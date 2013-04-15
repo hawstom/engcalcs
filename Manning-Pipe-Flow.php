@@ -1,6 +1,5 @@
 <?php 
-require_once ('path.inc.php');
-require_once (BASE_DIRECTORY.'lib/base.inc.php');
+require_once('../lib/edc.lib.php');
 $headerhtml='
 	<meta name="Description" content="'.$ec_lang['t_manningPipeFlowCalculator'].'" />
 	<meta name="Keywords" content="mannings sizing pipie pipes rate chezy-manning tubo tobus tubos calculac&iacute;on calcular calculacion calculation" />
