@@ -19,9 +19,9 @@ echoCalculatorForm(
 	Array(
 		Array('v',Array('mps','ftps','mph'),$ec_lang['d_velocity']),
 		Array('hv',Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'),$ec_lang['d_velocityHead']),
-		Array('hf',Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'),'Friction loss, H<sub>f</sub>'),
-		Array('hm',Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'),'Junction loss, H<sub>m</sub>'),
-		Array('hl',Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'),'Total loss, H<sub>l</sub>'),
+		Array('hf',Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'),$ec_lang['d_frictionLoss'], 'H<sub>f</sub>'),
+		Array('hm',Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'),$ec_lang['d_junctionLoss'], 'H<sub>m</sub>'),
+		Array('hl',Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'),$ec_lang['d_totalLoss'], 'H<sub>l</sub>'),
 	)
 );
 ?>
