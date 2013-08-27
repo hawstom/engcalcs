@@ -35,10 +35,7 @@ echoCalculatorForm(
 );
 ?>
 
- <div class="left"><p><a href="../contact.php"><?=$ec_lang['d_feedbackRequest']?></a></p></div>
-
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js">
-</script>
+<div class="left"><p><a href="../contact.php"><?=$ec_lang['d_feedbackRequest']?></a></p></div>
 
 <script type="text/javascript">
 function pageCalculator(f) {
@@ -72,10 +69,8 @@ function pageCalculator(f) {
 	q = v*a;
 	froude = v * Math.sqrt(t/(g * a * Math.cos(Math.atan(s0))));
 	tau = gammawater * y * s0;
-				$(document).ready(function(){
-						    $("#q");
-	 			  });
-	document.getElementById('q').innerHTML = (q * f['qu'].value).toFixed(4);
+	$("#q").html((q * f['qu'].value).toFixed(4));
+	//document.getElementById('q').innerHTML = (q * f['qu'].value).toFixed(4);
 	document.getElementById('v').innerHTML = (v * f['vu'].value).toFixed(4);
 	document.getElementById('hv').innerHTML = (hv * f['hvu'].value).toFixed(4);
 	document.getElementById('a').innerHTML = (a * f['au'].value).toFixed(4);
