@@ -9,7 +9,7 @@ echoHeader('EngCalcs',$ec_lang['t_manningTrapFlowCalculator']);
 echoCalculatorForm(
 	//Inputs
 	Array(
-		Array('b', Array('m', 'mm', 'ft', 'in'), $ec_lang['d_bottomWidth']),
+		Array('b', Array('m', 'mm', 'ft', 'in'), $ec_lang['d_bottomWidth']), 
 		Array('z1', NULL, $ec_lang['d_sideSlope1']),
 		Array('z2', NULL, $ec_lang['d_sideSlope2']), 
 		Array('n', NULL, '<span title="Typical roughness values for plastics, clay, and concrete range from 0.009 to 0.013">'.$ec_lang['d_manningRoughness'].' <a href="http://www.engineeringtoolbox.com/mannings-roughness-d_799.html">?</a></span>'),
