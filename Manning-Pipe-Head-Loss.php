@@ -1,31 +1,37 @@
 <?php 
 require_once ("../lib/edc.lib.php");
-echoHeader("EngCalcs",$ec_lang['t_manningPipeHeadLossCalculator']);
+$html_title = $ec_lang['mphl_main_title'];
+$html_head='
+	<meta name="Description" content="'. $html_title .'" />
+	<meta name="Keywords" content="mannings sizing pipie pipes rate chezy-manning tubo tobus tubos calculac&iacute;on calcular calculacion calculation" />
+';
+echoHeader("EngCalcs", $html_title, $html_head);
+
 ?>
-<h2><?php echo $ec_lang['d_manningPipeLossCalculator']; ?></h2>
-<p><a href="../contact.php"><?=$ec_lang['translationHelpWanted']?></a></p>
+<h2><?php echo $ec_lang['mphl_main_desc']; ?></h2>
+<p><a href="../contact.php"><?=$ec_lang['template_translation_help']?></a></p>
 
 <?php
 echoCalculatorForm(
 	//Inputs
 	Array(
-		Array('q',Array('m3ps','lps','ft3ps','gpm','mgd'),$ec_lang['d_flow']),
-		Array('d0',Array('m','mm','ft','in'),$ec_lang['d_pipeDiameter']),
-		Array('l',Array('m','mm','ft','in'),$ec_lang['d_pipeLength']),
-		Array('n',NULL,'<span title="Typical roughness values for plastics, clay, and concrete range from 0.009 to 0.013">'.$ec_lang['d_manningRoughness'].' <a href="http://www.engineeringtoolbox.com/mannings-roughness-d_799.html">?</a></span>'),
-		Array('k',NULL,$ec_lang['d_totalJunctionK']),
+		Array('q',Array('m3ps','lps','ft3ps','gpm','mgd'),$ec_lang['mpf_flow']),
+		Array('d0',Array('m','mm','ft','in'),$ec_lang['mpf_pipe_diameter']),
+		Array('l',Array('m','mm','ft','in'),$ec_lang['mphl_pipe_length']),
+		Array('n',NULL,'<span title="Typical roughness values for plastics, clay, and concrete range from 0.009 to 0.013">'.$ec_lang['mpf_manningRoughness'].' <a href="http://www.engineeringtoolbox.com/mannings-roughness-d_799.html">?</a></span>'),
+		Array('k',NULL,$ec_lang['mphl_total_junction_k']),
 ),
 	//Results
 	Array(
-		Array('v',Array('mps','ftps','mph'),$ec_lang['d_velocity']),
-		Array('hv',Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'),$ec_lang['d_velocityHead']),
-		Array('hf',Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'),$ec_lang['d_frictionLoss'], 'H<sub>f</sub>'),
-		Array('hm',Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'),$ec_lang['d_junctionLoss'], 'H<sub>m</sub>'),
-		Array('hl',Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'),$ec_lang['d_totalLoss'], 'H<sub>l</sub>'),
+		Array('v',Array('mps','ftps','mph'),$ec_lang['mpf_velocity']),
+		Array('hv',Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'),$ec_lang['mpf_velocity_head']),
+		Array('hf',Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'),$ec_lang['mphl_friction_loss'], 'H<sub>f</sub>'),
+		Array('hm',Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'),$ec_lang['mphl_junction_loss'], 'H<sub>m</sub>'),
+		Array('hl',Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'),$ec_lang['mphl_total_loss'], 'H<sub>l</sub>'),
 	)
 );
 ?>
-<div class="left"><p><a href="../contact.php"><?=$ec_lang['d_feedbackRequest']?></a></p></div>
+<div class="left"><p><a href="../contact.php"><?=$ec_lang['template_feedback']?></a></p></div>
 <script type="text/javascript">
 function pageCalculator(f) {
 	var q = f['q'].value / f['qu'].value,

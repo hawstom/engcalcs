@@ -1,45 +1,51 @@
 <?php 
 require_once ('../lib/edc.lib.php');
-echoHeader('EngCalcs',$ec_lang['t_manningTrapFlowCalculator']);
+$html_title = $ec_lang['mtc_main_title'];
+$html_head='
+	<meta name="Description" content="'. $html_title .'" />
+	<meta name="Keywords" content="wier vetedero calculac&iacute;on calcular calculacion calculation" />
+';
+echoHeader("EngCalcs", $html_title, $html_head);
+
 ?>
-<h2><?=$ec_lang['d_manningTrapFlowCalculator']?></h2>
-<p><a href="../contact.php"><?=$ec_lang['translationHelpWanted']?></a></p>
+<h2><?=$ec_lang['mtc_main_desc']?></h2>
+<p><a href="../contact.php"><?=$ec_lang['template_translation_help']?></a></p>
 
 <?php
 echoCalculatorForm(
 	//Inputs
 	Array(
-		Array('b', Array('m', 'mm', 'ft', 'in'), $ec_lang['d_bottomWidth']), 
-		Array('z1', NULL, $ec_lang['d_sideSlope1']),
-		Array('z2', NULL, $ec_lang['d_sideSlope2']), 
-		Array('n', NULL, '<span title="Typical roughness values for plastics, clay, and concrete range from 0.009 to 0.013">'.$ec_lang['d_manningRoughness'].' <a href="http://www.engineeringtoolbox.com/mannings-roughness-d_799.html">?</a></span>'),
-		Array('s0',  Array('grade', 'gradePercent'), $ec_lang['d_channelSlope']),
-		Array('y',  Array('m', 'mm', 'ft', 'in'), $ec_lang['d_flowDepth']),
+		Array('b', Array('m', 'mm', 'ft', 'in'), $ec_lang['mtc_bottom_width']), 
+		Array('z1', NULL, $ec_lang['mtc_side_slope_1']),
+		Array('z2', NULL, $ec_lang['mtc_side_slope_2']), 
+		Array('n', NULL, '<span title="Typical roughness values for plastics, clay, and concrete range from 0.009 to 0.013">'.$ec_lang['mpf_manningRoughness'].' <a href="http://www.engineeringtoolbox.com/mannings-roughness-d_799.html">?</a></span>'),
+		Array('s0',  Array('grade', 'gradePercent'), $ec_lang['mtc_channel_slope']),
+		Array('y',  Array('m', 'mm', 'ft', 'in'), $ec_lang['mtc_flow_depth']),
 		Array('beta', NULL, 'Bend Angle (for riprap sizing)'),
 		Array('sgrock', NULL, 'Stone specific gravity (2.65)')
 	),
 	//Results
 	Array(
-		Array('a', Array('m2', 'mm2', 'ft2', 'in2'), $ec_lang['d_flowArea']),
-		Array('pw', Array('m', 'mm', 'ft', 'in'), $ec_lang['d_wettedPerimeter']),
-		Array('rh', Array('m', 'mm', 'ft', 'in'), $ec_lang['d_hydraulicRadius']),
-		Array('v', Array('mps', 'ftps', 'mph'), $ec_lang['d_velocity']),
-		Array('q', Array('m3ps', 'lps', 'ft3ps', 'gpm', 'mgd'), $ec_lang['d_flow']),
-		Array('hv', Array('m', 'mm', 'ft', 'in'), $ec_lang['d_velocityHead']),
-		Array('t', Array('m', 'mm', 'ft', 'in'), $ec_lang['d_topWidth']),
-		Array('f', NULL, $ec_lang['d_froudeNumber']),
-		Array('tau', Array('npm2', 'psf'), $ec_lang['d_shearStress']),
-		Array('d50_strickler', Array('m', 'mm', 'ft', 'in'), '<span title="per Strickler (Adjust n so this equals your design lining size)">Implied riprap size based on n</span>'),
-		Array('d50_bottom', Array('m', 'mm', 'ft', 'in'), '<span title="per Isbash (1936), Robinson, and Maricopa County, Arizona, US">Required bottom angular riprap size, D50, Maricopa County</span>'),
-		Array('d50_z1', Array('m', 'mm', 'ft', 'in'), '<span title="per Isbash (1936), Robinson, and Maricopa County, Arizona, US">Required side slope 1 angular riprap size, D50, Maricopa County</span>'),
-		Array('d50_z2', Array('m', 'mm', 'ft', 'in'), '<span title="per Isbash (1936), Robinson, and Maricopa County, Arizona, US">Required side slope 2 angular riprap size, D50, Maricopa County</span>'),
-		Array('d50_mra', Array('m', 'mm', 'ft', 'in'), 'Required angular riprap size, D50, per Maynord, Ruff, and Abt (1989)'),
-		Array('d50_searcy', Array('m', 'mm', 'ft', 'in'), 'Required angular riprap size, D50, per Searcy (1967)'), 
+		Array('a', Array('m2', 'mm2', 'ft2', 'in2'), $ec_lang['mpf_flow_area']),
+		Array('pw', Array('m', 'mm', 'ft', 'in'), $ec_lang['mpf_wetted_perimeter']),
+		Array('rh', Array('m', 'mm', 'ft', 'in'), $ec_lang['mpf_hydraulic_radius']),
+		Array('v', Array('mps', 'ftps', 'mph'), $ec_lang['mpf_velocity']),
+		Array('q', Array('m3ps', 'lps', 'ft3ps', 'gpm', 'mgd'), $ec_lang['mpf_flow']),
+		Array('hv', Array('m', 'mm', 'ft', 'in'), $ec_lang['mpf_velocity_head']),
+		Array('t', Array('m', 'mm', 'ft', 'in'), $ec_lang['mpf_top_width']),
+		Array('f', NULL, $ec_lang['mpf_shear_stress']),
+		Array('tau', Array('npm2', 'psf'), $ec_lang['mpf_shear_stress']),
+		Array('d50_strickler', Array('m', 'mm', 'ft', 'in'), $ec_lang['mtc_d50_strickler']),
+		Array('d50_bottom', Array('m', 'mm', 'ft', 'in'), $ec_lang['mtc_d50_bottom']),
+		Array('d50_z1', Array('m', 'mm', 'ft', 'in'), $ec_lang['mtc_d50_z1']),
+		Array('d50_z2', Array('m', 'mm', 'ft', 'in'), $ec_lang['mtc_d50_z2']),
+		Array('d50_mra', Array('m', 'mm', 'ft', 'in'), $ec_lang['mtc_d50_mra']),
+		Array('d50_searcy', Array('m', 'mm', 'ft', 'in'), $ec_lang['mtc_d50_searcy']), 
 	)
 );
 ?>
 
-<div class="left"><p><a href="../contact.php"><?=$ec_lang['d_feedbackRequest']?></a></p></div>
+<div class="left"><p><a href="../contact.php"><?=$ec_lang['template_feedback']?></a></p></div>
 <script type="text/javascript">
 var pageCalculator = function(f) {
 	var

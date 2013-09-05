@@ -1,23 +1,30 @@
 <?php 
 require_once ("../lib/edc.lib.php");
-echoHeader("EngCalcs",$ec_lang['t_simpleWeirFlowCalculator']);
+$html_title = $ec_lang['ws_main_title'];
+$html_head='
+	<meta name="Description" content="'. $html_title .'" />
+	<meta name="Keywords" content="wier vetedero calculac&iacute;on calcular calculacion calculation" />
+';
+echoHeader("EngCalcs", $html_title, $html_head);
+
 ?>
-<p><a href="../contact.php"><?=$ec_lang['translationHelpWanted']?></a></p>
+<h2><?=$ec_lang['ws_main_desc']?></h2>
+<p><a href="../contact.php"><?=$ec_lang['template_translation_help']?></a></p>
 <form name="formInput" action="javascript:calcAndSave(document.forms.formInput, 'Weir-Flow-Simple')" method="post">
 	<div>
-		<input type="text" size="6" name="l" id="l" /> <?=$ec_lang['d_weirLength']?><br /><br />
-		<input type="text" size="6" name="h" id="h" /> <?=$ec_lang['d_headWaterHeight']?><br /><br />
-		<input type="text" size="6" name="cw" id="cw" /> <?=$ec_lang['d_weirCoefficient']?><br /><br />
-		<input type="submit" name="Submit" value="<?=$ec_lang['t_saveAndCalculate']?>" />
+		<input type="text" size="6" name="l" id="l" /> <?=$ec_lang['ws_weirLength']?><br /><br />
+		<input type="text" size="6" name="h" id="h" /> <?=$ec_lang['ws_headWaterHeight']?><br /><br />
+		<input type="text" size="6" name="cw" id="cw" /> <?=$ec_lang['ws_weirCoefficient']?><br /><br />
+		<input type="submit" name="Submit" value="<?=$ec_lang['wi_save_and_calculate']?>" />
 	</div>
 </form>
 <div>
-<?=$ec_lang['t_results']?>
+<?=$ec_lang['calc_results']?>
 	<table>
-		<tr><td><?=$ec_lang['d_flow']?></td><td id="q"><?=$ec_lang['d_flow']?></td></tr>
+		<tr><td><?=$ec_lang['mpf_flow']?></td><td id="q"><?=$ec_lang['mpf_flow']?></td></tr>
 	</table>
 </div>
-<p><a href="../contact.php"><?=$ec_lang['d_feedbackRequest']?></a></p>
+<p><a href="../contact.php"><?=$ec_lang['template_feedback']?></a></p>
 <h2>Notes</h2>
 <dl>
 <dt>Weir Equation</dt><dd>q = cw * length * h<sup>1.5</sup></dd>

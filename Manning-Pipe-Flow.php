@@ -1,41 +1,41 @@
 <?php 
 require_once('../lib/edc.lib.php');
-$headerhtml='
-	<meta name="Description" content="'.$ec_lang['t_manningPipeFlowCalculator'].'" />
+$html_title = $ec_lang['mpf_main_title'];
+$html_head='
+	<meta name="Description" content="'. $html_title .'" />
 	<meta name="Keywords" content="mannings sizing pipie pipes rate chezy-manning tubo tobus tubos calculac&iacute;on calcular calculacion calculation" />
-	<title>'.$ec_lang['t_manningPipeFlowCalculator'].'</title>
 ';
-echoHeader("EngCalcsSEO",$headerhtml);
+echoHeader("EngCalcs", $html_title, $html_head);
 
 ?>
-<h2><?=$ec_lang['d_manningPipeFlowCalculator']?></h2>
-<p><a href="../contact.php"><?=$ec_lang['translationHelpWanted']?></a></p>
+<h2><?=$ec_lang['mpf_main_desc']?></h2>
+<p><a href="../contact.php"><?=$ec_lang['template_translation_help']?></a></p>
 
 <?php
 echoCalculatorForm(
 	//Inputs
 	Array(
-		Array('d0',Array('m','mm','ft','in'),$ec_lang['d_pipeDiameter']),
-		Array('n',NULL,'<span title="Typical roughness values for plastics, clay, and concrete range from 0.009 to 0.013">'.$ec_lang['d_manningRoughness'].' <a href="http://www.engineeringtoolbox.com/mannings-roughness-d_799.html">?</a></span>'),
-		Array('s0',Array('grade','gradePercent'),$ec_lang['d_frictionSlope']),
-		Array('dd0',Array('depthFrac','depthPercent'),$ec_lang['d_depthRatio']),
+		Array('d0',Array('m','mm','ft','in'),$ec_lang['mpf_pipe_diameter']),
+		Array('n',NULL,'<span title="Typical roughness values for plastics, clay, and concrete range from 0.009 to 0.013">'.$ec_lang['mpf_manningRoughness'].' <a href="http://www.engineeringtoolbox.com/mannings-roughness-d_799.html">?</a></span>'),
+		Array('s0',Array('grade','gradePercent'),$ec_lang['mpf_friction_slope']),
+		Array('dd0',Array('depthFrac','depthPercent'),$ec_lang['mpf_depth_ratio']),
 	),
 	//Results
 	Array(
-		Array('q',Array('m3ps','lps','ft3ps','gpm','mgd'),$ec_lang['d_flow']),
-		Array('v',Array('mps','ftps','mph'),$ec_lang['d_velocity']),
-		Array('hv',Array('m','mm','ft','in'),$ec_lang['d_velocityHead']),
-		Array('a',Array('m2','mm2','ft2','in2'),$ec_lang['d_flowArea']),
-		Array('pw',Array('m','mm','ft','in'),$ec_lang['d_wettedPerimeter']),
-		Array('rh',Array('m','mm','ft','in'),$ec_lang['d_hydraulicRadius']),
-		Array('t',Array('m','mm','ft','in'),$ec_lang['d_topWidth']),
-		Array('f',NULL,$ec_lang['d_froudeNumber']),
-		Array('tau',Array('npm2','psf'),$ec_lang['d_shearStress']),
+		Array('q',Array('m3ps','lps','ft3ps','gpm','mgd'),$ec_lang['mpf_flow']),
+		Array('v',Array('mps','ftps','mph'),$ec_lang['mpf_velocity']),
+		Array('hv',Array('m','mm','ft','in'),$ec_lang['mpf_velocity_head']),
+		Array('a',Array('m2','mm2','ft2','in2'),$ec_lang['mpf_flow_area']),
+		Array('pw',Array('m','mm','ft','in'),$ec_lang['mpf_wetted_perimeter']),
+		Array('rh',Array('m','mm','ft','in'),$ec_lang['mpf_hydraulic_radius']),
+		Array('t',Array('m','mm','ft','in'),$ec_lang['mpf_top_width']),
+		Array('f',NULL,$ec_lang['mpf_shear_stress']),
+		Array('tau',Array('npm2','psf'),$ec_lang['mpf_shear_stress']),
 	)
 );
 ?>
 
-<div class="left"><p><a href="../contact.php"><?=$ec_lang['d_feedbackRequest']?></a></p></div>
+<div class="left"><p><a href="../contact.php"><?=$ec_lang['template_feedback']?></a></p></div>
 
 <script type="text/javascript">
 function pageCalculator(f) {
