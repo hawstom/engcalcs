@@ -25,9 +25,9 @@ echoHeader("EngCalcs", $html_title, $html_head);
 	</table>
 </div>
 <p><a href="../contact.php"><?=$ec_lang['template_feedback']?></a></p>
-<h2>Notes</h2>
+<h2><?=$ec_lang['ws_notes_heading']?></h2>$ec_lang['ws_notes_heading']
 <dl>
-<dt>Weir Equation</dt><dd>q = cw * length * h<sup>1.5</sup></dd>
+<dt><?=$ec_lang['ws_notes_we_term']?></dt><dd>q = cw * l * h<sup>1.5</sup></dd>
 </dl>
 <script type="text/javascript">
 <!--

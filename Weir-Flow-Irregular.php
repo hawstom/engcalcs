@@ -35,15 +35,15 @@ echoHeader("EngCalcs", $html_title, $html_head);
 	<br />
 	<input type="submit" name="Submit" value="<?=$ec_lang['wi_save_and_calculate']?>" /> 
 	<!--<input type="submit" name="Submit" value="Load and Calculate" /> --> 
-	<?=$ec_lang['or']?> 
+	<?=$ec_lang['wi_or_adjust']?> 
 	<a href="javascript:addStation('','')">+</a>/<a href="javascript:deleteStation()">-</a> <?=$ec_lang['wi_n_rows']?>
 	<br />
 	</div>
 </form>
 <p><a href="../contact.php"><?=$ec_lang['template_feedback']?></a></p>
-<h2>Notes</h2>
+<h2><?=$ec_lang['wi_or_adjust']?></h2>
 <dl>
-<dt>Weir Equation</dt><dd>q = if (length = 0) then 0 else if (slope=0) then cw*length*d0<sup>1.5</sup> else cw/(2.5*slope) * (d0<sup>2.5</sup> - d1<sup>2.5</sup>) where d1 and d0 are always positive or zero</dd>
+<dt><?=$ec_lang['wi_or_adjust']?></dt><dd>q = if (length = 0) then 0 else if (slope=0) then cw*length*d0<sup>1.5</sup> else cw/(2.5*slope) * (d0<sup>2.5</sup> - d1<sup>2.5</sup>) where d1 and d0 are always positive or zero</dd>
 </dl>
 <script type="text/javascript">
 <!--
