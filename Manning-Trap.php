@@ -33,7 +33,7 @@ echoCalculatorForm(
 		Array('q', Array('m3ps', 'lps', 'ft3ps', 'gpm', 'mgd'), $ec_lang['mpf_flow']),
 		Array('hv', Array('m', 'mm', 'ft', 'in'), $ec_lang['mpf_velocity_head']),
 		Array('t', Array('m', 'mm', 'ft', 'in'), $ec_lang['mpf_top_width']),
-		Array('f', NULL, $ec_lang['mpf_shear_stress']),
+		Array('f', NULL, $ec_lang['mpf_froude_number']),
 		Array('tau', Array('npm2', 'psf'), $ec_lang['mpf_shear_stress']),
 		Array('d50_strickler', Array('m', 'mm', 'ft', 'in'), $ec_lang['mtc_d50_strickler']),
 		Array('d50_bottom', Array('m', 'mm', 'ft', 'in'), $ec_lang['mtc_d50_bottom']),

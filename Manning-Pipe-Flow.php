@@ -29,7 +29,7 @@ echoCalculatorForm(
 		Array('pw',Array('m','mm','ft','in'),$ec_lang['mpf_wetted_perimeter']),
 		Array('rh',Array('m','mm','ft','in'),$ec_lang['mpf_hydraulic_radius']),
 		Array('t',Array('m','mm','ft','in'),$ec_lang['mpf_top_width']),
-		Array('f',NULL,$ec_lang['mpf_shear_stress']),
+		Array('f',NULL,$ec_lang['mpf_froude_number']),
 		Array('tau',Array('npm2','psf'),$ec_lang['mpf_shear_stress']),
 	)
 );
