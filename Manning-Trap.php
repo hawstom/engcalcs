@@ -21,7 +21,7 @@ echoCalculatorForm(
 		Array('n', NULL, '<span title="Typical roughness values for plastics, clay, and concrete range from 0.009 to 0.013">'.$ec_lang['mpf_manningRoughness'].' <a href="http://www.engineeringtoolbox.com/mannings-roughness-d_799.html">?</a></span>'),
 		Array('s0',  Array('grade', 'gradePercent'), $ec_lang['mtc_channel_slope']),
 		Array('y',  Array('m', 'mm', 'ft', 'in'), $ec_lang['mtc_flow_depth']),
-		Array('beta', NULL, 'Bend Angle (for riprap sizing)'),
+		Array('beta', NULL, 'Bend Angle<a href="/riprap-bend-angle.png">?</a> (for riprap sizing)'),
 		Array('sgrock', NULL, 'Stone specific gravity (2.65)')
 	),
 	//Results
@@ -109,10 +109,12 @@ var pageCalculator = function(f) {
 	document.getElementById('d50_searcy').innerHTML = (d50_searcy * f['d50_searcyu'].value).toFixed(2);
 };
 var riprap_size = function(y, a, hv, z, s0, c, sgrock) {
-	var d50;
+	var 
+	d50,
+	hvmax = hv * 1.33 * 1.33;
 	if (s0 < 0.02) {
 		// Isbash
-		d50 = hv / (c * c * Math.cos(Math.atan(1 / z)) * (sgrock - 1));
+		d50 = hvmax / (c * c * Math.cos(Math.atan(1 / z)) * (sgrock - 1));
 	} else if (s0 < 0.1) {
 		// Robinson
 		d50 = 1.413 * Math.pow(a / y, 0.529) * Math.pow(s0, 0.794);
