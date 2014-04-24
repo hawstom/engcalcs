@@ -69,8 +69,7 @@ function pageCalculator(f) {
 	q = v*a;
 	froude = v * Math.sqrt(t/(g * a * Math.cos(Math.atan(s0))));
 	tau = gammawater * y * s0;
-	$("#q").html((q * f['qu'].value).toFixed(4));
-	//document.getElementById('q').innerHTML = (q * f['qu'].value).toFixed(4);
+	document.getElementById('q').innerHTML = (q * f['qu'].value).toFixed(4);
 	document.getElementById('v').innerHTML = (v * f['vu'].value).toFixed(4);
 	document.getElementById('hv').innerHTML = (hv * f['hvu'].value).toFixed(4);
 	document.getElementById('a').innerHTML = (a * f['au'].value).toFixed(4);

@@ -13,6 +13,8 @@ echoHeader("EngCalcs", $html_title, $html_head);
 
 <form name="formweir" action="javascript:weirCalcs()"  method="post">
 	<div>
+    <input type="text" style="font-size: 2em; width: 98%" placeholder="Printable Title" /><br />
+    <input type="text" style="font-size: 1.5em; width: 98%" placeholder="Printable Subtitle" />
 	<input type="text" size="6" name="hw" /> <?=$ec_lang['wi_headWaterelevation']?>, (<?php echo $ec_lang['u_ft'].' '.$ec_lang['or'].' '. 	$ec_lang['u_m'];?>)<br /><br />
 	<input type="text" size="6" name="cw" /> <?=$ec_lang['ws_weirCoefficient']?><br /><br />
 	<table id="CalcsTable" cellspacing="0" border="1">

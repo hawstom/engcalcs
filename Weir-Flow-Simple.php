@@ -12,6 +12,8 @@ echoHeader("EngCalcs", $html_title, $html_head);
 <p><a href="../contact.php"><?=$ec_lang['template_translation_help']?></a></p>
 <form name="formInput" action="javascript:calcAndSave(document.forms.formInput, 'Weir-Flow-Simple')" method="post">
 	<div>
+        <input type="text" style="font-size: 2em; width: 98%" placeholder="Printable Title" /><br />
+        <input type="text" style="font-size: 1.5em; width: 98%" placeholder="Printable Subtitle" />
 		<input type="text" size="6" name="l" id="l" /> <?=$ec_lang['ws_weirLength']?><br /><br />
 		<input type="text" size="6" name="h" id="h" /> <?=$ec_lang['ws_headWaterHeight']?><br /><br />
 		<input type="text" size="6" name="cw" id="cw" /> <?=$ec_lang['ws_weirCoefficient']?><br /><br />
