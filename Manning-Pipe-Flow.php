@@ -11,8 +11,6 @@ echoHeader("EngCalcs", $html_title, $html_head);
 <h2><?=$ec_lang['mpf_main_desc']?></h2>
 <p><a href="../contact.php"><?=$ec_lang['template_translation_help']?></a></p>
 
-<div id="sketch"></div>
-
 <?php
 echoCalculatorForm(
     //Inputs
@@ -36,6 +34,8 @@ echoCalculatorForm(
     )
 );
 ?>
+
+<div id="sketch"></div>
 
 <div class="left"><p><a href="../contact.php"><?=$ec_lang['template_feedback']?></a></p></div>
 
