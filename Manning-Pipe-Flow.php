@@ -65,6 +65,13 @@ function pageCalculator(f) {
     pw = theta * d0;
     rh = d0 / (4 * theta) * (theta - Math.sin(theta) * Math.cos(theta));
     t = d0 * Math.sin(theta);
+
+    v = c/n*Math.pow(rh,2/3)*Math.pow(s0,0.5);
+    hv = v * v / (2 * g);
+    q = v*a;
+    froude = v * Math.sqrt(t/(g * a * Math.cos(Math.atan(s0))));
+    tau = gammawater * y * s0;
+
     // Sketch
     gcr = 50; // Pipe circle radius
     gh = 3 * gcr; // SVG height
@@ -78,12 +85,6 @@ function pageCalculator(f) {
     gty = gly - gcr/4;
     gtx1 = gcx - gcr/8;
     gtx2 = gcx + gcr/8
-
-    v = c/n*Math.pow(rh,2/3)*Math.pow(s0,0.5);
-    hv = v * v / (2 * g);
-    q = v*a;
-    froude = v * Math.sqrt(t/(g * a * Math.cos(Math.atan(s0))));
-    tau = gammawater * y * s0;
 
     document.getElementById('q').innerHTML = (q * f['qu'].value).toFixed(4);
     document.getElementById('v').innerHTML = (v * f['vu'].value).toFixed(4);
