@@ -104,7 +104,7 @@ function pageCalculator(f) {
             gcx + ',' + gly + ' ' +
             gtx1 + ',' + gty + ' ' +
             gtx2 + ',' + gty + '" ' +
-            'style="fill:white;stroke:black;stroke-width:' + gcr/25 + '" />' +
+            'style="fill:white;stroke:black;stroke-width:' + gcr/50 + '" />' +
             'Sorry, your browser does not support inline SVG.' +
         '</svg>';
 }

@@ -102,14 +102,16 @@ var pageCalculator = function(f) {
     gt = Math.min(garmax, gar) * gymax; // Graphic flow width
     gs = gt/t; // Graphic scale
     gy = gs * y;
-    gh = gymax * 1.5; // SVG height
+    gh = gy + gymax/2; // SVG height
+    gyb = gy + gymax/4 // Bottom of flow
+    gyt = gymax/4 // Top of flow
     gw = gt; // SVG width
     gxb1 = z1 * y * gs;
     gxb2 = gxb1 + b * gs;
     gxm = gw/2;
     gtx1 = gxm - gymax/16;
     gtx2 = gxm + gymax/16;
-    gty = gh - gy - gymax/8;
+    gty = gyt - gymax/8;
 
     //document.getElementById('q').innerHTML = (q * f['qu'].value).toFixed(2);
     document.getElementById('v').innerHTML = (v * f['vu'].value).toFixed(2);
@@ -129,17 +131,17 @@ var pageCalculator = function(f) {
     document.getElementById('sketch').innerHTML =
         '<svg height="' + gh + '" width="' + gw + '">' +
             '<polyline points="' +
-            '0,' + (gh - gy)  + ' ' +
-            gxb1 + ',' + gh + ' ' +
-            gxb2 + ',' + gh + ' ' +
-            gt + ',' + (gh - gy) + '" ' +
+            '0,' + gyt  + ' ' +
+            gxb1 + ',' + gyb + ' ' +
+            gxb2 + ',' + gyb + ' ' +
+            gt + ',' + gyt + '" ' +
             'style="fill:none;stroke:black;stroke-width:' + gymax/25 + '" />' +
-            '<line x1="0" y1="' + (gh - gy)  + '" x2="' + gt + '" y2="' + (gh - gy)  + '" style="stroke:rgb(0,0,255);stroke-width:' + gymax/25 + '" />' +
+            '<line x1="0" y1="' + gyt  + '" x2="' + gt + '" y2="' + gyt  + '" style="stroke:rgb(0,0,255);stroke-width:' + gymax/25 + '" />' +
             '<polygon points="' +
-            gxm + ',' + (gh - gy) + ' ' +
+            gxm + ',' + gyt + ' ' +
             gtx1 + ',' + gty + ' ' +
             gtx2 + ',' + gty + '" ' +
-            'style="fill:white;stroke:black;stroke-width:' + gymax/25 + '" />' +
+            'style="fill:white;stroke:black;stroke-width:' + gymax/50 + '" />' +
             'Sorry, your browser does not support inline SVG.' +
         '</svg>';
 };
