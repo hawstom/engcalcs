@@ -21,7 +21,7 @@ echoCalculatorForm(
         Array('n', NULL, '<span title="Typical roughness values for plastics, clay, and concrete range from 0.009 to 0.013">'.$ec_lang['mpf_manningRoughness'].' <a href="http://www.engineeringtoolbox.com/mannings-roughness-d_799.html">?</a></span>'),
         Array('s0',  Array('grade', 'gradePercent'), $ec_lang['mtc_channel_slope']),
         Array('y',  Array('m', 'mm', 'ft', 'in'), $ec_lang['mtc_flow_depth']),
-        Array('beta', NULL, 'Bend Angle<a href="/riprap-bend-angle.png">?</a> (for riprap sizing)'),
+        Array('beta', NULL, 'Bend Angle<a href="/riprap-bend-angle.png" title="Click for image">?</a> (for riprap sizing)'),
         Array('sgrock', NULL, 'Stone specific gravity (2.65)')
     ),
     //Results
