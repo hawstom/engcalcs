@@ -1,5 +1,6 @@
 <?php
 require_once('../lib/edc.lib.php');
+//phpinfo();
 $html_title = $ec_lang['mpf_main_title'];
 $html_head='
     <meta name="Description" content="'. $html_title .'" />
