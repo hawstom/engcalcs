@@ -87,12 +87,12 @@ var pageCalculator = function(f) {
     froude = v * Math.sqrt(t/(g * a * Math.cos(Math.atan(s0))));
     tau = gammawater * y * s0;
     c_isbash = (beta <= 30) ? 1.2 : 0.86;
-    d50_strickler = Math.pow(n * 21.2, 6);
+    d50_strickler = Math.pow(n * 21.2, 6); // n = 0.047 D ^ (1/6)
     d50_mra = 0.031 * Math.pow(v, 2.5) / (Math.pow(sgrock - 1, 0.25) * Math.pow(y, 0.25) * ((beta <= 30) ? 1 : 1.5));
     d50_searcy = 0.022 * v * v;
-    d50_bottom = riprap_size(y, a, hv, 1000, s0, c_isbash, sgrock);
-    d50_z1 = riprap_size(y, a, hv, z1, s0, c_isbash, sgrock);
-    d50_z2 = riprap_size(y, a, hv, z2, s0, c_isbash, sgrock);
+    d50_bottom = mc_riprap_size(y, a, v, g, 1000, s0, c_isbash, sgrock);
+    d50_z1 = mc_riprap_size(y, a, v, g, z1, s0, c_isbash, sgrock);
+    d50_z2 = mc_riprap_size(y, a, v, g, z2, s0, c_isbash, sgrock);
     $("#q").html((q * f['qu'].value).toFixed(4));
 
     // Sketch
@@ -145,19 +145,19 @@ var pageCalculator = function(f) {
             'Sorry, your browser does not support inline SVG.' +
         '</svg>';
 };
-var riprap_size = function(y, a, hv, z, s0, c, sgrock) {
+var mc_riprap_size = function(y, a, v, g, z, s0, c, sgrock) {
     var
     d50,
-    hvmax = hv * 1.33 * 1.33;
+    hvmax = v * v * 1.33 * 1.33 / (2 * g) ;
     if (s0 < 0.02) {
         // Isbash
         d50 = hvmax / (c * c * Math.cos(Math.atan(1 / z)) * (sgrock - 1));
     } else if (s0 < 0.1) {
-        // Robinson
-        d50 = 1.413 * Math.pow(a / y, 0.529) * Math.pow(s0, 0.794);
+        // Robinson unit q = v * y corrected 2015-10-17
+        d50 = 1.413 * Math.pow(v * y, 0.529) * Math.pow(s0, 0.794);
     } else if (s0 < 0.4) {
         // Robinson
-        d50 = 0.4623 * Math.pow(a / y, 0.529) * Math.pow(s0, 0.307);
+        d50 = 0.4623 * Math.pow(v * y, 0.529) * Math.pow(s0, 0.307);
     } else {
         d50 = '-';
     }
