@@ -24,7 +24,7 @@ echoHeader("EngCalcs", $html_title, $html_head);
 			</tr>
 			<tr>
 				<th><?=$ec_lang['wi_station']?></th>
-				<th><?=$ec_lang['elevation']?></th>
+				<th><?=$ec_lang['wi_elevation']?></th>
 				<th width="100pt"><?=$ec_lang['wi_pondingHeight']?></th>
 				<th width="100pt"><?=$ec_lang['wi_incrementalFlow']?></th>
 				<th width="100pt"><?=$ec_lang['wi_cumulativeFlow']?></th>
@@ -43,9 +43,9 @@ echoHeader("EngCalcs", $html_title, $html_head);
 	</div>
 </form>
 <p><a href="../contact.php"><?=$ec_lang['template_feedback']?></a></p>
-<h2><?=$ec_lang['wi_or_adjust']?></h2>
+<h2><?=$ec_lang['wi_notes']?></h2>
 <dl>
-<dt><?=$ec_lang['wi_or_adjust']?></dt><dd>q = if (length = 0) then 0 else if (slope=0) then cw*length*d0<sup>1.5</sup> else cw/(2.5*slope) * (d0<sup>2.5</sup> - d1<sup>2.5</sup>) where d1 and d0 are always positive or zero</dd>
+<dt><?=$ec_lang['wi_notes_we_term']?></dt><dd><?=$ec_lang['wi_notes_we_def']?></dd>
 </dl>
 <script type="text/javascript">
 <!--
