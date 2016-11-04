@@ -15,7 +15,7 @@ echoHeader("EngCalcs", $html_title, $html_head);
 echoCalculatorForm(
 	//Inputs
 	Array(
-		Array('q',Array('m3ps','lps','ft3ps','gpm','mgd'),$ec_lang['mpf_flow']),
+		Array('q',Array('m3ps','lps','mld','ft3ps','gpm','mgd'),$ec_lang['mpf_flow']),
 		Array('d0',Array('m','mm','ft','in'),$ec_lang['mpf_pipe_diameter']),
 		Array('l',Array('m','mm','ft','in'),$ec_lang['mphl_pipe_length']),
 		Array('n',NULL,'<span title="Typical roughness values for plastics, clay, and concrete range from 0.009 to 0.013">'.$ec_lang['mpf_manningRoughness'].' <a href="http://www.engineeringtoolbox.com/mannings-roughness-d_799.html">?</a></span>'),

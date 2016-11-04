@@ -30,7 +30,7 @@ echoCalculatorForm(
         Array('pw', Array('m', 'mm', 'ft', 'in'), $ec_lang['mpf_wetted_perimeter']),
         Array('rh', Array('m', 'mm', 'ft', 'in'), $ec_lang['mpf_hydraulic_radius']),
         Array('v', Array('mps', 'ftps', 'mph'), $ec_lang['mpf_velocity']),
-        Array('q', Array('m3ps', 'lps', 'ft3ps', 'gpm', 'mgd'), $ec_lang['mpf_flow']),
+        Array('q', Array('m3ps', 'lps', 'mld', 'ft3ps', 'gpm', 'mgd'), $ec_lang['mpf_flow']),
         Array('hv', Array('m', 'mm', 'ft', 'in'), $ec_lang['mpf_velocity_head']),
         Array('t', Array('m', 'mm', 'ft', 'in'), $ec_lang['mpf_top_width']),
         Array('f', NULL, $ec_lang['mpf_froude_number']),

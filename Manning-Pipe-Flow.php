@@ -23,7 +23,7 @@ echoCalculatorForm(
     ),
     //Results
     Array(
-        Array('q',Array('m3ps','lps','ft3ps','gpm','mgd'),$ec_lang['mpf_flow']),
+        Array('q',Array('m3ps','lps','mld','ft3ps','gpm','mgd'),$ec_lang['mpf_flow']),
         Array('v',Array('mps','ftps','mph'),$ec_lang['mpf_velocity']),
         Array('hv',Array('m','mm','ft','in'),$ec_lang['mpf_velocity_head']),
         Array('a',Array('m2','mm2','ft2','in2'),$ec_lang['mpf_flow_area']),
