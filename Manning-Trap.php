@@ -21,8 +21,8 @@ echoCalculatorForm(
         Array('n', NULL, '<span title="Typical roughness values for plastics, clay, and concrete range from 0.009 to 0.013">'.$ec_lang['mpf_manningRoughness'].' <a href="http://www.engineeringtoolbox.com/mannings-roughness-d_799.html">?</a></span>'),
         Array('s0',  Array('grade', 'gradePercent'), $ec_lang['mtc_channel_slope']),
         Array('y',  Array('m', 'mm', 'ft', 'in'), $ec_lang['mtc_flow_depth']),
-        Array('beta', NULL, 'Bend Angle<a href="/riprap-bend-angle.png" title="Click for image">?</a> (for riprap sizing)'),
-        Array('sgrock', NULL, 'Stone specific gravity (2.65)')
+        Array('beta', NULL, $ec_lang['mtc_bend_angle']),
+        Array('sgrock', NULL, $ec_lang['mtc_sgrock'])
     ),
     //Results
     Array(
@@ -93,7 +93,6 @@ var pageCalculator = function(f) {
     d50_bottom = mc_riprap_size(y, a, v, g, 1000, s0, c_isbash, sgrock);
     d50_z1 = mc_riprap_size(y, a, v, g, z1, s0, c_isbash, sgrock);
     d50_z2 = mc_riprap_size(y, a, v, g, z2, s0, c_isbash, sgrock);
-    $("#q").html((q * f['qu'].value).toFixed(4));
 
     // Sketch
     gymax = 100; // Max graphic flow depth
@@ -113,7 +112,7 @@ var pageCalculator = function(f) {
     gtx2 = gxm + gymax/16;
     gty = gyt - gymax/8;
 
-    //document.getElementById('q').innerHTML = (q * f['qu'].value).toFixed(2);
+    document.getElementById('q').innerHTML = (q * f['qu'].value).toFixed(2);
     document.getElementById('v').innerHTML = (v * f['vu'].value).toFixed(2);
     document.getElementById('hv').innerHTML = (hv * f['hvu'].value).toFixed(2);
     document.getElementById('a').innerHTML = (a * f['au'].value).toFixed(2);
