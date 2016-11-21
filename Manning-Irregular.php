@@ -139,8 +139,11 @@ var pageCalculator = function (f) {
 	row,
 	station0,
 	station1,
+	arrStation = [],
 	elev0,
 	elev1,
+	arrElev = [],
+	objSketchSegment,
 	n1,
 	d0,
 	d1,
@@ -162,7 +165,9 @@ var pageCalculator = function (f) {
 	for (var station=0; station < numCalcRows; station++) {
 		row = document.getElementById("CalcsBody").getElementsByTagName('tr')[station];
 		station1 = row.getElementsByTagName( 'input' )[0].value / f['stationu'].value;
-		elev1 = row.getElementsByTagName( 'input' )[1].value / f['elevationu'].value;
+		arrStation.push(station1);
+		elev1 = row.getElementsByTagName('input')[1].value / f['elevationu'].value;
+		arrElev.push(elev1);
 		d1=Math.max(ws-elev1,0);
 		dmax = Math.max(dmax,d1);
 		
@@ -179,6 +184,14 @@ var pageCalculator = function (f) {
 			Manning.pw = (Manning.a == 0) ? 0 : (s == 0) ? l :  Math.abs(wedgeWettedPerimeter(d0, s) - wedgeWettedPerimeter(d1, s));
 			pwc = pwc + Manning.pw;
 			Manning.t = l*Manning.pw/hypotenuse;
+			objSketchSegment = {
+				sectionX1: station0,
+				sectionX2: station1,
+				sectionY1: elev0,
+				sectionY2: elev1,
+				WSX1: (s >= 0) ? station0 : (station1 - Manning.t),
+				WSX2: (s <= 0) ? station1 : (station0 + Manning.t),
+			}
 			topwidthc = topwidthc + Manning.t;
 			Manning.recalc();
 			qc = qc + Manning.q;
@@ -228,23 +241,26 @@ var pageCalculator = function (f) {
 	document.getElementById('d50_steepest').innerHTML = (d50_z1 * f['d50_steepestu'].value).toFixed(2);
 	document.getElementById('d50_mra').innerHTML = (d50_mra * f['d50_mrau'].value).toFixed(2);
 	document.getElementById('d50_searcy').innerHTML = (d50_searcy * f['d50_searcyu'].value).toFixed(2);
-	
+*/	
 	// Sketch
-	gymax = 100; // Max graphic flow depth
-	garmax = 6; // Max graphic aspect ratio
-	gar = t/y; // Flow aspect ratio
-	gt = Math.min(garmax, gar) * gymax; // Graphic flow width
-	gs = gt/t; // Graphic scale
-	gy = gs * y;
-	gh = gy + gymax/2; // SVG height
-	gyb = gy + gymax/4 // Bottom of flow
-	gyt = gymax/4 // Top of flow
-	gw = gt; // SVG width
-	gxb1 = z1 * y * gs;
-	gxb2 = gxb1 + b * gs;
-	gxm = gw/2;
-	gtx1 = gxm - gymax/16;
-	gtx2 = gxm + gymax/16;
+	var
+	lt = Math.max(...arrStation) - Math.min(...arrStation),
+	ht = Math.max(...arrElev, ws) - Math.min(...arrStation),
+	gymax = 100, // Max graphic flow depth
+	garmax = 6, // Max graphic aspect ratio
+	gar = lt/ht, // Section aspect ratio
+	glt = Math.min(garmax, gar) * gymax, // Graphic width
+	gs = glt/lt;/*, // Graphic scale
+	gy = gs * y,
+	gh = gy + gymax/2, // SVG height
+	gyb = gy + gymax/4, // Bottom of flow
+	gyt = gymax/4, // Top of flow
+	gw = gt, // SVG width
+	gxb1 = z1 * y * gs,
+	gxb2 = gxb1 + b * gs,
+	gxm = gw/2,
+	gtx1 = gxm - gymax/16,
+	gtx2 = gxm + gymax/16,
 	gty = gyt - gymax/8;
 
 	document.getElementById('sketch').innerHTML =
@@ -265,7 +281,6 @@ var pageCalculator = function (f) {
 		'</svg>';
 */
 	adjustInputWidth(f);
-	// Save a cookie for next time
 };
 var Manning = {};
 

@@ -98,7 +98,7 @@ var weirCalcs = function (f) {
 	}
 	// Save a cookie for next time
 	adjustInputWidth(f);
-	createCookie("Segmented-Weir-Flow",cookie,36000);
+	createCookie("Weir-Flow-Irregular",cookie,36000);
 };
 
 var addWeirStation = function (station, elevation) {
