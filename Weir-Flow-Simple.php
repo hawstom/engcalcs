@@ -9,7 +9,7 @@ echoHeader("EngCalcs", $html_title, $html_head);
 
 ?>
 <h2><?=$ec_lang['ws_main_desc']?></h2>
-<p><a href="../contact.php"><?=$ec_lang['template_translation_help']?></a></p>
+<?php echoHelpWanted(); ?>
 <form name="formInput" action="javascript:calcAndSave(document.forms.formInput, 'Weir-Flow-Simple')" method="post">
 	<div>
         <input type="text" style="font-size: 2em; width: 98%" placeholder="Printable Title" /><br />
@@ -26,7 +26,7 @@ echoHeader("EngCalcs", $html_title, $html_head);
 		<tr><td><?=$ec_lang['mpf_flow']?></td><td id="q"><?=$ec_lang['mpf_flow']?></td></tr>
 	</table>
 </div>
-<p><a href="../contact.php"><?=$ec_lang['template_feedback']?></a></p>
+<?php echoFeedback(); ?>
 <h2><?=$ec_lang['ws_notes_heading']?></h2>$ec_lang['ws_notes_heading']
 <dl>
 <dt><?=$ec_lang['ws_notes_we_term']?></dt><dd>q = cw * l * h<sup>1.5</sup></dd>

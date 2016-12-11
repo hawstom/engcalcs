@@ -9,7 +9,7 @@ echoHeader("EngCalcs", $html_title, $html_head);
 
 ?>
 <h2><?php echo $ec_lang['wi_main_desc'] ?></h2>
-<p>By Thomas Gail Haws, P.E.</p>
+<?php echoHelpWanted(); ?>
 
 <form name="formweir" action="javascript:weirCalcs()"  method="post">
 	<div>
@@ -42,7 +42,7 @@ echoHeader("EngCalcs", $html_title, $html_head);
 	<br />
 	</div>
 </form>
-<p><a href="../contact.php"><?=$ec_lang['template_feedback']?></a></p>
+<?php echoFeedback(); ?>
 <h2><?=$ec_lang['wi_notes']?></h2>
 <dl>
 <dt><?=$ec_lang['wi_notes_we_term']?></dt><dd><?=$ec_lang['wi_notes_we_def']?></dd>

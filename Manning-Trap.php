@@ -9,7 +9,7 @@ echoHeader("EngCalcs", $html_title, $html_head);
 
 ?>
 <h2><?=$ec_lang['mtc_main_desc']?></h2>
-<p><a href="../contact.php"><?=$ec_lang['template_translation_help']?></a></p>
+<?php echoHelpWanted(); ?>
 
 <?php
 echoCalculatorForm(
@@ -47,7 +47,7 @@ echoCalculatorForm(
 
 <div id="sketch"></div>
 
-<div class="left"><p><a href="../contact.php"><?=$ec_lang['template_feedback']?></a></p></div>
+<?php echoFeedback(); ?>
 <script type="text/javascript">
 var pageCalculator = function(f) {
     var
@@ -87,7 +87,7 @@ var pageCalculator = function(f) {
     froude = v * Math.sqrt(t/(g * a * Math.cos(Math.atan(s0))));
     tau = gammawater * y * s0;
     c_isbash = (beta <= 30) ? 1.2 : 0.86;
-    d50_strickler = Math.pow(this.n * 21.1, 6); // n = 1/21.1 D ^ (1/6)
+    d50_strickler = Math.pow(n * 21.1, 6); // n = 1/21.1 D ^ (1/6)
     d50_mra = 0.031 * Math.pow(v, 2.5) / (Math.pow(sgrock - 1, 0.25) * Math.pow(y, 0.25) * ((beta <= 30) ? 1 : 1.5));
     d50_searcy = 0.022 * v * v;
     d50_bottom = mc_riprap_size(y, a, v, g, 1000, s0, c_isbash, sgrock);

@@ -8,7 +8,7 @@ $html_head='
 echoHeader("EngCalcs", $html_title, $html_head);
 ?>
 <h2><?php echo $ec_lang['mi_main_desc'] ?></h2>
-<p><a href="../contact.php"><?=$ec_lang['template_translation_help']?></a></p>
+<?php echoHelpWanted(); ?>
 
 <?php
 echoCalculatorForm(
@@ -117,7 +117,7 @@ function echoCalculatorFormAppend() {
 }
 ?>
 <div id="sketch"></div>
-<p><a href="../contact.php"><?=$ec_lang['template_feedback']?></a></p>
+<?php echoFeedback(); ?>
 <h2><?=$ec_lang['mi_notes']?></h2>
 <dl>
 <dt><?=$ec_lang['mi_notes_1_term']?></dt><dd><?=$ec_lang['mi_notes_1_def']?></dd>
