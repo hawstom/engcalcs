@@ -10,7 +10,7 @@ echoHeader("EngCalcs", $html_title, $html_head);
 ?>
 <h2><?=$ec_lang['ws_main_desc']?></h2>
 <?php echoHelpWanted(); ?>
-<form name="formInput" action="javascript:calcAndSave(document.forms.formInput, 'Weir-Flow-Simple')" method="post">
+<form name="formInput" action="javascript:EngCalcs.calcAndSave(document.forms.formInput, 'Weir-Flow-Simple')" method="post">
 	<div>
         <input type="text" style="font-size: 2em; width: 98%" placeholder="Printable Title" /><br />
         <input type="text" style="font-size: 1.5em; width: 98%" placeholder="Printable Subtitle" />
@@ -33,7 +33,7 @@ echoHeader("EngCalcs", $html_title, $html_head);
 </dl>
 <script type="text/javascript">
 <!--
-function pageCalculator(f) {
+EngCalcs.pageCalculator = function(f) {
 	var l = f.l.value,
 	h = f.h.value,
 	cw = f.cw.value,
@@ -43,7 +43,7 @@ function pageCalculator(f) {
 	document.getElementById('q').innerHTML = q.toFixed(2);
 }
 // On load, read cookie and calc.
-readAndCalc('Weir-Flow-Simple', document.forms.formInput);
+EngCalcs.readAndCalc('Weir-Flow-Simple', document.forms.formInput);
 -->
 </script>
 <?php

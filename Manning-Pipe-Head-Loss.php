@@ -33,7 +33,7 @@ echoCalculatorForm(
 ?>
 <?php echoFeedback(); ?>
 <script type="text/javascript">
-function pageCalculator(f) {
+EngCalcs.pageCalculator = function(f) {
 	var q = f['q'].value / f['qu'].value,
 	d0 = f['d0'].value / f['d0u'].value,
 	l = f['l'].value / f['lu'].value,

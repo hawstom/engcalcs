@@ -11,13 +11,23 @@ echoHeader("EngCalcs", $html_title, $html_head);
 <h2><?php echo $ec_lang['wi_main_desc'] ?></h2>
 <?php echoHelpWanted(); ?>
 
-<form name="formweir" action="javascript:weirCalcs()"  method="post">
-	<div>
-		<input type="text" style="font-size: 2em; width: 98%" placeholder="Printable Title" /><br />
-		<input type="text" style="font-size: 1.5em; width: 98%" placeholder="Printable Subtitle" />
-	<input type="text" size="6" name="hw" /> <?=$ec_lang['wi_headWaterelevation']?>, (<?php echo $ec_lang['u_ft'].' '.$ec_lang['or'].' '. 	$ec_lang['u_m'];?>)<br /><br />
-	<input type="text" size="6" name="cw" /> <?=$ec_lang['ws_weirCoefficient']?><br /><br />
-	<table id="CalcsTable" cellspacing="0" border="1">
+<?php
+echoCalculatorForm(
+    //Inputs
+    Array(
+        Array('hw', NULL, $ec_lang['wi_headWaterelevation']),
+        Array('cw',  NULL, $ec_lang['ws_weirCoefficient']),
+    ),
+    //Results
+    NULL,
+    $flagFormAppend = true,
+    $flagHideUnits = true   
+);
+function echoCalculatorFormAppend() {
+        global $ec_units, $ec_lang;
+        $indent_string = "\t\t\t\t\t";
+?>
+	<table id="CalcsTable">
 		<thead>
 			<tr>
 				<th colspan="5"><?=$ec_lang['wi_weirPoints']?></th>
@@ -38,10 +48,12 @@ echoHeader("EngCalcs", $html_title, $html_head);
 	<input type="submit" name="Submit" value="<?=$ec_lang['wi_save_and_calculate']?>" /> 
 	<!--<input type="submit" name="Submit" value="Load and Calculate" /> --> 
 	<?=$ec_lang['wi_or_adjust']?> 
-	<a href="javascript:addWeirStation('','')">+</a>/<a href="javascript:deleteCalcRow()">-</a> <?=$ec_lang['wi_n_rows']?>
+	<a href="javascript:EngCalcs.pageAddCalcRow()">+</a>/<a href="javascript:deleteCalcRow()">-</a> <?=$ec_lang['wi_n_rows']?>
 	<br />
 	</div>
-</form>
+<?php
+}
+?>
 <?php echoFeedback(); ?>
 <h2><?=$ec_lang['wi_notes']?></h2>
 <dl>
@@ -49,7 +61,7 @@ echoHeader("EngCalcs", $html_title, $html_head);
 </dl>
 <script type="text/javascript">
 // The argument f is not used here.
-var weirCalcs = function (f) {
+EngCalcs.pageCalculator = function (f) {
 	'use strict';
 	var row,
 	station0,
@@ -63,13 +75,12 @@ var weirCalcs = function (f) {
 	s,
 	qi,
 	qc = 0,
-	cookie;
 	// Get the global values and save them to a cookie
-	hw = document.formweir.hw.value;
-	cw = document.formweir.cw.value;
-	cookie= hw+","+cw;
+	hw = f.hw.value,
+	cw = f.cw.value;
+	cw = f.cw.value;
 
-	for (station = 0; station < numCalcRows; station++) {
+	for (var station = 0; station < EngCalcs.numCalcRows; station++) {
 		// Save the old variables if this is not the first row
 		if(station1) {
 			station0=station1;
@@ -82,7 +93,6 @@ var weirCalcs = function (f) {
 		elev1 = row.getElementsByTagName( 'input' )[1].value;
 		d1=Math.max(hw-elev1,0);
 		row.getElementsByTagName( 'td' )[2].innerHTML = d1.toFixed(2);
-		cookie+= "," + station1 + "," + elev1;
 		
 		// Do the calcs and output if this is not the first row
 		if(station0) {
@@ -97,11 +107,10 @@ var weirCalcs = function (f) {
 		}
 	}
 	// Save a cookie for next time
-	adjustInputWidth(f);
-	createCookie("Weir-Flow-Irregular",cookie,36000);
+	EngCalcs.adjustInputWidth(f);
 };
 
-var addWeirStation = function (station, elevation) {
+EngCalcs.addWeirStation = function (station, elevation) {
 	'use strict';
 	var arrColumns = [
 		{name: 'station',   value: station,   isInput: true},
@@ -110,29 +119,17 @@ var addWeirStation = function (station, elevation) {
 		{name: 'qi',        value: null,      isInput: false},
 		{name: 'qc',        value: null,      isInput: false},
 	];
-	addCalcRow(arrColumns);
+	this.addCalcRow(arrColumns);
+};
+
+EngCalcs.pageAddCalcRow = function () {
+	this.addWeirStation(0,0);
 };
 
 <!--
-// Global variables
-var hw, cw, numCalcRows = 0, cookie, cookievars;
-cookie=readCookie("Weir-Flow-Irregular");
-if(cookie)
-	{
-	cookievars=cookie.split(",");
-	document.formweir.hw.value=cookievars[0];
-	document.formweir.cw.value=cookievars[1];
-
-	for (var station=1;station<=cookievars.length/2-1;station++) {
-		addWeirStation(cookievars[station*2],cookievars[station*2+1]);
-	}
-	weirCalcs();
-	}
-else
-	{
-	addWeirStation('','');
-	addWeirStation('','');
-	}
+<?php
+echoCookieScript ();
+?>
 -->
 </script>
 <?php

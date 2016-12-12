@@ -109,7 +109,7 @@ function echoCalculatorFormAppend() {
 	<input type="submit" name="Submit" value="<?=$ec_lang['mi_save_and_calculate']?>" /> 
 	<!--<input type="submit" name="Submit" value="Load and Calculate" /> --> 
 	<?=$ec_lang['mi_or_adjust']?> 
-	<a href="javascript:pageAddCalcRow()">+</a>/<a href="javascript:deleteCalcRow()">-</a> <?=$ec_lang['mi_n_rows']?>
+	<a href="javascript:EngCalcs.pageAddCalcRow()">+</a>/<a href="javascript:EngCalcs.deleteCalcRow()">-</a> <?=$ec_lang['mi_n_rows']?>
 	<br />
 	</div>
 
@@ -126,11 +126,11 @@ function echoCalculatorFormAppend() {
 <script type="text/javascript">
 <!--
 // The argument f is not used here.
-var pageCalculator = function (f) {
+EngCalcs.pageCalculator = function (f) {
 	'use strict';
-	Haws.Manning.s0 = f['s0'].value / f['s0u'].value;
-	Haws.Manning.beta = f['beta'].value;
-	Haws.Manning.sgrock = f['sgrock'].value;
+	EngCalcs.Manning.s0 = f['s0'].value / f['s0u'].value;
+	EngCalcs.Manning.beta = f['beta'].value;
+	EngCalcs.Manning.sgrock = f['sgrock'].value;
 	ws = f.ws.value;
 	var
 	// Use unary + to convert form values to numbers
@@ -164,7 +164,7 @@ var pageCalculator = function (f) {
 	ncompterm617c = 0,
 	ncompterm618c = 0;
 
-	for (var station=0; station < numCalcRows; station++) {
+	for (var station=0; station < EngCalcs.numCalcRows; station++) {
 		row = document.getElementById("CalcsBody").getElementsByTagName('tr')[station];
 		station1 = row.getElementsByTagName( 'input' )[0].value / f['stationu'].value;
 		arrStation.push(station1);
@@ -175,46 +175,46 @@ var pageCalculator = function (f) {
 		
 		// Do the calcs and output if this is not the first row
 		if(station > 0) {
-			Haws.Manning.n = row.getElementsByTagName( 'input' )[2].value;
+			EngCalcs.Manning.n = row.getElementsByTagName( 'input' )[2].value;
 			l=station1-station0;
 			rise=elev1-elev0;
 			hypotenuse = Math.pow(l*l+rise*rise,0.5);
 			s = (l == 0) ? 0 : rise/l;
-			Haws.Manning.a = (s==0) ? (d0*l) : (d0*d0-d1*d1)/(2*s);
-			ac = ac + Haws.Manning.a;
+			EngCalcs.Manning.a = (s==0) ? (d0*l) : (d0*d0-d1*d1)/(2*s);
+			ac = ac + EngCalcs.Manning.a;
 			// Three shorthand "if" statements nested/strung together
-			Haws.Manning.pw = (Haws.Manning.a == 0) ? 0 : (s == 0) ? l :  Math.abs(wedgeWettedPerimeter(d0, s) - wedgeWettedPerimeter(d1, s));
-			pwc = pwc + Haws.Manning.pw;
-			Haws.Manning.t = l*Haws.Manning.pw/hypotenuse;
+			EngCalcs.Manning.pw = (EngCalcs.Manning.a == 0) ? 0 : (s == 0) ? l :  Math.abs(this.wedgeWettedPerimeter(d0, s) - this.wedgeWettedPerimeter(d1, s));
+			pwc = pwc + EngCalcs.Manning.pw;
+			EngCalcs.Manning.t = l*EngCalcs.Manning.pw/hypotenuse;
 			arrSketchSegments.push({
 				sectionX1: station0,
 				sectionX2: station1,
 				sectionY1: elev0,
 				sectionY2: elev1,
-				WSX1: (s >= 0) ? station0 : (station1 - Haws.Manning.t),
-				WSX2: (s <= 0) ? station1 : (station0 + Haws.Manning.t)
+				WSX1: (s >= 0) ? station0 : (station1 - EngCalcs.Manning.t),
+				WSX2: (s <= 0) ? station1 : (station0 + EngCalcs.Manning.t)
 			});
-			topwidthc = topwidthc + Haws.Manning.t;
-			Haws.Manning.recalc();
-			qc = qc + Haws.Manning.q;
-			ncompterm617c = ncompterm617c + Haws.Manning.ncompterm617;
-			ncompterm618c = ncompterm618c + Haws.Manning.ncompterm618,
-			tau = Haws.Manning.get_tau(dmax);
-			d50_mc = Haws.Manning.get_d50_mc(dmax, Math.abs(1/s));
-			d50_mra = Haws.Manning.get_d50_mra(dmax);
-			row.getElementsByTagName('td')[3].innerHTML = (Haws.Manning.q * f['qu'].value).toFixed(2);
-			row.getElementsByTagName('td')[4].innerHTML = (Haws.Manning.v * f['vu'].value).toFixed(2);
-			row.getElementsByTagName('td')[5].innerHTML = (Haws.Manning.t * f['tu'].value).toFixed(2);
-			row.getElementsByTagName('td')[6].innerHTML = Haws.Manning.f.toFixed(2);
-			row.getElementsByTagName('td')[7].innerHTML = (Haws.Manning.d50_strickler * f['d50_strickleru'].value).toFixed(2);
+			topwidthc = topwidthc + EngCalcs.Manning.t;
+			EngCalcs.Manning.recalc();
+			qc = qc + EngCalcs.Manning.q;
+			ncompterm617c = ncompterm617c + EngCalcs.Manning.ncompterm617;
+			ncompterm618c = ncompterm618c + EngCalcs.Manning.ncompterm618,
+			tau = EngCalcs.Manning.get_tau(dmax);
+			d50_mc = EngCalcs.Manning.get_d50_mc(dmax, Math.abs(1/s));
+			d50_mra = EngCalcs.Manning.get_d50_mra(dmax);
+			row.getElementsByTagName('td')[3].innerHTML = (EngCalcs.Manning.q * f['qu'].value).toFixed(2);
+			row.getElementsByTagName('td')[4].innerHTML = (EngCalcs.Manning.v * f['vu'].value).toFixed(2);
+			row.getElementsByTagName('td')[5].innerHTML = (EngCalcs.Manning.t * f['tu'].value).toFixed(2);
+			row.getElementsByTagName('td')[6].innerHTML = EngCalcs.Manning.f.toFixed(2);
+			row.getElementsByTagName('td')[7].innerHTML = (EngCalcs.Manning.d50_strickler * f['d50_strickleru'].value).toFixed(2);
 			row.getElementsByTagName('td')[8].innerHTML = (d50_mc * f['d50_mcu'].value).toFixed(2);
 			row.getElementsByTagName('td')[9].innerHTML = (d50_mra * f['d50_mrau'].value).toFixed(2);
-			row.getElementsByTagName('td')[10].innerHTML = (Haws.Manning.d50_searcy * f['d50_searcyu'].value).toFixed(2);
-			row.getElementsByTagName('td')[11].innerHTML = (Haws.Manning.hv * f['hvu'].value).toFixed(2);
+			row.getElementsByTagName('td')[10].innerHTML = (EngCalcs.Manning.d50_searcy * f['d50_searcyu'].value).toFixed(2);
+			row.getElementsByTagName('td')[11].innerHTML = (EngCalcs.Manning.hv * f['hvu'].value).toFixed(2);
 			row.getElementsByTagName('td')[12].innerHTML = (tau * f['tauu'].value).toFixed(2);
-			row.getElementsByTagName('td')[13].innerHTML = (Haws.Manning.a * f['au'].value).toFixed(2);
-			row.getElementsByTagName('td')[14].innerHTML = (Haws.Manning.pw * f['pwu'].value).toFixed(2);
-			row.getElementsByTagName('td')[15].innerHTML = (Haws.Manning.rh * f['rhu'].value).toFixed(2);
+			row.getElementsByTagName('td')[13].innerHTML = (EngCalcs.Manning.a * f['au'].value).toFixed(2);
+			row.getElementsByTagName('td')[14].innerHTML = (EngCalcs.Manning.pw * f['pwu'].value).toFixed(2);
+			row.getElementsByTagName('td')[15].innerHTML = (EngCalcs.Manning.rh * f['rhu'].value).toFixed(2);
 			// Save the old geometry variables
 		}
 		station0=station1;
@@ -222,14 +222,14 @@ var pageCalculator = function (f) {
 		d0=d1;
 	}
     document.getElementById('q_sum').innerHTML = (qc * f['q_sumu'].value).toFixed(2);
-	Haws.Manning.pw = pwc;
-	Haws.Manning.a = ac;
-	Haws.Manning.n = Math.pow(ncompterm617c, (2/3))/Math.pow(pwc, (2/3));
-	Haws.Manning.recalc();
-	document.getElementById('q_617').innerHTML = (Haws.Manning.q * f['q_617u'].value).toFixed(2);
-	Haws.Manning.n = Math.pow(ncompterm618c, 0.5)/Math.pow(pwc, 0.5);
-	Haws.Manning.recalc();
-	document.getElementById('q_618').innerHTML = (Haws.Manning.q * f['q_618u'].value).toFixed(2);
+	EngCalcs.Manning.pw = pwc;
+	EngCalcs.Manning.a = ac;
+	EngCalcs.Manning.n = Math.pow(ncompterm617c, (2/3))/Math.pow(pwc, (2/3));
+	EngCalcs.Manning.recalc();
+	document.getElementById('q_617').innerHTML = (EngCalcs.Manning.q * f['q_617u'].value).toFixed(2);
+	EngCalcs.Manning.n = Math.pow(ncompterm618c, 0.5)/Math.pow(pwc, 0.5);
+	EngCalcs.Manning.recalc();
+	document.getElementById('q_618').innerHTML = (EngCalcs.Manning.q * f['q_618u'].value).toFixed(2);
 /*	document.getElementById('v').innerHTML = (v * f['vu'].value).toFixed(2);
 	document.getElementById('hv').innerHTML = (hv * f['hvu'].value).toFixed(2);
 	document.getElementById('a').innerHTML = (a * f['au'].value).toFixed(2);
@@ -248,7 +248,7 @@ var pageCalculator = function (f) {
 	var
 	i,
 	htmlSketchSegments = '';
-	Haws.Sketch.construct({
+	EngCalcs.Sketch.construct({
 		maxHeight: 100,
 		maxWidth: 600,
 		strokeColor: 'black',
@@ -259,16 +259,16 @@ var pageCalculator = function (f) {
 		figureWidth: Math.max(...arrStation) - Math.min(...arrStation)
 	});
 	for (i = 0; i < arrSketchSegments.length; i = i + 1) {
-		Haws.Sketch.strokeColor = 'black';
+		EngCalcs.Sketch.strokeColor = 'black';
 		htmlSketchSegments = htmlSketchSegments.concat(
-			Haws.Sketch.getLineHtml([
+			EngCalcs.Sketch.getLineHtml([
 			 {x:arrSketchSegments[i].sectionX1, y:arrSketchSegments[i].sectionY1},
 			 {x:arrSketchSegments[i].sectionX2, y:arrSketchSegments[i].sectionY2}
 			])
 		);
-		Haws.Sketch.strokeColor = 'blue';
+		EngCalcs.Sketch.strokeColor = 'blue';
 		htmlSketchSegments = htmlSketchSegments.concat(
-			Haws.Sketch.getLineHtml([
+			EngCalcs.Sketch.getLineHtml([
 			 {x:arrSketchSegments[i].WSX1, y:ws},
 			 {x:arrSketchSegments[i].WSX2, y:ws}
 			])
@@ -276,21 +276,19 @@ var pageCalculator = function (f) {
 	}
 
 	document.getElementById('sketch').innerHTML =
-		'<svg height="' + Haws.Sketch.maxHeight + '" width="' + Haws.Sketch.maxWidth + '">' 
+		'<svg height="' + EngCalcs.Sketch.maxHeight + '" width="' + EngCalcs.Sketch.maxWidth + '">' 
 		+ htmlSketchSegments
 		+ 'Sorry, your browser does not support inline SVG.' 
 		+ '</svg>';
 
-	adjustInputWidth(f);
+	EngCalcs.adjustInputWidth(f);
 };
-if (Haws) {
-	alert('Fatal error: Object \'Haws\' already defined.');
-} else {
-	var Haws = {};
-}
-Haws.Sketch = {};
 
-Haws.Sketch.construct = function (obj) {
+var EngCalcs = EngCalcs || {};
+
+EngCalcs.Sketch = {};
+
+EngCalcs.Sketch.construct = function (obj) {
 	this.maxHeight = obj.maxHeight;
 	this.maxWidth = obj.maxWidth;
 	this.strokeColor = obj.strokeColor;
@@ -305,14 +303,14 @@ Haws.Sketch.construct = function (obj) {
 
 // Convert point from right-handed figure coordinate system
 // to left-handed sketch coordinate system
-Haws.Sketch.convertPoint = function (objFigurePoint) {
+EngCalcs.Sketch.convertPoint = function (objFigurePoint) {
 	var objPoint = {};
 	objPoint.x = this.strokeWidth/2 + (objFigurePoint.x - this.figureLeft) * this.xScale;
 	objPoint.y = this.strokeWidth/2 + (objFigurePoint.y - this.figureTop) * this.yScale;
 	return objPoint;
 }
 
-Haws.Sketch.getLineHtml = function (arrPoints) {
+EngCalcs.Sketch.getLineHtml = function (arrPoints) {
 	return '<line '
 	+ 'x1="' + this.convertPoint(arrPoints[0]).x.toString()
 	+ '" y1="'  + this.convertPoint(arrPoints[0]).y.toString()
@@ -322,13 +320,13 @@ Haws.Sketch.getLineHtml = function (arrPoints) {
 	+ ';stroke-width:' + this.strokeWidth + '" />';
 }
 
-Haws.Manning = {};
+EngCalcs.Manning = {};
 
-Haws.Manning.c = 1.0;
-Haws.Manning.g = 9.806;
-Haws.Manning.gammawater = 9806;
+EngCalcs.Manning.c = 1.0;
+EngCalcs.Manning.g = 9.806;
+EngCalcs.Manning.gammawater = 9806;
 
-Haws.Manning.recalc = function () {
+EngCalcs.Manning.recalc = function () {
 	this.s0root = Math.pow(this.s0, 0.5);
 	this.rh = this.a/this.pw;
 	this.v = this.c/this.n*Math.pow(this.rh,2/3)*this.s0root;
@@ -343,16 +341,16 @@ Haws.Manning.recalc = function () {
 };
 
 // Shear stress depends on y, so we report it for a point and don't store it with the section.
-Haws.Manning.get_tau = function (y) {
+EngCalcs.Manning.get_tau = function (y) {
 	return this.gammawater * y * this.s0;
 };
 
-Haws.Manning.get_d50_mra = function (y) {
+EngCalcs.Manning.get_d50_mra = function (y) {
 		d50 = 0.031 * Math.pow(this.v, 2.5) / (Math.pow(this.sgrock - 1, 0.25) * Math.pow(y, 0.25) * ((this.beta <= 30) ? 1 : 1.5));
 		return d50;
 };
 
-Haws.Manning.get_d50_mc = function(y, z) {
+EngCalcs.Manning.get_d50_mc = function(y, z) {
 	var
 	d50,
 	hvmax = this.v * this.v * 1.33 * 1.33 / (2 * this.g);
@@ -371,11 +369,11 @@ Haws.Manning.get_d50_mc = function(y, z) {
 	return d50;
 };
 
-var wedgeWettedPerimeter = function (depth, slope) {
+EngCalcs.wedgeWettedPerimeter = function (depth, slope) {
 	return Math.pow(depth*depth+(depth/slope)*(depth/slope), 0.5);
 };
 
-var addManningIrregularStation = function (station, elevation, n) {
+EngCalcs.addManningIrregularStation = function (station, elevation, n) {
 	'use strict';
 	var arrColumns = [
 		{name: 'station',      value: station,   isInput: true},
@@ -395,23 +393,21 @@ var addManningIrregularStation = function (station, elevation, n) {
 		{name: 'pw',           value: null,      isInput: false},
 		{name: 'rh',           value: null,      isInput: false},
 	];
-	addCalcRow(arrColumns);
+	this.addCalcRow(arrColumns);
 };
 
-var pageAddCalcRow = function () {
+EngCalcs.pageAddCalcRow = function () {
 	var n;
-    if (numCalcRows === 0) {
+    if (this.numCalcRows === 0) {
 		n = false;
 	} else {
 		n = 0.030;
 	}
-	addManningIrregularStation(0,0,n);
+	this.addManningIrregularStation(0,0,n);
 };
 
 
 <!--
-// Global variables
-var numCalcRows = 0;
 <?php
 echoCookieScript ();
 ?>

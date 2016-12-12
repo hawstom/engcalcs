@@ -49,7 +49,7 @@ echoCalculatorForm(
 
 <?php echoFeedback(); ?>
 <script type="text/javascript">
-var pageCalculator = function(f) {
+EngCalcs.pageCalculator = function(f) {
     var
     c = 1.0,
     g = 9.806,
