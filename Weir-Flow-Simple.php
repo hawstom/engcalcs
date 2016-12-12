@@ -14,9 +14,9 @@ echoHeader("EngCalcs", $html_title, $html_head);
 	<div>
         <input type="text" style="font-size: 2em; width: 98%" placeholder="Printable Title" /><br />
         <input type="text" style="font-size: 1.5em; width: 98%" placeholder="Printable Subtitle" />
-		<input type="text" size="6" name="l" id="l" /> <?=$ec_lang['ws_weirLength']?><br /><br />
-		<input type="text" size="6" name="h" id="h" /> <?=$ec_lang['ws_headWaterHeight']?><br /><br />
-		<input type="text" size="6" name="cw" id="cw" /> <?=$ec_lang['ws_weirCoefficient']?><br /><br />
+		<input type="number" size="6" name="l" id="l" /> <?=$ec_lang['ws_weirLength']?><br /><br />
+		<input type="number" size="6" name="h" id="h" /> <?=$ec_lang['ws_headWaterHeight']?><br /><br />
+		<input type="number" size="6" name="cw" id="cw" /> <?=$ec_lang['ws_weirCoefficient']?><br /><br />
 		<input type="submit" name="Submit" value="<?=$ec_lang['wi_save_and_calculate']?>" />
 	</div>
 </form>
