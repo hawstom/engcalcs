@@ -16,7 +16,7 @@ echoCalculatorForm(
     //Inputs
     Array(
         Array('name' => 'hw', 'type' => 'number', 'units' => NULL, 'label' => $ec_lang['wi_headWaterelevation']),
-        Array('name' => 'cw', 'type' => 'number', 'units' => NULL, 'label' => $ec_lang['ws_weirCoefficient'].' <a href="http://epg.modot.org/files/b/bc/749_Broad-Crested_Weir_Coefficients.pdf">?</a>'),
+        Array('name' => 'cw', 'type' => 'number', 'units' => NULL, 'label' => $ec_lang['ws_weirCoefficient'].' <a target="_blank" href="http://epg.modot.org/files/b/bc/749_Broad-Crested_Weir_Coefficients.pdf">?</a>'),
     ),
     //Results
     NULL,
@@ -48,7 +48,7 @@ function echoCalculatorFormAppend() {
 	<input type="submit" name="Submit" value="<?=$ec_lang['wi_save_and_calculate']?>" /> 
 	<!--<input type="submit" name="Submit" value="Load and Calculate" /> --> 
 	<?=$ec_lang['wi_or_adjust']?> 
-	<a href="javascript:EngCalcs.pageAddCalcRow()">+</a>/<a href="javascript:deleteCalcRow()">-</a> <?=$ec_lang['wi_n_rows']?>
+	<a target="_blank" href="javascript:EngCalcs.pageAddCalcRow()">+</a>/<a target="_blank" href="javascript:deleteCalcRow()">-</a> <?=$ec_lang['wi_n_rows']?>
 	<br />
 	</div>
 <?php

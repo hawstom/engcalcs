@@ -18,7 +18,7 @@ echoCalculatorForm(
         Array('name' => 'b', 'type' => 'number', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mtc_bottom_width']),
         Array('name' => 'z1', 'type' => 'number', 'units' => NULL, 'label' => $ec_lang['mtc_side_slope_1']),
         Array('name' => 'z2', 'type' => 'number', 'units' => NULL, 'label' => $ec_lang['mtc_side_slope_2']),
-        Array('name' => 'n', 'type' => 'number', 'units' => NULL, 'label' => $ec_lang['mpf_manningRoughness'].' <a href="http://www.engineeringtoolbox.com/mannings-roughness-d_799.html">?</a>'),
+        Array('name' => 'n', 'type' => 'number', 'units' => NULL, 'label' => $ec_lang['mpf_manningRoughness'].' <a target="_blank" href="http://www.engineeringtoolbox.com/mannings-roughness-d_799.html">?</a>'),
         Array('name' => 's0', 'type' => 'number', 'units' => Array('grade', 'gradePercent'), 'label' => $ec_lang['mtc_channel_slope']),
         Array('name' => 'y', 'type' => 'number', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mtc_flow_depth']),
         Array('name' => 'beta', 'type' => 'number', 'units' => NULL, 'label' => $ec_lang['mtc_bend_angle']),

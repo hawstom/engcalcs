@@ -16,7 +16,7 @@ echoHeader("EngCalcs", $html_title, $html_head);
         <input type="text" style="font-size: 1.5em; width: 98%" placeholder="Printable Subtitle" />
 		<input type="number" size="6" name="l" id="l" /> <?=$ec_lang['ws_weirLength']?><br /><br />
 		<input type="number" size="6" name="h" id="h" /> <?=$ec_lang['ws_headWaterHeight']?><br /><br />
-		<input type="number" size="6" name="cw" id="cw" /> <?=$ec_lang['ws_weirCoefficient']?> <a href="http://epg.modot.org/files/b/bc/749_Broad-Crested_Weir_Coefficients.pdf">?</a><br /><br />
+		<input type="number" size="6" name="cw" id="cw" /> <?=$ec_lang['ws_weirCoefficient']?> <a target="_blank" href="http://epg.modot.org/files/b/bc/749_Broad-Crested_Weir_Coefficients.pdf">?</a><br /><br />
 		<input type="submit" name="Submit" value="<?=$ec_lang['wi_save_and_calculate']?>" />
 	</div>
 </form>
