@@ -125,7 +125,6 @@ function echoCalculatorFormAppend() {
 </dl>
 <script type="text/javascript">
 <!--
-// The argument f is not used here.
 EngCalcs.pageCalculator = function (f) {
 	'use strict';
 	EngCalcs.Manning.s0 = f['s0'].value / f['s0u'].value;
