@@ -15,8 +15,8 @@ echoHeader("EngCalcs", $html_title, $html_head);
 echoCalculatorForm(
     //Inputs
     Array(
-        Array('name' => 'hw', 'type' => 'number', 'units' => NULL, $ec_lang['wi_headWaterelevation']),
-        Array('name' => 'cw', 'type' => 'number', 'units' => NULL, $ec_lang['ws_weirCoefficient']),
+        Array('name' => 'hw', 'type' => 'number', 'units' => NULL, 'label' => $ec_lang['wi_headWaterelevation']),
+        Array('name' => 'cw', 'type' => 'number', 'units' => NULL, 'label' => $ec_lang['ws_weirCoefficient'].' <a href="http://epg.modot.org/files/b/bc/749_Broad-Crested_Weir_Coefficients.pdf">?</a>'),
     ),
     //Results
     NULL,

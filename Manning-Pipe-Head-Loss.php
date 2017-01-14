@@ -18,8 +18,8 @@ echoCalculatorForm(
 		Array('name' => 'q', 'type' => 'number', 'units' => Array('m3ps','lps','mld','ft3ps','gpm','mgd'), 'label' => $ec_lang['mpf_flow']),
 		Array('name' => 'd0', 'type' => 'number', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mpf_pipe_diameter']),
 		Array('name' => 'l', 'type' => 'number', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mphl_pipe_length']),
-		Array('name' => 'n', 'type' => 'number', 'units' => NULL,'<span title="Typical roughness values for plastics, clay, and concrete range from 0.009 to 0.013">'.$ec_lang['mpf_manningRoughness'].' <a href="http://www.engineeringtoolbox.com/mannings-roughness-d_799.html">?</a></span>'),
-		Array('k', 'type' => 'number', 'units' => NULL, 'label' => $ec_lang['mphl_total_junction_k']),
+		Array('name' => 'n', 'type' => 'number', 'units' => NULL, 'label' => $ec_lang['mpf_manningRoughness'].' <a href="http://www.engineeringtoolbox.com/mannings-roughness-d_799.html">?</a>'),
+		Array( 'name' => 'k', 'type' => 'number', 'units' => NULL, 'label' => $ec_lang['mphl_total_junction_k']),
 ),
 	//Results
 	Array(
