@@ -15,8 +15,8 @@ echoHeader("EngCalcs", $html_title, $html_head);
 echoCalculatorForm(
     //Inputs
     Array(
-        Array('name' => 'hw', 'units' => NULL, $ec_lang['wi_headWaterelevation']),
-        Array('name' => 'cw', 'units' => NULL, $ec_lang['ws_weirCoefficient']),
+        Array('name' => 'hw', 'type' => 'number', 'units' => NULL, $ec_lang['wi_headWaterelevation']),
+        Array('name' => 'cw', 'type' => 'number', 'units' => NULL, $ec_lang['ws_weirCoefficient']),
     ),
     //Results
     NULL,

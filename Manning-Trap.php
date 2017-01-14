@@ -15,14 +15,14 @@ echoHeader("EngCalcs", $html_title, $html_head);
 echoCalculatorForm(
     //Inputs
     Array(
-        Array('name' => 'b', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mtc_bottom_width']),
-        Array('name' => 'z1', 'units' => NULL, $ec_lang['mtc_side_slope_1']),
-        Array('name' => 'z2', 'units' => NULL, $ec_lang['mtc_side_slope_2']),
-        Array('name' => 'n', 'units' => NULL, '<span title="Typical roughness values for plastics, clay, and concrete range from 0.009 to 0.013">'.$ec_lang['mpf_manningRoughness'].' <a href="http://www.engineeringtoolbox.com/mannings-roughness-d_799.html">?</a></span>'),
-        Array('name' => 's0', 'units' => Array('grade', 'gradePercent'), 'label' => $ec_lang['mtc_channel_slope']),
-        Array('name' => 'y', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mtc_flow_depth']),
-        Array('name' => 'beta', 'units' => NULL, $ec_lang['mtc_bend_angle']),
-        Array('name' => 'sgrock', 'units' => NULL, $ec_lang['mtc_sgrock'])
+        Array('name' => 'b', 'type' => 'number', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mtc_bottom_width']),
+        Array('name' => 'z1', 'type' => 'number', 'units' => NULL, $ec_lang['mtc_side_slope_1']),
+        Array('name' => 'z2', 'type' => 'number', 'units' => NULL, $ec_lang['mtc_side_slope_2']),
+        Array('name' => 'n', 'type' => 'number', 'units' => NULL, '<span title="Typical roughness values for plastics, clay, and concrete range from 0.009 to 0.013">'.$ec_lang['mpf_manningRoughness'].' <a href="http://www.engineeringtoolbox.com/mannings-roughness-d_799.html">?</a></span>'),
+        Array('name' => 's0', 'type' => 'number', 'units' => Array('grade', 'gradePercent'), 'label' => $ec_lang['mtc_channel_slope']),
+        Array('name' => 'y', 'type' => 'number', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mtc_flow_depth']),
+        Array('name' => 'beta', 'type' => 'number', 'units' => NULL, $ec_lang['mtc_bend_angle']),
+        Array('name' => 'sgrock', 'type' => 'number', 'units' => NULL, $ec_lang['mtc_sgrock'])
     ),
     //Results
     Array(

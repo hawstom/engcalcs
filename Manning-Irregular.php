@@ -14,10 +14,10 @@ echoHeader("EngCalcs", $html_title, $html_head);
 echoCalculatorForm(
     //Inputs
     Array(
-        Array('name' => 'ws', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mi_waterSurfaceElevation']),
-        Array('name' => 's0', 'units' => Array('grade', 'gradePercent'), 'label' => $ec_lang['mtc_channel_slope']),
-        Array('name' => 'beta', 'units' => NULL, $ec_lang['mtc_bend_angle']),
-        Array('name' => 'sgrock', 'units' => NULL, $ec_lang['mtc_sgrock'])
+        Array('name' => 'ws', 'type' => 'number', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mi_waterSurfaceElevation']),
+        Array('name' => 's0', 'type' => 'number', 'units' => Array('grade', 'gradePercent'), 'label' => $ec_lang['mtc_channel_slope']),
+        Array('name' => 'beta', 'type' => 'number', 'units' => NULL, $ec_lang['mtc_bend_angle']),
+        Array('name' => 'sgrock', 'type' => 'number', 'units' => NULL, $ec_lang['mtc_sgrock'])
     ),
     //Results
     Array(
