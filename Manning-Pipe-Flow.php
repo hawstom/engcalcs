@@ -16,22 +16,22 @@ echoHeader("EngCalcs", $html_title, $html_head);
 echoCalculatorForm(
     //Inputs
     Array(
-        Array('d0',Array('m','mm','ft','in'),$ec_lang['mpf_pipe_diameter']),
-        Array('n',NULL,'<span title="Typical roughness values for plastics, clay, and concrete range from 0.009 to 0.013">'.$ec_lang['mpf_manningRoughness'].' <a href="http://www.engineeringtoolbox.com/mannings-roughness-d_799.html">?</a></span>'),
-        Array('s0',Array('grade','gradePercent'),$ec_lang['mpf_friction_slope']),
-        Array('dd0',Array('depthFrac','depthPercent'),$ec_lang['mpf_depth_ratio']),
+        Array('name' => 'd0', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mpf_pipe_diameter']),
+        Array('name' => 'n', 'units' => NULL, 'label' => '<span title="Typical roughness values for plastics, clay, and concrete range from 0.009 to 0.013">'.$ec_lang['mpf_manningRoughness'].' <a href="http://www.engineeringtoolbox.com/mannings-roughness-d_799.html">?</a></span>'),
+        Array('name' => 's0', 'units' => Array('grade','gradePercent'), 'label' => $ec_lang['mpf_friction_slope']),
+        Array('name' => 'dd0', 'units' => Array('depthFrac','depthPercent'), 'label' => $ec_lang['mpf_depth_ratio']),
     ),
     //Results
     Array(
-        Array('q',Array('m3ps','lps','mld','ft3ps','gpm','mgd'),$ec_lang['mpf_flow']),
-        Array('v',Array('mps','ftps','mph'),$ec_lang['mpf_velocity']),
-        Array('hv',Array('m','mm','ft','in'),$ec_lang['mpf_velocity_head']),
-        Array('a',Array('m2','mm2','ft2','in2'),$ec_lang['mpf_flow_area']),
-        Array('pw',Array('m','mm','ft','in'),$ec_lang['mpf_wetted_perimeter']),
-        Array('rh',Array('m','mm','ft','in'),$ec_lang['mpf_hydraulic_radius']),
-        Array('t',Array('m','mm','ft','in'),$ec_lang['mpf_top_width']),
-        Array('f',NULL,$ec_lang['mpf_froude_number']),
-        Array('tau',Array('npm2','psf'),$ec_lang['mpf_shear_stress']),
+        Array('name' => 'q', 'units' => Array('m3ps','lps','mld','ft3ps','gpm','mgd'), 'label' => $ec_lang['mpf_flow']),
+        Array('name' => 'v', 'units' => Array('mps','ftps','mph'), 'label' => $ec_lang['mpf_velocity']),
+        Array('name' => 'hv', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mpf_velocity_head']),
+        Array('name' => 'a', 'units' => Array('m2','mm2','ft2','in2'), 'label' => $ec_lang['mpf_flow_area']),
+        Array('name' => 'pw', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mpf_wetted_perimeter']),
+        Array('name' => 'rh', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mpf_hydraulic_radius']),
+        Array('name' => 't', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mpf_top_width']),
+        Array('name' => 'f', 'units' => NULL, 'label' => $ec_lang['mpf_froude_number']),
+        Array('name' => 'tau', 'units' => Array('npm2','psf'), 'label' => $ec_lang['mpf_shear_stress']),
     )
 );
 ?>

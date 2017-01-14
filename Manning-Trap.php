@@ -15,32 +15,32 @@ echoHeader("EngCalcs", $html_title, $html_head);
 echoCalculatorForm(
     //Inputs
     Array(
-        Array('b', Array('m', 'mm', 'ft', 'in'), $ec_lang['mtc_bottom_width']),
-        Array('z1', NULL, $ec_lang['mtc_side_slope_1']),
-        Array('z2', NULL, $ec_lang['mtc_side_slope_2']),
-        Array('n', NULL, '<span title="Typical roughness values for plastics, clay, and concrete range from 0.009 to 0.013">'.$ec_lang['mpf_manningRoughness'].' <a href="http://www.engineeringtoolbox.com/mannings-roughness-d_799.html">?</a></span>'),
-        Array('s0',  Array('grade', 'gradePercent'), $ec_lang['mtc_channel_slope']),
-        Array('y',  Array('m', 'mm', 'ft', 'in'), $ec_lang['mtc_flow_depth']),
-        Array('beta', NULL, $ec_lang['mtc_bend_angle']),
-        Array('sgrock', NULL, $ec_lang['mtc_sgrock'])
+        Array('name' => 'b', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mtc_bottom_width']),
+        Array('name' => 'z1', 'units' => NULL, $ec_lang['mtc_side_slope_1']),
+        Array('name' => 'z2', 'units' => NULL, $ec_lang['mtc_side_slope_2']),
+        Array('name' => 'n', 'units' => NULL, '<span title="Typical roughness values for plastics, clay, and concrete range from 0.009 to 0.013">'.$ec_lang['mpf_manningRoughness'].' <a href="http://www.engineeringtoolbox.com/mannings-roughness-d_799.html">?</a></span>'),
+        Array('name' => 's0', 'units' => Array('grade', 'gradePercent'), 'label' => $ec_lang['mtc_channel_slope']),
+        Array('name' => 'y', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mtc_flow_depth']),
+        Array('name' => 'beta', 'units' => NULL, $ec_lang['mtc_bend_angle']),
+        Array('name' => 'sgrock', 'units' => NULL, $ec_lang['mtc_sgrock'])
     ),
     //Results
     Array(
-        Array('a', Array('m2', 'mm2', 'ft2', 'in2'), $ec_lang['mpf_flow_area']),
-        Array('pw', Array('m', 'mm', 'ft', 'in'), $ec_lang['mpf_wetted_perimeter']),
-        Array('rh', Array('m', 'mm', 'ft', 'in'), $ec_lang['mpf_hydraulic_radius']),
-        Array('v', Array('mps', 'ftps', 'mph'), $ec_lang['mpf_velocity']),
-        Array('q', Array('m3ps', 'lps', 'mld', 'ft3ps', 'gpm', 'mgd'), $ec_lang['mpf_flow']),
-        Array('hv', Array('m', 'mm', 'ft', 'in'), $ec_lang['mpf_velocity_head']),
-        Array('t', Array('m', 'mm', 'ft', 'in'), $ec_lang['mpf_top_width']),
-        Array('f', NULL, $ec_lang['mpf_froude_number']),
-        Array('tau', Array('npm2', 'psf'), $ec_lang['mpf_shear_stress']),
-        Array('d50_strickler', Array('m', 'mm', 'ft', 'in'), $ec_lang['mtc_d50_strickler']),
-        Array('d50_bottom', Array('m', 'mm', 'ft', 'in'), $ec_lang['mtc_d50_bottom']),
-        Array('d50_z1', Array('m', 'mm', 'ft', 'in'), $ec_lang['mtc_d50_z1']),
-        Array('d50_z2', Array('m', 'mm', 'ft', 'in'), $ec_lang['mtc_d50_z2']),
-        Array('d50_mra', Array('m', 'mm', 'ft', 'in'), $ec_lang['mtc_d50_mra']),
-        Array('d50_searcy', Array('m', 'mm', 'ft', 'in'), $ec_lang['mtc_d50_searcy']),
+        Array('name' => 'a', 'units' => Array('m2', 'mm2', 'ft2', 'in2'), 'label' => $ec_lang['mpf_flow_area']),
+        Array('name' => 'pw', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mpf_wetted_perimeter']),
+        Array('name' => 'rh', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mpf_hydraulic_radius']),
+        Array('name' => 'v', 'units' => Array('mps', 'ftps', 'mph'), 'label' => $ec_lang['mpf_velocity']),
+        Array('name' => 'q', 'units' => Array('m3ps', 'lps', 'mld', 'ft3ps', 'gpm', 'mgd'), 'label' => $ec_lang['mpf_flow']),
+        Array('name' => 'hv', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mpf_velocity_head']),
+        Array('name' => 't', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mpf_top_width']),
+        Array('name' => 'f', 'units' => NULL, $ec_lang['mpf_froude_number']),
+        Array('name' => 'tau', 'units' => Array('npm2', 'psf'), 'label' => $ec_lang['mpf_shear_stress']),
+        Array('name' => 'd50_strickler', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mtc_d50_strickler']),
+        Array('name' => 'd50_bottom', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mtc_d50_bottom']),
+        Array('name' => 'd50_z1', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mtc_d50_z1']),
+        Array('name' => 'd50_z2', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mtc_d50_z2']),
+        Array('name' => 'd50_mra', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mtc_d50_mra']),
+        Array('name' => 'd50_searcy', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mtc_d50_searcy']),
     )
 );
 ?>

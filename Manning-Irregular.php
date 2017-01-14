@@ -14,16 +14,16 @@ echoHeader("EngCalcs", $html_title, $html_head);
 echoCalculatorForm(
     //Inputs
     Array(
-        Array('ws', Array('m', 'mm', 'ft', 'in'), $ec_lang['mi_waterSurfaceElevation']),
-        Array('s0',  Array('grade', 'gradePercent'), $ec_lang['mtc_channel_slope']),
-        Array('beta', NULL, $ec_lang['mtc_bend_angle']),
-        Array('sgrock', NULL, $ec_lang['mtc_sgrock'])
+        Array('name' => 'ws', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mi_waterSurfaceElevation']),
+        Array('name' => 's0', 'units' => Array('grade', 'gradePercent'), 'label' => $ec_lang['mtc_channel_slope']),
+        Array('name' => 'beta', 'units' => NULL, $ec_lang['mtc_bend_angle']),
+        Array('name' => 'sgrock', 'units' => NULL, $ec_lang['mtc_sgrock'])
     ),
     //Results
     Array(
-        Array('q_sum', Array('m3ps', 'lps', 'mld', 'ft3ps', 'gpm', 'mgd'), $ec_lang['mi_q_sum']),
-        Array('q_617', Array('m3ps', 'lps', 'mld', 'ft3ps', 'gpm', 'mgd'), $ec_lang['mi_q_617']),
-        Array('q_618', Array('m3ps', 'lps', 'mld', 'ft3ps', 'gpm', 'mgd'), $ec_lang['mi_q_618']),
+        Array('name' => 'q_sum', 'units' => Array('m3ps', 'lps', 'mld', 'ft3ps', 'gpm', 'mgd'), 'label' => $ec_lang['mi_q_sum']),
+        Array('name' => 'q_617', 'units' => Array('m3ps', 'lps', 'mld', 'ft3ps', 'gpm', 'mgd'), 'label' => $ec_lang['mi_q_617']),
+        Array('name' => 'q_618', 'units' => Array('m3ps', 'lps', 'mld', 'ft3ps', 'gpm', 'mgd'), 'label' => $ec_lang['mi_q_618']),
     ),
     $flagFormAppend = true
 );
