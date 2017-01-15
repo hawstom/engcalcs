@@ -208,19 +208,19 @@ EngCalcs.pageCalculator = function (f) {
             } else {
                 document.getElementsByName('is_bank')[iStation].disabled = false;               
             }
-            //document.getElementsByName('q')[iStation].innerHTML = (this.Manning.q * f['qu'].value).toFixed(2);
-            //document.getElementsByName('v')[iStation].innerHTML = (this.Manning.v * f['vu'].value).toFixed(2);
-            //document.getElementsByName('t')[iStation].innerHTML = (this.Manning.t * f['tu'].value).toFixed(2);
-            //document.getElementsByName('f')[iStation].innerHTML = this.Manning.f.toFixed(2);
-            //document.getElementsByName('d50_strickler')[iStation].innerHTML = (this.Manning.d50_strickler * f['d50_strickleru'].value).toFixed(2);
-            //document.getElementsByName('d50_mc')[iStation].innerHTML = (d50_mc * f['d50_mcu'].value).toFixed(2);
-            //document.getElementsByName('d50_mra')[iStation].innerHTML = (d50_mra * f['d50_mrau'].value).toFixed(2);
-            //document.getElementsByName('d50_searcy')[iStation].innerHTML = (this.Manning.d50_searcy * f['d50_searcyu'].value).toFixed(2);
-            //document.getElementsByName('hv')[iStation].innerHTML = (this.Manning.hv * f['hvu'].value).toFixed(2);
-            //document.getElementsByName('tau')[iStation].innerHTML = (tau * f['tauu'].value).toFixed(2);
-            //document.getElementsByName('a')[iStation].innerHTML = (this.Manning.a * f['au'].value).toFixed(2);
-            //document.getElementsByName('pw')[iStation].innerHTML = (this.Manning.pw * f['pwu'].value).toFixed(2);
-            //document.getElementsByName('rh')[iStation].innerHTML = (this.Manning.rh * f['rhu'].value).toFixed(2);
+            document.getElementsByName('q')[iStation].innerHTML = (this.Manning.q * f['qu'].value).toFixed(2);
+            document.getElementsByName('v')[iStation].innerHTML = (this.Manning.v * f['vu'].value).toFixed(2);
+            document.getElementsByName('t')[iStation].innerHTML = (this.Manning.t * f['tu'].value).toFixed(2);
+            ocument.getElementsByName('f')[iStation].innerHTML = this.Manning.f.toFixed(2);
+            document.getElementsByName('d50_strickler')[iStation].innerHTML = (this.Manning.d50_strickler * f['d50_strickleru'].value).toFixed(2);
+            document.getElementsByName('d50_mc')[iStation].innerHTML = (d50_mc * f['d50_mcu'].value).toFixed(2);
+            document.getElementsByName('d50_mra')[iStation].innerHTML = (d50_mra * f['d50_mrau'].value).toFixed(2);
+            document.getElementsByName('d50_searcy')[iStation].innerHTML = (this.Manning.d50_searcy * f['d50_searcyu'].value).toFixed(2);
+            document.getElementsByName('hv')[iStation].innerHTML = (this.Manning.hv * f['hvu'].value).toFixed(2);
+            document.getElementsByName('tau')[iStation].innerHTML = (tau * f['tauu'].value).toFixed(2);
+            document.getElementsByName('a')[iStation].innerHTML = (this.Manning.a * f['au'].value).toFixed(2);
+            document.getElementsByName('pw')[iStation].innerHTML = (this.Manning.pw * f['pwu'].value).toFixed(2);
+            document.getElementsByName('rh')[iStation].innerHTML = (this.Manning.rh * f['rhu'].value).toFixed(2);
             if (document.getElementsByName('is_bank')[iStation].checked) {
                 this.Manning.closeRegion();
             }
