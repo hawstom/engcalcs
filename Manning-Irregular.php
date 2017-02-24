@@ -37,7 +37,8 @@ function echoCalculatorFormAppend() {
     <table id="CalcsTable">
         <thead>
             <tr>
-                <th colspan="17"><?=$ec_lang['mi_xSecPoints']?></th>
+                <th colspan="17"><?=$ec_lang['mi_xSecPoints']?>
+                <a href="javascript:EngCalcs.addSingleCalcRow()">+</a>/<a href="javascript:EngCalcs.deleteSingleCalcRow()">-</a></th>
             </tr>
             <tr>
                 <th>
@@ -112,11 +113,8 @@ function echoCalculatorFormAppend() {
     </table>
     <!-- <input type="text" size="6" name="calcname" /> Calculation name<br /><br /> -->
     <br />
-    <input type="submit" name="Submit" value="<?=$ec_lang['mi_save_and_calculate']?>" /> 
-    <!--<input type="submit" name="Submit" value="Load and Calculate" /> --> 
-    <?=$ec_lang['mi_or_adjust']?> 
-    <a href="javascript:EngCalcs.pageAddCalcRow()">+</a>/<a href="javascript:EngCalcs.deleteCalcRow()">-</a> <?=$ec_lang['mi_n_rows']?>
-    <br />
+	<!--<input type="submit" name="Submit" value="Load and Calculate" /> --> 
+    <input type="submit" name="Submit" value="<?=$ec_lang['mi_save_and_calculate']?>" />
     </div>
 
 <?php
@@ -190,13 +188,16 @@ EngCalcs.pageCalculator = function (f) {
             this.Manning.pw = (this.Manning.a == 0) ? 0 : (s == 0) ? l :  Math.abs(this.wedgeWettedPerimeter(d0, s) - this.wedgeWettedPerimeter(d1, s));
             this.Manning.pwc = this.Manning.pwc + this.Manning.pw;
             this.Manning.t = l*this.Manning.pw/hypotenuse;
+            this.Manning.isBank = document.getElementsByName('is_bank')[iStation].checked;
             arrSketchSegments.push({
                 sectionX1: station0,
                 sectionX2: station1,
                 sectionY1: elev0,
                 sectionY2: elev1,
                 WSX1: (s >= 0) ? station0 : (station1 - this.Manning.t),
-                WSX2: (s <= 0) ? station1 : (station0 + this.Manning.t)
+                WSX2: (s <= 0) ? station1 : (station0 + this.Manning.t),
+                isBank: this.Manning.isBank,
+                n: this.Manning.n
             });
             this.Manning.recalc();
             this.Manning.qc = this.Manning.qc + this.Manning.q;
@@ -224,7 +225,7 @@ EngCalcs.pageCalculator = function (f) {
             document.getElementsByName('a')[iStation].innerHTML = (this.Manning.a * f['au'].value).toFixed(2);
             document.getElementsByName('pw')[iStation].innerHTML = (this.Manning.pw * f['pwu'].value).toFixed(2);
             document.getElementsByName('rh')[iStation].innerHTML = (this.Manning.rh * f['rhu'].value).toFixed(2);
-            if (document.getElementsByName('is_bank')[iStation].checked) {
+            if (this.Manning.isBank) {
                 this.Manning.closeRegion();
             }
         }
@@ -272,6 +273,12 @@ EngCalcs.pageCalculator = function (f) {
              {x:arrSketchSegments[i].sectionX2, y:arrSketchSegments[i].sectionY2}
             ])
         );
+        htmlSketchSegments = htmlSketchSegments.concat(
+            this.Sketch.getTextHtml(
+                {x:(arrSketchSegments[i].sectionX1 + arrSketchSegments[i].sectionX2) / 2, y:ws-this.Sketch.figureHeight/2},
+                arrSketchSegments[i].n
+            )
+        );
         this.Sketch.strokeColor = 'blue';
         htmlSketchSegments = htmlSketchSegments.concat(
             this.Sketch.getLineHtml([
@@ -279,6 +286,15 @@ EngCalcs.pageCalculator = function (f) {
              {x:arrSketchSegments[i].WSX2, y:ws}
             ])
         );
+        if (arrSketchSegments[i].isBank) {
+            this.Sketch.strokeColor = 'red';
+            htmlSketchSegments = htmlSketchSegments.concat(
+                this.Sketch.getLineHtml([
+                 {x:arrSketchSegments[i].WSX2, y:ws},
+                 {x:arrSketchSegments[i].WSX2, y:arrSketchSegments[i].sectionY2}
+                ])
+            );
+        }
     }
 
     document.getElementById('sketch').innerHTML =
@@ -320,10 +336,18 @@ EngCalcs.Sketch.getLineHtml = function (arrPoints) {
     return '<line '
     + 'x1="' + this.convertPoint(arrPoints[0]).x.toString()
     + '" y1="'  + this.convertPoint(arrPoints[0]).y.toString()
-    +  '" x2="'  + this.convertPoint(arrPoints[1]).x.toString()
-    +  '" y2="'  + this.convertPoint(arrPoints[1]).y.toString()
-    +  '" style="stroke:' + this.strokeColor 
+    + '" x2="'  + this.convertPoint(arrPoints[1]).x.toString()
+    + '" y2="'  + this.convertPoint(arrPoints[1]).y.toString()
+    + '" style="stroke:' + this.strokeColor 
     + ';stroke-width:' + this.strokeWidth + '" />';
+}
+
+EngCalcs.Sketch.getTextHtml = function (point, text) {
+    return '<text '
+    + 'x="' + this.convertPoint(point).x.toString()
+    + '" y="'  + this.convertPoint(point).y.toString()
+    + '" fill="green" text-anchor = "middle"'
+    + '>' + text + '</text>';
 }
 
 EngCalcs.Manning = {};
@@ -435,8 +459,6 @@ EngCalcs.pageAddCalcRow = function () {
     this.addManningIrregularStation(0, 0, n, isBank);
 };
 
-
-<!--
 <?php
 echoCookieScript ();
 ?>
