@@ -8,6 +8,9 @@ $html_head='
 echoHeader("EngCalcs", $html_title, $html_head);
 ?>
 <h2><?php echo $ec_lang['mi_main_desc'] ?></h2>
+
+<p>CAUTION! This calculator is in beta state.  Cookies may be unstable.  Next time you visit, your entries may be lost.</p>
+
 <?php echoHelpWanted(); ?>
 
 <?php
