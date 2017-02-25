@@ -273,12 +273,6 @@ EngCalcs.pageCalculator = function (f) {
              {x:arrSketchSegments[i].sectionX2, y:arrSketchSegments[i].sectionY2}
             ])
         );
-        htmlSketchSegments = htmlSketchSegments.concat(
-            this.Sketch.getTextHtml(
-                {x:(arrSketchSegments[i].sectionX1 + arrSketchSegments[i].sectionX2) / 2, y:ws-this.Sketch.figureHeight/2},
-                arrSketchSegments[i].n
-            )
-        );
         this.Sketch.strokeColor = 'blue';
         htmlSketchSegments = htmlSketchSegments.concat(
             this.Sketch.getLineHtml([
@@ -286,15 +280,23 @@ EngCalcs.pageCalculator = function (f) {
              {x:arrSketchSegments[i].WSX2, y:ws}
             ])
         );
-        if (arrSketchSegments[i].isBank) {
+        if (arrSketchSegments[i].isBank && i < arrSketchSegments.length - 1) {
             this.Sketch.strokeColor = 'red';
             htmlSketchSegments = htmlSketchSegments.concat(
                 this.Sketch.getLineHtml([
-                 {x:arrSketchSegments[i].WSX2, y:ws},
-                 {x:arrSketchSegments[i].WSX2, y:arrSketchSegments[i].sectionY2}
+                 {x:arrSketchSegments[i].sectionX2, y:this.Sketch.figureTop},
+                 {x:arrSketchSegments[i].sectionX2, y:(this.Sketch.figureTop - this.Sketch.figureHeight)}
                 ])
             );
         }
+        htmlSketchSegments = htmlSketchSegments.concat(
+            this.Sketch.getMiddleTextHtml({
+                point: {x:(arrSketchSegments[i].sectionX1 + arrSketchSegments[i].sectionX2) / 2, y:this.Sketch.figureTop-this.Sketch.figureHeight/2},
+                text: arrSketchSegments[i].n,
+                height: 14,
+                rotation: -90
+            })
+        );
     }
 
     document.getElementById('sketch').innerHTML =
@@ -342,12 +344,16 @@ EngCalcs.Sketch.getLineHtml = function (arrPoints) {
     + ';stroke-width:' + this.strokeWidth + '" />';
 }
 
-EngCalcs.Sketch.getTextHtml = function (point, text) {
+EngCalcs.Sketch.getMiddleTextHtml = function (obj) {
     return '<text '
-    + 'x="' + this.convertPoint(point).x.toString()
-    + '" y="'  + this.convertPoint(point).y.toString()
-    + '" fill="green" text-anchor = "middle"'
-    + '>' + text + '</text>';
+    + 'x="' + this.convertPoint(obj.point).x.toString()
+    + '" y="'  + this.convertPoint(obj.point).y.toString()
+    + '" transform="rotate(' + obj.rotation.toString() 
+    + ' ' + this.convertPoint(obj.point).x.toString()
+    + ',' + (this.convertPoint(obj.point).y-obj.height/2).toString() + ')"'
+    + '" style="font-size: ' + obj.height + 'px;"' 
+    + ' fill="green" text-anchor = "middle"'
+    + '>' + obj.text + '</text>';
 }
 
 EngCalcs.Manning = {};
@@ -358,9 +364,13 @@ EngCalcs.Manning.gammawater = 9806;
 
 EngCalcs.Manning.recalc = function () {
     this.s0root = Math.pow(this.s0, 0.5);
-    this.rh = this.a/this.pw;
-    this.v = this.c/this.n*Math.pow(this.rh,2/3)*this.s0root;
-    this.q = this.v * this.a;
+        this.rh = this.a/this.pw;
+        this.v = this.c/this.n*Math.pow(this.rh,2/3)*this.s0root;
+    if (this.a == 0) {
+        this.q = 0;
+    } else {
+        this.q = this.v * this.a;
+    }
     this.hv = this.v * this.v / (2 * this.g);
     this.f = this.v * Math.sqrt(this.t/(this.g * this.a * Math.cos(Math.atan(this.s0))));
     this.ncompterm617 = this.pw*Math.pow(this.n,1.5);
