@@ -14,9 +14,9 @@ echoHeader("EngCalcs", $html_title, $html_head);
 	<div>
         <input type="text" style="font-size: 2em; width: 98%" placeholder="Printable Title" /><br />
         <input type="text" style="font-size: 1.5em; width: 98%" placeholder="Printable Subtitle" />
-		<input type="number" class="input" name="l" id="l" /> <?=$ec_lang['ws_weirLength']?><br /><br />
-		<input type="number" class="input" name="h" id="h" /> <?=$ec_lang['ws_headWaterHeight']?><br /><br />
-		<input type="number" class="input" name="cw" id="cw" /> <?=$ec_lang['ws_weirCoefficient']?> <a target="_blank" href="http://epg.modot.org/files/b/bc/749_Broad-Crested_Weir_Coefficients.pdf">?</a><br /><br />
+		<input type="number" step="any" class="input" name="l" id="l" /> <?=$ec_lang['ws_weirLength']?><br /><br />
+		<input type="number" step="any" class="input" name="h" id="h" /> <?=$ec_lang['ws_headWaterHeight']?><br /><br />
+		<input type="number" step="any" class="input" name="cw" id="cw" /> <?=$ec_lang['ws_weirCoefficient']?> <a target="_blank" href="http://epg.modot.org/files/b/bc/749_Broad-Crested_Weir_Coefficients.pdf">?</a><br /><br />
 		<input type="submit" name="Submit" value="<?=$ec_lang['wi_save_and_calculate']?>" />
 	</div>
 </form>
