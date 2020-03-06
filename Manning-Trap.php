@@ -85,7 +85,7 @@ EngCalcs.pageCalculator = function(f) {
     hv=v * v / (2 * g)
     q = v*a;
     froude = v * Math.sqrt(t/(g * a * Math.cos(Math.atan(s0))));
-    tau = gammawater * y * s0;
+    tau = gammawater * rh * s0;
     c_isbash = (beta <= 30) ? 1.2 : 0.86;
     d50_strickler = Math.pow(n * 21.1, 6); // n = 1/21.1 D ^ (1/6)
     d50_mra = 0.031 * Math.pow(v, 2.5) / (Math.pow(sgrock - 1, 0.25) * Math.pow(y, 0.25) * ((beta <= 30) ? 1 : 1.5));

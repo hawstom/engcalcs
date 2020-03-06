@@ -71,7 +71,7 @@ EngCalcs.pageCalculator = function(f) {
     hv = v * v / (2 * g);
     q = v*a;
     froude = v * Math.sqrt(t/(g * a * Math.cos(Math.atan(s0))));
-    tau = gammawater * y * s0;
+    tau = gammawater * rh * s0;
 
     // Sketch
     gcr = 50; // Pipe circle radius
