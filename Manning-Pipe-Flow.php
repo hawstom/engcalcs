@@ -1,5 +1,6 @@
 <?php
-require_once('../lib/edc.lib.php');
+define('BASE_DIRECTORY', realpath(__DIR__.'/..'));
+require_once (BASE_DIRECTORY."/engcalcs/lib/base.inc.php");
 //phpinfo();
 $html_title = $ec_lang['mpf_main_title'];
 $html_head='

@@ -1,0 +1,123 @@
+<?php
+// Birimler
+// Hesap makinası birim seçimi için gerekli
+$ec_lang['u_ft']="ft";
+$ec_lang['u_ft2']="ft^2";
+$ec_lang['u_ftps']="ft/s";
+$ec_lang['u_ft3ps']="ft^3/s";
+$ec_lang['u_gpm']="g/d";
+$ec_lang['u_in']="inç";
+$ec_lang['u_in2']="inç^2";
+$ec_lang['u_lps']="l/s";
+$ec_lang['u_m']="m";
+$ec_lang['u_m2']="m^2";
+$ec_lang['u_mgd']="g*10^6/gün";
+$ec_lang['u_mps']="m/s";
+$ec_lang['u_m3ph']="m^3/sa";
+$ec_lang['u_m3ps']="m^3/s";
+$ec_lang['u_mm']="mm";
+$ec_lang['u_mm2']="mm^2";
+$ec_lang['u_mph']="mil/sa";
+$ec_lang['u_npm2']="N/m^2";
+$ec_lang['u_pa']="Pa";
+$ec_lang['u_kpa']="kPa";
+$ec_lang['u_mh2o']="m H2O";
+$ec_lang['u_mmh2o']="mm H2O";
+$ec_lang['u_psf']="psf";
+$ec_lang['u_psi']="psi";
+$ec_lang['u_fth2o']="ft H2O";
+$ec_lang['u_inh2o']="in H2O";
+$ec_lang['u_s']="sec";
+$ec_lang['u_grade']="Yükselme/İlerleme";
+$ec_lang['u_gradePercent']='% Yükselme/İlerleme';
+$ec_lang['u_depthFrac']='oran';
+$ec_lang['u_depthPercent']="%";
+
+// Page text
+// Note: Daha kolay bakım için dil değişkenlerinin sayfa sıralamasına göre ayarlanması sürecinde
+$ec_lang['menu_main_list']='Hesap makinası listesi';
+$ec_lang['menu_main_hydraulics']='Hidrolik';
+$ec_lang['menu_main_language']='Dil';
+$ec_lang['menu_sub1_manning']='Manning Formülü';
+$ec_lang['template_translation_help']="Bu hesap makinesini kendi dilinize çevirmek ya da bu hesap makinesini web sitenizde göstermek ister misiniz? Türkçe çeviri için Mustafa Özbay'a tesekkür ederim.";
+$ec_lang['template_feedback']='Lütfen görüslerinizi ve begenileriniz bizimle paylasin. Bu ücretsiz hesap makinesi beklentilerinizi karsilayabildi mi?';
+$ec_lang['index_title']='Bedava çevrimiçi mühendislik hesaplayıcıları';
+$ec_lang['mpf_main_menu']='Manning boru akımı';
+$ec_lang['mpf_main_title']="Belli Egim ve Yükseklikteki Düzgün Akis Için Manning Formülü";
+$ec_lang['mpf_main_desc']="Belli Egim ve Yükseklikteki Düzgün Akis Için Manning Formülü";
+$ec_lang['calc_set_units']='Birimleri ayarla:';
+$ec_lang['calc_results']='Sonuçlar:';
+$ec_lang['mpf_pipe_diameter']="Boru Çapı, d0";
+$ec_lang['mpf_manningRoughness']='Manning pürüzlülük katsayısı, n';
+$ec_lang['mpf_friction_slope']='Basinç Egimi (<a target="_blank"
+href="../pressureslope.php">Boru Egimi</a>)';
+$ec_lang['mpf_depth_ratio']='Tam derinlik yüzdesi (ya da orani) (Eger tam dolu boru ise 100% ya da 1)';
+$ec_lang['mpf_flow']='Akış, q';
+$ec_lang['mpf_velocity']='Hız, v';
+$ec_lang['mpf_velocity_head']='Hız Yükü, hv';
+$ec_lang['mpf_flow_area']='Akis Alani';
+$ec_lang['mpf_wetted_perimeter']='Islak Çevre';
+$ec_lang['mpf_hydraulic_radius']='Hidrolik Yariçap';
+$ec_lang['mpf_top_width']='Üst Genisligi, T';
+$ec_lang['mpf_froude_number']='Froude Sayısı, F';
+$ec_lang['mpf_shear_stress']='Kayma Gerilmesi, τ';
+$ec_lang['mphl_main_menu']='Tam Akis Sartlarinda Yük Kaybi';
+$ec_lang['mphl_main_title']='Ücretsiz Tam Akis Sartlarinda Manning Yük Kaybi Formülü';
+$ec_lang['mphl_main_desc']='Tam Akış Şartlarında Manning Yük Kaybı Formülü';
+$ec_lang['mphl_pipe_length']='Boru Uzunluğu, l';
+$ec_lang['mphl_total_junction_k']='Pürüzsüzlük Katsayısı, k';
+$ec_lang['mphl_friction_loss']='Sürtünmeye Bağlı Yük Kaybı, Hf';
+$ec_lang['mphl_junction_loss']='İkincil Yük Kayıpları, Hm';
+$ec_lang['mphl_total_loss']='Toplam Yük Kaybı, Hl';
+$ec_lang['mtc_menu']='Belli Eğim ve Derinlikteki Düzgün Trapezoidal Kanallar';
+$ec_lang['mtc_main_title']='Ücretsiz Belli Eğim ve Derinlikteki Düzgün Trapezoidal Kanallar için Manning Formülü';
+$ec_lang['mtc_main_desc']='Belli Eğim ve Derinlikteki Düzgün Trapezoidal Kanallar için Manning Formülü';
+$ec_lang['mtc_bottom_width']='Dip Genişliği';
+$ec_lang['mtc_side_slope_1']='Yan Eğim 1 (yatay / dikey)';
+$ec_lang['mtc_side_slope_2']='Yan Eğim 2 (yatay / dikey)';
+$ec_lang['mtc_channel_slope']='Kanal Eğimi';
+$ec_lang['mtc_flow_depth']='Akış Derinliği';
+$ec_lang['mtc_d50_bottom']='<span title="per Isbash (1936), Robinson, and Maricopa County, Arizona, US">Required bottom angular riprap size Gerekli açısal taban örtüsü boyutu, D50, Maricopa County</span>';
+$ec_lang['mtc_d50_mra']='Required angular riprap size Gerekli açısal taban örtüsü boyutu, D50, per Maynord, Ruff, and Abt (1989)';
+$ec_lang['mtc_d50_searcy']='Required angular riprap size Gerekli açısal taban örtüsü boyutu, D50, per Searcy (1967)';
+$ec_lang['mtc_d50_strickler']='<span title="per Strickler (Adjust n so this equals your design lining size n değerini ayarlayın böylece sizin tasarım örtü boyuna eşit olsun)">Implied riprap size based on n n’ye bağlı uygulanan örtü boyutu</span>';
+$ec_lang['mtc_d50_z1']='<span title="per Isbash (1936), Robinson, and Maricopa County, Arizona, US">Required side slope 1 angular riprap size,yan eğim 1 için gerekli açısal örtü boyutu D50, Maricopa County</span>';
+$ec_lang['mtc_d50_z2']='<span title="per Isbash (1936), Robinson, and Maricopa County, Arizona, US">Required side slope 2 angular riprap size, yan eğim 2 için gerekli açısal örtü boyutu D50, Maricopa County</span>';
+$ec_lang['rrc_main_menu']="Robinson Rock Chute Design Robinson Rock Şüt(Paraşüt) Tasarımı";
+$ec_lang['rrc_main_desc']="Robinson Rock Chute Design Spreadsheet Robinson Rock Şüt(Paraşüt) Tasarımı Excel Sayfası";
+$ec_lang['ws_main_menu']='Basit Savaklar için Debi Hesabı';
+$ec_lang['ws_main_title']='Ücretsiz Basit Savaklar için Debi Hesabı Broad-crested Geniş-kretli';
+$ec_lang['ws_main_desc']='Basit Savaklar için Debi Hesabı Broad-crested Geniş-kretli';
+$ec_lang['ws_weirLength']='Savak Uzunluğu, l';
+$ec_lang['ws_headWaterHeight']='Su Yüksekliği, h';
+$ec_lang['ws_weirCoefficient']='Savak Sabiti, Cw (Savağa bağlıdır. Geniş tepeli savak için, kret genişliği, derinliği, ve üst kenar şekline bağlı olarak bu değer
+feet biriminde işlem yapılıyorsa 2.3 ve 3.3 arasında değişir.)';
+$ec_lang['ws_notes_heading']='Not';
+$ec_lang['ws_notes_we_term']='Savak Denklemi';
+$ec_lang['wi_menu']='Değişken Derinlikte, Düzensiz Savak Debisi Hesabı';
+$ec_lang['wi_main_title']='Ücretsiz Değişken Derinlikte, Düzensiz Savak Debisi Hesabı Broad-crested Geniş-kretli';
+$ec_lang['wi_main_desc']='Değişken Derinlikte, Düzensiz Savak Debisi Hesabı Broad-crested Geniş-kretli';
+$ec_lang['wi_headWaterelevation']='Su Yüksekliği';
+$ec_lang['wi_weirPoints']='Savak Noktaları';
+$ec_lang['wi_station']="Kanal";
+$ec_lang['wi_elevation']="Yükseklik";
+$ec_lang['wi_pondingHeight']='Göllenme Yüksekliği';
+$ec_lang['wi_incrementalFlow']='Artımlı Akış';
+$ec_lang['wi_cumulativeFlow']='Kümülatif Akış';
+$ec_lang['wi_save_and_calculate']='Kaydet ve Hesapla';
+$ec_lang['wi_or_adjust']="ya da";
+$ec_lang['wi_n_rows']="sıraların sayısı";
+$ec_lang['wi_notes_we_term']='Weir Equation Weir denklemi';
+$ec_lang['wi_notes_we_def']='q = eğer (uzunluk = 0) ise 0, eğer (eğim=0) ise cw*uzunluk*d01.5, ya da d1 ve d0’ın daima pozitif veya sıfır olduğu yerde q=
+cw/(2.5*eğim) * (d02.5 - d12.5)';
+$ec_lang['contact_title']='Haws EDC Iletisim';
+$ec_lang['contactSendMessage']="Tom Haws'a bir mesaj gönderin";
+$ec_lang['contactYourName']='Isim:';
+$ec_lang['contactYourEmail']='E-mail Adresi:';
+$ec_lang['contactSubject']='Konu:';
+$ec_lang['contact_message']='Mesaj:';
+$ec_lang['contactSpamPrefix']='Bes arti bir';
+$ec_lang['contactSpamPostfix']='(Lütfen yaziyla gösterin. 1= bir 2=iki 3=üç 4=dört 5=bes 6=alti 7=yedi +=arti 5+1=6)';
+$ec_lang['contactSubmitButton']='Gönder';
+?>
+

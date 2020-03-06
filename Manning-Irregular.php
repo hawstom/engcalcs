@@ -1,5 +1,6 @@
 <?php 
-require_once ("../lib/edc.lib.php");
+define('BASE_DIRECTORY', realpath(__DIR__.'/..'));
+require_once (BASE_DIRECTORY."/engcalcs/lib/base.inc.php");
 $html_title = $ec_lang['mi_main_title'];
 $html_head='
     <meta name="Description" content="'. $html_title .'" />
