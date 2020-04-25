@@ -38,6 +38,10 @@ switch ($_SERVER['SERVER_NAME'])
         $baseurl = 'http://cnmm';
         $debugmode=TRUE;
         break;
+    case 'dev.hawsedc.com':
+        $baseurl = 'http://dev.hawsedc.com';
+        $debugmode=TRUE;
+        break;
     default :
         $baseurl = 'http://www.hawsedc.com';
         $debugmode=FALSE;

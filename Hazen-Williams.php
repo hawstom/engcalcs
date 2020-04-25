@@ -9,15 +9,15 @@ $html_head='
 echoHeader("EngCalcs", $html_title, $html_head);
 
 ?>
-<h2><?=$ec_lang['ws_main_desc']?></h2>
+<h2><?=$ec_lang['hw_main_desc']?></h2>
 <?php echoHelpWanted(); ?>
 <form name="formInput" action="javascript:EngCalcs.calcAndSave(document.forms.formInput, 'Weir-Flow-Simple')" method="post">
 	<div>
         <input type="text" style="font-size: 2em; width: 98%" placeholder="Printable Title" /><br />
         <input type="text" style="font-size: 1.5em; width: 98%" placeholder="Printable Subtitle" />
-		<input type="number" step="any" class="input" name="l" id="l" /> <?=$ec_lang['ws_weirLength']?><br /><br />
-		<input type="number" step="any" class="input" name="h" id="h" /> <?=$ec_lang['ws_headWaterHeight']?><br /><br />
-		<input type="number" step="any" class="input" name="cw" id="cw" /> <?=$ec_lang['ws_weirCoefficient']?> <a target="_blank" href="http://epg.modot.org/files/b/bc/749_Broad-Crested_Weir_Coefficients.pdf">?</a><br /><br />
+		<input type="number" step="any" class="input" name="l" id="l" /> <?=$ec_lang['hw_weirLength']?><br /><br />
+		<input type="number" step="any" class="input" name="h" id="h" /> <?=$ec_lang['hw_headWaterHeight']?><br /><br />
+		<input type="number" step="any" class="input" name="cw" id="cw" /> <?=$ec_lang['hw_weirCoefficient']?> <a target="_blank" href="http://epg.modot.org/files/b/bc/749_Broad-Crested_Weir_Coefficients.pdf">?</a><br /><br />
 		<input type="submit" name="Submit" value="<?=$ec_lang['wi_save_and_calculate']?>" />
 	</div>
 </form>
@@ -28,9 +28,9 @@ echoHeader("EngCalcs", $html_title, $html_head);
 	</table>
 </div>
 <?php echoFeedback(); ?>
-<h2><?=$ec_lang['ws_notes_heading']?></h2>
+<h2><?=$ec_lang['hw_notes_heading']?></h2>
 <dl>
-<dt><?=$ec_lang['ws_notes_we_term']?></dt><dd>q = cw * l * h<sup>1.5</sup></dd>
+<dt><?=$ec_lang['hw_notes_we_term']?></dt><dd>q = cw * l * h<sup>1.5</sup></dd>
 </dl>
 <script type="text/javascript">
 <!--
