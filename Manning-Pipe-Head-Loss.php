@@ -24,6 +24,7 @@ echoCalculatorForm(
 ),
 	//Results
 	Array(
+		Array('name' => 'a', 'units' => Array('m2','mm2','ft2', 'in2'), 'label' => $ec_lang['mphl_area']),
 		Array('name' => 'v', 'units' => Array('mps','ftps','mph'), 'label' => $ec_lang['mpf_velocity']),
 		Array('name' => 'hv', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mpf_velocity_head']),
 		Array('name' => 'hf', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mphl_friction_loss'], 'H<sub>f</sub>'),
@@ -42,14 +43,16 @@ EngCalcs.pageCalculator = function(f) {
 	k = f['k'].value,
 	c=1.0,
 	g=9.806,
+	a,
 	v,
 	hv,
 	hf,
 	hm,
 	hl,
 	tau;
-	v = q/(Math.PI*d0*d0/4);
-	// Report heads in pascals.  Convert meters to pascals with * (1000 * g)
+	a = (Math.PI*d0*d0/4);
+	v = q/a;
+	// Report heads in pascals (standard SI pressure unit).  Convert meters to pascals with * (1000 * g)
 	hv = v * v / (2 * g) * (1000 * g);
 	hf = l * v * v * n * n * 6.3496 / (c*c *Math.pow(d0,4/3)) * (1000 * g);
 	hm = k * hv;
