@@ -17,7 +17,7 @@ echoCalculatorForm(
 	//Inputs
 	Array(
 		Array('name' => 'q', 'type' => 'number', 'units' => Array('m3ps','lps','mld','ft3ps','gpm','mgd'), 'label' => $ec_lang['mpf_flow']),
-		Array('name' => 'd0', 'type' => 'number', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mpf_pipe_diameter']),
+		Array('name' => 'd', 'type' => 'number', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mpf_pipe_diameter']),
 		Array('name' => 'l', 'type' => 'number', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mphl_pipe_length']),
 		Array('name' => 'n', 'type' => 'number', 'units' => NULL, 'label' => $ec_lang['mpf_manningRoughness'].' <a target="_blank" href="http://www.engineeringtoolbox.com/mannings-roughness-d_799.html">?</a>'),
 		Array( 'name' => 'k', 'type' => 'number', 'units' => NULL, 'label' => $ec_lang['mphl_total_junction_k']),
@@ -37,7 +37,7 @@ echoCalculatorForm(
 <script type="text/javascript">
 EngCalcs.pageCalculator = function(f) {
 	var q = f['q'].value / f['qu'].value,
-	d0 = f['d0'].value / f['d0u'].value,
+	d = f['d'].value / f['du'].value,
 	l = f['l'].value / f['lu'].value,
 	n = f['n'].value,
 	k = f['k'].value,
@@ -50,11 +50,11 @@ EngCalcs.pageCalculator = function(f) {
 	hm,
 	hl,
 	tau;
-	a = (Math.PI*d0*d0/4);
+	a = (Math.PI*d*d/4);
 	v = q/a;
 	// Report heads in pascals (standard SI pressure unit).  Convert meters to pascals with * (1000 * g)
 	hv = v * v / (2 * g) * (1000 * g);
-	hf = l * v * v * n * n * 6.3496 / (c*c *Math.pow(d0,4/3)) * (1000 * g);
+	hf = l * v * v * n * n * 6.3496 / (c*c *Math.pow(d,4/3)) * (1000 * g);
 	hm = k * hv;
 	hl = +hf + +hm;
 	document.getElementById('v').innerHTML = (v * f['vu'].value).toFixed(4);
