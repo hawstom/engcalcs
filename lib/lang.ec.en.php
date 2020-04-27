@@ -158,6 +158,12 @@ $ec_lang['hw_main_title']='Free Online Hazen-Williams Head Loss Calculator';
 $ec_lang['hw_main_desc']='Hazen-Williams Head Loss at Given Diameter, Roughness, and Flow';
 $ec_lang['hw_roughness']='Hazen-Williams roughness coefficient, C';
 $ec_lang['hw_friction_slope']='Friction slope';
+// Darcy-Weisbach. See mphl_ for missing language.
+$ec_lang['dw_main_menu']='Darcy-Weisbach Head Loss';
+$ec_lang['dw_main_title']='Free Online Darcy-Weisbach Head Loss Calculator';
+$ec_lang['dw_main_desc']='Darcy-Weisbach Head Loss at Given Diameter, Roughness, and Flow';
+$ec_lang['dw_roughness']='Darcy-Weisbach absolute roughness, e';
+$ec_lang['dw_friction_slope']='Friction slope';
 // Contact us.
 $ec_lang['contact_title']="HawsEDC Contact";
 $ec_lang['contactSendMessage']='Send Tom Haws a message';
