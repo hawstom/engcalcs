@@ -61,7 +61,7 @@ function echoCalculatorFormAppend() {
 </dl>
 <script type="text/javascript">
 // The argument f is not used here.
-EngCalcs.pageCalculator = function (f) {
+EngCalcs.pageCalculator = function (objForm) {
     'use strict';
     var row,
     station0,
@@ -76,9 +76,9 @@ EngCalcs.pageCalculator = function (f) {
     qi,
     qc = 0,
     // Get the global values and save them to a cookie
-    hw = f.hw.value,
-    cw = f.cw.value;
-    cw = f.cw.value;
+    hw = objForm.hw.value,
+    cw = objForm.cw.value;
+    cw = objForm.cw.value;
 
     for (var station = 0; station < EngCalcs.numCalcRows; station++) {
         // Save the old variables if this is not the first row
@@ -107,7 +107,7 @@ EngCalcs.pageCalculator = function (f) {
         }
     }
     // Save a cookie for next time
-    EngCalcs.adjustInputWidth(f);
+    EngCalcs.adjustInputWidth(objForm);
 };
 
 EngCalcs.addWeirStation = function (station, elevation) {

@@ -34,10 +34,10 @@ echoHeader("EngCalcs", $html_title, $html_head);
 </dl>
 <script type="text/javascript">
 <!--
-EngCalcs.pageCalculator = function(f) {
-	var l = f.l.value,
-	h = f.h.value,
-	cw = f.cw.value,
+EngCalcs.pageCalculator = function(objForm) {
+	var l = objForm.l.value,
+	h = objForm.h.value,
+	cw = objForm.cw.value,
 	q
 	;
 	q = cw * l * Math.pow(h, 1.5);

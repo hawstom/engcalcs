@@ -35,33 +35,28 @@ echoCalculatorForm(
 ?>
 <?php echoFeedback(); ?>
 <script type="text/javascript">
-EngCalcs.pageCalculator = function(f) {
-	var q = f['q'].value / f['qu'].value,
-	d = f['d'].value / f['du'].value,
-	l = f['l'].value / f['lu'].value,
-	n = f['n'].value,
-	k = f['k'].value,
-	c=1.0,
-	g=9.806,
-	a,
-	v,
-	hv,
-	hf,
-	hm,
-	hl,
-	tau;
-	a = (Math.PI*d*d/4);
-	v = q/a;
+EngCalcs.pageCalculator = function(objForm) {
+	this.var = {};
+	this.readFormInput(objForm, 'q', hasUnits = true);
+	this.readFormInput(objForm, 'd', hasUnits = true);
+	this.readFormInput(objForm, 'l', hasUnits = true);
+	this.readFormInput(objForm, 'n', hasUnits = false);
+	this.readFormInput(objForm, 'k', hasUnits = false);
+	this.var.c = 1.0;
+	this.var.g = 9.806;
+	this.var.a = (Math.PI * this.var.d * this.var.d / 4);
+	this.var.v = this.var.q / this.var.a;
 	// Report heads in pascals (standard SI pressure unit).  Convert meters to pascals with * (1000 * g)
-	hv = v * v / (2 * g) * (1000 * g);
-	hf = l * v * v * n * n * 6.3496 / (c*c *Math.pow(d,4/3)) * (1000 * g);
-	hm = k * hv;
-	hl = +hf + +hm;
-	document.getElementById('v').innerHTML = (v * f['vu'].value).toFixed(4);
-	document.getElementById('hv').innerHTML = (hv * f['hvu'].value).toFixed(4);
-	document.getElementById('hf').innerHTML = (hf * f['hfu'].value).toFixed(4);
-	document.getElementById('hm').innerHTML = (hm * f['hmu'].value).toFixed(4);
-	document.getElementById('hl').innerHTML = (hl * f['hlu'].value).toFixed(4);
+	this.var.hv = Math.pow(this.var.v,2) / (2 * this.var.g) * (1000 * this.var.g);
+	this.var.hf = this.var.l * Math.pow(this.var.v,2) * Math.pow(this.var.n,2) * 6.3496 / (Math.pow(this.var.c,2) * Math.pow(this.var.d,4/3)) * (1000 * this.var.g);
+	this.var.hm = this.var.k * this.var.hv;
+	this.var.hl = +this.var.hf + +this.var.hm;
+	this.writeFormResult(objForm, 'a', precision = 4, hasUnits = true);
+	this.writeFormResult(objForm, 'v', precision = 4, hasUnits = true);
+	this.writeFormResult(objForm, 'hv', precision = 4, hasUnits = true);
+	this.writeFormResult(objForm, 'hf', precision = 4, hasUnits = true);
+	this.writeFormResult(objForm, 'hm', precision = 4, hasUnits = true);
+	this.writeFormResult(objForm, 'hl', precision = 4, hasUnits = true);
 }
 <?php echoCookieScript(); ?>
 </script>

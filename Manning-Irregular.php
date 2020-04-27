@@ -130,16 +130,16 @@ function echoCalculatorFormAppend() {
 </dl>
 <script type="text/javascript">
 <!--
-EngCalcs.pageCalculator = function (f) {
+EngCalcs.pageCalculator = function (objForm) {
     'use strict';
-    this.Manning.s0 = f['s0'].value / f['s0u'].value;
-    this.Manning.beta = f['beta'].value;
-    this.Manning.sgrock = f['sgrock'].value;
+    this.Manning.s0 = objForm['s0'].value / objForm['s0u'].value;
+    this.Manning.beta = objForm['beta'].value;
+    this.Manning.sgrock = objForm['sgrock'].value;
     ws = f.ws.value;
     var
     // Use unary + to convert form values to numbers
     // so when we add z1 and z2 they don't get concatenated.
-    ws = f['ws'].value / f['wsu'].value,
+    ws = objForm['ws'].value / objForm['wsu'].value,
     row,
     station0,
     station1,
@@ -169,9 +169,9 @@ EngCalcs.pageCalculator = function (f) {
 
     for (var iStation=0; iStation < this.numCalcRows; iStation++) {
         row = document.getElementById("CalcsBody").getElementsByTagName('tr')[iStation];
-        station1 = row.getElementsByTagName( 'input' )[0].value / f['stationu'].value;
+        station1 = row.getElementsByTagName( 'input' )[0].value / objForm['stationu'].value;
         arrStation.push(station1);
-        elev1 = row.getElementsByTagName('input')[1].value / f['elevationu'].value;
+        elev1 = row.getElementsByTagName('input')[1].value / objForm['elevationu'].value;
         arrElev.push(elev1);
         d1=Math.max(ws-elev1,0);
         dmax = Math.max(dmax,d1);
@@ -213,19 +213,19 @@ EngCalcs.pageCalculator = function (f) {
             } else {
                 document.getElementsByName('is_bank')[iStation].disabled = false;               
             }
-            document.getElementsByName('q')[iStation].innerHTML = (this.Manning.q * f['qu'].value).toFixed(2);
-            document.getElementsByName('v')[iStation].innerHTML = (this.Manning.v * f['vu'].value).toFixed(2);
-            document.getElementsByName('t')[iStation].innerHTML = (this.Manning.t * f['tu'].value).toFixed(2);
+            document.getElementsByName('q')[iStation].innerHTML = (this.Manning.q * objForm['qu'].value).toFixed(2);
+            document.getElementsByName('v')[iStation].innerHTML = (this.Manning.v * objForm['vu'].value).toFixed(2);
+            document.getElementsByName('t')[iStation].innerHTML = (this.Manning.t * objForm['tu'].value).toFixed(2);
             document.getElementsByName('f')[iStation].innerHTML = this.Manning.f.toFixed(2);
-            document.getElementsByName('d50_strickler')[iStation].innerHTML = (this.Manning.d50_strickler * f['d50_strickleru'].value).toFixed(2);
-            document.getElementsByName('d50_mc')[iStation].innerHTML = (d50_mc * f['d50_mcu'].value).toFixed(2);
-            document.getElementsByName('d50_mra')[iStation].innerHTML = (d50_mra * f['d50_mrau'].value).toFixed(2);
-            document.getElementsByName('d50_searcy')[iStation].innerHTML = (this.Manning.d50_searcy * f['d50_searcyu'].value).toFixed(2);
-            document.getElementsByName('hv')[iStation].innerHTML = (this.Manning.hv * f['hvu'].value).toFixed(2);
-            document.getElementsByName('tau')[iStation].innerHTML = (tau * f['tauu'].value).toFixed(2);
-            document.getElementsByName('a')[iStation].innerHTML = (this.Manning.a * f['au'].value).toFixed(2);
-            document.getElementsByName('pw')[iStation].innerHTML = (this.Manning.pw * f['pwu'].value).toFixed(2);
-            document.getElementsByName('rh')[iStation].innerHTML = (this.Manning.rh * f['rhu'].value).toFixed(2);
+            document.getElementsByName('d50_strickler')[iStation].innerHTML = (this.Manning.d50_strickler * objForm['d50_strickleru'].value).toFixed(2);
+            document.getElementsByName('d50_mc')[iStation].innerHTML = (d50_mc * objForm['d50_mcu'].value).toFixed(2);
+            document.getElementsByName('d50_mra')[iStation].innerHTML = (d50_mra * objForm['d50_mrau'].value).toFixed(2);
+            document.getElementsByName('d50_searcy')[iStation].innerHTML = (this.Manning.d50_searcy * objForm['d50_searcyu'].value).toFixed(2);
+            document.getElementsByName('hv')[iStation].innerHTML = (this.Manning.hv * objForm['hvu'].value).toFixed(2);
+            document.getElementsByName('tau')[iStation].innerHTML = (tau * objForm['tauu'].value).toFixed(2);
+            document.getElementsByName('a')[iStation].innerHTML = (this.Manning.a * objForm['au'].value).toFixed(2);
+            document.getElementsByName('pw')[iStation].innerHTML = (this.Manning.pw * objForm['pwu'].value).toFixed(2);
+            document.getElementsByName('rh')[iStation].innerHTML = (this.Manning.rh * objForm['rhu'].value).toFixed(2);
             if (this.Manning.isBank) {
                 this.Manning.closeRegion();
             }
@@ -235,22 +235,22 @@ EngCalcs.pageCalculator = function (f) {
         elev0=elev1;
         d0=d1;
     }
-    document.getElementById('q_sum').innerHTML = (this.Manning.qc * f['q_sumu'].value).toFixed(2);
-    document.getElementById('q_617').innerHTML = (this.Manning.q617c * f['q_617u'].value).toFixed(2);
-    document.getElementById('q_618').innerHTML = (this.Manning.q618c * f['q_618u'].value).toFixed(2);
-/*  document.getElementById('v').innerHTML = (v * f['vu'].value).toFixed(2);
-    document.getElementById('hv').innerHTML = (hv * f['hvu'].value).toFixed(2);
-    document.getElementById('a').innerHTML = (a * f['au'].value).toFixed(2);
-    document.getElementById('pw').innerHTML = (pw * f['pwu'].value).toFixed(2);
-    document.getElementById('rh').innerHTML = (rh * f['rhu'].value).toFixed(2);
-    document.getElementById('t').innerHTML = (t * f['tu'].value).toFixed(2);
+    document.getElementById('q_sum').innerHTML = (this.Manning.qc * objForm['q_sumu'].value).toFixed(2);
+    document.getElementById('q_617').innerHTML = (this.Manning.q617c * objForm['q_617u'].value).toFixed(2);
+    document.getElementById('q_618').innerHTML = (this.Manning.q618c * objForm['q_618u'].value).toFixed(2);
+/*  document.getElementById('v').innerHTML = (v * objForm['vu'].value).toFixed(2);
+    document.getElementById('hv').innerHTML = (hv * objForm['hvu'].value).toFixed(2);
+    document.getElementById('a').innerHTML = (a * objForm['au'].value).toFixed(2);
+    document.getElementById('pw').innerHTML = (pw * objForm['pwu'].value).toFixed(2);
+    document.getElementById('rh').innerHTML = (rh * objForm['rhu'].value).toFixed(2);
+    document.getElementById('t').innerHTML = (t * objForm['tu'].value).toFixed(2);
     document.getElementById('f').innerHTML = froude.toFixed(2);
-    document.getElementById('tau').innerHTML = (tau * f['tauu'].value).toFixed(2);
-    document.getElementById('d50_strickler').innerHTML = (d50_strickler * f['d50_strickleru'].value).toFixed(2);
-    document.getElementById('d50_flattest').innerHTML = (d50_bottom * f['d50_flattestu'].value).toFixed(2);
-    document.getElementById('d50_steepest').innerHTML = (d50_z1 * f['d50_steepestu'].value).toFixed(2);
-    document.getElementById('d50_mra').innerHTML = (d50_mra * f['d50_mrau'].value).toFixed(2);
-    document.getElementById('d50_searcy').innerHTML = (d50_searcy * f['d50_searcyu'].value).toFixed(2);
+    document.getElementById('tau').innerHTML = (tau * objForm['tauu'].value).toFixed(2);
+    document.getElementById('d50_strickler').innerHTML = (d50_strickler * objForm['d50_strickleru'].value).toFixed(2);
+    document.getElementById('d50_flattest').innerHTML = (d50_bottom * objForm['d50_flattestu'].value).toFixed(2);
+    document.getElementById('d50_steepest').innerHTML = (d50_z1 * objForm['d50_steepestu'].value).toFixed(2);
+    document.getElementById('d50_mra').innerHTML = (d50_mra * objForm['d50_mrau'].value).toFixed(2);
+    document.getElementById('d50_searcy').innerHTML = (d50_searcy * objForm['d50_searcyu'].value).toFixed(2);
 */  
     // Sketch
     var

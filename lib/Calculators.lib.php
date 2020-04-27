@@ -4,21 +4,21 @@ function echoHelpWanted(){
     global $ec_lang;
 ?>
 <p class="collapse in" id="helpWanted" aria-expanded="true" >
-<a href="../contact.php"><?=$ec_lang['template_translation_help']?></a> <a data-toggle="collapse" href="#helpWanted" aria-controls="helpWanted">[Hide this request]</a>
-
+	<a href="../contact.php"><?=$ec_lang['template_translation_help']?></a> <a data-toggle="collapse" href="#helpWanted" aria-controls="helpWanted">[Hide this request]</a>
+</p>
 <?php
 if (basename($_SERVER['PHP_SELF']) == "Manning-Pipe-Flow.php") {
-    ?>
-    </p>
-    Check out our spreadsheet version of this calculator:
-    &ensp;
-    <a href="spreadsheet/<?=basename($_SERVER['PHP_SELF'], '.php') . '.xlsx';?>">Download Spreadsheet</a>
-    &ensp;
-    <a href="spreadsheet/<?=basename($_SERVER['PHP_SELF'], '.php') . '.php';?>">Open Google Sheets version</a>
-    &ensp;
-    <a href="http://www.hawsedc.com/engcalcs/SpreadsheetLibrary.php">View All Spreadsheets</a>
+?>
+<p>   
+	Check out our spreadsheet version of this calculator:
+	&ensp;
+	<a href="spreadsheet/<?=basename($_SERVER['PHP_SELF'], '.php') . '.xlsx';?>">Download Spreadsheet</a>
+	&ensp;
+	<a href="spreadsheet/<?=basename($_SERVER['PHP_SELF'], '.php') . '.php';?>">Open Google Sheets version</a>
+	&ensp;
+	<a href="http://www.hawsedc.com/engcalcs/SpreadsheetLibrary.php">View All Spreadsheets</a>
 </p>
-   <?php
+<?php
 }
 ?>
 </br>
@@ -32,7 +32,7 @@ function echoFeedback(){
     global $ec_lang;
 ?>
 <p class="collapse in" id="feedback" aria-expanded="true" >
-<a href="../contact.php"><?=$ec_lang['template_feedback']?></a> <a data-toggle="collapse" href="#feedback" aria-controls="helpWanted">[Hide this request]</a>
+	<a href="../contact.php"><?=$ec_lang['template_feedback']?></a> <a data-toggle="collapse" href="#feedback" aria-controls="helpWanted">[Hide this request]</a>
 </p>
 <?php
 }
@@ -65,65 +65,65 @@ EngCalcs.unitSets = {};
 EngCalcs.unitSets['<?=$key?>'] = ['<?=implode($set, "', '")?>'];
 <?php endforeach ; ?>
 $(document).ready(function() {
-    $('#set_units_m').click(function() {
-    EngCalcs.setUnits('m') }
-    );
-    $('#set_units_mm').click(function() {EngCalcs.setUnits('mm')});
-    $('#set_units_ft').click(function() {EngCalcs.setUnits('ft')});
-    $('#set_units_in').click(function() {EngCalcs.setUnits('in')});
+	$('#set_units_m').click(function() {
+	EngCalcs.setUnits('m') }
+	);
+	$('#set_units_mm').click(function() {EngCalcs.setUnits('mm')});
+	$('#set_units_ft').click(function() {EngCalcs.setUnits('ft')});
+	$('#set_units_in').click(function() {EngCalcs.setUnits('in')});
 });
 </script>
 <form id="formInput" action="javascript:EngCalcs.submitForm()" method="post">
-    <input type="text" style="font-size: 2em; width: 98%" placeholder="<?=$ec_lang['template_printable_title']?>" /><br />
-    <input type="text" style="font-size: 1.5em; width: 98%" placeholder="<?=$ec_lang['template_printable_subtitle']?>" />
-    <table class="bare">
-        <tbody>
-            <tr>
-                <td>
-                    <span <?php if ($flagHideUnits === true) : ?>class="hide"<?php endif; ?>><?=$ec_lang['calc_set_units']?> <button type="button" id="set_units_m"><?=$ec_lang['u_m']?></button><button type="button" id="set_units_mm"><?=$ec_lang['u_mm']?></button><button type="button" id="set_units_ft"><?=$ec_lang['u_ft']?></button><button type="button" id="set_units_in"><?=$ec_lang['u_in']?></button></span>
-                    <table>
-                        <tbody>
+	<input type="text" style="font-size: 2em; width: 98%" placeholder="<?=$ec_lang['template_printable_title']?>" /><br />
+	<input type="text" style="font-size: 1.5em; width: 98%" placeholder="<?=$ec_lang['template_printable_subtitle']?>" />
+	<table class="bare">
+		<tbody>
+			<tr>
+				<td>
+					<span <?php if ($flagHideUnits === true) : ?>class="hide"<?php endif; ?>><?=$ec_lang['calc_set_units']?> <button type="button" id="set_units_m"><?=$ec_lang['u_m']?></button><button type="button" id="set_units_mm"><?=$ec_lang['u_mm']?></button><button type="button" id="set_units_ft"><?=$ec_lang['u_ft']?></button><button type="button" id="set_units_in"><?=$ec_lang['u_in']?></button></span>
+					<table>
+						<tbody>
 <?php
-    foreach ($arrayInputs as $input) {
+	foreach ($arrayInputs as $input) {
 ?>
-                            <tr>
-                                <td><label for='<?=$input['name']?>'><?=$input['label']?></label></td>
-                                <td><?php echoInput($input['name'], $input['type'], "\t\t\t\t\t\t\t\t\t");?><?php echoUnitSelect($input['name'].'u', $input['units'], "\t\t\t\t\t\t\t\t\t");?></td>
-                            </tr>
+							<tr>
+								<td><label for='<?=$input['name']?>'><?=$input['label']?></label></td>
+								<td><?php echoInput($input['name'], $input['type'], "\t\t\t\t\t\t\t\t\t");?><?php echoUnitSelect($input['name'].'u', $input['units'], "\t\t\t\t\t\t\t\t\t");?></td>
+							</tr>
 <?php
-    }
+	}
 ?>
-                        </tbody>
-                    </table>
-                </td>
+						</tbody>
+					</table>
+				</td>
 <?php if ($arrayResults) : ?>
-                <td>
-                    <?php echo $ec_lang['calc_results'];?>
+				<td>
+					<?php echo $ec_lang['calc_results'];?>
 
-                    <table>
-                        <tbody>
+					<table>
+						<tbody>
 <?php
-    foreach ($arrayResults as $result) {
+	foreach ($arrayResults as $result) {
 ?>
-                            <tr>
-                                <td><label for='<?=$result['name']?>'><?=$result['label']?></label></td>
-                                <td id="<?php echo $result['name'];?>"><?php echo $result['label'];?></td>
-                                <td>
-                                    <?php echoUnitSelect($result['name'].'u',$result['units'], "\t\t\t\t\t\t\t\t\t");?>
+							<tr>
+								<td><label for='<?=$result['name']?>'><?=$result['label']?></label></td>
+								<td id="<?php echo $result['name'];?>"><?php echo $result['label'];?></td>
+								<td>
+									<?php echoUnitSelect($result['name'].'u',$result['units'], "\t\t\t\t\t\t\t\t\t");?>
 
-                                </td>
-                            </tr>
+								</td>
+							</tr>
 <?php
-    }
+	}
 ?>
-                        </tbody>
-                    </table>
-                </td>
-            </tr>
-            <tr>
-            </tr>
-        </tbody>
-    </table>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+			<tr>
+			</tr>
+		</tbody>
+	</table>
 <?php endif; ?>
 <?php if ($flagFormAppend === true) {echoCalculatorFormAppend();} ?>
 </form>
@@ -132,9 +132,9 @@ $(document).ready(function() {
 function echoCookieScript ()
 {
 ?>
-    // On load, read cookie and calc.
-    EngCalcs.cookieName='<?php $p=pathinfo($_SERVER['SCRIPT_NAME']); echo $p['filename']; ?>';
-    EngCalcs.readAndCalc(EngCalcs.cookieName, document.forms['formInput']);
+	// On load, read cookie and calc.
+	EngCalcs.cookieName='<?php $p=pathinfo($_SERVER['SCRIPT_NAME']); echo $p['filename']; ?>';
+	EngCalcs.readAndCalc(EngCalcs.cookieName, document.forms['formInput']);
 <?php
 }
 ?>

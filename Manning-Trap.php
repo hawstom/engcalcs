@@ -50,21 +50,21 @@ echoCalculatorForm(
 
 <?php echoFeedback(); ?>
 <script type="text/javascript">
-EngCalcs.pageCalculator = function(f) {
+EngCalcs.pageCalculator = function(objForm) {
     var
     c = 1.0,
     g = 9.806,
     gammawater = 9806,
-    b = f['b'].value / f['bu'].value,
-    y = f['y'].value / f['yu'].value,
+    b = objForm['b'].value / objForm['bu'].value,
+    y = objForm['y'].value / objForm['yu'].value,
     // Use unary + to convert form values to numbers
     // so when we add z1 and z2 they don't get concatenated.
-    z1 = +f['z1'].value,
-    z2 = +f['z2'].value,
-    s0 = f['s0'].value / f['s0u'].value,
-    n = f['n'].value,
-    beta = f['beta'].value,
-    sgrock = f['sgrock'].value,
+    z1 = +objForm['z1'].value,
+    z2 = +objForm['z2'].value,
+    s0 = objForm['s0'].value / objForm['s0u'].value,
+    n = objForm['n'].value,
+    beta = objForm['beta'].value,
+    sgrock = objForm['sgrock'].value,
     a,
     pw,
     rh,
@@ -113,21 +113,21 @@ EngCalcs.pageCalculator = function(f) {
     gtx2 = gxm + gymax/16;
     gty = gyt - gymax/8;
 
-    document.getElementById('q').innerHTML = (q * f['qu'].value).toFixed(2);
-    document.getElementById('v').innerHTML = (v * f['vu'].value).toFixed(2);
-    document.getElementById('hv').innerHTML = (hv * f['hvu'].value).toFixed(2);
-    document.getElementById('a').innerHTML = (a * f['au'].value).toFixed(2);
-    document.getElementById('pw').innerHTML = (pw * f['pwu'].value).toFixed(2);
-    document.getElementById('rh').innerHTML = (rh * f['rhu'].value).toFixed(2);
-    document.getElementById('t').innerHTML = (t * f['tu'].value).toFixed(2);
+    document.getElementById('q').innerHTML = (q * objForm['qu'].value).toFixed(2);
+    document.getElementById('v').innerHTML = (v * objForm['vu'].value).toFixed(2);
+    document.getElementById('hv').innerHTML = (hv * objForm['hvu'].value).toFixed(2);
+    document.getElementById('a').innerHTML = (a * objForm['au'].value).toFixed(2);
+    document.getElementById('pw').innerHTML = (pw * objForm['pwu'].value).toFixed(2);
+    document.getElementById('rh').innerHTML = (rh * objForm['rhu'].value).toFixed(2);
+    document.getElementById('t').innerHTML = (t * objForm['tu'].value).toFixed(2);
     document.getElementById('f').innerHTML = froude.toFixed(2);
-    document.getElementById('tau').innerHTML = (tau * f['tauu'].value).toFixed(2);
-    document.getElementById('d50_strickler').innerHTML = (d50_strickler * f['d50_strickleru'].value).toFixed(2);
-    document.getElementById('d50_bottom').innerHTML = (d50_bottom * f['d50_bottomu'].value).toFixed(2);
-    document.getElementById('d50_z1').innerHTML = (d50_z1 * f['d50_z1u'].value).toFixed(2);
-    document.getElementById('d50_z2').innerHTML = (d50_z2 * f['d50_z2u'].value).toFixed(2);
-    document.getElementById('d50_mra').innerHTML = (d50_mra * f['d50_mrau'].value).toFixed(2);
-    document.getElementById('d50_searcy').innerHTML = (d50_searcy * f['d50_searcyu'].value).toFixed(2);
+    document.getElementById('tau').innerHTML = (tau * objForm['tauu'].value).toFixed(2);
+    document.getElementById('d50_strickler').innerHTML = (d50_strickler * objForm['d50_strickleru'].value).toFixed(2);
+    document.getElementById('d50_bottom').innerHTML = (d50_bottom * objForm['d50_bottomu'].value).toFixed(2);
+    document.getElementById('d50_z1').innerHTML = (d50_z1 * objForm['d50_z1u'].value).toFixed(2);
+    document.getElementById('d50_z2').innerHTML = (d50_z2 * objForm['d50_z2u'].value).toFixed(2);
+    document.getElementById('d50_mra').innerHTML = (d50_mra * objForm['d50_mrau'].value).toFixed(2);
+    document.getElementById('d50_searcy').innerHTML = (d50_searcy * objForm['d50_searcyu'].value).toFixed(2);
     document.getElementById('sketch').innerHTML =
         '<svg height="' + gh + '" width="' + gw + '">' +
             '<polyline points="' +

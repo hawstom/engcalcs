@@ -45,17 +45,17 @@ echoCalculatorForm(
 <?php echoFeedback(); ?>
 
 <script type="text/javascript">
-EngCalcs.pageCalculator = function(f) {
+EngCalcs.pageCalculator = function(objForm) {
 	var
 	khw = 0.849,
 	g = 9.806,
 	gammawater = 9806,
 	// Convert input values from form to SI
-	d = f['d'].value / f['du'].value,
-	c = f['c'].value,
-	km = f['k'].value,
-	l = f['l'].value / f['lu'].value,
-	q = f['q'].value / f['qu'].value,
+	d = objForm['d'].value / objForm['du'].value,
+	c = objForm['c'].value,
+	km = objForm['k'].value,
+	l = objForm['l'].value / objForm['lu'].value,
+	q = objForm['q'].value / objForm['qu'].value,
 	a,
 	pw,
 	rh,
@@ -80,16 +80,16 @@ EngCalcs.pageCalculator = function(f) {
 	hl = +hf + +hm;
 
 	// Write results to page.
-	document.getElementById('v').innerHTML = (v * f['vu'].value).toFixed(4);
-	document.getElementById('hv').innerHTML = (hv * f['hvu'].value).toFixed(4);
-	document.getElementById('a').innerHTML = (a * f['au'].value).toFixed(4);
-	document.getElementById('pw').innerHTML = (pw * f['pwu'].value).toFixed(4);
-	document.getElementById('rh').innerHTML = (rh * f['rhu'].value).toFixed(4);
-	document.getElementById('sf').innerHTML = (sf * f['sfu'].value).toFixed(4);
-	document.getElementById('tau').innerHTML = (tau * f['tauu'].value).toFixed(4);
-	document.getElementById('hf').innerHTML = (hf * f['hfu'].value).toFixed(4);
-	document.getElementById('hm').innerHTML = (hm * f['hmu'].value).toFixed(4);
-	document.getElementById('hl').innerHTML = (hl * f['hlu'].value).toFixed(4);
+	document.getElementById('v').innerHTML = (v * objForm['vu'].value).toFixed(4);
+	document.getElementById('hv').innerHTML = (hv * objForm['hvu'].value).toFixed(4);
+	document.getElementById('a').innerHTML = (a * objForm['au'].value).toFixed(4);
+	document.getElementById('pw').innerHTML = (pw * objForm['pwu'].value).toFixed(4);
+	document.getElementById('rh').innerHTML = (rh * objForm['rhu'].value).toFixed(4);
+	document.getElementById('sf').innerHTML = (sf * objForm['sfu'].value).toFixed(4);
+	document.getElementById('tau').innerHTML = (tau * objForm['tauu'].value).toFixed(4);
+	document.getElementById('hf').innerHTML = (hf * objForm['hfu'].value).toFixed(4);
+	document.getElementById('hm').innerHTML = (hm * objForm['hmu'].value).toFixed(4);
+	document.getElementById('hl').innerHTML = (hl * objForm['hlu'].value).toFixed(4);
 }
 
 <?php echoCookieScript(); ?>

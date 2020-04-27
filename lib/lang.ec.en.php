@@ -52,6 +52,7 @@ $ec_lang['mpf_main_title']='Free Online Manning Pipe Flow Calculator';
 $ec_lang['mpf_main_desc']='Manning Formula Uniform Pipe Flow at Given Slope and Depth';
 $ec_lang['calc_set_units']='Set units:';
 $ec_lang['calc_results']='Results';
+// Manning Pipe Flow
 $ec_lang['mpf_pipe_diameter']='Pipe diameter, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Manning roughness, n';
 $ec_lang['mpf_friction_slope']='Pressure slope (possibly <a target="_blank" href="../pressureslope.php">?</a> equal to pipe slope), S<sub>0</sub>';
@@ -65,16 +66,17 @@ $ec_lang['mpf_hydraulic_radius']='Hydraulic radius';
 $ec_lang['mpf_top_width']='Top width, T';
 $ec_lang['mpf_froude_number']='Froude number, F';
 $ec_lang['mpf_shear_stress']='Shear stress (tractive force), tau';
+// Manning Pipe Head Loss. See mpf_ for missing language.
 $ec_lang['mphl_main_menu']='Manning Pipe Head Loss';
 $ec_lang['mphl_main_title']='Free Online Manning Pipe Head Loss Calculator';
 $ec_lang['mphl_main_desc']='Manning Formula Head Loss at Given Full Flow';
-// See mpf_ for missing language.
 $ec_lang['mphl_pipe_length']='Pipe length, L';
 $ec_lang['mphl_area']='Area, A';
 $ec_lang['mphl_total_junction_k']='Total combined junction loss coefficient, k';
 $ec_lang['mphl_friction_loss']='Friction loss';
 $ec_lang['mphl_junction_loss']='Junction loss';
 $ec_lang['mphl_total_loss']='Total loss';
+// Manning Trapezoid. See mpf for missing language.
 $ec_lang['mtc_menu']='Manning Trapezoidal Channel';
 $ec_lang['mtc_main_title']='Free Online Manning Formula Trapezoidal Channel Calculator';
 $ec_lang['mtc_main_desc']='Manning Formula Uniform Trapezoidal Channel Flow at Given Slope and Depth';
