@@ -37,6 +37,7 @@ echoCalculatorForm(
 <script type="text/javascript">
 EngCalcs.pageCalculator = function(objForm) {
 	this.var = {};
+	// Read and convert form inputs to this.var.___ as SI units
 	this.readFormInput(objForm, 'q', hasUnits = true);
 	this.readFormInput(objForm, 'd', hasUnits = true);
 	this.readFormInput(objForm, 'l', hasUnits = true);
@@ -44,7 +45,7 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.readFormInput(objForm, 'k', hasUnits = false);
 	this.var.c = 1.0;
 	this.var.g = 9.806;
-	this.var.a = (Math.PI * this.var.d * this.var.d / 4);
+	this.var.a = (Math.PI * Math.pow(this.var.d, 2) / 4);
 	this.var.v = this.var.q / this.var.a;
 	// Report heads in pascals (standard SI pressure unit).  Convert meters to pascals with * (1000 * g)
 	this.var.hv = Math.pow(this.var.v,2) / (2 * this.var.g) * (1000 * this.var.g);

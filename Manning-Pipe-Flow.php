@@ -47,6 +47,7 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.var.c = 1.0;
 	this.var.g = 9.806;
 	this.var.gammawater = 9806;
+	// Read and convert form inputs to this.var.___ as SI units
 	this.readFormInput(objForm, 'd0', hasUnits = true);
 	this.readFormInput(objForm, 's0', hasUnits = true);
 	this.readFormInput(objForm, 'n', hasUnits = false);

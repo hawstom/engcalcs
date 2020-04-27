@@ -21,7 +21,7 @@ echoCalculatorForm(
 		Array('name' => 'd', 'type' => 'number', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mpf_pipe_diameter']),
 		Array('name' => 'l', 'type' => 'number', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mphl_pipe_length']),
 		Array('name' => 'c', 'type' => 'number', 'units' => NULL, 'label' => $ec_lang['hw_roughness']),
-		Array( 'name' => 'k', 'type' => 'number', 'units' => NULL, 'label' => $ec_lang['mphl_total_junction_k']),
+		Array( 'name' => 'km', 'type' => 'number', 'units' => NULL, 'label' => $ec_lang['mphl_total_junction_k']),
 	),
 	//Results
 	Array(
@@ -46,50 +46,38 @@ echoCalculatorForm(
 
 <script type="text/javascript">
 EngCalcs.pageCalculator = function(objForm) {
-	var
-	khw = 0.849,
-	g = 9.806,
-	gammawater = 9806,
-	// Convert input values from form to SI
-	d = objForm['d'].value / objForm['du'].value,
-	c = objForm['c'].value,
-	km = objForm['k'].value,
-	l = objForm['l'].value / objForm['lu'].value,
-	q = objForm['q'].value / objForm['qu'].value,
-	a,
-	pw,
-	rh,
-	v,
-	hv,
-	sf,
-	hf,
-	hm,
-	hl,
-	tau; // End declaring variables. Begin calculations.
-	a = Math.PI * Math.pow(d, 2) / 4;
-	pw = Math.PI * d;
-	rh = d / 4;
-	v = q / a;
+	this.var = {};
+	this.var.khw = 0.849,
+	this.var.g = 9.806;
+	this.var.gammawater = 9806,
+	// Read and convert form inputs to this.var.___ as SI units
+	this.readFormInput(objForm, 'q', hasUnits = true);
+	this.readFormInput(objForm, 'd', hasUnits = true);
+	this.readFormInput(objForm, 'l', hasUnits = true);
+	this.readFormInput(objForm, 'c', hasUnits = false);
+	this.readFormInput(objForm, 'km', hasUnits = false);
+	this.var.a = (Math.PI * Math.pow(this.var.d, 2) / 4);
+	this.var.pw = Math.PI * this.var.d;
+	this.var.rh = this.var.d / 4;
+	this.var.v = this.var.q / this.var.a;
 	// From 7.8828/d^4.8704 * (Q/(k*C))^1.852 at Wikipedia Hazen-Williams article.
-	sf = 7.8828 / Math.pow(d, 4.8704) * Math.pow(q / (khw * c), 1.852);
-	tau = gammawater * rh * sf;
+	this.var.sf = 7.8828 / Math.pow(this.var.d, 4.8704) * Math.pow(this.var.q / (this.var.khw * this.var.c), 1.852);
+	this.var.tau = this.var.gammawater * this.var.rh * this.var.sf;
 	// For units selector, report heads in pascals (standard SI pressure unit).  Convert meters to pascals with * (1000 * g)
-	hv = v * v / (2 * g) * (1000 * g);
-	hf = sf * l  * (1000 * g);
-	hm = hv * km;
-	hl = +hf + +hm;
-
-	// Write results to page.
-	document.getElementById('v').innerHTML = (v * objForm['vu'].value).toFixed(4);
-	document.getElementById('hv').innerHTML = (hv * objForm['hvu'].value).toFixed(4);
-	document.getElementById('a').innerHTML = (a * objForm['au'].value).toFixed(4);
-	document.getElementById('pw').innerHTML = (pw * objForm['pwu'].value).toFixed(4);
-	document.getElementById('rh').innerHTML = (rh * objForm['rhu'].value).toFixed(4);
-	document.getElementById('sf').innerHTML = (sf * objForm['sfu'].value).toFixed(4);
-	document.getElementById('tau').innerHTML = (tau * objForm['tauu'].value).toFixed(4);
-	document.getElementById('hf').innerHTML = (hf * objForm['hfu'].value).toFixed(4);
-	document.getElementById('hm').innerHTML = (hm * objForm['hmu'].value).toFixed(4);
-	document.getElementById('hl').innerHTML = (hl * objForm['hlu'].value).toFixed(4);
+	this.var.hv = Math.pow(this.var.v,2) / (2 * this.var.g) * (1000 * this.var.g);
+	this.var.hf = this.var.sf * this.var.l  * (1000 * this.var.g);
+	this.var.hm = this.var.hv * this.var.km;
+	this.var.hl = +this.var.hf + +this.var.hm;
+	this.writeFormResult(objForm, 'a', precision = 4, hasUnits = true);
+	this.writeFormResult(objForm, 'pw', precision = 4, hasUnits = true);
+	this.writeFormResult(objForm, 'rh', precision = 4, hasUnits = true);
+	this.writeFormResult(objForm, 'v', precision = 4, hasUnits = true);
+	this.writeFormResult(objForm, 'hv', precision = 4, hasUnits = true);
+	this.writeFormResult(objForm, 'sf', precision = 4, hasUnits = true);
+	this.writeFormResult(objForm, 'tau', precision = 4, hasUnits = true);
+	this.writeFormResult(objForm, 'hf', precision = 4, hasUnits = true);
+	this.writeFormResult(objForm, 'hm', precision = 4, hasUnits = true);
+	this.writeFormResult(objForm, 'hl', precision = 4, hasUnits = true);
 }
 
 <?php echoCookieScript(); ?>
