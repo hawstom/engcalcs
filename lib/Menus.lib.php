@@ -110,6 +110,7 @@ function echoEngCalcsMenu () {
             <li><a href="New-Calc-2.php" title="New Calculator 2">New Calculator 2 quick text</a></li>
             <li><a href="New-Calc-31.php" title="New Calculator 3">New Calculator 3 quick text</a></li>
             <li><a href="Hazen-Williams.php" title="<?=$ec_lang['hw_main_desc']?>"><?=$ec_lang['hw_main_menu']?></a></li>
+            <li><a href="Darcy-Weisbach.php" title="<?=$ec_lang['dw_main_desc']?>"><?=$ec_lang['dw_main_menu']?></a></li>
           </ul>
         </li>
         <li class="dropdown">
