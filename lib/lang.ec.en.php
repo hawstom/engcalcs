@@ -152,6 +152,13 @@ $ec_lang['mi_notes_1_term']='Q Methods';
 $ec_lang['mi_notes_1_def']='Q by sum of conveyances underestimates the frictional contribution from steep segments. Q by composite n overestimates the effect of wide shallow (overbank) friction on flow in deeper areas (main channel).';
 $ec_lang['mi_notes_2_term']='D50 Values';
 $ec_lang['mi_notes_2_def']='The Strickler D<sub>50</sub> is the size (for a straight and clean channel) implied by the roughness entered. The other D<sub>50</sub> results are required to resist erosion per 1) Maricopa County and Robinson Rock Chutes, 2) Maynord, Ruff, and Abt (1989), and 3) Searcy (1967)';
+
+// Erosion Setback and Scour Calc.
+$ec_lang['essc_btbw']='Bank to bank width';
+$ec_lang['essc_mcr']='Minimum curve radius';
+$ec_lang['essc_q']='Flow, Q';
+$ec_lang['plamen_test']='What does this button do';
+
 // Hazen-Williams. See mphl_ for missing language.
 $ec_lang['hw_main_menu']='Hazen-Williams Head Loss';
 $ec_lang['hw_main_title']='Free Online Hazen-Williams Head Loss Calculator';

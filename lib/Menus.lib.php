@@ -106,7 +106,7 @@ function echoEngCalcsMenu () {
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">New calculators under development <span class="caret"></span></a>
           <ul class="dropdown-menu">
-            <li><a href="New-Calc-1.php" title="New Calculator 1">New Calculator 1 quick text</a></li>
+            <li><a href="Plamen-test.php" title="Plamen's test calculator">Plamen's test calculator</a></li>
             <li><a href="New-Calc-2.php" title="New Calculator 2">New Calculator 2 quick text</a></li>
             <li><a href="New-Calc-31.php" title="New Calculator 3">New Calculator 3 quick text</a></li>
             <li><a href="Hazen-Williams.php" title="<?=$ec_lang['hw_main_desc']?>"><?=$ec_lang['hw_main_menu']?></a></li>

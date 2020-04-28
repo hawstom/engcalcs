@@ -35,7 +35,7 @@ function echoHTMLHead($type, $html_title, $html_head) {
 if (substr($type, 0, 8) == "EngCalcs") {
 ?>
 
-    <link rel="stylesheet" href="engcalcs/lib/engcalcs.css" type="text/css" />
+    <link rel="stylesheet" href="<?=BASE_URL?>/engcalcs/lib/engcalcs.css" type="text/css" />
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <script type="text/javascript" src="<?=BASE_URL?>/engcalcs/lib/Cookies.lib.js?v=3"></script>
     <script type="text/javascript" src="<?=BASE_URL?>/engcalcs/lib/Calculators.lib.js?v=3"></script>
