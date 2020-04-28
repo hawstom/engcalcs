@@ -1,25 +1,10 @@
 <?php
 
-// mail('tom.haws@gmail.com', 'HawsEDC calculators spanish file was accessed', 'HawsEDC calculators spanish file was accessed by '.$_SERVER['REQUEST_URI']);
+// All missing text declarations will fall back to English.
 
-/**
-    * All language is givein in its most complicated case, namely as in a standard sentence.
-    * Title case is calculated by the ec-title() function
-    * See also these php functions:
-    * ucwords() - Uppercase the first character of each word in a string
-    * strtoupper() - Make a string uppercase
-    * strtolower() - Make a string lowercase
-    * ucfirst() - Make a string's first character uppercase
-    * mb_convert_case() - Perform case folding on a string
-    *
-    * Abbreviations:
-    * d_ description
-    * h_ heading
-    * s_ symbol
-    * t_ title
-    */
+
 // Base words
-// Note 2013-09-14 This section was a bad idea.  Too complicated.  Not translateable.  Nightmare.  Phasing out.
+// Do not use. Type entire page text phrase below.
 $ec_lang['and']="et";
 $ec_lang['area']="surface";
 $ec_lang['bottom']="la base";
@@ -114,6 +99,7 @@ $ec_lang['u_depthFrac']="fraction";
 $ec_lang['u_depthPercent']="%";
 
 // Symbols
+// Do not use. Type entire page text phrase below.
 $ec_lang['s_d']="d";
 $ec_lang['s_d0']="$ec_lang[s_d]<sub>0</sub>";
 $ec_lang['s_hv']="h<sub>v</sub>";
@@ -122,7 +108,7 @@ $ec_lang['s_q']="q";
 $ec_lang['s_v']="v";
 
 // Combined words
-// Not the best idea.  I suggest moving away from them and typing entire phrases.
+// Do not use. Type entire page text phrase below.
 $ec_lang['bottomWidth']="$ec_lang[width] $ec_lang[of] $ec_lang[bottom]";
 $ec_lang['channelSlope']="$ec_lang[slope] $ec_lang[of] $ec_lang[channel] ($ec_lang[vertical] / $ec_lang[horizontal])";
 $ec_lang['flowCalculator']="$ec_lang[calculator] $ec_lang[of] $ec_lang[flow]";
@@ -143,11 +129,12 @@ $ec_lang['menu_sub1_manning']=ucfirst("la $ec_lang[formula] $ec_lang[of] $ec_lan
 $ec_lang['template_translation_help']="Assistance a la traducion est desiree. Pouvez vous installer ce calculateur sur votre site?";
 $ec_lang['template_feedback']="Donnez nous votre avis. Est-ce que cet ordinateur a depassé vos attentes?";
 $ec_lang['index_title']=ucfirst("$ec_lang[calculators] $ec_lang[freeOnline] pour $ec_lang[engineers]");
+$ec_lang['calc_set_units']='Set units:';
+$ec_lang['calc_results']=ucfirst("$ec_lang[results]:");
+// Manning Pipe Flow
 $ec_lang['mpf_main_menu']=ucfirst("$ec_lang[flow] $ec_lang[manning] en $ec_lang[pipe]s");
 $ec_lang['mpf_main_title']=ucfirst("$ec_lang[calculator] $ec_lang[freeOnline] de $ec_lang[manningFormula] pour $ec_lang[flow] en $ec_lang[pipe]s");
 $ec_lang['mpf_main_desc']=ucfirst("$ec_lang[flow] $ec_lang[uniform] $ec_lang[manning] en un $ec_lang[pipe] a $ec_lang[given] $ec_lang[slope] $ec_lang[and] $ec_lang[depth]");
-$ec_lang['calc_set_units']='Set units:';
-$ec_lang['calc_results']=ucfirst("$ec_lang[results]:");
 $ec_lang['mpf_pipe_diameter']=ucfirst("$ec_lang[diameter] $ec_lang[of] $ec_lang[pipe], $ec_lang[s_d0]");
 $ec_lang['mpf_manningRoughness']=ucfirst("$ec_lang[roughness] $ec_lang[manning], $ec_lang[s_n]");
 $ec_lang['mpf_friction_slope']=ucfirst("$ec_lang[slope] de la
@@ -164,6 +151,7 @@ $ec_lang['mpf_hydraulic_radius']=ucfirst("$ec_lang[radius] $ec_lang[hydraulic]")
 $ec_lang['mpf_top_width']=ucfirst("largeur supérieure, T");
 $ec_lang['mpf_froude_number']=ucfirst("numéro de Froude, F");
 $ec_lang['mpf_shear_stress']=ucfirst("force tractive, tau");
+// Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']=ucfirst("$ec_lang[loss] $ec_lang[of] $ec_lang[head] en $ec_lang[pipe] $ec_lang[manning]");
 $ec_lang['mphl_main_title']=ucfirst("$ec_lang[calculator] $ec_lang[freeOnline] de la $ec_lang[loss] de $ec_lang[head] en un $ec_lang[pipe] $ec_lang[manning]");
 $ec_lang['mphl_main_desc']=ucfirst("la $ec_lang[loss] de $ec_lang[head] en un $ec_lang[pipe] $ec_lang[full]e, $ec_lang[given] la $ec_lang[flow]");
@@ -172,6 +160,7 @@ $ec_lang['mphl_total_junction_k']="Coeficient total de $ec_lang[loss] dans les j
 $ec_lang['mphl_friction_loss']=ucfirst("$ec_lang[frictionLoss]");
 $ec_lang['mphl_junction_loss']=ucfirst("$ec_lang[junctionLoss]");
 $ec_lang['mphl_total_loss']=ucfirst("$ec_lang[totalLoss]");
+// Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']=ucfirst("$ec_lang[channel] $ec_lang[trapezoidal] $ec_lang[manning]");
 $ec_lang['mtc_main_title']=ucfirst("$ec_lang[calculator] $ec_lang[freeOnline] de $ec_lang[manningFormula] pour $ec_lang[channel] $ec_lang[trapezoidal]");
 $ec_lang['mtc_main_desc']=ucfirst("$ec_lang[flow] $ec_lang[uniform] $ec_lang[manning] en un $ec_lang[channel] $ec_lang[trapezoidal] a $ec_lang[given] $ec_lang[slope] $ec_lang[and] $ec_lang[depth]");
@@ -186,16 +175,7 @@ $ec_lang['mtc_d50_searcy']='Required angular riprap size, D50, per Searcy (1967)
 $ec_lang['mtc_d50_strickler']='<span title="per Strickler (Adjust n so this equals your design lining size)">Implied riprap size based on n</span>';
 $ec_lang['mtc_d50_z1']='<span title="per Isbash (1936), Robinson, and Maricopa County, Arizona, US">Required side slope 1 angular riprap size, D50, Maricopa County</span>';
 $ec_lang['mtc_d50_z2']='<span title="per Isbash (1936), Robinson, and Maricopa County, Arizona, US">Required side slope 2 angular riprap size, D50, Maricopa County</span>';
-$ec_lang['rrc_main_menu']="Robinson Rock Chute Design";
-$ec_lang['rrc_main_desc']="Robinson Rock Chute Design Spreadsheet";
-$ec_lang['ws_main_menu']='Weir Flow Simple';
-$ec_lang['ws_main_title']='Simple Broad-crested Weir Flow Calculator';
-$ec_lang['ws_main_desc']='Simple Broad-crested Weir Flow Calculator';
-$ec_lang['ws_weirLength']='Weir length, l';
-$ec_lang['ws_headWaterHeight']='Headwater height, h';
-$ec_lang['ws_weirCoefficient']='Weir coefficient, Cw';
-$ec_lang['ws_notes_heading']='Notes';
-$ec_lang['ws_notes_we_term']='Weir Equation';
+// Weir Flow Irregular. See ws_ for missing text.
 $ec_lang['wi_menu']=ucfirst("$ec_lang[weir] $ec_lang[irregular]");
 $ec_lang['wi_main_title']=ucfirst("$ec_lang[calculator] $ec_lang[freeOnline] para $ec_lang[weir] $ec_lang[irregular], de $ec_lang[depth] $ec_lang[variable] Broad-crested");
 $ec_lang['wi_main_desc']=ucfirst("$ec_lang[calculator] para $ec_lang[weir] $ec_lang[irregular], de $ec_lang[depth] $ec_lang[variable] Broad-crested");
@@ -211,6 +191,7 @@ $ec_lang['wi_or_adjust']="ou";
 $ec_lang['wi_n_rows']="le nombre de rangées";
 $ec_lang['wi_notes_we_term']='Weir Equation';
 $ec_lang['wi_notes_we_def']='q = if (length = 0) then 0 else if (slope=0) then cw*length*d0<sup>1.5</sup> else cw/(2.5*slope) * (d0<sup>2.5</sup> - d1<sup>2.5</sup>) where d1 and d0 are always positive or zero';
+// Contact us.
 $ec_lang['contact_title']="Contacte avec HawsEDC";
 $ec_lang['contactSendMessage']='Envoiye un message a Tom Haws';
 $ec_lang['contactYourName']='Votre nom:';
