@@ -1,5 +1,7 @@
 <?php
 
+// All missing text declarations will fall back to English.
+
 // Units
 // Necessary for calculator units selectors
 $ec_lang['u_ft']="ft";
@@ -52,69 +54,7 @@ $ec_lang['mpf_main_title']='Безплатен Онлайн Калкулатор
 $ec_lang['mpf_main_desc']='Формула на Манинг за Равномерно Движение в Тръбопровод при Зададени Наклон И Воден Стълб'; 
 $ec_lang['calc_set_units']='Изберете мерни единици:'; 
 $ec_lang['calc_results']='Резултати'; 
-$ec_lang['mpf_pipe_diameter']='Диаметър на тръбата, d<sub>0</sub>'; 
-$ec_lang['mpf_manningRoughness']='Грапавина по Манинг, n'; 
-$ec_lang['mpf_friction_slope']='Хидравличен наклон (често <a target="_blank" href="../pressureslope.php">?</a> равен на наклона на тръбата), J'; 
-$ec_lang['mpf_depth_ratio']='Процентно запълване (или съотношение) към пълното запълване (100% или 1 при пълно запълване)'; 
-$ec_lang['mpf_flow']='Водно количество, Q'; 
-$ec_lang['mpf_velocity']='Скорост, V'; 
-$ec_lang['mpf_velocity_head']='Скоростен напор, h<sub>v</sub>';  
-$ec_lang['mpf_flow_area']='Водна площ'; 
-$ec_lang['mpf_wetted_perimeter']='Мокър периметър'; 
-$ec_lang['mpf_hydraulic_radius']='Хидравличен радиус'; 
-$ec_lang['mpf_top_width']='Горна ширина, T'; 
-$ec_lang['mpf_froude_number']='Число на Фруд, F'; 
-$ec_lang['mpf_shear_stress']='Срязващo напрежение (теглителна сила), tau'; 
-$ec_lang['mphl_main_menu']='Хидравлични Загуби в Напорен Тръбопровод по Манинг'; 
-$ec_lang['mphl_main_title']='Безплатен Онлайн Калкулатор: Хидравлични Загуби в Напорен Тръбопровод'; 
-$ec_lang['mphl_main_desc']='Формула на Манинг за Хидравлични Загуби при Зададено Водно Количество'; 
-$ec_lang['mphl_pipe_length']='Дължина на Тръбата, L'; 
-$ec_lang['mphl_total_junction_k']='Общ Коефициент на Местните Съпротивления, ?'; 
-$ec_lang['mphl_friction_loss']='Загуби по дължина'; 
-$ec_lang['mphl_junction_loss']='Местни загуби'; 
-$ec_lang['mphl_total_loss']='Общи загуби'; 
-$ec_lang['mtc_menu']='Изчисления на Трапецовидни Канали по Манинг'; 
-$ec_lang['mtc_main_title']='Безплатен Онлайн Калкулатор за Изчисления на Трапецовидни Канали по Манинг'; 
-$ec_lang['mtc_main_desc']='Формула на Манинг за Равномерно Движение в Трапецовиден Канал при Зададени Наклон и Воден Стълб'; 
-$ec_lang['mtc_bottom_width']='Ширина на Дъното'; 
-$ec_lang['mtc_side_slope_1']='Страничен откос 1 (хориз./верт.)'; 
-$ec_lang['mtc_side_slope_2']='Страничен откос 2 (хориз./верт.)'; 
-$ec_lang['mtc_channel_slope']='Наклон на канала'; 
-$ec_lang['mtc_flow_depth']='Воден стълб'; 
-$ec_lang['mtc_bend_angle']='Bend Angle<a target="_blank" href="/riprap-bend-angle.png" title="Click for image">?</a> (for riprap sizing)'; //No need
-$ec_lang['mtc_sgrock']='Stone specific gravity (2.65)'; //No need
-$ec_lang['mtc_d50_bottom']='<span title="per Isbash (1936), Robinson, and Maricopa County, Arizona, US">Required bottom angular riprap size, D50, Maricopa County</span>'; //No need
-$ec_lang['mtc_d50_mra']='Required angular riprap size, D50, per Maynord, Ruff, and Abt (1989)'; //No need
-$ec_lang['mtc_d50_searcy']='Required angular riprap size, D50, per Searcy (1967)'; //No need
-$ec_lang['mtc_d50_strickler']='<span title="per Strickler (Adjust n so this equals your design lining size)">Implied riprap size based on n</span>'; //No need
-$ec_lang['mtc_d50_z1']='<span title="per Isbash (1936), Robinson, and Maricopa County, Arizona, US">Required side slope 1 angular riprap size, D50, Maricopa County</span>'; //No need
-$ec_lang['mtc_d50_z2']='<span title="per Isbash (1936), Robinson, and Maricopa County, Arizona, US">Required side slope 2 angular riprap size, D50, Maricopa County</span>'; //No need
-$ec_lang['rrc_main_menu']="Бързоток Robinson Rock"; 
-$ec_lang['rrc_main_desc']="Оразмеряване на бързоток по Robinson Rock - таблица"; 
-$ec_lang['ws_main_menu']='Хидравлични изчисления за преливник'; 
-$ec_lang['ws_main_title']='Калкулатор за изчисляване на преливник с широк праг'; 
-$ec_lang['ws_main_desc']='Калкулатор за изчисляване на преливник с широк праг'; 
-$ec_lang['ws_weirLength']='Преливна широчина, b'; 
-$ec_lang['ws_headWaterHeight']='Преливна височина, h'; 
-$ec_lang['ws_weirCoefficient']='Коефициент на преливника, Cw'; 
-$ec_lang['ws_notes_heading']='Забележки'; 
-$ec_lang['ws_notes_we_term']='Уравнение на преливника'; 
-$ec_lang['wi_menu']='Хидравлика на преливници с неправилна геометрия'; 
-$ec_lang['wi_main_title']='Free Online Segmented, Variable Depth, Irregular Broad-crested Weir Flow Calculator'; //no 
-$ec_lang['wi_main_desc']='Irregular Broad-crested Weir Flow Calculator'; //no
-$ec_lang['wi_headWaterelevation']='Headwater elevation';//no
-$ec_lang['wi_weirPoints']='Weir points';//no
-$ec_lang['wi_station']='Station';//no
-$ec_lang['wi_elevation']='Elevation';//no
-$ec_lang['wi_pondingHeight']='Ponding Height';//no
-$ec_lang['wi_incrementalFlow']='Incremental Flow';//no
-$ec_lang['wi_cumulativeFlow']='Cumulative Flow';//no
-$ec_lang['wi_save_and_calculate']='Save and Calculate';//no
-$ec_lang['wi_or_adjust']="or";//no
-$ec_lang['wi_n_rows']="the number of rows";//no
-$ec_lang['wi_notes']='Notes';//no
-$ec_lang['wi_notes_we_term']='Weir Equation';//no
-$ec_lang['wi_notes_we_def']='q = if (length = 0) then 0 else if (slope=0) then cw*length*d0<sup>1.5</sup> else cw/(2.5*slope) * (d0<sup>2.5</sup> - d1<sup>2.5</sup>) where d1 and d0 are always positive or zero';//no
+// Manning Irregular
 $ec_lang['mi_menu']='Manning Irregular Channel'; //no
 $ec_lang['mi_main_title']='Free Online Manning Irregular Channel Calculator'; //no
 $ec_lang['mi_main_desc']='Irregular Channel Uniform Flow Calculator'; //no
@@ -148,6 +88,76 @@ $ec_lang['mi_notes_1_term']='Q Methods'; //no
 $ec_lang['mi_notes_1_def']='Q by sum of conveyances underestimates the frictional contribution from steep segments. Q by composite n overestimates the effect of wide shallow (overbank) friction on flow in deeper areas (main channel).'; //no
 $ec_lang['mi_notes_2_term']='D50 Values'; //no
 $ec_lang['mi_notes_2_def']='The Strickler D<sub>50</sub> is the size (for a straight and clean channel) implied by the roughness entered. The other D<sub>50</sub> results are required to resist erosion per 1) Maricopa County and Robinson Rock Chutes, 2) Maynord, Ruff, and Abt (1989), and 3) Searcy (1967)'; //no
+// Manning Pipe Flow
+$ec_lang['mpf_pipe_diameter']='Диаметър на тръбата, d<sub>0</sub>'; 
+$ec_lang['mpf_manningRoughness']='Грапавина по Манинг, n'; 
+$ec_lang['mpf_friction_slope']='Хидравличен наклон (често <a target="_blank" href="../pressureslope.php">?</a> равен на наклона на тръбата), J'; 
+$ec_lang['mpf_depth_ratio']='Процентно запълване (или съотношение) към пълното запълване (100% или 1 при пълно запълване)'; 
+$ec_lang['mpf_flow']='Водно количество, Q'; 
+$ec_lang['mpf_velocity']='Скорост, V'; 
+$ec_lang['mpf_velocity_head']='Скоростен напор, h<sub>v</sub>';  
+$ec_lang['mpf_flow_area']='Водна площ'; 
+$ec_lang['mpf_wetted_perimeter']='Мокър периметър'; 
+$ec_lang['mpf_hydraulic_radius']='Хидравличен радиус'; 
+$ec_lang['mpf_top_width']='Горна ширина, T'; 
+$ec_lang['mpf_froude_number']='Число на Фруд, F'; 
+$ec_lang['mpf_shear_stress']='Срязващo напрежение (теглителна сила), tau'; 
+// Manning Pipe Head Loss. See mpf_ for missing text.
+$ec_lang['mphl_main_menu']='Хидравлични Загуби в Напорен Тръбопровод по Манинг'; 
+$ec_lang['mphl_main_title']='Безплатен Онлайн Калкулатор: Хидравлични Загуби в Напорен Тръбопровод'; 
+$ec_lang['mphl_main_desc']='Формула на Манинг за Хидравлични Загуби при Зададено Водно Количество'; 
+$ec_lang['mphl_pipe_length']='Дължина на Тръбата, L'; 
+$ec_lang['mphl_total_junction_k']='Общ Коефициент на Местните Съпротивления, ?'; 
+$ec_lang['mphl_friction_loss']='Загуби по дължина'; 
+$ec_lang['mphl_junction_loss']='Местни загуби'; 
+$ec_lang['mphl_total_loss']='Общи загуби'; 
+// Manning Trapezoid. See mpf_ for missing text.
+$ec_lang['mtc_menu']='Изчисления на Трапецовидни Канали по Манинг'; 
+$ec_lang['mtc_main_title']='Безплатен Онлайн Калкулатор за Изчисления на Трапецовидни Канали по Манинг'; 
+$ec_lang['mtc_main_desc']='Формула на Манинг за Равномерно Движение в Трапецовиден Канал при Зададени Наклон и Воден Стълб'; 
+$ec_lang['mtc_bottom_width']='Ширина на Дъното'; 
+$ec_lang['mtc_side_slope_1']='Страничен откос 1 (хориз./верт.)'; 
+$ec_lang['mtc_side_slope_2']='Страничен откос 2 (хориз./верт.)'; 
+$ec_lang['mtc_channel_slope']='Наклон на канала'; 
+$ec_lang['mtc_flow_depth']='Воден стълб'; 
+$ec_lang['mtc_bend_angle']='Bend Angle<a target="_blank" href="/riprap-bend-angle.png" title="Click for image">?</a> (for riprap sizing)'; //No need
+$ec_lang['mtc_sgrock']='Stone specific gravity (2.65)'; //No need
+$ec_lang['mtc_d50_bottom']='<span title="per Isbash (1936), Robinson, and Maricopa County, Arizona, US">Required bottom angular riprap size, D50, Maricopa County</span>'; //No need
+$ec_lang['mtc_d50_mra']='Required angular riprap size, D50, per Maynord, Ruff, and Abt (1989)'; //No need
+$ec_lang['mtc_d50_searcy']='Required angular riprap size, D50, per Searcy (1967)'; //No need
+$ec_lang['mtc_d50_strickler']='<span title="per Strickler (Adjust n so this equals your design lining size)">Implied riprap size based on n</span>'; //No need
+$ec_lang['mtc_d50_z1']='<span title="per Isbash (1936), Robinson, and Maricopa County, Arizona, US">Required side slope 1 angular riprap size, D50, Maricopa County</span>'; //No need
+$ec_lang['mtc_d50_z2']='<span title="per Isbash (1936), Robinson, and Maricopa County, Arizona, US">Required side slope 2 angular riprap size, D50, Maricopa County</span>'; //No need
+// Robinson Rock Chute
+$ec_lang['rrc_main_menu']="Бързоток Robinson Rock"; 
+$ec_lang['rrc_main_desc']="Оразмеряване на бързоток по Robinson Rock - таблица"; 
+// Weir Flow Simple\n// Weir Flow Simple
+$ec_lang['ws_main_menu']='Хидравлични изчисления за преливник'; 
+$ec_lang['ws_main_title']='Калкулатор за изчисляване на преливник с широк праг'; 
+$ec_lang['ws_main_desc']='Калкулатор за изчисляване на преливник с широк праг'; 
+$ec_lang['ws_weirLength']='Преливна широчина, b'; 
+$ec_lang['ws_headWaterHeight']='Преливна височина, h'; 
+$ec_lang['ws_weirCoefficient']='Коефициент на преливника, Cw'; 
+$ec_lang['ws_notes_heading']='Забележки'; 
+$ec_lang['ws_notes_we_term']='Уравнение на преливника'; 
+// Weir Flow Irregular. See ws_ for missing text.
+$ec_lang['wi_menu']='Хидравлика на преливници с неправилна геометрия'; 
+$ec_lang['wi_main_title']='Free Online Segmented, Variable Depth, Irregular Broad-crested Weir Flow Calculator'; //no 
+$ec_lang['wi_main_desc']='Irregular Broad-crested Weir Flow Calculator'; //no
+$ec_lang['wi_headWaterelevation']='Headwater elevation';//no
+$ec_lang['wi_weirPoints']='Weir points';//no
+$ec_lang['wi_station']='Station';//no
+$ec_lang['wi_elevation']='Elevation';//no
+$ec_lang['wi_pondingHeight']='Ponding Height';//no
+$ec_lang['wi_incrementalFlow']='Incremental Flow';//no
+$ec_lang['wi_cumulativeFlow']='Cumulative Flow';//no
+$ec_lang['wi_save_and_calculate']='Save and Calculate';//no
+$ec_lang['wi_or_adjust']="or";//no
+$ec_lang['wi_n_rows']="the number of rows";//no
+$ec_lang['wi_notes']='Notes';//no
+$ec_lang['wi_notes_we_term']='Weir Equation';//no
+$ec_lang['wi_notes_we_def']='q = if (length = 0) then 0 else if (slope=0) then cw*length*d0<sup>1.5</sup> else cw/(2.5*slope) * (d0<sup>2.5</sup> - d1<sup>2.5</sup>) where d1 and d0 are always positive or zero';//no
+// Contact us.
 $ec_lang['contact_title']="Контакт с HawsEDC"; 
 $ec_lang['contactSendMessage']='Изпратете съобщение на Tom Haws'; 
 $ec_lang['contactYourName']='Вашето име:'; 

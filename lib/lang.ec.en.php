@@ -1,5 +1,7 @@
 <?php
 
+// All missing text declarations will fall back to English.
+
 // Units
 // Necessary for calculator units selectors
 $ec_lang['u_ft']="ft";
@@ -37,88 +39,32 @@ $ec_lang['u_depthPercent']="%";
 
 // Page text
 // Note: In the process of rearranging the language variables into page order for easier maintenance.
+// Menu and General
 $ec_lang['menu_brand']='HawsEDC Calculators';
 $ec_lang['menu_main_list']='List of Calculators';
 $ec_lang['menu_main_hydraulics']='Hydraulics';
 $ec_lang['menu_main_language']='Language';
 $ec_lang['menu_sub1_manning']='Manning Formula';
-$ec_lang['template_translation_help']="Can you help me translate, program, or host these calculators?  ";
-$ec_lang['template_feedback']="Please give us your valued words of suggestion or praise.  Did this free calculator exceed your expectations in every way?";
-$ec_lang['template_printable_title']="Printable Title";
-$ec_lang['template_printable_subtitle']="Printable Subtitle";
+$ec_lang['template_translation_help']='Can you help me translate, program, or host these calculators?  ';
+$ec_lang['template_feedback']='Please give us your valued words of suggestion or praise.  Did this free calculator exceed your expectations in every way?';
+$ec_lang['template_printable_title']='Printable Title';
+$ec_lang['template_printable_subtitle']='Printable Subtitle';
 $ec_lang['index_title']='Free Online Engineering Calculators';
-$ec_lang['mpf_main_menu']='Manning Pipe Flow';
-$ec_lang['mpf_main_title']='Free Online Manning Pipe Flow Calculator';
-$ec_lang['mpf_main_desc']='Manning Formula Uniform Pipe Flow at Given Slope and Depth';
 $ec_lang['calc_set_units']='Set units:';
 $ec_lang['calc_results']='Results';
-// Manning Pipe Flow
-$ec_lang['mpf_pipe_diameter']='Pipe diameter, d<sub>0</sub>';
-$ec_lang['mpf_manningRoughness']='Manning roughness, n';
-$ec_lang['mpf_friction_slope']='Pressure slope (possibly <a target="_blank" href="../pressureslope.php">?</a> equal to pipe slope), S<sub>0</sub>';
-$ec_lang['mpf_depth_ratio']='Percent of (or ratio to) full depth (100% or 1 if flowing full)';
-$ec_lang['mpf_flow']='Flow, Q';
-$ec_lang['mpf_velocity']='Velocity, v';
-$ec_lang['mpf_velocity_head']='Velocity head, h<sub>v</sub>';
-$ec_lang['mpf_flow_area']='Flow area';
-$ec_lang['mpf_wetted_perimeter']='Wetted perimeter';
-$ec_lang['mpf_hydraulic_radius']='Hydraulic radius';
-$ec_lang['mpf_top_width']='Top width, T';
-$ec_lang['mpf_froude_number']='Froude number, F';
-$ec_lang['mpf_shear_stress']='Shear stress (tractive force), tau';
-// Manning Pipe Head Loss. See mpf_ for missing language.
-$ec_lang['mphl_main_menu']='Manning Pipe Head Loss';
-$ec_lang['mphl_main_title']='Free Online Manning Pipe Head Loss Calculator';
-$ec_lang['mphl_main_desc']='Manning Formula Head Loss at Given Full Flow';
-$ec_lang['mphl_pipe_length']='Pipe length, L';
-$ec_lang['mphl_area']='Area, A';
-$ec_lang['mphl_total_junction_k']='Total combined junction loss coefficient, k';
-$ec_lang['mphl_friction_loss']='Friction loss, H<sub>f</sub>';
-$ec_lang['mphl_junction_loss']='Junction loss, H<sub>m</sub>';
-$ec_lang['mphl_total_loss']='Total loss, H<sub>l</sub>';
-// Manning Trapezoid. See mpf for missing language.
-$ec_lang['mtc_menu']='Manning Trapezoidal Channel';
-$ec_lang['mtc_main_title']='Free Online Manning Formula Trapezoidal Channel Calculator';
-$ec_lang['mtc_main_desc']='Manning Formula Uniform Trapezoidal Channel Flow at Given Slope and Depth';
-$ec_lang['mtc_bottom_width']='Bottom width';
-$ec_lang['mtc_side_slope_1']='Side slope 1 (horiz./vert.)';
-$ec_lang['mtc_side_slope_2']='Side slope 2 (horiz./vert.)';
-$ec_lang['mtc_channel_slope']='Channel slope';
-$ec_lang['mtc_flow_depth']='Flow depth';
-$ec_lang['mtc_bend_angle']='Bend Angle<a target="_blank" href="/riprap-bend-angle.png" title="Click for image">?</a> (for riprap sizing)';
-$ec_lang['mtc_sgrock']='Stone specific gravity (2.65)';
-$ec_lang['mtc_d50_bottom']='<span title="per Isbash (1936), Robinson, and Maricopa County, Arizona, US">Required bottom angular riprap size, D50, Maricopa County</span>';
-$ec_lang['mtc_d50_mra']='Required angular riprap size, D50, per Maynord, Ruff, and Abt (1989)';
-$ec_lang['mtc_d50_searcy']='Required angular riprap size, D50, per Searcy (1967)';
-$ec_lang['mtc_d50_strickler']='Implied design <a target="_blank" href="javascript:alert(\'The Strickler formula relates n and D50 for a straight and clean channel. Adjust n so this implied design size is larger than the required erosion protection size. Then line your channel as implied.\')">?</a> riprap size based on n';
-$ec_lang['mtc_d50_z1']='<span title="per Isbash (1936), Robinson, and Maricopa County, Arizona, US">Required side slope 1 angular riprap size, D50, Maricopa County</span>';
-$ec_lang['mtc_d50_z2']='<span title="per Isbash (1936), Robinson, and Maricopa County, Arizona, US">Required side slope 2 angular riprap size, D50, Maricopa County</span>';
-$ec_lang['rrc_main_menu']="Robinson Rock Chute";
-$ec_lang['rrc_main_desc']="Robinson Rock Chute Design Spreadsheet";
-$ec_lang['ws_main_menu']='Weir Flow Simple';
-$ec_lang['ws_main_title']='Simple Broad-crested Weir Flow Calculator';
-$ec_lang['ws_main_desc']='Simple Broad-crested Weir Flow Calculator';
-$ec_lang['ws_weirLength']='Weir length, l';
-$ec_lang['ws_headWaterHeight']='Headwater height, h';
-$ec_lang['ws_weirCoefficient']='Weir coefficient, Cw';
-$ec_lang['ws_notes_heading']='Notes';
-$ec_lang['ws_notes_we_term']='Weir Equation';
-$ec_lang['wi_menu']='Weir Flow Irregular';
-$ec_lang['wi_main_title']='Free Online Segmented, Variable Depth, Irregular Broad-crested Weir Flow Calculator';
-$ec_lang['wi_main_desc']='Irregular Broad-crested Weir Flow Calculator';
-$ec_lang['wi_headWaterelevation']='Headwater elevation';
-$ec_lang['wi_weirPoints']='Weir points';
-$ec_lang['wi_station']='Station (distance)';
-$ec_lang['wi_elevation']='Elevation';
-$ec_lang['wi_pondingHeight']='Ponding Height';
-$ec_lang['wi_incrementalFlow']='Incremental Flow';
-$ec_lang['wi_cumulativeFlow']='Cumulative Flow';
-$ec_lang['wi_save_and_calculate']='Save and Calculate';
-$ec_lang['wi_or_adjust']="or";
-$ec_lang['wi_n_rows']="the number of rows";
-$ec_lang['wi_notes']='Notes';
-$ec_lang['wi_notes_we_term']='Weir Equation';
-$ec_lang['wi_notes_we_def']='q = if (length = 0) then 0 else if (slope=0) then cw*length*d0<sup>1.5</sup> else cw/(2.5*slope) * (d0<sup>2.5</sup> - d1<sup>2.5</sup>) where d1 and d0 are always positive or zero';
+// Darcy-Weisbach. See mphl_ for missing text.
+$ec_lang['dw_main_menu']='Darcy-Weisbach Head Loss';
+$ec_lang['dw_main_title']='Free Online Darcy-Weisbach Head Loss Calculator';
+$ec_lang['dw_main_desc']='Darcy-Weisbach Head Loss at Given Diameter, Roughness, and Flow';
+$ec_lang['dw_roughness']='Darcy-Weisbach absolute roughness, e';
+$ec_lang['dw_friction_slope']='Friction slope';
+// Hazen-Williams. See mphl_ for missing text.
+$ec_lang['hw_main_menu']='Hazen-Williams Head Loss';
+$ec_lang['hw_main_title']='Free Online Hazen-Williams Head Loss Calculator';
+$ec_lang['hw_main_desc']='Hazen-Williams Head Loss at Given Diameter, Roughness, and Flow';
+$ec_lang['hw_roughness']='Hazen-Williams roughness coefficient, C';
+$ec_lang['hw_friction_slope']='Friction slope';
+// Manning Irregular
 $ec_lang['mi_menu']='Manning Irregular Channel';
 $ec_lang['mi_main_title']='Free Online Manning Irregular Channel Calculator';
 $ec_lang['mi_main_desc']='Irregular Channel Uniform Flow Calculator';
@@ -145,27 +91,88 @@ $ec_lang['mi_a']='A';
 $ec_lang['mi_pw']='P<sub>w</sub>';
 $ec_lang['mi_rh']='R<sub>h</sub>';
 $ec_lang['mi_save_and_calculate']='Save and Calculate';
-$ec_lang['mi_or_adjust']="or";
-$ec_lang['mi_n_rows']="the number of rows";
+$ec_lang['mi_or_adjust']='or';
+$ec_lang['mi_n_rows']='the number of rows';
 $ec_lang['mi_notes']='Notes';
 $ec_lang['mi_notes_1_term']='Q Methods';
 $ec_lang['mi_notes_1_def']='Q by sum of conveyances underestimates the frictional contribution from steep segments. Q by composite n overestimates the effect of wide shallow (overbank) friction on flow in deeper areas (main channel).';
 $ec_lang['mi_notes_2_term']='D50 Values';
 $ec_lang['mi_notes_2_def']='The Strickler D<sub>50</sub> is the size (for a straight and clean channel) implied by the roughness entered. The other D<sub>50</sub> results are required to resist erosion per 1) Maricopa County and Robinson Rock Chutes, 2) Maynord, Ruff, and Abt (1989), and 3) Searcy (1967)';
-// Hazen-Williams. See mphl_ for missing language.
-$ec_lang['hw_main_menu']='Hazen-Williams Head Loss';
-$ec_lang['hw_main_title']='Free Online Hazen-Williams Head Loss Calculator';
-$ec_lang['hw_main_desc']='Hazen-Williams Head Loss at Given Diameter, Roughness, and Flow';
-$ec_lang['hw_roughness']='Hazen-Williams roughness coefficient, C';
-$ec_lang['hw_friction_slope']='Friction slope';
-// Darcy-Weisbach. See mphl_ for missing language.
-$ec_lang['dw_main_menu']='Darcy-Weisbach Head Loss';
-$ec_lang['dw_main_title']='Free Online Darcy-Weisbach Head Loss Calculator';
-$ec_lang['dw_main_desc']='Darcy-Weisbach Head Loss at Given Diameter, Roughness, and Flow';
-$ec_lang['dw_roughness']='Darcy-Weisbach absolute roughness, e';
-$ec_lang['dw_friction_slope']='Friction slope';
+// Manning Pipe Flow
+$ec_lang['mpf_main_menu']='Manning Pipe Flow';
+$ec_lang['mpf_main_title']='Free Online Manning Pipe Flow Calculator';
+$ec_lang['mpf_main_desc']='Manning Formula Uniform Pipe Flow at Given Slope and Depth';
+$ec_lang['mpf_pipe_diameter']='Pipe diameter, d<sub>0</sub>';
+$ec_lang['mpf_manningRoughness']='Manning roughness, n';
+$ec_lang['mpf_friction_slope']='Pressure slope (possibly <a target="_blank" href="../pressureslope.php">?</a> equal to pipe slope), S<sub>0</sub>';
+$ec_lang['mpf_depth_ratio']='Percent of (or ratio to) full depth (100% or 1 if flowing full)';
+$ec_lang['mpf_flow']='Flow, Q';
+$ec_lang['mpf_velocity']='Velocity, v';
+$ec_lang['mpf_velocity_head']='Velocity head, h<sub>v</sub>';
+$ec_lang['mpf_flow_area']='Flow area';
+$ec_lang['mpf_wetted_perimeter']='Wetted perimeter';
+$ec_lang['mpf_hydraulic_radius']='Hydraulic radius';
+$ec_lang['mpf_top_width']='Top width, T';
+$ec_lang['mpf_froude_number']='Froude number, F';
+$ec_lang['mpf_shear_stress']='Shear stress (tractive force), tau';
+// Manning Pipe Head Loss. See mpf_ for missing text.
+$ec_lang['mphl_main_menu']='Manning Pipe Head Loss';
+$ec_lang['mphl_main_title']='Free Online Manning Pipe Head Loss Calculator';
+$ec_lang['mphl_main_desc']='Manning Formula Head Loss at Given Full Flow';
+$ec_lang['mphl_pipe_length']='Pipe length, L';
+$ec_lang['mphl_area']='Area, A';
+$ec_lang['mphl_total_junction_k']='Total combined junction loss coefficient, k';
+$ec_lang['mphl_friction_loss']='Friction loss, H<sub>f</sub>';
+$ec_lang['mphl_junction_loss']='Junction loss, H<sub>m</sub>';
+$ec_lang['mphl_total_loss']='Total loss, H<sub>l</sub>';
+// Manning Trapezoid. See mpf_ for missing text.
+$ec_lang['mtc_menu']='Manning Trapezoidal Channel';
+$ec_lang['mtc_main_title']='Free Online Manning Formula Trapezoidal Channel Calculator';
+$ec_lang['mtc_main_desc']='Manning Formula Uniform Trapezoidal Channel Flow at Given Slope and Depth';
+$ec_lang['mtc_bottom_width']='Bottom width';
+$ec_lang['mtc_side_slope_1']='Side slope 1 (horiz./vert.)';
+$ec_lang['mtc_side_slope_2']='Side slope 2 (horiz./vert.)';
+$ec_lang['mtc_channel_slope']='Channel slope';
+$ec_lang['mtc_flow_depth']='Flow depth';
+$ec_lang['mtc_bend_angle']='Bend Angle<a target="_blank" href="/riprap-bend-angle.png" title="Click for image">?</a> (for riprap sizing)';
+$ec_lang['mtc_sgrock']='Stone specific gravity (2.65)';
+$ec_lang['mtc_d50_bottom']='<span title="per Isbash (1936), Robinson, and Maricopa County, Arizona, US">Required bottom angular riprap size, D50, Maricopa County</span>';
+$ec_lang['mtc_d50_mra']='Required angular riprap size, D50, per Maynord, Ruff, and Abt (1989)';
+$ec_lang['mtc_d50_searcy']='Required angular riprap size, D50, per Searcy (1967)';
+$ec_lang['mtc_d50_strickler']='Implied design <a target="_blank" href="javascript:alert(\'The Strickler formula relates n and D50 for a straight and clean channel. Adjust n so this implied design size is larger than the required erosion protection size. Then line your channel as implied.\')">?</a> riprap size based on n';
+$ec_lang['mtc_d50_z1']='<span title="per Isbash (1936), Robinson, and Maricopa County, Arizona, US">Required side slope 1 angular riprap size, D50, Maricopa County</span>';
+$ec_lang['mtc_d50_z2']='<span title="per Isbash (1936), Robinson, and Maricopa County, Arizona, US">Required side slope 2 angular riprap size, D50, Maricopa County</span>';
+// Robinson Rock Chute
+$ec_lang['rrc_main_menu']='Robinson Rock Chute';
+$ec_lang['rrc_main_desc']='Robinson Rock Chute Design Spreadsheet';
+// Weir Flow Simple
+$ec_lang['ws_main_menu']='Weir Flow Simple';
+$ec_lang['ws_main_title']='Free  Online Simple Broad-crested Weir Flow Calculator';
+$ec_lang['ws_main_desc']='Simple Broad-crested Weir Flow Calculator';
+$ec_lang['ws_weirLength']='Weir length, l';
+$ec_lang['ws_headWaterHeight']='Headwater height, h';
+$ec_lang['ws_weirCoefficient']='Weir coefficient, Cw';
+$ec_lang['ws_notes_heading']='Notes';
+$ec_lang['ws_notes_we_term']='Weir Equation';
+// Weir Flow Irregular. See ws_ for missing text.
+$ec_lang['wi_menu']='Weir Flow Irregular';
+$ec_lang['wi_main_title']='Free Online Segmented, Variable Depth, Irregular Broad-crested Weir Flow Calculator';
+$ec_lang['wi_main_desc']='Irregular Broad-crested Weir Flow Calculator';
+$ec_lang['wi_headWaterelevation']='Headwater elevation';
+$ec_lang['wi_weirPoints']='Weir points';
+$ec_lang['wi_station']='Station (distance)';
+$ec_lang['wi_elevation']='Elevation';
+$ec_lang['wi_pondingHeight']='Ponding Height';
+$ec_lang['wi_incrementalFlow']='Incremental Flow';
+$ec_lang['wi_cumulativeFlow']='Cumulative Flow';
+$ec_lang['wi_save_and_calculate']='Save and Calculate';
+$ec_lang['wi_or_adjust']='or';
+$ec_lang['wi_n_rows']='the number of rows';
+$ec_lang['wi_notes']='Notes';
+$ec_lang['wi_notes_we_term']='Weir Equation';
+$ec_lang['wi_notes_we_def']='q = if (length = 0) then 0 else if (slope=0) then cw*length*d0<sup>1.5</sup> else cw/(2.5*slope) * (d0<sup>2.5</sup> - d1<sup>2.5</sup>) where d1 and d0 are always positive or zero';
 // Contact us.
-$ec_lang['contact_title']="HawsEDC Contact";
+$ec_lang['contact_title']='HawsEDC Contact';
 $ec_lang['contactSendMessage']='Send Tom Haws a message';
 $ec_lang['contactYourName']='Your name:';
 $ec_lang['contactYourEmail']='Your e-mail address:';

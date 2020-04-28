@@ -1,4 +1,7 @@
 <?php
+
+// All missing text declarations will fall back to English.
+
 // Birimler
 // Hesap makinası birim seçimi için gerekli
 $ec_lang['u_ft']="ft";
@@ -42,11 +45,12 @@ $ec_lang['menu_sub1_manning']='Manning Formülü';
 $ec_lang['template_translation_help']="Bu hesap makinesini kendi dilinize çevirmek ya da bu hesap makinesini web sitenizde göstermek ister misiniz? Türkçe çeviri için Mustafa Özbay'a tesekkür ederim.";
 $ec_lang['template_feedback']='Lütfen görüslerinizi ve begenileriniz bizimle paylasin. Bu ücretsiz hesap makinesi beklentilerinizi karsilayabildi mi?';
 $ec_lang['index_title']='Bedava çevrimiçi mühendislik hesaplayıcıları';
+$ec_lang['calc_set_units']='Birimleri ayarla:';
+$ec_lang['calc_results']='Sonuçlar:';
+// Manning Pipe Flow
 $ec_lang['mpf_main_menu']='Manning boru akımı';
 $ec_lang['mpf_main_title']="Belli Egim ve Yükseklikteki Düzgün Akis Için Manning Formülü";
 $ec_lang['mpf_main_desc']="Belli Egim ve Yükseklikteki Düzgün Akis Için Manning Formülü";
-$ec_lang['calc_set_units']='Birimleri ayarla:';
-$ec_lang['calc_results']='Sonuçlar:';
 $ec_lang['mpf_pipe_diameter']="Boru Çapı, d0";
 $ec_lang['mpf_manningRoughness']='Manning pürüzlülük katsayısı, n';
 $ec_lang['mpf_friction_slope']='Basinç Egimi (<a target="_blank"
@@ -61,6 +65,7 @@ $ec_lang['mpf_hydraulic_radius']='Hidrolik Yariçap';
 $ec_lang['mpf_top_width']='Üst Genisligi, T';
 $ec_lang['mpf_froude_number']='Froude Sayısı, F';
 $ec_lang['mpf_shear_stress']='Kayma Gerilmesi, τ';
+// Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Tam Akis Sartlarinda Yük Kaybi';
 $ec_lang['mphl_main_title']='Ücretsiz Tam Akis Sartlarinda Manning Yük Kaybi Formülü';
 $ec_lang['mphl_main_desc']='Tam Akış Şartlarında Manning Yük Kaybı Formülü';
@@ -69,6 +74,7 @@ $ec_lang['mphl_total_junction_k']='Pürüzsüzlük Katsayısı, k';
 $ec_lang['mphl_friction_loss']='Sürtünmeye Bağlı Yük Kaybı, Hf';
 $ec_lang['mphl_junction_loss']='İkincil Yük Kayıpları, Hm';
 $ec_lang['mphl_total_loss']='Toplam Yük Kaybı, Hl';
+// Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Belli Eğim ve Derinlikteki Düzgün Trapezoidal Kanallar';
 $ec_lang['mtc_main_title']='Ücretsiz Belli Eğim ve Derinlikteki Düzgün Trapezoidal Kanallar için Manning Formülü';
 $ec_lang['mtc_main_desc']='Belli Eğim ve Derinlikteki Düzgün Trapezoidal Kanallar için Manning Formülü';
@@ -83,8 +89,10 @@ $ec_lang['mtc_d50_searcy']='Required angular riprap size Gerekli açısal taban 
 $ec_lang['mtc_d50_strickler']='<span title="per Strickler (Adjust n so this equals your design lining size n değerini ayarlayın böylece sizin tasarım örtü boyuna eşit olsun)">Implied riprap size based on n n’ye bağlı uygulanan örtü boyutu</span>';
 $ec_lang['mtc_d50_z1']='<span title="per Isbash (1936), Robinson, and Maricopa County, Arizona, US">Required side slope 1 angular riprap size,yan eğim 1 için gerekli açısal örtü boyutu D50, Maricopa County</span>';
 $ec_lang['mtc_d50_z2']='<span title="per Isbash (1936), Robinson, and Maricopa County, Arizona, US">Required side slope 2 angular riprap size, yan eğim 2 için gerekli açısal örtü boyutu D50, Maricopa County</span>';
+// Robinson Rock Chute
 $ec_lang['rrc_main_menu']="Robinson Rock Chute Design Robinson Rock Şüt(Paraşüt) Tasarımı";
 $ec_lang['rrc_main_desc']="Robinson Rock Chute Design Spreadsheet Robinson Rock Şüt(Paraşüt) Tasarımı Excel Sayfası";
+// Weir Flow Simple\n// Weir Flow Simple
 $ec_lang['ws_main_menu']='Basit Savaklar için Debi Hesabı';
 $ec_lang['ws_main_title']='Ücretsiz Basit Savaklar için Debi Hesabı Broad-crested Geniş-kretli';
 $ec_lang['ws_main_desc']='Basit Savaklar için Debi Hesabı Broad-crested Geniş-kretli';
@@ -94,6 +102,7 @@ $ec_lang['ws_weirCoefficient']='Savak Sabiti, Cw (Savağa bağlıdır. Geniş te
 feet biriminde işlem yapılıyorsa 2.3 ve 3.3 arasında değişir.)';
 $ec_lang['ws_notes_heading']='Not';
 $ec_lang['ws_notes_we_term']='Savak Denklemi';
+// Weir Flow Irregular. See ws_ for missing text.
 $ec_lang['wi_menu']='Değişken Derinlikte, Düzensiz Savak Debisi Hesabı';
 $ec_lang['wi_main_title']='Ücretsiz Değişken Derinlikte, Düzensiz Savak Debisi Hesabı Broad-crested Geniş-kretli';
 $ec_lang['wi_main_desc']='Değişken Derinlikte, Düzensiz Savak Debisi Hesabı Broad-crested Geniş-kretli';
@@ -110,6 +119,7 @@ $ec_lang['wi_n_rows']="sıraların sayısı";
 $ec_lang['wi_notes_we_term']='Weir Equation Weir denklemi';
 $ec_lang['wi_notes_we_def']='q = eğer (uzunluk = 0) ise 0, eğer (eğim=0) ise cw*uzunluk*d01.5, ya da d1 ve d0’ın daima pozitif veya sıfır olduğu yerde q=
 cw/(2.5*eğim) * (d02.5 - d12.5)';
+// Contact us.
 $ec_lang['contact_title']='Haws EDC Iletisim';
 $ec_lang['contactSendMessage']="Tom Haws'a bir mesaj gönderin";
 $ec_lang['contactYourName']='Isim:';
