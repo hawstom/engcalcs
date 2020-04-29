@@ -1,7 +1,4 @@
-<?php 
-echo "<h1><b>Plamen was here</b></h1>";
-;?>
-
+<?php echo "<h1><b>Plamen was here 1234</b></h1>" ;?>
 <?php
 define('BASE_DIRECTORY', realpath(__DIR__.'/..'));
 require_once (BASE_DIRECTORY."/engcalcs/lib/base.inc.php");
@@ -17,37 +14,28 @@ echoHeader("EngCalcs", $html_title, $html_head);
 <h2><?=$ec_lang['hw_main_desc']?></h2>
 <?php echoHelpWanted(); ?>
 
-
-
 <?php
 echoCalculatorForm(
 	//Inputs
 	Array(
-		Array('name' => 'w', 'type' => 'number', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['essc_btbw']),
-                Array('name' => 'r', 'type' => 'number', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['essc_mcr']),
-		Array('name' => 'q', 'type' => 'number', 'units' => Array('m3ps','lps','mld','ft3ps','gpm','mgd'), 'label' => $ec_lang['essc_q']),
-		Array('name' => 'c', 'type' => 'number', 'units' => NULL, 'label' => $ec_lang['plamen_test']),
-		Array( 'name' => 'km', 'type' => 'number', 'units' => NULL, 'label' => $ec_lang['plamen_test']),
-                Array( 'name' => 'km', 'type' => 'number', 'units' => NULL, 'label' => $ec_lang['plamen_test']),
-                Array( 'name' => 'km', 'type' => 'number', 'units' => NULL, 'label' => $ec_lang['plamen_test']),
+		Array('name' => 'q', 'type' => 'number', 'units' => Array('m3ps','lps','mld','ft3ps','gpm','mgd'), 'label' => $ec_lang['mpf_flow']),
+		Array('name' => 'd', 'type' => 'number', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mpf_pipe_diameter']),
+		Array('name' => 'l', 'type' => 'number', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mphl_pipe_length']),
+		Array('name' => 'c', 'type' => 'number', 'units' => NULL, 'label' => $ec_lang['hw_roughness']),
+		Array( 'name' => 'km', 'type' => 'number', 'units' => NULL, 'label' => $ec_lang['mphl_total_junction_k']),
 	),
 	//Results
 	Array(
-		Array('name' => 'a', 'units' => Array('m2','mm2','ft2','in2'), 'label' => $ec_lang['plamen_test']),
-		Array('name' => 'pw', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['plamen_test']),
-		Array('name' => 'rh', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['plamen_test']),
-		Array('name' => 'v', 'units' => Array('mps','ftps','mph'), 'label' => $ec_lang['plamen_test']),
-		Array('name' => 'hv', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['plamen_test']),
+		Array('name' => 'a', 'units' => Array('m2','mm2','ft2','in2'), 'label' => $ec_lang['mpf_flow_area']),
+		Array('name' => 'pw', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mpf_wetted_perimeter']),
+		Array('name' => 'rh', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mpf_hydraulic_radius']),
+		Array('name' => 'v', 'units' => Array('mps','ftps','mph'), 'label' => $ec_lang['mpf_velocity']),
+		Array('name' => 'hv', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mpf_velocity_head']),
 		Array('name' => 'sf', 'units' => Array('grade','gradePercent'), 'label' => $ec_lang['hw_friction_slope']),
 		Array('name' => 'tau', 'units' => Array('npm2','psf'), 'label' => $ec_lang['mpf_shear_stress']),
 		Array('name' => 'hf', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mphl_friction_loss']),
 		Array('name' => 'hm', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mphl_junction_loss']),
 		Array('name' => 'hl', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mphl_total_loss']),
-		Array('name' => 'z', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mphl_total_loss'] . 'Z1'),
-		Array('name' => 'z1', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mphl_total_loss'] . 'Z1'),
-		Array('name' => 'z2', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mphl_total_loss'] . 'Z1'),
-		Array('name' => 'z3', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mphl_total_loss'] . 'Z1'),
-		Array('name' => 'z4', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mphl_total_loss'] . 'Z1'),
 	)
 );
 
@@ -59,6 +47,8 @@ echoCalculatorForm(
 
 <script type="text/javascript">
 EngCalcs.pageCalculator = function(objForm) {
+    'use strict';
+    var hasUnits, precision;
 	this.var = {};
 	this.var.khw = 0.849,
 	this.var.g = 9.806;
