@@ -21,6 +21,7 @@
   *
   */
 function chooseLanguage($all_language_settings) {
+    $browserDefaultQuality = 0;
     if (!empty($_GET["lang"])) {
         // If $_GET["lang"] is a valid language, set a session language override.
         if ((strlen($_GET["lang"]) == 2) && $all_language_settings[$_GET["lang"]]) {
