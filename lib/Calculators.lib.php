@@ -88,7 +88,7 @@ $(document).ready(function() {
 ?>
 							<tr class="collapse in" id="<?=$input['name']?>_row" aria-expanded="true">
 								<td><label for='<?=$input['name']?>'><?=$input['label']?></label></td>
-								<td><?php echoInput($input['name'], $input['type'], "\t\t\t\t\t\t\t\t\t");?><?php echoUnitSelect($input['name'].'u', $input['units'], "\t\t\t\t\t\t\t\t\t");?><a data-toggle="collapse" href="#<?=$input['name']?>_row" aria-controls="helpWanted">X</a></td>
+								<td><?php echoInput($input['name'], $input['type'], "\t\t\t\t\t\t\t\t\t");?><?php echoUnitSelect($input['name'].'u', $input['units'], "\t\t\t\t\t\t\t\t\t");?><a data-toggle="collapse" href="#<?=$input['name']?>_row" aria-controls="<?=$input['name']?>_row">X</a></td>
 							</tr>
 <?php
 	}
@@ -110,7 +110,7 @@ $(document).ready(function() {
 								<td id="<?php echo $result['name'];?>"><?php echo $result['label'];?></td>
 								<td>
 									<?php echoUnitSelect($result['name'].'u',$result['units'], "\t\t\t\t\t\t\t\t\t");?>
-									<a data-toggle="collapse" href="#<?=$result['name']?>_row" aria-controls="helpWanted">X</a>
+									<a data-toggle="collapse" href="#<?=$result['name']?>_row" aria-controls="<?=$input['name']?>_row">X</a>
 
 								</td>
 							</tr>
