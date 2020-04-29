@@ -109,8 +109,7 @@ $(document).ready(function() {
 								<td><label for='<?=$result['name']?>'><?=$result['label']?></label></td>
 								<td id="<?php echo $result['name'];?>"><?php echo $result['label'];?></td>
 								<td>
-									<?php echoUnitSelect($result['name'].'u',$result['units'], "\t\t\t\t\t\t\t\t\t");?>
-									<a data-toggle="collapse" href="#<?=$result['name']?>_row" aria-controls="<?=$input['name']?>_row">X</a>
+									<?php echoUnitSelect($result['name'].'u',$result['units'], "\t\t\t\t\t\t\t\t\t");?><a data-toggle="collapse" href="#<?=$result['name']?>_row" aria-controls="<?=$input['name']?>_row">X</a>
 
 								</td>
 							</tr>
