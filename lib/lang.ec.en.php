@@ -57,7 +57,15 @@ $ec_lang['dw_main_menu']='Darcy-Weisbach Head Loss';
 $ec_lang['dw_main_title']='Free Online Darcy-Weisbach Head Loss Calculator';
 $ec_lang['dw_main_desc']='Darcy-Weisbach Head Loss at Given Diameter, Roughness, and Flow';
 $ec_lang['dw_roughness']='Darcy-Weisbach absolute roughness, e';
-$ec_lang['dw_friction_slope']='Friction slope';
+$ec_lang['dw_kinematic_viscosity']='Kinematic viscosity, v, in m<sup>2</sup>/sec (1E-6 for clean water at room temperature)';
+$ec_lang['dw_reynolds_number']='Reynolds number, Re';
+$ec_lang['dw_flow_regime']='Flow regime';
+$ec_lang['dw_regime_laminar']='laminar';
+$ec_lang['dw_regime_transitional']='transitional';
+$ec_lang['dw_regime_turbulent']='turbulent';
+$ec_lang['dw_friction_factor_method']='Friction factor method';
+$ec_lang['dw_friction_factor']='Friction factor, f';
+$ec_lang['dw_friction_slope']='Friction slope, s<sub>f</sub>';
 // Hazen-Williams. See mphl_ for missing text.
 $ec_lang['hw_main_menu']='Hazen-Williams Head Loss';
 $ec_lang['hw_main_title']='Free Online Hazen-Williams Head Loss Calculator';
