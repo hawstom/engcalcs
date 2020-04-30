@@ -69,7 +69,7 @@ $(document).ready(function() {
 	$('#set_units_mm').click(function() {EngCalcs.setUnits('mm')});
 	$('#set_units_ft').click(function() {EngCalcs.setUnits('ft')});
 	$('#set_units_in').click(function() {EngCalcs.setUnits('in')});
-	$('#toggle_all_x').click(function() {$('.engcalcs-x').toggle()});
+	$('#btn-printable').click(function() {$('.d-print-none').hide()});
 });
 </script>
 <form id="formInput" action="javascript:EngCalcs.submitForm()" method="post">
@@ -134,7 +134,7 @@ $(document).ready(function() {
 <?php endif; ?>
 <?php if ($flagFormAppend === true) {echoCalculatorFormAppend();} ?>
 </form>
-<p class="d-print-none"><button type="button" id="toggle_all_x">Hide/Show all X</button></p>
+<p class="d-print-none"><button type="button" id="btn-printable">Printable version (reload/refresh to restore)</button></p>
 <?php
 }
 function echoCookieScript ()
