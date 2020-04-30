@@ -6,7 +6,6 @@ function echoHeader($type="normal", $html_title = "", $html_head = "") {
       break;
     case "engcalcs":
             echoHTMLHead("EngCalcs", $html_title, $html_head);
-            echoEngCalcsMenu($html_title);
       break;
   }
 }
@@ -48,8 +47,11 @@ if (substr($type, 0, 8) === "EngCalcs") {
 <?php if (substr($type, 0, 8) === "EngCalcs") : ?>
 <script type="text/javascript" src="<?=BASE_URL?>/engcalcs/lib/Cookies.lib.js?v=3"></script>
 <script type="text/javascript" src="<?=BASE_URL?>/engcalcs/lib/Calculators.lib.js?v=3"></script>
-<?php endif; ?>
-<h1><?=$html_title?></h1>
+<?php 
+echoEngCalcsMenu($html_title);
+endif; 
+?>
+<h1 class="d-print-none"><?=$html_title?></h1>
 <p class="d-print-none">>> Drop your fears at the door; love is spoken here. <<</p>
 <?php
 }

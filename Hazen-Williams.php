@@ -17,11 +17,11 @@ echoHeader("EngCalcs", $html_title, $html_head);
 echoCalculatorForm(
 	//Inputs
 	Array(
-		Array('name' => 'q', 'type' => 'tel', 'units' => Array('m3ps','lps','mld','ft3ps','gpm','mgd'), 'label' => $ec_lang['mpf_flow']),
-		Array('name' => 'd', 'type' => 'tel', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mpf_pipe_diameter']),
-		Array('name' => 'l', 'type' => 'tel', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mphl_pipe_length']),
-		Array('name' => 'c', 'type' => 'tel', 'units' => NULL, 'label' => $ec_lang['hw_roughness']),
-		Array( 'name' => 'km', 'type' => 'tel', 'units' => NULL, 'label' => $ec_lang['mphl_total_junction_k']),
+		Array('name' => 'q', 'type' => 'number', 'units' => Array('m3ps','lps','mld','ft3ps','gpm','mgd'), 'label' => $ec_lang['mpf_flow']),
+		Array('name' => 'd', 'type' => 'number', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mpf_pipe_diameter']),
+		Array('name' => 'l', 'type' => 'number', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mphl_pipe_length']),
+		Array('name' => 'c', 'type' => 'number', 'units' => NULL, 'label' => $ec_lang['hw_roughness']),
+		Array( 'name' => 'km', 'type' => 'number', 'units' => NULL, 'label' => $ec_lang['mphl_total_junction_k']),
 	),
 	//Results
 	Array(
