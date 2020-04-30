@@ -65,12 +65,11 @@ EngCalcs.unitSets = {};
 EngCalcs.unitSets['<?=$key?>'] = ['<?=implode($set, "', '")?>'];
 <?php endforeach ; ?>
 $(document).ready(function() {
-	$('#set_units_m').click(function() {
-	EngCalcs.setUnits('m') }
-	);
+	$('#set_units_m').click(function() {EngCalcs.setUnits('m')});
 	$('#set_units_mm').click(function() {EngCalcs.setUnits('mm')});
 	$('#set_units_ft').click(function() {EngCalcs.setUnits('ft')});
 	$('#set_units_in').click(function() {EngCalcs.setUnits('in')});
+	$('#toggle_all_x').click(function() {$('.engcalcs-x').toggle()});
 });
 </script>
 <form id="formInput" action="javascript:EngCalcs.submitForm()" method="post">
@@ -78,9 +77,13 @@ $(document).ready(function() {
 	<input type="text" style="font-size: 1.5em; width: 98%" placeholder="<?=$ec_lang['template_printable_subtitle']?>" />
 	<table class="bare">
 		<tbody>
+			<tr class="collapse in<?php if ($flagHideUnits === true) : ?> hidden<?php endif; ?>" id="set_units_row" aria-expanded="true">
+				<td>
+					<?=$ec_lang['calc_set_units']?> <button type="button" id="set_units_m"><?=$ec_lang['u_m']?></button><button type="button" id="set_units_mm"><?=$ec_lang['u_mm']?></button><button type="button" id="set_units_ft"><?=$ec_lang['u_ft']?></button><button type="button" id="set_units_in"><?=$ec_lang['u_in']?></button><a data-toggle="collapse" href="#set_units_row" aria-controls="<?=$input['name']?>_row">[Hide this line]</a>
+				<td>
+			</tr>
 			<tr>
 				<td>
-					<span <?php if ($flagHideUnits === true) : ?>class="hide"<?php endif; ?>><?=$ec_lang['calc_set_units']?> <button type="button" id="set_units_m"><?=$ec_lang['u_m']?></button><button type="button" id="set_units_mm"><?=$ec_lang['u_mm']?></button><button type="button" id="set_units_ft"><?=$ec_lang['u_ft']?></button><button type="button" id="set_units_in"><?=$ec_lang['u_in']?></button></span>
 					<table>
 						<tbody>
 <?php
@@ -88,7 +91,10 @@ $(document).ready(function() {
 ?>
 							<tr class="collapse in" id="<?=$input['name']?>_row" aria-expanded="true">
 								<td><label for='<?=$input['name']?>'><?=$input['label']?></label></td>
-								<td><?php echoInput($input['name'], $input['type'], "\t\t\t\t\t\t\t\t\t");?><?php echoUnitSelect($input['name'].'u', $input['units'], "\t\t\t\t\t\t\t\t\t");?><a data-toggle="collapse" href="#<?=$input['name']?>_row" aria-controls="<?=$input['name']?>_row">X</a></td>
+								<td>
+									<?php echoInput($input['name'], $input['type'], "\t\t\t\t\t\t\t\t\t");?><?php echoUnitSelect($input['name'].'u', $input['units'], "\t\t\t\t\t\t\t\t\t");?>
+								</td>
+								<td class="engcalcs-x"><a data-toggle="collapse" href="#<?=$input['name']?>_row" aria-controls="<?=$input['name']?>_row">X</a></td>
 							</tr>
 <?php
 	}
@@ -109,9 +115,10 @@ $(document).ready(function() {
 								<td><label for='<?=$result['name']?>'><?=$result['label']?></label></td>
 								<td id="<?php echo $result['name'];?>"><?php echo $result['label'];?></td>
 								<td>
-									<?php echoUnitSelect($result['name'].'u',$result['units'], "\t\t\t\t\t\t\t\t\t");?><a data-toggle="collapse" href="#<?=$result['name']?>_row" aria-controls="<?=$input['name']?>_row">X</a>
+									<?php echoUnitSelect($result['name'].'u',$result['units'], "\t\t\t\t\t\t\t\t\t");?>
 
 								</td>
+								<td class="engcalcs-x"><a data-toggle="collapse" href="#<?=$result['name']?>_row" aria-controls="<?=$input['name']?>_row">X</a></td>
 							</tr>
 <?php
 	}
@@ -127,6 +134,7 @@ $(document).ready(function() {
 <?php endif; ?>
 <?php if ($flagFormAppend === true) {echoCalculatorFormAppend();} ?>
 </form>
+<p><button type="button" id="toggle_all_x">Hide/Show all X</button></p>
 <?php
 }
 function echoCookieScript ()
