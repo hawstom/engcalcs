@@ -85,7 +85,7 @@ $(document).ready(function() {
 			<tr>
 				<td>
 					Inputs
-					<table class="table table-bordered table-sm">
+					<table>
 						<tbody>
 <?php
 	foreach ($arrayInputs as $input) {
@@ -106,7 +106,7 @@ $(document).ready(function() {
 <?php if ($arrayResults) : ?>
 				<td>
 					<?php echo $ec_lang['calc_results'];?>
-					<table class="table table-bordered  table-sm">
+					<table>
 						<tbody>
 <?php
 	foreach ($arrayResults as $result) {
