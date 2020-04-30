@@ -32,17 +32,25 @@ function echoHTMLHead($type, $html_title, $html_head) {
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title><?=$html_title?></title>
 <?php
-if (substr($type, 0, 8) == "EngCalcs") {
+if (substr($type, 0, 8) === "EngCalcs") {
 ?>
 
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">    <link rel="stylesheet" href="<?=BASE_URL?>/engcalcs/lib/engcalcs.css" type="text/css" />
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+	<link rel="stylesheet" href="<?=BASE_URL?>/hawsedc.css" type="text/css">
+	<link rel="stylesheet" href="<?=BASE_URL?>/engcalcs/lib/engcalcs.css" type="text/css" />
 <?php
 }
 ?>
 </head>
 <body>
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+
+<?php if (substr($type, 0, 8) === "EngCalcs") : ?>
+<script type="text/javascript" src="<?=BASE_URL?>/engcalcs/lib/Cookies.lib.js?v=3"></script>
+<script type="text/javascript" src="<?=BASE_URL?>/engcalcs/lib/Calculators.lib.js?v=3"></script>
+<?php endif; ?>
 <h1><?=$html_title?></h1>
-<p>>> Drop your fears at the door; love is spoken here. <<</p>
+<p class="d-print-none">>> Drop your fears at the door; love is spoken here. <<</p>
 <?php
 }
 /****************************************************************************************************************/
@@ -52,7 +60,7 @@ if (substr($type, 0, 8) == "EngCalcs") {
 /****************************************************************************************************************/
 function echoFooter($type) {
 ?>
-<div class="left">
+<div class="left d-print-none">
 <?php
 echoMenu("main");
 ?>
@@ -82,15 +90,13 @@ echoMenu("main");
 	</p>
 <?php endif; ?>
 </div>
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-<?php if ($type === 'engcalcs') : ?>
-<script type="text/javascript" src="<?=BASE_URL?>/engcalcs/lib/Cookies.lib.js?v=3"></script>
-<script type="text/javascript" src="<?=BASE_URL?>/engcalcs/lib/Calculators.lib.js?v=3"></script>
-<?php endif; ?>
 </body>
 </html>
-<?php
-}
+<?php 
+    if ($type === 'EngCalcs') { 
 ?>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+<?php 
+    }
+}

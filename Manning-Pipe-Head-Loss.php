@@ -62,5 +62,5 @@ EngCalcs.pageCalculator = function(objForm) {
 <?php echoCookieScript(); ?>
 </script>
 <?php
-echoFooter("engcalcs");
+echoFooter("EngCalcs");
 ?>

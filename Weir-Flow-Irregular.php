@@ -133,5 +133,5 @@ echoCookieScript ();
 -->
 </script>
 <?php
-echoFooter("engcalcs");
+echoFooter("EngCalcs");
 ?>

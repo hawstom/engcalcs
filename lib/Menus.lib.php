@@ -43,7 +43,7 @@ function echoMainMenu() {
         array(BASE_URL.'/famtree.php','Collaborative Family Trees'),
         array(BASE_URL.'/contact.php','Contact')
     );
-    echo '<div>';
+    echo '<div class="d-print-none">';
 // Step through the array
   for ($i = 0; $i < count($menuarr); $i += 1) {
 // If the URL is absolute (starts with 'http'), display it always.
@@ -75,59 +75,45 @@ function echoEngCalcsMenu () {
     global $ec_lang;
 ?>
 
-<nav class="navbar navbar-default">
-  <div class="container-fluid">
-    <!-- Brand and toggle get grouped for better mobile display -->
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <a class="navbar-brand" href="#"><?=$ec_lang['menu_brand']?></a>
-    </div>
+<nav class="navbar navbar-expand-lg navbar-light bg-light d-print-none">
+	<a class="navbar-brand" href="#"><?=$ec_lang['menu_brand']?></a>
+	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+		<span class="navbar-toggler-icon"></span>
+	</button>
 
-    <!-- Collect the nav links, forms, and other content for toggling -->
-    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-      <ul class="nav navbar-nav">
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><?=$ec_lang['menu_main_hydraulics']?> <span class="caret"></span></a>
-          <ul class="dropdown-menu">
-            <li><a href="Manning-Pipe-Flow.php" title="<?=$ec_lang['mpf_main_desc']?>"><?=$ec_lang['mpf_main_menu']?></a></li>
-            <li><a href="Manning-Pipe-Head-Loss.php" title="<?=$ec_lang['mphl_main_desc']?>"><?=$ec_lang['mphl_main_menu']?></a></li>
-            <li><a href="Manning-Trap.php" title="<?=$ec_lang['mtc_main_desc']?>"><?=$ec_lang['mtc_menu']?></a></li>
-            <li><a href="Manning-Irregular.php" title="<?=$ec_lang['mi_main_desc']?>"><?=$ec_lang['mi_menu']?></a></li>
-            <li><a href="Weir-Flow-Simple.php" title="<?=$ec_lang['ws_main_desc']?>"><?=$ec_lang['ws_main_menu']?></a></li>
-            <li><a href="Weir-Flow-Irregular.php" title="<?=$ec_lang['wi_main_desc']?>"><?=$ec_lang['wi_menu']?></a></li>
-            <li><a href="https://docs.google.com/spreadsheets/d/1XRaQtrd8G9GnhXJK9zHBL7TXd0Rj2qex8siopZEPMsA/edit?usp=sharing" title="<?=$ec_lang['rrc_main_desc']?>"><?=$ec_lang['rrc_main_menu']?></a></li>
-          </ul>
-        </li>
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">New calculators under development <span class="caret"></span></a>
-          <ul class="dropdown-menu">
-            <li><a href="Plamen-test.php" title="Plamen's test calculator">Plamen's test calculator</a></li>
-            <li><a href="New-Calc-2.php" title="New Calculator 2">New Calculator 2 quick text</a></li>
-            <li><a href="New-Calc-31.php" title="New Calculator 3">New Calculator 3 quick text</a></li>
-            <li><a href="Hazen-Williams.php" title="<?=$ec_lang['hw_main_desc']?>"><?=$ec_lang['hw_main_menu']?></a></li>
-            <li><a href="Darcy-Weisbach.php" title="<?=$ec_lang['dw_main_desc']?>"><?=$ec_lang['dw_main_menu']?></a></li>
-          </ul>
-        </li>
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><?=$ec_lang['menu_main_language']?> <span class="caret"></span></a>
-          <ul class="dropdown-menu">
+	<div class="collapse navbar-collapse" id="navbarSupportedContent">
+		<ul class="navbar-nav mr-auto">
+			<li class="nav-item dropdown">
+				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					<?=$ec_lang['menu_main_hydraulics']?>
+				</a>
+				<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+					<a class="dropdown-item" href="Manning-Pipe-Flow.php" title="<?=$ec_lang['mpf_main_desc']?>"><?=$ec_lang['mpf_main_menu']?></a>
+					<a class="dropdown-item" href="Manning-Pipe-Head-Loss.php" title="<?=$ec_lang['mphl_main_desc']?>"><?=$ec_lang['mphl_main_menu']?></a>
+					<a class="dropdown-item" href="Hazen-Williams.php" title="<?=$ec_lang['hw_main_desc']?>"><?=$ec_lang['hw_main_menu']?></a>
+					<a class="dropdown-item" href="Darcy-Weisbach.php" title="<?=$ec_lang['dw_main_desc']?>"><?=$ec_lang['dw_main_menu']?></a>
+					<a class="dropdown-item" href="Plamen-test.php" title="Plamen's test calculator">Plamen's test calculator</a>
+					<div class="dropdown-divider"></div>
+					<a class="dropdown-item" href="Manning-Trap.php" title="<?=$ec_lang['mtc_main_desc']?>"><?=$ec_lang['mtc_menu']?></a>
+					<a class="dropdown-item" href="Manning-Irregular.php" title="<?=$ec_lang['mi_main_desc']?>"><?=$ec_lang['mi_menu']?></a>
+					<a class="dropdown-item" href="https://docs.google.com/spreadsheets/d/1XRaQtrd8G9GnhXJK9zHBL7TXd0Rj2qex8siopZEPMsA/edit?usp=sharing" title="<?=$ec_lang['rrc_main_desc']?>"><?=$ec_lang['rrc_main_menu']?></a>
+					<div class="dropdown-divider"></div>
+					<a class="dropdown-item" href="Weir-Flow-Simple.php" title="<?=$ec_lang['ws_main_desc']?>"><?=$ec_lang['ws_main_menu']?></a>
+					<a class="dropdown-item" href="Weir-Flow-Irregular.php" title="<?=$ec_lang['wi_main_desc']?>"><?=$ec_lang['wi_menu']?></a>
+				</div>
+			</li>
+			<li class="nav-item dropdown">
+				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					<?=$ec_lang['menu_main_language']?>
+				</a>
+				<div class="dropdown-menu" aria-labelledby="navbarDropdown">
 <?php foreach ($GLOBALS['all_language_settings'] as $key => $lang) : ?>
-            <li>
-                <a href="<?=$_SERVER['PHP_SELF']?>?lang=<?=$key?>" title="<?=$lang['LANGNAME']?>"><?=$lang['LANGNAME']?></a>
-            </li>
+					<a class="dropdown-item" href="<?=$_SERVER['PHP_SELF']?>?lang=<?=$key?>" title="<?=$lang['LANGNAME']?>"><?=$lang['LANGNAME']?></a>
 <?php endforeach; ?>
-          </ul>
-        </li>
-      </ul>
-    </div><!-- /.navbar-collapse -->
-  </div><!-- /.container-fluid -->
+				</div>
+			</li>
+		</ul>
+	</div>
 </nav>
-
 <?php
-                                                            }
-?>
+}

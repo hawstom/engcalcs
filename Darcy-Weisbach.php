@@ -108,5 +108,5 @@ EngCalcs.pageCalculator = function(objForm) {
 <?php echoCookieScript(); ?>
 </script>
 <?php
-engcalcsechoFooter("engcalcs");
+echoFooter("EngCalcs");
 ?>

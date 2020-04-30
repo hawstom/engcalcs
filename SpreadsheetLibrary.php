@@ -32,5 +32,5 @@ echoHeader("EngCalcs", $html_title, $html_head);
 </p>
 
 <?php
-echoFooter();
+echoFooter('main');
 ?>
