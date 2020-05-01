@@ -42,6 +42,10 @@ switch ($_SERVER['SERVER_NAME'])
         $baseurl = 'http://dev.hawsedc.com';
         $debugmode=TRUE;
         break;
+    case 'localhost' :
+        $baseurl = 'http://localhost/constructionnotesmanager.com/public_html/hawsedc';
+        $debugmode=TRUE;
+        break;    
     default :
         $baseurl = 'http://www.hawsedc.com';
         $debugmode=FALSE;
