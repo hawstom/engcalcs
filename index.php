@@ -7,6 +7,6 @@ $html_head='
 	<meta name="Keywords" content="open source calculac&iacute;on calcular calculacion calculation" />
 ';
 echoHeader("EngCalcs", $html_title, $html_head);
-echoFooter();
+echoFooter("EngCalcs");
 ?>
 
