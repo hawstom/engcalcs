@@ -75,7 +75,7 @@ $ec_lang['mpf_friction_slope']='Pendiente hidraulica (o quiz&aacute;s <a target=
 $ec_lang['mpf_depth_ratio']='% llenado de la tubería (llena=100% o fracción 1)';
 $ec_lang['mpf_flow']='Caudal, q';
 $ec_lang['mpf_velocity']='Velocidad, v';
-$ec_lang['mpf_velocity_head']='Presión (en M.C.As) por velocidad de flujo, hv';
+$ec_lang['mpf_velocity_head']='Presión por velocidad de flujo, hv';
 $ec_lang['mpf_flow_area']='Sección del tubo';
 $ec_lang['mpf_wetted_perimeter']='Perímetro mojado';
 $ec_lang['mpf_hydraulic_radius']='Radio hidráulico';
