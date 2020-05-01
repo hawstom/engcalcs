@@ -11,22 +11,21 @@ echoHeader("EngCalcs", $html_title, $html_head);
 ?>
 <h2><?=$ec_lang['ws_main_desc']?></h2>
 <?php echoHelpWanted(); ?>
-<form name="formInput" action="javascript:EngCalcs.calcAndSave(document.forms.formInput, 'Weir-Flow-Simple')" method="post">
-	<div>
-        <input type="text" style="font-size: 2em; width: 98%" placeholder="Printable Title" /><br />
-        <input type="text" style="font-size: 1.5em; width: 98%" placeholder="Printable Subtitle" />
-		<input type="number" step="any" class="input" name="l" id="l" /> <?=$ec_lang['ws_weirLength']?><br /><br />
-		<input type="number" step="any" class="input" name="h" id="h" /> <?=$ec_lang['ws_headWaterHeight']?><br /><br />
-		<input type="number" step="any" class="input" name="cw" id="cw" /> <?=$ec_lang['ws_weirCoefficient']?> <a target="_blank" href="http://epg.modot.org/files/b/bc/749_Broad-Crested_Weir_Coefficients.pdf">?</a><br /><br />
-		<input type="submit" name="Submit" value="<?=$ec_lang['wi_save_and_calculate']?>" />
-	</div>
-</form>
-<div>
-<?=$ec_lang['calc_results']?>
-	<table>
-		<tr><td><?=$ec_lang['mpf_flow']?></td><td id="q"><?=$ec_lang['mpf_flow']?></td></tr>
-	</table>
-</div>
+<?php
+echoCalculatorForm(
+	//Inputs
+	Array(
+		Array('name' => 'l', 'type' => 'number', 'units' => NULL, 'label' => $ec_lang['ws_weirLength']),
+		Array('name' => 'h', 'type' => 'number', 'units' => NULL, 'label' => $ec_lang['ws_headWaterHeight']),
+		Array('name' => 'cw', 'type' => 'number', 'units' => NULL, 'label' => $ec_lang['ws_weirCoefficient'].'<a target="_blank" href="http://epg.modot.org/files/b/bc/749_Broad-Crested_Weir_Coefficients.pdf">?</a>'),
+	),
+	//Results
+	Array(
+		Array('name' => 'q', 'units' => NULL, 'label' => $ec_lang['mpf_flow']),
+	),
+	$flagFormAppend = false, $flagHideUnits = true
+);
+?>
 <?php echoFeedback(); ?>
 <h2><?=$ec_lang['ws_notes_heading']?></h2>
 <dl>
@@ -35,13 +34,14 @@ echoHeader("EngCalcs", $html_title, $html_head);
 <script type="text/javascript">
 <!--
 EngCalcs.pageCalculator = function(objForm) {
-	var l = objForm.l.value,
-	h = objForm.h.value,
-	cw = objForm.cw.value,
-	q
-	;
-	q = cw * l * Math.pow(h, 1.5);
-	document.getElementById('q').innerHTML = q.toFixed(2);
+	'use strict';
+	var hasUnits, precision;
+	this.var = {};
+	this.readFormInput(objForm, 'l', hasUnits = false);
+	this.readFormInput(objForm, 'h', hasUnits = false);
+	this.readFormInput(objForm, 'cw', hasUnits = false);
+	this.var.q = this.var.cw * this.var.l * Math.pow(this.var.h, 1.5);
+	this.writeFormResult(objForm, 'q', precision = 2, hasUnits = false);
 }
 
 <?php

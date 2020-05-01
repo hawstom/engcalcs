@@ -36,6 +36,8 @@ echoCalculatorForm(
 <?php echoFeedback(); ?>
 <script type="text/javascript">
 EngCalcs.pageCalculator = function(objForm) {
+	'use strict';
+	var hasUnits, precision;
 	this.var = {};
 	// Read and convert form inputs to this.var.___ as SI units
 	this.readFormInput(objForm, 'q', hasUnits = true);

@@ -77,7 +77,7 @@ $(document).ready(function() {
 	<input type="text" style="font-size: 1.5em; width: 98%" placeholder="<?=$ec_lang['template_printable_subtitle']?>" />
 	<table class="bare">
 		<tbody>
-			<tr class="collapse show d-print-none<?php if ($flagHideUnits === true) : ?> hidden<?php endif; ?>" id="set_units_row">
+			<tr class="collapse d-print-none<?php if ($flagHideUnits === false) : ?> show<?php endif; ?>" id="set_units_row">
 				<td>
 					<?=$ec_lang['calc_set_units']?> <button type="button" id="set_units_m"><?=$ec_lang['u_m']?></button><button type="button" id="set_units_mm"><?=$ec_lang['u_mm']?></button><button type="button" id="set_units_ft"><?=$ec_lang['u_ft']?></button><button type="button" id="set_units_in"><?=$ec_lang['u_in']?></button><a data-toggle="collapse" href="#set_units_row" aria-expanded="true" aria-controls="set_units_row">[Hide this line]</a>
 				<td>

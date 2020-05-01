@@ -51,6 +51,8 @@ echoCalculatorForm(
 <?php echoFeedback(); ?>
 <script type="text/javascript">
 EngCalcs.pageCalculator = function(objForm) {
+	'use strict';
+	var hasUnits, precision;
 	this.var = {};
 	this.var.c = 1.0;
 	this.var.g = 9.806;
@@ -97,36 +99,36 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.writeFormResult(objForm, 'd50_searcy', precision = 4, hasUnits = true);
 
 	// Sketch
-	gymax = 100; // Max graphic flow depth
-	garmax = 6; // Max graphic aspect ratio
-	gar = this.var.t / this.var.y; // Flow aspect ratio
-	gt = Math.min(garmax, gar) * gymax; // Graphic flow width
-	gs = gt/ this.var.t; // Graphic scale
-	gy = gs * this.var.y;
-	gh = gy + gymax/2; // SVG height
-	gyb = gy + gymax/4 // Bottom of flow
-	gyt = gymax/4 // Top of flow
-	gw = gt; // SVG width
-	gxb1 = this.var.z1 * this.var.y * gs;
-	gxb2 = gxb1 + this.var.b * gs;
-	gxm = gw/2;
-	gtx1 = gxm - gymax/16;
-	gtx2 = gxm + gymax/16;
-	gty = gyt - gymax/8;
+	this.var.gymax = 100; // Max graphic flow depth
+	this.var.garmax = 6; // Max graphic aspect ratio
+	this.var.gar = this.var.t / this.var.y; // Flow aspect ratio
+	this.var.gt = Math.min(this.var.garmax, this.var.gar) * this.var.gymax; // Graphic flow width
+	this.var.gs = this.var.gt/ this.var.t; // Graphic scale
+	this.var.gy = this.var.gs * this.var.y;
+	this.var.gh = this.var.gy + this.var.gymax/2; // SVG height
+	this.var.gyb = this.var.gy + this.var.gymax/4 // Bottom of flow
+	this.var.gyt = this.var.gymax/4 // Top of flow
+	this.var.gw = this.var.gt; // SVG width
+	this.var.gxb1 = this.var.z1 * this.var.y * this.var.gs;
+	this.var.gxb2 = this.var.gxb1 + this.var.b * this.var.gs;
+	this.var.gxm = this.var.gw/2;
+	this.var.gtx1 = this.var.gxm - this.var.gymax/16;
+	this.var.gtx2 = this.var.gxm + this.var.gymax/16;
+	this.var.gty = this.var.gyt - this.var.gymax/8;
 	document.getElementById('sketch').innerHTML =
-		'<svg height="' + gh + '" width="' + gw + '">' +
+		'<svg height="' + this.var.gh + '" width="' + this.var.gw + '">' +
 			'<polyline points="' +
-			'0,' + gyt  + ' ' +
-			gxb1 + ',' + gyb + ' ' +
-			gxb2 + ',' + gyb + ' ' +
-			gt + ',' + gyt + '" ' +
-			'style="fill:none;stroke:black;stroke-width:' + gymax/25 + '" />' +
-			'<line x1="0" y1="' + gyt  + '" x2="' + gt + '" y2="' + gyt  + '" style="stroke:rgb(0,0,255);stroke-width:' + gymax/25 + '" />' +
+			'0,' + this.var.gyt  + ' ' +
+			this.var.gxb1 + ',' + this.var.gyb + ' ' +
+			this.var.gxb2 + ',' + this.var.gyb + ' ' +
+			this.var.gt + ',' + this.var.gyt + '" ' +
+			'style="fill:none;stroke:black;stroke-width:' + this.var.gymax/25 + '" />' +
+			'<line x1="0" y1="' + this.var.gyt  + '" x2="' + this.var.gt + '" y2="' + this.var.gyt  + '" style="stroke:rgb(0,0,255);stroke-width:' + this.var.gymax/25 + '" />' +
 			'<polygon points="' +
-			gxm + ',' + gyt + ' ' +
-			gtx1 + ',' + gty + ' ' +
-			gtx2 + ',' + gty + '" ' +
-			'style="fill:white;stroke:black;stroke-width:' + gymax/50 + '" />' +
+			this.var.gxm + ',' + this.var.gyt + ' ' +
+			this.var.gtx1 + ',' + this.var.gty + ' ' +
+			this.var.gtx2 + ',' + this.var.gty + '" ' +
+			'style="fill:white;stroke:black;stroke-width:' + this.var.gymax/50 + '" />' +
 			'Sorry, your browser does not support inline SVG.' +
 		'</svg>';
 };

@@ -43,6 +43,8 @@ echoCalculatorForm(
 
 <script type="text/javascript">
 EngCalcs.pageCalculator = function(objForm) {
+	'use strict';
+	var hasUnits, precision;
 	this.var = {};
 	this.var.c = 1.0;
 	this.var.g = 9.806;

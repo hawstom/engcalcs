@@ -32,7 +32,7 @@ function echoCalculatorFormAppend() {
         <thead>
             <tr>
                 <th colspan="5"><?=$ec_lang['wi_weirPoints']?>
-                    <a href="javascript:EngCalcs.addSingleCalcRow()">+</a>/<a href="javascript:deleteSingleCalcRow()">-</a>
+                    <a href="javascript:EngCalcs.addSingleCalcRow()">+</a>/<a href="javascript:EngCalcs.deleteSingleCalcRow()">-</a>
                 </th>
             </tr>
             <tr>
@@ -46,11 +46,6 @@ function echoCalculatorFormAppend() {
         <tbody id="CalcsBody">
         </tbody>
     </table>
-    <!-- <input type="text" size="6" name="calcname" /> Calculation name<br /><br /> -->
-    <br />
-    <input type="submit" name="Submit" value="<?=$ec_lang['wi_save_and_calculate']?>" /> 
-    <!--<input type="submit" name="Submit" value="Load and Calculate" /> --> 
-    </div>
 <?php
 }
 ?>

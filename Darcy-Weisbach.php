@@ -51,6 +51,8 @@ echoCalculatorForm(
 
 <script type="text/javascript">
 EngCalcs.pageCalculator = function(objForm) {
+	'use strict';
+	var hasUnits, precision;
 	this.var = {};
 	this.var.g = 9.806;
 	this.var.gammawater = 9806,
