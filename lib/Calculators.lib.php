@@ -77,7 +77,7 @@ $(document).ready(function() {
 	<input type="text" style="font-size: 1.5em; width: 98%" placeholder="<?=$ec_lang['template_printable_subtitle']?>" />
 	<table class="bare">
 		<tbody>
-			<tr class="<?php if ($flagHideUnits === true) : ?> hidden<?php endif; ?>collapse show d-print-none" id="set_units_row">
+			<tr class="collapse show d-print-none<?php if ($flagHideUnits === true) : ?> hidden<?php endif; ?>" id="set_units_row">
 				<td>
 					<?=$ec_lang['calc_set_units']?> <button type="button" id="set_units_m"><?=$ec_lang['u_m']?></button><button type="button" id="set_units_mm"><?=$ec_lang['u_mm']?></button><button type="button" id="set_units_ft"><?=$ec_lang['u_ft']?></button><button type="button" id="set_units_in"><?=$ec_lang['u_in']?></button><a data-toggle="collapse" href="#set_units_row" aria-expanded="true" aria-controls="set_units_row">[Hide this line]</a>
 				<td>
@@ -90,12 +90,12 @@ $(document).ready(function() {
 <?php
 	foreach ($arrayInputs as $input) {
 ?>
-							<tr class="" id="<?=$input['name']?>_row" aria-expanded="true">
+							<tr class="collapse show" id="<?=$input['name']?>_row">
 								<td><label for='<?=$input['name']?>'><?=$input['label']?></label></td>
 								<td>
 									<?php echoInput($input['name'], $input['type'], "\t\t\t\t\t\t\t\t\t");?><?php echoUnitSelect($input['name'].'u', $input['units'], "\t\t\t\t\t\t\t\t\t");?>
 								</td>
-								<td class="engcalcs-x d-print-none"><a data-toggle="collapse" href="#<?=$input['name']?>_row" aria-controls="<?=$input['name']?>_row">X</a></td>
+								<td class="engcalcs-x d-print-none"><a data-toggle="collapse" href="#<?=$input['name']?>_row" aria-expanded="true" aria-controls="<?=$input['name']?>_row">X</a></td>
 							</tr>
 <?php
 	}
@@ -111,14 +111,14 @@ $(document).ready(function() {
 <?php
 	foreach ($arrayResults as $result) {
 ?>
-							<tr class="" id="<?=$result['name']?>_row" aria-expanded="true">
+							<tr class="collapse show" id="<?=$result['name']?>_row">
 								<td><label for='<?=$result['name']?>'><?=$result['label']?></label></td>
 								<td id="<?php echo $result['name'];?>"><?php echo $result['label'];?></td>
 								<td>
 									<?php echoUnitSelect($result['name'].'u',$result['units'], "\t\t\t\t\t\t\t\t\t");?>
 
 								</td>
-								<td class="engcalcs-x d-print-none"><a data-toggle="collapse" href="#<?=$result['name']?>_row" aria-controls="<?=$input['name']?>_row">X</a></td>
+								<td class="engcalcs-x d-print-none"><a data-toggle="collapse" href="#<?=$result['name']?>_row" aria-expanded="true" aria-controls="<?=$input['name']?>_row">X</a></td>
 							</tr>
 <?php
 	}
