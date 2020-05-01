@@ -65,9 +65,8 @@ EngCalcs.pageCalculator = function(objForm) {
 	// From 7.8828/d^4.8704 * (Q/(k*C))^1.852 at Wikipedia Hazen-Williams article.
 	this.var.sf = 7.8828 / Math.pow(this.var.d, 4.8704) * Math.pow(this.var.q / (this.var.khw * this.var.c), 1.852);
 	this.var.tau = this.var.gammawater * this.var.rh * this.var.sf;
-	// For units selector, report heads in pascals (standard SI pressure unit).  Convert meters to pascals with * (1000 * g)
-	this.var.hv = Math.pow(this.var.v,2) / (2 * this.var.g) * (1000 * this.var.g);
-	this.var.hf = this.var.sf * this.var.l  * (1000 * this.var.g);
+	this.var.hv = Math.pow(this.var.v,2) / (2 * this.var.g);
+	this.var.hf = this.var.sf * this.var.l;
 	this.var.hm = this.var.hv * this.var.km;
 	this.var.hl = +this.var.hf + +this.var.hm;
 	this.writeFormResult(objForm, 'a', precision = 4, hasUnits = true);

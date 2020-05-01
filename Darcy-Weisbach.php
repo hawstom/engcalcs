@@ -84,9 +84,8 @@ EngCalcs.pageCalculator = function(objForm) {
 	}
 	this.var.sf = this.var.f * Math.pow(this.var.u, 2) / (2 * this.var.d * this.var.g);
 	this.var.tau = this.var.gammawater * this.var.rh * this.var.sf;
-	// For units selector, report heads in pascals (standard SI pressure unit).  Convert meters to pascals with * (1000 * g)
-	this.var.hv = Math.pow(this.var.u,2) / (2 * this.var.g) * (1000 * this.var.g);
-	this.var.hf = this.var.sf * this.var.l  * (1000 * this.var.g);
+	this.var.hv = Math.pow(this.var.u,2) / (2 * this.var.g);
+	this.var.hf = this.var.sf * this.var.l;
 	this.var.hm = this.var.hv * this.var.km;
 	this.var.hl = +this.var.hf + +this.var.hm;
 	this.writeFormResult(objForm, 'a', precision = 4, hasUnits = true);

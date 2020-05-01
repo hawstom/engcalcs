@@ -47,9 +47,8 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.var.g = 9.806;
 	this.var.a = (Math.PI * Math.pow(this.var.d, 2) / 4);
 	this.var.v = this.var.q / this.var.a;
-	// Report heads in pascals (standard SI pressure unit).  Convert meters to pascals with * (1000 * g)
-	this.var.hv = Math.pow(this.var.v,2) / (2 * this.var.g) * (1000 * this.var.g);
-	this.var.hf = this.var.l * Math.pow(this.var.v,2) * Math.pow(this.var.n,2) * 6.3496 / (Math.pow(this.var.c,2) * Math.pow(this.var.d,4/3)) * (1000 * this.var.g);
+	this.var.hv = Math.pow(this.var.v,2) / (2 * this.var.g);
+	this.var.hf = this.var.l * Math.pow(this.var.v,2) * Math.pow(this.var.n,2) * 6.3496 / (Math.pow(this.var.c,2) * Math.pow(this.var.d,4/3));
 	this.var.hm = this.var.k * this.var.hv;
 	this.var.hl = +this.var.hf + +this.var.hm;
 	this.writeFormResult(objForm, 'a', precision = 4, hasUnits = true);
