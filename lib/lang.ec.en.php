@@ -22,15 +22,17 @@ $ec_lang['u_m3ps']="m^3/s";
 $ec_lang['u_mm']="mm";
 $ec_lang['u_mm2']="mm^2";
 $ec_lang['u_mph']="mi/hr";
-$ec_lang['u_npm2']="N/m^2";
-$ec_lang['u_pa']="Pa";
-$ec_lang['u_kpa']="kPa";
 $ec_lang['u_mh2o']="m H2O";
 $ec_lang['u_mmh2o']="mm H2O";
-$ec_lang['u_psf']="psf";
-$ec_lang['u_psi']="psi";
 $ec_lang['u_fth2o']="ft H2O";
 $ec_lang['u_inh2o']="in H2O";
+$ec_lang['u_pa']="Pa";
+$ec_lang['u_kpa']="kPa";
+$ec_lang['u_npm2']="N/m^2";
+$ec_lang['u_knpm2']="kN/m^2";
+$ec_lang['u_knpcm2']="kN/cm^2";
+$ec_lang['u_psf']="psf";
+$ec_lang['u_psi']="psi";
 $ec_lang['u_s']="sec";
 $ec_lang['u_grade']="rise/run";
 $ec_lang['u_gradePercent']='% rise/run';
@@ -45,17 +47,21 @@ $ec_lang['menu_main_list']='List of Calculators';
 $ec_lang['menu_main_hydraulics']='Hydraulics';
 $ec_lang['menu_main_language']='Language';
 $ec_lang['menu_sub1_manning']='Manning Formula';
+$ec_lang['template_welcome']='>> Drop your fears at the door; love is spoken here. <<';
 $ec_lang['template_translation_help']='Can you help me translate, program, or host these calculators?  ';
 $ec_lang['template_feedback']='Please give us your valued words of suggestion or praise.  Did this free calculator exceed your expectations in every way?';
 $ec_lang['template_printable_title']='Printable Title';
 $ec_lang['template_printable_subtitle']='Printable Subtitle';
 $ec_lang['index_title']='Free Online Engineering Calculators';
 $ec_lang['calc_set_units']='Set units:';
+$ec_lang['calc_inputs']='Inputs';
 $ec_lang['calc_results']='Results';
-// Darcy-Weisbach. See mphl_ for missing text.
-$ec_lang['dw_main_menu']='Darcy-Weisbach Head Loss';
-$ec_lang['dw_main_title']='Free Online Darcy-Weisbach Head Loss Calculator';
-$ec_lang['dw_main_desc']='Darcy-Weisbach Head Loss at Given Diameter, Roughness, and Flow';
+$ec_lang['view_hide_line']='[Hide this line]';
+$ec_lang['view_printable']='Printable version (reload/refresh to restore)';
+// Darcy-Weisbach. See hw_ and mphl_ for missing text.
+$ec_lang['dw_main_menu']='Darcy-Weisbach Pipe Head Loss';
+$ec_lang['dw_main_title']='Free Online Darcy-Weisbach Pipe Head Loss Calculator';
+$ec_lang['dw_main_desc']='Darcy-Weisbach Pipe Head Loss at Given Diameter, Roughness, and Flow';
 $ec_lang['dw_roughness']='Darcy-Weisbach absolute roughness, e';
 $ec_lang['dw_kinematic_viscosity']='Kinematic viscosity, v, in m<sup>2</sup>/sec (1E-6 for clean water at room temperature)';
 $ec_lang['dw_reynolds_number']='Reynolds number, Re';
@@ -65,17 +71,16 @@ $ec_lang['dw_regime_transitional']='transitional';
 $ec_lang['dw_regime_turbulent']='turbulent';
 $ec_lang['dw_friction_factor_method']='Friction factor method';
 $ec_lang['dw_friction_factor']='Friction factor, f';
-$ec_lang['dw_friction_slope']='Friction slope, s<sub>f</sub>';
 // Hazen-Williams. See mphl_ for missing text.
-$ec_lang['hw_main_menu']='Hazen-Williams Head Loss';
-$ec_lang['hw_main_title']='Free Online Hazen-Williams Head Loss Calculator';
-$ec_lang['hw_main_desc']='Hazen-Williams Head Loss at Given Diameter, Roughness, and Flow';
-$ec_lang['hw_roughness']='Hazen-Williams roughness coefficient, C';
+$ec_lang['hw_main_menu']='Hazen-Williams Pipe Head Loss';
+$ec_lang['hw_main_title']='Free Online Hazen-Williams Pipe Head Loss Calculator';
+$ec_lang['hw_main_desc']='Hazen-Williams Pipe Head Loss at Given Diameter, Roughness, and Flow';
+$ec_lang['hw_roughness']='Hazen-Williams coefficient, C';
 $ec_lang['hw_friction_slope']='Friction slope';
 // Manning Irregular
 $ec_lang['mi_menu']='Manning Irregular Channel';
 $ec_lang['mi_main_title']='Free Online Manning Irregular Channel Calculator';
-$ec_lang['mi_main_desc']='Irregular Channel Uniform Flow Calculator';
+$ec_lang['mi_main_desc']='Irregular Channel Manning Uniform Flow Calculator';
 $ec_lang['mi_waterSurfaceElevation']='Water surface elevation';
 $ec_lang['mi_q_sum']='Q by sum of segments';
 $ec_lang['mi_q_617']='Q by sum of regions with composite n per Chow 6-17 equal velocities';
@@ -98,9 +103,6 @@ $ec_lang['mi_tau']='Shear<br />&tau;';
 $ec_lang['mi_a']='A';
 $ec_lang['mi_pw']='P<sub>w</sub>';
 $ec_lang['mi_rh']='R<sub>h</sub>';
-$ec_lang['mi_save_and_calculate']='Save and Calculate';
-$ec_lang['mi_or_adjust']='or';
-$ec_lang['mi_n_rows']='the number of rows';
 $ec_lang['mi_notes']='Notes';
 $ec_lang['mi_notes_1_term']='Q Methods';
 $ec_lang['mi_notes_1_def']='Q by sum of conveyances underestimates the frictional contribution from steep segments. Q by composite n overestimates the effect of wide shallow (overbank) friction on flow in deeper areas (main channel).';
@@ -110,6 +112,10 @@ $ec_lang['mi_notes_2_def']='The Strickler D<sub>50</sub> is the size (for a stra
 $ec_lang['mpf_main_menu']='Manning Pipe Flow';
 $ec_lang['mpf_main_title']='Free Online Manning Pipe Flow Calculator';
 $ec_lang['mpf_main_desc']='Manning Formula Uniform Pipe Flow at Given Slope and Depth';
+$ec_lang['mpf_spreadheet_notice']='Check out our spreadsheet version of this calculator';
+$ec_lang['mpf_spreadheet_link_download']='Download Spreadsheet';
+$ec_lang['mpf_spreadheet_link_Google']='Open Google Sheets version';
+$ec_lang['mpf_spreadheet_view_all']='View All Spreadsheets';
 $ec_lang['mpf_pipe_diameter']='Pipe diameter, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Manning roughness, n';
 $ec_lang['mpf_friction_slope']='Pressure slope (possibly <a target="_blank" href="../pressureslope.php">?</a> equal to pipe slope), S<sub>0</sub>';
@@ -164,8 +170,8 @@ $ec_lang['ws_notes_heading']='Notes';
 $ec_lang['ws_notes_we_term']='Weir Equation';
 // Weir Flow Irregular. See ws_ for missing text.
 $ec_lang['wi_menu']='Weir Flow Irregular';
-$ec_lang['wi_main_title']='Free Online Segmented, Variable Depth, Irregular Broad-crested Weir Flow Calculator';
-$ec_lang['wi_main_desc']='Irregular Broad-crested Weir Flow Calculator';
+$ec_lang['wi_main_title']='Free Online Segmented, Variable Depth, Irregular Weir Flow Calculator';
+$ec_lang['wi_main_desc']='Irregular Weir Flow Calculator';
 $ec_lang['wi_headWaterelevation']='Headwater elevation';
 $ec_lang['wi_weirPoints']='Weir points';
 $ec_lang['wi_station']='Station (distance)';
@@ -174,32 +180,13 @@ $ec_lang['wi_pondingHeight']='Ponding Height';
 $ec_lang['wi_incrementalFlow']='Incremental Flow';
 $ec_lang['wi_cumulativeFlow']='Cumulative Flow';
 $ec_lang['wi_save_and_calculate']='Save and Calculate';
-$ec_lang['wi_or_adjust']='or';
-$ec_lang['wi_n_rows']='the number of rows';
-$ec_lang['wi_notes']='Notes';
 $ec_lang['wi_notes_we_term']='Weir Equation';
 $ec_lang['wi_notes_we_def']='q = if (length = 0) then 0 else if (slope=0) then cw*length*d0<sup>1.5</sup> else cw/(2.5*slope) * (d0<sup>2.5</sup> - d1<sup>2.5</sup>) where d1 and d0 are always positive or zero';
-
 // Erosion Setback and Scour Calc.
 $ec_lang['essc_btbw']='Bank to bank width';
 $ec_lang['essc_mcr']='Minimum curve radius';
 $ec_lang['essc_q']='Flow, Q';
 $ec_lang['plamen_test']='What does this button do';
-
-// Hazen-Williams. See mphl_ for missing language.
-$ec_lang['hw_main_menu']='Hazen-Williams Head Loss';
-$ec_lang['hw_main_title']='Free Online Hazen-Williams Head Loss Calculator';
-$ec_lang['hw_main_desc']='Hazen-Williams Head Loss at Given Diameter, Roughness, and Flow';
-$ec_lang['hw_roughness']='Hazen-Williams roughness coefficient, C';
-$ec_lang['hw_friction_slope']='Friction slope';
-
-// Darcy-Weisbach. See mphl_ for missing language.
-$ec_lang['dw_main_menu']='Darcy-Weisbach Head Loss';
-$ec_lang['dw_main_title']='Free Online Darcy-Weisbach Head Loss Calculator';
-$ec_lang['dw_main_desc']='Darcy-Weisbach Head Loss at Given Diameter, Roughness, and Flow';
-$ec_lang['dw_roughness']='Darcy-Weisbach absolute roughness, e';
-$ec_lang['dw_friction_slope']='Friction slope';
-
 // Contact us.
 $ec_lang['contact_title']='HawsEDC Contact';
 $ec_lang['contactSendMessage']='Send Tom Haws a message';

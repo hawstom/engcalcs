@@ -35,7 +35,7 @@ echoCalculatorForm(
 		Array('name' => 'regime_label', 'units' => NULL, 'label' => $ec_lang['dw_flow_regime']),
 		Array('name' => 'f_method', 'units' => NULL, 'label' => $ec_lang['dw_friction_factor_method']),
 		Array('name' => 'f', 'units' => NULL, 'label' => $ec_lang['dw_friction_factor']),
-		Array('name' => 'sf', 'units' => Array('grade','gradePercent'), 'label' => $ec_lang['dw_friction_slope']),
+		Array('name' => 'sf', 'units' => Array('grade','gradePercent'), 'label' => $ec_lang['hw_friction_slope']),
 		Array('name' => 'tau', 'units' => Array('npm2','psf'), 'label' => $ec_lang['mpf_shear_stress']),
 		Array('name' => 'hf', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mphl_friction_loss']),
 		Array('name' => 'hm', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mphl_junction_loss']),

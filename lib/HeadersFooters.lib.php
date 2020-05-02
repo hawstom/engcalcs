@@ -19,6 +19,7 @@ function echoHeader($type="normal", $html_title = "", $html_head = "") {
     **/
 function echoHTMLHead($type, $html_title, $html_head) {
 
+global $ec_lang;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -54,7 +55,7 @@ echoEngCalcsMenu($html_title);
 endif; 
 ?>
 <h1 class="d-print-none"><?=$html_title?></h1>
-<p class="d-print-none">>> Drop your fears at the door; love is spoken here. <<</p>
+<p class="d-print-none"><?=$ec_lang['template_welcome']?></p>
 <?php
 }
 /****************************************************************************************************************/

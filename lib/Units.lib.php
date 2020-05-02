@@ -37,12 +37,14 @@ $ec_units['ft2']=10.764;
 $ec_units['in2']=1550;
 
 $ec_units['mh2o']=1;
+$ec_units['mmh2o']=1000;
 $ec_units['fth2o']=3.2808;
 $ec_units['inh2o']=39.37;
 $ec_units['pa']=9806;
-$ec_units['npm2']=9806;
 $ec_units['kpa']=9.806;
-$ec_units['mmh2o']=1000;
+$ec_units['npm2']=9806;
+$ec_units['knpm2']=9.806;
+$ec_units['knpcm2']=98060;
 $ec_units['bar']=0.0981;
 $ec_units['psf']=204.82;
 $ec_units['psi']=1.4223;

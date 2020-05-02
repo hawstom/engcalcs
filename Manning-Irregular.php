@@ -110,10 +110,6 @@ function echoCalculatorFormAppend() {
         <tbody id="CalcsBody">
         </tbody>
     </table>
-    <!-- <input type="text" size="6" name="calcname" /> Calculation name<br /><br /> -->
-    <br />
-	<!--<input type="submit" name="Submit" value="Load and Calculate" /> --> 
-    <input type="submit" name="Submit" value="<?=$ec_lang['mi_save_and_calculate']?>" />
     </div>
 
 <?php
@@ -397,7 +393,7 @@ EngCalcs.Manning.closeRegion = function () {
 
 // Shear stress depends on y, so we report it for a point and don't store it with the section.
 EngCalcs.Manning.get_tau = function (y) {
-	return this.gammawater * y * this.s0;
+	return y * this.s0;
 };
 
 EngCalcs.Manning.get_d50_mra = function (y) {

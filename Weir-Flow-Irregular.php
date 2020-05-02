@@ -50,7 +50,7 @@ function echoCalculatorFormAppend() {
 }
 ?>
 <?php echoFeedback(); ?>
-<h2><?=$ec_lang['wi_notes']?></h2>
+<h2><?=$ec_lang['mi_notes']?></h2>
 <dl>
 <dt><?=$ec_lang['wi_notes_we_term']?></dt><dd><?=$ec_lang['wi_notes_we_def']?></dd>
 </dl>

@@ -4,19 +4,19 @@ function echoHelpWanted(){
     global $ec_lang;
 ?>
 <p class="collapse show d-print-none" id="helpWanted">
-	<a href="../contact.php"><?=$ec_lang['template_translation_help']?></a> <a data-toggle="collapse" href="#helpWanted" aria-expanded="true" aria-controls="helpWanted">[Hide this request]</a>
+	<a href="../contact.php"><?=$ec_lang['template_translation_help']?></a> <a data-toggle="collapse" href="#helpWanted" aria-expanded="true" aria-controls="helpWanted"><?=$ec_lang['view_hide_line']?></a>
 </p>
 <?php
 if (basename($_SERVER['PHP_SELF']) == "Manning-Pipe-Flow.php") {
 ?>
 <p>   
-	Check out our spreadsheet version of this calculator:
+	<?=$ec_lang['mpf_spreadheet_notice']?>
 	&ensp;
-	<a href="spreadsheet/<?=basename($_SERVER['PHP_SELF'], '.php') . '.xlsx';?>">Download Spreadsheet</a>
+	<a href="spreadsheet/<?=basename($_SERVER['PHP_SELF'], '.php') . '.xlsx';?>"><?=$ec_lang['mpf_spreadheet_link_download']?></a>
 	&ensp;
-	<a href="spreadsheet/<?=basename($_SERVER['PHP_SELF'], '.php') . '.php';?>">Open Google Sheets version</a>
+	<a href="spreadsheet/<?=basename($_SERVER['PHP_SELF'], '.php') . '.php';?>"><?=$ec_lang['mpf_spreadheet_link_Google']?></a>
 	&ensp;
-	<a href="http://www.hawsedc.com/engcalcs/SpreadsheetLibrary.php">View All Spreadsheets</a>
+	<a href="http://www.hawsedc.com/engcalcs/SpreadsheetLibrary.php"><?=$ec_lang['mpf_spreadheet_view_all']?></a>
 </p>
 <?php
 }
@@ -32,7 +32,7 @@ function echoFeedback(){
     global $ec_lang;
 ?>
 <p class="collapse show d-print-none" id="feedback">
-	<a href="../contact.php"><?=$ec_lang['template_feedback']?></a> <a data-toggle="collapse" href="#feedback"  aria-expanded="true"aria-controls="helpWanted">[Hide this request]</a>
+	<a href="../contact.php"><?=$ec_lang['template_feedback']?></a> <a data-toggle="collapse" href="#feedback"  aria-expanded="true"aria-controls="helpWanted"><?=$ec_lang['view_hide_line']?></a>
 </p>
 <?php
 }
@@ -79,7 +79,7 @@ $(document).ready(function() {
 		<tbody>
 			<tr class="collapse d-print-none<?php if ($flagHideUnits === false) : ?> show<?php endif; ?>" id="set_units_row">
 				<td>
-					<?=$ec_lang['calc_set_units']?> <button type="button" id="set_units_m"><?=$ec_lang['u_m']?></button><button type="button" id="set_units_mm"><?=$ec_lang['u_mm']?></button><button type="button" id="set_units_ft"><?=$ec_lang['u_ft']?></button><button type="button" id="set_units_in"><?=$ec_lang['u_in']?></button><a data-toggle="collapse" href="#set_units_row" aria-expanded="true" aria-controls="set_units_row">[Hide this line]</a>
+					<?=$ec_lang['calc_set_units']?> <button type="button" id="set_units_m"><?=$ec_lang['u_m']?></button><button type="button" id="set_units_mm"><?=$ec_lang['u_mm']?></button><button type="button" id="set_units_ft"><?=$ec_lang['u_ft']?></button><button type="button" id="set_units_in"><?=$ec_lang['u_in']?></button><a data-toggle="collapse" href="#set_units_row" aria-expanded="true" aria-controls="set_units_row"><?=$ec_lang['view_hide_line']?></a>
 				<td>
 			</tr>
 			<tr>
@@ -134,7 +134,7 @@ $(document).ready(function() {
 <?php endif; ?>
 <?php if ($flagFormAppend === true) {echoCalculatorFormAppend();} ?>
 </form>
-<p class="d-print-none"><button type="button" id="btn-printable">Printable version (reload/refresh to restore)</button></p>
+<p class="d-print-none"><button type="button" id="btn-printable"><?=$ec_lang['view_printable']?></button></p>
 <?php
 }
 function echoCookieScript ()
