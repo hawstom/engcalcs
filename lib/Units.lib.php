@@ -24,7 +24,6 @@ $ec_units['ftps']=3.2808;
 $ec_units['mph']=2.237;
 
 $ec_units['m3ps']=1;
-$ec_units['m3ph']=3600;
 $ec_units['lps']=1000;
 $ec_units['ft3ps']=35.313;
 $ec_units['gpm']=15849;

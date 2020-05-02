@@ -2,42 +2,40 @@
 
 // All missing text declarations will fall back to English.
 
-// Units
+// Units (alphabetical order)
 // Necessary for calculator units selectors
-$ec_lang['u_ft']="ft";
+$ec_lang['u_depthFrac']="fraction";
+$ec_lang['u_depthPercent']="%";
 $ec_lang['u_ft2']="ft^2";
-$ec_lang['u_ftps']="ft/sec";
 $ec_lang['u_ft3ps']="cfs";
-$ec_lang['u_gpm']="gpm";
-$ec_lang['u_in']="in";
-$ec_lang['u_in2']="sq. in.";
-$ec_lang['u_lps']="l/s";
-$ec_lang['u_m']="m";
-$ec_lang['u_m2']="m^2";
-$ec_lang['u_mgd']="MGD";
-$ec_lang['u_mld']="Ml/d";
-$ec_lang['u_mps']="m/s";
-$ec_lang['u_m3ph']="m^3/hr";
-$ec_lang['u_m3ps']="m^3/s";
-$ec_lang['u_mm']="mm";
-$ec_lang['u_mm2']="mm^2";
-$ec_lang['u_mph']="mi/hr";
-$ec_lang['u_mh2o']="m H2O";
-$ec_lang['u_mmh2o']="mm H2O";
+$ec_lang['u_ft']="ft";
 $ec_lang['u_fth2o']="ft H2O";
+$ec_lang['u_ftps']="ft/sec";
+$ec_lang['u_gpm']="gpm";
+$ec_lang['u_gradePercent']='% rise/run';
+$ec_lang['u_grade']="rise/run";
+$ec_lang['u_in2']="sq. in.";
 $ec_lang['u_inh2o']="in H2O";
-$ec_lang['u_pa']="Pa";
-$ec_lang['u_kpa']="kPa";
-$ec_lang['u_npm2']="N/m^2";
-$ec_lang['u_knpm2']="kN/m^2";
+$ec_lang['u_in']="in";
 $ec_lang['u_knpcm2']="kN/cm^2";
+$ec_lang['u_knpm2']="kN/m^2";
+$ec_lang['u_kpa']="kPa";
+$ec_lang['u_lps']="l/s";
+$ec_lang['u_m2']="m^2";
+$ec_lang['u_m3ps']="m^3/s";
+$ec_lang['u_mgd']="MGD";
+$ec_lang['u_mh2o']="m H2O";
+$ec_lang['u_mld']="Ml/d";
+$ec_lang['u_m']="m";
+$ec_lang['u_mm2']="mm^2";
+$ec_lang['u_mmh2o']="mm H2O";
+$ec_lang['u_mm']="mm";
+$ec_lang['u_mps']="m/s";
+$ec_lang['u_npm2']="N/m^2";
+$ec_lang['u_pa']="Pa";
 $ec_lang['u_psf']="psf";
 $ec_lang['u_psi']="psi";
 $ec_lang['u_s']="sec";
-$ec_lang['u_grade']="rise/run";
-$ec_lang['u_gradePercent']='% rise/run';
-$ec_lang['u_depthFrac']="fraction";
-$ec_lang['u_depthPercent']="%";
 
 // Page text
 // Note: In the process of rearranging the language variables into page order for easier maintenance.
@@ -46,9 +44,8 @@ $ec_lang['menu_brand']='HawsEDC Calculators';
 $ec_lang['menu_main_list']='List of Calculators';
 $ec_lang['menu_main_hydraulics']='Hydraulics';
 $ec_lang['menu_main_language']='Language';
-$ec_lang['menu_sub1_manning']='Manning Formula';
 $ec_lang['template_welcome']='>> Drop your fears at the door; love is spoken here. <<';
-$ec_lang['template_translation_help']='Can you help me translate, program, or host these calculators?  ';
+$ec_lang['template_translation_help']='Can you help me improve translations, program, or host these calculators?  ';
 $ec_lang['template_feedback']='Please give us your valued words of suggestion or praise.  Did this free calculator exceed your expectations in every way?';
 $ec_lang['template_printable_title']='Printable Title';
 $ec_lang['template_printable_subtitle']='Printable Subtitle';

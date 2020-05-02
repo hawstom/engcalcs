@@ -64,39 +64,41 @@ $ec_lang['weir']="barrage";
 $ec_lang['wettedperimeter']="périmètre mouiller";
 $ec_lang['width']="largeur";
 
-// Units
+// Units (alphabetical order)
 // Necessary for calculator units selectors
-$ec_lang['u_ft']="ft";
-$ec_lang['u_ft2']="ft^2";
-$ec_lang['u_fps']="ft/sec.";
-$ec_lang['u_ft3ps']="ft^3/sec";
-$ec_lang['u_gpm']="galons/minute";
-$ec_lang['u_inches']="inches";
-$ec_lang['u_in2']="inches^2";
-$ec_lang['u_lps']="l/s";
-$ec_lang['u_meters']="m";
-$ec_lang['u_m2']="m^2";
-$ec_lang['u_mgd']="millions de galons par jour";
-$ec_lang['u_mps']="m/s";
-$ec_lang['u_m3ph']="m^3/hr";
-$ec_lang['u_m3ps']="m^3/s";
-$ec_lang['u_mm']="mm";
-$ec_lang['u_mm2']="mm^2";
-$ec_lang['u_mph']="milles/heur";
-$ec_lang['u_npm2']="N/m^2";
-$ec_lang['u_pa']="Pa";
-$ec_lang['u_kpa']="kPa";
-$ec_lang['u_mh2o']="m H2O";
-$ec_lang['u_mmh2o']="mm H2O";
-$ec_lang['u_psf']="lbs/ft^2";
-$ec_lang['u_psi']="lbs/in^2";
-$ec_lang['u_fth2o']="ft2O";
-$ec_lang['u_inh2o']="in H2O";
-$ec_lang['u_s']="sec";
-$ec_lang['u_grade']="pente";
-$ec_lang['u_gradePercent']='% pente';
 $ec_lang['u_depthFrac']="fraction";
 $ec_lang['u_depthPercent']="%";
+$ec_lang['u_fps']="ft/sec.";
+$ec_lang['u_ft2']="ft^2";
+$ec_lang['u_ft3ps']="ft^3/sec";
+$ec_lang['u_ft']="ft";
+$ec_lang['u_fth2o']="ft2O";
+$ec_lang['u_ftps']="ft/sec";
+$ec_lang['u_gpm']="galons/minute";
+$ec_lang['u_grade']="pente";
+$ec_lang['u_gradePercent']='% pente';
+$ec_lang['u_in2']="inches^2";
+$ec_lang['u_inches']="inches";
+$ec_lang['u_inh2o']="in H2O";
+$ec_lang['u_in']="in";
+$ec_lang['u_knpcm2']="kN/cm^2";
+$ec_lang['u_knpm2']="kN/m^2";
+$ec_lang['u_kpa']="kPa";
+$ec_lang['u_lps']="l/s";
+$ec_lang['u_m2']="m^2";
+$ec_lang['u_m3ps']="m^3/s";
+$ec_lang['u_meters']="m";
+$ec_lang['u_mgd']="millions de galons par jour";
+$ec_lang['u_mh2o']="m H2O";
+$ec_lang['u_mm2']="mm^2";
+$ec_lang['u_mmh2o']="mm H2O";
+$ec_lang['u_mm']="mm";
+$ec_lang['u_mps']="m/s";
+$ec_lang['u_npm2']="N/m^2";
+$ec_lang['u_pa']="Pa";
+$ec_lang['u_psf']="lbs/ft^2";
+$ec_lang['u_psi']="lbs/in^2";
+$ec_lang['u_s']="sec";
 
 // Symbols
 // Do not use. Type entire page text phrase below.
@@ -122,15 +124,21 @@ $ec_lang['sideSlope2']="$ec_lang[slope] $ec_lang[of] $ec_lang[side] 2 ($ec_lang[
 
 // Page text
 // Note: In the process of rearranging the language variables into page order for easier maintenance.
+$ec_lang['menu_brand']=ucfirst("$ec_lang[calculator]s HawsEDC");
 $ec_lang['menu_main_list']=ucfirst("liste de $ec_lang[calculators]");
 $ec_lang['menu_main_hydraulics']=ucfirst("$ec_lang[hydraulics]");
 $ec_lang['menu_main_language']=ucfirst("langue");
-$ec_lang['menu_sub1_manning']=ucfirst("la $ec_lang[formula] $ec_lang[of] $ec_lang[manning]");
+$ec_lang['template_welcome']='>> Drop your fears at the door; love is spoken here. <<';
 $ec_lang['template_translation_help']="Assistance a la traducion est desiree. Pouvez vous installer ce calculateur sur votre site?";
 $ec_lang['template_feedback']="Donnez nous votre avis. Est-ce que cet ordinateur a depassé vos attentes?";
+$ec_lang['template_printable_title']='Printable Title';
+$ec_lang['template_printable_subtitle']='Printable Subtitle';
 $ec_lang['index_title']=ucfirst("$ec_lang[calculators] $ec_lang[freeOnline] pour $ec_lang[engineers]");
 $ec_lang['calc_set_units']='Set units:';
+$ec_lang['calc_inputs']='Inputs';
 $ec_lang['calc_results']=ucfirst("$ec_lang[results]:");
+$ec_lang['view_hide_line']='[Hide this line]';
+$ec_lang['view_printable']='Printable version (reload/refresh to restore)';
 // Manning Pipe Flow
 $ec_lang['mpf_main_menu']=ucfirst("$ec_lang[flow] $ec_lang[manning] en $ec_lang[pipe]s");
 $ec_lang['mpf_main_title']=ucfirst("$ec_lang[calculator] $ec_lang[freeOnline] de $ec_lang[manningFormula] pour $ec_lang[flow] en $ec_lang[pipe]s");
@@ -186,9 +194,6 @@ $ec_lang['wi_elevation']="Nivel";
 $ec_lang['wi_pondingHeight']=ucfirst("$ec_lang[height] $ec_lang[of] $ec_lang[ponding]");
 $ec_lang['wi_incrementalFlow']=ucfirst("$ec_lang[flow] $ec_lang[incremental]");
 $ec_lang['wi_cumulativeFlow']=ucfirst("$ec_lang[flow] $ec_lang[cumulative]");
-$ec_lang['wi_save_and_calculate']=ucfirst("$ec_lang[save] $ec_lang[and] $ec_lang[calculate]");
-$ec_lang['wi_or_adjust']="ou";
-$ec_lang['wi_n_rows']="le nombre de rangées";
 $ec_lang['wi_notes_we_term']='Weir Equation';
 $ec_lang['wi_notes_we_def']='q = if (length = 0) then 0 else if (slope=0) then cw*length*d0<sup>1.5</sup> else cw/(2.5*slope) * (d0<sup>2.5</sup> - d1<sup>2.5</sup>) where d1 and d0 are always positive or zero';
 // Contact us.

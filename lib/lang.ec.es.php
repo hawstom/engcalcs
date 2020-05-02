@@ -1,38 +1,41 @@
 <?php
 
-// All missing text declarations will fall back to English.
-// áéíóúñ
+// ñáéíóú All missing text declarations will fall back to English.
 
-// Units
+// Units (alphabetical order)
 // Necessary for calculator units selectors
-$ec_lang['u_ft']="pies";
+$ec_lang['u_depthFrac']="fracción";
+$ec_lang['u_depthPercent']="%";
 $ec_lang['u_ft2']="pies^2";
-$ec_lang['u_ftps']="pies/seg.";
 $ec_lang['u_ft3ps']="pies^3/seg";
-$ec_lang['u_gpm']="gal/min";
-$ec_lang['u_in']="pulg.";
-$ec_lang['u_in2']="$ec_lang[u_in]^2";
-$ec_lang['u_lps']="l/s";
-$ec_lang['u_m']="m";
-$ec_lang['u_m2']="m^2";
-$ec_lang['u_mgd']="Mgal/día";
-$ec_lang['u_mps']="m/s";
-$ec_lang['u_m3ph']="m^3/hr";
-$ec_lang['u_m3ps']="m^3/s";
-$ec_lang['u_mm']="mm";
-$ec_lang['u_mm2']="mm^2";
-$ec_lang['u_mph']="millas/h";
-$ec_lang['u_mh2o']="mca";
-$ec_lang['u_mmh2o']="mmca";
 $ec_lang['u_fth2o']="pies ca";
+$ec_lang['u_ft']="pies";
+$ec_lang['u_ftps']="pies/seg.";
+$ec_lang['u_gpm']="gal/min";
+$ec_lang['u_gradePercent']="% $ec_lang[u_grade]";
+$ec_lang['u_grade']="vert./horiz.";
+$ec_lang['u_in2']="$ec_lang[u_in]^2";
 $ec_lang['u_inh2o']="pulg. ca";
+$ec_lang['u_in']="pulg.";
+$ec_lang['u_knpcm2']="kN/cm^2";
+$ec_lang['u_knpm2']="kN/m^2";
+$ec_lang['u_kpa']="kPa";
+$ec_lang['u_lps']="l/s";
+$ec_lang['u_m2']="m^2";
+$ec_lang['u_m3ps']="m^3/s";
+$ec_lang['u_mgd']="Mgal/día";
+$ec_lang['u_mh2o']="mca";
+$ec_lang['u_mld']="Ml/d";
+$ec_lang['u_m']="m";
+$ec_lang['u_mm2']="mm^2";
+$ec_lang['u_mmh2o']="mmca";
+$ec_lang['u_mm']="mm";
+$ec_lang['u_mps']="m/s";
+$ec_lang['u_npm2']="N/m^2";
+$ec_lang['u_pa']="Pa";
 $ec_lang['u_psf']="lb/pie^2";
 $ec_lang['u_psi']="lb/pulg^2";
 $ec_lang['u_s']="seg";
-$ec_lang['u_grade']="vert./horiz.";
-$ec_lang['u_gradePercent']="% $ec_lang[u_grade]";
-$ec_lang['u_depthFrac']="fracción";
-$ec_lang['u_depthPercent']="%";
 
 // Page text
 // Note: In the process of rearranging the language variables into page order for easier maintenance.
@@ -41,7 +44,6 @@ $ec_lang['menu_brand']='Calculadoras HawsEDC';
 $ec_lang['menu_main_list']='Lista de calculadoras';
 $ec_lang['menu_main_hydraulics']='Hydraulica';
 $ec_lang['menu_main_language']='Idioma';
-$ec_lang['menu_sub1_manning']='Manning';
 $ec_lang['template_welcome']='>> Dejad vuestros miedos en la puerta; el amor se habla aquí. <<';
 $ec_lang['template_translation_help']='&iquest;Me puede ayudar a traducir esta calculadora a su idioma?  &iquest;Quisiera Ud. poner esta calculadora en su propio sitio web?';
 $ec_lang['template_feedback']='Tenga la amabilidad de enviarnos sus comentarios. &iquest;Le fue útil esta calculadora?';
