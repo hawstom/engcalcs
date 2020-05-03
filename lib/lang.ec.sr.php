@@ -12,7 +12,7 @@ $ec_lang['mpf_main_desc']='Manning Formula Uniform Pipe Flow at Given Slope and 
 $ec_lang['mpf_spreadheet_notice']='Check out our spreadsheet version of this calculator';
 $ec_lang['mpf_spreadheet_link_download']='Download Spreadsheet';
 $ec_lang['mpf_spreadheet_link_Google']='Open Google Sheets version';
-ec_lang['mpf_spreadheet_view_all']='View All Spreadsheets';
+$ec_lang['mpf_spreadheet_view_all']='View All Spreadsheets';
 $ec_lang['mpf_pipe_diameter']='Prečnik cevi, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Manningov koeficijent hrapavosti, n';
 $ec_lang['mpf_friction_slope']='Linijski gubitak pritiska (moguće <a target="_blank" href="../pressureslope.php">?</a> jednak nagibu cijevi), S<sub>0</sub>';
