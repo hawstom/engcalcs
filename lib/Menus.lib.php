@@ -84,7 +84,7 @@ function echoEngCalcsMenu () {
 	<div class="collapse navbar-collapse" id="navbarSupportedContent">
 		<ul class="navbar-nav mr-auto">
 			<li class="nav-item dropdown">
-				<a class="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				<a class="nav-link dropdown-toggle active" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 					<?=$ec_lang['menu_main_hydraulics']?>
 				</a>
 				<div class="dropdown-menu" aria-labelledby="navbarDropdown">
@@ -103,7 +103,7 @@ function echoEngCalcsMenu () {
 				</div>
 			</li>
 			<li class="nav-item dropdown">
-				<a class="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				<a class="nav-link dropdown-toggle active" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 					<?=$ec_lang['menu_main_language']?>
 				</a>
 				<div class="dropdown-menu" aria-labelledby="navbarDropdown">

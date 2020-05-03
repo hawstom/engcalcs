@@ -49,7 +49,7 @@ echoCalculatorForm(
 <div id="sketch"></div>
 
 <?php echoFeedback(); ?>
-<script type="text/javascript">
+<script>
 EngCalcs.pageCalculator = function(objForm) {
 	'use strict';
 	var hasUnits, precision;

@@ -21,7 +21,7 @@ if (basename($_SERVER['PHP_SELF']) == "Manning-Pipe-Flow.php") {
 <?php
 }
 ?>
-</br>
+<br />
 
 
 
@@ -39,7 +39,7 @@ function echoFeedback(){
 
 function echoInput($name, $type, $indent_string)
 {
-    echo "\n" . $indent_string . '<input class="input" type="'.$type.'" step="any" name="'.$name.'" id="'.$name.'" value="" oninput="EngCalcs.submitForm();" onpropertychange="this.onkeyup();" />';
+    echo "\n" . $indent_string . '<input class="input" type="'.$type.'" step="any" name="'.$name.'" id="'.$name.'" value="" oninput="EngCalcs.submitForm();" />';
 
 }
 
@@ -59,7 +59,7 @@ function echoCalculatorForm($arrayInputs, $arrayResults, $flagFormAppend = false
 {
     global $ec_lang;
 ?>
-<script type="text/javascript">
+<script>
 EngCalcs.unitSets = {};
 <?php foreach ($GLOBALS['ec_unit_sets'] as $key => $set) : ?>
 EngCalcs.unitSets['<?=$key?>'] = ['<?=implode($set, "', '")?>'];
@@ -112,7 +112,7 @@ $(document).ready(function() {
 	foreach ($arrayResults as $result) {
 ?>
 							<tr class="collapse show" id="<?=$result['name']?>_row">
-								<td><label for='<?=$result['name']?>'><?=$result['label']?></label></td>
+								<td><?=$result['label']?></td>
 								<td id="<?php echo $result['name'];?>"><?php echo $result['label'];?></td>
 								<td>
 									<?php echoUnitSelect($result['name'].'u',$result['units'], "\t\t\t\t\t\t\t\t\t");?>

@@ -29,7 +29,7 @@ echoCalculatorForm(
 		Array('name' => 'a', 'units' => Array('m2','mm2','ft2','in2'), 'label' => $ec_lang['mpf_flow_area']),
 		Array('name' => 'pw', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mpf_wetted_perimeter']),
 		Array('name' => 'rh', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mpf_hydraulic_radius']),
-		Array('name' => 'u', 'units' => Array('mps','ftps','mph'), 'label' => $ec_lang['mpf_velocity']),
+		Array('name' => 'u', 'units' => Array('mps','ftps'), 'label' => $ec_lang['mpf_velocity']),
 		Array('name' => 'hv', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mpf_velocity_head']),
 		Array('name' => 're', 'units' => NULL, 'label' => $ec_lang['dw_reynolds_number']),
 		Array('name' => 'regime_label', 'units' => NULL, 'label' => $ec_lang['dw_flow_regime']),
@@ -49,7 +49,7 @@ echoCalculatorForm(
 
 <?php echoFeedback(); ?>
 
-<script type="text/javascript">
+<script>
 EngCalcs.pageCalculator = function(objForm) {
 	'use strict';
 	var hasUnits, precision;

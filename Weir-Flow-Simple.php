@@ -31,7 +31,7 @@ echoCalculatorForm(
 <dl>
 <dt><?=$ec_lang['ws_notes_we_term']?></dt><dd>q = cw * l * h<sup>1.5</sup></dd>
 </dl>
-<script type="text/javascript">
+<script>
 <!--
 EngCalcs.pageCalculator = function(objForm) {
 	'use strict';

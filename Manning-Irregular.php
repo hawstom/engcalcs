@@ -122,7 +122,7 @@ function echoCalculatorFormAppend() {
 <dt><?=$ec_lang['mi_notes_1_term']?></dt><dd><?=$ec_lang['mi_notes_1_def']?></dd>
 <dt><?=$ec_lang['mi_notes_2_term']?></dt><dd><?=$ec_lang['mi_notes_2_def']?></dd>
 </dl>
-<script type="text/javascript">
+<script>
 <!--
 EngCalcs.pageCalculator = function (objForm) {
 	'use strict';

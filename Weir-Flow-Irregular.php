@@ -54,7 +54,7 @@ function echoCalculatorFormAppend() {
 <dl>
 <dt><?=$ec_lang['wi_notes_we_term']?></dt><dd><?=$ec_lang['wi_notes_we_def']?></dd>
 </dl>
-<script type="text/javascript">
+<script>
 // The argument f is not used here.
 EngCalcs.pageCalculator = function (objForm) {
     'use strict';
