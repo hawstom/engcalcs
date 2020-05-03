@@ -84,10 +84,10 @@ function echoEngCalcsMenu () {
 	<div class="collapse navbar-collapse" id="navbarSupportedContent">
 		<ul class="navbar-nav mr-auto">
 			<li class="nav-item dropdown">
-				<a class="nav-link dropdown-toggle active" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				<a class="nav-link dropdown-toggle active" id="dropdown-calc" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 					<?=$ec_lang['menu_main_hydraulics']?>
 				</a>
-				<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+				<div class="dropdown-menu" aria-labelledby="dropdown-calc">
 					<a class="dropdown-item" href="Manning-Pipe-Flow.php" title="<?=$ec_lang['mpf_main_desc']?>"><?=$ec_lang['mpf_main_menu']?></a>
 					<a class="dropdown-item" href="Manning-Pipe-Head-Loss.php" title="<?=$ec_lang['mphl_main_desc']?>"><?=$ec_lang['mphl_main_menu']?></a>
 					<a class="dropdown-item" href="Hazen-Williams.php" title="<?=$ec_lang['hw_main_desc']?>"><?=$ec_lang['hw_main_menu']?></a>
@@ -103,10 +103,10 @@ function echoEngCalcsMenu () {
 				</div>
 			</li>
 			<li class="nav-item dropdown">
-				<a class="nav-link dropdown-toggle active" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				<a class="nav-link dropdown-toggle active" id="dropdown-lang" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 					<?=$ec_lang['menu_main_language']?>
 				</a>
-				<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+				<div class="dropdown-menu" aria-labelledby="dropdown-lang">
 <?php foreach ($GLOBALS['all_language_settings'] as $key => $lang) : ?>
 					<a class="dropdown-item" href="<?=$_SERVER['PHP_SELF']?>?lang=<?=$key?>" title="<?=$lang['LANGNAME']?>"><?=$lang['LANGNAME']?></a>
 <?php endforeach; ?>

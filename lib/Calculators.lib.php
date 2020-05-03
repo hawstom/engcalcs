@@ -32,7 +32,7 @@ function echoFeedback(){
     global $ec_lang;
 ?>
 <p class="collapse show d-print-none" id="feedback">
-	<a href="../contact.php"><?=$ec_lang['template_feedback']?></a> <a data-toggle="collapse" href="#feedback"  aria-expanded="true"aria-controls="helpWanted"><?=$ec_lang['view_hide_line']?></a>
+	<a href="../contact.php"><?=$ec_lang['template_feedback']?></a> <a data-toggle="collapse" href="#feedback"  aria-expanded="true" aria-controls="feedback"><?=$ec_lang['view_hide_line']?></a>
 </p>
 <?php
 }
@@ -126,8 +126,6 @@ $(document).ready(function() {
 						</tbody>
 					</table>
 				</td>
-			</tr>
-			<tr>
 			</tr>
 		</tbody>
 	</table>
