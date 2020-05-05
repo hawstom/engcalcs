@@ -17,12 +17,12 @@ echoHeader("EngCalcs", $html_title, $html_head);
 echoCalculatorForm(
 	//Inputs
 	Array(
-		Array('name' => 'q', 'type' => 'number', 'units' => Array('m3ps','lps','mld','ft3ps','gpm','mgd'), 'label' => $ec_lang['mpf_flow']),
-		Array('name' => 'd', 'type' => 'number', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mpf_pipe_diameter']),
-		Array('name' => 'l', 'type' => 'number', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mphl_pipe_length']),
-		Array('name' => 'e', 'type' => 'number', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['dw_roughness']),
-		Array('name' => 'v', 'type' => 'number', 'units' => NULL, 'label' => $ec_lang['dw_kinematic_viscosity']),
-		Array( 'name' => 'km', 'type' => 'number', 'units' => NULL, 'label' => $ec_lang['mphl_total_junction_k']),
+		Array('name' => 'q', 'type' => 'number', 'default' => '1', 'units' => Array('m3ps','lps','mld','ft3ps','gpm','mgd'), 'label' => $ec_lang['mpf_flow']),
+		Array('name' => 'd', 'type' => 'number', 'default' => '1', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mpf_pipe_diameter']),
+		Array('name' => 'l', 'type' => 'number', 'default' => '1000', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mphl_pipe_length']),
+		Array('name' => 'e', 'type' => 'number', 'default' => '0.001', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['dw_roughness']),
+		Array('name' => 'v', 'type' => 'number', 'default' => '1e-6', 'units' => NULL, 'label' => $ec_lang['dw_kinematic_viscosity']),
+		Array( 'name' => 'km', 'type' => 'number', 'default' => '10', 'units' => NULL, 'label' => $ec_lang['mphl_total_junction_k']),
 	),
 	//Results
 	Array(
@@ -105,7 +105,8 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.writeFormResult(objForm, 'hm', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'hl', precision = 4, hasUnits = true);
 }
-
+EngCalcs.pageCalculatorInitialize = function () {
+}
 <?php echoCookieScript(); ?>
 </script>
 <?php

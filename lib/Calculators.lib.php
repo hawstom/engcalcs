@@ -37,9 +37,9 @@ function echoFeedback(){
 <?php
 }
 
-function echoInput($name, $type, $indent_string)
+function echoInput($name, $type, $default, $indent_string)
 {
-    echo "\n" . $indent_string . '<input class="input" type="'.$type.'" step="any" name="'.$name.'" id="'.$name.'" value="" oninput="EngCalcs.submitForm();" />';
+    echo "\n" . $indent_string . '<input class="input" type="'.$type.'" step="any" name="'.$name.'" id="'.$name.'" value="'.$default.'" oninput="EngCalcs.submitForm();" />';
 
 }
 
@@ -93,7 +93,7 @@ $(document).ready(function() {
 							<tr class="collapse show" id="<?=$input['name']?>_row">
 								<td><label for='<?=$input['name']?>'><?=$input['label']?></label></td>
 								<td>
-									<?php echoInput($input['name'], $input['type'], "\t\t\t\t\t\t\t\t\t");?><?php echoUnitSelect($input['name'].'u', $input['units'], "\t\t\t\t\t\t\t\t\t");?>
+									<?php echoInput($input['name'], $input['type'], $input['default'], "\t\t\t\t\t\t\t\t\t");?><?php echoUnitSelect($input['name'].'u', $input['units'], "\t\t\t\t\t\t\t\t\t");?>
 								</td>
 								<td class="engcalcs-x d-print-none"><a data-toggle="collapse" href="#<?=$input['name']?>_row" aria-expanded="true" aria-controls="<?=$input['name']?>_row">X</a></td>
 							</tr>
