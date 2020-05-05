@@ -80,10 +80,16 @@ $ec_lang['mphl_main_menu']='Manning Pipe Head Loss';
 $ec_lang['mphl_main_title']='Free Online Manning Pipe Head Loss Calculator';
 $ec_lang['mphl_main_desc']='Manning Formula Head Loss at Given Full Flow';
 $ec_lang['mphl_pipe_length']='אורך הצינור,l';
+$ec_lang['mphl_elevation_1']='Elevation 1';
+$ec_lang['mphl_pressure_head_1']='Pressure head 1';
+$ec_lang['mphl_elevation_2']='Elevation 2';
+$ec_lang['mphl_pressure_head_2']='Pressure head 2';
 $ec_lang['mphl_total_junction_k']='חישוב סך כל מקדמי ההפסדים בצומת, k';
 $ec_lang['mphl_friction_loss']='הפסד חיכוך';
 $ec_lang['mphl_junction_loss']='הפסד בצומת';
 $ec_lang['mphl_total_loss'] = 'סהכ הפסד';
+$ec_lang['mphl_hgl_1']='HGL 1';
+$ec_lang['mphl_hgl_2']='HGL 2';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Manning Trapezoidal Channel';
 $ec_lang['mtc_main_title']='Free Online Manning Formula Trapezoidal Channel Calculator';

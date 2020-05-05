@@ -23,6 +23,9 @@ echoCalculatorForm(
 		Array('name' => 'e', 'type' => 'number', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['dw_roughness']),
 		Array('name' => 'v', 'type' => 'number', 'units' => NULL, 'label' => $ec_lang['dw_kinematic_viscosity']),
 		Array( 'name' => 'km', 'type' => 'number', 'units' => NULL, 'label' => $ec_lang['mphl_total_junction_k']),
+		Array('name' => 'z1', 'type' => 'number', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mphl_elevation_1']),
+		Array('name' => 'p1', 'type' => 'number', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mphl_pressure_head_1']),
+		Array('name' => 'z2', 'type' => 'number', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mphl_elevation_2']),
 	),
 	//Results
 	Array(
@@ -40,6 +43,9 @@ echoCalculatorForm(
 		Array('name' => 'hf', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mphl_friction_loss']),
 		Array('name' => 'hm', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mphl_junction_loss']),
 		Array('name' => 'hl', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mphl_total_loss']),
+		Array('name' => 'hgl1', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mphl_hgl_1']),
+		Array('name' => 'hgl2', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mphl_hgl_2']),
+		Array('name' => 'p2', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mphl_pressure_head_2']),
 	)
 );
 
@@ -91,6 +97,9 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.var.tau = this.var.gammawater * this.var.rh * this.var.sf;
 	this.var.hf = this.var.sf * this.var.l;
 	this.var.hl = +this.var.hf + +this.var.hm;
+	this.var.hgl1 = +this.var.z1 + +this.var.hv;
+	this.var.hgl2 = +this.var.hgl1 - +this.var.hf;
+	this.var.p2 = +this.var.hgl2 - +this.var.z2;
 	this.writeFormResult(objForm, 'a', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'pw', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'rh', precision = 4, hasUnits = true);
@@ -105,6 +114,9 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.writeFormResult(objForm, 'hf', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'hm', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'hl', precision = 4, hasUnits = true);
+	this.writeFormResult(objForm, 'hgl1', precision = 4, hasUnits = true);
+	this.writeFormResult(objForm, 'hgl2', precision = 4, hasUnits = true);
+	this.writeFormResult(objForm, 'p2', precision = 4, hasUnits = true);
 }
 
 <?php echoCookieScript(); ?>
