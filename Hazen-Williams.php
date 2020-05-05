@@ -68,16 +68,13 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.var.pw = Math.PI * this.var.d;
 	this.var.rh = this.var.d / 4;
 	this.var.v = this.var.q / this.var.a;
-	this.var.hv = Math.pow(this.var.v,2) / (2 * this.var.g);
-	this.var.hm = this.var.hv * this.var.km;
 	// From 7.8828/d^4.8704 * (Q/(k*C))^1.852 at Wikipedia Hazen-Williams article.
 	this.var.sf = 7.8828 / Math.pow(this.var.d, 4.8704) * Math.pow(this.var.q / (this.var.khw * this.var.c), 1.852);
 	this.var.tau = this.var.gammawater * this.var.rh * this.var.sf;
+	this.var.hv = Math.pow(this.var.v,2) / (2 * this.var.g);
 	this.var.hf = this.var.sf * this.var.l;
+	this.var.hm = this.var.hv * this.var.km;
 	this.var.hl = +this.var.hf + +this.var.hm;
-	this.var.hgl1 = +this.var.z1 + +this.var.hv;
-	this.var.hgl2 = +this.var.hgl1 - +this.var.hf;
-	this.var.p2 = +this.var.hgl2 - +this.var.z2;
 	this.writeFormResult(objForm, 'a', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'pw', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'rh', precision = 4, hasUnits = true);
@@ -88,9 +85,6 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.writeFormResult(objForm, 'hf', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'hm', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'hl', precision = 4, hasUnits = true);
-	this.writeFormResult(objForm, 'hgl1', precision = 4, hasUnits = true);
-	this.writeFormResult(objForm, 'hgl2', precision = 4, hasUnits = true);
-	this.writeFormResult(objForm, 'p2', precision = 4, hasUnits = true);
 }
 
 <?php echoCookieScript(); ?>

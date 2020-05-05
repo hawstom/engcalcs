@@ -16,10 +16,10 @@ echoHeader("EngCalcs", $html_title, $html_head);
 echoCalculatorForm(
     //Inputs
     Array(
-        Array('name' => 'ws', 'type' => 'number', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mi_waterSurfaceElevation']),
-        Array('name' => 's0', 'type' => 'number', 'units' => Array('grade', 'gradePercent'), 'label' => $ec_lang['mtc_channel_slope']),
-        Array('name' => 'beta', 'type' => 'number', 'units' => NULL, 'label' => $ec_lang['mtc_bend_angle']),
-        Array('name' => 'sgrock', 'type' => 'number', 'units' => NULL, 'label' => $ec_lang['mtc_sgrock'])
+        Array('name' => 'ws', 'type' => 'number', 'default' => '1', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mi_waterSurfaceElevation']),
+        Array('name' => 's0', 'type' => 'number', 'default' => '0.001', 'units' => Array('grade', 'gradePercent'), 'label' => $ec_lang['mtc_channel_slope']),
+        Array('name' => 'beta', 'type' => 'number', 'default' => '0', 'units' => NULL, 'label' => $ec_lang['mtc_bend_angle']),
+        Array('name' => 'sgrock', 'type' => 'number', 'default' => '2.65', 'units' => NULL, 'label' => $ec_lang['mtc_sgrock'])
     ),
     //Results
     Array(
@@ -304,7 +304,12 @@ EngCalcs.pageCalculator = function (objForm) {
 	this.adjustInputWidth(objForm);
 };
 
-var EngCalcs = EngCalcs || {};
+EngCalcs.pageCalculatorInitialize = function () {
+	this.pageAddCalcRow();
+	this.pageAddCalcRow();
+	this.pageAddCalcRow();
+	this.pageAddCalcRow();
+}
 
 EngCalcs.Sketch = {};
 
@@ -450,19 +455,22 @@ EngCalcs.addManningIrregularStation = function (station, elevation, n, isBank) {
 
 EngCalcs.pageAddCalcRow = function () {
 	var n,
-	isBank;
+	isBank,
+	station,
+	elevation;
 	if (this.numCalcRows === 0) {
 		n = null;
+		// If first row, don't show bank checkbox.
+		isBank = null;
+		station = 0
+		elevation = 1 
 	} else {
 		n = 0.030;
-	}
-	// If first row, don't show bank checkbox.
-	if (this.numCalcRows === 0) {
-		isBank = null;
-	} else {
 		isBank = false;
+		station = +document.getElementsByName('station')[this.numCalcRows - 1].value + +1;
+		elevation = +document.getElementsByName('elevation')[this.numCalcRows - 1].value;
 	}
-	this.addManningIrregularStation(0, 0, n, isBank);
+	this.addManningIrregularStation(station, elevation, n, isBank);
 };
 
 <?php

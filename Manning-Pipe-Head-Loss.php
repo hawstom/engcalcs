@@ -77,9 +77,6 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.writeFormResult(objForm, 'hf', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'hm', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'hl', precision = 4, hasUnits = true);
-	this.writeFormResult(objForm, 'hgl1', precision = 4, hasUnits = true);
-	this.writeFormResult(objForm, 'hgl2', precision = 4, hasUnits = true);
-	this.writeFormResult(objForm, 'p2', precision = 4, hasUnits = true);
 }
 <?php echoCookieScript(); ?>
 </script>

@@ -72,10 +72,7 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.var.a = (Math.PI * Math.pow(this.var.d, 2) / 4);
 	this.var.pw = Math.PI * this.var.d;
 	this.var.rh = this.var.d / 4;
-	// We are calling nu v, so velocity is u. I didn't make this up myself.
 	this.var.u = this.var.q / this.var.a;
-	this.var.hv = Math.pow(this.var.u,2) / (2 * this.var.g);
-	this.var.hm = this.var.hv * this.var.km;
 	this.var.re = this.var.u * this.var.d / this.var.v;
 	if (this.var.re < 2000) {
 		this.var.regime = 0;
@@ -95,11 +92,10 @@ EngCalcs.pageCalculator = function(objForm) {
 	}
 	this.var.sf = this.var.f * Math.pow(this.var.u, 2) / (2 * this.var.d * this.var.g);
 	this.var.tau = this.var.gammawater * this.var.rh * this.var.sf;
+	this.var.hv = Math.pow(this.var.u,2) / (2 * this.var.g);
 	this.var.hf = this.var.sf * this.var.l;
+	this.var.hm = this.var.hv * this.var.km;
 	this.var.hl = +this.var.hf + +this.var.hm;
-	this.var.hgl1 = +this.var.z1 + +this.var.hv;
-	this.var.hgl2 = +this.var.hgl1 - +this.var.hf;
-	this.var.p2 = +this.var.hgl2 - +this.var.z2;
 	this.writeFormResult(objForm, 'a', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'pw', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'rh', precision = 4, hasUnits = true);
@@ -114,9 +110,6 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.writeFormResult(objForm, 'hf', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'hm', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'hl', precision = 4, hasUnits = true);
-	this.writeFormResult(objForm, 'hgl1', precision = 4, hasUnits = true);
-	this.writeFormResult(objForm, 'hgl2', precision = 4, hasUnits = true);
-	this.writeFormResult(objForm, 'p2', precision = 4, hasUnits = true);
 }
 
 <?php echoCookieScript(); ?>

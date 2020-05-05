@@ -16,8 +16,8 @@ echoHeader("EngCalcs", $html_title, $html_head);
 echoCalculatorForm(
     //Inputs
     Array(
-        Array('name' => 'hw', 'type' => 'number', 'units' => NULL, 'label' => $ec_lang['wi_headWaterelevation']),
-        Array('name' => 'cw', 'type' => 'number', 'units' => NULL, 'label' => $ec_lang['ws_weirCoefficient'].' <a target="_blank" href="http://epg.modot.org/files/b/bc/749_Broad-Crested_Weir_Coefficients.pdf">?</a>'),
+        Array('name' => 'hw', 'type' => 'number', 'default' => '1', 'units' => NULL, 'label' => $ec_lang['wi_headWaterelevation']),
+        Array('name' => 'cw', 'type' => 'number', 'default' => '3', 'units' => NULL, 'label' => $ec_lang['ws_weirCoefficient'].' <a target="_blank" href="http://epg.modot.org/files/b/bc/749_Broad-Crested_Weir_Coefficients.pdf">?</a>'),
     ),
     //Results
     NULL,
@@ -104,7 +104,12 @@ EngCalcs.pageCalculator = function (objForm) {
     // Save a cookie for next time
     EngCalcs.adjustInputWidth(objForm);
 };
-
+EngCalcs.pageCalculatorInitialize = function () {
+	this.pageAddCalcRow();
+	this.pageAddCalcRow();
+	this.pageAddCalcRow();
+	this.pageAddCalcRow();
+}
 EngCalcs.addWeirStation = function (station, elevation) {
     'use strict';
     var arrColumns = [
@@ -118,7 +123,16 @@ EngCalcs.addWeirStation = function (station, elevation) {
 };
 
 EngCalcs.pageAddCalcRow = function () {
-    this.addWeirStation(0,0);
+	var station,
+	elevation;
+	if (this.numCalcRows === 0) {
+		station = 0
+		elevation = 0 
+	} else {
+		station = +document.getElementsByName('station')[this.numCalcRows - 1].value + +1;
+		elevation = +document.getElementsByName('elevation')[this.numCalcRows - 1].value;
+	}
+    this.addWeirStation(station,elevation);
 };
 
 <!--

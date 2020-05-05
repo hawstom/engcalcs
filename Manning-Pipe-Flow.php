@@ -17,10 +17,10 @@ echoHeader("EngCalcs", $html_title, $html_head);
 echoCalculatorForm(
 	//Inputs
 	Array(
-		Array('name' => 'd0', 'type' => 'number', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mpf_pipe_diameter']),
-		Array('name' => 'n', 'type' => 'number', 'units' => NULL, 'label' => $ec_lang['mpf_manningRoughness'].' <a target="_blank" href="http://www.engineeringtoolbox.com/mannings-roughness-d_799.html">?</a>'),
-		Array('name' => 's0', 'type' => 'number', 'units' => Array('grade','gradePercent'), 'label' => $ec_lang['mpf_friction_slope']),
-		Array('name' => 'dd0', 'type' => 'number', 'units' => Array('depthFrac','depthPercent'), 'label' => $ec_lang['mpf_depth_ratio']),
+		Array('name' => 'd0', 'type' => 'number', 'default' => '1', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mpf_pipe_diameter']),
+		Array('name' => 'n', 'type' => 'number', 'default' => '0.01', 'units' => NULL, 'label' => $ec_lang['mpf_manningRoughness'].' <a target="_blank" href="http://www.engineeringtoolbox.com/mannings-roughness-d_799.html">?</a>'),
+		Array('name' => 's0', 'type' => 'number', 'default' => '0.001', 'units' => Array('grade','gradePercent'), 'label' => $ec_lang['mpf_friction_slope']),
+		Array('name' => 'dd0', 'type' => 'number', 'default' => '0.6', 'units' => Array('depthFrac','depthPercent'), 'label' => $ec_lang['mpf_depth_ratio']),
 	),
 	//Results
 	Array(
@@ -104,6 +104,9 @@ EngCalcs.pageCalculator = function(objForm) {
 			'style="fill:white;stroke:black;stroke-width:' + gcr/50 + '" />' +
 			'Sorry, your browser does not support inline SVG.' +
 		'</svg>';
+}
+
+EngCalcs.pageCalculatorInitialize = function () {
 }
 
 <?php echoCookieScript(); ?>

@@ -16,14 +16,14 @@ echoHeader("EngCalcs", $html_title, $html_head);
 echoCalculatorForm(
 	//Inputs
 	Array(
-		Array('name' => 'b', 'type' => 'number', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mtc_bottom_width']),
-		Array('name' => 'z1', 'type' => 'number', 'units' => NULL, 'label' => $ec_lang['mtc_side_slope_1']),
-		Array('name' => 'z2', 'type' => 'number', 'units' => NULL, 'label' => $ec_lang['mtc_side_slope_2']),
-		Array('name' => 'n', 'type' => 'number', 'units' => NULL, 'label' => $ec_lang['mpf_manningRoughness'].' <a target="_blank" href="http://www.engineeringtoolbox.com/mannings-roughness-d_799.html">?</a>'),
-		Array('name' => 's0', 'type' => 'number', 'units' => Array('grade', 'gradePercent'), 'label' => $ec_lang['mtc_channel_slope']),
-		Array('name' => 'y', 'type' => 'number', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mtc_flow_depth']),
-		Array('name' => 'beta', 'type' => 'number', 'units' => NULL, 'label' => $ec_lang['mtc_bend_angle']),
-		Array('name' => 'sgrock', 'type' => 'number', 'units' => NULL, 'label' => $ec_lang['mtc_sgrock'])
+		Array('name' => 'b', 'type' => 'number', 'default' => '1', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mtc_bottom_width']),
+		Array('name' => 'z1', 'type' => 'number', 'default' => '4', 'units' => NULL, 'label' => $ec_lang['mtc_side_slope_1']),
+		Array('name' => 'z2', 'type' => 'number', 'default' => '4', 'units' => NULL, 'label' => $ec_lang['mtc_side_slope_2']),
+		Array('name' => 'n', 'type' => 'number', 'default' => '0.03', 'units' => NULL, 'label' => $ec_lang['mpf_manningRoughness'].' <a target="_blank" href="http://www.engineeringtoolbox.com/mannings-roughness-d_799.html">?</a>'),
+		Array('name' => 's0', 'type' => 'number', 'default' => '0.001', 'units' => Array('grade', 'gradePercent'), 'label' => $ec_lang['mtc_channel_slope']),
+		Array('name' => 'y', 'type' => 'number', 'default' => '1', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mtc_flow_depth']),
+		Array('name' => 'beta', 'type' => 'number', 'default' => '0', 'units' => NULL, 'label' => $ec_lang['mtc_bend_angle']),
+		Array('name' => 'sgrock', 'type' => 'number', 'default' => '2.65', 'units' => NULL, 'label' => $ec_lang['mtc_sgrock'])
 	),
 	//Results
 	Array(
@@ -132,6 +132,8 @@ EngCalcs.pageCalculator = function(objForm) {
 			'Sorry, your browser does not support inline SVG.' +
 		'</svg>';
 };
+EngCalcs.pageCalculatorInitialize = function () {
+}
 var mc_riprap_size = function(y, a, v, g, z, s0, c, sgrock) {
 	var
 	d50,
