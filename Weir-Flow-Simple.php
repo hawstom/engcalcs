@@ -43,7 +43,8 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.var.q = this.var.cw * this.var.l * Math.pow(this.var.h, 1.5);
 	this.writeFormResult(objForm, 'q', precision = 2, hasUnits = false);
 }
-
+EngCalcs.pageCalculatorInitialize = function () {
+}
 <?php
 echoCookieScript ();
 ?>

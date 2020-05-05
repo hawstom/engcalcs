@@ -142,8 +142,7 @@ $ec_lang['mphl_total_loss']='Pérdida total';
 $ec_lang['mphl_hgl_1']='HGL 1';
 $ec_lang['mphl_hgl_2']='HGL 2';
 // Manning Trapezoid. See mpf_ for missing text.
-$ec_lang['mtc_menu']='Canal trapecial seg&u
-n  Manning';
+$ec_lang['mtc_menu']='Canal trapecial según Manning';
 $ec_lang['mtc_main_title']='Calculadora gratis en línea de la fórmula de Manning para canal trapecial';
 $ec_lang['mtc_main_desc']='Gasto uniforme Manning en un canal trapecial a dado pendiente y profundidad';
 $ec_lang['mtc_bottom_width']='Anchura de la base';

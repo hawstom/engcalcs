@@ -16,18 +16,20 @@ echoHeader("EngCalcs", $html_title, $html_head);
 echoCalculatorForm(
 	//Inputs
 	Array(
-		Array('name' => 'q', 'type' => 'number', 'units' => Array('m3ps','lps','mld','ft3ps','gpm','mgd'), 'label' => $ec_lang['mpf_flow']),
-		Array('name' => 'd', 'type' => 'number', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mpf_pipe_diameter']),
-		Array('name' => 'l', 'type' => 'number', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mphl_pipe_length']),
-		Array('name' => 'n', 'type' => 'number', 'units' => NULL, 'label' => $ec_lang['mpf_manningRoughness'].' <a target="_blank" href="http://www.engineeringtoolbox.com/mannings-roughness-d_799.html">?</a>'),
-		Array( 'name' => 'k', 'type' => 'number', 'units' => NULL, 'label' => $ec_lang['mphl_total_junction_k']),
-		Array('name' => 'z1', 'type' => 'number', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mphl_elevation_1']),
-		Array('name' => 'p1', 'type' => 'number', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mphl_pressure_head_1']),
-		Array('name' => 'z2', 'type' => 'number', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mphl_elevation_2']),
+		Array('name' => 'q', 'type' => 'number', 'default' => '1', 'units' => Array('m3ps','lps','mld','ft3ps','gpm','mgd'), 'label' => $ec_lang['mpf_flow']),
+		Array('name' => 'd', 'type' => 'number', 'default' => '1', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mpf_pipe_diameter']),
+		Array('name' => 'l', 'type' => 'number', 'default' => '1000', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mphl_pipe_length']),
+		Array('name' => 'n', 'type' => 'number', 'default' => '0.01', 'units' => NULL, 'label' => $ec_lang['mpf_manningRoughness'].' <a target="_blank" href="http://www.engineeringtoolbox.com/mannings-roughness-d_799.html">?</a>'),
+		Array( 'name' => 'k', 'type' => 'number', 'default' => '10', 'units' => NULL, 'label' => $ec_lang['mphl_total_junction_k']),
+		Array('name' => 'z1', 'type' => 'number', 'default' => '0', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mphl_elevation_1']),
+		Array('name' => 'p1', 'type' => 'number', 'default' => '10', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mphl_pressure_head_1']),
+		Array('name' => 'z2', 'type' => 'number', 'default' => '0', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mphl_elevation_2']),
 ),
 	//Results
 	Array(
 		Array('name' => 'a', 'units' => Array('m2','mm2','ft2', 'in2'), 'label' => $ec_lang['mphl_area']),
+		Array('name' => 'pw', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mpf_wetted_perimeter']),
+		Array('name' => 'rh', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mpf_hydraulic_radius']),
 		Array('name' => 'v', 'units' => Array('mps','ftps'), 'label' => $ec_lang['mpf_velocity']),
 		Array('name' => 'hv', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mpf_velocity_head']),
 		Array('name' => 'sf', 'units' => Array('grade','gradePercent'), 'label' => $ec_lang['mphl_friction_slope']),
@@ -58,7 +60,10 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.readFormInput(objForm, 'z2', hasUnits = false);
 	this.var.c = 1.0;
 	this.var.g = 9.806;
+	this.var.gammawater = 9806,
 	this.var.a = (Math.PI * Math.pow(this.var.d, 2) / 4);
+	this.var.pw = Math.PI * this.var.d;
+	this.var.rh = this.var.d / 4;
 	this.var.v = this.var.q / this.var.a;
 	this.var.hv = Math.pow(this.var.v,2) / (2 * this.var.g);
 	this.var.hm = this.var.k * this.var.hv;
@@ -66,10 +71,12 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.var.tau = this.var.gammawater * this.var.rh * this.var.sf;
 	this.var.hf = this.var.l * this.var.sf;
 	this.var.hl = +this.var.hf + +this.var.hm;
-	this.var.hgl1 = +this.var.z1 + +this.var.hv;
-	this.var.hgl2 = +this.var.hgl1 - +this.var.hf;
+	this.var.hgl1 = +this.var.z1 + +this.var.p1;
+	this.var.hgl2 = +this.var.hgl1 - +this.var.hl;
 	this.var.p2 = +this.var.hgl2 - +this.var.z2;
 	this.writeFormResult(objForm, 'a', precision = 4, hasUnits = true);
+	this.writeFormResult(objForm, 'pw', precision = 4, hasUnits = true);
+	this.writeFormResult(objForm, 'rh', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'v', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'hv', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'sf', precision = 4, hasUnits = true);
@@ -77,6 +84,11 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.writeFormResult(objForm, 'hf', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'hm', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'hl', precision = 4, hasUnits = true);
+	this.writeFormResult(objForm, 'hgl1', precision = 4, hasUnits = true);
+	this.writeFormResult(objForm, 'hgl2', precision = 4, hasUnits = true);
+	this.writeFormResult(objForm, 'p2', precision = 4, hasUnits = true);
+}
+EngCalcs.pageCalculatorInitialize = function () {
 }
 <?php echoCookieScript(); ?>
 </script>
