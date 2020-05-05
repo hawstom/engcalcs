@@ -123,7 +123,7 @@ $ec_lang['sideSlope1']="$ec_lang[slope] $ec_lang[of] $ec_lang[side] 1 ($ec_lang[
 $ec_lang['sideSlope2']="$ec_lang[slope] $ec_lang[of] $ec_lang[side] 2 ($ec_lang[horizontal] / $ec_lang[vertical])";
 
 // Page text
-// Note: In the process of rearranging the language variables into page order for easier maintenance.
+// In page order for easiest maintenance.
 $ec_lang['menu_brand']=ucfirst("$ec_lang[calculator]s HawsEDC");
 $ec_lang['menu_main_list']=ucfirst("liste de $ec_lang[calculators]");
 $ec_lang['menu_main_hydraulics']=ucfirst("$ec_lang[hydraulics]");

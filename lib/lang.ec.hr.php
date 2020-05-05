@@ -3,7 +3,7 @@
 // All missing text declarations will fall back to English.
 
 // Page text
-// Note: In the process of rearranging the language variables into page order for easier maintenance.
+// In page order for easiest maintenance.
 // Manning Pipe Flow
 $ec_lang['mpf_main_menu']='Manning Pipe Flow';
 $ec_lang['mpf_main_title']='Free Online Manning Pipe Flow Calculator';

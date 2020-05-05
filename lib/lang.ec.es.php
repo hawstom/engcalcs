@@ -38,8 +38,7 @@ $ec_lang['u_psi']="lb/pulg^2";
 $ec_lang['u_s']="seg";
 
 // Page text
-// Note: In the process of rearranging the language variables into page order for easier maintenance.
-
+// In page order for easiest maintenance.
 $ec_lang['menu_brand']='Calculadoras HawsEDC';
 $ec_lang['menu_main_list']='Lista de calculadoras';
 $ec_lang['menu_main_hydraulics']='Hydraulica';
@@ -55,7 +54,7 @@ $ec_lang['calc_inputs']='Ingresos';
 $ec_lang['calc_results']='Resultados: ';
 $ec_lang['view_hide_line']='[Ocultar esta linea]';
 $ec_lang['view_printable']='Versión Imprimible (recargar/renover para restaurar)';
-// Darcy-Weisbach. See hw_ and mphl_ for missing text.
+// Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Pérdida de presión en una tubería según Darcy-Weisbach';
 $ec_lang['dw_main_title']='Calculadora gratis en linea de pérdida de presión en una tubería según Darcy-Weisbach';
 $ec_lang['dw_main_desc']='Pérdida de presión en una tubería a dado diámetro, rugosidad, y gasto según Darcy-Weisbach';
@@ -73,7 +72,6 @@ $ec_lang['hw_main_menu']='Pérdida de presión en una tubería según Hazen-Will
 $ec_lang['hw_main_title']='Calculadora gratis en linea de pérdida de presión en una tubería según Hazen-Williams';
 $ec_lang['hw_main_desc']='Calculadora de pérdida de presión en una tubería a dado diámetro, rugosidad, y gasto según Hazen-Williams';
 $ec_lang['hw_roughness']='Coeficiente de Hazen-Williams, C';
-$ec_lang['hw_friction_slope']='Pendiente de fricción, s<sub>f</sub>';
 // Manning Irregular
 $ec_lang['mi_menu']='Canal irregular según Manning';
 $ec_lang['mi_main_title']='Calculadora gratis en linea de un canal irregular según Manning';
@@ -133,6 +131,7 @@ $ec_lang['mphl_main_desc']='La pérdida de presión en una tubería llena a dado
 $ec_lang['mphl_pipe_length']='Longitud de la tubería, l';
 $ec_lang['mphl_area']='Area, A';
 $ec_lang['mphl_total_junction_k']='Coeficiente total de pérdida en las juntas, k';
+$ec_lang['mphl_friction_slope']='Pendiente de fricción, s<sub>f</sub>';
 $ec_lang['mphl_friction_loss']='Pérdidas por fricción';
 $ec_lang['mphl_junction_loss']='Pérdidas en las juntas';
 $ec_lang['mphl_total_loss']='Pérdida total';

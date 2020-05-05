@@ -35,7 +35,7 @@ $ec_lang['u_psi']="psi";
 $ec_lang['u_s']="sec";
 
 // Page text
-// Note: In the process of rearranging the language variables into page order for easier maintenance.
+// In page order for easiest maintenance.
 $ec_lang['menu_main_list']='計算器清單';
 $ec_lang['menu_main_hydraulics']='水力學';
 $ec_lang['menu_main_language']='語言';

@@ -27,6 +27,8 @@ echoCalculatorForm(
 		Array('name' => 'a', 'units' => Array('m2','mm2','ft2', 'in2'), 'label' => $ec_lang['mphl_area']),
 		Array('name' => 'v', 'units' => Array('mps','ftps'), 'label' => $ec_lang['mpf_velocity']),
 		Array('name' => 'hv', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mpf_velocity_head']),
+		Array('name' => 'sf', 'units' => Array('grade','gradePercent'), 'label' => $ec_lang['mphl_friction_slope']),
+		Array('name' => 'tau', 'units' => Array('npm2','psf'), 'label' => $ec_lang['mpf_shear_stress']),
 		Array('name' => 'hf', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mphl_friction_loss']),
 		Array('name' => 'hm', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mphl_junction_loss']),
 		Array('name' => 'hl', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mphl_total_loss']),
@@ -50,12 +52,16 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.var.a = (Math.PI * Math.pow(this.var.d, 2) / 4);
 	this.var.v = this.var.q / this.var.a;
 	this.var.hv = Math.pow(this.var.v,2) / (2 * this.var.g);
-	this.var.hf = this.var.l * Math.pow(this.var.v,2) * Math.pow(this.var.n,2) * 6.3496 / (Math.pow(this.var.c,2) * Math.pow(this.var.d,4/3));
 	this.var.hm = this.var.k * this.var.hv;
+	this.var.sf = Math.pow(this.var.v,2) * Math.pow(this.var.n,2) * 6.3496 / (Math.pow(this.var.c,2) * Math.pow(this.var.d,4/3));
+	this.var.tau = this.var.gammawater * this.var.rh * this.var.sf;
+	this.var.hf = this.var.l * this.var.sf;
 	this.var.hl = +this.var.hf + +this.var.hm;
 	this.writeFormResult(objForm, 'a', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'v', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'hv', precision = 4, hasUnits = true);
+	this.writeFormResult(objForm, 'sf', precision = 4, hasUnits = true);
+	this.writeFormResult(objForm, 'tau', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'hf', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'hm', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'hl', precision = 4, hasUnits = true);

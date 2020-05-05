@@ -3,6 +3,7 @@
 // All missing text declarations will fall back to English.
 
 // Page text
+// In page order for easiest maintenance.
 $ec_lang['calc_set_units']='Alege unitate masură:';
 $ec_lang['calc_results']='Rezultate';
 // Manning Pipe Flow

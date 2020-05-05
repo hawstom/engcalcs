@@ -38,7 +38,7 @@ $ec_lang['u_psi']="psi";
 $ec_lang['u_s']="sec";
 
 // Page text
-// Note: In the process of rearranging the language variables into page order for easier maintenance.
+// In page order for easiest maintenance.
 $ec_lang['menu_brand']='HawsEDC Калкулатори';
 $ec_lang['menu_main_list']='Списък с калкулатори'; 
 $ec_lang['menu_main_hydraulics']='Хидравлика'; 
@@ -54,7 +54,7 @@ $ec_lang['calc_inputs']='Inputs';
 $ec_lang['calc_results']='Results';
 $ec_lang['view_hide_line']='[Hide this line]';
 $ec_lang['view_printable']='Printable version (reload/refresh to restore)';
-// Darcy-Weisbach. See hw_ and mphl_ for missing text.
+// Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Darcy-Weisbach Pipe Head Loss';
 $ec_lang['dw_main_title']='Free Online Darcy-Weisbach Pipe Head Loss Calculator';
 $ec_lang['dw_main_desc']='Darcy-Weisbach Pipe Head Loss at Given Diameter, Roughness, and Flow';
@@ -72,7 +72,6 @@ $ec_lang['hw_main_menu']='Hazen-Williams Pipe Head Loss';
 $ec_lang['hw_main_title']='Free Online Hazen-Williams Pipe Head Loss Calculator';
 $ec_lang['hw_main_desc']='Hazen-Williams Pipe Head Loss at Given Diameter, Roughness, and Flow';
 $ec_lang['hw_roughness']='Hazen-Williams coefficient, C';
-$ec_lang['hw_friction_slope']='Friction slope';
 $ec_lang['calc_set_units']='Изберете мерни единици:'; 
 $ec_lang['calc_results']='Резултати'; 
 // Manning Irregular
@@ -134,6 +133,7 @@ $ec_lang['mphl_main_desc']='Формула на Манинг за Хидравл
 $ec_lang['mphl_pipe_length']='Дължина на Тръбата, L'; 
 $ec_lang['mphl_area']='площ, A';
 $ec_lang['mphl_total_junction_k']='Общ Коефициент на Местните Съпротивления, ?'; 
+$ec_lang['mphl_friction_loss']='Friction slope';
 $ec_lang['mphl_friction_loss']='Загуби по дължина'; 
 $ec_lang['mphl_junction_loss']='Местни загуби'; 
 $ec_lang['mphl_total_loss']='Общи загуби'; 

@@ -38,6 +38,7 @@ $ec_lang['u_psi']="psi";
 $ec_lang['u_s']="sec";
 
 // Page text
+// In page order for easiest maintenance.
 // Note: Daha kolay bakım için dil değişkenlerinin sayfa sıralamasına göre ayarlanması sürecinde
 $ec_lang['menu_brand']='HawsEDC Calculators';
 $ec_lang['menu_main_list']='Hesap makinası listesi';
@@ -54,7 +55,7 @@ $ec_lang['calc_inputs']='Inputs';
 $ec_lang['calc_results']='Sonuçlar:';
 $ec_lang['view_hide_line']='[Hide this line]';
 $ec_lang['view_printable']='Printable version (reload/refresh to restore)';
-// Darcy-Weisbach. See hw_ and mphl_ for missing text.
+// Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Darcy-Weisbach Pipe Head Loss';
 $ec_lang['dw_main_title']='Free Online Darcy-Weisbach Pipe Head Loss Calculator';
 $ec_lang['dw_main_desc']='Darcy-Weisbach Pipe Head Loss at Given Diameter, Roughness, and Flow';
@@ -72,7 +73,6 @@ $ec_lang['hw_main_menu']='Hazen-Williams Pipe Head Loss';
 $ec_lang['hw_main_title']='Free Online Hazen-Williams Pipe Head Loss Calculator';
 $ec_lang['hw_main_desc']='Hazen-Williams Pipe Head Loss at Given Diameter, Roughness, and Flow';
 $ec_lang['hw_roughness']='Hazen-Williams coefficient, C';
-$ec_lang['hw_friction_slope']='Friction slope';
 // Manning Irregular
 $ec_lang['mi_menu']='Manning Irregular Channel';
 $ec_lang['mi_main_title']='Free Online Manning Irregular Channel Calculator';
@@ -133,6 +133,7 @@ $ec_lang['mphl_main_desc']='Tam Akış Şartlarında Manning Yük Kaybı Formül
 $ec_lang['mphl_pipe_length']='Boru Uzunluğu, l';
 $ec_lang['mphl_area']='Area, A';
 $ec_lang['mphl_total_junction_k']='Pürüzsüzlük Katsayısı, k';
+$ec_lang['mphl_friction_slope']='Friction slope';
 $ec_lang['mphl_friction_loss']='Sürtünmeye Bağlı Yük Kaybı, Hf';
 $ec_lang['mphl_junction_loss']='İkincil Yük Kayıpları, Hm';
 $ec_lang['mphl_total_loss']='Toplam Yük Kaybı, Hl';

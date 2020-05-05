@@ -35,7 +35,7 @@ echoCalculatorForm(
 		Array('name' => 'regime_label', 'units' => NULL, 'label' => $ec_lang['dw_flow_regime']),
 		Array('name' => 'f_method', 'units' => NULL, 'label' => $ec_lang['dw_friction_factor_method']),
 		Array('name' => 'f', 'units' => NULL, 'label' => $ec_lang['dw_friction_factor']),
-		Array('name' => 'sf', 'units' => Array('grade','gradePercent'), 'label' => $ec_lang['hw_friction_slope']),
+		Array('name' => 'sf', 'units' => Array('grade','gradePercent'), 'label' => $ec_lang['mphl_friction_slope']),
 		Array('name' => 'tau', 'units' => Array('npm2','psf'), 'label' => $ec_lang['mpf_shear_stress']),
 		Array('name' => 'hf', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mphl_friction_loss']),
 		Array('name' => 'hm', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mphl_junction_loss']),
@@ -66,7 +66,10 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.var.a = (Math.PI * Math.pow(this.var.d, 2) / 4);
 	this.var.pw = Math.PI * this.var.d;
 	this.var.rh = this.var.d / 4;
+	// We are calling nu v, so velocity is u. I didn't make this up myself.
 	this.var.u = this.var.q / this.var.a;
+	this.var.hv = Math.pow(this.var.u,2) / (2 * this.var.g);
+	this.var.hm = this.var.hv * this.var.km;
 	this.var.re = this.var.u * this.var.d / this.var.v;
 	if (this.var.re < 2000) {
 		this.var.regime = 0;
@@ -86,9 +89,7 @@ EngCalcs.pageCalculator = function(objForm) {
 	}
 	this.var.sf = this.var.f * Math.pow(this.var.u, 2) / (2 * this.var.d * this.var.g);
 	this.var.tau = this.var.gammawater * this.var.rh * this.var.sf;
-	this.var.hv = Math.pow(this.var.u,2) / (2 * this.var.g);
 	this.var.hf = this.var.sf * this.var.l;
-	this.var.hm = this.var.hv * this.var.km;
 	this.var.hl = +this.var.hf + +this.var.hm;
 	this.writeFormResult(objForm, 'a', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'pw', precision = 4, hasUnits = true);
