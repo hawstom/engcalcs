@@ -462,7 +462,7 @@ EngCalcs.pageAddCalcRow = function () {
 		// If first row, don't show bank checkbox.
 		isBank = null;
 		station = 0
-		elevation = 1 
+		elevation = 0
 	} else {
 		n = 0.030;
 		isBank = false;
