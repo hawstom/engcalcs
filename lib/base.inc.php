@@ -30,26 +30,26 @@ require_once('config.inc.php');
 
 // Load the language settings.
 // They are needed for determining the session language in Session.lib.php below.
-require_once(BASE_DIRECTORY.'/engcalcs/lib/Language.Settings.php');
+require_once('Language.Settings.php');
 
 // Load the language functions and set current language.
-require_once(BASE_DIRECTORY.'/engcalcs/lib/Language.lib.php');
+require_once('Language.lib.php');
 
 // Load the text for the current language
 // Session.lib.php has to be loaded first above to determine current language.
 // Load english first in case current language is incomplete.
-require_once(BASE_DIRECTORY.'/engcalcs/lib/lang.ec.en.php');
-require_once(BASE_DIRECTORY.'/engcalcs/lib/lang.ec.'.$clanguage.'.php');
+require_once('lang.ec.en.php');
+require_once('lang.ec.'.$clanguage.'.php');
 
 // Load the headers and footers
-require_once(BASE_DIRECTORY.'/engcalcs/lib/HeadersFooters.lib.php');
+require_once('HeadersFooters.lib.php');
 
 // Load the menus that are shown in the headers and footers
-require_once(BASE_DIRECTORY.'/engcalcs/lib/Menus.lib.php');
+require_once('Menus.lib.php');
 
 // Load the units factors
-require_once(BASE_DIRECTORY.'/engcalcs/lib/Units.lib.php');
+require_once('Units.lib.php');
 
 // Load the calculator functions
-require_once(BASE_DIRECTORY.'/engcalcs/lib/Calculators.lib.php');
+require_once('Calculators.lib.php');
 ?>

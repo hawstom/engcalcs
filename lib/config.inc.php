@@ -52,6 +52,7 @@ switch ($_SERVER['SERVER_NAME'])
         break;
 }
 
+define('BASE_DIRECTORY', realpath(__DIR__.'/../..'));
 define('DEBUG_MODE', $debugmode);
 define('BASE_URL', $baseurl);
 
