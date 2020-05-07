@@ -19,6 +19,8 @@
  *
  */
 
+$basedirectory = realpath(__DIR__.'/../..');
+
 // Set some global variables
 switch ($_SERVER['SERVER_NAME'])
 {
@@ -52,7 +54,7 @@ switch ($_SERVER['SERVER_NAME'])
         break;
 }
 
-define('BASE_DIRECTORY', realpath(__DIR__.'/../..'));
+define('BASE_DIRECTORY', $basedirectory);
 define('DEBUG_MODE', $debugmode);
 define('BASE_URL', $baseurl);
 
