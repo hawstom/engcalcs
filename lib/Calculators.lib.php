@@ -143,4 +143,4 @@ function echoCookieScript ()
 	EngCalcs.readAndCalc(EngCalcs.cookieName, document.forms['formInput']);
 <?php
 }
-?>
+// Omit last closing tag is good practice.

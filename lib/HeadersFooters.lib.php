@@ -103,3 +103,4 @@ echoMenu("main");
 </html>
 <?php
 }
+// Omit last closing tag is good practice.

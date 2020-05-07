@@ -196,4 +196,3 @@ $ec_lang['contact_message']='Съобщение:';
 $ec_lang['contactSpamPrefix']='Five plus one equals'; //Shouldn't translate that
 $ec_lang['contactSpamPostfix']='(Please spell it out. 1=one 2=two 3=three 4=four 5=five 6=six 7=seven +=plus 5+1=6)'; //Shouldn't translate that
 $ec_lang['contactSubmitButton']='Изпратете съобщението'; 
-?>

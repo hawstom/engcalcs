@@ -201,4 +201,3 @@ $ec_lang['contactSpamPrefix']='Bes arti bir';
 $ec_lang['contactSpamPostfix']='(Lütfen yaziyla gösterin. 1= bir 2=iki 3=üç 4=dört 5=bes 6=alti 7=yedi +=arti 5+1=6)';
 $ec_lang['contactSubmitButton']='Gönder';
 ?>
-

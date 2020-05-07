@@ -57,4 +57,3 @@ switch ($_SERVER['SERVER_NAME'])
 define('BASE_DIRECTORY', $basedirectory);
 define('DEBUG_MODE', $debugmode);
 define('BASE_URL', $baseurl);
-

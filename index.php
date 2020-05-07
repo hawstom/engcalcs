@@ -7,5 +7,4 @@ $html_head='
 ';
 echoHeader("EngCalcs", $html_title, $html_head);
 echoFooter("EngCalcs");
-?>
-
+// Omit last closing tag is good practice

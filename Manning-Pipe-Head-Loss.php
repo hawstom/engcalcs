@@ -93,4 +93,4 @@ EngCalcs.pageCalculatorInitialize = function () {
 </script>
 <?php
 echoFooter("EngCalcs");
-?>
+// Omit last closing tag is good practice

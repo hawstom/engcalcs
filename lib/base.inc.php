@@ -52,4 +52,3 @@ require_once('Units.lib.php');
 
 // Load the calculator functions
 require_once('Calculators.lib.php');
-?>

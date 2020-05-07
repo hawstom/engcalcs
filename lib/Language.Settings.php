@@ -118,5 +118,3 @@ $all_language_settings['tr']=array(
 'LANGNAME'=>'Türkçe',
 'TITLE_WORDS'=>array(),
 );
-
-?>

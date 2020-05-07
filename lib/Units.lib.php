@@ -54,4 +54,3 @@ $ec_units['gradePercent']=100;
 
 $ec_units['depthFrac']=1;
 $ec_units['depthPercent']=100;
-?>

@@ -19,4 +19,4 @@ echoHeader("EngCalcs", $html_title, $html_head);
 </p>
 <?php
 echoFooter('main');
-?>
+// Omit last closing tag is good practice

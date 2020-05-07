@@ -155,4 +155,4 @@ var mc_riprap_size = function(y, a, v, g, z, s0, c, sgrock) {
 </script>
 <?php
 echoFooter("EngCalcs");
-?>
+// Omit last closing tag is good practice

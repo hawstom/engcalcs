@@ -201,4 +201,3 @@ $ec_lang['contact_message']='Message:';
 $ec_lang['contactSpamPrefix']='Five plus one equals';
 $ec_lang['contactSpamPostfix']='(Please spell it out. 1=one 2=two 3=three 4=four 5=five 6=six 7=seven +=plus 5+1=6)';
 $ec_lang['contactSubmitButton']='Submit Message';
-?>
