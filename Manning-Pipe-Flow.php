@@ -8,7 +8,7 @@ $html_head='
 ';
 echoHeader("EngCalcs", $html_title, $html_head);
 
-?>
+?>xu
 <h2><?=$ec_lang['mpf_main_desc']?></h2>
 <?php echoHelpWanted(); ?>
 
@@ -17,7 +17,7 @@ echoCalculatorForm(
 	//Inputs
 	Array(
 		Array('name' => 'd0', 'type' => 'number', 'default' => '1', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mpf_pipe_diameter']),
-		Array('name' => 'n', 'type' => 'number', 'default' => '0.01', 'units' => NULL, 'label' => $ec_lang['mpf_manningRoughness'].' <a target="_blank" href="http://www.engineeringtoolbox.com/mannings-roughness-d_799.html">?</a>'),
+		Array('name' => 'n', 'type' => 'number', 'default' => '0.01', 'units' => NULL, 'label' => '<a href="http://www.engineeringtoolbox.com/mannings-roughness-d_799.html">'.$ec_lang['mpf_manningRoughness'].'</a>'),
 		Array('name' => 's0', 'type' => 'number', 'default' => '0.001', 'units' => Array('grade','gradePercent'), 'label' => $ec_lang['mpf_friction_slope']),
 		Array('name' => 'dd0', 'type' => 'number', 'default' => '0.6', 'units' => Array('depthFrac','depthPercent'), 'label' => $ec_lang['mpf_depth_ratio']),
 	),
