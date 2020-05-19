@@ -55,7 +55,6 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.var = {};
 	this.var.c = 1.0;
 	this.var.g = 9.806;
-	this.var.gammawater = 9806;
 	// Read and convert form inputs to this.var.___ as SI units
 	this.readFormInput(objForm, 'b', hasUnits = true);
 	this.readFormInput(objForm, 'y', hasUnits = true);
@@ -73,7 +72,7 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.var.hv=Math.pow(this.var.v, 2) / (2 * this.var.g)
 	this.var.q = this.var.v * this.var.a;
 	this.var.froude = this.var.v * Math.sqrt(this.var.t/(this.var.g * this.var.a * Math.cos(Math.atan(this.var.s0))));
-	this.var.tau = this.var.gammawater * this.var.rh * this.var.s0;
+	this.var.tau = this.var.rh * this.var.s0;
 	this.var.c_isbash = (this.var.beta <= 30) ? 1.2 : 0.86;
 	this.var.d50_strickler = Math.pow(this.var.n * 21.1, 6); // n = 1/21.1 D ^ (1/6)
 	this.var.d50_mra = 0.031 * Math.pow(this.var.v, 2.5) / (Math.pow(this.var.sgrock - 1, 0.25) * Math.pow(this.var.y, 0.25) * ((this.var.beta <= 30) ? 1 : 1.5));

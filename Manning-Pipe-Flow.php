@@ -47,7 +47,6 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.var = {};
 	this.var.c = 1.0;
 	this.var.g = 9.806;
-	this.var.gammawater = 9806;
 	// Read and convert form inputs to this.var.___ as SI units
 	this.readFormInput(objForm, 'd0', hasUnits = true);
 	this.readFormInput(objForm, 's0', hasUnits = true);
@@ -64,7 +63,7 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.var.hv = this.var.v * this.var.v / (2 * this.var.g);
 	this.var.q = this.var.v * this.var.a;
 	this.var.f = this.var.v * Math.sqrt(this.var.t/(this.var.g * this.var.a * Math.cos(Math.atan(this.var.s0))));
-	this.var.tau = this.var.gammawater * this.var.rh * this.var.s0;
+	this.var.tau = this.var.rh * this.var.s0;
 
 	this.writeFormResult(objForm, 'q', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'v', precision = 4, hasUnits = true);

@@ -360,7 +360,6 @@ EngCalcs.Manning = {};
 
 EngCalcs.Manning.c = 1.0;
 EngCalcs.Manning.g = 9.806;
-EngCalcs.Manning.gammawater = 9806;
 
 EngCalcs.Manning.recalc = function () {
 	this.s0root = Math.pow(this.s0, 0.5);
