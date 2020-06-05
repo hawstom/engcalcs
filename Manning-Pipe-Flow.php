@@ -8,7 +8,7 @@ $html_head='
 ';
 echoHeader("EngCalcs", $html_title, $html_head);
 
-?>xu
+?>
 <h2><?=$ec_lang['mpf_main_desc']?></h2>
 <?php echoHelpWanted(); ?>
 
