@@ -52,7 +52,7 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.readFormInput(objForm, 's0', hasUnits = true);
 	this.readFormInput(objForm, 'n', hasUnits = false);
 	this.readFormInput(objForm, 'dd0', hasUnits = true);
-	this.var.y = dd0 * d0;
+	this.var.y = this.var.dd0 * this.var.d0;
 	// Theta here is half the included angle of the wetted perimeter.
 	this.var.theta = Math.acos(1 - 2 * this.var.dd0);
 	this.var.a = (this.var.theta - Math.sin(2 * this.var.theta) / 2) * Math.pow(this.var.d0, 2) / 4;
@@ -76,30 +76,30 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.writeFormResult(objForm, 'tau', precision = 4, hasUnits = true);
 
 	// Sketch
-	gcr = 50; // Pipe circle radius
-	gh = 3 * gcr; // SVG height
-	gw = 3 * gcr; // SVG width
-	gcx = 1.5 * gcr; // Pipe center x
-	gcy = 1.5 * gcr; // Pipe center y
-	gcb = gcy + gcr; // Pipe bottom
-	glx1 = gcx - this.var.t/this.var.d0 * gcr;
-	glx2 = gcx + this.var.t/this.var.d0 * gcr;
-	gly = gcy + (1/2 - this.var.dd0) * 2 * gcr;
-	gty = gly - gcr/4;
-	gtx1 = gcx - gcr/8;
-	gtx2 = gcx + gcr/8
+	this.var.gcr = 50; // Pipe circle radius
+	this.var.gh = 3 * this.var.gcr; // SVG height
+	this.var.gw = 3 * this.var.gcr; // SVG width
+	this.var.gcx = 1.5 * this.var.gcr; // Pipe center x
+	this.var.gcy = 1.5 * this.var.gcr; // Pipe center y
+	this.var.gcb = this.var.gcy + this.var.gcr; // Pipe bottom
+	this.var.glx1 = this.var.gcx - this.var.t/this.var.d0 * this.var.gcr;
+	this.var.glx2 = this.var.gcx + this.var.t/this.var.d0 * this.var.gcr;
+	this.var.gly = this.var.gcy + (1/2 - this.var.dd0) * 2 * this.var.gcr;
+	this.var.gty = this.var.gly - this.var.gcr/4;
+	this.var.gtx1 = this.var.gcx - this.var.gcr/8;
+	this.var.gtx2 = this.var.gcx + this.var.gcr/8
 
 
 	document.getElementById('sketch').innerHTML =
-		'<svg height="' + gh + '" width="' + gw + '">' +
-			'<circle cx="' + gcx + '" cy="' + gcy + '" r="' + gcr + '" stroke="black" stroke-width="' + gcr/25 + '" fill="white" />' +
-			'<line x1="' + glx1 + '" y1="' + gly + '" x2="' + glx2 + '" y2="' + gly + '" style="stroke:rgb(0,0,255);stroke-width:' + gcr/25 + '" />' +
-			'<line x1="' + gcx + '" y1="' + gcb + '" x2="' + gcx + '" y2="' + gly + '" style="stroke:rgb(0,0,255);stroke-width:' + gcr/3 + '" />' +
+		'<svg height="' + this.var.gh + '" width="' + this.var.gw + '">' +
+			'<circle cx="' + this.var.gcx + '" cy="' + this.var.gcy + '" r="' + this.var.gcr + '" stroke="black" stroke-width="' + this.var.gcr/25 + '" fill="white" />' +
+			'<line x1="' + this.var.glx1 + '" y1="' + this.var.gly + '" x2="' + this.var.glx2 + '" y2="' + this.var.gly + '" style="stroke:rgb(0,0,255);stroke-width:' + this.var.gcr/25 + '" />' +
+			'<line x1="' + this.var.gcx + '" y1="' + this.var.gcb + '" x2="' + this.var.gcx + '" y2="' + this.var.gly + '" style="stroke:rgb(0,0,255);stroke-width:' + this.var.gcr/3 + '" />' +
 			'<polygon points="' +
-			gcx + ',' + gly + ' ' +
-			gtx1 + ',' + gty + ' ' +
-			gtx2 + ',' + gty + '" ' +
-			'style="fill:white;stroke:black;stroke-width:' + gcr/50 + '" />' +
+			this.var.gcx + ',' + this.var.gly + ' ' +
+			this.var.gtx1 + ',' + this.var.gty + ' ' +
+			this.var.gtx2 + ',' + this.var.gty + '" ' +
+			'style="fill:white;stroke:black;stroke-width:' + this.var.gcr/50 + '" />' +
 			'Sorry, your browser does not support inline SVG.' +
 		'</svg>';
 }
