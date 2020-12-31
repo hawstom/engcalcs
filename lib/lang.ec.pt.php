@@ -151,12 +151,12 @@ $ec_lang['mtc_channel_slope']='Pendiente de canal (vertical / horizontal)';
 $ec_lang['mtc_flow_depth']='Profundidade de caudal';
 $ec_lang['mtc_bend_angle']='Angulo da curva<a target="_blank" href="/riprap-bend-angle.png" title="Haz clic para ver imagen">?</a> (para o tamaño de roca)';
 $ec_lang['mtc_sgrock']='Gravedade específica da roca (2.65)';
-$ec_lang['mtc_d50_bottom']='<span title="según Isbash (1936), Robinson, e Maricopa County, Arizona, US">Tamaño de roca requerido em o fondo, D50, Maricopa County</span>';
+$ec_lang['mtc_d50_strickler']='Tamanho de roca do diseño <a target="_blank" href="javascript:alert(\'La fórmula Strickler relata n com D50 por um canal recto e limpio. Ajuste o valor n para que este tamaño de roca do diseño sea más grande que o tamaño de roca requerido em as siguientes linhas. Depois use tal roca em su diseño.\')">?</a> basado na dada rugosidade Manning';
+$ec_lang['mtc_d50_bottom']='Tamanho de roca requerido em o fondo, D50, Maricopa County <a href="javascript:alert(\'Cuando S0 < 2% segum Isbash (1936) and Maricopa County, Arizona, US. Cuando S >= 2% segum Robinson Rock Chute \')">?</a>';
+$ec_lang['mtc_d50_z1']='Tamanho de roca requerido em o lado 1, D50, Maricopa County <a href="javascript:alert(\'Cuando S0 < 2% segum Isbash (1936) and Maricopa County, Arizona, US. Cuando S >= 2% segum Robinson Rock Chute \')">?</a>';
+$ec_lang['mtc_d50_z2']='Tamanho de roca requerido em o lado 2, D50, Maricopa County <a href="javascript:alert(\'Cuando S0 < 2% segum Isbash (1936) and Maricopa County, Arizona, US. Cuando S >= 2% segum Robinson Rock Chute \')">?</a>';
 $ec_lang['mtc_d50_mra']='Tamaño de roca requerido, D50, de acordo com Maynord, Ruff, e Abt (1989)';
 $ec_lang['mtc_d50_searcy']='Tamaño de roca requerido, D50, de acordo com Searcy (1967)';
-$ec_lang['mtc_d50_strickler']='Tamaño de roca do diseño <a target="_blank" href="javascript:alert(\'La fórmula Strickler relata n com D50 por um canal recto e limpio. Ajuste o valor n para que este tamaño de roca do diseño sea más grande que o tamaño de roca requerido em as siguientes linhas. Depois use tal roca em su diseño.\')">?</a> basado na dada rugosidade Manning';
-$ec_lang['mtc_d50_z1']='<span title="según Isbash (1936), Robinson, e Maricopa County, Arizona, US">Tamaño de roca requerido em o lado 1, D50, Maricopa County</span>';
-$ec_lang['mtc_d50_z2']='<span title="según Isbash (1936), Robinson, e Maricopa County, Arizona, US">Tamaño de roca requerido em o lado 2, D50, Maricopa County</span>';
 // Robinson Rock Chute
 $ec_lang['rrc_main_menu']='Robinson Rock Chute Design';
 $ec_lang['rrc_main_desc']='Robinson Rock Chute Design Spreadsheet';

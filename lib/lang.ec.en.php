@@ -154,12 +154,12 @@ $ec_lang['mtc_channel_slope']='Channel slope';
 $ec_lang['mtc_flow_depth']='Flow depth';
 $ec_lang['mtc_bend_angle']='Bend Angle<a target="_blank" href="/riprap-bend-angle.png" title="Click for image">?</a> (for riprap sizing)';
 $ec_lang['mtc_sgrock']='Stone specific gravity (2.65)';
-$ec_lang['mtc_d50_bottom']='<span title="per Isbash (1936), Robinson, and Maricopa County, Arizona, US">Required bottom angular riprap size, D50, Maricopa County</span>';
+$ec_lang['mtc_d50_strickler']='Implied design <a href="javascript:alert(\'The Strickler formula relates n and D50 for a straight and clean channel. Adjust n so this implied design size is larger than the required erosion protection size. Then line your channel as implied.\')">?</a> riprap size based on n';
+$ec_lang['mtc_d50_bottom']='Required bottom angular riprap size, D50, Maricopa County <a href="javascript:alert(\'For S0 < 2% per Isbash (1936) and Maricopa County, Arizona, US. For S >= 2% per Robinson Rock Chute \')">?</a>';
+$ec_lang['mtc_d50_z1']='Required side slope 1 angular riprap size, D50, Maricopa County <a href="javascript:alert(\'For S0 < 2% per Isbash (1936) and Maricopa County, Arizona, US. For S >= 2% per Robinson Rock Chute \')">?</a>';
+$ec_lang['mtc_d50_z2']='Required side slope 2 angular riprap size, D50, Maricopa County <a href="javascript:alert(\'For S0 < 2% per Isbash (1936) and Maricopa County, Arizona, US. For S >= 2% per Robinson Rock Chute \')">?</a>';
 $ec_lang['mtc_d50_mra']='Required angular riprap size, D50, per Maynord, Ruff, and Abt (1989)';
 $ec_lang['mtc_d50_searcy']='Required angular riprap size, D50, per Searcy (1967)';
-$ec_lang['mtc_d50_strickler']='Implied design <a target="_blank" href="javascript:alert(\'The Strickler formula relates n and D50 for a straight and clean channel. Adjust n so this implied design size is larger than the required erosion protection size. Then line your channel as implied.\')">?</a> riprap size based on n';
-$ec_lang['mtc_d50_z1']='<span title="per Isbash (1936), Robinson, and Maricopa County, Arizona, US">Required side slope 1 angular riprap size, D50, Maricopa County</span>';
-$ec_lang['mtc_d50_z2']='<span title="per Isbash (1936), Robinson, and Maricopa County, Arizona, US">Required side slope 2 angular riprap size, D50, Maricopa County</span>';
 // Robinson Rock Chute
 $ec_lang['rrc_main_menu']='Robinson Rock Chute';
 $ec_lang['rrc_main_desc']='Robinson Rock Chute Design Spreadsheet';
