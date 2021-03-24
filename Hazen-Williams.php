@@ -21,9 +21,7 @@ echoCalculatorForm(
 		Array('name' => 'l', 'type' => 'number', 'default' => '1000', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mphl_pipe_length']),
 		Array('name' => 'c', 'type' => 'number', 'default' => '100', 'units' => NULL, 'label' => '<a href="https://www.engineeringtoolbox.com/hazen-williams-coefficients-d_798.html">'.$ec_lang['hw_roughness'].'</a>'),
 		Array( 'name' => 'km', 'type' => 'number', 'default' => '10', 'units' => NULL, 'label' => '<a href="https://www.engineeringtoolbox.com/minor-loss-coefficients-pipes-d_626.html">'.$ec_lang['mphl_total_junction_k'].'</a>'),
-		Array('name' => 'z1', 'type' => 'number', 'default' => '0', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mphl_elevation_1']),
-		Array('name' => 'p1', 'type' => 'number', 'default' => '10', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mphl_pressure_head_1']),
-		Array('name' => 'z2', 'type' => 'number', 'default' => '0', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mphl_elevation_2']),
+		Array('name' => 'hgl1', 'type' => 'number', 'default' => '0', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mphl_hgl_1']),
 	),
 	//Results
 	Array(
@@ -37,9 +35,7 @@ echoCalculatorForm(
 		Array('name' => 'hf', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mphl_friction_loss']),
 		Array('name' => 'hm', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mphl_junction_loss']),
 		Array('name' => 'hl', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mphl_total_loss']),
-		Array('name' => 'hgl1', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mphl_hgl_1']),
 		Array('name' => 'hgl2', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mphl_hgl_2']),
-		Array('name' => 'p2', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mphl_pressure_head_2']),
 	)
 );
 
@@ -62,9 +58,7 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.readFormInput(objForm, 'l', hasUnits = true);
 	this.readFormInput(objForm, 'c', hasUnits = false);
 	this.readFormInput(objForm, 'km', hasUnits = false);
-	this.readFormInput(objForm, 'z1', hasUnits = true);
-	this.readFormInput(objForm, 'p1', hasUnits = true);
-	this.readFormInput(objForm, 'z2', hasUnits = true);
+	this.readFormInput(objForm, 'hgl1', hasUnits = true);
 	this.var.a = (Math.PI * Math.pow(this.var.d, 2) / 4);
 	this.var.pw = Math.PI * this.var.d;
 	this.var.rh = this.var.d / 4;
@@ -76,9 +70,7 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.var.hf = this.var.sf * this.var.l;
 	this.var.hm = this.var.hv * this.var.km;
 	this.var.hl = +this.var.hf + +this.var.hm;
-	this.var.hgl1 = +this.var.z1 + +this.var.p1;
 	this.var.hgl2 = +this.var.hgl1 + +this.var.hl;
-	this.var.p2 = +this.var.hgl2 - +this.var.z2;
 	this.writeFormResult(objForm, 'a', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'pw', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'rh', precision = 4, hasUnits = true);
