@@ -38,6 +38,8 @@ echoCalculatorForm(
 
 <div id="sketch"></div>
 
+<?php echo $ec_lang['mpf_note_1']; ?>
+
 <?php echoFeedback(); ?>
 
 <script>
