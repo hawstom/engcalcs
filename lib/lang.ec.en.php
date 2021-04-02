@@ -130,7 +130,7 @@ $ec_lang['mpf_hydraulic_radius']='Hydraulic radius';
 $ec_lang['mpf_top_width']='Top width, T';
 $ec_lang['mpf_froude_number']='Froude number, F';
 $ec_lang['mpf_shear_stress']='Shear stress (tractive force), tau';
-$ec_lang['mpf_note_1']='<p>Notes:</p><dl><dt>This is the flow <em>inside</em> the pipe.</dt><dd>Getting the flow into the pipe may require significant headwater depth. Add at least 1.5 times the velocity head to get the headwater depth or <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">see my 2-minute tutorial</a> for standard culvert headwater calculations using HY-8.</dd>';
+$ec_lang['mpf_note_1']='<p>Notes:</p><dl><dt>This is the flow and depth <em>inside</em> the pipe.</dt><dd>Getting the flow into the pipe may require significantly higher headwater depth. Add at least 1.5 times the velocity head to get the headwater depth or <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">see my 2-minute tutorial</a> for standard culvert headwater calculations using HY-8.</dd>';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Manning Pipe Head Loss';
 $ec_lang['mphl_main_title']='Free Online Manning Pipe Head Loss Calculator';
