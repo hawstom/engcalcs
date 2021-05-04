@@ -80,7 +80,7 @@ EngCalcs.pageCalculator = function(objForm) {
 		this.var.f_method = 'Moody Dunlop EPANET';
 		this.var.r = this.var.re/2000;
 		this.var.y2 = this.var.e / (3.7 * this.var.d) + 5.74 / Math.pow(this.var.re, 0.9);
-		this.var.y3 = -0.86859 * Math.log(this.var.e / (3.7 * this.var.d) + 5.74 / Math.pow(4000,0.9));
+		this.var.y3 = -0.86859 * Math.log10(this.var.e / (3.7 * this.var.d) + 5.74 / Math.pow(4000,0.9));
 		this.var.fa = Math.pow(this.var.y3,-2);
 		this.var.fb =  this.var.fa * (2 - 0.00514215 / (this.var.y2 * this.var.y3));
 		this.var.x1 =  7 * this.var.fa - this.var.fb;
@@ -92,7 +92,7 @@ EngCalcs.pageCalculator = function(objForm) {
 		this.var.regime = 2;
 		this.var.regime_label = '<?=$ec_lang['dw_regime_turbulent']?>';
 		this.var.f_method = '<a href="https://en.wikipedia.org/wiki/Darcy_friction_factor_formulae#Swamee%E2%80%93Jain_equation">Swamee Jain</a>';
-		this.var.f = 0.25 / Math.pow(Math.log(this.var.e / (3.7 * this.var.d) + 5.74 / Math.pow(this.var.re, 0.9)), 2);
+		this.var.f = 0.25 / Math.pow(Math.log10(this.var.e / (3.7 * this.var.d) + 5.74 / Math.pow(this.var.re, 0.9)), 2);
 	}
 	this.var.sf = this.var.f * Math.pow(this.var.u, 2) / (2 * this.var.d * this.var.g);
 	this.var.tau = this.var.rh * this.var.sf;
