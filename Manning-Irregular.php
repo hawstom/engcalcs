@@ -41,11 +41,18 @@ function echoCalculatorFormAppend() {
             <tr>
                 <th>
                     <?=$ec_lang['mi_station']?><br />
+                    <br />
                     <?php echoUnitSelect($name = 'stationu', $units = Array('m', 'mm', 'ft', 'in'), $indent_string); ?>
                 </th>
                 <th>
                     <?=$ec_lang['mi_elevation']?>
+                    <br />
                     <?php echoUnitSelect($name = 'elevationu', $units = Array('m', 'mm', 'ft', 'in'), $indent_string); ?>
+                </th>
+                <th>
+                    <?=$ec_lang['mi_d50in']?>
+                    <br />
+                    <?php echoUnitSelect($name = 'd50inu', $units = Array('m', 'mm', 'ft', 'in'), $indent_string); ?>
                 </th>
                 <th>
                     <?=$ec_lang['mi_n']?>
@@ -55,53 +62,72 @@ function echoCalculatorFormAppend() {
                 </th>
                 <th>
                     <?=$ec_lang['mi_q']?>
+                    <br />
                     <?php echoUnitSelect($name = 'qu', $units = Array('m3ps', 'lps', 'mld', 'ft3ps', 'gpm', 'mgd'), $indent_string); ?>
                 </th>
                 <th>
                     <?=$ec_lang['mi_v']?>
+                    <br />
                     <?php echoUnitSelect($name = 'vu', $units = Array('mps', 'ftps', 'mph'), $indent_string); ?>
                 </th>
                 <th>
                     <?=$ec_lang['mi_t']?>
+                    <br />
                     <?php echoUnitSelect($name = 'tu', $units = Array('m', 'mm', 'ft', 'in'), $indent_string); ?>
                 </th>
                 <th>
                     <?=$ec_lang['mi_f']?>
                 </th>
                 <th>
-                    <?=$ec_lang['mi_d50_strickler']?>
-                    <?php echoUnitSelect($name = 'd50_strickleru', $units = Array('m', 'mm', 'ft', 'in'), $indent_string); ?>
+                    <?=$ec_lang['mi_n_strickler']?>
+                </th>
+                <th>
+                    <?=$ec_lang['mi_n_blodgett']?>
+                </th>
+                <th>
+                    <?=$ec_lang['mi_n_bathurst']?>
+                </th>
+                <th>
+                    <?=$ec_lang['mi_blodgett_v_bathurst']?>
                 </th>
                 <th>
                     <?=$ec_lang['mi_d50_mc']?>
+                    <br />
                     <?php echoUnitSelect($name = 'd50_mcu', $units = Array('m', 'mm', 'ft', 'in'), $indent_string); ?>
                 </th>
                 <th>
                     <?=$ec_lang['mi_d50_mra']?>
+                    <br />
                     <?php echoUnitSelect($name = 'd50_mrau', $units = Array('m', 'mm', 'ft', 'in'), $indent_string); ?>
                 </th>
                 <th>
                     <?=$ec_lang['mi_d50_searcy']?>
+                    <br />
                     <?php echoUnitSelect($name = 'd50_searcyu', $units = Array('m', 'mm', 'ft', 'in'), $indent_string); ?>
                 </th>
                 <th>
                     <?=$ec_lang['mi_hv']?>
+                    <br />
                     <?php echoUnitSelect($name = 'hvu', $units = Array('m', 'mm', 'ft', 'in'), $indent_string); ?>
                 </th>
                 <th>
                     <?=$ec_lang['mi_tau']?>
+                    <br />
                     <?php echoUnitSelect($name = 'tauu', $units = Array('npm2', 'psf'), $indent_string); ?>
                 </th>
                 <th>
                     <?=$ec_lang['mi_a']?>
+                    <br />
                     <?php echoUnitSelect($name = 'au', $units = Array('m2', 'mm2', 'ft2', 'in2'), $indent_string); ?>
                 </th>
                 <th>
                     <?=$ec_lang['mi_pw']?>
+                    <br />
                     <?php echoUnitSelect($name = 'pwu', $units = Array('m', 'mm', 'ft', 'in'), $indent_string); ?>
                 </th>
                 <th>
                     <?=$ec_lang['mi_rh']?>
+                    <br />
                     <?php echoUnitSelect($name = 'rhu', $units = Array('m', 'mm', 'ft', 'in'), $indent_string); ?>
                 </th>
             </tr>
@@ -121,6 +147,7 @@ function echoCalculatorFormAppend() {
 <dt><?=$ec_lang['mi_notes_1_term']?></dt><dd><?=$ec_lang['mi_notes_1_def']?></dd>
 <dt><?=$ec_lang['mi_notes_2_term']?></dt><dd><?=$ec_lang['mi_notes_2_def']?></dd>
 </dl>
+<script src="<?=BASE_URL?>/engcalcs/lib/Manning.lib.js?v=4"></script>
 <script>
 <!--
 EngCalcs.pageCalculator = function (objForm) {
@@ -172,6 +199,7 @@ EngCalcs.pageCalculator = function (objForm) {
 		
 		// Do the calcs and output if this is not the first row
 		if(iStation > 0) {
+			this.Manning.d50in = document.getElementsByName('d50in')[iStation].value / objForm['d50inu'].value;
 			this.Manning.n = document.getElementsByName('n')[iStation].value;
 			l=station1-station0;
 			rise=elev1-elev0;
@@ -183,6 +211,8 @@ EngCalcs.pageCalculator = function (objForm) {
 			this.Manning.pw = (this.Manning.a == 0) ? 0 : (s == 0) ? l :  Math.abs(this.wedgeWettedPerimeter(d0, s) - this.wedgeWettedPerimeter(d1, s));
 			this.Manning.pwc = this.Manning.pwc + this.Manning.pw;
 			this.Manning.t = l*this.Manning.pw/hypotenuse;
+			this.Manning.da = this.Manning.a / this.Manning.t;
+			this.Manning.da_over_d50 = this.Manning.da / this.Manning.d50in;
 			this.Manning.isBank = document.getElementsByName('is_bank')[iStation].checked;
 			arrSketchSegments.push({
 				sectionX1: station0,
@@ -211,7 +241,10 @@ EngCalcs.pageCalculator = function (objForm) {
 			document.getElementsByName('v')[iStation].innerHTML = (this.Manning.v * objForm['vu'].value).toFixed(2);
 			document.getElementsByName('t')[iStation].innerHTML = (this.Manning.t * objForm['tu'].value).toFixed(2);
 			document.getElementsByName('f')[iStation].innerHTML = this.Manning.f.toFixed(2);
-			document.getElementsByName('d50_strickler')[iStation].innerHTML = (this.Manning.d50_strickler * objForm['d50_strickleru'].value).toFixed(2);
+			document.getElementsByName('n_strickler')[iStation].innerHTML = this.Manning.n_strickler.toFixed(4);
+			document.getElementsByName('n_blodgett')[iStation].innerHTML = this.Manning.n_blodgett.toFixed(4);
+			document.getElementsByName('n_bathurst')[iStation].innerHTML = this.Manning.n_bathurst.toFixed(4);
+			document.getElementsByName('blodgett_v_bathurst')[iStation].innerHTML = this.Manning.blodgett_v_bathurst;
 			document.getElementsByName('d50_mc')[iStation].innerHTML = (d50_mc * objForm['d50_mcu'].value).toFixed(2);
 			document.getElementsByName('d50_mra')[iStation].innerHTML = (d50_mra * objForm['d50_mrau'].value).toFixed(2);
 			document.getElementsByName('d50_searcy')[iStation].innerHTML = (this.Manning.d50_searcy * objForm['d50_searcyu'].value).toFixed(2);
@@ -356,11 +389,6 @@ EngCalcs.Sketch.getMiddleTextHtml = function (obj) {
 	+ '>' + obj.text + '</text>';
 }
 
-EngCalcs.Manning = {};
-
-EngCalcs.Manning.c = 1.0;
-EngCalcs.Manning.g = 9.806;
-
 EngCalcs.Manning.recalc = function () {
 	this.s0root = Math.pow(this.s0, 0.5);
 		this.rh = this.a/this.pw;
@@ -374,9 +402,12 @@ EngCalcs.Manning.recalc = function () {
 	this.f = this.v * Math.sqrt(this.t/(this.g * this.a * Math.cos(Math.atan(this.s0))));
 	this.ncompterm617 = this.pw*Math.pow(this.n,1.5);
 	this.ncompterm618 = this.pw*Math.pow(this.n,2);
-	this.c_isbash = (this.beta <= 30) ? 1.2 : 0.86;
-	this.d50_strickler = Math.pow(this.n * 21.1, 6); // n = 1/21.1 D ^ (1/6)
+	this.n_strickler = Math.pow(this.d50in, 1 / 6) / 21.1;
+	this.n_blodgett = this.alpha_blodgett * Math.pow(this.da, 1/6) / (2.25 + 5.23 * Math.log10(this.da/this.d50in));
+	this.n_bathurst = this.bathurst_n(this.alpha_bathurst, this.g, this.t, this.da, this.d50in, this.f);
+	this.blodgett_v_bathurst = (this.da_over_d50 < 0.3) ? '----' : (this.da_over_d50 < 1.5) ? 'Bathurst' : (this.da_over_d50 <= 185) ? 'Blodgett' : '++++';
 	this.d50_searcy = 0.022 * this.v * this.v;
+	this.c_isbash = (this.beta <= 30) ? 1.2 : 0.86;
 };
 
 EngCalcs.Manning.closeRegion = function () {
@@ -427,26 +458,30 @@ EngCalcs.wedgeWettedPerimeter = function (depth, slope) {
 	return Math.pow(depth*depth+(depth/slope)*(depth/slope), 0.5);
 };
 
-EngCalcs.addManningIrregularStation = function (station, elevation, n, isBank) {
+EngCalcs.addManningIrregularStation = function (station, elevation, d50in, n, isBank) {
 	'use strict';
 	var arrColumns = [
-		{name: 'station',      value: station,   inputType: 'number'},
-		{name: 'elevation',    value: elevation, inputType: 'number'},
-		{name: 'n',            value: n,         inputType: ((n === null) ? null : 'number')},
-		{name: 'is_bank',      value: isBank,    inputType: ((isBank === null) ? null : 'checkbox')},
-		{name: 'q',            value: null,      inputType: null},
-		{name: 'v',            value: null,      inputType: null},
-		{name: 't',            value: null,      inputType: null},
-		{name: 'f',            value: null,      inputType: null},
-		{name: 'd50_strickler',value: null,      inputType: null},
-		{name: 'd50_mc',       value: null,      inputType: null},
-		{name: 'd50_mra',      value: null,      inputType: null},
-		{name: 'd50_searcy',   value: null,      inputType: null},
-		{name: 'hv',           value: null,      inputType: null},
-		{name: 'tau',          value: null,      inputType: null},
-		{name: 'a',            value: null,      inputType: null},
-		{name: 'pw',           value: null,      inputType: null},
-		{name: 'rh',           value: null,      inputType: null},
+		{name: 'station',            value: station,   inputType: 'number'},
+		{name: 'elevation',          value: elevation, inputType: 'number'},
+		{name: 'd50in',              value: d50in,     inputType: ((d50in === null) ? null : 'number')},
+		{name: 'n',                  value: n,         inputType: ((n === null) ? null : 'number')},
+		{name: 'is_bank',            value: isBank,    inputType: ((isBank === null) ? null : 'checkbox')},
+		{name: 'q',                  value: null,      inputType: null},
+		{name: 'v',                  value: null,      inputType: null},
+		{name: 't',                  value: null,      inputType: null},
+		{name: 'f',                  value: null,      inputType: null},
+		{name: 'n_strickler',        value: null,      inputType: null},
+		{name: 'n_blodgett',         value: null,      inputType: null},
+		{name: 'n_bathurst',         value: null,      inputType: null},
+		{name: 'blodgett_v_bathurst',value: null,      inputType: null},
+		{name: 'd50_mc',             value: null,      inputType: null},
+		{name: 'd50_mra',            value: null,      inputType: null},
+		{name: 'd50_searcy',         value: null,      inputType: null},
+		{name: 'hv',                 value: null,      inputType: null},
+		{name: 'tau',                value: null,      inputType: null},
+		{name: 'a',                  value: null,      inputType: null},
+		{name: 'pw',                 value: null,      inputType: null},
+		{name: 'rh',                 value: null,      inputType: null},
 	];
 	this.addCalcRow(arrColumns);
 };
@@ -457,18 +492,20 @@ EngCalcs.pageAddCalcRow = function () {
 	station,
 	elevation;
 	if (this.numCalcRows === 0) {
+		d50in = null;
 		n = null;
 		// If first row, don't show bank checkbox.
 		isBank = null;
 		station = 0
 		elevation = 0
 	} else {
-		n = 0.030;
+		d50in = 1;
+		n = 1;
 		isBank = false;
 		station = +document.getElementsByName('station')[this.numCalcRows - 1].value + +1;
 		elevation = +document.getElementsByName('elevation')[this.numCalcRows - 1].value;
 	}
-	this.addManningIrregularStation(station, elevation, n, isBank);
+	this.addManningIrregularStation(station, elevation, d50in, n, isBank);
 };
 
 <?php

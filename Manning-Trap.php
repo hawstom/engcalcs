@@ -52,6 +52,7 @@ echoCalculatorForm(
 <div id="sketch"></div>
 
 <?php echoFeedback(); ?>
+<script src="<?=BASE_URL?>/engcalcs/lib/Manning.lib.js?v=4"></script>
 <script>
 EngCalcs.pageCalculator = function(objForm) {
 	'use strict';
@@ -82,16 +83,16 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.var.q = this.var.v * this.var.a;
 	this.var.froude = this.var.v * Math.sqrt(this.var.t/(this.var.g * this.var.a * Math.cos(Math.atan(this.var.s0))));
 	this.var.tau = this.var.rh * this.var.s0;
-	this.var.c_isbash = (this.var.beta <= 30) ? 1.2 : 0.86;
 	this.var.n_strickler = Math.pow(this.var.d50in, 1 / 6) / 21.1;
 	this.var.n_blodgett = this.var.alpha_blodgett * Math.pow(this.var.da, 1/6) / (2.25 + 5.23 * Math.log10(this.var.da/this.var.d50in));
-	this.var.n_bathurst = this.bathurst_n(this.var.alpha_bathurst, this.var.g, this.var.t, this.var.da, this.var.d50in, this.var.froude);
+	this.var.n_bathurst = this.Manning.bathurst_n(this.var.alpha_bathurst, this.var.g, this.var.t, this.var.da, this.var.d50in, this.var.froude);
 	this.var.blodgett_v_bathurst = (this.var.da_over_d50 < 0.3) ? '----' : (this.var.da_over_d50 < 1.5) ? 'Bathurst' : (this.var.da_over_d50 <= 185) ? 'Blodgett' : '++++';
 	this.var.d50_mra = 0.031 * Math.pow(this.var.v, 2.5) / (Math.pow(this.var.sgrock - 1, 0.25) * Math.pow(this.var.y, 0.25) * ((this.var.beta <= 30) ? 1 : 1.5));
 	this.var.d50_searcy = 0.022 * Math.pow(this.var.v, 2);
-	this.var.d50_bottom = this.mc_riprap_size(this.var.y, this.var.a, this.var.v, this.var.g, 1000, this.var.s0, this.var.c_isbash, this.var.sgrock);
-	this.var.d50_z1 = this.mc_riprap_size(this.var.y, this.var.a, this.var.v, this.var.g, this.var.z1, this.var.s0, this.var.c_isbash, this.var.sgrock);
-	this.var.d50_z2 = this.mc_riprap_size(this.var.y, this.var.a, this.var.v, this.var.g, this.var.z2, this.var.s0, this.var.c_isbash, this.var.sgrock);
+	this.var.c_isbash = (this.var.beta <= 30) ? 1.2 : 0.86;
+	this.var.d50_bottom = this.Manning.mc_riprap_size(this.var.y, this.var.a, this.var.v, this.var.g, 1000, this.var.s0, this.var.c_isbash, this.var.sgrock);
+	this.var.d50_z1 = this.Manning.mc_riprap_size(this.var.y, this.var.a, this.var.v, this.var.g, this.var.z1, this.var.s0, this.var.c_isbash, this.var.sgrock);
+	this.var.d50_z2 = this.Manning.mc_riprap_size(this.var.y, this.var.a, this.var.v, this.var.g, this.var.z2, this.var.s0, this.var.c_isbash, this.var.sgrock);
 	this.writeFormResult(objForm, 'a', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'pw', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'rh', precision = 4, hasUnits = true);

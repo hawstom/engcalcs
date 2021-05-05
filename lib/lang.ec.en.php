@@ -85,6 +85,7 @@ $ec_lang['mi_xSecPoints']='Cross section points';
 $ec_lang['mi_station']='Sta';
 $ec_lang['mi_elevation']='Elev';
 $ec_lang['mi_q']='Q';
+$ec_lang['mi_d50in']='Lining<br />median<br />rock<br />size';
 $ec_lang['mi_n']='n<br />for seg-<br />ment';
 $ec_lang['mi_is_bank']='R<sub>h</sub>, Q<br />region<br />boundary<br />(Bank)';
 $ec_lang['mi_v']='v';
