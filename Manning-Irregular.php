@@ -2,8 +2,8 @@
 require_once ('lib/base.inc.php');
 $html_title = $ec_lang['mi_main_title'];
 $html_head='
-    <meta name="Description" content="'. $html_title .'" />
-    <meta name="Keywords" content="mannings sizing pipie pipes rate chezy-manning tubo tobus tubos calculac&iacute;on calcular calculacion calculation" />
+	<meta name="Description" content="'. $html_title .'" />
+	<meta name="Keywords" content="mannings sizing pipie pipes rate chezy-manning tubo tobus tubos calculac&iacute;on calcular calculacion calculation" />
 ';
 echoHeader("EngCalcs", $html_title, $html_head);
 ?>
@@ -13,96 +13,101 @@ echoHeader("EngCalcs", $html_title, $html_head);
 
 <?php
 echoCalculatorForm(
-    //Inputs
-    Array(
-        Array('name' => 'ws', 'type' => 'number', 'default' => '1', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mi_waterSurfaceElevation']),
-        Array('name' => 's0', 'type' => 'number', 'default' => '0.001', 'units' => Array('grade', 'gradePercent'), 'label' => $ec_lang['mtc_channel_slope']),
-        Array('name' => 'beta', 'type' => 'number', 'default' => '0', 'units' => NULL, 'label' => $ec_lang['mtc_bend_angle']),
-        Array('name' => 'sgrock', 'type' => 'number', 'default' => '2.65', 'units' => NULL, 'label' => $ec_lang['mtc_sgrock'])
-    ),
-    //Results
-    Array(
-        Array('name' => 'q_617', 'units' => Array('m3ps', 'lps', 'mld', 'ft3ps', 'gpm', 'mgd'), 'label' => $ec_lang['mi_q_617']),
-        Array('name' => 'q_618', 'units' => Array('m3ps', 'lps', 'mld', 'ft3ps', 'gpm', 'mgd'), 'label' => $ec_lang['mi_q_618']),
-    ),
-    $flagFormAppend = true
+	//Inputs
+	Array(
+		Array('name' => 'ws', 'type' => 'number', 'default' => '1', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mi_waterSurfaceElevation']),
+		Array('name' => 's0', 'type' => 'number', 'default' => '0.001', 'units' => Array('grade', 'gradePercent'), 'label' => $ec_lang['mtc_channel_slope']),
+	),
+	//Results
+	Array(
+		Array('name' => 'q_617', 'units' => Array('m3ps', 'lps', 'mld', 'ft3ps', 'gpm', 'mgd'), 'label' => $ec_lang['mi_q_617']),
+	),
+	$flagFormAppend = true
 );
 function echoCalculatorFormAppend() {
-        global $ec_units, $ec_lang;
-        $indent_string = "\t\t\t\t\t";
+		global $ec_units, $ec_lang;
+		$indent_string = "\t\t\t\t\t";
 ?>
-    <table id="CalcsTable">
-        <thead>
-            <tr>
-                <th colspan="17"><?=$ec_lang['mi_xSecPoints']?>
-                <a href="javascript:EngCalcs.addSingleCalcRow()">+</a>/<a href="javascript:EngCalcs.deleteSingleCalcRow()">-</a></th>
-            </tr>
-            <tr>
-                <th>
-                    <?=$ec_lang['mi_station']?><br />
-                    <br />
-                    <?php echoUnitSelect($name = 'stationu', $units = Array('m', 'mm', 'ft', 'in'), $indent_string); ?>
-                </th>
-                <th>
-                    <?=$ec_lang['mi_elevation']?>
-                    <br />
-                    <?php echoUnitSelect($name = 'elevationu', $units = Array('m', 'mm', 'ft', 'in'), $indent_string); ?>
-                </th>
-                <th>
-                    <?=$ec_lang['mi_n']?>
-                </th>
-                <th>
-                    <?=$ec_lang['mi_is_bank']?>
-                </th>
-                <th>
-                    <?=$ec_lang['mi_q']?>
-                    <br />
-                    <?php echoUnitSelect($name = 'qu', $units = Array('m3ps', 'lps', 'mld', 'ft3ps', 'gpm', 'mgd'), $indent_string); ?>
-                </th>
-                <th>
-                    <?=$ec_lang['mi_v']?>
-                    <br />
-                    <?php echoUnitSelect($name = 'vu', $units = Array('mps', 'ftps', 'mph'), $indent_string); ?>
-                </th>
-                <th>
-                    <?=$ec_lang['mi_t']?>
-                    <br />
-                    <?php echoUnitSelect($name = 'tu', $units = Array('m', 'mm', 'ft', 'in'), $indent_string); ?>
-                </th>
-                <th>
-                    <?=$ec_lang['mi_f']?>
-                </th>
-                <th>
-                    <?=$ec_lang['mi_hv']?>
-                    <br />
-                    <?php echoUnitSelect($name = 'hvu', $units = Array('m', 'mm', 'ft', 'in'), $indent_string); ?>
-                </th>
-                <th>
-                    <?=$ec_lang['mi_tau']?>
-                    <br />
-                    <?php echoUnitSelect($name = 'tauu', $units = Array('npm2', 'psf'), $indent_string); ?>
-                </th>
-                <th>
-                    <?=$ec_lang['mi_a']?>
-                    <br />
-                    <?php echoUnitSelect($name = 'au', $units = Array('m2', 'mm2', 'ft2', 'in2'), $indent_string); ?>
-                </th>
-                <th>
-                    <?=$ec_lang['mi_pw']?>
-                    <br />
-                    <?php echoUnitSelect($name = 'pwu', $units = Array('m', 'mm', 'ft', 'in'), $indent_string); ?>
-                </th>
-                <th>
-                    <?=$ec_lang['mi_rh']?>
-                    <br />
-                    <?php echoUnitSelect($name = 'rhu', $units = Array('m', 'mm', 'ft', 'in'), $indent_string); ?>
-                </th>
-            </tr>
-        </thead>
-        <tbody id="CalcsBody">
-        </tbody>
-    </table>
-    </div>
+	<table id="CalcsTable">
+		<thead>
+			<tr>
+				<th colspan="17"><?=$ec_lang['mi_xSecPoints']?>
+				<a href="javascript:EngCalcs.addSingleCalcRow()">+</a>/<a href="javascript:EngCalcs.deleteSingleCalcRow()">-</a></th>
+			</tr>
+			<tr>
+				<th colspan="5"><?=$ec_lang['mi_groupPoint']?></th>
+				<th colspan="3"><?=$ec_lang['mi_groupSegment']?></th>
+				<th colspan="6"><?=$ec_lang['mi_groupRegion']?></th>
+			</tr>
+			<tr>
+				<th>
+					<?=$ec_lang['mi_station']?><br />
+					<br />
+					<?php echoUnitSelect($name = 'stationu', $units = Array('m', 'mm', 'ft', 'in'), $indent_string); ?>
+				</th>
+				<th>
+					<?=$ec_lang['mi_elevation']?>
+					<br />
+					<?php echoUnitSelect($name = 'elevationu', $units = Array('m', 'mm', 'ft', 'in'), $indent_string); ?>
+				</th>
+				<th>
+					<?=$ec_lang['mi_n']?>
+				</th>
+				<th>
+					<?=$ec_lang['mi_is_bank']?>
+				</th>
+				<th>
+					<?=$ec_lang['mi_tau']?>
+					<br />
+					<?php echoUnitSelect($name = 'tauu', $units = Array('npm2', 'psf'), $indent_string); ?>
+				</th>
+				<th>
+					<?=$ec_lang['mi_t']?>
+					<br />
+					<?php echoUnitSelect($name = 'tu', $units = Array('m', 'mm', 'ft', 'in'), $indent_string); ?>
+				</th>
+				<th>
+					<?=$ec_lang['mi_pw']?>
+					<br />
+					<?php echoUnitSelect($name = 'pwu', $units = Array('m', 'mm', 'ft', 'in'), $indent_string); ?>
+				</th>
+				<th>
+					<?=$ec_lang['mi_a']?>
+					<br />
+					<?php echoUnitSelect($name = 'au', $units = Array('m2', 'mm2', 'ft2', 'in2'), $indent_string); ?>
+				</th>
+				<th>
+					<?=$ec_lang['mi_rh']?>
+					<br />
+					<?php echoUnitSelect($name = 'rhu', $units = Array('m', 'mm', 'ft', 'in'), $indent_string); ?>
+				</th>
+				<th>
+					<?=$ec_lang['mi_n617']?>
+				</th>
+				<th>
+					<?=$ec_lang['mi_v617']?>
+					<br />
+					<?php echoUnitSelect($name = 'v617u', $units = Array('mps', 'ftps', 'mph'), $indent_string); ?>
+				</th>
+				<th>
+					<?=$ec_lang['mi_hv617']?>
+					<br />
+					<?php echoUnitSelect($name = 'hv617u', $units = Array('m', 'mm', 'ft', 'in'), $indent_string); ?>
+				</th>
+				<th>
+					<?=$ec_lang['mi_fr617']?>
+				</th>
+				<th>
+					<?=$ec_lang['mi_q617']?>
+					<br />
+					<?php echoUnitSelect($name = 'q617u', $units = Array('m3ps', 'lps', 'mld', 'ft3ps', 'gpm', 'mgd'), $indent_string); ?>
+				</th>
+			</tr>
+		</thead>
+		<tbody id="CalcsBody">
+		</tbody>
+	</table>
+	</div>
 
 <?php
 }
@@ -120,8 +125,6 @@ function echoCalculatorFormAppend() {
 EngCalcs.pageCalculator = function (objForm) {
 	'use strict';
 	this.Manning.s0 = objForm['s0'].value / objForm['s0u'].value;
-	this.Manning.beta = objForm['beta'].value;
-	this.Manning.sgrock = objForm['sgrock'].value;
 	ws = objForm.ws.value;
 	var
 	hasUnits, precision,
@@ -139,7 +142,6 @@ EngCalcs.pageCalculator = function (objForm) {
 	n1,
 	d0,
 	d1,
-	dmax = 0,
 	l,
 	rise,
 	hypotenuse,
@@ -162,8 +164,11 @@ EngCalcs.pageCalculator = function (objForm) {
 		elev1 = row.getElementsByTagName('input')[1].value / objForm['elevationu'].value;
 		arrElev.push(elev1);
 		d1=Math.max(ws-elev1,0);
-		dmax = Math.max(dmax,d1);
-		
+		// Output
+		// Point
+		// Shear stress depends on y, so we report it for a point and don't store it with the section.
+		tau = d1 * this.Manning.s0;
+		document.getElementsByName('tau')[iStation].innerHTML = (tau * objForm['tauu'].value).toFixed(2);
 		// Do the calcs and output if this is not the first row
 		if(iStation > 0) {
 			this.Manning.n = document.getElementsByName('n')[iStation].value;
@@ -192,25 +197,27 @@ EngCalcs.pageCalculator = function (objForm) {
 			this.Manning.recalc();
 			this.Manning.qc = this.Manning.qc + this.Manning.q;
 			this.Manning.ncompterm617c = this.Manning.ncompterm617c + this.Manning.ncompterm617;
-			this.Manning.ncompterm618c = this.Manning.ncompterm618c + this.Manning.ncompterm618,
-			tau = this.Manning.get_tau(dmax);
+			this.Manning.ncompterm618c = this.Manning.ncompterm618c + this.Manning.ncompterm618;
 			if (iStation === this.numCalcRows - 1) {
 				document.getElementsByName('is_bank')[iStation].checked = true;
 				document.getElementsByName('is_bank')[iStation].disabled = true;
 			} else {
 				document.getElementsByName('is_bank')[iStation].disabled = false;               
 			}
-			document.getElementsByName('q')[iStation].innerHTML = (this.Manning.q * objForm['qu'].value).toFixed(2);
-			document.getElementsByName('v')[iStation].innerHTML = (this.Manning.v * objForm['vu'].value).toFixed(2);
+			// Output
+			// Segment
 			document.getElementsByName('t')[iStation].innerHTML = (this.Manning.t * objForm['tu'].value).toFixed(2);
-			document.getElementsByName('f')[iStation].innerHTML = this.Manning.f.toFixed(2);
-			document.getElementsByName('hv')[iStation].innerHTML = (this.Manning.hv * objForm['hvu'].value).toFixed(2);
-			document.getElementsByName('tau')[iStation].innerHTML = (tau * objForm['tauu'].value).toFixed(2);
-			document.getElementsByName('a')[iStation].innerHTML = (this.Manning.a * objForm['au'].value).toFixed(2);
 			document.getElementsByName('pw')[iStation].innerHTML = (this.Manning.pw * objForm['pwu'].value).toFixed(2);
-			document.getElementsByName('rh')[iStation].innerHTML = (this.Manning.rh * objForm['rhu'].value).toFixed(2);
+			document.getElementsByName('a')[iStation].innerHTML = (this.Manning.a * objForm['au'].value).toFixed(2);
+			// Region
 			if (this.Manning.isBank) {
 				this.Manning.closeRegion();
+				document.getElementsByName('rh')[iStation].innerHTML = (this.Manning.rh * objForm['rhu'].value).toFixed(2);
+				document.getElementsByName('n617')[iStation].innerHTML = this.Manning.n617.toFixed(2);
+				document.getElementsByName('v617')[iStation].innerHTML = (this.Manning.v617 * objForm['v617u'].value).toFixed(2);7
+				document.getElementsByName('hv617')[iStation].innerHTML = (this.Manning.hv617 * objForm['hv617u'].value).toFixed(2);
+				document.getElementsByName('fr617')[iStation].innerHTML = this.Manning.fr617.toFixed(2);
+				document.getElementsByName('q617')[iStation].innerHTML = (this.Manning.q617 * objForm['q617u'].value).toFixed(2);
 			}
 		}
 		// Save the old geometry variables
@@ -219,21 +226,7 @@ EngCalcs.pageCalculator = function (objForm) {
 		d0=d1;
 	}
 	document.getElementById('q_617').innerHTML = (this.Manning.q617c * objForm['q_617u'].value).toFixed(2);
-	document.getElementById('q_618').innerHTML = (this.Manning.q618c * objForm['q_618u'].value).toFixed(2);
-/*  document.getElementById('v').innerHTML = (v * objForm['vu'].value).toFixed(2);
-	document.getElementById('hv').innerHTML = (hv * objForm['hvu'].value).toFixed(2);
-	document.getElementById('a').innerHTML = (a * objForm['au'].value).toFixed(2);
-	document.getElementById('pw').innerHTML = (pw * objForm['pwu'].value).toFixed(2);
-	document.getElementById('rh').innerHTML = (rh * objForm['rhu'].value).toFixed(2);
-	document.getElementById('t').innerHTML = (t * objForm['tu'].value).toFixed(2);
-	document.getElementById('f').innerHTML = froude.toFixed(2);
-	document.getElementById('tau').innerHTML = (tau * objForm['tauu'].value).toFixed(2);
-	document.getElementById('d50_strickler').innerHTML = (d50_strickler * objForm['d50_strickleru'].value).toFixed(2);
-	document.getElementById('d50_flattest').innerHTML = (d50_bottom * objForm['d50_flattestu'].value).toFixed(2);
-	document.getElementById('d50_steepest').innerHTML = (d50_z1 * objForm['d50_steepestu'].value).toFixed(2);
-	document.getElementById('d50_mra').innerHTML = (d50_mra * objForm['d50_mrau'].value).toFixed(2);
-	document.getElementById('d50_searcy').innerHTML = (d50_searcy * objForm['d50_searcyu'].value).toFixed(2);
-*/  
+
 	// Sketch
 	var
 	i,
@@ -354,7 +347,7 @@ EngCalcs.Manning.recalc = function () {
 		this.q = this.v * this.a;
 	}
 	this.hv = this.v * this.v / (2 * this.g);
-	this.f = this.v * Math.sqrt(this.t/(this.g * this.a * Math.cos(Math.atan(this.s0))));
+	this.fr = this.v * Math.sqrt(this.t/(this.g * this.a * Math.cos(Math.atan(this.s0))));
 	this.ncompterm617 = this.pw*Math.pow(this.n,1.5);
 	this.ncompterm618 = this.pw*Math.pow(this.n,2);
 };
@@ -364,43 +357,23 @@ EngCalcs.Manning.closeRegion = function () {
 	this.a = this.ac;
 	this.n = Math.pow(this.ncompterm617c, (2/3))/Math.pow(this.pwc, (2/3));
 	this.recalc();
+	this.n617 = this.n;
+	this.v617 = this.v;
+	this.hv617 = this.hv;
+	this.fr617 = this.fr;
+	this.q617 = this.q;
 	this.q617c = this.q617c + this.q;
 	this.n = Math.pow(this.ncompterm618c, 0.5)/Math.pow(this.pwc, 0.5);
 	this.recalc();
+	this.n618 = this.n;
+	this.v618 = this.v;
+	this.fr618 = this.fr;
+	this.q618 = this.q;
 	this.q618c = this.q618c + this.q;
 	this.pwc = 0;
 	this.ac = 0;
 	this.ncompterm617c = 0;
 	this.ncompterm618c = 0;
-};
-
-// Shear stress depends on y, so we report it for a point and don't store it with the section.
-EngCalcs.Manning.get_tau = function (y) {
-	return y * this.s0;
-};
-
-EngCalcs.Manning.get_d50_mra = function (y) {
-		d50 = 0.031 * Math.pow(this.v, 2.5) / (Math.pow(this.sgrock - 1, 0.25) * Math.pow(y, 0.25) * ((this.beta <= 30) ? 1 : 1.5));
-		return d50;
-};
-
-EngCalcs.Manning.get_d50_mc = function(y, z) {
-	var
-	d50,
-	hvmax = this.v * this.v * 1.33 * 1.33 / (2 * this.g);
-	if (this.s0 < 0.02) {
-		// Isbash
-		d50 = hvmax / (this.c_isbash * this.c_isbash * Math.cos(Math.atan(1 / z)) * (this.sgrock - 1));
-	} else if (this.s0 < 0.1) {
-		// Robinson unit q = v * y corrected 2015-10-17
-		d50 = 1.413 * Math.pow(this.v * y, 0.529) * Math.pow(this.s0, 0.794);
-	} else if (s0 < 0.4) {
-		// Robinson
-		d50 = 0.4623 * Math.pow(this.v * y, 0.529) * Math.pow(this.s0, 0.307);
-	} else {
-		d50 = '-';
-	}
-	return d50;
 };
 
 EngCalcs.wedgeWettedPerimeter = function (depth, slope) {
@@ -410,19 +383,23 @@ EngCalcs.wedgeWettedPerimeter = function (depth, slope) {
 EngCalcs.addManningIrregularStation = function (station, elevation, d50in, n, isBank) {
 	'use strict';
 	var arrColumns = [
+		// Point
 		{name: 'station',            value: station,   inputType: 'number'},
 		{name: 'elevation',          value: elevation, inputType: 'number'},
 		{name: 'n',                  value: n,         inputType: ((n === null) ? null : 'number')},
 		{name: 'is_bank',            value: isBank,    inputType: ((isBank === null) ? null : 'checkbox')},
-		{name: 'q',                  value: null,      inputType: null},
-		{name: 'v',                  value: null,      inputType: null},
-		{name: 't',                  value: null,      inputType: null},
-		{name: 'f',                  value: null,      inputType: null},
-		{name: 'hv',                 value: null,      inputType: null},
 		{name: 'tau',                value: null,      inputType: null},
-		{name: 'a',                  value: null,      inputType: null},
+		// Segment
+		{name: 't',                  value: null,      inputType: null},
 		{name: 'pw',                 value: null,      inputType: null},
+		{name: 'a',                  value: null,      inputType: null},
+		// Region
 		{name: 'rh',                 value: null,      inputType: null},
+		{name: 'n617',               value: null,      inputType: null},
+		{name: 'v617',               value: null,      inputType: null},
+		{name: 'hv617',              value: null,      inputType: null},
+		{name: 'fr617',              value: null,      inputType: null},
+		{name: 'q617',               value: null,      inputType: null},
 	];
 	this.addCalcRow(arrColumns);
 };
