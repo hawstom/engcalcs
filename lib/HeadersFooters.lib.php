@@ -36,7 +36,7 @@ global $ec_lang;
 <?php
 if (substr($type, 0, 8) === "EngCalcs") {
 ?>
-	<link rel="stylesheet" href="<?=BASE_URL?>/engcalcs/lib/engcalcs.css" type="text/css" />
+	<link rel="stylesheet" href="<?=BASE_URL?>/engcalcs/lib/engcalcs.css?v=1" type="text/css" />
 <?php
 }
 ?>
