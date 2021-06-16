@@ -12,3 +12,13 @@ input::-webkit-inner-spin-button {
 input[type=number] {
 	-moz-appearance: textfield;
 }
+
+.blink {
+  animation: blinker 1s step-start 15;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 0;
+  }
+}

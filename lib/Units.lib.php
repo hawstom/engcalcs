@@ -21,7 +21,6 @@ $ec_units['in']=39.37;
 
 $ec_units['mps']=1;
 $ec_units['ftps']=3.2808;
-$ec_units['mph']=2.237;
 
 $ec_units['m3ps']=1;
 $ec_units['lps']=1000;

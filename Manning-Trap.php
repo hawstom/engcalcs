@@ -18,19 +18,19 @@ echoCalculatorForm(
 		Array('name' => 'b', 'type' => 'number', 'default' => '1', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mtc_bottom_width']),
 		Array('name' => 'z1', 'type' => 'number', 'default' => '4', 'units' => NULL, 'label' => $ec_lang['mtc_side_slope_1']),
 		Array('name' => 'z2', 'type' => 'number', 'default' => '4', 'units' => NULL, 'label' => $ec_lang['mtc_side_slope_2']),
-		Array('name' => 'n', 'type' => 'number', 'default' => '0.03', 'units' => NULL, 'label' => $ec_lang['mpf_manningRoughness'].' <a target="_blank" href="http://www.engineeringtoolbox.com/mannings-roughness-d_799.html">?</a>'),
+		Array('name' => 'n_in', 'type' => 'number', 'default' => '0.03', 'units' => NULL, 'label' => $ec_lang['mpf_manningRoughness'].' <a target="_blank" href="http://www.engineeringtoolbox.com/mannings-roughness-d_799.html">?</a>'),
 		Array('name' => 's0', 'type' => 'number', 'default' => '0.001', 'units' => Array('grade', 'gradePercent'), 'label' => $ec_lang['mtc_channel_slope']),
 		Array('name' => 'y', 'type' => 'number', 'default' => '1', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mtc_flow_depth']),
 		Array('name' => 'beta', 'type' => 'number', 'default' => '0', 'units' => NULL, 'label' => $ec_lang['mtc_bend_angle']),
 		Array('name' => 'sgrock', 'type' => 'number', 'default' => '2.65', 'units' => NULL, 'label' => $ec_lang['mtc_sgrock']),
-		Array('name' => 'd50in', 'type' => 'number', 'default' => '1', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mtc_d50in']),
+		Array('name' => 'd50_in', 'type' => 'number', 'default' => '1', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mtc_d50_in']),
 	),
 	//Results
 	Array(
 		Array('name' => 'a', 'units' => Array('m2', 'mm2', 'ft2', 'in2'), 'label' => $ec_lang['mpf_flow_area']),
 		Array('name' => 'pw', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mpf_wetted_perimeter']),
 		Array('name' => 'rh', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mpf_hydraulic_radius']),
-		Array('name' => 'v', 'units' => Array('mps', 'ftps', 'mph'), 'label' => $ec_lang['mpf_velocity']),
+		Array('name' => 'v', 'units' => Array('mps', 'ftps'), 'label' => $ec_lang['mpf_velocity']),
 		Array('name' => 'q', 'units' => Array('m3ps', 'lps', 'mld', 'ft3ps', 'gpm', 'mgd'), 'label' => $ec_lang['mpf_flow']),
 		Array('name' => 'hv', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mpf_velocity_head']),
 		Array('name' => 't', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mpf_top_width']),
@@ -68,24 +68,24 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.readFormInput(objForm, 'z1', hasUnits = false);
 	this.readFormInput(objForm, 'z2', hasUnits = false);
 	this.readFormInput(objForm, 's0', hasUnits = true);
-	this.readFormInput(objForm, 'n', hasUnits = false);
+	this.readFormInput(objForm, 'n_in', hasUnits = false);
 	this.readFormInput(objForm, 'beta', hasUnits = false);
 	this.readFormInput(objForm, 'sgrock', hasUnits = false);
-	this.readFormInput(objForm, 'd50in', hasUnits = true);
+	this.readFormInput(objForm, 'd50_in', hasUnits = true);
 	this.var.a = this.var.y * (this.var.b + (+this.var.z1 + +this.var.z2) * this.var.y / 2);
 	this.var.pw = this.var.b + this.var.y * (Math.sqrt(1 + Math.pow(this.var.z1, 2)) + Math.sqrt(1 + Math.pow(this.var.z2, 2)));
 	this.var.rh = this.var.a / this.var.pw;
 	this.var.t = this.var.b + this.var.y * (+this.var.z1 + +this.var.z2);
 	this.var.da = this.var.a / this.var.t;
-	this.var.da_over_d50 = this.var.da / this.var.d50in;
-	this.var.v = this.var.c/this.var.n*Math.pow(this.var.rh,2/3)*Math.pow(this.var.s0,0.5);
+	this.var.da_over_d50 = this.var.da / this.var.d50_in;
+	this.var.v = this.var.c/this.var.n_in*Math.pow(this.var.rh,2/3)*Math.pow(this.var.s0,0.5);
 	this.var.hv=Math.pow(this.var.v, 2) / (2 * this.var.g)
 	this.var.q = this.var.v * this.var.a;
 	this.var.froude = this.var.v * Math.sqrt(this.var.t/(this.var.g * this.var.a * Math.cos(Math.atan(this.var.s0))));
 	this.var.tau = this.var.rh * this.var.s0;
-	this.var.n_strickler = Math.pow(this.var.d50in, 1 / 6) / 21.1;
-	this.var.n_blodgett = this.var.alpha_blodgett * Math.pow(this.var.da, 1/6) / (2.25 + 5.23 * Math.log10(this.var.da/this.var.d50in));
-	this.var.n_bathurst = this.Manning.bathurst_n(this.var.alpha_bathurst, this.var.g, this.var.t, this.var.da, this.var.d50in, this.var.froude);
+	this.var.n_strickler = Math.pow(this.var.d50_in, 1 / 6) / 21.1;
+	this.var.n_blodgett = this.var.alpha_blodgett * Math.pow(this.var.da, 1/6) / (2.25 + 5.23 * Math.log10(this.var.da/this.var.d50_in));
+	this.var.n_bathurst = this.Manning.bathurst_n(this.var.alpha_bathurst, this.var.g, this.var.t, this.var.da, this.var.d50_in, this.var.froude);
 	this.var.blodgett_v_bathurst = (this.var.da_over_d50 < 0.3) ? '----' : (this.var.da_over_d50 < 1.5) ? 'Bathurst' : (this.var.da_over_d50 <= 185) ? 'Blodgett' : '++++';
 	this.var.d50_mra = 0.031 * Math.pow(this.var.v, 2.5) / (Math.pow(this.var.sgrock - 1, 0.25) * Math.pow(this.var.y, 0.25) * ((this.var.beta <= 30) ? 1 : 1.5));
 	this.var.d50_searcy = 0.022 * Math.pow(this.var.v, 2);
@@ -111,7 +111,18 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.writeFormResult(objForm, 'd50_z2', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'd50_mra', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'd50_searcy', precision = 4, hasUnits = true);
-
+	// Make Copy n buttons blink if n seems too low.
+	if (this.var.n_in < Math.min(this.var.n_strickler, (this.var.blodgett_v_bathurst === 'Blodgett') ? this.var.n_blodgett : this.var.n_bathurst)) {
+		$('[id$=copy]').addClass('blink');
+	} else {
+		$('[id$=copy]').removeClass('blink');
+	}
+	// Make Rock Size blink if it seems too low.
+	if (this.var.d50_in < Math.min(this.var.d50_mra, this.var.d50_searcy, this.var.d50_bottom, this.var.d50_z1, this.var.d50_z2)) {
+		$('#d50_in_row').addClass('blink');
+	} else {
+		$('#d50_in_row').removeClass('blink');
+	}
 	// Sketch
 	this.var.gymax = 100; // Max graphic flow depth
 	this.var.garmax = 6; // Max graphic aspect ratio
@@ -148,7 +159,14 @@ EngCalcs.pageCalculator = function(objForm) {
 };
 EngCalcs.pageCalculatorInitialize = function () {
 }
+//'[id$=copy]'
+$(document).ready(function() {
+	$('#n_strickler_copy').click(function() {$('#n_in').val($('#n_strickler').html()); $('[id$=copy]').removeClass('blink'); EngCalcs.submitForm();});
+	$('#n_blodgett_copy').click(function() {$('#n_in').val($('#n_blodgett').html()); $('[id$=copy]').removeClass('blink'); EngCalcs.submitForm();});
+	$('#n_bathurst_copy').click(function() {$('#n_in').val($('#n_bathurst').html()); $('[id$=copy]').removeClass('blink'); EngCalcs.submitForm();});
+});
 <?php echoCookieScript(); ?>
+
 </script>
 <?php
 echoFooter("EngCalcs");
