@@ -92,7 +92,6 @@ function echoEngCalcsMenu () {
 					<a class="dropdown-item" href="Manning-Pipe-Head-Loss.php" title="<?=$ec_lang['mphl_main_desc']?>"><?=$ec_lang['mphl_main_menu']?></a>
 					<a class="dropdown-item" href="Hazen-Williams.php" title="<?=$ec_lang['hw_main_desc']?>"><?=$ec_lang['hw_main_menu']?></a>
 					<a class="dropdown-item" href="Darcy-Weisbach.php" title="<?=$ec_lang['dw_main_desc']?>"><?=$ec_lang['dw_main_menu']?></a>
-					<a class="dropdown-item" href="Plamen-test.php" title="Plamen's test calculator">Plamen's test calculator</a>
 					<div class="dropdown-divider"></div>
 					<a class="dropdown-item" href="Manning-Trap.php" title="<?=$ec_lang['mtc_main_desc']?>"><?=$ec_lang['mtc_menu']?></a>
 					<a class="dropdown-item" href="Manning-Irregular.php" title="<?=$ec_lang['mi_main_desc']?>"><?=$ec_lang['mi_menu']?></a>
