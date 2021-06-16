@@ -158,11 +158,11 @@ $ec_lang['mtc_n_strickler']='n for rock size per Strickler <button type="button"
 $ec_lang['mtc_n_blodgett']='n for rock size per Blodgett <button type="button" id="n_blodgett_copy">Copy to input</button>';
 $ec_lang['mtc_n_bathurst']='n for rock size per Bathurst <button type="button" id="n_bathurst_copy">Copy to  input</button>';
 $ec_lang['mtc_blodgett_v_bathurst']='Blodgett vs. Bathurst';
-$ec_lang['mtc_d50_bottom']='Required bottom angular rock size, D50, Maricopa County <a href="javascript:alert(\'For S0 < 2% per Isbash (1936) and Maricopa County, Arizona, US. For S >= 2% per Robinson Rock Chute \')">?</a>';
-$ec_lang['mtc_d50_z1']='Required side slope 1 angular rock size, D50, Maricopa County <a href="javascript:alert(\'For S0 < 2% per Isbash (1936) and Maricopa County, Arizona, US. For S >= 2% per Robinson Rock Chute \')">?</a>';
-$ec_lang['mtc_d50_z2']='Required side slope 2 angular rock size, D50, Maricopa County <a href="javascript:alert(\'For S0 < 2% per Isbash (1936) and Maricopa County, Arizona, US. For S >= 2% per Robinson Rock Chute \')">?</a>';
-$ec_lang['mtc_d50_mra']='Required angular rock size, D50, per Maynord, Ruff, and Abt (1989)';
-$ec_lang['mtc_d50_searcy']='Required angular rock size, D50, per Searcy (1967)';
+$ec_lang['mtc_d50_bottom']='Required bottom angular rock size, D50 (Isbash & MC) <a href="javascript:alert(\'Per Isbash (1936) and Maricopa County, Arizona, US.\')">?</a>';
+$ec_lang['mtc_d50_z1']='Required side slope 1 angular rock size, D50 (Isbash & MC) <a href="javascript:alert(\'Per Isbash (1936) and Maricopa County, Arizona, US.\')">?</a>';
+$ec_lang['mtc_d50_z2']='Required side slope 2 angular rock size, D50 (Isbash & MC) <a href="javascript:alert(\'Per Isbash (1936) and Maricopa County, Arizona, US.\')">?</a>';
+$ec_lang['mtc_d50_mra']='Required angular rock size, D50 (Maynord, Ruff, and Abt 1989)';
+$ec_lang['mtc_d50_searcy']='Required angular rock size, D50 (Searcy 1967)';
 // Robinson Rock Chute
 $ec_lang['rrc_main_menu']='Robinson Rock Chute';
 $ec_lang['rrc_main_desc']='Robinson Rock Chute Design Spreadsheet';
