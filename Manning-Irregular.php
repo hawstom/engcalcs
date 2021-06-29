@@ -214,10 +214,17 @@ EngCalcs.pageCalculator = function (objForm) {
 				this.Manning.closeRegion();
 				document.getElementsByName('rh')[iStation].innerHTML = (this.Manning.rh * objForm['rhu'].value).toFixed(2);
 				document.getElementsByName('n617')[iStation].innerHTML = this.Manning.n617.toFixed(2);
-				document.getElementsByName('v617')[iStation].innerHTML = (this.Manning.v617 * objForm['v617u'].value).toFixed(2);7
+				document.getElementsByName('v617')[iStation].innerHTML = (this.Manning.v617 * objForm['v617u'].value).toFixed(2);
 				document.getElementsByName('hv617')[iStation].innerHTML = (this.Manning.hv617 * objForm['hv617u'].value).toFixed(2);
 				document.getElementsByName('fr617')[iStation].innerHTML = this.Manning.fr617.toFixed(2);
 				document.getElementsByName('q617')[iStation].innerHTML = (this.Manning.q617 * objForm['q617u'].value).toFixed(2);
+			} else {
+				document.getElementsByName('rh')[iStation].innerHTML = '';
+				document.getElementsByName('n617')[iStation].innerHTML = '';
+				document.getElementsByName('v617')[iStation].innerHTML = '';
+				document.getElementsByName('hv617')[iStation].innerHTML = '';
+				document.getElementsByName('fr617')[iStation].innerHTML = '';
+				document.getElementsByName('q617')[iStation].innerHTML = '';
 			}
 		}
 		// Save the old geometry variables
