@@ -42,7 +42,7 @@ $ec_lang['u_s']="segundos (seg)";
 $ec_lang['menu_main_list']='Lista de calculadoras';
 $ec_lang['menu_main_hydraulics']='Hydraulica';
 $ec_lang['menu_main_language']='Idioma';
-$ec_lang['template_welcome']='>> Deixe seus medos na porta. O amor é falado aqui. <<';
+$ec_lang['template_welcome']='>> Deixe seus medos na porta. O amor é falado aqui. Aproveite também <a href="https://hawsedc.com/download.php">as ferramentas livres HawsEDC para AutoCAD</a>.<<';
 $ec_lang['template_translation_help']='Você pode me ajudar a traduzir esta calculadora para sua língua ou hostear esta calculadora em seu site?';
 $ec_lang['template_feedback']='Por favor, dê-nos suas valiosas palavras de sugestão ou elogio. Esta calculadora gratuita excedeu suas expectativas em todos os aspectos?';
 $ec_lang['template_printable_title']='Título imprimível';
