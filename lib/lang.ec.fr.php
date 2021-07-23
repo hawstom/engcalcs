@@ -128,7 +128,7 @@ $ec_lang['menu_brand']=ucfirst("$ec_lang[calculator]s HawsEDC");
 $ec_lang['menu_main_list']=ucfirst("liste de $ec_lang[calculators]");
 $ec_lang['menu_main_hydraulics']=ucfirst("$ec_lang[hydraulics]");
 $ec_lang['menu_main_language']=ucfirst("langue");
-$ec_lang['template_welcome']='&gt;&gt; Drop your fears at the door; love is spoken here. Enjoy the <a href="https://hawsedc.com/download.php">free HawsEDC AutoCAD tools</a> too. &lt;&lt;';
+$ec_lang['template_welcome']='&gt;&gt; Drop your fears at the door; love is spoken here. Enjoy the <a href="https://hawsedc.com/download.php">free libre HawsEDC AutoCAD tools</a> too. &lt;&lt;';
 $ec_lang['template_translation_help']="Assistance a la traducion est desiree. Pouvez vous installer ce calculateur sur votre site?";
 $ec_lang['template_feedback']="Donnez nous votre avis. Est-ce que cet ordinateur a depassé vos attentes?";
 $ec_lang['template_printable_title']='Printable Title';

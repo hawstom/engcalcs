@@ -44,7 +44,7 @@ $ec_lang['menu_brand']='HawsEDC Calculators';
 $ec_lang['menu_main_list']='Hesap makinası listesi';
 $ec_lang['menu_main_hydraulics']='Hidrolik';
 $ec_lang['menu_main_language']='Dil';
-$ec_lang['template_welcome']='&gt;&gt; Drop your fears at the door; love is spoken here. Enjoy the <a href="https://hawsedc.com/download.php">free HawsEDC AutoCAD tools</a> too. &lt;&lt;';
+$ec_lang['template_welcome']='&gt;&gt; Drop your fears at the door; love is spoken here. Enjoy the <a href="https://hawsedc.com/download.php">free libre HawsEDC AutoCAD tools</a> too. &lt;&lt;';
 $ec_lang['template_translation_help']="Bu hesap makinesini kendi dilinize çevirmek ya da bu hesap makinesini web sitenizde göstermek ister misiniz? Türkçe çeviri için Mustafa Özbay'a tesekkür ederim.";
 $ec_lang['template_feedback']='Lütfen görüslerinizi ve begenileriniz bizimle paylasin. Bu ücretsiz hesap makinesi beklentilerinizi karsilayabildi mi?';
 $ec_lang['template_printable_title']='Printable Title';

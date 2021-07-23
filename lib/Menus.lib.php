@@ -33,7 +33,7 @@ function echoMainMenu() {
   $menuarr =
     array(
         array(BASE_URL.'/index.php','Home'),
-        array(BASE_URL.'/support.php','Support'),
+        array(BASE_URL.'/support.php','AutoCAD Tools'),
         array(BASE_URL.'/gnu/index.php','FreeSoftware'),
         array(BASE_URL.'/engserv.php','Engineering Services'),
         array(BASE_URL.'/engcalcs/index.php','Engineering Calculators'),
