@@ -137,8 +137,9 @@ $ec_lang['mphl_friction_slope']='Friction slope';
 $ec_lang['mphl_friction_loss']='Sürtünmeye Bağlı Yük Kaybı, Hf';
 $ec_lang['mphl_junction_loss']='İkincil Yük Kayıpları, Hm';
 $ec_lang['mphl_total_loss']='Toplam Yük Kaybı, Hl';
-$ec_lang['mphl_hgl_1']='Downstream HGL';
-$ec_lang['mphl_hgl_2']='Upstream HGL';
+$ec_lang['mphl_egl_1']='Downstream EGL';
+$ec_lang['mphl_egl_2']='Upstream EGL';
+$ec_lang['mphl_hgl_2']='Upstream HGL in pipe ' . $ec_lang['mpf_see_notes'];
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Belli Eğim ve Derinlikteki Düzgün Trapezoidal Kanallar';
 $ec_lang['mtc_main_title']='Ücretsiz Belli Eğim ve Derinlikteki Düzgün Trapezoidal Kanallar için Manning Formülü';

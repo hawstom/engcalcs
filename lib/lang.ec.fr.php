@@ -168,8 +168,9 @@ $ec_lang['mphl_total_junction_k']="Coeficient total de $ec_lang[loss] dans les j
 $ec_lang['mphl_friction_loss']=ucfirst("$ec_lang[frictionLoss]");
 $ec_lang['mphl_junction_loss']=ucfirst("$ec_lang[junctionLoss]");
 $ec_lang['mphl_total_loss']=ucfirst("$ec_lang[totalLoss]");
-$ec_lang['mphl_hgl_1']='Downstream HGL';
-$ec_lang['mphl_hgl_2']='Upstream HGL';
+$ec_lang['mphl_egl_1']='Downstream EGL';
+$ec_lang['mphl_egl_2']='Upstream EGL';
+$ec_lang['mphl_hgl_2']='Upstream HGL in pipe ' . $ec_lang['mpf_see_notes'];
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']=ucfirst("$ec_lang[channel] $ec_lang[trapezoidal] $ec_lang[manning]");
 $ec_lang['mtc_main_title']=ucfirst("$ec_lang[calculator] $ec_lang[freeOnline] de $ec_lang[manningFormula] pour $ec_lang[channel] $ec_lang[trapezoidal]");

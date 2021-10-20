@@ -84,8 +84,9 @@ $ec_lang['mphl_total_junction_k']='חישוב סך כל מקדמי ההפסדי�
 $ec_lang['mphl_friction_loss']='הפסד חיכוך';
 $ec_lang['mphl_junction_loss']='הפסד בצומת';
 $ec_lang['mphl_total_loss'] = 'סהכ הפסד';
-$ec_lang['mphl_hgl_1']='Downstream HGL';
-$ec_lang['mphl_hgl_2']='Upstream HGL';
+$ec_lang['mphl_egl_1']='Downstream EGL';
+$ec_lang['mphl_egl_2']='Upstream EGL';
+$ec_lang['mphl_hgl_2']='Upstream HGL in pipe ' . $ec_lang['mpf_see_notes'];
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Manning Trapezoidal Channel';
 $ec_lang['mtc_main_title']='Free Online Manning Formula Trapezoidal Channel Calculator';

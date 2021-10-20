@@ -72,6 +72,8 @@ $ec_lang['dw_friction_factor']='Friction factor, f';
 $ec_lang['hw_main_menu']='Hazen-Williams Pipe Head Loss';
 $ec_lang['hw_main_title']='Free Online Hazen-Williams Pipe Head Loss Calculator';
 $ec_lang['hw_main_desc']='Hazen-Williams Pipe Head Loss at Given Diameter, Roughness, and Flow';
+$ec_lang['hw_hgl_1']='Downstream HGL';
+$ec_lang['hw_hgl_2']='Upstream HGL';
 $ec_lang['hw_roughness']='Hazen-Williams coefficient, C';
 // Manning Irregular
 $ec_lang['mi_menu']='Manning Irregular Channel';
@@ -138,10 +140,10 @@ $ec_lang['mphl_friction_slope']='Friction slope';
 $ec_lang['mphl_friction_loss']='Friction loss, H<sub>f</sub>';
 $ec_lang['mphl_junction_loss']='Junction loss, H<sub>m</sub>';
 $ec_lang['mphl_total_loss']='Total loss, H<sub>l</sub>';
-$ec_lang['mphl_hgl_1']='Downstream HGL';
-$ec_lang['mphl_hgl_2']='Upstream HGL ' . $ec_lang['mpf_see_notes'];
-$ec_lang['mphl_egl_2']='Upstream EGL ' . $ec_lang['mpf_see_notes'];
-$ec_lang['mphl_note_1']='<p>Notes:</p><dl><dt>It is necessary to check for inlet control conditions.</dt><dd>1. The upstream HGL cannot be lower than the upstream normal depth flow elevation (or lower than the pipe!).</dd><dd>2. The headwater of a culvert is better represented by the upstream EGL than the upstream HGL.</dd><dd>3. See <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">my 2-minute tutorial</a> for simple standard culvert headwater calculations using HY-8.</dd>';
+$ec_lang['mphl_egl_1']='Downstream EGL';
+$ec_lang['mphl_egl_2']='Upstream EGL';
+$ec_lang['mphl_hgl_2']='Upstream HGL in pipe ' . $ec_lang['mpf_see_notes'];
+$ec_lang['mphl_note_1']='<p>Notes:</p><dl><dt>For an open inlet (culvert) condition, it is necessary to check for inlet control conditions.</dt><dd>1. The upstream HGL cannot be lower than the upstream normal depth flow elevation (or lower than the pipe!).</dd><dd>2. The headwater of a culvert is better represented by the upstream EGL than the upstream HGL.</dd><dd>3. See <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">my 2-minute tutorial</a> for simple standard culvert headwater calculations using HY-8.</dd>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Manning Trapezoidal Channel';
 $ec_lang['mtc_main_title']='Free Online Manning Formula Trapezoidal Channel Calculator';

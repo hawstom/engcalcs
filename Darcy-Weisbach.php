@@ -22,7 +22,7 @@ echoCalculatorForm(
 		Array('name' => 'e', 'type' => 'number', 'default' => '0.001', 'units' => Array('m','mm','ft','in'), 'label' => '<a href="https://nepis.epa.gov/Exe/ZyNET.exe/P1007WWU.txt?ZyActionD=ZyDocument&Client=EPA&Index=2000%20Thru%202005&SearchMethod=1&TocRestrict=n&&IntQFieldOp=0&ExtQFieldOp=0&XmlQuery=&File=D%3A%5CZYFILES%5CINDEX%20DATA%5C00THRU05%5CTXT%5C00000024%5CP1007WWU.txt&User=ANONYMOUS&Password=anonymous&SortMethod=h%7C-&MaximumDocuments=1&FuzzyDegree=0&ImageQuality=r75g8/r75g8/x150y150g16/i425&Display=hpfr&DefSeekPage=x&SearchBack=ZyActionL&Back=ZyActionS&BackDesc=Results%20page&MaximumPages=1&ZyEntry=31">'.$ec_lang['dw_roughness'].'</a>'),
 		Array('name' => 'v', 'type' => 'number', 'default' => '1e-6', 'units' => NULL, 'label' => '<a href="https://www.engineersedge.com/fluid_flow/kinematic-viscosity-table.htm">'.$ec_lang['dw_kinematic_viscosity'].'</a>'),
 		Array( 'name' => 'km', 'type' => 'number', 'default' => '10', 'units' => NULL, 'label' => '<a href="https://www.engineeringtoolbox.com/minor-loss-coefficients-pipes-d_626.html">'.$ec_lang['mphl_total_junction_k'].'</a>'),
-		Array('name' => 'hgl1', 'type' => 'number', 'default' => '0', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mphl_hgl_1']),
+		Array('name' => 'egl1', 'type' => 'number', 'default' => '0', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mphl_egl_1']),
 	),
 	//Results
 	Array(
@@ -40,7 +40,9 @@ echoCalculatorForm(
 		Array('name' => 'hf', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mphl_friction_loss']),
 		Array('name' => 'hm', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mphl_junction_loss']),
 		Array('name' => 'hl', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mphl_total_loss']),
-		Array('name' => 'hgl2', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mphl_hgl_2']),
+		Array('name' => 'hgl1', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['hw_hgl_1']),
+		Array('name' => 'egl2', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mphl_egl_2']),
+		Array('name' => 'hgl2', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['hw_hgl_2']),
 	)
 );
 
@@ -63,7 +65,7 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.readFormInput(objForm, 'e', hasUnits = true);
 	this.readFormInput(objForm, 'v', hasUnits = false);
 	this.readFormInput(objForm, 'km', hasUnits = false);
-	this.readFormInput(objForm, 'hgl1', hasUnits = true);
+	this.readFormInput(objForm, 'egl1', hasUnits = true);
 	this.var.a = (Math.PI * Math.pow(this.var.d, 2) / 4);
 	this.var.pw = Math.PI * this.var.d;
 	this.var.rh = this.var.d / 4;
@@ -97,10 +99,12 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.var.sf = this.var.f * Math.pow(this.var.u, 2) / (2 * this.var.d * this.var.g);
 	this.var.tau = this.var.rh * this.var.sf;
 	this.var.hv = Math.pow(this.var.u,2) / (2 * this.var.g);
+	this.var.hgl1 = +this.var.egl1 - +this.var.hv;
 	this.var.hf = this.var.sf * this.var.l;
 	this.var.hm = this.var.hv * this.var.km;
 	this.var.hl = +this.var.hf + +this.var.hm;
-	this.var.hgl2 = +this.var.hgl1 + +this.var.hl;
+	this.var.egl2 = +this.var.egl1 + +this.var.hl;
+	this.var.hgl2 = +this.var.egl2 - +this.var.hv;
 	this.writeFormResult(objForm, 'a', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'pw', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'rh', precision = 4, hasUnits = true);
@@ -116,6 +120,7 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.writeFormResult(objForm, 'hm', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'hl', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'hgl1', precision = 4, hasUnits = true);
+	this.writeFormResult(objForm, 'egl2', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'hgl2', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'p2', precision = 4, hasUnits = true);
 }

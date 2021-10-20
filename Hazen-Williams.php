@@ -21,7 +21,7 @@ echoCalculatorForm(
 		Array('name' => 'l', 'type' => 'number', 'default' => '1000', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mphl_pipe_length']),
 		Array('name' => 'c', 'type' => 'number', 'default' => '100', 'units' => NULL, 'label' => '<a href="https://www.engineeringtoolbox.com/hazen-williams-coefficients-d_798.html">'.$ec_lang['hw_roughness'].'</a>'),
 		Array( 'name' => 'km', 'type' => 'number', 'default' => '10', 'units' => NULL, 'label' => '<a href="https://www.engineeringtoolbox.com/minor-loss-coefficients-pipes-d_626.html">'.$ec_lang['mphl_total_junction_k'].'</a>'),
-		Array('name' => 'hgl1', 'type' => 'number', 'default' => '0', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mphl_hgl_1']),
+		Array('name' => 'egl1', 'type' => 'number', 'default' => '0', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mphl_egl_1']),
 	),
 	//Results
 	Array(
@@ -35,7 +35,9 @@ echoCalculatorForm(
 		Array('name' => 'hf', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mphl_friction_loss']),
 		Array('name' => 'hm', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mphl_junction_loss']),
 		Array('name' => 'hl', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mphl_total_loss']),
-		Array('name' => 'hgl2', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mphl_hgl_2']),
+		Array('name' => 'hgl1', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['hw_hgl_1']),
+		Array('name' => 'egl2', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mphl_egl_2']),
+		Array('name' => 'hgl2', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['hw_hgl_2']),
 	)
 );
 
@@ -58,7 +60,7 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.readFormInput(objForm, 'l', hasUnits = true);
 	this.readFormInput(objForm, 'c', hasUnits = false);
 	this.readFormInput(objForm, 'km', hasUnits = false);
-	this.readFormInput(objForm, 'hgl1', hasUnits = true);
+	this.readFormInput(objForm, 'egl1', hasUnits = true);
 	this.var.a = (Math.PI * Math.pow(this.var.d, 2) / 4);
 	this.var.pw = Math.PI * this.var.d;
 	this.var.rh = this.var.d / 4;
@@ -67,10 +69,12 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.var.sf = 7.8828 / Math.pow(this.var.d, 4.8704) * Math.pow(this.var.q / (this.var.khw * this.var.c), 1.852);
 	this.var.tau = this.var.rh * this.var.sf;
 	this.var.hv = Math.pow(this.var.v,2) / (2 * this.var.g);
+	this.var.hgl1 = +this.var.egl1 - +this.var.hv;
 	this.var.hf = this.var.sf * this.var.l;
 	this.var.hm = this.var.hv * this.var.km;
 	this.var.hl = +this.var.hf + +this.var.hm;
-	this.var.hgl2 = +this.var.hgl1 + +this.var.hl;
+	this.var.egl2 = +this.var.egl1 + +this.var.hl;
+	this.var.hgl2 = +this.var.egl2 - +this.var.hv;
 	this.writeFormResult(objForm, 'a', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'pw', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'rh', precision = 4, hasUnits = true);
@@ -82,6 +86,7 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.writeFormResult(objForm, 'hm', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'hl', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'hgl1', precision = 4, hasUnits = true);
+	this.writeFormResult(objForm, 'egl2', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'hgl2', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'p2', precision = 4, hasUnits = true);
 }
