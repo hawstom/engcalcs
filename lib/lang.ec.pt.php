@@ -122,7 +122,7 @@ $ec_lang['mpf_wetted_perimeter']='Perímetro molhado';
 $ec_lang['mpf_hydraulic_radius']='Raio hidráulico';
 $ec_lang['mpf_top_width']='Largura, L';
 $ec_lang['mpf_froude_number']='Número de Froude, F';
-$ec_lang['mpf_shear_stress']='Tensão cisalhante (força de tração), tau';
+$ec_lang['mpf_shear_stress']='Tensão cisalhante average (força de tração), tau';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Pérdida de pressão em uma tubería de acordo com Manning';
 $ec_lang['mphl_main_title']='Calculadora gratis em linha da pérdida de altura de pressão em uma tubería de acordo com Manning';

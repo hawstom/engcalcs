@@ -74,7 +74,7 @@ $ec_lang['mpf_wetted_perimeter']='ההיקף הרטוב';
 $ec_lang['mpf_hydraulic_radius']='רדיוס הידראולי';
 $ec_lang['mpf_top_width']='רוחב פני הנוזל';
 $ec_lang['mpf_froude_number']='מספר פראוד';
-$ec_lang['mpf_shear_stress']='מאמץ גזירה (כושר דחיפה)';
+$ec_lang['mpf_shear_stress']='Average shear stress (tractive force), tau';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Manning Pipe Head Loss';
 $ec_lang['mphl_main_title']='Free Online Manning Pipe Head Loss Calculator';

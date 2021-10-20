@@ -26,4 +26,4 @@ $ec_lang['mpf_wetted_perimeter']='Perimetrul secţiunii de curgere';
 $ec_lang['mpf_hydraulic_radius']='Raza hidraulică';
 $ec_lang['mpf_top_width']='Laţimea suprafeţei libere';
 $ec_lang['mpf_froude_number']='Numărul Froude';
-$ec_lang['mpf_shear_stress']='Efort tangenţial';
+$ec_lang['mpf_shear_stress']='Efort tangenţial promedio';

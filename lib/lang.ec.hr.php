@@ -20,4 +20,4 @@ $ec_lang['mpf_wetted_perimeter']='Omočeni opseg, O';
 $ec_lang['mpf_hydraulic_radius']='Hidraulički radijus, R';
 $ec_lang['mpf_top_width']='Najveća širina, T';
 $ec_lang['mpf_froude_number']='Froudeov broj, F';
-$ec_lang['mpf_shear_stress']='Posmično naprezanje (vučna sila), tau';
+$ec_lang['mpf_shear_stress']='Posmično naprezanje average (vučna sila), tau';

@@ -90,7 +90,7 @@ $ec_lang['mi_elevation']='Elev';
 $ec_lang['mi_d50in']='Lining<br />median<br />rock<br />size';
 $ec_lang['mi_n']='n<br />for seg-<br />ment';
 $ec_lang['mi_is_bank']='R<sub>h</sub>, Q<br />region<br />boundary<br />(Bank)';
-$ec_lang['mi_tau']='Shear<br />&tau;';
+$ec_lang['mi_tau']='Bot.<br />shear<br />&tau;'; //no
 $ec_lang['mi_t']='T';
 $ec_lang['mi_pw']='P<sub>w</sub>';
 $ec_lang['mi_a']='A';
@@ -126,7 +126,7 @@ $ec_lang['mpf_wetted_perimeter']='Wetted perimeter';
 $ec_lang['mpf_hydraulic_radius']='Hydraulic radius';
 $ec_lang['mpf_top_width']='Top width, T';
 $ec_lang['mpf_froude_number']='Froude number, F';
-$ec_lang['mpf_shear_stress']='Shear stress (tractive force), tau';
+$ec_lang['mpf_shear_stress']='Average shear stress (tractive force), tau';
 $ec_lang['mpf_note_1']='<p>Notes:</p><dl><dt>This is the flow and depth <em>inside</em> the pipe.</dt><dd>Getting the flow into the pipe may require significantly higher headwater depth. Add at least 1.5 times the velocity head to get the headwater depth or <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">see my 2-minute tutorial</a> for standard culvert headwater calculations using HY-8.</dd>';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Manning Pipe Head Loss';

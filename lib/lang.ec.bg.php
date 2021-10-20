@@ -96,7 +96,7 @@ $ec_lang['mi_d50_mc']='MC<br />Requ\'d.<br />D<sub>50</sub>'; //no
 $ec_lang['mi_d50_mra']='MRA<br />Requ\'d.<br />D<sub>50</sub>'; //no
 $ec_lang['mi_d50_searcy']='Searcy<br />Requ\'d.<br />D<sub>50</sub>'; //no
 $ec_lang['mi_hv']='H<sub>v</sub>'; //no
-$ec_lang['mi_tau']='Shear<br />&tau;'; //no
+$ec_lang['mi_tau']='Bot.<br />shear<br />&tau;'; //no
 $ec_lang['mi_a']='A'; //no
 $ec_lang['mi_pw']='P<sub>w</sub>'; //no
 $ec_lang['mi_rh']='R<sub>h</sub>'; //no
@@ -125,7 +125,7 @@ $ec_lang['mpf_wetted_perimeter']='Мокър периметър';
 $ec_lang['mpf_hydraulic_radius']='Хидравличен радиус'; 
 $ec_lang['mpf_top_width']='Горна ширина, T'; 
 $ec_lang['mpf_froude_number']='Число на Фруд, F'; 
-$ec_lang['mpf_shear_stress']='Срязващo напрежение (теглителна сила), tau'; 
+$ec_lang['mpf_shear_stress']='Срязващo напрежение average (теглителна сила), tau'; 
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Хидравлични Загуби в Напорен Тръбопровод по Манинг'; 
 $ec_lang['mphl_main_title']='Безплатен Онлайн Калкулатор: Хидравлични Загуби в Напорен Тръбопровод'; 

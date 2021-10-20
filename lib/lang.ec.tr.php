@@ -95,7 +95,7 @@ $ec_lang['mi_d50_mc']='MC<br />Requ\'d.<br />D<sub>50</sub>';
 $ec_lang['mi_d50_mra']='MRA<br />Requ\'d.<br />D<sub>50</sub>';
 $ec_lang['mi_d50_searcy']='Searcy<br />Requ\'d.<br />D<sub>50</sub>';
 $ec_lang['mi_hv']='H<sub>v</sub>';
-$ec_lang['mi_tau']='Shear<br />&tau;';
+$ec_lang['mi_tau']='Bot.<br />shear<br />&tau;'; //no
 $ec_lang['mi_a']='A';
 $ec_lang['mi_pw']='P<sub>w</sub>';
 $ec_lang['mi_rh']='R<sub>h</sub>';
@@ -125,7 +125,7 @@ $ec_lang['mpf_wetted_perimeter']='Islak Çevre';
 $ec_lang['mpf_hydraulic_radius']='Hidrolik Yariçap';
 $ec_lang['mpf_top_width']='Üst Genisligi, T';
 $ec_lang['mpf_froude_number']='Froude Sayısı, F';
-$ec_lang['mpf_shear_stress']='Kayma Gerilmesi, τ';
+$ec_lang['mpf_shear_stress']='Average Kayma Gerilmesi, τ';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Tam Akis Sartlarinda Yük Kaybi';
 $ec_lang['mphl_main_title']='Ücretsiz Tam Akis Sartlarinda Manning Yük Kaybi Formülü';

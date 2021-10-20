@@ -158,7 +158,7 @@ $ec_lang['mpf_wetted_perimeter']=ucfirst("$ec_lang[wettedperimeter]");
 $ec_lang['mpf_hydraulic_radius']=ucfirst("$ec_lang[radius] $ec_lang[hydraulic]");
 $ec_lang['mpf_top_width']=ucfirst("largeur supérieure, T");
 $ec_lang['mpf_froude_number']=ucfirst("numéro de Froude, F");
-$ec_lang['mpf_shear_stress']=ucfirst("force tractive, tau");
+$ec_lang['mpf_shear_stress']=ucfirst("Average tractive force, tau");
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']=ucfirst("$ec_lang[loss] $ec_lang[of] $ec_lang[head] en $ec_lang[pipe] $ec_lang[manning]");
 $ec_lang['mphl_main_title']=ucfirst("$ec_lang[calculator] $ec_lang[freeOnline] de la $ec_lang[loss] de $ec_lang[head] en un $ec_lang[pipe] $ec_lang[manning]");
