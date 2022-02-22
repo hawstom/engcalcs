@@ -107,7 +107,7 @@ $ec_lang['mi_notes_2_def']='El tamaño mediano D<sub>50</sub> según Strickler e
 $ec_lang['mpf_main_menu']='Gasto Manning en tuberías';
 $ec_lang['mpf_main_title']='Calculadora gratis en línea de la fórmula de Manning para gasto en tuberías';
 $ec_lang['mpf_main_desc']='Cálculo por Manning de caudal y velocidad de gasto en tuberías a pendiente y sección dado';
-$ec_lang['mpf_spreadheet_notice']='Estrene nuestra versión de esta calculadora en una hoja de cálculo';
+$ec_lang['mpf_spreadheet_notice']='Estrene la versión de esta calculadora en una hoja de cálculo';
 $ec_lang['mpf_spreadheet_link_download']='Descargar hoja de cálculo';
 $ec_lang['mpf_spreadheet_link_Google']='Abrir la versión en Google Sheets';
 $ec_lang['mpf_spreadheet_view_all']='Ver lista de hojas de cálculo';
@@ -155,9 +155,6 @@ $ec_lang['mtc_d50_z2']='Tamaño de roca requerido en el lado 2, D50, Maricopa Co
 $ec_lang['mtc_d50_mra']='Tamaño de roca requerido, D50, según Maynord, Ruff, y Abt (1989)';
 $ec_lang['mtc_d50_searcy']='Tamaño de roca requerido, D50, según Searcy (1967)';
 $ec_lang['mtc_d50_strickler']='Tamaño de roca del diseño <a target="_blank" href="javascript:alert(\'La fórmula Strickler relata n con D50 por un canal recto y limpio. Ajuste el valor n para que este tamaño de roca del diseño sea más grande que el tamaño de roca requerido en las siguientes lineas. Luego use tal roca en su diseño.\')">?</a> basado en la dada rugosidad Manning';
-// Robinson Rock Chute
-$ec_lang['rrc_main_menu']='Robinson Rock Chute Design';
-$ec_lang['rrc_main_desc']='Robinson Rock Chute Design Spreadsheet';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='Vertedero hidráulico sencillo';
 $ec_lang['ws_main_title']='Calculadora de gasto en un vertedero hidráulico sencillo';

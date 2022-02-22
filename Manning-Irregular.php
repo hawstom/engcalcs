@@ -166,7 +166,7 @@ EngCalcs.pageCalculator = function (objForm) {
 		d1=Math.max(ws-elev1,0);
 		// Output
 		// Point
-		// Shear stress depends on y, so we report it for a point and don't store it with the section.
+		// Bottom shear stress depends on y, so we report it for a point and don't store it with the section.
 		tau = d1 * this.Manning.s0;
 		document.getElementsByName('tau')[iStation].innerHTML = (tau * objForm['tauu'].value).toFixed(2);
 		// Do the calcs and output if this is not the first row

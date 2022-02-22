@@ -10,13 +10,7 @@ function echoHelpWanted(){
 if (basename($_SERVER['PHP_SELF']) == "Manning-Pipe-Flow.php") {
 ?>
 <p>   
-	<?=$ec_lang['mpf_spreadheet_notice']?>
-	&ensp;
-	<a href="spreadsheet/<?=basename($_SERVER['PHP_SELF'], '.php') . '.xlsx';?>"><?=$ec_lang['mpf_spreadheet_link_download']?></a>
-	&ensp;
-	<a href="spreadsheet/<?=basename($_SERVER['PHP_SELF'], '.php') . '.php';?>"><?=$ec_lang['mpf_spreadheet_link_Google']?></a>
-	&ensp;
-	<a href="http://www.hawsedc.com/engcalcs/SpreadsheetLibrary.php"><?=$ec_lang['mpf_spreadheet_view_all']?></a>
+	<a href="spreadsheet/<?=basename($_SERVER['PHP_SELF'], '.php') . '.php';?>"><?=$ec_lang['mpf_spreadheet_notice']?></a>
 </p>
 <?php
 }

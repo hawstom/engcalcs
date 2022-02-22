@@ -109,10 +109,6 @@ $ec_lang['mi_notes_2_def']='The Strickler D<sub>50</sub> is the size (for a stra
 $ec_lang['mpf_main_menu']='Изчисления на Тръбопроводи по Манинг'; 
 $ec_lang['mpf_main_title']='Безплатен Онлайн Калкулатор за Изчлиснения на Тръбопроводи по Манинг ';  
 $ec_lang['mpf_main_desc']='Формула на Манинг за Равномерно Движение в Тръбопровод при Зададени Наклон И Воден Стълб'; 
-$ec_lang['mpf_spreadheet_notice']='Check out our spreadsheet version of this calculator';
-$ec_lang['mpf_spreadheet_link_download']='Download Spreadsheet';
-$ec_lang['mpf_spreadheet_link_Google']='Open Google Sheets version';
-$ec_lang['mpf_spreadheet_view_all']='View All Spreadsheets';
 $ec_lang['mpf_pipe_diameter']='Диаметър на тръбата, d<sub>0</sub>'; 
 $ec_lang['mpf_manningRoughness']='Грапавина по Манинг, n'; 
 $ec_lang['mpf_friction_slope']='Хидравличен наклон (често <a target="_blank" href="../pressureslope.php">?</a> равен на наклона на тръбата), J'; 
