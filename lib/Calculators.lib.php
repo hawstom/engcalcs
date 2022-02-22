@@ -9,8 +9,8 @@ function echoHelpWanted(){
 <?php
 if (basename($_SERVER['PHP_SELF']) == "Manning-Pipe-Flow.php") {
 ?>
-<p>   
-	<a href="spreadsheet/<?=basename($_SERVER['PHP_SELF'], '.php') . '.php';?>"><?=$ec_lang['mpf_spreadheet_notice']?></a>
+<p class="collapse show d-print-none" id="spreadsheetNotice">   
+	<a href="spreadsheet/<?=basename($_SERVER['PHP_SELF'], '.php') . '.php';?>"><?=$ec_lang['mpf_spreadheet_notice']?></a> <a data-toggle="collapse" href="#spreadsheetNotice" aria-expanded="true" aria-controls="spreadsheetNotice"><?=$ec_lang['view_hide_line']?></a>
 </p>
 <?php
 }
