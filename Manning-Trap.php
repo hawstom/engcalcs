@@ -52,7 +52,7 @@ echoCalculatorForm(
 <div id="sketch"></div>
 
 <?php echoFeedback(); ?>
-<script src="<?=BASE_URL?>/engcalcs/lib/Manning.lib.js?v=4"></script>
+<script src="<?=BASE_URL?>/engcalcs/lib/Manning.lib.js?v=5"></script>
 <script>
 EngCalcs.pageCalculator = function(objForm) {
 	'use strict';
