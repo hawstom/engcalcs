@@ -85,7 +85,7 @@ EngCalcs.pageCalculator = function(objForm) {
 		this.var.n_in = this.var.n_strickler; // Initial guess for n (Strickler)
 	}
 	this.var.iterate_p = true; // Always calculate once.
-	while (this.var.iterate_p === true && this.var.i < 10) {
+	while (this.var.iterate_p === true && this.var.i < 100) {
 		this.var.i++;
 		this.var.a = this.var.y * (this.var.b + (+this.var.z1 + +this.var.z2) * this.var.y / 2);
 		this.var.pw = this.var.b + this.var.y * (Math.sqrt(1 + Math.pow(this.var.z1, 2)) + Math.sqrt(1 + Math.pow(this.var.z2, 2)));
@@ -142,7 +142,7 @@ EngCalcs.pageCalculator = function(objForm) {
 		}
 		if (this.var.iterate_p === true) {
 			this.var.iterate_p = (Math.abs(this.var.d50_safety * this.var.d50_calc / this.var.d50_in - 1) > this.var.max_err);
-			this.var.d50_in = (this.var.d50_in + 3 * this.var.d50_safety * this.var.d50_calc) / 4; // Move d50_in 75% of the way to d50calc for a cheap way to iterate.
+			this.var.d50_in = (this.var.d50_in + 5 * this.var.d50_safety * this.var.d50_calc) / 6; // Move d50_in 75% of the way to d50calc for a cheap way to iterate.
 		}
 	}
 	if (this.var.n_radio !== '') {
