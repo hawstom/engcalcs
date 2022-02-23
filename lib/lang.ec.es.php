@@ -149,6 +149,7 @@ $ec_lang['mtc_channel_slope']='Pendiente de canal (vertical / horizontal)';
 $ec_lang['mtc_flow_depth']='Profundidad de gasto';
 $ec_lang['mtc_bend_angle']='Angulo de la curva<a href="/riprap-bend-angle.png" title="Haz clic para ver imagen">?</a> (para el tamaño de roca)';
 $ec_lang['mtc_sgrock']='Gravedad específica de la roca (2.65)';
+$ec_lang['mtc_d50_in']='Tamaño de roca';
 $ec_lang['mtc_d50_bottom']='Tamaño de roca requerido en el fondo, D50, Maricopa County <a href="javascript:alert(\'Cuando S0 < 2% según Isbash (1936) and Maricopa County, Arizona, US. Cuando S >= 2% según Robinson Rock Chute \')">?</a>';
 $ec_lang['mtc_d50_z1']='Tamaño de roca requerido en el lado 1, D50, Maricopa County <a href="javascript:alert(\'Cuando S0 < 2% según Isbash (1936) and Maricopa County, Arizona, US. Cuando S >= 2% según Robinson Rock Chute \')">?</a>';
 $ec_lang['mtc_d50_z2']='Tamaño de roca requerido en el lado 2, D50, Maricopa County <a href="javascript:alert(\'Cuando S0 < 2% según Isbash (1936) and Maricopa County, Arizona, US. Cuando S >= 2% según Robinson Rock Chute \')">?</a>';
