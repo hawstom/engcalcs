@@ -23,7 +23,11 @@ echoCalculatorForm(
 		Array('name' => 'y', 'type' => 'number', 'default' => '1', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mtc_flow_depth']),
 		Array('name' => 'beta', 'type' => 'number', 'default' => '0', 'units' => NULL, 'label' => $ec_lang['mtc_bend_angle']),
 		Array('name' => 'sgrock', 'type' => 'number', 'default' => '2.65', 'units' => NULL, 'label' => $ec_lang['mtc_sgrock']),
-		Array('name' => 'd50_in', 'type' => 'number', 'default' => '0.1', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mtc_d50_in'].'<br /> <input type="radio" name="d50_radio" id="d50_radio_isbash" value="isbash" onchange="EngCalcs.submitForm()" /><label for="d50_radio_isbash">Isbash</label> <input type="radio" name="d50_radio" id="d50_radio_maynord" value="maynord" onchange="EngCalcs.submitForm()" /><label for="d50_radio_maynord">Maynord</label> <input type="radio" name="d50_radio" id="d50_radio_searcy" value="searcy" onchange="EngCalcs.submitForm()" /><label for="d50_radio_searcy">Searcy</label><br />* <input type="number" name="d50_safety" id="d50_safety" value="1.25" oninput="EngCalcs.submitForm()" />'),
+		Array(
+			'name' => 'd50_in', 
+			'type' => 'number', 'default' => '0.1', 
+			'units' => Array('m', 'mm', 'ft', 'in'), 
+			'label' => $ec_lang['mtc_d50_in'] . '<br /> <input type="radio" name="d50_radio" id="d50_radio_isbash" value="isbash" onchange="EngCalcs.submitForm()" /><label for="d50_radio_isbash">Isbash</label> <input type="radio" name="d50_radio" id="d50_radio_maynord" value="maynord" onchange="EngCalcs.submitForm()" /><label for="d50_radio_maynord">Maynord</label> <input type="radio" name="d50_radio" id="d50_radio_searcy" value="searcy" onchange="EngCalcs.submitForm()" /><label for="d50_radio_searcy">Searcy</label><br />*' . inputHtml('d50_safety', 'number', '1.25', '')),
 	),
 	//Results
 	Array(
@@ -118,7 +122,7 @@ EngCalcs.pageCalculator = function(objForm) {
 				this.var.n_in = this.var.n_strickler;
 				break;
 			default:
-				this.var.iterate_p === false ; // n_in is manual. No need to iterate.
+				this.var.iterate_p = false ; // n_in is manual. No need to iterate.
 		}
 		this.var.d50_mra = 0.031 * Math.pow(this.var.v, 2.5) / (Math.pow(this.var.sgrock - 1, 0.25) * Math.pow(this.var.y, 0.25) * ((this.var.beta <= 30) ? 1 : 1.5));
 		this.var.d50_searcy = 0.022 * Math.pow(this.var.v, 2);
@@ -138,7 +142,7 @@ EngCalcs.pageCalculator = function(objForm) {
 				break;
 			default:
 				this.var.d50_calc = this.var.d50_in;
-				this.var.iterate_p === false ; // No need to iterate if d50_in is manual.
+				this.var.iterate_p = false ; // d50_in is manual. No need to iterate.
 		}
 		if (this.var.iterate_p === true) {
 			this.var.iterate_p = (Math.abs(this.var.d50_safety * this.var.d50_calc / this.var.d50_in - 1) > this.var.max_err);
