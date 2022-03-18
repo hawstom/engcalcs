@@ -162,6 +162,7 @@ $ec_lang['mtc_d50_z1']='Required side slope 1 angular rock size, D50 (Isbash & M
 $ec_lang['mtc_d50_z2']='Required side slope 2 angular rock size, D50 (Isbash & MC) <a href="javascript:alert(\'Per Isbash (1936) and Maricopa County, Arizona, US.\')">?</a>';
 $ec_lang['mtc_d50_mra']='Required angular rock size, D50 (Maynord, Ruff, and Abt 1989)';
 $ec_lang['mtc_d50_searcy']='Required angular rock size, D50 (Searcy 1967)';
+$ec_lang['mtc_note_1']='<p>Notes:</p><dl><dt>Automated rock size and roughness design iteration</dt><dd>Choose a roughness radio button (BB recommended), and a rock size radio button (Isbash recommended). Enter a design rock size safety factor. Every time you change any input value, the following iteration cycle happens until the design rock size and the required rock size are very close: 1. Roughness is calculated from design rock size. 2. The requested roughness calculation is copied to input roughness. 3. Channel flow and required rock size are calculated. 4. Design rock size is adjusted. 5. Repeat.</dd>';
 // Robinson Rock Chute
 $ec_lang['rrc_main_menu']='Robinson Rock Chute';
 $ec_lang['rrc_main_desc']='Robinson Rock Chute Design Spreadsheet';
