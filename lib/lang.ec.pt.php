@@ -150,7 +150,7 @@ $ec_lang['mtc_side_slope_1']='Pendiente de lado 1 (horizontal / vertical)';
 $ec_lang['mtc_side_slope_2']='Pendiente de lado 2 (horizontal / vertical)';
 $ec_lang['mtc_channel_slope']='Pendiente de canal (vertical / horizontal)';
 $ec_lang['mtc_flow_depth']='Profundidade de caudal';
-$ec_lang['mtc_bend_angle']='Angulo da curva<a target="_blank" href="/riprap-bend-angle.png" title="Haz clic para ver imagen">?</a> (para o tamaño de roca)';
+$ec_lang['mtc_bend_angle']='Angulo da curva<a target="_blank" href="riprap-bend-angle.png" title="Haz clic para ver imagen">?</a> (para o tamaño de roca)';
 $ec_lang['mtc_sgrock']='Gravedade específica da roca (2.65)';
 $ec_lang['mtc_d50_in']='Tamanho de roca';
 $ec_lang['mtc_d50_strickler']='Tamanho de roca do diseño <a target="_blank" href="javascript:alert(\'La fórmula Strickler relata n com D50 por um canal recto e limpio. Ajuste o valor n para que este tamaño de roca do diseño sea más grande que o tamaño de roca requerido em as siguientes linhas. Depois use tal roca em su diseño.\')">?</a> basado na dada rugosidade Manning';

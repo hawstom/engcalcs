@@ -145,7 +145,7 @@ $ec_lang['mtc_side_slope_1']='Yan Eğim 1 (yatay / dikey)';
 $ec_lang['mtc_side_slope_2']='Yan Eğim 2 (yatay / dikey)';
 $ec_lang['mtc_channel_slope']='Kanal Eğimi';
 $ec_lang['mtc_flow_depth']='Akış Derinliği';
-$ec_lang['mtc_bend_angle']='Bend Angle<a target="_blank" href="/riprap-bend-angle.png" title="Click for image">?</a> (for riprap sizing)';
+$ec_lang['mtc_bend_angle']='Bend Angle<a target="_blank" href="riprap-bend-angle.png" title="Click for image">?</a> (for riprap sizing)';
 $ec_lang['mtc_sgrock']='Stone specific gravity (2.65)';
 $ec_lang['mtc_d50_strickler']='<span title="per Strickler (Adjust n so this equals your design lining size n değerini ayarlayın böylece sizin tasarım örtü boyuna eşit olsun)">Implied riprap size based on n n’ye bağlı uygulanan örtü boyutu</span>';
 $ec_lang['mtc_d50_bottom']='<span title="per Isbash (1936), Robinson, and Maricopa County, Arizona, US">Required bottom angular riprap size Gerekli açısal taban örtüsü boyutu, D50, Maricopa County</span>';

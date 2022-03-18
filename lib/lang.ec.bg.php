@@ -145,7 +145,7 @@ $ec_lang['mtc_side_slope_1']='Страничен откос 1 (хориз./ве�
 $ec_lang['mtc_side_slope_2']='Страничен откос 2 (хориз./верт.)'; 
 $ec_lang['mtc_channel_slope']='Наклон на канала'; 
 $ec_lang['mtc_flow_depth']='Воден стълб'; 
-$ec_lang['mtc_bend_angle']='Bend Angle<a href="/riprap-bend-angle.png" title="Click for image">?</a> (for riprap sizing)'; //No need
+$ec_lang['mtc_bend_angle']='Bend Angle<a href="riprap-bend-angle.png" title="Click for image">?</a> (for riprap sizing)'; //No need
 $ec_lang['mtc_sgrock']='Stone specific gravity (2.65)'; //No need
 $ec_lang['mtc_d50_strickler']='Implied design <a href="javascript:alert(\'The Strickler formula relates n and D50 for a straight and clean channel. Adjust n so this implied design size is larger than the required erosion protection size. Then line your channel as implied.\')">?</a> riprap size based on n';
 $ec_lang['mtc_d50_bottom']='Required bottom angular riprap size, D50, Maricopa County <a href="javascript:alert(\'For S0 < 2% per Isbash (1936) and Maricopa County, Arizona, US. For S >= 2% per Robinson Rock Chute \')">?</a>';

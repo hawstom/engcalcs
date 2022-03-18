@@ -66,7 +66,7 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.var.c = 1.0;
 	this.var.alpha_blodgett = 0.319;
 	this.var.alpha_bathurst = 1.0;
-	this.var.max_err = .001;
+	this.var.max_err = 0.00001;
 	this.var.i = 0;
 	// Read and convert form inputs to this.var.___ as SI units
 	this.readFormInput(objForm, 'b', hasUnits = true);
@@ -147,6 +147,8 @@ EngCalcs.pageCalculator = function(objForm) {
 		if (this.var.iterate_p === true) {
 			this.var.iterate_p = (Math.abs(this.var.d50_safety * this.var.d50_calc / this.var.d50_in - 1) > this.var.max_err);
 			this.var.d50_in = (this.var.d50_in + 5 * this.var.d50_safety * this.var.d50_calc) / 6; // Move d50_in 75% of the way to d50calc for a cheap way to iterate.
+		} else {
+			this.var.d50_in = this.var.d50_safety * this.var.d50_calc; // Move d50_in 75% of the way to d50calc for a cheap way to 
 		}
 	}
 	if (this.var.n_radio !== '') {
@@ -155,6 +157,7 @@ EngCalcs.pageCalculator = function(objForm) {
 	if (this.var.d50_radio !== '') {
 		objForm.d50_in.value = (this.var.d50_in * objForm.d50_inu.value).toFixed(4);  
 	}
+	this.var.froude = this.var.i;
 	this.writeFormResult(objForm, 'a', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'pw', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'rh', precision = 4, hasUnits = true);
