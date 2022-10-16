@@ -31,8 +31,13 @@ function echoCalculatorFormAppend() {
 	<table id="CalcsTable">
 		<thead>
 			<tr>
-				<th colspan="17"><?=$ec_lang['mi_xSecPoints']?>
-				<a href="javascript:EngCalcs.addSingleCalcRow()">+</a>/<a href="javascript:EngCalcs.deleteSingleCalcRow()">-</a></th>
+				<th colspan="17">
+					<?=$ec_lang['mi_xSecPoints']?>
+					<a href="javascript:EngCalcs.addSingleCalcRow()">+</a>/<a href="javascript:EngCalcs.deleteSingleCalcRow()">-</a>
+					<button type="button" id="clipboard_copy"><?=$ec_lang['clipboard_copy']?></button>
+					<button type="button" id="clipboard_paste"><?=$ec_lang['clipboard_paste']?></button>
+					(Copy/paste buttons under construction. For testing only.)
+				</th>
 			</tr>
 			<tr>
 				<th colspan="5"><?=$ec_lang['mi_groupPoint']?></th>
@@ -150,7 +155,7 @@ EngCalcs.pageCalculator = function (objForm) {
 	d50_mc,
 	d50_mra;
 	this.Manning.ac = 0;
-	this.Manning.pwc = 0
+	this.Manning.pwc = 0;
 	this.Manning.ncompterm617c = 0;
 	this.Manning.ncompterm618c = 0;
 	this.Manning.qc = 0;
