@@ -155,7 +155,7 @@ EngCalcs.pageCalculator = function (objForm) {
 	d50_mc,
 	d50_mra;
 	this.Manning.ac = 0;
-	this.Manning.pwc = 0
+	this.Manning.pwc = 0;
 	this.Manning.ncompterm617c = 0;
 	this.Manning.ncompterm618c = 0;
 	this.Manning.qc = 0;
