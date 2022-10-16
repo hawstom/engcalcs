@@ -63,6 +63,8 @@ $(document).ready(function() {
 	$('#set_units_mm').click(function() {EngCalcs.setUnits('mm')});
 	$('#set_units_ft').click(function() {EngCalcs.setUnits('ft')});
 	$('#set_units_in').click(function() {EngCalcs.setUnits('in')});
+	$('#clipboard_copy').click(function() {EngCalcs.clipboardCopy()});
+	$('#clipboard_paste').click(function() {EngCalcs.clipboardPaste()});
 	$('#btn-printable').click(function() {$('.d-print-none').hide()});
 });
 </script>
