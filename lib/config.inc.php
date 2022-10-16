@@ -49,7 +49,7 @@ switch ($_SERVER['SERVER_NAME'])
         $debugmode=TRUE;
         break;    
     default :
-        $baseurl = 'http://www.hawsedc.com';
+        $baseurl = 'https://www.hawsedc.com';
         $debugmode=FALSE;
         break;
 }
