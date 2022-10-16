@@ -233,6 +233,7 @@ EngCalcs.pageCalculator = function (objForm) {
 		d0=d1;
 	}
 	document.getElementById('q_617').innerHTML = (this.Manning.q617c * objForm['q_617u'].value).toFixed(2);
+	window.navigator.clipboard.writeText(this.Manning.q617c);
 
 	// Sketch
 	var
