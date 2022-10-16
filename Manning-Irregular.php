@@ -293,7 +293,6 @@ EngCalcs.pageCalculator = function (objForm) {
 		+ 'Sorry, your browser does not support inline SVG.' 
 		+ '</svg>';
 
-	this.adjustInputWidth(objForm);
 };
 
 EngCalcs.pageCalculatorInitialize = function () {
