@@ -7,9 +7,12 @@
  * 
  * This file loads all the other required files.
  *
+ * Constants:
+ * NAME                        WHERE DEFINED         DESCRIPTION
+ * DEBUG_MODE                  config.inc.php        TRUE or FALSE to show validator links
+ * 
  * Global variables:
  * NAME                        WHERE DEFINED         DESCRIPTION
- * $debugmode                  This file             TRUE or FALSE to show validator links
  * $basedirectory              This file             Server directory of application root
  * $baseurl                    This file             URL of application root
  * $clanguage                  Session.lib.php       User language

@@ -26,34 +26,33 @@ switch ($_SERVER['SERVER_NAME'])
 {
     case 'hawsedc' :
         $baseurl = 'http://hawsedc';
-        $debugmode=TRUE;
+		define('DEBUG_MODE', true);
         break;
     case 'cnm' :
         $baseurl = 'http://cnm/public_html/hawsedc';
-        $debugmode=TRUE;
+		define('DEBUG_MODE', true);
         break;
     case 'hawsedcm' :
         $baseurl = 'http://hawsedcm';
-        $debugmode=TRUE;
+		define('DEBUG_MODE', true);
         break;
     case 'cnmm' :
         $baseurl = 'http://cnmm';
-        $debugmode=TRUE;
+		define('DEBUG_MODE', true);
         break;
     case 'dev.hawsedc.com':
         $baseurl = 'http://dev.hawsedc.com';
-        $debugmode=TRUE;
+		define('DEBUG_MODE', true);
         break;
     case 'localhost' :
         $baseurl = 'http://localhost/constructionnotesmanager.com/public_html/hawsedc';
-        $debugmode=TRUE;
+		define('DEBUG_MODE', true);
         break;    
     default :
         $baseurl = 'https://www.hawsedc.com';
-        $debugmode=FALSE;
+		define('DEBUG_MODE', false);
         break;
 }
 
 define('BASE_DIRECTORY', $basedirectory);
-define('DEBUG_MODE', $debugmode);
 define('BASE_URL', $baseurl);

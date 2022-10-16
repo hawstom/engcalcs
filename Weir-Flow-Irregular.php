@@ -136,7 +136,7 @@ EngCalcs.pageAddCalcRow = function () {
     this.addWeirStation(station,elevation);
 };
 
-EngCalcs.csvSingletonsCount = 2;
+EngCalcs.csvSingletonsCount = 4;
 EngCalcs.csvColumnsCount = 2;
 
 <!--

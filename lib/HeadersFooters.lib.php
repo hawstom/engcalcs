@@ -70,7 +70,7 @@ function echoFooter($type) {
 echoMenu("main");
 ?>
 <hr />
-<?php if ($GLOBALS['debugmode'] == TRUE) : ?>
+<?php if (DEBUG_MODE === TRUE) : ?>
 	<p>
 		<a href="http://validator.w3.org/check/referer">
 			<img
