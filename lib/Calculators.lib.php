@@ -56,7 +56,7 @@ function echoCalculatorForm($arrayInputs, $arrayResults, $flagFormAppend = false
 <script>
 EngCalcs.unitSets = {};
 <?php foreach ($GLOBALS['ec_unit_sets'] as $key => $set) : ?>
-EngCalcs.unitSets['<?=$key?>'] = ['<?=implode($set, "', '")?>'];
+EngCalcs.unitSets['<?=$key?>'] = ['<?=implode("', '", $set)?>'];
 <?php endforeach ; ?>
 $(document).ready(function() {
 	$('#set_units_m').click(function() {EngCalcs.setUnits('m')});

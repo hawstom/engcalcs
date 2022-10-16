@@ -148,7 +148,7 @@ function ec_title($sentence) {
         //print_r($language_settings);
         if (!$key or !in_array($word, $language_settings['TITLE_WORDS'])) $words[$key] = ucwords($word);
     }
-    return implode(' ', $words);
+    return implode($words, ' ');
 }
 
 function compare_langs ($baseLang, $secondLang) {
