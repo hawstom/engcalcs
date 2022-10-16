@@ -32,7 +32,9 @@ function echoCalculatorFormAppend() {
             <tr>
                 <th colspan="5"><?=$ec_lang['wi_weirPoints']?>
                     <a href="javascript:EngCalcs.addSingleCalcRow()">+</a>/<a href="javascript:EngCalcs.deleteSingleCalcRow()">-</a>
-                </th>
+ 					<button type="button" id="clipboard_copy"><?=$ec_lang['clipboard_copy']?></button>
+					<button type="button" id="clipboard_paste"><?=$ec_lang['clipboard_paste']?></button>
+               </th>
             </tr>
             <tr>
                 <th><?=$ec_lang['wi_station']?></th>
@@ -133,6 +135,9 @@ EngCalcs.pageAddCalcRow = function () {
 	}
     this.addWeirStation(station,elevation);
 };
+
+EngCalcs.csvSingletonsCount = 2;
+EngCalcs.csvColumnsCount = 2;
 
 <!--
 <?php
