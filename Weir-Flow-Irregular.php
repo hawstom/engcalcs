@@ -27,13 +27,11 @@ function echoCalculatorFormAppend() {
         global $ec_units, $ec_lang;
         $indent_string = "\t\t\t\t\t";
 ?>
-    <table id="CalcsTable">
+    <table id="CalcsTable" style='float: left;'>
         <thead>
             <tr>
                 <th colspan="5"><?=$ec_lang['wi_weirPoints']?>
-                    <a href="javascript:EngCalcs.addSingleCalcRow()">+</a>/<a href="javascript:EngCalcs.deleteSingleCalcRow()">-</a>
- 					<button type="button" id="clipboard_copy"><?=$ec_lang['clipboard_copy']?></button>
-					<button type="button" id="clipboard_paste"><?=$ec_lang['clipboard_paste']?></button>
+                    <a href="javascript:EngCalcs.addSingleCalcRow()">+</a>/<a href="javascript:EngCalcs.deleteSingleCalcRow()">-</a> <?=$ec_lang['points_data_help']?>
                </th>
             </tr>
             <tr>
@@ -47,6 +45,15 @@ function echoCalculatorFormAppend() {
         <tbody id="CalcsBody">
         </tbody>
     </table>
+	<div style='float:left;'>
+		<p><?=$ec_lang['points_data_title']?></p>
+		<p>
+			<button type="button" id="points_data_copy"><?=$ec_lang['points_data_copy']?></button>
+			<button type="button" id="points_data_paste"><?=$ec_lang['points_data_paste']?></button>
+		</p>
+		<textarea id='points_data'></textarea>
+	</div>
+	<div style='clear: both;'></div>
 <?php
 }
 ?>
@@ -137,7 +144,8 @@ EngCalcs.pageAddCalcRow = function () {
 };
 
 EngCalcs.csvSingletonsCount = 4;
-EngCalcs.csvColumnsCount = 2;
+EngCalcs.csvColumnsFirstRowCount = 2;
+EngCalcs.csvColumnsOtherRowsCount = 2;
 
 <!--
 <?php

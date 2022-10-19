@@ -28,15 +28,12 @@ function echoCalculatorFormAppend() {
 		global $ec_units, $ec_lang;
 		$indent_string = "\t\t\t\t\t";
 ?>
-	<table id="CalcsTable">
+	<table id="CalcsTable" style='float: left;'>
 		<thead>
 			<tr>
 				<th colspan="17">
 					<?=$ec_lang['mi_xSecPoints']?>
-					<a href="javascript:EngCalcs.addSingleCalcRow()">+</a>/<a href="javascript:EngCalcs.deleteSingleCalcRow()">-</a>
-					<button type="button" id="clipboard_copy"><?=$ec_lang['clipboard_copy']?></button>
-					<button type="button" id="clipboard_paste"><?=$ec_lang['clipboard_paste']?></button>
-					(Copy/paste buttons under construction. For testing only.)
+					<a href="javascript:EngCalcs.addSingleCalcRow()">+</a>/<a href="javascript:EngCalcs.deleteSingleCalcRow()">-</a> <?=$ec_lang['points_data_help']?>
 				</th>
 			</tr>
 			<tr>
@@ -112,7 +109,15 @@ function echoCalculatorFormAppend() {
 		<tbody id="CalcsBody">
 		</tbody>
 	</table>
+	<div style='float:left;'>
+		<p><?=$ec_lang['points_data_title']?></p>
+		<p>
+			<button type="button" id="points_data_copy"><?=$ec_lang['points_data_copy']?></button>
+			<button type="button" id="points_data_paste"><?=$ec_lang['points_data_paste']?></button>
+		</p>
+		<textarea id='points_data'></textarea>
 	</div>
+	<div style='clear: both;'></div>
 
 <?php
 }

@@ -63,8 +63,8 @@ $(document).ready(function() {
 	$('#set_units_mm').click(function() {EngCalcs.setUnits('mm')});
 	$('#set_units_ft').click(function() {EngCalcs.setUnits('ft')});
 	$('#set_units_in').click(function() {EngCalcs.setUnits('in')});
-	$('#clipboard_copy').click(function() {EngCalcs.clipboardCopy()});
-	$('#clipboard_paste').click(function() {EngCalcs.clipboardPaste()});
+	$('#points_data_copy').click(function() {EngCalcs.pointsDataCopy()});
+	$('#points_data_paste').click(function() {EngCalcs.pointsDataPaste()});
 	$('#btn-printable').click(function() {$('.d-print-none').hide()});
 });
 </script>
