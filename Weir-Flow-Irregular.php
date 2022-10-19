@@ -45,7 +45,7 @@ function echoCalculatorFormAppend() {
         <tbody id="CalcsBody">
         </tbody>
     </table>
-	<div style='float:left;'>
+	<div class='d-print-none' style='float:left;'>
 		<p>
 			<?=$ec_lang['points_data_title']?>
 			<br />
