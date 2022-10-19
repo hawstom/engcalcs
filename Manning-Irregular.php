@@ -442,9 +442,9 @@ EngCalcs.pageAddCalcRow = function () {
 	this.addManningIrregularStation(station, elevation, d50in, n, isBank);
 };
 
-EngCalcs.csvSingletonsCount = 4;
-EngCalcs.csvColumnsFirstRowCount = 2;
-EngCalcs.csvColumnsOtherRowsCount = 4;
+EngCalcs.dataSingletonsCount = 4;
+EngCalcs.dataColumnsFirstRowCount = 2;
+EngCalcs.dataColumnsOtherRowsCount = 4;
 
 <?php
 echoCookieScript ();
