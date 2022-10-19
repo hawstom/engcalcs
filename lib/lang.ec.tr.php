@@ -162,8 +162,8 @@ $ec_lang['ws_main_title']='Ücretsiz Basit Savaklar için Debi Hesabı Broad-cre
 $ec_lang['ws_main_desc']='Basit Savaklar için Debi Hesabı Broad-crested Geniş-kretli';
 $ec_lang['ws_weirLength']='Savak Uzunluğu, l';
 $ec_lang['ws_headWaterHeight']='Su Yüksekliği, h';
-$ec_lang['ws_weirCoefficient']='Savak Sabiti, Cw (Savağa bağlıdır. Geniş tepeli savak için, kret genişliği, derinliği, ve üst kenar şekline bağlı olarak bu değer
-feet biriminde işlem yapılıyorsa 2.3 ve 3.3 arasında değişir.)';
+$ec_lang['ws_weirCoefficient']='Savak Sabiti,  <span title="Savağa bağlıdır. Geniş tepeli savak için, kret genişliği, derinliği, ve üst kenar şekline bağlı olarak bu değer
+feet biriminde işlem yapılıyorsa 2.3 ve 3.3 arasında değişir.">Cw</span>';
 $ec_lang['ws_notes_heading']='Not';
 $ec_lang['ws_notes_we_term']='Savak Denklemi';
 // Weir Flow Irregular. See ws_ for missing text.
