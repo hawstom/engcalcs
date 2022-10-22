@@ -106,7 +106,7 @@ EngCalcs.pageCalculator = function(objForm) {
 		'</svg>';
 }
 
-EngCalcs.pageCalculatorInitialize = function () {
+EngCalcs.pageCalculatorInitialize = function (objForm) {
 }
 
 <?php echoCookieScript(); ?>

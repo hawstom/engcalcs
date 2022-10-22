@@ -111,9 +111,9 @@ EngCalcs.pageCalculator = function (objForm) {
         }
     }
     // Save a cookie for next time
-    EngCalcs.adjustInputWidth(objForm);
+    EngCalcs.adjustInputWidth();
 };
-EngCalcs.pageCalculatorInitialize = function () {
+EngCalcs.pageCalculatorInitialize = function (objForm) {
 	this.pageAddCalcRow();
 	this.pageAddCalcRow();
 	this.pageAddCalcRow();

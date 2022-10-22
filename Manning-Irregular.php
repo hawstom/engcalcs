@@ -302,14 +302,8 @@ EngCalcs.pageCalculator = function (objForm) {
 };
 
 EngCalcs.pageCalculatorInitialize = function (objForm) {
-	this.pageAddCalcRow();
-	this.pageAddCalcRow();
-	this.pageAddCalcRow();
-	this.pageAddCalcRow();
-	this.pageAddCalcRow();
-	this.pageAddCalcRow();
-	this.cookieValue = 'i:,i:,i:1,s:1,i:0.001,s:1,s:1,s:1,s:1,s:9806,s:1,s:1,s:1,s:1,s:1,s:1,s:1';
-	this.dataString = "0,1\n10,0.9,0.03,true\n12,0,0.03,false\n18,0,0.03,false\n20,0.9,0.03,true\n30,1,0.03,true";
+	this.cookieValue = 'i:,i:,i:1,s:1,i:0.001,s:1,s:1,s:1,s:1,s:9806,s:1,s:1,s:1,s:1,s:1,s:1,s:1'; // Up to points data.
+	this.dataString = "0,1\n10,0.9,0.03,true\n12,0,0.03,false\n18,0,0.03,false\n20,0.9,0.03,true\n30,1,0.03,true"; // Points data (user readable).
 	this.dataStringToCookieValue();
 	this.createCookie();
 	this.cookieToForm(objForm);

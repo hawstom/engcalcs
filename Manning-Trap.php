@@ -212,7 +212,7 @@ EngCalcs.pageCalculator = function(objForm) {
 		'</svg>';
 };
 
-EngCalcs.pageCalculatorInitialize = function () {
+EngCalcs.pageCalculatorInitialize = function (objForm) {
 }
 //'[id$=copy]'
 $(document).ready(function() {
