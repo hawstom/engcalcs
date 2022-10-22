@@ -137,7 +137,7 @@ function echoCookieScript ()
 	// On load, read cookie and calc.
 	EngCalcs.debugMode = <?=DEBUG_MODE ? 'true' : 'false' ?>;
 	EngCalcs.cookieName='<?php $p=pathinfo($_SERVER['SCRIPT_NAME']); echo $p['filename']; ?>';
-	EngCalcs.readAndCalc(document.forms['formInput']);
+	EngCalcs.readCookieAndCalc(document.forms['formInput']);
 <?php
 }
 // Omit last closing tag is good practice.
