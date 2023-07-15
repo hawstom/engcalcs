@@ -26,7 +26,8 @@ echoCalculatorForm(
 		Array('name' => 'q', 'units' => Array('m3ps','lps','mld','ft3ps','gpm','mgd'), 'label' => $ec_lang['mpf_flow']),
 		Array('name' => 'v', 'units' => Array('mps','ftps'), 'label' => $ec_lang['mpf_velocity']),
 		Array('name' => 'hv', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mpf_velocity_head']),
-		Array('name' => 'a', 'units' => Array('m2','mm2','ft2','in2'), 'label' => $ec_lang['mpf_flow_area']),
+		Array('name' => 'y', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mtc_flow_depth']),
+		Array('name' => 'a', 'units' => Array('m2', 'mm2', 'ft2', 'in2'), 'label' => $ec_lang['mpf_flow_area']),
 		Array('name' => 'pw', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mpf_wetted_perimeter']),
 		Array('name' => 'rh', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mpf_hydraulic_radius']),
 		Array('name' => 't', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mpf_top_width']),
@@ -54,9 +55,9 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.readFormInput(objForm, 's0', hasUnits = true);
 	this.readFormInput(objForm, 'n', hasUnits = false);
 	this.readFormInput(objForm, 'dd0', hasUnits = true);
-	this.var.y = this.var.dd0 * this.var.d0;
 	// Theta here is half the included angle of the wetted perimeter.
 	this.var.theta = Math.acos(1 - 2 * this.var.dd0);
+	this.var.y = this.var.dd0 * this.var.d0;
 	this.var.a = (this.var.theta - Math.sin(2 * this.var.theta) / 2) * Math.pow(this.var.d0, 2) / 4;
 	this.var.pw = this.var.theta * this.var.d0;
 	this.var.rh = this.var.d0 / (4 * this.var.theta) * (this.var.theta - Math.sin(this.var.theta) * Math.cos(this.var.theta));
@@ -70,6 +71,7 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.writeFormResult(objForm, 'q', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'v', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'hv', precision = 4, hasUnits = true);
+	this.writeFormResult(objForm, 'y', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'a', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'pw', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'rh', precision = 4, hasUnits = true);
