@@ -117,7 +117,7 @@ $ec_lang['mpf_spreadheet_notice']='Check out the spreadsheet version of this cal
 $ec_lang['mpf_pipe_diameter']='Pipe diameter, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Manning roughness, n';
 $ec_lang['mpf_friction_slope']='Pressure slope (possibly <a target="_blank" href="../pressureslope.php">?</a> equal to pipe slope), S<sub>0</sub>';
-$ec_lang['mpf_depth_ratio']='Relative depth, y/d<sub>0</sub>';
+$ec_lang['mpf_depth_ratio']='Relative flow depth, y/d<sub>0</sub>';
 $ec_lang['mpf_see_notes']='(See notes)';
 $ec_lang['mpf_flow']='Flow, Q ' . $ec_lang['mpf_see_notes'];
 $ec_lang['mpf_velocity']='Velocity, v';
@@ -128,7 +128,7 @@ $ec_lang['mpf_hydraulic_radius']='Hydraulic radius, R';
 $ec_lang['mpf_top_width']='Top width, T';
 $ec_lang['mpf_froude_number']='Froude number, F';
 $ec_lang['mpf_shear_stress']='Average shear stress (tractive force), tau';
-$ec_lang['mpf_note_1']='<p>Notes:</p><dl><dt>This is the flow and depth <em>inside</em> the pipe.</dt><dd>Getting the flow into the pipe may require significantly higher headwater depth. Add at least 1.5 times the velocity head to get the headwater depth or <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">see my 2-minute tutorial</a> for standard culvert headwater calculations using HY-8.</dd>';
+$ec_lang['mpf_note_1']='<p>Notes:</p><dl><dt>This is the flow and depth inside an <em>infinitely long</em> pipe.</dt><dd>Getting the flow into the pipe may require significantly higher headwater depth. Add at least 1.5 times the velocity head to get the headwater depth or <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">see my 2-minute tutorial</a> for standard culvert headwater calculations using HY-8.</dd>';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Manning Pipe Head Loss';
 $ec_lang['mphl_main_title']='Free Online Manning Pipe Head Loss Calculator';
