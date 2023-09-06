@@ -116,7 +116,7 @@ function echoCalculatorFormAppend() {
 			<button type="button" id="points_data_copy"><?=$ec_lang['points_data_copy']?></button>
 			<button type="button" id="points_data_paste"><?=$ec_lang['points_data_paste']?></button>
 		</p>
-		<textarea id='points_data'></textarea>
+		<textarea id='points_data' cols='25'></textarea>
 	</div>
 	<div style='clear: both;'></div>
 
