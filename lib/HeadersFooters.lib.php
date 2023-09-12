@@ -36,7 +36,7 @@ global $ec_lang;
 <?php
 if (substr($type, 0, 8) === "EngCalcs") {
 ?>
-	<link rel="stylesheet" href="<?=BASE_URL?>/engcalcs/lib/engcalcs.css?v=1" type="text/css" />
+	<link rel="stylesheet" href="<?=BASE_URL?>/engcalcs/lib/engcalcs.css?v=2" type="text/css" />
 <?php
 }
 ?>
@@ -48,8 +48,8 @@ if (substr($type, 0, 8) === "EngCalcs") {
 <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
 
 <?php if (substr($type, 0, 8) === "EngCalcs") : ?>
-<script src="<?=BASE_URL?>/engcalcs/lib/Cookies.lib.js?v=9"></script>
-<script src="<?=BASE_URL?>/engcalcs/lib/Calculators.lib.js?v=9"></script>
+<script src="<?=BASE_URL?>/engcalcs/lib/Cookies.lib.js?v=10"></script>
+<script src="<?=BASE_URL?>/engcalcs/lib/Calculators.lib.js?v=10"></script>
 <?php 
 echoEngCalcsMenu($html_title);
 endif; 
