@@ -32,16 +32,16 @@ function echoMainMenu() {
 // Define the menu items.
   $menuarr =
     array(
-        array(BASE_URL.'/index.php','Home'),
-        array(BASE_URL.'/support.php','AutoCAD Tools'),
-        array(BASE_URL.'/gnu/index.php','FreeSoftware'),
-        array(BASE_URL.'/engserv.php','Engineering Services'),
-        array(BASE_URL.'/engcalcs/index.php','Engineering Calculators'),
-        array(BASE_URL.'/techdocs.php','Technical Documents'),
+        array('/index.php','Home'),
+        array('/support.php','AutoCAD Tools'),
+        array('/gnu/index.php','FreeSoftware'),
+        array('/engserv.php','Engineering Services'),
+        array('/engcalcs/index.php','Engineering Calculators'),
+        array('/techdocs.php','Technical Documents'),
         array('http://tomsthird.blogspot.com/','Blog (new in 2009)'),
-        array(BASE_URL.'/thomas','Personal essays'),
-        array(BASE_URL.'/famtree.php','Collaborative Family Trees'),
-        array(BASE_URL.'/contact.php','Contact')
+        array('/thomas','Personal essays'),
+        array('/famtree.php','Collaborative Family Trees'),
+        array('/contact.php','Contact')
     );
     echo '<div class="d-print-none">';
 // Step through the array

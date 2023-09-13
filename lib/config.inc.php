@@ -25,34 +25,26 @@ $basedirectory = realpath(__DIR__.'/../..');
 switch ($_SERVER['SERVER_NAME'])
 {
     case 'hawsedc' :
-        $baseurl = '';
 		define('DEBUG_MODE', true);
         break;
     case 'cnm' :
-        $baseurl = '';
 		define('DEBUG_MODE', true);
         break;
     case 'hawsedcm' :
-        $baseurl = '';
 		define('DEBUG_MODE', true);
         break;
     case 'cnmm' :
-        $baseurl = '';
 		define('DEBUG_MODE', true);
         break;
     case 'dev.hawsedc.com':
-        $baseurl = '';
 		define('DEBUG_MODE', true);
         break;
     case 'localhost' :
-        $baseurl = 'http://localhost/constructionnotesmanager.com/public_html/hawsedc';
 		define('DEBUG_MODE', true);
         break;    
     default :
-        $baseurl = '';
 		define('DEBUG_MODE', false);
         break;
 }
 
 define('BASE_DIRECTORY', $basedirectory);
-define('BASE_URL', $baseurl);

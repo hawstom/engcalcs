@@ -58,7 +58,7 @@ echoCalculatorForm(
 <?php echo $ec_lang['mtc_note_1']; ?>
 
 <?php echoFeedback(); ?>
-<script src="<?=BASE_URL?>/engcalcs/lib/Manning.lib.js?v=5"></script>
+<script src="/engcalcs/lib/Manning.lib.js?v=5"></script>
 <script>
 EngCalcs.pageCalculator = function(objForm) {
 	'use strict';
