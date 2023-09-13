@@ -25,23 +25,23 @@ $basedirectory = realpath(__DIR__.'/../..');
 switch ($_SERVER['SERVER_NAME'])
 {
     case 'hawsedc' :
-        $baseurl = 'http://hawsedc';
+        $baseurl = '';
 		define('DEBUG_MODE', true);
         break;
     case 'cnm' :
-        $baseurl = 'http://cnm/public_html/hawsedc';
+        $baseurl = '';
 		define('DEBUG_MODE', true);
         break;
     case 'hawsedcm' :
-        $baseurl = 'http://hawsedcm';
+        $baseurl = '';
 		define('DEBUG_MODE', true);
         break;
     case 'cnmm' :
-        $baseurl = 'http://cnmm';
+        $baseurl = '';
 		define('DEBUG_MODE', true);
         break;
     case 'dev.hawsedc.com':
-        $baseurl = 'http://dev.hawsedc.com';
+        $baseurl = '';
 		define('DEBUG_MODE', true);
         break;
     case 'localhost' :
@@ -49,7 +49,7 @@ switch ($_SERVER['SERVER_NAME'])
 		define('DEBUG_MODE', true);
         break;    
     default :
-        $baseurl = 'https://www.hawsedc.com';
+        $baseurl = '';
 		define('DEBUG_MODE', false);
         break;
 }
