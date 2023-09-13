@@ -34,7 +34,7 @@ echoCalculatorForm(
 		Array('name' => 'hv', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mpf_velocity_head']),
 		Array('name' => 'f', 'units' => NULL, 'label' => '<a href="https://www.engineeringtoolbox.com/froude-number-d_578.html">'.$ec_lang['mpf_froude_number'].'</a>'),
 		Array('name' => 'tau', 'units' => Array('npm2','psf'), 'label' => $ec_lang['mpf_shear_stress']),
-		Array('name' => 'q', 'units' => Array('m3ps','lps','mld','ft3ps','gpm','mgd'), 'label' => $ec_lang['mpf_flow']),
+		Array('name' => 'q', 'units' => Array('m3ps','lps','mld','ft3ps','gpm','mgd'), 'label' => '<strong>' . $ec_lang['mpf_flow'] . '</strong> ' . $ec_lang['mpf_see_notes']),
 		Array('name' => 'q0', 'units' => Array('m3ps','lps','mld','ft3ps','gpm','mgd'), 'label' => $ec_lang['mpf_full_flow']),
 		Array('name' => 'qq0', 'units' => Array('depthFrac','depthPercent'), 'label' => $ec_lang['mpf_full_flow_ratio']),
 	)

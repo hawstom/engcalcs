@@ -119,7 +119,7 @@ $ec_lang['mpf_manningRoughness']='Manning roughness, n';
 $ec_lang['mpf_friction_slope']='Pressure slope (possibly <a target="_blank" href="../pressureslope.php">?</a> equal to pipe slope), S<sub>0</sub>';
 $ec_lang['mpf_depth_ratio']='Relative flow depth, y/d<sub>0</sub>';
 $ec_lang['mpf_see_notes']='(See notes)';
-$ec_lang['mpf_flow']='<strong>Flow, Q</strong> ' . $ec_lang['mpf_see_notes'];
+$ec_lang['mpf_flow']='Flow, Q';
 $ec_lang['mpf_velocity']='Velocity, v';
 $ec_lang['mpf_velocity_head']='Velocity head, h<sub>v</sub>';
 $ec_lang['mpf_flow_area']='Flow area, a';
