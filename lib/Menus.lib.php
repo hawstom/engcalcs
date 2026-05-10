@@ -54,7 +54,7 @@ function echoMainMenu() {
       echo '<strong>'.rtrim($menuarr[$i][1]).'</strong>';
 // Else show the URL and text as a link
     } else {
-      echo '<a href="http://'.$_SERVER['SERVER_NAME'].rtrim($menuarr[$i][0]).'">'.rtrim($menuarr[$i][1]).'</a>';
+      echo '<a href="http://'.htmlspecialchars($_SERVER['SERVER_NAME'], ENT_QUOTES, 'UTF-8').rtrim($menuarr[$i][0]).'">'.rtrim($menuarr[$i][1]).'</a>';
     }
 // If there are more menu items coming, add a vertical bar and spaces.
     if (isset($menuarr[$i + 1]))
@@ -107,7 +107,7 @@ function echoEngCalcsMenu () {
 				</a>
 				<div class="dropdown-menu" aria-labelledby="dropdown-lang">
 <?php foreach ($GLOBALS['all_language_settings'] as $key => $lang) : ?>
-					<a class="dropdown-item" href="<?=$_SERVER['PHP_SELF']?>?lang=<?=$key?>" title="<?=$lang['LANGNAME']?>"><?=$lang['LANGNAME']?></a>
+					<a class="dropdown-item" href="<?=htmlspecialchars($_SERVER['PHP_SELF'], ENT_QUOTES, 'UTF-8')?>?lang=<?=$key?>" title="<?=$lang['LANGNAME']?>"><?=$lang['LANGNAME']?></a>
 <?php endforeach; ?>
 				</div>
 			</li>

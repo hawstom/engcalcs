@@ -22,29 +22,6 @@
 $basedirectory = realpath(__DIR__.'/../..');
 
 // Set some global variables
-switch ($_SERVER['SERVER_NAME'])
-{
-    case 'hawsedc' :
-		define('DEBUG_MODE', true);
-        break;
-    case 'cnm' :
-		define('DEBUG_MODE', true);
-        break;
-    case 'hawsedcm' :
-		define('DEBUG_MODE', true);
-        break;
-    case 'cnmm' :
-		define('DEBUG_MODE', true);
-        break;
-    case 'dev.hawsedc.com':
-		define('DEBUG_MODE', true);
-        break;
-    case 'localhost' :
-		define('DEBUG_MODE', true);
-        break;    
-    default :
-		define('DEBUG_MODE', false);
-        break;
-}
+define('DEBUG_MODE', getenv('APP_ENV') === 'development');
 
 define('BASE_DIRECTORY', $basedirectory);
