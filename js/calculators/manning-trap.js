@@ -153,7 +153,11 @@ EngCalcs.pageCalculator = function(objForm) {
 EngCalcs.pageCalculatorInitialize = function (objForm) {
 };
 
-$(document).ready(function() {
-	$('#n_in').on('input',function() {$('[id^=n_radio_]').prop('checked', false);});
-	$('#d50_in').on('input',function() {$('[id^=d50_radio_]').prop('checked', false);});
+document.addEventListener('DOMContentLoaded', function() {
+	document.getElementById('n_in').addEventListener('input', function() {
+		document.querySelectorAll('[id^="n_radio_"]').forEach(function(el) { el.checked = false; });
+	});
+	document.getElementById('d50_in').addEventListener('input', function() {
+		document.querySelectorAll('[id^="d50_radio_"]').forEach(function(el) { el.checked = false; });
+	});
 });

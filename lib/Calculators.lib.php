@@ -4,13 +4,13 @@ function echoHelpWanted(){
     global $ec_lang;
 ?>
 <p class="collapse show d-print-none" id="helpWanted">
-	<a href="../contact.php"><?=$ec_lang['template_translation_help']?></a> <a data-toggle="collapse" href="#helpWanted" aria-expanded="true" aria-controls="helpWanted"><?=$ec_lang['view_hide_line']?></a>
+	<a href="../contact.php"><?=$ec_lang['template_translation_help']?></a> <a data-bs-toggle="collapse" href="#helpWanted" aria-expanded="true" aria-controls="helpWanted"><?=$ec_lang['view_hide_line']?></a>
 </p>
 <?php
 if (basename($_SERVER['PHP_SELF']) == "Manning-Pipe-Flow.php") {
 ?>
 <p class="collapse show d-print-none" id="spreadsheetNotice">   
-	<a href="spreadsheet/<?=basename($_SERVER['PHP_SELF'], '.php') . '.php';?>"><?=$ec_lang['mpf_spreadheet_notice']?></a> <a data-toggle="collapse" href="#spreadsheetNotice" aria-expanded="true" aria-controls="spreadsheetNotice"><?=$ec_lang['view_hide_line']?></a>
+	<a href="spreadsheet/<?=basename($_SERVER['PHP_SELF'], '.php') . '.php';?>"><?=$ec_lang['mpf_spreadheet_notice']?></a> <a data-bs-toggle="collapse" href="#spreadsheetNotice" aria-expanded="true" aria-controls="spreadsheetNotice"><?=$ec_lang['view_hide_line']?></a>
 </p>
 <?php
 }
@@ -26,7 +26,7 @@ function echoFeedback(){
     global $ec_lang;
 ?>
 <p class="collapse show d-print-none" id="feedback">
-	<a href="../contact.php"><?=$ec_lang['template_feedback']?></a> <a data-toggle="collapse" href="#feedback"  aria-expanded="true" aria-controls="feedback"><?=$ec_lang['view_hide_line']?></a>
+	<a href="../contact.php"><?=$ec_lang['template_feedback']?></a> <a data-bs-toggle="collapse" href="#feedback"  aria-expanded="true" aria-controls="feedback"><?=$ec_lang['view_hide_line']?></a>
 </p>
 <?php
 }
@@ -58,14 +58,18 @@ EngCalcs.unitSets = {};
 <?php foreach ($GLOBALS['ec_unit_sets'] as $key => $set) : ?>
 EngCalcs.unitSets['<?=$key?>'] = ['<?=implode("', '", $set)?>'];
 <?php endforeach ; ?>
-$(document).ready(function() {
-	$('#set_units_m').click(function() {EngCalcs.setUnits('m')});
-	$('#set_units_mm').click(function() {EngCalcs.setUnits('mm')});
-	$('#set_units_ft').click(function() {EngCalcs.setUnits('ft')});
-	$('#set_units_in').click(function() {EngCalcs.setUnits('in')});
-	$('#points_data_copy').click(function() {EngCalcs.pointsDataCopy()});
-	$('#points_data_paste').click(function() {EngCalcs.pointsDataPaste()});
-	$('#btn-printable').click(function() {$('.d-print-none').hide()});
+document.addEventListener('DOMContentLoaded', function() {
+	document.getElementById('set_units_m').addEventListener('click', function() { EngCalcs.setUnits('m'); });
+	document.getElementById('set_units_mm').addEventListener('click', function() { EngCalcs.setUnits('mm'); });
+	document.getElementById('set_units_ft').addEventListener('click', function() { EngCalcs.setUnits('ft'); });
+	document.getElementById('set_units_in').addEventListener('click', function() { EngCalcs.setUnits('in'); });
+	var pdc = document.getElementById('points_data_copy');
+	if (pdc) pdc.addEventListener('click', function() { EngCalcs.pointsDataCopy(); });
+	var pdp = document.getElementById('points_data_paste');
+	if (pdp) pdp.addEventListener('click', function() { EngCalcs.pointsDataPaste(); });
+	document.getElementById('btn-printable').addEventListener('click', function() {
+		document.querySelectorAll('.d-print-none').forEach(function(el) { el.style.display = 'none'; });
+	});
 });
 </script>
 <form id="formInput" action="javascript:EngCalcs.submitForm()" method="post">
@@ -75,7 +79,7 @@ $(document).ready(function() {
 		<tbody>
 			<tr class="collapse d-print-none<?php if ($flagHideUnits === false) : ?> show<?php endif; ?>" id="set_units_row">
 				<td>
-					<?=$ec_lang['calc_set_units']?> <button type="button" id="set_units_m"><?=$ec_lang['u_m']?></button><button type="button" id="set_units_mm"><?=$ec_lang['u_mm']?></button><button type="button" id="set_units_ft"><?=$ec_lang['u_ft']?></button><button type="button" id="set_units_in"><?=$ec_lang['u_in']?></button><a data-toggle="collapse" href="#set_units_row" aria-expanded="true" aria-controls="set_units_row"><?=$ec_lang['view_hide_line']?></a>
+					<?=$ec_lang['calc_set_units']?> <button type="button" id="set_units_m"><?=$ec_lang['u_m']?></button><button type="button" id="set_units_mm"><?=$ec_lang['u_mm']?></button><button type="button" id="set_units_ft"><?=$ec_lang['u_ft']?></button><button type="button" id="set_units_in"><?=$ec_lang['u_in']?></button><a data-bs-toggle="collapse" href="#set_units_row" aria-expanded="true" aria-controls="set_units_row"><?=$ec_lang['view_hide_line']?></a>
 				<td>
 			</tr>
 			<tr>
@@ -91,7 +95,7 @@ $(document).ready(function() {
 								<td>
 									<?php echo inputHtml($input['name'], $input['type'], $input['default'], "\t\t\t\t\t\t\t\t\t");?><?php echoUnitSelect($input['name'].'u', $input['units'], "\t\t\t\t\t\t\t\t\t");?>
 								</td>
-								<td class="engcalcs-x d-print-none"><a data-toggle="collapse" href="#<?=$input['name']?>_row" aria-expanded="true" aria-controls="<?=$input['name']?>_row">X</a></td>
+								<td class="engcalcs-x d-print-none"><a data-bs-toggle="collapse" href="#<?=$input['name']?>_row" aria-expanded="true" aria-controls="<?=$input['name']?>_row">X</a></td>
 							</tr>
 <?php
 	}
@@ -114,7 +118,7 @@ $(document).ready(function() {
 									<?php echoUnitSelect($result['name'].'u',$result['units'], "\t\t\t\t\t\t\t\t\t");?>
 
 								</td>
-								<td class="engcalcs-x d-print-none"><a data-toggle="collapse" href="#<?=$result['name']?>_row" aria-expanded="true" aria-controls="<?=$input['name']?>_row">X</a></td>
+								<td class="engcalcs-x d-print-none"><a data-bs-toggle="collapse" href="#<?=$result['name']?>_row" aria-expanded="true" aria-controls="<?=$input['name']?>_row">X</a></td>
 							</tr>
 <?php
 	}

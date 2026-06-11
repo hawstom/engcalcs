@@ -77,14 +77,14 @@ function echoEngCalcsMenu () {
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light d-print-none">
 	<a class="navbar-brand" href="index.php"><?=$ec_lang['menu_brand']?></a>
-	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+	<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 		<span class="navbar-toggler-icon"></span>
 	</button>
 
 	<div class="collapse navbar-collapse" id="navbarSupportedContent">
-		<ul class="navbar-nav mr-auto">
+		<ul class="navbar-nav me-auto">
 			<li class="nav-item dropdown">
-				<a class="nav-link dropdown-toggle active" id="dropdown-calc" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				<a class="nav-link dropdown-toggle active" id="dropdown-calc" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 					<?=$ec_lang['menu_main_hydraulics']?>
 				</a>
 				<div class="dropdown-menu" aria-labelledby="dropdown-calc">
@@ -102,7 +102,7 @@ function echoEngCalcsMenu () {
 				</div>
 			</li>
 			<li class="nav-item dropdown">
-				<a class="nav-link dropdown-toggle active" id="dropdown-lang" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				<a class="nav-link dropdown-toggle active" id="dropdown-lang" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 					<?=$ec_lang['menu_main_language']?>
 				</a>
 				<div class="dropdown-menu" aria-labelledby="dropdown-lang">
