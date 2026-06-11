@@ -30,24 +30,9 @@ echoCalculatorForm(
 <dl>
 <dt><?=$ec_lang['ws_notes_we_term']?></dt><dd>q = cw * l * h<sup>1.5</sup></dd>
 </dl>
+<script src="/engcalcs/js/calculators/weir-flow-simple.js?v=1"></script>
 <script>
-<!--
-EngCalcs.pageCalculator = function(objForm) {
-	'use strict';
-	var hasUnits, precision;
-	this.var = {};
-	this.readFormInput(objForm, 'l', hasUnits = false);
-	this.readFormInput(objForm, 'h', hasUnits = false);
-	this.readFormInput(objForm, 'cw', hasUnits = false);
-	this.var.q = this.var.cw * this.var.l * Math.pow(this.var.h, 1.5);
-	this.writeFormResult(objForm, 'q', precision = 2, hasUnits = false);
-}
-EngCalcs.pageCalculatorInitialize = function () {
-}
-<?php
-echoCookieScript ();
-?>
--->
+<?php echoCookieScript(); ?>
 </script>
 <?php
 echoFooter("EngCalcs");
