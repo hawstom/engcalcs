@@ -19,10 +19,12 @@ function echoHeader($type="normal", $html_title = "", $html_head = "") {
     **/
 function echoHTMLHead($type, $html_title, $html_head) {
 
-global $ec_lang;
+global $ec_lang, $clanguage;
+$html_lang = isset($clanguage) ? $clanguage : 'en';
+$html_dir  = ($html_lang === 'he') ? ' dir="rtl"' : '';
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<?=$html_lang?>"<?=$html_dir?>>
 <head>
 	<meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
 	<meta name="Generator" content="Notepad++"  />

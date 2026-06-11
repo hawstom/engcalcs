@@ -34,6 +34,11 @@ if (stristr($_SERVER["SCRIPT_NAME"], basename(__FILE__))!==false) {
 // Array definition of language_settings
 $all_language_settings = array();
 // You have to add each language to Language.Settings.php, and config.inc.php VALID_LANGUAGES constant.
+//
+// QUALITY is this app's own preference weight for a language, multiplied against the browser's q-value
+// when choosing the best language match from Accept-Language. 1.0 = fully translated, well-maintained.
+// Lower values (e.g. 0.3) indicate partial or aging translations — they will only win if the browser
+// strongly prefers that language and no better-quality match exists.
 
 //-- settings for bulgarian
 $all_language_settings['bg']=array(

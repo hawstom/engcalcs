@@ -26,6 +26,13 @@ function chooseLanguage($all_language_settings) {
         // If $_GET["lang"] is a valid language, set a session language override.
         if (ctype_alpha($_GET["lang"]) && strlen($_GET["lang"]) == 2 && $all_language_settings[$_GET["lang"]]) {
             $_SESSION["CLANGUAGE"] = $_GET["lang"];
+            setcookie("ec_language", $_GET["lang"], [
+                'expires'  => time() + 365 * 24 * 60 * 60,
+                'path'     => '/',
+                'samesite' => 'Strict',
+                'secure'   => true,
+                'httponly' => true,
+            ]);
             return $_GET["lang"];
         } else {
             return "en";
@@ -33,11 +40,13 @@ function chooseLanguage($all_language_settings) {
     } elseif (!empty($_SESSION["CLANGUAGE"]) && !empty($all_language_settings[$_SESSION["CLANGUAGE"]])) {
         // Else if a valid language was already determined in this session, use it.
         return $_SESSION["CLANGUAGE"];
+    } elseif (!empty($_COOKIE["ec_language"]) && ctype_alpha($_COOKIE["ec_language"]) && strlen($_COOKIE["ec_language"]) == 2 && !empty($all_language_settings[$_COOKIE["ec_language"]])) {
+        // Else if a valid language cookie exists from a previous browser session, use it.
+        $_SESSION["CLANGUAGE"] = $_COOKIE["ec_language"];
+        return $_COOKIE["ec_language"];
     } else {
         // Get and try to match user's acceptable languages.
-        if (isset($HTTP_ACCEPT_LANGUAGE)) {
-            $accept_langs = $HTTP_ACCEPT_LANGUAGE;
-        } elseif (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+        if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
             $accept_langs = $_SERVER['HTTP_ACCEPT_LANGUAGE'];
         }
         // If there is a browser language list
@@ -148,17 +157,17 @@ function ec_title($sentence) {
         //print_r($language_settings);
         if (!$key or !in_array($word, $language_settings['TITLE_WORDS'])) $words[$key] = ucwords($word);
     }
-    return implode($words, ' ');
+    return implode(' ', $words);
 }
 
 function compare_langs ($baseLang, $secondLang) {
-    global $basedirectory;
-    echo "$basedirectory<br />";
+    $langDir = __DIR__;
+    echo "$langDir<br />";
     unset($ec_lang);
-    require("{$basedirectory}lib/lang.ec.$baseLang.php");
+    require("$langDir/lang.ec.$baseLang.php");
     $baseLang=$ec_lang;
     unset($ec_lang);
-    require("{$basedirectory}lib/lang.ec.$secondLang.php");
+    require("$langDir/lang.ec.$secondLang.php");
     $secondLang=$ec_lang;
     // print_r($baseLang);
     // print_r($secondLang);
