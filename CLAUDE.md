@@ -93,7 +93,7 @@ See full prioritized roadmap in project memory. Summary:
 | Priority | Area | Status |
 |----------|------|--------|
 | 1 — Security | XSS fixes, lang validation, cookie Secure flag, ENV-based debug, remove test files | **Done** (commit 5e807c6) |
-| 2 — Dev infra | CI pipeline, npm for frontend deps, Composer, this CLAUDE.md | In progress |
-| 3 — Reduce duplication | Extract per-calculator JS to separate files, standardize prefixes, clean stale branches | Not started |
-| 4 — Dependency updates | Bootstrap 5 migration, drop jQuery | Not started |
+| 2 — Dev infra | php -l pre-commit hook, CLAUDE.md; npm/Composer deferred | **Done** (commit 61cf0dc) |
+| 3 — Reduce duplication | Extract per-calculator JS to separate files, standardize prefixes, clean stale branches | Partially done (commit 76d6255); stale branches + conflict files remain |
+| 4 — Dependency updates | Bootstrap 5.3.2 migration, drop jQuery | **Done** (commit 92f38da) |
 | 5 — Long-term | TypeScript, server-side calc fallback, results sharing | Only if scope grows |
