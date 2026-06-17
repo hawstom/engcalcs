@@ -26,7 +26,7 @@ $ec_lang['mpf_shear_stress']='Efort tangenţial promedio';
 // Orifice Flow
 $ec_lang['or_main_menu']='Debit prin Orificiu';
 $ec_lang['or_main_title']='Calculator gratuit online de debit prin orificiu';
-$ec_lang['or_main_desc']='Debit prin Orificiu — Liber și Înecat';
+$ec_lang['or_main_desc']='Debit prin Orificiu — Liber sau Înecat';
 $ec_lang['or_shape']='Forma deschiderii';
 $ec_lang['or_shape_circular']='Circulară';
 $ec_lang['or_shape_rectangular']='Dreptunghiulară';

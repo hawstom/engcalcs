@@ -25,7 +25,7 @@ $ec_lang['mpf_shear_stress']='Napon smicanja average (vučna sila), tau';
 // Orifice Flow
 $ec_lang['or_main_menu']='Протицај кроз отвор';
 $ec_lang['or_main_title']='Бесплатни онлајн калкулатор протицаја кроз отвор';
-$ec_lang['or_main_desc']='Протицај кроз отвор — Слободан и потопљен';
+$ec_lang['or_main_desc']='Протицај кроз отвор — Слободан или потопљен';
 $ec_lang['or_shape']='Облик отвора';
 $ec_lang['or_shape_circular']='Кружни';
 $ec_lang['or_shape_rectangular']='Правоугаони';

@@ -101,7 +101,7 @@ $ec_lang['mtc_d50_z2']='<span title="per Isbash (1936), Robinson, and Maricopa C
 // Orifice Flow
 $ec_lang['or_main_menu']='זרימה דרך פתח';
 $ec_lang['or_main_title']='מחשבון זרימה דרך פתח - חינם';
-$ec_lang['or_main_desc']='זרימה דרך פתח — חופשית וטבועה';
+$ec_lang['or_main_desc']='זרימה דרך פתח — חופשית או טבועה';
 $ec_lang['or_shape']='צורת הפתח';
 $ec_lang['or_shape_circular']='עגול';
 $ec_lang['or_shape_rectangular']='מלבני';

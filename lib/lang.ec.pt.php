@@ -192,7 +192,7 @@ $ec_lang['wi_notes_we_def']='q = se (distancia = 0) entonces 0 o se (slope=0) en
 // Orifice Flow
 $ec_lang['or_main_menu']='Vazão por Orifício';
 $ec_lang['or_main_title']='Calculadora gratuita de vazão por orifício';
-$ec_lang['or_main_desc']='Vazão por Orifício — Livre e Submersa';
+$ec_lang['or_main_desc']='Vazão por Orifício — Livre ou Submersa';
 $ec_lang['or_shape']='Forma da abertura';
 $ec_lang['or_shape_circular']='Circular';
 $ec_lang['or_shape_rectangular']='Retangular';

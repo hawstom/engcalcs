@@ -200,7 +200,7 @@ $ec_lang['wi_notes_we_def']='q = si (longueur = 0) alors 0 sinon si (pente=0) al
 // Orifice Flow
 $ec_lang['or_main_menu']='Débit par Orifice';
 $ec_lang['or_main_title']='Calculateur gratuit en ligne de débit par orifice';
-$ec_lang['or_main_desc']='Débit par Orifice — Libre et Noyé';
+$ec_lang['or_main_desc']='Débit par Orifice — Libre ou Noyé';
 $ec_lang['or_shape']='Forme de l\'ouverture';
 $ec_lang['or_shape_circular']='Circulaire';
 $ec_lang['or_shape_rectangular']='Rectangulaire';

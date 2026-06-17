@@ -79,7 +79,7 @@ $ec_lang['wi_menu']='不規則的水堰流動';
 // Orifice Flow
 $ec_lang['or_main_menu']='孔口流量';
 $ec_lang['or_main_title']='孔口流量在线计算器（免费）';
-$ec_lang['or_main_desc']='孔口流量 — 自由出流与淹没出流';
+$ec_lang['or_main_desc']='孔口流量 — 自由出流或淹没出流';
 $ec_lang['or_shape']='孔口形状';
 $ec_lang['or_shape_circular']='圆形';
 $ec_lang['or_shape_rectangular']='矩形';

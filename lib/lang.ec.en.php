@@ -200,7 +200,7 @@ $ec_lang['wi_notes_we_def']='q = if (length = 0) then 0 else if (slope=0) then c
 // Orifice Flow
 $ec_lang['or_main_menu']='Orifice Flow';
 $ec_lang['or_main_title']='Free Online Orifice Flow Calculator';
-$ec_lang['or_main_desc']='Orifice Flow — Free and Submerged';
+$ec_lang['or_main_desc']='Orifice Flow — Free or Submerged';
 $ec_lang['or_shape']='Opening shape';
 $ec_lang['or_shape_circular']='Circular';
 $ec_lang['or_shape_rectangular']='Rectangular';

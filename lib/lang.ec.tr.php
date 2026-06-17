@@ -185,7 +185,7 @@ $ec_lang['wi_notes_we_def']='q = eğer (uzunluk = 0) ise 0, eğer (eğim=0) ise 
 // Orifice Flow
 $ec_lang['or_main_menu']='Orifis Debisi';
 $ec_lang['or_main_title']='Ücretsiz Çevrimiçi Orifis Debisi Hesaplayıcı';
-$ec_lang['or_main_desc']='Orifis Debisi — Serbest ve Batık';
+$ec_lang['or_main_desc']='Orifis Debisi — Serbest veya Batık';
 $ec_lang['or_shape']='Açıklık şekli';
 $ec_lang['or_shape_circular']='Dairesel';
 $ec_lang['or_shape_rectangular']='Dikdörtgen';

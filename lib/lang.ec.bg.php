@@ -181,7 +181,7 @@ $ec_lang['wi_notes_we_def']='q = ако (дължина = 0) тогава 0 ин
 // Orifice Flow
 $ec_lang['or_main_menu']='Дебит през отвор';
 $ec_lang['or_main_title']='Безплатен онлайн калкулатор за дебит през отвор';
-$ec_lang['or_main_desc']='Дебит през отвор — Свободно и потопено изтичане';
+$ec_lang['or_main_desc']='Дебит през отвор — Свободно или потопено изтичане';
 $ec_lang['or_shape']='Форма на отвора';
 $ec_lang['or_shape_circular']='Кръгъл';
 $ec_lang['or_shape_rectangular']='Правоъгълен';
