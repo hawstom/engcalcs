@@ -10,7 +10,8 @@ EngCalcs.createCookie = function () {
 	date = new Date();
 	date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
 	expires = "; expires=" + date.toGMTString();
-	document.cookie = this.cookieName + "=" + this.cookieValue + expires + "; SameSite=Strict; Secure; path=/";
+	var secure = (location.protocol === 'https:') ? "; Secure" : "";
+	document.cookie = this.cookieName + "=" + this.cookieValue + expires + "; SameSite=Strict" + secure + "; path=/";
 };
 
 // readCookie

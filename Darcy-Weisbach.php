@@ -59,7 +59,7 @@ EngCalcs.pageConfig = {
 	regime_turbulent:    '<?=htmlspecialchars($ec_lang['dw_regime_turbulent'],    ENT_QUOTES, 'UTF-8')?>'
 };
 </script>
-<script src="/engcalcs/js/darcy-weisbach.js?v=1"></script>
+<script src="/engcalcs/js/darcy-weisbach.js?v=<?=filemtime(__DIR__.'/js/darcy-weisbach.js')?>"></script>
 <script>
 <?php echoCookieScript(); ?>
 </script>

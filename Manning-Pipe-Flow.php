@@ -47,7 +47,7 @@ echoCalculatorForm(
 
 <?php echoFeedback(); ?>
 
-<script src="/engcalcs/js/manning-pipe-flow.js?v=1"></script>
+<script src="/engcalcs/js/manning-pipe-flow.js?v=<?=filemtime(__DIR__.'/js/manning-pipe-flow.js')?>"></script>
 <script>
 <?php echoCookieScript(); ?>
 </script>

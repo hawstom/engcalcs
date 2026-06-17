@@ -43,7 +43,7 @@ echoCalculatorForm(
 <?php echo $ec_lang['mphl_note_1']; ?>
 
 <?php echoFeedback(); ?>
-<script src="/engcalcs/js/manning-pipe-head-loss.js?v=1"></script>
+<script src="/engcalcs/js/manning-pipe-head-loss.js?v=<?=filemtime(__DIR__.'/js/manning-pipe-head-loss.js')?>"></script>
 <script>
 <?php echoCookieScript(); ?>
 </script>

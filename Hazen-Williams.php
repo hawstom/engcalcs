@@ -47,7 +47,7 @@ echoCalculatorForm(
 
 <?php echoFeedback(); ?>
 
-<script src="/engcalcs/js/hazen-williams.js?v=1"></script>
+<script src="/engcalcs/js/hazen-williams.js?v=<?=filemtime(__DIR__.'/js/hazen-williams.js')?>"></script>
 <script>
 <?php echoCookieScript(); ?>
 </script>

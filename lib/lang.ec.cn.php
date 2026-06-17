@@ -76,3 +76,32 @@ $ec_lang['mtc_main_desc']='在特定斜率  和深度的均勻梯形流動曼寧
 $ec_lang['ws_main_menu']='簡單的水堰流動';
 // Weir Flow Irregular. See ws_ for missing text.
 $ec_lang['wi_menu']='不規則的水堰流動';
+// Orifice Flow
+$ec_lang['or_main_menu']='孔口流量';
+$ec_lang['or_main_title']='孔口流量在线计算器（免费）';
+$ec_lang['or_main_desc']='孔口流量 — 自由出流与淹没出流';
+$ec_lang['or_shape']='孔口形状';
+$ec_lang['or_shape_circular']='圆形';
+$ec_lang['or_shape_rectangular']='矩形';
+$ec_lang['or_diameter']='直径（圆形）或高度（矩形），D';
+$ec_lang['or_width']='宽度，W（仅限矩形）';
+$ec_lang['or_invert']='孔口底部高程';
+$ec_lang['or_hwe']='上游水位高程';
+$ec_lang['or_twe']='下游水位高程';
+$ec_lang['or_cd']='流量系数，C<sub>d</sub>';
+$ec_lang['or_centroid_elev']='形心高程';
+$ec_lang['or_head']='有效水头，h';
+$ec_lang['or_area']='孔口面积，A';
+$ec_lang['or_flow']='流量，Q';
+$ec_lang['or_regime']='孔口流态检验';
+$ec_lang['or_regime_valid']='自由出流 — 孔口流态有效 ✓';
+$ec_lang['or_regime_submerged']='淹没孔口（下游水位高于孔底）— 有效 ✓';
+$ec_lang['or_regime_warn']='警告：上游水位低于孔顶 — 非孔口流态';
+$ec_lang['or_notes_1_term']='孔口方程';
+$ec_lang['or_notes_1_def']='Q = C<sub>d</sub> &times; A &times; &radic;(2gh)。自由出流：h = HWE &minus; 形心高程。淹没出流（下游水位高于孔底）：h = HWE &minus; TWE。';
+$ec_lang['or_notes_2_term']='孔口流态';
+$ec_lang['or_notes_2_def']='当上游水位高于孔口顶部时，适用孔口流量方程。当上游水位低于孔顶时，请改用堰流方程。';
+$ec_lang['or_notes_3_term']='流量系数';
+$ec_lang['or_notes_3_def']='锐缘孔口的 C<sub>d</sub> 约为 0.60&ndash;0.65。圆角或内缩入口的值不同。请参考 <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venture-d_590.html">Engineering Toolbox</a> 或 HEC-RAS 水力学参考手册。';
+$ec_lang['or_notes_4_term']='淹没';
+$ec_lang['or_notes_4_def']='当下游水位高于孔口底部时，计算器自动采用淹没孔口方程，h = HWE &minus; TWE。当下游水位等于或低于孔底时，采用自由出流假定，h = HWE &minus; 形心高程。';

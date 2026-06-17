@@ -15,6 +15,10 @@ A PHP/JS suite of hydraulic engineering calculators. 12 calculators, 11 language
 5. Write `EngCalcs.pageCalculator = function(objForm) { ... }` in the `<script>` block at the bottom.
 6. Call `echoHeader`, `echoCalculatorForm`, `echoFeedback`, then `echoFooter` — that's the full page structure.
 7. Add the new calculator to the menus in `lib/Menus.lib.php`.
+8. Include the calculator JS using `filemtime()` for automatic cache-busting — never use a hardcoded `?v=N`:
+   ```php
+   <script src="/engcalcs/js/my-calc.js?v=<?=filemtime(__DIR__.'/js/my-calc.js')?>"></script>
+   ```
 
 ## Application Bootstrap
 
@@ -37,6 +41,7 @@ Each calculator owns a short prefix for its language keys and JS variables:
 | `mtc_` | Manning Trap Channel |
 | `wfs_` | Weir Flow Simple |
 | `wfi_` | Weir Flow Irregular |
+| `or_`  | Orifice Flow |
 
 New calculators must define a new unique prefix and document it here.
 
