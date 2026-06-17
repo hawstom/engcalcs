@@ -63,7 +63,7 @@ function echoCalculatorFormAppend() {
 <dl>
 <dt><?=$ec_lang['wi_notes_we_term']?></dt><dd><?=$ec_lang['wi_notes_we_def']?></dd>
 </dl>
-<script src="/engcalcs/js/calculators/weir-flow-irregular.js?v=1"></script>
+<script src="/engcalcs/js/weir-flow-irregular.js?v=1"></script>
 <script>
 <?php echoCookieScript(); ?>
 </script>

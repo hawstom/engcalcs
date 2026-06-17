@@ -47,7 +47,7 @@ echoCalculatorForm(
 
 <?php echoFeedback(); ?>
 
-<script src="/engcalcs/js/calculators/hazen-williams.js?v=1"></script>
+<script src="/engcalcs/js/hazen-williams.js?v=1"></script>
 <script>
 <?php echoCookieScript(); ?>
 </script>

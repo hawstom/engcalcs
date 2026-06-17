@@ -130,8 +130,8 @@ function echoCalculatorFormAppend() {
 <dt><?=$ec_lang['mi_notes_1_term']?></dt><dd><?=$ec_lang['mi_notes_1_def']?></dd>
 <dt><?=$ec_lang['mi_notes_2_term']?></dt><dd><?=$ec_lang['mi_notes_2_def']?></dd>
 </dl>
-<script src="/engcalcs/lib/Manning.lib.js?v=4"></script>
-<script src="/engcalcs/js/calculators/manning-irregular.js?v=1"></script>
+<script src="/engcalcs/js/Manning.lib.js?v=5"></script>
+<script src="/engcalcs/js/manning-irregular.js?v=1"></script>
 <script>
 <?php echoCookieScript(); ?>
 </script>

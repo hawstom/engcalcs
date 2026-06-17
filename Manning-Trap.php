@@ -58,8 +58,8 @@ echoCalculatorForm(
 <?php echo $ec_lang['mtc_note_1']; ?>
 
 <?php echoFeedback(); ?>
-<script src="/engcalcs/lib/Manning.lib.js?v=5"></script>
-<script src="/engcalcs/js/calculators/manning-trap.js?v=1"></script>
+<script src="/engcalcs/js/Manning.lib.js?v=5"></script>
+<script src="/engcalcs/js/manning-trap.js?v=1"></script>
 <script>
 <?php echoCookieScript(); ?>
 </script>

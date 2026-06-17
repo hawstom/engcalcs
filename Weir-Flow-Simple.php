@@ -30,7 +30,7 @@ echoCalculatorForm(
 <dl>
 <dt><?=$ec_lang['ws_notes_we_term']?></dt><dd>q = cw * l * h<sup>1.5</sup></dd>
 </dl>
-<script src="/engcalcs/js/calculators/weir-flow-simple.js?v=1"></script>
+<script src="/engcalcs/js/weir-flow-simple.js?v=1"></script>
 <script>
 <?php echoCookieScript(); ?>
 </script>

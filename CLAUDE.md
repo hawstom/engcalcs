@@ -72,28 +72,15 @@ Set `APP_ENV=development` in your web server config or a `.env` file for local d
 | `lib/base.inc.php` | Master bootstrap — include this and nothing else |
 | `lib/config.inc.php` | Global config, DEBUG_MODE |
 | `lib/Calculators.lib.php` | `echoCalculatorForm()` and related helpers |
-| `lib/Calculators.lib.js` | Client-side calculation engine, unit conversion, form wiring |
-| `lib/Manning.lib.js` | Shared JS for Manning/irregular geometry |
+| `js/Calculators.lib.js` | Client-side calculation engine, unit conversion, form wiring |
+| `js/Manning.lib.js` | Shared JS for Manning/irregular geometry and sketch rendering |
 | `lib/Menus.lib.php` | `echoMainMenu()`, `echoHeader()`, `echoFooter()` |
 | `lib/Units.lib.php` | Unit sets and conversion factors |
 | `lib/Language.lib.php` | Language detection and switching |
 | `lib/lang.ec.??.php` | Localized string arrays (11 languages) |
-| `lib/Cookies.lib.js` | Cookie persistence for user unit/language prefs |
-| `lib/engcalcs.css` | App-wide styles |
-
-## Open TODO Items (from README.txt)
-
-- Sketch on irregular weir
-- Move sketch object to library from irregular Manning
+| `js/Cookies.lib.js` | Cookie persistence for user unit/language prefs |
+| `css/engcalcs.css` | App-wide styles |
 
 ## Improvement Roadmap
 
-See full prioritized roadmap in project memory. Summary:
-
-| Priority | Area | Status |
-|----------|------|--------|
-| 1 — Security | XSS fixes, lang validation, cookie Secure flag, ENV-based debug, remove test files | **Done** (commit 5e807c6) |
-| 2 — Dev infra | php -l pre-commit hook, CLAUDE.md; npm/Composer deferred | **Done** (commit 61cf0dc) |
-| 3 — Reduce duplication | Extract per-calculator JS to separate files, standardize prefixes, clean stale branches | Partially done (commit 76d6255); stale branches + conflict files remain |
-| 4 — Dependency updates | Bootstrap 5.3.2 migration, drop jQuery | **Done** (commit 92f38da) |
-| 5 — Long-term | TypeScript, server-side calc fallback, results sharing | Only if scope grows |
+See `ROADMAP.md` in the project root for the full prioritized roadmap.

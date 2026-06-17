@@ -38,7 +38,7 @@ $html_dir  = ($html_lang === 'he') ? ' dir="rtl"' : '';
 <?php
 if (substr($type, 0, 8) === "EngCalcs") {
 ?>
-	<link rel="stylesheet" href="/engcalcs/lib/engcalcs.css?v=2" type="text/css" />
+	<link rel="stylesheet" href="/engcalcs/css/engcalcs.css?v=2" type="text/css" />
 <?php
 }
 ?>
@@ -50,8 +50,8 @@ if (substr($type, 0, 8) === "EngCalcs") {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 
 <?php if (substr($type, 0, 8) === "EngCalcs") : ?>
-<script src="/engcalcs/lib/Cookies.lib.js?v=10"></script>
-<script src="/engcalcs/lib/Calculators.lib.js?v=10"></script>
+<script src="/engcalcs/js/Cookies.lib.js?v=10"></script>
+<script src="/engcalcs/js/Calculators.lib.js?v=10"></script>
 <?php 
 echoEngCalcsMenu($html_title);
 endif; 

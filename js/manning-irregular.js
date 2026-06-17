@@ -173,52 +173,6 @@ EngCalcs.pageCalculatorInitialize = function (objForm) {
 	this.cookieToForm(objForm);
 };
 
-EngCalcs.Sketch = {};
-
-EngCalcs.Sketch.construct = function (obj) {
-	this.maxHeight = obj.maxHeight;
-	this.maxWidth = obj.maxWidth;
-	this.strokeColor = obj.strokeColor;
-	this.strokeWidth = obj.strokeWidth;
-	this.figureTop = obj.figureTop;
-	this.figureLeft = obj.figureLeft;
-	this.figureHeight = obj.figureHeight;
-	this.figureWidth = obj.figureWidth;
-	this.xScale = (this.maxWidth-this.strokeWidth) / this.figureWidth;
-	this.yScale = -1 * (this.maxHeight-this.strokeWidth) / this.figureHeight;
-};
-
-// Convert point from right-handed figure coordinate system
-// to left-handed sketch coordinate system
-EngCalcs.Sketch.convertPoint = function (objFigurePoint) {
-	var objPoint = {};
-	objPoint.x = this.strokeWidth/2 + (objFigurePoint.x - this.figureLeft) * this.xScale;
-	objPoint.y = this.strokeWidth/2 + (objFigurePoint.y - this.figureTop) * this.yScale;
-	return objPoint;
-};
-
-EngCalcs.Sketch.getLineHtml = function (arrPoints) {
-	return '<line '
-	+ 'x1="' + this.convertPoint(arrPoints[0]).x.toString()
-	+ '" y1="'  + this.convertPoint(arrPoints[0]).y.toString()
-	+ '" x2="'  + this.convertPoint(arrPoints[1]).x.toString()
-	+ '" y2="'  + this.convertPoint(arrPoints[1]).y.toString()
-	+ '" style="stroke:' + this.strokeColor
-	+ ';stroke-width:' + this.strokeWidth + '" />';
-};
-
-EngCalcs.Sketch.getMiddleTextHtml = function (obj) {
-	return '<text '
-	+ 'x="' + this.convertPoint(obj.point).x.toString()
-	+ '" y="'  + this.convertPoint(obj.point).y.toString()
-	+ '" transform="rotate(' + obj.rotation.toString()
-	+ ' ' + this.convertPoint(obj.point).x.toString()
-	+ ',' + (this.convertPoint(obj.point).y-obj.height/2).toString() + ')"'
-	+ '" style="font-size: ' + obj.height + 'px;"'
-	+ ' fill="green" text-anchor = "middle"'
-	+ '>' + obj.text + '</text>';
-};
-
 EngCalcs.Manning.recalc = function () {
 	this.s0root = Math.pow(this.s0, 0.5);
 	this.rh = this.a/this.pw;
