@@ -8,6 +8,10 @@ The format of each task is: Priority/status|Description. 0 means "Completed" and
 
 - 50|Clean stale remote branch `origin/Solver` and remove any conflict-marker files left in master. The Solver branch was merged/abandoned; leaving it creates confusion for future contributors.
 
+- 40|Translations (multi-lingual): Improve remaining languages (he, pt, hr, sr, ro, cn) — partial or sparse coverage; native-speaker review recommended.
+
+- 20|Translations (multi-lingual): Implement a way (logging system?) to have insight into language demand using both explicit requests and visitor languages.
+
 - 20|Set up npm (package.json) and/or Composer for dependency management. Deferred from dev-infra work; currently Bootstrap and other assets are manually vendored.
 
 - 10|TypeScript migration — convert `lib/Calculators.lib.js` and per-calculator files to `.ts`. Only worthwhile if the project scope grows significantly.
@@ -29,3 +33,9 @@ The format of each task is: Priority/status|Description. 0 means "Completed" and
 - 0|Added php -l pre-commit hook to catch PHP syntax errors before commit. (commit 61cf0dc)
 
 - 0|Priority 1 security fixes: XSS output escaping, language parameter validation, cookie Secure/HttpOnly flags, ENV-based DEBUG_MODE, removed test/debug files. (commit 5e807c6)
+
+- 0|Translations (multi-lingual): Evaluated the cost/value of having a languages system in the post-2025 (AI) age. Decision: keep the system — engineering terminology mistranslates poorly in browser auto-translation; marginal maintenance cost is low since the PHP system is already built.
+
+- 0|Translations (multi-lingual): Improved fr (complete rewrite — all calculators now covered), bg (dw/hw/mi/wi sections added), tr (dw/hw/mi added, mixed EN/TR strings fixed). Quality scores updated in Language.Settings.php.
+
+- 0|Orifice calculator phase 1: Orifice.php created with circular/rectangular shape selector, unit-aware inputs (D, W, invert elevation, HWE, Cd), results (centroid, h, area, Q, v, regime check), SVG profile sketch, and notes. js/orifice.js implements Q = Cd × A × √(2gh). Phase 1 assumes unsubmerged free outfall only.
