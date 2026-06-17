@@ -218,6 +218,7 @@ $ec_lang['or_regime']='Vérification du régime d\'orifice';
 $ec_lang['or_regime_valid']='Déversement libre — régime d\'orifice valide ✓';
 $ec_lang['or_regime_submerged']='Orifice noyé (TWE au-dessus du radier) — valide ✓';
 $ec_lang['or_regime_warn']='Avertissement : surface amont sous la clé — pas en régime d\'orifice';
+$ec_lang['or_regime_twe_above_hwe']='Warning: tailwater (TWE) above headwater (HWE) — check inputs';
 $ec_lang['or_notes_1_term']='Équation d\'orifice';
 $ec_lang['or_notes_1_def']='Q = C<sub>d</sub> &times; A &times; &radic;(2gh). Déversement libre : h = HWE &minus; centroïde. Écoulement noyé (TWE au-dessus du radier) : h = HWE &minus; TWE.';
 $ec_lang['or_notes_2_term']='Régime d\'orifice';

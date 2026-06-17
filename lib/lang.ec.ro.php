@@ -44,6 +44,7 @@ $ec_lang['or_regime']='Verificarea regimului de orificiu';
 $ec_lang['or_regime_valid']='Curgere liberă — regim de orificiu valid ✓';
 $ec_lang['or_regime_submerged']='Orificiu înecat (TWE peste radier) — valid ✓';
 $ec_lang['or_regime_warn']='Atenție: nivelul amonte sub cheia arcului — nu este regim de orificiu';
+$ec_lang['or_regime_twe_above_hwe']='Warning: tailwater (TWE) above headwater (HWE) — check inputs';
 $ec_lang['or_notes_1_term']='Ecuația orificiului';
 $ec_lang['or_notes_1_def']='Q = C<sub>d</sub> &times; A &times; &radic;(2gh). Curgere liberă: h = HWE &minus; centroid. Înecat (TWE peste radier): h = HWE &minus; TWE.';
 $ec_lang['or_notes_2_term']='Regimul orificiului';

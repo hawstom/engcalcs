@@ -119,6 +119,7 @@ $ec_lang['or_regime']='בדיקת משטר הזרימה';
 $ec_lang['or_regime_valid']='זרימה חופשית — משטר פתח תקין ✓';
 $ec_lang['or_regime_submerged']='פתח טבוע (TWE מעל לתחתית) — תקין ✓';
 $ec_lang['or_regime_warn']='אזהרה: מפלס עליון מתחת לגג הפתח — לא משטר פתח';
+$ec_lang['or_regime_twe_above_hwe']='Warning: tailwater (TWE) above headwater (HWE) — check inputs';
 $ec_lang['or_notes_1_term']='משוואת הפתח';
 $ec_lang['or_notes_1_def']='Q = C<sub>d</sub> &times; A &times; &radic;(2gh). זרימה חופשית: h = HWE &minus; צנטרואיד. זרימה טבועה (TWE מעל לתחתית): h = HWE &minus; TWE.';
 $ec_lang['or_notes_2_term']='משטר הפתח';

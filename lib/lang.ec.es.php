@@ -209,6 +209,7 @@ $ec_lang['or_regime']='Verificación del régimen de orificio';
 $ec_lang['or_regime_valid']='Salida libre — régimen de orificio válido ✓';
 $ec_lang['or_regime_submerged']='Orificio sumergido (TWE sobre la solera) — válido ✓';
 $ec_lang['or_regime_warn']='Advertencia: lámina aguas arriba bajo la clave — no es régimen de orificio';
+$ec_lang['or_regime_twe_above_hwe']='Warning: tailwater (TWE) above headwater (HWE) — check inputs';
 $ec_lang['or_notes_1_term']='Ecuación de orificio';
 $ec_lang['or_notes_1_def']='Q = C<sub>d</sub> &times; A &times; &radic;(2gh). Salida libre: h = HWE &minus; centroide. Sumergido (TWE sobre la solera): h = HWE &minus; TWE.';
 $ec_lang['or_notes_2_term']='Régimen de orificio';

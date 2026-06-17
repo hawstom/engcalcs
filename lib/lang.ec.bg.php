@@ -199,6 +199,7 @@ $ec_lang['or_regime']='Проверка на режима на изтичане'
 $ec_lang['or_regime_valid']='Свободно изтичане — режим на отвор ✓';
 $ec_lang['or_regime_submerged']='Потопен отвор (TWE над дъното) — валидно ✓';
 $ec_lang['or_regime_warn']='Предупреждение: горната вода е под горния ръб — не е режим на отвор';
+$ec_lang['or_regime_twe_above_hwe']='Warning: tailwater (TWE) above headwater (HWE) — check inputs';
 $ec_lang['or_notes_1_term']='Уравнение за отвор';
 $ec_lang['or_notes_1_def']='Q = C<sub>d</sub> &times; A &times; &radic;(2gh). При свободно изтичане: h = HWE &minus; центроид. При потопено (TWE над дъното): h = HWE &minus; TWE.';
 $ec_lang['or_notes_2_term']='Режим на отвор';

@@ -97,6 +97,7 @@ $ec_lang['or_regime']='孔口流态检验';
 $ec_lang['or_regime_valid']='自由出流 — 孔口流态有效 ✓';
 $ec_lang['or_regime_submerged']='淹没孔口（下游水位高于孔底）— 有效 ✓';
 $ec_lang['or_regime_warn']='警告：上游水位低于孔顶 — 非孔口流态';
+$ec_lang['or_regime_twe_above_hwe']='Warning: tailwater (TWE) above headwater (HWE) — check inputs';
 $ec_lang['or_notes_1_term']='孔口方程';
 $ec_lang['or_notes_1_def']='Q = C<sub>d</sub> &times; A &times; &radic;(2gh)。自由出流：h = HWE &minus; 形心高程。淹没出流（下游水位高于孔底）：h = HWE &minus; TWE。';
 $ec_lang['or_notes_2_term']='孔口流态';

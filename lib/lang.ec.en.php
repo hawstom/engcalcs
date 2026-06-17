@@ -219,6 +219,7 @@ $ec_lang['or_regime']='Orifice regime check';
 $ec_lang['or_regime_valid']='Free outfall — orifice regime valid ✓';
 $ec_lang['or_regime_submerged']='Submerged orifice (TWE above invert) — valid ✓';
 $ec_lang['or_regime_warn']='Warning: headwater below crown — not orifice regime';
+$ec_lang['or_regime_twe_above_hwe']='Warning: tailwater (TWE) above headwater (HWE) — check inputs';
 $ec_lang['or_notes_1_term']='Orifice Equation';
 $ec_lang['or_notes_1_def']='Q = C<sub>d</sub> &times; A &times; &radic;(2gh). For free outfall: h = HWE &minus; centroid. For submerged flow (TWE above invert): h = HWE &minus; TWE.';
 $ec_lang['or_notes_2_term']='Orifice Regime';

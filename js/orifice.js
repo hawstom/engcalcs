@@ -29,7 +29,10 @@ EngCalcs.pageCalculator = function(objForm) {
 	var regimeEl = document.getElementById('regime');
 	if (regimeEl) {
 		var regimeOk = (this.var.hwe >= this.var.crown && this.var.h > 0);
-		if (!regimeOk) {
+		if (this.var.twe > this.var.hwe) {
+			regimeEl.innerHTML = EngCalcs.pageConfig.regime_twe_above_hwe;
+			regimeEl.style.color = 'red';
+		} else if (!regimeOk) {
 			regimeEl.innerHTML = EngCalcs.pageConfig.regime_warn;
 			regimeEl.style.color = 'darkorange';
 		} else if (this.var.submerged) {

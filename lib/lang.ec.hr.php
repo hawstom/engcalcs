@@ -42,6 +42,7 @@ $ec_lang['or_regime']='Provjera režima otvora';
 $ec_lang['or_regime_valid']='Slobodni istjecaj — režim otvora valjan ✓';
 $ec_lang['or_regime_submerged']='Potopljeni otvor (TWE iznad dna) — valjano ✓';
 $ec_lang['or_regime_warn']='Upozorenje: uzvodni nivo ispod tjemena — nije režim otvora';
+$ec_lang['or_regime_twe_above_hwe']='Warning: tailwater (TWE) above headwater (HWE) — check inputs';
 $ec_lang['or_notes_1_term']='Jednadžba otvora';
 $ec_lang['or_notes_1_def']='Q = C<sub>d</sub> &times; A &times; &radic;(2gh). Slobodan istjecaj: h = HWE &minus; težište. Potopljeni (TWE iznad dna): h = HWE &minus; TWE.';
 $ec_lang['or_notes_2_term']='Režim otvora';

@@ -210,6 +210,7 @@ $ec_lang['or_regime']='Verificação do regime de orifício';
 $ec_lang['or_regime_valid']='Saída livre — regime de orifício válido ✓';
 $ec_lang['or_regime_submerged']='Orifício submerso (TWE acima da soleira) — válido ✓';
 $ec_lang['or_regime_warn']='Aviso: nível a montante abaixo da crista — não é regime de orifício';
+$ec_lang['or_regime_twe_above_hwe']='Warning: tailwater (TWE) above headwater (HWE) — check inputs';
 $ec_lang['or_notes_1_term']='Equação do orifício';
 $ec_lang['or_notes_1_def']='Q = C<sub>d</sub> &times; A &times; &radic;(2gh). Saída livre: h = HWE &minus; centroide. Escoamento submerso (TWE acima da soleira): h = HWE &minus; TWE.';
 $ec_lang['or_notes_2_term']='Regime de orifício';

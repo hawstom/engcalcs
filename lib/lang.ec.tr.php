@@ -203,6 +203,7 @@ $ec_lang['or_regime']='Orifis rejimi kontrolü';
 $ec_lang['or_regime_valid']='Serbest çıkış — orifis rejimi geçerli ✓';
 $ec_lang['or_regime_submerged']='Batık orifis (TWE taban kotu üzerinde) — geçerli ✓';
 $ec_lang['or_regime_warn']='Uyarı: memba su yüzü tavan altında — orifis rejimi değil';
+$ec_lang['or_regime_twe_above_hwe']='Warning: tailwater (TWE) above headwater (HWE) — check inputs';
 $ec_lang['or_notes_1_term']='Orifis Denklemi';
 $ec_lang['or_notes_1_def']='Q = C<sub>d</sub> &times; A &times; &radic;(2gh). Serbest çıkış: h = HWE &minus; ağırlık merkezi kotu. Batık akış (TWE taban kotu üzerinde): h = HWE &minus; TWE.';
 $ec_lang['or_notes_2_term']='Orifis Rejimi';

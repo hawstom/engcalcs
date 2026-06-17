@@ -43,6 +43,7 @@ $ec_lang['or_regime']='Провера режима отвора';
 $ec_lang['or_regime_valid']='Слободно истицање — режим отвора валидан ✓';
 $ec_lang['or_regime_submerged']='Потопљен отвор (TWE изнад дна) — валидно ✓';
 $ec_lang['or_regime_warn']='Упозорење: узводни ниво испод темена — није режим отвора';
+$ec_lang['or_regime_twe_above_hwe']='Warning: tailwater (TWE) above headwater (HWE) — check inputs';
 $ec_lang['or_notes_1_term']='Једначина отвора';
 $ec_lang['or_notes_1_def']='Q = C<sub>d</sub> &times; A &times; &radic;(2gh). Слободно истицање: h = HWE &minus; тежиште. Потопљени (TWE изнад дна): h = HWE &minus; TWE.';
 $ec_lang['or_notes_2_term']='Режим отвора';
