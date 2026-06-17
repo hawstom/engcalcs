@@ -43,7 +43,7 @@ echoHeader("EngCalcs", $html_title, $html_head);
   </ul>
 
   <p>
-    Because the pond sides are straight (conic section assumption), the radius changes linearly with height.
+    Because the pond sides are straight, the radius (conic section assumption) changes linearly with height.
     Since area is proportional to radius squared, the square root of the area also changes linearly with height.
     That is the geometric fact that makes the derivation tractable, and it gives the interpolation formula:
   </p>
