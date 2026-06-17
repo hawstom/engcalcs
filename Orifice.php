@@ -14,9 +14,9 @@ echoHeader("EngCalcs", $html_title, $html_head);
 echoCalculatorForm(
 	//Inputs
 	Array(
-		Array('name' => 'hwe',    'type' => 'number', 'default' => '2',    'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['or_hwe']),
-		Array('name' => 'twe',    'type' => 'number', 'default' => '0',    'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['or_twe']),
-		Array('name' => 'zinv',   'type' => 'number', 'default' => '0',    'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['or_invert']),
+		Array('name' => 'hwe',    'type' => 'number', 'default' => '102',    'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['or_hwe']),
+		Array('name' => 'twe',    'type' => 'number', 'default' => '100',    'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['or_twe']),
+		Array('name' => 'zinv',   'type' => 'number', 'default' => '100.5',    'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['or_invert']),
 		Array('name' => 'd',      'type' => 'number', 'default' => '1',    'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['or_diameter'] . '<br /><input type="radio" name="shape" id="shape_circ" value="circular" checked onchange="EngCalcs.submitForm()"> <label for="shape_circ">' . $ec_lang['or_shape_circular'] . '</label> <input type="radio" name="shape" id="shape_rect" value="rectangular" onchange="EngCalcs.submitForm()"> <label for="shape_rect">' . $ec_lang['or_shape_rectangular'] . '</label>'),
 		Array('name' => 'w',      'type' => 'number', 'default' => '1',    'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['or_width']),
 		Array('name' => 'cd',     'type' => 'number', 'default' => '0.61', 'units' => NULL,                     'label' => '<a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venturi-d_590.html">'.$ec_lang['or_cd'].'</a>'),

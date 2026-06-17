@@ -19,9 +19,9 @@ echoCalculatorForm(
 		Array('name' => 'h2_elev',   'type' => 'number', 'default' => '1',   'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['odt_h2_elev']),
 		Array('name' => 'h_orifice', 'type' => 'number', 'default' => '0',   'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['odt_h_orifice']),
 		Array('name' => 'a0',        'type' => 'number', 'default' => '100',  'units' => Array('m2','mm2','ft2','in2'), 'label' => $ec_lang['odt_a0']),
-		Array('name' => 'd',       'type' => 'number', 'default' => '0.3',  'units' => Array('m','mm','ft','in'),         'label' => $ec_lang['odt_d'] . '<br /><input type="radio" name="shape" id="shape_circ" value="circular" checked onchange="EngCalcs.submitForm()"> <label for="shape_circ">' . $ec_lang['or_shape_circular'] . '</label> <input type="radio" name="shape" id="shape_rect" value="rectangular" onchange="EngCalcs.submitForm()"> <label for="shape_rect">' . $ec_lang['or_shape_rectangular'] . '</label>'),
+		Array('name' => 'd',       'type' => 'number', 'default' => '0.1',  'units' => Array('m','mm','ft','in'),         'label' => $ec_lang['odt_d'] . '<br /><input type="radio" name="shape" id="shape_circ" value="circular" checked onchange="EngCalcs.submitForm()"> <label for="shape_circ">' . $ec_lang['or_shape_circular'] . '</label> <input type="radio" name="shape" id="shape_rect" value="rectangular" onchange="EngCalcs.submitForm()"> <label for="shape_rect">' . $ec_lang['or_shape_rectangular'] . '</label>'),
 		Array('name' => 'w',       'type' => 'number', 'default' => '0.3',  'units' => Array('m','mm','ft','in'),         'label' => $ec_lang['odt_w']),
-		Array('name' => 'cd',      'type' => 'number', 'default' => '0.61', 'units' => NULL,                              'label' => '<a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venture-d_590.html">'.$ec_lang['or_cd'].'</a>'),
+		Array('name' => 'cd',      'type' => 'number', 'default' => '0.61', 'units' => NULL,                              'label' => '<a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venturi-d_590.html">'.$ec_lang['or_cd'].'</a>'),
 	),
 	//Results
 	Array(
