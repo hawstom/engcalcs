@@ -196,7 +196,7 @@ $ec_lang['wi_incrementalFlow']='Débit élémentaire';
 $ec_lang['wi_cumulativeFlow']='Débit cumulé';
 $ec_lang['wi_save_and_calculate']='Enregistrer et calculer';
 $ec_lang['wi_notes_we_term']='Équation du déversoir';
-$ec_lang['wi_notes_we_def']='q = si (longueur = 0) alors 0 sinon si (pente=0) alors cw*longueur*d<sub>0</sub><sup>1,5</sup> sinon cw/(2,5*pente) * (d<sub>0</sub><sup>2,5</sup> - d1<sup>2,5</sup>) où d<sub>1</sub> et d<sub>0</sub> sont toujours positifs ou nuls';
+$ec_lang['wi_notes_we_def']='q = si (longueur = 0) alors 0 sinon si (pente=0) alors cw*longueur*d<sub>0</sub><sup>1,5</sup> sinon cw/(2,5*pente) * (d<sub>0</sub><sup>2,5</sup> - d<sub>1</sub><sup>2,5</sup>) où d<sub>1</sub> et d<sub>0</sub> sont toujours positifs ou nuls';
 // Orifice Flow
 $ec_lang['or_main_menu']='Débit par Orifice';
 $ec_lang['or_main_title']='Calculateur gratuit en ligne de débit par orifice';
@@ -226,6 +226,26 @@ $ec_lang['or_notes_3_term']='Coefficient de débit';
 $ec_lang['or_notes_3_def']='C<sub>d</sub> varie entre 0,60 et 0,65 pour les orifices à arête vive. Les entrées arrondies ou en retrait ont des valeurs différentes. Voir <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venture-d_590.html">Engineering Toolbox</a> ou le Manuel de Référence Hydraulique HEC-RAS.';
 $ec_lang['or_notes_4_term']='Submersion';
 $ec_lang['or_notes_4_def']='Lorsque TWE est au-dessus du radier de l\'ouverture, la calculatrice applique automatiquement l\'équation d\'orifice noyé avec h = HWE &minus; TWE. Lorsque TWE est au niveau ou en dessous du radier, un déversement libre est supposé et h = HWE &minus; centroïde.';
+// Orifice Drain Time
+$ec_lang['odt_main_menu']='Orifice Drain Time';
+$ec_lang['odt_main_title']='Free Online Orifice Drain Time Calculator';
+$ec_lang['odt_main_desc']='Pond Orifice Drain Time &mdash; Conic Volume Method';
+$ec_lang['odt_h1_elev']='Starting water surface elevation';
+$ec_lang['odt_a1']='Full pond area, A1';
+$ec_lang['odt_h2_elev']='Ending water surface elevation';
+$ec_lang['odt_h_orifice']='Orifice centroid elevation';
+$ec_lang['odt_a0']='Pond area at orifice elevation, A0';
+$ec_lang['odt_a_ending']='Ending pond area, A2 (interpolated)';
+$ec_lang['odt_d']='Orifice diameter (circular) or height (rectangular), D';
+$ec_lang['odt_w']='Orifice width, W (rectangular only)';
+$ec_lang['odt_t_sec']='Drain time (seconds)';
+$ec_lang['odt_t_min']='Drain time (minutes)';
+$ec_lang['odt_t_hr']='Drain time (hours)';
+$ec_lang['odt_t_day']='Drain time (days)';
+$ec_lang['odt_notes_1_term']='Formula';
+$ec_lang['odt_notes_1_def']='t = &radic;H<sub>1</sub> / (C<sub>d</sub> A<sub>or</sub> &radic;(2g)) &times; (2A<sub>x</sub>/5 + 8&radic;(A<sub>x</sub>A<sub>0</sub>)/15 + 16A<sub>0</sub>/15) gives drain time from head H to the orifice. Drain time = t(H<sub>1</sub>,A<sub>1</sub>,A<sub>0</sub>) &minus; t(H<sub>2</sub>,A<sub>2</sub>,A<sub>0</sub>), where H<sub>1</sub> = starting elevation &minus; orifice elevation, H<sub>2</sub> = ending elevation &minus; orifice elevation.';
+$ec_lang['odt_notes_2_term']='Method';
+$ec_lang['odt_notes_2_def']='The conic volume method models the pond as a conic section between the starting area A<sub>1</sub> at the initial water surface and the area A<sub>0</sub> at the orifice centroid elevation. A<sub>2</sub>, the pond area at the ending elevation, is interpolated from A<sub>1</sub> and A<sub>0</sub> using the conic section model. Drain time from starting to ending elevation equals total drain time from H<sub>1</sub> to orifice minus remaining drain time from H<sub>2</sub> to orifice.';
 // Contact us.
 $ec_lang['contact_title']='Contact HawsEDC';
 $ec_lang['contactSendMessage']='Envoyer un message à Tom Haws';

@@ -98,6 +98,7 @@ function echoEngCalcsMenu () {
 					<a class="dropdown-item" href="https://docs.google.com/spreadsheets/d/1XRaQtrd8G9GnhXJK9zHBL7TXd0Rj2qex8siopZEPMsA/edit?usp=sharing" title="<?=$ec_lang['rrc_main_desc']?>"><?=$ec_lang['rrc_main_menu']?></a>
 					<div class="dropdown-divider"></div>
 					<a class="dropdown-item" href="Orifice.php" title="<?=$ec_lang['or_main_desc']?>"><?=$ec_lang['or_main_menu']?></a>
+					<a class="dropdown-item" href="Orifice-Drain-Time.php" title="<?=$ec_lang['odt_main_desc']?>"><?=$ec_lang['odt_main_menu']?></a>
 					<a class="dropdown-item" href="Weir-Flow-Simple.php" title="<?=$ec_lang['ws_main_desc']?>"><?=$ec_lang['ws_main_menu']?></a>
 					<a class="dropdown-item" href="Weir-Flow-Irregular.php" title="<?=$ec_lang['wi_main_desc']?>"><?=$ec_lang['wi_menu']?></a>
 				</div>

@@ -28,7 +28,7 @@ echoCalculatorForm(
 <?php echoFeedback(); ?>
 <h2><?=$ec_lang['ws_notes_heading']?></h2>
 <dl>
-<dt><?=$ec_lang['ws_notes_we_term']?></dt><dd>q = cw * l * h<sup>1.5</sup></dd>
+<dt><?=$ec_lang['ws_notes_we_term']?></dt><dd>Q = C<sub>w</sub> &times; l &times; h<sup>1.5</sup></dd>
 </dl>
 <script src="/engcalcs/js/weir-flow-simple.js?v=<?=filemtime(__DIR__.'/js/weir-flow-simple.js')?>"></script>
 <script>
