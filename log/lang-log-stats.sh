@@ -12,15 +12,21 @@
 #
 # LOG FORMAT (tab-separated, one line per session/selection):
 #   timestamp   lang   source   page
-#   2026-06-17T21:04:33Z   es   get      Manning-Pipe-Flow
-#   2026-06-17T21:05:11Z   fr   browser  Orifice
-#   2026-06-18T09:12:44Z   es   cookie   Hazen-Williams
+#   2026-06-17T21:04:33Z   es      get      Manning-Pipe-Flow
+#   2026-06-17T21:05:11Z   es-MX   browser  Orifice
+#   2026-06-18T09:12:44Z   es      cookie   Hazen-Williams
 #
 # SOURCES:
 #   get     — user explicitly selected a language via ?lang=XX (every occurrence)
 #   cookie  — returning user whose prior selection was saved in a cookie (once per session)
 #   browser — raw first Accept-Language tag from the browser (e.g. es-MX, zh-TW), logged once ever
 #             per browser via the ec_blang cookie; may not be a language we support
+#
+# SUB-LANGUAGE NOTE:
+#   browser entries may contain subtags (es-MX, zh-TW, pt-BR, en-US, etc.).
+#   get and cookie entries are always plain 2-letter codes (our supported languages).
+#   Most sections below aggregate subtags to their primary code (es-MX → es) so
+#   all sources are comparable. The raw browser breakdown is also shown separately.
 #
 # WHY THREE SOURCES:
 #   'get' answers: which languages do users actively seek out?
@@ -52,7 +58,11 @@ echo "--- Language demand: explicit selections only (source=get) ---"
 awk -F'\t' '$3=="get" {print $2}' "$LOG" | sort | uniq -c | sort -rn
 
 echo ""
-echo "--- Language demand: browser auto-detection (source=browser) ---"
+echo "--- Language demand: browser first-preference, aggregated (source=browser) ---"
+awk -F'\t' '$3=="browser" {split($2,a,"-"); print a[1]}' "$LOG" | sort | uniq -c | sort -rn
+
+echo ""
+echo "--- Language demand: browser first-preference, raw subtags (source=browser) ---"
 awk -F'\t' '$3=="browser" {print $2}' "$LOG" | sort | uniq -c | sort -rn
 
 echo ""
@@ -60,12 +70,12 @@ echo "--- Language demand: returning users with saved preference (source=cookie)
 awk -F'\t' '$3=="cookie" {print $2}' "$LOG" | sort | uniq -c | sort -rn
 
 echo ""
-echo "--- Overall language demand: all sources combined ---"
-awk -F'\t' '{print $2}' "$LOG" | sort | uniq -c | sort -rn
+echo "--- Overall language demand: all sources combined, aggregated ---"
+awk -F'\t' '{split($2,a,"-"); print a[1]}' "$LOG" | sort | uniq -c | sort -rn
 
 echo ""
-echo "--- Non-English demand by page (all sources) ---"
-awk -F'\t' '$2!="en" {print $2"\t"$4}' "$LOG" | sort | uniq -c | sort -rn
+echo "--- Non-English demand by page, aggregated (all sources) ---"
+awk -F'\t' '{split($2,a,"-"); if (a[1]!="en") print a[1]"\t"$4}' "$LOG" | sort | uniq -c | sort -rn
 
 echo ""
 echo "--- Entries per day ---"
