@@ -58,6 +58,7 @@ function echoCalculatorFormAppend() {
 <?php
 }
 ?>
+<div id="sketch" style="margin-top:1em; max-width:540px;"></div>
 <?php echoFeedback(); ?>
 <h2><?=$ec_lang['mi_notes']?></h2>
 <dl>

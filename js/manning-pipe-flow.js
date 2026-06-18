@@ -56,15 +56,15 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.var.gtx2 = this.var.gcx + this.var.gcr/8;
 
 	document.getElementById('sketch').innerHTML =
-		'<svg height="' + this.var.gh + '" width="' + this.var.gw + '">' +
-			'<circle cx="' + this.var.gcx + '" cy="' + this.var.gcy + '" r="' + this.var.gcr + '" stroke="black" stroke-width="' + this.var.gcr/25 + '" fill="white" />' +
-			'<line x1="' + this.var.glx1 + '" y1="' + this.var.gly + '" x2="' + this.var.glx2 + '" y2="' + this.var.gly + '" style="stroke:rgb(0,0,255);stroke-width:' + this.var.gcr/25 + '" />' +
-			'<line x1="' + this.var.gcx + '" y1="' + this.var.gcb + '" x2="' + this.var.gcx + '" y2="' + this.var.gly + '" style="stroke:rgb(0,0,255);stroke-width:' + this.var.gcr/3 + '" />' +
+		'<svg height="' + this.var.gh + '" width="' + this.var.gw + '" style="font-family:sans-serif;font-size:11px;">' +
+			'<circle cx="' + this.var.gcx + '" cy="' + this.var.gcy + '" r="' + this.var.gcr + '" stroke="black" stroke-width="' + this.var.gcr/25 + '" fill="white"/>' +
+			'<line x1="' + this.var.glx1 + '" y1="' + this.var.gly + '" x2="' + this.var.glx2 + '" y2="' + this.var.gly + '" stroke="blue" stroke-width="' + this.var.gcr/25 + '"/>' +
+			'<line x1="' + this.var.gcx + '" y1="' + this.var.gcb + '" x2="' + this.var.gcx + '" y2="' + this.var.gly + '" stroke="blue" stroke-width="' + this.var.gcr/3 + '"/>' +
 			'<polygon points="' +
 			this.var.gcx + ',' + this.var.gly + ' ' +
 			this.var.gtx1 + ',' + this.var.gty + ' ' +
 			this.var.gtx2 + ',' + this.var.gty + '" ' +
-			'style="fill:white;stroke:black;stroke-width:' + this.var.gcr/50 + '" />' +
+			'fill="white" stroke="black" stroke-width="' + this.var.gcr/50 + '"/>' +
 			'Sorry, your browser does not support inline SVG.' +
 		'</svg>';
 };

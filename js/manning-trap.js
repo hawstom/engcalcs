@@ -133,19 +133,19 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.var.gtx2 = this.var.gxm + this.var.gymax/16;
 	this.var.gty = this.var.gyt - this.var.gymax/8;
 	document.getElementById('sketch').innerHTML =
-		'<svg height="' + this.var.gh + '" width="' + this.var.gw + '">' +
+		'<svg height="' + this.var.gh + '" width="' + this.var.gw + '" style="font-family:sans-serif;font-size:11px;">' +
 			'<polyline points="' +
 			'0,' + this.var.gyt  + ' ' +
 			this.var.gxb1 + ',' + this.var.gyb + ' ' +
 			this.var.gxb2 + ',' + this.var.gyb + ' ' +
 			this.var.gt + ',' + this.var.gyt + '" ' +
-			'style="fill:none;stroke:black;stroke-width:' + this.var.gymax/25 + '" />' +
-			'<line x1="0" y1="' + this.var.gyt  + '" x2="' + this.var.gt + '" y2="' + this.var.gyt  + '" style="stroke:rgb(0,0,255);stroke-width:' + this.var.gymax/25 + '" />' +
+			'fill="none" stroke="black" stroke-width="' + this.var.gymax/25 + '"/>' +
+			'<line x1="0" y1="' + this.var.gyt  + '" x2="' + this.var.gt + '" y2="' + this.var.gyt  + '" stroke="blue" stroke-width="' + this.var.gymax/25 + '"/>' +
 			'<polygon points="' +
 			this.var.gxm + ',' + this.var.gyt + ' ' +
 			this.var.gtx1 + ',' + this.var.gty + ' ' +
 			this.var.gtx2 + ',' + this.var.gty + '" ' +
-			'style="fill:white;stroke:black;stroke-width:' + this.var.gymax/50 + '" />' +
+			'fill="white" stroke="black" stroke-width="' + this.var.gymax/50 + '"/>' +
 			'Sorry, your browser does not support inline SVG.' +
 		'</svg>';
 };

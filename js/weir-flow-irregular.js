@@ -46,6 +46,7 @@ EngCalcs.pageCalculator = function (objForm) {
     }
     // Save a cookie for next time
     EngCalcs.adjustInputWidth();
+    EngCalcs.wiDrawSketch(hw);
 };
 
 EngCalcs.pageCalculatorInitialize = function (objForm) {
@@ -83,3 +84,64 @@ EngCalcs.pageAddCalcRow = function () {
 EngCalcs.dataSingletonsCount = 4;
 EngCalcs.dataColumnsFirstRowCount = 2;
 EngCalcs.dataColumnsOtherRowsCount = 2;
+
+EngCalcs.wiDrawSketch = function(hw) {
+    var el = document.getElementById('sketch');
+    if (!el) { return; }
+
+    var hwNum = parseFloat(hw);
+    if (!isFinite(hwNum)) { el.innerHTML = ''; return; }
+
+    // Collect station/elevation pairs from the weir table
+    var pts = [];
+    var tbody = document.getElementById('CalcsBody');
+    if (!tbody) { el.innerHTML = ''; return; }
+    var rows = tbody.getElementsByTagName('tr');
+    for (var i = 0; i < EngCalcs.numCalcRows; i++) {
+        var inp = rows[i].getElementsByTagName('input');
+        var sta  = parseFloat(inp[0].value);
+        var elev = parseFloat(inp[1].value);
+        if (isFinite(sta) && isFinite(elev)) { pts.push({x: sta, y: elev}); }
+    }
+    if (pts.length < 2) { el.innerHTML = ''; return; }
+
+    var minX = pts[0].x, maxX = pts[0].x;
+    var minY = pts[0].y, maxY = pts[0].y;
+    for (var i = 1; i < pts.length; i++) {
+        if (pts[i].x < minX) { minX = pts[i].x; }
+        if (pts[i].x > maxX) { maxX = pts[i].x; }
+        if (pts[i].y < minY) { minY = pts[i].y; }
+        if (pts[i].y > maxY) { maxY = pts[i].y; }
+    }
+    maxY = Math.max(maxY, hwNum);
+
+    var spanX = maxX - minX, spanY = maxY - minY;
+    if (spanX <= 0 || spanY <= 0) { el.innerHTML = ''; return; }
+
+    var svgW = 400, svgH = 200;
+    var padL = 10, padR = 10, padT = 20, padB = 10;
+    var drawW = svgW - padL - padR;
+    var drawH = svgH - padT - padB;
+
+    function toX(x) { return padL + (x - minX) / spanX * drawW; }
+    function toY(y) { return svgH - padB - (y - minY) / spanY * drawH; }
+
+    var s = '<svg width="' + svgW + '" height="' + svgH + '" style="font-family:sans-serif;font-size:11px;">';
+
+    // Weir crest profile
+    var poly = '';
+    for (var i = 0; i < pts.length; i++) {
+        if (i > 0) { poly += ' '; }
+        poly += toX(pts[i].x) + ',' + toY(pts[i].y);
+    }
+    s += '<polyline points="' + poly + '" fill="none" stroke="black" stroke-width="2"/>';
+
+    // HWE line
+    if (hwNum > minY) {
+        var hweY = toY(hwNum);
+        s += '<line x1="' + toX(minX) + '" y1="' + hweY + '" x2="' + toX(maxX) + '" y2="' + hweY + '" stroke="blue" stroke-width="2"/>';
+    }
+
+    s += '</svg>';
+    el.innerHTML = s;
+};

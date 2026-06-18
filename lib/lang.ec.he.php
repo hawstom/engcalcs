@@ -36,6 +36,9 @@ $ec_lang['u_pa']='Pa';
 $ec_lang['u_psf']='psf';
 $ec_lang['u_psi']='psi';
 $ec_lang['u_s']='sec';
+$ec_lang['u_acft']="ac-ft";
+$ec_lang['u_ft3']="ft^3";
+$ec_lang['u_m3']="m^3";
 
 // Page text
 // In page order for easiest maintenance.
@@ -134,11 +137,14 @@ $ec_lang['odt_main_menu']="Orifice Drain Time";
 $ec_lang['odt_main_title']="Free Online Orifice Drain Time Calculator";
 $ec_lang['odt_main_desc']="Pond Orifice Drain Time &mdash; Conic Volume Method";
 $ec_lang['odt_h1_elev']="Starting water surface elevation";
-$ec_lang['odt_a1']="Full pond area, A1";
+$ec_lang['odt_a1']="Starting pond area, A1";
 $ec_lang['odt_h2_elev']="Ending water surface elevation";
 $ec_lang['odt_h_orifice']='Orifice centroid elevation';
 $ec_lang['odt_a0']='Pond area at orifice elevation, A0';
 $ec_lang['odt_a_ending']='Ending pond area, A2 (interpolated)';
+$ec_lang['odt_h2_check']='Ending elevation check';
+$ec_lang['odt_h2_ok']='Ending elevation above orifice top ✓';
+$ec_lang['odt_h2_warn']='Warning: ending elevation at or below orifice top (centroid + D/2)';
 $ec_lang['odt_d']="Orifice diameter (circular) or height (rectangular), D";
 $ec_lang['odt_w']="Orifice width, W (rectangular only)";
 $ec_lang['odt_t_sec']="Drain time (seconds)";
@@ -149,3 +155,6 @@ $ec_lang['odt_notes_1_term']="Formula";
 $ec_lang['odt_notes_1_def']='t = &radic;H<sub>1</sub> / (C<sub>d</sub> A<sub>or</sub> &radic;(2g)) &times; (2A<sub>x</sub>/5 + 8&radic;(A<sub>x</sub>A<sub>0</sub>)/15 + 16A<sub>0</sub>/15) gives drain time from head H to the orifice. Drain time = t(H<sub>1</sub>,A<sub>1</sub>,A<sub>0</sub>) &minus; t(H<sub>2</sub>,A<sub>2</sub>,A<sub>0</sub>), where H<sub>1</sub> = starting elevation &minus; orifice elevation, H<sub>2</sub> = ending elevation &minus; orifice elevation.';
 $ec_lang['odt_notes_2_term']="Method";
 $ec_lang['odt_notes_2_def']='The conic volume method models the pond as a conic section between the starting area A<sub>1</sub> at the initial water surface and the area A<sub>0</sub> at the orifice centroid elevation. A<sub>2</sub>, the pond area at the ending elevation, is interpolated from A<sub>1</sub> and A<sub>0</sub> using the conic section model. Drain time from starting to ending elevation equals total drain time from H<sub>1</sub> to orifice minus remaining drain time from H<sub>2</sub> to orifice.';
+$ec_lang['odt_h1']='Starting head, H<sub>1</sub> (WSE &minus; centroid)';
+$ec_lang['odt_q_max']='Max (starting) flow, Q<sub>max</sub>';
+$ec_lang['odt_vol']='Drained volume';
