@@ -29,24 +29,5 @@ define('BASE_DIRECTORY', $basedirectory);
 // Language demand log — outside public_html, not HTTP-accessible.
 // Only explicit user selections (?lang=XX) are logged; browser auto-detection is not.
 // Each line: ISO-8601 UTC timestamp TAB lang-code TAB page-basename
-// Example:   2026-06-17T21:04:33Z    es    Manning-Pipe-Flow
-//
-// Useful shell commands:
-//   View raw log:
-//     cat /var/www/cnm/logs/engcalcs-lang.log
-//
-//   Count selections by language (most popular first):
-//     awk -F'\t' '{print $2}' /var/www/cnm/logs/engcalcs-lang.log | sort | uniq -c | sort -rn
-//
-//   Count selections by page:
-//     awk -F'\t' '{print $3}' /var/www/cnm/logs/engcalcs-lang.log | sort | uniq -c | sort -rn
-//
-//   Count selections by language and page together:
-//     awk -F'\t' '{print $2"\t"$3}' /var/www/cnm/logs/engcalcs-lang.log | sort | uniq -c | sort -rn
-//
-//   Show selections for a specific language (e.g. es):
-//     grep $'\tes\t' /var/www/cnm/logs/engcalcs-lang.log
-//
-//   Count selections per day:
-//     awk -F'\t' '{print substr($1,1,10)}' /var/www/cnm/logs/engcalcs-lang.log | sort | uniq -c
+// Run lang-log-stats.sh to analyze.
 define('LANG_LOG', realpath(dirname(BASE_DIRECTORY) . '/..') . '/logs/engcalcs-lang.log');
