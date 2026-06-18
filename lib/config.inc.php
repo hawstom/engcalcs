@@ -27,7 +27,9 @@ define('DEBUG_MODE', getenv('APP_ENV') === 'development');
 define('BASE_DIRECTORY', $basedirectory);
 
 // Language demand log — stored in log/ at the project root, blocked from HTTP by log/.htaccess.
-// Only explicit user selections (?lang=XX) are logged; browser auto-detection is not.
-// Each line: ISO-8601 UTC timestamp TAB lang-code TAB page-basename
+// Each line: ISO-8601 UTC timestamp TAB lang-code TAB source TAB page-basename
+//   source='get'     explicit ?lang=XX selection — logged every occurrence
+//   source='cookie'  returning user with saved preference — logged once per session
+//   source='browser' Accept-Language auto-detection — logged once per session
 // Run log/lang-log-stats.sh to analyze.
 define('LANG_LOG', dirname(__DIR__) . '/log/engcalcs-lang.log');

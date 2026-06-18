@@ -20,7 +20,10 @@
   * "es,en-gb;q=0.9,en-us;q=0.8,en;q=0.6,pt;q=0.5,ie;q=0.4,it;q=0.3,fr;q=0.1"
   *
   */
-function logLanguageSelection($lang) {
+// $source: 'get' = explicit ?lang=XX (every occurrence)
+//          'cookie' = returning user with saved preference (once per session)
+//          'browser' = Accept-Language auto-detection (once per session)
+function logLanguageSelection($lang, $source) {
     $logFile = defined('LANG_LOG') ? LANG_LOG : null;
     if (!$logFile) return;
     $dir = dirname($logFile);
@@ -28,7 +31,7 @@ function logLanguageSelection($lang) {
         @mkdir($dir, 0750, true);
     }
     $page = isset($_SERVER['SCRIPT_NAME']) ? basename($_SERVER['SCRIPT_NAME'], '.php') : '';
-    $line = gmdate('Y-m-d\TH:i:s\Z') . "\t" . $lang . "\t" . $page . "\n";
+    $line = gmdate('Y-m-d\TH:i:s\Z') . "\t" . $lang . "\t" . $source . "\t" . $page . "\n";
     @file_put_contents($logFile, $line, FILE_APPEND | LOCK_EX);
 }
 
@@ -45,7 +48,7 @@ function chooseLanguage($all_language_settings) {
                 'secure'   => true,
                 'httponly' => true,
             ]);
-            logLanguageSelection($_GET["lang"]);
+            logLanguageSelection($_GET["lang"], 'get');
             return $_GET["lang"];
         } else {
             return "en";
@@ -56,6 +59,10 @@ function chooseLanguage($all_language_settings) {
     } elseif (!empty($_COOKIE["ec_language"]) && ctype_alpha($_COOKIE["ec_language"]) && strlen($_COOKIE["ec_language"]) == 2 && !empty($all_language_settings[$_COOKIE["ec_language"]])) {
         // Else if a valid language cookie exists from a previous browser session, use it.
         $_SESSION["CLANGUAGE"] = $_COOKIE["ec_language"];
+        if (empty($_SESSION['CLANG_LOGGED'])) {
+            logLanguageSelection($_COOKIE["ec_language"], 'cookie');
+            $_SESSION['CLANG_LOGGED'] = true;
+        }
         return $_COOKIE["ec_language"];
     } else {
         // Get and try to match user's acceptable languages.
@@ -150,6 +157,10 @@ function chooseLanguage($all_language_settings) {
     print_r($accept_langs_array);
     print_r($language_settings);
     */
+    if (empty($_SESSION['CLANG_LOGGED'])) {
+        logLanguageSelection($winningLanguage, 'browser');
+        $_SESSION['CLANG_LOGGED'] = true;
+    }
     return $winningLanguage;
     }
 }
