@@ -25,3 +25,7 @@ $basedirectory = realpath(__DIR__.'/../..');
 define('DEBUG_MODE', getenv('APP_ENV') === 'development');
 
 define('BASE_DIRECTORY', $basedirectory);
+
+// Language demand log — outside public_html, not HTTP-accessible.
+// Each line: ISO-8601 UTC timestamp TAB lang-code TAB page-basename
+define('LANG_LOG', realpath(dirname(BASE_DIRECTORY) . '/..') . '/logs/engcalcs-lang.log');

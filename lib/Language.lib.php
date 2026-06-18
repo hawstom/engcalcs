@@ -20,6 +20,18 @@
   * "es,en-gb;q=0.9,en-us;q=0.8,en;q=0.6,pt;q=0.5,ie;q=0.4,it;q=0.3,fr;q=0.1"
   *
   */
+function logLanguageSelection($lang) {
+    $logFile = defined('LANG_LOG') ? LANG_LOG : null;
+    if (!$logFile) return;
+    $dir = dirname($logFile);
+    if (!is_dir($dir)) {
+        @mkdir($dir, 0750, true);
+    }
+    $page = isset($_SERVER['SCRIPT_NAME']) ? basename($_SERVER['SCRIPT_NAME'], '.php') : '';
+    $line = gmdate('Y-m-d\TH:i:s\Z') . "\t" . $lang . "\t" . $page . "\n";
+    @file_put_contents($logFile, $line, FILE_APPEND | LOCK_EX);
+}
+
 function chooseLanguage($all_language_settings) {
     $browserDefaultQuality = 0;
     if (!empty($_GET["lang"])) {
@@ -33,6 +45,7 @@ function chooseLanguage($all_language_settings) {
                 'secure'   => true,
                 'httponly' => true,
             ]);
+            logLanguageSelection($_GET["lang"]);
             return $_GET["lang"];
         } else {
             return "en";
