@@ -30,6 +30,6 @@ define('BASE_DIRECTORY', $basedirectory);
 // Each line: ISO-8601 UTC timestamp TAB lang-code TAB source TAB page-basename
 //   source='get'     explicit ?lang=XX selection — logged every occurrence
 //   source='cookie'  returning user with saved preference — logged once per session
-//   source='browser' Accept-Language auto-detection — logged once per session
+//   source='browser' raw first Accept-Language tag (e.g. es-MX, zh-TW) — logged once ever per browser via ec_blang cookie
 // Run log/lang-log-stats.sh to analyze.
 define('LANG_LOG', dirname(__DIR__) . '/log/engcalcs-lang.log');

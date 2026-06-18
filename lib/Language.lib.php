@@ -157,10 +157,20 @@ function chooseLanguage($all_language_settings) {
     print_r($accept_langs_array);
     print_r($language_settings);
     */
-    if (empty($_SESSION['CLANG_LOGGED'])) {
-        logLanguageSelection($winningLanguage, 'browser');
-        $_SESSION['CLANG_LOGGED'] = true;
+    // Log the raw first Accept-Language tag (not the served language) once ever per browser.
+    // ec_blang cookie prevents re-logging across sessions.
+    if (!isset($_COOKIE['ec_blang']) && isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+        $rawLang = strtolower(trim(explode(';', explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE'])[0])[0]));
+        logLanguageSelection($rawLang, 'browser');
+        setcookie('ec_blang', $rawLang, [
+            'expires'  => time() + 365 * 24 * 60 * 60,
+            'path'     => '/',
+            'samesite' => 'Strict',
+            'secure'   => true,
+            'httponly' => true,
+        ]);
     }
+    $_SESSION['CLANG_LOGGED'] = true;
     return $winningLanguage;
     }
 }

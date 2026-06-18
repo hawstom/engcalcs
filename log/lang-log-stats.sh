@@ -19,11 +19,12 @@
 # SOURCES:
 #   get     — user explicitly selected a language via ?lang=XX (every occurrence)
 #   cookie  — returning user whose prior selection was saved in a cookie (once per session)
-#   browser — language chosen automatically from the browser's Accept-Language header (once per session)
+#   browser — raw first Accept-Language tag from the browser (e.g. es-MX, zh-TW), logged once ever
+#             per browser via the ec_blang cookie; may not be a language we support
 #
 # WHY THREE SOURCES:
 #   'get' answers: which languages do users actively seek out?
-#   'browser' answers: what is the passive language distribution of our visitors?
+#   'browser' answers: what languages do visitors actually want? (raw, unsupported langs visible too)
 #   'cookie' answers: which languages retain users across sessions?
 #   Combining all three answers: what languages are in real demand overall?
 
