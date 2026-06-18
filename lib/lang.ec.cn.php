@@ -67,6 +67,9 @@ $ec_lang['mpf_hydraulic_radius']='水力半徑';
 $ec_lang['mpf_top_width']='頂部寬度, T';
 $ec_lang['mpf_froude_number']='Froude 數, F';
 $ec_lang['mpf_shear_stress']='Average 剪應力(牽引力), tau';
+$ec_lang['mpf_solve_for_dd0']='Solve for y/d<sub>0</sub> given Q';
+$ec_lang['mpf_solve_desc']='Using D<sub>0</sub>, n, and S<sub>0</sub> from the calculator form, finds the lowest y/d<sub>0</sub> for a given Q.';
+$ec_lang['mpf_solve_button']='Solve';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='曼寧管道壓頭損失';
 $ec_lang['mphl_main_title']='曼寧粗造度係數, n?';

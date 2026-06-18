@@ -130,6 +130,9 @@ $ec_lang['mpf_hydraulic_radius']='Raio hidráulico';
 $ec_lang['mpf_top_width']='Largura, L';
 $ec_lang['mpf_froude_number']='Número de Froude, F';
 $ec_lang['mpf_shear_stress']='Tensão cisalhante average (força de tração), tau';
+$ec_lang['mpf_solve_for_dd0']='Solve for y/d<sub>0</sub> given Q';
+$ec_lang['mpf_solve_desc']='Using D<sub>0</sub>, n, and S<sub>0</sub> from the calculator form, finds the lowest y/d<sub>0</sub> for a given Q.';
+$ec_lang['mpf_solve_button']='Solve';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Pérdida de pressão em uma tubería de acordo com Manning';
 $ec_lang['mphl_main_title']='Calculadora gratis em linha da pérdida de altura de pressão em uma tubería de acordo com Manning';

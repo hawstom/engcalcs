@@ -25,6 +25,9 @@ $ec_lang['mpf_hydraulic_radius']='Hidraulički radijus, R';
 $ec_lang['mpf_top_width']='Najveća širina, T';
 $ec_lang['mpf_froude_number']='Frudov broj, F';
 $ec_lang['mpf_shear_stress']='Napon smicanja average (vučna sila), tau';
+$ec_lang['mpf_solve_for_dd0']='Solve for y/d<sub>0</sub> given Q';
+$ec_lang['mpf_solve_desc']='Using D<sub>0</sub>, n, and S<sub>0</sub> from the calculator form, finds the lowest y/d<sub>0</sub> for a given Q.';
+$ec_lang['mpf_solve_button']='Solve';
 // Orifice Flow
 $ec_lang['or_main_menu']='Протицај кроз отвор';
 $ec_lang['or_main_title']='Бесплатни онлајн калкулатор протицаја кроз отвор';

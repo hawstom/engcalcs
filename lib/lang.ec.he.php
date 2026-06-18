@@ -74,6 +74,9 @@ $ec_lang['mpf_hydraulic_radius']='רדיוס הידראולי';
 $ec_lang['mpf_top_width']='רוחב פני הנוזל';
 $ec_lang['mpf_froude_number']='מספר פראוד';
 $ec_lang['mpf_shear_stress']='Average shear stress (tractive force), tau';
+$ec_lang['mpf_solve_for_dd0']='Solve for y/d<sub>0</sub> given Q';
+$ec_lang['mpf_solve_desc']='Using D<sub>0</sub>, n, and S<sub>0</sub> from the calculator form, finds the lowest y/d<sub>0</sub> for a given Q.';
+$ec_lang['mpf_solve_button']='Solve';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Manning Pipe Head Loss';
 $ec_lang['mphl_main_title']='Free Online Manning Pipe Head Loss Calculator';

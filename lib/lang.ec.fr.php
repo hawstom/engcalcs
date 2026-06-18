@@ -136,6 +136,9 @@ $ec_lang['mpf_shear_stress']='Contrainte de cisaillement moyenne (force tractric
 $ec_lang['mpf_full_flow']='Débit à section pleine, Q0';
 $ec_lang['mpf_full_flow_ratio']='Rapport au débit plein, Q/Q0';
 $ec_lang['mpf_note_1']='<p>Notes:</p><dl><dt>Il s\'agit du débit (et de la profondeur) à l\'intérieur d\'une conduite de <em>longueur infinie</em>.</dt><dd>Faire entrer le débit dans la conduite peut nécessiter une charge amont nettement plus élevée. Ajoutez au moins 1,5 fois la charge cinétique pour obtenir la charge amont, ou <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">consultez mon tutoriel de 2 minutes</a> pour les calculs standard de charge amont de buse avec HY-8.</dd>';
+$ec_lang['mpf_solve_for_dd0']='Solve for y/d<sub>0</sub> given Q';
+$ec_lang['mpf_solve_desc']='Using D<sub>0</sub>, n, and S<sub>0</sub> from the calculator form, finds the lowest y/d<sub>0</sub> for a given Q.';
+$ec_lang['mpf_solve_button']='Solve';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Perte de charge Manning en conduite';
 $ec_lang['mphl_main_title']='Calculateur gratuit en ligne de perte de charge Manning en conduite';

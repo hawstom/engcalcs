@@ -125,6 +125,9 @@ $ec_lang['mpf_hydraulic_radius']='Hidrolik Yariçap';
 $ec_lang['mpf_top_width']='Üst Genisligi, T';
 $ec_lang['mpf_froude_number']='Froude Sayısı, F';
 $ec_lang['mpf_shear_stress']='Average Kayma Gerilmesi, τ';
+$ec_lang['mpf_solve_for_dd0']='Solve for y/d<sub>0</sub> given Q';
+$ec_lang['mpf_solve_desc']='Using D<sub>0</sub>, n, and S<sub>0</sub> from the calculator form, finds the lowest y/d<sub>0</sub> for a given Q.';
+$ec_lang['mpf_solve_button']='Solve';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Tam Akis Sartlarinda Yük Kaybi';
 $ec_lang['mphl_main_title']='Ücretsiz Tam Akis Sartlarinda Manning Yük Kaybi Formülü';

@@ -124,6 +124,9 @@ $ec_lang['mpf_hydraulic_radius']='Хидравличен радиус';
 $ec_lang['mpf_top_width']='Горна ширина, T'; 
 $ec_lang['mpf_froude_number']='Число на Фруд, F'; 
 $ec_lang['mpf_shear_stress']='Срязващo напрежение average (теглителна сила), tau'; 
+$ec_lang['mpf_solve_for_dd0']='Solve for y/d<sub>0</sub> given Q';
+$ec_lang['mpf_solve_desc']='Using D<sub>0</sub>, n, and S<sub>0</sub> from the calculator form, finds the lowest y/d<sub>0</sub> for a given Q.';
+$ec_lang['mpf_solve_button']='Solve';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Хидравлични Загуби в Напорен Тръбопровод по Манинг'; 
 $ec_lang['mphl_main_title']='Безплатен Онлайн Калкулатор: Хидравлични Загуби в Напорен Тръбопровод'; 

@@ -136,6 +136,9 @@ $ec_lang['mpf_shear_stress']='Tensión tangencial promedio (fuerza de tracción)
 $ec_lang['mpf_full_flow']='Caudal lleno, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Relación de caudales, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<p>Notes:</p><dl><dt>Este es el caudal (también la profundidad) dentro de una tubería <em>de largo infinito</em>.</dt><dd>El alcanzar que el caudal entre a la tubería puede requerir un cabezal bastante más alto. Agregue por lo menos 1,5 veces la energía cinética al calado o <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">haga los cálculos de cabecera de alcantarilla de una manera estándar utilizando HY-8.</a> </dd>';
+$ec_lang['mpf_solve_for_dd0']='Solve for y/d<sub>0</sub> given Q';
+$ec_lang['mpf_solve_desc']='Using D<sub>0</sub>, n, and S<sub>0</sub> from the calculator form, finds the lowest y/d<sub>0</sub> for a given Q.';
+$ec_lang['mpf_solve_button']='Solve';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Pérdida de presión en una tubería según Manning';
 $ec_lang['mphl_main_title']='Calculadora gratis en línea de la pérdida de altura de presión en una tubería según Manning';

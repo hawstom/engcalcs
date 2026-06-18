@@ -71,3 +71,48 @@ EngCalcs.pageCalculator = function(objForm) {
 
 EngCalcs.pageCalculatorInitialize = function (objForm) {
 };
+
+// Solves for y/d0 given a target Q, using d0, n, s0 from the main form.
+// Q for a circular Manning pipe peaks at y/d0 ≈ 0.9376; no solution above that.
+EngCalcs.solveForDd0 = function() {
+	'use strict';
+	var objForm = document.forms['formInput'];
+	var d0 = parseFloat(objForm['d0'].value) / parseFloat(objForm['d0u'].value);
+	var n  = parseFloat(objForm['n'].value);
+	var s0 = parseFloat(objForm['s0'].value) / parseFloat(objForm['s0u'].value);
+	var qu = parseFloat(document.getElementById('solver_qu').value);
+	var q_target = parseFloat(document.getElementById('solver_q').value) / qu;
+	var msgEl = document.getElementById('solver_msg');
+
+	function computeQ(dd0) {
+		var theta = Math.acos(1 - 2 * dd0);
+		var a  = (theta - Math.sin(2 * theta) / 2) * d0 * d0 / 4;
+		var rh = d0 / (4 * theta) * (theta - Math.sin(theta) * Math.cos(theta));
+		return a * Math.pow(rh, 2/3) * Math.pow(s0, 0.5) / n;
+	}
+
+	if (isNaN(q_target) || q_target <= 0) {
+		msgEl.textContent = 'Enter a positive target Q.';
+		return;
+	}
+
+	var DD0_PEAK = 0.9376;
+	var q_max = computeQ(DD0_PEAK);
+	if (q_target > q_max) {
+		msgEl.textContent = 'No solution: Q exceeds pipe capacity at y/d0 = 93.8% '
+			+ '(Qmax = ' + (q_max * qu).toFixed(4) + ' in selected units).';
+		return;
+	}
+
+	var lo = 1e-4, hi = DD0_PEAK, mid = 0.5;
+	for (var i = 0; i < 60; i++) {
+		mid = (lo + hi) / 2;
+		if (computeQ(mid) < q_target) { lo = mid; } else { hi = mid; }
+		if (hi - lo < 1e-10) { break; }
+	}
+
+	var dd0u = parseFloat(objForm['dd0u'].value);
+	objForm['dd0'].value = parseFloat((mid * dd0u).toPrecision(6));
+	msgEl.textContent = '';
+	EngCalcs.submitForm();
+};
