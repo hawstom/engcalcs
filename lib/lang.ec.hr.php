@@ -85,6 +85,8 @@ $ec_lang['odt_notes_2_def']='Metoda koničnog volumena modelira jezerce kao koni
 $ec_lang['odt_h1']='Početna visina, H<sub>1</sub> (WSE &minus; težište)';
 $ec_lang['odt_q_max']='Maksimalni (početni) protok, Q<sub>max</sub>';
 $ec_lang['odt_vol']='Ispražnjeni volumen';
+$ec_lang['odt_sketch_start']='Početak';
+$ec_lang['odt_sketch_end']='Kraj';
 
 // Units (alphabetical order)
 $ec_lang['u_depthFrac']='udio';
@@ -216,6 +218,7 @@ $ec_lang['mphl_junction_loss']='Lokalni gubitak, H<sub>m</sub>';
 $ec_lang['mphl_total_loss']='Ukupni gubitak, H<sub>l</sub>';
 $ec_lang['mphl_egl_1']='Nizvodni EGL';
 $ec_lang['mphl_egl_2']='Uzvodni EGL';
+$ec_lang['mphl_hgl_2']='Uzvodni HGL u cijevi ' . $ec_lang['mpf_see_notes'];
 $ec_lang['mphl_note_1']='<p>Napomene:</p><dl><dt>Za uvjete otvorenog ulaza (propust) potrebno je provjeriti uvjete kontrole ulaza.</dt><dd>1. Uzvodni HGL ne može biti niži od kote normalnog tečenja uzvodnog toka (niti niži od cijevi!).</dd><dd>2. Uzvodna razina propusta bolje je predstavljena uzvodnim EGL-om nego uzvodnim HGL-om.</dd><dd>3. Pogledajte <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">moj 2-minutni tutorial</a> za jednostavne standardne proračune uzvodne razine propusta pomoću HY-8.</dd>';
 
 // Manning Trapezoid

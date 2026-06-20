@@ -251,6 +251,8 @@ $ec_lang['odt_notes_2_def']='El método del volumen cónico modela el estanque c
 $ec_lang['odt_h1']='Carga inicial, H<sub>1</sub> (WSE &minus; centroide)';
 $ec_lang['odt_q_max']='Caudal máximo (inicial), Q<sub>max</sub>';
 $ec_lang['odt_vol']='Volumen vaciado';
+$ec_lang['odt_sketch_start']='Inicio';
+$ec_lang['odt_sketch_end']='Fin';
 // Contact us.
 $ec_lang['contact_title']='Contacto con HawsEDC';
 $ec_lang['contactSendMessage']='Envíe un mensaje a Tom Haws';

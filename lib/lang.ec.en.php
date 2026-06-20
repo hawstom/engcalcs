@@ -260,11 +260,12 @@ $ec_lang['odt_notes_2_def']='The conic volume method models the pond as a conic 
 $ec_lang['odt_h1']='Starting head, H<sub>1</sub> (WSE &minus; centroid)';
 $ec_lang['odt_q_max']='Max (starting) flow, Q<sub>max</sub>';
 $ec_lang['odt_vol']='Drained volume';
+$ec_lang['odt_sketch_start']='Start';
+$ec_lang['odt_sketch_end']='End';
 // Erosion Setback and Scour Calc.
 $ec_lang['essc_btbw']='Bank to bank width';
 $ec_lang['essc_mcr']='Minimum curve radius';
 $ec_lang['essc_q']='Flow, Q';
-$ec_lang['plamen_test']='What does this button do';
 // Contact us.
 $ec_lang['contact_title']='HawsEDC Contact';
 $ec_lang['contactSendMessage']='Send Tom Haws a message';

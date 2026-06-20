@@ -87,6 +87,8 @@ $ec_lang['odt_notes_2_def']='Metoda volumului conic modelează iazul ca o secți
 $ec_lang['odt_h1']='Sarcina inițială, H<sub>1</sub> (WSE &minus; centroid)';
 $ec_lang['odt_q_max']='Debit maxim (inițial), Q<sub>max</sub>';
 $ec_lang['odt_vol']='Volum golit';
+$ec_lang['odt_sketch_start']='Start';
+$ec_lang['odt_sketch_end']='Sfârșit';
 
 // Units (alphabetical order)
 $ec_lang['u_depthFrac']='fracție';
@@ -210,6 +212,7 @@ $ec_lang['mphl_junction_loss']='Pierdere la racord, H<sub>m</sub>';
 $ec_lang['mphl_total_loss']='Pierdere totală, H<sub>l</sub>';
 $ec_lang['mphl_egl_1']='EGL aval';
 $ec_lang['mphl_egl_2']='EGL amonte';
+$ec_lang['mphl_hgl_2']='HGL amonte în conductă ' . $ec_lang['mpf_see_notes'];
 $ec_lang['mphl_note_1']='<p>Note:</p><dl><dt>Pentru o condiție de intrare deschisă (podeț), este necesar să se verifice condițiile de control la intrare.</dt><dd>1. HGL amonte nu poate fi mai jos decât cota de adâncime normală amonte a curgerii (sau sub conductă!).</dd><dd>2. Nivelul apei din amonte al unui podeț este mai bine reprezentat de EGL amonte decât de HGL amonte.</dd><dd>3. Consultați <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">tutorialul meu de 2 minute</a> pentru calculele simple standard ale nivelului din amonte ale podețelor folosind HY-8.</dd>';
 // Manning Trapezoid
 $ec_lang['mtc_menu']='Manning Canal Trapezoidal';

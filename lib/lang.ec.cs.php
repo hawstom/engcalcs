@@ -256,6 +256,8 @@ $ec_lang['odt_notes_2_def']='Metoda kónického objemu modeluje nádrž jako kó
 $ec_lang['odt_h1']='Počáteční výška, H<sub>1</sub> (WSE &minus; těžiště)';
 $ec_lang['odt_q_max']='Maximální (počáteční) průtok, Q<sub>max</sub>';
 $ec_lang['odt_vol']='Vyčerpaný objem';
+$ec_lang['odt_sketch_start']='Začátek';
+$ec_lang['odt_sketch_end']='Konec';
 // Erosion Setback
 $ec_lang['essc_btbw']='Šířka od břehu k břehu';
 $ec_lang['essc_mcr']='Minimální poloměr oblouku';

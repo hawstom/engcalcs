@@ -88,12 +88,12 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.writeFormResult(objForm, 't_hr',  precision = 2, hasUnits = false);
 	this.writeFormResult(objForm, 't_day', precision = 3, hasUnits = false);
 
-	this.odtDrawSketch();
+	this.odtDrawSketch(EngCalcs.pageConfig.sketch_start, EngCalcs.pageConfig.sketch_end);
 };
 
 EngCalcs.pageCalculatorInitialize = function(objForm) {};
 
-EngCalcs.odtDrawSketch = function() {
+EngCalcs.odtDrawSketch = function(labelStart, labelEnd) {
 	var el = document.getElementById('sketch');
 	if (!el) { return; }
 	var v = this.var;
@@ -137,12 +137,12 @@ EngCalcs.odtDrawSketch = function() {
 	// Starting water surface
 	s += '<line x1="0" y1="' + startY + '" x2="' + wallX + '" y2="' + startY + '" stroke="blue" stroke-width="2"/>';
 	var startTextY = (startY < 15) ? startY + 13 : startY - 4;
-	s += '<text x="4" y="' + startTextY + '" fill="blue">Start</text>';
+	s += '<text x="4" y="' + startTextY + '" fill="blue">' + labelStart + '</text>';
 
 	// Ending water surface
 	s += '<line x1="0" y1="' + endY + '" x2="' + wallX + '" y2="' + endY + '" stroke="blue" stroke-width="2"/>';
 	var endTextY = (endY < 15) ? endY + 13 : endY - 4;
-	s += '<text x="4" y="' + endTextY + '" fill="blue">End</text>';
+	s += '<text x="4" y="' + endTextY + '" fill="blue">' + labelEnd + '</text>';
 
 	s += '</svg>';
 	el.innerHTML = s;

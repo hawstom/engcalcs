@@ -256,6 +256,8 @@ $ec_lang['odt_notes_2_def']='锥体体积法将池塘模型化为初始水面面
 $ec_lang['odt_h1']='初始水头，H<sub>1</sub>（水面高程 &minus; 形心高程）';
 $ec_lang['odt_q_max']='最大（初始）流量，Q<sub>max</sub>';
 $ec_lang['odt_vol']='排出水量';
+$ec_lang['odt_sketch_start']='开始';
+$ec_lang['odt_sketch_end']='结束';
 // Erosion Setback
 $ec_lang['essc_btbw']='岸对岸宽度';
 $ec_lang['essc_mcr']='最小弯道半径';

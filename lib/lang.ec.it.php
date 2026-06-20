@@ -256,6 +256,8 @@ $ec_lang['odt_notes_2_def']='Il metodo del volume conico modella la vasca come s
 $ec_lang['odt_h1']='Carico iniziale, H<sub>1</sub> (WSE &minus; centroide)';
 $ec_lang['odt_q_max']='Portata massima (iniziale), Q<sub>max</sub>';
 $ec_lang['odt_vol']='Volume svuotato';
+$ec_lang['odt_sketch_start']='Inizio';
+$ec_lang['odt_sketch_end']='Fine';
 // Erosion Setback
 $ec_lang['essc_btbw']='Larghezza di sponda a sponda';
 $ec_lang['essc_mcr']='Raggio minimo di curvatura';

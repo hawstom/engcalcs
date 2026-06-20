@@ -259,6 +259,8 @@ $ec_lang['odt_notes_2_def']='La méthode du volume conique modélise le bassin c
 $ec_lang['odt_h1']='Charge initiale, H<sub>1</sub> (WSE &minus; centroïde)';
 $ec_lang['odt_q_max']='Débit maximal (initial), Q<sub>max</sub>';
 $ec_lang['odt_vol']='Volume vidangé';
+$ec_lang['odt_sketch_start']='Début';
+$ec_lang['odt_sketch_end']='Fin';
 // Contact us.
 $ec_lang['contact_title']='Contact HawsEDC';
 $ec_lang['contactSendMessage']='Envoyer un message à Tom Haws';

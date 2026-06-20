@@ -46,7 +46,7 @@ $ec_lang['menu_brand']='מחשבוני HawsEDC';
 $ec_lang['menu_main_list']='רשימת המחשבונים';
 $ec_lang['menu_main_hydraulics']='הידרוליקה';
 $ec_lang['menu_main_language']='שפה';
-$ec_lang['template_welcome']='&gt;&gt; Drop your fears at the door; love is spoken here. Enjoy the <a href="https://hawsedc.com/download.php">free libre HawsEDC AutoCAD tools</a> too. &lt;&lt;';
+$ec_lang['template_welcome']='&gt;&gt; השאירו את פחדיכם בדלת; כאן מדברים אהבה. נהנו גם מ<a href="https://hawsedc.com/download.php">כלי ה-AutoCAD החינמיים של HawsEDC.</a> &lt;&lt;';
 $ec_lang['template_translation_help']='האם אתה יכול לעזור לי לתרגם את המחשבון לשפה שלך או להטמיע את המחשבון באתר שלך?  ';
 $ec_lang['template_feedback']='בבקשה תן לנו את חוות דעתך. האם המחשבון החינמי עלה על כל ציפיותיך?';
 $ec_lang['template_printable_title']='אזור כותרת להדפסה';
@@ -161,6 +161,8 @@ $ec_lang['odt_notes_2_def']='שיטת הנפח הקוני מדמה את הריכ
 $ec_lang['odt_h1']='ראש התחלתי, H<sub>1</sub> (WSE &minus; צנטרואיד)';
 $ec_lang['odt_q_max']='ספיקה מרבית (התחלתית), Q<sub>max</sub>';
 $ec_lang['odt_vol']='נפח מרוקן';
+$ec_lang['odt_sketch_start']='התחלה';
+$ec_lang['odt_sketch_end']='סיום';
 // Contact us.
 $ec_lang['contact_title']='צור קשר עם HawsEDC';
 $ec_lang['contactSendMessage']='שלח הודעה ל-Tom Haws';

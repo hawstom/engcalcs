@@ -244,6 +244,8 @@ $ec_lang['odt_notes_2_def']='Konik hacim yöntemi, göleti başlangıç su yüz�
 $ec_lang['odt_h1']='Başlangıç yükü, H<sub>1</sub> (WSE &minus; ağırlık merkezi)';
 $ec_lang['odt_q_max']='Maksimum (başlangıç) debi, Q<sub>max</sub>';
 $ec_lang['odt_vol']='Boşaltılan hacim';
+$ec_lang['odt_sketch_start']='Başlangıç';
+$ec_lang['odt_sketch_end']='Bitiş';
 // Erosion Setback and Scour Calc.
 $ec_lang['essc_btbw']='Bankadan bankaya genişlik';
 $ec_lang['essc_mcr']='Minimum eğri yarıçapı';

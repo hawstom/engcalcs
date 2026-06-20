@@ -50,8 +50,10 @@ echoCalculatorForm(
 <script src="/engcalcs/js/orifice-drain-time.js?v=<?=filemtime(__DIR__.'/js/orifice-drain-time.js')?>"></script>
 <script>
 EngCalcs.pageConfig = {
-	h2_ok:   '<?=htmlspecialchars($ec_lang['odt_h2_ok'],   ENT_QUOTES, 'UTF-8')?>',
-	h2_warn: '<?=htmlspecialchars($ec_lang['odt_h2_warn'], ENT_QUOTES, 'UTF-8')?>'
+	h2_ok:        '<?=htmlspecialchars($ec_lang['odt_h2_ok'],        ENT_QUOTES, 'UTF-8')?>',
+	h2_warn:      '<?=htmlspecialchars($ec_lang['odt_h2_warn'],      ENT_QUOTES, 'UTF-8')?>',
+	sketch_start: '<?=htmlspecialchars($ec_lang['odt_sketch_start'], ENT_QUOTES, 'UTF-8')?>',
+	sketch_end:   '<?=htmlspecialchars($ec_lang['odt_sketch_end'],   ENT_QUOTES, 'UTF-8')?>'
 };
 <?php echoCookieScript(); ?>
 </script>

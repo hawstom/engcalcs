@@ -46,7 +46,7 @@ $ec_lang['menu_brand']='HawsEDC Калкулатори';
 $ec_lang['menu_main_list']='Списък с калкулатори'; 
 $ec_lang['menu_main_hydraulics']='Хидравлика'; 
 $ec_lang['menu_main_language']='Език';
-$ec_lang['template_welcome']='&gt;&gt; Drop your fears at the door; love is spoken here. Enjoy the <a href="https://hawsedc.com/download.php">free libre HawsEDC AutoCAD tools</a> too. &lt;&lt;';
+$ec_lang['template_welcome']='&gt;&gt; Оставете страховете си на прага; тук се говори с любов. Насладете се и на <a href="https://hawsedc.com/download.php">безплатните инструменти HawsEDC за AutoCAD.</a> &lt;&lt;';
 $ec_lang['template_translation_help']='Можете ли да ми помогнете с превода, програмирането или хостинга за тези калкулатори?'; 
 $ec_lang['template_feedback']='Моля споделете мнението си под формата на предложение или похвала. Този безплатен калкулатор надмина ли всичките ви очаквания?'; 
 $ec_lang['template_printable_title']='Заглавие за принтиране'; 
@@ -239,6 +239,8 @@ $ec_lang['odt_notes_2_def']='Методът на коничния обем мо�
 $ec_lang['odt_h1']='Начален напор, H<sub>1</sub> (WSE &minus; центроид)';
 $ec_lang['odt_q_max']='Максимален (начален) дебит, Q<sub>max</sub>';
 $ec_lang['odt_vol']='Изпразнен обем';
+$ec_lang['odt_sketch_start']='Начало';
+$ec_lang['odt_sketch_end']='Край';
 // Contact us.
 $ec_lang['contact_title']="Контакт с HawsEDC"; 
 $ec_lang['contactSendMessage']='Изпратете съобщение на Tom Haws'; 

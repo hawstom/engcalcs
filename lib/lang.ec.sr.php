@@ -85,6 +85,8 @@ $ec_lang['odt_notes_2_def']='Метод конусне запремине мод
 $ec_lang['odt_h1']='Почетни напор, H<sub>1</sub> (WSE &minus; тежиште)';
 $ec_lang['odt_q_max']='Максимални (почетни) протицај, Q<sub>max</sub>';
 $ec_lang['odt_vol']='Испражњена запремина';
+$ec_lang['odt_sketch_start']='Почетак';
+$ec_lang['odt_sketch_end']='Крај';
 
 // Units
 $ec_lang['u_depthFrac']='разломак';
@@ -210,6 +212,7 @@ $ec_lang['mphl_junction_loss']='Губитак на споју, H<sub>m</sub>';
 $ec_lang['mphl_total_loss']='Укупни губитак, H<sub>l</sub>';
 $ec_lang['mphl_egl_1']='Низводна EGL';
 $ec_lang['mphl_egl_2']='Узводна EGL';
+$ec_lang['mphl_hgl_2']='Узводна HGL у цеви ' . $ec_lang['mpf_see_notes'];
 $ec_lang['mphl_note_1']='<p>Напомене:</p><dl><dt>За услов отвореног улаза (пропуст), неопходно је проверити услове контроле улаза.</dt><dd>1. Узводна HGL не може бити нижа од узводне коте нормалног тецања (нити нижа од цеви!).</dd><dd>2. Ниво воде на пропусту боље је представити узводном EGL него узводном HGL.</dd><dd>3. Погледајте <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">мој 2-минутни туторијал</a> заједноставна стандардна израчунавања нивоа воде на пропусту помоћу HY-8.</dd>';
 // Manning Trapezoidal Channel
 $ec_lang['mtc_menu']='Манингов трапезни канал';

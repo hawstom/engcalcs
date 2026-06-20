@@ -251,6 +251,8 @@ $ec_lang['odt_notes_2_def']='O método do volume cônico modela a lagoa como uma
 $ec_lang['odt_h1']='Carga inicial, H<sub>1</sub> (WSE &minus; centroide)';
 $ec_lang['odt_q_max']='Vazão máxima (inicial), Q<sub>max</sub>';
 $ec_lang['odt_vol']='Volume esvaziado';
+$ec_lang['odt_sketch_start']='Início';
+$ec_lang['odt_sketch_end']='Fim';
 // Contact us.
 $ec_lang['contact_title']='Contacto com HawsEDC';
 $ec_lang['contactSendMessage']='Envíe um mensajem a Tom Haws';

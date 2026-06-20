@@ -256,6 +256,8 @@ $ec_lang['odt_notes_2_def']='Метод конического объёма мо
 $ec_lang['odt_h1']='Начальный напор, H<sub>1</sub> (ВУ &minus; центроид)';
 $ec_lang['odt_q_max']='Максимальный (начальный) расход, Q<sub>max</sub>';
 $ec_lang['odt_vol']='Слитый объём';
+$ec_lang['odt_sketch_start']='Начало';
+$ec_lang['odt_sketch_end']='Конец';
 // Erosion Setback
 $ec_lang['essc_btbw']='Ширина между берегами';
 $ec_lang['essc_mcr']='Минимальный радиус кривой';

@@ -256,6 +256,8 @@ $ec_lang['odt_notes_2_def']='Die Kegelvolumenmethode modelliert den Teich als Ke
 $ec_lang['odt_h1']='Anfangsdruckhöhe, H<sub>1</sub> (WSE &minus; Schwerpunkt)';
 $ec_lang['odt_q_max']='Maximaldurchfluss (Anfang), Q<sub>max</sub>';
 $ec_lang['odt_vol']='Abgeführtes Volumen';
+$ec_lang['odt_sketch_start']='Anfang';
+$ec_lang['odt_sketch_end']='Ende';
 // Erosion Setback
 $ec_lang['essc_btbw']='Uferbandbreite';
 $ec_lang['essc_mcr']='Minimaler Kurvenradius';
