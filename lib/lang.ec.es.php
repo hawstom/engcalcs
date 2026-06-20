@@ -136,9 +136,9 @@ $ec_lang['mpf_shear_stress']='Tensión tangencial promedio (fuerza de tracción)
 $ec_lang['mpf_full_flow']='Caudal lleno, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Relación de caudales, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<p>Notes:</p><dl><dt>Este es el caudal (también la profundidad) dentro de una tubería <em>de largo infinito</em>.</dt><dd>El alcanzar que el caudal entre a la tubería puede requerir un cabezal bastante más alto. Agregue por lo menos 1,5 veces la energía cinética al calado o <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">haga los cálculos de cabecera de alcantarilla de una manera estándar utilizando HY-8.</a> </dd>';
-$ec_lang['mpf_solve_for_dd0']='Solve for y/d<sub>0</sub> given Q';
-$ec_lang['mpf_solve_desc']='Using D<sub>0</sub>, n, and S<sub>0</sub> from the calculator form, finds the lowest y/d<sub>0</sub> for a given Q.';
-$ec_lang['mpf_solve_button']='Solve';
+$ec_lang['mpf_solve_for_dd0']='Calcular y/d<sub>0</sub> para un Q dado';
+$ec_lang['mpf_solve_desc']='Usando D<sub>0</sub>, n y S<sub>0</sub> del formulario de la calculadora, encuentra el menor y/d<sub>0</sub> para un Q dado.';
+$ec_lang['mpf_solve_button']='Calcular';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Pérdida de presión en una tubería según Manning';
 $ec_lang['mphl_main_title']='Calculadora gratis en línea de la pérdida de altura de presión en una tubería según Manning';
@@ -150,9 +150,10 @@ $ec_lang['mphl_friction_slope']='Pendiente de fricción, s<sub>f</sub>';
 $ec_lang['mphl_friction_loss']='Pérdidas por fricción';
 $ec_lang['mphl_junction_loss']='Pérdidas en las juntas';
 $ec_lang['mphl_total_loss']='Pérdida total';
-$ec_lang['mphl_egl_1']='Downstream EGL';
-$ec_lang['mphl_egl_2']='Upstream EGL';
-$ec_lang['mphl_hgl_2']='Upstream HGL in pipe ' . $ec_lang['mpf_see_notes'];
+$ec_lang['mphl_egl_1']='EGL aguas abajo';
+$ec_lang['mphl_egl_2']='EGL aguas arriba';
+$ec_lang['mpf_see_notes']='(Véanse las notas)';
+$ec_lang['mphl_hgl_2']='HGL aguas arriba en la tubería ' . $ec_lang['mpf_see_notes'];
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Canal trapecial según Manning';
 $ec_lang['mtc_main_title']='Calculadora gratis en línea de la fórmula de Manning para canal trapecial';
@@ -192,7 +193,7 @@ $ec_lang['wi_pondingHeight']='Altura de inundación';
 $ec_lang['wi_incrementalFlow']='Gasto adicional';
 $ec_lang['wi_cumulativeFlow']='Gasto total';
 $ec_lang['wi_save_and_calculate']='Grabar y calcular';
-$ec_lang['wi_notes_we_term']='Weir Equation';
+$ec_lang['wi_notes_we_term']='Ecuación de Vertedero';
 $ec_lang['wi_notes_we_def']='q = si (distancia = 0) entonces 0 o si (slope=0) entoces cw*distancia*d<sub>0</sub><sup>1.5</sup> o cw/(2.5*pendiente) * (d<sub>0</sub><sup>2.5</sup> - d<sub>1</sub><sup>2.5</sup>) donde d<sub>1</sub> y d<sub>0</sub> son siempre positivos o cero';
 // Orifice Flow
 $ec_lang['or_main_menu']='Flujo por Orificio';
@@ -215,7 +216,7 @@ $ec_lang['or_regime']='Verificación del régimen de orificio';
 $ec_lang['or_regime_valid']='Salida libre — régimen de orificio válido ✓';
 $ec_lang['or_regime_submerged']='Orificio sumergido (TWE sobre la solera) — válido ✓';
 $ec_lang['or_regime_warn']='Advertencia: lámina aguas arriba bajo la clave — no es régimen de orificio';
-$ec_lang['or_regime_twe_above_hwe']='Warning: tailwater (TWE) above headwater (HWE) — check inputs';
+$ec_lang['or_regime_twe_above_hwe']='Advertencia: agua de cola (TWE) sobre agua de cabeza (HWE) — verifique las entradas';
 $ec_lang['or_notes_1_term']='Ecuación de orificio';
 $ec_lang['or_notes_1_def']='Q = C<sub>d</sub> &times; A &times; &radic;(2gh). Salida libre: h = HWE &minus; centroide. Sumergido (TWE sobre la solera): h = HWE &minus; TWE.';
 $ec_lang['or_notes_2_term']='Régimen de orificio';
@@ -225,31 +226,31 @@ $ec_lang['or_notes_3_def']='C<sub>d</sub> es aproximadamente 0,60&ndash;0,65 par
 $ec_lang['or_notes_4_term']='Sumersión';
 $ec_lang['or_notes_4_def']='Cuando TWE está sobre la solera de la apertura, la calculadora aplica automáticamente la ecuación de orificio sumergido con h = HWE &minus; TWE. Cuando TWE es igual o inferior a la solera, se asume salida libre y h = HWE &minus; centroide.';
 // Orifice Drain Time
-$ec_lang['odt_main_menu']='Orifice Drain Time';
-$ec_lang['odt_main_title']='Free Online Orifice Drain Time Calculator';
-$ec_lang['odt_main_desc']='Pond Orifice Drain Time &mdash; Conic Volume Method';
-$ec_lang['odt_h1_elev']='Starting water surface elevation';
-$ec_lang['odt_a1']='Starting pond area, A1';
-$ec_lang['odt_h2_elev']='Ending water surface elevation';
-$ec_lang['odt_h_orifice']='Orifice centroid elevation';
-$ec_lang['odt_a0']='Pond area at orifice elevation, A0';
-$ec_lang['odt_a_ending']='Ending pond area, A2 (interpolated)';
-$ec_lang['odt_h2_check']='Ending elevation check';
-$ec_lang['odt_h2_ok']='Ending elevation above orifice top ✓';
-$ec_lang['odt_h2_warn']='Warning: ending elevation at or below orifice top (centroid + D/2)';
-$ec_lang['odt_d']='Orifice diameter (circular) or height (rectangular), D';
-$ec_lang['odt_w']='Orifice width, W (rectangular only)';
-$ec_lang['odt_t_sec']='Drain time (seconds)';
-$ec_lang['odt_t_min']='Drain time (minutes)';
-$ec_lang['odt_t_hr']='Drain time (hours)';
-$ec_lang['odt_t_day']='Drain time (days)';
-$ec_lang['odt_notes_1_term']='Formula';
-$ec_lang['odt_notes_1_def']='t = &radic;H<sub>1</sub> / (C<sub>d</sub> A<sub>or</sub> &radic;(2g)) &times; (2A<sub>x</sub>/5 + 8&radic;(A<sub>x</sub>A<sub>0</sub>)/15 + 16A<sub>0</sub>/15) gives drain time from head H to the orifice. Drain time = t(H<sub>1</sub>,A<sub>1</sub>,A<sub>0</sub>) &minus; t(H<sub>2</sub>,A<sub>2</sub>,A<sub>0</sub>), where H<sub>1</sub> = starting elevation &minus; orifice elevation, H<sub>2</sub> = ending elevation &minus; orifice elevation.';
-$ec_lang['odt_notes_2_term']='Method';
-$ec_lang['odt_notes_2_def']='The conic volume method models the pond as a conic section between the starting area A<sub>1</sub> at the initial water surface and the area A<sub>0</sub> at the orifice centroid elevation. A<sub>2</sub>, the pond area at the ending elevation, is interpolated from A<sub>1</sub> and A<sub>0</sub> using the conic section model. Drain time from starting to ending elevation equals total drain time from H<sub>1</sub> to orifice minus remaining drain time from H<sub>2</sub> to orifice.';
-$ec_lang['odt_h1']='Starting head, H<sub>1</sub> (WSE &minus; centroid)';
-$ec_lang['odt_q_max']='Max (starting) flow, Q<sub>max</sub>';
-$ec_lang['odt_vol']='Drained volume';
+$ec_lang['odt_main_menu']='Tiempo de vaciado por orificio';
+$ec_lang['odt_main_title']='Calculadora gratuita en línea de tiempo de vaciado por orificio';
+$ec_lang['odt_main_desc']='Tiempo de vaciado de estanque por orificio &mdash; Método del volumen cónico';
+$ec_lang['odt_h1_elev']='Cota inicial de la lámina de agua';
+$ec_lang['odt_a1']='Área inicial del estanque, A1';
+$ec_lang['odt_h2_elev']='Cota final de la lámina de agua';
+$ec_lang['odt_h_orifice']='Cota del centroide del orificio';
+$ec_lang['odt_a0']='Área del estanque a la cota del orificio, A0';
+$ec_lang['odt_a_ending']='Área final del estanque, A2 (interpolada)';
+$ec_lang['odt_h2_check']='Verificación de cota final';
+$ec_lang['odt_h2_ok']='Cota final sobre la cima del orificio ✓';
+$ec_lang['odt_h2_warn']='Advertencia: cota final igual o inferior a la cima del orificio (centroide + D/2)';
+$ec_lang['odt_d']='Diámetro (circular) o altura (rectangular) del orificio, D';
+$ec_lang['odt_w']='Ancho del orificio, W (solo rectangular)';
+$ec_lang['odt_t_sec']='Tiempo de vaciado (segundos)';
+$ec_lang['odt_t_min']='Tiempo de vaciado (minutos)';
+$ec_lang['odt_t_hr']='Tiempo de vaciado (horas)';
+$ec_lang['odt_t_day']='Tiempo de vaciado (días)';
+$ec_lang['odt_notes_1_term']='Fórmula';
+$ec_lang['odt_notes_1_def']='t = &radic;H<sub>1</sub> / (C<sub>d</sub> A<sub>or</sub> &radic;(2g)) &times; (2A<sub>x</sub>/5 + 8&radic;(A<sub>x</sub>A<sub>0</sub>)/15 + 16A<sub>0</sub>/15) da el tiempo de vaciado desde la carga H hasta el orificio. Tiempo de vaciado = t(H<sub>1</sub>,A<sub>1</sub>,A<sub>0</sub>) &minus; t(H<sub>2</sub>,A<sub>2</sub>,A<sub>0</sub>), donde H<sub>1</sub> = cota inicial &minus; cota del orificio, H<sub>2</sub> = cota final &minus; cota del orificio.';
+$ec_lang['odt_notes_2_term']='Método';
+$ec_lang['odt_notes_2_def']='El método del volumen cónico modela el estanque como una sección cónica entre el área inicial A<sub>1</sub> en la lámina de agua inicial y el área A<sub>0</sub> a la cota del centroide del orificio. A<sub>2</sub>, el área del estanque a la cota final, se interpola de A<sub>1</sub> y A<sub>0</sub> usando el modelo de sección cónica. El tiempo de vaciado desde la cota inicial hasta la final es igual al tiempo total de vaciado desde H<sub>1</sub> hasta el orificio menos el tiempo de vaciado restante desde H<sub>2</sub> hasta el orificio.';
+$ec_lang['odt_h1']='Carga inicial, H<sub>1</sub> (WSE &minus; centroide)';
+$ec_lang['odt_q_max']='Caudal máximo (inicial), Q<sub>max</sub>';
+$ec_lang['odt_vol']='Volumen vaciado';
 // Contact us.
 $ec_lang['contact_title']='Contacto con HawsEDC';
 $ec_lang['contactSendMessage']='Envíe un mensaje a Tom Haws';
@@ -260,3 +261,33 @@ $ec_lang['contact_message']='Mensaje:';
 $ec_lang['contactSpamPrefix']='Five (cinco) plus (y) one (uno) equals (son) ';
 $ec_lang['contactSpamPostfix']='(Favor de escribirla en inglés con letras. 1=one 2=two 3=three 4=four 5=five 6=six 7=seven +=plus 5+1=6)';
 $ec_lang['contactSubmitButton']='Enviar Mensaje';
+// Erosion Setback and Scour Calc.
+$ec_lang['essc_btbw']='Ancho de orilla a orilla';
+$ec_lang['essc_mcr']='Radio mínimo de curvatura';
+$ec_lang['essc_q']='Caudal, Q';
+// Hazen-Williams HGL
+$ec_lang['hw_hgl_1']='HGL aguas abajo';
+$ec_lang['hw_hgl_2']='HGL aguas arriba';
+// Manning Irregular additional keys
+$ec_lang['mi_d50in']='Diam.<br />mediano<br />de la<br />roca';
+$ec_lang['mi_fr617']='Fr';
+$ec_lang['mi_groupPoint']='Punto';
+$ec_lang['mi_groupRegion']='Región';
+$ec_lang['mi_groupSegment']='Segmento';
+$ec_lang['mi_hv617']='H<sub>v</sub>';
+$ec_lang['mi_n617']='n<br />compuesto';
+$ec_lang['mi_q617']='Q';
+$ec_lang['mi_v617']='v';
+// Manning Pipe Head Loss note
+$ec_lang['mphl_note_1']='<p>Notas:</p><dl><dt>Para una entrada abierta (alcantarilla), es necesario verificar las condiciones de control de entrada.</dt><dd>1. El HGL aguas arriba no puede ser inferior a la cota de flujo a profundidad normal aguas arriba (ni inferior a la tubería).</dd><dd>2. El cabezal de una alcantarilla se representa mejor con el EGL aguas arriba que con el HGL aguas arriba.</dd><dd>3. Véase <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">mi tutorial de 2 minutos</a> para cálculos estándar de cabezal en alcantarillas usando HY-8.</dd>';
+// Manning Trapezoidal Channel additional keys
+$ec_lang['mtc_blodgett_v_bathurst']='Blodgett vs. Bathurst';
+$ec_lang['mtc_n_bathurst']='n para el tamaño de roca de diseño según Bathurst';
+$ec_lang['mtc_n_blodgett']='n para el tamaño de roca de diseño según Blodgett';
+$ec_lang['mtc_n_strickler']='n para el tamaño de roca de diseño según Strickler';
+$ec_lang['mtc_note_1']='<p>Notas:</p><dl><dt>Iteración automática para diseño de tamaño y rugosidad de roca</dt><dd>Elija un botón de radio de rugosidad (se recomienda BB) y un botón de radio para el tamaño de roca de diseño (se recomienda Isbash). Ajuste la profundidad y el factor de seguridad del tamaño de roca para obtener el caudal deseado con un tamaño de roca uniforme. Cada vez que cambie cualquier valor de entrada, ocurre el siguiente ciclo de iteración: 1. Se calcula la rugosidad a partir del tamaño de roca de diseño. 2. El cálculo de rugosidad solicitado se copia al campo de rugosidad. 3. Se calculan el caudal del canal y el tamaño de roca requerido. 4. Se ajusta el tamaño de roca de diseño. 5. Se repite hasta que el error en el tamaño de roca de diseño sea muy pequeño.</dd><dt>Calculadora básica (sin iteración)</dt><dd>Ingrese el valor de rugosidad deseado. Ignore el área de entrada del tamaño de roca de diseño.</dd></dl>';
+// Orifice Flow additional key
+$ec_lang['or_velocity']='Velocidad en la apertura, v';
+// Robinson Rock Chute
+$ec_lang['rrc_main_desc']='Hoja de cálculo de diseño de canal de roca según Robinson';
+$ec_lang['rrc_main_menu']='Canal de roca según Robinson';

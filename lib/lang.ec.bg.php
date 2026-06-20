@@ -124,9 +124,9 @@ $ec_lang['mpf_hydraulic_radius']='Хидравличен радиус';
 $ec_lang['mpf_top_width']='Горна ширина, T'; 
 $ec_lang['mpf_froude_number']='Число на Фруд, F'; 
 $ec_lang['mpf_shear_stress']='Срязващo напрежение average (теглителна сила), tau'; 
-$ec_lang['mpf_solve_for_dd0']='Solve for y/d<sub>0</sub> given Q';
-$ec_lang['mpf_solve_desc']='Using D<sub>0</sub>, n, and S<sub>0</sub> from the calculator form, finds the lowest y/d<sub>0</sub> for a given Q.';
-$ec_lang['mpf_solve_button']='Solve';
+$ec_lang['mpf_solve_for_dd0']='Намерете y/d<sub>0</sub> при дадено Q';
+$ec_lang['mpf_solve_desc']='Използвайки D<sub>0</sub>, n и S<sub>0</sub> от формуляра на калкулатора, намира най-ниското y/d<sub>0</sub> за даденото Q.';
+$ec_lang['mpf_solve_button']='Изчисли';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Хидравлични Загуби в Напорен Тръбопровод по Манинг'; 
 $ec_lang['mphl_main_title']='Безплатен Онлайн Калкулатор: Хидравлични Загуби в Напорен Тръбопровод'; 
@@ -134,12 +134,11 @@ $ec_lang['mphl_main_desc']='Формула на Манинг за Хидравл
 $ec_lang['mphl_pipe_length']='Дължина на Тръбата, L'; 
 $ec_lang['mphl_area']='площ, A';
 $ec_lang['mphl_total_junction_k']='Общ Коефициент на Местните Съпротивления, ?'; 
-$ec_lang['mphl_friction_loss']='Friction slope';
-$ec_lang['mphl_friction_loss']='Загуби по дължина'; 
+$ec_lang['mphl_friction_loss']='Загуби по дължина';
 $ec_lang['mphl_junction_loss']='Местни загуби'; 
 $ec_lang['mphl_total_loss']='Общи загуби'; 
-$ec_lang['mphl_egl_1']='Downstream EGL';
-$ec_lang['mphl_egl_2']='Upstream EGL';
+$ec_lang['mphl_egl_1']='EGL надолу по течение';
+$ec_lang['mphl_egl_2']='EGL нагоре по течение';
 $ec_lang['mphl_hgl_2']='Upstream HGL in pipe ' . $ec_lang['mpf_see_notes'];
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Изчисления на Трапецовидни Канали по Манинг'; 
@@ -205,7 +204,7 @@ $ec_lang['or_regime']='Проверка на режима на изтичане'
 $ec_lang['or_regime_valid']='Свободно изтичане — режим на отвор ✓';
 $ec_lang['or_regime_submerged']='Потопен отвор (TWE над дъното) — валидно ✓';
 $ec_lang['or_regime_warn']='Предупреждение: горната вода е под горния ръб — не е режим на отвор';
-$ec_lang['or_regime_twe_above_hwe']='Warning: tailwater (TWE) above headwater (HWE) — check inputs';
+$ec_lang['or_regime_twe_above_hwe']='Предупреждение: нивото надолу по течение (TWE) е над нивото нагоре по течение (HWE) — проверете входните данни';
 $ec_lang['or_notes_1_term']='Уравнение за отвор';
 $ec_lang['or_notes_1_def']='Q = C<sub>d</sub> &times; A &times; &radic;(2gh). При свободно изтичане: h = HWE &minus; центроид. При потопено (TWE над дъното): h = HWE &minus; TWE.';
 $ec_lang['or_notes_2_term']='Режим на отвор';
@@ -215,31 +214,31 @@ $ec_lang['or_notes_3_def']='C<sub>d</sub> е приблизително 0,60&nda
 $ec_lang['or_notes_4_term']='Потопяване';
 $ec_lang['or_notes_4_def']='Когато TWE е над дъното на отвора, калкулаторът автоматично прилага уравнението за потопен отвор с h = HWE &minus; TWE. Когато TWE е на или под дъното, се приема свободно изтичане и h = HWE &minus; центроид.';
 // Orifice Drain Time
-$ec_lang['odt_main_menu']="Orifice Drain Time";
-$ec_lang['odt_main_title']="Free Online Orifice Drain Time Calculator";
-$ec_lang['odt_main_desc']="Pond Orifice Drain Time &mdash; Conic Volume Method";
-$ec_lang['odt_h1_elev']="Starting water surface elevation";
-$ec_lang['odt_a1']="Starting pond area, A1";
-$ec_lang['odt_h2_elev']="Ending water surface elevation";
-$ec_lang['odt_h_orifice']='Orifice centroid elevation';
-$ec_lang['odt_a0']='Pond area at orifice elevation, A0';
-$ec_lang['odt_a_ending']='Ending pond area, A2 (interpolated)';
-$ec_lang['odt_h2_check']='Ending elevation check';
-$ec_lang['odt_h2_ok']='Ending elevation above orifice top ✓';
-$ec_lang['odt_h2_warn']='Warning: ending elevation at or below orifice top (centroid + D/2)';
-$ec_lang['odt_d']="Orifice diameter (circular) or height (rectangular), D";
-$ec_lang['odt_w']="Orifice width, W (rectangular only)";
-$ec_lang['odt_t_sec']="Drain time (seconds)";
-$ec_lang['odt_t_min']="Drain time (minutes)";
-$ec_lang['odt_t_hr']="Drain time (hours)";
-$ec_lang['odt_t_day']="Drain time (days)";
-$ec_lang['odt_notes_1_term']="Formula";
-$ec_lang['odt_notes_1_def']='t = &radic;H<sub>1</sub> / (C<sub>d</sub> A<sub>or</sub> &radic;(2g)) &times; (2A<sub>x</sub>/5 + 8&radic;(A<sub>x</sub>A<sub>0</sub>)/15 + 16A<sub>0</sub>/15) gives drain time from head H to the orifice. Drain time = t(H<sub>1</sub>,A<sub>1</sub>,A<sub>0</sub>) &minus; t(H<sub>2</sub>,A<sub>2</sub>,A<sub>0</sub>), where H<sub>1</sub> = starting elevation &minus; orifice elevation, H<sub>2</sub> = ending elevation &minus; orifice elevation.';
-$ec_lang['odt_notes_2_term']="Method";
-$ec_lang['odt_notes_2_def']='The conic volume method models the pond as a conic section between the starting area A<sub>1</sub> at the initial water surface and the area A<sub>0</sub> at the orifice centroid elevation. A<sub>2</sub>, the pond area at the ending elevation, is interpolated from A<sub>1</sub> and A<sub>0</sub> using the conic section model. Drain time from starting to ending elevation equals total drain time from H<sub>1</sub> to orifice minus remaining drain time from H<sub>2</sub> to orifice.';
-$ec_lang['odt_h1']='Starting head, H<sub>1</sub> (WSE &minus; centroid)';
-$ec_lang['odt_q_max']='Max (starting) flow, Q<sub>max</sub>';
-$ec_lang['odt_vol']='Drained volume';
+$ec_lang['odt_main_menu']='Време за изпразване на отвор';
+$ec_lang['odt_main_title']='Безплатен онлайн калкулатор за времето за изпразване на отвор';
+$ec_lang['odt_main_desc']='Време за изпразване на езерце през отвор &mdash; Метод на коничния обем';
+$ec_lang['odt_h1_elev']='Начална кота на водната повърхност';
+$ec_lang['odt_a1']='Начална площ на езерцето, A1';
+$ec_lang['odt_h2_elev']='Крайна кота на водната повърхност';
+$ec_lang['odt_h_orifice']='Кота на центроида на отвора';
+$ec_lang['odt_a0']='Площ на езерцето при кота на отвора, A0';
+$ec_lang['odt_a_ending']='Крайна площ на езерцето, A2 (интерполирана)';
+$ec_lang['odt_h2_check']='Проверка на крайната кота';
+$ec_lang['odt_h2_ok']='Крайната кота е над горния ръб на отвора ✓';
+$ec_lang['odt_h2_warn']='Предупреждение: крайната кота е на или под горния ръб на отвора (центроид + D/2)';
+$ec_lang['odt_d']='Диаметър на отвора (кръгъл) или височина (правоъгълен), D';
+$ec_lang['odt_w']='Ширина на отвора, W (само за правоъгълен)';
+$ec_lang['odt_t_sec']='Време за изпразване (секунди)';
+$ec_lang['odt_t_min']='Време за изпразване (минути)';
+$ec_lang['odt_t_hr']='Време за изпразване (часове)';
+$ec_lang['odt_t_day']='Време за изпразване (дни)';
+$ec_lang['odt_notes_1_term']='Формула';
+$ec_lang['odt_notes_1_def']='t = &radic;H<sub>1</sub> / (C<sub>d</sub> A<sub>or</sub> &radic;(2g)) &times; (2A<sub>x</sub>/5 + 8&radic;(A<sub>x</sub>A<sub>0</sub>)/15 + 16A<sub>0</sub>/15) дава времето за изпразване от напор H до отвора. Времето за изпразване = t(H<sub>1</sub>,A<sub>1</sub>,A<sub>0</sub>) &minus; t(H<sub>2</sub>,A<sub>2</sub>,A<sub>0</sub>), където H<sub>1</sub> = начална кота &minus; кота на отвора, H<sub>2</sub> = крайна кота &minus; кота на отвора.';
+$ec_lang['odt_notes_2_term']='Метод';
+$ec_lang['odt_notes_2_def']='Методът на коничния обем моделира езерцето като конично сечение между началната площ A<sub>1</sub> при началната водна повърхност и площта A<sub>0</sub> при кота на центроида на отвора. A<sub>2</sub>, площта на езерцето при крайната кота, се интерполира от A<sub>1</sub> и A<sub>0</sub> по модела на коничното сечение. Времето за изпразване от началната до крайната кота е равно на общото време за изпразване от H<sub>1</sub> до отвора минус оставащото времe за изпразване от H<sub>2</sub> до отвора.';
+$ec_lang['odt_h1']='Начален напор, H<sub>1</sub> (WSE &minus; центроид)';
+$ec_lang['odt_q_max']='Максимален (начален) дебит, Q<sub>max</sub>';
+$ec_lang['odt_vol']='Изпразнен обем';
 // Contact us.
 $ec_lang['contact_title']="Контакт с HawsEDC"; 
 $ec_lang['contactSendMessage']='Изпратете съобщение на Tom Haws'; 
@@ -247,6 +246,37 @@ $ec_lang['contactYourName']='Вашето име:';
 $ec_lang['contactYourEmail']='Вашият e-mail адрес:'; 
 $ec_lang['contactSubject']='Относно:'; 
 $ec_lang['contact_message']='Съобщение:'; 
-$ec_lang['contactSpamPrefix']='Five plus one equals'; //Shouldn't translate that
-$ec_lang['contactSpamPostfix']='(Please spell it out. 1=one 2=two 3=three 4=four 5=five 6=six 7=seven +=plus 5+1=6)'; //Shouldn't translate that
+$ec_lang['contactSpamPrefix']='Пет плюс едно е равно на';
+$ec_lang['contactSpamPostfix']="(Моля, изпишете с думи. 1=едно 2=две 3=три 4=четири 5=пет 6=шест 7=седем +=плюс 5+1=6)";
 $ec_lang['contactSubmitButton']='Изпратете съобщението'; 
+// Erosion Setback and Scour Calc.
+$ec_lang['essc_btbw']='Ширина от бряг до бряг';
+$ec_lang['essc_mcr']='Минимален радиус на кривина';
+$ec_lang['essc_q']='Дебит, Q';
+// Manning Irregular — additional keys
+$ec_lang['mi_d50in']='Облицовка<br />медиен<br />размер<br />камъни';
+// Manning Pipe Flow — additional keys
+$ec_lang['mpf_area_ratio']='Относителна площ, a/a0';
+$ec_lang['mpf_full_flow']='Пълен дебит, Q0';
+$ec_lang['mpf_full_flow_ratio']='Съотношение към пълен дебит, Q/Q0';
+$ec_lang['mpf_note_1']='<p>Бележки:</p><dl><dt>Това е дебитът и дълбочината в <em>безкрайно дълга</em> тръба.</dt><dd>За вкарването на потока в тръбата може да е необходима значително по-голяма дълбочина на горната вода. Добавете поне 1,5 пъти скоростния напор за да получите дълбочината на горната вода или <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">вижте моя 2-минутен урок</a> за стандартни изчисления на горна вода за водостоци с HY-8.</dd>';
+$ec_lang['mpf_pipe_area']='Площ на тръбата, a0';
+$ec_lang['mpf_see_notes']='(Вижте бележките)';
+$ec_lang['mpf_spreadheet_notice']='Вижте таблицата на Excel за тази версия на калкулатора';
+// Manning Pipe Head Loss — additional keys
+$ec_lang['mphl_friction_slope']='Хидравличен наклон';
+$ec_lang['mphl_note_1']='<p>Бележки:</p><dl><dt>При отворен вход (водосток) е необходима проверка за контрол при входа.</dt><dd>1. HGL нагоре по течението не може да бъде по-ниско от котата на нормалното течение нагоре по течението (или по-ниско от тръбата!).</dd><dd>2. Горната вода на водосток се представя по-добре от EGL нагоре по течението, отколкото от HGL нагоре по течението.</dd><dd>3. Вижте <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">моя 2-минутен урок</a> за прости стандартни изчисления на горна вода за водостоци с HY-8.</dd>';
+// Manning Trapezoid — additional keys
+$ec_lang['mtc_blodgett_v_bathurst']='Blodgett срещу Bathurst';
+$ec_lang['mtc_d50_in']='Проектен размер на камъните, D50';
+$ec_lang['mtc_n_bathurst']='n за проектния размер на камъните по Bathurst';
+$ec_lang['mtc_n_blodgett']='n за проектния размер на камъните по Blodgett';
+$ec_lang['mtc_n_strickler']='n за проектния размер на камъните по Strickler';
+$ec_lang['mtc_note_1']='<p>Бележки:</p><dl><dt>Автоматична итерация за проектиране на размера и грапавината на каменната облицовка</dt><dd>Изберете радио бутон за грапавина (препоръчва се BB) и радио бутон за проектен размер на камъните (препоръчва се Isbash). Настройте дълбочината и коефициента на безопасност за размера на камъните, за да получите желания дебит с равен размер на камъните. При всяка промяна на входна стойност се изпълнява следният итерационен цикъл: 1. Грапавината се изчислява от проектния размер на камъните. 2. Избраното изчисление на грапавината се копира в входната грапавина. 3. Дебитът в канала и необходимият размер на камъните се изчисляват. 4. Проектният размер на камъните се коригира. 5. Повтаря се до много малка грешка в проектния размер.</dd><dt>Основен калкулатор (без итерация)</dt><dd>Въведете желаната стойност на грапавината. Игнорирайте полето за проектен размер на камъните.</dd></dl>';
+// Orifice Flow — additional key
+$ec_lang['or_velocity']='Скорост при отвора, v';
+// Points data keys
+$ec_lang['points_data_copy']='Копирай';
+$ec_lang['points_data_help']='(или Копиране/Поставяне чрез областта с данни)';
+$ec_lang['points_data_paste']='Постави';
+$ec_lang['points_data_title']='Данни за точки<br />(разделени със запетая или табулация)';
