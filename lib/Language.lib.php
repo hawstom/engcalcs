@@ -103,7 +103,7 @@ function chooseLanguage($all_language_settings) {
     // print_r($all_language_settings);
     foreach ($all_language_settings as $tag => $language) {
       $tagarray = explode("-", $tag);
-      $tagPrefix = $tagarray[0];
+      $tagPrefix = isset($language['BROWSER_TAG']) ? $language['BROWSER_TAG'] : $tagarray[0];
       $tagQuality = $language['QUALITY'];
       $longestMatch = 0;
       // Assign the default quality.

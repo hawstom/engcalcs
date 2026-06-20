@@ -49,8 +49,10 @@ $all_language_settings['bg']=array(
 );
 //-- settings for chinese
 $all_language_settings['cn']=array(
-'QUALITY'=>'0.3',
+'QUALITY'=>'0.7',
 'LANGNAME'=>'中文',
+// Browser Accept-Language sends 'zh' but our internal code is 'cn'.
+'BROWSER_TAG'=>'zh',
 // Title words is a list of words that are not capitalized in titles.
 'TITLE_WORDS'=>array(),
 );
@@ -121,5 +123,33 @@ $all_language_settings['sr']=array(
 $all_language_settings['tr']=array(
 'QUALITY'=>'0.9',
 'LANGNAME'=>'Türkçe',
+'TITLE_WORDS'=>array(),
+);
+
+//-- settings for german
+$all_language_settings['de']=array(
+'QUALITY'=>'0.9',
+'LANGNAME'=>'Deutsch',
+'TITLE_WORDS'=>array(),
+);
+
+//-- settings for italian
+$all_language_settings['it']=array(
+'QUALITY'=>'0.9',
+'LANGNAME'=>'Italiano',
+'TITLE_WORDS'=>array(),
+);
+
+//-- settings for czech
+$all_language_settings['cs']=array(
+'QUALITY'=>'0.9',
+'LANGNAME'=>'Čeština',
+'TITLE_WORDS'=>array(),
+);
+
+//-- settings for russian
+$all_language_settings['ru']=array(
+'QUALITY'=>'0.9',
+'LANGNAME'=>'Русский',
 'TITLE_WORDS'=>array(),
 );
