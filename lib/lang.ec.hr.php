@@ -61,13 +61,13 @@ $ec_lang['or_notes_4_def']='Kada je TWE iznad dna otvora, kalkulator automatski 
 
 // Orifice Drain Time
 $ec_lang['odt_main_menu']='Vrijeme pražnjenja otvora';
-$ec_lang['odt_main_title']='Besplatni online kalkulator vremena pražnjenja otvora';
-$ec_lang['odt_main_desc']='Vrijeme pražnjenja jezerca kroz otvor &mdash; metoda koničnog volumena';
+$ec_lang['odt_main_title']='Besplatni online kalkulator vremena pražnjenja otvora — jezerce, bazen ili rezervoar';
+$ec_lang['odt_main_desc']='Vrijeme pražnjenja jezerca ili bazena kroz otvor &mdash; metoda koničnog volumena';
 $ec_lang['odt_h1_elev']='Početna kota razine vode';
-$ec_lang['odt_a1']='Početna površina jezerca, A1';
+$ec_lang['odt_a1']='Početna površina jezerca ili bazena, A1';
 $ec_lang['odt_h2_elev']='Završna kota razine vode';
 $ec_lang['odt_h_orifice']='Kota težišta otvora';
-$ec_lang['odt_a0']='Površina jezerca na koti otvora, A0';
+$ec_lang['odt_a0']='Površina jezerca ili bazena na koti otvora, A0';
 $ec_lang['odt_a_ending']='Završna površina jezerca, A2 (interpolirano)';
 $ec_lang['odt_h2_check']='Provjera završne kote';
 $ec_lang['odt_h2_ok']='Završna kota iznad gornjeg ruba otvora ✓';
@@ -81,7 +81,7 @@ $ec_lang['odt_t_day']='Vrijeme pražnjenja (dani)';
 $ec_lang['odt_notes_1_term']='Formula';
 $ec_lang['odt_notes_1_def']='t = &radic;H<sub>1</sub> / (C<sub>d</sub> A<sub>or</sub> &radic;(2g)) &times; (2A<sub>x</sub>/5 + 8&radic;(A<sub>x</sub>A<sub>0</sub>)/15 + 16A<sub>0</sub>/15) daje vrijeme pražnjenja od visine H do otvora. Vrijeme pražnjenja = t(H<sub>1</sub>,A<sub>1</sub>,A<sub>0</sub>) &minus; t(H<sub>2</sub>,A<sub>2</sub>,A<sub>0</sub>), gdje je H<sub>1</sub> = početna kota &minus; kota otvora, H<sub>2</sub> = završna kota &minus; kota otvora.';
 $ec_lang['odt_notes_2_term']='Metoda';
-$ec_lang['odt_notes_2_def']='Metoda koničnog volumena modelira jezerce kao konični presjek između početne površine A<sub>1</sub> na početnoj razini vode i površine A<sub>0</sub> na koti težišta otvora. A<sub>2</sub>, površina jezerca na završnoj koti, interpolira se iz A<sub>1</sub> i A<sub>0</sub> pomoću modela koničnog presjeka. Vrijeme pražnjenja od početne do završne kote jednako je ukupnom vremenu pražnjenja od H<sub>1</sub> do otvora minus preostalo vrijeme pražnjenja od H<sub>2</sub> do otvora.';
+$ec_lang['odt_notes_2_def']='Metoda koničnog volumena modelira jezerce ili bazen kao konični presjek između početne površine A<sub>1</sub> na početnoj razini vode i površine A<sub>0</sub> na koti težišta otvora. A<sub>2</sub>, površina jezerca na završnoj koti, interpolira se iz A<sub>1</sub> i A<sub>0</sub> pomoću modela koničnog presjeka. Vrijeme pražnjenja od početne do završne kote jednako je ukupnom vremenu pražnjenja od H<sub>1</sub> do otvora minus preostalo vrijeme pražnjenja od H<sub>2</sub> do otvora.';
 $ec_lang['odt_h1']='Početna visina, H<sub>1</sub> (WSE &minus; težište)';
 $ec_lang['odt_q_max']='Maksimalni (početni) protok, Q<sub>max</sub>';
 $ec_lang['odt_vol']='Ispražnjeni volumen';

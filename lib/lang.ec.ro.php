@@ -63,13 +63,13 @@ $ec_lang['or_notes_4_def']='Când TWE depășește radierul deschiderii, calcula
 
 // Orifice Drain Time
 $ec_lang['odt_main_menu']='Timp de Golire prin Orificiu';
-$ec_lang['odt_main_title']='Calculator Gratuit Online Timp de Golire prin Orificiu';
-$ec_lang['odt_main_desc']='Timp de Golire a Iazului prin Orificiu &mdash; Metoda Volumului Conic';
+$ec_lang['odt_main_title']='Calculator Gratuit Online Timp de Golire prin Orificiu — Iaz, Bazin sau Rezervor';
+$ec_lang['odt_main_desc']='Timp de Golire a Iazului sau Bazinului prin Orificiu &mdash; Metoda Volumului Conic';
 $ec_lang['odt_h1_elev']='Cota inițială a suprafeței apei';
-$ec_lang['odt_a1']='Aria inițială a iazului, A1';
+$ec_lang['odt_a1']='Aria inițială a iazului sau bazinului, A1';
 $ec_lang['odt_h2_elev']='Cota finală a suprafeței apei';
 $ec_lang['odt_h_orifice']='Cota centroidului orificiului';
-$ec_lang['odt_a0']='Aria iazului la cota orificiului, A0';
+$ec_lang['odt_a0']='Aria iazului sau bazinului la cota orificiului, A0';
 $ec_lang['odt_a_ending']='Aria finală a iazului, A2 (interpolată)';
 $ec_lang['odt_h2_check']='Verificare cotă finală';
 $ec_lang['odt_h2_ok']='Cota finală deasupra vârfului orificiului ✓';
@@ -83,7 +83,7 @@ $ec_lang['odt_t_day']='Timp de golire (zile)';
 $ec_lang['odt_notes_1_term']='Formulă';
 $ec_lang['odt_notes_1_def']='t = &radic;H<sub>1</sub> / (C<sub>d</sub> A<sub>or</sub> &radic;(2g)) &times; (2A<sub>x</sub>/5 + 8&radic;(A<sub>x</sub>A<sub>0</sub>)/15 + 16A<sub>0</sub>/15) dă timpul de golire de la sarcina H până la orificiu. Timp de golire = t(H<sub>1</sub>,A<sub>1</sub>,A<sub>0</sub>) &minus; t(H<sub>2</sub>,A<sub>2</sub>,A<sub>0</sub>), unde H<sub>1</sub> = cota inițială &minus; cota orificiului, H<sub>2</sub> = cota finală &minus; cota orificiului.';
 $ec_lang['odt_notes_2_term']='Metodă';
-$ec_lang['odt_notes_2_def']='Metoda volumului conic modelează iazul ca o secțiune conică între aria inițială A<sub>1</sub> la suprafața inițială a apei și aria A<sub>0</sub> la cota centroidului orificiului. A<sub>2</sub>, aria iazului la cota finală, este interpolată din A<sub>1</sub> și A<sub>0</sub> folosind modelul secțiunii conice. Timpul de golire de la cota inițială la cea finală este egal cu timpul total de golire de la H<sub>1</sub> la orificiu minus timpul rămas de golire de la H<sub>2</sub> la orificiu.';
+$ec_lang['odt_notes_2_def']='Metoda volumului conic modelează iazul sau bazinul ca o secțiune conică între aria inițială A<sub>1</sub> la suprafața inițială a apei și aria A<sub>0</sub> la cota centroidului orificiului. A<sub>2</sub>, aria iazului la cota finală, este interpolată din A<sub>1</sub> și A<sub>0</sub> folosind modelul secțiunii conice. Timpul de golire de la cota inițială la cea finală este egal cu timpul total de golire de la H<sub>1</sub> la orificiu minus timpul rămas de golire de la H<sub>2</sub> la orificiu.';
 $ec_lang['odt_h1']='Sarcina inițială, H<sub>1</sub> (WSE &minus; centroid)';
 $ec_lang['odt_q_max']='Debit maxim (inițial), Q<sub>max</sub>';
 $ec_lang['odt_vol']='Volum golit';

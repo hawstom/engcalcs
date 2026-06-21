@@ -137,13 +137,13 @@ $ec_lang['or_notes_4_def']='כאשר TWE גבוה מתחתית הפתח, המח�
 
 // Orifice Drain Time
 $ec_lang['odt_main_menu']='זמן ריקון פתח';
-$ec_lang['odt_main_title']='מחשבון זמן ריקון פתח — חינם מקוון';
-$ec_lang['odt_main_desc']='זמן ריקון פתח בריכת איגום &mdash; שיטת נפח קוני';
+$ec_lang['odt_main_title']='מחשבון זמן ריקון פתח — בריכה, אגן או מיכל — חינם מקוון';
+$ec_lang['odt_main_desc']='זמן ריקון פתח בריכת איגום או אגן &mdash; שיטת נפח קוני';
 $ec_lang['odt_h1_elev']='גובה מפלס מים התחלתי';
-$ec_lang['odt_a1']='שטח ריכוז התחלתי, A1';
+$ec_lang['odt_a1']='שטח בריכה או אגן התחלתי, A1';
 $ec_lang['odt_h2_elev']='גובה מפלס מים סופי';
 $ec_lang['odt_h_orifice']='גובה צנטרואיד הפתח';
-$ec_lang['odt_a0']='שטח ריכוז בגובה הפתח, A0';
+$ec_lang['odt_a0']='שטח בריכה או אגן בגובה הפתח, A0';
 $ec_lang['odt_a_ending']='שטח ריכוז סופי, A2 (אינטרפולציה)';
 $ec_lang['odt_h2_check']='בדיקת גובה סופי';
 $ec_lang['odt_h2_ok']='הגובה הסופי מעל לחלק העליון של הפתח ✓';
@@ -157,7 +157,7 @@ $ec_lang['odt_t_day']='זמן ריקון (ימים)';
 $ec_lang['odt_notes_1_term']='נוסחה';
 $ec_lang['odt_notes_1_def']='t = &radic;H<sub>1</sub> / (C<sub>d</sub> A<sub>or</sub> &radic;(2g)) &times; (2A<sub>x</sub>/5 + 8&radic;(A<sub>x</sub>A<sub>0</sub>)/15 + 16A<sub>0</sub>/15) נותן את זמן הריקון מגובה ראש H עד לפתח. זמן ריקון = t(H<sub>1</sub>,A<sub>1</sub>,A<sub>0</sub>) &minus; t(H<sub>2</sub>,A<sub>2</sub>,A<sub>0</sub>), כאשר H<sub>1</sub> = גובה התחלתי &minus; גובה הפתח, H<sub>2</sub> = גובה סופי &minus; גובה הפתח.';
 $ec_lang['odt_notes_2_term']='שיטה';
-$ec_lang['odt_notes_2_def']='שיטת הנפח הקוני מדמה את הריכוז כחתך קוני בין שטח התחלתי A<sub>1</sub> במפלס המים הראשוני לבין שטח A<sub>0</sub> בגובה צנטרואיד הפתח. A<sub>2</sub>, שטח הריכוז בגובה הסופי, מחושב באינטרפולציה מ-A<sub>1</sub> ו-A<sub>0</sub> לפי מודל החתך הקוני. זמן הריקון מגובה התחלתי לסופי שווה לזמן הריקון הכולל מ-H<sub>1</sub> לפתח פחות זמן הריקון הנותר מ-H<sub>2</sub> לפתח.';
+$ec_lang['odt_notes_2_def']='שיטת הנפח הקוני מדמה את הבריכה או האגן כחתך קוני בין שטח התחלתי A<sub>1</sub> במפלס המים הראשוני לבין שטח A<sub>0</sub> בגובה צנטרואיד הפתח. A<sub>2</sub>, שטח הבריכה בגובה הסופי, מחושב באינטרפולציה מ-A<sub>1</sub> ו-A<sub>0</sub> לפי מודל החתך הקוני. זמן הריקון מגובה התחלתי לסופי שווה לזמן הריקון הכולל מ-H<sub>1</sub> לפתח פחות זמן הריקון הנותר מ-H<sub>2</sub> לפתח.';
 $ec_lang['odt_h1']='ראש התחלתי, H<sub>1</sub> (WSE &minus; צנטרואיד)';
 $ec_lang['odt_q_max']='ספיקה מרבית (התחלתית), Q<sub>max</sub>';
 $ec_lang['odt_vol']='נפח מרוקן';
