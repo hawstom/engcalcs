@@ -1,0 +1,5 @@
+# Redirect old /lib/ asset paths to current locations.
+# These were cached by browsers before the CSS/JS directories were reorganized.
+Redirect 301 /engcalcs/lib/engcalcs.css /engcalcs/css/engcalcs.css
+Redirect 301 /engcalcs/lib/Cookies.lib.js /engcalcs/js/Cookies.lib.js
+Redirect 301 /engcalcs/lib/Calculators.lib.js /engcalcs/js/Calculators.lib.js
