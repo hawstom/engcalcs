@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			</tr>
 			<tr>
 				<td>
-					Inputs
+					<?=$ec_lang['calc_inputs']?>
 					<table>
 						<tbody>
 <?php
