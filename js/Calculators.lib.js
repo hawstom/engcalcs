@@ -182,7 +182,7 @@ EngCalcs.adjustInputWidth = function () {
 	'use strict';
 	var stringLength = 2;
 	document.querySelectorAll('.input').forEach(function(el) {
-		stringLength = Math.max(stringLength, el.value.length / 1.6);
+		stringLength = Math.max(stringLength, el.value.length * 0.56 + 0.55);
 	});
 	var inputWidth = stringLength.toString() + 'em';
 	document.querySelectorAll('.input').forEach(function(el) {
