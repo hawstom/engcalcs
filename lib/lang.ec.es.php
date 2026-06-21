@@ -44,7 +44,7 @@ $ec_lang['u_m3']="m^3";
 // In page order for easiest maintenance.
 $ec_lang['menu_brand']='Calculadoras HawsEDC';
 $ec_lang['menu_main_list']='Lista de calculadoras';
-$ec_lang['menu_main_hydraulics']='Hydraulica';
+$ec_lang['menu_main_hydraulics']='Hidráulica';
 $ec_lang['menu_main_language']='Idioma';
 $ec_lang['template_welcome']='>> Dejad vuestros miedos en la puerta; el amor se habla aquí. Disfrutad tambi&eacute;n <a href="https://hawsedc.com/download.php">las herramientas libres HawsEDC para AutoCAD.</a> <<';
 $ec_lang['template_translation_help']='&iquest;Tiene usted una gran visión para una calculadora que agregar aquí?  &iquest;Me puede ayudar a traducir esta calculadora a su idioma?  &iquest;Quisiera Ud. poner esta calculadora en su propio sitio web?';
@@ -59,11 +59,11 @@ $ec_lang['points_data_copy']='Copiar';
 $ec_lang['points_data_paste']='Pegar';
 $ec_lang['calc_inputs']='Ingresos';
 $ec_lang['calc_results']='Resultados: ';
-$ec_lang['view_hide_line']='[Ocultar esta linea]';
+$ec_lang['view_hide_line']='[Ocultar esta línea]';
 $ec_lang['view_printable']='Versión Imprimible (recargar/renover para restaurar)';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Pérdida de presión en una tubería según Darcy-Weisbach';
-$ec_lang['dw_main_title']='Calculadora gratis en linea de pérdida de presión en una tubería según Darcy-Weisbach';
+$ec_lang['dw_main_title']='Calculadora gratis en línea de pérdida de presión en una tubería según Darcy-Weisbach';
 $ec_lang['dw_main_desc']='Pérdida de presión en una tubería a partir de diámetro, rugosidad, y gasto según Darcy-Weisbach';
 $ec_lang['dw_roughness']='Rugosidad absoluto, e';
 $ec_lang['dw_kinematic_viscosity']='<span title="1E-6 m^2/sec por agua limpia a la temperatura ambiente">Viscosidad kinemática, v (1E-6)</span>';
@@ -76,12 +76,12 @@ $ec_lang['dw_friction_factor_method']='Método del factor de fricción';
 $ec_lang['dw_friction_factor']='Factor de fricción, f';
 // Hazen-Williams. See mphl_ for missing text.
 $ec_lang['hw_main_menu']='Pérdida de presión en una tubería según Hazen-Williams';
-$ec_lang['hw_main_title']='Calculadora gratis en linea de pérdida de presión en una tubería según Hazen-Williams';
+$ec_lang['hw_main_title']='Calculadora gratis en línea de pérdida de presión en una tubería según Hazen-Williams';
 $ec_lang['hw_main_desc']='Calculadora de pérdida de presión en una tubería a partir de diámetro, rugosidad, y gasto según Hazen-Williams';
 $ec_lang['hw_roughness']='Coeficiente de Hazen-Williams, C';
 // Manning Irregular
 $ec_lang['mi_menu']='Canal irregular según Manning';
-$ec_lang['mi_main_title']='Calculadora gratis en linea de un canal irregular según Manning';
+$ec_lang['mi_main_title']='Calculadora gratis en línea de un canal irregular según Manning';
 $ec_lang['mi_main_desc']='Calculadora de un canal irregular con flujo uniforme según Manning';
 $ec_lang['mi_waterSurfaceElevation']='Altura de la lámina libre';
 $ec_lang['mi_q_sum']='Q por sumación de segmentos';
@@ -163,7 +163,7 @@ $ec_lang['mtc_side_slope_1']='Pendiente de lado 1 (horizontal / vertical)';
 $ec_lang['mtc_side_slope_2']='Pendiente de lado 2 (horizontal / vertical)';
 $ec_lang['mtc_channel_slope']='Pendiente del canal (vertical / horizontal)';
 $ec_lang['mtc_flow_depth']='Calado de la lámina de agua, y';
-$ec_lang['mtc_bend_angle']='Angulo de la curva<a href="riprap-bend-angle.png" title="Haz clic para ver imagen">?</a> (para el tamaño de roca)';
+$ec_lang['mtc_bend_angle']='Ángulo de la curva<a href="riprap-bend-angle.png" title="Haz clic para ver imagen">?</a> (para el tamaño de roca)';
 $ec_lang['mtc_sgrock']='Gravedad específica de la roca (2.65)';
 $ec_lang['mtc_d50_in']='Tamaño de roca';
 $ec_lang['mtc_d50_bottom']='Tamaño de roca requerido en el fondo, D<sub>50</sub>, Maricopa County <a href="javascript:alert(\'Cuando S0 < 2% según Isbash (1936) and Maricopa County, Arizona, US. Cuando S >= 2% según Robinson Rock Chute \')">?</a>';
@@ -171,7 +171,7 @@ $ec_lang['mtc_d50_z1']='Tamaño de roca requerido en el lado 1, D<sub>50</sub>, 
 $ec_lang['mtc_d50_z2']='Tamaño de roca requerido en el lado 2, D<sub>50</sub>, Maricopa County <a href="javascript:alert(\'Cuando S0 < 2% según Isbash (1936) and Maricopa County, Arizona, US. Cuando S >= 2% según Robinson Rock Chute \')">?</a>';
 $ec_lang['mtc_d50_mra']='Tamaño de roca requerido, D<sub>50</sub>, según Maynord, Ruff, y Abt (1989)';
 $ec_lang['mtc_d50_searcy']='Tamaño de roca requerido, D<sub>50</sub>, según Searcy (1967)';
-$ec_lang['mtc_d50_strickler']='Tamaño de roca del diseño <a target="_blank" href="javascript:alert(\'La fórmula Strickler relata n con D50 por un canal recto y limpio. Ajuste el valor n para que este tamaño de roca del diseño sea más grande que el tamaño de roca requerido en las siguientes lineas. Luego use tal roca en su diseño.\')">?</a> basado en la dada rugosidad Manning';
+$ec_lang['mtc_d50_strickler']='Tamaño de roca del diseño <a target="_blank" href="javascript:alert(\'La fórmula Strickler relata n con D50 por un canal recto y limpio. Ajuste el valor n para que este tamaño de roca del diseño sea más grande que el tamaño de roca requerido en las siguientes líneas. Luego use tal roca en su diseño.\')">?</a> basado en la dada rugosidad Manning';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='Vertedero hidráulico sencillo';
 $ec_lang['ws_main_title']='Calculadora de gasto en un vertedero hidráulico sencillo';
