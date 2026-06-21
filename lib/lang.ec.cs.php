@@ -45,7 +45,7 @@ $ec_lang['menu_main_list']='Seznam kalkulaček';
 $ec_lang['menu_main_hydraulics']='Hydraulika';
 $ec_lang['menu_main_language']='Jazyk';
 $ec_lang['template_welcome']='&gt;&gt; Nechejte strachy za dveřmi; zde se mluví láskou. Užijte si také <a href="https://hawsedc.com/download.php">zdarma nástroje HawsEDC pro AutoCAD.</a> &lt;&lt;';
-$ec_lang['template_translation_help']='Můžete mi pomoci zlepšit překlady, programovat nebo hostovat tyto kalkulačky?  ';
+$ec_lang['template_translation_help']='Máte skvělou vizi pro kalkulačku, která by mohla být přidána zde?  Můžete mi pomoci zlepšit překlady, programovat nebo hostovat tyto kalkulačky?  ';
 $ec_lang['template_feedback']='Prosíme, podělte se o vaše cenné připomínky nebo pochvaly. Překonala tato bezplatná kalkulačka vaše očekávání?';
 $ec_lang['template_printable_title']='Tisknutelný název';
 $ec_lang['template_printable_subtitle']='Tisknutelný podtitul';

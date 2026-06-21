@@ -127,7 +127,7 @@ $ec_lang['menu_main_list']='Листа калкулатора';
 $ec_lang['menu_main_hydraulics']='Хидраулика';
 $ec_lang['menu_main_language']='Језик';
 $ec_lang['template_welcome']='&gt;&gt; Оставите страхове за вратима; овде се говори о љубави. Уживајте и у <a href="https://hawsedc.com/download.php">бесплатним HawsEDC AutoCAD алатима</a>. &lt;&lt;';
-$ec_lang['template_translation_help']='Можете ли помоћи у побољшању превода, програмирању или хостовању ових калкулатора?  ';
+$ec_lang['template_translation_help']='Имате ли одличну идеју за калкулатор који би требало додати овде?  Можете ли помоћи у побољшању превода, програмирању или хостовању ових калкулатора?  ';
 $ec_lang['template_feedback']='Молимо вас да нам дате своје вредне сугестије или похвале. Да ли је овај бесплатни калкулатор превазишао ваша очекивања у сваком погледу?';
 $ec_lang['template_printable_title']='Наслов за штампу';
 $ec_lang['template_printable_subtitle']='Поднаслов за штампу';
