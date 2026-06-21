@@ -39,6 +39,8 @@ $all_language_settings = array();
 // when choosing the best language match from Accept-Language. 1.0 = fully translated, well-maintained.
 // Lower values (e.g. 0.3) indicate partial or aging translations — they will only win if the browser
 // strongly prefers that language and no better-quality match exists.
+//
+// Languages are ordered alphabetically by English name, matching the EU/UN convention.
 
 //-- settings for bulgarian
 $all_language_settings['bg']=array(
@@ -47,6 +49,7 @@ $all_language_settings['bg']=array(
 // Title words is a list of words that are not capitalized in titles.
 'TITLE_WORDS'=>array(),
 );
+
 //-- settings for chinese
 $all_language_settings['cn']=array(
 'QUALITY'=>'0.7',
@@ -56,6 +59,22 @@ $all_language_settings['cn']=array(
 // Title words is a list of words that are not capitalized in titles.
 'TITLE_WORDS'=>array(),
 );
+
+//-- settings for croatian
+$all_language_settings['hr']=array(
+'QUALITY'=>'0.3',
+'LANGNAME'=>'Hrvatski',
+// Title words is a list of words that are not capitalized in titles.
+'TITLE_WORDS'=>array(),
+);
+
+//-- settings for czech
+$all_language_settings['cs']=array(
+'QUALITY'=>'0.9',
+'LANGNAME'=>'Čeština',
+'TITLE_WORDS'=>array(),
+);
+
 //-- settings for english
 $all_language_settings['en']=array(
 'QUALITY'=>'1',
@@ -64,17 +83,17 @@ $all_language_settings['en']=array(
 'TITLE_WORDS'=>array('of','a','the','and','an','or','nor','but','is','if','then','else', 'when', 'at', 'from', 'by','on','off','for','in','out','over','to','into','with'),
 );
 
-//-- settings for spanish
-$all_language_settings['es']=array(
-'QUALITY'=>'0.95',
-'LANGNAME'=>'Español',
-'TITLE_WORDS'=>array(),
-);
-
 //-- settings for french
 $all_language_settings['fr']=array(
 'QUALITY'=>'0.9',
 'LANGNAME'=>'Francais',
+'TITLE_WORDS'=>array(),
+);
+
+//-- settings for german
+$all_language_settings['de']=array(
+'QUALITY'=>'0.9',
+'LANGNAME'=>'Deutsch',
 'TITLE_WORDS'=>array(),
 );
 
@@ -86,11 +105,10 @@ $all_language_settings['he']=array(
 'TITLE_WORDS'=>array(),
 );
 
-//-- settings for croatian
-$all_language_settings['hr']=array(
-'QUALITY'=>'0.3',
-'LANGNAME'=>'Hrvatski',
-// Title words is a list of words that are not capitalized in titles.
+//-- settings for italian
+$all_language_settings['it']=array(
+'QUALITY'=>'0.9',
+'LANGNAME'=>'Italiano',
 'TITLE_WORDS'=>array(),
 );
 
@@ -111,6 +129,13 @@ $all_language_settings['ro']=array(
 'TITLE_WORDS'=>array(),
 );
 
+//-- settings for russian
+$all_language_settings['ru']=array(
+'QUALITY'=>'0.9',
+'LANGNAME'=>'Русский',
+'TITLE_WORDS'=>array(),
+);
+
 //-- settings for serbian
 $all_language_settings['sr']=array(
 'QUALITY'=>'0.3',
@@ -119,37 +144,16 @@ $all_language_settings['sr']=array(
 'TITLE_WORDS'=>array(),
 );
 
+//-- settings for spanish
+$all_language_settings['es']=array(
+'QUALITY'=>'0.95',
+'LANGNAME'=>'Español',
+'TITLE_WORDS'=>array(),
+);
+
 //-- settings for turkish
 $all_language_settings['tr']=array(
 'QUALITY'=>'0.9',
 'LANGNAME'=>'Türkçe',
-'TITLE_WORDS'=>array(),
-);
-
-//-- settings for german
-$all_language_settings['de']=array(
-'QUALITY'=>'0.9',
-'LANGNAME'=>'Deutsch',
-'TITLE_WORDS'=>array(),
-);
-
-//-- settings for italian
-$all_language_settings['it']=array(
-'QUALITY'=>'0.9',
-'LANGNAME'=>'Italiano',
-'TITLE_WORDS'=>array(),
-);
-
-//-- settings for czech
-$all_language_settings['cs']=array(
-'QUALITY'=>'0.9',
-'LANGNAME'=>'Čeština',
-'TITLE_WORDS'=>array(),
-);
-
-//-- settings for russian
-$all_language_settings['ru']=array(
-'QUALITY'=>'0.9',
-'LANGNAME'=>'Русский',
 'TITLE_WORDS'=>array(),
 );
