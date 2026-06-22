@@ -328,6 +328,11 @@ $ec_lang['essc_btbw']='ទទឹង Bank ទៅ Bank';
 $ec_lang['essc_mcr']='កាំ​ong​ curve តូចបំផុត';
 $ec_lang['essc_q']='ការហូរ, Q';
 // Contact us.
+
+// Irrigation
+$ec_lang['irr_main_menu']='ការវាស់ស្ទង់លំហូរប្រព័ន្ធស្រោចស្រព';
+$ec_lang['irr_main_title']='ម៉ាស៊ីនគណនាឥតគិតថ្លៃតាមអ៊ីនធឺណិតសម្រាប់ការវាស់ស្ទង់លំហូរប្រព័ន្ធស្រោចស្រព';
+$ec_lang['irr_main_desc']='ការវាស់ស្ទង់លំហូរប្រព័ន្ធស្រោចស្រព — ទ្រនាប់ទឹក និងរន្ធ';
 $ec_lang['contact_title']='ទំនាក់ទំនង HawsEDC';
 $ec_lang['contactSendMessage']='ផ្ញើសារទៅ Tom Haws';
 $ec_lang['contactYourName']='ឈ្មោះ​ របស់​ អ្នក:';

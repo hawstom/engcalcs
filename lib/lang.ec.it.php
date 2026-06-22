@@ -268,6 +268,11 @@ $ec_lang['essc_btbw']='Larghezza di sponda a sponda';
 $ec_lang['essc_mcr']='Raggio minimo di curvatura';
 $ec_lang['essc_q']='Portata, Q';
 // Contact
+
+// Irrigation
+$ec_lang['irr_main_menu']='Misurazione del Flusso di Irrigazione';
+$ec_lang['irr_main_title']='Calcolatrici Online Gratuite per la Misurazione del Flusso di Irrigazione';
+$ec_lang['irr_main_desc']='Misurazione del Flusso di Irrigazione — Stramazzi e Orifizi';
 $ec_lang['contact_title']='Contatti HawsEDC';
 $ec_lang['contactSendMessage']='Invia un messaggio a Tom Haws';
 $ec_lang['contactYourName']='Nome:';

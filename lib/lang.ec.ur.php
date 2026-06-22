@@ -271,6 +271,11 @@ $ec_lang['essc_btbw']='کنارے سے کنارے چوڑائی';
 $ec_lang['essc_mcr']='کم سے کم انحناء نصف قطر';
 $ec_lang['essc_q']='بہاؤ، Q';
 // Contact us.
+
+// Irrigation
+$ec_lang['irr_main_menu']='آبپاشی بہاؤ پیمائش';
+$ec_lang['irr_main_title']='آبپاشی بہاؤ پیمائش کے مفت آن لائن حسابگر';
+$ec_lang['irr_main_desc']='آبپاشی بہاؤ پیمائش — ویئر اور اوریفس';
 $ec_lang['contact_title']='HawsEDC سے رابطہ';
 $ec_lang['contactSendMessage']='Tom Haws کو پیغام بھیجیں';
 $ec_lang['contactYourName']='آپ کا نام:';

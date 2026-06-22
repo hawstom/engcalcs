@@ -328,6 +328,11 @@ $ec_lang['essc_btbw']='د غاړه تر غاړه پلنوالی';
 $ec_lang['essc_mcr']='لږترلږه د منحني رادیوس';
 $ec_lang['essc_q']='بهاو، Q';
 // Contact us.
+
+// Irrigation
+$ec_lang['irr_main_menu']='د اوبه اچولو بهیر اندازه کول';
+$ec_lang['irr_main_title']='د اوبه اچولو بهیر اندازه کولو وړیا آنلاین حسابونه';
+$ec_lang['irr_main_desc']='د اوبه اچولو بهیر اندازه کول — د اوبو وزي او سوري';
 $ec_lang['contact_title']='HawsEDC اړیکه';
 $ec_lang['contactSendMessage']='Tom Haws ته پیغام ولیږئ';
 $ec_lang['contactYourName']='ستاسو نوم:';

@@ -268,6 +268,11 @@ $ec_lang['essc_btbw']='Lebar tepi ke tepi';
 $ec_lang['essc_mcr']='Radius kurva minimum';
 $ec_lang['essc_q']='Debit, Q';
 // Contact us.
+
+// Irrigation
+$ec_lang['irr_main_menu']='Pengukuran Aliran Irigasi';
+$ec_lang['irr_main_title']='Kalkulator Pengukuran Aliran Irigasi Online Gratis';
+$ec_lang['irr_main_desc']='Pengukuran Aliran Irigasi — Pelimpah dan Orifis';
 $ec_lang['contact_title']='Kontak HawsEDC';
 $ec_lang['contactSendMessage']='Kirim pesan ke Tom Haws';
 $ec_lang['contactYourName']='Nama Anda:';

@@ -271,6 +271,11 @@ $ec_lang['essc_btbw']='ዳርቻ እስከ ዳርቻ ስፋት';
 $ec_lang['essc_mcr']='ዝቅተኛ ጥምዝ ራዲየስ';
 $ec_lang['essc_q']='ፍሰት, Q';
 // Contact us.
+
+// Irrigation
+$ec_lang['irr_main_menu']='የመስኖ ፍሰት ልኬት';
+$ec_lang['irr_main_title']='ነፃ ኦንላይን የመስኖ ፍሰት ልኬት ካልኩሌተሮች';
+$ec_lang['irr_main_desc']='የመስኖ ፍሰት ልኬት — ዊርስ እና ኦሪፊስ';
 $ec_lang['contact_title']='HawsEDC ያግኙን';
 $ec_lang['contactSendMessage']='Tom Haws ላክ መልዕክት';
 $ec_lang['contactYourName']='ስምህ:';

@@ -328,6 +328,11 @@ $ec_lang['essc_btbw']='Ширина від берега до берега';
 $ec_lang['essc_mcr']='Мінімальний радіус кривизни';
 $ec_lang['essc_q']='Витрата, Q';
 // Contact us.
+
+// Irrigation
+$ec_lang['irr_main_menu']='Вимірювання витрати зрошення';
+$ec_lang['irr_main_title']='Безкоштовні онлайн-калькулятори вимірювання витрати зрошення';
+$ec_lang['irr_main_desc']='Вимірювання витрати зрошення — водозливи та отвори';
 $ec_lang['contact_title']='Зв\'язок з HawsEDC';
 $ec_lang['contactSendMessage']='Надіслати повідомлення Тому Хоусу';
 $ec_lang['contactYourName']='Ваше ім\'я:';

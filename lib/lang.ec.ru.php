@@ -268,6 +268,11 @@ $ec_lang['essc_btbw']='Ширина между берегами';
 $ec_lang['essc_mcr']='Минимальный радиус кривой';
 $ec_lang['essc_q']='Расход, Q';
 // Contact
+
+// Irrigation
+$ec_lang['irr_main_menu']='Измерение расхода ирригации';
+$ec_lang['irr_main_title']='Бесплатные онлайн-калькуляторы измерения расхода ирригации';
+$ec_lang['irr_main_desc']='Измерение расхода ирригации — водосливы и отверстия';
 $ec_lang['contact_title']='Контакт HawsEDC';
 $ec_lang['contactSendMessage']='Отправить сообщение Tom Haws';
 $ec_lang['contactYourName']='Ваше имя:';

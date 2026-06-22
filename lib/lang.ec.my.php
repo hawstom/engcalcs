@@ -328,6 +328,11 @@ $ec_lang['essc_btbw']='ကမ်းနဖူးမှ ကမ်းနဖူး�
 $ec_lang['essc_mcr']='အနည်းဆုံးကောက်ကြောင်းအချင်း';
 $ec_lang['essc_q']='စီးဆင်းမှု, Q';
 // Contact us.
+
+// Irrigation
+$ec_lang['irr_main_menu']='ဆည်မြောင်းရေစီးဆင်းမှုတိုင်းတာ';
+$ec_lang['irr_main_title']='အခမဲ့ အွန်လိုင်းဆည်မြောင်းရေစီးဆင်းမှုတိုင်းတာ ကိရိယာများ';
+$ec_lang['irr_main_desc']='ဆည်မြောင်းရေစီးဆင်းမှုတိုင်းတာ — Weir နှင့် Orifice';
 $ec_lang['contact_title']='HawsEDC ဆက်သွယ်ရန်';
 $ec_lang['contactSendMessage']='Tom Haws ထံ မက်ဆေ့ပေးပို့ပါ';
 $ec_lang['contactYourName']='သင့်နာမည်:';

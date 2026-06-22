@@ -24,8 +24,6 @@ The format of each task is: Priority/status|Description. 0 means "Completed" and
 
 ## Calculator Improvements
 
-- 88|Irrigation: Existing weir and orifice calculators already serve irrigation flow measurement — add an explicit note or landing page connecting them to irrigation use cases (farmers and irrigation districts use these constantly).
-
 - 80|Irrigation: Explore drip/sprinkler design calculator — emitter flow, lateral spacing, precipitation rate, system uniformity coefficient. High value for smallholder agriculture in water-scarce regions.
 
 - 75|Robinson Rock Chute: Evaluate adding this calculator (currently a Google Spreadsheet). Should we retire the spreadsheet or refer to other available calculators? Does the reference white paper justify the complexity?
@@ -43,6 +41,8 @@ The format of each task is: Priority/status|Description. 0 means "Completed" and
 - 10|Results sharing — generate a shareable URL or printable summary of a completed calculation.
 
 ## Completed
+
+- 0|Irrigation landing page (Irrigation.php): added to menu with divider. Links to Weir Flow Simple, Weir Flow Irregular, Orifice Flow, Orifice Drain Time, and Manning channel calculators. Quick-reference section for diversion dams, headgates, pipe turnouts, and USBR Water Measurement Manual alignment. irr_ keys added to all 27 lang files.
 
 - 0|Add km (Khmer), my (Burmese/Myanmar), ps (Pashto), fa (Farsi/Persian), uk (Ukrainian) as new languages — complete translation of all calculators. Khmer, Burmese, Ukrainian are LTR; Farsi and Pashto are RTL (added to dir="rtl" array in HeadersFooters.lib.php). All registered in Language.Settings.php (QUALITY 0.9). Now 27 languages total.
 

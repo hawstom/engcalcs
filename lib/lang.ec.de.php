@@ -268,6 +268,11 @@ $ec_lang['essc_btbw']='Uferbandbreite';
 $ec_lang['essc_mcr']='Minimaler Kurvenradius';
 $ec_lang['essc_q']='Durchfluss, Q';
 // Contact
+
+// Irrigation
+$ec_lang['irr_main_menu']='Bewässerungsdurchflussmessung';
+$ec_lang['irr_main_title']='Kostenlose Online-Rechner für Bewässerungsdurchflussmessung';
+$ec_lang['irr_main_desc']='Bewässerungsdurchflussmessung — Wehre und Öffnungen';
 $ec_lang['contact_title']='HawsEDC Kontakt';
 $ec_lang['contactSendMessage']='Senden Sie Tom Haws eine Nachricht';
 $ec_lang['contactYourName']='Ihr Name:';

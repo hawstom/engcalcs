@@ -287,6 +287,11 @@ $ec_lang['essc_mcr']='Minimalni radijus krivine';
 $ec_lang['essc_q']='Protok, Q';
 
 // Contact us
+
+// Irrigation
+$ec_lang['irr_main_menu']='Mjerenje protoka navodnjavanja';
+$ec_lang['irr_main_title']='Besplatni online kalkulatori za mjerenje protoka navodnjavanja';
+$ec_lang['irr_main_desc']='Mjerenje protoka navodnjavanja — pragovi i otvori';
 $ec_lang['contact_title']='HawsEDC Kontakt';
 $ec_lang['contactSendMessage']='Pošaljite poruku Tomu Hawsu';
 $ec_lang['contactYourName']='Vaše ime:';

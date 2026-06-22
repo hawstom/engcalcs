@@ -241,6 +241,11 @@ $ec_lang['odt_vol']='Volume esvaziado';
 $ec_lang['odt_sketch_start']='Início';
 $ec_lang['odt_sketch_end']='Fim';
 // Contact us.
+
+// Irrigation
+$ec_lang['irr_main_menu']='Medição de Vazão de Irrigação';
+$ec_lang['irr_main_title']='Calculadoras Online Gratuitas de Medição de Vazão de Irrigação';
+$ec_lang['irr_main_desc']='Medição de Vazão de Irrigação — Vertedores e Orifícios';
 $ec_lang['contact_title']='Contacto com HawsEDC';
 $ec_lang['contactSendMessage']='Envie uma mensagem para Tom Haws';
 $ec_lang['contactYourName']='Seu nome:';

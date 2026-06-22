@@ -329,6 +329,11 @@ $ec_lang['essc_btbw']='Bank to bank width';
 $ec_lang['essc_mcr']='Minimum curve radius';
 $ec_lang['essc_q']='Flow, Q';
 // Contact us.
+
+// Irrigation
+$ec_lang['irr_main_menu']='Irrigation Flow Measurement';
+$ec_lang['irr_main_title']='Free Online Irrigation Flow Measurement Calculators';
+$ec_lang['irr_main_desc']='Irrigation Flow Measurement — Weirs and Orifices';
 $ec_lang['contact_title']='HawsEDC Contact';
 $ec_lang['contactSendMessage']='Send Tom Haws a message';
 $ec_lang['contactYourName']='Your name:';

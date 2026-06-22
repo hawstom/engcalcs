@@ -271,6 +271,11 @@ $ec_lang['essc_btbw']='Upana kutoka ukingo hadi ukingo';
 $ec_lang['essc_mcr']='Radi ndogo kabisa ya mviringo';
 $ec_lang['essc_q']='Mtiririko, Q';
 // Contact us.
+
+// Irrigation
+$ec_lang['irr_main_menu']='Kupima Mtiririko wa Umwagiliaji';
+$ec_lang['irr_main_title']='Mahesabu ya Bure ya Mtandaoni ya Kupima Mtiririko wa Umwagiliaji';
+$ec_lang['irr_main_desc']='Kupima Mtiririko wa Umwagiliaji — Weirs na Orifisi';
 $ec_lang['contact_title']='Mawasiliano ya HawsEDC';
 $ec_lang['contactSendMessage']='Tuma Tom Haws ujumbe';
 $ec_lang['contactYourName']='Jina lako:';

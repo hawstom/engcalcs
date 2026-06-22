@@ -104,6 +104,8 @@ function echoEngCalcsMenu () {
 					<a class="dropdown-item" href="Orifice-Drain-Time.php" title="<?=$ec_lang['odt_main_desc']?>"><?=$ec_lang['odt_main_menu']?></a>
 					<a class="dropdown-item" href="Weir-Flow-Simple.php" title="<?=$ec_lang['ws_main_desc']?>"><?=$ec_lang['ws_main_menu']?></a>
 					<a class="dropdown-item" href="Weir-Flow-Irregular.php" title="<?=$ec_lang['wi_main_desc']?>"><?=$ec_lang['wi_menu']?></a>
+					<div class="dropdown-divider"></div>
+					<a class="dropdown-item" href="Irrigation.php" title="<?=$ec_lang['irr_main_desc']?>"><?=$ec_lang['irr_main_menu']?></a>
 				</div>
 			</li>
 			<li class="nav-item dropdown">

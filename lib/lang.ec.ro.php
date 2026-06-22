@@ -273,6 +273,11 @@ $ec_lang['essc_btbw']='Lățimea mal la mal';
 $ec_lang['essc_mcr']='Raza minimă de curbură';
 $ec_lang['essc_q']='Debit, Q';
 // Contact us.
+
+// Irrigation
+$ec_lang['irr_main_menu']='Măsurarea Debitului de Irigare';
+$ec_lang['irr_main_title']='Calculatoare Online Gratuite pentru Măsurarea Debitului de Irigare';
+$ec_lang['irr_main_desc']='Măsurarea Debitului de Irigare — Deversor și Orificii';
 $ec_lang['contact_title']='Contact HawsEDC';
 $ec_lang['contactSendMessage']='Trimiteți un mesaj lui Tom Haws';
 $ec_lang['contactYourName']='Numele dumneavoastră:';

@@ -266,6 +266,11 @@ $ec_lang['odt_vol']='Volume vidangé';
 $ec_lang['odt_sketch_start']='Début';
 $ec_lang['odt_sketch_end']='Fin';
 // Contact us.
+
+// Irrigation
+$ec_lang['irr_main_menu']='Mesure du débit d\'irrigation';
+$ec_lang['irr_main_title']='Calculateurs en ligne gratuits de mesure du débit d\'irrigation';
+$ec_lang['irr_main_desc']='Mesure du débit d\'irrigation — déversoirs et orifices';
 $ec_lang['contact_title']='Contact HawsEDC';
 $ec_lang['contactSendMessage']='Envoyer un message à Tom Haws';
 $ec_lang['contactYourName']='Votre nom:';

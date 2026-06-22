@@ -268,6 +268,11 @@ $ec_lang['essc_btbw']='তীর থেকে তীর প্রস্থ';
 $ec_lang['essc_mcr']='সর্বনিম্ন বক্ররেখা ব্যাসার্ধ';
 $ec_lang['essc_q']='প্রবাহ, Q';
 // Contact us.
+
+// Irrigation
+$ec_lang['irr_main_menu']='সেচ প্রবাহ পরিমাপ';
+$ec_lang['irr_main_title']='বিনামূল্যে অনলাইন সেচ প্রবাহ পরিমাপ ক্যালকুলেটর';
+$ec_lang['irr_main_desc']='সেচ প্রবাহ পরিমাপ — ওয়্যার এবং অরিফিস';
 $ec_lang['contact_title']='HawsEDC যোগাযোগ';
 $ec_lang['contactSendMessage']='Tom Haws-কে বার্তা পাঠান';
 $ec_lang['contactYourName']='আপনার নাম:';

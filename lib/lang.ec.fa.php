@@ -328,6 +328,11 @@ $ec_lang['essc_btbw']='عرض از کناره تا کناره';
 $ec_lang['essc_mcr']='حداقل شعاع انحنا';
 $ec_lang['essc_q']='دبی، Q';
 // Contact us.
+
+// Irrigation
+$ec_lang['irr_main_menu']='اندازه‌گیری جریان آبیاری';
+$ec_lang['irr_main_title']='ماشین‌حساب‌های رایگان آنلاین اندازه‌گیری جریان آبیاری';
+$ec_lang['irr_main_desc']='اندازه‌گیری جریان آبیاری — سرریزها و دریچه‌ها';
 $ec_lang['contact_title']='تماس با HawsEDC';
 $ec_lang['contactSendMessage']='پیام برای Tom Haws ارسال کنید';
 $ec_lang['contactYourName']='نام شما:';

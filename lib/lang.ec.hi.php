@@ -271,6 +271,11 @@ $ec_lang['essc_btbw']='तट से तट चौड़ाई';
 $ec_lang['essc_mcr']='न्यूनतम वक्र त्रिज्या';
 $ec_lang['essc_q']='प्रवाह, Q';
 // Contact us.
+
+// Irrigation
+$ec_lang['irr_main_menu']='सिंचाई प्रवाह मापन';
+$ec_lang['irr_main_title']='मुफ्त ऑनलाइन सिंचाई प्रवाह मापन कैलकुलेटर';
+$ec_lang['irr_main_desc']='सिंचाई प्रवाह मापन — वियर और ओरिफिस';
 $ec_lang['contact_title']='HawsEDC संपर्क';
 $ec_lang['contactSendMessage']='Tom Haws को संदेश भेजें';
 $ec_lang['contactYourName']='आपका नाम:';

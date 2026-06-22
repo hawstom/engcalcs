@@ -272,6 +272,11 @@ $ec_lang['essc_btbw']='العرض من ضفة إلى ضفة';
 $ec_lang['essc_mcr']='الحد الأدنى لنصف قطر الانحناء';
 $ec_lang['essc_q']='التدفق، Q';
 // Contact us.
+
+// Irrigation
+$ec_lang['irr_main_menu']='قياس تدفق الري';
+$ec_lang['irr_main_title']='حاسبات قياس تدفق الري المجانية عبر الإنترنت';
+$ec_lang['irr_main_desc']='قياس تدفق الري — القناطر والفتحات';
 $ec_lang['contact_title']='التواصل مع HawsEDC';
 $ec_lang['contactSendMessage']='أرسل رسالة إلى Tom Haws';
 $ec_lang['contactYourName']='اسمك:';

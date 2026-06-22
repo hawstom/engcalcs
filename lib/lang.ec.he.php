@@ -168,6 +168,11 @@ $ec_lang['odt_vol']='נפח מרוקן';
 $ec_lang['odt_sketch_start']='התחלה';
 $ec_lang['odt_sketch_end']='סיום';
 // Contact us.
+
+// Irrigation
+$ec_lang['irr_main_menu']='מדידת ספיקת השקיה';
+$ec_lang['irr_main_title']='מחשבוני מדידת ספיקת השקיה חינמיים באינטרנט';
+$ec_lang['irr_main_desc']='מדידת ספיקת השקיה — מפלי מים ופתחים';
 $ec_lang['contact_title']='צור קשר עם HawsEDC';
 $ec_lang['contactSendMessage']='שלח הודעה ל-Tom Haws';
 $ec_lang['contactYourName']='שמך:';

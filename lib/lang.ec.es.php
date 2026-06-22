@@ -245,6 +245,11 @@ $ec_lang['odt_vol']='Volumen vaciado';
 $ec_lang['odt_sketch_start']='Inicio';
 $ec_lang['odt_sketch_end']='Fin';
 // Contact us.
+
+// Irrigation
+$ec_lang['irr_main_menu']='Medición de Caudal de Riego';
+$ec_lang['irr_main_title']='Calculadoras en línea gratuitas para la medición de caudal de riego';
+$ec_lang['irr_main_desc']='Medición de Caudal de Riego — Vertederos y Orificios';
 $ec_lang['contact_title']='Contacto con HawsEDC';
 $ec_lang['contactSendMessage']='Envíe un mensaje a Tom Haws';
 $ec_lang['contactYourName']='Su nombre:';

@@ -268,6 +268,11 @@ $ec_lang['essc_btbw']='岸对岸宽度';
 $ec_lang['essc_mcr']='最小弯道半径';
 $ec_lang['essc_q']='流量，Q';
 // Contact
+
+// Irrigation
+$ec_lang['irr_main_menu']='灌溉流量测量';
+$ec_lang['irr_main_title']='免费在线灌溉流量测量计算器';
+$ec_lang['irr_main_desc']='灌溉流量测量 — 堰和孔口';
 $ec_lang['contact_title']='HawsEDC 联系';
 $ec_lang['contactSendMessage']='给 Tom Haws 发送消息';
 $ec_lang['contactYourName']='您的姓名：';

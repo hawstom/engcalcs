@@ -279,6 +279,11 @@ $ec_lang['mtc_note_1']='<dl><dt>Otomatik taş boyutu ve pürüzlülük tasarım 
 // Orifice Flow additional
 $ec_lang['or_velocity']='Açıklıktaki hız, v';
 // Contact us.
+
+// Irrigation
+$ec_lang['irr_main_menu']='Sulama Akışı Ölçümü';
+$ec_lang['irr_main_title']='Ücretsiz Online Sulama Akışı Ölçüm Hesaplayıcıları';
+$ec_lang['irr_main_desc']='Sulama Akışı Ölçümü — Savaklar ve Orifisler';
 $ec_lang['contact_title']='Haws EDC Iletisim';
 $ec_lang['contactSendMessage']="Tom Haws'a bir mesaj gönderin";
 $ec_lang['contactYourName']='Isim:';

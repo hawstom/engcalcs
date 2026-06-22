@@ -268,6 +268,11 @@ $ec_lang['essc_btbw']='Šířka od břehu k břehu';
 $ec_lang['essc_mcr']='Minimální poloměr oblouku';
 $ec_lang['essc_q']='Průtok, Q';
 // Contact
+
+// Irrigation
+$ec_lang['irr_main_menu']='Měření průtoku závlahy';
+$ec_lang['irr_main_title']='Bezplatné online kalkulačky pro měření průtoku závlahy';
+$ec_lang['irr_main_desc']='Měření průtoku závlahy — přelivy a otvory';
 $ec_lang['contact_title']='Kontakt HawsEDC';
 $ec_lang['contactSendMessage']='Pošlete zprávu Tomu Hawsovi';
 $ec_lang['contactYourName']='Vaše jméno:';

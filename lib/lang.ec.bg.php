@@ -246,6 +246,11 @@ $ec_lang['odt_vol']='Изпразнен обем';
 $ec_lang['odt_sketch_start']='Начало';
 $ec_lang['odt_sketch_end']='Край';
 // Contact us.
+
+// Irrigation
+$ec_lang['irr_main_menu']='Измерване на напоителен дебит';
+$ec_lang['irr_main_title']='Безплатни онлайн калкулатори за измерване на напоителен дебит';
+$ec_lang['irr_main_desc']='Измерване на напоителен дебит — прагове и отвори';
 $ec_lang['contact_title']="Контакт с HawsEDC"; 
 $ec_lang['contactSendMessage']='Изпратете съобщение на Tom Haws'; 
 $ec_lang['contactYourName']='Вашето име:'; 
