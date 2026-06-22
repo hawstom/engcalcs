@@ -119,6 +119,13 @@ $all_language_settings['he']=array(
 'TITLE_WORDS'=>array(),
 );
 
+//-- settings for hindi
+$all_language_settings['hi']=array(
+'QUALITY'=>'0.9',
+'LANGNAME'=>'हिन्दी',
+'TITLE_WORDS'=>array(),
+);
+
 //-- settings for indonesian
 $all_language_settings['id']=array(
 'QUALITY'=>'0.85',
