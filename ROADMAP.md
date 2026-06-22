@@ -8,8 +8,6 @@ The format of each task is: Priority/status|Description. 0 means "Completed" and
 
 ## Mission & Love
 
-- 95|Rework message of love: the current single "Love" reference is a start. Consider adding the third clause explicitly — "You are not going to ruin everything" — which names the shame-fear that blocks people from receiving the other two. Any addition should feel like part of the tool, not an interruption of it.
-
 - 50|Love is spoken — native speaker review: Three languages use formulations that may be correct but are ambiguous and worth a native-speaker check: ar ("هنا نتحدث بالمحبة" — "بـ" is the language-speaking preposition, so may be correct), pt ("O amor é falado aqui" — grammatically odd passive), am ("ፍቅር እዚህ ይነገራል" — "told/spoken here" — probably fine). Eight languages corrected: it, sr, bg, cs, bn, hi, id, ur all now say "love is our language here" rather than "we speak about/with love."
 
 - 85|About page: Add a menu link to a page covering: global humanitarian open source mission, offline/zip download options, PWA status, Bitbucket repository, and pull requests.
@@ -21,16 +19,6 @@ The format of each task is: Priority/status|Description. 0 means "Completed" and
 - 55|Text-only mode: Evaluate the need and cost/benefit of a leaner text-only rendering for the global south.
 
 ## Language Expansion
-
-- 90|Add km (Khmer) as a new language
-
-- 90|Add my (Burmese/Myanmar) as a new language
-
-- 90|Add ps (Pashto) as a new language
-
-- 90|Add fa (Farsi/Persian) as a new language
-
-- 90|Add uk (Ukrainian) as a new language
 
 - 82|Improve remaining language quality: he, pt, hr, sr, ro, zh — partial or sparse coverage; native-speaker review recommended.
 
@@ -55,6 +43,10 @@ The format of each task is: Priority/status|Description. 0 means "Completed" and
 - 10|Results sharing — generate a shareable URL or printable summary of a completed calculation.
 
 ## Completed
+
+- 0|Add km (Khmer), my (Burmese/Myanmar), ps (Pashto), fa (Farsi/Persian), uk (Ukrainian) as new languages — complete translation of all calculators. Khmer, Burmese, Ukrainian are LTR; Farsi and Pashto are RTL (added to dir="rtl" array in HeadersFooters.lib.php). All registered in Language.Settings.php (QUALITY 0.9). Now 27 languages total.
+
+- 0|Rework message of love: added "You are not ruining everything" as the third clause in all 22 languages. Naming the shame-fear that blocks people from receiving the other two. Fits naturally in the welcome bar.
 
 - 0|Love is spoken — corrected 8 translations: it, sr, bg, cs, bn, hi, id, ur were saying "we speak about love" or "we speak lovingly." All now say "love is our language here." Three languages (ar, pt, am) flagged for native-speaker review; see roadmap.
 

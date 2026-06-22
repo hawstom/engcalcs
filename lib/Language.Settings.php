@@ -101,6 +101,13 @@ $all_language_settings['en']=array(
 'TITLE_WORDS'=>array('of','a','the','and','an','or','nor','but','is','if','then','else', 'when', 'at', 'from', 'by','on','off','for','in','out','over','to','into','with'),
 );
 
+//-- settings for farsi
+$all_language_settings['fa']=array(
+'QUALITY'=>'0.9',
+'LANGNAME'=>'فارسی',
+'TITLE_WORDS'=>array(),
+);
+
 //-- settings for french
 $all_language_settings['fr']=array(
 'QUALITY'=>'0.9',
@@ -141,6 +148,27 @@ $all_language_settings['id']=array(
 $all_language_settings['it']=array(
 'QUALITY'=>'0.9',
 'LANGNAME'=>'Italiano',
+'TITLE_WORDS'=>array(),
+);
+
+//-- settings for khmer
+$all_language_settings['km']=array(
+'QUALITY'=>'0.9',
+'LANGNAME'=>'ភាសាខ្មែរ',
+'TITLE_WORDS'=>array(),
+);
+
+//-- settings for myanmar (burmese)
+$all_language_settings['my']=array(
+'QUALITY'=>'0.9',
+'LANGNAME'=>'မြန်မာဘာသာ',
+'TITLE_WORDS'=>array(),
+);
+
+//-- settings for pashto
+$all_language_settings['ps']=array(
+'QUALITY'=>'0.9',
+'LANGNAME'=>'پښتو',
 'TITLE_WORDS'=>array(),
 );
 
@@ -194,6 +222,13 @@ $all_language_settings['sw']=array(
 $all_language_settings['tr']=array(
 'QUALITY'=>'0.9',
 'LANGNAME'=>'Türkçe',
+'TITLE_WORDS'=>array(),
+);
+
+//-- settings for ukrainian
+$all_language_settings['uk']=array(
+'QUALITY'=>'0.9',
+'LANGNAME'=>'Українська',
 'TITLE_WORDS'=>array(),
 );
 
