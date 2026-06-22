@@ -140,7 +140,7 @@ $ec_lang['mpf_froude_number']='Froude number, F';
 $ec_lang['mpf_shear_stress']='Average shear stress (tractive force), tau';
 $ec_lang['mpf_full_flow']='Full flow, Q0';
 $ec_lang['mpf_full_flow_ratio']='Ratio to full flow, Q/Q0';
-$ec_lang['mpf_note_1']='<p>Notes:</p><dl><dt>This is the flow and depth inside an <em>infinitely long</em> pipe.</dt><dd>Getting the flow into the pipe may require significantly higher headwater depth. Add at least 1.5 times the velocity head to get the headwater depth or <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">see my 2-minute tutorial</a> for standard culvert headwater calculations using HY-8.</dd>';
+$ec_lang['mpf_note_1']='<dl><dt>This is the flow and depth inside an <em>infinitely long</em> pipe.</dt><dd>Getting the flow into the pipe may require significantly higher headwater depth. Add at least 1.5 times the velocity head to get the headwater depth or <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">see my 2-minute tutorial</a> for standard culvert headwater calculations using HY-8.</dd>';
 $ec_lang['mpf_solve_for_dd0']='Solve for y/d<sub>0</sub> given Q';
 $ec_lang['mpf_solve_desc']='Using D<sub>0</sub>, n, and S<sub>0</sub> from the calculator form, finds the lowest y/d<sub>0</sub> for a given Q.';
 $ec_lang['mpf_solve_button']='Solve';
@@ -159,7 +159,7 @@ $ec_lang['mphl_total_loss']='Total loss, H<sub>l</sub>';
 $ec_lang['mphl_egl_1']='Downstream EGL';
 $ec_lang['mphl_egl_2']='Upstream EGL';
 $ec_lang['mphl_hgl_2']='Upstream HGL in pipe ' . $ec_lang['mpf_see_notes'];
-$ec_lang['mphl_note_1']='<p>Notes:</p><dl><dt>For an open inlet (culvert) condition, it is necessary to check for inlet control conditions.</dt><dd>1. The upstream HGL cannot be lower than the upstream normal depth flow elevation (or lower than the pipe!).</dd><dd>2. The headwater of a culvert is better represented by the upstream EGL than the upstream HGL.</dd><dd>3. See <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">my 2-minute tutorial</a> for simple standard culvert headwater calculations using HY-8.</dd>';
+$ec_lang['mphl_note_1']='<dl><dt>For an open inlet (culvert) condition, it is necessary to check for inlet control conditions.</dt><dd>1. The upstream HGL cannot be lower than the upstream normal depth flow elevation (or lower than the pipe!).</dd><dd>2. The headwater of a culvert is better represented by the upstream EGL than the upstream HGL.</dd><dd>3. See <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">my 2-minute tutorial</a> for simple standard culvert headwater calculations using HY-8.</dd>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Manning Trapezoidal Channel';
 $ec_lang['mtc_main_title']='Free Online Manning Formula Trapezoidal Channel Calculator';
@@ -181,7 +181,7 @@ $ec_lang['mtc_d50_z1']='Required side slope 1 angular rock size, D50 (Isbash & M
 $ec_lang['mtc_d50_z2']='Required side slope 2 angular rock size, D50 (Isbash & MC) <a href="javascript:alert(\'Per Isbash (1936) and Maricopa County, Arizona, US.\')">?</a>';
 $ec_lang['mtc_d50_mra']='Required angular rock size, D50 (Maynord, Ruff, and Abt 1989)';
 $ec_lang['mtc_d50_searcy']='Required angular rock size, D50 (Searcy 1967)';
-$ec_lang['mtc_note_1']='<p>Notes:</p><dl><dt>Automated rock size and roughness design iteration</dt><dd>Choose a roughness radio button (BB recommended) and a design rock size radio button (Isbash recommended). Fine-tune depth and rock size safety factor to get your desired flow with an even rock size. Every time you change any input value, the following iteration cycle happens: 1. Roughness is calculated from design rock size. 2. The requested roughness calculation is copied to input roughness. 3. Channel flow and required rock size are calculated. 4. Design rock size is adjusted. 5. Repeat until error in the design rock size is very small.</dd><dt>Basic calculator (no iteration)</dt><dd>Enter your desired roughness value. Ignore the design rock size input area.</dd></dl>';
+$ec_lang['mtc_note_1']='<dl><dt>Automated rock size and roughness design iteration</dt><dd>Choose a roughness radio button (BB recommended) and a design rock size radio button (Isbash recommended). Fine-tune depth and rock size safety factor to get your desired flow with an even rock size. Every time you change any input value, the following iteration cycle happens: 1. Roughness is calculated from design rock size. 2. The requested roughness calculation is copied to input roughness. 3. Channel flow and required rock size are calculated. 4. Design rock size is adjusted. 5. Repeat until error in the design rock size is very small.</dd><dt>Basic calculator (no iteration)</dt><dd>Enter your desired roughness value. Ignore the design rock size input area.</dd></dl>';
 // Robinson Rock Chute
 $ec_lang['rrc_main_menu']='Robinson Rock Chute';
 $ec_lang['rrc_main_desc']='Robinson Rock Chute Design Spreadsheet';

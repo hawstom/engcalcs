@@ -140,7 +140,7 @@ $ec_lang['mpf_froude_number']='Nombre de Froude, F';
 $ec_lang['mpf_shear_stress']='Contrainte de cisaillement moyenne (force tractrice), tau';
 $ec_lang['mpf_full_flow']='Débit à section pleine, Q0';
 $ec_lang['mpf_full_flow_ratio']='Rapport au débit plein, Q/Q0';
-$ec_lang['mpf_note_1']='<p>Notes:</p><dl><dt>Il s\'agit du débit (et de la profondeur) à l\'intérieur d\'une conduite de <em>longueur infinie</em>.</dt><dd>Faire entrer le débit dans la conduite peut nécessiter une charge amont nettement plus élevée. Ajoutez au moins 1,5 fois la charge cinétique pour obtenir la charge amont, ou <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">consultez mon tutoriel de 2 minutes</a> pour les calculs standard de charge amont de buse avec HY-8.</dd>';
+$ec_lang['mpf_note_1']='<dl><dt>Il s\'agit du débit (et de la profondeur) à l\'intérieur d\'une conduite de <em>longueur infinie</em>.</dt><dd>Faire entrer le débit dans la conduite peut nécessiter une charge amont nettement plus élevée. Ajoutez au moins 1,5 fois la charge cinétique pour obtenir la charge amont, ou <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">consultez mon tutoriel de 2 minutes</a> pour les calculs standard de charge amont de buse avec HY-8.</dd>';
 $ec_lang['mpf_solve_for_dd0']='Calculer y/d<sub>0</sub> pour un Q donné';
 $ec_lang['mpf_solve_desc']='En utilisant D<sub>0</sub>, n et S<sub>0</sub> du formulaire, trouve le plus petit y/d<sub>0</sub> pour un Q donné.';
 $ec_lang['mpf_solve_button']='Calculer';
@@ -158,7 +158,7 @@ $ec_lang['mphl_total_loss']='Perte totale, H<sub>l</sub>';
 $ec_lang['mphl_egl_1']='LHE aval';
 $ec_lang['mphl_egl_2']='LHE amont';
 $ec_lang['mphl_hgl_2']='LHP amont en conduite ' . $ec_lang['mpf_see_notes'];
-$ec_lang['mphl_note_1']='<p>Notes:</p><dl><dt>Pour une entrée libre (buse), il est nécessaire de vérifier les conditions de contrôle à l\'entrée.</dt><dd>1. La LHP amont ne peut pas être inférieure à la cote de profondeur normal amont (ni inférieure au fil d\'eau!).</dd><dd>2. La charge amont d\'une buse est mieux représentée par la LHE amont que par la LHP amont.</dd><dd>3. Voir <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">mon tutoriel de 2 minutes</a> pour les calculs simples de charge amont de buse avec HY-8.</dd>';
+$ec_lang['mphl_note_1']='<dl><dt>Pour une entrée libre (buse), il est nécessaire de vérifier les conditions de contrôle à l\'entrée.</dt><dd>1. La LHP amont ne peut pas être inférieure à la cote de profondeur normal amont (ni inférieure au fil d\'eau!).</dd><dd>2. La charge amont d\'une buse est mieux représentée par la LHE amont que par la LHP amont.</dd><dd>3. Voir <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">mon tutoriel de 2 minutes</a> pour les calculs simples de charge amont de buse avec HY-8.</dd>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Canal trapézoïdal Manning';
 $ec_lang['mtc_main_title']='Calculateur gratuit en ligne de la formule Manning pour canal trapézoïdal';
@@ -181,7 +181,7 @@ $ec_lang['mtc_d50_z2']='Granulométrie d\'enrochement anguleux requise sur talus
 $ec_lang['mtc_d50_mra']='Granulométrie d\'enrochement anguleux requise, D50 (Maynord, Ruff et Abt 1989)';
 $ec_lang['mtc_d50_searcy']='Granulométrie d\'enrochement anguleux requise, D50 (Searcy 1967)';
 $ec_lang['mtc_d50_strickler']='Granulométrie implicite <a target="_blank" href="javascript:alert(\'La formule de Strickler relie n et D50 pour un canal droit et propre. Ajustez n pour que cette taille implicite soit supérieure à la granulométrie requise, puis utilisez cet enrochement dans votre conception.\')">?</a> basée sur n Manning';
-$ec_lang['mtc_note_1']='<p>Notes:</p><dl><dt>Dimensionnement itératif automatique des enrochements</dt><dd>Choisissez un bouton de rugosité (BB recommandé) et un bouton de granulométrie de conception (Isbash recommandé). Affinez la profondeur et le coefficient de sécurité pour obtenir le débit souhaité avec une granulométrie ronde. À chaque modification: 1. La rugosité est calculée à partir de la granulométrie. 2. La rugosité calculée est copiée en entrée. 3. L\'écoulement et la granulométrie requise sont calculés. 4. La granulométrie est ajustée. 5. Répéter jusqu\'à convergence.</dd><dt>Calculateur de base (sans itération)</dt><dd>Entrez votre valeur de rugosité. Ignorez la zone de granulométrie de conception.</dd></dl>';
+$ec_lang['mtc_note_1']='<dl><dt>Dimensionnement itératif automatique des enrochements</dt><dd>Choisissez un bouton de rugosité (BB recommandé) et un bouton de granulométrie de conception (Isbash recommandé). Affinez la profondeur et le coefficient de sécurité pour obtenir le débit souhaité avec une granulométrie ronde. À chaque modification: 1. La rugosité est calculée à partir de la granulométrie. 2. La rugosité calculée est copiée en entrée. 3. L\'écoulement et la granulométrie requise sont calculés. 4. La granulométrie est ajustée. 5. Répéter jusqu\'à convergence.</dd><dt>Calculateur de base (sans itération)</dt><dd>Entrez votre valeur de rugosité. Ignorez la zone de granulométrie de conception.</dd></dl>';
 // Robinson Rock Chute
 $ec_lang['rrc_main_menu']='Chute en enrochement Robinson';
 $ec_lang['rrc_main_desc']='Tableur de dimensionnement de chute en enrochement Robinson';

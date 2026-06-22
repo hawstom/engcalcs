@@ -137,7 +137,7 @@ $ec_lang['mpf_froude_number']='Bilangan Froude, F';
 $ec_lang['mpf_shear_stress']='Tegangan geser rata-rata (gaya traksi), tau';
 $ec_lang['mpf_full_flow']='Aliran penuh, Q0';
 $ec_lang['mpf_full_flow_ratio']='Rasio terhadap aliran penuh, Q/Q0';
-$ec_lang['mpf_note_1']='<p>Catatan:</p><dl><dt>Ini adalah debit dan kedalaman di dalam pipa yang <em>sangat panjang</em>.</dt><dd>Memasukkan aliran ke dalam pipa mungkin memerlukan kedalaman air hulu yang jauh lebih tinggi. Tambahkan setidaknya 1,5 kali tinggi kecepatan untuk mendapatkan kedalaman air hulu atau <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">lihat tutorial 2 menit saya</a> untuk perhitungan standar air hulu gorong-gorong menggunakan HY-8.</dd>';
+$ec_lang['mpf_note_1']='<dl><dt>Ini adalah debit dan kedalaman di dalam pipa yang <em>sangat panjang</em>.</dt><dd>Memasukkan aliran ke dalam pipa mungkin memerlukan kedalaman air hulu yang jauh lebih tinggi. Tambahkan setidaknya 1,5 kali tinggi kecepatan untuk mendapatkan kedalaman air hulu atau <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">lihat tutorial 2 menit saya</a> untuk perhitungan standar air hulu gorong-gorong menggunakan HY-8.</dd>';
 $ec_lang['mpf_solve_for_dd0']='Cari y/d<sub>0</sub> berdasarkan Q';
 $ec_lang['mpf_solve_desc']='Menggunakan D<sub>0</sub>, n, dan S<sub>0</sub> dari formulir kalkulator, mencari nilai y/d<sub>0</sub> terendah untuk Q tertentu.';
 $ec_lang['mpf_solve_button']='Hitung';
@@ -155,7 +155,7 @@ $ec_lang['mphl_total_loss']='Kehilangan total, H<sub>l</sub>';
 $ec_lang['mphl_egl_1']='EGL Hilir';
 $ec_lang['mphl_egl_2']='EGL Hulu';
 $ec_lang['mphl_hgl_2']='HGL Hulu di pipa ' . $ec_lang['mpf_see_notes'];
-$ec_lang['mphl_note_1']='<p>Catatan:</p><dl><dt>Untuk kondisi saluran masuk terbuka (gorong-gorong), perlu diperiksa kondisi kendali saluran masuk.</dt><dd>1. HGL hulu tidak boleh lebih rendah dari elevasi aliran kedalaman normal hulu (atau lebih rendah dari pipa!).</dd><dd>2. Air hulu gorong-gorong lebih baik diwakili oleh EGL hulu daripada HGL hulu.</dd><dd>3. Lihat <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">tutorial 2 menit saya</a> untuk perhitungan standar sederhana air hulu gorong-gorong menggunakan HY-8.</dd>';
+$ec_lang['mphl_note_1']='<dl><dt>Untuk kondisi saluran masuk terbuka (gorong-gorong), perlu diperiksa kondisi kendali saluran masuk.</dt><dd>1. HGL hulu tidak boleh lebih rendah dari elevasi aliran kedalaman normal hulu (atau lebih rendah dari pipa!).</dd><dd>2. Air hulu gorong-gorong lebih baik diwakili oleh EGL hulu daripada HGL hulu.</dd><dd>3. Lihat <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">tutorial 2 menit saya</a> untuk perhitungan standar sederhana air hulu gorong-gorong menggunakan HY-8.</dd>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Saluran Trapesium Manning';
 $ec_lang['mtc_main_title']='Kalkulator Rumus Manning Saluran Trapesium Gratis Daring';
@@ -177,7 +177,7 @@ $ec_lang['mtc_d50_z1']='Ukuran batu sudut yang dibutuhkan di tebing 1, D50 (Isba
 $ec_lang['mtc_d50_z2']='Ukuran batu sudut yang dibutuhkan di tebing 2, D50 (Isbash &amp; MC) <a href="javascript:alert(\'Menurut Isbash (1936) dan Maricopa County, Arizona, AS.\')">?</a>';
 $ec_lang['mtc_d50_mra']='Ukuran batu sudut yang dibutuhkan, D50 (Maynord, Ruff, dan Abt 1989)';
 $ec_lang['mtc_d50_searcy']='Ukuran batu sudut yang dibutuhkan, D50 (Searcy 1967)';
-$ec_lang['mtc_note_1']='<p>Catatan:</p><dl><dt>Iterasi otomatis ukuran batu dan kekasaran</dt><dd>Pilih tombol radio kekasaran (BB direkomendasikan) dan tombol radio ukuran batu rencana (Isbash direkomendasikan). Sesuaikan kedalaman dan faktor keamanan ukuran batu untuk mendapatkan debit yang diinginkan dengan ukuran batu yang seragam. Setiap kali Anda mengubah nilai masukan, siklus iterasi berikut terjadi: 1. Kekasaran dihitung dari ukuran batu rencana. 2. Perhitungan kekasaran yang diminta disalin ke kekasaran masukan. 3. Debit saluran dan ukuran batu yang diperlukan dihitung. 4. Ukuran batu rencana disesuaikan. 5. Ulangi hingga galat pada ukuran batu rencana sangat kecil.</dd><dt>Kalkulator dasar (tanpa iterasi)</dt><dd>Masukkan nilai kekasaran yang Anda inginkan. Abaikan area masukan ukuran batu rencana.</dd></dl>';
+$ec_lang['mtc_note_1']='<dl><dt>Iterasi otomatis ukuran batu dan kekasaran</dt><dd>Pilih tombol radio kekasaran (BB direkomendasikan) dan tombol radio ukuran batu rencana (Isbash direkomendasikan). Sesuaikan kedalaman dan faktor keamanan ukuran batu untuk mendapatkan debit yang diinginkan dengan ukuran batu yang seragam. Setiap kali Anda mengubah nilai masukan, siklus iterasi berikut terjadi: 1. Kekasaran dihitung dari ukuran batu rencana. 2. Perhitungan kekasaran yang diminta disalin ke kekasaran masukan. 3. Debit saluran dan ukuran batu yang diperlukan dihitung. 4. Ukuran batu rencana disesuaikan. 5. Ulangi hingga galat pada ukuran batu rencana sangat kecil.</dd><dt>Kalkulator dasar (tanpa iterasi)</dt><dd>Masukkan nilai kekasaran yang Anda inginkan. Abaikan area masukan ukuran batu rencana.</dd></dl>';
 // Robinson Rock Chute
 $ec_lang['rrc_main_menu']='Saluran Batu Robinson';
 $ec_lang['rrc_main_desc']='Spreadsheet Perancangan Saluran Batu Robinson';

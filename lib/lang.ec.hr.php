@@ -207,7 +207,7 @@ $ec_lang['mpf_pipe_area']='Površina cijevi, a0';
 $ec_lang['mpf_area_ratio']='Relativna površina, a/a0';
 $ec_lang['mpf_full_flow']='Puni protok, Q0';
 $ec_lang['mpf_full_flow_ratio']='Omjer punog protoka, Q/Q0';
-$ec_lang['mpf_note_1']='<p>Napomene:</p><dl><dt>Ovo je protok i dubina unutar <em>beskonačno dugačke</em> cijevi.</dt><dd>Uvođenje protoka u cijev može zahtijevati znatno veću dubinu uzvodne vode. Dodajte najmanje 1,5 puta energetsku visinu za dobivanje dubine uzvodne vode ili <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">pogledajte moj 2-minutni tutorial</a> za standardne proračune uzvodne razine propusta pomoću HY-8.</dd>';
+$ec_lang['mpf_note_1']='<dl><dt>Ovo je protok i dubina unutar <em>beskonačno dugačke</em> cijevi.</dt><dd>Uvođenje protoka u cijev može zahtijevati znatno veću dubinu uzvodne vode. Dodajte najmanje 1,5 puta energetsku visinu za dobivanje dubine uzvodne vode ili <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">pogledajte moj 2-minutni tutorial</a> za standardne proračune uzvodne razine propusta pomoću HY-8.</dd>';
 $ec_lang['mpf_spreadheet_notice']='Pogledajte proračunsku tablicu ovog kalkulatora';
 
 // Manning Pipe Head Loss
@@ -224,7 +224,7 @@ $ec_lang['mphl_total_loss']='Ukupni gubitak, H<sub>l</sub>';
 $ec_lang['mphl_egl_1']='Nizvodni EGL';
 $ec_lang['mphl_egl_2']='Uzvodni EGL';
 $ec_lang['mphl_hgl_2']='Uzvodni HGL u cijevi ' . $ec_lang['mpf_see_notes'];
-$ec_lang['mphl_note_1']='<p>Napomene:</p><dl><dt>Za uvjete otvorenog ulaza (propust) potrebno je provjeriti uvjete kontrole ulaza.</dt><dd>1. Uzvodni HGL ne može biti niži od kote normalnog tečenja uzvodnog toka (niti niži od cijevi!).</dd><dd>2. Uzvodna razina propusta bolje je predstavljena uzvodnim EGL-om nego uzvodnim HGL-om.</dd><dd>3. Pogledajte <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">moj 2-minutni tutorial</a> za jednostavne standardne proračune uzvodne razine propusta pomoću HY-8.</dd>';
+$ec_lang['mphl_note_1']='<dl><dt>Za uvjete otvorenog ulaza (propust) potrebno je provjeriti uvjete kontrole ulaza.</dt><dd>1. Uzvodni HGL ne može biti niži od kote normalnog tečenja uzvodnog toka (niti niži od cijevi!).</dd><dd>2. Uzvodna razina propusta bolje je predstavljena uzvodnim EGL-om nego uzvodnim HGL-om.</dd><dd>3. Pogledajte <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">moj 2-minutni tutorial</a> za jednostavne standardne proračune uzvodne razine propusta pomoću HY-8.</dd>';
 
 // Manning Trapezoid
 $ec_lang['mtc_menu']='Manning trapezoidni kanal';
@@ -247,7 +247,7 @@ $ec_lang['mtc_d50_z1']='Potrebna veličina uglatog kamena bočne strane 1, D50 (
 $ec_lang['mtc_d50_z2']='Potrebna veličina uglatog kamena bočne strane 2, D50 (Isbash i MC) <a href="javascript:alert(\'Prema Isbash (1936) i Maricopa County, Arizona, US.\')">?</a>';
 $ec_lang['mtc_d50_mra']='Potrebna veličina uglatog kamena, D50 (Maynord, Ruff i Abt 1989)';
 $ec_lang['mtc_d50_searcy']='Potrebna veličina uglatog kamena, D50 (Searcy 1967)';
-$ec_lang['mtc_note_1']='<p>Napomene:</p><dl><dt>Automatizirana iteracija dimenzioniranja kamena i hrapavosti</dt><dd>Odaberite radio gumb za hrapavost (preporučuje se BB) i radio gumb za projektnu veličinu kamena (preporučuje se Isbash). Fino podesite dubinu i faktor sigurnosti veličine kamena kako biste dobili željeni protok s jednoličnom veličinom kamena. Svaki put kada promijenite bilo koji ulazni podatak, odvija se sljedeći iteracijski ciklus: 1. Hrapavost se izračunava iz projektne veličine kamena. 2. Traženi izračun hrapavosti kopira se na ulaznu hrapavost. 3. Izračunavaju se protok kroz kanal i potrebna veličina kamena. 4. Projektna veličina kamena se prilagođava. 5. Ponavljati dok pogreška u projektnoj veličini kamena nije vrlo mala.</dd><dt>Osnovni kalkulator (bez iteracije)</dt><dd>Unesite željenu vrijednost hrapavosti. Zanemarite područje unosa projektne veličine kamena.</dd></dl>';
+$ec_lang['mtc_note_1']='<dl><dt>Automatizirana iteracija dimenzioniranja kamena i hrapavosti</dt><dd>Odaberite radio gumb za hrapavost (preporučuje se BB) i radio gumb za projektnu veličinu kamena (preporučuje se Isbash). Fino podesite dubinu i faktor sigurnosti veličine kamena kako biste dobili željeni protok s jednoličnom veličinom kamena. Svaki put kada promijenite bilo koji ulazni podatak, odvija se sljedeći iteracijski ciklus: 1. Hrapavost se izračunava iz projektne veličine kamena. 2. Traženi izračun hrapavosti kopira se na ulaznu hrapavost. 3. Izračunavaju se protok kroz kanal i potrebna veličina kamena. 4. Projektna veličina kamena se prilagođava. 5. Ponavljati dok pogreška u projektnoj veličini kamena nije vrlo mala.</dd><dt>Osnovni kalkulator (bez iteracije)</dt><dd>Unesite željenu vrijednost hrapavosti. Zanemarite područje unosa projektne veličine kamena.</dd></dl>';
 
 // Robinson Rock Chute
 $ec_lang['rrc_main_menu']='Robinson kameniti brzotok';

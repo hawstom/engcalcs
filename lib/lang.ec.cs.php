@@ -137,7 +137,7 @@ $ec_lang['mpf_froude_number']='Froudovo číslo, F';
 $ec_lang['mpf_shear_stress']='Průměrné smykové napětí (trakční síla), tau';
 $ec_lang['mpf_full_flow']='Průtok při plném plnění, Q0';
 $ec_lang['mpf_full_flow_ratio']='Poměr k plnému průtoku, Q/Q0';
-$ec_lang['mpf_note_1']='<p>Poznámky:</p><dl><dt>Toto je průtok a hloubka uvnitř <em>nekonečně dlouhého</em> potrubí.</dt><dd>Přivést průtok do potrubí může vyžadovat výrazně vyšší výšku hladiny. Přidejte alespoň 1,5násobek rychlostní výšky pro výšku hladiny nebo <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">viz 2minutový výukový program</a> pro standardní výpočty propustků pomocí HY-8.</dd>';
+$ec_lang['mpf_note_1']='<dl><dt>Toto je průtok a hloubka uvnitř <em>nekonečně dlouhého</em> potrubí.</dt><dd>Přivést průtok do potrubí může vyžadovat výrazně vyšší výšku hladiny. Přidejte alespoň 1,5násobek rychlostní výšky pro výšku hladiny nebo <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">viz 2minutový výukový program</a> pro standardní výpočty propustků pomocí HY-8.</dd>';
 $ec_lang['mpf_solve_for_dd0']='Vypočítat y/d<sub>0</sub> pro dané Q';
 $ec_lang['mpf_solve_desc']='Pomocí D<sub>0</sub>, n a S<sub>0</sub> z formuláře najde nejnižší y/d<sub>0</sub> pro dané Q.';
 $ec_lang['mpf_solve_button']='Vypočítat';
@@ -155,7 +155,7 @@ $ec_lang['mphl_total_loss']='Celková ztráta, H<sub>l</sub>';
 $ec_lang['mphl_egl_1']='EGL po proudu';
 $ec_lang['mphl_egl_2']='EGL proti proudu';
 $ec_lang['mphl_hgl_2']='HGL proti proudu v potrubí ' . $ec_lang['mpf_see_notes'];
-$ec_lang['mphl_note_1']='<p>Poznámky:</p><dl><dt>Pro podmínku otevřeného vtoku (propustek) je nutné zkontrolovat podmínky vtokového ovládání.</dt><dd>1. HGL proti proudu nemůže být nižší než kóta normální hloubky proudění (ani nižší než potrubí!).</dd><dd>2. Hladina propustku je lépe reprezentována EGL než HGL proti proudu.</dd><dd>3. Viz <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">2minutový výukový program</a> pro jednoduchý standardní výpočet propustků pomocí HY-8.</dd>';
+$ec_lang['mphl_note_1']='<dl><dt>Pro podmínku otevřeného vtoku (propustek) je nutné zkontrolovat podmínky vtokového ovládání.</dt><dd>1. HGL proti proudu nemůže být nižší než kóta normální hloubky proudění (ani nižší než potrubí!).</dd><dd>2. Hladina propustku je lépe reprezentována EGL než HGL proti proudu.</dd><dd>3. Viz <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">2minutový výukový program</a> pro jednoduchý standardní výpočet propustků pomocí HY-8.</dd>';
 // Manning Trapezoid
 $ec_lang['mtc_menu']='Lichoběžníkový průřez Manning';
 $ec_lang['mtc_main_title']='Bezplatný online kalkulátor lichoběžníkového koryta Manning';
@@ -177,7 +177,7 @@ $ec_lang['mtc_d50_z1']='Požadovaná velikost lomového kamene svahu 1, D50 (Isb
 $ec_lang['mtc_d50_z2']='Požadovaná velikost lomového kamene svahu 2, D50 (Isbash &amp; MC) <a href="javascript:alert(\'Dle Isbash (1936) a Maricopa County, Arizona, USA.\')">?</a>';
 $ec_lang['mtc_d50_mra']='Požadovaná velikost lomového kamene, D50 (Maynord, Ruff a Abt 1989)';
 $ec_lang['mtc_d50_searcy']='Požadovaná velikost lomového kamene, D50 (Searcy 1967)';
-$ec_lang['mtc_note_1']='<p>Poznámky:</p><dl><dt>Automatická iterace návrhu kamene a drsnosti</dt><dd>Zvolte přepínač pro drsnost (doporučeno BB) a přepínač pro návrhovou velikost kamene (doporučeno Isbash). Dolaďte hloubku a bezpečnostní faktor kamene pro dosažení požadovaného průtoku s rovnoměrnou velikostí kamene. Každá změna vstupní hodnoty spustí iterační cyklus: 1. Drsnost je vypočtena z návrhové velikosti kamene. 2. Požadovaný výpočet drsnosti je zkopírován do vstupní drsnosti. 3. Průtok v korytě a požadovaná velikost kamene jsou vypočteny. 4. Návrhová velikost kamene je upravena. 5. Opakovat dokud chyba v návrhové velikosti kamene není velmi malá.</dd><dt>Základní kalkulátor (bez iterace)</dt><dd>Zadejte požadovanou hodnotu drsnosti. Ignorujte oblast zadávání návrhové velikosti kamene.</dd></dl>';
+$ec_lang['mtc_note_1']='<dl><dt>Automatická iterace návrhu kamene a drsnosti</dt><dd>Zvolte přepínač pro drsnost (doporučeno BB) a přepínač pro návrhovou velikost kamene (doporučeno Isbash). Dolaďte hloubku a bezpečnostní faktor kamene pro dosažení požadovaného průtoku s rovnoměrnou velikostí kamene. Každá změna vstupní hodnoty spustí iterační cyklus: 1. Drsnost je vypočtena z návrhové velikosti kamene. 2. Požadovaný výpočet drsnosti je zkopírován do vstupní drsnosti. 3. Průtok v korytě a požadovaná velikost kamene jsou vypočteny. 4. Návrhová velikost kamene je upravena. 5. Opakovat dokud chyba v návrhové velikosti kamene není velmi malá.</dd><dt>Základní kalkulátor (bez iterace)</dt><dd>Zadejte požadovanou hodnotu drsnosti. Ignorujte oblast zadávání návrhové velikosti kamene.</dd></dl>';
 // Robinson Rock Chute
 $ec_lang['rrc_main_menu']='Kamenná rampa Robinson';
 $ec_lang['rrc_main_desc']='Tabulka návrhu kamenné rampy Robinson';

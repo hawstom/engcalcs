@@ -137,7 +137,7 @@ $ec_lang['mpf_froude_number']='弗劳德数，F';
 $ec_lang['mpf_shear_stress']='平均剪切力（拖拽力），tau';
 $ec_lang['mpf_full_flow']='满流流量，Q0';
 $ec_lang['mpf_full_flow_ratio']='流量比，Q/Q0';
-$ec_lang['mpf_note_1']='<p>注释：</p><dl><dt>这是<em>无限长</em>管道内部的流量和水深。</dt><dd>使水流进入管道可能需要显著更高的水位。请在水深基础上至少加 1.5 倍流速水头，或 <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">参见 2 分钟教程</a>，了解使用 HY-8 进行标准涵洞水位计算的方法。</dd>';
+$ec_lang['mpf_note_1']='<dl><dt>这是<em>无限长</em>管道内部的流量和水深。</dt><dd>使水流进入管道可能需要显著更高的水位。请在水深基础上至少加 1.5 倍流速水头，或 <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">参见 2 分钟教程</a>，了解使用 HY-8 进行标准涵洞水位计算的方法。</dd>';
 $ec_lang['mpf_solve_for_dd0']='已知 Q 求 y/d<sub>0</sub>';
 $ec_lang['mpf_solve_desc']='使用计算器表单中的 D<sub>0</sub>、n 和 S<sub>0</sub>，求给定 Q 对应的最小 y/d<sub>0</sub>。';
 $ec_lang['mpf_solve_button']='求解';
@@ -155,7 +155,7 @@ $ec_lang['mphl_total_loss']='总损失，H<sub>l</sub>';
 $ec_lang['mphl_egl_1']='下游能量坡降线';
 $ec_lang['mphl_egl_2']='上游能量坡降线';
 $ec_lang['mphl_hgl_2']='管内上游测压管水头线 ' . $ec_lang['mpf_see_notes'];
-$ec_lang['mphl_note_1']='<p>注释：</p><dl><dt>对于开口进水口（涵洞）情况，需检验进口控制条件。</dt><dd>1. 上游测压管水头线不得低于上游正常水深处高程（也不得低于管顶！）。</dd><dd>2. 涵洞水位更宜用上游能量坡降线而非测压管水头线表示。</dd><dd>3. <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">参见 2 分钟教程</a>，了解使用 HY-8 进行简单标准涵洞水位计算的方法。</dd>';
+$ec_lang['mphl_note_1']='<dl><dt>对于开口进水口（涵洞）情况，需检验进口控制条件。</dt><dd>1. 上游测压管水头线不得低于上游正常水深处高程（也不得低于管顶！）。</dd><dd>2. 涵洞水位更宜用上游能量坡降线而非测压管水头线表示。</dd><dd>3. <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">参见 2 分钟教程</a>，了解使用 HY-8 进行简单标准涵洞水位计算的方法。</dd>';
 // Manning Trapezoid
 $ec_lang['mtc_menu']='曼宁梯形渠道';
 $ec_lang['mtc_main_title']='免费在线曼宁公式梯形渠道计算器';
@@ -177,7 +177,7 @@ $ec_lang['mtc_d50_z1']='边坡 1 所需棱角石材粒径，D50（Isbash 与 MC�
 $ec_lang['mtc_d50_z2']='边坡 2 所需棱角石材粒径，D50（Isbash 与 MC）<a href="javascript:alert(\'依据 Isbash (1936) 及 Maricopa County, Arizona, US。\')">?</a>';
 $ec_lang['mtc_d50_mra']='所需棱角石材粒径，D50（Maynord、Ruff 和 Abt 1989）';
 $ec_lang['mtc_d50_searcy']='所需棱角石材粒径，D50（Searcy 1967）';
-$ec_lang['mtc_note_1']='<p>注释：</p><dl><dt>石材粒径与糙率自动迭代</dt><dd>选择糙率单选按钮（推荐 BB）和设计石材粒径单选按钮（推荐 Isbash）。调整水深和石材安全系数，以获得所需流量和均一石材粒径。每次修改输入值时，将触发以下迭代循环：1. 由设计石材粒径计算糙率。2. 所求糙率复制至输入糙率。3. 计算渠道流量和所需石材粒径。4. 调整设计石材粒径。5. 重复直至设计石材粒径误差极小。</dd><dt>基础计算器（无迭代）</dt><dd>直接输入所需糙率值，忽略设计石材粒径输入区域。</dd></dl>';
+$ec_lang['mtc_note_1']='<dl><dt>石材粒径与糙率自动迭代</dt><dd>选择糙率单选按钮（推荐 BB）和设计石材粒径单选按钮（推荐 Isbash）。调整水深和石材安全系数，以获得所需流量和均一石材粒径。每次修改输入值时，将触发以下迭代循环：1. 由设计石材粒径计算糙率。2. 所求糙率复制至输入糙率。3. 计算渠道流量和所需石材粒径。4. 调整设计石材粒径。5. 重复直至设计石材粒径误差极小。</dd><dt>基础计算器（无迭代）</dt><dd>直接输入所需糙率值，忽略设计石材粒径输入区域。</dd></dl>';
 // Robinson Rock Chute
 $ec_lang['rrc_main_menu']='Robinson 石材跌水';
 $ec_lang['rrc_main_desc']='Robinson 石材跌水设计电子表格';

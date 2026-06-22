@@ -137,7 +137,7 @@ $ec_lang['mpf_froude_number']='Froude-Zahl, F';
 $ec_lang['mpf_shear_stress']='Mittlere Sohlschubspannung (Schleppkraft), tau';
 $ec_lang['mpf_full_flow']='Vollfüllung, Q0';
 $ec_lang['mpf_full_flow_ratio']='Füllungsverhältnis, Q/Q0';
-$ec_lang['mpf_note_1']='<p>Hinweise:</p><dl><dt>Dies ist der Durchfluss und die Tiefe innerhalb eines <em>unendlich langen</em> Rohres.</dt><dd>Um den Durchfluss in das Rohr zu leiten, kann eine erheblich höhere Einstauhöhe erforderlich sein. Addieren Sie mindestens das 1,5-fache der Geschwindigkeitshöhe zur Einstauhöhe oder <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">sehen Sie das 2-Minuten-Tutorial</a> für Standard-Durchlassberechnungen mit HY-8.</dd>';
+$ec_lang['mpf_note_1']='<dl><dt>Dies ist der Durchfluss und die Tiefe innerhalb eines <em>unendlich langen</em> Rohres.</dt><dd>Um den Durchfluss in das Rohr zu leiten, kann eine erheblich höhere Einstauhöhe erforderlich sein. Addieren Sie mindestens das 1,5-fache der Geschwindigkeitshöhe zur Einstauhöhe oder <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">sehen Sie das 2-Minuten-Tutorial</a> für Standard-Durchlassberechnungen mit HY-8.</dd>';
 $ec_lang['mpf_solve_for_dd0']='y/d<sub>0</sub> für gegebenes Q berechnen';
 $ec_lang['mpf_solve_desc']='Mit D<sub>0</sub>, n und S<sub>0</sub> aus dem Formular wird das kleinste y/d<sub>0</sub> für ein gegebenes Q gefunden.';
 $ec_lang['mpf_solve_button']='Berechnen';
@@ -155,7 +155,7 @@ $ec_lang['mphl_total_loss']='Gesamtverlust, H<sub>l</sub>';
 $ec_lang['mphl_egl_1']='EGL flussabwärts';
 $ec_lang['mphl_egl_2']='EGL flussaufwärts';
 $ec_lang['mphl_hgl_2']='HGL im Rohr flussaufwärts ' . $ec_lang['mpf_see_notes'];
-$ec_lang['mphl_note_1']='<p>Hinweise:</p><dl><dt>Für einen offenen Einlauf (Durchlass) müssen die Einlaufsteuerungsbedingungen geprüft werden.</dt><dd>1. Die HGL flussaufwärts kann nicht unter der normalen Fließtiefe flussaufwärts liegen (oder unter dem Rohr!).</dd><dd>2. Der Einstaupegel eines Durchlasses wird besser durch die EGL als durch die HGL flussaufwärts dargestellt.</dd><dd>3. Sehen Sie <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">das 2-Minuten-Tutorial</a> für einfache Standard-Durchlassberechnungen mit HY-8.</dd>';
+$ec_lang['mphl_note_1']='<dl><dt>Für einen offenen Einlauf (Durchlass) müssen die Einlaufsteuerungsbedingungen geprüft werden.</dt><dd>1. Die HGL flussaufwärts kann nicht unter der normalen Fließtiefe flussaufwärts liegen (oder unter dem Rohr!).</dd><dd>2. Der Einstaupegel eines Durchlasses wird besser durch die EGL als durch die HGL flussaufwärts dargestellt.</dd><dd>3. Sehen Sie <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">das 2-Minuten-Tutorial</a> für einfache Standard-Durchlassberechnungen mit HY-8.</dd>';
 // Manning Trapezoid
 $ec_lang['mtc_menu']='Trapezprofil-Kanal Manning';
 $ec_lang['mtc_main_title']='Kostenloser Online-Rechner Trapezkanal Manning-Formel';
@@ -177,7 +177,7 @@ $ec_lang['mtc_d50_z1']='Erforderliche Körnung kantenreicher Steine Böschung 1,
 $ec_lang['mtc_d50_z2']='Erforderliche Körnung kantenreicher Steine Böschung 2, D50 (Isbash &amp; MC) <a href="javascript:alert(\'Nach Isbash (1936) und Maricopa County, Arizona, USA.\')">?</a>';
 $ec_lang['mtc_d50_mra']='Erforderliche Körnung kantenreicher Steine, D50 (Maynord, Ruff und Abt 1989)';
 $ec_lang['mtc_d50_searcy']='Erforderliche Körnung kantenreicher Steine, D50 (Searcy 1967)';
-$ec_lang['mtc_note_1']='<p>Hinweise:</p><dl><dt>Automatische Iteration Steinbemessung und Rauheit</dt><dd>Wählen Sie einen Rauheits-Radioknopf (BB empfohlen) und einen Radioknopf für die Bemessungskorngröße (Isbash empfohlen). Stellen Sie Tiefe und Steinbemessungsfaktor ein, um den gewünschten Durchfluss mit einer gleichmäßigen Korngröße zu erzielen. Bei jeder Änderung eines Eingabewerts startet der Iterationszyklus: 1. Die Rauheit wird aus der Bemessungskorngröße berechnet. 2. Der berechnete Rauheitswert wird in die Eingaberauheit kopiert. 3. Kanaldurchfluss und erforderliche Korngröße werden berechnet. 4. Die Bemessungskorngröße wird angepasst. 5. Wiederholen bis der Fehler sehr klein ist.</dd><dt>Grundrechner (ohne Iteration)</dt><dd>Geben Sie den gewünschten Rauheitswert ein. Ignorieren Sie den Eingabebereich für die Bemessungskorngröße.</dd></dl>';
+$ec_lang['mtc_note_1']='<dl><dt>Automatische Iteration Steinbemessung und Rauheit</dt><dd>Wählen Sie einen Rauheits-Radioknopf (BB empfohlen) und einen Radioknopf für die Bemessungskorngröße (Isbash empfohlen). Stellen Sie Tiefe und Steinbemessungsfaktor ein, um den gewünschten Durchfluss mit einer gleichmäßigen Korngröße zu erzielen. Bei jeder Änderung eines Eingabewerts startet der Iterationszyklus: 1. Die Rauheit wird aus der Bemessungskorngröße berechnet. 2. Der berechnete Rauheitswert wird in die Eingaberauheit kopiert. 3. Kanaldurchfluss und erforderliche Korngröße werden berechnet. 4. Die Bemessungskorngröße wird angepasst. 5. Wiederholen bis der Fehler sehr klein ist.</dd><dt>Grundrechner (ohne Iteration)</dt><dd>Geben Sie den gewünschten Rauheitswert ein. Ignorieren Sie den Eingabebereich für die Bemessungskorngröße.</dd></dl>';
 // Robinson Rock Chute
 $ec_lang['rrc_main_menu']='Robinson-Steinrampe';
 $ec_lang['rrc_main_desc']='Bemessungstabelle Robinson-Steinrampe';
