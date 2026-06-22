@@ -8,7 +8,6 @@ The format of each task is: Priority/status|Description. 0 means "Completed" and
 
 ## Mission & Love
 
-- 50|Love is spoken — native speaker review: Three languages use formulations that may be correct but are ambiguous and worth a native-speaker check: ar ("هنا نتحدث بالمحبة" — "بـ" is the language-speaking preposition, so may be correct), pt ("O amor é falado aqui" — grammatically odd passive), am ("ፍቅር እዚህ ይነገራል" — "told/spoken here" — probably fine). Eight languages corrected: it, sr, bg, cs, bn, hi, id, ur all now say "love is our language here" rather than "we speak about/with love."
 
 - 60|Progressive Web App (PWA): Implement PWA offline support for engineers and field workers in low-connectivity regions. Zip download dropped in favor of PWA — zip requires extraction and hits browser security warnings on local file:// URLs; PWA caches automatically and installs to the home screen with no friction. Save As covers basic one-off offline use; PWA covers reliable offline-first use.
 
@@ -48,7 +47,7 @@ The format of each task is: Priority/status|Description. 0 means "Completed" and
 
 - 0|Rework message of love: added "You are not ruining everything" as the third clause in all 22 languages. Naming the shame-fear that blocks people from receiving the other two. Fits naturally in the welcome bar.
 
-- 0|Love is spoken — corrected 8 translations: it, sr, bg, cs, bn, hi, id, ur were saying "we speak about love" or "we speak lovingly." All now say "love is our language here." Three languages (ar, pt, am) flagged for native-speaker review; see roadmap.
+- 0|Love is spoken — corrected 8 translations: it, sr, bg, cs, bn, hi, id, ur were saying "we speak about love" or "we speak lovingly." All now say "love is our language here." Three languages (ar, pt, am) have formulations that may be correct but are ambiguous; native-speaker corrections welcome via the feedback bar if they arise.
 
 - 0|Roadmap reorganized: grouped by theme (Mission & Love, Language Expansion, Calculator Improvements, Offline & Accessibility, Low Priority), priorities differentiated so ties are intentional, descriptions tightened.
 
