@@ -6,6 +6,10 @@ The format of each task is: Priority/status|Description. 0 means "Completed" and
 
 # Tasks
 
+- 100|Check the menu order of languages again against EU and UN.
+
+- 99|Audit the language system for any obvious problems and optimization opportunities. 1. Are there fixable duplications? 2. Are all the units appropriately localized?
+
 - 91|Robinson Rock Chute: 1. Can/should we add this calculator that is currently a Google Spreadsheet? Should we retire the spreadsheet? Should we refer to other available calculators for this method? Why are they more complicated? Does the reference white paper justify complication?
 
 - 90|Love is spoken: I need to clarify for all translations that "Love is spoken here" does not mean "We speak about love here." This means "Love is the language we speak here." Please ensure that this correct implication or express meaning is present in all translations. For example, in Spanish we would say "Se habla el amor aqui", not "Se habla del amor agui." My presenting doubt is about the Italian, though I am not proficient in Italian.
