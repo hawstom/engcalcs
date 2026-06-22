@@ -5,49 +5,60 @@ This is a prioritized, bulleted roadmap for the EngCalcs hydraulic calculator su
 The format of each task is: Priority/status|Description. 0 means "Completed" and 100 means top priority. Ties (same priority for multiple tasks) are okay. Any whole number 0-100 can be used. Tasks are sorted highest priority first; completed tasks are at the bottom.
 
 # Tasks
-- 100|Help me reorganize this file @ROADMAP.md and set good priorities.
 
-- 90|About and Offline page: Add a link in the menu to a place where we can give more information about our global humanitarian open source mission "I want to use my AI subscription to tell all my sisters and brothers that they are loved and cherished forever.", zip downloads (possibly a single rendered html zip download if that's feasible; see separate issue), PWA, the bitbucket repository, pull requests
+## Mission & Love
 
-- 89|Zip download: Plan the best way to provide each language or possibly all languages in a zip download(s). What architecture changes would be needed if we were interested to make a single html multi-lingual download? I assume that the menus would need some sort of a "Zip mode" where the calculator menu would also reference current language and the language menu would reference also current calculator. And would that use Angular or something to make it lighter in terms of files and bytes? What is best for the global south?
+- 95|Rework message of love: the current single "Love" reference is a start. Consider adding the third clause explicitly — "You are not going to ruin everything" — which names the shame-fear that blocks people from receiving the other two. Any addition should feel like part of the tool, not an interruption of it.
 
-- 90|Add km as a new language
+- 50|Love is spoken — native speaker review: Three languages use formulations that may be correct but are ambiguous and worth a native-speaker check: ar ("هنا نتحدث بالمحبة" — "بـ" is the language-speaking preposition, so may be correct), pt ("O amor é falado aqui" — grammatically odd passive), am ("ፍቅር እዚህ ይነገራል" — "told/spoken here" — probably fine). Eight languages corrected: it, sr, bg, cs, bn, hi, id, ur all now say "love is our language here" rather than "we speak about/with love."
 
-- 90|Add my as a new language
+- 85|About page: Add a menu link to a page covering: global humanitarian open source mission, offline/zip download options, PWA status, Bitbucket repository, and pull requests.
 
-- 90|Add ps as a new language
+- 70|Zip download: Plan the best architecture for per-language or multi-language zip downloads. Consider whether a single-HTML multi-lingual download is feasible and what menu/routing changes it would require. Optimize for the global south (file size, offline usability).
 
-- 90|Add fa as a new language
+- 60|Progressive Web App (PWA): Plan a PWA or companion phone app for engineers and field workers in low-connectivity regions.
 
-- 90|Add uk as a new language
+- 55|Text-only mode: Evaluate the need and cost/benefit of a leaner text-only rendering for the global south.
 
-- 90|Evaluate the need cost/benefit of a leaner "text-only" mode for the global south.
+## Language Expansion
 
-- 91|Robinson Rock Chute: 1. Can/should we add this calculator that is currently a Google Spreadsheet? Should we retire the spreadsheet? Should we refer to other available calculators for this method? Why are they more complicated? Does the reference white paper justify complication?
+- 90|Add km (Khmer) as a new language
 
-- 90|Love is spoken: I need to clarify for all translations that "Love is spoken here" does not mean "We speak about love here." This means "Love is the language we speak here." Please ensure that this correct implication or express meaning is present in all translations. For example, in Spanish we would say "Se habla el amor aqui", not "Se habla del amor agui." My presenting doubt is about the Italian, though I am not proficient in Italian.
+- 90|Add my (Burmese/Myanmar) as a new language
 
-- 93|Irrigation: Existing weir and orifice calculators already serve irrigation flow measurement — consider adding an explicit note or landing page connecting them to irrigation use cases (farmers and irrigation districts use these constantly).
+- 90|Add ps (Pashto) as a new language
 
-- 91|Irrigation: Explore drip/sprinkler design calculator — emitter flow, lateral spacing, precipitation rate, system uniformity coefficient. High value for smallholder agriculture in water-scarce regions.
+- 90|Add fa (Farsi/Persian) as a new language
 
-- 85|Irrigation: Explore canal seepage/loss estimation — helps irrigation districts quantify conveyance efficiency and prioritize lining investments.
+- 90|Add uk (Ukrainian) as a new language
 
-- 90|Plan a Progressive Web App (PWA) or companion phone app, as the most usable and useful case may be. Priority use case: engineers and field workers in low-connectivity regions (same audience as the Global South language expansion).
+- 82|Improve remaining language quality: he, pt, hr, sr, ro, zh — partial or sparse coverage; native-speaker review recommended.
 
-- 90|Rework message of love: the current single "Love" reference is a start. Consider adding the third clause explicitly — "You are not going to ruin everything" — which names the shame-fear that blocks people from receiving the other two. Any addition should feel like part of the tool, not an interruption of it.
+## Calculator Improvements
 
-- 40|Translations (multi-lingual): Improve remaining languages (he, pt, hr, sr, ro, cn) — partial or sparse coverage; native-speaker review recommended.
+- 88|Irrigation: Existing weir and orifice calculators already serve irrigation flow measurement — add an explicit note or landing page connecting them to irrigation use cases (farmers and irrigation districts use these constantly).
 
-- 20|Set up npm (package.json) and/or Composer for dependency management. Deferred from dev-infra work; currently Bootstrap and other assets are manually vendored.
+- 80|Irrigation: Explore drip/sprinkler design calculator — emitter flow, lateral spacing, precipitation rate, system uniformity coefficient. High value for smallholder agriculture in water-scarce regions.
+
+- 75|Robinson Rock Chute: Evaluate adding this calculator (currently a Google Spreadsheet). Should we retire the spreadsheet or refer to other available calculators? Does the reference white paper justify the complexity?
+
+- 65|Irrigation: Explore canal seepage/loss estimation — helps irrigation districts quantify conveyance efficiency and prioritize lining investments.
+
+## Low Priority / Nice-to-Have
+
+- 20|Set up npm (package.json) and/or Composer for dependency management. Currently Bootstrap and other assets are manually vendored.
 
 - 10|TypeScript migration — convert `lib/Calculators.lib.js` and per-calculator files to `.ts`. Only worthwhile if the project scope grows significantly.
 
 - 10|Server-side calculation fallback — duplicate JS calc logic in PHP so results can be generated without JavaScript (accessibility, search indexing). High effort, low urgency.
 
-- 10|Results sharing — generate a shareable URL or printable summary of a completed calculation. Nice-to-have feature.
+- 10|Results sharing — generate a shareable URL or printable summary of a completed calculation.
 
 ## Completed
+
+- 0|Love is spoken — corrected 8 translations: it, sr, bg, cs, bn, hi, id, ur were saying "we speak about love" or "we speak lovingly." All now say "love is our language here." Three languages (ar, pt, am) flagged for native-speaker review; see roadmap.
+
+- 0|Roadmap reorganized: grouped by theme (Mission & Love, Language Expansion, Calculator Improvements, Offline & Accessibility, Low Priority), priorities differentiated so ties are intentional, descriptions tightened.
 
 - 0|Language menu order: Corrected Language.Settings.php order to alphabetical by English name (EU/UN convention). Arabic, Bengali, Bulgarian were out of order (was bg, ar, bn → now ar, bn, bg).
 

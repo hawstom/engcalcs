@@ -52,7 +52,7 @@ $ec_lang['menu_brand']='HawsEDC حسابات';
 $ec_lang['menu_main_list']='حسابات کی فہرست';
 $ec_lang['menu_main_hydraulics']='ہائیڈرولکس';
 $ec_lang['menu_main_language']='زبان';
-$ec_lang['template_welcome']='&gt;&gt; اپنے خوف دروازے پر چھوڑ دیں؛ یہاں محبت کی باتیں ہوتی ہیں۔ <a target="_blank" href="https://hawsedc.com/download.php">مفت HawsEDC AutoCAD اوزار</a> بھی آزمائیں۔ &lt;&lt;';
+$ec_lang['template_welcome']='&gt;&gt; اپنے خوف دروازے پر چھوڑ دیں؛ یہاں محبت ہماری زبان ہے۔ <a target="_blank" href="https://hawsedc.com/download.php">مفت HawsEDC AutoCAD اوزار</a> بھی آزمائیں۔ &lt;&lt;';
 $ec_lang['template_translation_help']='کیا آپ کے ذہن میں یہاں شامل کرنے کے لیے کوئی شاندار حاسبے کا خیال ہے؟ کیا آپ ترجمے بہتر کرنے، پروگرامنگ، یا ان حاسبات کی میزبانی میں مدد کر سکتے ہیں؟  ';
 $ec_lang['template_feedback']='براہ کرم اپنی قیمتی رائے یا تعریف شیئر کریں۔ کیا اس مفت حاسبے نے ہر لحاظ سے آپ کی توقعات سے بڑھ کر کام کیا؟';
 $ec_lang['template_printable_title']='طباعت کے قابل عنوان';
