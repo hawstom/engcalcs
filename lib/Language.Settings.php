@@ -42,6 +42,13 @@ $all_language_settings = array();
 //
 // Languages are ordered alphabetically by English name, matching the EU/UN convention.
 
+//-- settings for amharic
+$all_language_settings['am']=array(
+'QUALITY'=>'0.9',
+'LANGNAME'=>'አማርኛ',
+'TITLE_WORDS'=>array(),
+);
+
 //-- settings for bulgarian
 $all_language_settings['bg']=array(
 'QUALITY'=>'0.95',

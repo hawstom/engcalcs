@@ -7,8 +7,6 @@ The format of each task is: Priority/status|Description. 0 means "Completed" and
 # Tasks
 
 
-- 97|Add Amharic
-
 - 95|Hydropower: Explore run-of-river micro-hydro power calculator. Core formula: P = η·ρ·g·Q·H (flow rate, gross head, efficiency → kW). Connects naturally to existing Manning/Darcy-Weisbach work for penstock sizing and head-loss accounting. Target audience: small community hydro projects in the Global South.
 
 - 94|Hydropower: Explore penstock design calculator — size a pipe for a hydropower intake, optimizing diameter against head loss and cost. Darcy-Weisbach is already built; this would be a thin layer on top of it.
@@ -34,6 +32,8 @@ The format of each task is: Priority/status|Description. 0 means "Completed" and
 - 10|Results sharing — generate a shareable URL or printable summary of a completed calculation. Nice-to-have feature.
 
 ## Completed
+
+- 0|Add Amharic (አማርኛ) translation — complete translation of all calculators. Registered in Language.Settings.php (QUALITY 0.9). LTR; no RTL change needed.
 
 - 0|Add Urdu (اردو) translation — complete translation of all calculators. Registered in Language.Settings.php (QUALITY 0.9). RTL; added 'ur' to dir="rtl" array in HeadersFooters.lib.php alongside 'ar' and 'he'.
 
