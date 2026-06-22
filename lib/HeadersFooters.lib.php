@@ -21,7 +21,7 @@ function echoHTMLHead($type, $html_title, $html_head) {
 
 global $ec_lang, $clanguage;
 $html_lang = isset($clanguage) ? $clanguage : 'en';
-$html_dir  = ($html_lang === 'he') ? ' dir="rtl"' : '';
+$html_dir  = in_array($html_lang, ['ar', 'he']) ? ' dir="rtl"' : '';
 ?>
 <!DOCTYPE html>
 <html lang="<?=$html_lang?>"<?=$html_dir?>>

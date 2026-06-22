@@ -50,6 +50,13 @@ $all_language_settings['bg']=array(
 'TITLE_WORDS'=>array(),
 );
 
+//-- settings for arabic
+$all_language_settings['ar']=array(
+'QUALITY'=>'0.9',
+'LANGNAME'=>'العربية',
+'TITLE_WORDS'=>array(),
+);
+
 //-- settings for bengali
 $all_language_settings['bn']=array(
 'QUALITY'=>'0.85',
