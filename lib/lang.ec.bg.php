@@ -144,7 +144,7 @@ $ec_lang['mphl_junction_loss']='Местни загуби';
 $ec_lang['mphl_total_loss']='Общи загуби'; 
 $ec_lang['mphl_egl_1']='EGL надолу по течение';
 $ec_lang['mphl_egl_2']='EGL нагоре по течение';
-$ec_lang['mphl_hgl_2']='Upstream HGL in pipe ' . $ec_lang['mpf_see_notes'];
+$ec_lang['mphl_hgl_2']='Upstream HGL in pipe (Вижте бележките)';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Изчисления на Трапецовидни Канали по Манинг'; 
 $ec_lang['mtc_main_title']='Безплатен Онлайн Калкулатор за Изчисления на Трапецовидни Канали по Манинг'; 
@@ -156,7 +156,6 @@ $ec_lang['mtc_channel_slope']='Наклон на канала';
 $ec_lang['mtc_flow_depth']='Воден стълб'; 
 $ec_lang['mtc_bend_angle']='Bend Angle<a href="riprap-bend-angle.png" title="Click for image">?</a> (for riprap sizing)'; //No need
 $ec_lang['mtc_sgrock']='Stone specific gravity (2.65)'; //No need
-$ec_lang['mtc_d50_strickler']='Implied design <a href="javascript:alert(\'The Strickler formula relates n and D50 for a straight and clean channel. Adjust n so this implied design size is larger than the required erosion protection size. Then line your channel as implied.\')">?</a> riprap size based on n';
 $ec_lang['mtc_d50_bottom']='Required bottom angular riprap size, D50, Maricopa County <a href="javascript:alert(\'For S0 < 2% per Isbash (1936) and Maricopa County, Arizona, US. For S >= 2% per Robinson Rock Chute \')">?</a>';
 $ec_lang['mtc_d50_z1']='Required side slope 1 angular riprap size, D50, Maricopa County <a href="javascript:alert(\'For S0 < 2% per Isbash (1936) and Maricopa County, Arizona, US. For S >= 2% per Robinson Rock Chute \')">?</a>';
 $ec_lang['mtc_d50_z2']='Required side slope 2 angular riprap size, D50, Maricopa County <a href="javascript:alert(\'For S0 < 2% per Isbash (1936) and Maricopa County, Arizona, US. For S >= 2% per Robinson Rock Chute \')">?</a>';

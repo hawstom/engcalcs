@@ -6,9 +6,6 @@ The format of each task is: Priority/status|Description. 0 means "Completed" and
 
 # Tasks
 
-- 100|Check the menu order of languages again against EU and UN.
-
-- 99|Audit the language system for any obvious problems and optimization opportunities. 1. Are there fixable duplications? 2. Are all the units appropriately localized?
 
 - 91|Robinson Rock Chute: 1. Can/should we add this calculator that is currently a Google Spreadsheet? Should we retire the spreadsheet? Should we refer to other available calculators for this method? Why are they more complicated? Does the reference white paper justify complication?
 
@@ -35,6 +32,12 @@ The format of each task is: Priority/status|Description. 0 means "Completed" and
 - 10|Results sharing — generate a shareable URL or printable summary of a completed calculation. Nice-to-have feature.
 
 ## Completed
+
+- 0|Language menu order: Corrected Language.Settings.php order to alphabetical by English name (EU/UN convention). Arabic, Bengali, Bulgarian were out of order (was bg, ar, bn → now ar, bn, bg).
+
+- 0|Language system audit: Fixed all lang file issues. Removed ~30 orphaned legacy keys from es, pt, bg, fr, he, tr (mtc_d50_strickler, old mi_d50_* and mi_q/v/f/hv keys, mpf_spreadheet_link_*, mphl_elevation/pressure_head_1/2). Added missing or_velocity to ro and sr. Fixed es.php forward-reference bug (u_grade and u_in used before defined). Fixed tr.php premature ?> close tag that dropped 55 mhp_/ps_ keys outside PHP scope; fixed 3 unescaped apostrophes in Turkish Penstock strings. Fixed bg/he mphl_hgl_2 forward reference to mpf_see_notes. All 23 language files now have zero missing or extra keys, zero warnings.
+
+- 0|Chinese language code: Renamed internal code cn→zh (ISO 639-1 standard). Renamed lang.ec.cn.php → lang.ec.zh.php. Removed BROWSER_TAG hack from Language.Settings.php. Added normalizeLang() to Language.lib.php to silently correct legacy ?lang=cn GET params and ec_language=cn cookies to zh, so returning visitors with old bookmarks/cookies transparently receive Chinese and all logging records zh.
 
 - 0|Penstock Design calculator: Penstock-Design.php wraps Darcy-Weisbach friction factor logic with gross head, plant efficiency, and power output. Inputs: Q, H_gross, D, L, roughness e, minor loss km, kinematic viscosity, η. Results: velocity + color-coded velocity check (1–3 m/s target), f, h_f, h_m, h_L, color-coded head loss % check (10%/20% thresholds), H_net, power (kW/MW/hp), annual kWh/yr. Dynamic SVG bar sketch shows H_net vs h_L proportions. ps_ keys added to all 22 lang files.
 

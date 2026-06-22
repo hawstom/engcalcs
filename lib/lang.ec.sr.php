@@ -50,6 +50,7 @@ $ec_lang['or_centroid_elev']='Кота тежишта';
 $ec_lang['or_head']='Ефективна висина, h';
 $ec_lang['or_area']='Површина отвора, A';
 $ec_lang['or_flow']='Протицај, Q';
+$ec_lang['or_velocity']='Брзина на отвору, v';
 $ec_lang['or_regime']='Провера режима отвора';
 $ec_lang['or_regime_valid']='Слободно истицање — режим отвора валидан ✓';
 $ec_lang['or_regime_submerged']='Потопљен отвор (TWE изнад дна) — валидно ✓';

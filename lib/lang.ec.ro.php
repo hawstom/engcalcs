@@ -52,6 +52,7 @@ $ec_lang['or_centroid_elev']='Cota centroidului';
 $ec_lang['or_head']='Sarcină efectivă, h';
 $ec_lang['or_area']='Aria deschiderii, A';
 $ec_lang['or_flow']='Debit, Q';
+$ec_lang['or_velocity']='Viteza la deschidere, v';
 $ec_lang['or_regime']='Verificarea regimului de orificiu';
 $ec_lang['or_regime_valid']='Curgere liberă — regim de orificiu valid ✓';
 $ec_lang['or_regime_submerged']='Orificiu înecat (TWE peste radier) — valid ✓';

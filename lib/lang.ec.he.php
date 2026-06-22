@@ -93,7 +93,7 @@ $ec_lang['mphl_junction_loss']='הפסד בצומת';
 $ec_lang['mphl_total_loss'] = 'סהכ הפסד';
 $ec_lang['mphl_egl_1']='EGL מורד';
 $ec_lang['mphl_egl_2']='EGL מעלה';
-$ec_lang['mphl_hgl_2']='Upstream HGL in pipe ' . $ec_lang['mpf_see_notes'];
+$ec_lang['mphl_hgl_2']='Upstream HGL in pipe (ראה הערות)';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='תעלה טרפזואידית — Manning';
 $ec_lang['mtc_main_title']='מחשבון תעלה טרפזואידית לפי נוסחת Manning — חינם מקוון';
@@ -106,7 +106,6 @@ $ec_lang['mtc_flow_depth']='עומק הספיקה';
 $ec_lang['mtc_d50_bottom']='<span title="per Isbash (1936), Robinson, and Maricopa County, Arizona, US">Required bottom angular riprap size, D50, Maricopa County</span>';
 $ec_lang['mtc_d50_mra']='Required angular riprap size, D50, per Maynord, Ruff, and Abt (1989)';
 $ec_lang['mtc_d50_searcy']='Required angular riprap size, D50, per Searcy (1967)';
-$ec_lang['mtc_d50_strickler']='<span title="per Strickler (Adjust n so this equals your design lining size)">Implied riprap size based on n</span>';
 $ec_lang['mtc_d50_z1']='<span title="per Isbash (1936), Robinson, and Maricopa County, Arizona, US">Required side slope 1 angular riprap size, D50, Maricopa County</span>';
 $ec_lang['mtc_d50_z2']='<span title="per Isbash (1936), Robinson, and Maricopa County, Arizona, US">Required side slope 2 angular riprap size, D50, Maricopa County</span>';
 // Orifice Flow

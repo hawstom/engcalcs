@@ -158,7 +158,6 @@ $ec_lang['mtc_channel_slope']='Kanal Eğimi';
 $ec_lang['mtc_flow_depth']='Akış Derinliği';
 $ec_lang['mtc_bend_angle']='Bend Angle<a target="_blank" href="riprap-bend-angle.png" title="Click for image">?</a> (for riprap sizing)';
 $ec_lang['mtc_sgrock']='Stone specific gravity (2.65)';
-$ec_lang['mtc_d50_strickler']='<span title="Strickler formülüne göre (n\'yi, bu değer tasarım kaplama boyutuna eşit olacak şekilde ayarlayın)">n\'ye dayalı ima edilen taş kaplama boyutu</span>';
 $ec_lang['mtc_d50_bottom']='<span title="Isbash (1936) ve Maricopa County, Arizona, US\'ye göre">Taban için gerekli köşeli taş kaplama boyutu, D50, Maricopa County</span>';
 $ec_lang['mtc_d50_z1']='<span title="Isbash (1936) ve Maricopa County, Arizona, US\'ye göre">Yan eğim 1 için gerekli köşeli taş kaplama boyutu, D50, Maricopa County</span>';
 $ec_lang['mtc_d50_z2']='<span title="Isbash (1936) ve Maricopa County, Arizona, US\'ye göre">Yan eğim 2 için gerekli köşeli taş kaplama boyutu, D50, Maricopa County</span>';
@@ -189,8 +188,6 @@ $ec_lang['wi_pondingHeight']='Göllenme Yüksekliği';
 $ec_lang['wi_incrementalFlow']='Artımlı Akış';
 $ec_lang['wi_cumulativeFlow']='Kümülatif Akış';
 $ec_lang['wi_save_and_calculate']='Kaydet ve Hesapla';
-$ec_lang['wi_or_adjust']="ya da";
-$ec_lang['wi_n_rows']="sıraların sayısı";
 $ec_lang['wi_notes_we_term']='Savak Denklemi';
 $ec_lang['wi_notes_we_def']='q = eğer (uzunluk = 0) ise 0, eğer (eğim=0) ise cw*uzunluk*d0<sup>1,5</sup>, ya da d1 ve d0\'ın daima pozitif veya sıfır olduğu yerde q = cw/(2,5*eğim) * (d0<sup>2,5</sup> - d1<sup>2,5</sup>)';
 // Orifice Flow
@@ -291,7 +288,6 @@ $ec_lang['contact_message']='Mesaj:';
 $ec_lang['contactSpamPrefix']='Bes arti bir';
 $ec_lang['contactSpamPostfix']='(Lütfen yaziyla gösterin. 1= bir 2=iki 3=üç 4=dört 5=bes 6=alti 7=yedi +=arti 5+1=6)';
 $ec_lang['contactSubmitButton']='Gönder';
-?>
 
 // Micro-Hydro Power
 $ec_lang['mhp_main_menu']='Mikro-Hidroelektrik Güç';
@@ -339,14 +335,14 @@ $ec_lang['ps_vel_low']='1 m/s altında — çapı artırın ⚠';
 $ec_lang['ps_vel_high']='3 m/s üzerinde — çapı azaltın ⚠';
 $ec_lang['ps_hl_ok']='%10 hedef içinde ✓';
 $ec_lang['ps_hl_warn']='%10 hedefi aşıyor — daha büyük boru düşünün ⚠';
-$ec_lang['ps_hl_bad']='%20'yi aşıyor — boruyu yeniden boyutlandırın';
+$ec_lang['ps_hl_bad']='%20\'yi aşıyor — boruyu yeniden boyutlandırın';
 $ec_lang['ps_notes_1_term']='Yük Kaybı';
 $ec_lang['ps_notes_1_def']='Toplam cebri boru kaybı h<sub>L</sub> = h<sub>f</sub> + h<sub>m</sub>; burada h<sub>f</sub> = f(L/D)(v&sup2;/2g) Darcy-Weisbach sürtünme kaybıdır ve h<sub>m</sub> = k<sub>m</sub>&middot;v&sup2;/2g giriş, dirsek ve vanaları kapsar. Net yük H<sub>net</sub> = H<sub>gross</sub> &minus; h<sub>L</sub>.';
 $ec_lang['ps_notes_2_term']='Hız';
 $ec_lang['ps_notes_2_def']='Hedef 1&ndash;3 m/s. 1 m/s altı boru aşırı boyutlanmış; 3 m/s üstü sürtünme kayıplarını ve su darbesi riskini artırır.';
 $ec_lang['ps_notes_3_term']='Yük Kaybı Hedefi';
-$ec_lang['ps_notes_3_def']='Brüt yükün %10'unun altındaki cebri boru kayıpları genellikle ekonomiktir. Boru maliyeti ile kaybedilen güç arasındaki optimum denge, yüksek değerli elektrik tesislerinde genellikle %4&ndash;6 civarındadır.';
+$ec_lang['ps_notes_3_def']='Brüt yükün %10\'unun altındaki cebri boru kayıpları genellikle ekonomiktir. Boru maliyeti ile kaybedilen güç arasındaki optimum denge, yüksek değerli elektrik tesislerinde genellikle %4&ndash;6 civarındadır.';
 $ec_lang['ps_notes_4_term']='Lokal Kayıplar k<sub>m</sub>';
-$ec_lang['ps_notes_4_def']='Tipik değerler: keskin giriş 0.5, her 45&deg; dirsek 0.2&ndash;0.3, sürgü vana (tam açık) 0.1, kelebek vana 0.2. Tüm bağlantı parçalarının toplamı toplam k<sub>m</sub>'yi verir. Varsayılan 1.5, bir giriş ve iki dirsek varsayar.';
+$ec_lang['ps_notes_4_def']='Tipik değerler: keskin giriş 0.5, her 45&deg; dirsek 0.2&ndash;0.3, sürgü vana (tam açık) 0.1, kelebek vana 0.2. Tüm bağlantı parçalarının toplamı toplam k<sub>m</sub>\'yi verir. Varsayılan 1.5, bir giriş ve iki dirsek varsayar.';
 $ec_lang['ps_notes_5_term']='Boru Pürüzlülüğü e';
 $ec_lang['ps_notes_5_def']='Tipik mutlak pürüzlülük: çelik (yeni) 0.046&nbsp;mm, çelik (kullanılmış) 0.15&nbsp;mm, HDPE 0.003&nbsp;mm, PVC/uPVC 0.0015&nbsp;mm, beton 0.3&ndash;3&nbsp;mm. HDPE, küçük mikro-hidro cebri borularında yaygındır.';

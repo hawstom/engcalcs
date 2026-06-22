@@ -35,35 +35,44 @@ function logLanguageSelection($lang, $source) {
     @file_put_contents($logFile, $line, FILE_APPEND | LOCK_EX);
 }
 
+// Map legacy/non-standard language codes to their correct ISO 639-1 equivalents.
+$LEGACY_LANG_MAP = ['cn' => 'zh'];
+
+function normalizeLang($lang) {
+    global $LEGACY_LANG_MAP;
+    return $LEGACY_LANG_MAP[$lang] ?? $lang;
+}
+
 function chooseLanguage($all_language_settings) {
     $browserDefaultQuality = 0;
     if (!empty($_GET["lang"])) {
         // If $_GET["lang"] is a valid language, set a session language override.
-        if (ctype_alpha($_GET["lang"]) && strlen($_GET["lang"]) == 2 && $all_language_settings[$_GET["lang"]]) {
-            $_SESSION["CLANGUAGE"] = $_GET["lang"];
-            setcookie("ec_language", $_GET["lang"], [
+        $lang = normalizeLang($_GET["lang"]);
+        if (ctype_alpha($lang) && strlen($lang) == 2 && $all_language_settings[$lang]) {
+            $_SESSION["CLANGUAGE"] = $lang;
+            setcookie("ec_language", $lang, [
                 'expires'  => time() + 365 * 24 * 60 * 60,
                 'path'     => '/',
                 'samesite' => 'Strict',
                 'secure'   => true,
                 'httponly' => true,
             ]);
-            logLanguageSelection($_GET["lang"], 'get');
-            return $_GET["lang"];
+            logLanguageSelection($lang, 'get');
+            return $lang;
         } else {
             return "en";
         }
     } elseif (!empty($_SESSION["CLANGUAGE"]) && !empty($all_language_settings[$_SESSION["CLANGUAGE"]])) {
         // Else if a valid language was already determined in this session, use it.
         return $_SESSION["CLANGUAGE"];
-    } elseif (!empty($_COOKIE["ec_language"]) && ctype_alpha($_COOKIE["ec_language"]) && strlen($_COOKIE["ec_language"]) == 2 && !empty($all_language_settings[$_COOKIE["ec_language"]])) {
+    } elseif (!empty($_COOKIE["ec_language"]) && ctype_alpha($_COOKIE["ec_language"]) && strlen($_COOKIE["ec_language"]) == 2 && !empty($all_language_settings[$cookieLang = normalizeLang($_COOKIE["ec_language"])])) {
         // Else if a valid language cookie exists from a previous browser session, use it.
-        $_SESSION["CLANGUAGE"] = $_COOKIE["ec_language"];
+        $_SESSION["CLANGUAGE"] = $cookieLang;
         if (empty($_SESSION['CLANG_LOGGED'])) {
-            logLanguageSelection($_COOKIE["ec_language"], 'cookie');
+            logLanguageSelection($cookieLang, 'cookie');
             $_SESSION['CLANG_LOGGED'] = true;
         }
-        return $_COOKIE["ec_language"];
+        return $cookieLang;
     } else {
         // Get and try to match user's acceptable languages.
         if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
