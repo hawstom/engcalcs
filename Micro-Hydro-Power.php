@@ -14,7 +14,7 @@ echoHeader("EngCalcs", $html_title, $html_head);
 echoCalculatorForm(
 	//Inputs
 	Array(
-		Array('name' => 'q',      'type' => 'number', 'default' => '0.5',  'units' => Array('m3ps','lps','ft3ps','gpm'), 'label' => $ec_lang['mhp_flow']),
+		Array('name' => 'q',      'type' => 'number', 'default' => '10',   'units' => Array('lps','m3ps','ft3ps','gpm'), 'label' => $ec_lang['mhp_flow']),
 		Array('name' => 'hgross', 'type' => 'number', 'default' => '50',   'units' => Array('m','mm','ft','in'),          'label' => $ec_lang['mhp_gross_head']),
 		Array('name' => 'hloss',  'type' => 'number', 'default' => '2.5',  'units' => Array('m','mm','ft','in'),          'label' => $ec_lang['mhp_head_loss']),
 		Array('name' => 'eta',    'type' => 'number', 'default' => '0.75', 'units' => NULL,                               'label' => $ec_lang['mhp_efficiency']),
