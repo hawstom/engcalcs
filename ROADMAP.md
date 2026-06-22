@@ -10,15 +10,13 @@ The format of each task is: Priority/status|Description. 0 means "Completed" and
 
 - 50|Love is spoken — native speaker review: Three languages use formulations that may be correct but are ambiguous and worth a native-speaker check: ar ("هنا نتحدث بالمحبة" — "بـ" is the language-speaking preposition, so may be correct), pt ("O amor é falado aqui" — grammatically odd passive), am ("ፍቅር እዚህ ይነገራል" — "told/spoken here" — probably fine). Eight languages corrected: it, sr, bg, cs, bn, hi, id, ur all now say "love is our language here" rather than "we speak about/with love."
 
-- 70|Zip download: Plan the best architecture for per-language or multi-language zip downloads. Consider whether a single-HTML multi-lingual download is feasible and what menu/routing changes it would require. Optimize for the global south (file size, offline usability).
-
-- 60|Progressive Web App (PWA): Plan a PWA or companion phone app for engineers and field workers in low-connectivity regions.
+- 60|Progressive Web App (PWA): Implement PWA offline support for engineers and field workers in low-connectivity regions. Zip download dropped in favor of PWA — zip requires extraction and hits browser security warnings on local file:// URLs; PWA caches automatically and installs to the home screen with no friction. Save As covers basic one-off offline use; PWA covers reliable offline-first use.
 
 - 55|Text-only mode: Evaluate the need and cost/benefit of a leaner text-only rendering for the global south.
 
 ## Language Expansion
 
-- 35|Language quality — native-speaker review: he, pt, hr, sr, ro, zh all now have complete key coverage and quality scores raised (hr/pt/ro → 0.9, sr/he → 0.85, zh → 0.9). Structural fixes applied: he had 6 English strings in mtc_ section and mixed mphl_hgl_2; sr had 4 Croatian-script strings in irr_/mhp_ sections. All 26 non-English lang files also gained about_ keys (About page). Remaining gap: native-speaker review of translation accuracy, especially he and sr.
+- 45|About page — translate body content into all 26 languages. Currently only the menu label, page title, and meta description are translated (3 keys); the body prose is English-only. Approach: one `about_body_html` key per language containing the full page body as an HTML string, falling back to English. Narrative content benefits from block translation rather than granular keys.
 
 ## Calculator Improvements
 
@@ -39,6 +37,8 @@ The format of each task is: Priority/status|Description. 0 means "Completed" and
 - 10|Results sharing — generate a shareable URL or printable summary of a completed calculation.
 
 ## Completed
+
+- 0|Language quality — structural fixes: he, pt, hr, sr, ro, zh all raised to 0.85–0.9. he: fixed 6 English strings in mtc_ section and mixed-language mphl_hgl_2. sr: fixed 4 Croatian-script strings in irr_/mhp_ sections. All 26 non-English lang files gained about_ keys. Native-speaker review not tracked here — handled when speakers reach out via the feedback bar.
 
 - 0|About page (About.php): added to nav menu. Covers global humanitarian open source mission, GNU GPL v3 license, Bitbucket repository link (bitbucket.org/hawstom/engcalcs), contributing (translations, bugs, new calculators, hosting), offline ZIP download (planned/roadmap), and PWA status (planned/roadmap).
 
