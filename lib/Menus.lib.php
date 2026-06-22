@@ -118,6 +118,9 @@ function echoEngCalcsMenu () {
 <?php endforeach; ?>
 				</div>
 			</li>
+			<li class="nav-item">
+				<a class="nav-link" href="About.php"><?=$ec_lang['about_main_menu']?></a>
+			</li>
 		</ul>
 	</div>
 </nav>

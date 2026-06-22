@@ -334,6 +334,10 @@ $ec_lang['essc_q']='Flow, Q';
 $ec_lang['irr_main_menu']='Irrigation Flow Measurement';
 $ec_lang['irr_main_title']='Free Online Irrigation Flow Measurement Calculators';
 $ec_lang['irr_main_desc']='Irrigation Flow Measurement — Weirs and Orifices';
+// About
+$ec_lang['about_main_menu']='About';
+$ec_lang['about_main_title']='About HawsEDC Engineering Calculators';
+$ec_lang['about_main_desc']='Mission, Open Source, and Contributing';
 $ec_lang['contact_title']='HawsEDC Contact';
 $ec_lang['contactSendMessage']='Send Tom Haws a message';
 $ec_lang['contactYourName']='Your name:';

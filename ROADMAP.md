@@ -10,8 +10,6 @@ The format of each task is: Priority/status|Description. 0 means "Completed" and
 
 - 50|Love is spoken — native speaker review: Three languages use formulations that may be correct but are ambiguous and worth a native-speaker check: ar ("هنا نتحدث بالمحبة" — "بـ" is the language-speaking preposition, so may be correct), pt ("O amor é falado aqui" — grammatically odd passive), am ("ፍቅር እዚህ ይነገራል" — "told/spoken here" — probably fine). Eight languages corrected: it, sr, bg, cs, bn, hi, id, ur all now say "love is our language here" rather than "we speak about/with love."
 
-- 85|About page: Add a menu link to a page covering: global humanitarian open source mission, offline/zip download options, PWA status, Bitbucket repository, and pull requests.
-
 - 70|Zip download: Plan the best architecture for per-language or multi-language zip downloads. Consider whether a single-HTML multi-lingual download is feasible and what menu/routing changes it would require. Optimize for the global south (file size, offline usability).
 
 - 60|Progressive Web App (PWA): Plan a PWA or companion phone app for engineers and field workers in low-connectivity regions.
@@ -41,6 +39,8 @@ The format of each task is: Priority/status|Description. 0 means "Completed" and
 - 10|Results sharing — generate a shareable URL or printable summary of a completed calculation.
 
 ## Completed
+
+- 0|About page (About.php): added to nav menu. Covers global humanitarian open source mission, GNU GPL v3 license, Bitbucket repository link (bitbucket.org/hawstom/engcalcs), contributing (translations, bugs, new calculators, hosting), offline ZIP download (planned/roadmap), and PWA status (planned/roadmap).
 
 - 0|Irrigation landing page (Irrigation.php): added to menu with divider. Links to Weir Flow Simple, Weir Flow Irregular, Orifice Flow, Orifice Drain Time, and Manning channel calculators. Quick-reference section for diversion dams, headgates, pipe turnouts, and USBR Water Measurement Manual alignment. irr_ keys added to all 27 lang files.
 

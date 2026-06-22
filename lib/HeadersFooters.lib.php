@@ -29,7 +29,7 @@ $html_dir  = in_array($html_lang, ['ar', 'fa', 'he', 'ps', 'ur']) ? ' dir="rtl"'
 	<meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
 	<meta name="Generator" content="Notepad++"  />
 	<meta name="Author" content="Thomas Gail Haws" />
-	<meta name="Copyright" content="Copyleft &copy; 1999-2002 by Thomas Gail Haws. Licensed under the terms of the GNU GPL 3.0 or later." />
+	<meta name="Copyright" content="Copyright &copy; 2009&ndash;2026 Thomas Gail Haws. Licensed under the GNU GPL v3.0 or later." />
 	<?=$html_head?>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title><?=$html_title?></title>
