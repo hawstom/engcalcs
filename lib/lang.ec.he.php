@@ -41,6 +41,8 @@ $ec_lang['u_ft3']="ft^3";
 $ec_lang['u_m3']="m^3";
 $ec_lang['u_kw']='kW';
 $ec_lang['u_mw']='MW';
+$ec_lang['u_kwh_yr']='kWh/yr';
+$ec_lang['u_mwh_yr']='MWh/yr';
 $ec_lang['u_hp']='hp';
 
 // Page text
@@ -295,7 +297,7 @@ $ec_lang['mhp_head_loss']='אובדן ראש בצינור הלחץ, h<sub>L</sub
 $ec_lang['mhp_efficiency']='יעילות המתקן, &eta; (0&ndash;1)';
 $ec_lang['mhp_net_head']='ראש נטו, H<sub>net</sub>';
 $ec_lang['mhp_power']='הספק, P';
-$ec_lang['mhp_annual_kwh']='אנרגיה שנתית ב-100% קיבולת (kWh/שנה)';
+$ec_lang['mhp_annual_kwh']='אנרגיה שנתית ב-100% קיבולת';
 $ec_lang['mhp_notes_1_term']='משוואת ההספק';
 $ec_lang['mhp_notes_1_def']='P = &eta; &times; &rho; &times; g &times; Q &times; H<sub>net</sub>, כאשר &rho; = 1000 ק"ג/מ&sup3; (מים מתוקים) ו-g = 9.806 מ/ש&sup2;.';
 $ec_lang['mhp_notes_2_term']='ראש נטו';
@@ -325,13 +327,13 @@ $ec_lang['ps_hl']='סך אובדן צינור הלחץ, h<sub>L</sub>';
 $ec_lang['ps_hl_check']='בדיקת אובדן לחץ';
 $ec_lang['ps_hnet']='גובה נטו, H<sub>net</sub>';
 $ec_lang['ps_power']='הספק יציאה, P';
-$ec_lang['ps_annual_kwh']='אנרגיה שנתית בקיבולת 100% (קוט"ש/שנה)';
-$ec_lang['ps_vel_ok']='1&ndash;3 מ/ש &mdash; בטווח היעד &#x2713;';
-$ec_lang['ps_vel_low']='מתחת ל-1 מ/ש &mdash; הגדל קוטר &#x26a0;';
-$ec_lang['ps_vel_high']='מעל 3 מ/ש &mdash; הקטן קוטר &#x26a0;';
-$ec_lang['ps_hl_ok']='בתוך יעד 10% &#x2713;';
-$ec_lang['ps_hl_warn']='חורג מיעד 10% &mdash; שקול צינור גדול יותר &#x26a0;';
-$ec_lang['ps_hl_bad']='חורג מ-20% &mdash; ממד מחדש את הצינור';
+$ec_lang['ps_annual_kwh']='אנרגיה שנתית בקיבולת 100%';
+$ec_lang['ps_vel_ok']='1–3 מ/ש — בטווח היעד ✓';
+$ec_lang['ps_vel_low']='מתחת ל-1 מ/ש — הגדל קוטר ⚠';
+$ec_lang['ps_vel_high']='מעל 3 מ/ש — הקטן קוטר ⚠';
+$ec_lang['ps_hl_ok']='בתוך יעד 10% ✓';
+$ec_lang['ps_hl_warn']='חורג מיעד 10% — שקול צינור גדול יותר ⚠';
+$ec_lang['ps_hl_bad']='חורג מ-20% — ממד מחדש את הצינור';
 $ec_lang['ps_notes_1_term']='אובדן לחץ';
 $ec_lang['ps_notes_1_def']='סך אובדן צינור הלחץ h<sub>L</sub> = h<sub>f</sub> + h<sub>m</sub>, כאשר h<sub>f</sub> = f(L/D)(v&sup2;/2g) הוא אובדן חיכוך לפי דארסי-ויסבאך ו-h<sub>m</sub> = k<sub>m</sub>&middot;v&sup2;/2g מכסה כניסה, עקומות ושסתומים. גובה נטו H<sub>net</sub> = H<sub>gross</sub> &minus; h<sub>L</sub>.';
 $ec_lang['ps_notes_2_term']='מהירות';

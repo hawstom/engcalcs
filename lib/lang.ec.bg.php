@@ -41,6 +41,8 @@ $ec_lang['u_ft3']="ft^3";
 $ec_lang['u_m3']="m^3";
 $ec_lang['u_kw']='kW';
 $ec_lang['u_mw']='MW';
+$ec_lang['u_kwh_yr']='kWh/yr';
+$ec_lang['u_mwh_yr']='MWh/yr';
 $ec_lang['u_hp']='hp';
 
 // Page text
@@ -296,7 +298,7 @@ $ec_lang['mhp_head_loss']='Загуби на напор в напорния тр
 $ec_lang['mhp_efficiency']='Ефективност на централата, &eta; (0&ndash;1)';
 $ec_lang['mhp_net_head']='Нетен напор, H<sub>net</sub>';
 $ec_lang['mhp_power']='Изходна мощност, P';
-$ec_lang['mhp_annual_kwh']='Годишна енергия при 100% капацитет (kWh/год)';
+$ec_lang['mhp_annual_kwh']='Годишна енергия при 100% капацитет';
 $ec_lang['mhp_notes_1_term']='Уравнение за мощност';
 $ec_lang['mhp_notes_1_def']='P = &eta; &times; &rho; &times; g &times; Q &times; H<sub>net</sub>, където &rho; = 1000 kg/m&sup3; (прясна вода) и g = 9,806 m/s&sup2;.';
 $ec_lang['mhp_notes_2_term']='Нетен напор';
@@ -326,13 +328,13 @@ $ec_lang['ps_hl']='Обща загуба в тръбопровода, h<sub>L</s
 $ec_lang['ps_hl_check']='Проверка на загубата на напор';
 $ec_lang['ps_hnet']='Нетен напор, H<sub>net</sub>';
 $ec_lang['ps_power']='Изходна мощност, P';
-$ec_lang['ps_annual_kwh']='Годишна енергия при 100% натоварване (кВтч/год)';
-$ec_lang['ps_vel_ok']='1&ndash;3 м/с &mdash; в целевия диапазон &#x2713;';
-$ec_lang['ps_vel_low']='под 1 м/с &mdash; увеличете диаметъра &#x26a0;';
-$ec_lang['ps_vel_high']='над 3 м/с &mdash; намалете диаметъра &#x26a0;';
-$ec_lang['ps_hl_ok']='в рамките на целевите 10% &#x2713;';
-$ec_lang['ps_hl_warn']='надвишава целевите 10% &mdash; помислете за по-голяма тръба &#x26a0;';
-$ec_lang['ps_hl_bad']='надвишава 20% &mdash; преоразмерете тръбата';
+$ec_lang['ps_annual_kwh']='Годишна енергия при 100% натоварване';
+$ec_lang['ps_vel_ok']='1–3 м/с — в целевия диапазон ✓';
+$ec_lang['ps_vel_low']='под 1 м/с — увеличете диаметъра ⚠';
+$ec_lang['ps_vel_high']='над 3 м/с — намалете диаметъра ⚠';
+$ec_lang['ps_hl_ok']='в рамките на целевите 10% ✓';
+$ec_lang['ps_hl_warn']='надвишава целевите 10% — помислете за по-голяма тръба ⚠';
+$ec_lang['ps_hl_bad']='надвишава 20% — преоразмерете тръбата';
 $ec_lang['ps_notes_1_term']='Загуба на напор';
 $ec_lang['ps_notes_1_def']='Обща загуба h<sub>L</sub> = h<sub>f</sub> + h<sub>m</sub>, където h<sub>f</sub> = f(L/D)(v&sup2;/2g) е загубата от триене по Дарси-Вайсбах, а h<sub>m</sub> = k<sub>m</sub>&middot;v&sup2;/2g включва вход, колена и спирателни органи. Нетен напор H<sub>net</sub> = H<sub>gross</sub> &minus; h<sub>L</sub>.';
 $ec_lang['ps_notes_2_term']='Скорост';

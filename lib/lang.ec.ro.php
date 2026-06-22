@@ -7,6 +7,8 @@ $ec_lang['u_ft3']="ft^3";
 $ec_lang['u_m3']="m^3";
 $ec_lang['u_kw']='kW';
 $ec_lang['u_mw']='MW';
+$ec_lang['u_kwh_yr']='kWh/yr';
+$ec_lang['u_mwh_yr']='MWh/yr';
 $ec_lang['u_hp']='hp';
 
 // Page text
@@ -290,7 +292,7 @@ $ec_lang['mhp_head_loss']='Pierderi de sarcină în conducta forțată, h<sub>L<
 $ec_lang['mhp_efficiency']='Randamentul instalației, &eta; (0&ndash;1)';
 $ec_lang['mhp_net_head']='Cădere netă, H<sub>net</sub>';
 $ec_lang['mhp_power']='Putere produsă, P';
-$ec_lang['mhp_annual_kwh']='Energie anuală la capacitate 100% (kWh/an)';
+$ec_lang['mhp_annual_kwh']='Energie anuală la capacitate 100%';
 $ec_lang['mhp_notes_1_term']='Ecuația puterii';
 $ec_lang['mhp_notes_1_def']='P = &eta; &times; &rho; &times; g &times; Q &times; H<sub>net</sub>, unde &rho; = 1000 kg/m&sup3; (apă dulce) și g = 9,806 m/s&sup2;.';
 $ec_lang['mhp_notes_2_term']='Cădere netă';
@@ -320,13 +322,13 @@ $ec_lang['ps_hl']='Pierdere totală în conducta forțată, h<sub>L</sub>';
 $ec_lang['ps_hl_check']='Verificarea pierderii de sarcină';
 $ec_lang['ps_hnet']='Sarcina netă, H<sub>net</sub>';
 $ec_lang['ps_power']='Putere produsă, P';
-$ec_lang['ps_annual_kwh']='Energie anuală la 100% capacitate (kWh/an)';
-$ec_lang['ps_vel_ok']='1&ndash;3 m/s &mdash; în intervalul țintă &#x2713;';
-$ec_lang['ps_vel_low']='sub 1 m/s &mdash; măriți diametrul &#x26a0;';
-$ec_lang['ps_vel_high']='peste 3 m/s &mdash; reduceți diametrul &#x26a0;';
-$ec_lang['ps_hl_ok']='în limita țintei de 10% &#x2713;';
-$ec_lang['ps_hl_warn']='depășește ținta de 10% &mdash; luați în calcul o conductă mai mare &#x26a0;';
-$ec_lang['ps_hl_bad']='depășește 20% &mdash; redimensionați conducta';
+$ec_lang['ps_annual_kwh']='Energie anuală la 100% capacitate';
+$ec_lang['ps_vel_ok']='1–3 m/s — în intervalul țintă ✓';
+$ec_lang['ps_vel_low']='sub 1 m/s — măriți diametrul ⚠';
+$ec_lang['ps_vel_high']='peste 3 m/s — reduceți diametrul ⚠';
+$ec_lang['ps_hl_ok']='în limita țintei de 10% ✓';
+$ec_lang['ps_hl_warn']='depășește ținta de 10% — luați în calcul o conductă mai mare ⚠';
+$ec_lang['ps_hl_bad']='depășește 20% — redimensionați conducta';
 $ec_lang['ps_notes_1_term']='Pierdere de sarcină';
 $ec_lang['ps_notes_1_def']='Pierderea totală h<sub>L</sub> = h<sub>f</sub> + h<sub>m</sub>, unde h<sub>f</sub> = f(L/D)(v&sup2;/2g) este pierderea prin frecare Darcy-Weisbach, iar h<sub>m</sub> = k<sub>m</sub>&middot;v&sup2;/2g acoperă intrarea, coturi și armături. Sarcina netă H<sub>net</sub> = H<sub>gross</sub> &minus; h<sub>L</sub>.';
 $ec_lang['ps_notes_2_term']='Viteză';

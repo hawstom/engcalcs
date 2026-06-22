@@ -41,6 +41,8 @@ $ec_lang['u_ft3']='ft^3';
 $ec_lang['u_m3']='m^3';
 $ec_lang['u_kw']='kW';
 $ec_lang['u_mw']='MW';
+$ec_lang['u_kwh_yr']='kWh/yr';
+$ec_lang['u_mwh_yr']='MWh/yr';
 $ec_lang['u_hp']='hp';
 
 // Page text
@@ -289,7 +291,7 @@ $ec_lang['mhp_head_loss']='Hasara za kichwa za bomba la maji (penstock), h<sub>L
 $ec_lang['mhp_efficiency']='Ufanisi wa mmea, &eta; (0&ndash;1)';
 $ec_lang['mhp_net_head']='Kichwa halisi, H<sub>net</sub>';
 $ec_lang['mhp_power']='Uzalishaji wa nguvu, P';
-$ec_lang['mhp_annual_kwh']='Nishati ya kila mwaka kwa uwezo wa 100% (kWh/mwaka)';
+$ec_lang['mhp_annual_kwh']='Nishati ya kila mwaka kwa uwezo wa 100%';
 $ec_lang['mhp_notes_1_term']='Mlingano wa Nguvu';
 $ec_lang['mhp_notes_1_def']='P = &eta; &times; &rho; &times; g &times; Q &times; H<sub>net</sub>, ambapo &rho; = 1000 kg/m&sup3; (maji baridi) na g = 9.806 m/s&sup2;.';
 $ec_lang['mhp_notes_2_term']='Kichwa Halisi';
@@ -319,13 +321,13 @@ $ec_lang['ps_hl']='Jumla ya upotezaji wa bomba la shinikizo, h<sub>L</sub>';
 $ec_lang['ps_hl_check']='Ukaguzi wa upotezaji wa kichwa';
 $ec_lang['ps_hnet']='Kichwa halisi, H<sub>net</sub>';
 $ec_lang['ps_power']='Nguvu inayotolewa, P';
-$ec_lang['ps_annual_kwh']='Nishati ya kila mwaka kwa uwezo wa 100% (kWh/mwaka)';
-$ec_lang['ps_vel_ok']='1&ndash;3 m/s &mdash; ndani ya lengo &#x2713;';
-$ec_lang['ps_vel_low']='chini ya 1 m/s &mdash; ongeza kipenyo &#x26a0;';
-$ec_lang['ps_vel_high']='zaidi ya 3 m/s &mdash; punguza kipenyo &#x26a0;';
-$ec_lang['ps_hl_ok']='ndani ya lengo la 10% &#x2713;';
-$ec_lang['ps_hl_warn']='inazidi lengo la 10% &mdash; fikiria bomba kubwa zaidi &#x26a0;';
-$ec_lang['ps_hl_bad']='inazidi 20% &mdash; panga upya ukubwa wa bomba';
+$ec_lang['ps_annual_kwh']='Nishati ya kila mwaka kwa uwezo wa 100%';
+$ec_lang['ps_vel_ok']='1–3 m/s — ndani ya lengo ✓';
+$ec_lang['ps_vel_low']='chini ya 1 m/s — ongeza kipenyo ⚠';
+$ec_lang['ps_vel_high']='zaidi ya 3 m/s — punguza kipenyo ⚠';
+$ec_lang['ps_hl_ok']='ndani ya lengo la 10% ✓';
+$ec_lang['ps_hl_warn']='inazidi lengo la 10% — fikiria bomba kubwa zaidi ⚠';
+$ec_lang['ps_hl_bad']='inazidi 20% — panga upya ukubwa wa bomba';
 $ec_lang['ps_notes_1_term']='Upotezaji wa Kichwa';
 $ec_lang['ps_notes_1_def']='Jumla ya upotezaji h<sub>L</sub> = h<sub>f</sub> + h<sub>m</sub>, ambapo h<sub>f</sub> = f(L/D)(v&sup2;/2g) ni upotezaji wa msuguano wa Darcy-Weisbach na h<sub>m</sub> = k<sub>m</sub>&middot;v&sup2;/2g inashughulikia mlango, mipinda na valvu. Kichwa halisi H<sub>net</sub> = H<sub>gross</sub> &minus; h<sub>L</sub>.';
 $ec_lang['ps_notes_2_term']='Kasi';

@@ -41,6 +41,8 @@ $ec_lang['u_ft3']='ft^3';
 $ec_lang['u_m3']='m^3';
 $ec_lang['u_kw']='kW';
 $ec_lang['u_mw']='MW';
+$ec_lang['u_kwh_yr']='kWh/yr';
+$ec_lang['u_mwh_yr']='MWh/yr';
 $ec_lang['u_hp']='hp';
 
 // Page text
@@ -289,7 +291,7 @@ $ec_lang['mhp_head_loss']='የውሃ ቱቦ ጭንቅ ኪሳራዎች, h<sub>L</
 $ec_lang['mhp_efficiency']='የፋብሪካ ብቃት, &eta; (0&ndash;1)';
 $ec_lang['mhp_net_head']='የተጣራ ጭንቅ, H<sub>net</sub>';
 $ec_lang['mhp_power']='የኃይል ውፅዓት, P';
-$ec_lang['mhp_annual_kwh']='በ100% አቅም ዓመታዊ ኃይል (kWh/ዓ.ም.)';
+$ec_lang['mhp_annual_kwh']='በ100% አቅም ዓመታዊ ኃይል';
 $ec_lang['mhp_notes_1_term']='የኃይል ቀመር';
 $ec_lang['mhp_notes_1_def']='P = &eta; &times; &rho; &times; g &times; Q &times; H<sub>net</sub>, &rho; = 1000 kg/m&sup3; (ንጹህ ውሃ) እና g = 9.806 m/s&sup2;.';
 $ec_lang['mhp_notes_2_term']='የተጣራ ጭንቅ';
@@ -319,13 +321,13 @@ $ec_lang['ps_hl']='ጠቅላላ የቧንቧ ጫና ኪሳራ፣ h<sub>L</sub>';
 $ec_lang['ps_hl_check']='የጫና ኪሳራ ምርመራ';
 $ec_lang['ps_hnet']='ንጹህ ጫና፣ H<sub>net</sub>';
 $ec_lang['ps_power']='የሃይል ውጤት፣ P';
-$ec_lang['ps_annual_kwh']='ከ100% አቅም ጋር ዓመታዊ ኃይል (kWh/ዓ)';
-$ec_lang['ps_vel_ok']='1&ndash;3 m/s &mdash; ዒላማ ውስጥ &#x2713;';
-$ec_lang['ps_vel_low']='ከ1 m/s በታች &mdash; ዲያሜትሩን ጨምሩ &#x26a0;';
-$ec_lang['ps_vel_high']='ከ3 m/s በላይ &mdash; ዲያሜትሩን ቀንሱ &#x26a0;';
-$ec_lang['ps_hl_ok']='ከ10% ዒላማ ውስጥ &#x2713;';
-$ec_lang['ps_hl_warn']='10% ዒላማ አልፏል &mdash; ትልቅ ቧንቧ ያስቡ &#x26a0;';
-$ec_lang['ps_hl_bad']='20% አልፏል &mdash; ቧንቧ ዳግም ስሌት ያድርጉ';
+$ec_lang['ps_annual_kwh']='ከ100% አቅም ጋር ዓመታዊ ኃይል';
+$ec_lang['ps_vel_ok']='1–3 m/s — ዒላማ ውስጥ ✓';
+$ec_lang['ps_vel_low']='ከ1 m/s በታች — ዲያሜትሩን ጨምሩ ⚠';
+$ec_lang['ps_vel_high']='ከ3 m/s በላይ — ዲያሜትሩን ቀንሱ ⚠';
+$ec_lang['ps_hl_ok']='ከ10% ዒላማ ውስጥ ✓';
+$ec_lang['ps_hl_warn']='10% ዒላማ አልፏል — ትልቅ ቧንቧ ያስቡ ⚠';
+$ec_lang['ps_hl_bad']='20% አልፏል — ቧንቧ ዳግም ስሌት ያድርጉ';
 $ec_lang['ps_notes_1_term']='ጫና ኪሳራ';
 $ec_lang['ps_notes_1_def']='ጠቅላላ ኪሳራ h<sub>L</sub> = h<sub>f</sub> + h<sub>m</sub>፤ h<sub>f</sub> = f(L/D)(v&sup2;/2g) የዳርሲ-ዋይስባክ ፍሰት ኪሳራ ነው፤ h<sub>m</sub> = k<sub>m</sub>&middot;v&sup2;/2g መግቢያ፣ ጥምዝ እና ቫልቮችን ይሸፍናል። ንጹህ ጫና H<sub>net</sub> = H<sub>gross</sub> &minus; h<sub>L</sub>.';
 $ec_lang['ps_notes_2_term']='ፍጥነት';

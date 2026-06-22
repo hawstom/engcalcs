@@ -7,6 +7,8 @@ $ec_lang['u_ft3']="ft^3";
 $ec_lang['u_m3']="m^3";
 $ec_lang['u_kw']='kW';
 $ec_lang['u_mw']='MW';
+$ec_lang['u_kwh_yr']='kWh/yr';
+$ec_lang['u_mwh_yr']='MWh/yr';
 $ec_lang['u_hp']='hp';
 
 // Page text
@@ -290,7 +292,7 @@ $ec_lang['mhp_head_loss']='Губици пада у доводном цевов�
 $ec_lang['mhp_efficiency']='Искористивост постројења, &eta; (0&ndash;1)';
 $ec_lang['mhp_net_head']='Нето пад, H<sub>net</sub>';
 $ec_lang['mhp_power']='Излазна снага, P';
-$ec_lang['mhp_annual_kwh']='Годишња енергија при 100% капацитету (kWh/год)';
+$ec_lang['mhp_annual_kwh']='Годишња енергија при 100% капацитету';
 $ec_lang['mhp_notes_1_term']='Jednadžba snage';
 $ec_lang['mhp_notes_1_def']='P = &eta; &times; &rho; &times; g &times; Q &times; H<sub>net</sub>, где &rho; = 1000 kg/m&sup3; (слатка вода) и g = 9,806 m/s&sup2;.';
 $ec_lang['mhp_notes_2_term']='Нето пад';
@@ -320,13 +322,13 @@ $ec_lang['ps_hl']='Укупни губитак цевовода, h<sub>L</sub>';
 $ec_lang['ps_hl_check']='Провера губитка напора';
 $ec_lang['ps_hnet']='Нето напор, H<sub>net</sub>';
 $ec_lang['ps_power']='Излазна снага, P';
-$ec_lang['ps_annual_kwh']='Годишња енергија при 100% капацитета (кВтх/год)';
-$ec_lang['ps_vel_ok']='1&ndash;3 м/с &mdash; у циљном опсегу &#x2713;';
-$ec_lang['ps_vel_low']='испод 1 м/с &mdash; повећајте пречник &#x26a0;';
-$ec_lang['ps_vel_high']='изнад 3 м/с &mdash; смањите пречник &#x26a0;';
-$ec_lang['ps_hl_ok']='у оквиру циља 10% &#x2713;';
-$ec_lang['ps_hl_warn']='прелази циљ 10% &mdash; размотрите шири цевовод &#x26a0;';
-$ec_lang['ps_hl_bad']='прелази 20% &mdash; редимензионишите цевовод';
+$ec_lang['ps_annual_kwh']='Годишња енергија при 100% капацитета';
+$ec_lang['ps_vel_ok']='1–3 м/с — у циљном опсегу ✓';
+$ec_lang['ps_vel_low']='испод 1 м/с — повећајте пречник ⚠';
+$ec_lang['ps_vel_high']='изнад 3 м/с — смањите пречник ⚠';
+$ec_lang['ps_hl_ok']='у оквиру циља 10% ✓';
+$ec_lang['ps_hl_warn']='прелази циљ 10% — размотрите шири цевовод ⚠';
+$ec_lang['ps_hl_bad']='прелази 20% — редимензионишите цевовод';
 $ec_lang['ps_notes_1_term']='Губитак напора';
 $ec_lang['ps_notes_1_def']='Укупни губитак h<sub>L</sub> = h<sub>f</sub> + h<sub>m</sub>, где је h<sub>f</sub> = f(L/D)(v&sup2;/2g) губитак трењем по Дарси-Вајсбаху, а h<sub>m</sub> = k<sub>m</sub>&middot;v&sup2;/2g обухвата улаз, лукове и вентиле. Нето напор H<sub>net</sub> = H<sub>gross</sub> &minus; h<sub>L</sub>.';
 $ec_lang['ps_notes_2_term']='Брзина';

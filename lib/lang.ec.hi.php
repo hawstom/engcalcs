@@ -41,6 +41,8 @@ $ec_lang['u_ft3']='ft^3';
 $ec_lang['u_m3']='मी^3';
 $ec_lang['u_kw']='kW';
 $ec_lang['u_mw']='MW';
+$ec_lang['u_kwh_yr']='kWh/yr';
+$ec_lang['u_mwh_yr']='MWh/yr';
 $ec_lang['u_hp']='hp';
 
 // Page text
@@ -289,7 +291,7 @@ $ec_lang['mhp_head_loss']='पेनस्टॉक शीर्ष हानि
 $ec_lang['mhp_efficiency']='संयंत्र दक्षता, &eta; (0&ndash;1)';
 $ec_lang['mhp_net_head']='शुद्ध शीर्ष, H<sub>net</sub>';
 $ec_lang['mhp_power']='शक्ति उत्पादन, P';
-$ec_lang['mhp_annual_kwh']='100% क्षमता पर वार्षिक ऊर्जा (kWh/वर्ष)';
+$ec_lang['mhp_annual_kwh']='100% क्षमता पर वार्षिक ऊर्जा';
 $ec_lang['mhp_notes_1_term']='शक्ति समीकरण';
 $ec_lang['mhp_notes_1_def']='P = &eta; &times; &rho; &times; g &times; Q &times; H<sub>net</sub>, जहाँ &rho; = 1000 kg/m&sup3; (मीठा पानी) और g = 9.806 m/s&sup2;.';
 $ec_lang['mhp_notes_2_term']='शुद्ध शीर्ष';
@@ -319,13 +321,13 @@ $ec_lang['ps_hl']='कुल पेनस्टॉक हानि, h<sub>L</sub
 $ec_lang['ps_hl_check']='हेड हानि जाँच';
 $ec_lang['ps_hnet']='नेट हेड, H<sub>net</sub>';
 $ec_lang['ps_power']='शक्ति उत्पादन, P';
-$ec_lang['ps_annual_kwh']='100% क्षमता पर वार्षिक ऊर्जा (kWh/वर्ष)';
-$ec_lang['ps_vel_ok']='1&ndash;3 m/s &mdash; लक्ष्य सीमा में &#x2713;';
-$ec_lang['ps_vel_low']='1 m/s से कम &mdash; व्यास बढ़ाएँ &#x26a0;';
-$ec_lang['ps_vel_high']='3 m/s से अधिक &mdash; व्यास घटाएँ &#x26a0;';
-$ec_lang['ps_hl_ok']='10% लक्ष्य के भीतर &#x2713;';
-$ec_lang['ps_hl_warn']='10% लक्ष्य से अधिक &mdash; बड़े पाइप पर विचार करें &#x26a0;';
-$ec_lang['ps_hl_bad']='20% से अधिक &mdash; पाइप का पुनः आकार निर्धारण करें';
+$ec_lang['ps_annual_kwh']='100% क्षमता पर वार्षिक ऊर्जा';
+$ec_lang['ps_vel_ok']='1–3 m/s — लक्ष्य सीमा में ✓';
+$ec_lang['ps_vel_low']='1 m/s से कम — व्यास बढ़ाएँ ⚠';
+$ec_lang['ps_vel_high']='3 m/s से अधिक — व्यास घटाएँ ⚠';
+$ec_lang['ps_hl_ok']='10% लक्ष्य के भीतर ✓';
+$ec_lang['ps_hl_warn']='10% लक्ष्य से अधिक — बड़े पाइप पर विचार करें ⚠';
+$ec_lang['ps_hl_bad']='20% से अधिक — पाइप का पुनः आकार निर्धारण करें';
 $ec_lang['ps_notes_1_term']='हेड हानि';
 $ec_lang['ps_notes_1_def']='कुल हानि h<sub>L</sub> = h<sub>f</sub> + h<sub>m</sub>, जहाँ h<sub>f</sub> = f(L/D)(v&sup2;/2g) डार्सी-वाइसबैक घर्षण हानि है और h<sub>m</sub> = k<sub>m</sub>&middot;v&sup2;/2g प्रवेश, मोड़ और वाल्व को कवर करता है। नेट हेड H<sub>net</sub> = H<sub>gross</sub> &minus; h<sub>L</sub>.';
 $ec_lang['ps_notes_2_term']='वेग';

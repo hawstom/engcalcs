@@ -23,13 +23,14 @@ echoCalculatorForm(
 	Array(
 		Array('name' => 'hnet',       'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mhp_net_head']),
 		Array('name' => 'power',      'units' => Array('kw','mw','hp'),     'label' => $ec_lang['mhp_power']),
-		Array('name' => 'annual_kwh', 'units' => NULL,                      'label' => $ec_lang['mhp_annual_kwh']),
+		Array('name' => 'annual_kwh', 'units' => Array('kwh_yr','mwh_yr'),   'label' => $ec_lang['mhp_annual_kwh']),
 	)
 );
 ?>
 
 <div id="sketch" style="margin-top:1em; max-width:380px;"></div>
 
+<h2><?=$ec_lang['ws_notes_heading']?></h2>
 <dl>
 	<dt><?=$ec_lang['mhp_notes_1_term']?></dt><dd><?=$ec_lang['mhp_notes_1_def']?></dd>
 	<dt><?=$ec_lang['mhp_notes_2_term']?></dt><dd><?=$ec_lang['mhp_notes_2_def']?></dd>

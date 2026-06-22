@@ -40,6 +40,8 @@ $ec_lang['u_ft3']="ft^3";
 $ec_lang['u_m3']="м^3";
 $ec_lang['u_kw']='kW';
 $ec_lang['u_mw']='MW';
+$ec_lang['u_kwh_yr']='kWh/yr';
+$ec_lang['u_mwh_yr']='MWh/yr';
 $ec_lang['u_hp']='hp';
 
 // Page text
@@ -286,7 +288,7 @@ $ec_lang['mhp_head_loss']='Потери напора в пенстоке, h<sub>
 $ec_lang['mhp_efficiency']='КПД установки, &eta; (0&ndash;1)';
 $ec_lang['mhp_net_head']='Расчётный напор, H<sub>net</sub>';
 $ec_lang['mhp_power']='Мощность, P';
-$ec_lang['mhp_annual_kwh']='Годовая выработка при 100% загрузке (кВт·ч/год)';
+$ec_lang['mhp_annual_kwh']='Годовая выработка при 100% загрузке';
 $ec_lang['mhp_notes_1_term']='Формула мощности';
 $ec_lang['mhp_notes_1_def']='P = &eta; &times; &rho; &times; g &times; Q &times; H<sub>net</sub>, где &rho; = 1000 кг/м&sup3; (пресная вода) и g = 9,806 м/с&sup2;.';
 $ec_lang['mhp_notes_2_term']='Расчётный напор';
@@ -316,13 +318,13 @@ $ec_lang['ps_hl']='Суммарные потери в пенстоке, h<sub>L<
 $ec_lang['ps_hl_check']='Проверка потерь напора';
 $ec_lang['ps_hnet']='Нетто-напор, H<sub>net</sub>';
 $ec_lang['ps_power']='Выходная мощность, P';
-$ec_lang['ps_annual_kwh']='Годовая выработка при 100% загрузке (кВт·ч/год)';
-$ec_lang['ps_vel_ok']='1&ndash;3 м/с &mdash; в пределах нормы &#x2713;';
-$ec_lang['ps_vel_low']='менее 1 м/с &mdash; увеличьте диаметр &#x26a0;';
-$ec_lang['ps_vel_high']='более 3 м/с &mdash; уменьшите диаметр &#x26a0;';
-$ec_lang['ps_hl_ok']='в пределах 10% от нормы &#x2713;';
-$ec_lang['ps_hl_warn']='превышает 10% &mdash; рассмотрите трубу большего диаметра &#x26a0;';
-$ec_lang['ps_hl_bad']='превышает 20% &mdash; пересчитайте трубу';
+$ec_lang['ps_annual_kwh']='Годовая выработка при 100% загрузке';
+$ec_lang['ps_vel_ok']='1–3 м/с — в пределах нормы ✓';
+$ec_lang['ps_vel_low']='менее 1 м/с — увеличьте диаметр ⚠';
+$ec_lang['ps_vel_high']='более 3 м/с — уменьшите диаметр ⚠';
+$ec_lang['ps_hl_ok']='в пределах 10% от нормы ✓';
+$ec_lang['ps_hl_warn']='превышает 10% — рассмотрите трубу большего диаметра ⚠';
+$ec_lang['ps_hl_bad']='превышает 20% — пересчитайте трубу';
 $ec_lang['ps_notes_1_term']='Потери напора';
 $ec_lang['ps_notes_1_def']='Суммарные потери h<sub>L</sub> = h<sub>f</sub> + h<sub>m</sub>, где h<sub>f</sub> = f(L/D)(v&sup2;/2g) — потери на трение по Дарси–Вейсбаху, а h<sub>m</sub> = k<sub>m</sub>&middot;v&sup2;/2g учитывает вход, повороты и задвижки. Нетто-напор H<sub>net</sub> = H<sub>gross</sub> &minus; h<sub>L</sub>.';
 $ec_lang['ps_notes_2_term']='Скорость';

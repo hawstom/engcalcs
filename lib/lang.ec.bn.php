@@ -40,6 +40,8 @@ $ec_lang['u_ft3']="ft^3";
 $ec_lang['u_m3']="m^3";
 $ec_lang['u_kw']='kW';
 $ec_lang['u_mw']='MW';
+$ec_lang['u_kwh_yr']='kWh/yr';
+$ec_lang['u_mwh_yr']='MWh/yr';
 $ec_lang['u_hp']='hp';
 
 // Page text
@@ -286,7 +288,7 @@ $ec_lang['mhp_head_loss']='পেনস্টক চাপ শীর্ষ ক�
 $ec_lang['mhp_efficiency']='প্ল্যান্ট দক্ষতা, &eta; (0&ndash;1)';
 $ec_lang['mhp_net_head']='নিট চাপ শীর্ষ, H<sub>net</sub>';
 $ec_lang['mhp_power']='বিদ্যুৎ উৎপাদন, P';
-$ec_lang['mhp_annual_kwh']='100% ক্ষমতায় বার্ষিক শক্তি (kWh/বছর)';
+$ec_lang['mhp_annual_kwh']='100% ক্ষমতায় বার্ষিক শক্তি';
 $ec_lang['mhp_notes_1_term']='বিদ্যুৎ সমীকরণ';
 $ec_lang['mhp_notes_1_def']='P = &eta; &times; &rho; &times; g &times; Q &times; H<sub>net</sub>, যেখানে &rho; = 1000 kg/m&sup3; (মিষ্টি পানি) এবং g = 9.806 m/s&sup2;.';
 $ec_lang['mhp_notes_2_term']='নিট চাপ শীর্ষ';
@@ -316,13 +318,13 @@ $ec_lang['ps_hl']='মোট পেনস্টক ক্ষতি, h<sub>L</sub
 $ec_lang['ps_hl_check']='মাথার ক্ষতি পরীক্ষা';
 $ec_lang['ps_hnet']='নেট মাথা, H<sub>net</sub>';
 $ec_lang['ps_power']='শক্তি আউটপুট, P';
-$ec_lang['ps_annual_kwh']='100% ক্ষমতায় বার্ষিক শক্তি (kWh/বছর)';
-$ec_lang['ps_vel_ok']='1&ndash;3 m/s &mdash; লক্ষ্যমাত্রার মধ্যে &#x2713;';
-$ec_lang['ps_vel_low']='1 m/s এর নিচে &mdash; ব্যাস বাড়ান &#x26a0;';
-$ec_lang['ps_vel_high']='3 m/s এর উপরে &mdash; ব্যাস কমান &#x26a0;';
-$ec_lang['ps_hl_ok']='10% লক্ষ্যমাত্রার মধ্যে &#x2713;';
-$ec_lang['ps_hl_warn']='10% লক্ষ্যমাত্রা ছাড়িয়েছে &mdash; বড় পাইপ বিবেচনা করুন &#x26a0;';
-$ec_lang['ps_hl_bad']='20% ছাড়িয়েছে &mdash; পাইপ পুনরায় আকার দিন';
+$ec_lang['ps_annual_kwh']='100% ক্ষমতায় বার্ষিক শক্তি';
+$ec_lang['ps_vel_ok']='1–3 m/s — লক্ষ্যমাত্রার মধ্যে ✓';
+$ec_lang['ps_vel_low']='1 m/s এর নিচে — ব্যাস বাড়ান ⚠';
+$ec_lang['ps_vel_high']='3 m/s এর উপরে — ব্যাস কমান ⚠';
+$ec_lang['ps_hl_ok']='10% লক্ষ্যমাত্রার মধ্যে ✓';
+$ec_lang['ps_hl_warn']='10% লক্ষ্যমাত্রা ছাড়িয়েছে — বড় পাইপ বিবেচনা করুন ⚠';
+$ec_lang['ps_hl_bad']='20% ছাড়িয়েছে — পাইপ পুনরায় আকার দিন';
 $ec_lang['ps_notes_1_term']='মাথার ক্ষতি';
 $ec_lang['ps_notes_1_def']='মোট ক্ষতি h<sub>L</sub> = h<sub>f</sub> + h<sub>m</sub>, যেখানে h<sub>f</sub> = f(L/D)(v&sup2;/2g) ডার্সি-ওয়েইসবাক ঘর্ষণ ক্ষতি এবং h<sub>m</sub> = k<sub>m</sub>&middot;v&sup2;/2g প্রবেশ, বাঁক এবং ভালভ কভার করে। নেট মাথা H<sub>net</sub> = H<sub>gross</sub> &minus; h<sub>L</sub>.';
 $ec_lang['ps_notes_2_term']='বেগ';

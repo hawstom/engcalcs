@@ -41,6 +41,8 @@ $ec_lang['u_ft3']='ft^3';
 $ec_lang['u_m3']='م^3';
 $ec_lang['u_kw']='kW';
 $ec_lang['u_mw']='MW';
+$ec_lang['u_kwh_yr']='kWh/yr';
+$ec_lang['u_mwh_yr']='MWh/yr';
 $ec_lang['u_hp']='hp';
 
 // Page text
@@ -290,7 +292,7 @@ $ec_lang['mhp_head_loss']='فاقد الرأس في أنبوب الضغط، h<su
 $ec_lang['mhp_efficiency']='كفاءة المنشأة، &eta; (0&ndash;1)';
 $ec_lang['mhp_net_head']='الرأس الصافي، H<sub>net</sub>';
 $ec_lang['mhp_power']='القدرة المنتجة، P';
-$ec_lang['mhp_annual_kwh']='الطاقة السنوية عند طاقة 100% (كيلوواط·ساعة/سنة)';
+$ec_lang['mhp_annual_kwh']='الطاقة السنوية عند طاقة 100%';
 $ec_lang['mhp_notes_1_term']='معادلة القدرة';
 $ec_lang['mhp_notes_1_def']='P = &eta; &times; &rho; &times; g &times; Q &times; H<sub>net</sub>، حيث &rho; = 1000 كغ/م&sup3; (ماء عذب) و g = 9.806 م/ث&sup2;.';
 $ec_lang['mhp_notes_2_term']='الرأس الصافي';
@@ -320,13 +322,13 @@ $ec_lang['ps_hl']='إجمالي فقد أنبوب الضغط، h<sub>L</sub>';
 $ec_lang['ps_hl_check']='فحص فقد الضغط';
 $ec_lang['ps_hnet']='الرأس الصافي، H<sub>net</sub>';
 $ec_lang['ps_power']='القدرة المنتجة، P';
-$ec_lang['ps_annual_kwh']='الطاقة السنوية بالطاقة الكاملة (كيلوواط ساعة/سنة)';
-$ec_lang['ps_vel_ok']='1&ndash;3 م/ث &mdash; ضمن الهدف &#x2713;';
-$ec_lang['ps_vel_low']='أقل من 1 م/ث &mdash; زيادة القطر &#x26a0;';
-$ec_lang['ps_vel_high']='أكثر من 3 م/ث &mdash; تقليل القطر &#x26a0;';
-$ec_lang['ps_hl_ok']='ضمن هدف 10% &#x2713;';
-$ec_lang['ps_hl_warn']='يتجاوز هدف 10% &mdash; يُنصح بأنبوب أكبر &#x26a0;';
-$ec_lang['ps_hl_bad']='يتجاوز 20% &mdash; يلزم إعادة التصميم';
+$ec_lang['ps_annual_kwh']='الطاقة السنوية بالطاقة الكاملة';
+$ec_lang['ps_vel_ok']='1–3 م/ث — ضمن الهدف ✓';
+$ec_lang['ps_vel_low']='أقل من 1 م/ث — زيادة القطر ⚠';
+$ec_lang['ps_vel_high']='أكثر من 3 م/ث — تقليل القطر ⚠';
+$ec_lang['ps_hl_ok']='ضمن هدف 10% ✓';
+$ec_lang['ps_hl_warn']='يتجاوز هدف 10% — يُنصح بأنبوب أكبر ⚠';
+$ec_lang['ps_hl_bad']='يتجاوز 20% — يلزم إعادة التصميم';
 $ec_lang['ps_notes_1_term']='فقد الضغط';
 $ec_lang['ps_notes_1_def']='إجمالي فقد أنبوب الضغط h<sub>L</sub> = h<sub>f</sub> + h<sub>m</sub>، حيث h<sub>f</sub> = f(L/D)(v&sup2;/2g) هو فقد الاحتكاك وفق داركي-وايسباخ وh<sub>m</sub> = k<sub>m</sub>&middot;v&sup2;/2g يغطي مدخل الأنبوب والانحناءات والصمامات. الرأس الصافي H<sub>net</sub> = H<sub>gross</sub> &minus; h<sub>L</sub>.';
 $ec_lang['ps_notes_2_term']='السرعة';

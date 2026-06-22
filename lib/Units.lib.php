@@ -61,3 +61,6 @@ $ec_units['depthPercent']=100;
 $ec_units['kw']=0.001;
 $ec_units['mw']=0.000001;
 $ec_units['hp']=0.001341;
+
+$ec_units['kwh_yr']=1.0;
+$ec_units['mwh_yr']=0.001;

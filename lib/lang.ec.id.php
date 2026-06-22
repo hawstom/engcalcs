@@ -40,6 +40,8 @@ $ec_lang['u_ft3']="ft^3";
 $ec_lang['u_m3']="m^3";
 $ec_lang['u_kw']='kW';
 $ec_lang['u_mw']='MW';
+$ec_lang['u_kwh_yr']='kWh/yr';
+$ec_lang['u_mwh_yr']='MWh/yr';
 $ec_lang['u_hp']='hp';
 
 // Page text
@@ -286,7 +288,7 @@ $ec_lang['mhp_head_loss']='Kehilangan tinggi tekan pipa penstock, h<sub>L</sub>'
 $ec_lang['mhp_efficiency']='Efisiensi instalasi, &eta; (0&ndash;1)';
 $ec_lang['mhp_net_head']='Tinggi tekan neto, H<sub>net</sub>';
 $ec_lang['mhp_power']='Daya keluaran, P';
-$ec_lang['mhp_annual_kwh']='Energi tahunan pada kapasitas 100% (kWh/thn)';
+$ec_lang['mhp_annual_kwh']='Energi tahunan pada kapasitas 100%';
 $ec_lang['mhp_notes_1_term']='Persamaan Daya';
 $ec_lang['mhp_notes_1_def']='P = &eta; &times; &rho; &times; g &times; Q &times; H<sub>net</sub>, dengan &rho; = 1000 kg/m&sup3; (air tawar) dan g = 9,806 m/s&sup2;.';
 $ec_lang['mhp_notes_2_term']='Tinggi Tekan Neto';
@@ -316,13 +318,13 @@ $ec_lang['ps_hl']='Total kehilangan tinggi penstock, h<sub>L</sub>';
 $ec_lang['ps_hl_check']='Pemeriksaan kehilangan tinggi';
 $ec_lang['ps_hnet']='Tinggi neto, H<sub>net</sub>';
 $ec_lang['ps_power']='Daya keluaran, P';
-$ec_lang['ps_annual_kwh']='Energi tahunan pada kapasitas 100% (kWh/tahun)';
-$ec_lang['ps_vel_ok']='1&ndash;3 m/s &mdash; dalam rentang target &#x2713;';
-$ec_lang['ps_vel_low']='di bawah 1 m/s &mdash; tambah diameter &#x26a0;';
-$ec_lang['ps_vel_high']='di atas 3 m/s &mdash; kurangi diameter &#x26a0;';
-$ec_lang['ps_hl_ok']='dalam target 10% &#x2713;';
-$ec_lang['ps_hl_warn']='melebihi target 10% &mdash; pertimbangkan pipa lebih besar &#x26a0;';
-$ec_lang['ps_hl_bad']='melebihi 20% &mdash; ubah ukuran pipa';
+$ec_lang['ps_annual_kwh']='Energi tahunan pada kapasitas 100%';
+$ec_lang['ps_vel_ok']='1–3 m/s — dalam rentang target ✓';
+$ec_lang['ps_vel_low']='di bawah 1 m/s — tambah diameter ⚠';
+$ec_lang['ps_vel_high']='di atas 3 m/s — kurangi diameter ⚠';
+$ec_lang['ps_hl_ok']='dalam target 10% ✓';
+$ec_lang['ps_hl_warn']='melebihi target 10% — pertimbangkan pipa lebih besar ⚠';
+$ec_lang['ps_hl_bad']='melebihi 20% — ubah ukuran pipa';
 $ec_lang['ps_notes_1_term']='Kehilangan Tinggi';
 $ec_lang['ps_notes_1_def']='Total kehilangan h<sub>L</sub> = h<sub>f</sub> + h<sub>m</sub>, di mana h<sub>f</sub> = f(L/D)(v&sup2;/2g) adalah kehilangan gesekan Darcy-Weisbach dan h<sub>m</sub> = k<sub>m</sub>&middot;v&sup2;/2g mencakup inlet, belokan, dan katup. Tinggi neto H<sub>net</sub> = H<sub>gross</sub> &minus; h<sub>L</sub>.';
 $ec_lang['ps_notes_2_term']='Kecepatan';

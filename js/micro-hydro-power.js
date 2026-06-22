@@ -20,7 +20,7 @@ EngCalcs.pageCalculator = function(objForm) {
 
 	this.writeFormResult(objForm, 'hnet',       precision = 3, hasUnits = true);
 	this.writeFormResult(objForm, 'power',      precision = 2, hasUnits = true);
-	this.writeFormResult(objForm, 'annual_kwh', precision = 0, hasUnits = false);
+	this.writeFormResult(objForm, 'annual_kwh', precision = 1, hasUnits = true);
 
 	this.mhpDrawSketch();
 };
