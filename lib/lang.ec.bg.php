@@ -51,7 +51,7 @@ $ec_lang['menu_brand']='HawsEDC Калкулатори';
 $ec_lang['menu_main_list']='Списък с калкулатори'; 
 $ec_lang['menu_main_hydraulics']='Хидравлика'; 
 $ec_lang['menu_main_language']='Език';
-$ec_lang['template_welcome']='&gt;&gt; Оставете страховете си на прага; тук любовта е нашият език. Насладете се и на <a target="_blank" href="https://hawsedc.com/download.php">безплатните инструменти HawsEDC за AutoCAD.</a> &lt;&lt;';
+$ec_lang['template_welcome']='&gt;&gt; Оставете страховете си на прага; тук любовта е нашият език. Не съсипвате всичко. Насладете се и на <a target="_blank" href="https://hawsedc.com/download.php">безплатните инструменти HawsEDC за AutoCAD.</a> &lt;&lt;';
 $ec_lang['template_translation_help']='Имате ли страхотна идея за калкулатор, който да добавите тук?  Можете ли да ми помогнете с превода, програмирането или хостинга за тези калкулатори?';
 $ec_lang['template_feedback']='Моля споделете мнението си под формата на предложение или похвала. Този безплатен калкулатор надмина ли всичките ви очаквания?'; 
 $ec_lang['template_printable_title']='Заглавие за принтиране'; 

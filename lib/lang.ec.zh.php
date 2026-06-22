@@ -49,7 +49,7 @@ $ec_lang['menu_brand']='HawsEDC 计算器';
 $ec_lang['menu_main_list']='计算器列表';
 $ec_lang['menu_main_hydraulics']='水力学';
 $ec_lang['menu_main_language']='语言';
-$ec_lang['template_welcome']='&gt;&gt; 把恐惧留在门外；这里说爱的语言。同时享用免费的 <a target="_blank" href="https://hawsedc.com/download.php">HawsEDC AutoCAD 工具。</a> &lt;&lt;';
+$ec_lang['template_welcome']='&gt;&gt; 把恐惧留在门外；这里说爱的语言。你没有毁掉一切。同时享用免费的 <a target="_blank" href="https://hawsedc.com/download.php">HawsEDC AutoCAD 工具。</a> &lt;&lt;';
 $ec_lang['template_translation_help']='您是否有关于在此处添加计算器的绝妙构想？  您能帮助我改进翻译、编程或托管这些计算器吗？  ';
 $ec_lang['template_feedback']='请给我们有价值的建议或嘉许的话。此免费计算器是否在每个方面都超出您的预期？';
 $ec_lang['template_printable_title']='可打印标题';

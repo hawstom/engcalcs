@@ -52,7 +52,7 @@ $ec_lang['menu_brand']='Calculateurs HawsEDC';
 $ec_lang['menu_main_list']='Liste des calculateurs';
 $ec_lang['menu_main_hydraulics']='Hydraulique';
 $ec_lang['menu_main_language']='Langue';
-$ec_lang['template_welcome']='&gt;&gt; Laissez vos peurs à la porte; l\'amour est parlé ici. Profitez également des <a target="_blank" href="https://hawsedc.com/download.php">outils AutoCAD gratuits HawsEDC</a>. &lt;&lt;';
+$ec_lang['template_welcome']='&gt;&gt; Laissez vos peurs à la porte; l\'amour est parlé ici. Vous ne ruinez pas tout. Profitez également des <a target="_blank" href="https://hawsedc.com/download.php">outils AutoCAD gratuits HawsEDC</a>. &lt;&lt;';
 $ec_lang['template_translation_help']="Avez-vous une grande vision pour une calculatrice à ajouter ici ?  Pouvez-vous m'aider à traduire ce calculateur dans votre langue ou l'héberger sur votre site web?";
 $ec_lang['template_feedback']="Donnez-nous vos précieux commentaires ou éloges. Ce calculateur gratuit a-t-il dépassé toutes vos attentes?";
 $ec_lang['template_printable_title']='Titre imprimable';

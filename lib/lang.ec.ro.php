@@ -134,7 +134,7 @@ $ec_lang['menu_brand']='Calculatoare HawsEDC';
 $ec_lang['menu_main_list']='Listă de calculatoare';
 $ec_lang['menu_main_hydraulics']='Hidraulică';
 $ec_lang['menu_main_language']='Limbă';
-$ec_lang['template_welcome']='&gt;&gt; Lasă temerile la ușă; dragostea se vorbește aici. Bucurați-vă și de <a target="_blank" href="https://hawsedc.com/download.php">instrumentele gratuite HawsEDC AutoCAD</a>. &lt;&lt;';
+$ec_lang['template_welcome']='&gt;&gt; Lasă temerile la ușă; dragostea se vorbește aici. Nu stricați totul. Bucurați-vă și de <a target="_blank" href="https://hawsedc.com/download.php">instrumentele gratuite HawsEDC AutoCAD</a>. &lt;&lt;';
 $ec_lang['template_translation_help']='Aveți o viziune excelentă pentru un calculator de adăugat aici?  Mă puteți ajuta să îmbunătățesc traducerile, să programez sau să găzduiesc aceste calculatoare?  ';
 $ec_lang['template_feedback']='Vă rugăm să ne transmiteți sugestiile sau aprecierile dumneavoastră valoroase. Acest calculator gratuit v-a depășit așteptările în orice privință?';
 $ec_lang['template_printable_title']='Titlu tipărit';

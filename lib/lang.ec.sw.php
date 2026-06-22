@@ -52,7 +52,7 @@ $ec_lang['menu_brand']='Vikokotoo vya HawsEDC';
 $ec_lang['menu_main_list']='Orodha ya Vikokotoo';
 $ec_lang['menu_main_hydraulics']='Majimajii';
 $ec_lang['menu_main_language']='Lugha';
-$ec_lang['template_welcome']='&gt;&gt; Acha wasiwasi wako mlangoni; hapa upendo unasemwa. Furahia <a target="_blank" href="https://hawsedc.com/download.php">zana za bure za HawsEDC AutoCAD</a> pia. &lt;&lt;';
+$ec_lang['template_welcome']='&gt;&gt; Acha wasiwasi wako mlangoni; hapa upendo unasemwa. Huharibu kila kitu. Furahia <a target="_blank" href="https://hawsedc.com/download.php">zana za bure za HawsEDC AutoCAD</a> pia. &lt;&lt;';
 $ec_lang['template_translation_help']='Je, una wazo zuri la kikokotoo cha kuongeza hapa? Je, unaweza kunisaidia kuboresha tafsiri, kupanga programu, au kuweka vikokotoo hivi?  ';
 $ec_lang['template_feedback']='Tafadhali tupe maoni yako ya thamani au sifa. Je, kikokotoo hiki cha bure kilivuka matarajio yako kwa kila njia?';
 $ec_lang['template_printable_title']='Kichwa cha Kuchapishwa';
