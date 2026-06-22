@@ -179,6 +179,13 @@ $all_language_settings['es']=array(
 'TITLE_WORDS'=>array(),
 );
 
+//-- settings for swahili
+$all_language_settings['sw']=array(
+'QUALITY'=>'0.9',
+'LANGNAME'=>'Kiswahili',
+'TITLE_WORDS'=>array(),
+);
+
 //-- settings for turkish
 $all_language_settings['tr']=array(
 'QUALITY'=>'0.9',
