@@ -133,7 +133,7 @@ $ec_lang['menu_brand']='Calculatoare HawsEDC';
 $ec_lang['menu_main_list']='Listă de calculatoare';
 $ec_lang['menu_main_hydraulics']='Hidraulică';
 $ec_lang['menu_main_language']='Limbă';
-$ec_lang['template_welcome']='&gt;&gt; Lasă temerile la ușă; dragostea se vorbește aici. Bucurați-vă și de <a href="https://hawsedc.com/download.php">instrumentele gratuite HawsEDC AutoCAD</a>. &lt;&lt;';
+$ec_lang['template_welcome']='&gt;&gt; Lasă temerile la ușă; dragostea se vorbește aici. Bucurați-vă și de <a target="_blank" href="https://hawsedc.com/download.php">instrumentele gratuite HawsEDC AutoCAD</a>. &lt;&lt;';
 $ec_lang['template_translation_help']='Aveți o viziune excelentă pentru un calculator de adăugat aici?  Mă puteți ajuta să îmbunătățesc traducerile, să programez sau să găzduiesc aceste calculatoare?  ';
 $ec_lang['template_feedback']='Vă rugăm să ne transmiteți sugestiile sau aprecierile dumneavoastră valoroase. Acest calculator gratuit v-a depășit așteptările în orice privință?';
 $ec_lang['template_printable_title']='Titlu tipărit';
@@ -202,7 +202,7 @@ $ec_lang['mpf_pipe_area']='Aria conductei, a0';
 $ec_lang['mpf_area_ratio']='Arie relativă, a/a0';
 $ec_lang['mpf_full_flow']='Debit la plin, Q0';
 $ec_lang['mpf_full_flow_ratio']='Raport față de debitul la plin, Q/Q0';
-$ec_lang['mpf_note_1']='<dl><dt>Acesta este debitul și adâncimea în interiorul unei conducte <em>infinit lungi</em>.</dt><dd>Introducerea debitului în conductă poate necesita o adâncime a apei din amonte semnificativ mai mare. Adăugați cel puțin de 1,5 ori sarcina de viteză pentru a obține adâncimea din amonte sau <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">consultați tutorialul meu de 2 minute</a> pentru calculele standard ale nivelului din amonte ale podețelor folosind HY-8.</dd>';
+$ec_lang['mpf_note_1']='<dl><dt>Acesta este debitul și adâncimea în interiorul unei conducte <em>infinit lungi</em>.</dt><dd>Introducerea debitului în conductă poate necesita o adâncime a apei din amonte semnificativ mai mare. Adăugați cel puțin de 1,5 ori sarcina de viteză pentru a obține adâncimea din amonte sau <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">consultați tutorialul meu de 2 minute</a> pentru calculele standard ale nivelului din amonte ale podețelor folosind HY-8.</dd>';
 $ec_lang['mpf_spreadheet_notice']='Consultați versiunea de calcul tabelar a acestui calculator';
 // Manning Pipe Head Loss
 $ec_lang['mphl_main_menu']='Manning Pierdere de Sarcină Conductă';
@@ -218,7 +218,7 @@ $ec_lang['mphl_total_loss']='Pierdere totală, H<sub>l</sub>';
 $ec_lang['mphl_egl_1']='EGL aval';
 $ec_lang['mphl_egl_2']='EGL amonte';
 $ec_lang['mphl_hgl_2']='HGL amonte în conductă ' . $ec_lang['mpf_see_notes'];
-$ec_lang['mphl_note_1']='<dl><dt>Pentru o condiție de intrare deschisă (podeț), este necesar să se verifice condițiile de control la intrare.</dt><dd>1. HGL amonte nu poate fi mai jos decât cota de adâncime normală amonte a curgerii (sau sub conductă!).</dd><dd>2. Nivelul apei din amonte al unui podeț este mai bine reprezentat de EGL amonte decât de HGL amonte.</dd><dd>3. Consultați <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">tutorialul meu de 2 minute</a> pentru calculele simple standard ale nivelului din amonte ale podețelor folosind HY-8.</dd>';
+$ec_lang['mphl_note_1']='<dl><dt>Pentru o condiție de intrare deschisă (podeț), este necesar să se verifice condițiile de control la intrare.</dt><dd>1. HGL amonte nu poate fi mai jos decât cota de adâncime normală amonte a curgerii (sau sub conductă!).</dd><dd>2. Nivelul apei din amonte al unui podeț este mai bine reprezentat de EGL amonte decât de HGL amonte.</dd><dd>3. Consultați <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">tutorialul meu de 2 minute</a> pentru calculele simple standard ale nivelului din amonte ale podețelor folosind HY-8.</dd>';
 // Manning Trapezoid
 $ec_lang['mtc_menu']='Manning Canal Trapezoidal';
 $ec_lang['mtc_main_title']='Calculator Gratuit Online Formula Manning Canal Trapezoidal';

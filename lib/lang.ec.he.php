@@ -51,7 +51,7 @@ $ec_lang['menu_brand']='מחשבוני HawsEDC';
 $ec_lang['menu_main_list']='רשימת המחשבונים';
 $ec_lang['menu_main_hydraulics']='הידרוליקה';
 $ec_lang['menu_main_language']='שפה';
-$ec_lang['template_welcome']='&gt;&gt; השאירו את פחדיכם בדלת; כאן מדברים אהבה. נהנו גם מ<a href="https://hawsedc.com/download.php">כלי ה-AutoCAD החינמיים של HawsEDC.</a> &lt;&lt;';
+$ec_lang['template_welcome']='&gt;&gt; השאירו את פחדיכם בדלת; כאן מדברים אהבה. נהנו גם מ<a target="_blank" href="https://hawsedc.com/download.php">כלי ה-AutoCAD החינמיים של HawsEDC.</a> &lt;&lt;';
 $ec_lang['template_translation_help']='האם יש לך חזון נהדר למחשבון שיתווסף כאן?  האם אתה יכול לעזור לי לתרגם את המחשבון לשפה שלך או להטמיע את המחשבון באתר שלך?  ';
 $ec_lang['template_feedback']='בבקשה תן לנו את חוות דעתך. האם המחשבון החינמי עלה על כל ציפיותיך?';
 $ec_lang['template_printable_title']='אזור כותרת להדפסה';
@@ -235,11 +235,11 @@ $ec_lang['mpf_full_flow']='זרימה מלאה, Q0';
 $ec_lang['mpf_full_flow_ratio']='יחס לזרימה מלאה, Q/Q0';
 $ec_lang['mpf_see_notes']='(ראה הערות)';
 $ec_lang['mpf_spreadheet_notice']='עיין בגרסת הגיליון האלקטרוני של מחשבון זה';
-$ec_lang['mpf_note_1']='<dl><dt>זהו הזרימה והעומק בתוך צינור <em>ארוך אינסופית</em>.</dt><dd>כדי לקבל את הזרימה לתוך הצינור ייתכן שיידרש גובה מים עליון גבוה הרבה יותר. הוסף לפחות 1.5 פעמים ראש המהירות כדי לקבל את גובה המים העליון, או <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">ראה את המדריך הקצר שלי</a> לחישובי גובה מים עליון לתעלות ניקוז סטנדרטיות באמצעות HY-8.</dd>';
+$ec_lang['mpf_note_1']='<dl><dt>זהו הזרימה והעומק בתוך צינור <em>ארוך אינסופית</em>.</dt><dd>כדי לקבל את הזרימה לתוך הצינור ייתכן שיידרש גובה מים עליון גבוה הרבה יותר. הוסף לפחות 1.5 פעמים ראש המהירות כדי לקבל את גובה המים העליון, או <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">ראה את המדריך הקצר שלי</a> לחישובי גובה מים עליון לתעלות ניקוז סטנדרטיות באמצעות HY-8.</dd>';
 // Manning Pipe Head Loss additional keys
 $ec_lang['mphl_area']='שטח, A';
 $ec_lang['mphl_friction_slope']='שיפוע חיכוך';
-$ec_lang['mphl_note_1']='<dl><dt>עבור כניסה פתוחה (תעלת ניקוז), יש לבדוק תנאי שליטה בכניסה.</dt><dd>1. HGL המעלה אינו יכול להיות נמוך מגובה זרימה נורמלית במעלה (ולא נמוך מהצינור!).</dd><dd>2. גובה המים העליון של תעלת ניקוז מיוצג טוב יותר על ידי EGL המעלה מאשר HGL המעלה.</dd><dd>3. ראה <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">את המדריך הקצר שלי</a> לחישובי גובה מים עליון פשוטים לתעלות ניקוז סטנדרטיות באמצעות HY-8.</dd>';
+$ec_lang['mphl_note_1']='<dl><dt>עבור כניסה פתוחה (תעלת ניקוז), יש לבדוק תנאי שליטה בכניסה.</dt><dd>1. HGL המעלה אינו יכול להיות נמוך מגובה זרימה נורמלית במעלה (ולא נמוך מהצינור!).</dd><dd>2. גובה המים העליון של תעלת ניקוז מיוצג טוב יותר על ידי EGL המעלה מאשר HGL המעלה.</dd><dd>3. ראה <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">את המדריך הקצר שלי</a> לחישובי גובה מים עליון פשוטים לתעלות ניקוז סטנדרטיות באמצעות HY-8.</dd>';
 // Manning Trapezoidal Channel additional keys
 $ec_lang['mtc_bend_angle']='זווית כיפוף <a target="_blank" href="riprap-bend-angle.png" title="לחץ לתמונה">?</a> (לממדי ריפ-ראפ)';
 $ec_lang['mtc_sgrock']='משקל סגולי של סלע (2.65)';

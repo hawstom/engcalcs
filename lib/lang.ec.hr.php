@@ -132,7 +132,7 @@ $ec_lang['menu_brand']='HawsEDC Kalkulatori';
 $ec_lang['menu_main_list']='Popis kalkulatora';
 $ec_lang['menu_main_hydraulics']='Hidraulika';
 $ec_lang['menu_main_language']='Jezik';
-$ec_lang['template_welcome']='&gt;&gt; Ostavite strahove na ulazu; ovdje se govori ljubav. Uživajte u <a href="https://hawsedc.com/download.php">besplatnim HawsEDC AutoCAD alatima</a> također. &lt;&lt;';
+$ec_lang['template_welcome']='&gt;&gt; Ostavite strahove na ulazu; ovdje se govori ljubav. Uživajte u <a target="_blank" href="https://hawsedc.com/download.php">besplatnim HawsEDC AutoCAD alatima</a> također. &lt;&lt;';
 $ec_lang['template_translation_help']='Imate li sjajnu viziju za kalkulator koji biste ovdje dodali?  Možete li mi pomoći poboljšati prijevode, programirati ili ugostiti ove kalkulatore?  ';
 $ec_lang['template_feedback']='Molimo podijelite svoje dragocjene prijedloge ili pohvale. Je li ovaj besplatni kalkulator premašio vaša očekivanja u svakom pogledu?';
 $ec_lang['template_printable_title']='Naslov za ispis';
@@ -207,7 +207,7 @@ $ec_lang['mpf_pipe_area']='Površina cijevi, a0';
 $ec_lang['mpf_area_ratio']='Relativna površina, a/a0';
 $ec_lang['mpf_full_flow']='Puni protok, Q0';
 $ec_lang['mpf_full_flow_ratio']='Omjer punog protoka, Q/Q0';
-$ec_lang['mpf_note_1']='<dl><dt>Ovo je protok i dubina unutar <em>beskonačno dugačke</em> cijevi.</dt><dd>Uvođenje protoka u cijev može zahtijevati znatno veću dubinu uzvodne vode. Dodajte najmanje 1,5 puta energetsku visinu za dobivanje dubine uzvodne vode ili <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">pogledajte moj 2-minutni tutorial</a> za standardne proračune uzvodne razine propusta pomoću HY-8.</dd>';
+$ec_lang['mpf_note_1']='<dl><dt>Ovo je protok i dubina unutar <em>beskonačno dugačke</em> cijevi.</dt><dd>Uvođenje protoka u cijev može zahtijevati znatno veću dubinu uzvodne vode. Dodajte najmanje 1,5 puta energetsku visinu za dobivanje dubine uzvodne vode ili <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">pogledajte moj 2-minutni tutorial</a> za standardne proračune uzvodne razine propusta pomoću HY-8.</dd>';
 $ec_lang['mpf_spreadheet_notice']='Pogledajte proračunsku tablicu ovog kalkulatora';
 
 // Manning Pipe Head Loss
@@ -224,7 +224,7 @@ $ec_lang['mphl_total_loss']='Ukupni gubitak, H<sub>l</sub>';
 $ec_lang['mphl_egl_1']='Nizvodni EGL';
 $ec_lang['mphl_egl_2']='Uzvodni EGL';
 $ec_lang['mphl_hgl_2']='Uzvodni HGL u cijevi ' . $ec_lang['mpf_see_notes'];
-$ec_lang['mphl_note_1']='<dl><dt>Za uvjete otvorenog ulaza (propust) potrebno je provjeriti uvjete kontrole ulaza.</dt><dd>1. Uzvodni HGL ne može biti niži od kote normalnog tečenja uzvodnog toka (niti niži od cijevi!).</dd><dd>2. Uzvodna razina propusta bolje je predstavljena uzvodnim EGL-om nego uzvodnim HGL-om.</dd><dd>3. Pogledajte <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">moj 2-minutni tutorial</a> za jednostavne standardne proračune uzvodne razine propusta pomoću HY-8.</dd>';
+$ec_lang['mphl_note_1']='<dl><dt>Za uvjete otvorenog ulaza (propust) potrebno je provjeriti uvjete kontrole ulaza.</dt><dd>1. Uzvodni HGL ne može biti niži od kote normalnog tečenja uzvodnog toka (niti niži od cijevi!).</dd><dd>2. Uzvodna razina propusta bolje je predstavljena uzvodnim EGL-om nego uzvodnim HGL-om.</dd><dd>3. Pogledajte <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">moj 2-minutni tutorial</a> za jednostavne standardne proračune uzvodne razine propusta pomoću HY-8.</dd>';
 
 // Manning Trapezoid
 $ec_lang['mtc_menu']='Manning trapezoidni kanal';

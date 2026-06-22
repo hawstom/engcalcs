@@ -52,7 +52,7 @@ $ec_lang['menu_brand']='HawsEDC Hesap Makineleri';
 $ec_lang['menu_main_list']='Hesap makinası listesi';
 $ec_lang['menu_main_hydraulics']='Hidrolik';
 $ec_lang['menu_main_language']='Dil';
-$ec_lang['template_welcome']='&gt;&gt; Korkularını kapıda bırak; burada sevgi konuşulur. <a href="https://hawsedc.com/download.php">Ücretsiz HawsEDC AutoCAD araçlarını</a> da deneyin. &lt;&lt;';
+$ec_lang['template_welcome']='&gt;&gt; Korkularını kapıda bırak; burada sevgi konuşulur. <a target="_blank" href="https://hawsedc.com/download.php">Ücretsiz HawsEDC AutoCAD araçlarını</a> da deneyin. &lt;&lt;';
 $ec_lang['template_translation_help']="Buraya eklenecek bir hesap makinesi için harika bir vizyonunuz var mı?  Bu hesap makinesini kendi dilinize çevirmek ya da bu hesap makinesini web sitenizde göstermek ister misiniz? Türkçe çeviri için Mustafa Özbay'a tesekkür ederim.";
 $ec_lang['template_feedback']='Lütfen görüslerinizi ve begenileriniz bizimle paylasin. Bu ücretsiz hesap makinesi beklentilerinizi karsilayabildi mi?';
 $ec_lang['template_printable_title']='Yazdırılabilir Başlık';
@@ -269,9 +269,9 @@ $ec_lang['mpf_area_ratio']='Göreli alan, a/a0';
 $ec_lang['mpf_full_flow']='Tam akış, Q0';
 $ec_lang['mpf_full_flow_ratio']='Tam akışa oran, Q/Q0';
 $ec_lang['mpf_spreadheet_notice']='Bu hesaplayıcının elektronik tablo sürümüne göz atın';
-$ec_lang['mpf_note_1']='<dl><dt>Bu, <em>sonsuz uzunluktaki</em> bir borunun içindeki akış ve derinliktir.</dt><dd>Akışın boruya girmesi için önemli ölçüde daha yüksek memba derinliği gerekebilir. Memba derinliğini elde etmek için en az 1,5 hız yükü ekleyin ya da HY-8 kullanarak standart menfez memba hesaplamaları için <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">2 dakikalık öğreticime bakın</a>.</dd>';
+$ec_lang['mpf_note_1']='<dl><dt>Bu, <em>sonsuz uzunluktaki</em> bir borunun içindeki akış ve derinliktir.</dt><dd>Akışın boruya girmesi için önemli ölçüde daha yüksek memba derinliği gerekebilir. Memba derinliğini elde etmek için en az 1,5 hız yükü ekleyin ya da HY-8 kullanarak standart menfez memba hesaplamaları için <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">2 dakikalık öğreticime bakın</a>.</dd>';
 // Manning Pipe Head Loss additional
-$ec_lang['mphl_note_1']='<dl><dt>Açık giriş (menfez) koşulunda, giriş kontrolü koşullarının kontrol edilmesi gerekir.</dt><dd>1. Memba HGL\'si, memba normal derinlik akış kotundan (veya borudan) düşük olamaz.</dd><dd>2. Bir menfezin memba su yüzü, memba HGL\'sinden ziyade memba EGL\'si ile daha iyi temsil edilir.</dd><dd>3. HY-8 kullanarak basit standart menfez memba hesaplamaları için <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">2 dakikalık öğreticime bakın</a>.</dd>';
+$ec_lang['mphl_note_1']='<dl><dt>Açık giriş (menfez) koşulunda, giriş kontrolü koşullarının kontrol edilmesi gerekir.</dt><dd>1. Memba HGL\'si, memba normal derinlik akış kotundan (veya borudan) düşük olamaz.</dd><dd>2. Bir menfezin memba su yüzü, memba HGL\'sinden ziyade memba EGL\'si ile daha iyi temsil edilir.</dd><dd>3. HY-8 kullanarak basit standart menfez memba hesaplamaları için <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">2 dakikalık öğreticime bakın</a>.</dd>';
 // Manning Trapezoid additional
 $ec_lang['mtc_d50_in']='Tasarım taş boyutu, D50';
 $ec_lang['mtc_n_strickler']='Tasarım taş boyutu için n (Strickler\'e göre)';

@@ -51,7 +51,7 @@ $ec_lang['menu_brand']='Calculadoras HawsEDC';
 $ec_lang['menu_main_list']='Lista de calculadoras';
 $ec_lang['menu_main_hydraulics']='Hidráulica';
 $ec_lang['menu_main_language']='Idioma';
-$ec_lang['template_welcome']='>> Dejad vuestros miedos en la puerta; el amor se habla aquí. Disfrutad tambi&eacute;n <a href="https://hawsedc.com/download.php">las herramientas libres HawsEDC para AutoCAD.</a> <<';
+$ec_lang['template_welcome']='>> Dejad vuestros miedos en la puerta; el amor se habla aquí. Disfrutad tambi&eacute;n <a target="_blank" href="https://hawsedc.com/download.php">las herramientas libres HawsEDC para AutoCAD.</a> <<';
 $ec_lang['template_translation_help']='&iquest;Tiene usted una gran visión para una calculadora que agregar aquí?  &iquest;Me puede ayudar a traducir esta calculadora a su idioma?  &iquest;Quisiera Ud. poner esta calculadora en su propio sitio web?';
 $ec_lang['template_feedback']='Tenga la amabilidad de enviarnos sus comentarios. &iquest;Le fue útil esta calculadora?';
 $ec_lang['template_printable_title']='Título Imprimible';
@@ -140,7 +140,7 @@ $ec_lang['mpf_froude_number']='Número de Froude, F';
 $ec_lang['mpf_shear_stress']='Tensión tangencial promedio (fuerza de tracción), tau';
 $ec_lang['mpf_full_flow']='Caudal lleno, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Relación de caudales, Q/Q<sub>0</sub>';
-$ec_lang['mpf_note_1']='<dl><dt>Este es el caudal (también la profundidad) dentro de una tubería <em>de largo infinito</em>.</dt><dd>El alcanzar que el caudal entre a la tubería puede requerir un cabezal bastante más alto. Agregue por lo menos 1,5 veces la energía cinética al calado o <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">haga los cálculos de cabecera de alcantarilla de una manera estándar utilizando HY-8.</a> </dd>';
+$ec_lang['mpf_note_1']='<dl><dt>Este es el caudal (también la profundidad) dentro de una tubería <em>de largo infinito</em>.</dt><dd>El alcanzar que el caudal entre a la tubería puede requerir un cabezal bastante más alto. Agregue por lo menos 1,5 veces la energía cinética al calado o <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">haga los cálculos de cabecera de alcantarilla de una manera estándar utilizando HY-8.</a> </dd>';
 $ec_lang['mpf_solve_for_dd0']='Calcular y/d<sub>0</sub> para un Q dado';
 $ec_lang['mpf_solve_desc']='Usando D<sub>0</sub>, n y S<sub>0</sub> del formulario de la calculadora, encuentra el menor y/d<sub>0</sub> para un Q dado.';
 $ec_lang['mpf_solve_button']='Calcular';
@@ -286,7 +286,7 @@ $ec_lang['mi_n617']='n<br />compuesto';
 $ec_lang['mi_q617']='Q';
 $ec_lang['mi_v617']='v';
 // Manning Pipe Head Loss note
-$ec_lang['mphl_note_1']='<dl><dt>Para una entrada abierta (alcantarilla), es necesario verificar las condiciones de control de entrada.</dt><dd>1. El HGL aguas arriba no puede ser inferior a la cota de flujo a profundidad normal aguas arriba (ni inferior a la tubería).</dd><dd>2. El cabezal de una alcantarilla se representa mejor con el EGL aguas arriba que con el HGL aguas arriba.</dd><dd>3. Véase <a href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">mi tutorial de 2 minutos</a> para cálculos estándar de cabezal en alcantarillas usando HY-8.</dd>';
+$ec_lang['mphl_note_1']='<dl><dt>Para una entrada abierta (alcantarilla), es necesario verificar las condiciones de control de entrada.</dt><dd>1. El HGL aguas arriba no puede ser inferior a la cota de flujo a profundidad normal aguas arriba (ni inferior a la tubería).</dd><dd>2. El cabezal de una alcantarilla se representa mejor con el EGL aguas arriba que con el HGL aguas arriba.</dd><dd>3. Véase <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">mi tutorial de 2 minutos</a> para cálculos estándar de cabezal en alcantarillas usando HY-8.</dd>';
 // Manning Trapezoidal Channel additional keys
 $ec_lang['mtc_blodgett_v_bathurst']='Blodgett vs. Bathurst';
 $ec_lang['mtc_n_bathurst']='n para el tamaño de roca de diseño según Bathurst';
