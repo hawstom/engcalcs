@@ -55,7 +55,7 @@ echoHeader("EngCalcs", $html_title, $html_head);
 				   Use the Trapezoidal calculator for new channels; the Irregular calculator for
 				   existing natural or constructed sections.</p>
 				<a href="Manning-Trap.php" class="btn btn-primary me-1"><?=$ec_lang['mtc_menu']?></a>
-				<a href="Manning-Irregular.php" class="btn btn-secondary"><?=$ec_lang['mi_menu']?></a>
+				<a href="Manning-Irregular.php" class="btn btn-primary"><?=$ec_lang['mi_menu']?></a>
 			</div>
 		</div>
 	</div>
