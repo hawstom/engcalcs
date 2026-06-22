@@ -6,8 +6,27 @@ The format of each task is: Priority/status|Description. 0 means "Completed" and
 
 # Tasks
 
-- 40|Translations (multi-lingual): Improve remaining languages (he, pt, hr, sr, ro, cn) — partial or sparse coverage; native-speaker review recommended.
+- 99|Add Hindi/Urdu
 
+- 98|Add Swahili
+
+- 97|Add Amharic
+
+- 95|Hydropower: Explore run-of-river micro-hydro power calculator. Core formula: P = η·ρ·g·Q·H (flow rate, gross head, efficiency → kW). Connects naturally to existing Manning/Darcy-Weisbach work for penstock sizing and head-loss accounting. Target audience: small community hydro projects in the Global South.
+
+- 94|Hydropower: Explore penstock design calculator — size a pipe for a hydropower intake, optimizing diameter against head loss and cost. Darcy-Weisbach is already built; this would be a thin layer on top of it.
+
+- 93|Irrigation: Existing weir and orifice calculators already serve irrigation flow measurement — consider adding an explicit note or landing page connecting them to irrigation use cases (farmers and irrigation districts use these constantly).
+
+- 90|Irrigation: Explore drip/sprinkler design calculator — emitter flow, lateral spacing, precipitation rate, system uniformity coefficient. High value for smallholder agriculture in water-scarce regions.
+
+- 85|Irrigation: Explore canal seepage/loss estimation — helps irrigation districts quantify conveyance efficiency and prioritize lining investments.
+
+- 90|Plan a Progressive Web App (PWA) or companion phone app, as the most usable and useful case may be. Priority use case: engineers and field workers in low-connectivity regions (same audience as the Global South language expansion).
+
+- 90|Rework message of love: the current single "Love" reference is a start. Consider adding the third clause explicitly — "You are not going to ruin everything" — which names the shame-fear that blocks people from receiving the other two. Any addition should feel like part of the tool, not an interruption of it.
+
+- 40|Translations (multi-lingual): Improve remaining languages (he, pt, hr, sr, ro, cn) — partial or sparse coverage; native-speaker review recommended.
 
 - 20|Set up npm (package.json) and/or Composer for dependency management. Deferred from dev-infra work; currently Bootstrap and other assets are manually vendored.
 
@@ -18,6 +37,8 @@ The format of each task is: Priority/status|Description. 0 means "Completed" and
 - 10|Results sharing — generate a shareable URL or printable summary of a completed calculation. Nice-to-have feature.
 
 ## Completed
+
+- 0|Ensure that Arabic delivery is complete. Added lib/lang.ec.ar.php (full translation of all 12 calculators), registered in Language.Settings.php (QUALITY 0.9), and fixed RTL rendering in HeadersFooters.lib.php to include 'ar' alongside 'he'. (commit 6ab09d5)
 
 - 0|Translations (multi-lingual): Language-demand logging implemented. `logLanguageSelection()` added to `lib/Language.lib.php`; called in `chooseLanguage()` whenever a valid `?lang=XX` GET parameter is used (explicit user selection only — browser auto-detection is not logged, as Awstats already covers that). Log path defined in `lib/config.inc.php` as `LANG_LOG` → `/var/www/cnm/logs/engcalcs-lang.log` (outside `public_html`, not HTTP-accessible). Log format: tab-separated `UTC-timestamp\tlang-code\tpage-basename`. Directory created with mode 0750; PHP `@file_put_contents` with `LOCK_EX` so logging failures are silent and never break page delivery.
 
