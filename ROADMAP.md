@@ -5,7 +5,23 @@ This is a prioritized, bulleted roadmap for the EngCalcs hydraulic calculator su
 The format of each task is: Priority/status|Description. 0 means "Completed" and 100 means top priority. Ties (same priority for multiple tasks) are okay. Any whole number 0-100 can be used. Tasks are sorted highest priority first; completed tasks are at the bottom.
 
 # Tasks
+- 100|Help me reorganize this file @ROADMAP.md and set good priorities.
 
+- 90|About and Offline page: Add a link in the menu to a place where we can give more information about our global humanitarian open source mission "I want to use my AI subscription to tell all my sisters and brothers that they are loved and cherished forever.", zip downloads (possibly a single rendered html zip download if that's feasible; see separate issue), PWA, the bitbucket repository, pull requests
+
+- 89|Zip download: Plan the best way to provide each language or possibly all languages in a zip download(s). What architecture changes would be needed if we were interested to make a single html multi-lingual download? I assume that the menus would need some sort of a "Zip mode" where the calculator menu would also reference current language and the language menu would reference also current calculator. And would that use Angular or something to make it lighter in terms of files and bytes? What is best for the global south?
+
+- 90|Add km as a new language
+
+- 90|Add my as a new language
+
+- 90|Add ps as a new language
+
+- 90|Add fa as a new language
+
+- 90|Add uk as a new language
+
+- 90|Evaluate the need cost/benefit of a leaner "text-only" mode for the global south.
 
 - 91|Robinson Rock Chute: 1. Can/should we add this calculator that is currently a Google Spreadsheet? Should we retire the spreadsheet? Should we refer to other available calculators for this method? Why are they more complicated? Does the reference white paper justify complication?
 
