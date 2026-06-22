@@ -359,3 +359,8 @@ $ec_lang['ps_notes_4_term']='Lokalni gubici k<sub>m</sub>';
 $ec_lang['ps_notes_4_def']='Tipične vrijednosti: oštar ulaz 0.5, svako koljeno 45&deg; između 0.2&ndash;0.3, zaporni ventil (potpuno otvoren) 0.1, leptirasti ventil 0.2. Zbroj svih fitinga daje ukupni k<sub>m</sub>. Zadana vrijednost 1.5 pretpostavlja jedan ulaz i dva koljena.';
 $ec_lang['ps_notes_5_term']='Hrapavost cijevi e';
 $ec_lang['ps_notes_5_def']='Tipična apsolutna hrapavost: čelik (nov) 0.046&nbsp;mm, čelik (rabljeni) 0.15&nbsp;mm, HDPE 0.003&nbsp;mm, PVC/uPVC 0.0015&nbsp;mm, beton 0.3&ndash;3&nbsp;mm. HDPE je uobičajen za male dovodne cijevi mikro-hidro sustava.';
+
+// About
+$ec_lang['about_main_menu']='O nama';
+$ec_lang['about_main_title']='O HawsEDC inženjerskim kalkulatorima';
+$ec_lang['about_main_desc']='Misija, otvoreni izvorni kod i doprinosi';

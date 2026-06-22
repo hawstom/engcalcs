@@ -18,7 +18,7 @@ The format of each task is: Priority/status|Description. 0 means "Completed" and
 
 ## Language Expansion
 
-- 82|Improve remaining language quality: he, pt, hr, sr, ro, zh — partial or sparse coverage; native-speaker review recommended.
+- 35|Language quality — native-speaker review: he, pt, hr, sr, ro, zh all now have complete key coverage and quality scores raised (hr/pt/ro → 0.9, sr/he → 0.85, zh → 0.9). Structural fixes applied: he had 6 English strings in mtc_ section and mixed mphl_hgl_2; sr had 4 Croatian-script strings in irr_/mhp_ sections. All 26 non-English lang files also gained about_ keys (About page). Remaining gap: native-speaker review of translation accuracy, especially he and sr.
 
 ## Calculator Improvements
 

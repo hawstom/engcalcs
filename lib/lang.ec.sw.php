@@ -343,3 +343,8 @@ $ec_lang['ps_notes_4_term']='Hasara Ndogo k<sub>m</sub>';
 $ec_lang['ps_notes_4_def']='Maadili ya kawaida: mlango mkali 0.5, kila mpinda wa 45&deg; kati ya 0.2&ndash;0.3, valvu ya lango (wazi kabisa) 0.1, valvu ya kipepeo 0.2. Jumla ya viungo vyote inakupa k<sub>m</sub> jumla. Chaguo-msingi 1.5 inadhani mlango mmoja na mipinda miwili.';
 $ec_lang['ps_notes_5_term']='Ugumu wa Bomba e';
 $ec_lang['ps_notes_5_def']='Ugumu kamili wa kawaida: chuma (kipya) 0.046&nbsp;mm, chuma (kilichotumiwa) 0.15&nbsp;mm, HDPE 0.003&nbsp;mm, PVC/uPVC 0.0015&nbsp;mm, zege 0.3&ndash;3&nbsp;mm. HDPE ni ya kawaida kwa mabomba madogo ya micro-hydro.';
+
+// About
+$ec_lang['about_main_menu']='Kuhusu';
+$ec_lang['about_main_title']='Kuhusu Vikokotoo vya Uhandisi HawsEDC';
+$ec_lang['about_main_desc']='Dhamira, Msimbo Wazi, na Kuchangia';

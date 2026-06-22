@@ -93,21 +93,21 @@ $ec_lang['mphl_junction_loss']='הפסד בצומת';
 $ec_lang['mphl_total_loss'] = 'סהכ הפסד';
 $ec_lang['mphl_egl_1']='EGL מורד';
 $ec_lang['mphl_egl_2']='EGL מעלה';
-$ec_lang['mphl_hgl_2']='Upstream HGL in pipe (ראה הערות)';
+$ec_lang['mphl_hgl_2']='HGL מעלה בצינור (ראה הערות)';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='תעלה טרפזואידית — Manning';
 $ec_lang['mtc_main_title']='מחשבון תעלה טרפזואידית לפי נוסחת Manning — חינם מקוון';
 $ec_lang['mtc_main_desc']='זרימה אחידה בתעלה טרפזואידית לפי נוסחת Manning בשיפוע ועומק נתונים';
-$ec_lang['mtc_bottom_width']='Bottom width';
+$ec_lang['mtc_bottom_width']='רוחב קרקעית, b';
 $ec_lang['mtc_side_slope_1']='צד השיפוע 1 (אופקי\אנכי)';
 $ec_lang['mtc_side_slope_2']= 'צד השיפוע 2 (אופקי\אנכי)';
 $ec_lang['mtc_channel_slope']='שיפוע התעלה';
 $ec_lang['mtc_flow_depth']='עומק הספיקה';
-$ec_lang['mtc_d50_bottom']='<span title="per Isbash (1936), Robinson, and Maricopa County, Arizona, US">Required bottom angular riprap size, D50, Maricopa County</span>';
-$ec_lang['mtc_d50_mra']='Required angular riprap size, D50, per Maynord, Ruff, and Abt (1989)';
-$ec_lang['mtc_d50_searcy']='Required angular riprap size, D50, per Searcy (1967)';
-$ec_lang['mtc_d50_z1']='<span title="per Isbash (1936), Robinson, and Maricopa County, Arizona, US">Required side slope 1 angular riprap size, D50, Maricopa County</span>';
-$ec_lang['mtc_d50_z2']='<span title="per Isbash (1936), Robinson, and Maricopa County, Arizona, US">Required side slope 2 angular riprap size, D50, Maricopa County</span>';
+$ec_lang['mtc_d50_bottom']='גודל אבן זוויתית נדרש לקרקעית, D50 (Isbash ו-MC) <a href="javascript:alert(\'לפי Isbash (1936) ו-Maricopa County, אריזונה, ארה"ב.\')">?</a>';
+$ec_lang['mtc_d50_z1']='גודל אבן זוויתית נדרש לצד 1, D50 (Isbash ו-MC) <a href="javascript:alert(\'לפי Isbash (1936) ו-Maricopa County, אריזונה, ארה"ב.\')">?</a>';
+$ec_lang['mtc_d50_z2']='גודל אבן זוויתית נדרש לצד 2, D50 (Isbash ו-MC) <a href="javascript:alert(\'לפי Isbash (1936) ו-Maricopa County, אריזונה, ארה"ב.\')">?</a>';
+$ec_lang['mtc_d50_mra']='גודל אבן זוויתית נדרש, D50 (Maynord, Ruff ו-Abt 1989)';
+$ec_lang['mtc_d50_searcy']='גודל אבן זוויתית נדרש, D50 (Searcy 1967)';
 // Orifice Flow
 $ec_lang['or_main_menu']='זרימה דרך פתח';
 $ec_lang['or_main_title']='מחשבון זרימה דרך פתח - חינם';
@@ -348,3 +348,8 @@ $ec_lang['ps_notes_4_term']='אובדן משני k<sub>m</sub>';
 $ec_lang['ps_notes_4_def']='ערכים אופייניים: כניסה חדה 0.5, כל עיקול 45&deg; בין 0.2&ndash;0.3, ברז שער (פתוח לחלוטין) 0.1, שסתום פרפר 0.2. סכום כל האבזרים הוא k<sub>m</sub> הכולל. ברירת המחדל 1.5 מניחה כניסה אחת ושני עיקולים.';
 $ec_lang['ps_notes_5_term']='גסות הצינור e';
 $ec_lang['ps_notes_5_def']='גסות מוחלטת אופיינית: פלדה (חדשה) 0.046&nbsp;מ"מ, פלדה (משומשת) 0.15&nbsp;מ"מ, HDPE 0.003&nbsp;מ"מ, PVC/uPVC 0.0015&nbsp;מ"מ, בטון 0.3&ndash;3&nbsp;מ"מ. HDPE נפוץ בצינורות לחץ קטנים למיקרו-הידרו.';
+
+// About
+$ec_lang['about_main_menu']='אודות';
+$ec_lang['about_main_title']='אודות מחשבוני ההנדסה HawsEDC';
+$ec_lang['about_main_desc']='מטרה, קוד פתוח ותרומה';

@@ -340,3 +340,8 @@ $ec_lang['ps_notes_4_term']='Einzelwiderstände k<sub>m</sub>';
 $ec_lang['ps_notes_4_def']='Typische Werte: scharfkantige Einlauföffnung 0,5, jeder 45&deg;-Krümmer 0,2&ndash;0,3, Schieber (vollständig geöffnet) 0,1, Schmetterlingsklappe 0,2. Alle Einbauten summieren für den Gesamt-k<sub>m</sub>. Standardwert 1,5 geht von einem Einlauf und zwei Krümmern aus.';
 $ec_lang['ps_notes_5_term']='Rohrrauheit e';
 $ec_lang['ps_notes_5_def']='Typische absolute Rauheit: Stahl (neu) 0,046&nbsp;mm, Stahl (gebraucht) 0,15&nbsp;mm, HDPE 0,003&nbsp;mm, PVC/uPVC 0,0015&nbsp;mm, Beton 0,3&ndash;3&nbsp;mm. HDPE ist bei kleinen Mikro-Wasserkraft-Druckrohrleitungen weit verbreitet.';
+
+// About
+$ec_lang['about_main_menu']='Über';
+$ec_lang['about_main_title']='Über die HawsEDC-Ingenieurrechner';
+$ec_lang['about_main_desc']='Mission, Open Source und Mitwirken';

@@ -342,3 +342,8 @@ $ec_lang['contact_message']='Повідомлення:';
 $ec_lang['contactSpamPrefix']='П\'ять плюс один дорівнює';
 $ec_lang['contactSpamPostfix']='(Будь ласка, напишіть словами. 1=один 2=два 3=три 4=чотири 5=п\'ять 6=шість 7=сім +=плюс 5+1=6)';
 $ec_lang['contactSubmitButton']='Надіслати повідомлення';
+
+// About
+$ec_lang['about_main_menu']='Про';
+$ec_lang['about_main_title']='Про інженерні калькулятори HawsEDC';
+$ec_lang['about_main_desc']='Місія, відкритий код і внесок';

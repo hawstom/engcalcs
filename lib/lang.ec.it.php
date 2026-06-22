@@ -340,3 +340,8 @@ $ec_lang['ps_notes_4_term']='Perdite minori k<sub>m</sub>';
 $ec_lang['ps_notes_4_def']='Valori tipici: imbocco con spigolo vivo 0,5, ogni curva a 45&deg; 0,2&ndash;0,3, saracinesca (completamente aperta) 0,1, valvola a farfalla 0,2. Sommare tutti i raccordi per ottenere il k<sub>m</sub> totale. Il valore predefinito 1,5 presuppone un imbocco e due curve.';
 $ec_lang['ps_notes_5_term']='Rugosità della tubazione e';
 $ec_lang['ps_notes_5_def']='Rugosità assoluta tipica: acciaio (nuovo) 0,046&nbsp;mm, acciaio (usato) 0,15&nbsp;mm, HDPE 0,003&nbsp;mm, PVC/uPVC 0,0015&nbsp;mm, calcestruzzo 0,3&ndash;3&nbsp;mm. L\'HDPE è comune nelle condotte forzate di piccoli impianti micro-idroelettrici.';
+
+// About
+$ec_lang['about_main_menu']='Informazioni';
+$ec_lang['about_main_title']='Informazioni sui calcolatori HawsEDC';
+$ec_lang['about_main_desc']='Missione, open source e contributi';

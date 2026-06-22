@@ -275,9 +275,9 @@ $ec_lang['essc_q']='Протицај, Q';
 // Contact
 
 // Irrigation
-$ec_lang['irr_main_menu']='Mjerenje protoka navodnjavanja';
-$ec_lang['irr_main_title']='Besplatni online kalkulatori za mjerenje protoka navodnjavanja';
-$ec_lang['irr_main_desc']='Mjerenje protoka navodnjavanja — prelivi i otvori';
+$ec_lang['irr_main_menu']='Мерење протока наводњавања';
+$ec_lang['irr_main_title']='Бесплатни онлајн калкулатори за мерење протока наводњавања';
+$ec_lang['irr_main_desc']='Мерење протока наводњавања — преливи и отвори';
 $ec_lang['contact_title']='HawsEDC Контакт';
 $ec_lang['contactSendMessage']='Пошаљите поруку Тому Хоусу';
 $ec_lang['contactYourName']='Ваше име:';
@@ -299,7 +299,7 @@ $ec_lang['mhp_efficiency']='Искористивост постројења, &et
 $ec_lang['mhp_net_head']='Нето пад, H<sub>net</sub>';
 $ec_lang['mhp_power']='Излазна снага, P';
 $ec_lang['mhp_annual_kwh']='Годишња енергија при 100% капацитету';
-$ec_lang['mhp_notes_1_term']='Jednadžba snage';
+$ec_lang['mhp_notes_1_term']='Једначина снаге';
 $ec_lang['mhp_notes_1_def']='P = &eta; &times; &rho; &times; g &times; Q &times; H<sub>net</sub>, где &rho; = 1000 kg/m&sup3; (слатка вода) и g = 9,806 m/s&sup2;.';
 $ec_lang['mhp_notes_2_term']='Нето пад';
 $ec_lang['mhp_notes_2_def']='Нето пад = бруто пад &minus; губици пада у доводном цевоводу. Уобичајена прва процена је h<sub>L</sub> &asymp; 5% од H<sub>gross</sub>. Користите <a href="Darcy-Weisbach.php">Darcy-Weisbach калкулатор</a> за прецизније процене губитака у цевоводу.';
@@ -345,3 +345,8 @@ $ec_lang['ps_notes_4_term']='Локални губици k<sub>m</sub>';
 $ec_lang['ps_notes_4_def']='Типичне вредности: оштри улаз 0.5, свако колено 45&deg; између 0.2&ndash;0.3, засун (потпуно отворен) 0.1, лептирасти вентил 0.2. Збир свих фитинга даје укупни k<sub>m</sub>. Подразумевана вредност 1.5 претпоставља један улаз и два колена.';
 $ec_lang['ps_notes_5_term']='Храпавост цеви e';
 $ec_lang['ps_notes_5_def']='Типична апсолутна храпавост: челик (нов) 0.046&nbsp;мм, челик (половни) 0.15&nbsp;мм, HDPE 0.003&nbsp;мм, PVC/uPVC 0.0015&nbsp;мм, бетон 0.3&ndash;3&nbsp;мм. HDPE је уобичајен за мале доводне цевоводе мало-хидро система.';
+
+// About
+$ec_lang['about_main_menu']='О нама';
+$ec_lang['about_main_title']='О инжењерским калкулаторима HawsEDC';
+$ec_lang['about_main_desc']='Мисија, отворени код и доприноси';

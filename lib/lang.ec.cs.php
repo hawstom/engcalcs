@@ -340,3 +340,8 @@ $ec_lang['ps_notes_4_term']='Místní ztráty k<sub>m</sub>';
 $ec_lang['ps_notes_4_def']='Typické hodnoty: ostrý vtok 0.5, každé koleno 45&deg; 0.2&ndash;0.3, šoupě (plně otevřené) 0.1, klapka 0.2. Součet všech armatur tvoří celkový k<sub>m</sub>. Výchozí hodnota 1.5 předpokládá jeden vtok a dvě kolena.';
 $ec_lang['ps_notes_5_term']='Drsnost potrubí e';
 $ec_lang['ps_notes_5_def']='Typická absolutní drsnost: ocel (nová) 0.046&nbsp;mm, ocel (použitá) 0.15&nbsp;mm, HDPE 0.003&nbsp;mm, PVC/uPVC 0.0015&nbsp;mm, beton 0.3&ndash;3&nbsp;mm. HDPE je běžný materiál pro malá přiváděcí potrubí mikro-vodních elektráren.';
+
+// About
+$ec_lang['about_main_menu']='O nás';
+$ec_lang['about_main_title']='O kalkulátorech HawsEDC';
+$ec_lang['about_main_desc']='Poslání, open source a přispívání';

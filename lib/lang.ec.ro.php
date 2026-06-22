@@ -345,3 +345,8 @@ $ec_lang['ps_notes_4_term']='Pierderi locale k<sub>m</sub>';
 $ec_lang['ps_notes_4_def']='Valori tipice: intrare cu margine ascuțită 0.5, fiecare cot de 45&deg; între 0.2&ndash;0.3, robinet cu sertar (complet deschis) 0.1, robinet fluture 0.2. Suma tuturor fitingurilor dă k<sub>m</sub> total. Valoarea implicită 1.5 presupune o intrare și două coturi.';
 $ec_lang['ps_notes_5_term']='Rugozitatea conductei e';
 $ec_lang['ps_notes_5_def']='Rugozitate absolută tipică: oțel (nou) 0.046&nbsp;mm, oțel (uzat) 0.15&nbsp;mm, HDPE 0.003&nbsp;mm, PVC/uPVC 0.0015&nbsp;mm, beton 0.3&ndash;3&nbsp;mm. HDPE este des utilizat la conductele forțate micro-hidro de mici dimensiuni.';
+
+// About
+$ec_lang['about_main_menu']='Despre';
+$ec_lang['about_main_title']='Despre calculatoarele de inginerie HawsEDC';
+$ec_lang['about_main_desc']='Misiune, sursă deschisă și contribuții';

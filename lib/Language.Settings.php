@@ -73,14 +73,14 @@ $all_language_settings['bg']=array(
 
 //-- settings for chinese
 $all_language_settings['zh']=array(
-'QUALITY'=>'0.7',
+'QUALITY'=>'0.9',
 'LANGNAME'=>'中文',
 'TITLE_WORDS'=>array(),
 );
 
 //-- settings for croatian
 $all_language_settings['hr']=array(
-'QUALITY'=>'0.3',
+'QUALITY'=>'0.9',
 'LANGNAME'=>'Hrvatski',
 // Title words is a list of words that are not capitalized in titles.
 'TITLE_WORDS'=>array(),
@@ -124,7 +124,7 @@ $all_language_settings['de']=array(
 
 //-- settings for hebrew
 $all_language_settings['he']=array(
-'QUALITY'=>'0.6',
+'QUALITY'=>'0.85',
 'LANGNAME'=>'עברית',
 // Title words is a list of words that are not capitalized in titles.
 'TITLE_WORDS'=>array(),
@@ -174,7 +174,7 @@ $all_language_settings['ps']=array(
 
 //-- settings for portuguese
 $all_language_settings['pt']=array(
-'QUALITY'=>'0.3',
+'QUALITY'=>'0.9',
 'LANGNAME'=>'Portugues',
 'LANG_USE'=>true,
 // Title words is a list of words that are not capitalized in titles.
@@ -183,7 +183,7 @@ $all_language_settings['pt']=array(
 
 //-- settings for romanian
 $all_language_settings['ro']=array(
-'QUALITY'=>'0.3',
+'QUALITY'=>'0.9',
 'LANGNAME'=>'Română',
 // Title words is a list of words that are not capitalized in titles.
 'TITLE_WORDS'=>array(),
@@ -198,7 +198,7 @@ $all_language_settings['ru']=array(
 
 //-- settings for serbian
 $all_language_settings['sr']=array(
-'QUALITY'=>'0.3',
+'QUALITY'=>'0.85',
 'LANGNAME'=>'Srpski',
 // Title words is a list of words that are not capitalized in titles.
 'TITLE_WORDS'=>array(),

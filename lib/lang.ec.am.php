@@ -343,3 +343,8 @@ $ec_lang['ps_notes_4_term']='ሁለተኛ ደረጃ ኪሳራዎች k<sub>m</sub
 $ec_lang['ps_notes_4_def']='ተለምዷዊ እሴቶች: ሹል መግቢያ 0.5፣ እያንዳንዱ 45&deg; ጥምዝ 0.2&ndash;0.3፣ ቤይ ቫልቭ (ሙሉ ክፍት) 0.1፣ ቢራቢሮ ቫልቭ 0.2። ሁሉም ፊቲንጎች ሲደማሙ k<sub>m</sub> ይሆናሉ። ነባሪ 1.5 አንድ መግቢያ እና ሁለት ጥምዝ ያስቆጥራል።';
 $ec_lang['ps_notes_5_term']='የቧንቧ ሻካራነት e';
 $ec_lang['ps_notes_5_def']='ተለምዷዊ ፍፁም ሻካራነት: ብረት (አዲስ) 0.046&nbsp;ሚሜ፣ ብረት (ያረጀ) 0.15&nbsp;ሚሜ፣ HDPE 0.003&nbsp;ሚሜ፣ PVC/uPVC 0.0015&nbsp;ሚሜ፣ ኮንክሪት 0.3&ndash;3&nbsp;ሚሜ። HDPE ለትንሽ ማይክሮ-ሃይድሮ ቧንቧዎች ተለምዷዊ ነው።';
+
+// About
+$ec_lang['about_main_menu']='ስለ';
+$ec_lang['about_main_title']='ስለ HawsEDC የምህንድስና ካልኩሌተሮች';
+$ec_lang['about_main_desc']='ተልዕኮ፣ ክፍት ምንጭ እና አስተዋጽዖ';

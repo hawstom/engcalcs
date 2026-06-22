@@ -351,3 +351,8 @@ $ec_lang['ps_notes_4_term']='Lokal Kayıplar k<sub>m</sub>';
 $ec_lang['ps_notes_4_def']='Tipik değerler: keskin giriş 0.5, her 45&deg; dirsek 0.2&ndash;0.3, sürgü vana (tam açık) 0.1, kelebek vana 0.2. Tüm bağlantı parçalarının toplamı toplam k<sub>m</sub>\'yi verir. Varsayılan 1.5, bir giriş ve iki dirsek varsayar.';
 $ec_lang['ps_notes_5_term']='Boru Pürüzlülüğü e';
 $ec_lang['ps_notes_5_def']='Tipik mutlak pürüzlülük: çelik (yeni) 0.046&nbsp;mm, çelik (kullanılmış) 0.15&nbsp;mm, HDPE 0.003&nbsp;mm, PVC/uPVC 0.0015&nbsp;mm, beton 0.3&ndash;3&nbsp;mm. HDPE, küçük mikro-hidro cebri borularında yaygındır.';
+
+// About
+$ec_lang['about_main_menu']='Hakkında';
+$ec_lang['about_main_title']='HawsEDC Mühendislik Hesaplayıcıları Hakkında';
+$ec_lang['about_main_desc']='Misyon, Açık Kaynak ve Katkı';

@@ -340,3 +340,8 @@ $ec_lang['ps_notes_4_term']='Kehilangan Minor k<sub>m</sub>';
 $ec_lang['ps_notes_4_def']='Nilai tipikal: inlet tajam 0.5, setiap belokan 45&deg; antara 0.2&ndash;0.3, katup gerbang (terbuka penuh) 0.1, katup kupu-kupu 0.2. Jumlah semua fitting menghasilkan k<sub>m</sub> total. Default 1.5 mengasumsikan satu inlet dan dua belokan.';
 $ec_lang['ps_notes_5_term']='Kekasaran Pipa e';
 $ec_lang['ps_notes_5_def']='Kekasaran absolut tipikal: baja (baru) 0.046&nbsp;mm, baja (bekas) 0.15&nbsp;mm, HDPE 0.003&nbsp;mm, PVC/uPVC 0.0015&nbsp;mm, beton 0.3&ndash;3&nbsp;mm. HDPE umum digunakan untuk pipa penstock mikro-hidro kecil.';
+
+// About
+$ec_lang['about_main_menu']='Tentang';
+$ec_lang['about_main_title']='Tentang Kalkulator Teknik HawsEDC';
+$ec_lang['about_main_desc']='Misi, Sumber Terbuka, dan Kontribusi';

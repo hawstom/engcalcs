@@ -342,3 +342,8 @@ $ec_lang['contact_message']='សារ:';
 $ec_lang['contactSpamPrefix']='ប្រាំ​ បូក​ មួយ​ ស្មើ​ នឹង';
 $ec_lang['contactSpamPostfix']='(សូម​ សរសេរ​ ជា​ ពាក្យ​។ 1=one 2=two 3=three 4=four 5=five 6=six 7=seven +=plus 5+1=6)';
 $ec_lang['contactSubmitButton']='ផ្ញើ​ សារ';
+
+// About
+$ec_lang['about_main_menu']='អំពី';
+$ec_lang['about_main_title']='អំពី HawsEDC ម៉ាស៊ីនគណនាវិស្វកម្ម';
+$ec_lang['about_main_desc']='បេសកកម្ម, ប្រភពបើកចំហ, និងការចូលរួម';

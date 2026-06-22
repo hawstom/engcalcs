@@ -343,3 +343,8 @@ $ec_lang['ps_notes_4_term']='अल्प हानियाँ k<sub>m</sub>';
 $ec_lang['ps_notes_4_def']='विशिष्ट मूल्य: तीक्ष्ण प्रवेश 0.5, प्रत्येक 45&deg; मोड़ 0.2&ndash;0.3, गेट वाल्व (पूर्ण खुला) 0.1, बटरफ्लाई वाल्व 0.2। सभी फिटिंग्स का योग कुल k<sub>m</sub> है। डिफ़ॉल्ट 1.5 एक प्रवेश और दो मोड़ मानता है।';
 $ec_lang['ps_notes_5_term']='पाइप खुरदरापन e';
 $ec_lang['ps_notes_5_def']='सामान्य पूर्ण खुरदरापन: इस्पात (नया) 0.046&nbsp;mm, इस्पात (पुराना) 0.15&nbsp;mm, HDPE 0.003&nbsp;mm, PVC/uPVC 0.0015&nbsp;mm, कंक्रीट 0.3&ndash;3&nbsp;mm। HDPE छोटे माइक्रो-हाइड्रो पेनस्टॉक में आम है।';
+
+// About
+$ec_lang['about_main_menu']='के बारे में';
+$ec_lang['about_main_title']='HawsEDC इंजीनियरिंग कैलकुलेटर के बारे में';
+$ec_lang['about_main_desc']='मिशन, ओपन सोर्स और योगदान';

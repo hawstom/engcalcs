@@ -340,3 +340,8 @@ $ec_lang['ps_notes_4_term']='局部损失 k<sub>m</sub>';
 $ec_lang['ps_notes_4_def']='典型参考值：锐边进口 0.5，每个 45&deg; 弯头 0.2&ndash;0.3，闸阀（全开）0.1，蝶阀 0.2。累加所有管件得到总 k<sub>m</sub>。默认值 1.5 假设一个进口和两个弯头。';
 $ec_lang['ps_notes_5_term']='管道粗糙度 e';
 $ec_lang['ps_notes_5_def']='典型绝对粗糙度：钢管（新）0.046&nbsp;mm，钢管（旧）0.15&nbsp;mm，HDPE 0.003&nbsp;mm，PVC/uPVC 0.0015&nbsp;mm，混凝土 0.3&ndash;3&nbsp;mm。HDPE 常用于小型微水电压力管道。';
+
+// About
+$ec_lang['about_main_menu']='关于';
+$ec_lang['about_main_title']='关于 HawsEDC 工程计算器';
+$ec_lang['about_main_desc']='使命、开源与贡献';

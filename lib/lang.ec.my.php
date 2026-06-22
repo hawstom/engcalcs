@@ -342,3 +342,8 @@ $ec_lang['contact_message']='မက်ဆေ့:';
 $ec_lang['contactSpamPrefix']='ငါးပေါင်း တစ်ညီ';
 $ec_lang['contactSpamPostfix']='(ကျေးဇူးပြု၍ စကားလုံးဖြင့် ရေးပါ။ 1=တစ် 2=နှစ် 3=သုံး 4=လေး 5=ငါး 6=ခြောက် 7=ခုနစ် +=ပေါင်း 5+1=6)';
 $ec_lang['contactSubmitButton']='မက်ဆေ့တင်ပြရန်';
+
+// About
+$ec_lang['about_main_menu']='အကြောင်း';
+$ec_lang['about_main_title']='HawsEDC အင်ဂျင်နီယာ ကိရိယာများ အကြောင်း';
+$ec_lang['about_main_desc']='ရည်ရွယ်ချက်၊ ပွင့်လင်းအရင်းအမြစ်နှင့် ပါဝင်ကူညီမှု';

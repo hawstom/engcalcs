@@ -347,3 +347,8 @@ $ec_lang['ps_notes_4_term']='Pérdidas menores k<sub>m</sub>';
 $ec_lang['ps_notes_4_def']='Valores típicos: entrada con borde vivo 0,5, cada codo de 45&deg; 0,2&ndash;0,3, válvula compuerta (totalmente abierta) 0,1, válvula mariposa 0,2. Sume todos los accesorios para obtener el k<sub>m</sub> total. El valor por defecto 1,5 supone una entrada y dos codos.';
 $ec_lang['ps_notes_5_term']='Rugosidad de la tubería e';
 $ec_lang['ps_notes_5_def']='Rugosidad absoluta típica: acero (nuevo) 0,046&nbsp;mm, acero (usado) 0,15&nbsp;mm, HDPE 0,003&nbsp;mm, PVC/uPVC 0,0015&nbsp;mm, hormigón 0,3&ndash;3&nbsp;mm. El HDPE es común en tuberías de presión de pequeñas instalaciones micro-hidroeléctricas.';
+
+// About
+$ec_lang['about_main_menu']='Acerca de';
+$ec_lang['about_main_title']='Acerca de las calculadoras de ingeniería HawsEDC';
+$ec_lang['about_main_desc']='Misión, código abierto y contribuciones';
