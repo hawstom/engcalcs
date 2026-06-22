@@ -6,7 +6,6 @@ The format of each task is: Priority/status|Description. 0 means "Completed" and
 
 # Tasks
 
-- 85|Add Urdu (اردو) — RTL, shares vocabulary with Hindi but uses Nastaliq/Arabic script. Register as 'ur', add dir="rtl" alongside 'ar' and 'he' in HeadersFooters.lib.php.
 
 - 97|Add Amharic
 
@@ -35,6 +34,8 @@ The format of each task is: Priority/status|Description. 0 means "Completed" and
 - 10|Results sharing — generate a shareable URL or printable summary of a completed calculation. Nice-to-have feature.
 
 ## Completed
+
+- 0|Add Urdu (اردو) translation — complete translation of all calculators. Registered in Language.Settings.php (QUALITY 0.9). RTL; added 'ur' to dir="rtl" array in HeadersFooters.lib.php alongside 'ar' and 'he'.
 
 - 0|Add Swahili (Kiswahili) translation — complete translation of all calculators. Registered in Language.Settings.php (QUALITY 0.9). LTR; no RTL change needed.
 

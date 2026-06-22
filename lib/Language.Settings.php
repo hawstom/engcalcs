@@ -192,3 +192,10 @@ $all_language_settings['tr']=array(
 'LANGNAME'=>'Türkçe',
 'TITLE_WORDS'=>array(),
 );
+
+//-- settings for urdu
+$all_language_settings['ur']=array(
+'QUALITY'=>'0.9',
+'LANGNAME'=>'اردو',
+'TITLE_WORDS'=>array(),
+);
