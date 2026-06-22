@@ -6,8 +6,6 @@ The format of each task is: Priority/status|Description. 0 means "Completed" and
 
 # Tasks
 
-- 94|Hydropower: Explore penstock design calculator — size a pipe for a hydropower intake, optimizing diameter against head loss and cost. Darcy-Weisbach is already built; this would be a thin layer on top of it.
-
 - 93|Irrigation: Existing weir and orifice calculators already serve irrigation flow measurement — consider adding an explicit note or landing page connecting them to irrigation use cases (farmers and irrigation districts use these constantly).
 
 - 90|Irrigation: Explore drip/sprinkler design calculator — emitter flow, lateral spacing, precipitation rate, system uniformity coefficient. High value for smallholder agriculture in water-scarce regions.
@@ -29,6 +27,8 @@ The format of each task is: Priority/status|Description. 0 means "Completed" and
 - 10|Results sharing — generate a shareable URL or printable summary of a completed calculation. Nice-to-have feature.
 
 ## Completed
+
+- 0|Penstock Design calculator: Penstock-Design.php wraps Darcy-Weisbach friction factor logic with gross head, plant efficiency, and power output. Inputs: Q, H_gross, D, L, roughness e, minor loss km, kinematic viscosity, η. Results: velocity + color-coded velocity check (1–3 m/s target), f, h_f, h_m, h_L, color-coded head loss % check (10%/20% thresholds), H_net, power (kW/MW/hp), annual kWh/yr. Dynamic SVG bar sketch shows H_net vs h_L proportions. ps_ keys added to all 22 lang files.
 
 - 0|Micro-Hydro Power calculator: Micro-Hydro-Power.php added with run-of-river power formula P = η·ρ·g·Q·H_net. Inputs: Q, gross head, penstock losses, plant efficiency. Outputs: net head, power (kW/MW/hp), annual energy at 100% capacity (kWh/yr). kW/MW/hp units added to Units.lib.php; mhp_ keys added to all 22 lang files. SVG sketch of headpond–penstock–powerhouse system. Notes link to Darcy-Weisbach calculator for penstock loss sizing.
 
