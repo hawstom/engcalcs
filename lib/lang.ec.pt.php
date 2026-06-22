@@ -39,6 +39,9 @@ $ec_lang['u_s']="segundos (seg)";
 $ec_lang['u_acft']="ac-ft";
 $ec_lang['u_ft3']="ft^3";
 $ec_lang['u_m3']="m^3";
+$ec_lang['u_kw']='kW';
+$ec_lang['u_mw']='MW';
+$ec_lang['u_hp']='hp';
 
 // Page text
 // In page order for easiest maintenance.
@@ -291,3 +294,23 @@ $ec_lang['mtc_n_blodgett']='n para o tamanho de rocha de projeto segundo Blodget
 $ec_lang['mtc_n_strickler']='n para o tamanho de rocha de projeto segundo Strickler';
 $ec_lang['mtc_note_1']='<p>Notas:</p><dl><dt>Iteração automatizada de dimensionamento de rocha e rugosidade</dt><dd>Escolha um botão de opção de rugosidade (BB recomendado) e um botão de opção de tamanho de rocha de projeto (Isbash recomendado). Ajuste a profundidade e o fator de segurança do tamanho de rocha para obter o escoamento desejado com um tamanho de rocha inteiro. Toda vez que qualquer valor de entrada é alterado, o seguinte ciclo de iteração ocorre: 1. A rugosidade é calculada a partir do tamanho de rocha de projeto. 2. O cálculo de rugosidade solicitado é copiado para a rugosidade de entrada. 3. O escoamento do canal e o tamanho de rocha requerido são calculados. 4. O tamanho de rocha de projeto é ajustado. 5. Repete até que o erro no tamanho de rocha de projeto seja muito pequeno.</dd><dt>Calculadora básica (sem iteração)</dt><dd>Digite o valor de rugosidade desejado. Ignore a área de entrada do tamanho de rocha de projeto.</dd></dl>';
 $ec_lang['or_velocity']='Velocidade na abertura, v';
+
+// Micro-Hydro Power
+$ec_lang['mhp_main_menu']='Micro-Hydro Power';
+$ec_lang['mhp_main_title']='Free Online Micro-Hydro Power Calculator';
+$ec_lang['mhp_main_desc']='Run-of-River Micro-Hydro Power Output Calculator';
+$ec_lang['mhp_flow']='Flow rate, Q';
+$ec_lang['mhp_gross_head']='Gross head (elevation drop), H<sub>gross</sub>';
+$ec_lang['mhp_head_loss']='Penstock head losses, h<sub>L</sub>';
+$ec_lang['mhp_efficiency']='Plant efficiency, &eta; (0&ndash;1)';
+$ec_lang['mhp_net_head']='Net head, H<sub>net</sub>';
+$ec_lang['mhp_power']='Power output, P';
+$ec_lang['mhp_annual_kwh']='Annual energy at 100% capacity (kWh/yr)';
+$ec_lang['mhp_notes_1_term']='Power Equation';
+$ec_lang['mhp_notes_1_def']='P = &eta; &times; &rho; &times; g &times; Q &times; H<sub>net</sub>, where &rho; = 1000 kg/m&sup3; (fresh water) and g = 9.806 m/s&sup2;.';
+$ec_lang['mhp_notes_2_term']='Net Head';
+$ec_lang['mhp_notes_2_def']='Net head = gross head &minus; penstock head losses. A common first estimate is h<sub>L</sub> &asymp; 5% of H<sub>gross</sub>. Use the <a href="Darcy-Weisbach.php">Darcy-Weisbach calculator</a> for more accurate penstock loss estimates.';
+$ec_lang['mhp_notes_3_term']='Efficiency';
+$ec_lang['mhp_notes_3_def']='Typical plant efficiency &eta; ranges from 0.70 to 0.85 for Pelton and cross-flow turbines common in micro-hydro. Use 0.75 as a conservative first estimate.';
+$ec_lang['mhp_notes_4_term']='Annual Energy';
+$ec_lang['mhp_notes_4_def']='Annual energy assumes continuous full-flow operation (8760 hours/year). Actual production will be lower due to seasonal flow variation, maintenance downtime, and load factor.';

@@ -39,6 +39,9 @@ $ec_lang['u_s']="sec";
 $ec_lang['u_acft']="ac-ft";
 $ec_lang['u_ft3']="ft^3";
 $ec_lang['u_m3']="m^3";
+$ec_lang['u_kw']="kW";
+$ec_lang['u_mw']="MW";
+$ec_lang['u_hp']="hp";
 
 // Page text
 // In page order for easiest maintenance.
@@ -234,6 +237,25 @@ $ec_lang['or_notes_3_term']='Discharge Coefficient';
 $ec_lang['or_notes_3_def']='C<sub>d</sub> ranges from about 0.60&ndash;0.65 for sharp-edged orifices. Rounded or re-entrant inlets use different values. See the <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venture-d_590.html">Engineering Toolbox</a> or the HEC-RAS Hydraulic Reference Manual for guidance.';
 $ec_lang['or_notes_4_term']='Submergence';
 $ec_lang['or_notes_4_def']='When TWE is above the opening invert, this calculator automatically applies the submerged orifice equation using h = HWE &minus; TWE. When TWE is at or below the invert, free outfall is assumed and h = HWE &minus; centroid.';
+// Micro-Hydro Power
+$ec_lang['mhp_main_menu']='Micro-Hydro Power';
+$ec_lang['mhp_main_title']='Free Online Micro-Hydro Power Calculator';
+$ec_lang['mhp_main_desc']='Run-of-River Micro-Hydro Power Output Calculator';
+$ec_lang['mhp_flow']='Flow rate, Q';
+$ec_lang['mhp_gross_head']='Gross head (elevation drop), H<sub>gross</sub>';
+$ec_lang['mhp_head_loss']='Penstock head losses, h<sub>L</sub>';
+$ec_lang['mhp_efficiency']='Plant efficiency, &eta; (0&ndash;1)';
+$ec_lang['mhp_net_head']='Net head, H<sub>net</sub>';
+$ec_lang['mhp_power']='Power output, P';
+$ec_lang['mhp_annual_kwh']='Annual energy at 100% capacity (kWh/yr)';
+$ec_lang['mhp_notes_1_term']='Power Equation';
+$ec_lang['mhp_notes_1_def']='P = &eta; &times; &rho; &times; g &times; Q &times; H<sub>net</sub>, where &rho; = 1000 kg/m&sup3; (fresh water) and g = 9.806 m/s&sup2;.';
+$ec_lang['mhp_notes_2_term']='Net Head';
+$ec_lang['mhp_notes_2_def']='Net head = gross head &minus; penstock head losses. A common first estimate is h<sub>L</sub> &asymp; 5% of H<sub>gross</sub>. Use the <a href="Darcy-Weisbach.php">Darcy-Weisbach calculator</a> for more accurate penstock loss estimates.';
+$ec_lang['mhp_notes_3_term']='Efficiency';
+$ec_lang['mhp_notes_3_def']='Typical plant efficiency &eta; ranges from 0.70 to 0.85 for Pelton and cross-flow turbines common in micro-hydro. Use 0.75 as a conservative first estimate.';
+$ec_lang['mhp_notes_4_term']='Annual Energy';
+$ec_lang['mhp_notes_4_def']='Annual energy assumes continuous full-flow operation (8760 hours/year). Actual production will be lower due to seasonal flow variation, maintenance downtime, and load factor.';
 // Orifice Drain Time
 $ec_lang['odt_main_menu']='Orifice Drain Time';
 $ec_lang['odt_main_title']='Free Online Orifice Drain Time Calculator — Pond, Basin, or Tank';

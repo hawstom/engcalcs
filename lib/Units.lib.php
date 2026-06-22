@@ -4,10 +4,10 @@
  * Unit sets let users set all units to defaults for set with one click.
  *
  */
-$ec_unit_sets['m'] = Array($ec_lang['u_m'],$ec_lang['u_mps'], $ec_lang['u_m3ps'], $ec_lang['u_m2'], $ec_lang['u_kpa'], $ec_lang['u_npm2'], $ec_lang['u_mh2o'], $ec_lang['u_m3']);
-$ec_unit_sets['mm'] = Array($ec_lang['u_mm'], $ec_lang['u_mps'], $ec_lang['u_lps'], $ec_lang['u_mm2'], $ec_lang['u_pa'], $ec_lang['u_npm2'], $ec_lang['u_mmh2o'], $ec_lang['u_m3']);
-$ec_unit_sets['ft'] = Array($ec_lang['u_ft'], $ec_lang['u_ftps'], $ec_lang['u_ft3ps'], $ec_lang['u_ft2'], $ec_lang['u_psf'], $ec_lang['u_fth2o'], $ec_lang['u_ft3']);
-$ec_unit_sets['in'] = Array($ec_lang['u_in'], $ec_lang['u_ftps'], $ec_lang['u_gpm'], $ec_lang['u_in2'], $ec_lang['u_psi'], $ec_lang['u_inh2o'], $ec_lang['u_ft3']);
+$ec_unit_sets['m'] = Array($ec_lang['u_m'],$ec_lang['u_mps'], $ec_lang['u_m3ps'], $ec_lang['u_m2'], $ec_lang['u_kpa'], $ec_lang['u_npm2'], $ec_lang['u_mh2o'], $ec_lang['u_m3'], $ec_lang['u_kw']);
+$ec_unit_sets['mm'] = Array($ec_lang['u_mm'], $ec_lang['u_mps'], $ec_lang['u_lps'], $ec_lang['u_mm2'], $ec_lang['u_pa'], $ec_lang['u_npm2'], $ec_lang['u_mmh2o'], $ec_lang['u_m3'], $ec_lang['u_kw']);
+$ec_unit_sets['ft'] = Array($ec_lang['u_ft'], $ec_lang['u_ftps'], $ec_lang['u_ft3ps'], $ec_lang['u_ft2'], $ec_lang['u_psf'], $ec_lang['u_fth2o'], $ec_lang['u_ft3'], $ec_lang['u_kw']);
+$ec_unit_sets['in'] = Array($ec_lang['u_in'], $ec_lang['u_ftps'], $ec_lang['u_gpm'], $ec_lang['u_in2'], $ec_lang['u_psi'], $ec_lang['u_inh2o'], $ec_lang['u_ft3'], $ec_lang['u_kw']);
 /**
  *
  * The value of each unit is the number of that unit
@@ -57,3 +57,7 @@ $ec_units['gradePercent']=100;
 
 $ec_units['depthFrac']=1;
 $ec_units['depthPercent']=100;
+
+$ec_units['kw']=0.001;
+$ec_units['mw']=0.000001;
+$ec_units['hp']=0.001341;

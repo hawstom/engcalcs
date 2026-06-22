@@ -6,9 +6,6 @@ The format of each task is: Priority/status|Description. 0 means "Completed" and
 
 # Tasks
 
-
-- 95|Hydropower: Explore run-of-river micro-hydro power calculator. Core formula: P = η·ρ·g·Q·H (flow rate, gross head, efficiency → kW). Connects naturally to existing Manning/Darcy-Weisbach work for penstock sizing and head-loss accounting. Target audience: small community hydro projects in the Global South.
-
 - 94|Hydropower: Explore penstock design calculator — size a pipe for a hydropower intake, optimizing diameter against head loss and cost. Darcy-Weisbach is already built; this would be a thin layer on top of it.
 
 - 93|Irrigation: Existing weir and orifice calculators already serve irrigation flow measurement — consider adding an explicit note or landing page connecting them to irrigation use cases (farmers and irrigation districts use these constantly).
@@ -32,6 +29,8 @@ The format of each task is: Priority/status|Description. 0 means "Completed" and
 - 10|Results sharing — generate a shareable URL or printable summary of a completed calculation. Nice-to-have feature.
 
 ## Completed
+
+- 0|Micro-Hydro Power calculator: Micro-Hydro-Power.php added with run-of-river power formula P = η·ρ·g·Q·H_net. Inputs: Q, gross head, penstock losses, plant efficiency. Outputs: net head, power (kW/MW/hp), annual energy at 100% capacity (kWh/yr). kW/MW/hp units added to Units.lib.php; mhp_ keys added to all 22 lang files. SVG sketch of headpond–penstock–powerhouse system. Notes link to Darcy-Weisbach calculator for penstock loss sizing.
 
 - 0|Add Amharic (አማርኛ) translation — complete translation of all calculators. Registered in Language.Settings.php (QUALITY 0.9). LTR; no RTL change needed.
 
