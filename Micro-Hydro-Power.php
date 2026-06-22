@@ -16,14 +16,14 @@ echoCalculatorForm(
 	Array(
 		Array('name' => 'q',      'type' => 'number', 'default' => '10',   'units' => Array('lps','m3ps','ft3ps','gpm'), 'label' => $ec_lang['mhp_flow']),
 		Array('name' => 'hgross', 'type' => 'number', 'default' => '50',   'units' => Array('m','mm','ft','in'),          'label' => $ec_lang['mhp_gross_head']),
-		Array('name' => 'hloss',  'type' => 'number', 'default' => '2.5',  'units' => Array('m','mm','ft','in'),          'label' => $ec_lang['mhp_head_loss']),
-		Array('name' => 'eta',    'type' => 'number', 'default' => '0.75', 'units' => NULL,                               'label' => $ec_lang['mhp_efficiency']),
+		Array('name' => 'hloss',  'type' => 'number', 'default' => '2.5',  'units' => Array('m','mm','ft','in'),          'label' => $ec_lang['mhp_head_loss'].' '.$ec_lang['mpf_see_notes']),
+		Array('name' => 'eta',    'type' => 'number', 'default' => '0.75', 'units' => NULL,                               'label' => $ec_lang['mhp_efficiency'].' '.$ec_lang['mpf_see_notes']),
 	),
 	//Results
 	Array(
 		Array('name' => 'hnet',       'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mhp_net_head']),
 		Array('name' => 'power',      'units' => Array('kw','mw','hp'),     'label' => $ec_lang['mhp_power']),
-		Array('name' => 'annual_kwh', 'units' => Array('kwh_yr','mwh_yr'),   'label' => $ec_lang['mhp_annual_kwh']),
+		Array('name' => 'annual_kwh', 'units' => Array('kwh_yr','mwh_yr'),   'label' => $ec_lang['mhp_annual_kwh'].' '.$ec_lang['mpf_see_notes']),
 	)
 );
 ?>
