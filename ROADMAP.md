@@ -8,7 +8,7 @@ The format of each task is: Priority/status|Description. 0 means "Completed" and
 
 ## Mission & Love
 
-- 60|Progressive Web App (PWA): Implement PWA offline support for engineers and field workers in low-connectivity regions. Zip download dropped in favor of PWA — zip requires extraction and hits browser security warnings on local file:// URLs; PWA caches automatically and installs to the home screen with no friction. Save As covers basic one-off offline use; PWA covers reliable offline-first use.
+- 100|Progressive Web App (PWA): Implement PWA offline support for engineers and field workers in low-connectivity regions. Zip download dropped in favor of PWA — zip requires extraction and hits browser security warnings on local file:// URLs; PWA caches automatically and installs to the home screen with no friction. Save As covers basic one-off offline use; PWA covers reliable offline-first use.
 
 - 55|Text-only mode: Evaluate the need and cost/benefit of a leaner text-only rendering for the global south.
 
