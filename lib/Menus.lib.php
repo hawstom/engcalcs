@@ -106,6 +106,7 @@ function echoEngCalcsMenu () {
 					<a class="dropdown-item" href="Weir-Flow-Irregular.php" title="<?=$ec_lang['wi_main_desc']?>"><?=$ec_lang['wi_menu']?></a>
 					<div class="dropdown-divider"></div>
 					<a class="dropdown-item" href="Irrigation.php" title="<?=$ec_lang['irr_main_desc']?>"><?=$ec_lang['irr_main_menu']?></a>
+						<a class="dropdown-item" href="Drip-Sprinkler.php" title="<?=$ec_lang['ds_main_desc']?>"><?=$ec_lang['ds_main_menu']?></a>
 				</div>
 			</li>
 			<li class="nav-item dropdown">

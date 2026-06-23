@@ -16,7 +16,7 @@ echoHeader("EngCalcs", $html_title, $html_head);
    These tools are part of a broader humanitarian mission: to tell every human being in the most
    practical and effective way possible that they are loved and cherished forever, that they have
    nothing to fear, and that they are not going to ruin everything.</p>
-<p>The calculators are the vehicle. The destination is people.</p>
+<p>The calculators are the vehicle. The destination is a world free of suffering.</p>
 
 <h3>Open Source License</h3>
 <p>All code is released under the

@@ -19,7 +19,6 @@ The format of each task is: Priority/status|Description. 0 means "Completed" and
 
 ## Calculator Improvements
 
-- 80|Irrigation: Explore drip/sprinkler design calculator — emitter flow, lateral spacing, precipitation rate, system uniformity coefficient. High value for smallholder agriculture in water-scarce regions.
 
 - 75|Robinson Rock Chute: Evaluate adding this calculator (currently a Google Spreadsheet). Should we retire the spreadsheet or refer to other available calculators? Does the reference white paper justify the complexity?
 
@@ -36,6 +35,8 @@ The format of each task is: Priority/status|Description. 0 means "Completed" and
 - 10|Results sharing — generate a shareable URL or printable summary of a completed calculation.
 
 ## Completed
+
+- 0|Drip/Sprinkler Application Rate calculator (Drip-Sprinkler.php): inputs are average and minimum emitter flow rate, emitter spacing Se, lateral spacing Sl, emitters per lateral, laterals per zone, and target application depth. Outputs are area per emitter, application (precipitation) rate PR = q/Ae, distribution uniformity DU = qmin/qavg (with color-coded quality check), flow per lateral, zone flow, and runtime for target depth. New units added: lph, gph (flow rates), mmph, inph (precipitation rate). Added to main nav under Irrigation, and added a card to Irrigation.php landing page. ds_ keys added to all 27 lang files (English translations; other languages fall back to English pending native-speaker review).
 
 - 0|Language quality — structural fixes: he, pt, hr, sr, ro, zh all raised to 0.85–0.9. he: fixed 6 English strings in mtc_ section and mixed-language mphl_hgl_2. sr: fixed 4 Croatian-script strings in irr_/mhp_ sections. All 26 non-English lang files gained about_ keys. Native-speaker review not tracked here — handled when speakers reach out via the feedback bar.
 

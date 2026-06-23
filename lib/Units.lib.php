@@ -64,3 +64,8 @@ $ec_units['hp']=0.001341;
 
 $ec_units['kwh_yr']=1.0;
 $ec_units['mwh_yr']=0.001;
+
+$ec_units['lph']=3600000;    // L/hr per m³/s
+$ec_units['gph']=951019;     // US gal/hr per m³/s
+$ec_units['mmph']=3600000;   // mm/hr per m/s (precipitation rate)
+$ec_units['inph']=141732;    // in/hr per m/s
