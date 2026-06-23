@@ -1,0 +1,19 @@
+{
+  "name": "EngCalcs — Hydraulic Engineering Calculators",
+  "short_name": "EngCalcs",
+  "description": "Free open-source hydraulic engineering calculators for field and office use.",
+  "start_url": "/engcalcs/index.php",
+  "scope": "/engcalcs/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1a6faf",
+  "lang": "en",
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

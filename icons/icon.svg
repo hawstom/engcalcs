@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="80" fill="#1a6faf"/>
+  <text x="256" y="300" font-family="Georgia,serif" font-size="220" font-weight="bold"
+        text-anchor="middle" fill="#ffffff">EC</text>
+  <path d="M100 370 Q180 340 256 370 Q332 400 412 370 L412 410 Q332 440 256 410 Q180 380 100 410 Z"
+        fill="#7ec8e3" opacity="0.85"/>
+</svg>

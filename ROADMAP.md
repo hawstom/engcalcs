@@ -8,7 +8,7 @@ The format of each task is: Priority/status|Description. 0 means "Completed" and
 
 ## Mission & Love
 
-- 100|Progressive Web App (PWA): Implement PWA offline support for engineers and field workers in low-connectivity regions. Zip download dropped in favor of PWA — zip requires extraction and hits browser security warnings on local file:// URLs; PWA caches automatically and installs to the home screen with no friction. Save As covers basic one-off offline use; PWA covers reliable offline-first use.
+- 0|Progressive Web App (PWA): Implemented. manifest.json, sw.js, and icons/icon.svg added. Service worker pre-caches all 16 calculator pages + all JS/CSS assets + Bootstrap CDN files on install. Strategy: cache-first for static assets, network-first (falling back to cache) for PHP pages. Language cookies work normally when online; offline serves the cached version in whatever language was current at install time. SW registration injected into echoHTMLHead() via HeadersFooters.lib.php. Theme color #1a6faf. Remaining nice-to-have: PNG icons for older Android WebView installs (currently SVG only, works on Chrome 112+/Safari 16+/Firefox).
 
 - 55|Text-only mode: Evaluate the need and cost/benefit of a leaner text-only rendering for the global south.
 
