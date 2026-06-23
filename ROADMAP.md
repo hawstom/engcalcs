@@ -8,16 +8,28 @@ The format of each task is: Priority/status|Description. 0 means "Completed" and
 
 ## Mission & Love
 
-
 - 60|Progressive Web App (PWA): Implement PWA offline support for engineers and field workers in low-connectivity regions. Zip download dropped in favor of PWA — zip requires extraction and hits browser security warnings on local file:// URLs; PWA caches automatically and installs to the home screen with no friction. Save As covers basic one-off offline use; PWA covers reliable offline-first use.
 
 - 55|Text-only mode: Evaluate the need and cost/benefit of a leaner text-only rendering for the global south.
 
 ## Language Expansion
 
-- 45|About page — translate body content into all 26 languages. Currently only the menu label, page title, and meta description are translated (3 keys); the body prose is English-only. Approach: one `about_body_html` key per language containing the full page body as an HTML string, falling back to English. Narrative content benefits from block translation rather than granular keys.
+- 36|Redundant phrases: We are starting to get some repeated phrases that maybe we can standardize as snippets. Maybe you can evaluate possible lengthy passages ("Measure flow", love statement, etc) to index/compress into standard snippets. I know from my experience first launching these language files long ago that this can cause more trouble than it's worth; I reworked the system that was overly "normalized". But maybe within reason?
+
 
 ## Calculator Improvements
+
+- 0|Drip-Sprinkler: DU quality check renders as "Good &mdash; DU &ge; 80% ✓" — fixed. HTML entities in ds_du_* lang keys were double-encoded through htmlspecialchars() into JS. Replaced with Unicode (— ≥ <) in all 27 lang files.
+
+- 100|Drip-Sprinkler: Talk to me more about the value of this calculator. It seems trivial, like something easily rigged in a spreadsheet. Do you find any clear indication that this is demanded?
+
+- 95|Drip-Sprinkler: The calculator is not translated. If/once we decide it's worthwhile, we need to translate it before deploying it.
+
+- 35|Standalone engcalcs: Would it be good to more completely decouple engcalcs from its containing web site? I am not sure about the standard way to accomplish this, but it seems intuitive to me that this app should not depend on its containing site in its parent folder(s).
+
+- 45|About page — translate body content into all 26 languages. Currently only the menu label, page title, and meta description are translated (3 keys); the body prose is English-only. Approach: one `about_body_html` key per language containing the full page body as an HTML string, falling back to English. Narrative content benefits from block translation rather than granular keys.
+
+- 99|Irrigation.php: I have my doubts about this page. It must be translated to all languages as does about.php. And we don't know whether it's useful. I am game to try it. But we have to do it right (translations) if we are going to do it.
 
 
 - 75|Robinson Rock Chute: Evaluate adding this calculator (currently a Google Spreadsheet). Should we retire the spreadsheet or refer to other available calculators? Does the reference white paper justify the complexity?
