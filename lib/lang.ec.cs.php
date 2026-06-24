@@ -378,6 +378,33 @@ $ec_lang['ds_notes_2_term']='Rovnoměrnost distribuce (DU)';
 $ec_lang['ds_notes_2_def']='DU = q<sub>min</sub> / q<sub>avg</sub>. DU 1,0 (100 %) znamená, že všechny emitory tekou identicky. Hodnoty pod 0,80 plýtvají vodou v dobře zavlažovaných oblastech a zanechávají sušší místa. Rovnoměrnost klesá při nadměrných tlakových výkyvech podél postranní větve, opotřebení emitorů nebo částečném ucpání.';
 $ec_lang['ds_notes_3_term']='Doba závlahy';
 $ec_lang['ds_notes_3_def']='Doba závlahy = cílová hloubka &divide; dávka vody. Na svažitých nebo zhutnělých půdách rozdělte dobu závlahy do dvou nebo tří kratších cyklů s přestávkami, abyste se vyhnuli povrchovému odtoku.';
+
+// Canal Seepage / Conveyance Efficiency. Prefix cs_.
+$ec_lang['cs_main_menu']='Ztráty průsakem v kanálu';
+$ec_lang['cs_main_title']='Bezplatná online kalkulačka ztrát průsakem v kanálu a dopravní účinnosti';
+$ec_lang['cs_main_desc']='Ztráty průsakem v kanálu &amp; Dopravní účinnost &mdash; Metoda přítok–odtok';
+$ec_lang['cs_Q_in']='Průtok na vtoku úseku, Q<sub>in</sub>';
+$ec_lang['cs_Q_out']='Průtok na výtoku úseku, Q<sub>out</sub>';
+$ec_lang['cs_Q_loss']='Rychlost průsakové ztráty, Q<sub>loss</sub>';
+$ec_lang['cs_loss_check']='Kontrola měření';
+$ec_lang['cs_pct_loss']='Ztráta jako podíl přítoku';
+$ec_lang['cs_Ec']='Dopravní účinnost, E<sub>c</sub>';
+$ec_lang['cs_Ec_check']='Hodnocení účinnosti';
+$ec_lang['cs_Vol_day']='Denní objem ztracený průsakem';
+$ec_lang['cs_Vol_year']='Roční objem ztracený průsakem';
+$ec_lang['cs_loss_positive']='Qin > Qout — průsak zjištěn ✓';
+$ec_lang['cs_loss_zero']='Qin = Qout — žádná měřitelná ztráta';
+$ec_lang['cs_loss_negative']='Varování: Qout > Qin — zkontrolujte měření ⚠';
+$ec_lang['cs_Ec_good']='Dobrá — Ec ≥ 80% ✓';
+$ec_lang['cs_Ec_fair']='Přijatelná — Ec 60–80%';
+$ec_lang['cs_Ec_poor']='Špatná — Ec < 60% ⚠';
+$ec_lang['cs_notes_1_term']='Metoda';
+$ec_lang['cs_notes_1_def']='Metoda přítok–odtok odhaduje průsak měřením průtoku na vtoku a výtoku úseku kanálu: Q<sub>loss</sub> = Q<sub>in</sub> &minus; Q<sub>out</sub>. Dopravní účinnost E<sub>c</sub> = Q<sub>out</sub> / Q<sub>in</sub>. Roční objem předpokládá nepřetržitý provoz s plným průtokem; skutečná ztráta je nižší pro sezónní nebo částečně průtočné kanály.';
+$ec_lang['cs_notes_2_term']='Hodnocení účinnosti';
+$ec_lang['cs_notes_2_def']='Typické nezpevněné zemní kanály: E<sub>c</sub> = 60&ndash;80%. Dobře udržované zemní kanály: 75&ndash;85%. Betonové kanály: 90&ndash;98%. Průsakové ztráty nad 30 % přítoku často odůvodňují investici do zpevnění. (USBR, FAO)';
+$ec_lang['cs_notes_3_term']='Literatura';
+$ec_lang['cs_notes_3_def']='USBR <em>Water Measurement Manual</em>, 3. vyd. (2001). FAO Irrigation and Drainage Paper 57 (1999).';
+
 $ec_lang['irr_intro_html']='<p>Přelivy a otvory jsou standardní terénní nástroje pro měření průtoku vody v závlahových systémech. Vyberte kalkulačku odpovídající vaší konstrukci:</p>';
 $ec_lang['irr_card_weir_uniform_head']='Přeliv — Široká Koruna (Rovnoměrná Šířka)';
 $ec_lang['irr_card_weir_uniform_desc']='Měřte průtok přes korunu odvodňovacího jezu, kontrolního objektu nebo přelivné desky. Zadejte délku přelivu a hloubku vody nad korunou.';
@@ -389,6 +416,8 @@ $ec_lang['irr_card_canal_head']='Návrh &amp; Analýza Kanálu';
 $ec_lang['irr_card_canal_desc']='Navrhněte nebo ověřte závlahový kanál pomocí Manningova vzorce. Používejte lichoběžníkovou kalkulačku pro nové kanály; nepravidelnou kalkulačku pro stávající přirozené nebo vybudované průřezy.';
 $ec_lang['irr_card_drip_head']='Návrh Kapkové &amp; Sprinklerové Závlahy';
 $ec_lang['irr_card_drip_desc']='Vypočítejte míru aplikace, rovnoměrnost distribuce, průtok větve, průtok zóny a dobu provozu pro kapkový nebo sprinklerový závlahový systém. Zadejte průtok emitoru, rozteč emitorů a cílovou hloubku.';
+$ec_lang['irr_card_seepage_head']='Průsak kanálu &amp; Dopravní účinnost';
+$ec_lang['irr_card_seepage_desc']='Odhadněte průsakové ztráty z úseku kanálu pomocí měření přítoku a odtoku. Vypočítejte dopravní účinnost a roční ztrátu vody pro stanovení priorit investic do zpevnění kanálu.';
 $ec_lang['irr_quickref_html']='<h3>Rychlá Referenční Příručka</h3><dl><dt>Odvodňovací jez nebo kontrolní objekt</dt><dd>Změřte hloubku vody nad korunou přelivu. Používejte <a href="Weir-Flow-Simple.php">Jednoduchý Přeliv</a> pro rovnoměrnou korunu nebo <a href="Weir-Flow-Irregular.php">Nepravidelný Přeliv</a> pro profilovanou nebo stupňovitou korunu.</dd><dt>Hlavní šoupě nebo trubní výpust</dt><dd>Změřte nadmořskou výšku hladiny v horní a dolní vodě (nebo výšku dna při volném výtoku). Používejte <a href="Orifice.php">Průtok Otvorem</a>. Pro kruhovou trubku D&nbsp;= průměr trubky; pro obdélníkové šoupě zadejte šířku W a výšku D.</dd><dt>Doba vyprázdnění nádrže nebo rybníka</dt><dd>Použijte <a href="Orifice-Drain-Time.php">Dobu Vyprázdnění Otvorem</a> pro odhad doby potřebné ke snížení hladiny rybníka nebo nádrže přes spodní otvor — užitečné pro plánování závlahového zásobníku.</dd><dt>Terénní standardy</dt><dd>Rovnice průtoku přelivem a otvorem použité zde odpovídají postupům USBR <em>Water Measurement Manual</em> (3. vydání), které běžně vyžadují správci vod a závlahové obvody.</dd></dl>';
 $ec_lang['about_body_html']='<h3>Poslání</h3><p>Inženýrské Kalkulačky HawsEDC existují, aby sloužily inženýrům a terénním pracovníkům po celém světě — zejména těm, kteří pracují v oblastech s nedostatkem vody, omezenými zdroji nebo nedostatečným zásobením. Tyto nástroje jsou součástí širšího humanitárního poslání: říci každému člověku co nejpraktičtějším a nejúčinnějším způsobem, že je navždy milován a ceněn, že se nemá čeho bát a že nezkazí všechno.</p><p>Kalkulačky jsou prostředkem. Cílem je svět bez utrpení.</p><h3>Licence s Otevřeným Zdrojovým Kódem</h3><p>Veškerý kód je vydán pod <a target="_blank" href="https://www.gnu.org/licenses/gpl-3.0.html">GNU General Public License v3.0 nebo novější</a> — svobodný ve smyslu svobody. Kód můžete za stejných podmínek používat, studovat, upravovat a šířit dál.</p><p>Copyright &copy; 2009&ndash;2026 Thomas Gail Haws.</p><h3>Zdrojový Kód</h3><p>Úplný zdrojový kód je veřejně dostupný na Bitbucket:</p><p><a target="_blank" href="https://bitbucket.org/hawstom/engcalcs">bitbucket.org/hawstom/engcalcs</a></p><p>Tam si můžete prohlédnout kód, nahlásit problémy nebo forknout repozitář.</p><h3>Příspěvky</h3><p>Pull requesty jsou vítány. Způsoby přispění:</p><ul><li><strong>Překlady</strong> — vylepšete nebo přidejte jazyk. Otevřete pull request se změnami v příslušném souboru <code>lib/lang.ec.??.php</code>.</li><li><strong>Hlášení chyb</strong> — použijte formulář zpětné vazby na libovolné stránce kalkulačky nebo nahlaste problém na Bitbucket.</li><li><strong>Nové kalkulačky</strong> — nápady na hydraulicko-inženýrské nástroje sloužící terénním pracovníkům a odborníkům na závlahy jsou zvláště vítány. Viz příručka pro vývojáře <code>CLAUDE.md</code> v repozitáři.</li><li><strong>Hosting</strong> — pokud můžete tuto kalkulačku zrcadlit pro oblast s omezeným připojením, obraťte se na nás.</li></ul><h3>Offline použití</h3><p>Tyto kalkulačky fungují jako progresivní webová aplikace (PWA). Navštivte jakoukoli stránku kalkulačky při připojeném internetu a váš prohlížeč automaticky uloží všechny kalkulačky do mezipaměti. Poté všechny kalkulačky fungují offline — bez potřeby internetu.</p><p>Na Androidu nebo iOS použijte možnost „Přidat na domovskou obrazovku" v prohlížeči a nainstalujte EngCalcs jako aplikaci do svého zařízení. Na počítači hledejte ikonu instalace v adresním řádku prohlížeče.</p><p>Libovolnou kalkulačku můžete také uložit pomocí nabídky „Uložit jako&hellip;" ve svém prohlížeči pro jednorázové offline použití.</p><h3>Kontakt</h3><p>Tom Haws — hydraulický inženýr a autor těchto kalkulaček.<br />Použijte formulář zpětné vazby na libovolné stránce kalkulačky nebo přistupte ke zdrojovému kódu na <a target="_blank" href="https://bitbucket.org/hawstom/engcalcs">Bitbucket</a>.</p>';
 

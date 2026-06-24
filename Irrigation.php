@@ -64,6 +64,16 @@ echoHeader("EngCalcs", $html_title, $html_head);
 		</div>
 	</div>
 
+	<div class="col">
+		<div class="card h-100">
+			<div class="card-header fw-bold"><?=$ec_lang['irr_card_seepage_head']?></div>
+			<div class="card-body">
+				<p class="card-text"><?=$ec_lang['irr_card_seepage_desc']?></p>
+				<a href="Canal-Seepage.php" class="btn btn-primary"><?=$ec_lang['cs_main_menu']?></a>
+			</div>
+		</div>
+	</div>
+
 </div>
 
 <?=$ec_lang['irr_quickref_html']?>

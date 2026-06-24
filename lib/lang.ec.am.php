@@ -381,6 +381,33 @@ $ec_lang['ds_notes_2_term']='የስርጭት ወጥነት (DU)';
 $ec_lang['ds_notes_2_def']='DU = q<sub>min</sub> / q<sub>avg</sub>። DU 1.0 (100%) ሁሉም ኤሚተሮች አንድ ዓይነት ፍሰት እንዳላቸው ያሳያል። ከ0.80 በታች ያሉ እሴቶች ውሃ ያባክናሉ። ወጥነቱ በላተራሉ ላይ ከፍተኛ የግፊት ልዩነት፣ የኤሚተር ጉዳት ወይም ከፊል መዘጋት ሲኖር ይቀንሳል።';
 $ec_lang['ds_notes_3_term']='የሩጫ ጊዜ';
 $ec_lang['ds_notes_3_def']='የሩጫ ጊዜ = ዒላማ ጥልቀት &divide; አፈፃፀም መጠን። በዳገታማ ወይም በጠጣር አፈር ላይ የሩጫ ጊዜን በሁለት ወይም ሦስት አጭር ዙሮች ይከፋፍሉ።';
+
+// Canal Seepage / Conveyance Efficiency. Prefix cs_.
+$ec_lang['cs_main_menu']='የቦይ ፍሳሽ';
+$ec_lang['cs_main_title']='ነፃ ኦንላይን የቦይ ፍሳሽ ኪሳራ እና የማስተላለፊያ ብቃት ካልኩሌተር';
+$ec_lang['cs_main_desc']='የቦይ ፍሳሽ ኪሳራ &amp; የማስተላለፊያ ብቃት &mdash; የፍሰት መግቢያ-መውጫ ዘዴ';
+$ec_lang['cs_Q_in']='በደረጃ ጫፍ የሚገባ ፍሰት, Q<sub>in</sub>';
+$ec_lang['cs_Q_out']='በደረጃ ጅራት የሚወጣ ፍሰት, Q<sub>out</sub>';
+$ec_lang['cs_Q_loss']='የፍሳሽ ኪሳራ ፍጥነት, Q<sub>loss</sub>';
+$ec_lang['cs_loss_check']='የልኬት ማረጋገጫ';
+$ec_lang['cs_pct_loss']='ኪሳራ እንደ ከፍሰቱ ድርሻ';
+$ec_lang['cs_Ec']='የማስተላለፊያ ብቃት, E<sub>c</sub>';
+$ec_lang['cs_Ec_check']='የብቃት ደረጃ';
+$ec_lang['cs_Vol_day']='በቀን የሚጠፋ ድምር';
+$ec_lang['cs_Vol_year']='በዓመት የሚጠፋ ድምር';
+$ec_lang['cs_loss_positive']='Qin > Qout — ፍሳሽ ተገኝቷል ✓';
+$ec_lang['cs_loss_zero']='Qin = Qout — ሊለካ የሚችል ኪሳራ የለም';
+$ec_lang['cs_loss_negative']='ማስጠንቀቂያ: Qout > Qin — ልኬቶቹን ያረጋግጡ ⚠';
+$ec_lang['cs_Ec_good']='ጥሩ — Ec ≥ 80% ✓';
+$ec_lang['cs_Ec_fair']='መካከለኛ — Ec 60–80%';
+$ec_lang['cs_Ec_poor']='ደካማ — Ec < 60% ⚠';
+$ec_lang['cs_notes_1_term']='ዘዴ';
+$ec_lang['cs_notes_1_def']='የፍሰት መግቢያ-መውጫ ዘዴ ፍሳሽን የሚገምተው ፍሰቱን በቦይ ደረጃ ጫፍ እና ጅራት ላይ በመለካት ነው: Q<sub>loss</sub> = Q<sub>in</sub> &minus; Q<sub>out</sub>። የማስተላለፊያ ብቃት E<sub>c</sub> = Q<sub>out</sub> / Q<sub>in</sub>። ዓመታዊ ድምር ያለማቋረጥ ሙሉ-ፍሰት ስራ እንደሚካሄድ ይገምታል; ትክክለኛ ኪሳራ ለወቅታዊ ወይም ከፊል-ፍሰት ቦዮች ያነሰ ነው።';
+$ec_lang['cs_notes_2_term']='የብቃት ደረጃዎች';
+$ec_lang['cs_notes_2_def']='ዓይነተኛ ያልተሸፈኑ የምድር ቦዮች: E<sub>c</sub> = 60&ndash;80%። በደንብ የተጠበቁ የምድር ቦዮች: 75&ndash;85%። ኮንክሪት-ተሸፍኖ ቦዮች: 90&ndash;98%። ከፍሰቱ 30% በላይ የሚሆን ፍሳሽ ብዙ ጊዜ ሽፋን ኢንቨስትመንት ያስፈልጋዋል። (USBR, FAO)';
+$ec_lang['cs_notes_3_term']='ማጣቀሻ';
+$ec_lang['cs_notes_3_def']='USBR <em>Water Measurement Manual</em>, 3ኛ እትም (2001)። FAO Irrigation and Drainage Paper 57 (1999)።';
+
 $ec_lang['irr_intro_html']='<p>ዌር እና ኦሪፊስ በመስኖ ስርዓቶች ውስጥ የውሃ ፍሰት ለመለካት ደረጃዊ የሜዳ መሳሪያዎች ናቸው። ለእርስዎ ግንባታ የሚስማማ ካልኩሌተር ይምረጡ፡</p>';
 $ec_lang['irr_card_weir_uniform_head']='ዌር — ሰፊ ጫፍ (ወጥ ስፋት)';
 $ec_lang['irr_card_weir_uniform_desc']='በዳይቨርሽን ግድብ ጫፍ፣ የቁጥጥር መዋቅር ወይም የዌር ሰሌዳ ላይ ያለውን ፍሰት ይለኩ። የዌሩን ርዝማኔ እና በጫፉ ላይ ያለውን የውሃ ጥልቀት ያስገቡ።';
@@ -392,6 +419,8 @@ $ec_lang['irr_card_canal_head']='የቦይ ዲዛይን &amp; ትንተና';
 $ec_lang['irr_card_canal_desc']='የ Manning\'s ቀመር ተጠቅመው የመስኖ ቦይ ዲዛይን ያድርጉ ወይም ይፈትሹ። ለአዲስ ቦዮች ትራፕዞይዳዊ ካልኩሌተር፤ ለነባር ተፈጥሯዊ ወይም ሰው ሠራሽ ክፍሎች ያልተስተካከለ ካልኩሌተር።';
 $ec_lang['irr_card_drip_head']='ጠብታ &amp; ስፕሪንክለር ዲዛይን';
 $ec_lang['irr_card_drip_desc']='ለጠብታ ወይም ስፕሪንክለር መስኖ ስርዓት የመስኖ መጠን፣ የስርጭት ወጥነት፣ ጎን ቅርንጫፍ ፍሰት፣ ዞን ፍሰት እና የሥራ ጊዜ ያሰሉ። የኤሚተር ፍሰት፣ የኤሚተር ርቀት እና ዒላማ ጥልቀት ያስገቡ።';
+$ec_lang['irr_card_seepage_head']='የቦይ ፍሳሽ &amp; የማስተላለፊያ ብቃት';
+$ec_lang['irr_card_seepage_desc']='ፍሳሽ ኪሳራን ከቦይ ደረጃ ላይ የፍሰት መግቢያ እና መውጫ ልኬቶችን ተጠቅሞ ይገምቱ። የማስተላለፊያ ብቃት እና ዓመታዊ የውሃ ኪሳራ ያሰሉ፤ ይህም ሽፋን ኢንቨስትመንት ቅድሚያ ለማውጣት ይረዳል።';
 $ec_lang['irr_quickref_html']='<h3>ፈጣን ማጣቀሻ</h3><dl><dt>ዳይቨርሽን ግድብ ወይም የቁጥጥር መዋቅር</dt><dd>የዌሩ ጫፍ ላይ ያለውን የውሃ ጥልቀት ይለኩ። ለወጥ ጫፍ <a href="Weir-Flow-Simple.php">ቀላል ዌር ፍሰት</a> ወይም ለፕሮፋይል ወይም ደረጃ ለዘለ ጫፍ <a href="Weir-Flow-Irregular.php">ያልተስተካከለ ዌር ፍሰት</a> ይጠቀሙ።</dd><dt>የጭንቅላት በር ወይም የቧንቧ መውጫ</dt><dd>ከላይ ያለውን እና ከስር ያለውን የውሃ ከፍታ ይለኩ (ወይም ነፃ ፍሳሽ ከሆነ የቧንቧ ዝቅተኛ ከፍታ)። <a href="Orifice.php">ኦሪፊስ ፍሰት</a> ይጠቀሙ። ለክብ ቧንቧ D&nbsp;= የቧንቧ ዲያሜትር፤ ለአራት ማዕዘን በር ስፋት W እና ቁመት D ያስገቡ።</dd><dt>የምንጭ ወይም የኩሬ ማፍሰሻ ጊዜ</dt><dd>በስር ኦሪፊስ በኩል የኩሬ ወይም የምንጭ ደረጃ ለዝቅ ለማድረግ የሚወስደውን ጊዜ ለመገምገም <a href="Orifice-Drain-Time.php">የኦሪፊስ ፍሳሽ ጊዜ</a> ይጠቀሙ — ለመስኖ ማጠራቀሚያ ዕቅድ ጠቃሚ ነው።</dd><dt>የሜዳ ደረጃዎች</dt><dd>እዚህ ጥቅም ላይ የዋሉ ዌር እና ኦሪፊስ ፍሰት እኩልታዎች USBR <em>Water Measurement Manual</em> (3ኛ&nbsp;እትም) ሂደቶችን ይከተላሉ፣ ብዙ ጊዜ በውሃ አስተዳዳሪዎችና በመስኖ ዲስትሪክቶች ያስፈልጋሉ።</dd></dl>';
 $ec_lang['about_body_html']='<h3>ተልዕኮ</h3><p>የ HawsEDC ምህንድስና ካልኩሌተሮች በዓለም ዙሪያ ላሉ መሐንዲሶችና የሜዳ ሠራተኞች ለማገልገል ናቸው — በተለይ ውሃ እጥረት፣ ሀብት ውስንነት ወይም ዝቅተኛ አገልግሎት ባለበት አካባቢ ለሚሰሩ። እነዚህ መሳሪያዎች ሰፊ ሰብዓዊ ተልዕኮ አካል ናቸው፡ ለእያንዳንዱ ሰው በጣም ተግባራዊ እና ውጤታማ በሆነ መንገድ መናገር — ለዘለዓለም የተወደዱ እና የሚቀሩ መሆናቸውን፣ ምንም ነገር ሊፈሩ አለመሆናቸውን፣ እና ሁሉንም ነገር ሊያበላሹ አለመሆናቸውን።</p><p>ካልኩሌተሮቹ መሳሪያ ናቸው። ዓላማው ስቃይ የሌለው ዓለም ነው።</p><h3>ክፍት ምንጭ ፍቃድ</h3><p>ሁሉም ኮድ በ<a target="_blank" href="https://www.gnu.org/licenses/gpl-3.0.html">GNU General Public License v3.0 ወይም ቆይቶ</a> ተለቋል — እንደ ነፃነቱ ነፃ። ተመሳሳይ ሁኔታዎች ስር ኮዱን መጠቀም፣ ማጥናት፣ ማሻሻል እና ማሰራጨት ይችላሉ።</p><p>Copyright &copy; 2009&ndash;2026 Thomas Gail Haws.</p><h3>ምንጭ ኮድ</h3><p>ሙሉ ምንጭ ኮድ በ Bitbucket ላይ ሕዝባዊ ሆኖ ይገኛል፡</p><p><a target="_blank" href="https://bitbucket.org/hawstom/engcalcs">bitbucket.org/hawstom/engcalcs</a></p><p>ኮዱን መቃኘት፣ ጉዳዮችን ሪፖርት ማድረግ፣ ወይም ሪፖዚቶሪውን ፎርክ ማድረግ ይችላሉ።</p><h3>አስተዋፅኦ</h3><p>Pull Requests ተቀባይነት አላቸው። የአስተዋፅኦ ዘዴዎች:</p><ul><li><strong>ትርጉሞች</strong> — ቋንቋ ያሻሽሉ ወይም አዲስ ይጨምሩ። ተዛማጅ <code>lib/lang.ec.??.php</code> ፋይሉ ላይ ለውጦቹን ይዘው Pull Request ይክፈቱ።</li><li><strong>ስህተት ሪፖርቶች</strong> — በማንኛውም ካልኩሌተር ገጽ ላይ ያለውን የተጠቃሚ ሀሳብ ቅጽ ይጠቀሙ፣ ወይም ጉዳዩን ሪፖዚቶሪ ላይ ሪፖርት ያድርጉ።</li><li><strong>አዲስ ካልኩሌተሮች</strong> — ለሜዳ ሠራተኞችና ለመስኖ ባለሙያዎች የሚያገለግሉ የሃይድሮሊክ ምህንድስና ሃሳቦች በተለይ ተቀባይነት አላቸው። ሪፖዚቶሪ ውስጥ ያለውን <code>CLAUDE.md</code> የ ዲቨሎፐር መመሪያ ይዩ።</li><li><strong>ሆስቲንግ</strong> — ዝቅተኛ ኔትወርክ ባለው አካባቢ ካልኩሌተሮቹን ማሳያ ማድረግ ከቻሉ እባኮትን ያስፈልጋቸው ያነጋግሩን።</li></ul><h3>ያለ ኢንተርኔት አጠቃቀም</h3><p>እነዚህ ካልኩሌተሮች እንደ ፕሮግሬሲቭ ዌብ አፕ (PWA) ይሠራሉ። ከኢንተርኔት ጋር ሲገናኙ ማንኛውንም የካልኩሌተር ገጽ ይጎብኙ፣ እና አሳሽዎ ሁሉንም ካልኩሌተሮች በራስ-ሰር ያከማቻል። ከዚያ በኋላ ሁሉም ካልኩሌተሮች ያለ ኢንተርኔት ይሠራሉ — ኢንተርኔት አያስፈልግም።</p><p>ለ Android ወይም iOS፣ EngCalcs እንደ አፕ በመሣሪያዎ ላይ ለመጫን የአሳሽዎን "ወደ መነሻ ማያ ገጽ ጨምር" አማራጭ ይጠቀሙ። ለዴስክቶፕ፣ የጭነት አዶ በአሳሽዎ የአድራሻ አሞሌ ውስጥ ይፈልጉ።</p><p>እንዲሁም ማንኛውንም ካልኩሌተር ወደ አካባቢያዊ መሣሪያዎ ለማስቀመጥ የአሳሽዎን "እንደ&hellip; አስቀምጥ" ምናሌ መጠቀም ይችላሉ።</p><h3>ግንኙነት</h3><p>Tom Haws — ሃይድሮሊክ መሐንዲስ እና የእነዚህ ካልኩሌተሮች ደራሲ።<br />በማንኛውም ካልኩሌተር ገጽ ላይ ያለውን ተጠቃሚ ሀሳብ ቅጽ ይጠቀሙ፣ ወይም <a target="_blank" href="https://bitbucket.org/hawstom/engcalcs">Bitbucket</a> ላይ ምንጭ ኮዱን ያስሱ።</p>';
 

@@ -378,6 +378,33 @@ $ec_lang['ds_notes_2_term']='Keseragaman Distribusi (DU)';
 $ec_lang['ds_notes_2_def']='DU = q<sub>min</sub> / q<sub>avg</sub>. DU 1,0 (100%) berarti semua emitter mengalir secara identik. Nilai di bawah 0,80 membuang air di area yang teririgasi dengan baik sambil meninggalkan titik yang lebih kering. Keseragaman menurun dengan variasi tekanan berlebih di sepanjang lateral, keausan emitter, atau penyumbatan sebagian.';
 $ec_lang['ds_notes_3_term']='Waktu Operasi';
 $ec_lang['ds_notes_3_def']='Waktu operasi = kedalaman target &divide; laju aplikasi. Pada tanah miring atau padat, bagi waktu operasi menjadi dua atau tiga siklus yang lebih pendek dengan periode istirahat di antaranya untuk menghindari limpasan permukaan.';
+
+// Canal Seepage / Conveyance Efficiency. Prefix cs_.
+$ec_lang['cs_main_menu']='Rembesan Saluran';
+$ec_lang['cs_main_title']='Kalkulator Kehilangan Rembesan Saluran dan Efisiensi Konveyans Gratis Online';
+$ec_lang['cs_main_desc']='Kehilangan Rembesan Saluran &amp; Efisiensi Konveyans &mdash; Metode Aliran Masuk-Keluar';
+$ec_lang['cs_Q_in']='Aliran masuk di hulu ruas, Q<sub>in</sub>';
+$ec_lang['cs_Q_out']='Aliran keluar di hilir ruas, Q<sub>out</sub>';
+$ec_lang['cs_Q_loss']='Laju kehilangan rembesan, Q<sub>loss</sub>';
+$ec_lang['cs_loss_check']='Pemeriksaan pengukuran';
+$ec_lang['cs_pct_loss']='Kehilangan sebagai fraksi aliran masuk';
+$ec_lang['cs_Ec']='Efisiensi konveyans, E<sub>c</sub>';
+$ec_lang['cs_Ec_check']='Peringkat efisiensi';
+$ec_lang['cs_Vol_day']='Volume harian yang hilang';
+$ec_lang['cs_Vol_year']='Volume tahunan yang hilang';
+$ec_lang['cs_loss_positive']='Qin > Qout — rembesan terdeteksi ✓';
+$ec_lang['cs_loss_zero']='Qin = Qout — tidak ada kehilangan terukur';
+$ec_lang['cs_loss_negative']='Peringatan: Qout > Qin — periksa pengukuran ⚠';
+$ec_lang['cs_Ec_good']='Baik — Ec ≥ 80% ✓';
+$ec_lang['cs_Ec_fair']='Sedang — Ec 60–80%';
+$ec_lang['cs_Ec_poor']='Buruk — Ec < 60% ⚠';
+$ec_lang['cs_notes_1_term']='Metode';
+$ec_lang['cs_notes_1_def']='Metode aliran masuk-keluar memperkirakan rembesan dengan mengukur aliran di hulu dan hilir ruas saluran: Q<sub>loss</sub> = Q<sub>in</sub> &minus; Q<sub>out</sub>. Efisiensi konveyans E<sub>c</sub> = Q<sub>out</sub> / Q<sub>in</sub>. Volume tahunan mengasumsikan operasi aliran penuh terus-menerus; kehilangan aktual lebih rendah untuk saluran musiman atau aliran parsial.';
+$ec_lang['cs_notes_2_term']='Peringkat Efisiensi';
+$ec_lang['cs_notes_2_def']='Saluran tanah tidak dilapisi yang umum: E<sub>c</sub> = 60&ndash;80%. Saluran tanah terawat baik: 75&ndash;85%. Saluran berlapis beton: 90&ndash;98%. Kehilangan rembesan di atas 30% aliran masuk sering kali membenarkan investasi lapisan saluran. (USBR, FAO)';
+$ec_lang['cs_notes_3_term']='Referensi';
+$ec_lang['cs_notes_3_def']='USBR <em>Water Measurement Manual</em>, edisi ke-3 (2001). FAO Irrigation and Drainage Paper 57 (1999).';
+
 $ec_lang['irr_intro_html']='<p>Weir dan orifice adalah alat lapangan standar untuk mengukur aliran air dalam sistem irigasi. Pilih kalkulator yang sesuai dengan struktur Anda:</p>';
 $ec_lang['irr_card_weir_uniform_head']='Weir — Mercu Lebar (Lebar Seragam)';
 $ec_lang['irr_card_weir_uniform_desc']='Ukur aliran di atas mercu bendung pengalih, bangunan cek, atau papan weir. Masukkan panjang weir dan kedalaman air di atas mercu.';
@@ -389,6 +416,8 @@ $ec_lang['irr_card_canal_head']='Desain &amp; Analisis Saluran';
 $ec_lang['irr_card_canal_desc']='Desain atau periksa saluran irigasi menggunakan rumus Manning. Gunakan kalkulator Trapesium untuk saluran baru; kalkulator Tidak Beraturan untuk penampang alam atau buatan yang sudah ada.';
 $ec_lang['irr_card_drip_head']='Desain Tetes &amp; Sprinkler';
 $ec_lang['irr_card_drip_desc']='Hitung laju aplikasi, keseragaman distribusi, debit lateral, debit zona, dan waktu operasi untuk sistem irigasi tetes atau sprinkler. Masukkan debit emitter, jarak emitter, dan kedalaman target.';
+$ec_lang['irr_card_seepage_head']='Rembesan Saluran &amp; Efisiensi Konveyans';
+$ec_lang['irr_card_seepage_desc']='Perkirakan kehilangan rembesan dari ruas saluran menggunakan pengukuran aliran masuk dan keluar. Hitung efisiensi konveyans dan kehilangan air tahunan untuk membantu memprioritaskan investasi lapisan saluran.';
 $ec_lang['irr_quickref_html']='<h3>Referensi Cepat</h3><dl><dt>Bendung pengalih atau bangunan cek</dt><dd>Ukur kedalaman air di atas mercu weir. Gunakan <a href="Weir-Flow-Simple.php">Weir Aliran Sederhana</a> untuk mercu seragam, atau <a href="Weir-Flow-Irregular.php">Weir Aliran Tidak Beraturan</a> untuk mercu berprofil atau bertangga.</dd><dt>Pintu air atau sambungan pipa</dt><dd>Ukur elevasi muka air hulu dan hilir (atau elevasi dasar pipa jika aliran bebas). Gunakan <a href="Orifice.php">Aliran Orifice</a>. Untuk pipa bulat, D&nbsp;= diameter pipa; untuk pintu persegi panjang, masukkan lebar W dan tinggi D.</dd><dt>Waktu pengosongan waduk atau kolam</dt><dd>Gunakan <a href="Orifice-Drain-Time.php">Waktu Pengosongan Orifice</a> untuk memperkirakan berapa lama menurunkan kolam atau waduk melalui orifice dasar — berguna untuk perencanaan tampungan irigasi.</dd><dt>Standar lapangan</dt><dd>Persamaan aliran weir dan orifice yang digunakan di sini sesuai dengan prosedur USBR <em>Water Measurement Manual</em> (edisi ke-3), yang umumnya dipersyaratkan oleh pengelola air dan distrik irigasi.</dd></dl>';
 $ec_lang['about_body_html']='<h3>Misi</h3><p>Kalkulator Teknik HawsEDC hadir untuk melayani insinyur dan pekerja lapangan di seluruh dunia — terutama mereka yang bekerja di wilayah dengan keterbatasan air, sumber daya terbatas, atau kurang terlayani. Alat-alat ini merupakan bagian dari misi kemanusiaan yang lebih luas: menyampaikan kepada setiap manusia dengan cara yang paling praktis dan efektif bahwa mereka dicintai dan disayangi selamanya, bahwa mereka tidak perlu takut, dan bahwa mereka tidak akan merusak segalanya.</p><p>Kalkulator adalah kendaraannya. Tujuannya adalah dunia yang bebas dari penderitaan.</p><h3>Lisensi Sumber Terbuka</h3><p>Semua kode dirilis di bawah <a target="_blank" href="https://www.gnu.org/licenses/gpl-3.0.html">GNU General Public License v3.0 atau lebih baru</a> — bebas dalam arti kebebasan. Anda boleh menggunakan, mempelajari, memodifikasi, dan mendistribusikan ulang kode dengan syarat yang sama.</p><p>Copyright &copy; 2009&ndash;2026 Thomas Gail Haws.</p><h3>Kode Sumber</h3><p>Kode sumber lengkap tersedia secara publik di Bitbucket:</p><p><a target="_blank" href="https://bitbucket.org/hawstom/engcalcs">bitbucket.org/hawstom/engcalcs</a></p><p>Anda dapat menjelajahi kode, mengajukan isu, atau mem-fork repositori di sana.</p><h3>Berkontribusi</h3><p>Pull request sangat disambut. Cara berkontribusi:</p><ul><li><strong>Terjemahan</strong> — tingkatkan atau tambahkan bahasa. Buka pull request dengan perubahan pada file <code>lib/lang.ec.??.php</code> yang relevan.</li><li><strong>Laporan bug</strong> — gunakan formulir umpan balik di halaman kalkulator mana pun, atau ajukan isu di Bitbucket.</li><li><strong>Kalkulator baru</strong> — ide untuk alat teknik hidrolik yang melayani pekerja lapangan dan praktisi irigasi sangat disambut. Lihat panduan pengembang <code>CLAUDE.md</code> di repositori.</li><li><strong>Hosting</strong> — jika Anda dapat mencerminkan kalkulator ini untuk wilayah dengan konektivitas terbatas, silakan hubungi kami.</li></ul><h3>Penggunaan Offline</h3><p>Kalkulator-kalkulator ini berfungsi sebagai Aplikasi Web Progresif (PWA). Kunjungi halaman kalkulator mana pun saat terhubung ke internet, dan browser Anda akan secara otomatis menyimpan semua kalkulator ke dalam cache. Setelah itu, semua kalkulator berfungsi secara offline — tidak perlu internet.</p><p>Di Android atau iOS, gunakan opsi "Tambahkan ke Layar Utama" di browser Anda untuk memasang EngCalcs sebagai aplikasi di perangkat Anda. Di desktop, cari ikon pasang di bilah alamat browser Anda.</p><p>Anda juga dapat menyimpan kalkulator individual menggunakan menu "Simpan sebagai&hellip;" di browser Anda untuk penggunaan offline sekali pakai.</p><h3>Kontak</h3><p>Tom Haws — insinyur hidrolik dan penulis kalkulator ini.<br />Gunakan formulir umpan balik di halaman kalkulator mana pun, atau akses kode sumber di <a target="_blank" href="https://bitbucket.org/hawstom/engcalcs">Bitbucket</a>.</p>';
 

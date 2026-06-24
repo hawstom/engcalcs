@@ -378,6 +378,33 @@ $ec_lang['ds_notes_2_term']='灌水均匀度（DU）';
 $ec_lang['ds_notes_2_def']='DU = q<sub>min</sub> / q<sub>avg</sub>。DU 为 1.0（100%）表示所有灌水器出流完全一致。低于 0.80 的值会在灌水充足区浪费水，同时留下较干燥的区域。均匀度随支管沿线压力变化过大、灌水器磨损或局部堵塞而下降。';
 $ec_lang['ds_notes_3_term']='运行时间';
 $ec_lang['ds_notes_3_def']='运行时间 = 目标深度 &divide; 灌水强度。在坡地或板结土壤上，将运行时间分成两到三个较短的周期，中间安排休息，以避免地表径流。';
+
+// Canal Seepage / Conveyance Efficiency. Prefix cs_.
+$ec_lang['cs_main_menu']='渠道渗漏';
+$ec_lang['cs_main_title']='免费在线渠道渗漏损失与输水效率计算器';
+$ec_lang['cs_main_desc']='渠道渗漏损失 &amp; 输水效率 &mdash; 进出水量差值法';
+$ec_lang['cs_Q_in']='渠段首部入流量, Q<sub>in</sub>';
+$ec_lang['cs_Q_out']='渠段尾部出流量, Q<sub>out</sub>';
+$ec_lang['cs_Q_loss']='渗漏损失流量, Q<sub>loss</sub>';
+$ec_lang['cs_loss_check']='量测检验';
+$ec_lang['cs_pct_loss']='占入流量的损失比例';
+$ec_lang['cs_Ec']='输水效率, E<sub>c</sub>';
+$ec_lang['cs_Ec_check']='效率等级';
+$ec_lang['cs_Vol_day']='日渗漏水量';
+$ec_lang['cs_Vol_year']='年渗漏水量';
+$ec_lang['cs_loss_positive']='Qin > Qout — 检测到渗漏 ✓';
+$ec_lang['cs_loss_zero']='Qin = Qout — 无可测损失';
+$ec_lang['cs_loss_negative']='警告：Qout > Qin — 请检查量测数据 ⚠';
+$ec_lang['cs_Ec_good']='良好 — Ec ≥ 80% ✓';
+$ec_lang['cs_Ec_fair']='一般 — Ec 60–80%';
+$ec_lang['cs_Ec_poor']='差 — Ec < 60% ⚠';
+$ec_lang['cs_notes_1_term']='方法';
+$ec_lang['cs_notes_1_def']='进出水量差值法通过测量渠段首尾流量来估算渗漏量：Q<sub>loss</sub> = Q<sub>in</sub> &minus; Q<sub>out</sub>。输水效率 E<sub>c</sub> = Q<sub>out</sub> / Q<sub>in</sub>。年渗漏量按全年满流连续运行计算；季节性或非满流渠道的实际损失将低于此值。';
+$ec_lang['cs_notes_2_term']='效率等级';
+$ec_lang['cs_notes_2_def']='典型土渠（无衬砌）：E<sub>c</sub> = 60&ndash;80%。维护良好的土渠：75&ndash;85%。混凝土衬砌渠道：90&ndash;98%。渗漏损失超过入流量 30% 时，通常值得投资进行渠道衬砌。（美国垦务局、联合国粮农组织）';
+$ec_lang['cs_notes_3_term']='参考文献';
+$ec_lang['cs_notes_3_def']='美国垦务局《量水手册》第3版（2001年）。联合国粮农组织灌溉与排水文件第57号（1999年）。';
+
 $ec_lang['irr_intro_html']='<p>量水堰和孔口是测量灌溉系统水流量的标准现场工具。请选择与您的水工建筑物相匹配的计算器：</p>';
 $ec_lang['irr_card_weir_uniform_head']='量水堰 — 宽顶堰（均匀宽度）';
 $ec_lang['irr_card_weir_uniform_desc']='测量引水坝堰顶、控制建筑物或堰板的过流量。输入堰长和堰顶以上水深。';
@@ -389,6 +416,8 @@ $ec_lang['irr_card_canal_head']='渠道设计 &amp; 分析';
 $ec_lang['irr_card_canal_desc']='使用曼宁公式设计或核算灌溉渠道。新建渠道使用梯形断面计算器；已有天然或人工断面使用不规则断面计算器。';
 $ec_lang['irr_card_drip_head']='滴灌 &amp; 喷灌设计';
 $ec_lang['irr_card_drip_desc']='计算滴灌或喷灌系统的灌水强度、分布均匀度、支管流量、轮灌区流量和灌水时间。输入灌水器流量、间距和设计灌水深度。';
+$ec_lang['irr_card_seepage_head']='渠道渗漏 &amp; 输水效率';
+$ec_lang['irr_card_seepage_desc']='利用渠段进出水量测量数据估算渠道渗漏损失。计算输水效率和年渗漏水量，为渠道衬砌投资决策提供依据。';
 $ec_lang['irr_quickref_html']='<h3>快速参考</h3><dl><dt>引水坝或控制建筑物</dt><dd>测量堰顶以上水深。均匀堰顶使用 <a href="Weir-Flow-Simple.php">简单量水堰</a>，异形或阶梯型堰顶使用 <a href="Weir-Flow-Irregular.php">不规则量水堰</a>。</dd><dt>闸门或管道出水口</dt><dd>测量上游水位和下游水位（自由出流时测管道底部高程）。使用 <a href="Orifice.php">孔口流量</a>。圆形管道 D&nbsp;= 管径；矩形闸门输入宽度 W 和高度 D。</dd><dt>水库或池塘排空时间</dt><dd>使用 <a href="Orifice-Drain-Time.php">孔口排空时间</a> 估算池塘或水库通过底部孔口降低水位所需时间——适用于灌溉调蓄规划。</dd><dt>现场标准</dt><dd>本站量水堰和孔口流量方程符合美国垦务局（USBR）<em>量水手册</em>（第3版）规程，通常为水资源管理机构和灌区所要求。</dd></dl>';
 $ec_lang['about_body_html']='<h3>使命</h3><p>HawsEDC 工程计算器旨在为全球工程师和现场工作者服务——尤其是在缺水、资源匮乏或服务不足地区工作的人。这些工具是更广泛人道主义使命的一部分：以最实际、最有效的方式告诉每一个人，他们永远是被爱和珍视的，他们不必害怕，也不会毁掉一切。</p><p>计算器是载体，目标是一个没有苦难的世界。</p><h3>开源许可证</h3><p>所有代码均在 <a target="_blank" href="https://www.gnu.org/licenses/gpl-3.0.html">GNU 通用公共许可证 v3.0 或更高版本</a>下发布——自由如自由本身。您可以在相同条款下使用、研究、修改和再分发代码。</p><p>版权所有 &copy; 2009&ndash;2026 Thomas Gail Haws。</p><h3>源代码</h3><p>完整源代码在 Bitbucket 上公开提供：</p><p><a target="_blank" href="https://bitbucket.org/hawstom/engcalcs">bitbucket.org/hawstom/engcalcs</a></p><p>您可以在那里浏览代码、提交问题或 fork 仓库。</p><h3>参与贡献</h3><p>欢迎提交 Pull Request。贡献方式：</p><ul><li><strong>翻译</strong> — 改进或新增语言。提交包含相关 <code>lib/lang.ec.??.php</code> 文件修改的 Pull Request。</li><li><strong>错误报告</strong> — 使用任意计算器页面上的反馈表单，或在 Bitbucket 上提交问题。</li><li><strong>新计算器</strong> — 特别欢迎为现场工作者和灌溉从业者服务的水力工程工具创意。请参阅仓库中的开发者指南 <code>CLAUDE.md</code>。</li><li><strong>托管镜像</strong> — 如果您能为连接受限地区提供镜像服务，欢迎联系我们。</li></ul><h3>离线使用</h3><p>这些计算器可作为渐进式网络应用（PWA）运行。在联网状态下访问任意计算器页面，您的浏览器将自动缓存所有计算器。此后，所有计算器均可离线使用——无需网络连接。</p><p>在 Android 或 iOS 上，使用浏览器的"添加到主屏幕"功能，将 EngCalcs 作为应用安装到您的设备上。在桌面端，请在浏览器地址栏中找到安装图标。</p><p>您也可以使用浏览器的"另存为&hellip;"菜单保存任意单个计算器，以便临时离线使用。</p><h3>联系方式</h3><p>Tom Haws——水力工程师，这些计算器的作者。<br />请使用任意计算器页面上的反馈表单，或访问 <a target="_blank" href="https://bitbucket.org/hawstom/engcalcs">Bitbucket</a> 上的源代码。</p>';
 

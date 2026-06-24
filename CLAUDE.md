@@ -44,6 +44,7 @@ Each calculator owns a short prefix for its language keys and JS variables:
 | `or_`  | Orifice Flow |
 | `odt_` | Orifice Drain Time |
 | `ds_`  | Drip/Sprinkler Application Rate |
+| `cs_`  | Canal Seepage & Conveyance Efficiency |
 
 New calculators must define a new unique prefix and document it here.
 

@@ -2,7 +2,7 @@
 
 This is a prioritized, bulleted roadmap for the EngCalcs hydraulic calculator suite.
 
-The format of each task is: Priority/status|Description. 0 means "Completed" and 100 means top priority. Ties (same priority for multiple tasks) are okay. Any whole number 0-100 can be used. Tasks are sorted highest priority first; completed tasks are at the bottom.
+The format of each task is: Priority/status|Description. 0 means "Completed" and 100 means top priority. Ties (same priority for multiple tasks) are okay. Any whole number 0-100 can be used. Tasks are sorted highest priority first; move completed tasks to the ## Completed section.
 
 # Tasks
 
@@ -29,9 +29,9 @@ The format of each task is: Priority/status|Description. 0 means "Completed" and
 - 35|Standalone engcalcs: Would it be good to more completely decouple engcalcs from its containing web site? I am not sure about the standard way to accomplish this, but it seems intuitive to me that this app should not depend on its containing site in its parent folder(s).
 
 
-- 75|Robinson Rock Chute: Evaluate adding this calculator (currently a Google Spreadsheet). Should we retire the spreadsheet or refer to other available calculators? Does the reference white paper justify the complexity?
+- 0|Robinson Rock Chute: Rock-Chute.php implemented — Robinson, Rice & Kadavy (1998) D50 sizing equations, slope-based equation selection, range checks, layer/crest/apron geometry, SVG sketch, translated into all 27 languages. Reference spreadsheets retained in .claude/ for audit purposes. Google Spreadsheet superseded.
 
-- 65|Irrigation: Explore canal seepage/loss estimation — helps irrigation districts quantify conveyance efficiency and prioritize lining investments.
+- 0|Irrigation: Canal-Seepage.php added (prefix cs_). Inflow-outflow method: Q_loss = Q_in − Q_out, conveyance efficiency Ec = Q_out/Q_in. Outputs: loss rate, loss fraction, Ec with Good/Fair/Poor rating (≥80%/60-80%/<60%), daily and annual volume lost. Unit-aware (m³/s, L/s, cfs for flow; m³/ft³/ac-ft for volume). Added card to Irrigation.php landing page and menu entry under Irrigation.
 
 - 35|Is there a nice way to let users save a named calculation? Save/restore button? Leads to inputs for save name and a list of save names to open or delete. Leads to user registration and login for cross-device saves (I lean against this)?
 
