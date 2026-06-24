@@ -153,7 +153,6 @@ $ec_lang['mphl_main_menu']='فاقد الضغط في الأنابيب — مان
 $ec_lang['mphl_main_title']='حاسبة فاقد الضغط في الأنابيب بمانينغ المجانية عبر الإنترنت';
 $ec_lang['mphl_main_desc']='فاقد الضغط بمعادلة مانينغ عند جريان كامل معلوم';
 $ec_lang['mphl_pipe_length']='طول الأنبوب، L';
-$ec_lang['mphl_pipe_length']='طول الأنبوب، L';
 $ec_lang['mphl_area']='المساحة، A';
 $ec_lang['mphl_total_junction_k']='إجمالي معامل فاقد الوصلة المركّب، k';
 $ec_lang['mphl_friction_slope']='ميل الاحتكاك';

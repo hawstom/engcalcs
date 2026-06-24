@@ -159,7 +159,6 @@ $ec_lang['mphl_main_menu']='Manning Pipe Head Loss';
 $ec_lang['mphl_main_title']='Free Online Manning Pipe Head Loss Calculator';
 $ec_lang['mphl_main_desc']='Manning Formula Head Loss at Given Full Flow';
 $ec_lang['mphl_pipe_length']='Pipe length, L';
-$ec_lang['mphl_pipe_length']='Pipe length, L';
 $ec_lang['mphl_area']='Area, A';
 $ec_lang['mphl_total_junction_k']='Total combined junction loss coefficient, k';
 $ec_lang['mphl_friction_slope']='Friction slope';
