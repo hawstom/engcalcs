@@ -67,6 +67,10 @@ $ec_lang['calc_inputs']='ننوتنې';
 $ec_lang['calc_results']='پایلې';
 $ec_lang['view_hide_line']='[دا کرښه پټه کړئ]';
 $ec_lang['view_printable']='د چاپ وړ نسخه (د بیا ترلاسه کولو لپاره بیا پورته کړئ)';
+$ec_lang['ec_name_label']='برچې:';
+$ec_lang['ec_name_placeholder']='د نشاني‌گریز کولو یا د شریکولو لپاره برچې';
+$ec_lang['ec_name_hint']='حروف، عددونه، فاصلې، – _ .';
+$ec_lang['ec_name_invalid']='یوازې حروف، عددونه، فاصلې، – _ . وکاروئ';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Darcy-Weisbach د پایپ سر ضیاع';
 $ec_lang['dw_main_title']='وړیا آنلاین Darcy-Weisbach د پایپ سر ضیاع محاسبه';

@@ -67,6 +67,10 @@ $ec_lang['calc_inputs']='ထည့်သွင်းချက်များ';
 $ec_lang['calc_results']='ရလဒ်များ';
 $ec_lang['view_hide_line']='[ဤစာကြောင်း ဝှက်ရန်]';
 $ec_lang['view_printable']='မှတ်တမ်းတင်နိုင်သောဗားရှင်း (ပြန်ရယူရန် ပြန်လည်တင်/ရှင်းလင်းပါ)';
+$ec_lang['ec_name_label']='အညွှန်း:';
+$ec_lang['ec_name_placeholder']='စာမှတ်မုံးခြင်း/မျှဝေရန်အညွှန်း';
+$ec_lang['ec_name_hint']='အက္ခရာ၊ ကိန်းဂဏန်း၊ အကွာ၊ – _ .';
+$ec_lang['ec_name_invalid']='အက္ခရာ၊ ကိန်းဂဏန်း၊ အကွာ၊ – _ . သာ အသုံးပြုပါ။';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Darcy-Weisbach သွတ်ပိုက် ခေါင်းဆုံးဆုံးရှုံးမှု';
 $ec_lang['dw_main_title']='အခမဲ့ အွန်လိုင်း Darcy-Weisbach သွတ်ပိုက် ခေါင်းဆုံးဆုံးရှုံးမှု တွက်ချက်မှုကိရိယာ';

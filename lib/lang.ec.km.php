@@ -67,6 +67,10 @@ $ec_lang['calc_inputs']='ទិន្នន័យបញ្ចូល';
 $ec_lang['calc_results']='លទ្ធផល';
 $ec_lang['view_hide_line']='[លាក់បន្ទាត់នេះ]';
 $ec_lang['view_printable']='កំណែដែលអាចបោះពុម្ព (ផ្ទុកឡើងវិញ/ធ្វើឱ្យស្រស់ ដើម្បីស្ដារ)';
+$ec_lang['ec_name_label']='ស្លាក៖';
+$ec_lang['ec_name_placeholder']='ស្លាកសម្រាប់ការរក្សាទុក/ការចែងលែង';
+$ec_lang['ec_name_hint']='អក្សរ, ខ្ទង់, ចន្លោះ, – _ .';
+$ec_lang['ec_name_invalid']='ប្រើតែអក្សរ, ខ្ទង់, ចន្លោះ, – _ .';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Darcy-Weisbach ការបាត់បង់ទំនាប់ទឹកក្នុងបំពង់';
 $ec_lang['dw_main_title']='ម៉ាស៊ីនគណនា Darcy-Weisbach ការបាត់បង់ទំនាប់ទឹកក្នុងបំពង់ ឥតគិតថ្លៃ';

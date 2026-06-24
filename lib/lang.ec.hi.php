@@ -67,6 +67,10 @@ $ec_lang['calc_inputs']='इनपुट';
 $ec_lang['calc_results']='परिणाम';
 $ec_lang['view_hide_line']='[यह पंक्ति छुपाएँ]';
 $ec_lang['view_printable']='प्रिंट करने योग्य संस्करण (पुनर्स्थापित करने के लिए पुनः लोड करें)';
+$ec_lang['ec_name_label']='लेबल:';
+$ec_lang['ec_name_placeholder']='बुकमार्किंग/साझा करने के लिए लेबल';
+$ec_lang['ec_name_hint']='अक्षर, अंक, रिक्त स्थान, – _ .';
+$ec_lang['ec_name_invalid']='केवल अक्षर, अंक, रिक्त स्थान, – _ . का उपयोग करें';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='डार्सी-वाइसबाख पाइप शीर्ष हानि';
 $ec_lang['dw_main_title']='मुफ़्त ऑनलाइन डार्सी-वाइसबाख पाइप शीर्ष हानि कैलकुलेटर';

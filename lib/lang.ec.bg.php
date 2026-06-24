@@ -62,6 +62,10 @@ $ec_lang['calc_inputs']='Входни данни';
 $ec_lang['calc_results']='Резултати';
 $ec_lang['view_hide_line']='[Скрий този ред]';
 $ec_lang['view_printable']='Версия за печат (презаредете за възстановяване)';
+$ec_lang['ec_name_label']='Етикет:';
+$ec_lang['ec_name_placeholder']='Етикет за запазване/споделяне';
+$ec_lang['ec_name_hint']='букви, цифри, интервали, – _ .';
+$ec_lang['ec_name_invalid']='Използвайте само букви, цифри, интервали, – _ .';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Хидравлични загуби в тръбопровод по Дарси-Вайсбах';
 $ec_lang['dw_main_title']='Безплатен онлайн калкулатор за хидравлични загуби по Дарси-Вайсбах';

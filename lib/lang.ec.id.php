@@ -64,6 +64,10 @@ $ec_lang['calc_inputs']='Masukan';
 $ec_lang['calc_results']='Hasil';
 $ec_lang['view_hide_line']='[Sembunyikan baris ini]';
 $ec_lang['view_printable']='Versi cetak (muat ulang untuk memulihkan)';
+$ec_lang['ec_name_label']='Label:';
+$ec_lang['ec_name_placeholder']='Label untuk penanda/bagikan';
+$ec_lang['ec_name_hint']='huruf, angka, spasi, – _ .';
+$ec_lang['ec_name_invalid']='Gunakan hanya huruf, angka, spasi, – _ .';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Kehilangan Tinggi Tekan Darcy-Weisbach';
 $ec_lang['dw_main_title']='Kalkulator Kehilangan Tinggi Tekan Pipa Darcy-Weisbach Gratis Daring';

@@ -66,6 +66,10 @@ $ec_lang['calc_inputs']='Ingresos';
 $ec_lang['calc_results']='Resultados: ';
 $ec_lang['view_hide_line']='[Ocultar esta línea]';
 $ec_lang['view_printable']='Versión Imprimible (recargar/renover para restaurar)';
+$ec_lang['ec_name_label']='Etiqueta:';
+$ec_lang['ec_name_placeholder']='Etiqueta para marcapáginas/compartir';
+$ec_lang['ec_name_hint']='letras, dígitos, espacios, – _ .';
+$ec_lang['ec_name_invalid']='Use solo letras, dígitos, espacios, – _ .';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Pérdida de presión en una tubería según Darcy-Weisbach';
 $ec_lang['dw_main_title']='Calculadora gratis en línea de pérdida de presión en una tubería según Darcy-Weisbach';

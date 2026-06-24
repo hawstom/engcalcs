@@ -67,6 +67,10 @@ $ec_lang['calc_inputs']='Вхідні дані';
 $ec_lang['calc_results']='Результати';
 $ec_lang['view_hide_line']='[Сховати цей рядок]';
 $ec_lang['view_printable']='Версія для друку (перезавантажте для відновлення)';
+$ec_lang['ec_name_label']='Мітка:';
+$ec_lang['ec_name_placeholder']='Мітка для збереження/спільного доступу';
+$ec_lang['ec_name_hint']='букви, цифри, пробіли, – _ .';
+$ec_lang['ec_name_invalid']='Використовуйте тільки букви, цифри, пробіли, – _ .';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Втрати напору в трубі за Darcy-Weisbach';
 $ec_lang['dw_main_title']='Безкоштовний онлайн-калькулятор втрат напору в трубі за Darcy-Weisbach';

@@ -5,7 +5,7 @@ $html_head = '
 	<meta name="Description" content="' . htmlspecialchars($html_title, ENT_QUOTES, 'UTF-8') . '" />
 	<meta name="Keywords" content="irrigation flow measurement weir orifice headgate turnout diversion dam" />
 ';
-echoHeader("EngCalcs", $html_title, $html_head);
+echoHeader("EngCalcs", $html_title, $html_head, false);
 ?>
 <h2><?=$ec_lang['irr_main_desc']?></h2>
 <?php echoHelpWanted(); ?>

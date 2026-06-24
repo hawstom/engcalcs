@@ -65,6 +65,10 @@ $ec_lang['calc_inputs']='Entradas';
 $ec_lang['calc_results']='Resultados';
 $ec_lang['view_hide_line']='[Ocultar esta linha]';
 $ec_lang['view_printable']='Versão Imprimível (recarregar/renovar para restaurar)';
+$ec_lang['ec_name_label']='Rótulo:';
+$ec_lang['ec_name_placeholder']='Rótulo para marcador/compartilhamento';
+$ec_lang['ec_name_hint']='letras, dígitos, espaços, – _ .';
+$ec_lang['ec_name_invalid']='Use apenas letras, dígitos, espaços, – _ .';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Perda de pressão em uma tubulação de acordo com Darcy-Weisbach';
 $ec_lang['dw_main_title']='Calculadora gratuita online de perda de pressão em uma tubulação de acordo com Darcy-Weisbach';

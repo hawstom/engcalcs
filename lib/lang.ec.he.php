@@ -62,6 +62,10 @@ $ec_lang['calc_inputs']='נתוני קלט';
 $ec_lang['calc_results']='תוצאות:';
 $ec_lang['view_hide_line']='[הסתר שורה זו]';
 $ec_lang['view_printable']='גרסה להדפסה (טען מחדש לשחזור)';
+$ec_lang['ec_name_label']='תווית:';
+$ec_lang['ec_name_placeholder']='תווית לסימניה/שיתוף';
+$ec_lang['ec_name_hint']='אותיות, ספרות, רווחים, – _ .';
+$ec_lang['ec_name_invalid']='השתמשו בתווים: אותיות, ספרות, רווחים, – _ .';
 // Manning Pipe Flow
 $ec_lang['mpf_main_menu']='זרימה בצינור — Manning';
 $ec_lang['mpf_main_title']='מחשבון זרימה בצינור לפי Manning — חינם מקוון';

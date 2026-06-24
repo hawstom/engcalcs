@@ -64,6 +64,10 @@ $ec_lang['calc_inputs']='Dati di input';
 $ec_lang['calc_results']='Risultati';
 $ec_lang['view_hide_line']='[Nascondi questa riga]';
 $ec_lang['view_printable']='Versione stampabile (ricaricare per ripristinare)';
+$ec_lang['ec_name_label']='Etichetta:';
+$ec_lang['ec_name_placeholder']='Etichetta per segnalibri/condivisione';
+$ec_lang['ec_name_hint']='lettere, cifre, spazi, – _ .';
+$ec_lang['ec_name_invalid']='Usa solo lettere, cifre, spazi, – _ .';
 // Darcy-Weisbach
 $ec_lang['dw_main_menu']='Perdita di carico Darcy-Weisbach';
 $ec_lang['dw_main_title']='Calcolatore gratuito online perdita di carico Darcy-Weisbach';

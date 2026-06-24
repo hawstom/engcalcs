@@ -64,6 +64,10 @@ $ec_lang['calc_inputs']='Eingaben';
 $ec_lang['calc_results']='Ergebnisse';
 $ec_lang['view_hide_line']='[Diese Zeile ausblenden]';
 $ec_lang['view_printable']='Druckversion (Seite neu laden zum Zurücksetzen)';
+$ec_lang['ec_name_label']='Beschriftung:';
+$ec_lang['ec_name_placeholder']='Beschriftung für Lesezeichen/Freigabe';
+$ec_lang['ec_name_hint']='Buchstaben, Zahlen, Leerzeichen, – _ .';
+$ec_lang['ec_name_invalid']='Nur Buchstaben, Zahlen, Leerzeichen, – _ . verwenden';
 // Darcy-Weisbach
 $ec_lang['dw_main_menu']='Rohrreibungsverlust Darcy-Weisbach';
 $ec_lang['dw_main_title']='Kostenloser Online-Rechner Rohrreibungsverlust Darcy-Weisbach';

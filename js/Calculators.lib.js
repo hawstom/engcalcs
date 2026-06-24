@@ -4,18 +4,78 @@
 var EngCalcs = EngCalcs || {};
 EngCalcs.numCalcRows = 0;
 EngCalcs.cookieSlotsLength = 0;
+EngCalcs.pageTitle = '';
+EngCalcs.namePattern = /^[A-Za-z0-9 _.-]*$/;
+
+EngCalcs.updateUrl = function () {
+	'use strict';
+	var params = new URLSearchParams();
+	var nameEl = document.getElementById('ec_calc_name');
+	var nameVal = nameEl ? nameEl.value.trim() : '';
+	if (nameVal) params.set('name', nameVal);
+	var form = document.forms['formInput'];
+	if (form) {
+		Array.prototype.forEach.call(form.elements, function (el) {
+			if (el.name) params.set(el.name, el.value);
+		});
+	}
+	history.replaceState(null, '', '?' + params.toString());
+	document.title = (nameVal ? nameVal + ' — ' : '') + EngCalcs.pageTitle;
+};
+
+EngCalcs.loadFromUrl = function (objForm) {
+	'use strict';
+	if (!window.location.search) return false;
+	var params = new URLSearchParams(window.location.search);
+	var nameVal = params.get('name');
+	if (nameVal !== null) {
+		var nameEl = document.getElementById('ec_calc_name');
+		if (nameEl) nameEl.value = nameVal;
+		document.title = (nameVal ? nameVal + ' — ' : '') + EngCalcs.pageTitle;
+	}
+	var formLoaded = false;
+	if (objForm) {
+		params.forEach(function (value, key) {
+			if (key === 'name') return;
+			var el = objForm.elements[key];
+			if (el !== undefined) {
+				el.value = value;
+				formLoaded = true;
+			}
+		});
+	}
+	return formLoaded;
+};
+
+document.addEventListener('DOMContentLoaded', function () {
+	var nameEl = document.getElementById('ec_calc_name');
+	var hintEl = document.getElementById('ec_calc_name_hint');
+	if (!nameEl) return;
+	nameEl.addEventListener('input', function () {
+		var valid = EngCalcs.namePattern.test(this.value);
+		if (hintEl) hintEl.style.color = valid ? '' : '#dc3545';
+	});
+	nameEl.addEventListener('change', function () {
+		this.value = this.value.replace(/[^A-Za-z0-9 _.-]/g, '').trim();
+		if (hintEl) hintEl.style.color = '';
+		EngCalcs.updateUrl();
+	});
+});
 
 EngCalcs.calcAndSave = function (objForm) {
 	'use strict';
 	this.formToCookie(objForm);
 	this.pageCalculator(objForm);
 	this.adjustInputWidth();
+	this.updateUrl();
 };
 
 EngCalcs.readCookieAndCalc = function (objForm) {
 	'use strict';
-	if (!EngCalcs.cookieToForm(objForm)) {
-		this.pageCalculatorInitialize(objForm);
+	if (!this.loadFromUrl(objForm)) {
+		if (!EngCalcs.cookieToForm(objForm)) {
+			this.pageCalculatorInitialize(objForm);
+		}
 	}
 	this.pageCalculator(objForm);
 	this.adjustInputWidth();

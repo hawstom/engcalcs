@@ -1,11 +1,11 @@
 <?php
-function echoHeader($type="normal", $html_title = "", $html_head = "") {
+function echoHeader($type="normal", $html_title = "", $html_head = "", $show_name_field = true) {
   switch (strtolower($type)) {
     case "normal":
-            echoHTMLHead("Normal", $html_title, $html_head);
+            echoHTMLHead("Normal", $html_title, $html_head, false);
       break;
     case "engcalcs":
-            echoHTMLHead("EngCalcs", $html_title, $html_head);
+            echoHTMLHead("EngCalcs", $html_title, $html_head, $show_name_field);
       break;
   }
 }
@@ -17,11 +17,14 @@ function echoHeader($type="normal", $html_title = "", $html_head = "") {
 /**
     * Header elements at top of page common to all header types
     **/
-function echoHTMLHead($type, $html_title, $html_head) {
+function echoHTMLHead($type, $html_title, $html_head, $show_name_field = true) {
 
 global $ec_lang, $clanguage;
 $html_lang = isset($clanguage) ? $clanguage : 'en';
 $html_dir  = in_array($html_lang, ['ar', 'fa', 'he', 'ps', 'ur']) ? ' dir="rtl"' : '';
+$calc_name = $show_name_field ? trim($_GET['name'] ?? '') : '';
+$safe_name = htmlspecialchars($calc_name, ENT_QUOTES, 'UTF-8');
+$page_title = $calc_name ? $safe_name . ' — ' . $html_title : $html_title;
 ?>
 <!DOCTYPE html>
 <html lang="<?=$html_lang?>"<?=$html_dir?>>
@@ -32,7 +35,7 @@ $html_dir  = in_array($html_lang, ['ar', 'fa', 'he', 'ps', 'ur']) ? ' dir="rtl"'
 	<meta name="Copyright" content="Copyright &copy; 2009&ndash;2026 Thomas Gail Haws. Licensed under the GNU GPL v3.0 or later." />
 	<?=$html_head?>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title><?=$html_title?></title>
+	<title><?=$calc_name ? $safe_name . ' — ' . $html_title : $html_title?></title>
 	<link rel="manifest" href="/engcalcs/manifest.json">
 	<meta name="theme-color" content="#1a6faf">
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
@@ -56,10 +59,26 @@ if (substr($type, 0, 8) === "EngCalcs") {
 <script src="/engcalcs/js/Calculators.lib.js?v=<?=filemtime(__DIR__.'/../js/Calculators.lib.js')?>"></script>
 <?php 
 echoEngCalcsMenu($html_title);
-endif; 
+endif;
 ?>
-<h1 class="d-print-none"><?=$html_title?></h1>
+<div class="d-flex justify-content-between align-items-baseline d-print-none">
+	<h1 class="mb-0"><?=$html_title?></h1>
+<?php if ($show_name_field) : ?>
+	<div class="text-end ms-3 flex-shrink-0">
+		<label for="ec_calc_name" class="form-label mb-0 me-1 small fw-semibold"><?=$ec_lang['ec_name_label'] ?? 'Label:'?></label>
+		<input type="text" id="ec_calc_name"
+			class="form-control form-control-sm d-inline-block"
+			style="width:16em"
+			placeholder="<?=htmlspecialchars($ec_lang['ec_name_placeholder'] ?? 'Label for bookmarking/sharing', ENT_QUOTES, 'UTF-8')?>"
+			value="<?=$safe_name?>"
+			maxlength="50"
+			autocomplete="off">
+		<div id="ec_calc_name_hint" class="text-muted" style="font-size:0.75em"><?=$ec_lang['ec_name_hint'] ?? 'letters, digits, spaces, &ndash; _ .'?></div>
+	</div>
+<?php endif; ?>
+</div>
 <p class="d-print-none"><?=$ec_lang['template_welcome']?></p>
+<script>EngCalcs.pageTitle = <?=json_encode($html_title)?>;</script>
 <?php
 }
 /****************************************************************************************************************/
