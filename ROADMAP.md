@@ -4,21 +4,49 @@ This is a prioritized, bulleted roadmap for the EngCalcs hydraulic calculator su
 
 The format of each task is: Priority/status|Description. 0 means "Completed" and 100 means top priority. Ties (same priority for multiple tasks) are okay. Any whole number 0-100 can be used. Tasks are sorted highest priority first; move completed tasks to the ## Completed section.
 
+Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Copilot, `[H]` = Human decision needed, `[CC→CP]` / `[CP→CC]` = split task (first actor works, then updates tag to the next plain tag when handing off). Untagged = actor-agnostic. See `cross-platform-planning.md` §2.2.2 for the full tag lifecycle.
+
 # Tasks
 
 ## Calculator Improvements
 
-- 35|Standalone engcalcs: Would it be good to more completely decouple engcalcs from its containing web site? I am not sure about the standard way to accomplish this, but it seems intuitive to me that this app should not depend on its containing site in its parent folder(s).
+- 35|Standalone engcalcs: Would it be good to more completely decouple engcalcs from its containing web site? I am not sure about the standard way to accomplish this, but it seems intuitive to me that this app should not depend on its containing site in its parent folder(s). [H]
+
+## AI Efficiency Scripting (Overhead)
+
+These tasks reduce the AI token cost of routine maintenance by replacing repeated AI judgment with deterministic scripts. Copilot owns execution (all tagged `[CP]`); Claude Code specs any script whose output feeds back into translation quality work.
+
+- 45|Engineering glossary: `scripts/glossary.json` — 26 core hydraulic terms with preferred translations per language and translation_notes for prompt injection. CC authored initial file; CP to integrate into payload generator and API script prompts. Grows organically as sprints surface competing renderings. [CP]
+
+- 40|Lang-key parity checker: PHP or bash script that compares every `lib/lang.ec.*.php` file against the English source (`lang.ec.en.php`) and reports missing keys, extra keys, and keys whose values are still English placeholders. CP runs it; its output is the sprint brief consumed by CC before each translation sprint and used to confirm completeness after. Replaces repeated manual audits. [CP]
+
+- 40|Lang-file syntax validator: Expand the existing `php -l` pre-commit hook (or add a standalone script) to catch unbalanced single quotes, stray apostrophes, premature `?>` tags, and out-of-scope keys. Should output file:line for each error so fixes are surgical. Replaces the recurring hand-inspection Claude does before committing lang files. [CP]
+
+- 40|Zero-API translation runner (default): Keep translation workflow free of per-call API cost. Use payload + parity scripts to identify untranslated keys by prefix/language, then apply translations directly in `lib/lang.ec.??.php` (manual/agent-assisted), followed by deterministic validation (`php -l` + parity check + completion matrix). Keep `scripts/translate.php` optional and non-default for teams that explicitly opt in to paid API usage. [CP]
+
+- 35|Translation payload generator (per-lang JSON): Script (`scripts/generate_translation_payloads.php`) that reads the English source and a target lang file, identifies untranslated or missing keys, and writes a compact JSON payload ready to hand to a translation agent — with context (key name, English string, neighboring translated strings for register consistency). Eliminates the manual payload-assembly step before each sprint. [CP]
+
+- 35|New-calculator scaffold script: Script that, given a prefix (e.g. `rc_`) and a list of key names, (a) appends stub entries to all 27 lang files and (b) produces a skeleton PHP calculator page following repo conventions (`filemtime()` include, `echoHeader`/`echoCalculatorForm`/`echoFeedback`/`echoFooter` calls). Replaces the repetitive copy-and-edit step when starting a new calculator. [CP]
+
+- 35|Translation completion matrix: Script that produces a compact table — languages as rows, key-prefix groups (dw_, hw_, mpf_, etc.) as columns — showing the count of untranslated keys per cell. Run once before a sprint to prioritize which languages and which calculators need the most attention. Eliminates the ad-hoc "which lang files are most behind?" question that currently costs AI time to answer. [CP]
+
+- 30|Lang-file key-order normalizer: Script that rewrites each `lib/lang.ec.??.php` so its key order matches the English source exactly. Currently, keys accumulated in insertion order over many sprints, making `git diff` noisy and making it easy for parity-checker output to be hard to read. One-time run + hook to enforce order on future edits. [CP]
+
+- 30|Deployment workflow script: Shell script wrapping the full release sequence — php syntax check on changed files, git add/commit prompt, push via `altssh.bitbucket.org:443`. Removes the per-session SSH configuration overhead that currently requires either a manual reminder or asking an AI to recall the altssh workaround. [CP]
+
+- 25|HTML-entity audit script: One-pass scan of all lang files for `&amp;`, `&lt;`, `&gt;`, `&mdash;`, `&ge;`, etc. — entities that double-encode when passed through `htmlspecialchars()` into JS `pageConfig`. Outputs a list of affected keys with suggested Unicode replacements. Prevents the recurring class of bug where AI misses an entity during translation. [CP]
+
+- 25|Quality-score updater: Script that accepts a lang code and a new QUALITY score and updates the `QUALITY` constant in the matching `lang.ec.??.php` file. Trivial change, but currently requires opening the file manually or asking an AI — a one-liner script removes that friction entirely. [CP]
 
 ## Low Priority / Nice-to-Have
 
-- 20|Set up npm (package.json) and/or Composer for dependency management. Currently Bootstrap and other assets are manually vendored.
+- 20|Set up npm (package.json) and/or Composer for dependency management. Currently Bootstrap and other assets are manually vendored. [CP]
 
-- 10|TypeScript migration — convert `lib/Calculators.lib.js` and per-calculator files to `.ts`. Only worthwhile if the project scope grows significantly.
+- 10|TypeScript migration — convert `lib/Calculators.lib.js` and per-calculator files to `.ts`. Only worthwhile if the project scope grows significantly. [H]
 
-- 10|Server-side calculation fallback — duplicate JS calc logic in PHP so results can be generated without JavaScript (accessibility, search indexing). High effort, low urgency.
+- 10|Server-side calculation fallback — duplicate JS calc logic in PHP so results can be generated without JavaScript (accessibility, search indexing). High effort, low urgency. [H]
 
-- 10|Results sharing — generate a shareable URL or printable summary of a completed calculation. Largely addressed by the URL-based label feature (history.replaceState encodes all inputs as GET params), but a dedicated "Copy link" button or print summary could still add polish.
+- 10|Results sharing — dedicated "Copy link" button or print summary. Largely addressed by the URL-based label feature; a polished UI affordance is the remaining gap. [CP]
 
 ## Completed
 

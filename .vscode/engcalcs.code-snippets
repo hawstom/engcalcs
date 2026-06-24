@@ -1,0 +1,20 @@
+{
+  "Add lang key": {
+    "prefix": "ec-lang",
+    "body": [
+      "$ec_lang['${1:key}'] = '${2:Translation}';",
+      ""
+    ],
+    "description": "Insert an $ec_lang key/value pair"
+  },
+  "PHP Translation File Header": {
+    "prefix": "ec-php-header",
+    "body": [
+      "<?php",
+      "\n// Translation file for ${1:lang} — generated from template",
+      "\n" ,
+      ""
+    ],
+    "description": "Header for language PHP files"
+  }
+}

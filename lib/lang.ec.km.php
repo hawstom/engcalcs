@@ -76,14 +76,14 @@ $ec_lang['dw_main_menu']='Darcy-Weisbach ការបាត់បង់ទំន
 $ec_lang['dw_main_title']='ម៉ាស៊ីនគណនា Darcy-Weisbach ការបាត់បង់ទំនាប់ទឹកក្នុងបំពង់ ឥតគិតថ្លៃ';
 $ec_lang['dw_main_desc']='ការបាត់បង់ទំនាប់ទឹកក្នុងបំពង់ Darcy-Weisbach ប្រឡោះ ភាពរញ៉េរញ៉ៃ និងល្បឿនហូរទឹកដែលបានកំណត់';
 $ec_lang['dw_roughness']='ភាពរញ៉េរញ៉ៃដាច់ខាត Darcy-Weisbach, e';
-$ec_lang['dw_kinematic_viscosity']='Kinematic viscosity, &nu; <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water at 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['dw_kinematic_viscosity']='ភាពខាប់ស៊ីណេម៉ាទិក, &nu; <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water at 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['dw_reynolds_number']='លេខ Reynolds, Re';
 $ec_lang['dw_flow_regime']='របៀបហូរ';
 $ec_lang['dw_regime_laminar']='លំហូរស្រួល';
 $ec_lang['dw_regime_transitional']='លំហូរផ្លាស់ប្ដូរ';
 $ec_lang['dw_regime_turbulent']='លំហូររំខាន';
 $ec_lang['dw_friction_factor_method']='វិធីសាស្ត្រគ្រាប់ friction factor';
-$ec_lang['dw_friction_factor']='Friction factor, f';
+$ec_lang['dw_friction_factor']='កត្តាកកិត, f';
 // Hazen-Williams. See mphl_ for missing text.
 $ec_lang['hw_main_menu']='Hazen-Williams ការបាត់បង់ទំនាប់ទឹកក្នុងបំពង់';
 $ec_lang['hw_main_title']='ម៉ាស៊ីនគណនា Hazen-Williams ការបាត់បង់ទំនាប់ទឹកក្នុងបំពង់ ឥតគិតថ្លៃ';

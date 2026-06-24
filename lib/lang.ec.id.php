@@ -76,7 +76,7 @@ $ec_lang['dw_roughness']='Kekasaran absolut Darcy-Weisbach, e';
 $ec_lang['dw_kinematic_viscosity']='Viskositas kinematik, &nu; <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water at 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['dw_reynolds_number']='Bilangan Reynolds, Re';
 $ec_lang['dw_flow_regime']='Regime aliran';
-$ec_lang['dw_regime_laminar']='laminar';
+$ec_lang['dw_regime_laminar']='aliran laminar';
 $ec_lang['dw_regime_transitional']='transisi';
 $ec_lang['dw_regime_turbulent']='turbulen';
 $ec_lang['dw_friction_factor_method']='Metode faktor gesekan';

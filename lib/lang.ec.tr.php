@@ -72,7 +72,7 @@ $ec_lang['dw_main_menu']='Darcy-Weisbach Boru Yük Kaybı';
 $ec_lang['dw_main_title']='Ücretsiz Çevrimiçi Darcy-Weisbach Boru Yük Kaybı Hesaplayıcısı';
 $ec_lang['dw_main_desc']='Verilen Çap, Pürüzlülük ve Akış için Darcy-Weisbach Boru Yük Kaybı';
 $ec_lang['dw_roughness']='Darcy-Weisbach mutlak pürüzlülüğü, e';
-$ec_lang['dw_kinematic_viscosity']='Kinematic viscosity, &nu; <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water at 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['dw_kinematic_viscosity']='Kinematik viskozite, &nu; <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water at 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['dw_reynolds_number']='Reynolds sayısı, Re';
 $ec_lang['dw_flow_regime']='Akış rejimi';
 $ec_lang['dw_regime_laminar']='laminer';

@@ -76,7 +76,7 @@ $ec_lang['dw_main_menu']='Втрати напору в трубі за Darcy-Wei
 $ec_lang['dw_main_title']='Безкоштовний онлайн-калькулятор втрат напору в трубі за Darcy-Weisbach';
 $ec_lang['dw_main_desc']='Втрати напору в трубі за Darcy-Weisbach при заданому діаметрі, шорсткості та витраті';
 $ec_lang['dw_roughness']='Абсолютна шорсткість Darcy-Weisbach, e';
-$ec_lang['dw_kinematic_viscosity']='Кінематична в\'язкість, &nu; <span title="1&times;10&minus;&#8308; m&#8308;/s для чистої води при 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['dw_kinematic_viscosity']='Кінематична в’язкість, &nu; <span title="1&times;10&minus;&#8308; m&#8308;/s для чистої води при 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['dw_reynolds_number']='Число Рейнольдса, Re';
 $ec_lang['dw_flow_regime']='Режим течії';
 $ec_lang['dw_regime_laminar']='ламінарний';

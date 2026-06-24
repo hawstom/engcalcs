@@ -73,12 +73,12 @@ $ec_lang['dw_main_menu']='Rohrreibungsverlust Darcy-Weisbach';
 $ec_lang['dw_main_title']='Kostenloser Online-Rechner Rohrreibungsverlust Darcy-Weisbach';
 $ec_lang['dw_main_desc']='Rohrreibungsverlust nach Darcy-Weisbach bei gegebenem Durchmesser, Rauheit und Durchfluss';
 $ec_lang['dw_roughness']='Absolute Rauheit Darcy-Weisbach, e';
-$ec_lang['dw_kinematic_viscosity']='Kinematic viscosity, &nu; <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water at 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['dw_kinematic_viscosity']='Kinematische Viskosität, &nu; <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water at 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['dw_reynolds_number']='Reynolds-Zahl, Re';
 $ec_lang['dw_flow_regime']='Strömungsregime';
-$ec_lang['dw_regime_laminar']='laminar';
+$ec_lang['dw_regime_laminar']='laminare Strömung';
 $ec_lang['dw_regime_transitional']='Übergangsbereich';
-$ec_lang['dw_regime_turbulent']='turbulent';
+$ec_lang['dw_regime_turbulent']='turbulente Strömung';
 $ec_lang['dw_friction_factor_method']='Methode des Reibungsbeiwerts';
 $ec_lang['dw_friction_factor']='Reibungsbeiwert, f';
 // Hazen-Williams

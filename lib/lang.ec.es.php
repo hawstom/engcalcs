@@ -78,7 +78,7 @@ $ec_lang['dw_roughness']='Rugosidad absoluto, e';
 $ec_lang['dw_kinematic_viscosity']='Viscosidad cinemática, &nu; <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water at 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['dw_reynolds_number']='Número de Reynolds, Re';
 $ec_lang['dw_flow_regime']='Régimen del flujo';
-$ec_lang['dw_regime_laminar']='laminar';
+$ec_lang['dw_regime_laminar']='flujo laminar';
 $ec_lang['dw_regime_transitional']='transicional';
 $ec_lang['dw_regime_turbulent']='turbulente';
 $ec_lang['dw_friction_factor_method']='Método del factor de fricción';

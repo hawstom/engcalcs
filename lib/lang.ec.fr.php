@@ -78,10 +78,10 @@ $ec_lang['dw_main_desc']='Perte de charge Darcy-Weisbach pour un diamètre, une 
 $ec_lang['dw_roughness']='Rugosité absolue Darcy-Weisbach, e';
 $ec_lang['dw_kinematic_viscosity']='Viscosité cinématique, &nu; <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water at 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['dw_reynolds_number']='Nombre de Reynolds, Re';
-$ec_lang['dw_flow_regime']='Régime d\'écoulement';
+$ec_lang['dw_flow_regime']='Régime d’écoulement';
 $ec_lang['dw_regime_laminar']='laminaire';
 $ec_lang['dw_regime_transitional']='transitoire';
-$ec_lang['dw_regime_turbulent']='turbulent';
+$ec_lang['dw_regime_turbulent']='écoulement turbulent';
 $ec_lang['dw_friction_factor_method']='Méthode du facteur de frottement';
 $ec_lang['dw_friction_factor']='Facteur de frottement, f';
 // Hazen-Williams. See mphl_ for missing text.

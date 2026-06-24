@@ -76,7 +76,7 @@ $ec_lang['dw_main_menu']='Darcy-Weisbach የቧንቧ ጭንቅ ኪሳራ';
 $ec_lang['dw_main_title']='ነፃ ኦንላይን Darcy-Weisbach የቧንቧ ጭንቅ ኪሳራ ካልኩሌተር';
 $ec_lang['dw_main_desc']='Darcy-Weisbach የቧንቧ ጭንቅ ኪሳራ በተሰጠ ዲያሜትር፣ ሻካሪነት እና ፍሰት';
 $ec_lang['dw_roughness']='Darcy-Weisbach ፍጹም ሻካሪነት, e';
-$ec_lang['dw_kinematic_viscosity']='Kinematic viscosity, &nu; <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water at 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['dw_kinematic_viscosity']='ኪኔማቲክ ቪስኮሲቲ, &nu; <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water at 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['dw_reynolds_number']='ሬይኖልዶስ ቁጥር, Re';
 $ec_lang['dw_flow_regime']='የፍሰት አገዛዝ';
 $ec_lang['dw_regime_laminar']='ላሚናር';

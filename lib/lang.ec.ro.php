@@ -159,9 +159,9 @@ $ec_lang['dw_roughness']='Rugozitate absolută Darcy-Weisbach, e';
 $ec_lang['dw_kinematic_viscosity']='Vâscozitate cinematică, &nu; <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water at 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['dw_reynolds_number']='Numărul Reynolds, Re';
 $ec_lang['dw_flow_regime']='Regimul de curgere';
-$ec_lang['dw_regime_laminar']='laminar';
+$ec_lang['dw_regime_laminar']='curgere laminară';
 $ec_lang['dw_regime_transitional']='tranzițional';
-$ec_lang['dw_regime_turbulent']='turbulent';
+$ec_lang['dw_regime_turbulent']='curgere turbulentă';
 $ec_lang['dw_friction_factor_method']='Metoda factorului de frecare';
 $ec_lang['dw_friction_factor']='Factorul de frecare, f';
 // Hazen-Williams

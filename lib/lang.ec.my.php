@@ -76,7 +76,7 @@ $ec_lang['dw_main_menu']='Darcy-Weisbach သွတ်ပိုက် ခေါ�
 $ec_lang['dw_main_title']='အခမဲ့ အွန်လိုင်း Darcy-Weisbach သွတ်ပိုက် ခေါင်းဆုံးဆုံးရှုံးမှု တွက်ချက်မှုကိရိယာ';
 $ec_lang['dw_main_desc']='သတ်မှတ်အချင်း၊ ကြမ်းတမ်းမှုနှင့် စီးဆင်းမှုတွင် Darcy-Weisbach သွတ်ပိုက် ခေါင်းဆုံးဆုံးရှုံးမှု';
 $ec_lang['dw_roughness']='Darcy-Weisbach ပကတိကြမ်းတမ်းမှု, e';
-$ec_lang['dw_kinematic_viscosity']='Kinematic viscosity, &nu; <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water at 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['dw_kinematic_viscosity']='ကိနမက်တစ် ဗစ်စကော့စিটি, &nu; <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water at 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['dw_reynolds_number']='Reynolds ကိန်း, Re';
 $ec_lang['dw_flow_regime']='စီးဆင်းမှုပုံစံ';
 $ec_lang['dw_regime_laminar']='ညင်သာသောစီးဆင်းမှု (laminar)';
