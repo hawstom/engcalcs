@@ -447,3 +447,8 @@ $ec_lang['rc_notes_7_term']='ការត្រួតពិនិត្យទឹ
 $ec_lang['rc_notes_7_def']='នៅពេលជម្រៅធម្មតានៅក្នុងប្រឡាយបញ្ចូលតិចជាងជម្រៅទឹក weir (H<sub>p</sub>) ដែលចាំបាច់ដើម្បីឆ្លងកាត់ q<sub>t</sub> ការហូររួមចង្អៀត ឬទឹកដាំងកើតឡើងខ្ពស់ទឹក​​នៃ​ apron បញ្ចូល។ នេះជាទូទៅអាចទទួលយកបាន — ទឹកដាំងកាត់បន្ថយល្បឿន និងការពារការ침ខ្ទេចខ្ពស់ទឹក។ ដើម្បីត្រួតពិនិត្យ: ប្រើម៉ាស៊ីនគណនា weir flow ដើម្បីស្វែងរក H<sub>p</sub> សម្រាប់ q<sub>t</sub> និងទទឹង crest ដែលបានផ្ដល់ ហើយប្រៀបធៀបជាមួយជម្រៅធម្មតានៅក្នុងប្រឡាយបញ្ចូល។ ប្រសិនបើ H<sub>p</sub> លើសជម្រៅធម្មតា ទឹកដាំងនឹងកើតឡើង។';
 $ec_lang['rc_notes_4_term']='ឯកសារយោង';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). &ldquo;<a target="_blank" href="https://doi.org/10.13031/2013.17230">រចនា rock chutes</a>.&rdquo; <em>Transactions of the ASAE</em>, 41(3), 621&ndash;626. USDA ARS ក៏បោះពុម្ពផ្សាយ <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">សន្លឹក Excel</a> ដោយផ្អែកលើវិធីដូចគ្នា។';
+// Sketch labels
+$ec_lang['rc_sketch_filter']          = 'តម្រង';
+$ec_lang['rc_sketch_top_crest_curve'] = 'កោងកំពូល';
+$ec_lang['rc_sketch_outlet_apron']    = 'ធុងទឹកចេញ';
+$ec_lang['rc_sketch_radius']          = 'កាំ';

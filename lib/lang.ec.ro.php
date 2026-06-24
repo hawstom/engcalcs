@@ -450,3 +450,8 @@ $ec_lang['rc_notes_7_term']='Verificare înălțare la intrare';
 $ec_lang['rc_notes_7_def']='Când adâncimea normală în canalul de intrare este mai mică decât sarcina hidraulică (H<sub>p</sub>) necesară pentru a evacua q<sub>t</sub>, apare restricție de debit sau înălțare în amontele radierului de intrare. Aceasta este în general acceptabilă — înălțarea reduce viteza și previne eroziunea în amonte. Verificare: utilizați un calculator de deversor pentru a determina H<sub>p</sub> pentru q<sub>t</sub> și lățimea crestei date, și comparați cu adâncimea normală a canalului de intrare. Dacă H<sub>p</sub> depășește adâncimea normală, va apărea înălțare.';
 $ec_lang['rc_notes_4_term']='Referință';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). &ldquo;<a target="_blank" href="https://doi.org/10.13031/2013.17230">Design of rock chutes</a>.&rdquo; <em>Transactions of the ASAE</em>, 41(3), 621&ndash;626. USDA ARS publică, de asemenea, un <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">tabel Excel</a> bazat pe aceeași metodă.';
+// Sketch labels
+$ec_lang['rc_sketch_filter']          = 'Filtru';
+$ec_lang['rc_sketch_top_crest_curve'] = 'Curbă de creastă';
+$ec_lang['rc_sketch_outlet_apron']    = 'Radier de ieșire';
+$ec_lang['rc_sketch_radius']          = 'rază';

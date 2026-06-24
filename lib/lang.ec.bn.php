@@ -445,3 +445,8 @@ $ec_lang['rc_notes_7_term']='ইনলেট পন্ডিং পরীক্�
 $ec_lang['rc_notes_7_def']='যখন ইনলেট চ্যানেলের সাধারণ গভীরতা q<sub>t</sub> পার করতে প্রয়োজনীয় ওয়্যার হেড (H<sub>p</sub>)-এর চেয়ে কম হয়, তখন ইনলেট এপ্রনের উজানে সীমাবদ্ধ প্রবাহ বা জলাবদ্ধতা হয়। এটি সাধারণত গ্রহণযোগ্য — জলাবদ্ধতা বেগ কমায় এবং উজানের ক্ষয় রোধ করে। পরীক্ষার জন্য: দেওয়া q<sub>t</sub> এবং ক্রেস্ট প্রস্থের জন্য H<sub>p</sub> খুঁজে পেতে একটি ওয়্যার ফ্লো ক্যালকুলেটর ব্যবহার করুন এবং এটি ইনলেট চ্যানেলের সাধারণ গভীরতার সাথে তুলনা করুন। যদি H<sub>p</sub> সাধারণ গভীরতার বেশি হয়, জলাবদ্ধতা হবে।';
 $ec_lang['rc_notes_4_term']='তথ্যসূত্র';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). &ldquo;<a target="_blank" href="https://doi.org/10.13031/2013.17230">রক চুটের ডিজাইন</a>.&rdquo; <em>Transactions of the ASAE</em>, 41(3), 621&ndash;626. USDA ARS একই পদ্ধতির উপর ভিত্তি করে একটি <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">Excel স্প্রেডশিট</a>ও প্রকাশ করে।';
+// Sketch labels
+$ec_lang['rc_sketch_filter']          = 'ফিল্টার';
+$ec_lang['rc_sketch_top_crest_curve'] = 'শীর্ষ বাঁক';
+$ec_lang['rc_sketch_outlet_apron']    = 'নির্গম স্ল্যাব';
+$ec_lang['rc_sketch_radius']          = 'ব্যাসার্ধ';

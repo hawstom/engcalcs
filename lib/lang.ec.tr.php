@@ -456,3 +456,8 @@ $ec_lang['rc_notes_7_term']='Giriş Göllenmesi Kontrolü';
 $ec_lang['rc_notes_7_def']='Giriş kanalındaki normal derinlik, q<sub>t</sub>'yi iletmek için gerekli savak yükü (H<sub>p</sub>)'ndan az olduğunda, giriş önlüğü mansabında kısıtlı akış veya göllenme oluşur. Bu genellikle kabul edilebilirdir — göllenme hızı düşürür ve mansap erozyonunu önler. Kontrol için: verilen q<sub>t</sub> ve eşik genişliği için bir savak hesap makinesiyle H<sub>p</sub>'yi bulun ve giriş kanalı normal derinliğiyle karşılaştırın. H<sub>p</sub> normal derinliği aşarsa göllenme oluşacaktır.';
 $ec_lang['rc_notes_4_term']='Kaynak';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). &ldquo;<a target="_blank" href="https://doi.org/10.13031/2013.17230">Design of rock chutes</a>.&rdquo; <em>Transactions of the ASAE</em>, 41(3), 621&ndash;626. USDA ARS aynı yönteme dayalı bir <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">Excel tablosu</a> da yayınlamaktadır.';
+// Sketch labels
+$ec_lang['rc_sketch_filter']          = 'Filtre';
+$ec_lang['rc_sketch_top_crest_curve'] = 'Tepe Eğrisi';
+$ec_lang['rc_sketch_outlet_apron']    = 'Çıkış Perdahı';
+$ec_lang['rc_sketch_radius']          = 'yarıçap';

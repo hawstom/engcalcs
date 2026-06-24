@@ -447,3 +447,8 @@ $ec_lang['rc_notes_7_term']='د ننوتلو د اوبو ټولیدلو کتنه
 $ec_lang['rc_notes_7_def']='کله چې د ننوتلو کانال کې نورمال ژوروالی د ویر هیډ (H<sub>p</sub>) لاندې وي چې د q<sub>t</sub> تیرولو لپاره اړین دی، د ننوتلو اپرون پورتنۍ خوا کې محدود بهاو یا د اوبو ټولیدل رامنځته کیږي. دا معمولاً د منلو وړ دي — د اوبو ټولیدل سرعت کموي او د پورتنۍ فرسایش مخه نیسي. د کتنې لپاره: د ویر فلو کلکولیټر وکاروئ تر ثواري q<sub>t</sub> او کرسټ پلنوالي لپاره H<sub>p</sub> ومومئ، او د ننوتلو کانال نورمال ژوروالي سره یې پرتله کړئ. که H<sub>p</sub> د نورمال ژوروالي لوړ شي، د اوبو ټولیدل رامنځته کیږي.';
 $ec_lang['rc_notes_4_term']='سرچینه';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). &ldquo;<a target="_blank" href="https://doi.org/10.13031/2013.17230">Design of rock chutes</a>.&rdquo; <em>Transactions of the ASAE</em>, 41(3), 621&ndash;626. USDA ARS د ورته طریقې پر بنسټ یو <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">Excel سپریډشیټ</a> هم خپروي.';
+// Sketch labels
+$ec_lang['rc_sketch_filter']          = 'فلتر';
+$ec_lang['rc_sketch_top_crest_curve'] = 'د سر خم';
+$ec_lang['rc_sketch_outlet_apron']    = 'د وتلو تلپاکه';
+$ec_lang['rc_sketch_radius']          = 'شعاع';

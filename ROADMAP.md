@@ -16,6 +16,7 @@ The format of each task is: Priority/status|Description. 0 means "Completed" and
 
 - 36|Redundant phrases: We are starting to get some repeated phrases that maybe we can standardize as snippets. Maybe you can evaluate possible lengthy passages ("Measure flow", love statement, etc) to index/compress into standard snippets. I know from my experience first launching these language files long ago that this can cause more trouble than it's worth; I reworked the system that was overly "normalized". But maybe within reason?
 
+- 95|It might be a bad idea to be translating the word "Language". Is there a standard web approach to this issue? How do we help everybody find the "Language" button? Flags? A standard generic flag icon?
 
 ## Calculator Improvements
 

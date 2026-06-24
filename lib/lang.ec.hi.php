@@ -448,3 +448,8 @@ $ec_lang['rc_notes_7_term']='इनलेट जलभराव जाँच';
 $ec_lang['rc_notes_7_def']='जब इनलेट चैनल में सामान्य गहराई q<sub>t</sub> पारित करने के लिए आवश्यक वियर हेड (H<sub>p</sub>) से कम होती है, तो इनलेट एप्रन के अपस्ट्रीम प्रतिबंधित प्रवाह या जलभराव होता है। यह सामान्यतः स्वीकार्य है — जलभराव वेग कम करता है और अपस्ट्रीम कटाव रोकता है। जाँच के लिए: दी गई q<sub>t</sub> और क्रेस्ट चौड़ाई के लिए H<sub>p</sub> ज्ञात करने हेतु वियर फ्लो कैलकुलेटर उपयोग करें, और इसे इनलेट चैनल की सामान्य गहराई से तुलना करें। यदि H<sub>p</sub> सामान्य गहराई से अधिक है, तो जलभराव होगा।';
 $ec_lang['rc_notes_4_term']='संदर्भ';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). &ldquo;<a target="_blank" href="https://doi.org/10.13031/2013.17230">रॉक चूट का डिज़ाइन</a>.&rdquo; <em>Transactions of the ASAE</em>, 41(3), 621&ndash;626. USDA ARS उसी विधि पर आधारित एक <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">Excel स्प्रेडशीट</a> भी प्रकाशित करता है।';
+// Sketch labels
+$ec_lang['rc_sketch_filter']          = 'फ़िल्टर';
+$ec_lang['rc_sketch_top_crest_curve'] = 'शीर्ष वक्र';
+$ec_lang['rc_sketch_outlet_apron']    = 'निर्गम एप्रन';
+$ec_lang['rc_sketch_radius']          = 'त्रिज्या';

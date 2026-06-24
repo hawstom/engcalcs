@@ -63,7 +63,11 @@ EngCalcs.pageConfig = {
 	rc_SD_low:       '<?=htmlspecialchars($ec_lang['rc_SD_low'],       ENT_QUOTES, 'UTF-8')?>',
 	rc_SD_high:      '<?=htmlspecialchars($ec_lang['rc_SD_high'],      ENT_QUOTES, 'UTF-8')?>',
 	rc_pond_ok:      '<?=htmlspecialchars($ec_lang['rc_pond_ok'],      ENT_QUOTES, 'UTF-8')?>',
-	rc_pond_warn:    '<?=htmlspecialchars($ec_lang['rc_pond_warn'],    ENT_QUOTES, 'UTF-8')?>'
+	rc_pond_warn:             '<?=htmlspecialchars($ec_lang['rc_pond_warn'],             ENT_QUOTES, 'UTF-8')?>',
+	rc_sketch_filter:         '<?=$ec_lang['rc_sketch_filter']?>',
+	rc_sketch_top_crest_curve:'<?=$ec_lang['rc_sketch_top_crest_curve']?>',
+	rc_sketch_outlet_apron:   '<?=$ec_lang['rc_sketch_outlet_apron']?>',
+	rc_sketch_radius:         '<?=$ec_lang['rc_sketch_radius']?>'
 };
 </script>
 <script src="/engcalcs/js/rock-chute.js?v=<?=filemtime(__DIR__.'/js/rock-chute.js')?>"></script>

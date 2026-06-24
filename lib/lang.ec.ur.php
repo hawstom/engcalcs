@@ -448,3 +448,8 @@ $ec_lang['rc_notes_7_term']='ان لیٹ پونڈنگ چیک';
 $ec_lang['rc_notes_7_def']='جب ان لیٹ چینل میں نارمل گہرائی ویئر ہیڈ (H<sub>p</sub>) سے کم ہو جو q<sub>t</sub> گزارنے کے لیے درکار ہے، تو ان لیٹ ایپرن کے اوپری جانب محدود بہاؤ یا پانی جمع ہوتا ہے۔ یہ عموماً قابل قبول ہے — پانی جمع ہونے سے رفتار کم ہوتی ہے اور اوپری جانب کٹاؤ روکتا ہے۔ جانچ کے لیے: ویئر فلو کیلکولیٹر استعمال کریں تاکہ دیے گئے q<sub>t</sub> اور کرسٹ چوڑائی کے لیے H<sub>p</sub> معلوم ہو، اور ان لیٹ چینل کی نارمل گہرائی سے موازنہ کریں۔ اگر H<sub>p</sub> نارمل گہرائی سے زیادہ ہو تو پانی جمع ہوگا۔';
 $ec_lang['rc_notes_4_term']='حوالہ';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). &ldquo;<a target="_blank" href="https://doi.org/10.13031/2013.17230">Design of rock chutes</a>.&rdquo; <em>Transactions of the ASAE</em>, 41(3), 621&ndash;626. USDA ARS اسی طریقہ پر مبنی ایک <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">Excel اسپریڈ شیٹ</a> بھی شائع کرتی ہے۔';
+// Sketch labels
+$ec_lang['rc_sketch_filter']          = 'فلٹر';
+$ec_lang['rc_sketch_top_crest_curve'] = 'چوٹی کا منحنی';
+$ec_lang['rc_sketch_outlet_apron']    = 'آؤٹ لیٹ ایپرن';
+$ec_lang['rc_sketch_radius']          = 'نصف قطر';

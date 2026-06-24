@@ -446,3 +446,8 @@ $ec_lang['rc_notes_7_term']='Verificação de remanso na entrada';
 $ec_lang['rc_notes_7_def']='Quando o tirante normal no canal de entrada é menor que a carga no vertedor (H<sub>p</sub>) necessária para escoar q<sub>t</sub>, ocorre fluxo restringido ou remanso a montante do colchão de entrada. Isso é geralmente aceitável — o remanso reduz a velocidade e previne erosão a montante. Para verificar: usar uma calculadora de vertedor para encontrar H<sub>p</sub> para o q<sub>t</sub> e largura de crista dados, e comparar com o tirante normal do canal de entrada. Se H<sub>p</sub> exceder o tirante normal, ocorrerá remanso.';
 $ec_lang['rc_notes_4_term']='Referência';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., e Kadavy, K.C. (1998). &ldquo;<a target="_blank" href="https://doi.org/10.13031/2013.17230">Design of rock chutes</a>.&rdquo; <em>Transactions of the ASAE</em>, 41(3), 621&ndash;626. O USDA ARS também publica uma <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">planilha Excel</a> baseada no mesmo método.';
+// Sketch labels
+$ec_lang['rc_sketch_filter']          = 'Filtro';
+$ec_lang['rc_sketch_top_crest_curve'] = 'Curva de crista';
+$ec_lang['rc_sketch_outlet_apron']    = 'Laje de saída';
+$ec_lang['rc_sketch_radius']          = 'raio';

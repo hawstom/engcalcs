@@ -449,3 +449,8 @@ $ec_lang['rc_notes_7_term']='Vérification de la mise en charge à l\'entrée';
 $ec_lang['rc_notes_7_def']='Lorsque le tirant d\'eau normal dans le canal d\'entrée est inférieur à la charge de déversoir (H<sub>p</sub>) nécessaire pour transiter q<sub>t</sub>, un écoulement limité ou une mise en charge se produit en amont du tablier d\'entrée. Ceci est généralement acceptable — la mise en charge réduit la vitesse et prévient l\'érosion en amont. Pour vérifier : utiliser une calculatrice de déversoir pour trouver H<sub>p</sub> pour le q<sub>t</sub> et la largeur de crête donnés, puis comparer au tirant d\'eau normal du canal d\'entrée. Si H<sub>p</sub> dépasse le tirant d\'eau normal, une mise en charge se produira.';
 $ec_lang['rc_notes_4_term']='Référence';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., et Kadavy, K.C. (1998). &ldquo;<a target="_blank" href="https://doi.org/10.13031/2013.17230">Design of rock chutes</a>.&rdquo; <em>Transactions of the ASAE</em>, 41(3), 621&ndash;626. L\'USDA ARS publie également un <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">tableur Excel</a> basé sur la même méthode.';
+// Sketch labels
+$ec_lang['rc_sketch_filter']          = 'Filtre';
+$ec_lang['rc_sketch_top_crest_curve'] = 'Courbe de crête';
+$ec_lang['rc_sketch_outlet_apron']    = 'Radier de sortie';
+$ec_lang['rc_sketch_radius']          = 'rayon';

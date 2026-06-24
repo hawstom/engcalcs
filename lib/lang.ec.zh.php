@@ -445,3 +445,8 @@ $ec_lang['rc_notes_7_term']='进口积水检验';
 $ec_lang['rc_notes_7_def']='当进口渠道正常水深小于通过 q<sub>t</sub> 所需的堰顶水头（H<sub>p</sub>）时，进口护坦上游将出现壅水或积水。这通常是可接受的——积水可降低流速，防止上游冲刷。检验方法：使用量水堰计算器，根据给定的 q<sub>t</sub> 和堰顶宽度求 H<sub>p</sub>，并与进口渠道正常水深比较。若 H<sub>p</sub> 超过正常水深，则将发生积水。';
 $ec_lang['rc_notes_4_term']='参考文献';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). &ldquo;<a target="_blank" href="https://doi.org/10.13031/2013.17230">Design of rock chutes</a>.&rdquo; <em>Transactions of the ASAE</em>, 41(3), 621&ndash;626. USDA ARS 亦发布了基于同一方法的 <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">Excel 计算表</a>。';
+// Sketch labels
+$ec_lang['rc_sketch_filter']          = '过滤层';
+$ec_lang['rc_sketch_top_crest_curve'] = '顶部曲线';
+$ec_lang['rc_sketch_outlet_apron']    = '出口护坦';
+$ec_lang['rc_sketch_radius']          = '半径';

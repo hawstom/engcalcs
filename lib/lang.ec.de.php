@@ -445,3 +445,8 @@ $ec_lang['rc_notes_7_term']='Einlaufeinstauprüfung';
 $ec_lang['rc_notes_7_def']='Wenn die Normaltiefe im Zulaufgerinne kleiner ist als die erforderliche Wehrstauhöhe (H<sub>p</sub>) für den Abfluss q<sub>t</sub>, kommt es oberstrom der Einlaufschüttung zu eingeschränktem Abfluss oder Einstau. Dies ist grundsätzlich akzeptabel — Einstau vermindert die Fließgeschwindigkeit und verhindert Erosion oberstrom. Zur Prüfung: mit einem Wehrrechner H<sub>p</sub> für das gegebene q<sub>t</sub> und die Breite berechnen und mit der Normaltiefe im Zulaufgerinne vergleichen. Übersteigt H<sub>p</sub> die Normaltiefe, tritt Einstau auf.';
 $ec_lang['rc_notes_4_term']='Literatur';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., und Kadavy, K.C. (1998). &ldquo;<a target="_blank" href="https://doi.org/10.13031/2013.17230">Design of rock chutes</a>.&rdquo; <em>Transactions of the ASAE</em>, 41(3), 621&ndash;626. Der USDA ARS veröffentlicht auch ein <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">Excel-Arbeitsblatt</a> auf Basis derselben Methode.';
+// Sketch labels
+$ec_lang['rc_sketch_filter']          = 'Filter';
+$ec_lang['rc_sketch_top_crest_curve'] = 'Einlaufkurve';
+$ec_lang['rc_sketch_outlet_apron']    = 'Auslaufschürze';
+$ec_lang['rc_sketch_radius']          = 'Radius';

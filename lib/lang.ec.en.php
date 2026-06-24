@@ -445,3 +445,8 @@ $ec_lang['rc_notes_7_term']='Inlet Ponding Check';
 $ec_lang['rc_notes_7_def'] ='When the normal depth in the inlet channel is less than the weir head (H<sub>p</sub>) required to pass q<sub>t</sub>, restricted flow or ponding occurs upstream of the inlet apron. This is generally acceptable &mdash; ponding reduces velocity and prevents erosion upstream. To check: use a weir flow calculator to find H<sub>p</sub> for the given q<sub>t</sub> and crest width, and compare it to the inlet channel normal depth. If H<sub>p</sub> exceeds normal depth, ponding will occur.';
 $ec_lang['rc_notes_4_term']='Reference';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). &ldquo;<a target="_blank" href="https://doi.org/10.13031/2013.17230">Design of rock chutes</a>.&rdquo; <em>Transactions of the ASAE</em>, 41(3), 621&ndash;626. USDA ARS also publishes an <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">Excel spreadsheet</a> based on the same method.';
+// Sketch labels
+$ec_lang['rc_sketch_filter']          = 'Filter';
+$ec_lang['rc_sketch_top_crest_curve'] = 'Top Crest Curve';
+$ec_lang['rc_sketch_outlet_apron']    = 'Outlet Apron';
+$ec_lang['rc_sketch_radius']          = 'radius';

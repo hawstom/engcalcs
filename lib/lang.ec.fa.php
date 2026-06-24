@@ -447,3 +447,8 @@ $ec_lang['rc_notes_7_term']='بررسی تجمع آب در ورودی';
 $ec_lang['rc_notes_7_def']='هنگامی که عمق نرمال در کانال ورودی کمتر از هد آب مورد نیاز (H<sub>p</sub>) برای عبور q<sub>t</sub> باشد، جریان محدود یا تجمع آب در بالادست پیش‌بند ورودی رخ می‌دهد. این عموماً قابل قبول است — تجمع آب سرعت را کاهش داده و از فرسایش بالادست جلوگیری می‌کند. برای بررسی: از ماشین‌حساب جریان سرریز برای یافتن H<sub>p</sub> برای q<sub>t</sub> و عرض تاج داده‌شده استفاده کنید و با عمق نرمال کانال ورودی مقایسه کنید. اگر H<sub>p</sub> از عمق نرمال بیشتر شود، تجمع آب رخ خواهد داد.';
 $ec_lang['rc_notes_4_term']='مرجع';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). &ldquo;<a target="_blank" href="https://doi.org/10.13031/2013.17230">Design of rock chutes</a>.&rdquo; <em>Transactions of the ASAE</em>, 41(3), 621&ndash;626. USDA ARS همچنین یک <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">صفحه گسترده Excel</a> بر اساس همین روش منتشر کرده است.';
+// Sketch labels
+$ec_lang['rc_sketch_filter']          = 'فیلتر';
+$ec_lang['rc_sketch_top_crest_curve'] = 'منحنی تاج';
+$ec_lang['rc_sketch_outlet_apron']    = 'پیش‌بند خروجی';
+$ec_lang['rc_sketch_radius']          = 'شعاع';

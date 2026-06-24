@@ -448,3 +448,8 @@ $ec_lang['rc_notes_7_term']='Ukaguzi wa Mafuriko ya Ingizo';
 $ec_lang['rc_notes_7_def']='Kina cha kawaida katika njia ya ingizo kinapokuwa chini ya kichwa cha weir (H<sub>p</sub>) kinachohitajika kupitisha q<sub>t</sub>, mtiririko mdogo au bwawa hutokea juu ya apron ya ingizo. Hii kwa ujumla inakubalika — bwawa hupunguza kasi na huzuia mmomonyoko juu ya mkondo. Kukagua: tumia kikokotoo cha mtiririko wa weir kupata H<sub>p</sub> kwa q<sub>t</sub> na upana wa kilele uliopewa, na ulinganishe na kina cha kawaida cha njia ya ingizo. Ikiwa H<sub>p</sub> inazidi kina cha kawaida, bwawa litatokea.';
 $ec_lang['rc_notes_4_term']='Marejeo';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). &ldquo;<a target="_blank" href="https://doi.org/10.13031/2013.17230">Usanifu wa mifereji ya mawe</a>.&rdquo; <em>Transactions of the ASAE</em>, 41(3), 621&ndash;626. USDA ARS pia inachapisha <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">lahajedwali ya Excel</a> kulingana na njia ile ile.';
+// Sketch labels
+$ec_lang['rc_sketch_filter']          = 'Chujio';
+$ec_lang['rc_sketch_top_crest_curve'] = 'Upinde wa Juu';
+$ec_lang['rc_sketch_outlet_apron']    = 'Sakafu ya Toka';
+$ec_lang['rc_sketch_radius']          = 'radi';

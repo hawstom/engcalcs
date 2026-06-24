@@ -448,3 +448,8 @@ $ec_lang['rc_notes_7_term']='የመግቢያ ውሃ ማቆርቆሪያ ምርመ
 $ec_lang['rc_notes_7_def']='የመግቢያ ቦይ ውስጥ ተፈጥሯዊ ጥልቀት q<sub>t</sub> ለማሻገር ከሚያስፈልገው ዌር ሄድ (H<sub>p</sub>) ያነሰ ሲሆን, ከመግቢያ ሰሌዳ ወደ ላይ ገደብ ያለው ፍሳሽ ወይም ኩሬ ይከሰታል። ይህ ብዙ ጊዜ ተቀባይነት አለው — ኩሬ ፍጥነትን ይቀንሳል እና ወደ ላይ ሸርሸሮን ይከላከላል። ለመምርመር: ለተሰጠ q<sub>t</sub> እና ጫፍ ስፋት H<sub>p</sub> ለማወቅ የዌር ፍሳሽ ካልኩሌተር ይጠቀሙ, እና ከመግቢያ ቦይ ተፈጥሯዊ ጥልቀት ጋር ያወዳድሩ። H<sub>p</sub> ተፈጥሯዊ ጥልቀትን ካለፈ, ኩሬ ይከሰታል።';
 $ec_lang['rc_notes_4_term']='ማጣቀሻ';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). &ldquo;<a target="_blank" href="https://doi.org/10.13031/2013.17230">የድንጋይ ቱቦ ዲዛይን</a>.&rdquo; <em>Transactions of the ASAE</em>, 41(3), 621&ndash;626. USDA ARS ተመሳሳይ ዘዴ ላይ ተመስርቶ የ<a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">Excel ሰሌዳ</a>ም ያቀርባል።';
+// Sketch labels
+$ec_lang['rc_sketch_filter']          = 'ማጣሪያ';
+$ec_lang['rc_sketch_top_crest_curve'] = 'የጫፍ ኩርባ';
+$ec_lang['rc_sketch_outlet_apron']    = 'መውጫ ሰሌዳ';
+$ec_lang['rc_sketch_radius']          = 'ራዲየስ';

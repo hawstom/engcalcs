@@ -445,3 +445,8 @@ $ec_lang['rc_notes_7_term']='Kontrola vzdutí na vtoku';
 $ec_lang['rc_notes_7_def']='Pokud je normální hloubka ve vtokové stoce menší než přepadová výška (H<sub>p</sub>) potřebná k převedení q<sub>t</sub>, dochází k omezení průtoku nebo vzdutí nad vtokovou deskou. To je obecně přijatelné — vzdutí snižuje rychlost a zabraňuje erozi na vtoku. Kontrola: pomocí kalkulačky přelivu zjistěte H<sub>p</sub> pro dané q<sub>t</sub> a šířku koruny a porovnejte s normální hloubkou vtokové stoky. Pokud H<sub>p</sub> překračuje normální hloubku, dojde ke vzdutí.';
 $ec_lang['rc_notes_4_term']='Literatura';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). &ldquo;<a target="_blank" href="https://doi.org/10.13031/2013.17230">Design of rock chutes</a>.&rdquo; <em>Transactions of the ASAE</em>, 41(3), 621&ndash;626. USDA ARS také zveřejňuje <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">tabulku Excel</a> založenou na stejné metodě.';
+// Sketch labels
+$ec_lang['rc_sketch_filter']          = 'Filtr';
+$ec_lang['rc_sketch_top_crest_curve'] = 'Vrcholový oblouk';
+$ec_lang['rc_sketch_outlet_apron']    = 'Výtokový práh';
+$ec_lang['rc_sketch_radius']          = 'poloměr';

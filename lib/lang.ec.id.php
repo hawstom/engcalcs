@@ -445,3 +445,8 @@ $ec_lang['rc_notes_7_term']='Pemeriksaan Genangan Inlet';
 $ec_lang['rc_notes_7_def']='Ketika kedalaman normal di saluran inlet lebih kecil dari tinggi muka air weir (H<sub>p</sub>) yang diperlukan untuk mengalirkan q<sub>t</sub>, terjadi aliran terbatas atau genangan di hulu apron inlet. Ini umumnya dapat diterima — genangan mengurangi kecepatan dan mencegah erosi di hulu. Untuk memeriksa: gunakan kalkulator aliran weir untuk mencari H<sub>p</sub> bagi q<sub>t</sub> dan lebar mercu yang diberikan, dan bandingkan dengan kedalaman normal saluran inlet. Jika H<sub>p</sub> melebihi kedalaman normal, genangan akan terjadi.';
 $ec_lang['rc_notes_4_term']='Referensi';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). &ldquo;<a target="_blank" href="https://doi.org/10.13031/2013.17230">Desain peluncur batu</a>.&rdquo; <em>Transactions of the ASAE</em>, 41(3), 621&ndash;626. USDA ARS juga menerbitkan <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">lembar kerja Excel</a> berdasarkan metode yang sama.';
+// Sketch labels
+$ec_lang['rc_sketch_filter']          = 'Filter';
+$ec_lang['rc_sketch_top_crest_curve'] = 'Lengkung Puncak';
+$ec_lang['rc_sketch_outlet_apron']    = 'Lantai Hilir';
+$ec_lang['rc_sketch_radius']          = 'jari-jari';

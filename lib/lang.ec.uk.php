@@ -447,3 +447,8 @@ $ec_lang['rc_notes_7_term']='Перевірка підпору на вході';
 $ec_lang['rc_notes_7_def']='Якщо нормальна глибина у вхідному каналі менша за напір на порозі (H<sub>p</sub>), необхідний для пропуску q<sub>t</sub>, вище вхідного фартуха виникає стиснення потоку або підпір. Це, як правило, допустимо — підпір знижує швидкість і запобігає ерозії вище за течією. Для перевірки: скористайтесь калькулятором водозливу, знайдіть H<sub>p</sub> для заданих q<sub>t</sub> і ширини гребеня, потім порівняйте з нормальною глибиною вхідного каналу. Якщо H<sub>p</sub> перевищує нормальну глибину, підпір виникне.';
 $ec_lang['rc_notes_4_term']='Джерело';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). &ldquo;<a target="_blank" href="https://doi.org/10.13031/2013.17230">Design of rock chutes</a>.&rdquo; <em>Transactions of the ASAE</em>, 41(3), 621&ndash;626. USDA ARS також публікує <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">таблицю Excel</a> на основі того ж методу.';
+// Sketch labels
+$ec_lang['rc_sketch_filter']          = 'Фільтр';
+$ec_lang['rc_sketch_top_crest_curve'] = 'Вхідна крива';
+$ec_lang['rc_sketch_outlet_apron']    = 'Вихідна плита';
+$ec_lang['rc_sketch_radius']          = 'радіус';

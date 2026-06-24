@@ -464,3 +464,8 @@ $ec_lang['rc_notes_7_term']='Provjera zadržavanja vode na ulazu';
 $ec_lang['rc_notes_7_def']='Kada je normalna dubina u ulaznom kanalu manja od tlaka na pragu (H<sub>p</sub>) potrebnog za propuštanje q<sub>t</sub>, iznad ulazne ploče dolazi do sužavanja toka ili zadržavanja vode. To je u pravilu prihvatljivo — zadržavanje vode smanjuje brzinu i sprječava eroziju uzvodno. Za provjeru: koristite kalkulator za preljevicu, pronađite H<sub>p</sub> za zadane q<sub>t</sub> i širinu grebena, a zatim usporedite s normalnom dubinom ulaznog kanala. Ako H<sub>p</sub> premašuje normalnu dubinu, doći će do zadržavanja vode.';
 $ec_lang['rc_notes_4_term']='Izvor';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). &ldquo;<a target="_blank" href="https://doi.org/10.13031/2013.17230">Design of rock chutes</a>.&rdquo; <em>Transactions of the ASAE</em>, 41(3), 621&ndash;626. USDA ARS također objavljuje <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">Excel tablicu</a> temeljenu na istoj metodi.';
+// Sketch labels
+$ec_lang['rc_sketch_filter']          = 'Filter';
+$ec_lang['rc_sketch_top_crest_curve'] = 'Ulazni luk';
+$ec_lang['rc_sketch_outlet_apron']    = 'Izlazna ploča';
+$ec_lang['rc_sketch_radius']          = 'polumjer';

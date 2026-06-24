@@ -123,6 +123,7 @@ EngCalcs.pageCalculatorInitialize = function(objForm) {};
 EngCalcs.rcDrawSketch = function() {
 	var el = document.getElementById('rc_sketch');
 	if (!el) return;
+	var cfg = EngCalcs.pageConfig;
 	var v = this.var;
 	var D50 = v.rc_D50;
 	if (!D50 || D50 <= 0) { el.innerHTML = ''; return; }
@@ -265,40 +266,30 @@ EngCalcs.rcDrawSketch = function() {
 
 	// --- Labels ---
 
-	// Entrance + q arrow
-	s += '<text x="' + r(xL) + '" y="16">Entrance</text>';
+	// q arrow
 	var qx1 = xL + 6, qx2 = xL + 34, qy = wseUpY - 9;
 	s += '<line x1="' + r(qx1) + '" y1="' + r(qy) + '" x2="' + r(qx2) + '" y2="' + r(qy) + '" stroke="black" stroke-width="1.2"/>';
 	s += '<polygon points="' + r(qx2) + ',' + r(qy) + ' ' + r(qx2-6) + ',' + r(qy-4) + ' ' + r(qx2-6) + ',' + r(qy+4) + '" fill="black"/>';
 	s += '<text x="' + r(qx1 + 2) + '" y="' + r(qy - 3) + '" font-style="italic">q</text>';
 
-	// Combined "Top Crest Curve / 40D₅₀ radius" — proper elbow leader below/inside arc
-	// Text sits above horizontal landing; diagonal arm with arrowhead points at arc midpoint
+	// Combined "Top Crest Curve / 40D₅₀ radius" — elbow leader pointing at arc midpoint
 	var arcMidX = xCrest + R_px * Math.sin(thetaVis * 0.50);
 	var arcMidY = arcCy  - R_px * Math.cos(thetaVis * 0.50);
-	var labElbX = xCrest - 2,  labElbY = yApp + 33;  // elbow point
-	var labX    = xCrest - 32;                         // horizontal landing right edge
+	var labElbX = xCrest - 2,  labElbY = yApp + 33;
+	var labX    = xCrest - 32;
 	s += '<line x1="' + r(labX) + '" y1="' + r(labElbY) + '" x2="' + r(labElbX) + '" y2="' + r(labElbY) + '" stroke="black" stroke-width="0.9"/>';
 	s += '<line x1="' + r(labElbX) + '" y1="' + r(labElbY) + '" x2="' + r(arcMidX) + '" y2="' + r(arcMidY) + '" stroke="black" stroke-width="0.9" marker-end="url(#ah)"/>';
-	s += '<text x="' + r(labX - 2) + '" y="' + r(labElbY - 16) + '" text-anchor="end">Top Crest Curve</text>';
-	s += '<text x="' + r(labX - 2) + '" y="' + r(labElbY - 3)  + '" text-anchor="end">40×D50 radius</text>';
+	s += '<text x="' + r(labX - 2) + '" y="' + r(labElbY - 16) + '" text-anchor="end">' + cfg.rc_sketch_top_crest_curve + '</text>';
+	s += '<text x="' + r(labX - 2) + '" y="' + r(labElbY - 3)  + '" text-anchor="end">40\xd7D50 ' + cfg.rc_sketch_radius + '</text>';
 
-	// Riprap label — elbow leader (like Top Crest Curve), right of slope diagram
-	var rpElbX = 380, rpElbY = 90, rpLandX = 422;
-	var rpTgtX = r(xCC + 0.85 * chuteLen * cosT + gnx * 7);
-	var rpTgtY = r(yCC + 0.85 * chuteLen * sinT + gny * 7);
-	s += '<line x1="' + r(rpElbX) + '" y1="' + r(rpElbY) + '" x2="' + r(rpLandX) + '" y2="' + r(rpElbY) + '" stroke="black" stroke-width="0.9"/>';
-	s += '<line x1="' + r(rpElbX) + '" y1="' + r(rpElbY) + '" x2="' + rpTgtX + '" y2="' + rpTgtY + '" stroke="black" stroke-width="0.9" marker-end="url(#ah)"/>';
-	s += '<text x="' + r(rpLandX + 2) + '" y="' + r(rpElbY - 6) + '" text-anchor="start">Riprap</text>';
-
-	// Filter label — dot at feature point on geo line, leader into soil, text below endpoint
+	// Filter label — dot on geo line, leader into soil
 	var gFeatT = 0.40;
 	var gFeatX = geoCCx + (geoCEx - geoCCx) * gFeatT;
 	var gFeatY = geoCCy + (geoCEy - geoCCy) * gFeatT;
 	var gLeadX = gFeatX + gnx * 16, gLeadY = gFeatY + gny * 16;
 	s += '<circle cx="' + r(gFeatX) + '" cy="' + r(gFeatY) + '" r="2" fill="#555"/>';
 	s += '<line x1="' + r(gFeatX) + '" y1="' + r(gFeatY) + '" x2="' + r(gLeadX) + '" y2="' + r(gLeadY) + '" stroke="#555" stroke-width="0.8"/>';
-	s += '<text x="' + r(gLeadX) + '" y="' + r(gLeadY + 14) + '" fill="#333">Filter</text>';
+	s += '<text x="' + r(gLeadX) + '" y="' + r(gLeadY + 14) + '" fill="#333">' + cfg.rc_sketch_filter + '</text>';
 
 	// Outlet Apron dimension
 	var dimY = yApronEnd + layerPx + 14;
@@ -306,16 +297,12 @@ EngCalcs.rcDrawSketch = function() {
 	s += '<line x1="' + r(xChuteEnd) + '" y1="' + r(dimY-5) + '" x2="' + r(xChuteEnd) + '" y2="' + r(dimY+5) + '" stroke="black" stroke-width="1"/>';
 	s += '<line x1="' + r(xApronEnd) + '" y1="' + r(dimY-5) + '" x2="' + r(xApronEnd) + '" y2="' + r(dimY+5) + '" stroke="black" stroke-width="1"/>';
 	s += '<text x="' + r((xChuteEnd+xApronEnd)*0.5) + '" y="' + r(dimY+13) + '" text-anchor="middle">15×D50</text>';
-	s += '<text x="' + r((xChuteEnd+xApronEnd)*0.5) + '" y="' + r(dimY+27) + '" text-anchor="middle">Outlet Apron</text>';
+	s += '<text x="' + r((xChuteEnd+xApronEnd)*0.5) + '" y="' + r(dimY+27) + '" text-anchor="middle">' + cfg.rc_sketch_outlet_apron + '</text>';
 
 	// TW indicator
 	var twX = xApronEnd + exitLen * 0.55;
 	s += '<line x1="' + r(twX) + '" y1="' + r(yExitEnd) + '" x2="' + r(twX) + '" y2="' + r(yTw + 1) + '" stroke="#444" stroke-width="0.8" stroke-dasharray="2,2"/>';
 	s += '<text x="' + r(twX + 3) + '" y="' + r((yExitEnd+yTw)*0.5 + 4) + '">TW</text>';
-
-	// Exit Channel — above TW line
-	s += '<text x="' + r(xApronEnd + 5) + '" y="' + r(yTw - 22) + '">Exit</text>';
-	s += '<text x="' + r(xApronEnd + 2) + '" y="' + r(yTw - 9)  + '">Channel</text>';
 
 	s += '</svg>';
 	el.innerHTML = s;

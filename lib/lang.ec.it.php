@@ -445,3 +445,8 @@ $ec_lang['rc_notes_7_term']='Verifica del rigurgito all\'ingresso';
 $ec_lang['rc_notes_7_def']='Quando il tirante normale nel canale di ingresso è inferiore al carico al soglio (H<sub>p</sub>) necessario per transitare q<sub>t</sub>, si verifica un deflusso limitato o un rigurgito a monte del grembiule di ingresso. Ciò è generalmente accettabile — il rigurgito riduce la velocità e previene l\'erosione a monte. Per verificare: utilizzare una calcolatrice di soglio per trovare H<sub>p</sub> per il q<sub>t</sub> e la larghezza di cresta dati, e confrontarlo con il tirante normale del canale di ingresso. Se H<sub>p</sub> supera il tirante normale, si verificherà rigurgito.';
 $ec_lang['rc_notes_4_term']='Riferimento';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., e Kadavy, K.C. (1998). &ldquo;<a target="_blank" href="https://doi.org/10.13031/2013.17230">Design of rock chutes</a>.&rdquo; <em>Transactions of the ASAE</em>, 41(3), 621&ndash;626. L\'USDA ARS pubblica anche un <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">foglio di calcolo Excel</a> basato sullo stesso metodo.';
+// Sketch labels
+$ec_lang['rc_sketch_filter']          = 'Filtro';
+$ec_lang['rc_sketch_top_crest_curve'] = 'Curva di cresta';
+$ec_lang['rc_sketch_outlet_apron']    = 'Platea di uscita';
+$ec_lang['rc_sketch_radius']          = 'raggio';

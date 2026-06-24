@@ -454,3 +454,8 @@ $ec_lang['rc_notes_7_term']='Проверка за подпор при вход�
 $ec_lang['rc_notes_7_def']='Когато нормалната дълбочина във входния канал е по-малка от напора на прага (H<sub>p</sub>), необходим за пропускане на q<sub>t</sub>, над входния праг възниква стесняване на потока или подпор. Това като цяло е приемливо — подпорът намалява скоростта и предотвратява ерозията нагоре по течението. За проверка: използвайте калкулатор за преливник, намерете H<sub>p</sub> за дадените q<sub>t</sub> и ширина на гребена, след което го сравнете с нормалната дълбочина на входния канал. Ако H<sub>p</sub> надвишава нормалната дълбочина, ще се образува подпор.';
 $ec_lang['rc_notes_4_term']='Извор';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). &ldquo;<a target="_blank" href="https://doi.org/10.13031/2013.17230">Design of rock chutes</a>.&rdquo; <em>Transactions of the ASAE</em>, 41(3), 621&ndash;626. USDA ARS публикува и <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">таблица в Excel</a> по същия метод.';
+// Sketch labels
+$ec_lang['rc_sketch_filter']          = 'Филтър';
+$ec_lang['rc_sketch_top_crest_curve'] = 'Горна крива';
+$ec_lang['rc_sketch_outlet_apron']    = 'Изходна плоча';
+$ec_lang['rc_sketch_radius']          = 'радиус';
