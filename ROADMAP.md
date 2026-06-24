@@ -10,11 +10,13 @@ The format of each task is: Priority/status|Description. 0 means "Completed" and
 
 - 0|Progressive Web App (PWA): Implemented. manifest.json, sw.js, and icons/icon.svg added. Service worker pre-caches all 16 calculator pages + all JS/CSS assets + Bootstrap CDN files on install. Strategy: cache-first for static assets, network-first (falling back to cache) for PHP pages. Language cookies work normally when online; offline serves the cached version in whatever language was current at install time. SW registration injected into echoHTMLHead() via HeadersFooters.lib.php. Theme color #1a6faf. Remaining nice-to-have: PNG icons for older Android WebView installs (currently SVG only, works on Chrome 112+/Safari 16+/Firefox).
 
-- 55|Text-only mode: Evaluate the need and cost/benefit of a leaner text-only rendering for the global south.
+- 0|Text-only mode: Evaluated and closed. The PWA (already shipped) pre-caches all assets on install, making text-only redundant for returning visitors — the primary global south use case. A parallel rendering path would add significant maintenance burden for a narrow first-load benefit. If first-load size becomes a concern, minifying existing CSS/JS is the better lever.
 
 ## Language Expansion
 
 - 36|Redundant phrases: We are starting to get some repeated phrases that maybe we can standardize as snippets. Maybe you can evaluate possible lengthy passages ("Measure flow", love statement, etc) to index/compress into standard snippets. I know from my experience first launching these language files long ago that this can cause more trouble than it's worth; I reworked the system that was overly "normalized". But maybe within reason?
+
+- 30|Canal seepage: Replace "per" with "/" in these parentheticals in all languages if appropriate for space savings: Value of water (currency / unit volume)	& Lining cost (currency / unit area)
 
 - 0|Language button: replaced translated "Language" text with a globe emoji (🌐) — universally recognized, no translation needed, no flags (flags conflate language with country per W3C i18n). Screen-reader text "Language" retained via visually-hidden span. Dropdown items already show native language names so users can find their language once the dropdown opens.
 
