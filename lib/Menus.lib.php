@@ -72,7 +72,7 @@ function echoMainMenu() {
  *
 **/
 function echoEngCalcsMenu () {
-    global $ec_lang;
+    global $ec_lang, $language_settings;
 ?>
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light d-print-none">
@@ -111,7 +111,7 @@ function echoEngCalcsMenu () {
 			</li>
 			<li class="nav-item dropdown">
 				<a class="nav-link dropdown-toggle active" id="dropdown-lang" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-					<?=$ec_lang['menu_main_language']?>
+					&#x1F310; <?=$language_settings['LANGNAME']?>
 				</a>
 				<div class="dropdown-menu" aria-labelledby="dropdown-lang">
 <?php foreach ($GLOBALS['all_language_settings'] as $key => $lang) : ?>
