@@ -49,15 +49,14 @@ EngCalcs.loadFromUrl = function (objForm) {
 
 document.addEventListener('DOMContentLoaded', function () {
 	var nameEl = document.getElementById('ec_calc_name');
-	var hintEl = document.getElementById('ec_calc_name_hint');
 	if (!nameEl) return;
 	nameEl.addEventListener('input', function () {
 		var valid = EngCalcs.namePattern.test(this.value);
-		if (hintEl) hintEl.style.color = valid ? '' : '#dc3545';
+		this.classList.toggle('is-invalid', !valid);
 	});
 	nameEl.addEventListener('change', function () {
 		this.value = this.value.replace(/[^A-Za-z0-9 _.-]/g, '').trim();
-		if (hintEl) hintEl.style.color = '';
+		this.classList.remove('is-invalid');
 		EngCalcs.updateUrl();
 	});
 });

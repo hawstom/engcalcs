@@ -57,26 +57,11 @@ if (substr($type, 0, 8) === "EngCalcs") {
 <?php if (substr($type, 0, 8) === "EngCalcs") : ?>
 <script src="/engcalcs/js/Cookies.lib.js?v=<?=filemtime(__DIR__.'/../js/Cookies.lib.js')?>"></script>
 <script src="/engcalcs/js/Calculators.lib.js?v=<?=filemtime(__DIR__.'/../js/Calculators.lib.js')?>"></script>
-<?php 
-echoEngCalcsMenu($html_title);
+<?php
+echoEngCalcsMenu($html_title, $show_name_field, $calc_name);
 endif;
 ?>
-<div class="d-flex justify-content-between align-items-baseline d-print-none">
-	<h1 class="mb-0"><?=$html_title?></h1>
-<?php if ($show_name_field) : ?>
-	<div class="text-end ms-3 flex-shrink-0">
-		<label for="ec_calc_name" class="form-label mb-0 me-1 small fw-semibold"><?=$ec_lang['ec_name_label'] ?? 'Label:'?></label>
-		<input type="text" id="ec_calc_name"
-			class="form-control form-control-sm d-inline-block"
-			style="width:16em"
-			placeholder="<?=htmlspecialchars($ec_lang['ec_name_placeholder'] ?? 'Label for bookmarking/sharing', ENT_QUOTES, 'UTF-8')?>"
-			value="<?=$safe_name?>"
-			maxlength="50"
-			autocomplete="off">
-		<div id="ec_calc_name_hint" class="text-muted" style="font-size:0.75em"><?=$ec_lang['ec_name_hint'] ?? 'letters, digits, spaces, &ndash; _ .'?></div>
-	</div>
-<?php endif; ?>
-</div>
+<h1 class="d-print-none"><?=$html_title?></h1>
 <p class="d-print-none"><?=$ec_lang['template_welcome']?></p>
 <script>EngCalcs.pageTitle = <?=json_encode($html_title)?>;</script>
 <?php
