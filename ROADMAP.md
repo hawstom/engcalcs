@@ -18,10 +18,6 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 - 45|Engineering glossary: `scripts/glossary.json` — 26 core hydraulic terms with preferred translations per language and translation_notes for prompt injection. CC authored initial file; CP to integrate into payload generator and API script prompts. Grows organically as sprints surface competing renderings. [CP]
 
-- 40|Lang-key parity checker: PHP or bash script that compares every `lib/lang.ec.*.php` file against the English source (`lang.ec.en.php`) and reports missing keys, extra keys, and keys whose values are still English placeholders. CP runs it; its output is the sprint brief consumed by CC before each translation sprint and used to confirm completeness after. Replaces repeated manual audits. [CP]
-
-- 40|Lang-file syntax validator: Expand the existing `php -l` pre-commit hook (or add a standalone script) to catch unbalanced single quotes, stray apostrophes, premature `?>` tags, and out-of-scope keys. Should output file:line for each error so fixes are surgical. Replaces the recurring hand-inspection Claude does before committing lang files. [CP]
-
 - 40|Zero-API translation runner (default): Keep translation workflow free of per-call API cost. Use payload + parity scripts to identify untranslated keys by prefix/language, then apply translations directly in `lib/lang.ec.??.php` (manual/agent-assisted), followed by deterministic validation (`php -l` + parity check + completion matrix). Keep `scripts/translate.php` optional and non-default for teams that explicitly opt in to paid API usage. [CP]
 
 - 35|Translation payload generator (per-lang JSON): Script (`scripts/generate_translation_payloads.php`) that reads the English source and a target lang file, identifies untranslated or missing keys, and writes a compact JSON payload ready to hand to a translation agent — with context (key name, English string, neighboring translated strings for register consistency). Eliminates the manual payload-assembly step before each sprint. [CP]
@@ -49,6 +45,10 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 - 10|Results sharing — dedicated "Copy link" button or print summary. Largely addressed by the URL-based label feature; a polished UI affordance is the remaining gap. [CP]
 
 ## Completed
+
+- 0|Lang-key parity checker: Implemented `scripts/lang_parity_check.php`. Compares each `lib/lang.ec.??.php` against `lib/lang.ec.en.php`, reports missing keys, extra keys, and keys still equal to English. Supports `--lang`, `--prefix`, and `--strict` for sprint briefs and completion checks.
+
+- 0|Lang-file syntax validator: Implemented `scripts/lang_syntax_validate.php`. Runs `php -l` per lang file and reports file:line findings for syntax errors, premature `?>`/out-of-scope declarations, and duplicate keys. Supports `--lang` scoping for surgical checks.
 
 - 0|Save/share named calculations: URL-based Option B implemented. "Label:" field (50 chars, letters/digits/spaces/–_.) in h1 flex row on all calculator pages. On every calculation, history.replaceState encodes all form inputs + label as GET params. Loading a labelled URL pre-fills the form and restores the label. &lt;title&gt; reflects label. Client-side validation: hint text turns red on invalid chars, strips on blur. Label field suppressed on non-calculator pages. ec_name_* keys added to all 27 lang files.
 
