@@ -69,3 +69,6 @@ $ec_units['lph']=3600000;    // L/hr per m³/s
 $ec_units['gph']=951019;     // US gal/hr per m³/s
 $ec_units['mmph']=3600000;   // mm/hr per m/s (precipitation rate)
 $ec_units['inph']=141732;    // in/hr per m/s
+
+$ec_units['m2ps']=1;         // m²/s (unit discharge, SI base)
+$ec_units['ft2ps']=10.7639;  // cfs/ft = ft²/s per m²/s (1 m²/s = 3.28084² ft²/s)

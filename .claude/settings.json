@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(php -l *)",
+      "Bash(git -C * status)",
+      "Bash(git -C * status *)",
+      "Bash(git -C * diff *)",
+      "Bash(git -C * log *)",
+      "Bash(zcat *)"
+    ]
+  }
+}

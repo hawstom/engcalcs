@@ -49,7 +49,20 @@ New calculators must define a new unique prefix and document it here.
 
 ## Language Keys
 
-All display strings live in `lib/lang.ec.??.php` (11 files: bg, cn, en, es, fr, he, hr, pt, ro, sr, tr). Keys follow the pattern `prefix_description`, e.g. `dw_friction_factor`, `mpf_flow`. Add keys to **all** language files when adding a new calculator — use English text as the fallback where translations aren't available yet.
+All display strings live in `lib/lang.ec.??.php` (27 files: en + 26 non-English). Keys follow the pattern `prefix_description`, e.g. `dw_friction_factor`, `mpf_flow`. Add keys to **all** language files when adding a new calculator — use English text as the fallback where translations aren't available yet.
+
+The 26 non-English languages: am, ar, bg, bn, cs, de, es, fa, fr, he, hi, hr, id, it, km, my, ps, pt, ro, ru, sr, sw, tr, uk, ur, zh.
+
+## Translation Sprints
+
+When translating a new calculator's keys into all 26 non-English languages, **spawn one agent per language in parallel** — not one agent for all languages sequentially. Reasons: faster (minutes not hours), better quality (each agent starts with a fresh context focused on one language), and easier to retry a single language if quality is poor.
+
+Standard pattern:
+1. Tell the user: "Starting 26 agents, one for each language." (always say this before launching)
+2. Spawn all 26 agents in a single message with `run_in_background: true`
+3. Each agent receives: the full English key block, the target language file path, and clear instructions on which keys to add/replace
+
+Always announce the launch count before spawning ("Starting 26 agents, one for each language.") so the user knows what is happening.
 
 ## Unit Sets
 

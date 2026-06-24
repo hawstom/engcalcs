@@ -95,7 +95,7 @@ function echoEngCalcsMenu () {
 					<div class="dropdown-divider"></div>
 					<a class="dropdown-item" href="Manning-Trap.php" title="<?=$ec_lang['mtc_main_desc']?>"><?=$ec_lang['mtc_menu']?></a>
 					<a class="dropdown-item" href="Manning-Irregular.php" title="<?=$ec_lang['mi_main_desc']?>"><?=$ec_lang['mi_menu']?></a>
-					<a class="dropdown-item" href="https://docs.google.com/spreadsheets/d/1XRaQtrd8G9GnhXJK9zHBL7TXd0Rj2qex8siopZEPMsA/edit?usp=sharing" title="<?=$ec_lang['rrc_main_desc']?>"><?=$ec_lang['rrc_main_menu']?></a>
+					<a class="dropdown-item" href="Rock-Chute.php" title="<?=$ec_lang['rrc_main_desc']?>"><?=$ec_lang['rrc_main_menu']?></a>
 					<div class="dropdown-divider"></div>
 					<a class="dropdown-item" href="Micro-Hydro-Power.php" title="<?=$ec_lang['mhp_main_desc']?>"><?=$ec_lang['mhp_main_menu']?></a>
 					<a class="dropdown-item" href="Penstock-Design.php" title="<?=$ec_lang['ps_main_desc']?>"><?=$ec_lang['ps_main_menu']?></a>

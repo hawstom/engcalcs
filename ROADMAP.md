@@ -23,12 +23,16 @@ The format of each task is: Priority/status|Description. 0 means "Completed" and
 
 - 0|Translation sprint — three pages: Drip-Sprinkler.php (ds_* keys), Irrigation.php (body prose and card descriptions), and About.php (body prose). Decision: keep all three pages; translate all 26 non-English lang files before next deployment. Drip-Sprinkler value question resolved — unit-conversion (L/hr → mm/hr) and DU quality flag are genuine value for field workers in their own language; arithmetic simplicity is not the disqualifier. About and Irrigation body content to use one block key per page per language (e.g. `about_body_html`, `irr_body_html`) so prose translates naturally rather than key-by-key.
 
+- 40|Contextual hover tips for all calculators: Replace `<a href="javascript:alert(...)">?</a>` inline help links with `<span title="..." style="cursor:help;color:#06c;font-size:0.9em">?</span>` hover tips across all calculators, and move short notes inline (next to the relevant input/output label) rather than in the bottom notes block. Pattern established in Rock Chute (rc_qt, rc_D50, rc_apron_length, rc_sg, rc_SD, rc_Hp, rc_yn). Apply to all remaining calculators that use javascript:alert.
+
 - 35|Standalone engcalcs: Would it be good to more completely decouple engcalcs from its containing web site? I am not sure about the standard way to accomplish this, but it seems intuitive to me that this app should not depend on its containing site in its parent folder(s).
 
 
 - 75|Robinson Rock Chute: Evaluate adding this calculator (currently a Google Spreadsheet). Should we retire the spreadsheet or refer to other available calculators? Does the reference white paper justify the complexity?
 
 - 65|Irrigation: Explore canal seepage/loss estimation — helps irrigation districts quantify conveyance efficiency and prioritize lining investments.
+
+- 35|Is there a nice way to let users save a named calculation? Save/restore button? Leads to inputs for save name and a list of save names to open or delete. Leads to user registration and login for cross-device saves (I lean against this)?
 
 ## Low Priority / Nice-to-Have
 
