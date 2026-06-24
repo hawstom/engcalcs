@@ -175,9 +175,9 @@ $ec_lang['mtc_n_strickler']='Strickler के अनुसार डिज़ा
 $ec_lang['mtc_n_blodgett']='Blodgett के अनुसार डिज़ाइन चट्टान आकार के लिए n';
 $ec_lang['mtc_n_bathurst']='Bathurst के अनुसार डिज़ाइन चट्टान आकार के लिए n';
 $ec_lang['mtc_blodgett_v_bathurst']='Blodgett बनाम Bathurst';
-$ec_lang['mtc_d50_bottom']='तल के लिए आवश्यक कोणीय चट्टान आकार, D50 (Isbash और MC) <a href="javascript:alert(\'Isbash (1936) और Maricopa County, Arizona, US के अनुसार।\')">?</a>';
-$ec_lang['mtc_d50_z1']='पार्श्व ढलान 1 के लिए आवश्यक कोणीय चट्टान आकार, D50 (Isbash और MC) <a href="javascript:alert(\'Isbash (1936) और Maricopa County, Arizona, US के अनुसार।\')">?</a>';
-$ec_lang['mtc_d50_z2']='पार्श्व ढलान 2 के लिए आवश्यक कोणीय चट्टान आकार, D50 (Isbash और MC) <a href="javascript:alert(\'Isbash (1936) और Maricopa County, Arizona, US के अनुसार।\')">?</a>';
+$ec_lang['mtc_d50_bottom']='तल के लिए आवश्यक कोणीय चट्टान आकार, D50 (Isbash और MC) <span title="Isbash (1936) और Maricopa County, Arizona, US के अनुसार।" style="cursor:help;color:#06c;font-size:0.9em">?</span>';
+$ec_lang['mtc_d50_z1']='पार्श्व ढलान 1 के लिए आवश्यक कोणीय चट्टान आकार, D50 (Isbash और MC) <span title="Isbash (1936) और Maricopa County, Arizona, US के अनुसार।" style="cursor:help;color:#06c;font-size:0.9em">?</span>';
+$ec_lang['mtc_d50_z2']='पार्श्व ढलान 2 के लिए आवश्यक कोणीय चट्टान आकार, D50 (Isbash और MC) <span title="Isbash (1936) और Maricopa County, Arizona, US के अनुसार।" style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['mtc_d50_mra']='आवश्यक कोणीय चट्टान आकार, D50 (Maynord, Ruff और Abt 1989)';
 $ec_lang['mtc_d50_searcy']='आवश्यक कोणीय चट्टान आकार, D50 (Searcy 1967)';
 $ec_lang['mtc_note_1']='<dl><dt>स्वचालित चट्टान आकार और खुरदरापन डिज़ाइन पुनरावृत्ति</dt><dd>एक खुरदरापन रेडियो बटन (BB अनुशंसित) और एक डिज़ाइन चट्टान आकार रेडियो बटन (Isbash अनुशंसित) चुनें। समान चट्टान आकार के साथ अपना वांछित प्रवाह पाने के लिए गहराई और चट्टान आकार सुरक्षा कारक को सूक्ष्म-समायोजित करें। हर बार जब आप कोई इनपुट मूल्य बदलते हैं, तो निम्नलिखित पुनरावृत्ति चक्र होता है: 1. डिज़ाइन चट्टान आकार से खुरदरापन की गणना की जाती है। 2. अनुरोधित खुरदरापन गणना इनपुट खुरदरापन में कॉपी की जाती है। 3. नाली प्रवाह और आवश्यक चट्टान आकार की गणना की जाती है। 4. डिज़ाइन चट्टान आकार समायोजित किया जाता है। 5. डिज़ाइन चट्टान आकार में त्रुटि बहुत छोटी होने तक दोहराएँ।</dd><dt>बुनियादी कैलकुलेटर (पुनरावृत्ति के बिना)</dt><dd>अपना वांछित खुरदरापन मूल्य दर्ज करें। डिज़ाइन चट्टान आकार इनपुट क्षेत्र को अनदेखा करें।</dd></dl>';

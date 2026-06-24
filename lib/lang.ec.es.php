@@ -158,9 +158,9 @@ $ec_lang['mtc_flow_depth']='Calado de la lámina de agua, y';
 $ec_lang['mtc_bend_angle']='Ángulo de la curva<a href="riprap-bend-angle.png" title="Haz clic para ver imagen">?</a> (para el tamaño de roca)';
 $ec_lang['mtc_sgrock']='Gravedad específica de la roca (2.65)';
 $ec_lang['mtc_d50_in']='Tamaño de roca';
-$ec_lang['mtc_d50_bottom']='Tamaño de roca requerido en el fondo, D<sub>50</sub>, Maricopa County <a href="javascript:alert(\'Cuando S0 < 2% según Isbash (1936) and Maricopa County, Arizona, US. Cuando S >= 2% según Robinson Rock Chute \')">?</a>';
-$ec_lang['mtc_d50_z1']='Tamaño de roca requerido en el lado 1, D<sub>50</sub>, Maricopa County <a href="javascript:alert(\'Cuando S0 < 2% según Isbash (1936) and Maricopa County, Arizona, US. Cuando S >= 2% según Robinson Rock Chute \')">?</a>';
-$ec_lang['mtc_d50_z2']='Tamaño de roca requerido en el lado 2, D<sub>50</sub>, Maricopa County <a href="javascript:alert(\'Cuando S0 < 2% según Isbash (1936) and Maricopa County, Arizona, US. Cuando S >= 2% según Robinson Rock Chute \')">?</a>';
+$ec_lang['mtc_d50_bottom']='Tamaño de roca requerido en el fondo, D<sub>50</sub>, Maricopa County <span title="Cuando S0 < 2% según Isbash (1936) and Maricopa County, Arizona, US. Cuando S >= 2% según Robinson Rock Chute " style="cursor:help;color:#06c;font-size:0.9em">?</span>';
+$ec_lang['mtc_d50_z1']='Tamaño de roca requerido en el lado 1, D<sub>50</sub>, Maricopa County <span title="Cuando S0 < 2% según Isbash (1936) and Maricopa County, Arizona, US. Cuando S >= 2% según Robinson Rock Chute " style="cursor:help;color:#06c;font-size:0.9em">?</span>';
+$ec_lang['mtc_d50_z2']='Tamaño de roca requerido en el lado 2, D<sub>50</sub>, Maricopa County <span title="Cuando S0 < 2% según Isbash (1936) and Maricopa County, Arizona, US. Cuando S >= 2% según Robinson Rock Chute " style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['mtc_d50_mra']='Tamaño de roca requerido, D<sub>50</sub>, según Maynord, Ruff, y Abt (1989)';
 $ec_lang['mtc_d50_searcy']='Tamaño de roca requerido, D<sub>50</sub>, según Searcy (1967)';
 // Weir Flow Simple

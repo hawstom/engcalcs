@@ -175,9 +175,9 @@ $ec_lang['mtc_n_strickler']='Strickler کے مطابق ڈیزائن پتھر ح�
 $ec_lang['mtc_n_blodgett']='Blodgett کے مطابق ڈیزائن پتھر حجم کے لیے n';
 $ec_lang['mtc_n_bathurst']='Bathurst کے مطابق ڈیزائن پتھر حجم کے لیے n';
 $ec_lang['mtc_blodgett_v_bathurst']='Blodgett بمقابلہ Bathurst';
-$ec_lang['mtc_d50_bottom']='تہ کے لیے ضروری زاویہ دار پتھر حجم، D50 (Isbash اور MC) <a href="javascript:alert(\'Isbash (1936) اور Maricopa County، Arizona، US کے مطابق۔\')">؟</a>';
-$ec_lang['mtc_d50_z1']='جانبی ڈھلان 1 کے لیے ضروری زاویہ دار پتھر حجم، D50 (Isbash اور MC) <a href="javascript:alert(\'Isbash (1936) اور Maricopa County، Arizona، US کے مطابق۔\')">؟</a>';
-$ec_lang['mtc_d50_z2']='جانبی ڈھلان 2 کے لیے ضروری زاویہ دار پتھر حجم، D50 (Isbash اور MC) <a href="javascript:alert(\'Isbash (1936) اور Maricopa County، Arizona، US کے مطابق۔\')">؟</a>';
+$ec_lang['mtc_d50_bottom']='تہ کے لیے ضروری زاویہ دار پتھر حجم، D50 (Isbash اور MC) <span title="Isbash (1936) اور Maricopa County، Arizona، US کے مطابق۔" style="cursor:help;color:#06c;font-size:0.9em">؟</span>';
+$ec_lang['mtc_d50_z1']='جانبی ڈھلان 1 کے لیے ضروری زاویہ دار پتھر حجم، D50 (Isbash اور MC) <span title="Isbash (1936) اور Maricopa County، Arizona، US کے مطابق۔" style="cursor:help;color:#06c;font-size:0.9em">؟</span>';
+$ec_lang['mtc_d50_z2']='جانبی ڈھلان 2 کے لیے ضروری زاویہ دار پتھر حجم، D50 (Isbash اور MC) <span title="Isbash (1936) اور Maricopa County، Arizona، US کے مطابق۔" style="cursor:help;color:#06c;font-size:0.9em">؟</span>';
 $ec_lang['mtc_d50_mra']='ضروری زاویہ دار پتھر حجم، D50 (Maynord، Ruff اور Abt 1989)';
 $ec_lang['mtc_d50_searcy']='ضروری زاویہ دار پتھر حجم، D50 (Searcy 1967)';
 $ec_lang['mtc_note_1']='<dl><dt>خودکار پتھر حجم اور کھردرا پن ڈیزائن تکرار</dt><dd>ایک کھردرا پن ریڈیو بٹن (BB تجویز کردہ) اور ایک ڈیزائن پتھر حجم ریڈیو بٹن (Isbash تجویز کردہ) منتخب کریں۔ مساوی پتھر حجم کے ساتھ اپنا مطلوبہ بہاؤ حاصل کرنے کے لیے گہرائی اور پتھر حجم حفاظت عامل کو ایڈجسٹ کریں۔ ہر بار جب آپ کوئی ان پٹ قدر تبدیل کرتے ہیں، درج ذیل تکرار چکر ہوتا ہے: 1. ڈیزائن پتھر حجم سے کھردرا پن کا حساب کیا جاتا ہے۔ 2. درخواست کردہ کھردرا پن حساب ان پٹ کھردرا پن میں کاپی کیا جاتا ہے۔ 3. نالہ بہاؤ اور ضروری پتھر حجم کا حساب کیا جاتا ہے۔ 4. ڈیزائن پتھر حجم کو ایڈجسٹ کیا جاتا ہے۔ 5. ڈیزائن پتھر حجم میں غلطی بہت چھوٹی ہونے تک دہرائیں۔</dd><dt>بنیادی حاسبہ (تکرار کے بغیر)</dt><dd>اپنی مطلوبہ کھردرا پن قدر درج کریں۔ ڈیزائن پتھر حجم ان پٹ علاقہ نظرانداز کریں۔</dd></dl>';

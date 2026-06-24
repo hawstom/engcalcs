@@ -103,9 +103,9 @@ $ec_lang['mtc_side_slope_1']='צד השיפוע 1 (אופקי\אנכי)';
 $ec_lang['mtc_side_slope_2']= 'צד השיפוע 2 (אופקי\אנכי)';
 $ec_lang['mtc_channel_slope']='שיפוע התעלה';
 $ec_lang['mtc_flow_depth']='עומק הספיקה';
-$ec_lang['mtc_d50_bottom']='גודל אבן זוויתית נדרש לקרקעית, D50 (Isbash ו-MC) <a href="javascript:alert(\'לפי Isbash (1936) ו-Maricopa County, אריזונה, ארה"ב.\')">?</a>';
-$ec_lang['mtc_d50_z1']='גודל אבן זוויתית נדרש לצד 1, D50 (Isbash ו-MC) <a href="javascript:alert(\'לפי Isbash (1936) ו-Maricopa County, אריזונה, ארה"ב.\')">?</a>';
-$ec_lang['mtc_d50_z2']='גודל אבן זוויתית נדרש לצד 2, D50 (Isbash ו-MC) <a href="javascript:alert(\'לפי Isbash (1936) ו-Maricopa County, אריזונה, ארה"ב.\')">?</a>';
+$ec_lang['mtc_d50_bottom']='גודל אבן זוויתית נדרש לקרקעית, D50 (Isbash ו-MC) <span title="לפי Isbash (1936) ו-Maricopa County, אריזונה, ארה"ב." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
+$ec_lang['mtc_d50_z1']='גודל אבן זוויתית נדרש לצד 1, D50 (Isbash ו-MC) <span title="לפי Isbash (1936) ו-Maricopa County, אריזונה, ארה"ב." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
+$ec_lang['mtc_d50_z2']='גודל אבן זוויתית נדרש לצד 2, D50 (Isbash ו-MC) <span title="לפי Isbash (1936) ו-Maricopa County, אריזונה, ארה"ב." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['mtc_d50_mra']='גודל אבן זוויתית נדרש, D50 (Maynord, Ruff ו-Abt 1989)';
 $ec_lang['mtc_d50_searcy']='גודל אבן זוויתית נדרש, D50 (Searcy 1967)';
 // Orifice Flow

@@ -175,9 +175,9 @@ $ec_lang['mtc_n_strickler']='n ለ Strickler ንድፍ የድንጋይ መጠን
 $ec_lang['mtc_n_blodgett']='n ለ Blodgett ንድፍ የድንጋይ መጠን';
 $ec_lang['mtc_n_bathurst']='n ለ Bathurst ንድፍ የድንጋይ መጠን';
 $ec_lang['mtc_blodgett_v_bathurst']='Blodgett vs. Bathurst';
-$ec_lang['mtc_d50_bottom']='የሚፈለግ የታቹ ማዕዘናዊ የድንጋይ መጠን, D50 (Isbash & MC) <a href="javascript:alert(\'Isbash (1936) እና Maricopa County, Arizona, US. መሠረት\')">?</a>';
-$ec_lang['mtc_d50_z1']='የሚፈለግ የጎን ቁልቁለት 1 ማዕዘናዊ የድንጋይ መጠን, D50 (Isbash & MC) <a href="javascript:alert(\'Isbash (1936) እና Maricopa County, Arizona, US. መሠረት\')">?</a>';
-$ec_lang['mtc_d50_z2']='የሚፈለግ የጎን ቁልቁለት 2 ማዕዘናዊ የድንጋይ መጠን, D50 (Isbash & MC) <a href="javascript:alert(\'Isbash (1936) እና Maricopa County, Arizona, US. መሠረት\')">?</a>';
+$ec_lang['mtc_d50_bottom']='የሚፈለግ የታቹ ማዕዘናዊ የድንጋይ መጠን, D50 (Isbash & MC) <span title="Isbash (1936) እና Maricopa County, Arizona, US. መሠረት" style="cursor:help;color:#06c;font-size:0.9em">?</span>';
+$ec_lang['mtc_d50_z1']='የሚፈለግ የጎን ቁልቁለት 1 ማዕዘናዊ የድንጋይ መጠን, D50 (Isbash & MC) <span title="Isbash (1936) እና Maricopa County, Arizona, US. መሠረት" style="cursor:help;color:#06c;font-size:0.9em">?</span>';
+$ec_lang['mtc_d50_z2']='የሚፈለግ የጎን ቁልቁለት 2 ማዕዘናዊ የድንጋይ መጠን, D50 (Isbash & MC) <span title="Isbash (1936) እና Maricopa County, Arizona, US. መሠረት" style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['mtc_d50_mra']='የሚፈለግ ማዕዘናዊ የድንጋይ መጠን, D50 (Maynord, Ruff, and Abt 1989)';
 $ec_lang['mtc_d50_searcy']='የሚፈለግ ማዕዘናዊ የድንጋይ መጠን, D50 (Searcy 1967)';
 $ec_lang['mtc_note_1']='<dl><dt>አውቶማቲክ የድንጋይ መጠን እና ሻካሪነት ንድፍ ድግግሞሽ</dt><dd>የሻካሪነት ራዲዮ አዝራር (BB ይመከራል) እና የንድፍ የድንጋይ መጠን ራዲዮ አዝራር (Isbash ይመከራል) ምረጥ። የሚፈለገህን ፍሰት ለማግኘት ጥልቀቱን እና የድንጋይ መጠን የደህንነት ሁኔታን ቁልቁለት በተረጋጋ የድንጋይ መጠን ቁጥጥር አድርግ። ማንኛውንም ግቤት ሲቀይሩ ይህ ዑደት ይከናወናል: 1. ሻካሪነት ከንድፍ የድንጋይ መጠን ይሰላል። 2. የሚፈለገው ሻካሪነት ስሌት ወደ ግቤት ሻካሪነት ይቀዳል። 3. የቦይ ፍሰት እና የሚፈለግ የድንጋይ መጠን ይሰላሉ። 4. ንድፍ የድንጋይ መጠን ይስተካከላል። 5. እስከ ንድፍ የድንጋይ መጠን ስህተት በጣም ትንሽ እስኪሆን ድገም።</dd><dt>መሠረታዊ ካልኩሌተር (ድግግሞሽ አልባ)</dt><dd>ፈለጋቸውን ሻካሪነት ዋጋ አስገባ። ንድፍ የድንጋይ መጠን ግቤት ቦታን ሰካ።</dd></dl>';

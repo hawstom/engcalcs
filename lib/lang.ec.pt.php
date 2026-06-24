@@ -151,9 +151,9 @@ $ec_lang['mtc_flow_depth']='Profundidade do escoamento';
 $ec_lang['mtc_bend_angle']='Ângulo da curva<a target="_blank" href="riprap-bend-angle.png" title="Clique para ver imagem">?</a> (para o tamanho de rocha)';
 $ec_lang['mtc_sgrock']='Gravidade específica da rocha (2.65)';
 $ec_lang['mtc_d50_in']='Tamanho de rocha';
-$ec_lang['mtc_d50_bottom']='Tamanho de rocha requerido no fundo, D50, Maricopa County <a href="javascript:alert(\'Quando S0 < 2% segundo Isbash (1936) e Maricopa County, Arizona, EUA. Quando S >= 2% segundo Robinson Rock Chute \')">?</a>';
-$ec_lang['mtc_d50_z1']='Tamanho de rocha requerido no lado 1, D50, Maricopa County <a href="javascript:alert(\'Quando S0 < 2% segundo Isbash (1936) e Maricopa County, Arizona, EUA. Quando S >= 2% segundo Robinson Rock Chute \')">?</a>';
-$ec_lang['mtc_d50_z2']='Tamanho de rocha requerido no lado 2, D50, Maricopa County <a href="javascript:alert(\'Quando S0 < 2% segundo Isbash (1936) e Maricopa County, Arizona, EUA. Quando S >= 2% segundo Robinson Rock Chute \')">?</a>';
+$ec_lang['mtc_d50_bottom']='Tamanho de rocha requerido no fundo, D50, Maricopa County <span title="Quando S0 < 2% segundo Isbash (1936) e Maricopa County, Arizona, EUA. Quando S >= 2% segundo Robinson Rock Chute " style="cursor:help;color:#06c;font-size:0.9em">?</span>';
+$ec_lang['mtc_d50_z1']='Tamanho de rocha requerido no lado 1, D50, Maricopa County <span title="Quando S0 < 2% segundo Isbash (1936) e Maricopa County, Arizona, EUA. Quando S >= 2% segundo Robinson Rock Chute " style="cursor:help;color:#06c;font-size:0.9em">?</span>';
+$ec_lang['mtc_d50_z2']='Tamanho de rocha requerido no lado 2, D50, Maricopa County <span title="Quando S0 < 2% segundo Isbash (1936) e Maricopa County, Arizona, EUA. Quando S >= 2% segundo Robinson Rock Chute " style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['mtc_d50_mra']='Tamanho de rocha requerido, D50, de acordo com Maynord, Ruff, e Abt (1989)';
 $ec_lang['mtc_d50_searcy']='Tamanho de rocha requerido, D50, de acordo com Searcy (1967)';
 // Robinson Rock Chute

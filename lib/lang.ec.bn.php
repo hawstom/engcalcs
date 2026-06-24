@@ -172,9 +172,9 @@ $ec_lang['mtc_n_strickler']='স্ট্রিকলার অনুযায�
 $ec_lang['mtc_n_blodgett']='ব্লডগেট অনুযায়ী নকশা পাথর আকারের জন্য n';
 $ec_lang['mtc_n_bathurst']='বাথার্স্ট অনুযায়ী নকশা পাথর আকারের জন্য n';
 $ec_lang['mtc_blodgett_v_bathurst']='ব্লডগেট বনাম বাথার্স্ট';
-$ec_lang['mtc_d50_bottom']='তলায় প্রয়োজনীয় কোণযুক্ত পাথর আকার, D50 (Isbash এবং MC) <a href="javascript:alert(\'Isbash (1936) এবং Maricopa County, Arizona, US অনুযায়ী।\')">?</a>';
-$ec_lang['mtc_d50_z1']='পার্শ্ব ঢাল ১-এ প্রয়োজনীয় কোণযুক্ত পাথর আকার, D50 (Isbash এবং MC) <a href="javascript:alert(\'Isbash (1936) এবং Maricopa County, Arizona, US অনুযায়ী।\')">?</a>';
-$ec_lang['mtc_d50_z2']='পার্শ্ব ঢাল ২-এ প্রয়োজনীয় কোণযুক্ত পাথর আকার, D50 (Isbash এবং MC) <a href="javascript:alert(\'Isbash (1936) এবং Maricopa County, Arizona, US অনুযায়ী।\')">?</a>';
+$ec_lang['mtc_d50_bottom']='তলায় প্রয়োজনীয় কোণযুক্ত পাথর আকার, D50 (Isbash এবং MC) <span title="Isbash (1936) এবং Maricopa County, Arizona, US অনুযায়ী।" style="cursor:help;color:#06c;font-size:0.9em">?</span>';
+$ec_lang['mtc_d50_z1']='পার্শ্ব ঢাল ১-এ প্রয়োজনীয় কোণযুক্ত পাথর আকার, D50 (Isbash এবং MC) <span title="Isbash (1936) এবং Maricopa County, Arizona, US অনুযায়ী।" style="cursor:help;color:#06c;font-size:0.9em">?</span>';
+$ec_lang['mtc_d50_z2']='পার্শ্ব ঢাল ২-এ প্রয়োজনীয় কোণযুক্ত পাথর আকার, D50 (Isbash এবং MC) <span title="Isbash (1936) এবং Maricopa County, Arizona, US অনুযায়ী।" style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['mtc_d50_mra']='প্রয়োজনীয় কোণযুক্ত পাথর আকার, D50 (Maynord, Ruff, এবং Abt 1989)';
 $ec_lang['mtc_d50_searcy']='প্রয়োজনীয় কোণযুক্ত পাথর আকার, D50 (Searcy 1967)';
 $ec_lang['mtc_note_1']='<dl><dt>স্বয়ংক্রিয় পাথর আকার ও রুক্ষতা ডিজাইন পুনরাবৃত্তি</dt><dd>একটি রুক্ষতা রেডিও বাটন (BB প্রস্তাবিত) এবং একটি নকশা পাথর আকার রেডিও বাটন (Isbash প্রস্তাবিত) নির্বাচন করুন। একটি সমান পাথর আকারে আপনার কাঙ্ক্ষিত প্রবাহ পেতে গভীরতা ও পাথর আকার নিরাপত্তা গুণক সামঞ্জস্য করুন। প্রতিবার কোনো ইনপুট মান পরিবর্তন করলে নিম্নলিখিত পুনরাবৃত্তি চক্র ঘটে: ১. নকশা পাথর আকার থেকে রুক্ষতা গণনা করা হয়। ২. অনুরোধকৃত রুক্ষতা গণনা ইনপুট রুক্ষতায় কপি করা হয়। ৩. চ্যানেল প্রবাহ ও প্রয়োজনীয় পাথর আকার গণনা করা হয়। ৪. নকশা পাথর আকার সামঞ্জস্য করা হয়। ৫. নকশা পাথর আকারে ত্রুটি খুব ছোট না হওয়া পর্যন্ত পুনরাবৃত্তি।</dd><dt>বেসিক ক্যালকুলেটর (পুনরাবৃত্তি ছাড়া)</dt><dd>আপনার কাঙ্ক্ষিত রুক্ষতা মান লিখুন। নকশা পাথর আকার ইনপুট এলাকা উপেক্ষা করুন।</dd></dl>';

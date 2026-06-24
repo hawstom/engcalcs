@@ -175,9 +175,9 @@ $ec_lang['mtc_n_strickler']='n pour la granulométrie de conception selon Strick
 $ec_lang['mtc_n_blodgett']='n pour la granulométrie de conception selon Blodgett';
 $ec_lang['mtc_n_bathurst']='n pour la granulométrie de conception selon Bathurst';
 $ec_lang['mtc_blodgett_v_bathurst']='Blodgett vs. Bathurst';
-$ec_lang['mtc_d50_bottom']='Granulométrie d\'enrochement anguleux requise au fond, D50 (Isbash & MC) <a href="javascript:alert(\'Selon Isbash (1936) et Maricopa County, Arizona, US.\')">?</a>';
-$ec_lang['mtc_d50_z1']='Granulométrie d\'enrochement anguleux requise sur talus 1, D50 (Isbash & MC) <a href="javascript:alert(\'Selon Isbash (1936) et Maricopa County, Arizona, US.\')">?</a>';
-$ec_lang['mtc_d50_z2']='Granulométrie d\'enrochement anguleux requise sur talus 2, D50 (Isbash & MC) <a href="javascript:alert(\'Selon Isbash (1936) et Maricopa County, Arizona, US.\')">?</a>';
+$ec_lang['mtc_d50_bottom']='Granulométrie d\'enrochement anguleux requise au fond, D50 (Isbash & MC) <span title="Selon Isbash (1936) et Maricopa County, Arizona, US." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
+$ec_lang['mtc_d50_z1']='Granulométrie d\'enrochement anguleux requise sur talus 1, D50 (Isbash & MC) <span title="Selon Isbash (1936) et Maricopa County, Arizona, US." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
+$ec_lang['mtc_d50_z2']='Granulométrie d\'enrochement anguleux requise sur talus 2, D50 (Isbash & MC) <span title="Selon Isbash (1936) et Maricopa County, Arizona, US." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['mtc_d50_mra']='Granulométrie d\'enrochement anguleux requise, D50 (Maynord, Ruff et Abt 1989)';
 $ec_lang['mtc_d50_searcy']='Granulométrie d\'enrochement anguleux requise, D50 (Searcy 1967)';
 $ec_lang['mtc_note_1']='<dl><dt>Dimensionnement itératif automatique des enrochements</dt><dd>Choisissez un bouton de rugosité (BB recommandé) et un bouton de granulométrie de conception (Isbash recommandé). Affinez la profondeur et le coefficient de sécurité pour obtenir le débit souhaité avec une granulométrie ronde. À chaque modification: 1. La rugosité est calculée à partir de la granulométrie. 2. La rugosité calculée est copiée en entrée. 3. L\'écoulement et la granulométrie requise sont calculés. 4. La granulométrie est ajustée. 5. Répéter jusqu\'à convergence.</dd><dt>Calculateur de base (sans itération)</dt><dd>Entrez votre valeur de rugosité. Ignorez la zone de granulométrie de conception.</dd></dl>';

@@ -175,9 +175,9 @@ $ec_lang['mtc_n_strickler']='n សម្រាប់ទំហំថ្មរច�
 $ec_lang['mtc_n_blodgett']='n សម្រាប់ទំហំថ្មរចនា តាម Blodgett';
 $ec_lang['mtc_n_bathurst']='n សម្រាប់ទំហំថ្មរចនា តាម Bathurst';
 $ec_lang['mtc_blodgett_v_bathurst']='Blodgett ទល់នឹង Bathurst';
-$ec_lang['mtc_d50_bottom']='ទំហំថ្មខ្ចាញ់ខាងក្រោមដែលត្រូវការ, D50 (Isbash & MC) <a href="javascript:alert(\'Per Isbash (1936) and Maricopa County, Arizona, US.\')">?</a>';
-$ec_lang['mtc_d50_z1']='ទំហំថ្មខ្ចាញ់ជម្រាលចំហៀង 1 ដែលត្រូវការ, D50 (Isbash & MC) <a href="javascript:alert(\'Per Isbash (1936) and Maricopa County, Arizona, US.\')">?</a>';
-$ec_lang['mtc_d50_z2']='ទំហំថ្មខ្ចាញ់ជម្រាលចំហៀង 2 ដែលត្រូវការ, D50 (Isbash & MC) <a href="javascript:alert(\'Per Isbash (1936) and Maricopa County, Arizona, US.\')">?</a>';
+$ec_lang['mtc_d50_bottom']='ទំហំថ្មខ្ចាញ់ខាងក្រោមដែលត្រូវការ, D50 (Isbash & MC) <span title="Per Isbash (1936) and Maricopa County, Arizona, US." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
+$ec_lang['mtc_d50_z1']='ទំហំថ្មខ្ចាញ់ជម្រាលចំហៀង 1 ដែលត្រូវការ, D50 (Isbash & MC) <span title="Per Isbash (1936) and Maricopa County, Arizona, US." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
+$ec_lang['mtc_d50_z2']='ទំហំថ្មខ្ចាញ់ជម្រាលចំហៀង 2 ដែលត្រូវការ, D50 (Isbash & MC) <span title="Per Isbash (1936) and Maricopa County, Arizona, US." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['mtc_d50_mra']='ទំហំថ្មខ្ចាញ់ដែលត្រូវការ, D50 (Maynord, Ruff, and Abt 1989)';
 $ec_lang['mtc_d50_searcy']='ទំហំថ្មខ្ចាញ់ដែលត្រូវការ, D50 (Searcy 1967)';
 $ec_lang['mtc_note_1']='<dl><dt>ការធ្វើម្ដងទៀតដោយស្វ័យប្រវត្តិនៃទំហំថ្ម និងការរចនាភាពរញ៉េរញ៉ៃ</dt><dd>ជ្រើសប៊ូតុងភាពរញ៉េរញ៉ៃ (ណែនាំ BB) និងប៊ូតុងទំហំថ្មរចនា (ណែនាំ Isbash)។ កែតម្រូវជម្រៅ និងកត្តាសុវត្ថិភាពទំហំថ្ម ដើម្បីទទួលបានការហូរចង់បានជាមួយទំហំថ្មស្ថិតស្ថេរ។ រាល់ពេលអ្នកផ្លាស់ប្ដូរតម្លៃបញ្ចូលណាមួយ ដំណើរការម្ដងទៀតខាងក្រោមនឹងកើតឡើង: 1. ភាពរញ៉េរញ៉ៃត្រូវបានគណនាពីទំហំថ្មរចនា។ 2. ការគណនាភាពរញ៉េរញ៉ៃដែលបានស្នើត្រូវបានចម្លងទៅភាពរញ៉េរញ៉ៃបញ្ចូល។ 3. ការហូរក្នុងប្រឡាយ និងទំហំថ្មដែលត្រូវការ ត្រូវបានគណនា។ 4. ទំហំថ្មរចនាត្រូវបានកែតម្រូវ។ 5. ធ្វើម្ដងទៀតរហូតដល់កំហុសក្នុងទំហំថ្មរចនាតូចណាស់។</dd><dt>ម៉ាស៊ីនគណនាមូលដ្ឋាន (គ្មានការធ្វើម្ដងទៀត)</dt><dd>បញ្ចូលតម្លៃភាពរញ៉េរញ៉ៃចង់បាន។ មិនយកចិត្តទុកដាក់ផ្ទៃបញ្ចូលទំហំថ្មរចនា។</dd></dl>';

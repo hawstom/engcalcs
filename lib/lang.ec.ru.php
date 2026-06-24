@@ -172,9 +172,9 @@ $ec_lang['mtc_n_strickler']='n для расчётного размера кам
 $ec_lang['mtc_n_blodgett']='n для расчётного размера камня по Блодгетту';
 $ec_lang['mtc_n_bathurst']='n для расчётного размера камня по Батхёрсту';
 $ec_lang['mtc_blodgett_v_bathurst']='Блодгетт vs. Батхёрст';
-$ec_lang['mtc_d50_bottom']='Требуемый размер угловатого камня на дне, D50 (Isbash &amp; MC) <a href="javascript:alert(\'По Isbash (1936) и Maricopa County, Arizona, USA.\')">?</a>';
-$ec_lang['mtc_d50_z1']='Требуемый размер угловатого камня откос 1, D50 (Isbash &amp; MC) <a href="javascript:alert(\'По Isbash (1936) и Maricopa County, Arizona, USA.\')">?</a>';
-$ec_lang['mtc_d50_z2']='Требуемый размер угловатого камня откос 2, D50 (Isbash &amp; MC) <a href="javascript:alert(\'По Isbash (1936) и Maricopa County, Arizona, USA.\')">?</a>';
+$ec_lang['mtc_d50_bottom']='Требуемый размер угловатого камня на дне, D50 (Isbash &amp; MC) <span title="По Isbash (1936) и Maricopa County, Arizona, USA." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
+$ec_lang['mtc_d50_z1']='Требуемый размер угловатого камня откос 1, D50 (Isbash &amp; MC) <span title="По Isbash (1936) и Maricopa County, Arizona, USA." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
+$ec_lang['mtc_d50_z2']='Требуемый размер угловатого камня откос 2, D50 (Isbash &amp; MC) <span title="По Isbash (1936) и Maricopa County, Arizona, USA." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['mtc_d50_mra']='Требуемый размер угловатого камня, D50 (Maynord, Ruff и Abt 1989)';
 $ec_lang['mtc_d50_searcy']='Требуемый размер угловатого камня, D50 (Searcy 1967)';
 $ec_lang['mtc_note_1']='<dl><dt>Автоматическая итерация подбора камня и шероховатости</dt><dd>Выберите переключатель шероховатости (рекомендуется BB) и переключатель расчётного размера камня (рекомендуется Isbash). Подберите глубину и коэффициент надёжности камня для получения желаемого расхода с равномерным размером камня. При каждом изменении входного значения запускается итерационный цикл: 1. Шероховатость вычисляется из расчётного размера камня. 2. Требуемое значение шероховатости копируется во входную шероховатость. 3. Расход в канале и требуемый размер камня вычисляются. 4. Расчётный размер камня корректируется. 5. Повторять до достижения малой погрешности в расчётном размере камня.</dd><dt>Базовый калькулятор (без итерации)</dt><dd>Введите желаемое значение шероховатости. Игнорируйте поле ввода расчётного размера камня.</dd></dl>';

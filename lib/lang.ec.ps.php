@@ -175,9 +175,9 @@ $ec_lang['mtc_n_strickler']='د Strickler له مخې د ډیزاین کاڼو �
 $ec_lang['mtc_n_blodgett']='د Blodgett له مخې د ډیزاین کاڼو اندازې لپاره n';
 $ec_lang['mtc_n_bathurst']='د Bathurst له مخې د ډیزاین کاڼو اندازې لپاره n';
 $ec_lang['mtc_blodgett_v_bathurst']='Blodgett مقابل Bathurst';
-$ec_lang['mtc_d50_bottom']='اړین لاندیني زاویه لرونکي کاڼو اندازه، D50 (Isbash او MC) <a href="javascript:alert(\'د Isbash (1936) او Maricopa County, Arizona, US له مخې.\')">?</a>';
-$ec_lang['mtc_d50_z1']='اړین د اړخ میل ۱ زاویه لرونکي کاڼو اندازه، D50 (Isbash او MC) <a href="javascript:alert(\'د Isbash (1936) او Maricopa County, Arizona, US له مخې.\')">?</a>';
-$ec_lang['mtc_d50_z2']='اړین د اړخ میل ۲ زاویه لرونکي کاڼو اندازه، D50 (Isbash او MC) <a href="javascript:alert(\'د Isbash (1936) او Maricopa County, Arizona, US له مخې.\')">?</a>';
+$ec_lang['mtc_d50_bottom']='اړین لاندیني زاویه لرونکي کاڼو اندازه، D50 (Isbash او MC) <span title="د Isbash (1936) او Maricopa County, Arizona, US له مخې." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
+$ec_lang['mtc_d50_z1']='اړین د اړخ میل ۱ زاویه لرونکي کاڼو اندازه، D50 (Isbash او MC) <span title="د Isbash (1936) او Maricopa County, Arizona, US له مخې." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
+$ec_lang['mtc_d50_z2']='اړین د اړخ میل ۲ زاویه لرونکي کاڼو اندازه، D50 (Isbash او MC) <span title="د Isbash (1936) او Maricopa County, Arizona, US له مخې." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['mtc_d50_mra']='اړین زاویه لرونکي کاڼو اندازه، D50 (Maynord, Ruff, and Abt 1989)';
 $ec_lang['mtc_d50_searcy']='اړین زاویه لرونکي کاڼو اندازه، D50 (Searcy 1967)';
 $ec_lang['mtc_note_1']='<dl><dt>د کاڼو اندازه او خشونت ډیزاین اتوماتیک تکرار</dt><dd>یو خشونت ریډیو تڼۍ (BB وړاندیز کیږي) او د ډیزاین کاڼو اندازې ریډیو تڼۍ (Isbash وړاندیز کیږي) غوره کړئ. ژوروالی او د کاڼو اندازې امنیتي فاکتور سم کړئ ترڅو خپل غوښتل شوي بهاو د مساوي کاڼو اندازې سره ترلاسه کړئ. هر ځل چې تاسو کوم داخلي ارزښت بدل کړئ، لاندینی تکرار دور پیښیږي: ۱. خشونت د ډیزاین کاڼو اندازې له مخې محاسبه کیږي. ۲. غوښتل شوي خشونت محاسبه د داخلي خشونت ته کاپي کیږي. ۳. د چینل بهاو او اړین کاڼو اندازه محاسبه کیږي. ۴. د ډیزاین کاڼو اندازه تنظیمیږي. ۵. د ډیزاین کاڼو اندازې کې تیروتنه ډیره کوچنۍ شي پورې تکرار کیږي.</dd><dt>اساسي محاسبه (بدون تکرار)</dt><dd>خپل غوښتل شوي خشونت ارزښت داخل کړئ. د ډیزاین کاڼو اندازې داخلي ساحه له پامه غورځوئ.</dd></dl>';
