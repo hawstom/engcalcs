@@ -16,8 +16,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 These tasks reduce the AI token cost of routine maintenance by replacing repeated AI judgment with deterministic scripts. Copilot owns execution (all tagged `[CP]`); Claude Code specs any script whose output feeds back into translation quality work.
 
-- 35|New-calculator scaffold script: Script that, given a prefix (e.g. `rc_`) and a list of key names, (a) appends stub entries to all 27 lang files and (b) produces a skeleton PHP calculator page following repo conventions (`filemtime()` include, `echoHeader`/`echoCalculatorForm`/`echoFeedback`/`echoFooter` calls). Replaces the repetitive copy-and-edit step when starting a new calculator. [CP]
-
 - 30|Lang-file key-order normalizer: Script that rewrites each `lib/lang.ec.??.php` so its key order matches the English source exactly. Currently, keys accumulated in insertion order over many sprints, making `git diff` noisy and making it easy for parity-checker output to be hard to read. One-time run + hook to enforce order on future edits. [CP]
 
 - 30|Deployment workflow script: Shell script wrapping the full release sequence — php syntax check on changed files, git add/commit prompt, push via `altssh.bitbucket.org:443`. Removes the per-session SSH configuration overhead that currently requires either a manual reminder or asking an AI to recall the altssh workaround. [CP]
@@ -37,6 +35,8 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 - 10|Results sharing — dedicated "Copy link" button or print summary. Largely addressed by the URL-based label feature; a polished UI affordance is the remaining gap. [CP]
 
 ## Completed
+
+- 0|New-calculator scaffold script: Added `scripts/new_calculator_scaffold.php`. Given `--prefix` and `--keys`, it appends missing stub entries across all 27 `lib/lang.ec.??.php` files and creates a calculator skeleton page + JS file using repo conventions (`echoHeader`/`echoCalculatorForm`/`echoFeedback`/`echoFooter`, JS include with `filemtime()`).
 
 - 0|Translation completion matrix: Added `scripts/translation_completion_matrix.php` to report untranslated-key counts with languages as rows and key prefixes as columns. Supports `--lang`, `--prefix`, and `--format=table|csv` for sprint prioritization.
 
