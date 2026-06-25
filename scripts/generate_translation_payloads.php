@@ -1,88 +1,328 @@
 <?php
-// generate_translation_payloads.php
-// Usage:
-//   php generate_translation_payloads.php [output_dir] [calculator_prefix]
-//   php generate_translation_payloads.php [output_dir] --prefix=<calculator_prefix>
+/**
+ * Translation payload generator.
+ *
+ * Writes per-language JSON payloads containing only missing/untranslated keys,
+ * plus neighboring translated context for tone/register consistency.
+ *
+ * Usage:
+ *   php scripts/generate_translation_payloads.php
+ *   php scripts/generate_translation_payloads.php --prefix=dw
+ *   php scripts/generate_translation_payloads.php --lang=fr,uk --prefix=dw
+ *   php scripts/generate_translation_payloads.php /tmp/payloads
+ */
 
-$input = __DIR__ . '/../lib/lang.ec.en.php';
-$glossaryPath = __DIR__ . '/glossary.json';
-$outputDir = __DIR__ . '/../translation_payloads';
-$requestedPrefix = null;
+const DEFAULT_LANG_DIR = __DIR__ . '/../lib';
+const DEFAULT_OUTPUT_DIR = __DIR__ . '/../translation_payloads';
+const GLOSSARY_PATH = __DIR__ . '/glossary.json';
+const EN_FILE = DEFAULT_LANG_DIR . '/lang.ec.en.php';
+const TARGET_LANGS = [
+    'am', 'ar', 'bg', 'bn', 'cs', 'de', 'es', 'fa', 'fr', 'he', 'hi', 'hr', 'id', 'it', 'km', 'my',
+    'ps', 'pt', 'ro', 'ru', 'sr', 'sw', 'tr', 'uk', 'ur', 'zh',
+];
 
-$positionals = [];
-for ($i = 1; $i < count($argv); $i++) {
-    $arg = $argv[$i];
-    if (strpos($arg, '--prefix=') === 0) {
-        $requestedPrefix = substr($arg, strlen('--prefix='));
-        continue;
+main($argv);
+
+function main(array $argv): void
+{
+    $opts = parseArgs($argv);
+
+    if (!file_exists(EN_FILE)) {
+        fail('English language file not found: ' . EN_FILE);
     }
-    if (strpos($arg, '--') === 0) {
-        fwrite(STDERR, "Unknown option: {$arg}\n");
-        exit(1);
+    if (!file_exists(GLOSSARY_PATH)) {
+        fail('Glossary file not found: ' . GLOSSARY_PATH);
     }
-    $positionals[] = $arg;
-}
 
-if (isset($positionals[0])) {
-    $outputDir = $positionals[0];
-}
-if ($requestedPrefix === null && isset($positionals[1])) {
-    $requestedPrefix = $positionals[1];
-}
-
-if (!file_exists($input)) {
-    fwrite(STDERR, "English language file not found: $input\n");
-    exit(1);
-}
-
-if (!file_exists($glossaryPath)) {
-    fwrite(STDERR, "Glossary file not found: $glossaryPath\n");
-    exit(1);
-}
-
-if (!is_dir($outputDir)) {
-    mkdir($outputDir, 0755, true);
-}
-
-$contents = file_get_contents($input);
-$glossaryRaw = file_get_contents($glossaryPath);
-$glossaryData = json_decode($glossaryRaw, true);
-
-if (!is_array($glossaryData) || !isset($glossaryData['terms']) || !is_array($glossaryData['terms'])) {
-    fwrite(STDERR, "Invalid glossary JSON structure in: $glossaryPath\n");
-    exit(1);
-}
-
-// Match $ec_lang['key'] = '...'; including multiline quoted values.
-$pattern = '/\$ec_lang\[\'([^\']+)\'\]\s*=\s*(\'((?:[^\\\']|\\.)*)\'|\"((?:[^\\\"]|\\.)*)\"|([^;]*));/m';
-preg_match_all($pattern, $contents, $matches, PREG_SET_ORDER);
-
-$keys = [];
-foreach ($matches as $m) {
-    $key = $m[1];
-    $val = '';
-    if (isset($m[3]) && $m[3] !== '') {
-        $val = stripcslashes($m[3]);
-    } elseif (isset($m[4]) && $m[4] !== '') {
-        $val = stripcslashes($m[4]);
-    } else {
-        $val = trim($m[5] ?? '');
+    if (!is_dir($opts['output_dir']) && !mkdir($opts['output_dir'], 0755, true) && !is_dir($opts['output_dir'])) {
+        fail('Unable to create output directory: ' . $opts['output_dir']);
     }
-    $keys[$key] = $val;
+
+    $enKeys = loadLangArray(EN_FILE);
+    if (count($enKeys) === 0) {
+        fail('No keys parsed from English language file.');
+    }
+
+    $glossaryData = readJsonFile(GLOSSARY_PATH);
+    if (!isset($glossaryData['terms']) || !is_array($glossaryData['terms'])) {
+        fail('Invalid glossary JSON structure in: ' . GLOSSARY_PATH);
+    }
+
+    $termIndex = termIndexByName($glossaryData['terms']);
+    $prefixMap = prefixToTermNames();
+
+    $detectedPrefixes = detectPrefixes($enKeys);
+    $activePrefixes = $detectedPrefixes;
+    if ($opts['requested_prefix'] !== null) {
+        $activePrefixes = array_values(array_filter($activePrefixes, static function ($p) use ($opts) {
+            return $p === $opts['requested_prefix'];
+        }));
+
+        if (count($activePrefixes) === 0) {
+            fail('Requested prefix not found in English keys: ' . $opts['requested_prefix']);
+        }
+    }
+
+    file_put_contents(
+        $opts['output_dir'] . '/lang.en.json',
+        json_encode([
+            'language' => 'en',
+            'keys' => $enKeys,
+            'count' => count($enKeys),
+            'active_prefixes' => $activePrefixes,
+            'requested_prefix' => $opts['requested_prefix'],
+        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
+    );
+
+    $langs = resolveTargetLanguages($opts['languages']);
+    $generatedCount = 0;
+
+    foreach ($langs as $lang) {
+        $targetFile = DEFAULT_LANG_DIR . "/lang.ec.{$lang}.php";
+        if (!file_exists($targetFile)) {
+            fwrite(STDERR, "WARN: target language file missing, skipping: {$targetFile}\n");
+            continue;
+        }
+
+        $current = loadLangArray($targetFile);
+        [$deltaKeys, $keyContext] = collectDeltaAndContext($enKeys, $current, $activePrefixes);
+
+        $prefixesInDelta = detectPrefixes($deltaKeys);
+        $prefixGlossary = buildPrefixGlossary($prefixesInDelta, $termIndex, $prefixMap);
+
+        $promptByPrefix = [];
+        $termsByPrefix = [];
+        foreach ($prefixGlossary as $prefix => $terms) {
+            $promptByPrefix[$prefix] = buildPromptContext($terms, $lang);
+            $termsByPrefix[$prefix] = array_map(static function ($term) use ($lang) {
+                return [
+                    'term' => $term['term'] ?? '',
+                    'symbol' => $term['symbol'] ?? '',
+                    'context' => $term['context'] ?? '',
+                    'translation_notes' => $term['translation_notes'] ?? '',
+                    'preferred_translation' => $term['translations'][$lang] ?? '',
+                ];
+            }, $terms);
+        }
+
+        $payload = [
+            'meta' => [
+                'language' => $lang,
+                'expected_key_count' => count($enKeys),
+                'delta_key_count' => count($deltaKeys),
+                'active_prefixes' => $prefixesInDelta,
+                'requested_prefix' => $opts['requested_prefix'],
+                'notes' => 'Translate only keys in keys_to_translate; preserve HTML, units, and symbols.',
+                'glossary_injection_notes' => 'Use prompt_context_by_prefix and glossary_terms_by_prefix.preferred_translation when available.',
+                'context_notes' => 'Use key_context.neighbors to keep register consistent with nearby translated strings.',
+            ],
+            'prompt_context_by_prefix' => $promptByPrefix,
+            'glossary_terms_by_prefix' => $termsByPrefix,
+            'keys_to_translate' => $deltaKeys,
+            // Backward-compatibility for scripts that still expect payload["keys"].
+            'keys' => $deltaKeys,
+            'key_context' => $keyContext,
+        ];
+
+        file_put_contents(
+            $opts['output_dir'] . "/payload_{$lang}.json",
+            json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
+        );
+        $generatedCount++;
+    }
+
+    echo "Generated {$generatedCount} payload files in: {$opts['output_dir']}\n";
+    echo 'Active prefixes: ' . implode(', ', $activePrefixes) . "\n";
 }
 
-function detectPrefixes(array $languageKeys): array
+function parseArgs(array $argv): array
+{
+    $opts = [
+        'output_dir' => DEFAULT_OUTPUT_DIR,
+        'requested_prefix' => null,
+        'languages' => [],
+    ];
+
+    $positionals = [];
+    for ($i = 1; $i < count($argv); $i++) {
+        $arg = $argv[$i];
+        if (strpos($arg, '--prefix=') === 0) {
+            $opts['requested_prefix'] = trim(substr($arg, strlen('--prefix=')));
+            continue;
+        }
+        if (strpos($arg, '--lang=') === 0) {
+            $opts['languages'] = splitCsv(substr($arg, strlen('--lang=')));
+            continue;
+        }
+        if ($arg === '--help' || $arg === '-h') {
+            printHelpAndExit();
+        }
+        if (strpos($arg, '--') === 0) {
+            fail('Unknown option: ' . $arg);
+        }
+        $positionals[] = $arg;
+    }
+
+    if (isset($positionals[0])) {
+        $opts['output_dir'] = $positionals[0];
+    }
+    if ($opts['requested_prefix'] === null && isset($positionals[1])) {
+        $opts['requested_prefix'] = trim($positionals[1]);
+    }
+
+    if ($opts['requested_prefix'] === '') {
+        $opts['requested_prefix'] = null;
+    }
+
+    return $opts;
+}
+
+function printHelpAndExit(): void
+{
+    echo "Usage: php scripts/generate_translation_payloads.php [output_dir] [prefix]\n";
+    echo "       php scripts/generate_translation_payloads.php --lang=fr,uk --prefix=dw\n";
+    exit(0);
+}
+
+function splitCsv(string $value): array
+{
+    $parts = array_filter(array_map('trim', explode(',', $value)), static function ($v) {
+        return $v !== '';
+    });
+    return array_values(array_unique($parts));
+}
+
+function readJsonFile(string $path): array
+{
+    $raw = file_get_contents($path);
+    if ($raw === false) {
+        fail('Unable to read JSON file: ' . $path);
+    }
+    $decoded = json_decode($raw, true);
+    if (!is_array($decoded)) {
+        fail('Invalid JSON in file: ' . $path);
+    }
+    return $decoded;
+}
+
+function resolveTargetLanguages(array $requested): array
+{
+    if (count($requested) === 0) {
+        return TARGET_LANGS;
+    }
+
+    $filtered = array_values(array_filter(TARGET_LANGS, static function ($lang) use ($requested) {
+        return in_array($lang, $requested, true);
+    }));
+
+    if (count($filtered) === 0) {
+        fail('No target languages matched --lang filter.');
+    }
+
+    return $filtered;
+}
+
+function loadLangArray(string $file): array
+{
+    $ec_lang = [];
+    include $file;
+
+    if (!is_array($ec_lang)) {
+        fail('Language file did not produce $ec_lang array: ' . $file);
+    }
+
+    return $ec_lang;
+}
+
+function detectPrefixes(array $keys): array
 {
     $prefixes = [];
-    foreach (array_keys($languageKeys) as $key) {
+    foreach (array_keys($keys) as $key) {
         $parts = explode('_', $key, 2);
-        if (count($parts) === 2 && strlen($parts[0]) > 0) {
+        if (count($parts) === 2 && $parts[0] !== '') {
             $prefixes[$parts[0]] = true;
         }
     }
-    $result = array_keys($prefixes);
-    sort($result);
-    return $result;
+    $list = array_keys($prefixes);
+    sort($list);
+    return $list;
+}
+
+function collectDeltaAndContext(array $enKeys, array $current, array $activePrefixes): array
+{
+    $delta = [];
+    $context = [];
+    $orderedKeys = array_keys($enKeys);
+
+    for ($i = 0; $i < count($orderedKeys); $i++) {
+        $key = $orderedKeys[$i];
+        $prefix = keyPrefix($key);
+        if (count($activePrefixes) > 0 && !in_array($prefix, $activePrefixes, true)) {
+            continue;
+        }
+
+        $english = (string)($enKeys[$key] ?? '');
+        $currentValue = array_key_exists($key, $current) ? trim((string)$current[$key]) : null;
+
+        $reason = null;
+        if ($currentValue === null) {
+            $reason = 'missing';
+        } elseif ($currentValue === '') {
+            $reason = 'blank';
+        } elseif ($currentValue === trim($english)) {
+            $reason = 'equal_to_english';
+        }
+
+        if ($reason === null) {
+            continue;
+        }
+
+        $delta[$key] = $english;
+        $context[$key] = [
+            'reason' => $reason,
+            'current_value' => $currentValue,
+            'neighbors' => [
+                'previous_translated' => findNeighbor($orderedKeys, $enKeys, $current, $i, -1),
+                'next_translated' => findNeighbor($orderedKeys, $enKeys, $current, $i, 1),
+            ],
+        ];
+    }
+
+    return [$delta, $context];
+}
+
+function findNeighbor(array $orderedKeys, array $enKeys, array $current, int $startIndex, int $direction): ?array
+{
+    for ($i = $startIndex + $direction; $i >= 0 && $i < count($orderedKeys); $i += $direction) {
+        $candidate = $orderedKeys[$i];
+        if (!array_key_exists($candidate, $current)) {
+            continue;
+        }
+
+        $value = trim((string)$current[$candidate]);
+        if ($value === '') {
+            continue;
+        }
+
+        $enValue = trim((string)($enKeys[$candidate] ?? ''));
+        if ($value === $enValue) {
+            continue;
+        }
+
+        return [
+            'key' => $candidate,
+            'value' => $value,
+            'english' => (string)($enKeys[$candidate] ?? ''),
+        ];
+    }
+
+    return null;
+}
+
+function keyPrefix(string $key): string
+{
+    $parts = explode('_', $key, 2);
+    return $parts[0] ?? '';
 }
 
 function termIndexByName(array $terms): array
@@ -92,7 +332,7 @@ function termIndexByName(array $terms): array
         if (!isset($term['term'])) {
             continue;
         }
-        $index[strtolower($term['term'])] = $term;
+        $index[strtolower((string)$term['term'])] = $term;
     }
     return $index;
 }
@@ -125,6 +365,7 @@ function buildPrefixGlossary(array $activePrefixes, array $termIndex, array $pre
 {
     $prefixGlossary = [];
     $defaultTerms = ['flow', 'velocity', 'slope'];
+
     foreach ($activePrefixes as $prefix) {
         $names = $prefixMap[$prefix] ?? $defaultTerms;
         $entries = [];
@@ -136,6 +377,7 @@ function buildPrefixGlossary(array $activePrefixes, array $termIndex, array $pre
         }
         $prefixGlossary[$prefix] = $entries;
     }
+
     return $prefixGlossary;
 }
 
@@ -144,86 +386,31 @@ function buildPromptContext(array $terms, string $language): string
     if (count($terms) === 0) {
         return 'No calculator-specific glossary terms were matched.';
     }
+
     $lines = [];
     foreach ($terms as $term) {
         $name = $term['term'] ?? '';
         if ($name === '') {
             continue;
         }
+
         $symbol = $term['symbol'] ?? '';
         $translation = $term['translations'][$language] ?? '';
         $translationDisplay = ($translation === '') ? '[needs translation sprint]' : $translation;
-        $line = "- {$name}";
+
+        $line = '- ' . $name;
         if ($symbol !== '') {
-            $line .= " ({$symbol})";
+            $line .= ' (' . $symbol . ')';
         }
-        $line .= ": {$translationDisplay}";
+        $line .= ': ' . $translationDisplay;
         $lines[] = $line;
     }
+
     return "Use these preferred technical term translations when relevant:\n" . implode("\n", $lines);
 }
 
-$termIndex = termIndexByName($glossaryData['terms']);
-$prefixMap = prefixToTermNames();
-$detectedPrefixes = detectPrefixes($keys);
-$activePrefixes = array_values(array_intersect($detectedPrefixes, array_keys($prefixMap)));
-sort($activePrefixes);
-
-if ($requestedPrefix !== null) {
-    $activePrefixes = array_values(array_filter($activePrefixes, function ($p) use ($requestedPrefix) {
-        return $p === $requestedPrefix;
-    }));
+function fail(string $message): void
+{
+    fwrite(STDERR, 'ERROR: ' . $message . "\n");
+    exit(1);
 }
-
-$prefixGlossary = buildPrefixGlossary($activePrefixes, $termIndex, $prefixMap);
-
-// Save a full English JSON snapshot
-file_put_contents(
-    $outputDir . '/lang.en.json',
-    json_encode([
-        'language' => 'en',
-        'keys' => $keys,
-        'count' => count($keys),
-        'active_prefixes' => $activePrefixes,
-    ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
-);
-
-$targets = ['am', 'ar', 'bg', 'bn', 'cs', 'de', 'es', 'fa', 'fr', 'he', 'hi', 'hr', 'id', 'it', 'km', 'my', 'ps', 'pt', 'ro', 'ru', 'sr', 'sw', 'tr', 'uk', 'ur', 'zh'];
-
-foreach ($targets as $t) {
-    $promptByPrefix = [];
-    $termsByPrefix = [];
-    foreach ($prefixGlossary as $prefix => $terms) {
-        $promptByPrefix[$prefix] = buildPromptContext($terms, $t);
-        $termsByPrefix[$prefix] = array_map(function ($term) use ($t) {
-            return [
-                'term' => $term['term'] ?? '',
-                'symbol' => $term['symbol'] ?? '',
-                'context' => $term['context'] ?? '',
-                'translation_notes' => $term['translation_notes'] ?? '',
-                'preferred_translation' => $term['translations'][$t] ?? '',
-            ];
-        }, $terms);
-    }
-
-    $payload = [
-        'meta' => [
-            'language' => $t,
-            'expected_key_count' => count($keys),
-            'active_prefixes' => $activePrefixes,
-            'requested_prefix' => $requestedPrefix,
-            'notes' => 'Translate the values; preserve HTML and units. Return only PHP file contents.',
-            'glossary_injection_notes' => 'Use prompt_context_by_prefix for prefix-scoped prompts, and prefer glossary_terms_by_prefix.preferred_translation when provided.',
-        ],
-        'prompt_context_by_prefix' => $promptByPrefix,
-        'glossary_terms_by_prefix' => $termsByPrefix,
-        'keys' => $keys,
-    ];
-
-    file_put_contents($outputDir . "/payload_{$t}.json", json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-}
-
-echo "Generated payloads in: $outputDir\n";
-echo "Active prefixes: " . implode(', ', $activePrefixes) . "\n";
-
-?>

@@ -9,6 +9,7 @@
  * Payload fields consumed (from generate_translation_payloads.php output):
  *   $payload['prompt_context_by_prefix'][$prefix]  — plain-text term summary for this prefix
  *   $payload['glossary_terms_by_prefix'][$prefix]  — array of term objects with preferred_translation
+ *   $payload['key_context'][$key]                  — neighboring translated strings for register consistency
  *
  * API parameters (pass these to the Anthropic messages endpoint):
  *   model:       TRANSLATE_MODEL (claude-haiku-4-5-20251001)
@@ -60,6 +61,22 @@ function buildTranslationPrompt(
 
     // --- Glossary details (term objects, for any term with a non-empty preferred_translation) ---
     $terms = $payload['glossary_terms_by_prefix'][$prefix] ?? [];
+    $preferred = [];
+    foreach ($terms as $entry) {
+        $termName = trim((string)($entry['term'] ?? ''));
+        $preferredTranslation = trim((string)($entry['preferred_translation'] ?? ''));
+        if ($termName !== '' && $preferredTranslation !== '') {
+            $preferred[] = "  {$termName} => {$preferredTranslation}";
+        }
+    }
+    if ($preferred) {
+        $parts[] = '';
+        $parts[] = 'PREFERRED TERM MAP (use these exact renderings where applicable):';
+        foreach ($preferred as $line) {
+            $parts[] = $line;
+        }
+    }
+
     $detailed = [];
     foreach ($terms as $entry) {
         if (!empty($entry['translation_notes'])) {
@@ -91,9 +108,24 @@ function buildTranslationPrompt(
     // --- Strings to translate ---
     $parts[] = '';
     $parts[] = 'STRINGS TO TRANSLATE:';
+    $keyContext = $payload['key_context'] ?? [];
     foreach ($delta_strings as $key => $value) {
         // Escape single quotes in the English value so the example is syntactically valid
         $escaped = str_replace("'", "\\'", $value);
+
+        $ctx = $keyContext[$key] ?? null;
+        if (is_array($ctx)) {
+            $neighbors = $ctx['neighbors'] ?? [];
+            $prev = $neighbors['previous_translated'] ?? null;
+            $next = $neighbors['next_translated'] ?? null;
+            if (is_array($prev)) {
+                $parts[] = "# Context previous {$prev['key']}: " . (string)($prev['value'] ?? '');
+            }
+            if (is_array($next)) {
+                $parts[] = "# Context next {$next['key']}: " . (string)($next['value'] ?? '');
+            }
+        }
+
         $parts[] = "\$ec_lang['{$key}']='{$escaped}';";
     }
 

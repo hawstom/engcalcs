@@ -1,6 +1,7 @@
 <?php
 /**
  * Direct translation driver using Anthropic Messages API.
+ * Optional paid path; default project workflow is scripts/translate_zero_api.php.
  *
  * Usage examples:
  *   ANTHROPIC_API_KEY=... php scripts/translate.php
@@ -215,6 +216,7 @@ function parseArgs(array $argv): array
 function printHelpAndExit(): void
 {
     echo "Usage: php scripts/translate.php [options]\n";
+    echo "Note: This is the optional paid API path. Default workflow: php scripts/translate_zero_api.php\n";
     echo "\nOptions:\n";
     echo "  --payload-dir=DIR   Directory containing payload_*.json files\n";
     echo "  --lang=es,fr        Limit to specific language codes\n";

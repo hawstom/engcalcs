@@ -16,15 +16,7 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 These tasks reduce the AI token cost of routine maintenance by replacing repeated AI judgment with deterministic scripts. Copilot owns execution (all tagged `[CP]`); Claude Code specs any script whose output feeds back into translation quality work.
 
-- 45|Engineering glossary: `scripts/glossary.json` — 26 core hydraulic terms with preferred translations per language and translation_notes for prompt injection. CC authored initial file; CP to integrate into payload generator and API script prompts. Grows organically as sprints surface competing renderings. [CP]
-
-- 40|Zero-API translation runner (default): Keep translation workflow free of per-call API cost. Use payload + parity scripts to identify untranslated keys by prefix/language, then apply translations directly in `lib/lang.ec.??.php` (manual/agent-assisted), followed by deterministic validation (`php -l` + parity check + completion matrix). Keep `scripts/translate.php` optional and non-default for teams that explicitly opt in to paid API usage. [CP]
-
-- 35|Translation payload generator (per-lang JSON): Script (`scripts/generate_translation_payloads.php`) that reads the English source and a target lang file, identifies untranslated or missing keys, and writes a compact JSON payload ready to hand to a translation agent — with context (key name, English string, neighboring translated strings for register consistency). Eliminates the manual payload-assembly step before each sprint. [CP]
-
 - 35|New-calculator scaffold script: Script that, given a prefix (e.g. `rc_`) and a list of key names, (a) appends stub entries to all 27 lang files and (b) produces a skeleton PHP calculator page following repo conventions (`filemtime()` include, `echoHeader`/`echoCalculatorForm`/`echoFeedback`/`echoFooter` calls). Replaces the repetitive copy-and-edit step when starting a new calculator. [CP]
-
-- 35|Translation completion matrix: Script that produces a compact table — languages as rows, key-prefix groups (dw_, hw_, mpf_, etc.) as columns — showing the count of untranslated keys per cell. Run once before a sprint to prioritize which languages and which calculators need the most attention. Eliminates the ad-hoc "which lang files are most behind?" question that currently costs AI time to answer. [CP]
 
 - 30|Lang-file key-order normalizer: Script that rewrites each `lib/lang.ec.??.php` so its key order matches the English source exactly. Currently, keys accumulated in insertion order over many sprints, making `git diff` noisy and making it easy for parity-checker output to be hard to read. One-time run + hook to enforce order on future edits. [CP]
 
@@ -45,6 +37,14 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 - 10|Results sharing — dedicated "Copy link" button or print summary. Largely addressed by the URL-based label feature; a polished UI affordance is the remaining gap. [CP]
 
 ## Completed
+
+- 0|Translation completion matrix: Added `scripts/translation_completion_matrix.php` to report untranslated-key counts with languages as rows and key prefixes as columns. Supports `--lang`, `--prefix`, and `--format=table|csv` for sprint prioritization.
+
+- 0|Zero-API translation runner (default): Added `scripts/translate_zero_api.php` to orchestrate default non-API translation workflow with deterministic phases (`scan` and `validate`) using payload generation, parity checks, syntax validation, and completion matrix reporting. `scripts/translate.php` remains optional paid path and now labels itself as non-default.
+
+- 0|Engineering glossary integration: `scripts/glossary.json` is now wired into both `scripts/generate_translation_payloads.php` (prefix-scoped glossary context and preferred-term payload fields) and API prompt construction in `scripts/translate_prompt.php` (preferred term map, translation notes, and neighboring translated key context injection).
+
+- 0|Translation payload generator (per-lang JSON): `scripts/generate_translation_payloads.php` now reads English plus each target lang file, emits only missing/untranslated keys, and includes neighboring translated context per key for register consistency (`key_context`). Supports `--prefix` and `--lang` filters and keeps backward compatibility with existing payload consumers via `keys` aliasing `keys_to_translate`.
 
 - 0|Lang-key parity checker: Implemented `scripts/lang_parity_check.php`. Compares each `lib/lang.ec.??.php` against `lib/lang.ec.en.php`, reports missing keys, extra keys, and keys still equal to English. Supports `--lang`, `--prefix`, and `--strict` for sprint briefs and completion checks.
 
