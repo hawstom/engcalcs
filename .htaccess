@@ -3,3 +3,11 @@
 Redirect 301 /engcalcs/lib/engcalcs.css /engcalcs/css/engcalcs.css
 Redirect 301 /engcalcs/lib/Cookies.lib.js /engcalcs/js/Cookies.lib.js
 Redirect 301 /engcalcs/lib/Calculators.lib.js /engcalcs/js/Calculators.lib.js
+
+# Block dotfiles and non-web source files.
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+<FilesMatch "\.(md|txt)$">
+    Require all denied
+</FilesMatch>
