@@ -63,9 +63,9 @@ $ec_lang['calc_inputs']='Girdiler';
 $ec_lang['calc_results']='Sonuçlar:';
 $ec_lang['view_hide_line']='[Bu satırı gizle]';
 $ec_lang['view_printable']='Yazdırılabilir sürüm (geri yüklemek için yeniden yükleyin)';
-$ec_lang['ec_name_label']='Etiket:';
-$ec_lang['ec_name_placeholder']='Yer işareti/paylaşım için etiket';
-$ec_lang['ec_name_hint']='harfler, rakamlar, boşluklar, – _ .';
+$ec_lang['ec_name_label']='Bu hesaplamayı kaydet:';
+$ec_lang['ec_name_placeholder']='Ad';
+$ec_lang['ec_name_hint']='Bu hesaplamayı URL\'ye kaydeder (yer işareti, geçmiş ve paylaşım için)';
 $ec_lang['ec_name_invalid']='Yalnızca harfler, rakamlar, boşluklar, – _ . kullanın';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Darcy-Weisbach Boru Yük Kaybı';

@@ -62,9 +62,9 @@ $ec_lang['calc_inputs']='Входни данни';
 $ec_lang['calc_results']='Резултати';
 $ec_lang['view_hide_line']='[Скрий този ред]';
 $ec_lang['view_printable']='Версия за печат (презаредете за възстановяване)';
-$ec_lang['ec_name_label']='Етикет:';
-$ec_lang['ec_name_placeholder']='Етикет за запазване/споделяне';
-$ec_lang['ec_name_hint']='букви, цифри, интервали, – _ .';
+$ec_lang['ec_name_label']='Запазете това изчисление:';
+$ec_lang['ec_name_placeholder']='Име';
+$ec_lang['ec_name_hint']='Запазва това изчисление в URL адреса за добавяне в отметки, извличане от история и споделяне';
 $ec_lang['ec_name_invalid']='Използвайте само букви, цифри, интервали, – _ .';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Хидравлични загуби в тръбопровод по Дарси-Вайсбах';

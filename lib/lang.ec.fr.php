@@ -67,9 +67,9 @@ $ec_lang['calc_inputs']='Données';
 $ec_lang['calc_results']='Résultats:';
 $ec_lang['view_hide_line']='[Masquer cette ligne]';
 $ec_lang['view_printable']='Version imprimable (recharger pour restaurer)';
-$ec_lang['ec_name_label']='Étiquette :';
-$ec_lang['ec_name_placeholder']='Étiquette pour signets/partage';
-$ec_lang['ec_name_hint']='lettres, chiffres, espaces, – _ .';
+$ec_lang['ec_name_label']='Enregistrer ce calcul :';
+$ec_lang['ec_name_placeholder']='Nom';
+$ec_lang['ec_name_hint']='Enregistre ce calcul dans l\'URL pour les signets, la récupération de l\'historique et le partage';
 $ec_lang['ec_name_invalid']='Utilisez uniquement lettres, chiffres, espaces, – _ .';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Perte de charge Darcy-Weisbach';

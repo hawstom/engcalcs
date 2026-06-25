@@ -67,9 +67,9 @@ $ec_lang['calc_inputs']='ان پٹ';
 $ec_lang['calc_results']='نتائج';
 $ec_lang['view_hide_line']='[یہ سطر چھپائیں]';
 $ec_lang['view_printable']='طباعت کے قابل ورژن (بحال کرنے کے لیے دوبارہ لوڈ کریں)';
-$ec_lang['ec_name_label']='لیبل:';
-$ec_lang['ec_name_placeholder']='نشان زدہ کرنے/شیئار کرنے کے لیے لیبل';
-$ec_lang['ec_name_hint']='حروف، ہندسے، اسپیسز، – _ .';
+$ec_lang['ec_name_label']='یہ حساب محفوظ کریں:';
+$ec_lang['ec_name_placeholder']='نام';
+$ec_lang['ec_name_hint']='اس حساب کو نشان زد کریں URL میں نشان زدگی، سابقہ بازیافت، اور شیئرنگ کے لیے';
 $ec_lang['ec_name_invalid']='صرف حروف، ہندسے، اسپیسز، – _ . استعمال کریں';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='ڈارسی-وائسباخ پائپ دباؤ نقصان';

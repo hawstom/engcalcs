@@ -64,9 +64,9 @@ $ec_lang['calc_inputs']='ইনপুট';
 $ec_lang['calc_results']='ফলাফল';
 $ec_lang['view_hide_line']='[এই লাইনটি লুকান]';
 $ec_lang['view_printable']='মুদ্রণযোগ্য সংস্করণ (পুনরুদ্ধারের জন্য পুনরায় লোড করুন)';
-$ec_lang['ec_name_label']='লেবেল:';
-$ec_lang['ec_name_placeholder']='বুকমার্ক/শেয়ারিংর জন্য লেবেল';
-$ec_lang['ec_name_hint']='বর্ণ, সংখ্যা, স্থান, – _ .';
+$ec_lang['ec_name_label']='এই গণনা সংরক্ষণ করুন:';
+$ec_lang['ec_name_placeholder']='নাম';
+$ec_lang['ec_name_hint']='এই গণনা বুকমার্ক, ইতিহাস পুনরুদ্ধার এবং শেয়ারিংয়ের জন্য URL-এ সংরক্ষণ করে';
 $ec_lang['ec_name_invalid']='শুধুমাত্র বর্ণ, সংখ্যা, স্থান, – _ . ব্যবহার করুন';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='ড্যার্সি-ওয়েইসবাখ পাইপ হেড লস';

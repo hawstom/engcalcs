@@ -67,9 +67,9 @@ $ec_lang['calc_inputs']='Maingizo';
 $ec_lang['calc_results']='Matokeo';
 $ec_lang['view_hide_line']='[Ficha mstari huu]';
 $ec_lang['view_printable']='Toleo la kuchapishwa (pakia upya ili kurejesha)';
-$ec_lang['ec_name_label']='Jina:';
-$ec_lang['ec_name_placeholder']='Jina la kufa alama/kuondoa kasara';
-$ec_lang['ec_name_hint']='herufi, nambari, nafasi, – _ .';
+$ec_lang['ec_name_label']='Hifadhi hesabu hii:';
+$ec_lang['ec_name_placeholder']='Jina';
+$ec_lang['ec_name_hint']='Huhifadhi hesabu hii kwenye URL kwa ajili ya kuweka alama, kurejea historia, na kushiriki';
 $ec_lang['ec_name_invalid']='Tumia tu herufi, nambari, nafasi, – _ .';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Upotevu wa Kichwa cha Bomba la Darcy-Weisbach';

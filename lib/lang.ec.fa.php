@@ -67,9 +67,9 @@ $ec_lang['calc_inputs']='ورودی‌ها';
 $ec_lang['calc_results']='نتایج';
 $ec_lang['view_hide_line']='[پنهان کردن این خط]';
 $ec_lang['view_printable']='نسخه قابل چاپ (برای بازگشت بارگذاری مجدد کنید)';
-$ec_lang['ec_name_label']='برچسب:';
-$ec_lang['ec_name_placeholder']='برچسب برای نشانک‌گذاری/اشتراک';
-$ec_lang['ec_name_hint']='حروف، ارقام، فاصله، – _ .';
+$ec_lang['ec_name_label']='این محاسبه را ذخیره کنید:';
+$ec_lang['ec_name_placeholder']='نام';
+$ec_lang['ec_name_hint']='این محاسبه را به URL ذخیره می‌کند برای نشانک‌گذاری، بازیابی سابقه و اشتراک';
 $ec_lang['ec_name_invalid']='فقط از حروف، ارقام، فاصله، – _ . استفاده کنید';
 // Darcy-Weisbach. برای متن مفقود به mphl_ مراجعه کنید.
 $ec_lang['dw_main_menu']='افت فشار لوله Darcy-Weisbach';

@@ -67,9 +67,9 @@ $ec_lang['calc_inputs']='المدخلات';
 $ec_lang['calc_results']='النتائج';
 $ec_lang['view_hide_line']='[إخفاء هذا السطر]';
 $ec_lang['view_printable']='نسخة قابلة للطباعة (أعد التحميل للاستعادة)';
-$ec_lang['ec_name_label']='العنوان:';
-$ec_lang['ec_name_placeholder']='عنوان للحفظ/المشاركة';
-$ec_lang['ec_name_hint']='أحرف وأرقام ومسافات – _ .';
+$ec_lang['ec_name_label']='احفظ هذا الحساب:';
+$ec_lang['ec_name_placeholder']='الاسم';
+$ec_lang['ec_name_hint']='يحفظ هذا الحساب في عنوان URL لإنشاء إشارة مرجعية واسترجاع السجل والمشاركة';
 $ec_lang['ec_name_invalid']='استخدم أحرف وأرقام ومسافات – _ . فقط';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='فاقد الضغط في الأنابيب — داركي-وايسباخ';

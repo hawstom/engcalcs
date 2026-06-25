@@ -64,9 +64,9 @@ $ec_lang['calc_inputs']='Vstupy';
 $ec_lang['calc_results']='Výsledky';
 $ec_lang['view_hide_line']='[Skrýt tento řádek]';
 $ec_lang['view_printable']='Verze pro tisk (obnovit pro vrácení)';
-$ec_lang['ec_name_label']='Popisek:';
-$ec_lang['ec_name_placeholder']='Popisek pro uložení/sdílení';
-$ec_lang['ec_name_hint']='písmena, číslice, mezery, – _ .';
+$ec_lang['ec_name_label']='Uložit tento výpočet:';
+$ec_lang['ec_name_placeholder']='Název';
+$ec_lang['ec_name_hint']='Uloží tento výpočet do adresy URL pro přidání do záložek, načtení z historie a sdílení';
 $ec_lang['ec_name_invalid']='Používejte pouze písmena, číslice, mezery, – _ .';
 // Darcy-Weisbach
 $ec_lang['dw_main_menu']='Ztráta tlaku v potrubí Darcy-Weisbach';

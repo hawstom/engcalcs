@@ -64,9 +64,9 @@ $ec_lang['calc_inputs']='输入';
 $ec_lang['calc_results']='结果';
 $ec_lang['view_hide_line']='[隐藏此行]';
 $ec_lang['view_printable']='打印版本（刷新页面可恢复）';
-$ec_lang['ec_name_label']='标签：';
-$ec_lang['ec_name_placeholder']='用于书签/分享的标签';
-$ec_lang['ec_name_hint']='字母、数字、空格、– _ .';
+$ec_lang['ec_name_label']='保存此计算：';
+$ec_lang['ec_name_placeholder']='名称';
+$ec_lang['ec_name_hint']='保存此计算到网址以方便书签、历史记录和分享';
 $ec_lang['ec_name_invalid']='仅允许字母、数字、空格、– _ .';
 // Darcy-Weisbach
 $ec_lang['dw_main_menu']='达西-韦斯巴赫管道水头损失';

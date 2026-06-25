@@ -67,9 +67,9 @@ $ec_lang['calc_inputs']='ግቤቶች';
 $ec_lang['calc_results']='ውጤቶች';
 $ec_lang['view_hide_line']='[ይህን መስመር ደብቅ]';
 $ec_lang['view_printable']='ሊታተም የሚችል እትም (ለመመለስ አደስ)';
-$ec_lang['ec_name_label']='ስም:';
-$ec_lang['ec_name_placeholder']='ለቅዱስ/ማጋራት ስም';
-$ec_lang['ec_name_hint']='ፊደላት፣ ቁጥሮች፣ ክፍተቶች፣ – _ .';
+$ec_lang['ec_name_label']='ይህን ስሌት አስቀምጥ:';
+$ec_lang['ec_name_placeholder']='ስም';
+$ec_lang['ec_name_hint']='ይህን ስሌት ወደ URL ያስቀምጣል በደንብ ምልክት ለመስጠት ታሪክ ማግኛ እና ማጋራት';
 $ec_lang['ec_name_invalid']='ፊደላት፣ ቁጥሮች፣ ክፍተቶች፣ – _ . ብቻ ይጠቀሙ';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Darcy-Weisbach የቧንቧ ጭንቅ ኪሳራ';

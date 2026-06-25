@@ -64,9 +64,9 @@ $ec_lang['calc_inputs']='Входные данные';
 $ec_lang['calc_results']='Результаты';
 $ec_lang['view_hide_line']='[Скрыть эту строку]';
 $ec_lang['view_printable']='Версия для печати (обновить страницу для восстановления)';
-$ec_lang['ec_name_label']='Ярлык:';
-$ec_lang['ec_name_placeholder']='Ярлык для закладки/общего доступа';
-$ec_lang['ec_name_hint']='буквы, цифры, пробелы, – _ .';
+$ec_lang['ec_name_label']='Сохранить этот расчёт:';
+$ec_lang['ec_name_placeholder']='Имя';
+$ec_lang['ec_name_hint']='Сохраняет этот расчёт в URL для сохранения в закладках, получения из истории и обмена';
 $ec_lang['ec_name_invalid']='Используйте только буквы, цифры, пробелы, – _ .';
 // Darcy-Weisbach
 $ec_lang['dw_main_menu']='Потери давления в трубе Дарси-Вейсбах';
