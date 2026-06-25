@@ -158,8 +158,8 @@ $ec_lang['mphl_junction_loss']='Perdita ai giunti, H<sub>m</sub>';
 $ec_lang['mphl_total_loss']='Perdita totale, H<sub>l</sub>';
 $ec_lang['mphl_egl_1']='EGL a valle';
 $ec_lang['mphl_egl_2']='EGL a monte';
-$ec_lang['mphl_hgl_2']='HGL a monte in tubazione \' . $ec_lang[\'mpf_see_notes\'];
-$ec_lang[\'mphl_note_1\']=\'<dl><dt>Per una condizione di imbocco aperto (tombino), è necessario verificare le condizioni di controllo all\'imbocco.</dt><dd>1. L\'HGL a monte non può essere inferiore alla quota di deflusso a profondità normale a monte (o inferiore alla tubazione!).</dd><dd>2. Il livello idraulico di un tombino è meglio rappresentato dall\'EGL a monte che dall\'HGL a monte.</dd><dd>3. <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">Vedere il tutorial di 2 minuti</a> per semplici calcoli standard del livello idraulico nei tombini con HY-8.</dd>';
+$ec_lang['mphl_hgl_2']='HGL a monte in tubazione ' . $ec_lang['mpf_see_notes'];
+$ec_lang['mphl_note_1']='<dl><dt>Per una condizione di imbocco aperto (tombino), è necessario verificare le condizioni di controllo all\'imbocco.</dt><dd>1. L\'HGL a monte non può essere inferiore alla quota di deflusso a profondità normale a monte (o inferiore alla tubazione!).</dd><dd>2. Il livello idraulico di un tombino è meglio rappresentato dall\'EGL a monte che dall\'HGL a monte.</dd><dd>3. <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">Vedere il tutorial di 2 minuti</a> per semplici calcoli standard del livello idraulico nei tombini con HY-8.</dd>';
 // Manning Trapezoid
 $ec_lang['mtc_menu']='Canale trapezoidale Manning';
 $ec_lang['mtc_main_title']='Calcolatore gratuito online formula di Manning canale trapezoidale';

@@ -161,8 +161,8 @@ $ec_lang['mphl_junction_loss']='Perte aux raccords, H<sub>m</sub>';
 $ec_lang['mphl_total_loss']='Perte totale, H<sub>l</sub>';
 $ec_lang['mphl_egl_1']='LHE aval';
 $ec_lang['mphl_egl_2']='LHE amont';
-$ec_lang['mphl_hgl_2']='LHP amont en conduite \' . $ec_lang[\'mpf_see_notes\'];
-$ec_lang[\'mphl_note_1\']=\'<dl><dt>Pour une entrée libre (buse), il est nécessaire de vérifier les conditions de contrôle à l\'entrée.</dt><dd>1. La LHP amont ne peut pas être inférieure à la cote de profondeur normal amont (ni inférieure au fil d\'eau!).</dd><dd>2. La charge amont d\'une buse est mieux représentée par la LHE amont que par la LHP amont.</dd><dd>3. Voir <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">mon tutoriel de 2 minutes</a> pour les calculs simples de charge amont de buse avec HY-8.</dd>';
+$ec_lang['mphl_hgl_2']='LHP amont en conduite ' . $ec_lang['mpf_see_notes'];
+$ec_lang['mphl_note_1']='<dl><dt>Pour une entrée libre (buse), il est nécessaire de vérifier les conditions de contrôle à l\'entrée.</dt><dd>1. La LHP amont ne peut pas être inférieure à la cote de profondeur normal amont (ni inférieure au fil d\'eau!).</dd><dd>2. La charge amont d\'une buse est mieux représentée par la LHE amont que par la LHP amont.</dd><dd>3. Voir <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">mon tutoriel de 2 minutes</a> pour les calculs simples de charge amont de buse avec HY-8.</dd>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Canal trapézoïdal Manning';
 $ec_lang['mtc_main_title']='Calculateur gratuit en ligne de la formule Manning pour canal trapézoïdal';
