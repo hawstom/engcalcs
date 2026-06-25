@@ -55,3 +55,11 @@ require_once('Units.lib.php');
 
 // Load the calculator functions
 require_once('Calculators.lib.php');
+
+// Optional parent-site hooks (CSS injection, footer menu).
+// The parent site places engcalcs-parent-hooks.php two directories above engcalcs root.
+$_engcalcs_parent_hooks = realpath(__DIR__ . '/../../engcalcs-parent-hooks.php');
+if ($_engcalcs_parent_hooks && file_exists($_engcalcs_parent_hooks)) {
+    require_once($_engcalcs_parent_hooks);
+}
+unset($_engcalcs_parent_hooks);

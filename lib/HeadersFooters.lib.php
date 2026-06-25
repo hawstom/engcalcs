@@ -48,7 +48,7 @@ if (substr($type, 0, 8) === "EngCalcs") {
 }
 ?>
 
-	<link rel="stylesheet" href="/hawsedc.css" type="text/css">
+	<?php if (function_exists('engcalcsParentCSS')) engcalcsParentCSS(); ?>
 
 </head>
 <body>
@@ -75,7 +75,7 @@ function echoFooter($type) {
 ?>
 <div class="left d-print-none">
 <?php
-echoMenu("main");
+if (function_exists('engcalcsParentMenu')) engcalcsParentMenu();
 ?>
 <hr />
 <?php if (DEBUG_MODE === TRUE) : ?>
