@@ -13,7 +13,7 @@
  *   php scripts/lang_parity_check.php --strict
  */
 
-const DEFAULT_LANG_DIR = __DIR__ . '/../lib';
+const DEFAULT_LANG_DIR = __DIR__ . '/../../lib';
 const EN_FILE = DEFAULT_LANG_DIR . '/lang.ec.en.php';
 
 main($argv);

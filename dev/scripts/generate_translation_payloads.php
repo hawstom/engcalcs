@@ -12,8 +12,8 @@
  *   php scripts/generate_translation_payloads.php /tmp/payloads
  */
 
-const DEFAULT_LANG_DIR = __DIR__ . '/../lib';
-const DEFAULT_OUTPUT_DIR = __DIR__ . '/../translation_payloads';
+const DEFAULT_LANG_DIR = __DIR__ . '/../../lib';
+const DEFAULT_OUTPUT_DIR = __DIR__ . '/../../dev/translation_payloads';
 const GLOSSARY_PATH = __DIR__ . '/glossary.json';
 const EN_FILE = DEFAULT_LANG_DIR . '/lang.ec.en.php';
 const TARGET_LANGS = [

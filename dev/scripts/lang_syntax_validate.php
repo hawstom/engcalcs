@@ -13,7 +13,7 @@
  *   php scripts/lang_syntax_validate.php --lang=es,fr
  */
 
-const DEFAULT_LANG_DIR = __DIR__ . '/../lib';
+const DEFAULT_LANG_DIR = __DIR__ . '/../../lib';
 
 main($argv);
 

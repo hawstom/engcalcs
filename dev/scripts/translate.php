@@ -14,8 +14,8 @@ require_once __DIR__ . '/translate_prompt.php';
 
 const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
 const ANTHROPIC_VERSION = '2023-06-01';
-const DEFAULT_PAYLOAD_DIR = __DIR__ . '/../translation_payloads';
-const DEFAULT_LANG_DIR = __DIR__ . '/../lib';
+const DEFAULT_PAYLOAD_DIR = __DIR__ . '/../../dev/translation_payloads';
+const DEFAULT_LANG_DIR = __DIR__ . '/../../lib';
 
 const DEFAULT_INPUT_COST_PER_MTOK = 0.80;
 const DEFAULT_OUTPUT_COST_PER_MTOK = 4.00;

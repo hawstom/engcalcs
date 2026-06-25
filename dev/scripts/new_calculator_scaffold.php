@@ -11,7 +11,7 @@
  *   php scripts/new_calculator_scaffold.php --prefix=rc --keys=main_menu,main_title,main_desc,notes_1 --page=Rock-Chute.php --js=rock-chute.js
  */
 
-const ROOT_DIR = __DIR__ . '/..';
+const ROOT_DIR = __DIR__ . '/../..';
 const LANG_GLOB = ROOT_DIR . '/lib/lang.ec.*.php';
 const PAGE_DIR = ROOT_DIR;
 const JS_DIR = ROOT_DIR . '/js';
