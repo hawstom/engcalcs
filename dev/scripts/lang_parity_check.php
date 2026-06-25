@@ -201,7 +201,7 @@ function printList(string $label, array $keys): void
 
 function parseLangAssignments(string $content): array
 {
-    $pattern = '/\$ec_lang\[\'([^\']+)\'\]\s*=\s*(\'((?:[^\\\']|\\.)*)\'|"((?:[^\\"]|\\.)*)"|([^;]*));/m';
+    $pattern = '/\$ec_lang\[\'([^\']+)\'\]\s*=\s*(\'((?:[^\'\\\\]|\\\\.)*)\'|"((?:[^"\\\\]|\\\\.)*)"|([^;]*));/m';
     preg_match_all($pattern, $content, $matches, PREG_SET_ORDER);
 
     $values = [];
