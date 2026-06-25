@@ -73,9 +73,9 @@ $ec_lang['calc_inputs']='Inputs';
 $ec_lang['calc_results']='Results';
 $ec_lang['view_hide_line']='[Hide this line]';
 $ec_lang['view_printable']='Printable version (reload/refresh to restore)';
-$ec_lang['ec_name_label']='Label:';
-$ec_lang['ec_name_placeholder']='Label for bookmarking/sharing';
-$ec_lang['ec_name_hint']='letters, digits, spaces, &ndash; _ .';
+$ec_lang['ec_name_label']='Save this calculation:';
+$ec_lang['ec_name_placeholder']='Name';
+$ec_lang['ec_name_hint']='Saves this calculation to the URL for bookmarking, history retrieval, and sharing';
 $ec_lang['ec_name_invalid']='Use only letters, digits, spaces, &ndash; _ .';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Darcy-Weisbach Pipe Head Loss';
