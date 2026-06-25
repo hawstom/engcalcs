@@ -102,6 +102,16 @@ Set `APP_ENV=development` in your web server config or a `.env` file for local d
 | `js/Cookies.lib.js` | Cookie persistence for user unit/language prefs |
 | `css/engcalcs.css` | App-wide styles |
 
-## Improvement Roadmap
+## Dev Folder
 
-See `ROADMAP.md` in the project root for the full prioritized roadmap.
+Non-web files live in `dev/` (blocked from web access via `dev/.htaccess`):
+
+| Path | Purpose |
+|------|---------|
+| `dev/ROADMAP.md` | Prioritized improvement roadmap |
+| `dev/cross-platform-planning.md` | CC/CP collaboration conventions |
+| `dev/scripts/` | CLI tools: parity checker, scaffold, translation driver, etc. |
+| `dev/translation_payloads/` | Per-language JSON payloads for translation sprints |
+| `dev/scripts/glossary.json` | Engineering term glossary for translation prompts |
+
+**Note for scripts:** paths to `lib/` inside `dev/scripts/*.php` use `__DIR__ . '/../../lib'` (two levels up from `dev/scripts/`).
