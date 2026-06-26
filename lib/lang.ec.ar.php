@@ -290,6 +290,7 @@ $ec_lang['contact_message']='الرسالة:';
 $ec_lang['contactSpamPrefix']='خمسة زائد واحد يساوي';
 $ec_lang['contactSpamPostfix']='(يرجى كتابتها بالحروف. 1=one 2=two 3=three 4=four 5=five 6=six 7=seven +=plus 5+1=6)';
 $ec_lang['contactSubmitButton']='إرسال الرسالة';
+$ec_lang['contact_success']='شكراً لك على تخصيص الوقت للكتابة.';
 
 // Micro-Hydro Power
 $ec_lang['mhp_main_menu']='طاقة المياه الصغيرة';

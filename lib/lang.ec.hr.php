@@ -306,6 +306,7 @@ $ec_lang['contact_message']='Poruka:';
 $ec_lang['contactSpamPrefix']='Pet plus jedan jednako';
 $ec_lang['contactSpamPostfix']='(Molimo napišite slovima. 1=jedan 2=dva 3=tri 4=četiri 5=pet 6=šest 7=sedam +=plus 5+1=6)';
 $ec_lang['contactSubmitButton']='Pošalji poruku';
+$ec_lang['contact_success']='Hvala vam što ste si odvojili vremena da napišete.';
 
 // Micro-Hydro Power
 $ec_lang['mhp_main_menu']='Mala hidroelektrana';

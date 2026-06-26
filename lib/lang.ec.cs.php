@@ -287,6 +287,7 @@ $ec_lang['contact_message']='Zpráva:';
 $ec_lang['contactSpamPrefix']='Pět plus jedna se rovná';
 $ec_lang['contactSpamPostfix']='(Prosím napište anglicky slovy. 1=one 2=two 3=three 4=four 5=five 6=six 7=seven +=plus 5+1=6)';
 $ec_lang['contactSubmitButton']='Odeslat zprávu';
+$ec_lang['contact_success']='Děkujeme za váš čas věnovaný napsání.';
 
 // Micro-Hydro Power
 $ec_lang['mhp_main_menu']='Mikro-vodní elektrárna';

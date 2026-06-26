@@ -347,6 +347,7 @@ $ec_lang['contact_message']='پیام:';
 $ec_lang['contactSpamPrefix']='پنج به‌علاوه یک برابر است با';
 $ec_lang['contactSpamPostfix']='(لطفاً آن را به‌صورت حروف بنویسید. 1=یک 2=دو 3=سه 4=چهار 5=پنج 6=شش 7=هفت +=به‌علاوه 5+1=6)';
 $ec_lang['contactSubmitButton']='ارسال پیام';
+$ec_lang['contact_success']='تشکر می‌کنم که وقت گذاشتید برای نوشتن.';
 
 // About
 $ec_lang['about_main_menu']='درباره';

@@ -287,6 +287,7 @@ $ec_lang['contact_message']='Pesan:';
 $ec_lang['contactSpamPrefix']='Lima ditambah satu sama dengan';
 $ec_lang['contactSpamPostfix']='(Tulis dalam bahasa Inggris. 1=one 2=two 3=three 4=four 5=five 6=six 7=seven +=plus 5+1=6)';
 $ec_lang['contactSubmitButton']='Kirim Pesan';
+$ec_lang['contact_success']='Terima kasih telah meluangkan waktu untuk menulis.';
 
 // Micro-Hydro Power
 $ec_lang['mhp_main_menu']='Tenaga Mikro-Hidro';

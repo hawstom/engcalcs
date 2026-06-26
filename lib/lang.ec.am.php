@@ -290,6 +290,7 @@ $ec_lang['contact_message']='መልዕክት:';
 $ec_lang['contactSpamPrefix']='አምስት ሲደምር አንድ ይሆናል';
 $ec_lang['contactSpamPostfix']='(እባክህ በቃላት ፃፍ። 1=አንድ 2=ሁለት 3=ሦስት 4=አራት 5=አምስት 6=ስድስት 7=ሰባት +=ሲደምር 5+1=6)';
 $ec_lang['contactSubmitButton']='መልዕክት ላክ';
+$ec_lang['contact_success']='ለመጻፍ ጊዜ ለወጣህ አመሰግናለሁ።';
 
 // Micro-Hydro Power
 $ec_lang['mhp_main_menu']='ማይክሮ-ሃይድሮ ኃይል';

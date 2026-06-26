@@ -347,6 +347,7 @@ $ec_lang['contact_message']='សារ:';
 $ec_lang['contactSpamPrefix']='ប្រាំ​ បូក​ មួយ​ ស្មើ​ នឹង';
 $ec_lang['contactSpamPostfix']='(សូម​ សរសេរ​ ជា​ ពាក្យ​។ 1=one 2=two 3=three 4=four 5=five 6=six 7=seven +=plus 5+1=6)';
 $ec_lang['contactSubmitButton']='ផ្ញើ​ សារ';
+$ec_lang['contact_success']='សូមថ្លែងអរគុណដែលបានចំណាយពេលសរសេរ។';
 
 // About
 $ec_lang['about_main_menu']='អំពី';

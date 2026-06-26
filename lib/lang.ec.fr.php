@@ -285,6 +285,7 @@ $ec_lang['contact_message']='Message :';
 $ec_lang['contactSpamPrefix']='Cinq plus un égale';
 $ec_lang['contactSpamPostfix']="(Veuillez l'écrire en lettres. 1=un 2=deux 3=trois 4=quatre 5=cinq 6=six 7=sept +=plus 5+1=6)";
 $ec_lang['contactSubmitButton']='Envoyer le message';
+$ec_lang['contact_success']='Merci d\'avoir pris le temps d\'écrire.';
 // Erosion Setback and Scour Calc.
 $ec_lang['essc_btbw']='Largeur de berge à berge';
 $ec_lang['essc_mcr']='Rayon de courbure minimal';

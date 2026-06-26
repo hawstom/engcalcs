@@ -290,6 +290,7 @@ $ec_lang['contact_message']='Ujumbe:';
 $ec_lang['contactSpamPrefix']='Tano pamoja na moja ni sawa na';
 $ec_lang['contactSpamPostfix']='(Tafadhali andika kwa maneno. 1=moja 2=mbili 3=tatu 4=nne 5=tano 6=sita 7=saba +=pamoja 5+1=6)';
 $ec_lang['contactSubmitButton']='Tuma Ujumbe';
+$ec_lang['contact_success']='Asante kwa kuchukua muda wa kuandika.';
 
 // Micro-Hydro Power
 $ec_lang['mhp_main_menu']='Nguvu ya Micro-Hydro';

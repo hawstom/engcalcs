@@ -442,6 +442,7 @@ $ec_lang['contact_message']='Message:';
 $ec_lang['contactSpamPrefix']='Five plus one equals';
 $ec_lang['contactSpamPostfix']='(Please spell it out. 1=one 2=two 3=three 4=four 5=five 6=six 7=seven +=plus 5+1=6)';
 $ec_lang['contactSubmitButton']='Submit Message';
+$ec_lang['contact_success']='Thank you for taking the time to write.';
 // Rock Chute Design (Robinson, Rice & Kadavy 1998). Prefix rc_.
 $ec_lang['rc_main_menu']='Rock Chute Design (Robinson)';
 $ec_lang['rc_main_title']='Free Online Rock Chute Design Calculator — Robinson (1998)';

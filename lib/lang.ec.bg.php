@@ -264,7 +264,8 @@ $ec_lang['contactSubject']='Относно:';
 $ec_lang['contact_message']='Съобщение:'; 
 $ec_lang['contactSpamPrefix']='Пет плюс едно е равно на';
 $ec_lang['contactSpamPostfix']="(Моля, изпишете с думи. 1=едно 2=две 3=три 4=четири 5=пет 6=шест 7=седем +=плюс 5+1=6)";
-$ec_lang['contactSubmitButton']='Изпратете съобщението'; 
+$ec_lang['contactSubmitButton']='Изпратете съобщението';
+$ec_lang['contact_success']='Благодарим ви за времето, което си отделили да напишете.';
 // Erosion Setback and Scour Calc.
 $ec_lang['essc_btbw']='Ширина от бряг до бряг';
 $ec_lang['essc_mcr']='Минимален радиус на кривина';

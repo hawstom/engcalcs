@@ -298,6 +298,7 @@ $ec_lang['contact_message']='Mesaj:';
 $ec_lang['contactSpamPrefix']='Bes arti bir';
 $ec_lang['contactSpamPostfix']='(Lütfen yaziyla gösterin. 1= bir 2=iki 3=üç 4=dört 5=bes 6=alti 7=yedi +=arti 5+1=6)';
 $ec_lang['contactSubmitButton']='Gönder';
+$ec_lang['contact_success']='Yazmanız için zaman ayırdığınız için teşekkür ederiz.';
 
 // Micro-Hydro Power
 $ec_lang['mhp_main_menu']='Mikro-Hidroelektrik Güç';

@@ -187,6 +187,7 @@ $ec_lang['contact_message']='הודעה:';
 $ec_lang['contactSpamPrefix']='חמש ועוד אחת שווה';
 $ec_lang['contactSpamPostfix']='(אנא כתוב במילים. 1=one 2=two 3=three 4=four 5=five 6=six 7=seven +=plus 5+1=6)';
 $ec_lang['contactSubmitButton']='שלח הודעה';
+$ec_lang['contact_success']='תודה שלקחת את הזמן לכתוב.';
 // Darcy-Weisbach
 $ec_lang['dw_main_menu']='אובדן גובה בצינור — Darcy-Weisbach';
 $ec_lang['dw_main_title']='מחשבון אובדן גובה בצינור Darcy-Weisbach — חינם מקוון';

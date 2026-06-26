@@ -292,6 +292,7 @@ $ec_lang['contact_message']='Mesaj:';
 $ec_lang['contactSpamPrefix']='Cinci plus unu este egal cu';
 $ec_lang['contactSpamPostfix']='(Vă rugăm să scrieți cu litere. 1=unu 2=doi 3=trei 4=patru 5=cinci 6=șase 7=șapte +=plus 5+1=6)';
 $ec_lang['contactSubmitButton']='Trimiteți Mesajul';
+$ec_lang['contact_success']='Mulțumesc că ați luat timp pentru a scrie.';
 
 // Micro-Hydro Power
 $ec_lang['mhp_main_menu']='Micro-Hidroenergie';

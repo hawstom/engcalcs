@@ -287,6 +287,7 @@ $ec_lang['contact_message']='留言：';
 $ec_lang['contactSpamPrefix']='五加一等于';
 $ec_lang['contactSpamPostfix']='（请用英文拼写。1=one 2=two 3=three 4=four 5=five 6=six 7=seven +=plus 5+1=6）';
 $ec_lang['contactSubmitButton']='发送消息';
+$ec_lang['contact_success']='感谢您抽出宝贵的时间来写信。';
 
 // Micro-Hydro Power
 $ec_lang['mhp_main_menu']='微型水力发电';

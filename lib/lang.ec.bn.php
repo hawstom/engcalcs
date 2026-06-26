@@ -287,6 +287,7 @@ $ec_lang['contact_message']='বার্তা:';
 $ec_lang['contactSpamPrefix']='পাঁচ যোগ এক সমান';
 $ec_lang['contactSpamPostfix']='(ইংরেজিতে বানান করুন। 1=one 2=two 3=three 4=four 5=five 6=six 7=seven +=plus 5+1=6)';
 $ec_lang['contactSubmitButton']='বার্তা পাঠান';
+$ec_lang['contact_success']='সময় দিয়ে লেখার জন্য আপনাকে ধন্যবাদ।';
 
 // Micro-Hydro Power
 $ec_lang['mhp_main_menu']='মাইক্রো-হাইড্রো বিদ্যুৎ';

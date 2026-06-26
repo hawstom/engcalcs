@@ -290,6 +290,7 @@ $ec_lang['contact_message']='پیغام:';
 $ec_lang['contactSpamPrefix']='پانچ جمع ایک برابر';
 $ec_lang['contactSpamPostfix']='(براہ کرم انگریزی میں لکھیں۔ 1=one 2=two 3=three 4=four 5=five 6=six 7=seven +=plus 5+1=6)';
 $ec_lang['contactSubmitButton']='پیغام بھیجیں';
+$ec_lang['contact_success']='آپ کا وقت لگا کر لکھنے کے لیے شکریہ۔';
 
 // Micro-Hydro Power
 $ec_lang['mhp_main_menu']='مائیکرو-ہائیڈرو بجلی';

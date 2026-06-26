@@ -347,6 +347,7 @@ $ec_lang['contact_message']='پیغام:';
 $ec_lang['contactSpamPrefix']='پنځه زیات یو مساوي دي';
 $ec_lang['contactSpamPostfix']='(مهرباني وکړئ هغه ولیکئ. 1=یو 2=دوه 3=درې 4=څلور 5=پنځه 6=شپږ 7=اوه +=زیات 5+1=6)';
 $ec_lang['contactSubmitButton']='پیغام ولیږئ';
+$ec_lang['contact_success']='تاسو د لیکلو لپاره وخت کاروت د هغې لپاره تشکر.';
 
 // About
 $ec_lang['about_main_menu']='د اړه';

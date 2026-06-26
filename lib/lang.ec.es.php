@@ -264,6 +264,7 @@ $ec_lang['contact_message']='Mensaje:';
 $ec_lang['contactSpamPrefix']='Five (cinco) plus (y) one (uno) equals (son) ';
 $ec_lang['contactSpamPostfix']='(Favor de escribirla en inglés con letras. 1=one 2=two 3=three 4=four 5=five 6=six 7=seven +=plus 5+1=6)';
 $ec_lang['contactSubmitButton']='Enviar Mensaje';
+$ec_lang['contact_success']='Gracias por tomarse el tiempo para escribir.';
 // Erosion Setback and Scour Calc.
 $ec_lang['essc_btbw']='Ancho de orilla a orilla';
 $ec_lang['essc_mcr']='Radio mínimo de curvatura';

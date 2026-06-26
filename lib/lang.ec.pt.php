@@ -260,6 +260,7 @@ $ec_lang['contact_message']='Mensagem:';
 $ec_lang['contactSpamPrefix']='Five (cinco) plus (e) one (um) equals (são) ';
 $ec_lang['contactSpamPostfix']='(Por favor, escreva em inglês com letras. 1=one 2=two 3=three 4=four 5=five 6=six 7=seven +=plus 5+1=6)';
 $ec_lang['contactSubmitButton']='Enviar Mensagem';
+$ec_lang['contact_success']='Obrigado por dedicar seu tempo para escrever.';
 $ec_lang['menu_brand']='Calculadoras HawsEDC';
 $ec_lang['essc_btbw']='Largura de margem a margem';
 $ec_lang['essc_mcr']='Raio mínimo de curvatura';
