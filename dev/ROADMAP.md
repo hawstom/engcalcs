@@ -9,7 +9,13 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 # Tasks
 
 ## Calculator Improvements
+100|Touch tooltips: On touch screens, `title` attribute tooltips don't fire — long-press does nothing. Affects all `?` help tips and the "Save this calculation" label. Fix: make the `?` span (and the Save label) tappable to show the tip text inline or via a small popover. Should work on both desktop (hover) and mobile (tap). [CC]
 
+100|PWA on mobile — investigate: User cannot find any install indicator on mobile. Diagnose: is the PWA install prompt firing on Android Chrome? Does iOS Safari show "Add to Home Screen"? Is the manifest/sw.js scope correct? Report findings before building PWA evangelism UI (task below). [CC]
+
+90|Layout overflow: On a small screen the blue bounding box shrinks to fit the window but the results table overflows past the right edge. The box should be wide enough to contain all content (titles, inputs, results). Likely fix: `min-width` on the container or `overflow-x: auto` on the results table. [CC]
+
+80|PWA evangelism: Add an "Install this calculator" affordance to the navbar, before the Save field. Use `beforeinstallprompt` to show only when the browser offers install. Design depends on PWA-on-mobile investigation findings above. [CC]
 
 ## AI Efficiency Scripting (Overhead)
 
