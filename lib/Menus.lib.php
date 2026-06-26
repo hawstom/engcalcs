@@ -41,7 +41,7 @@ function echoMainMenu() {
         array('http://tomsthird.blogspot.com/','Blog (new in 2009)'),
         array('/thomas','Personal essays'),
         array('/famtree.php','Collaborative Family Trees'),
-        array('/contact.php','Contact')
+        array('/contact.htm','Contact')
     );
     echo '<div class="d-print-none">';
 // Step through the array
