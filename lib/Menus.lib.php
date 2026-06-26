@@ -41,7 +41,7 @@ function echoMainMenu() {
         array('http://tomsthird.blogspot.com/','Blog (new in 2009)'),
         array('/thomas','Personal essays'),
         array('/famtree.php','Collaborative Family Trees'),
-        array('/contact.htm','Contact')
+        array('/engcalcs/contact.php','Contact')
     );
     echo '<div class="d-print-none">';
 // Step through the array
@@ -117,7 +117,7 @@ function echoEngCalcsMenu ($html_title = '', $show_name_field = false, $calc_nam
 				<div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-more">
 					<a class="dropdown-item" href="About.php"><?=$ec_lang['about_main_menu']?></a>
 					<a class="dropdown-item" href="Install.php"><?=$ec_lang['install_main_menu']?></a>
-					<a class="dropdown-item" href="/contact.php"><?=$ec_lang['contact_main_menu']?></a>
+					<a class="dropdown-item" href="contact.php"><?=$ec_lang['contact_main_menu']?></a>
 				</div>
 			</li>
 		</ul>
