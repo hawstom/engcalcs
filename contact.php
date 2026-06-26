@@ -12,6 +12,7 @@ echoHeader("Normal", $html_title, $html_head, false);
 Mesa, AZ  85201<br />
 Phone: 480-389-4583 (Google voice)<br />
 <br />
+</p>
 
 <br />
 
@@ -53,11 +54,6 @@ Phone: 480-389-4583 (Google voice)<br />
     <input
       type="submit"
       value="<?php echo $ec_lang['contactSubmitButton'];?>"
-    >
-    <input
-      type="hidden"
-      name="success"
-      value="formmailsuccess.php"
     >
     <input
       type="hidden"

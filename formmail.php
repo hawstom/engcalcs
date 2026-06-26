@@ -16,7 +16,6 @@
 // email=the user's email address
 // subject
 // message
-// success=success file URL
 //
 // Modify the spam test string, to address, and success file name below.
 $testanswer='six';
@@ -58,8 +57,8 @@ if (preg_match("/(\r|\n)/", $_POST['subject']) or preg_match("/@/",$_POST['subje
 // Get the message
 $message = $_POST['message'].$_POST['more_message'];
 
-// Get the success file name
-$successfile=$_POST['success'];
+// Use a fixed internal success page (do not trust user input for redirects).
+$successfile = 'formmailsuccess.php';
 
 // Put commentor's e-mail address in Reply-to: or else omit the Reply-to:
 if  ($email !== "") {
@@ -78,22 +77,16 @@ $moreheaders = $from."\r\n".$replyto;
 
 // Send the message. If send was successful, show the success page.
 if (mail($to, $subject, $message, $moreheaders)) {
-  // Get the success file or provide a default message
-  if (file_exists($successfile)){
-    // Redirect to it.
-    ?><!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-    <html>
-    <head><meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Sending mail</title>
-    <meta http-equiv="REFRESH" content="0;url=<?=$successfile?>"></HEAD>
-    <BODY>
-    </BODY>
-    </HTML>
-    <?
-  } else {
-    // Show this default success message.
-    echo "<p>Thank you for your message</p>\n<p>Name: $name</p>\n<p>Email: $email</p>\n<p>Subject: $subject</p>\n<p>Message: $message</p>";
-  }
+  // Redirect to the fixed internal success page.
+  ?><!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+  <html>
+  <head><meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Sending mail</title>
+  <meta http-equiv="REFRESH" content="0;url=<?=$successfile?>"></HEAD>
+  <BODY>
+  </BODY>
+  </HTML>
+  <?
 
 // Otherwise show a send failure message.
 } else {
