@@ -62,7 +62,7 @@ Phone: 480-389-4583 (Google voice)<br />
     <input
       type="hidden"
       name="more_message"
-      value="\n---\nIf this message is in Turkish, forward it to Mustafa Özbay <m.ozbay21@gmail.com>"
+      value="\n---\nIf this message needs translation, use AI."
     >
   </p>
 </form>
