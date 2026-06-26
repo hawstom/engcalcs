@@ -49,6 +49,7 @@ $ec_lang['menu_brand']='HawsEDC ক্যালকুলেটর';
 $ec_lang['menu_main_list']='ক্যালকুলেটর তালিকা';
 $ec_lang['menu_main_hydraulics']='হাইড্রোলিক্স';
 $ec_lang['menu_main_language']='ভাষা';
+$ec_lang['menu_more']='আরও';
 $ec_lang['template_welcome']='&gt;&gt; দরজায় ভয় রেখে আসুন; এখানে ভালোবাসাই আমাদের ভাষা। আপনি সব কিছু নষ্ট করছেন না। <a target="_blank" href="https://hawsedc.com/download.php">বিনামূল্যে HawsEDC AutoCAD টুলগুলো</a>ও উপভোগ করুন। &lt;&lt;';
 $ec_lang['template_translation_help']='আপনার কাছে কি এখানে যোগ করার জন্য একটি দারুণ ক্যালকুলেটরের ধারণা আছে?  আপনি কি অনুবাদ উন্নত করতে, প্রোগ্রাম করতে বা এই ক্যালকুলেটরগুলি হোস্ট করতে সাহায্য করতে পারেন?  ';
 $ec_lang['template_feedback']='অনুগ্রহ করে আপনার মূল্যবান পরামর্শ বা প্রশংসার কথা জানান। এই বিনামূল্যের ক্যালকুলেটর কি সব দিক থেকে আপনার প্রত্যাশা ছাড়িয়ে গেছে?';
@@ -66,14 +67,14 @@ $ec_lang['view_hide_line']='[এই লাইনটি লুকান]';
 $ec_lang['view_printable']='মুদ্রণযোগ্য সংস্করণ (পুনরুদ্ধারের জন্য পুনরায় লোড করুন)';
 $ec_lang['ec_name_label']='এই গণনা সংরক্ষণ করুন:';
 $ec_lang['ec_name_placeholder']='নাম';
-$ec_lang['ec_name_hint']='এই গণনা বুকমার্ক, ইতিহাস পুনরুদ্ধার এবং শেয়ারিংয়ের জন্য URL-এ সংরক্ষণ করে';
+$ec_lang['ec_name_hint']='এই ইনপুটগুলি বুকমার্কিং, ইতিহাস পুনরুদ্ধার এবং শেয়ারিংয়ের জন্য URL-এ সংরক্ষণ করে';
 $ec_lang['ec_name_invalid']='শুধুমাত্র বর্ণ, সংখ্যা, স্থান, – _ . ব্যবহার করুন';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='ড্যার্সি-ওয়েইসবাখ পাইপ হেড লস';
 $ec_lang['dw_main_title']='বিনামূল্যে অনলাইন ড্যার্সি-ওয়েইসবাখ পাইপ হেড লস ক্যালকুলেটর';
 $ec_lang['dw_main_desc']='নির্দিষ্ট ব্যাস, রুক্ষতা ও প্রবাহে ড্যার্সি-ওয়েইসবাখ পাইপ হেড লস';
 $ec_lang['dw_roughness']='ড্যার্সি-ওয়েইসবাখ পরম রুক্ষতা, e';
-$ec_lang['dw_kinematic_viscosity']='গতিগত সান্দ্রতা, &nu; <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water at 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['dw_kinematic_viscosity']='গতিগত সান্দ্রতা, &nu; <span title="1×10⁻⁶ m²/s for clean water at 20°C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['dw_reynolds_number']='রেনোল্ডস সংখ্যা, Re';
 $ec_lang['dw_flow_regime']='প্রবাহ ব্যবস্থা';
 $ec_lang['dw_regime_laminar']='স্তরীয়';
@@ -316,7 +317,7 @@ $ec_lang['ps_diameter']='পেনস্টক ব্যাস, D';
 $ec_lang['ps_length']='পেনস্টক দৈর্ঘ্য, L';
 $ec_lang['ps_roughness']='পাইপের রুক্ষতা, e';
 $ec_lang['ps_km']='গৌণ ক্ষতি সহগ, k<sub>m</sub> <span title="Sum of all junction and fitting loss coefficients along the penstock" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
-$ec_lang['ps_nu']='গতিগত সান্দ্রতা, &nu; <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water near 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['ps_nu']='গতিগত সান্দ্রতা, &nu; <span title="1×10⁻⁶ m²/s for clean water near 20°C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['ps_efficiency']='প্ল্যান্ট দক্ষতা, &eta; (0&ndash;1)';
 $ec_lang['ps_velocity']='প্রবাহ বেগ, v';
 $ec_lang['ps_vel_check']='বেগ পরীক্ষা';
@@ -347,6 +348,10 @@ $ec_lang['ps_notes_5_def']='সাধারণ পরম রুক্ষতা: 
 
 // About
 $ec_lang['about_main_menu']='সম্পর্কে';
+$ec_lang['install_main_menu']='ইনস্টল করুন';
+$ec_lang['install_main_title']='EngCalcs ইনস্টল করুন';
+$ec_lang['install_main_desc']='অফলাইন ব্যবহারের জন্য আপনার ডিভাইসে যোগ করুন';
+$ec_lang['contact_main_menu']='যোগাযোগ';
 $ec_lang['about_main_title']='HawsEDC ইঞ্জিনিয়ারিং ক্যালকুলেটর সম্পর্কে';
 $ec_lang['about_main_desc']='মিশন, ওপেন সোর্স এবং অবদান';
 

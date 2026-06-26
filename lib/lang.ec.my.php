@@ -52,6 +52,7 @@ $ec_lang['menu_brand']='HawsEDC တွက်ချက်မှုကိရိယ
 $ec_lang['menu_main_list']='တွက်ချက်မှုကိရိယာများ စာရင်း';
 $ec_lang['menu_main_hydraulics']='ဟိုက်ဒရောလစ်';
 $ec_lang['menu_main_language']='ဘာသာစကား';
+$ec_lang['menu_more']='နောက်ထပ်';
 $ec_lang['template_welcome']='&gt;&gt; သင့်ကြောက်ရွံ့မှုများကို တံခါးဝတွင် ချန်ထားပါ; ချစ်ခြင်းမေတ္တာသည် ဤနေရာ၌ ကျွန်ုပ်တို့၏ဘာသာစကားဖြစ်သည်။ သင်သည် အရာခပ်သိမ်းကို ဖျက်ဆီးနေသည်မဟုတ်ပါ။ <a target="_blank" href="https://hawsedc.com/download.php">အခမဲ့ HawsEDC AutoCAD ကိရိယာများ</a>ကိုလည်း ခံစားပါ။ &lt;&lt;';
 $ec_lang['template_translation_help']='ဤနေရာတွင် ထည့်သွင်းရန် တွက်ချက်မှုကိရိယာတစ်ခုအတွက် မြင်ကွင်းကောင်းတစ်ခု ရှိပါသလား။ ဘာသာပြန်ဆိုမှုများ တိုးတက်စေရန်၊ ပရိုဂရမ်ရေးရန် သို့မဟုတ် ဤတွက်ချက်မှုကိရိယာများကို လက်ခံဆောင်ရွက်ရန် ကူညီနိုင်ပါသလား။  ';
 $ec_lang['template_feedback']='ကျေးဇူးပြု၍ သင်၏တန်ဖိုးရှိသောအကြံပြုချက် သို့မဟုတ် ချီးမွမ်းစကားများ ပေးပါ။ ဤအခမဲ့တွက်ချက်မှုကိရိယာသည် သင်၏မျှော်လင့်ချက်များကို အကုန်အလုံး ကျော်လွန်ဆောင်ရွက်နိုင်ခဲ့ပါသလား။';
@@ -69,14 +70,14 @@ $ec_lang['view_hide_line']='[ဤစာကြောင်း ဝှက်ရန�
 $ec_lang['view_printable']='မှတ်တမ်းတင်နိုင်သောဗားရှင်း (ပြန်ရယူရန် ပြန်လည်တင်/ရှင်းလင်းပါ)';
 $ec_lang['ec_name_label']='ဤတွက်ချက်မှုကိုသိမ်းဆည်းပါ:';
 $ec_lang['ec_name_placeholder']='အမည်';
-$ec_lang['ec_name_hint']='ဤတွက်ချက်မှုကို URL သို့သိမ်းဆည်းကာ စာမှတ်မုံးခြင်း၊ မှတ်တမ်းများ ပြန်လည်ရယူခြင်းနှင့် မျှဝေခြင်းအတွက်ဖြစ်သည်။';
+$ec_lang['ec_name_hint']='ထည့်သွင်းချက်များကို URL သို့သိမ်းဆည်းကာ စာမှတ်မုံးခြင်း၊ မှတ်တမ်းများ ပြန်လည်ရယူခြင်းနှင့် မျှဝေခြင်းအတွက်ဖြစ်သည်။';
 $ec_lang['ec_name_invalid']='အက္ခရာ၊ ကိန်းဂဏန်း၊ အကွာ၊ – _ . သာ အသုံးပြုပါ။';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Darcy-Weisbach သွတ်ပိုက် ခေါင်းဆုံးဆုံးရှုံးမှု';
 $ec_lang['dw_main_title']='အခမဲ့ အွန်လိုင်း Darcy-Weisbach သွတ်ပိုက် ခေါင်းဆုံးဆုံးရှုံးမှု တွက်ချက်မှုကိရိယာ';
 $ec_lang['dw_main_desc']='သတ်မှတ်အချင်း၊ ကြမ်းတမ်းမှုနှင့် စီးဆင်းမှုတွင် Darcy-Weisbach သွတ်ပိုက် ခေါင်းဆုံးဆုံးရှုံးမှု';
 $ec_lang['dw_roughness']='Darcy-Weisbach ပကတိကြမ်းတမ်းမှု, e';
-$ec_lang['dw_kinematic_viscosity']='ကိနမက်တစ် ဗစ်စကော့စিটি, &nu; <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water at 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['dw_kinematic_viscosity']='ကိနမက်တစ် ဗစ်စကော့စিটি, &nu; <span title="1×10⁻⁶ m²/s for clean water at 20°C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['dw_reynolds_number']='Reynolds ကိန်း, Re';
 $ec_lang['dw_flow_regime']='စီးဆင်းမှုပုံစံ';
 $ec_lang['dw_regime_laminar']='ညင်သာသောစီးဆင်းမှု (laminar)';
@@ -252,7 +253,7 @@ $ec_lang['ps_diameter']='Penstock အချင်း, D';
 $ec_lang['ps_length']='Penstock အရှည်, L';
 $ec_lang['ps_roughness']='သွတ်ပိုက်ကြမ်းတမ်းမှု, e';
 $ec_lang['ps_km']='Minor loss coefficient, k<sub>m</sub> <span title="Sum of all junction and fitting loss coefficients along the penstock" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
-$ec_lang['ps_nu']='Kinematic viscosity, &nu; <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water near 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['ps_nu']='Kinematic viscosity, &nu; <span title="1×10⁻⁶ m²/s for clean water near 20°C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['ps_efficiency']='စက်ရုံထိရောက်မှု, &eta; (0&ndash;1)';
 $ec_lang['ps_velocity']='စီးဆင်းမှုအမြန်နှုန်း, v';
 $ec_lang['ps_vel_check']='အမြန်နှုန်းစစ်ဆေးမှု';
@@ -349,6 +350,10 @@ $ec_lang['contactSubmitButton']='မက်ဆေ့တင်ပြရန်';
 
 // About
 $ec_lang['about_main_menu']='အကြောင်း';
+$ec_lang['install_main_menu']='ထည့်သွင်း';
+$ec_lang['install_main_title']='EngCalcs ထည့်သွင်းရန်';
+$ec_lang['install_main_desc']='အင်တာနက်မရှိဘဲ သုံးရန် သင့်စက်တွင် ထည့်ပါ';
+$ec_lang['contact_main_menu']='ဆက်သွယ်ရန်';
 $ec_lang['about_main_title']='HawsEDC အင်ဂျင်နီယာ ကိရိယာများ အကြောင်း';
 $ec_lang['about_main_desc']='ရည်ရွယ်ချက်၊ ပွင့်လင်းအရင်းအမြစ်နှင့် ပါဝင်ကူညီမှု';
 

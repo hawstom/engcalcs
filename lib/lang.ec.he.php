@@ -51,6 +51,7 @@ $ec_lang['menu_brand']='מחשבוני HawsEDC';
 $ec_lang['menu_main_list']='רשימת המחשבונים';
 $ec_lang['menu_main_hydraulics']='הידרוליקה';
 $ec_lang['menu_main_language']='שפה';
+$ec_lang['menu_more']='עוד';
 $ec_lang['template_welcome']='&gt;&gt; השאירו את פחדיכם בדלת; כאן מדברים אהבה. אתם לא הורסים הכול. נהנו גם מ<a target="_blank" href="https://hawsedc.com/download.php">כלי ה-AutoCAD החינמיים של HawsEDC.</a> &lt;&lt;';
 $ec_lang['template_translation_help']='האם יש לך חזון נהדר למחשבון שיתווסף כאן?  האם אתה יכול לעזור לי לתרגם את המחשבון לשפה שלך או להטמיע את המחשבון באתר שלך?  ';
 $ec_lang['template_feedback']='בבקשה תן לנו את חוות דעתך. האם המחשבון החינמי עלה על כל ציפיותיך?';
@@ -64,7 +65,7 @@ $ec_lang['view_hide_line']='[הסתר שורה זו]';
 $ec_lang['view_printable']='גרסה להדפסה (טען מחדש לשחזור)';
 $ec_lang['ec_name_label']='שמור חישוב זה:';
 $ec_lang['ec_name_placeholder']='שם';
-$ec_lang['ec_name_hint']='שמור חישוב זה לכתובת עם סימניה, אחזור מהיסטוריה, ושיתוף';
+$ec_lang['ec_name_hint']='שמירת הערכים האלה בכתובת עם סימניה, אחזור מהיסטוריה, ושיתוף';
 $ec_lang['ec_name_invalid']='השתמשו בתווים: אותיות, ספרות, רווחים, – _ .';
 // Manning Pipe Flow
 $ec_lang['mpf_main_menu']='זרימה בצינור — Manning';
@@ -191,7 +192,7 @@ $ec_lang['dw_main_menu']='אובדן גובה בצינור — Darcy-Weisbach';
 $ec_lang['dw_main_title']='מחשבון אובדן גובה בצינור Darcy-Weisbach — חינם מקוון';
 $ec_lang['dw_main_desc']='אובדן גובה בצינור Darcy-Weisbach בקוטר, גסות וספיקה נתונים';
 $ec_lang['dw_roughness']='גסות מוחלטת Darcy-Weisbach, e';
-$ec_lang['dw_kinematic_viscosity']='צמיגות קינמטית, &nu; <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water at 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['dw_kinematic_viscosity']='צמיגות קינמטית, &nu; <span title="1×10⁻⁶ m²/s for clean water at 20°C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['dw_reynolds_number']='מספר Reynolds, Re';
 $ec_lang['dw_flow_regime']='משטר זרימה';
 $ec_lang['dw_regime_laminar']='למינרי';
@@ -324,7 +325,7 @@ $ec_lang['ps_diameter']='קוטר צינור הלחץ, D';
 $ec_lang['ps_length']='אורך צינור הלחץ, L';
 $ec_lang['ps_roughness']='גסות הצינור, e';
 $ec_lang['ps_km']='מקדם אובדן משני, k<sub>m</sub> <span title="Sum of all junction and fitting loss coefficients along the penstock" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
-$ec_lang['ps_nu']='צמיגות קינמטית, &nu; <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water near 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['ps_nu']='צמיגות קינמטית, &nu; <span title="1×10⁻⁶ m²/s for clean water near 20°C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['ps_efficiency']='יעילות מתקן, &eta; (0&ndash;1)';
 $ec_lang['ps_velocity']='מהירות זרימה, v';
 $ec_lang['ps_vel_check']='בדיקת מהירות';
@@ -355,6 +356,10 @@ $ec_lang['ps_notes_5_def']='גסות מוחלטת אופיינית: פלדה (ח
 
 // About
 $ec_lang['about_main_menu']='אודות';
+$ec_lang['install_main_menu']='התקן';
+$ec_lang['install_main_title']='התקן את EngCalcs';
+$ec_lang['install_main_desc']='הוסף למכשיר שלך לשימוש לא מקוון';
+$ec_lang['contact_main_menu']='צור קשר';
 $ec_lang['about_main_title']='אודות מחשבוני ההנדסה HawsEDC';
 $ec_lang['about_main_desc']='מטרה, קוד פתוח ותרומה';
 

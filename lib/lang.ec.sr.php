@@ -132,6 +132,7 @@ $ec_lang['menu_brand']='HawsEDC Калкулатори';
 $ec_lang['menu_main_list']='Листа калкулатора';
 $ec_lang['menu_main_hydraulics']='Хидраулика';
 $ec_lang['menu_main_language']='Језик';
+$ec_lang['menu_more']='Više';
 $ec_lang['template_welcome']='&gt;&gt; Оставите страхове за вратима; овде је љубав наш језик. Не кварите све. Уживајте и у <a target="_blank" href="https://hawsedc.com/download.php">бесплатним HawsEDC AutoCAD алатима</a>. &lt;&lt;';
 $ec_lang['template_translation_help']='Имате ли одличну идеју за калкулатор који би требало додати овде?  Можете ли помоћи у побољшању превода, програмирању или хостовању ових калкулатора?  ';
 $ec_lang['template_feedback']='Молимо вас да нам дате своје вредне сугестије или похвале. Да ли је овај бесплатни калкулатор превазишао ваша очекивања у сваком погледу?';
@@ -145,7 +146,7 @@ $ec_lang['view_hide_line']='[Сакриј овај ред]';
 $ec_lang['view_printable']='Верзија за штампу (освежите страницу да бисте вратили)';
 $ec_lang['ec_name_label']='Сачувајте овај прорачун:';
 $ec_lang['ec_name_placeholder']='Назив';
-$ec_lang['ec_name_hint']='Сачувава овај прорачун у URL адресу за обележавање, преузимање из историје и дељење';
+$ec_lang['ec_name_hint']='Чува унете вредности у URL адресу за обележавање, преузимање из историје и дељење';
 $ec_lang['ec_name_invalid']='Користите само слова, цифре, размаци, – _ .';
 $ec_lang['points_data_help']='(или Копирај/Налепи помоћу поља за податке)';
 $ec_lang['points_data_title']='Подаци тачака<br />(одвојени зарезом или табулатором)';
@@ -156,7 +157,7 @@ $ec_lang['dw_main_menu']='Губитак напора у цевима по Darcy
 $ec_lang['dw_main_title']='Бесплатни онлајн калкулатор губитка напора у цевима по Darcy-Weisbachу';
 $ec_lang['dw_main_desc']='Губитак напора у цевима по Darcy-Weisbachу при задатом пречнику, храпавости и протицају';
 $ec_lang['dw_roughness']='Апсолутна храпавост по Darcy-Weisbachу, e';
-$ec_lang['dw_kinematic_viscosity']='Кинематичка вискозност, ν <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water at 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['dw_kinematic_viscosity']='Кинематичка вискозност, ν <span title="1×10⁻⁶ m²/s for clean water at 20°C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['dw_reynolds_number']='Рејнолдсов број, Re';
 $ec_lang['dw_flow_regime']='Режим тецања';
 $ec_lang['dw_regime_laminar']='ламинарно';
@@ -321,7 +322,7 @@ $ec_lang['ps_diameter']='Пречник цевовода, D';
 $ec_lang['ps_length']='Дужина цевовода, L';
 $ec_lang['ps_roughness']='Храпавост цеви, e';
 $ec_lang['ps_km']='Коефицијент локалних губитака, k<sub>m</sub> <span title="Sum of all junction and fitting loss coefficients along the penstock" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
-$ec_lang['ps_nu']='Кинематичка вискозност, ν <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water near 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['ps_nu']='Кинематичка вискозност, ν <span title="1×10⁻⁶ m²/s for clean water near 20°C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['ps_efficiency']='Ефикасност постројења, &eta; (0&ndash;1)';
 $ec_lang['ps_velocity']='Брзина струјања, v';
 $ec_lang['ps_vel_check']='Провера брзине';
@@ -352,6 +353,10 @@ $ec_lang['ps_notes_5_def']='Типична апсолутна храпавост
 
 // About
 $ec_lang['about_main_menu']='О нама';
+$ec_lang['install_main_menu']='Инсталирај';
+$ec_lang['install_main_title']='Инсталирај EngCalcs';
+$ec_lang['install_main_desc']='Додај на уређај за коришћење без интернета';
+$ec_lang['contact_main_menu']='Контакт';
 $ec_lang['about_main_title']='О инжењерским калкулаторима HawsEDC';
 $ec_lang['about_main_desc']='Мисија, отворени код и доприноси';
 

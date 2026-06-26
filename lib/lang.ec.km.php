@@ -52,6 +52,7 @@ $ec_lang['menu_brand']='HawsEDC Calculators';
 $ec_lang['menu_main_list']='បញ្ជីម៉ាស៊ីនគណនា';
 $ec_lang['menu_main_hydraulics']='វិស្វកម្មហ៊ីដ្រូលីក';
 $ec_lang['menu_main_language']='ភាសា';
+$ec_lang['menu_more']='បន្ថែម';
 $ec_lang['template_welcome']='&gt;&gt; ទម្លាក់ការភ័យខ្លាចរបស់អ្នកនៅក្រៅទ្វារ; ក្ដីស្រឡាញ់ត្រូវបានប្រើសម្រាប់ភាសាទីនេះ។ អ្នកមិនបំផ្លាញអ្វីទាំងអស់ឡើយ។ រីករាយជាមួយ <a target="_blank" href="https://hawsedc.com/download.php">ឧបករណ៍ HawsEDC AutoCAD ឥតគិតថ្លៃ</a> ផងដែរ។ &lt;&lt;';
 $ec_lang['template_translation_help']='តើអ្នកមានគំនិតល្អសម្រាប់ម៉ាស៊ីនគណនាដែលចង់បន្ថែមនៅទីនេះទេ? តើអ្នកអាចជួយខ្ញុំកែលម្អការបកប្រែ ការសរសេរកម្មវិធី ឬការបង្ហោះម៉ាស៊ីនគណនាទាំងនេះបានទេ?  ';
 $ec_lang['template_feedback']='សូមផ្ញើមតិយោបល់ ឬការសរសើររបស់អ្នកដ៏មានតម្លៃមកយើង។ តើម៉ាស៊ីនគណនាឥតគិតថ្លៃនេះបានលើសពីការរំពឹងទុករបស់អ្នកគ្រប់ទិសទិសទេ?';
@@ -69,14 +70,14 @@ $ec_lang['view_hide_line']='[លាក់បន្ទាត់នេះ]';
 $ec_lang['view_printable']='កំណែដែលអាចបោះពុម្ព (ផ្ទុកឡើងវិញ/ធ្វើឱ្យស្រស់ ដើម្បីស្ដារ)';
 $ec_lang['ec_name_label']='រក្សាទុកការគណនានេះ៖';
 $ec_lang['ec_name_placeholder']='ឈ្មោះ';
-$ec_lang['ec_name_hint']='រក្សាទុកការគណនានេះទៅក្នុង URL សម្រាប់ការចាប់ផ្តើមវិញ ប្រវត្តិ ឬការចែងលែង';
+$ec_lang['ec_name_hint']='រក្សាទុកទិន្នន័យបញ្ចូលនេះទៅក្នុង URL សម្រាប់ការចាប់ផ្តើមវិញ ប្រវត្តិ ឬការចែងលែង';
 $ec_lang['ec_name_invalid']='ប្រើតែអក្សរ, ខ្ទង់, ចន្លោះ, – _ .';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Darcy-Weisbach ការបាត់បង់ទំនាប់ទឹកក្នុងបំពង់';
 $ec_lang['dw_main_title']='ម៉ាស៊ីនគណនា Darcy-Weisbach ការបាត់បង់ទំនាប់ទឹកក្នុងបំពង់ ឥតគិតថ្លៃ';
 $ec_lang['dw_main_desc']='ការបាត់បង់ទំនាប់ទឹកក្នុងបំពង់ Darcy-Weisbach ប្រឡោះ ភាពរញ៉េរញ៉ៃ និងល្បឿនហូរទឹកដែលបានកំណត់';
 $ec_lang['dw_roughness']='ភាពរញ៉េរញ៉ៃដាច់ខាត Darcy-Weisbach, e';
-$ec_lang['dw_kinematic_viscosity']='ភាពខាប់ស៊ីណេម៉ាទិក, &nu; <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water at 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['dw_kinematic_viscosity']='ភាពខាប់ស៊ីណេម៉ាទិក, &nu; <span title="1×10⁻⁶ m²/s for clean water at 20°C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['dw_reynolds_number']='លេខ Reynolds, Re';
 $ec_lang['dw_flow_regime']='របៀបហូរ';
 $ec_lang['dw_regime_laminar']='លំហូរស្រួល';
@@ -252,7 +253,7 @@ $ec_lang['ps_diameter']='ប្រឡោះ penstock, D';
 $ec_lang['ps_length']='ប្រវែង penstock, L';
 $ec_lang['ps_roughness']='ភាពរញ៉េរញ៉ៃបំពង់, e';
 $ec_lang['ps_km']='Minor loss coefficient, k<sub>m</sub> <span title="Sum of all junction and fitting loss coefficients along the penstock" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
-$ec_lang['ps_nu']='Kinematic viscosity, &nu; <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water near 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['ps_nu']='Kinematic viscosity, &nu; <span title="1×10⁻⁶ m²/s for clean water near 20°C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['ps_efficiency']='ប្រសិទ្ធភាពរោងចក្រ, &eta; (0&ndash;1)';
 $ec_lang['ps_velocity']='ល្បឿនហូរ, v';
 $ec_lang['ps_vel_check']='ការពិនិត្យល្បឿន';
@@ -349,6 +350,10 @@ $ec_lang['contactSubmitButton']='ផ្ញើ​ សារ';
 
 // About
 $ec_lang['about_main_menu']='អំពី';
+$ec_lang['install_main_menu']='ដំឡើង';
+$ec_lang['install_main_title']='ដំឡើង EngCalcs';
+$ec_lang['install_main_desc']='បន្ថែមទៅឧបករណ៍របស់អ្នកសម្រាប់ប្រើដោយគ្មានអ៊ីនធឺណិត';
+$ec_lang['contact_main_menu']='ទំនាក់ទំនង';
 $ec_lang['about_main_title']='អំពី HawsEDC ម៉ាស៊ីនគណនាវិស្វកម្ម';
 $ec_lang['about_main_desc']='បេសកកម្ម, ប្រភពបើកចំហ, និងការចូលរួម';
 

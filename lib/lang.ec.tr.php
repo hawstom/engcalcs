@@ -52,6 +52,7 @@ $ec_lang['menu_brand']='HawsEDC Hesap Makineleri';
 $ec_lang['menu_main_list']='Hesap makinası listesi';
 $ec_lang['menu_main_hydraulics']='Hidrolik';
 $ec_lang['menu_main_language']='Dil';
+$ec_lang['menu_more']='Daha fazla';
 $ec_lang['template_welcome']='&gt;&gt; Korkularını kapıda bırak; burada sevgi konuşulur. Her şeyi mahvetmiyorsun. <a target="_blank" href="https://hawsedc.com/download.php">Ücretsiz HawsEDC AutoCAD araçlarını</a> da deneyin. &lt;&lt;';
 $ec_lang['template_translation_help']="Buraya eklenecek bir hesap makinesi için harika bir vizyonunuz var mı?  Bu hesap makinesini kendi dilinize çevirmek ya da bu hesap makinesini web sitenizde göstermek ister misiniz? Türkçe çeviri için Mustafa Özbay'a tesekkür ederim.";
 $ec_lang['template_feedback']='Lütfen görüslerinizi ve begenileriniz bizimle paylasin. Bu ücretsiz hesap makinesi beklentilerinizi karsilayabildi mi?';
@@ -65,14 +66,14 @@ $ec_lang['view_hide_line']='[Bu satırı gizle]';
 $ec_lang['view_printable']='Yazdırılabilir sürüm (geri yüklemek için yeniden yükleyin)';
 $ec_lang['ec_name_label']='Bu hesaplamayı kaydet:';
 $ec_lang['ec_name_placeholder']='Ad';
-$ec_lang['ec_name_hint']='Bu hesaplamayı URL\'ye kaydeder (yer işareti, geçmiş ve paylaşım için)';
+$ec_lang['ec_name_hint']='Bu girdileri URL\'ye kaydeder (yer işareti, geçmiş ve paylaşım için)';
 $ec_lang['ec_name_invalid']='Yalnızca harfler, rakamlar, boşluklar, – _ . kullanın';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Darcy-Weisbach Boru Yük Kaybı';
 $ec_lang['dw_main_title']='Ücretsiz Çevrimiçi Darcy-Weisbach Boru Yük Kaybı Hesaplayıcısı';
 $ec_lang['dw_main_desc']='Verilen Çap, Pürüzlülük ve Akış için Darcy-Weisbach Boru Yük Kaybı';
 $ec_lang['dw_roughness']='Darcy-Weisbach mutlak pürüzlülüğü, e';
-$ec_lang['dw_kinematic_viscosity']='Kinematik viskozite, &nu; <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water at 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['dw_kinematic_viscosity']='Kinematik viskozite, &nu; <span title="1×10⁻⁶ m²/s for clean water at 20°C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['dw_reynolds_number']='Reynolds sayısı, Re';
 $ec_lang['dw_flow_regime']='Akış rejimi';
 $ec_lang['dw_regime_laminar']='laminer';
@@ -327,7 +328,7 @@ $ec_lang['ps_diameter']='Cebri boru çapı, D';
 $ec_lang['ps_length']='Cebri boru uzunluğu, L';
 $ec_lang['ps_roughness']='Boru pürüzlülüğü, e';
 $ec_lang['ps_km']='Minor loss coefficient, k<sub>m</sub> <span title="Sum of all junction and fitting loss coefficients along the penstock" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
-$ec_lang['ps_nu']='Kinematic viscosity, &nu; <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water near 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['ps_nu']='Kinematic viscosity, &nu; <span title="1×10⁻⁶ m²/s for clean water near 20°C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['ps_efficiency']='Santral verimi, &eta; (0&ndash;1)';
 $ec_lang['ps_velocity']='Akış hızı, v';
 $ec_lang['ps_vel_check']='Hız kontrolü';
@@ -358,6 +359,10 @@ $ec_lang['ps_notes_5_def']='Tipik mutlak pürüzlülük: çelik (yeni) 0.046&nbs
 
 // About
 $ec_lang['about_main_menu']='Hakkında';
+$ec_lang['install_main_menu']='Yükle';
+$ec_lang['install_main_title']='EngCalcs\'i Yükle';
+$ec_lang['install_main_desc']='Çevrimdışı kullanım için cihazınıza ekleyin';
+$ec_lang['contact_main_menu']='İletişim';
 $ec_lang['about_main_title']='HawsEDC Mühendislik Hesaplayıcıları Hakkında';
 $ec_lang['about_main_desc']='Misyon, Açık Kaynak ve Katkı';
 

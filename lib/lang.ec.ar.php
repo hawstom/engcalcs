@@ -52,6 +52,7 @@ $ec_lang['menu_brand']='حاسبات HawsEDC';
 $ec_lang['menu_main_list']='قائمة الحاسبات';
 $ec_lang['menu_main_hydraulics']='الهيدروليكا';
 $ec_lang['menu_main_language']='اللغة';
+$ec_lang['menu_more']='المزيد';
 $ec_lang['template_welcome']='&gt;&gt; اتركوا مخاوفكم عند الباب؛ هنا نتحدث بالمحبة. أنتم لا تدمرون كل شيء. استمتعوا أيضاً بـ<a target="_blank" href="https://hawsedc.com/download.php">أدوات HawsEDC المجانية لـ AutoCAD.</a> &lt;&lt;';
 $ec_lang['template_translation_help']='هل لديك رؤية رائعة لحاسبة تريد إضافتها هنا؟ هل يمكنك مساعدتي في تحسين الترجمات أو البرمجة أو استضافة هذه الحاسبات؟  ';
 $ec_lang['template_feedback']='يرجى مشاركتنا ملاحظاتك القيّمة. هل فاقت هذه الحاسبة المجانية توقعاتك من كل جانب؟';
@@ -69,14 +70,14 @@ $ec_lang['view_hide_line']='[إخفاء هذا السطر]';
 $ec_lang['view_printable']='نسخة قابلة للطباعة (أعد التحميل للاستعادة)';
 $ec_lang['ec_name_label']='احفظ هذا الحساب:';
 $ec_lang['ec_name_placeholder']='الاسم';
-$ec_lang['ec_name_hint']='يحفظ هذا الحساب في عنوان URL لإنشاء إشارة مرجعية واسترجاع السجل والمشاركة';
+$ec_lang['ec_name_hint']='يحفظ المدخلات في عنوان URL للإشارات المرجعية واسترجاع السجل والمشاركة';
 $ec_lang['ec_name_invalid']='استخدم أحرف وأرقام ومسافات – _ . فقط';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='فاقد الضغط في الأنابيب — داركي-وايسباخ';
 $ec_lang['dw_main_title']='حاسبة فاقد الضغط في الأنابيب داركي-وايسباخ المجانية عبر الإنترنت';
 $ec_lang['dw_main_desc']='فاقد الضغط في الأنابيب بداركي-وايسباخ عند قطر وخشونة وتدفق معلومة';
 $ec_lang['dw_roughness']='الخشونة المطلقة داركي-وايسباخ، e';
-$ec_lang['dw_kinematic_viscosity']='اللزوجة الحركية، &nu; <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water at 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['dw_kinematic_viscosity']='اللزوجة الحركية، &nu; <span title="1×10⁻⁶ m²/s for clean water at 20°C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['dw_reynolds_number']='رقم رينولدز، Re';
 $ec_lang['dw_flow_regime']='نظام الجريان';
 $ec_lang['dw_regime_laminar']='صفحي';
@@ -319,7 +320,7 @@ $ec_lang['ps_diameter']='قطر أنبوب الضغط، D';
 $ec_lang['ps_length']='طول أنبوب الضغط، L';
 $ec_lang['ps_roughness']='خشونة الأنبوب، e';
 $ec_lang['ps_km']='معامل الخسارة الثانوية، k<sub>m</sub> <span title="Sum of all junction and fitting loss coefficients along the penstock" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
-$ec_lang['ps_nu']='اللزوجة الحركية، &nu; <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water near 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['ps_nu']='اللزوجة الحركية، &nu; <span title="1×10⁻⁶ m²/s for clean water near 20°C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['ps_efficiency']='كفاءة المحطة، &eta; (0&ndash;1)';
 $ec_lang['ps_velocity']='سرعة التدفق، v';
 $ec_lang['ps_vel_check']='فحص السرعة';
@@ -350,6 +351,10 @@ $ec_lang['ps_notes_5_def']='الخشونة المطلقة النموذجية: ف
 
 // About
 $ec_lang['about_main_menu']='حول';
+$ec_lang['install_main_menu']='تثبيت';
+$ec_lang['install_main_title']='تثبيت EngCalcs';
+$ec_lang['install_main_desc']='أضفه إلى جهازك للاستخدام دون اتصال';
+$ec_lang['contact_main_menu']='تواصل';
 $ec_lang['about_main_title']='حول حاسبات HawsEDC الهندسية';
 $ec_lang['about_main_desc']='الرسالة، المصدر المفتوح، والمساهمة';
 

@@ -52,6 +52,7 @@ $ec_lang['menu_brand']='ماشین‌حساب‌های HawsEDC';
 $ec_lang['menu_main_list']='فهرست ماشین‌حساب‌ها';
 $ec_lang['menu_main_hydraulics']='هیدرولیک';
 $ec_lang['menu_main_language']='زبان';
+$ec_lang['menu_more']='بیشتر';
 $ec_lang['template_welcome']='&gt;&gt; ترس‌هایت را پشت در بگذار؛ اینجا زبان محبت است. تو همه چیز را خراب نمی‌کنی. از <a target="_blank" href="https://hawsedc.com/download.php">ابزارهای رایگان HawsEDC AutoCAD</a> هم لذت ببر. &lt;&lt;';
 $ec_lang['template_translation_help']='آیا ایده‌ای عالی برای افزودن یک ماشین‌حساب دارید؟ آیا می‌توانید در بهبود ترجمه‌ها، برنامه‌نویسی، یا میزبانی این ماشین‌حساب‌ها کمک کنید؟  ';
 $ec_lang['template_feedback']='لطفاً نظرات ارزشمند خود را برای پیشنهاد یا تعریف با ما در میان بگذارید. آیا این ماشین‌حساب رایگان در همه جهات انتظارات شما را برآورده کرد؟';
@@ -69,14 +70,14 @@ $ec_lang['view_hide_line']='[پنهان کردن این خط]';
 $ec_lang['view_printable']='نسخه قابل چاپ (برای بازگشت بارگذاری مجدد کنید)';
 $ec_lang['ec_name_label']='این محاسبه را ذخیره کنید:';
 $ec_lang['ec_name_placeholder']='نام';
-$ec_lang['ec_name_hint']='این محاسبه را به URL ذخیره می‌کند برای نشانک‌گذاری، بازیابی سابقه و اشتراک';
+$ec_lang['ec_name_hint']='این داده‌های ورودی را به URL ذخیره می‌کند برای نشانک‌گذاری، بازیابی سابقه و اشتراک';
 $ec_lang['ec_name_invalid']='فقط از حروف، ارقام، فاصله، – _ . استفاده کنید';
 // Darcy-Weisbach. برای متن مفقود به mphl_ مراجعه کنید.
 $ec_lang['dw_main_menu']='افت فشار لوله Darcy-Weisbach';
 $ec_lang['dw_main_title']='ماشین‌حساب رایگان آنلاین افت فشار لوله Darcy-Weisbach';
 $ec_lang['dw_main_desc']='افت فشار لوله Darcy-Weisbach برای قطر، زبری و دبی مشخص';
 $ec_lang['dw_roughness']='زبری مطلق Darcy-Weisbach، e';
-$ec_lang['dw_kinematic_viscosity']='ویسکوزیته سینماتیک، ν <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water at 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['dw_kinematic_viscosity']='ویسکوزیته سینماتیک، ν <span title="1×10⁻⁶ m²/s for clean water at 20°C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['dw_reynolds_number']='عدد رینولدز، Re';
 $ec_lang['dw_flow_regime']='رژیم جریان';
 $ec_lang['dw_regime_laminar']='لامینار';
@@ -252,7 +253,7 @@ $ec_lang['ps_diameter']='قطر لوله پنستاک، D';
 $ec_lang['ps_length']='طول لوله پنستاک، L';
 $ec_lang['ps_roughness']='زبری لوله، e';
 $ec_lang['ps_km']='ضریب افت اتصال، k<sub>m</sub> <span title="Sum of all junction and fitting loss coefficients along the penstock" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
-$ec_lang['ps_nu']='ویسکوزیته سینماتیک، ν <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water near 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['ps_nu']='ویسکوزیته سینماتیک، ν <span title="1×10⁻⁶ m²/s for clean water near 20°C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['ps_efficiency']='بازده نیروگاه، &eta; (0&ndash;1)';
 $ec_lang['ps_velocity']='سرعت جریان، v';
 $ec_lang['ps_vel_check']='بررسی سرعت';
@@ -349,6 +350,10 @@ $ec_lang['contactSubmitButton']='ارسال پیام';
 
 // About
 $ec_lang['about_main_menu']='درباره';
+$ec_lang['install_main_menu']='نصب';
+$ec_lang['install_main_title']='نصب EngCalcs';
+$ec_lang['install_main_desc']='برای استفاده آفلاین به دستگاه خود اضافه کنید';
+$ec_lang['contact_main_menu']='تماس';
 $ec_lang['about_main_title']='درباره ماشین‌حساب‌های مهندسی HawsEDC';
 $ec_lang['about_main_desc']='مأموریت، منبع باز و مشارکت';
 

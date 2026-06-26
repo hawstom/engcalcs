@@ -52,6 +52,7 @@ $ec_lang['menu_brand']='HawsEDC حسابات';
 $ec_lang['menu_main_list']='حسابات کی فہرست';
 $ec_lang['menu_main_hydraulics']='ہائیڈرولکس';
 $ec_lang['menu_main_language']='زبان';
+$ec_lang['menu_more']='مزید';
 $ec_lang['template_welcome']='&gt;&gt; اپنے خوف دروازے پر چھوڑ دیں؛ یہاں محبت ہماری زبان ہے۔ آپ سب کچھ برباد نہیں کر رہے۔ <a target="_blank" href="https://hawsedc.com/download.php">مفت HawsEDC AutoCAD اوزار</a> بھی آزمائیں۔ &lt;&lt;';
 $ec_lang['template_translation_help']='کیا آپ کے ذہن میں یہاں شامل کرنے کے لیے کوئی شاندار حاسبے کا خیال ہے؟ کیا آپ ترجمے بہتر کرنے، پروگرامنگ، یا ان حاسبات کی میزبانی میں مدد کر سکتے ہیں؟  ';
 $ec_lang['template_feedback']='براہ کرم اپنی قیمتی رائے یا تعریف شیئر کریں۔ کیا اس مفت حاسبے نے ہر لحاظ سے آپ کی توقعات سے بڑھ کر کام کیا؟';
@@ -69,14 +70,14 @@ $ec_lang['view_hide_line']='[یہ سطر چھپائیں]';
 $ec_lang['view_printable']='طباعت کے قابل ورژن (بحال کرنے کے لیے دوبارہ لوڈ کریں)';
 $ec_lang['ec_name_label']='یہ حساب محفوظ کریں:';
 $ec_lang['ec_name_placeholder']='نام';
-$ec_lang['ec_name_hint']='اس حساب کو نشان زد کریں URL میں نشان زدگی، سابقہ بازیافت، اور شیئرنگ کے لیے';
+$ec_lang['ec_name_hint']='ان درج کردہ قدریوں کو URL میں محفوظ کریں نشان زدگی، تاریخ سے بازیافت، اور شیئرنگ کے لیے';
 $ec_lang['ec_name_invalid']='صرف حروف، ہندسے، اسپیسز، – _ . استعمال کریں';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='ڈارسی-وائسباخ پائپ دباؤ نقصان';
 $ec_lang['dw_main_title']='مفت آنلائن ڈارسی-وائسباخ پائپ دباؤ نقصان حاسبہ';
 $ec_lang['dw_main_desc']='دیے گئے قطر، کھردرا پن اور بہاؤ پر ڈارسی-وائسباخ پائپ دباؤ نقصان';
 $ec_lang['dw_roughness']='ڈارسی-وائسباخ مطلق کھردرا پن، e';
-$ec_lang['dw_kinematic_viscosity']='حرکیاتی چپچپاہٹ، &nu; <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water at 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['dw_kinematic_viscosity']='حرکیاتی چپچپاہٹ، &nu; <span title="1×10⁻⁶ m²/s for clean water at 20°C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['dw_reynolds_number']='رینولڈز عدد، Re';
 $ec_lang['dw_flow_regime']='بہاؤ کی نوع';
 $ec_lang['dw_regime_laminar']='ورقی';
@@ -319,7 +320,7 @@ $ec_lang['ps_diameter']='پینسٹاک قطر، D';
 $ec_lang['ps_length']='پینسٹاک لمبائی، L';
 $ec_lang['ps_roughness']='پائپ کی کھردرت، e';
 $ec_lang['ps_km']='ثانوی نقصان عامل، k<sub>m</sub> <span title="Sum of all junction and fitting loss coefficients along the penstock" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
-$ec_lang['ps_nu']='حرکیاتی چپچپاہٹ، &nu; <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water near 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['ps_nu']='حرکیاتی چپچپاہٹ، &nu; <span title="1×10⁻⁶ m²/s for clean water near 20°C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['ps_efficiency']='پلانٹ کارکردگی، &eta; (0&ndash;1)';
 $ec_lang['ps_velocity']='بہاؤ کی رفتار، v';
 $ec_lang['ps_vel_check']='رفتار کی جانچ';
@@ -350,6 +351,10 @@ $ec_lang['ps_notes_5_def']='مخصوص مطلق کھردرت: اسٹیل (نیا
 
 // About
 $ec_lang['about_main_menu']='کے بارے میں';
+$ec_lang['install_main_menu']='انسٹال کریں';
+$ec_lang['install_main_title']='EngCalcs انسٹال کریں';
+$ec_lang['install_main_desc']='آف لائن استعمال کے لیے اپنے آلے میں شامل کریں';
+$ec_lang['contact_main_menu']='رابطہ';
 $ec_lang['about_main_title']='HawsEDC انجینئرنگ کیلکولیٹرز کے بارے میں';
 $ec_lang['about_main_desc']='مشن، اوپن سورس اور تعاون';
 

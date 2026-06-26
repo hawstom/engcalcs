@@ -49,6 +49,7 @@ $ec_lang['menu_brand']='HawsEDC Rechner';
 $ec_lang['menu_main_list']='Rechnerliste';
 $ec_lang['menu_main_hydraulics']='Hydraulik';
 $ec_lang['menu_main_language']='Sprache';
+$ec_lang['menu_more']='Mehr';
 $ec_lang['template_welcome']='&gt;&gt; Lasst Eure Ängste an der Tür; hier wird Liebe gesprochen. Ihr ruiniert nicht alles. Genießt auch die <a target="_blank" href="https://hawsedc.com/download.php">kostenlosen HawsEDC AutoCAD-Tools.</a> &lt;&lt;';
 $ec_lang['template_translation_help']='Haben Sie eine großartige Idee für einen Rechner, der hier hinzugefügt werden soll?  Können Sie mir helfen, Übersetzungen zu verbessern, zu programmieren oder diese Rechner zu hosten?  ';
 $ec_lang['template_feedback']='Bitte teilen Sie uns Ihre wertvollen Anmerkungen oder Ihr Lob mit. Hat dieser kostenlose Rechner Ihre Erwartungen übertroffen?';
@@ -66,14 +67,14 @@ $ec_lang['view_hide_line']='[Diese Zeile ausblenden]';
 $ec_lang['view_printable']='Druckversion (Seite neu laden zum Zurücksetzen)';
 $ec_lang['ec_name_label']='Diese Berechnung speichern:';
 $ec_lang['ec_name_placeholder']='Name';
-$ec_lang['ec_name_hint']='Speichert diese Berechnung in der URL zum Lesezeichen, zum Abrufen aus dem Verlauf und zum Teilen';
+$ec_lang['ec_name_hint']='Speichert diese Eingaben in der URL zum Lesezeichen, zum Abrufen aus dem Verlauf und zum Teilen';
 $ec_lang['ec_name_invalid']='Nur Buchstaben, Zahlen, Leerzeichen, – _ . verwenden';
 // Darcy-Weisbach
 $ec_lang['dw_main_menu']='Rohrreibungsverlust Darcy-Weisbach';
 $ec_lang['dw_main_title']='Kostenloser Online-Rechner Rohrreibungsverlust Darcy-Weisbach';
 $ec_lang['dw_main_desc']='Rohrreibungsverlust nach Darcy-Weisbach bei gegebenem Durchmesser, Rauheit und Durchfluss';
 $ec_lang['dw_roughness']='Absolute Rauheit Darcy-Weisbach, e';
-$ec_lang['dw_kinematic_viscosity']='Kinematische Viskosität, &nu; <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water at 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['dw_kinematic_viscosity']='Kinematische Viskosität, &nu; <span title="1×10⁻⁶ m²/s for clean water at 20°C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['dw_reynolds_number']='Reynolds-Zahl, Re';
 $ec_lang['dw_flow_regime']='Strömungsregime';
 $ec_lang['dw_regime_laminar']='laminare Strömung';
@@ -347,6 +348,10 @@ $ec_lang['ps_notes_5_def']='Typische absolute Rauheit: Stahl (neu) 0,046&nbsp;mm
 
 // About
 $ec_lang['about_main_menu']='Über';
+$ec_lang['install_main_menu']='Installieren';
+$ec_lang['install_main_title']='EngCalcs installieren';
+$ec_lang['install_main_desc']='Zum Gerät hinzufügen für Offline-Nutzung';
+$ec_lang['contact_main_menu']='Kontakt';
 $ec_lang['about_main_title']='Über die HawsEDC-Ingenieurrechner';
 $ec_lang['about_main_desc']='Mission, Open Source und Mitwirken';
 

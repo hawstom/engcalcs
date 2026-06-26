@@ -49,6 +49,7 @@ $ec_lang['menu_brand']='Kalkulator HawsEDC';
 $ec_lang['menu_main_list']='Daftar Kalkulator';
 $ec_lang['menu_main_hydraulics']='Hidraulika';
 $ec_lang['menu_main_language']='Bahasa';
+$ec_lang['menu_more']='Lainnya';
 $ec_lang['template_welcome']='&gt;&gt; Buang rasa takutmu di pintu; di sini cinta adalah bahasa kami. Kamu tidak merusak segalanya. Nikmati juga <a target="_blank" href="https://hawsedc.com/download.php">alat AutoCAD HawsEDC gratis</a>. &lt;&lt;';
 $ec_lang['template_translation_help']='Apakah Anda memiliki visi luar biasa untuk kalkulator yang ingin ditambahkan di sini?  Bisakah Anda membantu meningkatkan terjemahan, memprogram, atau meng-host kalkulator ini?  ';
 $ec_lang['template_feedback']='Silakan berikan masukan atau pujian yang berharga. Apakah kalkulator gratis ini melebihi harapan Anda di segala hal?';
@@ -66,14 +67,14 @@ $ec_lang['view_hide_line']='[Sembunyikan baris ini]';
 $ec_lang['view_printable']='Versi cetak (muat ulang untuk memulihkan)';
 $ec_lang['ec_name_label']='Simpan perhitungan ini:';
 $ec_lang['ec_name_placeholder']='Nama';
-$ec_lang['ec_name_hint']='Menyimpan perhitungan ini ke URL untuk penanda halaman, pengambilan riwayat, dan berbagi';
+$ec_lang['ec_name_hint']='Menyimpan nilai masukan ini ke URL untuk penanda halaman, pengambilan riwayat, dan berbagi';
 $ec_lang['ec_name_invalid']='Gunakan hanya huruf, angka, spasi, – _ .';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Kehilangan Tinggi Tekan Darcy-Weisbach';
 $ec_lang['dw_main_title']='Kalkulator Kehilangan Tinggi Tekan Pipa Darcy-Weisbach Gratis Daring';
 $ec_lang['dw_main_desc']='Kehilangan Tinggi Tekan Pipa Darcy-Weisbach pada Diameter, Kekasaran, dan Debit Tertentu';
 $ec_lang['dw_roughness']='Kekasaran absolut Darcy-Weisbach, e';
-$ec_lang['dw_kinematic_viscosity']='Viskositas kinematik, &nu; <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water at 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['dw_kinematic_viscosity']='Viskositas kinematik, &nu; <span title="1×10⁻⁶ m²/s for clean water at 20°C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['dw_reynolds_number']='Bilangan Reynolds, Re';
 $ec_lang['dw_flow_regime']='Regime aliran';
 $ec_lang['dw_regime_laminar']='aliran laminar';
@@ -316,7 +317,7 @@ $ec_lang['ps_diameter']='Diameter pipa penstock, D';
 $ec_lang['ps_length']='Panjang pipa penstock, L';
 $ec_lang['ps_roughness']='Kekasaran pipa, e';
 $ec_lang['ps_km']='Koefisien kehilangan minor, k<sub>m</sub> <span title="Sum of all junction and fitting loss coefficients along the penstock" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
-$ec_lang['ps_nu']='Viskositas kinematik, &nu; <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water near 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['ps_nu']='Viskositas kinematik, &nu; <span title="1×10⁻⁶ m²/s for clean water near 20°C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['ps_efficiency']='Efisiensi instalasi, &eta; (0&ndash;1)';
 $ec_lang['ps_velocity']='Kecepatan aliran, v';
 $ec_lang['ps_vel_check']='Pemeriksaan kecepatan';
@@ -347,6 +348,10 @@ $ec_lang['ps_notes_5_def']='Kekasaran absolut tipikal: baja (baru) 0.046&nbsp;mm
 
 // About
 $ec_lang['about_main_menu']='Tentang';
+$ec_lang['install_main_menu']='Instal';
+$ec_lang['install_main_title']='Instal EngCalcs';
+$ec_lang['install_main_desc']='Tambahkan ke perangkat Anda untuk penggunaan offline';
+$ec_lang['contact_main_menu']='Kontak';
 $ec_lang['about_main_title']='Tentang Kalkulator Teknik HawsEDC';
 $ec_lang['about_main_desc']='Misi, Sumber Terbuka, dan Kontribusi';
 

@@ -134,6 +134,7 @@ $ec_lang['menu_brand']='Calculatoare HawsEDC';
 $ec_lang['menu_main_list']='Listă de calculatoare';
 $ec_lang['menu_main_hydraulics']='Hidraulică';
 $ec_lang['menu_main_language']='Limbă';
+$ec_lang['menu_more']='Mai mult';
 $ec_lang['template_welcome']='&gt;&gt; Lasă temerile la ușă; dragostea se vorbește aici. Nu stricați totul. Bucurați-vă și de <a target="_blank" href="https://hawsedc.com/download.php">instrumentele gratuite HawsEDC AutoCAD</a>. &lt;&lt;';
 $ec_lang['template_translation_help']='Aveți o viziune excelentă pentru un calculator de adăugat aici?  Mă puteți ajuta să îmbunătățesc traducerile, să programez sau să găzduiesc aceste calculatoare?  ';
 $ec_lang['template_feedback']='Vă rugăm să ne transmiteți sugestiile sau aprecierile dumneavoastră valoroase. Acest calculator gratuit v-a depășit așteptările în orice privință?';
@@ -145,7 +146,7 @@ $ec_lang['view_hide_line']='[Ascunde această linie]';
 $ec_lang['view_printable']='Versiune tipăribilă (reîncărcați/actualizați pentru a restaura)';
 $ec_lang['ec_name_label']='Salvați acest calcul:';
 $ec_lang['ec_name_placeholder']='Nume';
-$ec_lang['ec_name_hint']='Salvează acest calcul în URL pentru marcaj, recuperare istoric și partajare';
+$ec_lang['ec_name_hint']='Salvează valorile introduse în URL pentru marcaj, recuperare istoric și partajare';
 $ec_lang['ec_name_invalid']='Utilizați doar litere, cifre, spații, – _ .';
 $ec_lang['points_data_help']='(sau Copiați/Lipiți folosind zona de date)';
 $ec_lang['points_data_title']='Date puncte<br />(separate prin virgulă sau tabulație)';
@@ -156,7 +157,7 @@ $ec_lang['dw_main_menu']='Pierdere de Sarcină Conductă Darcy-Weisbach';
 $ec_lang['dw_main_title']='Calculator Gratuit Online Pierdere de Sarcină Conductă Darcy-Weisbach';
 $ec_lang['dw_main_desc']='Pierdere de Sarcină Conductă Darcy-Weisbach la Diametru, Rugozitate și Debit Date';
 $ec_lang['dw_roughness']='Rugozitate absolută Darcy-Weisbach, e';
-$ec_lang['dw_kinematic_viscosity']='Vâscozitate cinematică, &nu; <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water at 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['dw_kinematic_viscosity']='Vâscozitate cinematică, &nu; <span title="1×10⁻⁶ m²/s for clean water at 20°C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['dw_reynolds_number']='Numărul Reynolds, Re';
 $ec_lang['dw_flow_regime']='Regimul de curgere';
 $ec_lang['dw_regime_laminar']='curgere laminară';
@@ -321,7 +322,7 @@ $ec_lang['ps_diameter']='Diametrul conductei forțate, D';
 $ec_lang['ps_length']='Lungimea conductei forțate, L';
 $ec_lang['ps_roughness']='Rugozitatea conductei, e';
 $ec_lang['ps_km']='Minor loss coefficient, k<sub>m</sub> <span title="Sum of all junction and fitting loss coefficients along the penstock" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
-$ec_lang['ps_nu']='Kinematic viscosity, &nu; <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water near 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['ps_nu']='Kinematic viscosity, &nu; <span title="1×10⁻⁶ m²/s for clean water near 20°C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['ps_efficiency']='Randamentul centralei, &eta; (0&ndash;1)';
 $ec_lang['ps_velocity']='Viteza de curgere, v';
 $ec_lang['ps_vel_check']='Verificarea vitezei';
@@ -352,6 +353,10 @@ $ec_lang['ps_notes_5_def']='Rugozitate absolută tipică: oțel (nou) 0.046&nbsp
 
 // About
 $ec_lang['about_main_menu']='Despre';
+$ec_lang['install_main_menu']='Instalare';
+$ec_lang['install_main_title']='Instalează EngCalcs';
+$ec_lang['install_main_desc']='Adaugă pe dispozitiv pentru utilizare offline';
+$ec_lang['contact_main_menu']='Contact';
 $ec_lang['about_main_title']='Despre calculatoarele de inginerie HawsEDC';
 $ec_lang['about_main_desc']='Misiune, sursă deschisă și contribuții';
 

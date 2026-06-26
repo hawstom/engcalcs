@@ -49,6 +49,7 @@ $ec_lang['menu_brand']='Kalkulačky HawsEDC';
 $ec_lang['menu_main_list']='Seznam kalkulaček';
 $ec_lang['menu_main_hydraulics']='Hydraulika';
 $ec_lang['menu_main_language']='Jazyk';
+$ec_lang['menu_more']='Více';
 $ec_lang['template_welcome']='&gt;&gt; Nechejte strachy za dveřmi; zde je láska naším jazykem. Nekazíte vše. Užijte si také <a target="_blank" href="https://hawsedc.com/download.php">zdarma nástroje HawsEDC pro AutoCAD.</a> &lt;&lt;';
 $ec_lang['template_translation_help']='Máte skvělou vizi pro kalkulačku, která by mohla být přidána zde?  Můžete mi pomoci zlepšit překlady, programovat nebo hostovat tyto kalkulačky?  ';
 $ec_lang['template_feedback']='Prosíme, podělte se o vaše cenné připomínky nebo pochvaly. Překonala tato bezplatná kalkulačka vaše očekávání?';
@@ -66,14 +67,14 @@ $ec_lang['view_hide_line']='[Skrýt tento řádek]';
 $ec_lang['view_printable']='Verze pro tisk (obnovit pro vrácení)';
 $ec_lang['ec_name_label']='Uložit tento výpočet:';
 $ec_lang['ec_name_placeholder']='Název';
-$ec_lang['ec_name_hint']='Uloží tento výpočet do adresy URL pro přidání do záložek, načtení z historie a sdílení';
+$ec_lang['ec_name_hint']='Uloží tyto zadané hodnoty do adresy URL pro přidání do záložek, načtení z historie a sdílení';
 $ec_lang['ec_name_invalid']='Používejte pouze písmena, číslice, mezery, – _ .';
 // Darcy-Weisbach
 $ec_lang['dw_main_menu']='Ztráta tlaku v potrubí Darcy-Weisbach';
 $ec_lang['dw_main_title']='Bezplatný online kalkulátor ztrát tlaku v potrubí Darcy-Weisbach';
 $ec_lang['dw_main_desc']='Ztráta tlaku v potrubí dle Darcy-Weisbach při daném průměru, drsnosti a průtoku';
 $ec_lang['dw_roughness']='Absolutní drsnost Darcy-Weisbach, e';
-$ec_lang['dw_kinematic_viscosity']='Kinematická viskozita, ν <span title="1&times;10&minus;&sup6; m&sup2;/s pro čistou vodu při 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['dw_kinematic_viscosity']='Kinematická viskozita, ν <span title="1×10⁻⁶ m²/s pro čistou vodu při 20°C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['dw_reynolds_number']='Reynoldsovo číslo, Re';
 $ec_lang['dw_flow_regime']='Režim proudění';
 $ec_lang['dw_regime_laminar']='laminární';
@@ -316,7 +317,7 @@ $ec_lang['ps_diameter']='Průměr přiváděcího potrubí, D';
 $ec_lang['ps_length']='Délka přiváděcího potrubí, L';
 $ec_lang['ps_roughness']='Drsnost potrubí, e';
 $ec_lang['ps_km']='Součinitel místní ztráty, k<sub>m</sub> <span title="Součet všech součinitelů ztrát na armaturách a conectích v přiváděcím potrubí" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
-$ec_lang['ps_nu']='Kinematická viskozita, ν <span title="1&times;10&minus;&sup6; m&sup2;/s pro čistou vodu poblíž 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['ps_nu']='Kinematická viskozita, ν <span title="1×10⁻⁶ m²/s pro čistou vodu poblíž 20°C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['ps_efficiency']='Účinnost elektrárny, &eta; (0&ndash;1)';
 $ec_lang['ps_velocity']='Rychlost proudění, v';
 $ec_lang['ps_vel_check']='Kontrola rychlosti';
@@ -347,6 +348,10 @@ $ec_lang['ps_notes_5_def']='Typická absolutní drsnost: ocel (nová) 0.046&nbsp
 
 // About
 $ec_lang['about_main_menu']='O nás';
+$ec_lang['install_main_menu']='Nainstalovat';
+$ec_lang['install_main_title']='Nainstalovat EngCalcs';
+$ec_lang['install_main_desc']='Přidejte si na zařízení pro offline použití';
+$ec_lang['contact_main_menu']='Kontakt';
 $ec_lang['about_main_title']='O kalkulátorech HawsEDC';
 $ec_lang['about_main_desc']='Poslání, open source a přispívání';
 

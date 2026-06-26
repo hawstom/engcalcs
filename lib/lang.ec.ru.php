@@ -49,6 +49,7 @@ $ec_lang['menu_brand']='Калькуляторы HawsEDC';
 $ec_lang['menu_main_list']='Список калькуляторов';
 $ec_lang['menu_main_hydraulics']='Гидравлика';
 $ec_lang['menu_main_language']='Язык';
+$ec_lang['menu_more']='Ещё';
 $ec_lang['template_welcome']='&gt;&gt; Оставьте страхи за дверью; здесь говорят на языке любви. Вы не разрушаете всё. Наслаждайтесь также <a target="_blank" href="https://hawsedc.com/download.php">бесплатными инструментами HawsEDC для AutoCAD.</a> &lt;&lt;';
 $ec_lang['template_translation_help']='Есть ли у вас отличная идея для калькулятора, который можно добавить сюда?  Можете ли вы помочь мне улучшить переводы, программирование или хостинг этих калькуляторов?  ';
 $ec_lang['template_feedback']='Пожалуйста, поделитесь вашими ценными замечаниями или похвалой. Превзошёл ли этот бесплатный калькулятор ваши ожидания?';
@@ -66,14 +67,14 @@ $ec_lang['view_hide_line']='[Скрыть эту строку]';
 $ec_lang['view_printable']='Версия для печати (обновить страницу для восстановления)';
 $ec_lang['ec_name_label']='Сохранить этот расчёт:';
 $ec_lang['ec_name_placeholder']='Имя';
-$ec_lang['ec_name_hint']='Сохраняет этот расчёт в URL для сохранения в закладках, получения из истории и обмена';
+$ec_lang['ec_name_hint']='Сохраняет входные данные в URL для сохранения в закладках, получения из истории и обмена';
 $ec_lang['ec_name_invalid']='Используйте только буквы, цифры, пробелы, – _ .';
 // Darcy-Weisbach
 $ec_lang['dw_main_menu']='Потери давления в трубе Дарси-Вейсбах';
 $ec_lang['dw_main_title']='Бесплатный онлайн калькулятор потерь давления Дарси-Вейсбах';
 $ec_lang['dw_main_desc']='Потери давления в трубе по Дарси-Вейсбах при заданных диаметре, шероховатости и расходе';
 $ec_lang['dw_roughness']='Абсолютная шероховатость Дарси-Вейсбах, e';
-$ec_lang['dw_kinematic_viscosity']='Кинематическая вязкость, ν <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water at 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['dw_kinematic_viscosity']='Кинематическая вязкость, ν <span title="1×10⁻⁶ m²/s for clean water at 20°C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['dw_reynolds_number']='Число Рейнольдса, Re';
 $ec_lang['dw_flow_regime']='Режим течения';
 $ec_lang['dw_regime_laminar']='ламинарный';
@@ -316,7 +317,7 @@ $ec_lang['ps_diameter']='Диаметр пенстока, D';
 $ec_lang['ps_length']='Длина пенстока, L';
 $ec_lang['ps_roughness']='Шероховатость трубы, e';
 $ec_lang['ps_km']='Коэффициент местных потерь, k<sub>m</sub> <span title="Sum of all junction and fitting loss coefficients along the penstock" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
-$ec_lang['ps_nu']='Кинематическая вязкость, ν <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water near 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['ps_nu']='Кинематическая вязкость, ν <span title="1×10⁻⁶ m²/s for clean water near 20°C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['ps_efficiency']='КПД установки, &eta; (0&ndash;1)';
 $ec_lang['ps_velocity']='Скорость потока, v';
 $ec_lang['ps_vel_check']='Проверка скорости';
@@ -347,6 +348,10 @@ $ec_lang['ps_notes_5_def']='Типичная абсолютная шерохов
 
 // About
 $ec_lang['about_main_menu']='О нас';
+$ec_lang['install_main_menu']='Установить';
+$ec_lang['install_main_title']='Установить EngCalcs';
+$ec_lang['install_main_desc']='Добавить на устройство для работы офлайн';
+$ec_lang['contact_main_menu']='Контакт';
 $ec_lang['about_main_title']='Об инженерных калькуляторах HawsEDC';
 $ec_lang['about_main_desc']='Миссия, открытый исходный код и вклад';
 

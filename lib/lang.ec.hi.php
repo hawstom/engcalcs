@@ -52,6 +52,7 @@ $ec_lang['menu_brand']='HawsEDC कैलकुलेटर';
 $ec_lang['menu_main_list']='कैलकुलेटर सूची';
 $ec_lang['menu_main_hydraulics']='जलगतिकी';
 $ec_lang['menu_main_language']='भाषा';
+$ec_lang['menu_more']='अधिक';
 $ec_lang['template_welcome']='&gt;&gt; दरवाज़े पर अपने डर छोड़ें; यहाँ प्यार हमारी भाषा है। आप सब कुछ बर्बाद नहीं कर रहे। <a target="_blank" href="https://hawsedc.com/download.php">मुफ़्त HawsEDC AutoCAD टूल</a> भी आज़माएँ। &lt;&lt;';
 $ec_lang['template_translation_help']='क्या आपके पास यहाँ जोड़ने के लिए किसी कैलकुलेटर का शानदार विचार है? क्या आप अनुवाद सुधारने, प्रोग्राम करने, या इन कैलकुलेटरों को होस्ट करने में मदद कर सकते हैं?  ';
 $ec_lang['template_feedback']='कृपया अपने बहुमूल्य सुझाव या प्रशंसा दें। क्या इस मुफ़्त कैलकुलेटर ने हर तरह से आपकी उम्मीदों को पार किया?';
@@ -69,14 +70,14 @@ $ec_lang['view_hide_line']='[यह पंक्ति छुपाएँ]';
 $ec_lang['view_printable']='प्रिंट करने योग्य संस्करण (पुनर्स्थापित करने के लिए पुनः लोड करें)';
 $ec_lang['ec_name_label']='इस गणना को सहेजें:';
 $ec_lang['ec_name_placeholder']='नाम';
-$ec_lang['ec_name_hint']='इस गणना को बुकमार्किंग, इतिहास पुनः प्राप्त करने और साझा करने के लिए URL में सहेजता है';
+$ec_lang['ec_name_hint']='इन इनपुटों को बुकमार्किंग, इतिहास पुनः प्राप्त करने और साझा करने के लिए URL में सहेजता है';
 $ec_lang['ec_name_invalid']='केवल अक्षर, अंक, रिक्त स्थान, – _ . का उपयोग करें';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='डार्सी-वाइसबाख पाइप शीर्ष हानि';
 $ec_lang['dw_main_title']='मुफ़्त ऑनलाइन डार्सी-वाइसबाख पाइप शीर्ष हानि कैलकुलेटर';
 $ec_lang['dw_main_desc']='दिए गए व्यास, खुरदरापन और प्रवाह पर डार्सी-वाइसबाख पाइप शीर्ष हानि';
 $ec_lang['dw_roughness']='डार्सी-वाइसबाख निरपेक्ष खुरदरापन, e';
-$ec_lang['dw_kinematic_viscosity']='गतिक श्यानता, &nu; <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water at 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['dw_kinematic_viscosity']='गतिक श्यानता, &nu; <span title="1×10⁻⁶ m²/s for clean water at 20°C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['dw_reynolds_number']='रेनॉल्ड्स संख्या, Re';
 $ec_lang['dw_flow_regime']='प्रवाह व्यवस्था';
 $ec_lang['dw_regime_laminar']='स्तरीय';
@@ -319,7 +320,7 @@ $ec_lang['ps_diameter']='पेनस्टॉक व्यास, D';
 $ec_lang['ps_length']='पेनस्टॉक लंबाई, L';
 $ec_lang['ps_roughness']='पाइप खुरदरापन, e';
 $ec_lang['ps_km']='हानि गुणांक, k<sub>m</sub> <span title="Sum of all junction and fitting loss coefficients along the penstock" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
-$ec_lang['ps_nu']='गतिक श्यानता, &nu; <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water near 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['ps_nu']='गतिक श्यानता, &nu; <span title="1×10⁻⁶ m²/s for clean water near 20°C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['ps_efficiency']='संयंत्र दक्षता, &eta; (0&ndash;1)';
 $ec_lang['ps_velocity']='प्रवाह वेग, v';
 $ec_lang['ps_vel_check']='वेग जाँच';
@@ -350,6 +351,10 @@ $ec_lang['ps_notes_5_def']='सामान्य पूर्ण खुरद�
 
 // About
 $ec_lang['about_main_menu']='के बारे में';
+$ec_lang['install_main_menu']='इंस्टॉल करें';
+$ec_lang['install_main_title']='EngCalcs इंस्टॉल करें';
+$ec_lang['install_main_desc']='ऑफ़लाइन उपयोग के लिए अपने डिवाइस में जोड़ें';
+$ec_lang['contact_main_menu']='संपर्क';
 $ec_lang['about_main_title']='HawsEDC इंजीनियरिंग कैलकुलेटर के बारे में';
 $ec_lang['about_main_desc']='मिशन, ओपन सोर्स और योगदान';
 

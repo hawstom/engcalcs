@@ -49,6 +49,7 @@ $ec_lang['menu_brand']='HawsEDC 计算器';
 $ec_lang['menu_main_list']='计算器列表';
 $ec_lang['menu_main_hydraulics']='水力学';
 $ec_lang['menu_main_language']='语言';
+$ec_lang['menu_more']='更多';
 $ec_lang['template_welcome']='&gt;&gt; 把恐惧留在门外；这里说爱的语言。你没有毁掉一切。同时享用免费的 <a target="_blank" href="https://hawsedc.com/download.php">HawsEDC AutoCAD 工具。</a> &lt;&lt;';
 $ec_lang['template_translation_help']='您是否有关于在此处添加计算器的绝妙构想？  您能帮助我改进翻译、编程或托管这些计算器吗？  ';
 $ec_lang['template_feedback']='请给我们有价值的建议或嘉许的话。此免费计算器是否在每个方面都超出您的预期？';
@@ -66,14 +67,14 @@ $ec_lang['view_hide_line']='[隐藏此行]';
 $ec_lang['view_printable']='打印版本（刷新页面可恢复）';
 $ec_lang['ec_name_label']='保存此计算：';
 $ec_lang['ec_name_placeholder']='名称';
-$ec_lang['ec_name_hint']='保存此计算到网址以方便书签、历史记录和分享';
+$ec_lang['ec_name_hint']='将这些输入值保存到网址中以便书签、历史记录和分享';
 $ec_lang['ec_name_invalid']='仅允许字母、数字、空格、– _ .';
 // Darcy-Weisbach
 $ec_lang['dw_main_menu']='达西-韦斯巴赫管道水头损失';
 $ec_lang['dw_main_title']='免费在线达西-韦斯巴赫管道水头损失计算器';
 $ec_lang['dw_main_desc']='在给定管径、粗糙度和流量条件下的达西-韦斯巴赫管道水头损失';
 $ec_lang['dw_roughness']='达西-韦斯巴赫绝对粗糙度，e';
-$ec_lang['dw_kinematic_viscosity']='运动粘度，&nu; <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water at 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['dw_kinematic_viscosity']='运动粘度，&nu; <span title="1×10⁻⁶ m²/s for clean water at 20°C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['dw_reynolds_number']='雷诺数，Re';
 $ec_lang['dw_flow_regime']='流态';
 $ec_lang['dw_regime_laminar']='层流';
@@ -316,7 +317,7 @@ $ec_lang['ps_diameter']='压力管道直径，D';
 $ec_lang['ps_length']='压力管道长度，L';
 $ec_lang['ps_roughness']='管道粗糙度，e';
 $ec_lang['ps_km']='局部损失系数，k<sub>m</sub> <span title="Sum of all junction and fitting loss coefficients along the penstock" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
-$ec_lang['ps_nu']='运动粘度，&nu; <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water near 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['ps_nu']='运动粘度，&nu; <span title="1×10⁻⁶ m²/s for clean water near 20°C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['ps_efficiency']='水电站效率，&eta;（0&ndash;1）';
 $ec_lang['ps_velocity']='流速，v';
 $ec_lang['ps_vel_check']='流速校核';
@@ -347,6 +348,10 @@ $ec_lang['ps_notes_5_def']='典型绝对粗糙度：钢管（新）0.046&nbsp;mm
 
 // About
 $ec_lang['about_main_menu']='关于';
+$ec_lang['install_main_menu']='安装';
+$ec_lang['install_main_title']='安装 EngCalcs';
+$ec_lang['install_main_desc']='添加到您的设备以供离线使用';
+$ec_lang['contact_main_menu']='联系';
 $ec_lang['about_main_title']='关于 HawsEDC 工程计算器';
 $ec_lang['about_main_desc']='使命、开源与贡献';
 

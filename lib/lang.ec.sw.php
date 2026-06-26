@@ -52,6 +52,7 @@ $ec_lang['menu_brand']='Vikokotoo vya HawsEDC';
 $ec_lang['menu_main_list']='Orodha ya Vikokotoo';
 $ec_lang['menu_main_hydraulics']='Majimajii';
 $ec_lang['menu_main_language']='Lugha';
+$ec_lang['menu_more']='Zaidi';
 $ec_lang['template_welcome']='&gt;&gt; Acha wasiwasi wako mlangoni; hapa upendo unasemwa. Huharibu kila kitu. Furahia <a target="_blank" href="https://hawsedc.com/download.php">zana za bure za HawsEDC AutoCAD</a> pia. &lt;&lt;';
 $ec_lang['template_translation_help']='Je, una wazo zuri la kikokotoo cha kuongeza hapa? Je, unaweza kunisaidia kuboresha tafsiri, kupanga programu, au kuweka vikokotoo hivi?  ';
 $ec_lang['template_feedback']='Tafadhali tupe maoni yako ya thamani au sifa. Je, kikokotoo hiki cha bure kilivuka matarajio yako kwa kila njia?';
@@ -69,14 +70,14 @@ $ec_lang['view_hide_line']='[Ficha mstari huu]';
 $ec_lang['view_printable']='Toleo la kuchapishwa (pakia upya ili kurejesha)';
 $ec_lang['ec_name_label']='Hifadhi hesabu hii:';
 $ec_lang['ec_name_placeholder']='Jina';
-$ec_lang['ec_name_hint']='Huhifadhi hesabu hii kwenye URL kwa ajili ya kuweka alama, kurejea historia, na kushiriki';
+$ec_lang['ec_name_hint']='Huhifadhi maingizo haya kwenye URL kwa ajili ya kuweka alama, kurejea historia, na kushiriki';
 $ec_lang['ec_name_invalid']='Tumia tu herufi, nambari, nafasi, – _ .';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Upotevu wa Kichwa cha Bomba la Darcy-Weisbach';
 $ec_lang['dw_main_title']='Kikokotoo cha Bure Mtandaoni cha Upotevu wa Kichwa cha Bomba la Darcy-Weisbach';
 $ec_lang['dw_main_desc']='Upotevu wa Kichwa cha Bomba la Darcy-Weisbach kwa Kipenyo, Ukakamavu, na Mtiririko Uliowekwa';
 $ec_lang['dw_roughness']='Ukakamavu kamili wa Darcy-Weisbach, e';
-$ec_lang['dw_kinematic_viscosity']='Mnato wa kinematik, &nu; <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water at 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['dw_kinematic_viscosity']='Mnato wa kinematik, &nu; <span title="1×10⁻⁶ m²/s for clean water at 20°C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['dw_reynolds_number']='Nambari ya Reynolds, Re';
 $ec_lang['dw_flow_regime']='Utaratibu wa mtiririko';
 $ec_lang['dw_regime_laminar']='lamlam';
@@ -319,7 +320,7 @@ $ec_lang['ps_diameter']='Kipenyo cha bomba la shinikizo, D';
 $ec_lang['ps_length']='Urefu wa bomba la shinikizo, L';
 $ec_lang['ps_roughness']='Ugumu wa bomba, e';
 $ec_lang['ps_km']='Mgawo wa hasara ndogo, k<sub>m</sub> <span title="Sum of all junction and fitting loss coefficients along the penstock" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
-$ec_lang['ps_nu']='Mnato wa kinematik, &nu; <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water near 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['ps_nu']='Mnato wa kinematik, &nu; <span title="1×10⁻⁶ m²/s for clean water near 20°C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['ps_efficiency']='Ufanisi wa mmea, &eta; (0&ndash;1)';
 $ec_lang['ps_velocity']='Kasi ya mtiririko, v';
 $ec_lang['ps_vel_check']='Ukaguzi wa kasi';
@@ -350,6 +351,10 @@ $ec_lang['ps_notes_5_def']='Ugumu kamili wa kawaida: chuma (kipya) 0.046&nbsp;mm
 
 // About
 $ec_lang['about_main_menu']='Kuhusu';
+$ec_lang['install_main_menu']='Sakinisha';
+$ec_lang['install_main_title']='Sakinisha EngCalcs';
+$ec_lang['install_main_desc']='Ongeza kwenye kifaa chako kwa matumizi bila mtandao';
+$ec_lang['contact_main_menu']='Wasiliana';
 $ec_lang['about_main_title']='Kuhusu Vikokotoo vya Uhandisi HawsEDC';
 $ec_lang['about_main_desc']='Dhamira, Msimbo Wazi, na Kuchangia';
 

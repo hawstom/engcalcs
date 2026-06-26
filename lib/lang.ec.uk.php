@@ -52,6 +52,7 @@ $ec_lang['menu_brand']='HawsEDC Calculators';
 $ec_lang['menu_main_list']='Список калькуляторів';
 $ec_lang['menu_main_hydraulics']='Гідравліка';
 $ec_lang['menu_main_language']='Мова';
+$ec_lang['menu_more']='Ще';
 $ec_lang['template_welcome']='&gt;&gt; Залиш свої страхи за дверима; тут розмовляють мовою любові. Ти не все руйнуєш. Насолоджуйся також <a target="_blank" href="https://hawsedc.com/download.php">безкоштовними інструментами HawsEDC AutoCAD</a>. &lt;&lt;';
 $ec_lang['template_translation_help']='Чи маєте ви ідею для нового калькулятора? Чи можете допомогти з перекладом, програмуванням або розміщенням цих калькуляторів? ';
 $ec_lang['template_feedback']='Будь ласка, поділіться своїми цінними порадами або словами подяки. Чи перевершив цей безкоштовний калькулятор ваші очікування?';
@@ -69,14 +70,14 @@ $ec_lang['view_hide_line']='[Сховати цей рядок]';
 $ec_lang['view_printable']='Версія для друку (перезавантажте для відновлення)';
 $ec_lang['ec_name_label']='Збережіть цей розрахунок:';
 $ec_lang['ec_name_placeholder']='Назва';
-$ec_lang['ec_name_hint']='Зберігає цей розрахунок у URL для створення закладки, отримання історії та спільного доступу';
+$ec_lang['ec_name_hint']='Зберігає ці вхідні дані у URL для створення закладки, отримання історії та спільного доступу';
 $ec_lang['ec_name_invalid']='Використовуйте тільки букви, цифри, пробіли, – _ .';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Втрати напору в трубі за Darcy-Weisbach';
 $ec_lang['dw_main_title']='Безкоштовний онлайн-калькулятор втрат напору в трубі за Darcy-Weisbach';
 $ec_lang['dw_main_desc']='Втрати напору в трубі за Darcy-Weisbach при заданому діаметрі, шорсткості та витраті';
 $ec_lang['dw_roughness']='Абсолютна шорсткість Darcy-Weisbach, e';
-$ec_lang['dw_kinematic_viscosity']='Кінематична в’язкість, &nu; <span title="1&times;10&minus;&#8308; m&#8308;/s для чистої води при 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['dw_kinematic_viscosity']='Кінематична в’язкість, &nu; <span title="1×10⁻⁶ m²/s для чистої води при 20°C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['dw_reynolds_number']='Число Рейнольдса, Re';
 $ec_lang['dw_flow_regime']='Режим течії';
 $ec_lang['dw_regime_laminar']='ламінарний';
@@ -252,7 +253,7 @@ $ec_lang['ps_diameter']='Діаметр напірного трубопрово�
 $ec_lang['ps_length']='Довжина напірного трубопроводу, L';
 $ec_lang['ps_roughness']='Шорсткість труби, e';
 $ec_lang['ps_km']='Коефіцієнт місцевих втрат, k<sub>m</sub> <span title="Сума всіх коефіцієнтів місцевих втрат вздовж пеньківки" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
-$ec_lang['ps_nu']='Кінематична в\'язкість, &nu; <span title="1&times;10&minus;&#8308; m&#8308;/s для чистої води близько 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['ps_nu']='Кінематична в\'язкість, &nu; <span title="1×10⁻⁶ m²/s для чистої води близько 20°C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['ps_efficiency']='ККД установки, &eta; (0&ndash;1)';
 $ec_lang['ps_velocity']='Швидкість течії, v';
 $ec_lang['ps_vel_check']='Перевірка швидкості';
@@ -349,6 +350,10 @@ $ec_lang['contactSubmitButton']='Надіслати повідомлення';
 
 // About
 $ec_lang['about_main_menu']='Про';
+$ec_lang['install_main_menu']='Встановити';
+$ec_lang['install_main_title']='Встановити EngCalcs';
+$ec_lang['install_main_desc']='Додайте на пристрій для використання офлайн';
+$ec_lang['contact_main_menu']='Контакт';
 $ec_lang['about_main_title']='Про інженерні калькулятори HawsEDC';
 $ec_lang['about_main_desc']='Місія, відкритий код і внесок';
 

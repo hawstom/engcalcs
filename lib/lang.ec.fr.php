@@ -52,6 +52,7 @@ $ec_lang['menu_brand']='Calculateurs HawsEDC';
 $ec_lang['menu_main_list']='Liste des calculateurs';
 $ec_lang['menu_main_hydraulics']='Hydraulique';
 $ec_lang['menu_main_language']='Langue';
+$ec_lang['menu_more']='Plus';
 $ec_lang['template_welcome']='&gt;&gt; Laissez vos peurs à la porte; l\'amour est parlé ici. Vous ne ruinez pas tout. Profitez également des <a target="_blank" href="https://hawsedc.com/download.php">outils AutoCAD gratuits HawsEDC</a>. &lt;&lt;';
 $ec_lang['template_translation_help']="Avez-vous une grande vision pour une calculatrice à ajouter ici ?  Pouvez-vous m'aider à traduire ce calculateur dans votre langue ou l'héberger sur votre site web?";
 $ec_lang['template_feedback']="Donnez-nous vos précieux commentaires ou éloges. Ce calculateur gratuit a-t-il dépassé toutes vos attentes?";
@@ -69,14 +70,14 @@ $ec_lang['view_hide_line']='[Masquer cette ligne]';
 $ec_lang['view_printable']='Version imprimable (recharger pour restaurer)';
 $ec_lang['ec_name_label']='Enregistrer ce calcul :';
 $ec_lang['ec_name_placeholder']='Nom';
-$ec_lang['ec_name_hint']='Enregistre ce calcul dans l\'URL pour les signets, la récupération de l\'historique et le partage';
+$ec_lang['ec_name_hint']='Enregistre les données saisies dans l\'URL pour les signets, la récupération de l\'historique et le partage';
 $ec_lang['ec_name_invalid']='Utilisez uniquement lettres, chiffres, espaces, – _ .';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Perte de charge Darcy-Weisbach';
 $ec_lang['dw_main_title']='Calculateur gratuit en ligne de perte de charge Darcy-Weisbach';
 $ec_lang['dw_main_desc']='Perte de charge Darcy-Weisbach pour un diamètre, une rugosité et un débit donnés';
 $ec_lang['dw_roughness']='Rugosité absolue Darcy-Weisbach, e';
-$ec_lang['dw_kinematic_viscosity']='Viscosité cinématique, &nu; <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water at 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['dw_kinematic_viscosity']='Viscosité cinématique, &nu; <span title="1×10⁻⁶ m²/s for clean water at 20°C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['dw_reynolds_number']='Nombre de Reynolds, Re';
 $ec_lang['dw_flow_regime']='Régime d’écoulement';
 $ec_lang['dw_regime_laminar']='laminaire';
@@ -320,7 +321,7 @@ $ec_lang['ps_diameter']='Diamètre de la conduite forcée, D';
 $ec_lang['ps_length']='Longueur de la conduite forcée, L';
 $ec_lang['ps_roughness']='Rugosité de la conduite, e';
 $ec_lang['ps_km']='Coefficient de perte, k<sub>m</sub> <span title="Sum of all junction and fitting loss coefficients along the penstock" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
-$ec_lang['ps_nu']='Viscosité cinématique, &nu; <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water near 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['ps_nu']='Viscosité cinématique, &nu; <span title="1×10⁻⁶ m²/s for clean water near 20°C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['ps_efficiency']='Rendement de l\'installation, &eta; (0&ndash;1)';
 $ec_lang['ps_velocity']='Vitesse d\'écoulement, v';
 $ec_lang['ps_vel_check']='Vérification de la vitesse';
@@ -351,6 +352,10 @@ $ec_lang['ps_notes_5_def']='Rugosité absolue typique : acier (neuf) 0,046&nbsp;
 
 // About
 $ec_lang['about_main_menu']='À propos';
+$ec_lang['install_main_menu']='Installer';
+$ec_lang['install_main_title']='Installer EngCalcs';
+$ec_lang['install_main_desc']='Ajouter à votre appareil pour une utilisation hors ligne';
+$ec_lang['contact_main_menu']='Contact';
 $ec_lang['about_main_title']='À propos des calculateurs HawsEDC';
 $ec_lang['about_main_desc']='Mission, open source et contribution';
 

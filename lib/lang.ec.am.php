@@ -52,6 +52,7 @@ $ec_lang['menu_brand']='HawsEDC ካልኩሌተሮች';
 $ec_lang['menu_main_list']='የካልኩሌተሮች ዝርዝር';
 $ec_lang['menu_main_hydraulics']='ሃይድሮሊክስ';
 $ec_lang['menu_main_language']='ቋንቋ';
+$ec_lang['menu_more']='ተጨማሪ';
 $ec_lang['template_welcome']='&gt;&gt; ፍርሃትህን በር ላይ ትተህ ግባ; ፍቅር እዚህ ይነገራል። ሁሉንም ነገር አታበላሽም። <a target="_blank" href="https://hawsedc.com/download.php">ነፃ HawsEDC AutoCAD መሣሪያዎችን</a> ደግሞ ተጠቀም። &lt;&lt;';
 $ec_lang['template_translation_help']='ለዚህ ቦታ ለመጨመር ጥሩ ሃሳብ አለህ? ትርጉም ለማሻሻል፣ ፕሮግራም ለማዘጋጀት፣ ወይም ካልኩሌተሮቹን ለማስተናገድ ልትረዳኝ ትችላለህ?  ';
 $ec_lang['template_feedback']='እባክህ ሃሳብህን ወይም ምስጋናህን ስጠን። ይህ ነፃ ካልኩሌተር በሁሉም ረገድ ከምትጠብቀው በላይ ሆኗል?';
@@ -69,14 +70,14 @@ $ec_lang['view_hide_line']='[ይህን መስመር ደብቅ]';
 $ec_lang['view_printable']='ሊታተም የሚችል እትም (ለመመለስ አደስ)';
 $ec_lang['ec_name_label']='ይህን ስሌት አስቀምጥ:';
 $ec_lang['ec_name_placeholder']='ስም';
-$ec_lang['ec_name_hint']='ይህን ስሌት ወደ URL ያስቀምጣል በደንብ ምልክት ለመስጠት ታሪክ ማግኛ እና ማጋራት';
+$ec_lang['ec_name_hint']='እነዚህ ግቤቶች ወደ URL ያስቀምጣል በደንብ ምልክት ለመስጠት ታሪክ ማግኛ እና ማጋራት';
 $ec_lang['ec_name_invalid']='ፊደላት፣ ቁጥሮች፣ ክፍተቶች፣ – _ . ብቻ ይጠቀሙ';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Darcy-Weisbach የቧንቧ ጭንቅ ኪሳራ';
 $ec_lang['dw_main_title']='ነፃ ኦንላይን Darcy-Weisbach የቧንቧ ጭንቅ ኪሳራ ካልኩሌተር';
 $ec_lang['dw_main_desc']='Darcy-Weisbach የቧንቧ ጭንቅ ኪሳራ በተሰጠ ዲያሜትር፣ ሻካሪነት እና ፍሰት';
 $ec_lang['dw_roughness']='Darcy-Weisbach ፍጹም ሻካሪነት, e';
-$ec_lang['dw_kinematic_viscosity']='ኪኔማቲክ ቪስኮሲቲ, &nu; <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water at 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['dw_kinematic_viscosity']='ኪኔማቲክ ቪስኮሲቲ, &nu; <span title="1×10⁻⁶ m²/s for clean water at 20°C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['dw_reynolds_number']='ሬይኖልዶስ ቁጥር, Re';
 $ec_lang['dw_flow_regime']='የፍሰት አገዛዝ';
 $ec_lang['dw_regime_laminar']='ላሚናር';
@@ -319,7 +320,7 @@ $ec_lang['ps_diameter']='የቧንቧ ዲያሜትር፣ D';
 $ec_lang['ps_length']='የቧንቧ ርዝማኔ፣ L';
 $ec_lang['ps_roughness']='የቧንቧ ሻካራነት፣ e';
 $ec_lang['ps_km']='ጠንካራ ኪሳራ ቅንጅት, k<sub>m</sub> <span title="Sum of all junction and fitting loss coefficients along the penstock" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
-$ec_lang['ps_nu']='የኪነማቲክ viscosity, &nu; <span title="1&times;10&minus;&sup6; m&sup2;/s for clean water near 20&deg;C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['ps_nu']='የኪነማቲክ viscosity, &nu; <span title="1×10⁻⁶ m²/s for clean water near 20°C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['ps_efficiency']='የፋብሪካ ብቃት፣ &eta; (0&ndash;1)';
 $ec_lang['ps_velocity']='የፍሰት ፍጥነት፣ v';
 $ec_lang['ps_vel_check']='የፍጥነት ምርመራ';
@@ -350,6 +351,10 @@ $ec_lang['ps_notes_5_def']='ተለምዷዊ ፍፁም ሻካራነት: ብረት
 
 // About
 $ec_lang['about_main_menu']='ስለ';
+$ec_lang['install_main_menu']='ጫን';
+$ec_lang['install_main_title']='EngCalcs ይጫኑ';
+$ec_lang['install_main_desc']='ያለኢንተርኔት ለመጠቀም ወደ መሳሪያዎ ያክሉ';
+$ec_lang['contact_main_menu']='አግኙን';
 $ec_lang['about_main_title']='ስለ HawsEDC የምህንድስና ካልኩሌተሮች';
 $ec_lang['about_main_desc']='ተልዕኮ፣ ክፍት ምንጭ እና አስተዋጽዖ';
 

@@ -111,17 +111,14 @@ function echoEngCalcsMenu ($html_title = '', $show_name_field = false, $calc_nam
 				</div>
 			</li>
 			<li class="nav-item dropdown">
-				<a class="nav-link dropdown-toggle active" id="dropdown-lang" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-					&#x1F310; <?=$language_settings['LANGNAME']?>
+				<a class="nav-link dropdown-toggle" id="dropdown-more" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					<?=$ec_lang['menu_more']?>
 				</a>
-				<div class="dropdown-menu" aria-labelledby="dropdown-lang">
-<?php foreach ($GLOBALS['all_language_settings'] as $key => $lang) : ?>
-					<a class="dropdown-item" href="<?=htmlspecialchars($_SERVER['PHP_SELF'], ENT_QUOTES, 'UTF-8')?>?lang=<?=$key?>" title="<?=$lang['LANGNAME']?>"><?=$lang['LANGNAME']?></a>
-<?php endforeach; ?>
+				<div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-more">
+					<a class="dropdown-item" href="About.php"><?=$ec_lang['about_main_menu']?></a>
+					<a class="dropdown-item" href="Install.php"><?=$ec_lang['install_main_menu']?></a>
+					<a class="dropdown-item" href="/contact.php"><?=$ec_lang['contact_main_menu']?></a>
 				</div>
-			</li>
-			<li class="nav-item">
-				<a class="nav-link" href="About.php"><?=$ec_lang['about_main_menu']?></a>
 			</li>
 		</ul>
 <?php if ($show_name_field) : ?>
@@ -138,6 +135,18 @@ function echoEngCalcsMenu ($html_title = '', $show_name_field = false, $calc_nam
 				autocomplete="off">
 		</form>
 <?php endif; ?>
+		<ul class="navbar-nav ms-auto">
+			<li class="nav-item dropdown">
+				<a class="nav-link dropdown-toggle active" id="dropdown-lang" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					&#x1F310; <?=$language_settings['LANGNAME']?>
+				</a>
+				<div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-lang">
+<?php foreach ($GLOBALS['all_language_settings'] as $key => $lang) : ?>
+					<a class="dropdown-item" href="<?=htmlspecialchars($_SERVER['PHP_SELF'], ENT_QUOTES, 'UTF-8')?>?lang=<?=$key?>" title="<?=$lang['LANGNAME']?>"><?=$lang['LANGNAME']?></a>
+<?php endforeach; ?>
+				</div>
+			</li>
+		</ul>
 	</div>
 </nav>
 <?php
