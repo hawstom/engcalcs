@@ -75,6 +75,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <form id="formInput" action="javascript:EngCalcs.submitForm()" method="post">
 	<input id="printable_title" name="printable_title" type="text" style="font-size: 2em; width: 98%" placeholder="<?=$ec_lang['template_printable_title']?>" onchange="EngCalcs.submitForm();" /><br />
 	<input id="printable_subtitle" name="printable_subtitle" type="text" style="font-size: 1.5em; width: 98%" placeholder="<?=$ec_lang['template_printable_subtitle']?>" onchange="EngCalcs.submitForm();" />
+	<div style="overflow-x:auto">
 	<table class="bare">
 		<tbody>
 			<tr class="collapse d-print-none<?php if ($flagHideUnits === false) : ?> show<?php endif; ?>" id="set_units_row">
@@ -129,6 +130,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			</tr>
 		</tbody>
 	</table>
+	</div>
 <?php endif; ?>
 <?php if ($flagFormAppend === true) {echoCalculatorFormAppend();} ?>
 </form>

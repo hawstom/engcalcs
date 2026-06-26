@@ -2,6 +2,38 @@
 // Loaded by the echoHTMLHead php function.
 // Master namespace object if not already exists.
 var EngCalcs = EngCalcs || {};
+
+// Touch-friendly tooltips: activate Bootstrap tooltips on all cursor:help elements
+// so they respond to tap (click trigger) in addition to hover on desktop.
+document.addEventListener('DOMContentLoaded', function () {
+	document.querySelectorAll('[title][style*="cursor:help"]').forEach(function (el) {
+		new bootstrap.Tooltip(el, { trigger: 'hover focus click' });
+	});
+});
+
+// PWA install prompt
+EngCalcs._deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', function (e) {
+	e.preventDefault();
+	EngCalcs._deferredInstallPrompt = e;
+	var btn = document.getElementById('ec-install-btn');
+	if (btn) btn.style.display = '';
+});
+window.addEventListener('appinstalled', function () {
+	EngCalcs._deferredInstallPrompt = null;
+	var btn = document.getElementById('ec-install-btn');
+	if (btn) btn.style.display = 'none';
+});
+EngCalcs.installPWA = function () {
+	'use strict';
+	if (!EngCalcs._deferredInstallPrompt) return;
+	EngCalcs._deferredInstallPrompt.prompt();
+	EngCalcs._deferredInstallPrompt.userChoice.then(function () {
+		EngCalcs._deferredInstallPrompt = null;
+		var btn = document.getElementById('ec-install-btn');
+		if (btn) btn.style.display = 'none';
+	});
+};
 EngCalcs.numCalcRows = 0;
 EngCalcs.cookieSlotsLength = 0;
 EngCalcs.pageTitle = '';

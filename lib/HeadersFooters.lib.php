@@ -38,6 +38,10 @@ $page_title = $calc_name ? $safe_name . ' — ' . $html_title : $html_title;
 	<title><?=$calc_name ? $safe_name . ' — ' . $html_title : $html_title?></title>
 	<link rel="manifest" href="/engcalcs/manifest.json">
 	<meta name="theme-color" content="#1a6faf">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="default">
+	<meta name="apple-mobile-web-app-title" content="EngCalcs">
+	<link rel="apple-touch-icon" href="/engcalcs/icons/icon-192.png">
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 
 <?php

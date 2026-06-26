@@ -1,6 +1,6 @@
 // EngCalcs Service Worker
 // Cache version — bump this string when static assets change
-const CACHE_VERSION = 'engcalcs-v1';
+const CACHE_VERSION = 'engcalcs-v2';
 const ASSET_CACHE = CACHE_VERSION + '-assets';
 const PAGE_CACHE  = CACHE_VERSION + '-pages';
 
@@ -24,6 +24,8 @@ const STATIC_ASSETS = [
   '/engcalcs/js/weir-flow-irregular.js',
   '/engcalcs/js/weir-flow-simple.js',
   '/engcalcs/icons/icon.svg',
+  '/engcalcs/icons/icon-192.png',
+  '/engcalcs/icons/icon-512.png',
   // Bootstrap from CDN
   'https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css',
   'https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js',

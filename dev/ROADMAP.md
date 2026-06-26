@@ -9,13 +9,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 # Tasks
 
 ## Calculator Improvements
-100|Touch tooltips: On touch screens, `title` attribute tooltips don't fire — long-press does nothing. Affects all `?` help tips and the "Save this calculation" label. Fix: make the `?` span (and the Save label) tappable to show the tip text inline or via a small popover. Should work on both desktop (hover) and mobile (tap). [CC]
-
-100|PWA on mobile — investigate: User cannot find any install indicator on mobile. Diagnose: is the PWA install prompt firing on Android Chrome? Does iOS Safari show "Add to Home Screen"? Is the manifest/sw.js scope correct? Report findings before building PWA evangelism UI (task below). [CC]
-
-90|Layout overflow: On a small screen the blue bounding box shrinks to fit the window but the results table overflows past the right edge. The box should be wide enough to contain all content (titles, inputs, results). Likely fix: `min-width` on the container or `overflow-x: auto` on the results table. [CC]
-
-80|PWA evangelism: Add an "Install this calculator" affordance to the navbar, before the Save field. Use `beforeinstallprompt` to show only when the browser offers install. Design depends on PWA-on-mobile investigation findings above. [CC]
 
 ## AI Efficiency Scripting (Overhead)
 
@@ -122,5 +115,13 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 - 0|Translations (multi-lingual): Evaluated cost/value of having a languages system in the post-2025 (AI) age. Decision: keep the system — engineering terminology mistranslates poorly in browser auto-translation. Improved fr (complete rewrite), bg (dw/hw/mi/wi sections added), tr (dw/hw/mi added).
 
 - 0|Orifice calculator phase 1: Orifice.php created with circular/rectangular shape selector, unit-aware inputs (D, W, invert elevation, HWE, Cd), results (centroid, h, area, Q, v, regime check), SVG profile sketch, and notes.
+
+- 0|Touch tooltips: Bootstrap Tooltip initialized on all `[title][style*="cursor:help"]` spans via DOMContentLoaded in Calculators.lib.js (`trigger: 'hover focus click'`). Tappable on mobile. `?` span added after Save label in navbar for the `ec_name_hint` text.
+
+- 0|PWA on mobile: PNG icons (192×192, 512×512) generated and added to manifest.json. Apple meta tags (`apple-mobile-web-app-capable`, `apple-touch-icon`, etc.) added to `<head>` via HeadersFooters.lib.php. SW cache bumped to v2. iOS requires manual "Add to Home Screen" from Safari share menu — `beforeinstallprompt` does not fire on iOS by design.
+
+- 0|Layout overflow: Wrapped `<table class="bare">` in `<div style="overflow-x:auto">` in `echoCalculatorForm()`. On narrow screens the table scrolls horizontally within the page rather than overflowing past the edge.
+
+- 0|PWA evangelism: "⬇ Install" button added to navbar (before Save field), hidden by default. Shown only when `beforeinstallprompt` fires (Android Chrome); hidden again on `appinstalled`. `EngCalcs.installPWA()` triggers the native install prompt. iOS users see no button (iOS does not fire `beforeinstallprompt`).
 
 - 0|Roadmap reorganized: grouped by theme, priorities differentiated so ties are intentional, descriptions tightened. Completed items moved to ## Completed section per instructions.
