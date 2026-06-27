@@ -85,12 +85,12 @@ EngCalcs.pageCalculator = function(objForm) {
 		}
 	}
 
-	this.psDrawSketch();
+	this.mhpDrawSketch();
 };
 
 EngCalcs.pageCalculatorInitialize = function(objForm) {};
 
-EngCalcs.psDrawSketch = function() {
+EngCalcs.mhpDrawSketch = function() {
 	var el = document.getElementById('sketch');
 	if (!el) { return; }
 	var v = this.var;
