@@ -296,9 +296,9 @@ $ec_lang['contact_success']='Хвала вам што сте одвојили в
 
 
 // Micro-Hydro Power
-$ec_lang['mhp_main_menu']='Пројектовање доводног цевовода';
-$ec_lang['mhp_main_title']='Бесплатни онлајн калкулатор доводног цевовода';
-$ec_lang['mhp_main_desc']='Димензионисање доводног цевовода за мало-хидро — губитак притиска, снага и брзина';
+$ec_lang['mhp_main_menu']='Мала хидроелектрана';
+$ec_lang['mhp_main_title']='Бесплатни онлајн калкулатор за малу хидроелектрану';
+$ec_lang['mhp_main_desc']='Калкулатор излазне снаге мале хидроелектране проточног типа';
 $ec_lang['mhp_flow']='Протицај, Q';
 $ec_lang['mhp_gross_head']='Бруто напор, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='Пречник цевовода, D';

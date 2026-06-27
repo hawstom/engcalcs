@@ -300,9 +300,9 @@ $ec_lang['points_data_title']='Данни за точки<br />(разделен
 
 
 // Micro-Hydro Power
-$ec_lang['mhp_main_menu']='Проектиране на напорен тръбопровод';
-$ec_lang['mhp_main_title']='Безплатен онлайн калкулатор за напорен тръбопровод';
-$ec_lang['mhp_main_desc']='Оразмеряване на напорен тръбопровод за микрохидро — загуба на напор, мощност и скорост';
+$ec_lang['mhp_main_menu']='Микро-ВЕЦ';
+$ec_lang['mhp_main_title']='Безплатен онлайн калкулатор за мощност на микро-ВЕЦ';
+$ec_lang['mhp_main_desc']='Калкулатор за изходна мощност на микро-ВЕЦ с деривационна схема';
 $ec_lang['mhp_flow']='Дебит, Q';
 $ec_lang['mhp_gross_head']='Брутен напор, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='Диаметър на тръбопровода, D';

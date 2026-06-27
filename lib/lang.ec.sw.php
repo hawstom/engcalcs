@@ -294,9 +294,9 @@ $ec_lang['contact_success']='Asante kwa kuchukua muda wa kuandika.';
 
 
 // Micro-Hydro Power
-$ec_lang['mhp_main_menu']='Ubunifu wa Bomba la Shinikizo';
-$ec_lang['mhp_main_title']='Kikokotoo cha Bure cha Mtandaoni cha Bomba la Shinikizo';
-$ec_lang['mhp_main_desc']='Upangaji wa Bomba la Shinikizo la Micro-Hydro — Upotezaji wa Kichwa, Nguvu na Kasi';
+$ec_lang['mhp_main_menu']='Nguvu ya Micro-Hydro';
+$ec_lang['mhp_main_title']='Kikokotoo cha Bure cha Nguvu ya Micro-Hydro Mtandaoni';
+$ec_lang['mhp_main_desc']='Kikokotoo cha Uzalishaji wa Nguvu ya Micro-Hydro ya Mto';
 $ec_lang['mhp_flow']='Kiwango cha mtiririko, Q';
 $ec_lang['mhp_gross_head']='Kichwa jumla, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='Kipenyo cha bomba la shinikizo, D';

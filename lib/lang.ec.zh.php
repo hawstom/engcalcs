@@ -291,9 +291,9 @@ $ec_lang['contact_success']='感谢您抽出宝贵的时间来写信。';
 
 
 // Micro-Hydro Power
-$ec_lang['mhp_main_menu']='压力管道设计';
-$ec_lang['mhp_main_title']='免费在线压力管道设计计算器';
-$ec_lang['mhp_main_desc']='微型水电压力管道尺寸计算——水头损失、功率与流速';
+$ec_lang['mhp_main_menu']='微型水力发电';
+$ec_lang['mhp_main_title']='免费在线微型水力发电计算器';
+$ec_lang['mhp_main_desc']='径流式微型水力发电功率计算器';
 $ec_lang['mhp_flow']='流量，Q';
 $ec_lang['mhp_gross_head']='毛水头，H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='压力管道直径，D';

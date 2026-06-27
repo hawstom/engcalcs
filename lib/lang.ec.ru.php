@@ -291,9 +291,9 @@ $ec_lang['contact_success']='Спасибо, что потратили врем�
 
 
 // Micro-Hydro Power
-$ec_lang['mhp_main_menu']='Проектирование пенстока';
-$ec_lang['mhp_main_title']='Бесплатный онлайн-калькулятор проектирования пенстока';
-$ec_lang['mhp_main_desc']='Подбор пенстока для микро-ГЭС — потери напора, мощность и скорость';
+$ec_lang['mhp_main_menu']='Микро-ГЭС';
+$ec_lang['mhp_main_title']='Бесплатный онлайн-калькулятор мощности микро-ГЭС';
+$ec_lang['mhp_main_desc']='Калькулятор выработки мощности русловой микро-ГЭС';
 $ec_lang['mhp_flow']='Расход, Q';
 $ec_lang['mhp_gross_head']='Брутто-напор, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='Диаметр пенстока, D';

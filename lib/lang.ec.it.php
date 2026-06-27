@@ -291,9 +291,9 @@ $ec_lang['contact_success']='Grazie per aver dedicato il tempo a scrivere.';
 
 
 // Micro-Hydro Power
-$ec_lang['mhp_main_menu']='Progetto condotta forzata';
-$ec_lang['mhp_main_title']='Calcolatore gratuito online per condotte forzate';
-$ec_lang['mhp_main_desc']='Dimensionamento della condotta forzata micro-idroelettrica — Perdita di carico, potenza e velocità';
+$ec_lang['mhp_main_menu']='Micro-Idroelettrico';
+$ec_lang['mhp_main_title']='Calcolatore Gratuito di Potenza Micro-Idroelettrica';
+$ec_lang['mhp_main_desc']='Calcolatore di Potenza Micro-Idroelettrica ad Acqua Fluente';
 $ec_lang['mhp_flow']='Portata, Q';
 $ec_lang['mhp_gross_head']='Altezza lorda, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='Diametro della condotta forzata, D';

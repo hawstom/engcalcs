@@ -291,9 +291,9 @@ $ec_lang['contact_success']='সময় দিয়ে লেখার জন
 
 
 // Micro-Hydro Power
-$ec_lang['mhp_main_menu']='পেনস্টক ডিজাইন';
-$ec_lang['mhp_main_title']='বিনামূল্যে অনলাইন পেনস্টক ডিজাইন ক্যালকুলেটর';
-$ec_lang['mhp_main_desc']='মাইক্রো-হাইড্রো পেনস্টক আকার নির্ধারণ — মাথার ক্ষতি, শক্তি এবং বেগ';
+$ec_lang['mhp_main_menu']='মাইক্রো-হাইড্রো বিদ্যুৎ';
+$ec_lang['mhp_main_title']='বিনামূল্যে অনলাইন মাইক্রো-হাইড্রো বিদ্যুৎ ক্যালকুলেটর';
+$ec_lang['mhp_main_desc']='রান-অব-রিভার মাইক্রো-হাইড্রো বিদ্যুৎ উৎপাদন ক্যালকুলেটর';
 $ec_lang['mhp_flow']='প্রবাহ হার, Q';
 $ec_lang['mhp_gross_head']='মোট মাথা, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='পেনস্টক ব্যাস, D';

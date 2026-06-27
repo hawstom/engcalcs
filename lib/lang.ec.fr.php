@@ -295,9 +295,9 @@ $ec_lang['or_velocity']='Vitesse, v';
 
 
 // Micro-Hydro Power
-$ec_lang['mhp_main_menu']='Dimensionnement de conduite forcée';
-$ec_lang['mhp_main_title']='Calculateur gratuit en ligne de conduite forcée';
-$ec_lang['mhp_main_desc']='Dimensionnement de conduite forcée micro-hydraulique — Perte de charge, puissance et vitesse';
+$ec_lang['mhp_main_menu']='Micro-Hydroélectricité';
+$ec_lang['mhp_main_title']='Calculateur Gratuit de Puissance Micro-Hydroélectrique';
+$ec_lang['mhp_main_desc']='Calculateur de Puissance Micro-Hydroélectrique au Fil de l\'Eau';
 $ec_lang['mhp_flow']='Débit, Q';
 $ec_lang['mhp_gross_head']='Hauteur brute, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='Diamètre de la conduite forcée, D';

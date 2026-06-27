@@ -291,9 +291,9 @@ $ec_lang['contact_success']='Děkujeme za váš čas věnovaný napsání.';
 
 
 // Micro-Hydro Power
-$ec_lang['mhp_main_menu']='Návrh přiváděcího potrubí';
-$ec_lang['mhp_main_title']='Bezplatná online kalkulačka přiváděcího potrubí';
-$ec_lang['mhp_main_desc']='Dimenzování přiváděcího potrubí mikro-vodní elektrárny — ztráta tlakové výšky, výkon a rychlost';
+$ec_lang['mhp_main_menu']='Mikro-vodní elektrárna';
+$ec_lang['mhp_main_title']='Bezplatná online kalkulačka výkonu mikro-vodní elektrárny';
+$ec_lang['mhp_main_desc']='Kalkulačka výkonu průtočné mikro-vodní elektrárny';
 $ec_lang['mhp_flow']='Průtok, Q';
 $ec_lang['mhp_gross_head']='Hrubá tlaková výška, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='Průměr přiváděcího potrubí, D';

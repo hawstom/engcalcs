@@ -294,9 +294,9 @@ $ec_lang['contact_success']='ለመጻፍ ጊዜ ለወጣህ አመሰግናለ
 
 
 // Micro-Hydro Power
-$ec_lang['mhp_main_menu']='የቧንቧ ጫና ዲዛይን';
-$ec_lang['mhp_main_title']='ነፃ የኦንላይን የቧንቧ ጫና ዲዛይን ካልኩሌተር';
-$ec_lang['mhp_main_desc']='ማይክሮ-ሃይድሮ የቧንቧ መጠን ስሌት — የጫና ኪሳራ፣ ኃይልና ፍጥነት';
+$ec_lang['mhp_main_menu']='ማይክሮ-ሃይድሮ ኃይል';
+$ec_lang['mhp_main_title']='ነፃ የኦንላይን ማይክሮ-ሃይድሮ ኃይል ካልኩሌተር';
+$ec_lang['mhp_main_desc']='የወንዝ-ፍሰት ማይክሮ-ሃይድሮ ኃይል ውፅዓት ካልኩሌተር';
 $ec_lang['mhp_flow']='የፍሰት መጠን፣ Q';
 $ec_lang['mhp_gross_head']='ጠቅላላ ጫና፣ H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='የቧንቧ ዲያሜትር፣ D';

@@ -244,9 +244,9 @@ $ec_lang['or_notes_3_def']='C<sub>d</sub> ស្ថិតក្នុងចន�
 $ec_lang['or_notes_4_term']='ការជ្រុក';
 $ec_lang['or_notes_4_def']='នៅពេល TWE ស្ថិតនៅលើ invert រន្ធ ម៉ាស៊ីនគណនានេះអនុវត្ត orifice ជ្រុកដោយស្វ័យប្រវត្តិ ដោយប្រើ h = HWE &minus; TWE។ នៅពេល TWE ស្ថិតនៅ invert ឬក្រោម ហូរចេញសេរីត្រូវបានសន្មតថា h = HWE &minus; centroid។';
 // Micro-Hydro Power
-$ec_lang['mhp_main_menu']='ការរចនា Penstock';
-$ec_lang['mhp_main_title']='ម៉ាស៊ីនគណនារចនា Penstock ឥតគិតថ្លៃ';
-$ec_lang['mhp_main_desc']='ការកំណត់ទំហំ Penstock Micro-Hydro — ការបាត់បង់ទំនាប់ ថាមពល និងល្បឿន';
+$ec_lang['mhp_main_menu']='ថាមពល Micro-Hydro';
+$ec_lang['mhp_main_title']='ម៉ាស៊ីនគណនាថាមពល Micro-Hydro ឥតគិតថ្លៃ';
+$ec_lang['mhp_main_desc']='ម៉ាស៊ីនគណនាផលិតថាមពល Micro-Hydro Run-of-River';
 $ec_lang['mhp_flow']='អត្រាហូរ, Q';
 $ec_lang['mhp_gross_head']='ទំនាប់ brut, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='ប្រឡោះ penstock, D';

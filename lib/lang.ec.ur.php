@@ -294,9 +294,9 @@ $ec_lang['contact_success']='آپ کا وقت لگا کر لکھنے کے لیے
 
 
 // Micro-Hydro Power
-$ec_lang['mhp_main_menu']='پینسٹاک ڈیزائن';
-$ec_lang['mhp_main_title']='مفت آن لائن پینسٹاک ڈیزائن کیلکولیٹر';
-$ec_lang['mhp_main_desc']='مائیکرو-ہائیڈرو پینسٹاک سائزنگ — سر کا نقصان، طاقت اور رفتار';
+$ec_lang['mhp_main_menu']='مائیکرو-ہائیڈرو بجلی';
+$ec_lang['mhp_main_title']='مفت آن لائن مائیکرو-ہائیڈرو بجلی کیلکولیٹر';
+$ec_lang['mhp_main_desc']='رن-آف-ریور مائیکرو-ہائیڈرو بجلی پیداوار کیلکولیٹر';
 $ec_lang['mhp_flow']='بہاؤ کی شرح، Q';
 $ec_lang['mhp_gross_head']='مجموعی سر، H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='پینسٹاک قطر، D';

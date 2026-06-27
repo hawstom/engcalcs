@@ -296,9 +296,9 @@ $ec_lang['contact_success']='Mulțumesc că ați luat timp pentru a scrie.';
 
 
 // Micro-Hydro Power
-$ec_lang['mhp_main_menu']='Proiectare conductă forțată';
-$ec_lang['mhp_main_title']='Calculator gratuit online pentru conductă forțată';
-$ec_lang['mhp_main_desc']='Dimensionarea conductei forțate micro-hidro — Pierderi de sarcină, putere și viteză';
+$ec_lang['mhp_main_menu']='Micro-Hidroenergie';
+$ec_lang['mhp_main_title']='Calculator gratuit online de micro-hidroenergie';
+$ec_lang['mhp_main_desc']='Calculator de putere pentru micro-hidrocentrale cu derivație fluvială';
 $ec_lang['mhp_flow']='Debit, Q';
 $ec_lang['mhp_gross_head']='Sarcina brută, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='Diametrul conductei forțate, D';

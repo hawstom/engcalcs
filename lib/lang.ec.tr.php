@@ -302,9 +302,9 @@ $ec_lang['contact_success']='Yazmanız için zaman ayırdığınız için teşek
 
 
 // Micro-Hydro Power
-$ec_lang['mhp_main_menu']='Cebri Boru Tasarımı';
-$ec_lang['mhp_main_title']='Ücretsiz Çevrimiçi Cebri Boru Tasarım Hesaplayıcısı';
-$ec_lang['mhp_main_desc']='Mikro-Hidro Cebri Boru Boyutlandırma — Yük Kaybı, Güç ve Hız';
+$ec_lang['mhp_main_menu']='Mikro-Hidroelektrik Güç';
+$ec_lang['mhp_main_title']='Ücretsiz Çevrimiçi Mikro-Hidroelektrik Güç Hesaplayıcısı';
+$ec_lang['mhp_main_desc']='Nehir Akışı Mikro-Hidroelektrik Güç Çıkışı Hesaplayıcısı';
 $ec_lang['mhp_flow']='Debi, Q';
 $ec_lang['mhp_gross_head']='Brüt yük, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='Cebri boru çapı, D';

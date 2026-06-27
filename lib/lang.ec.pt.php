@@ -292,9 +292,9 @@ $ec_lang['or_velocity']='Velocidade, v';
 
 
 // Micro-Hydro Power
-$ec_lang['mhp_main_menu']='Dimensionamento de conduta forçada';
-$ec_lang['mhp_main_title']='Calculadora gratuita online de conduta forçada';
-$ec_lang['mhp_main_desc']='Dimensionamento de conduta forçada micro-hidráulica — Perda de carga, potência e velocidade';
+$ec_lang['mhp_main_menu']='Micro-Hidroelétrica';
+$ec_lang['mhp_main_title']='Calculadora Gratuita de Potência Micro-Hidroelétrica';
+$ec_lang['mhp_main_desc']='Calculadora de Potência de Micro-Hidroelétrica a Fio d\'Água';
 $ec_lang['mhp_flow']='Vazão, Q';
 $ec_lang['mhp_gross_head']='Altura bruta, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='Diâmetro da conduta forçada, D';

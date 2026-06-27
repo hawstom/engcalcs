@@ -291,9 +291,9 @@ $ec_lang['contact_success']='Terima kasih telah meluangkan waktu untuk menulis.'
 
 
 // Micro-Hydro Power
-$ec_lang['mhp_main_menu']='Desain Pipa Penstock';
-$ec_lang['mhp_main_title']='Kalkulator Desain Pipa Penstock Gratis Online';
-$ec_lang['mhp_main_desc']='Dimensi Pipa Penstock Mikro-Hidro — Kehilangan Tinggi, Daya, dan Kecepatan';
+$ec_lang['mhp_main_menu']='Tenaga Mikro-Hidro';
+$ec_lang['mhp_main_title']='Kalkulator Tenaga Mikro-Hidro Online Gratis';
+$ec_lang['mhp_main_desc']='Kalkulator Daya Keluaran Mikro-Hidro Aliran Sungai';
 $ec_lang['mhp_flow']='Debit, Q';
 $ec_lang['mhp_gross_head']='Tinggi bruto, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='Diameter pipa penstock, D';

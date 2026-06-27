@@ -299,9 +299,9 @@ $ec_lang['wi_notes_we_def']='q = אם (אורך = 0) אז 0; אחרת אם (שי
 
 
 // Micro-Hydro Power
-$ec_lang['mhp_main_menu']='תכנון צינור לחץ';
-$ec_lang['mhp_main_title']='מחשבון תכנון צינור לחץ חינמי באינטרנט';
-$ec_lang['mhp_main_desc']='ממדי צינור לחץ למיקרו-הידרו — אובדן לחץ, הספק ומהירות';
+$ec_lang['mhp_main_menu']='הידרו-כוח זעיר';
+$ec_lang['mhp_main_title']='מחשבון הידרו-כוח זעיר חינמי מקוון';
+$ec_lang['mhp_main_desc']='מחשבון הספק הידרו-כוח זעיר עם זרימה טבעית בנהר';
 $ec_lang['mhp_flow']='ספיקה, Q';
 $ec_lang['mhp_gross_head']='גובה ברוטו, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='קוטר צינור הלחץ, D';

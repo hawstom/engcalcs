@@ -298,9 +298,9 @@ $ec_lang['rrc_main_menu']='Diseño de Rampa de Roca según Robinson';
 
 
 // Micro-Hydro Power
-$ec_lang['mhp_main_menu']='Diseño de tubería de presión';
-$ec_lang['mhp_main_title']='Calculadora gratuita en línea de diseño de tubería de presión';
-$ec_lang['mhp_main_desc']='Dimensionamiento de tubería de presión micro-hidráulica — Pérdida de carga, potencia y velocidad';
+$ec_lang['mhp_main_menu']='Micro-Hidroeléctrica';
+$ec_lang['mhp_main_title']='Calculadora Gratuita de Potencia Micro-Hidroeléctrica';
+$ec_lang['mhp_main_desc']='Calculadora de Potencia de Micro-Hidroeléctrica de Pasada';
 $ec_lang['mhp_flow']='Caudal, Q';
 $ec_lang['mhp_gross_head']='Altura bruta, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='Diámetro de la tubería de presión, D';

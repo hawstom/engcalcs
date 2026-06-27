@@ -244,9 +244,9 @@ $ec_lang['or_notes_3_def']='C<sub>d</sub> د تیز غاړو سوریو لپار
 $ec_lang['or_notes_4_term']='لاندې اوبو حالت';
 $ec_lang['or_notes_4_def']='کله چې TWE د خلاص انورټ پورته وي، دا محاسبه اتوماتیک د لاندې اوبو د سوري معادله h = HWE &minus; TWE کاروي. کله چې TWE د انورټ پر سطحه یا لاندې وي، آزاد وتل فرض کیږي او h = HWE &minus; مرکز.';
 // Micro-Hydro Power
-$ec_lang['mhp_main_menu']='د Penstock ډیزاین';
-$ec_lang['mhp_main_title']='وړیا آنلاین د Penstock ډیزاین محاسبه';
-$ec_lang['mhp_main_desc']='د مایکرو هایدرو Penstock اندازه کول — د سر ضیاع، ځواک، او سرعت';
+$ec_lang['mhp_main_menu']='مایکرو هایدرو ځواک';
+$ec_lang['mhp_main_title']='وړیا آنلاین مایکرو هایدرو ځواک محاسبه';
+$ec_lang['mhp_main_desc']='د سیند بهاو مایکرو هایدرو ځواک محصول محاسبه';
 $ec_lang['mhp_flow']='د بهاو مقدار، Q';
 $ec_lang['mhp_gross_head']='ناخالص سر، H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='د Penstock قطر، D';

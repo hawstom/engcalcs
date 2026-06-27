@@ -291,9 +291,9 @@ $ec_lang['contact_success']='Danke, dass Sie sich die Zeit genommen haben zu sch
 
 
 // Micro-Hydro Power
-$ec_lang['mhp_main_menu']='Druckrohrleitung dimensionieren';
-$ec_lang['mhp_main_title']='Kostenloser Online-Rechner für Druckrohrleitungen';
-$ec_lang['mhp_main_desc']='Dimensionierung der Druckrohrleitung für Mikro-Wasserkraft — Druckverlust, Leistung und Fließgeschwindigkeit';
+$ec_lang['mhp_main_menu']='Mikro-Wasserkraft';
+$ec_lang['mhp_main_title']='Kostenloser Online-Rechner für Mikro-Wasserkraft';
+$ec_lang['mhp_main_desc']='Leistungsrechner für Laufwasser-Mikro-Wasserkraftanlagen';
 $ec_lang['mhp_flow']='Durchfluss, Q';
 $ec_lang['mhp_gross_head']='Bruttofallhöhe, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='Rohrdurchmesser der Druckrohrleitung, D';

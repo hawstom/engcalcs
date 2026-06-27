@@ -244,9 +244,9 @@ $ec_lang['or_notes_3_def']='C<sub>d</sub> برای دریچه‌های لبه ت
 $ec_lang['or_notes_4_term']='استغراق';
 $ec_lang['or_notes_4_def']='وقتی TWE بالاتر از کف دهانه است، این ماشین‌حساب به‌طور خودکار معادله دریچه مستغرق را با h = HWE &minus; TWE اعمال می‌کند. وقتی TWE در سطح کف یا پایین‌تر از آن باشد، خروج آزاد فرض می‌شود و h = HWE &minus; مرکز ثقل.';
 // Micro-Hydro Power
-$ec_lang['mhp_main_menu']='طراحی لوله پنستاک';
-$ec_lang['mhp_main_title']='ماشین‌حساب رایگان آنلاین طراحی لوله پنستاک';
-$ec_lang['mhp_main_desc']='اندازه‌بندی لوله پنستاک میکرو-هیدرو — افت هد، توان و سرعت';
+$ec_lang['mhp_main_menu']='توان میکرو-هیدرو';
+$ec_lang['mhp_main_title']='ماشین‌حساب رایگان آنلاین توان میکرو-هیدرو';
+$ec_lang['mhp_main_desc']='ماشین‌حساب توان خروجی میکرو-هیدرو جریان‌رودی';
 $ec_lang['mhp_flow']='دبی، Q';
 $ec_lang['mhp_gross_head']='هد ناخالص، H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='قطر لوله پنستاک، D';

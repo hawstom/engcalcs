@@ -244,9 +244,9 @@ $ec_lang['or_notes_3_def']='C<sub>d</sub> သည် ချွန်ထက်သ�
 $ec_lang['or_notes_4_term']='နစ်မွန်းမှု';
 $ec_lang['or_notes_4_def']='TWE သည် ဖွင့်လှစ်မှ invert အပေါ်တွင်ရှိသောအခါ ဤတွက်ချက်မှုကိရိယာသည် h = HWE &minus; TWE ကိုအသုံးပြု၍ နစ်မွန်းသောအပေါက်ညီမျှခြင်းကို အလိုအလျောက်သုံးသည်။ TWE သည် invert တွင်ရှိသော သို့မဟုတ် အောက်တွင်ရှိသောအခါ လွတ်လပ်သောကျဆင်းမှုဟု မှတ်ယူပြီး h = HWE &minus; ဗဟိုချက်ဖြစ်သည်။';
 // Micro-Hydro Power
-$ec_lang['mhp_main_menu']='Penstock ဒီဇိုင်း';
-$ec_lang['mhp_main_title']='အခမဲ့ အွန်လိုင်း Penstock ဒီဇိုင်း တွက်ချက်မှုကိရိယာ';
-$ec_lang['mhp_main_desc']='Micro-Hydro Penstock အရွယ်တိုင်းတာမှု — ခေါင်းဆုံးဆုံးရှုံးမှု၊ ပါဝါနှင့် အမြန်နှုန်း';
+$ec_lang['mhp_main_menu']='မိုက်ခရိုဟိုက်ဒရို ပါဝါ';
+$ec_lang['mhp_main_title']='အခမဲ့ အွန်လိုင်း မိုက်ခရိုဟိုက်ဒရို ပါဝါ တွက်ချက်မှုကိရိယာ';
+$ec_lang['mhp_main_desc']='မြစ်ဘေးစီးမိုက်ခရိုဟိုက်ဒရို ပါဝါထုတ်ပိုးတွက်ချက်မှုကိရိယာ';
 $ec_lang['mhp_flow']='စီးဆင်းနှုန်း, Q';
 $ec_lang['mhp_gross_head']='စုစုပေါင်းခေါင်းဆုံး, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='Penstock အချင်း, D';

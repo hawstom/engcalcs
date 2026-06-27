@@ -294,9 +294,9 @@ $ec_lang['contact_success']='आपका समय लेने के लि�
 
 
 // Micro-Hydro Power
-$ec_lang['mhp_main_menu']='पेनस्टॉक डिज़ाइन';
-$ec_lang['mhp_main_title']='निःशुल्क ऑनलाइन पेनस्टॉक डिज़ाइन कैलकुलेटर';
-$ec_lang['mhp_main_desc']='माइक्रो-हाइड्रो पेनस्टॉक आकार निर्धारण — हेड हानि, शक्ति और वेग';
+$ec_lang['mhp_main_menu']='माइक्रो-हाइड्रो पावर';
+$ec_lang['mhp_main_title']='निःशुल्क ऑनलाइन माइक्रो-हाइड्रो पावर कैलकुलेटर';
+$ec_lang['mhp_main_desc']='रन-ऑफ-रिवर माइक्रो-हाइड्रो पावर आउटपुट कैलकुलेटर';
 $ec_lang['mhp_flow']='प्रवाह दर, Q';
 $ec_lang['mhp_gross_head']='कुल हेड, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='पेनस्टॉक व्यास, D';

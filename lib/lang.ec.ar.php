@@ -294,9 +294,9 @@ $ec_lang['contact_success']='شكراً لك على تخصيص الوقت للك
 
 
 // Micro-Hydro Power
-$ec_lang['mhp_main_menu']='تصميم أنبوب الضغط';
-$ec_lang['mhp_main_title']='حاسبة تصميم أنبوب الضغط المجانية عبر الإنترنت';
-$ec_lang['mhp_main_desc']='تحديد أبعاد أنبوب ضغط الطاقة المائية الصغيرة — فقدان الضغط والقدرة والسرعة';
+$ec_lang['mhp_main_menu']='طاقة المياه الصغيرة';
+$ec_lang['mhp_main_title']='حاسبة طاقة المياه الصغيرة المجانية عبر الإنترنت';
+$ec_lang['mhp_main_desc']='حاسبة إنتاج طاقة المياه الصغيرة المتدفقة في الأنهار';
 $ec_lang['mhp_flow']='معدل التدفق، Q';
 $ec_lang['mhp_gross_head']='الرأس الإجمالي، H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='قطر أنبوب الضغط، D';
