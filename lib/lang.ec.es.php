@@ -335,6 +335,10 @@ $ec_lang['mhp_notes_4_term']='Pérdidas menores k<sub>m</sub>';
 $ec_lang['mhp_notes_4_def']='Valores típicos: entrada con borde vivo 0,5, cada codo de 45&deg; 0,2&ndash;0,3, válvula compuerta (totalmente abierta) 0,1, válvula mariposa 0,2. Sume todos los accesorios para obtener el k<sub>m</sub> total. El valor por defecto 1,5 supone una entrada y dos codos.';
 $ec_lang['mhp_notes_5_term']='Rugosidad de la tubería e';
 $ec_lang['mhp_notes_5_def']='Rugosidad absoluta típica: acero (nuevo) 0,046&nbsp;mm, acero (usado) 0,15&nbsp;mm, HDPE 0,003&nbsp;mm, PVC/uPVC 0,0015&nbsp;mm, hormigón 0,3&ndash;3&nbsp;mm. El HDPE es común en tuberías de presión de pequeñas instalaciones micro-hidroeléctricas.';
+$ec_lang['mhp_notes_6_term']='Rendimiento';
+$ec_lang['mhp_notes_6_def']='El rendimiento típico de la instalación &eta; varía de 0,70 a 0,85 para turbinas Pelton y turbinas de flujo cruzado comunes en micro-hidráulica. Use 0,75 como estimación inicial conservadora.';
+$ec_lang['mhp_notes_7_term']='Energía Anual';
+$ec_lang['mhp_notes_7_def']='La energía anual supone operación continua a caudal completo (8760 horas/año). La producción real será menor debido a la variación estacional del caudal, paradas por mantenimiento y factor de carga.';
 
 // About
 $ec_lang['about_main_menu']='Acerca de';

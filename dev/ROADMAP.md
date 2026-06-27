@@ -8,6 +8,11 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 # Tasks
 
+## Translation improvements
+100|Audit remaining English strings. Find out what English is left in the other language files. I know this is subjective because some things can't be translated. And this is a language-by-language judgment call. But we need to try to ensure that all translations are complete. Please advise.
+
+
+
 ## Calculator Improvements
 
 ## AI Efficiency Scripting (Overhead)

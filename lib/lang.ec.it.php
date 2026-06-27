@@ -299,14 +299,14 @@ $ec_lang['mhp_gross_head']='Altezza lorda, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='Diametro della condotta forzata, D';
 $ec_lang['mhp_length']='Lunghezza della condotta forzata, L';
 $ec_lang['mhp_roughness']='Rugosità della tubazione, e';
-$ec_lang['mhp_km']='Minor loss coefficient, k<sub>m</sub> <span title="Sum of all junction and fitting loss coefficients along the penstock" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
-$ec_lang['mhp_nu']='Kinematic viscosity, &nu; <span title="1×10⁻⁶ m²/s for clean water near 20°C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['mhp_km']='Coefficiente di perdita minore, k<sub>m</sub> <span title="Somma di tutti i coefficienti di perdita nei raccordi e negli imbocchi della condotta forzata" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['mhp_nu']='Viscosità cinematica, &nu; <span title="1×10⁻⁶ m²/s per acqua pulita a circa 20°C" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['mhp_efficiency']='Rendimento dell\'impianto, &eta; (0&ndash;1)';
 $ec_lang['mhp_velocity']='Velocità di flusso, v';
 $ec_lang['mhp_vel_check']='Verifica della velocità';
 $ec_lang['mhp_f']='Fattore di attrito, f';
 $ec_lang['mhp_hf']='Perdita di carico per attrito, h<sub>f</sub>';
-$ec_lang['mhp_hm']='Minor head loss, h<sub>m</sub>';
+$ec_lang['mhp_hm']='Perdita di carico minore, h<sub>m</sub>';
 $ec_lang['mhp_hl']='Perdita totale nella condotta forzata, h<sub>L</sub>';
 $ec_lang['mhp_hl_check']='Verifica della perdita di carico';
 $ec_lang['mhp_hnet']='Altezza netta, H<sub>net</sub>';
@@ -328,6 +328,10 @@ $ec_lang['mhp_notes_4_term']='Perdite minori k<sub>m</sub>';
 $ec_lang['mhp_notes_4_def']='Valori tipici: imbocco con spigolo vivo 0,5, ogni curva a 45&deg; 0,2&ndash;0,3, saracinesca (completamente aperta) 0,1, valvola a farfalla 0,2. Sommare tutti i raccordi per ottenere il k<sub>m</sub> totale. Il valore predefinito 1,5 presuppone un imbocco e due curve.';
 $ec_lang['mhp_notes_5_term']='Rugosità della tubazione e';
 $ec_lang['mhp_notes_5_def']='Rugosità assoluta tipica: acciaio (nuovo) 0,046&nbsp;mm, acciaio (usato) 0,15&nbsp;mm, HDPE 0,003&nbsp;mm, PVC/uPVC 0,0015&nbsp;mm, calcestruzzo 0,3&ndash;3&nbsp;mm. L\'HDPE è comune nelle condotte forzate di piccoli impianti micro-idroelettrici.';
+$ec_lang['mhp_notes_6_term']='Rendimento';
+$ec_lang['mhp_notes_6_def']='Il rendimento tipico dell\'impianto &eta; varia da 0,70 a 0,85 per le turbine Pelton e cross-flow comuni negli impianti micro-idroelettrici. Usare 0,75 come stima conservativa iniziale.';
+$ec_lang['mhp_notes_7_term']='Energia annua';
+$ec_lang['mhp_notes_7_def']='L\'energia annua presuppone un funzionamento continuativo a portata piena (8760 ore/anno). La produzione reale sarà inferiore a causa della variazione stagionale di portata, dei tempi di fermo per manutenzione e del fattore di carico.';
 
 // About
 $ec_lang['about_main_menu']='Informazioni';

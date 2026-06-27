@@ -332,6 +332,10 @@ $ec_lang['mhp_notes_4_term']='Pertes singulières k<sub>m</sub>';
 $ec_lang['mhp_notes_4_def']='Valeurs typiques : entrée à arête vive 0,5, chaque coude à 45&deg; 0,2&ndash;0,3, vanne-guillotine (pleinement ouverte) 0,1, vanne papillon 0,2. Additionner tous les accessoires pour obtenir le k<sub>m</sub> total. La valeur par défaut 1,5 suppose une entrée et deux coudes.';
 $ec_lang['mhp_notes_5_term']='Rugosité de la conduite e';
 $ec_lang['mhp_notes_5_def']='Rugosité absolue typique : acier (neuf) 0,046&nbsp;mm, acier (usagé) 0,15&nbsp;mm, PEHD 0,003&nbsp;mm, PVC/uPVC 0,0015&nbsp;mm, béton 0,3&ndash;3&nbsp;mm. Le PEHD est courant pour les conduites forcées des petites installations micro-hydrauliques.';
+$ec_lang['mhp_notes_6_term']='Rendement';
+$ec_lang['mhp_notes_6_def']='Le rendement typique de l\'installation &eta; varie de 0,70 à 0,85 pour les turbines Pelton et à flux croisé courantes en micro-hydroélectricité. Utilisez 0,75 comme première estimation prudente.';
+$ec_lang['mhp_notes_7_term']='Énergie annuelle';
+$ec_lang['mhp_notes_7_def']='L\'énergie annuelle suppose un fonctionnement continu à débit plein (8760 heures/an). La production réelle sera plus faible en raison de la variation saisonnière du débit, des temps d\'arrêt pour maintenance et du facteur de charge.';
 
 // About
 $ec_lang['about_main_menu']='À propos';

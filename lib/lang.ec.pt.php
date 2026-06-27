@@ -329,6 +329,10 @@ $ec_lang['mhp_notes_4_term']='Perdas menores k<sub>m</sub>';
 $ec_lang['mhp_notes_4_def']='Valores típicos: entrada com aresta viva 0,5, cada curva a 45&deg; 0,2&ndash;0,3, válvula de gaveta (totalmente aberta) 0,1, válvula borboleta 0,2. Somar todos os acessórios para obter o k<sub>m</sub> total. O valor por defeito 1,5 assume uma entrada e duas curvas.';
 $ec_lang['mhp_notes_5_term']='Rugosidade da tubagem e';
 $ec_lang['mhp_notes_5_def']='Rugosidade absoluta típica: aço (novo) 0,046&nbsp;mm, aço (usado) 0,15&nbsp;mm, HDPE 0,003&nbsp;mm, PVC/uPVC 0,0015&nbsp;mm, betão 0,3&ndash;3&nbsp;mm. O HDPE é comum em condutas forçadas de pequenas instalações micro-hidráulicas.';
+$ec_lang['mhp_notes_6_term']='Rendimento';
+$ec_lang['mhp_notes_6_def']='Rendimento típico da instalação &eta; varia de 0,70 a 0,85 para turbinas Pelton e de fluxo cruzado comuns em micro-hidroelétricas. Use 0,75 como uma estimativa conservadora inicial.';
+$ec_lang['mhp_notes_7_term']='Energia Anual';
+$ec_lang['mhp_notes_7_def']='A energia anual pressupõe operação contínua a pleno escoamento (8760 horas/ano). A produção real será menor devido a variação sazonal de escoamento, tempo de paragem para manutenção e fator de carga.';
 
 // About
 $ec_lang['about_main_menu']='Sobre';
