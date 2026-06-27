@@ -1,0 +1,33 @@
+dw_main_menu	Drop in the height of a column of water due to entering, traversing, and exiting a full pipe, calculated using the Darcy-Weisbach equation.
+dw_main_title	Drop in the height of a column of water due to entering, traversing, and exiting a full pipe, calculated using the Darcy-Weisbach equation.
+dw_main_desc	Drop in the height of a column of water due to entering, traversing, and exiting a full pipe for specified diameter, roughness, and flow, using Darcy-Weisbach relations.
+hw_main_menu	Drop in the height of a column of water due to entering, traversing, and exiting a full pipe, calculated using the Hazen-Williams empirical equation.
+hw_main_title	Drop in the height of a column of water due to entering, traversing, and exiting a full pipe, calculated using the Hazen-Williams empirical equation.
+hw_main_desc	Drop in the height of a column of water due to entering, traversing, and exiting a full pipe, calculated using the Hazen-Williams empirical equation for specified diameter, Hazen-Williams coefficient C, and flow rate.
+mphl_main_menu	Drop in the height of a column of water due to entering, traversing, and exiting a full pipe, calculated using the Manning equation
+mphl_main_title	Drop in the height of a column of water due to entering, traversing, and exiting a full pipe, calculated using the Manning equation
+mphl_main_desc	Drop in the height of a column of water due to a given flow entering, traversing, and exiting a full pipe at full depth, calculated using the Manning equation
+rrc_main_menu	Robinson refers to the named design method (engineer attribution), not a location; method for sizing median riprap rock in a chute/spillway.
+rrc_main_desc	Spreadsheet implementation of the Robinson design method for sizing median riprap rock in a chute/spillway.
+ps_main_desc	Micro-Hydropower Inlet pipe Sizing — Drop in the height of a column of water due to traversing the pipe at full depth, Power, and Velocity
+ps_hf	Friction head loss, h<sub>f</sub>
+ps_hm	Minor head loss, h<sub>m</sub>
+ps_hl_check	Head loss check
+ps_notes_1_term	Head Loss
+ps_notes_3_term	Head Loss Target
+mhp_head_loss	Penstock head losses, h<sub>L</sub>
+mhp_notes_2_def	Net head = gross head &minus; penstock head losses. A common first estimate is h<sub>L</sub> &asymp; 5% of H<sub>gross</sub>. Use the <a href="Darcy-Weisbach.php">Darcy-Weisbach calculator</a> for more accurate penstock loss estimates.
+rc_main_menu	Rock chute design by the Robinson method; "Robinson" is a method/author name, not a place.
+rc_main_title	Rock chute design by the Robinson method; "Robinson" is a method/author name, not a place.
+rc_main_desc	Required median riprap size for a rock-lined steep chute or spillway, using the Robinson, Rice, and Kadavy method.
+rc_sg	Rock specific gravity, sg <span title="Typical crushed granite or basalt ≈ 2.65. Robinson valid range: 2.54 to 2.82." style="cursor:help;color:#06c;font-size:0.9em">?</span>
+rc_SD	Gradation SD = D<sub>84.1</sub>/D<sub>50</sub> <span title="Gradation standard deviation. Uniform rock ≈ 1.25. Robinson valid range: 1.15 to 1.47." style="cursor:help;color:#06c;font-size:0.9em">?</span>
+rc_sg_low	Warning: sg < 2.54 — below Robinson range
+rc_sg_high	Warning: sg > 2.82 — above Robinson range
+rc_SD_low	Warning: SD < 1.15 — below Robinson range
+rc_SD_high	Warning: SD > 1.47 — above Robinson range
+rc_apron_length	Outlet apron length (15 &times; D<sub>50</sub>) <span title="Required for structural support of the chute rock. &quot;The minimum tailwater that occurs as a result of the outlet reach and downstream channel resistance is sufficient to ensure stability of the riprap in the outlet reach.&quot; (Robinson)" style="cursor:help;color:#06c;font-size:0.9em">?</span>
+rc_eq_warn_low	Warning: S0 < 0.02 — below Robinson validation range
+rc_eq_warn_high	Warning: S0 > 0.40 — above Robinson validation range
+rc_notes_1_def	Robinson, Rice &amp; Kadavy (1998) developed two empirical equations for median riprap size D<sub>50</sub> based on chute slope and unit discharge. Equation 1 applies for mild slopes (S<sub>0</sub> &lt; 0.10); Equation 2 applies for steep slopes (0.10 &le; S<sub>0</sub> &le; 0.40). Both equations require q<sub>t</sub> in m&sup2;/s and return D<sub>50</sub> in mm. The validated range is 0.02 &le; S<sub>0</sub> &le; 0.40.
+rc_notes_4_def	Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). &ldquo;<a target="_blank" href="https://doi.org/10.13031/2013.17230">Design of rock chutes</a>.&rdquo; <em>Transactions of the ASAE</em>, 41(3), 621&ndash;626. USDA ARS also publishes an <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">Excel spreadsheet</a> based on the same method.

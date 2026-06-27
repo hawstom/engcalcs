@@ -5,6 +5,11 @@
  * Writes per-language JSON payloads containing only missing/untranslated keys,
  * plus neighboring translated context for tone/register consistency.
  *
+ * Optional sibling map support in lib/lang.ec.en.php:
+ *   $ec_lang_intent['some_key'] = 'Expanded semantic intent for translators';
+ * When present and different from the base English value, intent is emitted to
+ * payload['key_intent'][key] for prompt-time disambiguation.
+ *
  * Usage:
  *   php scripts/generate_translation_payloads.php
  *   php scripts/generate_translation_payloads.php --prefix=dw
@@ -42,6 +47,7 @@ function main(array $argv): void
     if (count($enKeys) === 0) {
         fail('No keys parsed from English language file.');
     }
+    $enIntent = loadEnglishIntentMap(EN_FILE);
 
     $glossaryData = readJsonFile(GLOSSARY_PATH);
     if (!isset($glossaryData['terms']) || !is_array($glossaryData['terms'])) {
@@ -86,6 +92,7 @@ function main(array $argv): void
 
         $current = loadLangArray($targetFile);
         [$deltaKeys, $keyContext] = collectDeltaAndContext($enKeys, $current, $activePrefixes);
+        $keyIntent = collectKeyIntent($deltaKeys, $enKeys, $enIntent);
 
         $prefixesInDelta = detectPrefixes($deltaKeys);
         $prefixGlossary = buildPrefixGlossary($prefixesInDelta, $termIndex, $prefixMap);
@@ -115,6 +122,7 @@ function main(array $argv): void
                 'notes' => 'Translate only keys in keys_to_translate; preserve HTML, units, and symbols.',
                 'glossary_injection_notes' => 'Use prompt_context_by_prefix and glossary_terms_by_prefix.preferred_translation when available.',
                 'context_notes' => 'Use key_context.neighbors to keep register consistent with nearby translated strings.',
+                'intent_notes' => 'Use key_intent when present; these entries provide terse disambiguation comments only where translation risk exists.',
             ],
             'prompt_context_by_prefix' => $promptByPrefix,
             'glossary_terms_by_prefix' => $termsByPrefix,
@@ -122,6 +130,7 @@ function main(array $argv): void
             // Backward-compatibility for scripts that still expect payload["keys"].
             'keys' => $deltaKeys,
             'key_context' => $keyContext,
+            'key_intent' => $keyIntent,
         ];
 
         file_put_contents(
@@ -232,6 +241,44 @@ function loadLangArray(string $file): array
     }
 
     return $ec_lang;
+}
+
+function loadEnglishIntentMap(string $file): array
+{
+    $ec_lang = [];
+    $ec_lang_intent = [];
+    include $file;
+
+    if (!is_array($ec_lang_intent)) {
+        return [];
+    }
+
+    return $ec_lang_intent;
+}
+
+function collectKeyIntent(array $deltaKeys, array $enKeys, array $intentMap): array
+{
+    $result = [];
+
+    foreach ($deltaKeys as $key => $english) {
+        if (!array_key_exists($key, $intentMap)) {
+            continue;
+        }
+
+        $intent = trim((string)$intentMap[$key]);
+        if ($intent === '') {
+            continue;
+        }
+
+        $enValue = trim((string)($enKeys[$key] ?? $english));
+        if ($intent === $enValue) {
+            continue;
+        }
+
+        $result[$key] = $intent;
+    }
+
+    return $result;
 }
 
 function detectPrefixes(array $keys): array

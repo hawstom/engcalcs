@@ -10,6 +10,7 @@
  *   $payload['prompt_context_by_prefix'][$prefix]  — plain-text term summary for this prefix
  *   $payload['glossary_terms_by_prefix'][$prefix]  — array of term objects with preferred_translation
  *   $payload['key_context'][$key]                  — neighboring translated strings for register consistency
+ *   $payload['key_intent'][$key]                   — expanded semantic intent for ambiguous strings
  *
  * API parameters (pass these to the Anthropic messages endpoint):
  *   model:       TRANSLATE_MODEL (claude-haiku-4-5-20251001)
@@ -103,7 +104,8 @@ function buildTranslationPrompt(
     $parts[] = "6. Use formal engineering register — no colloquial language.";
     $parts[] = "7. Use literal UTF-8 characters for special symbols (—, ≥, ≤, ×, etc.) — never HTML entities.";
     $parts[] = "8. Single-quote the value. Escape any literal single quote inside the value as \\'.";
-    $parts[] = "9. Do not add comments, blank lines, or any text outside the PHP assignment lines.";
+    $parts[] = "9. If an intent note is provided for a key, prioritize that intended meaning over literal word-by-word translation.";
+    $parts[] = "10. Do not add comments, blank lines, or any text outside the PHP assignment lines.";
 
     // --- Strings to translate ---
     $parts[] = '';
@@ -112,6 +114,12 @@ function buildTranslationPrompt(
     foreach ($delta_strings as $key => $value) {
         // Escape single quotes in the English value so the example is syntactically valid
         $escaped = str_replace("'", "\\'", $value);
+
+        $intent = trim((string)($payload['key_intent'][$key] ?? ''));
+        if ($intent !== '') {
+            $intent = preg_replace('/\s+/', ' ', $intent);
+            $parts[] = "# Intent for {$key}: {$intent}";
+        }
 
         $ctx = $keyContext[$key] ?? null;
         if (is_array($ctx)) {

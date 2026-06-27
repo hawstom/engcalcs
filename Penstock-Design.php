@@ -1,13 +1,13 @@
 <?php
 require_once ('lib/base.inc.php');
-$html_title = $ec_lang['ps_main_title'];
+$html_title = $ec_lang['mhp_main_title'];
 $html_head='
 	<meta name="Description" content="'. $html_title .'" />
 	<meta name="Keywords" content="penstock design calculator micro hydro pipe sizing head loss Darcy-Weisbach velocity" />
 ';
 echoHeader("EngCalcs", $html_title, $html_head);
 ?>
-<h2><?=$ec_lang['ps_main_desc']?></h2>
+<h2><?=$ec_lang['mhp_main_desc']?></h2>
 <?php echoHelpWanted(); ?>
 
 <?php
@@ -48,6 +48,8 @@ echoCalculatorForm(
 	<dt><?=$ec_lang['ps_notes_3_term']?></dt><dd><?=$ec_lang['ps_notes_3_def']?></dd>
 	<dt><?=$ec_lang['ps_notes_4_term']?></dt><dd><?=$ec_lang['ps_notes_4_def']?></dd>
 	<dt><?=$ec_lang['ps_notes_5_term']?></dt><dd><?=$ec_lang['ps_notes_5_def']?></dd>
+	<dt><?=$ec_lang['ps_notes_6_term']?></dt><dd><?=$ec_lang['ps_notes_6_def']?></dd>
+	<dt><?=$ec_lang['ps_notes_7_term']?></dt><dd><?=$ec_lang['ps_notes_7_def']?></dd>
 </dl>
 
 <?php echoFeedback(); ?>

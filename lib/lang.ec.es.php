@@ -293,8 +293,8 @@ $ec_lang['mtc_note_1']='<dl><dt>Iteración automática para diseño de tamaño y
 // Orifice Flow additional key
 $ec_lang['or_velocity']='Velocidad, v';
 // Robinson Rock Chute
-$ec_lang['rrc_main_desc']='Hoja de cálculo de diseño de canal de roca según Robinson';
-$ec_lang['rrc_main_menu']='Canal de roca según Robinson';
+$ec_lang['rrc_main_desc']='Hoja de cálculo para el diseño de rampas de roca según el método de Robinson';
+$ec_lang['rrc_main_menu']='Diseño de Rampa de Roca según Robinson';
 
 // Micro-Hydro Power
 $ec_lang['mhp_main_menu']='Micro-Hidroeléctrica';

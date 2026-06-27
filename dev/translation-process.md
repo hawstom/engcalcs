@@ -10,6 +10,22 @@ Overview
 3. Spawn one agent per language with the payload (Claude style). Announce: "Starting N agents, one for each language."
 4. Collect results into `lib/lang.ec.XX.php` files and run a reviewer pass.
 
+Intent authoring standard (`$ec_lang_intent` in `lib/lang.ec.en.php`)
+- Purpose: include only disambiguation a skilled but non-technical translator could plausibly get wrong without context.
+- Keep intent minimal and high-signal. Intent is a supplement to the English source string, not a rewrite of it.
+- Default value: use empty string (`''`) for `ec_lang_intent[key]` to mean "no comment".
+- Add non-empty intent only when translation risk is observed (for example poor outputs or reverse-translation spot checks).
+- Good intent content:
+	- Noun-stack grammatical expansion when English stacks modifiers densely.
+	- Ambiguous-word synonym clarification (one or more options if needed).
+	- Ambiguous proper-name clarification (example: Robinson is an attribution/method name, not a place).
+	- Cryptic jargon expansion when the term is likely to be mistranslated.
+- Style rules for non-empty intent:
+	- Use terse plain text, not metadata labels.
+	- Do not prepend scaffolding such as "Page title for" or "Menu entry for".
+	- Use parenthetical negatives like "(not ...)" only when truly needed.
+	- Keep each comment decision-focused; avoid long explanations or teaching prose.
+
 Scripts
 - `scripts/generate_translation_payloads.php` — extracts keys and creates JSON payloads.
 
