@@ -21,6 +21,7 @@ echoCalculatorForm(
 	//Results
 	Array(
 		Array('name' => 'q_617', 'units' => Array('m3ps', 'lps', 'mld', 'ft3ps', 'gpm', 'mgd'), 'label' => $ec_lang['mi_q_617']),
+		Array('name' => 'v_check', 'units' => NULL, 'label' => $ec_lang['mtc_vel_check']),
 	),
 	$flagFormAppend = true
 );
@@ -129,7 +130,15 @@ function echoCalculatorFormAppend() {
 <dl>
 <dt><?=$ec_lang['mi_notes_1_term']?></dt><dd><?=$ec_lang['mi_notes_1_def']?></dd>
 <dt><?=$ec_lang['mi_notes_2_term']?></dt><dd><?=$ec_lang['mi_notes_2_def']?></dd>
+<dt><?=$ec_lang['mtc_note_2_term']?></dt><dd><?=$ec_lang['mtc_note_2_def']?></dd>
 </dl>
+<script>
+EngCalcs.pageConfig = {
+	mtc_vel_ok: <?=json_encode($ec_lang['mtc_vel_ok'])?>,
+	mtc_vel_high: <?=json_encode($ec_lang['mtc_vel_high'])?>,
+	mtc_vel_low: <?=json_encode($ec_lang['mtc_vel_low'])?>
+};
+</script>
 <script src="/engcalcs/js/Manning.lib.js?v=<?=filemtime(__DIR__.'/js/Manning.lib.js')?>"></script>
 <script src="/engcalcs/js/manning-irregular.js?v=<?=filemtime(__DIR__.'/js/manning-irregular.js')?>"></script>
 <script>

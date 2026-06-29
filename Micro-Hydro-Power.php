@@ -55,12 +55,12 @@ echoCalculatorForm(
 <?php echoFeedback(); ?>
 <script>
 EngCalcs.pageConfig = {
-	vel_ok:   '<?=htmlspecialchars($ec_lang['mhp_vel_ok'],   ENT_QUOTES, 'UTF-8')?>',
-	vel_low:  '<?=htmlspecialchars($ec_lang['mhp_vel_low'],  ENT_QUOTES, 'UTF-8')?>',
-	vel_high: '<?=htmlspecialchars($ec_lang['mhp_vel_high'], ENT_QUOTES, 'UTF-8')?>',
-	hl_ok:    '<?=htmlspecialchars($ec_lang['mhp_hl_ok'],    ENT_QUOTES, 'UTF-8')?>',
-	hl_warn:  '<?=htmlspecialchars($ec_lang['mhp_hl_warn'],  ENT_QUOTES, 'UTF-8')?>',
-	hl_bad:   '<?=htmlspecialchars($ec_lang['mhp_hl_bad'],   ENT_QUOTES, 'UTF-8')?>'
+	vel_ok:   <?=json_encode($ec_lang['mhp_vel_ok'])?>,
+	vel_low:  <?=json_encode($ec_lang['mhp_vel_low'])?>,
+	vel_high: <?=json_encode($ec_lang['mhp_vel_high'])?>,
+	hl_ok:    <?=json_encode($ec_lang['mhp_hl_ok'])?>,
+	hl_warn:  <?=json_encode($ec_lang['mhp_hl_warn'])?>,
+	hl_bad:   <?=json_encode($ec_lang['mhp_hl_bad'])?>
 };
 </script>
 <script src="/engcalcs/js/micro-hydro-power.js?v=<?=filemtime(__DIR__.'/js/micro-hydro-power.js')?>"></script>

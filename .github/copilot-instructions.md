@@ -34,6 +34,7 @@ Before starting any task:
 - **Match formatting exactly** — whitespace, indentation, markdown levels.
 - **Show the diff** — state oldString and newString before applying changes.
 - **Ask if ambiguous** — don't infer scope or assumptions.
+- **Do NOT edit `$ec_lang_intent` entries** — this array is reserved for human review and editing only. AI must not add, change, or remove any `$ec_lang_intent` value without explicit written permission from the human in that conversation.
 
 ---
 

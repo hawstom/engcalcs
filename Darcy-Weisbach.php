@@ -54,9 +54,9 @@ echoCalculatorForm(
 
 <script>
 EngCalcs.pageConfig = {
-	regime_laminar:      '<?=htmlspecialchars($ec_lang['dw_regime_laminar'],      ENT_QUOTES, 'UTF-8')?>',
-	regime_transitional: '<?=htmlspecialchars($ec_lang['dw_regime_transitional'], ENT_QUOTES, 'UTF-8')?>',
-	regime_turbulent:    '<?=htmlspecialchars($ec_lang['dw_regime_turbulent'],    ENT_QUOTES, 'UTF-8')?>'
+	regime_laminar:      <?=json_encode($ec_lang['dw_regime_laminar'])?>,
+	regime_transitional: <?=json_encode($ec_lang['dw_regime_transitional'])?>,
+	regime_turbulent:    <?=json_encode($ec_lang['dw_regime_turbulent'])?>
 };
 </script>
 <script src="/engcalcs/js/darcy-weisbach.js?v=<?=filemtime(__DIR__.'/js/darcy-weisbach.js')?>"></script>

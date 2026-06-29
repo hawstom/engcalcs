@@ -52,12 +52,12 @@ echoCalculatorForm(
 <?php echoFeedback(); ?>
 <script>
 EngCalcs.pageConfig = {
-	loss_positive: '<?=htmlspecialchars($ec_lang['cs_loss_positive'], ENT_QUOTES, 'UTF-8')?>',
-	loss_zero:     '<?=htmlspecialchars($ec_lang['cs_loss_zero'],     ENT_QUOTES, 'UTF-8')?>',
-	loss_negative: '<?=htmlspecialchars($ec_lang['cs_loss_negative'], ENT_QUOTES, 'UTF-8')?>',
-	Ec_good:       '<?=htmlspecialchars($ec_lang['cs_Ec_good'],       ENT_QUOTES, 'UTF-8')?>',
-	Ec_fair:       '<?=htmlspecialchars($ec_lang['cs_Ec_fair'],       ENT_QUOTES, 'UTF-8')?>',
-	Ec_poor:       '<?=htmlspecialchars($ec_lang['cs_Ec_poor'],       ENT_QUOTES, 'UTF-8')?>'
+	loss_positive: <?=json_encode($ec_lang['cs_loss_positive'])?>,
+	loss_zero:     <?=json_encode($ec_lang['cs_loss_zero'])?>,
+	loss_negative: <?=json_encode($ec_lang['cs_loss_negative'])?>,
+	Ec_good:       <?=json_encode($ec_lang['cs_Ec_good'])?>,
+	Ec_fair:       <?=json_encode($ec_lang['cs_Ec_fair'])?>,
+	Ec_poor:       <?=json_encode($ec_lang['cs_Ec_poor'])?>
 };
 </script>
 <script src="/engcalcs/js/canal-seepage.js?v=<?=filemtime(__DIR__.'/js/canal-seepage.js')?>"></script>

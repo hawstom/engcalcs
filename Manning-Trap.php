@@ -35,6 +35,7 @@ echoCalculatorForm(
 		Array('name' => 'pw', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mpf_wetted_perimeter']),
 		Array('name' => 'rh', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mpf_hydraulic_radius']),
 		Array('name' => 'v', 'units' => Array('mps', 'ftps'), 'label' => $ec_lang['mpf_velocity']),
+		Array('name' => 'v_check', 'units' => NULL, 'label' => $ec_lang['mtc_vel_check']),
 		Array('name' => 'q', 'units' => Array('m3ps', 'lps', 'mld', 'ft3ps', 'gpm', 'mgd'), 'label' => '<strong>' . $ec_lang['mpf_flow'] . '</strong> '),
 		Array('name' => 'hv', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mpf_velocity_head']),
 		Array('name' => 't', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mpf_top_width']),
@@ -57,8 +58,19 @@ echoCalculatorForm(
 
 <h2><?=$ec_lang['ws_notes_heading']?></h2>
 <?php echo $ec_lang['mtc_note_1']; ?>
+<dl>
+	<dt><?=$ec_lang['mtc_note_2_term']?></dt>
+	<dd><?=$ec_lang['mtc_note_2_def']?></dd>
+</dl>
 
 <?php echoFeedback(); ?>
+<script>
+EngCalcs.pageConfig = {
+	mtc_vel_ok: <?=json_encode($ec_lang['mtc_vel_ok'])?>,
+	mtc_vel_high: <?=json_encode($ec_lang['mtc_vel_high'])?>,
+	mtc_vel_low: <?=json_encode($ec_lang['mtc_vel_low'])?>
+};
+</script>
 <script src="/engcalcs/js/Manning.lib.js?v=<?=filemtime(__DIR__.'/js/Manning.lib.js')?>"></script>
 <script src="/engcalcs/js/manning-trap.js?v=<?=filemtime(__DIR__.'/js/manning-trap.js')?>"></script>
 <script>

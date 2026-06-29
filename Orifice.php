@@ -45,10 +45,10 @@ echoCalculatorForm(
 <?php echoFeedback(); ?>
 <script>
 EngCalcs.pageConfig = {
-	regime_valid:        '<?=htmlspecialchars($ec_lang['or_regime_valid'],        ENT_QUOTES, 'UTF-8')?>',
-	regime_submerged:    '<?=htmlspecialchars($ec_lang['or_regime_submerged'],    ENT_QUOTES, 'UTF-8')?>',
-	regime_warn:         '<?=htmlspecialchars($ec_lang['or_regime_warn'],         ENT_QUOTES, 'UTF-8')?>',
-	regime_twe_above_hwe:'<?=htmlspecialchars($ec_lang['or_regime_twe_above_hwe'],ENT_QUOTES, 'UTF-8')?>'
+	regime_valid:        <?=json_encode($ec_lang['or_regime_valid'])?>,
+	regime_submerged:    <?=json_encode($ec_lang['or_regime_submerged'])?>,
+	regime_warn:         <?=json_encode($ec_lang['or_regime_warn'])?>,
+	regime_twe_above_hwe:<?=json_encode($ec_lang['or_regime_twe_above_hwe'])?>
 };
 </script>
 <script src="/engcalcs/js/orifice.js?v=<?=filemtime(__DIR__.'/js/orifice.js')?>"></script>

@@ -45,10 +45,10 @@ echoCalculatorForm(
 <?php echoFeedback(); ?>
 <script>
 EngCalcs.pageConfig = {
-	du_excellent: '<?=htmlspecialchars($ec_lang['ds_du_excellent'], ENT_QUOTES, 'UTF-8')?>',
-	du_good:      '<?=htmlspecialchars($ec_lang['ds_du_good'],      ENT_QUOTES, 'UTF-8')?>',
-	du_acceptable:'<?=htmlspecialchars($ec_lang['ds_du_acceptable'], ENT_QUOTES, 'UTF-8')?>',
-	du_poor:      '<?=htmlspecialchars($ec_lang['ds_du_poor'],       ENT_QUOTES, 'UTF-8')?>'
+	du_excellent: <?=json_encode($ec_lang['ds_du_excellent'])?>,
+	du_good:      <?=json_encode($ec_lang['ds_du_good'])?>,
+	du_acceptable:<?=json_encode($ec_lang['ds_du_acceptable'])?>,
+	du_poor:      <?=json_encode($ec_lang['ds_du_poor'])?>
 };
 </script>
 <script src="/engcalcs/js/drip-sprinkler.js?v=<?=filemtime(__DIR__.'/js/drip-sprinkler.js')?>"></script>

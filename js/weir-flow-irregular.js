@@ -1,3 +1,5 @@
+// Cw is unit-system-specific (US customary ~3.0, SI ~1.84).
+// All inputs are left unconverted; the external reference link covers Cw selection.
 // The argument f is not used here.
 EngCalcs.pageCalculator = function (objForm) {
     'use strict';
@@ -15,7 +17,6 @@ EngCalcs.pageCalculator = function (objForm) {
     qc = 0,
     // Get the global values and save them to a cookie
     hw = objForm.hw.value,
-    cw = objForm.cw.value;
     cw = objForm.cw.value;
 
     for (var station = 0; station < EngCalcs.numCalcRows; station++) {

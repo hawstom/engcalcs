@@ -110,6 +110,19 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.writeFormResult(objForm, 'n_blodgett', precision = 4, hasUnits = false);
 	this.writeFormResult(objForm, 'n_bathurst', precision = 4, hasUnits = false);
 	document.getElementById('blodgett_v_bathurst').innerHTML = (this.var.blodgett_v_bathurst);
+	var vCheckEl = document.getElementById('v_check');
+	if (vCheckEl) {
+		if (this.var.v > 3.0) {
+			vCheckEl.innerHTML = EngCalcs.pageConfig.mtc_vel_high;
+			vCheckEl.style.color = 'darkorange';
+		} else if (this.var.v < 0.6) {
+			vCheckEl.innerHTML = EngCalcs.pageConfig.mtc_vel_low;
+			vCheckEl.style.color = 'darkorange';
+		} else {
+			vCheckEl.innerHTML = EngCalcs.pageConfig.mtc_vel_ok;
+			vCheckEl.style.color = 'green';
+		}
+	}
 	this.writeFormResult(objForm, 'd50_bottom', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'd50_z1', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'd50_z2', precision = 4, hasUnits = true);

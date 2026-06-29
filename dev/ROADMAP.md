@@ -8,28 +8,28 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 # Tasks
 
-## Translation improvements
-100|Audit remaining English strings. Find out what English is left in the other language files. I know this is subjective because some things can't be translated. And this is a language-by-language judgment call. But we need to try to ensure that all translations are complete. Please advise.
-
-100|Ensure that AI shall not edit ec_lang_intent array without explicit permission.
-
-100|I corrected a linked url in $ec_lang['rc_notes_4_def']. It must be propagated to all translations.
-
-
-
 ## Calculator Improvements
+- 89|Manning Pipe Head Loss Upstream HGL in pipe is still NaN. I thought we fixed that. It should be parallel to Hazen-Williams and Darcy-Weisbach. Those three calculators should be identical except for the friction equation (and the D-W f derivation), and we can note that inside them to help us keep them identical.
+
+- 88|Orifice submerged at centroid, not invert: This and the comparison logic should be audited and fixed if needed. "Orifice regime check	Submerged orifice (TWE above invert) — valid ✓"
+
+- 88|All the occurences of Velocity check probably should be shortened to "OK", "High !", and "Low !" with tips to explain more. As they currently are, they are unsightly.
+
+## Translation improvements
+
+- 90|Our test of the $ec_lang_intent system didn't work very well. Spanish still talks about a canal for Robinson, when it should talk about something steep, I assume. I see this as the tip of an iceberg of a system that is not working, and I am afraid to find out what the languages I have no hope of checking look like. I am open to ideas and work flows for making this better. Should I translate one calculator at a time to all languages, one language at a time for all calculators, or what? I tend to think the latter. But is work flow the problem, or is the system?
+
+- 90|Audit remaining English strings in other languages. Find out what English is left in the other language files. I know this is subjective because some things can't be translated. And this is a language-by-language judgment call. But we need to try to ensure that all translations are complete. Please advise.
 
 ## AI Efficiency Scripting (Overhead)
 
 These tasks reduce the AI token cost of routine maintenance by replacing repeated AI judgment with deterministic scripts. Copilot owns execution (all tagged `[CP]`); Claude Code specs any script whose output feeds back into translation quality work.
 
-- 30|Lang-file key-order normalizer: Script that rewrites each `lib/lang.ec.??.php` so its key order matches the English source exactly. Currently, keys accumulated in insertion order over many sprints, making `git diff` noisy and making it easy for parity-checker output to be hard to read. One-time run + hook to enforce order on future edits. [CP]
+- 35|Lang-file key-order normalizer: Script that rewrites each `lib/lang.ec.??.php` so its key order matches the English source exactly. Currently, keys accumulated in insertion order over many sprints, making `git diff` noisy and making it easy for parity-checker output to be hard to read. One-time run + hook to enforce order on future edits. [CP]
 
 - 30|Deployment workflow script: Shell script wrapping the full release sequence — php syntax check on changed files, git add/commit prompt, push via `altssh.bitbucket.org:443`. Removes the per-session SSH configuration overhead that currently requires either a manual reminder or asking an AI to recall the altssh workaround. [CP]
 
-- 25|HTML-entity audit script: One-pass scan of all lang files for `&amp;`, `&lt;`, `&gt;`, `&mdash;`, `&ge;`, etc. — entities that double-encode when passed through `htmlspecialchars()` into JS `pageConfig`. Outputs a list of affected keys with suggested Unicode replacements. Prevents the recurring class of bug where AI misses an entity during translation. [CP]
-
-- 25|Quality-score updater: Script that accepts a lang code and a new QUALITY score and updates the `QUALITY` constant in the matching `lang.ec.??.php` file. Trivial change, but currently requires opening the file manually or asking an AI — a one-liner script removes that friction entirely. [CP]
+- 24|Quality-score updater: Script that accepts a lang code and a new QUALITY score and updates the `QUALITY` constant in the matching `lang.ec.??.php` file. Trivial change, but currently requires opening the file manually or asking an AI — a one-liner script removes that friction entirely. [CP]
 
 ## Low Priority / Nice-to-Have
 
@@ -42,6 +42,18 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 - 10|Results sharing — dedicated "Copy link" button or print summary. Largely addressed by the URL-based label feature; a polished UI affordance is the remaining gap. [CP]
 
 ## Completed
+
+- 0|HTML-entity audit script + bulk fix: `dev/scripts/html_entity_audit.php` scans all lang files for HTML entities (`&mdash;`, `&ge;`, `&amp;`, `&nu;`, etc.) that double-encode through `htmlspecialchars()` into JS `pageConfig`. Supports `--lang`, `--prefix`, `--fix` (replace in-place), and `--strict` (exit 1 for CI). On first run with `--fix`, replaced 2201 entity occurrences across all 26 non-English lang files with plain Unicode characters. English file was already clean; all non-English files now match that standard. Run without `--fix` to audit future regressions.
+
+- 0|Hard-coded velocity units in Micro-Hydro messages/footnote: Updated velocity check output to unitless wording ("Velocity very low", "Velocity very high", "Velocity reasonable") and replaced the velocity note text with unitless guidance tied to available drop, losses, and water-hammer risk.
+
+- 0|Propagate corrected `rc_notes_4_def` link to all translations: Replaced the old DOI URL with `https://www.fs.usda.gov/biology/nsaec/fishxing/fplibrary/Robinson_1998_Design_of_Rock_Chutes.pdf` in all 27 `lib/lang.ec.??.php` files.
+
+- 0|Add velocity checks to Manning trapezoid and irregular calculators: Added `v_check` result to both calculators with warning messaging when velocity is high, and added the requested design note about high specific energy and potential expansion/obstruction losses.
+
+- 0|ec_lang_intent guard: `$ec_lang_intent` is now explicitly off-limits to AI in both `CLAUDE.md` and `.github/copilot-instructions.md`. Both files state that AI must not add, change, or remove any `$ec_lang_intent` value without explicit written permission from the human in that conversation.
+
+- 0|Math/logic review of all 14 calculators: Full review completed; findings written to `dev/ai-report.md`. One confirmed bug (Manning Pipe Head Loss HGL₂ always NaN — `hgl2` referenced before assignment), one medium logic concern (Orifice submergence criterion overestimates flow when TWE between invert and centroid), one design risk (Weir Flow Simple missing unit guidance for Cw), one cosmetic misspelling (Hagen-"Pouseuille" in DW). All core hydraulic formulas in the other 12 calculators verified correct.
 
 - 0|"More" dropdown: About link moved under a "More ▾" dropdown (`menu_more` key, translated into all 27 languages). Follows web convention (Twitter, LinkedIn); "Help → About" is desktop-app convention. Dropdown uses `dropdown-menu-end` so it aligns to the right edge on small screens. Ready for Install/Subscribe/Contact items as those pages are built.
 

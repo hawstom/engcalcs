@@ -18,6 +18,8 @@ EngCalcs.pageCalculator = function (objForm) {
 	n1,
 	d0,
 	d1,
+	maxRegionVelocity = 0,
+	minRegionVelocity = Infinity,
 	l,
 	rise,
 	hypotenuse,
@@ -88,6 +90,8 @@ EngCalcs.pageCalculator = function (objForm) {
 			// Region
 			if (this.Manning.isBank) {
 				this.Manning.closeRegion();
+				maxRegionVelocity = Math.max(maxRegionVelocity, this.Manning.v617);
+				minRegionVelocity = Math.min(minRegionVelocity, this.Manning.v617);
 				document.getElementsByName('rh')[iStation].innerHTML = (this.Manning.rh * objForm['rhu'].value).toFixed(2);
 				document.getElementsByName('n617')[iStation].innerHTML = this.Manning.n617.toFixed(2);
 				document.getElementsByName('v617')[iStation].innerHTML = (this.Manning.v617 * objForm['v617u'].value).toFixed(2);
@@ -109,6 +113,22 @@ EngCalcs.pageCalculator = function (objForm) {
 		d0=d1;
 	}
 	document.getElementById('q_617').innerHTML = (this.Manning.q617c * objForm['q_617u'].value).toFixed(2);
+	var vCheckEl = document.getElementById('v_check');
+	if (vCheckEl) {
+		if (minRegionVelocity === Infinity) {
+			vCheckEl.innerHTML = '';
+			vCheckEl.style.color = '';
+		} else if (maxRegionVelocity > 3.0) {
+			vCheckEl.innerHTML = EngCalcs.pageConfig.mtc_vel_high;
+			vCheckEl.style.color = 'darkorange';
+		} else if (minRegionVelocity < 0.6) {
+			vCheckEl.innerHTML = EngCalcs.pageConfig.mtc_vel_low;
+			vCheckEl.style.color = 'darkorange';
+		} else {
+			vCheckEl.innerHTML = EngCalcs.pageConfig.mtc_vel_ok;
+			vCheckEl.style.color = 'green';
+		}
+	}
 
 	// Sketch
 	var
