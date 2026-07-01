@@ -295,6 +295,31 @@ function detectPrefixes(array $keys): array
     return $list;
 }
 
+/**
+ * Returns true when a key's English value is inherently universal (unit symbols,
+ * single-letter variable names) and should never be flagged as equal_to_english.
+ *
+ * u_ prefix rule: no consecutive letter run ≥ 4 chars.
+ *   Passes: "ft", "cfs", "kWh/yr", "ft H2O", "sec", "gpm" (all ≤ 3 alpha chars).
+ *   Fails: "fraction" (8), "rise/run" (rise=4) — correctly sent for translation.
+ *
+ * mi_ prefix rule: 1–2 alphanumeric chars after stripping HTML tags.
+ *   Passes: 'Q', 'Fr', 'P<sub>w</sub>'→"Pw", 'R<sub>h</sub>'→"Rh", 'H<sub>v</sub>'→"Hv".
+ *   Fails: 'Sta' (3), 'Elev' (4), compound strings with real words.
+ */
+function isUniversalKey(string $key, string $englishValue): bool
+{
+    $prefix = keyPrefix($key);
+    if ($prefix === 'u') {
+        return !preg_match('/[a-zA-Z]{4}/', $englishValue);
+    }
+    if ($prefix === 'mi') {
+        $stripped = preg_replace('/<[^>]+>/', '', $englishValue);
+        return (bool) preg_match('/^[a-zA-Z0-9]{1,2}$/', $stripped);
+    }
+    return false;
+}
+
 function collectDeltaAndContext(array $enKeys, array $current, array $activePrefixes): array
 {
     $delta = [];
@@ -317,7 +342,9 @@ function collectDeltaAndContext(array $enKeys, array $current, array $activePref
         } elseif ($currentValue === '') {
             $reason = 'blank';
         } elseif ($currentValue === trim($english)) {
-            $reason = 'equal_to_english';
+            if (!isUniversalKey($key, $english)) {
+                $reason = 'equal_to_english';
+            }
         }
 
         if ($reason === null) {
@@ -401,10 +428,10 @@ function prefixToTermNames(): array
         'odt' => ['orifice', 'discharge coefficient', 'headwater elevation', 'tailwater elevation'],
         'ds' => ['flow', 'application rate', 'distribution uniformity', 'emitter'],
         'cs' => ['flow', 'conveyance efficiency', 'seepage'],
-        'mhp' => ['flow', 'penstock', 'gross head', 'net head', 'plant efficiency', 'head loss'],
+        'mhp' => ['flow', 'penstock', 'gross head', 'net head', 'plant efficiency', 'head loss', 'run-of-river', 'headworks', 'junction loss'],
         'pd' => ['flow', 'penstock', 'gross head', 'net head', 'head loss', 'friction factor'],
-        'rc' => ['flow', 'velocity', 'riprap', 'slope'],
-        'rrc' => ['flow', 'velocity', 'riprap', 'slope'],
+        'rc' => ['flow', 'velocity', 'riprap', 'slope', 'rock chute', 'chute', 'unit discharge', 'median rock size', 'gradation', 'porosity', 'specific gravity', 'ponding'],
+        'rrc' => ['flow', 'velocity', 'riprap', 'slope', 'rock chute', 'chute', 'unit discharge', 'median rock size', 'gradation', 'porosity', 'specific gravity', 'ponding'],
     ];
 }
 

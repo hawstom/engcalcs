@@ -1,17 +1,125 @@
 {
     "meta": {
         "language": "uk",
-        "expected_key_count": 463,
-        "delta_key_count": 0,
-        "active_prefixes": [],
-        "requested_prefix": "dw",
+        "expected_key_count": 459,
+        "delta_key_count": 2,
+        "active_prefixes": [
+            "menu",
+            "wi"
+        ],
+        "requested_prefix": null,
         "notes": "Translate only keys in keys_to_translate; preserve HTML, units, and symbols.",
         "glossary_injection_notes": "Use prompt_context_by_prefix and glossary_terms_by_prefix.preferred_translation when available.",
-        "context_notes": "Use key_context.neighbors to keep register consistent with nearby translated strings."
+        "context_notes": "Use key_context.neighbors to keep register consistent with nearby translated strings.",
+        "intent_notes": "Use key_intent when present; these entries provide terse disambiguation comments only where translation risk exists."
     },
-    "prompt_context_by_prefix": [],
-    "glossary_terms_by_prefix": [],
-    "keys_to_translate": [],
-    "keys": [],
-    "key_context": []
+    "prompt_context_by_prefix": {
+        "menu": "Use these preferred technical term translations when relevant:\n- flow (Q): витрата\n- velocity (v): швидкість\n- slope (S): ухил",
+        "wi": "Use these preferred technical term translations when relevant:\n- flow (Q): витрата\n- weir: водозлив\n- headwater elevation: позначка рівня верхнього б'єфа\n- tailwater elevation: позначка рівня нижнього б'єфа\n- discharge coefficient (C_d): коефіцієнт витрати"
+    },
+    "glossary_terms_by_prefix": {
+        "menu": [
+            {
+                "term": "flow",
+                "symbol": "Q",
+                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
+                "preferred_translation": "витрата"
+            },
+            {
+                "term": "velocity",
+                "symbol": "v",
+                "context": "Flow velocity (speed of water). Appears in all calculators.",
+                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
+                "preferred_translation": "швидкість"
+            },
+            {
+                "term": "slope",
+                "symbol": "S",
+                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
+                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
+                "preferred_translation": "ухил"
+            }
+        ],
+        "wi": [
+            {
+                "term": "flow",
+                "symbol": "Q",
+                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
+                "preferred_translation": "витрата"
+            },
+            {
+                "term": "weir",
+                "symbol": "",
+                "context": "A flow-measurement or water-control structure — a barrier across a channel over which water flows. Appears in Weir Flow Simple and Weir Flow Irregular calculators.",
+                "translation_notes": "WMO No. 385 entry 1665 confirms: es = 'vertedero', fr = 'déversoir', ru = 'водослив'. In an irrigation context, the term often overlaps with 'diversion dam' or 'check structure'. Use the term most common among irrigation field workers in the target language, not a purely civil-engineering dictionary term.",
+                "preferred_translation": "водозлив"
+            },
+            {
+                "term": "headwater elevation",
+                "symbol": "",
+                "context": "Water surface elevation on the upstream side of a weir or orifice. Appears in Weir Flow and Orifice calculators.",
+                "translation_notes": "'Headwater' is an upstream water surface — do not confuse with 'head' (energy) or 'source' (origin of a stream). Use the hydraulic structure term.",
+                "preferred_translation": "позначка рівня верхнього б'єфа"
+            },
+            {
+                "term": "tailwater elevation",
+                "symbol": "",
+                "context": "Water surface elevation on the downstream side of a weir or orifice. Appears in Orifice Flow calculator. When tailwater is above the invert, the orifice is submerged.",
+                "translation_notes": "Use the hydraulic structure term for downstream water level. Pair consistently with 'headwater elevation'.",
+                "preferred_translation": "позначка рівня нижнього б'єфа"
+            },
+            {
+                "term": "discharge coefficient",
+                "symbol": "C_d",
+                "context": "Coefficient correcting theoretical orifice or weir flow for real-world contraction and friction effects. Appears in Orifice and Weir calculators.",
+                "translation_notes": "The 'discharge' here refers to flow rate, not the verb. Use the hydraulic engineering compound term.",
+                "preferred_translation": "коефіцієнт витрати"
+            }
+        ]
+    },
+    "keys_to_translate": {
+        "menu_brand": "HawsEDC Calculators",
+        "wi_notes_we_def": "q = if (length = 0) then 0 else if (slope=0) then cw*length*d<sub>0<\/sub><sup>1.5<\/sup> else cw\/(2.5*slope) * (d<sub>0<\/sub><sup>2.5<\/sup> - d<sub>1<\/sub><sup>2.5<\/sup>) where d<sub>1<\/sub> and d<sub>0<\/sub> are always positive or zero"
+    },
+    "keys": {
+        "menu_brand": "HawsEDC Calculators",
+        "wi_notes_we_def": "q = if (length = 0) then 0 else if (slope=0) then cw*length*d<sub>0<\/sub><sup>1.5<\/sup> else cw\/(2.5*slope) * (d<sub>0<\/sub><sup>2.5<\/sup> - d<sub>1<\/sub><sup>2.5<\/sup>) where d<sub>1<\/sub> and d<sub>0<\/sub> are always positive or zero"
+    },
+    "key_context": {
+        "menu_brand": {
+            "reason": "equal_to_english",
+            "current_value": "HawsEDC Calculators",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "u_s",
+                    "value": "с",
+                    "english": "sec"
+                },
+                "next_translated": {
+                    "key": "menu_main_list",
+                    "value": "Список калькуляторів",
+                    "english": "List of Calculators"
+                }
+            }
+        },
+        "wi_notes_we_def": {
+            "reason": "equal_to_english",
+            "current_value": "q = if (length = 0) then 0 else if (slope=0) then cw*length*d<sub>0<\/sub><sup>1.5<\/sup> else cw\/(2.5*slope) * (d<sub>0<\/sub><sup>2.5<\/sup> - d<sub>1<\/sub><sup>2.5<\/sup>) where d<sub>1<\/sub> and d<sub>0<\/sub> are always positive or zero",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "wi_notes_we_term",
+                    "value": "Рівняння водозливу",
+                    "english": "Weir Equation"
+                },
+                "next_translated": {
+                    "key": "or_main_menu",
+                    "value": "Витікання через отвір",
+                    "english": "Orifice Flow"
+                }
+            }
+        }
+    },
+    "key_intent": []
 }

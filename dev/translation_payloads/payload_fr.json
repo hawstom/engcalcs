@@ -1,17 +1,396 @@
 {
     "meta": {
         "language": "fr",
-        "expected_key_count": 463,
-        "delta_key_count": 0,
-        "active_prefixes": [],
-        "requested_prefix": "dw",
+        "expected_key_count": 459,
+        "delta_key_count": 9,
+        "active_prefixes": [
+            "contact",
+            "ds",
+            "mi",
+            "mtc",
+            "u",
+            "ws"
+        ],
+        "requested_prefix": null,
         "notes": "Translate only keys in keys_to_translate; preserve HTML, units, and symbols.",
         "glossary_injection_notes": "Use prompt_context_by_prefix and glossary_terms_by_prefix.preferred_translation when available.",
-        "context_notes": "Use key_context.neighbors to keep register consistent with nearby translated strings."
+        "context_notes": "Use key_context.neighbors to keep register consistent with nearby translated strings.",
+        "intent_notes": "Use key_intent when present; these entries provide terse disambiguation comments only where translation risk exists."
     },
-    "prompt_context_by_prefix": [],
-    "glossary_terms_by_prefix": [],
-    "keys_to_translate": [],
-    "keys": [],
-    "key_context": []
+    "prompt_context_by_prefix": {
+        "contact": "Use these preferred technical term translations when relevant:\n- flow (Q): débit\n- velocity (v): vitesse\n- slope (S): pente",
+        "ds": "Use these preferred technical term translations when relevant:\n- flow (Q): débit\n- application rate (PR): taux d'application\n- distribution uniformity (DU): uniformité de distribution\n- emitter: émetteur",
+        "mi": "Use these preferred technical term translations when relevant:\n- flow (Q): débit\n- velocity (v): vitesse\n- hydraulic radius (R_h): rayon hydraulique\n- wetted perimeter (P_w): périmètre mouillé\n- Manning roughness (n): coefficient de rugosité de Manning\n- slope (S): pente",
+        "mtc": "Use these preferred technical term translations when relevant:\n- flow (Q): débit\n- velocity (v): vitesse\n- hydraulic radius (R_h): rayon hydraulique\n- wetted perimeter (P_w): périmètre mouillé\n- Manning roughness (n): coefficient de rugosité de Manning\n- slope (S): pente",
+        "u": "Use these preferred technical term translations when relevant:\n- flow (Q): débit\n- velocity (v): vitesse\n- slope (S): pente",
+        "ws": "Use these preferred technical term translations when relevant:\n- flow (Q): débit\n- weir: déversoir\n- headwater elevation: niveau d'eau amont\n- tailwater elevation: niveau d'eau aval\n- discharge coefficient (C_d): coefficient de décharge"
+    },
+    "glossary_terms_by_prefix": {
+        "contact": [
+            {
+                "term": "flow",
+                "symbol": "Q",
+                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
+                "preferred_translation": "débit"
+            },
+            {
+                "term": "velocity",
+                "symbol": "v",
+                "context": "Flow velocity (speed of water). Appears in all calculators.",
+                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
+                "preferred_translation": "vitesse"
+            },
+            {
+                "term": "slope",
+                "symbol": "S",
+                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
+                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
+                "preferred_translation": "pente"
+            }
+        ],
+        "ds": [
+            {
+                "term": "flow",
+                "symbol": "Q",
+                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
+                "preferred_translation": "débit"
+            },
+            {
+                "term": "application rate",
+                "symbol": "PR",
+                "context": "Depth of water applied per unit time by a drip or sprinkler system. PR = q \/ A_e. Appears in Drip\/Sprinkler calculator.",
+                "translation_notes": "In irrigation, 'application rate' or 'precipitation rate' (for sprinklers) or 'irrigation rate'. Use the field irrigation term. Do not use a water-quality or chemical-application connotation.",
+                "preferred_translation": "taux d'application"
+            },
+            {
+                "term": "distribution uniformity",
+                "symbol": "DU",
+                "context": "Ratio of minimum to average emitter flow rate in a drip or sprinkler system. DU = q_min \/ q_avg. Appears in Drip\/Sprinkler calculator.",
+                "translation_notes": "Use the irrigation engineering standard term. 'Uniformity' refers to how evenly water is distributed across the field, not physical evenness of the system.",
+                "preferred_translation": "uniformité de distribution"
+            },
+            {
+                "term": "emitter",
+                "symbol": "",
+                "context": "A drip irrigation emitter (dripper\/micro-sprinkler) that delivers water at a controlled low flow rate directly to the soil or plant root zone. Appears in Drip\/Sprinkler calculator.",
+                "translation_notes": "Use the field term most familiar to irrigation practitioners in the target language. Arabic: 'قطارة' (dripper) is the field term, preferred over the academic 'مُصدِر'. Spanish: 'gotero' is field-common in Latin America alongside the technical 'emisor'. Ukrainian: 'крапельниця' is the field term used by irrigation workers.",
+                "preferred_translation": "émetteur"
+            }
+        ],
+        "mi": [
+            {
+                "term": "flow",
+                "symbol": "Q",
+                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
+                "preferred_translation": "débit"
+            },
+            {
+                "term": "velocity",
+                "symbol": "v",
+                "context": "Flow velocity (speed of water). Appears in all calculators.",
+                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
+                "preferred_translation": "vitesse"
+            },
+            {
+                "term": "hydraulic radius",
+                "symbol": "R_h",
+                "context": "Cross-sectional flow area divided by wetted perimeter. Appears in Manning calculators.",
+                "translation_notes": "Use the standard hydraulic engineering phrase. Pre-2026 sr\/hr human translations used the Latin loanword 'hidraulički radijus' — this form is widely used in South Slavic engineering practice and may be more recognizable to field practitioners than the native Slavic equivalents 'полупречник' (sr) \/ 'polumjer' (hr). Both are correct; native Slavic engineers may encounter both forms.",
+                "preferred_translation": "rayon hydraulique"
+            },
+            {
+                "term": "wetted perimeter",
+                "symbol": "P_w",
+                "context": "Length of the channel or pipe boundary in contact with flowing water. Appears in Manning calculators.",
+                "translation_notes": "WMO No. 385 entry 1682 confirms: es = 'perímetro mojado', fr = 'périmètre mouillé'. Use the standard hydraulic engineering phrase. 'Wetted' here means 'in contact with water', not 'soaked'. Pre-2026 sr human used 'okvašeni obim' (obim = natural South Slavic word for perimeter\/circumference); current uses 'квашени периметар' (периметар = Greek-derived loanword). Both are correct; 'obim\/opseg' is more natural in informal Serbian\/Croatian field use.",
+                "preferred_translation": "périmètre mouillé"
+            },
+            {
+                "term": "Manning roughness",
+                "symbol": "n",
+                "context": "Manning's n — empirical roughness coefficient used in the Manning formula for open-channel and pipe flow.",
+                "translation_notes": "Always include 'Manning' as a proper noun. The coefficient itself (n) needs no translation — only the label does. Do not translate as generic 'roughness coefficient' without 'Manning'.",
+                "preferred_translation": "coefficient de rugosité de Manning"
+            },
+            {
+                "term": "slope",
+                "symbol": "S",
+                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
+                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
+                "preferred_translation": "pente"
+            }
+        ],
+        "mtc": [
+            {
+                "term": "flow",
+                "symbol": "Q",
+                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
+                "preferred_translation": "débit"
+            },
+            {
+                "term": "velocity",
+                "symbol": "v",
+                "context": "Flow velocity (speed of water). Appears in all calculators.",
+                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
+                "preferred_translation": "vitesse"
+            },
+            {
+                "term": "hydraulic radius",
+                "symbol": "R_h",
+                "context": "Cross-sectional flow area divided by wetted perimeter. Appears in Manning calculators.",
+                "translation_notes": "Use the standard hydraulic engineering phrase. Pre-2026 sr\/hr human translations used the Latin loanword 'hidraulički radijus' — this form is widely used in South Slavic engineering practice and may be more recognizable to field practitioners than the native Slavic equivalents 'полупречник' (sr) \/ 'polumjer' (hr). Both are correct; native Slavic engineers may encounter both forms.",
+                "preferred_translation": "rayon hydraulique"
+            },
+            {
+                "term": "wetted perimeter",
+                "symbol": "P_w",
+                "context": "Length of the channel or pipe boundary in contact with flowing water. Appears in Manning calculators.",
+                "translation_notes": "WMO No. 385 entry 1682 confirms: es = 'perímetro mojado', fr = 'périmètre mouillé'. Use the standard hydraulic engineering phrase. 'Wetted' here means 'in contact with water', not 'soaked'. Pre-2026 sr human used 'okvašeni obim' (obim = natural South Slavic word for perimeter\/circumference); current uses 'квашени периметар' (периметар = Greek-derived loanword). Both are correct; 'obim\/opseg' is more natural in informal Serbian\/Croatian field use.",
+                "preferred_translation": "périmètre mouillé"
+            },
+            {
+                "term": "Manning roughness",
+                "symbol": "n",
+                "context": "Manning's n — empirical roughness coefficient used in the Manning formula for open-channel and pipe flow.",
+                "translation_notes": "Always include 'Manning' as a proper noun. The coefficient itself (n) needs no translation — only the label does. Do not translate as generic 'roughness coefficient' without 'Manning'.",
+                "preferred_translation": "coefficient de rugosité de Manning"
+            },
+            {
+                "term": "slope",
+                "symbol": "S",
+                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
+                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
+                "preferred_translation": "pente"
+            }
+        ],
+        "u": [
+            {
+                "term": "flow",
+                "symbol": "Q",
+                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
+                "preferred_translation": "débit"
+            },
+            {
+                "term": "velocity",
+                "symbol": "v",
+                "context": "Flow velocity (speed of water). Appears in all calculators.",
+                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
+                "preferred_translation": "vitesse"
+            },
+            {
+                "term": "slope",
+                "symbol": "S",
+                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
+                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
+                "preferred_translation": "pente"
+            }
+        ],
+        "ws": [
+            {
+                "term": "flow",
+                "symbol": "Q",
+                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
+                "preferred_translation": "débit"
+            },
+            {
+                "term": "weir",
+                "symbol": "",
+                "context": "A flow-measurement or water-control structure — a barrier across a channel over which water flows. Appears in Weir Flow Simple and Weir Flow Irregular calculators.",
+                "translation_notes": "WMO No. 385 entry 1665 confirms: es = 'vertedero', fr = 'déversoir', ru = 'водослив'. In an irrigation context, the term often overlaps with 'diversion dam' or 'check structure'. Use the term most common among irrigation field workers in the target language, not a purely civil-engineering dictionary term.",
+                "preferred_translation": "déversoir"
+            },
+            {
+                "term": "headwater elevation",
+                "symbol": "",
+                "context": "Water surface elevation on the upstream side of a weir or orifice. Appears in Weir Flow and Orifice calculators.",
+                "translation_notes": "'Headwater' is an upstream water surface — do not confuse with 'head' (energy) or 'source' (origin of a stream). Use the hydraulic structure term.",
+                "preferred_translation": "niveau d'eau amont"
+            },
+            {
+                "term": "tailwater elevation",
+                "symbol": "",
+                "context": "Water surface elevation on the downstream side of a weir or orifice. Appears in Orifice Flow calculator. When tailwater is above the invert, the orifice is submerged.",
+                "translation_notes": "Use the hydraulic structure term for downstream water level. Pair consistently with 'headwater elevation'.",
+                "preferred_translation": "niveau d'eau aval"
+            },
+            {
+                "term": "discharge coefficient",
+                "symbol": "C_d",
+                "context": "Coefficient correcting theoretical orifice or weir flow for real-world contraction and friction effects. Appears in Orifice and Weir calculators.",
+                "translation_notes": "The 'discharge' here refers to flow rate, not the verb. Use the hydraulic engineering compound term.",
+                "preferred_translation": "coefficient de décharge"
+            }
+        ]
+    },
+    "keys_to_translate": {
+        "u_depthFrac": "fraction",
+        "mi_groupPoint": "Point",
+        "mi_groupSegment": "Segment",
+        "mi_notes": "Notes",
+        "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
+        "ws_notes_heading": "Notes",
+        "ds_du_excellent": "Excellent — DU ≥ 90% ✓",
+        "ds_du_acceptable": "Acceptable — DU ≥ 70%",
+        "contact_main_menu": "Contact"
+    },
+    "keys": {
+        "u_depthFrac": "fraction",
+        "mi_groupPoint": "Point",
+        "mi_groupSegment": "Segment",
+        "mi_notes": "Notes",
+        "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
+        "ws_notes_heading": "Notes",
+        "ds_du_excellent": "Excellent — DU ≥ 90% ✓",
+        "ds_du_acceptable": "Acceptable — DU ≥ 70%",
+        "contact_main_menu": "Contact"
+    },
+    "key_context": {
+        "u_depthFrac": {
+            "reason": "equal_to_english",
+            "current_value": "fraction",
+            "neighbors": {
+                "previous_translated": null,
+                "next_translated": {
+                    "key": "u_ft3ps",
+                    "value": "ft^3\/s",
+                    "english": "cfs"
+                }
+            }
+        },
+        "mi_groupPoint": {
+            "reason": "equal_to_english",
+            "current_value": "Point",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "mi_xSecPoints",
+                    "value": "Points de la section en travers",
+                    "english": "Cross section points"
+                },
+                "next_translated": {
+                    "key": "mi_groupRegion",
+                    "value": "Région",
+                    "english": "Region"
+                }
+            }
+        },
+        "mi_groupSegment": {
+            "reason": "equal_to_english",
+            "current_value": "Segment",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "mi_xSecPoints",
+                    "value": "Points de la section en travers",
+                    "english": "Cross section points"
+                },
+                "next_translated": {
+                    "key": "mi_groupRegion",
+                    "value": "Région",
+                    "english": "Region"
+                }
+            }
+        },
+        "mi_notes": {
+            "reason": "equal_to_english",
+            "current_value": "Notes",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "mi_n617",
+                    "value": "n<br \/>composé",
+                    "english": "Comp.<br \/>n"
+                },
+                "next_translated": {
+                    "key": "mi_notes_1_term",
+                    "value": "n composé",
+                    "english": "Composite n"
+                }
+            }
+        },
+        "mtc_blodgett_v_bathurst": {
+            "reason": "equal_to_english",
+            "current_value": "Blodgett vs. Bathurst",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "mtc_n_bathurst",
+                    "value": "n pour la granulométrie de conception selon Bathurst",
+                    "english": "n for design rock size per Bathurst"
+                },
+                "next_translated": {
+                    "key": "mtc_d50_bottom",
+                    "value": "Granulométrie d'enrochement anguleux requise au fond, D50 (Isbash & MC) <span title=\"Selon Isbash (1936) et Maricopa County, Arizona, US.\" style=\"cursor:help;color:#06c;font-size:0.9em\">?<\/span>",
+                    "english": "Required bottom angular rock size, D50 (Isbash & MC) <span title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\" style=\"cursor:help;color:#06c;font-size:0.9em\">?<\/span>"
+                }
+            }
+        },
+        "ws_notes_heading": {
+            "reason": "equal_to_english",
+            "current_value": "Notes",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "ws_weirCoefficient",
+                    "value": "Coefficient de déversoir, Cw",
+                    "english": "Weir coefficient, Cw"
+                },
+                "next_translated": {
+                    "key": "ws_notes_we_term",
+                    "value": "Équation du déversoir",
+                    "english": "Weir Equation"
+                }
+            }
+        },
+        "ds_du_excellent": {
+            "reason": "equal_to_english",
+            "current_value": "Excellent — DU ≥ 90% ✓",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "ds_t_run",
+                    "value": "Durée (heures)",
+                    "english": "Runtime (hours)"
+                },
+                "next_translated": {
+                    "key": "ds_du_good",
+                    "value": "Bon — DU ≥ 80% ✓",
+                    "english": "Good — DU ≥ 80% ✓"
+                }
+            }
+        },
+        "ds_du_acceptable": {
+            "reason": "equal_to_english",
+            "current_value": "Acceptable — DU ≥ 70%",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "ds_du_good",
+                    "value": "Bon — DU ≥ 80% ✓",
+                    "english": "Good — DU ≥ 80% ✓"
+                },
+                "next_translated": {
+                    "key": "ds_du_poor",
+                    "value": "Médiocre — DU < 70% — revoir la conception ⚠",
+                    "english": "Poor — DU < 70% — review design ⚠"
+                }
+            }
+        },
+        "contact_main_menu": {
+            "reason": "equal_to_english",
+            "current_value": "Contact",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "install_main_desc",
+                    "value": "Ajouter à votre appareil pour une utilisation hors ligne",
+                    "english": "Add to Your Device for Offline Use"
+                },
+                "next_translated": {
+                    "key": "about_main_title",
+                    "value": "À propos des calculateurs HawsEDC",
+                    "english": "About HawsEDC Engineering Calculators"
+                }
+            }
+        }
+    },
+    "key_intent": []
 }

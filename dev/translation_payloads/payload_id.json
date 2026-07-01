@@ -1,78 +1,52 @@
 {
     "meta": {
         "language": "id",
-        "expected_key_count": 463,
-        "delta_key_count": 53,
+        "expected_key_count": 459,
+        "delta_key_count": 4,
         "active_prefixes": [
-            "ec",
             "mi",
             "mtc",
-            "rc",
-            "u"
+            "rc"
         ],
         "requested_prefix": null,
         "notes": "Translate only keys in keys_to_translate; preserve HTML, units, and symbols.",
         "glossary_injection_notes": "Use prompt_context_by_prefix and glossary_terms_by_prefix.preferred_translation when available.",
-        "context_notes": "Use key_context.neighbors to keep register consistent with nearby translated strings."
+        "context_notes": "Use key_context.neighbors to keep register consistent with nearby translated strings.",
+        "intent_notes": "Use key_intent when present; these entries provide terse disambiguation comments only where translation risk exists."
     },
     "prompt_context_by_prefix": {
-        "ec": "Use these preferred technical term translations when relevant:\n- flow (Q): debit\n- velocity (v): kecepatan\n- slope (S): kemiringan",
         "mi": "Use these preferred technical term translations when relevant:\n- flow (Q): debit\n- velocity (v): kecepatan\n- hydraulic radius (R_h): jari-jari hidrolik\n- wetted perimeter (P_w): keliling basah\n- Manning roughness (n): koefisien kekasaran Manning\n- slope (S): kemiringan",
         "mtc": "Use these preferred technical term translations when relevant:\n- flow (Q): debit\n- velocity (v): kecepatan\n- hydraulic radius (R_h): jari-jari hidrolik\n- wetted perimeter (P_w): keliling basah\n- Manning roughness (n): koefisien kekasaran Manning\n- slope (S): kemiringan",
-        "rc": "Use these preferred technical term translations when relevant:\n- flow (Q): debit\n- velocity (v): kecepatan\n- riprap: batu pasangan\n- slope (S): kemiringan",
-        "u": "Use these preferred technical term translations when relevant:\n- flow (Q): debit\n- velocity (v): kecepatan\n- slope (S): kemiringan"
+        "rc": "Use these preferred technical term translations when relevant:\n- flow (Q): debit\n- velocity (v): kecepatan\n- riprap: batu pasangan\n- slope (S): kemiringan\n- rock chute: saluran curam berbatu\n- chute: saluran curam\n- unit discharge (q, q_t): debit per satuan lebar\n- median rock size (D50): ukuran median batu\n- gradation (SD): gradasi butir\n- porosity (n_p): porositas\n- specific gravity (sg): berat jenis\n- ponding: genangan air hulu"
     },
     "glossary_terms_by_prefix": {
-        "ec": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'.",
-                "preferred_translation": "debit"
-            },
-            {
-                "term": "velocity",
-                "symbol": "v",
-                "context": "Flow velocity (speed of water). Appears in all calculators.",
-                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists.",
-                "preferred_translation": "kecepatan"
-            },
-            {
-                "term": "slope",
-                "symbol": "S",
-                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
-                "translation_notes": "In open-channel hydraulics, 'slope' is the bed gradient — not the angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
-                "preferred_translation": "kemiringan"
-            }
-        ],
         "mi": [
             {
                 "term": "flow",
                 "symbol": "Q",
                 "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'.",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
                 "preferred_translation": "debit"
             },
             {
                 "term": "velocity",
                 "symbol": "v",
                 "context": "Flow velocity (speed of water). Appears in all calculators.",
-                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists.",
+                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
                 "preferred_translation": "kecepatan"
             },
             {
                 "term": "hydraulic radius",
                 "symbol": "R_h",
                 "context": "Cross-sectional flow area divided by wetted perimeter. Appears in Manning calculators.",
-                "translation_notes": "Standard term in hydraulic engineering — most languages use a direct translation. Do not confuse with 'pipe radius'.",
+                "translation_notes": "Use the standard hydraulic engineering phrase. Pre-2026 sr\/hr human translations used the Latin loanword 'hidraulički radijus' — this form is widely used in South Slavic engineering practice and may be more recognizable to field practitioners than the native Slavic equivalents 'полупречник' (sr) \/ 'polumjer' (hr). Both are correct; native Slavic engineers may encounter both forms.",
                 "preferred_translation": "jari-jari hidrolik"
             },
             {
                 "term": "wetted perimeter",
                 "symbol": "P_w",
                 "context": "Length of the channel or pipe boundary in contact with flowing water. Appears in Manning calculators.",
-                "translation_notes": "Use the standard hydraulic engineering phrase. 'Wetted' here means 'in contact with water', not 'soaked'.",
+                "translation_notes": "WMO No. 385 entry 1682 confirms: es = 'perímetro mojado', fr = 'périmètre mouillé'. Use the standard hydraulic engineering phrase. 'Wetted' here means 'in contact with water', not 'soaked'. Pre-2026 sr human used 'okvašeni obim' (obim = natural South Slavic word for perimeter\/circumference); current uses 'квашени периметар' (периметар = Greek-derived loanword). Both are correct; 'obim\/opseg' is more natural in informal Serbian\/Croatian field use.",
                 "preferred_translation": "keliling basah"
             },
             {
@@ -86,7 +60,7 @@
                 "term": "slope",
                 "symbol": "S",
                 "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
-                "translation_notes": "In open-channel hydraulics, 'slope' is the bed gradient — not the angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
+                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
                 "preferred_translation": "kemiringan"
             }
         ],
@@ -95,28 +69,28 @@
                 "term": "flow",
                 "symbol": "Q",
                 "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'.",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
                 "preferred_translation": "debit"
             },
             {
                 "term": "velocity",
                 "symbol": "v",
                 "context": "Flow velocity (speed of water). Appears in all calculators.",
-                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists.",
+                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
                 "preferred_translation": "kecepatan"
             },
             {
                 "term": "hydraulic radius",
                 "symbol": "R_h",
                 "context": "Cross-sectional flow area divided by wetted perimeter. Appears in Manning calculators.",
-                "translation_notes": "Standard term in hydraulic engineering — most languages use a direct translation. Do not confuse with 'pipe radius'.",
+                "translation_notes": "Use the standard hydraulic engineering phrase. Pre-2026 sr\/hr human translations used the Latin loanword 'hidraulički radijus' — this form is widely used in South Slavic engineering practice and may be more recognizable to field practitioners than the native Slavic equivalents 'полупречник' (sr) \/ 'polumjer' (hr). Both are correct; native Slavic engineers may encounter both forms.",
                 "preferred_translation": "jari-jari hidrolik"
             },
             {
                 "term": "wetted perimeter",
                 "symbol": "P_w",
                 "context": "Length of the channel or pipe boundary in contact with flowing water. Appears in Manning calculators.",
-                "translation_notes": "Use the standard hydraulic engineering phrase. 'Wetted' here means 'in contact with water', not 'soaked'.",
+                "translation_notes": "WMO No. 385 entry 1682 confirms: es = 'perímetro mojado', fr = 'périmètre mouillé'. Use the standard hydraulic engineering phrase. 'Wetted' here means 'in contact with water', not 'soaked'. Pre-2026 sr human used 'okvašeni obim' (obim = natural South Slavic word for perimeter\/circumference); current uses 'квашени периметар' (периметар = Greek-derived loanword). Both are correct; 'obim\/opseg' is more natural in informal Serbian\/Croatian field use.",
                 "preferred_translation": "keliling basah"
             },
             {
@@ -130,7 +104,7 @@
                 "term": "slope",
                 "symbol": "S",
                 "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
-                "translation_notes": "In open-channel hydraulics, 'slope' is the bed gradient — not the angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
+                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
                 "preferred_translation": "kemiringan"
             }
         ],
@@ -139,14 +113,14 @@
                 "term": "flow",
                 "symbol": "Q",
                 "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'.",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
                 "preferred_translation": "debit"
             },
             {
                 "term": "velocity",
                 "symbol": "v",
                 "context": "Flow velocity (speed of water). Appears in all calculators.",
-                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists.",
+                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
                 "preferred_translation": "kecepatan"
             },
             {
@@ -160,801 +134,80 @@
                 "term": "slope",
                 "symbol": "S",
                 "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
-                "translation_notes": "In open-channel hydraulics, 'slope' is the bed gradient — not the angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
+                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
                 "preferred_translation": "kemiringan"
-            }
-        ],
-        "u": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'.",
-                "preferred_translation": "debit"
             },
             {
-                "term": "velocity",
-                "symbol": "v",
-                "context": "Flow velocity (speed of water). Appears in all calculators.",
-                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists.",
-                "preferred_translation": "kecepatan"
+                "term": "rock chute",
+                "symbol": "",
+                "context": "A steep rock-lined drop structure (also called a 'rock ramp') that conveys water rapidly down a slope in irrigation, drainage, or watershed management. Key concepts for translation: rock-lined, steep gradient, spillway or drop structure — translate the concept, not the English word 'chute'. The rock riprap matrix dissipates energy and resists erosion. Appears in Rock Chute Design (Robinson) and Robinson Rock Chute calculators.",
+                "translation_notes": "CRITICAL: 'Robinson' is the surname of K.M. Robinson, co-author of Robinson, Rice & Kadavy (1998) — it is a proper noun and must NEVER be translated or modified in any language. Translate only 'Rock Chute'. Concept to translate: 'rock-lined steep channel' or 'rock-lined spillway' — the drop\/descent nature must be conveyed; a generic 'rock channel' is insufficient. CRITICAL for French: WMO No. 385 entry 517 establishes that the French word 'chute' means 'fall' (elevation difference) — it cannot name this structure. Use 'coursier en enrochement' (coursier = steep channel structure; enrochement = riprap). Spanish: USDA uses 'bajante de rocado' — 'bajante' (from bajar = to descend) correctly conveys the drop-structure nature; 'de rocado' = rock-lined. Russian: 'каменный быстроток' ('быстроток' = fast-flow\/steep channel). Portuguese: changed from 'calha' (generic trough) to 'rampa em enrocamento' (rampa = ramp\/slope, enrocamento = riprap) to convey steep character. Serbian: changed from 'жлеб' (gutter\/trough) to 'брзоток' (fast-flow structure), consistent with ru\/uk pattern. Bengali: changed from borrowed 'চ্যুট' (conveys nothing) to 'পাথর-আবৃত খাড়া নালা' (rock-lined steep channel). Persian: changed from generic 'آبراه سنگی' (stone waterway) to 'آبراه تند سنگچین' (تند = steep\/swift, سنگچین = stone-laid\/riprap). Pashto: added 'تند' (steep\/swift) to original. Khmer: changed 'ចំហ' (open) to 'ជម្រាល' (sloped\/inclined). NEEDS HUMAN REVIEW: am (ምቀጫ meaning uncertain), my (ထောင် may not clearly convey steep to all readers), de (Steinschütte is standard engineering term but doesn't explicitly say 'steep channel').",
+                "preferred_translation": "saluran curam berbatu"
             },
             {
-                "term": "slope",
-                "symbol": "S",
-                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
-                "translation_notes": "In open-channel hydraulics, 'slope' is the bed gradient — not the angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
-                "preferred_translation": "kemiringan"
+                "term": "chute",
+                "symbol": "",
+                "context": "A steep open channel or drop structure for conveying water rapidly down a slope. Distinct from a gentle-slope irrigation canal. Per ec_lang_intent guidance: translate as 'steep channel' or 'spillway' — not as the word 'chute' borrowed into another language. Appears in Rock Chute Design (Robinson), Manning Trapezoidal Channel, and related drop-structure calculators.",
+                "translation_notes": "CRITICAL for French: WMO No. 385 entry 517 defines the English word 'fall' (elevation difference) as French 'chute', Spanish 'caída', and Russian 'падение'. The same pattern holds in all three WMO languages: the word for 'fall' (elevation difference) is NOT available for this hydraulic structure. 'Coursier' is the correct French term for the structure. Spanish: 'canal rápido'. Russian: 'быстроток' (the steep channel structure — distinct from 'падение' which means elevation fall). Chinese: '陡槽'.",
+                "preferred_translation": "saluran curam"
+            },
+            {
+                "term": "unit discharge",
+                "symbol": "q, q_t",
+                "context": "Flow rate per unit width of channel (Q\/B), in m²\/s or ft²\/s. The primary design input for the Robinson rock chute method. Appears in Rock Chute Design calculator.",
+                "translation_notes": "Use the hydraulic engineering term. 'Unit' here means 'per unit channel width' — not related to measurement units. Spanish: 'caudal unitario'. French: 'débit unitaire'. German: 'spezifischer Abfluss'. Russian: 'удельный расход'. Chinese: '单宽流量'.",
+                "preferred_translation": "debit per satuan lebar"
+            },
+            {
+                "term": "median rock size",
+                "symbol": "D50",
+                "context": "The particle size at which 50% of the rock is finer by weight. The primary output of the Robinson rock chute method. Also used in Manning Trapezoidal Channel riprap sizing. The symbol D50 is universal — translate only the descriptive label.",
+                "translation_notes": "D50 (or D₅₀) is a universal engineering symbol — do not translate it. Translate only the label 'median rock size' or 'median particle size'. Most languages express this as 'median diameter'. Do not use 'average' (average ≠ median statistically). Spanish: 'tamaño mediano de roca'. French: 'taille médiane des rochers'. Chinese: '中值粒径'.",
+                "preferred_translation": "ukuran median batu"
+            },
+            {
+                "term": "gradation",
+                "symbol": "SD",
+                "context": "The spread or uniformity of rock particle sizes. In the Robinson method, gradation is expressed as SD = D84.1\/D50. Uniform rock ≈ 1.25; Robinson valid range 1.15–1.47. Appears in Rock Chute Design calculator.",
+                "translation_notes": "Use the geotechnical\/hydraulic engineering term for grain size distribution or grading. Do not translate as 'grade' (implies quality). The symbol 'SD' and ratio notation D84.1\/D50 are universal. Spanish\/Portuguese: 'granulometría'\/'granulometria'. French: 'granulométrie'. Russian\/Bulgarian\/Serbian: 'гранулометрический состав'. Chinese: '级配'.",
+                "preferred_translation": "gradasi butir"
+            },
+            {
+                "term": "porosity",
+                "symbol": "n_p",
+                "context": "The fraction of the rock layer volume that is void space (air + water). Default 0.45 for angular crushed rock. Determines how much flow passes through the rock mantle versus over the surface. Appears in Rock Chute Design calculator. Distinct from Manning's n (roughness coefficient) — do not confuse the two.",
+                "translation_notes": "Standard hydraulic\/geotechnical term with cognates in most European languages. Always distinguish from Manning 'n' in context — they appear in the same calculator.",
+                "preferred_translation": "porositas"
+            },
+            {
+                "term": "specific gravity",
+                "symbol": "sg",
+                "context": "Ratio of a material's density to the density of water (dimensionless). Typical crushed granite or basalt ≈ 2.65. Robinson method valid range: 2.54–2.82. Appears in Rock Chute Design and Manning Trapezoidal Channel calculators.",
+                "translation_notes": "Use the established civil\/geotechnical engineering term meaning 'density relative to water'. Spanish: 'gravedad específica'. French: 'densité relative'. German: 'spezifisches Gewicht'. Arabic: 'الوزن النوعي' is the traditional hydraulic engineering term. Do not use 'unit weight' (weight per volume — has different dimensions).",
+                "preferred_translation": "berat jenis"
+            },
+            {
+                "term": "ponding",
+                "symbol": "",
+                "context": "Upstream water accumulation at the inlet of a chute or spillway, forming a small pond. In the Robinson method, ponding (Hp > yn) is desirable — the head at the inlet crest acts as a weir, reducing upstream erosion risk. Appears in Rock Chute Design calculator.",
+                "translation_notes": "Use the irrigation\/drainage engineering term for upstream water backing up to form a small beneficial pond at the inlet. Do not use a word implying flooding, failure, or undesirable inundation — ponding here is a design goal. Spanish: 'represamiento'. French: 'mise en charge amont'. Russian: 'подпор воды'. Chinese: '壅水'.",
+                "preferred_translation": "genangan air hulu"
             }
         ]
     },
     "keys_to_translate": {
-        "u_depthPercent": "%",
-        "u_ft2": "ft^2",
-        "u_ft3ps": "cfs",
-        "u_ft": "ft",
-        "u_fth2o": "ft H2O",
-        "u_gpm": "gpm",
-        "u_inh2o": "in H2O",
-        "u_in": "in",
-        "u_knpcm2": "kN\/cm^2",
-        "u_knpm2": "kN\/m^2",
-        "u_kpa": "kPa",
-        "u_lps": "l\/s",
-        "u_m2": "m^2",
-        "u_m3ps": "m^3\/s",
-        "u_mgd": "MGD",
-        "u_mh2o": "m H2O",
-        "u_m": "m",
-        "u_mm2": "mm^2",
-        "u_mmh2o": "mm H2O",
-        "u_mm": "mm",
-        "u_mps": "m\/s",
-        "u_npm2": "N\/m^2",
-        "u_pa": "Pa",
-        "u_psf": "psf",
-        "u_psi": "psi",
-        "u_lph": "L\/hr",
-        "u_gph": "gal\/hr",
-        "u_mmph": "mm\/hr",
-        "u_inph": "in\/hr",
-        "u_acft": "ac-ft",
-        "u_ft3": "ft^3",
-        "u_m3": "m^3",
-        "u_kw": "kW",
-        "u_mw": "MW",
-        "u_kwh_yr": "kWh\/yr",
-        "u_mwh_yr": "MWh\/yr",
-        "u_hp": "hp",
-        "u_m2ps": "m^2\/s",
-        "u_ft2ps": "cfs\/ft",
-        "ec_name_label": "Label:",
-        "mi_q_617": "Q",
         "mi_station": "Sta",
         "mi_elevation": "Elev",
-        "mi_t": "T",
-        "mi_pw": "P<sub>w<\/sub>",
-        "mi_a": "A",
-        "mi_rh": "R<sub>h<\/sub>",
-        "mi_v617": "v",
-        "mi_fr617": "Fr",
-        "mi_hv617": "H<sub>v<\/sub>",
-        "mi_q617": "Q",
         "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
         "rc_sketch_filter": "Filter"
     },
     "keys": {
-        "u_depthPercent": "%",
-        "u_ft2": "ft^2",
-        "u_ft3ps": "cfs",
-        "u_ft": "ft",
-        "u_fth2o": "ft H2O",
-        "u_gpm": "gpm",
-        "u_inh2o": "in H2O",
-        "u_in": "in",
-        "u_knpcm2": "kN\/cm^2",
-        "u_knpm2": "kN\/m^2",
-        "u_kpa": "kPa",
-        "u_lps": "l\/s",
-        "u_m2": "m^2",
-        "u_m3ps": "m^3\/s",
-        "u_mgd": "MGD",
-        "u_mh2o": "m H2O",
-        "u_m": "m",
-        "u_mm2": "mm^2",
-        "u_mmh2o": "mm H2O",
-        "u_mm": "mm",
-        "u_mps": "m\/s",
-        "u_npm2": "N\/m^2",
-        "u_pa": "Pa",
-        "u_psf": "psf",
-        "u_psi": "psi",
-        "u_lph": "L\/hr",
-        "u_gph": "gal\/hr",
-        "u_mmph": "mm\/hr",
-        "u_inph": "in\/hr",
-        "u_acft": "ac-ft",
-        "u_ft3": "ft^3",
-        "u_m3": "m^3",
-        "u_kw": "kW",
-        "u_mw": "MW",
-        "u_kwh_yr": "kWh\/yr",
-        "u_mwh_yr": "MWh\/yr",
-        "u_hp": "hp",
-        "u_m2ps": "m^2\/s",
-        "u_ft2ps": "cfs\/ft",
-        "ec_name_label": "Label:",
-        "mi_q_617": "Q",
         "mi_station": "Sta",
         "mi_elevation": "Elev",
-        "mi_t": "T",
-        "mi_pw": "P<sub>w<\/sub>",
-        "mi_a": "A",
-        "mi_rh": "R<sub>h<\/sub>",
-        "mi_v617": "v",
-        "mi_fr617": "Fr",
-        "mi_hv617": "H<sub>v<\/sub>",
-        "mi_q617": "Q",
         "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
         "rc_sketch_filter": "Filter"
     },
     "key_context": {
-        "u_depthPercent": {
-            "reason": "equal_to_english",
-            "current_value": "%",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "u_depthFrac",
-                    "value": "fraksi",
-                    "english": "fraction"
-                },
-                "next_translated": {
-                    "key": "u_ftps",
-                    "value": "ft\/s",
-                    "english": "ft\/sec"
-                }
-            }
-        },
-        "u_ft2": {
-            "reason": "equal_to_english",
-            "current_value": "ft^2",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "u_depthFrac",
-                    "value": "fraksi",
-                    "english": "fraction"
-                },
-                "next_translated": {
-                    "key": "u_ftps",
-                    "value": "ft\/s",
-                    "english": "ft\/sec"
-                }
-            }
-        },
-        "u_ft3ps": {
-            "reason": "equal_to_english",
-            "current_value": "cfs",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "u_depthFrac",
-                    "value": "fraksi",
-                    "english": "fraction"
-                },
-                "next_translated": {
-                    "key": "u_ftps",
-                    "value": "ft\/s",
-                    "english": "ft\/sec"
-                }
-            }
-        },
-        "u_ft": {
-            "reason": "equal_to_english",
-            "current_value": "ft",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "u_depthFrac",
-                    "value": "fraksi",
-                    "english": "fraction"
-                },
-                "next_translated": {
-                    "key": "u_ftps",
-                    "value": "ft\/s",
-                    "english": "ft\/sec"
-                }
-            }
-        },
-        "u_fth2o": {
-            "reason": "equal_to_english",
-            "current_value": "ft H2O",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "u_depthFrac",
-                    "value": "fraksi",
-                    "english": "fraction"
-                },
-                "next_translated": {
-                    "key": "u_ftps",
-                    "value": "ft\/s",
-                    "english": "ft\/sec"
-                }
-            }
-        },
-        "u_gpm": {
-            "reason": "equal_to_english",
-            "current_value": "gpm",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "u_ftps",
-                    "value": "ft\/s",
-                    "english": "ft\/sec"
-                },
-                "next_translated": {
-                    "key": "u_gradePercent",
-                    "value": "% naik\/datar",
-                    "english": "% rise\/run"
-                }
-            }
-        },
-        "u_inh2o": {
-            "reason": "equal_to_english",
-            "current_value": "in H2O",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "u_in2",
-                    "value": "in^2",
-                    "english": "sq. in."
-                },
-                "next_translated": {
-                    "key": "u_mld",
-                    "value": "Ml\/h",
-                    "english": "Ml\/d"
-                }
-            }
-        },
-        "u_in": {
-            "reason": "equal_to_english",
-            "current_value": "in",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "u_in2",
-                    "value": "in^2",
-                    "english": "sq. in."
-                },
-                "next_translated": {
-                    "key": "u_mld",
-                    "value": "Ml\/h",
-                    "english": "Ml\/d"
-                }
-            }
-        },
-        "u_knpcm2": {
-            "reason": "equal_to_english",
-            "current_value": "kN\/cm^2",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "u_in2",
-                    "value": "in^2",
-                    "english": "sq. in."
-                },
-                "next_translated": {
-                    "key": "u_mld",
-                    "value": "Ml\/h",
-                    "english": "Ml\/d"
-                }
-            }
-        },
-        "u_knpm2": {
-            "reason": "equal_to_english",
-            "current_value": "kN\/m^2",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "u_in2",
-                    "value": "in^2",
-                    "english": "sq. in."
-                },
-                "next_translated": {
-                    "key": "u_mld",
-                    "value": "Ml\/h",
-                    "english": "Ml\/d"
-                }
-            }
-        },
-        "u_kpa": {
-            "reason": "equal_to_english",
-            "current_value": "kPa",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "u_in2",
-                    "value": "in^2",
-                    "english": "sq. in."
-                },
-                "next_translated": {
-                    "key": "u_mld",
-                    "value": "Ml\/h",
-                    "english": "Ml\/d"
-                }
-            }
-        },
-        "u_lps": {
-            "reason": "equal_to_english",
-            "current_value": "l\/s",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "u_in2",
-                    "value": "in^2",
-                    "english": "sq. in."
-                },
-                "next_translated": {
-                    "key": "u_mld",
-                    "value": "Ml\/h",
-                    "english": "Ml\/d"
-                }
-            }
-        },
-        "u_m2": {
-            "reason": "equal_to_english",
-            "current_value": "m^2",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "u_in2",
-                    "value": "in^2",
-                    "english": "sq. in."
-                },
-                "next_translated": {
-                    "key": "u_mld",
-                    "value": "Ml\/h",
-                    "english": "Ml\/d"
-                }
-            }
-        },
-        "u_m3ps": {
-            "reason": "equal_to_english",
-            "current_value": "m^3\/s",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "u_in2",
-                    "value": "in^2",
-                    "english": "sq. in."
-                },
-                "next_translated": {
-                    "key": "u_mld",
-                    "value": "Ml\/h",
-                    "english": "Ml\/d"
-                }
-            }
-        },
-        "u_mgd": {
-            "reason": "equal_to_english",
-            "current_value": "MGD",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "u_in2",
-                    "value": "in^2",
-                    "english": "sq. in."
-                },
-                "next_translated": {
-                    "key": "u_mld",
-                    "value": "Ml\/h",
-                    "english": "Ml\/d"
-                }
-            }
-        },
-        "u_mh2o": {
-            "reason": "equal_to_english",
-            "current_value": "m H2O",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "u_in2",
-                    "value": "in^2",
-                    "english": "sq. in."
-                },
-                "next_translated": {
-                    "key": "u_mld",
-                    "value": "Ml\/h",
-                    "english": "Ml\/d"
-                }
-            }
-        },
-        "u_m": {
-            "reason": "equal_to_english",
-            "current_value": "m",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "u_mld",
-                    "value": "Ml\/h",
-                    "english": "Ml\/d"
-                },
-                "next_translated": {
-                    "key": "u_s",
-                    "value": "dtk",
-                    "english": "sec"
-                }
-            }
-        },
-        "u_mm2": {
-            "reason": "equal_to_english",
-            "current_value": "mm^2",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "u_mld",
-                    "value": "Ml\/h",
-                    "english": "Ml\/d"
-                },
-                "next_translated": {
-                    "key": "u_s",
-                    "value": "dtk",
-                    "english": "sec"
-                }
-            }
-        },
-        "u_mmh2o": {
-            "reason": "equal_to_english",
-            "current_value": "mm H2O",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "u_mld",
-                    "value": "Ml\/h",
-                    "english": "Ml\/d"
-                },
-                "next_translated": {
-                    "key": "u_s",
-                    "value": "dtk",
-                    "english": "sec"
-                }
-            }
-        },
-        "u_mm": {
-            "reason": "equal_to_english",
-            "current_value": "mm",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "u_mld",
-                    "value": "Ml\/h",
-                    "english": "Ml\/d"
-                },
-                "next_translated": {
-                    "key": "u_s",
-                    "value": "dtk",
-                    "english": "sec"
-                }
-            }
-        },
-        "u_mps": {
-            "reason": "equal_to_english",
-            "current_value": "m\/s",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "u_mld",
-                    "value": "Ml\/h",
-                    "english": "Ml\/d"
-                },
-                "next_translated": {
-                    "key": "u_s",
-                    "value": "dtk",
-                    "english": "sec"
-                }
-            }
-        },
-        "u_npm2": {
-            "reason": "equal_to_english",
-            "current_value": "N\/m^2",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "u_mld",
-                    "value": "Ml\/h",
-                    "english": "Ml\/d"
-                },
-                "next_translated": {
-                    "key": "u_s",
-                    "value": "dtk",
-                    "english": "sec"
-                }
-            }
-        },
-        "u_pa": {
-            "reason": "equal_to_english",
-            "current_value": "Pa",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "u_mld",
-                    "value": "Ml\/h",
-                    "english": "Ml\/d"
-                },
-                "next_translated": {
-                    "key": "u_s",
-                    "value": "dtk",
-                    "english": "sec"
-                }
-            }
-        },
-        "u_psf": {
-            "reason": "equal_to_english",
-            "current_value": "psf",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "u_mld",
-                    "value": "Ml\/h",
-                    "english": "Ml\/d"
-                },
-                "next_translated": {
-                    "key": "u_s",
-                    "value": "dtk",
-                    "english": "sec"
-                }
-            }
-        },
-        "u_psi": {
-            "reason": "equal_to_english",
-            "current_value": "psi",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "u_mld",
-                    "value": "Ml\/h",
-                    "english": "Ml\/d"
-                },
-                "next_translated": {
-                    "key": "u_s",
-                    "value": "dtk",
-                    "english": "sec"
-                }
-            }
-        },
-        "u_lph": {
-            "reason": "equal_to_english",
-            "current_value": "L\/hr",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "u_s",
-                    "value": "dtk",
-                    "english": "sec"
-                },
-                "next_translated": {
-                    "key": "menu_brand",
-                    "value": "Kalkulator HawsEDC",
-                    "english": "HawsEDC Calculators"
-                }
-            }
-        },
-        "u_gph": {
-            "reason": "equal_to_english",
-            "current_value": "gal\/hr",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "u_s",
-                    "value": "dtk",
-                    "english": "sec"
-                },
-                "next_translated": {
-                    "key": "menu_brand",
-                    "value": "Kalkulator HawsEDC",
-                    "english": "HawsEDC Calculators"
-                }
-            }
-        },
-        "u_mmph": {
-            "reason": "equal_to_english",
-            "current_value": "mm\/hr",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "u_s",
-                    "value": "dtk",
-                    "english": "sec"
-                },
-                "next_translated": {
-                    "key": "menu_brand",
-                    "value": "Kalkulator HawsEDC",
-                    "english": "HawsEDC Calculators"
-                }
-            }
-        },
-        "u_inph": {
-            "reason": "equal_to_english",
-            "current_value": "in\/hr",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "u_s",
-                    "value": "dtk",
-                    "english": "sec"
-                },
-                "next_translated": {
-                    "key": "menu_brand",
-                    "value": "Kalkulator HawsEDC",
-                    "english": "HawsEDC Calculators"
-                }
-            }
-        },
-        "u_acft": {
-            "reason": "equal_to_english",
-            "current_value": "ac-ft",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "u_s",
-                    "value": "dtk",
-                    "english": "sec"
-                },
-                "next_translated": {
-                    "key": "menu_brand",
-                    "value": "Kalkulator HawsEDC",
-                    "english": "HawsEDC Calculators"
-                }
-            }
-        },
-        "u_ft3": {
-            "reason": "equal_to_english",
-            "current_value": "ft^3",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "u_s",
-                    "value": "dtk",
-                    "english": "sec"
-                },
-                "next_translated": {
-                    "key": "menu_brand",
-                    "value": "Kalkulator HawsEDC",
-                    "english": "HawsEDC Calculators"
-                }
-            }
-        },
-        "u_m3": {
-            "reason": "equal_to_english",
-            "current_value": "m^3",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "u_s",
-                    "value": "dtk",
-                    "english": "sec"
-                },
-                "next_translated": {
-                    "key": "menu_brand",
-                    "value": "Kalkulator HawsEDC",
-                    "english": "HawsEDC Calculators"
-                }
-            }
-        },
-        "u_kw": {
-            "reason": "equal_to_english",
-            "current_value": "kW",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "u_s",
-                    "value": "dtk",
-                    "english": "sec"
-                },
-                "next_translated": {
-                    "key": "menu_brand",
-                    "value": "Kalkulator HawsEDC",
-                    "english": "HawsEDC Calculators"
-                }
-            }
-        },
-        "u_mw": {
-            "reason": "equal_to_english",
-            "current_value": "MW",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "u_s",
-                    "value": "dtk",
-                    "english": "sec"
-                },
-                "next_translated": {
-                    "key": "menu_brand",
-                    "value": "Kalkulator HawsEDC",
-                    "english": "HawsEDC Calculators"
-                }
-            }
-        },
-        "u_kwh_yr": {
-            "reason": "equal_to_english",
-            "current_value": "kWh\/yr",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "u_s",
-                    "value": "dtk",
-                    "english": "sec"
-                },
-                "next_translated": {
-                    "key": "menu_brand",
-                    "value": "Kalkulator HawsEDC",
-                    "english": "HawsEDC Calculators"
-                }
-            }
-        },
-        "u_mwh_yr": {
-            "reason": "equal_to_english",
-            "current_value": "MWh\/yr",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "u_s",
-                    "value": "dtk",
-                    "english": "sec"
-                },
-                "next_translated": {
-                    "key": "menu_brand",
-                    "value": "Kalkulator HawsEDC",
-                    "english": "HawsEDC Calculators"
-                }
-            }
-        },
-        "u_hp": {
-            "reason": "equal_to_english",
-            "current_value": "hp",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "u_s",
-                    "value": "dtk",
-                    "english": "sec"
-                },
-                "next_translated": {
-                    "key": "menu_brand",
-                    "value": "Kalkulator HawsEDC",
-                    "english": "HawsEDC Calculators"
-                }
-            }
-        },
-        "u_m2ps": {
-            "reason": "equal_to_english",
-            "current_value": "m^2\/s",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "u_s",
-                    "value": "dtk",
-                    "english": "sec"
-                },
-                "next_translated": {
-                    "key": "menu_brand",
-                    "value": "Kalkulator HawsEDC",
-                    "english": "HawsEDC Calculators"
-                }
-            }
-        },
-        "u_ft2ps": {
-            "reason": "equal_to_english",
-            "current_value": "cfs\/ft",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "u_s",
-                    "value": "dtk",
-                    "english": "sec"
-                },
-                "next_translated": {
-                    "key": "menu_brand",
-                    "value": "Kalkulator HawsEDC",
-                    "english": "HawsEDC Calculators"
-                }
-            }
-        },
-        "ec_name_label": {
-            "reason": "equal_to_english",
-            "current_value": "Label:",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "view_printable",
-                    "value": "Versi cetak (muat ulang untuk memulihkan)",
-                    "english": "Printable version (reload\/refresh to restore)"
-                },
-                "next_translated": {
-                    "key": "ec_name_placeholder",
-                    "value": "Label untuk penanda\/bagikan",
-                    "english": "Label for bookmarking\/sharing"
-                }
-            }
-        },
-        "mi_q_617": {
-            "reason": "equal_to_english",
-            "current_value": "Q",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mi_waterSurfaceElevation",
-                    "value": "Elevasi permukaan air",
-                    "english": "Water surface elevation"
-                },
-                "next_translated": {
-                    "key": "mi_xSecPoints",
-                    "value": "Titik penampang melintang",
-                    "english": "Cross section points"
-                }
-            }
-        },
         "mi_station": {
             "reason": "equal_to_english",
             "current_value": "Sta",
@@ -987,134 +240,6 @@
                 }
             }
         },
-        "mi_t": {
-            "reason": "equal_to_english",
-            "current_value": "T",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mi_tau",
-                    "value": "Tegangan<br \/>geser<br \/>dasar<br \/>&tau;",
-                    "english": "Bot.<br \/>shear<br \/>&tau;"
-                },
-                "next_translated": {
-                    "key": "mi_n617",
-                    "value": "n<br \/>komposit",
-                    "english": "Comp.<br \/>n"
-                }
-            }
-        },
-        "mi_pw": {
-            "reason": "equal_to_english",
-            "current_value": "P<sub>w<\/sub>",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mi_tau",
-                    "value": "Tegangan<br \/>geser<br \/>dasar<br \/>&tau;",
-                    "english": "Bot.<br \/>shear<br \/>&tau;"
-                },
-                "next_translated": {
-                    "key": "mi_n617",
-                    "value": "n<br \/>komposit",
-                    "english": "Comp.<br \/>n"
-                }
-            }
-        },
-        "mi_a": {
-            "reason": "equal_to_english",
-            "current_value": "A",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mi_tau",
-                    "value": "Tegangan<br \/>geser<br \/>dasar<br \/>&tau;",
-                    "english": "Bot.<br \/>shear<br \/>&tau;"
-                },
-                "next_translated": {
-                    "key": "mi_n617",
-                    "value": "n<br \/>komposit",
-                    "english": "Comp.<br \/>n"
-                }
-            }
-        },
-        "mi_rh": {
-            "reason": "equal_to_english",
-            "current_value": "R<sub>h<\/sub>",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mi_tau",
-                    "value": "Tegangan<br \/>geser<br \/>dasar<br \/>&tau;",
-                    "english": "Bot.<br \/>shear<br \/>&tau;"
-                },
-                "next_translated": {
-                    "key": "mi_n617",
-                    "value": "n<br \/>komposit",
-                    "english": "Comp.<br \/>n"
-                }
-            }
-        },
-        "mi_v617": {
-            "reason": "equal_to_english",
-            "current_value": "v",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mi_n617",
-                    "value": "n<br \/>komposit",
-                    "english": "Comp.<br \/>n"
-                },
-                "next_translated": {
-                    "key": "mi_notes",
-                    "value": "Catatan",
-                    "english": "Notes"
-                }
-            }
-        },
-        "mi_fr617": {
-            "reason": "equal_to_english",
-            "current_value": "Fr",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mi_n617",
-                    "value": "n<br \/>komposit",
-                    "english": "Comp.<br \/>n"
-                },
-                "next_translated": {
-                    "key": "mi_notes",
-                    "value": "Catatan",
-                    "english": "Notes"
-                }
-            }
-        },
-        "mi_hv617": {
-            "reason": "equal_to_english",
-            "current_value": "H<sub>v<\/sub>",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mi_n617",
-                    "value": "n<br \/>komposit",
-                    "english": "Comp.<br \/>n"
-                },
-                "next_translated": {
-                    "key": "mi_notes",
-                    "value": "Catatan",
-                    "english": "Notes"
-                }
-            }
-        },
-        "mi_q617": {
-            "reason": "equal_to_english",
-            "current_value": "Q",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mi_n617",
-                    "value": "n<br \/>komposit",
-                    "english": "Comp.<br \/>n"
-                },
-                "next_translated": {
-                    "key": "mi_notes",
-                    "value": "Catatan",
-                    "english": "Notes"
-                }
-            }
-        },
         "mtc_blodgett_v_bathurst": {
             "reason": "equal_to_english",
             "current_value": "Blodgett vs. Bathurst",
@@ -1126,7 +251,7 @@
                 },
                 "next_translated": {
                     "key": "mtc_d50_bottom",
-                    "value": "Ukuran batu sudut yang dibutuhkan di dasar, D50 (Isbash &amp; MC) <span title=\"Menurut Isbash (1936) dan Maricopa County, Arizona, AS.\" style=\"cursor:help;color:#06c;font-size:0.9em\">?<\/span>",
+                    "value": "Ukuran batu sudut yang dibutuhkan di dasar, D50 (Isbash & MC) <span title=\"Menurut Isbash (1936) dan Maricopa County, Arizona, AS.\" style=\"cursor:help;color:#06c;font-size:0.9em\">?<\/span>",
                     "english": "Required bottom angular rock size, D50 (Isbash & MC) <span title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\" style=\"cursor:help;color:#06c;font-size:0.9em\">?<\/span>"
                 }
             }
@@ -1137,8 +262,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "rc_notes_4_def",
-                    "value": "Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). &ldquo;<a target=\"_blank\" href=\"https:\/\/doi.org\/10.13031\/2013.17230\">Desain peluncur batu<\/a>.&rdquo; <em>Transactions of the ASAE<\/em>, 41(3), 621&ndash;626. USDA ARS juga menerbitkan <a target=\"_blank\" href=\"https:\/\/data.nal.usda.gov\/dataset\/rock-chute-design\">lembar kerja Excel<\/a> berdasarkan metode yang sama.",
-                    "english": "Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). &ldquo;<a target=\"_blank\" href=\"https:\/\/doi.org\/10.13031\/2013.17230\">Design of rock chutes<\/a>.&rdquo; <em>Transactions of the ASAE<\/em>, 41(3), 621&ndash;626. USDA ARS also publishes an <a target=\"_blank\" href=\"https:\/\/data.nal.usda.gov\/dataset\/rock-chute-design\">Excel spreadsheet<\/a> based on the same method."
+                    "value": "Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). \"<a target=\"_blank\" href=\"https:\/\/www.fs.usda.gov\/biology\/nsaec\/fishxing\/fplibrary\/Robinson_1998_Design_of_Rock_Chutes.pdf\">Desain peluncur batu<\/a>.\" <em>Transactions of the ASAE<\/em>, 41(3), 621–626. USDA ARS juga menerbitkan <a target=\"_blank\" href=\"https:\/\/data.nal.usda.gov\/dataset\/rock-chute-design\">lembar kerja Excel<\/a> berdasarkan metode yang sama.",
+                    "english": "Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). &ldquo;<a target=\"_blank\" href=\"https:\/\/www.fs.usda.gov\/biology\/nsaec\/fishxing\/fplibrary\/Robinson_1998_Design_of_Rock_Chutes.pdf\">Design of rock chutes<\/a>.&rdquo; <em>Transactions of the ASAE<\/em>, 41(3), 621&ndash;626. USDA ARS also publishes an <a target=\"_blank\" href=\"https:\/\/data.nal.usda.gov\/dataset\/rock-chute-design\">Excel spreadsheet<\/a> based on the same method."
                 },
                 "next_translated": {
                     "key": "rc_sketch_top_crest_curve",
@@ -1147,5 +272,6 @@
                 }
             }
         }
-    }
+    },
+    "key_intent": []
 }
