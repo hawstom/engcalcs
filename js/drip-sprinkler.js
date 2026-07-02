@@ -29,18 +29,19 @@ EngCalcs.pageCalculator = function(objForm) {
 	if (duEl) {
 		var du = this.var.du;
 		var cfg = EngCalcs.pageConfig;
+		duEl.className = '';
 		if (du >= 0.90) {
 			duEl.innerHTML = cfg.du_excellent;
-			duEl.style.color = 'green';
+			duEl.classList.add('ec-status-ok');
 		} else if (du >= 0.80) {
 			duEl.innerHTML = cfg.du_good;
-			duEl.style.color = 'steelblue';
+			duEl.classList.add('ec-status-info');
 		} else if (du >= 0.70) {
 			duEl.innerHTML = cfg.du_acceptable;
-			duEl.style.color = 'darkorange';
+			duEl.classList.add('ec-status-warn');
 		} else {
 			duEl.innerHTML = cfg.du_poor;
-			duEl.style.color = 'red';
+			duEl.classList.add('ec-status-bad');
 		}
 	}
 

@@ -1,13 +1,12 @@
 {
     "meta": {
         "language": "ro",
-        "expected_key_count": 459,
+        "expected_key_count": 465,
         "delta_key_count": 4,
         "active_prefixes": [
-            "contact",
+            "mhp",
             "mi",
-            "mtc",
-            "odt"
+            "mtc"
         ],
         "requested_prefix": null,
         "notes": "Translate only keys in keys_to_translate; preserve HTML, units, and symbols.",
@@ -16,13 +15,12 @@
         "intent_notes": "Use key_intent when present; these entries provide terse disambiguation comments only where translation risk exists."
     },
     "prompt_context_by_prefix": {
-        "contact": "Use these preferred technical term translations when relevant:\n- flow (Q): debit\n- velocity (v): viteză\n- slope (S): pantă",
+        "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): debit\n- penstock: conductă sub presiune\n- gross head (H_gross): cădere brută\n- net head (H_net): cădere netă\n- plant efficiency (η): eficiența instalației\n- head loss (h_L): pierdere de presiune\n- run-of-river: centrală hidroelectrică la cursul apei\n- headworks: lucrări de captare\n- junction loss (H_m): pierderi locale",
         "mi": "Use these preferred technical term translations when relevant:\n- flow (Q): debit\n- velocity (v): viteză\n- hydraulic radius (R_h): raza hidraulică\n- wetted perimeter (P_w): perimetru udat\n- Manning roughness (n): coeficientul de rugozitate Manning\n- slope (S): pantă",
-        "mtc": "Use these preferred technical term translations when relevant:\n- flow (Q): debit\n- velocity (v): viteză\n- hydraulic radius (R_h): raza hidraulică\n- wetted perimeter (P_w): perimetru udat\n- Manning roughness (n): coeficientul de rugozitate Manning\n- slope (S): pantă",
-        "odt": "Use these preferred technical term translations when relevant:\n- orifice: orificiu\n- discharge coefficient (C_d): coeficient de debit\n- headwater elevation: nivelul apei amonte\n- tailwater elevation: nivelul apei aval"
+        "mtc": "Use these preferred technical term translations when relevant:\n- flow (Q): debit\n- velocity (v): viteză\n- hydraulic radius (R_h): raza hidraulică\n- wetted perimeter (P_w): perimetru udat\n- Manning roughness (n): coeficientul de rugozitate Manning\n- slope (S): pantă"
     },
     "glossary_terms_by_prefix": {
-        "contact": [
+        "mhp": [
             {
                 "term": "flow",
                 "symbol": "Q",
@@ -31,18 +29,60 @@
                 "preferred_translation": "debit"
             },
             {
-                "term": "velocity",
-                "symbol": "v",
-                "context": "Flow velocity (speed of water). Appears in all calculators.",
-                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
-                "preferred_translation": "viteză"
+                "term": "penstock",
+                "symbol": "",
+                "context": "Pressure pipe carrying water from a reservoir or headpond down to a turbine in a micro-hydro system. Appears in Micro-Hydro Power calculator.",
+                "translation_notes": "'Penstock' is a specialized term with no exact one-word equivalent in many languages. Use the established civil\/hydro engineering phrase for 'pressure conduit' or 'force main to turbine'. Czech: 'tlakovod' (pressure main) is preferred over the generic 'přiváděcí potrubí' (supply pipe). Serbian: 'напорни цевовод' is the standard hydraulic engineering term.",
+                "preferred_translation": "conductă sub presiune"
             },
             {
-                "term": "slope",
-                "symbol": "S",
-                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
-                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
-                "preferred_translation": "pantă"
+                "term": "gross head",
+                "symbol": "H_gross",
+                "context": "Total elevation difference between the headpond water surface and the turbine — before subtracting penstock losses. Appears in Micro-Hydro Power calculator.",
+                "translation_notes": "'Gross' means total\/before-deduction. Pair with 'net head' for clarity. Use the hydro-power standard term.",
+                "preferred_translation": "cădere brută"
+            },
+            {
+                "term": "net head",
+                "symbol": "H_net",
+                "context": "Effective head available at the turbine after subtracting penstock friction and minor losses from gross head. H_net = H_gross - h_L.",
+                "translation_notes": "'Net' means after-deduction. Pair with 'gross head'. Use the hydro-power standard term. WMO No. 385 entry 111 ('available head') gives the Russian term 'полезный напор' (useful head) \/ syn. 'располагаемый напор' — these overlap with net head in Russian hydro engineering practice.",
+                "preferred_translation": "cădere netă"
+            },
+            {
+                "term": "plant efficiency",
+                "symbol": "η",
+                "context": "Overall efficiency of a micro-hydro power plant — product of turbine, generator, and transmission efficiencies. Dimensionless, 0–1. Appears in Micro-Hydro Power calculator.",
+                "translation_notes": "'Plant' here means the power plant\/installation, not a living plant. Use the energy\/electrical engineering term for overall system efficiency.",
+                "preferred_translation": "eficiența instalației"
+            },
+            {
+                "term": "head loss",
+                "symbol": "h_L",
+                "context": "Energy loss expressed as a height of water column. Appears in Darcy-Weisbach, Hazen-Williams, Manning pipe, and Penstock calculators. Distinct from 'pressure drop' — use the hydraulic engineering term.",
+                "translation_notes": "'Head' in the hydraulic sense (energy per unit weight) does not translate literally in many languages — use the established civil\/hydraulic engineering phrase. Pre-2026 sr\/hr human translations used 'gubitak pritiska' (= pressure loss), which is technically the same concept expressed in pressure terms rather than head terms. The current 'губитак напора \/ gubitak tlačne visine' (= loss of hydraulic head) is more precise in a hydraulic engineering context and is preferred.",
+                "preferred_translation": "pierdere de presiune"
+            },
+            {
+                "term": "run-of-river",
+                "symbol": "",
+                "context": "A hydropower configuration that uses natural river flow without a dam or significant storage reservoir. Power output varies with seasonal river flow. Appears in Micro-Hydro Power calculator.",
+                "translation_notes": "Use the established energy\/hydropower sector term. 'Run' means natural river current — do not translate as jogging or running. WMO No. 385 entry 1263 gives the full facility names: Spanish 'central hidroeléctrica de pasada', French 'usine hydroélectrique au fil de l'eau', Russian 'русловая гидроэлектростанция' — these are the authoritative terms for the power plant noun. The abbreviated forms 'filo de agua' (es), 'au fil de l'eau' (fr), and 'русловая ГЭС' (ru) are standard in engineering use. German: 'Laufwasserkraftwerk'. Chinese: '径流式水电'.",
+                "preferred_translation": "centrală hidroelectrică la cursul apei"
+            },
+            {
+                "term": "headworks",
+                "symbol": "",
+                "context": "The intake structure at the upstream end of a penstock or canal, where water is diverted from the river or reservoir into the conveyance system. Appears in Micro-Hydro Power calculator (penstock diameter and length descriptions).",
+                "translation_notes": "Use the civil\/irrigation engineering term for a water intake or diversion structure. Spanish: 'obra de toma'. French: 'ouvrage de prise d'eau'. Russian: 'водозаборное сооружение'. German: 'Einlaufbauwerk'. In many languages, 'intake structure' is preferred over a literal translation of 'headworks'.",
+                "preferred_translation": "lucrări de captare"
+            },
+            {
+                "term": "junction loss",
+                "symbol": "H_m",
+                "context": "Energy loss at pipe junctions, bends, fittings, and entrance — a local (point) loss as opposed to distributed friction loss along the pipe. H_m = k × v²\/(2g). Also called 'minor loss', though in short penstocks these can equal or exceed friction losses. Appears in Manning Pipe Head Loss and Micro-Hydro Power calculators.",
+                "translation_notes": "The term 'minor loss' is conventional but misleading — do not imply these losses are always small. Use the hydraulic engineering term for local\/point losses at fittings. French: 'perte singulière'. Spanish: 'pérdida local' or 'pérdida por accesorio'. Russian: 'местные потери'. Chinese: '局部水头损失'.",
+                "preferred_translation": "pierderi locale"
             }
         ],
         "mi": [
@@ -132,49 +172,19 @@
                 "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
                 "preferred_translation": "pantă"
             }
-        ],
-        "odt": [
-            {
-                "term": "orifice",
-                "symbol": "",
-                "context": "A submerged or free-flowing opening through which water discharges under head. Appears in Orifice Flow and Orifice Drain Time calculators.",
-                "translation_notes": "In irrigation contexts, often the opening of a headgate or pipe turnout. Use the hydraulic engineering term, not a general word for 'hole' or 'opening'.",
-                "preferred_translation": "orificiu"
-            },
-            {
-                "term": "discharge coefficient",
-                "symbol": "C_d",
-                "context": "Coefficient correcting theoretical orifice or weir flow for real-world contraction and friction effects. Appears in Orifice and Weir calculators.",
-                "translation_notes": "The 'discharge' here refers to flow rate, not the verb. Use the hydraulic engineering compound term.",
-                "preferred_translation": "coeficient de debit"
-            },
-            {
-                "term": "headwater elevation",
-                "symbol": "",
-                "context": "Water surface elevation on the upstream side of a weir or orifice. Appears in Weir Flow and Orifice calculators.",
-                "translation_notes": "'Headwater' is an upstream water surface — do not confuse with 'head' (energy) or 'source' (origin of a stream). Use the hydraulic structure term.",
-                "preferred_translation": "nivelul apei amonte"
-            },
-            {
-                "term": "tailwater elevation",
-                "symbol": "",
-                "context": "Water surface elevation on the downstream side of a weir or orifice. Appears in Orifice Flow calculator. When tailwater is above the invert, the orifice is submerged.",
-                "translation_notes": "Use the hydraulic structure term for downstream water level. Pair consistently with 'headwater elevation'.",
-                "preferred_translation": "nivelul apei aval"
-            }
         ]
     },
     "keys_to_translate": {
         "mi_groupSegment": "Segment",
         "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
-        "odt_sketch_start": "Start",
-        "contact_main_menu": "Contact"
+        "mtc_vel_ok_short": "OK",
+        "mhp_vel_ok_short": "OK"
     },
     "keys": {
         "mi_groupSegment": "Segment",
         "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
-        "odt_sketch_start": "Start",
-        "contact_main_menu": "Contact"
+        "mtc_vel_ok_short": "OK",
+        "mhp_vel_ok_short": "OK"
     },
     "key_context": {
         "mi_groupSegment": {
@@ -209,35 +219,35 @@
                 }
             }
         },
-        "odt_sketch_start": {
+        "mtc_vel_ok_short": {
             "reason": "equal_to_english",
-            "current_value": "Start",
+            "current_value": "OK",
             "neighbors": {
                 "previous_translated": {
-                    "key": "odt_vol",
-                    "value": "Volum golit",
-                    "english": "Drained volume"
+                    "key": "mtc_vel_low",
+                    "value": "Viteză mică — risc de sedimentare.",
+                    "english": "Velocity low - sedimentation risk."
                 },
                 "next_translated": {
-                    "key": "odt_sketch_end",
-                    "value": "Sfârșit",
-                    "english": "End"
+                    "key": "mtc_vel_high_short",
+                    "value": "Ridicată",
+                    "english": "High"
                 }
             }
         },
-        "contact_main_menu": {
+        "mhp_vel_ok_short": {
             "reason": "equal_to_english",
-            "current_value": "Contact",
+            "current_value": "OK",
             "neighbors": {
                 "previous_translated": {
-                    "key": "install_main_desc",
-                    "value": "Adaugă pe dispozitiv pentru utilizare offline",
-                    "english": "Add to Your Device for Offline Use"
+                    "key": "mhp_vel_high",
+                    "value": "peste 3 m\/s — măriți diametrul ⚠",
+                    "english": "Velocity very high ⚠"
                 },
                 "next_translated": {
-                    "key": "about_main_title",
-                    "value": "Despre calculatoarele de inginerie HawsEDC",
-                    "english": "About HawsEDC Engineering Calculators"
+                    "key": "mhp_vel_high_short",
+                    "value": "Ridicată",
+                    "english": "High"
                 }
             }
         }

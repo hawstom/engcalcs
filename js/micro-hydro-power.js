@@ -54,34 +54,29 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.writeFormResult(objForm, 'annual_kwh', precision = 1, hasUnits = true);
 
 	// Velocity check
-	var velEl = document.getElementById('vel_check');
-	if (velEl) {
-		var vms = this.var.vel;
-		if (vms >= 1.0 && vms <= 3.0) {
-			velEl.innerHTML = EngCalcs.pageConfig.vel_ok;
-			velEl.style.color = 'green';
-		} else if (vms > 3.0) {
-			velEl.innerHTML = EngCalcs.pageConfig.vel_high;
-			velEl.style.color = 'darkorange';
-		} else {
-			velEl.innerHTML = EngCalcs.pageConfig.vel_low;
-			velEl.style.color = 'darkorange';
-		}
-	}
+	var vms = this.var.vel;
+	this.writeVelocityCheck('vel_check', (vms >= 1.0 && vms <= 3.0) ? 'ok' : (vms > 3.0 ? 'high' : 'low'), {
+		ok: EngCalcs.pageConfig.mhp_vel_ok_short,
+		high: EngCalcs.pageConfig.mhp_vel_high_short,
+		low: EngCalcs.pageConfig.mhp_vel_low_short,
+		highTip: EngCalcs.pageConfig.vel_high,
+		lowTip: EngCalcs.pageConfig.vel_low
+	});
 
 	// Head loss % check
 	var hlEl = document.getElementById('hl_check');
 	if (hlEl && this.var.hgross > 0) {
 		var hlPct = this.var.hl / this.var.hgross * 100;
+		hlEl.className = '';
 		if (hlPct <= 10) {
 			hlEl.innerHTML = hlPct.toFixed(1) + '% — ' + EngCalcs.pageConfig.hl_ok;
-			hlEl.style.color = 'green';
+			hlEl.classList.add('ec-status-ok');
 		} else if (hlPct <= 20) {
 			hlEl.innerHTML = hlPct.toFixed(1) + '% — ' + EngCalcs.pageConfig.hl_warn;
-			hlEl.style.color = 'darkorange';
+			hlEl.classList.add('ec-status-warn');
 		} else {
 			hlEl.innerHTML = hlPct.toFixed(1) + '% — ' + EngCalcs.pageConfig.hl_bad;
-			hlEl.style.color = 'red';
+			hlEl.classList.add('ec-status-bad');
 		}
 	}
 
@@ -139,7 +134,7 @@ EngCalcs.mhpDrawSketch = function() {
 	// Right annotation: h_L percentage
 	var rx = barX + barW + 8;
 	var hlPct = (v.hl / v.hgross * 100);
-	var labelColor = (frac <= 0.10) ? 'green' : (frac <= 0.20) ? 'darkorange' : 'red';
+	var labelColor = (frac <= 0.10) ? '#267326' : (frac <= 0.20) ? '#c60' : '#c00';
 	if (hLpx > 0) {
 		s += '<line x1="' + (barX + barW) + '" y1="' + svgTop + '" x2="' + (rx + 5) + '" y2="' + svgTop + '" stroke="#aaa" stroke-width="1" stroke-dasharray="3,2"/>';
 		s += '<line x1="' + (barX + barW) + '" y1="' + (svgTop + hLpx) + '" x2="' + (rx + 5) + '" y2="' + (svgTop + hLpx) + '" stroke="#aaa" stroke-width="1" stroke-dasharray="3,2"/>';

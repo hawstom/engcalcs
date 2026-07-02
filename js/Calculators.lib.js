@@ -183,6 +183,29 @@ EngCalcs.writeFormResult = function (objForm, name, precision, hasUnits) {
 };
 
 /**
+	* writeVelocityCheck() renders a short OK / High / Low velocity status
+	* into elId, with the full explanation available as a hover tip on the
+	* warning icon. status is 'ok', 'high', 'low', or '' (blank/no result).
+	*/
+EngCalcs.writeVelocityCheck = function (elId, status, labels) {
+	'use strict';
+	var el = document.getElementById(elId);
+	if (!el) { return; }
+	el.className = '';
+	if (status === 'high' || status === 'low') {
+		el.innerHTML = (status === 'high' ? labels.high : labels.low) +
+			' <span class="ec-tip" title="' + (status === 'high' ? labels.highTip : labels.lowTip) +
+			'">⚠</span>';
+		el.classList.add('ec-status-warn');
+	} else if (status === 'ok') {
+		el.innerHTML = labels.ok;
+		el.classList.add('ec-status-ok');
+	} else {
+		el.innerHTML = '';
+	}
+};
+
+/**
 	* readTableInputs() reads current table inputs from the "CalcsTable" element
 	* into the global tableData array.  Modifies tableData.
 	*

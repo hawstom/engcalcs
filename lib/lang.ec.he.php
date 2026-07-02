@@ -4,7 +4,7 @@
 
 // Units (alphabetical order)
 // Necessary for calculator units selectors
-$ec_lang['u_depthFrac']='fraction';
+$ec_lang['u_depthFrac']='חלק';
 $ec_lang['u_depthPercent']='%';
 $ec_lang['u_ft2']='ft^2';
 $ec_lang['u_ft3ps']='cfs';
@@ -12,8 +12,8 @@ $ec_lang['u_ft']='ft';
 $ec_lang['u_fth2o']='ft H2O';
 $ec_lang['u_ftps']='ft/sec';
 $ec_lang['u_gpm']='gpm';
-$ec_lang['u_gradePercent']='% rise/run';
-$ec_lang['u_grade']='rise/run';
+$ec_lang['u_gradePercent']='% עלייה/ריצה';
+$ec_lang['u_grade']='עלייה/ריצה';
 $ec_lang['u_in2']='sq. in.';
 $ec_lang['u_inh2o']='in H2O';
 $ec_lang['u_in']='inches';
@@ -132,7 +132,7 @@ $ec_lang['or_area']='שטח הפתח, A';
 $ec_lang['or_flow']='ספיקה, Q';
 $ec_lang['or_regime']='בדיקת משטר הזרימה';
 $ec_lang['or_regime_valid']='זרימה חופשית — משטר פתח תקין ✓';
-$ec_lang['or_regime_submerged']='פתח טבוע (TWE מעל לתחתית) — תקין ✓';
+$ec_lang['or_regime_submerged']='פתח טבוע (TWE מעל לצנטרואיד) — תקין ✓';
 $ec_lang['or_regime_warn']='אזהרה: מפלס עליון מתחת לגג הפתח — לא משטר פתח';
 $ec_lang['or_regime_twe_above_hwe']='אזהרה: מפלס מים תחתון (TWE) גבוה ממפלס מים עליון (HWE) — בדוק קלטים';
 $ec_lang['or_notes_1_term']='משוואת הפתח';
@@ -323,6 +323,9 @@ $ec_lang['mhp_annual_kwh']='אנרגיה שנתית בקיבולת 100%';
 $ec_lang['mhp_vel_ok']='1–3 מ/ש — בטווח היעד ✓';
 $ec_lang['mhp_vel_low']='מתחת ל-1 מ/ש — הקטן קוטר ⚠';
 $ec_lang['mhp_vel_high']='מעל 3 מ/ש — הגדל קוטר ⚠';
+$ec_lang['mhp_vel_ok_short']='בסדר';
+$ec_lang['mhp_vel_high_short']='גבוה';
+$ec_lang['mhp_vel_low_short']='נמוך';
 $ec_lang['mhp_hl_ok']='בתוך יעד 10% ✓';
 $ec_lang['mhp_hl_warn']='חורג מיעד 10% — שקול צינור גדול יותר ⚠';
 $ec_lang['mhp_hl_bad']='חורג מ-20% — ממד מחדש את הצינור';
@@ -498,6 +501,9 @@ $ec_lang['mtc_vel_check']='בדיקת מהירות';
 $ec_lang['mtc_vel_ok']='המהירות סבירה להנחות זרימה אחידה.';
 $ec_lang['mtc_vel_high']='מהירות גבוהה — בדוק את הנפילה הזמינה ואת הפסדי ההתרחבות.';
 $ec_lang['mtc_vel_low']='מהירות נמוכה — סיכון להשתקעות.';
+$ec_lang['mtc_vel_ok_short']='בסדר';
+$ec_lang['mtc_vel_high_short']='גבוה';
+$ec_lang['mtc_vel_low_short']='נמוך';
 $ec_lang['mtc_note_2_term']='בדיקת מהירות';
 $ec_lang['mtc_note_2_def']='מהירות גבוהה משמעה אנרגיה סגולית גבוהה הנובעת מנפילה זמינה. אנרגיה זו עשויה ללכת לאיבוד במהירות באזורי התרחבות, בעקומות או בחסמים. יש לוודא שהדבר סביר עבור האתר.';
 

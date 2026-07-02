@@ -1,7 +1,7 @@
 {
     "meta": {
         "language": "am",
-        "expected_key_count": 459,
+        "expected_key_count": 465,
         "delta_key_count": 1,
         "active_prefixes": [
             "mtc"

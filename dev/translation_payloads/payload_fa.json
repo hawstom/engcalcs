@@ -1,10 +1,9 @@
 {
     "meta": {
         "language": "fa",
-        "expected_key_count": 459,
-        "delta_key_count": 3,
+        "expected_key_count": 465,
+        "delta_key_count": 1,
         "active_prefixes": [
-            "u",
             "wi"
         ],
         "requested_prefix": null,
@@ -14,33 +13,9 @@
         "intent_notes": "Use key_intent when present; these entries provide terse disambiguation comments only where translation risk exists."
     },
     "prompt_context_by_prefix": {
-        "u": "Use these preferred technical term translations when relevant:\n- flow (Q): دبی\n- velocity (v): سرعت\n- slope (S): شیب",
         "wi": "Use these preferred technical term translations when relevant:\n- flow (Q): دبی\n- weir: سرریز\n- headwater elevation: تراز آب بالادست\n- tailwater elevation: تراز آب پایین‌دست\n- discharge coefficient (C_d): ضریب تخلیه"
     },
     "glossary_terms_by_prefix": {
-        "u": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
-                "preferred_translation": "دبی"
-            },
-            {
-                "term": "velocity",
-                "symbol": "v",
-                "context": "Flow velocity (speed of water). Appears in all calculators.",
-                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
-                "preferred_translation": "سرعت"
-            },
-            {
-                "term": "slope",
-                "symbol": "S",
-                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
-                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
-                "preferred_translation": "شیب"
-            }
-        ],
         "wi": [
             {
                 "term": "flow",
@@ -80,48 +55,12 @@
         ]
     },
     "keys_to_translate": {
-        "u_gradePercent": "% rise\/run",
-        "u_grade": "rise\/run",
         "wi_notes_we_def": "q = if (length = 0) then 0 else if (slope=0) then cw*length*d<sub>0<\/sub><sup>1.5<\/sup> else cw\/(2.5*slope) * (d<sub>0<\/sub><sup>2.5<\/sup> - d<sub>1<\/sub><sup>2.5<\/sup>) where d<sub>1<\/sub> and d<sub>0<\/sub> are always positive or zero"
     },
     "keys": {
-        "u_gradePercent": "% rise\/run",
-        "u_grade": "rise\/run",
         "wi_notes_we_def": "q = if (length = 0) then 0 else if (slope=0) then cw*length*d<sub>0<\/sub><sup>1.5<\/sup> else cw\/(2.5*slope) * (d<sub>0<\/sub><sup>2.5<\/sup> - d<sub>1<\/sub><sup>2.5<\/sup>) where d<sub>1<\/sub> and d<sub>0<\/sub> are always positive or zero"
     },
     "key_context": {
-        "u_gradePercent": {
-            "reason": "equal_to_english",
-            "current_value": "% rise\/run",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "u_depthFrac",
-                    "value": "کسر",
-                    "english": "fraction"
-                },
-                "next_translated": {
-                    "key": "menu_brand",
-                    "value": "ماشین‌حساب‌های HawsEDC",
-                    "english": "HawsEDC Calculators"
-                }
-            }
-        },
-        "u_grade": {
-            "reason": "equal_to_english",
-            "current_value": "rise\/run",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "u_depthFrac",
-                    "value": "کسر",
-                    "english": "fraction"
-                },
-                "next_translated": {
-                    "key": "menu_brand",
-                    "value": "ماشین‌حساب‌های HawsEDC",
-                    "english": "HawsEDC Calculators"
-                }
-            }
-        },
         "wi_notes_we_def": {
             "reason": "equal_to_english",
             "current_value": "q = if (length = 0) then 0 else if (slope=0) then cw*length*d<sub>0<\/sub><sup>1.5<\/sup> else cw\/(2.5*slope) * (d<sub>0<\/sub><sup>2.5<\/sup> - d<sub>1<\/sub><sup>2.5<\/sup>) where d<sub>1<\/sub> and d<sub>0<\/sub> are always positive or zero",

@@ -20,9 +20,10 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.var.sf = Math.pow(this.var.v,2) * Math.pow(this.var.n,2) * 6.3496 / (Math.pow(this.var.c,2) * Math.pow(this.var.d,4/3));
 	this.var.tau = this.var.rh * this.var.sf;
 	this.var.hf = this.var.l * this.var.sf;
+	this.var.hgl1 = +this.var.egl1 - +this.var.hv;
 	this.var.hl = +this.var.hf + +this.var.hm;
 	this.var.egl2 = +this.var.egl1 + +this.var.hl;
-	this.var.hgl2 = +this.var.hgl2 - +this.var.hv;
+	this.var.hgl2 = +this.var.egl2 - +this.var.hv;
 	this.writeFormResult(objForm, 'a', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'pw', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'rh', precision = 4, hasUnits = true);
@@ -34,6 +35,7 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.writeFormResult(objForm, 'hm', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'hl', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'egl1', precision = 4, hasUnits = true);
+	this.writeFormResult(objForm, 'hgl1', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'egl2', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'hgl2', precision = 4, hasUnits = true);
 };

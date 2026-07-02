@@ -61,29 +61,31 @@ EngCalcs.pageCalculator = function(objForm) {
 
 	var lossEl = document.getElementById('cs_loss_check');
 	if (lossEl) {
+		lossEl.className = '';
 		if (Q_loss > 0) {
-			lossEl.innerHTML   = cfg.loss_positive;
-			lossEl.style.color = 'steelblue';
+			lossEl.innerHTML = cfg.loss_positive;
+			lossEl.classList.add('ec-status-info');
 		} else if (Q_loss === 0) {
-			lossEl.innerHTML   = cfg.loss_zero;
-			lossEl.style.color = 'gray';
+			lossEl.innerHTML = cfg.loss_zero;
+			lossEl.classList.add('ec-status-neutral');
 		} else {
-			lossEl.innerHTML   = cfg.loss_negative;
-			lossEl.style.color = 'red';
+			lossEl.innerHTML = cfg.loss_negative;
+			lossEl.classList.add('ec-status-bad');
 		}
 	}
 
 	var ecEl = document.getElementById('cs_Ec_check');
 	if (ecEl) {
+		ecEl.className = '';
 		if (this.var.cs_Ec >= 0.80) {
-			ecEl.innerHTML   = cfg.Ec_good;
-			ecEl.style.color = 'green';
+			ecEl.innerHTML = cfg.Ec_good;
+			ecEl.classList.add('ec-status-ok');
 		} else if (this.var.cs_Ec >= 0.60) {
-			ecEl.innerHTML   = cfg.Ec_fair;
-			ecEl.style.color = 'darkorange';
+			ecEl.innerHTML = cfg.Ec_fair;
+			ecEl.classList.add('ec-status-warn');
 		} else {
-			ecEl.innerHTML   = cfg.Ec_poor;
-			ecEl.style.color = 'red';
+			ecEl.innerHTML = cfg.Ec_poor;
+			ecEl.classList.add('ec-status-bad');
 		}
 	}
 

@@ -55,7 +55,7 @@ $ec_lang['or_flow']='Debit, Q';
 $ec_lang['or_velocity']='Viteză, v';
 $ec_lang['or_regime']='Verificarea regimului de orificiu';
 $ec_lang['or_regime_valid']='Curgere liberă — regim de orificiu valid ✓';
-$ec_lang['or_regime_submerged']='Orificiu înecat (TWE peste radier) — valid ✓';
+$ec_lang['or_regime_submerged']='Orificiu înecat (TWE peste centroid) — valid ✓';
 $ec_lang['or_regime_warn']='Atenție: nivelul amonte sub cheia arcului — nu este regim de orificiu';
 $ec_lang['or_regime_twe_above_hwe']='Atenție: apa din aval (TWE) depășește apa din amonte (HWE) — verificați datele de intrare';
 $ec_lang['or_notes_1_term']='Ecuația orificiului';
@@ -93,7 +93,7 @@ $ec_lang['odt_notes_2_def']='Metoda volumului conic modelează iazul sau bazinul
 $ec_lang['odt_h1']='Sarcina inițială, H<sub>1</sub> <span title="NWS inițial minus cota centroidului orificiului" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['odt_q_max']='Debit maxim, Q<sub>max</sub>';
 $ec_lang['odt_vol']='Volum golit';
-$ec_lang['odt_sketch_start']='Start';
+$ec_lang['odt_sketch_start']='Început';
 $ec_lang['odt_sketch_end']='Sfârșit';
 
 // Units (alphabetical order)
@@ -318,8 +318,11 @@ $ec_lang['mhp_hnet']='Sarcina netă, H<sub>net</sub>';
 $ec_lang['mhp_power']='Putere produsă, P';
 $ec_lang['mhp_annual_kwh']='Energie anuală la 100% capacitate';
 $ec_lang['mhp_vel_ok']='1–3 m/s — în intervalul țintă ✓';
+$ec_lang['mhp_vel_ok_short']='OK';
 $ec_lang['mhp_vel_low']='sub 1 m/s — reduceți diametrul ⚠';
+$ec_lang['mhp_vel_low_short']='Mică';
 $ec_lang['mhp_vel_high']='peste 3 m/s — măriți diametrul ⚠';
+$ec_lang['mhp_vel_high_short']='Ridicată';
 $ec_lang['mhp_hl_ok']='în limita țintei de 10% ✓';
 $ec_lang['mhp_hl_warn']='depășește ținta de 10% — luați în calcul o conductă mai mare ⚠';
 $ec_lang['mhp_hl_bad']='depășește 20% — redimensionați conducta';
@@ -339,7 +342,7 @@ $ec_lang['about_main_menu']='Despre';
 $ec_lang['install_main_menu']='Instalare';
 $ec_lang['install_main_title']='Instalează EngCalcs';
 $ec_lang['install_main_desc']='Adaugă pe dispozitiv pentru utilizare offline';
-$ec_lang['contact_main_menu']='Contact';
+$ec_lang['contact_main_menu']='Contacteaza';
 $ec_lang['about_main_title']='Despre calculatoarele de inginerie HawsEDC';
 $ec_lang['about_main_desc']='Misiune, sursă deschisă și contribuții';
 
@@ -492,8 +495,11 @@ $ec_lang['rc_sketch_radius']          = 'rază';
 // Manning Trapezoid velocity check
 $ec_lang['mtc_vel_check']='Verificare viteză';
 $ec_lang['mtc_vel_ok']='Viteză rezonabilă pentru ipotezele de curgere uniformă.';
+$ec_lang['mtc_vel_ok_short']='OK';
 $ec_lang['mtc_vel_high']='Viteză ridicată — verificați căderea disponibilă și pierderile la lărgire.';
+$ec_lang['mtc_vel_high_short']='Ridicată';
 $ec_lang['mtc_vel_low']='Viteză mică — risc de sedimentare.';
+$ec_lang['mtc_vel_low_short']='Mică';
 $ec_lang['mtc_note_2_term']='Verificare viteză';
 $ec_lang['mtc_note_2_def']='Viteza ridicată implică energie specifică mare dintr-o cădere disponibilă. Acea energie poate fi pierdută rapid la lărgiri, curbe sau obstacole. Verificați că aceasta este rezonabilă pentru amplasament.';
 

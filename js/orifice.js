@@ -15,7 +15,7 @@ EngCalcs.pageCalculator = function(objForm) {
 
 	this.var.centroid  = this.var.zinv + this.var.d / 2;
 	this.var.crown     = this.var.zinv + this.var.d;
-	this.var.submerged = (this.var.twe > this.var.zinv) ? 1 : 0;
+	this.var.submerged = (this.var.twe > this.var.centroid) ? 1 : 0;
 	this.var.h         = this.var.submerged
 		? Math.max(0, this.var.hwe - this.var.twe)
 		: Math.max(0, this.var.hwe - this.var.centroid);
@@ -28,19 +28,20 @@ EngCalcs.pageCalculator = function(objForm) {
 
 	var regimeEl = document.getElementById('regime');
 	if (regimeEl) {
+		regimeEl.className = '';
 		var regimeOk = (this.var.hwe >= this.var.crown && this.var.h > 0);
 		if (this.var.twe > this.var.hwe) {
 			regimeEl.innerHTML = EngCalcs.pageConfig.regime_twe_above_hwe;
-			regimeEl.style.color = 'red';
+			regimeEl.classList.add('ec-status-bad');
 		} else if (!regimeOk) {
 			regimeEl.innerHTML = EngCalcs.pageConfig.regime_warn;
-			regimeEl.style.color = 'darkorange';
+			regimeEl.classList.add('ec-status-warn');
 		} else if (this.var.submerged) {
 			regimeEl.innerHTML = EngCalcs.pageConfig.regime_submerged;
-			regimeEl.style.color = 'steelblue';
+			regimeEl.classList.add('ec-status-info');
 		} else {
 			regimeEl.innerHTML = EngCalcs.pageConfig.regime_valid;
-			regimeEl.style.color = 'green';
+			regimeEl.classList.add('ec-status-ok');
 		}
 	}
 

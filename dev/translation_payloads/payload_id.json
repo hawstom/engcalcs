@@ -1,9 +1,10 @@
 {
     "meta": {
         "language": "id",
-        "expected_key_count": 459,
-        "delta_key_count": 4,
+        "expected_key_count": 465,
+        "delta_key_count": 6,
         "active_prefixes": [
+            "mhp",
             "mi",
             "mtc",
             "rc"
@@ -15,11 +16,77 @@
         "intent_notes": "Use key_intent when present; these entries provide terse disambiguation comments only where translation risk exists."
     },
     "prompt_context_by_prefix": {
+        "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): debit\n- penstock: pipa tekanan\n- gross head (H_gross): tinggi jatuh bruto\n- net head (H_net): tinggi jatuh neto\n- plant efficiency (η): efisiensi instalasi\n- head loss (h_L): kehilangan tekanan\n- run-of-river: pembangkit listrik tenaga air aliran langsung\n- headworks: bangunan pengambilan air\n- junction loss (H_m): kehilangan lokal",
         "mi": "Use these preferred technical term translations when relevant:\n- flow (Q): debit\n- velocity (v): kecepatan\n- hydraulic radius (R_h): jari-jari hidrolik\n- wetted perimeter (P_w): keliling basah\n- Manning roughness (n): koefisien kekasaran Manning\n- slope (S): kemiringan",
         "mtc": "Use these preferred technical term translations when relevant:\n- flow (Q): debit\n- velocity (v): kecepatan\n- hydraulic radius (R_h): jari-jari hidrolik\n- wetted perimeter (P_w): keliling basah\n- Manning roughness (n): koefisien kekasaran Manning\n- slope (S): kemiringan",
         "rc": "Use these preferred technical term translations when relevant:\n- flow (Q): debit\n- velocity (v): kecepatan\n- riprap: batu pasangan\n- slope (S): kemiringan\n- rock chute: saluran curam berbatu\n- chute: saluran curam\n- unit discharge (q, q_t): debit per satuan lebar\n- median rock size (D50): ukuran median batu\n- gradation (SD): gradasi butir\n- porosity (n_p): porositas\n- specific gravity (sg): berat jenis\n- ponding: genangan air hulu"
     },
     "glossary_terms_by_prefix": {
+        "mhp": [
+            {
+                "term": "flow",
+                "symbol": "Q",
+                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
+                "preferred_translation": "debit"
+            },
+            {
+                "term": "penstock",
+                "symbol": "",
+                "context": "Pressure pipe carrying water from a reservoir or headpond down to a turbine in a micro-hydro system. Appears in Micro-Hydro Power calculator.",
+                "translation_notes": "'Penstock' is a specialized term with no exact one-word equivalent in many languages. Use the established civil\/hydro engineering phrase for 'pressure conduit' or 'force main to turbine'. Czech: 'tlakovod' (pressure main) is preferred over the generic 'přiváděcí potrubí' (supply pipe). Serbian: 'напорни цевовод' is the standard hydraulic engineering term.",
+                "preferred_translation": "pipa tekanan"
+            },
+            {
+                "term": "gross head",
+                "symbol": "H_gross",
+                "context": "Total elevation difference between the headpond water surface and the turbine — before subtracting penstock losses. Appears in Micro-Hydro Power calculator.",
+                "translation_notes": "'Gross' means total\/before-deduction. Pair with 'net head' for clarity. Use the hydro-power standard term.",
+                "preferred_translation": "tinggi jatuh bruto"
+            },
+            {
+                "term": "net head",
+                "symbol": "H_net",
+                "context": "Effective head available at the turbine after subtracting penstock friction and minor losses from gross head. H_net = H_gross - h_L.",
+                "translation_notes": "'Net' means after-deduction. Pair with 'gross head'. Use the hydro-power standard term. WMO No. 385 entry 111 ('available head') gives the Russian term 'полезный напор' (useful head) \/ syn. 'располагаемый напор' — these overlap with net head in Russian hydro engineering practice.",
+                "preferred_translation": "tinggi jatuh neto"
+            },
+            {
+                "term": "plant efficiency",
+                "symbol": "η",
+                "context": "Overall efficiency of a micro-hydro power plant — product of turbine, generator, and transmission efficiencies. Dimensionless, 0–1. Appears in Micro-Hydro Power calculator.",
+                "translation_notes": "'Plant' here means the power plant\/installation, not a living plant. Use the energy\/electrical engineering term for overall system efficiency.",
+                "preferred_translation": "efisiensi instalasi"
+            },
+            {
+                "term": "head loss",
+                "symbol": "h_L",
+                "context": "Energy loss expressed as a height of water column. Appears in Darcy-Weisbach, Hazen-Williams, Manning pipe, and Penstock calculators. Distinct from 'pressure drop' — use the hydraulic engineering term.",
+                "translation_notes": "'Head' in the hydraulic sense (energy per unit weight) does not translate literally in many languages — use the established civil\/hydraulic engineering phrase. Pre-2026 sr\/hr human translations used 'gubitak pritiska' (= pressure loss), which is technically the same concept expressed in pressure terms rather than head terms. The current 'губитак напора \/ gubitak tlačne visine' (= loss of hydraulic head) is more precise in a hydraulic engineering context and is preferred.",
+                "preferred_translation": "kehilangan tekanan"
+            },
+            {
+                "term": "run-of-river",
+                "symbol": "",
+                "context": "A hydropower configuration that uses natural river flow without a dam or significant storage reservoir. Power output varies with seasonal river flow. Appears in Micro-Hydro Power calculator.",
+                "translation_notes": "Use the established energy\/hydropower sector term. 'Run' means natural river current — do not translate as jogging or running. WMO No. 385 entry 1263 gives the full facility names: Spanish 'central hidroeléctrica de pasada', French 'usine hydroélectrique au fil de l'eau', Russian 'русловая гидроэлектростанция' — these are the authoritative terms for the power plant noun. The abbreviated forms 'filo de agua' (es), 'au fil de l'eau' (fr), and 'русловая ГЭС' (ru) are standard in engineering use. German: 'Laufwasserkraftwerk'. Chinese: '径流式水电'.",
+                "preferred_translation": "pembangkit listrik tenaga air aliran langsung"
+            },
+            {
+                "term": "headworks",
+                "symbol": "",
+                "context": "The intake structure at the upstream end of a penstock or canal, where water is diverted from the river or reservoir into the conveyance system. Appears in Micro-Hydro Power calculator (penstock diameter and length descriptions).",
+                "translation_notes": "Use the civil\/irrigation engineering term for a water intake or diversion structure. Spanish: 'obra de toma'. French: 'ouvrage de prise d'eau'. Russian: 'водозаборное сооружение'. German: 'Einlaufbauwerk'. In many languages, 'intake structure' is preferred over a literal translation of 'headworks'.",
+                "preferred_translation": "bangunan pengambilan air"
+            },
+            {
+                "term": "junction loss",
+                "symbol": "H_m",
+                "context": "Energy loss at pipe junctions, bends, fittings, and entrance — a local (point) loss as opposed to distributed friction loss along the pipe. H_m = k × v²\/(2g). Also called 'minor loss', though in short penstocks these can equal or exceed friction losses. Appears in Manning Pipe Head Loss and Micro-Hydro Power calculators.",
+                "translation_notes": "The term 'minor loss' is conventional but misleading — do not imply these losses are always small. Use the hydraulic engineering term for local\/point losses at fittings. French: 'perte singulière'. Spanish: 'pérdida local' or 'pérdida por accesorio'. Russian: 'местные потери'. Chinese: '局部水头损失'.",
+                "preferred_translation": "kehilangan lokal"
+            }
+        ],
         "mi": [
             {
                 "term": "flow",
@@ -199,12 +266,16 @@
         "mi_station": "Sta",
         "mi_elevation": "Elev",
         "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
+        "mtc_vel_ok_short": "OK",
+        "mhp_vel_ok_short": "OK",
         "rc_sketch_filter": "Filter"
     },
     "keys": {
         "mi_station": "Sta",
         "mi_elevation": "Elev",
         "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
+        "mtc_vel_ok_short": "OK",
+        "mhp_vel_ok_short": "OK",
         "rc_sketch_filter": "Filter"
     },
     "key_context": {
@@ -253,6 +324,38 @@
                     "key": "mtc_d50_bottom",
                     "value": "Ukuran batu sudut yang dibutuhkan di dasar, D50 (Isbash & MC) <span title=\"Menurut Isbash (1936) dan Maricopa County, Arizona, AS.\" style=\"cursor:help;color:#06c;font-size:0.9em\">?<\/span>",
                     "english": "Required bottom angular rock size, D50 (Isbash & MC) <span title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\" style=\"cursor:help;color:#06c;font-size:0.9em\">?<\/span>"
+                }
+            }
+        },
+        "mtc_vel_ok_short": {
+            "reason": "equal_to_english",
+            "current_value": "OK",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "mtc_vel_low",
+                    "value": "Kecepatan rendah — risiko sedimentasi.",
+                    "english": "Velocity low - sedimentation risk."
+                },
+                "next_translated": {
+                    "key": "mtc_vel_high_short",
+                    "value": "Tinggi",
+                    "english": "High"
+                }
+            }
+        },
+        "mhp_vel_ok_short": {
+            "reason": "equal_to_english",
+            "current_value": "OK",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "mhp_vel_high",
+                    "value": "di atas 3 m\/s — tambah diameter ⚠",
+                    "english": "Velocity very high ⚠"
+                },
+                "next_translated": {
+                    "key": "mhp_vel_high_short",
+                    "value": "Tinggi",
+                    "english": "High"
                 }
             }
         },

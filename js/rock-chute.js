@@ -60,47 +60,50 @@ EngCalcs.pageCalculator = function(objForm) {
 	// Inlet ponding check
 	var pondEl = document.getElementById('rc_ponding_check');
 	if (pondEl) {
+		pondEl.className = '';
 		if (yn > 0 && Hp > 0) {
-			if (Hp > yn) { pondEl.innerHTML = cfg.rc_pond_ok;   pondEl.style.color = '#267326'; }
-			else          { pondEl.innerHTML = cfg.rc_pond_warn; pondEl.style.color = '#c60';    }
+			if (Hp > yn) { pondEl.innerHTML = cfg.rc_pond_ok;   pondEl.classList.add('ec-status-ok');   }
+			else          { pondEl.innerHTML = cfg.rc_pond_warn; pondEl.classList.add('ec-status-warn'); }
 		} else {
 			pondEl.innerHTML = '';
-			pondEl.style.color = '';
 		}
 	}
 
 	// Equation / validity status
 	var statusEl = document.getElementById('rc_eq_used');
 	if (statusEl) {
+		statusEl.className = '';
 		if (S0 < 0.02) {
 			statusEl.innerHTML = cfg.rc_eq_warn_low;
-			statusEl.style.color = 'red';
+			statusEl.classList.add('ec-status-bad');
 		} else if (S0 > 0.40) {
 			statusEl.innerHTML = cfg.rc_eq_warn_high;
-			statusEl.style.color = 'red';
+			statusEl.classList.add('ec-status-bad');
 		} else if (S0 < 0.10) {
 			statusEl.innerHTML = cfg.rc_eq1;
-			statusEl.style.color = 'green';
+			statusEl.classList.add('ec-status-ok');
 		} else {
 			statusEl.innerHTML = cfg.rc_eq2;
-			statusEl.style.color = 'steelblue';
+			statusEl.classList.add('ec-status-info');
 		}
 	}
 
 	// Specific gravity validity check
 	var sgEl = document.getElementById('rc_sg_check');
 	if (sgEl && sg > 0) {
-		if (sg < 2.54)      { sgEl.innerHTML = cfg.rc_sg_low;  sgEl.style.color = 'red';       }
-		else if (sg > 2.82) { sgEl.innerHTML = cfg.rc_sg_high; sgEl.style.color = 'red';       }
-		else                { sgEl.innerHTML = cfg.rc_sg_ok;   sgEl.style.color = '#267326';   }
+		sgEl.className = '';
+		if (sg < 2.54)      { sgEl.innerHTML = cfg.rc_sg_low;  sgEl.classList.add('ec-status-bad'); }
+		else if (sg > 2.82) { sgEl.innerHTML = cfg.rc_sg_high; sgEl.classList.add('ec-status-bad'); }
+		else                { sgEl.innerHTML = cfg.rc_sg_ok;   sgEl.classList.add('ec-status-ok');  }
 	}
 
 	// Gradation SD validity check
 	var sdEl = document.getElementById('rc_SD_check');
 	if (sdEl && SD > 0) {
-		if (SD < 1.15)      { sdEl.innerHTML = cfg.rc_SD_low;  sdEl.style.color = 'red';       }
-		else if (SD > 1.47) { sdEl.innerHTML = cfg.rc_SD_high; sdEl.style.color = 'red';       }
-		else                { sdEl.innerHTML = cfg.rc_SD_ok;   sdEl.style.color = '#267326';   }
+		sdEl.className = '';
+		if (SD < 1.15)      { sdEl.innerHTML = cfg.rc_SD_low;  sdEl.classList.add('ec-status-bad'); }
+		else if (SD > 1.47) { sdEl.innerHTML = cfg.rc_SD_high; sdEl.classList.add('ec-status-bad'); }
+		else                { sdEl.innerHTML = cfg.rc_SD_ok;   sdEl.classList.add('ec-status-ok');  }
 	}
 
 	this.rcDrawSketch();

@@ -113,22 +113,17 @@ EngCalcs.pageCalculator = function (objForm) {
 		d0=d1;
 	}
 	document.getElementById('q_617').innerHTML = (this.Manning.q617c * objForm['q_617u'].value).toFixed(2);
-	var vCheckEl = document.getElementById('v_check');
-	if (vCheckEl) {
-		if (minRegionVelocity === Infinity) {
-			vCheckEl.innerHTML = '';
-			vCheckEl.style.color = '';
-		} else if (maxRegionVelocity > 3.0) {
-			vCheckEl.innerHTML = EngCalcs.pageConfig.mtc_vel_high;
-			vCheckEl.style.color = 'darkorange';
-		} else if (minRegionVelocity < 0.6) {
-			vCheckEl.innerHTML = EngCalcs.pageConfig.mtc_vel_low;
-			vCheckEl.style.color = 'darkorange';
-		} else {
-			vCheckEl.innerHTML = EngCalcs.pageConfig.mtc_vel_ok;
-			vCheckEl.style.color = 'green';
-		}
-	}
+	var vCheckStatus = (minRegionVelocity === Infinity) ? ''
+		: (maxRegionVelocity > 3.0) ? 'high'
+		: (minRegionVelocity < 0.6) ? 'low'
+		: 'ok';
+	this.writeVelocityCheck('v_check', vCheckStatus, {
+		ok: EngCalcs.pageConfig.mtc_vel_ok_short,
+		high: EngCalcs.pageConfig.mtc_vel_high_short,
+		low: EngCalcs.pageConfig.mtc_vel_low_short,
+		highTip: EngCalcs.pageConfig.mtc_vel_high,
+		lowTip: EngCalcs.pageConfig.mtc_vel_low
+	});
 
 	// Sketch
 	var

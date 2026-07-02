@@ -22,3 +22,26 @@ input[type=number] {
     opacity: 0;
   }
 }
+
+/* Validity/status check results (velocity checks, regime checks, DU quality,
+   D50 range checks, head-loss checks, conveyance efficiency, etc.) */
+.ec-status-ok {
+	color: #267326;
+}
+.ec-status-info {
+	color: steelblue;
+}
+.ec-status-warn {
+	color: #c60;
+}
+.ec-status-bad {
+	color: #c00;
+}
+.ec-status-neutral {
+	color: gray;
+}
+
+/* Hover-tip icons (⚠, ?) that carry a longer explanation in the title attribute */
+.ec-tip {
+	cursor: help;
+}

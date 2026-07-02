@@ -68,7 +68,10 @@ echoCalculatorForm(
 EngCalcs.pageConfig = {
 	mtc_vel_ok: <?=json_encode($ec_lang['mtc_vel_ok'])?>,
 	mtc_vel_high: <?=json_encode($ec_lang['mtc_vel_high'])?>,
-	mtc_vel_low: <?=json_encode($ec_lang['mtc_vel_low'])?>
+	mtc_vel_low: <?=json_encode($ec_lang['mtc_vel_low'])?>,
+	mtc_vel_ok_short: <?=json_encode($ec_lang['mtc_vel_ok_short'])?>,
+	mtc_vel_high_short: <?=json_encode($ec_lang['mtc_vel_high_short'])?>,
+	mtc_vel_low_short: <?=json_encode($ec_lang['mtc_vel_low_short'])?>
 };
 </script>
 <script src="/engcalcs/js/Manning.lib.js?v=<?=filemtime(__DIR__.'/js/Manning.lib.js')?>"></script>

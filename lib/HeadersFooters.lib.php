@@ -47,7 +47,7 @@ $page_title = $calc_name ? $safe_name . ' — ' . $html_title : $html_title;
 <?php
 if (substr($type, 0, 8) === "EngCalcs") {
 ?>
-	<link rel="stylesheet" href="/engcalcs/css/engcalcs.css?v=2" type="text/css" />
+	<link rel="stylesheet" href="/engcalcs/css/engcalcs.css?v=<?=filemtime(__DIR__.'/../css/engcalcs.css')?>" type="text/css" />
 <?php
 }
 ?>
