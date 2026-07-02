@@ -47,6 +47,7 @@ echoCalculatorForm(
 		Array('name' => 't', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mpf_top_width']),
 		Array('name' => 'v', 'units' => Array('mps','ftps'), 'label' => $ec_lang['mpf_velocity']),
 		Array('name' => 'hv', 'units' => Array('mh2o','mmh2o','kpa','fth2o','inh2o','psi'), 'label' => $ec_lang['mpf_velocity_head']),
+		Array('name' => 'vel_check', 'units' => NULL, 'label' => $ec_lang['mhp_vel_check']),
 		Array('name' => 'f', 'units' => NULL, 'label' => '<a target="_blank" href="https://www.engineeringtoolbox.com/froude-number-d_578.html">'.$ec_lang['mpf_froude_number'].'</a>'),
 		Array('name' => 'tau', 'units' => Array('npm2','psf'), 'label' => $ec_lang['mpf_shear_stress']),
 		Array('name' => 'q', 'units' => Array('m3ps','lps','mld','ft3ps','gpm','mgd'), 'label' => '<strong>' . $ec_lang['mpf_flow'] . '</strong> ' . $ec_lang['mpf_see_notes']),
@@ -63,6 +64,15 @@ echoCalculatorForm(
 
 <?php echoFeedback(); ?>
 
+<script>
+EngCalcs.pageConfig = {
+	mhp_vel_ok_short:   <?=json_encode($ec_lang['mhp_vel_ok_short'])?>,
+	mhp_vel_high_short: <?=json_encode($ec_lang['mhp_vel_high_short'])?>,
+	mhp_vel_low_short:  <?=json_encode($ec_lang['mhp_vel_low_short'])?>,
+	mhp_vel_high:       <?=json_encode($ec_lang['mhp_vel_high'])?>,
+	mhp_vel_low:        <?=json_encode($ec_lang['mhp_vel_low'])?>
+};
+</script>
 <script src="/engcalcs/js/manning-pipe-flow.js?v=<?=filemtime(__DIR__.'/js/manning-pipe-flow.js')?>"></script>
 <script>
 <?php echoCookieScript(); ?>

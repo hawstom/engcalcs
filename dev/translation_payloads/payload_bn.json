@@ -200,7 +200,7 @@
                 "previous_translated": {
                     "key": "mhp_vel_high",
                     "value": "3 m\/s এর উপরে — ব্যাস বাড়ান ⚠",
-                    "english": "Velocity very high ⚠"
+                    "english": "Velocity high - risk of water hammer and high point (minor) losses."
                 },
                 "next_translated": {
                     "key": "mhp_hl_ok",
@@ -216,7 +216,7 @@
                 "previous_translated": {
                     "key": "mhp_vel_high",
                     "value": "3 m\/s এর উপরে — ব্যাস বাড়ান ⚠",
-                    "english": "Velocity very high ⚠"
+                    "english": "Velocity high - risk of water hammer and high point (minor) losses."
                 },
                 "next_translated": {
                     "key": "mhp_hl_ok",
@@ -232,7 +232,7 @@
                 "previous_translated": {
                     "key": "mhp_vel_high",
                     "value": "3 m\/s এর উপরে — ব্যাস বাড়ান ⚠",
-                    "english": "Velocity very high ⚠"
+                    "english": "Velocity high - risk of water hammer and high point (minor) losses."
                 },
                 "next_translated": {
                     "key": "mhp_hl_ok",

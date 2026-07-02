@@ -55,6 +55,13 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.writeFormResult(objForm, 'rh', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'u', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'hv', precision = 4, hasUnits = true);
+	this.writeVelocityCheck('vel_check', (this.var.u >= 1.0 && this.var.u <= 3.0) ? 'ok' : (this.var.u > 3.0 ? 'high' : 'low'), {
+		ok: EngCalcs.pageConfig.mhp_vel_ok_short,
+		high: EngCalcs.pageConfig.mhp_vel_high_short,
+		low: EngCalcs.pageConfig.mhp_vel_low_short,
+		highTip: EngCalcs.pageConfig.mhp_vel_high,
+		lowTip: EngCalcs.pageConfig.mhp_vel_low
+	});
 	this.writeFormResult(objForm, 're', precision = 0, hasUnits = false);
 	document.getElementById('regime_label').innerHTML = this.var['regime_label'];
 	document.getElementById('f_method').innerHTML = this.var['f_method'];
