@@ -187,8 +187,8 @@ $ec_lang['mtc_d50_mra']='اړین زاویه لرونکي کاڼو اندازه�
 $ec_lang['mtc_d50_searcy']='اړین زاویه لرونکي کاڼو اندازه، D50 (Searcy 1967)';
 $ec_lang['mtc_note_1']='<dl><dt>د کاڼو اندازه او خشونت ډیزاین اتوماتیک تکرار</dt><dd>یو خشونت ریډیو تڼۍ (BB وړاندیز کیږي) او د ډیزاین کاڼو اندازې ریډیو تڼۍ (Isbash وړاندیز کیږي) غوره کړئ. ژوروالی او د کاڼو اندازې امنیتي فاکتور سم کړئ ترڅو خپل غوښتل شوي بهاو د مساوي کاڼو اندازې سره ترلاسه کړئ. هر ځل چې تاسو کوم داخلي ارزښت بدل کړئ، لاندینی تکرار دور پیښیږي: ۱. خشونت د ډیزاین کاڼو اندازې له مخې محاسبه کیږي. ۲. غوښتل شوي خشونت محاسبه د داخلي خشونت ته کاپي کیږي. ۳. د چینل بهاو او اړین کاڼو اندازه محاسبه کیږي. ۴. د ډیزاین کاڼو اندازه تنظیمیږي. ۵. د ډیزاین کاڼو اندازې کې تیروتنه ډیره کوچنۍ شي پورې تکرار کیږي.</dd><dt>اساسي محاسبه (بدون تکرار)</dt><dd>خپل غوښتل شوي خشونت ارزښت داخل کړئ. د ډیزاین کاڼو اندازې داخلي ساحه له پامه غورځوئ.</dd></dl>';
 // Robinson Rock Chute
-$ec_lang['rrc_main_menu']='Robinson Rock Chute';
-$ec_lang['rrc_main_desc']='Robinson Rock Chute د ډیزاین سپریډشیټ';
+$ec_lang['rrc_main_menu']='د Robinson د کاڼو تند اوبو لار';
+$ec_lang['rrc_main_desc']='د Robinson د کاڼو تند اوبو لار ډیزاین سپریډشیټ';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='ساده د ویر بهاو';
 $ec_lang['ws_main_title']='وړیا آنلاین ساده پراخ تاج لرونکي ویر بهاو محاسبه';
@@ -431,9 +431,9 @@ $ec_lang['about_body_html']='<h3>مأموریت</h3><p>د HawsEDC انجینیر
 // Rock Chute Design (Robinson, Rice & Kadavy 1998). Prefix rc_.
 $ec_lang['u_m2ps']='m^2/s';
 $ec_lang['u_ft2ps']='cfs/ft';
-$ec_lang['rc_main_menu']='د ډبرې چوټ ډیزاین (Robinson)';
-$ec_lang['rc_main_title']='وړیا آنلاین د ډبرې چوټ ډیزاین کلکولیټر — Robinson (1998)';
-$ec_lang['rc_main_desc']='د ډبرې چوټ ریپ‌ریپ اندازه ټاکل — Robinson, Rice & Kadavy (1998)';
+$ec_lang['rc_main_menu']='د کاڼو تند اوبو لار ډیزاین (Robinson)';
+$ec_lang['rc_main_title']='وړیا آنلاین د کاڼو تند اوبو لار ډیزاین کلکولیټر — Robinson (1998)';
+$ec_lang['rc_main_desc']='د کاڼو تند اوبو لار ریپ‌ریپ اندازه ټاکل — Robinson, Rice & Kadavy (1998)';
 $ec_lang['rc_S0']='د چوټ بیڈ شیب، S<sub>0</sub>';
 $ec_lang['rc_qt']='ټول واحد خارج، q<sub>t</sub> <span title="د چوټ ننوتلو کې د هر واحد پلنوالي لپاره بهاو. د B ښکتني پلنوالي او Q ټول بهاو لرونکې نهر لپاره q_t = Q / B وکاروئ." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['rc_np']='د ریپ‌ریپ سوری توب، n<sub>p</sub>';
@@ -486,3 +486,17 @@ $ec_lang['rc_sketch_filter']          = 'فلتر';
 $ec_lang['rc_sketch_top_crest_curve'] = 'د سر خم';
 $ec_lang['rc_sketch_outlet_apron']    = 'د وتلو تلپاکه';
 $ec_lang['rc_sketch_radius']          = 'شعاع';
+
+// Manning Trapezoid velocity checks and note 2
+$ec_lang['mtc_vel_check']='د سرعت کتنه';
+$ec_lang['mtc_vel_ok']='سرعت د یکنواخت بهاو فرضیو لپاره معقول دی.';
+$ec_lang['mtc_vel_high']='سرعت لوړ دی — د شتون لرونکي لوېدل او د پراختیا ضیاعات وکتل شي.';
+$ec_lang['mtc_vel_low']='سرعت ټیټ دی — د رسوب خطر.';
+$ec_lang['mtc_note_2_term']='د سرعت کتنه';
+$ec_lang['mtc_note_2_def']='لوړ سرعت د شتون لرونکي لوېدل څخه لوړ ځانګړی انرژي ښيي. هغه انرژي کولی شي د پراختیاوو، ګوډونو، یا خنډونو کې ژر له لاسه ورکړل شي. تصدیق وکړئ چې دا د سایټ لپاره معقول دی.';
+
+// Micro-Hydro Power notes 6 and 7
+$ec_lang['mhp_notes_6_term']='موثریت';
+$ec_lang['mhp_notes_6_def']='د مایکرو هایدرو کې د Pelton او کراس-فلو ټربینونو لپاره د پلانټ معمول موثریت &eta; د 0.70 تر 0.85 پورې وي. د محافظه‌کارانه لومړني اټکل لپاره 0.75 وکاروئ.';
+$ec_lang['mhp_notes_7_term']='کلنۍ انرژي';
+$ec_lang['mhp_notes_7_def']='کلنۍ انرژي د دوامداره بشپړ بهاو عملیات (8760 ساعت/کال) فرض کوي. واقعي تولید به د موسمي بهاو بدلون، د ساتنې د ودرولو وخت، او د بار فاکتور له امله ټیټ وي.';

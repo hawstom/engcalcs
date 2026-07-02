@@ -487,3 +487,17 @@ $ec_lang['rc_sketch_filter']          = 'ማጣሪያ';
 $ec_lang['rc_sketch_top_crest_curve'] = 'የጫፍ ኩርባ';
 $ec_lang['rc_sketch_outlet_apron']    = 'መውጫ ሰሌዳ';
 $ec_lang['rc_sketch_radius']          = 'ራዲየስ';
+
+// Manning Trapezoid velocity checks and note 2
+$ec_lang['mtc_vel_check']='የፍጥነት ምርመራ';
+$ec_lang['mtc_vel_ok']='ፍጥነቱ ለወጥ ፍሰት ግምቶች ምክንያታዊ ነው።';
+$ec_lang['mtc_vel_high']='ፍጥነቱ ከፍተኛ ነው - ያለ ቁልቁለትን እና መስፋፋት ኪሳራዎችን ያረጋግጡ።';
+$ec_lang['mtc_vel_low']='ፍጥነቱ ዝቅ ያለ ነው - የደለል አደጋ አለ።';
+$ec_lang['mtc_note_2_term']='የፍጥነት ምርመራ';
+$ec_lang['mtc_note_2_def']='ከፍተኛ ፍጥነት ከሚገኝ ቁልቁለት ከፍተኛ ልዩ ሃይልን ያሳያል። ያ ሃይል በስፋፊዎች፣ ጥምዞች ወይም እንቅፋቶች ላይ በፍጥነት ሊጠፋ ይችላል። ይህ ለቦታው ምክንያታዊ መሆኑን ያረጋግጡ።';
+
+// Micro-Hydro Power notes 6 and 7
+$ec_lang['mhp_notes_6_term']='ብቃት';
+$ec_lang['mhp_notes_6_def']='ለ Pelton እና cross-flow ተርቢኖች ለማይክሮ-ሃይድሮ ዓይነተኛ ፋብሪካ ብቃት &eta; ከ0.70 እስከ 0.85 ይደርሳል። 0.75 ጥንቃቄ ሞልቶ ቀዳሚ ግምት ሆኖ ይጠቀሙ።';
+$ec_lang['mhp_notes_7_term']='ዓመታዊ ሃይል';
+$ec_lang['mhp_notes_7_def']='ዓመታዊ ሃይል ያለ ቋረጣ ሙሉ-ፍሰት ሥራን (8760 ሰዓት/ዓመት) ይወስዳል። ምርቱ ወቅታዊ ፍሰት ልዩነት፣ ጥገና ቆም ጊዜ፣ እና ጭነት ሁኔታ ምክንያት ዝቅ ይሆናል።';

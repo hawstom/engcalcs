@@ -95,7 +95,7 @@ function echoEngCalcsMenu ($html_title = '', $show_name_field = false, $calc_nam
 					<div class="dropdown-divider"></div>
 					<a class="dropdown-item" href="Manning-Trap.php" title="<?=$ec_lang['mtc_main_desc']?>"><?=$ec_lang['mtc_menu']?></a>
 					<a class="dropdown-item" href="Manning-Irregular.php" title="<?=$ec_lang['mi_main_desc']?>"><?=$ec_lang['mi_menu']?></a>
-					<a class="dropdown-item" href="Rock-Chute.php" title="<?=$ec_lang['rrc_main_desc']?>"><?=$ec_lang['rrc_main_menu']?></a>
+					<a class="dropdown-item" href="Rock-Chute.php" title="<?=$ec_lang['rc_main_desc']?>"><?=$ec_lang['rc_main_menu']?></a>
 					<div class="dropdown-divider"></div>
 										<a class="dropdown-item" href="Micro-Hydro-Power.php" title="<?=$ec_lang['mhp_main_desc']?>"><?=$ec_lang['mhp_main_menu']?></a>
 					<div class="dropdown-divider"></div>

@@ -293,8 +293,8 @@ $ec_lang['mtc_note_1']='<dl><dt>Iteración automática para diseño de tamaño y
 // Orifice Flow additional key
 $ec_lang['or_velocity']='Velocidad, v';
 // Robinson Rock Chute
-$ec_lang['rrc_main_desc']='Hoja de cálculo para el diseño de rampas de roca según el método de Robinson';
-$ec_lang['rrc_main_menu']='Diseño de Rampa de Roca según Robinson';
+$ec_lang['rrc_main_desc']='Hoja de cálculo para el diseño de bajantes de rocado según el método de Robinson';
+$ec_lang['rrc_main_menu']='Diseño de Bajante de Rocado según Robinson';
 
 
 // Micro-Hydro Power
@@ -440,9 +440,9 @@ $ec_lang['about_body_html']='<h3>Misión</h3><p>Las Calculadoras de Ingeniería 
 // Rock Chute Design (Robinson, Rice & Kadavy 1998). Prefix rc_.
 $ec_lang['u_m2ps']='m^2/s';
 $ec_lang['u_ft2ps']='cfs/ft';
-$ec_lang['rc_main_menu']='Diseño de Canal de Roca (Robinson)';
-$ec_lang['rc_main_title']='Calculadora Gratuita de Diseño de Canal de Roca — Robinson (1998)';
-$ec_lang['rc_main_desc']='Dimensionamiento de Escollera en Canal de Roca — Robinson, Rice & Kadavy (1998)';
+$ec_lang['rc_main_menu']='Diseño de Bajante de Rocado (Robinson)';
+$ec_lang['rc_main_title']='Calculadora Gratuita de Diseño de Bajante de Rocado — Robinson (1998)';
+$ec_lang['rc_main_desc']='Dimensionamiento de Escollera para Bajante de Rocado — Robinson, Rice & Kadavy (1998)';
 $ec_lang['rc_S0']='Pendiente del fondo del canal, S<sub>0</sub>';
 $ec_lang['rc_qt']='Gasto unitario total, q<sub>t</sub> <span title="Caudal por unidad de ancho en la entrada del canal. Para un canal de ancho de plantilla B con gasto total Q, usar q_t = Q / B." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['rc_np']='Porosidad de la escollera, n<sub>p</sub>';
@@ -495,3 +495,10 @@ $ec_lang['rc_sketch_filter']          = 'Filtro';
 $ec_lang['rc_sketch_top_crest_curve'] = 'Curva de cresta';
 $ec_lang['rc_sketch_outlet_apron']    = 'Zampeado';
 $ec_lang['rc_sketch_radius']          = 'radio';
+// Manning Trapezoidal Channel velocity check
+$ec_lang['mtc_vel_check']='Verificación de velocidad';
+$ec_lang['mtc_vel_ok']='Velocidad razonable para supuestos de flujo uniforme.';
+$ec_lang['mtc_vel_high']='Velocidad elevada — verificar la caída disponible y las pérdidas por expansión.';
+$ec_lang['mtc_vel_low']='Velocidad baja — riesgo de sedimentación.';
+$ec_lang['mtc_note_2_term']='Verificación de velocidad';
+$ec_lang['mtc_note_2_def']='La velocidad elevada implica alta energía específica a partir de una caída disponible. Esa energía puede disiparse rápidamente en expansiones, curvas u obstrucciones. Verifique que esto sea razonable para el sitio.';

@@ -41,8 +41,8 @@ $ec_lang['u_ft3']="ft^3";
 $ec_lang['u_m3']="m^3";
 $ec_lang['u_kw']='kW';
 $ec_lang['u_mw']='MW';
-$ec_lang['u_kwh_yr']='kWh/yr';
-$ec_lang['u_mwh_yr']='MWh/yr';
+$ec_lang['u_kwh_yr']='kWh/an';
+$ec_lang['u_mwh_yr']='MWh/an';
 $ec_lang['u_hp']='hp';
 
 // Page text
@@ -255,7 +255,7 @@ $ec_lang['odt_a_ending']='Superficie finale, A<sub>2</sub> <span title="Interpol
 $ec_lang['odt_h2_check']='Vérification de la cote finale';
 $ec_lang['odt_h2_ok']='Cote finale au-dessus du sommet de l\'orifice ✓';
 $ec_lang['odt_h2_warn']='Avertissement : cote finale au niveau ou en dessous du sommet de l\'orifice (centroïde + D/2)';
-$ec_lang['odt_d']='Orifice D <span title="Diameter (circular) or height (rectangular)" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['odt_d']='Orifice D <span title="Diamètre (circulaire) ou hauteur (rectangulaire)" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['odt_w']='Largeur, W <span title="Rectangular only" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['odt_t_sec']='Temps de vidange (s)';
 $ec_lang['odt_t_min']='Temps de vidange (min)';
@@ -265,7 +265,7 @@ $ec_lang['odt_notes_1_term']='Formule';
 $ec_lang['odt_notes_1_def']='t = √H<sub>1</sub> / (C<sub>d</sub> A<sub>or</sub> √(2g)) × (2A<sub>x</sub>/5 + 8√(A<sub>x</sub>A<sub>0</sub>)/15 + 16A<sub>0</sub>/15) donne le temps de vidange depuis la charge H jusqu\'à l\'orifice. Temps de vidange = t(H<sub>1</sub>,A<sub>1</sub>,A<sub>0</sub>) − t(H<sub>2</sub>,A<sub>2</sub>,A<sub>0</sub>), où H<sub>1</sub> = cote de départ − cote de l\'orifice, H<sub>2</sub> = cote finale − cote de l\'orifice.';
 $ec_lang['odt_notes_2_term']='Méthode';
 $ec_lang['odt_notes_2_def']='La méthode du volume conique modélise le bassin ou l\'étang comme une section conique entre la superficie initiale A<sub>1</sub> à la surface libre de départ et la superficie A<sub>0</sub> à la cote du centroïde de l\'orifice. A<sub>2</sub>, la superficie du bassin à la cote finale, est interpolée à partir de A<sub>1</sub> et A<sub>0</sub> selon le modèle conique. Le temps de vidange de la cote de départ à la cote finale est égal au temps de vidange total de H<sub>1</sub> à l\'orifice moins le temps de vidange restant de H<sub>2</sub> à l\'orifice.';
-$ec_lang['odt_h1']='Starting head, H<sub>1</sub> <span title="Starting WSE minus orifice centroid elevation" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
+$ec_lang['odt_h1']='Charge initiale, H<sub>1</sub> <span title="CSE initiale moins cote du centroïde de l\'orifice" style="cursor:help;color:steelblue;font-size:0.9em">?</span>';
 $ec_lang['odt_q_max']='Débit max, Q<sub>max</sub>';
 $ec_lang['odt_vol']='Volume vidangé';
 $ec_lang['odt_sketch_start']='Début';
@@ -347,10 +347,10 @@ $ec_lang['about_main_title']='À propos des calculateurs HawsEDC';
 $ec_lang['about_main_desc']='Mission, open source et contribution';
 
 // Drip / Sprinkler Application Rate
-$ec_lang['u_lph']="L/hr";
-$ec_lang['u_gph']="gal/hr";
-$ec_lang['u_mmph']="mm/hr";
-$ec_lang['u_inph']="in/hr";
+$ec_lang['u_lph']='L/h';
+$ec_lang['u_gph']='gal/h';
+$ec_lang['u_mmph']='mm/h';
+$ec_lang['u_inph']='in/h';
 $ec_lang['ds_main_menu']='Taux d\'application — goutte-à-goutte/aspersion';
 $ec_lang['ds_main_title']='Calculateur gratuit en ligne du taux d\'application pour l\'irrigation goutte-à-goutte/aspersion';
 $ec_lang['ds_main_desc']='Irrigation goutte-à-goutte & aspersion — taux d\'application et uniformité';
@@ -492,3 +492,10 @@ $ec_lang['rc_sketch_filter']          = 'Filtre';
 $ec_lang['rc_sketch_top_crest_curve'] = 'Courbe de crête';
 $ec_lang['rc_sketch_outlet_apron']    = 'Radier de sortie';
 $ec_lang['rc_sketch_radius']          = 'rayon';
+// Manning Trapezoid velocity check (missing keys)
+$ec_lang['mtc_vel_check']='Vérification de la vitesse';
+$ec_lang['mtc_vel_ok']='Vitesse raisonnable pour les hypothèses d\'écoulement uniforme.';
+$ec_lang['mtc_vel_high']='Vitesse élevée — vérifier la chute disponible et les pertes par élargissement.';
+$ec_lang['mtc_vel_low']='Vitesse faible — risque de sédimentation.';
+$ec_lang['mtc_note_2_term']='Vérification de la vitesse';
+$ec_lang['mtc_note_2_def']='Une vitesse élevée implique une haute énergie spécifique résultant d\'une chute disponible. Cette énergie peut être dissipée rapidement aux élargissements, coudes ou obstacles. Vérifiez que cela est raisonnable pour le site.';

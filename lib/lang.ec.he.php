@@ -492,3 +492,17 @@ $ec_lang['rc_sketch_filter']          = 'מסנן';
 $ec_lang['rc_sketch_top_crest_curve'] = 'עקומת הרכס';
 $ec_lang['rc_sketch_outlet_apron']    = 'סינר יציאה';
 $ec_lang['rc_sketch_radius']          = 'רדיוס';
+
+// Manning Trapezoid velocity checks
+$ec_lang['mtc_vel_check']='בדיקת מהירות';
+$ec_lang['mtc_vel_ok']='המהירות סבירה להנחות זרימה אחידה.';
+$ec_lang['mtc_vel_high']='מהירות גבוהה — בדוק את הנפילה הזמינה ואת הפסדי ההתרחבות.';
+$ec_lang['mtc_vel_low']='מהירות נמוכה — סיכון להשתקעות.';
+$ec_lang['mtc_note_2_term']='בדיקת מהירות';
+$ec_lang['mtc_note_2_def']='מהירות גבוהה משמעה אנרגיה סגולית גבוהה הנובעת מנפילה זמינה. אנרגיה זו עשויה ללכת לאיבוד במהירות באזורי התרחבות, בעקומות או בחסמים. יש לוודא שהדבר סביר עבור האתר.';
+
+// Micro-Hydro Power additional notes
+$ec_lang['mhp_notes_6_term']='יעילות';
+$ec_lang['mhp_notes_6_def']='יעילות המתקן האופיינית &eta; נעה בין 0.70 ל-0.85 לטורבינות Pelton ורוחב-זרימה הנפוצות במיקרו-הידרו. השתמש ב-0.75 כאומדן ראשוני שמרני.';
+$ec_lang['mhp_notes_7_term']='אנרגיה שנתית';
+$ec_lang['mhp_notes_7_def']='האנרגיה השנתית מניחה פעולה מתמשכת בזרימה מלאה (8760 שעות לשנה). התפוקה בפועל תהיה נמוכה יותר בשל שינויי זרימה עונתיים, זמן השבתה לתחזוקה ומקדם עומס.';

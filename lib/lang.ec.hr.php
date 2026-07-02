@@ -503,3 +503,17 @@ $ec_lang['rc_sketch_filter']          = 'Filter';
 $ec_lang['rc_sketch_top_crest_curve'] = 'Ulazni luk';
 $ec_lang['rc_sketch_outlet_apron']    = 'Izlazna ploča';
 $ec_lang['rc_sketch_radius']          = 'polumjer';
+
+// Manning Trapezoid — velocity check messages
+$ec_lang['mtc_vel_check']='Provjera brzine';
+$ec_lang['mtc_vel_ok']='Brzina prihvatljiva za pretpostavke jednolikog tečenja.';
+$ec_lang['mtc_vel_high']='Brzina visoka — provjerite raspoloživi pad i gubitke pri proširenju.';
+$ec_lang['mtc_vel_low']='Brzina niska — opasnost od sedimentacije.';
+$ec_lang['mtc_note_2_term']='Provjera brzine';
+$ec_lang['mtc_note_2_def']='Visoka brzina podrazumijeva visoku specifičnu energiju uslijed raspoloživog pada. Ta energija može se brzo izgubiti na proširenjima, zavojima ili preprekama. Provjerite je li to razumno za dano gradilište.';
+
+// Micro-Hydro Power — notes 6 and 7
+$ec_lang['mhp_notes_6_term']='Učinkovitost';
+$ec_lang['mhp_notes_6_def']='Tipična učinkovitost postrojenja &eta; kreće se od 0,70 do 0,85 za Pelton i cross-flow turbine uobičajene u malim hidroelektranama. Koristite 0,75 kao konzervativnu prvu procjenu.';
+$ec_lang['mhp_notes_7_term']='Godišnja energija';
+$ec_lang['mhp_notes_7_def']='Godišnja energija pretpostavlja neprekidan rad pri punom protoku (8760 sati/godišnje). Stvarna proizvodnja bit će niža zbog sezonskih varijacija protoka, zastoja za održavanje i faktora opterećenja.';

@@ -1,0 +1,63 @@
+entry_number,en_term,en_definition,es_term,es_definition,fr_term,fr_definition,ru_term,ru_definition
+111,available head,Amount of fall in a stream which is available for hydroelectric power development.,salto disponible,"Valor del desnivel disponible en un curso de 
+agua para producir energ?a hidroel?ctrica.",hauteur de chute utile,"Valeur de la d?nivellation utilisable pour 
+l'am?nagement d'une usine hydro?lectrique sur 
+un cours d'eau.",,
+517,fall,"(1) Difference in elevation of the water surface 
+between two points of a stream at a given time. 
+(TR) 
+(2) Difference between the water levels on either 
+side of a weir or other hydraulic control 
+Structure.",ca?da,"1) Diferencia de elevaci?n de la superficie del 
+agua entre dos puntos de un curso de agua en 
+un momento determinado (RT).  
+2) Diferencia entre los niveles de agua a ambos 
+lados de un vertedero u otra estructura de 
+control hidr?ulico. ",chute,"1) Diff?rence de niveau de la surface de l'eau 
+entre deux points d'un cours d'eau ? un moment 
+donn?. 
+2) Diff?rence entre les niveaux de l'eau de part et 
+d'autre d'un d?versoir ou autre ouvrage 
+hydraulique.  ",,
+1263,"run-of-the-river (hydroelectric power plants) 
+see also in-stream use ","Hydraulic work that allows the use of water 
+without storing it in a reservoir. ","central hidroel?ctrica de pasada v?ase 
+tambi?n uso no consuntivo ","Obra hidr?ulica que permite el uso del agua sin 
+almacenarla en un embalse. ","usine hydro?lectrique au fil d'eau voir aussi 
+utilisation au fil de l'eau ","Ouvrage hydraulique permettant la production 
+d'?lectricit? sans stockage de l'eau. ",,
+477,"energy gradient syn. energy slope see also 
+hydraulic gradient ","Difference in total head along a conduit per unit 
+distance. ","gradiente de energ?a sin. pendiente de 
+energ?a v?ase tambi?n gradiente hidr?ulico","Diferencia en la carga hidr?ulica total a lo largo 
+de una conducci?n por unidad de longitud. ","gradient ?nerg?tique voir aussi gradient 
+hydraulique ","Perte de charge par unit? de longueur dans une 
+conduite. ",,
+1682, wetted perimeter,"Length of the line of contact between a stream 
+of flowing water and its containing channel, 
+measured at a cross-section.",per?metro mojado ,"Longitud del per?metro de contacto entre un 
+curso de agua en movimiento y su cauce, 
+medido en una secci?n transversal. ",p?rim?tre mouill? ,"Longueur de la ligne de contact entre le cours 
+d'eau et le chenal qui le contient, mesur?e dans 
+une section droite.",,
+misc indirect,plant,"a facility or system of machinery, equipment, and structures designed to perform a specific large-scale operation ",central,,usine,,,
+misc indirect,power,energy,energ?a,,?nergie,,,
+1665, weir,"Overflow structure which may be used for 
+controlling upstream water level or for 
+measuring discharge or for both. (TR) ",vertedero,"Estructura de rebosamiento que se puede 
+utilizar para controlar el nivel de agua aguas 
+arriba o para medir el caudal, o para ambos 
+fines (RT).",d?versoir,"Dispositif par-dessus lequel l'eau s'?coule. On 
+l'utilise soit pour r?gler le niveau de l'eau en 
+amont, soit pour mesurer le d?bit, soit pour les 
+deux (RT).",,
+1333,slope (of water surface),"Difference  in  the  elevation  of  the  surface  of  a 
+stream  per  unit  of  horizontal  distance  in  the 
+direction of flow. (ISO 772)",pendiente (de la superficie del agua),"Diferencia  de  la  altura  de  la  supeficie  de  una 
+corriente   de   agua   por   unidad   de   distancia 
+horizontal en la dirección del flujo.",pente (de la ligne d'eau),"Différence d'altitude de la surface du courant par 
+unité de distance horizontale dans la direction de 
+l'écoulement (ISO 772).",YKm0H (B0AH0I n0BepxH0CTI),"Pa3HocTb    BbcoTHbX    oTMeToK    ,ByX    To'eK 
+noBepXHocTI noToKa, ,eneHHa5 Ha paccTo5HIe, 
+I3MepeHHoe  no  ropI3oHTanI  B  HanpaBneHII 
+Te'eHI5."

@@ -484,3 +484,17 @@ $ec_lang['rc_sketch_filter']          = '过滤层';
 $ec_lang['rc_sketch_top_crest_curve'] = '顶部曲线';
 $ec_lang['rc_sketch_outlet_apron']    = '出口护坦';
 $ec_lang['rc_sketch_radius']          = '半径';
+
+// Manning Trapezoid — velocity checks and note 2 (added)
+$ec_lang['mtc_vel_check']='流速校核';
+$ec_lang['mtc_vel_ok']='流速在均匀流假设范围内合理。';
+$ec_lang['mtc_vel_high']='流速偏高 — 检查可用落差和扩大段损失。';
+$ec_lang['mtc_vel_low']='流速偏低 — 有泥沙淤积风险。';
+$ec_lang['mtc_note_2_term']='流速校核';
+$ec_lang['mtc_note_2_def']='高流速意味着来自可用落差的高比能。该能量可在扩大段、弯道或障碍处迅速耗散。请验证这对于该场地是否合理。';
+
+// Micro-Hydro Power — notes 6 and 7 (added)
+$ec_lang['mhp_notes_6_term']='效率';
+$ec_lang['mhp_notes_6_def']='微水电中常用的 Pelton 和贯流式水轮机典型机组效率 &eta; 为 0.70 至 0.85。保守起见，初步估算可取 0.75。';
+$ec_lang['mhp_notes_7_term']='年发电量';
+$ec_lang['mhp_notes_7_def']='年发电量假设全年满负荷连续运行（8760 小时/年）。实际发电量将因季节性流量变化、维护停机和负荷因子而偏低。';

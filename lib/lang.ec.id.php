@@ -484,3 +484,17 @@ $ec_lang['rc_sketch_filter']          = 'Filter';
 $ec_lang['rc_sketch_top_crest_curve'] = 'Lengkung Puncak';
 $ec_lang['rc_sketch_outlet_apron']    = 'Lantai Hilir';
 $ec_lang['rc_sketch_radius']          = 'jari-jari';
+
+// Manning Trapezoid — velocity checks and note 2 (new)
+$ec_lang['mtc_vel_check']='Pemeriksaan kecepatan';
+$ec_lang['mtc_vel_ok']='Kecepatan wajar untuk asumsi aliran seragam.';
+$ec_lang['mtc_vel_high']='Kecepatan tinggi — periksa beda tinggi yang tersedia dan kehilangan ekspansi.';
+$ec_lang['mtc_vel_low']='Kecepatan rendah — risiko sedimentasi.';
+$ec_lang['mtc_note_2_term']='Pemeriksaan kecepatan';
+$ec_lang['mtc_note_2_def']='Kecepatan tinggi mengimplikasikan energi spesifik tinggi dari beda tinggi yang tersedia. Energi tersebut dapat hilang dengan cepat pada ekspansi, belokan, atau hambatan. Verifikasi bahwa ini wajar untuk kondisi lapangan.';
+
+// Micro-Hydro Power — notes 6 and 7 (new)
+$ec_lang['mhp_notes_6_term']='Efisiensi';
+$ec_lang['mhp_notes_6_def']='Efisiensi instalasi tipikal &eta; berkisar antara 0,70 hingga 0,85 untuk turbin Pelton dan turbin aliran silang yang umum digunakan dalam mikro-hidro. Gunakan 0,75 sebagai estimasi awal yang konservatif.';
+$ec_lang['mhp_notes_7_term']='Energi Tahunan';
+$ec_lang['mhp_notes_7_def']='Energi tahunan mengasumsikan operasi aliran penuh berkelanjutan (8.760 jam/tahun). Produksi aktual akan lebih rendah akibat variasi debit musiman, waktu henti pemeliharaan, dan faktor beban.';

@@ -162,8 +162,8 @@ $ec_lang['mtc_d50_z2']='Tamanho de rocha requerido no lado 2, D50, Maricopa Coun
 $ec_lang['mtc_d50_mra']='Tamanho de rocha requerido, D50, de acordo com Maynord, Ruff, e Abt (1989)';
 $ec_lang['mtc_d50_searcy']='Tamanho de rocha requerido, D50, de acordo com Searcy (1967)';
 // Robinson Rock Chute
-$ec_lang['rrc_main_menu']='Calha de Pedras de Robinson';
-$ec_lang['rrc_main_desc']='Planilha de Dimensionamento da Calha de Pedras de Robinson';
+$ec_lang['rrc_main_menu']='Rampa em Enrocamento de Robinson';
+$ec_lang['rrc_main_desc']='Planilha de Dimensionamento da Rampa em Enrocamento de Robinson';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='Vertedor hidráulico simples';
 $ec_lang['ws_main_title']='Calculadora de vazão em um vertedor hidráulico simples';
@@ -434,9 +434,9 @@ $ec_lang['about_body_html']='<h3>Missão</h3><p>As Calculadoras de Engenharia Ha
 // Rock Chute Design (Robinson, Rice & Kadavy 1998). Prefix rc_.
 $ec_lang['u_m2ps']='m^2/s';
 $ec_lang['u_ft2ps']='cfs/ft';
-$ec_lang['rc_main_menu']='Projeto de Calha de Pedra (Robinson)';
-$ec_lang['rc_main_title']='Calculadora Gratuita de Projeto de Calha de Pedra — Robinson (1998)';
-$ec_lang['rc_main_desc']='Dimensionamento de Enrocamento em Calha de Pedra — Robinson, Rice & Kadavy (1998)';
+$ec_lang['rc_main_menu']='Projeto de Rampa em Enrocamento (Robinson)';
+$ec_lang['rc_main_title']='Calculadora Gratuita de Projeto de Rampa em Enrocamento — Robinson (1998)';
+$ec_lang['rc_main_desc']='Dimensionamento de Rampa em Enrocamento — Robinson, Rice & Kadavy (1998)';
 $ec_lang['rc_S0']='Declividade do fundo da calha, S<sub>0</sub>';
 $ec_lang['rc_qt']='Vazão específica total, q<sub>t</sub> <span title="Vazão por unidade de largura na entrada da calha. Para um canal de largura de base B com vazão total Q, usar q_t = Q / B." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['rc_np']='Porosidade do enrocamento, n<sub>p</sub>';
@@ -489,3 +489,11 @@ $ec_lang['rc_sketch_filter']          = 'Filtro';
 $ec_lang['rc_sketch_top_crest_curve'] = 'Curva de crista';
 $ec_lang['rc_sketch_outlet_apron']    = 'Laje de saída';
 $ec_lang['rc_sketch_radius']          = 'raio';
+
+// Manning Trapezoid velocity check messages
+$ec_lang['mtc_vel_check']='Verificação de velocidade';
+$ec_lang['mtc_vel_ok']='Velocidade razoável para hipóteses de escoamento uniforme.';
+$ec_lang['mtc_vel_high']='Velocidade elevada — verificar queda disponível e perdas por expansão.';
+$ec_lang['mtc_vel_low']='Velocidade baixa — risco de sedimentação.';
+$ec_lang['mtc_note_2_term']='Verificação de velocidade';
+$ec_lang['mtc_note_2_def']='Alta velocidade implica alta energia específica a partir de uma queda disponível. Essa energia pode se dissipar rapidamente em expansões, curvas ou obstruções. Verifique se isso é razoável para o local.';

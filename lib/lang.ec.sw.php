@@ -485,3 +485,15 @@ $ec_lang['rc_sketch_filter']          = 'Chujio';
 $ec_lang['rc_sketch_top_crest_curve'] = 'Upinde wa Juu';
 $ec_lang['rc_sketch_outlet_apron']    = 'Sakafu ya Toka';
 $ec_lang['rc_sketch_radius']          = 'radi';
+// Manning Trapezoid — velocity checks and note 2
+$ec_lang['mtc_vel_check']='Ukaguzi wa kasi';
+$ec_lang['mtc_vel_ok']='Kasi inakubalika kwa makadirio ya mtiririko sawia.';
+$ec_lang['mtc_vel_high']='Kasi ya juu — kagua anguko linalowezekana na hasara za upanukaji.';
+$ec_lang['mtc_vel_low']='Kasi ya chini — hatari ya mashapo.';
+$ec_lang['mtc_note_2_term']='Ukaguzi wa kasi';
+$ec_lang['mtc_note_2_def']='Kasi ya juu inaonyesha nishati maalum ya juu kutoka kwa anguko linalowezekana. Nishati hiyo inaweza kupotea haraka kwenye upanukaji, mapinda, au vizuizi. Thibitisha kwamba hii ni ya maana kwa eneo hili.';
+// Micro-Hydro Power — notes 6 and 7
+$ec_lang['mhp_notes_6_term']='Ufanisi';
+$ec_lang['mhp_notes_6_def']='Ufanisi wa kawaida wa kiwanda &eta; huanzia 0.70 hadi 0.85 kwa turbini za Pelton na turbini za msalaba zinazotumika sana katika micro-hydro. Tumia 0.75 kama makadirio ya kwanza ya kihafidhina.';
+$ec_lang['mhp_notes_7_term']='Nishati ya Kila Mwaka';
+$ec_lang['mhp_notes_7_def']='Nishati ya kila mwaka inachukulia uendeshaji wa mtiririko kamili bila kukoma (masaa 8760 kwa mwaka). Uzalishaji halisi utakuwa mdogo zaidi kutokana na mabadiliko ya mtiririko wa msimu, kusimama kwa matengenezo, na kipengele cha mzigo.';

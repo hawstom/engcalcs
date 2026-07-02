@@ -484,3 +484,17 @@ $ec_lang['rc_sketch_filter']          = 'Filtr';
 $ec_lang['rc_sketch_top_crest_curve'] = 'Vrcholový oblouk';
 $ec_lang['rc_sketch_outlet_apron']    = 'Výtokový práh';
 $ec_lang['rc_sketch_radius']          = 'poloměr';
+
+// Manning Trapezoid — velocity check
+$ec_lang['mtc_vel_check']='Kontrola rychlosti';
+$ec_lang['mtc_vel_ok']='Rychlost přiměřená pro předpoklady rovnoměrného proudění.';
+$ec_lang['mtc_vel_high']='Rychlost vysoká — zkontrolujte dostupný spád a ztráty na rozšíření.';
+$ec_lang['mtc_vel_low']='Rychlost nízká — riziko sedimentace.';
+$ec_lang['mtc_note_2_term']='Kontrola rychlosti';
+$ec_lang['mtc_note_2_def']='Vysoká rychlost znamená vysokou specifickou energii z dostupného spádu. Tato energie může být rychle ztracena na rozšířeních, obloucích nebo překážkách. Ověřte, zda je to pro danou lokalitu přiměřené.';
+
+// Micro-Hydro Power — notes 6 and 7
+$ec_lang['mhp_notes_6_term']='Účinnost';
+$ec_lang['mhp_notes_6_def']='Typická účinnost elektrárny &eta; se pohybuje od 0,70 do 0,85 pro Peltonovy a příčné turbíny běžné v mikro-vodní energetice. Jako konzervativní první odhad použijte hodnotu 0,75.';
+$ec_lang['mhp_notes_7_term']='Roční výroba energie';
+$ec_lang['mhp_notes_7_def']='Roční výroba energie předpokládá nepřetržitý provoz při plném průtoku (8760 hodin/rok). Skutečná výroba bude nižší z důvodu sezónní variability průtoku, prostojů při údržbě a faktoru zatížení.';

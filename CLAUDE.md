@@ -60,12 +60,22 @@ The 26 non-English languages: am, ar, bg, bn, cs, de, es, fa, fr, he, hi, hr, id
 
 When translating a new calculator's keys into all 26 non-English languages, **spawn one agent per language in parallel** — not one agent for all languages sequentially. Reasons: faster (minutes not hours), better quality (each agent starts with a fresh context focused on one language), and easier to retry a single language if quality is poor.
 
-Standard pattern:
-1. Tell the user: "Starting 26 agents, one for each language." (always say this before launching)
-2. Spawn all 26 agents in a single message with `run_in_background: true`
-3. Each agent receives: the full English key block, the target language file path, and clear instructions on which keys to add/replace
+**REQUIRED: Get explicit user authorization before launching any sprint.** A sprint spawns up to 26 paid agents. The correct pattern is always: propose → confirm → launch. Never infer authorization from a general "proceed" or a question about paths. The user must say something equivalent to "go ahead" or "run it" in response to a specific sprint proposal.
 
-Always announce the launch count before spawning ("Starting 26 agents, one for each language.") so the user knows what is happening.
+**Pre-sprint checklist (complete before proposing to the user):**
+1. Regenerate payloads so the delta count reflects the *current* lang files: `wsl -e php /var/www/cnm/public_html/hawsedc/engcalcs/dev/scripts/generate_translation_payloads.php`
+2. Verify `glossary.json` has `preferred_translation` populated for the calculator prefix's key terms, especially for anchor languages (es, fr, ru, ar). Check `translation_notes` for WMO-verified terms and terms with `$ec_lang_intent` framing requirements.
+3. State the delta count and which calculators are affected before asking for authorization.
+4. Note any known quality risks (new terms without glossary coverage, intent-guided terms, proper nouns).
+
+**Standard launch pattern:**
+1. Tell the user: "Starting N agents, one for each language." (always say this before launching)
+2. Spawn all agents in a single message with `run_in_background: true` and `model: "haiku"` — Haiku is the required model for bulk translation agents; glossary and intent injection provide the judgment layer
+3. Each agent receives: the payload JSON path, the target lang file path, and full instructions including glossary terms, intent notes, and all translation rules
+
+Always announce the launch count before spawning so the user knows what is happening.
+
+**On retries:** If an agent hits a session limit, retry only that language. If quality issues are found after a sprint (wrong term, missing intent framing), fix the glossary and/or lang file directly — do not re-run the full sprint.
 
 ## Unit Sets
 
