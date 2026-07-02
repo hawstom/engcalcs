@@ -15,11 +15,19 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 - 88|All the occurences of Velocity check probably should be shortened to "OK", "High !", and "Low !" with tips to explain more. As they currently are, they are unsightly.
 
+- 50|On Drip-Sprinkler.php, realistically, how would a person know the Minimum emitter rate? Is this a design calculator? Wouldn't they have to model the losses in the entire system or measure an existing system? I'm just checking that we are offering something useful here.
+
+## Translation Standardization (Glossary Project)
+
+- 0|Expand and tighten glossary.json: Filled in all 5 empty languages (am, bn, km, my, ps) for all 27 terms using 5 parallel agents. Reviewed 6 nuanced terms across 21 existing languages. Corrections applied: fr conveyance efficiency → rendement de transport d'eau; cs/sr penstock → tlakovod/напорни цевовод; ar/uk emitter → قطارة/крапельниця; uk conveyance efficiency → added 'води'. Version bumped to 1.1.
+
+- 85|Audit existing translations for glossary compliance: After glossary is finalized, check whether key high-drift terms (flow, head loss, weir, conveyance efficiency) in the 26 non-English lang files match the glossary preferred translations. Re-translate non-compliant strings in a targeted sprint. [CC]
+
 ## Translation improvements
 
-- 90|Our test of the $ec_lang_intent system didn't work very well. Spanish still talks about a canal for Robinson, when it should talk about something steep, I assume. I see this as the tip of an iceberg of a system that is not working, and I am afraid to find out what the languages I have no hope of checking look like. I am open to ideas and work flows for making this better. Should I translate one calculator at a time to all languages, one language at a time for all calculators, or what? I tend to think the latter. But is work flow the problem, or is the system?
+- 36|Remove $ec_lang['ec_name_invalid'] from all languages.
 
-- 90|Audit remaining English strings in other languages. Find out what English is left in the other language files. I know this is subjective because some things can't be translated. And this is a language-by-language judgment call. But we need to try to ensure that all translations are complete. Please advise.
+- 30|Remove orphaned rrc_ keys from all 26 non-English lang files: `rrc_main_desc` and `rrc_main_menu` appear in every non-English file but not in English — legacy of an earlier `rrc_` prefix before Rock Chute settled on `rc_`. Two-line removal per file × 26 files.
 
 ## AI Efficiency Scripting (Overhead)
 
@@ -42,6 +50,12 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 - 10|Results sharing — dedicated "Copy link" button or print summary. Largely addressed by the URL-based label feature; a polished UI affordance is the remaining gap. [CP]
 
 ## Completed
+
+- 0|Wire glossary into CLAUDE.md agent translation sprint: Translation Sprints section updated with pre-sprint step to verify glossary.json preferred-translation coverage for the calculator prefix's key terms, and launch instructions specifying that each agent receives embedded glossary terms, intent notes, and all translation rules. Glossary at v1.2 covers all 26 non-English languages across all calculator prefixes.
+
+- 0|ec_lang_intent workflow audit and Spanish Robinson fix: Spanish Robinson translations verified correct — `bajante de rocado` / `escollera` / `pendiente pronunciada` properly convey the steep-channel context (not generic "canal"). Parallel-agent sprint workflow (one agent per language) established as the standard approach. Glossary injection + intent guard provide the quality layer for future sprints.
+
+- 0|Audit remaining English strings in other languages: Parity checker run across all 26 non-English lang files confirms 0 missing keys in every language. English-equal strings (~23–55 per language) are overwhelmingly unit symbols (u_ft, u_m, u_kw, etc.) and technical abbreviations that correctly remain as international English. No untranslated calculator content found. Discovered two orphaned rrc_ keys present in all 26 non-English files — see active cleanup task.
 
 - 0|HTML-entity audit script + bulk fix: `dev/scripts/html_entity_audit.php` scans all lang files for HTML entities (`&mdash;`, `&ge;`, `&amp;`, `&nu;`, etc.) that double-encode through `htmlspecialchars()` into JS `pageConfig`. Supports `--lang`, `--prefix`, `--fix` (replace in-place), and `--strict` (exit 1 for CI). On first run with `--fix`, replaced 2201 entity occurrences across all 26 non-English lang files with plain Unicode characters. English file was already clean; all non-English files now match that standard. Run without `--fix` to audit future regressions.
 
