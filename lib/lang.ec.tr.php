@@ -168,8 +168,6 @@ $ec_lang['mtc_d50_z2']='<span title="Isbash (1936) ve Maricopa County, Arizona, 
 $ec_lang['mtc_d50_mra']='Gerekli köşeli taş kaplama boyutu, D50, Maynord, Ruff ve Abt (1989)\'e göre';
 $ec_lang['mtc_d50_searcy']='Gerekli köşeli taş kaplama boyutu, D50, Searcy (1967)\'ye göre';
 // Robinson Rock Chute
-$ec_lang['rrc_main_menu']="Robinson Taş Şüt Tasarımı";
-$ec_lang['rrc_main_desc']="Robinson Taş Şüt Tasarımı Excel Sayfası";
 // Weir Flow Simple\n// Weir Flow Simple
 $ec_lang['ws_main_menu']='Basit Savaklar için Debi Hesabı';
 $ec_lang['ws_main_title']='Ücretsiz Basit Savaklar için Debi Hesabı Broad-crested Geniş-kretli';

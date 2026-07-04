@@ -247,8 +247,6 @@ $ec_lang['mtc_d50_mra']='Dimensiunea necesară a rocii unghiulare, D50 (Maynord,
 $ec_lang['mtc_d50_searcy']='Dimensiunea necesară a rocii unghiulare, D50 (Searcy 1967)';
 $ec_lang['mtc_note_1']='<dl><dt>Iterație automată de dimensionare a rocii și rugozității</dt><dd>Alegeți un buton radio pentru rugozitate (BB recomandat) și un buton radio pentru dimensiunea de proiectare a rocii (Isbash recomandat). Ajustați adâncimea și factorul de siguranță al dimensiunii rocii pentru a obține debitul dorit cu o dimensiune uniformă a rocii. De fiecare dată când modificați orice valoare de intrare, are loc următorul ciclu de iterație: 1. Rugozitatea este calculată din dimensiunea de proiectare a rocii. 2. Calculul rugozității solicitate este copiat la rugozitatea de intrare. 3. Debitul canalului și dimensiunea necesară a rocii sunt calculate. 4. Dimensiunea de proiectare a rocii este ajustată. 5. Repetați până când eroarea din dimensiunea de proiectare a rocii este foarte mică.</dd><dt>Calculator de bază (fără iterație)</dt><dd>Introduceți valoarea dorită de rugozitate. Ignorați zona de intrare a dimensiunii de proiectare a rocii.</dd></dl>';
 // Robinson Rock Chute
-$ec_lang['rrc_main_menu']='Rapide din Rocă Robinson';
-$ec_lang['rrc_main_desc']='Foaie de Calcul Proiectare Rapide din Rocă Robinson';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='Deversor cu Creastă Lată Simplu';
 $ec_lang['ws_main_title']='Calculator Gratuit Online Deversor cu Creastă Lată Simplu';

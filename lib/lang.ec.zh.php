@@ -183,8 +183,6 @@ $ec_lang['mtc_d50_mra']='所需棱角石材粒径，D50（Maynord、Ruff 和 Abt
 $ec_lang['mtc_d50_searcy']='所需棱角石材粒径，D50（Searcy 1967）';
 $ec_lang['mtc_note_1']='<dl><dt>石材粒径与糙率自动迭代</dt><dd>选择糙率单选按钮（推荐 BB）和设计石材粒径单选按钮（推荐 Isbash）。调整水深和石材安全系数，以获得所需流量和均一石材粒径。每次修改输入值时，将触发以下迭代循环：1. 由设计石材粒径计算糙率。2. 所求糙率复制至输入糙率。3. 计算渠道流量和所需石材粒径。4. 调整设计石材粒径。5. 重复直至设计石材粒径误差极小。</dd><dt>基础计算器（无迭代）</dt><dd>直接输入所需糙率值，忽略设计石材粒径输入区域。</dd></dl>';
 // Robinson Rock Chute
-$ec_lang['rrc_main_menu']='Robinson 石材跌水';
-$ec_lang['rrc_main_desc']='Robinson 石材跌水设计电子表格';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='简单堰流';
 $ec_lang['ws_main_title']='免费在线简单宽顶堰流计算器';

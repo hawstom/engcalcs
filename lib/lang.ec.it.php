@@ -183,8 +183,6 @@ $ec_lang['mtc_d50_mra']='Dimensione roccia angolare richiesta, D50 (Maynord, Ruf
 $ec_lang['mtc_d50_searcy']='Dimensione roccia angolare richiesta, D50 (Searcy 1967)';
 $ec_lang['mtc_note_1']='<dl><dt>Iterazione automatica dimensionamento roccia e scabrezza</dt><dd>Scegliere un pulsante radio per la scabrezza (BB raccomandato) e uno per la dimensione roccia di progetto (Isbash raccomandato). Regolare profondità e fattore di sicurezza della roccia per ottenere il flusso desiderato con una dimensione roccia uniforme. Ogni modifica ai dati avvia il ciclo iterativo: 1. La scabrezza viene calcolata dalla dimensione roccia di progetto. 2. La scabrezza richiesta viene copiata nella scabrezza di input. 3. Il flusso nel canale e la dimensione roccia richiesta vengono calcolati. 4. La dimensione roccia di progetto viene aggiornata. 5. Si ripete fino a convergenza.</dd><dt>Calcolatore base (senza iterazione)</dt><dd>Inserire il valore di scabrezza desiderato. Ignorare l\'area di input della dimensione roccia di progetto.</dd></dl>';
 // Robinson Rock Chute
-$ec_lang['rrc_main_menu']='Scivolo in pietrame di Robinson';
-$ec_lang['rrc_main_desc']='Foglio di calcolo per la progettazione di scivoli in pietrame secondo Robinson';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='Sfioratore semplice';
 $ec_lang['ws_main_title']='Calcolatore gratuito online sfioratore largo a cresta semplice';

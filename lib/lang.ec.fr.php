@@ -186,8 +186,6 @@ $ec_lang['mtc_d50_mra']='Granulométrie d\'enrochement anguleux requise, D50 (Ma
 $ec_lang['mtc_d50_searcy']='Granulométrie d\'enrochement anguleux requise, D50 (Searcy 1967)';
 $ec_lang['mtc_note_1']='<dl><dt>Dimensionnement itératif automatique des enrochements</dt><dd>Choisissez un bouton de rugosité (BB recommandé) et un bouton de granulométrie de conception (Isbash recommandé). Affinez la profondeur et le coefficient de sécurité pour obtenir le débit souhaité avec une granulométrie ronde. À chaque modification: 1. La rugosité est calculée à partir de la granulométrie. 2. La rugosité calculée est copiée en entrée. 3. L\'écoulement et la granulométrie requise sont calculés. 4. La granulométrie est ajustée. 5. Répéter jusqu\'à convergence.</dd><dt>Calculateur de base (sans itération)</dt><dd>Entrez votre valeur de rugosité. Ignorez la zone de granulométrie de conception.</dd></dl>';
 // Robinson Rock Chute
-$ec_lang['rrc_main_menu']='Chute en enrochement Robinson';
-$ec_lang['rrc_main_desc']='Tableur de dimensionnement de chute en enrochement Robinson';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='Déversoir simple';
 $ec_lang['ws_main_title']='Calculateur gratuit en ligne de déversoir à seuil large';

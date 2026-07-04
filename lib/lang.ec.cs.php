@@ -183,8 +183,6 @@ $ec_lang['mtc_d50_mra']='Požadovaná velikost lomového kamene, D50 (Maynord, R
 $ec_lang['mtc_d50_searcy']='Požadovaná velikost lomového kamene, D50 (Searcy 1967)';
 $ec_lang['mtc_note_1']='<dl><dt>Automatická iterace návrhu kamene a drsnosti</dt><dd>Zvolte přepínač pro drsnost (doporučeno BB) a přepínač pro návrhovou velikost kamene (doporučeno Isbash). Dolaďte hloubku a bezpečnostní faktor kamene pro dosažení požadovaného průtoku s rovnoměrnou velikostí kamene. Každá změna vstupní hodnoty spustí iterační cyklus: 1. Drsnost je vypočtena z návrhové velikosti kamene. 2. Požadovaný výpočet drsnosti je zkopírován do vstupní drsnosti. 3. Průtok v korytě a požadovaná velikost kamene jsou vypočteny. 4. Návrhová velikost kamene je upravena. 5. Opakovat dokud chyba v návrhové velikosti kamene není velmi malá.</dd><dt>Základní kalkulátor (bez iterace)</dt><dd>Zadejte požadovanou hodnotu drsnosti. Ignorujte oblast zadávání návrhové velikosti kamene.</dd></dl>';
 // Robinson Rock Chute
-$ec_lang['rrc_main_menu']='Kamenná rampa Robinson';
-$ec_lang['rrc_main_desc']='Tabulka návrhu kamenné rampy Robinson';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='Jednoduchý přepad';
 $ec_lang['ws_main_title']='Bezplatný online kalkulátor jednoduchého širokokorunového přepadu';

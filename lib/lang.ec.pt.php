@@ -161,8 +161,6 @@ $ec_lang['mtc_d50_z2']='Tamanho de rocha requerido no lado 2, D50, Maricopa Coun
 $ec_lang['mtc_d50_mra']='Tamanho de rocha requerido, D50, de acordo com Maynord, Ruff, e Abt (1989)';
 $ec_lang['mtc_d50_searcy']='Tamanho de rocha requerido, D50, de acordo com Searcy (1967)';
 // Robinson Rock Chute
-$ec_lang['rrc_main_menu']='Rampa em Enrocamento de Robinson';
-$ec_lang['rrc_main_desc']='Planilha de Dimensionamento da Rampa em Enrocamento de Robinson';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='Vertedor hidráulico simples';
 $ec_lang['ws_main_title']='Calculadora de vazão em um vertedor hidráulico simples';

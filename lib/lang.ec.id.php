@@ -183,8 +183,6 @@ $ec_lang['mtc_d50_mra']='Ukuran batu sudut yang dibutuhkan, D50 (Maynord, Ruff, 
 $ec_lang['mtc_d50_searcy']='Ukuran batu sudut yang dibutuhkan, D50 (Searcy 1967)';
 $ec_lang['mtc_note_1']='<dl><dt>Iterasi otomatis ukuran batu dan kekasaran</dt><dd>Pilih tombol radio kekasaran (BB direkomendasikan) dan tombol radio ukuran batu rencana (Isbash direkomendasikan). Sesuaikan kedalaman dan faktor keamanan ukuran batu untuk mendapatkan debit yang diinginkan dengan ukuran batu yang seragam. Setiap kali Anda mengubah nilai masukan, siklus iterasi berikut terjadi: 1. Kekasaran dihitung dari ukuran batu rencana. 2. Perhitungan kekasaran yang diminta disalin ke kekasaran masukan. 3. Debit saluran dan ukuran batu yang diperlukan dihitung. 4. Ukuran batu rencana disesuaikan. 5. Ulangi hingga galat pada ukuran batu rencana sangat kecil.</dd><dt>Kalkulator dasar (tanpa iterasi)</dt><dd>Masukkan nilai kekasaran yang Anda inginkan. Abaikan area masukan ukuran batu rencana.</dd></dl>';
 // Robinson Rock Chute
-$ec_lang['rrc_main_menu']='Saluran Batu Robinson';
-$ec_lang['rrc_main_desc']='Spreadsheet Perancangan Saluran Batu Robinson';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='Aliran Pelimpah Sederhana';
 $ec_lang['ws_main_title']='Kalkulator Pelimpah Bermercu Lebar Sederhana Gratis Daring';

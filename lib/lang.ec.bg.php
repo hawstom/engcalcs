@@ -166,8 +166,6 @@ $ec_lang['mtc_d50_z2']='Required side slope 2 angular riprap size, D50, Maricopa
 $ec_lang['mtc_d50_mra']='Required angular riprap size, D50, per Maynord, Ruff, and Abt (1989)'; //No need
 $ec_lang['mtc_d50_searcy']='Required angular riprap size, D50, per Searcy (1967)'; //No need
 // Robinson Rock Chute
-$ec_lang['rrc_main_menu']="Каменен бързоток Robinson";
-$ec_lang['rrc_main_desc']="Таблица за оразмеряване на каменен бързоток Robinson";
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='Хидравлични изчисления за преливник'; 
 $ec_lang['ws_main_title']='Калкулатор за изчисляване на преливник с широк праг'; 

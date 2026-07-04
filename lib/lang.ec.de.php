@@ -183,8 +183,6 @@ $ec_lang['mtc_d50_mra']='Erforderliche Körnung kantenreicher Steine, D50 (Mayno
 $ec_lang['mtc_d50_searcy']='Erforderliche Körnung kantenreicher Steine, D50 (Searcy 1967)';
 $ec_lang['mtc_note_1']='<dl><dt>Automatische Iteration Steinbemessung und Rauheit</dt><dd>Wählen Sie einen Rauheits-Radioknopf (BB empfohlen) und einen Radioknopf für die Bemessungskorngröße (Isbash empfohlen). Stellen Sie Tiefe und Steinbemessungsfaktor ein, um den gewünschten Durchfluss mit einer gleichmäßigen Korngröße zu erzielen. Bei jeder Änderung eines Eingabewerts startet der Iterationszyklus: 1. Die Rauheit wird aus der Bemessungskorngröße berechnet. 2. Der berechnete Rauheitswert wird in die Eingaberauheit kopiert. 3. Kanaldurchfluss und erforderliche Korngröße werden berechnet. 4. Die Bemessungskorngröße wird angepasst. 5. Wiederholen bis der Fehler sehr klein ist.</dd><dt>Grundrechner (ohne Iteration)</dt><dd>Geben Sie den gewünschten Rauheitswert ein. Ignorieren Sie den Eingabebereich für die Bemessungskorngröße.</dd></dl>';
 // Robinson Rock Chute
-$ec_lang['rrc_main_menu']='Robinson-Steinrampe';
-$ec_lang['rrc_main_desc']='Bemessungstabelle Robinson-Steinrampe';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='Einfaches Wehr';
 $ec_lang['ws_main_title']='Kostenloser Online-Rechner breitkroniges Wehr';

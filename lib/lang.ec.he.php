@@ -266,8 +266,6 @@ $ec_lang['points_data_paste']='הדבק';
 $ec_lang['points_data_help']='(או העתק/הדבק באמצעות אזור הנתונים)';
 $ec_lang['points_data_title']='נתוני נקודות<br />(מופרדות בפסיקים או טאבים)';
 // Robinson Rock Chute
-$ec_lang['rrc_main_menu']='מגלשת סלעים Robinson';
-$ec_lang['rrc_main_desc']='גיליון עיצוב Robinson Rock Chute';
 // Erosion Setback and Scour Calc.
 $ec_lang['essc_btbw']='רוחב מגדה לגדה';
 $ec_lang['essc_mcr']='רדיוס עיקול מינימלי';

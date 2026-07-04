@@ -292,8 +292,6 @@ $ec_lang['mtc_note_1']='<dl><dt>Iteración automática para diseño de tamaño y
 // Orifice Flow additional key
 $ec_lang['or_velocity']='Velocidad, v';
 // Robinson Rock Chute
-$ec_lang['rrc_main_desc']='Hoja de cálculo para el diseño de bajantes de rocado según el método de Robinson';
-$ec_lang['rrc_main_menu']='Diseño de Bajante de Rocado según Robinson';
 
 
 // Micro-Hydro Power

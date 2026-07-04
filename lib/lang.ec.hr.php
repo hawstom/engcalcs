@@ -254,8 +254,6 @@ $ec_lang['mtc_d50_searcy']='Potrebna veličina uglatog kamena, D50 (Searcy 1967)
 $ec_lang['mtc_note_1']='<dl><dt>Automatizirana iteracija dimenzioniranja kamena i hrapavosti</dt><dd>Odaberite radio gumb za hrapavost (preporučuje se BB) i radio gumb za projektnu veličinu kamena (preporučuje se Isbash). Fino podesite dubinu i faktor sigurnosti veličine kamena kako biste dobili željeni protok s jednoličnom veličinom kamena. Svaki put kada promijenite bilo koji ulazni podatak, odvija se sljedeći iteracijski ciklus: 1. Hrapavost se izračunava iz projektne veličine kamena. 2. Traženi izračun hrapavosti kopira se na ulaznu hrapavost. 3. Izračunavaju se protok kroz kanal i potrebna veličina kamena. 4. Projektna veličina kamena se prilagođava. 5. Ponavljati dok pogreška u projektnoj veličini kamena nije vrlo mala.</dd><dt>Osnovni kalkulator (bez iteracije)</dt><dd>Unesite željenu vrijednost hrapavosti. Zanemarite područje unosa projektne veličine kamena.</dd></dl>';
 
 // Robinson Rock Chute
-$ec_lang['rrc_main_menu']='Robinson kameniti brzotok';
-$ec_lang['rrc_main_desc']='Proračunska tablica za projektiranje Robinson kamenitog brzotoka';
 
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='Protok preko preljeva (jednostavni)';

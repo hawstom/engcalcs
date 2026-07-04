@@ -186,8 +186,6 @@ $ec_lang['mtc_d50_mra']='Ukubwa wa jiwe la pembe unaohitajika, D50 (Maynord, Ruf
 $ec_lang['mtc_d50_searcy']='Ukubwa wa jiwe la pembe unaohitajika, D50 (Searcy 1967)';
 $ec_lang['mtc_note_1']='<dl><dt>Upangaji wa kiotomatiki wa ukubwa wa jiwe na ukakamavu</dt><dd>Chagua kitufe cha redio cha ukakamavu (BB inapendekezwa) na kitufe cha redio cha ukubwa wa jiwe la kubuni (Isbash inapendekezwa). Rekebisha kina na kipengele cha usalama wa ukubwa wa jiwe ili kupata mtiririko unaotakiwa kwa ukubwa sawa wa jiwe. Kila wakati unabadilisha thamani yoyote ya ingizo, mzunguko ufuatao wa upangaji hutokea: 1. Ukakamavu huhesabiwa kutoka kwa ukubwa wa jiwe la kubuni. 2. Hesabu ya ukakamavu ulioombwa hucopiwa kwenye ukakamavu wa ingizo. 3. Mtiririko wa mfereji na ukubwa wa jiwe unaohitajika huhesabiwa. 4. Ukubwa wa jiwe la kubuni hurekebishwa. 5. Rudia hadi hitilafu ya ukubwa wa jiwe la kubuni iwe ndogo sana.</dd><dt>Kikokotoo cha msingi (bila upangaji)</dt><dd>Ingiza thamani yako ya ukakamavu inayotakiwa. Puuza eneo la ingizo la ukubwa wa jiwe la kubuni.</dd></dl>';
 // Robinson Rock Chute
-$ec_lang['rrc_main_menu']='Teremko la Mawe la Robinson';
-$ec_lang['rrc_main_desc']='Lahajedwali la Kubuni Teremko la Mawe la Robinson';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='Mtiririko wa Bwawa Rahisi';
 $ec_lang['ws_main_title']='Kikokotoo cha Bure Mtandaoni cha Mtiririko wa Bwawa la Matawi-pana Rahisi';
