@@ -7,8 +7,8 @@ $ec_lang['u_depthFrac']="Anteil";
 $ec_lang['u_depthPercent']="%";
 $ec_lang['u_ft2']="ft^2";
 $ec_lang['u_ft3ps']="cfs";
-$ec_lang['u_fth2o']="ft WS";
 $ec_lang['u_ft']="ft";
+$ec_lang['u_fth2o']="ft WS";
 $ec_lang['u_ftps']="ft/s";
 $ec_lang['u_gpm']="gal/min";
 $ec_lang['u_gradePercent']="% Gefälle";
@@ -35,6 +35,10 @@ $ec_lang['u_pa']="Pa";
 $ec_lang['u_psf']="lb/ft^2";
 $ec_lang['u_psi']="psi";
 $ec_lang['u_s']="s";
+$ec_lang['u_lph']="L/hr";
+$ec_lang['u_gph']="gal/hr";
+$ec_lang['u_mmph']="mm/hr";
+$ec_lang['u_inph']="in/hr";
 $ec_lang['u_acft']="ac-ft";
 $ec_lang['u_ft3']="ft^3";
 $ec_lang['u_m3']="m^3";
@@ -43,8 +47,12 @@ $ec_lang['u_mw']='MW';
 $ec_lang['u_kwh_yr']='kWh/yr';
 $ec_lang['u_mwh_yr']='MWh/yr';
 $ec_lang['u_hp']='hp';
+$ec_lang['u_m2ps']='m^2/s';
+$ec_lang['u_ft2ps']='cfs/ft';
 
 // Page text
+// In page order for easiest maintenance.
+// Menu and General
 $ec_lang['menu_brand']='HawsEDC Rechner';
 $ec_lang['menu_main_list']='Rechnerliste';
 $ec_lang['menu_main_hydraulics']='Hydraulik';
@@ -68,7 +76,7 @@ $ec_lang['view_printable']='Druckversion (Seite neu laden zum Zurücksetzen)';
 $ec_lang['ec_name_label']='Diese Berechnung speichern:';
 $ec_lang['ec_name_placeholder']='Name';
 $ec_lang['ec_name_hint']='Speichert diese Eingaben in der URL zum Lesezeichen, zum Abrufen aus dem Verlauf und zum Teilen';
-// Darcy-Weisbach
+// Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Rohrreibungsverlust Darcy-Weisbach';
 $ec_lang['dw_main_title']='Kostenloser Online-Rechner Rohrreibungsverlust Darcy-Weisbach';
 $ec_lang['dw_main_desc']='Rohrreibungsverlust nach Darcy-Weisbach bei gegebenem Durchmesser, Rauheit und Durchfluss';
@@ -81,7 +89,7 @@ $ec_lang['dw_regime_transitional']='Übergangsbereich';
 $ec_lang['dw_regime_turbulent']='turbulente Strömung';
 $ec_lang['dw_friction_factor_method']='Methode des Reibungsbeiwerts';
 $ec_lang['dw_friction_factor']='Reibungsbeiwert, f';
-// Hazen-Williams
+// Hazen-Williams. See mphl_ for missing text.
 $ec_lang['hw_main_menu']='Rohrreibungsverlust Hazen-Williams';
 $ec_lang['hw_main_title']='Kostenloser Online-Rechner Rohrreibungsverlust Hazen-Williams';
 $ec_lang['hw_main_desc']='Rohrreibungsverlust nach Hazen-Williams bei gegebenem Durchmesser, Rauheit und Durchfluss';
@@ -145,7 +153,7 @@ $ec_lang['mpf_note_1']='<dl><dt>Dies ist der Durchfluss und die Tiefe innerhalb 
 $ec_lang['mpf_solve_for_dd0']='y/d<sub>0</sub> für gegebenes Q berechnen';
 $ec_lang['mpf_solve_desc']='Mit D<sub>0</sub>, n und S<sub>0</sub> aus dem Formular wird das kleinste y/d<sub>0</sub> für ein gegebenes Q gefunden.';
 $ec_lang['mpf_solve_button']='Berechnen';
-// Manning Pipe Head Loss
+// Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Rohrdruckverlust Manning';
 $ec_lang['mphl_main_title']='Kostenloser Online-Rechner Rohrdruckverlust Manning';
 $ec_lang['mphl_main_desc']='Manning-Formel Druckverlust bei gegebenem Vollfüllungsdurchfluss';
@@ -160,7 +168,7 @@ $ec_lang['mphl_egl_1']='EGL flussabwärts';
 $ec_lang['mphl_egl_2']='EGL flussaufwärts';
 $ec_lang['mphl_hgl_2']='HGL im Rohr flussaufwärts ' . $ec_lang['mpf_see_notes'];
 $ec_lang['mphl_note_1']='<dl><dt>Für einen offenen Einlauf (Durchlass) müssen die Einlaufsteuerungsbedingungen geprüft werden.</dt><dd>1. Die HGL flussaufwärts kann nicht unter der normalen Fließtiefe flussaufwärts liegen (oder unter dem Rohr!).</dd><dd>2. Der Einstaupegel eines Durchlasses wird besser durch die EGL als durch die HGL flussaufwärts dargestellt.</dd><dd>3. Sehen Sie <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">das 2-Minuten-Tutorial</a> für einfache Standard-Durchlassberechnungen mit HY-8.</dd>';
-// Manning Trapezoid
+// Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Trapezprofil-Kanal Manning';
 $ec_lang['mtc_main_title']='Kostenloser Online-Rechner Trapezkanal Manning-Formel';
 $ec_lang['mtc_main_desc']='Manning-Formel gleichförmiger Abfluss im Trapezkanal bei gegebenem Gefälle und Tiefe';
@@ -181,8 +189,16 @@ $ec_lang['mtc_d50_z1']='Erforderliche Körnung kantenreicher Steine Böschung 1,
 $ec_lang['mtc_d50_z2']='Erforderliche Körnung kantenreicher Steine Böschung 2, D50 (Isbash & MC) <span title="Nach Isbash (1936) und Maricopa County, Arizona, USA." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['mtc_d50_mra']='Erforderliche Körnung kantenreicher Steine, D50 (Maynord, Ruff und Abt 1989)';
 $ec_lang['mtc_d50_searcy']='Erforderliche Körnung kantenreicher Steine, D50 (Searcy 1967)';
+$ec_lang['mtc_vel_check']='Geschwindigkeitsprüfung';
+$ec_lang['mtc_vel_ok']='Geschwindigkeit plausibel für Gleichströmungsannahmen.';
+$ec_lang['mtc_vel_high']='Geschwindigkeit hoch – Übergangsverluste und verfügbare Energie prüfen.';
+$ec_lang['mtc_vel_low']='Geschwindigkeit niedrig – Sedimentationsrisiko.';
+$ec_lang['mtc_vel_ok_short']='OK';
+$ec_lang['mtc_vel_high_short']='Hoch';
+$ec_lang['mtc_vel_low_short']='Niedrig';
 $ec_lang['mtc_note_1']='<dl><dt>Automatische Iteration Steinbemessung und Rauheit</dt><dd>Wählen Sie einen Rauheits-Radioknopf (BB empfohlen) und einen Radioknopf für die Bemessungskorngröße (Isbash empfohlen). Stellen Sie Tiefe und Steinbemessungsfaktor ein, um den gewünschten Durchfluss mit einer gleichmäßigen Korngröße zu erzielen. Bei jeder Änderung eines Eingabewerts startet der Iterationszyklus: 1. Die Rauheit wird aus der Bemessungskorngröße berechnet. 2. Der berechnete Rauheitswert wird in die Eingaberauheit kopiert. 3. Kanaldurchfluss und erforderliche Korngröße werden berechnet. 4. Die Bemessungskorngröße wird angepasst. 5. Wiederholen bis der Fehler sehr klein ist.</dd><dt>Grundrechner (ohne Iteration)</dt><dd>Geben Sie den gewünschten Rauheitswert ein. Ignorieren Sie den Eingabebereich für die Bemessungskorngröße.</dd></dl>';
-// Robinson Rock Chute
+$ec_lang['mtc_note_2_term']='Geschwindigkeitsprüfung';
+$ec_lang['mtc_note_2_def']='Hohe Geschwindigkeit impliziert hohe spezifische Energie aus einem verfügbaren Absturz. Diese Energie kann schnell an Aufweitungen, Bögen oder Hindernissen abgebaut werden. Prüfen Sie, ob dies für den Standort plausibel ist.';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='Einfaches Wehr';
 $ec_lang['ws_main_title']='Kostenloser Online-Rechner breitkroniges Wehr';
@@ -192,7 +208,7 @@ $ec_lang['ws_headWaterHeight']='Oberwasserhöhe, h';
 $ec_lang['ws_weirCoefficient']='Wehrbeiwert, Cw';
 $ec_lang['ws_notes_heading']='Hinweise';
 $ec_lang['ws_notes_we_term']='Wehrformel';
-// Weir Flow Irregular
+// Weir Flow Irregular. See ws_ for missing text.
 $ec_lang['wi_menu']='Unregelmäßiges Wehr';
 $ec_lang['wi_main_title']='Kostenloser Online-Rechner segmentiertes Wehr mit variablem Querschnitt';
 $ec_lang['wi_main_desc']='Rechner für den Durchfluss über ein unregelmäßiges Wehr';
@@ -237,6 +253,52 @@ $ec_lang['or_notes_3_term']='Abflussbeiwert';
 $ec_lang['or_notes_3_def']='C<sub>d</sub> liegt bei ca. 0,60–0,65 für scharfkantige Öffnungen. Abgerundete oder einspringende Einläufe haben andere Werte. Siehe <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venture-d_590.html">Engineering Toolbox</a> oder das HEC-RAS Hydraulic Reference Manual.';
 $ec_lang['or_notes_4_term']='Rückstau';
 $ec_lang['or_notes_4_def']='Wenn TWE über der Sohle der Öffnung liegt, verwendet der Rechner automatisch die eingestaute Ausflusformel mit h = HWE − TWE. Liegt TWE auf oder unter der Sohle, wird freier Ausfluss angenommen und h = HWE − Schwerpunkt.';
+// Micro-Hydro Power
+$ec_lang['mhp_main_menu']='Mikro-Wasserkraft';
+$ec_lang['mhp_main_title']='Kostenloser Online-Rechner für Mikro-Wasserkraft';
+$ec_lang['mhp_main_desc']='Leistungsrechner für Laufwasser-Mikro-Wasserkraftanlagen';
+$ec_lang['mhp_flow']='Durchfluss, Q';
+$ec_lang['mhp_gross_head']='Bruttofallhöhe, H<sub>gross</sub>';
+$ec_lang['mhp_diameter']='Rohrdurchmesser der Druckrohrleitung, D';
+$ec_lang['mhp_length']='Rohrlänge der Druckrohrleitung, L';
+$ec_lang['mhp_roughness']='Rohrrauheit, e';
+$ec_lang['mhp_km']='Einzelwiderstandsbeiwert, k<sub>m</sub>';
+$ec_lang['mhp_nu']='Kinematische Viskosität, ν, in m<sup>2</sup>/s (1E-6 für Wasser nahe 20°C)';
+$ec_lang['mhp_efficiency']='Anlagenwirkungsgrad, η (0–1)';
+$ec_lang['mhp_velocity']='Fließgeschwindigkeit, v';
+$ec_lang['mhp_vel_check']='Geschwindigkeitsprüfung';
+$ec_lang['mhp_f']='Reibungsbeiwert, f';
+$ec_lang['mhp_hf']='Reibungsdruckverlust, h<sub>f</sub>';
+$ec_lang['mhp_hm']='Einzeldruckverlust, h<sub>m</sub>';
+$ec_lang['mhp_hl']='Gesamtverlust der Druckrohrleitung, h<sub>L</sub>';
+$ec_lang['mhp_hl_check']='Druckverlustprüfung';
+$ec_lang['mhp_hnet']='Nettofallhöhe, H<sub>net</sub>';
+$ec_lang['mhp_power']='Leistungsabgabe, P';
+$ec_lang['mhp_annual_kwh']='Jahresenergie bei 100 % Kapazität';
+$ec_lang['mhp_vel_ok']='1–3 m/s — im Zielbereich ✓';
+$ec_lang['mhp_vel_low']='Geschwindigkeit niedrig – Risiko von Sedimentation und Lufteintrag.';
+$ec_lang['mhp_vel_high']='Geschwindigkeit hoch – Risiko von Druckstoß und Einzelverlusten.';
+$ec_lang['mhp_vel_ok_short']='OK';
+$ec_lang['mhp_vel_high_short']='Hoch';
+$ec_lang['mhp_vel_low_short']='Niedrig';
+$ec_lang['mhp_hl_ok']='innerhalb des 10-%-Ziels ✓';
+$ec_lang['mhp_hl_warn']='überschreitet 10-%-Ziel — größeres Rohr erwägen ⚠';
+$ec_lang['mhp_hl_bad']='überschreitet 20 % — Rohr neu dimensionieren';
+$ec_lang['mhp_notes_1_term']='Druckverlust';
+$ec_lang['mhp_notes_1_def']='Gesamtverlust der Druckrohrleitung h<sub>L</sub> = h<sub>f</sub> + h<sub>m</sub>, wobei h<sub>f</sub> = f(L/D)(v²/2g) der Darcy-Weisbach-Reibungsverlust ist und h<sub>m</sub> = k<sub>m</sub>·v²/2g Einläufe, Krümmer und Armaturen berücksichtigt. Nettofallhöhe H<sub>net</sub> = H<sub>gross</sub> − h<sub>L</sub>.';
+$ec_lang['mhp_notes_2_term']='Fließgeschwindigkeit';
+$ec_lang['mhp_notes_2_def']='Zielbereich: 1–3 m/s. Unter 1 m/s ist das Rohr für den Durchfluss überdimensioniert; über 3 m/s steigen die Reibungsverluste und das Risiko eines Wasserschlags.';
+$ec_lang['mhp_notes_3_term']='Druckverlustziel';
+$ec_lang['mhp_notes_3_def']='Verluste in der Druckrohrleitung unter 10 % der Bruttofallhöhe sind in der Regel wirtschaftlich. Der optimale Kompromiss zwischen Rohrkosten und Leistungsverlust liegt für wertvolle Stromerzeugungs-Standorte oft bei 4–6 %.';
+$ec_lang['mhp_notes_4_term']='Einzelwiderstände k<sub>m</sub>';
+$ec_lang['mhp_notes_4_def']='Typische Werte: scharfkantige Einlauföffnung 0,5, jeder 45°-Krümmer 0,2–0,3, Schieber (vollständig geöffnet) 0,1, Schmetterlingsklappe 0,2. Alle Einbauten summieren für den Gesamt-k<sub>m</sub>. Standardwert 1,5 geht von einem Einlauf und zwei Krümmern aus.';
+$ec_lang['mhp_notes_5_term']='Rohrrauheit e';
+$ec_lang['mhp_notes_5_def']='Typische absolute Rauheit: Stahl (neu) 0,046 mm, Stahl (gebraucht) 0,15 mm, HDPE 0,003 mm, PVC/uPVC 0,0015 mm, Beton 0,3–3 mm. HDPE ist bei kleinen Mikro-Wasserkraft-Druckrohrleitungen weit verbreitet.';
+$ec_lang['mhp_notes_6_term']='Wirkungsgrad';
+$ec_lang['mhp_notes_6_def']='Der typische Anlagenwirkungsgrad &eta; liegt für Pelton- und Durchströmturbinen, die in der Mikro-Wasserkraft verbreitet sind, zwischen 0,70 und 0,85. Als konservativen Anfangswert 0,75 verwenden.';
+$ec_lang['mhp_notes_7_term']='Jahresenergie';
+$ec_lang['mhp_notes_7_def']='Die Jahresenergie setzt einen kontinuierlichen Vollbetrieb voraus (8760 Stunden/Jahr). Die tatsächliche Produktion ist aufgrund saisonaler Durchflussschwankungen, Wartungsausfallzeiten und des Lastfaktors geringer.';
+
 // Orifice Drain Time
 $ec_lang['odt_main_menu']='Entleerungszeit durch Öffnung';
 $ec_lang['odt_main_title']='Kostenloser Online-Rechner Entleerungszeit durch Öffnung';
@@ -265,84 +327,31 @@ $ec_lang['odt_q_max']='Maximaldurchfluss (Anfang), Q<sub>max</sub>';
 $ec_lang['odt_vol']='Abgeführtes Volumen';
 $ec_lang['odt_sketch_start']='Anfang';
 $ec_lang['odt_sketch_end']='Ende';
-// Erosion Setback
+// Erosion Setback and Scour Calc.
 $ec_lang['essc_btbw']='Uferbandbreite';
 $ec_lang['essc_mcr']='Minimaler Kurvenradius';
 $ec_lang['essc_q']='Durchfluss, Q';
-// Contact
+// Contact us.
 
 // Irrigation
 $ec_lang['irr_main_menu']='Bewässerungsdurchflussmessung';
 $ec_lang['irr_main_title']='Kostenlose Online-Rechner für Bewässerungsdurchflussmessung';
 $ec_lang['irr_main_desc']='Bewässerungsdurchflussmessung — Wehre und Öffnungen';
-$ec_lang['contact_title']='HawsEDC Kontakt';
-$ec_lang['contactSendMessage']='Senden Sie Tom Haws eine Nachricht';
-$ec_lang['contactYourName']='Ihr Name:';
-$ec_lang['contactYourEmail']='Ihre E-Mail-Adresse:';
-$ec_lang['contactSubject']='Betreff:';
-$ec_lang['contact_message']='Nachricht:';
-$ec_lang['contactSpamPrefix']='Fünf plus eins ergibt';
-$ec_lang['contactSpamPostfix']='(Bitte auf Englisch ausschreiben. 1=one 2=two 3=three 4=four 5=five 6=six 7=seven +=plus 5+1=6)';
-$ec_lang['contactSubmitButton']='Nachricht senden';
-$ec_lang['contact_success']='Danke, dass Sie sich die Zeit genommen haben zu schreiben.';
-
-
-// Micro-Hydro Power
-$ec_lang['mhp_main_menu']='Mikro-Wasserkraft';
-$ec_lang['mhp_main_title']='Kostenloser Online-Rechner für Mikro-Wasserkraft';
-$ec_lang['mhp_main_desc']='Leistungsrechner für Laufwasser-Mikro-Wasserkraftanlagen';
-$ec_lang['mhp_flow']='Durchfluss, Q';
-$ec_lang['mhp_gross_head']='Bruttofallhöhe, H<sub>gross</sub>';
-$ec_lang['mhp_diameter']='Rohrdurchmesser der Druckrohrleitung, D';
-$ec_lang['mhp_length']='Rohrlänge der Druckrohrleitung, L';
-$ec_lang['mhp_roughness']='Rohrrauheit, e';
-$ec_lang['mhp_km']='Einzelwiderstandsbeiwert, k<sub>m</sub>';
-$ec_lang['mhp_nu']='Kinematische Viskosität, ν, in m<sup>2</sup>/s (1E-6 für Wasser nahe 20°C)';
-$ec_lang['mhp_efficiency']='Anlagenwirkungsgrad, η (0–1)';
-$ec_lang['mhp_velocity']='Fließgeschwindigkeit, v';
-$ec_lang['mhp_vel_check']='Geschwindigkeitsprüfung';
-$ec_lang['mhp_f']='Reibungsbeiwert, f';
-$ec_lang['mhp_hf']='Reibungsdruckverlust, h<sub>f</sub>';
-$ec_lang['mhp_hm']='Einzeldruckverlust, h<sub>m</sub>';
-$ec_lang['mhp_hl']='Gesamtverlust der Druckrohrleitung, h<sub>L</sub>';
-$ec_lang['mhp_hl_check']='Druckverlustprüfung';
-$ec_lang['mhp_hnet']='Nettofallhöhe, H<sub>net</sub>';
-$ec_lang['mhp_power']='Leistungsabgabe, P';
-$ec_lang['mhp_annual_kwh']='Jahresenergie bei 100 % Kapazität';
-$ec_lang['mhp_vel_ok']='1–3 m/s — im Zielbereich ✓';
-$ec_lang['mhp_vel_ok_short']='OK';
-$ec_lang['mhp_vel_low']='Geschwindigkeit niedrig – Risiko von Sedimentation und Lufteintrag.';
-$ec_lang['mhp_vel_low_short']='Niedrig';
-$ec_lang['mhp_vel_high']='Geschwindigkeit hoch – Risiko von Druckstoß und Einzelverlusten.';
-$ec_lang['mhp_vel_high_short']='Hoch';
-$ec_lang['mhp_hl_ok']='innerhalb des 10-%-Ziels ✓';
-$ec_lang['mhp_hl_warn']='überschreitet 10-%-Ziel — größeres Rohr erwägen ⚠';
-$ec_lang['mhp_hl_bad']='überschreitet 20 % — Rohr neu dimensionieren';
-$ec_lang['mhp_notes_1_term']='Druckverlust';
-$ec_lang['mhp_notes_1_def']='Gesamtverlust der Druckrohrleitung h<sub>L</sub> = h<sub>f</sub> + h<sub>m</sub>, wobei h<sub>f</sub> = f(L/D)(v²/2g) der Darcy-Weisbach-Reibungsverlust ist und h<sub>m</sub> = k<sub>m</sub>·v²/2g Einläufe, Krümmer und Armaturen berücksichtigt. Nettofallhöhe H<sub>net</sub> = H<sub>gross</sub> − h<sub>L</sub>.';
-$ec_lang['mhp_notes_2_term']='Fließgeschwindigkeit';
-$ec_lang['mhp_notes_2_def']='Zielbereich: 1–3 m/s. Unter 1 m/s ist das Rohr für den Durchfluss überdimensioniert; über 3 m/s steigen die Reibungsverluste und das Risiko eines Wasserschlags.';
-$ec_lang['mhp_notes_3_term']='Druckverlustziel';
-$ec_lang['mhp_notes_3_def']='Verluste in der Druckrohrleitung unter 10 % der Bruttofallhöhe sind in der Regel wirtschaftlich. Der optimale Kompromiss zwischen Rohrkosten und Leistungsverlust liegt für wertvolle Stromerzeugungs-Standorte oft bei 4–6 %.';
-$ec_lang['mhp_notes_4_term']='Einzelwiderstände k<sub>m</sub>';
-$ec_lang['mhp_notes_4_def']='Typische Werte: scharfkantige Einlauföffnung 0,5, jeder 45°-Krümmer 0,2–0,3, Schieber (vollständig geöffnet) 0,1, Schmetterlingsklappe 0,2. Alle Einbauten summieren für den Gesamt-k<sub>m</sub>. Standardwert 1,5 geht von einem Einlauf und zwei Krümmern aus.';
-$ec_lang['mhp_notes_5_term']='Rohrrauheit e';
-$ec_lang['mhp_notes_5_def']='Typische absolute Rauheit: Stahl (neu) 0,046 mm, Stahl (gebraucht) 0,15 mm, HDPE 0,003 mm, PVC/uPVC 0,0015 mm, Beton 0,3–3 mm. HDPE ist bei kleinen Mikro-Wasserkraft-Druckrohrleitungen weit verbreitet.';
-
-// About
-$ec_lang['about_main_menu']='Über';
-$ec_lang['install_main_menu']='Installieren';
-$ec_lang['install_main_title']='EngCalcs installieren';
-$ec_lang['install_main_desc']='Zum Gerät hinzufügen für Offline-Nutzung';
-$ec_lang['contact_main_menu']='Kontakt';
-$ec_lang['about_main_title']='Über die HawsEDC-Ingenieurrechner';
-$ec_lang['about_main_desc']='Mission, Open Source und Mitwirken';
-
+$ec_lang['irr_intro_html']='<p>Wehre und Öffnungen sind die standardmäßigen Feldwerkzeuge zur Messung des Wasserdurchflusses in Bewässerungssystemen. Wählen Sie den Rechner aus, der zu Ihrer Anlage passt:</p>';
+$ec_lang['irr_card_weir_uniform_head']='Wehr — Breite Krone (Einheitliche Breite)';
+$ec_lang['irr_card_weir_uniform_desc']='Messen Sie den Durchfluss über eine Ableitungsdammkrone, ein Kontrollbauwerk oder ein Wehrboard. Geben Sie die Wehrlänge und die Wasserspiegeltiefe über der Krone ein.';
+$ec_lang['irr_card_weir_irregular_head']='Wehr — Unregelmäßiges Profil';
+$ec_lang['irr_card_weir_irregular_desc']='Verwenden Sie dies, wenn die Wehrkrone keine einheitliche Höhe hat — natürliche Überlaufbauwerke, Absturzbauwerke mit variabler Breite oder mehrteilige Kontrollbauwerke.';
+$ec_lang['irr_card_orifice_head']='Öffnung — Schieber oder Rohrauslass';
+$ec_lang['irr_card_orifice_desc']='Messen Sie den Durchfluss durch einen Schieber, einen Rohrauslass oder eine Durchlassöffnung. Behandelt automatisch sowohl freien Ausfluss als auch eingestauene Bedingungen (Unterwasser).';
+$ec_lang['irr_card_canal_head']='Kanalplanung & -analyse';
+$ec_lang['irr_card_canal_desc']='Planen oder überprüfen Sie einen Bewässerungskanal mit der Manning-Formel. Verwenden Sie den Trapezrechner für neue Kanäle; den Unregelmäßigen Rechner für bestehende natürliche oder gebaute Querschnitte.';
+$ec_lang['irr_card_drip_head']='Tropf- & Sprinklerplanung';
+$ec_lang['irr_card_drip_desc']='Berechnen Sie Auftragsrate, Verteilungsgleichmäßigkeit, Lateraldurchfluss, Zonendurchfluss und Laufzeit für ein Tropf- oder Sprinklerbewässerungssystem. Geben Sie Emitterdurchfluss, Emitterabstand und Zieltiefe ein.';
+$ec_lang['irr_card_seepage_head']='Kanaldurchsickerung & Transportwirkungsgrad';
+$ec_lang['irr_card_seepage_desc']='Schätzen Sie den Versickerungsverlust einer Kanalhaltung anhand von Zu- und Abflussmessungen. Berechnen Sie den Transportwirkungsgrad und den jährlichen Wasserverlust, um Auskleidungsinvestitionen zu priorisieren.';
+$ec_lang['irr_quickref_html']='<h3>Kurzreferenz</h3><dl><dt>Ableitungsdamm oder Kontrollbauwerk</dt><dd>Messen Sie die Wasserspiegeltiefe über der Wehrkrone. Verwenden Sie <a href="Weir-Flow-Simple.php">Einfaches Wehr</a> für eine einheitliche Krone oder <a href="Weir-Flow-Irregular.php">Unregelmäßiges Wehr</a> für eine profilierte oder gestufte Krone.</dd><dt>Schieber oder Rohrauslass</dt><dd>Messen Sie den Oberwasserspiegel und Unterwasserspiegel (oder die Sohlenhöhe bei freiem Ausfluss). Verwenden Sie <a href="Orifice.php">Öffnungsdurchfluss</a>. Bei einem Kreisrohr ist D = Rohrdurchmesser; bei einem rechteckigen Schieber geben Sie Breite W und Höhe D ein.</dd><dt>Entleerungszeit von Stausee oder Teich</dt><dd>Verwenden Sie <a href="Orifice-Drain-Time.php">Öffnungs-Entleerungszeit</a>, um zu schätzen, wie lange es dauert, einen Teich oder Stausee durch eine Bodenöffnung zu senken — nützlich für die Planung der Bewässerungsspeicherung.</dd><dt>Feldstandards</dt><dd>Die hier verwendeten Wehr- und Öffnungsdurchflussgleichungen entsprechen den Verfahren des USBR <em>Water Measurement Manual</em> (3. Aufl.), die häufig von Wassermeistern und Bewässerungsbezirken gefordert werden.</dd></dl>';
 // Drip / Sprinkler Application Rate
-$ec_lang['u_lph']="L/hr";
-$ec_lang['u_gph']="gal/hr";
-$ec_lang['u_mmph']="mm/hr";
-$ec_lang['u_inph']="in/hr";
 $ec_lang['ds_main_menu']='Tropf-/Sprinkler-Ausbringungsrate';
 $ec_lang['ds_main_title']='Kostenloser Online-Rechner für Tropf-/Sprinkler-Bewässerungsausbringungsrate';
 $ec_lang['ds_main_desc']='Tropf- & Sprinklerbewässerung — Ausbringungsrate';
@@ -361,13 +370,14 @@ $ec_lang['ds_notes_1_term']='Ausbringungsrate';
 $ec_lang['ds_notes_1_def']='PR = q / A<sub>e</sub>, wobei A<sub>e</sub> = S<sub>e</sub> × S<sub>l</sub> die von jedem Emitter versorgte Fläche ist. Eine niedrigere Ausbringungsrate gibt mehr Zeit für die Infiltration — wichtig bei schweren Böden oder geneigten Feldern.';
 $ec_lang['ds_notes_2_term']='Laufzeit';
 $ec_lang['ds_notes_2_def']='Laufzeit = Zieltiefe ÷ Ausbringungsrate. Auf geneigtem oder verdichtetem Boden die Laufzeit in zwei oder drei kürzere Zyklen mit Ruhepausen aufteilen, um Oberflächenabfluss zu vermeiden.';
-
 // Canal Seepage / Conveyance Efficiency. Prefix cs_.
 $ec_lang['cs_main_menu']='Kanaldurchsickerung';
 $ec_lang['cs_main_title']='Kostenloser Online-Rechner für Kanaldurchsickerungsverlust und Transportwirkungsgrad';
 $ec_lang['cs_main_desc']='Kanaldurchsickerungsverlust & Transportwirkungsgrad — Zu-/Abfluss-Methode';
 $ec_lang['cs_Q_in']='Zufluss am Anfang der Haltung, Q<sub>in</sub>';
 $ec_lang['cs_Q_out']='Abfluss am Ende der Haltung, Q<sub>out</sub>';
+$ec_lang['cs_L']='Haltungslänge, L';
+$ec_lang['cs_wp']='Benetzter Umfang des Kanalquerschnitts, P<sub>w</sub>';
 $ec_lang['cs_Q_loss']='Versickerungsrate, Q<sub>loss</sub>';
 $ec_lang['cs_loss_check']='Messpunktkontrolle';
 $ec_lang['cs_pct_loss']='Verlust als Anteil des Zuflusses';
@@ -375,8 +385,6 @@ $ec_lang['cs_Ec']='Transportwirkungsgrad, E<sub>c</sub>';
 $ec_lang['cs_Ec_check']='Wirkungsgradklasse';
 $ec_lang['cs_Vol_day']='Täglich verlorenes Volumen';
 $ec_lang['cs_Vol_year']='Jährlich verlorenes Volumen';
-$ec_lang['cs_L']='Haltungslänge, L';
-$ec_lang['cs_wp']='Benetzter Umfang des Kanalquerschnitts, P<sub>w</sub>';
 $ec_lang['cs_Q_loss_per_L']='Versickerungsverlust je Längeneinheit, Q<sub>loss</sub>/L';
 $ec_lang['cs_water_value']='Wasserpreis (Währung / Volumeneinheit)';
 $ec_lang['cs_lining_cost']='Auskleidungskosten (Währung / Flächeneinheit)';
@@ -400,26 +408,26 @@ $ec_lang['cs_notes_3_term']='Amortisation der Auskleidung';
 $ec_lang['cs_notes_3_def']='Wasserpreis und Auskleidungskosten in einer einheitlichen Währung eingeben. Auskleidungsfläche = Haltungslänge × benetzter Umfang — der benetzte Umfang des Kanalquerschnitts bei der gemessenen Fließtiefe (Sohlbreite plus beide benetzten Böschungen). Der jährlich zurückgewonnene Wert setzt voraus, dass der ausgekleidete Kanal das Ziel-E<sub>c</sub> dauerhaft erreicht. Die tatsächliche Amortisationszeit ist bei saisonalen Kanälen oder bei Nichterreichen der Zieleffizienz länger.';
 $ec_lang['cs_notes_4_term']='Literatur';
 $ec_lang['cs_notes_4_def']='USBR <em>Water Measurement Manual</em>, 3. Aufl. (2001). FAO Irrigation and Drainage Paper 57 (1999).';
-
-$ec_lang['irr_intro_html']='<p>Wehre und Öffnungen sind die standardmäßigen Feldwerkzeuge zur Messung des Wasserdurchflusses in Bewässerungssystemen. Wählen Sie den Rechner aus, der zu Ihrer Anlage passt:</p>';
-$ec_lang['irr_card_weir_uniform_head']='Wehr — Breite Krone (Einheitliche Breite)';
-$ec_lang['irr_card_weir_uniform_desc']='Messen Sie den Durchfluss über eine Ableitungsdammkrone, ein Kontrollbauwerk oder ein Wehrboard. Geben Sie die Wehrlänge und die Wasserspiegeltiefe über der Krone ein.';
-$ec_lang['irr_card_weir_irregular_head']='Wehr — Unregelmäßiges Profil';
-$ec_lang['irr_card_weir_irregular_desc']='Verwenden Sie dies, wenn die Wehrkrone keine einheitliche Höhe hat — natürliche Überlaufbauwerke, Absturzbauwerke mit variabler Breite oder mehrteilige Kontrollbauwerke.';
-$ec_lang['irr_card_orifice_head']='Öffnung — Schieber oder Rohrauslass';
-$ec_lang['irr_card_orifice_desc']='Messen Sie den Durchfluss durch einen Schieber, einen Rohrauslass oder eine Durchlassöffnung. Behandelt automatisch sowohl freien Ausfluss als auch eingestauene Bedingungen (Unterwasser).';
-$ec_lang['irr_card_canal_head']='Kanalplanung & -analyse';
-$ec_lang['irr_card_canal_desc']='Planen oder überprüfen Sie einen Bewässerungskanal mit der Manning-Formel. Verwenden Sie den Trapezrechner für neue Kanäle; den Unregelmäßigen Rechner für bestehende natürliche oder gebaute Querschnitte.';
-$ec_lang['irr_card_drip_head']='Tropf- & Sprinklerplanung';
-$ec_lang['irr_card_drip_desc']='Berechnen Sie Auftragsrate, Verteilungsgleichmäßigkeit, Lateraldurchfluss, Zonendurchfluss und Laufzeit für ein Tropf- oder Sprinklerbewässerungssystem. Geben Sie Emitterdurchfluss, Emitterabstand und Zieltiefe ein.';
-$ec_lang['irr_card_seepage_head']='Kanaldurchsickerung & Transportwirkungsgrad';
-$ec_lang['irr_card_seepage_desc']='Schätzen Sie den Versickerungsverlust einer Kanalhaltung anhand von Zu- und Abflussmessungen. Berechnen Sie den Transportwirkungsgrad und den jährlichen Wasserverlust, um Auskleidungsinvestitionen zu priorisieren.';
-$ec_lang['irr_quickref_html']='<h3>Kurzreferenz</h3><dl><dt>Ableitungsdamm oder Kontrollbauwerk</dt><dd>Messen Sie die Wasserspiegeltiefe über der Wehrkrone. Verwenden Sie <a href="Weir-Flow-Simple.php">Einfaches Wehr</a> für eine einheitliche Krone oder <a href="Weir-Flow-Irregular.php">Unregelmäßiges Wehr</a> für eine profilierte oder gestufte Krone.</dd><dt>Schieber oder Rohrauslass</dt><dd>Messen Sie den Oberwasserspiegel und Unterwasserspiegel (oder die Sohlenhöhe bei freiem Ausfluss). Verwenden Sie <a href="Orifice.php">Öffnungsdurchfluss</a>. Bei einem Kreisrohr ist D = Rohrdurchmesser; bei einem rechteckigen Schieber geben Sie Breite W und Höhe D ein.</dd><dt>Entleerungszeit von Stausee oder Teich</dt><dd>Verwenden Sie <a href="Orifice-Drain-Time.php">Öffnungs-Entleerungszeit</a>, um zu schätzen, wie lange es dauert, einen Teich oder Stausee durch eine Bodenöffnung zu senken — nützlich für die Planung der Bewässerungsspeicherung.</dd><dt>Feldstandards</dt><dd>Die hier verwendeten Wehr- und Öffnungsdurchflussgleichungen entsprechen den Verfahren des USBR <em>Water Measurement Manual</em> (3. Aufl.), die häufig von Wassermeistern und Bewässerungsbezirken gefordert werden.</dd></dl>';
+// About
+$ec_lang['about_main_menu']='Über';
+$ec_lang['install_main_menu']='Installieren';
+$ec_lang['install_main_title']='EngCalcs installieren';
+$ec_lang['install_main_desc']='Zum Gerät hinzufügen für Offline-Nutzung';
+$ec_lang['contact_main_menu']='Kontakt';
+$ec_lang['about_main_title']='Über die HawsEDC-Ingenieurrechner';
+$ec_lang['about_main_desc']='Mission, Open Source und Mitwirken';
 $ec_lang['about_body_html']='<h3>Mission</h3><p>Die HawsEDC-Ingenieurrechner dienen Ingenieuren und Feldarbeitern auf der ganzen Welt — insbesondere solchen, die in wasserarmen, ressourcenarmen oder unterversorgten Regionen arbeiten. Diese Werkzeuge sind Teil einer breiteren humanitären Mission: jedem Menschen auf die praktischste und wirkungsvollste Weise zu sagen, dass er für immer geliebt und geschätzt wird, dass er nichts zu befürchten hat und dass er nicht alles zunichte machen wird.</p><p>Die Rechner sind das Mittel. Das Ziel ist eine Welt frei von Leid.</p><h3>Open-Source-Lizenz</h3><p>Aller Code wird unter der <a target="_blank" href="https://www.gnu.org/licenses/gpl-3.0.html">GNU General Public License v3.0 oder später</a> veröffentlicht — frei wie in Freiheit. Sie dürfen den Code unter denselben Bedingungen nutzen, studieren, ändern und weitergeben.</p><p>Copyright © 2009–2026 Thomas Gail Haws.</p><h3>Quellcode</h3><p>Der vollständige Quellcode ist öffentlich auf Bitbucket verfügbar:</p><p><a target="_blank" href="https://bitbucket.org/hawstom/engcalcs">bitbucket.org/hawstom/engcalcs</a></p><p>Sie können dort den Code durchsuchen, Probleme melden oder das Repository forken.</p><h3>Mitwirken</h3><p>Pull-Requests sind willkommen. Möglichkeiten zur Mitwirkung:</p><ul><li><strong>Übersetzungen</strong> — verbessern oder ergänzen Sie eine Sprache. Öffnen Sie einen Pull-Request mit Änderungen an der entsprechenden <code>lib/lang.ec.??.php</code>-Datei.</li><li><strong>Fehlerberichte</strong> — nutzen Sie das Feedback-Formular auf einer beliebigen Rechnerseite oder melden Sie ein Problem auf Bitbucket.</li><li><strong>Neue Rechner</strong> — Ideen für hydraulisch-ingenieurtechnische Werkzeuge für Feldarbeiter und Bewässerungspraktiker sind besonders willkommen. Siehe die Entwickleranleitung <code>CLAUDE.md</code> im Repository.</li><li><strong>Hosting</strong> — wenn Sie diese Rechner für eine Region mit eingeschränkter Konnektivität spiegeln können, nehmen Sie bitte Kontakt auf.</li></ul><h3>Offline-Nutzung</h3><p>Diese Rechner funktionieren als Progressive Web App (PWA). Besuchen Sie eine beliebige Rechnerseite bei bestehender Internetverbindung, und Ihr Browser speichert alle Rechner automatisch im Cache. Danach funktionieren alle Rechner offline — kein Internet erforderlich.</p><p>Verwenden Sie auf Android oder iOS die Option „Zum Startbildschirm hinzufügen" in Ihrem Browser, um EngCalcs als App auf Ihrem Gerät zu installieren. Auf dem Desktop suchen Sie nach dem Installationssymbol in der Adressleiste Ihres Browsers.</p><p>Sie können auch jeden einzelnen Rechner über das Menü „Speichern unter…" Ihres Browsers für die einmalige Offline-Nutzung speichern.</p><h3>Kontakt</h3><p>Tom Haws — Wasserbauingenieur und Autor dieser Rechner.<br />Nutzen Sie das Feedback-Formular auf einer beliebigen Rechnerseite oder greifen Sie auf den Quellcode unter <a target="_blank" href="https://bitbucket.org/hawstom/engcalcs">Bitbucket</a> zu.</p>';
-
+$ec_lang['contact_title']='HawsEDC Kontakt';
+$ec_lang['contactSendMessage']='Senden Sie Tom Haws eine Nachricht';
+$ec_lang['contactYourName']='Ihr Name:';
+$ec_lang['contactYourEmail']='Ihre E-Mail-Adresse:';
+$ec_lang['contactSubject']='Betreff:';
+$ec_lang['contact_message']='Nachricht:';
+$ec_lang['contactSpamPrefix']='Fünf plus eins ergibt';
+$ec_lang['contactSpamPostfix']='(Bitte auf Englisch ausschreiben. 1=one 2=two 3=three 4=four 5=five 6=six 7=seven +=plus 5+1=6)';
+$ec_lang['contactSubmitButton']='Nachricht senden';
+$ec_lang['contact_success']='Danke, dass Sie sich die Zeit genommen haben zu schreiben.';
 // Rock Chute Design (Robinson, Rice & Kadavy 1998). Prefix rc_.
-$ec_lang['u_m2ps']='m^2/s';
-$ec_lang['u_ft2ps']='cfs/ft';
 $ec_lang['rc_main_menu']='Steingerinne-Bemessung (Robinson)';
 $ec_lang['rc_main_title']='Kostenloser Online-Rechner für Steingerinne-Bemessung — Robinson (1998)';
 $ec_lang['rc_main_desc']='Steingerinne Bruchsteinbemessung — Robinson, Rice & Kadavy (1998)';
@@ -475,18 +483,3 @@ $ec_lang['rc_sketch_filter']          = 'Filter';
 $ec_lang['rc_sketch_top_crest_curve'] = 'Einlaufkurve';
 $ec_lang['rc_sketch_outlet_apron']    = 'Auslaufschürze';
 $ec_lang['rc_sketch_radius']          = 'Radius';
-// Manning Trapezoid — velocity check (missing keys)
-$ec_lang['mtc_vel_check']='Geschwindigkeitsprüfung';
-$ec_lang['mtc_vel_ok']='Geschwindigkeit plausibel für Gleichströmungsannahmen.';
-$ec_lang['mtc_vel_ok_short']='OK';
-$ec_lang['mtc_vel_high']='Geschwindigkeit hoch – Übergangsverluste und verfügbare Energie prüfen.';
-$ec_lang['mtc_vel_high_short']='Hoch';
-$ec_lang['mtc_vel_low']='Geschwindigkeit niedrig – Sedimentationsrisiko.';
-$ec_lang['mtc_vel_low_short']='Niedrig';
-$ec_lang['mtc_note_2_term']='Geschwindigkeitsprüfung';
-$ec_lang['mtc_note_2_def']='Hohe Geschwindigkeit impliziert hohe spezifische Energie aus einem verfügbaren Absturz. Diese Energie kann schnell an Aufweitungen, Bögen oder Hindernissen abgebaut werden. Prüfen Sie, ob dies für den Standort plausibel ist.';
-// Micro-Hydro Power — missing notes
-$ec_lang['mhp_notes_6_term']='Wirkungsgrad';
-$ec_lang['mhp_notes_6_def']='Der typische Anlagenwirkungsgrad &eta; liegt für Pelton- und Durchströmturbinen, die in der Mikro-Wasserkraft verbreitet sind, zwischen 0,70 und 0,85. Als konservativen Anfangswert 0,75 verwenden.';
-$ec_lang['mhp_notes_7_term']='Jahresenergie';
-$ec_lang['mhp_notes_7_def']='Die Jahresenergie setzt einen kontinuierlichen Vollbetrieb voraus (8760 Stunden/Jahr). Die tatsächliche Produktion ist aufgrund saisonaler Durchflussschwankungen, Wartungsausfallzeiten und des Lastfaktors geringer.';

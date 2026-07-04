@@ -36,6 +36,10 @@ $ec_lang['u_pa']='Pa';
 $ec_lang['u_psf']='psf';
 $ec_lang['u_psi']='psi';
 $ec_lang['u_s']='सेकंड';
+$ec_lang['u_lph']="L/hr";
+$ec_lang['u_gph']="gal/hr";
+$ec_lang['u_mmph']="mm/hr";
+$ec_lang['u_inph']="in/hr";
 $ec_lang['u_acft']='एकड़-फुट';
 $ec_lang['u_ft3']='ft^3';
 $ec_lang['u_m3']='मी^3';
@@ -44,6 +48,8 @@ $ec_lang['u_mw']='MW';
 $ec_lang['u_kwh_yr']='kWh/yr';
 $ec_lang['u_mwh_yr']='MWh/yr';
 $ec_lang['u_hp']='hp';
+$ec_lang['u_m2ps']='m^2/s';
+$ec_lang['u_ft2ps']='cfs/ft';
 
 // Page text
 // In page order for easiest maintenance.
@@ -184,8 +190,16 @@ $ec_lang['mtc_d50_z1']='पार्श्व ढलान 1 के लिए �
 $ec_lang['mtc_d50_z2']='पार्श्व ढलान 2 के लिए आवश्यक कोणीय चट्टान आकार, D50 (Isbash और MC) <span title="Isbash (1936) और Maricopa County, Arizona, US के अनुसार।" style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['mtc_d50_mra']='आवश्यक कोणीय चट्टान आकार, D50 (Maynord, Ruff और Abt 1989)';
 $ec_lang['mtc_d50_searcy']='आवश्यक कोणीय चट्टान आकार, D50 (Searcy 1967)';
+$ec_lang['mtc_vel_check']='वेग जाँच';
+$ec_lang['mtc_vel_ok']='वेग एकसमान प्रवाह मान्यताओं के लिए उचित है।';
+$ec_lang['mtc_vel_high']='वेग अधिक है - संक्रमण हानियाँ और उपलब्ध ऊर्जा जाँचें।';
+$ec_lang['mtc_vel_low']='वेग कम है — अवसादन का जोखिम।';
+$ec_lang['mtc_vel_ok_short']='ठीक';
+$ec_lang['mtc_vel_high_short']='उच्च';
+$ec_lang['mtc_vel_low_short']='कम';
 $ec_lang['mtc_note_1']='<dl><dt>स्वचालित चट्टान आकार और खुरदरापन डिज़ाइन पुनरावृत्ति</dt><dd>एक खुरदरापन रेडियो बटन (BB अनुशंसित) और एक डिज़ाइन चट्टान आकार रेडियो बटन (Isbash अनुशंसित) चुनें। समान चट्टान आकार के साथ अपना वांछित प्रवाह पाने के लिए गहराई और चट्टान आकार सुरक्षा कारक को सूक्ष्म-समायोजित करें। हर बार जब आप कोई इनपुट मूल्य बदलते हैं, तो निम्नलिखित पुनरावृत्ति चक्र होता है: 1. डिज़ाइन चट्टान आकार से खुरदरापन की गणना की जाती है। 2. अनुरोधित खुरदरापन गणना इनपुट खुरदरापन में कॉपी की जाती है। 3. नाली प्रवाह और आवश्यक चट्टान आकार की गणना की जाती है। 4. डिज़ाइन चट्टान आकार समायोजित किया जाता है। 5. डिज़ाइन चट्टान आकार में त्रुटि बहुत छोटी होने तक दोहराएँ।</dd><dt>बुनियादी कैलकुलेटर (पुनरावृत्ति के बिना)</dt><dd>अपना वांछित खुरदरापन मूल्य दर्ज करें। डिज़ाइन चट्टान आकार इनपुट क्षेत्र को अनदेखा करें।</dd></dl>';
-// Robinson Rock Chute
+$ec_lang['mtc_note_2_term']='वेग जाँच';
+$ec_lang['mtc_note_2_def']='उच्च वेग उपलब्ध ड्रॉप से उच्च विशिष्ट ऊर्जा का संकेत देता है। वह ऊर्जा विस्तारों, मोड़ों या बाधाओं पर शीघ्र नष्ट हो सकती है। सत्यापित करें कि यह स्थल के लिए उचित है।';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='सरल वीयर प्रवाह';
 $ec_lang['ws_main_title']='मुफ़्त ऑनलाइन सरल चौड़ी-शिखर वीयर प्रवाह कैलकुलेटर';
@@ -240,56 +254,6 @@ $ec_lang['or_notes_3_term']='निर्वहन गुणांक';
 $ec_lang['or_notes_3_def']='तीखे-किनारे वाले छिद्रों के लिए C<sub>d</sub> लगभग 0.60–0.65 तक होता है। गोलाकार या पुनः-प्रवेशी इनलेट अलग मूल्य उपयोग करते हैं। मार्गदर्शन के लिए <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venture-d_590.html">Engineering Toolbox</a> या HEC-RAS हाइड्रॉलिक संदर्भ मैनुअल देखें।';
 $ec_lang['or_notes_4_term']='जलमग्नता';
 $ec_lang['or_notes_4_def']='जब TWE उद्घाटन इनवर्ट के ऊपर हो, तो यह कैलकुलेटर स्वचालित रूप से h = HWE − TWE का उपयोग करके जलमग्न छिद्र समीकरण लागू करता है। जब TWE इनवर्ट पर या उससे नीचे हो, तो स्वतंत्र निकास माना जाता है और h = HWE − केन्द्रक।';
-// Orifice Drain Time
-$ec_lang['odt_main_menu']='छिद्र निकासी समय';
-$ec_lang['odt_main_title']='मुफ़्त ऑनलाइन छिद्र निकासी समय कैलकुलेटर — तालाब, बेसिन या टंकी';
-$ec_lang['odt_main_desc']='तालाब या बेसिन छिद्र निकासी समय — शंक्वाकार आयतन विधि';
-$ec_lang['odt_h1_elev']='शुरुआती WSE <span title="Starting water surface elevation" class="ec-tip">?</span>';
-$ec_lang['odt_a1']='शुरुआती क्षेत्र, A<sub>1</sub>';
-$ec_lang['odt_h2_elev']='अंतिम WSE';
-$ec_lang['odt_h_orifice']='छिद्र केन्द्रक स्तर';
-$ec_lang['odt_a0']='छिद्र-स्तर क्षेत्र, A<sub>0</sub>';
-$ec_lang['odt_a_ending']='अंतिम क्षेत्र, A<sub>2</sub> <span title="Interpolated from conic model at ending elevation" class="ec-tip">?</span>';
-$ec_lang['odt_h2_check']='अंतिम स्तर जाँच';
-$ec_lang['odt_h2_ok']='अंतिम स्तर छिद्र शिखर के ऊपर ✓';
-$ec_lang['odt_h2_warn']='चेतावनी: अंतिम स्तर छिद्र शिखर पर या उससे नीचे (केन्द्रक + D/2)';
-$ec_lang['odt_d']='छिद्र D <span title="Diameter (circular) or height (rectangular)" class="ec-tip">?</span>';
-$ec_lang['odt_w']='छिद्र चौड़ाई, W <span title="Rectangular only" class="ec-tip">?</span>';
-$ec_lang['odt_t_sec']='निकासी समय (s)';
-$ec_lang['odt_t_min']='निकासी समय (min)';
-$ec_lang['odt_t_hr']='निकासी समय (hr)';
-$ec_lang['odt_t_day']='निकासी समय (days)';
-$ec_lang['odt_notes_1_term']='सूत्र';
-$ec_lang['odt_notes_1_def']='t = √H<sub>1</sub> / (C<sub>d</sub> A<sub>or</sub> √(2g)) × (2A<sub>x</sub>/5 + 8√(A<sub>x</sub>A<sub>0</sub>)/15 + 16A<sub>0</sub>/15) शीर्ष H से छिद्र तक निकासी समय देता है। निकासी समय = t(H<sub>1</sub>,A<sub>1</sub>,A<sub>0</sub>) − t(H<sub>2</sub>,A<sub>2</sub>,A<sub>0</sub>), जहाँ H<sub>1</sub> = प्रारंभिक स्तर − छिद्र स्तर, H<sub>2</sub> = अंतिम स्तर − छिद्र स्तर।';
-$ec_lang['odt_notes_2_term']='विधि';
-$ec_lang['odt_notes_2_def']='शंक्वाकार आयतन विधि तालाब या बेसिन को प्रारंभिक जल सतह पर A<sub>1</sub> और छिद्र केन्द्रक स्तर पर A<sub>0</sub> के बीच एक शंक्वाकार खंड के रूप में मॉडल करती है। A<sub>2</sub>, अंतिम स्तर पर तालाब का क्षेत्रफल, शंक्वाकार खंड मॉडल का उपयोग करके A<sub>1</sub> और A<sub>0</sub> से प्रक्षेपित किया जाता है। प्रारंभिक से अंतिम स्तर तक निकासी समय H<sub>1</sub> से छिद्र तक कुल निकासी समय से H<sub>2</sub> से छिद्र तक शेष निकासी समय घटाने के बराबर है।';
-$ec_lang['odt_h1']='शुरुआती हेड, H<sub>1</sub> <span title="Starting WSE minus orifice centroid elevation" class="ec-tip">?</span>';
-$ec_lang['odt_q_max']='अधिकतम प्रवाह, Q<sub>max</sub>';
-$ec_lang['odt_vol']='निकाला गया आयतन';
-$ec_lang['odt_sketch_start']='प्रारंभ';
-$ec_lang['odt_sketch_end']='अंत';
-// Erosion Setback and Scour Calc.
-$ec_lang['essc_btbw']='तट से तट चौड़ाई';
-$ec_lang['essc_mcr']='न्यूनतम वक्र त्रिज्या';
-$ec_lang['essc_q']='प्रवाह, Q';
-// Contact us.
-
-// Irrigation
-$ec_lang['irr_main_menu']='सिंचाई प्रवाह मापन';
-$ec_lang['irr_main_title']='मुफ्त ऑनलाइन सिंचाई प्रवाह मापन कैलकुलेटर';
-$ec_lang['irr_main_desc']='सिंचाई प्रवाह मापन — वियर और ओरिफिस';
-$ec_lang['contact_title']='HawsEDC संपर्क';
-$ec_lang['contactSendMessage']='Tom Haws को संदेश भेजें';
-$ec_lang['contactYourName']='आपका नाम:';
-$ec_lang['contactYourEmail']='आपका ई-मेल पता:';
-$ec_lang['contactSubject']='विषय:';
-$ec_lang['contact_message']='संदेश:';
-$ec_lang['contactSpamPrefix']='पाँच जमा एक बराबर';
-$ec_lang['contactSpamPostfix']='(कृपया अंग्रेज़ी में लिखें। 1=one 2=two 3=three 4=four 5=five 6=six 7=seven +=plus 5+1=6)';
-$ec_lang['contactSubmitButton']='संदेश भेजें';
-$ec_lang['contact_success']='आपका समय लेने के लिए धन्यवाद।';
-
-
 // Micro-Hydro Power
 $ec_lang['mhp_main_menu']='माइक्रो-हाइड्रो पावर';
 $ec_lang['mhp_main_title']='निःशुल्क ऑनलाइन माइक्रो-हाइड्रो पावर कैलकुलेटर';
@@ -331,21 +295,64 @@ $ec_lang['mhp_notes_4_term']='अल्प हानियाँ k<sub>m</sub>';
 $ec_lang['mhp_notes_4_def']='विशिष्ट मूल्य: तीक्ष्ण प्रवेश 0.5, प्रत्येक 45° मोड़ 0.2–0.3, गेट वाल्व (पूर्ण खुला) 0.1, बटरफ्लाई वाल्व 0.2। सभी फिटिंग्स का योग कुल k<sub>m</sub> है। डिफ़ॉल्ट 1.5 एक प्रवेश और दो मोड़ मानता है।';
 $ec_lang['mhp_notes_5_term']='पाइप खुरदरापन e';
 $ec_lang['mhp_notes_5_def']='सामान्य पूर्ण खुरदरापन: इस्पात (नया) 0.046 mm, इस्पात (पुराना) 0.15 mm, HDPE 0.003 mm, PVC/uPVC 0.0015 mm, कंक्रीट 0.3–3 mm। HDPE छोटे माइक्रो-हाइड्रो पेनस्टॉक में आम है।';
+$ec_lang['mhp_notes_6_term']='दक्षता';
+$ec_lang['mhp_notes_6_def']='सामान्य प्लांट दक्षता η माइक्रो-हाइड्रो में प्रचलित Pelton और क्रॉस-फ्लो टरबाइनों के लिए 0.70 से 0.85 तक होती है। एक रूढ़िवादी प्रथम अनुमान के रूप में 0.75 का उपयोग करें।';
+$ec_lang['mhp_notes_7_term']='वार्षिक ऊर्जा';
+$ec_lang['mhp_notes_7_def']='वार्षिक ऊर्जा निरंतर पूर्ण-प्रवाह संचालन (8760 घंटे/वर्ष) को मानती है। मौसमी प्रवाह भिन्नता, रखरखाव डाउनटाइम और लोड फैक्टर के कारण वास्तविक उत्पादन कम होगा।';
 
-// About
-$ec_lang['about_main_menu']='के बारे में';
-$ec_lang['install_main_menu']='इंस्टॉल करें';
-$ec_lang['install_main_title']='EngCalcs इंस्टॉल करें';
-$ec_lang['install_main_desc']='ऑफ़लाइन उपयोग के लिए अपने डिवाइस में जोड़ें';
-$ec_lang['contact_main_menu']='संपर्क';
-$ec_lang['about_main_title']='HawsEDC इंजीनियरिंग कैलकुलेटर के बारे में';
-$ec_lang['about_main_desc']='मिशन, ओपन सोर्स और योगदान';
+// Orifice Drain Time
+$ec_lang['odt_main_menu']='छिद्र निकासी समय';
+$ec_lang['odt_main_title']='मुफ़्त ऑनलाइन छिद्र निकासी समय कैलकुलेटर — तालाब, बेसिन या टंकी';
+$ec_lang['odt_main_desc']='तालाब या बेसिन छिद्र निकासी समय — शंक्वाकार आयतन विधि';
+$ec_lang['odt_h1_elev']='शुरुआती WSE <span title="Starting water surface elevation" class="ec-tip">?</span>';
+$ec_lang['odt_a1']='शुरुआती क्षेत्र, A<sub>1</sub>';
+$ec_lang['odt_h2_elev']='अंतिम WSE';
+$ec_lang['odt_h_orifice']='छिद्र केन्द्रक स्तर';
+$ec_lang['odt_a0']='छिद्र-स्तर क्षेत्र, A<sub>0</sub>';
+$ec_lang['odt_a_ending']='अंतिम क्षेत्र, A<sub>2</sub> <span title="Interpolated from conic model at ending elevation" class="ec-tip">?</span>';
+$ec_lang['odt_h2_check']='अंतिम स्तर जाँच';
+$ec_lang['odt_h2_ok']='अंतिम स्तर छिद्र शिखर के ऊपर ✓';
+$ec_lang['odt_h2_warn']='चेतावनी: अंतिम स्तर छिद्र शिखर पर या उससे नीचे (केन्द्रक + D/2)';
+$ec_lang['odt_d']='छिद्र D <span title="Diameter (circular) or height (rectangular)" class="ec-tip">?</span>';
+$ec_lang['odt_w']='छिद्र चौड़ाई, W <span title="Rectangular only" class="ec-tip">?</span>';
+$ec_lang['odt_t_sec']='निकासी समय (s)';
+$ec_lang['odt_t_min']='निकासी समय (min)';
+$ec_lang['odt_t_hr']='निकासी समय (hr)';
+$ec_lang['odt_t_day']='निकासी समय (days)';
+$ec_lang['odt_notes_1_term']='सूत्र';
+$ec_lang['odt_notes_1_def']='t = √H<sub>1</sub> / (C<sub>d</sub> A<sub>or</sub> √(2g)) × (2A<sub>x</sub>/5 + 8√(A<sub>x</sub>A<sub>0</sub>)/15 + 16A<sub>0</sub>/15) शीर्ष H से छिद्र तक निकासी समय देता है। निकासी समय = t(H<sub>1</sub>,A<sub>1</sub>,A<sub>0</sub>) − t(H<sub>2</sub>,A<sub>2</sub>,A<sub>0</sub>), जहाँ H<sub>1</sub> = प्रारंभिक स्तर − छिद्र स्तर, H<sub>2</sub> = अंतिम स्तर − छिद्र स्तर।';
+$ec_lang['odt_notes_2_term']='विधि';
+$ec_lang['odt_notes_2_def']='शंक्वाकार आयतन विधि तालाब या बेसिन को प्रारंभिक जल सतह पर A<sub>1</sub> और छिद्र केन्द्रक स्तर पर A<sub>0</sub> के बीच एक शंक्वाकार खंड के रूप में मॉडल करती है। A<sub>2</sub>, अंतिम स्तर पर तालाब का क्षेत्रफल, शंक्वाकार खंड मॉडल का उपयोग करके A<sub>1</sub> और A<sub>0</sub> से प्रक्षेपित किया जाता है। प्रारंभिक से अंतिम स्तर तक निकासी समय H<sub>1</sub> से छिद्र तक कुल निकासी समय से H<sub>2</sub> से छिद्र तक शेष निकासी समय घटाने के बराबर है।';
+$ec_lang['odt_h1']='शुरुआती हेड, H<sub>1</sub> <span title="Starting WSE minus orifice centroid elevation" class="ec-tip">?</span>';
+$ec_lang['odt_q_max']='अधिकतम प्रवाह, Q<sub>max</sub>';
+$ec_lang['odt_vol']='निकाला गया आयतन';
+$ec_lang['odt_sketch_start']='प्रारंभ';
+$ec_lang['odt_sketch_end']='अंत';
+// Erosion Setback and Scour Calc.
+$ec_lang['essc_btbw']='तट से तट चौड़ाई';
+$ec_lang['essc_mcr']='न्यूनतम वक्र त्रिज्या';
+$ec_lang['essc_q']='प्रवाह, Q';
+// Contact us.
 
+// Irrigation
+$ec_lang['irr_main_menu']='सिंचाई प्रवाह मापन';
+$ec_lang['irr_main_title']='मुफ्त ऑनलाइन सिंचाई प्रवाह मापन कैलकुलेटर';
+$ec_lang['irr_main_desc']='सिंचाई प्रवाह मापन — वियर और ओरिफिस';
+$ec_lang['irr_intro_html']='<p>वियर और ऑरिफिस सिंचाई प्रणालियों में जल प्रवाह मापने के मानक क्षेत्रीय उपकरण हैं। अपनी संरचना से मेल खाने वाला कैलकुलेटर चुनें:</p>';
+$ec_lang['irr_card_weir_uniform_head']='वियर — चौड़ी क्रेस्ट (एकसमान चौड़ाई)';
+$ec_lang['irr_card_weir_uniform_desc']='डायवर्जन डैम क्रेस्ट, चेक स्ट्रक्चर या वियर बोर्ड पर प्रवाह मापें। वियर की लंबाई और क्रेस्ट से ऊपर जल की गहराई दर्ज करें।';
+$ec_lang['irr_card_weir_irregular_head']='वियर — अनियमित प्रोफाइल';
+$ec_lang['irr_card_weir_irregular_desc']='तब उपयोग करें जब वियर क्रेस्ट एक समान ऊँचाई पर न हो — प्राकृतिक स्पिलवे, परिवर्तनीय चौड़ाई वाले ड्रॉप स्ट्रक्चर, या बहु-खंड नियंत्रण संरचनाएं।';
+$ec_lang['irr_card_orifice_head']='ऑरिफिस — हेडगेट या पाइप टर्नआउट';
+$ec_lang['irr_card_orifice_desc']='स्लुइस गेट, पाइप टर्नआउट या कल्वर्ट ओपनिंग से प्रवाह मापें। स्वतः ही मुक्त प्रवाह और जलमग्न (टेलवाटर) दोनों स्थितियों को संभालता है।';
+$ec_lang['irr_card_canal_head']='नहर डिज़ाइन & विश्लेषण';
+$ec_lang['irr_card_canal_desc']='Manning\'s सूत्र का उपयोग करके सिंचाई नहर डिज़ाइन या जाँच करें। नए चैनलों के लिए ट्रेपेज़ॉइडल कैलकुलेटर; मौजूदा प्राकृतिक या निर्मित खंडों के लिए अनियमित कैलकुलेटर।';
+$ec_lang['irr_card_drip_head']='ड्रिप & स्प्रिंकलर डिज़ाइन';
+$ec_lang['irr_card_drip_desc']='ड्रिप या स्प्रिंकलर सिंचाई प्रणाली के लिए एप्लीकेशन दर, वितरण एकरूपता, लेटरल प्रवाह, ज़ोन प्रवाह और रनटाइम की गणना करें। एमिटर प्रवाह, एमिटर स्पेसिंग और लक्ष्य गहराई दर्ज करें।';
+$ec_lang['irr_card_seepage_head']='नहर रिसाव & संवहन दक्षता';
+$ec_lang['irr_card_seepage_desc']='अंतर्वाह और बहिर्वाह माप का उपयोग करके नहर पहुँच से रिसाव हानि का अनुमान लगाएं। संवहन दक्षता और वार्षिक जल हानि की गणना करें ताकि अस्तर निवेश को प्राथमिकता देने में सहायता मिले।';
+$ec_lang['irr_quickref_html']='<h3>त्वरित संदर्भ</h3><dl><dt>डायवर्जन डैम या चेक स्ट्रक्चर</dt><dd>वियर क्रेस्ट के ऊपर जल की गहराई मापें। एकसमान क्रेस्ट के लिए <a href="Weir-Flow-Simple.php">वियर फ्लो सिम्पल</a> और प्रोफाइल्ड या स्टेप्ड क्रेस्ट के लिए <a href="Weir-Flow-Irregular.php">वियर फ्लो इरेगुलर</a> उपयोग करें।</dd><dt>हेडगेट या पाइप टर्नआउट</dt><dd>अपस्ट्रीम और डाउनस्ट्रीम जल स्तर मापें (या मुक्त प्रवाह हो तो इनवर्ट ऊँचाई)। <a href="Orifice.php">ऑरिफिस फ्लो</a> उपयोग करें। वृत्ताकार पाइप के लिए D = पाइप व्यास; आयताकार गेट के लिए चौड़ाई W और ऊँचाई D दर्ज करें।</dd><dt>जलाशय या तालाब खाली होने का समय</dt><dd>तले के ऑरिफिस से तालाब या जलाशय का स्तर कम होने में लगने वाले समय का अनुमान लगाने के लिए <a href="Orifice-Drain-Time.php">ऑरिफिस ड्रेन टाइम</a> उपयोग करें — सिंचाई भंडारण योजना के लिए उपयोगी।</dd><dt>क्षेत्रीय मानक</dt><dd>यहाँ उपयोग किए गए वियर और ऑरिफिस प्रवाह समीकरण USBR <em>Water Measurement Manual</em> (तीसरा संस्करण) की प्रक्रियाओं के अनुसार हैं, जो जल प्रबंधकों और सिंचाई जिलों द्वारा सामान्यतः आवश्यक होते हैं।</dd></dl>';
 // Drip / Sprinkler Application Rate
-$ec_lang['u_lph']="L/hr";
-$ec_lang['u_gph']="gal/hr";
-$ec_lang['u_mmph']="mm/hr";
-$ec_lang['u_inph']="in/hr";
 $ec_lang['ds_main_menu']='ड्रिप/स्प्रिंकलर सिंचाई दर';
 $ec_lang['ds_main_title']='निःशुल्क ऑनलाइन ड्रिप/स्प्रिंकलर सिंचाई अनुप्रयोग दर कैलकुलेटर';
 $ec_lang['ds_main_desc']='ड्रिप और स्प्रिंकलर सिंचाई — अनुप्रयोग दर';
@@ -364,13 +371,14 @@ $ec_lang['ds_notes_1_term']='अनुप्रयोग दर';
 $ec_lang['ds_notes_1_def']='PR = q / A<sub>e</sub>, जहाँ A<sub>e</sub> = S<sub>e</sub> × S<sub>l</sub> प्रत्येक एमिटर द्वारा सेवित क्षेत्र है। कम अनुप्रयोग दर से अंतःस्यंदन के लिए अधिक समय मिलता है — भारी मिट्टी या ढलान वाले खेतों में महत्वपूर्ण।';
 $ec_lang['ds_notes_2_term']='रनटाइम';
 $ec_lang['ds_notes_2_def']='रनटाइम = लक्ष्य गहराई ÷ अनुप्रयोग दर। ढलान वाली या संकुचित मिट्टी पर, रनटाइम को दो या तीन छोटे चक्रों में विभाजित करें।';
-
 // Canal Seepage / Conveyance Efficiency. Prefix cs_.
 $ec_lang['cs_main_menu']='नहर रिसाव';
 $ec_lang['cs_main_title']='निःशुल्क ऑनलाइन नहर रिसाव हानि और संवहन दक्षता कैलकुलेटर';
 $ec_lang['cs_main_desc']='नहर रिसाव हानि & संवहन दक्षता — अंतर्वाह-बहिर्वाह विधि';
 $ec_lang['cs_Q_in']='अंतर्वाह, Q<sub>in</sub>';
 $ec_lang['cs_Q_out']='बहिर्वाह, Q<sub>out</sub>';
+$ec_lang['cs_L']='पहुँच की लंबाई, L';
+$ec_lang['cs_wp']='भीगी परिधि, P<sub>w</sub>';
 $ec_lang['cs_Q_loss']='रिसाव हानि दर, Q<sub>loss</sub>';
 $ec_lang['cs_loss_check']='माप जाँच';
 $ec_lang['cs_pct_loss']='खोई हुई भिन्न';
@@ -378,8 +386,6 @@ $ec_lang['cs_Ec']='संवहन दक्षता, E<sub>c</sub>';
 $ec_lang['cs_Ec_check']='दक्षता रेटिंग';
 $ec_lang['cs_Vol_day']='दैनिक खोया आयतन';
 $ec_lang['cs_Vol_year']='वार्षिक खोया आयतन';
-$ec_lang['cs_L']='पहुँच की लंबाई, L';
-$ec_lang['cs_wp']='भीगी परिधि, P<sub>w</sub>';
 $ec_lang['cs_Q_loss_per_L']='हानि प्रति लंबाई, Q<sub>loss</sub>/L';
 $ec_lang['cs_water_value']='जल मूल्य';
 $ec_lang['cs_lining_cost']='अस्तर लागत';
@@ -403,26 +409,26 @@ $ec_lang['cs_notes_3_term']='अस्तर चुकौती';
 $ec_lang['cs_notes_3_def']='जल मूल्य और अस्तर लागत को किसी भी सुसंगत मुद्रा में दर्ज करें। अस्तर क्षेत्र = पहुँच की लंबाई × भीगी परिधि — मापी गई प्रवाह गहराई पर नहर क्रॉस-सेक्शन की भीगी परिधि (तल की चौड़ाई प्लस दोनों भीगी ढलानें)। वसूल किया गया वार्षिक मूल्य मानता है कि अस्तर नहर लक्ष्य E<sub>c</sub> को निरंतर प्राप्त करती है। यदि अस्तर लक्ष्य दक्षता तक नहीं पहुँचता या नहरें मौसमी होती हैं, तो वास्तविक चुकौती अवधि अधिक होगी।';
 $ec_lang['cs_notes_4_term']='संदर्भ';
 $ec_lang['cs_notes_4_def']='USBR <em>Water Measurement Manual</em>, 3rd ed. (2001)। FAO Irrigation and Drainage Paper 57 (1999)।';
-
-$ec_lang['irr_intro_html']='<p>वियर और ऑरिफिस सिंचाई प्रणालियों में जल प्रवाह मापने के मानक क्षेत्रीय उपकरण हैं। अपनी संरचना से मेल खाने वाला कैलकुलेटर चुनें:</p>';
-$ec_lang['irr_card_weir_uniform_head']='वियर — चौड़ी क्रेस्ट (एकसमान चौड़ाई)';
-$ec_lang['irr_card_weir_uniform_desc']='डायवर्जन डैम क्रेस्ट, चेक स्ट्रक्चर या वियर बोर्ड पर प्रवाह मापें। वियर की लंबाई और क्रेस्ट से ऊपर जल की गहराई दर्ज करें।';
-$ec_lang['irr_card_weir_irregular_head']='वियर — अनियमित प्रोफाइल';
-$ec_lang['irr_card_weir_irregular_desc']='तब उपयोग करें जब वियर क्रेस्ट एक समान ऊँचाई पर न हो — प्राकृतिक स्पिलवे, परिवर्तनीय चौड़ाई वाले ड्रॉप स्ट्रक्चर, या बहु-खंड नियंत्रण संरचनाएं।';
-$ec_lang['irr_card_orifice_head']='ऑरिफिस — हेडगेट या पाइप टर्नआउट';
-$ec_lang['irr_card_orifice_desc']='स्लुइस गेट, पाइप टर्नआउट या कल्वर्ट ओपनिंग से प्रवाह मापें। स्वतः ही मुक्त प्रवाह और जलमग्न (टेलवाटर) दोनों स्थितियों को संभालता है।';
-$ec_lang['irr_card_canal_head']='नहर डिज़ाइन & विश्लेषण';
-$ec_lang['irr_card_canal_desc']='Manning\'s सूत्र का उपयोग करके सिंचाई नहर डिज़ाइन या जाँच करें। नए चैनलों के लिए ट्रेपेज़ॉइडल कैलकुलेटर; मौजूदा प्राकृतिक या निर्मित खंडों के लिए अनियमित कैलकुलेटर।';
-$ec_lang['irr_card_drip_head']='ड्रिप & स्प्रिंकलर डिज़ाइन';
-$ec_lang['irr_card_drip_desc']='ड्रिप या स्प्रिंकलर सिंचाई प्रणाली के लिए एप्लीकेशन दर, वितरण एकरूपता, लेटरल प्रवाह, ज़ोन प्रवाह और रनटाइम की गणना करें। एमिटर प्रवाह, एमिटर स्पेसिंग और लक्ष्य गहराई दर्ज करें।';
-$ec_lang['irr_card_seepage_head']='नहर रिसाव & संवहन दक्षता';
-$ec_lang['irr_card_seepage_desc']='अंतर्वाह और बहिर्वाह माप का उपयोग करके नहर पहुँच से रिसाव हानि का अनुमान लगाएं। संवहन दक्षता और वार्षिक जल हानि की गणना करें ताकि अस्तर निवेश को प्राथमिकता देने में सहायता मिले।';
-$ec_lang['irr_quickref_html']='<h3>त्वरित संदर्भ</h3><dl><dt>डायवर्जन डैम या चेक स्ट्रक्चर</dt><dd>वियर क्रेस्ट के ऊपर जल की गहराई मापें। एकसमान क्रेस्ट के लिए <a href="Weir-Flow-Simple.php">वियर फ्लो सिम्पल</a> और प्रोफाइल्ड या स्टेप्ड क्रेस्ट के लिए <a href="Weir-Flow-Irregular.php">वियर फ्लो इरेगुलर</a> उपयोग करें।</dd><dt>हेडगेट या पाइप टर्नआउट</dt><dd>अपस्ट्रीम और डाउनस्ट्रीम जल स्तर मापें (या मुक्त प्रवाह हो तो इनवर्ट ऊँचाई)। <a href="Orifice.php">ऑरिफिस फ्लो</a> उपयोग करें। वृत्ताकार पाइप के लिए D = पाइप व्यास; आयताकार गेट के लिए चौड़ाई W और ऊँचाई D दर्ज करें।</dd><dt>जलाशय या तालाब खाली होने का समय</dt><dd>तले के ऑरिफिस से तालाब या जलाशय का स्तर कम होने में लगने वाले समय का अनुमान लगाने के लिए <a href="Orifice-Drain-Time.php">ऑरिफिस ड्रेन टाइम</a> उपयोग करें — सिंचाई भंडारण योजना के लिए उपयोगी।</dd><dt>क्षेत्रीय मानक</dt><dd>यहाँ उपयोग किए गए वियर और ऑरिफिस प्रवाह समीकरण USBR <em>Water Measurement Manual</em> (तीसरा संस्करण) की प्रक्रियाओं के अनुसार हैं, जो जल प्रबंधकों और सिंचाई जिलों द्वारा सामान्यतः आवश्यक होते हैं।</dd></dl>';
+// About
+$ec_lang['about_main_menu']='के बारे में';
+$ec_lang['install_main_menu']='इंस्टॉल करें';
+$ec_lang['install_main_title']='EngCalcs इंस्टॉल करें';
+$ec_lang['install_main_desc']='ऑफ़लाइन उपयोग के लिए अपने डिवाइस में जोड़ें';
+$ec_lang['contact_main_menu']='संपर्क';
+$ec_lang['about_main_title']='HawsEDC इंजीनियरिंग कैलकुलेटर के बारे में';
+$ec_lang['about_main_desc']='मिशन, ओपन सोर्स और योगदान';
 $ec_lang['about_body_html']='<h3>मिशन</h3><p>HawsEDC इंजीनियरिंग कैलकुलेटर दुनिया भर के इंजीनियरों और क्षेत्रीय कार्यकर्ताओं की सेवा के लिए हैं — विशेषकर उन लोगों के लिए जो जल-संकटग्रस्त, संसाधन-सीमित या वंचित क्षेत्रों में काम करते हैं। ये उपकरण एक व्यापक मानवीय मिशन का हिस्सा हैं: हर इंसान को सबसे व्यावहारिक और प्रभावी तरीके से यह बताना कि वे हमेशा के लिए प्यार किए गए और संजोए गए हैं, कि उन्हें डरने की कोई जरूरत नहीं, और वे सब कुछ बर्बाद नहीं करेंगे।</p><p>कैलकुलेटर साधन हैं। गंतव्य एक कष्ट-मुक्त संसार है।</p><h3>ओपन सोर्स लाइसेंस</h3><p>सभी कोड <a target="_blank" href="https://www.gnu.org/licenses/gpl-3.0.html">GNU General Public License v3.0 या बाद के संस्करण</a> के तहत जारी किया गया है — स्वतंत्रता की भावना में मुक्त। आप कोड को उन्हीं शर्तों के तहत उपयोग, अध्ययन, संशोधन और पुनर्वितरित कर सकते हैं।</p><p>Copyright © 2009–2026 Thomas Gail Haws.</p><h3>सोर्स कोड</h3><p>पूरा सोर्स कोड Bitbucket पर सार्वजनिक रूप से उपलब्ध है:</p><p><a target="_blank" href="https://bitbucket.org/hawstom/engcalcs">bitbucket.org/hawstom/engcalcs</a></p><p>आप वहाँ कोड ब्राउज़ कर सकते हैं, समस्याएँ दर्ज कर सकते हैं, या रिपॉजिटरी फोर्क कर सकते हैं।</p><h3>योगदान</h3><p>Pull requests स्वागत योग्य हैं। योगदान के तरीके:</p><ul><li><strong>अनुवाद</strong> — किसी भाषा में सुधार करें या नई भाषा जोड़ें। संबंधित <code>lib/lang.ec.??.php</code> फ़ाइल में बदलाव के साथ pull request खोलें।</li><li><strong>बग रिपोर्ट</strong> — किसी भी कैलकुलेटर पेज पर फीडबैक फॉर्म का उपयोग करें, या Bitbucket पर समस्या दर्ज करें।</li><li><strong>नए कैलकुलेटर</strong> — हाइड्रोलिक इंजीनियरिंग टूल के लिए विचार जो क्षेत्रीय कार्यकर्ताओं और सिंचाई पेशेवरों की सेवा करें, विशेष रूप से स्वागत योग्य हैं। रिपॉजिटरी में <code>CLAUDE.md</code> डेवलपर गाइड देखें।</li><li><strong>होस्टिंग</strong> — यदि आप सीमित कनेक्टिविटी वाले क्षेत्र के लिए इन कैलकुलेटरों को मिरर कर सकते हैं, तो कृपया संपर्क करें।</li></ul><h3>ऑफ़लाइन उपयोग</h3><p>ये कैलकुलेटर एक प्रोग्रेसिव वेब ऐप (PWA) के रूप में काम करते हैं। इंटरनेट से जुड़े होने पर किसी भी कैलकुलेटर पेज पर जाएँ, और आपका ब्राउज़र सभी कैलकुलेटरों को स्वचालित रूप से कैश कर लेगा। उसके बाद, सभी कैलकुलेटर ऑफ़लाइन काम करते हैं — इंटरनेट की आवश्यकता नहीं।</p><p>Android या iOS पर, अपने ब्राउज़र की "होम स्क्रीन में जोड़ें" सुविधा का उपयोग करके EngCalcs को अपने डिवाइस पर एक ऐप के रूप में इंस्टॉल करें। डेस्कटॉप पर, अपने ब्राउज़र के एड्रेस बार में इंस्टॉल आइकन देखें।</p><p>आप अपने ब्राउज़र के "इस रूप में सहेजें…" मेनू का उपयोग करके किसी भी कैलकुलेटर को एकल उपयोग के लिए सहेज भी सकते हैं।</p><h3>संपर्क</h3><p>Tom Haws — हाइड्रोलिक इंजीनियर और इन कैलकुलेटरों के लेखक।<br />किसी भी कैलकुलेटर पेज पर फीडबैक फॉर्म का उपयोग करें, या <a target="_blank" href="https://bitbucket.org/hawstom/engcalcs">Bitbucket</a> पर सोर्स कोड देखें।</p>';
-
+$ec_lang['contact_title']='HawsEDC संपर्क';
+$ec_lang['contactSendMessage']='Tom Haws को संदेश भेजें';
+$ec_lang['contactYourName']='आपका नाम:';
+$ec_lang['contactYourEmail']='आपका ई-मेल पता:';
+$ec_lang['contactSubject']='विषय:';
+$ec_lang['contact_message']='संदेश:';
+$ec_lang['contactSpamPrefix']='पाँच जमा एक बराबर';
+$ec_lang['contactSpamPostfix']='(कृपया अंग्रेज़ी में लिखें। 1=one 2=two 3=three 4=four 5=five 6=six 7=seven +=plus 5+1=6)';
+$ec_lang['contactSubmitButton']='संदेश भेजें';
+$ec_lang['contact_success']='आपका समय लेने के लिए धन्यवाद।';
 // Rock Chute Design (Robinson, Rice & Kadavy 1998). Prefix rc_.
-$ec_lang['u_m2ps']='m^2/s';
-$ec_lang['u_ft2ps']='cfs/ft';
 $ec_lang['rc_main_menu']='रॉक चूट डिज़ाइन (Robinson)';
 $ec_lang['rc_main_title']='मुफ्त ऑनलाइन रॉक चूट डिज़ाइन कैलकुलेटर — Robinson (1998)';
 $ec_lang['rc_main_desc']='रॉक चूट रिपरैप साइज़िंग — Robinson, Rice & Kadavy (1998)';
@@ -478,20 +484,3 @@ $ec_lang['rc_sketch_filter']          = 'फ़िल्टर';
 $ec_lang['rc_sketch_top_crest_curve'] = 'शीर्ष वक्र';
 $ec_lang['rc_sketch_outlet_apron']    = 'निर्गम एप्रन';
 $ec_lang['rc_sketch_radius']          = 'त्रिज्या';
-
-// Manning Trapezoid velocity checks
-$ec_lang['mtc_vel_check']='वेग जाँच';
-$ec_lang['mtc_vel_ok']='वेग एकसमान प्रवाह मान्यताओं के लिए उचित है।';
-$ec_lang['mtc_vel_high']='वेग अधिक है - संक्रमण हानियाँ और उपलब्ध ऊर्जा जाँचें।';
-$ec_lang['mtc_vel_low']='वेग कम है — अवसादन का जोखिम।';
-$ec_lang['mtc_vel_ok_short']='ठीक';
-$ec_lang['mtc_vel_high_short']='उच्च';
-$ec_lang['mtc_vel_low_short']='कम';
-$ec_lang['mtc_note_2_term']='वेग जाँच';
-$ec_lang['mtc_note_2_def']='उच्च वेग उपलब्ध ड्रॉप से उच्च विशिष्ट ऊर्जा का संकेत देता है। वह ऊर्जा विस्तारों, मोड़ों या बाधाओं पर शीघ्र नष्ट हो सकती है। सत्यापित करें कि यह स्थल के लिए उचित है।';
-
-// Micro-Hydro Power additional notes
-$ec_lang['mhp_notes_6_term']='दक्षता';
-$ec_lang['mhp_notes_6_def']='सामान्य प्लांट दक्षता η माइक्रो-हाइड्रो में प्रचलित Pelton और क्रॉस-फ्लो टरबाइनों के लिए 0.70 से 0.85 तक होती है। एक रूढ़िवादी प्रथम अनुमान के रूप में 0.75 का उपयोग करें।';
-$ec_lang['mhp_notes_7_term']='वार्षिक ऊर्जा';
-$ec_lang['mhp_notes_7_def']='वार्षिक ऊर्जा निरंतर पूर्ण-प्रवाह संचालन (8760 घंटे/वर्ष) को मानती है। मौसमी प्रवाह भिन्नता, रखरखाव डाउनटाइम और लोड फैक्टर के कारण वास्तविक उत्पादन कम होगा।';

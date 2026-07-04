@@ -7,9 +7,9 @@ $ec_lang['u_depthFrac']="比例";
 $ec_lang['u_depthPercent']="%";
 $ec_lang['u_ft2']="ft^2";
 $ec_lang['u_ft3ps']="cfs";
+$ec_lang['u_ft']="英尺";
 $ec_lang['u_fth2o']="英尺水柱";
 $ec_lang['u_ftps']="英尺/秒";
-$ec_lang['u_ft']="英尺";
 $ec_lang['u_gpm']="加仑/分钟";
 $ec_lang['u_gradePercent']="% 坡度";
 $ec_lang['u_grade']="坡度";
@@ -35,6 +35,10 @@ $ec_lang['u_pa']="帕";
 $ec_lang['u_psf']="磅/英尺^2";
 $ec_lang['u_psi']="磅/英寸^2";
 $ec_lang['u_s']="秒";
+$ec_lang['u_lph']="L/hr";
+$ec_lang['u_gph']="gal/hr";
+$ec_lang['u_mmph']="mm/hr";
+$ec_lang['u_inph']="in/hr";
 $ec_lang['u_acft']="英亩-英尺";
 $ec_lang['u_ft3']="英尺^3";
 $ec_lang['u_m3']="米^3";
@@ -43,8 +47,12 @@ $ec_lang['u_mw']='MW';
 $ec_lang['u_kwh_yr']='kWh/yr';
 $ec_lang['u_mwh_yr']='MWh/yr';
 $ec_lang['u_hp']='hp';
+$ec_lang['u_m2ps']='m^2/s';
+$ec_lang['u_ft2ps']='cfs/ft';
 
 // Page text
+// In page order for easiest maintenance.
+// Menu and General
 $ec_lang['menu_brand']='HawsEDC 计算器';
 $ec_lang['menu_main_list']='计算器列表';
 $ec_lang['menu_main_hydraulics']='水力学';
@@ -68,7 +76,7 @@ $ec_lang['view_printable']='打印版本（刷新页面可恢复）';
 $ec_lang['ec_name_label']='保存此计算：';
 $ec_lang['ec_name_placeholder']='名称';
 $ec_lang['ec_name_hint']='将这些输入值保存到网址中以便书签、历史记录和分享';
-// Darcy-Weisbach
+// Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='达西-韦斯巴赫管道水头损失';
 $ec_lang['dw_main_title']='免费在线达西-韦斯巴赫管道水头损失计算器';
 $ec_lang['dw_main_desc']='在给定管径、粗糙度和流量条件下的达西-韦斯巴赫管道水头损失';
@@ -81,7 +89,7 @@ $ec_lang['dw_regime_transitional']='过渡流';
 $ec_lang['dw_regime_turbulent']='紊流';
 $ec_lang['dw_friction_factor_method']='摩阻系数计算方法';
 $ec_lang['dw_friction_factor']='摩阻系数，f';
-// Hazen-Williams
+// Hazen-Williams. See mphl_ for missing text.
 $ec_lang['hw_main_menu']='哈森-威廉管道水头损失';
 $ec_lang['hw_main_title']='免费在线哈森-威廉管道水头损失计算器';
 $ec_lang['hw_main_desc']='在给定管径、粗糙度和流量条件下的哈森-威廉管道水头损失';
@@ -145,7 +153,7 @@ $ec_lang['mpf_note_1']='<dl><dt>这是<em>无限长</em>管道内部的流量和
 $ec_lang['mpf_solve_for_dd0']='已知 Q 求 y/d<sub>0</sub>';
 $ec_lang['mpf_solve_desc']='使用计算器表单中的 D<sub>0</sub>、n 和 S<sub>0</sub>，求给定 Q 对应的最小 y/d<sub>0</sub>。';
 $ec_lang['mpf_solve_button']='求解';
-// Manning Pipe Head Loss
+// Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='曼宁管道水头损失';
 $ec_lang['mphl_main_title']='免费在线曼宁管道水头损失计算器';
 $ec_lang['mphl_main_desc']='在给定满流流量条件下的曼宁公式水头损失';
@@ -160,7 +168,7 @@ $ec_lang['mphl_egl_1']='下游能量坡降线';
 $ec_lang['mphl_egl_2']='上游能量坡降线';
 $ec_lang['mphl_hgl_2']='管内上游测压管水头线 ' . $ec_lang['mpf_see_notes'];
 $ec_lang['mphl_note_1']='<dl><dt>对于开口进水口（涵洞）情况，需检验进口控制条件。</dt><dd>1. 上游测压管水头线不得低于上游正常水深处高程（也不得低于管顶！）。</dd><dd>2. 涵洞水位更宜用上游能量坡降线而非测压管水头线表示。</dd><dd>3. <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">参见 2 分钟教程</a>，了解使用 HY-8 进行简单标准涵洞水位计算的方法。</dd>';
-// Manning Trapezoid
+// Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='曼宁梯形渠道';
 $ec_lang['mtc_main_title']='免费在线曼宁公式梯形渠道计算器';
 $ec_lang['mtc_main_desc']='在给定坡度和水深条件下的曼宁公式均匀梯形渠道流';
@@ -181,8 +189,16 @@ $ec_lang['mtc_d50_z1']='边坡 1 所需棱角石材粒径，D50（Isbash 与 MC�
 $ec_lang['mtc_d50_z2']='边坡 2 所需棱角石材粒径，D50（Isbash 与 MC）<span title="依据 Isbash (1936) 及 Maricopa County, Arizona, US。" style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['mtc_d50_mra']='所需棱角石材粒径，D50（Maynord、Ruff 和 Abt 1989）';
 $ec_lang['mtc_d50_searcy']='所需棱角石材粒径，D50（Searcy 1967）';
+$ec_lang['mtc_vel_check']='流速校核';
+$ec_lang['mtc_vel_ok']='流速在均匀流假设范围内合理。';
+$ec_lang['mtc_vel_high']='流速偏高 — 检查过渡段损失和可用能量。';
+$ec_lang['mtc_vel_low']='流速偏低 — 有泥沙淤积风险。';
+$ec_lang['mtc_vel_ok_short']='正常';
+$ec_lang['mtc_vel_high_short']='偏高';
+$ec_lang['mtc_vel_low_short']='偏低';
 $ec_lang['mtc_note_1']='<dl><dt>石材粒径与糙率自动迭代</dt><dd>选择糙率单选按钮（推荐 BB）和设计石材粒径单选按钮（推荐 Isbash）。调整水深和石材安全系数，以获得所需流量和均一石材粒径。每次修改输入值时，将触发以下迭代循环：1. 由设计石材粒径计算糙率。2. 所求糙率复制至输入糙率。3. 计算渠道流量和所需石材粒径。4. 调整设计石材粒径。5. 重复直至设计石材粒径误差极小。</dd><dt>基础计算器（无迭代）</dt><dd>直接输入所需糙率值，忽略设计石材粒径输入区域。</dd></dl>';
-// Robinson Rock Chute
+$ec_lang['mtc_note_2_term']='流速校核';
+$ec_lang['mtc_note_2_def']='高流速意味着来自可用落差的高比能。该能量可在扩大段、弯道或障碍处迅速耗散。请验证这对于该场地是否合理。';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='简单堰流';
 $ec_lang['ws_main_title']='免费在线简单宽顶堰流计算器';
@@ -192,7 +208,7 @@ $ec_lang['ws_headWaterHeight']='上游水头，h';
 $ec_lang['ws_weirCoefficient']='堰流系数，Cw';
 $ec_lang['ws_notes_heading']='注释';
 $ec_lang['ws_notes_we_term']='堰流方程';
-// Weir Flow Irregular
+// Weir Flow Irregular. See ws_ for missing text.
 $ec_lang['wi_menu']='不规则堰流';
 $ec_lang['wi_main_title']='免费在线分段变深不规则堰流计算器';
 $ec_lang['wi_main_desc']='不规则堰流计算器';
@@ -237,6 +253,52 @@ $ec_lang['or_notes_3_term']='流量系数';
 $ec_lang['or_notes_3_def']='锐缘孔口的 C<sub>d</sub> 约为 0.60–0.65。圆角或内缩入口的值不同。请参考 <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venture-d_590.html">Engineering Toolbox</a> 或 HEC-RAS 水力学参考手册。';
 $ec_lang['or_notes_4_term']='淹没';
 $ec_lang['or_notes_4_def']='当下游水位高于孔口底部时，计算器自动采用淹没孔口方程，h = HWE − TWE。当下游水位等于或低于孔底时，采用自由出流假定，h = HWE − 形心高程。';
+// Micro-Hydro Power
+$ec_lang['mhp_main_menu']='微型水力发电';
+$ec_lang['mhp_main_title']='免费在线微型水力发电计算器';
+$ec_lang['mhp_main_desc']='径流式微型水力发电功率计算器';
+$ec_lang['mhp_flow']='流量，Q';
+$ec_lang['mhp_gross_head']='毛水头，H<sub>gross</sub>';
+$ec_lang['mhp_diameter']='压力管道直径，D';
+$ec_lang['mhp_length']='压力管道长度，L';
+$ec_lang['mhp_roughness']='管道粗糙度，e';
+$ec_lang['mhp_km']='局部损失系数，k<sub>m</sub> <span title="Sum of all junction and fitting loss coefficients along the penstock" class="ec-tip">?</span>';
+$ec_lang['mhp_nu']='运动粘度，ν <span title="1×10⁻⁶ m²/s for clean water near 20°C" class="ec-tip">?</span>';
+$ec_lang['mhp_efficiency']='水电站效率，η（0–1）';
+$ec_lang['mhp_velocity']='流速，v';
+$ec_lang['mhp_vel_check']='流速校核';
+$ec_lang['mhp_f']='摩擦系数，f';
+$ec_lang['mhp_hf']='沿程水头损失，h<sub>f</sub>';
+$ec_lang['mhp_hm']='局部水头损失，h<sub>m</sub>';
+$ec_lang['mhp_hl']='压力管道总损失，h<sub>L</sub>';
+$ec_lang['mhp_hl_check']='水头损失校核';
+$ec_lang['mhp_hnet']='净水头，H<sub>net</sub>';
+$ec_lang['mhp_power']='输出功率，P';
+$ec_lang['mhp_annual_kwh']='100% 装机容量下的年发电量';
+$ec_lang['mhp_vel_ok']='1–3 m/s — 在目标范围内 ✓';
+$ec_lang['mhp_vel_low']='流速过低 — 有泥沙淤积和吸气的风险。';
+$ec_lang['mhp_vel_high']='流速过高 — 有水锤风险和较大的局部损失。';
+$ec_lang['mhp_vel_ok_short']='正常';
+$ec_lang['mhp_vel_high_short']='高';
+$ec_lang['mhp_vel_low_short']='低';
+$ec_lang['mhp_hl_ok']='在 10% 目标内 ✓';
+$ec_lang['mhp_hl_warn']='超过 10% 目标 — 考虑更大管径 ⚠';
+$ec_lang['mhp_hl_bad']='超过 20% — 重新核算管道尺寸';
+$ec_lang['mhp_notes_1_term']='水头损失';
+$ec_lang['mhp_notes_1_def']='总损失 h<sub>L</sub> = h<sub>f</sub> + h<sub>m</sub>，其中 h<sub>f</sub> = f(L/D)(v²/2g) 为达西-魏斯巴赫沿程摩擦损失，h<sub>m</sub> = k<sub>m</sub>·v²/2g 包含进口、弯管与阀门损失。净水头 H<sub>net</sub> = H<sub>gross</sub> − h<sub>L</sub>。';
+$ec_lang['mhp_notes_2_term']='流速';
+$ec_lang['mhp_notes_2_def']='目标 1–3 m/s。低于 1 m/s 表明管道过大；高于 3 m/s 将增大摩擦损失和水锤风险。';
+$ec_lang['mhp_notes_3_term']='水头损失目标';
+$ec_lang['mhp_notes_3_def']='压力管道损失低于毛水头的 10% 一般是经济的。管道费用与损失电量之间的最优权衡通常在高价值发电站约 4–6% 处。';
+$ec_lang['mhp_notes_4_term']='局部损失 k<sub>m</sub>';
+$ec_lang['mhp_notes_4_def']='典型参考值：锐边进口 0.5，每个 45° 弯头 0.2–0.3，闸阀（全开）0.1，蝶阀 0.2。累加所有管件得到总 k<sub>m</sub>。默认值 1.5 假设一个进口和两个弯头。';
+$ec_lang['mhp_notes_5_term']='管道粗糙度 e';
+$ec_lang['mhp_notes_5_def']='典型绝对粗糙度：钢管（新）0.046 mm，钢管（旧）0.15 mm，HDPE 0.003 mm，PVC/uPVC 0.0015 mm，混凝土 0.3–3 mm。HDPE 常用于小型微水电压力管道。';
+$ec_lang['mhp_notes_6_term']='效率';
+$ec_lang['mhp_notes_6_def']='微水电中常用的 Pelton 和贯流式水轮机典型机组效率 &eta; 为 0.70 至 0.85。保守起见，初步估算可取 0.75。';
+$ec_lang['mhp_notes_7_term']='年发电量';
+$ec_lang['mhp_notes_7_def']='年发电量假设全年满负荷连续运行（8760 小时/年）。实际发电量将因季节性流量变化、维护停机和负荷因子而偏低。';
+
 // Orifice Drain Time
 $ec_lang['odt_main_menu']='孔口排水时间';
 $ec_lang['odt_main_title']='免费在线孔口排水时间计算器——池塘、调蓄池或水箱';
@@ -265,84 +327,31 @@ $ec_lang['odt_q_max']='最大流量，Q<sub>max</sub>';
 $ec_lang['odt_vol']='排出水量';
 $ec_lang['odt_sketch_start']='开始';
 $ec_lang['odt_sketch_end']='结束';
-// Erosion Setback
+// Erosion Setback and Scour Calc.
 $ec_lang['essc_btbw']='岸对岸宽度';
 $ec_lang['essc_mcr']='最小弯道半径';
 $ec_lang['essc_q']='流量，Q';
-// Contact
+// Contact us.
 
 // Irrigation
 $ec_lang['irr_main_menu']='灌溉流量测量';
 $ec_lang['irr_main_title']='免费在线灌溉流量测量计算器';
 $ec_lang['irr_main_desc']='灌溉流量测量 — 堰和孔口';
-$ec_lang['contact_title']='HawsEDC 联系';
-$ec_lang['contactSendMessage']='给 Tom Haws 发送消息';
-$ec_lang['contactYourName']='您的姓名：';
-$ec_lang['contactYourEmail']='您的电子邮件地址：';
-$ec_lang['contactSubject']='主题：';
-$ec_lang['contact_message']='留言：';
-$ec_lang['contactSpamPrefix']='五加一等于';
-$ec_lang['contactSpamPostfix']='（请用英文拼写。1=one 2=two 3=three 4=four 5=five 6=six 7=seven +=plus 5+1=6）';
-$ec_lang['contactSubmitButton']='发送消息';
-$ec_lang['contact_success']='感谢您抽出宝贵的时间来写信。';
-
-
-// Micro-Hydro Power
-$ec_lang['mhp_main_menu']='微型水力发电';
-$ec_lang['mhp_main_title']='免费在线微型水力发电计算器';
-$ec_lang['mhp_main_desc']='径流式微型水力发电功率计算器';
-$ec_lang['mhp_flow']='流量，Q';
-$ec_lang['mhp_gross_head']='毛水头，H<sub>gross</sub>';
-$ec_lang['mhp_diameter']='压力管道直径，D';
-$ec_lang['mhp_length']='压力管道长度，L';
-$ec_lang['mhp_roughness']='管道粗糙度，e';
-$ec_lang['mhp_km']='局部损失系数，k<sub>m</sub> <span title="Sum of all junction and fitting loss coefficients along the penstock" class="ec-tip">?</span>';
-$ec_lang['mhp_nu']='运动粘度，ν <span title="1×10⁻⁶ m²/s for clean water near 20°C" class="ec-tip">?</span>';
-$ec_lang['mhp_efficiency']='水电站效率，η（0–1）';
-$ec_lang['mhp_velocity']='流速，v';
-$ec_lang['mhp_vel_check']='流速校核';
-$ec_lang['mhp_f']='摩擦系数，f';
-$ec_lang['mhp_hf']='沿程水头损失，h<sub>f</sub>';
-$ec_lang['mhp_hm']='局部水头损失，h<sub>m</sub>';
-$ec_lang['mhp_hl']='压力管道总损失，h<sub>L</sub>';
-$ec_lang['mhp_hl_check']='水头损失校核';
-$ec_lang['mhp_hnet']='净水头，H<sub>net</sub>';
-$ec_lang['mhp_power']='输出功率，P';
-$ec_lang['mhp_annual_kwh']='100% 装机容量下的年发电量';
-$ec_lang['mhp_vel_ok']='1–3 m/s — 在目标范围内 ✓';
-$ec_lang['mhp_vel_ok_short']='正常';
-$ec_lang['mhp_vel_low']='流速过低 — 有泥沙淤积和吸气的风险。';
-$ec_lang['mhp_vel_low_short']='低';
-$ec_lang['mhp_vel_high']='流速过高 — 有水锤风险和较大的局部损失。';
-$ec_lang['mhp_vel_high_short']='高';
-$ec_lang['mhp_hl_ok']='在 10% 目标内 ✓';
-$ec_lang['mhp_hl_warn']='超过 10% 目标 — 考虑更大管径 ⚠';
-$ec_lang['mhp_hl_bad']='超过 20% — 重新核算管道尺寸';
-$ec_lang['mhp_notes_1_term']='水头损失';
-$ec_lang['mhp_notes_1_def']='总损失 h<sub>L</sub> = h<sub>f</sub> + h<sub>m</sub>，其中 h<sub>f</sub> = f(L/D)(v²/2g) 为达西-魏斯巴赫沿程摩擦损失，h<sub>m</sub> = k<sub>m</sub>·v²/2g 包含进口、弯管与阀门损失。净水头 H<sub>net</sub> = H<sub>gross</sub> − h<sub>L</sub>。';
-$ec_lang['mhp_notes_2_term']='流速';
-$ec_lang['mhp_notes_2_def']='目标 1–3 m/s。低于 1 m/s 表明管道过大；高于 3 m/s 将增大摩擦损失和水锤风险。';
-$ec_lang['mhp_notes_3_term']='水头损失目标';
-$ec_lang['mhp_notes_3_def']='压力管道损失低于毛水头的 10% 一般是经济的。管道费用与损失电量之间的最优权衡通常在高价值发电站约 4–6% 处。';
-$ec_lang['mhp_notes_4_term']='局部损失 k<sub>m</sub>';
-$ec_lang['mhp_notes_4_def']='典型参考值：锐边进口 0.5，每个 45° 弯头 0.2–0.3，闸阀（全开）0.1，蝶阀 0.2。累加所有管件得到总 k<sub>m</sub>。默认值 1.5 假设一个进口和两个弯头。';
-$ec_lang['mhp_notes_5_term']='管道粗糙度 e';
-$ec_lang['mhp_notes_5_def']='典型绝对粗糙度：钢管（新）0.046 mm，钢管（旧）0.15 mm，HDPE 0.003 mm，PVC/uPVC 0.0015 mm，混凝土 0.3–3 mm。HDPE 常用于小型微水电压力管道。';
-
-// About
-$ec_lang['about_main_menu']='关于';
-$ec_lang['install_main_menu']='安装';
-$ec_lang['install_main_title']='安装 EngCalcs';
-$ec_lang['install_main_desc']='添加到您的设备以供离线使用';
-$ec_lang['contact_main_menu']='联系';
-$ec_lang['about_main_title']='关于 HawsEDC 工程计算器';
-$ec_lang['about_main_desc']='使命、开源与贡献';
-
+$ec_lang['irr_intro_html']='<p>量水堰和孔口是测量灌溉系统水流量的标准现场工具。请选择与您的水工建筑物相匹配的计算器：</p>';
+$ec_lang['irr_card_weir_uniform_head']='量水堰 — 宽顶堰（均匀宽度）';
+$ec_lang['irr_card_weir_uniform_desc']='测量引水坝堰顶、控制建筑物或堰板的过流量。输入堰长和堰顶以上水深。';
+$ec_lang['irr_card_weir_irregular_head']='量水堰 — 不规则断面';
+$ec_lang['irr_card_weir_irregular_desc']='当堰顶高程不统一时使用——天然溢洪道、宽度变化的跌水建筑物或多段控制建筑物。';
+$ec_lang['irr_card_orifice_head']='孔口 — 闸门或管道出水口';
+$ec_lang['irr_card_orifice_desc']='测量通过闸门、管道出水口或涵洞开口的流量。自动处理自由出流和淹没（下游顶托）两种情况。';
+$ec_lang['irr_card_canal_head']='渠道设计 & 分析';
+$ec_lang['irr_card_canal_desc']='使用曼宁公式设计或核算灌溉渠道。新建渠道使用梯形断面计算器；已有天然或人工断面使用不规则断面计算器。';
+$ec_lang['irr_card_drip_head']='滴灌 & 喷灌设计';
+$ec_lang['irr_card_drip_desc']='计算滴灌或喷灌系统的灌水强度、分布均匀度、支管流量、轮灌区流量和灌水时间。输入灌水器流量、间距和设计灌水深度。';
+$ec_lang['irr_card_seepage_head']='渠道渗漏 & 输水效率';
+$ec_lang['irr_card_seepage_desc']='利用渠段进出水量测量数据估算渠道渗漏损失。计算输水效率和年渗漏水量，为渠道衬砌投资决策提供依据。';
+$ec_lang['irr_quickref_html']='<h3>快速参考</h3><dl><dt>引水坝或控制建筑物</dt><dd>测量堰顶以上水深。均匀堰顶使用 <a href="Weir-Flow-Simple.php">简单量水堰</a>，异形或阶梯型堰顶使用 <a href="Weir-Flow-Irregular.php">不规则量水堰</a>。</dd><dt>闸门或管道出水口</dt><dd>测量上游水位和下游水位（自由出流时测管道底部高程）。使用 <a href="Orifice.php">孔口流量</a>。圆形管道 D = 管径；矩形闸门输入宽度 W 和高度 D。</dd><dt>水库或池塘排空时间</dt><dd>使用 <a href="Orifice-Drain-Time.php">孔口排空时间</a> 估算池塘或水库通过底部孔口降低水位所需时间——适用于灌溉调蓄规划。</dd><dt>现场标准</dt><dd>本站量水堰和孔口流量方程符合美国垦务局（USBR）<em>量水手册</em>（第3版）规程，通常为水资源管理机构和灌区所要求。</dd></dl>';
 // Drip / Sprinkler Application Rate
-$ec_lang['u_lph']="L/hr";
-$ec_lang['u_gph']="gal/hr";
-$ec_lang['u_mmph']="mm/hr";
-$ec_lang['u_inph']="in/hr";
 $ec_lang['ds_main_menu']='滴灌/喷灌灌水强度';
 $ec_lang['ds_main_title']='免费在线滴灌/喷灌灌水强度计算器';
 $ec_lang['ds_main_desc']='滴灌和喷灌 — 灌水强度';
@@ -361,13 +370,14 @@ $ec_lang['ds_notes_1_term']='灌水强度';
 $ec_lang['ds_notes_1_def']='PR = q / A<sub>e</sub>，其中 A<sub>e</sub> = S<sub>e</sub> × S<sub>l</sub> 为每个灌水器控制的面积。较低的灌水强度可为水分入渗提供更多时间 — 在黏重土壤或坡地上尤为重要。';
 $ec_lang['ds_notes_2_term']='运行时间';
 $ec_lang['ds_notes_2_def']='运行时间 = 目标深度 ÷ 灌水强度。在坡地或板结土壤上，将运行时间分成两到三个较短的周期，中间安排休息，以避免地表径流。';
-
 // Canal Seepage / Conveyance Efficiency. Prefix cs_.
 $ec_lang['cs_main_menu']='渠道渗漏';
 $ec_lang['cs_main_title']='免费在线渠道渗漏损失与输水效率计算器';
 $ec_lang['cs_main_desc']='渠道渗漏损失 & 输水效率 — 进出水量差值法';
 $ec_lang['cs_Q_in']='入流，Q<sub>in</sub>';
 $ec_lang['cs_Q_out']='出流，Q<sub>out</sub>';
+$ec_lang['cs_L']='渠段长度，L';
+$ec_lang['cs_wp']='湿周，P<sub>w</sub>';
 $ec_lang['cs_Q_loss']='渗漏损失流量, Q<sub>loss</sub>';
 $ec_lang['cs_loss_check']='量测检验';
 $ec_lang['cs_pct_loss']='损失比例';
@@ -375,8 +385,6 @@ $ec_lang['cs_Ec']='输水效率, E<sub>c</sub>';
 $ec_lang['cs_Ec_check']='效率等级';
 $ec_lang['cs_Vol_day']='日渗漏水量';
 $ec_lang['cs_Vol_year']='年渗漏水量';
-$ec_lang['cs_L']='渠段长度，L';
-$ec_lang['cs_wp']='湿周，P<sub>w</sub>';
 $ec_lang['cs_Q_loss_per_L']='单位长度损失，Q<sub>loss</sub>/L';
 $ec_lang['cs_water_value']='水价值';
 $ec_lang['cs_lining_cost']='衬砌成本';
@@ -400,26 +408,26 @@ $ec_lang['cs_notes_3_term']='衬砌投资回收';
 $ec_lang['cs_notes_3_def']='输入任意统一货币单位的水价值和衬砌成本。衬砌面积 = 渠段长度 × 湿周 — 渠道横截面在量测流量水深处的湿周（底宽加两侧湿润坡面）。年回收价值按衬砌渠道持续达到目标 E<sub>c</sub> 计算。季节性渠道或衬砌未达目标效率的实际投资回收期将更长。';
 $ec_lang['cs_notes_4_term']='参考文献';
 $ec_lang['cs_notes_4_def']='美国垦务局《量水手册》第3版（2001年）。联合国粮农组织灌溉与排水文件第57号（1999年）。';
-
-$ec_lang['irr_intro_html']='<p>量水堰和孔口是测量灌溉系统水流量的标准现场工具。请选择与您的水工建筑物相匹配的计算器：</p>';
-$ec_lang['irr_card_weir_uniform_head']='量水堰 — 宽顶堰（均匀宽度）';
-$ec_lang['irr_card_weir_uniform_desc']='测量引水坝堰顶、控制建筑物或堰板的过流量。输入堰长和堰顶以上水深。';
-$ec_lang['irr_card_weir_irregular_head']='量水堰 — 不规则断面';
-$ec_lang['irr_card_weir_irregular_desc']='当堰顶高程不统一时使用——天然溢洪道、宽度变化的跌水建筑物或多段控制建筑物。';
-$ec_lang['irr_card_orifice_head']='孔口 — 闸门或管道出水口';
-$ec_lang['irr_card_orifice_desc']='测量通过闸门、管道出水口或涵洞开口的流量。自动处理自由出流和淹没（下游顶托）两种情况。';
-$ec_lang['irr_card_canal_head']='渠道设计 & 分析';
-$ec_lang['irr_card_canal_desc']='使用曼宁公式设计或核算灌溉渠道。新建渠道使用梯形断面计算器；已有天然或人工断面使用不规则断面计算器。';
-$ec_lang['irr_card_drip_head']='滴灌 & 喷灌设计';
-$ec_lang['irr_card_drip_desc']='计算滴灌或喷灌系统的灌水强度、分布均匀度、支管流量、轮灌区流量和灌水时间。输入灌水器流量、间距和设计灌水深度。';
-$ec_lang['irr_card_seepage_head']='渠道渗漏 & 输水效率';
-$ec_lang['irr_card_seepage_desc']='利用渠段进出水量测量数据估算渠道渗漏损失。计算输水效率和年渗漏水量，为渠道衬砌投资决策提供依据。';
-$ec_lang['irr_quickref_html']='<h3>快速参考</h3><dl><dt>引水坝或控制建筑物</dt><dd>测量堰顶以上水深。均匀堰顶使用 <a href="Weir-Flow-Simple.php">简单量水堰</a>，异形或阶梯型堰顶使用 <a href="Weir-Flow-Irregular.php">不规则量水堰</a>。</dd><dt>闸门或管道出水口</dt><dd>测量上游水位和下游水位（自由出流时测管道底部高程）。使用 <a href="Orifice.php">孔口流量</a>。圆形管道 D = 管径；矩形闸门输入宽度 W 和高度 D。</dd><dt>水库或池塘排空时间</dt><dd>使用 <a href="Orifice-Drain-Time.php">孔口排空时间</a> 估算池塘或水库通过底部孔口降低水位所需时间——适用于灌溉调蓄规划。</dd><dt>现场标准</dt><dd>本站量水堰和孔口流量方程符合美国垦务局（USBR）<em>量水手册</em>（第3版）规程，通常为水资源管理机构和灌区所要求。</dd></dl>';
+// About
+$ec_lang['about_main_menu']='关于';
+$ec_lang['install_main_menu']='安装';
+$ec_lang['install_main_title']='安装 EngCalcs';
+$ec_lang['install_main_desc']='添加到您的设备以供离线使用';
+$ec_lang['contact_main_menu']='联系';
+$ec_lang['about_main_title']='关于 HawsEDC 工程计算器';
+$ec_lang['about_main_desc']='使命、开源与贡献';
 $ec_lang['about_body_html']='<h3>使命</h3><p>HawsEDC 工程计算器旨在为全球工程师和现场工作者服务——尤其是在缺水、资源匮乏或服务不足地区工作的人。这些工具是更广泛人道主义使命的一部分：以最实际、最有效的方式告诉每一个人，他们永远是被爱和珍视的，他们不必害怕，也不会毁掉一切。</p><p>计算器是载体，目标是一个没有苦难的世界。</p><h3>开源许可证</h3><p>所有代码均在 <a target="_blank" href="https://www.gnu.org/licenses/gpl-3.0.html">GNU 通用公共许可证 v3.0 或更高版本</a>下发布——自由如自由本身。您可以在相同条款下使用、研究、修改和再分发代码。</p><p>版权所有 © 2009–2026 Thomas Gail Haws。</p><h3>源代码</h3><p>完整源代码在 Bitbucket 上公开提供：</p><p><a target="_blank" href="https://bitbucket.org/hawstom/engcalcs">bitbucket.org/hawstom/engcalcs</a></p><p>您可以在那里浏览代码、提交问题或 fork 仓库。</p><h3>参与贡献</h3><p>欢迎提交 Pull Request。贡献方式：</p><ul><li><strong>翻译</strong> — 改进或新增语言。提交包含相关 <code>lib/lang.ec.??.php</code> 文件修改的 Pull Request。</li><li><strong>错误报告</strong> — 使用任意计算器页面上的反馈表单，或在 Bitbucket 上提交问题。</li><li><strong>新计算器</strong> — 特别欢迎为现场工作者和灌溉从业者服务的水力工程工具创意。请参阅仓库中的开发者指南 <code>CLAUDE.md</code>。</li><li><strong>托管镜像</strong> — 如果您能为连接受限地区提供镜像服务，欢迎联系我们。</li></ul><h3>离线使用</h3><p>这些计算器可作为渐进式网络应用（PWA）运行。在联网状态下访问任意计算器页面，您的浏览器将自动缓存所有计算器。此后，所有计算器均可离线使用——无需网络连接。</p><p>在 Android 或 iOS 上，使用浏览器的"添加到主屏幕"功能，将 EngCalcs 作为应用安装到您的设备上。在桌面端，请在浏览器地址栏中找到安装图标。</p><p>您也可以使用浏览器的"另存为…"菜单保存任意单个计算器，以便临时离线使用。</p><h3>联系方式</h3><p>Tom Haws——水力工程师，这些计算器的作者。<br />请使用任意计算器页面上的反馈表单，或访问 <a target="_blank" href="https://bitbucket.org/hawstom/engcalcs">Bitbucket</a> 上的源代码。</p>';
-
+$ec_lang['contact_title']='HawsEDC 联系';
+$ec_lang['contactSendMessage']='给 Tom Haws 发送消息';
+$ec_lang['contactYourName']='您的姓名：';
+$ec_lang['contactYourEmail']='您的电子邮件地址：';
+$ec_lang['contactSubject']='主题：';
+$ec_lang['contact_message']='留言：';
+$ec_lang['contactSpamPrefix']='五加一等于';
+$ec_lang['contactSpamPostfix']='（请用英文拼写。1=one 2=two 3=three 4=four 5=five 6=six 7=seven +=plus 5+1=6）';
+$ec_lang['contactSubmitButton']='发送消息';
+$ec_lang['contact_success']='感谢您抽出宝贵的时间来写信。';
 // Rock Chute Design (Robinson, Rice & Kadavy 1998). Prefix rc_.
-$ec_lang['u_m2ps']='m^2/s';
-$ec_lang['u_ft2ps']='cfs/ft';
 $ec_lang['rc_main_menu']='块石陡槽设计（Robinson）';
 $ec_lang['rc_main_title']='免费在线块石陡槽设计计算器 — Robinson (1998)';
 $ec_lang['rc_main_desc']='块石陡槽护坡块石尺寸设计 — Robinson, Rice & Kadavy (1998)';
@@ -475,20 +483,3 @@ $ec_lang['rc_sketch_filter']          = '过滤层';
 $ec_lang['rc_sketch_top_crest_curve'] = '顶部曲线';
 $ec_lang['rc_sketch_outlet_apron']    = '出口护坦';
 $ec_lang['rc_sketch_radius']          = '半径';
-
-// Manning Trapezoid — velocity checks and note 2 (added)
-$ec_lang['mtc_vel_check']='流速校核';
-$ec_lang['mtc_vel_ok']='流速在均匀流假设范围内合理。';
-$ec_lang['mtc_vel_ok_short']='正常';
-$ec_lang['mtc_vel_high']='流速偏高 — 检查过渡段损失和可用能量。';
-$ec_lang['mtc_vel_high_short']='偏高';
-$ec_lang['mtc_vel_low']='流速偏低 — 有泥沙淤积风险。';
-$ec_lang['mtc_vel_low_short']='偏低';
-$ec_lang['mtc_note_2_term']='流速校核';
-$ec_lang['mtc_note_2_def']='高流速意味着来自可用落差的高比能。该能量可在扩大段、弯道或障碍处迅速耗散。请验证这对于该场地是否合理。';
-
-// Micro-Hydro Power — notes 6 and 7 (added)
-$ec_lang['mhp_notes_6_term']='效率';
-$ec_lang['mhp_notes_6_def']='微水电中常用的 Pelton 和贯流式水轮机典型机组效率 &eta; 为 0.70 至 0.85。保守起见，初步估算可取 0.75。';
-$ec_lang['mhp_notes_7_term']='年发电量';
-$ec_lang['mhp_notes_7_def']='年发电量假设全年满负荷连续运行（8760 小时/年）。实际发电量将因季节性流量变化、维护停机和负荷因子而偏低。';

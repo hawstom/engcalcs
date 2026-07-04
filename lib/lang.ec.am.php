@@ -36,6 +36,10 @@ $ec_lang['u_pa']='Pa';
 $ec_lang['u_psf']='psf';
 $ec_lang['u_psi']='psi';
 $ec_lang['u_s']='ሰከ';
+$ec_lang['u_lph']="L/hr";
+$ec_lang['u_gph']="gal/hr";
+$ec_lang['u_mmph']="mm/hr";
+$ec_lang['u_inph']="in/hr";
 $ec_lang['u_acft']='ac-ft';
 $ec_lang['u_ft3']='ft^3';
 $ec_lang['u_m3']='m^3';
@@ -44,6 +48,8 @@ $ec_lang['u_mw']='MW';
 $ec_lang['u_kwh_yr']='kWh/yr';
 $ec_lang['u_mwh_yr']='MWh/yr';
 $ec_lang['u_hp']='hp';
+$ec_lang['u_m2ps']='m^2/s';
+$ec_lang['u_ft2ps']='cfs/ft';
 
 // Page text
 // In page order for easiest maintenance.
@@ -184,8 +190,16 @@ $ec_lang['mtc_d50_z1']='የሚፈለግ የጎን ቁልቁለት 1 ማዕዘና
 $ec_lang['mtc_d50_z2']='የሚፈለግ የጎን ቁልቁለት 2 ማዕዘናዊ የድንጋይ መጠን, D50 (Isbash & MC) <span title="Isbash (1936) እና Maricopa County, Arizona, US. መሠረት" style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['mtc_d50_mra']='የሚፈለግ ማዕዘናዊ የድንጋይ መጠን, D50 (Maynord, Ruff, and Abt 1989)';
 $ec_lang['mtc_d50_searcy']='የሚፈለግ ማዕዘናዊ የድንጋይ መጠን, D50 (Searcy 1967)';
+$ec_lang['mtc_vel_check']='የፍጥነት ምርመራ';
+$ec_lang['mtc_vel_ok']='ፍጥነቱ ለወጥ ፍሰት ግምቶች ምክንያታዊ ነው።';
+$ec_lang['mtc_vel_high']='ፍጥነቱ ከፍተኛ ነው - ሽግግር ኪሳራዎች እና ሊታገድ የሚችል ሃይል ያረጋግጡ።';
+$ec_lang['mtc_vel_low']='ፍጥነቱ ዝቅ ያለ ነው - የደለል አደጋ አለ።';
+$ec_lang['mtc_vel_ok_short']='ጥሩ';
+$ec_lang['mtc_vel_high_short']='ከፍተኛ';
+$ec_lang['mtc_vel_low_short']='ዝቅተኛ';
 $ec_lang['mtc_note_1']='<dl><dt>አውቶማቲክ የድንጋይ መጠን እና ሻካሪነት ንድፍ ድግግሞሽ</dt><dd>የሻካሪነት ራዲዮ አዝራር (BB ይመከራል) እና የንድፍ የድንጋይ መጠን ራዲዮ አዝራር (Isbash ይመከራል) ምረጥ። የሚፈለገህን ፍሰት ለማግኘት ጥልቀቱን እና የድንጋይ መጠን የደህንነት ሁኔታን ቁልቁለት በተረጋጋ የድንጋይ መጠን ቁጥጥር አድርግ። ማንኛውንም ግቤት ሲቀይሩ ይህ ዑደት ይከናወናል: 1. ሻካሪነት ከንድፍ የድንጋይ መጠን ይሰላል። 2. የሚፈለገው ሻካሪነት ስሌት ወደ ግቤት ሻካሪነት ይቀዳል። 3. የቦይ ፍሰት እና የሚፈለግ የድንጋይ መጠን ይሰላሉ። 4. ንድፍ የድንጋይ መጠን ይስተካከላል። 5. እስከ ንድፍ የድንጋይ መጠን ስህተት በጣም ትንሽ እስኪሆን ድገም።</dd><dt>መሠረታዊ ካልኩሌተር (ድግግሞሽ አልባ)</dt><dd>ፈለጋቸውን ሻካሪነት ዋጋ አስገባ። ንድፍ የድንጋይ መጠን ግቤት ቦታን ሰካ።</dd></dl>';
-// Robinson Rock Chute
+$ec_lang['mtc_note_2_term']='የፍጥነት ምርመራ';
+$ec_lang['mtc_note_2_def']='ከፍተኛ ፍጥነት ከሚገኝ ቁልቁለት ከፍተኛ ልዩ ሃይልን ያሳያል። ያ ሃይል በስፋፊዎች፣ ጥምዞች ወይም እንቅፋቶች ላይ በፍጥነት ሊጠፋ ይችላል። ይህ ለቦታው ምክንያታዊ መሆኑን ያረጋግጡ።';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='ቀላል weir ፍሰት';
 $ec_lang['ws_main_title']='ነፃ ኦንላይን ቀላል ሰፊ-ጫፍ Weir ፍሰት ካልኩሌተር';
@@ -240,56 +254,6 @@ $ec_lang['or_notes_3_term']='የፍሰት ቅንጅት';
 $ec_lang['or_notes_3_def']='C<sub>d</sub> ለሹል-ጫፍ ቀዳዳዎች ከ0.60 እስከ 0.65 ይደርሳል። ክብ ወይም ወደ ኋላ ተዘርቶ ለተሠሩ መግቢያዎች ሌሎች ዋጋዎች ጥቅም ላይ ይውላሉ። <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venture-d_590.html">Engineering Toolbox</a> ወይም HEC-RAS Hydraulic Reference Manual ይመልከቱ።';
 $ec_lang['or_notes_4_term']='መጠለቅ';
 $ec_lang['or_notes_4_def']='TWE ከክፍት ቦታ invert በላይ ሲሆን ይህ ካልኩሌተር h = HWE − TWE ተጠቅሞ የተጠለቀ ቀዳዳ እኩልታ ያለቃ ያሠራል። TWE ከ invert ወይም ዝቅ ሲሆን ነፃ ፍሰት h = HWE − ማዕከል ሆኖ ይወሰዳል።';
-// Orifice Drain Time
-$ec_lang['odt_main_menu']='ቀዳዳ ፍሳሽ ጊዜ';
-$ec_lang['odt_main_title']='ነፃ ኦንላይን ቀዳዳ ፍሳሽ ጊዜ ካልኩሌተር — ኩሬ፣ ቤዝን ወይም ታንክ';
-$ec_lang['odt_main_desc']='ኩሬ ወይም ቤዝን ቀዳዳ ፍሳሽ ጊዜ — ኮኒካዊ ድምር ዘዴ';
-$ec_lang['odt_h1_elev']='የጀምር የውሃ ወለል ከፍታ';
-$ec_lang['odt_a1']='የጀምር ኩሬ ወይም ቤዝን ስፋት, A1';
-$ec_lang['odt_h2_elev']='የማብቂያ የውሃ ወለል ከፍታ';
-$ec_lang['odt_h_orifice']='የቀዳዳ ማዕከል ከፍታ';
-$ec_lang['odt_a0']='ኩሬ ወይም ቤዝን ስፋት በቀዳዳ ከፍታ, A0';
-$ec_lang['odt_a_ending']='የማብቂያ ኩሬ ስፋት, A2 (የተሰላ)';
-$ec_lang['odt_h2_check']='የማብቂያ ከፍታ ማረጋገጫ';
-$ec_lang['odt_h2_ok']='የማብቂያ ከፍታ ከቀዳዳ ጫፍ በላይ ✓';
-$ec_lang['odt_h2_warn']='ማስጠንቀቂያ: የማብቂያ ከፍታ ከቀዳዳ ጫፍ (ማዕከል + D/2) ወይም ዝቅ';
-$ec_lang['odt_d']='ቀዳዳ ዲያሜትር (ክብ) ወይም ከፍታ (አራት ማዕዘን), D';
-$ec_lang['odt_w']='ቀዳዳ ስፋት, W (አራት ማዕዘን ብቻ)';
-$ec_lang['odt_t_sec']='ፍሳሽ ጊዜ (ሰከንዶች)';
-$ec_lang['odt_t_min']='ፍሳሽ ጊዜ (ደቂቃዎች)';
-$ec_lang['odt_t_hr']='ፍሳሽ ጊዜ (ሰዓታት)';
-$ec_lang['odt_t_day']='ፍሳሽ ጊዜ (ቀናት)';
-$ec_lang['odt_notes_1_term']='ቀመር';
-$ec_lang['odt_notes_1_def']='t = √H<sub>1</sub> / (C<sub>d</sub> A<sub>or</sub> √(2g)) × (2A<sub>x</sub>/5 + 8√(A<sub>x</sub>A<sub>0</sub>)/15 + 16A<sub>0</sub>/15) ከጭንቅ H እስከ ቀዳዳ ፍሳሽ ጊዜ ይሰጣል። ፍሳሽ ጊዜ = t(H<sub>1</sub>,A<sub>1</sub>,A<sub>0</sub>) − t(H<sub>2</sub>,A<sub>2</sub>,A<sub>0</sub>)፣ H<sub>1</sub> = የጀምር ከፍታ − ቀዳዳ ከፍታ፣ H<sub>2</sub> = የማብቂያ ከፍታ − ቀዳዳ ከፍታ።';
-$ec_lang['odt_notes_2_term']='ዘዴ';
-$ec_lang['odt_notes_2_def']='ኮኒካዊ ድምር ዘዴ ኩሬ ወይም ቤዝኑን ከጀምር ስፋት A<sub>1</sub> በጀምር ውሃ ወለል እስከ ስፋት A<sub>0</sub> በቀዳዳ ማዕከል ከፍታ ድረስ ኮኒካዊ ክፍል ሆኖ ያሞዳሉ። A<sub>2</sub>፣ ኩሬ ስፋት በማብቂያ ከፍታ፣ ከ A<sub>1</sub> እና A<sub>0</sub> ኮኒካዊ ክፍሉን ሞዴል ተጠቅሞ ይሰላል። ከጀምር እስከ ማብቂያ ከፍታ ፍሳሽ ጊዜ ከ H<sub>1</sub> እስከ ቀዳዳ ጠቅላላ ፍሳሽ ጊዜ ከ H<sub>2</sub> እስከ ቀዳዳ ቀሪ ፍሳሽ ጊዜ ሲቀነስ ይሆናል።';
-$ec_lang['odt_h1']='የጀምር ጭንቅ, H<sub>1</sub> (WSE − ማዕከል)';
-$ec_lang['odt_q_max']='ከፍተኛ (የጀምር) ፍሰት, Q<sub>max</sub>';
-$ec_lang['odt_vol']='የፈሰሰ ድምር';
-$ec_lang['odt_sketch_start']='ጅምር';
-$ec_lang['odt_sketch_end']='ፍጻሜ';
-// Erosion Setback and Scour Calc.
-$ec_lang['essc_btbw']='ዳርቻ እስከ ዳርቻ ስፋት';
-$ec_lang['essc_mcr']='ዝቅተኛ ጥምዝ ራዲየስ';
-$ec_lang['essc_q']='ፍሰት, Q';
-// Contact us.
-
-// Irrigation
-$ec_lang['irr_main_menu']='የመስኖ ፍሰት ልኬት';
-$ec_lang['irr_main_title']='ነፃ ኦንላይን የመስኖ ፍሰት ልኬት ካልኩሌተሮች';
-$ec_lang['irr_main_desc']='የመስኖ ፍሰት ልኬት — ዊርስ እና ኦሪፊስ';
-$ec_lang['contact_title']='HawsEDC ያግኙን';
-$ec_lang['contactSendMessage']='Tom Haws ላክ መልዕክት';
-$ec_lang['contactYourName']='ስምህ:';
-$ec_lang['contactYourEmail']='የኢሜይል አድራሻህ:';
-$ec_lang['contactSubject']='ርዕሰ ጉዳይ:';
-$ec_lang['contact_message']='መልዕክት:';
-$ec_lang['contactSpamPrefix']='አምስት ሲደምር አንድ ይሆናል';
-$ec_lang['contactSpamPostfix']='(እባክህ በቃላት ፃፍ። 1=አንድ 2=ሁለት 3=ሦስት 4=አራት 5=አምስት 6=ስድስት 7=ሰባት +=ሲደምር 5+1=6)';
-$ec_lang['contactSubmitButton']='መልዕክት ላክ';
-$ec_lang['contact_success']='ለመጻፍ ጊዜ ለወጣህ አመሰግናለሁ።';
-
-
 // Micro-Hydro Power
 $ec_lang['mhp_main_menu']='ማይክሮ-ሃይድሮ ኃይል';
 $ec_lang['mhp_main_title']='ነፃ የኦንላይን ማይክሮ-ሃይድሮ ኃይል ካልኩሌተር';
@@ -331,21 +295,64 @@ $ec_lang['mhp_notes_4_term']='ሁለተኛ ደረጃ ኪሳራዎች k<sub>m</su
 $ec_lang['mhp_notes_4_def']='ተለምዷዊ እሴቶች: ሹል መግቢያ 0.5፣ እያንዳንዱ 45° ጥምዝ 0.2–0.3፣ ቤይ ቫልቭ (ሙሉ ክፍት) 0.1፣ ቢራቢሮ ቫልቭ 0.2። ሁሉም ፊቲንጎች ሲደማሙ k<sub>m</sub> ይሆናሉ። ነባሪ 1.5 አንድ መግቢያ እና ሁለት ጥምዝ ያስቆጥራል።';
 $ec_lang['mhp_notes_5_term']='የቧንቧ ሻካራነት e';
 $ec_lang['mhp_notes_5_def']='ተለምዷዊ ፍፁም ሻካራነት: ብረት (አዲስ) 0.046 ሚሜ፣ ብረት (ያረጀ) 0.15 ሚሜ፣ HDPE 0.003 ሚሜ፣ PVC/uPVC 0.0015 ሚሜ፣ ኮንክሪት 0.3–3 ሚሜ። HDPE ለትንሽ ማይክሮ-ሃይድሮ ቧንቧዎች ተለምዷዊ ነው።';
+$ec_lang['mhp_notes_6_term']='ብቃት';
+$ec_lang['mhp_notes_6_def']='ለ Pelton እና cross-flow ተርቢኖች ለማይክሮ-ሃይድሮ ዓይነተኛ ፋብሪካ ብቃት &eta; ከ0.70 እስከ 0.85 ይደርሳል። 0.75 ጥንቃቄ ሞልቶ ቀዳሚ ግምት ሆኖ ይጠቀሙ።';
+$ec_lang['mhp_notes_7_term']='ዓመታዊ ሃይል';
+$ec_lang['mhp_notes_7_def']='ዓመታዊ ሃይል ያለ ቋረጣ ሙሉ-ፍሰት ሥራን (8760 ሰዓት/ዓመት) ይወስዳል። ምርቱ ወቅታዊ ፍሰት ልዩነት፣ ጥገና ቆም ጊዜ፣ እና ጭነት ሁኔታ ምክንያት ዝቅ ይሆናል።';
 
-// About
-$ec_lang['about_main_menu']='ስለ';
-$ec_lang['install_main_menu']='ጫን';
-$ec_lang['install_main_title']='EngCalcs ይጫኑ';
-$ec_lang['install_main_desc']='ያለኢንተርኔት ለመጠቀም ወደ መሳሪያዎ ያክሉ';
-$ec_lang['contact_main_menu']='አግኙን';
-$ec_lang['about_main_title']='ስለ HawsEDC የምህንድስና ካልኩሌተሮች';
-$ec_lang['about_main_desc']='ተልዕኮ፣ ክፍት ምንጭ እና አስተዋጽዖ';
+// Orifice Drain Time
+$ec_lang['odt_main_menu']='ቀዳዳ ፍሳሽ ጊዜ';
+$ec_lang['odt_main_title']='ነፃ ኦንላይን ቀዳዳ ፍሳሽ ጊዜ ካልኩሌተር — ኩሬ፣ ቤዝን ወይም ታንክ';
+$ec_lang['odt_main_desc']='ኩሬ ወይም ቤዝን ቀዳዳ ፍሳሽ ጊዜ — ኮኒካዊ ድምር ዘዴ';
+$ec_lang['odt_h1_elev']='የጀምር የውሃ ወለል ከፍታ';
+$ec_lang['odt_a1']='የጀምር ኩሬ ወይም ቤዝን ስፋት, A1';
+$ec_lang['odt_h2_elev']='የማብቂያ የውሃ ወለል ከፍታ';
+$ec_lang['odt_h_orifice']='የቀዳዳ ማዕከል ከፍታ';
+$ec_lang['odt_a0']='ኩሬ ወይም ቤዝን ስፋት በቀዳዳ ከፍታ, A0';
+$ec_lang['odt_a_ending']='የማብቂያ ኩሬ ስፋት, A2 (የተሰላ)';
+$ec_lang['odt_h2_check']='የማብቂያ ከፍታ ማረጋገጫ';
+$ec_lang['odt_h2_ok']='የማብቂያ ከፍታ ከቀዳዳ ጫፍ በላይ ✓';
+$ec_lang['odt_h2_warn']='ማስጠንቀቂያ: የማብቂያ ከፍታ ከቀዳዳ ጫፍ (ማዕከል + D/2) ወይም ዝቅ';
+$ec_lang['odt_d']='ቀዳዳ ዲያሜትር (ክብ) ወይም ከፍታ (አራት ማዕዘን), D';
+$ec_lang['odt_w']='ቀዳዳ ስፋት, W (አራት ማዕዘን ብቻ)';
+$ec_lang['odt_t_sec']='ፍሳሽ ጊዜ (ሰከንዶች)';
+$ec_lang['odt_t_min']='ፍሳሽ ጊዜ (ደቂቃዎች)';
+$ec_lang['odt_t_hr']='ፍሳሽ ጊዜ (ሰዓታት)';
+$ec_lang['odt_t_day']='ፍሳሽ ጊዜ (ቀናት)';
+$ec_lang['odt_notes_1_term']='ቀመር';
+$ec_lang['odt_notes_1_def']='t = √H<sub>1</sub> / (C<sub>d</sub> A<sub>or</sub> √(2g)) × (2A<sub>x</sub>/5 + 8√(A<sub>x</sub>A<sub>0</sub>)/15 + 16A<sub>0</sub>/15) ከጭንቅ H እስከ ቀዳዳ ፍሳሽ ጊዜ ይሰጣል። ፍሳሽ ጊዜ = t(H<sub>1</sub>,A<sub>1</sub>,A<sub>0</sub>) − t(H<sub>2</sub>,A<sub>2</sub>,A<sub>0</sub>)፣ H<sub>1</sub> = የጀምር ከፍታ − ቀዳዳ ከፍታ፣ H<sub>2</sub> = የማብቂያ ከፍታ − ቀዳዳ ከፍታ።';
+$ec_lang['odt_notes_2_term']='ዘዴ';
+$ec_lang['odt_notes_2_def']='ኮኒካዊ ድምር ዘዴ ኩሬ ወይም ቤዝኑን ከጀምር ስፋት A<sub>1</sub> በጀምር ውሃ ወለል እስከ ስፋት A<sub>0</sub> በቀዳዳ ማዕከል ከፍታ ድረስ ኮኒካዊ ክፍል ሆኖ ያሞዳሉ። A<sub>2</sub>፣ ኩሬ ስፋት በማብቂያ ከፍታ፣ ከ A<sub>1</sub> እና A<sub>0</sub> ኮኒካዊ ክፍሉን ሞዴል ተጠቅሞ ይሰላል። ከጀምር እስከ ማብቂያ ከፍታ ፍሳሽ ጊዜ ከ H<sub>1</sub> እስከ ቀዳዳ ጠቅላላ ፍሳሽ ጊዜ ከ H<sub>2</sub> እስከ ቀዳዳ ቀሪ ፍሳሽ ጊዜ ሲቀነስ ይሆናል።';
+$ec_lang['odt_h1']='የጀምር ጭንቅ, H<sub>1</sub> (WSE − ማዕከል)';
+$ec_lang['odt_q_max']='ከፍተኛ (የጀምር) ፍሰት, Q<sub>max</sub>';
+$ec_lang['odt_vol']='የፈሰሰ ድምር';
+$ec_lang['odt_sketch_start']='ጅምር';
+$ec_lang['odt_sketch_end']='ፍጻሜ';
+// Erosion Setback and Scour Calc.
+$ec_lang['essc_btbw']='ዳርቻ እስከ ዳርቻ ስፋት';
+$ec_lang['essc_mcr']='ዝቅተኛ ጥምዝ ራዲየስ';
+$ec_lang['essc_q']='ፍሰት, Q';
+// Contact us.
 
+// Irrigation
+$ec_lang['irr_main_menu']='የመስኖ ፍሰት ልኬት';
+$ec_lang['irr_main_title']='ነፃ ኦንላይን የመስኖ ፍሰት ልኬት ካልኩሌተሮች';
+$ec_lang['irr_main_desc']='የመስኖ ፍሰት ልኬት — ዊርስ እና ኦሪፊስ';
+$ec_lang['irr_intro_html']='<p>ዌር እና ኦሪፊስ በመስኖ ስርዓቶች ውስጥ የውሃ ፍሰት ለመለካት ደረጃዊ የሜዳ መሳሪያዎች ናቸው። ለእርስዎ ግንባታ የሚስማማ ካልኩሌተር ይምረጡ፡</p>';
+$ec_lang['irr_card_weir_uniform_head']='ዌር — ሰፊ ጫፍ (ወጥ ስፋት)';
+$ec_lang['irr_card_weir_uniform_desc']='በዳይቨርሽን ግድብ ጫፍ፣ የቁጥጥር መዋቅር ወይም የዌር ሰሌዳ ላይ ያለውን ፍሰት ይለኩ። የዌሩን ርዝማኔ እና በጫፉ ላይ ያለውን የውሃ ጥልቀት ያስገቡ።';
+$ec_lang['irr_card_weir_irregular_head']='ዌር — ያልተስተካከለ ፕሮፋይል';
+$ec_lang['irr_card_weir_irregular_desc']='የዌሩ ጫፍ ወጥ ከፍታ ሲሌለው ይጠቀሙ — ተፈጥሯዊ መፍሰሻዎች፣ ተለዋዋጭ ስፋት ያለው የመውደቂያ መዋቅሮች ወይም ብዙ ክፍሎች ያሉ የቁጥጥር መዋቅሮች።';
+$ec_lang['irr_card_orifice_head']='ኦሪፊስ — የጭንቅላት በር ወይም የቧንቧ መውጫ';
+$ec_lang['irr_card_orifice_desc']='በሳሌዳ በር፣ የቧንቧ መውጫ ወይም የካልቨርት ክፍት ቦታ ውስጥ ያለውን ፍሰት ይለኩ። ነፃ ፍሳሽ እና ተጥለቅልቆ (ተቃራኒ ሁኔታ) ሁለቱንም ሁኔታዎች አውቶማቲሲሊ ይቆጣጠራል።';
+$ec_lang['irr_card_canal_head']='የቦይ ዲዛይን & ትንተና';
+$ec_lang['irr_card_canal_desc']='የ Manning\'s ቀመር ተጠቅመው የመስኖ ቦይ ዲዛይን ያድርጉ ወይም ይፈትሹ። ለአዲስ ቦዮች ትራፕዞይዳዊ ካልኩሌተር፤ ለነባር ተፈጥሯዊ ወይም ሰው ሠራሽ ክፍሎች ያልተስተካከለ ካልኩሌተር።';
+$ec_lang['irr_card_drip_head']='ጠብታ & ስፕሪንክለር ዲዛይን';
+$ec_lang['irr_card_drip_desc']='ለጠብታ ወይም ስፕሪንክለር መስኖ ስርዓት የመስኖ መጠን፣ የስርጭት ወጥነት፣ ጎን ቅርንጫፍ ፍሰት፣ ዞን ፍሰት እና የሥራ ጊዜ ያሰሉ። የኤሚተር ፍሰት፣ የኤሚተር ርቀት እና ዒላማ ጥልቀት ያስገቡ።';
+$ec_lang['irr_card_seepage_head']='የቦይ ፍሳሽ & የማስተላለፊያ ብቃት';
+$ec_lang['irr_card_seepage_desc']='ፍሳሽ ኪሳራን ከቦይ ደረጃ ላይ የፍሰት መግቢያ እና መውጫ ልኬቶችን ተጠቅሞ ይገምቱ። የማስተላለፊያ ብቃት እና ዓመታዊ የውሃ ኪሳራ ያሰሉ፤ ይህም ሽፋን ኢንቨስትመንት ቅድሚያ ለማውጣት ይረዳል።';
+$ec_lang['irr_quickref_html']='<h3>ፈጣን ማጣቀሻ</h3><dl><dt>ዳይቨርሽን ግድብ ወይም የቁጥጥር መዋቅር</dt><dd>የዌሩ ጫፍ ላይ ያለውን የውሃ ጥልቀት ይለኩ። ለወጥ ጫፍ <a href="Weir-Flow-Simple.php">ቀላል ዌር ፍሰት</a> ወይም ለፕሮፋይል ወይም ደረጃ ለዘለ ጫፍ <a href="Weir-Flow-Irregular.php">ያልተስተካከለ ዌር ፍሰት</a> ይጠቀሙ።</dd><dt>የጭንቅላት በር ወይም የቧንቧ መውጫ</dt><dd>ከላይ ያለውን እና ከስር ያለውን የውሃ ከፍታ ይለኩ (ወይም ነፃ ፍሳሽ ከሆነ የቧንቧ ዝቅተኛ ከፍታ)። <a href="Orifice.php">ኦሪፊስ ፍሰት</a> ይጠቀሙ። ለክብ ቧንቧ D = የቧንቧ ዲያሜትር፤ ለአራት ማዕዘን በር ስፋት W እና ቁመት D ያስገቡ።</dd><dt>የምንጭ ወይም የኩሬ ማፍሰሻ ጊዜ</dt><dd>በስር ኦሪፊስ በኩል የኩሬ ወይም የምንጭ ደረጃ ለዝቅ ለማድረግ የሚወስደውን ጊዜ ለመገምገም <a href="Orifice-Drain-Time.php">የኦሪፊስ ፍሳሽ ጊዜ</a> ይጠቀሙ — ለመስኖ ማጠራቀሚያ ዕቅድ ጠቃሚ ነው።</dd><dt>የሜዳ ደረጃዎች</dt><dd>እዚህ ጥቅም ላይ የዋሉ ዌር እና ኦሪፊስ ፍሰት እኩልታዎች USBR <em>Water Measurement Manual</em> (3ኛ እትም) ሂደቶችን ይከተላሉ፣ ብዙ ጊዜ በውሃ አስተዳዳሪዎችና በመስኖ ዲስትሪክቶች ያስፈልጋሉ።</dd></dl>';
 // Drip / Sprinkler Application Rate
-$ec_lang['u_lph']="L/hr";
-$ec_lang['u_gph']="gal/hr";
-$ec_lang['u_mmph']="mm/hr";
-$ec_lang['u_inph']="in/hr";
 $ec_lang['ds_main_menu']='ጠብታ/ርጭት የመስኖ መጠን';
 $ec_lang['ds_main_title']='ነፃ ኦንላይን ጠብታ/ርጭት መስኖ አተገባበር ስሌት';
 $ec_lang['ds_main_desc']='ጠብታ & ርጭት መስኖ — አፈጻጸም መጠን';
@@ -364,13 +371,14 @@ $ec_lang['ds_notes_1_term']='አፈፃፀም መጠን';
 $ec_lang['ds_notes_1_def']='PR = q / A<sub>e</sub>, A<sub>e</sub> = S<sub>e</sub> × S<sub>l</sub> ለእያንዳንዱ ኤሚተር የሚሸፈን ስፋት ነው። ዝቅተኛ አፈፃፀም መጠን ለምድር ዘለቃ የበለጠ ጊዜ ይሰጣል — በከባድ አፈር ወይም ዳገታማ ሜዳዎች አስፈላጊ ነው።';
 $ec_lang['ds_notes_2_term']='የሩጫ ጊዜ';
 $ec_lang['ds_notes_2_def']='የሩጫ ጊዜ = ዒላማ ጥልቀት ÷ አፈፃፀም መጠን። በዳገታማ ወይም በጠጣር አፈር ላይ የሩጫ ጊዜን በሁለት ወይም ሦስት አጭር ዙሮች ይከፋፍሉ።';
-
 // Canal Seepage / Conveyance Efficiency. Prefix cs_.
 $ec_lang['cs_main_menu']='የቦይ ፍሳሽ';
 $ec_lang['cs_main_title']='ነፃ ኦንላይን የቦይ ፍሳሽ ኪሳራ እና የማስተላለፊያ ብቃት ካልኩሌተር';
 $ec_lang['cs_main_desc']='የቦይ ፍሳሽ ኪሳራ & የማስተላለፊያ ብቃት — የፍሰት መግቢያ-መውጫ ዘዴ';
 $ec_lang['cs_Q_in']='በደረጃ ጫፍ የሚገባ ፍሰት, Q<sub>in</sub>';
 $ec_lang['cs_Q_out']='በደረጃ ጅራት የሚወጣ ፍሰት, Q<sub>out</sub>';
+$ec_lang['cs_L']='የደረጃ ርዝመት, L';
+$ec_lang['cs_wp']='የቦይ መስቀለኛ ክፍል የተረጠቀ ዙሪያ, P<sub>w</sub>';
 $ec_lang['cs_Q_loss']='የፍሳሽ ኪሳራ ፍጥነት, Q<sub>loss</sub>';
 $ec_lang['cs_loss_check']='የልኬት ማረጋገጫ';
 $ec_lang['cs_pct_loss']='ኪሳራ እንደ ከፍሰቱ ድርሻ';
@@ -378,8 +386,6 @@ $ec_lang['cs_Ec']='የማስተላለፊያ ብቃት, E<sub>c</sub>';
 $ec_lang['cs_Ec_check']='የብቃት ደረጃ';
 $ec_lang['cs_Vol_day']='በቀን የሚጠፋ ድምር';
 $ec_lang['cs_Vol_year']='በዓመት የሚጠፋ ድምር';
-$ec_lang['cs_L']='የደረጃ ርዝመት, L';
-$ec_lang['cs_wp']='የቦይ መስቀለኛ ክፍል የተረጠቀ ዙሪያ, P<sub>w</sub>';
 $ec_lang['cs_Q_loss_per_L']='በአሃድ ርዝመት ፍሳሽ ኪሳራ, Q<sub>loss</sub>/L';
 $ec_lang['cs_water_value']='የውሃ ዋጋ (ምንዛሬ / አሃድ ድምር)';
 $ec_lang['cs_lining_cost']='የሽፋን ወጪ (ምንዛሬ / አሃድ ስፋት)';
@@ -403,26 +409,26 @@ $ec_lang['cs_notes_3_term']='የሽፋን ክፍያ መመለሻ';
 $ec_lang['cs_notes_3_def']='የውሃ ዋጋ እና የሽፋን ወጪ በማናቸውም ወጥ ምንዛሬ ያስገቡ። የሽፋን ስፋት = የደረጃ ርዝመት × የተረጠቀ ዙሪያ — በተለካ ፍሰት ጥልቀት ላይ የቦይ መስቀለኛ ክፍል የተረጠቀ ዙሪያ (የታቹ ስፋት ከሁለቱም የተረጠቁ ጎኖች ጋር)። የሚመለሰው ዓመታዊ ዋጋ የተሸፈነ ቦይ ዒላማ E<sub>c</sub>ን ያለማቋረጥ ያሳካዋል ብሎ ይገምታል። ለወቅታዊ ቦዮች ወይም ሽፋኑ ዒላማ ብቃቱን ካልደረሰ ትክክለኛ ክፍያ መመለሻ ጊዜ ይረዝማል።';
 $ec_lang['cs_notes_4_term']='ማጣቀሻ';
 $ec_lang['cs_notes_4_def']='USBR <em>Water Measurement Manual</em>, 3ኛ እትም (2001)። FAO Irrigation and Drainage Paper 57 (1999)።';
-
-$ec_lang['irr_intro_html']='<p>ዌር እና ኦሪፊስ በመስኖ ስርዓቶች ውስጥ የውሃ ፍሰት ለመለካት ደረጃዊ የሜዳ መሳሪያዎች ናቸው። ለእርስዎ ግንባታ የሚስማማ ካልኩሌተር ይምረጡ፡</p>';
-$ec_lang['irr_card_weir_uniform_head']='ዌር — ሰፊ ጫፍ (ወጥ ስፋት)';
-$ec_lang['irr_card_weir_uniform_desc']='በዳይቨርሽን ግድብ ጫፍ፣ የቁጥጥር መዋቅር ወይም የዌር ሰሌዳ ላይ ያለውን ፍሰት ይለኩ። የዌሩን ርዝማኔ እና በጫፉ ላይ ያለውን የውሃ ጥልቀት ያስገቡ።';
-$ec_lang['irr_card_weir_irregular_head']='ዌር — ያልተስተካከለ ፕሮፋይል';
-$ec_lang['irr_card_weir_irregular_desc']='የዌሩ ጫፍ ወጥ ከፍታ ሲሌለው ይጠቀሙ — ተፈጥሯዊ መፍሰሻዎች፣ ተለዋዋጭ ስፋት ያለው የመውደቂያ መዋቅሮች ወይም ብዙ ክፍሎች ያሉ የቁጥጥር መዋቅሮች።';
-$ec_lang['irr_card_orifice_head']='ኦሪፊስ — የጭንቅላት በር ወይም የቧንቧ መውጫ';
-$ec_lang['irr_card_orifice_desc']='በሳሌዳ በር፣ የቧንቧ መውጫ ወይም የካልቨርት ክፍት ቦታ ውስጥ ያለውን ፍሰት ይለኩ። ነፃ ፍሳሽ እና ተጥለቅልቆ (ተቃራኒ ሁኔታ) ሁለቱንም ሁኔታዎች አውቶማቲሲሊ ይቆጣጠራል።';
-$ec_lang['irr_card_canal_head']='የቦይ ዲዛይን & ትንተና';
-$ec_lang['irr_card_canal_desc']='የ Manning\'s ቀመር ተጠቅመው የመስኖ ቦይ ዲዛይን ያድርጉ ወይም ይፈትሹ። ለአዲስ ቦዮች ትራፕዞይዳዊ ካልኩሌተር፤ ለነባር ተፈጥሯዊ ወይም ሰው ሠራሽ ክፍሎች ያልተስተካከለ ካልኩሌተር።';
-$ec_lang['irr_card_drip_head']='ጠብታ & ስፕሪንክለር ዲዛይን';
-$ec_lang['irr_card_drip_desc']='ለጠብታ ወይም ስፕሪንክለር መስኖ ስርዓት የመስኖ መጠን፣ የስርጭት ወጥነት፣ ጎን ቅርንጫፍ ፍሰት፣ ዞን ፍሰት እና የሥራ ጊዜ ያሰሉ። የኤሚተር ፍሰት፣ የኤሚተር ርቀት እና ዒላማ ጥልቀት ያስገቡ።';
-$ec_lang['irr_card_seepage_head']='የቦይ ፍሳሽ & የማስተላለፊያ ብቃት';
-$ec_lang['irr_card_seepage_desc']='ፍሳሽ ኪሳራን ከቦይ ደረጃ ላይ የፍሰት መግቢያ እና መውጫ ልኬቶችን ተጠቅሞ ይገምቱ። የማስተላለፊያ ብቃት እና ዓመታዊ የውሃ ኪሳራ ያሰሉ፤ ይህም ሽፋን ኢንቨስትመንት ቅድሚያ ለማውጣት ይረዳል።';
-$ec_lang['irr_quickref_html']='<h3>ፈጣን ማጣቀሻ</h3><dl><dt>ዳይቨርሽን ግድብ ወይም የቁጥጥር መዋቅር</dt><dd>የዌሩ ጫፍ ላይ ያለውን የውሃ ጥልቀት ይለኩ። ለወጥ ጫፍ <a href="Weir-Flow-Simple.php">ቀላል ዌር ፍሰት</a> ወይም ለፕሮፋይል ወይም ደረጃ ለዘለ ጫፍ <a href="Weir-Flow-Irregular.php">ያልተስተካከለ ዌር ፍሰት</a> ይጠቀሙ።</dd><dt>የጭንቅላት በር ወይም የቧንቧ መውጫ</dt><dd>ከላይ ያለውን እና ከስር ያለውን የውሃ ከፍታ ይለኩ (ወይም ነፃ ፍሳሽ ከሆነ የቧንቧ ዝቅተኛ ከፍታ)። <a href="Orifice.php">ኦሪፊስ ፍሰት</a> ይጠቀሙ። ለክብ ቧንቧ D = የቧንቧ ዲያሜትር፤ ለአራት ማዕዘን በር ስፋት W እና ቁመት D ያስገቡ።</dd><dt>የምንጭ ወይም የኩሬ ማፍሰሻ ጊዜ</dt><dd>በስር ኦሪፊስ በኩል የኩሬ ወይም የምንጭ ደረጃ ለዝቅ ለማድረግ የሚወስደውን ጊዜ ለመገምገም <a href="Orifice-Drain-Time.php">የኦሪፊስ ፍሳሽ ጊዜ</a> ይጠቀሙ — ለመስኖ ማጠራቀሚያ ዕቅድ ጠቃሚ ነው።</dd><dt>የሜዳ ደረጃዎች</dt><dd>እዚህ ጥቅም ላይ የዋሉ ዌር እና ኦሪፊስ ፍሰት እኩልታዎች USBR <em>Water Measurement Manual</em> (3ኛ እትም) ሂደቶችን ይከተላሉ፣ ብዙ ጊዜ በውሃ አስተዳዳሪዎችና በመስኖ ዲስትሪክቶች ያስፈልጋሉ።</dd></dl>';
+// About
+$ec_lang['about_main_menu']='ስለ';
+$ec_lang['install_main_menu']='ጫን';
+$ec_lang['install_main_title']='EngCalcs ይጫኑ';
+$ec_lang['install_main_desc']='ያለኢንተርኔት ለመጠቀም ወደ መሳሪያዎ ያክሉ';
+$ec_lang['contact_main_menu']='አግኙን';
+$ec_lang['about_main_title']='ስለ HawsEDC የምህንድስና ካልኩሌተሮች';
+$ec_lang['about_main_desc']='ተልዕኮ፣ ክፍት ምንጭ እና አስተዋጽዖ';
 $ec_lang['about_body_html']='<h3>ተልዕኮ</h3><p>የ HawsEDC ምህንድስና ካልኩሌተሮች በዓለም ዙሪያ ላሉ መሐንዲሶችና የሜዳ ሠራተኞች ለማገልገል ናቸው — በተለይ ውሃ እጥረት፣ ሀብት ውስንነት ወይም ዝቅተኛ አገልግሎት ባለበት አካባቢ ለሚሰሩ። እነዚህ መሳሪያዎች ሰፊ ሰብዓዊ ተልዕኮ አካል ናቸው፡ ለእያንዳንዱ ሰው በጣም ተግባራዊ እና ውጤታማ በሆነ መንገድ መናገር — ለዘለዓለም የተወደዱ እና የሚቀሩ መሆናቸውን፣ ምንም ነገር ሊፈሩ አለመሆናቸውን፣ እና ሁሉንም ነገር ሊያበላሹ አለመሆናቸውን።</p><p>ካልኩሌተሮቹ መሳሪያ ናቸው። ዓላማው ስቃይ የሌለው ዓለም ነው።</p><h3>ክፍት ምንጭ ፍቃድ</h3><p>ሁሉም ኮድ በ<a target="_blank" href="https://www.gnu.org/licenses/gpl-3.0.html">GNU General Public License v3.0 ወይም ቆይቶ</a> ተለቋል — እንደ ነፃነቱ ነፃ። ተመሳሳይ ሁኔታዎች ስር ኮዱን መጠቀም፣ ማጥናት፣ ማሻሻል እና ማሰራጨት ይችላሉ።</p><p>Copyright © 2009–2026 Thomas Gail Haws.</p><h3>ምንጭ ኮድ</h3><p>ሙሉ ምንጭ ኮድ በ Bitbucket ላይ ሕዝባዊ ሆኖ ይገኛል፡</p><p><a target="_blank" href="https://bitbucket.org/hawstom/engcalcs">bitbucket.org/hawstom/engcalcs</a></p><p>ኮዱን መቃኘት፣ ጉዳዮችን ሪፖርት ማድረግ፣ ወይም ሪፖዚቶሪውን ፎርክ ማድረግ ይችላሉ።</p><h3>አስተዋፅኦ</h3><p>Pull Requests ተቀባይነት አላቸው። የአስተዋፅኦ ዘዴዎች:</p><ul><li><strong>ትርጉሞች</strong> — ቋንቋ ያሻሽሉ ወይም አዲስ ይጨምሩ። ተዛማጅ <code>lib/lang.ec.??.php</code> ፋይሉ ላይ ለውጦቹን ይዘው Pull Request ይክፈቱ።</li><li><strong>ስህተት ሪፖርቶች</strong> — በማንኛውም ካልኩሌተር ገጽ ላይ ያለውን የተጠቃሚ ሀሳብ ቅጽ ይጠቀሙ፣ ወይም ጉዳዩን ሪፖዚቶሪ ላይ ሪፖርት ያድርጉ።</li><li><strong>አዲስ ካልኩሌተሮች</strong> — ለሜዳ ሠራተኞችና ለመስኖ ባለሙያዎች የሚያገለግሉ የሃይድሮሊክ ምህንድስና ሃሳቦች በተለይ ተቀባይነት አላቸው። ሪፖዚቶሪ ውስጥ ያለውን <code>CLAUDE.md</code> የ ዲቨሎፐር መመሪያ ይዩ።</li><li><strong>ሆስቲንግ</strong> — ዝቅተኛ ኔትወርክ ባለው አካባቢ ካልኩሌተሮቹን ማሳያ ማድረግ ከቻሉ እባኮትን ያስፈልጋቸው ያነጋግሩን።</li></ul><h3>ያለ ኢንተርኔት አጠቃቀም</h3><p>እነዚህ ካልኩሌተሮች እንደ ፕሮግሬሲቭ ዌብ አፕ (PWA) ይሠራሉ። ከኢንተርኔት ጋር ሲገናኙ ማንኛውንም የካልኩሌተር ገጽ ይጎብኙ፣ እና አሳሽዎ ሁሉንም ካልኩሌተሮች በራስ-ሰር ያከማቻል። ከዚያ በኋላ ሁሉም ካልኩሌተሮች ያለ ኢንተርኔት ይሠራሉ — ኢንተርኔት አያስፈልግም።</p><p>ለ Android ወይም iOS፣ EngCalcs እንደ አፕ በመሣሪያዎ ላይ ለመጫን የአሳሽዎን "ወደ መነሻ ማያ ገጽ ጨምር" አማራጭ ይጠቀሙ። ለዴስክቶፕ፣ የጭነት አዶ በአሳሽዎ የአድራሻ አሞሌ ውስጥ ይፈልጉ።</p><p>እንዲሁም ማንኛውንም ካልኩሌተር ወደ አካባቢያዊ መሣሪያዎ ለማስቀመጥ የአሳሽዎን "እንደ… አስቀምጥ" ምናሌ መጠቀም ይችላሉ።</p><h3>ግንኙነት</h3><p>Tom Haws — ሃይድሮሊክ መሐንዲስ እና የእነዚህ ካልኩሌተሮች ደራሲ።<br />በማንኛውም ካልኩሌተር ገጽ ላይ ያለውን ተጠቃሚ ሀሳብ ቅጽ ይጠቀሙ፣ ወይም <a target="_blank" href="https://bitbucket.org/hawstom/engcalcs">Bitbucket</a> ላይ ምንጭ ኮዱን ያስሱ።</p>';
-
+$ec_lang['contact_title']='HawsEDC ያግኙን';
+$ec_lang['contactSendMessage']='Tom Haws ላክ መልዕክት';
+$ec_lang['contactYourName']='ስምህ:';
+$ec_lang['contactYourEmail']='የኢሜይል አድራሻህ:';
+$ec_lang['contactSubject']='ርዕሰ ጉዳይ:';
+$ec_lang['contact_message']='መልዕክት:';
+$ec_lang['contactSpamPrefix']='አምስት ሲደምር አንድ ይሆናል';
+$ec_lang['contactSpamPostfix']='(እባክህ በቃላት ፃፍ። 1=አንድ 2=ሁለት 3=ሦስት 4=አራት 5=አምስት 6=ስድስት 7=ሰባት +=ሲደምር 5+1=6)';
+$ec_lang['contactSubmitButton']='መልዕክት ላክ';
+$ec_lang['contact_success']='ለመጻፍ ጊዜ ለወጣህ አመሰግናለሁ።';
 // Rock Chute Design (Robinson, Rice & Kadavy 1998). Prefix rc_.
-$ec_lang['u_m2ps']='m^2/s';
-$ec_lang['u_ft2ps']='cfs/ft';
 $ec_lang['rc_main_menu']='የድንጋይ ቱቦ ዲዛይን (Robinson)';
 $ec_lang['rc_main_title']='ነፃ የመስመር ላይ የድንጋይ ቱቦ ዲዛይን ካልኩሌተር — Robinson (1998)';
 $ec_lang['rc_main_desc']='የድንጋይ ቱቦ ሪፕራፕ ማቀናጀት — Robinson, Rice & Kadavy (1998)';
@@ -478,20 +484,3 @@ $ec_lang['rc_sketch_filter']          = 'ማጣሪያ';
 $ec_lang['rc_sketch_top_crest_curve'] = 'የጫፍ ኩርባ';
 $ec_lang['rc_sketch_outlet_apron']    = 'መውጫ ሰሌዳ';
 $ec_lang['rc_sketch_radius']          = 'ራዲየስ';
-
-// Manning Trapezoid velocity checks and note 2
-$ec_lang['mtc_vel_check']='የፍጥነት ምርመራ';
-$ec_lang['mtc_vel_ok']='ፍጥነቱ ለወጥ ፍሰት ግምቶች ምክንያታዊ ነው።';
-$ec_lang['mtc_vel_high']='ፍጥነቱ ከፍተኛ ነው - ሽግግር ኪሳራዎች እና ሊታገድ የሚችል ሃይል ያረጋግጡ።';
-$ec_lang['mtc_vel_low']='ፍጥነቱ ዝቅ ያለ ነው - የደለል አደጋ አለ።';
-$ec_lang['mtc_vel_ok_short']='ጥሩ';
-$ec_lang['mtc_vel_high_short']='ከፍተኛ';
-$ec_lang['mtc_vel_low_short']='ዝቅተኛ';
-$ec_lang['mtc_note_2_term']='የፍጥነት ምርመራ';
-$ec_lang['mtc_note_2_def']='ከፍተኛ ፍጥነት ከሚገኝ ቁልቁለት ከፍተኛ ልዩ ሃይልን ያሳያል። ያ ሃይል በስፋፊዎች፣ ጥምዞች ወይም እንቅፋቶች ላይ በፍጥነት ሊጠፋ ይችላል። ይህ ለቦታው ምክንያታዊ መሆኑን ያረጋግጡ።';
-
-// Micro-Hydro Power notes 6 and 7
-$ec_lang['mhp_notes_6_term']='ብቃት';
-$ec_lang['mhp_notes_6_def']='ለ Pelton እና cross-flow ተርቢኖች ለማይክሮ-ሃይድሮ ዓይነተኛ ፋብሪካ ብቃት &eta; ከ0.70 እስከ 0.85 ይደርሳል። 0.75 ጥንቃቄ ሞልቶ ቀዳሚ ግምት ሆኖ ይጠቀሙ።';
-$ec_lang['mhp_notes_7_term']='ዓመታዊ ሃይል';
-$ec_lang['mhp_notes_7_def']='ዓመታዊ ሃይል ያለ ቋረጣ ሙሉ-ፍሰት ሥራን (8760 ሰዓት/ዓመት) ይወስዳል። ምርቱ ወቅታዊ ፍሰት ልዩነት፣ ጥገና ቆም ጊዜ፣ እና ጭነት ሁኔታ ምክንያት ዝቅ ይሆናል።';

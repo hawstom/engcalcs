@@ -35,6 +35,10 @@ $ec_lang['u_pa']="Pa";
 $ec_lang['u_psf']="psf";
 $ec_lang['u_psi']="psi";
 $ec_lang['u_s']="dtk";
+$ec_lang['u_lph']="L/hr";
+$ec_lang['u_gph']="gal/hr";
+$ec_lang['u_mmph']="mm/hr";
+$ec_lang['u_inph']="in/hr";
 $ec_lang['u_acft']="ac-ft";
 $ec_lang['u_ft3']="ft^3";
 $ec_lang['u_m3']="m^3";
@@ -43,8 +47,12 @@ $ec_lang['u_mw']='MW';
 $ec_lang['u_kwh_yr']='kWh/yr';
 $ec_lang['u_mwh_yr']='MWh/yr';
 $ec_lang['u_hp']='hp';
+$ec_lang['u_m2ps']='m^2/s';
+$ec_lang['u_ft2ps']='cfs/ft';
 
 // Page text
+// In page order for easiest maintenance.
+// Menu and General
 $ec_lang['menu_brand']='Kalkulator HawsEDC';
 $ec_lang['menu_main_list']='Daftar Kalkulator';
 $ec_lang['menu_main_hydraulics']='Hidraulika';
@@ -181,8 +189,16 @@ $ec_lang['mtc_d50_z1']='Ukuran batu sudut yang dibutuhkan di tebing 1, D50 (Isba
 $ec_lang['mtc_d50_z2']='Ukuran batu sudut yang dibutuhkan di tebing 2, D50 (Isbash & MC) <span title="Menurut Isbash (1936) dan Maricopa County, Arizona, AS." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['mtc_d50_mra']='Ukuran batu sudut yang dibutuhkan, D50 (Maynord, Ruff, dan Abt 1989)';
 $ec_lang['mtc_d50_searcy']='Ukuran batu sudut yang dibutuhkan, D50 (Searcy 1967)';
+$ec_lang['mtc_vel_check']='Pemeriksaan kecepatan';
+$ec_lang['mtc_vel_ok']='Kecepatan wajar untuk asumsi aliran seragam.';
+$ec_lang['mtc_vel_high']='Kecepatan tinggi — periksa kehilangan transisi dan energi yang tersedia.';
+$ec_lang['mtc_vel_low']='Kecepatan rendah — risiko sedimentasi.';
+$ec_lang['mtc_vel_ok_short']='OK';
+$ec_lang['mtc_vel_high_short']='Tinggi';
+$ec_lang['mtc_vel_low_short']='Rendah';
 $ec_lang['mtc_note_1']='<dl><dt>Iterasi otomatis ukuran batu dan kekasaran</dt><dd>Pilih tombol radio kekasaran (BB direkomendasikan) dan tombol radio ukuran batu rencana (Isbash direkomendasikan). Sesuaikan kedalaman dan faktor keamanan ukuran batu untuk mendapatkan debit yang diinginkan dengan ukuran batu yang seragam. Setiap kali Anda mengubah nilai masukan, siklus iterasi berikut terjadi: 1. Kekasaran dihitung dari ukuran batu rencana. 2. Perhitungan kekasaran yang diminta disalin ke kekasaran masukan. 3. Debit saluran dan ukuran batu yang diperlukan dihitung. 4. Ukuran batu rencana disesuaikan. 5. Ulangi hingga galat pada ukuran batu rencana sangat kecil.</dd><dt>Kalkulator dasar (tanpa iterasi)</dt><dd>Masukkan nilai kekasaran yang Anda inginkan. Abaikan area masukan ukuran batu rencana.</dd></dl>';
-// Robinson Rock Chute
+$ec_lang['mtc_note_2_term']='Pemeriksaan kecepatan';
+$ec_lang['mtc_note_2_def']='Kecepatan tinggi mengimplikasikan energi spesifik tinggi dari beda tinggi yang tersedia. Energi tersebut dapat hilang dengan cepat pada ekspansi, belokan, atau hambatan. Verifikasi bahwa ini wajar untuk kondisi lapangan.';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='Aliran Pelimpah Sederhana';
 $ec_lang['ws_main_title']='Kalkulator Pelimpah Bermercu Lebar Sederhana Gratis Daring';
@@ -237,6 +253,52 @@ $ec_lang['or_notes_3_term']='Koefisien Debit';
 $ec_lang['or_notes_3_def']='C<sub>d</sub> berkisar sekitar 0,60–0,65 untuk orifis bersudut tajam. Saluran masuk bulat atau re-entrant menggunakan nilai yang berbeda. Lihat <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venture-d_590.html">Engineering Toolbox</a> atau Manual Referensi Hidraulik HEC-RAS untuk panduan.';
 $ec_lang['or_notes_4_term']='Tenggelam';
 $ec_lang['or_notes_4_def']='Ketika TWE berada di atas dasar bukaan, kalkulator ini secara otomatis menerapkan persamaan orifis tenggelam menggunakan h = HWE − TWE. Ketika TWE sama dengan atau di bawah dasar, aliran bebas diasumsikan dan h = HWE − sentroid.';
+// Micro-Hydro Power
+$ec_lang['mhp_main_menu']='Tenaga Mikro-Hidro';
+$ec_lang['mhp_main_title']='Kalkulator Tenaga Mikro-Hidro Online Gratis';
+$ec_lang['mhp_main_desc']='Kalkulator Daya Keluaran Mikro-Hidro Aliran Sungai';
+$ec_lang['mhp_flow']='Debit, Q';
+$ec_lang['mhp_gross_head']='Tinggi bruto, H<sub>gross</sub>';
+$ec_lang['mhp_diameter']='Diameter pipa penstock, D';
+$ec_lang['mhp_length']='Panjang pipa penstock, L';
+$ec_lang['mhp_roughness']='Kekasaran pipa, e';
+$ec_lang['mhp_km']='Koefisien kehilangan minor, k<sub>m</sub> <span title="Sum of all junction and fitting loss coefficients along the penstock" class="ec-tip">?</span>';
+$ec_lang['mhp_nu']='Viskositas kinematik, ν <span title="1×10⁻⁶ m²/s for clean water near 20°C" class="ec-tip">?</span>';
+$ec_lang['mhp_efficiency']='Efisiensi instalasi, η (0–1)';
+$ec_lang['mhp_velocity']='Kecepatan aliran, v';
+$ec_lang['mhp_vel_check']='Pemeriksaan kecepatan';
+$ec_lang['mhp_f']='Faktor gesekan, f';
+$ec_lang['mhp_hf']='Kehilangan tinggi akibat gesekan, h<sub>f</sub>';
+$ec_lang['mhp_hm']='Kehilangan tinggi minor, h<sub>m</sub>';
+$ec_lang['mhp_hl']='Total kehilangan tinggi penstock, h<sub>L</sub>';
+$ec_lang['mhp_hl_check']='Pemeriksaan kehilangan tinggi';
+$ec_lang['mhp_hnet']='Tinggi neto, H<sub>net</sub>';
+$ec_lang['mhp_power']='Daya keluaran, P';
+$ec_lang['mhp_annual_kwh']='Energi tahunan pada kapasitas 100%';
+$ec_lang['mhp_vel_ok']='1–3 m/s — dalam rentang target ✓';
+$ec_lang['mhp_vel_low']='Kecepatan rendah — risiko sedimentasi dan masuknya udara.';
+$ec_lang['mhp_vel_high']='Kecepatan tinggi — risiko pukulan air dan kehilangan titik (minor).';
+$ec_lang['mhp_vel_ok_short']='OK';
+$ec_lang['mhp_vel_high_short']='Tinggi';
+$ec_lang['mhp_vel_low_short']='Rendah';
+$ec_lang['mhp_hl_ok']='dalam target 10% ✓';
+$ec_lang['mhp_hl_warn']='melebihi target 10% — pertimbangkan pipa lebih besar ⚠';
+$ec_lang['mhp_hl_bad']='melebihi 20% — ubah ukuran pipa';
+$ec_lang['mhp_notes_1_term']='Kehilangan Tinggi';
+$ec_lang['mhp_notes_1_def']='Total kehilangan h<sub>L</sub> = h<sub>f</sub> + h<sub>m</sub>, di mana h<sub>f</sub> = f(L/D)(v²/2g) adalah kehilangan gesekan Darcy-Weisbach dan h<sub>m</sub> = k<sub>m</sub>·v²/2g mencakup inlet, belokan, dan katup. Tinggi neto H<sub>net</sub> = H<sub>gross</sub> − h<sub>L</sub>.';
+$ec_lang['mhp_notes_2_term']='Kecepatan';
+$ec_lang['mhp_notes_2_def']='Target 1–3 m/s. Di bawah 1 m/s pipa terlalu besar; di atas 3 m/s meningkatkan kehilangan gesekan dan risiko pukulan air.';
+$ec_lang['mhp_notes_3_term']='Target Kehilangan Tinggi';
+$ec_lang['mhp_notes_3_def']='Kehilangan penstock di bawah 10% dari tinggi bruto umumnya ekonomis. Titik optimal antara biaya pipa dan daya yang hilang sering berada di sekitar 4–6% untuk lokasi listrik bernilai tinggi.';
+$ec_lang['mhp_notes_4_term']='Kehilangan Minor k<sub>m</sub>';
+$ec_lang['mhp_notes_4_def']='Nilai tipikal: inlet tajam 0.5, setiap belokan 45° antara 0.2–0.3, katup gerbang (terbuka penuh) 0.1, katup kupu-kupu 0.2. Jumlah semua fitting menghasilkan k<sub>m</sub> total. Default 1.5 mengasumsikan satu inlet dan dua belokan.';
+$ec_lang['mhp_notes_5_term']='Kekasaran Pipa e';
+$ec_lang['mhp_notes_5_def']='Kekasaran absolut tipikal: baja (baru) 0.046 mm, baja (bekas) 0.15 mm, HDPE 0.003 mm, PVC/uPVC 0.0015 mm, beton 0.3–3 mm. HDPE umum digunakan untuk pipa penstock mikro-hidro kecil.';
+$ec_lang['mhp_notes_6_term']='Efisiensi';
+$ec_lang['mhp_notes_6_def']='Efisiensi instalasi tipikal &eta; berkisar antara 0,70 hingga 0,85 untuk turbin Pelton dan turbin aliran silang yang umum digunakan dalam mikro-hidro. Gunakan 0,75 sebagai estimasi awal yang konservatif.';
+$ec_lang['mhp_notes_7_term']='Energi Tahunan';
+$ec_lang['mhp_notes_7_def']='Energi tahunan mengasumsikan operasi aliran penuh berkelanjutan (8.760 jam/tahun). Produksi aktual akan lebih rendah akibat variasi debit musiman, waktu henti pemeliharaan, dan faktor beban.';
+
 // Orifice Drain Time
 $ec_lang['odt_main_menu']='Waktu Pengosongan Orifis';
 $ec_lang['odt_main_title']='Kalkulator Waktu Pengosongan Orifis Gratis Daring — Kolam, Cekungan, atau Tangki';
@@ -275,74 +337,21 @@ $ec_lang['essc_q']='Debit, Q';
 $ec_lang['irr_main_menu']='Pengukuran Aliran Irigasi';
 $ec_lang['irr_main_title']='Kalkulator Pengukuran Aliran Irigasi Online Gratis';
 $ec_lang['irr_main_desc']='Pengukuran Aliran Irigasi — Pelimpah dan Orifis';
-$ec_lang['contact_title']='Kontak HawsEDC';
-$ec_lang['contactSendMessage']='Kirim pesan ke Tom Haws';
-$ec_lang['contactYourName']='Nama Anda:';
-$ec_lang['contactYourEmail']='Alamat e-mail Anda:';
-$ec_lang['contactSubject']='Subjek:';
-$ec_lang['contact_message']='Pesan:';
-$ec_lang['contactSpamPrefix']='Lima ditambah satu sama dengan';
-$ec_lang['contactSpamPostfix']='(Tulis dalam bahasa Inggris. 1=one 2=two 3=three 4=four 5=five 6=six 7=seven +=plus 5+1=6)';
-$ec_lang['contactSubmitButton']='Kirim Pesan';
-$ec_lang['contact_success']='Terima kasih telah meluangkan waktu untuk menulis.';
-
-
-// Micro-Hydro Power
-$ec_lang['mhp_main_menu']='Tenaga Mikro-Hidro';
-$ec_lang['mhp_main_title']='Kalkulator Tenaga Mikro-Hidro Online Gratis';
-$ec_lang['mhp_main_desc']='Kalkulator Daya Keluaran Mikro-Hidro Aliran Sungai';
-$ec_lang['mhp_flow']='Debit, Q';
-$ec_lang['mhp_gross_head']='Tinggi bruto, H<sub>gross</sub>';
-$ec_lang['mhp_diameter']='Diameter pipa penstock, D';
-$ec_lang['mhp_length']='Panjang pipa penstock, L';
-$ec_lang['mhp_roughness']='Kekasaran pipa, e';
-$ec_lang['mhp_km']='Koefisien kehilangan minor, k<sub>m</sub> <span title="Sum of all junction and fitting loss coefficients along the penstock" class="ec-tip">?</span>';
-$ec_lang['mhp_nu']='Viskositas kinematik, ν <span title="1×10⁻⁶ m²/s for clean water near 20°C" class="ec-tip">?</span>';
-$ec_lang['mhp_efficiency']='Efisiensi instalasi, η (0–1)';
-$ec_lang['mhp_velocity']='Kecepatan aliran, v';
-$ec_lang['mhp_vel_check']='Pemeriksaan kecepatan';
-$ec_lang['mhp_f']='Faktor gesekan, f';
-$ec_lang['mhp_hf']='Kehilangan tinggi akibat gesekan, h<sub>f</sub>';
-$ec_lang['mhp_hm']='Kehilangan tinggi minor, h<sub>m</sub>';
-$ec_lang['mhp_hl']='Total kehilangan tinggi penstock, h<sub>L</sub>';
-$ec_lang['mhp_hl_check']='Pemeriksaan kehilangan tinggi';
-$ec_lang['mhp_hnet']='Tinggi neto, H<sub>net</sub>';
-$ec_lang['mhp_power']='Daya keluaran, P';
-$ec_lang['mhp_annual_kwh']='Energi tahunan pada kapasitas 100%';
-$ec_lang['mhp_vel_ok']='1–3 m/s — dalam rentang target ✓';
-$ec_lang['mhp_vel_ok_short']='OK';
-$ec_lang['mhp_vel_low']='Kecepatan rendah — risiko sedimentasi dan masuknya udara.';
-$ec_lang['mhp_vel_low_short']='Rendah';
-$ec_lang['mhp_vel_high']='Kecepatan tinggi — risiko pukulan air dan kehilangan titik (minor).';
-$ec_lang['mhp_vel_high_short']='Tinggi';
-$ec_lang['mhp_hl_ok']='dalam target 10% ✓';
-$ec_lang['mhp_hl_warn']='melebihi target 10% — pertimbangkan pipa lebih besar ⚠';
-$ec_lang['mhp_hl_bad']='melebihi 20% — ubah ukuran pipa';
-$ec_lang['mhp_notes_1_term']='Kehilangan Tinggi';
-$ec_lang['mhp_notes_1_def']='Total kehilangan h<sub>L</sub> = h<sub>f</sub> + h<sub>m</sub>, di mana h<sub>f</sub> = f(L/D)(v²/2g) adalah kehilangan gesekan Darcy-Weisbach dan h<sub>m</sub> = k<sub>m</sub>·v²/2g mencakup inlet, belokan, dan katup. Tinggi neto H<sub>net</sub> = H<sub>gross</sub> − h<sub>L</sub>.';
-$ec_lang['mhp_notes_2_term']='Kecepatan';
-$ec_lang['mhp_notes_2_def']='Target 1–3 m/s. Di bawah 1 m/s pipa terlalu besar; di atas 3 m/s meningkatkan kehilangan gesekan dan risiko pukulan air.';
-$ec_lang['mhp_notes_3_term']='Target Kehilangan Tinggi';
-$ec_lang['mhp_notes_3_def']='Kehilangan penstock di bawah 10% dari tinggi bruto umumnya ekonomis. Titik optimal antara biaya pipa dan daya yang hilang sering berada di sekitar 4–6% untuk lokasi listrik bernilai tinggi.';
-$ec_lang['mhp_notes_4_term']='Kehilangan Minor k<sub>m</sub>';
-$ec_lang['mhp_notes_4_def']='Nilai tipikal: inlet tajam 0.5, setiap belokan 45° antara 0.2–0.3, katup gerbang (terbuka penuh) 0.1, katup kupu-kupu 0.2. Jumlah semua fitting menghasilkan k<sub>m</sub> total. Default 1.5 mengasumsikan satu inlet dan dua belokan.';
-$ec_lang['mhp_notes_5_term']='Kekasaran Pipa e';
-$ec_lang['mhp_notes_5_def']='Kekasaran absolut tipikal: baja (baru) 0.046 mm, baja (bekas) 0.15 mm, HDPE 0.003 mm, PVC/uPVC 0.0015 mm, beton 0.3–3 mm. HDPE umum digunakan untuk pipa penstock mikro-hidro kecil.';
-
-// About
-$ec_lang['about_main_menu']='Tentang';
-$ec_lang['install_main_menu']='Instal';
-$ec_lang['install_main_title']='Instal EngCalcs';
-$ec_lang['install_main_desc']='Tambahkan ke perangkat Anda untuk penggunaan offline';
-$ec_lang['contact_main_menu']='Kontak';
-$ec_lang['about_main_title']='Tentang Kalkulator Teknik HawsEDC';
-$ec_lang['about_main_desc']='Misi, Sumber Terbuka, dan Kontribusi';
-
+$ec_lang['irr_intro_html']='<p>Weir dan orifice adalah alat lapangan standar untuk mengukur aliran air dalam sistem irigasi. Pilih kalkulator yang sesuai dengan struktur Anda:</p>';
+$ec_lang['irr_card_weir_uniform_head']='Weir — Mercu Lebar (Lebar Seragam)';
+$ec_lang['irr_card_weir_uniform_desc']='Ukur aliran di atas mercu bendung pengalih, bangunan cek, atau papan weir. Masukkan panjang weir dan kedalaman air di atas mercu.';
+$ec_lang['irr_card_weir_irregular_head']='Weir — Profil Tidak Beraturan';
+$ec_lang['irr_card_weir_irregular_desc']='Gunakan saat mercu weir tidak berada pada elevasi seragam tunggal — pelimpah alami, bangunan terjun dengan lebar bervariasi, atau bangunan kendali multi-bagian.';
+$ec_lang['irr_card_orifice_head']='Orifice — Pintu Air atau Sambungan Pipa';
+$ec_lang['irr_card_orifice_desc']='Ukur aliran melalui pintu sorong, sambungan pipa, atau bukaan gorong-gorong. Menangani secara otomatis kondisi aliran bebas maupun tenggelam (tekanan balik hilir).';
+$ec_lang['irr_card_canal_head']='Desain & Analisis Saluran';
+$ec_lang['irr_card_canal_desc']='Desain atau periksa saluran irigasi menggunakan rumus Manning. Gunakan kalkulator Trapesium untuk saluran baru; kalkulator Tidak Beraturan untuk penampang alam atau buatan yang sudah ada.';
+$ec_lang['irr_card_drip_head']='Desain Tetes & Sprinkler';
+$ec_lang['irr_card_drip_desc']='Hitung laju aplikasi, keseragaman distribusi, debit lateral, debit zona, dan waktu operasi untuk sistem irigasi tetes atau sprinkler. Masukkan debit emitter, jarak emitter, dan kedalaman target.';
+$ec_lang['irr_card_seepage_head']='Rembesan Saluran & Efisiensi Konveyans';
+$ec_lang['irr_card_seepage_desc']='Perkirakan kehilangan rembesan dari ruas saluran menggunakan pengukuran aliran masuk dan keluar. Hitung efisiensi konveyans dan kehilangan air tahunan untuk membantu memprioritaskan investasi lapisan saluran.';
+$ec_lang['irr_quickref_html']='<h3>Referensi Cepat</h3><dl><dt>Bendung pengalih atau bangunan cek</dt><dd>Ukur kedalaman air di atas mercu weir. Gunakan <a href="Weir-Flow-Simple.php">Weir Aliran Sederhana</a> untuk mercu seragam, atau <a href="Weir-Flow-Irregular.php">Weir Aliran Tidak Beraturan</a> untuk mercu berprofil atau bertangga.</dd><dt>Pintu air atau sambungan pipa</dt><dd>Ukur elevasi muka air hulu dan hilir (atau elevasi dasar pipa jika aliran bebas). Gunakan <a href="Orifice.php">Aliran Orifice</a>. Untuk pipa bulat, D = diameter pipa; untuk pintu persegi panjang, masukkan lebar W dan tinggi D.</dd><dt>Waktu pengosongan waduk atau kolam</dt><dd>Gunakan <a href="Orifice-Drain-Time.php">Waktu Pengosongan Orifice</a> untuk memperkirakan berapa lama menurunkan kolam atau waduk melalui orifice dasar — berguna untuk perencanaan tampungan irigasi.</dd><dt>Standar lapangan</dt><dd>Persamaan aliran weir dan orifice yang digunakan di sini sesuai dengan prosedur USBR <em>Water Measurement Manual</em> (edisi ke-3), yang umumnya dipersyaratkan oleh pengelola air dan distrik irigasi.</dd></dl>';
 // Drip / Sprinkler Application Rate
-$ec_lang['u_lph']="L/hr";
-$ec_lang['u_gph']="gal/hr";
-$ec_lang['u_mmph']="mm/hr";
-$ec_lang['u_inph']="in/hr";
 $ec_lang['ds_main_menu']='Laju Aplikasi Irigasi Tetes/Sprinkler';
 $ec_lang['ds_main_title']='Kalkulator Laju Aplikasi Irigasi Tetes/Sprinkler Gratis Online';
 $ec_lang['ds_main_desc']='Irigasi Tetes & Sprinkler — Laju Aplikasi';
@@ -361,13 +370,14 @@ $ec_lang['ds_notes_1_term']='Laju Aplikasi';
 $ec_lang['ds_notes_1_def']='PR = q / A<sub>e</sub>, di mana A<sub>e</sub> = S<sub>e</sub> × S<sub>l</sub> adalah luas yang dilayani oleh setiap emitter. Laju aplikasi yang lebih rendah memberikan lebih banyak waktu untuk infiltrasi — penting pada tanah berat atau lahan miring.';
 $ec_lang['ds_notes_2_term']='Waktu Operasi';
 $ec_lang['ds_notes_2_def']='Waktu operasi = kedalaman target ÷ laju aplikasi. Pada tanah miring atau padat, bagi waktu operasi menjadi dua atau tiga siklus yang lebih pendek dengan periode istirahat di antaranya untuk menghindari limpasan permukaan.';
-
 // Canal Seepage / Conveyance Efficiency. Prefix cs_.
 $ec_lang['cs_main_menu']='Rembesan Saluran';
 $ec_lang['cs_main_title']='Kalkulator Kehilangan Rembesan Saluran dan Efisiensi Konveyans Gratis Online';
 $ec_lang['cs_main_desc']='Kehilangan Rembesan Saluran & Efisiensi Konveyans — Metode Aliran Masuk-Keluar';
 $ec_lang['cs_Q_in']='Aliran masuk, Q<sub>in</sub>';
 $ec_lang['cs_Q_out']='Aliran keluar, Q<sub>out</sub>';
+$ec_lang['cs_L']='Panjang ruas, L';
+$ec_lang['cs_wp']='Keliling basah, P<sub>w</sub>';
 $ec_lang['cs_Q_loss']='Laju kehilangan rembesan, Q<sub>loss</sub>';
 $ec_lang['cs_loss_check']='Pemeriksaan pengukuran';
 $ec_lang['cs_pct_loss']='Fraksi hilang';
@@ -375,8 +385,6 @@ $ec_lang['cs_Ec']='Efisiensi konveyans, E<sub>c</sub>';
 $ec_lang['cs_Ec_check']='Peringkat efisiensi';
 $ec_lang['cs_Vol_day']='Volume harian yang hilang';
 $ec_lang['cs_Vol_year']='Volume tahunan yang hilang';
-$ec_lang['cs_L']='Panjang ruas, L';
-$ec_lang['cs_wp']='Keliling basah, P<sub>w</sub>';
 $ec_lang['cs_Q_loss_per_L']='Kehilangan per satuan panjang, Q<sub>loss</sub>/L';
 $ec_lang['cs_water_value']='Nilai air';
 $ec_lang['cs_lining_cost']='Biaya pelapisan';
@@ -400,26 +408,26 @@ $ec_lang['cs_notes_3_term']='Pengembalian Pelapisan';
 $ec_lang['cs_notes_3_def']='Masukkan nilai air dan biaya pelapisan dalam mata uang yang konsisten apa pun. Luas pelapisan = panjang ruas × keliling basah — keliling basah penampang saluran di kedalaman aliran terukur (lebar dasar ditambah kedua tebing basah). Nilai tahunan yang dipulihkan mengasumsikan saluran berlapis mencapai E<sub>c</sub> target secara berkelanjutan. Pengembalian aktual akan lebih lama untuk saluran musiman atau jika pelapisan tidak mencapai efisiensi target.';
 $ec_lang['cs_notes_4_term']='Referensi';
 $ec_lang['cs_notes_4_def']='USBR <em>Water Measurement Manual</em>, edisi ke-3 (2001). FAO Irrigation and Drainage Paper 57 (1999).';
-
-$ec_lang['irr_intro_html']='<p>Weir dan orifice adalah alat lapangan standar untuk mengukur aliran air dalam sistem irigasi. Pilih kalkulator yang sesuai dengan struktur Anda:</p>';
-$ec_lang['irr_card_weir_uniform_head']='Weir — Mercu Lebar (Lebar Seragam)';
-$ec_lang['irr_card_weir_uniform_desc']='Ukur aliran di atas mercu bendung pengalih, bangunan cek, atau papan weir. Masukkan panjang weir dan kedalaman air di atas mercu.';
-$ec_lang['irr_card_weir_irregular_head']='Weir — Profil Tidak Beraturan';
-$ec_lang['irr_card_weir_irregular_desc']='Gunakan saat mercu weir tidak berada pada elevasi seragam tunggal — pelimpah alami, bangunan terjun dengan lebar bervariasi, atau bangunan kendali multi-bagian.';
-$ec_lang['irr_card_orifice_head']='Orifice — Pintu Air atau Sambungan Pipa';
-$ec_lang['irr_card_orifice_desc']='Ukur aliran melalui pintu sorong, sambungan pipa, atau bukaan gorong-gorong. Menangani secara otomatis kondisi aliran bebas maupun tenggelam (tekanan balik hilir).';
-$ec_lang['irr_card_canal_head']='Desain & Analisis Saluran';
-$ec_lang['irr_card_canal_desc']='Desain atau periksa saluran irigasi menggunakan rumus Manning. Gunakan kalkulator Trapesium untuk saluran baru; kalkulator Tidak Beraturan untuk penampang alam atau buatan yang sudah ada.';
-$ec_lang['irr_card_drip_head']='Desain Tetes & Sprinkler';
-$ec_lang['irr_card_drip_desc']='Hitung laju aplikasi, keseragaman distribusi, debit lateral, debit zona, dan waktu operasi untuk sistem irigasi tetes atau sprinkler. Masukkan debit emitter, jarak emitter, dan kedalaman target.';
-$ec_lang['irr_card_seepage_head']='Rembesan Saluran & Efisiensi Konveyans';
-$ec_lang['irr_card_seepage_desc']='Perkirakan kehilangan rembesan dari ruas saluran menggunakan pengukuran aliran masuk dan keluar. Hitung efisiensi konveyans dan kehilangan air tahunan untuk membantu memprioritaskan investasi lapisan saluran.';
-$ec_lang['irr_quickref_html']='<h3>Referensi Cepat</h3><dl><dt>Bendung pengalih atau bangunan cek</dt><dd>Ukur kedalaman air di atas mercu weir. Gunakan <a href="Weir-Flow-Simple.php">Weir Aliran Sederhana</a> untuk mercu seragam, atau <a href="Weir-Flow-Irregular.php">Weir Aliran Tidak Beraturan</a> untuk mercu berprofil atau bertangga.</dd><dt>Pintu air atau sambungan pipa</dt><dd>Ukur elevasi muka air hulu dan hilir (atau elevasi dasar pipa jika aliran bebas). Gunakan <a href="Orifice.php">Aliran Orifice</a>. Untuk pipa bulat, D = diameter pipa; untuk pintu persegi panjang, masukkan lebar W dan tinggi D.</dd><dt>Waktu pengosongan waduk atau kolam</dt><dd>Gunakan <a href="Orifice-Drain-Time.php">Waktu Pengosongan Orifice</a> untuk memperkirakan berapa lama menurunkan kolam atau waduk melalui orifice dasar — berguna untuk perencanaan tampungan irigasi.</dd><dt>Standar lapangan</dt><dd>Persamaan aliran weir dan orifice yang digunakan di sini sesuai dengan prosedur USBR <em>Water Measurement Manual</em> (edisi ke-3), yang umumnya dipersyaratkan oleh pengelola air dan distrik irigasi.</dd></dl>';
+// About
+$ec_lang['about_main_menu']='Tentang';
+$ec_lang['install_main_menu']='Instal';
+$ec_lang['install_main_title']='Instal EngCalcs';
+$ec_lang['install_main_desc']='Tambahkan ke perangkat Anda untuk penggunaan offline';
+$ec_lang['contact_main_menu']='Kontak';
+$ec_lang['about_main_title']='Tentang Kalkulator Teknik HawsEDC';
+$ec_lang['about_main_desc']='Misi, Sumber Terbuka, dan Kontribusi';
 $ec_lang['about_body_html']='<h3>Misi</h3><p>Kalkulator Teknik HawsEDC hadir untuk melayani insinyur dan pekerja lapangan di seluruh dunia — terutama mereka yang bekerja di wilayah dengan keterbatasan air, sumber daya terbatas, atau kurang terlayani. Alat-alat ini merupakan bagian dari misi kemanusiaan yang lebih luas: menyampaikan kepada setiap manusia dengan cara yang paling praktis dan efektif bahwa mereka dicintai dan disayangi selamanya, bahwa mereka tidak perlu takut, dan bahwa mereka tidak akan merusak segalanya.</p><p>Kalkulator adalah kendaraannya. Tujuannya adalah dunia yang bebas dari penderitaan.</p><h3>Lisensi Sumber Terbuka</h3><p>Semua kode dirilis di bawah <a target="_blank" href="https://www.gnu.org/licenses/gpl-3.0.html">GNU General Public License v3.0 atau lebih baru</a> — bebas dalam arti kebebasan. Anda boleh menggunakan, mempelajari, memodifikasi, dan mendistribusikan ulang kode dengan syarat yang sama.</p><p>Copyright © 2009–2026 Thomas Gail Haws.</p><h3>Kode Sumber</h3><p>Kode sumber lengkap tersedia secara publik di Bitbucket:</p><p><a target="_blank" href="https://bitbucket.org/hawstom/engcalcs">bitbucket.org/hawstom/engcalcs</a></p><p>Anda dapat menjelajahi kode, mengajukan isu, atau mem-fork repositori di sana.</p><h3>Berkontribusi</h3><p>Pull request sangat disambut. Cara berkontribusi:</p><ul><li><strong>Terjemahan</strong> — tingkatkan atau tambahkan bahasa. Buka pull request dengan perubahan pada file <code>lib/lang.ec.??.php</code> yang relevan.</li><li><strong>Laporan bug</strong> — gunakan formulir umpan balik di halaman kalkulator mana pun, atau ajukan isu di Bitbucket.</li><li><strong>Kalkulator baru</strong> — ide untuk alat teknik hidrolik yang melayani pekerja lapangan dan praktisi irigasi sangat disambut. Lihat panduan pengembang <code>CLAUDE.md</code> di repositori.</li><li><strong>Hosting</strong> — jika Anda dapat mencerminkan kalkulator ini untuk wilayah dengan konektivitas terbatas, silakan hubungi kami.</li></ul><h3>Penggunaan Offline</h3><p>Kalkulator-kalkulator ini berfungsi sebagai Aplikasi Web Progresif (PWA). Kunjungi halaman kalkulator mana pun saat terhubung ke internet, dan browser Anda akan secara otomatis menyimpan semua kalkulator ke dalam cache. Setelah itu, semua kalkulator berfungsi secara offline — tidak perlu internet.</p><p>Di Android atau iOS, gunakan opsi "Tambahkan ke Layar Utama" di browser Anda untuk memasang EngCalcs sebagai aplikasi di perangkat Anda. Di desktop, cari ikon pasang di bilah alamat browser Anda.</p><p>Anda juga dapat menyimpan kalkulator individual menggunakan menu "Simpan sebagai…" di browser Anda untuk penggunaan offline sekali pakai.</p><h3>Kontak</h3><p>Tom Haws — insinyur hidrolik dan penulis kalkulator ini.<br />Gunakan formulir umpan balik di halaman kalkulator mana pun, atau akses kode sumber di <a target="_blank" href="https://bitbucket.org/hawstom/engcalcs">Bitbucket</a>.</p>';
-
+$ec_lang['contact_title']='Kontak HawsEDC';
+$ec_lang['contactSendMessage']='Kirim pesan ke Tom Haws';
+$ec_lang['contactYourName']='Nama Anda:';
+$ec_lang['contactYourEmail']='Alamat e-mail Anda:';
+$ec_lang['contactSubject']='Subjek:';
+$ec_lang['contact_message']='Pesan:';
+$ec_lang['contactSpamPrefix']='Lima ditambah satu sama dengan';
+$ec_lang['contactSpamPostfix']='(Tulis dalam bahasa Inggris. 1=one 2=two 3=three 4=four 5=five 6=six 7=seven +=plus 5+1=6)';
+$ec_lang['contactSubmitButton']='Kirim Pesan';
+$ec_lang['contact_success']='Terima kasih telah meluangkan waktu untuk menulis.';
 // Rock Chute Design (Robinson, Rice & Kadavy 1998). Prefix rc_.
-$ec_lang['u_m2ps']='m^2/s';
-$ec_lang['u_ft2ps']='cfs/ft';
 $ec_lang['rc_main_menu']='Desain Peluncur Batu (Robinson)';
 $ec_lang['rc_main_title']='Kalkulator Desain Peluncur Batu Gratis Online — Robinson (1998)';
 $ec_lang['rc_main_desc']='Penentuan Ukuran Riprap Peluncur Batu — Robinson, Rice & Kadavy (1998)';
@@ -475,20 +483,3 @@ $ec_lang['rc_sketch_filter']          = 'Filter';
 $ec_lang['rc_sketch_top_crest_curve'] = 'Lengkung Puncak';
 $ec_lang['rc_sketch_outlet_apron']    = 'Lantai Hilir';
 $ec_lang['rc_sketch_radius']          = 'jari-jari';
-
-// Manning Trapezoid — velocity checks and note 2 (new)
-$ec_lang['mtc_vel_check']='Pemeriksaan kecepatan';
-$ec_lang['mtc_vel_ok']='Kecepatan wajar untuk asumsi aliran seragam.';
-$ec_lang['mtc_vel_ok_short']='OK';
-$ec_lang['mtc_vel_high']='Kecepatan tinggi — periksa kehilangan transisi dan energi yang tersedia.';
-$ec_lang['mtc_vel_high_short']='Tinggi';
-$ec_lang['mtc_vel_low']='Kecepatan rendah — risiko sedimentasi.';
-$ec_lang['mtc_vel_low_short']='Rendah';
-$ec_lang['mtc_note_2_term']='Pemeriksaan kecepatan';
-$ec_lang['mtc_note_2_def']='Kecepatan tinggi mengimplikasikan energi spesifik tinggi dari beda tinggi yang tersedia. Energi tersebut dapat hilang dengan cepat pada ekspansi, belokan, atau hambatan. Verifikasi bahwa ini wajar untuk kondisi lapangan.';
-
-// Micro-Hydro Power — notes 6 and 7 (new)
-$ec_lang['mhp_notes_6_term']='Efisiensi';
-$ec_lang['mhp_notes_6_def']='Efisiensi instalasi tipikal &eta; berkisar antara 0,70 hingga 0,85 untuk turbin Pelton dan turbin aliran silang yang umum digunakan dalam mikro-hidro. Gunakan 0,75 sebagai estimasi awal yang konservatif.';
-$ec_lang['mhp_notes_7_term']='Energi Tahunan';
-$ec_lang['mhp_notes_7_def']='Energi tahunan mengasumsikan operasi aliran penuh berkelanjutan (8.760 jam/tahun). Produksi aktual akan lebih rendah akibat variasi debit musiman, waktu henti pemeliharaan, dan faktor beban.';

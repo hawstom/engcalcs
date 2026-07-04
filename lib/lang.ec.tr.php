@@ -36,6 +36,10 @@ $ec_lang['u_pa']="Pa";
 $ec_lang['u_psf']="psf";
 $ec_lang['u_psi']="psi";
 $ec_lang['u_s']="sec";
+$ec_lang['u_lph']="L/hr";
+$ec_lang['u_gph']="gal/hr";
+$ec_lang['u_mmph']="mm/hr";
+$ec_lang['u_inph']="in/hr";
 $ec_lang['u_acft']="ac-ft";
 $ec_lang['u_ft3']="ft^3";
 $ec_lang['u_m3']="m^3";
@@ -44,10 +48,12 @@ $ec_lang['u_mw']='MW';
 $ec_lang['u_kwh_yr']='kWh/yr';
 $ec_lang['u_mwh_yr']='MWh/yr';
 $ec_lang['u_hp']='hp';
+$ec_lang['u_m2ps']='m^2/s';
+$ec_lang['u_ft2ps']='cfs/ft';
 
 // Page text
 // In page order for easiest maintenance.
-// Note: Daha kolay bakım için dil değişkenlerinin sayfa sıralamasına göre ayarlanması sürecinde
+// Menu and General
 $ec_lang['menu_brand']='HawsEDC Hesap Makineleri';
 $ec_lang['menu_main_list']='Hesap makinası listesi';
 $ec_lang['menu_main_hydraulics']='Hidrolik';
@@ -60,6 +66,10 @@ $ec_lang['template_printable_title']='Yazdırılabilir Başlık';
 $ec_lang['template_printable_subtitle']='Yazdırılabilir Alt Başlık';
 $ec_lang['index_title']='Bedava çevrimiçi mühendislik hesaplayıcıları';
 $ec_lang['calc_set_units']='Birimleri ayarla:';
+$ec_lang['points_data_help']='(veya veri alanını kullanarak Kopyala/Yapıştır)';
+$ec_lang['points_data_title']='Nokta verileri<br />(virgül veya sekme ile ayrılmış)';
+$ec_lang['points_data_copy']='Kopyala';
+$ec_lang['points_data_paste']='Yapıştır';
 $ec_lang['calc_inputs']='Girdiler';
 $ec_lang['calc_results']='Sonuçlar:';
 $ec_lang['view_hide_line']='[Bu satırı gizle]';
@@ -99,6 +109,7 @@ $ec_lang['mi_groupSegment']='Bölüm';
 $ec_lang['mi_groupRegion']='Bölge';
 $ec_lang['mi_station']='İst.';
 $ec_lang['mi_elevation']='Kot';
+$ec_lang['mi_d50in']='Kaplama<br />medyan<br />taş<br />boyutu';
 $ec_lang['mi_n']='n<br />seg-<br />ment';
 $ec_lang['mi_is_bank']='R<sub>h</sub>, Q<br />bölge<br />sınırı<br />(Kıyı)';
 $ec_lang['mi_tau']='Taban<br />kaym.<br />τ';
@@ -120,20 +131,27 @@ $ec_lang['mi_notes_2_def']='Taş kaplama tasarımı için Manning Trapez Kanal H
 $ec_lang['mpf_main_menu']='Manning boru akımı';
 $ec_lang['mpf_main_title']="Belli Egim ve Yükseklikteki Düzgün Akis Için Manning Formülü";
 $ec_lang['mpf_main_desc']="Belli Egim ve Yükseklikteki Düzgün Akis Için Manning Formülü";
+$ec_lang['mpf_spreadheet_notice']='Bu hesaplayıcının elektronik tablo sürümüne göz atın';
 $ec_lang['mpf_pipe_diameter']="Boru Çapı, d0";
 $ec_lang['mpf_manningRoughness']='Manning pürüzlülük katsayısı, n';
 $ec_lang['mpf_friction_slope']='Basinç Egimi (<a target="_blank"
 href="../pressureslope.php">Boru Egimi</a>)';
 $ec_lang['mpf_depth_ratio']='Tam derinlik yüzdesi (ya da orani) (Eger tam dolu boru ise 100% ya da 1)';
+$ec_lang['mpf_see_notes']='(Notlara bakın)';
 $ec_lang['mpf_flow']='Debi, q';
 $ec_lang['mpf_velocity']='Hız, v';
 $ec_lang['mpf_velocity_head']='Hız Yükü, hv';
 $ec_lang['mpf_flow_area']='Akis Alani';
+$ec_lang['mpf_pipe_area']='Boru alanı, a0';
+$ec_lang['mpf_area_ratio']='Göreli alan, a/a0';
 $ec_lang['mpf_wetted_perimeter']='Islak Çevre';
 $ec_lang['mpf_hydraulic_radius']='Hidrolik Yariçap';
 $ec_lang['mpf_top_width']='Üst Genisligi, T';
 $ec_lang['mpf_froude_number']='Froude Sayısı, F';
 $ec_lang['mpf_shear_stress']='Average Kayma Gerilmesi, τ';
+$ec_lang['mpf_full_flow']='Tam akış, Q0';
+$ec_lang['mpf_full_flow_ratio']='Tam akışa oran, Q/Q0';
+$ec_lang['mpf_note_1']='<dl><dt>Bu, <em>sonsuz uzunluktaki</em> bir borunun içindeki akış ve derinliktir.</dt><dd>Akışın boruya girmesi için önemli ölçüde daha yüksek memba derinliği gerekebilir. Memba derinliğini elde etmek için en az 1,5 hız yükü ekleyin ya da HY-8 kullanarak standart menfez memba hesaplamaları için <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">2 dakikalık öğreticime bakın</a>.</dd>';
 $ec_lang['mpf_solve_for_dd0']='Verilen Q için y/d<sub>0</sub> hesapla';
 $ec_lang['mpf_solve_desc']="Hesap makinesi formundan D<sub>0</sub>, n ve S<sub>0</sub> kullanarak belirli bir Q için en düşük y/d<sub>0</sub>'ı bulur.";
 $ec_lang['mpf_solve_button']='Hesapla';
@@ -151,6 +169,7 @@ $ec_lang['mphl_total_loss']='Toplam Yük Kaybı, Hl';
 $ec_lang['mphl_egl_1']='Mansap EGL';
 $ec_lang['mphl_egl_2']='Memba EGL';
 $ec_lang['mphl_hgl_2']='Borudaki memba HGL (Notlara bakın)';
+$ec_lang['mphl_note_1']='<dl><dt>Açık giriş (menfez) koşulunda, giriş kontrolü koşullarının kontrol edilmesi gerekir.</dt><dd>1. Memba HGL\'si, memba normal derinlik akış kotundan (veya borudan) düşük olamaz.</dd><dd>2. Bir menfezin memba su yüzü, memba HGL\'sinden ziyade memba EGL\'si ile daha iyi temsil edilir.</dd><dd>3. HY-8 kullanarak basit standart menfez memba hesaplamaları için <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">2 dakikalık öğreticime bakın</a>.</dd>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Belli Eğim ve Derinlikteki Düzgün Trapezoidal Kanallar';
 $ec_lang['mtc_main_title']='Ücretsiz Belli Eğim ve Derinlikteki Düzgün Trapezoidal Kanallar için Manning Formülü';
@@ -162,13 +181,27 @@ $ec_lang['mtc_channel_slope']='Kanal Eğimi';
 $ec_lang['mtc_flow_depth']='Akış Derinliği';
 $ec_lang['mtc_bend_angle']='Bend Angle<a target="_blank" href="riprap-bend-angle.png" title="Click for image">?</a> (for riprap sizing)';
 $ec_lang['mtc_sgrock']='Stone specific gravity (2.65)';
+$ec_lang['mtc_d50_in']='Tasarım taş boyutu, D50';
+$ec_lang['mtc_n_strickler']='Tasarım taş boyutu için n (Strickler\'e göre)';
+$ec_lang['mtc_n_blodgett']='Tasarım taş boyutu için n (Blodgett\'e göre)';
+$ec_lang['mtc_n_bathurst']='Tasarım taş boyutu için n (Bathurst\'e göre)';
+$ec_lang['mtc_blodgett_v_bathurst']='Blodgett ve Bathurst karşılaştırması';
 $ec_lang['mtc_d50_bottom']='<span title="Isbash (1936) ve Maricopa County, Arizona, US\'ye göre">Taban için gerekli köşeli taş kaplama boyutu, D50, Maricopa County</span>';
 $ec_lang['mtc_d50_z1']='<span title="Isbash (1936) ve Maricopa County, Arizona, US\'ye göre">Yan eğim 1 için gerekli köşeli taş kaplama boyutu, D50, Maricopa County</span>';
 $ec_lang['mtc_d50_z2']='<span title="Isbash (1936) ve Maricopa County, Arizona, US\'ye göre">Yan eğim 2 için gerekli köşeli taş kaplama boyutu, D50, Maricopa County</span>';
 $ec_lang['mtc_d50_mra']='Gerekli köşeli taş kaplama boyutu, D50, Maynord, Ruff ve Abt (1989)\'e göre';
 $ec_lang['mtc_d50_searcy']='Gerekli köşeli taş kaplama boyutu, D50, Searcy (1967)\'ye göre';
-// Robinson Rock Chute
-// Weir Flow Simple\n// Weir Flow Simple
+$ec_lang['mtc_vel_check']='Hız kontrolü';
+$ec_lang['mtc_vel_ok']='Hız, düzgün akış varsayımları için makul.';
+$ec_lang['mtc_vel_high']='Hız yüksek — geçiş kayıplarını ve mevcut enerjiyi kontrol edin.';
+$ec_lang['mtc_vel_low']='Hız düşük — çökelme riski.';
+$ec_lang['mtc_vel_ok_short']='Tamam';
+$ec_lang['mtc_vel_high_short']='Yüksek';
+$ec_lang['mtc_vel_low_short']='Düşük';
+$ec_lang['mtc_note_1']='<dl><dt>Otomatik taş boyutu ve pürüzlülük tasarım döngüsü</dt><dd>Bir pürüzlülük radyo düğmesi (BB önerilir) ve bir tasarım taş boyutu radyo düğmesi (Isbash önerilir) seçin. İstenen akışı düzgün bir taş boyutuyla elde etmek için derinliği ve taş boyutu güvenlik faktörünü ince ayarlayın. Her giriş değeri değiştiğinde şu döngü gerçekleşir: 1. Pürüzlülük, tasarım taş boyutundan hesaplanır. 2. İstenen pürüzlülük hesabı giriş pürüzlülüğüne kopyalanır. 3. Kanal akışı ve gerekli taş boyutu hesaplanır. 4. Tasarım taş boyutu ayarlanır. 5. Tasarım taş boyutundaki hata çok küçük olana kadar tekrarlanır.</dd><dt>Temel hesaplayıcı (döngü yok)</dt><dd>İstediğiniz pürüzlülük değerini girin. Tasarım taş boyutu giriş alanını yoksayın.</dd></dl>';
+$ec_lang['mtc_note_2_term']='Hız kontrolü';
+$ec_lang['mtc_note_2_def']='Yüksek hız, mevcut bir düşüden yüksek özgül enerji anlamına gelir. Bu enerji, genişlemelerde, dirseklerde veya engellerde hızla kaybolabilir. Bunun saha için makul olduğunu doğrulayın.';
+// Weir Flow Simple
 $ec_lang['ws_main_menu']='Basit Savaklar için Debi Hesabı';
 $ec_lang['ws_main_title']='Ücretsiz Basit Savaklar için Debi Hesabı Broad-crested Geniş-kretli';
 $ec_lang['ws_main_desc']='Basit Savaklar için Debi Hesabı Broad-crested Geniş-kretli';
@@ -209,6 +242,7 @@ $ec_lang['or_centroid_elev']='Ağırlık merkezi kotu';
 $ec_lang['or_head']='Etkin su yükü, h';
 $ec_lang['or_area']='Açıklık alanı, A';
 $ec_lang['or_flow']='Debi, Q';
+$ec_lang['or_velocity']='Hız, v';
 $ec_lang['or_regime']='Orifis rejimi kontrolü';
 $ec_lang['or_regime_valid']='Serbest çıkış — orifis rejimi geçerli ✓';
 $ec_lang['or_regime_submerged']='Batık orifis (TWE ağırlık merkezi üzerinde) — geçerli ✓';
@@ -222,82 +256,6 @@ $ec_lang['or_notes_3_term']='Debi Katsayısı';
 $ec_lang['or_notes_3_def']='C<sub>d</sub>, keskin kenarlı orifisler için yaklaşık 0,60–0,65 aralığındadır. Yuvarlatılmış veya içe girik girişler farklı değerler alır. Bkz. <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venture-d_590.html">Engineering Toolbox</a> veya HEC-RAS Hidrolik Referans Kılavuzu.';
 $ec_lang['or_notes_4_term']='Boğulma';
 $ec_lang['or_notes_4_def']='TWE açıklık tabanının üzerindeyken hesaplayıcı, h = HWE − TWE ile batık orifis denklemini otomatik olarak uygular. TWE taban kotunda veya altındayken serbest çıkış kabul edilir ve h = HWE − ağırlık merkezi kotu alınır.';
-// Orifice Drain Time
-$ec_lang['odt_main_menu']='Orifis Boşalma Süresi';
-$ec_lang['odt_main_title']='Ücretsiz Çevrimiçi Orifis Boşalma Süresi Hesaplayıcısı — Gölet, Havuz veya Depo';
-$ec_lang['odt_main_desc']='Gölet veya Havuz Orifis Boşalma Süresi — Konik Hacim Yöntemi';
-$ec_lang['odt_h1_elev']='Başlangıç SYK <span title="Başlangıç su yüzeyi kotu" class="ec-tip">?</span>';
-$ec_lang['odt_a1']='Başlangıç alanı, A<sub>1</sub>';
-$ec_lang['odt_h2_elev']='Bitiş su yüzeyi kotu';
-$ec_lang['odt_h_orifice']='Orifis ağırlık merkezi kotu';
-$ec_lang['odt_a0']='Orifis seviyesindeki alan, A<sub>0</sub>';
-$ec_lang['odt_a_ending']='Bitiş alanı, A<sub>2</sub> <span title="Bitiş kotunda konik model interpolasyonuyla elde edilen değer" class="ec-tip">?</span>';
-$ec_lang['odt_h2_check']='Bitiş kotu kontrolü';
-$ec_lang['odt_h2_ok']='Bitiş kotu orifis üst noktasının üzerinde ✓';
-$ec_lang['odt_h2_warn']='Uyarı: bitiş kotu orifis üst noktasında veya altında (ağırlık merkezi + D/2)';
-$ec_lang['odt_d']='Orifis D <span title="Çap (dairesel) veya yükseklik (dikdörtgen)" class="ec-tip">?</span>';
-$ec_lang['odt_w']='Orifis genişliği, W <span title="Yalnızca dikdörtgen için" class="ec-tip">?</span>';
-$ec_lang['odt_t_sec']='Boşalma süresi (sn)';
-$ec_lang['odt_t_min']='Boşalma süresi (dk)';
-$ec_lang['odt_t_hr']='Boşalma süresi (sa)';
-$ec_lang['odt_t_day']='Boşalma süresi (gün)';
-$ec_lang['odt_notes_1_term']='Formül';
-$ec_lang['odt_notes_1_def']='t = √H<sub>1</sub> / (C<sub>d</sub> A<sub>or</sub> √(2g)) × (2A<sub>x</sub>/5 + 8√(A<sub>x</sub>A<sub>0</sub>)/15 + 16A<sub>0</sub>/15) ifadesi, H yükünden orifise kadar boşalma süresini verir. Boşalma süresi = t(H<sub>1</sub>,A<sub>1</sub>,A<sub>0</sub>) − t(H<sub>2</sub>,A<sub>2</sub>,A<sub>0</sub>), burada H<sub>1</sub> = başlangıç kotu − orifis kotu, H<sub>2</sub> = bitiş kotu − orifis kotu.';
-$ec_lang['odt_notes_2_term']='Yöntem';
-$ec_lang['odt_notes_2_def']='Konik hacim yöntemi, göleti veya havuzu başlangıç su yüzündeki A<sub>1</sub> alanı ile orifis ağırlık merkezi kotundaki A<sub>0</sub> alanı arasında konik bir kesit olarak modeller. Bitiş kotundaki gölet alanı A<sub>2</sub>, konik kesit modeli kullanılarak A<sub>1</sub> ve A<sub>0</sub> arasında interpolasyonla hesaplanır. Başlangıçtan bitiş kotuna boşalma süresi, H<sub>1</sub>\'den orifise toplam boşalma süresinden H<sub>2</sub>\'den orifise kalan boşalma süresinin çıkarılmasıyla bulunur.';
-$ec_lang['odt_h1']='Başlangıç su yükü, H<sub>1</sub> <span title="Başlangıç su yüzeyi kotu eksi orifis ağırlık merkezi kotu" class="ec-tip">?</span>';
-$ec_lang['odt_q_max']='Maksimum debi, Q<sub>max</sub>';
-$ec_lang['odt_vol']='Boşaltılan hacim';
-$ec_lang['odt_sketch_start']='Başlangıç';
-$ec_lang['odt_sketch_end']='Bitiş';
-// Erosion Setback and Scour Calc.
-$ec_lang['essc_btbw']='Bankadan bankaya genişlik';
-$ec_lang['essc_mcr']='Minimum eğri yarıçapı';
-$ec_lang['essc_q']='Debi, Q';
-// Points data
-$ec_lang['points_data_help']='(veya veri alanını kullanarak Kopyala/Yapıştır)';
-$ec_lang['points_data_title']='Nokta verileri<br />(virgül veya sekme ile ayrılmış)';
-$ec_lang['points_data_copy']='Kopyala';
-$ec_lang['points_data_paste']='Yapıştır';
-// Manning Irregular additional
-$ec_lang['mi_d50in']='Kaplama<br />medyan<br />taş<br />boyutu';
-// Manning Pipe Flow additional
-$ec_lang['mpf_see_notes']='(Notlara bakın)';
-$ec_lang['mpf_pipe_area']='Boru alanı, a0';
-$ec_lang['mpf_area_ratio']='Göreli alan, a/a0';
-$ec_lang['mpf_full_flow']='Tam akış, Q0';
-$ec_lang['mpf_full_flow_ratio']='Tam akışa oran, Q/Q0';
-$ec_lang['mpf_spreadheet_notice']='Bu hesaplayıcının elektronik tablo sürümüne göz atın';
-$ec_lang['mpf_note_1']='<dl><dt>Bu, <em>sonsuz uzunluktaki</em> bir borunun içindeki akış ve derinliktir.</dt><dd>Akışın boruya girmesi için önemli ölçüde daha yüksek memba derinliği gerekebilir. Memba derinliğini elde etmek için en az 1,5 hız yükü ekleyin ya da HY-8 kullanarak standart menfez memba hesaplamaları için <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">2 dakikalık öğreticime bakın</a>.</dd>';
-// Manning Pipe Head Loss additional
-$ec_lang['mphl_note_1']='<dl><dt>Açık giriş (menfez) koşulunda, giriş kontrolü koşullarının kontrol edilmesi gerekir.</dt><dd>1. Memba HGL\'si, memba normal derinlik akış kotundan (veya borudan) düşük olamaz.</dd><dd>2. Bir menfezin memba su yüzü, memba HGL\'sinden ziyade memba EGL\'si ile daha iyi temsil edilir.</dd><dd>3. HY-8 kullanarak basit standart menfez memba hesaplamaları için <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">2 dakikalık öğreticime bakın</a>.</dd>';
-// Manning Trapezoid additional
-$ec_lang['mtc_d50_in']='Tasarım taş boyutu, D50';
-$ec_lang['mtc_n_strickler']='Tasarım taş boyutu için n (Strickler\'e göre)';
-$ec_lang['mtc_n_blodgett']='Tasarım taş boyutu için n (Blodgett\'e göre)';
-$ec_lang['mtc_n_bathurst']='Tasarım taş boyutu için n (Bathurst\'e göre)';
-$ec_lang['mtc_blodgett_v_bathurst']='Blodgett ve Bathurst karşılaştırması';
-$ec_lang['mtc_note_1']='<dl><dt>Otomatik taş boyutu ve pürüzlülük tasarım döngüsü</dt><dd>Bir pürüzlülük radyo düğmesi (BB önerilir) ve bir tasarım taş boyutu radyo düğmesi (Isbash önerilir) seçin. İstenen akışı düzgün bir taş boyutuyla elde etmek için derinliği ve taş boyutu güvenlik faktörünü ince ayarlayın. Her giriş değeri değiştiğinde şu döngü gerçekleşir: 1. Pürüzlülük, tasarım taş boyutundan hesaplanır. 2. İstenen pürüzlülük hesabı giriş pürüzlülüğüne kopyalanır. 3. Kanal akışı ve gerekli taş boyutu hesaplanır. 4. Tasarım taş boyutu ayarlanır. 5. Tasarım taş boyutundaki hata çok küçük olana kadar tekrarlanır.</dd><dt>Temel hesaplayıcı (döngü yok)</dt><dd>İstediğiniz pürüzlülük değerini girin. Tasarım taş boyutu giriş alanını yoksayın.</dd></dl>';
-// Orifice Flow additional
-$ec_lang['or_velocity']='Hız, v';
-// Contact us.
-
-// Irrigation
-$ec_lang['irr_main_menu']='Sulama Akışı Ölçümü';
-$ec_lang['irr_main_title']='Ücretsiz Online Sulama Akışı Ölçüm Hesaplayıcıları';
-$ec_lang['irr_main_desc']='Sulama Akışı Ölçümü — Savaklar ve Orifisler';
-$ec_lang['contact_title']='Haws EDC Iletisim';
-$ec_lang['contactSendMessage']="Tom Haws'a bir mesaj gönderin";
-$ec_lang['contactYourName']='Isim:';
-$ec_lang['contactYourEmail']='E-mail Adresi:';
-$ec_lang['contactSubject']='Konu:';
-$ec_lang['contact_message']='Mesaj:';
-$ec_lang['contactSpamPrefix']='Bes arti bir';
-$ec_lang['contactSpamPostfix']='(Lütfen yaziyla gösterin. 1= bir 2=iki 3=üç 4=dört 5=bes 6=alti 7=yedi +=arti 5+1=6)';
-$ec_lang['contactSubmitButton']='Gönder';
-$ec_lang['contact_success']='Yazmanız için zaman ayırdığınız için teşekkür ederiz.';
-
-
 // Micro-Hydro Power
 $ec_lang['mhp_main_menu']='Mikro-Hidroelektrik Güç';
 $ec_lang['mhp_main_title']='Ücretsiz Çevrimiçi Mikro-Hidroelektrik Güç Hesaplayıcısı';
@@ -339,21 +297,64 @@ $ec_lang['mhp_notes_4_term']='Lokal Kayıplar k<sub>m</sub>';
 $ec_lang['mhp_notes_4_def']='Tipik değerler: keskin giriş 0.5, her 45° dirsek 0.2–0.3, sürgü vana (tam açık) 0.1, kelebek vana 0.2. Tüm bağlantı parçalarının toplamı toplam k<sub>m</sub>\'yi verir. Varsayılan 1.5, bir giriş ve iki dirsek varsayar.';
 $ec_lang['mhp_notes_5_term']='Boru Pürüzlülüğü e';
 $ec_lang['mhp_notes_5_def']='Tipik mutlak pürüzlülük: çelik (yeni) 0.046 mm, çelik (kullanılmış) 0.15 mm, HDPE 0.003 mm, PVC/uPVC 0.0015 mm, beton 0.3–3 mm. HDPE, küçük mikro-hidro cebri borularında yaygındır.';
+$ec_lang['mhp_notes_6_term']='Verimlilik';
+$ec_lang['mhp_notes_6_def']='Tipik santral verimi η, mikro-hidro sistemlerinde yaygın olan Pelton ve çapraz akış türbinleri için 0,70 ile 0,85 arasında değişir. Muhafazakâr bir ilk tahmin olarak 0,75 kullanın.';
+$ec_lang['mhp_notes_7_term']='Yıllık Enerji';
+$ec_lang['mhp_notes_7_def']='Yıllık enerji, sürekli tam debi çalışmasını (yılda 8.760 saat) varsayar. Mevsimsel debi değişimi, bakım duruşları ve yük faktörü nedeniyle gerçek üretim daha düşük olacaktır.';
 
-// About
-$ec_lang['about_main_menu']='Hakkında';
-$ec_lang['install_main_menu']='Yükle';
-$ec_lang['install_main_title']='EngCalcs\'i Yükle';
-$ec_lang['install_main_desc']='Çevrimdışı kullanım için cihazınıza ekleyin';
-$ec_lang['contact_main_menu']='İletişim';
-$ec_lang['about_main_title']='HawsEDC Mühendislik Hesaplayıcıları Hakkında';
-$ec_lang['about_main_desc']='Misyon, Açık Kaynak ve Katkı';
+// Orifice Drain Time
+$ec_lang['odt_main_menu']='Orifis Boşalma Süresi';
+$ec_lang['odt_main_title']='Ücretsiz Çevrimiçi Orifis Boşalma Süresi Hesaplayıcısı — Gölet, Havuz veya Depo';
+$ec_lang['odt_main_desc']='Gölet veya Havuz Orifis Boşalma Süresi — Konik Hacim Yöntemi';
+$ec_lang['odt_h1_elev']='Başlangıç SYK <span title="Başlangıç su yüzeyi kotu" class="ec-tip">?</span>';
+$ec_lang['odt_a1']='Başlangıç alanı, A<sub>1</sub>';
+$ec_lang['odt_h2_elev']='Bitiş su yüzeyi kotu';
+$ec_lang['odt_h_orifice']='Orifis ağırlık merkezi kotu';
+$ec_lang['odt_a0']='Orifis seviyesindeki alan, A<sub>0</sub>';
+$ec_lang['odt_a_ending']='Bitiş alanı, A<sub>2</sub> <span title="Bitiş kotunda konik model interpolasyonuyla elde edilen değer" class="ec-tip">?</span>';
+$ec_lang['odt_h2_check']='Bitiş kotu kontrolü';
+$ec_lang['odt_h2_ok']='Bitiş kotu orifis üst noktasının üzerinde ✓';
+$ec_lang['odt_h2_warn']='Uyarı: bitiş kotu orifis üst noktasında veya altında (ağırlık merkezi + D/2)';
+$ec_lang['odt_d']='Orifis D <span title="Çap (dairesel) veya yükseklik (dikdörtgen)" class="ec-tip">?</span>';
+$ec_lang['odt_w']='Orifis genişliği, W <span title="Yalnızca dikdörtgen için" class="ec-tip">?</span>';
+$ec_lang['odt_t_sec']='Boşalma süresi (sn)';
+$ec_lang['odt_t_min']='Boşalma süresi (dk)';
+$ec_lang['odt_t_hr']='Boşalma süresi (sa)';
+$ec_lang['odt_t_day']='Boşalma süresi (gün)';
+$ec_lang['odt_notes_1_term']='Formül';
+$ec_lang['odt_notes_1_def']='t = √H<sub>1</sub> / (C<sub>d</sub> A<sub>or</sub> √(2g)) × (2A<sub>x</sub>/5 + 8√(A<sub>x</sub>A<sub>0</sub>)/15 + 16A<sub>0</sub>/15) ifadesi, H yükünden orifise kadar boşalma süresini verir. Boşalma süresi = t(H<sub>1</sub>,A<sub>1</sub>,A<sub>0</sub>) − t(H<sub>2</sub>,A<sub>2</sub>,A<sub>0</sub>), burada H<sub>1</sub> = başlangıç kotu − orifis kotu, H<sub>2</sub> = bitiş kotu − orifis kotu.';
+$ec_lang['odt_notes_2_term']='Yöntem';
+$ec_lang['odt_notes_2_def']='Konik hacim yöntemi, göleti veya havuzu başlangıç su yüzündeki A<sub>1</sub> alanı ile orifis ağırlık merkezi kotundaki A<sub>0</sub> alanı arasında konik bir kesit olarak modeller. Bitiş kotundaki gölet alanı A<sub>2</sub>, konik kesit modeli kullanılarak A<sub>1</sub> ve A<sub>0</sub> arasında interpolasyonla hesaplanır. Başlangıçtan bitiş kotuna boşalma süresi, H<sub>1</sub>\'den orifise toplam boşalma süresinden H<sub>2</sub>\'den orifise kalan boşalma süresinin çıkarılmasıyla bulunur.';
+$ec_lang['odt_h1']='Başlangıç su yükü, H<sub>1</sub> <span title="Başlangıç su yüzeyi kotu eksi orifis ağırlık merkezi kotu" class="ec-tip">?</span>';
+$ec_lang['odt_q_max']='Maksimum debi, Q<sub>max</sub>';
+$ec_lang['odt_vol']='Boşaltılan hacim';
+$ec_lang['odt_sketch_start']='Başlangıç';
+$ec_lang['odt_sketch_end']='Bitiş';
+// Erosion Setback and Scour Calc.
+$ec_lang['essc_btbw']='Bankadan bankaya genişlik';
+$ec_lang['essc_mcr']='Minimum eğri yarıçapı';
+$ec_lang['essc_q']='Debi, Q';
+// Contact us.
 
+// Irrigation
+$ec_lang['irr_main_menu']='Sulama Akışı Ölçümü';
+$ec_lang['irr_main_title']='Ücretsiz Online Sulama Akışı Ölçüm Hesaplayıcıları';
+$ec_lang['irr_main_desc']='Sulama Akışı Ölçümü — Savaklar ve Orifisler';
+$ec_lang['irr_intro_html']='<p>Savaklar ve orifisler, sulama sistemlerinde su akışını ölçmek için standart saha araçlarıdır. Yapınıza uygun hesap makinesini seçin:</p>';
+$ec_lang['irr_card_weir_uniform_head']='Savak — Geniş Eşik (Tekdüze Genişlik)';
+$ec_lang['irr_card_weir_uniform_desc']='Bir derivasyon barajının eşiği, kontrol yapısı veya savak tahtası üzerindeki akışı ölçün. Savak uzunluğunu ve eşiğin üzerindeki su derinliğini girin.';
+$ec_lang['irr_card_weir_irregular_head']='Savak — Düzensiz Profil';
+$ec_lang['irr_card_weir_irregular_desc']='Savak eşiği tek ve tekdüze bir yükseklikte olmadığında kullanın — doğal taşkın savakları, değişken genişlikli düşü yapıları veya çok bölümlü kontrol yapıları.';
+$ec_lang['irr_card_orifice_head']='Orifis — Baş Kapak veya Boru Çıkışı';
+$ec_lang['irr_card_orifice_desc']='Bir sürgülü kapak, boru çıkışı veya menfez açıklığından geçen akışı ölçün. Hem serbest akış hem de batık (kuyruk suyu) koşullarını otomatik olarak işler.';
+$ec_lang['irr_card_canal_head']='Kanal Tasarımı & Analizi';
+$ec_lang['irr_card_canal_desc']='Manning formülünü kullanarak bir sulama kanalı tasarlayın veya kontrol edin. Yeni kanallar için Trapez hesap makinesini; mevcut doğal veya yapay kesitler için Düzensiz hesap makinesini kullanın.';
+$ec_lang['irr_card_drip_head']='Damla & Yağmurlama Tasarımı';
+$ec_lang['irr_card_drip_desc']='Bir damla veya yağmurlama sulama sistemi için uygulama hızını, dağılım tekdüzeliğini, lateral debisini, bölge debisini ve çalışma süresini hesaplayın. Damlatıcı debisini, damlatıcı aralığını ve hedef derinliği girin.';
+$ec_lang['irr_card_seepage_head']='Kanal Sızıntısı & İletim Verimliliği';
+$ec_lang['irr_card_seepage_desc']='Giriş ve çıkış ölçümlerini kullanarak bir kanal güzergahındaki sızıntı kaybını tahmin edin. İletim verimliliğini ve yıllık su kaybını hesaplayarak astar yatırımlarının önceliklendirilmesine yardımcı olun.';
+$ec_lang['irr_quickref_html']='<h3>Hızlı Başvuru</h3><dl><dt>Derivasyon barajı veya kontrol yapısı</dt><dd>Savak eşiğinin üzerindeki su derinliğini ölçün. Tekdüze eşik için <a href="Weir-Flow-Simple.php">Basit Savak Akışı</a>\'nı veya profilli ya da kademeli eşik için <a href="Weir-Flow-Irregular.php">Düzensiz Savak Akışı</a>\'nı kullanın.</dd><dt>Baş kapak veya boru çıkışı</dt><dd>Mansap ve memba su yüzü kotlarını ölçün (serbest akışta boru taban kotunu). <a href="Orifice.php">Orifis Akışı</a>\'nı kullanın. Dairesel boru için D = boru çapı; dikdörtgen kapak için genişlik W ve yükseklik D girin.</dd><dt>Rezervuar veya gölet boşaltma süresi</dt><dd>Bir gölet veya rezervuarın taban orifisinden boşaltılma süresini tahmin etmek için <a href="Orifice-Drain-Time.php">Orifis Boşaltma Süresi</a>\'ni kullanın — sulama depolama planlaması için kullanışlıdır.</dd><dt>Saha standartları</dt><dd>Burada kullanılan savak ve orifis akış denklemleri, genellikle su yöneticileri ve sulama birlikleri tarafından gerektirilen USBR <em>Water Measurement Manual</em> (3. baskı) prosedürleriyle uyumludur.</dd></dl>';
 // Drip / Sprinkler Application Rate
-$ec_lang['u_lph']="L/hr";
-$ec_lang['u_gph']="gal/hr";
-$ec_lang['u_mmph']="mm/hr";
-$ec_lang['u_inph']="in/hr";
 $ec_lang['ds_main_menu']='Damla/Yağmurlama Sulama Uygulama Oranı';
 $ec_lang['ds_main_title']='Ücretsiz Çevrimiçi Damla/Yağmurlama Sulama Uygulama Oranı Hesaplayıcısı';
 $ec_lang['ds_main_desc']='Damla ve Yağmurlama Sulama — Uygulama Oranı';
@@ -372,12 +373,14 @@ $ec_lang['ds_notes_1_term']='Uygulama Oranı';
 $ec_lang['ds_notes_1_def']='PR = q / A<sub>e</sub>, burada A<sub>e</sub> = S<sub>e</sub> × S<sub>l</sub> her damlatıcının hizmet verdiği alandır. Daha düşük uygulama oranı infiltrasyon için daha fazla zaman tanır — ağır topraklarda veya eğimli alanlarda önemlidir.';
 $ec_lang['ds_notes_2_term']='Çalışma Süresi';
 $ec_lang['ds_notes_2_def']='Çalışma süresi = hedef derinlik ÷ uygulama oranı. Eğimli veya sıkışık topraklarda yüzey akışını önlemek için çalışma süresini aralarında dinlenme aralıkları bulunan iki veya üç kısa döngüye bölün.';
-// Kanal Sızıntısı / İletim Verimliliği. Ön ek cs_.
+// Canal Seepage / Conveyance Efficiency. Prefix cs_.
 $ec_lang['cs_main_menu']='Kanal Sızıntısı';
 $ec_lang['cs_main_title']='Ücretsiz Çevrimiçi Kanal Sızıntı Kaybı ve İletim Verimliliği Hesaplayıcısı';
 $ec_lang['cs_main_desc']='Kanal Sızıntı Kaybı & İletim Verimliliği — Giriş-Çıkış Yöntemi';
 $ec_lang['cs_Q_in']='Giriş debisi, Q<sub>in</sub>';
 $ec_lang['cs_Q_out']='Çıkış debisi, Q<sub>out</sub>';
+$ec_lang['cs_L']='Güzergah uzunluğu, L';
+$ec_lang['cs_wp']='Islak çevre, P<sub>w</sub>';
 $ec_lang['cs_Q_loss']='Sızıntı kayıp debisi, Q<sub>loss</sub>';
 $ec_lang['cs_loss_check']='Ölçüm kontrolü';
 $ec_lang['cs_pct_loss']='Kayıp oranı';
@@ -385,8 +388,6 @@ $ec_lang['cs_Ec']='İletim verimliliği, E<sub>c</sub>';
 $ec_lang['cs_Ec_check']='Verimlilik değerlendirmesi';
 $ec_lang['cs_Vol_day']='Günlük kaybedilen hacim';
 $ec_lang['cs_Vol_year']='Yıllık kaybedilen hacim';
-$ec_lang['cs_L']='Güzergah uzunluğu, L';
-$ec_lang['cs_wp']='Islak çevre, P<sub>w</sub>';
 $ec_lang['cs_Q_loss_per_L']='Birim uzunluk başına kayıp, Q<sub>loss</sub>/L';
 $ec_lang['cs_water_value']='Su değeri';
 $ec_lang['cs_lining_cost']='Astar maliyeti';
@@ -410,25 +411,26 @@ $ec_lang['cs_notes_3_term']='Astar Geri Ödeme';
 $ec_lang['cs_notes_3_def']='Su değerini ve astar maliyetini herhangi bir tutarlı para biriminde girin. Astar alanı = güzergah uzunluğu × ıslak çevre — ölçülen akış derinliğindeki kanal kesitinin ıslak çevresi (taban genişliği artı her iki ıslak yamaç). Kurtarılan yıllık değer, astarlı kanalın hedef E<sub>c</sub>\'yi sürekli olarak sağladığını varsayar. Mevsimsel kanallar için veya astar hedef verimliliğe ulaşmadığında gerçek geri ödeme süresi daha uzun olacaktır.';
 $ec_lang['cs_notes_4_term']='Kaynak';
 $ec_lang['cs_notes_4_def']='USBR <em>Water Measurement Manual</em>, 3. baskı (2001). FAO Sulama ve Drenaj Belgesi 57 (1999).';
-$ec_lang['irr_intro_html']='<p>Savaklar ve orifisler, sulama sistemlerinde su akışını ölçmek için standart saha araçlarıdır. Yapınıza uygun hesap makinesini seçin:</p>';
-$ec_lang['irr_card_weir_uniform_head']='Savak — Geniş Eşik (Tekdüze Genişlik)';
-$ec_lang['irr_card_weir_uniform_desc']='Bir derivasyon barajının eşiği, kontrol yapısı veya savak tahtası üzerindeki akışı ölçün. Savak uzunluğunu ve eşiğin üzerindeki su derinliğini girin.';
-$ec_lang['irr_card_weir_irregular_head']='Savak — Düzensiz Profil';
-$ec_lang['irr_card_weir_irregular_desc']='Savak eşiği tek ve tekdüze bir yükseklikte olmadığında kullanın — doğal taşkın savakları, değişken genişlikli düşü yapıları veya çok bölümlü kontrol yapıları.';
-$ec_lang['irr_card_orifice_head']='Orifis — Baş Kapak veya Boru Çıkışı';
-$ec_lang['irr_card_orifice_desc']='Bir sürgülü kapak, boru çıkışı veya menfez açıklığından geçen akışı ölçün. Hem serbest akış hem de batık (kuyruk suyu) koşullarını otomatik olarak işler.';
-$ec_lang['irr_card_canal_head']='Kanal Tasarımı & Analizi';
-$ec_lang['irr_card_canal_desc']='Manning formülünü kullanarak bir sulama kanalı tasarlayın veya kontrol edin. Yeni kanallar için Trapez hesap makinesini; mevcut doğal veya yapay kesitler için Düzensiz hesap makinesini kullanın.';
-$ec_lang['irr_card_drip_head']='Damla & Yağmurlama Tasarımı';
-$ec_lang['irr_card_drip_desc']='Bir damla veya yağmurlama sulama sistemi için uygulama hızını, dağılım tekdüzeliğini, lateral debisini, bölge debisini ve çalışma süresini hesaplayın. Damlatıcı debisini, damlatıcı aralığını ve hedef derinliği girin.';
-$ec_lang['irr_card_seepage_head']='Kanal Sızıntısı & İletim Verimliliği';
-$ec_lang['irr_card_seepage_desc']='Giriş ve çıkış ölçümlerini kullanarak bir kanal güzergahındaki sızıntı kaybını tahmin edin. İletim verimliliğini ve yıllık su kaybını hesaplayarak astar yatırımlarının önceliklendirilmesine yardımcı olun.';
-$ec_lang['irr_quickref_html']='<h3>Hızlı Başvuru</h3><dl><dt>Derivasyon barajı veya kontrol yapısı</dt><dd>Savak eşiğinin üzerindeki su derinliğini ölçün. Tekdüze eşik için <a href="Weir-Flow-Simple.php">Basit Savak Akışı</a>\'nı veya profilli ya da kademeli eşik için <a href="Weir-Flow-Irregular.php">Düzensiz Savak Akışı</a>\'nı kullanın.</dd><dt>Baş kapak veya boru çıkışı</dt><dd>Mansap ve memba su yüzü kotlarını ölçün (serbest akışta boru taban kotunu). <a href="Orifice.php">Orifis Akışı</a>\'nı kullanın. Dairesel boru için D = boru çapı; dikdörtgen kapak için genişlik W ve yükseklik D girin.</dd><dt>Rezervuar veya gölet boşaltma süresi</dt><dd>Bir gölet veya rezervuarın taban orifisinden boşaltılma süresini tahmin etmek için <a href="Orifice-Drain-Time.php">Orifis Boşaltma Süresi</a>\'ni kullanın — sulama depolama planlaması için kullanışlıdır.</dd><dt>Saha standartları</dt><dd>Burada kullanılan savak ve orifis akış denklemleri, genellikle su yöneticileri ve sulama birlikleri tarafından gerektirilen USBR <em>Water Measurement Manual</em> (3. baskı) prosedürleriyle uyumludur.</dd></dl>';
+// About
+$ec_lang['about_main_menu']='Hakkında';
+$ec_lang['install_main_menu']='Yükle';
+$ec_lang['install_main_title']='EngCalcs\'i Yükle';
+$ec_lang['install_main_desc']='Çevrimdışı kullanım için cihazınıza ekleyin';
+$ec_lang['contact_main_menu']='İletişim';
+$ec_lang['about_main_title']='HawsEDC Mühendislik Hesaplayıcıları Hakkında';
+$ec_lang['about_main_desc']='Misyon, Açık Kaynak ve Katkı';
 $ec_lang['about_body_html']='<h3>Misyon</h3><p>HawsEDC Mühendislik Hesap Makineleri, dünya genelindeki mühendislere ve saha çalışanlarına hizmet etmek için var — özellikle su kıtlığı olan, kaynak yetersizliği çeken veya ihmal edilmiş bölgelerde çalışanlara. Bu araçlar, daha geniş bir insani misyonun parçasıdır: her insana en pratik ve etkili şekilde, sonsuza dek sevildiğini ve değer gördüğünü, hiçbir şeyden korkmasına gerek olmadığını ve her şeyi mahvetmeyeceğini söylemek.</p><p>Hesap makineleri araçtır. Hedef, acısız bir dünyadır.</p><h3>Açık Kaynak Lisansı</h3><p>Tüm kod, <a target="_blank" href="https://www.gnu.org/licenses/gpl-3.0.html">GNU Genel Kamu Lisansı v3.0 veya üzeri</a> kapsamında yayınlanmıştır — özgürlük anlamında özgür. Kodu aynı koşullar altında kullanabilir, inceleyebilir, değiştirebilir ve yeniden dağıtabilirsiniz.</p><p>Copyright © 2009–2026 Thomas Gail Haws.</p><h3>Kaynak Kodu</h3><p>Tam kaynak kodu Bitbucket\'ta herkese açık olarak mevcuttur:</p><p><a target="_blank" href="https://bitbucket.org/hawstom/engcalcs">bitbucket.org/hawstom/engcalcs</a></p><p>Orada kodu inceleyebilir, sorun bildirebilir veya depoyu çatallandırabilirsiniz.</p><h3>Katkıda Bulunma</h3><p>Pull request\'ler memnuniyetle karşılanır. Katkıda bulunma yolları:</p><ul><li><strong>Çeviriler</strong> — bir dili geliştirin veya yeni dil ekleyin. İlgili <code>lib/lang.ec.??.php</code> dosyasındaki değişikliklerle pull request açın.</li><li><strong>Hata raporları</strong> — herhangi bir hesap makinesi sayfasındaki geri bildirim formunu kullanın veya Bitbucket\'ta sorun bildirin.</li><li><strong>Yeni hesap makineleri</strong> — saha çalışanlarına ve sulama uzmanlarına hizmet eden hidrolik mühendislik araçları için fikirler özellikle memnuniyetle karşılanır. Depodaki <code>CLAUDE.md</code> geliştirici kılavuzuna bakın.</li><li><strong>Barındırma</strong> — bu hesap makinelerini sınırlı bağlantısı olan bir bölge için yansıtabilirseniz lütfen iletişime geçin.</li></ul><h3>Çevrimdışı Kullanım</h3><p>Bu hesap makineleri bir Aşamalı Web Uygulaması (PWA) olarak çalışır. İnternete bağlıyken herhangi bir hesap makinesi sayfasını ziyaret edin; tarayıcınız tüm hesap makinelerini otomatik olarak önbelleğe alacaktır. Bundan sonra tüm hesap makineleri çevrimdışı çalışır — internet gerekmez.</p><p>Android veya iOS\'ta, EngCalcs\'ı cihazınıza uygulama olarak yüklemek için tarayıcınızın "Ana Ekrana Ekle" seçeneğini kullanın. Masaüstünde, tarayıcınızın adres çubuğundaki yükleme simgesini arayın.</p><p>Ayrıca herhangi bir hesap makinesini tek seferlik çevrimdışı kullanım için tarayıcınızın "Farklı kaydet…" menüsünü kullanarak kaydedebilirsiniz.</p><h3>İletişim</h3><p>Tom Haws — hidrolik mühendisi ve bu hesap makinelerinin yazarı.<br />Herhangi bir hesap makinesi sayfasındaki geri bildirim formunu kullanın veya <a target="_blank" href="https://bitbucket.org/hawstom/engcalcs">Bitbucket</a>\'taki kaynak koda erişin.</p>';
-
+$ec_lang['contact_title']='Haws EDC Iletisim';
+$ec_lang['contactSendMessage']="Tom Haws'a bir mesaj gönderin";
+$ec_lang['contactYourName']='Isim:';
+$ec_lang['contactYourEmail']='E-mail Adresi:';
+$ec_lang['contactSubject']='Konu:';
+$ec_lang['contact_message']='Mesaj:';
+$ec_lang['contactSpamPrefix']='Bes arti bir';
+$ec_lang['contactSpamPostfix']='(Lütfen yaziyla gösterin. 1= bir 2=iki 3=üç 4=dört 5=bes 6=alti 7=yedi +=arti 5+1=6)';
+$ec_lang['contactSubmitButton']='Gönder';
+$ec_lang['contact_success']='Yazmanız için zaman ayırdığınız için teşekkür ederiz.';
 // Rock Chute Design (Robinson, Rice & Kadavy 1998). Prefix rc_.
-$ec_lang['u_m2ps']='m^2/s';
-$ec_lang['u_ft2ps']='cfs/ft';
 $ec_lang['rc_main_menu']='Taş Düşü Tasarımı (Robinson)';
 $ec_lang['rc_main_title']='Ücretsiz Çevrimiçi Taş Düşü Tasarım Hesap Makinesi — Robinson (1998)';
 $ec_lang['rc_main_desc']='Taş Düşü Parça Taşı Boyutlandırması — Robinson, Rice & Kadavy (1998)';
@@ -484,18 +486,3 @@ $ec_lang['rc_sketch_filter']          = 'Filtre';
 $ec_lang['rc_sketch_top_crest_curve'] = 'Tepe Eğrisi';
 $ec_lang['rc_sketch_outlet_apron']    = 'Çıkış Perdahı';
 $ec_lang['rc_sketch_radius']          = 'yarıçap';
-// Manning Trapezoid velocity check (missing)
-$ec_lang['mtc_vel_check']='Hız kontrolü';
-$ec_lang['mtc_vel_ok']='Hız, düzgün akış varsayımları için makul.';
-$ec_lang['mtc_vel_high']='Hız yüksek — geçiş kayıplarını ve mevcut enerjiyi kontrol edin.';
-$ec_lang['mtc_vel_low']='Hız düşük — çökelme riski.';
-$ec_lang['mtc_vel_ok_short']='Tamam';
-$ec_lang['mtc_vel_high_short']='Yüksek';
-$ec_lang['mtc_vel_low_short']='Düşük';
-$ec_lang['mtc_note_2_term']='Hız kontrolü';
-$ec_lang['mtc_note_2_def']='Yüksek hız, mevcut bir düşüden yüksek özgül enerji anlamına gelir. Bu enerji, genişlemelerde, dirseklerde veya engellerde hızla kaybolabilir. Bunun saha için makul olduğunu doğrulayın.';
-// Micro-Hydro Power additional notes (missing)
-$ec_lang['mhp_notes_6_term']='Verimlilik';
-$ec_lang['mhp_notes_6_def']='Tipik santral verimi η, mikro-hidro sistemlerinde yaygın olan Pelton ve çapraz akış türbinleri için 0,70 ile 0,85 arasında değişir. Muhafazakâr bir ilk tahmin olarak 0,75 kullanın.';
-$ec_lang['mhp_notes_7_term']='Yıllık Enerji';
-$ec_lang['mhp_notes_7_def']='Yıllık enerji, sürekli tam debi çalışmasını (yılda 8.760 saat) varsayar. Mevsimsel debi değişimi, bakım duruşları ve yük faktörü nedeniyle gerçek üretim daha düşük olacaktır.';

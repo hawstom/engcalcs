@@ -2,101 +2,6 @@
 
 // All missing text declarations will fall back to English.
 
-$ec_lang['u_acft']="ac-ft";
-$ec_lang['u_ft3']="ft^3";
-$ec_lang['u_m3']="m^3";
-$ec_lang['u_kw']='kW';
-$ec_lang['u_mw']='MW';
-$ec_lang['u_kwh_yr']='kWh/yr';
-$ec_lang['u_mwh_yr']='MWh/yr';
-$ec_lang['u_hp']='hp';
-
-// Page text
-// In page order for easiest maintenance.
-$ec_lang['calc_set_units']='Alege unitate masură:';
-$ec_lang['calc_results']='Rezultate';
-// Manning Pipe Flow
-$ec_lang['mpf_main_menu']='Manning Curgere Conductă';
-$ec_lang['mpf_main_title']='Calculator Gratuit Online Manning Curgere Conductă';
-$ec_lang['mpf_main_desc']='Formula Manning Curgere Uniformă în Conductă la Pantă și Adâncime Date';
-$ec_lang['mpf_pipe_diameter']='Diametru conductă';
-$ec_lang['mpf_manningRoughness']='Rugozitate';
-$ec_lang['mpf_friction_slope']='Panta (possibly <a target="_blank" href="../pressureslope.php">?</a> equal to pipe slope, S<sub>0</sub> ';
-$ec_lang['mpf_depth_ratio']='Procent sau fracţie din conducta plină (100% sau 1 inseamnă plină)';
-$ec_lang['mpf_flow']='Debit';
-$ec_lang['mpf_velocity']='Viteză';
-$ec_lang['mpf_velocity_head']='Presiunea dinamică';
-$ec_lang['mpf_flow_area']='Secţiune de curgere';
-$ec_lang['mpf_wetted_perimeter']='Perimetrul secţiunii de curgere';
-$ec_lang['mpf_hydraulic_radius']='Raza hidraulică';
-$ec_lang['mpf_top_width']='Laţimea suprafeţei libere';
-$ec_lang['mpf_froude_number']='Numărul Froude';
-$ec_lang['mpf_shear_stress']='Efort tangenţial promedio';
-$ec_lang['mpf_solve_for_dd0']='Calculează y/d<sub>0</sub> pentru Q dat';
-$ec_lang['mpf_solve_desc']='Folosind D<sub>0</sub>, n și S<sub>0</sub> din formularul calculatorului, găsește cel mai mic y/d<sub>0</sub> pentru un Q dat.';
-$ec_lang['mpf_solve_button']='Calculează';
-// Orifice Flow
-$ec_lang['or_main_menu']='Debit prin Orificiu';
-$ec_lang['or_main_title']='Calculator gratuit online de debit prin orificiu';
-$ec_lang['or_main_desc']='Debit prin Orificiu — Liber sau Înecat';
-$ec_lang['or_shape']='Forma deschiderii';
-$ec_lang['or_shape_circular']='Circulară';
-$ec_lang['or_shape_rectangular']='Dreptunghiulară';
-$ec_lang['or_diameter']='Diametru sau înălțime, D <span title="Diametru pentru circular; înălțime pentru dreptunghiular" class="ec-tip">?</span>';
-$ec_lang['or_width']='Lățime, W <span title="Numai deschideri dreptunghiulare" class="ec-tip">?</span>';
-$ec_lang['or_invert']='Cotă radier <span title="Fundul deschiderii" class="ec-tip">?</span>';
-$ec_lang['or_hwe']='Nivelul apei în amonte';
-$ec_lang['or_twe']='Nivelul apei în aval';
-$ec_lang['or_cd']='Coeficient de debit, C<sub>d</sub>';
-$ec_lang['or_centroid_elev']='Cota centroidului';
-$ec_lang['or_head']='Sarcină efectivă, h';
-$ec_lang['or_area']='Aria deschiderii, A';
-$ec_lang['or_flow']='Debit, Q';
-$ec_lang['or_velocity']='Viteză, v';
-$ec_lang['or_regime']='Verificarea regimului de orificiu';
-$ec_lang['or_regime_valid']='Curgere liberă — regim de orificiu valid ✓';
-$ec_lang['or_regime_submerged']='Orificiu înecat (TWE peste centroid) — valid ✓';
-$ec_lang['or_regime_warn']='Atenție: nivelul amonte sub cheia arcului — nu este regim de orificiu';
-$ec_lang['or_regime_twe_above_hwe']='Atenție: apa din aval (TWE) depășește apa din amonte (HWE) — verificați datele de intrare';
-$ec_lang['or_notes_1_term']='Ecuația orificiului';
-$ec_lang['or_notes_1_def']='Q = C<sub>d</sub> × A × √(2gh). Curgere liberă: h = HWE − centroid. Înecat (TWE peste radier): h = HWE − TWE.';
-$ec_lang['or_notes_2_term']='Regimul orificiului';
-$ec_lang['or_notes_2_def']='Ecuațiile de debit prin orificiu se aplică atunci când nivelul din amonte este deasupra cheii deschiderii. Când este sub cheie, utilizați o ecuație de deversor.';
-$ec_lang['or_notes_3_term']='Coeficient de debit';
-$ec_lang['or_notes_3_def']='C<sub>d</sub> variază între 0,60 și 0,65 pentru orificii cu margini ascuțite. Intrările rotunjite sau reintrate au valori diferite. Consultați <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venture-d_590.html">Engineering Toolbox</a> sau Manualul de Referință Hidraulică HEC-RAS.';
-$ec_lang['or_notes_4_term']='Înecare';
-$ec_lang['or_notes_4_def']='Când TWE depășește radierul deschiderii, calculatorul aplică automat ecuația orificiului înecat cu h = HWE − TWE. Când TWE este la nivelul sau sub radier, se presupune curgere liberă și h = HWE − centroid.';
-
-// Orifice Drain Time
-$ec_lang['odt_main_menu']='Timp de Golire prin Orificiu';
-$ec_lang['odt_main_title']='Calculator Gratuit Online Timp de Golire prin Orificiu — Iaz, Bazin sau Rezervor';
-$ec_lang['odt_main_desc']='Timp de Golire a Iazului sau Bazinului prin Orificiu — Metoda Volumului Conic';
-$ec_lang['odt_h1_elev']='NWS inițial <span title="Cota inițială a suprafeței apei" class="ec-tip">?</span>';
-$ec_lang['odt_a1']='Aria inițială, A<sub>1</sub>';
-$ec_lang['odt_h2_elev']='NWS final';
-$ec_lang['odt_h_orifice']='Cota centroidului orificiului';
-$ec_lang['odt_a0']='Aria la nivelul orificiului, A<sub>0</sub>';
-$ec_lang['odt_a_ending']='Aria finală, A<sub>2</sub> <span title="Interpolată din modelul conic la cota finală" class="ec-tip">?</span>';
-$ec_lang['odt_h2_check']='Verificare cotă finală';
-$ec_lang['odt_h2_ok']='Cota finală deasupra vârfului orificiului ✓';
-$ec_lang['odt_h2_warn']='Atenție: cota finală la nivelul sau sub vârful orificiului (centroid + D/2)';
-$ec_lang['odt_d']='D orificiu <span title="Diametru (circular) sau înălțime (dreptunghiular)" class="ec-tip">?</span>';
-$ec_lang['odt_w']='Lățimea orificiului, W <span title="Numai dreptunghiular" class="ec-tip">?</span>';
-$ec_lang['odt_t_sec']='Timp de golire (s)';
-$ec_lang['odt_t_min']='Timp de golire (min)';
-$ec_lang['odt_t_hr']='Timp de golire (ore)';
-$ec_lang['odt_t_day']='Timp de golire (zile)';
-$ec_lang['odt_notes_1_term']='Formulă';
-$ec_lang['odt_notes_1_def']='t = √H<sub>1</sub> / (C<sub>d</sub> A<sub>or</sub> √(2g)) × (2A<sub>x</sub>/5 + 8√(A<sub>x</sub>A<sub>0</sub>)/15 + 16A<sub>0</sub>/15) dă timpul de golire de la sarcina H până la orificiu. Timp de golire = t(H<sub>1</sub>,A<sub>1</sub>,A<sub>0</sub>) − t(H<sub>2</sub>,A<sub>2</sub>,A<sub>0</sub>), unde H<sub>1</sub> = cota inițială − cota orificiului, H<sub>2</sub> = cota finală − cota orificiului.';
-$ec_lang['odt_notes_2_term']='Metodă';
-$ec_lang['odt_notes_2_def']='Metoda volumului conic modelează iazul sau bazinul ca o secțiune conică între aria inițială A<sub>1</sub> la suprafața inițială a apei și aria A<sub>0</sub> la cota centroidului orificiului. A<sub>2</sub>, aria iazului la cota finală, este interpolată din A<sub>1</sub> și A<sub>0</sub> folosind modelul secțiunii conice. Timpul de golire de la cota inițială la cea finală este egal cu timpul total de golire de la H<sub>1</sub> la orificiu minus timpul rămas de golire de la H<sub>2</sub> la orificiu.';
-$ec_lang['odt_h1']='Sarcina inițială, H<sub>1</sub> <span title="NWS inițial minus cota centroidului orificiului" class="ec-tip">?</span>';
-$ec_lang['odt_q_max']='Debit maxim, Q<sub>max</sub>';
-$ec_lang['odt_vol']='Volum golit';
-$ec_lang['odt_sketch_start']='Început';
-$ec_lang['odt_sketch_end']='Sfârșit';
-
-// Units (alphabetical order)
 $ec_lang['u_depthFrac']='fracție';
 $ec_lang['u_depthPercent']='%';
 $ec_lang['u_ft2']='ft^2';
@@ -129,6 +34,23 @@ $ec_lang['u_pa']='Pa';
 $ec_lang['u_psf']='psf';
 $ec_lang['u_psi']='psi';
 $ec_lang['u_s']='sec';
+$ec_lang['u_lph']="L/hr";
+$ec_lang['u_gph']="gal/hr";
+$ec_lang['u_mmph']="mm/hr";
+$ec_lang['u_inph']="in/hr";
+$ec_lang['u_acft']="ac-ft";
+$ec_lang['u_ft3']="ft^3";
+$ec_lang['u_m3']="m^3";
+$ec_lang['u_kw']='kW';
+$ec_lang['u_mw']='MW';
+$ec_lang['u_kwh_yr']='kWh/yr';
+$ec_lang['u_mwh_yr']='MWh/yr';
+$ec_lang['u_hp']='hp';
+$ec_lang['u_m2ps']='m^2/s';
+$ec_lang['u_ft2ps']='cfs/ft';
+
+// Page text
+// In page order for easiest maintenance.
 // Menu and General
 $ec_lang['menu_brand']='Calculatoare HawsEDC';
 $ec_lang['menu_main_list']='Listă de calculatoare';
@@ -141,17 +63,19 @@ $ec_lang['template_feedback']='Vă rugăm să ne transmiteți sugestiile sau apr
 $ec_lang['template_printable_title']='Titlu tipărit';
 $ec_lang['template_printable_subtitle']='Subtitlu tipărit';
 $ec_lang['index_title']='Calculatoare Inginerești Gratuite Online';
+$ec_lang['calc_set_units']='Alege unitate masură:';
+$ec_lang['points_data_help']='(sau Copiați/Lipiți folosind zona de date)';
+$ec_lang['points_data_title']='Date puncte<br />(separate prin virgulă sau tabulație)';
+$ec_lang['points_data_copy']='Copiați';
+$ec_lang['points_data_paste']='Lipiți';
 $ec_lang['calc_inputs']='Date de intrare';
+$ec_lang['calc_results']='Rezultate';
 $ec_lang['view_hide_line']='[Ascunde această linie]';
 $ec_lang['view_printable']='Versiune tipăribilă (reîncărcați/actualizați pentru a restaura)';
 $ec_lang['ec_name_label']='Salvați acest calcul:';
 $ec_lang['ec_name_placeholder']='Nume';
 $ec_lang['ec_name_hint']='Salvează valorile introduse în URL pentru marcaj, recuperare istoric și partajare';
-$ec_lang['points_data_help']='(sau Copiați/Lipiți folosind zona de date)';
-$ec_lang['points_data_title']='Date puncte<br />(separate prin virgulă sau tabulație)';
-$ec_lang['points_data_copy']='Copiați';
-$ec_lang['points_data_paste']='Lipiți';
-// Darcy-Weisbach
+// Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Pierdere de Sarcină Conductă Darcy-Weisbach';
 $ec_lang['dw_main_title']='Calculator Gratuit Online Pierdere de Sarcină Conductă Darcy-Weisbach';
 $ec_lang['dw_main_desc']='Pierdere de Sarcină Conductă Darcy-Weisbach la Diametru, Rugozitate și Debit Date';
@@ -164,7 +88,7 @@ $ec_lang['dw_regime_transitional']='tranzițional';
 $ec_lang['dw_regime_turbulent']='curgere turbulentă';
 $ec_lang['dw_friction_factor_method']='Metoda factorului de frecare';
 $ec_lang['dw_friction_factor']='Factorul de frecare, f';
-// Hazen-Williams
+// Hazen-Williams. See mphl_ for missing text.
 $ec_lang['hw_main_menu']='Pierdere de Sarcină Conductă Hazen-Williams';
 $ec_lang['hw_main_title']='Calculator Gratuit Online Pierdere de Sarcină Conductă Hazen-Williams';
 $ec_lang['hw_main_desc']='Pierdere de Sarcină Conductă Hazen-Williams la Diametru, Rugozitate și Debit Date';
@@ -201,15 +125,34 @@ $ec_lang['mi_notes_1_term']='n compozit';
 $ec_lang['mi_notes_1_def']='Acest calculator urmează Manualul de Referință HEC-RAS în calculul n compozit de regiune folosind Chow 1959, pagina 136, ecuația 6-17 (nu 6-18).';
 $ec_lang['mi_notes_2_term']='Placare cu rocă';
 $ec_lang['mi_notes_2_def']='Folosiți Calculatorul Manning Canal Trapezoidal pentru a proiecta placarea cu rocă. Acest calculator este mai potrivit pentru secțiuni naturale.';
-// Manning Pipe Flow additional keys
+// Manning Pipe Flow
+$ec_lang['mpf_main_menu']='Manning Curgere Conductă';
+$ec_lang['mpf_main_title']='Calculator Gratuit Online Manning Curgere Conductă';
+$ec_lang['mpf_main_desc']='Formula Manning Curgere Uniformă în Conductă la Pantă și Adâncime Date';
+$ec_lang['mpf_spreadheet_notice']='Consultați versiunea de calcul tabelar a acestui calculator';
+$ec_lang['mpf_pipe_diameter']='Diametru conductă';
+$ec_lang['mpf_manningRoughness']='Rugozitate';
+$ec_lang['mpf_friction_slope']='Panta (possibly <a target="_blank" href="../pressureslope.php">?</a> equal to pipe slope, S<sub>0</sub> ';
+$ec_lang['mpf_depth_ratio']='Procent sau fracţie din conducta plină (100% sau 1 inseamnă plină)';
 $ec_lang['mpf_see_notes']='(Consultați notele)';
+$ec_lang['mpf_flow']='Debit';
+$ec_lang['mpf_velocity']='Viteză';
+$ec_lang['mpf_velocity_head']='Presiunea dinamică';
+$ec_lang['mpf_flow_area']='Secţiune de curgere';
 $ec_lang['mpf_pipe_area']='Aria conductei, a0';
 $ec_lang['mpf_area_ratio']='Arie relativă, a/a0';
+$ec_lang['mpf_wetted_perimeter']='Perimetrul secţiunii de curgere';
+$ec_lang['mpf_hydraulic_radius']='Raza hidraulică';
+$ec_lang['mpf_top_width']='Laţimea suprafeţei libere';
+$ec_lang['mpf_froude_number']='Numărul Froude';
+$ec_lang['mpf_shear_stress']='Efort tangenţial promedio';
 $ec_lang['mpf_full_flow']='Debit la plin, Q0';
 $ec_lang['mpf_full_flow_ratio']='Raport față de debitul la plin, Q/Q0';
 $ec_lang['mpf_note_1']='<dl><dt>Acesta este debitul și adâncimea în interiorul unei conducte <em>infinit lungi</em>.</dt><dd>Introducerea debitului în conductă poate necesita o adâncime a apei din amonte semnificativ mai mare. Adăugați cel puțin de 1,5 ori sarcina de viteză pentru a obține adâncimea din amonte sau <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">consultați tutorialul meu de 2 minute</a> pentru calculele standard ale nivelului din amonte ale podețelor folosind HY-8.</dd>';
-$ec_lang['mpf_spreadheet_notice']='Consultați versiunea de calcul tabelar a acestui calculator';
-// Manning Pipe Head Loss
+$ec_lang['mpf_solve_for_dd0']='Calculează y/d<sub>0</sub> pentru Q dat';
+$ec_lang['mpf_solve_desc']='Folosind D<sub>0</sub>, n și S<sub>0</sub> din formularul calculatorului, găsește cel mai mic y/d<sub>0</sub> pentru un Q dat.';
+$ec_lang['mpf_solve_button']='Calculează';
+// Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Manning Pierdere de Sarcină Conductă';
 $ec_lang['mphl_main_title']='Calculator Gratuit Online Manning Pierdere de Sarcină Conductă';
 $ec_lang['mphl_main_desc']='Formula Manning Pierdere de Sarcină la Curgere Plină Dată';
@@ -224,7 +167,7 @@ $ec_lang['mphl_egl_1']='EGL aval';
 $ec_lang['mphl_egl_2']='EGL amonte';
 $ec_lang['mphl_hgl_2']='HGL amonte în conductă ' . $ec_lang['mpf_see_notes'];
 $ec_lang['mphl_note_1']='<dl><dt>Pentru o condiție de intrare deschisă (podeț), este necesar să se verifice condițiile de control la intrare.</dt><dd>1. HGL amonte nu poate fi mai jos decât cota de adâncime normală amonte a curgerii (sau sub conductă!).</dd><dd>2. Nivelul apei din amonte al unui podeț este mai bine reprezentat de EGL amonte decât de HGL amonte.</dd><dd>3. Consultați <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">tutorialul meu de 2 minute</a> pentru calculele simple standard ale nivelului din amonte ale podețelor folosind HY-8.</dd>';
-// Manning Trapezoid
+// Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Manning Canal Trapezoidal';
 $ec_lang['mtc_main_title']='Calculator Gratuit Online Formula Manning Canal Trapezoidal';
 $ec_lang['mtc_main_desc']='Formula Manning Curgere Uniformă în Canal Trapezoidal la Pantă și Adâncime Date';
@@ -245,8 +188,16 @@ $ec_lang['mtc_d50_z1']='Dimensiunea necesară a rocii unghiulare taluz 1, D50 (I
 $ec_lang['mtc_d50_z2']='Dimensiunea necesară a rocii unghiulare taluz 2, D50 (Isbash & MC) <span title="Conform Isbash (1936) și Comitatul Maricopa, Arizona, SUA." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['mtc_d50_mra']='Dimensiunea necesară a rocii unghiulare, D50 (Maynord, Ruff și Abt 1989)';
 $ec_lang['mtc_d50_searcy']='Dimensiunea necesară a rocii unghiulare, D50 (Searcy 1967)';
+$ec_lang['mtc_vel_check']='Verificare viteză';
+$ec_lang['mtc_vel_ok']='Viteză rezonabilă pentru ipotezele de curgere uniformă.';
+$ec_lang['mtc_vel_high']='Viteză ridicată - verificați pierderile la tranzitii și energia disponibilă.';
+$ec_lang['mtc_vel_low']='Viteză mică — risc de sedimentare.';
+$ec_lang['mtc_vel_ok_short']='OK';
+$ec_lang['mtc_vel_high_short']='Ridicată';
+$ec_lang['mtc_vel_low_short']='Mică';
 $ec_lang['mtc_note_1']='<dl><dt>Iterație automată de dimensionare a rocii și rugozității</dt><dd>Alegeți un buton radio pentru rugozitate (BB recomandat) și un buton radio pentru dimensiunea de proiectare a rocii (Isbash recomandat). Ajustați adâncimea și factorul de siguranță al dimensiunii rocii pentru a obține debitul dorit cu o dimensiune uniformă a rocii. De fiecare dată când modificați orice valoare de intrare, are loc următorul ciclu de iterație: 1. Rugozitatea este calculată din dimensiunea de proiectare a rocii. 2. Calculul rugozității solicitate este copiat la rugozitatea de intrare. 3. Debitul canalului și dimensiunea necesară a rocii sunt calculate. 4. Dimensiunea de proiectare a rocii este ajustată. 5. Repetați până când eroarea din dimensiunea de proiectare a rocii este foarte mică.</dd><dt>Calculator de bază (fără iterație)</dt><dd>Introduceți valoarea dorită de rugozitate. Ignorați zona de intrare a dimensiunii de proiectare a rocii.</dd></dl>';
-// Robinson Rock Chute
+$ec_lang['mtc_note_2_term']='Verificare viteză';
+$ec_lang['mtc_note_2_def']='Viteza ridicată implică energie specifică mare dintr-o cădere disponibilă. Acea energie poate fi pierdută rapid la lărgiri, curbe sau obstacole. Verificați că aceasta este rezonabilă pentru amplasament.';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='Deversor cu Creastă Lată Simplu';
 $ec_lang['ws_main_title']='Calculator Gratuit Online Deversor cu Creastă Lată Simplu';
@@ -256,7 +207,7 @@ $ec_lang['ws_headWaterHeight']='Înălțimea apei amonte, h';
 $ec_lang['ws_weirCoefficient']='Coeficientul deversorului, Cw';
 $ec_lang['ws_notes_heading']='Note';
 $ec_lang['ws_notes_we_term']='Ecuația deversorului';
-// Weir Flow Irregular
+// Weir Flow Irregular. See ws_ for missing text.
 $ec_lang['wi_menu']='Deversor Neregulat';
 $ec_lang['wi_main_title']='Calculator Gratuit Online Deversor Segmentat, Adâncime Variabilă, Neregulat';
 $ec_lang['wi_main_desc']='Calculator pentru Curgere peste Deversor Neregulat';
@@ -270,28 +221,37 @@ $ec_lang['wi_cumulativeFlow']='Debit cumulat';
 $ec_lang['wi_save_and_calculate']='Salvați și Calculați';
 $ec_lang['wi_notes_we_term']='Ecuația deversorului';
 $ec_lang['wi_notes_we_def']='q = dacă (lungime = 0) atunci 0 altfel dacă (pantă=0) atunci cw*lungime*d<sub>0</sub><sup>1.5</sup> altfel cw/(2.5*pantă) * (d<sub>0</sub><sup>2.5</sup> - d<sub>1</sub><sup>2.5</sup>) unde d<sub>1</sub> și d<sub>0</sub> sunt întotdeauna pozitive sau zero';
-// Erosion Setback and Scour Calc.
-$ec_lang['essc_btbw']='Lățimea mal la mal';
-$ec_lang['essc_mcr']='Raza minimă de curbură';
-$ec_lang['essc_q']='Debit, Q';
-// Contact us.
-
-// Irrigation
-$ec_lang['irr_main_menu']='Măsurarea Debitului de Irigare';
-$ec_lang['irr_main_title']='Calculatoare Online Gratuite pentru Măsurarea Debitului de Irigare';
-$ec_lang['irr_main_desc']='Măsurarea Debitului de Irigare — Deversor și Orificii';
-$ec_lang['contact_title']='Contact HawsEDC';
-$ec_lang['contactSendMessage']='Trimiteți un mesaj lui Tom Haws';
-$ec_lang['contactYourName']='Numele dumneavoastră:';
-$ec_lang['contactYourEmail']='Adresa dumneavoastră de e-mail:';
-$ec_lang['contactSubject']='Subiect:';
-$ec_lang['contact_message']='Mesaj:';
-$ec_lang['contactSpamPrefix']='Cinci plus unu este egal cu';
-$ec_lang['contactSpamPostfix']='(Vă rugăm să scrieți cu litere. 1=unu 2=doi 3=trei 4=patru 5=cinci 6=șase 7=șapte +=plus 5+1=6)';
-$ec_lang['contactSubmitButton']='Trimiteți Mesajul';
-$ec_lang['contact_success']='Mulțumesc că ați luat timp pentru a scrie.';
-
-
+// Orifice Flow
+$ec_lang['or_main_menu']='Debit prin Orificiu';
+$ec_lang['or_main_title']='Calculator gratuit online de debit prin orificiu';
+$ec_lang['or_main_desc']='Debit prin Orificiu — Liber sau Înecat';
+$ec_lang['or_shape']='Forma deschiderii';
+$ec_lang['or_shape_circular']='Circulară';
+$ec_lang['or_shape_rectangular']='Dreptunghiulară';
+$ec_lang['or_diameter']='Diametru sau înălțime, D <span title="Diametru pentru circular; înălțime pentru dreptunghiular" class="ec-tip">?</span>';
+$ec_lang['or_width']='Lățime, W <span title="Numai deschideri dreptunghiulare" class="ec-tip">?</span>';
+$ec_lang['or_invert']='Cotă radier <span title="Fundul deschiderii" class="ec-tip">?</span>';
+$ec_lang['or_hwe']='Nivelul apei în amonte';
+$ec_lang['or_twe']='Nivelul apei în aval';
+$ec_lang['or_cd']='Coeficient de debit, C<sub>d</sub>';
+$ec_lang['or_centroid_elev']='Cota centroidului';
+$ec_lang['or_head']='Sarcină efectivă, h';
+$ec_lang['or_area']='Aria deschiderii, A';
+$ec_lang['or_flow']='Debit, Q';
+$ec_lang['or_velocity']='Viteză, v';
+$ec_lang['or_regime']='Verificarea regimului de orificiu';
+$ec_lang['or_regime_valid']='Curgere liberă — regim de orificiu valid ✓';
+$ec_lang['or_regime_submerged']='Orificiu înecat (TWE peste centroid) — valid ✓';
+$ec_lang['or_regime_warn']='Atenție: nivelul amonte sub cheia arcului — nu este regim de orificiu';
+$ec_lang['or_regime_twe_above_hwe']='Atenție: apa din aval (TWE) depășește apa din amonte (HWE) — verificați datele de intrare';
+$ec_lang['or_notes_1_term']='Ecuația orificiului';
+$ec_lang['or_notes_1_def']='Q = C<sub>d</sub> × A × √(2gh). Curgere liberă: h = HWE − centroid. Înecat (TWE peste radier): h = HWE − TWE.';
+$ec_lang['or_notes_2_term']='Regimul orificiului';
+$ec_lang['or_notes_2_def']='Ecuațiile de debit prin orificiu se aplică atunci când nivelul din amonte este deasupra cheii deschiderii. Când este sub cheie, utilizați o ecuație de deversor.';
+$ec_lang['or_notes_3_term']='Coeficient de debit';
+$ec_lang['or_notes_3_def']='C<sub>d</sub> variază între 0,60 și 0,65 pentru orificii cu margini ascuțite. Intrările rotunjite sau reintrate au valori diferite. Consultați <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venture-d_590.html">Engineering Toolbox</a> sau Manualul de Referință Hidraulică HEC-RAS.';
+$ec_lang['or_notes_4_term']='Înecare';
+$ec_lang['or_notes_4_def']='Când TWE depășește radierul deschiderii, calculatorul aplică automat ecuația orificiului înecat cu h = HWE − TWE. Când TWE este la nivelul sau sub radier, se presupune curgere liberă și h = HWE − centroid.';
 // Micro-Hydro Power
 $ec_lang['mhp_main_menu']='Micro-Hidroenergie';
 $ec_lang['mhp_main_title']='Calculator gratuit online de micro-hidroenergie';
@@ -315,11 +275,11 @@ $ec_lang['mhp_hnet']='Sarcina netă, H<sub>net</sub>';
 $ec_lang['mhp_power']='Putere produsă, P';
 $ec_lang['mhp_annual_kwh']='Energie anuală la 100% capacitate';
 $ec_lang['mhp_vel_ok']='1–3 m/s — în intervalul țintă ✓';
-$ec_lang['mhp_vel_ok_short']='OK';
 $ec_lang['mhp_vel_low']='Viteză mică - risc de sedimentare și antrenare de aer.';
-$ec_lang['mhp_vel_low_short']='Mică';
 $ec_lang['mhp_vel_high']='Viteză ridicată - risc de lovitura de berbec și pierderi locale (minore).';
+$ec_lang['mhp_vel_ok_short']='OK';
 $ec_lang['mhp_vel_high_short']='Ridicată';
+$ec_lang['mhp_vel_low_short']='Mică';
 $ec_lang['mhp_hl_ok']='în limita țintei de 10% ✓';
 $ec_lang['mhp_hl_warn']='depășește ținta de 10% — luați în calcul o conductă mai mare ⚠';
 $ec_lang['mhp_hl_bad']='depășește 20% — redimensionați conducta';
@@ -333,21 +293,64 @@ $ec_lang['mhp_notes_4_term']='Pierderi locale k<sub>m</sub>';
 $ec_lang['mhp_notes_4_def']='Valori tipice: intrare cu margine ascuțită 0.5, fiecare cot de 45° între 0.2–0.3, robinet cu sertar (complet deschis) 0.1, robinet fluture 0.2. Suma tuturor fitingurilor dă k<sub>m</sub> total. Valoarea implicită 1.5 presupune o intrare și două coturi.';
 $ec_lang['mhp_notes_5_term']='Rugozitatea conductei e';
 $ec_lang['mhp_notes_5_def']='Rugozitate absolută tipică: oțel (nou) 0.046 mm, oțel (uzat) 0.15 mm, HDPE 0.003 mm, PVC/uPVC 0.0015 mm, beton 0.3–3 mm. HDPE este des utilizat la conductele forțate micro-hidro de mici dimensiuni.';
+$ec_lang['mhp_notes_6_term']='Randament';
+$ec_lang['mhp_notes_6_def']='Randamentul tipic al centralei η variază între 0,70 și 0,85 pentru turbinele Pelton și cu flux încrucișat comune în micro-hidroenergie. Utilizați 0,75 ca primă estimare conservatoare.';
+$ec_lang['mhp_notes_7_term']='Energie Anuală';
+$ec_lang['mhp_notes_7_def']='Energia anuală presupune funcționare continuă la debit maxim (8.760 de ore/an). Producția reală va fi mai mică din cauza variației sezoniere a debitului, întreruperii pentru întreținere și factorului de sarcină.';
 
-// About
-$ec_lang['about_main_menu']='Despre';
-$ec_lang['install_main_menu']='Instalare';
-$ec_lang['install_main_title']='Instalează EngCalcs';
-$ec_lang['install_main_desc']='Adaugă pe dispozitiv pentru utilizare offline';
-$ec_lang['contact_main_menu']='Contacteaza';
-$ec_lang['about_main_title']='Despre calculatoarele de inginerie HawsEDC';
-$ec_lang['about_main_desc']='Misiune, sursă deschisă și contribuții';
+// Orifice Drain Time
+$ec_lang['odt_main_menu']='Timp de Golire prin Orificiu';
+$ec_lang['odt_main_title']='Calculator Gratuit Online Timp de Golire prin Orificiu — Iaz, Bazin sau Rezervor';
+$ec_lang['odt_main_desc']='Timp de Golire a Iazului sau Bazinului prin Orificiu — Metoda Volumului Conic';
+$ec_lang['odt_h1_elev']='NWS inițial <span title="Cota inițială a suprafeței apei" class="ec-tip">?</span>';
+$ec_lang['odt_a1']='Aria inițială, A<sub>1</sub>';
+$ec_lang['odt_h2_elev']='NWS final';
+$ec_lang['odt_h_orifice']='Cota centroidului orificiului';
+$ec_lang['odt_a0']='Aria la nivelul orificiului, A<sub>0</sub>';
+$ec_lang['odt_a_ending']='Aria finală, A<sub>2</sub> <span title="Interpolată din modelul conic la cota finală" class="ec-tip">?</span>';
+$ec_lang['odt_h2_check']='Verificare cotă finală';
+$ec_lang['odt_h2_ok']='Cota finală deasupra vârfului orificiului ✓';
+$ec_lang['odt_h2_warn']='Atenție: cota finală la nivelul sau sub vârful orificiului (centroid + D/2)';
+$ec_lang['odt_d']='D orificiu <span title="Diametru (circular) sau înălțime (dreptunghiular)" class="ec-tip">?</span>';
+$ec_lang['odt_w']='Lățimea orificiului, W <span title="Numai dreptunghiular" class="ec-tip">?</span>';
+$ec_lang['odt_t_sec']='Timp de golire (s)';
+$ec_lang['odt_t_min']='Timp de golire (min)';
+$ec_lang['odt_t_hr']='Timp de golire (ore)';
+$ec_lang['odt_t_day']='Timp de golire (zile)';
+$ec_lang['odt_notes_1_term']='Formulă';
+$ec_lang['odt_notes_1_def']='t = √H<sub>1</sub> / (C<sub>d</sub> A<sub>or</sub> √(2g)) × (2A<sub>x</sub>/5 + 8√(A<sub>x</sub>A<sub>0</sub>)/15 + 16A<sub>0</sub>/15) dă timpul de golire de la sarcina H până la orificiu. Timp de golire = t(H<sub>1</sub>,A<sub>1</sub>,A<sub>0</sub>) − t(H<sub>2</sub>,A<sub>2</sub>,A<sub>0</sub>), unde H<sub>1</sub> = cota inițială − cota orificiului, H<sub>2</sub> = cota finală − cota orificiului.';
+$ec_lang['odt_notes_2_term']='Metodă';
+$ec_lang['odt_notes_2_def']='Metoda volumului conic modelează iazul sau bazinul ca o secțiune conică între aria inițială A<sub>1</sub> la suprafața inițială a apei și aria A<sub>0</sub> la cota centroidului orificiului. A<sub>2</sub>, aria iazului la cota finală, este interpolată din A<sub>1</sub> și A<sub>0</sub> folosind modelul secțiunii conice. Timpul de golire de la cota inițială la cea finală este egal cu timpul total de golire de la H<sub>1</sub> la orificiu minus timpul rămas de golire de la H<sub>2</sub> la orificiu.';
+$ec_lang['odt_h1']='Sarcina inițială, H<sub>1</sub> <span title="NWS inițial minus cota centroidului orificiului" class="ec-tip">?</span>';
+$ec_lang['odt_q_max']='Debit maxim, Q<sub>max</sub>';
+$ec_lang['odt_vol']='Volum golit';
+$ec_lang['odt_sketch_start']='Început';
+$ec_lang['odt_sketch_end']='Sfârșit';
+// Erosion Setback and Scour Calc.
+$ec_lang['essc_btbw']='Lățimea mal la mal';
+$ec_lang['essc_mcr']='Raza minimă de curbură';
+$ec_lang['essc_q']='Debit, Q';
+// Contact us.
 
+// Irrigation
+$ec_lang['irr_main_menu']='Măsurarea Debitului de Irigare';
+$ec_lang['irr_main_title']='Calculatoare Online Gratuite pentru Măsurarea Debitului de Irigare';
+$ec_lang['irr_main_desc']='Măsurarea Debitului de Irigare — Deversor și Orificii';
+$ec_lang['irr_intro_html']='<p>Deversorele și orificiile sunt instrumentele standard de teren pentru măsurarea debitului de apă în sistemele de irigații. Selectați calculatorul care corespunde structurii dvs.:</p>';
+$ec_lang['irr_card_weir_uniform_head']='Deversor — Prag Lat (Lățime Uniformă)';
+$ec_lang['irr_card_weir_uniform_desc']='Măsurați debitul peste creasta unui baraj de derivație, a unei structuri de control sau a unei plăci deversoare. Introduceți lungimea deversorului și adâncimea apei deasupra crestei.';
+$ec_lang['irr_card_weir_irregular_head']='Deversor — Profil Neregulat';
+$ec_lang['irr_card_weir_irregular_desc']='Utilizați când creasta deversorului nu se află la o cotă uniformă — deversor natural, structuri de cădere cu lățime variabilă sau structuri de control cu mai multe secțiuni.';
+$ec_lang['irr_card_orifice_head']='Orificiu — Vană de Cap sau Branșament de Conductă';
+$ec_lang['irr_card_orifice_desc']='Măsurați debitul printr-o vană glisantă, branșament de conductă sau orificiu de pod-canal. Gestionează automat atât curgerea liberă, cât și condițiile de înec (presiunea apei din aval).';
+$ec_lang['irr_card_canal_head']='Proiectarea & Analiza Canalului';
+$ec_lang['irr_card_canal_desc']='Proiectați sau verificați un canal de irigații utilizând formula Manning. Folosiți calculatorul Trapezoidal pentru canale noi; calculatorul Neregulat pentru secțiuni naturale sau construite existente.';
+$ec_lang['irr_card_drip_head']='Proiectare Picurare & Aspersoare';
+$ec_lang['irr_card_drip_desc']='Calculați rata de aplicare, uniformitatea distribuției, debitul lateral, debitul de zonă și durata de funcționare pentru un sistem de irigare prin picurare sau aspersoare. Introduceți debitul emițătorului, distanța dintre emițătoare și adâncimea țintă.';
+$ec_lang['irr_card_seepage_head']='Infiltrații Canal & Eficiența de Transport';
+$ec_lang['irr_card_seepage_desc']='Estimați pierderile prin infiltrație dintr-un tronson de canal folosind măsurătorile de influx și eflux. Calculați eficiența de transport și volumul anual de apă pierdut pentru a ajuta la prioritizarea investițiilor în căptușire.';
+$ec_lang['irr_quickref_html']='<h3>Referință Rapidă</h3><dl><dt>Baraj de derivație sau structură de control</dt><dd>Măsurați adâncimea apei deasupra crestei deversorului. Utilizați <a href="Weir-Flow-Simple.php">Deversor Simplu</a> pentru o creastă uniformă sau <a href="Weir-Flow-Irregular.php">Deversor Neregulat</a> pentru o creastă profilată sau în trepte.</dd><dt>Vană de cap sau branșament de conductă</dt><dd>Măsurați cota apei în amonte și în aval (sau cota radierului dacă curgerea este liberă). Utilizați <a href="Orifice.php">Debit prin Orificiu</a>. Pentru conductă circulară, D = diametrul conductei; pentru vană dreptunghiulară, introduceți lățimea W și înălțimea D.</dd><dt>Timp de golire a unui rezervor sau iaz</dt><dd>Utilizați <a href="Orifice-Drain-Time.php">Timp de Golire prin Orificiu</a> pentru a estima cât durează coborârea nivelului unui iaz sau rezervor printr-un orificiu de fund — util pentru planificarea stocării apei de irigații.</dd><dt>Standarde de teren</dt><dd>Ecuațiile de debit ale deversorului și orificiului utilizate aici corespund procedurilor din USBR <em>Water Measurement Manual</em> (ediția a 3-a), solicitate în mod obișnuit de administratorii de apă și districtele de irigații.</dd></dl>';
 // Drip / Sprinkler Application Rate
-$ec_lang['u_lph']="L/hr";
-$ec_lang['u_gph']="gal/hr";
-$ec_lang['u_mmph']="mm/hr";
-$ec_lang['u_inph']="in/hr";
 $ec_lang['ds_main_menu']='Rata de aplicare — irigare prin picurare/aspersiune';
 $ec_lang['ds_main_title']='Calculator gratuit online al ratei de aplicare la irigarea prin picurare/aspersiune';
 $ec_lang['ds_main_desc']='Irigare prin picurare & aspersiune — rata de aplicare';
@@ -372,6 +375,8 @@ $ec_lang['cs_main_title']='Calculator Online Gratuit pentru Pierderi prin Infilt
 $ec_lang['cs_main_desc']='Pierderi prin Infiltrație & Eficiența de Transport a Canalului — Metoda Influx-Eflux';
 $ec_lang['cs_Q_in']='Influx, Q<sub>in</sub>';
 $ec_lang['cs_Q_out']='Eflux, Q<sub>out</sub>';
+$ec_lang['cs_L']='Lungimea tronsonului, L';
+$ec_lang['cs_wp']='Perimetru udat, P<sub>w</sub>';
 $ec_lang['cs_Q_loss']='Rata de pierderi prin infiltrație, Q<sub>loss</sub>';
 $ec_lang['cs_loss_check']='Verificare măsurători';
 $ec_lang['cs_pct_loss']='Fracție pierdută';
@@ -379,8 +384,6 @@ $ec_lang['cs_Ec']='Eficiența de transport, E<sub>c</sub>';
 $ec_lang['cs_Ec_check']='Clasificare eficiență';
 $ec_lang['cs_Vol_day']='Volum pierdut zilnic';
 $ec_lang['cs_Vol_year']='Volum pierdut anual';
-$ec_lang['cs_L']='Lungimea tronsonului, L';
-$ec_lang['cs_wp']='Perimetru udat, P<sub>w</sub>';
 $ec_lang['cs_Q_loss_per_L']='Pierdere pe unitate de lungime, Q<sub>loss</sub>/L';
 $ec_lang['cs_water_value']='Valoarea apei';
 $ec_lang['cs_lining_cost']='Costul căptușelii';
@@ -404,26 +407,26 @@ $ec_lang['cs_notes_3_term']='Rambursare Căptușeală';
 $ec_lang['cs_notes_3_def']='Introduceți valoarea apei și costul căptușelii în orice monedă consistentă. Suprafață căptușeală = lungimea tronsonului × perimetrul udat — perimetrul udat al secțiunii transversale a canalului la adâncimea de curgere măsurată (lățimea fundului plus ambii taluzi udați). Valoarea anuală recuperată presupune că canalul căptușit atinge în mod continuu E<sub>c</sub> țintă. Rambursarea reală va fi mai lungă pentru canale sezoniere sau dacă căptușeala nu atinge eficiența țintă.';
 $ec_lang['cs_notes_4_term']='Referință';
 $ec_lang['cs_notes_4_def']='USBR <em>Water Measurement Manual</em>, ediția a 3-a (2001). FAO Irrigation and Drainage Paper 57 (1999).';
-
-$ec_lang['irr_intro_html']='<p>Deversorele și orificiile sunt instrumentele standard de teren pentru măsurarea debitului de apă în sistemele de irigații. Selectați calculatorul care corespunde structurii dvs.:</p>';
-$ec_lang['irr_card_weir_uniform_head']='Deversor — Prag Lat (Lățime Uniformă)';
-$ec_lang['irr_card_weir_uniform_desc']='Măsurați debitul peste creasta unui baraj de derivație, a unei structuri de control sau a unei plăci deversoare. Introduceți lungimea deversorului și adâncimea apei deasupra crestei.';
-$ec_lang['irr_card_weir_irregular_head']='Deversor — Profil Neregulat';
-$ec_lang['irr_card_weir_irregular_desc']='Utilizați când creasta deversorului nu se află la o cotă uniformă — deversor natural, structuri de cădere cu lățime variabilă sau structuri de control cu mai multe secțiuni.';
-$ec_lang['irr_card_orifice_head']='Orificiu — Vană de Cap sau Branșament de Conductă';
-$ec_lang['irr_card_orifice_desc']='Măsurați debitul printr-o vană glisantă, branșament de conductă sau orificiu de pod-canal. Gestionează automat atât curgerea liberă, cât și condițiile de înec (presiunea apei din aval).';
-$ec_lang['irr_card_canal_head']='Proiectarea & Analiza Canalului';
-$ec_lang['irr_card_canal_desc']='Proiectați sau verificați un canal de irigații utilizând formula Manning. Folosiți calculatorul Trapezoidal pentru canale noi; calculatorul Neregulat pentru secțiuni naturale sau construite existente.';
-$ec_lang['irr_card_drip_head']='Proiectare Picurare & Aspersoare';
-$ec_lang['irr_card_drip_desc']='Calculați rata de aplicare, uniformitatea distribuției, debitul lateral, debitul de zonă și durata de funcționare pentru un sistem de irigare prin picurare sau aspersoare. Introduceți debitul emițătorului, distanța dintre emițătoare și adâncimea țintă.';
-$ec_lang['irr_card_seepage_head']='Infiltrații Canal & Eficiența de Transport';
-$ec_lang['irr_card_seepage_desc']='Estimați pierderile prin infiltrație dintr-un tronson de canal folosind măsurătorile de influx și eflux. Calculați eficiența de transport și volumul anual de apă pierdut pentru a ajuta la prioritizarea investițiilor în căptușire.';
-$ec_lang['irr_quickref_html']='<h3>Referință Rapidă</h3><dl><dt>Baraj de derivație sau structură de control</dt><dd>Măsurați adâncimea apei deasupra crestei deversorului. Utilizați <a href="Weir-Flow-Simple.php">Deversor Simplu</a> pentru o creastă uniformă sau <a href="Weir-Flow-Irregular.php">Deversor Neregulat</a> pentru o creastă profilată sau în trepte.</dd><dt>Vană de cap sau branșament de conductă</dt><dd>Măsurați cota apei în amonte și în aval (sau cota radierului dacă curgerea este liberă). Utilizați <a href="Orifice.php">Debit prin Orificiu</a>. Pentru conductă circulară, D = diametrul conductei; pentru vană dreptunghiulară, introduceți lățimea W și înălțimea D.</dd><dt>Timp de golire a unui rezervor sau iaz</dt><dd>Utilizați <a href="Orifice-Drain-Time.php">Timp de Golire prin Orificiu</a> pentru a estima cât durează coborârea nivelului unui iaz sau rezervor printr-un orificiu de fund — util pentru planificarea stocării apei de irigații.</dd><dt>Standarde de teren</dt><dd>Ecuațiile de debit ale deversorului și orificiului utilizate aici corespund procedurilor din USBR <em>Water Measurement Manual</em> (ediția a 3-a), solicitate în mod obișnuit de administratorii de apă și districtele de irigații.</dd></dl>';
+// About
+$ec_lang['about_main_menu']='Despre';
+$ec_lang['install_main_menu']='Instalare';
+$ec_lang['install_main_title']='Instalează EngCalcs';
+$ec_lang['install_main_desc']='Adaugă pe dispozitiv pentru utilizare offline';
+$ec_lang['contact_main_menu']='Contacteaza';
+$ec_lang['about_main_title']='Despre calculatoarele de inginerie HawsEDC';
+$ec_lang['about_main_desc']='Misiune, sursă deschisă și contribuții';
 $ec_lang['about_body_html']='<h3>Misiune</h3><p>Calculatoarele de Inginerie HawsEDC există pentru a servi ingineri și muncitori de teren din întreaga lume — în special cei care lucrează în regiuni cu deficit de apă, resurse limitate sau insuficient deservite. Aceste instrumente fac parte dintr-o misiune umanitară mai amplă: să spună fiecărui om în cel mai practic și eficient mod posibil că este iubit și prețuit pentru totdeauna, că nu are nimic de care să se teamă și că nu va ruina totul.</p><p>Calculatoarele sunt vehiculul. Destinația este o lume fără suferință.</p><h3>Licență Open Source</h3><p>Tot codul este publicat sub <a target="_blank" href="https://www.gnu.org/licenses/gpl-3.0.html">GNU General Public License v3.0 sau mai nou</a> — liber ca în libertate. Puteți utiliza, studia, modifica și redistribui codul în aceleași condiții.</p><p>Copyright © 2009–2026 Thomas Gail Haws.</p><h3>Cod Sursă</h3><p>Codul sursă complet este disponibil public pe Bitbucket:</p><p><a target="_blank" href="https://bitbucket.org/hawstom/engcalcs">bitbucket.org/hawstom/engcalcs</a></p><p>Puteți răsfoi codul, semnala probleme sau face fork la depozit acolo.</p><h3>Contribuție</h3><p>Pull request-urile sunt binevenite. Modalități de contribuție:</p><ul><li><strong>Traduceri</strong> — îmbunătățiți sau adăugați o limbă. Deschideți un pull request cu modificări în fișierul <code>lib/lang.ec.??.php</code> relevant.</li><li><strong>Rapoarte de erori</strong> — utilizați formularul de feedback pe orice pagină de calculator sau semnalați o problemă pe Bitbucket.</li><li><strong>Calculatoare noi</strong> — ideile pentru instrumente de inginerie hidraulică care servesc lucrătorilor de teren și practicienilor în irigații sunt deosebit de binevenite. Consultați ghidul pentru dezvoltatori <code>CLAUDE.md</code> din depozit.</li><li><strong>Găzduire</strong> — dacă puteți oglindi aceste calculatoare pentru o regiune cu conectivitate limitată, vă rugăm să ne contactați.</li></ul><h3>Utilizare offline</h3><p>Aceste calculatoare funcționează ca o Aplicație Web Progresivă (PWA). Vizitați orice pagină de calculator în timp ce sunteți conectat la internet, iar browserul dvs. va stoca automat toate calculatoarele în cache. După aceea, toate calculatoarele funcționează offline — nu este necesar internetul.</p><p>Pe Android sau iOS, folosiți opțiunea „Adaugă pe ecranul principal" din browserul dvs. pentru a instala EngCalcs ca aplicație pe dispozitivul dvs. Pe desktop, căutați pictograma de instalare în bara de adrese a browserului.</p><p>Puteți, de asemenea, să salvați orice calculator individual folosind meniul „Salvare ca…" din browser pentru utilizare offline ocazională.</p><h3>Contact</h3><p>Tom Haws — inginer hidraulic și autorul acestor calculatoare.<br />Folosiți formularul de feedback pe orice pagină de calculator sau accesați codul sursă pe <a target="_blank" href="https://bitbucket.org/hawstom/engcalcs">Bitbucket</a>.</p>';
-
+$ec_lang['contact_title']='Contact HawsEDC';
+$ec_lang['contactSendMessage']='Trimiteți un mesaj lui Tom Haws';
+$ec_lang['contactYourName']='Numele dumneavoastră:';
+$ec_lang['contactYourEmail']='Adresa dumneavoastră de e-mail:';
+$ec_lang['contactSubject']='Subiect:';
+$ec_lang['contact_message']='Mesaj:';
+$ec_lang['contactSpamPrefix']='Cinci plus unu este egal cu';
+$ec_lang['contactSpamPostfix']='(Vă rugăm să scrieți cu litere. 1=unu 2=doi 3=trei 4=patru 5=cinci 6=șase 7=șapte +=plus 5+1=6)';
+$ec_lang['contactSubmitButton']='Trimiteți Mesajul';
+$ec_lang['contact_success']='Mulțumesc că ați luat timp pentru a scrie.';
 // Rock Chute Design (Robinson, Rice & Kadavy 1998). Prefix rc_.
-$ec_lang['u_m2ps']='m^2/s';
-$ec_lang['u_ft2ps']='cfs/ft';
 $ec_lang['rc_main_menu']='Proiectarea Rigolei din Piatră (Robinson)';
 $ec_lang['rc_main_title']='Calculator Online Gratuit pentru Proiectarea Rigolei din Piatră — Robinson (1998)';
 $ec_lang['rc_main_desc']='Dimensionarea Pietrei de Protecție a Rigolei — Robinson, Rice & Kadavy (1998)';
@@ -479,20 +482,3 @@ $ec_lang['rc_sketch_filter']          = 'Filtru';
 $ec_lang['rc_sketch_top_crest_curve'] = 'Curbă de creastă';
 $ec_lang['rc_sketch_outlet_apron']    = 'Radier de ieșire';
 $ec_lang['rc_sketch_radius']          = 'rază';
-
-// Manning Trapezoid velocity check
-$ec_lang['mtc_vel_check']='Verificare viteză';
-$ec_lang['mtc_vel_ok']='Viteză rezonabilă pentru ipotezele de curgere uniformă.';
-$ec_lang['mtc_vel_ok_short']='OK';
-$ec_lang['mtc_vel_high']='Viteză ridicată - verificați pierderile la tranzitii și energia disponibilă.';
-$ec_lang['mtc_vel_high_short']='Ridicată';
-$ec_lang['mtc_vel_low']='Viteză mică — risc de sedimentare.';
-$ec_lang['mtc_vel_low_short']='Mică';
-$ec_lang['mtc_note_2_term']='Verificare viteză';
-$ec_lang['mtc_note_2_def']='Viteza ridicată implică energie specifică mare dintr-o cădere disponibilă. Acea energie poate fi pierdută rapid la lărgiri, curbe sau obstacole. Verificați că aceasta este rezonabilă pentru amplasament.';
-
-// Micro-Hydro additional notes
-$ec_lang['mhp_notes_6_term']='Randament';
-$ec_lang['mhp_notes_6_def']='Randamentul tipic al centralei η variază între 0,70 și 0,85 pentru turbinele Pelton și cu flux încrucișat comune în micro-hidroenergie. Utilizați 0,75 ca primă estimare conservatoare.';
-$ec_lang['mhp_notes_7_term']='Energie Anuală';
-$ec_lang['mhp_notes_7_def']='Energia anuală presupune funcționare continuă la debit maxim (8.760 de ore/an). Producția reală va fi mai mică din cauza variației sezoniere a debitului, întreruperii pentru întreținere și factorului de sarcină.';

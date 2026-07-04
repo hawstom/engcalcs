@@ -36,6 +36,10 @@ $ec_lang['u_pa']="Pa";
 $ec_lang['u_psf']="lbs/ft^2";
 $ec_lang['u_psi']="lbs/po^2";
 $ec_lang['u_s']="s";
+$ec_lang['u_lph']='L/h';
+$ec_lang['u_gph']='gal/h';
+$ec_lang['u_mmph']='mm/h';
+$ec_lang['u_inph']='in/h';
 $ec_lang['u_acft']="ac-ft";
 $ec_lang['u_ft3']="ft^3";
 $ec_lang['u_m3']="m^3";
@@ -44,6 +48,8 @@ $ec_lang['u_mw']='MW';
 $ec_lang['u_kwh_yr']='kWh/an';
 $ec_lang['u_mwh_yr']='MWh/an';
 $ec_lang['u_hp']='hp';
+$ec_lang['u_m2ps']='m^2/s';
+$ec_lang['u_ft2ps']='cfs/ft';
 
 // Page text
 // In page order for easiest maintenance.
@@ -184,8 +190,16 @@ $ec_lang['mtc_d50_z1']='Granulométrie d\'enrochement anguleux requise sur talus
 $ec_lang['mtc_d50_z2']='Granulométrie d\'enrochement anguleux requise sur talus 2, D50 (Isbash & MC) <span title="Selon Isbash (1936) et Maricopa County, Arizona, US." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['mtc_d50_mra']='Granulométrie d\'enrochement anguleux requise, D50 (Maynord, Ruff et Abt 1989)';
 $ec_lang['mtc_d50_searcy']='Granulométrie d\'enrochement anguleux requise, D50 (Searcy 1967)';
+$ec_lang['mtc_vel_check']='Vérification de la vitesse';
+$ec_lang['mtc_vel_ok']='Vitesse raisonnable pour les hypothèses d\'écoulement uniforme.';
+$ec_lang['mtc_vel_high']='Vitesse élevée - vérifier les pertes de transition et l\'énergie disponible.';
+$ec_lang['mtc_vel_low']='Vitesse faible — risque de sédimentation.';
+$ec_lang['mtc_vel_ok_short']='OK';
+$ec_lang['mtc_vel_high_short']='Élevée';
+$ec_lang['mtc_vel_low_short']='Faible';
 $ec_lang['mtc_note_1']='<dl><dt>Dimensionnement itératif automatique des enrochements</dt><dd>Choisissez un bouton de rugosité (BB recommandé) et un bouton de granulométrie de conception (Isbash recommandé). Affinez la profondeur et le coefficient de sécurité pour obtenir le débit souhaité avec une granulométrie ronde. À chaque modification: 1. La rugosité est calculée à partir de la granulométrie. 2. La rugosité calculée est copiée en entrée. 3. L\'écoulement et la granulométrie requise sont calculés. 4. La granulométrie est ajustée. 5. Répéter jusqu\'à convergence.</dd><dt>Calculateur de base (sans itération)</dt><dd>Entrez votre valeur de rugosité. Ignorez la zone de granulométrie de conception.</dd></dl>';
-// Robinson Rock Chute
+$ec_lang['mtc_note_2_term']='Vérification de la vitesse';
+$ec_lang['mtc_note_2_def']='Une vitesse élevée implique une haute énergie spécifique résultant d\'une chute disponible. Cette énergie peut être dissipée rapidement aux élargissements, coudes ou obstacles. Vérifiez que cela est raisonnable pour le site.';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='Déversoir simple';
 $ec_lang['ws_main_title']='Calculateur gratuit en ligne de déversoir à seuil large';
@@ -226,6 +240,7 @@ $ec_lang['or_centroid_elev']='Cote du centroïde';
 $ec_lang['or_head']='Charge effective, h';
 $ec_lang['or_area']='Aire de l\'ouverture, A';
 $ec_lang['or_flow']='Débit, Q';
+$ec_lang['or_velocity']='Vitesse, v';
 $ec_lang['or_regime']='Vérification du régime d\'orifice';
 $ec_lang['or_regime_valid']='Déversement libre — régime d\'orifice valide ✓';
 $ec_lang['or_regime_submerged']='Orifice noyé (TWE au-dessus du centroïde) — valide ✓';
@@ -239,6 +254,52 @@ $ec_lang['or_notes_3_term']='Coefficient de débit';
 $ec_lang['or_notes_3_def']='C<sub>d</sub> varie entre 0,60 et 0,65 pour les orifices à arête vive. Les entrées arrondies ou en retrait ont des valeurs différentes. Voir <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venture-d_590.html">Engineering Toolbox</a> ou le Manuel de Référence Hydraulique HEC-RAS.';
 $ec_lang['or_notes_4_term']='Submersion';
 $ec_lang['or_notes_4_def']='Lorsque TWE est au-dessus du radier de l\'ouverture, la calculatrice applique automatiquement l\'équation d\'orifice noyé avec h = HWE − TWE. Lorsque TWE est au niveau ou en dessous du radier, un déversement libre est supposé et h = HWE − centroïde.';
+// Micro-Hydro Power
+$ec_lang['mhp_main_menu']='Micro-Hydroélectricité';
+$ec_lang['mhp_main_title']='Calculateur Gratuit de Puissance Micro-Hydroélectrique';
+$ec_lang['mhp_main_desc']='Calculateur de Puissance Micro-Hydroélectrique au Fil de l\'Eau';
+$ec_lang['mhp_flow']='Débit, Q';
+$ec_lang['mhp_gross_head']='Hauteur brute, H<sub>gross</sub>';
+$ec_lang['mhp_diameter']='Diamètre de la conduite forcée, D';
+$ec_lang['mhp_length']='Longueur de la conduite forcée, L';
+$ec_lang['mhp_roughness']='Rugosité de la conduite, e';
+$ec_lang['mhp_km']='Coefficient de perte, k<sub>m</sub> <span title="Sum of all junction and fitting loss coefficients along the penstock" class="ec-tip">?</span>';
+$ec_lang['mhp_nu']='Viscosité cinématique, ν <span title="1×10⁻⁶ m²/s for clean water near 20°C" class="ec-tip">?</span>';
+$ec_lang['mhp_efficiency']='Rendement de l\'installation, η (0–1)';
+$ec_lang['mhp_velocity']='Vitesse d\'écoulement, v';
+$ec_lang['mhp_vel_check']='Vérification de la vitesse';
+$ec_lang['mhp_f']='Facteur de frottement, f';
+$ec_lang['mhp_hf']='Perte de charge par frottement, h<sub>f</sub>';
+$ec_lang['mhp_hm']='Perte mineure, h<sub>m</sub>';
+$ec_lang['mhp_hl']='Perte totale dans la conduite forcée, h<sub>L</sub>';
+$ec_lang['mhp_hl_check']='Vérification de la perte de charge';
+$ec_lang['mhp_hnet']='Hauteur nette, H<sub>net</sub>';
+$ec_lang['mhp_power']='Puissance produite, P';
+$ec_lang['mhp_annual_kwh']='Énergie annuelle à 100 % de capacité';
+$ec_lang['mhp_vel_ok']='1–3 m/s — dans la plage cible ✓';
+$ec_lang['mhp_vel_low']='Vitesse faible - risque de sédimentation et d\'entraînement d\'air.';
+$ec_lang['mhp_vel_high']='Vitesse élevée - risque de coup de bélier et pertes singulières (mineures).';
+$ec_lang['mhp_vel_ok_short']='OK';
+$ec_lang['mhp_vel_high_short']='Élevée';
+$ec_lang['mhp_vel_low_short']='Faible';
+$ec_lang['mhp_hl_ok']='dans la cible de 10 % ✓';
+$ec_lang['mhp_hl_warn']='dépasse la cible de 10 % — envisager une conduite plus grande ⚠';
+$ec_lang['mhp_hl_bad']='dépasse 20 % — redimensionner la conduite';
+$ec_lang['mhp_notes_1_term']='Perte de charge';
+$ec_lang['mhp_notes_1_def']='La perte totale dans la conduite forcée h<sub>L</sub> = h<sub>f</sub> + h<sub>m</sub>, où h<sub>f</sub> = f(L/D)(v²/2g) est la perte par frottement de Darcy-Weisbach et h<sub>m</sub> = k<sub>m</sub>·v²/2g couvre les entrées, coudes et vannes. Hauteur nette H<sub>net</sub> = H<sub>gross</sub> − h<sub>L</sub>.';
+$ec_lang['mhp_notes_2_term']='Vitesse';
+$ec_lang['mhp_notes_2_def']='Objectif : 1–3 m/s. En dessous de 1 m/s, la conduite est surdimensionnée pour le débit ; au-dessus de 3 m/s, les pertes par frottement et le risque de coup de bélier augmentent.';
+$ec_lang['mhp_notes_3_term']='Objectif de perte de charge';
+$ec_lang['mhp_notes_3_def']='Des pertes dans la conduite forcée inférieures à 10 % de la hauteur brute sont généralement économiques. Le compromis optimal entre le coût de la conduite et la puissance perdue se situe souvent autour de 4–6 % pour les sites à électricité de haute valeur.';
+$ec_lang['mhp_notes_4_term']='Pertes singulières k<sub>m</sub>';
+$ec_lang['mhp_notes_4_def']='Valeurs typiques : entrée à arête vive 0,5, chaque coude à 45° 0,2–0,3, vanne-guillotine (pleinement ouverte) 0,1, vanne papillon 0,2. Additionner tous les accessoires pour obtenir le k<sub>m</sub> total. La valeur par défaut 1,5 suppose une entrée et deux coudes.';
+$ec_lang['mhp_notes_5_term']='Rugosité de la conduite e';
+$ec_lang['mhp_notes_5_def']='Rugosité absolue typique : acier (neuf) 0,046 mm, acier (usagé) 0,15 mm, PEHD 0,003 mm, PVC/uPVC 0,0015 mm, béton 0,3–3 mm. Le PEHD est courant pour les conduites forcées des petites installations micro-hydrauliques.';
+$ec_lang['mhp_notes_6_term']='Rendement';
+$ec_lang['mhp_notes_6_def']='Le rendement typique de l\'installation η varie de 0,70 à 0,85 pour les turbines Pelton et à flux croisé courantes en micro-hydroélectricité. Utilisez 0,75 comme première estimation prudente.';
+$ec_lang['mhp_notes_7_term']='Énergie annuelle';
+$ec_lang['mhp_notes_7_def']='L\'énergie annuelle suppose un fonctionnement continu à débit plein (8760 heures/an). La production réelle sera plus faible en raison de la variation saisonnière du débit, des temps d\'arrêt pour maintenance et du facteur de charge.';
+
 // Orifice Drain Time
 $ec_lang['odt_main_menu']='Temps de vidange par orifice';
 $ec_lang['odt_main_title']='Calculateur gratuit en ligne du temps de vidange par orifice — Bassin, étang ou réservoir';
@@ -267,90 +328,31 @@ $ec_lang['odt_q_max']='Débit max, Q<sub>max</sub>';
 $ec_lang['odt_vol']='Volume vidangé';
 $ec_lang['odt_sketch_start']='Début';
 $ec_lang['odt_sketch_end']='Fin';
+// Erosion Setback and Scour Calc.
+$ec_lang['essc_btbw']='Largeur de berge à berge';
+$ec_lang['essc_mcr']='Rayon de courbure minimal';
+$ec_lang['essc_q']='Débit, Q';
 // Contact us.
 
 // Irrigation
 $ec_lang['irr_main_menu']='Mesure du débit d\'irrigation';
 $ec_lang['irr_main_title']='Calculateurs en ligne gratuits de mesure du débit d\'irrigation';
 $ec_lang['irr_main_desc']='Mesure du débit d\'irrigation — déversoirs et orifices';
-$ec_lang['contact_title']='Contact HawsEDC';
-$ec_lang['contactSendMessage']='Envoyer un message à Tom Haws';
-$ec_lang['contactYourName']='Votre nom:';
-$ec_lang['contactYourEmail']='Votre adresse e-mail:';
-$ec_lang['contactSubject']='Sujet:';
-$ec_lang['contact_message']='Message :';
-$ec_lang['contactSpamPrefix']='Cinq plus un égale';
-$ec_lang['contactSpamPostfix']="(Veuillez l'écrire en lettres. 1=un 2=deux 3=trois 4=quatre 5=cinq 6=six 7=sept +=plus 5+1=6)";
-$ec_lang['contactSubmitButton']='Envoyer le message';
-$ec_lang['contact_success']='Merci d\'avoir pris le temps d\'écrire.';
-// Erosion Setback and Scour Calc.
-$ec_lang['essc_btbw']='Largeur de berge à berge';
-$ec_lang['essc_mcr']='Rayon de courbure minimal';
-$ec_lang['essc_q']='Débit, Q';
-// Orifice Flow
-$ec_lang['or_velocity']='Vitesse, v';
-
-
-// Micro-Hydro Power
-$ec_lang['mhp_main_menu']='Micro-Hydroélectricité';
-$ec_lang['mhp_main_title']='Calculateur Gratuit de Puissance Micro-Hydroélectrique';
-$ec_lang['mhp_main_desc']='Calculateur de Puissance Micro-Hydroélectrique au Fil de l\'Eau';
-$ec_lang['mhp_flow']='Débit, Q';
-$ec_lang['mhp_gross_head']='Hauteur brute, H<sub>gross</sub>';
-$ec_lang['mhp_diameter']='Diamètre de la conduite forcée, D';
-$ec_lang['mhp_length']='Longueur de la conduite forcée, L';
-$ec_lang['mhp_roughness']='Rugosité de la conduite, e';
-$ec_lang['mhp_km']='Coefficient de perte, k<sub>m</sub> <span title="Sum of all junction and fitting loss coefficients along the penstock" class="ec-tip">?</span>';
-$ec_lang['mhp_nu']='Viscosité cinématique, ν <span title="1×10⁻⁶ m²/s for clean water near 20°C" class="ec-tip">?</span>';
-$ec_lang['mhp_efficiency']='Rendement de l\'installation, η (0–1)';
-$ec_lang['mhp_velocity']='Vitesse d\'écoulement, v';
-$ec_lang['mhp_vel_check']='Vérification de la vitesse';
-$ec_lang['mhp_f']='Facteur de frottement, f';
-$ec_lang['mhp_hf']='Perte de charge par frottement, h<sub>f</sub>';
-$ec_lang['mhp_hm']='Perte mineure, h<sub>m</sub>';
-$ec_lang['mhp_hl']='Perte totale dans la conduite forcée, h<sub>L</sub>';
-$ec_lang['mhp_hl_check']='Vérification de la perte de charge';
-$ec_lang['mhp_hnet']='Hauteur nette, H<sub>net</sub>';
-$ec_lang['mhp_power']='Puissance produite, P';
-$ec_lang['mhp_annual_kwh']='Énergie annuelle à 100 % de capacité';
-$ec_lang['mhp_vel_ok']='1–3 m/s — dans la plage cible ✓';
-$ec_lang['mhp_vel_ok_short']='OK';
-$ec_lang['mhp_vel_low']='Vitesse faible - risque de sédimentation et d\'entraînement d\'air.';
-$ec_lang['mhp_vel_low_short']='Faible';
-$ec_lang['mhp_vel_high']='Vitesse élevée - risque de coup de bélier et pertes singulières (mineures).';
-$ec_lang['mhp_vel_high_short']='Élevée';
-$ec_lang['mhp_hl_ok']='dans la cible de 10 % ✓';
-$ec_lang['mhp_hl_warn']='dépasse la cible de 10 % — envisager une conduite plus grande ⚠';
-$ec_lang['mhp_hl_bad']='dépasse 20 % — redimensionner la conduite';
-$ec_lang['mhp_notes_1_term']='Perte de charge';
-$ec_lang['mhp_notes_1_def']='La perte totale dans la conduite forcée h<sub>L</sub> = h<sub>f</sub> + h<sub>m</sub>, où h<sub>f</sub> = f(L/D)(v²/2g) est la perte par frottement de Darcy-Weisbach et h<sub>m</sub> = k<sub>m</sub>·v²/2g couvre les entrées, coudes et vannes. Hauteur nette H<sub>net</sub> = H<sub>gross</sub> − h<sub>L</sub>.';
-$ec_lang['mhp_notes_2_term']='Vitesse';
-$ec_lang['mhp_notes_2_def']='Objectif : 1–3 m/s. En dessous de 1 m/s, la conduite est surdimensionnée pour le débit ; au-dessus de 3 m/s, les pertes par frottement et le risque de coup de bélier augmentent.';
-$ec_lang['mhp_notes_3_term']='Objectif de perte de charge';
-$ec_lang['mhp_notes_3_def']='Des pertes dans la conduite forcée inférieures à 10 % de la hauteur brute sont généralement économiques. Le compromis optimal entre le coût de la conduite et la puissance perdue se situe souvent autour de 4–6 % pour les sites à électricité de haute valeur.';
-$ec_lang['mhp_notes_4_term']='Pertes singulières k<sub>m</sub>';
-$ec_lang['mhp_notes_4_def']='Valeurs typiques : entrée à arête vive 0,5, chaque coude à 45° 0,2–0,3, vanne-guillotine (pleinement ouverte) 0,1, vanne papillon 0,2. Additionner tous les accessoires pour obtenir le k<sub>m</sub> total. La valeur par défaut 1,5 suppose une entrée et deux coudes.';
-$ec_lang['mhp_notes_5_term']='Rugosité de la conduite e';
-$ec_lang['mhp_notes_5_def']='Rugosité absolue typique : acier (neuf) 0,046 mm, acier (usagé) 0,15 mm, PEHD 0,003 mm, PVC/uPVC 0,0015 mm, béton 0,3–3 mm. Le PEHD est courant pour les conduites forcées des petites installations micro-hydrauliques.';
-$ec_lang['mhp_notes_6_term']='Rendement';
-$ec_lang['mhp_notes_6_def']='Le rendement typique de l\'installation η varie de 0,70 à 0,85 pour les turbines Pelton et à flux croisé courantes en micro-hydroélectricité. Utilisez 0,75 comme première estimation prudente.';
-$ec_lang['mhp_notes_7_term']='Énergie annuelle';
-$ec_lang['mhp_notes_7_def']='L\'énergie annuelle suppose un fonctionnement continu à débit plein (8760 heures/an). La production réelle sera plus faible en raison de la variation saisonnière du débit, des temps d\'arrêt pour maintenance et du facteur de charge.';
-
-// About
-$ec_lang['about_main_menu']='À propos';
-$ec_lang['install_main_menu']='Installer';
-$ec_lang['install_main_title']='Installer EngCalcs';
-$ec_lang['install_main_desc']='Ajouter à votre appareil pour une utilisation hors ligne';
-$ec_lang['contact_main_menu']='Contact';
-$ec_lang['about_main_title']='À propos des calculateurs HawsEDC';
-$ec_lang['about_main_desc']='Mission, open source et contribution';
-
+$ec_lang['irr_intro_html']='<p>Les déversoirs et les orifices sont les outils de terrain standard pour mesurer le débit d\'eau dans les systèmes d\'irrigation. Sélectionnez la calculatrice correspondant à votre structure :</p>';
+$ec_lang['irr_card_weir_uniform_head']='Déversoir — Seuil Large (Largeur Uniforme)';
+$ec_lang['irr_card_weir_uniform_desc']='Mesurez le débit sur la crête d\'un barrage de dérivation, d\'une structure de contrôle ou d\'un seuil. Saisissez la longueur du déversoir et la hauteur d\'eau au-dessus de la crête.';
+$ec_lang['irr_card_weir_irregular_head']='Déversoir — Profil Irrégulier';
+$ec_lang['irr_card_weir_irregular_desc']='À utiliser lorsque la crête du déversoir n\'est pas à une élévation uniforme unique — déversoirs naturels, structures de chute à largeur variable ou structures de contrôle à sections multiples.';
+$ec_lang['irr_card_orifice_head']='Orifice — Vanne de Prise ou Sortie de Canalisation';
+$ec_lang['irr_card_orifice_desc']='Mesurez le débit à travers une vanne de type batardeau, une sortie de canalisation ou une ouverture de buse. Gère automatiquement les conditions de déversement libre et noyé (contrecharge aval).';
+$ec_lang['irr_card_canal_head']='Conception & Analyse de Canal';
+$ec_lang['irr_card_canal_desc']='Concevez ou vérifiez un canal d\'irrigation à l\'aide de la formule de Manning. Utilisez la calculatrice Trapézoïdale pour les nouveaux canaux ; la calculatrice Irrégulière pour les sections naturelles ou construites existantes.';
+$ec_lang['irr_card_drip_head']='Conception Goutte-à-Goutte & Aspersion';
+$ec_lang['irr_card_drip_desc']='Calculez le taux d\'application, l\'uniformité de distribution, le débit latéral, le débit de zone et la durée de fonctionnement pour un système d\'irrigation goutte-à-goutte ou par aspersion. Saisissez le débit de l\'émetteur, l\'espacement et la profondeur cible.';
+$ec_lang['irr_card_seepage_head']='Infiltration & Efficience de Transport en Canal';
+$ec_lang['irr_card_seepage_desc']='Estimez les pertes par infiltration d\'un bief de canal à partir des mesures de débit entrant et sortant. Calculez l\'efficience de transport et le volume d\'eau perdu annuellement pour aider à prioriser les investissements de revêtement.';
+$ec_lang['irr_quickref_html']='<h3>Référence Rapide</h3><dl><dt>Barrage de dérivation ou structure de contrôle</dt><dd>Mesurez la hauteur d\'eau au-dessus de la crête du déversoir. Utilisez <a href="Weir-Flow-Simple.php">Déversoir Simple</a> pour une crête uniforme, ou <a href="Weir-Flow-Irregular.php">Déversoir Irrégulier</a> pour une crête profilée ou à gradins.</dd><dt>Vanne de prise ou sortie de canalisation</dt><dd>Mesurez la cote de l\'eau en amont et en aval (ou la cote du radier si le déversement est libre). Utilisez <a href="Orifice.php">Débit par Orifice</a>. Pour une canalisation circulaire, D = diamètre de la canalisation ; pour une vanne rectangulaire, saisissez la largeur W et la hauteur D.</dd><dt>Temps de vidange de réservoir ou d\'étang</dt><dd>Utilisez <a href="Orifice-Drain-Time.php">Temps de Vidange par Orifice</a> pour estimer le temps nécessaire pour abaisser le niveau d\'un étang ou réservoir par un orifice de fond — utile pour la planification du stockage irrigant.</dd><dt>Normes de terrain</dt><dd>Les équations de débit par déversoir et orifice utilisées ici correspondent aux procédures du <em>Manuel de Mesure de l\'Eau</em> (3e éd.) de l\'USBR, couramment exigées par les gestionnaires de l\'eau et les districts d\'irrigation.</dd></dl>';
 // Drip / Sprinkler Application Rate
-$ec_lang['u_lph']='L/h';
-$ec_lang['u_gph']='gal/h';
-$ec_lang['u_mmph']='mm/h';
-$ec_lang['u_inph']='in/h';
 $ec_lang['ds_main_menu']='Taux d\'application — goutte-à-goutte/aspersion';
 $ec_lang['ds_main_title']='Calculateur gratuit en ligne du taux d\'application pour l\'irrigation goutte-à-goutte/aspersion';
 $ec_lang['ds_main_desc']='Irrigation goutte-à-goutte & aspersion — taux d\'application';
@@ -369,13 +371,14 @@ $ec_lang['ds_notes_1_term']='Taux d\'application';
 $ec_lang['ds_notes_1_def']='PR = q / A<sub>e</sub>, où A<sub>e</sub> = S<sub>e</sub> × S<sub>l</sub> est la surface desservie par chaque émetteur. Un taux d\'application plus faible laisse plus de temps à l\'infiltration — important sur les sols lourds ou les champs en pente.';
 $ec_lang['ds_notes_2_term']='Durée d\'arrosage';
 $ec_lang['ds_notes_2_def']='Durée d\'arrosage = profondeur cible ÷ taux d\'application. Sur un sol en pente ou compacté, fractionnez la durée en deux ou trois cycles plus courts avec des temps de repos entre eux pour éviter le ruissellement de surface.';
-
 // Canal Seepage / Conveyance Efficiency. Prefix cs_.
 $ec_lang['cs_main_menu']='Pertes par infiltration — canal';
 $ec_lang['cs_main_title']='Calculateur gratuit en ligne des pertes par infiltration et de l\'efficience de transport en canal';
 $ec_lang['cs_main_desc']='Pertes par infiltration & efficience de transport en canal — Méthode entrée-sortie';
 $ec_lang['cs_Q_in']='Débit entrant, Q<sub>in</sub>';
 $ec_lang['cs_Q_out']='Débit sortant, Q<sub>out</sub>';
+$ec_lang['cs_L']='Longueur du bief, L';
+$ec_lang['cs_wp']='Périmètre mouillé, P<sub>w</sub>';
 $ec_lang['cs_Q_loss']='Taux de perte par infiltration, Q<sub>loss</sub>';
 $ec_lang['cs_loss_check']='Vérification de la mesure';
 $ec_lang['cs_pct_loss']='Fraction perdue';
@@ -383,8 +386,6 @@ $ec_lang['cs_Ec']='Efficience de transport, E<sub>c</sub>';
 $ec_lang['cs_Ec_check']='Classe d\'efficience';
 $ec_lang['cs_Vol_day']='Volume perdu quotidiennement';
 $ec_lang['cs_Vol_year']='Volume perdu annuellement';
-$ec_lang['cs_L']='Longueur du bief, L';
-$ec_lang['cs_wp']='Périmètre mouillé, P<sub>w</sub>';
 $ec_lang['cs_Q_loss_per_L']='Perte unitaire, Q<sub>loss</sub>/L';
 $ec_lang['cs_water_value']='Valeur de l\'eau';
 $ec_lang['cs_lining_cost']='Coût revêtement';
@@ -408,26 +409,26 @@ $ec_lang['cs_notes_3_term']='Délai de récupération du revêtement';
 $ec_lang['cs_notes_3_def']='Saisissez la valeur de l\'eau et le coût du revêtement dans une devise cohérente quelconque. Surface de revêtement = longueur du bief × périmètre mouillé — le périmètre mouillé de la section transversale du canal à la profondeur d\'écoulement mesurée (largeur du fond plus les deux talus mouillés). La valeur annuelle récupérée suppose que le canal revêtu atteint l\'E<sub>c</sub> cible en continu. Le délai de récupération réel sera plus long pour les canaux saisonniers ou si le revêtement n\'atteint pas l\'efficience cible.';
 $ec_lang['cs_notes_4_term']='Référence';
 $ec_lang['cs_notes_4_def']='USBR <em>Water Measurement Manual</em>, 3e éd. (2001). FAO Irrigation and Drainage Paper 57 (1999).';
-
-$ec_lang['irr_intro_html']='<p>Les déversoirs et les orifices sont les outils de terrain standard pour mesurer le débit d\'eau dans les systèmes d\'irrigation. Sélectionnez la calculatrice correspondant à votre structure :</p>';
-$ec_lang['irr_card_weir_uniform_head']='Déversoir — Seuil Large (Largeur Uniforme)';
-$ec_lang['irr_card_weir_uniform_desc']='Mesurez le débit sur la crête d\'un barrage de dérivation, d\'une structure de contrôle ou d\'un seuil. Saisissez la longueur du déversoir et la hauteur d\'eau au-dessus de la crête.';
-$ec_lang['irr_card_weir_irregular_head']='Déversoir — Profil Irrégulier';
-$ec_lang['irr_card_weir_irregular_desc']='À utiliser lorsque la crête du déversoir n\'est pas à une élévation uniforme unique — déversoirs naturels, structures de chute à largeur variable ou structures de contrôle à sections multiples.';
-$ec_lang['irr_card_orifice_head']='Orifice — Vanne de Prise ou Sortie de Canalisation';
-$ec_lang['irr_card_orifice_desc']='Mesurez le débit à travers une vanne de type batardeau, une sortie de canalisation ou une ouverture de buse. Gère automatiquement les conditions de déversement libre et noyé (contrecharge aval).';
-$ec_lang['irr_card_canal_head']='Conception & Analyse de Canal';
-$ec_lang['irr_card_canal_desc']='Concevez ou vérifiez un canal d\'irrigation à l\'aide de la formule de Manning. Utilisez la calculatrice Trapézoïdale pour les nouveaux canaux ; la calculatrice Irrégulière pour les sections naturelles ou construites existantes.';
-$ec_lang['irr_card_drip_head']='Conception Goutte-à-Goutte & Aspersion';
-$ec_lang['irr_card_drip_desc']='Calculez le taux d\'application, l\'uniformité de distribution, le débit latéral, le débit de zone et la durée de fonctionnement pour un système d\'irrigation goutte-à-goutte ou par aspersion. Saisissez le débit de l\'émetteur, l\'espacement et la profondeur cible.';
-$ec_lang['irr_card_seepage_head']='Infiltration & Efficience de Transport en Canal';
-$ec_lang['irr_card_seepage_desc']='Estimez les pertes par infiltration d\'un bief de canal à partir des mesures de débit entrant et sortant. Calculez l\'efficience de transport et le volume d\'eau perdu annuellement pour aider à prioriser les investissements de revêtement.';
-$ec_lang['irr_quickref_html']='<h3>Référence Rapide</h3><dl><dt>Barrage de dérivation ou structure de contrôle</dt><dd>Mesurez la hauteur d\'eau au-dessus de la crête du déversoir. Utilisez <a href="Weir-Flow-Simple.php">Déversoir Simple</a> pour une crête uniforme, ou <a href="Weir-Flow-Irregular.php">Déversoir Irrégulier</a> pour une crête profilée ou à gradins.</dd><dt>Vanne de prise ou sortie de canalisation</dt><dd>Mesurez la cote de l\'eau en amont et en aval (ou la cote du radier si le déversement est libre). Utilisez <a href="Orifice.php">Débit par Orifice</a>. Pour une canalisation circulaire, D = diamètre de la canalisation ; pour une vanne rectangulaire, saisissez la largeur W et la hauteur D.</dd><dt>Temps de vidange de réservoir ou d\'étang</dt><dd>Utilisez <a href="Orifice-Drain-Time.php">Temps de Vidange par Orifice</a> pour estimer le temps nécessaire pour abaisser le niveau d\'un étang ou réservoir par un orifice de fond — utile pour la planification du stockage irrigant.</dd><dt>Normes de terrain</dt><dd>Les équations de débit par déversoir et orifice utilisées ici correspondent aux procédures du <em>Manuel de Mesure de l\'Eau</em> (3e éd.) de l\'USBR, couramment exigées par les gestionnaires de l\'eau et les districts d\'irrigation.</dd></dl>';
+// About
+$ec_lang['about_main_menu']='À propos';
+$ec_lang['install_main_menu']='Installer';
+$ec_lang['install_main_title']='Installer EngCalcs';
+$ec_lang['install_main_desc']='Ajouter à votre appareil pour une utilisation hors ligne';
+$ec_lang['contact_main_menu']='Contact';
+$ec_lang['about_main_title']='À propos des calculateurs HawsEDC';
+$ec_lang['about_main_desc']='Mission, open source et contribution';
 $ec_lang['about_body_html']='<h3>Mission</h3><p>Les Calculatrices d\'Ingénierie HawsEDC existent pour servir les ingénieurs et les travailleurs de terrain du monde entier — en particulier ceux qui travaillent dans des régions à faibles ressources en eau, à ressources limitées ou peu desservies. Ces outils font partie d\'une mission humanitaire plus large : dire à chaque être humain de la manière la plus pratique et la plus efficace possible qu\'il est aimé et chéri pour toujours, qu\'il n\'a rien à craindre, et qu\'il ne va pas tout gâcher.</p><p>Les calculatrices sont le véhicule. La destination est un monde libre de souffrance.</p><h3>Licence Open Source</h3><p>Tout le code est publié sous la <a target="_blank" href="https://www.gnu.org/licenses/gpl-3.0.html">Licence Publique Générale GNU v3.0 ou ultérieure</a> — libre comme dans liberté. Vous pouvez utiliser, étudier, modifier et redistribuer le code selon les mêmes termes.</p><p>Copyright © 2009–2026 Thomas Gail Haws.</p><h3>Code Source</h3><p>Le code source complet est disponible publiquement sur Bitbucket :</p><p><a target="_blank" href="https://bitbucket.org/hawstom/engcalcs">bitbucket.org/hawstom/engcalcs</a></p><p>Vous pouvez parcourir le code, signaler des problèmes ou bifurquer le dépôt là-bas.</p><h3>Contribuer</h3><p>Les demandes de tirage sont les bienvenues. Façons de contribuer :</p><ul><li><strong>Traductions</strong> — améliorez ou ajoutez une langue. Ouvrez une demande de tirage avec les modifications apportées au fichier <code>lib/lang.ec.??.php</code> correspondant.</li><li><strong>Rapports de bogues</strong> — utilisez le formulaire de commentaires sur n\'importe quelle page de calculatrice, ou signalez un problème sur Bitbucket.</li><li><strong>Nouvelles calculatrices</strong> — les idées d\'outils de génie hydraulique au service des travailleurs de terrain et des praticiens de l\'irrigation sont particulièrement bienvenues. Consultez le guide du développeur <code>CLAUDE.md</code> dans le dépôt.</li><li><strong>Hébergement</strong> — si vous pouvez héberger ces calculatrices pour une région à connectivité limitée, veuillez nous contacter.</li></ul><h3>Utilisation hors ligne</h3><p>Ces calculatrices fonctionnent comme une Application Web Progressive (PWA). Visitez n\'importe quelle page de calculatrice en étant connecté à internet, et votre navigateur mettra automatiquement en cache toutes les calculatrices. Ensuite, toutes les calculatrices fonctionnent hors ligne — sans connexion internet requise.</p><p>Sur Android ou iOS, utilisez l\'option « Ajouter à l\'écran d\'accueil » de votre navigateur pour installer EngCalcs comme application sur votre appareil. Sur ordinateur, recherchez l\'icône d\'installation dans la barre d\'adresse de votre navigateur.</p><p>Vous pouvez également enregistrer n\'importe quelle calculatrice individuelle en utilisant le menu « Enregistrer sous… » de votre navigateur pour une utilisation hors ligne ponctuelle.</p><h3>Contact</h3><p>Tom Haws — ingénieur hydraulique et auteur de ces calculatrices.<br />Utilisez le formulaire de commentaires sur n\'importe quelle page de calculatrice, ou accédez au code source sur <a target="_blank" href="https://bitbucket.org/hawstom/engcalcs">Bitbucket</a>.</p>';
-
+$ec_lang['contact_title']='Contact HawsEDC';
+$ec_lang['contactSendMessage']='Envoyer un message à Tom Haws';
+$ec_lang['contactYourName']='Votre nom:';
+$ec_lang['contactYourEmail']='Votre adresse e-mail:';
+$ec_lang['contactSubject']='Sujet:';
+$ec_lang['contact_message']='Message :';
+$ec_lang['contactSpamPrefix']='Cinq plus un égale';
+$ec_lang['contactSpamPostfix']="(Veuillez l'écrire en lettres. 1=un 2=deux 3=trois 4=quatre 5=cinq 6=six 7=sept +=plus 5+1=6)";
+$ec_lang['contactSubmitButton']='Envoyer le message';
+$ec_lang['contact_success']='Merci d\'avoir pris le temps d\'écrire.';
 // Rock Chute Design (Robinson, Rice & Kadavy 1998). Prefix rc_.
-$ec_lang['u_m2ps']='m^2/s';
-$ec_lang['u_ft2ps']='cfs/ft';
 $ec_lang['rc_main_menu']='Conception de Chute en Enrochement (Robinson)';
 $ec_lang['rc_main_title']='Calculatrice Gratuite de Conception de Chute en Enrochement — Robinson (1998)';
 $ec_lang['rc_main_desc']='Dimensionnement de l\'Enrochement de Chute — Robinson, Rice & Kadavy (1998)';
@@ -483,13 +484,3 @@ $ec_lang['rc_sketch_filter']          = 'Filtre';
 $ec_lang['rc_sketch_top_crest_curve'] = 'Courbe de crête';
 $ec_lang['rc_sketch_outlet_apron']    = 'Radier de sortie';
 $ec_lang['rc_sketch_radius']          = 'rayon';
-// Manning Trapezoid velocity check (missing keys)
-$ec_lang['mtc_vel_check']='Vérification de la vitesse';
-$ec_lang['mtc_vel_ok']='Vitesse raisonnable pour les hypothèses d\'écoulement uniforme.';
-$ec_lang['mtc_vel_ok_short']='OK';
-$ec_lang['mtc_vel_high']='Vitesse élevée - vérifier les pertes de transition et l\'énergie disponible.';
-$ec_lang['mtc_vel_high_short']='Élevée';
-$ec_lang['mtc_vel_low']='Vitesse faible — risque de sédimentation.';
-$ec_lang['mtc_vel_low_short']='Faible';
-$ec_lang['mtc_note_2_term']='Vérification de la vitesse';
-$ec_lang['mtc_note_2_def']='Une vitesse élevée implique une haute énergie spécifique résultant d\'une chute disponible. Cette énergie peut être dissipée rapidement aux élargissements, coudes ou obstacles. Vérifiez que cela est raisonnable pour le site.';

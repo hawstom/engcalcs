@@ -7,8 +7,8 @@ $ec_lang['u_depthFrac']="frazione";
 $ec_lang['u_depthPercent']="%";
 $ec_lang['u_ft2']="ft^2";
 $ec_lang['u_ft3ps']="cfs";
-$ec_lang['u_fth2o']="ft H2O";
 $ec_lang['u_ft']="ft";
+$ec_lang['u_fth2o']="ft H2O";
 $ec_lang['u_ftps']="ft/s";
 $ec_lang['u_gpm']="gal/min";
 $ec_lang['u_gradePercent']="% pendenza";
@@ -35,6 +35,10 @@ $ec_lang['u_pa']="Pa";
 $ec_lang['u_psf']="lb/ft^2";
 $ec_lang['u_psi']="psi";
 $ec_lang['u_s']="s";
+$ec_lang['u_lph']="L/hr";
+$ec_lang['u_gph']="gal/hr";
+$ec_lang['u_mmph']="mm/hr";
+$ec_lang['u_inph']="in/hr";
 $ec_lang['u_acft']="ac-ft";
 $ec_lang['u_ft3']="ft^3";
 $ec_lang['u_m3']="m^3";
@@ -43,8 +47,12 @@ $ec_lang['u_mw']='MW';
 $ec_lang['u_kwh_yr']='kWh/yr';
 $ec_lang['u_mwh_yr']='MWh/yr';
 $ec_lang['u_hp']='hp';
+$ec_lang['u_m2ps']='m^2/s';
+$ec_lang['u_ft2ps']='cfs/ft';
 
 // Page text
+// In page order for easiest maintenance.
+// Menu and General
 $ec_lang['menu_brand']='Calcolatori HawsEDC';
 $ec_lang['menu_main_list']='Elenco calcolatori';
 $ec_lang['menu_main_hydraulics']='Idraulica';
@@ -68,7 +76,7 @@ $ec_lang['view_printable']='Versione stampabile (ricaricare per ripristinare)';
 $ec_lang['ec_name_label']='Salva questo calcolo:';
 $ec_lang['ec_name_placeholder']='Nome';
 $ec_lang['ec_name_hint']='Salva questi dati inseriti nell\'URL per segnalibri, recupero della cronologia e condivisione';
-// Darcy-Weisbach
+// Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Perdita di carico Darcy-Weisbach';
 $ec_lang['dw_main_title']='Calcolatore gratuito online perdita di carico Darcy-Weisbach';
 $ec_lang['dw_main_desc']='Perdita di carico in tubazione con Darcy-Weisbach a diametro, scabrezza e portata dati';
@@ -81,7 +89,7 @@ $ec_lang['dw_regime_transitional']='di transizione';
 $ec_lang['dw_regime_turbulent']='turbolento';
 $ec_lang['dw_friction_factor_method']='Metodo del coefficiente di attrito';
 $ec_lang['dw_friction_factor']='Coefficiente di attrito, f';
-// Hazen-Williams
+// Hazen-Williams. See mphl_ for missing text.
 $ec_lang['hw_main_menu']='Perdita di carico Hazen-Williams';
 $ec_lang['hw_main_title']='Calcolatore gratuito online perdita di carico Hazen-Williams';
 $ec_lang['hw_main_desc']='Perdita di carico in tubazione con Hazen-Williams a diametro, scabrezza e portata dati';
@@ -145,7 +153,7 @@ $ec_lang['mpf_note_1']='<dl><dt>Questo è il flusso e la profondità all\'intern
 $ec_lang['mpf_solve_for_dd0']='Calcola y/d<sub>0</sub> dato Q';
 $ec_lang['mpf_solve_desc']='Usando D<sub>0</sub>, n, e S<sub>0</sub> dal modulo, trova il minimo y/d<sub>0</sub> per un dato Q.';
 $ec_lang['mpf_solve_button']='Calcola';
-// Manning Pipe Head Loss
+// Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Perdita di carico in tubazione Manning';
 $ec_lang['mphl_main_title']='Calcolatore gratuito online perdita di carico in tubazione Manning';
 $ec_lang['mphl_main_desc']='Formula di Manning perdita di carico a portata piena data';
@@ -160,7 +168,7 @@ $ec_lang['mphl_egl_1']='EGL a valle';
 $ec_lang['mphl_egl_2']='EGL a monte';
 $ec_lang['mphl_hgl_2']='HGL a monte in tubazione ' . $ec_lang['mpf_see_notes'];
 $ec_lang['mphl_note_1']='<dl><dt>Per una condizione di imbocco aperto (tombino), è necessario verificare le condizioni di controllo all\'imbocco.</dt><dd>1. L\'HGL a monte non può essere inferiore alla quota di deflusso a profondità normale a monte (o inferiore alla tubazione!).</dd><dd>2. Il livello idraulico di un tombino è meglio rappresentato dall\'EGL a monte che dall\'HGL a monte.</dd><dd>3. <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">Vedere il tutorial di 2 minuti</a> per semplici calcoli standard del livello idraulico nei tombini con HY-8.</dd>';
-// Manning Trapezoid
+// Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Canale trapezoidale Manning';
 $ec_lang['mtc_main_title']='Calcolatore gratuito online formula di Manning canale trapezoidale';
 $ec_lang['mtc_main_desc']='Flusso uniforme Manning in canale trapezoidale a pendenza e profondità date';
@@ -181,8 +189,16 @@ $ec_lang['mtc_d50_z1']='Dimensione roccia angolare richiesta scarpata 1, D50 (Is
 $ec_lang['mtc_d50_z2']='Dimensione roccia angolare richiesta scarpata 2, D50 (Isbash & MC) <span title="Secondo Isbash (1936) e Maricopa County, Arizona, US." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['mtc_d50_mra']='Dimensione roccia angolare richiesta, D50 (Maynord, Ruff, e Abt 1989)';
 $ec_lang['mtc_d50_searcy']='Dimensione roccia angolare richiesta, D50 (Searcy 1967)';
+$ec_lang['mtc_vel_check']='Controllo della velocità';
+$ec_lang['mtc_vel_ok']='Velocità ragionevole per le ipotesi di flusso uniforme.';
+$ec_lang['mtc_vel_high']='Velocità elevata — verificare le perdite di transizione e l\'energia disponibile.';
+$ec_lang['mtc_vel_low']='Velocità bassa — rischio di sedimentazione.';
+$ec_lang['mtc_vel_ok_short']='OK';
+$ec_lang['mtc_vel_high_short']='Alto';
+$ec_lang['mtc_vel_low_short']='Basso';
 $ec_lang['mtc_note_1']='<dl><dt>Iterazione automatica dimensionamento roccia e scabrezza</dt><dd>Scegliere un pulsante radio per la scabrezza (BB raccomandato) e uno per la dimensione roccia di progetto (Isbash raccomandato). Regolare profondità e fattore di sicurezza della roccia per ottenere il flusso desiderato con una dimensione roccia uniforme. Ogni modifica ai dati avvia il ciclo iterativo: 1. La scabrezza viene calcolata dalla dimensione roccia di progetto. 2. La scabrezza richiesta viene copiata nella scabrezza di input. 3. Il flusso nel canale e la dimensione roccia richiesta vengono calcolati. 4. La dimensione roccia di progetto viene aggiornata. 5. Si ripete fino a convergenza.</dd><dt>Calcolatore base (senza iterazione)</dt><dd>Inserire il valore di scabrezza desiderato. Ignorare l\'area di input della dimensione roccia di progetto.</dd></dl>';
-// Robinson Rock Chute
+$ec_lang['mtc_note_2_term']='Controllo della velocità';
+$ec_lang['mtc_note_2_def']='Velocità elevata implica elevata energia specifica derivante da una caduta disponibile. Tale energia può dissiparsi rapidamente in corrispondenza di espansioni, curve o ostruzioni. Verificare che ciò sia ragionevole per il sito.';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='Sfioratore semplice';
 $ec_lang['ws_main_title']='Calcolatore gratuito online sfioratore largo a cresta semplice';
@@ -192,7 +208,7 @@ $ec_lang['ws_headWaterHeight']='Altezza pelo libero a monte, h';
 $ec_lang['ws_weirCoefficient']='Coefficiente sfioratore, Cw';
 $ec_lang['ws_notes_heading']='Note';
 $ec_lang['ws_notes_we_term']='Equazione sfioratore';
-// Weir Flow Irregular
+// Weir Flow Irregular. See ws_ for missing text.
 $ec_lang['wi_menu']='Sfioratore irregolare';
 $ec_lang['wi_main_title']='Calcolatore gratuito online sfioratore irregolare a profondità variabile';
 $ec_lang['wi_main_desc']='Calcolatore portata sfioratore irregolare';
@@ -237,56 +253,6 @@ $ec_lang['or_notes_3_term']='Coefficiente di deflusso';
 $ec_lang['or_notes_3_def']='C<sub>d</sub> varia da circa 0,60 a 0,65 per orifizi a spigolo vivo. Imbocchi arrotondati o rientranti hanno valori diversi. Vedere <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venture-d_590.html">Engineering Toolbox</a> o il Manuale di Riferimento Idraulico HEC-RAS.';
 $ec_lang['or_notes_4_term']='Sommersione';
 $ec_lang['or_notes_4_def']='Quando TWE è sopra la soletta dell\'apertura, la calcolatrice applica automaticamente l\'equazione dell\'orifizio sommerso usando h = HWE − TWE. Quando TWE è pari o inferiore alla soletta, si assume uscita libera e h = HWE − centroide.';
-// Orifice Drain Time
-$ec_lang['odt_main_menu']='Tempo di svuotamento a orifizio';
-$ec_lang['odt_main_title']='Calcolatore gratuito online tempo di svuotamento a orifizio';
-$ec_lang['odt_main_desc']='Tempo di svuotamento vasca tramite orifizio — Metodo volume conico';
-$ec_lang['odt_h1_elev']='Quota pelo libero iniziale <span title="Quota pelo libero iniziale" class="ec-tip">?</span>';
-$ec_lang['odt_a1']='Area iniziale, A<sub>1</sub>';
-$ec_lang['odt_h2_elev']='Quota pelo libero finale';
-$ec_lang['odt_h_orifice']='Quota centroide orifizio';
-$ec_lang['odt_a0']='Area alla quota dell\'orifizio, A<sub>0</sub>';
-$ec_lang['odt_a_ending']='Area finale, A<sub>2</sub> <span title="Interpolata dal modello conico alla quota finale" class="ec-tip">?</span>';
-$ec_lang['odt_h2_check']='Verifica quota finale';
-$ec_lang['odt_h2_ok']='Quota finale sopra la sommità dell\'orifizio ✓';
-$ec_lang['odt_h2_warn']='Attenzione: quota finale pari o inferiore alla sommità orifizio (centroide + D/2)';
-$ec_lang['odt_d']='D orifizio <span title="Diametro (circolare) o altezza (rettangolare)" class="ec-tip">?</span>';
-$ec_lang['odt_w']='Larghezza orifizio, W <span title="Solo per rettangolare" class="ec-tip">?</span>';
-$ec_lang['odt_t_sec']='Tempo di svuotamento (s)';
-$ec_lang['odt_t_min']='Tempo di svuotamento (min)';
-$ec_lang['odt_t_hr']='Tempo di svuotamento (h)';
-$ec_lang['odt_t_day']='Tempo di svuotamento (giorni)';
-$ec_lang['odt_notes_1_term']='Formula';
-$ec_lang['odt_notes_1_def']='t = √H<sub>1</sub> / (C<sub>d</sub> A<sub>or</sub> √(2g)) × (2A<sub>x</sub>/5 + 8√(A<sub>x</sub>A<sub>0</sub>)/15 + 16A<sub>0</sub>/15) fornisce il tempo di svuotamento dal carico H all\'orifizio. Tempo di svuotamento = t(H<sub>1</sub>,A<sub>1</sub>,A<sub>0</sub>) − t(H<sub>2</sub>,A<sub>2</sub>,A<sub>0</sub>), dove H<sub>1</sub> = quota iniziale − quota orifizio, H<sub>2</sub> = quota finale − quota orifizio.';
-$ec_lang['odt_notes_2_term']='Metodo';
-$ec_lang['odt_notes_2_def']='Il metodo del volume conico modella la vasca come sezione conica tra l\'area iniziale A<sub>1</sub> al pelo libero iniziale e l\'area A<sub>0</sub> alla quota del centroide dell\'orifizio. A<sub>2</sub>, l\'area della vasca alla quota finale, è interpolata da A<sub>1</sub> e A<sub>0</sub> usando il modello conico. Il tempo di svuotamento dalla quota iniziale alla finale equivale al tempo totale da H<sub>1</sub> all\'orifizio meno il tempo rimanente da H<sub>2</sub> all\'orifizio.';
-$ec_lang['odt_h1']='Carico iniziale, H<sub>1</sub> <span title="Quota pelo libero iniziale meno quota centroide orifizio" class="ec-tip">?</span>';
-$ec_lang['odt_q_max']='Portata massima, Q<sub>max</sub>';
-$ec_lang['odt_vol']='Volume svuotato';
-$ec_lang['odt_sketch_start']='Inizio';
-$ec_lang['odt_sketch_end']='Fine';
-// Erosion Setback
-$ec_lang['essc_btbw']='Larghezza di sponda a sponda';
-$ec_lang['essc_mcr']='Raggio minimo di curvatura';
-$ec_lang['essc_q']='Portata, Q';
-// Contact
-
-// Irrigation
-$ec_lang['irr_main_menu']='Misurazione del Flusso di Irrigazione';
-$ec_lang['irr_main_title']='Calcolatrici Online Gratuite per la Misurazione del Flusso di Irrigazione';
-$ec_lang['irr_main_desc']='Misurazione del Flusso di Irrigazione — Stramazzi e Orifizi';
-$ec_lang['contact_title']='Contatti HawsEDC';
-$ec_lang['contactSendMessage']='Invia un messaggio a Tom Haws';
-$ec_lang['contactYourName']='Nome:';
-$ec_lang['contactYourEmail']='Indirizzo e-mail:';
-$ec_lang['contactSubject']='Oggetto:';
-$ec_lang['contact_message']='Messaggio:';
-$ec_lang['contactSpamPrefix']='Cinque più uno è';
-$ec_lang['contactSpamPostfix']='(Scrivere in inglese. 1=one 2=two 3=three 4=four 5=five 6=six 7=seven +=plus 5+1=6)';
-$ec_lang['contactSubmitButton']='Invia messaggio';
-$ec_lang['contact_success']='Grazie per aver dedicato il tempo a scrivere.';
-
-
 // Micro-Hydro Power
 $ec_lang['mhp_main_menu']='Micro-Idroelettrico';
 $ec_lang['mhp_main_title']='Calcolatore Gratuito di Potenza Micro-Idroelettrica';
@@ -333,20 +299,59 @@ $ec_lang['mhp_notes_6_def']='Il rendimento tipico dell\'impianto η varia da 0,7
 $ec_lang['mhp_notes_7_term']='Energia annua';
 $ec_lang['mhp_notes_7_def']='L\'energia annua presuppone un funzionamento continuativo a portata piena (8760 ore/anno). La produzione reale sarà inferiore a causa della variazione stagionale di portata, dei tempi di fermo per manutenzione e del fattore di carico.';
 
-// About
-$ec_lang['about_main_menu']='Informazioni';
-$ec_lang['install_main_menu']='Installa';
-$ec_lang['install_main_title']='Installa EngCalcs';
-$ec_lang['install_main_desc']='Aggiungi al tuo dispositivo per l\'uso offline';
-$ec_lang['contact_main_menu']='Contatto';
-$ec_lang['about_main_title']='Informazioni sui calcolatori HawsEDC';
-$ec_lang['about_main_desc']='Missione, open source e contributi';
+// Orifice Drain Time
+$ec_lang['odt_main_menu']='Tempo di svuotamento a orifizio';
+$ec_lang['odt_main_title']='Calcolatore gratuito online tempo di svuotamento a orifizio';
+$ec_lang['odt_main_desc']='Tempo di svuotamento vasca tramite orifizio — Metodo volume conico';
+$ec_lang['odt_h1_elev']='Quota pelo libero iniziale <span title="Quota pelo libero iniziale" class="ec-tip">?</span>';
+$ec_lang['odt_a1']='Area iniziale, A<sub>1</sub>';
+$ec_lang['odt_h2_elev']='Quota pelo libero finale';
+$ec_lang['odt_h_orifice']='Quota centroide orifizio';
+$ec_lang['odt_a0']='Area alla quota dell\'orifizio, A<sub>0</sub>';
+$ec_lang['odt_a_ending']='Area finale, A<sub>2</sub> <span title="Interpolata dal modello conico alla quota finale" class="ec-tip">?</span>';
+$ec_lang['odt_h2_check']='Verifica quota finale';
+$ec_lang['odt_h2_ok']='Quota finale sopra la sommità dell\'orifizio ✓';
+$ec_lang['odt_h2_warn']='Attenzione: quota finale pari o inferiore alla sommità orifizio (centroide + D/2)';
+$ec_lang['odt_d']='D orifizio <span title="Diametro (circolare) o altezza (rettangolare)" class="ec-tip">?</span>';
+$ec_lang['odt_w']='Larghezza orifizio, W <span title="Solo per rettangolare" class="ec-tip">?</span>';
+$ec_lang['odt_t_sec']='Tempo di svuotamento (s)';
+$ec_lang['odt_t_min']='Tempo di svuotamento (min)';
+$ec_lang['odt_t_hr']='Tempo di svuotamento (h)';
+$ec_lang['odt_t_day']='Tempo di svuotamento (giorni)';
+$ec_lang['odt_notes_1_term']='Formula';
+$ec_lang['odt_notes_1_def']='t = √H<sub>1</sub> / (C<sub>d</sub> A<sub>or</sub> √(2g)) × (2A<sub>x</sub>/5 + 8√(A<sub>x</sub>A<sub>0</sub>)/15 + 16A<sub>0</sub>/15) fornisce il tempo di svuotamento dal carico H all\'orifizio. Tempo di svuotamento = t(H<sub>1</sub>,A<sub>1</sub>,A<sub>0</sub>) − t(H<sub>2</sub>,A<sub>2</sub>,A<sub>0</sub>), dove H<sub>1</sub> = quota iniziale − quota orifizio, H<sub>2</sub> = quota finale − quota orifizio.';
+$ec_lang['odt_notes_2_term']='Metodo';
+$ec_lang['odt_notes_2_def']='Il metodo del volume conico modella la vasca come sezione conica tra l\'area iniziale A<sub>1</sub> al pelo libero iniziale e l\'area A<sub>0</sub> alla quota del centroide dell\'orifizio. A<sub>2</sub>, l\'area della vasca alla quota finale, è interpolata da A<sub>1</sub> e A<sub>0</sub> usando il modello conico. Il tempo di svuotamento dalla quota iniziale alla finale equivale al tempo totale da H<sub>1</sub> all\'orifizio meno il tempo rimanente da H<sub>2</sub> all\'orifizio.';
+$ec_lang['odt_h1']='Carico iniziale, H<sub>1</sub> <span title="Quota pelo libero iniziale meno quota centroide orifizio" class="ec-tip">?</span>';
+$ec_lang['odt_q_max']='Portata massima, Q<sub>max</sub>';
+$ec_lang['odt_vol']='Volume svuotato';
+$ec_lang['odt_sketch_start']='Inizio';
+$ec_lang['odt_sketch_end']='Fine';
+// Erosion Setback and Scour Calc.
+$ec_lang['essc_btbw']='Larghezza di sponda a sponda';
+$ec_lang['essc_mcr']='Raggio minimo di curvatura';
+$ec_lang['essc_q']='Portata, Q';
+// Contact us.
 
+// Irrigation
+$ec_lang['irr_main_menu']='Misurazione del Flusso di Irrigazione';
+$ec_lang['irr_main_title']='Calcolatrici Online Gratuite per la Misurazione del Flusso di Irrigazione';
+$ec_lang['irr_main_desc']='Misurazione del Flusso di Irrigazione — Stramazzi e Orifizi';
+$ec_lang['irr_intro_html']='<p>Stramazzi e orifizi sono gli strumenti standard sul campo per misurare il flusso d\'acqua nei sistemi di irrigazione. Seleziona la calcolatrice che corrisponde alla tua struttura:</p>';
+$ec_lang['irr_card_weir_uniform_head']='Stramazzo — Soglia Larga (Larghezza Uniforme)';
+$ec_lang['irr_card_weir_uniform_desc']='Misura il flusso sulla soglia di una diga di derivazione, struttura di controllo o tavola stramazzi. Inserisci la lunghezza dello stramazzo e la profondità dell\'acqua sopra la soglia.';
+$ec_lang['irr_card_weir_irregular_head']='Stramazzo — Profilo Irregolare';
+$ec_lang['irr_card_weir_irregular_desc']='Da usare quando la soglia dello stramazzo non ha un\'unica elevazione uniforme — sfioratori naturali, strutture di caduta con larghezza variabile o strutture di controllo a sezioni multiple.';
+$ec_lang['irr_card_orifice_head']='Orifizio — Paratoia o Presa Tubazione';
+$ec_lang['irr_card_orifice_desc']='Misura il flusso attraverso una paratoia, una presa tubazione o un\'apertura di tombino. Gestisce automaticamente sia la caduta libera sia le condizioni di sommersione (contropressione a valle).';
+$ec_lang['irr_card_canal_head']='Progetto & Analisi del Canale';
+$ec_lang['irr_card_canal_desc']='Progetta o verifica un canale irriguo usando la formula di Manning. Usa la calcolatrice Trapezoidale per i nuovi canali; la calcolatrice Irregolare per sezioni naturali o costruite esistenti.';
+$ec_lang['irr_card_drip_head']='Progetto Goccia a Goccia & Aspersione';
+$ec_lang['irr_card_drip_desc']='Calcola il tasso di applicazione, l\'uniformità di distribuzione, il flusso laterale, il flusso di zona e il tempo di esercizio per un sistema di irrigazione a goccia o a pioggia. Inserisci il flusso dell\'emettitore, la spaziatura e la profondità target.';
+$ec_lang['irr_card_seepage_head']='Percolazione dal Canale & Efficienza di Convogliamento';
+$ec_lang['irr_card_seepage_desc']='Stima la perdita per percolazione da un tratto di canale usando misurazioni di afflusso e deflusso. Calcola l\'efficienza di convogliamento e la perdita d\'acqua annuale per aiutare a stabilire le priorità di rivestimento.';
+$ec_lang['irr_quickref_html']='<h3>Riferimento Rapido</h3><dl><dt>Diga di derivazione o struttura di controllo</dt><dd>Misura la profondità dell\'acqua sopra la soglia dello stramazzo. Usa <a href="Weir-Flow-Simple.php">Stramazzo Semplice</a> per una soglia uniforme, o <a href="Weir-Flow-Irregular.php">Stramazzo Irregolare</a> per una soglia profilata o a gradini.</dd><dt>Paratoia o presa tubazione</dt><dd>Misura la quota del pelo libero a monte e a valle (o la quota di fondo se la scarica è libera). Usa <a href="Orifice.php">Flusso per Orifizio</a>. Per una tubazione circolare, D = diametro della tubazione; per una paratoia rettangolare, inserisci la larghezza W e l\'altezza D.</dd><dt>Tempo di svuotamento di serbatoio o laghetto</dt><dd>Usa <a href="Orifice-Drain-Time.php">Tempo di Svuotamento per Orifizio</a> per stimare quanto tempo ci vuole per abbassare il livello di un laghetto o serbatoio attraverso un orifizio sul fondo — utile per la pianificazione dello stoccaggio irriguo.</dd><dt>Standard sul campo</dt><dd>Le equazioni di flusso per stramazzo e orifizio usate qui corrispondono alle procedure del <em>Water Measurement Manual</em> USBR (3a ed.), comunemente richieste da gestori dell\'acqua e distretti irrigui.</dd></dl>';
 // Drip / Sprinkler Application Rate
-$ec_lang['u_lph']="L/hr";
-$ec_lang['u_gph']="gal/hr";
-$ec_lang['u_mmph']="mm/hr";
-$ec_lang['u_inph']="in/hr";
 $ec_lang['ds_main_menu']='Portata di adacquamento — goccia a goccia/irrigatori';
 $ec_lang['ds_main_title']='Calcolatore gratuito online della portata di adacquamento per irrigazione a goccia/irrigatori';
 $ec_lang['ds_main_desc']='Irrigazione a goccia e a pioggia — portata di adacquamento';
@@ -403,26 +408,26 @@ $ec_lang['cs_notes_3_term']='Ammortamento del rivestimento';
 $ec_lang['cs_notes_3_def']='Inserire il valore dell\'acqua e il costo del rivestimento in qualsiasi valuta coerente. Area di rivestimento = lunghezza del tratto × perimetro bagnato — il perimetro bagnato della sezione trasversale del canale alla profondità di flusso misurata (larghezza di fondo più entrambe le sponde bagnate). Il valore annuo recuperato presuppone che il canale rivestito raggiunga l\'E<sub>c</sub> obiettivo in modo continuativo. Il tempo di ammortamento effettivo sarà più lungo per canali stagionali o se il rivestimento non raggiunge l\'efficienza obiettivo.';
 $ec_lang['cs_notes_4_term']='Riferimento';
 $ec_lang['cs_notes_4_def']='USBR <em>Water Measurement Manual</em>, 3a ed. (2001). FAO Irrigation and Drainage Paper 57 (1999).';
-
-$ec_lang['irr_intro_html']='<p>Stramazzi e orifizi sono gli strumenti standard sul campo per misurare il flusso d\'acqua nei sistemi di irrigazione. Seleziona la calcolatrice che corrisponde alla tua struttura:</p>';
-$ec_lang['irr_card_weir_uniform_head']='Stramazzo — Soglia Larga (Larghezza Uniforme)';
-$ec_lang['irr_card_weir_uniform_desc']='Misura il flusso sulla soglia di una diga di derivazione, struttura di controllo o tavola stramazzi. Inserisci la lunghezza dello stramazzo e la profondità dell\'acqua sopra la soglia.';
-$ec_lang['irr_card_weir_irregular_head']='Stramazzo — Profilo Irregolare';
-$ec_lang['irr_card_weir_irregular_desc']='Da usare quando la soglia dello stramazzo non ha un\'unica elevazione uniforme — sfioratori naturali, strutture di caduta con larghezza variabile o strutture di controllo a sezioni multiple.';
-$ec_lang['irr_card_orifice_head']='Orifizio — Paratoia o Presa Tubazione';
-$ec_lang['irr_card_orifice_desc']='Misura il flusso attraverso una paratoia, una presa tubazione o un\'apertura di tombino. Gestisce automaticamente sia la caduta libera sia le condizioni di sommersione (contropressione a valle).';
-$ec_lang['irr_card_canal_head']='Progetto & Analisi del Canale';
-$ec_lang['irr_card_canal_desc']='Progetta o verifica un canale irriguo usando la formula di Manning. Usa la calcolatrice Trapezoidale per i nuovi canali; la calcolatrice Irregolare per sezioni naturali o costruite esistenti.';
-$ec_lang['irr_card_drip_head']='Progetto Goccia a Goccia & Aspersione';
-$ec_lang['irr_card_drip_desc']='Calcola il tasso di applicazione, l\'uniformità di distribuzione, il flusso laterale, il flusso di zona e il tempo di esercizio per un sistema di irrigazione a goccia o a pioggia. Inserisci il flusso dell\'emettitore, la spaziatura e la profondità target.';
-$ec_lang['irr_card_seepage_head']='Percolazione dal Canale & Efficienza di Convogliamento';
-$ec_lang['irr_card_seepage_desc']='Stima la perdita per percolazione da un tratto di canale usando misurazioni di afflusso e deflusso. Calcola l\'efficienza di convogliamento e la perdita d\'acqua annuale per aiutare a stabilire le priorità di rivestimento.';
-$ec_lang['irr_quickref_html']='<h3>Riferimento Rapido</h3><dl><dt>Diga di derivazione o struttura di controllo</dt><dd>Misura la profondità dell\'acqua sopra la soglia dello stramazzo. Usa <a href="Weir-Flow-Simple.php">Stramazzo Semplice</a> per una soglia uniforme, o <a href="Weir-Flow-Irregular.php">Stramazzo Irregolare</a> per una soglia profilata o a gradini.</dd><dt>Paratoia o presa tubazione</dt><dd>Misura la quota del pelo libero a monte e a valle (o la quota di fondo se la scarica è libera). Usa <a href="Orifice.php">Flusso per Orifizio</a>. Per una tubazione circolare, D = diametro della tubazione; per una paratoia rettangolare, inserisci la larghezza W e l\'altezza D.</dd><dt>Tempo di svuotamento di serbatoio o laghetto</dt><dd>Usa <a href="Orifice-Drain-Time.php">Tempo di Svuotamento per Orifizio</a> per stimare quanto tempo ci vuole per abbassare il livello di un laghetto o serbatoio attraverso un orifizio sul fondo — utile per la pianificazione dello stoccaggio irriguo.</dd><dt>Standard sul campo</dt><dd>Le equazioni di flusso per stramazzo e orifizio usate qui corrispondono alle procedure del <em>Water Measurement Manual</em> USBR (3a ed.), comunemente richieste da gestori dell\'acqua e distretti irrigui.</dd></dl>';
+// About
+$ec_lang['about_main_menu']='Informazioni';
+$ec_lang['install_main_menu']='Installa';
+$ec_lang['install_main_title']='Installa EngCalcs';
+$ec_lang['install_main_desc']='Aggiungi al tuo dispositivo per l\'uso offline';
+$ec_lang['contact_main_menu']='Contatto';
+$ec_lang['about_main_title']='Informazioni sui calcolatori HawsEDC';
+$ec_lang['about_main_desc']='Missione, open source e contributi';
 $ec_lang['about_body_html']='<h3>Missione</h3><p>Le Calcolatrici di Ingegneria HawsEDC esistono per servire ingegneri e operatori sul campo in tutto il mondo — in particolare coloro che lavorano in regioni con scarsità d\'acqua, risorse limitate o poco servite. Questi strumenti fanno parte di una missione umanitaria più ampia: dire a ogni essere umano nel modo più pratico ed efficace possibile che è amato e prezioso per sempre, che non ha nulla da temere e che non rovinerà tutto.</p><p>Le calcolatrici sono il mezzo. La destinazione è un mondo libero dalla sofferenza.</p><h3>Licenza Open Source</h3><p>Tutto il codice è rilasciato sotto la <a target="_blank" href="https://www.gnu.org/licenses/gpl-3.0.html">Licenza Pubblica Generale GNU v3.0 o successiva</a> — libero come nella libertà. Puoi usare, studiare, modificare e ridistribuire il codice secondo gli stessi termini.</p><p>Copyright © 2009–2026 Thomas Gail Haws.</p><h3>Codice Sorgente</h3><p>Il codice sorgente completo è disponibile pubblicamente su Bitbucket:</p><p><a target="_blank" href="https://bitbucket.org/hawstom/engcalcs">bitbucket.org/hawstom/engcalcs</a></p><p>Puoi sfogliare il codice, segnalare problemi o fare un fork del repository lì.</p><h3>Contribuire</h3><p>Le pull request sono benvenute. Modi per contribuire:</p><ul><li><strong>Traduzioni</strong> — migliora o aggiungi una lingua. Apri una pull request con modifiche al file <code>lib/lang.ec.??.php</code> pertinente.</li><li><strong>Segnalazioni di bug</strong> — usa il modulo di feedback su qualsiasi pagina della calcolatrice, o segnala un problema su Bitbucket.</li><li><strong>Nuove calcolatrici</strong> — le idee per strumenti di ingegneria idraulica al servizio di operatori sul campo e professionisti dell\'irrigazione sono particolarmente benvenute. Consulta la guida per sviluppatori <code>CLAUDE.md</code> nel repository.</li><li><strong>Hosting</strong> — se puoi ospitare queste calcolatrici per una regione con connettività limitata, contattaci.</li></ul><h3>Uso offline</h3><p>Questi calcolatori funzionano come un\'App Web Progressiva (PWA). Visita qualsiasi pagina del calcolatore mentre sei connesso a internet e il tuo browser memorizzerà automaticamente tutti i calcolatori nella cache. Dopodiché, tutti i calcolatori funzionano offline — senza necessità di internet.</p><p>Su Android o iOS, usa l\'opzione "Aggiungi alla schermata iniziale" del tuo browser per installare EngCalcs come app sul tuo dispositivo. Su desktop, cerca l\'icona di installazione nella barra degli indirizzi del browser.</p><p>Puoi anche salvare qualsiasi calcolatore individuale usando il menu "Salva con nome…" del tuo browser per un utilizzo offline occasionale.</p><h3>Contatto</h3><p>Tom Haws — ingegnere idraulico e autore di queste calcolatrici.<br />Usa il modulo di feedback su qualsiasi pagina della calcolatrice, o accedi al codice sorgente su <a target="_blank" href="https://bitbucket.org/hawstom/engcalcs">Bitbucket</a>.</p>';
-
+$ec_lang['contact_title']='Contatti HawsEDC';
+$ec_lang['contactSendMessage']='Invia un messaggio a Tom Haws';
+$ec_lang['contactYourName']='Nome:';
+$ec_lang['contactYourEmail']='Indirizzo e-mail:';
+$ec_lang['contactSubject']='Oggetto:';
+$ec_lang['contact_message']='Messaggio:';
+$ec_lang['contactSpamPrefix']='Cinque più uno è';
+$ec_lang['contactSpamPostfix']='(Scrivere in inglese. 1=one 2=two 3=three 4=four 5=five 6=six 7=seven +=plus 5+1=6)';
+$ec_lang['contactSubmitButton']='Invia messaggio';
+$ec_lang['contact_success']='Grazie per aver dedicato il tempo a scrivere.';
 // Rock Chute Design (Robinson, Rice & Kadavy 1998). Prefix rc_.
-$ec_lang['u_m2ps']='m^2/s';
-$ec_lang['u_ft2ps']='cfs/ft';
 $ec_lang['rc_main_menu']='Progetto di Scivolo in Pietrame (Robinson)';
 $ec_lang['rc_main_title']='Calcolatrice Gratuita per Progetto di Scivolo in Pietrame — Robinson (1998)';
 $ec_lang['rc_main_desc']='Dimensionamento del Pietrame per Scivolo — Robinson, Rice & Kadavy (1998)';
@@ -478,13 +483,3 @@ $ec_lang['rc_sketch_filter']          = 'Filtro';
 $ec_lang['rc_sketch_top_crest_curve'] = 'Curva di cresta';
 $ec_lang['rc_sketch_outlet_apron']    = 'Platea di uscita';
 $ec_lang['rc_sketch_radius']          = 'raggio';
-// Manning Trapezoid velocity checks
-$ec_lang['mtc_vel_check']='Controllo della velocità';
-$ec_lang['mtc_vel_ok']='Velocità ragionevole per le ipotesi di flusso uniforme.';
-$ec_lang['mtc_vel_high']='Velocità elevata — verificare le perdite di transizione e l\'energia disponibile.';
-$ec_lang['mtc_vel_low']='Velocità bassa — rischio di sedimentazione.';
-$ec_lang['mtc_vel_ok_short']='OK';
-$ec_lang['mtc_vel_high_short']='Alto';
-$ec_lang['mtc_vel_low_short']='Basso';
-$ec_lang['mtc_note_2_term']='Controllo della velocità';
-$ec_lang['mtc_note_2_def']='Velocità elevata implica elevata energia specifica derivante da una caduta disponibile. Tale energia può dissiparsi rapidamente in corrispondenza di espansioni, curve o ostruzioni. Verificare che ciò sia ragionevole per il sito.';

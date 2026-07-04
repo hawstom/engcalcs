@@ -7,8 +7,8 @@ $ec_lang['u_depthFrac']="podíl";
 $ec_lang['u_depthPercent']="%";
 $ec_lang['u_ft2']="ft^2";
 $ec_lang['u_ft3ps']="cfs";
-$ec_lang['u_fth2o']="ft H2O";
 $ec_lang['u_ft']="ft";
+$ec_lang['u_fth2o']="ft H2O";
 $ec_lang['u_ftps']="ft/s";
 $ec_lang['u_gpm']="gal/min";
 $ec_lang['u_gradePercent']="% sklonu";
@@ -35,6 +35,10 @@ $ec_lang['u_pa']="Pa";
 $ec_lang['u_psf']="lb/ft^2";
 $ec_lang['u_psi']="psi";
 $ec_lang['u_s']="s";
+$ec_lang['u_lph']="L/hr";
+$ec_lang['u_gph']="gal/hr";
+$ec_lang['u_mmph']="mm/hr";
+$ec_lang['u_inph']="in/hr";
 $ec_lang['u_acft']="ac-ft";
 $ec_lang['u_ft3']="ft^3";
 $ec_lang['u_m3']="m^3";
@@ -43,8 +47,12 @@ $ec_lang['u_mw']='MW';
 $ec_lang['u_kwh_yr']='kWh/yr';
 $ec_lang['u_mwh_yr']='MWh/yr';
 $ec_lang['u_hp']='hp';
+$ec_lang['u_m2ps']='m^2/s';
+$ec_lang['u_ft2ps']='cfs/ft';
 
 // Page text
+// In page order for easiest maintenance.
+// Menu and General
 $ec_lang['menu_brand']='Kalkulačky HawsEDC';
 $ec_lang['menu_main_list']='Seznam kalkulaček';
 $ec_lang['menu_main_hydraulics']='Hydraulika';
@@ -68,7 +76,7 @@ $ec_lang['view_printable']='Verze pro tisk (obnovit pro vrácení)';
 $ec_lang['ec_name_label']='Uložit tento výpočet:';
 $ec_lang['ec_name_placeholder']='Název';
 $ec_lang['ec_name_hint']='Uloží tyto zadané hodnoty do adresy URL pro přidání do záložek, načtení z historie a sdílení';
-// Darcy-Weisbach
+// Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Ztráta tlaku v potrubí Darcy-Weisbach';
 $ec_lang['dw_main_title']='Bezplatný online kalkulátor ztrát tlaku v potrubí Darcy-Weisbach';
 $ec_lang['dw_main_desc']='Ztráta tlaku v potrubí dle Darcy-Weisbach při daném průměru, drsnosti a průtoku';
@@ -81,7 +89,7 @@ $ec_lang['dw_regime_transitional']='přechodný';
 $ec_lang['dw_regime_turbulent']='turbulentní';
 $ec_lang['dw_friction_factor_method']='Metoda součinitele tření';
 $ec_lang['dw_friction_factor']='Součinitel tření, f';
-// Hazen-Williams
+// Hazen-Williams. See mphl_ for missing text.
 $ec_lang['hw_main_menu']='Ztráta tlaku v potrubí Hazen-Williams';
 $ec_lang['hw_main_title']='Bezplatný online kalkulátor ztrát tlaku Hazen-Williams';
 $ec_lang['hw_main_desc']='Ztráta tlaku v potrubí dle Hazen-Williams při daném průměru, drsnosti a průtoku';
@@ -145,7 +153,7 @@ $ec_lang['mpf_note_1']='<dl><dt>Toto je průtok a hloubka uvnitř <em>nekonečn�
 $ec_lang['mpf_solve_for_dd0']='Vypočítat y/d<sub>0</sub> pro dané Q';
 $ec_lang['mpf_solve_desc']='Pomocí D<sub>0</sub>, n a S<sub>0</sub> z formuláře najde nejnižší y/d<sub>0</sub> pro dané Q.';
 $ec_lang['mpf_solve_button']='Vypočítat';
-// Manning Pipe Head Loss
+// Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Ztráta výšky v potrubí Manning';
 $ec_lang['mphl_main_title']='Bezplatný online kalkulátor ztrát výšky v potrubí Manning';
 $ec_lang['mphl_main_desc']='Manningova rovnice ztráty výšky při plném průtoku';
@@ -160,7 +168,7 @@ $ec_lang['mphl_egl_1']='EGL po proudu';
 $ec_lang['mphl_egl_2']='EGL proti proudu';
 $ec_lang['mphl_hgl_2']='HGL proti proudu v potrubí ' . $ec_lang['mpf_see_notes'];
 $ec_lang['mphl_note_1']='<dl><dt>Pro podmínku otevřeného vtoku (propustek) je nutné zkontrolovat podmínky vtokového ovládání.</dt><dd>1. HGL proti proudu nemůže být nižší než kóta normální hloubky proudění (ani nižší než potrubí!).</dd><dd>2. Hladina propustku je lépe reprezentována EGL než HGL proti proudu.</dd><dd>3. Viz <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">2minutový výukový program</a> pro jednoduchý standardní výpočet propustků pomocí HY-8.</dd>';
-// Manning Trapezoid
+// Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Lichoběžníkový průřez Manning';
 $ec_lang['mtc_main_title']='Bezplatný online kalkulátor lichoběžníkového koryta Manning';
 $ec_lang['mtc_main_desc']='Manningova rovnice rovnoměrného proudění v lichoběžníkovém korytě při daném sklonu a hloubce';
@@ -181,8 +189,16 @@ $ec_lang['mtc_d50_z1']='Požadovaná velikost lomového kamene svahu 1, D50 (Isb
 $ec_lang['mtc_d50_z2']='Požadovaná velikost lomového kamene svahu 2, D50 (Isbash & MC) <span title="Dle Isbash (1936) a Maricopa County, Arizona, USA." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['mtc_d50_mra']='Požadovaná velikost lomového kamene, D50 (Maynord, Ruff a Abt 1989)';
 $ec_lang['mtc_d50_searcy']='Požadovaná velikost lomového kamene, D50 (Searcy 1967)';
+$ec_lang['mtc_vel_check']='Kontrola rychlosti';
+$ec_lang['mtc_vel_ok']='Rychlost přiměřená pro předpoklady rovnoměrného proudění.';
+$ec_lang['mtc_vel_high']='Rychlost vysoká — zkontrolujte ztráty na přechodech a dostupnou energii.';
+$ec_lang['mtc_vel_low']='Rychlost nízká — riziko sedimentace.';
+$ec_lang['mtc_vel_ok_short']='OK';
+$ec_lang['mtc_vel_high_short']='Vysoká';
+$ec_lang['mtc_vel_low_short']='Nízká';
 $ec_lang['mtc_note_1']='<dl><dt>Automatická iterace návrhu kamene a drsnosti</dt><dd>Zvolte přepínač pro drsnost (doporučeno BB) a přepínač pro návrhovou velikost kamene (doporučeno Isbash). Dolaďte hloubku a bezpečnostní faktor kamene pro dosažení požadovaného průtoku s rovnoměrnou velikostí kamene. Každá změna vstupní hodnoty spustí iterační cyklus: 1. Drsnost je vypočtena z návrhové velikosti kamene. 2. Požadovaný výpočet drsnosti je zkopírován do vstupní drsnosti. 3. Průtok v korytě a požadovaná velikost kamene jsou vypočteny. 4. Návrhová velikost kamene je upravena. 5. Opakovat dokud chyba v návrhové velikosti kamene není velmi malá.</dd><dt>Základní kalkulátor (bez iterace)</dt><dd>Zadejte požadovanou hodnotu drsnosti. Ignorujte oblast zadávání návrhové velikosti kamene.</dd></dl>';
-// Robinson Rock Chute
+$ec_lang['mtc_note_2_term']='Kontrola rychlosti';
+$ec_lang['mtc_note_2_def']='Vysoká rychlost znamená vysokou specifickou energii z dostupného spádu. Tato energie může být rychle ztracena na rozšířeních, obloucích nebo překážkách. Ověřte, zda je to pro danou lokalitu přiměřené.';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='Jednoduchý přepad';
 $ec_lang['ws_main_title']='Bezplatný online kalkulátor jednoduchého širokokorunového přepadu';
@@ -192,7 +208,7 @@ $ec_lang['ws_headWaterHeight']='Výška vzdutí, h';
 $ec_lang['ws_weirCoefficient']='Koeficient přepadu, Cw';
 $ec_lang['ws_notes_heading']='Poznámky';
 $ec_lang['ws_notes_we_term']='Rovnice přepadu';
-// Weir Flow Irregular
+// Weir Flow Irregular. See ws_ for missing text.
 $ec_lang['wi_menu']='Nepravidelný přepad';
 $ec_lang['wi_main_title']='Bezplatný online kalkulátor nepravidelného přepadu s proměnnou hloubkou';
 $ec_lang['wi_main_desc']='Kalkulátor průtoku nepravidelným přepadem';
@@ -237,56 +253,6 @@ $ec_lang['or_notes_3_term']='Součinitel průtoku';
 $ec_lang['or_notes_3_def']='C<sub>d</sub> se pohybuje přibližně 0,60–0,65 pro ostrohrané otvory. Zaoblené nebo zúžené vstupy mají jiné hodnoty. Viz <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venture-d_590.html">Engineering Toolbox</a> nebo Hydraulický referenční manuál HEC-RAS.';
 $ec_lang['or_notes_4_term']='Zatopení';
 $ec_lang['or_notes_4_def']='Pokud je TWE nad dnem otvoru, kalkulačka automaticky použije rovnici zatopeného otvoru s h = HWE − TWE. Pokud je TWE na dně nebo níže, předpokládá se volný výtok a h = HWE − těžiště.';
-// Orifice Drain Time
-$ec_lang['odt_main_menu']='Doba prázdnění otvorem';
-$ec_lang['odt_main_title']='Bezplatný online kalkulátor doby prázdnění otvorem';
-$ec_lang['odt_main_desc']='Doba prázdnění nádrže otvorem — Metoda kónického objemu';
-$ec_lang['odt_h1_elev']='Počáteční kóta hladiny vody';
-$ec_lang['odt_a1']='Počáteční plocha nádrže, A1';
-$ec_lang['odt_h2_elev']='Koncová kóta hladiny vody';
-$ec_lang['odt_h_orifice']='Kóta těžiště otvoru';
-$ec_lang['odt_a0']='Plocha nádrže na kótě otvoru, A0';
-$ec_lang['odt_a_ending']='Koncová plocha nádrže, A2 (interpolováno)';
-$ec_lang['odt_h2_check']='Kontrola koncové kóty';
-$ec_lang['odt_h2_ok']='Koncová kóta nad vrcholem otvoru ✓';
-$ec_lang['odt_h2_warn']='Varování: koncová kóta na úrovni nebo pod vrcholem otvoru (těžiště + D/2)';
-$ec_lang['odt_d']='Průměr otvoru (kruhový) nebo výška (obdélníkový), D';
-$ec_lang['odt_w']='Šířka otvoru, W (jen obdélníkový)';
-$ec_lang['odt_t_sec']='Doba prázdnění (sekundy)';
-$ec_lang['odt_t_min']='Doba prázdnění (minuty)';
-$ec_lang['odt_t_hr']='Doba prázdnění (hodiny)';
-$ec_lang['odt_t_day']='Doba prázdnění (dny)';
-$ec_lang['odt_notes_1_term']='Vzorec';
-$ec_lang['odt_notes_1_def']='t = √H<sub>1</sub> / (C<sub>d</sub> A<sub>or</sub> √(2g)) × (2A<sub>x</sub>/5 + 8√(A<sub>x</sub>A<sub>0</sub>)/15 + 16A<sub>0</sub>/15) udává dobu prázdnění od výšky H k otvoru. Doba prázdnění = t(H<sub>1</sub>,A<sub>1</sub>,A<sub>0</sub>) − t(H<sub>2</sub>,A<sub>2</sub>,A<sub>0</sub>), kde H<sub>1</sub> = počáteční kóta − kóta otvoru, H<sub>2</sub> = koncová kóta − kóta otvoru.';
-$ec_lang['odt_notes_2_term']='Metoda';
-$ec_lang['odt_notes_2_def']='Metoda kónického objemu modeluje nádrž jako kónický řez mezi počáteční plochou A<sub>1</sub> u počáteční hladiny a plochou A<sub>0</sub> na kótě těžiště otvoru. A<sub>2</sub>, plocha nádrže na koncové kótě, je interpolována z A<sub>1</sub> a A<sub>0</sub> pomocí modelu kónického řezu. Doba prázdnění od počáteční do koncové kóty se rovná celkové době od H<sub>1</sub> k otvoru minus zbývající doba od H<sub>2</sub> k otvoru.';
-$ec_lang['odt_h1']='Počáteční výška, H<sub>1</sub> (WSE − těžiště)';
-$ec_lang['odt_q_max']='Maximální (počáteční) průtok, Q<sub>max</sub>';
-$ec_lang['odt_vol']='Vyčerpaný objem';
-$ec_lang['odt_sketch_start']='Začátek';
-$ec_lang['odt_sketch_end']='Konec';
-// Erosion Setback
-$ec_lang['essc_btbw']='Šířka od břehu k břehu';
-$ec_lang['essc_mcr']='Minimální poloměr oblouku';
-$ec_lang['essc_q']='Průtok, Q';
-// Contact
-
-// Irrigation
-$ec_lang['irr_main_menu']='Měření průtoku závlahy';
-$ec_lang['irr_main_title']='Bezplatné online kalkulačky pro měření průtoku závlahy';
-$ec_lang['irr_main_desc']='Měření průtoku závlahy — přelivy a otvory';
-$ec_lang['contact_title']='Kontakt HawsEDC';
-$ec_lang['contactSendMessage']='Pošlete zprávu Tomu Hawsovi';
-$ec_lang['contactYourName']='Vaše jméno:';
-$ec_lang['contactYourEmail']='Vaše e-mailová adresa:';
-$ec_lang['contactSubject']='Předmět:';
-$ec_lang['contact_message']='Zpráva:';
-$ec_lang['contactSpamPrefix']='Pět plus jedna se rovná';
-$ec_lang['contactSpamPostfix']='(Prosím napište anglicky slovy. 1=one 2=two 3=three 4=four 5=five 6=six 7=seven +=plus 5+1=6)';
-$ec_lang['contactSubmitButton']='Odeslat zprávu';
-$ec_lang['contact_success']='Děkujeme za váš čas věnovaný napsání.';
-
-
 // Micro-Hydro Power
 $ec_lang['mhp_main_menu']='Mikro-vodní elektrárna';
 $ec_lang['mhp_main_title']='Bezplatná online kalkulačka výkonu mikro-vodní elektrárny';
@@ -328,21 +294,64 @@ $ec_lang['mhp_notes_4_term']='Místní ztráty k<sub>m</sub>';
 $ec_lang['mhp_notes_4_def']='Typické hodnoty: ostrý vtok 0.5, každé koleno 45° 0.2–0.3, šoupě (plně otevřené) 0.1, klapka 0.2. Součet všech armatur tvoří celkový k<sub>m</sub>. Výchozí hodnota 1.5 předpokládá jeden vtok a dvě kolena.';
 $ec_lang['mhp_notes_5_term']='Drsnost potrubí e';
 $ec_lang['mhp_notes_5_def']='Typická absolutní drsnost: ocel (nová) 0.046 mm, ocel (použitá) 0.15 mm, HDPE 0.003 mm, PVC/uPVC 0.0015 mm, beton 0.3–3 mm. HDPE je běžný materiál pro malá přiváděcí potrubí mikro-vodních elektráren.';
+$ec_lang['mhp_notes_6_term']='Účinnost';
+$ec_lang['mhp_notes_6_def']='Typická účinnost elektrárny &eta; se pohybuje od 0,70 do 0,85 pro Peltonovy a příčné turbíny běžné v mikro-vodní energetice. Jako konzervativní první odhad použijte hodnotu 0,75.';
+$ec_lang['mhp_notes_7_term']='Roční výroba energie';
+$ec_lang['mhp_notes_7_def']='Roční výroba energie předpokládá nepřetržitý provoz při plném průtoku (8760 hodin/rok). Skutečná výroba bude nižší z důvodu sezónní variability průtoku, prostojů při údržbě a faktoru zatížení.';
 
-// About
-$ec_lang['about_main_menu']='O nás';
-$ec_lang['install_main_menu']='Nainstalovat';
-$ec_lang['install_main_title']='Nainstalovat EngCalcs';
-$ec_lang['install_main_desc']='Přidejte si na zařízení pro offline použití';
-$ec_lang['contact_main_menu']='Kontakt';
-$ec_lang['about_main_title']='O kalkulátorech HawsEDC';
-$ec_lang['about_main_desc']='Poslání, open source a přispívání';
+// Orifice Drain Time
+$ec_lang['odt_main_menu']='Doba prázdnění otvorem';
+$ec_lang['odt_main_title']='Bezplatný online kalkulátor doby prázdnění otvorem';
+$ec_lang['odt_main_desc']='Doba prázdnění nádrže otvorem — Metoda kónického objemu';
+$ec_lang['odt_h1_elev']='Počáteční kóta hladiny vody';
+$ec_lang['odt_a1']='Počáteční plocha nádrže, A1';
+$ec_lang['odt_h2_elev']='Koncová kóta hladiny vody';
+$ec_lang['odt_h_orifice']='Kóta těžiště otvoru';
+$ec_lang['odt_a0']='Plocha nádrže na kótě otvoru, A0';
+$ec_lang['odt_a_ending']='Koncová plocha nádrže, A2 (interpolováno)';
+$ec_lang['odt_h2_check']='Kontrola koncové kóty';
+$ec_lang['odt_h2_ok']='Koncová kóta nad vrcholem otvoru ✓';
+$ec_lang['odt_h2_warn']='Varování: koncová kóta na úrovni nebo pod vrcholem otvoru (těžiště + D/2)';
+$ec_lang['odt_d']='Průměr otvoru (kruhový) nebo výška (obdélníkový), D';
+$ec_lang['odt_w']='Šířka otvoru, W (jen obdélníkový)';
+$ec_lang['odt_t_sec']='Doba prázdnění (sekundy)';
+$ec_lang['odt_t_min']='Doba prázdnění (minuty)';
+$ec_lang['odt_t_hr']='Doba prázdnění (hodiny)';
+$ec_lang['odt_t_day']='Doba prázdnění (dny)';
+$ec_lang['odt_notes_1_term']='Vzorec';
+$ec_lang['odt_notes_1_def']='t = √H<sub>1</sub> / (C<sub>d</sub> A<sub>or</sub> √(2g)) × (2A<sub>x</sub>/5 + 8√(A<sub>x</sub>A<sub>0</sub>)/15 + 16A<sub>0</sub>/15) udává dobu prázdnění od výšky H k otvoru. Doba prázdnění = t(H<sub>1</sub>,A<sub>1</sub>,A<sub>0</sub>) − t(H<sub>2</sub>,A<sub>2</sub>,A<sub>0</sub>), kde H<sub>1</sub> = počáteční kóta − kóta otvoru, H<sub>2</sub> = koncová kóta − kóta otvoru.';
+$ec_lang['odt_notes_2_term']='Metoda';
+$ec_lang['odt_notes_2_def']='Metoda kónického objemu modeluje nádrž jako kónický řez mezi počáteční plochou A<sub>1</sub> u počáteční hladiny a plochou A<sub>0</sub> na kótě těžiště otvoru. A<sub>2</sub>, plocha nádrže na koncové kótě, je interpolována z A<sub>1</sub> a A<sub>0</sub> pomocí modelu kónického řezu. Doba prázdnění od počáteční do koncové kóty se rovná celkové době od H<sub>1</sub> k otvoru minus zbývající doba od H<sub>2</sub> k otvoru.';
+$ec_lang['odt_h1']='Počáteční výška, H<sub>1</sub> (WSE − těžiště)';
+$ec_lang['odt_q_max']='Maximální (počáteční) průtok, Q<sub>max</sub>';
+$ec_lang['odt_vol']='Vyčerpaný objem';
+$ec_lang['odt_sketch_start']='Začátek';
+$ec_lang['odt_sketch_end']='Konec';
+// Erosion Setback and Scour Calc.
+$ec_lang['essc_btbw']='Šířka od břehu k břehu';
+$ec_lang['essc_mcr']='Minimální poloměr oblouku';
+$ec_lang['essc_q']='Průtok, Q';
+// Contact us.
 
+// Irrigation
+$ec_lang['irr_main_menu']='Měření průtoku závlahy';
+$ec_lang['irr_main_title']='Bezplatné online kalkulačky pro měření průtoku závlahy';
+$ec_lang['irr_main_desc']='Měření průtoku závlahy — přelivy a otvory';
+$ec_lang['irr_intro_html']='<p>Přelivy a otvory jsou standardní terénní nástroje pro měření průtoku vody v závlahových systémech. Vyberte kalkulačku odpovídající vaší konstrukci:</p>';
+$ec_lang['irr_card_weir_uniform_head']='Přeliv — Široká Koruna (Rovnoměrná Šířka)';
+$ec_lang['irr_card_weir_uniform_desc']='Měřte průtok přes korunu odvodňovacího jezu, kontrolního objektu nebo přelivné desky. Zadejte délku přelivu a hloubku vody nad korunou.';
+$ec_lang['irr_card_weir_irregular_head']='Přeliv — Nepravidelný Profil';
+$ec_lang['irr_card_weir_irregular_desc']='Použijte, když koruna přelivu není v jediné rovnoměrné výšce — přirozené bezpečnostní přelivy, stupně s proměnnou šířkou nebo vícesekční regulační objekty.';
+$ec_lang['irr_card_orifice_head']='Otvor — Hlavní Šoupě nebo Trubní Výpust';
+$ec_lang['irr_card_orifice_desc']='Měřte průtok skrze stavidlové šoupě, trubní výpust nebo otvor propustku. Automaticky zpracovává jak volný výtok, tak podmínky vzdutí (protitlak z dolní vody).';
+$ec_lang['irr_card_canal_head']='Návrh & Analýza Kanálu';
+$ec_lang['irr_card_canal_desc']='Navrhněte nebo ověřte závlahový kanál pomocí Manningova vzorce. Používejte lichoběžníkovou kalkulačku pro nové kanály; nepravidelnou kalkulačku pro stávající přirozené nebo vybudované průřezy.';
+$ec_lang['irr_card_drip_head']='Návrh Kapkové & Sprinklerové Závlahy';
+$ec_lang['irr_card_drip_desc']='Vypočítejte míru aplikace, rovnoměrnost distribuce, průtok větve, průtok zóny a dobu provozu pro kapkový nebo sprinklerový závlahový systém. Zadejte průtok emitoru, rozteč emitorů a cílovou hloubku.';
+$ec_lang['irr_card_seepage_head']='Průsak kanálu & Dopravní účinnost';
+$ec_lang['irr_card_seepage_desc']='Odhadněte průsakové ztráty z úseku kanálu pomocí měření přítoku a odtoku. Vypočítejte dopravní účinnost a roční ztrátu vody pro stanovení priorit investic do zpevnění kanálu.';
+$ec_lang['irr_quickref_html']='<h3>Rychlá Referenční Příručka</h3><dl><dt>Odvodňovací jez nebo kontrolní objekt</dt><dd>Změřte hloubku vody nad korunou přelivu. Používejte <a href="Weir-Flow-Simple.php">Jednoduchý Přeliv</a> pro rovnoměrnou korunu nebo <a href="Weir-Flow-Irregular.php">Nepravidelný Přeliv</a> pro profilovanou nebo stupňovitou korunu.</dd><dt>Hlavní šoupě nebo trubní výpust</dt><dd>Změřte nadmořskou výšku hladiny v horní a dolní vodě (nebo výšku dna při volném výtoku). Používejte <a href="Orifice.php">Průtok Otvorem</a>. Pro kruhovou trubku D = průměr trubky; pro obdélníkové šoupě zadejte šířku W a výšku D.</dd><dt>Doba vyprázdnění nádrže nebo rybníka</dt><dd>Použijte <a href="Orifice-Drain-Time.php">Dobu Vyprázdnění Otvorem</a> pro odhad doby potřebné ke snížení hladiny rybníka nebo nádrže přes spodní otvor — užitečné pro plánování závlahového zásobníku.</dd><dt>Terénní standardy</dt><dd>Rovnice průtoku přelivem a otvorem použité zde odpovídají postupům USBR <em>Water Measurement Manual</em> (3. vydání), které běžně vyžadují správci vod a závlahové obvody.</dd></dl>';
 // Drip / Sprinkler Application Rate
-$ec_lang['u_lph']="L/hr";
-$ec_lang['u_gph']="gal/hr";
-$ec_lang['u_mmph']="mm/hr";
-$ec_lang['u_inph']="in/hr";
 $ec_lang['ds_main_menu']='Kapková/postřiková závlaha — dávka vody';
 $ec_lang['ds_main_title']='Bezplatná online kalkulačka dávky vody kapkové/postřikové závlahy';
 $ec_lang['ds_main_desc']='Kapková a postřiková závlaha — dávka vody';
@@ -361,13 +370,14 @@ $ec_lang['ds_notes_1_term']='Dávka vody';
 $ec_lang['ds_notes_1_def']='PR = q / A<sub>e</sub>, kde A<sub>e</sub> = S<sub>e</sub> × S<sub>l</sub> je plocha zásobovaná každým emitorem. Nižší dávka vody poskytuje více času pro vsak — důležité na těžkých půdách nebo svažitých polích.';
 $ec_lang['ds_notes_2_term']='Doba závlahy';
 $ec_lang['ds_notes_2_def']='Doba závlahy = cílová hloubka ÷ dávka vody. Na svažitých nebo zhutnělých půdách rozdělte dobu závlahy do dvou nebo tří kratších cyklů s přestávkami, abyste se vyhnuli povrchovému odtoku.';
-
 // Canal Seepage / Conveyance Efficiency. Prefix cs_.
 $ec_lang['cs_main_menu']='Ztráty průsakem v kanálu';
 $ec_lang['cs_main_title']='Bezplatná online kalkulačka ztrát průsakem v kanálu a dopravní účinnosti';
 $ec_lang['cs_main_desc']='Ztráty průsakem v kanálu & Dopravní účinnost — Metoda přítok–odtok';
 $ec_lang['cs_Q_in']='Průtok na vtoku úseku, Q<sub>in</sub>';
 $ec_lang['cs_Q_out']='Průtok na výtoku úseku, Q<sub>out</sub>';
+$ec_lang['cs_L']='Délka úseku, L';
+$ec_lang['cs_wp']='Smočený obvod průřezu kanálu, P<sub>w</sub>';
 $ec_lang['cs_Q_loss']='Rychlost průsakové ztráty, Q<sub>loss</sub>';
 $ec_lang['cs_loss_check']='Kontrola měření';
 $ec_lang['cs_pct_loss']='Ztráta jako podíl přítoku';
@@ -375,8 +385,6 @@ $ec_lang['cs_Ec']='Dopravní účinnost, E<sub>c</sub>';
 $ec_lang['cs_Ec_check']='Hodnocení účinnosti';
 $ec_lang['cs_Vol_day']='Denní objem ztracený průsakem';
 $ec_lang['cs_Vol_year']='Roční objem ztracený průsakem';
-$ec_lang['cs_L']='Délka úseku, L';
-$ec_lang['cs_wp']='Smočený obvod průřezu kanálu, P<sub>w</sub>';
 $ec_lang['cs_Q_loss_per_L']='Průsaková ztráta na jednotku délky, Q<sub>loss</sub>/L';
 $ec_lang['cs_water_value']='Hodnota vody (měna / jednotku objemu)';
 $ec_lang['cs_lining_cost']='Náklady na zpevnění (měna / jednotku plochy)';
@@ -400,26 +408,26 @@ $ec_lang['cs_notes_3_term']='Návratnost zpevnění';
 $ec_lang['cs_notes_3_def']='Zadejte hodnotu vody a náklady na zpevnění v jakékoli konzistentní měně. Plocha zpevnění = délka úseku × smočený obvod — smočený obvod průřezu kanálu při měřené hloubce proudění (šířka dna plus oba smočené svahy). Roční získaná hodnota předpokládá, že zpevněný kanál trvale dosahuje cílové E<sub>c</sub>. Skutečná doba návratnosti bude delší pro sezónní kanály nebo pokud zpevnění nedosáhne cílové účinnosti.';
 $ec_lang['cs_notes_4_term']='Literatura';
 $ec_lang['cs_notes_4_def']='USBR <em>Water Measurement Manual</em>, 3. vyd. (2001). FAO Irrigation and Drainage Paper 57 (1999).';
-
-$ec_lang['irr_intro_html']='<p>Přelivy a otvory jsou standardní terénní nástroje pro měření průtoku vody v závlahových systémech. Vyberte kalkulačku odpovídající vaší konstrukci:</p>';
-$ec_lang['irr_card_weir_uniform_head']='Přeliv — Široká Koruna (Rovnoměrná Šířka)';
-$ec_lang['irr_card_weir_uniform_desc']='Měřte průtok přes korunu odvodňovacího jezu, kontrolního objektu nebo přelivné desky. Zadejte délku přelivu a hloubku vody nad korunou.';
-$ec_lang['irr_card_weir_irregular_head']='Přeliv — Nepravidelný Profil';
-$ec_lang['irr_card_weir_irregular_desc']='Použijte, když koruna přelivu není v jediné rovnoměrné výšce — přirozené bezpečnostní přelivy, stupně s proměnnou šířkou nebo vícesekční regulační objekty.';
-$ec_lang['irr_card_orifice_head']='Otvor — Hlavní Šoupě nebo Trubní Výpust';
-$ec_lang['irr_card_orifice_desc']='Měřte průtok skrze stavidlové šoupě, trubní výpust nebo otvor propustku. Automaticky zpracovává jak volný výtok, tak podmínky vzdutí (protitlak z dolní vody).';
-$ec_lang['irr_card_canal_head']='Návrh & Analýza Kanálu';
-$ec_lang['irr_card_canal_desc']='Navrhněte nebo ověřte závlahový kanál pomocí Manningova vzorce. Používejte lichoběžníkovou kalkulačku pro nové kanály; nepravidelnou kalkulačku pro stávající přirozené nebo vybudované průřezy.';
-$ec_lang['irr_card_drip_head']='Návrh Kapkové & Sprinklerové Závlahy';
-$ec_lang['irr_card_drip_desc']='Vypočítejte míru aplikace, rovnoměrnost distribuce, průtok větve, průtok zóny a dobu provozu pro kapkový nebo sprinklerový závlahový systém. Zadejte průtok emitoru, rozteč emitorů a cílovou hloubku.';
-$ec_lang['irr_card_seepage_head']='Průsak kanálu & Dopravní účinnost';
-$ec_lang['irr_card_seepage_desc']='Odhadněte průsakové ztráty z úseku kanálu pomocí měření přítoku a odtoku. Vypočítejte dopravní účinnost a roční ztrátu vody pro stanovení priorit investic do zpevnění kanálu.';
-$ec_lang['irr_quickref_html']='<h3>Rychlá Referenční Příručka</h3><dl><dt>Odvodňovací jez nebo kontrolní objekt</dt><dd>Změřte hloubku vody nad korunou přelivu. Používejte <a href="Weir-Flow-Simple.php">Jednoduchý Přeliv</a> pro rovnoměrnou korunu nebo <a href="Weir-Flow-Irregular.php">Nepravidelný Přeliv</a> pro profilovanou nebo stupňovitou korunu.</dd><dt>Hlavní šoupě nebo trubní výpust</dt><dd>Změřte nadmořskou výšku hladiny v horní a dolní vodě (nebo výšku dna při volném výtoku). Používejte <a href="Orifice.php">Průtok Otvorem</a>. Pro kruhovou trubku D = průměr trubky; pro obdélníkové šoupě zadejte šířku W a výšku D.</dd><dt>Doba vyprázdnění nádrže nebo rybníka</dt><dd>Použijte <a href="Orifice-Drain-Time.php">Dobu Vyprázdnění Otvorem</a> pro odhad doby potřebné ke snížení hladiny rybníka nebo nádrže přes spodní otvor — užitečné pro plánování závlahového zásobníku.</dd><dt>Terénní standardy</dt><dd>Rovnice průtoku přelivem a otvorem použité zde odpovídají postupům USBR <em>Water Measurement Manual</em> (3. vydání), které běžně vyžadují správci vod a závlahové obvody.</dd></dl>';
+// About
+$ec_lang['about_main_menu']='O nás';
+$ec_lang['install_main_menu']='Nainstalovat';
+$ec_lang['install_main_title']='Nainstalovat EngCalcs';
+$ec_lang['install_main_desc']='Přidejte si na zařízení pro offline použití';
+$ec_lang['contact_main_menu']='Kontakt';
+$ec_lang['about_main_title']='O kalkulátorech HawsEDC';
+$ec_lang['about_main_desc']='Poslání, open source a přispívání';
 $ec_lang['about_body_html']='<h3>Poslání</h3><p>Inženýrské Kalkulačky HawsEDC existují, aby sloužily inženýrům a terénním pracovníkům po celém světě — zejména těm, kteří pracují v oblastech s nedostatkem vody, omezenými zdroji nebo nedostatečným zásobením. Tyto nástroje jsou součástí širšího humanitárního poslání: říci každému člověku co nejpraktičtějším a nejúčinnějším způsobem, že je navždy milován a ceněn, že se nemá čeho bát a že nezkazí všechno.</p><p>Kalkulačky jsou prostředkem. Cílem je svět bez utrpení.</p><h3>Licence s Otevřeným Zdrojovým Kódem</h3><p>Veškerý kód je vydán pod <a target="_blank" href="https://www.gnu.org/licenses/gpl-3.0.html">GNU General Public License v3.0 nebo novější</a> — svobodný ve smyslu svobody. Kód můžete za stejných podmínek používat, studovat, upravovat a šířit dál.</p><p>Copyright © 2009–2026 Thomas Gail Haws.</p><h3>Zdrojový Kód</h3><p>Úplný zdrojový kód je veřejně dostupný na Bitbucket:</p><p><a target="_blank" href="https://bitbucket.org/hawstom/engcalcs">bitbucket.org/hawstom/engcalcs</a></p><p>Tam si můžete prohlédnout kód, nahlásit problémy nebo forknout repozitář.</p><h3>Příspěvky</h3><p>Pull requesty jsou vítány. Způsoby přispění:</p><ul><li><strong>Překlady</strong> — vylepšete nebo přidejte jazyk. Otevřete pull request se změnami v příslušném souboru <code>lib/lang.ec.??.php</code>.</li><li><strong>Hlášení chyb</strong> — použijte formulář zpětné vazby na libovolné stránce kalkulačky nebo nahlaste problém na Bitbucket.</li><li><strong>Nové kalkulačky</strong> — nápady na hydraulicko-inženýrské nástroje sloužící terénním pracovníkům a odborníkům na závlahy jsou zvláště vítány. Viz příručka pro vývojáře <code>CLAUDE.md</code> v repozitáři.</li><li><strong>Hosting</strong> — pokud můžete tuto kalkulačku zrcadlit pro oblast s omezeným připojením, obraťte se na nás.</li></ul><h3>Offline použití</h3><p>Tyto kalkulačky fungují jako progresivní webová aplikace (PWA). Navštivte jakoukoli stránku kalkulačky při připojeném internetu a váš prohlížeč automaticky uloží všechny kalkulačky do mezipaměti. Poté všechny kalkulačky fungují offline — bez potřeby internetu.</p><p>Na Androidu nebo iOS použijte možnost „Přidat na domovskou obrazovku" v prohlížeči a nainstalujte EngCalcs jako aplikaci do svého zařízení. Na počítači hledejte ikonu instalace v adresním řádku prohlížeče.</p><p>Libovolnou kalkulačku můžete také uložit pomocí nabídky „Uložit jako…" ve svém prohlížeči pro jednorázové offline použití.</p><h3>Kontakt</h3><p>Tom Haws — hydraulický inženýr a autor těchto kalkulaček.<br />Použijte formulář zpětné vazby na libovolné stránce kalkulačky nebo přistupte ke zdrojovému kódu na <a target="_blank" href="https://bitbucket.org/hawstom/engcalcs">Bitbucket</a>.</p>';
-
+$ec_lang['contact_title']='Kontakt HawsEDC';
+$ec_lang['contactSendMessage']='Pošlete zprávu Tomu Hawsovi';
+$ec_lang['contactYourName']='Vaše jméno:';
+$ec_lang['contactYourEmail']='Vaše e-mailová adresa:';
+$ec_lang['contactSubject']='Předmět:';
+$ec_lang['contact_message']='Zpráva:';
+$ec_lang['contactSpamPrefix']='Pět plus jedna se rovná';
+$ec_lang['contactSpamPostfix']='(Prosím napište anglicky slovy. 1=one 2=two 3=three 4=four 5=five 6=six 7=seven +=plus 5+1=6)';
+$ec_lang['contactSubmitButton']='Odeslat zprávu';
+$ec_lang['contact_success']='Děkujeme za váš čas věnovaný napsání.';
 // Rock Chute Design (Robinson, Rice & Kadavy 1998). Prefix rc_.
-$ec_lang['u_m2ps']='m^2/s';
-$ec_lang['u_ft2ps']='cfs/ft';
 $ec_lang['rc_main_menu']='Návrh Kamenného Skluzu (Robinson)';
 $ec_lang['rc_main_title']='Bezplatná Online Kalkulačka Návrhu Kamenného Skluzu — Robinson (1998)';
 $ec_lang['rc_main_desc']='Dimenzování Záhozu Kamenného Skluzu — Robinson, Rice & Kadavy (1998)';
@@ -475,20 +483,3 @@ $ec_lang['rc_sketch_filter']          = 'Filtr';
 $ec_lang['rc_sketch_top_crest_curve'] = 'Vrcholový oblouk';
 $ec_lang['rc_sketch_outlet_apron']    = 'Výtokový práh';
 $ec_lang['rc_sketch_radius']          = 'poloměr';
-
-// Manning Trapezoid — velocity check
-$ec_lang['mtc_vel_check']='Kontrola rychlosti';
-$ec_lang['mtc_vel_ok']='Rychlost přiměřená pro předpoklady rovnoměrného proudění.';
-$ec_lang['mtc_vel_high']='Rychlost vysoká — zkontrolujte ztráty na přechodech a dostupnou energii.';
-$ec_lang['mtc_vel_low']='Rychlost nízká — riziko sedimentace.';
-$ec_lang['mtc_vel_ok_short']='OK';
-$ec_lang['mtc_vel_high_short']='Vysoká';
-$ec_lang['mtc_vel_low_short']='Nízká';
-$ec_lang['mtc_note_2_term']='Kontrola rychlosti';
-$ec_lang['mtc_note_2_def']='Vysoká rychlost znamená vysokou specifickou energii z dostupného spádu. Tato energie může být rychle ztracena na rozšířeních, obloucích nebo překážkách. Ověřte, zda je to pro danou lokalitu přiměřené.';
-
-// Micro-Hydro Power — notes 6 and 7
-$ec_lang['mhp_notes_6_term']='Účinnost';
-$ec_lang['mhp_notes_6_def']='Typická účinnost elektrárny &eta; se pohybuje od 0,70 do 0,85 pro Peltonovy a příčné turbíny běžné v mikro-vodní energetice. Jako konzervativní první odhad použijte hodnotu 0,75.';
-$ec_lang['mhp_notes_7_term']='Roční výroba energie';
-$ec_lang['mhp_notes_7_def']='Roční výroba energie předpokládá nepřetržitý provoz při plném průtoku (8760 hodin/rok). Skutečná výroba bude nižší z důvodu sezónní variability průtoku, prostojů při údržbě a faktoru zatížení.';

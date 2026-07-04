@@ -2,99 +2,6 @@
 
 // All missing text declarations will fall back to English.
 
-$ec_lang['u_acft']="ac-ft";
-$ec_lang['u_ft3']="ft^3";
-$ec_lang['u_m3']="m^3";
-$ec_lang['u_kw']='kW';
-$ec_lang['u_mw']='MW';
-$ec_lang['u_kwh_yr']='kWh/yr';
-$ec_lang['u_mwh_yr']='MWh/yr';
-$ec_lang['u_hp']='hp';
-
-// Page text
-// Note: In the process of rearranging the language variables into page order for easier maintenance.
-// Manning Pipe Flow
-$ec_lang['mpf_main_menu']='Протицај у цевима по Manningu';
-$ec_lang['mpf_main_title']='Бесплатни онлајн калкулатор протицаја у цевима по Manningu';
-$ec_lang['mpf_main_desc']='Манингова формула равномерног тецања у цевима при задатом паду и дубини';
-$ec_lang['mpf_pipe_diameter']='Prečnik cevi, d<sub>0</sub>';
-$ec_lang['mpf_manningRoughness']='Manningov koeficijent hrapavosti, n';
-$ec_lang['mpf_friction_slope']='Linijski gubitak pritiska (moguće <a target="_blank" href="../pressureslope.php">?</a> jednak nagibu cijevi), S<sub>0</sub>';
-$ec_lang['mpf_depth_ratio']='Udeo ispunjenosti cevi (u % visine prečnika)';
-$ec_lang['mpf_flow']='Проток, q';
-$ec_lang['mpf_velocity']='Tečenja, v';
-$ec_lang['mpf_velocity_head']='Energija tečenja, h<sub>v</sub>';
-$ec_lang['mpf_flow_area']='Površina preseka';
-$ec_lang['mpf_wetted_perimeter']='Okvašeni obim, O';
-$ec_lang['mpf_hydraulic_radius']='Hidraulički radijus, R';
-$ec_lang['mpf_top_width']='Najveća širina, T';
-$ec_lang['mpf_froude_number']='Frudov broj, F';
-$ec_lang['mpf_shear_stress']='Napon smicanja average (vučna sila), tau';
-$ec_lang['mpf_solve_for_dd0']='Израчунај y/d<sub>0</sub> за дато Q';
-$ec_lang['mpf_solve_desc']='Користећи D<sub>0</sub>, n и S<sub>0</sub> из формулара калкулатора, проналази најмањи y/d<sub>0</sub> за дато Q.';
-$ec_lang['mpf_solve_button']='Израчунај';
-// Orifice Flow
-$ec_lang['or_main_menu']='Протицај кроз отвор';
-$ec_lang['or_main_title']='Бесплатни онлајн калкулатор протицаја кроз отвор';
-$ec_lang['or_main_desc']='Протицај кроз отвор — Слободан или потопљен';
-$ec_lang['or_shape']='Облик отвора';
-$ec_lang['or_shape_circular']='Кружни';
-$ec_lang['or_shape_rectangular']='Правоугаони';
-$ec_lang['or_diameter']='Пречник или висина, D <span title="Diameter for circular; height for rectangular" class="ec-tip">?</span>';
-$ec_lang['or_width']='Ширина, W <span title="Rectangular openings only" class="ec-tip">?</span>';
-$ec_lang['or_invert']='Кота дна отвора <span title="Bottom of opening" class="ec-tip">?</span>';
-$ec_lang['or_hwe']='Кота узводног нивоа воде';
-$ec_lang['or_twe']='Кота низводног нивоа воде';
-$ec_lang['or_cd']='Коефицијент протицаја, C<sub>d</sub>';
-$ec_lang['or_centroid_elev']='Кота тежишта';
-$ec_lang['or_head']='Ефективна висина, h';
-$ec_lang['or_area']='Површина отвора, A';
-$ec_lang['or_flow']='Проток, Q';
-$ec_lang['or_velocity']='Брзина, v';
-$ec_lang['or_regime']='Провера режима отвора';
-$ec_lang['or_regime_valid']='Слободно истицање — режим отвора валидан ✓';
-$ec_lang['or_regime_submerged']='Потопљен отвор (TWE изнад тежишта) — валидно ✓';
-$ec_lang['or_regime_warn']='Упозорење: узводни ниво испод темена — није режим отвора';
-$ec_lang['or_regime_twe_above_hwe']='Упозорење: низводни ниво (TWE) изнад узводног нивоа (HWE) — проверите улазне вредности';
-$ec_lang['or_notes_1_term']='Једначина отвора';
-$ec_lang['or_notes_1_def']='Q = C<sub>d</sub> × A × √(2gh). Слободно истицање: h = HWE − тежиште. Потопљени (TWE изнад дна): h = HWE − TWE.';
-$ec_lang['or_notes_2_term']='Режим отвора';
-$ec_lang['or_notes_2_def']='Једначине протицаја кроз отвор примењују се када је узводни ниво изнад темена отвора. Када је испод темена, користите једначину прелива.';
-$ec_lang['or_notes_3_term']='Коефицијент протицаја';
-$ec_lang['or_notes_3_def']='C<sub>d</sub> је приближно 0,60–0,65 за оштроивичне отворе. Заобљени или увучени улази имају различите вредности. Погледајте <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venture-d_590.html">Engineering Toolbox</a> или HEC-RAS Хидраулички приручник.';
-$ec_lang['or_notes_4_term']='Потапање';
-$ec_lang['or_notes_4_def']='Када је TWE изнад дна отвора, калкулатор аутоматски примењује једначину потопљеног отвора са h = HWE − TWE. Када је TWE на нивоу или испод дна, претпоставља се слободно истицање и h = HWE − тежиште.';
-
-// Orifice Drain Time
-$ec_lang['odt_main_menu']='Време пражњења кроз отвор';
-$ec_lang['odt_main_title']='Бесплатни онлајн калкулатор времена пражњења кроз отвор — Акумулација, базен или резервоар';
-$ec_lang['odt_main_desc']='Време пражњења акумулације или базена кроз отвор — Метод конусне запремине';
-$ec_lang['odt_h1_elev']='Почетна кота нивоа воде <span title="Starting water surface elevation" class="ec-tip">?</span>';
-$ec_lang['odt_a1']='Почетна површина, A<sub>1</sub>';
-$ec_lang['odt_h2_elev']='Завршна кота нивоа воде';
-$ec_lang['odt_h_orifice']='Кота тежишта отвора';
-$ec_lang['odt_a0']='Површина на отвору, A<sub>0</sub>';
-$ec_lang['odt_a_ending']='Завршна површина, A<sub>2</sub> <span title="Interpolated from conic model at ending elevation" class="ec-tip">?</span>';
-$ec_lang['odt_h2_check']='Провера завршне коте';
-$ec_lang['odt_h2_ok']='Завршна кота изнад врха отвора ✓';
-$ec_lang['odt_h2_warn']='Упозорење: завршна кота на нивоу или испод врха отвора (тежиште + D/2)';
-$ec_lang['odt_d']='Пречник отвора, D <span title="Diameter (circular) or height (rectangular)" class="ec-tip">?</span>';
-$ec_lang['odt_w']='Ширина отвора, W <span title="Rectangular only" class="ec-tip">?</span>';
-$ec_lang['odt_t_sec']='Време пражњења (s)';
-$ec_lang['odt_t_min']='Време пражњења (min)';
-$ec_lang['odt_t_hr']='Време пражњења (hr)';
-$ec_lang['odt_t_day']='Време пражњења (days)';
-$ec_lang['odt_notes_1_term']='Формула';
-$ec_lang['odt_notes_1_def']='t = √H<sub>1</sub> / (C<sub>d</sub> A<sub>or</sub> √(2g)) × (2A<sub>x</sub>/5 + 8√(A<sub>x</sub>A<sub>0</sub>)/15 + 16A<sub>0</sub>/15) даје време пражњења од висине H до отвора. Време пражњења = t(H<sub>1</sub>,A<sub>1</sub>,A<sub>0</sub>) − t(H<sub>2</sub>,A<sub>2</sub>,A<sub>0</sub>), где је H<sub>1</sub> = почетна кота − кота отвора, H<sub>2</sub> = завршна кота − кота отвора.';
-$ec_lang['odt_notes_2_term']='Метод';
-$ec_lang['odt_notes_2_def']='Метод конусне запремине моделује акумулацију или базен као конусни пресек између почетне површине A<sub>1</sub> на почетном нивоу воде и површине A<sub>0</sub> на коти тежишта отвора. A<sub>2</sub>, површина акумулације на завршној коти, интерполује се из A<sub>1</sub> и A<sub>0</sub> помоћу модела конусног пресека. Време пражњења од почетне до завршне коте једнако је укупном времену пражњења од H<sub>1</sub> до отвора умањеном за преостало време пражњења од H<sub>2</sub> до отвора.';
-$ec_lang['odt_h1']='Почетни напор, H<sub>1</sub> <span title="Starting WSE minus orifice centroid elevation" class="ec-tip">?</span>';
-$ec_lang['odt_q_max']='Максимални протицај, Q<sub>max</sub>';
-$ec_lang['odt_vol']='Испражњена запремина';
-$ec_lang['odt_sketch_start']='Почетак';
-$ec_lang['odt_sketch_end']='Крај';
-
-// Units
 $ec_lang['u_depthFrac']='разломак';
 $ec_lang['u_depthPercent']='%';
 $ec_lang['u_ft2']='ft^2';
@@ -127,6 +34,23 @@ $ec_lang['u_pa']='Pa';
 $ec_lang['u_psf']='psf';
 $ec_lang['u_psi']='psi';
 $ec_lang['u_s']='sec';
+$ec_lang['u_lph']="L/hr";
+$ec_lang['u_gph']="gal/hr";
+$ec_lang['u_mmph']="mm/hr";
+$ec_lang['u_inph']="in/hr";
+$ec_lang['u_acft']="ac-ft";
+$ec_lang['u_ft3']="ft^3";
+$ec_lang['u_m3']="m^3";
+$ec_lang['u_kw']='kW';
+$ec_lang['u_mw']='MW';
+$ec_lang['u_kwh_yr']='kWh/yr';
+$ec_lang['u_mwh_yr']='MWh/yr';
+$ec_lang['u_hp']='hp';
+$ec_lang['u_m2ps']='m^2/s';
+$ec_lang['u_ft2ps']='cfs/ft';
+
+// Page text
+// In page order for easiest maintenance.
 // Menu and General
 $ec_lang['menu_brand']='HawsEDC Калкулатори';
 $ec_lang['menu_main_list']='Листа калкулатора';
@@ -140,6 +64,10 @@ $ec_lang['template_printable_title']='Наслов за штампу';
 $ec_lang['template_printable_subtitle']='Поднаслов за штампу';
 $ec_lang['index_title']='Бесплатни онлајн инжењерски калкулатори';
 $ec_lang['calc_set_units']='Подеси јединице:';
+$ec_lang['points_data_help']='(или Копирај/Налепи помоћу поља за податке)';
+$ec_lang['points_data_title']='Подаци тачака<br />(одвојени зарезом или табулатором)';
+$ec_lang['points_data_copy']='Копирај';
+$ec_lang['points_data_paste']='Налепи';
 $ec_lang['calc_inputs']='Улазне вредности';
 $ec_lang['calc_results']='Резултати';
 $ec_lang['view_hide_line']='[Сакриј овај ред]';
@@ -147,11 +75,7 @@ $ec_lang['view_printable']='Верзија за штампу (освежите �
 $ec_lang['ec_name_label']='Сачувајте овај прорачун:';
 $ec_lang['ec_name_placeholder']='Назив';
 $ec_lang['ec_name_hint']='Чува унете вредности у URL адресу за обележавање, преузимање из историје и дељење';
-$ec_lang['points_data_help']='(или Копирај/Налепи помоћу поља за податке)';
-$ec_lang['points_data_title']='Подаци тачака<br />(одвојени зарезом или табулатором)';
-$ec_lang['points_data_copy']='Копирај';
-$ec_lang['points_data_paste']='Налепи';
-// Darcy-Weisbach
+// Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Губитак напора у цевима по Darcy-Weisbachу';
 $ec_lang['dw_main_title']='Бесплатни онлајн калкулатор губитка напора у цевима по Darcy-Weisbachу';
 $ec_lang['dw_main_desc']='Губитак напора у цевима по Darcy-Weisbachу при задатом пречнику, храпавости и протицају';
@@ -164,7 +88,7 @@ $ec_lang['dw_regime_transitional']='прелазно';
 $ec_lang['dw_regime_turbulent']='турбулентно';
 $ec_lang['dw_friction_factor_method']='Метод фактора трења';
 $ec_lang['dw_friction_factor']='Фактор трења, f';
-// Hazen-Williams
+// Hazen-Williams. See mphl_ for missing text.
 $ec_lang['hw_main_menu']='Губитак напора у цевима по Hazen-Williamsu';
 $ec_lang['hw_main_title']='Бесплатни онлајн калкулатор губитка напора у цевима по Hazen-Williamsu';
 $ec_lang['hw_main_desc']='Губитак напора у цевима по Hazen-Williamsu при задатом пречнику, храпавости и протицају';
@@ -201,15 +125,34 @@ $ec_lang['mi_notes_1_term']='Композитни n';
 $ec_lang['mi_notes_1_def']='Овај калкулатор прати HEC-RAS Референтни приручник у израчунавању композитног n регије помоћу Chow 1959, страна 136, једначина 6-17 (не 6-18).';
 $ec_lang['mi_notes_2_term']='Каменa облога';
 $ec_lang['mi_notes_2_def']='Користите калкулатор трапезног канала по Manningu за пројектовање каменe облоге. Овај калкулатор је примереnији за природне пресеке.';
-// Manning Pipe Flow extras
+// Manning Pipe Flow
+$ec_lang['mpf_main_menu']='Протицај у цевима по Manningu';
+$ec_lang['mpf_main_title']='Бесплатни онлајн калкулатор протицаја у цевима по Manningu';
+$ec_lang['mpf_main_desc']='Манингова формула равномерног тецања у цевима при задатом паду и дубини';
+$ec_lang['mpf_spreadheet_notice']='Погледајте верзију овог калкулатора у облику табеле';
+$ec_lang['mpf_pipe_diameter']='Prečnik cevi, d<sub>0</sub>';
+$ec_lang['mpf_manningRoughness']='Manningov koeficijent hrapavosti, n';
+$ec_lang['mpf_friction_slope']='Linijski gubitak pritiska (moguće <a target="_blank" href="../pressureslope.php">?</a> jednak nagibu cijevi), S<sub>0</sub>';
+$ec_lang['mpf_depth_ratio']='Udeo ispunjenosti cevi (u % visine prečnika)';
 $ec_lang['mpf_see_notes']='(Погледај напомене)';
+$ec_lang['mpf_flow']='Проток, q';
+$ec_lang['mpf_velocity']='Tečenja, v';
+$ec_lang['mpf_velocity_head']='Energija tečenja, h<sub>v</sub>';
+$ec_lang['mpf_flow_area']='Površina preseka';
 $ec_lang['mpf_pipe_area']='Површина цеви, a0';
 $ec_lang['mpf_area_ratio']='Релативна површина, a/a0';
+$ec_lang['mpf_wetted_perimeter']='Okvašeni obim, O';
+$ec_lang['mpf_hydraulic_radius']='Hidraulički radijus, R';
+$ec_lang['mpf_top_width']='Najveća širina, T';
+$ec_lang['mpf_froude_number']='Frudov broj, F';
+$ec_lang['mpf_shear_stress']='Napon smicanja average (vučna sila), tau';
 $ec_lang['mpf_full_flow']='Пуни протицај, Q0';
 $ec_lang['mpf_full_flow_ratio']='Однос према пуном протицају, Q/Q0';
 $ec_lang['mpf_note_1']='<dl><dt>Ово је протицај и дубина унутар <em>бесконачно дугачке</em> цеви.</dt><dd>За унос воде у цев може бити потребна знатно већа дубина нивоа воде. Додајте најмање 1,5 пута енергетску висину брзине да бисте добили дубину нивоа воде или <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">погледајте мој 2-минутни туторијал</a> за стандардна израчунавања нивоа воде на пропусту помоћу HY-8.</dd>';
-$ec_lang['mpf_spreadheet_notice']='Погледајте верзију овог калкулатора у облику табеле';
-// Manning Pipe Head Loss
+$ec_lang['mpf_solve_for_dd0']='Израчунај y/d<sub>0</sub> за дато Q';
+$ec_lang['mpf_solve_desc']='Користећи D<sub>0</sub>, n и S<sub>0</sub> из формулара калкулатора, проналази најмањи y/d<sub>0</sub> за дато Q.';
+$ec_lang['mpf_solve_button']='Израчунај';
+// Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Губитак напора у цевима по Manningu';
 $ec_lang['mphl_main_title']='Бесплатни онлајн калкулатор губитка напора у цевима по Manningu';
 $ec_lang['mphl_main_desc']='Манингова формула губитка напора при пуном протицају';
@@ -224,7 +167,7 @@ $ec_lang['mphl_egl_1']='Низводна EGL';
 $ec_lang['mphl_egl_2']='Узводна EGL';
 $ec_lang['mphl_hgl_2']='Узводна HGL у цеви ' . $ec_lang['mpf_see_notes'];
 $ec_lang['mphl_note_1']='<dl><dt>За услов отвореног улаза (пропуст), неопходно је проверити услове контроле улаза.</dt><dd>1. Узводна HGL не може бити нижа од узводне коте нормалног тецања (нити нижа од цеви!).</dd><dd>2. Ниво воде на пропусту боље је представити узводном EGL него узводном HGL.</dd><dd>3. Погледајте <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">мој 2-минутни туторијал</a> заједноставна стандардна израчунавања нивоа воде на пропусту помоћу HY-8.</dd>';
-// Manning Trapezoidal Channel
+// Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Манингов трапезни канал';
 $ec_lang['mtc_main_title']='Бесплатни онлајн калкулатор трапезног канала по Манинговој формули';
 $ec_lang['mtc_main_desc']='Манингова формула равномерног тецања у трапезном каналу при задатом паду и дубини';
@@ -245,8 +188,16 @@ $ec_lang['mtc_d50_z1']='Потребна величина угаоног кам�
 $ec_lang['mtc_d50_z2']='Потребна величина угаоног камена бочне стране 2, D50 (Isbash & MC) <span title="По Isbashu (1936) и округу Maricopa, Аризона, САД." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['mtc_d50_mra']='Потребна величина угаоног камена, D50 (Maynord, Ruff и Abt 1989)';
 $ec_lang['mtc_d50_searcy']='Потребна величина угаоног камена, D50 (Searcy 1967)';
+$ec_lang['mtc_vel_check']='Провера брзине';
+$ec_lang['mtc_vel_ok']='Брзина прихватљива за претпоставке равномерног тецања.';
+$ec_lang['mtc_vel_high']='Брзина висока — проверите губитке при преласку и расположиву енергију.';
+$ec_lang['mtc_vel_low']='Брзина ниска — ризик таложења наноса.';
+$ec_lang['mtc_vel_ok_short']='У реду';
+$ec_lang['mtc_vel_high_short']='Висока';
+$ec_lang['mtc_vel_low_short']='Ниска';
 $ec_lang['mtc_note_1']='<dl><dt>Аутоматска итерација пројектовања величине камена и храпавости</dt><dd>Изаберите радио дугме за храпавост (препоручује се BB) и радио дугме за пројектовану величину камена (препоручује се Isbash). Финим подешавањем дубине и фактора сигурности величине камена добијте жељени протицај са заокруженом величином камена. Свако промену улазне вредности покреће следећи итерациони циклус: 1. Храпавост се израчунава из пројектоване величине камена. 2. Израчунавање тражене храпавости копира се у улазну храпавост. 3. Израчунавају се протицај у каналу и потребна величина камена. 4. Пројектована величина камена се подешава. 5. Понавља се до врло малe грешке у пројектованoj величини камена.</dd><dt>Основни калкулатор (без итерације)</dt><dd>Унесите жељену вредност храпавости. Занемарите поље за унос пројектоване величине камена.</dd></dl>';
-// Robinson Rock Chute
+$ec_lang['mtc_note_2_term']='Провера брзине';
+$ec_lang['mtc_note_2_def']='Висока брзина подразумева велику специфичну енергију услед расположивог пада. Та енергија може се брзо изгубити на ширењима, луковима или препрекама. Проверите да ли је то прихватљиво за дато место.';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='Протицај преко прелива (просто)';
 $ec_lang['ws_main_title']='Бесплатни онлајн калкулатор протицаја преко ширококрунског прелива';
@@ -256,7 +207,7 @@ $ec_lang['ws_headWaterHeight']='Висина узводног нивоа вод�
 $ec_lang['ws_weirCoefficient']='Коефицијент прелива, Cw';
 $ec_lang['ws_notes_heading']='Напомене';
 $ec_lang['ws_notes_we_term']='Једначина прелива';
-// Weir Flow Irregular
+// Weir Flow Irregular. See ws_ for missing text.
 $ec_lang['wi_menu']='Протицај преко неправилног прелива';
 $ec_lang['wi_main_title']='Бесплатни онлајн калкулатор протицаја преко сегментираног неправилног прелива са променљивом дубином';
 $ec_lang['wi_main_desc']='Калкулатор протицаја преко неправилног прелива';
@@ -270,28 +221,37 @@ $ec_lang['wi_cumulativeFlow']='Кумулативни протицај';
 $ec_lang['wi_save_and_calculate']='Сачувај и израчунај';
 $ec_lang['wi_notes_we_term']='Једначина прелива';
 $ec_lang['wi_notes_we_def']='q = ако (дужина = 0) онда 0 иначе ако (нагиб=0) онда cw*дужина*d<sub>0</sub><sup>1.5</sup> иначе cw/(2.5*нагиб) * (d<sub>0</sub><sup>2.5</sup> - d<sub>1</sub><sup>2.5</sup>) где су d<sub>1</sub> и d<sub>0</sub> увек позитивни или нула';
-// Erosion Setback and Scour
-$ec_lang['essc_btbw']='Ширина од обале до обале';
-$ec_lang['essc_mcr']='Минимални полупречник кривине';
-$ec_lang['essc_q']='Проток, Q';
-// Contact
-
-// Irrigation
-$ec_lang['irr_main_menu']='Мерење протока наводњавања';
-$ec_lang['irr_main_title']='Бесплатни онлајн калкулатори за мерење протока наводњавања';
-$ec_lang['irr_main_desc']='Мерење протока наводњавања — преливи и отвори';
-$ec_lang['contact_title']='HawsEDC Контакт';
-$ec_lang['contactSendMessage']='Пошаљите поруку Тому Хоусу';
-$ec_lang['contactYourName']='Ваше име:';
-$ec_lang['contactYourEmail']='Ваша е-маил адреса:';
-$ec_lang['contactSubject']='Предмет:';
-$ec_lang['contact_message']='Порука:';
-$ec_lang['contactSpamPrefix']='Пет плус један је';
-$ec_lang['contactSpamPostfix']='(Молимо вас напишите речима. 1=jedan 2=dva 3=tri 4=četiri 5=pet 6=šest 7=sedam +=plus 5+1=6)';
-$ec_lang['contactSubmitButton']='Пошаљи поруку';
-$ec_lang['contact_success']='Хвала вам што сте одвојили време да напишете.';
-
-
+// Orifice Flow
+$ec_lang['or_main_menu']='Протицај кроз отвор';
+$ec_lang['or_main_title']='Бесплатни онлајн калкулатор протицаја кроз отвор';
+$ec_lang['or_main_desc']='Протицај кроз отвор — Слободан или потопљен';
+$ec_lang['or_shape']='Облик отвора';
+$ec_lang['or_shape_circular']='Кружни';
+$ec_lang['or_shape_rectangular']='Правоугаони';
+$ec_lang['or_diameter']='Пречник или висина, D <span title="Diameter for circular; height for rectangular" class="ec-tip">?</span>';
+$ec_lang['or_width']='Ширина, W <span title="Rectangular openings only" class="ec-tip">?</span>';
+$ec_lang['or_invert']='Кота дна отвора <span title="Bottom of opening" class="ec-tip">?</span>';
+$ec_lang['or_hwe']='Кота узводног нивоа воде';
+$ec_lang['or_twe']='Кота низводног нивоа воде';
+$ec_lang['or_cd']='Коефицијент протицаја, C<sub>d</sub>';
+$ec_lang['or_centroid_elev']='Кота тежишта';
+$ec_lang['or_head']='Ефективна висина, h';
+$ec_lang['or_area']='Површина отвора, A';
+$ec_lang['or_flow']='Проток, Q';
+$ec_lang['or_velocity']='Брзина, v';
+$ec_lang['or_regime']='Провера режима отвора';
+$ec_lang['or_regime_valid']='Слободно истицање — режим отвора валидан ✓';
+$ec_lang['or_regime_submerged']='Потопљен отвор (TWE изнад тежишта) — валидно ✓';
+$ec_lang['or_regime_warn']='Упозорење: узводни ниво испод темена — није режим отвора';
+$ec_lang['or_regime_twe_above_hwe']='Упозорење: низводни ниво (TWE) изнад узводног нивоа (HWE) — проверите улазне вредности';
+$ec_lang['or_notes_1_term']='Једначина отвора';
+$ec_lang['or_notes_1_def']='Q = C<sub>d</sub> × A × √(2gh). Слободно истицање: h = HWE − тежиште. Потопљени (TWE изнад дна): h = HWE − TWE.';
+$ec_lang['or_notes_2_term']='Режим отвора';
+$ec_lang['or_notes_2_def']='Једначине протицаја кроз отвор примењују се када је узводни ниво изнад темена отвора. Када је испод темена, користите једначину прелива.';
+$ec_lang['or_notes_3_term']='Коефицијент протицаја';
+$ec_lang['or_notes_3_def']='C<sub>d</sub> је приближно 0,60–0,65 за оштроивичне отворе. Заобљени или увучени улази имају различите вредности. Погледајте <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venture-d_590.html">Engineering Toolbox</a> или HEC-RAS Хидраулички приручник.';
+$ec_lang['or_notes_4_term']='Потапање';
+$ec_lang['or_notes_4_def']='Када је TWE изнад дна отвора, калкулатор аутоматски примењује једначину потопљеног отвора са h = HWE − TWE. Када је TWE на нивоу или испод дна, претпоставља се слободно истицање и h = HWE − тежиште.';
 // Micro-Hydro Power
 $ec_lang['mhp_main_menu']='Мала хидроелектрана';
 $ec_lang['mhp_main_title']='Бесплатни онлајн калкулатор за малу хидроелектрану';
@@ -315,11 +275,11 @@ $ec_lang['mhp_hnet']='Нето напор, H<sub>net</sub>';
 $ec_lang['mhp_power']='Излазна снага, P';
 $ec_lang['mhp_annual_kwh']='Годишња енергија при 100% капацитета';
 $ec_lang['mhp_vel_ok']='1–3 м/с — у циљном опсегу ✓';
-$ec_lang['mhp_vel_ok_short']='У реду';
 $ec_lang['mhp_vel_low']='Брзина ниска — ризик од таложења наноса и увлачења ваздуха.';
-$ec_lang['mhp_vel_low_short']='Ниска';
 $ec_lang['mhp_vel_high']='Брзина висока — ризик од водног удара и локалних губитака.';
+$ec_lang['mhp_vel_ok_short']='У реду';
 $ec_lang['mhp_vel_high_short']='Висока';
+$ec_lang['mhp_vel_low_short']='Ниска';
 $ec_lang['mhp_hl_ok']='у оквиру циља 10% ✓';
 $ec_lang['mhp_hl_warn']='прелази циљ 10% — размотрите шири цевовод ⚠';
 $ec_lang['mhp_hl_bad']='прелази 20% — редимензионишите цевовод';
@@ -333,21 +293,64 @@ $ec_lang['mhp_notes_4_term']='Локални губици k<sub>m</sub>';
 $ec_lang['mhp_notes_4_def']='Типичне вредности: оштри улаз 0.5, свако колено 45° између 0.2–0.3, засун (потпуно отворен) 0.1, лептирасти вентил 0.2. Збир свих фитинга даје укупни k<sub>m</sub>. Подразумевана вредност 1.5 претпоставља један улаз и два колена.';
 $ec_lang['mhp_notes_5_term']='Храпавост цеви e';
 $ec_lang['mhp_notes_5_def']='Типична апсолутна храпавост: челик (нов) 0.046 мм, челик (половни) 0.15 мм, HDPE 0.003 мм, PVC/uPVC 0.0015 мм, бетон 0.3–3 мм. HDPE је уобичајен за мале доводне цевоводе мало-хидро система.';
+$ec_lang['mhp_notes_6_term']='Ефикасност';
+$ec_lang['mhp_notes_6_def']='Типична ефикасност постројења &eta; износи 0.70 до 0.85 за Pelton и попречне турбине уобичајене у мало-хидро системима. Користите 0.75 као конзервативну прву процену.';
+$ec_lang['mhp_notes_7_term']='Годишња енергија';
+$ec_lang['mhp_notes_7_def']='Годишња енергија претпоставља непрекидан рад при пуном протоку (8760 сати/годишње). Стварна производња биће нижа услед сезонских варијација протока, застоја ради одржавања и фактора оптерећења.';
 
-// About
-$ec_lang['about_main_menu']='О нама';
-$ec_lang['install_main_menu']='Инсталирај';
-$ec_lang['install_main_title']='Инсталирај EngCalcs';
-$ec_lang['install_main_desc']='Додај на уређај за коришћење без интернета';
-$ec_lang['contact_main_menu']='Контакт';
-$ec_lang['about_main_title']='О инжењерским калкулаторима HawsEDC';
-$ec_lang['about_main_desc']='Мисија, отворени код и доприноси';
+// Orifice Drain Time
+$ec_lang['odt_main_menu']='Време пражњења кроз отвор';
+$ec_lang['odt_main_title']='Бесплатни онлајн калкулатор времена пражњења кроз отвор — Акумулација, базен или резервоар';
+$ec_lang['odt_main_desc']='Време пражњења акумулације или базена кроз отвор — Метод конусне запремине';
+$ec_lang['odt_h1_elev']='Почетна кота нивоа воде <span title="Starting water surface elevation" class="ec-tip">?</span>';
+$ec_lang['odt_a1']='Почетна површина, A<sub>1</sub>';
+$ec_lang['odt_h2_elev']='Завршна кота нивоа воде';
+$ec_lang['odt_h_orifice']='Кота тежишта отвора';
+$ec_lang['odt_a0']='Површина на отвору, A<sub>0</sub>';
+$ec_lang['odt_a_ending']='Завршна површина, A<sub>2</sub> <span title="Interpolated from conic model at ending elevation" class="ec-tip">?</span>';
+$ec_lang['odt_h2_check']='Провера завршне коте';
+$ec_lang['odt_h2_ok']='Завршна кота изнад врха отвора ✓';
+$ec_lang['odt_h2_warn']='Упозорење: завршна кота на нивоу или испод врха отвора (тежиште + D/2)';
+$ec_lang['odt_d']='Пречник отвора, D <span title="Diameter (circular) or height (rectangular)" class="ec-tip">?</span>';
+$ec_lang['odt_w']='Ширина отвора, W <span title="Rectangular only" class="ec-tip">?</span>';
+$ec_lang['odt_t_sec']='Време пражњења (s)';
+$ec_lang['odt_t_min']='Време пражњења (min)';
+$ec_lang['odt_t_hr']='Време пражњења (hr)';
+$ec_lang['odt_t_day']='Време пражњења (days)';
+$ec_lang['odt_notes_1_term']='Формула';
+$ec_lang['odt_notes_1_def']='t = √H<sub>1</sub> / (C<sub>d</sub> A<sub>or</sub> √(2g)) × (2A<sub>x</sub>/5 + 8√(A<sub>x</sub>A<sub>0</sub>)/15 + 16A<sub>0</sub>/15) даје време пражњења од висине H до отвора. Време пражњења = t(H<sub>1</sub>,A<sub>1</sub>,A<sub>0</sub>) − t(H<sub>2</sub>,A<sub>2</sub>,A<sub>0</sub>), где је H<sub>1</sub> = почетна кота − кота отвора, H<sub>2</sub> = завршна кота − кота отвора.';
+$ec_lang['odt_notes_2_term']='Метод';
+$ec_lang['odt_notes_2_def']='Метод конусне запремине моделује акумулацију или базен као конусни пресек између почетне површине A<sub>1</sub> на почетном нивоу воде и површине A<sub>0</sub> на коти тежишта отвора. A<sub>2</sub>, површина акумулације на завршној коти, интерполује се из A<sub>1</sub> и A<sub>0</sub> помоћу модела конусног пресека. Време пражњења од почетне до завршне коте једнако је укупном времену пражњења од H<sub>1</sub> до отвора умањеном за преостало време пражњења од H<sub>2</sub> до отвора.';
+$ec_lang['odt_h1']='Почетни напор, H<sub>1</sub> <span title="Starting WSE minus orifice centroid elevation" class="ec-tip">?</span>';
+$ec_lang['odt_q_max']='Максимални протицај, Q<sub>max</sub>';
+$ec_lang['odt_vol']='Испражњена запремина';
+$ec_lang['odt_sketch_start']='Почетак';
+$ec_lang['odt_sketch_end']='Крај';
+// Erosion Setback and Scour Calc.
+$ec_lang['essc_btbw']='Ширина од обале до обале';
+$ec_lang['essc_mcr']='Минимални полупречник кривине';
+$ec_lang['essc_q']='Проток, Q';
+// Contact us.
 
+// Irrigation
+$ec_lang['irr_main_menu']='Мерење протока наводњавања';
+$ec_lang['irr_main_title']='Бесплатни онлајн калкулатори за мерење протока наводњавања';
+$ec_lang['irr_main_desc']='Мерење протока наводњавања — преливи и отвори';
+$ec_lang['irr_intro_html']='<p>Преливи и отвори су стандардни теренски алати за мерење протока воде у системима за наводњавање. Изаберите калкулатор који одговара вашој конструкцији:</p>';
+$ec_lang['irr_card_weir_uniform_head']='Прелив — Широка Круна (Равномерна Ширина)';
+$ec_lang['irr_card_weir_uniform_desc']='Измерите проток преко круне одводне бране, контролне грађевине или таблице прелива. Унесите дужину прелива и дубину воде изнад круне.';
+$ec_lang['irr_card_weir_irregular_head']='Прелив — Неправилни Профил';
+$ec_lang['irr_card_weir_irregular_desc']='Користите када круна прелива није на јединствeној равномерној котe — природни преливи, грађевине пада с променљивом ширином или вишеделне регулационе грађевине.';
+$ec_lang['irr_card_orifice_head']='Отвор — Главна Шустерна или Цевни Испуст';
+$ec_lang['irr_card_orifice_desc']='Измерите проток кроз шустерну, цевни испуст или отвор пропуста. Аутоматски обрађује и слободно истицање и потопљене услове (противпритисак са низводне стране).';
+$ec_lang['irr_card_canal_head']='Пројектовање & Анализа Канала';
+$ec_lang['irr_card_canal_desc']='Пројектујте или проверите канал за наводњавање помоћу Манингове формуле. Користите трапезни калкулатор за нове канале; калкулатор за неправилне пресеке за постојеће природне или изграђене пресеке.';
+$ec_lang['irr_card_drip_head']='Пројектовање Капљичног & Спринклерског Наводњавања';
+$ec_lang['irr_card_drip_desc']='Израчунајте норму наводњавања, равномерност расподеле, проток бочне гране, проток зоне и трајање рада за систем капљичног или спринклерског наводњавања. Унесите проток емитера, размак емитера и циљну дубину.';
+$ec_lang['irr_card_seepage_head']='Просипање из канала & ефикасност транспорта';
+$ec_lang['irr_card_seepage_desc']='Процените губитак воде просипањем из деонице канала помоћу мерења притицаја и отицаја. Израчунајте ефикасност транспорта и годишњи губитак воде ради утврђивања приоритета за улагање у облогу.';
+$ec_lang['irr_quickref_html']='<h3>Брзи Водич</h3><dl><dt>Одводна брана или контролна грађевина</dt><dd>Измерите дубину воде изнад круне прелива. Користите <a href="Weir-Flow-Simple.php">Прости Прелив</a> за равномерну круну или <a href="Weir-Flow-Irregular.php">Неправилни Прелив</a> за профилисану или степенасту круну.</dd><dt>Главна шустерна или цевни испуст</dt><dd>Измерите котe воде узводно и низводно (или коту дна при слободном истицању). Користите <a href="Orifice.php">Проток кроз Отвор</a>. За кружну цев D = пречник цеви; за правоугаону шустерну унесите ширину W и висину D.</dd><dt>Време пражњења акумулације или рибњака</dt><dd>Користите <a href="Orifice-Drain-Time.php">Трајање Пражњења кроз Отвор</a> за процену колико траје спуштање нивоа рибњака или акумулације кроз донски отвор — корисно за планирање навоодњавачке акумулације.</dd><dt>Теренски стандарди</dt><dd>Једначине протока прелива и отвора коришћене овде одговарају процедурама USBR <em>Water Measurement Manual</em> (3. изд.), које обично захтевају управници вода и наводњавачки окрузи.</dd></dl>';
 // Drip / Sprinkler Application Rate
-$ec_lang['u_lph']="L/hr";
-$ec_lang['u_gph']="gal/hr";
-$ec_lang['u_mmph']="mm/hr";
-$ec_lang['u_inph']="in/hr";
 $ec_lang['ds_main_menu']='Norma navodnjavanja — kap po kap/orošavanje';
 $ec_lang['ds_main_title']='Besplatni online kalkulator norme navodnjavanja kapanjem/orošavanjem';
 $ec_lang['ds_main_desc']='Navodnjavanje kap po kap i orošavanje — norma navodnjavanja';
@@ -366,13 +369,14 @@ $ec_lang['ds_notes_1_term']='Norma navodnjavanja';
 $ec_lang['ds_notes_1_def']='PR = q / A<sub>e</sub>, gde je A<sub>e</sub> = S<sub>e</sub> × S<sub>l</sub> površina koju opsluži svaki emiter. Niža norma navodnjavanja daje više vremena za infiltraciju — važno na teškim zemljištima ili nagnutim njivama.';
 $ec_lang['ds_notes_2_term']='Trajanje navodnjavanja';
 $ec_lang['ds_notes_2_def']='Trajanje navodnjavanja = ciljna dubina ÷ norma navodnjavanja. Na nagnutom ili zbijenom zemljištu podelite trajanje u dva ili tri kraća ciklusa sa pauzama između njih kako biste izbegli površinsko oticanje.';
-
 // Canal Seepage / Conveyance Efficiency. Prefix cs_.
 $ec_lang['cs_main_menu']='Губитак воде у каналу (Просипање)';
 $ec_lang['cs_main_title']='Бесплатни онлајн калкулатор губитка воде у каналу и ефикасности транспорта';
 $ec_lang['cs_main_desc']='Губитак воде у каналу & ефикасност транспорта — метода мерења притицаја и отицаја';
 $ec_lang['cs_Q_in']='Притицај, Q<sub>in</sub>';
 $ec_lang['cs_Q_out']='Отицај, Q<sub>out</sub>';
+$ec_lang['cs_L']='Дужина деонице, L';
+$ec_lang['cs_wp']='Оквашени обим, P<sub>w</sub>';
 $ec_lang['cs_Q_loss']='Стопа губитка просипањем, Q<sub>loss</sub>';
 $ec_lang['cs_loss_check']='Провера мерења';
 $ec_lang['cs_pct_loss']='Удео губитка';
@@ -380,8 +384,6 @@ $ec_lang['cs_Ec']='Ефикасност транспорта, E<sub>c</sub>';
 $ec_lang['cs_Ec_check']='Оцена ефикасности';
 $ec_lang['cs_Vol_day']='Дневни изгубљени обим воде';
 $ec_lang['cs_Vol_year']='Годишњи изгубљени обим воде';
-$ec_lang['cs_L']='Дужина деонице, L';
-$ec_lang['cs_wp']='Оквашени обим, P<sub>w</sub>';
 $ec_lang['cs_Q_loss_per_L']='Губитак по јединици дужине, Q<sub>loss</sub>/L';
 $ec_lang['cs_water_value']='Вредност воде';
 $ec_lang['cs_lining_cost']='Трошак облога';
@@ -405,26 +407,26 @@ $ec_lang['cs_notes_3_term']='Амортизација облога';
 $ec_lang['cs_notes_3_def']='Унесите вредност воде и трошак облога у любој конзистентној валути. Површина облога = дужина деонице × оквашени обим — оквашени обим попречног пресека канала на измереној дубини тока (ширина дна плус оба оквашена нагиба). Годишња вредност опорављена претпоставља да облога канала достигне циљну E<sub>c</sub> континуирано. Стварна амортизација биће дужа за сезонске канале или ако облога не достигне циљну ефикасност.';
 $ec_lang['cs_notes_4_term']='Извор';
 $ec_lang['cs_notes_4_def']='USBR <em>Water Measurement Manual</em>, 3. изд. (2001). FAO Irrigation and Drainage Paper 57 (1999).';
-
-$ec_lang['irr_intro_html']='<p>Преливи и отвори су стандардни теренски алати за мерење протока воде у системима за наводњавање. Изаберите калкулатор који одговара вашој конструкцији:</p>';
-$ec_lang['irr_card_weir_uniform_head']='Прелив — Широка Круна (Равномерна Ширина)';
-$ec_lang['irr_card_weir_uniform_desc']='Измерите проток преко круне одводне бране, контролне грађевине или таблице прелива. Унесите дужину прелива и дубину воде изнад круне.';
-$ec_lang['irr_card_weir_irregular_head']='Прелив — Неправилни Профил';
-$ec_lang['irr_card_weir_irregular_desc']='Користите када круна прелива није на јединствeној равномерној котe — природни преливи, грађевине пада с променљивом ширином или вишеделне регулационе грађевине.';
-$ec_lang['irr_card_orifice_head']='Отвор — Главна Шустерна или Цевни Испуст';
-$ec_lang['irr_card_orifice_desc']='Измерите проток кроз шустерну, цевни испуст или отвор пропуста. Аутоматски обрађује и слободно истицање и потопљене услове (противпритисак са низводне стране).';
-$ec_lang['irr_card_canal_head']='Пројектовање & Анализа Канала';
-$ec_lang['irr_card_canal_desc']='Пројектујте или проверите канал за наводњавање помоћу Манингове формуле. Користите трапезни калкулатор за нове канале; калкулатор за неправилне пресеке за постојеће природне или изграђене пресеке.';
-$ec_lang['irr_card_drip_head']='Пројектовање Капљичног & Спринклерског Наводњавања';
-$ec_lang['irr_card_drip_desc']='Израчунајте норму наводњавања, равномерност расподеле, проток бочне гране, проток зоне и трајање рада за систем капљичног или спринклерског наводњавања. Унесите проток емитера, размак емитера и циљну дубину.';
-$ec_lang['irr_card_seepage_head']='Просипање из канала & ефикасност транспорта';
-$ec_lang['irr_card_seepage_desc']='Процените губитак воде просипањем из деонице канала помоћу мерења притицаја и отицаја. Израчунајте ефикасност транспорта и годишњи губитак воде ради утврђивања приоритета за улагање у облогу.';
-$ec_lang['irr_quickref_html']='<h3>Брзи Водич</h3><dl><dt>Одводна брана или контролна грађевина</dt><dd>Измерите дубину воде изнад круне прелива. Користите <a href="Weir-Flow-Simple.php">Прости Прелив</a> за равномерну круну или <a href="Weir-Flow-Irregular.php">Неправилни Прелив</a> за профилисану или степенасту круну.</dd><dt>Главна шустерна или цевни испуст</dt><dd>Измерите котe воде узводно и низводно (или коту дна при слободном истицању). Користите <a href="Orifice.php">Проток кроз Отвор</a>. За кружну цев D = пречник цеви; за правоугаону шустерну унесите ширину W и висину D.</dd><dt>Време пражњења акумулације или рибњака</dt><dd>Користите <a href="Orifice-Drain-Time.php">Трајање Пражњења кроз Отвор</a> за процену колико траје спуштање нивоа рибњака или акумулације кроз донски отвор — корисно за планирање навоодњавачке акумулације.</dd><dt>Теренски стандарди</dt><dd>Једначине протока прелива и отвора коришћене овде одговарају процедурама USBR <em>Water Measurement Manual</em> (3. изд.), које обично захтевају управници вода и наводњавачки окрузи.</dd></dl>';
+// About
+$ec_lang['about_main_menu']='О нама';
+$ec_lang['install_main_menu']='Инсталирај';
+$ec_lang['install_main_title']='Инсталирај EngCalcs';
+$ec_lang['install_main_desc']='Додај на уређај за коришћење без интернета';
+$ec_lang['contact_main_menu']='Контакт';
+$ec_lang['about_main_title']='О инжењерским калкулаторима HawsEDC';
+$ec_lang['about_main_desc']='Мисија, отворени код и доприноси';
 $ec_lang['about_body_html']='<h3>Мисија</h3><p>Инжењерски Калкулатори HawsEDC постоје да служе инжењерима и теренским радницима широм света — посебно онима који раде у регионима са недостатком воде, ограниченим ресурсима или недовољном покривеношћу. Ови алати су део шире хуманитарне мисије: рећи сваком човеку на најпрактичнији и најефикаснији могући начин да је вољен и цењен заувек, да нема ничег чега треба да се боји и да неће упропастити све.</p><p>Калкулатори су средство. Циљ је свет без патње.</p><h3>Лиценца са Отвореним Изворним Кодом</h3><p>Сав код је објављен под <a target="_blank" href="https://www.gnu.org/licenses/gpl-3.0.html">GNU Општом Јавном Лиценцом v3.0 или новијом</a> — слободан у смислу слободе. Код можете користити, проучавати, мењати и даље дистрибуирати под истим условима.</p><p>Copyright © 2009–2026 Thomas Gail Haws.</p><h3>Изворни Код</h3><p>Пуни изворни код јавно је доступан на Bitbucket-у:</p><p><a target="_blank" href="https://bitbucket.org/hawstom/engcalcs">bitbucket.org/hawstom/engcalcs</a></p><p>Тамо можете прегледати код, пријавити проблеме или направити fork репозиторијума.</p><h3>Допринос</h3><p>Pull захтеви су добродошли. Начини доприноса:</p><ul><li><strong>Преводи</strong> — побољшајте или додајте језик. Отворите pull захтев са изменама у одговарајућем фајлу <code>lib/lang.ec.??.php</code>.</li><li><strong>Пријаве грешака</strong> — користите формулар за повратне информације на bilo kojoj stranici калкулатора или пријавите проблем на Bitbucket-у.</li><li><strong>Нови калкулатори</strong> — идеје за хидрауличко-инжењерске алате који служе теренским радницима и стручњацима за наводњавање посебно су добродошле. Погледајте развојни водич <code>CLAUDE.md</code> у репозиторијуму.</li><li><strong>Хостинг</strong> — ако можете да поставите огледало ових калкулатора за регион са ограниченом повезаношћу, јавите се.</li></ul><h3>Коришћење без интернета</h3><p>Ови калкулатори раде као прогресивна веб апликација (PWA). Посетите било коју страницу калкулатора dok сте повезани на интернет и ваш прегледач ће аутоматски сачувати све калкулаторе у кеш. Након тога, сви калкулатори раде без интернета — интернет није потребан.</p><p>На Android-у или iOS-у користите опцију „Додај на почетни екран" у прегледачу да бисте инсталирали EngCalcs као апликацију на свом уређају. На рачунару потражите икону за инсталацију у адресној траци прегледача.</p><p>Такође можете сачувати сваки калкулатор појединачно помоћу менија „Сачувај као…" у прегледачу за повремену употребу без интернета.</p><h3>Контакт</h3><p>Tom Haws — хидраулички инжењер и аутор ових калкулатора.<br />Користите формулар за повратне информације на bilo kojoj stranici калкулатора или приступите изворном коду на <a target="_blank" href="https://bitbucket.org/hawstom/engcalcs">Bitbucket-у</a>.</p>';
-
+$ec_lang['contact_title']='HawsEDC Контакт';
+$ec_lang['contactSendMessage']='Пошаљите поруку Тому Хоусу';
+$ec_lang['contactYourName']='Ваше име:';
+$ec_lang['contactYourEmail']='Ваша е-маил адреса:';
+$ec_lang['contactSubject']='Предмет:';
+$ec_lang['contact_message']='Порука:';
+$ec_lang['contactSpamPrefix']='Пет плус један је';
+$ec_lang['contactSpamPostfix']='(Молимо вас напишите речима. 1=jedan 2=dva 3=tri 4=četiri 5=pet 6=šest 7=sedam +=plus 5+1=6)';
+$ec_lang['contactSubmitButton']='Пошаљи поруку';
+$ec_lang['contact_success']='Хвала вам што сте одвојили време да напишете.';
 // Rock Chute Design (Robinson, Rice & Kadavy 1998). Prefix rc_.
-$ec_lang['u_m2ps']='m^2/s';
-$ec_lang['u_ft2ps']='cfs/ft';
 $ec_lang['rc_main_menu']='Пројектовање Каменог Брзотока (Robinson)';
 $ec_lang['rc_main_title']='Бесплатни Онлајн Калкулатор за Пројектовање Каменог Брзотока — Robinson (1998)';
 $ec_lang['rc_main_desc']='Димензионисање Каменог Поплочавања за Брзоток — Robinson, Rice & Kadavy (1998)';
@@ -480,20 +482,3 @@ $ec_lang['rc_sketch_filter']          = 'Филтер';
 $ec_lang['rc_sketch_top_crest_curve'] = 'Улазна кривина';
 $ec_lang['rc_sketch_outlet_apron']    = 'Излазна плоча';
 $ec_lang['rc_sketch_radius']          = 'полупречник';
-
-// Manning Trapezoidal Channel — velocity check (added 2026-06)
-$ec_lang['mtc_vel_check']='Провера брзине';
-$ec_lang['mtc_vel_ok']='Брзина прихватљива за претпоставке равномерног тецања.';
-$ec_lang['mtc_vel_ok_short']='У реду';
-$ec_lang['mtc_vel_high']='Брзина висока — проверите губитке при преласку и расположиву енергију.';
-$ec_lang['mtc_vel_high_short']='Висока';
-$ec_lang['mtc_vel_low']='Брзина ниска — ризик таложења наноса.';
-$ec_lang['mtc_vel_low_short']='Ниска';
-$ec_lang['mtc_note_2_term']='Провера брзине';
-$ec_lang['mtc_note_2_def']='Висока брзина подразумева велику специфичну енергију услед расположивог пада. Та енергија може се брзо изгубити на ширењима, луковима или препрекама. Проверите да ли је то прихватљиво за дато место.';
-
-// Micro-Hydro Power — efficiency and annual energy notes (added 2026-06)
-$ec_lang['mhp_notes_6_term']='Ефикасност';
-$ec_lang['mhp_notes_6_def']='Типична ефикасност постројења &eta; износи 0.70 до 0.85 за Pelton и попречне турбине уобичајене у мало-хидро системима. Користите 0.75 као конзервативну прву процену.';
-$ec_lang['mhp_notes_7_term']='Годишња енергија';
-$ec_lang['mhp_notes_7_def']='Годишња енергија претпоставља непрекидан рад при пуном протоку (8760 сати/годишње). Стварна производња биће нижа услед сезонских варијација протока, застоја ради одржавања и фактора оптерећења.';

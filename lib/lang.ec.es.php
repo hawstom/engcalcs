@@ -8,8 +8,8 @@ $ec_lang['u_depthFrac']="fracción";
 $ec_lang['u_depthPercent']="%";
 $ec_lang['u_ft2']="pies^2";
 $ec_lang['u_ft3ps']="pies^3/seg";
-$ec_lang['u_fth2o']="pies ca";
 $ec_lang['u_ft']="pies";
+$ec_lang['u_fth2o']="pies ca";
 $ec_lang['u_ftps']="pies/seg.";
 $ec_lang['u_gpm']="gal/min";
 $ec_lang['u_grade']="vert./horiz.";
@@ -36,6 +36,10 @@ $ec_lang['u_pa']="Pa";
 $ec_lang['u_psf']="lb/pie^2";
 $ec_lang['u_psi']="lb/pulg^2";
 $ec_lang['u_s']="seg";
+$ec_lang['u_lph']="L/hr";
+$ec_lang['u_gph']="gal/hr";
+$ec_lang['u_mmph']="mm/hr";
+$ec_lang['u_inph']="in/hr";
 $ec_lang['u_acft']="ac-ft";
 $ec_lang['u_ft3']="ft^3";
 $ec_lang['u_m3']="m^3";
@@ -44,9 +48,12 @@ $ec_lang['u_mw']='MW';
 $ec_lang['u_kwh_yr']='kWh/yr';
 $ec_lang['u_mwh_yr']='MWh/yr';
 $ec_lang['u_hp']='hp';
+$ec_lang['u_m2ps']='m^2/s';
+$ec_lang['u_ft2ps']='cfs/ft';
 
 // Page text
 // In page order for easiest maintenance.
+// Menu and General
 $ec_lang['menu_brand']='Calculadoras HawsEDC';
 $ec_lang['menu_main_list']='Lista de calculadoras';
 $ec_lang['menu_main_hydraulics']='Hidráulica';
@@ -87,6 +94,8 @@ $ec_lang['dw_friction_factor']='Factor de fricción, f';
 $ec_lang['hw_main_menu']='Pérdida de presión en una tubería según Hazen-Williams';
 $ec_lang['hw_main_title']='Calculadora gratis en línea de pérdida de presión en una tubería según Hazen-Williams';
 $ec_lang['hw_main_desc']='Calculadora de pérdida de presión en una tubería a partir de diámetro, rugosidad, y gasto según Hazen-Williams';
+$ec_lang['hw_hgl_1']='HGL aguas abajo';
+$ec_lang['hw_hgl_2']='HGL aguas arriba';
 $ec_lang['hw_roughness']='Coeficiente de Hazen-Williams, C';
 // Manning Irregular
 $ec_lang['mi_menu']='Canal irregular según Manning';
@@ -95,15 +104,24 @@ $ec_lang['mi_main_desc']='Calculadora de un canal irregular con flujo uniforme s
 $ec_lang['mi_waterSurfaceElevation']='Altura de la lámina libre';
 $ec_lang['mi_q_617']='Q por sumación de regiones con n compuesto según Chow 6-17 velocidades iguales';
 $ec_lang['mi_xSecPoints']='Puntos de la sección traversal';
+$ec_lang['mi_groupPoint']='Punto';
+$ec_lang['mi_groupSegment']='Segmento';
+$ec_lang['mi_groupRegion']='Región';
 $ec_lang['mi_station']='Dist.';
 $ec_lang['mi_elevation']='Alt.';
+$ec_lang['mi_d50in']='Diam.<br />mediano<br />de la<br />roca';
 $ec_lang['mi_n']='n<br />del seg-<br />mento';
 $ec_lang['mi_is_bank']='Div. de<br />regiónes<br />R<sub>h</sub>y Q<br />(Banco)';
-$ec_lang['mi_t']='T';
 $ec_lang['mi_tau']='Fza. tang.<br />τ';
-$ec_lang['mi_a']='A';
+$ec_lang['mi_t']='T';
 $ec_lang['mi_pw']='P<sub>w</sub>';
+$ec_lang['mi_a']='A';
 $ec_lang['mi_rh']='R<sub>h</sub>';
+$ec_lang['mi_n617']='n<br />compuesto';
+$ec_lang['mi_v617']='v';
+$ec_lang['mi_fr617']='Fr';
+$ec_lang['mi_hv617']='H<sub>v</sub>';
+$ec_lang['mi_q617']='Q';
 $ec_lang['mi_notes']='Notas';
 $ec_lang['mi_notes_1_term']='Métodos de calcular Q';
 $ec_lang['mi_notes_1_def']='Q por sumación de segmentos estima por bajo la contribución friccional de segmentos con alto pendiente traversal. Q por sumación de regiones con n compuesto estima por alto el efecto de la fricción en áreas anchas de poca profundidad en el flujo en áreas más profundas (canal primario).';
@@ -118,6 +136,7 @@ $ec_lang['mpf_pipe_diameter']='Diámetro de la tubería, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Rugosidad según Manning, n';
 $ec_lang['mpf_friction_slope']='Pendiente hidráulica (o quizás <a target="_blank" href="/pressureslope.php">?</a> de la tubería), S<sub>0</sub>';
 $ec_lang['mpf_depth_ratio']='Relación de calados, y/d<sub>0</sub>';
+$ec_lang['mpf_see_notes']='(Véanse las notas)';
 $ec_lang['mpf_flow']='Caudal, q';
 $ec_lang['mpf_velocity']='Velocidad, v';
 $ec_lang['mpf_velocity_head']='Energía cinética, hv';
@@ -148,8 +167,8 @@ $ec_lang['mphl_junction_loss']='Pérdidas en las juntas';
 $ec_lang['mphl_total_loss']='Pérdida total';
 $ec_lang['mphl_egl_1']='EGL aguas abajo';
 $ec_lang['mphl_egl_2']='EGL aguas arriba';
-$ec_lang['mpf_see_notes']='(Véanse las notas)';
 $ec_lang['mphl_hgl_2']='HGL aguas arriba en la tubería ' . $ec_lang['mpf_see_notes'];
+$ec_lang['mphl_note_1']='<dl><dt>Para una entrada abierta (alcantarilla), es necesario verificar las condiciones de control de entrada.</dt><dd>1. El HGL aguas arriba no puede ser inferior a la cota de flujo a profundidad normal aguas arriba (ni inferior a la tubería).</dd><dd>2. El cabezal de una alcantarilla se representa mejor con el EGL aguas arriba que con el HGL aguas arriba.</dd><dd>3. Véase <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">mi tutorial de 2 minutos</a> para cálculos estándar de cabezal en alcantarillas usando HY-8.</dd>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Canal trapecial según Manning';
 $ec_lang['mtc_main_title']='Calculadora gratis en línea de la fórmula de Manning para canal trapecial';
@@ -162,11 +181,25 @@ $ec_lang['mtc_flow_depth']='Calado de la lámina de agua, y';
 $ec_lang['mtc_bend_angle']='Ángulo de la curva<a href="riprap-bend-angle.png" title="Haz clic para ver imagen">?</a> (para el tamaño de roca)';
 $ec_lang['mtc_sgrock']='Gravedad específica de la roca (2.65)';
 $ec_lang['mtc_d50_in']='Tamaño de roca';
+$ec_lang['mtc_n_strickler']='n para el tamaño de roca de diseño según Strickler';
+$ec_lang['mtc_n_blodgett']='n para el tamaño de roca de diseño según Blodgett';
+$ec_lang['mtc_n_bathurst']='n para el tamaño de roca de diseño según Bathurst';
+$ec_lang['mtc_blodgett_v_bathurst']='Blodgett vs. Bathurst';
 $ec_lang['mtc_d50_bottom']='Tamaño de roca requerido en el fondo, D<sub>50</sub>, Maricopa County <span title="Cuando S0 < 2% según Isbash (1936) and Maricopa County, Arizona, US. Cuando S >= 2% según Robinson Rock Chute " style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['mtc_d50_z1']='Tamaño de roca requerido en el lado 1, D<sub>50</sub>, Maricopa County <span title="Cuando S0 < 2% según Isbash (1936) and Maricopa County, Arizona, US. Cuando S >= 2% según Robinson Rock Chute " style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['mtc_d50_z2']='Tamaño de roca requerido en el lado 2, D<sub>50</sub>, Maricopa County <span title="Cuando S0 < 2% según Isbash (1936) and Maricopa County, Arizona, US. Cuando S >= 2% según Robinson Rock Chute " style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['mtc_d50_mra']='Tamaño de roca requerido, D<sub>50</sub>, según Maynord, Ruff, y Abt (1989)';
 $ec_lang['mtc_d50_searcy']='Tamaño de roca requerido, D<sub>50</sub>, según Searcy (1967)';
+$ec_lang['mtc_vel_check']='Verificación de velocidad';
+$ec_lang['mtc_vel_ok']='Velocidad razonable para supuestos de flujo uniforme.';
+$ec_lang['mtc_vel_high']='Velocidad elevada — verificar pérdidas de transición y energía disponible.';
+$ec_lang['mtc_vel_low']='Velocidad baja — riesgo de sedimentación.';
+$ec_lang['mtc_vel_ok_short']='OK';
+$ec_lang['mtc_vel_high_short']='Alto';
+$ec_lang['mtc_vel_low_short']='Bajo';
+$ec_lang['mtc_note_1']='<dl><dt>Iteración automática para diseño de tamaño y rugosidad de roca</dt><dd>Elija un botón de radio de rugosidad (se recomienda BB) y un botón de radio para el tamaño de roca de diseño (se recomienda Isbash). Ajuste la profundidad y el factor de seguridad del tamaño de roca para obtener el caudal deseado con un tamaño de roca uniforme. Cada vez que cambie cualquier valor de entrada, ocurre el siguiente ciclo de iteración: 1. Se calcula la rugosidad a partir del tamaño de roca de diseño. 2. El cálculo de rugosidad solicitado se copia al campo de rugosidad. 3. Se calculan el caudal del canal y el tamaño de roca requerido. 4. Se ajusta el tamaño de roca de diseño. 5. Se repite hasta que el error en el tamaño de roca de diseño sea muy pequeño.</dd><dt>Calculadora básica (sin iteración)</dt><dd>Ingrese el valor de rugosidad deseado. Ignore el área de entrada del tamaño de roca de diseño.</dd></dl>';
+$ec_lang['mtc_note_2_term']='Verificación de velocidad';
+$ec_lang['mtc_note_2_def']='La velocidad elevada implica alta energía específica a partir de una caída disponible. Esa energía puede disiparse rápidamente en expansiones, curvas u obstrucciones. Verifique que esto sea razonable para el sitio.';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='Vertedero hidráulico sencillo';
 $ec_lang['ws_main_title']='Calculadora de gasto en un vertedero hidráulico sencillo';
@@ -207,6 +240,7 @@ $ec_lang['or_centroid_elev']='Elevación del centroide';
 $ec_lang['or_head']='Carga efectiva, h';
 $ec_lang['or_area']='Área de la apertura, A';
 $ec_lang['or_flow']='Caudal, Q';
+$ec_lang['or_velocity']='Velocidad, v';
 $ec_lang['or_regime']='Verificación del régimen de orificio';
 $ec_lang['or_regime_valid']='Salida libre — régimen de orificio válido ✓';
 $ec_lang['or_regime_submerged']='Orificio sumergido (TWE sobre el centroide) — válido ✓';
@@ -220,80 +254,6 @@ $ec_lang['or_notes_3_term']='Coeficiente de descarga';
 $ec_lang['or_notes_3_def']='C<sub>d</sub> es aproximadamente 0,60–0,65 para orificios de borde agudo. Entradas redondeadas o reentrantes tienen valores diferentes. Consulte <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venture-d_590.html">Engineering Toolbox</a> o el Manual de Referencia Hidráulica de HEC-RAS.';
 $ec_lang['or_notes_4_term']='Sumersión';
 $ec_lang['or_notes_4_def']='Cuando TWE está sobre la solera de la apertura, la calculadora aplica automáticamente la ecuación de orificio sumergido con h = HWE − TWE. Cuando TWE es igual o inferior a la solera, se asume salida libre y h = HWE − centroide.';
-// Orifice Drain Time
-$ec_lang['odt_main_menu']='Tiempo de vaciado por orificio';
-$ec_lang['odt_main_title']='Calculadora gratuita en línea de tiempo de vaciado por orificio — Estanque, laguna o depósito';
-$ec_lang['odt_main_desc']='Tiempo de vaciado de estanque o laguna por orificio — Método del volumen cónico';
-$ec_lang['odt_h1_elev']='Cota inicial WSE <span title="Starting water surface elevation" class="ec-tip">?</span>';
-$ec_lang['odt_a1']='Área inicial, A<sub>1</sub>';
-$ec_lang['odt_h2_elev']='Cota final WSE';
-$ec_lang['odt_h_orifice']='Cota del centroide del orificio';
-$ec_lang['odt_a0']='Área a nivel orificio, A<sub>0</sub>';
-$ec_lang['odt_a_ending']='Área final, A<sub>2</sub> <span title="Interpolated from conic model at ending elevation" class="ec-tip">?</span>';
-$ec_lang['odt_h2_check']='Verificación de cota final';
-$ec_lang['odt_h2_ok']='Cota final sobre la cima del orificio ✓';
-$ec_lang['odt_h2_warn']='Advertencia: cota final igual o inferior a la cima del orificio (centroide + D/2)';
-$ec_lang['odt_d']='Orificio D <span title="Diameter (circular) or height (rectangular)" class="ec-tip">?</span>';
-$ec_lang['odt_w']='Ancho orificio, W <span title="Rectangular only" class="ec-tip">?</span>';
-$ec_lang['odt_t_sec']='Tiempo drenaje (s)';
-$ec_lang['odt_t_min']='Tiempo drenaje (min)';
-$ec_lang['odt_t_hr']='Tiempo drenaje (hr)';
-$ec_lang['odt_t_day']='Tiempo drenaje (days)';
-$ec_lang['odt_notes_1_term']='Fórmula';
-$ec_lang['odt_notes_1_def']='t = √H<sub>1</sub> / (C<sub>d</sub> A<sub>or</sub> √(2g)) × (2A<sub>x</sub>/5 + 8√(A<sub>x</sub>A<sub>0</sub>)/15 + 16A<sub>0</sub>/15) da el tiempo de vaciado desde la carga H hasta el orificio. Tiempo de vaciado = t(H<sub>1</sub>,A<sub>1</sub>,A<sub>0</sub>) − t(H<sub>2</sub>,A<sub>2</sub>,A<sub>0</sub>), donde H<sub>1</sub> = cota inicial − cota del orificio, H<sub>2</sub> = cota final − cota del orificio.';
-$ec_lang['odt_notes_2_term']='Método';
-$ec_lang['odt_notes_2_def']='El método del volumen cónico modela el estanque o laguna como una sección cónica entre el área inicial A<sub>1</sub> en la lámina de agua inicial y el área A<sub>0</sub> a la cota del centroide del orificio. A<sub>2</sub>, el área del estanque a la cota final, se interpola de A<sub>1</sub> y A<sub>0</sub> usando el modelo de sección cónica. El tiempo de vaciado desde la cota inicial hasta la final es igual al tiempo total de vaciado desde H<sub>1</sub> hasta el orificio menos el tiempo de vaciado restante desde H<sub>2</sub> hasta el orificio.';
-$ec_lang['odt_h1']='Carga inicial, H<sub>1</sub> <span title="Starting WSE minus orifice centroid elevation" class="ec-tip">?</span>';
-$ec_lang['odt_q_max']='Flujo máx, Q<sub>max</sub>';
-$ec_lang['odt_vol']='Volumen vaciado';
-$ec_lang['odt_sketch_start']='Inicio';
-$ec_lang['odt_sketch_end']='Fin';
-// Contact us.
-
-// Irrigation
-$ec_lang['irr_main_menu']='Medición de Caudal de Riego';
-$ec_lang['irr_main_title']='Calculadoras en línea gratuitas para la medición de caudal de riego';
-$ec_lang['irr_main_desc']='Medición de Caudal de Riego — Vertederos y Orificios';
-$ec_lang['contact_title']='Contacto con HawsEDC';
-$ec_lang['contactSendMessage']='Envíe un mensaje a Tom Haws';
-$ec_lang['contactYourName']='Su nombre:';
-$ec_lang['contactYourEmail']='Su dirección de correo electrónico:';
-$ec_lang['contactSubject']='Asunto:';
-$ec_lang['contact_message']='Mensaje:';
-$ec_lang['contactSpamPrefix']='Five (cinco) plus (y) one (uno) equals (son) ';
-$ec_lang['contactSpamPostfix']='(Favor de escribirla en inglés con letras. 1=one 2=two 3=three 4=four 5=five 6=six 7=seven +=plus 5+1=6)';
-$ec_lang['contactSubmitButton']='Enviar Mensaje';
-$ec_lang['contact_success']='Gracias por tomarse el tiempo para escribir.';
-// Erosion Setback and Scour Calc.
-$ec_lang['essc_btbw']='Ancho de orilla a orilla';
-$ec_lang['essc_mcr']='Radio mínimo de curvatura';
-$ec_lang['essc_q']='Caudal, Q';
-// Hazen-Williams HGL
-$ec_lang['hw_hgl_1']='HGL aguas abajo';
-$ec_lang['hw_hgl_2']='HGL aguas arriba';
-// Manning Irregular additional keys
-$ec_lang['mi_d50in']='Diam.<br />mediano<br />de la<br />roca';
-$ec_lang['mi_fr617']='Fr';
-$ec_lang['mi_groupPoint']='Punto';
-$ec_lang['mi_groupRegion']='Región';
-$ec_lang['mi_groupSegment']='Segmento';
-$ec_lang['mi_hv617']='H<sub>v</sub>';
-$ec_lang['mi_n617']='n<br />compuesto';
-$ec_lang['mi_q617']='Q';
-$ec_lang['mi_v617']='v';
-// Manning Pipe Head Loss note
-$ec_lang['mphl_note_1']='<dl><dt>Para una entrada abierta (alcantarilla), es necesario verificar las condiciones de control de entrada.</dt><dd>1. El HGL aguas arriba no puede ser inferior a la cota de flujo a profundidad normal aguas arriba (ni inferior a la tubería).</dd><dd>2. El cabezal de una alcantarilla se representa mejor con el EGL aguas arriba que con el HGL aguas arriba.</dd><dd>3. Véase <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">mi tutorial de 2 minutos</a> para cálculos estándar de cabezal en alcantarillas usando HY-8.</dd>';
-// Manning Trapezoidal Channel additional keys
-$ec_lang['mtc_blodgett_v_bathurst']='Blodgett vs. Bathurst';
-$ec_lang['mtc_n_bathurst']='n para el tamaño de roca de diseño según Bathurst';
-$ec_lang['mtc_n_blodgett']='n para el tamaño de roca de diseño según Blodgett';
-$ec_lang['mtc_n_strickler']='n para el tamaño de roca de diseño según Strickler';
-$ec_lang['mtc_note_1']='<dl><dt>Iteración automática para diseño de tamaño y rugosidad de roca</dt><dd>Elija un botón de radio de rugosidad (se recomienda BB) y un botón de radio para el tamaño de roca de diseño (se recomienda Isbash). Ajuste la profundidad y el factor de seguridad del tamaño de roca para obtener el caudal deseado con un tamaño de roca uniforme. Cada vez que cambie cualquier valor de entrada, ocurre el siguiente ciclo de iteración: 1. Se calcula la rugosidad a partir del tamaño de roca de diseño. 2. El cálculo de rugosidad solicitado se copia al campo de rugosidad. 3. Se calculan el caudal del canal y el tamaño de roca requerido. 4. Se ajusta el tamaño de roca de diseño. 5. Se repite hasta que el error en el tamaño de roca de diseño sea muy pequeño.</dd><dt>Calculadora básica (sin iteración)</dt><dd>Ingrese el valor de rugosidad deseado. Ignore el área de entrada del tamaño de roca de diseño.</dd></dl>';
-// Orifice Flow additional key
-$ec_lang['or_velocity']='Velocidad, v';
-// Robinson Rock Chute
-
-
 // Micro-Hydro Power
 $ec_lang['mhp_main_menu']='Micro-Hidroeléctrica';
 $ec_lang['mhp_main_title']='Calculadora Gratuita de Potencia Micro-Hidroeléctrica';
@@ -340,20 +300,59 @@ $ec_lang['mhp_notes_6_def']='El rendimiento típico de la instalación η varía
 $ec_lang['mhp_notes_7_term']='Energía Anual';
 $ec_lang['mhp_notes_7_def']='La energía anual supone operación continua a caudal completo (8760 horas/año). La producción real será menor debido a la variación estacional del caudal, paradas por mantenimiento y factor de carga.';
 
-// About
-$ec_lang['about_main_menu']='Acerca de';
-$ec_lang['install_main_menu']='Instalar';
-$ec_lang['install_main_title']='Instalar EngCalcs';
-$ec_lang['install_main_desc']='Agregar al dispositivo para uso sin conexión';
-$ec_lang['contact_main_menu']='Contacto';
-$ec_lang['about_main_title']='Acerca de las calculadoras de ingeniería HawsEDC';
-$ec_lang['about_main_desc']='Misión, código abierto y contribuciones';
+// Orifice Drain Time
+$ec_lang['odt_main_menu']='Tiempo de vaciado por orificio';
+$ec_lang['odt_main_title']='Calculadora gratuita en línea de tiempo de vaciado por orificio — Estanque, laguna o depósito';
+$ec_lang['odt_main_desc']='Tiempo de vaciado de estanque o laguna por orificio — Método del volumen cónico';
+$ec_lang['odt_h1_elev']='Cota inicial WSE <span title="Starting water surface elevation" class="ec-tip">?</span>';
+$ec_lang['odt_a1']='Área inicial, A<sub>1</sub>';
+$ec_lang['odt_h2_elev']='Cota final WSE';
+$ec_lang['odt_h_orifice']='Cota del centroide del orificio';
+$ec_lang['odt_a0']='Área a nivel orificio, A<sub>0</sub>';
+$ec_lang['odt_a_ending']='Área final, A<sub>2</sub> <span title="Interpolated from conic model at ending elevation" class="ec-tip">?</span>';
+$ec_lang['odt_h2_check']='Verificación de cota final';
+$ec_lang['odt_h2_ok']='Cota final sobre la cima del orificio ✓';
+$ec_lang['odt_h2_warn']='Advertencia: cota final igual o inferior a la cima del orificio (centroide + D/2)';
+$ec_lang['odt_d']='Orificio D <span title="Diameter (circular) or height (rectangular)" class="ec-tip">?</span>';
+$ec_lang['odt_w']='Ancho orificio, W <span title="Rectangular only" class="ec-tip">?</span>';
+$ec_lang['odt_t_sec']='Tiempo drenaje (s)';
+$ec_lang['odt_t_min']='Tiempo drenaje (min)';
+$ec_lang['odt_t_hr']='Tiempo drenaje (hr)';
+$ec_lang['odt_t_day']='Tiempo drenaje (days)';
+$ec_lang['odt_notes_1_term']='Fórmula';
+$ec_lang['odt_notes_1_def']='t = √H<sub>1</sub> / (C<sub>d</sub> A<sub>or</sub> √(2g)) × (2A<sub>x</sub>/5 + 8√(A<sub>x</sub>A<sub>0</sub>)/15 + 16A<sub>0</sub>/15) da el tiempo de vaciado desde la carga H hasta el orificio. Tiempo de vaciado = t(H<sub>1</sub>,A<sub>1</sub>,A<sub>0</sub>) − t(H<sub>2</sub>,A<sub>2</sub>,A<sub>0</sub>), donde H<sub>1</sub> = cota inicial − cota del orificio, H<sub>2</sub> = cota final − cota del orificio.';
+$ec_lang['odt_notes_2_term']='Método';
+$ec_lang['odt_notes_2_def']='El método del volumen cónico modela el estanque o laguna como una sección cónica entre el área inicial A<sub>1</sub> en la lámina de agua inicial y el área A<sub>0</sub> a la cota del centroide del orificio. A<sub>2</sub>, el área del estanque a la cota final, se interpola de A<sub>1</sub> y A<sub>0</sub> usando el modelo de sección cónica. El tiempo de vaciado desde la cota inicial hasta la final es igual al tiempo total de vaciado desde H<sub>1</sub> hasta el orificio menos el tiempo de vaciado restante desde H<sub>2</sub> hasta el orificio.';
+$ec_lang['odt_h1']='Carga inicial, H<sub>1</sub> <span title="Starting WSE minus orifice centroid elevation" class="ec-tip">?</span>';
+$ec_lang['odt_q_max']='Flujo máx, Q<sub>max</sub>';
+$ec_lang['odt_vol']='Volumen vaciado';
+$ec_lang['odt_sketch_start']='Inicio';
+$ec_lang['odt_sketch_end']='Fin';
+// Erosion Setback and Scour Calc.
+$ec_lang['essc_btbw']='Ancho de orilla a orilla';
+$ec_lang['essc_mcr']='Radio mínimo de curvatura';
+$ec_lang['essc_q']='Caudal, Q';
+// Contact us.
 
+// Irrigation
+$ec_lang['irr_main_menu']='Medición de Caudal de Riego';
+$ec_lang['irr_main_title']='Calculadoras en línea gratuitas para la medición de caudal de riego';
+$ec_lang['irr_main_desc']='Medición de Caudal de Riego — Vertederos y Orificios';
+$ec_lang['irr_intro_html']='<p>Los vertederos y orificios son las herramientas de campo estándar para medir el caudal en los sistemas de riego. Seleccione la calculadora que corresponde a su estructura:</p>';
+$ec_lang['irr_card_weir_uniform_head']='Vertedero — Cresta Ancha (Ancho Uniforme)';
+$ec_lang['irr_card_weir_uniform_desc']='Mida el caudal sobre una cresta de presa de desvío, estructura de control o tablero vertedor. Ingrese la longitud del vertedero y la profundidad del agua sobre la cresta.';
+$ec_lang['irr_card_weir_irregular_head']='Vertedero — Perfil Irregular';
+$ec_lang['irr_card_weir_irregular_desc']='Úselo cuando la cresta del vertedero no tenga una elevación uniforme única: aliviaderos naturales, estructuras de caída con ancho variable o estructuras de control de múltiples secciones.';
+$ec_lang['irr_card_orifice_head']='Orificio — Compuerta de Cabecera o Toma de Tubería';
+$ec_lang['irr_card_orifice_desc']='Mida el caudal a través de una compuerta deslizante, toma de tubería o abertura de alcantarilla. Maneja automáticamente tanto la descarga libre como las condiciones sumergidas (aguas abajo).';
+$ec_lang['irr_card_canal_head']='Diseño y Análisis de Canal';
+$ec_lang['irr_card_canal_desc']='Diseñe o verifique un canal de riego usando la fórmula de Manning. Use la calculadora Trapezoidal para canales nuevos; la calculadora Irregular para secciones naturales o construidas existentes.';
+$ec_lang['irr_card_drip_head']='Diseño de Goteo & Aspersión';
+$ec_lang['irr_card_drip_desc']='Calcule la tasa de aplicación, uniformidad de distribución, caudal lateral, caudal de zona y tiempo de funcionamiento para un sistema de riego por goteo o aspersión. Ingrese el caudal del emisor, el espaciado y la profundidad objetivo.';
+$ec_lang['irr_card_seepage_head']='Infiltración en Canales & Eficiencia de Conducción';
+$ec_lang['irr_card_seepage_desc']='Estime la pérdida por infiltración en un tramo de canal usando mediciones de gasto de entrada y salida. Calcule la eficiencia de conducción y la pérdida anual de agua para ayudar a priorizar inversiones en revestimiento.';
+$ec_lang['irr_quickref_html']='<h3>Referencia Rápida</h3><dl><dt>Presa de desvío o estructura de control</dt><dd>Mida la profundidad del agua sobre la cresta del vertedero. Use <a href="Weir-Flow-Simple.php">Vertedero Simple</a> para una cresta uniforme, o <a href="Weir-Flow-Irregular.php">Vertedero Irregular</a> para una cresta perfilada o escalonada.</dd><dt>Compuerta de cabecera o toma de tubería</dt><dd>Mida la elevación del agua aguas arriba y aguas abajo (o la cota de solera si descarga libremente). Use <a href="Orifice.php">Caudal por Orificio</a>. Para una tubería circular, D = diámetro de la tubería; para una compuerta rectangular, ingrese el ancho W y la altura D.</dd><dt>Tiempo de vaciado de embalse o estanque</dt><dd>Use <a href="Orifice-Drain-Time.php">Tiempo de Vaciado por Orificio</a> para estimar cuánto tiempo tarda en bajar el nivel de un estanque o embalse a través de un orificio en el fondo — útil para la planificación del almacenamiento de riego.</dd><dt>Estándares de campo</dt><dd>Las ecuaciones de caudal por vertedero y orificio usadas aquí corresponden a los procedimientos del <em>Manual de Medición de Agua</em> (3.ª ed.) del USBR, comúnmente requeridos por administradores de agua y distritos de riego.</dd></dl>';
 // Drip / Sprinkler Application Rate
-$ec_lang['u_lph']="L/hr";
-$ec_lang['u_gph']="gal/hr";
-$ec_lang['u_mmph']="mm/hr";
-$ec_lang['u_inph']="in/hr";
 $ec_lang['ds_main_menu']='Tasa de aplicación de riego por goteo/aspersión';
 $ec_lang['ds_main_title']='Calculadora gratuita en línea de tasa de aplicación de riego por goteo/aspersión';
 $ec_lang['ds_main_desc']='Riego por Goteo & Aspersión — Tasa de Aplicación';
@@ -372,13 +371,14 @@ $ec_lang['ds_notes_1_term']='Tasa de Aplicación';
 $ec_lang['ds_notes_1_def']='PR = q / A<sub>e</sub>, donde A<sub>e</sub> = S<sub>e</sub> × S<sub>l</sub> es el área servida por cada emisor. Una tasa de aplicación menor da más tiempo para la infiltración — importante en suelos pesados o campos con pendiente.';
 $ec_lang['ds_notes_2_term']='Tiempo de Riego';
 $ec_lang['ds_notes_2_def']='Tiempo de riego = lámina objetivo ÷ tasa de aplicación. En suelos con pendiente o compactados, divida el tiempo de riego en dos o tres ciclos más cortos con períodos de descanso entre ellos para evitar escorrentía superficial.';
-
 // Canal Seepage / Conveyance Efficiency. Prefix cs_.
 $ec_lang['cs_main_menu']='Pérdida por Infiltración en Canales';
 $ec_lang['cs_main_title']='Calculadora gratuita en línea de pérdida por infiltración y eficiencia de conducción en canales';
 $ec_lang['cs_main_desc']='Pérdida por Infiltración & Eficiencia de Conducción — Método Entrada-Salida';
 $ec_lang['cs_Q_in']='Entrada, Q<sub>in</sub>';
 $ec_lang['cs_Q_out']='Salida, Q<sub>out</sub>';
+$ec_lang['cs_L']='Longitud del tramo, L';
+$ec_lang['cs_wp']='Perímetro mojado, P<sub>w</sub>';
 $ec_lang['cs_Q_loss']='Tasa de pérdida por infiltración, Q<sub>loss</sub>';
 $ec_lang['cs_loss_check']='Verificación de medición';
 $ec_lang['cs_pct_loss']='Fracción perdida';
@@ -386,8 +386,6 @@ $ec_lang['cs_Ec']='Eficiencia de conducción, E<sub>c</sub>';
 $ec_lang['cs_Ec_check']='Clasificación de eficiencia';
 $ec_lang['cs_Vol_day']='Volumen perdido diario';
 $ec_lang['cs_Vol_year']='Volumen perdido anual';
-$ec_lang['cs_L']='Longitud del tramo, L';
-$ec_lang['cs_wp']='Perímetro mojado, P<sub>w</sub>';
 $ec_lang['cs_Q_loss_per_L']='Pérdida por longitud, Q<sub>loss</sub>/L';
 $ec_lang['cs_water_value']='Valor agua';
 $ec_lang['cs_lining_cost']='Costo revestimiento';
@@ -411,26 +409,26 @@ $ec_lang['cs_notes_3_term']='Recuperación por Revestimiento';
 $ec_lang['cs_notes_3_def']='Ingrese el valor del agua y el costo del revestimiento en cualquier moneda consistente. Área de revestimiento = longitud del tramo × perímetro mojado — el perímetro mojado de la sección transversal del canal a la profundidad de flujo medida (ancho de plantilla más ambas orillas mojadas). El valor anual recuperado supone que el canal revestido alcanza la E<sub>c</sub> objetivo de forma continua. El período de recuperación real será mayor en canales de uso estacional o si el revestimiento no alcanza la eficiencia objetivo.';
 $ec_lang['cs_notes_4_term']='Referencia';
 $ec_lang['cs_notes_4_def']='USBR <em>Water Measurement Manual</em>, 3.ª ed. (2001). FAO Irrigation and Drainage Paper 57 (1999).';
-
-$ec_lang['irr_intro_html']='<p>Los vertederos y orificios son las herramientas de campo estándar para medir el caudal en los sistemas de riego. Seleccione la calculadora que corresponde a su estructura:</p>';
-$ec_lang['irr_card_weir_uniform_head']='Vertedero — Cresta Ancha (Ancho Uniforme)';
-$ec_lang['irr_card_weir_uniform_desc']='Mida el caudal sobre una cresta de presa de desvío, estructura de control o tablero vertedor. Ingrese la longitud del vertedero y la profundidad del agua sobre la cresta.';
-$ec_lang['irr_card_weir_irregular_head']='Vertedero — Perfil Irregular';
-$ec_lang['irr_card_weir_irregular_desc']='Úselo cuando la cresta del vertedero no tenga una elevación uniforme única: aliviaderos naturales, estructuras de caída con ancho variable o estructuras de control de múltiples secciones.';
-$ec_lang['irr_card_orifice_head']='Orificio — Compuerta de Cabecera o Toma de Tubería';
-$ec_lang['irr_card_orifice_desc']='Mida el caudal a través de una compuerta deslizante, toma de tubería o abertura de alcantarilla. Maneja automáticamente tanto la descarga libre como las condiciones sumergidas (aguas abajo).';
-$ec_lang['irr_card_canal_head']='Diseño y Análisis de Canal';
-$ec_lang['irr_card_canal_desc']='Diseñe o verifique un canal de riego usando la fórmula de Manning. Use la calculadora Trapezoidal para canales nuevos; la calculadora Irregular para secciones naturales o construidas existentes.';
-$ec_lang['irr_card_drip_head']='Diseño de Goteo & Aspersión';
-$ec_lang['irr_card_drip_desc']='Calcule la tasa de aplicación, uniformidad de distribución, caudal lateral, caudal de zona y tiempo de funcionamiento para un sistema de riego por goteo o aspersión. Ingrese el caudal del emisor, el espaciado y la profundidad objetivo.';
-$ec_lang['irr_card_seepage_head']='Infiltración en Canales & Eficiencia de Conducción';
-$ec_lang['irr_card_seepage_desc']='Estime la pérdida por infiltración en un tramo de canal usando mediciones de gasto de entrada y salida. Calcule la eficiencia de conducción y la pérdida anual de agua para ayudar a priorizar inversiones en revestimiento.';
-$ec_lang['irr_quickref_html']='<h3>Referencia Rápida</h3><dl><dt>Presa de desvío o estructura de control</dt><dd>Mida la profundidad del agua sobre la cresta del vertedero. Use <a href="Weir-Flow-Simple.php">Vertedero Simple</a> para una cresta uniforme, o <a href="Weir-Flow-Irregular.php">Vertedero Irregular</a> para una cresta perfilada o escalonada.</dd><dt>Compuerta de cabecera o toma de tubería</dt><dd>Mida la elevación del agua aguas arriba y aguas abajo (o la cota de solera si descarga libremente). Use <a href="Orifice.php">Caudal por Orificio</a>. Para una tubería circular, D = diámetro de la tubería; para una compuerta rectangular, ingrese el ancho W y la altura D.</dd><dt>Tiempo de vaciado de embalse o estanque</dt><dd>Use <a href="Orifice-Drain-Time.php">Tiempo de Vaciado por Orificio</a> para estimar cuánto tiempo tarda en bajar el nivel de un estanque o embalse a través de un orificio en el fondo — útil para la planificación del almacenamiento de riego.</dd><dt>Estándares de campo</dt><dd>Las ecuaciones de caudal por vertedero y orificio usadas aquí corresponden a los procedimientos del <em>Manual de Medición de Agua</em> (3.ª ed.) del USBR, comúnmente requeridos por administradores de agua y distritos de riego.</dd></dl>';
+// About
+$ec_lang['about_main_menu']='Acerca de';
+$ec_lang['install_main_menu']='Instalar';
+$ec_lang['install_main_title']='Instalar EngCalcs';
+$ec_lang['install_main_desc']='Agregar al dispositivo para uso sin conexión';
+$ec_lang['contact_main_menu']='Contacto';
+$ec_lang['about_main_title']='Acerca de las calculadoras de ingeniería HawsEDC';
+$ec_lang['about_main_desc']='Misión, código abierto y contribuciones';
 $ec_lang['about_body_html']='<h3>Misión</h3><p>Las Calculadoras de Ingeniería HawsEDC existen para servir a ingenieros y trabajadores de campo en todo el mundo — especialmente a quienes trabajan en regiones con escasez de agua, recursos limitados o poco atendidas. Estas herramientas forman parte de una misión humanitaria más amplia: decirle a cada ser humano de la manera más práctica y efectiva posible que es amado y apreciado para siempre, que no tiene nada que temer y que no va a arruinarlo todo.</p><p>Las calculadoras son el vehículo. El destino es un mundo libre de sufrimiento.</p><h3>Licencia de Código Abierto</h3><p>Todo el código se publica bajo la <a target="_blank" href="https://www.gnu.org/licenses/gpl-3.0.html">Licencia Pública General GNU v3.0 o posterior</a> — libre como en libertad. Puede usar, estudiar, modificar y redistribuir el código bajo los mismos términos.</p><p>Copyright © 2009–2026 Thomas Gail Haws.</p><h3>Código Fuente</h3><p>El código fuente completo está disponible públicamente en Bitbucket:</p><p><a target="_blank" href="https://bitbucket.org/hawstom/engcalcs">bitbucket.org/hawstom/engcalcs</a></p><p>Puede explorar el código, registrar problemas o bifurcar el repositorio allí.</p><h3>Contribuir</h3><p>Se aceptan solicitudes de extracción. Formas de contribuir:</p><ul><li><strong>Traducciones</strong> — mejore o agregue un idioma. Abra una solicitud de extracción con cambios en el archivo <code>lib/lang.ec.??.php</code> correspondiente.</li><li><strong>Informes de errores</strong> — use el formulario de comentarios en cualquier página de calculadora, o registre un problema en Bitbucket.</li><li><strong>Nuevas calculadoras</strong> — las ideas para herramientas de ingeniería hidráulica que sirvan a trabajadores de campo y profesionales del riego son especialmente bienvenidas. Consulte la guía del desarrollador <code>CLAUDE.md</code> en el repositorio.</li><li><strong>Alojamiento</strong> — si puede alojar estas calculadoras en una región con conectividad limitada, comuníquese con nosotros.</li></ul><h3>Uso sin conexión</h3><p>Estas calculadoras funcionan como una Aplicación Web Progresiva (PWA). Visite cualquier página de calculadora con conexión a internet, y su navegador almacenará automáticamente todas las calculadoras en caché. Después de eso, todas las calculadoras funcionan sin conexión — no se requiere internet.</p><p>En Android o iOS, use la opción "Agregar a pantalla de inicio" de su navegador para instalar EngCalcs como una aplicación en su dispositivo. En el escritorio, busque el ícono de instalación en la barra de direcciones de su navegador.</p><p>También puede guardar cualquier calculadora individual usando el menú "Guardar como…" de su navegador para uso sin conexión puntual.</p><h3>Contacto</h3><p>Tom Haws — ingeniero hidráulico y autor de estas calculadoras.<br />Use el formulario de comentarios en cualquier página de calculadora, o acceda al código fuente en <a target="_blank" href="https://bitbucket.org/hawstom/engcalcs">Bitbucket</a>.</p>';
-
+$ec_lang['contact_title']='Contacto con HawsEDC';
+$ec_lang['contactSendMessage']='Envíe un mensaje a Tom Haws';
+$ec_lang['contactYourName']='Su nombre:';
+$ec_lang['contactYourEmail']='Su dirección de correo electrónico:';
+$ec_lang['contactSubject']='Asunto:';
+$ec_lang['contact_message']='Mensaje:';
+$ec_lang['contactSpamPrefix']='Five (cinco) plus (y) one (uno) equals (son) ';
+$ec_lang['contactSpamPostfix']='(Favor de escribirla en inglés con letras. 1=one 2=two 3=three 4=four 5=five 6=six 7=seven +=plus 5+1=6)';
+$ec_lang['contactSubmitButton']='Enviar Mensaje';
+$ec_lang['contact_success']='Gracias por tomarse el tiempo para escribir.';
 // Rock Chute Design (Robinson, Rice & Kadavy 1998). Prefix rc_.
-$ec_lang['u_m2ps']='m^2/s';
-$ec_lang['u_ft2ps']='cfs/ft';
 $ec_lang['rc_main_menu']='Diseño de Bajante de Rocado (Robinson)';
 $ec_lang['rc_main_title']='Calculadora Gratuita de Diseño de Bajante de Rocado — Robinson (1998)';
 $ec_lang['rc_main_desc']='Dimensionamiento de Escollera para Bajante de Rocado — Robinson, Rice & Kadavy (1998)';
@@ -486,13 +484,3 @@ $ec_lang['rc_sketch_filter']          = 'Filtro';
 $ec_lang['rc_sketch_top_crest_curve'] = 'Curva de cresta';
 $ec_lang['rc_sketch_outlet_apron']    = 'Zampeado';
 $ec_lang['rc_sketch_radius']          = 'radio';
-// Manning Trapezoidal Channel velocity check
-$ec_lang['mtc_vel_check']='Verificación de velocidad';
-$ec_lang['mtc_vel_ok']='Velocidad razonable para supuestos de flujo uniforme.';
-$ec_lang['mtc_vel_high']='Velocidad elevada — verificar pérdidas de transición y energía disponible.';
-$ec_lang['mtc_vel_low']='Velocidad baja — riesgo de sedimentación.';
-$ec_lang['mtc_vel_ok_short']='OK';
-$ec_lang['mtc_vel_high_short']='Alto';
-$ec_lang['mtc_vel_low_short']='Bajo';
-$ec_lang['mtc_note_2_term']='Verificación de velocidad';
-$ec_lang['mtc_note_2_def']='La velocidad elevada implica alta energía específica a partir de una caída disponible. Esa energía puede disiparse rápidamente en expansiones, curvas u obstrucciones. Verifique que esto sea razonable para el sitio.';

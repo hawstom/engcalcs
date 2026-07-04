@@ -36,6 +36,10 @@ $ec_lang['u_pa']='Pa';
 $ec_lang['u_psf']='psf';
 $ec_lang['u_psi']='psi';
 $ec_lang['u_s']='sec';
+$ec_lang['u_lph']="L/hr";
+$ec_lang['u_gph']="gal/hr";
+$ec_lang['u_mmph']="mm/hr";
+$ec_lang['u_inph']="in/hr";
 $ec_lang['u_acft']="ac-ft";
 $ec_lang['u_ft3']="ft^3";
 $ec_lang['u_m3']="m^3";
@@ -44,9 +48,12 @@ $ec_lang['u_mw']='MW';
 $ec_lang['u_kwh_yr']='kWh/yr';
 $ec_lang['u_mwh_yr']='MWh/yr';
 $ec_lang['u_hp']='hp';
+$ec_lang['u_m2ps']='m^2/s';
+$ec_lang['u_ft2ps']='cfs/ft';
 
 // Page text
 // In page order for easiest maintenance.
+// Menu and General
 $ec_lang['menu_brand']='מחשבוני HawsEDC';
 $ec_lang['menu_main_list']='רשימת המחשבונים';
 $ec_lang['menu_main_hydraulics']='הידרוליקה';
@@ -59,6 +66,10 @@ $ec_lang['template_printable_title']='אזור כותרת להדפסה';
 $ec_lang['template_printable_subtitle']='אזור כותרת משנה להדפסה';
 $ec_lang['index_title']='מחשבוני הנדסה חינמיים מקוונים';
 $ec_lang['calc_set_units']='הגדרת יחידות';
+$ec_lang['points_data_help']='(או העתק/הדבק באמצעות אזור הנתונים)';
+$ec_lang['points_data_title']='נתוני נקודות<br />(מופרדות בפסיקים או טאבים)';
+$ec_lang['points_data_copy']='העתק';
+$ec_lang['points_data_paste']='הדבק';
 $ec_lang['calc_inputs']='נתוני קלט';
 $ec_lang['calc_results']='תוצאות:';
 $ec_lang['view_hide_line']='[הסתר שורה זו]';
@@ -66,128 +77,7 @@ $ec_lang['view_printable']='גרסה להדפסה (טען מחדש לשחזור)
 $ec_lang['ec_name_label']='שמור חישוב זה:';
 $ec_lang['ec_name_placeholder']='שם';
 $ec_lang['ec_name_hint']='שמירת הערכים האלה בכתובת עם סימניה, אחזור מהיסטוריה, ושיתוף';
-// Manning Pipe Flow
-$ec_lang['mpf_main_menu']='זרימה בצינור — Manning';
-$ec_lang['mpf_main_title']='מחשבון זרימה בצינור לפי Manning — חינם מקוון';
-$ec_lang['mpf_main_desc']='זרימה אחידה בצינור לפי נוסחת Manning בשיפוע ועומק נתונים';
-$ec_lang['mpf_pipe_diameter']='קוטר הצינור';
-$ec_lang['mpf_manningRoughness']='מקדם מאנינג';
-$ec_lang['mpf_friction_slope']='<a target="_blank" href="../pressureslope.php">שיפוע התעלה (יתכן כי שווה לשיפוע הצינור)</a>';
-$ec_lang['mpf_depth_ratio']='אחוז של (או היחס) עומק מלא (100% או 1 אם זרימה מלאה)';
-$ec_lang['mpf_flow']='ספיקה';
-$ec_lang['mpf_velocity']='מהירות';
-$ec_lang['mpf_velocity_head']='עומד הידראולי';
-$ec_lang['mpf_flow_area']='חתך הזרימה';
-$ec_lang['mpf_wetted_perimeter']='ההיקף הרטוב';
-$ec_lang['mpf_hydraulic_radius']='רדיוס הידראולי';
-$ec_lang['mpf_top_width']='רוחב פני הנוזל';
-$ec_lang['mpf_froude_number']='מספר פראוד';
-$ec_lang['mpf_shear_stress']='מאמץ גזירה ממוצע (כוח גרר), tau';
-$ec_lang['mpf_solve_for_dd0']='חשב y/d<sub>0</sub> עבור Q נתון';
-$ec_lang['mpf_solve_desc']='תוך שימוש ב-D<sub>0</sub>, n ו-S<sub>0</sub> מטופס המחשבון, מוצא את ה-y/d<sub>0</sub> הנמוך ביותר עבור Q נתון.';
-$ec_lang['mpf_solve_button']='חשב';
-// Manning Pipe Head Loss. See mpf_ for missing text.
-$ec_lang['mphl_main_menu']='אובדן גובה בצינור — Manning';
-$ec_lang['mphl_main_title']='מחשבון אובדן גובה בצינור לפי Manning — חינם מקוון';
-$ec_lang['mphl_main_desc']='אובדן גובה לפי נוסחת Manning בזרימה מלאה נתונה';
-$ec_lang['mphl_pipe_length']='אורך הצינור,l';
-$ec_lang['mphl_total_junction_k']='חישוב סך כל מקדמי ההפסדים בצומת, k';
-$ec_lang['mphl_friction_loss']='הפסד חיכוך';
-$ec_lang['mphl_junction_loss']='הפסד בצומת';
-$ec_lang['mphl_total_loss'] = 'סהכ הפסד';
-$ec_lang['mphl_egl_1']='EGL מורד';
-$ec_lang['mphl_egl_2']='EGL מעלה';
-$ec_lang['mphl_hgl_2']='HGL מעלה בצינור (ראה הערות)';
-// Manning Trapezoid. See mpf_ for missing text.
-$ec_lang['mtc_menu']='תעלה טרפזואידית — Manning';
-$ec_lang['mtc_main_title']='מחשבון תעלה טרפזואידית לפי נוסחת Manning — חינם מקוון';
-$ec_lang['mtc_main_desc']='זרימה אחידה בתעלה טרפזואידית לפי נוסחת Manning בשיפוע ועומק נתונים';
-$ec_lang['mtc_bottom_width']='רוחב קרקעית, b';
-$ec_lang['mtc_side_slope_1']='צד השיפוע 1 (אופקי\אנכי)';
-$ec_lang['mtc_side_slope_2']= 'צד השיפוע 2 (אופקי\אנכי)';
-$ec_lang['mtc_channel_slope']='שיפוע התעלה';
-$ec_lang['mtc_flow_depth']='עומק הספיקה';
-$ec_lang['mtc_d50_bottom']='גודל אבן זוויתית נדרש לקרקעית, D50 (Isbash ו-MC) <span title="לפי Isbash (1936) ו-Maricopa County, אריזונה, ארה"ב." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
-$ec_lang['mtc_d50_z1']='גודל אבן זוויתית נדרש לצד 1, D50 (Isbash ו-MC) <span title="לפי Isbash (1936) ו-Maricopa County, אריזונה, ארה"ב." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
-$ec_lang['mtc_d50_z2']='גודל אבן זוויתית נדרש לצד 2, D50 (Isbash ו-MC) <span title="לפי Isbash (1936) ו-Maricopa County, אריזונה, ארה"ב." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
-$ec_lang['mtc_d50_mra']='גודל אבן זוויתית נדרש, D50 (Maynord, Ruff ו-Abt 1989)';
-$ec_lang['mtc_d50_searcy']='גודל אבן זוויתית נדרש, D50 (Searcy 1967)';
-// Orifice Flow
-$ec_lang['or_main_menu']='זרימה דרך פתח';
-$ec_lang['or_main_title']='מחשבון זרימה דרך פתח - חינם';
-$ec_lang['or_main_desc']='זרימה דרך פתח — חופשית או טבועה';
-$ec_lang['or_shape']='צורת הפתח';
-$ec_lang['or_shape_circular']='עגול';
-$ec_lang['or_shape_rectangular']='מלבני';
-$ec_lang['or_diameter']='קוטר או גובה, D <span title="Diameter for circular; height for rectangular" class="ec-tip">?</span>';
-$ec_lang['or_width']='רוחב, W <span title="Rectangular openings only" class="ec-tip">?</span>';
-$ec_lang['or_invert']='גובה היסוד <span title="Bottom of opening" class="ec-tip">?</span>';
-$ec_lang['or_hwe']='גובה מפלס מים עליון';
-$ec_lang['or_twe']='גובה מפלס מים תחתון';
-$ec_lang['or_cd']='מקדם הספיקה, C<sub>d</sub>';
-$ec_lang['or_centroid_elev']='גובה הצנטרואיד';
-$ec_lang['or_head']='עומק יעיל, h';
-$ec_lang['or_area']='שטח הפתח, A';
-$ec_lang['or_flow']='ספיקה, Q';
-$ec_lang['or_regime']='בדיקת משטר הזרימה';
-$ec_lang['or_regime_valid']='זרימה חופשית — משטר פתח תקין ✓';
-$ec_lang['or_regime_submerged']='פתח טבוע (TWE מעל לצנטרואיד) — תקין ✓';
-$ec_lang['or_regime_warn']='אזהרה: מפלס עליון מתחת לגג הפתח — לא משטר פתח';
-$ec_lang['or_regime_twe_above_hwe']='אזהרה: מפלס מים תחתון (TWE) גבוה ממפלס מים עליון (HWE) — בדוק קלטים';
-$ec_lang['or_notes_1_term']='משוואת הפתח';
-$ec_lang['or_notes_1_def']='Q = C<sub>d</sub> × A × √(2gh). זרימה חופשית: h = HWE − צנטרואיד. זרימה טבועה (TWE מעל לתחתית): h = HWE − TWE.';
-$ec_lang['or_notes_2_term']='משטר הפתח';
-$ec_lang['or_notes_2_def']='משוואות זרימה דרך פתח חלות כאשר המפלס העליון גבוה מגג הפתח. כאשר המפלס נמוך מהגג, יש להשתמש במשוואת מפל.';
-$ec_lang['or_notes_3_term']='מקדם הספיקה';
-$ec_lang['or_notes_3_def']='C<sub>d</sub> נע בין 0.60 ל-0.65 לפתחים עם קצה חד. כניסות מעוגלות או שקועות מקבלות ערכים שונים. ראה <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venture-d_590.html">Engineering Toolbox</a> או מדריך הידרולוגיית HEC-RAS.';
-$ec_lang['or_notes_4_term']='טביעה';
-$ec_lang['or_notes_4_def']='כאשר TWE גבוה מתחתית הפתח, המחשבון מיישם אוטומטית את משוואת הפתח הטבוע עם h = HWE − TWE. כאשר TWE שווה לתחתית הפתח או נמוך ממנה, מניחים זרימה חופשית ו-h = HWE − צנטרואיד.';
-
-// Orifice Drain Time
-$ec_lang['odt_main_menu']='זמן ריקון פתח';
-$ec_lang['odt_main_title']='מחשבון זמן ריקון פתח — בריכה, אגן או מיכל — חינם מקוון';
-$ec_lang['odt_main_desc']='זמן ריקון פתח בריכת איגום או אגן — שיטת נפח קוני';
-$ec_lang['odt_h1_elev']='WSE התחלתי <span title="Starting water surface elevation" class="ec-tip">?</span>';
-$ec_lang['odt_a1']='שטח התחלתי, A<sub>1</sub>';
-$ec_lang['odt_h2_elev']='WSE סופי';
-$ec_lang['odt_h_orifice']='גובה צנטרואיד הפתח';
-$ec_lang['odt_a0']='שטח בגובה הפתח, A<sub>0</sub>';
-$ec_lang['odt_a_ending']='שטח סופי, A<sub>2</sub> <span title="Interpolated from conic model at ending elevation" class="ec-tip">?</span>';
-$ec_lang['odt_h2_check']='בדיקת גובה סופי';
-$ec_lang['odt_h2_ok']='הגובה הסופי מעל לחלק העליון של הפתח ✓';
-$ec_lang['odt_h2_warn']='אזהרה: הגובה הסופי שווה או נמוך מחלק עליון של הפתח (צנטרואיד + D/2)';
-$ec_lang['odt_d']='קוטר פתח D <span title="Diameter (circular) or height (rectangular)" class="ec-tip">?</span>';
-$ec_lang['odt_w']='רוחב פתח, W <span title="Rectangular only" class="ec-tip">?</span>';
-$ec_lang['odt_t_sec']='זמן ריקון (s)';
-$ec_lang['odt_t_min']='זמן ריקון (min)';
-$ec_lang['odt_t_hr']='זמן ריקון (hr)';
-$ec_lang['odt_t_day']='זמן ריקון (days)';
-$ec_lang['odt_notes_1_term']='נוסחה';
-$ec_lang['odt_notes_1_def']='t = √H<sub>1</sub> / (C<sub>d</sub> A<sub>or</sub> √(2g)) × (2A<sub>x</sub>/5 + 8√(A<sub>x</sub>A<sub>0</sub>)/15 + 16A<sub>0</sub>/15) נותן את זמן הריקון מגובה ראש H עד לפתח. זמן ריקון = t(H<sub>1</sub>,A<sub>1</sub>,A<sub>0</sub>) − t(H<sub>2</sub>,A<sub>2</sub>,A<sub>0</sub>), כאשר H<sub>1</sub> = גובה התחלתי − גובה הפתח, H<sub>2</sub> = גובה סופי − גובה הפתח.';
-$ec_lang['odt_notes_2_term']='שיטה';
-$ec_lang['odt_notes_2_def']='שיטת הנפח הקוני מדמה את הבריכה או האגן כחתך קוני בין שטח התחלתי A<sub>1</sub> במפלס המים הראשוני לבין שטח A<sub>0</sub> בגובה צנטרואיד הפתח. A<sub>2</sub>, שטח הבריכה בגובה הסופי, מחושב באינטרפולציה מ-A<sub>1</sub> ו-A<sub>0</sub> לפי מודל החתך הקוני. זמן הריקון מגובה התחלתי לסופי שווה לזמן הריקון הכולל מ-H<sub>1</sub> לפתח פחות זמן הריקון הנותר מ-H<sub>2</sub> לפתח.';
-$ec_lang['odt_h1']='ראש התחלתי, H<sub>1</sub> <span title="Starting WSE minus orifice centroid elevation" class="ec-tip">?</span>';
-$ec_lang['odt_q_max']='זרימה מקסימלית, Q<sub>max</sub>';
-$ec_lang['odt_vol']='נפח מרוקן';
-$ec_lang['odt_sketch_start']='התחלה';
-$ec_lang['odt_sketch_end']='סיום';
-// Contact us.
-
-// Irrigation
-$ec_lang['irr_main_menu']='מדידת ספיקת השקיה';
-$ec_lang['irr_main_title']='מחשבוני מדידת ספיקת השקיה חינמיים באינטרנט';
-$ec_lang['irr_main_desc']='מדידת ספיקת השקיה — מפלי מים ופתחים';
-$ec_lang['contact_title']='צור קשר עם HawsEDC';
-$ec_lang['contactSendMessage']='שלח הודעה ל-Tom Haws';
-$ec_lang['contactYourName']='שמך:';
-$ec_lang['contactYourEmail']='כתובת הדוא"ל שלך:';
-$ec_lang['contactSubject']='נושא:';
-$ec_lang['contact_message']='הודעה:';
-$ec_lang['contactSpamPrefix']='חמש ועוד אחת שווה';
-$ec_lang['contactSpamPostfix']='(אנא כתוב במילים. 1=one 2=two 3=three 4=four 5=five 6=six 7=seven +=plus 5+1=6)';
-$ec_lang['contactSubmitButton']='שלח הודעה';
-$ec_lang['contact_success']='תודה שלקחת את הזמן לכתוב.';
-// Darcy-Weisbach
+// Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='אובדן גובה בצינור — Darcy-Weisbach';
 $ec_lang['dw_main_title']='מחשבון אובדן גובה בצינור Darcy-Weisbach — חינם מקוון';
 $ec_lang['dw_main_desc']='אובדן גובה בצינור Darcy-Weisbach בקוטר, גסות וספיקה נתונים';
@@ -200,14 +90,14 @@ $ec_lang['dw_regime_transitional']='מעברי';
 $ec_lang['dw_regime_turbulent']='טורבולנטי';
 $ec_lang['dw_friction_factor_method']='שיטת מקדם החיכוך';
 $ec_lang['dw_friction_factor']='מקדם חיכוך, f';
-// Hazen-Williams
+// Hazen-Williams. See mphl_ for missing text.
 $ec_lang['hw_main_menu']='אובדן גובה בצינור — Hazen-Williams';
 $ec_lang['hw_main_title']='מחשבון אובדן גובה בצינור Hazen-Williams — חינם מקוון';
 $ec_lang['hw_main_desc']='אובדן גובה בצינור Hazen-Williams בקוטר, גסות וספיקה נתונים';
 $ec_lang['hw_hgl_1']='HGL מורד';
 $ec_lang['hw_hgl_2']='HGL מעלה';
 $ec_lang['hw_roughness']='מקדם Hazen-Williams, C';
-// Manning Irregular Channel
+// Manning Irregular
 $ec_lang['mi_menu']='תעלה לא סדירה — Manning';
 $ec_lang['mi_main_title']='מחשבון תעלה לא סדירה לפי Manning — חינם מקוון';
 $ec_lang['mi_main_desc']='מחשבון זרימה אחידה בתעלה לא סדירה לפי Manning';
@@ -237,19 +127,57 @@ $ec_lang['mi_notes_1_term']='n מורכב';
 $ec_lang['mi_notes_1_def']='מחשבון זה עוקב אחר המדריך ההתייחסות של HEC-RAS בחישוב n מורכב של אזור לפי Chow 1959, עמוד 136, משוואה 6-17 (לא 6-18).';
 $ec_lang['mi_notes_2_term']='חיפוי סלע';
 $ec_lang['mi_notes_2_def']='השתמש במחשבון תעלה טרפזואידית לפי Manning לתכנון חיפוי סלע. מחשבון זה מתאים יותר לחתכים טבעיים.';
-// Manning Pipe Flow additional keys
+// Manning Pipe Flow
+$ec_lang['mpf_main_menu']='זרימה בצינור — Manning';
+$ec_lang['mpf_main_title']='מחשבון זרימה בצינור לפי Manning — חינם מקוון';
+$ec_lang['mpf_main_desc']='זרימה אחידה בצינור לפי נוסחת Manning בשיפוע ועומק נתונים';
+$ec_lang['mpf_spreadheet_notice']='עיין בגרסת הגיליון האלקטרוני של מחשבון זה';
+$ec_lang['mpf_pipe_diameter']='קוטר הצינור';
+$ec_lang['mpf_manningRoughness']='מקדם מאנינג';
+$ec_lang['mpf_friction_slope']='<a target="_blank" href="../pressureslope.php">שיפוע התעלה (יתכן כי שווה לשיפוע הצינור)</a>';
+$ec_lang['mpf_depth_ratio']='אחוז של (או היחס) עומק מלא (100% או 1 אם זרימה מלאה)';
+$ec_lang['mpf_see_notes']='(ראה הערות)';
+$ec_lang['mpf_flow']='ספיקה';
+$ec_lang['mpf_velocity']='מהירות';
+$ec_lang['mpf_velocity_head']='עומד הידראולי';
+$ec_lang['mpf_flow_area']='חתך הזרימה';
 $ec_lang['mpf_pipe_area']='שטח צינור, a0';
 $ec_lang['mpf_area_ratio']='שטח יחסי, a/a0';
+$ec_lang['mpf_wetted_perimeter']='ההיקף הרטוב';
+$ec_lang['mpf_hydraulic_radius']='רדיוס הידראולי';
+$ec_lang['mpf_top_width']='רוחב פני הנוזל';
+$ec_lang['mpf_froude_number']='מספר פראוד';
+$ec_lang['mpf_shear_stress']='מאמץ גזירה ממוצע (כוח גרר), tau';
 $ec_lang['mpf_full_flow']='זרימה מלאה, Q0';
 $ec_lang['mpf_full_flow_ratio']='יחס לזרימה מלאה, Q/Q0';
-$ec_lang['mpf_see_notes']='(ראה הערות)';
-$ec_lang['mpf_spreadheet_notice']='עיין בגרסת הגיליון האלקטרוני של מחשבון זה';
 $ec_lang['mpf_note_1']='<dl><dt>זהו הזרימה והעומק בתוך צינור <em>ארוך אינסופית</em>.</dt><dd>כדי לקבל את הזרימה לתוך הצינור ייתכן שיידרש גובה מים עליון גבוה הרבה יותר. הוסף לפחות 1.5 פעמים ראש המהירות כדי לקבל את גובה המים העליון, או <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">ראה את המדריך הקצר שלי</a> לחישובי גובה מים עליון לתעלות ניקוז סטנדרטיות באמצעות HY-8.</dd>';
-// Manning Pipe Head Loss additional keys
+$ec_lang['mpf_solve_for_dd0']='חשב y/d<sub>0</sub> עבור Q נתון';
+$ec_lang['mpf_solve_desc']='תוך שימוש ב-D<sub>0</sub>, n ו-S<sub>0</sub> מטופס המחשבון, מוצא את ה-y/d<sub>0</sub> הנמוך ביותר עבור Q נתון.';
+$ec_lang['mpf_solve_button']='חשב';
+// Manning Pipe Head Loss. See mpf_ for missing text.
+$ec_lang['mphl_main_menu']='אובדן גובה בצינור — Manning';
+$ec_lang['mphl_main_title']='מחשבון אובדן גובה בצינור לפי Manning — חינם מקוון';
+$ec_lang['mphl_main_desc']='אובדן גובה לפי נוסחת Manning בזרימה מלאה נתונה';
+$ec_lang['mphl_pipe_length']='אורך הצינור,l';
 $ec_lang['mphl_area']='שטח, A';
+$ec_lang['mphl_total_junction_k']='חישוב סך כל מקדמי ההפסדים בצומת, k';
 $ec_lang['mphl_friction_slope']='שיפוע חיכוך';
+$ec_lang['mphl_friction_loss']='הפסד חיכוך';
+$ec_lang['mphl_junction_loss']='הפסד בצומת';
+$ec_lang['mphl_total_loss'] = 'סהכ הפסד';
+$ec_lang['mphl_egl_1']='EGL מורד';
+$ec_lang['mphl_egl_2']='EGL מעלה';
+$ec_lang['mphl_hgl_2']='HGL מעלה בצינור (ראה הערות)';
 $ec_lang['mphl_note_1']='<dl><dt>עבור כניסה פתוחה (תעלת ניקוז), יש לבדוק תנאי שליטה בכניסה.</dt><dd>1. HGL המעלה אינו יכול להיות נמוך מגובה זרימה נורמלית במעלה (ולא נמוך מהצינור!).</dd><dd>2. גובה המים העליון של תעלת ניקוז מיוצג טוב יותר על ידי EGL המעלה מאשר HGL המעלה.</dd><dd>3. ראה <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">את המדריך הקצר שלי</a> לחישובי גובה מים עליון פשוטים לתעלות ניקוז סטנדרטיות באמצעות HY-8.</dd>';
-// Manning Trapezoidal Channel additional keys
+// Manning Trapezoid. See mpf_ for missing text.
+$ec_lang['mtc_menu']='תעלה טרפזואידית — Manning';
+$ec_lang['mtc_main_title']='מחשבון תעלה טרפזואידית לפי נוסחת Manning — חינם מקוון';
+$ec_lang['mtc_main_desc']='זרימה אחידה בתעלה טרפזואידית לפי נוסחת Manning בשיפוע ועומק נתונים';
+$ec_lang['mtc_bottom_width']='רוחב קרקעית, b';
+$ec_lang['mtc_side_slope_1']='צד השיפוע 1 (אופקי\אנכי)';
+$ec_lang['mtc_side_slope_2']= 'צד השיפוע 2 (אופקי\אנכי)';
+$ec_lang['mtc_channel_slope']='שיפוע התעלה';
+$ec_lang['mtc_flow_depth']='עומק הספיקה';
 $ec_lang['mtc_bend_angle']='זווית כיפוף <a target="_blank" href="riprap-bend-angle.png" title="לחץ לתמונה">?</a> (לממדי ריפ-ראפ)';
 $ec_lang['mtc_sgrock']='משקל סגולי של סלע (2.65)';
 $ec_lang['mtc_d50_in']='גודל סלע עיצוב, D50';
@@ -257,19 +185,21 @@ $ec_lang['mtc_n_strickler']='n לגודל סלע עיצוב לפי Strickler';
 $ec_lang['mtc_n_blodgett']='n לגודל סלע עיצוב לפי Blodgett';
 $ec_lang['mtc_n_bathurst']='n לגודל סלע עיצוב לפי Bathurst';
 $ec_lang['mtc_blodgett_v_bathurst']='Blodgett לעומת Bathurst';
+$ec_lang['mtc_d50_bottom']='גודל אבן זוויתית נדרש לקרקעית, D50 (Isbash ו-MC) <span title="לפי Isbash (1936) ו-Maricopa County, אריזונה, ארה"ב." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
+$ec_lang['mtc_d50_z1']='גודל אבן זוויתית נדרש לצד 1, D50 (Isbash ו-MC) <span title="לפי Isbash (1936) ו-Maricopa County, אריזונה, ארה"ב." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
+$ec_lang['mtc_d50_z2']='גודל אבן זוויתית נדרש לצד 2, D50 (Isbash ו-MC) <span title="לפי Isbash (1936) ו-Maricopa County, אריזונה, ארה"ב." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
+$ec_lang['mtc_d50_mra']='גודל אבן זוויתית נדרש, D50 (Maynord, Ruff ו-Abt 1989)';
+$ec_lang['mtc_d50_searcy']='גודל אבן זוויתית נדרש, D50 (Searcy 1967)';
+$ec_lang['mtc_vel_check']='בדיקת מהירות';
+$ec_lang['mtc_vel_ok']='המהירות סבירה להנחות זרימה אחידה.';
+$ec_lang['mtc_vel_high']='מהירות גבוהה — בדוק הפסדי מעברים ואנרגיה זמינה.';
+$ec_lang['mtc_vel_low']='מהירות נמוכה — סיכון להשתקעות.';
+$ec_lang['mtc_vel_ok_short']='בסדר';
+$ec_lang['mtc_vel_high_short']='גבוה';
+$ec_lang['mtc_vel_low_short']='נמוך';
 $ec_lang['mtc_note_1']='<dl><dt>איטרציה אוטומטית לתכנון גודל סלע וגסות</dt><dd>בחר לחצן בחירת גסות (BB מומלץ) ולחצן בחירת גודל סלע עיצוב (Isbash מומלץ). כוונן את העומק ומקדם הביטחון של גודל הסלע כדי לקבל את הזרימה הרצויה עם גודל סלע שלם. בכל שינוי ערך קלט מתרחשת מחזור איטרציה: 1. הגסות מחושבת מגודל סלע העיצוב. 2. חישוב הגסות המבוקש מועתק לגסות הקלט. 3. זרימת התעלה וגודל הסלע הנדרש מחושבים. 4. גודל סלע העיצוב מותאם. 5. חזרה עד שהשגיאה בגודל סלע העיצוב קטנה מאד.</dd><dt>מחשבון בסיסי (ללא איטרציה)</dt><dd>הכנס את ערך הגסות הרצוי. התעלם מאזור קלט גודל סלע העיצוב.</dd></dl>';
-// Orifice Flow additional keys
-$ec_lang['or_velocity']='מהירות, v';
-// Points data
-$ec_lang['points_data_copy']='העתק';
-$ec_lang['points_data_paste']='הדבק';
-$ec_lang['points_data_help']='(או העתק/הדבק באמצעות אזור הנתונים)';
-$ec_lang['points_data_title']='נתוני נקודות<br />(מופרדות בפסיקים או טאבים)';
-// Robinson Rock Chute
-// Erosion Setback and Scour Calc.
-$ec_lang['essc_btbw']='רוחב מגדה לגדה';
-$ec_lang['essc_mcr']='רדיוס עיקול מינימלי';
-$ec_lang['essc_q']='ספיקה, Q';
+$ec_lang['mtc_note_2_term']='בדיקת מהירות';
+$ec_lang['mtc_note_2_def']='מהירות גבוהה משמעה אנרגיה סגולית גבוהה הנובעת מנפילה זמינה. אנרגיה זו עשויה ללכת לאיבוד במהירות באזורי התרחבות, בעקומות או בחסמים. יש לוודא שהדבר סביר עבור האתר.';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='זרימת מפל — פשוטה';
 $ec_lang['ws_main_title']='מחשבון זרימת מפל עם כתר רחב פשוט — חינם מקוון';
@@ -279,7 +209,7 @@ $ec_lang['ws_headWaterHeight']='גובה מים עליונים, h';
 $ec_lang['ws_weirCoefficient']='מקדם מפל, Cw';
 $ec_lang['ws_notes_heading']='הערות';
 $ec_lang['ws_notes_we_term']='משוואת המפל';
-// Weir Flow Irregular
+// Weir Flow Irregular. See ws_ for missing text.
 $ec_lang['wi_menu']='זרימת מפל — לא סדיר';
 $ec_lang['wi_main_title']='מחשבון זרימת מפל לא סדיר עם עומק משתנה — חינם מקוון';
 $ec_lang['wi_main_desc']='מחשבון זרימת מפל לא סדיר';
@@ -293,8 +223,37 @@ $ec_lang['wi_cumulativeFlow']='ספיקה מצטברת כוללת';
 $ec_lang['wi_save_and_calculate']='שמור וחשב';
 $ec_lang['wi_notes_we_term']='משוואת המפל';
 $ec_lang['wi_notes_we_def']='q = אם (אורך = 0) אז 0; אחרת אם (שיפוע=0) אז cw*length*d<sub>0</sub><sup>1.5</sup>; אחרת cw/(2.5*slope) * (d<sub>0</sub><sup>2.5</sup> - d<sub>1</sub><sup>2.5</sup>) כאשר d<sub>1</sub> ו-d<sub>0</sub> תמיד חיוביים או אפס';
-
-
+// Orifice Flow
+$ec_lang['or_main_menu']='זרימה דרך פתח';
+$ec_lang['or_main_title']='מחשבון זרימה דרך פתח - חינם';
+$ec_lang['or_main_desc']='זרימה דרך פתח — חופשית או טבועה';
+$ec_lang['or_shape']='צורת הפתח';
+$ec_lang['or_shape_circular']='עגול';
+$ec_lang['or_shape_rectangular']='מלבני';
+$ec_lang['or_diameter']='קוטר או גובה, D <span title="Diameter for circular; height for rectangular" class="ec-tip">?</span>';
+$ec_lang['or_width']='רוחב, W <span title="Rectangular openings only" class="ec-tip">?</span>';
+$ec_lang['or_invert']='גובה היסוד <span title="Bottom of opening" class="ec-tip">?</span>';
+$ec_lang['or_hwe']='גובה מפלס מים עליון';
+$ec_lang['or_twe']='גובה מפלס מים תחתון';
+$ec_lang['or_cd']='מקדם הספיקה, C<sub>d</sub>';
+$ec_lang['or_centroid_elev']='גובה הצנטרואיד';
+$ec_lang['or_head']='עומק יעיל, h';
+$ec_lang['or_area']='שטח הפתח, A';
+$ec_lang['or_flow']='ספיקה, Q';
+$ec_lang['or_velocity']='מהירות, v';
+$ec_lang['or_regime']='בדיקת משטר הזרימה';
+$ec_lang['or_regime_valid']='זרימה חופשית — משטר פתח תקין ✓';
+$ec_lang['or_regime_submerged']='פתח טבוע (TWE מעל לצנטרואיד) — תקין ✓';
+$ec_lang['or_regime_warn']='אזהרה: מפלס עליון מתחת לגג הפתח — לא משטר פתח';
+$ec_lang['or_regime_twe_above_hwe']='אזהרה: מפלס מים תחתון (TWE) גבוה ממפלס מים עליון (HWE) — בדוק קלטים';
+$ec_lang['or_notes_1_term']='משוואת הפתח';
+$ec_lang['or_notes_1_def']='Q = C<sub>d</sub> × A × √(2gh). זרימה חופשית: h = HWE − צנטרואיד. זרימה טבועה (TWE מעל לתחתית): h = HWE − TWE.';
+$ec_lang['or_notes_2_term']='משטר הפתח';
+$ec_lang['or_notes_2_def']='משוואות זרימה דרך פתח חלות כאשר המפלס העליון גבוה מגג הפתח. כאשר המפלס נמוך מהגג, יש להשתמש במשוואת מפל.';
+$ec_lang['or_notes_3_term']='מקדם הספיקה';
+$ec_lang['or_notes_3_def']='C<sub>d</sub> נע בין 0.60 ל-0.65 לפתחים עם קצה חד. כניסות מעוגלות או שקועות מקבלות ערכים שונים. ראה <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venture-d_590.html">Engineering Toolbox</a> או מדריך הידרולוגיית HEC-RAS.';
+$ec_lang['or_notes_4_term']='טביעה';
+$ec_lang['or_notes_4_def']='כאשר TWE גבוה מתחתית הפתח, המחשבון מיישם אוטומטית את משוואת הפתח הטבוע עם h = HWE − TWE. כאשר TWE שווה לתחתית הפתח או נמוך ממנה, מניחים זרימה חופשית ו-h = HWE − צנטרואיד.';
 // Micro-Hydro Power
 $ec_lang['mhp_main_menu']='הידרו-כוח זעיר';
 $ec_lang['mhp_main_title']='מחשבון הידרו-כוח זעיר חינמי מקוון';
@@ -336,21 +295,64 @@ $ec_lang['mhp_notes_4_term']='אובדן משני k<sub>m</sub>';
 $ec_lang['mhp_notes_4_def']='ערכים אופייניים: כניסה חדה 0.5, כל עיקול 45° בין 0.2–0.3, ברז שער (פתוח לחלוטין) 0.1, שסתום פרפר 0.2. סכום כל האבזרים הוא k<sub>m</sub> הכולל. ברירת המחדל 1.5 מניחה כניסה אחת ושני עיקולים.';
 $ec_lang['mhp_notes_5_term']='גסות הצינור e';
 $ec_lang['mhp_notes_5_def']='גסות מוחלטת אופיינית: פלדה (חדשה) 0.046 מ"מ, פלדה (משומשת) 0.15 מ"מ, HDPE 0.003 מ"מ, PVC/uPVC 0.0015 מ"מ, בטון 0.3–3 מ"מ. HDPE נפוץ בצינורות לחץ קטנים למיקרו-הידרו.';
+$ec_lang['mhp_notes_6_term']='יעילות';
+$ec_lang['mhp_notes_6_def']='יעילות המתקן האופיינית &eta; נעה בין 0.70 ל-0.85 לטורבינות Pelton ורוחב-זרימה הנפוצות במיקרו-הידרו. השתמש ב-0.75 כאומדן ראשוני שמרני.';
+$ec_lang['mhp_notes_7_term']='אנרגיה שנתית';
+$ec_lang['mhp_notes_7_def']='האנרגיה השנתית מניחה פעולה מתמשכת בזרימה מלאה (8760 שעות לשנה). התפוקה בפועל תהיה נמוכה יותר בשל שינויי זרימה עונתיים, זמן השבתה לתחזוקה ומקדם עומס.';
 
-// About
-$ec_lang['about_main_menu']='אודות';
-$ec_lang['install_main_menu']='התקן';
-$ec_lang['install_main_title']='התקן את EngCalcs';
-$ec_lang['install_main_desc']='הוסף למכשיר שלך לשימוש לא מקוון';
-$ec_lang['contact_main_menu']='צור קשר';
-$ec_lang['about_main_title']='אודות מחשבוני ההנדסה HawsEDC';
-$ec_lang['about_main_desc']='מטרה, קוד פתוח ותרומה';
+// Orifice Drain Time
+$ec_lang['odt_main_menu']='זמן ריקון פתח';
+$ec_lang['odt_main_title']='מחשבון זמן ריקון פתח — בריכה, אגן או מיכל — חינם מקוון';
+$ec_lang['odt_main_desc']='זמן ריקון פתח בריכת איגום או אגן — שיטת נפח קוני';
+$ec_lang['odt_h1_elev']='WSE התחלתי <span title="Starting water surface elevation" class="ec-tip">?</span>';
+$ec_lang['odt_a1']='שטח התחלתי, A<sub>1</sub>';
+$ec_lang['odt_h2_elev']='WSE סופי';
+$ec_lang['odt_h_orifice']='גובה צנטרואיד הפתח';
+$ec_lang['odt_a0']='שטח בגובה הפתח, A<sub>0</sub>';
+$ec_lang['odt_a_ending']='שטח סופי, A<sub>2</sub> <span title="Interpolated from conic model at ending elevation" class="ec-tip">?</span>';
+$ec_lang['odt_h2_check']='בדיקת גובה סופי';
+$ec_lang['odt_h2_ok']='הגובה הסופי מעל לחלק העליון של הפתח ✓';
+$ec_lang['odt_h2_warn']='אזהרה: הגובה הסופי שווה או נמוך מחלק עליון של הפתח (צנטרואיד + D/2)';
+$ec_lang['odt_d']='קוטר פתח D <span title="Diameter (circular) or height (rectangular)" class="ec-tip">?</span>';
+$ec_lang['odt_w']='רוחב פתח, W <span title="Rectangular only" class="ec-tip">?</span>';
+$ec_lang['odt_t_sec']='זמן ריקון (s)';
+$ec_lang['odt_t_min']='זמן ריקון (min)';
+$ec_lang['odt_t_hr']='זמן ריקון (hr)';
+$ec_lang['odt_t_day']='זמן ריקון (days)';
+$ec_lang['odt_notes_1_term']='נוסחה';
+$ec_lang['odt_notes_1_def']='t = √H<sub>1</sub> / (C<sub>d</sub> A<sub>or</sub> √(2g)) × (2A<sub>x</sub>/5 + 8√(A<sub>x</sub>A<sub>0</sub>)/15 + 16A<sub>0</sub>/15) נותן את זמן הריקון מגובה ראש H עד לפתח. זמן ריקון = t(H<sub>1</sub>,A<sub>1</sub>,A<sub>0</sub>) − t(H<sub>2</sub>,A<sub>2</sub>,A<sub>0</sub>), כאשר H<sub>1</sub> = גובה התחלתי − גובה הפתח, H<sub>2</sub> = גובה סופי − גובה הפתח.';
+$ec_lang['odt_notes_2_term']='שיטה';
+$ec_lang['odt_notes_2_def']='שיטת הנפח הקוני מדמה את הבריכה או האגן כחתך קוני בין שטח התחלתי A<sub>1</sub> במפלס המים הראשוני לבין שטח A<sub>0</sub> בגובה צנטרואיד הפתח. A<sub>2</sub>, שטח הבריכה בגובה הסופי, מחושב באינטרפולציה מ-A<sub>1</sub> ו-A<sub>0</sub> לפי מודל החתך הקוני. זמן הריקון מגובה התחלתי לסופי שווה לזמן הריקון הכולל מ-H<sub>1</sub> לפתח פחות זמן הריקון הנותר מ-H<sub>2</sub> לפתח.';
+$ec_lang['odt_h1']='ראש התחלתי, H<sub>1</sub> <span title="Starting WSE minus orifice centroid elevation" class="ec-tip">?</span>';
+$ec_lang['odt_q_max']='זרימה מקסימלית, Q<sub>max</sub>';
+$ec_lang['odt_vol']='נפח מרוקן';
+$ec_lang['odt_sketch_start']='התחלה';
+$ec_lang['odt_sketch_end']='סיום';
+// Erosion Setback and Scour Calc.
+$ec_lang['essc_btbw']='רוחב מגדה לגדה';
+$ec_lang['essc_mcr']='רדיוס עיקול מינימלי';
+$ec_lang['essc_q']='ספיקה, Q';
+// Contact us.
 
+// Irrigation
+$ec_lang['irr_main_menu']='מדידת ספיקת השקיה';
+$ec_lang['irr_main_title']='מחשבוני מדידת ספיקת השקיה חינמיים באינטרנט';
+$ec_lang['irr_main_desc']='מדידת ספיקת השקיה — מפלי מים ופתחים';
+$ec_lang['irr_intro_html']='<p>מעביר מים ופתחים הם הכלים השטחיים הסטנדרטיים למדידת זרימת מים במערכות השקיה. בחרו את המחשבון המתאים למבנה שלכם:</p>';
+$ec_lang['irr_card_weir_uniform_head']='מעביר מים — סף רחב (רוחב אחיד)';
+$ec_lang['irr_card_weir_uniform_desc']='מדדו את הזרימה מעל לכתר סכר הסטייה, מבנה הבקרה או לוח המעביר. הזינו את אורך המעביר ועומק המים מעל הסף.';
+$ec_lang['irr_card_weir_irregular_head']='מעביר מים — פרופיל לא סדיר';
+$ec_lang['irr_card_weir_irregular_desc']='השתמשו כאשר כתר המעביר אינו בגובה אחיד — שפכי חירום טבעיים, מבני נפילה ברוחב משתנה, או מבני בקרה רב-מקטעיים.';
+$ec_lang['irr_card_orifice_head']='פתח — שער ראשי או חיבור צינור';
+$ec_lang['irr_card_orifice_desc']='מדדו את הזרימה דרך שער הזזה, חיבור צינור, או פתח תעלת ניקוז. מטפל אוטומטית הן בשפיכה חופשית והן בתנאים מוצפים (לחץ נגדי מהזרם התחתון).';
+$ec_lang['irr_card_canal_head']='תכנון & ניתוח תעלה';
+$ec_lang['irr_card_canal_desc']='תכננו או בדקו תעלת השקיה בעזרת נוסחת Manning. השתמשו במחשבון הטרפזי לתעלות חדשות; במחשבון הלא סדיר לחתכים טבעיים או מבנויים קיימים.';
+$ec_lang['irr_card_drip_head']='תכנון טפטוף & ממטרים';
+$ec_lang['irr_card_drip_desc']='חשבו את קצב ההשקיה, אחידות ההפצה, ספיקת הצינור הצידי, ספיקת האזור וזמן הפעולה עבור מערכת השקיה בטפטוף או בממטרים. הזינו ספיקת פולט, מרווח בין פולטים ועומק יעד.';
+$ec_lang['irr_card_seepage_head']='דליפת תעלה & יעילות הולכה';
+$ec_lang['irr_card_seepage_desc']='אמדו את אובדן הדליפה ממקטע תעלה באמצעות מדידות ספיקת כניסה ויציאה. חשבו יעילות הולכה ואובדן מים שנתי כדי לסייע בתעדוף השקעות בריפוד.';
+$ec_lang['irr_quickref_html']='<h3>מדריך מהיר</h3><dl><dt>סכר הסטייה או מבנה בקרה</dt><dd>מדדו את עומק המים מעל לכתר המעביר. השתמשו ב<a href="Weir-Flow-Simple.php">מעביר פשוט</a> עבור כתר אחיד, או ב<a href="Weir-Flow-Irregular.php">מעביר לא סדיר</a> עבור כתר בעל פרופיל או ממדרגות.</dd><dt>שער ראשי או חיבור צינור</dt><dd>מדדו את מפלס המים בזרם העליון והתחתון (או גובה תחתית הצינור בשפיכה חופשית). השתמשו ב<a href="Orifice.php">זרימת פתח</a>. לצינור עגול D = קוטר הצינור; לשער מלבני הזינו רוחב W וגובה D.</dd><dt>זמן ריקון מאגר או בריכה</dt><dd>השתמשו ב<a href="Orifice-Drain-Time.php">זמן ניקוז דרך פתח</a> להערכת הזמן הדרוש להורדת מפלס בריכה או מאגר דרך פתח תחתי — שימושי לתכנון אחסון מי השקיה.</dd><dt>תקני שטח</dt><dd>משוואות הזרימה של מעביר ופתח המשמשות כאן תואמות את הנהלים של USBR <em>Water Measurement Manual</em> (מהדורה 3), הנדרשים בדרך כלל על ידי מנהלי מים ומחוזות השקיה.</dd></dl>';
 // Drip / Sprinkler Application Rate
-$ec_lang['u_lph']="L/hr";
-$ec_lang['u_gph']="gal/hr";
-$ec_lang['u_mmph']="mm/hr";
-$ec_lang['u_inph']="in/hr";
 $ec_lang['ds_main_menu']='קצב השקיה — טפטוף/ספרינקלר';
 $ec_lang['ds_main_title']='מחשבון חינמי מקוון לקצב יישום השקיה בטפטוף/ספרינקלר';
 $ec_lang['ds_main_desc']='השקיה בטפטוף וספרינקלר — קצב יישום';
@@ -369,13 +371,14 @@ $ec_lang['ds_notes_1_term']='קצב יישום';
 $ec_lang['ds_notes_1_def']='PR = q / A<sub>e</sub>, כאשר A<sub>e</sub> = S<sub>e</sub> × S<sub>l</sub> הוא השטח המשורת על ידי כל פולט. קצב יישום נמוך יותר נותן יותר זמן לחדירה — חשוב בקרקעות כבדות או שדות משופעים.';
 $ec_lang['ds_notes_2_term']='זמן הפעלה';
 $ec_lang['ds_notes_2_def']='זמן הפעלה = עומק יעד ÷ קצב יישום. בקרקע משופעת או מהודקת, חלק את זמן ההפעלה לשניים או שלושה מחזורים קצרים יותר עם הפסקות ביניהם למניעת נגר עילי.';
-
 // Canal Seepage / Conveyance Efficiency. Prefix cs_.
 $ec_lang['cs_main_menu']='דליפת תעלה';
 $ec_lang['cs_main_title']='מחשבון חינמי מקוון לאובדן דליפה בתעלה ויעילות הולכה';
 $ec_lang['cs_main_desc']='אובדן דליפה בתעלה & יעילות הולכה — שיטת מדידת יניקה-פליטה';
 $ec_lang['cs_Q_in']='זרימת כניסה, Q<sub>in</sub>';
 $ec_lang['cs_Q_out']='זרימת יציאה, Q<sub>out</sub>';
+$ec_lang['cs_L']='אורך המקטע, L';
+$ec_lang['cs_wp']='היקף רטוב, P<sub>w</sub>';
 $ec_lang['cs_Q_loss']='קצב אובדן הדליפה, Q<sub>loss</sub>';
 $ec_lang['cs_loss_check']='בדיקת מדידה';
 $ec_lang['cs_pct_loss']='שבר שאבד';
@@ -383,8 +386,6 @@ $ec_lang['cs_Ec']='יעילות הולכה, E<sub>c</sub>';
 $ec_lang['cs_Ec_check']='דירוג יעילות';
 $ec_lang['cs_Vol_day']='נפח יומי שאבד';
 $ec_lang['cs_Vol_year']='נפח שנתי שאבד';
-$ec_lang['cs_L']='אורך המקטע, L';
-$ec_lang['cs_wp']='היקף רטוב, P<sub>w</sub>';
 $ec_lang['cs_Q_loss_per_L']='אובדן ליחידת אורך, Q<sub>loss</sub>/L';
 $ec_lang['cs_water_value']='ערך מים';
 $ec_lang['cs_lining_cost']='עלות ריפוד';
@@ -408,26 +409,26 @@ $ec_lang['cs_notes_3_term']='ריפוד החזרה';
 $ec_lang['cs_notes_3_def']='הזינו ערך המים ועלות ריפוד בכל מטבע עקבי. שטח ריפוד = אורך מקטע × היקף רטוב — היקף הרטוב של חתך התעלה בעומק הזרימה הנמדד (רוחב תחתון ועל שתי המדרונות הרטובים). הערך השנתי שנשמר מניח שתעלה מרופדת משיגה את יעילות הולכה המטרה ברציפות. תקופת החזרה בפועל תהיה ארוכה יותר לתעלות עונתיות או אם הריפוד אינו מגיע ליעילות המטרה.';
 $ec_lang['cs_notes_4_term']='מקור';
 $ec_lang['cs_notes_4_def']='USBR <em>Water Measurement Manual</em>, מהדורה 3 (2001). FAO Irrigation and Drainage Paper 57 (1999).';
-
-$ec_lang['irr_intro_html']='<p>מעביר מים ופתחים הם הכלים השטחיים הסטנדרטיים למדידת זרימת מים במערכות השקיה. בחרו את המחשבון המתאים למבנה שלכם:</p>';
-$ec_lang['irr_card_weir_uniform_head']='מעביר מים — סף רחב (רוחב אחיד)';
-$ec_lang['irr_card_weir_uniform_desc']='מדדו את הזרימה מעל לכתר סכר הסטייה, מבנה הבקרה או לוח המעביר. הזינו את אורך המעביר ועומק המים מעל הסף.';
-$ec_lang['irr_card_weir_irregular_head']='מעביר מים — פרופיל לא סדיר';
-$ec_lang['irr_card_weir_irregular_desc']='השתמשו כאשר כתר המעביר אינו בגובה אחיד — שפכי חירום טבעיים, מבני נפילה ברוחב משתנה, או מבני בקרה רב-מקטעיים.';
-$ec_lang['irr_card_orifice_head']='פתח — שער ראשי או חיבור צינור';
-$ec_lang['irr_card_orifice_desc']='מדדו את הזרימה דרך שער הזזה, חיבור צינור, או פתח תעלת ניקוז. מטפל אוטומטית הן בשפיכה חופשית והן בתנאים מוצפים (לחץ נגדי מהזרם התחתון).';
-$ec_lang['irr_card_canal_head']='תכנון & ניתוח תעלה';
-$ec_lang['irr_card_canal_desc']='תכננו או בדקו תעלת השקיה בעזרת נוסחת Manning. השתמשו במחשבון הטרפזי לתעלות חדשות; במחשבון הלא סדיר לחתכים טבעיים או מבנויים קיימים.';
-$ec_lang['irr_card_drip_head']='תכנון טפטוף & ממטרים';
-$ec_lang['irr_card_drip_desc']='חשבו את קצב ההשקיה, אחידות ההפצה, ספיקת הצינור הצידי, ספיקת האזור וזמן הפעולה עבור מערכת השקיה בטפטוף או בממטרים. הזינו ספיקת פולט, מרווח בין פולטים ועומק יעד.';
-$ec_lang['irr_card_seepage_head']='דליפת תעלה & יעילות הולכה';
-$ec_lang['irr_card_seepage_desc']='אמדו את אובדן הדליפה ממקטע תעלה באמצעות מדידות ספיקת כניסה ויציאה. חשבו יעילות הולכה ואובדן מים שנתי כדי לסייע בתעדוף השקעות בריפוד.';
-$ec_lang['irr_quickref_html']='<h3>מדריך מהיר</h3><dl><dt>סכר הסטייה או מבנה בקרה</dt><dd>מדדו את עומק המים מעל לכתר המעביר. השתמשו ב<a href="Weir-Flow-Simple.php">מעביר פשוט</a> עבור כתר אחיד, או ב<a href="Weir-Flow-Irregular.php">מעביר לא סדיר</a> עבור כתר בעל פרופיל או ממדרגות.</dd><dt>שער ראשי או חיבור צינור</dt><dd>מדדו את מפלס המים בזרם העליון והתחתון (או גובה תחתית הצינור בשפיכה חופשית). השתמשו ב<a href="Orifice.php">זרימת פתח</a>. לצינור עגול D = קוטר הצינור; לשער מלבני הזינו רוחב W וגובה D.</dd><dt>זמן ריקון מאגר או בריכה</dt><dd>השתמשו ב<a href="Orifice-Drain-Time.php">זמן ניקוז דרך פתח</a> להערכת הזמן הדרוש להורדת מפלס בריכה או מאגר דרך פתח תחתי — שימושי לתכנון אחסון מי השקיה.</dd><dt>תקני שטח</dt><dd>משוואות הזרימה של מעביר ופתח המשמשות כאן תואמות את הנהלים של USBR <em>Water Measurement Manual</em> (מהדורה 3), הנדרשים בדרך כלל על ידי מנהלי מים ומחוזות השקיה.</dd></dl>';
+// About
+$ec_lang['about_main_menu']='אודות';
+$ec_lang['install_main_menu']='התקן';
+$ec_lang['install_main_title']='התקן את EngCalcs';
+$ec_lang['install_main_desc']='הוסף למכשיר שלך לשימוש לא מקוון';
+$ec_lang['contact_main_menu']='צור קשר';
+$ec_lang['about_main_title']='אודות מחשבוני ההנדסה HawsEDC';
+$ec_lang['about_main_desc']='מטרה, קוד פתוח ותרומה';
 $ec_lang['about_body_html']='<h3>שליחות</h3><p>מחשבוני ההנדסה של HawsEDC קיימים לשרת מהנדסים ועובדי שטח ברחבי העולם — ובמיוחד אלה הפועלים באזורים הסובלים מחוסר מים, מחסור במשאבים, או חסרי שירות מספק. כלים אלה הם חלק משליחות הומניטרית רחבה יותר: לומר לכל אדם בדרך המעשית והאפקטיבית ביותר שהוא אהוב ויקיר לנצח, שאין לו מה לפחד, ושהוא לא ישחית הכל.</p><p>המחשבונים הם הכלי. היעד הוא עולם נטול סבל.</p><h3>רישיון קוד פתוח</h3><p>כל הקוד מופץ תחת <a target="_blank" href="https://www.gnu.org/licenses/gpl-3.0.html">רישיון GNU הציבורי הכללי גרסה 3.0 ומעלה</a> — חופשי כמשמעות החופש. תוכלו להשתמש, ללמוד, לשנות ולהפיץ את הקוד תחת אותם תנאים.</p><p>Copyright © 2009–2026 Thomas Gail Haws.</p><h3>קוד מקור</h3><p>קוד המקור המלא זמין לציבור ב-Bitbucket:</p><p><a target="_blank" href="https://bitbucket.org/hawstom/engcalcs">bitbucket.org/hawstom/engcalcs</a></p><p>תוכלו לעיין בקוד, לדווח על בעיות, או לפצל את המאגר שם.</p><h3>תרומה</h3><p>בקשות משיכה מתקבלות בברכה. דרכים לתרום:</p><ul><li><strong>תרגומים</strong> — שפרו או הוסיפו שפה. פתחו בקשת משיכה עם שינויים בקובץ <code>lib/lang.ec.??.php</code> הרלוונטי.</li><li><strong>דיווח על באגים</strong> — השתמשו בטופס המשוב בכל עמוד מחשבון, או דווחו על בעיה ב-Bitbucket.</li><li><strong>מחשבונים חדשים</strong> — רעיונות לכלי הנדסה הידראולית המשרתים עובדי שטח ואנשי מקצוע בהשקיה מתקבלים בברכה מיוחדת. ראו את מדריך המפתחים <code>CLAUDE.md</code> במאגר.</li><li><strong>אירוח</strong> — אם תוכלו לשקף מחשבונים אלה לאזור בעל קישוריות מוגבלת, אנא צרו קשר.</li></ul><h3>שימוש ללא חיבור לאינטרנט</h3><p>המחשבונים האלה פועלים כאפליקציית ווב מתקדמת (PWA). בקרו בכל עמוד מחשבון כאשר אתם מחוברים לאינטרנט, והדפדפן שלכם יאחסן אוטומטית את כל המחשבונים. לאחר מכן כל המחשבונים יפעלו ללא אינטרנט — אין צורך בחיבור.</p><p>ב-Android או iOS, השתמשו באפשרות "הוסף למסך הבית" בדפדפן שלכם כדי להתקין את EngCalcs כאפליקציה במכשירכם. במחשב שולחני, חפשו את סמל ההתקנה בשורת הכתובת של הדפדפן.</p><p>תוכלו גם לשמור כל מחשבון בנפרד באמצעות תפריט "שמור בשם…" בדפדפן שלכם לשימוש חד-פעמי ללא חיבור לאינטרנט.</p><h3>יצירת קשר</h3><p>Tom Haws — מהנדס הידראולי ומחבר מחשבונים אלה.<br />השתמשו בטופס המשוב בכל עמוד מחשבון, או גשו לקוד המקור ב<a target="_blank" href="https://bitbucket.org/hawstom/engcalcs">Bitbucket</a>.</p>';
-
+$ec_lang['contact_title']='צור קשר עם HawsEDC';
+$ec_lang['contactSendMessage']='שלח הודעה ל-Tom Haws';
+$ec_lang['contactYourName']='שמך:';
+$ec_lang['contactYourEmail']='כתובת הדוא"ל שלך:';
+$ec_lang['contactSubject']='נושא:';
+$ec_lang['contact_message']='הודעה:';
+$ec_lang['contactSpamPrefix']='חמש ועוד אחת שווה';
+$ec_lang['contactSpamPostfix']='(אנא כתוב במילים. 1=one 2=two 3=three 4=four 5=five 6=six 7=seven +=plus 5+1=6)';
+$ec_lang['contactSubmitButton']='שלח הודעה';
+$ec_lang['contact_success']='תודה שלקחת את הזמן לכתוב.';
 // Rock Chute Design (Robinson, Rice & Kadavy 1998). Prefix rc_.
-$ec_lang['u_m2ps']='m^2/s';
-$ec_lang['u_ft2ps']='cfs/ft';
 $ec_lang['rc_main_menu']='תכנון מגלשת סלעים (Robinson)';
 $ec_lang['rc_main_title']='מחשבון חינמי לתכנון מגלשת סלעים — Robinson (1998)';
 $ec_lang['rc_main_desc']='קביעת גודל ריפרפ במגלשת סלעים — Robinson, Rice & Kadavy (1998)';
@@ -483,20 +484,3 @@ $ec_lang['rc_sketch_filter']          = 'מסנן';
 $ec_lang['rc_sketch_top_crest_curve'] = 'עקומת הרכס';
 $ec_lang['rc_sketch_outlet_apron']    = 'סינר יציאה';
 $ec_lang['rc_sketch_radius']          = 'רדיוס';
-
-// Manning Trapezoid velocity checks
-$ec_lang['mtc_vel_check']='בדיקת מהירות';
-$ec_lang['mtc_vel_ok']='המהירות סבירה להנחות זרימה אחידה.';
-$ec_lang['mtc_vel_high']='מהירות גבוהה — בדוק הפסדי מעברים ואנרגיה זמינה.';
-$ec_lang['mtc_vel_low']='מהירות נמוכה — סיכון להשתקעות.';
-$ec_lang['mtc_vel_ok_short']='בסדר';
-$ec_lang['mtc_vel_high_short']='גבוה';
-$ec_lang['mtc_vel_low_short']='נמוך';
-$ec_lang['mtc_note_2_term']='בדיקת מהירות';
-$ec_lang['mtc_note_2_def']='מהירות גבוהה משמעה אנרגיה סגולית גבוהה הנובעת מנפילה זמינה. אנרגיה זו עשויה ללכת לאיבוד במהירות באזורי התרחבות, בעקומות או בחסמים. יש לוודא שהדבר סביר עבור האתר.';
-
-// Micro-Hydro Power additional notes
-$ec_lang['mhp_notes_6_term']='יעילות';
-$ec_lang['mhp_notes_6_def']='יעילות המתקן האופיינית &eta; נעה בין 0.70 ל-0.85 לטורבינות Pelton ורוחב-זרימה הנפוצות במיקרו-הידרו. השתמש ב-0.75 כאומדן ראשוני שמרני.';
-$ec_lang['mhp_notes_7_term']='אנרגיה שנתית';
-$ec_lang['mhp_notes_7_def']='האנרגיה השנתית מניחה פעולה מתמשכת בזרימה מלאה (8760 שעות לשנה). התפוקה בפועל תהיה נמוכה יותר בשל שינויי זרימה עונתיים, זמן השבתה לתחזוקה ומקדם עומס.';
