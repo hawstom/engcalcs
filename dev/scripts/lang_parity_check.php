@@ -154,7 +154,7 @@ function compareLanguage(array $en, array $current, array $prefixes): array
             continue;
         }
 
-        if (trim((string)$current[$key]) === trim((string)$enValue)) {
+        if (normalizeForCompare((string)$current[$key]) === normalizeForCompare((string)$enValue)) {
             $englishEqual[] = $key;
         }
     }
@@ -217,6 +217,16 @@ function parseLangAssignments(string $content): array
     }
 
     return $values;
+}
+
+/**
+ * Normalizes a string for equality comparison so that an HTML-entity form
+ * (e.g. &ndash;, &times;) and its literal UTF-8 character (e.g. –, ×) are
+ * treated as identical rather than as a false "translated" difference.
+ */
+function normalizeForCompare(string $value): string
+{
+    return trim(html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
 }
 
 function fail(string $message): void

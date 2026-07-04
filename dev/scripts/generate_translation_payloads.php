@@ -341,7 +341,7 @@ function collectDeltaAndContext(array $enKeys, array $current, array $activePref
             $reason = 'missing';
         } elseif ($currentValue === '') {
             $reason = 'blank';
-        } elseif ($currentValue === trim($english)) {
+        } elseif (normalizeForCompare($currentValue) === normalizeForCompare($english)) {
             if (!isUniversalKey($key, $english)) {
                 $reason = 'equal_to_english';
             }
@@ -379,7 +379,7 @@ function findNeighbor(array $orderedKeys, array $enKeys, array $current, int $st
         }
 
         $enValue = trim((string)($enKeys[$candidate] ?? ''));
-        if ($value === $enValue) {
+        if (normalizeForCompare($value) === normalizeForCompare($enValue)) {
             continue;
         }
 
@@ -481,6 +481,16 @@ function buildPromptContext(array $terms, string $language): string
     }
 
     return "Use these preferred technical term translations when relevant:\n" . implode("\n", $lines);
+}
+
+/**
+ * Normalizes a string for equality comparison so that an HTML-entity form
+ * (e.g. &ndash;, &times;) and its literal UTF-8 character (e.g. –, ×) are
+ * treated as identical rather than as a false "untranslated" delta.
+ */
+function normalizeForCompare(string $value): string
+{
+    return trim(html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
 }
 
 function fail(string $message): void

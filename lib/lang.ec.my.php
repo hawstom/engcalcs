@@ -250,7 +250,7 @@ $ec_lang['mhp_diameter']='Penstock အချင်း, D';
 $ec_lang['mhp_length']='Penstock အရှည်, L';
 $ec_lang['mhp_roughness']='သွတ်ပိုက်ကြမ်းတမ်းမှု, e';
 $ec_lang['mhp_km']='ချိတ်ဆက်မ ဆုံးရှုံးမှုကိန်း, k<sub>m</sub> <span title="Penstock တစ်လျှောက် ချိတ်ဆက်မ နှင့် တပ်ဆင်မ ဆုံးရှုံးမှုကိန်းများ ပေါင်းလဒ်" class="ec-tip">?</span>';
-$ec_lang['mhp_nu']='Kinematic viscosity, ν <span title="1×10⁻⁶ m²/s for clean water near 20°C" class="ec-tip">?</span>';
+$ec_lang['mhp_nu']='ကိုင်နမက်တစ် ပျစ်ညစ်မှု, ν <span title="20°C အနီးရှိ သန့်ရှင်းသောရေအတွက် 1×10⁻⁶ m²/s" class="ec-tip">?</span>';
 $ec_lang['mhp_efficiency']='စက်ရုံထိရောက်မှု, η (0–1)';
 $ec_lang['mhp_velocity']='စီးဆင်းမှုအမြန်နှုန်း, v';
 $ec_lang['mhp_vel_check']='အမြန်နှုန်းစစ်ဆေးမှု';
@@ -386,7 +386,7 @@ $ec_lang['cs_lining_area']='အနားသတ် ဧရိယာ, L × P<sub>w<
 $ec_lang['cs_annual_value_lost']='နှစ်စဉ်ဆုံးရှုံးသောတန်ဖိုး';
 $ec_lang['cs_annual_value_recovered']='နှစ်စဉ်ပြန်လည်ရရှိသောတန်ဖိုး';
 $ec_lang['cs_lining_total_cost']='အနားသတ်ကုန်ကျစားရိတ်စုစုပေါင်း';
-$ec_lang['cs_payback_years']='Payback period <span title="Simple payback = total lining cost ÷ annual value recovered" class="ec-tip">?</span>';
+$ec_lang['cs_payback_years']='ရင်းနှီးငွေပြန်ရကာလ <span title="ရိုးရှင်းသောပြန်ရငွေ = စုစုပေါင်း အနားသတ်ကုန်ကျစားရိတ် ÷ နှစ်စဉ်ပြန်လည်ရရှိသောတန်ဖိုး" class="ec-tip">?</span>';
 $ec_lang['cs_notes_3_term']='အနားသတ်စြမ်းပြန်ရထားခြင်းကာလ';
 $ec_lang['cs_notes_3_def']='ရေ တန်ဖိုးနှင့် အနားသတ်စြမ်းကုန်ကျစားရိတ်ကို တူညီသော ငွေကြေးယူနစ်ဖြင့် ထည့်သွင်းပါ။ အနားသတ်စြမ်းဧရိယာ = ရောက်ရှိသောနေရာအလျား × စိုရွှဲသောပတ်လည် — အတိုင်းအတာထားသော စီးဆင်းမှုနက်ရှိုင်းမှုတွင် မြောင်းခြတ်သုံးမျက်နှာပြင်၏ စိုရွှဲသောပတ်လည် (အောက်ခြေအကျယ်အပြင် ခြေလှမ်းနှစ်ခုလုံး၏ စိုရွှဲသည့် ကြမ်းခင်း)။ နှစ်စဉ်ပြန်လည်ရရှိသည့် တန်ဖိုးသည် အနားသတ်စြမ်းမြောင်းသည် ပစ်မှတ် E<sub>c</sub> ကိုအဆက်မပြတ် ရရှိသည်ဟု မှတ်ယူသည်။ ရုံးကျန်တွင် အနားသတ်စြမ်းများ သို့မဟုတ် အနားသတ်စြမ်းသည် ပစ်မှတ်ထိရောက်နှုန်းသို့မဟုတ်နိမ့်ကျသည်ခြင်းတွင် တကယ့်ပြန်ရထားခြင်းကာလသည် ပိုရှည်ပါလိမ့်မည်။';
 $ec_lang['cs_notes_4_term']='ကိုးကားချက်';

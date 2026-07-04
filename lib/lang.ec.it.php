@@ -388,7 +388,7 @@ $ec_lang['cs_lining_area']='Area di rivestimento, L × P<sub>w</sub>';
 $ec_lang['cs_annual_value_lost']='Valore annuo perso';
 $ec_lang['cs_annual_value_recovered']='Valore annuo recuperato';
 $ec_lang['cs_lining_total_cost']='Costo totale del rivestimento';
-$ec_lang['cs_payback_years']='Payback period <span title="Simple payback = total lining cost ÷ annual value recovered" class="ec-tip">?</span>';
+$ec_lang['cs_payback_years']='Periodo di recupero <span title="Recupero semplice = costo totale del rivestimento ÷ valore annuo recuperato" class="ec-tip">?</span>';
 $ec_lang['cs_loss_positive']='Qin > Qout — percolazione rilevata ✓';
 $ec_lang['cs_loss_zero']='Qin = Qout — nessuna perdita misurabile';
 $ec_lang['cs_loss_negative']='Attenzione: Qout > Qin — verificare le misurazioni ⚠';

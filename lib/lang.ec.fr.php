@@ -393,7 +393,7 @@ $ec_lang['cs_lining_area']='Surface, L × P<sub>w</sub>';
 $ec_lang['cs_annual_value_lost']='Valeur annuelle perdue';
 $ec_lang['cs_annual_value_recovered']='Valeur annuelle récupérée';
 $ec_lang['cs_lining_total_cost']='Coût total revêtement';
-$ec_lang['cs_payback_years']='Payback period <span title="Simple payback = total lining cost ÷ annual value recovered" class="ec-tip">?</span>';
+$ec_lang['cs_payback_years']='Période de récupération <span title="Récupération simple = coût total du revêtement ÷ valeur annuelle récupérée" class="ec-tip">?</span>';
 $ec_lang['cs_loss_positive']='Qin > Qout — infiltration détectée ✓';
 $ec_lang['cs_loss_zero']='Qin = Qout — aucune perte mesurable';
 $ec_lang['cs_loss_negative']='Avertissement : Qout > Qin — vérifier les mesures ⚠';
