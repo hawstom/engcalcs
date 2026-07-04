@@ -349,7 +349,7 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "mhp_vel_high",
-                    "value": "di atas 3 m\/s — tambah diameter ⚠",
+                    "value": "Kecepatan tinggi — risiko pukulan air dan kehilangan titik (minor).",
                     "english": "Velocity high - risk of water hammer and high point (minor) losses."
                 },
                 "next_translated": {

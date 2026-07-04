@@ -44,4 +44,6 @@ input[type=number] {
 /* Hover-tip icons (⚠, ?) that carry a longer explanation in the title attribute */
 .ec-tip {
 	cursor: help;
+	color: steelblue;
+	font-size: 0.9em;
 }

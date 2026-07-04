@@ -392,7 +392,7 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "mhp_vel_high",
-                    "value": "über 3 m\/s — Durchmesser vergrößern ⚠",
+                    "value": "Geschwindigkeit hoch – Risiko von Druckstoß und Einzelverlusten.",
                     "english": "Velocity high - risk of water hammer and high point (minor) losses."
                 },
                 "next_translated": {

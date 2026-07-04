@@ -199,7 +199,7 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "mhp_vel_high",
-                    "value": "3 m\/s এর উপরে — ব্যাস বাড়ান ⚠",
+                    "value": "বেগ বেশি - জলের হাতুড়ির ঝুঁকি এবং উচ্চ বিন্দু (গৌণ) ক্ষতি।",
                     "english": "Velocity high - risk of water hammer and high point (minor) losses."
                 },
                 "next_translated": {
@@ -215,7 +215,7 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "mhp_vel_high",
-                    "value": "3 m\/s এর উপরে — ব্যাস বাড়ান ⚠",
+                    "value": "বেগ বেশি - জলের হাতুড়ির ঝুঁকি এবং উচ্চ বিন্দু (গৌণ) ক্ষতি।",
                     "english": "Velocity high - risk of water hammer and high point (minor) losses."
                 },
                 "next_translated": {
@@ -231,7 +231,7 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "mhp_vel_high",
-                    "value": "3 m\/s এর উপরে — ব্যাস বাড়ান ⚠",
+                    "value": "বেগ বেশি - জলের হাতুড়ির ঝুঁকি এবং উচ্চ বিন্দু (গৌণ) ক্ষতি।",
                     "english": "Velocity high - risk of water hammer and high point (minor) losses."
                 },
                 "next_translated": {

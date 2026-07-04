@@ -9,17 +9,12 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 # Tasks
 
 ## Calculator Improvements
-- 50|On Drip-Sprinkler.php, realistically, how would a person know the Minimum emitter rate? Is this a design calculator? Wouldn't they have to model the losses in the entire system or measure an existing system? I'm just checking that we are offering something useful here.
 
 ## Translation Standardization (Glossary Project)
 
 - 0|Expand and tighten glossary.json: Filled in all 5 empty languages (am, bn, km, my, ps) for all 27 terms using 5 parallel agents. Reviewed 6 nuanced terms across 21 existing languages. Corrections applied: fr conveyance efficiency → rendement de transport d'eau; cs/sr penstock → tlakovod/напорни цевовод; ar/uk emitter → قطارة/крапельниця; uk conveyance efficiency → added 'води'. Version bumped to 1.1.
 
-- 85|Audit existing translations for glossary compliance: After glossary is finalized, check whether key high-drift terms (flow, head loss, weir, conveyance efficiency) in the 26 non-English lang files match the glossary preferred translations. Re-translate non-compliant strings in a targeted sprint. [CC]
-
 ## Translation improvements
-
-- 36|Remove $ec_lang['ec_name_invalid'] from all languages.
 
 - 30|Remove orphaned rrc_ keys from all 26 non-English lang files: `rrc_main_desc` and `rrc_main_menu` appear in every non-English file but not in English — legacy of an earlier `rrc_` prefix before Rock Chute settled on `rc_`. Two-line removal per file × 26 files.
 
@@ -33,7 +28,15 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 - 24|Quality-score updater: Script that accepts a lang code and a new QUALITY score and updates the `QUALITY` constant in the matching `lang.ec.??.php` file. Trivial change, but currently requires opening the file manually or asking an AI — a one-liner script removes that friction entirely. [CP]
 
+## CSS Standardization Follow-up
+
+- DONE|Finish the tooltip-icon CSS standardization: the earlier "CSS standardization for validity/status checks" sprint added `.ec-tip` (currently just `cursor: help`) but only wired it into `EngCalcs.writeVelocityCheck()` in JS. The much larger set of hover-tip spans hardcoded directly into the lang files was never migrated — 318 occurrences of `style="cursor:help;color:steelblue;font-size:0.9em"` across all 27 `lib/lang.ec.??.php` files (English included). Plan: (1) add `color: steelblue; font-size: 0.9em` to `.ec-tip` in `css/engcalcs.css`, (2) mechanical find/replace `style="cursor:help;color:steelblue;font-size:0.9em"` → `class="ec-tip"` in all 27 lang files (no translation judgment needed, just markup — safe for a script or a single pass, not a per-language translation sprint). [CP]
+
+  Note: a separate, unaddressed variant `style="cursor:help;color:#06c;font-size:0.9em"` (a different blue) also exists in several lang files for the same tooltip-icon purpose — out of scope for this item, candidate for a follow-up consolidation.
+
 ## Low Priority / Nice-to-Have
+
+- 5|Drip lateral hydraulics / emission uniformity calculator (new, separate calculator — not a Drip-Sprinkler.php extension): proper DU requires the pressure profile along a real lateral/main (Christiansen multi-outlet friction-loss method, plus an emitter q-H curve exponent) to get legitimate q_avg/q_min values — a catalog "emitter flow rate" alone is really just the best-case (near-inlet) value, not avg or min. Scope grows further once pipe-size steps along the lateral are allowed (arbitrary number of diameter transitions), not just a single uniform pipe. Large effort, no near-term demand — deprioritized indefinitely. [H]
 
 - 20|Set up npm (package.json) and/or Composer for dependency management. Currently Bootstrap and other assets are manually vendored. [CP]
 
@@ -44,6 +47,10 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 - 10|Results sharing — dedicated "Copy link" button or print summary. Largely addressed by the URL-based label feature; a polished UI affordance is the remaining gap. [CP]
 
 ## Completed
+
+- 0|Drip-Sprinkler.php simplified — removed Distribution Uniformity (DU): DU as implemented required both an average and a minimum emitter flow rate, but neither is knowable at design time without full lateral/main hydraulic modeling (a catalog emitter rating is really a best-case/near-inlet value, not avg or min — DU would report 100% for any un-modeled layout). Removed `q_min`, `du`, `du_check`, and the four `du_*` quality-tier keys; renamed `ds_q_avg` to plain "Emitter flow rate, q"; merged the DU notes entry out and renumbered the Runtime note. Calculator now honestly scopes to what's knowable pre-hydraulics: area per emitter, application rate, lateral/zone flow, and runtime for a target depth. Removed the same keys mechanically (deletion + notes renumbering) from all 26 non-English lang files, then hand-trimmed the "average"/"and uniformity" wording out of `ds_main_desc`/`ds_q_avg` in each (no new translation needed, just removing qualifiers that no longer apply). `lang_parity_check.php --prefix=ds` shows 0 missing/extra/equal-to-English across all 27 files; `php -l` clean. Follow-up (full lateral-hydraulics DU calculator) logged as a new, separate, low-priority roadmap item — scope is larger than first thought once arbitrary pipe-size steps are considered.
+
+- 0|Removed `$ec_lang['ec_name_invalid']` (and its empty `$ec_lang_intent` entry, English-only, removed with explicit user permission this session) from all 27 `lib/lang.ec.??.php` files — confirmed unused outside the lang files via repo-wide grep before removal. `php -l` clean on all 27 files; `lang_parity_check.php` shows 0 missing keys post-removal.
 
 - 0|Velocity-tip wording upgrade (open-channel + enclosed-pipe): Per user feedback, richer tooltip wording for both threshold groups. Open-channel (`mtc_vel_high`, shared by mtc+mi): "check available drop" → "check transition losses and available energy" (more translatable, more general hydraulic concept than "drop/fall"). Enclosed/pressure (`mhp_vel_high`/`mhp_vel_low`, shared by dw/hw/mpf/mphl/mhp): replaced the trivial "Velocity very high/low ⚠" with substantive tips — high: "risk of water hammer and high point (minor) losses"; low: "risk of sedimentation and air entrainment" (matches the specificity of the open-channel tips; dropped the redundant ⚠ since the icon itself already shows it). Launched 26 parallel haiku agents to reword all 3 keys across every non-English `lib/lang.ec.??.php` file (existing translations were stale — several still described old "diameter sizing" advice rather than the current tooltip content). 0 missing keys, all `php -l` clean.
 
@@ -122,6 +129,12 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 - 0|Irrigation: Canal-Seepage.php added (prefix cs_). Inflow-outflow method: Q_loss = Q_in − Q_out, conveyance efficiency Ec = Q_out/Q_in. Outputs: loss rate, loss fraction, Ec with Good/Fair/Poor rating (≥80%/60-80%/<60%), daily and annual volume lost. Unit-aware (m³/s, L/s, cfs for flow; m³/ft³/ac-ft for volume). Added card to Irrigation.php landing page and menu entry under Irrigation.
 
 - 0|Drip/Sprinkler Application Rate calculator (Drip-Sprinkler.php): inputs are average and minimum emitter flow rate, emitter spacing Se, lateral spacing Sl, emitters per lateral, laterals per zone, and target application depth. Outputs are area per emitter, application (precipitation) rate PR = q/Ae, distribution uniformity DU = qmin/qavg (with color-coded quality check), flow per lateral, zone flow, and runtime for target depth. New units added: lph, gph (flow rates), mmph, inph (precipitation rate). ds_ keys added to all 27 lang files.
+
+- 0|Audit existing translations for glossary compliance: built `dev/scripts/glossary_compliance_audit.php`, comparing lang-file strings for the four highest-drift terms (flow, head loss, weir, conveyance efficiency) against glossary.json preferred translations across all 26 non-English files. Most flagged mismatches were false positives from case/declension (e.g. Bulgarian "загуба"/"загуби") rather than real drift. Found and fixed one genuine defect: bg, tr, sr, km, and my each used a different word for "flow" across the mpf_/or_/mhp_ calculators within the same lang file — standardized all three to the glossary-preferred term per language. Also discovered (but did not yet fix — logged as a new task above) that `cs_Ec_target`'s tooltip text is untranslated English in 19 languages.
+
+- 0|Translated `cs_Ec_target` (and the sibling `cs_lining_area`, same defect) into all 25 non-English languages: fr/it/km/my/ro/tr had the literal English "Lining target"/"Lining area" strings; 13 more languages (es, fa, he, hi, hr, id, pt, ps, ru, sr, sw, ur, zh) had a translated label but an untranslated English tooltip `title` attribute; bg/cs/bn/ar/am used a fuller inline sentence instead of the short-label-plus-tooltip pattern that the English source and most other languages use — all reworked to match. Existing per-language "conveyance efficiency" (`cs_Ec`) and "lining" (`cs_lining_cost`) vocabulary reused for consistency within each file. Root cause of why this slipped past `generate_translation_payloads.php`'s delta detection: the checker does exact-string equality against English, and these strings differed from English only by HTML entity vs. literal character (`&ndash;`/`–`, `&times;`/`×`) — a normalization gap in that script, logged separately below.
+
+- 60|`generate_translation_payloads.php` and `lang_parity_check.php`'s "equal to English" detection compares raw strings and misses matches that differ only by HTML-entity-vs-literal-character encoding (e.g. `&ndash;` vs `–`, `&times;` vs `×`). A broader one-off scan (not yet actioned beyond `cs_Ec_target`/`cs_lining_area`) found ~40 more suspect keys across many languages this way (e.g. `mtc_blodgett_v_bathurst`, `mi_groupSegment`, `wi_notes_we_def`) — some may be legitimate untranslated proper nouns/technical keys, not confirmed defects. Needs triage before any fix. [CC]
 
 - 0|Language quality — structural fixes: he, pt, hr, sr, ro, zh all raised to 0.85–0.9. he: fixed 6 English strings in mtc_ section and mixed-language mphl_hgl_2. sr: fixed 4 Croatian-script strings in irr_/mhp_ sections. All 26 non-English lang files gained about_ keys.
 

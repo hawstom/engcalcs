@@ -241,7 +241,7 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "mhp_vel_high",
-                    "value": "peste 3 m\/s — măriți diametrul ⚠",
+                    "value": "Viteză ridicată - risc de lovitura de berbec și pierderi locale (minore).",
                     "english": "Velocity high - risk of water hammer and high point (minor) losses."
                 },
                 "next_translated": {

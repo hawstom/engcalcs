@@ -259,7 +259,7 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "mhp_vel_high",
-                    "value": "nad 3 m\/s — zvětšete průměr ⚠",
+                    "value": "Rychlost vysoká — riziko vodního rázu a místních ztrát.",
                     "english": "Velocity high - risk of water hammer and high point (minor) losses."
                 },
                 "next_translated": {

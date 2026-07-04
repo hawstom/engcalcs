@@ -282,7 +282,7 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "mhp_vel_high",
-                    "value": "superiore a 3 m\/s — aumentare il diametro ⚠",
+                    "value": "Velocità elevata — rischio di colpo d'ariete e perdite localizzate.",
                     "english": "Velocity high - risk of water hammer and high point (minor) losses."
                 },
                 "next_translated": {

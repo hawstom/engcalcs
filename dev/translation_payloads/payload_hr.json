@@ -347,7 +347,7 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "mhp_vel_high",
-                    "value": "iznad 3 m\/s — povećajte promjer ⚠",
+                    "value": "Brzina visoka — rizik od vodnog udara i lokalnih gubitaka.",
                     "english": "Velocity high - risk of water hammer and high point (minor) losses."
                 },
                 "next_translated": {

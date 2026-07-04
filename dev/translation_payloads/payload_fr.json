@@ -436,7 +436,7 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "mhp_vel_high",
-                    "value": "supérieur à 3 m\/s — augmenter le diamètre ⚠",
+                    "value": "Vitesse élevée - risque de coup de bélier et pertes singulières (mineures).",
                     "english": "Velocity high - risk of water hammer and high point (minor) losses."
                 },
                 "next_translated": {
