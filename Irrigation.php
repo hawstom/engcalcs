@@ -74,6 +74,16 @@ echoHeader("EngCalcs", $html_title, $html_head, false);
 		</div>
 	</div>
 
+	<div class="col">
+		<div class="card h-100">
+			<div class="card-header fw-bold"><?=$ec_lang['irr_card_pressure_head']?></div>
+			<div class="card-body">
+				<p class="card-text"><?=$ec_lang['irr_card_pressure_desc']?></p>
+				<a href="Irrigation-Pressure.php" class="btn btn-primary"><?=$ec_lang['ip_main_menu']?></a>
+			</div>
+		</div>
+	</div>
+
 </div>
 
 <?=$ec_lang['irr_quickref_html']?>

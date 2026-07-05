@@ -107,6 +107,7 @@ function echoEngCalcsMenu ($html_title = '', $show_name_field = false, $calc_nam
 					<a class="dropdown-item" href="Irrigation.php" title="<?=$ec_lang['irr_main_desc']?>"><?=$ec_lang['irr_main_menu']?></a>
 						<a class="dropdown-item" href="Drip-Sprinkler.php" title="<?=$ec_lang['ds_main_desc']?>"><?=$ec_lang['ds_main_menu']?></a>
 						<a class="dropdown-item" href="Canal-Seepage.php" title="<?=$ec_lang['cs_main_desc']?>"><?=$ec_lang['cs_main_menu']?></a>
+						<a class="dropdown-item" href="Irrigation-Pressure.php" title="<?=$ec_lang['ip_main_desc']?>"><?=$ec_lang['ip_main_menu']?></a>
 				</div>
 			</li>
 			<li class="nav-item dropdown">

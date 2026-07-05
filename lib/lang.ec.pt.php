@@ -66,6 +66,7 @@ $ec_lang['template_printable_title']='Título imprimível';
 $ec_lang['template_printable_subtitle']='Subtítulo imprimível';
 $ec_lang['index_title']='Calculadoras de Engenharia Gratuitas Online';
 $ec_lang['calc_set_units']='Definir unidades:';
+$ec_lang['calc_defaults']='Valores padrão';
 $ec_lang['points_data_help']='(ou Copiar/Colar usando a área de dados)';
 $ec_lang['points_data_title']='Dados dos pontos (separados por vírgula ou tabulação)';
 $ec_lang['points_data_copy']='Copiar';

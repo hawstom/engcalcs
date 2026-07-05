@@ -66,6 +66,7 @@ $ec_lang['template_printable_title']='طباعت کے قابل عنوان';
 $ec_lang['template_printable_subtitle']='طباعت کے قابل ذیلی عنوان';
 $ec_lang['index_title']='مفت آنلائن انجینئرنگ حاسبات';
 $ec_lang['calc_set_units']='اکائیاں مقرر کریں:';
+$ec_lang['calc_defaults']='پہلے سے مقرر اقدار';
 $ec_lang['points_data_help']='(یا ڈیٹا علاقے سے کاپی/پیسٹ کریں)';
 $ec_lang['points_data_title']='نقطہ ڈیٹا<br />(کاما یا ٹیب سے علیحدہ)';
 $ec_lang['points_data_copy']='کاپی';

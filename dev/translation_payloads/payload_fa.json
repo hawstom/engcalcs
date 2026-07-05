@@ -1,22 +1,22 @@
 {
     "meta": {
         "language": "fa",
-        "expected_key_count": 465,
+        "expected_key_count": 508,
         "delta_key_count": 1,
         "active_prefixes": [
-            "wi"
+            "calc"
         ],
-        "requested_prefix": null,
+        "requested_prefix": "calc",
         "notes": "Translate only keys in keys_to_translate; preserve HTML, units, and symbols.",
         "glossary_injection_notes": "Use prompt_context_by_prefix and glossary_terms_by_prefix.preferred_translation when available.",
         "context_notes": "Use key_context.neighbors to keep register consistent with nearby translated strings.",
         "intent_notes": "Use key_intent when present; these entries provide terse disambiguation comments only where translation risk exists."
     },
     "prompt_context_by_prefix": {
-        "wi": "Use these preferred technical term translations when relevant:\n- flow (Q): دبی\n- weir: سرریز\n- headwater elevation: تراز آب بالادست\n- tailwater elevation: تراز آب پایین‌دست\n- discharge coefficient (C_d): ضریب تخلیه"
+        "calc": "Use these preferred technical term translations when relevant:\n- flow (Q): دبی\n- velocity (v): سرعت\n- slope (S): شیب"
     },
     "glossary_terms_by_prefix": {
-        "wi": [
+        "calc": [
             {
                 "term": "flow",
                 "symbol": "Q",
@@ -25,55 +25,41 @@
                 "preferred_translation": "دبی"
             },
             {
-                "term": "weir",
-                "symbol": "",
-                "context": "A flow-measurement or water-control structure — a barrier across a channel over which water flows. Appears in Weir Flow Simple and Weir Flow Irregular calculators.",
-                "translation_notes": "WMO No. 385 entry 1665 confirms: es = 'vertedero', fr = 'déversoir', ru = 'водослив'. In an irrigation context, the term often overlaps with 'diversion dam' or 'check structure'. Use the term most common among irrigation field workers in the target language, not a purely civil-engineering dictionary term.",
-                "preferred_translation": "سرریز"
+                "term": "velocity",
+                "symbol": "v",
+                "context": "Flow velocity (speed of water). Appears in all calculators.",
+                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
+                "preferred_translation": "سرعت"
             },
             {
-                "term": "headwater elevation",
-                "symbol": "",
-                "context": "Water surface elevation on the upstream side of a weir or orifice. Appears in Weir Flow and Orifice calculators.",
-                "translation_notes": "'Headwater' is an upstream water surface — do not confuse with 'head' (energy) or 'source' (origin of a stream). Use the hydraulic structure term.",
-                "preferred_translation": "تراز آب بالادست"
-            },
-            {
-                "term": "tailwater elevation",
-                "symbol": "",
-                "context": "Water surface elevation on the downstream side of a weir or orifice. Appears in Orifice Flow calculator. When tailwater is above the invert, the orifice is submerged.",
-                "translation_notes": "Use the hydraulic structure term for downstream water level. Pair consistently with 'headwater elevation'.",
-                "preferred_translation": "تراز آب پایین‌دست"
-            },
-            {
-                "term": "discharge coefficient",
-                "symbol": "C_d",
-                "context": "Coefficient correcting theoretical orifice or weir flow for real-world contraction and friction effects. Appears in Orifice and Weir calculators.",
-                "translation_notes": "The 'discharge' here refers to flow rate, not the verb. Use the hydraulic engineering compound term.",
-                "preferred_translation": "ضریب تخلیه"
+                "term": "slope",
+                "symbol": "S",
+                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
+                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
+                "preferred_translation": "شیب"
             }
         ]
     },
     "keys_to_translate": {
-        "wi_notes_we_def": "q = if (length = 0) then 0 else if (slope=0) then cw*length*d<sub>0<\/sub><sup>1.5<\/sup> else cw\/(2.5*slope) * (d<sub>0<\/sub><sup>2.5<\/sup> - d<sub>1<\/sub><sup>2.5<\/sup>) where d<sub>1<\/sub> and d<sub>0<\/sub> are always positive or zero"
+        "calc_defaults": "Default values"
     },
     "keys": {
-        "wi_notes_we_def": "q = if (length = 0) then 0 else if (slope=0) then cw*length*d<sub>0<\/sub><sup>1.5<\/sup> else cw\/(2.5*slope) * (d<sub>0<\/sub><sup>2.5<\/sup> - d<sub>1<\/sub><sup>2.5<\/sup>) where d<sub>1<\/sub> and d<sub>0<\/sub> are always positive or zero"
+        "calc_defaults": "Default values"
     },
     "key_context": {
-        "wi_notes_we_def": {
+        "calc_defaults": {
             "reason": "equal_to_english",
-            "current_value": "q = if (length = 0) then 0 else if (slope=0) then cw*length*d<sub>0<\/sub><sup>1.5<\/sup> else cw\/(2.5*slope) * (d<sub>0<\/sub><sup>2.5<\/sup> - d<sub>1<\/sub><sup>2.5<\/sup>) where d<sub>1<\/sub> and d<sub>0<\/sub> are always positive or zero",
+            "current_value": "Default values",
             "neighbors": {
                 "previous_translated": {
-                    "key": "wi_notes_we_term",
-                    "value": "معادله سرریز",
-                    "english": "Weir Equation"
+                    "key": "calc_set_units",
+                    "value": "تنظیم واحدها:",
+                    "english": "Set units:"
                 },
                 "next_translated": {
-                    "key": "or_main_menu",
-                    "value": "جریان دریچه",
-                    "english": "Orifice Flow"
+                    "key": "points_data_help",
+                    "value": "(یا با استفاده از ناحیه داده کپی\/پیست کنید)",
+                    "english": "(or Copy\/Paste using data area)"
                 }
             }
         }

@@ -1,22 +1,22 @@
 {
     "meta": {
         "language": "my",
-        "expected_key_count": 465,
-        "delta_key_count": 2,
+        "expected_key_count": 508,
+        "delta_key_count": 1,
         "active_prefixes": [
-            "u"
+            "calc"
         ],
-        "requested_prefix": null,
+        "requested_prefix": "calc",
         "notes": "Translate only keys in keys_to_translate; preserve HTML, units, and symbols.",
         "glossary_injection_notes": "Use prompt_context_by_prefix and glossary_terms_by_prefix.preferred_translation when available.",
         "context_notes": "Use key_context.neighbors to keep register consistent with nearby translated strings.",
         "intent_notes": "Use key_intent when present; these entries provide terse disambiguation comments only where translation risk exists."
     },
     "prompt_context_by_prefix": {
-        "u": "Use these preferred technical term translations when relevant:\n- flow (Q): ရေစီးနှုန်း\n- velocity (v): ရေအလျင်နှုန်း\n- slope (S): လျောစောင်း"
+        "calc": "Use these preferred technical term translations when relevant:\n- flow (Q): ရေစီးနှုန်း\n- velocity (v): ရေအလျင်နှုန်း\n- slope (S): လျောစောင်း"
     },
     "glossary_terms_by_prefix": {
-        "u": [
+        "calc": [
             {
                 "term": "flow",
                 "symbol": "Q",
@@ -41,43 +41,25 @@
         ]
     },
     "keys_to_translate": {
-        "u_gradePercent": "% rise\/run",
-        "u_grade": "rise\/run"
+        "calc_defaults": "Default values"
     },
     "keys": {
-        "u_gradePercent": "% rise\/run",
-        "u_grade": "rise\/run"
+        "calc_defaults": "Default values"
     },
     "key_context": {
-        "u_gradePercent": {
+        "calc_defaults": {
             "reason": "equal_to_english",
-            "current_value": "% rise\/run",
+            "current_value": "Default values",
             "neighbors": {
                 "previous_translated": {
-                    "key": "u_depthFrac",
-                    "value": "အပိုင်းကိန်း",
-                    "english": "fraction"
+                    "key": "calc_set_units",
+                    "value": "ယူနစ်သတ်မှတ်ရန်:",
+                    "english": "Set units:"
                 },
                 "next_translated": {
-                    "key": "menu_brand",
-                    "value": "HawsEDC တွက်ချက်မှုကိရိယာများ",
-                    "english": "HawsEDC Calculators"
-                }
-            }
-        },
-        "u_grade": {
-            "reason": "equal_to_english",
-            "current_value": "rise\/run",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "u_depthFrac",
-                    "value": "အပိုင်းကိန်း",
-                    "english": "fraction"
-                },
-                "next_translated": {
-                    "key": "menu_brand",
-                    "value": "HawsEDC တွက်ချက်မှုကိရိယာများ",
-                    "english": "HawsEDC Calculators"
+                    "key": "points_data_help",
+                    "value": "(သို့မဟုတ် ဒေတာနေရာကို အသုံးပြု၍ ကူးယူ\/ကူးထည့်ပါ)",
+                    "english": "(or Copy\/Paste using data area)"
                 }
             }
         }

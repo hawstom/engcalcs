@@ -66,6 +66,7 @@ $ec_lang['template_printable_title']='Yazdırılabilir Başlık';
 $ec_lang['template_printable_subtitle']='Yazdırılabilir Alt Başlık';
 $ec_lang['index_title']='Bedava çevrimiçi mühendislik hesaplayıcıları';
 $ec_lang['calc_set_units']='Birimleri ayarla:';
+$ec_lang['calc_defaults']='Varsayılanlar';
 $ec_lang['points_data_help']='(veya veri alanını kullanarak Kopyala/Yapıştır)';
 $ec_lang['points_data_title']='Nokta verileri<br />(virgül veya sekme ile ayrılmış)';
 $ec_lang['points_data_copy']='Kopyala';

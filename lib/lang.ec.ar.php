@@ -66,6 +66,7 @@ $ec_lang['template_printable_title']='عنوان للطباعة';
 $ec_lang['template_printable_subtitle']='عنوان فرعي للطباعة';
 $ec_lang['index_title']='حاسبات هندسية مجانية عبر الإنترنت';
 $ec_lang['calc_set_units']='تحديد الوحدات:';
+$ec_lang['calc_defaults']='القيم الافتراضية';
 $ec_lang['points_data_help']='(أو نسخ/لصق باستخدام منطقة البيانات)';
 $ec_lang['points_data_title']='بيانات النقاط<br />(مفصولة بفاصلة أو مسافة جدولة)';
 $ec_lang['points_data_copy']='نسخ';

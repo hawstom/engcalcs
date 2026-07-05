@@ -65,6 +65,7 @@ $ec_lang['template_printable_title']='Titolo stampabile';
 $ec_lang['template_printable_subtitle']='Sottotitolo stampabile';
 $ec_lang['index_title']='Calcolatori ingegneristici gratuiti online';
 $ec_lang['calc_set_units']='Imposta unità:';
+$ec_lang['calc_defaults']='Valori predefiniti';
 $ec_lang['points_data_help']='(o Copia/Incolla usando l\'area dati)';
 $ec_lang['points_data_title']='Dati punti<br />(separati da virgola o tabulazione)';
 $ec_lang['points_data_copy']='Copia';

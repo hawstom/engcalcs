@@ -66,6 +66,7 @@ $ec_lang['template_printable_title']='မှတ်တမ်းတင်ရာ �
 $ec_lang['template_printable_subtitle']='မှတ်တမ်းတင်ရာ အမည်ငယ်';
 $ec_lang['index_title']='အခမဲ့ အွန်လိုင်း အင်ဂျင်နီယာ တွက်ချက်မှုကိရိယာများ';
 $ec_lang['calc_set_units']='ယူနစ်သတ်မှတ်ရန်:';
+$ec_lang['calc_defaults']='ပုံမှန် တန်ဖိုးများ';
 $ec_lang['points_data_help']='(သို့မဟုတ် ဒေတာနေရာကို အသုံးပြု၍ ကူးယူ/ကူးထည့်ပါ)';
 $ec_lang['points_data_title']='အမှတ်ဒေတာ<br />(ကော်မာ သို့မဟုတ် tab ဖြင့် ခွဲ)';
 $ec_lang['points_data_copy']='ကူးယူ';

@@ -65,6 +65,7 @@ $ec_lang['template_printable_title']='Druckbarer Titel';
 $ec_lang['template_printable_subtitle']='Druckbarer Untertitel';
 $ec_lang['index_title']='Kostenlose Ingenieurrechner online';
 $ec_lang['calc_set_units']='Einheiten festlegen:';
+$ec_lang['calc_defaults']='Standardwerte';
 $ec_lang['points_data_help']='(oder Kopieren/Einfügen im Datenbereich)';
 $ec_lang['points_data_title']='Punktdaten<br />(durch Komma oder Tabulator getrennt)';
 $ec_lang['points_data_copy']='Kopieren';

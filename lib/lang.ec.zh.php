@@ -65,6 +65,7 @@ $ec_lang['template_printable_title']='可打印标题';
 $ec_lang['template_printable_subtitle']='可打印副标题';
 $ec_lang['index_title']='免费在线工程计算器';
 $ec_lang['calc_set_units']='单位设置：';
+$ec_lang['calc_defaults']='默认值';
 $ec_lang['points_data_help']='（或使用数据区域复制/粘贴）';
 $ec_lang['points_data_title']='测点数据<br />（逗号或制表符分隔）';
 $ec_lang['points_data_copy']='复制';

@@ -64,6 +64,7 @@ $ec_lang['template_printable_title']='Naslov za ispis';
 $ec_lang['template_printable_subtitle']='Podnaslov za ispis';
 $ec_lang['index_title']='Besplatni online inženjerski kalkulatori';
 $ec_lang['calc_set_units']='Postavi jedinice:';
+$ec_lang['calc_defaults']='Zadane vrijednosti';
 $ec_lang['points_data_help']='(ili Kopiraj/Zalijepi pomoću područja podataka)';
 $ec_lang['points_data_title']='Podaci točaka<br />(odvojeni zarezom ili tabulatorom)';
 $ec_lang['points_data_copy']='Kopiraj';

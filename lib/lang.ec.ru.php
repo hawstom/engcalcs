@@ -65,6 +65,7 @@ $ec_lang['template_printable_title']='Печатный заголовок';
 $ec_lang['template_printable_subtitle']='Печатный подзаголовок';
 $ec_lang['index_title']='Бесплатные инженерные калькуляторы онлайн';
 $ec_lang['calc_set_units']='Установить единицы:';
+$ec_lang['calc_defaults']='Значения по умолчанию';
 $ec_lang['points_data_help']='(или Копировать/Вставить через область данных)';
 $ec_lang['points_data_title']='Данные точек<br />(разделены запятой или табуляцией)';
 $ec_lang['points_data_copy']='Копировать';

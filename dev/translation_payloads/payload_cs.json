@@ -1,91 +1,22 @@
 {
     "meta": {
         "language": "cs",
-        "expected_key_count": 465,
-        "delta_key_count": 5,
+        "expected_key_count": 508,
+        "delta_key_count": 1,
         "active_prefixes": [
-            "mhp",
-            "mi",
-            "mtc"
+            "calc"
         ],
-        "requested_prefix": null,
+        "requested_prefix": "calc",
         "notes": "Translate only keys in keys_to_translate; preserve HTML, units, and symbols.",
         "glossary_injection_notes": "Use prompt_context_by_prefix and glossary_terms_by_prefix.preferred_translation when available.",
         "context_notes": "Use key_context.neighbors to keep register consistent with nearby translated strings.",
         "intent_notes": "Use key_intent when present; these entries provide terse disambiguation comments only where translation risk exists."
     },
     "prompt_context_by_prefix": {
-        "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): průtok\n- penstock: tlakovod\n- gross head (H_gross): hrubý spád\n- net head (H_net): čistý spád\n- plant efficiency (η): účinnost elektrárny\n- head loss (h_L): ztráta tlakové výšky\n- run-of-river: průtočná vodní elektrárna\n- headworks: odběrný objekt\n- junction loss (H_m): místní ztráty",
-        "mi": "Use these preferred technical term translations when relevant:\n- flow (Q): průtok\n- velocity (v): rychlost\n- hydraulic radius (R_h): hydraulický poloměr\n- wetted perimeter (P_w): smočený obvod\n- Manning roughness (n): Manningův součinitel drsnosti\n- slope (S): sklon",
-        "mtc": "Use these preferred technical term translations when relevant:\n- flow (Q): průtok\n- velocity (v): rychlost\n- hydraulic radius (R_h): hydraulický poloměr\n- wetted perimeter (P_w): smočený obvod\n- Manning roughness (n): Manningův součinitel drsnosti\n- slope (S): sklon"
+        "calc": "Use these preferred technical term translations when relevant:\n- flow (Q): průtok\n- velocity (v): rychlost\n- slope (S): sklon"
     },
     "glossary_terms_by_prefix": {
-        "mhp": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
-                "preferred_translation": "průtok"
-            },
-            {
-                "term": "penstock",
-                "symbol": "",
-                "context": "Pressure pipe carrying water from a reservoir or headpond down to a turbine in a micro-hydro system. Appears in Micro-Hydro Power calculator.",
-                "translation_notes": "'Penstock' is a specialized term with no exact one-word equivalent in many languages. Use the established civil\/hydro engineering phrase for 'pressure conduit' or 'force main to turbine'. Czech: 'tlakovod' (pressure main) is preferred over the generic 'přiváděcí potrubí' (supply pipe). Serbian: 'напорни цевовод' is the standard hydraulic engineering term.",
-                "preferred_translation": "tlakovod"
-            },
-            {
-                "term": "gross head",
-                "symbol": "H_gross",
-                "context": "Total elevation difference between the headpond water surface and the turbine — before subtracting penstock losses. Appears in Micro-Hydro Power calculator.",
-                "translation_notes": "'Gross' means total\/before-deduction. Pair with 'net head' for clarity. Use the hydro-power standard term.",
-                "preferred_translation": "hrubý spád"
-            },
-            {
-                "term": "net head",
-                "symbol": "H_net",
-                "context": "Effective head available at the turbine after subtracting penstock friction and minor losses from gross head. H_net = H_gross - h_L.",
-                "translation_notes": "'Net' means after-deduction. Pair with 'gross head'. Use the hydro-power standard term. WMO No. 385 entry 111 ('available head') gives the Russian term 'полезный напор' (useful head) \/ syn. 'располагаемый напор' — these overlap with net head in Russian hydro engineering practice.",
-                "preferred_translation": "čistý spád"
-            },
-            {
-                "term": "plant efficiency",
-                "symbol": "η",
-                "context": "Overall efficiency of a micro-hydro power plant — product of turbine, generator, and transmission efficiencies. Dimensionless, 0–1. Appears in Micro-Hydro Power calculator.",
-                "translation_notes": "'Plant' here means the power plant\/installation, not a living plant. Use the energy\/electrical engineering term for overall system efficiency.",
-                "preferred_translation": "účinnost elektrárny"
-            },
-            {
-                "term": "head loss",
-                "symbol": "h_L",
-                "context": "Energy loss expressed as a height of water column. Appears in Darcy-Weisbach, Hazen-Williams, Manning pipe, and Penstock calculators. Distinct from 'pressure drop' — use the hydraulic engineering term.",
-                "translation_notes": "'Head' in the hydraulic sense (energy per unit weight) does not translate literally in many languages — use the established civil\/hydraulic engineering phrase. Pre-2026 sr\/hr human translations used 'gubitak pritiska' (= pressure loss), which is technically the same concept expressed in pressure terms rather than head terms. The current 'губитак напора \/ gubitak tlačne visine' (= loss of hydraulic head) is more precise in a hydraulic engineering context and is preferred.",
-                "preferred_translation": "ztráta tlakové výšky"
-            },
-            {
-                "term": "run-of-river",
-                "symbol": "",
-                "context": "A hydropower configuration that uses natural river flow without a dam or significant storage reservoir. Power output varies with seasonal river flow. Appears in Micro-Hydro Power calculator.",
-                "translation_notes": "Use the established energy\/hydropower sector term. 'Run' means natural river current — do not translate as jogging or running. WMO No. 385 entry 1263 gives the full facility names: Spanish 'central hidroeléctrica de pasada', French 'usine hydroélectrique au fil de l'eau', Russian 'русловая гидроэлектростанция' — these are the authoritative terms for the power plant noun. The abbreviated forms 'filo de agua' (es), 'au fil de l'eau' (fr), and 'русловая ГЭС' (ru) are standard in engineering use. German: 'Laufwasserkraftwerk'. Chinese: '径流式水电'.",
-                "preferred_translation": "průtočná vodní elektrárna"
-            },
-            {
-                "term": "headworks",
-                "symbol": "",
-                "context": "The intake structure at the upstream end of a penstock or canal, where water is diverted from the river or reservoir into the conveyance system. Appears in Micro-Hydro Power calculator (penstock diameter and length descriptions).",
-                "translation_notes": "Use the civil\/irrigation engineering term for a water intake or diversion structure. Spanish: 'obra de toma'. French: 'ouvrage de prise d'eau'. Russian: 'водозаборное сооружение'. German: 'Einlaufbauwerk'. In many languages, 'intake structure' is preferred over a literal translation of 'headworks'.",
-                "preferred_translation": "odběrný objekt"
-            },
-            {
-                "term": "junction loss",
-                "symbol": "H_m",
-                "context": "Energy loss at pipe junctions, bends, fittings, and entrance — a local (point) loss as opposed to distributed friction loss along the pipe. H_m = k × v²\/(2g). Also called 'minor loss', though in short penstocks these can equal or exceed friction losses. Appears in Manning Pipe Head Loss and Micro-Hydro Power calculators.",
-                "translation_notes": "The term 'minor loss' is conventional but misleading — do not imply these losses are always small. Use the hydraulic engineering term for local\/point losses at fittings. French: 'perte singulière'. Spanish: 'pérdida local' or 'pérdida por accesorio'. Russian: 'местные потери'. Chinese: '局部水头损失'.",
-                "preferred_translation": "místní ztráty"
-            }
-        ],
-        "mi": [
+        "calc": [
             {
                 "term": "flow",
                 "symbol": "Q",
@@ -99,71 +30,6 @@
                 "context": "Flow velocity (speed of water). Appears in all calculators.",
                 "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
                 "preferred_translation": "rychlost"
-            },
-            {
-                "term": "hydraulic radius",
-                "symbol": "R_h",
-                "context": "Cross-sectional flow area divided by wetted perimeter. Appears in Manning calculators.",
-                "translation_notes": "Use the standard hydraulic engineering phrase. Pre-2026 sr\/hr human translations used the Latin loanword 'hidraulički radijus' — this form is widely used in South Slavic engineering practice and may be more recognizable to field practitioners than the native Slavic equivalents 'полупречник' (sr) \/ 'polumjer' (hr). Both are correct; native Slavic engineers may encounter both forms.",
-                "preferred_translation": "hydraulický poloměr"
-            },
-            {
-                "term": "wetted perimeter",
-                "symbol": "P_w",
-                "context": "Length of the channel or pipe boundary in contact with flowing water. Appears in Manning calculators.",
-                "translation_notes": "WMO No. 385 entry 1682 confirms: es = 'perímetro mojado', fr = 'périmètre mouillé'. Use the standard hydraulic engineering phrase. 'Wetted' here means 'in contact with water', not 'soaked'. Pre-2026 sr human used 'okvašeni obim' (obim = natural South Slavic word for perimeter\/circumference); current uses 'квашени периметар' (периметар = Greek-derived loanword). Both are correct; 'obim\/opseg' is more natural in informal Serbian\/Croatian field use.",
-                "preferred_translation": "smočený obvod"
-            },
-            {
-                "term": "Manning roughness",
-                "symbol": "n",
-                "context": "Manning's n — empirical roughness coefficient used in the Manning formula for open-channel and pipe flow.",
-                "translation_notes": "Always include 'Manning' as a proper noun. The coefficient itself (n) needs no translation — only the label does. Do not translate as generic 'roughness coefficient' without 'Manning'.",
-                "preferred_translation": "Manningův součinitel drsnosti"
-            },
-            {
-                "term": "slope",
-                "symbol": "S",
-                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
-                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
-                "preferred_translation": "sklon"
-            }
-        ],
-        "mtc": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
-                "preferred_translation": "průtok"
-            },
-            {
-                "term": "velocity",
-                "symbol": "v",
-                "context": "Flow velocity (speed of water). Appears in all calculators.",
-                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
-                "preferred_translation": "rychlost"
-            },
-            {
-                "term": "hydraulic radius",
-                "symbol": "R_h",
-                "context": "Cross-sectional flow area divided by wetted perimeter. Appears in Manning calculators.",
-                "translation_notes": "Use the standard hydraulic engineering phrase. Pre-2026 sr\/hr human translations used the Latin loanword 'hidraulički radijus' — this form is widely used in South Slavic engineering practice and may be more recognizable to field practitioners than the native Slavic equivalents 'полупречник' (sr) \/ 'polumjer' (hr). Both are correct; native Slavic engineers may encounter both forms.",
-                "preferred_translation": "hydraulický poloměr"
-            },
-            {
-                "term": "wetted perimeter",
-                "symbol": "P_w",
-                "context": "Length of the channel or pipe boundary in contact with flowing water. Appears in Manning calculators.",
-                "translation_notes": "WMO No. 385 entry 1682 confirms: es = 'perímetro mojado', fr = 'périmètre mouillé'. Use the standard hydraulic engineering phrase. 'Wetted' here means 'in contact with water', not 'soaked'. Pre-2026 sr human used 'okvašeni obim' (obim = natural South Slavic word for perimeter\/circumference); current uses 'квашени периметар' (периметар = Greek-derived loanword). Both are correct; 'obim\/opseg' is more natural in informal Serbian\/Croatian field use.",
-                "preferred_translation": "smočený obvod"
-            },
-            {
-                "term": "Manning roughness",
-                "symbol": "n",
-                "context": "Manning's n — empirical roughness coefficient used in the Manning formula for open-channel and pipe flow.",
-                "translation_notes": "Always include 'Manning' as a proper noun. The coefficient itself (n) needs no translation — only the label does. Do not translate as generic 'roughness coefficient' without 'Manning'.",
-                "preferred_translation": "Manningův součinitel drsnosti"
             },
             {
                 "term": "slope",
@@ -175,97 +41,25 @@
         ]
     },
     "keys_to_translate": {
-        "mi_groupSegment": "Segment",
-        "mi_station": "Sta",
-        "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
-        "mtc_vel_ok_short": "OK",
-        "mhp_vel_ok_short": "OK"
+        "calc_defaults": "Default values"
     },
     "keys": {
-        "mi_groupSegment": "Segment",
-        "mi_station": "Sta",
-        "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
-        "mtc_vel_ok_short": "OK",
-        "mhp_vel_ok_short": "OK"
+        "calc_defaults": "Default values"
     },
     "key_context": {
-        "mi_groupSegment": {
+        "calc_defaults": {
             "reason": "equal_to_english",
-            "current_value": "Segment",
+            "current_value": "Default values",
             "neighbors": {
                 "previous_translated": {
-                    "key": "mi_groupPoint",
-                    "value": "Bod",
-                    "english": "Point"
+                    "key": "calc_set_units",
+                    "value": "Nastavit jednotky:",
+                    "english": "Set units:"
                 },
                 "next_translated": {
-                    "key": "mi_groupRegion",
-                    "value": "Oblast",
-                    "english": "Region"
-                }
-            }
-        },
-        "mi_station": {
-            "reason": "equal_to_english",
-            "current_value": "Sta",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mi_groupRegion",
-                    "value": "Oblast",
-                    "english": "Region"
-                },
-                "next_translated": {
-                    "key": "mi_elevation",
-                    "value": "Kóta",
-                    "english": "Elev"
-                }
-            }
-        },
-        "mtc_blodgett_v_bathurst": {
-            "reason": "equal_to_english",
-            "current_value": "Blodgett vs. Bathurst",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mtc_n_bathurst",
-                    "value": "n pro návrhovou velikost kamene dle Bathursta",
-                    "english": "n for design rock size per Bathurst"
-                },
-                "next_translated": {
-                    "key": "mtc_d50_bottom",
-                    "value": "Požadovaná velikost lomového kamene na dně, D50 (Isbash & MC) <span title=\"Dle Isbash (1936) a Maricopa County, Arizona, USA.\" style=\"cursor:help;color:#06c;font-size:0.9em\">?<\/span>",
-                    "english": "Required bottom angular rock size, D50 (Isbash & MC) <span title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\" style=\"cursor:help;color:#06c;font-size:0.9em\">?<\/span>"
-                }
-            }
-        },
-        "mtc_vel_ok_short": {
-            "reason": "equal_to_english",
-            "current_value": "OK",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mtc_vel_low",
-                    "value": "Rychlost nízká — riziko sedimentace.",
-                    "english": "Velocity low - sedimentation risk."
-                },
-                "next_translated": {
-                    "key": "mtc_vel_high_short",
-                    "value": "Vysoká",
-                    "english": "High"
-                }
-            }
-        },
-        "mhp_vel_ok_short": {
-            "reason": "equal_to_english",
-            "current_value": "OK",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mhp_vel_high",
-                    "value": "Rychlost vysoká — riziko vodního rázu a místních ztrát.",
-                    "english": "Velocity high - risk of water hammer and high point (minor) losses."
-                },
-                "next_translated": {
-                    "key": "mhp_vel_high_short",
-                    "value": "Vysoká",
-                    "english": "High"
+                    "key": "points_data_help",
+                    "value": "(nebo Kopírovat\/Vložit pomocí datové oblasti)",
+                    "english": "(or Copy\/Paste using data area)"
                 }
             }
         }

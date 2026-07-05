@@ -66,6 +66,7 @@ $ec_lang['template_printable_title']='Заглавие за принтиране
 $ec_lang['template_printable_subtitle']='Подзаглавие за принтиране';
 $ec_lang['index_title']='Безплатни Oнлайн Инженерни Калкулатори';
 $ec_lang['calc_set_units']='Изберете мерни единици:';
+$ec_lang['calc_defaults']='Стандартни стойности';
 $ec_lang['points_data_help']='(или Копиране/Поставяне чрез областта с данни)';
 $ec_lang['points_data_title']='Данни за точки<br />(разделени със запетая или табулация)';
 $ec_lang['points_data_copy']='Копирай';

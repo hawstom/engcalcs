@@ -1,24 +1,22 @@
 {
     "meta": {
         "language": "ps",
-        "expected_key_count": 465,
-        "delta_key_count": 3,
+        "expected_key_count": 508,
+        "delta_key_count": 1,
         "active_prefixes": [
-            "u",
-            "wi"
+            "calc"
         ],
-        "requested_prefix": null,
+        "requested_prefix": "calc",
         "notes": "Translate only keys in keys_to_translate; preserve HTML, units, and symbols.",
         "glossary_injection_notes": "Use prompt_context_by_prefix and glossary_terms_by_prefix.preferred_translation when available.",
         "context_notes": "Use key_context.neighbors to keep register consistent with nearby translated strings.",
         "intent_notes": "Use key_intent when present; these entries provide terse disambiguation comments only where translation risk exists."
     },
     "prompt_context_by_prefix": {
-        "u": "Use these preferred technical term translations when relevant:\n- flow (Q): بهاو\n- velocity (v): سرعت\n- slope (S): شیب",
-        "wi": "Use these preferred technical term translations when relevant:\n- flow (Q): بهاو\n- weir: بند\n- headwater elevation: د پورته اوبو سطح\n- tailwater elevation: د ښکته اوبو سطح\n- discharge coefficient (C_d): د بهاو ضریب"
+        "calc": "Use these preferred technical term translations when relevant:\n- flow (Q): بهاو\n- velocity (v): سرعت\n- slope (S): شیب"
     },
     "glossary_terms_by_prefix": {
-        "u": [
+        "calc": [
             {
                 "term": "flow",
                 "symbol": "Q",
@@ -40,101 +38,28 @@
                 "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
                 "preferred_translation": "شیب"
             }
-        ],
-        "wi": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
-                "preferred_translation": "بهاو"
-            },
-            {
-                "term": "weir",
-                "symbol": "",
-                "context": "A flow-measurement or water-control structure — a barrier across a channel over which water flows. Appears in Weir Flow Simple and Weir Flow Irregular calculators.",
-                "translation_notes": "WMO No. 385 entry 1665 confirms: es = 'vertedero', fr = 'déversoir', ru = 'водослив'. In an irrigation context, the term often overlaps with 'diversion dam' or 'check structure'. Use the term most common among irrigation field workers in the target language, not a purely civil-engineering dictionary term.",
-                "preferred_translation": "بند"
-            },
-            {
-                "term": "headwater elevation",
-                "symbol": "",
-                "context": "Water surface elevation on the upstream side of a weir or orifice. Appears in Weir Flow and Orifice calculators.",
-                "translation_notes": "'Headwater' is an upstream water surface — do not confuse with 'head' (energy) or 'source' (origin of a stream). Use the hydraulic structure term.",
-                "preferred_translation": "د پورته اوبو سطح"
-            },
-            {
-                "term": "tailwater elevation",
-                "symbol": "",
-                "context": "Water surface elevation on the downstream side of a weir or orifice. Appears in Orifice Flow calculator. When tailwater is above the invert, the orifice is submerged.",
-                "translation_notes": "Use the hydraulic structure term for downstream water level. Pair consistently with 'headwater elevation'.",
-                "preferred_translation": "د ښکته اوبو سطح"
-            },
-            {
-                "term": "discharge coefficient",
-                "symbol": "C_d",
-                "context": "Coefficient correcting theoretical orifice or weir flow for real-world contraction and friction effects. Appears in Orifice and Weir calculators.",
-                "translation_notes": "The 'discharge' here refers to flow rate, not the verb. Use the hydraulic engineering compound term.",
-                "preferred_translation": "د بهاو ضریب"
-            }
         ]
     },
     "keys_to_translate": {
-        "u_gradePercent": "% rise\/run",
-        "u_grade": "rise\/run",
-        "wi_notes_we_def": "q = if (length = 0) then 0 else if (slope=0) then cw*length*d<sub>0<\/sub><sup>1.5<\/sup> else cw\/(2.5*slope) * (d<sub>0<\/sub><sup>2.5<\/sup> - d<sub>1<\/sub><sup>2.5<\/sup>) where d<sub>1<\/sub> and d<sub>0<\/sub> are always positive or zero"
+        "calc_defaults": "Default values"
     },
     "keys": {
-        "u_gradePercent": "% rise\/run",
-        "u_grade": "rise\/run",
-        "wi_notes_we_def": "q = if (length = 0) then 0 else if (slope=0) then cw*length*d<sub>0<\/sub><sup>1.5<\/sup> else cw\/(2.5*slope) * (d<sub>0<\/sub><sup>2.5<\/sup> - d<sub>1<\/sub><sup>2.5<\/sup>) where d<sub>1<\/sub> and d<sub>0<\/sub> are always positive or zero"
+        "calc_defaults": "Default values"
     },
     "key_context": {
-        "u_gradePercent": {
+        "calc_defaults": {
             "reason": "equal_to_english",
-            "current_value": "% rise\/run",
+            "current_value": "Default values",
             "neighbors": {
                 "previous_translated": {
-                    "key": "u_depthFrac",
-                    "value": "کسر",
-                    "english": "fraction"
+                    "key": "calc_set_units",
+                    "value": "واحدونه تنظیم کړئ:",
+                    "english": "Set units:"
                 },
                 "next_translated": {
-                    "key": "menu_brand",
-                    "value": "HawsEDC محاسبې",
-                    "english": "HawsEDC Calculators"
-                }
-            }
-        },
-        "u_grade": {
-            "reason": "equal_to_english",
-            "current_value": "rise\/run",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "u_depthFrac",
-                    "value": "کسر",
-                    "english": "fraction"
-                },
-                "next_translated": {
-                    "key": "menu_brand",
-                    "value": "HawsEDC محاسبې",
-                    "english": "HawsEDC Calculators"
-                }
-            }
-        },
-        "wi_notes_we_def": {
-            "reason": "equal_to_english",
-            "current_value": "q = if (length = 0) then 0 else if (slope=0) then cw*length*d<sub>0<\/sub><sup>1.5<\/sup> else cw\/(2.5*slope) * (d<sub>0<\/sub><sup>2.5<\/sup> - d<sub>1<\/sub><sup>2.5<\/sup>) where d<sub>1<\/sub> and d<sub>0<\/sub> are always positive or zero",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "wi_notes_we_term",
-                    "value": "د ویر معادله",
-                    "english": "Weir Equation"
-                },
-                "next_translated": {
-                    "key": "or_main_menu",
-                    "value": "د سوري بهاو",
-                    "english": "Orifice Flow"
+                    "key": "points_data_help",
+                    "value": "(یا د معلوماتو ساحې له لارې کاپي\/پیسټ وکړئ)",
+                    "english": "(or Copy\/Paste using data area)"
                 }
             }
         }

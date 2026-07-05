@@ -65,6 +65,7 @@ $ec_lang['template_printable_title']='Judul Cetak';
 $ec_lang['template_printable_subtitle']='Subjudul Cetak';
 $ec_lang['index_title']='Kalkulator Teknik Gratis Daring';
 $ec_lang['calc_set_units']='Atur satuan:';
+$ec_lang['calc_defaults']='Nilai Default';
 $ec_lang['points_data_help']='(atau Salin/Tempel menggunakan area data)';
 $ec_lang['points_data_title']='Data titik<br />(dipisah koma atau tabulasi)';
 $ec_lang['points_data_copy']='Salin';

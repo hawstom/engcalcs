@@ -70,7 +70,10 @@ EngCalcs.loadFromUrl = function (objForm) {
 		params.forEach(function (value, key) {
 			if (key === 'name') return;
 			var el = objForm.elements[key];
-			if (el !== undefined) {
+			// objForm.elements[key] can resolve to a plain number (e.g. the collection's own
+			// .length) instead of a form control when key collides with a reserved property
+			// name like "length" or "item" -- guard against assigning .value to that.
+			if (el !== undefined && el !== null && (el instanceof RadioNodeList || el.tagName)) {
 				el.value = value;
 				formLoaded = true;
 			}
@@ -115,7 +118,9 @@ EngCalcs.readCookieAndCalc = function (objForm) {
 EngCalcs.addCalcRow = function (arrColumns) {
 		'use strict';
 		this.numCalcRows = this.numCalcRows + 1;
-		document.getElementById("points_data").rows = this.numCalcRows * 1.25;
+		if (document.getElementById("points_data")) {
+			document.getElementById("points_data").rows = this.numCalcRows * 1.25;
+		}
 		var tbody = document.getElementById("CalcsTable").getElementsByTagName("TBODY")[0],
 		row = document.createElement("TR"),
 		i;
@@ -132,6 +137,9 @@ EngCalcs.addCalcRow = function (arrColumns) {
 						inputi.value=String(column.value);
 						inputi.setAttribute('onkeyup', 'EngCalcs.submitForm()');
 					} else {
+						if (column.inputType === 'checkbox' || column.inputType === 'radio') {
+							inputi.checked = !!column.value;
+						}
 						inputi.setAttribute('onchange', 'EngCalcs.submitForm()');
 					}
 					inputi.name=column.name;
@@ -154,7 +162,9 @@ EngCalcs.addSingleCalcRow = function () {
 EngCalcs.deleteSingleCalcRow = function () {
 	'use strict';
 	this.numCalcRows = this.numCalcRows - 1;
+	if (document.getElementById("points_data")) {
 		document.getElementById("points_data").rows = this.numCalcRows * 1.25;
+	}
 	var tbody = document.getElementById("CalcsBody");
 	tbody.removeChild(tbody.getElementsByTagName("TR")[this.numCalcRows]);
 	this.submitForm();
@@ -262,6 +272,12 @@ EngCalcs.writeTableData = function () {
 EngCalcs.submitForm = function () {
 	'use strict';
 	this.calcAndSave(document.forms['formInput'],this.cookieName);
+};
+
+EngCalcs.resetToDefaults = function() {
+	'use strict';
+	this.expireCookie();
+	window.location.href = window.location.pathname;
 };
 
 EngCalcs.setUnits = function(unitSet) {

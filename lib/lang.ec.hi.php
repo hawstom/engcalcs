@@ -66,6 +66,7 @@ $ec_lang['template_printable_title']='प्रिंट करने योग�
 $ec_lang['template_printable_subtitle']='प्रिंट करने योग्य उप-शीर्षक';
 $ec_lang['index_title']='मुफ़्त ऑनलाइन इंजीनियरिंग कैलकुलेटर';
 $ec_lang['calc_set_units']='इकाइयाँ निर्धारित करें:';
+$ec_lang['calc_defaults']='डिफ़ॉल्ट मान';
 $ec_lang['points_data_help']='(या डेटा क्षेत्र से कॉपी/पेस्ट करें)';
 $ec_lang['points_data_title']='बिंदु डेटा<br />(अल्पविराम या टैब से अलग)';
 $ec_lang['points_data_copy']='कॉपी';

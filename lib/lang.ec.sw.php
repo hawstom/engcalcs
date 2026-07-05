@@ -66,6 +66,7 @@ $ec_lang['template_printable_title']='Kichwa cha Kuchapishwa';
 $ec_lang['template_printable_subtitle']='Kichwa Kidogo cha Kuchapishwa';
 $ec_lang['index_title']='Vikokotoo vya Uhandisi Bure Mtandaoni';
 $ec_lang['calc_set_units']='Weka vitengo:';
+$ec_lang['calc_defaults']='Maadili ya kawaida';
 $ec_lang['points_data_help']='(au Nakili/Bandika ukitumia eneo la data)';
 $ec_lang['points_data_title']='Data za vituo<br />(kwa mkato au kichupo)';
 $ec_lang['points_data_copy']='Nakili';

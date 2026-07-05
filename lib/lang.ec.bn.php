@@ -65,6 +65,7 @@ $ec_lang['template_printable_title']='মুদ্রণযোগ্য শি�
 $ec_lang['template_printable_subtitle']='মুদ্রণযোগ্য উপশিরোনাম';
 $ec_lang['index_title']='বিনামূল্যে অনলাইন ইঞ্জিনিয়ারিং ক্যালকুলেটর';
 $ec_lang['calc_set_units']='একক নির্ধারণ করুন:';
+$ec_lang['calc_defaults']='ডিফল্ট মান';
 $ec_lang['points_data_help']='(অথবা ডেটা এলাকা ব্যবহার করে কপি/পেস্ট করুন)';
 $ec_lang['points_data_title']='পয়েন্ট ডেটা<br />(কমা বা ট্যাব দ্বারা বিভক্ত)';
 $ec_lang['points_data_copy']='কপি';

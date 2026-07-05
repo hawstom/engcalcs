@@ -66,6 +66,7 @@ $ec_lang['template_printable_title']='אזור כותרת להדפסה';
 $ec_lang['template_printable_subtitle']='אזור כותרת משנה להדפסה';
 $ec_lang['index_title']='מחשבוני הנדסה חינמיים מקוונים';
 $ec_lang['calc_set_units']='הגדרת יחידות';
+$ec_lang['calc_defaults']='ערכים ברירת מחדל';
 $ec_lang['points_data_help']='(או העתק/הדבק באמצעות אזור הנתונים)';
 $ec_lang['points_data_title']='נתוני נקודות<br />(מופרדות בפסיקים או טאבים)';
 $ec_lang['points_data_copy']='העתק';

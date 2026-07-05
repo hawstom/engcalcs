@@ -1,89 +1,22 @@
 {
     "meta": {
         "language": "bn",
-        "expected_key_count": 465,
-        "delta_key_count": 6,
+        "expected_key_count": 508,
+        "delta_key_count": 1,
         "active_prefixes": [
-            "mhp",
-            "mtc"
+            "calc"
         ],
-        "requested_prefix": null,
+        "requested_prefix": "calc",
         "notes": "Translate only keys in keys_to_translate; preserve HTML, units, and symbols.",
         "glossary_injection_notes": "Use prompt_context_by_prefix and glossary_terms_by_prefix.preferred_translation when available.",
         "context_notes": "Use key_context.neighbors to keep register consistent with nearby translated strings.",
         "intent_notes": "Use key_intent when present; these entries provide terse disambiguation comments only where translation risk exists."
     },
     "prompt_context_by_prefix": {
-        "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): প্রবাহ\n- penstock: পেনস্টক\n- gross head (H_gross): মোট জলশীর্ষ\n- net head (H_net): নিট জলশীর্ষ\n- plant efficiency (η): প্লান্ট দক্ষতা\n- head loss (h_L): পানিশীর্ষ ক্ষতি\n- run-of-river: নদীর স্বাভাবিক প্রবাহ বিদ্যুৎ\n- headworks: হেডওয়ার্কস\n- junction loss (H_m): সংযোগস্থল ক্ষতি",
-        "mtc": "Use these preferred technical term translations when relevant:\n- flow (Q): প্রবাহ\n- velocity (v): প্রবাহ বেগ\n- hydraulic radius (R_h): হাইড্রলিক ব্যাসার্ধ\n- wetted perimeter (P_w): ভেজা পরিধি\n- Manning roughness (n): ম্যানিং রাফনেস সহগ\n- slope (S): ঢাল"
+        "calc": "Use these preferred technical term translations when relevant:\n- flow (Q): প্রবাহ\n- velocity (v): প্রবাহ বেগ\n- slope (S): ঢাল"
     },
     "glossary_terms_by_prefix": {
-        "mhp": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
-                "preferred_translation": "প্রবাহ"
-            },
-            {
-                "term": "penstock",
-                "symbol": "",
-                "context": "Pressure pipe carrying water from a reservoir or headpond down to a turbine in a micro-hydro system. Appears in Micro-Hydro Power calculator.",
-                "translation_notes": "'Penstock' is a specialized term with no exact one-word equivalent in many languages. Use the established civil\/hydro engineering phrase for 'pressure conduit' or 'force main to turbine'. Czech: 'tlakovod' (pressure main) is preferred over the generic 'přiváděcí potrubí' (supply pipe). Serbian: 'напорни цевовод' is the standard hydraulic engineering term.",
-                "preferred_translation": "পেনস্টক"
-            },
-            {
-                "term": "gross head",
-                "symbol": "H_gross",
-                "context": "Total elevation difference between the headpond water surface and the turbine — before subtracting penstock losses. Appears in Micro-Hydro Power calculator.",
-                "translation_notes": "'Gross' means total\/before-deduction. Pair with 'net head' for clarity. Use the hydro-power standard term.",
-                "preferred_translation": "মোট জলশীর্ষ"
-            },
-            {
-                "term": "net head",
-                "symbol": "H_net",
-                "context": "Effective head available at the turbine after subtracting penstock friction and minor losses from gross head. H_net = H_gross - h_L.",
-                "translation_notes": "'Net' means after-deduction. Pair with 'gross head'. Use the hydro-power standard term. WMO No. 385 entry 111 ('available head') gives the Russian term 'полезный напор' (useful head) \/ syn. 'располагаемый напор' — these overlap with net head in Russian hydro engineering practice.",
-                "preferred_translation": "নিট জলশীর্ষ"
-            },
-            {
-                "term": "plant efficiency",
-                "symbol": "η",
-                "context": "Overall efficiency of a micro-hydro power plant — product of turbine, generator, and transmission efficiencies. Dimensionless, 0–1. Appears in Micro-Hydro Power calculator.",
-                "translation_notes": "'Plant' here means the power plant\/installation, not a living plant. Use the energy\/electrical engineering term for overall system efficiency.",
-                "preferred_translation": "প্লান্ট দক্ষতা"
-            },
-            {
-                "term": "head loss",
-                "symbol": "h_L",
-                "context": "Energy loss expressed as a height of water column. Appears in Darcy-Weisbach, Hazen-Williams, Manning pipe, and Penstock calculators. Distinct from 'pressure drop' — use the hydraulic engineering term.",
-                "translation_notes": "'Head' in the hydraulic sense (energy per unit weight) does not translate literally in many languages — use the established civil\/hydraulic engineering phrase. Pre-2026 sr\/hr human translations used 'gubitak pritiska' (= pressure loss), which is technically the same concept expressed in pressure terms rather than head terms. The current 'губитак напора \/ gubitak tlačne visine' (= loss of hydraulic head) is more precise in a hydraulic engineering context and is preferred.",
-                "preferred_translation": "পানিশীর্ষ ক্ষতি"
-            },
-            {
-                "term": "run-of-river",
-                "symbol": "",
-                "context": "A hydropower configuration that uses natural river flow without a dam or significant storage reservoir. Power output varies with seasonal river flow. Appears in Micro-Hydro Power calculator.",
-                "translation_notes": "Use the established energy\/hydropower sector term. 'Run' means natural river current — do not translate as jogging or running. WMO No. 385 entry 1263 gives the full facility names: Spanish 'central hidroeléctrica de pasada', French 'usine hydroélectrique au fil de l'eau', Russian 'русловая гидроэлектростанция' — these are the authoritative terms for the power plant noun. The abbreviated forms 'filo de agua' (es), 'au fil de l'eau' (fr), and 'русловая ГЭС' (ru) are standard in engineering use. German: 'Laufwasserkraftwerk'. Chinese: '径流式水电'.",
-                "preferred_translation": "নদীর স্বাভাবিক প্রবাহ বিদ্যুৎ"
-            },
-            {
-                "term": "headworks",
-                "symbol": "",
-                "context": "The intake structure at the upstream end of a penstock or canal, where water is diverted from the river or reservoir into the conveyance system. Appears in Micro-Hydro Power calculator (penstock diameter and length descriptions).",
-                "translation_notes": "Use the civil\/irrigation engineering term for a water intake or diversion structure. Spanish: 'obra de toma'. French: 'ouvrage de prise d'eau'. Russian: 'водозаборное сооружение'. German: 'Einlaufbauwerk'. In many languages, 'intake structure' is preferred over a literal translation of 'headworks'.",
-                "preferred_translation": "হেডওয়ার্কস"
-            },
-            {
-                "term": "junction loss",
-                "symbol": "H_m",
-                "context": "Energy loss at pipe junctions, bends, fittings, and entrance — a local (point) loss as opposed to distributed friction loss along the pipe. H_m = k × v²\/(2g). Also called 'minor loss', though in short penstocks these can equal or exceed friction losses. Appears in Manning Pipe Head Loss and Micro-Hydro Power calculators.",
-                "translation_notes": "The term 'minor loss' is conventional but misleading — do not imply these losses are always small. Use the hydraulic engineering term for local\/point losses at fittings. French: 'perte singulière'. Spanish: 'pérdida local' or 'pérdida por accesorio'. Russian: 'местные потери'. Chinese: '局部水头损失'.",
-                "preferred_translation": "সংযোগস্থল ক্ষতি"
-            }
-        ],
-        "mtc": [
+        "calc": [
             {
                 "term": "flow",
                 "symbol": "Q",
@@ -99,27 +32,6 @@
                 "preferred_translation": "প্রবাহ বেগ"
             },
             {
-                "term": "hydraulic radius",
-                "symbol": "R_h",
-                "context": "Cross-sectional flow area divided by wetted perimeter. Appears in Manning calculators.",
-                "translation_notes": "Use the standard hydraulic engineering phrase. Pre-2026 sr\/hr human translations used the Latin loanword 'hidraulički radijus' — this form is widely used in South Slavic engineering practice and may be more recognizable to field practitioners than the native Slavic equivalents 'полупречник' (sr) \/ 'polumjer' (hr). Both are correct; native Slavic engineers may encounter both forms.",
-                "preferred_translation": "হাইড্রলিক ব্যাসার্ধ"
-            },
-            {
-                "term": "wetted perimeter",
-                "symbol": "P_w",
-                "context": "Length of the channel or pipe boundary in contact with flowing water. Appears in Manning calculators.",
-                "translation_notes": "WMO No. 385 entry 1682 confirms: es = 'perímetro mojado', fr = 'périmètre mouillé'. Use the standard hydraulic engineering phrase. 'Wetted' here means 'in contact with water', not 'soaked'. Pre-2026 sr human used 'okvašeni obim' (obim = natural South Slavic word for perimeter\/circumference); current uses 'квашени периметар' (периметар = Greek-derived loanword). Both are correct; 'obim\/opseg' is more natural in informal Serbian\/Croatian field use.",
-                "preferred_translation": "ভেজা পরিধি"
-            },
-            {
-                "term": "Manning roughness",
-                "symbol": "n",
-                "context": "Manning's n — empirical roughness coefficient used in the Manning formula for open-channel and pipe flow.",
-                "translation_notes": "Always include 'Manning' as a proper noun. The coefficient itself (n) needs no translation — only the label does. Do not translate as generic 'roughness coefficient' without 'Manning'.",
-                "preferred_translation": "ম্যানিং রাফনেস সহগ"
-            },
-            {
                 "term": "slope",
                 "symbol": "S",
                 "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
@@ -129,115 +41,25 @@
         ]
     },
     "keys_to_translate": {
-        "mtc_vel_ok_short": "OK",
-        "mtc_vel_high_short": "High",
-        "mtc_vel_low_short": "Low",
-        "mhp_vel_ok_short": "OK",
-        "mhp_vel_high_short": "High",
-        "mhp_vel_low_short": "Low"
+        "calc_defaults": "Default values"
     },
     "keys": {
-        "mtc_vel_ok_short": "OK",
-        "mtc_vel_high_short": "High",
-        "mtc_vel_low_short": "Low",
-        "mhp_vel_ok_short": "OK",
-        "mhp_vel_high_short": "High",
-        "mhp_vel_low_short": "Low"
+        "calc_defaults": "Default values"
     },
     "key_context": {
-        "mtc_vel_ok_short": {
+        "calc_defaults": {
             "reason": "equal_to_english",
-            "current_value": "OK",
+            "current_value": "Default values",
             "neighbors": {
                 "previous_translated": {
-                    "key": "mtc_vel_low",
-                    "value": "বেগ কম - পলি জমার ঝুঁকি।",
-                    "english": "Velocity low - sedimentation risk."
+                    "key": "calc_set_units",
+                    "value": "একক নির্ধারণ করুন:",
+                    "english": "Set units:"
                 },
                 "next_translated": {
-                    "key": "mtc_note_1",
-                    "value": "<dl><dt>স্বয়ংক্রিয় পাথর আকার ও রুক্ষতা ডিজাইন পুনরাবৃত্তি<\/dt><dd>একটি রুক্ষতা রেডিও বাটন (BB প্রস্তাবিত) এবং একটি নকশা পাথর আকার রেডিও বাটন (Isbash প্রস্তাবিত) নির্বাচন করুন। একটি সমান পাথর আকারে আপনার কাঙ্ক্ষিত প্রবাহ পেতে গভীরতা ও পাথর আকার নিরাপত্তা গুণক সামঞ্জস্য করুন। প্রতিবার কোনো ইনপুট মান পরিবর্তন করলে নিম্নলিখিত পুনরাবৃত্তি চক্র ঘটে: ১. নকশা পাথর আকার থেকে রুক্ষতা গণনা করা হয়। ২. অনুরোধকৃত রুক্ষতা গণনা ইনপুট রুক্ষতায় কপি করা হয়। ৩. চ্যানেল প্রবাহ ও প্রয়োজনীয় পাথর আকার গণনা করা হয়। ৪. নকশা পাথর আকার সামঞ্জস্য করা হয়। ৫. নকশা পাথর আকারে ত্রুটি খুব ছোট না হওয়া পর্যন্ত পুনরাবৃত্তি।<\/dd><dt>বেসিক ক্যালকুলেটর (পুনরাবৃত্তি ছাড়া)<\/dt><dd>আপনার কাঙ্ক্ষিত রুক্ষতা মান লিখুন। নকশা পাথর আকার ইনপুট এলাকা উপেক্ষা করুন।<\/dd><\/dl>",
-                    "english": "<dl><dt>Automated rock size and roughness design iteration<\/dt><dd>Choose a roughness radio button (BB recommended) and a design rock size radio button (Isbash recommended). Fine-tune depth and rock size safety factor to get your desired flow with an even rock size. Every time you change any input value, the following iteration cycle happens: 1. Roughness is calculated from design rock size. 2. The requested roughness calculation is copied to input roughness. 3. Channel flow and required rock size are calculated. 4. Design rock size is adjusted. 5. Repeat until error in the design rock size is very small.<\/dd><dt>Basic calculator (no iteration)<\/dt><dd>Enter your desired roughness value. Ignore the design rock size input area.<\/dd><\/dl>"
-                }
-            }
-        },
-        "mtc_vel_high_short": {
-            "reason": "equal_to_english",
-            "current_value": "High",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mtc_vel_low",
-                    "value": "বেগ কম - পলি জমার ঝুঁকি।",
-                    "english": "Velocity low - sedimentation risk."
-                },
-                "next_translated": {
-                    "key": "mtc_note_1",
-                    "value": "<dl><dt>স্বয়ংক্রিয় পাথর আকার ও রুক্ষতা ডিজাইন পুনরাবৃত্তি<\/dt><dd>একটি রুক্ষতা রেডিও বাটন (BB প্রস্তাবিত) এবং একটি নকশা পাথর আকার রেডিও বাটন (Isbash প্রস্তাবিত) নির্বাচন করুন। একটি সমান পাথর আকারে আপনার কাঙ্ক্ষিত প্রবাহ পেতে গভীরতা ও পাথর আকার নিরাপত্তা গুণক সামঞ্জস্য করুন। প্রতিবার কোনো ইনপুট মান পরিবর্তন করলে নিম্নলিখিত পুনরাবৃত্তি চক্র ঘটে: ১. নকশা পাথর আকার থেকে রুক্ষতা গণনা করা হয়। ২. অনুরোধকৃত রুক্ষতা গণনা ইনপুট রুক্ষতায় কপি করা হয়। ৩. চ্যানেল প্রবাহ ও প্রয়োজনীয় পাথর আকার গণনা করা হয়। ৪. নকশা পাথর আকার সামঞ্জস্য করা হয়। ৫. নকশা পাথর আকারে ত্রুটি খুব ছোট না হওয়া পর্যন্ত পুনরাবৃত্তি।<\/dd><dt>বেসিক ক্যালকুলেটর (পুনরাবৃত্তি ছাড়া)<\/dt><dd>আপনার কাঙ্ক্ষিত রুক্ষতা মান লিখুন। নকশা পাথর আকার ইনপুট এলাকা উপেক্ষা করুন।<\/dd><\/dl>",
-                    "english": "<dl><dt>Automated rock size and roughness design iteration<\/dt><dd>Choose a roughness radio button (BB recommended) and a design rock size radio button (Isbash recommended). Fine-tune depth and rock size safety factor to get your desired flow with an even rock size. Every time you change any input value, the following iteration cycle happens: 1. Roughness is calculated from design rock size. 2. The requested roughness calculation is copied to input roughness. 3. Channel flow and required rock size are calculated. 4. Design rock size is adjusted. 5. Repeat until error in the design rock size is very small.<\/dd><dt>Basic calculator (no iteration)<\/dt><dd>Enter your desired roughness value. Ignore the design rock size input area.<\/dd><\/dl>"
-                }
-            }
-        },
-        "mtc_vel_low_short": {
-            "reason": "equal_to_english",
-            "current_value": "Low",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mtc_vel_low",
-                    "value": "বেগ কম - পলি জমার ঝুঁকি।",
-                    "english": "Velocity low - sedimentation risk."
-                },
-                "next_translated": {
-                    "key": "mtc_note_1",
-                    "value": "<dl><dt>স্বয়ংক্রিয় পাথর আকার ও রুক্ষতা ডিজাইন পুনরাবৃত্তি<\/dt><dd>একটি রুক্ষতা রেডিও বাটন (BB প্রস্তাবিত) এবং একটি নকশা পাথর আকার রেডিও বাটন (Isbash প্রস্তাবিত) নির্বাচন করুন। একটি সমান পাথর আকারে আপনার কাঙ্ক্ষিত প্রবাহ পেতে গভীরতা ও পাথর আকার নিরাপত্তা গুণক সামঞ্জস্য করুন। প্রতিবার কোনো ইনপুট মান পরিবর্তন করলে নিম্নলিখিত পুনরাবৃত্তি চক্র ঘটে: ১. নকশা পাথর আকার থেকে রুক্ষতা গণনা করা হয়। ২. অনুরোধকৃত রুক্ষতা গণনা ইনপুট রুক্ষতায় কপি করা হয়। ৩. চ্যানেল প্রবাহ ও প্রয়োজনীয় পাথর আকার গণনা করা হয়। ৪. নকশা পাথর আকার সামঞ্জস্য করা হয়। ৫. নকশা পাথর আকারে ত্রুটি খুব ছোট না হওয়া পর্যন্ত পুনরাবৃত্তি।<\/dd><dt>বেসিক ক্যালকুলেটর (পুনরাবৃত্তি ছাড়া)<\/dt><dd>আপনার কাঙ্ক্ষিত রুক্ষতা মান লিখুন। নকশা পাথর আকার ইনপুট এলাকা উপেক্ষা করুন।<\/dd><\/dl>",
-                    "english": "<dl><dt>Automated rock size and roughness design iteration<\/dt><dd>Choose a roughness radio button (BB recommended) and a design rock size radio button (Isbash recommended). Fine-tune depth and rock size safety factor to get your desired flow with an even rock size. Every time you change any input value, the following iteration cycle happens: 1. Roughness is calculated from design rock size. 2. The requested roughness calculation is copied to input roughness. 3. Channel flow and required rock size are calculated. 4. Design rock size is adjusted. 5. Repeat until error in the design rock size is very small.<\/dd><dt>Basic calculator (no iteration)<\/dt><dd>Enter your desired roughness value. Ignore the design rock size input area.<\/dd><\/dl>"
-                }
-            }
-        },
-        "mhp_vel_ok_short": {
-            "reason": "equal_to_english",
-            "current_value": "OK",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mhp_vel_high",
-                    "value": "বেগ বেশি - জলের হাতুড়ির ঝুঁকি এবং উচ্চ বিন্দু (গৌণ) ক্ষতি।",
-                    "english": "Velocity high - risk of water hammer and high point (minor) losses."
-                },
-                "next_translated": {
-                    "key": "mhp_hl_ok",
-                    "value": "10% লক্ষ্যমাত্রার মধ্যে ✓",
-                    "english": "within 10% target ✓"
-                }
-            }
-        },
-        "mhp_vel_high_short": {
-            "reason": "equal_to_english",
-            "current_value": "High",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mhp_vel_high",
-                    "value": "বেগ বেশি - জলের হাতুড়ির ঝুঁকি এবং উচ্চ বিন্দু (গৌণ) ক্ষতি।",
-                    "english": "Velocity high - risk of water hammer and high point (minor) losses."
-                },
-                "next_translated": {
-                    "key": "mhp_hl_ok",
-                    "value": "10% লক্ষ্যমাত্রার মধ্যে ✓",
-                    "english": "within 10% target ✓"
-                }
-            }
-        },
-        "mhp_vel_low_short": {
-            "reason": "equal_to_english",
-            "current_value": "Low",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mhp_vel_high",
-                    "value": "বেগ বেশি - জলের হাতুড়ির ঝুঁকি এবং উচ্চ বিন্দু (গৌণ) ক্ষতি।",
-                    "english": "Velocity high - risk of water hammer and high point (minor) losses."
-                },
-                "next_translated": {
-                    "key": "mhp_hl_ok",
-                    "value": "10% লক্ষ্যমাত্রার মধ্যে ✓",
-                    "english": "within 10% target ✓"
+                    "key": "points_data_help",
+                    "value": "(অথবা ডেটা এলাকা ব্যবহার করে কপি\/পেস্ট করুন)",
+                    "english": "(or Copy\/Paste using data area)"
                 }
             }
         }

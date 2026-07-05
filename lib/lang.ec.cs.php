@@ -65,6 +65,7 @@ $ec_lang['template_printable_title']='Tisknutelný název';
 $ec_lang['template_printable_subtitle']='Tisknutelný podtitul';
 $ec_lang['index_title']='Bezplatné inženýrské kalkulačky online';
 $ec_lang['calc_set_units']='Nastavit jednotky:';
+$ec_lang['calc_defaults']='Výchozí hodnoty';
 $ec_lang['points_data_help']='(nebo Kopírovat/Vložit pomocí datové oblasti)';
 $ec_lang['points_data_title']='Data bodů<br />(oddělena čárkou nebo tabulátorem)';
 $ec_lang['points_data_copy']='Kopírovat';

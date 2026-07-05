@@ -14,6 +14,11 @@ EngCalcs.createCookie = function () {
 	document.cookie = this.cookieName + "=" + this.cookieValue + expires + "; SameSite=Strict" + secure + "; path=/";
 };
 
+EngCalcs.expireCookie = function () {
+	"use strict";
+	document.cookie = this.cookieName + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+};
+
 // readCookie
 // Saves the data part of the requested named cookie from the document cookie string to this.cookieValue.
 EngCalcs.readCookie = function () {
@@ -55,12 +60,20 @@ EngCalcs.cookieToForm = function (form) {
 		this.cookieSlotsLength = form.getElementsByTagName("INPUT").length + form.getElementsByTagName("SELECT").length;
 		while (this.cookieSlotsLength < this.cookieVarsLength) {
 			this.pageAddCalcRow();
+			this.cookieSlotsLength = form.getElementsByTagName("INPUT").length + form.getElementsByTagName("SELECT").length;
+		}
+		// A stored cookie from a since-changed page layout (singleton fields added/removed, not
+		// just rows) can never reconcile by adding rows alone -- bail out to a fresh, correctly
+		// initialized page instead of partially applying a mismatched cookie or crashing.
+		if (this.cookieSlotsLength !== this.cookieVarsLength) {
+			return null;
 		}
 		for (i = 0; i < this.cookieVarsLength; i = i + 1) {
 			cookieVarSplit = cookieVars[i].split(":");
 			switch (cookieVarSplit[0]) {
 			case 'i':
 				inputCounter = inputCounter + 1;
+				if (!form.getElementsByTagName("INPUT")[inputCounter]) { break; }
 				if (form.getElementsByTagName("INPUT")[inputCounter].type === 'checkbox' || form.getElementsByTagName("INPUT")[inputCounter].type === 'radio') {
 						if (cookieVarSplit[1] === 'true') {
 								form.getElementsByTagName("INPUT")[inputCounter].checked = 'checked';
@@ -73,6 +86,7 @@ EngCalcs.cookieToForm = function (form) {
 				break;
 			case 's':
 				selectCounter = selectCounter + 1;
+				if (!form.getElementsByTagName("SELECT")[selectCounter]) { break; }
 				form.getElementsByTagName("SELECT")[selectCounter].value = '';
 				if (!isNaN(parseInt(cookieVarSplit[1]))) {
 					form.getElementsByTagName("SELECT")[selectCounter].value = cookieVarSplit[1];

@@ -1,93 +1,22 @@
 {
     "meta": {
         "language": "it",
-        "expected_key_count": 465,
-        "delta_key_count": 5,
+        "expected_key_count": 508,
+        "delta_key_count": 1,
         "active_prefixes": [
-            "mhp",
-            "mphl",
-            "mtc",
-            "odt"
+            "calc"
         ],
-        "requested_prefix": null,
+        "requested_prefix": "calc",
         "notes": "Translate only keys in keys_to_translate; preserve HTML, units, and symbols.",
         "glossary_injection_notes": "Use prompt_context_by_prefix and glossary_terms_by_prefix.preferred_translation when available.",
         "context_notes": "Use key_context.neighbors to keep register consistent with nearby translated strings.",
         "intent_notes": "Use key_intent when present; these entries provide terse disambiguation comments only where translation risk exists."
     },
     "prompt_context_by_prefix": {
-        "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): portata\n- penstock: condotta forzata\n- gross head (H_gross): altezza lorda\n- net head (H_net): altezza netta\n- plant efficiency (η): rendimento dell'impianto\n- head loss (h_L): perdita di carico\n- run-of-river: ad acqua fluente\n- headworks: opera di presa\n- junction loss (H_m): perdite di carico locali",
-        "mphl": "Use these preferred technical term translations when relevant:\n- flow (Q): portata\n- velocity (v): velocità\n- head loss (h_L): perdita di carico\n- hydraulic radius (R_h): raggio idraulico\n- wetted perimeter (P_w): perimetro bagnato\n- Manning roughness (n): coefficiente di scabrezza di Manning\n- slope (S): pendenza",
-        "mtc": "Use these preferred technical term translations when relevant:\n- flow (Q): portata\n- velocity (v): velocità\n- hydraulic radius (R_h): raggio idraulico\n- wetted perimeter (P_w): perimetro bagnato\n- Manning roughness (n): coefficiente di scabrezza di Manning\n- slope (S): pendenza",
-        "odt": "Use these preferred technical term translations when relevant:\n- orifice: orifizio\n- discharge coefficient (C_d): coefficiente di efflusso\n- headwater elevation: livello idrometrico a monte\n- tailwater elevation: livello idrometrico a valle"
+        "calc": "Use these preferred technical term translations when relevant:\n- flow (Q): portata\n- velocity (v): velocità\n- slope (S): pendenza"
     },
     "glossary_terms_by_prefix": {
-        "mhp": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
-                "preferred_translation": "portata"
-            },
-            {
-                "term": "penstock",
-                "symbol": "",
-                "context": "Pressure pipe carrying water from a reservoir or headpond down to a turbine in a micro-hydro system. Appears in Micro-Hydro Power calculator.",
-                "translation_notes": "'Penstock' is a specialized term with no exact one-word equivalent in many languages. Use the established civil\/hydro engineering phrase for 'pressure conduit' or 'force main to turbine'. Czech: 'tlakovod' (pressure main) is preferred over the generic 'přiváděcí potrubí' (supply pipe). Serbian: 'напорни цевовод' is the standard hydraulic engineering term.",
-                "preferred_translation": "condotta forzata"
-            },
-            {
-                "term": "gross head",
-                "symbol": "H_gross",
-                "context": "Total elevation difference between the headpond water surface and the turbine — before subtracting penstock losses. Appears in Micro-Hydro Power calculator.",
-                "translation_notes": "'Gross' means total\/before-deduction. Pair with 'net head' for clarity. Use the hydro-power standard term.",
-                "preferred_translation": "altezza lorda"
-            },
-            {
-                "term": "net head",
-                "symbol": "H_net",
-                "context": "Effective head available at the turbine after subtracting penstock friction and minor losses from gross head. H_net = H_gross - h_L.",
-                "translation_notes": "'Net' means after-deduction. Pair with 'gross head'. Use the hydro-power standard term. WMO No. 385 entry 111 ('available head') gives the Russian term 'полезный напор' (useful head) \/ syn. 'располагаемый напор' — these overlap with net head in Russian hydro engineering practice.",
-                "preferred_translation": "altezza netta"
-            },
-            {
-                "term": "plant efficiency",
-                "symbol": "η",
-                "context": "Overall efficiency of a micro-hydro power plant — product of turbine, generator, and transmission efficiencies. Dimensionless, 0–1. Appears in Micro-Hydro Power calculator.",
-                "translation_notes": "'Plant' here means the power plant\/installation, not a living plant. Use the energy\/electrical engineering term for overall system efficiency.",
-                "preferred_translation": "rendimento dell'impianto"
-            },
-            {
-                "term": "head loss",
-                "symbol": "h_L",
-                "context": "Energy loss expressed as a height of water column. Appears in Darcy-Weisbach, Hazen-Williams, Manning pipe, and Penstock calculators. Distinct from 'pressure drop' — use the hydraulic engineering term.",
-                "translation_notes": "'Head' in the hydraulic sense (energy per unit weight) does not translate literally in many languages — use the established civil\/hydraulic engineering phrase. Pre-2026 sr\/hr human translations used 'gubitak pritiska' (= pressure loss), which is technically the same concept expressed in pressure terms rather than head terms. The current 'губитак напора \/ gubitak tlačne visine' (= loss of hydraulic head) is more precise in a hydraulic engineering context and is preferred.",
-                "preferred_translation": "perdita di carico"
-            },
-            {
-                "term": "run-of-river",
-                "symbol": "",
-                "context": "A hydropower configuration that uses natural river flow without a dam or significant storage reservoir. Power output varies with seasonal river flow. Appears in Micro-Hydro Power calculator.",
-                "translation_notes": "Use the established energy\/hydropower sector term. 'Run' means natural river current — do not translate as jogging or running. WMO No. 385 entry 1263 gives the full facility names: Spanish 'central hidroeléctrica de pasada', French 'usine hydroélectrique au fil de l'eau', Russian 'русловая гидроэлектростанция' — these are the authoritative terms for the power plant noun. The abbreviated forms 'filo de agua' (es), 'au fil de l'eau' (fr), and 'русловая ГЭС' (ru) are standard in engineering use. German: 'Laufwasserkraftwerk'. Chinese: '径流式水电'.",
-                "preferred_translation": "ad acqua fluente"
-            },
-            {
-                "term": "headworks",
-                "symbol": "",
-                "context": "The intake structure at the upstream end of a penstock or canal, where water is diverted from the river or reservoir into the conveyance system. Appears in Micro-Hydro Power calculator (penstock diameter and length descriptions).",
-                "translation_notes": "Use the civil\/irrigation engineering term for a water intake or diversion structure. Spanish: 'obra de toma'. French: 'ouvrage de prise d'eau'. Russian: 'водозаборное сооружение'. German: 'Einlaufbauwerk'. In many languages, 'intake structure' is preferred over a literal translation of 'headworks'.",
-                "preferred_translation": "opera di presa"
-            },
-            {
-                "term": "junction loss",
-                "symbol": "H_m",
-                "context": "Energy loss at pipe junctions, bends, fittings, and entrance — a local (point) loss as opposed to distributed friction loss along the pipe. H_m = k × v²\/(2g). Also called 'minor loss', though in short penstocks these can equal or exceed friction losses. Appears in Manning Pipe Head Loss and Micro-Hydro Power calculators.",
-                "translation_notes": "The term 'minor loss' is conventional but misleading — do not imply these losses are always small. Use the hydraulic engineering term for local\/point losses at fittings. French: 'perte singulière'. Spanish: 'pérdida local' or 'pérdida por accesorio'. Russian: 'местные потери'. Chinese: '局部水头损失'.",
-                "preferred_translation": "perdite di carico locali"
-            }
-        ],
-        "mphl": [
+        "calc": [
             {
                 "term": "flow",
                 "symbol": "Q",
@@ -103,208 +32,34 @@
                 "preferred_translation": "velocità"
             },
             {
-                "term": "head loss",
-                "symbol": "h_L",
-                "context": "Energy loss expressed as a height of water column. Appears in Darcy-Weisbach, Hazen-Williams, Manning pipe, and Penstock calculators. Distinct from 'pressure drop' — use the hydraulic engineering term.",
-                "translation_notes": "'Head' in the hydraulic sense (energy per unit weight) does not translate literally in many languages — use the established civil\/hydraulic engineering phrase. Pre-2026 sr\/hr human translations used 'gubitak pritiska' (= pressure loss), which is technically the same concept expressed in pressure terms rather than head terms. The current 'губитак напора \/ gubitak tlačne visine' (= loss of hydraulic head) is more precise in a hydraulic engineering context and is preferred.",
-                "preferred_translation": "perdita di carico"
-            },
-            {
-                "term": "hydraulic radius",
-                "symbol": "R_h",
-                "context": "Cross-sectional flow area divided by wetted perimeter. Appears in Manning calculators.",
-                "translation_notes": "Use the standard hydraulic engineering phrase. Pre-2026 sr\/hr human translations used the Latin loanword 'hidraulički radijus' — this form is widely used in South Slavic engineering practice and may be more recognizable to field practitioners than the native Slavic equivalents 'полупречник' (sr) \/ 'polumjer' (hr). Both are correct; native Slavic engineers may encounter both forms.",
-                "preferred_translation": "raggio idraulico"
-            },
-            {
-                "term": "wetted perimeter",
-                "symbol": "P_w",
-                "context": "Length of the channel or pipe boundary in contact with flowing water. Appears in Manning calculators.",
-                "translation_notes": "WMO No. 385 entry 1682 confirms: es = 'perímetro mojado', fr = 'périmètre mouillé'. Use the standard hydraulic engineering phrase. 'Wetted' here means 'in contact with water', not 'soaked'. Pre-2026 sr human used 'okvašeni obim' (obim = natural South Slavic word for perimeter\/circumference); current uses 'квашени периметар' (периметар = Greek-derived loanword). Both are correct; 'obim\/opseg' is more natural in informal Serbian\/Croatian field use.",
-                "preferred_translation": "perimetro bagnato"
-            },
-            {
-                "term": "Manning roughness",
-                "symbol": "n",
-                "context": "Manning's n — empirical roughness coefficient used in the Manning formula for open-channel and pipe flow.",
-                "translation_notes": "Always include 'Manning' as a proper noun. The coefficient itself (n) needs no translation — only the label does. Do not translate as generic 'roughness coefficient' without 'Manning'.",
-                "preferred_translation": "coefficiente di scabrezza di Manning"
-            },
-            {
                 "term": "slope",
                 "symbol": "S",
                 "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
                 "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
                 "preferred_translation": "pendenza"
-            }
-        ],
-        "mtc": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
-                "preferred_translation": "portata"
-            },
-            {
-                "term": "velocity",
-                "symbol": "v",
-                "context": "Flow velocity (speed of water). Appears in all calculators.",
-                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
-                "preferred_translation": "velocità"
-            },
-            {
-                "term": "hydraulic radius",
-                "symbol": "R_h",
-                "context": "Cross-sectional flow area divided by wetted perimeter. Appears in Manning calculators.",
-                "translation_notes": "Use the standard hydraulic engineering phrase. Pre-2026 sr\/hr human translations used the Latin loanword 'hidraulički radijus' — this form is widely used in South Slavic engineering practice and may be more recognizable to field practitioners than the native Slavic equivalents 'полупречник' (sr) \/ 'polumjer' (hr). Both are correct; native Slavic engineers may encounter both forms.",
-                "preferred_translation": "raggio idraulico"
-            },
-            {
-                "term": "wetted perimeter",
-                "symbol": "P_w",
-                "context": "Length of the channel or pipe boundary in contact with flowing water. Appears in Manning calculators.",
-                "translation_notes": "WMO No. 385 entry 1682 confirms: es = 'perímetro mojado', fr = 'périmètre mouillé'. Use the standard hydraulic engineering phrase. 'Wetted' here means 'in contact with water', not 'soaked'. Pre-2026 sr human used 'okvašeni obim' (obim = natural South Slavic word for perimeter\/circumference); current uses 'квашени периметар' (периметар = Greek-derived loanword). Both are correct; 'obim\/opseg' is more natural in informal Serbian\/Croatian field use.",
-                "preferred_translation": "perimetro bagnato"
-            },
-            {
-                "term": "Manning roughness",
-                "symbol": "n",
-                "context": "Manning's n — empirical roughness coefficient used in the Manning formula for open-channel and pipe flow.",
-                "translation_notes": "Always include 'Manning' as a proper noun. The coefficient itself (n) needs no translation — only the label does. Do not translate as generic 'roughness coefficient' without 'Manning'.",
-                "preferred_translation": "coefficiente di scabrezza di Manning"
-            },
-            {
-                "term": "slope",
-                "symbol": "S",
-                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
-                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
-                "preferred_translation": "pendenza"
-            }
-        ],
-        "odt": [
-            {
-                "term": "orifice",
-                "symbol": "",
-                "context": "A submerged or free-flowing opening through which water discharges under head. Appears in Orifice Flow and Orifice Drain Time calculators.",
-                "translation_notes": "In irrigation contexts, often the opening of a headgate or pipe turnout. Use the hydraulic engineering term, not a general word for 'hole' or 'opening'.",
-                "preferred_translation": "orifizio"
-            },
-            {
-                "term": "discharge coefficient",
-                "symbol": "C_d",
-                "context": "Coefficient correcting theoretical orifice or weir flow for real-world contraction and friction effects. Appears in Orifice and Weir calculators.",
-                "translation_notes": "The 'discharge' here refers to flow rate, not the verb. Use the hydraulic engineering compound term.",
-                "preferred_translation": "coefficiente di efflusso"
-            },
-            {
-                "term": "headwater elevation",
-                "symbol": "",
-                "context": "Water surface elevation on the upstream side of a weir or orifice. Appears in Weir Flow and Orifice calculators.",
-                "translation_notes": "'Headwater' is an upstream water surface — do not confuse with 'head' (energy) or 'source' (origin of a stream). Use the hydraulic structure term.",
-                "preferred_translation": "livello idrometrico a monte"
-            },
-            {
-                "term": "tailwater elevation",
-                "symbol": "",
-                "context": "Water surface elevation on the downstream side of a weir or orifice. Appears in Orifice Flow calculator. When tailwater is above the invert, the orifice is submerged.",
-                "translation_notes": "Use the hydraulic structure term for downstream water level. Pair consistently with 'headwater elevation'.",
-                "preferred_translation": "livello idrometrico a valle"
             }
         ]
     },
     "keys_to_translate": {
-        "mphl_area": "Area, A",
-        "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
-        "mtc_vel_ok_short": "OK",
-        "mhp_vel_ok_short": "OK",
-        "odt_notes_1_term": "Formula"
+        "calc_defaults": "Default values"
     },
     "keys": {
-        "mphl_area": "Area, A",
-        "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
-        "mtc_vel_ok_short": "OK",
-        "mhp_vel_ok_short": "OK",
-        "odt_notes_1_term": "Formula"
+        "calc_defaults": "Default values"
     },
     "key_context": {
-        "mphl_area": {
+        "calc_defaults": {
             "reason": "equal_to_english",
-            "current_value": "Area, A",
+            "current_value": "Default values",
             "neighbors": {
                 "previous_translated": {
-                    "key": "mphl_pipe_length",
-                    "value": "Lunghezza tubazione, L",
-                    "english": "Pipe length, L"
+                    "key": "calc_set_units",
+                    "value": "Imposta unità:",
+                    "english": "Set units:"
                 },
                 "next_translated": {
-                    "key": "mphl_total_junction_k",
-                    "value": "Coefficiente totale perdita di carico ai giunti, k",
-                    "english": "Total combined junction loss coefficient, k"
-                }
-            }
-        },
-        "mtc_blodgett_v_bathurst": {
-            "reason": "equal_to_english",
-            "current_value": "Blodgett vs. Bathurst",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mtc_n_bathurst",
-                    "value": "n per dimensione roccia di progetto secondo Bathurst",
-                    "english": "n for design rock size per Bathurst"
-                },
-                "next_translated": {
-                    "key": "mtc_d50_bottom",
-                    "value": "Dimensione roccia angolare richiesta sul fondo, D50 (Isbash & MC) <span title=\"Secondo Isbash (1936) e Maricopa County, Arizona, US.\" style=\"cursor:help;color:#06c;font-size:0.9em\">?<\/span>",
-                    "english": "Required bottom angular rock size, D50 (Isbash & MC) <span title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\" style=\"cursor:help;color:#06c;font-size:0.9em\">?<\/span>"
-                }
-            }
-        },
-        "mtc_vel_ok_short": {
-            "reason": "equal_to_english",
-            "current_value": "OK",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mtc_vel_low",
-                    "value": "Velocità bassa — rischio di sedimentazione.",
-                    "english": "Velocity low - sedimentation risk."
-                },
-                "next_translated": {
-                    "key": "mtc_vel_high_short",
-                    "value": "Alto",
-                    "english": "High"
-                }
-            }
-        },
-        "mhp_vel_ok_short": {
-            "reason": "equal_to_english",
-            "current_value": "OK",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mhp_vel_high",
-                    "value": "Velocità elevata — rischio di colpo d'ariete e perdite localizzate.",
-                    "english": "Velocity high - risk of water hammer and high point (minor) losses."
-                },
-                "next_translated": {
-                    "key": "mhp_vel_high_short",
-                    "value": "Alto",
-                    "english": "High"
-                }
-            }
-        },
-        "odt_notes_1_term": {
-            "reason": "equal_to_english",
-            "current_value": "Formula",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "odt_t_day",
-                    "value": "Tempo di svuotamento (giorni)",
-                    "english": "Drain time (days)"
-                },
-                "next_translated": {
-                    "key": "odt_notes_1_def",
-                    "value": "t = √H<sub>1<\/sub> \/ (C<sub>d<\/sub> A<sub>or<\/sub> √(2g)) × (2A<sub>x<\/sub>\/5 + 8√(A<sub>x<\/sub>A<sub>0<\/sub>)\/15 + 16A<sub>0<\/sub>\/15) fornisce il tempo di svuotamento dal carico H all'orifizio. Tempo di svuotamento = t(H<sub>1<\/sub>,A<sub>1<\/sub>,A<sub>0<\/sub>) − t(H<sub>2<\/sub>,A<sub>2<\/sub>,A<sub>0<\/sub>), dove H<sub>1<\/sub> = quota iniziale − quota orifizio, H<sub>2<\/sub> = quota finale − quota orifizio.",
-                    "english": "t = &radic;H<sub>1<\/sub> \/ (C<sub>d<\/sub> A<sub>or<\/sub> &radic;(2g)) &times; (2A<sub>x<\/sub>\/5 + 8&radic;(A<sub>x<\/sub>A<sub>0<\/sub>)\/15 + 16A<sub>0<\/sub>\/15) gives drain time from head H to the orifice. Drain time = t(H<sub>1<\/sub>,A<sub>1<\/sub>,A<sub>0<\/sub>) &minus; t(H<sub>2<\/sub>,A<sub>2<\/sub>,A<sub>0<\/sub>), where H<sub>1<\/sub> = starting elevation &minus; orifice elevation, H<sub>2<\/sub> = ending elevation &minus; orifice elevation."
+                    "key": "points_data_help",
+                    "value": "(o Copia\/Incolla usando l'area dati)",
+                    "english": "(or Copy\/Paste using data area)"
                 }
             }
         }

@@ -66,6 +66,7 @@ $ec_lang['template_printable_title']='د چاپ سرلیک';
 $ec_lang['template_printable_subtitle']='د چاپ فرعي سرلیک';
 $ec_lang['index_title']='وړیا آنلاین انجینري محاسبې';
 $ec_lang['calc_set_units']='واحدونه تنظیم کړئ:';
+$ec_lang['calc_defaults']='د لاسليک ارزښتونه';
 $ec_lang['points_data_help']='(یا د معلوماتو ساحې له لارې کاپي/پیسټ وکړئ)';
 $ec_lang['points_data_title']='د نقطو معلومات<br />(د کوما یا ټب لخوا جلا شوي)';
 $ec_lang['points_data_copy']='کاپي';

@@ -66,6 +66,7 @@ $ec_lang['template_printable_title']='ចំណងជើងដែលអាចប
 $ec_lang['template_printable_subtitle']='ចំណងជើងរងដែលអាចបោះពុម្ព';
 $ec_lang['index_title']='ម៉ាស៊ីនគណនាវិស្វកម្មតាមអ៊ីនធឺណិតឥតគិតថ្លៃ';
 $ec_lang['calc_set_units']='កំណត់ឯកតា:';
+$ec_lang['calc_defaults']='តម្លៃលំនាំដើម';
 $ec_lang['points_data_help']='(ឬ ចម្លង/បិទភ្ជាប់ ដោយប្រើផ្ទៃទិន្នន័យ)';
 $ec_lang['points_data_title']='ទិន្នន័យចំណុច<br />(បំបែកដោយក្បៀស ឬ tab)';
 $ec_lang['points_data_copy']='ចម្លង';

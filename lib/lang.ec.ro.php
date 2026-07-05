@@ -64,6 +64,7 @@ $ec_lang['template_printable_title']='Titlu tipărit';
 $ec_lang['template_printable_subtitle']='Subtitlu tipărit';
 $ec_lang['index_title']='Calculatoare Inginerești Gratuite Online';
 $ec_lang['calc_set_units']='Alege unitate masură:';
+$ec_lang['calc_defaults']='Valori implicite';
 $ec_lang['points_data_help']='(sau Copiați/Lipiți folosind zona de date)';
 $ec_lang['points_data_title']='Date puncte<br />(separate prin virgulă sau tabulație)';
 $ec_lang['points_data_copy']='Copiați';

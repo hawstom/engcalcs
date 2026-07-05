@@ -66,6 +66,7 @@ $ec_lang['template_printable_title']='عنوان قابل چاپ';
 $ec_lang['template_printable_subtitle']='زیرعنوان قابل چاپ';
 $ec_lang['index_title']='ماشین‌حساب‌های رایگان مهندسی آنلاین';
 $ec_lang['calc_set_units']='تنظیم واحدها:';
+$ec_lang['calc_defaults']='مقادیر پیش‌فرض';
 $ec_lang['points_data_help']='(یا با استفاده از ناحیه داده کپی/پیست کنید)';
 $ec_lang['points_data_title']='داده‌های نقاط<br />(جداشده با کاما یا تب)';
 $ec_lang['points_data_copy']='کپی';

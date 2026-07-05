@@ -1,93 +1,22 @@
 {
     "meta": {
         "language": "id",
-        "expected_key_count": 465,
-        "delta_key_count": 6,
+        "expected_key_count": 508,
+        "delta_key_count": 1,
         "active_prefixes": [
-            "mhp",
-            "mi",
-            "mtc",
-            "rc"
+            "calc"
         ],
-        "requested_prefix": null,
+        "requested_prefix": "calc",
         "notes": "Translate only keys in keys_to_translate; preserve HTML, units, and symbols.",
         "glossary_injection_notes": "Use prompt_context_by_prefix and glossary_terms_by_prefix.preferred_translation when available.",
         "context_notes": "Use key_context.neighbors to keep register consistent with nearby translated strings.",
         "intent_notes": "Use key_intent when present; these entries provide terse disambiguation comments only where translation risk exists."
     },
     "prompt_context_by_prefix": {
-        "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): debit\n- penstock: pipa tekanan\n- gross head (H_gross): tinggi jatuh bruto\n- net head (H_net): tinggi jatuh neto\n- plant efficiency (η): efisiensi instalasi\n- head loss (h_L): kehilangan tekanan\n- run-of-river: pembangkit listrik tenaga air aliran langsung\n- headworks: bangunan pengambilan air\n- junction loss (H_m): kehilangan lokal",
-        "mi": "Use these preferred technical term translations when relevant:\n- flow (Q): debit\n- velocity (v): kecepatan\n- hydraulic radius (R_h): jari-jari hidrolik\n- wetted perimeter (P_w): keliling basah\n- Manning roughness (n): koefisien kekasaran Manning\n- slope (S): kemiringan",
-        "mtc": "Use these preferred technical term translations when relevant:\n- flow (Q): debit\n- velocity (v): kecepatan\n- hydraulic radius (R_h): jari-jari hidrolik\n- wetted perimeter (P_w): keliling basah\n- Manning roughness (n): koefisien kekasaran Manning\n- slope (S): kemiringan",
-        "rc": "Use these preferred technical term translations when relevant:\n- flow (Q): debit\n- velocity (v): kecepatan\n- riprap: batu pasangan\n- slope (S): kemiringan\n- rock chute: saluran curam berbatu\n- chute: saluran curam\n- unit discharge (q, q_t): debit per satuan lebar\n- median rock size (D50): ukuran median batu\n- gradation (SD): gradasi butir\n- porosity (n_p): porositas\n- specific gravity (sg): berat jenis\n- ponding: genangan air hulu"
+        "calc": "Use these preferred technical term translations when relevant:\n- flow (Q): debit\n- velocity (v): kecepatan\n- slope (S): kemiringan"
     },
     "glossary_terms_by_prefix": {
-        "mhp": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
-                "preferred_translation": "debit"
-            },
-            {
-                "term": "penstock",
-                "symbol": "",
-                "context": "Pressure pipe carrying water from a reservoir or headpond down to a turbine in a micro-hydro system. Appears in Micro-Hydro Power calculator.",
-                "translation_notes": "'Penstock' is a specialized term with no exact one-word equivalent in many languages. Use the established civil\/hydro engineering phrase for 'pressure conduit' or 'force main to turbine'. Czech: 'tlakovod' (pressure main) is preferred over the generic 'přiváděcí potrubí' (supply pipe). Serbian: 'напорни цевовод' is the standard hydraulic engineering term.",
-                "preferred_translation": "pipa tekanan"
-            },
-            {
-                "term": "gross head",
-                "symbol": "H_gross",
-                "context": "Total elevation difference between the headpond water surface and the turbine — before subtracting penstock losses. Appears in Micro-Hydro Power calculator.",
-                "translation_notes": "'Gross' means total\/before-deduction. Pair with 'net head' for clarity. Use the hydro-power standard term.",
-                "preferred_translation": "tinggi jatuh bruto"
-            },
-            {
-                "term": "net head",
-                "symbol": "H_net",
-                "context": "Effective head available at the turbine after subtracting penstock friction and minor losses from gross head. H_net = H_gross - h_L.",
-                "translation_notes": "'Net' means after-deduction. Pair with 'gross head'. Use the hydro-power standard term. WMO No. 385 entry 111 ('available head') gives the Russian term 'полезный напор' (useful head) \/ syn. 'располагаемый напор' — these overlap with net head in Russian hydro engineering practice.",
-                "preferred_translation": "tinggi jatuh neto"
-            },
-            {
-                "term": "plant efficiency",
-                "symbol": "η",
-                "context": "Overall efficiency of a micro-hydro power plant — product of turbine, generator, and transmission efficiencies. Dimensionless, 0–1. Appears in Micro-Hydro Power calculator.",
-                "translation_notes": "'Plant' here means the power plant\/installation, not a living plant. Use the energy\/electrical engineering term for overall system efficiency.",
-                "preferred_translation": "efisiensi instalasi"
-            },
-            {
-                "term": "head loss",
-                "symbol": "h_L",
-                "context": "Energy loss expressed as a height of water column. Appears in Darcy-Weisbach, Hazen-Williams, Manning pipe, and Penstock calculators. Distinct from 'pressure drop' — use the hydraulic engineering term.",
-                "translation_notes": "'Head' in the hydraulic sense (energy per unit weight) does not translate literally in many languages — use the established civil\/hydraulic engineering phrase. Pre-2026 sr\/hr human translations used 'gubitak pritiska' (= pressure loss), which is technically the same concept expressed in pressure terms rather than head terms. The current 'губитак напора \/ gubitak tlačne visine' (= loss of hydraulic head) is more precise in a hydraulic engineering context and is preferred.",
-                "preferred_translation": "kehilangan tekanan"
-            },
-            {
-                "term": "run-of-river",
-                "symbol": "",
-                "context": "A hydropower configuration that uses natural river flow without a dam or significant storage reservoir. Power output varies with seasonal river flow. Appears in Micro-Hydro Power calculator.",
-                "translation_notes": "Use the established energy\/hydropower sector term. 'Run' means natural river current — do not translate as jogging or running. WMO No. 385 entry 1263 gives the full facility names: Spanish 'central hidroeléctrica de pasada', French 'usine hydroélectrique au fil de l'eau', Russian 'русловая гидроэлектростанция' — these are the authoritative terms for the power plant noun. The abbreviated forms 'filo de agua' (es), 'au fil de l'eau' (fr), and 'русловая ГЭС' (ru) are standard in engineering use. German: 'Laufwasserkraftwerk'. Chinese: '径流式水电'.",
-                "preferred_translation": "pembangkit listrik tenaga air aliran langsung"
-            },
-            {
-                "term": "headworks",
-                "symbol": "",
-                "context": "The intake structure at the upstream end of a penstock or canal, where water is diverted from the river or reservoir into the conveyance system. Appears in Micro-Hydro Power calculator (penstock diameter and length descriptions).",
-                "translation_notes": "Use the civil\/irrigation engineering term for a water intake or diversion structure. Spanish: 'obra de toma'. French: 'ouvrage de prise d'eau'. Russian: 'водозаборное сооружение'. German: 'Einlaufbauwerk'. In many languages, 'intake structure' is preferred over a literal translation of 'headworks'.",
-                "preferred_translation": "bangunan pengambilan air"
-            },
-            {
-                "term": "junction loss",
-                "symbol": "H_m",
-                "context": "Energy loss at pipe junctions, bends, fittings, and entrance — a local (point) loss as opposed to distributed friction loss along the pipe. H_m = k × v²\/(2g). Also called 'minor loss', though in short penstocks these can equal or exceed friction losses. Appears in Manning Pipe Head Loss and Micro-Hydro Power calculators.",
-                "translation_notes": "The term 'minor loss' is conventional but misleading — do not imply these losses are always small. Use the hydraulic engineering term for local\/point losses at fittings. French: 'perte singulière'. Spanish: 'pérdida local' or 'pérdida por accesorio'. Russian: 'местные потери'. Chinese: '局部水头损失'.",
-                "preferred_translation": "kehilangan lokal"
-            }
-        ],
-        "mi": [
+        "calc": [
             {
                 "term": "flow",
                 "symbol": "Q",
@@ -103,275 +32,34 @@
                 "preferred_translation": "kecepatan"
             },
             {
-                "term": "hydraulic radius",
-                "symbol": "R_h",
-                "context": "Cross-sectional flow area divided by wetted perimeter. Appears in Manning calculators.",
-                "translation_notes": "Use the standard hydraulic engineering phrase. Pre-2026 sr\/hr human translations used the Latin loanword 'hidraulički radijus' — this form is widely used in South Slavic engineering practice and may be more recognizable to field practitioners than the native Slavic equivalents 'полупречник' (sr) \/ 'polumjer' (hr). Both are correct; native Slavic engineers may encounter both forms.",
-                "preferred_translation": "jari-jari hidrolik"
-            },
-            {
-                "term": "wetted perimeter",
-                "symbol": "P_w",
-                "context": "Length of the channel or pipe boundary in contact with flowing water. Appears in Manning calculators.",
-                "translation_notes": "WMO No. 385 entry 1682 confirms: es = 'perímetro mojado', fr = 'périmètre mouillé'. Use the standard hydraulic engineering phrase. 'Wetted' here means 'in contact with water', not 'soaked'. Pre-2026 sr human used 'okvašeni obim' (obim = natural South Slavic word for perimeter\/circumference); current uses 'квашени периметар' (периметар = Greek-derived loanword). Both are correct; 'obim\/opseg' is more natural in informal Serbian\/Croatian field use.",
-                "preferred_translation": "keliling basah"
-            },
-            {
-                "term": "Manning roughness",
-                "symbol": "n",
-                "context": "Manning's n — empirical roughness coefficient used in the Manning formula for open-channel and pipe flow.",
-                "translation_notes": "Always include 'Manning' as a proper noun. The coefficient itself (n) needs no translation — only the label does. Do not translate as generic 'roughness coefficient' without 'Manning'.",
-                "preferred_translation": "koefisien kekasaran Manning"
-            },
-            {
                 "term": "slope",
                 "symbol": "S",
                 "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
                 "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
                 "preferred_translation": "kemiringan"
-            }
-        ],
-        "mtc": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
-                "preferred_translation": "debit"
-            },
-            {
-                "term": "velocity",
-                "symbol": "v",
-                "context": "Flow velocity (speed of water). Appears in all calculators.",
-                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
-                "preferred_translation": "kecepatan"
-            },
-            {
-                "term": "hydraulic radius",
-                "symbol": "R_h",
-                "context": "Cross-sectional flow area divided by wetted perimeter. Appears in Manning calculators.",
-                "translation_notes": "Use the standard hydraulic engineering phrase. Pre-2026 sr\/hr human translations used the Latin loanword 'hidraulički radijus' — this form is widely used in South Slavic engineering practice and may be more recognizable to field practitioners than the native Slavic equivalents 'полупречник' (sr) \/ 'polumjer' (hr). Both are correct; native Slavic engineers may encounter both forms.",
-                "preferred_translation": "jari-jari hidrolik"
-            },
-            {
-                "term": "wetted perimeter",
-                "symbol": "P_w",
-                "context": "Length of the channel or pipe boundary in contact with flowing water. Appears in Manning calculators.",
-                "translation_notes": "WMO No. 385 entry 1682 confirms: es = 'perímetro mojado', fr = 'périmètre mouillé'. Use the standard hydraulic engineering phrase. 'Wetted' here means 'in contact with water', not 'soaked'. Pre-2026 sr human used 'okvašeni obim' (obim = natural South Slavic word for perimeter\/circumference); current uses 'квашени периметар' (периметар = Greek-derived loanword). Both are correct; 'obim\/opseg' is more natural in informal Serbian\/Croatian field use.",
-                "preferred_translation": "keliling basah"
-            },
-            {
-                "term": "Manning roughness",
-                "symbol": "n",
-                "context": "Manning's n — empirical roughness coefficient used in the Manning formula for open-channel and pipe flow.",
-                "translation_notes": "Always include 'Manning' as a proper noun. The coefficient itself (n) needs no translation — only the label does. Do not translate as generic 'roughness coefficient' without 'Manning'.",
-                "preferred_translation": "koefisien kekasaran Manning"
-            },
-            {
-                "term": "slope",
-                "symbol": "S",
-                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
-                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
-                "preferred_translation": "kemiringan"
-            }
-        ],
-        "rc": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
-                "preferred_translation": "debit"
-            },
-            {
-                "term": "velocity",
-                "symbol": "v",
-                "context": "Flow velocity (speed of water). Appears in all calculators.",
-                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
-                "preferred_translation": "kecepatan"
-            },
-            {
-                "term": "riprap",
-                "symbol": "",
-                "context": "Angular rock placed to resist erosion on channel beds and banks. Appears in Manning Trapezoidal Channel and Rock Chute calculators.",
-                "translation_notes": "No direct single-word equivalent in most languages. Use the established local engineering term — this varies significantly by country. In Spanish, 'enrocado' (general) or 'escollera' (bank protection) are both used; lead with 'enrocado'.",
-                "preferred_translation": "batu pasangan"
-            },
-            {
-                "term": "slope",
-                "symbol": "S",
-                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
-                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
-                "preferred_translation": "kemiringan"
-            },
-            {
-                "term": "rock chute",
-                "symbol": "",
-                "context": "A steep rock-lined drop structure (also called a 'rock ramp') that conveys water rapidly down a slope in irrigation, drainage, or watershed management. Key concepts for translation: rock-lined, steep gradient, spillway or drop structure — translate the concept, not the English word 'chute'. The rock riprap matrix dissipates energy and resists erosion. Appears in Rock Chute Design (Robinson) and Robinson Rock Chute calculators.",
-                "translation_notes": "CRITICAL: 'Robinson' is the surname of K.M. Robinson, co-author of Robinson, Rice & Kadavy (1998) — it is a proper noun and must NEVER be translated or modified in any language. Translate only 'Rock Chute'. Concept to translate: 'rock-lined steep channel' or 'rock-lined spillway' — the drop\/descent nature must be conveyed; a generic 'rock channel' is insufficient. CRITICAL for French: WMO No. 385 entry 517 establishes that the French word 'chute' means 'fall' (elevation difference) — it cannot name this structure. Use 'coursier en enrochement' (coursier = steep channel structure; enrochement = riprap). Spanish: USDA uses 'bajante de rocado' — 'bajante' (from bajar = to descend) correctly conveys the drop-structure nature; 'de rocado' = rock-lined. Russian: 'каменный быстроток' ('быстроток' = fast-flow\/steep channel). Portuguese: changed from 'calha' (generic trough) to 'rampa em enrocamento' (rampa = ramp\/slope, enrocamento = riprap) to convey steep character. Serbian: changed from 'жлеб' (gutter\/trough) to 'брзоток' (fast-flow structure), consistent with ru\/uk pattern. Bengali: changed from borrowed 'চ্যুট' (conveys nothing) to 'পাথর-আবৃত খাড়া নালা' (rock-lined steep channel). Persian: changed from generic 'آبراه سنگی' (stone waterway) to 'آبراه تند سنگچین' (تند = steep\/swift, سنگچین = stone-laid\/riprap). Pashto: added 'تند' (steep\/swift) to original. Khmer: changed 'ចំហ' (open) to 'ជម្រាល' (sloped\/inclined). NEEDS HUMAN REVIEW: am (ምቀጫ meaning uncertain), my (ထောင် may not clearly convey steep to all readers), de (Steinschütte is standard engineering term but doesn't explicitly say 'steep channel').",
-                "preferred_translation": "saluran curam berbatu"
-            },
-            {
-                "term": "chute",
-                "symbol": "",
-                "context": "A steep open channel or drop structure for conveying water rapidly down a slope. Distinct from a gentle-slope irrigation canal. Per ec_lang_intent guidance: translate as 'steep channel' or 'spillway' — not as the word 'chute' borrowed into another language. Appears in Rock Chute Design (Robinson), Manning Trapezoidal Channel, and related drop-structure calculators.",
-                "translation_notes": "CRITICAL for French: WMO No. 385 entry 517 defines the English word 'fall' (elevation difference) as French 'chute', Spanish 'caída', and Russian 'падение'. The same pattern holds in all three WMO languages: the word for 'fall' (elevation difference) is NOT available for this hydraulic structure. 'Coursier' is the correct French term for the structure. Spanish: 'canal rápido'. Russian: 'быстроток' (the steep channel structure — distinct from 'падение' which means elevation fall). Chinese: '陡槽'.",
-                "preferred_translation": "saluran curam"
-            },
-            {
-                "term": "unit discharge",
-                "symbol": "q, q_t",
-                "context": "Flow rate per unit width of channel (Q\/B), in m²\/s or ft²\/s. The primary design input for the Robinson rock chute method. Appears in Rock Chute Design calculator.",
-                "translation_notes": "Use the hydraulic engineering term. 'Unit' here means 'per unit channel width' — not related to measurement units. Spanish: 'caudal unitario'. French: 'débit unitaire'. German: 'spezifischer Abfluss'. Russian: 'удельный расход'. Chinese: '单宽流量'.",
-                "preferred_translation": "debit per satuan lebar"
-            },
-            {
-                "term": "median rock size",
-                "symbol": "D50",
-                "context": "The particle size at which 50% of the rock is finer by weight. The primary output of the Robinson rock chute method. Also used in Manning Trapezoidal Channel riprap sizing. The symbol D50 is universal — translate only the descriptive label.",
-                "translation_notes": "D50 (or D₅₀) is a universal engineering symbol — do not translate it. Translate only the label 'median rock size' or 'median particle size'. Most languages express this as 'median diameter'. Do not use 'average' (average ≠ median statistically). Spanish: 'tamaño mediano de roca'. French: 'taille médiane des rochers'. Chinese: '中值粒径'.",
-                "preferred_translation": "ukuran median batu"
-            },
-            {
-                "term": "gradation",
-                "symbol": "SD",
-                "context": "The spread or uniformity of rock particle sizes. In the Robinson method, gradation is expressed as SD = D84.1\/D50. Uniform rock ≈ 1.25; Robinson valid range 1.15–1.47. Appears in Rock Chute Design calculator.",
-                "translation_notes": "Use the geotechnical\/hydraulic engineering term for grain size distribution or grading. Do not translate as 'grade' (implies quality). The symbol 'SD' and ratio notation D84.1\/D50 are universal. Spanish\/Portuguese: 'granulometría'\/'granulometria'. French: 'granulométrie'. Russian\/Bulgarian\/Serbian: 'гранулометрический состав'. Chinese: '级配'.",
-                "preferred_translation": "gradasi butir"
-            },
-            {
-                "term": "porosity",
-                "symbol": "n_p",
-                "context": "The fraction of the rock layer volume that is void space (air + water). Default 0.45 for angular crushed rock. Determines how much flow passes through the rock mantle versus over the surface. Appears in Rock Chute Design calculator. Distinct from Manning's n (roughness coefficient) — do not confuse the two.",
-                "translation_notes": "Standard hydraulic\/geotechnical term with cognates in most European languages. Always distinguish from Manning 'n' in context — they appear in the same calculator.",
-                "preferred_translation": "porositas"
-            },
-            {
-                "term": "specific gravity",
-                "symbol": "sg",
-                "context": "Ratio of a material's density to the density of water (dimensionless). Typical crushed granite or basalt ≈ 2.65. Robinson method valid range: 2.54–2.82. Appears in Rock Chute Design and Manning Trapezoidal Channel calculators.",
-                "translation_notes": "Use the established civil\/geotechnical engineering term meaning 'density relative to water'. Spanish: 'gravedad específica'. French: 'densité relative'. German: 'spezifisches Gewicht'. Arabic: 'الوزن النوعي' is the traditional hydraulic engineering term. Do not use 'unit weight' (weight per volume — has different dimensions).",
-                "preferred_translation": "berat jenis"
-            },
-            {
-                "term": "ponding",
-                "symbol": "",
-                "context": "Upstream water accumulation at the inlet of a chute or spillway, forming a small pond. In the Robinson method, ponding (Hp > yn) is desirable — the head at the inlet crest acts as a weir, reducing upstream erosion risk. Appears in Rock Chute Design calculator.",
-                "translation_notes": "Use the irrigation\/drainage engineering term for upstream water backing up to form a small beneficial pond at the inlet. Do not use a word implying flooding, failure, or undesirable inundation — ponding here is a design goal. Spanish: 'represamiento'. French: 'mise en charge amont'. Russian: 'подпор воды'. Chinese: '壅水'.",
-                "preferred_translation": "genangan air hulu"
             }
         ]
     },
     "keys_to_translate": {
-        "mi_station": "Sta",
-        "mi_elevation": "Elev",
-        "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
-        "mtc_vel_ok_short": "OK",
-        "mhp_vel_ok_short": "OK",
-        "rc_sketch_filter": "Filter"
+        "calc_defaults": "Default values"
     },
     "keys": {
-        "mi_station": "Sta",
-        "mi_elevation": "Elev",
-        "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
-        "mtc_vel_ok_short": "OK",
-        "mhp_vel_ok_short": "OK",
-        "rc_sketch_filter": "Filter"
+        "calc_defaults": "Default values"
     },
     "key_context": {
-        "mi_station": {
+        "calc_defaults": {
             "reason": "equal_to_english",
-            "current_value": "Sta",
+            "current_value": "Default values",
             "neighbors": {
                 "previous_translated": {
-                    "key": "mi_groupRegion",
-                    "value": "Zona",
-                    "english": "Region"
+                    "key": "calc_set_units",
+                    "value": "Atur satuan:",
+                    "english": "Set units:"
                 },
                 "next_translated": {
-                    "key": "mi_d50in",
-                    "value": "Ukuran<br \/>median<br \/>batu<br \/>pelapis",
-                    "english": "Lining<br \/>median<br \/>rock<br \/>size"
-                }
-            }
-        },
-        "mi_elevation": {
-            "reason": "equal_to_english",
-            "current_value": "Elev",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mi_groupRegion",
-                    "value": "Zona",
-                    "english": "Region"
-                },
-                "next_translated": {
-                    "key": "mi_d50in",
-                    "value": "Ukuran<br \/>median<br \/>batu<br \/>pelapis",
-                    "english": "Lining<br \/>median<br \/>rock<br \/>size"
-                }
-            }
-        },
-        "mtc_blodgett_v_bathurst": {
-            "reason": "equal_to_english",
-            "current_value": "Blodgett vs. Bathurst",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mtc_n_bathurst",
-                    "value": "n untuk ukuran batu rencana menurut Bathurst",
-                    "english": "n for design rock size per Bathurst"
-                },
-                "next_translated": {
-                    "key": "mtc_d50_bottom",
-                    "value": "Ukuran batu sudut yang dibutuhkan di dasar, D50 (Isbash & MC) <span title=\"Menurut Isbash (1936) dan Maricopa County, Arizona, AS.\" style=\"cursor:help;color:#06c;font-size:0.9em\">?<\/span>",
-                    "english": "Required bottom angular rock size, D50 (Isbash & MC) <span title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\" style=\"cursor:help;color:#06c;font-size:0.9em\">?<\/span>"
-                }
-            }
-        },
-        "mtc_vel_ok_short": {
-            "reason": "equal_to_english",
-            "current_value": "OK",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mtc_vel_low",
-                    "value": "Kecepatan rendah — risiko sedimentasi.",
-                    "english": "Velocity low - sedimentation risk."
-                },
-                "next_translated": {
-                    "key": "mtc_vel_high_short",
-                    "value": "Tinggi",
-                    "english": "High"
-                }
-            }
-        },
-        "mhp_vel_ok_short": {
-            "reason": "equal_to_english",
-            "current_value": "OK",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mhp_vel_high",
-                    "value": "Kecepatan tinggi — risiko pukulan air dan kehilangan titik (minor).",
-                    "english": "Velocity high - risk of water hammer and high point (minor) losses."
-                },
-                "next_translated": {
-                    "key": "mhp_vel_high_short",
-                    "value": "Tinggi",
-                    "english": "High"
-                }
-            }
-        },
-        "rc_sketch_filter": {
-            "reason": "equal_to_english",
-            "current_value": "Filter",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_notes_4_def",
-                    "value": "Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). \"<a target=\"_blank\" href=\"https:\/\/www.fs.usda.gov\/biology\/nsaec\/fishxing\/fplibrary\/Robinson_1998_Design_of_Rock_Chutes.pdf\">Desain peluncur batu<\/a>.\" <em>Transactions of the ASAE<\/em>, 41(3), 621–626. USDA ARS juga menerbitkan <a target=\"_blank\" href=\"https:\/\/data.nal.usda.gov\/dataset\/rock-chute-design\">lembar kerja Excel<\/a> berdasarkan metode yang sama.",
-                    "english": "Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). &ldquo;<a target=\"_blank\" href=\"https:\/\/www.fs.usda.gov\/biology\/nsaec\/fishxing\/fplibrary\/Robinson_1998_Design_of_Rock_Chutes.pdf\">Design of rock chutes<\/a>.&rdquo; <em>Transactions of the ASAE<\/em>, 41(3), 621&ndash;626. USDA ARS also publishes an <a target=\"_blank\" href=\"https:\/\/data.nal.usda.gov\/dataset\/rock-chute-design\">Excel spreadsheet<\/a> based on the same method."
-                },
-                "next_translated": {
-                    "key": "rc_sketch_top_crest_curve",
-                    "value": "Lengkung Puncak",
-                    "english": "Top Crest Curve"
+                    "key": "points_data_help",
+                    "value": "(atau Salin\/Tempel menggunakan area data)",
+                    "english": "(or Copy\/Paste using data area)"
                 }
             }
         }

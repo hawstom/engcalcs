@@ -66,6 +66,7 @@ $ec_lang['template_printable_title']='Titre imprimable';
 $ec_lang['template_printable_subtitle']='Sous-titre imprimable';
 $ec_lang['index_title']='Calculateurs d\'ingénierie gratuits en ligne';
 $ec_lang['calc_set_units']='Définir les unités:';
+$ec_lang['calc_defaults']='Valeurs par défaut';
 $ec_lang['points_data_help']='(ou Copier/Coller via la zone de données)';
 $ec_lang['points_data_title']='Données des points<br />(séparés par virgule ou tabulation)';
 $ec_lang['points_data_copy']='Copier';

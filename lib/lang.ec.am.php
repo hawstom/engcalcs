@@ -66,6 +66,7 @@ $ec_lang['template_printable_title']='ሊታተም የሚችል ርዕስ';
 $ec_lang['template_printable_subtitle']='ሊታተም የሚችል ንዑስ ርዕስ';
 $ec_lang['index_title']='ነፃ የኦንላይን ምህንድስና ካልኩሌተሮች';
 $ec_lang['calc_set_units']='አሃዶችን አዘጋጅ:';
+$ec_lang['calc_defaults']='ነባር ዋጋዎች';
 $ec_lang['points_data_help']='(ወይም የውሂብ ቦታ ተጠቅሞ ቅዳ/ለጥፍ)';
 $ec_lang['points_data_title']='የነጥቦች ውሂብ<br />(በኮማ ወይም 탭 የተለዩ)';
 $ec_lang['points_data_copy']='ቅዳ';
