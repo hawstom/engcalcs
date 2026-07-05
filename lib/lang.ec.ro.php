@@ -65,6 +65,7 @@ $ec_lang['template_printable_subtitle']='Subtitlu tipărit';
 $ec_lang['index_title']='Calculatoare Inginerești Gratuite Online';
 $ec_lang['calc_set_units']='Alege unitate masură:';
 $ec_lang['calc_defaults']='Valori implicite';
+$ec_lang['calc_defaults_confirm']='Reset calculator to factory defaults?';
 $ec_lang['points_data_help']='(sau Copiați/Lipiți folosind zona de date)';
 $ec_lang['points_data_title']='Date puncte<br />(separate prin virgulă sau tabulație)';
 $ec_lang['points_data_copy']='Copiați';
@@ -76,6 +77,8 @@ $ec_lang['view_printable']='Versiune tipăribilă (reîncărcați/actualizați p
 $ec_lang['ec_name_label']='Salvați acest calcul:';
 $ec_lang['ec_name_placeholder']='Nume';
 $ec_lang['ec_name_hint']='Salvează valorile introduse în URL pentru marcaj, recuperare istoric și partajare';
+$ec_lang['calc_copy_link']='Copy link';
+$ec_lang['calc_copy_link_done']='Copied!';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Pierdere de Sarcină Conductă Darcy-Weisbach';
 $ec_lang['dw_main_title']='Calculator Gratuit Online Pierdere de Sarcină Conductă Darcy-Weisbach';

@@ -67,6 +67,7 @@ $ec_lang['template_printable_subtitle']='ចំណងជើងរងដែលអ
 $ec_lang['index_title']='ម៉ាស៊ីនគណនាវិស្វកម្មតាមអ៊ីនធឺណិតឥតគិតថ្លៃ';
 $ec_lang['calc_set_units']='កំណត់ឯកតា:';
 $ec_lang['calc_defaults']='តម្លៃលំនាំដើម';
+$ec_lang['calc_defaults_confirm']='Reset calculator to factory defaults?';
 $ec_lang['points_data_help']='(ឬ ចម្លង/បិទភ្ជាប់ ដោយប្រើផ្ទៃទិន្នន័យ)';
 $ec_lang['points_data_title']='ទិន្នន័យចំណុច<br />(បំបែកដោយក្បៀស ឬ tab)';
 $ec_lang['points_data_copy']='ចម្លង';
@@ -78,6 +79,8 @@ $ec_lang['view_printable']='កំណែដែលអាចបោះពុម្�
 $ec_lang['ec_name_label']='រក្សាទុកការគណនានេះ៖';
 $ec_lang['ec_name_placeholder']='ឈ្មោះ';
 $ec_lang['ec_name_hint']='រក្សាទុកទិន្នន័យបញ្ចូលនេះទៅក្នុង URL សម្រាប់ការចាប់ផ្តើមវិញ ប្រវត្តិ ឬការចែងលែង';
+$ec_lang['calc_copy_link']='Copy link';
+$ec_lang['calc_copy_link_done']='Copied!';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Darcy-Weisbach ការបាត់បង់ទំនាប់ទឹកក្នុងបំពង់';
 $ec_lang['dw_main_title']='ម៉ាស៊ីនគណនា Darcy-Weisbach ការបាត់បង់ទំនាប់ទឹកក្នុងបំពង់ ឥតគិតថ្លៃ';

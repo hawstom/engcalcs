@@ -67,6 +67,7 @@ $ec_lang['template_printable_subtitle']='Subtítulo imprimível';
 $ec_lang['index_title']='Calculadoras de Engenharia Gratuitas Online';
 $ec_lang['calc_set_units']='Definir unidades:';
 $ec_lang['calc_defaults']='Valores padrão';
+$ec_lang['calc_defaults_confirm']='Reset calculator to factory defaults?';
 $ec_lang['points_data_help']='(ou Copiar/Colar usando a área de dados)';
 $ec_lang['points_data_title']='Dados dos pontos (separados por vírgula ou tabulação)';
 $ec_lang['points_data_copy']='Copiar';
@@ -78,6 +79,8 @@ $ec_lang['view_printable']='Versão Imprimível (recarregar/renovar para restaur
 $ec_lang['ec_name_label']='Salvar este cálculo:';
 $ec_lang['ec_name_placeholder']='Nome';
 $ec_lang['ec_name_hint']='Salva esses valores na URL para favoritos, recuperação do histórico e compartilhamento';
+$ec_lang['calc_copy_link']='Copy link';
+$ec_lang['calc_copy_link_done']='Copied!';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Perda de pressão em uma tubulação de acordo com Darcy-Weisbach';
 $ec_lang['dw_main_title']='Calculadora gratuita online de perda de pressão em uma tubulação de acordo com Darcy-Weisbach';

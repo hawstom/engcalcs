@@ -46,9 +46,13 @@ EngCalcs.updateUrl = function () {
 	var nameVal = nameEl ? nameEl.value.trim() : '';
 	if (nameVal) params.set('name', nameVal);
 	var form = document.forms['formInput'];
+	var calcsBody = document.getElementById('CalcsBody');
 	if (form) {
 		Array.prototype.forEach.call(form.elements, function (el) {
-			if (el.name) params.set(el.name, el.value);
+			// Dynamic row-table inputs (reach/point tables) share the same name across every
+			// row, so they can't round-trip as flat key=value pairs -- leave them out of the
+			// shareable URL. They're restored from the cookie instead.
+			if (el.name && !(calcsBody && calcsBody.contains(el))) params.set(el.name, el.value);
 		});
 	}
 	history.replaceState(null, '', '?' + params.toString());
@@ -101,16 +105,31 @@ EngCalcs.calcAndSave = function (objForm) {
 	this.formToCookie(objForm);
 	this.pageCalculator(objForm);
 	this.adjustInputWidth();
+};
+
+// Explicit "Copy link" action -- URL sync is opt-in, not automatic on every keystroke
+// (constant history.replaceState churn was noise, especially for dynamic-row calculators).
+EngCalcs.copyLink = function () {
+	'use strict';
 	this.updateUrl();
+	var btn = document.getElementById('ec-copy-link-btn');
+	if (!btn || !navigator.clipboard || !navigator.clipboard.writeText) { return; }
+	navigator.clipboard.writeText(window.location.href).then(function () {
+		var originalText = btn.textContent;
+		btn.textContent = btn.dataset.copiedText || originalText;
+		setTimeout(function () { btn.textContent = originalText; }, 1500);
+	});
 };
 
 EngCalcs.readCookieAndCalc = function (objForm) {
 	'use strict';
-	if (!this.loadFromUrl(objForm)) {
-		if (!EngCalcs.cookieToForm(objForm)) {
-			this.pageCalculatorInitialize(objForm);
-		}
+	// Dynamic row tables (reach/point tables) start empty in the raw HTML -- only
+	// cookieToForm/pageCalculatorInitialize ever create rows. Run that unconditionally first
+	// so rows always exist, then layer any shared-URL singleton values on top as overrides.
+	if (!EngCalcs.cookieToForm(objForm)) {
+		this.pageCalculatorInitialize(objForm);
 	}
+	this.loadFromUrl(objForm);
 	this.pageCalculator(objForm);
 	this.adjustInputWidth();
 };
@@ -274,8 +293,9 @@ EngCalcs.submitForm = function () {
 	this.calcAndSave(document.forms['formInput'],this.cookieName);
 };
 
-EngCalcs.resetToDefaults = function() {
+EngCalcs.resetToDefaults = function(confirmMessage) {
 	'use strict';
+	if (!window.confirm(confirmMessage)) return;
 	this.expireCookie();
 	window.location.href = window.location.pathname;
 };

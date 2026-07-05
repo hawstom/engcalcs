@@ -66,6 +66,7 @@ $ec_lang['template_printable_subtitle']='Subjudul Cetak';
 $ec_lang['index_title']='Kalkulator Teknik Gratis Daring';
 $ec_lang['calc_set_units']='Atur satuan:';
 $ec_lang['calc_defaults']='Nilai Default';
+$ec_lang['calc_defaults_confirm']='Reset calculator to factory defaults?';
 $ec_lang['points_data_help']='(atau Salin/Tempel menggunakan area data)';
 $ec_lang['points_data_title']='Data titik<br />(dipisah koma atau tabulasi)';
 $ec_lang['points_data_copy']='Salin';
@@ -77,6 +78,8 @@ $ec_lang['view_printable']='Versi cetak (muat ulang untuk memulihkan)';
 $ec_lang['ec_name_label']='Simpan perhitungan ini:';
 $ec_lang['ec_name_placeholder']='Nama';
 $ec_lang['ec_name_hint']='Menyimpan nilai masukan ini ke URL untuk penanda halaman, pengambilan riwayat, dan berbagi';
+$ec_lang['calc_copy_link']='Copy link';
+$ec_lang['calc_copy_link_done']='Copied!';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Kehilangan Tinggi Tekan Darcy-Weisbach';
 $ec_lang['dw_main_title']='Kalkulator Kehilangan Tinggi Tekan Pipa Darcy-Weisbach Gratis Daring';

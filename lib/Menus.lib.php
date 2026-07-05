@@ -132,6 +132,9 @@ function echoEngCalcsMenu ($html_title = '', $show_name_field = false, $calc_nam
 				value="<?=htmlspecialchars($calc_name, ENT_QUOTES, 'UTF-8')?>"
 				maxlength="50"
 				autocomplete="off">
+			<button type="button" id="ec-copy-link-btn" class="btn btn-sm btn-outline-secondary"
+				data-copied-text="<?=htmlspecialchars($ec_lang['calc_copy_link_done'], ENT_QUOTES, 'UTF-8')?>"
+				onclick="EngCalcs.copyLink()"><?=$ec_lang['calc_copy_link']?></button>
 		</form>
 <?php endif; ?>
 		<ul class="navbar-nav ms-auto">

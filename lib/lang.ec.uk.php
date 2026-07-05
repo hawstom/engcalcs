@@ -67,6 +67,7 @@ $ec_lang['template_printable_subtitle']='Підзаголовок для дру�
 $ec_lang['index_title']='Безкоштовні онлайн-калькулятори для інженерів';
 $ec_lang['calc_set_units']='Встановити одиниці:';
 $ec_lang['calc_defaults']='Значення за замовчуванням';
+$ec_lang['calc_defaults_confirm']='Reset calculator to factory defaults?';
 $ec_lang['points_data_help']='(або Копіювати/Вставити через область даних)';
 $ec_lang['points_data_title']='Дані точок<br />(розділені комою або табуляцією)';
 $ec_lang['points_data_copy']='Копіювати';
@@ -78,6 +79,8 @@ $ec_lang['view_printable']='Версія для друку (перезавант
 $ec_lang['ec_name_label']='Збережіть цей розрахунок:';
 $ec_lang['ec_name_placeholder']='Назва';
 $ec_lang['ec_name_hint']='Зберігає ці вхідні дані у URL для створення закладки, отримання історії та спільного доступу';
+$ec_lang['calc_copy_link']='Copy link';
+$ec_lang['calc_copy_link_done']='Copied!';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Втрати напору в трубі за Darcy-Weisbach';
 $ec_lang['dw_main_title']='Безкоштовний онлайн-калькулятор втрат напору в трубі за Darcy-Weisbach';

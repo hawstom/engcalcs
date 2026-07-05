@@ -67,6 +67,7 @@ $ec_lang['template_printable_subtitle']='زیرعنوان قابل چاپ';
 $ec_lang['index_title']='ماشین‌حساب‌های رایگان مهندسی آنلاین';
 $ec_lang['calc_set_units']='تنظیم واحدها:';
 $ec_lang['calc_defaults']='مقادیر پیش‌فرض';
+$ec_lang['calc_defaults_confirm']='Reset calculator to factory defaults?';
 $ec_lang['points_data_help']='(یا با استفاده از ناحیه داده کپی/پیست کنید)';
 $ec_lang['points_data_title']='داده‌های نقاط<br />(جداشده با کاما یا تب)';
 $ec_lang['points_data_copy']='کپی';
@@ -78,6 +79,8 @@ $ec_lang['view_printable']='نسخه قابل چاپ (برای بازگشت با
 $ec_lang['ec_name_label']='این محاسبه را ذخیره کنید:';
 $ec_lang['ec_name_placeholder']='نام';
 $ec_lang['ec_name_hint']='این داده‌های ورودی را به URL ذخیره می‌کند برای نشانک‌گذاری، بازیابی سابقه و اشتراک';
+$ec_lang['calc_copy_link']='Copy link';
+$ec_lang['calc_copy_link_done']='Copied!';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='افت فشار لوله Darcy-Weisbach';
 $ec_lang['dw_main_title']='ماشین‌حساب رایگان آنلاین افت فشار لوله Darcy-Weisbach';

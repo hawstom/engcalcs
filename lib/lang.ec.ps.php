@@ -67,6 +67,7 @@ $ec_lang['template_printable_subtitle']='د چاپ فرعي سرلیک';
 $ec_lang['index_title']='وړیا آنلاین انجینري محاسبې';
 $ec_lang['calc_set_units']='واحدونه تنظیم کړئ:';
 $ec_lang['calc_defaults']='د لاسليک ارزښتونه';
+$ec_lang['calc_defaults_confirm']='Reset calculator to factory defaults?';
 $ec_lang['points_data_help']='(یا د معلوماتو ساحې له لارې کاپي/پیسټ وکړئ)';
 $ec_lang['points_data_title']='د نقطو معلومات<br />(د کوما یا ټب لخوا جلا شوي)';
 $ec_lang['points_data_copy']='کاپي';
@@ -78,6 +79,8 @@ $ec_lang['view_printable']='د چاپ وړ نسخه (د بیا ترلاسه کو
 $ec_lang['ec_name_label']='دا محاسبه خوندي کړئ:';
 $ec_lang['ec_name_placeholder']='نوم';
 $ec_lang['ec_name_hint']='دا ننوتنې URL ته خوندي کوي د نشان کتاب، تاریخ بیر کیدو، او شریکولو لپاره';
+$ec_lang['calc_copy_link']='Copy link';
+$ec_lang['calc_copy_link_done']='Copied!';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Darcy-Weisbach د پایپ سر ضیاع';
 $ec_lang['dw_main_title']='وړیا آنلاین Darcy-Weisbach د پایپ سر ضیاع محاسبه';

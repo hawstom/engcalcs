@@ -66,6 +66,7 @@ $ec_lang['template_printable_subtitle']='Druckbarer Untertitel';
 $ec_lang['index_title']='Kostenlose Ingenieurrechner online';
 $ec_lang['calc_set_units']='Einheiten festlegen:';
 $ec_lang['calc_defaults']='Standardwerte';
+$ec_lang['calc_defaults_confirm']='Reset calculator to factory defaults?';
 $ec_lang['points_data_help']='(oder Kopieren/Einfügen im Datenbereich)';
 $ec_lang['points_data_title']='Punktdaten<br />(durch Komma oder Tabulator getrennt)';
 $ec_lang['points_data_copy']='Kopieren';
@@ -77,6 +78,8 @@ $ec_lang['view_printable']='Druckversion (Seite neu laden zum Zurücksetzen)';
 $ec_lang['ec_name_label']='Diese Berechnung speichern:';
 $ec_lang['ec_name_placeholder']='Name';
 $ec_lang['ec_name_hint']='Speichert diese Eingaben in der URL zum Lesezeichen, zum Abrufen aus dem Verlauf und zum Teilen';
+$ec_lang['calc_copy_link']='Copy link';
+$ec_lang['calc_copy_link_done']='Copied!';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Rohrreibungsverlust Darcy-Weisbach';
 $ec_lang['dw_main_title']='Kostenloser Online-Rechner Rohrreibungsverlust Darcy-Weisbach';

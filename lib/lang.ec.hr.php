@@ -65,6 +65,7 @@ $ec_lang['template_printable_subtitle']='Podnaslov za ispis';
 $ec_lang['index_title']='Besplatni online inženjerski kalkulatori';
 $ec_lang['calc_set_units']='Postavi jedinice:';
 $ec_lang['calc_defaults']='Zadane vrijednosti';
+$ec_lang['calc_defaults_confirm']='Reset calculator to factory defaults?';
 $ec_lang['points_data_help']='(ili Kopiraj/Zalijepi pomoću područja podataka)';
 $ec_lang['points_data_title']='Podaci točaka<br />(odvojeni zarezom ili tabulatorom)';
 $ec_lang['points_data_copy']='Kopiraj';
@@ -76,6 +77,8 @@ $ec_lang['view_printable']='Verzija za ispis (osvježite stranicu za povratak)';
 $ec_lang['ec_name_label']='Spremi ovaj izračun:';
 $ec_lang['ec_name_placeholder']='Naziv';
 $ec_lang['ec_name_hint']='Sprema ove unesene vrijednosti u URL za zabilješke, preuzimanje iz povijesti i zajedničko korištenje';
+$ec_lang['calc_copy_link']='Copy link';
+$ec_lang['calc_copy_link_done']='Copied!';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Darcy-Weisbach gubitak tlaka u cijevi';
 $ec_lang['dw_main_title']='Besplatni online kalkulator Darcy-Weisbach gubitka tlaka u cijevi';

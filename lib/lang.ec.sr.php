@@ -65,6 +65,7 @@ $ec_lang['template_printable_subtitle']='Поднаслов за штампу';
 $ec_lang['index_title']='Бесплатни онлајн инжењерски калкулатори';
 $ec_lang['calc_set_units']='Подеси јединице:';
 $ec_lang['calc_defaults']='Подразумеване вредности';
+$ec_lang['calc_defaults_confirm']='Reset calculator to factory defaults?';
 $ec_lang['points_data_help']='(или Копирај/Налепи помоћу поља за податке)';
 $ec_lang['points_data_title']='Подаци тачака<br />(одвојени зарезом или табулатором)';
 $ec_lang['points_data_copy']='Копирај';
@@ -76,6 +77,8 @@ $ec_lang['view_printable']='Верзија за штампу (освежите �
 $ec_lang['ec_name_label']='Сачувајте овај прорачун:';
 $ec_lang['ec_name_placeholder']='Назив';
 $ec_lang['ec_name_hint']='Чува унете вредности у URL адресу за обележавање, преузимање из историје и дељење';
+$ec_lang['calc_copy_link']='Copy link';
+$ec_lang['calc_copy_link_done']='Copied!';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Губитак напора у цевима по Darcy-Weisbachу';
 $ec_lang['dw_main_title']='Бесплатни онлајн калкулатор губитка напора у цевима по Darcy-Weisbachу';

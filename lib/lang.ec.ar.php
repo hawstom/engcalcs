@@ -67,6 +67,7 @@ $ec_lang['template_printable_subtitle']='عنوان فرعي للطباعة';
 $ec_lang['index_title']='حاسبات هندسية مجانية عبر الإنترنت';
 $ec_lang['calc_set_units']='تحديد الوحدات:';
 $ec_lang['calc_defaults']='القيم الافتراضية';
+$ec_lang['calc_defaults_confirm']='Reset calculator to factory defaults?';
 $ec_lang['points_data_help']='(أو نسخ/لصق باستخدام منطقة البيانات)';
 $ec_lang['points_data_title']='بيانات النقاط<br />(مفصولة بفاصلة أو مسافة جدولة)';
 $ec_lang['points_data_copy']='نسخ';
@@ -78,6 +79,8 @@ $ec_lang['view_printable']='نسخة قابلة للطباعة (أعد التح�
 $ec_lang['ec_name_label']='احفظ هذا الحساب:';
 $ec_lang['ec_name_placeholder']='الاسم';
 $ec_lang['ec_name_hint']='يحفظ المدخلات في عنوان URL للإشارات المرجعية واسترجاع السجل والمشاركة';
+$ec_lang['calc_copy_link']='Copy link';
+$ec_lang['calc_copy_link_done']='Copied!';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='فاقد الضغط في الأنابيب — داركي-وايسباخ';
 $ec_lang['dw_main_title']='حاسبة فاقد الضغط في الأنابيب داركي-وايسباخ المجانية عبر الإنترنت';

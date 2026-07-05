@@ -67,6 +67,7 @@ $ec_lang['template_printable_subtitle']='Kichwa Kidogo cha Kuchapishwa';
 $ec_lang['index_title']='Vikokotoo vya Uhandisi Bure Mtandaoni';
 $ec_lang['calc_set_units']='Weka vitengo:';
 $ec_lang['calc_defaults']='Maadili ya kawaida';
+$ec_lang['calc_defaults_confirm']='Reset calculator to factory defaults?';
 $ec_lang['points_data_help']='(au Nakili/Bandika ukitumia eneo la data)';
 $ec_lang['points_data_title']='Data za vituo<br />(kwa mkato au kichupo)';
 $ec_lang['points_data_copy']='Nakili';
@@ -78,6 +79,8 @@ $ec_lang['view_printable']='Toleo la kuchapishwa (pakia upya ili kurejesha)';
 $ec_lang['ec_name_label']='Hifadhi hesabu hii:';
 $ec_lang['ec_name_placeholder']='Jina';
 $ec_lang['ec_name_hint']='Huhifadhi maingizo haya kwenye URL kwa ajili ya kuweka alama, kurejea historia, na kushiriki';
+$ec_lang['calc_copy_link']='Copy link';
+$ec_lang['calc_copy_link_done']='Copied!';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Upotevu wa Kichwa cha Bomba la Darcy-Weisbach';
 $ec_lang['dw_main_title']='Kikokotoo cha Bure Mtandaoni cha Upotevu wa Kichwa cha Bomba la Darcy-Weisbach';

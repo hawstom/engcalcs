@@ -67,6 +67,7 @@ $ec_lang['template_printable_subtitle']='မှတ်တမ်းတင်ရာ
 $ec_lang['index_title']='အခမဲ့ အွန်လိုင်း အင်ဂျင်နီယာ တွက်ချက်မှုကိရိယာများ';
 $ec_lang['calc_set_units']='ယူနစ်သတ်မှတ်ရန်:';
 $ec_lang['calc_defaults']='ပုံမှန် တန်ဖိုးများ';
+$ec_lang['calc_defaults_confirm']='Reset calculator to factory defaults?';
 $ec_lang['points_data_help']='(သို့မဟုတ် ဒေတာနေရာကို အသုံးပြု၍ ကူးယူ/ကူးထည့်ပါ)';
 $ec_lang['points_data_title']='အမှတ်ဒေတာ<br />(ကော်မာ သို့မဟုတ် tab ဖြင့် ခွဲ)';
 $ec_lang['points_data_copy']='ကူးယူ';
@@ -78,6 +79,8 @@ $ec_lang['view_printable']='မှတ်တမ်းတင်နိုင်သ�
 $ec_lang['ec_name_label']='ဤတွက်ချက်မှုကိုသိမ်းဆည်းပါ:';
 $ec_lang['ec_name_placeholder']='အမည်';
 $ec_lang['ec_name_hint']='ထည့်သွင်းချက်များကို URL သို့သိမ်းဆည်းကာ စာမှတ်မုံးခြင်း၊ မှတ်တမ်းများ ပြန်လည်ရယူခြင်းနှင့် မျှဝေခြင်းအတွက်ဖြစ်သည်။';
+$ec_lang['calc_copy_link']='Copy link';
+$ec_lang['calc_copy_link_done']='Copied!';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Darcy-Weisbach သွတ်ပိုက် ခေါင်းဆုံးဆုံးရှုံးမှု';
 $ec_lang['dw_main_title']='အခမဲ့ အွန်လိုင်း Darcy-Weisbach သွတ်ပိုက် ခေါင်းဆုံးဆုံးရှုံးမှု တွက်ချက်မှုကိရိယာ';

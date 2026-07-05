@@ -66,6 +66,7 @@ $ec_lang['template_printable_subtitle']='Tisknutelný podtitul';
 $ec_lang['index_title']='Bezplatné inženýrské kalkulačky online';
 $ec_lang['calc_set_units']='Nastavit jednotky:';
 $ec_lang['calc_defaults']='Výchozí hodnoty';
+$ec_lang['calc_defaults_confirm']='Reset calculator to factory defaults?';
 $ec_lang['points_data_help']='(nebo Kopírovat/Vložit pomocí datové oblasti)';
 $ec_lang['points_data_title']='Data bodů<br />(oddělena čárkou nebo tabulátorem)';
 $ec_lang['points_data_copy']='Kopírovat';
@@ -77,6 +78,8 @@ $ec_lang['view_printable']='Verze pro tisk (obnovit pro vrácení)';
 $ec_lang['ec_name_label']='Uložit tento výpočet:';
 $ec_lang['ec_name_placeholder']='Název';
 $ec_lang['ec_name_hint']='Uloží tyto zadané hodnoty do adresy URL pro přidání do záložek, načtení z historie a sdílení';
+$ec_lang['calc_copy_link']='Copy link';
+$ec_lang['calc_copy_link_done']='Copied!';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Ztráta tlaku v potrubí Darcy-Weisbach';
 $ec_lang['dw_main_title']='Bezplatný online kalkulátor ztrát tlaku v potrubí Darcy-Weisbach';

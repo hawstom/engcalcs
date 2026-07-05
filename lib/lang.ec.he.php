@@ -67,6 +67,7 @@ $ec_lang['template_printable_subtitle']='אזור כותרת משנה להדפס
 $ec_lang['index_title']='מחשבוני הנדסה חינמיים מקוונים';
 $ec_lang['calc_set_units']='הגדרת יחידות';
 $ec_lang['calc_defaults']='ערכים ברירת מחדל';
+$ec_lang['calc_defaults_confirm']='Reset calculator to factory defaults?';
 $ec_lang['points_data_help']='(או העתק/הדבק באמצעות אזור הנתונים)';
 $ec_lang['points_data_title']='נתוני נקודות<br />(מופרדות בפסיקים או טאבים)';
 $ec_lang['points_data_copy']='העתק';
@@ -78,6 +79,8 @@ $ec_lang['view_printable']='גרסה להדפסה (טען מחדש לשחזור)
 $ec_lang['ec_name_label']='שמור חישוב זה:';
 $ec_lang['ec_name_placeholder']='שם';
 $ec_lang['ec_name_hint']='שמירת הערכים האלה בכתובת עם סימניה, אחזור מהיסטוריה, ושיתוף';
+$ec_lang['calc_copy_link']='Copy link';
+$ec_lang['calc_copy_link_done']='Copied!';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='אובדן גובה בצינור — Darcy-Weisbach';
 $ec_lang['dw_main_title']='מחשבון אובדן גובה בצינור Darcy-Weisbach — חינם מקוון';

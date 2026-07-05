@@ -67,6 +67,7 @@ $ec_lang['template_printable_subtitle']='Sous-titre imprimable';
 $ec_lang['index_title']='Calculateurs d\'ingénierie gratuits en ligne';
 $ec_lang['calc_set_units']='Définir les unités:';
 $ec_lang['calc_defaults']='Valeurs par défaut';
+$ec_lang['calc_defaults_confirm']='Reset calculator to factory defaults?';
 $ec_lang['points_data_help']='(ou Copier/Coller via la zone de données)';
 $ec_lang['points_data_title']='Données des points<br />(séparés par virgule ou tabulation)';
 $ec_lang['points_data_copy']='Copier';
@@ -78,6 +79,8 @@ $ec_lang['view_printable']='Version imprimable (recharger pour restaurer)';
 $ec_lang['ec_name_label']='Enregistrer ce calcul :';
 $ec_lang['ec_name_placeholder']='Nom';
 $ec_lang['ec_name_hint']='Enregistre les données saisies dans l\'URL pour les signets, la récupération de l\'historique et le partage';
+$ec_lang['calc_copy_link']='Copy link';
+$ec_lang['calc_copy_link_done']='Copied!';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Perte de charge Darcy-Weisbach';
 $ec_lang['dw_main_title']='Calculateur gratuit en ligne de perte de charge Darcy-Weisbach';

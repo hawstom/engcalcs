@@ -8,6 +8,12 @@
 EngCalcs.g = 9.806;
 EngCalcs.christiansenM = 1.852; // fixed loss exponent used by Christiansen's F(n), not user-facing.
 
+// Copy/paste data area: singletons = printable_title, printable_subtitle, and the 12 form
+// inputs; every reach row has 7 editable columns (is_lateral..elev_ds), the rest are outputs.
+EngCalcs.dataSingletonsCount = 14;
+EngCalcs.dataColumnsFirstRowCount = 7;
+EngCalcs.dataColumnsOtherRowsCount = 7;
+
 // Darcy-Weisbach friction factor for one reach, same 3-regime approach as darcy-weisbach.js.
 EngCalcs.ipFriction = function (q, d, e, visc) {
 	'use strict';
@@ -325,7 +331,7 @@ EngCalcs.pageAddCalcRow = function () {
 	'use strict';
 	var isLateral, count, length, diameter, roughness, kMinor, elevDs, prev = this.numCalcRows - 1;
 	if (this.numCalcRows === 0) {
-		isLateral = false; count = 60; length = 50; diameter = 25; roughness = 0.15; kMinor = 1; elevDs = 49.5;
+		isLateral = false; count = 60; length = 50; diameter = 25; roughness = 0.0015; kMinor = 1; elevDs = 49.5;
 	} else if (this.numCalcRows === 1) {
 		isLateral = true; count = 20; length = 10; diameter = 12; roughness = 0.0015; kMinor = 1; elevDs = 49.0;
 	} else if (this.numCalcRows === 2) {
