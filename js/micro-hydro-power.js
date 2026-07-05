@@ -59,8 +59,8 @@ EngCalcs.pageCalculator = function(objForm) {
 		ok: EngCalcs.pageConfig.mhp_vel_ok_short,
 		high: EngCalcs.pageConfig.mhp_vel_high_short,
 		low: EngCalcs.pageConfig.mhp_vel_low_short,
-		highTip: EngCalcs.pageConfig.vel_high,
-		lowTip: EngCalcs.pageConfig.vel_low
+		highTip: EngCalcs.pageConfig.mhp_vel_high,
+		lowTip: EngCalcs.pageConfig.mhp_vel_low
 	});
 
 	// Head loss % check
