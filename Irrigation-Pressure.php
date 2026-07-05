@@ -14,18 +14,18 @@ echoHeader("EngCalcs", $html_title, $html_head);
 echoCalculatorForm(
 	// Inputs
 	Array(
-		Array('name' => 'h_supply',        'type' => 'number', 'default' => '20',   'units' => Array('mh2o', 'mmh2o', 'kpa', 'fth2o', 'inh2o', 'psi'), 'label' => $ec_lang['ip_h_supply']),
-		Array('name' => 'elev_supply',     'type' => 'number', 'default' => '0',    'units' => Array('m', 'ft'),                                       'label' => $ec_lang['ip_elev_supply']),
+		Array('name' => 'h_supply',        'type' => 'number', 'default' => '7',    'units' => Array('mh2o', 'mmh2o', 'kpa', 'fth2o', 'inh2o', 'psi'), 'label' => $ec_lang['ip_h_supply']),
+		Array('name' => 'elev_supply',     'type' => 'number', 'default' => '50',   'units' => Array('m', 'ft'),                                       'label' => $ec_lang['ip_elev_supply']),
 		Array('name' => 'q_design',        'type' => 'number', 'default' => '4',    'units' => Array('lph', 'gph'),                                    'label' => $ec_lang['ip_q_design']),
-		Array('name' => 'h_design',        'type' => 'number', 'default' => '18',   'units' => Array('mh2o', 'mmh2o', 'kpa', 'fth2o', 'inh2o', 'psi'), 'label' => $ec_lang['ip_h_design']),
+		Array('name' => 'h_design',        'type' => 'number', 'default' => '6',    'units' => Array('mh2o', 'mmh2o', 'kpa', 'fth2o', 'inh2o', 'psi'), 'label' => $ec_lang['ip_h_design']),
 		Array('name' => 'x',               'type' => 'number', 'default' => '0.5',  'units' => NULL,                                                    'label' => $ec_lang['ip_x']),
 		Array('name' => 'dp_avg',          'type' => 'number', 'default' => '0',    'units' => Array('mh2o', 'mmh2o', 'kpa', 'fth2o', 'inh2o', 'psi'), 'label' => $ec_lang['ip_dp_avg']),
 		Array('name' => 'visc',            'type' => 'number', 'default' => '1e-6', 'units' => NULL,                                                    'label' => '<a target="_blank" href="https://www.engineersedge.com/fluid_flow/kinematic-viscosity-table.htm">'.$ec_lang['dw_kinematic_viscosity'].'</a>'),
-		Array('name' => 'se',              'type' => 'number', 'default' => '2',    'units' => Array('m', 'mm', 'ft', 'in'),                            'label' => $ec_lang['ds_se']),
-		Array('name' => 'sl',              'type' => 'number', 'default' => '1',    'units' => Array('m', 'mm', 'ft', 'in'),                            'label' => $ec_lang['ds_sl']),
-		Array('name' => 'n_e',             'type' => 'number', 'default' => '10',   'units' => NULL,                                                    'label' => $ec_lang['ds_n_e']),
-		Array('name' => 'n_l',             'type' => 'number', 'default' => '10',   'units' => NULL,                                                    'label' => $ec_lang['ds_n_l']),
-		Array('name' => 'd',               'type' => 'number', 'default' => '25',   'units' => Array('mm', 'm', 'in', 'ft'),                            'label' => $ec_lang['ds_d']),
+		Array('name' => 'se',              'type' => 'number', 'default' => '0.5',  'units' => Array('m', 'mm', 'ft', 'in'),                            'label' => $ec_lang['ip_se']),
+		Array('name' => 'sl',              'type' => 'number', 'default' => '0.5',  'units' => Array('m', 'mm', 'ft', 'in'),                            'label' => $ec_lang['ip_sl']),
+		Array('name' => 'n_e',             'type' => 'number', 'default' => '10',   'units' => NULL,                                                    'label' => $ec_lang['ip_n_e']),
+		Array('name' => 'n_l',             'type' => 'number', 'default' => '10',   'units' => NULL,                                                    'label' => $ec_lang['ip_n_l']),
+		Array('name' => 'd',               'type' => 'number', 'default' => '25',   'units' => Array('mm', 'm', 'in', 'ft'),                            'label' => $ec_lang['ip_d']),
 	),
 	// Results
 	Array(
@@ -36,11 +36,11 @@ echoCalculatorForm(
 		Array('name' => 'q_avg_field',   'units' => Array('lph', 'gph'),                                    'label' => $ec_lang['ip_q_avg_field']),
 		Array('name' => 'du_estimate',   'units' => NULL,                                                   'label' => $ec_lang['ip_du_estimate']),
 		Array('name' => 'q_ratio',       'units' => NULL,                                                   'label' => $ec_lang['ip_q_ratio']),
-		Array('name' => 'a_e',           'units' => Array('m2', 'mm2', 'ft2', 'in2'),                        'label' => $ec_lang['ds_a_e']),
-		Array('name' => 'pr',            'units' => Array('mmph', 'inph'),                                   'label' => $ec_lang['ds_pr']),
-		Array('name' => 'q_lat',         'units' => Array('lph', 'gph'),                                     'label' => $ec_lang['ds_q_lat']),
-		Array('name' => 'q_sys',         'units' => Array('lph', 'gph'),                                     'label' => $ec_lang['ds_q_sys']),
-		Array('name' => 't_run',         'units' => NULL,                                                    'label' => $ec_lang['ds_t_run']),
+		Array('name' => 'a_e',           'units' => Array('m2', 'mm2', 'ft2', 'in2'),                        'label' => $ec_lang['ip_a_e']),
+		Array('name' => 'pr',            'units' => Array('mmph', 'inph'),                                   'label' => $ec_lang['ip_pr']),
+		Array('name' => 'q_lat',         'units' => Array('lph', 'gph'),                                     'label' => $ec_lang['ip_q_lat']),
+		Array('name' => 'q_sys',         'units' => Array('lph', 'gph'),                                     'label' => $ec_lang['ip_q_sys']),
+		Array('name' => 't_run',         'units' => NULL,                                                    'label' => $ec_lang['ip_t_run']),
 	),
 	$flagFormAppend = true
 );

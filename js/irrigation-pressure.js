@@ -220,8 +220,7 @@ EngCalcs.pageCalculator = function (objForm) {
 		this.var.du_estimate = this.var.q_avg_field ? this.var.q_critical / this.var.q_avg_field : NaN;
 		this.var.q_ratio = this.var.q_design ? this.var.q_critical / this.var.q_design : NaN;
 
-		// Application design (ported from js/drip-sprinkler.js), fed by the corrected q_avg_field
-		// instead of a manually-entered rate.
+		// Application design, fed by the corrected q_avg_field instead of a manually-entered rate.
 		this.var.a_e = (this.var.se > 0 && this.var.sl > 0) ? this.var.se * this.var.sl : 0;
 		this.var.pr = (this.var.a_e > 0 && this.var.q_avg_field > 0) ? this.var.q_avg_field / this.var.a_e : 0;
 		this.var.q_lat = this.var.n_e * this.var.q_avg_field;
@@ -320,18 +319,17 @@ EngCalcs.addIrrigationPressureReach = function (isLateral, count, length, diamet
 
 // Default 3-row example: one main reach feeding the test lateral's takeoff,
 // then the test lateral itself split into two segments (same idiom as the
-// Manning-Irregular/Weir-Flow-Irregular calculators' sample rows).
+// Manning-Irregular/Weir-Flow-Irregular calculators' sample rows). Elevations
+// step down a modest, realistic field slope (50 -> 49.5 -> 49.0 -> 48.5 m).
 EngCalcs.pageAddCalcRow = function () {
 	'use strict';
 	var isLateral, count, length, diameter, roughness, kMinor, elevDs, prev = this.numCalcRows - 1;
 	if (this.numCalcRows === 0) {
-		isLateral = false; count = 30; length = 50; diameter = 25; roughness = 0.15; kMinor = 1; elevDs = 0;
+		isLateral = false; count = 60; length = 50; diameter = 25; roughness = 0.15; kMinor = 1; elevDs = 49.5;
 	} else if (this.numCalcRows === 1) {
-		// A gentle, realistic slope (~0.5%) -- large enough to demonstrate elevation's effect
-		// without letting it dominate friction loss the way an exaggerated drop would.
-		isLateral = true; count = 5; length = 10; diameter = 12; roughness = 0.0015; kMinor = 1; elevDs = -0.05;
+		isLateral = true; count = 20; length = 10; diameter = 12; roughness = 0.0015; kMinor = 1; elevDs = 49.0;
 	} else if (this.numCalcRows === 2) {
-		isLateral = true; count = 5; length = 10; diameter = 12; roughness = 0.0015; kMinor = 1; elevDs = -0.1;
+		isLateral = true; count = 20; length = 10; diameter = 12; roughness = 0.0015; kMinor = 1; elevDs = 48.5;
 	} else {
 		isLateral = document.getElementsByName('is_lateral')[prev].checked;
 		count = +document.getElementsByName('count')[prev].value;

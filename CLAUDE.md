@@ -43,9 +43,8 @@ Each calculator owns a short prefix for its language keys and JS variables:
 | `wfi_` | Weir Flow Irregular |
 | `or_`  | Orifice Flow |
 | `odt_` | Orifice Drain Time |
-| `ds_`  | Drip/Sprinkler Application Rate |
 | `cs_`  | Canal Seepage & Conveyance Efficiency |
-| `ip_`  | Irrigation Pressure (main/lateral branch pressure profile & DU estimate) |
+| `ip_`  | Irrigation Pressure (main/lateral branch pressure profile, DU estimate & application design) |
 
 New calculators must define a new unique prefix and document it here.
 

@@ -56,16 +56,6 @@ echoHeader("EngCalcs", $html_title, $html_head, false);
 
 	<div class="col">
 		<div class="card h-100">
-			<div class="card-header fw-bold"><?=$ec_lang['irr_card_drip_head']?></div>
-			<div class="card-body">
-				<p class="card-text"><?=$ec_lang['irr_card_drip_desc']?></p>
-				<a href="Drip-Sprinkler.php" class="btn btn-primary"><?=$ec_lang['ds_main_menu']?></a>
-			</div>
-		</div>
-	</div>
-
-	<div class="col">
-		<div class="card h-100">
 			<div class="card-header fw-bold"><?=$ec_lang['irr_card_seepage_head']?></div>
 			<div class="card-body">
 				<p class="card-text"><?=$ec_lang['irr_card_seepage_desc']?></p>

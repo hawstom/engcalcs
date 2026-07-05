@@ -1,6 +1,6 @@
 // EngCalcs Service Worker
 // Cache version — bump this string when static assets change
-const CACHE_VERSION = 'engcalcs-v2';
+const CACHE_VERSION = 'engcalcs-v3';
 const ASSET_CACHE = CACHE_VERSION + '-assets';
 const PAGE_CACHE  = CACHE_VERSION + '-pages';
 
@@ -11,7 +11,6 @@ const STATIC_ASSETS = [
   '/engcalcs/js/Calculators.lib.js',
   '/engcalcs/js/Manning.lib.js',
   '/engcalcs/js/darcy-weisbach.js',
-  '/engcalcs/js/drip-sprinkler.js',
   '/engcalcs/js/hazen-williams.js',
   '/engcalcs/js/manning-irregular.js',
   '/engcalcs/js/manning-pipe-flow.js',
@@ -35,7 +34,6 @@ const CALC_PAGES = [
   '/engcalcs/index.php',
   '/engcalcs/About.php',
   '/engcalcs/Irrigation.php',
-  '/engcalcs/Drip-Sprinkler.php',
   '/engcalcs/Manning-Pipe-Flow.php',
   '/engcalcs/Manning-Pipe-Head-Loss.php',
   '/engcalcs/Manning-Trap.php',
