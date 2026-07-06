@@ -337,7 +337,7 @@ $ec_lang['essc_q']='Protok, Q';
 // Contact us.
 
 // Irrigation
-$ec_lang['irr_main_menu']='Mjerenje protoka navodnjavanja';
+$ec_lang['irr_main_menu']='Navodnjavanje';
 $ec_lang['irr_main_title']='Besplatni online kalkulatori za mjerenje protoka navodnjavanja';
 $ec_lang['irr_main_desc']='Mjerenje protoka navodnjavanja — pragovi i otvori';
 $ec_lang['irr_intro_html']='<p>Preljevice i otvori standardni su terenska mjernog alata za mjerenje protoka vode u sustavima navodnjavanja. Odaberite kalkulator koji odgovara vašoj građevini:</p>';

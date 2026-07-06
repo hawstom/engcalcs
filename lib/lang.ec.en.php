@@ -657,7 +657,7 @@ $ec_lang_intent['essc_q']='';
 // Contact us.
 
 // Irrigation
-$ec_lang['irr_main_menu']='Irrigation Flow Measurement';
+$ec_lang['irr_main_menu']='Irrigation';
 $ec_lang_intent['irr_main_menu']='';
 $ec_lang['irr_main_title']='Free Online Irrigation Flow Measurement Calculators';
 $ec_lang_intent['irr_main_title']='';

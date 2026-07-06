@@ -338,7 +338,7 @@ $ec_lang['essc_q']='Portata, Q';
 // Contact us.
 
 // Irrigation
-$ec_lang['irr_main_menu']='Misurazione del Flusso di Irrigazione';
+$ec_lang['irr_main_menu']='Irrigazione';
 $ec_lang['irr_main_title']='Calcolatrici Online Gratuite per la Misurazione del Flusso di Irrigazione';
 $ec_lang['irr_main_desc']='Misurazione del Flusso di Irrigazione — Stramazzi e Orifizi';
 $ec_lang['irr_intro_html']='<p>Stramazzi e orifizi sono gli strumenti standard sul campo per misurare il flusso d\'acqua nei sistemi di irrigazione. Seleziona la calcolatrice che corrisponde alla tua struttura:</p>';

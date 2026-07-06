@@ -338,7 +338,7 @@ $ec_lang['essc_q']='Durchfluss, Q';
 // Contact us.
 
 // Irrigation
-$ec_lang['irr_main_menu']='Bewässerungsdurchflussmessung';
+$ec_lang['irr_main_menu']='Bewässerung';
 $ec_lang['irr_main_title']='Kostenlose Online-Rechner für Bewässerungsdurchflussmessung';
 $ec_lang['irr_main_desc']='Bewässerungsdurchflussmessung — Wehre und Öffnungen';
 $ec_lang['irr_intro_html']='<p>Wehre und Öffnungen sind die standardmäßigen Feldwerkzeuge zur Messung des Wasserdurchflusses in Bewässerungssystemen. Wählen Sie den Rechner aus, der zu Ihrer Anlage passt:</p>';

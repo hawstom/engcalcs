@@ -338,7 +338,7 @@ $ec_lang['essc_q']='流量，Q';
 // Contact us.
 
 // Irrigation
-$ec_lang['irr_main_menu']='灌溉流量测量';
+$ec_lang['irr_main_menu']='灌溉';
 $ec_lang['irr_main_title']='免费在线灌溉流量测量计算器';
 $ec_lang['irr_main_desc']='灌溉流量测量 — 堰和孔口';
 $ec_lang['irr_intro_html']='<p>量水堰和孔口是测量灌溉系统水流量的标准现场工具。请选择与您的水工建筑物相匹配的计算器：</p>';

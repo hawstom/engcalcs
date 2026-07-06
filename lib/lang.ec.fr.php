@@ -339,7 +339,7 @@ $ec_lang['essc_q']='Débit, Q';
 // Contact us.
 
 // Irrigation
-$ec_lang['irr_main_menu']='Mesure du débit d\'irrigation';
+$ec_lang['irr_main_menu']='Irrigation';
 $ec_lang['irr_main_title']='Calculateurs en ligne gratuits de mesure du débit d\'irrigation';
 $ec_lang['irr_main_desc']='Mesure du débit d\'irrigation — déversoirs et orifices';
 $ec_lang['irr_intro_html']='<p>Les déversoirs et les orifices sont les outils de terrain standard pour mesurer le débit d\'eau dans les systèmes d\'irrigation. Sélectionnez la calculatrice correspondant à votre structure :</p>';

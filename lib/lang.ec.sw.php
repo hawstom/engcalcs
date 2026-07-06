@@ -339,7 +339,7 @@ $ec_lang['essc_q']='Mtiririko, Q';
 // Contact us.
 
 // Irrigation
-$ec_lang['irr_main_menu']='Kupima Mtiririko wa Umwagiliaji';
+$ec_lang['irr_main_menu']='Umwagiliaji';
 $ec_lang['irr_main_title']='Mahesabu ya Bure ya Mtandaoni ya Kupima Mtiririko wa Umwagiliaji';
 $ec_lang['irr_main_desc']='Kupima Mtiririko wa Umwagiliaji — Weirs na Orifisi';
 $ec_lang['irr_intro_html']='<p>Viyari na mifereji ni zana za kawaida za shambani kwa kupima mtiririko wa maji katika mifumo ya umwagiliaji. Chagua kikokotoo kinachofaa muundo wako:</p>';

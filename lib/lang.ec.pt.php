@@ -339,7 +339,7 @@ $ec_lang['essc_q']='Vazão, Q';
 // Contact us.
 
 // Irrigation
-$ec_lang['irr_main_menu']='Medição de Vazão de Irrigação';
+$ec_lang['irr_main_menu']='Irrigação';
 $ec_lang['irr_main_title']='Calculadoras Online Gratuitas de Medição de Vazão de Irrigação';
 $ec_lang['irr_main_desc']='Medição de Vazão de Irrigação — Vertedores e Orifícios';
 $ec_lang['irr_intro_html']='<p>Vertedouros e orifícios são as ferramentas de campo padrão para medir o fluxo de água em sistemas de irrigação. Selecione a calculadora que corresponde à sua estrutura:</p>';

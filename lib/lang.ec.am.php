@@ -339,7 +339,7 @@ $ec_lang['essc_q']='ፍሰት, Q';
 // Contact us.
 
 // Irrigation
-$ec_lang['irr_main_menu']='የመስኖ ፍሰት ልኬት';
+$ec_lang['irr_main_menu']='መስኖ';
 $ec_lang['irr_main_title']='ነፃ ኦንላይን የመስኖ ፍሰት ልኬት ካልኩሌተሮች';
 $ec_lang['irr_main_desc']='የመስኖ ፍሰት ልኬት — ዊርስ እና ኦሪፊስ';
 $ec_lang['irr_intro_html']='<p>ዌር እና ኦሪፊስ በመስኖ ስርዓቶች ውስጥ የውሃ ፍሰት ለመለካት ደረጃዊ የሜዳ መሳሪያዎች ናቸው። ለእርስዎ ግንባታ የሚስማማ ካልኩሌተር ይምረጡ፡</p>';

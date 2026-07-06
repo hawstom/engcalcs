@@ -339,7 +339,7 @@ $ec_lang['essc_q']='Caudal, Q';
 // Contact us.
 
 // Irrigation
-$ec_lang['irr_main_menu']='Medición de Caudal de Riego';
+$ec_lang['irr_main_menu']='Riego';
 $ec_lang['irr_main_title']='Calculadoras en línea gratuitas para la medición de caudal de riego';
 $ec_lang['irr_main_desc']='Medición de Caudal de Riego — Vertederos y Orificios';
 $ec_lang['irr_intro_html']='<p>Los vertederos y orificios son las herramientas de campo estándar para medir el caudal en los sistemas de riego. Seleccione la calculadora que corresponde a su estructura:</p>';

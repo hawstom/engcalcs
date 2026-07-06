@@ -337,7 +337,7 @@ $ec_lang['essc_q']='Debit, Q';
 // Contact us.
 
 // Irrigation
-$ec_lang['irr_main_menu']='Măsurarea Debitului de Irigare';
+$ec_lang['irr_main_menu']='Irigare';
 $ec_lang['irr_main_title']='Calculatoare Online Gratuite pentru Măsurarea Debitului de Irigare';
 $ec_lang['irr_main_desc']='Măsurarea Debitului de Irigare — Deversor și Orificii';
 $ec_lang['irr_intro_html']='<p>Deversorele și orificiile sunt instrumentele standard de teren pentru măsurarea debitului de apă în sistemele de irigații. Selectați calculatorul care corespunde structurii dvs.:</p>';

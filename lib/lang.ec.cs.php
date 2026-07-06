@@ -338,7 +338,7 @@ $ec_lang['essc_q']='Průtok, Q';
 // Contact us.
 
 // Irrigation
-$ec_lang['irr_main_menu']='Měření průtoku závlahy';
+$ec_lang['irr_main_menu']='Závlaha';
 $ec_lang['irr_main_title']='Bezplatné online kalkulačky pro měření průtoku závlahy';
 $ec_lang['irr_main_desc']='Měření průtoku závlahy — přelivy a otvory';
 $ec_lang['irr_intro_html']='<p>Přelivy a otvory jsou standardní terénní nástroje pro měření průtoku vody v závlahových systémech. Vyberte kalkulačku odpovídající vaší konstrukci:</p>';

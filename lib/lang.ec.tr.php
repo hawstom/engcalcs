@@ -341,7 +341,7 @@ $ec_lang['essc_q']='Debi, Q';
 // Contact us.
 
 // Irrigation
-$ec_lang['irr_main_menu']='Sulama Akışı Ölçümü';
+$ec_lang['irr_main_menu']='Sulama';
 $ec_lang['irr_main_title']='Ücretsiz Online Sulama Akışı Ölçüm Hesaplayıcıları';
 $ec_lang['irr_main_desc']='Sulama Akışı Ölçümü — Savaklar ve Orifisler';
 $ec_lang['irr_intro_html']='<p>Savaklar ve orifisler, sulama sistemlerinde su akışını ölçmek için standart saha araçlarıdır. Yapınıza uygun hesap makinesini seçin:</p>';
