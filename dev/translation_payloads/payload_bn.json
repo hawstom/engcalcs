@@ -1,19 +1,27 @@
 {
     "meta": {
         "language": "bn",
-        "expected_key_count": 508,
-        "delta_key_count": 1,
+        "expected_key_count": 501,
+        "delta_key_count": 61,
         "active_prefixes": [
-            "calc"
+            "calc",
+            "ip",
+            "irr",
+            "mhp",
+            "mtc"
         ],
-        "requested_prefix": "calc",
+        "requested_prefix": null,
         "notes": "Translate only keys in keys_to_translate; preserve HTML, units, and symbols.",
         "glossary_injection_notes": "Use prompt_context_by_prefix and glossary_terms_by_prefix.preferred_translation when available.",
         "context_notes": "Use key_context.neighbors to keep register consistent with nearby translated strings.",
         "intent_notes": "Use key_intent when present; these entries provide terse disambiguation comments only where translation risk exists."
     },
     "prompt_context_by_prefix": {
-        "calc": "Use these preferred technical term translations when relevant:\n- flow (Q): প্রবাহ\n- velocity (v): প্রবাহ বেগ\n- slope (S): ঢাল"
+        "calc": "Use these preferred technical term translations when relevant:\n- flow (Q): প্রবাহ\n- velocity (v): প্রবাহ বেগ\n- slope (S): ঢাল",
+        "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): প্রবাহ\n- velocity (v): প্রবাহ বেগ\n- slope (S): ঢাল",
+        "irr": "Use these preferred technical term translations when relevant:\n- flow (Q): প্রবাহ\n- velocity (v): প্রবাহ বেগ\n- slope (S): ঢাল",
+        "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): প্রবাহ\n- penstock: পেনস্টক\n- gross head (H_gross): মোট জলশীর্ষ\n- net head (H_net): নিট জলশীর্ষ\n- plant efficiency (η): প্লান্ট দক্ষতা\n- head loss (h_L): পানিশীর্ষ ক্ষতি\n- run-of-river: নদীর স্বাভাবিক প্রবাহ বিদ্যুৎ\n- headworks: হেডওয়ার্কস\n- junction loss (H_m): সংযোগস্থল ক্ষতি",
+        "mtc": "Use these preferred technical term translations when relevant:\n- flow (Q): প্রবাহ\n- velocity (v): প্রবাহ বেগ\n- hydraulic radius (R_h): হাইড্রলিক ব্যাসার্ধ\n- wetted perimeter (P_w): ভেজা পরিধি\n- Manning roughness (n): ম্যানিং রাফনেস সহগ\n- slope (S): ঢাল"
     },
     "glossary_terms_by_prefix": {
         "calc": [
@@ -38,29 +46,1056 @@
                 "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
                 "preferred_translation": "ঢাল"
             }
+        ],
+        "ip": [
+            {
+                "term": "flow",
+                "symbol": "Q",
+                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
+                "preferred_translation": "প্রবাহ"
+            },
+            {
+                "term": "velocity",
+                "symbol": "v",
+                "context": "Flow velocity (speed of water). Appears in all calculators.",
+                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
+                "preferred_translation": "প্রবাহ বেগ"
+            },
+            {
+                "term": "slope",
+                "symbol": "S",
+                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
+                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
+                "preferred_translation": "ঢাল"
+            }
+        ],
+        "irr": [
+            {
+                "term": "flow",
+                "symbol": "Q",
+                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
+                "preferred_translation": "প্রবাহ"
+            },
+            {
+                "term": "velocity",
+                "symbol": "v",
+                "context": "Flow velocity (speed of water). Appears in all calculators.",
+                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
+                "preferred_translation": "প্রবাহ বেগ"
+            },
+            {
+                "term": "slope",
+                "symbol": "S",
+                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
+                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
+                "preferred_translation": "ঢাল"
+            }
+        ],
+        "mhp": [
+            {
+                "term": "flow",
+                "symbol": "Q",
+                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
+                "preferred_translation": "প্রবাহ"
+            },
+            {
+                "term": "penstock",
+                "symbol": "",
+                "context": "Pressure pipe carrying water from a reservoir or headpond down to a turbine in a micro-hydro system. Appears in Micro-Hydro Power calculator.",
+                "translation_notes": "'Penstock' is a specialized term with no exact one-word equivalent in many languages. Use the established civil\/hydro engineering phrase for 'pressure conduit' or 'force main to turbine'. Czech: 'tlakovod' (pressure main) is preferred over the generic 'přiváděcí potrubí' (supply pipe). Serbian: 'напорни цевовод' is the standard hydraulic engineering term.",
+                "preferred_translation": "পেনস্টক"
+            },
+            {
+                "term": "gross head",
+                "symbol": "H_gross",
+                "context": "Total elevation difference between the headpond water surface and the turbine — before subtracting penstock losses. Appears in Micro-Hydro Power calculator.",
+                "translation_notes": "'Gross' means total\/before-deduction. Pair with 'net head' for clarity. Use the hydro-power standard term.",
+                "preferred_translation": "মোট জলশীর্ষ"
+            },
+            {
+                "term": "net head",
+                "symbol": "H_net",
+                "context": "Effective head available at the turbine after subtracting penstock friction and minor losses from gross head. H_net = H_gross - h_L.",
+                "translation_notes": "'Net' means after-deduction. Pair with 'gross head'. Use the hydro-power standard term. WMO No. 385 entry 111 ('available head') gives the Russian term 'полезный напор' (useful head) \/ syn. 'располагаемый напор' — these overlap with net head in Russian hydro engineering practice.",
+                "preferred_translation": "নিট জলশীর্ষ"
+            },
+            {
+                "term": "plant efficiency",
+                "symbol": "η",
+                "context": "Overall efficiency of a micro-hydro power plant — product of turbine, generator, and transmission efficiencies. Dimensionless, 0–1. Appears in Micro-Hydro Power calculator.",
+                "translation_notes": "'Plant' here means the power plant\/installation, not a living plant. Use the energy\/electrical engineering term for overall system efficiency.",
+                "preferred_translation": "প্লান্ট দক্ষতা"
+            },
+            {
+                "term": "head loss",
+                "symbol": "h_L",
+                "context": "Energy loss expressed as a height of water column. Appears in Darcy-Weisbach, Hazen-Williams, Manning pipe, and Penstock calculators. Distinct from 'pressure drop' — use the hydraulic engineering term.",
+                "translation_notes": "'Head' in the hydraulic sense (energy per unit weight) does not translate literally in many languages — use the established civil\/hydraulic engineering phrase. Pre-2026 sr\/hr human translations used 'gubitak pritiska' (= pressure loss), which is technically the same concept expressed in pressure terms rather than head terms. The current 'губитак напора \/ gubitak tlačne visine' (= loss of hydraulic head) is more precise in a hydraulic engineering context and is preferred.",
+                "preferred_translation": "পানিশীর্ষ ক্ষতি"
+            },
+            {
+                "term": "run-of-river",
+                "symbol": "",
+                "context": "A hydropower configuration that uses natural river flow without a dam or significant storage reservoir. Power output varies with seasonal river flow. Appears in Micro-Hydro Power calculator.",
+                "translation_notes": "Use the established energy\/hydropower sector term. 'Run' means natural river current — do not translate as jogging or running. WMO No. 385 entry 1263 gives the full facility names: Spanish 'central hidroeléctrica de pasada', French 'usine hydroélectrique au fil de l'eau', Russian 'русловая гидроэлектростанция' — these are the authoritative terms for the power plant noun. The abbreviated forms 'filo de agua' (es), 'au fil de l'eau' (fr), and 'русловая ГЭС' (ru) are standard in engineering use. German: 'Laufwasserkraftwerk'. Chinese: '径流式水电'.",
+                "preferred_translation": "নদীর স্বাভাবিক প্রবাহ বিদ্যুৎ"
+            },
+            {
+                "term": "headworks",
+                "symbol": "",
+                "context": "The intake structure at the upstream end of a penstock or canal, where water is diverted from the river or reservoir into the conveyance system. Appears in Micro-Hydro Power calculator (penstock diameter and length descriptions).",
+                "translation_notes": "Use the civil\/irrigation engineering term for a water intake or diversion structure. Spanish: 'obra de toma'. French: 'ouvrage de prise d'eau'. Russian: 'водозаборное сооружение'. German: 'Einlaufbauwerk'. In many languages, 'intake structure' is preferred over a literal translation of 'headworks'.",
+                "preferred_translation": "হেডওয়ার্কস"
+            },
+            {
+                "term": "junction loss",
+                "symbol": "H_m",
+                "context": "Energy loss at pipe junctions, bends, fittings, and entrance — a local (point) loss as opposed to distributed friction loss along the pipe. H_m = k × v²\/(2g). Also called 'minor loss', though in short penstocks these can equal or exceed friction losses. Appears in Manning Pipe Head Loss and Micro-Hydro Power calculators.",
+                "translation_notes": "The term 'minor loss' is conventional but misleading — do not imply these losses are always small. Use the hydraulic engineering term for local\/point losses at fittings. French: 'perte singulière'. Spanish: 'pérdida local' or 'pérdida por accesorio'. Russian: 'местные потери'. Chinese: '局部水头损失'.",
+                "preferred_translation": "সংযোগস্থল ক্ষতি"
+            }
+        ],
+        "mtc": [
+            {
+                "term": "flow",
+                "symbol": "Q",
+                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
+                "preferred_translation": "প্রবাহ"
+            },
+            {
+                "term": "velocity",
+                "symbol": "v",
+                "context": "Flow velocity (speed of water). Appears in all calculators.",
+                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
+                "preferred_translation": "প্রবাহ বেগ"
+            },
+            {
+                "term": "hydraulic radius",
+                "symbol": "R_h",
+                "context": "Cross-sectional flow area divided by wetted perimeter. Appears in Manning calculators.",
+                "translation_notes": "Use the standard hydraulic engineering phrase. Pre-2026 sr\/hr human translations used the Latin loanword 'hidraulički radijus' — this form is widely used in South Slavic engineering practice and may be more recognizable to field practitioners than the native Slavic equivalents 'полупречник' (sr) \/ 'polumjer' (hr). Both are correct; native Slavic engineers may encounter both forms.",
+                "preferred_translation": "হাইড্রলিক ব্যাসার্ধ"
+            },
+            {
+                "term": "wetted perimeter",
+                "symbol": "P_w",
+                "context": "Length of the channel or pipe boundary in contact with flowing water. Appears in Manning calculators.",
+                "translation_notes": "WMO No. 385 entry 1682 confirms: es = 'perímetro mojado', fr = 'périmètre mouillé'. Use the standard hydraulic engineering phrase. 'Wetted' here means 'in contact with water', not 'soaked'. Pre-2026 sr human used 'okvašeni obim' (obim = natural South Slavic word for perimeter\/circumference); current uses 'квашени периметар' (периметар = Greek-derived loanword). Both are correct; 'obim\/opseg' is more natural in informal Serbian\/Croatian field use.",
+                "preferred_translation": "ভেজা পরিধি"
+            },
+            {
+                "term": "Manning roughness",
+                "symbol": "n",
+                "context": "Manning's n — empirical roughness coefficient used in the Manning formula for open-channel and pipe flow.",
+                "translation_notes": "Always include 'Manning' as a proper noun. The coefficient itself (n) needs no translation — only the label does. Do not translate as generic 'roughness coefficient' without 'Manning'.",
+                "preferred_translation": "ম্যানিং রাফনেস সহগ"
+            },
+            {
+                "term": "slope",
+                "symbol": "S",
+                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
+                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
+                "preferred_translation": "ঢাল"
+            }
         ]
     },
     "keys_to_translate": {
-        "calc_defaults": "Default values"
+        "calc_defaults_confirm": "Reset calculator to factory defaults?",
+        "calc_copy_link": "Copy link",
+        "calc_copy_link_done": "Copied!",
+        "mtc_vel_ok_short": "OK",
+        "mtc_vel_high_short": "High",
+        "mtc_vel_low_short": "Low",
+        "mhp_vel_ok_short": "OK",
+        "mhp_vel_high_short": "High",
+        "mhp_vel_low_short": "Low",
+        "ip_main_menu": "Irrigation Pressure",
+        "ip_main_title": "Free Online Irrigation Pressure &amp; Distribution Uniformity Calculator",
+        "ip_main_desc": "Test Branch Pressure and Uniformity Estimate",
+        "ip_h_supply": "Supply pressure",
+        "ip_elev_supply": "Supply elevation, z<sub>supply<\/sub>",
+        "ip_q_design": "Emitter design flow, q<sub>design<\/sub>",
+        "ip_h_design": "Emitter design pressure",
+        "ip_x": "Emitter discharge exponent, x <span title=\"0.5 for standard non-compensating emitters; near 0 for pressure-compensating emitters\" class=\"ec-tip\">?<\/span>",
+        "ip_reach_table_title": "Test path",
+        "ip_group_reach": "Reach",
+        "ip_group_upstream": "Upstream",
+        "ip_group_downstream": "Downstream",
+        "ip_group_loss": "Loss",
+        "ip_is_lateral": "Lat. <span title=\"Checked: this reach is a segment of the test lateral, drawn off by individual emitters. Unchecked: this reach is a main, only passing flow along to laterals not on the test path.\" class=\"ec-tip\">?<\/span>",
+        "ip_count": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach right at the test lateral&rsquo;s own takeoff, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>",
+        "ip_length": "L",
+        "ip_diameter": "D",
+        "ip_e": "e <span title=\"Darcy-Weisbach roughness height\" class=\"ec-tip\">?<\/span>",
+        "ip_km": "K<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>",
+        "ip_elev_ds": "DS Elev. <span title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\" class=\"ec-tip\">?<\/span>",
+        "ip_elev_ds_missing_warn": "Last emitter elevation (last row) was left blank and defaulted to flat &mdash; enter it for an accurate result ⚠",
+        "ip_flow": "Flow",
+        "ip_press": "Press.",
+        "ip_v": "V",
+        "ip_hv": "H<sub>v<\/sub>",
+        "ip_hf": "H<sub>f<\/sub>",
+        "ip_hm": "H<sub>m<\/sub>",
+        "ip_hl": "H<sub>l<\/sub> <span title=\"Total reach loss, H_f + H_m\" class=\"ec-tip\">?<\/span>",
+        "ip_pressure_warn": "Low\/negative pressure &mdash; check for subatmospheric conditions",
+        "ip_pressure_warn_short": "Low ⚠",
+        "ip_h_far": "Last emitter pressure",
+        "ip_q_supply": "Test path supply flow, Q<sub>supply<\/sub> <span title=\"Flow entering the modeled test path only, not the whole zone\/system — see Q_zone in Application Design below for the system-wide total.\" class=\"ec-tip\">?<\/span>",
+        "ip_q_critical": "Last emitter flow, q<sub>last<\/sub>",
+        "ip_q_avg_lateral": "Average emitter flow (test lateral), q<sub>avg<\/sub>",
+        "ip_dp_avg": "Est. &Delta;pressure, avg. vs. test lateral <span title=\"How much higher (or lower) you believe a typical\/average lateral runs compared to this test lateral. The test lateral is deliberately the presumed worst case, so its own average is a biased-low stand-in for a field average &mdash; left at 0, the uniformity check and application-design numbers below use the test lateral&rsquo;s own (likely optimistic) average as-is.\" class=\"ec-tip\">?<\/span>",
+        "ip_q_avg_field": "Est. field-average emitter flow, q<sub>avg,field<\/sub> <span title=\"q_avg_lateral re-evaluated at each lateral row&rsquo;s pressure plus the entered pressure difference above &mdash; an attempt to correct for the test lateral being the presumed worst case, not a representative one. Feeds both the uniformity check and the application-design section below.\" class=\"ec-tip\">?<\/span>",
+        "ip_du_estimate": "Uniformity check, q<sub>last<\/sub>\/q<sub>avg,field<\/sub> <span title=\"Last emitter&rsquo;s computed flow divided by the estimated field-average emitter flow &mdash; same shape as textbook low-quarter Distribution Uniformity (low-group average &divide; population mean), but from a small modeled sample and a user-estimated correction, not a full-field statistical sample. Values at or above 1 are possible and not a bug: it just means the last emitter isn&rsquo;t the low point relative to the estimated field average (e.g. a favorable downhill run, or the &Delta;pressure estimate above is too small).\" class=\"ec-tip\">?<\/span>",
+        "ip_worst_case_warn": "Test emitter pressure is at or above supply pressure &mdash; this path is not likely your worst-case lateral. Check for a more remote or higher-friction lateral, or an elevation profile that better represents the actual worst case.",
+        "ip_q_ratio": "Last emitter flow vs. design flow, q<sub>last<\/sub>\/q<sub>design<\/sub> <span title=\"A separate check, not a uniformity figure: how far the last emitter runs from the manufacturer&rsquo;s rated design flow. Above 1: running above its design point (e.g. from a favorable downhill elevation gain). Below 1: running under design (typical friction-dominated case).\" class=\"ec-tip\">?<\/span>",
+        "ip_no_solution": "No solution: required supply pressure exceeds the entered supply pressure. Increase supply pressure, reduce demand, or use a larger pipe.",
+        "ip_notes_1_term": "Method",
+        "ip_notes_1_def": "Guesses the pressure at the last (most remote) emitter, then marches the Energy Grade Line back toward the supply, reach by reach, adding friction and minor losses along the way. Elevation and velocity head are backed out at each node to report the actual pressure there. The guessed far-end pressure is adjusted (bisection) until the computed required supply pressure matches the entered supply pressure &mdash; the same closed-loop problem addressed by the pipe-flow solver on the Manning Pipe Flow calculator, extended to a branching network.",
+        "ip_notes_2_term": "Main vs. Lateral Reaches",
+        "ip_notes_2_def": "Each row is one reach along the single hydraulically worst path (the test path) from the supply to the last emitter. A Main reach only passes flow to laterals not on the test path, so its draw is a flat multiplication (design flow &times; the reach&rsquo;s total emitter count) &mdash; no local pressure sensitivity. The main is a shared trunk pipe, so the reach right at the test lateral&rsquo;s own takeoff must include not just laterals between its own endpoints but also any laterals still further down the main beyond that takeoff, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow travels through that same reach before splitting off, whether or not they appear anywhere else in this table. A Lateral reach is a segment of the test lateral itself: emitter discharge is computed from the actual local pressure via q = k&middot;H<sup>x<\/sup>, and friction loss is reduced by Christiansen&rsquo;s F(n) factor to account for flow stepping down as each emitter in the reach draws off.",
+        "ip_notes_3_term": "Limitations",
+        "ip_notes_3_def": "Models one fixed inlet pressure (no pump curve), one test path only (not the full field), and a 2-parameter emitter curve (set the exponent near 0 to approximate a pressure-compensating emitter). Two different ratios are reported, deliberately kept separate: q<sub>last<\/sub>\/q<sub>avg,field<\/sub> is a uniformity check, shaped like textbook low-quarter Distribution Uniformity (low-group average &divide; population mean) but computed from the test lateral&rsquo;s own modeled emitters, corrected by an entered &Delta;pressure estimate rather than a full-field statistical sample &mdash; the test lateral is deliberately the presumed worst case, so its raw, uncorrected average would understate the true field average and make uniformity look better than it is; the &Delta;pressure input exists specifically to counter that bias. Values at or above 1 are still possible (e.g. the &Delta;pressure estimate is too small, or a favorable downhill run). q<sub>last<\/sub>\/q<sub>design<\/sub> is a different, non-uniformity check against the manufacturer&rsquo;s rated flow &mdash; useful for spotting an over- or under-pressured system overall, but not a substitute for the uniformity number, since the design\/rated flow has no necessary relationship to the system&rsquo;s actual mean operating pressure.",
+        "ip_notes_4_term": "Reference",
+        "ip_notes_4_def": "Christiansen, J.E. (1942). &ldquo;Irrigation by sprinkling.&rdquo; California Agricultural Experiment Station Bulletin 670. ASAE\/ASABE standards for microirrigation design use the same multi-outlet friction-loss approach.",
+        "ip_notes_5_term": "Application Design",
+        "ip_notes_5_def": "Application rate and system\/zone flow use the estimated field-average emitter flow (q<sub>avg,field<\/sub> &mdash; the test lateral&rsquo;s own average, corrected by the entered &Delta;pressure estimate), not a guessed rate: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub>, fed by the corrected modeled value. Spacing and system-wide lateral\/emitter counts are separate inputs here because the test path only models one worst-case branch, not every lateral in the field.",
+        "irr_card_pressure_head": "Irrigation Pressure &amp; Uniformity",
+        "irr_card_pressure_desc": "Model the pressure and flow profile along a main-lateral-emitter branch to estimate distribution uniformity from the real test-path pressure, not just a catalog emitter flow rate."
     },
     "keys": {
-        "calc_defaults": "Default values"
+        "calc_defaults_confirm": "Reset calculator to factory defaults?",
+        "calc_copy_link": "Copy link",
+        "calc_copy_link_done": "Copied!",
+        "mtc_vel_ok_short": "OK",
+        "mtc_vel_high_short": "High",
+        "mtc_vel_low_short": "Low",
+        "mhp_vel_ok_short": "OK",
+        "mhp_vel_high_short": "High",
+        "mhp_vel_low_short": "Low",
+        "ip_main_menu": "Irrigation Pressure",
+        "ip_main_title": "Free Online Irrigation Pressure &amp; Distribution Uniformity Calculator",
+        "ip_main_desc": "Test Branch Pressure and Uniformity Estimate",
+        "ip_h_supply": "Supply pressure",
+        "ip_elev_supply": "Supply elevation, z<sub>supply<\/sub>",
+        "ip_q_design": "Emitter design flow, q<sub>design<\/sub>",
+        "ip_h_design": "Emitter design pressure",
+        "ip_x": "Emitter discharge exponent, x <span title=\"0.5 for standard non-compensating emitters; near 0 for pressure-compensating emitters\" class=\"ec-tip\">?<\/span>",
+        "ip_reach_table_title": "Test path",
+        "ip_group_reach": "Reach",
+        "ip_group_upstream": "Upstream",
+        "ip_group_downstream": "Downstream",
+        "ip_group_loss": "Loss",
+        "ip_is_lateral": "Lat. <span title=\"Checked: this reach is a segment of the test lateral, drawn off by individual emitters. Unchecked: this reach is a main, only passing flow along to laterals not on the test path.\" class=\"ec-tip\">?<\/span>",
+        "ip_count": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach right at the test lateral&rsquo;s own takeoff, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>",
+        "ip_length": "L",
+        "ip_diameter": "D",
+        "ip_e": "e <span title=\"Darcy-Weisbach roughness height\" class=\"ec-tip\">?<\/span>",
+        "ip_km": "K<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>",
+        "ip_elev_ds": "DS Elev. <span title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\" class=\"ec-tip\">?<\/span>",
+        "ip_elev_ds_missing_warn": "Last emitter elevation (last row) was left blank and defaulted to flat &mdash; enter it for an accurate result ⚠",
+        "ip_flow": "Flow",
+        "ip_press": "Press.",
+        "ip_v": "V",
+        "ip_hv": "H<sub>v<\/sub>",
+        "ip_hf": "H<sub>f<\/sub>",
+        "ip_hm": "H<sub>m<\/sub>",
+        "ip_hl": "H<sub>l<\/sub> <span title=\"Total reach loss, H_f + H_m\" class=\"ec-tip\">?<\/span>",
+        "ip_pressure_warn": "Low\/negative pressure &mdash; check for subatmospheric conditions",
+        "ip_pressure_warn_short": "Low ⚠",
+        "ip_h_far": "Last emitter pressure",
+        "ip_q_supply": "Test path supply flow, Q<sub>supply<\/sub> <span title=\"Flow entering the modeled test path only, not the whole zone\/system — see Q_zone in Application Design below for the system-wide total.\" class=\"ec-tip\">?<\/span>",
+        "ip_q_critical": "Last emitter flow, q<sub>last<\/sub>",
+        "ip_q_avg_lateral": "Average emitter flow (test lateral), q<sub>avg<\/sub>",
+        "ip_dp_avg": "Est. &Delta;pressure, avg. vs. test lateral <span title=\"How much higher (or lower) you believe a typical\/average lateral runs compared to this test lateral. The test lateral is deliberately the presumed worst case, so its own average is a biased-low stand-in for a field average &mdash; left at 0, the uniformity check and application-design numbers below use the test lateral&rsquo;s own (likely optimistic) average as-is.\" class=\"ec-tip\">?<\/span>",
+        "ip_q_avg_field": "Est. field-average emitter flow, q<sub>avg,field<\/sub> <span title=\"q_avg_lateral re-evaluated at each lateral row&rsquo;s pressure plus the entered pressure difference above &mdash; an attempt to correct for the test lateral being the presumed worst case, not a representative one. Feeds both the uniformity check and the application-design section below.\" class=\"ec-tip\">?<\/span>",
+        "ip_du_estimate": "Uniformity check, q<sub>last<\/sub>\/q<sub>avg,field<\/sub> <span title=\"Last emitter&rsquo;s computed flow divided by the estimated field-average emitter flow &mdash; same shape as textbook low-quarter Distribution Uniformity (low-group average &divide; population mean), but from a small modeled sample and a user-estimated correction, not a full-field statistical sample. Values at or above 1 are possible and not a bug: it just means the last emitter isn&rsquo;t the low point relative to the estimated field average (e.g. a favorable downhill run, or the &Delta;pressure estimate above is too small).\" class=\"ec-tip\">?<\/span>",
+        "ip_worst_case_warn": "Test emitter pressure is at or above supply pressure &mdash; this path is not likely your worst-case lateral. Check for a more remote or higher-friction lateral, or an elevation profile that better represents the actual worst case.",
+        "ip_q_ratio": "Last emitter flow vs. design flow, q<sub>last<\/sub>\/q<sub>design<\/sub> <span title=\"A separate check, not a uniformity figure: how far the last emitter runs from the manufacturer&rsquo;s rated design flow. Above 1: running above its design point (e.g. from a favorable downhill elevation gain). Below 1: running under design (typical friction-dominated case).\" class=\"ec-tip\">?<\/span>",
+        "ip_no_solution": "No solution: required supply pressure exceeds the entered supply pressure. Increase supply pressure, reduce demand, or use a larger pipe.",
+        "ip_notes_1_term": "Method",
+        "ip_notes_1_def": "Guesses the pressure at the last (most remote) emitter, then marches the Energy Grade Line back toward the supply, reach by reach, adding friction and minor losses along the way. Elevation and velocity head are backed out at each node to report the actual pressure there. The guessed far-end pressure is adjusted (bisection) until the computed required supply pressure matches the entered supply pressure &mdash; the same closed-loop problem addressed by the pipe-flow solver on the Manning Pipe Flow calculator, extended to a branching network.",
+        "ip_notes_2_term": "Main vs. Lateral Reaches",
+        "ip_notes_2_def": "Each row is one reach along the single hydraulically worst path (the test path) from the supply to the last emitter. A Main reach only passes flow to laterals not on the test path, so its draw is a flat multiplication (design flow &times; the reach&rsquo;s total emitter count) &mdash; no local pressure sensitivity. The main is a shared trunk pipe, so the reach right at the test lateral&rsquo;s own takeoff must include not just laterals between its own endpoints but also any laterals still further down the main beyond that takeoff, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow travels through that same reach before splitting off, whether or not they appear anywhere else in this table. A Lateral reach is a segment of the test lateral itself: emitter discharge is computed from the actual local pressure via q = k&middot;H<sup>x<\/sup>, and friction loss is reduced by Christiansen&rsquo;s F(n) factor to account for flow stepping down as each emitter in the reach draws off.",
+        "ip_notes_3_term": "Limitations",
+        "ip_notes_3_def": "Models one fixed inlet pressure (no pump curve), one test path only (not the full field), and a 2-parameter emitter curve (set the exponent near 0 to approximate a pressure-compensating emitter). Two different ratios are reported, deliberately kept separate: q<sub>last<\/sub>\/q<sub>avg,field<\/sub> is a uniformity check, shaped like textbook low-quarter Distribution Uniformity (low-group average &divide; population mean) but computed from the test lateral&rsquo;s own modeled emitters, corrected by an entered &Delta;pressure estimate rather than a full-field statistical sample &mdash; the test lateral is deliberately the presumed worst case, so its raw, uncorrected average would understate the true field average and make uniformity look better than it is; the &Delta;pressure input exists specifically to counter that bias. Values at or above 1 are still possible (e.g. the &Delta;pressure estimate is too small, or a favorable downhill run). q<sub>last<\/sub>\/q<sub>design<\/sub> is a different, non-uniformity check against the manufacturer&rsquo;s rated flow &mdash; useful for spotting an over- or under-pressured system overall, but not a substitute for the uniformity number, since the design\/rated flow has no necessary relationship to the system&rsquo;s actual mean operating pressure.",
+        "ip_notes_4_term": "Reference",
+        "ip_notes_4_def": "Christiansen, J.E. (1942). &ldquo;Irrigation by sprinkling.&rdquo; California Agricultural Experiment Station Bulletin 670. ASAE\/ASABE standards for microirrigation design use the same multi-outlet friction-loss approach.",
+        "ip_notes_5_term": "Application Design",
+        "ip_notes_5_def": "Application rate and system\/zone flow use the estimated field-average emitter flow (q<sub>avg,field<\/sub> &mdash; the test lateral&rsquo;s own average, corrected by the entered &Delta;pressure estimate), not a guessed rate: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub>, fed by the corrected modeled value. Spacing and system-wide lateral\/emitter counts are separate inputs here because the test path only models one worst-case branch, not every lateral in the field.",
+        "irr_card_pressure_head": "Irrigation Pressure &amp; Uniformity",
+        "irr_card_pressure_desc": "Model the pressure and flow profile along a main-lateral-emitter branch to estimate distribution uniformity from the real test-path pressure, not just a catalog emitter flow rate."
     },
     "key_context": {
-        "calc_defaults": {
+        "calc_defaults_confirm": {
             "reason": "equal_to_english",
-            "current_value": "Default values",
+            "current_value": "Reset calculator to factory defaults?",
             "neighbors": {
                 "previous_translated": {
-                    "key": "calc_set_units",
-                    "value": "একক নির্ধারণ করুন:",
-                    "english": "Set units:"
+                    "key": "calc_defaults",
+                    "value": "ডিফল্ট মান",
+                    "english": "Default values"
                 },
                 "next_translated": {
                     "key": "points_data_help",
                     "value": "(অথবা ডেটা এলাকা ব্যবহার করে কপি\/পেস্ট করুন)",
                     "english": "(or Copy\/Paste using data area)"
                 }
+            }
+        },
+        "calc_copy_link": {
+            "reason": "equal_to_english",
+            "current_value": "Copy link",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "ec_name_hint",
+                    "value": "এই ইনপুটগুলি বুকমার্কিং, ইতিহাস পুনরুদ্ধার এবং শেয়ারিংয়ের জন্য URL-এ সংরক্ষণ করে",
+                    "english": "Saves these inputs to the URL for bookmarking, history retrieval, and sharing"
+                },
+                "next_translated": {
+                    "key": "dw_main_menu",
+                    "value": "ড্যার্সি-ওয়েইসবাখ পাইপ হেড লস",
+                    "english": "Darcy-Weisbach Pipe Head Loss"
+                }
+            }
+        },
+        "calc_copy_link_done": {
+            "reason": "equal_to_english",
+            "current_value": "Copied!",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "ec_name_hint",
+                    "value": "এই ইনপুটগুলি বুকমার্কিং, ইতিহাস পুনরুদ্ধার এবং শেয়ারিংয়ের জন্য URL-এ সংরক্ষণ করে",
+                    "english": "Saves these inputs to the URL for bookmarking, history retrieval, and sharing"
+                },
+                "next_translated": {
+                    "key": "dw_main_menu",
+                    "value": "ড্যার্সি-ওয়েইসবাখ পাইপ হেড লস",
+                    "english": "Darcy-Weisbach Pipe Head Loss"
+                }
+            }
+        },
+        "mtc_vel_ok_short": {
+            "reason": "equal_to_english",
+            "current_value": "OK",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "mtc_vel_low",
+                    "value": "বেগ কম - পলি জমার ঝুঁকি।",
+                    "english": "Velocity low - sedimentation risk."
+                },
+                "next_translated": {
+                    "key": "mtc_note_1",
+                    "value": "<dl><dt>স্বয়ংক্রিয় পাথর আকার ও রুক্ষতা ডিজাইন পুনরাবৃত্তি<\/dt><dd>একটি রুক্ষতা রেডিও বাটন (BB প্রস্তাবিত) এবং একটি নকশা পাথর আকার রেডিও বাটন (Isbash প্রস্তাবিত) নির্বাচন করুন। একটি সমান পাথর আকারে আপনার কাঙ্ক্ষিত প্রবাহ পেতে গভীরতা ও পাথর আকার নিরাপত্তা গুণক সামঞ্জস্য করুন। প্রতিবার কোনো ইনপুট মান পরিবর্তন করলে নিম্নলিখিত পুনরাবৃত্তি চক্র ঘটে: ১. নকশা পাথর আকার থেকে রুক্ষতা গণনা করা হয়। ২. অনুরোধকৃত রুক্ষতা গণনা ইনপুট রুক্ষতায় কপি করা হয়। ৩. চ্যানেল প্রবাহ ও প্রয়োজনীয় পাথর আকার গণনা করা হয়। ৪. নকশা পাথর আকার সামঞ্জস্য করা হয়। ৫. নকশা পাথর আকারে ত্রুটি খুব ছোট না হওয়া পর্যন্ত পুনরাবৃত্তি।<\/dd><dt>বেসিক ক্যালকুলেটর (পুনরাবৃত্তি ছাড়া)<\/dt><dd>আপনার কাঙ্ক্ষিত রুক্ষতা মান লিখুন। নকশা পাথর আকার ইনপুট এলাকা উপেক্ষা করুন।<\/dd><\/dl>",
+                    "english": "<dl><dt>Automated rock size and roughness design iteration<\/dt><dd>Choose a roughness radio button (BB recommended) and a design rock size radio button (Isbash recommended). Fine-tune depth and rock size safety factor to get your desired flow with an even rock size. Every time you change any input value, the following iteration cycle happens: 1. Roughness is calculated from design rock size. 2. The requested roughness calculation is copied to input roughness. 3. Channel flow and required rock size are calculated. 4. Design rock size is adjusted. 5. Repeat until error in the design rock size is very small.<\/dd><dt>Basic calculator (no iteration)<\/dt><dd>Enter your desired roughness value. Ignore the design rock size input area.<\/dd><\/dl>"
+                }
+            }
+        },
+        "mtc_vel_high_short": {
+            "reason": "equal_to_english",
+            "current_value": "High",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "mtc_vel_low",
+                    "value": "বেগ কম - পলি জমার ঝুঁকি।",
+                    "english": "Velocity low - sedimentation risk."
+                },
+                "next_translated": {
+                    "key": "mtc_note_1",
+                    "value": "<dl><dt>স্বয়ংক্রিয় পাথর আকার ও রুক্ষতা ডিজাইন পুনরাবৃত্তি<\/dt><dd>একটি রুক্ষতা রেডিও বাটন (BB প্রস্তাবিত) এবং একটি নকশা পাথর আকার রেডিও বাটন (Isbash প্রস্তাবিত) নির্বাচন করুন। একটি সমান পাথর আকারে আপনার কাঙ্ক্ষিত প্রবাহ পেতে গভীরতা ও পাথর আকার নিরাপত্তা গুণক সামঞ্জস্য করুন। প্রতিবার কোনো ইনপুট মান পরিবর্তন করলে নিম্নলিখিত পুনরাবৃত্তি চক্র ঘটে: ১. নকশা পাথর আকার থেকে রুক্ষতা গণনা করা হয়। ২. অনুরোধকৃত রুক্ষতা গণনা ইনপুট রুক্ষতায় কপি করা হয়। ৩. চ্যানেল প্রবাহ ও প্রয়োজনীয় পাথর আকার গণনা করা হয়। ৪. নকশা পাথর আকার সামঞ্জস্য করা হয়। ৫. নকশা পাথর আকারে ত্রুটি খুব ছোট না হওয়া পর্যন্ত পুনরাবৃত্তি।<\/dd><dt>বেসিক ক্যালকুলেটর (পুনরাবৃত্তি ছাড়া)<\/dt><dd>আপনার কাঙ্ক্ষিত রুক্ষতা মান লিখুন। নকশা পাথর আকার ইনপুট এলাকা উপেক্ষা করুন।<\/dd><\/dl>",
+                    "english": "<dl><dt>Automated rock size and roughness design iteration<\/dt><dd>Choose a roughness radio button (BB recommended) and a design rock size radio button (Isbash recommended). Fine-tune depth and rock size safety factor to get your desired flow with an even rock size. Every time you change any input value, the following iteration cycle happens: 1. Roughness is calculated from design rock size. 2. The requested roughness calculation is copied to input roughness. 3. Channel flow and required rock size are calculated. 4. Design rock size is adjusted. 5. Repeat until error in the design rock size is very small.<\/dd><dt>Basic calculator (no iteration)<\/dt><dd>Enter your desired roughness value. Ignore the design rock size input area.<\/dd><\/dl>"
+                }
+            }
+        },
+        "mtc_vel_low_short": {
+            "reason": "equal_to_english",
+            "current_value": "Low",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "mtc_vel_low",
+                    "value": "বেগ কম - পলি জমার ঝুঁকি।",
+                    "english": "Velocity low - sedimentation risk."
+                },
+                "next_translated": {
+                    "key": "mtc_note_1",
+                    "value": "<dl><dt>স্বয়ংক্রিয় পাথর আকার ও রুক্ষতা ডিজাইন পুনরাবৃত্তি<\/dt><dd>একটি রুক্ষতা রেডিও বাটন (BB প্রস্তাবিত) এবং একটি নকশা পাথর আকার রেডিও বাটন (Isbash প্রস্তাবিত) নির্বাচন করুন। একটি সমান পাথর আকারে আপনার কাঙ্ক্ষিত প্রবাহ পেতে গভীরতা ও পাথর আকার নিরাপত্তা গুণক সামঞ্জস্য করুন। প্রতিবার কোনো ইনপুট মান পরিবর্তন করলে নিম্নলিখিত পুনরাবৃত্তি চক্র ঘটে: ১. নকশা পাথর আকার থেকে রুক্ষতা গণনা করা হয়। ২. অনুরোধকৃত রুক্ষতা গণনা ইনপুট রুক্ষতায় কপি করা হয়। ৩. চ্যানেল প্রবাহ ও প্রয়োজনীয় পাথর আকার গণনা করা হয়। ৪. নকশা পাথর আকার সামঞ্জস্য করা হয়। ৫. নকশা পাথর আকারে ত্রুটি খুব ছোট না হওয়া পর্যন্ত পুনরাবৃত্তি।<\/dd><dt>বেসিক ক্যালকুলেটর (পুনরাবৃত্তি ছাড়া)<\/dt><dd>আপনার কাঙ্ক্ষিত রুক্ষতা মান লিখুন। নকশা পাথর আকার ইনপুট এলাকা উপেক্ষা করুন।<\/dd><\/dl>",
+                    "english": "<dl><dt>Automated rock size and roughness design iteration<\/dt><dd>Choose a roughness radio button (BB recommended) and a design rock size radio button (Isbash recommended). Fine-tune depth and rock size safety factor to get your desired flow with an even rock size. Every time you change any input value, the following iteration cycle happens: 1. Roughness is calculated from design rock size. 2. The requested roughness calculation is copied to input roughness. 3. Channel flow and required rock size are calculated. 4. Design rock size is adjusted. 5. Repeat until error in the design rock size is very small.<\/dd><dt>Basic calculator (no iteration)<\/dt><dd>Enter your desired roughness value. Ignore the design rock size input area.<\/dd><\/dl>"
+                }
+            }
+        },
+        "mhp_vel_ok_short": {
+            "reason": "equal_to_english",
+            "current_value": "OK",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "mhp_vel_high",
+                    "value": "বেগ বেশি - রূপান্তর ক্ষতি, উপলব্ধ শক্তি এবং জলের হাতুড়ির ঝুঁকি পরীক্ষা করুন।",
+                    "english": "Velocity high - check transition losses, available energy, and water hammer."
+                },
+                "next_translated": {
+                    "key": "mhp_hl_ok",
+                    "value": "10% লক্ষ্যমাত্রার মধ্যে ✓",
+                    "english": "within 10% target ✓"
+                }
+            }
+        },
+        "mhp_vel_high_short": {
+            "reason": "equal_to_english",
+            "current_value": "High",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "mhp_vel_high",
+                    "value": "বেগ বেশি - রূপান্তর ক্ষতি, উপলব্ধ শক্তি এবং জলের হাতুড়ির ঝুঁকি পরীক্ষা করুন।",
+                    "english": "Velocity high - check transition losses, available energy, and water hammer."
+                },
+                "next_translated": {
+                    "key": "mhp_hl_ok",
+                    "value": "10% লক্ষ্যমাত্রার মধ্যে ✓",
+                    "english": "within 10% target ✓"
+                }
+            }
+        },
+        "mhp_vel_low_short": {
+            "reason": "equal_to_english",
+            "current_value": "Low",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "mhp_vel_high",
+                    "value": "বেগ বেশি - রূপান্তর ক্ষতি, উপলব্ধ শক্তি এবং জলের হাতুড়ির ঝুঁকি পরীক্ষা করুন।",
+                    "english": "Velocity high - check transition losses, available energy, and water hammer."
+                },
+                "next_translated": {
+                    "key": "mhp_hl_ok",
+                    "value": "10% লক্ষ্যমাত্রার মধ্যে ✓",
+                    "english": "within 10% target ✓"
+                }
+            }
+        },
+        "ip_main_menu": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_main_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_main_desc": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_h_supply": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_elev_supply": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_q_design": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_h_design": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_x": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_reach_table_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_group_reach": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_group_upstream": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_group_downstream": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_group_loss": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_is_lateral": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_count": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_length": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_diameter": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_e": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_km": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_elev_ds": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_elev_ds_missing_warn": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_flow": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_press": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_v": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_hv": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_hf": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_hm": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_hl": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_pressure_warn": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_pressure_warn_short": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_h_far": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_q_supply": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_q_critical": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_q_avg_lateral": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_dp_avg": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_q_avg_field": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_du_estimate": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_worst_case_warn": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_q_ratio": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_no_solution": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_notes_1_term": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_notes_1_def": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_notes_2_term": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_notes_2_def": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_notes_3_term": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_notes_3_def": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_notes_4_term": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_notes_4_def": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_notes_5_term": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_notes_5_def": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "irr_card_pressure_head": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "irr_card_pressure_desc": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "ব্যাসার্ধ",
+                    "english": "radius"
+                },
+                "next_translated": null
             }
         }
     },

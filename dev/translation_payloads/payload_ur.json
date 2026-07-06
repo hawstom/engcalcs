@@ -1,19 +1,23 @@
 {
     "meta": {
         "language": "ur",
-        "expected_key_count": 508,
-        "delta_key_count": 1,
+        "expected_key_count": 501,
+        "delta_key_count": 55,
         "active_prefixes": [
-            "calc"
+            "calc",
+            "ip",
+            "irr"
         ],
-        "requested_prefix": "calc",
+        "requested_prefix": null,
         "notes": "Translate only keys in keys_to_translate; preserve HTML, units, and symbols.",
         "glossary_injection_notes": "Use prompt_context_by_prefix and glossary_terms_by_prefix.preferred_translation when available.",
         "context_notes": "Use key_context.neighbors to keep register consistent with nearby translated strings.",
         "intent_notes": "Use key_intent when present; these entries provide terse disambiguation comments only where translation risk exists."
     },
     "prompt_context_by_prefix": {
-        "calc": "Use these preferred technical term translations when relevant:\n- flow (Q): بہاؤ\n- velocity (v): رفتار\n- slope (S): ڈھلوان"
+        "calc": "Use these preferred technical term translations when relevant:\n- flow (Q): بہاؤ\n- velocity (v): رفتار\n- slope (S): ڈھلوان",
+        "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): بہاؤ\n- velocity (v): رفتار\n- slope (S): ڈھلوان",
+        "irr": "Use these preferred technical term translations when relevant:\n- flow (Q): بہاؤ\n- velocity (v): رفتار\n- slope (S): ڈھلوان"
     },
     "glossary_terms_by_prefix": {
         "calc": [
@@ -38,29 +42,839 @@
                 "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
                 "preferred_translation": "ڈھلوان"
             }
+        ],
+        "ip": [
+            {
+                "term": "flow",
+                "symbol": "Q",
+                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
+                "preferred_translation": "بہاؤ"
+            },
+            {
+                "term": "velocity",
+                "symbol": "v",
+                "context": "Flow velocity (speed of water). Appears in all calculators.",
+                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
+                "preferred_translation": "رفتار"
+            },
+            {
+                "term": "slope",
+                "symbol": "S",
+                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
+                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
+                "preferred_translation": "ڈھلوان"
+            }
+        ],
+        "irr": [
+            {
+                "term": "flow",
+                "symbol": "Q",
+                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
+                "preferred_translation": "بہاؤ"
+            },
+            {
+                "term": "velocity",
+                "symbol": "v",
+                "context": "Flow velocity (speed of water). Appears in all calculators.",
+                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
+                "preferred_translation": "رفتار"
+            },
+            {
+                "term": "slope",
+                "symbol": "S",
+                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
+                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
+                "preferred_translation": "ڈھلوان"
+            }
         ]
     },
     "keys_to_translate": {
-        "calc_defaults": "Default values"
+        "calc_defaults_confirm": "Reset calculator to factory defaults?",
+        "calc_copy_link": "Copy link",
+        "calc_copy_link_done": "Copied!",
+        "ip_main_menu": "Irrigation Pressure",
+        "ip_main_title": "Free Online Irrigation Pressure &amp; Distribution Uniformity Calculator",
+        "ip_main_desc": "Test Branch Pressure and Uniformity Estimate",
+        "ip_h_supply": "Supply pressure",
+        "ip_elev_supply": "Supply elevation, z<sub>supply<\/sub>",
+        "ip_q_design": "Emitter design flow, q<sub>design<\/sub>",
+        "ip_h_design": "Emitter design pressure",
+        "ip_x": "Emitter discharge exponent, x <span title=\"0.5 for standard non-compensating emitters; near 0 for pressure-compensating emitters\" class=\"ec-tip\">?<\/span>",
+        "ip_reach_table_title": "Test path",
+        "ip_group_reach": "Reach",
+        "ip_group_upstream": "Upstream",
+        "ip_group_downstream": "Downstream",
+        "ip_group_loss": "Loss",
+        "ip_is_lateral": "Lat. <span title=\"Checked: this reach is a segment of the test lateral, drawn off by individual emitters. Unchecked: this reach is a main, only passing flow along to laterals not on the test path.\" class=\"ec-tip\">?<\/span>",
+        "ip_count": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach right at the test lateral&rsquo;s own takeoff, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>",
+        "ip_length": "L",
+        "ip_diameter": "D",
+        "ip_e": "e <span title=\"Darcy-Weisbach roughness height\" class=\"ec-tip\">?<\/span>",
+        "ip_km": "K<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>",
+        "ip_elev_ds": "DS Elev. <span title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\" class=\"ec-tip\">?<\/span>",
+        "ip_elev_ds_missing_warn": "Last emitter elevation (last row) was left blank and defaulted to flat &mdash; enter it for an accurate result ⚠",
+        "ip_flow": "Flow",
+        "ip_press": "Press.",
+        "ip_v": "V",
+        "ip_hv": "H<sub>v<\/sub>",
+        "ip_hf": "H<sub>f<\/sub>",
+        "ip_hm": "H<sub>m<\/sub>",
+        "ip_hl": "H<sub>l<\/sub> <span title=\"Total reach loss, H_f + H_m\" class=\"ec-tip\">?<\/span>",
+        "ip_pressure_warn": "Low\/negative pressure &mdash; check for subatmospheric conditions",
+        "ip_pressure_warn_short": "Low ⚠",
+        "ip_h_far": "Last emitter pressure",
+        "ip_q_supply": "Test path supply flow, Q<sub>supply<\/sub> <span title=\"Flow entering the modeled test path only, not the whole zone\/system — see Q_zone in Application Design below for the system-wide total.\" class=\"ec-tip\">?<\/span>",
+        "ip_q_critical": "Last emitter flow, q<sub>last<\/sub>",
+        "ip_q_avg_lateral": "Average emitter flow (test lateral), q<sub>avg<\/sub>",
+        "ip_dp_avg": "Est. &Delta;pressure, avg. vs. test lateral <span title=\"How much higher (or lower) you believe a typical\/average lateral runs compared to this test lateral. The test lateral is deliberately the presumed worst case, so its own average is a biased-low stand-in for a field average &mdash; left at 0, the uniformity check and application-design numbers below use the test lateral&rsquo;s own (likely optimistic) average as-is.\" class=\"ec-tip\">?<\/span>",
+        "ip_q_avg_field": "Est. field-average emitter flow, q<sub>avg,field<\/sub> <span title=\"q_avg_lateral re-evaluated at each lateral row&rsquo;s pressure plus the entered pressure difference above &mdash; an attempt to correct for the test lateral being the presumed worst case, not a representative one. Feeds both the uniformity check and the application-design section below.\" class=\"ec-tip\">?<\/span>",
+        "ip_du_estimate": "Uniformity check, q<sub>last<\/sub>\/q<sub>avg,field<\/sub> <span title=\"Last emitter&rsquo;s computed flow divided by the estimated field-average emitter flow &mdash; same shape as textbook low-quarter Distribution Uniformity (low-group average &divide; population mean), but from a small modeled sample and a user-estimated correction, not a full-field statistical sample. Values at or above 1 are possible and not a bug: it just means the last emitter isn&rsquo;t the low point relative to the estimated field average (e.g. a favorable downhill run, or the &Delta;pressure estimate above is too small).\" class=\"ec-tip\">?<\/span>",
+        "ip_worst_case_warn": "Test emitter pressure is at or above supply pressure &mdash; this path is not likely your worst-case lateral. Check for a more remote or higher-friction lateral, or an elevation profile that better represents the actual worst case.",
+        "ip_q_ratio": "Last emitter flow vs. design flow, q<sub>last<\/sub>\/q<sub>design<\/sub> <span title=\"A separate check, not a uniformity figure: how far the last emitter runs from the manufacturer&rsquo;s rated design flow. Above 1: running above its design point (e.g. from a favorable downhill elevation gain). Below 1: running under design (typical friction-dominated case).\" class=\"ec-tip\">?<\/span>",
+        "ip_no_solution": "No solution: required supply pressure exceeds the entered supply pressure. Increase supply pressure, reduce demand, or use a larger pipe.",
+        "ip_notes_1_term": "Method",
+        "ip_notes_1_def": "Guesses the pressure at the last (most remote) emitter, then marches the Energy Grade Line back toward the supply, reach by reach, adding friction and minor losses along the way. Elevation and velocity head are backed out at each node to report the actual pressure there. The guessed far-end pressure is adjusted (bisection) until the computed required supply pressure matches the entered supply pressure &mdash; the same closed-loop problem addressed by the pipe-flow solver on the Manning Pipe Flow calculator, extended to a branching network.",
+        "ip_notes_2_term": "Main vs. Lateral Reaches",
+        "ip_notes_2_def": "Each row is one reach along the single hydraulically worst path (the test path) from the supply to the last emitter. A Main reach only passes flow to laterals not on the test path, so its draw is a flat multiplication (design flow &times; the reach&rsquo;s total emitter count) &mdash; no local pressure sensitivity. The main is a shared trunk pipe, so the reach right at the test lateral&rsquo;s own takeoff must include not just laterals between its own endpoints but also any laterals still further down the main beyond that takeoff, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow travels through that same reach before splitting off, whether or not they appear anywhere else in this table. A Lateral reach is a segment of the test lateral itself: emitter discharge is computed from the actual local pressure via q = k&middot;H<sup>x<\/sup>, and friction loss is reduced by Christiansen&rsquo;s F(n) factor to account for flow stepping down as each emitter in the reach draws off.",
+        "ip_notes_3_term": "Limitations",
+        "ip_notes_3_def": "Models one fixed inlet pressure (no pump curve), one test path only (not the full field), and a 2-parameter emitter curve (set the exponent near 0 to approximate a pressure-compensating emitter). Two different ratios are reported, deliberately kept separate: q<sub>last<\/sub>\/q<sub>avg,field<\/sub> is a uniformity check, shaped like textbook low-quarter Distribution Uniformity (low-group average &divide; population mean) but computed from the test lateral&rsquo;s own modeled emitters, corrected by an entered &Delta;pressure estimate rather than a full-field statistical sample &mdash; the test lateral is deliberately the presumed worst case, so its raw, uncorrected average would understate the true field average and make uniformity look better than it is; the &Delta;pressure input exists specifically to counter that bias. Values at or above 1 are still possible (e.g. the &Delta;pressure estimate is too small, or a favorable downhill run). q<sub>last<\/sub>\/q<sub>design<\/sub> is a different, non-uniformity check against the manufacturer&rsquo;s rated flow &mdash; useful for spotting an over- or under-pressured system overall, but not a substitute for the uniformity number, since the design\/rated flow has no necessary relationship to the system&rsquo;s actual mean operating pressure.",
+        "ip_notes_4_term": "Reference",
+        "ip_notes_4_def": "Christiansen, J.E. (1942). &ldquo;Irrigation by sprinkling.&rdquo; California Agricultural Experiment Station Bulletin 670. ASAE\/ASABE standards for microirrigation design use the same multi-outlet friction-loss approach.",
+        "ip_notes_5_term": "Application Design",
+        "ip_notes_5_def": "Application rate and system\/zone flow use the estimated field-average emitter flow (q<sub>avg,field<\/sub> &mdash; the test lateral&rsquo;s own average, corrected by the entered &Delta;pressure estimate), not a guessed rate: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub>, fed by the corrected modeled value. Spacing and system-wide lateral\/emitter counts are separate inputs here because the test path only models one worst-case branch, not every lateral in the field.",
+        "irr_card_pressure_head": "Irrigation Pressure &amp; Uniformity",
+        "irr_card_pressure_desc": "Model the pressure and flow profile along a main-lateral-emitter branch to estimate distribution uniformity from the real test-path pressure, not just a catalog emitter flow rate."
     },
     "keys": {
-        "calc_defaults": "Default values"
+        "calc_defaults_confirm": "Reset calculator to factory defaults?",
+        "calc_copy_link": "Copy link",
+        "calc_copy_link_done": "Copied!",
+        "ip_main_menu": "Irrigation Pressure",
+        "ip_main_title": "Free Online Irrigation Pressure &amp; Distribution Uniformity Calculator",
+        "ip_main_desc": "Test Branch Pressure and Uniformity Estimate",
+        "ip_h_supply": "Supply pressure",
+        "ip_elev_supply": "Supply elevation, z<sub>supply<\/sub>",
+        "ip_q_design": "Emitter design flow, q<sub>design<\/sub>",
+        "ip_h_design": "Emitter design pressure",
+        "ip_x": "Emitter discharge exponent, x <span title=\"0.5 for standard non-compensating emitters; near 0 for pressure-compensating emitters\" class=\"ec-tip\">?<\/span>",
+        "ip_reach_table_title": "Test path",
+        "ip_group_reach": "Reach",
+        "ip_group_upstream": "Upstream",
+        "ip_group_downstream": "Downstream",
+        "ip_group_loss": "Loss",
+        "ip_is_lateral": "Lat. <span title=\"Checked: this reach is a segment of the test lateral, drawn off by individual emitters. Unchecked: this reach is a main, only passing flow along to laterals not on the test path.\" class=\"ec-tip\">?<\/span>",
+        "ip_count": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach right at the test lateral&rsquo;s own takeoff, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>",
+        "ip_length": "L",
+        "ip_diameter": "D",
+        "ip_e": "e <span title=\"Darcy-Weisbach roughness height\" class=\"ec-tip\">?<\/span>",
+        "ip_km": "K<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>",
+        "ip_elev_ds": "DS Elev. <span title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\" class=\"ec-tip\">?<\/span>",
+        "ip_elev_ds_missing_warn": "Last emitter elevation (last row) was left blank and defaulted to flat &mdash; enter it for an accurate result ⚠",
+        "ip_flow": "Flow",
+        "ip_press": "Press.",
+        "ip_v": "V",
+        "ip_hv": "H<sub>v<\/sub>",
+        "ip_hf": "H<sub>f<\/sub>",
+        "ip_hm": "H<sub>m<\/sub>",
+        "ip_hl": "H<sub>l<\/sub> <span title=\"Total reach loss, H_f + H_m\" class=\"ec-tip\">?<\/span>",
+        "ip_pressure_warn": "Low\/negative pressure &mdash; check for subatmospheric conditions",
+        "ip_pressure_warn_short": "Low ⚠",
+        "ip_h_far": "Last emitter pressure",
+        "ip_q_supply": "Test path supply flow, Q<sub>supply<\/sub> <span title=\"Flow entering the modeled test path only, not the whole zone\/system — see Q_zone in Application Design below for the system-wide total.\" class=\"ec-tip\">?<\/span>",
+        "ip_q_critical": "Last emitter flow, q<sub>last<\/sub>",
+        "ip_q_avg_lateral": "Average emitter flow (test lateral), q<sub>avg<\/sub>",
+        "ip_dp_avg": "Est. &Delta;pressure, avg. vs. test lateral <span title=\"How much higher (or lower) you believe a typical\/average lateral runs compared to this test lateral. The test lateral is deliberately the presumed worst case, so its own average is a biased-low stand-in for a field average &mdash; left at 0, the uniformity check and application-design numbers below use the test lateral&rsquo;s own (likely optimistic) average as-is.\" class=\"ec-tip\">?<\/span>",
+        "ip_q_avg_field": "Est. field-average emitter flow, q<sub>avg,field<\/sub> <span title=\"q_avg_lateral re-evaluated at each lateral row&rsquo;s pressure plus the entered pressure difference above &mdash; an attempt to correct for the test lateral being the presumed worst case, not a representative one. Feeds both the uniformity check and the application-design section below.\" class=\"ec-tip\">?<\/span>",
+        "ip_du_estimate": "Uniformity check, q<sub>last<\/sub>\/q<sub>avg,field<\/sub> <span title=\"Last emitter&rsquo;s computed flow divided by the estimated field-average emitter flow &mdash; same shape as textbook low-quarter Distribution Uniformity (low-group average &divide; population mean), but from a small modeled sample and a user-estimated correction, not a full-field statistical sample. Values at or above 1 are possible and not a bug: it just means the last emitter isn&rsquo;t the low point relative to the estimated field average (e.g. a favorable downhill run, or the &Delta;pressure estimate above is too small).\" class=\"ec-tip\">?<\/span>",
+        "ip_worst_case_warn": "Test emitter pressure is at or above supply pressure &mdash; this path is not likely your worst-case lateral. Check for a more remote or higher-friction lateral, or an elevation profile that better represents the actual worst case.",
+        "ip_q_ratio": "Last emitter flow vs. design flow, q<sub>last<\/sub>\/q<sub>design<\/sub> <span title=\"A separate check, not a uniformity figure: how far the last emitter runs from the manufacturer&rsquo;s rated design flow. Above 1: running above its design point (e.g. from a favorable downhill elevation gain). Below 1: running under design (typical friction-dominated case).\" class=\"ec-tip\">?<\/span>",
+        "ip_no_solution": "No solution: required supply pressure exceeds the entered supply pressure. Increase supply pressure, reduce demand, or use a larger pipe.",
+        "ip_notes_1_term": "Method",
+        "ip_notes_1_def": "Guesses the pressure at the last (most remote) emitter, then marches the Energy Grade Line back toward the supply, reach by reach, adding friction and minor losses along the way. Elevation and velocity head are backed out at each node to report the actual pressure there. The guessed far-end pressure is adjusted (bisection) until the computed required supply pressure matches the entered supply pressure &mdash; the same closed-loop problem addressed by the pipe-flow solver on the Manning Pipe Flow calculator, extended to a branching network.",
+        "ip_notes_2_term": "Main vs. Lateral Reaches",
+        "ip_notes_2_def": "Each row is one reach along the single hydraulically worst path (the test path) from the supply to the last emitter. A Main reach only passes flow to laterals not on the test path, so its draw is a flat multiplication (design flow &times; the reach&rsquo;s total emitter count) &mdash; no local pressure sensitivity. The main is a shared trunk pipe, so the reach right at the test lateral&rsquo;s own takeoff must include not just laterals between its own endpoints but also any laterals still further down the main beyond that takeoff, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow travels through that same reach before splitting off, whether or not they appear anywhere else in this table. A Lateral reach is a segment of the test lateral itself: emitter discharge is computed from the actual local pressure via q = k&middot;H<sup>x<\/sup>, and friction loss is reduced by Christiansen&rsquo;s F(n) factor to account for flow stepping down as each emitter in the reach draws off.",
+        "ip_notes_3_term": "Limitations",
+        "ip_notes_3_def": "Models one fixed inlet pressure (no pump curve), one test path only (not the full field), and a 2-parameter emitter curve (set the exponent near 0 to approximate a pressure-compensating emitter). Two different ratios are reported, deliberately kept separate: q<sub>last<\/sub>\/q<sub>avg,field<\/sub> is a uniformity check, shaped like textbook low-quarter Distribution Uniformity (low-group average &divide; population mean) but computed from the test lateral&rsquo;s own modeled emitters, corrected by an entered &Delta;pressure estimate rather than a full-field statistical sample &mdash; the test lateral is deliberately the presumed worst case, so its raw, uncorrected average would understate the true field average and make uniformity look better than it is; the &Delta;pressure input exists specifically to counter that bias. Values at or above 1 are still possible (e.g. the &Delta;pressure estimate is too small, or a favorable downhill run). q<sub>last<\/sub>\/q<sub>design<\/sub> is a different, non-uniformity check against the manufacturer&rsquo;s rated flow &mdash; useful for spotting an over- or under-pressured system overall, but not a substitute for the uniformity number, since the design\/rated flow has no necessary relationship to the system&rsquo;s actual mean operating pressure.",
+        "ip_notes_4_term": "Reference",
+        "ip_notes_4_def": "Christiansen, J.E. (1942). &ldquo;Irrigation by sprinkling.&rdquo; California Agricultural Experiment Station Bulletin 670. ASAE\/ASABE standards for microirrigation design use the same multi-outlet friction-loss approach.",
+        "ip_notes_5_term": "Application Design",
+        "ip_notes_5_def": "Application rate and system\/zone flow use the estimated field-average emitter flow (q<sub>avg,field<\/sub> &mdash; the test lateral&rsquo;s own average, corrected by the entered &Delta;pressure estimate), not a guessed rate: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub>, fed by the corrected modeled value. Spacing and system-wide lateral\/emitter counts are separate inputs here because the test path only models one worst-case branch, not every lateral in the field.",
+        "irr_card_pressure_head": "Irrigation Pressure &amp; Uniformity",
+        "irr_card_pressure_desc": "Model the pressure and flow profile along a main-lateral-emitter branch to estimate distribution uniformity from the real test-path pressure, not just a catalog emitter flow rate."
     },
     "key_context": {
-        "calc_defaults": {
+        "calc_defaults_confirm": {
             "reason": "equal_to_english",
-            "current_value": "Default values",
+            "current_value": "Reset calculator to factory defaults?",
             "neighbors": {
                 "previous_translated": {
-                    "key": "calc_set_units",
-                    "value": "اکائیاں مقرر کریں:",
-                    "english": "Set units:"
+                    "key": "calc_defaults",
+                    "value": "پہلے سے مقرر اقدار",
+                    "english": "Default values"
                 },
                 "next_translated": {
                     "key": "points_data_help",
                     "value": "(یا ڈیٹا علاقے سے کاپی\/پیسٹ کریں)",
                     "english": "(or Copy\/Paste using data area)"
                 }
+            }
+        },
+        "calc_copy_link": {
+            "reason": "equal_to_english",
+            "current_value": "Copy link",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "ec_name_hint",
+                    "value": "ان درج کردہ قدریوں کو URL میں محفوظ کریں نشان زدگی، تاریخ سے بازیافت، اور شیئرنگ کے لیے",
+                    "english": "Saves these inputs to the URL for bookmarking, history retrieval, and sharing"
+                },
+                "next_translated": {
+                    "key": "dw_main_menu",
+                    "value": "ڈارسی-وائسباخ پائپ دباؤ نقصان",
+                    "english": "Darcy-Weisbach Pipe Head Loss"
+                }
+            }
+        },
+        "calc_copy_link_done": {
+            "reason": "equal_to_english",
+            "current_value": "Copied!",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "ec_name_hint",
+                    "value": "ان درج کردہ قدریوں کو URL میں محفوظ کریں نشان زدگی، تاریخ سے بازیافت، اور شیئرنگ کے لیے",
+                    "english": "Saves these inputs to the URL for bookmarking, history retrieval, and sharing"
+                },
+                "next_translated": {
+                    "key": "dw_main_menu",
+                    "value": "ڈارسی-وائسباخ پائپ دباؤ نقصان",
+                    "english": "Darcy-Weisbach Pipe Head Loss"
+                }
+            }
+        },
+        "ip_main_menu": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_main_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_main_desc": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_h_supply": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_elev_supply": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_q_design": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_h_design": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_x": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_reach_table_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_group_reach": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_group_upstream": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_group_downstream": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_group_loss": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_is_lateral": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_count": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_length": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_diameter": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_e": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_km": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_elev_ds": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_elev_ds_missing_warn": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_flow": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_press": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_v": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_hv": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_hf": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_hm": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_hl": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_pressure_warn": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_pressure_warn_short": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_h_far": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_q_supply": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_q_critical": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_q_avg_lateral": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_dp_avg": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_q_avg_field": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_du_estimate": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_worst_case_warn": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_q_ratio": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_no_solution": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_notes_1_term": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_notes_1_def": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_notes_2_term": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_notes_2_def": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_notes_3_term": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_notes_3_def": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_notes_4_term": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_notes_4_def": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_notes_5_term": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "ip_notes_5_def": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "irr_card_pressure_head": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
+            }
+        },
+        "irr_card_pressure_desc": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "نصف قطر",
+                    "english": "radius"
+                },
+                "next_translated": null
             }
         }
     },
