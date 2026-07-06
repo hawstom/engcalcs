@@ -177,12 +177,12 @@ $ec_lang['mtc_menu']='Трапецеидальный канал Маннинга
 $ec_lang['mtc_main_title']='Бесплатный онлайн калькулятор трапецеидального канала по Маннингу';
 $ec_lang['mtc_main_desc']='Формула Маннинга равномерного течения в трапецеидальном канале при заданном уклоне и глубине';
 $ec_lang['mtc_bottom_width']='Ширина дна, b';
-$ec_lang['mtc_side_slope_1']='Откос 1 (гориз./верт.)';
-$ec_lang['mtc_side_slope_2']='Откос 2 (гориз./верт.)';
+$ec_lang['mtc_side_slope_1']='Откос 1, z1 (гориз./верт.)';
+$ec_lang['mtc_side_slope_2']='Откос 2, z2 (гориз./верт.)';
 $ec_lang['mtc_channel_slope']='Уклон канала, S';
 $ec_lang['mtc_flow_depth']='Глубина потока, y';
-$ec_lang['mtc_bend_angle']='Угол поворота <a target="_blank" href="riprap-bend-angle.png" title="Нажмите для изображения">?</a> (для подбора каменной наброски)';
-$ec_lang['mtc_sgrock']='Удельный вес камня (2,65)';
+$ec_lang['mtc_bend_angle']='Угол поворота, β <a target="_blank" href="riprap-bend-angle.png" title="Нажмите для изображения">?</a> (для подбора каменной наброски)';
+$ec_lang['mtc_sgrock']='Удельный вес камня, SG (2,65)';
 $ec_lang['mtc_d50_in']='Расчётный размер камня, D50';
 $ec_lang['mtc_n_strickler']='n для расчётного размера камня по Стриклеру';
 $ec_lang['mtc_n_blodgett']='n для расчётного размера камня по Блодгетту';

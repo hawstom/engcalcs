@@ -178,12 +178,12 @@ $ec_lang['mtc_menu']='मैनिंग समलम्बाकार ना�
 $ec_lang['mtc_main_title']='मुफ़्त ऑनलाइन मैनिंग सूत्र समलम्बाकार नाली कैलकुलेटर';
 $ec_lang['mtc_main_desc']='दिए गए ढलान और गहराई पर मैनिंग सूत्र एकसमान समलम्बाकार नाली प्रवाह';
 $ec_lang['mtc_bottom_width']='तल चौड़ाई, b';
-$ec_lang['mtc_side_slope_1']='पार्श्व ढलान 1 (क्षैतिज/ऊर्ध्वाधर)';
-$ec_lang['mtc_side_slope_2']='पार्श्व ढलान 2 (क्षैतिज/ऊर्ध्वाधर)';
+$ec_lang['mtc_side_slope_1']='पार्श्व ढलान 1, z1 (क्षैतिज/ऊर्ध्वाधर)';
+$ec_lang['mtc_side_slope_2']='पार्श्व ढलान 2, z2 (क्षैतिज/ऊर्ध्वाधर)';
 $ec_lang['mtc_channel_slope']='नाली ढलान, S';
 $ec_lang['mtc_flow_depth']='प्रवाह गहराई, y';
-$ec_lang['mtc_bend_angle']='मोड़ कोण <a target="_blank" href="riprap-bend-angle.png" title="चित्र के लिए क्लिक करें">?</a> (रिप्रैप आकार के लिए)';
-$ec_lang['mtc_sgrock']='चट्टान का विशिष्ट गुरुत्व (2.65)';
+$ec_lang['mtc_bend_angle']='मोड़ कोण, β <a target="_blank" href="riprap-bend-angle.png" title="चित्र के लिए क्लिक करें">?</a> (रिप्रैप आकार के लिए)';
+$ec_lang['mtc_sgrock']='चट्टान का विशिष्ट गुरुत्व, SG (2.65)';
 $ec_lang['mtc_d50_in']='डिज़ाइन चट्टान आकार, D50';
 $ec_lang['mtc_n_strickler']='Strickler के अनुसार डिज़ाइन चट्टान आकार के लिए n';
 $ec_lang['mtc_n_blodgett']='Blodgett के अनुसार डिज़ाइन चट्टान आकार के लिए n';

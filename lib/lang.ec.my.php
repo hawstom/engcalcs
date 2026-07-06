@@ -178,12 +178,12 @@ $ec_lang['mtc_menu']='Manning Trapezoidal မြောင်းကြောင�
 $ec_lang['mtc_main_title']='အခမဲ့ အွန်လိုင်း Manning ဖော်မြူလာ Trapezoidal မြောင်းကြောင်း တွက်ချက်မှုကိရိယာ';
 $ec_lang['mtc_main_desc']='သတ်မှတ်အစောက်နှင့် နက်ရှိုင်းမှုတွင် Manning ဖော်မြူလာ တစ်သမတ်တည်း Trapezoidal မြောင်းကြောင်း စီးဆင်းမှု';
 $ec_lang['mtc_bottom_width']='အောက်ပိုင်းအကျယ်, b';
-$ec_lang['mtc_side_slope_1']='ဘေးစောက် ၁ (အလျားဆင့်/ဒေါင်လိုက်)';
-$ec_lang['mtc_side_slope_2']='ဘေးစောက် ၂ (အလျားဆင့်/ဒေါင်လိုက်)';
+$ec_lang['mtc_side_slope_1']='ဘေးစောက် ၁, z1 (အလျားဆင့်/ဒေါင်လိုက်)';
+$ec_lang['mtc_side_slope_2']='ဘေးစောက် ၂, z2 (အလျားဆင့်/ဒေါင်လိုက်)';
 $ec_lang['mtc_channel_slope']='မြောင်းကြောင်းအစောက်, S';
 $ec_lang['mtc_flow_depth']='စီးဆင်းမှုနက်ရှိုင်းမှု, y';
-$ec_lang['mtc_bend_angle']='ကောက်ကြောင်းထောင့် <a target="_blank" href="riprap-bend-angle.png" title="ပုံကြည့်ရန် နှိပ်ပါ">?</a> (riprap အရွယ်အတွက်)';
-$ec_lang['mtc_sgrock']='ကျောက်တုံးအထူးဆွဲငင်အား (2.65)';
+$ec_lang['mtc_bend_angle']='ကောက်ကြောင်းထောင့်, β <a target="_blank" href="riprap-bend-angle.png" title="ပုံကြည့်ရန် နှိပ်ပါ">?</a> (riprap အရွယ်အတွက်)';
+$ec_lang['mtc_sgrock']='ကျောက်တုံးအထူးဆွဲငင်အား, SG (2.65)';
 $ec_lang['mtc_d50_in']='ဒီဇိုင်းကျောက်တုံးအရွယ်, D50';
 $ec_lang['mtc_n_strickler']='Strickler အရ ဒီဇိုင်းကျောက်တုံးအရွယ်အတွက် n';
 $ec_lang['mtc_n_blodgett']='Blodgett အရ ဒီဇိုင်းကျောက်တုံးအရွယ်အတွက် n';

@@ -177,12 +177,12 @@ $ec_lang['mtc_menu']='ম্যানিং ট্র্যাপিজোয়
 $ec_lang['mtc_main_title']='বিনামূল্যে অনলাইন ম্যানিং ফর্মুলা ট্র্যাপিজোয়েডাল চ্যানেল ক্যালকুলেটর';
 $ec_lang['mtc_main_desc']='নির্দিষ্ট ঢাল ও গভীরতায় ম্যানিং ফর্মুলা অভিন্ন ট্র্যাপিজোয়েডাল চ্যানেল প্রবাহ';
 $ec_lang['mtc_bottom_width']='তলার প্রস্থ, b';
-$ec_lang['mtc_side_slope_1']='পার্শ্ব ঢাল ১ (অনুভূমিক/উল্লম্ব)';
-$ec_lang['mtc_side_slope_2']='পার্শ্ব ঢাল ২ (অনুভূমিক/উল্লম্ব)';
+$ec_lang['mtc_side_slope_1']='পার্শ্ব ঢাল ১, z1 (অনুভূমিক/উল্লম্ব)';
+$ec_lang['mtc_side_slope_2']='পার্শ্ব ঢাল ২, z2 (অনুভূমিক/উল্লম্ব)';
 $ec_lang['mtc_channel_slope']='চ্যানেল ঢাল, S';
 $ec_lang['mtc_flow_depth']='প্রবাহ গভীরতা, y';
-$ec_lang['mtc_bend_angle']='বাঁক কোণ <a target="_blank" href="riprap-bend-angle.png" title="চিত্রের জন্য ক্লিক করুন">?</a> (রিপ্র্যাপ আকারের জন্য)';
-$ec_lang['mtc_sgrock']='পাথরের আপেক্ষিক গুরুত্ব (2.65)';
+$ec_lang['mtc_bend_angle']='বাঁক কোণ, β <a target="_blank" href="riprap-bend-angle.png" title="চিত্রের জন্য ক্লিক করুন">?</a> (রিপ্র্যাপ আকারের জন্য)';
+$ec_lang['mtc_sgrock']='পাথরের আপেক্ষিক গুরুত্ব, SG (2.65)';
 $ec_lang['mtc_d50_in']='নকশা পাথর আকার, D50';
 $ec_lang['mtc_n_strickler']='স্ট্রিকলার অনুযায়ী নকশা পাথর আকারের জন্য n';
 $ec_lang['mtc_n_blodgett']='ব্লডগেট অনুযায়ী নকশা পাথর আকারের জন্য n';

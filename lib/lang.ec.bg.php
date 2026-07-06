@@ -178,12 +178,12 @@ $ec_lang['mtc_menu']='Изчисления на Трапецовидни Кан�
 $ec_lang['mtc_main_title']='Безплатен Онлайн Калкулатор за Изчисления на Трапецовидни Канали по Манинг';
 $ec_lang['mtc_main_desc']='Формула на Манинг за Равномерно Движение в Трапецовиден Канал при Зададени Наклон и Воден Стълб';
 $ec_lang['mtc_bottom_width']='Ширина на Дъното';
-$ec_lang['mtc_side_slope_1']='Страничен откос 1 (хориз./верт.)';
-$ec_lang['mtc_side_slope_2']='Страничен откос 2 (хориз./верт.)';
+$ec_lang['mtc_side_slope_1']='Страничен откос 1, z1 (хориз./верт.)';
+$ec_lang['mtc_side_slope_2']='Страничен откос 2, z2 (хориз./верт.)';
 $ec_lang['mtc_channel_slope']='Наклон на канала';
 $ec_lang['mtc_flow_depth']='Воден стълб';
-$ec_lang['mtc_bend_angle']='Bend Angle<a href="riprap-bend-angle.png" title="Click for image">?</a> (for riprap sizing)'; //No need
-$ec_lang['mtc_sgrock']='Stone specific gravity (2.65)'; //No need
+$ec_lang['mtc_bend_angle']='Bend Angle, β<a href="riprap-bend-angle.png" title="Click for image">?</a> (for riprap sizing)'; //No need
+$ec_lang['mtc_sgrock']='Stone specific gravity, SG (2.65)'; //No need
 $ec_lang['mtc_d50_in']='Проектен размер на камъните, D50';
 $ec_lang['mtc_n_strickler']='n за проектния размер на камъните по Strickler';
 $ec_lang['mtc_n_blodgett']='n за проектния размер на камъните по Blodgett';

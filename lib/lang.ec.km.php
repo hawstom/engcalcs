@@ -178,12 +178,12 @@ $ec_lang['mtc_menu']='Manning ប្រឡាយជ្រូងចតុកោ�
 $ec_lang['mtc_main_title']='ម៉ាស៊ីនគណនា Manning ប្រឡាយជ្រូងចតុកោណ ឥតគិតថ្លៃ';
 $ec_lang['mtc_main_desc']='រូបមន្ត Manning ការហូរប្រឡាយជ្រូងចតុកោណឯកសណ្ឋាន ជម្រាល និងជម្រៅដែលបានកំណត់';
 $ec_lang['mtc_bottom_width']='ទទឹងខាងក្រោម, b';
-$ec_lang['mtc_side_slope_1']='ជម្រាលចំហៀង 1 (ផ្ដេក/បញ្ឈរ)';
-$ec_lang['mtc_side_slope_2']='ជម្រាលចំហៀង 2 (ផ្ដេក/បញ្ឈរ)';
+$ec_lang['mtc_side_slope_1']='ជម្រាលចំហៀង 1, z1 (ផ្ដេក/បញ្ឈរ)';
+$ec_lang['mtc_side_slope_2']='ជម្រាលចំហៀង 2, z2 (ផ្ដេក/បញ្ឈរ)';
 $ec_lang['mtc_channel_slope']='ជម្រាលប្រឡាយ, S';
 $ec_lang['mtc_flow_depth']='ជម្រៅហូរ, y';
-$ec_lang['mtc_bend_angle']='មុំបត់ <a target="_blank" href="riprap-bend-angle.png" title="ចុចសម្រាប់រូបភាព">?</a> (សម្រាប់ការកំណត់ទំហំ riprap)';
-$ec_lang['mtc_sgrock']='ទំនាក់ទំនងទម្ងន់ជាក់លាក់ថ្ម (2.65)';
+$ec_lang['mtc_bend_angle']='មុំបត់, β <a target="_blank" href="riprap-bend-angle.png" title="ចុចសម្រាប់រូបភាព">?</a> (សម្រាប់ការកំណត់ទំហំ riprap)';
+$ec_lang['mtc_sgrock']='ទំនាក់ទំនងទម្ងន់ជាក់លាក់ថ្ម, SG (2.65)';
 $ec_lang['mtc_d50_in']='ទំហំថ្មរចនា, D50';
 $ec_lang['mtc_n_strickler']='n សម្រាប់ទំហំថ្មរចនា តាម Strickler';
 $ec_lang['mtc_n_blodgett']='n សម្រាប់ទំហំថ្មរចនា តាម Blodgett';

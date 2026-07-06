@@ -14,6 +14,8 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 ## Translation improvements
 
+- 15|bg/es/pt/tr have pre-existing symbol/translation gaps in Manning Trapezoidal Channel (`mtc_` prefix), found 2026-07-05 while adding `z1`/`z2`/`β`/`SG` symbols suite-wide: `mtc_bottom_width`, `mtc_channel_slope`, `mtc_flow_depth`, `mtc_d50_in` are missing their symbol suffix in these 4 languages (inconsistent with the rest of the file and with other languages), and bg/tr additionally have `mtc_bend_angle`/`mtc_sgrock` left as flat untranslated English marked `//No need` in-file. Worth a small pass to add the missing symbols and decide (with the human) whether the `//No need` strings should actually be translated or if there's a real reason they were left in English.
+
 ## AI Efficiency Scripting (Overhead)
 
 These tasks reduce the AI token cost of routine maintenance by replacing repeated AI judgment with deterministic scripts. Copilot owns execution (all tagged `[CP]`); Claude Code specs any script whose output feeds back into translation quality work.
