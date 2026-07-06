@@ -2,7 +2,7 @@
     "meta": {
         "language": "hi",
         "expected_key_count": 501,
-        "delta_key_count": 13,
+        "delta_key_count": 17,
         "active_prefixes": [
             "calc",
             "ip",
@@ -185,6 +185,9 @@
         "calc_defaults_confirm": "Reset calculator to factory defaults?",
         "calc_copy_link": "Copy link",
         "calc_copy_link_done": "Copied!",
+        "ip_x": "Emitter discharge exponent, x <span title=\"0.5 for standard non-compensating emitters; near 0 for pressure-compensating emitters\" class=\"ec-tip\">?<\/span>",
+        "ip_is_lateral": "Lat. <span title=\"Checked: this reach is a segment of the test lateral, drawn off by individual emitters. Unchecked: this reach is a main, only passing flow along to laterals not on the test path.\" class=\"ec-tip\">?<\/span>",
+        "ip_count": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach right at the test lateral&rsquo;s own takeoff, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>",
         "ip_length": "L",
         "ip_diameter": "D",
         "ip_e": "e <span title=\"Darcy-Weisbach roughness height\" class=\"ec-tip\">?<\/span>",
@@ -193,6 +196,7 @@
         "ip_hf": "H<sub>f<\/sub>",
         "ip_hm": "H<sub>m<\/sub>",
         "ip_hl": "H<sub>l<\/sub> <span title=\"Total reach loss, H_f + H_m\" class=\"ec-tip\">?<\/span>",
+        "ip_du_estimate": "Uniformity check, q<sub>last<\/sub>\/q<sub>avg,field<\/sub> <span title=\"Last emitter&rsquo;s computed flow divided by the estimated field-average emitter flow &mdash; same shape as textbook low-quarter Distribution Uniformity (low-group average &divide; population mean), but from a small modeled sample and a user-estimated correction, not a full-field statistical sample. Values at or above 1 are possible and not a bug: it just means the last emitter isn&rsquo;t the low point relative to the estimated field average (e.g. a favorable downhill run, or the &Delta;pressure estimate above is too small).\" class=\"ec-tip\">?<\/span>",
         "irr_card_pressure_head": "Irrigation Pressure &amp; Uniformity",
         "irr_card_pressure_desc": "Model the pressure and flow profile along a main-lateral-emitter branch to estimate distribution uniformity from the real test-path pressure, not just a catalog emitter flow rate."
     },
@@ -200,6 +204,9 @@
         "calc_defaults_confirm": "Reset calculator to factory defaults?",
         "calc_copy_link": "Copy link",
         "calc_copy_link_done": "Copied!",
+        "ip_x": "Emitter discharge exponent, x <span title=\"0.5 for standard non-compensating emitters; near 0 for pressure-compensating emitters\" class=\"ec-tip\">?<\/span>",
+        "ip_is_lateral": "Lat. <span title=\"Checked: this reach is a segment of the test lateral, drawn off by individual emitters. Unchecked: this reach is a main, only passing flow along to laterals not on the test path.\" class=\"ec-tip\">?<\/span>",
+        "ip_count": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach right at the test lateral&rsquo;s own takeoff, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>",
         "ip_length": "L",
         "ip_diameter": "D",
         "ip_e": "e <span title=\"Darcy-Weisbach roughness height\" class=\"ec-tip\">?<\/span>",
@@ -208,6 +215,7 @@
         "ip_hf": "H<sub>f<\/sub>",
         "ip_hm": "H<sub>m<\/sub>",
         "ip_hl": "H<sub>l<\/sub> <span title=\"Total reach loss, H_f + H_m\" class=\"ec-tip\">?<\/span>",
+        "ip_du_estimate": "Uniformity check, q<sub>last<\/sub>\/q<sub>avg,field<\/sub> <span title=\"Last emitter&rsquo;s computed flow divided by the estimated field-average emitter flow &mdash; same shape as textbook low-quarter Distribution Uniformity (low-group average &divide; population mean), but from a small modeled sample and a user-estimated correction, not a full-field statistical sample. Values at or above 1 are possible and not a bug: it just means the last emitter isn&rsquo;t the low point relative to the estimated field average (e.g. a favorable downhill run, or the &Delta;pressure estimate above is too small).\" class=\"ec-tip\">?<\/span>",
         "irr_card_pressure_head": "Irrigation Pressure &amp; Uniformity",
         "irr_card_pressure_desc": "Model the pressure and flow profile along a main-lateral-emitter branch to estimate distribution uniformity from the real test-path pressure, not just a catalog emitter flow rate."
     },
@@ -260,14 +268,62 @@
                 }
             }
         },
+        "ip_x": {
+            "reason": "blank",
+            "current_value": "",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "ip_h_design",
+                    "value": "एमिटर डिज़ाइन दाब",
+                    "english": "Emitter design pressure"
+                },
+                "next_translated": {
+                    "key": "ip_reach_table_title",
+                    "value": "परीक्षण पथ",
+                    "english": "Test path"
+                }
+            }
+        },
+        "ip_is_lateral": {
+            "reason": "blank",
+            "current_value": "",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "ip_group_loss",
+                    "value": "हानि",
+                    "english": "Loss"
+                },
+                "next_translated": {
+                    "key": "ip_km",
+                    "value": "K<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach's fittings\/valves\/couplers (≥0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>",
+                    "english": "K<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
+                }
+            }
+        },
+        "ip_count": {
+            "reason": "blank",
+            "current_value": "",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "ip_group_loss",
+                    "value": "हानि",
+                    "english": "Loss"
+                },
+                "next_translated": {
+                    "key": "ip_km",
+                    "value": "K<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach's fittings\/valves\/couplers (≥0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>",
+                    "english": "K<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
+                }
+            }
+        },
         "ip_length": {
             "reason": "equal_to_english",
             "current_value": "L",
             "neighbors": {
                 "previous_translated": {
-                    "key": "ip_count",
-                    "value": "एमिटर <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach right at the test lateral's own takeoff, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>",
-                    "english": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach right at the test lateral&rsquo;s own takeoff, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>"
+                    "key": "ip_group_loss",
+                    "value": "हानि",
+                    "english": "Loss"
                 },
                 "next_translated": {
                     "key": "ip_km",
@@ -281,9 +337,9 @@
             "current_value": "D",
             "neighbors": {
                 "previous_translated": {
-                    "key": "ip_count",
-                    "value": "एमिटर <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach right at the test lateral's own takeoff, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>",
-                    "english": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach right at the test lateral&rsquo;s own takeoff, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>"
+                    "key": "ip_group_loss",
+                    "value": "हानि",
+                    "english": "Loss"
                 },
                 "next_translated": {
                     "key": "ip_km",
@@ -297,9 +353,9 @@
             "current_value": "e <span title=\"Darcy-Weisbach roughness height\" class=\"ec-tip\">?<\/span>",
             "neighbors": {
                 "previous_translated": {
-                    "key": "ip_count",
-                    "value": "एमिटर <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach right at the test lateral's own takeoff, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>",
-                    "english": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach right at the test lateral&rsquo;s own takeoff, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>"
+                    "key": "ip_group_loss",
+                    "value": "हानि",
+                    "english": "Loss"
                 },
                 "next_translated": {
                     "key": "ip_km",
@@ -388,6 +444,22 @@
                 }
             }
         },
+        "ip_du_estimate": {
+            "reason": "blank",
+            "current_value": "",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "ip_q_avg_field",
+                    "value": "अनु. क्षेत्र-औसत एमिटर प्रवाह, q<sub>avg,field<\/sub> <span title=\"q_avg_lateral re-evaluated at each lateral row's pressure plus the entered pressure difference above — an attempt to correct for the test lateral being the presumed worst case, not a representative one. Feeds both the uniformity check and the application-design section below.\" class=\"ec-tip\">?<\/span>",
+                    "english": "Est. field-average emitter flow, q<sub>avg,field<\/sub> <span title=\"q_avg_lateral re-evaluated at each lateral row&rsquo;s pressure plus the entered pressure difference above &mdash; an attempt to correct for the test lateral being the presumed worst case, not a representative one. Feeds both the uniformity check and the application-design section below.\" class=\"ec-tip\">?<\/span>"
+                },
+                "next_translated": {
+                    "key": "ip_worst_case_warn",
+                    "value": "परीक्षण एमिटर दाब आपूर्ति दाब पर या उससे ऊपर है — यह पथ आपकी सबसे बुरी स्थिति पार्श्व होने की संभावना नहीं है। एक अधिक दूरस्थ या उच्च-घर्षण पार्श्व, या एक स्तर प्रोफाइल जो वास्तविक सबसे बुरी स्थिति का बेहतर प्रतिनिधित्व करे, की जाँच करें।",
+                    "english": "Test emitter pressure is at or above supply pressure &mdash; this path is not likely your worst-case lateral. Check for a more remote or higher-friction lateral, or an elevation profile that better represents the actual worst case."
+                }
+            }
+        },
         "irr_card_pressure_head": {
             "reason": "missing",
             "current_value": null,
@@ -414,9 +486,13 @@
         }
     },
     "key_intent": {
+        "ip_x": "Discharge exponent: the exponent x in q = k*H^x describing emitter hydraulic behavior. Discharge here is water outflow, never electrical.",
+        "ip_is_lateral": "Main = the mainline or trunk pipe; lateral = the branch line carrying emitters. Test = the path being analyzed, not a default. Use established drip-irrigation terms.",
+        "ip_count": "Lateral = branch line with emitters; main = trunk pipe. The reach right at the takeoff means exactly at that location, not the right-hand side. Branch (verb) means to split off flow.",
         "ip_hv": "Symbol: velocity head. Keep H and the subscript exactly as in English. Head is a height of water column, never anatomical.",
         "ip_hf": "Symbol: friction head loss. Keep H and the subscript exactly as in English.",
         "ip_hm": "Symbol: minor (local) head loss. Keep H and the subscript exactly as in English.",
-        "ip_hl": "Symbol: total reach head loss. Keep H and the subscript exactly as in English."
+        "ip_hl": "Symbol: total reach head loss. Keep H and the subscript exactly as in English.",
+        "ip_du_estimate": "Low-quarter Distribution Uniformity is the irrigation-engineering statistic DU_lq: average of the lowest quarter of measurements divided by the overall average. Use the established irrigation term in the target language; do not invent a phrase."
     }
 }

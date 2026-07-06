@@ -2,7 +2,7 @@
     "meta": {
         "language": "my",
         "expected_key_count": 501,
-        "delta_key_count": 15,
+        "delta_key_count": 35,
         "active_prefixes": [
             "calc",
             "ip",
@@ -17,7 +17,7 @@
     },
     "prompt_context_by_prefix": {
         "calc": "Use these preferred technical term translations when relevant:\n- flow (Q): ရေစီးနှုန်း\n- velocity (v): ရေအလျင်နှုန်း\n- slope (S): လျောစောင်း",
-        "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): ရေစီးနှုန်း\n- velocity (v): ရေအလျင်နှုန်း\n- head loss (h_L): ဖိမြင့်ဆင့်ဆုံးရှုံးမှု\n- emitter: ရေထုတ်ကိရိယာ\n- distribution uniformity (DU): ဖြန့်ဝေမှုညီမျှမှု\n- low-quarter distribution uniformity (DU_lq): [needs translation sprint]\n- application rate (PR): ရေသွင်းနှုန်း\n- lateral: [needs translation sprint]\n- mainline: [needs translation sprint]\n- reach: [needs translation sprint]\n- velocity head (H_v): [needs translation sprint]\n- friction loss (H_f): [needs translation sprint]\n- minor loss (H_m): [needs translation sprint]\n- energy grade line (EGL): [needs translation sprint]\n- upstream: [needs translation sprint]\n- downstream: [needs translation sprint]",
+        "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): ရေစီးနှုန်း\n- velocity (v): ရေအလျင်နှုန်း\n- head loss (h_L): ဖိမြင့်ဆင့်ဆုံးရှုံးမှု\n- emitter: ရေထုတ်ကိရိယာ\n- distribution uniformity (DU): ဖြန့်ဝေမှုညီမျှမှု\n- low-quarter distribution uniformity (DU_lq): [needs translation sprint]\n- application rate (PR): ရေသွင်းနှုန်း\n- lateral: ဘေးပိုက်\n- mainline: ပင်မပိုက်\n- reach: ပိုက်အပိုင်း\n- velocity head (H_v): [needs translation sprint]\n- friction loss (H_f): [needs translation sprint]\n- minor loss (H_m): [needs translation sprint]\n- energy grade line (EGL): စွမ်းအင်မျဉ်း\n- upstream: [needs translation sprint]\n- downstream: [needs translation sprint]",
         "irr": "Use these preferred technical term translations when relevant:\n- flow (Q): ရေစီးနှုန်း\n- velocity (v): ရေအလျင်နှုန်း\n- slope (S): လျောစောင်း",
         "u": "Use these preferred technical term translations when relevant:\n- flow (Q): ရေစီးနှုန်း\n- velocity (v): ရေအလျင်နှုန်း\n- slope (S): လျောစောင်း"
     },
@@ -100,21 +100,21 @@
                 "symbol": "",
                 "context": "Irrigation branch line carrying emitters, fed by the mainline. Pairs with \"mainline\". Appears throughout Irrigation Pressure.",
                 "translation_notes": "Branch pipe of a drip\/sprinkler system — NOT the adjective \"side\/lateral\". Wrong renderings found: sw \"taji\" (crown). fr irrigation standard is \"rampe\". Keep one word per language and never alternate (it file mixed \"laterale\" and \"manichetta\").",
-                "preferred_translation": ""
+                "preferred_translation": "ဘေးပိုက်"
             },
             {
                 "term": "mainline",
                 "symbol": "",
                 "context": "The trunk\/supply pipe feeding the laterals in an irrigation system. Pairs with \"lateral\".",
                 "translation_notes": "Translate \"main\/mainline\" as the trunk pipe, not the adjective \"main\". fr file left \"main\" untranslated (\"Tronçons Main\") — wrong.",
-                "preferred_translation": ""
+                "preferred_translation": "ပင်မပိုက်"
             },
             {
                 "term": "reach",
                 "symbol": "",
                 "context": "A segment of pipe or channel between two nodes\/cross-sections. Table rows in Irrigation Pressure are reaches.",
                 "translation_notes": "Hydraulics noun, NOT \"arrival\/reaching\" (ps \"رسیدل\" wrong), NOT \"agent\" (sw \"mwakala\" wrong), NOT \"stripe\" (km wrong).",
-                "preferred_translation": ""
+                "preferred_translation": "ပိုက်အပိုင်း"
             },
             {
                 "term": "velocity head",
@@ -142,7 +142,7 @@
                 "symbol": "EGL",
                 "context": "The total-head line (elevation + pressure head + velocity head) along a pipe or channel. Appears in Irrigation Pressure Method note.",
                 "translation_notes": "Use the established hydraulics term for the total-head line. NEVER calque word-by-word: es \"Linea de Grado de Energia\", fr \"ligne d'energie grade\", it \"Linea di Grado Energia\", ro \"Linia Gradului Energetic\", bg\/uk \"line of the energy class\", cs \"energy layer\" are all wrong renderings found in shipped files.",
-                "preferred_translation": ""
+                "preferred_translation": "စွမ်းအင်မျဉ်း"
             },
             {
                 "term": "upstream",
@@ -212,14 +212,34 @@
         "calc_defaults_confirm": "Reset calculator to factory defaults?",
         "calc_copy_link": "Copy link",
         "calc_copy_link_done": "Copied!",
+        "ip_main_menu": "Irrigation Pressure",
+        "ip_main_title": "Free Online Irrigation Pressure &amp; Distribution Uniformity Calculator",
+        "ip_main_desc": "Test Branch Pressure and Uniformity Estimate",
+        "ip_x": "Emitter discharge exponent, x <span title=\"0.5 for standard non-compensating emitters; near 0 for pressure-compensating emitters\" class=\"ec-tip\">?<\/span>",
+        "ip_reach_table_title": "Test path",
+        "ip_group_upstream": "Upstream",
+        "ip_group_downstream": "Downstream",
+        "ip_is_lateral": "Lat. <span title=\"Checked: this reach is a segment of the test lateral, drawn off by individual emitters. Unchecked: this reach is a main, only passing flow along to laterals not on the test path.\" class=\"ec-tip\">?<\/span>",
+        "ip_count": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach right at the test lateral&rsquo;s own takeoff, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>",
         "ip_length": "L",
         "ip_diameter": "D",
         "ip_e": "e <span title=\"Darcy-Weisbach roughness height\" class=\"ec-tip\">?<\/span>",
+        "ip_km": "K<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>",
+        "ip_elev_ds": "DS Elev. <span title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\" class=\"ec-tip\">?<\/span>",
         "ip_v": "V",
         "ip_hv": "H<sub>v<\/sub>",
         "ip_hf": "H<sub>f<\/sub>",
         "ip_hm": "H<sub>m<\/sub>",
         "ip_hl": "H<sub>l<\/sub> <span title=\"Total reach loss, H_f + H_m\" class=\"ec-tip\">?<\/span>",
+        "ip_q_supply": "Test path supply flow, Q<sub>supply<\/sub> <span title=\"Flow entering the modeled test path only, not the whole zone\/system — see Q_zone in Application Design below for the system-wide total.\" class=\"ec-tip\">?<\/span>",
+        "ip_dp_avg": "Est. &Delta;pressure, avg. vs. test lateral <span title=\"How much higher (or lower) you believe a typical\/average lateral runs compared to this test lateral. The test lateral is deliberately the presumed worst case, so its own average is a biased-low stand-in for a field average &mdash; left at 0, the uniformity check and application-design numbers below use the test lateral&rsquo;s own (likely optimistic) average as-is.\" class=\"ec-tip\">?<\/span>",
+        "ip_q_avg_field": "Est. field-average emitter flow, q<sub>avg,field<\/sub> <span title=\"q_avg_lateral re-evaluated at each lateral row&rsquo;s pressure plus the entered pressure difference above &mdash; an attempt to correct for the test lateral being the presumed worst case, not a representative one. Feeds both the uniformity check and the application-design section below.\" class=\"ec-tip\">?<\/span>",
+        "ip_du_estimate": "Uniformity check, q<sub>last<\/sub>\/q<sub>avg,field<\/sub> <span title=\"Last emitter&rsquo;s computed flow divided by the estimated field-average emitter flow &mdash; same shape as textbook low-quarter Distribution Uniformity (low-group average &divide; population mean), but from a small modeled sample and a user-estimated correction, not a full-field statistical sample. Values at or above 1 are possible and not a bug: it just means the last emitter isn&rsquo;t the low point relative to the estimated field average (e.g. a favorable downhill run, or the &Delta;pressure estimate above is too small).\" class=\"ec-tip\">?<\/span>",
+        "ip_q_ratio": "Last emitter flow vs. design flow, q<sub>last<\/sub>\/q<sub>design<\/sub> <span title=\"A separate check, not a uniformity figure: how far the last emitter runs from the manufacturer&rsquo;s rated design flow. Above 1: running above its design point (e.g. from a favorable downhill elevation gain). Below 1: running under design (typical friction-dominated case).\" class=\"ec-tip\">?<\/span>",
+        "ip_notes_1_def": "Guesses the pressure at the last (most remote) emitter, then marches the Energy Grade Line back toward the supply, reach by reach, adding friction and minor losses along the way. Elevation and velocity head are backed out at each node to report the actual pressure there. The guessed far-end pressure is adjusted (bisection) until the computed required supply pressure matches the entered supply pressure &mdash; the same closed-loop problem addressed by the pipe-flow solver on the Manning Pipe Flow calculator, extended to a branching network.",
+        "ip_notes_2_def": "Each row is one reach along the single hydraulically worst path (the test path) from the supply to the last emitter. A Main reach only passes flow to laterals not on the test path, so its draw is a flat multiplication (design flow &times; the reach&rsquo;s total emitter count) &mdash; no local pressure sensitivity. The main is a shared trunk pipe, so the reach right at the test lateral&rsquo;s own takeoff must include not just laterals between its own endpoints but also any laterals still further down the main beyond that takeoff, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow travels through that same reach before splitting off, whether or not they appear anywhere else in this table. A Lateral reach is a segment of the test lateral itself: emitter discharge is computed from the actual local pressure via q = k&middot;H<sup>x<\/sup>, and friction loss is reduced by Christiansen&rsquo;s F(n) factor to account for flow stepping down as each emitter in the reach draws off.",
+        "ip_notes_3_def": "Models one fixed inlet pressure (no pump curve), one test path only (not the full field), and a 2-parameter emitter curve (set the exponent near 0 to approximate a pressure-compensating emitter). Two different ratios are reported, deliberately kept separate: q<sub>last<\/sub>\/q<sub>avg,field<\/sub> is a uniformity check, shaped like textbook low-quarter Distribution Uniformity (low-group average &divide; population mean) but computed from the test lateral&rsquo;s own modeled emitters, corrected by an entered &Delta;pressure estimate rather than a full-field statistical sample &mdash; the test lateral is deliberately the presumed worst case, so its raw, uncorrected average would understate the true field average and make uniformity look better than it is; the &Delta;pressure input exists specifically to counter that bias. Values at or above 1 are still possible (e.g. the &Delta;pressure estimate is too small, or a favorable downhill run). q<sub>last<\/sub>\/q<sub>design<\/sub> is a different, non-uniformity check against the manufacturer&rsquo;s rated flow &mdash; useful for spotting an over- or under-pressured system overall, but not a substitute for the uniformity number, since the design\/rated flow has no necessary relationship to the system&rsquo;s actual mean operating pressure.",
+        "ip_notes_5_def": "Application rate and system\/zone flow use the estimated field-average emitter flow (q<sub>avg,field<\/sub> &mdash; the test lateral&rsquo;s own average, corrected by the entered &Delta;pressure estimate), not a guessed rate: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub>, fed by the corrected modeled value. Spacing and system-wide lateral\/emitter counts are separate inputs here because the test path only models one worst-case branch, not every lateral in the field.",
         "irr_card_pressure_head": "Irrigation Pressure &amp; Uniformity",
         "irr_card_pressure_desc": "Model the pressure and flow profile along a main-lateral-emitter branch to estimate distribution uniformity from the real test-path pressure, not just a catalog emitter flow rate."
     },
@@ -229,14 +249,34 @@
         "calc_defaults_confirm": "Reset calculator to factory defaults?",
         "calc_copy_link": "Copy link",
         "calc_copy_link_done": "Copied!",
+        "ip_main_menu": "Irrigation Pressure",
+        "ip_main_title": "Free Online Irrigation Pressure &amp; Distribution Uniformity Calculator",
+        "ip_main_desc": "Test Branch Pressure and Uniformity Estimate",
+        "ip_x": "Emitter discharge exponent, x <span title=\"0.5 for standard non-compensating emitters; near 0 for pressure-compensating emitters\" class=\"ec-tip\">?<\/span>",
+        "ip_reach_table_title": "Test path",
+        "ip_group_upstream": "Upstream",
+        "ip_group_downstream": "Downstream",
+        "ip_is_lateral": "Lat. <span title=\"Checked: this reach is a segment of the test lateral, drawn off by individual emitters. Unchecked: this reach is a main, only passing flow along to laterals not on the test path.\" class=\"ec-tip\">?<\/span>",
+        "ip_count": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach right at the test lateral&rsquo;s own takeoff, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>",
         "ip_length": "L",
         "ip_diameter": "D",
         "ip_e": "e <span title=\"Darcy-Weisbach roughness height\" class=\"ec-tip\">?<\/span>",
+        "ip_km": "K<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>",
+        "ip_elev_ds": "DS Elev. <span title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\" class=\"ec-tip\">?<\/span>",
         "ip_v": "V",
         "ip_hv": "H<sub>v<\/sub>",
         "ip_hf": "H<sub>f<\/sub>",
         "ip_hm": "H<sub>m<\/sub>",
         "ip_hl": "H<sub>l<\/sub> <span title=\"Total reach loss, H_f + H_m\" class=\"ec-tip\">?<\/span>",
+        "ip_q_supply": "Test path supply flow, Q<sub>supply<\/sub> <span title=\"Flow entering the modeled test path only, not the whole zone\/system — see Q_zone in Application Design below for the system-wide total.\" class=\"ec-tip\">?<\/span>",
+        "ip_dp_avg": "Est. &Delta;pressure, avg. vs. test lateral <span title=\"How much higher (or lower) you believe a typical\/average lateral runs compared to this test lateral. The test lateral is deliberately the presumed worst case, so its own average is a biased-low stand-in for a field average &mdash; left at 0, the uniformity check and application-design numbers below use the test lateral&rsquo;s own (likely optimistic) average as-is.\" class=\"ec-tip\">?<\/span>",
+        "ip_q_avg_field": "Est. field-average emitter flow, q<sub>avg,field<\/sub> <span title=\"q_avg_lateral re-evaluated at each lateral row&rsquo;s pressure plus the entered pressure difference above &mdash; an attempt to correct for the test lateral being the presumed worst case, not a representative one. Feeds both the uniformity check and the application-design section below.\" class=\"ec-tip\">?<\/span>",
+        "ip_du_estimate": "Uniformity check, q<sub>last<\/sub>\/q<sub>avg,field<\/sub> <span title=\"Last emitter&rsquo;s computed flow divided by the estimated field-average emitter flow &mdash; same shape as textbook low-quarter Distribution Uniformity (low-group average &divide; population mean), but from a small modeled sample and a user-estimated correction, not a full-field statistical sample. Values at or above 1 are possible and not a bug: it just means the last emitter isn&rsquo;t the low point relative to the estimated field average (e.g. a favorable downhill run, or the &Delta;pressure estimate above is too small).\" class=\"ec-tip\">?<\/span>",
+        "ip_q_ratio": "Last emitter flow vs. design flow, q<sub>last<\/sub>\/q<sub>design<\/sub> <span title=\"A separate check, not a uniformity figure: how far the last emitter runs from the manufacturer&rsquo;s rated design flow. Above 1: running above its design point (e.g. from a favorable downhill elevation gain). Below 1: running under design (typical friction-dominated case).\" class=\"ec-tip\">?<\/span>",
+        "ip_notes_1_def": "Guesses the pressure at the last (most remote) emitter, then marches the Energy Grade Line back toward the supply, reach by reach, adding friction and minor losses along the way. Elevation and velocity head are backed out at each node to report the actual pressure there. The guessed far-end pressure is adjusted (bisection) until the computed required supply pressure matches the entered supply pressure &mdash; the same closed-loop problem addressed by the pipe-flow solver on the Manning Pipe Flow calculator, extended to a branching network.",
+        "ip_notes_2_def": "Each row is one reach along the single hydraulically worst path (the test path) from the supply to the last emitter. A Main reach only passes flow to laterals not on the test path, so its draw is a flat multiplication (design flow &times; the reach&rsquo;s total emitter count) &mdash; no local pressure sensitivity. The main is a shared trunk pipe, so the reach right at the test lateral&rsquo;s own takeoff must include not just laterals between its own endpoints but also any laterals still further down the main beyond that takeoff, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow travels through that same reach before splitting off, whether or not they appear anywhere else in this table. A Lateral reach is a segment of the test lateral itself: emitter discharge is computed from the actual local pressure via q = k&middot;H<sup>x<\/sup>, and friction loss is reduced by Christiansen&rsquo;s F(n) factor to account for flow stepping down as each emitter in the reach draws off.",
+        "ip_notes_3_def": "Models one fixed inlet pressure (no pump curve), one test path only (not the full field), and a 2-parameter emitter curve (set the exponent near 0 to approximate a pressure-compensating emitter). Two different ratios are reported, deliberately kept separate: q<sub>last<\/sub>\/q<sub>avg,field<\/sub> is a uniformity check, shaped like textbook low-quarter Distribution Uniformity (low-group average &divide; population mean) but computed from the test lateral&rsquo;s own modeled emitters, corrected by an entered &Delta;pressure estimate rather than a full-field statistical sample &mdash; the test lateral is deliberately the presumed worst case, so its raw, uncorrected average would understate the true field average and make uniformity look better than it is; the &Delta;pressure input exists specifically to counter that bias. Values at or above 1 are still possible (e.g. the &Delta;pressure estimate is too small, or a favorable downhill run). q<sub>last<\/sub>\/q<sub>design<\/sub> is a different, non-uniformity check against the manufacturer&rsquo;s rated flow &mdash; useful for spotting an over- or under-pressured system overall, but not a substitute for the uniformity number, since the design\/rated flow has no necessary relationship to the system&rsquo;s actual mean operating pressure.",
+        "ip_notes_5_def": "Application rate and system\/zone flow use the estimated field-average emitter flow (q<sub>avg,field<\/sub> &mdash; the test lateral&rsquo;s own average, corrected by the entered &Delta;pressure estimate), not a guessed rate: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub>, fed by the corrected modeled value. Spacing and system-wide lateral\/emitter counts are separate inputs here because the test path only models one worst-case branch, not every lateral in the field.",
         "irr_card_pressure_head": "Irrigation Pressure &amp; Uniformity",
         "irr_card_pressure_desc": "Model the pressure and flow profile along a main-lateral-emitter branch to estimate distribution uniformity from the real test-path pressure, not just a catalog emitter flow rate."
     },
@@ -321,19 +361,163 @@
                 }
             }
         },
+        "ip_main_menu": {
+            "reason": "blank",
+            "current_value": "",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "အချင်းဝက်",
+                    "english": "radius"
+                },
+                "next_translated": {
+                    "key": "ip_h_supply",
+                    "value": "ထည့်သွင်းမှု ဖိအား",
+                    "english": "Supply pressure"
+                }
+            }
+        },
+        "ip_main_title": {
+            "reason": "blank",
+            "current_value": "",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "အချင်းဝက်",
+                    "english": "radius"
+                },
+                "next_translated": {
+                    "key": "ip_h_supply",
+                    "value": "ထည့်သွင်းမှု ဖိအား",
+                    "english": "Supply pressure"
+                }
+            }
+        },
+        "ip_main_desc": {
+            "reason": "blank",
+            "current_value": "",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sketch_radius",
+                    "value": "အချင်းဝက်",
+                    "english": "radius"
+                },
+                "next_translated": {
+                    "key": "ip_h_supply",
+                    "value": "ထည့်သွင်းမှု ဖိအား",
+                    "english": "Supply pressure"
+                }
+            }
+        },
+        "ip_x": {
+            "reason": "blank",
+            "current_value": "",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "ip_h_design",
+                    "value": "ထုတ်ကိရိယာ ဒီဇိုင်း ဖိအား",
+                    "english": "Emitter design pressure"
+                },
+                "next_translated": {
+                    "key": "ip_group_reach",
+                    "value": "ကဏ္ဍ",
+                    "english": "Reach"
+                }
+            }
+        },
+        "ip_reach_table_title": {
+            "reason": "blank",
+            "current_value": "",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "ip_h_design",
+                    "value": "ထုတ်ကိရိယာ ဒီဇိုင်း ဖိအား",
+                    "english": "Emitter design pressure"
+                },
+                "next_translated": {
+                    "key": "ip_group_reach",
+                    "value": "ကဏ္ဍ",
+                    "english": "Reach"
+                }
+            }
+        },
+        "ip_group_upstream": {
+            "reason": "blank",
+            "current_value": "",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "ip_group_reach",
+                    "value": "ကဏ္ဍ",
+                    "english": "Reach"
+                },
+                "next_translated": {
+                    "key": "ip_group_loss",
+                    "value": "ဆုံးရှုံးမှု",
+                    "english": "Loss"
+                }
+            }
+        },
+        "ip_group_downstream": {
+            "reason": "blank",
+            "current_value": "",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "ip_group_reach",
+                    "value": "ကဏ္ဍ",
+                    "english": "Reach"
+                },
+                "next_translated": {
+                    "key": "ip_group_loss",
+                    "value": "ဆုံးရှုံးမှု",
+                    "english": "Loss"
+                }
+            }
+        },
+        "ip_is_lateral": {
+            "reason": "blank",
+            "current_value": "",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "ip_group_loss",
+                    "value": "ဆုံးရှုံးမှု",
+                    "english": "Loss"
+                },
+                "next_translated": {
+                    "key": "ip_elev_ds_missing_warn",
+                    "value": "နောက်ဆုံးထုတ်ကိရိယာ အမြင့် (နောက်ဆုံးတန်း) ကို ချန်ထားခဲ့ပြီး ညီမျှခြင်းအတိုင်း ပုံသေထားခဲ့သည် — တစ်ခြင်းပြီးသောရလဒ်အတွက် ထည့်သွင်းပါ ⚠",
+                    "english": "Last emitter elevation (last row) was left blank and defaulted to flat &mdash; enter it for an accurate result ⚠"
+                }
+            }
+        },
+        "ip_count": {
+            "reason": "blank",
+            "current_value": "",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "ip_group_loss",
+                    "value": "ဆုံးရှုံးမှု",
+                    "english": "Loss"
+                },
+                "next_translated": {
+                    "key": "ip_elev_ds_missing_warn",
+                    "value": "နောက်ဆုံးထုတ်ကိရိယာ အမြင့် (နောက်ဆုံးတန်း) ကို ချန်ထားခဲ့ပြီး ညီမျှခြင်းအတိုင်း ပုံသေထားခဲ့သည် — တစ်ခြင်းပြီးသောရလဒ်အတွက် ထည့်သွင်းပါ ⚠",
+                    "english": "Last emitter elevation (last row) was left blank and defaulted to flat &mdash; enter it for an accurate result ⚠"
+                }
+            }
+        },
         "ip_length": {
             "reason": "equal_to_english",
             "current_value": "L",
             "neighbors": {
                 "previous_translated": {
-                    "key": "ip_count",
-                    "value": "ထုတ်ကိရိယာများ <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach right at the test lateral's own takeoff, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>",
-                    "english": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach right at the test lateral&rsquo;s own takeoff, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>"
+                    "key": "ip_group_loss",
+                    "value": "ဆုံးရှုံးမှု",
+                    "english": "Loss"
                 },
                 "next_translated": {
-                    "key": "ip_km",
-                    "value": "K<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach's fittings\/valves\/couplers (≥0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>",
-                    "english": "K<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
+                    "key": "ip_elev_ds_missing_warn",
+                    "value": "နောက်ဆုံးထုတ်ကိရိယာ အမြင့် (နောက်ဆုံးတန်း) ကို ချန်ထားခဲ့ပြီး ညီမျှခြင်းအတိုင်း ပုံသေထားခဲ့သည် — တစ်ခြင်းပြီးသောရလဒ်အတွက် ထည့်သွင်းပါ ⚠",
+                    "english": "Last emitter elevation (last row) was left blank and defaulted to flat &mdash; enter it for an accurate result ⚠"
                 }
             }
         },
@@ -342,30 +526,62 @@
             "current_value": "D",
             "neighbors": {
                 "previous_translated": {
-                    "key": "ip_count",
-                    "value": "ထုတ်ကိရိယာများ <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach right at the test lateral's own takeoff, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>",
-                    "english": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach right at the test lateral&rsquo;s own takeoff, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>"
+                    "key": "ip_group_loss",
+                    "value": "ဆုံးရှုံးမှု",
+                    "english": "Loss"
                 },
                 "next_translated": {
-                    "key": "ip_km",
-                    "value": "K<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach's fittings\/valves\/couplers (≥0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>",
-                    "english": "K<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
+                    "key": "ip_elev_ds_missing_warn",
+                    "value": "နောက်ဆုံးထုတ်ကိရိယာ အမြင့် (နောက်ဆုံးတန်း) ကို ချန်ထားခဲ့ပြီး ညီမျှခြင်းအတိုင်း ပုံသေထားခဲ့သည် — တစ်ခြင်းပြီးသောရလဒ်အတွက် ထည့်သွင်းပါ ⚠",
+                    "english": "Last emitter elevation (last row) was left blank and defaulted to flat &mdash; enter it for an accurate result ⚠"
                 }
             }
         },
         "ip_e": {
-            "reason": "equal_to_english",
-            "current_value": "e <span title=\"Darcy-Weisbach roughness height\" class=\"ec-tip\">?<\/span>",
+            "reason": "blank",
+            "current_value": "",
             "neighbors": {
                 "previous_translated": {
-                    "key": "ip_count",
-                    "value": "ထုတ်ကိရိယာများ <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach right at the test lateral's own takeoff, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>",
-                    "english": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach right at the test lateral&rsquo;s own takeoff, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>"
+                    "key": "ip_group_loss",
+                    "value": "ဆုံးရှုံးမှု",
+                    "english": "Loss"
                 },
                 "next_translated": {
-                    "key": "ip_km",
-                    "value": "K<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach's fittings\/valves\/couplers (≥0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>",
-                    "english": "K<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
+                    "key": "ip_elev_ds_missing_warn",
+                    "value": "နောက်ဆုံးထုတ်ကိရိယာ အမြင့် (နောက်ဆုံးတန်း) ကို ချန်ထားခဲ့ပြီး ညီမျှခြင်းအတိုင်း ပုံသေထားခဲ့သည် — တစ်ခြင်းပြီးသောရလဒ်အတွက် ထည့်သွင်းပါ ⚠",
+                    "english": "Last emitter elevation (last row) was left blank and defaulted to flat &mdash; enter it for an accurate result ⚠"
+                }
+            }
+        },
+        "ip_km": {
+            "reason": "blank",
+            "current_value": "",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "ip_group_loss",
+                    "value": "ဆုံးရှုံးမှု",
+                    "english": "Loss"
+                },
+                "next_translated": {
+                    "key": "ip_elev_ds_missing_warn",
+                    "value": "နောက်ဆုံးထုတ်ကိရိယာ အမြင့် (နောက်ဆုံးတန်း) ကို ချန်ထားခဲ့ပြီး ညီမျှခြင်းအတိုင်း ပုံသေထားခဲ့သည် — တစ်ခြင်းပြီးသောရလဒ်အတွက် ထည့်သွင်းပါ ⚠",
+                    "english": "Last emitter elevation (last row) was left blank and defaulted to flat &mdash; enter it for an accurate result ⚠"
+                }
+            }
+        },
+        "ip_elev_ds": {
+            "reason": "blank",
+            "current_value": "",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "ip_group_loss",
+                    "value": "ဆုံးရှုံးမှု",
+                    "english": "Loss"
+                },
+                "next_translated": {
+                    "key": "ip_elev_ds_missing_warn",
+                    "value": "နောက်ဆုံးထုတ်ကိရိယာ အမြင့် (နောက်ဆုံးတန်း) ကို ချန်ထားခဲ့ပြီး ညီမျှခြင်းအတိုင်း ပုံသေထားခဲ့သည် — တစ်ခြင်းပြီးသောရလဒ်အတွက် ထည့်သွင်းပါ ⚠",
+                    "english": "Last emitter elevation (last row) was left blank and defaulted to flat &mdash; enter it for an accurate result ⚠"
                 }
             }
         },
@@ -434,8 +650,8 @@
             }
         },
         "ip_hl": {
-            "reason": "equal_to_english",
-            "current_value": "H<sub>l<\/sub> <span title=\"Total reach loss, H_f + H_m\" class=\"ec-tip\">?<\/span>",
+            "reason": "blank",
+            "current_value": "",
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_press",
@@ -449,14 +665,154 @@
                 }
             }
         },
+        "ip_q_supply": {
+            "reason": "blank",
+            "current_value": "",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "ip_h_far",
+                    "value": "နောက်ဆုံးထုတ်ကိရိယာ ဖိအား",
+                    "english": "Last emitter pressure"
+                },
+                "next_translated": {
+                    "key": "ip_q_critical",
+                    "value": "နောက်ဆုံးထုတ်ကိရိယာ ရေစီးနှုန်း, q<sub>last<\/sub>",
+                    "english": "Last emitter flow, q<sub>last<\/sub>"
+                }
+            }
+        },
+        "ip_dp_avg": {
+            "reason": "blank",
+            "current_value": "",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "ip_q_avg_lateral",
+                    "value": "ပျမ်းမျှထုတ်ကိရိယာ ရေစီးနှုန်း (စမ်းသပ်နည်းလမ်း), q<sub>avg<\/sub>",
+                    "english": "Average emitter flow (test lateral), q<sub>avg<\/sub>"
+                },
+                "next_translated": {
+                    "key": "ip_worst_case_warn",
+                    "value": "စမ်းသပ်ထုတ်ကိရိယာ ဖိအား သည် ထည့်သွင်းမှု ဖိအားအတိုင်းအတာ သို့မဟုတ် အထက်တွင် ရှိသည် — ဤခြားလမ်းသည် သင်၏ အဆိုးဖြစ်နိုင်သောနည်းလမ်းမဟုတ်ပါ။ ပိုမိုဝေးလံသော သို့မဟုတ် မြင့်မားသောပွတ်တိုက်မှု နည်းလမ်းများအတွက် သို့မဟုတ် အမြင့်အလျှော့ အစီအစဉ်များအတွက် စစ်ဆေးပါ။",
+                    "english": "Test emitter pressure is at or above supply pressure &mdash; this path is not likely your worst-case lateral. Check for a more remote or higher-friction lateral, or an elevation profile that better represents the actual worst case."
+                }
+            }
+        },
+        "ip_q_avg_field": {
+            "reason": "blank",
+            "current_value": "",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "ip_q_avg_lateral",
+                    "value": "ပျမ်းမျှထုတ်ကိရိယာ ရေစီးနှုန်း (စမ်းသပ်နည်းလမ်း), q<sub>avg<\/sub>",
+                    "english": "Average emitter flow (test lateral), q<sub>avg<\/sub>"
+                },
+                "next_translated": {
+                    "key": "ip_worst_case_warn",
+                    "value": "စမ်းသပ်ထုတ်ကိရိယာ ဖိအား သည် ထည့်သွင်းမှု ဖိအားအတိုင်းအတာ သို့မဟုတ် အထက်တွင် ရှိသည် — ဤခြားလမ်းသည် သင်၏ အဆိုးဖြစ်နိုင်သောနည်းလမ်းမဟုတ်ပါ။ ပိုမိုဝေးလံသော သို့မဟုတ် မြင့်မားသောပွတ်တိုက်မှု နည်းလမ်းများအတွက် သို့မဟုတ် အမြင့်အလျှော့ အစီအစဉ်များအတွက် စစ်ဆေးပါ။",
+                    "english": "Test emitter pressure is at or above supply pressure &mdash; this path is not likely your worst-case lateral. Check for a more remote or higher-friction lateral, or an elevation profile that better represents the actual worst case."
+                }
+            }
+        },
+        "ip_du_estimate": {
+            "reason": "blank",
+            "current_value": "",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "ip_q_avg_lateral",
+                    "value": "ပျမ်းမျှထုတ်ကိရိယာ ရေစီးနှုန်း (စမ်းသပ်နည်းလမ်း), q<sub>avg<\/sub>",
+                    "english": "Average emitter flow (test lateral), q<sub>avg<\/sub>"
+                },
+                "next_translated": {
+                    "key": "ip_worst_case_warn",
+                    "value": "စမ်းသပ်ထုတ်ကိရိယာ ဖိအား သည် ထည့်သွင်းမှု ဖိအားအတိုင်းအတာ သို့မဟုတ် အထက်တွင် ရှိသည် — ဤခြားလမ်းသည် သင်၏ အဆိုးဖြစ်နိုင်သောနည်းလမ်းမဟုတ်ပါ။ ပိုမိုဝေးလံသော သို့မဟုတ် မြင့်မားသောပွတ်တိုက်မှု နည်းလမ်းများအတွက် သို့မဟုတ် အမြင့်အလျှော့ အစီအစဉ်များအတွက် စစ်ဆေးပါ။",
+                    "english": "Test emitter pressure is at or above supply pressure &mdash; this path is not likely your worst-case lateral. Check for a more remote or higher-friction lateral, or an elevation profile that better represents the actual worst case."
+                }
+            }
+        },
+        "ip_q_ratio": {
+            "reason": "blank",
+            "current_value": "",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "ip_worst_case_warn",
+                    "value": "စမ်းသပ်ထုတ်ကိရိယာ ဖိအား သည် ထည့်သွင်းမှု ဖိအားအတိုင်းအတာ သို့မဟုတ် အထက်တွင် ရှိသည် — ဤခြားလမ်းသည် သင်၏ အဆိုးဖြစ်နိုင်သောနည်းလမ်းမဟုတ်ပါ။ ပိုမိုဝေးလံသော သို့မဟုတ် မြင့်မားသောပွတ်တိုက်မှု နည်းလမ်းများအတွက် သို့မဟုတ် အမြင့်အလျှော့ အစီအစဉ်များအတွက် စစ်ဆေးပါ။",
+                    "english": "Test emitter pressure is at or above supply pressure &mdash; this path is not likely your worst-case lateral. Check for a more remote or higher-friction lateral, or an elevation profile that better represents the actual worst case."
+                },
+                "next_translated": {
+                    "key": "ip_no_solution",
+                    "value": "အဖြေမရှိပါ: လိုအပ်သောထည့်သွင်းမှု ဖိအား သည် ထည့်သွင်းခဲ့သော ထည့်သွင်းမှု ဖိအားထက် ကျော်လွန်သည်။ ထည့်သွင်းမှု ဖိအားကို တိုးမြှင့်ပါ၊ တောင်းဆိုချက်ကို လျှော့ချပါ သို့မဟုတ် ပိုကြီးသောပိုက်အသုံးပြုပါ။",
+                    "english": "No solution: required supply pressure exceeds the entered supply pressure. Increase supply pressure, reduce demand, or use a larger pipe."
+                }
+            }
+        },
+        "ip_notes_1_def": {
+            "reason": "blank",
+            "current_value": "",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "ip_notes_1_term",
+                    "value": "နည်းလမ်း",
+                    "english": "Method"
+                },
+                "next_translated": {
+                    "key": "ip_notes_2_term",
+                    "value": "ထိုင်ဒေါင်းမြုတ်အတိုင်း ကဏ္ဍများ vs. နည်းလမ်းများ",
+                    "english": "Main vs. Lateral Reaches"
+                }
+            }
+        },
+        "ip_notes_2_def": {
+            "reason": "blank",
+            "current_value": "",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "ip_notes_2_term",
+                    "value": "ထိုင်ဒေါင်းမြုတ်အတိုင်း ကဏ္ဍများ vs. နည်းလမ်းများ",
+                    "english": "Main vs. Lateral Reaches"
+                },
+                "next_translated": {
+                    "key": "ip_notes_3_term",
+                    "value": "အကန့်အသတ်များ",
+                    "english": "Limitations"
+                }
+            }
+        },
+        "ip_notes_3_def": {
+            "reason": "blank",
+            "current_value": "",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "ip_notes_3_term",
+                    "value": "အကန့်အသတ်များ",
+                    "english": "Limitations"
+                },
+                "next_translated": {
+                    "key": "ip_notes_4_term",
+                    "value": "ကိုးကားချက်",
+                    "english": "Reference"
+                }
+            }
+        },
+        "ip_notes_5_def": {
+            "reason": "blank",
+            "current_value": "",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "ip_notes_5_term",
+                    "value": "အသုံးချပ်ဒီဇိုင်း",
+                    "english": "Application Design"
+                },
+                "next_translated": null
+            }
+        },
         "irr_card_pressure_head": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "ip_notes_5_def",
-                    "value": "အသုံးချပ်အချိုးနှင့် စနစ်\/အဆင့်ရေစီးနှုန်းသည် အကျဉ်းချုပ်ကွင်းတည်ဆံ့မှုထုတ်ကိရိယာရေစီးနှုန်းသုံးယူထည့်သွင်းမှု (q<sub>avg,field<\/sub> — စမ်းသပ်နည်းလမ်း၏ကိုယ်တိုင်ကိုယ်တစ်ခြားဖွဲ့စည်းခြင်းမှု, အကျဉ်းချုပ်Δဖိအားအဆင့သည့်သုံးယူထည့်သွင်းမှုအလျောက်စုံလယ်မှုပြီးမ), ခန့်မှန်းထားသောအချိုးလုံခြုံရေးမဟုတ်ပါ: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub>, စုံလယ်မှုအုံးအလုံးခြင်းမူလတန်ဖိုးသုံးယူ။",
-                    "english": "Application rate and system\/zone flow use the estimated field-average emitter flow (q<sub>avg,field<\/sub> &mdash; the test lateral&rsquo;s own average, corrected by the entered &Delta;pressure estimate), not a guessed rate: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub>, fed by the corrected modeled value. Spacing and system-wide lateral\/emitter counts are separate inputs here because the test path only models one worst-case branch, not every lateral in the field."
+                    "key": "ip_notes_5_term",
+                    "value": "အသုံးချပ်ဒီဇိုင်း",
+                    "english": "Application Design"
                 },
                 "next_translated": null
             }
@@ -466,18 +822,33 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "ip_notes_5_def",
-                    "value": "အသုံးချပ်အချိုးနှင့် စနစ်\/အဆင့်ရေစီးနှုန်းသည် အကျဉ်းချုပ်ကွင်းတည်ဆံ့မှုထုတ်ကိရိယာရေစီးနှုန်းသုံးယူထည့်သွင်းမှု (q<sub>avg,field<\/sub> — စမ်းသပ်နည်းလမ်း၏ကိုယ်တိုင်ကိုယ်တစ်ခြားဖွဲ့စည်းခြင်းမှု, အကျဉ်းချုပ်Δဖိအားအဆင့သည့်သုံးယူထည့်သွင်းမှုအလျောက်စုံလယ်မှုပြီးမ), ခန့်မှန်းထားသောအချိုးလုံခြုံရေးမဟုတ်ပါ: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub>, စုံလယ်မှုအုံးအလုံးခြင်းမူလတန်ဖိုးသုံးယူ။",
-                    "english": "Application rate and system\/zone flow use the estimated field-average emitter flow (q<sub>avg,field<\/sub> &mdash; the test lateral&rsquo;s own average, corrected by the entered &Delta;pressure estimate), not a guessed rate: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub>, fed by the corrected modeled value. Spacing and system-wide lateral\/emitter counts are separate inputs here because the test path only models one worst-case branch, not every lateral in the field."
+                    "key": "ip_notes_5_term",
+                    "value": "အသုံးချပ်ဒီဇိုင်း",
+                    "english": "Application Design"
                 },
                 "next_translated": null
             }
         }
     },
     "key_intent": {
+        "ip_main_menu": "Pressure in a pressurized irrigation system (drip or sprinkler pipe network).",
+        "ip_main_title": "Pressure in a pressurized drip\/sprinkler irrigation network. Uniformity means evenness of water application among emitters, an irrigation-engineering statistic.",
+        "ip_main_desc": "Pressure in a branch of study and estimate of distribution uniformity.",
+        "ip_x": "Discharge exponent: the exponent x in q = k*H^x describing emitter hydraulic behavior. Discharge here is water outflow, never electrical.",
+        "ip_group_upstream": "Direction along the water path: upstream = toward the supply. Hydraulics term, not a software term (never upgrade).",
+        "ip_group_downstream": "Direction along the water path: downstream = toward the last emitter. Hydraulics term, not a software term (never downgrade).",
+        "ip_is_lateral": "Main = the mainline or trunk pipe; lateral = the branch line carrying emitters. Test = the path being analyzed, not a default. Use established drip-irrigation terms.",
+        "ip_count": "Lateral = branch line with emitters; main = trunk pipe. The reach right at the takeoff means exactly at that location, not the right-hand side. Branch (verb) means to split off flow.",
+        "ip_elev_ds": "DS abbreviates downstream. Choose an abbreviation that is unambiguously downstream and cannot be confused with upstream.",
         "ip_hv": "Symbol: velocity head. Keep H and the subscript exactly as in English. Head is a height of water column, never anatomical.",
         "ip_hf": "Symbol: friction head loss. Keep H and the subscript exactly as in English.",
         "ip_hm": "Symbol: minor (local) head loss. Keep H and the subscript exactly as in English.",
-        "ip_hl": "Symbol: total reach head loss. Keep H and the subscript exactly as in English."
+        "ip_hl": "Symbol: total reach head loss. Keep H and the subscript exactly as in English.",
+        "ip_q_supply": "Keep the subscript supply exactly as in English; subscripted names are symbols.",
+        "ip_q_avg_field": "Keep the subscripts avg,field exactly as in English; subscripted names are symbols.",
+        "ip_du_estimate": "Low-quarter Distribution Uniformity is the irrigation-engineering statistic DU_lq: average of the lowest quarter of measurements divided by the overall average. Use the established irrigation term in the target language; do not invent a phrase.",
+        "ip_notes_1_def": "Technical hydraulics prose. Key senses: a reach is a pipe segment between two nodes, not an arrival or extent. To draw or draw off means to withdraw water. The reach right at the takeoff means the reach located exactly at that point, not the right-hand side. Energy Grade Line is the standard hydraulics term for the total-head line; use the established term in the target language, never a word-by-word calque. Textbook (adjective) means as defined in standard textbooks, not a manual. A favorable downhill run means the pipe descends, gaining elevation head. Bisection is the numerical root-finding method. Keep symbols q_last, q_avg,field, q_design, k, H, x, F(n) exactly as written.",
+        "ip_notes_2_def": "Technical hydraulics prose. Key senses: a reach is a pipe segment between two nodes, not an arrival or extent. To draw or draw off means to withdraw water. The reach right at the takeoff means the reach located exactly at that point, not the right-hand side. Energy Grade Line is the standard hydraulics term for the total-head line; use the established term in the target language, never a word-by-word calque. Textbook (adjective) means as defined in standard textbooks, not a manual. A favorable downhill run means the pipe descends, gaining elevation head. Bisection is the numerical root-finding method. Keep symbols q_last, q_avg,field, q_design, k, H, x, F(n) exactly as written.",
+        "ip_notes_3_def": "Technical hydraulics prose. Key senses: a reach is a pipe segment between two nodes, not an arrival or extent. To draw or draw off means to withdraw water. The reach right at the takeoff means the reach located exactly at that point, not the right-hand side. Energy Grade Line is the standard hydraulics term for the total-head line; use the established term in the target language, never a word-by-word calque. Textbook (adjective) means as defined in standard textbooks, not a manual. A favorable downhill run means the pipe descends, gaining elevation head. Bisection is the numerical root-finding method. Keep symbols q_last, q_avg,field, q_design, k, H, x, F(n) exactly as written."
     }
 }
