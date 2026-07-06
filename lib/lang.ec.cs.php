@@ -444,7 +444,7 @@ $ec_lang['rc_SD_high'] ='Varování: SD > 1,47 — nad platným rozsahem Robinso
 $ec_lang['rc_layer']='Tloušťka kamenné vrstvy (2 × D<sub>50</sub>)';
 $ec_lang['rc_crest_radius']='Poloměr oblouku na koruně (40 × D<sub>50</sub>)';
 $ec_lang['rc_crest_length']='Délka oblouku na koruně';
-$ec_lang['rc_apron_length']='Délka vývarové desky na výtoku (15 × D<sub>50</sub>) <span title="Nezbytné pro konstrukční stabilitu kamene skluzu. „Minimální dolní voda vzniklá odporem výtokového úseku a dolního koryta postačuje k zajištění stability záhozu ve výtokovém úseku." (Robinson)" style="cursor:help;color:#06c;font-size:0.9em">?</span>';
+$ec_lang['rc_apron_length']='Délka vývarové desky na výtoku (15 × D<sub>50</sub>) <span title="Nezbytné pro konstrukční stabilitu kamene skluzu." (Robinson)" style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['rc_n_chute']='Manningova drsnost skluzu, n';
 $ec_lang['rc_Vm']='Rychlost proudění kamennou vrstvou, V<sub>m</sub> <span title="Část qt protékající póry kamenného záhozu. Zbytek qs teče po povrchu. Výchozí np = 0,45 pro ostrohranný drcený kámen." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['rc_qm']='Jednotkový průtok kamennou vrstvou, q<sub>m</sub>';

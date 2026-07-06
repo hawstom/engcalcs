@@ -430,8 +430,9 @@ function prefixToTermNames(): array
         'cs' => ['flow', 'conveyance efficiency', 'seepage'],
         'mhp' => ['flow', 'penstock', 'gross head', 'net head', 'plant efficiency', 'head loss', 'run-of-river', 'headworks', 'junction loss'],
         'pd' => ['flow', 'penstock', 'gross head', 'net head', 'head loss', 'friction factor'],
-        'rc' => ['flow', 'velocity', 'riprap', 'slope', 'rock chute', 'chute', 'unit discharge', 'median rock size', 'gradation', 'porosity', 'specific gravity', 'ponding'],
-        'rrc' => ['flow', 'velocity', 'riprap', 'slope', 'rock chute', 'chute', 'unit discharge', 'median rock size', 'gradation', 'porosity', 'specific gravity', 'ponding'],
+        'rc' => ['flow', 'velocity', 'riprap', 'slope', 'rock chute', 'chute', 'unit discharge', 'median rock size', 'gradation', 'porosity', 'specific gravity', 'ponding', 'outlet apron', 'weir head', 'upstream', 'downstream', 'reach'],
+        'rrc' => ['flow', 'velocity', 'riprap', 'slope', 'rock chute', 'chute', 'unit discharge', 'median rock size', 'gradation', 'porosity', 'specific gravity', 'ponding', 'outlet apron', 'weir head', 'upstream', 'downstream', 'reach'],
+        'ip' => ['flow', 'velocity', 'head loss', 'emitter', 'distribution uniformity', 'low-quarter distribution uniformity', 'application rate', 'lateral', 'mainline', 'reach', 'velocity head', 'friction loss', 'minor loss', 'energy grade line', 'upstream', 'downstream'],
     ];
 }
 

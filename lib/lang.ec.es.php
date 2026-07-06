@@ -497,7 +497,7 @@ $ec_lang['ip_length']='L';
 $ec_lang['ip_diameter']='D';
 $ec_lang['ip_e']='e <span title="Altura de rugosidad de Darcy-Weisbach" class="ec-tip">?</span>';
 $ec_lang['ip_km']='K<sub>m</sub> <span title="Coeficiente genérico de pérdida menor para los accesorios/válvulas/acoples de este tramo (≥0,5 mínimo sugerido)" class="ec-tip">?</span>';
-$ec_lang['ip_elev_ds']='Elev. AG. <span title="Elevación aguas abajo del tramo. Opcional en filas interiores (por defecto plano / igual que el nodo anterior si se deja en blanco). Requerido en la última fila: ese valor es la elevación del último emisor, que directamente establece la presión de suministro requerida." class="ec-tip">?</span>';
+$ec_lang['ip_elev_ds']='Elev. abajo <span title="Elevación aguas abajo del tramo. Opcional en filas interiores (por defecto plano / igual que el nodo anterior si se deja en blanco). Requerido en la última fila: ese valor es la elevación del último emisor, que directamente establece la presión de suministro requerida." class="ec-tip">?</span>';
 $ec_lang['ip_elev_ds_missing_warn']='Elevación del último emisor (última fila) se dejó en blanco y se asumió como plana — ingrese su valor para un resultado preciso ⚠';
 $ec_lang['ip_flow']='Caudal';
 $ec_lang['ip_press']='Pres.';

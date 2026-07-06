@@ -433,7 +433,7 @@ $ec_lang['rc_qt']='Toplam birim deşarj, q<sub>t</sub> <span title="Düşü giri
 $ec_lang['rc_np']='Parça taşı gözenekliliği, n<sub>p</sub>';
 $ec_lang['rc_sg']='Kaya özgül ağırlığı, sg <span title="Tipik kırma granit veya bazalt ≈ 2,65. Robinson geçerli aralığı: 2,54–2,82." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['rc_SD']='Granülometri SD = D<sub>84.1</sub>/D<sub>50</sub> <span title="Granülometri standart sapması. Tekdüze kaya ≈ 1,25. Robinson geçerli aralığı: 1,15–1,47." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
-$ec_lang['rc_yn']='Giriş kanalında normal derinlik, y<sub>n</sub> <span title="Göllenme (Hp > yn) olumludur — mansap erozyonunu azaltır. (USDA)" style="cursor:help;color:#06c;font-size:0.9em">?</span>';
+$ec_lang['rc_yn']='Giriş kanalında normal derinlik, y<sub>n</sub> <span title="Göllenme (Hp > yn) olumludur — memba erozyonunu azaltır. (USDA)" style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['rc_D50']='Gerekli ortanca kaya boyutu, D<sub>50</sub> <span title="Denklem 1 (S0 < 0.10) veya Denklem 2 (0,10–0,40). Geçerli: D50 15–278 mm, S0 0,02–0,40. Aralık dışı: ekstrapolasyon." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['rc_eq_used']='Uygulanan denklem';
 $ec_lang['rc_sg_check']='Özgül ağırlık kontrolü';
@@ -453,7 +453,7 @@ $ec_lang['rc_Vm']='Taş mantosu içindeki hız, V<sub>m</sub> <span title="Kaya 
 $ec_lang['rc_qm']='Manto içinden birim debi, q<sub>m</sub>';
 $ec_lang['rc_qs']='Yüzey birim debisi, q<sub>s</sub> (q<sub>t</sub> − q<sub>m</sub>)';
 $ec_lang['rc_d']='Parça taşı yüzeyi üzerindeki akış derinliği, d';
-$ec_lang['rc_Hp']='Giriş savak yükü, H<sub>p</sub> <span title="Göllenme (Hp > yn) olumludur — mansap erozyonunu azaltır. (USDA)" style="cursor:help;color:#06c;font-size:0.9em">?</span>';
+$ec_lang['rc_Hp']='Giriş savak yükü, H<sub>p</sub> <span title="Göllenme (Hp > yn) olumludur — memba erozyonunu azaltır. (USDA)" style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['rc_ponding_check']='Giriş göllenmesi kontrolü';
 $ec_lang['rc_pond_ok']  ='Hp > yn — memba göllenmesi ✓';
 $ec_lang['rc_pond_warn']='⚠ Hp ≤ yn — göllenme yok — girişi erozyon açısından kontrol edin';
@@ -472,7 +472,7 @@ $ec_lang['rc_notes_5_def']='Denklemler 15 mm ile 278 mm arasındaki D<sub>50</
 $ec_lang['rc_notes_6_term']='Çıkış Önlük Kotu';
 $ec_lang['rc_notes_6_def']='Çıkış kesimindeki parça taşının üst yüzey kotu, mansap kanal taban kotunda veya altında olmalıdır. Daha yüksekse çıkıştaki kaya instabil olacaktır.';
 $ec_lang['rc_notes_7_term']='Giriş Göllenmesi Kontrolü';
-$ec_lang['rc_notes_7_def']='Giriş kanalındaki normal derinlik, q<sub>t</sub>\'yi iletmek için gerekli savak yükü (H<sub>p</sub>)\'ndan az olduğunda, giriş önlüğü mansabında kısıtlı akış veya göllenme oluşur. Bu genellikle kabul edilebilirdir — göllenme hızı düşürür ve mansap erozyonunu önler. Kontrol için: verilen q<sub>t</sub> ve eşik genişliği için bir savak hesap makinesiyle H<sub>p</sub>\'yi bulun ve giriş kanalı normal derinliğiyle karşılaştırın. H<sub>p</sub> normal derinliği aşarsa göllenme oluşacaktır.';
+$ec_lang['rc_notes_7_def']='Giriş kanalındaki normal derinlik, q<sub>t</sub>\'yi iletmek için gerekli savak yükü (H<sub>p</sub>)\'ndan az olduğunda, giriş önlüğü membasında kısıtlı akış veya göllenme oluşur. Bu genellikle kabul edilebilirdir — göllenme hızı düşürür ve memba erozyonunu önler. Kontrol için: verilen q<sub>t</sub> ve eşik genişliği için bir savak hesap makinesiyle H<sub>p</sub>\'yi bulun ve giriş kanalı normal derinliğiyle karşılaştırın. H<sub>p</sub> normal derinliği aşarsa göllenme oluşacaktır.';
 $ec_lang['rc_notes_4_term']='Kaynak';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). "<a target="_blank" href="https://www.fs.usda.gov/biology/nsaec/fishxing/fplibrary/Robinson_1998_Design_of_Rock_Chutes.pdf">Design of rock chutes</a>." <em>Transactions of the ASAE</em>, 41(3), 621–626. USDA ARS aynı yönteme dayalı bir <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">Excel tablosu</a> da yayınlamaktadır.';
 // Sketch labels

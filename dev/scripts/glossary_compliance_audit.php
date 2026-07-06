@@ -34,6 +34,12 @@ const TERM_KEYS = [
         'irr_card_seepage_head', 'irr_card_seepage_desc',
         'cs_main_title', 'cs_main_desc', 'cs_Ec', 'cs_Ec_target', 'cs_notes_1_def',
     ],
+    'rock chute' => ['rc_main_menu', 'rc_main_title', 'rc_main_desc'],
+    'riprap' => ['rc_np', 'rc_d'],
+    'emitter' => ['ip_q_design', 'ip_h_design', 'ip_h_far'],
+    'distribution uniformity' => ['ip_main_title'],
+    'ponding' => ['rc_ponding_check', 'rc_notes_7_term'],
+    'outlet apron' => ['rc_apron_length', 'rc_sketch_outlet_apron'],
 ];
 
 main($argv);

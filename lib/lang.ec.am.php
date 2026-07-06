@@ -69,7 +69,7 @@ $ec_lang['calc_set_units']='አሃዶችን አዘጋጅ:';
 $ec_lang['calc_defaults']='ነባር ዋጋዎች';
 $ec_lang['calc_defaults_confirm']='Reset calculator to factory defaults?';
 $ec_lang['points_data_help']='(ወይም የውሂብ ቦታ ተጠቅሞ ቅዳ/ለጥፍ)';
-$ec_lang['points_data_title']='የነጥቦች ውሂብ<br />(በኮማ ወይም 탭 የተለዩ)';
+$ec_lang['points_data_title']='የነጥቦች ውሂብ<br />(በኮማ ወይም ታብ የተለዩ)';
 $ec_lang['points_data_copy']='ቅዳ';
 $ec_lang['points_data_paste']='ለጥፍ';
 $ec_lang['calc_inputs']='ግቤቶች';
@@ -443,7 +443,7 @@ $ec_lang['rc_SD_ok']   ='SD ትክክለኛ ወሰን ውስጥ (1.15–1.47) �
 $ec_lang['rc_SD_low']  ='ማስጠንቀቂያ: SD < 1.15 — ከ Robinson ወሰን በታች';
 $ec_lang['rc_SD_high'] ='ማስጠንቀቂያ: SD > 1.47 — ከ Robinson ወሰን በላይ';
 $ec_lang['rc_layer']='የድንጋይ ሽፋን ውፍረት (2 × D<sub>50</sub>)';
-$ec_lang['rc_crest_radius']='የላይኛው ጫፍ 곡선 ራዲየስ (40 × D<sub>50</sub>)';
+$ec_lang['rc_crest_radius']='የላይኛው ጫፍ ኩርባ ራዲየስ (40 × D<sub>50</sub>)';
 $ec_lang['rc_crest_length']='የላይኛው ጫፍ ቀስት ርዝማኔ';
 $ec_lang['rc_apron_length']='የማውጫ ሰሌዳ ርዝማኔ (15 × D<sub>50</sub>) <span title="ለቱቦ ድንጋይ አወቃቀራዊ ድጋፍ የሚያስፈልግ። "ከማውጫ ደረስ እና ከዳር ቦይ ተቃውሞ የሚከሰተው ዝቅተኛ ጭራ ውሃ በማውጫ ደረስ ውስጥ ሪፕራፕ መረጋጋትን ለማረጋገጥ በቂ ነው።" (Robinson)" style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['rc_n_chute']='በቱቦ ውስጥ Manning ድርቅ, n';
@@ -488,7 +488,7 @@ $ec_lang['ip_q_design']='ኤሚተር ዲዛይን ፍሰት, q<sub>design</sub>
 $ec_lang['ip_h_design']='ኤሚተር ዲዛይን ግፊት';
 $ec_lang['ip_x']='ኤሚተር ፍሳሽ አስተውውቀት, x <span title="ለመደበኛ የማይካካሹ ኤሚተሮች 0.5; ለግፊት-ካካሺ ኤሚተሮች 0 ጋር ቅርብ" class="ec-tip">?</span>';
 $ec_lang['ip_reach_table_title']='የሙከራ መንገድ';
-$ec_lang['ip_group_reach']='Reach';
+$ec_lang['ip_group_reach']='ክፍል';
 $ec_lang['ip_group_upstream']='ወደ ላይ ሃይል';
 $ec_lang['ip_group_downstream']='ወደ ታች ሃይል';
 $ec_lang['ip_group_loss']='ኪሳራ';
@@ -520,7 +520,7 @@ $ec_lang['ip_worst_case_warn']='ሙከራ ኤሚተር ግፊት ከ ወይም �
 $ec_lang['ip_q_ratio']='የሚቋጠር ኤሚተር ፍሰት vs. ዲዛይን ፍሰት, q<sub>last</sub>/q<sub>design</sub> <span title="ለየት ይሂድ, ወጥነት ስሌት ሳይደለም: ምን ያህል ወደ ታች ኤሚተር ከ ዋናው ዲዛይን ፍሰት ሮጫ. ከ 1 ከላይ: ከ ዲዛይን ነጥብ ከ ላይ ሮጫ (ለምሳሌ, ከ አንድ ወደ ታች ከፍታ ማግኖ). ከ 1 ከ ታች: ዲዛይን ከ ዝቅተኛ ሮጫ (ግምታዊ ግፊት-አሳቢ ሁኔታ)." class="ec-tip">?</span>';
 $ec_lang['ip_no_solution']='ውጤት የለም: የሚከለከል አቅርቦት ግፊት ከ ግቤት አቅርቦት ግፊት አልፎ ይበልጣል. አቅርቦት ግፊት ሰፊ, ፍሰት ይቀንሱ, ወይም ትላቅ ቧንቧ ይጠቀሙ.';
 $ec_lang['ip_notes_1_term']='ዘዴ';
-$ec_lang['ip_notes_1_def']='ግምታዊ ግፊት ወደ ታች (የሚቋጠር) ኤሚተር, ከዚያ ምርመራ ኢኖርጂ ግራድ መስመር ወደ ምንጩ, reach by reach, ግፊት ከ ትንንሽ ኪሳራ ጨምር. ከፍታ እና ፍጥነት ጭንቅ ህቦት ተመለሱ እያንዳንዱ ድንጋይ ወደ ግጥም ግፊት አሁን. ግምታዊ ወደ ታች-ጀርባ ግፊት ምርመራ ቅናሽ (bisection) እስከ ሞዴል ምርመራ አቅርቦት ግፊት ራስ ግቤት አቅርቦት ግፊት ተስተካክል &mdash; ሙሉ-ループ ወደ ታች ውሃ-ጂ-ፊት ሰር ቅናሽ (bisection) በ Manning pipe, ወደ ወገድ ኔትወርክ ሰፊ.';
+$ec_lang['ip_notes_1_def']='ግምታዊ ግፊት ወደ ታች (የሚቋጠር) ኤሚተር, ከዚያ ምርመራ ኢኖርጂ ግራድ መስመር ወደ ምንጩ, reach by reach, ግፊት ከ ትንንሽ ኪሳራ ጨምር. ከፍታ እና ፍጥነት ጭንቅ ህቦት ተመለሱ እያንዳንዱ ድንጋይ ወደ ግጥም ግፊት አሁን. ግምታዊ ወደ ታች-ጀርባ ግፊት ምርመራ ቅናሽ (bisection) እስከ ሞዴል ምርመራ አቅርቦት ግፊት ራስ ግቤት አቅርቦት ግፊት ተስተካክል &mdash; ዝግ ሉፕ ወደ ታች ውሃ-ጂ-ፊት ሰር ቅናሽ (bisection) በ Manning pipe, ወደ ወገድ ኔትወርክ ሰፊ.';
 $ec_lang['ip_notes_2_term']='ዋና vs. ላተራል Reaches';
 $ec_lang['ip_notes_2_def']='እያንዳንዱ ረድፍ አንድ reach ወደ ታች ብቸኛ ሃይድሮሊክ ዕሙልት መንገድ (ሙከራ መንገድ) ከ አቅርቦት ወደ ወደ ታች ኤሚተር. ዋና reach ለ ሌላ ላተራሎች ብቻ ፍሰት ጀርባ, ፍሰት ሰፊ-ብዜት (ዲዛይን ፍሰት × ሳቢ ቁጥር) &mdash; ምንም ግፊት-ጥገኛ. ዋናው ክፍት, ሙከራ ላተራል&rsquo;ሰ ራስ ስታር ጀርባ ላተራሎች ታክሎ ወይም ስታር ሙሉ (ለምሳሌ, ተቃራኒ-ጎን ላተራል) &mdash; የ ፍሰት ይህ reach ሙሉ ለ ተሰላ, ምንም ወይም ሌላ ቦታ ይህ ሠንጠረዥ ውስጥ ይታያል. ላተራል reach ክፍል ሙከራ ላተራል ራስ: ኤሚተር ፍሳሽ ሊሞከር ገጽ ትክክለኛ ግፊት via q = k·H<sup>x</sup>, ሃይል ኪሳራ ተቀንስ ብ Christiansen&rsquo;ሰ F(n) ምክንያት ፍሰት ተወርወር ወደ ታች ምክንያት እያንዳንዱ ኤሚተር ይህ reach ውስጥ ስለ.';
 $ec_lang['ip_notes_3_term']='ገደብ';

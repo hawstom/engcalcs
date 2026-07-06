@@ -445,7 +445,7 @@ $ec_lang['rc_SD_high'] ='انتباہ: SD > 1.47 — Robinson حد سے زیاد
 $ec_lang['rc_layer']='چٹان کی تہہ کی موٹائی (2 × D<sub>50</sub>)';
 $ec_lang['rc_crest_radius']='اوپری کرسٹ وکر کا نصف قطر (40 × D<sub>50</sub>)';
 $ec_lang['rc_crest_length']='اوپری کرسٹ وکر آرک کی لمبائی';
-$ec_lang['rc_apron_length']='آؤٹ لیٹ ایپرن لمبائی (15 × D<sub>50</sub>) <span title="چوٹ کی چٹانوں کی ساختی مدد کے لیے ضروری۔ «آؤٹ لیٹ ریچ اور نیچے کی جانب چینل کی مزاحمت سے پیدا ہونے والا کم سے کم ٹیل واٹر آؤٹ لیٹ ریچ میں ریپ‌ریپ کی استحکام یقینی بنانے کے لیے کافی ہے۔» (Robinson)" style="cursor:help;color:#06c;font-size:0.9em">?</span>';
+$ec_lang['rc_apron_length']='آؤٹ لیٹ ایپرن لمبائی (15 × D<sub>50</sub>) <span title="چوٹ کی چٹانوں کی ساختی مدد کے لیے ضروری۔" style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['rc_n_chute']='چوٹ میں Manning کی کھردرائی، n';
 $ec_lang['rc_Vm']='چٹان مینٹل سے گزرنے کی رفتار، V<sub>m</sub> <span title="qt کا وہ حصہ جو چٹان کے سوراخوں سے گزرتا ہے۔ باقی qs سطح پر بہتا ہے۔ ڈیفالٹ np = 0.45 زاویہ دار کٹی ہوئی چٹان کے لیے۔" style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['rc_qm']='مینٹل سے یونٹ بہاؤ، q<sub>m</sub>';

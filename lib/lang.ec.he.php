@@ -445,7 +445,7 @@ $ec_lang['rc_SD_high'] ='אזהרה: SD > 1.47 — מעל טווח Robinson';
 $ec_lang['rc_layer']='עובי שכבת הסלע (2 × D<sub>50</sub>)';
 $ec_lang['rc_crest_radius']='רדיוס עקמת הכתר העליון (40 × D<sub>50</sub>)';
 $ec_lang['rc_crest_length']='אורך קשת עקמת הכתר העליון';
-$ec_lang['rc_apron_length']='אורך מצוע יציאת המים (15 × D<sub>50</sub>) <span title="נדרש לתמיכה מבנית בסלעי המגלשה. «הגובה המינימלי של המים הנגדיים הנוצר כתוצאה מהתעלה היוצאת ותנגודת הערוץ המורד מספיק להבטחת יציבות הריפרפ במקטע המוצא.» (Robinson)" style="cursor:help;color:#06c;font-size:0.9em">?</span>';
+$ec_lang['rc_apron_length']='אורך מצוע יציאת המים (15 × D<sub>50</sub>) <span title="נדרש לתמיכה מבנית בסלעי המגלשה." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['rc_n_chute']='מקדם גסות Manning במגלשה, n';
 $ec_lang['rc_Vm']='מהירות דרך מעטפת הסלע, V<sub>m</sub> <span title="חלק מ-qt הזורם דרך נקבוביות הסלע. השאר qs זורם על פני השטח. ברירת מחדל np = 0.45 לסלע כתוש זוויתי." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['rc_qm']='ספיקה יחידתית דרך המעטפת, q<sub>m</sub>';

@@ -355,13 +355,13 @@ $ec_lang['irr_quickref_html']='<h3>Брзи Водич</h3><dl><dt>Одводн�
 // Drip / Sprinkler Application Rate
 $ec_lang['ip_se']='Растојање емитера, S<sub>e</sub>';
 $ec_lang['ip_sl']='Растојање латерале, S<sub>l</sub>';
-$ec_lang['ip_n_e']='Emiteri po laterali, n<sub>e</sub>';
-$ec_lang['ip_n_l']='Laterale po zoni, n<sub>l</sub>';
-$ec_lang['ip_d']='Ciljna dubina navodnjavanja, d';
-$ec_lang['ip_a_e']='Površina po emiteru, A<sub>e</sub>';
+$ec_lang['ip_n_e']='Емитери по латерали, n<sub>e</sub>';
+$ec_lang['ip_n_l']='Латерале по зони, n<sub>l</sub>';
+$ec_lang['ip_d']='Циљна дубина наводњавања, d';
+$ec_lang['ip_a_e']='Површина по емитеру, A<sub>e</sub>';
 $ec_lang['ip_pr']='Норма наводњавања, PR';
-$ec_lang['ip_q_lat']='Protok po laterali, Q<sub>lat</sub>';
-$ec_lang['ip_q_sys']='Protok zone, Q<sub>zone</sub>';
+$ec_lang['ip_q_lat']='Проток по латерали, Q<sub>lat</sub>';
+$ec_lang['ip_q_sys']='Проток зоне, Q<sub>zone</sub>';
 $ec_lang['ip_t_run']='Време наводњавања (сати)';
 // Canal Seepage / Conveyance Efficiency. Prefix cs_.
 $ec_lang['cs_main_menu']='Губитак воде у каналу (Просипање)';
@@ -443,7 +443,7 @@ $ec_lang['rc_SD_high'] ='Упозорење: SD > 1,47 — изнад опсег
 $ec_lang['rc_layer']='Дебљина слоја поплочавања (2 × D<sub>50</sub>)';
 $ec_lang['rc_crest_radius']='Радијус криве гребена (40 × D<sub>50</sub>)';
 $ec_lang['rc_crest_length']='Дужина лука криве гребена';
-$ec_lang['rc_apron_length']='Дужина излазне подлоге (15 × D<sub>50</sub>) <span title="Потребна за конструктивну подршку камена жлеба. «Минималне задњеводне дубине које настају услед отпора излазног дела и низводног канала довољне су за обезбеђивање стабилности поплочавања у излазном делу.» (Robinson)" style="cursor:help;color:#06c;font-size:0.9em">?</span>';
+$ec_lang['rc_apron_length']='Дужина излазне подлоге (15 × D<sub>50</sub>) <span title="Потребна за конструктивну подршку камена жлеба." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['rc_n_chute']='Манингов коефицијент храпавости у жлебу, n';
 $ec_lang['rc_Vm']='Брзина кроз каменост мантију, V<sub>m</sub> <span title="Део q_t који тече кроз поре камена. Остатак qs тече по површини. Подразумевана вредност np = 0,45 за угласти дробљени камен." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['rc_qm']='Јединични проток кроз мантију, q<sub>m</sub>';

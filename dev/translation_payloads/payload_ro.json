@@ -2,7 +2,7 @@
     "meta": {
         "language": "ro",
         "expected_key_count": 501,
-        "delta_key_count": 59,
+        "delta_key_count": 15,
         "active_prefixes": [
             "calc",
             "ip",
@@ -19,7 +19,7 @@
     },
     "prompt_context_by_prefix": {
         "calc": "Use these preferred technical term translations when relevant:\n- flow (Q): debit\n- velocity (v): viteză\n- slope (S): pantă",
-        "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): debit\n- velocity (v): viteză\n- slope (S): pantă",
+        "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): debit\n- velocity (v): viteză\n- head loss (h_L): pierdere de presiune\n- emitter: emițător\n- distribution uniformity (DU): uniformitatea distribuției\n- low-quarter distribution uniformity (DU_lq): [needs translation sprint]\n- application rate (PR): rata de aplicare\n- lateral: conductă laterală\n- mainline: conductă principală\n- reach: tronson\n- velocity head (H_v): înălțime cinetică\n- friction loss (H_f): pierdere prin frecare\n- minor loss (H_m): pierdere locală\n- energy grade line (EGL): linia energetică\n- upstream: amonte\n- downstream: aval",
         "irr": "Use these preferred technical term translations when relevant:\n- flow (Q): debit\n- velocity (v): viteză\n- slope (S): pantă",
         "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): debit\n- penstock: conductă sub presiune\n- gross head (H_gross): cădere brută\n- net head (H_net): cădere netă\n- plant efficiency (η): eficiența instalației\n- head loss (h_L): pierdere de presiune\n- run-of-river: centrală hidroelectrică la cursul apei\n- headworks: lucrări de captare\n- junction loss (H_m): pierderi locale",
         "mi": "Use these preferred technical term translations when relevant:\n- flow (Q): debit\n- velocity (v): viteză\n- hydraulic radius (R_h): raza hidraulică\n- wetted perimeter (P_w): perimetru udat\n- Manning roughness (n): coeficientul de rugozitate Manning\n- slope (S): pantă",
@@ -65,11 +65,102 @@
                 "preferred_translation": "viteză"
             },
             {
-                "term": "slope",
-                "symbol": "S",
-                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
-                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
-                "preferred_translation": "pantă"
+                "term": "head loss",
+                "symbol": "h_L",
+                "context": "Energy loss expressed as a height of water column. Appears in Darcy-Weisbach, Hazen-Williams, Manning pipe, and Penstock calculators. Distinct from 'pressure drop' — use the hydraulic engineering term.",
+                "translation_notes": "'Head' in the hydraulic sense (energy per unit weight) does not translate literally in many languages — use the established civil\/hydraulic engineering phrase. Pre-2026 sr\/hr human translations used 'gubitak pritiska' (= pressure loss), which is technically the same concept expressed in pressure terms rather than head terms. The current 'губитак напора \/ gubitak tlačne visine' (= loss of hydraulic head) is more precise in a hydraulic engineering context and is preferred.",
+                "preferred_translation": "pierdere de presiune"
+            },
+            {
+                "term": "emitter",
+                "symbol": "",
+                "context": "A drip irrigation emitter (dripper\/micro-sprinkler) that delivers water at a controlled low flow rate directly to the soil or plant root zone. Appears in Drip\/Sprinkler calculator.",
+                "translation_notes": "Use the field term most familiar to irrigation practitioners in the target language. Arabic: 'قطارة' (dripper) is the field term, preferred over the academic 'مُصدِر'. Spanish: 'gotero' is field-common in Latin America alongside the technical 'emisor'. Ukrainian: 'крапельниця' is the field term used by irrigation workers.",
+                "preferred_translation": "emițător"
+            },
+            {
+                "term": "distribution uniformity",
+                "symbol": "DU",
+                "context": "Ratio of minimum to average emitter flow rate in a drip or sprinkler system. DU = q_min \/ q_avg. Appears in Drip\/Sprinkler calculator.",
+                "translation_notes": "Use the irrigation engineering standard term. 'Uniformity' refers to how evenly water is distributed across the field, not physical evenness of the system. When the source says 'low-quarter DU', see the separate 'low-quarter distribution uniformity' entry. Hebrew: אחידות — never the nonword הוודות (found in shipped he file).",
+                "preferred_translation": "uniformitatea distribuției"
+            },
+            {
+                "term": "low-quarter distribution uniformity",
+                "symbol": "DU_lq",
+                "context": "Irrigation statistic: average of the lowest quarter of measured emitter flows divided by the overall average. Referenced in Irrigation Pressure notes as \"textbook low-quarter Distribution Uniformity\".",
+                "translation_notes": "Use the established irrigation-engineering phrase; do not invent one. \"Textbook\" is an adjective meaning \"as defined in standard textbooks\" — fr rendered it \"manuel\" (manual check), wrong. he: uniformity = אחידות, never the nonword הוודות.",
+                "preferred_translation": ""
+            },
+            {
+                "term": "application rate",
+                "symbol": "PR",
+                "context": "Depth of water applied per unit time by a drip or sprinkler system. PR = q \/ A_e. Appears in Drip\/Sprinkler calculator.",
+                "translation_notes": "In irrigation, 'application rate' or 'precipitation rate' (for sprinklers) or 'irrigation rate'. Use the field irrigation term. Do not use a water-quality or chemical-application connotation.",
+                "preferred_translation": "rata de aplicare"
+            },
+            {
+                "term": "lateral",
+                "symbol": "",
+                "context": "Irrigation branch line carrying emitters, fed by the mainline. Pairs with \"mainline\". Appears throughout Irrigation Pressure.",
+                "translation_notes": "Branch pipe of a drip\/sprinkler system — NOT the adjective \"side\/lateral\". Wrong renderings found: sw \"taji\" (crown). fr irrigation standard is \"rampe\". Keep one word per language and never alternate (it file mixed \"laterale\" and \"manichetta\").",
+                "preferred_translation": "conductă laterală"
+            },
+            {
+                "term": "mainline",
+                "symbol": "",
+                "context": "The trunk\/supply pipe feeding the laterals in an irrigation system. Pairs with \"lateral\".",
+                "translation_notes": "Translate \"main\/mainline\" as the trunk pipe, not the adjective \"main\". fr file left \"main\" untranslated (\"Tronçons Main\") — wrong.",
+                "preferred_translation": "conductă principală"
+            },
+            {
+                "term": "reach",
+                "symbol": "",
+                "context": "A segment of pipe or channel between two nodes\/cross-sections. Table rows in Irrigation Pressure are reaches.",
+                "translation_notes": "Hydraulics noun, NOT \"arrival\/reaching\" (ps \"رسیدل\" wrong), NOT \"agent\" (sw \"mwakala\" wrong), NOT \"stripe\" (km wrong).",
+                "preferred_translation": "tronson"
+            },
+            {
+                "term": "velocity head",
+                "symbol": "H_v",
+                "context": "Kinetic energy per unit weight, V²\/2g — a height of water column.",
+                "translation_notes": "\"Head\" is a height of water column, never anatomical (cs \"rychlostní hlava\" wrong — use \"rychlostní výška\").",
+                "preferred_translation": "înălțime cinetică"
+            },
+            {
+                "term": "friction loss",
+                "symbol": "H_f",
+                "context": "Head loss along the pipe due to wall friction (Darcy-Weisbach). Irrigation Pressure table column.",
+                "translation_notes": "",
+                "preferred_translation": "pierdere prin frecare"
+            },
+            {
+                "term": "minor loss",
+                "symbol": "H_m",
+                "context": "Local head loss at fittings\/valves\/couplers (K_m coefficient). Irrigation Pressure table column.",
+                "translation_notes": "\"Minor\/local\" loss at fittings — not \"smaller\" loss.",
+                "preferred_translation": "pierdere locală"
+            },
+            {
+                "term": "energy grade line",
+                "symbol": "EGL",
+                "context": "The total-head line (elevation + pressure head + velocity head) along a pipe or channel. Appears in Irrigation Pressure Method note.",
+                "translation_notes": "Use the established hydraulics term for the total-head line. NEVER calque word-by-word: es \"Linea de Grado de Energia\", fr \"ligne d'energie grade\", it \"Linea di Grado Energia\", ro \"Linia Gradului Energetic\", bg\/uk \"line of the energy class\", cs \"energy layer\" are all wrong renderings found in shipped files.",
+                "preferred_translation": "linia energetică"
+            },
+            {
+                "term": "upstream",
+                "symbol": "",
+                "context": "Direction toward the water source\/supply.",
+                "translation_notes": "Hydraulics direction, never software \"upgrade\" (my file error). tr: memba = upstream, mansap = downstream — a tr file flipped these; pin them.",
+                "preferred_translation": "amonte"
+            },
+            {
+                "term": "downstream",
+                "symbol": "",
+                "context": "Direction away from the supply, toward the outlet \/ last emitter.",
+                "translation_notes": "Never software \"downgrade\". ar: downstream = المصب \/ أسفل المجرى (a file used المنبعية = source-side, wrong).",
+                "preferred_translation": "aval"
             }
         ],
         "irr": [
@@ -257,56 +348,12 @@
         "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
         "mtc_vel_ok_short": "OK",
         "mhp_vel_ok_short": "OK",
-        "ip_main_menu": "Irrigation Pressure",
-        "ip_main_title": "Free Online Irrigation Pressure &amp; Distribution Uniformity Calculator",
-        "ip_main_desc": "Test Branch Pressure and Uniformity Estimate",
-        "ip_h_supply": "Supply pressure",
-        "ip_elev_supply": "Supply elevation, z<sub>supply<\/sub>",
-        "ip_q_design": "Emitter design flow, q<sub>design<\/sub>",
-        "ip_h_design": "Emitter design pressure",
-        "ip_x": "Emitter discharge exponent, x <span title=\"0.5 for standard non-compensating emitters; near 0 for pressure-compensating emitters\" class=\"ec-tip\">?<\/span>",
-        "ip_reach_table_title": "Test path",
-        "ip_group_reach": "Reach",
-        "ip_group_upstream": "Upstream",
-        "ip_group_downstream": "Downstream",
-        "ip_group_loss": "Loss",
-        "ip_is_lateral": "Lat. <span title=\"Checked: this reach is a segment of the test lateral, drawn off by individual emitters. Unchecked: this reach is a main, only passing flow along to laterals not on the test path.\" class=\"ec-tip\">?<\/span>",
-        "ip_count": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach right at the test lateral&rsquo;s own takeoff, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>",
         "ip_length": "L",
         "ip_diameter": "D",
-        "ip_e": "e <span title=\"Darcy-Weisbach roughness height\" class=\"ec-tip\">?<\/span>",
-        "ip_km": "K<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>",
-        "ip_elev_ds": "DS Elev. <span title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\" class=\"ec-tip\">?<\/span>",
-        "ip_elev_ds_missing_warn": "Last emitter elevation (last row) was left blank and defaulted to flat &mdash; enter it for an accurate result ⚠",
-        "ip_flow": "Flow",
-        "ip_press": "Press.",
         "ip_v": "V",
         "ip_hv": "H<sub>v<\/sub>",
         "ip_hf": "H<sub>f<\/sub>",
         "ip_hm": "H<sub>m<\/sub>",
-        "ip_hl": "H<sub>l<\/sub> <span title=\"Total reach loss, H_f + H_m\" class=\"ec-tip\">?<\/span>",
-        "ip_pressure_warn": "Low\/negative pressure &mdash; check for subatmospheric conditions",
-        "ip_pressure_warn_short": "Low ⚠",
-        "ip_h_far": "Last emitter pressure",
-        "ip_q_supply": "Test path supply flow, Q<sub>supply<\/sub> <span title=\"Flow entering the modeled test path only, not the whole zone\/system — see Q_zone in Application Design below for the system-wide total.\" class=\"ec-tip\">?<\/span>",
-        "ip_q_critical": "Last emitter flow, q<sub>last<\/sub>",
-        "ip_q_avg_lateral": "Average emitter flow (test lateral), q<sub>avg<\/sub>",
-        "ip_dp_avg": "Est. &Delta;pressure, avg. vs. test lateral <span title=\"How much higher (or lower) you believe a typical\/average lateral runs compared to this test lateral. The test lateral is deliberately the presumed worst case, so its own average is a biased-low stand-in for a field average &mdash; left at 0, the uniformity check and application-design numbers below use the test lateral&rsquo;s own (likely optimistic) average as-is.\" class=\"ec-tip\">?<\/span>",
-        "ip_q_avg_field": "Est. field-average emitter flow, q<sub>avg,field<\/sub> <span title=\"q_avg_lateral re-evaluated at each lateral row&rsquo;s pressure plus the entered pressure difference above &mdash; an attempt to correct for the test lateral being the presumed worst case, not a representative one. Feeds both the uniformity check and the application-design section below.\" class=\"ec-tip\">?<\/span>",
-        "ip_du_estimate": "Uniformity check, q<sub>last<\/sub>\/q<sub>avg,field<\/sub> <span title=\"Last emitter&rsquo;s computed flow divided by the estimated field-average emitter flow &mdash; same shape as textbook low-quarter Distribution Uniformity (low-group average &divide; population mean), but from a small modeled sample and a user-estimated correction, not a full-field statistical sample. Values at or above 1 are possible and not a bug: it just means the last emitter isn&rsquo;t the low point relative to the estimated field average (e.g. a favorable downhill run, or the &Delta;pressure estimate above is too small).\" class=\"ec-tip\">?<\/span>",
-        "ip_worst_case_warn": "Test emitter pressure is at or above supply pressure &mdash; this path is not likely your worst-case lateral. Check for a more remote or higher-friction lateral, or an elevation profile that better represents the actual worst case.",
-        "ip_q_ratio": "Last emitter flow vs. design flow, q<sub>last<\/sub>\/q<sub>design<\/sub> <span title=\"A separate check, not a uniformity figure: how far the last emitter runs from the manufacturer&rsquo;s rated design flow. Above 1: running above its design point (e.g. from a favorable downhill elevation gain). Below 1: running under design (typical friction-dominated case).\" class=\"ec-tip\">?<\/span>",
-        "ip_no_solution": "No solution: required supply pressure exceeds the entered supply pressure. Increase supply pressure, reduce demand, or use a larger pipe.",
-        "ip_notes_1_term": "Method",
-        "ip_notes_1_def": "Guesses the pressure at the last (most remote) emitter, then marches the Energy Grade Line back toward the supply, reach by reach, adding friction and minor losses along the way. Elevation and velocity head are backed out at each node to report the actual pressure there. The guessed far-end pressure is adjusted (bisection) until the computed required supply pressure matches the entered supply pressure &mdash; the same closed-loop problem addressed by the pipe-flow solver on the Manning Pipe Flow calculator, extended to a branching network.",
-        "ip_notes_2_term": "Main vs. Lateral Reaches",
-        "ip_notes_2_def": "Each row is one reach along the single hydraulically worst path (the test path) from the supply to the last emitter. A Main reach only passes flow to laterals not on the test path, so its draw is a flat multiplication (design flow &times; the reach&rsquo;s total emitter count) &mdash; no local pressure sensitivity. The main is a shared trunk pipe, so the reach right at the test lateral&rsquo;s own takeoff must include not just laterals between its own endpoints but also any laterals still further down the main beyond that takeoff, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow travels through that same reach before splitting off, whether or not they appear anywhere else in this table. A Lateral reach is a segment of the test lateral itself: emitter discharge is computed from the actual local pressure via q = k&middot;H<sup>x<\/sup>, and friction loss is reduced by Christiansen&rsquo;s F(n) factor to account for flow stepping down as each emitter in the reach draws off.",
-        "ip_notes_3_term": "Limitations",
-        "ip_notes_3_def": "Models one fixed inlet pressure (no pump curve), one test path only (not the full field), and a 2-parameter emitter curve (set the exponent near 0 to approximate a pressure-compensating emitter). Two different ratios are reported, deliberately kept separate: q<sub>last<\/sub>\/q<sub>avg,field<\/sub> is a uniformity check, shaped like textbook low-quarter Distribution Uniformity (low-group average &divide; population mean) but computed from the test lateral&rsquo;s own modeled emitters, corrected by an entered &Delta;pressure estimate rather than a full-field statistical sample &mdash; the test lateral is deliberately the presumed worst case, so its raw, uncorrected average would understate the true field average and make uniformity look better than it is; the &Delta;pressure input exists specifically to counter that bias. Values at or above 1 are still possible (e.g. the &Delta;pressure estimate is too small, or a favorable downhill run). q<sub>last<\/sub>\/q<sub>design<\/sub> is a different, non-uniformity check against the manufacturer&rsquo;s rated flow &mdash; useful for spotting an over- or under-pressured system overall, but not a substitute for the uniformity number, since the design\/rated flow has no necessary relationship to the system&rsquo;s actual mean operating pressure.",
-        "ip_notes_4_term": "Reference",
-        "ip_notes_4_def": "Christiansen, J.E. (1942). &ldquo;Irrigation by sprinkling.&rdquo; California Agricultural Experiment Station Bulletin 670. ASAE\/ASABE standards for microirrigation design use the same multi-outlet friction-loss approach.",
-        "ip_notes_5_term": "Application Design",
-        "ip_notes_5_def": "Application rate and system\/zone flow use the estimated field-average emitter flow (q<sub>avg,field<\/sub> &mdash; the test lateral&rsquo;s own average, corrected by the entered &Delta;pressure estimate), not a guessed rate: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub>, fed by the corrected modeled value. Spacing and system-wide lateral\/emitter counts are separate inputs here because the test path only models one worst-case branch, not every lateral in the field.",
         "irr_card_pressure_head": "Irrigation Pressure &amp; Uniformity",
         "irr_card_pressure_desc": "Model the pressure and flow profile along a main-lateral-emitter branch to estimate distribution uniformity from the real test-path pressure, not just a catalog emitter flow rate."
     },
@@ -318,56 +365,12 @@
         "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
         "mtc_vel_ok_short": "OK",
         "mhp_vel_ok_short": "OK",
-        "ip_main_menu": "Irrigation Pressure",
-        "ip_main_title": "Free Online Irrigation Pressure &amp; Distribution Uniformity Calculator",
-        "ip_main_desc": "Test Branch Pressure and Uniformity Estimate",
-        "ip_h_supply": "Supply pressure",
-        "ip_elev_supply": "Supply elevation, z<sub>supply<\/sub>",
-        "ip_q_design": "Emitter design flow, q<sub>design<\/sub>",
-        "ip_h_design": "Emitter design pressure",
-        "ip_x": "Emitter discharge exponent, x <span title=\"0.5 for standard non-compensating emitters; near 0 for pressure-compensating emitters\" class=\"ec-tip\">?<\/span>",
-        "ip_reach_table_title": "Test path",
-        "ip_group_reach": "Reach",
-        "ip_group_upstream": "Upstream",
-        "ip_group_downstream": "Downstream",
-        "ip_group_loss": "Loss",
-        "ip_is_lateral": "Lat. <span title=\"Checked: this reach is a segment of the test lateral, drawn off by individual emitters. Unchecked: this reach is a main, only passing flow along to laterals not on the test path.\" class=\"ec-tip\">?<\/span>",
-        "ip_count": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach right at the test lateral&rsquo;s own takeoff, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>",
         "ip_length": "L",
         "ip_diameter": "D",
-        "ip_e": "e <span title=\"Darcy-Weisbach roughness height\" class=\"ec-tip\">?<\/span>",
-        "ip_km": "K<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>",
-        "ip_elev_ds": "DS Elev. <span title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\" class=\"ec-tip\">?<\/span>",
-        "ip_elev_ds_missing_warn": "Last emitter elevation (last row) was left blank and defaulted to flat &mdash; enter it for an accurate result ⚠",
-        "ip_flow": "Flow",
-        "ip_press": "Press.",
         "ip_v": "V",
         "ip_hv": "H<sub>v<\/sub>",
         "ip_hf": "H<sub>f<\/sub>",
         "ip_hm": "H<sub>m<\/sub>",
-        "ip_hl": "H<sub>l<\/sub> <span title=\"Total reach loss, H_f + H_m\" class=\"ec-tip\">?<\/span>",
-        "ip_pressure_warn": "Low\/negative pressure &mdash; check for subatmospheric conditions",
-        "ip_pressure_warn_short": "Low ⚠",
-        "ip_h_far": "Last emitter pressure",
-        "ip_q_supply": "Test path supply flow, Q<sub>supply<\/sub> <span title=\"Flow entering the modeled test path only, not the whole zone\/system — see Q_zone in Application Design below for the system-wide total.\" class=\"ec-tip\">?<\/span>",
-        "ip_q_critical": "Last emitter flow, q<sub>last<\/sub>",
-        "ip_q_avg_lateral": "Average emitter flow (test lateral), q<sub>avg<\/sub>",
-        "ip_dp_avg": "Est. &Delta;pressure, avg. vs. test lateral <span title=\"How much higher (or lower) you believe a typical\/average lateral runs compared to this test lateral. The test lateral is deliberately the presumed worst case, so its own average is a biased-low stand-in for a field average &mdash; left at 0, the uniformity check and application-design numbers below use the test lateral&rsquo;s own (likely optimistic) average as-is.\" class=\"ec-tip\">?<\/span>",
-        "ip_q_avg_field": "Est. field-average emitter flow, q<sub>avg,field<\/sub> <span title=\"q_avg_lateral re-evaluated at each lateral row&rsquo;s pressure plus the entered pressure difference above &mdash; an attempt to correct for the test lateral being the presumed worst case, not a representative one. Feeds both the uniformity check and the application-design section below.\" class=\"ec-tip\">?<\/span>",
-        "ip_du_estimate": "Uniformity check, q<sub>last<\/sub>\/q<sub>avg,field<\/sub> <span title=\"Last emitter&rsquo;s computed flow divided by the estimated field-average emitter flow &mdash; same shape as textbook low-quarter Distribution Uniformity (low-group average &divide; population mean), but from a small modeled sample and a user-estimated correction, not a full-field statistical sample. Values at or above 1 are possible and not a bug: it just means the last emitter isn&rsquo;t the low point relative to the estimated field average (e.g. a favorable downhill run, or the &Delta;pressure estimate above is too small).\" class=\"ec-tip\">?<\/span>",
-        "ip_worst_case_warn": "Test emitter pressure is at or above supply pressure &mdash; this path is not likely your worst-case lateral. Check for a more remote or higher-friction lateral, or an elevation profile that better represents the actual worst case.",
-        "ip_q_ratio": "Last emitter flow vs. design flow, q<sub>last<\/sub>\/q<sub>design<\/sub> <span title=\"A separate check, not a uniformity figure: how far the last emitter runs from the manufacturer&rsquo;s rated design flow. Above 1: running above its design point (e.g. from a favorable downhill elevation gain). Below 1: running under design (typical friction-dominated case).\" class=\"ec-tip\">?<\/span>",
-        "ip_no_solution": "No solution: required supply pressure exceeds the entered supply pressure. Increase supply pressure, reduce demand, or use a larger pipe.",
-        "ip_notes_1_term": "Method",
-        "ip_notes_1_def": "Guesses the pressure at the last (most remote) emitter, then marches the Energy Grade Line back toward the supply, reach by reach, adding friction and minor losses along the way. Elevation and velocity head are backed out at each node to report the actual pressure there. The guessed far-end pressure is adjusted (bisection) until the computed required supply pressure matches the entered supply pressure &mdash; the same closed-loop problem addressed by the pipe-flow solver on the Manning Pipe Flow calculator, extended to a branching network.",
-        "ip_notes_2_term": "Main vs. Lateral Reaches",
-        "ip_notes_2_def": "Each row is one reach along the single hydraulically worst path (the test path) from the supply to the last emitter. A Main reach only passes flow to laterals not on the test path, so its draw is a flat multiplication (design flow &times; the reach&rsquo;s total emitter count) &mdash; no local pressure sensitivity. The main is a shared trunk pipe, so the reach right at the test lateral&rsquo;s own takeoff must include not just laterals between its own endpoints but also any laterals still further down the main beyond that takeoff, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow travels through that same reach before splitting off, whether or not they appear anywhere else in this table. A Lateral reach is a segment of the test lateral itself: emitter discharge is computed from the actual local pressure via q = k&middot;H<sup>x<\/sup>, and friction loss is reduced by Christiansen&rsquo;s F(n) factor to account for flow stepping down as each emitter in the reach draws off.",
-        "ip_notes_3_term": "Limitations",
-        "ip_notes_3_def": "Models one fixed inlet pressure (no pump curve), one test path only (not the full field), and a 2-parameter emitter curve (set the exponent near 0 to approximate a pressure-compensating emitter). Two different ratios are reported, deliberately kept separate: q<sub>last<\/sub>\/q<sub>avg,field<\/sub> is a uniformity check, shaped like textbook low-quarter Distribution Uniformity (low-group average &divide; population mean) but computed from the test lateral&rsquo;s own modeled emitters, corrected by an entered &Delta;pressure estimate rather than a full-field statistical sample &mdash; the test lateral is deliberately the presumed worst case, so its raw, uncorrected average would understate the true field average and make uniformity look better than it is; the &Delta;pressure input exists specifically to counter that bias. Values at or above 1 are still possible (e.g. the &Delta;pressure estimate is too small, or a favorable downhill run). q<sub>last<\/sub>\/q<sub>design<\/sub> is a different, non-uniformity check against the manufacturer&rsquo;s rated flow &mdash; useful for spotting an over- or under-pressured system overall, but not a substitute for the uniformity number, since the design\/rated flow has no necessary relationship to the system&rsquo;s actual mean operating pressure.",
-        "ip_notes_4_term": "Reference",
-        "ip_notes_4_def": "Christiansen, J.E. (1942). &ldquo;Irrigation by sprinkling.&rdquo; California Agricultural Experiment Station Bulletin 670. ASAE\/ASABE standards for microirrigation design use the same multi-outlet friction-loss approach.",
-        "ip_notes_5_term": "Application Design",
-        "ip_notes_5_def": "Application rate and system\/zone flow use the estimated field-average emitter flow (q<sub>avg,field<\/sub> &mdash; the test lateral&rsquo;s own average, corrected by the entered &Delta;pressure estimate), not a guessed rate: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub>, fed by the corrected modeled value. Spacing and system-wide lateral\/emitter counts are separate inputs here because the test path only models one worst-case branch, not every lateral in the field.",
         "irr_card_pressure_head": "Irrigation Pressure &amp; Uniformity",
         "irr_card_pressure_desc": "Model the pressure and flow profile along a main-lateral-emitter branch to estimate distribution uniformity from the real test-path pressure, not just a catalog emitter flow rate."
     },
@@ -484,604 +487,100 @@
                 }
             }
         },
-        "ip_main_menu": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
-                },
-                "next_translated": null
-            }
-        },
-        "ip_main_title": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
-                },
-                "next_translated": null
-            }
-        },
-        "ip_main_desc": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
-                },
-                "next_translated": null
-            }
-        },
-        "ip_h_supply": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
-                },
-                "next_translated": null
-            }
-        },
-        "ip_elev_supply": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
-                },
-                "next_translated": null
-            }
-        },
-        "ip_q_design": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
-                },
-                "next_translated": null
-            }
-        },
-        "ip_h_design": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
-                },
-                "next_translated": null
-            }
-        },
-        "ip_x": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
-                },
-                "next_translated": null
-            }
-        },
-        "ip_reach_table_title": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
-                },
-                "next_translated": null
-            }
-        },
-        "ip_group_reach": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
-                },
-                "next_translated": null
-            }
-        },
-        "ip_group_upstream": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
-                },
-                "next_translated": null
-            }
-        },
-        "ip_group_downstream": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
-                },
-                "next_translated": null
-            }
-        },
-        "ip_group_loss": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
-                },
-                "next_translated": null
-            }
-        },
-        "ip_is_lateral": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
-                },
-                "next_translated": null
-            }
-        },
-        "ip_count": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
-                },
-                "next_translated": null
-            }
-        },
         "ip_length": {
-            "reason": "missing",
-            "current_value": null,
+            "reason": "equal_to_english",
+            "current_value": "L",
             "neighbors": {
                 "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
+                    "key": "ip_count",
+                    "value": "Emițători <span title=\"Rânduri laterale: emițători numai în acest tronson. Rânduri principale: total emițători pe laterale ALTELE decât aceasta care se ramifică din acest tronson. Pentru tronsoanele chiar la prelevarea proprie a lateralului test, aceasta include și oricare laterale dincolo de acel punct de-a lungul principalului, sau care împart același junction (de ex. o laterală de parte opusă) &mdash; fluxul lor se ramifică din acest tronson la fel.\" class=\"ec-tip\">?<\/span>",
+                    "english": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach right at the test lateral&rsquo;s own takeoff, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>"
                 },
-                "next_translated": null
+                "next_translated": {
+                    "key": "ip_e",
+                    "value": "e <span title=\"Înălțime rugozitate Darcy-Weisbach\" class=\"ec-tip\">?<\/span>",
+                    "english": "e <span title=\"Darcy-Weisbach roughness height\" class=\"ec-tip\">?<\/span>"
+                }
             }
         },
         "ip_diameter": {
-            "reason": "missing",
-            "current_value": null,
+            "reason": "equal_to_english",
+            "current_value": "D",
             "neighbors": {
                 "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
+                    "key": "ip_count",
+                    "value": "Emițători <span title=\"Rânduri laterale: emițători numai în acest tronson. Rânduri principale: total emițători pe laterale ALTELE decât aceasta care se ramifică din acest tronson. Pentru tronsoanele chiar la prelevarea proprie a lateralului test, aceasta include și oricare laterale dincolo de acel punct de-a lungul principalului, sau care împart același junction (de ex. o laterală de parte opusă) &mdash; fluxul lor se ramifică din acest tronson la fel.\" class=\"ec-tip\">?<\/span>",
+                    "english": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach right at the test lateral&rsquo;s own takeoff, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>"
                 },
-                "next_translated": null
-            }
-        },
-        "ip_e": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
-                },
-                "next_translated": null
-            }
-        },
-        "ip_km": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
-                },
-                "next_translated": null
-            }
-        },
-        "ip_elev_ds": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
-                },
-                "next_translated": null
-            }
-        },
-        "ip_elev_ds_missing_warn": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
-                },
-                "next_translated": null
-            }
-        },
-        "ip_flow": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
-                },
-                "next_translated": null
-            }
-        },
-        "ip_press": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
-                },
-                "next_translated": null
+                "next_translated": {
+                    "key": "ip_e",
+                    "value": "e <span title=\"Înălțime rugozitate Darcy-Weisbach\" class=\"ec-tip\">?<\/span>",
+                    "english": "e <span title=\"Darcy-Weisbach roughness height\" class=\"ec-tip\">?<\/span>"
+                }
             }
         },
         "ip_v": {
-            "reason": "missing",
-            "current_value": null,
+            "reason": "equal_to_english",
+            "current_value": "V",
             "neighbors": {
                 "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
+                    "key": "ip_press",
+                    "value": "Pres.",
+                    "english": "Press."
                 },
-                "next_translated": null
+                "next_translated": {
+                    "key": "ip_hl",
+                    "value": "H<sub>l<\/sub> <span title=\"Pierdere totală tronson, H_f + H_m\" class=\"ec-tip\">?<\/span>",
+                    "english": "H<sub>l<\/sub> <span title=\"Total reach loss, H_f + H_m\" class=\"ec-tip\">?<\/span>"
+                }
             }
         },
         "ip_hv": {
-            "reason": "missing",
-            "current_value": null,
+            "reason": "equal_to_english",
+            "current_value": "H<sub>v<\/sub>",
             "neighbors": {
                 "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
+                    "key": "ip_press",
+                    "value": "Pres.",
+                    "english": "Press."
                 },
-                "next_translated": null
+                "next_translated": {
+                    "key": "ip_hl",
+                    "value": "H<sub>l<\/sub> <span title=\"Pierdere totală tronson, H_f + H_m\" class=\"ec-tip\">?<\/span>",
+                    "english": "H<sub>l<\/sub> <span title=\"Total reach loss, H_f + H_m\" class=\"ec-tip\">?<\/span>"
+                }
             }
         },
         "ip_hf": {
-            "reason": "missing",
-            "current_value": null,
+            "reason": "equal_to_english",
+            "current_value": "H<sub>f<\/sub>",
             "neighbors": {
                 "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
+                    "key": "ip_press",
+                    "value": "Pres.",
+                    "english": "Press."
                 },
-                "next_translated": null
+                "next_translated": {
+                    "key": "ip_hl",
+                    "value": "H<sub>l<\/sub> <span title=\"Pierdere totală tronson, H_f + H_m\" class=\"ec-tip\">?<\/span>",
+                    "english": "H<sub>l<\/sub> <span title=\"Total reach loss, H_f + H_m\" class=\"ec-tip\">?<\/span>"
+                }
             }
         },
         "ip_hm": {
-            "reason": "missing",
-            "current_value": null,
+            "reason": "equal_to_english",
+            "current_value": "H<sub>m<\/sub>",
             "neighbors": {
                 "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
+                    "key": "ip_press",
+                    "value": "Pres.",
+                    "english": "Press."
                 },
-                "next_translated": null
-            }
-        },
-        "ip_hl": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
-                },
-                "next_translated": null
-            }
-        },
-        "ip_pressure_warn": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
-                },
-                "next_translated": null
-            }
-        },
-        "ip_pressure_warn_short": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
-                },
-                "next_translated": null
-            }
-        },
-        "ip_h_far": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
-                },
-                "next_translated": null
-            }
-        },
-        "ip_q_supply": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
-                },
-                "next_translated": null
-            }
-        },
-        "ip_q_critical": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
-                },
-                "next_translated": null
-            }
-        },
-        "ip_q_avg_lateral": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
-                },
-                "next_translated": null
-            }
-        },
-        "ip_dp_avg": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
-                },
-                "next_translated": null
-            }
-        },
-        "ip_q_avg_field": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
-                },
-                "next_translated": null
-            }
-        },
-        "ip_du_estimate": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
-                },
-                "next_translated": null
-            }
-        },
-        "ip_worst_case_warn": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
-                },
-                "next_translated": null
-            }
-        },
-        "ip_q_ratio": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
-                },
-                "next_translated": null
-            }
-        },
-        "ip_no_solution": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
-                },
-                "next_translated": null
-            }
-        },
-        "ip_notes_1_term": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
-                },
-                "next_translated": null
-            }
-        },
-        "ip_notes_1_def": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
-                },
-                "next_translated": null
-            }
-        },
-        "ip_notes_2_term": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
-                },
-                "next_translated": null
-            }
-        },
-        "ip_notes_2_def": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
-                },
-                "next_translated": null
-            }
-        },
-        "ip_notes_3_term": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
-                },
-                "next_translated": null
-            }
-        },
-        "ip_notes_3_def": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
-                },
-                "next_translated": null
-            }
-        },
-        "ip_notes_4_term": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
-                },
-                "next_translated": null
-            }
-        },
-        "ip_notes_4_def": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
-                },
-                "next_translated": null
-            }
-        },
-        "ip_notes_5_term": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
-                },
-                "next_translated": null
-            }
-        },
-        "ip_notes_5_def": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
-                },
-                "next_translated": null
+                "next_translated": {
+                    "key": "ip_hl",
+                    "value": "H<sub>l<\/sub> <span title=\"Pierdere totală tronson, H_f + H_m\" class=\"ec-tip\">?<\/span>",
+                    "english": "H<sub>l<\/sub> <span title=\"Total reach loss, H_f + H_m\" class=\"ec-tip\">?<\/span>"
+                }
             }
         },
         "irr_card_pressure_head": {
@@ -1089,9 +588,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
+                    "key": "ip_notes_5_def",
+                    "value": "Rata de aplicare și debit sistem\/zonă folosesc debitul emițător mediu estimat teren (q<sub>avg,field<\/sub> &mdash; media proprie a lateralului test, corectată de estimare &Delta;presiune introdusă), nu o rată ghicită: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub>, alimentată de valoarea modelată corectată. Distanța și numărări laterale\/emițătoare pe întreg sistemul sunt intrări separate aici deoarece calea test modelează doar o ramură cel mai rău caz, nu fiecare laterală din teren.",
+                    "english": "Application rate and system\/zone flow use the estimated field-average emitter flow (q<sub>avg,field<\/sub> &mdash; the test lateral&rsquo;s own average, corrected by the entered &Delta;pressure estimate), not a guessed rate: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub>, fed by the corrected modeled value. Spacing and system-wide lateral\/emitter counts are separate inputs here because the test path only models one worst-case branch, not every lateral in the field."
                 },
                 "next_translated": null
             }
@@ -1101,13 +600,17 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "rc_sketch_radius",
-                    "value": "rază",
-                    "english": "radius"
+                    "key": "ip_notes_5_def",
+                    "value": "Rata de aplicare și debit sistem\/zonă folosesc debitul emițător mediu estimat teren (q<sub>avg,field<\/sub> &mdash; media proprie a lateralului test, corectată de estimare &Delta;presiune introdusă), nu o rată ghicită: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub>, alimentată de valoarea modelată corectată. Distanța și numărări laterale\/emițătoare pe întreg sistemul sunt intrări separate aici deoarece calea test modelează doar o ramură cel mai rău caz, nu fiecare laterală din teren.",
+                    "english": "Application rate and system\/zone flow use the estimated field-average emitter flow (q<sub>avg,field<\/sub> &mdash; the test lateral&rsquo;s own average, corrected by the entered &Delta;pressure estimate), not a guessed rate: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub>, fed by the corrected modeled value. Spacing and system-wide lateral\/emitter counts are separate inputs here because the test path only models one worst-case branch, not every lateral in the field."
                 },
                 "next_translated": null
             }
         }
     },
-    "key_intent": []
+    "key_intent": {
+        "ip_hv": "Symbol: velocity head. Keep H and the subscript exactly as in English. Head is a height of water column, never anatomical.",
+        "ip_hf": "Symbol: friction head loss. Keep H and the subscript exactly as in English.",
+        "ip_hm": "Symbol: minor (local) head loss. Keep H and the subscript exactly as in English."
+    }
 }

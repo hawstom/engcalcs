@@ -7,6 +7,10 @@
  * - unexpected close tags / code outside PHP scope
  * - malformed $ec_lang assignment lines
  * - duplicate keys
+ * - JSON-escape leakage: literal \/ or \" inside values (renders as garbage HTML)
+ * - <sub>/<span>/<sup> tag-count imbalance within a value
+ * - foreign-script characters (Hangul/Kana) that indicate model contamination
+ * - values byte-identical to the English source (untranslated content)
  *
  * Usage:
  *   php scripts/lang_syntax_validate.php
@@ -28,6 +32,7 @@ function main(array $argv): void
     sort($files);
 
     $issues = [];
+    $enValues = extractValues((string)file_get_contents(DEFAULT_LANG_DIR . '/lang.ec.en.php'));
 
     foreach ($files as $file) {
         if (!preg_match('/lang\.ec\.([a-z]{2})\.php$/', $file, $m)) {
@@ -45,6 +50,12 @@ function main(array $argv): void
         $issues = array_merge($issues, detectCloseTagIssues($file, $content));
         $issues = array_merge($issues, detectOutOfScopeAssignments($file, $content));
         $issues = array_merge($issues, detectDuplicateKeys($file, $content));
+        $issues = array_merge($issues, detectEscapeLeakage($file, $content));
+        $issues = array_merge($issues, detectTagImbalance($file, $content));
+        $issues = array_merge($issues, detectForeignScript($file, $content));
+        if ($lang !== 'en') {
+            $issues = array_merge($issues, detectUntranslatedValues($file, $content, $enValues));
+        }
     }
 
     if (count($issues) === 0) {
@@ -183,6 +194,76 @@ function detectDuplicateKeys(string $file, string $content): array
         }
     }
 
+    return $issues;
+}
+
+function extractValues(string $content): array
+{
+    $values = [];
+    if (preg_match_all("/\\\$ec_lang\\['([^']+)'\\]\\s*=\\s*'((?:[^'\\\\]|\\\\.)*)';/", $content, $m, PREG_SET_ORDER)) {
+        foreach ($m as $match) {
+            $values[$match[1]] = $match[2];
+        }
+    }
+    return $values;
+}
+
+/** Literal \/ or \" inside a single-quoted PHP value renders as garbage in HTML. */
+function detectEscapeLeakage(string $file, string $content): array
+{
+    $issues = [];
+    foreach (['\\/' => 'escaped-slash', '\\"' => 'escaped-quote'] as $needle => $type) {
+        $offset = 0;
+        while (($pos = strpos($content, $needle, $offset)) !== false) {
+            $issues[] = formatIssue($file, lineAtOffset($content, $pos), $type, 'JSON-escape leakage: literal ' . $needle . ' inside value.');
+            $offset = $pos + strlen($needle);
+        }
+    }
+    return $issues;
+}
+
+/** Unbalanced <sub>/<sup>/<span> open/close counts within a single value. */
+function detectTagImbalance(string $file, string $content): array
+{
+    $issues = [];
+    foreach (extractValues($content) as $key => $value) {
+        foreach (['sub', 'sup', 'span'] as $tag) {
+            $open = preg_match_all('/<' . $tag . '[\s>]/', $value);
+            $close = preg_match_all('/<\/' . $tag . '>/', $value);
+            if ($open !== $close) {
+                $issues[] = formatIssue($file, lineAtOffset($content, (int)strpos($content, "['" . $key . "']")), 'tag-imbalance', $key . ': <' . $tag . '> open=' . $open . ' close=' . $close . '.');
+            }
+        }
+    }
+    return $issues;
+}
+
+/** Hangul or Kana characters are never valid in any EngCalcs language — model contamination. */
+function detectForeignScript(string $file, string $content): array
+{
+    $issues = [];
+    if (preg_match_all('/[\x{AC00}-\x{D7AF}\x{1100}-\x{11FF}\x{3040}-\x{30FF}]/u', $content, $m, PREG_OFFSET_CAPTURE)) {
+        foreach ($m[0] as $hit) {
+            $issues[] = formatIssue($file, lineAtOffset($content, (int)$hit[1]), 'foreign-script', 'Hangul/Kana character "' . $hit[0] . '" — likely model contamination.');
+        }
+    }
+    return $issues;
+}
+
+/** Value byte-identical to English where English contains a real word (>=4 letters). Warning-grade. */
+function detectUntranslatedValues(string $file, string $content, array $enValues): array
+{
+    $issues = [];
+    foreach (extractValues($content) as $key => $value) {
+        $en = $enValues[$key] ?? null;
+        if ($en === null || $value !== $en) {
+            continue;
+        }
+        $plain = preg_replace('/&\w+;|<[^>]+>/', '', $en);
+        if (preg_match('/[a-zA-Z]{4,}/', (string)$plain)) {
+            $issues[] = formatIssue($file, lineAtOffset($content, (int)strpos($content, "['" . $key . "']")), 'identical-to-english', $key . ' is byte-identical to the English source.');
+        }
+    }
     return $issues;
 }
 

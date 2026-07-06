@@ -445,7 +445,7 @@ $ec_lang['rc_SD_high'] ='خبرداری: SD > 1.47 — د Robinson لړۍ پور
 $ec_lang['rc_layer']='د ډبرې پرت ضخامت (2 × D<sub>50</sub>)';
 $ec_lang['rc_crest_radius']='د پورتني کرسټ وکر نصف قطر (40 × D<sub>50</sub>)';
 $ec_lang['rc_crest_length']='د پورتني کرسټ وکر قوس اوږدوالی';
-$ec_lang['rc_apron_length']='د وتلو اپرون اوږدوالی (15 × D<sub>50</sub>) <span title="د چوټ ډبرو د جوړښتي ملاتړ لپاره اړین دی. «د وتلو ریچ او د ښکتني کانال مقاومت له امله رامنځته شوی لږ تر لږه ټیل واټر د وتلو ریچ کې د ریپ‌ریپ ثبات ډاډمن کولو لپاره کافي دی.» (Robinson)" style="cursor:help;color:#06c;font-size:0.9em">?</span>';
+$ec_lang['rc_apron_length']='د وتلو اپرون اوږدوالی (15 × D<sub>50</sub>) <span title="د چوټ ډبرو د جوړښتي ملاتړ لپاره اړین دی." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['rc_n_chute']='د چوټ کې د Manning کړکیچ، n';
 $ec_lang['rc_Vm']='د ډبرې مینټل له لارې سرعت، V<sub>m</sub> <span title="د qt هغه برخه چې د ډبرې سوریو له لارې تیریږي. پاتې qs د سطحې پر سر بهیږي. ډیفالټ np = 0.45 د زاویه لرونکې ماتې شوې ډبرې لپاره." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['rc_qm']='د مینټل له لارې واحد بهاو، q<sub>m</sub>';
