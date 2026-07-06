@@ -22,15 +22,13 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Low Priority / Nice-to-Have
 
-- 3|Rename the "Irrigation Flow Measurement" menu/nav item (`irr_main_menu`) to "Irrigation Calculators" or "Irrigation" — flagged during the Irrigation Pressure calculator build (2026-07-04) since the section now covers pressure/DU, not just flow measurement. Small, but touches a shared nav label used across all 27 lang files, so worth a deliberate pass rather than a drive-by edit. [H]
-
-- 20|Set up npm (package.json) and/or Composer for dependency management. Currently Bootstrap and other assets are manually vendored. [CP]
+- 3|Rename the "Irrigation Flow Measurement" menu/nav item (`irr_main_menu`) to "Irrigation Calculators" or "Irrigation" — flagged during the Irrigation Pressure calculator build (2026-07-04) since the section now covers pressure/DU, not just flow measurement. Small, but touches a shared nav label used across all 27 lang files, so worth a deliberate pass rather than a drive-by edit. [CC]
 
 - 1|TypeScript migration — convert `lib/Calculators.lib.js` and per-calculator files to `.ts`. Only worthwhile if the project scope grows significantly. [H]
 
-- 1|Server-side calculation fallback — duplicate JS calc logic in PHP so results can be generated without JavaScript (accessibility, search indexing). High effort, low urgency. [H]
-
 ## Completed
+
+- 0|npm/Composer dependency-management task closed as stale, 2026-07-05: investigated before starting (item was reassigned from `[CP]` to `[CC]` this session per Human direction) and found the premise no longer holds — `HeadersFooters.lib.php`/`sw.js` load Bootstrap straight from `cdn.jsdelivr.net`, not a locally vendored copy, and a repo-wide grep found no Composer usage (`vendor/`, PHP library requires) and no locally built/minified JS or CSS. There is currently nothing to manage a dependency manifest for. Closed with no code changes rather than manufacturing an empty `package.json`/`composer.json` — revisit if a real local dependency is introduced later.
 
 - 0|Suite-wide symbol-convention question, resolved 2026-07-05 (split off 2026-07-04 from the Irrigation Pressure H-vs-P item): decision is **keep single-letter symbols on labels as-is** — they aren't decoration, they're the join key between a label and the formula shown right below it (e.g. `mhp_notes_1_def`: "Net head H<sub>net</sub> = H<sub>gross</sub> − h<sub>L</sub>"), and the pattern (H<sub>gross</sub>, Q, k<sub>m</sub>, h<sub>f</sub>, R<sub>h</sub>, P<sub>w</sub>, etc.) is already consistent across mi_/mpf_/mphl_/or_/mhp_/odt_ and more. No suite-wide edit made — status quo confirmed, not changed.
 
