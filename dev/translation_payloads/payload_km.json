@@ -2,7 +2,7 @@
     "meta": {
         "language": "km",
         "expected_key_count": 501,
-        "delta_key_count": 40,
+        "delta_key_count": 11,
         "active_prefixes": [
             "calc",
             "ip",
@@ -185,41 +185,12 @@
         "calc_defaults_confirm": "Reset calculator to factory defaults?",
         "calc_copy_link": "Copy link",
         "calc_copy_link_done": "Copied!",
-        "ip_se": "Emitter spacing, S<sub>e<\/sub>",
-        "ip_n_e": "Emitters per lateral, n<sub>e<\/sub>",
-        "ip_a_e": "Area per emitter, A<sub>e<\/sub>",
-        "ip_main_desc": "Test Branch Pressure and Uniformity Estimate",
-        "ip_q_design": "Emitter design flow, q<sub>design<\/sub>",
-        "ip_h_design": "Emitter design pressure",
-        "ip_x": "Emitter discharge exponent, x <span title=\"0.5 for standard non-compensating emitters; near 0 for pressure-compensating emitters\" class=\"ec-tip\">?<\/span>",
-        "ip_reach_table_title": "Test path",
-        "ip_group_reach": "Reach",
-        "ip_group_upstream": "Upstream",
-        "ip_group_downstream": "Downstream",
-        "ip_is_lateral": "Lat. <span title=\"Checked: this reach is a segment of the test lateral, drawn off by individual emitters. Unchecked: this reach is a main, only passing flow along to laterals not on the test path.\" class=\"ec-tip\">?<\/span>",
-        "ip_count": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach right at the test lateral&rsquo;s own takeoff, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>",
         "ip_length": "L",
         "ip_diameter": "D",
-        "ip_e": "e <span title=\"Darcy-Weisbach roughness height\" class=\"ec-tip\">?<\/span>",
-        "ip_km": "K<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>",
-        "ip_elev_ds": "DS Elev. <span title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\" class=\"ec-tip\">?<\/span>",
         "ip_v": "V",
         "ip_hv": "H<sub>v<\/sub>",
         "ip_hf": "H<sub>f<\/sub>",
         "ip_hm": "H<sub>m<\/sub>",
-        "ip_hl": "H<sub>l<\/sub> <span title=\"Total reach loss, H_f + H_m\" class=\"ec-tip\">?<\/span>",
-        "ip_h_far": "Last emitter pressure",
-        "ip_q_supply": "Test path supply flow, Q<sub>supply<\/sub> <span title=\"Flow entering the modeled test path only, not the whole zone\/system — see Q_zone in Application Design below for the system-wide total.\" class=\"ec-tip\">?<\/span>",
-        "ip_q_critical": "Last emitter flow, q<sub>last<\/sub>",
-        "ip_q_avg_lateral": "Average emitter flow (test lateral), q<sub>avg<\/sub>",
-        "ip_dp_avg": "Est. &Delta;pressure, avg. vs. test lateral <span title=\"How much higher (or lower) you believe a typical\/average lateral runs compared to this test lateral. The test lateral is deliberately the presumed worst case, so its own average is a biased-low stand-in for a field average &mdash; left at 0, the uniformity check and application-design numbers below use the test lateral&rsquo;s own (likely optimistic) average as-is.\" class=\"ec-tip\">?<\/span>",
-        "ip_q_avg_field": "Est. field-average emitter flow, q<sub>avg,field<\/sub> <span title=\"q_avg_lateral re-evaluated at each lateral row&rsquo;s pressure plus the entered pressure difference above &mdash; an attempt to correct for the test lateral being the presumed worst case, not a representative one. Feeds both the uniformity check and the application-design section below.\" class=\"ec-tip\">?<\/span>",
-        "ip_du_estimate": "Uniformity check, q<sub>last<\/sub>\/q<sub>avg,field<\/sub> <span title=\"Last emitter&rsquo;s computed flow divided by the estimated field-average emitter flow &mdash; same shape as textbook low-quarter Distribution Uniformity (low-group average &divide; population mean), but from a small modeled sample and a user-estimated correction, not a full-field statistical sample. Values at or above 1 are possible and not a bug: it just means the last emitter isn&rsquo;t the low point relative to the estimated field average (e.g. a favorable downhill run, or the &Delta;pressure estimate above is too small).\" class=\"ec-tip\">?<\/span>",
-        "ip_q_ratio": "Last emitter flow vs. design flow, q<sub>last<\/sub>\/q<sub>design<\/sub> <span title=\"A separate check, not a uniformity figure: how far the last emitter runs from the manufacturer&rsquo;s rated design flow. Above 1: running above its design point (e.g. from a favorable downhill elevation gain). Below 1: running under design (typical friction-dominated case).\" class=\"ec-tip\">?<\/span>",
-        "ip_notes_1_def": "Guesses the pressure at the last (most remote) emitter, then marches the Energy Grade Line back toward the supply, reach by reach, adding friction and minor losses along the way. Elevation and velocity head are backed out at each node to report the actual pressure there. The guessed far-end pressure is adjusted (bisection) until the computed required supply pressure matches the entered supply pressure &mdash; the same closed-loop problem addressed by the pipe-flow solver on the Manning Pipe Flow calculator, extended to a branching network.",
-        "ip_notes_2_def": "Each row is one reach along the single hydraulically worst path (the test path) from the supply to the last emitter. A Main reach only passes flow to laterals not on the test path, so its draw is a flat multiplication (design flow &times; the reach&rsquo;s total emitter count) &mdash; no local pressure sensitivity. The main is a shared trunk pipe, so the reach right at the test lateral&rsquo;s own takeoff must include not just laterals between its own endpoints but also any laterals still further down the main beyond that takeoff, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow travels through that same reach before splitting off, whether or not they appear anywhere else in this table. A Lateral reach is a segment of the test lateral itself: emitter discharge is computed from the actual local pressure via q = k&middot;H<sup>x<\/sup>, and friction loss is reduced by Christiansen&rsquo;s F(n) factor to account for flow stepping down as each emitter in the reach draws off.",
-        "ip_notes_3_def": "Models one fixed inlet pressure (no pump curve), one test path only (not the full field), and a 2-parameter emitter curve (set the exponent near 0 to approximate a pressure-compensating emitter). Two different ratios are reported, deliberately kept separate: q<sub>last<\/sub>\/q<sub>avg,field<\/sub> is a uniformity check, shaped like textbook low-quarter Distribution Uniformity (low-group average &divide; population mean) but computed from the test lateral&rsquo;s own modeled emitters, corrected by an entered &Delta;pressure estimate rather than a full-field statistical sample &mdash; the test lateral is deliberately the presumed worst case, so its raw, uncorrected average would understate the true field average and make uniformity look better than it is; the &Delta;pressure input exists specifically to counter that bias. Values at or above 1 are still possible (e.g. the &Delta;pressure estimate is too small, or a favorable downhill run). q<sub>last<\/sub>\/q<sub>design<\/sub> is a different, non-uniformity check against the manufacturer&rsquo;s rated flow &mdash; useful for spotting an over- or under-pressured system overall, but not a substitute for the uniformity number, since the design\/rated flow has no necessary relationship to the system&rsquo;s actual mean operating pressure.",
-        "ip_notes_5_def": "Application rate and system\/zone flow use the estimated field-average emitter flow (q<sub>avg,field<\/sub> &mdash; the test lateral&rsquo;s own average, corrected by the entered &Delta;pressure estimate), not a guessed rate: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub>, fed by the corrected modeled value. Spacing and system-wide lateral\/emitter counts are separate inputs here because the test path only models one worst-case branch, not every lateral in the field.",
         "irr_card_pressure_head": "Irrigation Pressure &amp; Uniformity",
         "irr_card_pressure_desc": "Model the pressure and flow profile along a main-lateral-emitter branch to estimate distribution uniformity from the real test-path pressure, not just a catalog emitter flow rate."
     },
@@ -227,41 +198,12 @@
         "calc_defaults_confirm": "Reset calculator to factory defaults?",
         "calc_copy_link": "Copy link",
         "calc_copy_link_done": "Copied!",
-        "ip_se": "Emitter spacing, S<sub>e<\/sub>",
-        "ip_n_e": "Emitters per lateral, n<sub>e<\/sub>",
-        "ip_a_e": "Area per emitter, A<sub>e<\/sub>",
-        "ip_main_desc": "Test Branch Pressure and Uniformity Estimate",
-        "ip_q_design": "Emitter design flow, q<sub>design<\/sub>",
-        "ip_h_design": "Emitter design pressure",
-        "ip_x": "Emitter discharge exponent, x <span title=\"0.5 for standard non-compensating emitters; near 0 for pressure-compensating emitters\" class=\"ec-tip\">?<\/span>",
-        "ip_reach_table_title": "Test path",
-        "ip_group_reach": "Reach",
-        "ip_group_upstream": "Upstream",
-        "ip_group_downstream": "Downstream",
-        "ip_is_lateral": "Lat. <span title=\"Checked: this reach is a segment of the test lateral, drawn off by individual emitters. Unchecked: this reach is a main, only passing flow along to laterals not on the test path.\" class=\"ec-tip\">?<\/span>",
-        "ip_count": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach right at the test lateral&rsquo;s own takeoff, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>",
         "ip_length": "L",
         "ip_diameter": "D",
-        "ip_e": "e <span title=\"Darcy-Weisbach roughness height\" class=\"ec-tip\">?<\/span>",
-        "ip_km": "K<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>",
-        "ip_elev_ds": "DS Elev. <span title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\" class=\"ec-tip\">?<\/span>",
         "ip_v": "V",
         "ip_hv": "H<sub>v<\/sub>",
         "ip_hf": "H<sub>f<\/sub>",
         "ip_hm": "H<sub>m<\/sub>",
-        "ip_hl": "H<sub>l<\/sub> <span title=\"Total reach loss, H_f + H_m\" class=\"ec-tip\">?<\/span>",
-        "ip_h_far": "Last emitter pressure",
-        "ip_q_supply": "Test path supply flow, Q<sub>supply<\/sub> <span title=\"Flow entering the modeled test path only, not the whole zone\/system — see Q_zone in Application Design below for the system-wide total.\" class=\"ec-tip\">?<\/span>",
-        "ip_q_critical": "Last emitter flow, q<sub>last<\/sub>",
-        "ip_q_avg_lateral": "Average emitter flow (test lateral), q<sub>avg<\/sub>",
-        "ip_dp_avg": "Est. &Delta;pressure, avg. vs. test lateral <span title=\"How much higher (or lower) you believe a typical\/average lateral runs compared to this test lateral. The test lateral is deliberately the presumed worst case, so its own average is a biased-low stand-in for a field average &mdash; left at 0, the uniformity check and application-design numbers below use the test lateral&rsquo;s own (likely optimistic) average as-is.\" class=\"ec-tip\">?<\/span>",
-        "ip_q_avg_field": "Est. field-average emitter flow, q<sub>avg,field<\/sub> <span title=\"q_avg_lateral re-evaluated at each lateral row&rsquo;s pressure plus the entered pressure difference above &mdash; an attempt to correct for the test lateral being the presumed worst case, not a representative one. Feeds both the uniformity check and the application-design section below.\" class=\"ec-tip\">?<\/span>",
-        "ip_du_estimate": "Uniformity check, q<sub>last<\/sub>\/q<sub>avg,field<\/sub> <span title=\"Last emitter&rsquo;s computed flow divided by the estimated field-average emitter flow &mdash; same shape as textbook low-quarter Distribution Uniformity (low-group average &divide; population mean), but from a small modeled sample and a user-estimated correction, not a full-field statistical sample. Values at or above 1 are possible and not a bug: it just means the last emitter isn&rsquo;t the low point relative to the estimated field average (e.g. a favorable downhill run, or the &Delta;pressure estimate above is too small).\" class=\"ec-tip\">?<\/span>",
-        "ip_q_ratio": "Last emitter flow vs. design flow, q<sub>last<\/sub>\/q<sub>design<\/sub> <span title=\"A separate check, not a uniformity figure: how far the last emitter runs from the manufacturer&rsquo;s rated design flow. Above 1: running above its design point (e.g. from a favorable downhill elevation gain). Below 1: running under design (typical friction-dominated case).\" class=\"ec-tip\">?<\/span>",
-        "ip_notes_1_def": "Guesses the pressure at the last (most remote) emitter, then marches the Energy Grade Line back toward the supply, reach by reach, adding friction and minor losses along the way. Elevation and velocity head are backed out at each node to report the actual pressure there. The guessed far-end pressure is adjusted (bisection) until the computed required supply pressure matches the entered supply pressure &mdash; the same closed-loop problem addressed by the pipe-flow solver on the Manning Pipe Flow calculator, extended to a branching network.",
-        "ip_notes_2_def": "Each row is one reach along the single hydraulically worst path (the test path) from the supply to the last emitter. A Main reach only passes flow to laterals not on the test path, so its draw is a flat multiplication (design flow &times; the reach&rsquo;s total emitter count) &mdash; no local pressure sensitivity. The main is a shared trunk pipe, so the reach right at the test lateral&rsquo;s own takeoff must include not just laterals between its own endpoints but also any laterals still further down the main beyond that takeoff, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow travels through that same reach before splitting off, whether or not they appear anywhere else in this table. A Lateral reach is a segment of the test lateral itself: emitter discharge is computed from the actual local pressure via q = k&middot;H<sup>x<\/sup>, and friction loss is reduced by Christiansen&rsquo;s F(n) factor to account for flow stepping down as each emitter in the reach draws off.",
-        "ip_notes_3_def": "Models one fixed inlet pressure (no pump curve), one test path only (not the full field), and a 2-parameter emitter curve (set the exponent near 0 to approximate a pressure-compensating emitter). Two different ratios are reported, deliberately kept separate: q<sub>last<\/sub>\/q<sub>avg,field<\/sub> is a uniformity check, shaped like textbook low-quarter Distribution Uniformity (low-group average &divide; population mean) but computed from the test lateral&rsquo;s own modeled emitters, corrected by an entered &Delta;pressure estimate rather than a full-field statistical sample &mdash; the test lateral is deliberately the presumed worst case, so its raw, uncorrected average would understate the true field average and make uniformity look better than it is; the &Delta;pressure input exists specifically to counter that bias. Values at or above 1 are still possible (e.g. the &Delta;pressure estimate is too small, or a favorable downhill run). q<sub>last<\/sub>\/q<sub>design<\/sub> is a different, non-uniformity check against the manufacturer&rsquo;s rated flow &mdash; useful for spotting an over- or under-pressured system overall, but not a substitute for the uniformity number, since the design\/rated flow has no necessary relationship to the system&rsquo;s actual mean operating pressure.",
-        "ip_notes_5_def": "Application rate and system\/zone flow use the estimated field-average emitter flow (q<sub>avg,field<\/sub> &mdash; the test lateral&rsquo;s own average, corrected by the entered &Delta;pressure estimate), not a guessed rate: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub>, fed by the corrected modeled value. Spacing and system-wide lateral\/emitter counts are separate inputs here because the test path only models one worst-case branch, not every lateral in the field.",
         "irr_card_pressure_head": "Irrigation Pressure &amp; Uniformity",
         "irr_card_pressure_desc": "Model the pressure and flow profile along a main-lateral-emitter branch to estimate distribution uniformity from the real test-path pressure, not just a catalog emitter flow rate."
     },
@@ -314,227 +256,19 @@
                 }
             }
         },
-        "ip_se": {
-            "reason": "blank",
-            "current_value": "",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "irr_quickref_html",
-                    "value": "<h3>ឯកសារយោងរហ័ស<\/h3><dl><dt>ទំនប់បែងចែក ឬរចនាសម្ព័ន្ធគ្រប់គ្រង<\/dt><dd>វាស់ជម្រៅទឹកពីលើក្បាលទំនប់ស្ទឹង។ ប្រើ <a href=\"Weir-Flow-Simple.php\">ទំនប់ស្ទឹងសាមញ្ញ<\/a> សម្រាប់ក្បាលស្មើ ឬ <a href=\"Weir-Flow-Irregular.php\">ទំនប់ស្ទឹងមិនទៀងទាត់<\/a> សម្រាប់ក្បាលមានទម្រង់ ឬជណ្ដើរ។<\/dd><dt>ទ្វារទឹក ឬចុងបំពង់<\/dt><dd>វាស់ជម្រៅទឹកខាងលើ និងខាងក្រោម (ឬកម្ពស់បាតបំពង់ប្រសិនបើហូរទឹកសេរី)។ ប្រើ <a href=\"Orifice.php\">ប្រាក់ទឹករន្ធ<\/a>។ សម្រាប់បំពង់មូល D = ចន្លោះបំពង់; សម្រាប់ទ្វារចតុកោណ បញ្ចូលទទឹង W និងកម្ពស់ D។<\/dd><dt>ពេលវេលាបង្ហូរទឹករណ្ដប ឬស្រះ<\/dt><dd>ប្រើ <a href=\"Orifice-Drain-Time.php\">ពេលវេលាបង្ហូរទឹករន្ធ<\/a> ដើម្បីប៉ាន់ស្មានពេលវេលាដើម្បីបញ្ចុះកម្រិតទឹកស្រះ ឬទំនប់ តាមរន្ធបាត — មានប្រយោជន៍សម្រាប់ការគ្រោងផែនការស្តុកទឹក។<\/dd><dt>ស្តង់ដារវាលស្រែ<\/dt><dd>សមីការប្រាក់ទឹក weir និង orifice ដែលប្រើនៅទីនេះ ស្របនឹងនីតិវិធី USBR <em>Water Measurement Manual<\/em> (ការបោះពុម្ពលើក ៣) ដែលជាធម្មតាតម្រូវដោយអ្នកគ្រប់គ្រងទឹក និងស្រុកស្រោចស្រព។<\/dd><\/dl>",
-                    "english": "<h3>Quick Reference<\/h3><dl><dt>Diversion dam or check structure<\/dt><dd>Measure headwater depth above the weir crest. Use <a href=\"Weir-Flow-Simple.php\">Weir Flow Simple<\/a> for a uniform crest, or <a href=\"Weir-Flow-Irregular.php\">Weir Flow Irregular<\/a> for a profiled or stepped crest.<\/dd><dt>Headgate or pipe turnout<\/dt><dd>Measure headwater elevation and tailwater elevation (or invert if freely discharging). Use <a href=\"Orifice.php\">Orifice Flow<\/a>. For a circular pipe, D&nbsp;= pipe diameter; for a rectangular gate, enter width W and height D.<\/dd><dt>Reservoir or pond drain time<\/dt><dd>Use <a href=\"Orifice-Drain-Time.php\">Orifice Drain Time<\/a> to estimate how long it takes to lower a pond or reservoir through a bottom orifice — useful for irrigation storage planning.<\/dd><dt>Field standards<\/dt><dd>Weir and orifice flow equations used here match USBR <em>Water Measurement Manual<\/em> (3rd&nbsp;ed.) procedures commonly required by water masters and irrigation districts.<\/dd><\/dl>"
-                },
-                "next_translated": {
-                    "key": "ip_sl",
-                    "value": "ចម្ងាយ lateral, S<sub>l<\/sub>",
-                    "english": "Lateral spacing, S<sub>l<\/sub>"
-                }
-            }
-        },
-        "ip_n_e": {
-            "reason": "blank",
-            "current_value": "",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ip_sl",
-                    "value": "ចម្ងាយ lateral, S<sub>l<\/sub>",
-                    "english": "Lateral spacing, S<sub>l<\/sub>"
-                },
-                "next_translated": {
-                    "key": "ip_n_l",
-                    "value": "lateral ក្នុងតំបន់, n<sub>l<\/sub>",
-                    "english": "Laterals per zone, n<sub>l<\/sub>"
-                }
-            }
-        },
-        "ip_a_e": {
-            "reason": "blank",
-            "current_value": "",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ip_d",
-                    "value": "ជម្រៅប្រើប្រាស់ទឹកគោលដៅ, d",
-                    "english": "Target application depth, d"
-                },
-                "next_translated": {
-                    "key": "ip_pr",
-                    "value": "អត្រាដាក់ទឹក, PR",
-                    "english": "Application rate, PR"
-                }
-            }
-        },
-        "ip_main_desc": {
-            "reason": "blank",
-            "current_value": "",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ip_main_title",
-                    "value": "ម៉ាស៊ីនគណនាសម្ពាធស្រោចស្រព &amp; ឯកលក្ష្ណៈបរិយាយលំហូរឥតគិតថ្លៃតាមអ៊ីនធឺណិត",
-                    "english": "Free Online Irrigation Pressure &amp; Distribution Uniformity Calculator"
-                },
-                "next_translated": {
-                    "key": "ip_h_supply",
-                    "value": "សម្ពាធផ្គត់ផ្គង់",
-                    "english": "Supply pressure"
-                }
-            }
-        },
-        "ip_q_design": {
-            "reason": "blank",
-            "current_value": "",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ip_elev_supply",
-                    "value": "កម្ពស់ផ្គត់ផ្គង់, z<sub>supply<\/sub>",
-                    "english": "Supply elevation, z<sub>supply<\/sub>"
-                },
-                "next_translated": {
-                    "key": "ip_group_loss",
-                    "value": "ការបាត់បង់",
-                    "english": "Loss"
-                }
-            }
-        },
-        "ip_h_design": {
-            "reason": "blank",
-            "current_value": "",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ip_elev_supply",
-                    "value": "កម្ពស់ផ្គត់ផ្គង់, z<sub>supply<\/sub>",
-                    "english": "Supply elevation, z<sub>supply<\/sub>"
-                },
-                "next_translated": {
-                    "key": "ip_group_loss",
-                    "value": "ការបាត់បង់",
-                    "english": "Loss"
-                }
-            }
-        },
-        "ip_x": {
-            "reason": "blank",
-            "current_value": "",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ip_elev_supply",
-                    "value": "កម្ពស់ផ្គត់ផ្គង់, z<sub>supply<\/sub>",
-                    "english": "Supply elevation, z<sub>supply<\/sub>"
-                },
-                "next_translated": {
-                    "key": "ip_group_loss",
-                    "value": "ការបាត់បង់",
-                    "english": "Loss"
-                }
-            }
-        },
-        "ip_reach_table_title": {
-            "reason": "blank",
-            "current_value": "",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ip_elev_supply",
-                    "value": "កម្ពស់ផ្គត់ផ្គង់, z<sub>supply<\/sub>",
-                    "english": "Supply elevation, z<sub>supply<\/sub>"
-                },
-                "next_translated": {
-                    "key": "ip_group_loss",
-                    "value": "ការបាត់បង់",
-                    "english": "Loss"
-                }
-            }
-        },
-        "ip_group_reach": {
-            "reason": "blank",
-            "current_value": "",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ip_elev_supply",
-                    "value": "កម្ពស់ផ្គត់ផ្គង់, z<sub>supply<\/sub>",
-                    "english": "Supply elevation, z<sub>supply<\/sub>"
-                },
-                "next_translated": {
-                    "key": "ip_group_loss",
-                    "value": "ការបាត់បង់",
-                    "english": "Loss"
-                }
-            }
-        },
-        "ip_group_upstream": {
-            "reason": "blank",
-            "current_value": "",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ip_elev_supply",
-                    "value": "កម្ពស់ផ្គត់ផ្គង់, z<sub>supply<\/sub>",
-                    "english": "Supply elevation, z<sub>supply<\/sub>"
-                },
-                "next_translated": {
-                    "key": "ip_group_loss",
-                    "value": "ការបាត់បង់",
-                    "english": "Loss"
-                }
-            }
-        },
-        "ip_group_downstream": {
-            "reason": "blank",
-            "current_value": "",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ip_elev_supply",
-                    "value": "កម្ពស់ផ្គត់ផ្គង់, z<sub>supply<\/sub>",
-                    "english": "Supply elevation, z<sub>supply<\/sub>"
-                },
-                "next_translated": {
-                    "key": "ip_group_loss",
-                    "value": "ការបាត់បង់",
-                    "english": "Loss"
-                }
-            }
-        },
-        "ip_is_lateral": {
-            "reason": "blank",
-            "current_value": "",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ip_group_loss",
-                    "value": "ការបាត់បង់",
-                    "english": "Loss"
-                },
-                "next_translated": {
-                    "key": "ip_elev_ds_missing_warn",
-                    "value": "កម្ពស់ឧបករណ៍ចុចចុងក្រោយ (ជួរចុងក្រោយ) ត្រូវបានលុបចោល និងលំនាំដើមទៅរាបស្មើ &mdash; បញ្ចូលវាសម្រាប់លទ្ធផលត្រឹមត្រូវ ⚠",
-                    "english": "Last emitter elevation (last row) was left blank and defaulted to flat &mdash; enter it for an accurate result ⚠"
-                }
-            }
-        },
-        "ip_count": {
-            "reason": "blank",
-            "current_value": "",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ip_group_loss",
-                    "value": "ការបាត់បង់",
-                    "english": "Loss"
-                },
-                "next_translated": {
-                    "key": "ip_elev_ds_missing_warn",
-                    "value": "កម្ពស់ឧបករណ៍ចុចចុងក្រោយ (ជួរចុងក្រោយ) ត្រូវបានលុបចោល និងលំនាំដើមទៅរាបស្មើ &mdash; បញ្ចូលវាសម្រាប់លទ្ធផលត្រឹមត្រូវ ⚠",
-                    "english": "Last emitter elevation (last row) was left blank and defaulted to flat &mdash; enter it for an accurate result ⚠"
-                }
-            }
-        },
         "ip_length": {
             "reason": "equal_to_english",
             "current_value": "L",
             "neighbors": {
                 "previous_translated": {
-                    "key": "ip_group_loss",
-                    "value": "ការបាត់បង់",
-                    "english": "Loss"
+                    "key": "ip_count",
+                    "value": "ក្បាលបញ្ចេញទឹក <span title=\"ជួរបំពង់រង: ក្បាលបញ្ចេញទឹកក្នុងចម្រៀកនេះតែប៉ុណ្ណោះ។ ជួរបំពង់មេ: ចំនួនសរុបនៃក្បាលបញ្ចេញទឹកលើបំពង់រងផ្សេងទៀតដែលបែកចេញពីចម្រៀកនេះ។ សម្រាប់ចម្រៀកនៅត្រង់កន្លែងបែកចេញរបស់បំពង់រងសាកល្បងខ្លួនឯង ត្រូវរាប់បញ្ចូលទាំងបំពង់រងទាំងឡាយដែលនៅបន្តទៀតតាមបំពង់មេហួសពីចំណុចនោះ ឬដែលចែករំលែកថ្នាំងតែមួយ (ឧ. បំពង់រងនៅម្ខាងទៀត) &mdash; លំហូររបស់វាក៏ឆ្លងកាត់ចម្រៀកនេះដែរ។\" class=\"ec-tip\">?<\/span>",
+                    "english": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach right at the test lateral&rsquo;s own takeoff, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>"
                 },
                 "next_translated": {
-                    "key": "ip_elev_ds_missing_warn",
-                    "value": "កម្ពស់ឧបករណ៍ចុចចុងក្រោយ (ជួរចុងក្រោយ) ត្រូវបានលុបចោល និងលំនាំដើមទៅរាបស្មើ &mdash; បញ្ចូលវាសម្រាប់លទ្ធផលត្រឹមត្រូវ ⚠",
-                    "english": "Last emitter elevation (last row) was left blank and defaulted to flat &mdash; enter it for an accurate result ⚠"
+                    "key": "ip_e",
+                    "value": "e <span title=\"កម្ពស់ភាពរដុបតាម Darcy-Weisbach\" class=\"ec-tip\">?<\/span>",
+                    "english": "e <span title=\"Darcy-Weisbach roughness height\" class=\"ec-tip\">?<\/span>"
                 }
             }
         },
@@ -543,62 +277,14 @@
             "current_value": "D",
             "neighbors": {
                 "previous_translated": {
-                    "key": "ip_group_loss",
-                    "value": "ការបាត់បង់",
-                    "english": "Loss"
+                    "key": "ip_count",
+                    "value": "ក្បាលបញ្ចេញទឹក <span title=\"ជួរបំពង់រង: ក្បាលបញ្ចេញទឹកក្នុងចម្រៀកនេះតែប៉ុណ្ណោះ។ ជួរបំពង់មេ: ចំនួនសរុបនៃក្បាលបញ្ចេញទឹកលើបំពង់រងផ្សេងទៀតដែលបែកចេញពីចម្រៀកនេះ។ សម្រាប់ចម្រៀកនៅត្រង់កន្លែងបែកចេញរបស់បំពង់រងសាកល្បងខ្លួនឯង ត្រូវរាប់បញ្ចូលទាំងបំពង់រងទាំងឡាយដែលនៅបន្តទៀតតាមបំពង់មេហួសពីចំណុចនោះ ឬដែលចែករំលែកថ្នាំងតែមួយ (ឧ. បំពង់រងនៅម្ខាងទៀត) &mdash; លំហូររបស់វាក៏ឆ្លងកាត់ចម្រៀកនេះដែរ។\" class=\"ec-tip\">?<\/span>",
+                    "english": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach right at the test lateral&rsquo;s own takeoff, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>"
                 },
                 "next_translated": {
-                    "key": "ip_elev_ds_missing_warn",
-                    "value": "កម្ពស់ឧបករណ៍ចុចចុងក្រោយ (ជួរចុងក្រោយ) ត្រូវបានលុបចោល និងលំនាំដើមទៅរាបស្មើ &mdash; បញ្ចូលវាសម្រាប់លទ្ធផលត្រឹមត្រូវ ⚠",
-                    "english": "Last emitter elevation (last row) was left blank and defaulted to flat &mdash; enter it for an accurate result ⚠"
-                }
-            }
-        },
-        "ip_e": {
-            "reason": "blank",
-            "current_value": "",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ip_group_loss",
-                    "value": "ការបាត់បង់",
-                    "english": "Loss"
-                },
-                "next_translated": {
-                    "key": "ip_elev_ds_missing_warn",
-                    "value": "កម្ពស់ឧបករណ៍ចុចចុងក្រោយ (ជួរចុងក្រោយ) ត្រូវបានលុបចោល និងលំនាំដើមទៅរាបស្មើ &mdash; បញ្ចូលវាសម្រាប់លទ្ធផលត្រឹមត្រូវ ⚠",
-                    "english": "Last emitter elevation (last row) was left blank and defaulted to flat &mdash; enter it for an accurate result ⚠"
-                }
-            }
-        },
-        "ip_km": {
-            "reason": "blank",
-            "current_value": "",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ip_group_loss",
-                    "value": "ការបាត់បង់",
-                    "english": "Loss"
-                },
-                "next_translated": {
-                    "key": "ip_elev_ds_missing_warn",
-                    "value": "កម្ពស់ឧបករណ៍ចុចចុងក្រោយ (ជួរចុងក្រោយ) ត្រូវបានលុបចោល និងលំនាំដើមទៅរាបស្មើ &mdash; បញ្ចូលវាសម្រាប់លទ្ធផលត្រឹមត្រូវ ⚠",
-                    "english": "Last emitter elevation (last row) was left blank and defaulted to flat &mdash; enter it for an accurate result ⚠"
-                }
-            }
-        },
-        "ip_elev_ds": {
-            "reason": "blank",
-            "current_value": "",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ip_group_loss",
-                    "value": "ការបាត់បង់",
-                    "english": "Loss"
-                },
-                "next_translated": {
-                    "key": "ip_elev_ds_missing_warn",
-                    "value": "កម្ពស់ឧបករណ៍ចុចចុងក្រោយ (ជួរចុងក្រោយ) ត្រូវបានលុបចោល និងលំនាំដើមទៅរាបស្មើ &mdash; បញ្ចូលវាសម្រាប់លទ្ធផលត្រឹមត្រូវ ⚠",
-                    "english": "Last emitter elevation (last row) was left blank and defaulted to flat &mdash; enter it for an accurate result ⚠"
+                    "key": "ip_e",
+                    "value": "e <span title=\"កម្ពស់ភាពរដុបតាម Darcy-Weisbach\" class=\"ec-tip\">?<\/span>",
+                    "english": "e <span title=\"Darcy-Weisbach roughness height\" class=\"ec-tip\">?<\/span>"
                 }
             }
         },
@@ -612,9 +298,9 @@
                     "english": "Press."
                 },
                 "next_translated": {
-                    "key": "ip_pressure_warn",
-                    "value": "សម្ពាធទាប\/អវិជ្ជមាន &mdash; ពិនិត្យលក្ខខណ្ឌក្រោមបរិយាកាស",
-                    "english": "Low\/negative pressure &mdash; check for subatmospheric conditions"
+                    "key": "ip_hl",
+                    "value": "H<sub>l<\/sub> <span title=\"ការបាត់បង់សរុបនៃចម្រៀក, H_f + H_m\" class=\"ec-tip\">?<\/span>",
+                    "english": "H<sub>l<\/sub> <span title=\"Total reach loss, H_f + H_m\" class=\"ec-tip\">?<\/span>"
                 }
             }
         },
@@ -628,9 +314,9 @@
                     "english": "Press."
                 },
                 "next_translated": {
-                    "key": "ip_pressure_warn",
-                    "value": "សម្ពាធទាប\/អវិជ្ជមាន &mdash; ពិនិត្យលក្ខខណ្ឌក្រោមបរិយាកាស",
-                    "english": "Low\/negative pressure &mdash; check for subatmospheric conditions"
+                    "key": "ip_hl",
+                    "value": "H<sub>l<\/sub> <span title=\"ការបាត់បង់សរុបនៃចម្រៀក, H_f + H_m\" class=\"ec-tip\">?<\/span>",
+                    "english": "H<sub>l<\/sub> <span title=\"Total reach loss, H_f + H_m\" class=\"ec-tip\">?<\/span>"
                 }
             }
         },
@@ -644,9 +330,9 @@
                     "english": "Press."
                 },
                 "next_translated": {
-                    "key": "ip_pressure_warn",
-                    "value": "សម្ពាធទាប\/អវិជ្ជមាន &mdash; ពិនិត្យលក្ខខណ្ឌក្រោមបរិយាកាស",
-                    "english": "Low\/negative pressure &mdash; check for subatmospheric conditions"
+                    "key": "ip_hl",
+                    "value": "H<sub>l<\/sub> <span title=\"ការបាត់បង់សរុបនៃចម្រៀក, H_f + H_m\" class=\"ec-tip\">?<\/span>",
+                    "english": "H<sub>l<\/sub> <span title=\"Total reach loss, H_f + H_m\" class=\"ec-tip\">?<\/span>"
                 }
             }
         },
@@ -660,214 +346,10 @@
                     "english": "Press."
                 },
                 "next_translated": {
-                    "key": "ip_pressure_warn",
-                    "value": "សម្ពាធទាប\/អវិជ្ជមាន &mdash; ពិនិត្យលក្ខខណ្ឌក្រោមបរិយាកាស",
-                    "english": "Low\/negative pressure &mdash; check for subatmospheric conditions"
+                    "key": "ip_hl",
+                    "value": "H<sub>l<\/sub> <span title=\"ការបាត់បង់សរុបនៃចម្រៀក, H_f + H_m\" class=\"ec-tip\">?<\/span>",
+                    "english": "H<sub>l<\/sub> <span title=\"Total reach loss, H_f + H_m\" class=\"ec-tip\">?<\/span>"
                 }
-            }
-        },
-        "ip_hl": {
-            "reason": "blank",
-            "current_value": "",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ip_press",
-                    "value": "សម្ពាធ",
-                    "english": "Press."
-                },
-                "next_translated": {
-                    "key": "ip_pressure_warn",
-                    "value": "សម្ពាធទាប\/អវិជ្ជមាន &mdash; ពិនិត្យលក្ខខណ្ឌក្រោមបរិយាកាស",
-                    "english": "Low\/negative pressure &mdash; check for subatmospheric conditions"
-                }
-            }
-        },
-        "ip_h_far": {
-            "reason": "blank",
-            "current_value": "",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ip_pressure_warn_short",
-                    "value": "ទាប ⚠",
-                    "english": "Low ⚠"
-                },
-                "next_translated": {
-                    "key": "ip_worst_case_warn",
-                    "value": "សម្ពាធឧបករណ៍ចុចលំនាំដើមស្ថិតនៅស្មើ ឬលើស ពីសម្ពាធផ្គត់ផ្គង់ &mdash; ផ្លូវនេះប្រហែលជាមិនមែនឡង់ករណីដ៏អាក្រក់របស់អ្នកទេ។ ពិនិត្យលើឡង់ឆ្ងាយទៀត ឬមានការកកិតខ្ពស់ជាង ឬប្រវត្តិកម្ពស់ដែលតំណាងឱ្យករណីដ៏អាក្រក់ពិតប្រាកដល្អប្រសើរ។",
-                    "english": "Test emitter pressure is at or above supply pressure &mdash; this path is not likely your worst-case lateral. Check for a more remote or higher-friction lateral, or an elevation profile that better represents the actual worst case."
-                }
-            }
-        },
-        "ip_q_supply": {
-            "reason": "blank",
-            "current_value": "",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ip_pressure_warn_short",
-                    "value": "ទាប ⚠",
-                    "english": "Low ⚠"
-                },
-                "next_translated": {
-                    "key": "ip_worst_case_warn",
-                    "value": "សម្ពាធឧបករណ៍ចុចលំនាំដើមស្ថិតនៅស្មើ ឬលើស ពីសម្ពាធផ្គត់ផ្គង់ &mdash; ផ្លូវនេះប្រហែលជាមិនមែនឡង់ករណីដ៏អាក្រក់របស់អ្នកទេ។ ពិនិត្យលើឡង់ឆ្ងាយទៀត ឬមានការកកិតខ្ពស់ជាង ឬប្រវត្តិកម្ពស់ដែលតំណាងឱ្យករណីដ៏អាក្រក់ពិតប្រាកដល្អប្រសើរ។",
-                    "english": "Test emitter pressure is at or above supply pressure &mdash; this path is not likely your worst-case lateral. Check for a more remote or higher-friction lateral, or an elevation profile that better represents the actual worst case."
-                }
-            }
-        },
-        "ip_q_critical": {
-            "reason": "blank",
-            "current_value": "",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ip_pressure_warn_short",
-                    "value": "ទាប ⚠",
-                    "english": "Low ⚠"
-                },
-                "next_translated": {
-                    "key": "ip_worst_case_warn",
-                    "value": "សម្ពាធឧបករណ៍ចុចលំនាំដើមស្ថិតនៅស្មើ ឬលើស ពីសម្ពាធផ្គត់ផ្គង់ &mdash; ផ្លូវនេះប្រហែលជាមិនមែនឡង់ករណីដ៏អាក្រក់របស់អ្នកទេ។ ពិនិត្យលើឡង់ឆ្ងាយទៀត ឬមានការកកិតខ្ពស់ជាង ឬប្រវត្តិកម្ពស់ដែលតំណាងឱ្យករណីដ៏អាក្រក់ពិតប្រាកដល្អប្រសើរ។",
-                    "english": "Test emitter pressure is at or above supply pressure &mdash; this path is not likely your worst-case lateral. Check for a more remote or higher-friction lateral, or an elevation profile that better represents the actual worst case."
-                }
-            }
-        },
-        "ip_q_avg_lateral": {
-            "reason": "blank",
-            "current_value": "",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ip_pressure_warn_short",
-                    "value": "ទាប ⚠",
-                    "english": "Low ⚠"
-                },
-                "next_translated": {
-                    "key": "ip_worst_case_warn",
-                    "value": "សម្ពាធឧបករណ៍ចុចលំនាំដើមស្ថិតនៅស្មើ ឬលើស ពីសម្ពាធផ្គត់ផ្គង់ &mdash; ផ្លូវនេះប្រហែលជាមិនមែនឡង់ករណីដ៏អាក្រក់របស់អ្នកទេ។ ពិនិត្យលើឡង់ឆ្ងាយទៀត ឬមានការកកិតខ្ពស់ជាង ឬប្រវត្តិកម្ពស់ដែលតំណាងឱ្យករណីដ៏អាក្រក់ពិតប្រាកដល្អប្រសើរ។",
-                    "english": "Test emitter pressure is at or above supply pressure &mdash; this path is not likely your worst-case lateral. Check for a more remote or higher-friction lateral, or an elevation profile that better represents the actual worst case."
-                }
-            }
-        },
-        "ip_dp_avg": {
-            "reason": "blank",
-            "current_value": "",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ip_pressure_warn_short",
-                    "value": "ទាប ⚠",
-                    "english": "Low ⚠"
-                },
-                "next_translated": {
-                    "key": "ip_worst_case_warn",
-                    "value": "សម្ពាធឧបករណ៍ចុចលំនាំដើមស្ថិតនៅស្មើ ឬលើស ពីសម្ពាធផ្គត់ផ្គង់ &mdash; ផ្លូវនេះប្រហែលជាមិនមែនឡង់ករណីដ៏អាក្រក់របស់អ្នកទេ។ ពិនិត្យលើឡង់ឆ្ងាយទៀត ឬមានការកកិតខ្ពស់ជាង ឬប្រវត្តិកម្ពស់ដែលតំណាងឱ្យករណីដ៏អាក្រក់ពិតប្រាកដល្អប្រសើរ។",
-                    "english": "Test emitter pressure is at or above supply pressure &mdash; this path is not likely your worst-case lateral. Check for a more remote or higher-friction lateral, or an elevation profile that better represents the actual worst case."
-                }
-            }
-        },
-        "ip_q_avg_field": {
-            "reason": "blank",
-            "current_value": "",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ip_pressure_warn_short",
-                    "value": "ទាប ⚠",
-                    "english": "Low ⚠"
-                },
-                "next_translated": {
-                    "key": "ip_worst_case_warn",
-                    "value": "សម្ពាធឧបករណ៍ចុចលំនាំដើមស្ថិតនៅស្មើ ឬលើស ពីសម្ពាធផ្គត់ផ្គង់ &mdash; ផ្លូវនេះប្រហែលជាមិនមែនឡង់ករណីដ៏អាក្រក់របស់អ្នកទេ។ ពិនិត្យលើឡង់ឆ្ងាយទៀត ឬមានការកកិតខ្ពស់ជាង ឬប្រវត្តិកម្ពស់ដែលតំណាងឱ្យករណីដ៏អាក្រក់ពិតប្រាកដល្អប្រសើរ។",
-                    "english": "Test emitter pressure is at or above supply pressure &mdash; this path is not likely your worst-case lateral. Check for a more remote or higher-friction lateral, or an elevation profile that better represents the actual worst case."
-                }
-            }
-        },
-        "ip_du_estimate": {
-            "reason": "blank",
-            "current_value": "",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ip_pressure_warn_short",
-                    "value": "ទាប ⚠",
-                    "english": "Low ⚠"
-                },
-                "next_translated": {
-                    "key": "ip_worst_case_warn",
-                    "value": "សម្ពាធឧបករណ៍ចុចលំនាំដើមស្ថិតនៅស្មើ ឬលើស ពីសម្ពាធផ្គត់ផ្គង់ &mdash; ផ្លូវនេះប្រហែលជាមិនមែនឡង់ករណីដ៏អាក្រក់របស់អ្នកទេ។ ពិនិត្យលើឡង់ឆ្ងាយទៀត ឬមានការកកិតខ្ពស់ជាង ឬប្រវត្តិកម្ពស់ដែលតំណាងឱ្យករណីដ៏អាក្រក់ពិតប្រាកដល្អប្រសើរ។",
-                    "english": "Test emitter pressure is at or above supply pressure &mdash; this path is not likely your worst-case lateral. Check for a more remote or higher-friction lateral, or an elevation profile that better represents the actual worst case."
-                }
-            }
-        },
-        "ip_q_ratio": {
-            "reason": "blank",
-            "current_value": "",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ip_worst_case_warn",
-                    "value": "សម្ពាធឧបករណ៍ចុចលំនាំដើមស្ថិតនៅស្មើ ឬលើស ពីសម្ពាធផ្គត់ផ្គង់ &mdash; ផ្លូវនេះប្រហែលជាមិនមែនឡង់ករណីដ៏អាក្រក់របស់អ្នកទេ។ ពិនិត្យលើឡង់ឆ្ងាយទៀត ឬមានការកកិតខ្ពស់ជាង ឬប្រវត្តិកម្ពស់ដែលតំណាងឱ្យករណីដ៏អាក្រក់ពិតប្រាកដល្អប្រសើរ។",
-                    "english": "Test emitter pressure is at or above supply pressure &mdash; this path is not likely your worst-case lateral. Check for a more remote or higher-friction lateral, or an elevation profile that better represents the actual worst case."
-                },
-                "next_translated": {
-                    "key": "ip_no_solution",
-                    "value": "គ្មានដំណោះស្រាយ៖ សម្ពាធផ្គត់ផ្គង់ដែលត្រូវការលើសពីសម្ពាធផ្គត់ផ្គង់ដែលបានបញ្ចូល។ បង្កើនសម្ពាធផ្គត់ផ្គង់ កាត់បន្ថយតម្រូវការ ឬប្រើបំពង់ធំជាង។",
-                    "english": "No solution: required supply pressure exceeds the entered supply pressure. Increase supply pressure, reduce demand, or use a larger pipe."
-                }
-            }
-        },
-        "ip_notes_1_def": {
-            "reason": "blank",
-            "current_value": "",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ip_notes_1_term",
-                    "value": "វិធីសាស្ត្រ",
-                    "english": "Method"
-                },
-                "next_translated": {
-                    "key": "ip_notes_2_term",
-                    "value": "ឃ្លាំងសមរភូមិ ធៀប ឡង់សាខា",
-                    "english": "Main vs. Lateral Reaches"
-                }
-            }
-        },
-        "ip_notes_2_def": {
-            "reason": "blank",
-            "current_value": "",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ip_notes_2_term",
-                    "value": "ឃ្លាំងសមរភូមិ ធៀប ឡង់សាខា",
-                    "english": "Main vs. Lateral Reaches"
-                },
-                "next_translated": {
-                    "key": "ip_notes_3_term",
-                    "value": "ដែនកំណត់",
-                    "english": "Limitations"
-                }
-            }
-        },
-        "ip_notes_3_def": {
-            "reason": "blank",
-            "current_value": "",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ip_notes_3_term",
-                    "value": "ដែនកំណត់",
-                    "english": "Limitations"
-                },
-                "next_translated": {
-                    "key": "ip_notes_4_term",
-                    "value": "ឯកសារយោង",
-                    "english": "Reference"
-                }
-            }
-        },
-        "ip_notes_5_def": {
-            "reason": "blank",
-            "current_value": "",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ip_notes_5_term",
-                    "value": "ការរចនាកម្មវិធី",
-                    "english": "Application Design"
-                },
-                "next_translated": null
             }
         },
         "irr_card_pressure_head": {
@@ -875,9 +357,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "ip_notes_5_term",
-                    "value": "ការរចនាកម្មវិធី",
-                    "english": "Application Design"
+                    "key": "ip_notes_5_def",
+                    "value": "អត្រាដាក់ទឹក និងលំហូរប្រព័ន្ធ\/តំបន់ ប្រើលំហូរមធ្យមប៉ាន់ស្មានរបស់ក្បាលបញ្ចេញទឹកទាំងវាល (q<sub>avg,field<\/sub> &mdash; មធ្យមរបស់បំពង់រងសាកល្បងខ្លួនឯង កែតម្រូវដោយការប៉ាន់ស្មាន &Delta;សម្ពាធដែលបានបញ្ចូល) មិនមែនអត្រាទាយស្មានទេ: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub> ផ្គត់ផ្គង់ដោយតម្លៃគំរូដែលបានកែតម្រូវ។ គម្លាត និងចំនួនបំពង់រង\/ក្បាលបញ្ចេញទឹកទាំងប្រព័ន្ធជាការបញ្ចូលដាច់ដោយឡែកនៅទីនេះ ព្រោះផ្លូវសាកល្បងធ្វើគំរូតែសាខាករណីអាក្រក់បំផុតមួយប៉ុណ្ណោះ មិនមែនបំពង់រងនីមួយៗក្នុងវាលទេ។",
+                    "english": "Application rate and system\/zone flow use the estimated field-average emitter flow (q<sub>avg,field<\/sub> &mdash; the test lateral&rsquo;s own average, corrected by the entered &Delta;pressure estimate), not a guessed rate: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub>, fed by the corrected modeled value. Spacing and system-wide lateral\/emitter counts are separate inputs here because the test path only models one worst-case branch, not every lateral in the field."
                 },
                 "next_translated": null
             }
@@ -887,34 +369,17 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "ip_notes_5_term",
-                    "value": "ការរចនាកម្មវិធី",
-                    "english": "Application Design"
+                    "key": "ip_notes_5_def",
+                    "value": "អត្រាដាក់ទឹក និងលំហូរប្រព័ន្ធ\/តំបន់ ប្រើលំហូរមធ្យមប៉ាន់ស្មានរបស់ក្បាលបញ្ចេញទឹកទាំងវាល (q<sub>avg,field<\/sub> &mdash; មធ្យមរបស់បំពង់រងសាកល្បងខ្លួនឯង កែតម្រូវដោយការប៉ាន់ស្មាន &Delta;សម្ពាធដែលបានបញ្ចូល) មិនមែនអត្រាទាយស្មានទេ: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub> ផ្គត់ផ្គង់ដោយតម្លៃគំរូដែលបានកែតម្រូវ។ គម្លាត និងចំនួនបំពង់រង\/ក្បាលបញ្ចេញទឹកទាំងប្រព័ន្ធជាការបញ្ចូលដាច់ដោយឡែកនៅទីនេះ ព្រោះផ្លូវសាកល្បងធ្វើគំរូតែសាខាករណីអាក្រក់បំផុតមួយប៉ុណ្ណោះ មិនមែនបំពង់រងនីមួយៗក្នុងវាលទេ។",
+                    "english": "Application rate and system\/zone flow use the estimated field-average emitter flow (q<sub>avg,field<\/sub> &mdash; the test lateral&rsquo;s own average, corrected by the entered &Delta;pressure estimate), not a guessed rate: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub>, fed by the corrected modeled value. Spacing and system-wide lateral\/emitter counts are separate inputs here because the test path only models one worst-case branch, not every lateral in the field."
                 },
                 "next_translated": null
             }
         }
     },
     "key_intent": {
-        "ip_main_desc": "Pressure in a branch of study and estimate of distribution uniformity.",
-        "ip_q_design": "Design flow is the manufacturer rated emitter flow. Keep the subscript design exactly as in English; subscripted names are symbols.",
-        "ip_x": "Discharge exponent: the exponent x in q = k*H^x describing emitter hydraulic behavior. Discharge here is water outflow, never electrical.",
-        "ip_group_upstream": "Direction along the water path: upstream = toward the supply. Hydraulics term, not a software term (never upgrade).",
-        "ip_group_downstream": "Direction along the water path: downstream = toward the last emitter. Hydraulics term, not a software term (never downgrade).",
-        "ip_is_lateral": "Main = the mainline or trunk pipe; lateral = the branch line carrying emitters. Test = the path being analyzed, not a default. Use established drip-irrigation terms.",
-        "ip_count": "Lateral = branch line with emitters; main = trunk pipe. The reach right at the takeoff means exactly at that location, not the right-hand side. Branch (verb) means to split off flow.",
-        "ip_elev_ds": "DS abbreviates downstream. Choose an abbreviation that is unambiguously downstream and cannot be confused with upstream.",
         "ip_hv": "Symbol: velocity head. Keep H and the subscript exactly as in English. Head is a height of water column, never anatomical.",
         "ip_hf": "Symbol: friction head loss. Keep H and the subscript exactly as in English.",
-        "ip_hm": "Symbol: minor (local) head loss. Keep H and the subscript exactly as in English.",
-        "ip_hl": "Symbol: total reach head loss. Keep H and the subscript exactly as in English.",
-        "ip_q_supply": "Keep the subscript supply exactly as in English; subscripted names are symbols.",
-        "ip_q_critical": "Keep the subscript last exactly as in English; subscripted names are symbols.",
-        "ip_q_avg_lateral": "Keep the subscript avg exactly as in English; subscripted names are symbols.",
-        "ip_q_avg_field": "Keep the subscripts avg,field exactly as in English; subscripted names are symbols.",
-        "ip_du_estimate": "Low-quarter Distribution Uniformity is the irrigation-engineering statistic DU_lq: average of the lowest quarter of measurements divided by the overall average. Use the established irrigation term in the target language; do not invent a phrase.",
-        "ip_notes_1_def": "Technical hydraulics prose. Key senses: a reach is a pipe segment between two nodes, not an arrival or extent. To draw or draw off means to withdraw water. The reach right at the takeoff means the reach located exactly at that point, not the right-hand side. Energy Grade Line is the standard hydraulics term for the total-head line; use the established term in the target language, never a word-by-word calque. Textbook (adjective) means as defined in standard textbooks, not a manual. A favorable downhill run means the pipe descends, gaining elevation head. Bisection is the numerical root-finding method. Keep symbols q_last, q_avg,field, q_design, k, H, x, F(n) exactly as written.",
-        "ip_notes_2_def": "Technical hydraulics prose. Key senses: a reach is a pipe segment between two nodes, not an arrival or extent. To draw or draw off means to withdraw water. The reach right at the takeoff means the reach located exactly at that point, not the right-hand side. Energy Grade Line is the standard hydraulics term for the total-head line; use the established term in the target language, never a word-by-word calque. Textbook (adjective) means as defined in standard textbooks, not a manual. A favorable downhill run means the pipe descends, gaining elevation head. Bisection is the numerical root-finding method. Keep symbols q_last, q_avg,field, q_design, k, H, x, F(n) exactly as written.",
-        "ip_notes_3_def": "Technical hydraulics prose. Key senses: a reach is a pipe segment between two nodes, not an arrival or extent. To draw or draw off means to withdraw water. The reach right at the takeoff means the reach located exactly at that point, not the right-hand side. Energy Grade Line is the standard hydraulics term for the total-head line; use the established term in the target language, never a word-by-word calque. Textbook (adjective) means as defined in standard textbooks, not a manual. A favorable downhill run means the pipe descends, gaining elevation head. Bisection is the numerical root-finding method. Keep symbols q_last, q_avg,field, q_design, k, H, x, F(n) exactly as written."
+        "ip_hm": "Symbol: minor (local) head loss. Keep H and the subscript exactly as in English."
     }
 }
