@@ -24,8 +24,6 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 - 3|Rename the "Irrigation Flow Measurement" menu/nav item (`irr_main_menu`) to "Irrigation Calculators" or "Irrigation" — flagged during the Irrigation Pressure calculator build (2026-07-04) since the section now covers pressure/DU, not just flow measurement. Small, but touches a shared nav label used across all 27 lang files, so worth a deliberate pass rather than a drive-by edit. [H]
 
-- 40|Suite-wide symbol-convention question, split off 2026-07-04 from the now-resolved Irrigation Pressure H-vs-P item (see Completed): is assigning single-letter engineering symbols (H, Q, x, k) to every input/result label actually earning its keep, or just decoration? One concrete use noted during the Irrigation Pressure build: symbols would be handy for labeling a future profile/sketch diagram. No opinion yet — genuinely open, not urgent. [H]
-
 - 20|Set up npm (package.json) and/or Composer for dependency management. Currently Bootstrap and other assets are manually vendored. [CP]
 
 - 1|TypeScript migration — convert `lib/Calculators.lib.js` and per-calculator files to `.ts`. Only worthwhile if the project scope grows significantly. [H]
@@ -33,6 +31,8 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 - 1|Server-side calculation fallback — duplicate JS calc logic in PHP so results can be generated without JavaScript (accessibility, search indexing). High effort, low urgency. [H]
 
 ## Completed
+
+- 0|Suite-wide symbol-convention question, resolved 2026-07-05 (split off 2026-07-04 from the Irrigation Pressure H-vs-P item): decision is **keep single-letter symbols on labels as-is** — they aren't decoration, they're the join key between a label and the formula shown right below it (e.g. `mhp_notes_1_def`: "Net head H<sub>net</sub> = H<sub>gross</sub> − h<sub>L</sub>"), and the pattern (H<sub>gross</sub>, Q, k<sub>m</sub>, h<sub>f</sub>, R<sub>h</sub>, P<sub>w</sub>, etc.) is already consistent across mi_/mpf_/mphl_/or_/mhp_/odt_ and more. No suite-wide edit made — status quo confirmed, not changed.
 
 - 0|Fixed bg/es/pt/tr Manning Trapezoidal Channel (`mtc_`) symbol/translation gaps found 2026-07-05: added the missing `b`/`S`/`y`/`D50` symbol suffixes to `mtc_bottom_width`/`mtc_channel_slope`/`mtc_flow_depth`/`mtc_d50_in` in all 4 languages. For bg/tr, `mtc_bend_angle`/`mtc_sgrock` were left as flat untranslated English (bg additionally marked `//No need` in-file) — decided (no explicit `$ec_lang_intent` guidance existed for these, so treated as an ordinary translation gap) to translate both into bg and tr rather than leave them, matching the pattern already used by fr/de/ru for the same keys. `php -l` clean on all 4 files; `lang_parity_check.php --prefix=mtc` shows 0 missing/extra and 0 equal-to-English for bg/tr, and only pre-existing unrelated gaps (`mtc_blodgett_v_bathurst`, `mtc_vel_ok_short`) remain in es/pt.
 
