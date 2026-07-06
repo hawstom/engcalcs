@@ -14,6 +14,11 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 ## Translation improvements
 
+- 85|[CC] Extend the rc_/ip_ audit treatment to the remaining calculators, in batches. Per batch: read all 26 languages against English, fix mechanical defects (validator now catches most), fill missing `$ec_lang_intent` entries for polysemous terms, add glossary terms + `prefixToTermNames` mappings, then a Sonnet retranslation sprint for defective long strings only (per CLAUDE.md model policy), then post-sprint QA incl. `backtranslate_check.php`. Proposed order (user to confirm before each batch): (1) mi_ + wi_ — the Bulgarian engineer already flagged "irregular" mistranslations here, likely systemic across languages; (2) or_ + odt_ — orifice terms, directional errors likely; (3) wfs_/ws_ — weir; (4) dw_/hw_/mpf_/mphl_/mtc_ — Manning/friction family, oldest translations; (5) cs_ + mhp_ — seepage and micro-hydro; (6) shared/menu/calc_ strings incl. the 121 identical-to-english validator warnings. Each batch needs explicit user authorization before any paid sprint.
+
+- 80|[H] Bulgarian scope question for the native engineer (dev/Bulgarian-engineer-feedback.md): (1) should "дебит" become "водно количество" suite-wide (pipes/irrigation too) or only in open-channel/hydraulic-structure contexts? Currently applied only to rc_/or_ strings they corrected. (2) Confirm "коефициент на едрозърнестост" as the standard term for the D84.1/D50 gradation SD (vs "коефициент на разнозърненост"), ideally with a source. (3) Invite review of the freshly rewritten bg ip_ notes/tooltips and of Bulgarian menu-title casing (their corrections use sentence case; many bg titles are Title Case).
+
+
 ## AI Efficiency Scripting (Overhead)
 
 These tasks reduce the AI token cost of routine maintenance by replacing repeated AI judgment with deterministic scripts. Copilot owns execution (all tagged `[CP]`); Claude Code specs any script whose output feeds back into translation quality work.

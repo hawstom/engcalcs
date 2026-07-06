@@ -70,12 +70,34 @@ When translating a new calculator's keys into all 26 non-English languages, **sp
 
 **Standard launch pattern:**
 1. Tell the user: "Starting N agents, one for each language." (always say this before launching)
-2. Spawn all agents in a single message with `run_in_background: true` and `model: "haiku"` — Haiku is the required model for bulk translation agents; glossary and intent injection provide the judgment layer
+2. Spawn all agents in a single message with `run_in_background: true` and `model: "sonnet"` — Sonnet is the default model for translation agents. Haiku is permitted ONLY for batches consisting solely of short labels (≤ ~8 words, no tooltips, no `*_notes_*_def` keys); it is deprecated for everything else.
 3. Each agent receives: the payload JSON path, the target lang file path, and full instructions including glossary terms, intent notes, and all translation rules
 
 Always announce the launch count before spawning so the user knows what is happening.
 
+**Model policy (lesson from the 2026-07 rc_/ip_ sprint — see dev/translation-audit-rc-ip-2026-07.md):**
+Haiku, even with full glossary + intent injection, reliably mistranslated polysemous words in long
+technical prose and produced foreign-script contamination, escape leakage, and truncation in
+low-resource languages. Therefore:
+- Long strings (tooltip `title="..."` text and `*_notes_*_def`) go to **Sonnet**, 1–2 long strings
+  per request, or are translated inline by the orchestrating model.
+- Low-resource languages (am, km, my, ps) get Sonnet for everything plus a native-review flag.
+- Short labels only → Haiku is acceptable.
+
+**Post-sprint QA (mandatory, in order):**
+1. `php dev/scripts/lang_syntax_validate.php --lang=<codes>` — must be clean of escape-leakage,
+   tag-imbalance, and foreign-script findings (identical-to-english warnings are advisory).
+2. Tag-parity check of the sprinted keys against English (`<sub>/<sup>/<span>` sets must match).
+3. Back-translation semantic check: `php dev/scripts/backtranslate_check.php --lang=<code> --prefix=<p>`
+   (needs `ANTHROPIC_API_KEY`) — flags meaning-level mistranslations by comparing the target string
+   against the English source.
+
 **On retries:** If an agent hits a session limit, retry only that language. If quality issues are found after a sprint (wrong term, missing intent framing), fix the glossary and/or lang file directly — do not re-run the full sprint.
+
+**Native review:** Machine output for am, km, my, ps (and any language without a strong reviewer)
+should be marked for native-speaker review. Native feedback arrives as files under `dev/`
+(e.g. `dev/Bulgarian-engineer-feedback.md`); apply the corrections to the lang file AND record the
+verified terms in `glossary.json` citing the feedback file, so the next sprint inherits them.
 
 ## Unit Sets
 
