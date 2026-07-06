@@ -178,13 +178,13 @@ $ec_lang['mphl_note_1']='<dl><dt>Açık giriş (menfez) koşulunda, giriş kontr
 $ec_lang['mtc_menu']='Belli Eğim ve Derinlikteki Düzgün Trapezoidal Kanallar';
 $ec_lang['mtc_main_title']='Ücretsiz Belli Eğim ve Derinlikteki Düzgün Trapezoidal Kanallar için Manning Formülü';
 $ec_lang['mtc_main_desc']='Belli Eğim ve Derinlikteki Düzgün Trapezoidal Kanallar için Manning Formülü';
-$ec_lang['mtc_bottom_width']='Dip Genişliği';
+$ec_lang['mtc_bottom_width']='Dip Genişliği, b';
 $ec_lang['mtc_side_slope_1']='Yan Eğim 1, z1 (yatay / dikey)';
 $ec_lang['mtc_side_slope_2']='Yan Eğim 2, z2 (yatay / dikey)';
-$ec_lang['mtc_channel_slope']='Kanal Eğimi';
-$ec_lang['mtc_flow_depth']='Akış Derinliği';
-$ec_lang['mtc_bend_angle']='Bend Angle, β<a target="_blank" href="riprap-bend-angle.png" title="Click for image">?</a> (for riprap sizing)';
-$ec_lang['mtc_sgrock']='Stone specific gravity, SG (2.65)';
+$ec_lang['mtc_channel_slope']='Kanal Eğimi, S';
+$ec_lang['mtc_flow_depth']='Akış Derinliği, y';
+$ec_lang['mtc_bend_angle']='Kurp Açısı, β<a target="_blank" href="riprap-bend-angle.png" title="Görsel için tıklayın">?</a> (taş dolgu boyutlandırması için)';
+$ec_lang['mtc_sgrock']='Taşın özgül ağırlığı, SG (2.65)';
 $ec_lang['mtc_d50_in']='Tasarım taş boyutu, D50';
 $ec_lang['mtc_n_strickler']='Tasarım taş boyutu için n (Strickler\'e göre)';
 $ec_lang['mtc_n_blodgett']='Tasarım taş boyutu için n (Blodgett\'e göre)';

@@ -177,14 +177,14 @@ $ec_lang['mphl_note_1']='<dl><dt>Para una entrada abierta (alcantarilla), es nec
 $ec_lang['mtc_menu']='Canal trapecial según Manning';
 $ec_lang['mtc_main_title']='Calculadora gratis en línea de la fórmula de Manning para canal trapecial';
 $ec_lang['mtc_main_desc']='Flujo uniforme Manning en un canal trapecial a partir de pendiente y profundidad';
-$ec_lang['mtc_bottom_width']='Anchura de la base';
+$ec_lang['mtc_bottom_width']='Anchura de la base, b';
 $ec_lang['mtc_side_slope_1']='Pendiente de lado 1, z1 (horizontal / vertical)';
 $ec_lang['mtc_side_slope_2']='Pendiente de lado 2, z2 (horizontal / vertical)';
-$ec_lang['mtc_channel_slope']='Pendiente del canal (vertical / horizontal)';
+$ec_lang['mtc_channel_slope']='Pendiente del canal, S (vertical / horizontal)';
 $ec_lang['mtc_flow_depth']='Calado de la lámina de agua, y';
 $ec_lang['mtc_bend_angle']='Ángulo de la curva, β<a href="riprap-bend-angle.png" title="Haz clic para ver imagen">?</a> (para el tamaño de roca)';
 $ec_lang['mtc_sgrock']='Gravedad específica de la roca, SG (2.65)';
-$ec_lang['mtc_d50_in']='Tamaño de roca';
+$ec_lang['mtc_d50_in']='Tamaño de roca, D50';
 $ec_lang['mtc_n_strickler']='n para el tamaño de roca de diseño según Strickler';
 $ec_lang['mtc_n_blodgett']='n para el tamaño de roca de diseño según Blodgett';
 $ec_lang['mtc_n_bathurst']='n para el tamaño de roca de diseño según Bathurst';
