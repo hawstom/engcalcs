@@ -336,6 +336,24 @@ mini-sprint or by hand for anchor languages):
 - Validator now reports only `identical-to-english` warnings (121, mostly suite-wide `calc_*`
   keys outside this scope; a few are legitimate cognates like it/pt "Press.", fr "Limitations").
 
+## 11b. Retranslation sprint outcome 2026-07-06
+
+10 Haiku agents were launched for the defective ip_ blocks (ru, hi, bg, am, he, sw, km, my, ps,
+ur). Most hit a session limit mid-run; results were mixed and instructive:
+- **Completed well**: ru (needed 4 hand-fixes: Latin subscript, node-vs-water-level, case errors),
+  hi (clean).
+- **Completed with the same old failure modes**: my (new Korean/Katakana contamination, garbled
+  notes, deleted two keys), ps (escaped `\"` throughout — caught by the new validator), sw
+  (reused the explicitly forbidden "taji" and invented "Ukakamavu"), am (1 of 21 keys, garbled).
+- **Untouched**: bg, he, km, ur (session limit before any writes; the ur agent failed to launch).
+
+Conclusion recorded for future sprints: **Haiku is not reliable for long technical prose in
+low-resource languages even with glossary + intent injection.** The remainder (bg 17, he 18,
+ur 21, sw 15, am 18, km 29, my 18 strings) was translated inline by Claude (Fable 5) with
+per-language verification. Final state: all 26 languages pass lint, rc_/ip_ tag parity vs
+English, and the extended validator. **Native-speaker review recommended** for am, km, my, ps
+(competent but not native-verified); bg/he/ur/sw are high-confidence.
+
 ## 11. Suggested repair order
 
 1. Mechanical fixes (same day): de/hr/ro `<\/`, uk `\"`, fa `\/`; sr Latin-script lines; stale
