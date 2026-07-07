@@ -21,7 +21,7 @@ echoCalculatorForm(
 	//Results
 	Array(
 		Array('name' => 'q_617', 'units' => Array('m3ps', 'lps', 'mld', 'ft3ps', 'gpm', 'mgd'), 'label' => $ec_lang['mi_q_617']),
-		Array('name' => 'v_check', 'units' => NULL, 'label' => $ec_lang['mtc_vel_check']),
+		Array('name' => 'v_check', 'units' => NULL, 'label' => $ec_lang['mhp_vel_check']),
 	),
 	$flagFormAppend = true
 );
@@ -126,7 +126,7 @@ function echoCalculatorFormAppend() {
 ?>
 <div id="sketch"></div>
 <?php echoFeedback(); ?>
-<h2><?=$ec_lang['mi_notes']?></h2>
+<h2><?=$ec_lang['ws_notes_heading']?></h2>
 <dl>
 <dt><?=$ec_lang['mi_notes_1_term']?></dt><dd><?=$ec_lang['mi_notes_1_def']?></dd>
 <dt><?=$ec_lang['mi_notes_2_term']?></dt><dd><?=$ec_lang['mi_notes_2_def']?></dd>
@@ -137,9 +137,9 @@ EngCalcs.pageConfig = {
 	mtc_vel_ok: <?=json_encode($ec_lang['mtc_vel_ok'])?>,
 	mtc_vel_high: <?=json_encode($ec_lang['mtc_vel_high'])?>,
 	mtc_vel_low: <?=json_encode($ec_lang['mtc_vel_low'])?>,
-	mtc_vel_ok_short: <?=json_encode($ec_lang['mtc_vel_ok_short'])?>,
-	mtc_vel_high_short: <?=json_encode($ec_lang['mtc_vel_high_short'])?>,
-	mtc_vel_low_short: <?=json_encode($ec_lang['mtc_vel_low_short'])?>
+	mhp_vel_ok_short: <?=json_encode($ec_lang['mhp_vel_ok_short'])?>,
+	mhp_vel_high_short: <?=json_encode($ec_lang['mhp_vel_high_short'])?>,
+	mhp_vel_low_short: <?=json_encode($ec_lang['mhp_vel_low_short'])?>
 };
 </script>
 <script src="/engcalcs/js/Manning.lib.js?v=<?=filemtime(__DIR__.'/js/Manning.lib.js')?>"></script>

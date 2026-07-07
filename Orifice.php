@@ -26,7 +26,7 @@ echoCalculatorForm(
 		Array('name' => 'centroid', 'units' => Array('m','mm','ft','in'),                    'label' => $ec_lang['or_centroid_elev']),
 		Array('name' => 'h',        'units' => Array('m','mm','ft','in'),                    'label' => $ec_lang['or_head']),
 		Array('name' => 'area',     'units' => Array('m2','mm2','ft2','in2'),                'label' => $ec_lang['or_area']),
-		Array('name' => 'q',        'units' => Array('m3ps','lps','mld','ft3ps','gpm','mgd'),'label' => $ec_lang['or_flow']),
+		Array('name' => 'q',        'units' => Array('m3ps','lps','mld','ft3ps','gpm','mgd'),'label' => $ec_lang['mpf_flow']),
 		Array('name' => 'regime',   'units' => NULL,                                         'label' => $ec_lang['or_regime']),
 	)
 );

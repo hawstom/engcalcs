@@ -103,11 +103,11 @@ function echoCalculatorFormAppend() {
 					<?php echoUnitSelect($name = 'h_dsu', $units = Array('mh2o', 'mmh2o', 'kpa', 'fth2o', 'inh2o', 'psi'), $indent_string); ?>
 				</th>
 				<th>
-					<?=$ec_lang['ip_v']?><br />
+					<?=$ec_lang['mi_v617']?><br />
 					<?php echoUnitSelect($name = 'vu', $units = Array('mps', 'ftps'), $indent_string); ?>
 				</th>
 				<th>
-					<?=$ec_lang['ip_hv']?><br />
+					<?=$ec_lang['mi_hv617']?><br />
 					<?php echoUnitSelect($name = 'hvu', $units = Array('mh2o', 'mmh2o', 'kpa', 'fth2o', 'inh2o', 'psi'), $indent_string); ?>
 				</th>
 				<th>
@@ -144,10 +144,10 @@ function echoCalculatorFormAppend() {
 <?php echoFeedback(); ?>
 <h2><?=$ec_lang['ws_notes_heading']?></h2>
 <dl>
-	<dt><?=$ec_lang['ip_notes_1_term']?></dt><dd><?=$ec_lang['ip_notes_1_def']?></dd>
+	<dt><?=$ec_lang['odt_notes_2_term']?></dt><dd><?=$ec_lang['ip_notes_1_def']?></dd>
 	<dt><?=$ec_lang['ip_notes_2_term']?></dt><dd><?=$ec_lang['ip_notes_2_def']?></dd>
 	<dt><?=$ec_lang['ip_notes_3_term']?></dt><dd><?=$ec_lang['ip_notes_3_def']?></dd>
-	<dt><?=$ec_lang['ip_notes_4_term']?></dt><dd><?=$ec_lang['ip_notes_4_def']?></dd>
+	<dt><?=$ec_lang['rc_notes_4_term']?></dt><dd><?=$ec_lang['ip_notes_4_def']?></dd>
 	<dt><?=$ec_lang['ip_notes_5_term']?></dt><dd><?=$ec_lang['ip_notes_5_def']?></dd>
 </dl>
 <script>

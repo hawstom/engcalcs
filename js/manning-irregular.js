@@ -118,9 +118,9 @@ EngCalcs.pageCalculator = function (objForm) {
 		: (minRegionVelocity < 0.6) ? 'low'
 		: 'ok';
 	this.writeVelocityCheck('v_check', vCheckStatus, {
-		ok: EngCalcs.pageConfig.mtc_vel_ok_short,
-		high: EngCalcs.pageConfig.mtc_vel_high_short,
-		low: EngCalcs.pageConfig.mtc_vel_low_short,
+		ok: EngCalcs.pageConfig.mhp_vel_ok_short,
+		high: EngCalcs.pageConfig.mhp_vel_high_short,
+		low: EngCalcs.pageConfig.mhp_vel_low_short,
 		highTip: EngCalcs.pageConfig.mtc_vel_high,
 		lowTip: EngCalcs.pageConfig.mtc_vel_low
 	});

@@ -111,9 +111,9 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.writeFormResult(objForm, 'n_bathurst', precision = 4, hasUnits = false);
 	document.getElementById('blodgett_v_bathurst').innerHTML = (this.var.blodgett_v_bathurst);
 	this.writeVelocityCheck('v_check', this.var.v > 3.0 ? 'high' : (this.var.v < 0.6 ? 'low' : 'ok'), {
-		ok: EngCalcs.pageConfig.mtc_vel_ok_short,
-		high: EngCalcs.pageConfig.mtc_vel_high_short,
-		low: EngCalcs.pageConfig.mtc_vel_low_short,
+		ok: EngCalcs.pageConfig.mhp_vel_ok_short,
+		high: EngCalcs.pageConfig.mhp_vel_high_short,
+		low: EngCalcs.pageConfig.mhp_vel_low_short,
 		highTip: EngCalcs.pageConfig.mtc_vel_high,
 		lowTip: EngCalcs.pageConfig.mtc_vel_low
 	});

@@ -15,7 +15,7 @@ echoHeader("EngCalcs", $html_title, $html_head);
 echoCalculatorForm(
     //Inputs
     Array(
-        Array('name' => 'hw', 'type' => 'number', 'default' => '1', 'units' => NULL, 'label' => $ec_lang['wi_headWaterelevation']),
+        Array('name' => 'hw', 'type' => 'number', 'default' => '1', 'units' => NULL, 'label' => $ec_lang['or_hwe']),
         Array('name' => 'cw', 'type' => 'number', 'default' => '3', 'units' => NULL, 'label' => $ec_lang['ws_weirCoefficient'].' <a target="_blank" href="http://epg.modot.org/files/b/bc/749_Broad-Crested_Weir_Coefficients.pdf">?</a>'),
     ),
     //Results
@@ -60,9 +60,9 @@ function echoCalculatorFormAppend() {
 ?>
 <div id="sketch" style="margin-top:1em; max-width:540px;"></div>
 <?php echoFeedback(); ?>
-<h2><?=$ec_lang['mi_notes']?></h2>
+<h2><?=$ec_lang['ws_notes_heading']?></h2>
 <dl>
-<dt><?=$ec_lang['wi_notes_we_term']?></dt><dd><?=$ec_lang['wi_notes_we_def']?></dd>
+<dt><?=$ec_lang['ws_notes_we_term']?></dt><dd><?=$ec_lang['wi_notes_we_def']?></dd>
 </dl>
 <script src="/engcalcs/js/weir-flow-irregular.js?v=<?=filemtime(__DIR__.'/js/weir-flow-irregular.js')?>"></script>
 <script>

@@ -17,7 +17,7 @@ echoCalculatorForm(
 		Array('name' => 'cs_Q_in',       'type' => 'number', 'default' => '1.000', 'units' => Array('m3ps','lps','ft3ps'),  'label' => $ec_lang['cs_Q_in']),
 		Array('name' => 'cs_Q_out',      'type' => 'number', 'default' => '0.900', 'units' => Array('m3ps','lps','ft3ps'),  'label' => $ec_lang['cs_Q_out']),
 		Array('name' => 'cs_L',          'type' => 'number', 'default' => '1000',  'units' => Array('m','ft'),              'label' => $ec_lang['cs_L']),
-		Array('name' => 'cs_wp',         'type' => 'number', 'default' => '',      'units' => Array('m','ft'),              'label' => $ec_lang['cs_wp']),
+		Array('name' => 'cs_wp',         'type' => 'number', 'default' => '',      'units' => Array('m','ft'),              'label' => $ec_lang['mpf_wetted_perimeter']),
 		Array('name' => 'cs_water_value','type' => 'number', 'default' => '',      'units' => Array('m3','ft3','acft'),     'label' => $ec_lang['cs_water_value'], 'separator' => '/'),
 		Array('name' => 'cs_lining_cost','type' => 'number', 'default' => '',      'units' => Array('m2','ft2'),            'label' => $ec_lang['cs_lining_cost'],  'separator' => '/'),
 		Array('name' => 'cs_Ec_target',  'type' => 'number', 'default' => '',      'units' => NULL,                         'label' => $ec_lang['cs_Ec_target']),
@@ -43,10 +43,10 @@ echoCalculatorForm(
 
 <h2><?=$ec_lang['ws_notes_heading']?></h2>
 <dl>
-	<dt><?=$ec_lang['cs_notes_1_term']?></dt><dd><?=$ec_lang['cs_notes_1_def']?></dd>
+	<dt><?=$ec_lang['odt_notes_2_term']?></dt><dd><?=$ec_lang['cs_notes_1_def']?></dd>
 	<dt><?=$ec_lang['cs_notes_2_term']?></dt><dd><?=$ec_lang['cs_notes_2_def']?></dd>
 	<dt><?=$ec_lang['cs_notes_3_term']?></dt><dd><?=$ec_lang['cs_notes_3_def']?></dd>
-	<dt><?=$ec_lang['cs_notes_4_term']?></dt><dd><?=$ec_lang['cs_notes_4_def']?></dd>
+	<dt><?=$ec_lang['rc_notes_4_term']?></dt><dd><?=$ec_lang['cs_notes_4_def']?></dd>
 </dl>
 
 <?php echoFeedback(); ?>
