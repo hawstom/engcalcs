@@ -17,7 +17,7 @@ ruling required before exec).
 | Owner rule (neutral prefix vs borrow) | D1: borrow-from-owner, **incumbency** wins, menu order tiebreak | ☑ decided |
 
 ### §2 Exact duplicates (17 groups; full-suite audit 2026-07-07)
-Owner by incumbency→menu; apply D7 (capture divergence to `dev/merge-divergence-review.md`).
+Owner by incumbency→menu; apply D7 (**English-only**: delete redundant key from English + repoint refs; non-English orphans handled at propagation).
 | Survivor ← redundant | Status |
 |---|---|
 | `mpf_flow` ← or_flow, essc_q | ☐ |

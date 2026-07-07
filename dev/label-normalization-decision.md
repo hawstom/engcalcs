@@ -112,28 +112,33 @@ verdict-string block wherever it appears), not tied to any one calculator catego
 Terminology note: **"calculator categories"** (the 6 calc groupings) vs **"translation tiers/waves"**
 (language groupings) — never bare "families".
 
-### D7 — Merge execution method (per exact-duplicate / cluster group)
+### D7 — Merge execution method: ENGLISH-ONLY, propagate later (Tom, 2026-07-07)
 
-A full-suite safety scan (2026-07-07) showed the "exact English duplicate" groups are **not
-mechanical**: only 3 of 17 groups have non-English translations that match across all languages —
-the other 14 have **divergent** translations (same English, drifted over time). Method:
+**Item 90 touches only the English source (`lib/lang.ec.en.php`) and code references** (PHP/JS).
+The 26 non-English files are **not edited during item 90.** Non-English cleanup (deleting orphaned
+redundant keys, re-translating survivors) is **deferred to the propagation phase inside item 85**,
+where tier-1 cognate translation can feed corrections back to English. Per merge group:
 
 1. **Owner** = incumbent (D1), else menu order (D1 tiebreak).
-2. **Pick the surviving key; delete the redundant one(s); repoint every PHP/JS reference** to the
-   survivor.
-3. **Extra-meaning check (the `mi_q_617` lesson):** if a redundant key's divergence reflects
-   *meaning not present in the survivor's English* (e.g. es/pt's composite-`n` sentence), **capture
-   it in the English source first** (tip/intent), then merge.
-4. **Divergent translations: capture, don't discard** (Tom, 2026-07-07 — "capture/append/
-   concatenate when in doubt, and note for future review"). When a redundant key's translations
-   diverge from the survivor's, **record them** (per language) under the survivor in a divergence
-   review log (e.g. `dev/merge-divergence-review.md`) so a future translator can choose the best
-   wording — do **not** silently drop them. Rationale: some divergences are garbage and some are
-   the better rendering; the complete re-translation pass (and tier-1's interactive English
-   feedback) will reconcile them, but only if the prior art is preserved for review.
+2. **Pick the surviving key; delete the redundant one(s) from English only; repoint every PHP/JS
+   reference** to the survivor. Apply the chosen wording / symbols / D8 to the survivor's English.
+3. **Extra-meaning check (the `mi_q_617` lesson):** if a redundant key's non-English divergence
+   encodes *meaning not present in the survivor's English* (e.g. es/pt's composite-`n` sentence),
+   reflect that meaning in the **English** now (tip/intent) before deleting — capturing extra meaning
+   is an English decision and belongs here. Mere wording drift is NOT captured (see 4).
+4. **Divergent translations are preserved in place, not into a doc.** Because the redundant key is
+   deleted from English **only**, its non-English translations survive as **orphaned keys** in the
+   26 files until propagation. No `merge-divergence-review.md` is needed — the prior art is the
+   orphan itself. Propagation is **deterministic**: the orphans are exactly the keys
+   `lang_parity_check.php` reports as "extra" (present in a lang file, absent from English); the
+   complete re-translation + tier-1 English feedback reconcile them.
 5. **`mtc_note_2_term` stays separate** (Tom, 2026-07-07): although its English "Velocity check"
    matches the `mtc_vel_check` verdict label, it is a notes-glossary *term*, a different concept —
    do not merge it into the verdict group.
+
+**Expected transient state:** during the 90→85 window, `lang_parity_check` will report extra
+non-English keys (one per merged redundant key × 26) — that is the propagation worklist, not a
+defect. `php -l` + `lang_syntax_validate` must stay clean on every touched file.
 
 ## Execution backlog (item 90, full-suite — one pass over all calculators)
 
