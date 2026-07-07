@@ -17,12 +17,14 @@ are the rulings.
 
 ## Decisions
 
-### D1 — Ownership: borrow-from-owner, menu order breaks ties
+### D1 — Ownership: incumbency wins; menu order only disambiguates
 No neutral/shared prefix (`c_`/`calc_`) is introduced — the overhead of a new prefix is not worth
 it. A shared concept lives under **one owning calculator's key**; every other page borrows it.
-When a concept is shared and there is no established precedent for who owns it, the **owner is the
-calculator that appears earliest in the main menu** (`lib/Menus.lib.php`). Menu order as of this
-decision:
+**Incumbency decides the owner** (Tom, 2026-07-07): when one key is the clear incumbent — the
+survivor already used by materially more pages — it wins, even against menu order. Example:
+`ws_notes_heading` ("Notes", used by 10 pages) beats `mi_notes` (2 pages) despite `mi_` being
+earlier in the menu. **Menu order is only the tiebreaker where there is no clear incumbent** (roughly
+equal usage). Menu order as of this decision:
 
 `mpf_ → mphl_ → hw_ → dw_ → mtc_ → mi_ → rc_ → mhp_ → or_ → odt_ → ws_ → wi_ → cs_ → ip_`
 
@@ -69,28 +71,57 @@ etc.):
 > executed immediately before that family's Wave 0 / wave-1 sprint under item 85…~~
 
 **Reversal (Tom + Opus, 2026-07-07).** Key consolidation is **inherently cross-cutting** — a
-duplicate label's two halves live in *different* calculator families, so no per-calculator-family
+duplicate label's two halves live in *different* calculator categories, so no per-calculator-category
 view can make the merge/ownership call (proved same day: open-channel's merge candidates were
-shared with weirs, irrigation, and micro-hydro). Chunking consolidation per calculator-family
-therefore cannot work, and interleaving it with item 85's per-family translation loop is what
+shared with weirs, irrigation, and micro-hydro). Chunking consolidation per calculator category
+therefore cannot work, and interleaving it with item 85's per-category translation loop is what
 poisoned item 85. **Corrected sequencing:**
 
 > **Item 90 = ONE English-only pass over ALL calculators** (Opus), applying D1–D5 across the whole
 > suite. It is a prerequisite English-reform step, **decoupled from item 85**. Then Wave 0
-> colloquialism cleanup (Fable) → **freeze English** → item 85 complete re-translation → §10.5
-> source-hash last.
+> colloquialism cleanup (Fable) → **translation tier/wave 1 (anchors), which is INTERACTIVE** —
+> translating into cognate languages is how we still detect garbage in the English, so tier-1 work
+> may trigger further English edits (Tom, 2026-07-07) → **English then freezes for tiers/waves 2+**
+> → complete re-translation of waves 2–3 → §10.5 source-hash last.
+
+**Freeze is not absolute** (Tom's correction, 2026-07-07): English is frozen only for translation
+tiers/waves **2 and later**. **Tier/wave 1 stays interactive** — it is the truest detector of
+un-translatable/garbage English, so English keeps changing *through* wave 1 and only freezes after.
 
 The `writeVelocityCheck` mechanism change (D5) is part of this full-suite pass (it touches the
-verdict-string block wherever it appears), not tied to any one calculator family.
+verdict-string block wherever it appears), not tied to any one calculator category.
 
-Terminology note: **"calculator families"** (the 6 calc groupings) vs **"translation tiers/waves"**
+Terminology note: **"calculator categories"** (the 6 calc groupings) vs **"translation tiers/waves"**
 (language groupings) — never bare "families".
+
+### D7 — Merge execution method (per exact-duplicate / cluster group)
+
+A full-suite safety scan (2026-07-07) showed the "exact English duplicate" groups are **not
+mechanical**: only 3 of 17 groups have non-English translations that match across all languages —
+the other 14 have **divergent** translations (same English, drifted over time). Method:
+
+1. **Owner** = incumbent (D1), else menu order (D1 tiebreak).
+2. **Pick the surviving key; delete the redundant one(s); repoint every PHP/JS reference** to the
+   survivor.
+3. **Extra-meaning check (the `mi_q_617` lesson):** if a redundant key's divergence reflects
+   *meaning not present in the survivor's English* (e.g. es/pt's composite-`n` sentence), **capture
+   it in the English source first** (tip/intent), then merge.
+4. **Divergent translations: capture, don't discard** (Tom, 2026-07-07 — "capture/append/
+   concatenate when in doubt, and note for future review"). When a redundant key's translations
+   diverge from the survivor's, **record them** (per language) under the survivor in a divergence
+   review log (e.g. `dev/merge-divergence-review.md`) so a future translator can choose the best
+   wording — do **not** silently drop them. Rationale: some divergences are garbage and some are
+   the better rendering; the complete re-translation pass (and tier-1's interactive English
+   feedback) will reconcile them, but only if the prior art is preserved for review.
+5. **`mtc_note_2_term` stays separate** (Tom, 2026-07-07): although its English "Velocity check"
+   matches the `mtc_vel_check` verdict label, it is a notes-glossary *term*, a different concept —
+   do not merge it into the verdict group.
 
 ## Execution backlog (item 90, full-suite — one pass over all calculators)
 
 Ordered by value ÷ risk (survey §6). Each is a whole-label merge — never fragment composition
 (the one fragment idea, EGL/HGL from `ip_group_*`, is explicitly rejected; keep those as whole
-strings).
+strings). Apply D7 to every group.
 
 1. **Exact duplicates** (survey §2) — ~18 keys, no wording decision. Apply D1/D2 to pick the
    surviving key.

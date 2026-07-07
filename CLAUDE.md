@@ -56,9 +56,9 @@ render time (fragment composition is what broke the original word-level design i
 word-order / RTL languages). Policy:
 
 - **Owner:** the shared concept lives under **one owning calculator's key**; every other page
-  borrows it. No neutral prefix. When there's no established precedent for who owns a shared
-  concept, the owner is the calculator that appears **earliest in the main menu**
-  (`lib/Menus.lib.php`).
+  borrows it. No neutral prefix. **Incumbency decides the owner** — the key already used by
+  materially more pages wins (e.g. `ws_notes_heading`, 10 pages, over `mi_notes`, 2). **Menu order**
+  (`lib/Menus.lib.php`) is only the tiebreak when there's no clear incumbent.
 - **Wording:** menu order picks *which key survives*; the surviving key's English *value* takes the
   best wording found across the cluster (not automatically the owner's current wording).
 - **Loss symbols:** lowercase `h` for loss components (`h_f`, `h_m`, `h_L`; coefficient `k_m`);
@@ -68,8 +68,8 @@ word-order / RTL languages). Policy:
   form in the shared key, long forms in tooltips — never the reverse.
 
 Consolidation is **one full-suite English-only pass** over all calculators (never chunked per
-calculator family — a duplicate's two halves live in different families). Full decision record and
-execution backlog: `dev/label-normalization-decision.md`.
+calculator category — a duplicate's two halves live in different categories). Full decision record
+and execution backlog: `dev/label-normalization-decision.md`.
 
 ### Verdict / check-string convention (item-90 decision, 2026-07-07)
 
