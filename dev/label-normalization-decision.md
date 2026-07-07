@@ -82,11 +82,11 @@ inside the anchor (a tap on the `?` would navigate away). Pattern — **two sepa
 PHP shape: `<a href="…ref…">{symbol_key}</a> {tip_key}`. This supersedes the earlier "link OR tip,
 never both" idea — we keep both, as two distinct elements.
 
-### D6 — Sequencing ~~merge per calculator-family~~ → REVERSED 2026-07-07: one full-suite pass
+### D6 — Sequencing ~~merge per calculator-category~~ → REVERSED 2026-07-07: one full-suite pass
 > **⚠ D6 as originally written was WRONG and is reversed. Superseded text kept struck-through for the record.**
 >
-> ~~Merges are not a single suite-wide pass. Each family's exact-duplicate + cluster merges are
-> executed immediately before that family's Wave 0 / wave-1 sprint under item 85…~~
+> ~~Merges are not a single suite-wide pass. Each category's exact-duplicate + cluster merges are
+> executed immediately before that category's Wave 0 / wave-1 sprint under item 85…~~
 
 **Reversal (Tom + Opus, 2026-07-07).** Key consolidation is **inherently cross-cutting** — a
 duplicate label's two halves live in *different* calculator categories, so no per-calculator-category
@@ -96,11 +96,14 @@ therefore cannot work, and interleaving it with item 85's per-category translati
 poisoned item 85. **Corrected sequencing:**
 
 > **Item 90 = ONE English-only pass over ALL calculators** (Opus), applying D1–D5 across the whole
-> suite. It is a prerequisite English-reform step, **decoupled from item 85**. Then Wave 0
-> colloquialism cleanup (Fable) → **translation tier/wave 1 (anchors), which is INTERACTIVE** —
-> translating into cognate languages is how we still detect garbage in the English, so tier-1 work
-> may trigger further English edits (Tom, 2026-07-07) → **English then freezes for tiers/waves 2+**
-> → complete re-translation of waves 2–3 → §10.5 source-hash last.
+> suite. It is a prerequisite English-reform step, **decoupled from item 85**. Then **Wave 0
+> colloquialism cleanup (Fable) — also ONE pass across ALL 6 calculator categories, run to
+> completion before wave 1 starts on ANY category** (not interleaved per category — that would
+> repeat the exact per-category-chunking mistake this reversal is fixing for key consolidation) →
+> **translation tier/wave 1 (anchors), which is INTERACTIVE** — translating into cognate languages
+> is how we still detect garbage in the English, so tier-1 work may trigger further English edits
+> (Tom, 2026-07-07) → **English then freezes for tiers/waves 2+** → complete re-translation of
+> waves 2–3 → §10.5 source-hash last.
 
 **Freeze is not absolute** (Tom's correction, 2026-07-07): English is frozen only for translation
 tiers/waves **2 and later**. **Tier/wave 1 stays interactive** — it is the truest detector of
@@ -163,7 +166,7 @@ Each is a whole-label merge — never fragment composition (the one fragment ide
    "Weir length" (`ws_weirLength` — term of art). Fix `l`→`L` on weir length.
 7. **Friction-slope naming + S₀ convention** (§3.4) — "friction slope" canonical over mpf's
    "pressure slope"; keep S₀ = bed slope, S_f = friction slope (mpf currently inverts this).
-8. **Typography ride-alongs** (§4) — batch into each family's approved Wave 0 English edits: symbol
+8. **Typography ride-alongs** (§4) — batch into each category's approved Wave 0 English edits: symbol
    case drift, `Cw`→`C_w`, `D50`→`D₅₀`, Froude `F`→`Fr`, and converting the inline
    `style="cursor:help;…"` tooltip spans (mtc_, rc_) to `class="ec-tip"`.
 

@@ -19,7 +19,7 @@ Columns: **Key | Current English | Proposed English | Intent(s) obsoleted | Tom'
 
 ---
 
-## Family 1 — Open channel (`mtc_` / `mi_`)  [drafted by Opus, 2026-07-06]
+## Category 1 — Open channel (`mtc_` / `mi_`)  [drafted by Opus, 2026-07-06]
 
 ### A. Colloquialisms / casual wording — reword
 
@@ -83,8 +83,8 @@ Proposed `_intent` to ADD (calque-trap, survives perfect English): `mi_menu`/`mi
 
 ---
 
-## Families 2–6 — TODO (Fable Wave 0 sweep)
+## Categories 2–6 — TODO (Fable Wave 0 sweep)
 
 Sweep the remaining `*_notes_*_def` / tooltip long strings and harvest existing
 colloquialism-explaining intents (concentrated in `ip_`/`rc_`, where translation-discovery already
-happened — those intents ARE the surfaced grievances). Append a section per family here.
+happened — those intents ARE the surfaced grievances). Append a section per category here.

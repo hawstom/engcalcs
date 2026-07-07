@@ -208,9 +208,9 @@ One genuine caution: a shared label translated once must fit its narrowest use �
 uses need the short form to be the shared key's home (per the `.ec-narrowcol` width-is-king
 rule), with long forms as tooltips, not vice versa.
 
-**Interaction with item 85 (family-grid translation plan):** every merge executed *before* a
-family's Wave 0/wave 1 shrinks that family's paid sprint. The §2 merges touching families 2–6
-(weirs/orifices, pipe friction, mhp) are worth executing ahead of those families' waves.
+**Interaction with item 85 (category-grid translation plan):** every merge executed *before* a
+category's Wave 0/wave 1 shrinks that category's paid sprint. The §2 merges touching categories 2–6
+(weirs/orifices, pipe friction, mhp) are worth executing ahead of those categories' waves.
 
 ---
 
