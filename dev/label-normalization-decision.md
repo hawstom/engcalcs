@@ -64,6 +64,24 @@ etc.):
 - This makes future calculators' checks a drop-in and lets the duplicated `mtc_`/`mhp_`
   velocity-check block (7 keys) and the four ad-hoc verdict styles collapse to one.
 
+### D8 — Reference-linked labels: symbol link + separate reusable tip (Tom, 2026-07-07)
+Some input labels carry an **external reference link** applied in the PHP page (not the lang string)
+— it wraps the label in `<a href="…">` (e.g. EPA roughness tables on Darcy-Weisbach/Micro-Hydro `e`;
+engineeringtoolbox on Manning `n`, Hazen-Williams `c`). For these, a help tip must **not** nest
+inside the anchor (a tap on the `?` would navigate away). Pattern — **two separate affordances:**
+
+- **Linked label** = the bare **symbol only** (e.g. `e`), default HTML anchor styling (blue,
+  underlined), **no `?`**. Because it is a bare symbol it becomes a **universal key** (identical in
+  all 27 languages, no translation).
+- **A separate `?` help tip**, in its **own lang key**, placed **outside** the `</a>`, carrying the
+  `ec-tip` tooltip (e.g. title "Darcy-Weisbach roughness"). The `?` disambiguates the bare symbol.
+- **The tip key is reusable** across every calculator sharing the concept (one roughness tip for
+  dw/mhp/ip; one Manning-`n` tip for mpf/mphl/mtc). Net: verbose per-calculator labels collapse to
+  **one symbol key + one shared tip key** — a large key saving.
+
+PHP shape: `<a href="…ref…">{symbol_key}</a> {tip_key}`. This supersedes the earlier "link OR tip,
+never both" idea — we keep both, as two distinct elements.
+
 ### D6 — Sequencing ~~merge per calculator-family~~ → REVERSED 2026-07-07: one full-suite pass
 > **⚠ D6 as originally written was WRONG and is reversed. Superseded text kept struck-through for the record.**
 >
