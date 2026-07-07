@@ -280,7 +280,6 @@ $ec_lang['mhp_hl_check']='የጫና ኪሳራ ምርመራ';
 $ec_lang['mhp_hnet']='ንጹህ ጫና፣ H<sub>net</sub>';
 $ec_lang['mhp_power']='የሃይል ውጤት፣ P';
 $ec_lang['mhp_annual_kwh']='ከ100% አቅም ጋር ዓመታዊ ኃይል';
-$ec_lang['mhp_vel_ok']='1–3 m/s — ዒላማ ውስጥ ✓';
 $ec_lang['mhp_vel_low']='ከ1 m/s በታች — ረሳሪሕ እና አየር ወሰድ አደጋ ⚠';
 $ec_lang['mhp_vel_high']='ፍጥነቱ ከፍተኛ ነው - ሽግግር ኪሳራዎች፣ ሊታገድ የሚችል ሃይል፣ እና የውሃ ግፊት ያረጋግጡ።';
 $ec_lang['mhp_vel_ok_short']='ጥሩ';
@@ -333,9 +332,6 @@ $ec_lang['odt_vol']='የፈሰሰ ድምር';
 $ec_lang['odt_sketch_start']='ጅምር';
 $ec_lang['odt_sketch_end']='ፍጻሜ';
 // Erosion Setback and Scour Calc.
-$ec_lang['essc_btbw']='ዳርቻ እስከ ዳርቻ ስፋት';
-$ec_lang['essc_mcr']='ዝቅተኛ ጥምዝ ራዲየስ';
-$ec_lang['essc_q']='ፍሰት, Q';
 // Contact us.
 
 // Irrigation

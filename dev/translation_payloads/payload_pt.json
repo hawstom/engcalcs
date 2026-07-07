@@ -1,15 +1,18 @@
 {
     "meta": {
         "language": "pt",
-        "expected_key_count": 501,
-        "delta_key_count": 16,
+        "expected_key_count": 482,
+        "delta_key_count": 26,
         "active_prefixes": [
             "calc",
+            "dw",
             "ip",
             "irr",
             "mhp",
             "mtc",
-            "or"
+            "odt",
+            "or",
+            "rc"
         ],
         "requested_prefix": null,
         "notes": "Translate only keys in keys_to_translate; preserve HTML, units, and symbols.",
@@ -19,11 +22,14 @@
     },
     "prompt_context_by_prefix": {
         "calc": "Use these preferred technical term translations when relevant:\n- flow (Q): vazão\n- velocity (v): velocidade\n- slope (S): declividade",
+        "dw": "Use these preferred technical term translations when relevant:\n- flow (Q): vazão\n- velocity (v): velocidade\n- head loss (h_L): perda de carga\n- friction factor (f): fator de atrito\n- slope (S): declividade\n- laminar: laminar\n- transitional: de transição\n- turbulent: turbulento",
         "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): vazão\n- velocity (v): velocidade\n- head loss (h_L): perda de carga\n- emitter: emissor\n- distribution uniformity (DU): uniformidade de distribuição\n- low-quarter distribution uniformity (DU_lq): uniformidade de distribuição do quarto inferior\n- application rate (PR): taxa de aplicação\n- lateral: linha lateral\n- mainline: linha principal\n- reach: trecho\n- velocity head (H_v): carga de velocidade\n- friction loss (h_f): perda de carga por atrito\n- minor loss (h_m): perda de carga localizada\n- energy grade line (EGL): linha de energia\n- upstream: a montante\n- downstream: a jusante",
-        "irr": "Use these preferred technical term translations when relevant:\n- flow (Q): vazão\n- velocity (v): velocidade\n- slope (S): declividade",
-        "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): vazão\n- penstock: conduto forçado\n- gross head (H_gross): altura bruta\n- net head (H_net): altura líquida\n- plant efficiency (η): eficiência da usina\n- head loss (h_L): perda de carga\n- run-of-river: fio d'água\n- headworks: obras de captação\n- junction loss (h_m): perdas localizadas",
+        "irr": "Use these preferred technical term translations when relevant:\n- flow (Q): vazão\n- weir: vertedor\n- orifice: orifício\n- seepage: infiltração\n- conveyance efficiency (E_c): eficiência de condução\n- check structure: [needs translation sprint]",
+        "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): vazão\n- penstock: conduto forçado\n- gross head (H_gross): altura bruta\n- net head (H_net): altura líquida\n- plant efficiency (η): eficiência da usina\n- head loss (h_L): perda de carga\n- run-of-river: fio d'água\n- headworks: obras de captação\n- junction loss (h_m): perdas localizadas\n- minor loss (h_m): perda de carga localizada",
         "mtc": "Use these preferred technical term translations when relevant:\n- flow (Q): vazão\n- velocity (v): velocidade\n- hydraulic radius (R_h): raio hidráulico\n- wetted perimeter (P_w): perímetro molhado\n- Manning roughness (n): coeficiente de rugosidade de Manning\n- slope (S): declividade",
-        "or": "Use these preferred technical term translations when relevant:\n- flow (Q): vazão\n- orifice: orifício\n- discharge coefficient (C_d): coeficiente de descarga\n- headwater elevation: nível d'água a montante\n- tailwater elevation: nível d'água a jusante"
+        "odt": "Use these preferred technical term translations when relevant:\n- orifice: orifício\n- discharge coefficient (C_d): coeficiente de descarga\n- headwater elevation: nível d'água a montante\n- tailwater elevation: nível d'água a jusante\n- crown: [needs translation sprint]",
+        "or": "Use these preferred technical term translations when relevant:\n- flow (Q): vazão\n- orifice: orifício\n- discharge coefficient (C_d): coeficiente de descarga\n- headwater elevation: nível d'água a montante\n- tailwater elevation: nível d'água a jusante\n- crown: [needs translation sprint]",
+        "rc": "Use these preferred technical term translations when relevant:\n- flow (Q): vazão\n- velocity (v): velocidade\n- riprap: enrocamento\n- slope (S): declividade\n- rock chute: rampa em enrocamento\n- chute: calha rápida\n- unit discharge (q, q_t): vazão específica\n- median rock size (D50): tamanho mediano da rocha\n- gradation (SD): granulometria\n- porosity (n_p): porosidade\n- specific gravity (sg): densidade relativa\n- ponding: remanso\n- outlet apron: laje de saída\n- weir head (H_p): carga sobre o vertedor\n- upstream: a montante\n- downstream: a jusante\n- reach: trecho"
     },
     "glossary_terms_by_prefix": {
         "calc": [
@@ -47,6 +53,64 @@
                 "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
                 "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
                 "preferred_translation": "declividade"
+            }
+        ],
+        "dw": [
+            {
+                "term": "flow",
+                "symbol": "Q",
+                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered. ENGINEER CLARIFICATION (2026-07-06): 'дебит is a typical colloquial call of the word — regular people and non-hydraulic engineers use it. In university (hydraulic engineering) they used водно количество for Q, never дебит. I guess both work.' So both are acceptable; водно количество is the academic\/hydraulic-engineering register, дебит the general register. Still an open decision whether to standardize on водно количество suite-wide.",
+                "preferred_translation": "vazão"
+            },
+            {
+                "term": "velocity",
+                "symbol": "v",
+                "context": "Flow velocity (speed of water). Appears in all calculators.",
+                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
+                "preferred_translation": "velocidade"
+            },
+            {
+                "term": "head loss",
+                "symbol": "h_L",
+                "context": "Energy loss expressed as a height of water column. Appears in Darcy-Weisbach, Hazen-Williams, Manning pipe, and Penstock calculators. Distinct from 'pressure drop' — use the hydraulic engineering term.",
+                "translation_notes": "'Head' in the hydraulic sense (energy per unit weight) does not translate literally in many languages — use the established civil\/hydraulic engineering phrase. Pre-2026 sr\/hr human translations used 'gubitak pritiska' (= pressure loss), which is technically the same concept expressed in pressure terms rather than head terms. The current 'губитак напора \/ gubitak tlačne visine' (= loss of hydraulic head) is more precise in a hydraulic engineering context and is preferred.",
+                "preferred_translation": "perda de carga"
+            },
+            {
+                "term": "friction factor",
+                "symbol": "f",
+                "context": "Darcy-Weisbach friction factor. Dimensionless coefficient in the Darcy-Weisbach head loss equation. Distinct from Hazen-Williams C coefficient.",
+                "translation_notes": "Use the hydraulic\/civil engineering term. In some languages, 'friction' and 'resistance' terms compete — prefer 'friction' to match the Darcy-Weisbach naming convention.",
+                "preferred_translation": "fator de atrito"
+            },
+            {
+                "term": "slope",
+                "symbol": "S",
+                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
+                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
+                "preferred_translation": "declividade"
+            },
+            {
+                "term": "laminar",
+                "symbol": "",
+                "context": "Flow regime in which fluid moves in parallel layers with no lateral mixing. Reynolds number below ~2000. Appears in Darcy-Weisbach calculator flow regime check.",
+                "translation_notes": "Nearly always a direct cognate or borrowing from the Latin in technical languages. Confirm the local engineering convention.",
+                "preferred_translation": "laminar"
+            },
+            {
+                "term": "transitional",
+                "symbol": "",
+                "context": "Flow regime between laminar and turbulent — Reynolds number roughly 2000–4000. Appears in Darcy-Weisbach calculator flow regime check.",
+                "translation_notes": "Use the adjective form meaning 'between two states'. Some languages use 'critical flow' for this regime — check local hydraulics convention.",
+                "preferred_translation": "de transição"
+            },
+            {
+                "term": "turbulent",
+                "symbol": "",
+                "context": "Flow regime with chaotic, irregular mixing. Reynolds number above ~4000. Appears in Darcy-Weisbach calculator flow regime check.",
+                "translation_notes": "Nearly always a cognate. Some languages distinguish 'turbulent' (adjective) from 'turbulence' (noun) — use the adjective form.",
+                "preferred_translation": "turbulento"
             }
         ],
         "ip": [
@@ -117,7 +181,7 @@
                 "term": "reach",
                 "symbol": "",
                 "context": "A segment of pipe or channel between two nodes\/cross-sections. Table rows in Irrigation Pressure are reaches.",
-                "translation_notes": "Hydraulics noun, NOT \"arrival\/reaching\" (ps \"رسیدل\" wrong), NOT \"agent\" (sw \"mwakala\" wrong), NOT \"stripe\" (km wrong). Related senses in the Irrigation Pressure method notes: \"the reach right at the takeoff\" means the reach located exactly at that point, not the right-hand side; \"draw\"\/\"draw off\" means to withdraw water from the pipe. Bisection is the numerical root-finding method used to close the pressure loop.",
+                "translation_notes": "Hydraulics noun, NOT \"arrival\/reaching\" (ps \"رسیدل\" wrong), NOT \"agent\" (sw \"mwakala\" wrong), NOT \"stripe\" (km wrong). Bisection is the numerical root-finding method used to close the pressure loop in the Irrigation Pressure notes. (Wave 0, 2026-07-07, removed the former \"right at the takeoff\" and \"draw off\" wording from the English source.)",
                 "preferred_translation": "trecho"
             },
             {
@@ -172,18 +236,39 @@
                 "preferred_translation": "vazão"
             },
             {
-                "term": "velocity",
-                "symbol": "v",
-                "context": "Flow velocity (speed of water). Appears in all calculators.",
-                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
-                "preferred_translation": "velocidade"
+                "term": "weir",
+                "symbol": "",
+                "context": "A flow-measurement or water-control structure — a barrier across a channel over which water flows. Appears in Weir Flow Simple and Weir Flow Irregular calculators.",
+                "translation_notes": "WMO No. 385 entry 1665 confirms: es = 'vertedero', fr = 'déversoir', ru = 'водослив'. In an irrigation context, the term often overlaps with 'diversion dam' or 'check structure'. Use the term most common among irrigation field workers in the target language, not a purely civil-engineering dictionary term.",
+                "preferred_translation": "vertedor"
             },
             {
-                "term": "slope",
-                "symbol": "S",
-                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
-                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
-                "preferred_translation": "declividade"
+                "term": "orifice",
+                "symbol": "",
+                "context": "A submerged or free-flowing opening through which water discharges under head. Appears in Orifice Flow and Orifice Drain Time calculators.",
+                "translation_notes": "In irrigation contexts, often the opening of a headgate or pipe turnout. Use the hydraulic engineering term, not a general word for 'hole' or 'opening'.",
+                "preferred_translation": "orifício"
+            },
+            {
+                "term": "seepage",
+                "symbol": "",
+                "context": "Water lost from a canal through the bed and banks by percolation into the soil. Appears in Canal Seepage calculator.",
+                "translation_notes": "Use the irrigation\/canal engineering term for slow percolation loss, not a word implying leakage through a crack or structural failure.",
+                "preferred_translation": "infiltração"
+            },
+            {
+                "term": "conveyance efficiency",
+                "symbol": "E_c",
+                "context": "Ratio of outflow to inflow in a canal reach — measures how much water delivered at the head is received at the tail. Appears in Canal Seepage calculator. E_c = Q_out \/ Q_in.",
+                "translation_notes": "This is the most terminology-sensitive term in the suite. 'Conveyance' means transport of water along a canal — do not use a general word for 'efficiency' alone. The term should convey 'how well the canal transports water without loss'.",
+                "preferred_translation": "eficiência de condução"
+            },
+            {
+                "term": "check structure",
+                "symbol": "",
+                "context": "A small flow-control structure (gate or board structure) in an irrigation canal, used to raise ('check') the upstream water level for diversion or measurement. 'Check' is part of the structure's name.",
+                "translation_notes": "Use the local irrigation term for a canal check\/control gate. 'Check' here is NOT the verb 'to verify\/inspect' — do not translate as 'inspect the structure'.",
+                "preferred_translation": ""
             }
         ],
         "mhp": [
@@ -249,6 +334,13 @@
                 "context": "Energy loss at pipe junctions, bends, fittings, and entrance — a local (point) loss as opposed to distributed friction loss along the pipe. h_m = k_m × v²\/(2g). Appears in Manning Pipe Head Loss and Micro-Hydro Power calculators.",
                 "translation_notes": "CANONICAL ENGLISH (label-normalization decision, item 90, 2026-07-07): the suite-wide English label for this concept is \"Minor (local) loss\" — 'junction loss' (formerly mphl_) and 'minor loss' (mhp_\/ip_) are merged into it; see the 'minor loss' entry for the canonical treatment. The term 'minor' is conventional but misleading — do not imply these losses are always small; the parenthetical '(local)' carries the true sense. Use the hydraulic engineering term for local\/point losses at fittings. French: 'perte singulière'. Spanish: 'pérdida local' or 'pérdida por accesorio'. Russian: 'местные потери'. Chinese: '局部水头损失'.",
                 "preferred_translation": "perdas localizadas"
+            },
+            {
+                "term": "minor loss",
+                "symbol": "h_m",
+                "context": "Local head loss at fittings\/valves\/couplers (coefficient k_m). Canonical merged concept for the former 'junction loss' (mphl_) and 'minor loss' (mhp_\/ip_). Manning Pipe Head Loss, Micro-Hydro Power, Irrigation Pressure.",
+                "translation_notes": "CANONICAL ENGLISH LABEL: \"Minor (local) loss\" (label-normalization decision, item 90, 2026-07-07). 'Minor ⇄ local' — a local\/point loss at fittings, NOT a \"smaller\" loss; the '(local)' parenthetical fixes the mistranslation trap. Symbol h_m, coefficient k_m (lowercase h reserved for loss components; capital H reserved for total\/gross\/net head, per the same decision).",
+                "preferred_translation": "perda de carga localizada"
             }
         ],
         "mtc": [
@@ -295,6 +387,43 @@
                 "preferred_translation": "declividade"
             }
         ],
+        "odt": [
+            {
+                "term": "orifice",
+                "symbol": "",
+                "context": "A submerged or free-flowing opening through which water discharges under head. Appears in Orifice Flow and Orifice Drain Time calculators.",
+                "translation_notes": "In irrigation contexts, often the opening of a headgate or pipe turnout. Use the hydraulic engineering term, not a general word for 'hole' or 'opening'.",
+                "preferred_translation": "orifício"
+            },
+            {
+                "term": "discharge coefficient",
+                "symbol": "C_d",
+                "context": "Coefficient correcting theoretical orifice or weir flow for real-world contraction and friction effects. Appears in Orifice and Weir calculators.",
+                "translation_notes": "The 'discharge' here refers to flow rate, not the verb. Use the hydraulic engineering compound term.",
+                "preferred_translation": "coeficiente de descarga"
+            },
+            {
+                "term": "headwater elevation",
+                "symbol": "",
+                "context": "Water surface elevation on the upstream side of a weir or orifice. Appears in Weir Flow and Orifice calculators.",
+                "translation_notes": "'Headwater' is an upstream water surface — do not confuse with 'head' (energy) or 'source' (origin of a stream). Use the hydraulic structure term.",
+                "preferred_translation": "nível d'água a montante"
+            },
+            {
+                "term": "tailwater elevation",
+                "symbol": "",
+                "context": "Water surface elevation on the downstream side of a weir or orifice. Appears in Orifice Flow calculator. When tailwater is above the invert, the orifice is submerged.",
+                "translation_notes": "Use the hydraulic structure term for downstream water level. Pair consistently with 'headwater elevation'.",
+                "preferred_translation": "nível d'água a jusante"
+            },
+            {
+                "term": "crown",
+                "symbol": "",
+                "context": "The top (highest point) of the inside of a pipe or of an opening. Synonyms: top, soffit, obvert. Technical hydraulics term; orifice flow applies only when headwater is above the crown of the opening.",
+                "translation_notes": "Prefer the local hydraulics term for the pipe soffit\/crown if one exists; otherwise a plain word for 'top (of the opening)' is correct. Not the royal or anatomical senses of 'crown'.",
+                "preferred_translation": ""
+            }
+        ],
         "or": [
             {
                 "term": "flow",
@@ -330,62 +459,194 @@
                 "context": "Water surface elevation on the downstream side of a weir or orifice. Appears in Orifice Flow calculator. When tailwater is above the invert, the orifice is submerged.",
                 "translation_notes": "Use the hydraulic structure term for downstream water level. Pair consistently with 'headwater elevation'.",
                 "preferred_translation": "nível d'água a jusante"
+            },
+            {
+                "term": "crown",
+                "symbol": "",
+                "context": "The top (highest point) of the inside of a pipe or of an opening. Synonyms: top, soffit, obvert. Technical hydraulics term; orifice flow applies only when headwater is above the crown of the opening.",
+                "translation_notes": "Prefer the local hydraulics term for the pipe soffit\/crown if one exists; otherwise a plain word for 'top (of the opening)' is correct. Not the royal or anatomical senses of 'crown'.",
+                "preferred_translation": ""
+            }
+        ],
+        "rc": [
+            {
+                "term": "flow",
+                "symbol": "Q",
+                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered. ENGINEER CLARIFICATION (2026-07-06): 'дебит is a typical colloquial call of the word — regular people and non-hydraulic engineers use it. In university (hydraulic engineering) they used водно количество for Q, never дебит. I guess both work.' So both are acceptable; водно количество is the academic\/hydraulic-engineering register, дебит the general register. Still an open decision whether to standardize on водно количество suite-wide.",
+                "preferred_translation": "vazão"
+            },
+            {
+                "term": "velocity",
+                "symbol": "v",
+                "context": "Flow velocity (speed of water). Appears in all calculators.",
+                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
+                "preferred_translation": "velocidade"
+            },
+            {
+                "term": "riprap",
+                "symbol": "",
+                "context": "Angular rock placed to resist erosion on channel beds and banks. Appears in Manning Trapezoidal Channel and Rock Chute calculators.",
+                "translation_notes": "No direct single-word equivalent in most languages. Use the established local engineering term — this varies significantly by country. In Spanish, 'enrocado' (general) or 'escollera' (bank protection) are both used; lead with 'enrocado'. Bulgarian terms verified\/corrected by a native Bulgarian engineer, 2026-07 (dev\/Bulgarian-engineer-feedback.md). bg: 'каменна облицовка' (stone lining), not 'каменна наброска'.",
+                "preferred_translation": "enrocamento"
+            },
+            {
+                "term": "slope",
+                "symbol": "S",
+                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
+                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
+                "preferred_translation": "declividade"
+            },
+            {
+                "term": "rock chute",
+                "symbol": "",
+                "context": "A steep rock-lined drop structure (also called a 'rock ramp') that conveys water rapidly down a slope in irrigation, drainage, or watershed management. Key concepts for translation: rock-lined, steep gradient, spillway or drop structure — translate the concept, not the English word 'chute'. The rock riprap matrix dissipates energy and resists erosion. Appears in Rock Chute Design (Robinson) and Robinson Rock Chute calculators.",
+                "translation_notes": "CRITICAL: 'Robinson' is the surname of K.M. Robinson, co-author of Robinson, Rice & Kadavy (1998) — it is a proper noun and must NEVER be translated or modified in any language. Translate only 'Rock Chute'. Concept to translate: 'rock-lined steep channel' or 'rock-lined spillway' — the drop\/descent nature must be conveyed; a generic 'rock channel' is insufficient. CRITICAL for French: WMO No. 385 entry 517 establishes that the French word 'chute' means 'fall' (elevation difference) — it cannot name this structure. Use 'coursier en enrochement' (coursier = steep channel structure; enrochement = riprap). Spanish: USDA uses 'bajante de rocado' — 'bajante' (from bajar = to descend) correctly conveys the drop-structure nature; 'de rocado' = rock-lined. Russian: 'каменный быстроток' ('быстроток' = fast-flow\/steep channel). Portuguese: changed from 'calha' (generic trough) to 'rampa em enrocamento' (rampa = ramp\/slope, enrocamento = riprap) to convey steep character. Serbian: changed from 'жлеб' (gutter\/trough) to 'брзоток' (fast-flow structure), consistent with ru\/uk pattern. Bengali: changed from borrowed 'চ্যুট' (conveys nothing) to 'পাথর-আবৃত খাড়া নালা' (rock-lined steep channel). Persian: changed from generic 'آبراه سنگی' (stone waterway) to 'آبراه تند سنگچین' (تند = steep\/swift, سنگچین = stone-laid\/riprap). Pashto: added 'تند' (steep\/swift) to original. Khmer: changed 'ចំហ' (open) to 'ជម្រាល' (sloped\/inclined). NEEDS HUMAN REVIEW: am (ምቀጫ meaning uncertain), my (ထောင် may not clearly convey steep to all readers), de (Steinschütte is standard engineering term but doesn't explicitly say 'steep channel'). Turkish: changed to 'taş düşü' — 'düşü' is the established Turkish hydraulics term for a drop\/chute structure (2026-07 audit; previous 'taş eğimli kanal' was descriptive but nonstandard). Spanish: NEEDS HUMAN VERIFICATION — 'bajante de rocado' claims a USDA source but 'rocado' is not standard Spanish ('enrocado' is); verify the USDA document or switch to 'bajante de enrocado'. 2026-07 reconciliation: fr\/ro\/ru\/uk lang files updated to match this entry. NOT reconciled pending human review of the GLOSSARY side: hr 'kameni skluz' (consider 'kameni brzotok', parallel to sr\/ru), bg 'каменна бързина' (consider 'каменен бързоток'), de 'Steinschütte' vs shipped 'Steingerinne' (both defensible - pick one). RESOLVED bg: native Bulgarian engineer confirmed 'каменен бързоток' (2026-07); lang file updated.",
+                "preferred_translation": "rampa em enrocamento"
+            },
+            {
+                "term": "chute",
+                "symbol": "",
+                "context": "A steep open channel or drop structure for conveying water rapidly down a slope. Distinct from a gentle-slope irrigation canal. Per ec_lang_intent guidance: translate as 'steep channel' or 'spillway' — not as the word 'chute' borrowed into another language. Appears in Rock Chute Design (Robinson), Manning Trapezoidal Channel, and related drop-structure calculators.",
+                "translation_notes": "CRITICAL for French: WMO No. 385 entry 517 defines the English word 'fall' (elevation difference) as French 'chute', Spanish 'caída', and Russian 'падение'. The same pattern holds in all three WMO languages: the word for 'fall' (elevation difference) is NOT available for this hydraulic structure. 'Coursier' is the correct French term for the structure. Spanish: 'canal rápido'. Russian: 'быстроток' (the steep channel structure — distinct from 'падение' which means elevation fall). Chinese: '陡槽'.",
+                "preferred_translation": "calha rápida"
+            },
+            {
+                "term": "unit discharge",
+                "symbol": "q, q_t",
+                "context": "Flow rate per unit width of channel (Q\/B), in m²\/s or ft²\/s. The primary design input for the Robinson rock chute method. Appears in Rock Chute Design calculator.",
+                "translation_notes": "Use the hydraulic engineering term. 'Unit' here means 'per unit channel width' — not related to measurement units. Spanish: 'caudal unitario'. French: 'débit unitaire'. German: 'spezifischer Abfluss'. Russian: 'удельный расход'. Chinese: '单宽流量'. Bulgarian terms verified\/corrected by a native Bulgarian engineer, 2026-07 (dev\/Bulgarian-engineer-feedback.md). bg hydraulics uses 'водно количество' for discharge, not 'дебит'.",
+                "preferred_translation": "vazão específica"
+            },
+            {
+                "term": "median rock size",
+                "symbol": "D50",
+                "context": "The particle size at which 50% of the rock is finer by weight. The primary output of the Robinson rock chute method. Also used in Manning Trapezoidal Channel riprap sizing. The symbol D50 is universal — translate only the descriptive label.",
+                "translation_notes": "D50 (or D₅₀) is a universal engineering symbol — do not translate it. Translate only the label 'median rock size' or 'median particle size'. Most languages express this as 'median diameter'. Do not use 'average' (average ≠ median statistically). Spanish: 'tamaño mediano de roca'. French: 'taille médiane des rochers'. Chinese: '中值粒径'.",
+                "preferred_translation": "tamanho mediano da rocha"
+            },
+            {
+                "term": "gradation",
+                "symbol": "SD",
+                "context": "The spread or uniformity of rock particle sizes. In the Robinson method, gradation is expressed as SD = D84.1\/D50. Uniform rock ≈ 1.25; Robinson valid range 1.15–1.47. Appears in Rock Chute Design calculator.",
+                "translation_notes": "Use the geotechnical\/hydraulic engineering term for grain size distribution or grading. Do not translate as 'grade' (implies quality). The symbol 'SD' and ratio notation D84.1\/D50 are universal. Spanish\/Portuguese: 'granulometría'\/'granulometria'. French: 'granulométrie'. Russian\/Bulgarian\/Serbian: 'гранулометрический состав'. Chinese: '级配'. bg: engineer proposed 'коефициент на едрозърнестост' for the D84.1\/D50 gradation SD label (2026-07); applied, but ASK for the standard source — Bulgarian soil mechanics also uses 'коефициент на разнозърненост' for grain-size uniformity.",
+                "preferred_translation": "granulometria"
+            },
+            {
+                "term": "porosity",
+                "symbol": "n_p",
+                "context": "The fraction of the rock layer volume that is void space (air + water). Default 0.45 for angular crushed rock. Determines how much flow passes through the rock mantle versus over the surface. Appears in Rock Chute Design calculator. Distinct from Manning's n (roughness coefficient) — do not confuse the two.",
+                "translation_notes": "Standard hydraulic\/geotechnical term with cognates in most European languages. Always distinguish from Manning 'n' in context — they appear in the same calculator.",
+                "preferred_translation": "porosidade"
+            },
+            {
+                "term": "specific gravity",
+                "symbol": "sg",
+                "context": "Dimensionless ratio of rock density to water density (relative density). Rock Chute input.",
+                "translation_notes": "Dimensionless ratio — not specific weight, which has units (ro \"greutatea specifică\" wrong; use \"densitate relativă\"). Where local practice uses the specific-weight word for this ratio (tr \"özgül ağırlık\", sr\/hr \"specifična težina\"), keep local practice but never attach units.",
+                "preferred_translation": "densidade relativa"
+            },
+            {
+                "term": "ponding",
+                "symbol": "",
+                "context": "Water pooling\/backing up upstream of the chute inlet; beneficial in the Robinson design context.",
+                "translation_notes": "Backwater pooling, not flooding: sw \"mafuriko\" (floods) wrong — use \"kutuama kwa maji\". Keep one term per language (sw and it files alternate).",
+                "preferred_translation": "remanso"
+            },
+            {
+                "term": "outlet apron",
+                "symbol": "",
+                "context": "Flat protective pad of rock\/concrete at the chute outlet (hydraulic-structures term). Rock Chute output and sketch label.",
+                "translation_notes": "Never clothing: it \"grembiule\" (kitchen apron) wrong — use \"platea\"; tr \"önlük\" (bib) wrong. Use the stilling-basin\/apron family term: platea\/radier\/护坦.",
+                "preferred_translation": "laje de saída"
+            },
+            {
+                "term": "weir head",
+                "symbol": "H_p",
+                "context": "Upstream water-surface height above the weir crest — a length, not a pressure. Appears in Rock Chute inlet check.",
+                "translation_notes": "Not a pressure (hr \"tlak na pragu\" wrong). it: head over a weir = \"carico sullo stramazzo\" (soglia = sill; \"soglio\" = throne, wrong).",
+                "preferred_translation": "carga sobre o vertedor"
+            },
+            {
+                "term": "upstream",
+                "symbol": "",
+                "context": "Direction toward the water source\/supply.",
+                "translation_notes": "Hydraulics direction, never software \"upgrade\" (my file error). tr: memba = upstream, mansap = downstream — a tr file flipped these; pin them.",
+                "preferred_translation": "a montante"
+            },
+            {
+                "term": "downstream",
+                "symbol": "",
+                "context": "Direction away from the supply, toward the outlet \/ last emitter.",
+                "translation_notes": "Never software \"downgrade\". ar: downstream = المصب \/ أسفل المجرى (a file used المنبعية = source-side, wrong).",
+                "preferred_translation": "a jusante"
+            },
+            {
+                "term": "reach",
+                "symbol": "",
+                "context": "A segment of pipe or channel between two nodes\/cross-sections. Table rows in Irrigation Pressure are reaches.",
+                "translation_notes": "Hydraulics noun, NOT \"arrival\/reaching\" (ps \"رسیدل\" wrong), NOT \"agent\" (sw \"mwakala\" wrong), NOT \"stripe\" (km wrong). Bisection is the numerical root-finding method used to close the pressure loop in the Irrigation Pressure notes. (Wave 0, 2026-07-07, removed the former \"right at the takeoff\" and \"draw off\" wording from the English source.)",
+                "preferred_translation": "trecho"
             }
         ]
     },
     "keys_to_translate": {
-        "calc_defaults_confirm": "Reset calculator to factory defaults?",
         "calc_copy_link": "Copy link",
         "calc_copy_link_done": "Copied!",
+        "dw_roughness_tip": "<span title=\"Darcy-Weisbach roughness height\" class=\"ec-tip\">?<\/span>",
         "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
-        "mtc_vel_ok_short": "OK",
         "or_shape_circular": "Circular",
+        "or_regime_submerged_tip": "TWE above centroid — orifice regime still valid",
+        "or_regime_warn_tip": "Headwater below crown",
+        "or_regime_twe_above_hwe_tip": "Tailwater (TWE) above headwater (HWE)",
         "mhp_vel_ok_short": "OK",
+        "mhp_hl_warn_tip": "Consider larger pipe",
+        "mhp_hl_bad_tip": "Resize pipe",
+        "odt_h2_warn_tip": "Orifice top = centroid + D\/2",
+        "rc_sg_ok_tip": "2.54–2.82 (Robinson)",
+        "rc_sg_low_tip": "Valid range: 2.54–2.82",
+        "rc_sg_high_tip": "Valid range: 2.54–2.82",
+        "rc_SD_ok_tip": "1.15–1.47 (Robinson)",
+        "rc_SD_low_tip": "Valid range: 1.15–1.47",
+        "rc_SD_high_tip": "Valid range: 1.15–1.47",
+        "rc_pond_ok_tip": "Ponding upstream of the chute inlet is good; it reduces erosion upstream. (USDA)",
+        "rc_pond_warn_tip": "No ponding upstream of the chute inlet; erosion could occur upstream. (USDA)",
         "ip_length": "L",
         "ip_diameter": "D",
+        "ip_roughness": "e",
         "ip_press": "Press.",
-        "ip_v": "V",
-        "ip_hv": "H<sub>v<\/sub>",
-        "ip_hf": "H<sub>f<\/sub>",
-        "ip_hm": "H<sub>m<\/sub>",
         "irr_card_pressure_head": "Irrigation Pressure &amp; Uniformity",
         "irr_card_pressure_desc": "Model the pressure and flow profile along a main-lateral-emitter branch to estimate distribution uniformity from the real test-path pressure, not just a catalog emitter flow rate."
     },
     "keys": {
-        "calc_defaults_confirm": "Reset calculator to factory defaults?",
         "calc_copy_link": "Copy link",
         "calc_copy_link_done": "Copied!",
+        "dw_roughness_tip": "<span title=\"Darcy-Weisbach roughness height\" class=\"ec-tip\">?<\/span>",
         "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
-        "mtc_vel_ok_short": "OK",
         "or_shape_circular": "Circular",
+        "or_regime_submerged_tip": "TWE above centroid — orifice regime still valid",
+        "or_regime_warn_tip": "Headwater below crown",
+        "or_regime_twe_above_hwe_tip": "Tailwater (TWE) above headwater (HWE)",
         "mhp_vel_ok_short": "OK",
+        "mhp_hl_warn_tip": "Consider larger pipe",
+        "mhp_hl_bad_tip": "Resize pipe",
+        "odt_h2_warn_tip": "Orifice top = centroid + D\/2",
+        "rc_sg_ok_tip": "2.54–2.82 (Robinson)",
+        "rc_sg_low_tip": "Valid range: 2.54–2.82",
+        "rc_sg_high_tip": "Valid range: 2.54–2.82",
+        "rc_SD_ok_tip": "1.15–1.47 (Robinson)",
+        "rc_SD_low_tip": "Valid range: 1.15–1.47",
+        "rc_SD_high_tip": "Valid range: 1.15–1.47",
+        "rc_pond_ok_tip": "Ponding upstream of the chute inlet is good; it reduces erosion upstream. (USDA)",
+        "rc_pond_warn_tip": "No ponding upstream of the chute inlet; erosion could occur upstream. (USDA)",
         "ip_length": "L",
         "ip_diameter": "D",
+        "ip_roughness": "e",
         "ip_press": "Press.",
-        "ip_v": "V",
-        "ip_hv": "H<sub>v<\/sub>",
-        "ip_hf": "H<sub>f<\/sub>",
-        "ip_hm": "H<sub>m<\/sub>",
         "irr_card_pressure_head": "Irrigation Pressure &amp; Uniformity",
         "irr_card_pressure_desc": "Model the pressure and flow profile along a main-lateral-emitter branch to estimate distribution uniformity from the real test-path pressure, not just a catalog emitter flow rate."
     },
     "key_context": {
-        "calc_defaults_confirm": {
-            "reason": "equal_to_english",
-            "current_value": "Reset calculator to factory defaults?",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "calc_defaults",
-                    "value": "Valores padrão",
-                    "english": "Default values"
-                },
-                "next_translated": {
-                    "key": "points_data_help",
-                    "value": "(ou Copiar\/Colar usando a área de dados)",
-                    "english": "(or Copy\/Paste using data area)"
-                }
-            }
-        },
         "calc_copy_link": {
             "reason": "equal_to_english",
             "current_value": "Copy link",
@@ -418,6 +679,22 @@
                 }
             }
         },
+        "dw_roughness_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "dw_roughness",
+                    "value": "Rugosidade absoluta, e",
+                    "english": "Roughness, e"
+                },
+                "next_translated": {
+                    "key": "dw_kinematic_viscosity",
+                    "value": "Viscosidade cinemática, ν <span title=\"1×10⁻⁶ m²\/s for clean water at 20°C\" class=\"ec-tip\">?<\/span>",
+                    "english": "Kinematic viscosity, &nu; <span title=\"1×10⁻⁶ m²\/s for clean water at 20°C\" class=\"ec-tip\">?<\/span>"
+                }
+            }
+        },
         "mtc_blodgett_v_bathurst": {
             "reason": "equal_to_english",
             "current_value": "Blodgett vs. Bathurst",
@@ -430,23 +707,7 @@
                 "next_translated": {
                     "key": "mtc_d50_bottom",
                     "value": "Tamanho de rocha requerido no fundo, D50, Maricopa County <span title=\"Quando S0 < 2% segundo Isbash (1936) e Maricopa County, Arizona, EUA. Quando S >= 2% segundo Robinson Rock Chute \" style=\"cursor:help;color:#06c;font-size:0.9em\">?<\/span>",
-                    "english": "Required bottom angular rock size, D50 (Isbash & MC) <span title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\" style=\"cursor:help;color:#06c;font-size:0.9em\">?<\/span>"
-                }
-            }
-        },
-        "mtc_vel_ok_short": {
-            "reason": "equal_to_english",
-            "current_value": "OK",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mtc_vel_low",
-                    "value": "Velocidade baixa — risco de sedimentação.",
-                    "english": "Velocity is low; sedimentation risk."
-                },
-                "next_translated": {
-                    "key": "mtc_vel_high_short",
-                    "value": "Alto",
-                    "english": "High"
+                    "english": "Required bottom angular rock size, D<sub>50<\/sub> (Isbash & MC) <span title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\" class=\"ec-tip\">?<\/span>"
                 }
             }
         },
@@ -466,6 +727,54 @@
                 }
             }
         },
+        "or_regime_submerged_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "or_regime_submerged",
+                    "value": "Orifício submerso (TWE acima do centroide) — válido ✓",
+                    "english": "Submerged orifice"
+                },
+                "next_translated": {
+                    "key": "or_regime_warn",
+                    "value": "Aviso: nível a montante abaixo da crista — não é regime de orifício",
+                    "english": "Outside orifice regime"
+                }
+            }
+        },
+        "or_regime_warn_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "or_regime_warn",
+                    "value": "Aviso: nível a montante abaixo da crista — não é regime de orifício",
+                    "english": "Outside orifice regime"
+                },
+                "next_translated": {
+                    "key": "or_regime_twe_above_hwe",
+                    "value": "Aviso: nível de jusante (TWE) acima do nível de montante (HWE) — verifique as entradas",
+                    "english": "Check inputs"
+                }
+            }
+        },
+        "or_regime_twe_above_hwe_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "or_regime_twe_above_hwe",
+                    "value": "Aviso: nível de jusante (TWE) acima do nível de montante (HWE) — verifique as entradas",
+                    "english": "Check inputs"
+                },
+                "next_translated": {
+                    "key": "or_notes_1_term",
+                    "value": "Equação do orifício",
+                    "english": "Orifice Equation"
+                }
+            }
+        },
         "mhp_vel_ok_short": {
             "reason": "equal_to_english",
             "current_value": "OK",
@@ -473,12 +782,188 @@
                 "previous_translated": {
                     "key": "mhp_vel_high",
                     "value": "Velocidade elevada — verificar perdas de transição, energia disponível e golpe de aríete.",
-                    "english": "Velocity high - check transition losses, available energy, and water hammer."
+                    "english": "Velocity is high; check transition losses, available energy, and water hammer."
                 },
                 "next_translated": {
                     "key": "mhp_vel_high_short",
                     "value": "Alto",
                     "english": "High"
+                }
+            }
+        },
+        "mhp_hl_warn_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "mhp_hl_warn",
+                    "value": "supera o objetivo de 10% — considerar tubagem mais larga ⚠",
+                    "english": "exceeds 10% target"
+                },
+                "next_translated": {
+                    "key": "mhp_hl_bad",
+                    "value": "supera 20% — redimensionar a tubagem",
+                    "english": "exceeds 20%"
+                }
+            }
+        },
+        "mhp_hl_bad_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "mhp_hl_bad",
+                    "value": "supera 20% — redimensionar a tubagem",
+                    "english": "exceeds 20%"
+                },
+                "next_translated": {
+                    "key": "mhp_notes_1_term",
+                    "value": "Perda de carga",
+                    "english": "Head Loss"
+                }
+            }
+        },
+        "odt_h2_warn_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "odt_h2_warn",
+                    "value": "Aviso: cota final igual ou abaixo do topo do orifício (centroide + D\/2)",
+                    "english": "Ending elevation at or below orifice top"
+                },
+                "next_translated": {
+                    "key": "odt_d",
+                    "value": "Orifício D <span title=\"Diameter (circular) or height (rectangular)\" class=\"ec-tip\">?<\/span>",
+                    "english": "Orifice D <span title=\"Diameter (circular) or height (rectangular)\" class=\"ec-tip\">?<\/span>"
+                }
+            }
+        },
+        "rc_sg_ok_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sg_ok",
+                    "value": "sg na faixa válida (2,54–2,82) ✓",
+                    "english": "sg in valid range"
+                },
+                "next_translated": {
+                    "key": "rc_sg_low",
+                    "value": "Aviso: sg < 2,54 — abaixo da faixa Robinson",
+                    "english": "sg below Robinson range"
+                }
+            }
+        },
+        "rc_sg_low_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sg_low",
+                    "value": "Aviso: sg < 2,54 — abaixo da faixa Robinson",
+                    "english": "sg below Robinson range"
+                },
+                "next_translated": {
+                    "key": "rc_sg_high",
+                    "value": "Aviso: sg > 2,82 — acima da faixa Robinson",
+                    "english": "sg above Robinson range"
+                }
+            }
+        },
+        "rc_sg_high_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_sg_high",
+                    "value": "Aviso: sg > 2,82 — acima da faixa Robinson",
+                    "english": "sg above Robinson range"
+                },
+                "next_translated": {
+                    "key": "rc_SD_ok",
+                    "value": "SD na faixa válida (1,15–1,47) ✓",
+                    "english": "SD in valid range"
+                }
+            }
+        },
+        "rc_SD_ok_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_SD_ok",
+                    "value": "SD na faixa válida (1,15–1,47) ✓",
+                    "english": "SD in valid range"
+                },
+                "next_translated": {
+                    "key": "rc_SD_low",
+                    "value": "Aviso: SD < 1,15 — abaixo da faixa Robinson",
+                    "english": "SD below Robinson range"
+                }
+            }
+        },
+        "rc_SD_low_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_SD_low",
+                    "value": "Aviso: SD < 1,15 — abaixo da faixa Robinson",
+                    "english": "SD below Robinson range"
+                },
+                "next_translated": {
+                    "key": "rc_SD_high",
+                    "value": "Aviso: SD > 1,47 — acima da faixa Robinson",
+                    "english": "SD above Robinson range"
+                }
+            }
+        },
+        "rc_SD_high_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_SD_high",
+                    "value": "Aviso: SD > 1,47 — acima da faixa Robinson",
+                    "english": "SD above Robinson range"
+                },
+                "next_translated": {
+                    "key": "rc_layer",
+                    "value": "Espessura da camada de rocha (2 × D<sub>50<\/sub>)",
+                    "english": "Rock layer thickness (2 &times; D<sub>50<\/sub>)"
+                }
+            }
+        },
+        "rc_pond_ok_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_pond_ok",
+                    "value": "Hp > yn — remanso a montante ✓",
+                    "english": "H<sub>p<\/sub> > y<sub>n<\/sub> — ponding upstream"
+                },
+                "next_translated": {
+                    "key": "rc_pond_warn",
+                    "value": "⚠ Hp ≤ yn — sem remanso — verificar erosão na entrada",
+                    "english": "H<sub>p<\/sub> ≤ y<sub>n<\/sub> — no ponding — inlet erosion potential"
+                }
+            }
+        },
+        "rc_pond_warn_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "rc_pond_warn",
+                    "value": "⚠ Hp ≤ yn — sem remanso — verificar erosão na entrada",
+                    "english": "H<sub>p<\/sub> ≤ y<sub>n<\/sub> — no ponding — inlet erosion potential"
+                },
+                "next_translated": {
+                    "key": "rc_eq1",
+                    "value": "Eq. 1 (S0 < 0,10) — declividade suave",
+                    "english": "Eq. 1 (S<sub>0<\/sub> < 0.10) — gentle slope"
                 }
             }
         },
@@ -489,12 +974,12 @@
                 "previous_translated": {
                     "key": "ip_count",
                     "value": "Emissores <span title=\"Linhas laterais: emissores neste trecho apenas. Linhas principais: emissores totais em laterais OUTRAS que ramificam deste trecho. Para o trecho exatamente na própria tomada da lateral de teste, isto também inclui quaisquer laterais ainda mais abaixo na principal, ou compartilhando a mesma junção (por ex., uma lateral no lado oposto) — seu fluxo ramifica deste mesmo trecho também.\" class=\"ec-tip\">?<\/span>",
-                    "english": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach right at the test lateral&rsquo;s own takeoff, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>"
+                    "english": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>"
                 },
                 "next_translated": {
-                    "key": "ip_e",
-                    "value": "e <span title=\"Altura de rugosidade Darcy-Weisbach\" class=\"ec-tip\">?<\/span>",
-                    "english": "e <span title=\"Darcy-Weisbach roughness height\" class=\"ec-tip\">?<\/span>"
+                    "key": "ip_km",
+                    "value": "K<sub>m<\/sub> <span title=\"Coeficiente genérico de perda menor para acessórios\/válvulas\/acopladores deste trecho (≥0,5 mínimo sugerido)\" class=\"ec-tip\">?<\/span>",
+                    "english": "k<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
                 }
             }
         },
@@ -505,12 +990,28 @@
                 "previous_translated": {
                     "key": "ip_count",
                     "value": "Emissores <span title=\"Linhas laterais: emissores neste trecho apenas. Linhas principais: emissores totais em laterais OUTRAS que ramificam deste trecho. Para o trecho exatamente na própria tomada da lateral de teste, isto também inclui quaisquer laterais ainda mais abaixo na principal, ou compartilhando a mesma junção (por ex., uma lateral no lado oposto) — seu fluxo ramifica deste mesmo trecho também.\" class=\"ec-tip\">?<\/span>",
-                    "english": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach right at the test lateral&rsquo;s own takeoff, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>"
+                    "english": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>"
                 },
                 "next_translated": {
-                    "key": "ip_e",
-                    "value": "e <span title=\"Altura de rugosidade Darcy-Weisbach\" class=\"ec-tip\">?<\/span>",
-                    "english": "e <span title=\"Darcy-Weisbach roughness height\" class=\"ec-tip\">?<\/span>"
+                    "key": "ip_km",
+                    "value": "K<sub>m<\/sub> <span title=\"Coeficiente genérico de perda menor para acessórios\/válvulas\/acopladores deste trecho (≥0,5 mínimo sugerido)\" class=\"ec-tip\">?<\/span>",
+                    "english": "k<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
+                }
+            }
+        },
+        "ip_roughness": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "ip_count",
+                    "value": "Emissores <span title=\"Linhas laterais: emissores neste trecho apenas. Linhas principais: emissores totais em laterais OUTRAS que ramificam deste trecho. Para o trecho exatamente na própria tomada da lateral de teste, isto também inclui quaisquer laterais ainda mais abaixo na principal, ou compartilhando a mesma junção (por ex., uma lateral no lado oposto) — seu fluxo ramifica deste mesmo trecho também.\" class=\"ec-tip\">?<\/span>",
+                    "english": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>"
+                },
+                "next_translated": {
+                    "key": "ip_km",
+                    "value": "K<sub>m<\/sub> <span title=\"Coeficiente genérico de perda menor para acessórios\/válvulas\/acopladores deste trecho (≥0,5 mínimo sugerido)\" class=\"ec-tip\">?<\/span>",
+                    "english": "k<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
                 }
             }
         },
@@ -524,73 +1025,9 @@
                     "english": "Flow"
                 },
                 "next_translated": {
-                    "key": "ip_hl",
-                    "value": "H<sub>l<\/sub> <span title=\"Perda total do trecho, H_f + H_m\" class=\"ec-tip\">?<\/span>",
-                    "english": "H<sub>l<\/sub> <span title=\"Total reach loss, H_f + H_m\" class=\"ec-tip\">?<\/span>"
-                }
-            }
-        },
-        "ip_v": {
-            "reason": "equal_to_english",
-            "current_value": "V",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ip_flow",
-                    "value": "Vazão",
-                    "english": "Flow"
-                },
-                "next_translated": {
-                    "key": "ip_hl",
-                    "value": "H<sub>l<\/sub> <span title=\"Perda total do trecho, H_f + H_m\" class=\"ec-tip\">?<\/span>",
-                    "english": "H<sub>l<\/sub> <span title=\"Total reach loss, H_f + H_m\" class=\"ec-tip\">?<\/span>"
-                }
-            }
-        },
-        "ip_hv": {
-            "reason": "equal_to_english",
-            "current_value": "H<sub>v<\/sub>",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ip_flow",
-                    "value": "Vazão",
-                    "english": "Flow"
-                },
-                "next_translated": {
-                    "key": "ip_hl",
-                    "value": "H<sub>l<\/sub> <span title=\"Perda total do trecho, H_f + H_m\" class=\"ec-tip\">?<\/span>",
-                    "english": "H<sub>l<\/sub> <span title=\"Total reach loss, H_f + H_m\" class=\"ec-tip\">?<\/span>"
-                }
-            }
-        },
-        "ip_hf": {
-            "reason": "equal_to_english",
-            "current_value": "H<sub>f<\/sub>",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ip_flow",
-                    "value": "Vazão",
-                    "english": "Flow"
-                },
-                "next_translated": {
-                    "key": "ip_hl",
-                    "value": "H<sub>l<\/sub> <span title=\"Perda total do trecho, H_f + H_m\" class=\"ec-tip\">?<\/span>",
-                    "english": "H<sub>l<\/sub> <span title=\"Total reach loss, H_f + H_m\" class=\"ec-tip\">?<\/span>"
-                }
-            }
-        },
-        "ip_hm": {
-            "reason": "equal_to_english",
-            "current_value": "H<sub>m<\/sub>",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ip_flow",
-                    "value": "Vazão",
-                    "english": "Flow"
-                },
-                "next_translated": {
-                    "key": "ip_hl",
-                    "value": "H<sub>l<\/sub> <span title=\"Perda total do trecho, H_f + H_m\" class=\"ec-tip\">?<\/span>",
-                    "english": "H<sub>l<\/sub> <span title=\"Total reach loss, H_f + H_m\" class=\"ec-tip\">?<\/span>"
+                    "key": "ip_hf",
+                    "value": "H<sub>f<\/sub>",
+                    "english": "h<sub>f<\/sub>"
                 }
             }
         },
@@ -620,8 +1057,6 @@
         }
     },
     "key_intent": {
-        "ip_hv": "Velocity head.",
-        "ip_hf": "Friction head loss.",
-        "ip_hm": "Minor (local) head loss."
+        "or_regime_warn_tip": "The upstream water level is below the crown (the top, the highest inside point) of the opening."
     }
 }

@@ -280,7 +280,6 @@ $ec_lang['mhp_hl_check']='हेड हानि जाँच';
 $ec_lang['mhp_hnet']='नेट हेड, H<sub>net</sub>';
 $ec_lang['mhp_power']='शक्ति उत्पादन, P';
 $ec_lang['mhp_annual_kwh']='100% क्षमता पर वार्षिक ऊर्जा';
-$ec_lang['mhp_vel_ok']='1–3 m/s — लक्ष्य सीमा में ✓';
 $ec_lang['mhp_vel_low']='वेग कम है - तलछट जमाव और वायु अंतर्वेशन का जोखिम।';
 $ec_lang['mhp_vel_high']='वेग अधिक है - संक्रमण हानियाँ, उपलब्ध ऊर्जा और जल आघात जाँचें।';
 $ec_lang['mhp_vel_ok_short']='ठीक';
@@ -333,9 +332,6 @@ $ec_lang['odt_vol']='निकाला गया आयतन';
 $ec_lang['odt_sketch_start']='प्रारंभ';
 $ec_lang['odt_sketch_end']='अंत';
 // Erosion Setback and Scour Calc.
-$ec_lang['essc_btbw']='तट से तट चौड़ाई';
-$ec_lang['essc_mcr']='न्यूनतम वक्र त्रिज्या';
-$ec_lang['essc_q']='प्रवाह, Q';
 // Contact us.
 
 // Irrigation

@@ -278,7 +278,6 @@ $ec_lang['mhp_hl_check']='Provjera gubitka tlačne visine';
 $ec_lang['mhp_hnet']='Neto tlačna visina, H<sub>net</sub>';
 $ec_lang['mhp_power']='Izlazna snaga, P';
 $ec_lang['mhp_annual_kwh']='Godišnja energija pri 100% kapaciteta';
-$ec_lang['mhp_vel_ok']='1–3 m/s — unutar ciljnog raspona ✓';
 $ec_lang['mhp_vel_low']='Brzina niska — rizik od sedimentacije i usisa zraka.';
 $ec_lang['mhp_vel_high']='Brzina visoka — provjerite gubitke pri tranziciji, raspoloživu energiju i rizik od vodnog udara.';
 $ec_lang['mhp_vel_ok_short']='OK';
@@ -331,9 +330,6 @@ $ec_lang['odt_vol']='Ispražnjeni volumen';
 $ec_lang['odt_sketch_start']='Početak';
 $ec_lang['odt_sketch_end']='Kraj';
 // Erosion Setback and Scour Calc.
-$ec_lang['essc_btbw']='Širina od obale do obale';
-$ec_lang['essc_mcr']='Minimalni radijus krivine';
-$ec_lang['essc_q']='Protok, Q';
 // Contact us.
 
 // Irrigation

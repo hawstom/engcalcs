@@ -280,7 +280,6 @@ $ec_lang['mhp_hl_check']='فحص فقد الضغط';
 $ec_lang['mhp_hnet']='الرأس الصافي، H<sub>net</sub>';
 $ec_lang['mhp_power']='القدرة المنتجة، P';
 $ec_lang['mhp_annual_kwh']='الطاقة السنوية بالطاقة الكاملة';
-$ec_lang['mhp_vel_ok']='1–3 م/ث — ضمن الهدف ✓';
 $ec_lang['mhp_vel_low']='السرعة منخفضة - خطر الترسيب وجرف الهواء.';
 $ec_lang['mhp_vel_high']='السرعة عالية - تحقق من خسائر الانتقال، والطاقة المتاحة، وضربة المطرقة المائية.';
 $ec_lang['mhp_vel_ok_short']='موافق';
@@ -333,9 +332,6 @@ $ec_lang['odt_vol']='الحجم المُصرَّف';
 $ec_lang['odt_sketch_start']='البداية';
 $ec_lang['odt_sketch_end']='النهاية';
 // Erosion Setback and Scour Calc.
-$ec_lang['essc_btbw']='العرض من ضفة إلى ضفة';
-$ec_lang['essc_mcr']='الحد الأدنى لنصف قطر الانحناء';
-$ec_lang['essc_q']='التدفق، Q';
 // Contact us.
 
 // Irrigation

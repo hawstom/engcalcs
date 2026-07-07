@@ -279,7 +279,6 @@ $ec_lang['mhp_hl_check']='মাথার ক্ষতি পরীক্ষা'
 $ec_lang['mhp_hnet']='নেট মাথা, H<sub>net</sub>';
 $ec_lang['mhp_power']='শক্তি আউটপুট, P';
 $ec_lang['mhp_annual_kwh']='100% ক্ষমতায় বার্ষিক শক্তি';
-$ec_lang['mhp_vel_ok']='1–3 m/s — লক্ষ্যমাত্রার মধ্যে ✓';
 $ec_lang['mhp_vel_low']='বেগ কম - পলি জমা হওয়া এবং বায়ু প্রবেশের ঝুঁকি।';
 $ec_lang['mhp_vel_high']='বেগ বেশি - রূপান্তর ক্ষতি, উপলব্ধ শক্তি এবং জলের হাতুড়ির ঝুঁকি পরীক্ষা করুন।';
 $ec_lang['mhp_vel_ok_short']='OK';
@@ -332,9 +331,6 @@ $ec_lang['odt_vol']='নিষ্কাশিত আয়তন';
 $ec_lang['odt_sketch_start']='শুরু';
 $ec_lang['odt_sketch_end']='শেষ';
 // Erosion Setback and Scour Calc.
-$ec_lang['essc_btbw']='তীর থেকে তীর প্রস্থ';
-$ec_lang['essc_mcr']='সর্বনিম্ন বক্ররেখা ব্যাসার্ধ';
-$ec_lang['essc_q']='প্রবাহ, Q';
 // Contact us.
 
 // Irrigation

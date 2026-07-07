@@ -280,7 +280,6 @@ $ec_lang['mhp_hl_check']='سر نقصان کی جانچ';
 $ec_lang['mhp_hnet']='خالص سر، H<sub>net</sub>';
 $ec_lang['mhp_power']='طاقت پیداوار، P';
 $ec_lang['mhp_annual_kwh']='100% صلاحیت پر سالانہ توانائی';
-$ec_lang['mhp_vel_ok']='1–3 m/s — ہدف کے اندر ✓';
 $ec_lang['mhp_vel_low']='رفتار کم — تلچھٹ اور ہوا داخل ہونے کا خطرہ۔';
 $ec_lang['mhp_vel_high']='رفتار زیادہ — منتقلی کے نقصانات، دستیاب توانائی اور پانی کے ہتھوڑے کا خطرہ جانچیں۔';
 $ec_lang['mhp_vel_ok_short']='ٹھیک';
@@ -333,9 +332,6 @@ $ec_lang['odt_vol']='نکالا گیا حجم';
 $ec_lang['odt_sketch_start']='آغاز';
 $ec_lang['odt_sketch_end']='اختتام';
 // Erosion Setback and Scour Calc.
-$ec_lang['essc_btbw']='کنارے سے کنارے چوڑائی';
-$ec_lang['essc_mcr']='کم سے کم انحناء نصف قطر';
-$ec_lang['essc_q']='بہاؤ، Q';
 // Contact us.
 
 // Irrigation

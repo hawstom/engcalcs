@@ -280,7 +280,6 @@ $ec_lang['mhp_hl_check']='ခေါင်းဆုံးဆုံးရှုံ
 $ec_lang['mhp_hnet']='အသားတင်ခေါင်းဆုံး, H<sub>net</sub>';
 $ec_lang['mhp_power']='ပါဝါထုတ်ပိုး, P';
 $ec_lang['mhp_annual_kwh']='၁၀၀% အလားအလာတွင် နှစ်စဉ်စွမ်းအင်';
-$ec_lang['mhp_vel_ok']='1–3 m/s — ပစ်မှတ်အတွင်း ✓';
 $ec_lang['mhp_vel_low']='ရေအလျင်နှုန်း နိမ့်သည် — သဲမြူမှု နှင့် လေဝင်ခြင်း အန္တရာယ်။';
 $ec_lang['mhp_vel_high']='ရေအလျင်နှုန်း မြင့်သည် — အကူးအပြောင်းဆုံးရှုံးမှုများ၊ ရရှိနိုင်သောစွမ်းအင်နှင့် ရေတုန်းခြင်း အန္တရာယ်ကို စစ်ဆေးပါ။';
 $ec_lang['mhp_vel_ok_short']='ကောင်း';
@@ -333,9 +332,6 @@ $ec_lang['odt_vol']='ထုတ်လွှတ်ပမာဏ';
 $ec_lang['odt_sketch_start']='စတင်';
 $ec_lang['odt_sketch_end']='အဆုံးသတ်';
 // Erosion Setback and Scour Calc.
-$ec_lang['essc_btbw']='ကမ်းနဖူးမှ ကမ်းနဖူးအကျယ်';
-$ec_lang['essc_mcr']='အနည်းဆုံးကောက်ကြောင်းအချင်း';
-$ec_lang['essc_q']='ရေစီးနှုန်း, Q';
 // Contact us.
 
 // Irrigation

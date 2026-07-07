@@ -212,6 +212,20 @@ EngCalcs.writeFormResult = function (objForm, name, precision, hasUnits) {
 };
 
 /**
+	* escapeAttr() escapes text for safe inclusion inside an HTML attribute
+	* value (e.g. title="..."). Needed because tipText may eventually come
+	* from translated lang strings that contain a literal double quote.
+	*/
+EngCalcs.escapeAttr = function (text) {
+	'use strict';
+	return String(text)
+		.replace(/&/g, '&amp;')
+		.replace(/"/g, '&quot;')
+		.replace(/</g, '&lt;')
+		.replace(/>/g, '&gt;');
+};
+
+/**
 	* writeCheckHTML() builds the suite-wide verdict-string markup (item 90 D5):
 	* a leading ✓/⚠ glyph plus short text, with the whole string as the ec-tip
 	* hover/tap target when tipText is given (the glyph alone is too small a
@@ -221,7 +235,7 @@ EngCalcs.writeCheckHTML = function (ok, shortText, tipText) {
 	'use strict';
 	var glyph = ok ? '✓' : '⚠';
 	if (tipText) {
-		return '<span class="ec-tip" title="' + tipText + '">' + glyph + ' ' + shortText + '</span>';
+		return '<span class="ec-tip" title="' + EngCalcs.escapeAttr(tipText) + '">' + glyph + ' ' + shortText + '</span>';
 	}
 	return glyph + ' ' + shortText;
 };

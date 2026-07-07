@@ -280,7 +280,6 @@ $ec_lang['mhp_hl_check']='ការពិនិត្យការបាត់ប
 $ec_lang['mhp_hnet']='ទំនាប់ net, H<sub>net</sub>';
 $ec_lang['mhp_power']='ថាមពលផ្តល់ចេញ, P';
 $ec_lang['mhp_annual_kwh']='ថាមពលប្រចាំឆ្នាំ ក្នុងសមត្ថភាព 100%';
-$ec_lang['mhp_vel_ok']='1–3 m/s — ស្ថិតក្នុងគោលដៅ ✓';
 $ec_lang['mhp_vel_low']='ល្បឿនទាប — ហានិភ័យនៃការស្នាក់នៅ និងការស្រូបយករលក។';
 $ec_lang['mhp_vel_high']='ល្បឿនខ្ពស់ — ពិនិត្យការបាត់បង់ការផ្លាស់ប្តូរ ថាមពលដែលមាន និង water hammer។';
 $ec_lang['mhp_vel_ok_short']='ល្អ';
@@ -333,9 +332,6 @@ $ec_lang['odt_vol']='បរិមាណ​ ដែល​ បាន​ បង្�
 $ec_lang['odt_sketch_start']='ចាប់ផ្ដើម';
 $ec_lang['odt_sketch_end']='ចប់';
 // Erosion Setback and Scour Calc.
-$ec_lang['essc_btbw']='ទទឹង Bank ទៅ Bank';
-$ec_lang['essc_mcr']='កាំ​ong​ curve តូចបំផុត';
-$ec_lang['essc_q']='ការហូរ, Q';
 // Contact us.
 
 // Irrigation

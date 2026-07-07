@@ -279,7 +279,6 @@ $ec_lang['mhp_hl_check']='水头损失校核';
 $ec_lang['mhp_hnet']='净水头，H<sub>net</sub>';
 $ec_lang['mhp_power']='输出功率，P';
 $ec_lang['mhp_annual_kwh']='100% 装机容量下的年发电量';
-$ec_lang['mhp_vel_ok']='1–3 m/s — 在目标范围内 ✓';
 $ec_lang['mhp_vel_low']='流速过低 — 有泥沙淤积和吸气的风险。';
 $ec_lang['mhp_vel_high']='流速偏高 — 检查过渡段损失、可用能量和水锤风险。';
 $ec_lang['mhp_vel_ok_short']='正常';
@@ -332,9 +331,6 @@ $ec_lang['odt_vol']='排出水量';
 $ec_lang['odt_sketch_start']='开始';
 $ec_lang['odt_sketch_end']='结束';
 // Erosion Setback and Scour Calc.
-$ec_lang['essc_btbw']='岸对岸宽度';
-$ec_lang['essc_mcr']='最小弯道半径';
-$ec_lang['essc_q']='流量，Q';
 // Contact us.
 
 // Irrigation

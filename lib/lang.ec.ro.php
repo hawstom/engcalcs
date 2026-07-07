@@ -278,7 +278,6 @@ $ec_lang['mhp_hl_check']='Verificarea pierderii de sarcină';
 $ec_lang['mhp_hnet']='Sarcina netă, H<sub>net</sub>';
 $ec_lang['mhp_power']='Putere produsă, P';
 $ec_lang['mhp_annual_kwh']='Energie anuală la 100% capacitate';
-$ec_lang['mhp_vel_ok']='1–3 m/s — în intervalul țintă ✓';
 $ec_lang['mhp_vel_low']='Viteză mică - risc de sedimentare și antrenare de aer.';
 $ec_lang['mhp_vel_high']='Viteză ridicată - verificați pierderile la tranziții, energia disponibilă și lovitura de berbec.';
 $ec_lang['mhp_vel_ok_short']='OK';
@@ -331,9 +330,6 @@ $ec_lang['odt_vol']='Volum golit';
 $ec_lang['odt_sketch_start']='Început';
 $ec_lang['odt_sketch_end']='Sfârșit';
 // Erosion Setback and Scour Calc.
-$ec_lang['essc_btbw']='Lățimea mal la mal';
-$ec_lang['essc_mcr']='Raza minimă de curbură';
-$ec_lang['essc_q']='Debit, Q';
 // Contact us.
 
 // Irrigation

@@ -279,7 +279,6 @@ $ec_lang['mhp_hl_check']='Druckverlustprüfung';
 $ec_lang['mhp_hnet']='Nettofallhöhe, H<sub>net</sub>';
 $ec_lang['mhp_power']='Leistungsabgabe, P';
 $ec_lang['mhp_annual_kwh']='Jahresenergie bei 100 % Kapazität';
-$ec_lang['mhp_vel_ok']='1–3 m/s — im Zielbereich ✓';
 $ec_lang['mhp_vel_low']='Geschwindigkeit niedrig – Risiko von Sedimentation und Lufteintrag.';
 $ec_lang['mhp_vel_high']='Geschwindigkeit hoch – Übergangsverluste, verfügbare Energie und Druckstoß prüfen.';
 $ec_lang['mhp_vel_ok_short']='OK';
@@ -332,9 +331,6 @@ $ec_lang['odt_vol']='Abgeführtes Volumen';
 $ec_lang['odt_sketch_start']='Anfang';
 $ec_lang['odt_sketch_end']='Ende';
 // Erosion Setback and Scour Calc.
-$ec_lang['essc_btbw']='Uferbandbreite';
-$ec_lang['essc_mcr']='Minimaler Kurvenradius';
-$ec_lang['essc_q']='Durchfluss, Q';
 // Contact us.
 
 // Irrigation

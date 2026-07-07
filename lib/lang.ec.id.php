@@ -279,7 +279,6 @@ $ec_lang['mhp_hl_check']='Pemeriksaan kehilangan tinggi';
 $ec_lang['mhp_hnet']='Tinggi neto, H<sub>net</sub>';
 $ec_lang['mhp_power']='Daya keluaran, P';
 $ec_lang['mhp_annual_kwh']='Energi tahunan pada kapasitas 100%';
-$ec_lang['mhp_vel_ok']='1–3 m/s — dalam rentang target ✓';
 $ec_lang['mhp_vel_low']='Kecepatan rendah — risiko sedimentasi dan masuknya udara.';
 $ec_lang['mhp_vel_high']='Kecepatan tinggi — periksa kehilangan transisi, energi yang tersedia, dan risiko pukulan air.';
 $ec_lang['mhp_vel_ok_short']='OK';
@@ -332,9 +331,6 @@ $ec_lang['odt_vol']='Volume yang dikosongkan';
 $ec_lang['odt_sketch_start']='Mulai';
 $ec_lang['odt_sketch_end']='Akhir';
 // Erosion Setback and Scour Calc.
-$ec_lang['essc_btbw']='Lebar tepi ke tepi';
-$ec_lang['essc_mcr']='Radius kurva minimum';
-$ec_lang['essc_q']='Debit, Q';
 // Contact us.
 
 // Irrigation

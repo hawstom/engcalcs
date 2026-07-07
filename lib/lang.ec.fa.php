@@ -280,7 +280,6 @@ $ec_lang['mhp_hl_check']='بررسی افت هد';
 $ec_lang['mhp_hnet']='هد خالص، H<sub>net</sub>';
 $ec_lang['mhp_power']='توان خروجی، P';
 $ec_lang['mhp_annual_kwh']='انرژی سالانه در ظرفیت ۱۰۰٪';
-$ec_lang['mhp_vel_ok']='1–3 m/s — در محدوده هدف ✓';
 $ec_lang['mhp_vel_low']='سرعت پایین — خطر رسوب‌گذاری و ورود هوا.';
 $ec_lang['mhp_vel_high']='سرعت بالا — افت‌های انتقالی، انرژی موجود و ضربه قوچ را بررسی کنید.';
 $ec_lang['mhp_vel_ok_short']='خوب';
@@ -333,9 +332,6 @@ $ec_lang['odt_vol']='حجم تخلیه‌شده';
 $ec_lang['odt_sketch_start']='شروع';
 $ec_lang['odt_sketch_end']='پایان';
 // Erosion Setback and Scour Calc.
-$ec_lang['essc_btbw']='عرض از کناره تا کناره';
-$ec_lang['essc_mcr']='حداقل شعاع انحنا';
-$ec_lang['essc_q']='دبی، Q';
 // Contact us.
 
 // Irrigation

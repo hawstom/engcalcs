@@ -280,7 +280,6 @@ $ec_lang['mhp_hl_check']='د سر ضیاع چک';
 $ec_lang['mhp_hnet']='خالص سر، H<sub>net</sub>';
 $ec_lang['mhp_power']='د ځواک محصول، P';
 $ec_lang['mhp_annual_kwh']='کلنۍ انرژي د ۱۰۰٪ ظرفیت پر مهال';
-$ec_lang['mhp_vel_ok']='1–3 m/s — د هدف دننه ✓';
 $ec_lang['mhp_vel_low']='سرعت ټیټ دی - د رسوب او د هوا داخولو خطر';
 $ec_lang['mhp_vel_high']='سرعت لوړ دی — د انتقالي ضیاعاتو، د دسترس وړ انرژۍ او د اوبو چکش کتنه وکړئ.';
 $ec_lang['mhp_vel_ok_short']='ٹھیک';
@@ -333,9 +332,6 @@ $ec_lang['odt_vol']='ایستل شوی حجم';
 $ec_lang['odt_sketch_start']='پیل';
 $ec_lang['odt_sketch_end']='پای';
 // Erosion Setback and Scour Calc.
-$ec_lang['essc_btbw']='د غاړه تر غاړه پلنوالی';
-$ec_lang['essc_mcr']='لږترلږه د منحني رادیوس';
-$ec_lang['essc_q']='بهاو، Q';
 // Contact us.
 
 // Irrigation

@@ -280,7 +280,6 @@ $ec_lang['mhp_hl_check']='בדיקת אובדן לחץ';
 $ec_lang['mhp_hnet']='גובה נטו, H<sub>net</sub>';
 $ec_lang['mhp_power']='הספק יציאה, P';
 $ec_lang['mhp_annual_kwh']='אנרגיה שנתית בקיבולת 100%';
-$ec_lang['mhp_vel_ok']='1–3 מ/ש — בטווח היעד ✓';
 $ec_lang['mhp_vel_low']='מהירות נמוכה — סיכון של שקוע משקעים וסחיפת אוויר.';
 $ec_lang['mhp_vel_high']='מהירות גבוהה — בדוק הפסדי מעברים, אנרגיה זמינה ופטיש מים.';
 $ec_lang['mhp_vel_ok_short']='בסדר';
@@ -333,9 +332,6 @@ $ec_lang['odt_vol']='נפח מרוקן';
 $ec_lang['odt_sketch_start']='התחלה';
 $ec_lang['odt_sketch_end']='סיום';
 // Erosion Setback and Scour Calc.
-$ec_lang['essc_btbw']='רוחב מגדה לגדה';
-$ec_lang['essc_mcr']='רדיוס עיקול מינימלי';
-$ec_lang['essc_q']='ספיקה, Q';
 // Contact us.
 
 // Irrigation

@@ -62,8 +62,8 @@ EngCalcs.pageCalculator = function(objForm) {
 	if (pondEl) {
 		pondEl.className = '';
 		if (yn > 0 && Hp > 0) {
-			if (Hp > yn) { pondEl.innerHTML = cfg.rc_pond_ok;   pondEl.classList.add('ec-status-ok');   }
-			else          { pondEl.innerHTML = cfg.rc_pond_warn; pondEl.classList.add('ec-status-warn'); }
+			if (Hp > yn) { pondEl.innerHTML = EngCalcs.writeCheckHTML(true, cfg.rc_pond_ok, cfg.rc_pond_ok_tip);     pondEl.classList.add('ec-status-ok');   }
+			else          { pondEl.innerHTML = EngCalcs.writeCheckHTML(false, cfg.rc_pond_warn, cfg.rc_pond_warn_tip); pondEl.classList.add('ec-status-warn'); }
 		} else {
 			pondEl.innerHTML = '';
 		}
@@ -74,10 +74,10 @@ EngCalcs.pageCalculator = function(objForm) {
 	if (statusEl) {
 		statusEl.className = '';
 		if (S0 < 0.02) {
-			statusEl.innerHTML = cfg.rc_eq_warn_low;
+			statusEl.innerHTML = EngCalcs.writeCheckHTML(false, cfg.rc_eq_warn_low);
 			statusEl.classList.add('ec-status-bad');
 		} else if (S0 > 0.40) {
-			statusEl.innerHTML = cfg.rc_eq_warn_high;
+			statusEl.innerHTML = EngCalcs.writeCheckHTML(false, cfg.rc_eq_warn_high);
 			statusEl.classList.add('ec-status-bad');
 		} else if (S0 < 0.10) {
 			statusEl.innerHTML = cfg.rc_eq1;

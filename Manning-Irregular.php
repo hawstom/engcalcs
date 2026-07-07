@@ -135,7 +135,7 @@ function echoCalculatorFormAppend() {
 <script>
 EngCalcs.pageConfig = {
 	mtc_vel_ok: <?=json_encode($ec_lang['mtc_vel_ok'])?>,
-	mtc_vel_high: <?=json_encode($ec_lang['mtc_vel_high'])?>,
+	mtc_vel_high: <?=json_encode($ec_lang['mhp_vel_high'])?>,
 	mtc_vel_low: <?=json_encode($ec_lang['mtc_vel_low'])?>,
 	mhp_vel_ok_short: <?=json_encode($ec_lang['mhp_vel_ok_short'])?>,
 	mhp_vel_high_short: <?=json_encode($ec_lang['mhp_vel_high_short'])?>,

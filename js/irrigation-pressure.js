@@ -253,13 +253,13 @@ EngCalcs.pageCalculator = function (objForm) {
 	}
 
 	var warnEl = document.getElementById('ip_elev_warn');
-	warnEl.innerHTML = this.lastRowElevMissing ? EngCalcs.pageConfig.ip_elev_ds_missing_warn : '';
+	warnEl.innerHTML = this.lastRowElevMissing ? EngCalcs.writeCheckHTML(false, EngCalcs.pageConfig.ip_elev_ds_missing_warn) : '';
 };
 
 EngCalcs.ipPressureWarnHtml = function (h) {
 	'use strict';
 	if (h >= 0) { return ''; }
-	return ' <span class="ec-tip" title="' + EngCalcs.pageConfig.ip_pressure_warn + '">' + EngCalcs.pageConfig.ip_pressure_warn_short + '</span>';
+	return ' ' + EngCalcs.writeCheckHTML(false, EngCalcs.pageConfig.ip_pressure_warn_short, EngCalcs.pageConfig.ip_pressure_warn);
 };
 
 EngCalcs.ipWriteRows = function (objForm) {

@@ -278,7 +278,6 @@ $ec_lang['mhp_hl_check']='Провера губитка напора';
 $ec_lang['mhp_hnet']='Нето напор, H<sub>net</sub>';
 $ec_lang['mhp_power']='Излазна снага, P';
 $ec_lang['mhp_annual_kwh']='Годишња енергија при 100% капацитета';
-$ec_lang['mhp_vel_ok']='1–3 м/с — у циљном опсегу ✓';
 $ec_lang['mhp_vel_low']='Брзина ниска — ризик од таложења наноса и увлачења ваздуха.';
 $ec_lang['mhp_vel_high']='Брзина висока — проверите губитке при преласку, расположиву енергију и ризик од водног удара.';
 $ec_lang['mhp_vel_ok_short']='У реду';
@@ -331,9 +330,6 @@ $ec_lang['odt_vol']='Испражњена запремина';
 $ec_lang['odt_sketch_start']='Почетак';
 $ec_lang['odt_sketch_end']='Крај';
 // Erosion Setback and Scour Calc.
-$ec_lang['essc_btbw']='Ширина од обале до обале';
-$ec_lang['essc_mcr']='Минимални полупречник кривине';
-$ec_lang['essc_q']='Проток, Q';
 // Contact us.
 
 // Irrigation

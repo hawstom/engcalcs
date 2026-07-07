@@ -78,13 +78,13 @@ EngCalcs.pageCalculator = function(objForm) {
 	if (ecEl) {
 		ecEl.className = '';
 		if (this.var.cs_Ec >= 0.80) {
-			ecEl.innerHTML = cfg.Ec_good;
+			ecEl.innerHTML = EngCalcs.writeCheckHTML(true, cfg.Ec_good);
 			ecEl.classList.add('ec-status-ok');
 		} else if (this.var.cs_Ec >= 0.60) {
-			ecEl.innerHTML = cfg.Ec_fair;
+			ecEl.innerHTML = EngCalcs.writeCheckHTML(false, cfg.Ec_fair);
 			ecEl.classList.add('ec-status-warn');
 		} else {
-			ecEl.innerHTML = cfg.Ec_poor;
+			ecEl.innerHTML = EngCalcs.writeCheckHTML(false, cfg.Ec_poor);
 			ecEl.classList.add('ec-status-bad');
 		}
 	}

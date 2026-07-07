@@ -282,7 +282,6 @@ $ec_lang['mhp_hl_check']='Yük kaybı kontrolü';
 $ec_lang['mhp_hnet']='Net yük, H<sub>net</sub>';
 $ec_lang['mhp_power']='Çıkış gücü, P';
 $ec_lang['mhp_annual_kwh']='%100 kapasitede yıllık enerji';
-$ec_lang['mhp_vel_ok']='1–3 m/s — hedef aralıkta ✓';
 $ec_lang['mhp_vel_low']='Hız düşük — çökelme ve hava sürüklenmesi riski.';
 $ec_lang['mhp_vel_high']='Hız yüksek — geçiş kayıplarını, mevcut enerjiyi ve su darbesi riskini kontrol edin.';
 $ec_lang['mhp_vel_ok_short']='Tamam';
@@ -335,9 +334,6 @@ $ec_lang['odt_vol']='Boşaltılan hacim';
 $ec_lang['odt_sketch_start']='Başlangıç';
 $ec_lang['odt_sketch_end']='Bitiş';
 // Erosion Setback and Scour Calc.
-$ec_lang['essc_btbw']='Bankadan bankaya genişlik';
-$ec_lang['essc_mcr']='Minimum eğri yarıçapı';
-$ec_lang['essc_q']='Debi, Q';
 // Contact us.
 
 // Irrigation

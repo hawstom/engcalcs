@@ -279,7 +279,6 @@ $ec_lang['mhp_hl_check']='Kontrola ztráty tlakové výšky';
 $ec_lang['mhp_hnet']='Čistá tlaková výška, H<sub>net</sub>';
 $ec_lang['mhp_power']='Výstupní výkon, P';
 $ec_lang['mhp_annual_kwh']='Roční výroba při 100% výkonu';
-$ec_lang['mhp_vel_ok']='1–3 m/s — v cílovém rozsahu ✓';
 $ec_lang['mhp_vel_low']='Rychlost nízká — riziko sedimentace a usazování vzduchu.';
 $ec_lang['mhp_vel_high']='Rychlost vysoká — zkontrolujte ztráty na přechodech, dostupnou energii a riziko vodního rázu.';
 $ec_lang['mhp_vel_ok_short']='OK';
@@ -332,9 +331,6 @@ $ec_lang['odt_vol']='Vyčerpaný objem';
 $ec_lang['odt_sketch_start']='Začátek';
 $ec_lang['odt_sketch_end']='Konec';
 // Erosion Setback and Scour Calc.
-$ec_lang['essc_btbw']='Šířka od břehu k břehu';
-$ec_lang['essc_mcr']='Minimální poloměr oblouku';
-$ec_lang['essc_q']='Průtok, Q';
 // Contact us.
 
 // Irrigation

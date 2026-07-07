@@ -280,7 +280,6 @@ $ec_lang['mhp_hl_check']='Проверка на загубата на напор
 $ec_lang['mhp_hnet']='Нетен напор, H<sub>net</sub>';
 $ec_lang['mhp_power']='Изходна мощност, P';
 $ec_lang['mhp_annual_kwh']='Годишна енергия при 100% натоварване';
-$ec_lang['mhp_vel_ok']='1–3 м/с — в целевия диапазон ✓';
 $ec_lang['mhp_vel_low']='Ниска скорост — риск от утаяване и попадане на въздух.';
 $ec_lang['mhp_vel_high']='Висока скорост — проверете загубите при преходи, наличната енергия и хидравличния удар.';
 $ec_lang['mhp_vel_ok_short']='ОК';
@@ -333,9 +332,6 @@ $ec_lang['odt_vol']='Изпразнен обем';
 $ec_lang['odt_sketch_start']='Начало';
 $ec_lang['odt_sketch_end']='Край';
 // Erosion Setback and Scour Calc.
-$ec_lang['essc_btbw']='Ширина от бряг до бряг';
-$ec_lang['essc_mcr']='Минимален радиус на кривина';
-$ec_lang['essc_q']='Дебит, Q';
 // Contact us.
 
 // Irrigation

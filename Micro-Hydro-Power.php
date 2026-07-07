@@ -55,9 +55,8 @@ echoCalculatorForm(
 <?php echoFeedback(); ?>
 <script>
 EngCalcs.pageConfig = {
-	vel_ok:   <?=json_encode($ec_lang['mhp_vel_ok'])?>,
-	vel_low:  <?=json_encode($ec_lang['mhp_vel_low'])?>,
-	vel_high: <?=json_encode($ec_lang['mhp_vel_high'])?>,
+	mhp_vel_low:  <?=json_encode($ec_lang['mhp_vel_low'])?>,
+	mhp_vel_high: <?=json_encode($ec_lang['mhp_vel_high'])?>,
 	mhp_vel_ok_short:   <?=json_encode($ec_lang['mhp_vel_ok_short'])?>,
 	mhp_vel_high_short: <?=json_encode($ec_lang['mhp_vel_high_short'])?>,
 	mhp_vel_low_short:  <?=json_encode($ec_lang['mhp_vel_low_short'])?>,

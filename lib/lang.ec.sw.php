@@ -280,7 +280,6 @@ $ec_lang['mhp_hl_check']='Ukaguzi wa upotezaji wa kichwa';
 $ec_lang['mhp_hnet']='Kichwa halisi, H<sub>net</sub>';
 $ec_lang['mhp_power']='Nguvu inayotolewa, P';
 $ec_lang['mhp_annual_kwh']='Nishati ya kila mwaka kwa uwezo wa 100%';
-$ec_lang['mhp_vel_ok']='1–3 m/s — ndani ya lengo ✓';
 $ec_lang['mhp_vel_low']='Kasi ya chini — hatari ya mashapo na kuingiliwa kwa hewa.';
 $ec_lang['mhp_vel_high']='Kasi ya juu — kagua hasara za mpito, nishati inayopatikana, na hatari ya mshtuko wa maji.';
 $ec_lang['mhp_vel_ok_short']='SAWA';
@@ -333,9 +332,6 @@ $ec_lang['odt_vol']='Kiasi kilichomwagwa';
 $ec_lang['odt_sketch_start']='Mwanzo';
 $ec_lang['odt_sketch_end']='Mwisho';
 // Erosion Setback and Scour Calc.
-$ec_lang['essc_btbw']='Upana kutoka ukingo hadi ukingo';
-$ec_lang['essc_mcr']='Radi ndogo kabisa ya mviringo';
-$ec_lang['essc_q']='Mtiririko, Q';
 // Contact us.
 
 // Irrigation
