@@ -164,7 +164,7 @@ $ec_lang['dw_main_title']='Free Online Darcy-Weisbach Pipe Head Loss Calculator'
 $ec_lang_intent['dw_main_title']='Drop in the height of a column of water due to entering, traversing, and exiting a full pipe, calculated using the Darcy-Weisbach equation.';
 $ec_lang['dw_main_desc']='Darcy-Weisbach Pipe Head Loss at Given Diameter, Roughness, and Flow';
 $ec_lang_intent['dw_main_desc']='Drop in the height of a column of water due to entering, traversing, and exiting a full pipe for specified diameter, roughness, and flow, using Darcy-Weisbach relations.';
-$ec_lang['dw_roughness']='e';
+$ec_lang['dw_roughness']='Roughness, e';
 $ec_lang_intent['dw_roughness']='';
 $ec_lang['dw_roughness_tip']='<span title="Darcy-Weisbach roughness height" class="ec-tip">?</span>';
 $ec_lang_intent['dw_roughness_tip']='';
@@ -915,6 +915,8 @@ $ec_lang['ip_length']='L';
 $ec_lang_intent['ip_length']='';
 $ec_lang['ip_diameter']='D';
 $ec_lang_intent['ip_diameter']='';
+$ec_lang['ip_roughness']='e';
+$ec_lang_intent['ip_roughness']='';
 $ec_lang['ip_km']='k<sub>m</sub> <span title="Generic minor-loss coefficient for this reach&rsquo;s fittings/valves/couplers (&ge;0.5 suggested minimum)" class="ec-tip">?</span>';
 $ec_lang_intent['ip_km']='';
 $ec_lang['ip_elev_ds']='DS Elev. <span title="Downstream-end elevation of this reach. Optional on interior rows (defaults to flat / same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure." class="ec-tip">?</span>';
