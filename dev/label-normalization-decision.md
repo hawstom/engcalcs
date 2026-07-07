@@ -2,7 +2,8 @@
 
 **Roadmap item 90 (Opus/Tom half).** Decided 2026-07-07 by Tom + Opus, on the input of the
 Fable survey (`dev/label-normalization-survey.md`). This file is the durable decision record;
-the survey is the evidence, this is the ruling. Execution happens per-family under item 85.
+the survey is the evidence, this is the ruling. Execution is **one full-suite English-only pass**
+(item 90, Opus), decoupled from item 85's translation work — see D6 (reversed 2026-07-07).
 
 ## Context
 
@@ -61,17 +62,31 @@ etc.):
 - This makes future calculators' checks a drop-in and lets the duplicated `mtc_`/`mhp_`
   velocity-check block (7 keys) and the four ad-hoc verdict styles collapse to one.
 
-### D6 — Sequencing: merge per family, just before its waves
-Merges are **not** a single suite-wide pass. Each family's exact-duplicate + cluster merges are
-executed **immediately before that family's Wave 0 / wave-1 sprint** under item 85, so each merge
-shrinks the paid sprint that follows and no translation is ever wasted:
+### D6 — Sequencing ~~merge per calculator-family~~ → REVERSED 2026-07-07: one full-suite pass
+> **⚠ D6 as originally written was WRONG and is reversed. Superseded text kept struck-through for the record.**
+>
+> ~~Merges are not a single suite-wide pass. Each family's exact-duplicate + cluster merges are
+> executed immediately before that family's Wave 0 / wave-1 sprint under item 85…~~
 
-> per family: audit → **MERGE shared keys** → Wave 0 English reform → wave 1 → waves 2–3 → QA
+**Reversal (Tom + Opus, 2026-07-07).** Key consolidation is **inherently cross-cutting** — a
+duplicate label's two halves live in *different* calculator families, so no per-calculator-family
+view can make the merge/ownership call (proved same day: open-channel's merge candidates were
+shared with weirs, irrigation, and micro-hydro). Chunking consolidation per calculator-family
+therefore cannot work, and interleaving it with item 85's per-family translation loop is what
+poisoned item 85. **Corrected sequencing:**
 
-The `writeVelocityCheck` mechanism change (D5) rides with the first family that owns a
-velocity-check block (family 1 mtc_/mi_, already in prep; family 5 mhp_).
+> **Item 90 = ONE English-only pass over ALL calculators** (Opus), applying D1–D5 across the whole
+> suite. It is a prerequisite English-reform step, **decoupled from item 85**. Then Wave 0
+> colloquialism cleanup (Fable) → **freeze English** → item 85 complete re-translation → §10.5
+> source-hash last.
 
-## Execution backlog (hand to item 85, per family)
+The `writeVelocityCheck` mechanism change (D5) is part of this full-suite pass (it touches the
+verdict-string block wherever it appears), not tied to any one calculator family.
+
+Terminology note: **"calculator families"** (the 6 calc groupings) vs **"translation tiers/waves"**
+(language groupings) — never bare "families".
+
+## Execution backlog (item 90, full-suite — one pass over all calculators)
 
 Ordered by value ÷ risk (survey §6). Each is a whole-label merge — never fragment composition
 (the one fragment idea, EGL/HGL from `ip_group_*`, is explicitly rejected; keep those as whole

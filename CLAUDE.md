@@ -67,7 +67,9 @@ word-order / RTL languages). Policy:
 - A shared label translated once must fit its **narrowest** use: column-heading uses put the short
   form in the shared key, long forms in tooltips — never the reverse.
 
-Full decision record and per-family execution backlog: `dev/label-normalization-decision.md`.
+Consolidation is **one full-suite English-only pass** over all calculators (never chunked per
+calculator family — a duplicate's two halves live in different families). Full decision record and
+execution backlog: `dev/label-normalization-decision.md`.
 
 ### Verdict / check-string convention (item-90 decision, 2026-07-07)
 
