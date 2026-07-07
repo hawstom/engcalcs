@@ -17,7 +17,7 @@ echoCalculatorForm(
 		Array('name' => 'h1_elev', 'type' => 'number', 'default' => '3',    'units' => Array('m','mm','ft','in'),         'label' => $ec_lang['odt_h1_elev']),
 		Array('name' => 'a1',      'type' => 'number', 'default' => '1000', 'units' => Array('m2','mm2','ft2','in2'),      'label' => $ec_lang['odt_a1']),
 		Array('name' => 'h2_elev',   'type' => 'number', 'default' => '0',   'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['odt_h2_elev']),
-		Array('name' => 'h_orifice', 'type' => 'number', 'default' => '0',   'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['odt_h_orifice']),
+		Array('name' => 'h_orifice', 'type' => 'number', 'default' => '0',   'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['or_centroid_elev']),
 		Array('name' => 'a0',        'type' => 'number', 'default' => '100',  'units' => Array('m2','mm2','ft2','in2'), 'label' => $ec_lang['odt_a0']),
 		Array('name' => 'd',       'type' => 'number', 'default' => '0.1',  'units' => Array('m','mm','ft','in'),         'label' => $ec_lang['odt_d'] . '<br /><input type="radio" name="shape" id="shape_circ" value="circular" checked onchange="EngCalcs.submitForm()"> <label for="shape_circ">' . $ec_lang['or_shape_circular'] . '</label> <input type="radio" name="shape" id="shape_rect" value="rectangular" onchange="EngCalcs.submitForm()"> <label for="shape_rect">' . $ec_lang['or_shape_rectangular'] . '</label>'),
 		Array('name' => 'w',       'type' => 'number', 'default' => '0.3',  'units' => Array('m','mm','ft','in'),         'label' => $ec_lang['odt_w']),

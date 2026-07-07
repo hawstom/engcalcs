@@ -49,7 +49,7 @@ function echoCalculatorFormAppend() {
 					<?php echoUnitSelect($name = 'stationu', $units = Array('m', 'mm', 'ft', 'in'), $indent_string); ?>
 				</th>
 				<th>
-					<?=$ec_lang['mi_elevation']?>
+					<span class="ec-narrowcol"><?=$ec_lang['mi_elevation']?></span>
 					<br />
 					<?php echoUnitSelect($name = 'elevationu', $units = Array('m', 'mm', 'ft', 'in'), $indent_string); ?>
 				</th>

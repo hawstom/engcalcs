@@ -35,8 +35,8 @@ function echoCalculatorFormAppend() {
                </th>
             </tr>
             <tr>
-                <th><?=$ec_lang['wi_station']?></th>
-                <th><?=$ec_lang['wi_elevation']?></th>
+                <th><?=$ec_lang['mi_station']?></th>
+                <th><?=$ec_lang['mi_elevation']?></th>
                 <th width="100pt"><?=$ec_lang['wi_pondingHeight']?></th>
                 <th width="100pt"><?=$ec_lang['wi_incrementalFlow']?></th>
                 <th width="100pt"><?=$ec_lang['wi_cumulativeFlow']?></th>
