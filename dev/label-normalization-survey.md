@@ -211,3 +211,45 @@ rule), with long forms as tooltips, not vice versa.
 **Interaction with item 85 (family-grid translation plan):** every merge executed *before* a
 family's Wave 0/wave 1 shrinks that family's paid sprint. The §2 merges touching families 2–6
 (weirs/orifices, pipe friction, mhp) are worth executing ahead of those families' waves.
+
+---
+
+## 7. Review verdict (Fable, 2026-07-07) — APPROVED
+
+Opus/Sonnet's execution of §2–§5 is verified and approved. Independent checks performed, not
+taken from the tracker's self-report:
+
+- **No dangling references.** Every deleted key was grepped suite-wide; the only non-lang-file
+  hits are form *field names* that legitimately share a key's spelling (e.g. `cs_wp` in
+  `Canal-Seepage.php:20` is the input's `name`, whose label correctly borrows
+  `mpf_wetted_perimeter`). Orphan keys remaining in the 26 non-English files are the intended
+  item-85 propagation worklist per D7, not defects.
+- **§3.1 triad** — `mphl_` owns `Friction loss, h_f` / `Minor (local) loss, h_m` /
+  `Total loss, h_L` / `k_m`; dw/hw/mhp borrow them. Matches D3/D4 exactly.
+- **§3.4 slope** — English label is `Friction slope …, S_f`; form field and every use in
+  `js/manning-pipe-flow.js` (including the solve function) renamed `s0`→`sf` consistently;
+  Manning-Trap/Irregular correctly kept bed-slope `s0`.
+- **§5 verdicts** — `EngCalcs.writeCheckHTML()` implements D5 correctly (leading ✓/⚠, whole
+  string as the `ec-tip` target, glyph untranslated); all six verdict groups repointed.
+- **QA re-run clean:** `php -l` on all touched PHP, `node --check` on all touched JS,
+  `lang_syntax_validate.php --lang=en`, and CLI renders of all 14 calculator pages (only CLI
+  `SERVER_NAME` noise plus one pre-existing gap, below).
+
+Residual items (none block item-90 closure):
+
+1. **Tom's pending external rename** — the English `mpf_friction_slope` label now links to
+   `../frictionslope.php`, which does not exist yet; `pressureslope.php` lives on the parent
+   hawsedc.com site outside this repo. Until Tom renames it (a redirect from the old name is
+   preferable — 26 non-English labels still link `pressureslope.php` until item-85 propagation),
+   the English link 404s.
+2. **Superseded tracker text** — item 86 (commit f87a7de) reversed the §3.5/D8 roughness
+   consolidation after the tracker was marked complete: current state is
+   `dw_roughness`='Roughness, e' (wide forms, dw/mhp), new `ip_roughness`='e' (narrow column),
+   both sharing `dw_roughness_tip`. The state is coherent; the tracker row has been annotated.
+3. **Hardening suggestion before propagation** — `writeCheckHTML()` interpolates `tipText`
+   into `title="…"` unescaped. English tips are safe; a translated tip containing `"` would
+   break the markup. Escape quotes in the helper before the item-85 sprints translate the
+   `*_tip` keys.
+4. **Pre-existing, out of scope** — `Manning-Irregular.php:93` requests velocity unit `mph`,
+   which has no `$ec_units['mph']`/`u_mph` entry (gap dates to 2021); emits warnings and an
+   empty unit option. Worth a small ROADMAP item.
