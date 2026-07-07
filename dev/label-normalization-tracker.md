@@ -9,6 +9,28 @@ applying D7 to every merge. This file is the checklist; update the Status column
 Status legend: ☐ pending-exec · ☑ done · ◇ decided-keep (no change) · ⚠ **needs-decision** (Opus/Tom
 ruling required before exec).
 
+## How to execute (fresh-session handoff, 2026-07-07)
+
+**All decisions are made (D1–D8 in `dev/label-normalization-decision.md`); this is pure execution.**
+Read `dev/label-normalization-decision.md` (rulings + D7 method) and `dev/label-normalization-survey.md`
+(evidence) first. Then work the ☐ rows below **top to bottom**.
+
+- **Scope: ENGLISH-ONLY.** Edit `lib/lang.ec.en.php` and repoint PHP/JS references only. **Do NOT
+  touch the 26 non-English `lib/lang.ec.??.php` files** — that's the later propagation phase (item 85).
+- **Per merge (D7):** pick survivor (incumbency, else menu order) → set its English to the chosen
+  wording/symbol → **delete the redundant key from English only** → repoint every PHP/JS reference to
+  the survivor. Capture any `mi_q_617`-style *extra meaning* into the English survivor before deleting.
+- **Order:** §2 exact duplicates (17 groups, listed below) → §3 clusters → §4 typography → §5 verdicts.
+- **After each batch:** `php -l` touched files + `php dev/scripts/lang_syntax_validate.php`; then
+  `git grep "'<deleted_key>'"` to confirm no dangling reference. Commit in small reviewable batches.
+- **Expected:** `lang_parity_check.php` will report growing "extra" non-English keys — that is the
+  propagation worklist, **not** a defect (D7).
+- **Special cases:** §3.4 slope — verify `js/manning-pipe-flow.js` before re-symboling S₀/S_f. §3.5
+  roughness + reference-linked labels — apply **D8** (bare symbol as the link + separate reusable `?`
+  tip key outside the anchor). Velocity shorts — survivor is `mhp_vel_*_short` (incumbency 5>2).
+- **Model:** execution is well-specified; Opus is fine for the judgment (wording, extra-meaning), or
+  drop to Sonnet for the mechanical §4 typography ride-alongs. Not a Fable task (that's Wave 0).
+
 ## Survey coverage
 
 ### §1 Ownership policy
