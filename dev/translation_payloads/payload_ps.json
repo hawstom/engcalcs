@@ -18,7 +18,7 @@
     },
     "prompt_context_by_prefix": {
         "calc": "Use these preferred technical term translations when relevant:\n- flow (Q): بهاو\n- velocity (v): سرعت\n- slope (S): شیب",
-        "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): بهاو\n- velocity (v): سرعت\n- head loss (h_L): د سر زیان\n- emitter: وریز\n- distribution uniformity (DU): د ویش یو‌شانتیا\n- low-quarter distribution uniformity (DU_lq): [needs translation sprint]\n- application rate (PR): د اوبو د لګولو نرخ\n- lateral: جانبي نل\n- mainline: اصلي نل\n- reach: د نل برخه\n- velocity head (H_v): د سرعت لوړوالی\n- friction loss (H_f): [needs translation sprint]\n- minor loss (H_m): [needs translation sprint]\n- energy grade line (EGL): د انرژۍ کرښه\n- upstream: [needs translation sprint]\n- downstream: [needs translation sprint]",
+        "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): بهاو\n- velocity (v): سرعت\n- head loss (h_L): د سر زیان\n- emitter: وریز\n- distribution uniformity (DU): د ویش یو‌شانتیا\n- low-quarter distribution uniformity (DU_lq): [needs translation sprint]\n- application rate (PR): د اوبو د لګولو نرخ\n- lateral: جانبي نل\n- mainline: اصلي نل\n- reach: د نل برخه\n- velocity head (H_v): د سرعت لوړوالی\n- friction loss (h_f): [needs translation sprint]\n- minor loss (h_m): [needs translation sprint]\n- energy grade line (EGL): د انرژۍ کرښه\n- upstream: [needs translation sprint]\n- downstream: [needs translation sprint]",
         "irr": "Use these preferred technical term translations when relevant:\n- flow (Q): بهاو\n- velocity (v): سرعت\n- slope (S): شیب",
         "u": "Use these preferred technical term translations when relevant:\n- flow (Q): بهاو\n- velocity (v): سرعت\n- slope (S): شیب",
         "wi": "Use these preferred technical term translations when relevant:\n- flow (Q): بهاو\n- weir: بند\n- headwater elevation: د پورته اوبو سطح\n- tailwater elevation: د ښکته اوبو سطح\n- discharge coefficient (C_d): د بهاو ضریب\n- irregular channel: [needs translation sprint]"
@@ -127,16 +127,16 @@
             },
             {
                 "term": "friction loss",
-                "symbol": "H_f",
-                "context": "Head loss along the pipe due to wall friction (Darcy-Weisbach). Irrigation Pressure table column.",
+                "symbol": "h_f",
+                "context": "Head loss along the pipe due to wall friction (Darcy-Weisbach). Symbol h_f (lowercase h reserved for loss components; capital H reserved for total\/gross\/net head, per label-normalization decision item 90, 2026-07-07). Manning Pipe Head Loss, Micro-Hydro Power, Irrigation Pressure table column.",
                 "translation_notes": "",
                 "preferred_translation": ""
             },
             {
                 "term": "minor loss",
-                "symbol": "H_m",
-                "context": "Local head loss at fittings\/valves\/couplers (K_m coefficient). Irrigation Pressure table column.",
-                "translation_notes": "\"Minor\/local\" loss at fittings — not \"smaller\" loss.",
+                "symbol": "h_m",
+                "context": "Local head loss at fittings\/valves\/couplers (coefficient k_m). Canonical merged concept for the former 'junction loss' (mphl_) and 'minor loss' (mhp_\/ip_). Manning Pipe Head Loss, Micro-Hydro Power, Irrigation Pressure.",
+                "translation_notes": "CANONICAL ENGLISH LABEL: \"Minor (local) loss\" (label-normalization decision, item 90, 2026-07-07). 'Minor ⇄ local' — a local\/point loss at fittings, NOT a \"smaller\" loss; the '(local)' parenthetical fixes the mistranslation trap. Symbol h_m, coefficient k_m (lowercase h reserved for loss components; capital H reserved for total\/gross\/net head, per the same decision).",
                 "preferred_translation": ""
             },
             {

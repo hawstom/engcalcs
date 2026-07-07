@@ -16,7 +16,7 @@
     },
     "prompt_context_by_prefix": {
         "calc": "Use these preferred technical term translations when relevant:\n- flow (Q): mtiririko\n- velocity (v): kasi\n- slope (S): mteremko",
-        "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): mtiririko\n- velocity (v): kasi\n- head loss (h_L): upotevu wa shinikizo\n- emitter: kituo cha maji\n- distribution uniformity (DU): usawa wa usambazaji wa maji\n- low-quarter distribution uniformity (DU_lq): [needs translation sprint]\n- application rate (PR): kiwango cha kunyunyizia maji\n- lateral: bomba la tawi\n- mainline: bomba kuu\n- reach: sehemu ya bomba\n- velocity head (H_v): kimo cha kasi\n- friction loss (H_f): [needs translation sprint]\n- minor loss (H_m): [needs translation sprint]\n- energy grade line (EGL): mstari wa nishati\n- upstream: juu ya mkondo\n- downstream: chini ya mkondo",
+        "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): mtiririko\n- velocity (v): kasi\n- head loss (h_L): upotevu wa shinikizo\n- emitter: kituo cha maji\n- distribution uniformity (DU): usawa wa usambazaji wa maji\n- low-quarter distribution uniformity (DU_lq): [needs translation sprint]\n- application rate (PR): kiwango cha kunyunyizia maji\n- lateral: bomba la tawi\n- mainline: bomba kuu\n- reach: sehemu ya bomba\n- velocity head (H_v): kimo cha kasi\n- friction loss (h_f): [needs translation sprint]\n- minor loss (h_m): [needs translation sprint]\n- energy grade line (EGL): mstari wa nishati\n- upstream: juu ya mkondo\n- downstream: chini ya mkondo",
         "irr": "Use these preferred technical term translations when relevant:\n- flow (Q): mtiririko\n- velocity (v): kasi\n- slope (S): mteremko"
     },
     "glossary_terms_by_prefix": {
@@ -123,16 +123,16 @@
             },
             {
                 "term": "friction loss",
-                "symbol": "H_f",
-                "context": "Head loss along the pipe due to wall friction (Darcy-Weisbach). Irrigation Pressure table column.",
+                "symbol": "h_f",
+                "context": "Head loss along the pipe due to wall friction (Darcy-Weisbach). Symbol h_f (lowercase h reserved for loss components; capital H reserved for total\/gross\/net head, per label-normalization decision item 90, 2026-07-07). Manning Pipe Head Loss, Micro-Hydro Power, Irrigation Pressure table column.",
                 "translation_notes": "",
                 "preferred_translation": ""
             },
             {
                 "term": "minor loss",
-                "symbol": "H_m",
-                "context": "Local head loss at fittings\/valves\/couplers (K_m coefficient). Irrigation Pressure table column.",
-                "translation_notes": "\"Minor\/local\" loss at fittings — not \"smaller\" loss.",
+                "symbol": "h_m",
+                "context": "Local head loss at fittings\/valves\/couplers (coefficient k_m). Canonical merged concept for the former 'junction loss' (mphl_) and 'minor loss' (mhp_\/ip_). Manning Pipe Head Loss, Micro-Hydro Power, Irrigation Pressure.",
+                "translation_notes": "CANONICAL ENGLISH LABEL: \"Minor (local) loss\" (label-normalization decision, item 90, 2026-07-07). 'Minor ⇄ local' — a local\/point loss at fittings, NOT a \"smaller\" loss; the '(local)' parenthetical fixes the mistranslation trap. Symbol h_m, coefficient k_m (lowercase h reserved for loss components; capital H reserved for total\/gross\/net head, per the same decision).",
                 "preferred_translation": ""
             },
             {

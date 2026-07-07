@@ -18,9 +18,9 @@
     },
     "prompt_context_by_prefix": {
         "calc": "Use these preferred technical term translations when relevant:\n- flow (Q): প্রবাহ\n- velocity (v): প্রবাহ বেগ\n- slope (S): ঢাল",
-        "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): প্রবাহ\n- velocity (v): প্রবাহ বেগ\n- head loss (h_L): পানিশীর্ষ ক্ষতি\n- emitter: ড্রিপার\n- distribution uniformity (DU): বিতরণ সমতা\n- low-quarter distribution uniformity (DU_lq): [needs translation sprint]\n- application rate (PR): পানি প্রয়োগ হার\n- lateral: ল্যাটারাল\n- mainline: প্রধান লাইন\n- reach: অংশ\n- velocity head (H_v): বেগ হেড\n- friction loss (H_f): ঘর্ষণ ক্ষতি\n- minor loss (H_m): স্থানীয় ক্ষতি\n- energy grade line (EGL): শক্তি রেখা\n- upstream: উজান\n- downstream: ভাটি",
+        "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): প্রবাহ\n- velocity (v): প্রবাহ বেগ\n- head loss (h_L): পানিশীর্ষ ক্ষতি\n- emitter: ড্রিপার\n- distribution uniformity (DU): বিতরণ সমতা\n- low-quarter distribution uniformity (DU_lq): [needs translation sprint]\n- application rate (PR): পানি প্রয়োগ হার\n- lateral: ল্যাটারাল\n- mainline: প্রধান লাইন\n- reach: অংশ\n- velocity head (H_v): বেগ হেড\n- friction loss (h_f): ঘর্ষণ ক্ষতি\n- minor loss (h_m): স্থানীয় ক্ষতি\n- energy grade line (EGL): শক্তি রেখা\n- upstream: উজান\n- downstream: ভাটি",
         "irr": "Use these preferred technical term translations when relevant:\n- flow (Q): প্রবাহ\n- velocity (v): প্রবাহ বেগ\n- slope (S): ঢাল",
-        "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): প্রবাহ\n- penstock: পেনস্টক\n- gross head (H_gross): মোট জলশীর্ষ\n- net head (H_net): নিট জলশীর্ষ\n- plant efficiency (η): প্লান্ট দক্ষতা\n- head loss (h_L): পানিশীর্ষ ক্ষতি\n- run-of-river: নদীর স্বাভাবিক প্রবাহ বিদ্যুৎ\n- headworks: হেডওয়ার্কস\n- junction loss (H_m): সংযোগস্থল ক্ষতি",
+        "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): প্রবাহ\n- penstock: পেনস্টক\n- gross head (H_gross): মোট জলশীর্ষ\n- net head (H_net): নিট জলশীর্ষ\n- plant efficiency (η): প্লান্ট দক্ষতা\n- head loss (h_L): পানিশীর্ষ ক্ষতি\n- run-of-river: নদীর স্বাভাবিক প্রবাহ বিদ্যুৎ\n- headworks: হেডওয়ার্কস\n- junction loss (h_m): সংযোগস্থল ক্ষতি",
         "mtc": "Use these preferred technical term translations when relevant:\n- flow (Q): প্রবাহ\n- velocity (v): প্রবাহ বেগ\n- hydraulic radius (R_h): হাইড্রলিক ব্যাসার্ধ\n- wetted perimeter (P_w): ভেজা পরিধি\n- Manning roughness (n): ম্যানিং রাফনেস সহগ\n- slope (S): ঢাল"
     },
     "glossary_terms_by_prefix": {
@@ -127,16 +127,16 @@
             },
             {
                 "term": "friction loss",
-                "symbol": "H_f",
-                "context": "Head loss along the pipe due to wall friction (Darcy-Weisbach). Irrigation Pressure table column.",
+                "symbol": "h_f",
+                "context": "Head loss along the pipe due to wall friction (Darcy-Weisbach). Symbol h_f (lowercase h reserved for loss components; capital H reserved for total\/gross\/net head, per label-normalization decision item 90, 2026-07-07). Manning Pipe Head Loss, Micro-Hydro Power, Irrigation Pressure table column.",
                 "translation_notes": "",
                 "preferred_translation": "ঘর্ষণ ক্ষতি"
             },
             {
                 "term": "minor loss",
-                "symbol": "H_m",
-                "context": "Local head loss at fittings\/valves\/couplers (K_m coefficient). Irrigation Pressure table column.",
-                "translation_notes": "\"Minor\/local\" loss at fittings — not \"smaller\" loss.",
+                "symbol": "h_m",
+                "context": "Local head loss at fittings\/valves\/couplers (coefficient k_m). Canonical merged concept for the former 'junction loss' (mphl_) and 'minor loss' (mhp_\/ip_). Manning Pipe Head Loss, Micro-Hydro Power, Irrigation Pressure.",
+                "translation_notes": "CANONICAL ENGLISH LABEL: \"Minor (local) loss\" (label-normalization decision, item 90, 2026-07-07). 'Minor ⇄ local' — a local\/point loss at fittings, NOT a \"smaller\" loss; the '(local)' parenthetical fixes the mistranslation trap. Symbol h_m, coefficient k_m (lowercase h reserved for loss components; capital H reserved for total\/gross\/net head, per the same decision).",
                 "preferred_translation": "স্থানীয় ক্ষতি"
             },
             {
@@ -243,9 +243,9 @@
             },
             {
                 "term": "junction loss",
-                "symbol": "H_m",
-                "context": "Energy loss at pipe junctions, bends, fittings, and entrance — a local (point) loss as opposed to distributed friction loss along the pipe. H_m = k × v²\/(2g). Also called 'minor loss', though in short penstocks these can equal or exceed friction losses. Appears in Manning Pipe Head Loss and Micro-Hydro Power calculators.",
-                "translation_notes": "The term 'minor loss' is conventional but misleading — do not imply these losses are always small. Use the hydraulic engineering term for local\/point losses at fittings. French: 'perte singulière'. Spanish: 'pérdida local' or 'pérdida por accesorio'. Russian: 'местные потери'. Chinese: '局部水头损失'.",
+                "symbol": "h_m",
+                "context": "Energy loss at pipe junctions, bends, fittings, and entrance — a local (point) loss as opposed to distributed friction loss along the pipe. h_m = k_m × v²\/(2g). Appears in Manning Pipe Head Loss and Micro-Hydro Power calculators.",
+                "translation_notes": "CANONICAL ENGLISH (label-normalization decision, item 90, 2026-07-07): the suite-wide English label for this concept is \"Minor (local) loss\" — 'junction loss' (formerly mphl_) and 'minor loss' (mhp_\/ip_) are merged into it; see the 'minor loss' entry for the canonical treatment. The term 'minor' is conventional but misleading — do not imply these losses are always small; the parenthetical '(local)' carries the true sense. Use the hydraulic engineering term for local\/point losses at fittings. French: 'perte singulière'. Spanish: 'pérdida local' or 'pérdida por accesorio'. Russian: 'местные потери'. Chinese: '局部水头损失'.",
                 "preferred_translation": "সংযোগস্থল ক্ষতি"
             }
         ],

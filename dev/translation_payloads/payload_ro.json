@@ -19,9 +19,9 @@
     },
     "prompt_context_by_prefix": {
         "calc": "Use these preferred technical term translations when relevant:\n- flow (Q): debit\n- velocity (v): viteză\n- slope (S): pantă",
-        "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): debit\n- velocity (v): viteză\n- head loss (h_L): pierdere de presiune\n- emitter: emițător\n- distribution uniformity (DU): uniformitatea distribuției\n- low-quarter distribution uniformity (DU_lq): [needs translation sprint]\n- application rate (PR): rata de aplicare\n- lateral: conductă laterală\n- mainline: conductă principală\n- reach: tronson\n- velocity head (H_v): înălțime cinetică\n- friction loss (H_f): pierdere prin frecare\n- minor loss (H_m): pierdere locală\n- energy grade line (EGL): linia energetică\n- upstream: amonte\n- downstream: aval",
+        "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): debit\n- velocity (v): viteză\n- head loss (h_L): pierdere de presiune\n- emitter: emițător\n- distribution uniformity (DU): uniformitatea distribuției\n- low-quarter distribution uniformity (DU_lq): [needs translation sprint]\n- application rate (PR): rata de aplicare\n- lateral: conductă laterală\n- mainline: conductă principală\n- reach: tronson\n- velocity head (H_v): înălțime cinetică\n- friction loss (h_f): pierdere prin frecare\n- minor loss (h_m): pierdere locală\n- energy grade line (EGL): linia energetică\n- upstream: amonte\n- downstream: aval",
         "irr": "Use these preferred technical term translations when relevant:\n- flow (Q): debit\n- velocity (v): viteză\n- slope (S): pantă",
-        "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): debit\n- penstock: conductă sub presiune\n- gross head (H_gross): cădere brută\n- net head (H_net): cădere netă\n- plant efficiency (η): eficiența instalației\n- head loss (h_L): pierdere de presiune\n- run-of-river: centrală hidroelectrică la cursul apei\n- headworks: lucrări de captare\n- junction loss (H_m): pierderi locale",
+        "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): debit\n- penstock: conductă sub presiune\n- gross head (H_gross): cădere brută\n- net head (H_net): cădere netă\n- plant efficiency (η): eficiența instalației\n- head loss (h_L): pierdere de presiune\n- run-of-river: centrală hidroelectrică la cursul apei\n- headworks: lucrări de captare\n- junction loss (h_m): pierderi locale",
         "mi": "Use these preferred technical term translations when relevant:\n- flow (Q): debit\n- velocity (v): viteză\n- hydraulic radius (R_h): raza hidraulică\n- wetted perimeter (P_w): perimetru udat\n- Manning roughness (n): coeficientul de rugozitate Manning\n- slope (S): pantă\n- irregular channel: canal cu secțiune neregulată",
         "mtc": "Use these preferred technical term translations when relevant:\n- flow (Q): debit\n- velocity (v): viteză\n- hydraulic radius (R_h): raza hidraulică\n- wetted perimeter (P_w): perimetru udat\n- Manning roughness (n): coeficientul de rugozitate Manning\n- slope (S): pantă"
     },
@@ -129,16 +129,16 @@
             },
             {
                 "term": "friction loss",
-                "symbol": "H_f",
-                "context": "Head loss along the pipe due to wall friction (Darcy-Weisbach). Irrigation Pressure table column.",
+                "symbol": "h_f",
+                "context": "Head loss along the pipe due to wall friction (Darcy-Weisbach). Symbol h_f (lowercase h reserved for loss components; capital H reserved for total\/gross\/net head, per label-normalization decision item 90, 2026-07-07). Manning Pipe Head Loss, Micro-Hydro Power, Irrigation Pressure table column.",
                 "translation_notes": "",
                 "preferred_translation": "pierdere prin frecare"
             },
             {
                 "term": "minor loss",
-                "symbol": "H_m",
-                "context": "Local head loss at fittings\/valves\/couplers (K_m coefficient). Irrigation Pressure table column.",
-                "translation_notes": "\"Minor\/local\" loss at fittings — not \"smaller\" loss.",
+                "symbol": "h_m",
+                "context": "Local head loss at fittings\/valves\/couplers (coefficient k_m). Canonical merged concept for the former 'junction loss' (mphl_) and 'minor loss' (mhp_\/ip_). Manning Pipe Head Loss, Micro-Hydro Power, Irrigation Pressure.",
+                "translation_notes": "CANONICAL ENGLISH LABEL: \"Minor (local) loss\" (label-normalization decision, item 90, 2026-07-07). 'Minor ⇄ local' — a local\/point loss at fittings, NOT a \"smaller\" loss; the '(local)' parenthetical fixes the mistranslation trap. Symbol h_m, coefficient k_m (lowercase h reserved for loss components; capital H reserved for total\/gross\/net head, per the same decision).",
                 "preferred_translation": "pierdere locală"
             },
             {
@@ -245,9 +245,9 @@
             },
             {
                 "term": "junction loss",
-                "symbol": "H_m",
-                "context": "Energy loss at pipe junctions, bends, fittings, and entrance — a local (point) loss as opposed to distributed friction loss along the pipe. H_m = k × v²\/(2g). Also called 'minor loss', though in short penstocks these can equal or exceed friction losses. Appears in Manning Pipe Head Loss and Micro-Hydro Power calculators.",
-                "translation_notes": "The term 'minor loss' is conventional but misleading — do not imply these losses are always small. Use the hydraulic engineering term for local\/point losses at fittings. French: 'perte singulière'. Spanish: 'pérdida local' or 'pérdida por accesorio'. Russian: 'местные потери'. Chinese: '局部水头损失'.",
+                "symbol": "h_m",
+                "context": "Energy loss at pipe junctions, bends, fittings, and entrance — a local (point) loss as opposed to distributed friction loss along the pipe. h_m = k_m × v²\/(2g). Appears in Manning Pipe Head Loss and Micro-Hydro Power calculators.",
+                "translation_notes": "CANONICAL ENGLISH (label-normalization decision, item 90, 2026-07-07): the suite-wide English label for this concept is \"Minor (local) loss\" — 'junction loss' (formerly mphl_) and 'minor loss' (mhp_\/ip_) are merged into it; see the 'minor loss' entry for the canonical treatment. The term 'minor' is conventional but misleading — do not imply these losses are always small; the parenthetical '(local)' carries the true sense. Use the hydraulic engineering term for local\/point losses at fittings. French: 'perte singulière'. Spanish: 'pérdida local' or 'pérdida por accesorio'. Russian: 'местные потери'. Chinese: '局部水头损失'.",
                 "preferred_translation": "pierderi locale"
             }
         ],

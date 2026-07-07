@@ -16,7 +16,7 @@
     },
     "prompt_context_by_prefix": {
         "calc": "Use these preferred technical term translations when relevant:\n- flow (Q): 流量\n- velocity (v): 流速\n- slope (S): 坡度",
-        "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): 流量\n- velocity (v): 流速\n- head loss (h_L): 水头损失\n- emitter: 滴头\n- distribution uniformity (DU): 分布均匀度\n- low-quarter distribution uniformity (DU_lq): 低四分之一分布均匀度\n- application rate (PR): 灌水强度\n- lateral: 毛管\n- mainline: 干管\n- reach: 管段\n- velocity head (H_v): 流速水头\n- friction loss (H_f): 沿程水头损失\n- minor loss (H_m): 局部水头损失\n- energy grade line (EGL): 能量坡度线\n- upstream: 上游\n- downstream: 下游",
+        "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): 流量\n- velocity (v): 流速\n- head loss (h_L): 水头损失\n- emitter: 滴头\n- distribution uniformity (DU): 分布均匀度\n- low-quarter distribution uniformity (DU_lq): 低四分之一分布均匀度\n- application rate (PR): 灌水强度\n- lateral: 毛管\n- mainline: 干管\n- reach: 管段\n- velocity head (H_v): 流速水头\n- friction loss (h_f): 沿程水头损失\n- minor loss (h_m): 局部水头损失\n- energy grade line (EGL): 能量坡度线\n- upstream: 上游\n- downstream: 下游",
         "irr": "Use these preferred technical term translations when relevant:\n- flow (Q): 流量\n- velocity (v): 流速\n- slope (S): 坡度"
     },
     "glossary_terms_by_prefix": {
@@ -123,16 +123,16 @@
             },
             {
                 "term": "friction loss",
-                "symbol": "H_f",
-                "context": "Head loss along the pipe due to wall friction (Darcy-Weisbach). Irrigation Pressure table column.",
+                "symbol": "h_f",
+                "context": "Head loss along the pipe due to wall friction (Darcy-Weisbach). Symbol h_f (lowercase h reserved for loss components; capital H reserved for total\/gross\/net head, per label-normalization decision item 90, 2026-07-07). Manning Pipe Head Loss, Micro-Hydro Power, Irrigation Pressure table column.",
                 "translation_notes": "",
                 "preferred_translation": "沿程水头损失"
             },
             {
                 "term": "minor loss",
-                "symbol": "H_m",
-                "context": "Local head loss at fittings\/valves\/couplers (K_m coefficient). Irrigation Pressure table column.",
-                "translation_notes": "\"Minor\/local\" loss at fittings — not \"smaller\" loss.",
+                "symbol": "h_m",
+                "context": "Local head loss at fittings\/valves\/couplers (coefficient k_m). Canonical merged concept for the former 'junction loss' (mphl_) and 'minor loss' (mhp_\/ip_). Manning Pipe Head Loss, Micro-Hydro Power, Irrigation Pressure.",
+                "translation_notes": "CANONICAL ENGLISH LABEL: \"Minor (local) loss\" (label-normalization decision, item 90, 2026-07-07). 'Minor ⇄ local' — a local\/point loss at fittings, NOT a \"smaller\" loss; the '(local)' parenthetical fixes the mistranslation trap. Symbol h_m, coefficient k_m (lowercase h reserved for loss components; capital H reserved for total\/gross\/net head, per the same decision).",
                 "preferred_translation": "局部水头损失"
             },
             {

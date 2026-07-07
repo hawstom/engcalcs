@@ -18,7 +18,7 @@
     },
     "prompt_context_by_prefix": {
         "calc": "Use these preferred technical term translations when relevant:\n- flow (Q): витрата\n- velocity (v): швидкість\n- slope (S): ухил",
-        "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): витрата\n- velocity (v): швидкість\n- head loss (h_L): втрати напору\n- emitter: крапельниця\n- distribution uniformity (DU): рівномірність розподілу\n- low-quarter distribution uniformity (DU_lq): [needs translation sprint]\n- application rate (PR): інтенсивність зрошення\n- lateral: латераль\n- mainline: магістральний трубопровід\n- reach: ділянка\n- velocity head (H_v): швидкісний напір\n- friction loss (H_f): втрати на тертя\n- minor loss (H_m): місцеві втрати\n- energy grade line (EGL): лінія енергії\n- upstream: вище за течією\n- downstream: нижче за течією",
+        "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): витрата\n- velocity (v): швидкість\n- head loss (h_L): втрати напору\n- emitter: крапельниця\n- distribution uniformity (DU): рівномірність розподілу\n- low-quarter distribution uniformity (DU_lq): [needs translation sprint]\n- application rate (PR): інтенсивність зрошення\n- lateral: латераль\n- mainline: магістральний трубопровід\n- reach: ділянка\n- velocity head (H_v): швидкісний напір\n- friction loss (h_f): втрати на тертя\n- minor loss (h_m): місцеві втрати\n- energy grade line (EGL): лінія енергії\n- upstream: вище за течією\n- downstream: нижче за течією",
         "irr": "Use these preferred technical term translations when relevant:\n- flow (Q): витрата\n- velocity (v): швидкість\n- slope (S): ухил",
         "menu": "Use these preferred technical term translations when relevant:\n- flow (Q): витрата\n- velocity (v): швидкість\n- slope (S): ухил",
         "wi": "Use these preferred technical term translations when relevant:\n- flow (Q): витрата\n- weir: водозлив\n- headwater elevation: позначка рівня верхнього б'єфа\n- tailwater elevation: позначка рівня нижнього б'єфа\n- discharge coefficient (C_d): коефіцієнт витрати\n- irregular channel: русло довільного перерізу"
@@ -127,16 +127,16 @@
             },
             {
                 "term": "friction loss",
-                "symbol": "H_f",
-                "context": "Head loss along the pipe due to wall friction (Darcy-Weisbach). Irrigation Pressure table column.",
+                "symbol": "h_f",
+                "context": "Head loss along the pipe due to wall friction (Darcy-Weisbach). Symbol h_f (lowercase h reserved for loss components; capital H reserved for total\/gross\/net head, per label-normalization decision item 90, 2026-07-07). Manning Pipe Head Loss, Micro-Hydro Power, Irrigation Pressure table column.",
                 "translation_notes": "",
                 "preferred_translation": "втрати на тертя"
             },
             {
                 "term": "minor loss",
-                "symbol": "H_m",
-                "context": "Local head loss at fittings\/valves\/couplers (K_m coefficient). Irrigation Pressure table column.",
-                "translation_notes": "\"Minor\/local\" loss at fittings — not \"smaller\" loss.",
+                "symbol": "h_m",
+                "context": "Local head loss at fittings\/valves\/couplers (coefficient k_m). Canonical merged concept for the former 'junction loss' (mphl_) and 'minor loss' (mhp_\/ip_). Manning Pipe Head Loss, Micro-Hydro Power, Irrigation Pressure.",
+                "translation_notes": "CANONICAL ENGLISH LABEL: \"Minor (local) loss\" (label-normalization decision, item 90, 2026-07-07). 'Minor ⇄ local' — a local\/point loss at fittings, NOT a \"smaller\" loss; the '(local)' parenthetical fixes the mistranslation trap. Symbol h_m, coefficient k_m (lowercase h reserved for loss components; capital H reserved for total\/gross\/net head, per the same decision).",
                 "preferred_translation": "місцеві втрати"
             },
             {
