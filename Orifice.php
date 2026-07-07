@@ -47,8 +47,11 @@ echoCalculatorForm(
 EngCalcs.pageConfig = {
 	regime_valid:        <?=json_encode($ec_lang['or_regime_valid'])?>,
 	regime_submerged:    <?=json_encode($ec_lang['or_regime_submerged'])?>,
+	regime_submerged_tip:<?=json_encode($ec_lang['or_regime_submerged_tip'])?>,
 	regime_warn:         <?=json_encode($ec_lang['or_regime_warn'])?>,
-	regime_twe_above_hwe:<?=json_encode($ec_lang['or_regime_twe_above_hwe'])?>
+	regime_warn_tip:     <?=json_encode($ec_lang['or_regime_warn_tip'])?>,
+	regime_twe_above_hwe:<?=json_encode($ec_lang['or_regime_twe_above_hwe'])?>,
+	regime_twe_above_hwe_tip:<?=json_encode($ec_lang['or_regime_twe_above_hwe_tip'])?>
 };
 </script>
 <script src="/engcalcs/js/orifice.js?v=<?=filemtime(__DIR__.'/js/orifice.js')?>"></script>

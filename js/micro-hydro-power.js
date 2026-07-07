@@ -69,13 +69,13 @@ EngCalcs.pageCalculator = function(objForm) {
 		var hlPct = this.var.hl / this.var.hgross * 100;
 		hlEl.className = '';
 		if (hlPct <= 10) {
-			hlEl.innerHTML = hlPct.toFixed(1) + '% — ' + EngCalcs.pageConfig.hl_ok;
+			hlEl.innerHTML = EngCalcs.writeCheckHTML(true, hlPct.toFixed(1) + '% — ' + EngCalcs.pageConfig.hl_ok);
 			hlEl.classList.add('ec-status-ok');
 		} else if (hlPct <= 20) {
-			hlEl.innerHTML = hlPct.toFixed(1) + '% — ' + EngCalcs.pageConfig.hl_warn;
+			hlEl.innerHTML = EngCalcs.writeCheckHTML(false, hlPct.toFixed(1) + '% — ' + EngCalcs.pageConfig.hl_warn, EngCalcs.pageConfig.hl_warn_tip);
 			hlEl.classList.add('ec-status-warn');
 		} else {
-			hlEl.innerHTML = hlPct.toFixed(1) + '% — ' + EngCalcs.pageConfig.hl_bad;
+			hlEl.innerHTML = EngCalcs.writeCheckHTML(false, hlPct.toFixed(1) + '% — ' + EngCalcs.pageConfig.hl_bad, EngCalcs.pageConfig.hl_bad_tip);
 			hlEl.classList.add('ec-status-bad');
 		}
 	}

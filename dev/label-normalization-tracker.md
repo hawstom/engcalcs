@@ -72,16 +72,16 @@ Owner by incumbency→menu; apply D7 (**English-only**: delete redundant key fro
 ### §4 Symbol & typography inconsistencies (mechanical ride-alongs, per D4/symbol rule)
 | Item | Status |
 |---|---|
-| Case drift: `v`/`V`, `h_v`/`H_v`, `H`/`h` loss, `l`/`L`, `a`/`A`, `SG`/`sg`, unsubscripted `Cw`/`Q0`/`a0`/`z1`/`z2`/`d0`, `D50`/`D₅₀` | ☐ |
-| Froude `F`→`Fr` (`mpf_froude_number` vs `mi_fr617`) | ☐ |
-| `mpf_shear_stress` "tau" spelled vs `mi_tau` `&tau;` — normalize | ☐ |
-| Inline `style="cursor:help;color:#06c;…"` (mtc_, rc_) → `class="ec-tip"` | ☐ (coordinate with tips-standard item) |
+| Case drift: `v`/`V`, `h_v`/`H_v`, `H`/`h` loss, `l`/`L`, `a`/`A`, `SG`/`sg`, unsubscripted `Cw`/`Q0`/`a0`/`z1`/`z2`/`d0`, `D50`/`D₅₀` | ☑ (mpf_flow_area/pipe_area/area_ratio A-case + subscripts; mpf_full_flow/full_flow_ratio Q<sub>0</sub> subscripts; mtc_side_slope_1/2 z<sub>1</sub>/z<sub>2</sub> subscripts; `mi_hv617` H<sub>v</sub>→h<sub>v</sub> incl. its `$ec_lang_intent` — Tom authorized the intent edit 2026-07-07) |
+| Froude `F`→`Fr` (`mpf_froude_number` vs `mi_fr617`) | ☑ (`mpf_froude_number`→'Froude number, Fr') |
+| `mpf_shear_stress` "tau" spelled vs `mi_tau` `&tau;` — normalize | ☑ (`mpf_shear_stress`→'…, &tau;') |
+| Inline `style="cursor:help;color:#06c;…"` (mtc_, rc_) → `class="ec-tip"` | ☑ (10 occurrences in mtc_d50_*/rc_* mechanically converted) |
 
 ### §5 Check/verdict string conventions
 | Item | Disposition | Status |
 |---|---|---|
-| Single verdict convention + `writeVelocityCheck` whole-string target | D5 + tips-standard item | ☐ |
-| Collapse 4 ad-hoc verdict styles (✓ / Warning: / ⚠ / bare) across `cs_loss_*`, `or_regime_*`, `odt_h2_*`, `rc_sg_*`, `mhp_hl_*`, `mtc_vel_*` | D5 | ☐ |
+| Single verdict convention + `writeVelocityCheck` whole-string target | D5 + tips-standard item | ☑ (new shared `EngCalcs.writeCheckHTML(ok, shortText, tipText)` in `js/Calculators.lib.js`; `writeVelocityCheck` rewritten to wrap the whole string, not just the ⚠ glyph, in `.ec-tip`, and now prefixes ✓ on the ok case too) |
+| Collapse 4 ad-hoc verdict styles (✓ / Warning: / ⚠ / bare) across `cs_loss_*`, `or_regime_*`, `odt_h2_*`, `rc_sg_*`, `mhp_hl_*`, `mtc_vel_*` | D5 | ☑ mtc_vel_*/mhp_vel_* already fit the short+tip shape, only JS markup changed. The other 5 groups' baked-in long strings split into short label + new `*_tip` key (English only, D7): `or_regime_submerged_tip`/`or_regime_warn_tip`/`or_regime_twe_above_hwe_tip` (Orifice.php/orifice.js); `odt_h2_warn_tip` (Orifice-Drain-Time.php/orifice-drain-time.js); `cs_loss_positive/zero/negative` stripped of embedded ✓/⚠ (Canal-Seepage.php/canal-seepage.js, no tip needed — text was already short); `mhp_hl_warn_tip`/`mhp_hl_bad_tip` (Micro-Hydro-Power.php/micro-hydro-power.js); `rc_sg_ok_tip/low_tip/high_tip` + `rc_SD_ok_tip/low_tip/high_tip` (Rock-Chute.php/rock-chute.js — rc_SD_* rode along, same ad-hoc pattern as rc_sg_*, not separately listed in the tracker but same defect). All `php -l` + `node --check` clean; all 8 touched calculator pages render via CLI PHP with no fatals. New `_tip`/split keys show as "missing" in the 26 non-English files per D7 — expected propagation worklist for item 85, not a defect.
 
 ## Resolved decisions (Tom, 2026-07-07) — all 5 ruled
 1. **§2 velocity shorts — SHARED** (Tom overruled "keep separate"). One key each for OK/High/Low.
@@ -105,3 +105,8 @@ Owner by incumbency→menu; apply D7 (**English-only**: delete redundant key fro
 
 **Completion definition:** every row above is ☑ or ◇, the 5 decisions ruled (done), and post-edit
 `php -l` + `lang_syntax_validate` + tag-parity are clean suite-wide.
+
+**Status 2026-07-07: complete.** Every row is ☑ or ◇, including `mi_hv617` (Tom authorized the
+`$ec_lang_intent` edit 2026-07-07). QA is clean (`php -l`, `node --check`, `lang_syntax_validate.php`
+all clean on every touched file; touched calculator pages render with no fatals via CLI PHP). Item
+90 is done.

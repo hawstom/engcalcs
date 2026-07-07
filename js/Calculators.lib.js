@@ -212,9 +212,24 @@ EngCalcs.writeFormResult = function (objForm, name, precision, hasUnits) {
 };
 
 /**
+	* writeCheckHTML() builds the suite-wide verdict-string markup (item 90 D5):
+	* a leading ✓/⚠ glyph plus short text, with the whole string as the ec-tip
+	* hover/tap target when tipText is given (the glyph alone is too small a
+	* touch target). The glyph is decorative and carries no translation payload.
+	*/
+EngCalcs.writeCheckHTML = function (ok, shortText, tipText) {
+	'use strict';
+	var glyph = ok ? '✓' : '⚠';
+	if (tipText) {
+		return '<span class="ec-tip" title="' + tipText + '">' + glyph + ' ' + shortText + '</span>';
+	}
+	return glyph + ' ' + shortText;
+};
+
+/**
 	* writeVelocityCheck() renders a short OK / High / Low velocity status
 	* into elId, with the full explanation available as a hover tip on the
-	* warning icon. status is 'ok', 'high', 'low', or '' (blank/no result).
+	* whole string. status is 'ok', 'high', 'low', or '' (blank/no result).
 	*/
 EngCalcs.writeVelocityCheck = function (elId, status, labels) {
 	'use strict';
@@ -222,12 +237,11 @@ EngCalcs.writeVelocityCheck = function (elId, status, labels) {
 	if (!el) { return; }
 	el.className = '';
 	if (status === 'high' || status === 'low') {
-		el.innerHTML = (status === 'high' ? labels.high : labels.low) +
-			' <span class="ec-tip" title="' + (status === 'high' ? labels.highTip : labels.lowTip) +
-			'">⚠</span>';
+		el.innerHTML = EngCalcs.writeCheckHTML(false, status === 'high' ? labels.high : labels.low,
+			status === 'high' ? labels.highTip : labels.lowTip);
 		el.classList.add('ec-status-warn');
 	} else if (status === 'ok') {
-		el.innerHTML = labels.ok;
+		el.innerHTML = EngCalcs.writeCheckHTML(true, labels.ok);
 		el.classList.add('ec-status-ok');
 	} else {
 		el.innerHTML = '';

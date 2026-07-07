@@ -63,7 +63,9 @@ EngCalcs.pageConfig = {
 	mhp_vel_low_short:  <?=json_encode($ec_lang['mhp_vel_low_short'])?>,
 	hl_ok:    <?=json_encode($ec_lang['mhp_hl_ok'])?>,
 	hl_warn:  <?=json_encode($ec_lang['mhp_hl_warn'])?>,
-	hl_bad:   <?=json_encode($ec_lang['mhp_hl_bad'])?>
+	hl_warn_tip: <?=json_encode($ec_lang['mhp_hl_warn_tip'])?>,
+	hl_bad:   <?=json_encode($ec_lang['mhp_hl_bad'])?>,
+	hl_bad_tip: <?=json_encode($ec_lang['mhp_hl_bad_tip'])?>
 };
 </script>
 <script src="/engcalcs/js/micro-hydro-power.js?v=<?=filemtime(__DIR__.'/js/micro-hydro-power.js')?>"></script>

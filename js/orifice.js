@@ -31,16 +31,16 @@ EngCalcs.pageCalculator = function(objForm) {
 		regimeEl.className = '';
 		var regimeOk = (this.var.hwe >= this.var.crown && this.var.h > 0);
 		if (this.var.twe > this.var.hwe) {
-			regimeEl.innerHTML = EngCalcs.pageConfig.regime_twe_above_hwe;
+			regimeEl.innerHTML = EngCalcs.writeCheckHTML(false, EngCalcs.pageConfig.regime_twe_above_hwe, EngCalcs.pageConfig.regime_twe_above_hwe_tip);
 			regimeEl.classList.add('ec-status-bad');
 		} else if (!regimeOk) {
-			regimeEl.innerHTML = EngCalcs.pageConfig.regime_warn;
+			regimeEl.innerHTML = EngCalcs.writeCheckHTML(false, EngCalcs.pageConfig.regime_warn, EngCalcs.pageConfig.regime_warn_tip);
 			regimeEl.classList.add('ec-status-warn');
 		} else if (this.var.submerged) {
-			regimeEl.innerHTML = EngCalcs.pageConfig.regime_submerged;
+			regimeEl.innerHTML = EngCalcs.writeCheckHTML(true, EngCalcs.pageConfig.regime_submerged, EngCalcs.pageConfig.regime_submerged_tip);
 			regimeEl.classList.add('ec-status-info');
 		} else {
-			regimeEl.innerHTML = EngCalcs.pageConfig.regime_valid;
+			regimeEl.innerHTML = EngCalcs.writeCheckHTML(true, EngCalcs.pageConfig.regime_valid);
 			regimeEl.classList.add('ec-status-ok');
 		}
 	}

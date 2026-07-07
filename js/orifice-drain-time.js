@@ -58,7 +58,7 @@ EngCalcs.pageCalculator = function(objForm) {
 		this.var.t_day = t / 86400;
 		if (h2_check_el) {
 			h2_check_el.className = 'ec-status-ok';
-			h2_check_el.innerHTML = EngCalcs.pageConfig.h2_ok;
+			h2_check_el.innerHTML = EngCalcs.writeCheckHTML(true, EngCalcs.pageConfig.h2_ok);
 		}
 	} else {
 		this.var.h1    = 0;
@@ -71,7 +71,7 @@ EngCalcs.pageCalculator = function(objForm) {
 		if (h2_check_el) {
 			h2_check_el.className = '';
 			if (h2 < h2_min) {
-				h2_check_el.innerHTML = EngCalcs.pageConfig.h2_warn;
+				h2_check_el.innerHTML = EngCalcs.writeCheckHTML(false, EngCalcs.pageConfig.h2_warn, EngCalcs.pageConfig.h2_warn_tip);
 				h2_check_el.classList.add('ec-status-warn');
 			} else {
 				h2_check_el.innerHTML = '';

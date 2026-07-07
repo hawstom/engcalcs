@@ -53,6 +53,7 @@ echoCalculatorForm(
 EngCalcs.pageConfig = {
 	h2_ok:        <?=json_encode($ec_lang['odt_h2_ok'])?>,
 	h2_warn:      <?=json_encode($ec_lang['odt_h2_warn'])?>,
+	h2_warn_tip:  <?=json_encode($ec_lang['odt_h2_warn_tip'])?>,
 	sketch_start: <?=json_encode($ec_lang['odt_sketch_start'])?>,
 	sketch_end:   <?=json_encode($ec_lang['odt_sketch_end'])?>
 };

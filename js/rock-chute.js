@@ -92,18 +92,18 @@ EngCalcs.pageCalculator = function(objForm) {
 	var sgEl = document.getElementById('rc_sg_check');
 	if (sgEl && sg > 0) {
 		sgEl.className = '';
-		if (sg < 2.54)      { sgEl.innerHTML = cfg.rc_sg_low;  sgEl.classList.add('ec-status-bad'); }
-		else if (sg > 2.82) { sgEl.innerHTML = cfg.rc_sg_high; sgEl.classList.add('ec-status-bad'); }
-		else                { sgEl.innerHTML = cfg.rc_sg_ok;   sgEl.classList.add('ec-status-ok');  }
+		if (sg < 2.54)      { sgEl.innerHTML = EngCalcs.writeCheckHTML(false, cfg.rc_sg_low, cfg.rc_sg_low_tip);   sgEl.classList.add('ec-status-bad'); }
+		else if (sg > 2.82) { sgEl.innerHTML = EngCalcs.writeCheckHTML(false, cfg.rc_sg_high, cfg.rc_sg_high_tip); sgEl.classList.add('ec-status-bad'); }
+		else                { sgEl.innerHTML = EngCalcs.writeCheckHTML(true, cfg.rc_sg_ok, cfg.rc_sg_ok_tip);     sgEl.classList.add('ec-status-ok');  }
 	}
 
 	// Gradation SD validity check
 	var sdEl = document.getElementById('rc_SD_check');
 	if (sdEl && SD > 0) {
 		sdEl.className = '';
-		if (SD < 1.15)      { sdEl.innerHTML = cfg.rc_SD_low;  sdEl.classList.add('ec-status-bad'); }
-		else if (SD > 1.47) { sdEl.innerHTML = cfg.rc_SD_high; sdEl.classList.add('ec-status-bad'); }
-		else                { sdEl.innerHTML = cfg.rc_SD_ok;   sdEl.classList.add('ec-status-ok');  }
+		if (SD < 1.15)      { sdEl.innerHTML = EngCalcs.writeCheckHTML(false, cfg.rc_SD_low, cfg.rc_SD_low_tip);   sdEl.classList.add('ec-status-bad'); }
+		else if (SD > 1.47) { sdEl.innerHTML = EngCalcs.writeCheckHTML(false, cfg.rc_SD_high, cfg.rc_SD_high_tip); sdEl.classList.add('ec-status-bad'); }
+		else                { sdEl.innerHTML = EngCalcs.writeCheckHTML(true, cfg.rc_SD_ok, cfg.rc_SD_ok_tip);     sdEl.classList.add('ec-status-ok');  }
 	}
 
 	this.rcDrawSketch();

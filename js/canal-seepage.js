@@ -69,7 +69,7 @@ EngCalcs.pageCalculator = function(objForm) {
 			lossEl.innerHTML = cfg.loss_zero;
 			lossEl.classList.add('ec-status-neutral');
 		} else {
-			lossEl.innerHTML = cfg.loss_negative;
+			lossEl.innerHTML = EngCalcs.writeCheckHTML(false, cfg.loss_negative);
 			lossEl.classList.add('ec-status-bad');
 		}
 	}
