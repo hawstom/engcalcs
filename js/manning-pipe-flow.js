@@ -6,7 +6,7 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.var.g = 9.806;
 	// Read and convert form inputs to "this.var.___" as SI units
 	this.readFormInput(objForm, 'd0', hasUnits = true);
-	this.readFormInput(objForm, 's0', hasUnits = true);
+	this.readFormInput(objForm, 'sf', hasUnits = true);
 	this.readFormInput(objForm, 'n', hasUnits = false);
 	this.readFormInput(objForm, 'dd0', hasUnits = true);
 	// Theta here is half the included angle of the wetted perimeter.
@@ -18,12 +18,12 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.var.pw = this.var.theta * this.var.d0;
 	this.var.rh = this.var.d0 / (4 * this.var.theta) * (this.var.theta - Math.sin(this.var.theta) * Math.cos(this.var.theta));
 	this.var.t = this.var.d0 * Math.sin(this.var.theta);
-	this.var.v = this.var.c / this.var.n*Math.pow(this.var.rh,2/3)*Math.pow(this.var.s0,0.5);
+	this.var.v = this.var.c / this.var.n*Math.pow(this.var.rh,2/3)*Math.pow(this.var.sf,0.5);
 	this.var.hv = this.var.v * this.var.v / (2 * this.var.g);
 	this.var.q = this.var.v * this.var.a;
-	this.var.f = this.var.v * Math.sqrt(this.var.t/(this.var.g * this.var.a * Math.cos(Math.atan(this.var.s0))));
-	this.var.tau = this.var.rh * this.var.s0;
-	this.var.q0 = this.var.c / this.var.n * Math.PI * Math.pow(this.var.d0, 8/3) / Math.pow(4, 5/3) * Math.pow(this.var.s0, 0.5);
+	this.var.f = this.var.v * Math.sqrt(this.var.t/(this.var.g * this.var.a * Math.cos(Math.atan(this.var.sf))));
+	this.var.tau = this.var.rh * this.var.sf;
+	this.var.q0 = this.var.c / this.var.n * Math.PI * Math.pow(this.var.d0, 8/3) / Math.pow(4, 5/3) * Math.pow(this.var.sf, 0.5);
 	this.var.qq0 = this.var.q / this.var.q0;
 
 	this.writeFormResult(objForm, 'y', precision = 4, hasUnits = true);
@@ -79,14 +79,14 @@ EngCalcs.pageCalculator = function(objForm) {
 EngCalcs.pageCalculatorInitialize = function (objForm) {
 };
 
-// Solves for y/d0 given a target Q, using d0, n, s0 from the main form.
+// Solves for y/d0 given a target Q, using d0, n, sf from the main form.
 // Q for a circular Manning pipe peaks at y/d0 ≈ 0.9376; no solution above that.
 EngCalcs.solveForDd0 = function() {
 	'use strict';
 	var objForm = document.forms['formInput'];
 	var d0 = parseFloat(objForm['d0'].value) / parseFloat(objForm['d0u'].value);
 	var n  = parseFloat(objForm['n'].value);
-	var s0 = parseFloat(objForm['s0'].value) / parseFloat(objForm['s0u'].value);
+	var sf = parseFloat(objForm['sf'].value) / parseFloat(objForm['sfu'].value);
 	var qu = parseFloat(document.getElementById('solver_qu').value);
 	var q_target = parseFloat(document.getElementById('solver_q').value) / qu;
 	var msgEl = document.getElementById('solver_msg');
@@ -95,7 +95,7 @@ EngCalcs.solveForDd0 = function() {
 		var theta = Math.acos(1 - 2 * dd0);
 		var a  = (theta - Math.sin(2 * theta) / 2) * d0 * d0 / 4;
 		var rh = d0 / (4 * theta) * (theta - Math.sin(theta) * Math.cos(theta));
-		return a * Math.pow(rh, 2/3) * Math.pow(s0, 0.5) / n;
+		return a * Math.pow(rh, 2/3) * Math.pow(sf, 0.5) / n;
 	}
 
 	if (isNaN(q_target) || q_target <= 0) {

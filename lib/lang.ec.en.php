@@ -267,7 +267,7 @@ $ec_lang['mpf_pipe_diameter']='Pipe diameter, d<sub>0</sub>';
 $ec_lang_intent['mpf_pipe_diameter']='';
 $ec_lang['mpf_manningRoughness']='Manning roughness, n';
 $ec_lang_intent['mpf_manningRoughness']='';
-$ec_lang['mpf_friction_slope']='Pressure slope (possibly <a target="_blank" href="../pressureslope.php">?</a> equal to pipe slope), S<sub>0</sub>';
+$ec_lang['mpf_friction_slope']='Friction slope (possibly <a target="_blank" href="../frictionslope.php">?</a> equal to pipe slope), S<sub>f</sub>';
 $ec_lang_intent['mpf_friction_slope']='';
 $ec_lang['mpf_depth_ratio']='Relative flow depth, y/d<sub>0</sub>';
 $ec_lang_intent['mpf_depth_ratio']='';
@@ -303,7 +303,7 @@ $ec_lang['mpf_note_1']='<dl><dt>This is the flow and depth inside an <em>infinit
 $ec_lang_intent['mpf_note_1']='';
 $ec_lang['mpf_solve_for_dd0']='Solve for y/d<sub>0</sub> given Q';
 $ec_lang_intent['mpf_solve_for_dd0']='';
-$ec_lang['mpf_solve_desc']='Using D<sub>0</sub>, n, and S<sub>0</sub> from the calculator form, finds the lowest y/d<sub>0</sub> for a given Q.';
+$ec_lang['mpf_solve_desc']='Using D<sub>0</sub>, n, and S<sub>f</sub> from the calculator form, finds the lowest y/d<sub>0</sub> for a given Q.';
 $ec_lang_intent['mpf_solve_desc']='';
 $ec_lang['mpf_solve_button']='Solve';
 $ec_lang_intent['mpf_solve_button']='';
