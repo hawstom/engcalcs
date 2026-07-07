@@ -48,6 +48,38 @@ Each calculator owns a short prefix for its language keys and JS variables:
 
 New calculators must define a new unique prefix and document it here.
 
+### Concept-level label reuse (item-90 decision, 2026-07-07)
+
+When two calculators need the same concept, **reuse one whole label** rather than re-keying it —
+but only reuse **whole labels** (complete noun phrases), never compose a label from fragments at
+render time (fragment composition is what broke the original word-level design in gendered /
+word-order / RTL languages). Policy:
+
+- **Owner:** the shared concept lives under **one owning calculator's key**; every other page
+  borrows it. No neutral prefix. When there's no established precedent for who owns a shared
+  concept, the owner is the calculator that appears **earliest in the main menu**
+  (`lib/Menus.lib.php`).
+- **Wording:** menu order picks *which key survives*; the surviving key's English *value* takes the
+  best wording found across the cluster (not automatically the owner's current wording).
+- **Loss symbols:** lowercase `h` for loss components (`h_f`, `h_m`, `h_L`; coefficient `k_m`);
+  capital `H` reserved for total/gross/net heads. The local-loss term is **"Minor (local) loss"**
+  suite-wide (the "(local)" blocks the "smaller loss" mistranslation).
+- A shared label translated once must fit its **narrowest** use: column-heading uses put the short
+  form in the shared key, long forms in tooltips — never the reverse.
+
+Full decision record and per-family execution backlog: `dev/label-normalization-decision.md`.
+
+### Verdict / check-string convention (item-90 decision, 2026-07-07)
+
+All check/verdict outputs (velocity, regime, loss-sign, head-loss %, …) use one form:
+
+- **Leading verdict glyph, then short text:** `✓` for pass, `⚠` for caution. The glyph is a
+  decorative mark — it is international Unicode and RTL-safe, so **never** add a translated marker
+  word ("Warning:"/"OK:").
+- **The entire verdict string is the `ec-tip` hover/tap target**, with the full explanation in its
+  `title` (not just the glyph — a one-character tap target is bad on touch). Short visible text,
+  long text in the tooltip (width-is-king).
+
 ## Language Keys
 
 All display strings live in `lib/lang.ec.??.php` (27 files: en + 26 non-English). Keys follow the pattern `prefix_description`, e.g. `dw_friction_factor`, `mpf_flow`. Add keys to **all** language files when adding a new calculator — use English text as the fallback where translations aren't available yet.

@@ -1,6 +1,6 @@
 {
  "meta": {
-  "version": "1.3",
+  "version": "1.4",
   "description": "Engineering term glossary for EngCalcs translation prompts. Preferred translations per language to prevent term drift across calculators and sprints. Covers all calculators including Rock Chute Design (Robinson), Micro-Hydro Power, and Manning series.",
   "usage": "Inject relevant entries as context in translation prompts: 'Use these preferred translations for technical terms: [terms for this calculator prefix]'. Entries with empty strings need a sprint to fill.",
   "language_codes": [
@@ -1313,9 +1313,9 @@
   },
   {
    "term": "junction loss",
-   "symbol": "H_m",
-   "context": "Energy loss at pipe junctions, bends, fittings, and entrance — a local (point) loss as opposed to distributed friction loss along the pipe. H_m = k × v²/(2g). Also called 'minor loss', though in short penstocks these can equal or exceed friction losses. Appears in Manning Pipe Head Loss and Micro-Hydro Power calculators.",
-   "translation_notes": "The term 'minor loss' is conventional but misleading — do not imply these losses are always small. Use the hydraulic engineering term for local/point losses at fittings. French: 'perte singulière'. Spanish: 'pérdida local' or 'pérdida por accesorio'. Russian: 'местные потери'. Chinese: '局部水头损失'.",
+   "symbol": "h_m",
+   "context": "Energy loss at pipe junctions, bends, fittings, and entrance — a local (point) loss as opposed to distributed friction loss along the pipe. h_m = k_m × v²/(2g). Appears in Manning Pipe Head Loss and Micro-Hydro Power calculators.",
+   "translation_notes": "CANONICAL ENGLISH (label-normalization decision, item 90, 2026-07-07): the suite-wide English label for this concept is \"Minor (local) loss\" — 'junction loss' (formerly mphl_) and 'minor loss' (mhp_/ip_) are merged into it; see the 'minor loss' entry for the canonical treatment. The term 'minor' is conventional but misleading — do not imply these losses are always small; the parenthetical '(local)' carries the true sense. Use the hydraulic engineering term for local/point losses at fittings. French: 'perte singulière'. Spanish: 'pérdida local' or 'pérdida por accesorio'. Russian: 'местные потери'. Chinese: '局部水头损失'.",
    "translations": {
     "am": "ተፋሰስ ኪሳራ",
     "ar": "خسائر الوصلات",
@@ -1828,8 +1828,8 @@
   },
   {
    "term": "friction loss",
-   "symbol": "H_f",
-   "context": "Head loss along the pipe due to wall friction (Darcy-Weisbach). Irrigation Pressure table column.",
+   "symbol": "h_f",
+   "context": "Head loss along the pipe due to wall friction (Darcy-Weisbach). Symbol h_f (lowercase h reserved for loss components; capital H reserved for total/gross/net head, per label-normalization decision item 90, 2026-07-07). Manning Pipe Head Loss, Micro-Hydro Power, Irrigation Pressure table column.",
    "translations": {
     "am": "",
     "ar": "فاقد الاحتكاك",
@@ -1862,9 +1862,9 @@
   },
   {
    "term": "minor loss",
-   "symbol": "H_m",
-   "context": "Local head loss at fittings/valves/couplers (K_m coefficient). Irrigation Pressure table column.",
-   "translation_notes": "\"Minor/local\" loss at fittings — not \"smaller\" loss.",
+   "symbol": "h_m",
+   "context": "Local head loss at fittings/valves/couplers (coefficient k_m). Canonical merged concept for the former 'junction loss' (mphl_) and 'minor loss' (mhp_/ip_). Manning Pipe Head Loss, Micro-Hydro Power, Irrigation Pressure.",
+   "translation_notes": "CANONICAL ENGLISH LABEL: \"Minor (local) loss\" (label-normalization decision, item 90, 2026-07-07). 'Minor ⇄ local' — a local/point loss at fittings, NOT a \"smaller\" loss; the '(local)' parenthetical fixes the mistranslation trap. Symbol h_m, coefficient k_m (lowercase h reserved for loss components; capital H reserved for total/gross/net head, per the same decision).",
    "translations": {
     "am": "",
     "ar": "الفواقد الموضعية",
