@@ -836,7 +836,7 @@
                 },
                 "next_translated": {
                     "key": "mtc_d50_bottom",
-                    "value": "Erforderliche Körnung kantenreicher Steine Sohle, D50 (Isbash & MC) <span title=\"Nach Isbash (1936) und Maricopa County, Arizona, USA.\" style=\"cursor:help;color:#06c;font-size:0.9em\">?<\/span>",
+                    "value": "Erforderliche Körnung kantenreicher Steine Sohle, D<sub>50<\/sub> (Isbash & MC) <span title=\"Nach Isbash (1936) und Maricopa County, Arizona, USA.\" class=\"ec-tip\">?<\/span>",
                     "english": "Required bottom angular rock size, D<sub>50<\/sub> (Isbash & MC) <span title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\" class=\"ec-tip\">?<\/span>"
                 }
             }

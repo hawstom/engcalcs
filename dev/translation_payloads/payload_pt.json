@@ -2,13 +2,14 @@
     "meta": {
         "language": "pt",
         "expected_key_count": 482,
-        "delta_key_count": 26,
+        "delta_key_count": 27,
         "active_prefixes": [
             "calc",
             "dw",
             "ip",
             "irr",
             "mhp",
+            "mi",
             "mtc",
             "odt",
             "or",
@@ -26,6 +27,7 @@
         "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): vazão\n- velocity (v): velocidade\n- head loss (h_L): perda de carga\n- emitter: emissor\n- distribution uniformity (DU): uniformidade de distribuição\n- low-quarter distribution uniformity (DU_lq): uniformidade de distribuição do quarto inferior\n- application rate (PR): taxa de aplicação\n- lateral: linha lateral\n- mainline: linha principal\n- reach: trecho\n- velocity head (H_v): carga de velocidade\n- friction loss (h_f): perda de carga por atrito\n- minor loss (h_m): perda de carga localizada\n- energy grade line (EGL): linha de energia\n- upstream: a montante\n- downstream: a jusante",
         "irr": "Use these preferred technical term translations when relevant:\n- flow (Q): vazão\n- weir: vertedor\n- orifice: orifício\n- seepage: infiltração\n- conveyance efficiency (E_c): eficiência de condução\n- check structure: [needs translation sprint]",
         "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): vazão\n- penstock: conduto forçado\n- gross head (H_gross): altura bruta\n- net head (H_net): altura líquida\n- plant efficiency (η): eficiência da usina\n- head loss (h_L): perda de carga\n- run-of-river: fio d'água\n- headworks: obras de captação\n- junction loss (h_m): perdas localizadas\n- minor loss (h_m): perda de carga localizada",
+        "mi": "Use these preferred technical term translations when relevant:\n- flow (Q): vazão\n- velocity (v): velocidade\n- hydraulic radius (R_h): raio hidráulico\n- wetted perimeter (P_w): perímetro molhado\n- Manning roughness (n): coeficiente de rugosidade de Manning\n- slope (S): declividade\n- irregular channel: canal de seção irregular",
         "mtc": "Use these preferred technical term translations when relevant:\n- flow (Q): vazão\n- velocity (v): velocidade\n- hydraulic radius (R_h): raio hidráulico\n- wetted perimeter (P_w): perímetro molhado\n- Manning roughness (n): coeficiente de rugosidade de Manning\n- slope (S): declividade",
         "odt": "Use these preferred technical term translations when relevant:\n- orifice: orifício\n- discharge coefficient (C_d): coeficiente de descarga\n- headwater elevation: nível d'água a montante\n- tailwater elevation: nível d'água a jusante\n- crown: [needs translation sprint]",
         "or": "Use these preferred technical term translations when relevant:\n- flow (Q): vazão\n- orifice: orifício\n- discharge coefficient (C_d): coeficiente de descarga\n- headwater elevation: nível d'água a montante\n- tailwater elevation: nível d'água a jusante\n- crown: [needs translation sprint]",
@@ -343,6 +345,57 @@
                 "preferred_translation": "perda de carga localizada"
             }
         ],
+        "mi": [
+            {
+                "term": "flow",
+                "symbol": "Q",
+                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered. ENGINEER CLARIFICATION (2026-07-06): 'дебит is a typical colloquial call of the word — regular people and non-hydraulic engineers use it. In university (hydraulic engineering) they used водно количество for Q, never дебит. I guess both work.' So both are acceptable; водно количество is the academic\/hydraulic-engineering register, дебит the general register. Still an open decision whether to standardize on водно количество suite-wide.",
+                "preferred_translation": "vazão"
+            },
+            {
+                "term": "velocity",
+                "symbol": "v",
+                "context": "Flow velocity (speed of water). Appears in all calculators.",
+                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
+                "preferred_translation": "velocidade"
+            },
+            {
+                "term": "hydraulic radius",
+                "symbol": "R_h",
+                "context": "Cross-sectional flow area divided by wetted perimeter. Appears in Manning calculators.",
+                "translation_notes": "Use the standard hydraulic engineering phrase. Pre-2026 sr\/hr human translations used the Latin loanword 'hidraulički radijus' — this form is widely used in South Slavic engineering practice and may be more recognizable to field practitioners than the native Slavic equivalents 'полупречник' (sr) \/ 'polumjer' (hr). Both are correct; native Slavic engineers may encounter both forms.",
+                "preferred_translation": "raio hidráulico"
+            },
+            {
+                "term": "wetted perimeter",
+                "symbol": "P_w",
+                "context": "Length of the channel or pipe boundary in contact with flowing water. Appears in Manning calculators.",
+                "translation_notes": "WMO No. 385 entry 1682 confirms: es = 'perímetro mojado', fr = 'périmètre mouillé'. Use the standard hydraulic engineering phrase. 'Wetted' here means 'in contact with water', not 'soaked'. Pre-2026 sr human used 'okvašeni obim' (obim = natural South Slavic word for perimeter\/circumference); current uses 'квашени периметар' (периметар = Greek-derived loanword). Both are correct; 'obim\/opseg' is more natural in informal Serbian\/Croatian field use.",
+                "preferred_translation": "perímetro molhado"
+            },
+            {
+                "term": "Manning roughness",
+                "symbol": "n",
+                "context": "Manning's n — empirical roughness coefficient used in the Manning formula for open-channel and pipe flow.",
+                "translation_notes": "Always include 'Manning' as a proper noun. The coefficient itself (n) needs no translation — only the label does. Do not translate as generic 'roughness coefficient' without 'Manning'.",
+                "preferred_translation": "coeficiente de rugosidade de Manning"
+            },
+            {
+                "term": "slope",
+                "symbol": "S",
+                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
+                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
+                "preferred_translation": "declividade"
+            },
+            {
+                "term": "irregular channel",
+                "symbol": "",
+                "context": "A channel whose cross-section is non-uniform \/ non-prismatic — a natural or surveyed section defined by station-elevation points, as opposed to a regular trapezoidal shape. Titles the Manning Irregular Channel calculator (mi_) and, in the geometric sense, the Weir Flow Irregular calculator (wi_).",
+                "translation_notes": "\"Irregular\" here is GEOMETRIC: the cross-section is non-uniform \/ natural \/ arbitrary shape. It is NOT the temporal sense \"sporadic \/ occasional \/ not-regular\" (bg \"нередовен\" WRONG, uk \"нерегулярний\" WRONG per Bulgarian-engineer-feedback.md), and NOT \"incorrect \/ faulty\" (ru \"неправильное русло\" reads as \"wrong channel\" — prefer \"произвольного сечения\"). Where the language allows, name the cross-section explicitly (\"of irregular cross-section\") rather than a bare adjective that could be read as temporal or evaluative.",
+                "preferred_translation": "canal de seção irregular"
+            }
+        ],
         "mtc": [
             {
                 "term": "flow",
@@ -594,6 +647,7 @@
         "calc_copy_link": "Copy link",
         "calc_copy_link_done": "Copied!",
         "dw_roughness_tip": "<span title=\"Darcy-Weisbach roughness height\" class=\"ec-tip\">?<\/span>",
+        "mi_n617": "Comp.<br \/>n",
         "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
         "or_shape_circular": "Circular",
         "or_regime_submerged_tip": "TWE above centroid — orifice regime still valid",
@@ -622,6 +676,7 @@
         "calc_copy_link": "Copy link",
         "calc_copy_link_done": "Copied!",
         "dw_roughness_tip": "<span title=\"Darcy-Weisbach roughness height\" class=\"ec-tip\">?<\/span>",
+        "mi_n617": "Comp.<br \/>n",
         "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
         "or_shape_circular": "Circular",
         "or_regime_submerged_tip": "TWE above centroid — orifice regime still valid",
@@ -695,18 +750,34 @@
                 }
             }
         },
+        "mi_n617": {
+            "reason": "equal_to_english",
+            "current_value": "Comp.<br \/>n",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "mi_tau",
+                    "value": "Cisalh. de<br \/>fundo, τ",
+                    "english": "Bottom shear &tau;"
+                },
+                "next_translated": {
+                    "key": "mi_notes_1_term",
+                    "value": "n composto",
+                    "english": "Composite n"
+                }
+            }
+        },
         "mtc_blodgett_v_bathurst": {
             "reason": "equal_to_english",
             "current_value": "Blodgett vs. Bathurst",
             "neighbors": {
                 "previous_translated": {
                     "key": "mtc_n_bathurst",
-                    "value": "n para o tamanho de rocha de projeto segundo Bathurst",
+                    "value": "n para o tamanho de rocha de projeto (método de Bathurst)",
                     "english": "n for design rock size (Bathurst method)"
                 },
                 "next_translated": {
                     "key": "mtc_d50_bottom",
-                    "value": "Tamanho de rocha requerido no fundo, D50, Maricopa County <span title=\"Quando S0 < 2% segundo Isbash (1936) e Maricopa County, Arizona, EUA. Quando S >= 2% segundo Robinson Rock Chute \" style=\"cursor:help;color:#06c;font-size:0.9em\">?<\/span>",
+                    "value": "Tamanho de rocha angular requerido no fundo, D<sub>50<\/sub> (Isbash e MC) <span title=\"Segundo Isbash (1936) e o Condado de Maricopa, Arizona, EUA.\" class=\"ec-tip\">?<\/span>",
                     "english": "Required bottom angular rock size, D<sub>50<\/sub> (Isbash & MC) <span title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\" class=\"ec-tip\">?<\/span>"
                 }
             }
@@ -1057,6 +1128,7 @@
         }
     },
     "key_intent": {
+        "mi_n617": "The composite Manning roughness, n, of this region",
         "or_regime_warn_tip": "The upstream water level is below the crown (the top, the highest inside point) of the opening."
     }
 }

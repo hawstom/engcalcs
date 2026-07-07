@@ -656,7 +656,7 @@
                 },
                 "next_translated": {
                     "key": "mtc_d50_bottom",
-                    "value": "Tamaño de roca requerido en el fondo, D<sub>50<\/sub>, Maricopa County <span title=\"Cuando S0 < 2% según Isbash (1936) and Maricopa County, Arizona, US. Cuando S >= 2% según Robinson Rock Chute \" style=\"cursor:help;color:#06c;font-size:0.9em\">?<\/span>",
+                    "value": "Tamaño de roca angular requerido en el fondo, D<sub>50<\/sub> (Isbash y MC) <span title=\"Según Isbash (1936) y el condado de Maricopa, Arizona, EE. UU.\" class=\"ec-tip\">?<\/span>",
                     "english": "Required bottom angular rock size, D<sub>50<\/sub> (Isbash & MC) <span title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\" class=\"ec-tip\">?<\/span>"
                 }
             }

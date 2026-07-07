@@ -775,7 +775,7 @@
                 },
                 "next_translated": {
                     "key": "mtc_d50_bottom",
-                    "value": "Ukuran batu sudut yang dibutuhkan di dasar, D50 (Isbash & MC) <span title=\"Menurut Isbash (1936) dan Maricopa County, Arizona, AS.\" style=\"cursor:help;color:#06c;font-size:0.9em\">?<\/span>",
+                    "value": "Ukuran batu sudut yang dibutuhkan di dasar, D<sub>50<\/sub> (Isbash & MC) <span title=\"Menurut Isbash (1936) dan Maricopa County, Arizona, AS.\" class=\"ec-tip\">?<\/span>",
                     "english": "Required bottom angular rock size, D<sub>50<\/sub> (Isbash & MC) <span title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\" class=\"ec-tip\">?<\/span>"
                 }
             }

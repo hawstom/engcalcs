@@ -741,7 +741,7 @@
                 },
                 "next_translated": {
                     "key": "mtc_d50_bottom",
-                    "value": "Požadovaná velikost lomového kamene na dně, D50 (Isbash & MC) <span title=\"Dle Isbash (1936) a Maricopa County, Arizona, USA.\" style=\"cursor:help;color:#06c;font-size:0.9em\">?<\/span>",
+                    "value": "Požadovaná velikost lomového kamene na dně, D<sub>50<\/sub> (Isbash & MC) <span title=\"Dle Isbash (1936) a Maricopa County, Arizona, USA.\" class=\"ec-tip\">?<\/span>",
                     "english": "Required bottom angular rock size, D<sub>50<\/sub> (Isbash & MC) <span title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\" class=\"ec-tip\">?<\/span>"
                 }
             }

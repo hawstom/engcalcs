@@ -44,6 +44,41 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 > stacked-negatives pass applied (Tom's standing directive: watch for negatives in every future
 > linguistic pass). QA clean, payloads FRESH. **Wave 1 (item 85, category 1 anchors) is
 > unblocked** — sprint launch still requires explicit authorization per CLAUDE.md.
+>
+> **CONFIRMED 2026-07-07 (Tom): "complete re-translation" means all 53 current `mtc_`/`mi_` keys,
+> not just the unfilled delta.** A pre-launch payload check found category 1's anchor languages
+> already carry translations for all but ~17 key-instances (4 short labels: `mi_groupPoint`,
+> `mi_groupSegment`, `mi_station`, `mtc_blodgett_v_bathurst` — leftover gaps from the item-90 IA
+> reorder). That near-complete delta does **not** mean wave 1 is nearly done: per the
+> DEPENDENCY/RESTRUCTURE bullet above, wave 1 is a **complete original/comparative re-translation**
+> of the full 53-key set per anchor language — the existing strings predate Wave 0's English
+> reform and item-90 consolidation and are not assumed correct. Do not shrink the sprint to just
+> the delta keys. (Also found and left alone: 6 orphan keys — `mi_notes`, `mtc_vel_check`,
+> `mtc_vel_high`, `mtc_vel_high_short`, `mtc_vel_low_short`, `mtc_vel_ok_short` — present in
+> translated lang files but no longer in English; candidates for deletion, out of scope for wave 1
+> itself.)
+>
+> **DONE 2026-07-07: wave-1 sprint executed for category 1.** 14 Sonnet agents (one per anchor
+> language: es pt fr it de ro ru uk bg sr hr cs tr id), each given the full 53-key `mtc_`/`mi_`
+> bundle (English source + existing translation + intent + glossary) and told to re-translate from
+> English rather than assume the existing string. Real defects found and fixed suite-wide, not
+> just wording polish: dropped `<span class="ec-tip">` tooltips (several langs had silently lost
+> the whole tooltip, e.g. `mi_q_617`, `mtc_sgrock`), missing `<sub>` tags (`D<sub>50</sub>`,
+> `z<sub>1</sub>`/`z<sub>2</sub>`), stale `style="cursor:help"` markup instead of the current
+> `class="ec-tip"` convention, `H<sub>v</sub>`→`h<sub>v</sub>` case fix per the item-90 loss-symbol
+> convention, the audit-flagged "irregular channel" wrong-sense fix (ru/uk/sr/hr — temporal or
+> "incorrect" reading → geometric cross-section reading), and assorted typos/mixed-script (sr had
+> Latin/Cyrillic character mixing). Post-sprint QA: `lang_syntax_validate.php` clean (62 residual
+> findings, all `identical-to-english` advisory — legit cognates/proper nouns like `Segment` in
+> fr/de/cs/hr/ro and `Blodgett`/`Bathurst` surnames); a from-scratch tag-parity check (English vs.
+> translated `<sub>/<sup>/<span>/<a>` tag sets) caught one real miss the Turkish agent's own report
+> had claimed fixed but hadn't (`mtc_d50_bottom/in/mra/searcy/z1/z2` — missing `D<sub>50</sub>` and
+> an inverted tooltip structure) — corrected by hand, re-verified clean. Payloads regenerated,
+> `--check` reports FRESH. **Not run: `backtranslate_check.php`** (needs `ANTHROPIC_API_KEY`, not
+> set in this environment) — do this before calling category 1 fully closed if the key becomes
+> available. **Lesson: don't trust a translation agent's self-reported "fixed" claim without an
+> independent structural check** (tag-parity here) — the agent's own summary can be wrong even when
+> `php -l` passes, since lint only catches PHP syntax, not markup/content drift.
 
 - 85|[CC] Extend the rc_/ip_ audit treatment to the remaining calculators using the category-grid plan (agreed with Tom 2026-07-06). **Calculator categories (N=6):** (1) open channel: mtc_+mi_ (59 keys — first, because the Bulgarian engineer's "irregular"="нередовен" catch is likely systemic across languages); (2) weirs & orifices: ws_+wi_+or_+odt_ (78); (3) pipe friction: dw_+hw_+mpf_+mphl_ (59); (4) irrigation & seepage: cs_+irr_ (54); (5) micro-hydro: mhp_ (44); (6) shared UI/units: u_+calc_+menu_+points_ incl. the ~121 identical-to-english validator warnings. **Language tiers (M=3), run as sequential waves within each category, not parallel cells:** wave 1 anchors (es pt fr it de ro ru uk bg sr hr cs tr id — cognate language groups let one glossary decision propagate; review side-by-side within Slavic/Romance blocks; **wave 1 is also the English-reform gate (Tom's principle, 2026-07-06): tier-1 translators/reviewers must flag English source strings that resist translation — idioms, stacked modifiers, compressions like "right at"/"draw off"/"Est." — and those grievances are resolved by REWRITING THE ENGLISH (author-reviewable in cognate languages) rather than only patching intents, BEFORE waves 2-3 launch, so all remaining languages inherit the more translatable source**), wave 2 major non-Latin (zh ar he hi bn fa ur), wave 3 low-resource (am km my ps sw — run last against the glossary enriched by waves 1-2; mandatory backtranslate_check + native-review flag). Per category: audit read → mechanical fixes → intents (needs human authorization) → glossary + prefixToTermNames additions → wave-1 sprint → English-reform pass from wave-1 grievances (human approves English edits; re-run wave 1 on changed keys) → waves 2-3 → post-sprint QA chain. Prereq raised by this ordering: implement the per-key English source-hash in payloads so any later English edit re-flags all 26 translations (audit §10.5). ≈10-12 authorization events total; each paid sprint gated on explicit user go-ahead per CLAUDE.md.
   - **CORRECTION 2026-07-07 (Tom, supersedes the paragraph below where they conflict):** the "DEPENDS on a completed, FROZEN English source" framing was a **mistake**. English is NOT frozen after Wave 0, and item 90 neither finishes Wave 0 nor freezes English — **item 90 was about key consolidation only**. Item 85 **starts with** its own Wave 0 pass by Fable across all calculator categories, editing obvious colloquialisms, jargon, and lazy phrases into easily-translatable English. English freezes only after wave 1 (interactive anchors) — see the SEQUENCING RULE box.

@@ -904,7 +904,7 @@
                 },
                 "next_translated": {
                     "key": "mtc_d50_bottom",
-                    "value": "Granulométrie d'enrochement anguleux requise au fond, D50 (Isbash & MC) <span title=\"Selon Isbash (1936) et Maricopa County, Arizona, US.\" style=\"cursor:help;color:#06c;font-size:0.9em\">?<\/span>",
+                    "value": "Granulométrie d'enrochement anguleux requise au fond, D<sub>50<\/sub> (Isbash & MC) <span title=\"Selon Isbash (1936) et le comté de Maricopa, Arizona, États-Unis.\" class=\"ec-tip\">?<\/span>",
                     "english": "Required bottom angular rock size, D<sub>50<\/sub> (Isbash & MC) <span title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\" class=\"ec-tip\">?<\/span>"
                 }
             }

@@ -2,7 +2,7 @@
     "meta": {
         "language": "ro",
         "expected_key_count": 482,
-        "delta_key_count": 25,
+        "delta_key_count": 26,
         "active_prefixes": [
             "calc",
             "dw",
@@ -648,6 +648,7 @@
         "calc_copy_link_done": "Copied!",
         "dw_roughness_tip": "<span title=\"Darcy-Weisbach roughness height\" class=\"ec-tip\">?<\/span>",
         "mi_groupSegment": "Segment",
+        "mi_station": "Sta",
         "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
         "or_regime_submerged_tip": "TWE above centroid — orifice regime still valid",
         "or_regime_warn_tip": "Headwater below crown",
@@ -675,6 +676,7 @@
         "calc_copy_link_done": "Copied!",
         "dw_roughness_tip": "<span title=\"Darcy-Weisbach roughness height\" class=\"ec-tip\">?<\/span>",
         "mi_groupSegment": "Segment",
+        "mi_station": "Sta",
         "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
         "or_regime_submerged_tip": "TWE above centroid — orifice regime still valid",
         "or_regime_warn_tip": "Headwater below crown",
@@ -762,6 +764,22 @@
                 }
             }
         },
+        "mi_station": {
+            "reason": "equal_to_english",
+            "current_value": "Sta",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "mi_groupRegion",
+                    "value": "Regiune",
+                    "english": "Region"
+                },
+                "next_translated": {
+                    "key": "mi_elevation",
+                    "value": "Cotă",
+                    "english": "Elevation"
+                }
+            }
+        },
         "mtc_blodgett_v_bathurst": {
             "reason": "equal_to_english",
             "current_value": "Blodgett vs. Bathurst",
@@ -773,7 +791,7 @@
                 },
                 "next_translated": {
                     "key": "mtc_d50_bottom",
-                    "value": "Dimensiunea necesară a rocii unghiulare de fund, D50 (Isbash & MC) <span title=\"Conform Isbash (1936) și Comitatul Maricopa, Arizona, SUA.\" style=\"cursor:help;color:#06c;font-size:0.9em\">?<\/span>",
+                    "value": "Dimensiunea necesară a rocii unghiulare de fund, D<sub>50<\/sub> (Isbash & MC) <span title=\"Conform Isbash (1936) și Comitatul Maricopa, Arizona, SUA.\" class=\"ec-tip\">?<\/span>",
                     "english": "Required bottom angular rock size, D<sub>50<\/sub> (Isbash & MC) <span title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\" class=\"ec-tip\">?<\/span>"
                 }
             }
@@ -1092,6 +1110,7 @@
         }
     },
     "key_intent": {
+        "mi_station": "Station of this point",
         "or_regime_warn_tip": "The upstream water level is below the crown (the top, the highest inside point) of the opening."
     }
 }
