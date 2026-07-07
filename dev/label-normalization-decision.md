@@ -119,9 +119,13 @@ the other 14 have **divergent** translations (same English, drifted over time). 
 
 ## Execution backlog (item 90, full-suite — one pass over all calculators)
 
-Ordered by value ÷ risk (survey §6). Each is a whole-label merge — never fragment composition
-(the one fragment idea, EGL/HGL from `ip_group_*`, is explicitly rejected; keep those as whole
-strings). Apply D7 to every group.
+**Completion scope (Tom, 2026-07-07): item 90 covers the ENTIRE survey, not just this shortlist.**
+The row-by-row checklist and the 5 open wording decisions live in
+**`dev/label-normalization-tracker.md`** — that is the completion gate. The 8 items below are the
+survey §6 value÷risk shortlist; the tracker is the exhaustive list.
+
+Each is a whole-label merge — never fragment composition (the one fragment idea, EGL/HGL from
+`ip_group_*`, is explicitly rejected; keep those as whole strings). Apply D7 to every group.
 
 1. **Exact duplicates** (survey §2) — ~18 keys, no wording decision. Apply D1/D2 to pick the
    surviving key.
