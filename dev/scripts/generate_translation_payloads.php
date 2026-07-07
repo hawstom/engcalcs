@@ -39,6 +39,10 @@ function main(array $argv): void
         fail('Glossary file not found: ' . GLOSSARY_PATH);
     }
 
+    if ($opts['check']) {
+        exit(runFreshnessCheck($opts));
+    }
+
     if (!is_dir($opts['output_dir']) && !mkdir($opts['output_dir'], 0755, true) && !is_dir($opts['output_dir'])) {
         fail('Unable to create output directory: ' . $opts['output_dir']);
     }
@@ -150,11 +154,16 @@ function parseArgs(array $argv): array
         'output_dir' => DEFAULT_OUTPUT_DIR,
         'requested_prefix' => null,
         'languages' => [],
+        'check' => false,
     ];
 
     $positionals = [];
     for ($i = 1; $i < count($argv); $i++) {
         $arg = $argv[$i];
+        if ($arg === '--check') {
+            $opts['check'] = true;
+            continue;
+        }
         if (strpos($arg, '--prefix=') === 0) {
             $opts['requested_prefix'] = trim(substr($arg, strlen('--prefix=')));
             continue;
@@ -190,7 +199,78 @@ function printHelpAndExit(): void
 {
     echo "Usage: php scripts/generate_translation_payloads.php [output_dir] [prefix]\n";
     echo "       php scripts/generate_translation_payloads.php --lang=fr,uk --prefix=dw\n";
+    echo "       php scripts/generate_translation_payloads.php --check   (verify payloads are up to date; exit 1 if stale)\n";
     exit(0);
+}
+
+/**
+ * Freshness gate for sprint launchers. A payload is stale if it is older than any
+ * of its inputs: the English source, that language's lang file, the glossary, or
+ * this generator itself. Prints a FRESH/STALE verdict and returns a shell exit
+ * code (0 = fresh, 1 = stale/missing) so a sprint cannot launch on an old delta
+ * without a human ever having to remember to regenerate.
+ */
+function runFreshnessCheck(array $opts): int
+{
+    $commonInputs = [EN_FILE, GLOSSARY_PATH, __FILE__];
+    $commonNewest = 0;
+    foreach ($commonInputs as $f) {
+        $commonNewest = max($commonNewest, (int) @filemtime($f));
+    }
+
+    $langs = resolveTargetLanguages($opts['languages']);
+    $stale = [];
+    $checked = 0;
+
+    foreach ($langs as $lang) {
+        $targetFile = DEFAULT_LANG_DIR . "/lang.ec.{$lang}.php";
+        if (!file_exists($targetFile)) {
+            continue; // no source to translate; generation would skip it too
+        }
+        $checked++;
+
+        $payloadFile = $opts['output_dir'] . "/payload_{$lang}.json";
+        if (!file_exists($payloadFile)) {
+            $stale[] = "{$lang}: payload missing";
+            continue;
+        }
+
+        $inputs = array_merge($commonInputs, [$targetFile]);
+        $newestInput = max($commonNewest, (int) @filemtime($targetFile));
+        if ((int) filemtime($payloadFile) < $newestInput) {
+            $stale[] = "{$lang}: " . newestInputName((int) filemtime($payloadFile), $inputs);
+        }
+    }
+
+    if (count($stale) === 0) {
+        echo "FRESH: all {$checked} payload(s) are current with lang files, glossary, and generator.\n";
+        return 0;
+    }
+
+    fwrite(STDERR, 'STALE: ' . count($stale) . " of {$checked} payload(s) are out of date:\n");
+    foreach ($stale as $s) {
+        fwrite(STDERR, "  - {$s}\n");
+    }
+    fwrite(STDERR, 'Fix before launching a sprint: php ' . basename(__FILE__) . "\n");
+    return 1;
+}
+
+/**
+ * Names the newest input file that post-dates the payload, for an actionable
+ * stale message (e.g. "lang.ec.en.php is newer").
+ */
+function newestInputName(int $payloadMtime, array $inputs): string
+{
+    $name = '';
+    $best = $payloadMtime;
+    foreach ($inputs as $f) {
+        $m = (int) @filemtime($f);
+        if ($m > $best) {
+            $best = $m;
+            $name = basename($f);
+        }
+    }
+    return $name !== '' ? "{$name} is newer" : 'stale';
 }
 
 function splitCsv(string $value): array
