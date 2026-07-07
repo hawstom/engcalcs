@@ -38,8 +38,8 @@ function echoCalculatorFormAppend() {
 				</th>
 			</tr>
 			<tr>
-				<th colspan="5"><?=$ec_lang['mi_groupPoint']?></th>
-				<th colspan="3"><?=$ec_lang['mi_groupSegment']?></th>
+				<th colspan="4"><?=$ec_lang['mi_groupPoint']?></th>
+				<th colspan="4"><?=$ec_lang['mi_groupSegment']?></th>
 				<th colspan="6"><?=$ec_lang['mi_groupRegion']?></th>
 			</tr>
 			<tr>
@@ -54,15 +54,15 @@ function echoCalculatorFormAppend() {
 					<?php echoUnitSelect($name = 'elevationu', $units = Array('m', 'mm', 'ft', 'in'), $indent_string); ?>
 				</th>
 				<th>
-					<?=$ec_lang['mi_n']?>
+					<span class="ec-narrowcol"><?=$ec_lang['mi_is_bank']?></span>
 				</th>
 				<th>
-					<?=$ec_lang['mi_is_bank']?>
-				</th>
-				<th>
-					<?=$ec_lang['mi_tau']?>
+					<span class="ec-narrowcol" style="width:3.5em"><?=$ec_lang['mi_tau']?></span>
 					<br />
 					<?php echoUnitSelect($name = 'tauu', $units = Array('npm2', 'psf'), $indent_string); ?>
+				</th>
+				<th>
+					<?=$ec_lang['mi_n']?>
 				</th>
 				<th>
 					<?=$ec_lang['mi_t']?>

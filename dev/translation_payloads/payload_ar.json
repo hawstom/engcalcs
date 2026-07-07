@@ -25,7 +25,7 @@
                 "term": "flow",
                 "symbol": "Q",
                 "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered.",
                 "preferred_translation": "تدفق"
             },
             {
@@ -48,7 +48,7 @@
                 "term": "flow",
                 "symbol": "Q",
                 "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered.",
                 "preferred_translation": "تدفق"
             },
             {
@@ -162,7 +162,7 @@
                 "term": "flow",
                 "symbol": "Q",
                 "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered.",
                 "preferred_translation": "تدفق"
             },
             {

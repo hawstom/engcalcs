@@ -182,8 +182,11 @@ EngCalcs.pageCalculator = function (objForm) {
 
 EngCalcs.pageCalculatorInitialize = function (objForm) {
 	this.cookieValue = 'i:,i:,i:1,s:1,i:0.001,s:1,s:1,s:1,s:1,s:9806,s:1,s:1,s:1,s:1,s:1,s:1,s:1'; // Up to points data.
-	this.dataString = "0,1\n10,0.9,0.03,true\n12,0,0.03,false\n18,0,0.03,false\n20,0.9,0.03,true\n30,1,0.03,true"; // Points data (user readable).
+	// Points data (user readable). Column order matches the v2 table layout: station, elevation, is_bank, n.
+	this.dataString = "0,1\n10,0.9,true,0.03\n12,0,false,0.03\n18,0,false,0.03\n20,0.9,true,0.03\n30,1,true,0.03";
 	this.dataStringToCookieValue();
+	// Stamp the current format so this fresh seed isn't read back as a legacy (v1) cookie and migrated.
+	this.cookieValue = 'v' + (this.cookieFormatVersion || 1) + ',' + this.cookieValue;
 	this.createCookie();
 	this.cookieToForm(objForm);
 };
@@ -237,10 +240,10 @@ EngCalcs.addManningIrregularStation = function (station, elevation, d50in, n, is
 		// Point
 		{name: 'station',            value: station,   inputType: 'number'},
 		{name: 'elevation',          value: elevation, inputType: 'number'},
-		{name: 'n',                  value: n,         inputType: ((n === null) ? null : 'number')},
 		{name: 'is_bank',            value: isBank,    inputType: ((isBank === null) ? null : 'checkbox')},
 		{name: 'tau',                value: null,      inputType: null},
 		// Segment
+		{name: 'n',                  value: n,         inputType: ((n === null) ? null : 'number')},
 		{name: 't',                  value: null,      inputType: null},
 		{name: 'pw',                 value: null,      inputType: null},
 		{name: 'a',                  value: null,      inputType: null},
@@ -280,3 +283,36 @@ EngCalcs.pageAddCalcRow = function () {
 EngCalcs.dataSingletonsCount = 4;
 EngCalcs.dataColumnsFirstRowCount = 2;
 EngCalcs.dataColumnsOtherRowsCount = 4;
+
+// v2 (2026-07-06): the per-row "n" column moved from the Point group to lead the
+// Segment group, so its input now sits AFTER "is_bank" instead of before it. The
+// cookie is positional, so an older (v1) cookie has each non-first row's inputs as
+// [station, elevation, n, is_bank]; swap the last two so the values land in the
+// new [station, elevation, is_bank, n] order. The first row carries neither input.
+EngCalcs.cookieFormatVersion = 2;
+EngCalcs.migrateCookie = function (cookieVars, fromVersion) {
+	'use strict';
+	if (fromVersion >= 2) { return cookieVars; }
+	var i,
+		inputCount = 0,
+		prevInputIndex = -1,
+		rowInputStart = this.dataSingletonsCount + this.dataColumnsFirstRowCount,
+		rel,
+		tmp;
+	for (i = 0; i < cookieVars.length; i += 1) {
+		if (cookieVars[i].split(':')[0] === 'i') {
+			inputCount += 1;
+			if (inputCount > rowInputStart) {
+				// 0=station, 1=elevation, 2=n (v1), 3=is_bank (v1)
+				rel = (inputCount - rowInputStart - 1) % this.dataColumnsOtherRowsCount;
+				if (rel === 3) {
+					tmp = cookieVars[i];
+					cookieVars[i] = cookieVars[prevInputIndex];
+					cookieVars[prevInputIndex] = tmp;
+				}
+			}
+			prevInputIndex = i;
+		}
+	}
+	return cookieVars;
+};

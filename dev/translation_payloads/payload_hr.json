@@ -24,7 +24,7 @@
         "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): protok\n- velocity (v): brzina\n- head loss (h_L): gubitak tlačne visine\n- emitter: emiter\n- distribution uniformity (DU): ravnomjernost raspodjele\n- low-quarter distribution uniformity (DU_lq): [needs translation sprint]\n- application rate (PR): intenzitet navodnjavanja\n- lateral: laterala\n- mainline: glavni cjevovod\n- reach: dionica\n- velocity head (H_v): brzinska visina\n- friction loss (H_f): gubici trenja\n- minor loss (H_m): lokalni gubici\n- energy grade line (EGL): energetska linija\n- upstream: uzvodno\n- downstream: nizvodno",
         "irr": "Use these preferred technical term translations when relevant:\n- flow (Q): protok\n- velocity (v): brzina\n- slope (S): nagib",
         "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): protok\n- penstock: tlačni cjevovod\n- gross head (H_gross): bruto visinski pad\n- net head (H_net): neto visinski pad\n- plant efficiency (η): učinkovitost postrojenja\n- head loss (h_L): gubitak tlačne visine\n- run-of-river: protočna hidroelektrana\n- headworks: vodozahvatna građevina\n- junction loss (H_m): lokalni gubici",
-        "mi": "Use these preferred technical term translations when relevant:\n- flow (Q): protok\n- velocity (v): brzina\n- hydraulic radius (R_h): hidraulički polumjer\n- wetted perimeter (P_w): močeni opseg\n- Manning roughness (n): Manningov koeficijent hrapavosti\n- slope (S): nagib",
+        "mi": "Use these preferred technical term translations when relevant:\n- flow (Q): protok\n- velocity (v): brzina\n- hydraulic radius (R_h): hidraulički polumjer\n- wetted perimeter (P_w): močeni opseg\n- Manning roughness (n): Manningov koeficijent hrapavosti\n- slope (S): nagib\n- irregular channel: kanal nepravilnog presjeka",
         "mtc": "Use these preferred technical term translations when relevant:\n- flow (Q): protok\n- velocity (v): brzina\n- hydraulic radius (R_h): hidraulički polumjer\n- wetted perimeter (P_w): močeni opseg\n- Manning roughness (n): Manningov koeficijent hrapavosti\n- slope (S): nagib",
         "odt": "Use these preferred technical term translations when relevant:\n- orifice: otvor\n- discharge coefficient (C_d): koeficijent istjecanja\n- headwater elevation: razina uzvodne vode\n- tailwater elevation: razina nizvodne vode",
         "rc": "Use these preferred technical term translations when relevant:\n- flow (Q): protok\n- velocity (v): brzina\n- riprap: kameniti nasip\n- slope (S): nagib\n- rock chute: kameni skluz\n- chute: brzi kanal\n- unit discharge (q, q_t): specifični protok\n- median rock size (D50): srednja veličina kamena\n- gradation (SD): granulometrija\n- porosity (n_p): poroznost\n- specific gravity (sg): relativna gustoća\n- ponding: uspor\n- outlet apron: izlazna ploča\n- weir head (H_p): visina preljeva\n- upstream: uzvodno\n- downstream: nizvodno\n- reach: dionica"
@@ -35,7 +35,7 @@
                 "term": "flow",
                 "symbol": "Q",
                 "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered.",
                 "preferred_translation": "protok"
             },
             {
@@ -58,7 +58,7 @@
                 "term": "flow",
                 "symbol": "Q",
                 "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered.",
                 "preferred_translation": "protok"
             },
             {
@@ -172,7 +172,7 @@
                 "term": "flow",
                 "symbol": "Q",
                 "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered.",
                 "preferred_translation": "protok"
             },
             {
@@ -195,7 +195,7 @@
                 "term": "flow",
                 "symbol": "Q",
                 "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered.",
                 "preferred_translation": "protok"
             },
             {
@@ -260,7 +260,7 @@
                 "term": "flow",
                 "symbol": "Q",
                 "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered.",
                 "preferred_translation": "protok"
             },
             {
@@ -297,6 +297,13 @@
                 "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
                 "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
                 "preferred_translation": "nagib"
+            },
+            {
+                "term": "irregular channel",
+                "symbol": "",
+                "context": "A channel whose cross-section is non-uniform \/ non-prismatic — a natural or surveyed section defined by station-elevation points, as opposed to a regular trapezoidal shape. Titles the Manning Irregular Channel calculator (mi_) and, in the geometric sense, the Weir Flow Irregular calculator (wi_).",
+                "translation_notes": "\"Irregular\" here is GEOMETRIC: the cross-section is non-uniform \/ natural \/ arbitrary shape. It is NOT the temporal sense \"sporadic \/ occasional \/ not-regular\" (bg \"нередовен\" WRONG, uk \"нерегулярний\" WRONG per Bulgarian-engineer-feedback.md), and NOT \"incorrect \/ faulty\" (ru \"неправильное русло\" reads as \"wrong channel\" — prefer \"произвольного сечения\"). Where the language allows, name the cross-section explicitly (\"of irregular cross-section\") rather than a bare adjective that could be read as temporal or evaluative.",
+                "preferred_translation": "kanal nepravilnog presjeka"
             }
         ],
         "mtc": [
@@ -304,7 +311,7 @@
                 "term": "flow",
                 "symbol": "Q",
                 "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered.",
                 "preferred_translation": "protok"
             },
             {
@@ -378,7 +385,7 @@
                 "term": "flow",
                 "symbol": "Q",
                 "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered.",
                 "preferred_translation": "protok"
             },
             {
@@ -392,7 +399,7 @@
                 "term": "riprap",
                 "symbol": "",
                 "context": "Angular rock placed to resist erosion on channel beds and banks. Appears in Manning Trapezoidal Channel and Rock Chute calculators.",
-                "translation_notes": "No direct single-word equivalent in most languages. Use the established local engineering term — this varies significantly by country. In Spanish, 'enrocado' (general) or 'escollera' (bank protection) are both used; lead with 'enrocado'.",
+                "translation_notes": "No direct single-word equivalent in most languages. Use the established local engineering term — this varies significantly by country. In Spanish, 'enrocado' (general) or 'escollera' (bank protection) are both used; lead with 'enrocado'. Bulgarian terms verified\/corrected by a native Bulgarian engineer, 2026-07 (dev\/Bulgarian-engineer-feedback.md). bg: 'каменна облицовка' (stone lining), not 'каменна наброска'.",
                 "preferred_translation": "kameniti nasip"
             },
             {
@@ -406,7 +413,7 @@
                 "term": "rock chute",
                 "symbol": "",
                 "context": "A steep rock-lined drop structure (also called a 'rock ramp') that conveys water rapidly down a slope in irrigation, drainage, or watershed management. Key concepts for translation: rock-lined, steep gradient, spillway or drop structure — translate the concept, not the English word 'chute'. The rock riprap matrix dissipates energy and resists erosion. Appears in Rock Chute Design (Robinson) and Robinson Rock Chute calculators.",
-                "translation_notes": "CRITICAL: 'Robinson' is the surname of K.M. Robinson, co-author of Robinson, Rice & Kadavy (1998) — it is a proper noun and must NEVER be translated or modified in any language. Translate only 'Rock Chute'. Concept to translate: 'rock-lined steep channel' or 'rock-lined spillway' — the drop\/descent nature must be conveyed; a generic 'rock channel' is insufficient. CRITICAL for French: WMO No. 385 entry 517 establishes that the French word 'chute' means 'fall' (elevation difference) — it cannot name this structure. Use 'coursier en enrochement' (coursier = steep channel structure; enrochement = riprap). Spanish: USDA uses 'bajante de rocado' — 'bajante' (from bajar = to descend) correctly conveys the drop-structure nature; 'de rocado' = rock-lined. Russian: 'каменный быстроток' ('быстроток' = fast-flow\/steep channel). Portuguese: changed from 'calha' (generic trough) to 'rampa em enrocamento' (rampa = ramp\/slope, enrocamento = riprap) to convey steep character. Serbian: changed from 'жлеб' (gutter\/trough) to 'брзоток' (fast-flow structure), consistent with ru\/uk pattern. Bengali: changed from borrowed 'চ্যুট' (conveys nothing) to 'পাথর-আবৃত খাড়া নালা' (rock-lined steep channel). Persian: changed from generic 'آبراه سنگی' (stone waterway) to 'آبراه تند سنگچین' (تند = steep\/swift, سنگچین = stone-laid\/riprap). Pashto: added 'تند' (steep\/swift) to original. Khmer: changed 'ចំហ' (open) to 'ជម្រាល' (sloped\/inclined). NEEDS HUMAN REVIEW: am (ምቀጫ meaning uncertain), my (ထောင် may not clearly convey steep to all readers), de (Steinschütte is standard engineering term but doesn't explicitly say 'steep channel'). Turkish: changed to 'taş düşü' — 'düşü' is the established Turkish hydraulics term for a drop\/chute structure (2026-07 audit; previous 'taş eğimli kanal' was descriptive but nonstandard). Spanish: NEEDS HUMAN VERIFICATION — 'bajante de rocado' claims a USDA source but 'rocado' is not standard Spanish ('enrocado' is); verify the USDA document or switch to 'bajante de enrocado'. 2026-07 reconciliation: fr\/ro\/ru\/uk lang files updated to match this entry. NOT reconciled pending human review of the GLOSSARY side: hr 'kameni skluz' (consider 'kameni brzotok', parallel to sr\/ru), bg 'каменна бързина' (consider 'каменен бързоток'), de 'Steinschütte' vs shipped 'Steingerinne' (both defensible - pick one).",
+                "translation_notes": "CRITICAL: 'Robinson' is the surname of K.M. Robinson, co-author of Robinson, Rice & Kadavy (1998) — it is a proper noun and must NEVER be translated or modified in any language. Translate only 'Rock Chute'. Concept to translate: 'rock-lined steep channel' or 'rock-lined spillway' — the drop\/descent nature must be conveyed; a generic 'rock channel' is insufficient. CRITICAL for French: WMO No. 385 entry 517 establishes that the French word 'chute' means 'fall' (elevation difference) — it cannot name this structure. Use 'coursier en enrochement' (coursier = steep channel structure; enrochement = riprap). Spanish: USDA uses 'bajante de rocado' — 'bajante' (from bajar = to descend) correctly conveys the drop-structure nature; 'de rocado' = rock-lined. Russian: 'каменный быстроток' ('быстроток' = fast-flow\/steep channel). Portuguese: changed from 'calha' (generic trough) to 'rampa em enrocamento' (rampa = ramp\/slope, enrocamento = riprap) to convey steep character. Serbian: changed from 'жлеб' (gutter\/trough) to 'брзоток' (fast-flow structure), consistent with ru\/uk pattern. Bengali: changed from borrowed 'চ্যুট' (conveys nothing) to 'পাথর-আবৃত খাড়া নালা' (rock-lined steep channel). Persian: changed from generic 'آبراه سنگی' (stone waterway) to 'آبراه تند سنگچین' (تند = steep\/swift, سنگچین = stone-laid\/riprap). Pashto: added 'تند' (steep\/swift) to original. Khmer: changed 'ចំហ' (open) to 'ជម្រាល' (sloped\/inclined). NEEDS HUMAN REVIEW: am (ምቀጫ meaning uncertain), my (ထောင် may not clearly convey steep to all readers), de (Steinschütte is standard engineering term but doesn't explicitly say 'steep channel'). Turkish: changed to 'taş düşü' — 'düşü' is the established Turkish hydraulics term for a drop\/chute structure (2026-07 audit; previous 'taş eğimli kanal' was descriptive but nonstandard). Spanish: NEEDS HUMAN VERIFICATION — 'bajante de rocado' claims a USDA source but 'rocado' is not standard Spanish ('enrocado' is); verify the USDA document or switch to 'bajante de enrocado'. 2026-07 reconciliation: fr\/ro\/ru\/uk lang files updated to match this entry. NOT reconciled pending human review of the GLOSSARY side: hr 'kameni skluz' (consider 'kameni brzotok', parallel to sr\/ru), bg 'каменна бързина' (consider 'каменен бързоток'), de 'Steinschütte' vs shipped 'Steingerinne' (both defensible - pick one). RESOLVED bg: native Bulgarian engineer confirmed 'каменен бързоток' (2026-07); lang file updated.",
                 "preferred_translation": "kameni skluz"
             },
             {
@@ -420,7 +427,7 @@
                 "term": "unit discharge",
                 "symbol": "q, q_t",
                 "context": "Flow rate per unit width of channel (Q\/B), in m²\/s or ft²\/s. The primary design input for the Robinson rock chute method. Appears in Rock Chute Design calculator.",
-                "translation_notes": "Use the hydraulic engineering term. 'Unit' here means 'per unit channel width' — not related to measurement units. Spanish: 'caudal unitario'. French: 'débit unitaire'. German: 'spezifischer Abfluss'. Russian: 'удельный расход'. Chinese: '单宽流量'.",
+                "translation_notes": "Use the hydraulic engineering term. 'Unit' here means 'per unit channel width' — not related to measurement units. Spanish: 'caudal unitario'. French: 'débit unitaire'. German: 'spezifischer Abfluss'. Russian: 'удельный расход'. Chinese: '单宽流量'. Bulgarian terms verified\/corrected by a native Bulgarian engineer, 2026-07 (dev\/Bulgarian-engineer-feedback.md). bg hydraulics uses 'водно количество' for discharge, not 'дебит'.",
                 "preferred_translation": "specifični protok"
             },
             {
@@ -434,7 +441,7 @@
                 "term": "gradation",
                 "symbol": "SD",
                 "context": "The spread or uniformity of rock particle sizes. In the Robinson method, gradation is expressed as SD = D84.1\/D50. Uniform rock ≈ 1.25; Robinson valid range 1.15–1.47. Appears in Rock Chute Design calculator.",
-                "translation_notes": "Use the geotechnical\/hydraulic engineering term for grain size distribution or grading. Do not translate as 'grade' (implies quality). The symbol 'SD' and ratio notation D84.1\/D50 are universal. Spanish\/Portuguese: 'granulometría'\/'granulometria'. French: 'granulométrie'. Russian\/Bulgarian\/Serbian: 'гранулометрический состав'. Chinese: '级配'.",
+                "translation_notes": "Use the geotechnical\/hydraulic engineering term for grain size distribution or grading. Do not translate as 'grade' (implies quality). The symbol 'SD' and ratio notation D84.1\/D50 are universal. Spanish\/Portuguese: 'granulometría'\/'granulometria'. French: 'granulométrie'. Russian\/Bulgarian\/Serbian: 'гранулометрический состав'. Chinese: '级配'. bg: engineer proposed 'коефициент на едрозърнестост' for the D84.1\/D50 gradation SD label (2026-07); applied, but ASK for the standard source — Bulgarian soil mechanics also uses 'коефициент на разнозърненост' for grain-size uniformity.",
                 "preferred_translation": "granulometrija"
             },
             {

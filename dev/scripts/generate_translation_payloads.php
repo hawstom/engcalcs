@@ -265,7 +265,14 @@ function collectKeyIntent(array $deltaKeys, array $enKeys, array $intentMap): ar
             continue;
         }
 
+        // Intent strings follow the convention "<intent> | <commentary>" (see CLAUDE.md,
+        // Language Keys). Everything from the first pipe onward is non-translated commentary
+        // (layout/avoid/gloss tags); strip it so payloads carry only the translatable intent.
         $intent = trim((string)$intentMap[$key]);
+        $pipePos = strpos($intent, '|');
+        if ($pipePos !== false) {
+            $intent = trim(substr($intent, 0, $pipePos));
+        }
         if ($intent === '') {
             continue;
         }
@@ -419,11 +426,11 @@ function prefixToTermNames(): array
         'mpf' => ['flow', 'velocity', 'hydraulic radius', 'wetted perimeter', 'Manning roughness', 'slope'],
         'mphl' => ['flow', 'velocity', 'head loss', 'hydraulic radius', 'wetted perimeter', 'Manning roughness', 'slope'],
         'mtc' => ['flow', 'velocity', 'hydraulic radius', 'wetted perimeter', 'Manning roughness', 'slope'],
-        'mi' => ['flow', 'velocity', 'hydraulic radius', 'wetted perimeter', 'Manning roughness', 'slope'],
+        'mi' => ['flow', 'velocity', 'hydraulic radius', 'wetted perimeter', 'Manning roughness', 'slope', 'irregular channel'],
         'wfs' => ['flow', 'weir', 'headwater elevation', 'tailwater elevation', 'discharge coefficient'],
         'wfi' => ['flow', 'weir', 'headwater elevation', 'tailwater elevation', 'discharge coefficient'],
         'ws' => ['flow', 'weir', 'headwater elevation', 'tailwater elevation', 'discharge coefficient'],
-        'wi' => ['flow', 'weir', 'headwater elevation', 'tailwater elevation', 'discharge coefficient'],
+        'wi' => ['flow', 'weir', 'headwater elevation', 'tailwater elevation', 'discharge coefficient', 'irregular channel'],
         'or' => ['flow', 'orifice', 'discharge coefficient', 'headwater elevation', 'tailwater elevation'],
         'odt' => ['orifice', 'discharge coefficient', 'headwater elevation', 'tailwater elevation'],
         'ds' => ['flow', 'application rate', 'distribution uniformity', 'emitter'],

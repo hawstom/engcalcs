@@ -20,7 +20,7 @@
         "calc": "Use these preferred technical term translations when relevant:\n- flow (Q): průtok\n- velocity (v): rychlost\n- slope (S): sklon",
         "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): průtok\n- velocity (v): rychlost\n- head loss (h_L): ztráta tlakové výšky\n- emitter: kapač\n- distribution uniformity (DU): rovnoměrnost distribuce\n- low-quarter distribution uniformity (DU_lq): [needs translation sprint]\n- application rate (PR): intenzita závlahy\n- lateral: postranní větev\n- mainline: hlavní potrubí\n- reach: úsek\n- velocity head (H_v): rychlostní výška\n- friction loss (H_f): ztráta třením\n- minor loss (H_m): místní ztráta\n- energy grade line (EGL): čára energie\n- upstream: proti proudu\n- downstream: po proudu",
         "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): průtok\n- penstock: tlakovod\n- gross head (H_gross): hrubý spád\n- net head (H_net): čistý spád\n- plant efficiency (η): účinnost elektrárny\n- head loss (h_L): ztráta tlakové výšky\n- run-of-river: průtočná vodní elektrárna\n- headworks: odběrný objekt\n- junction loss (H_m): místní ztráty",
-        "mi": "Use these preferred technical term translations when relevant:\n- flow (Q): průtok\n- velocity (v): rychlost\n- hydraulic radius (R_h): hydraulický poloměr\n- wetted perimeter (P_w): smočený obvod\n- Manning roughness (n): Manningův součinitel drsnosti\n- slope (S): sklon",
+        "mi": "Use these preferred technical term translations when relevant:\n- flow (Q): průtok\n- velocity (v): rychlost\n- hydraulic radius (R_h): hydraulický poloměr\n- wetted perimeter (P_w): smočený obvod\n- Manning roughness (n): Manningův součinitel drsnosti\n- slope (S): sklon\n- irregular channel: nepravidelný průřez",
         "mtc": "Use these preferred technical term translations when relevant:\n- flow (Q): průtok\n- velocity (v): rychlost\n- hydraulic radius (R_h): hydraulický poloměr\n- wetted perimeter (P_w): smočený obvod\n- Manning roughness (n): Manningův součinitel drsnosti\n- slope (S): sklon"
     },
     "glossary_terms_by_prefix": {
@@ -29,7 +29,7 @@
                 "term": "flow",
                 "symbol": "Q",
                 "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered.",
                 "preferred_translation": "průtok"
             },
             {
@@ -52,7 +52,7 @@
                 "term": "flow",
                 "symbol": "Q",
                 "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered.",
                 "preferred_translation": "průtok"
             },
             {
@@ -166,7 +166,7 @@
                 "term": "flow",
                 "symbol": "Q",
                 "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered.",
                 "preferred_translation": "průtok"
             },
             {
@@ -231,7 +231,7 @@
                 "term": "flow",
                 "symbol": "Q",
                 "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered.",
                 "preferred_translation": "průtok"
             },
             {
@@ -268,6 +268,13 @@
                 "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
                 "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
                 "preferred_translation": "sklon"
+            },
+            {
+                "term": "irregular channel",
+                "symbol": "",
+                "context": "A channel whose cross-section is non-uniform \/ non-prismatic — a natural or surveyed section defined by station-elevation points, as opposed to a regular trapezoidal shape. Titles the Manning Irregular Channel calculator (mi_) and, in the geometric sense, the Weir Flow Irregular calculator (wi_).",
+                "translation_notes": "\"Irregular\" here is GEOMETRIC: the cross-section is non-uniform \/ natural \/ arbitrary shape. It is NOT the temporal sense \"sporadic \/ occasional \/ not-regular\" (bg \"нередовен\" WRONG, uk \"нерегулярний\" WRONG per Bulgarian-engineer-feedback.md), and NOT \"incorrect \/ faulty\" (ru \"неправильное русло\" reads as \"wrong channel\" — prefer \"произвольного сечения\"). Where the language allows, name the cross-section explicitly (\"of irregular cross-section\") rather than a bare adjective that could be read as temporal or evaluative.",
+                "preferred_translation": "nepravidelný průřez"
             }
         ],
         "mtc": [
@@ -275,7 +282,7 @@
                 "term": "flow",
                 "symbol": "Q",
                 "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered.",
                 "preferred_translation": "průtok"
             },
             {

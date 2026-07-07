@@ -1,6 +1,14 @@
 // Cookies.lib.js
 // Loaded by the echoHTMLHead php function.
 var EngCalcs = EngCalcs || {};
+
+// Cookie format version. A page whose field layout has changed since launch sets
+// this higher and provides EngCalcs.migrateCookie(vars, fromVersion) to remap an
+// older stored cookie. Cookies are written with a leading "v<N>" token; a cookie
+// with no such token is treated as v1 (legacy, pre-versioning). See Manning-
+// Irregular (v2: "n"/"is_bank" columns reordered).
+EngCalcs.cookieFormatVersion = 1;
+
 EngCalcs.createCookie = function () {
 	"use strict";
 	var
@@ -37,12 +45,34 @@ EngCalcs.readCookie = function () {
 		// Strip leading space of the current candidate
 		while (candidate.charAt(0) === ' ') { candidate = candidate.substring(1, candidate.length); }
 		// If it's the one we are looking for, return it without its name.
-		if (candidate.indexOf(nameEQ) === 0) { 
-			this.cookieValue = candidate.substring(nameEQ.length, candidate.length); 
+		if (candidate.indexOf(nameEQ) === 0) {
+			this.cookieValue = candidate.substring(nameEQ.length, candidate.length);
+			this.normalizeCookieValue();
 			return this.cookieValue;
 		}
 	}
 	return null;
+};
+
+// Detects and strips the leading "v<N>" format-version token, then migrates an
+// older cookie to the current layout via the page-provided EngCalcs.migrateCookie.
+// A cookie with no token is legacy v1. After this runs, this.cookieValue holds the
+// current-layout, token-free string that the positional readers expect.
+EngCalcs.normalizeCookieValue = function () {
+	"use strict";
+	if (!this.cookieValue) { return; }
+	var vars = this.cookieValue.split(","),
+		storedVersion = 1,
+		match = /^v(\d+)$/.exec(vars[0]);
+	if (match) {
+		storedVersion = parseInt(match[1], 10);
+		vars.shift();
+	}
+	this.cookieStoredVersion = storedVersion;
+	if (storedVersion < (this.cookieFormatVersion || 1) && typeof this.migrateCookie === 'function') {
+		vars = this.migrateCookie(vars, storedVersion);
+	}
+	this.cookieValue = vars.join(",");
 };
 
 EngCalcs.cookieToForm = function (form) {
@@ -124,7 +154,9 @@ EngCalcs.formToCookie = function (form) {
 			break;
 		}
 	}
-	this.cookieValue = this.cookieValue.substring(1);
+	// Strip the leading comma and prepend the format-version token so the cookie
+	// self-describes its layout for migration on the next read.
+	this.cookieValue = 'v' + (this.cookieFormatVersion || 1) + ',' + this.cookieValue.substring(1);
 	this.createCookie();
 };
 

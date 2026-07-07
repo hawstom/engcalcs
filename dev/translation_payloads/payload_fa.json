@@ -19,7 +19,7 @@
         "calc": "Use these preferred technical term translations when relevant:\n- flow (Q): دبی\n- velocity (v): سرعت\n- slope (S): شیب",
         "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): دبی\n- velocity (v): سرعت\n- head loss (h_L): افت فشار\n- emitter: قطره‌چکان\n- distribution uniformity (DU): یکنواختی توزیع\n- low-quarter distribution uniformity (DU_lq): [needs translation sprint]\n- application rate (PR): نرخ آبیاری\n- lateral: لوله جانبی\n- mainline: لوله اصلی\n- reach: بخش\n- velocity head (H_v): هد سرعت\n- friction loss (H_f): افت اصطکاکی\n- minor loss (H_m): افت موضعی\n- energy grade line (EGL): خط انرژی\n- upstream: بالادست\n- downstream: پایین‌دست",
         "irr": "Use these preferred technical term translations when relevant:\n- flow (Q): دبی\n- velocity (v): سرعت\n- slope (S): شیب",
-        "wi": "Use these preferred technical term translations when relevant:\n- flow (Q): دبی\n- weir: سرریز\n- headwater elevation: تراز آب بالادست\n- tailwater elevation: تراز آب پایین‌دست\n- discharge coefficient (C_d): ضریب تخلیه"
+        "wi": "Use these preferred technical term translations when relevant:\n- flow (Q): دبی\n- weir: سرریز\n- headwater elevation: تراز آب بالادست\n- tailwater elevation: تراز آب پایین‌دست\n- discharge coefficient (C_d): ضریب تخلیه\n- irregular channel: [needs translation sprint]"
     },
     "glossary_terms_by_prefix": {
         "calc": [
@@ -27,7 +27,7 @@
                 "term": "flow",
                 "symbol": "Q",
                 "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered.",
                 "preferred_translation": "دبی"
             },
             {
@@ -50,7 +50,7 @@
                 "term": "flow",
                 "symbol": "Q",
                 "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered.",
                 "preferred_translation": "دبی"
             },
             {
@@ -164,7 +164,7 @@
                 "term": "flow",
                 "symbol": "Q",
                 "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered.",
                 "preferred_translation": "دبی"
             },
             {
@@ -187,7 +187,7 @@
                 "term": "flow",
                 "symbol": "Q",
                 "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match).",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered.",
                 "preferred_translation": "دبی"
             },
             {
@@ -217,6 +217,13 @@
                 "context": "Coefficient correcting theoretical orifice or weir flow for real-world contraction and friction effects. Appears in Orifice and Weir calculators.",
                 "translation_notes": "The 'discharge' here refers to flow rate, not the verb. Use the hydraulic engineering compound term.",
                 "preferred_translation": "ضریب تخلیه"
+            },
+            {
+                "term": "irregular channel",
+                "symbol": "",
+                "context": "A channel whose cross-section is non-uniform \/ non-prismatic — a natural or surveyed section defined by station-elevation points, as opposed to a regular trapezoidal shape. Titles the Manning Irregular Channel calculator (mi_) and, in the geometric sense, the Weir Flow Irregular calculator (wi_).",
+                "translation_notes": "\"Irregular\" here is GEOMETRIC: the cross-section is non-uniform \/ natural \/ arbitrary shape. It is NOT the temporal sense \"sporadic \/ occasional \/ not-regular\" (bg \"нередовен\" WRONG, uk \"нерегулярний\" WRONG per Bulgarian-engineer-feedback.md), and NOT \"incorrect \/ faulty\" (ru \"неправильное русло\" reads as \"wrong channel\" — prefer \"произвольного сечения\"). Where the language allows, name the cross-section explicitly (\"of irregular cross-section\") rather than a bare adjective that could be read as temporal or evaluative.",
+                "preferred_translation": ""
             }
         ]
     },

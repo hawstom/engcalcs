@@ -1,6 +1,22 @@
 .input {
 	width: 7em;
 }
+/* Wave 0 narrow-column mechanism (validated 2026-07-06): holds a results-table
+   header as narrow as the old hard <br /> breaks did, so breaks can be removed
+   from lang strings for clean translation. Wrap a header label in this span and
+   the column stays fixed-width while long/other-language text wraps. Class-scoped
+   so it never touches ip_/wi_ which share #CalcsTable. Default is deliberately
+   NARROW for no-drop-down columns (nothing sets a width floor there, so keep them
+   tight). Mid-word wrapping across the 26 languages is expected and accepted — do
+   NOT widen to make English wrap prettily (that only helps English). Override per
+   column with an inline width where a unit-select sets a wider floor. */
+.ec-narrowcol {
+	display: inline-block;
+	width: 3.6em;
+	overflow-wrap: break-word;
+	white-space: normal;
+	vertical-align: top;
+}
 /* Chrome, Safari, Edge, Opera */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {

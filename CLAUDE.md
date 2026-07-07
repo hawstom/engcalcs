@@ -54,6 +54,33 @@ All display strings live in `lib/lang.ec.??.php` (27 files: en + 26 non-English)
 
 **`$ec_lang_intent` is off-limits to AI.** This array provides human-authored translation guidance that is interleaved with `$ec_lang` for human review. AI must never add, change, or remove any `$ec_lang_intent` entry without explicit written permission from the human in that conversation.
 
+### `$ec_lang_intent` format: `<intent> | <commentary>`
+
+An intent string has two parts separated by the first pipe (`|`):
+
+- **Left of the pipe — the intent.** A synonymic expansion of *this label's* meaning: a fuller paraphrase, with alternate words in parentheses, that a translator can re-compress in their language. This is the translatable payload. It may freely contain parentheses.
+- **Right of the pipe — commentary.** Production/layout notes and disambiguation. **Not** translated; the payload generator strips it. Keep it parsimonious by using the tag vocabulary below rather than prose.
+
+A string with **no pipe** is entirely intent (all existing clean strings stay valid — zero migration).
+
+**Never put commentary in bare parentheses on the intent side** — parentheses are reserved for synonyms and are ambiguous with real content (e.g. `(as in HEC-RAS)`). Commentary always goes behind the pipe.
+
+**Commentary tag vocabulary** (`tag: value`, semicolon-separated for multiples). Tags are shorthand that resolve to the full instruction defined here, so the intent string stays terse (`... | layout: column heading`):
+
+| Tag | Value | Full instruction it stands for |
+|-----|-------|-------------------------------|
+| `layout` | `column heading` | Renders as a header in a very narrow fixed-width results-table column; keep the term as short as the language allows. |
+| `avoid` | `<wrong sense>` | This label must NOT be read or translated in the named sense (e.g. `avoid: temporal "sporadic"`). |
+| `symbol` | *(flag, no value)* | This label contains a variable symbol; keep every letter and subscript in it exactly as in English in every language, including RTL. Subscripted names (e.g. `q<sub>avg,field</sub>`) are symbols, not words to translate. The specific subscript is read from the label itself, so it need not be repeated in the note. |
+| `gloss` | `<term>` | Defer to `glossary.json` term `<term>` for full disambiguation; do not restate it inline. |
+
+Tags may be **flags** (no `:value`, e.g. `symbol`) or `tag: value`. Combine multiple with `; ` (e.g. `symbol; avoid: anatomical "head"`).
+
+Add new `layout` tokens or tags here (defined once) rather than expanding prose in the data. Example:
+```php
+$ec_lang_intent['mi_is_bank']='Boundary (divider, edge, break, or bank as in HEC-RAS) between adjacent regions of differing flow, hydraulic radius, and composite n. | layout: column heading';
+```
+
 The 26 non-English languages: am, ar, bg, bn, cs, de, es, fa, fr, he, hi, hr, id, it, km, my, ps, pt, ro, ru, sr, sw, tr, uk, ur, zh.
 
 ## Translation Sprints
