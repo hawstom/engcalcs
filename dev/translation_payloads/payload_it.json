@@ -2,17 +2,15 @@
     "meta": {
         "language": "it",
         "expected_key_count": 482,
-        "delta_key_count": 27,
+        "delta_key_count": 22,
         "active_prefixes": [
             "calc",
-            "dw",
             "ip",
             "irr",
             "mhp",
             "mphl",
             "mtc",
             "odt",
-            "or",
             "rc"
         ],
         "requested_prefix": null,
@@ -23,14 +21,12 @@
     },
     "prompt_context_by_prefix": {
         "calc": "Use these preferred technical term translations when relevant:\n- flow (Q): portata\n- velocity (v): velocità\n- slope (S): pendenza",
-        "dw": "Use these preferred technical term translations when relevant:\n- flow (Q): portata\n- velocity (v): velocità\n- head loss (h_L): perdita di carico\n- friction factor (f): fattore di attrito\n- slope (S): pendenza\n- laminar: laminare\n- transitional: di transizione\n- turbulent: turbolento",
         "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): portata\n- velocity (v): velocità\n- head loss (h_L): perdita di carico\n- emitter: emettitore\n- distribution uniformity (DU): uniformità di distribuzione\n- low-quarter distribution uniformity (DU_lq): uniformità di distribuzione del quarto inferiore\n- application rate (PR): tasso di applicazione\n- lateral: ala laterale\n- mainline: condotta principale\n- reach: tratto\n- velocity head (H_v): altezza cinetica\n- friction loss (h_f): perdita di carico distribuita\n- minor loss (h_m): perdita di carico concentrata\n- energy grade line (EGL): linea dei carichi totali\n- upstream: a monte\n- downstream: a valle",
         "irr": "Use these preferred technical term translations when relevant:\n- flow (Q): portata\n- weir: stramazzo\n- orifice: orifizio\n- seepage: infiltrazione\n- conveyance efficiency (E_c): efficienza di trasporto\n- check structure: [needs translation sprint]",
         "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): portata\n- penstock: condotta forzata\n- gross head (H_gross): altezza lorda\n- net head (H_net): altezza netta\n- plant efficiency (η): rendimento dell'impianto\n- head loss (h_L): perdita di carico\n- run-of-river: ad acqua fluente\n- headworks: opera di presa\n- junction loss (h_m): perdite di carico locali\n- minor loss (h_m): perdita di carico concentrata",
         "mphl": "Use these preferred technical term translations when relevant:\n- flow (Q): portata\n- velocity (v): velocità\n- head loss (h_L): perdita di carico\n- friction loss (h_f): perdita di carico distribuita\n- minor loss (h_m): perdita di carico concentrata\n- hydraulic radius (R_h): raggio idraulico\n- wetted perimeter (P_w): perimetro bagnato\n- Manning roughness (n): coefficiente di scabrezza di Manning\n- slope (S): pendenza",
         "mtc": "Use these preferred technical term translations when relevant:\n- flow (Q): portata\n- velocity (v): velocità\n- hydraulic radius (R_h): raggio idraulico\n- wetted perimeter (P_w): perimetro bagnato\n- Manning roughness (n): coefficiente di scabrezza di Manning\n- slope (S): pendenza",
         "odt": "Use these preferred technical term translations when relevant:\n- orifice: orifizio\n- discharge coefficient (C_d): coefficiente di efflusso\n- headwater elevation: livello idrometrico a monte\n- tailwater elevation: livello idrometrico a valle\n- crown: [needs translation sprint]",
-        "or": "Use these preferred technical term translations when relevant:\n- flow (Q): portata\n- orifice: orifizio\n- discharge coefficient (C_d): coefficiente di efflusso\n- headwater elevation: livello idrometrico a monte\n- tailwater elevation: livello idrometrico a valle\n- crown: [needs translation sprint]",
         "rc": "Use these preferred technical term translations when relevant:\n- flow (Q): portata\n- velocity (v): velocità\n- riprap: scogliera\n- slope (S): pendenza\n- rock chute: scivolo in massi\n- chute: scivolo idraulico\n- unit discharge (q, q_t): portata specifica\n- median rock size (D50): diametro mediano dei massi\n- gradation (SD): granulometria\n- porosity (n_p): porosità\n- specific gravity (sg): peso specifico relativo\n- ponding: rigurgito\n- outlet apron: platea di uscita\n- weir head (H_p): carico sullo stramazzo\n- upstream: a monte\n- downstream: a valle\n- reach: tratto"
     },
     "glossary_terms_by_prefix": {
@@ -57,64 +53,6 @@
                 "preferred_translation": "pendenza"
             }
         ],
-        "dw": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered. ENGINEER CLARIFICATION (2026-07-06): 'дебит is a typical colloquial call of the word — regular people and non-hydraulic engineers use it. In university (hydraulic engineering) they used водно количество for Q, never дебит. I guess both work.' So both are acceptable; водно количество is the academic\/hydraulic-engineering register, дебит the general register. Still an open decision whether to standardize on водно количество suite-wide.",
-                "preferred_translation": "portata"
-            },
-            {
-                "term": "velocity",
-                "symbol": "v",
-                "context": "Flow velocity (speed of water). Appears in all calculators.",
-                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
-                "preferred_translation": "velocità"
-            },
-            {
-                "term": "head loss",
-                "symbol": "h_L",
-                "context": "Energy loss expressed as a height of water column. Appears in Darcy-Weisbach, Hazen-Williams, Manning pipe, and Penstock calculators. Distinct from 'pressure drop' — use the hydraulic engineering term.",
-                "translation_notes": "'Head' in the hydraulic sense (energy per unit weight) does not translate literally in many languages — use the established civil\/hydraulic engineering phrase. Pre-2026 sr\/hr human translations used 'gubitak pritiska' (= pressure loss), which is technically the same concept expressed in pressure terms rather than head terms. The current 'губитак напора \/ gubitak tlačne visine' (= loss of hydraulic head) is more precise in a hydraulic engineering context and is preferred.",
-                "preferred_translation": "perdita di carico"
-            },
-            {
-                "term": "friction factor",
-                "symbol": "f",
-                "context": "Darcy-Weisbach friction factor. Dimensionless coefficient in the Darcy-Weisbach head loss equation. Distinct from Hazen-Williams C coefficient.",
-                "translation_notes": "Use the hydraulic\/civil engineering term. In some languages, 'friction' and 'resistance' terms compete — prefer 'friction' to match the Darcy-Weisbach naming convention.",
-                "preferred_translation": "fattore di attrito"
-            },
-            {
-                "term": "slope",
-                "symbol": "S",
-                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
-                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
-                "preferred_translation": "pendenza"
-            },
-            {
-                "term": "laminar",
-                "symbol": "",
-                "context": "Flow regime in which fluid moves in parallel layers with no lateral mixing. Reynolds number below ~2000. Appears in Darcy-Weisbach calculator flow regime check.",
-                "translation_notes": "Nearly always a direct cognate or borrowing from the Latin in technical languages. Confirm the local engineering convention.",
-                "preferred_translation": "laminare"
-            },
-            {
-                "term": "transitional",
-                "symbol": "",
-                "context": "Flow regime between laminar and turbulent — Reynolds number roughly 2000–4000. Appears in Darcy-Weisbach calculator flow regime check.",
-                "translation_notes": "Use the adjective form meaning 'between two states'. Some languages use 'critical flow' for this regime — check local hydraulics convention.",
-                "preferred_translation": "di transizione"
-            },
-            {
-                "term": "turbulent",
-                "symbol": "",
-                "context": "Flow regime with chaotic, irregular mixing. Reynolds number above ~4000. Appears in Darcy-Weisbach calculator flow regime check.",
-                "translation_notes": "Nearly always a cognate. Some languages distinguish 'turbulent' (adjective) from 'turbulence' (noun) — use the adjective form.",
-                "preferred_translation": "turbolento"
-            }
-        ],
         "ip": [
             {
                 "term": "flow",
@@ -134,7 +72,7 @@
                 "term": "head loss",
                 "symbol": "h_L",
                 "context": "Energy loss expressed as a height of water column. Appears in Darcy-Weisbach, Hazen-Williams, Manning pipe, and Penstock calculators. Distinct from 'pressure drop' — use the hydraulic engineering term.",
-                "translation_notes": "'Head' in the hydraulic sense (energy per unit weight) does not translate literally in many languages — use the established civil\/hydraulic engineering phrase. Pre-2026 sr\/hr human translations used 'gubitak pritiska' (= pressure loss), which is technically the same concept expressed in pressure terms rather than head terms. The current 'губитак напора \/ gubitak tlačne visine' (= loss of hydraulic head) is more precise in a hydraulic engineering context and is preferred.",
+                "translation_notes": "'Head' in the hydraulic sense (energy per unit weight) does not translate literally in many languages — use the established civil\/hydraulic engineering phrase. Pre-2026 sr\/hr human translations used 'gubitak pritiska' (= pressure loss), which is technically the same concept expressed in pressure terms rather than head terms. The current 'губитак напора \/ gubitak tlačne visine' (= loss of hydraulic head) is more precise in a hydraulic engineering context and is preferred. DATA-ERROR FIX 2026-07-09 (category-3 wave-1 sprint): ro\/tr\/id translations were pressure-loss-sense ('pierdere de presiune'\/'basınç kaybı'\/'kehilangan tekanan'), contradicting this note's own guidance. Independently flagged by both the ro and tr wave-1 translation agents; corrected to head-loss-sense ('pierdere de sarcină'\/'yük kaybı'\/'kehilangan tinggi tekan') to match what both agents actually used in lib\/lang.ec.ro.php and lib\/lang.ec.tr.php. de's 'Druckverlust' was left as-is (not flagged; German engineering practice uses pressure\/head loss terms more interchangeably in pipe-flow context) but is worth a second look in a future audit.",
                 "preferred_translation": "perdita di carico"
             },
             {
@@ -313,7 +251,7 @@
                 "term": "head loss",
                 "symbol": "h_L",
                 "context": "Energy loss expressed as a height of water column. Appears in Darcy-Weisbach, Hazen-Williams, Manning pipe, and Penstock calculators. Distinct from 'pressure drop' — use the hydraulic engineering term.",
-                "translation_notes": "'Head' in the hydraulic sense (energy per unit weight) does not translate literally in many languages — use the established civil\/hydraulic engineering phrase. Pre-2026 sr\/hr human translations used 'gubitak pritiska' (= pressure loss), which is technically the same concept expressed in pressure terms rather than head terms. The current 'губитак напора \/ gubitak tlačne visine' (= loss of hydraulic head) is more precise in a hydraulic engineering context and is preferred.",
+                "translation_notes": "'Head' in the hydraulic sense (energy per unit weight) does not translate literally in many languages — use the established civil\/hydraulic engineering phrase. Pre-2026 sr\/hr human translations used 'gubitak pritiska' (= pressure loss), which is technically the same concept expressed in pressure terms rather than head terms. The current 'губитак напора \/ gubitak tlačne visine' (= loss of hydraulic head) is more precise in a hydraulic engineering context and is preferred. DATA-ERROR FIX 2026-07-09 (category-3 wave-1 sprint): ro\/tr\/id translations were pressure-loss-sense ('pierdere de presiune'\/'basınç kaybı'\/'kehilangan tekanan'), contradicting this note's own guidance. Independently flagged by both the ro and tr wave-1 translation agents; corrected to head-loss-sense ('pierdere de sarcină'\/'yük kaybı'\/'kehilangan tinggi tekan') to match what both agents actually used in lib\/lang.ec.ro.php and lib\/lang.ec.tr.php. de's 'Druckverlust' was left as-is (not flagged; German engineering practice uses pressure\/head loss terms more interchangeably in pipe-flow context) but is worth a second look in a future audit.",
                 "preferred_translation": "perdita di carico"
             },
             {
@@ -364,7 +302,7 @@
                 "term": "head loss",
                 "symbol": "h_L",
                 "context": "Energy loss expressed as a height of water column. Appears in Darcy-Weisbach, Hazen-Williams, Manning pipe, and Penstock calculators. Distinct from 'pressure drop' — use the hydraulic engineering term.",
-                "translation_notes": "'Head' in the hydraulic sense (energy per unit weight) does not translate literally in many languages — use the established civil\/hydraulic engineering phrase. Pre-2026 sr\/hr human translations used 'gubitak pritiska' (= pressure loss), which is technically the same concept expressed in pressure terms rather than head terms. The current 'губитак напора \/ gubitak tlačne visine' (= loss of hydraulic head) is more precise in a hydraulic engineering context and is preferred.",
+                "translation_notes": "'Head' in the hydraulic sense (energy per unit weight) does not translate literally in many languages — use the established civil\/hydraulic engineering phrase. Pre-2026 sr\/hr human translations used 'gubitak pritiska' (= pressure loss), which is technically the same concept expressed in pressure terms rather than head terms. The current 'губитак напора \/ gubitak tlačne visine' (= loss of hydraulic head) is more precise in a hydraulic engineering context and is preferred. DATA-ERROR FIX 2026-07-09 (category-3 wave-1 sprint): ro\/tr\/id translations were pressure-loss-sense ('pierdere de presiune'\/'basınç kaybı'\/'kehilangan tekanan'), contradicting this note's own guidance. Independently flagged by both the ro and tr wave-1 translation agents; corrected to head-loss-sense ('pierdere de sarcină'\/'yük kaybı'\/'kehilangan tinggi tekan') to match what both agents actually used in lib\/lang.ec.ro.php and lib\/lang.ec.tr.php. de's 'Druckverlust' was left as-is (not flagged; German engineering practice uses pressure\/head loss terms more interchangeably in pipe-flow context) but is worth a second look in a future audit.",
                 "preferred_translation": "perdita di carico"
             },
             {
@@ -399,7 +337,7 @@
                 "term": "Manning roughness",
                 "symbol": "n",
                 "context": "Manning's n — empirical roughness coefficient used in the Manning formula for open-channel and pipe flow.",
-                "translation_notes": "Always include 'Manning' as a proper noun. The coefficient itself (n) needs no translation — only the label does. Do not translate as generic 'roughness coefficient' without 'Manning'.",
+                "translation_notes": "Always include 'Manning' as a proper noun. The coefficient itself (n) needs no translation — only the label does. Do not translate as generic 'roughness coefficient' without 'Manning'. TYPO FIX 2026-07-09 (category-3 wave-1 sprint): ru\/uk transliterations were single-н 'Манинга'\/'Манінга', flagged by the ru wave-1 agent as inconsistent with the established double-н transliteration ('Маннинга'\/'Маннінга') used 11+ times elsewhere in both lang files (predates this sprint). Corrected to double-н for consistency.",
                 "preferred_translation": "coefficiente di scabrezza di Manning"
             },
             {
@@ -443,7 +381,7 @@
                 "term": "Manning roughness",
                 "symbol": "n",
                 "context": "Manning's n — empirical roughness coefficient used in the Manning formula for open-channel and pipe flow.",
-                "translation_notes": "Always include 'Manning' as a proper noun. The coefficient itself (n) needs no translation — only the label does. Do not translate as generic 'roughness coefficient' without 'Manning'.",
+                "translation_notes": "Always include 'Manning' as a proper noun. The coefficient itself (n) needs no translation — only the label does. Do not translate as generic 'roughness coefficient' without 'Manning'. TYPO FIX 2026-07-09 (category-3 wave-1 sprint): ru\/uk transliterations were single-н 'Манинга'\/'Манінга', flagged by the ru wave-1 agent as inconsistent with the established double-н transliteration ('Маннинга'\/'Маннінга') used 11+ times elsewhere in both lang files (predates this sprint). Corrected to double-н for consistency.",
                 "preferred_translation": "coefficiente di scabrezza di Manning"
             },
             {
@@ -473,58 +411,14 @@
                 "term": "headwater elevation",
                 "symbol": "",
                 "context": "Water surface elevation on the upstream side of a weir or orifice. Appears in Weir Flow and Orifice calculators.",
-                "translation_notes": "'Headwater' is an upstream water surface — do not confuse with 'head' (energy) or 'source' (origin of a stream). Use the hydraulic structure term.",
+                "translation_notes": "'Headwater' is an upstream water surface — do not confuse with 'head' (energy) or 'source' (origin of a stream). Use the hydraulic structure term. CORRECTED 2026-07 (category-2 sprint): tr was swapped with tailwater elevation ('mansap' is Turkish for downstream, not upstream — 'memba' is upstream); fixed to 'memba su seviyesi', matching the suite's existing correct usage in lib\/lang.ec.tr.php.",
                 "preferred_translation": "livello idrometrico a monte"
             },
             {
                 "term": "tailwater elevation",
                 "symbol": "",
                 "context": "Water surface elevation on the downstream side of a weir or orifice. Appears in Orifice Flow calculator. When tailwater is above the invert, the orifice is submerged.",
-                "translation_notes": "Use the hydraulic structure term for downstream water level. Pair consistently with 'headwater elevation'.",
-                "preferred_translation": "livello idrometrico a valle"
-            },
-            {
-                "term": "crown",
-                "symbol": "",
-                "context": "The top (highest point) of the inside of a pipe or of an opening. Synonyms: top, soffit, obvert. Technical hydraulics term; orifice flow applies only when headwater is above the crown of the opening.",
-                "translation_notes": "Prefer the local hydraulics term for the pipe soffit\/crown if one exists; otherwise a plain word for 'top (of the opening)' is correct. Not the royal or anatomical senses of 'crown'.",
-                "preferred_translation": ""
-            }
-        ],
-        "or": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered. ENGINEER CLARIFICATION (2026-07-06): 'дебит is a typical colloquial call of the word — regular people and non-hydraulic engineers use it. In university (hydraulic engineering) they used водно количество for Q, never дебит. I guess both work.' So both are acceptable; водно количество is the academic\/hydraulic-engineering register, дебит the general register. Still an open decision whether to standardize on водно количество suite-wide.",
-                "preferred_translation": "portata"
-            },
-            {
-                "term": "orifice",
-                "symbol": "",
-                "context": "A submerged or free-flowing opening through which water discharges under head. Appears in Orifice Flow and Orifice Drain Time calculators.",
-                "translation_notes": "In irrigation contexts, often the opening of a headgate or pipe turnout. Use the hydraulic engineering term, not a general word for 'hole' or 'opening'.",
-                "preferred_translation": "orifizio"
-            },
-            {
-                "term": "discharge coefficient",
-                "symbol": "C_d",
-                "context": "Coefficient correcting theoretical orifice or weir flow for real-world contraction and friction effects. Appears in Orifice and Weir calculators.",
-                "translation_notes": "The 'discharge' here refers to flow rate, not the verb. Use the hydraulic engineering compound term.",
-                "preferred_translation": "coefficiente di efflusso"
-            },
-            {
-                "term": "headwater elevation",
-                "symbol": "",
-                "context": "Water surface elevation on the upstream side of a weir or orifice. Appears in Weir Flow and Orifice calculators.",
-                "translation_notes": "'Headwater' is an upstream water surface — do not confuse with 'head' (energy) or 'source' (origin of a stream). Use the hydraulic structure term.",
-                "preferred_translation": "livello idrometrico a monte"
-            },
-            {
-                "term": "tailwater elevation",
-                "symbol": "",
-                "context": "Water surface elevation on the downstream side of a weir or orifice. Appears in Orifice Flow calculator. When tailwater is above the invert, the orifice is submerged.",
-                "translation_notes": "Use the hydraulic structure term for downstream water level. Pair consistently with 'headwater elevation'.",
+                "translation_notes": "Use the hydraulic structure term for downstream water level. Pair consistently with 'headwater elevation'. CORRECTED 2026-07 (category-2 sprint): tr was swapped with headwater elevation; fixed to 'mansap su seviyesi' (downstream), matching the suite's existing correct usage in lib\/lang.ec.tr.php.",
                 "preferred_translation": "livello idrometrico a valle"
             },
             {
@@ -609,8 +503,8 @@
             {
                 "term": "specific gravity",
                 "symbol": "sg",
-                "context": "Dimensionless ratio of rock density to water density (relative density). Rock Chute input.",
-                "translation_notes": "Dimensionless ratio — not specific weight, which has units (ro \"greutatea specifică\" wrong; use \"densitate relativă\"). Where local practice uses the specific-weight word for this ratio (tr \"özgül ağırlık\", sr\/hr \"specifična težina\"), keep local practice but never attach units.",
+                "context": "Dimensionless ratio of a material's density to the density of water. Typical crushed granite or basalt ≈ 2.65. Robinson method valid range: 2.54–2.82. Appears in Rock Chute Design and Manning Trapezoidal Channel calculators.",
+                "translation_notes": "Dimensionless ratio — not specific weight, which has units (ro \"greutatea specifică\" wrong; use \"densitate relativă\"; same trap hit de \"spezifisches Gewicht\"→\"relative Dichte\" and ru \"удельный вес\"→\"относительная плотность\" in the category-1 wave-1 back-translation QA, 2026-07-08). Where local practice uses the specific-weight word for this ratio (tr \"özgül ağırlık\", sr \"специфична тежина\", hr \"specifična težina\"), keep local practice but never attach units.",
                 "preferred_translation": "peso specifico relativo"
             },
             {
@@ -660,16 +554,11 @@
     "keys_to_translate": {
         "calc_copy_link": "Copy link",
         "calc_copy_link_done": "Copied!",
-        "dw_roughness_tip": "<span title=\"Darcy-Weisbach roughness height\" class=\"ec-tip\">?<\/span>",
         "mphl_area": "Area, A",
         "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
-        "or_regime_submerged_tip": "TWE above centroid — orifice regime still valid",
-        "or_regime_warn_tip": "Headwater below crown",
-        "or_regime_twe_above_hwe_tip": "Tailwater (TWE) above headwater (HWE)",
         "mhp_vel_ok_short": "OK",
         "mhp_hl_warn_tip": "Consider larger pipe",
         "mhp_hl_bad_tip": "Resize pipe",
-        "odt_h2_warn_tip": "Orifice top = centroid + D\/2",
         "odt_notes_1_term": "Formula",
         "rc_sg_ok_tip": "2.54–2.82 (Robinson)",
         "rc_sg_low_tip": "Valid range: 2.54–2.82",
@@ -689,16 +578,11 @@
     "keys": {
         "calc_copy_link": "Copy link",
         "calc_copy_link_done": "Copied!",
-        "dw_roughness_tip": "<span title=\"Darcy-Weisbach roughness height\" class=\"ec-tip\">?<\/span>",
         "mphl_area": "Area, A",
         "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
-        "or_regime_submerged_tip": "TWE above centroid — orifice regime still valid",
-        "or_regime_warn_tip": "Headwater below crown",
-        "or_regime_twe_above_hwe_tip": "Tailwater (TWE) above headwater (HWE)",
         "mhp_vel_ok_short": "OK",
         "mhp_hl_warn_tip": "Consider larger pipe",
         "mhp_hl_bad_tip": "Resize pipe",
-        "odt_h2_warn_tip": "Orifice top = centroid + D\/2",
         "odt_notes_1_term": "Formula",
         "rc_sg_ok_tip": "2.54–2.82 (Robinson)",
         "rc_sg_low_tip": "Valid range: 2.54–2.82",
@@ -748,34 +632,18 @@
                 }
             }
         },
-        "dw_roughness_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "dw_roughness",
-                    "value": "Scabrezza assoluta Darcy-Weisbach, e",
-                    "english": "Roughness, e"
-                },
-                "next_translated": {
-                    "key": "dw_kinematic_viscosity",
-                    "value": "Viscosità cinematica, ν <span title=\"1×10⁻⁶ m²\/s for clean water at 20°C\" class=\"ec-tip\">?<\/span>",
-                    "english": "Kinematic viscosity, &nu; <span title=\"1×10⁻⁶ m²\/s for clean water at 20°C\" class=\"ec-tip\">?<\/span>"
-                }
-            }
-        },
         "mphl_area": {
             "reason": "equal_to_english",
             "current_value": "Area, A",
             "neighbors": {
                 "previous_translated": {
                     "key": "mphl_pipe_length",
-                    "value": "Lunghezza tubazione, L",
+                    "value": "Lunghezza, L",
                     "english": "Length, L"
                 },
                 "next_translated": {
                     "key": "mphl_total_junction_k",
-                    "value": "Coefficiente totale perdita di carico ai giunti, k",
+                    "value": "Coefficiente di perdita di carico concentrata, k<sub>m<\/sub>",
                     "english": "Minor (local) loss coefficient, k<sub>m<\/sub>"
                 }
             }
@@ -793,54 +661,6 @@
                     "key": "mtc_d50_bottom",
                     "value": "Dimensione roccia angolare richiesta sul fondo, D<sub>50<\/sub> (Isbash & MC) <span title=\"Secondo Isbash (1936) e Maricopa County, Arizona, US.\" class=\"ec-tip\">?<\/span>",
                     "english": "Required bottom angular rock size, D<sub>50<\/sub> (Isbash & MC) <span title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\" class=\"ec-tip\">?<\/span>"
-                }
-            }
-        },
-        "or_regime_submerged_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "or_regime_submerged",
-                    "value": "Orifizio sommerso (TWE sopra il centroide) — valido ✓",
-                    "english": "Submerged orifice"
-                },
-                "next_translated": {
-                    "key": "or_regime_warn",
-                    "value": "Attenzione: pelo libero a monte sotto la chiave — non è regime orifizio",
-                    "english": "Outside orifice regime"
-                }
-            }
-        },
-        "or_regime_warn_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "or_regime_warn",
-                    "value": "Attenzione: pelo libero a monte sotto la chiave — non è regime orifizio",
-                    "english": "Outside orifice regime"
-                },
-                "next_translated": {
-                    "key": "or_regime_twe_above_hwe",
-                    "value": "Attenzione: acqua a valle (TWE) sopra acqua a monte (HWE) — verificare i dati",
-                    "english": "Check inputs"
-                }
-            }
-        },
-        "or_regime_twe_above_hwe_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "or_regime_twe_above_hwe",
-                    "value": "Attenzione: acqua a valle (TWE) sopra acqua a monte (HWE) — verificare i dati",
-                    "english": "Check inputs"
-                },
-                "next_translated": {
-                    "key": "or_notes_1_term",
-                    "value": "Equazione orifizio",
-                    "english": "Orifice Equation"
                 }
             }
         },
@@ -892,22 +712,6 @@
                 }
             }
         },
-        "odt_h2_warn_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "odt_h2_warn",
-                    "value": "Attenzione: quota finale pari o inferiore alla sommità orifizio (centroide + D\/2)",
-                    "english": "Ending elevation at or below orifice top"
-                },
-                "next_translated": {
-                    "key": "odt_d",
-                    "value": "D orifizio <span title=\"Diametro (circolare) o altezza (rettangolare)\" class=\"ec-tip\">?<\/span>",
-                    "english": "Orifice D <span title=\"Diameter (circular) or height (rectangular)\" class=\"ec-tip\">?<\/span>"
-                }
-            }
-        },
         "odt_notes_1_term": {
             "reason": "equal_to_english",
             "current_value": "Formula",
@@ -919,7 +723,7 @@
                 },
                 "next_translated": {
                     "key": "odt_notes_1_def",
-                    "value": "t = √H<sub>1<\/sub> \/ (C<sub>d<\/sub> A<sub>or<\/sub> √(2g)) × (2A<sub>x<\/sub>\/5 + 8√(A<sub>x<\/sub>A<sub>0<\/sub>)\/15 + 16A<sub>0<\/sub>\/15) fornisce il tempo di svuotamento dal carico H all'orifizio. Tempo di svuotamento = t(H<sub>1<\/sub>,A<sub>1<\/sub>,A<sub>0<\/sub>) − t(H<sub>2<\/sub>,A<sub>2<\/sub>,A<sub>0<\/sub>), dove H<sub>1<\/sub> = quota iniziale − quota orifizio, H<sub>2<\/sub> = quota finale − quota orifizio.",
+                    "value": "t = &radic;H<sub>1<\/sub> \/ (C<sub>d<\/sub> A<sub>or<\/sub> &radic;(2g)) &times; (2A<sub>x<\/sub>\/5 + 8&radic;(A<sub>x<\/sub>A<sub>0<\/sub>)\/15 + 16A<sub>0<\/sub>\/15) fornisce il tempo di svuotamento dal carico H all'orifizio. Tempo di svuotamento = t(H<sub>1<\/sub>,A<sub>1<\/sub>,A<sub>0<\/sub>) &minus; t(H<sub>2<\/sub>,A<sub>2<\/sub>,A<sub>0<\/sub>), dove H<sub>1<\/sub> = quota iniziale &minus; quota orifizio, H<sub>2<\/sub> = quota finale &minus; quota orifizio.",
                     "english": "t = &radic;H<sub>1<\/sub> \/ (C<sub>d<\/sub> A<sub>or<\/sub> &radic;(2g)) &times; (2A<sub>x<\/sub>\/5 + 8&radic;(A<sub>x<\/sub>A<sub>0<\/sub>)\/15 + 16A<sub>0<\/sub>\/15) gives drain time from head H to the orifice. Drain time = t(H<sub>1<\/sub>,A<sub>1<\/sub>,A<sub>0<\/sub>) &minus; t(H<sub>2<\/sub>,A<sub>2<\/sub>,A<sub>0<\/sub>), where H<sub>1<\/sub> = starting elevation &minus; orifice elevation, H<sub>2<\/sub> = ending elevation &minus; orifice elevation."
                 }
             }
@@ -1141,7 +945,5 @@
             }
         }
     },
-    "key_intent": {
-        "or_regime_warn_tip": "The upstream water level is below the crown (the top, the highest inside point) of the opening."
-    }
+    "key_intent": []
 }

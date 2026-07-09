@@ -2,15 +2,13 @@
     "meta": {
         "language": "hi",
         "expected_key_count": 482,
-        "delta_key_count": 22,
+        "delta_key_count": 18,
         "active_prefixes": [
             "calc",
             "dw",
             "ip",
             "irr",
             "mhp",
-            "odt",
-            "or",
             "rc"
         ],
         "requested_prefix": null,
@@ -25,8 +23,6 @@
         "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): प्रवाह\n- velocity (v): वेग\n- head loss (h_L): हेड हानि\n- emitter: उत्सर्जक\n- distribution uniformity (DU): वितरण एकरूपता\n- low-quarter distribution uniformity (DU_lq): [needs translation sprint]\n- application rate (PR): सिंचाई दर\n- lateral: पार्श्व नली\n- mainline: मुख्य नली\n- reach: खंड\n- velocity head (H_v): वेग शीर्ष\n- friction loss (h_f): घर्षण हानि\n- minor loss (h_m): स्थानीय हानि\n- energy grade line (EGL): ऊर्जा रेखा\n- upstream: ऊर्ध्वप्रवाह\n- downstream: अनुप्रवाह",
         "irr": "Use these preferred technical term translations when relevant:\n- flow (Q): प्रवाह\n- weir: वियर\n- orifice: छिद्र\n- seepage: रिसाव\n- conveyance efficiency (E_c): वहन दक्षता\n- check structure: [needs translation sprint]",
         "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): प्रवाह\n- penstock: दबाव नली\n- gross head (H_gross): सकल हेड\n- net head (H_net): शुद्ध हेड\n- plant efficiency (η): प्लांट दक्षता\n- head loss (h_L): हेड हानि\n- run-of-river: नदी प्रवाह ऊर्जा\n- headworks: प्रवेश संरचना\n- junction loss (h_m): स्थानीय हानि\n- minor loss (h_m): स्थानीय हानि",
-        "odt": "Use these preferred technical term translations when relevant:\n- orifice: छिद्र\n- discharge coefficient (C_d): निर्वहन गुणांक\n- headwater elevation: अपस्ट्रीम जल स्तर\n- tailwater elevation: डाउनस्ट्रीम जल स्तर\n- crown: [needs translation sprint]",
-        "or": "Use these preferred technical term translations when relevant:\n- flow (Q): प्रवाह\n- orifice: छिद्र\n- discharge coefficient (C_d): निर्वहन गुणांक\n- headwater elevation: अपस्ट्रीम जल स्तर\n- tailwater elevation: डाउनस्ट्रीम जल स्तर\n- crown: [needs translation sprint]",
         "rc": "Use these preferred technical term translations when relevant:\n- flow (Q): प्रवाह\n- velocity (v): वेग\n- riprap: पत्थर आवरण\n- slope (S): ढाल\n- rock chute: शैल-युक्त तीव्र नालिका\n- chute: तीव्र नालिका\n- unit discharge (q, q_t): इकाई प्रवाह\n- median rock size (D50): माध्यिका पत्थर आकार\n- gradation (SD): ग्रेडेशन\n- porosity (n_p): सरंध्रता\n- specific gravity (sg): आपेक्षिक घनत्व\n- ponding: जलभराव\n- outlet apron: निर्गम एप्रन\n- weir head (H_p): वियर शीर्ष\n- upstream: ऊर्ध्वप्रवाह\n- downstream: अनुप्रवाह\n- reach: खंड"
     },
     "glossary_terms_by_prefix": {
@@ -72,7 +68,7 @@
                 "term": "head loss",
                 "symbol": "h_L",
                 "context": "Energy loss expressed as a height of water column. Appears in Darcy-Weisbach, Hazen-Williams, Manning pipe, and Penstock calculators. Distinct from 'pressure drop' — use the hydraulic engineering term.",
-                "translation_notes": "'Head' in the hydraulic sense (energy per unit weight) does not translate literally in many languages — use the established civil\/hydraulic engineering phrase. Pre-2026 sr\/hr human translations used 'gubitak pritiska' (= pressure loss), which is technically the same concept expressed in pressure terms rather than head terms. The current 'губитак напора \/ gubitak tlačne visine' (= loss of hydraulic head) is more precise in a hydraulic engineering context and is preferred.",
+                "translation_notes": "'Head' in the hydraulic sense (energy per unit weight) does not translate literally in many languages — use the established civil\/hydraulic engineering phrase. Pre-2026 sr\/hr human translations used 'gubitak pritiska' (= pressure loss), which is technically the same concept expressed in pressure terms rather than head terms. The current 'губитак напора \/ gubitak tlačne visine' (= loss of hydraulic head) is more precise in a hydraulic engineering context and is preferred. DATA-ERROR FIX 2026-07-09 (category-3 wave-1 sprint): ro\/tr\/id translations were pressure-loss-sense ('pierdere de presiune'\/'basınç kaybı'\/'kehilangan tekanan'), contradicting this note's own guidance. Independently flagged by both the ro and tr wave-1 translation agents; corrected to head-loss-sense ('pierdere de sarcină'\/'yük kaybı'\/'kehilangan tinggi tekan') to match what both agents actually used in lib\/lang.ec.ro.php and lib\/lang.ec.tr.php. de's 'Druckverlust' was left as-is (not flagged; German engineering practice uses pressure\/head loss terms more interchangeably in pipe-flow context) but is worth a second look in a future audit.",
                 "preferred_translation": "हेड हानि"
             },
             {
@@ -130,7 +126,7 @@
                 "term": "head loss",
                 "symbol": "h_L",
                 "context": "Energy loss expressed as a height of water column. Appears in Darcy-Weisbach, Hazen-Williams, Manning pipe, and Penstock calculators. Distinct from 'pressure drop' — use the hydraulic engineering term.",
-                "translation_notes": "'Head' in the hydraulic sense (energy per unit weight) does not translate literally in many languages — use the established civil\/hydraulic engineering phrase. Pre-2026 sr\/hr human translations used 'gubitak pritiska' (= pressure loss), which is technically the same concept expressed in pressure terms rather than head terms. The current 'губитак напора \/ gubitak tlačne visine' (= loss of hydraulic head) is more precise in a hydraulic engineering context and is preferred.",
+                "translation_notes": "'Head' in the hydraulic sense (energy per unit weight) does not translate literally in many languages — use the established civil\/hydraulic engineering phrase. Pre-2026 sr\/hr human translations used 'gubitak pritiska' (= pressure loss), which is technically the same concept expressed in pressure terms rather than head terms. The current 'губитак напора \/ gubitak tlačne visine' (= loss of hydraulic head) is more precise in a hydraulic engineering context and is preferred. DATA-ERROR FIX 2026-07-09 (category-3 wave-1 sprint): ro\/tr\/id translations were pressure-loss-sense ('pierdere de presiune'\/'basınç kaybı'\/'kehilangan tekanan'), contradicting this note's own guidance. Independently flagged by both the ro and tr wave-1 translation agents; corrected to head-loss-sense ('pierdere de sarcină'\/'yük kaybı'\/'kehilangan tinggi tekan') to match what both agents actually used in lib\/lang.ec.ro.php and lib\/lang.ec.tr.php. de's 'Druckverlust' was left as-is (not flagged; German engineering practice uses pressure\/head loss terms more interchangeably in pipe-flow context) but is worth a second look in a future audit.",
                 "preferred_translation": "हेड हानि"
             },
             {
@@ -309,7 +305,7 @@
                 "term": "head loss",
                 "symbol": "h_L",
                 "context": "Energy loss expressed as a height of water column. Appears in Darcy-Weisbach, Hazen-Williams, Manning pipe, and Penstock calculators. Distinct from 'pressure drop' — use the hydraulic engineering term.",
-                "translation_notes": "'Head' in the hydraulic sense (energy per unit weight) does not translate literally in many languages — use the established civil\/hydraulic engineering phrase. Pre-2026 sr\/hr human translations used 'gubitak pritiska' (= pressure loss), which is technically the same concept expressed in pressure terms rather than head terms. The current 'губитак напора \/ gubitak tlačne visine' (= loss of hydraulic head) is more precise in a hydraulic engineering context and is preferred.",
+                "translation_notes": "'Head' in the hydraulic sense (energy per unit weight) does not translate literally in many languages — use the established civil\/hydraulic engineering phrase. Pre-2026 sr\/hr human translations used 'gubitak pritiska' (= pressure loss), which is technically the same concept expressed in pressure terms rather than head terms. The current 'губитак напора \/ gubitak tlačne visine' (= loss of hydraulic head) is more precise in a hydraulic engineering context and is preferred. DATA-ERROR FIX 2026-07-09 (category-3 wave-1 sprint): ro\/tr\/id translations were pressure-loss-sense ('pierdere de presiune'\/'basınç kaybı'\/'kehilangan tekanan'), contradicting this note's own guidance. Independently flagged by both the ro and tr wave-1 translation agents; corrected to head-loss-sense ('pierdere de sarcină'\/'yük kaybı'\/'kehilangan tinggi tekan') to match what both agents actually used in lib\/lang.ec.ro.php and lib\/lang.ec.tr.php. de's 'Druckverlust' was left as-is (not flagged; German engineering practice uses pressure\/head loss terms more interchangeably in pipe-flow context) but is worth a second look in a future audit.",
                 "preferred_translation": "हेड हानि"
             },
             {
@@ -339,87 +335,6 @@
                 "context": "Local head loss at fittings\/valves\/couplers (coefficient k_m). Canonical merged concept for the former 'junction loss' (mphl_) and 'minor loss' (mhp_\/ip_). Manning Pipe Head Loss, Micro-Hydro Power, Irrigation Pressure.",
                 "translation_notes": "CANONICAL ENGLISH LABEL: \"Minor (local) loss\" (label-normalization decision, item 90, 2026-07-07). 'Minor ⇄ local' — a local\/point loss at fittings, NOT a \"smaller\" loss; the '(local)' parenthetical fixes the mistranslation trap. Symbol h_m, coefficient k_m (lowercase h reserved for loss components; capital H reserved for total\/gross\/net head, per the same decision).",
                 "preferred_translation": "स्थानीय हानि"
-            }
-        ],
-        "odt": [
-            {
-                "term": "orifice",
-                "symbol": "",
-                "context": "A submerged or free-flowing opening through which water discharges under head. Appears in Orifice Flow and Orifice Drain Time calculators.",
-                "translation_notes": "In irrigation contexts, often the opening of a headgate or pipe turnout. Use the hydraulic engineering term, not a general word for 'hole' or 'opening'.",
-                "preferred_translation": "छिद्र"
-            },
-            {
-                "term": "discharge coefficient",
-                "symbol": "C_d",
-                "context": "Coefficient correcting theoretical orifice or weir flow for real-world contraction and friction effects. Appears in Orifice and Weir calculators.",
-                "translation_notes": "The 'discharge' here refers to flow rate, not the verb. Use the hydraulic engineering compound term.",
-                "preferred_translation": "निर्वहन गुणांक"
-            },
-            {
-                "term": "headwater elevation",
-                "symbol": "",
-                "context": "Water surface elevation on the upstream side of a weir or orifice. Appears in Weir Flow and Orifice calculators.",
-                "translation_notes": "'Headwater' is an upstream water surface — do not confuse with 'head' (energy) or 'source' (origin of a stream). Use the hydraulic structure term.",
-                "preferred_translation": "अपस्ट्रीम जल स्तर"
-            },
-            {
-                "term": "tailwater elevation",
-                "symbol": "",
-                "context": "Water surface elevation on the downstream side of a weir or orifice. Appears in Orifice Flow calculator. When tailwater is above the invert, the orifice is submerged.",
-                "translation_notes": "Use the hydraulic structure term for downstream water level. Pair consistently with 'headwater elevation'.",
-                "preferred_translation": "डाउनस्ट्रीम जल स्तर"
-            },
-            {
-                "term": "crown",
-                "symbol": "",
-                "context": "The top (highest point) of the inside of a pipe or of an opening. Synonyms: top, soffit, obvert. Technical hydraulics term; orifice flow applies only when headwater is above the crown of the opening.",
-                "translation_notes": "Prefer the local hydraulics term for the pipe soffit\/crown if one exists; otherwise a plain word for 'top (of the opening)' is correct. Not the royal or anatomical senses of 'crown'.",
-                "preferred_translation": ""
-            }
-        ],
-        "or": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered. ENGINEER CLARIFICATION (2026-07-06): 'дебит is a typical colloquial call of the word — regular people and non-hydraulic engineers use it. In university (hydraulic engineering) they used водно количество for Q, never дебит. I guess both work.' So both are acceptable; водно количество is the academic\/hydraulic-engineering register, дебит the general register. Still an open decision whether to standardize on водно количество suite-wide.",
-                "preferred_translation": "प्रवाह"
-            },
-            {
-                "term": "orifice",
-                "symbol": "",
-                "context": "A submerged or free-flowing opening through which water discharges under head. Appears in Orifice Flow and Orifice Drain Time calculators.",
-                "translation_notes": "In irrigation contexts, often the opening of a headgate or pipe turnout. Use the hydraulic engineering term, not a general word for 'hole' or 'opening'.",
-                "preferred_translation": "छिद्र"
-            },
-            {
-                "term": "discharge coefficient",
-                "symbol": "C_d",
-                "context": "Coefficient correcting theoretical orifice or weir flow for real-world contraction and friction effects. Appears in Orifice and Weir calculators.",
-                "translation_notes": "The 'discharge' here refers to flow rate, not the verb. Use the hydraulic engineering compound term.",
-                "preferred_translation": "निर्वहन गुणांक"
-            },
-            {
-                "term": "headwater elevation",
-                "symbol": "",
-                "context": "Water surface elevation on the upstream side of a weir or orifice. Appears in Weir Flow and Orifice calculators.",
-                "translation_notes": "'Headwater' is an upstream water surface — do not confuse with 'head' (energy) or 'source' (origin of a stream). Use the hydraulic structure term.",
-                "preferred_translation": "अपस्ट्रीम जल स्तर"
-            },
-            {
-                "term": "tailwater elevation",
-                "symbol": "",
-                "context": "Water surface elevation on the downstream side of a weir or orifice. Appears in Orifice Flow calculator. When tailwater is above the invert, the orifice is submerged.",
-                "translation_notes": "Use the hydraulic structure term for downstream water level. Pair consistently with 'headwater elevation'.",
-                "preferred_translation": "डाउनस्ट्रीम जल स्तर"
-            },
-            {
-                "term": "crown",
-                "symbol": "",
-                "context": "The top (highest point) of the inside of a pipe or of an opening. Synonyms: top, soffit, obvert. Technical hydraulics term; orifice flow applies only when headwater is above the crown of the opening.",
-                "translation_notes": "Prefer the local hydraulics term for the pipe soffit\/crown if one exists; otherwise a plain word for 'top (of the opening)' is correct. Not the royal or anatomical senses of 'crown'.",
-                "preferred_translation": ""
             }
         ],
         "rc": [
@@ -496,8 +411,8 @@
             {
                 "term": "specific gravity",
                 "symbol": "sg",
-                "context": "Dimensionless ratio of rock density to water density (relative density). Rock Chute input.",
-                "translation_notes": "Dimensionless ratio — not specific weight, which has units (ro \"greutatea specifică\" wrong; use \"densitate relativă\"). Where local practice uses the specific-weight word for this ratio (tr \"özgül ağırlık\", sr\/hr \"specifična težina\"), keep local practice but never attach units.",
+                "context": "Dimensionless ratio of a material's density to the density of water. Typical crushed granite or basalt ≈ 2.65. Robinson method valid range: 2.54–2.82. Appears in Rock Chute Design and Manning Trapezoidal Channel calculators.",
+                "translation_notes": "Dimensionless ratio — not specific weight, which has units (ro \"greutatea specifică\" wrong; use \"densitate relativă\"; same trap hit de \"spezifisches Gewicht\"→\"relative Dichte\" and ru \"удельный вес\"→\"относительная плотность\" in the category-1 wave-1 back-translation QA, 2026-07-08). Where local practice uses the specific-weight word for this ratio (tr \"özgül ağırlık\", sr \"специфична тежина\", hr \"specifična težina\"), keep local practice but never attach units.",
                 "preferred_translation": "आपेक्षिक घनत्व"
             },
             {
@@ -548,12 +463,8 @@
         "calc_copy_link": "Copy link",
         "calc_copy_link_done": "Copied!",
         "dw_roughness_tip": "<span title=\"Darcy-Weisbach roughness height\" class=\"ec-tip\">?<\/span>",
-        "or_regime_submerged_tip": "TWE above centroid — orifice regime still valid",
-        "or_regime_warn_tip": "Headwater below crown",
-        "or_regime_twe_above_hwe_tip": "Tailwater (TWE) above headwater (HWE)",
         "mhp_hl_warn_tip": "Consider larger pipe",
         "mhp_hl_bad_tip": "Resize pipe",
-        "odt_h2_warn_tip": "Orifice top = centroid + D\/2",
         "rc_sg_ok_tip": "2.54–2.82 (Robinson)",
         "rc_sg_low_tip": "Valid range: 2.54–2.82",
         "rc_sg_high_tip": "Valid range: 2.54–2.82",
@@ -572,12 +483,8 @@
         "calc_copy_link": "Copy link",
         "calc_copy_link_done": "Copied!",
         "dw_roughness_tip": "<span title=\"Darcy-Weisbach roughness height\" class=\"ec-tip\">?<\/span>",
-        "or_regime_submerged_tip": "TWE above centroid — orifice regime still valid",
-        "or_regime_warn_tip": "Headwater below crown",
-        "or_regime_twe_above_hwe_tip": "Tailwater (TWE) above headwater (HWE)",
         "mhp_hl_warn_tip": "Consider larger pipe",
         "mhp_hl_bad_tip": "Resize pipe",
-        "odt_h2_warn_tip": "Orifice top = centroid + D\/2",
         "rc_sg_ok_tip": "2.54–2.82 (Robinson)",
         "rc_sg_low_tip": "Valid range: 2.54–2.82",
         "rc_sg_high_tip": "Valid range: 2.54–2.82",
@@ -641,54 +548,6 @@
                 }
             }
         },
-        "or_regime_submerged_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "or_regime_submerged",
-                    "value": "जलमग्न छिद्र (TWE केन्द्रक के ऊपर) — वैध ✓",
-                    "english": "Submerged orifice"
-                },
-                "next_translated": {
-                    "key": "or_regime_warn",
-                    "value": "चेतावनी: शीर्ष जल शिखर से नीचे — छिद्र व्यवस्था नहीं",
-                    "english": "Outside orifice regime"
-                }
-            }
-        },
-        "or_regime_warn_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "or_regime_warn",
-                    "value": "चेतावनी: शीर्ष जल शिखर से नीचे — छिद्र व्यवस्था नहीं",
-                    "english": "Outside orifice regime"
-                },
-                "next_translated": {
-                    "key": "or_regime_twe_above_hwe",
-                    "value": "चेतावनी: पुच्छ जल (TWE) शीर्ष जल (HWE) से ऊपर — इनपुट जाँचें",
-                    "english": "Check inputs"
-                }
-            }
-        },
-        "or_regime_twe_above_hwe_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "or_regime_twe_above_hwe",
-                    "value": "चेतावनी: पुच्छ जल (TWE) शीर्ष जल (HWE) से ऊपर — इनपुट जाँचें",
-                    "english": "Check inputs"
-                },
-                "next_translated": {
-                    "key": "or_notes_1_term",
-                    "value": "छिद्र समीकरण",
-                    "english": "Orifice Equation"
-                }
-            }
-        },
         "mhp_hl_warn_tip": {
             "reason": "missing",
             "current_value": null,
@@ -718,22 +577,6 @@
                     "key": "mhp_notes_1_term",
                     "value": "हेड हानि",
                     "english": "Head Loss"
-                }
-            }
-        },
-        "odt_h2_warn_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "odt_h2_warn",
-                    "value": "चेतावनी: अंतिम स्तर छिद्र शिखर पर या उससे नीचे (केन्द्रक + D\/2)",
-                    "english": "Ending elevation at or below orifice top"
-                },
-                "next_translated": {
-                    "key": "odt_d",
-                    "value": "छिद्र D <span title=\"Diameter (circular) or height (rectangular)\" class=\"ec-tip\">?<\/span>",
-                    "english": "Orifice D <span title=\"Diameter (circular) or height (rectangular)\" class=\"ec-tip\">?<\/span>"
                 }
             }
         },
@@ -938,7 +781,5 @@
             }
         }
     },
-    "key_intent": {
-        "or_regime_warn_tip": "The upstream water level is below the crown (the top, the highest inside point) of the opening."
-    }
+    "key_intent": []
 }

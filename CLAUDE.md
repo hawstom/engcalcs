@@ -111,6 +111,16 @@ A string with **no pipe** is entirely intent (all existing clean strings stay va
 
 Tags may be **flags** (no `:value`, e.g. `symbol`) or `tag: value`. Combine multiple with `; ` (e.g. `symbol; avoid: anatomical "head"`).
 
+**English column-heading abbreviations are not a translation obstacle — verified, not assumed
+(2026-07-07).** Before Category 2's wave-1 sprint, `mi_station`="Sta" and `mi_n617`="Comp.<br
+/>n" were flagged as English-reform candidates (compressed, hard to translate). Checked against
+actual wave-1 output across all 14 anchor languages (Romance, Germanic, Slavic, Turkic): every
+language produced its own natural short form with no leftover English and no translator complaint
+(`Est.`/`Sta.`/`Prog.`/`Пикет`/`Ст.`/`İst.` for Station; `n compuesto`/`Composto`/`Zus.-ges.
+n`/`Составной n`/`Композ. n` for Composite n). Don't re-flag a `layout: column heading` abbreviation
+as an English-reform grievance on the strength of it merely looking terse — check whether wave-1
+translators actually struggled with it first.
+
 Add new `layout` tokens or tags here (defined once) rather than expanding prose in the data. Example:
 ```php
 $ec_lang_intent['mi_is_bank']='Boundary (divider, edge, break, or bank as in HEC-RAS) between adjacent regions of differing flow, hydraulic radius, and composite n. | layout: column heading';
@@ -160,6 +170,25 @@ low-resource languages. Therefore:
 should be marked for native-speaker review. Native feedback arrives as files under `dev/`
 (e.g. `dev/Bulgarian-engineer-feedback.md`); apply the corrections to the lang file AND record the
 verified terms in `glossary.json` citing the feedback file, so the next sprint inherits them.
+
+**A native-review flag with no visible consequence is not honest QA (Tom, 2026-07-08).** The flag
+must show up in `lib/Language.Settings.php`'s per-language `QUALITY` value (this app's own weight in
+browser Accept-Language negotiation — see the comment at the top of that file), not just live as a
+note in `dev/ROADMAP.md`. Tiers, calibrated 2026-07-08 against category 1's audit depth (the deepest
+evidence available at any given time — re-calibrate as later categories get equally deep audits):
+- `1.0` — English (source).
+- `0.95` — a language with an actual **verified native-speaker review on file** (e.g. bg via
+  `dev/Bulgarian-engineer-feedback.md`). Do not award this tier on the strength of automated QA alone.
+- `0.85` — AI-translated, independently back-translation-checked, and cross-language-consistency-
+  checked (the wave-1/wave-2 tier treatment) — real QA, but never confirmed by a native human.
+- `0.65` — the low-resource wave-3 tier (am/km/my/ps/sw and any language added to it) — gets *less*
+  independent verification than wave-1/2 by design (translating agent's own self-check only, no
+  second-agent QA pass) and is where native review is most needed and least available. Do not park
+  this tier at parity with reviewed/audited languages just because `lang_syntax_validate.php` is
+  clean — syntax cleanliness is not meaning-level confidence.
+Update via `php dev/scripts/update_quality_score.php <lang> <quality>`, never by hand-editing the
+file. When a language's tier changes (new native review lands, a category-level audit completes),
+update the score in the same session as the finding, not as a deferred follow-up.
 
 ## Unit Sets
 

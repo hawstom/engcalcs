@@ -503,7 +503,7 @@ function prefixToTermNames(): array
     return [
         'dw' => ['flow', 'velocity', 'head loss', 'friction factor', 'slope', 'laminar', 'transitional', 'turbulent'],
         'hw' => ['flow', 'velocity', 'head loss', 'slope'],
-        'mpf' => ['flow', 'velocity', 'hydraulic radius', 'wetted perimeter', 'Manning roughness', 'slope'],
+        'mpf' => ['flow', 'velocity', 'hydraulic radius', 'wetted perimeter', 'Manning roughness', 'slope', 'shear stress'],
         'mphl' => ['flow', 'velocity', 'head loss', 'friction loss', 'minor loss', 'hydraulic radius', 'wetted perimeter', 'Manning roughness', 'slope'],
         'mtc' => ['flow', 'velocity', 'hydraulic radius', 'wetted perimeter', 'Manning roughness', 'slope'],
         'mi' => ['flow', 'velocity', 'hydraulic radius', 'wetted perimeter', 'Manning roughness', 'slope', 'irregular channel'],

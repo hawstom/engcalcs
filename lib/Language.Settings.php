@@ -44,14 +44,14 @@ $all_language_settings = array();
 
 //-- settings for amharic
 $all_language_settings['am']=array(
-'QUALITY'=>'0.9',
+'QUALITY'=>'0.65',
 'LANGNAME'=>'አማርኛ',
 'TITLE_WORDS'=>array(),
 );
 
 //-- settings for arabic
 $all_language_settings['ar']=array(
-'QUALITY'=>'0.9',
+'QUALITY'=>'0.85',
 'LANGNAME'=>'العربية',
 'TITLE_WORDS'=>array(),
 );
@@ -73,14 +73,14 @@ $all_language_settings['bg']=array(
 
 //-- settings for chinese
 $all_language_settings['zh']=array(
-'QUALITY'=>'0.9',
+'QUALITY'=>'0.85',
 'LANGNAME'=>'中文',
 'TITLE_WORDS'=>array(),
 );
 
 //-- settings for croatian
 $all_language_settings['hr']=array(
-'QUALITY'=>'0.9',
+'QUALITY'=>'0.85',
 'LANGNAME'=>'Hrvatski',
 // Title words is a list of words that are not capitalized in titles.
 'TITLE_WORDS'=>array(),
@@ -88,7 +88,7 @@ $all_language_settings['hr']=array(
 
 //-- settings for czech
 $all_language_settings['cs']=array(
-'QUALITY'=>'0.9',
+'QUALITY'=>'0.85',
 'LANGNAME'=>'Čeština',
 'TITLE_WORDS'=>array(),
 );
@@ -103,21 +103,21 @@ $all_language_settings['en']=array(
 
 //-- settings for farsi
 $all_language_settings['fa']=array(
-'QUALITY'=>'0.9',
+'QUALITY'=>'0.85',
 'LANGNAME'=>'فارسی',
 'TITLE_WORDS'=>array(),
 );
 
 //-- settings for french
 $all_language_settings['fr']=array(
-'QUALITY'=>'0.9',
+'QUALITY'=>'0.85',
 'LANGNAME'=>'Francais',
 'TITLE_WORDS'=>array(),
 );
 
 //-- settings for german
 $all_language_settings['de']=array(
-'QUALITY'=>'0.9',
+'QUALITY'=>'0.85',
 'LANGNAME'=>'Deutsch',
 'TITLE_WORDS'=>array(),
 );
@@ -132,7 +132,7 @@ $all_language_settings['he']=array(
 
 //-- settings for hindi
 $all_language_settings['hi']=array(
-'QUALITY'=>'0.9',
+'QUALITY'=>'0.85',
 'LANGNAME'=>'हिन्दी',
 'TITLE_WORDS'=>array(),
 );
@@ -146,35 +146,35 @@ $all_language_settings['id']=array(
 
 //-- settings for italian
 $all_language_settings['it']=array(
-'QUALITY'=>'0.9',
+'QUALITY'=>'0.85',
 'LANGNAME'=>'Italiano',
 'TITLE_WORDS'=>array(),
 );
 
 //-- settings for khmer
 $all_language_settings['km']=array(
-'QUALITY'=>'0.9',
+'QUALITY'=>'0.65',
 'LANGNAME'=>'ភាសាខ្មែរ',
 'TITLE_WORDS'=>array(),
 );
 
 //-- settings for myanmar (burmese)
 $all_language_settings['my']=array(
-'QUALITY'=>'0.9',
+'QUALITY'=>'0.65',
 'LANGNAME'=>'မြန်မာဘာသာ',
 'TITLE_WORDS'=>array(),
 );
 
 //-- settings for pashto
 $all_language_settings['ps']=array(
-'QUALITY'=>'0.9',
+'QUALITY'=>'0.65',
 'LANGNAME'=>'پښتو',
 'TITLE_WORDS'=>array(),
 );
 
 //-- settings for portuguese
 $all_language_settings['pt']=array(
-'QUALITY'=>'0.9',
+'QUALITY'=>'0.85',
 'LANGNAME'=>'Portugues',
 'LANG_USE'=>true,
 // Title words is a list of words that are not capitalized in titles.
@@ -183,7 +183,7 @@ $all_language_settings['pt']=array(
 
 //-- settings for romanian
 $all_language_settings['ro']=array(
-'QUALITY'=>'0.9',
+'QUALITY'=>'0.85',
 'LANGNAME'=>'Română',
 // Title words is a list of words that are not capitalized in titles.
 'TITLE_WORDS'=>array(),
@@ -191,7 +191,7 @@ $all_language_settings['ro']=array(
 
 //-- settings for russian
 $all_language_settings['ru']=array(
-'QUALITY'=>'0.9',
+'QUALITY'=>'0.85',
 'LANGNAME'=>'Русский',
 'TITLE_WORDS'=>array(),
 );
@@ -206,35 +206,35 @@ $all_language_settings['sr']=array(
 
 //-- settings for spanish
 $all_language_settings['es']=array(
-'QUALITY'=>'0.95',
+'QUALITY'=>'0.85',
 'LANGNAME'=>'Español',
 'TITLE_WORDS'=>array(),
 );
 
 //-- settings for swahili
 $all_language_settings['sw']=array(
-'QUALITY'=>'0.9',
+'QUALITY'=>'0.65',
 'LANGNAME'=>'Kiswahili',
 'TITLE_WORDS'=>array(),
 );
 
 //-- settings for turkish
 $all_language_settings['tr']=array(
-'QUALITY'=>'0.9',
+'QUALITY'=>'0.85',
 'LANGNAME'=>'Türkçe',
 'TITLE_WORDS'=>array(),
 );
 
 //-- settings for ukrainian
 $all_language_settings['uk']=array(
-'QUALITY'=>'0.9',
+'QUALITY'=>'0.85',
 'LANGNAME'=>'Українська',
 'TITLE_WORDS'=>array(),
 );
 
 //-- settings for urdu
 $all_language_settings['ur']=array(
-'QUALITY'=>'0.9',
+'QUALITY'=>'0.85',
 'LANGNAME'=>'اردو',
 'TITLE_WORDS'=>array(),
 );
