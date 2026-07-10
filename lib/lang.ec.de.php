@@ -159,9 +159,9 @@ $ec_lang['mpf_solve_for_dd0']='y/d<sub>0</sub> für gegebenes Q berechnen';
 $ec_lang['mpf_solve_desc']='Mit d<sub>0</sub>, n und S<sub>f</sub> aus dem Rechnerformular wird das kleinste y/d<sub>0</sub> für ein gegebenes Q ermittelt.';
 $ec_lang['mpf_solve_button']='Berechnen';
 // Manning Pipe Head Loss. See mpf_ for missing text.
-$ec_lang['mphl_main_menu']='Rohrdruckverlust Manning';
-$ec_lang['mphl_main_title']='Kostenloser Online-Rechner Rohrdruckverlust Manning';
-$ec_lang['mphl_main_desc']='Manning-Formel Druckverlust bei gegebenem Vollfüllungsdurchfluss';
+$ec_lang['mphl_main_menu']='Rohrverlusthöhe Manning';
+$ec_lang['mphl_main_title']='Kostenloser Online-Rechner Rohrverlusthöhe Manning';
+$ec_lang['mphl_main_desc']='Manning-Formel Verlusthöhe bei gegebenem Vollfüllungsdurchfluss';
 $ec_lang['mphl_pipe_length']='Rohrlänge, L';
 $ec_lang['mphl_area']='Fläche, A';
 $ec_lang['mphl_total_junction_k']='Örtlicher (Einzel-)Verlustbeiwert, k<sub>m</sub>';

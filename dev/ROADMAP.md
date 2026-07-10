@@ -623,10 +623,52 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 > keys, `<sub>/<sup>/<span>/<a>` sets) found zero issues; a literal-ν/τ-character sweep across all 7
 > found zero remaining instances (all correctly use `&nu;`/`&tau;` entities). `backtranslate_check.php`
 > **not run** — no `ANTHROPIC_API_KEY` available in this environment, same gap as wave 1; outstanding
-> QA step, not a blocker to recording wave 2 as done. Payloads regenerated, `--check` FRESH. **Next**:
-> category 3 wave 3 (am km my ps sw — mandatory native-review flag, and must apply the item-40
-> shear-stress term decision for ps specifically, following the same scissors-trap avoidance ur just
-> confirmed).
+> QA step, not a blocker to recording wave 2 as done. Payloads regenerated, `--check` FRESH.
+
+> **DONE 2026-07-09: retroactive manual back-translation QA (policy step 1, ~ROADMAP line 151-183)
+> run for all 21 category-3 languages closed without it** — the 14 wave-1 anchors (es pt fr it de ro
+> ru uk bg sr hr cs tr id) plus the 7 wave-2 major-non-Latin (zh ar he hi bn fa ur), 59 keys each.
+> One review-only agent per language (21 total), each independently back-translating every long
+> string (tooltips, `*_note_1` blocks, `*_desc`/`*_solve_desc`) and sanity-checking short labels,
+> per the same rigor as the unavailable scripted `backtranslate_check.php` — no file edits by the
+> agents themselves, findings-only. Confirms the fallback procedure catches real defects the
+> translation sprints themselves missed: **7 real issues found across 21 languages, all fixed
+> directly (not re-sprinted) same session:**
+> - **pt** `mpf_shear_stress`: "força de arrasto" (drag force, a distinct fluid-mechanics concept)
+>   instead of "força trativa" (tractive force) — fixed.
+> - **de** `mphl_main_menu`/`mphl_main_title`/`mphl_main_desc`: used "Druckverlust" (pressure loss,
+>   a Δp/Pa quantity) where English says "head loss" (an h/length quantity) — a units/concept swap,
+>   internally inconsistent with the same calculator's own `mphl_total_loss` = `h_L` result label —
+>   fixed to "Verlusthöhe" (loss head), consistent with the `dw_`/`hw_` sibling keys' "...verlust"
+>   pattern.
+> - **sr** script-mixing: `hw_`/`mpf_`/`mphl_` (and, caught by the same `replace_all` fix,
+>   category-1's `mi_`/`ip_` keys referencing "Manningу") used a stray Latin "u" instead of Cyrillic
+>   "У" in the possessive suffix on "Darcy-Weisbach"/"Hazen-Williams"/"Manning" — only `dw_` had the
+>   correct Cyrillic У; fixed suite-wide across every occurrence in the file.
+> - **hi** `dw_kinematic_viscosity`: tooltip text "for clean water at 20°C" was left untranslated in
+>   English (an untranslated-passage finding, not a mistranslation) — translated.
+> - **ru** `mpf_note_1`: dropped the "headwater" qualifier ("к глубине" / "to the depth" instead of
+>   "to the headwater depth"), a precision-loss rather than a hard error — tightened to "к глубине
+>   уровня подпора."
+> - **bg** `mpf_friction_slope`/`mphl_friction_slope`: "Хидравличен наклон" (generic "hydraulic
+>   slope") blurs the specific friction-loss-rate sense of "friction slope" — flagged as a borderline
+>   terminology question for native-engineer review, not auto-fixed (matches this project's practice
+>   of not overriding a plausible existing technical-register choice without a human check).
+> - **he** `mpf_shear_stress` "כוח גרר": reviewed against the exact same failure class as the pt
+>   defect (drag force vs. tractive force) but judged NOT a defect — Hebrew "גרר/גרירה" (drag/pull)
+>   shares tractive's own "pulling" etymology much more directly than Portuguese's "arrasto," so it
+>   was kept as-is rather than force-changed to match the pt pattern.
+> - **ru** `mpf_note_1` and **hi** `dw_kinematic_viscosity` findings above were the only
+>   untranslated-passage/precision-loss class findings; no homonym traps, dropped clauses, or
+>   flipped upstream/downstream directions were found in ANY of the 21 languages — the
+>   highest-risk failure class (direction flips on HGL/EGL upstream/downstream pairs, the exact bug
+>   class the 2026-07 rc_/ip_ audit originally found) came back completely clean across the board.
+> Post-fix QA: `php -l` and `lang_syntax_validate.php` clean on all 5 edited files (pt, de, sr, hi,
+> ru); payloads regenerated, `--check` FRESH. **The holistic Opus/Fable cross-language consistency
+> pass (policy step 3) is a separate, additional layer, not yet run for category 3** — do this before
+> considering category 3's QA fully equivalent to category 1's treatment.  **Next**: category 3 wave
+> 3 (am km my ps sw — mandatory native-review flag, and must apply the item-40 shear-stress term
+> decision for ps specifically, following the same scissors-trap avoidance ur just confirmed).
 
 - 85|[CC] Extend the rc_/ip_ audit treatment to the remaining calculators using the category-grid plan (agreed with Tom 2026-07-06). **Calculator categories (N=6):** (1) open channel: mtc_+mi_ (59 keys — first, because the Bulgarian engineer's "irregular"="нередовен" catch is likely systemic across languages); (2) weirs & orifices: ws_+wi_+or_+odt_ (78); (3) pipe friction: dw_+hw_+mpf_+mphl_ (59); (4) irrigation & seepage: cs_+irr_ (54); (5) micro-hydro: mhp_ (44); (6) shared UI/units: u_+calc_+menu_+points_ incl. the ~121 identical-to-english validator warnings. **Language tiers (M=3), run as sequential waves within each category, not parallel cells:** wave 1 anchors (es pt fr it de ro ru uk bg sr hr cs tr id — cognate language groups let one glossary decision propagate; review side-by-side within Slavic/Romance blocks; **wave 1 is also the English-reform gate (Tom's principle, 2026-07-06): tier-1 translators/reviewers must flag English source strings that resist translation — idioms, stacked modifiers, compressions like "right at"/"draw off"/"Est." — and those grievances are resolved by REWRITING THE ENGLISH (author-reviewable in cognate languages) rather than only patching intents, BEFORE waves 2-3 launch, so all remaining languages inherit the more translatable source**), wave 2 major non-Latin (zh ar he hi bn fa ur), wave 3 low-resource (am km my ps sw — run last against the glossary enriched by waves 1-2; mandatory backtranslate_check + native-review flag). Per category: audit read → mechanical fixes → intents (needs human authorization) → glossary + prefixToTermNames additions → wave-1 sprint → English-reform pass from wave-1 grievances (human approves English edits; re-run wave 1 on changed keys) → waves 2-3 → post-sprint QA chain. Prereq raised by this ordering: implement the per-key English source-hash in payloads so any later English edit re-flags all 26 translations (audit §10.5). ≈10-12 authorization events total; each paid sprint gated on explicit user go-ahead per CLAUDE.md.
   - **CORRECTION 2026-07-07 (Tom, supersedes the paragraph below where they conflict):** the "DEPENDS on a completed, FROZEN English source" framing was a **mistake**. English is NOT frozen after Wave 0, and item 90 neither finishes Wave 0 nor freezes English — **item 90 was about key consolidation only**. Item 85 **starts with** its own Wave 0 pass by Fable across all calculator categories, editing obvious colloquialisms, jargon, and lazy phrases into easily-translatable English. English freezes only after wave 1 (interactive anchors) — see the SEQUENCING RULE box.

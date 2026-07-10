@@ -87,7 +87,7 @@ $ec_lang['dw_main_title']='मुफ़्त ऑनलाइन डार्स
 $ec_lang['dw_main_desc']='दिए गए व्यास, खुरदरापन और प्रवाह पर डार्सी-वाइसबाख पाइप शीर्ष हानि';
 $ec_lang['dw_roughness']='खुरदरापन, e';
 $ec_lang['dw_roughness_tip']='<span title="डार्सी-वाइसबाख खुरदरापन ऊँचाई" class="ec-tip">?</span>';
-$ec_lang['dw_kinematic_viscosity']='गतिक श्यानता, &nu; <span title="1×10⁻⁶ m²/s for clean water at 20°C" class="ec-tip">?</span>';
+$ec_lang['dw_kinematic_viscosity']='गतिक श्यानता, &nu; <span title="20°C पर स्वच्छ जल के लिए 1×10⁻⁶ मी²/से" class="ec-tip">?</span>';
 $ec_lang['dw_reynolds_number']='रेनॉल्ड्स संख्या, Re';
 $ec_lang['dw_flow_regime']='प्रवाह व्यवस्था';
 $ec_lang['dw_regime_laminar']='स्तरीय';
