@@ -7,7 +7,6 @@
             "calc",
             "dw",
             "ip",
-            "irr",
             "mhp",
             "mi",
             "mtc",
@@ -24,7 +23,6 @@
         "calc": "Use these preferred technical term translations when relevant:\n- flow (Q): vazão\n- velocity (v): velocidade\n- slope (S): declividade",
         "dw": "Use these preferred technical term translations when relevant:\n- flow (Q): vazão\n- velocity (v): velocidade\n- head loss (h_L): perda de carga\n- friction factor (f): fator de atrito\n- slope (S): declividade\n- laminar: laminar\n- transitional: de transição\n- turbulent: turbulento",
         "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): vazão\n- velocity (v): velocidade\n- head loss (h_L): perda de carga\n- emitter: emissor\n- distribution uniformity (DU): uniformidade de distribuição\n- low-quarter distribution uniformity (DU_lq): uniformidade de distribuição do quarto inferior\n- application rate (PR): taxa de aplicação\n- lateral: linha lateral\n- mainline: linha principal\n- reach: trecho\n- velocity head (H_v): carga de velocidade\n- friction loss (h_f): perda de carga por atrito\n- minor loss (h_m): perda de carga localizada\n- energy grade line (EGL): linha de energia\n- upstream: a montante\n- downstream: a jusante",
-        "irr": "Use these preferred technical term translations when relevant:\n- flow (Q): vazão\n- weir: vertedor\n- orifice: orifício\n- seepage: infiltração\n- conveyance efficiency (E_c): eficiência de condução\n- check structure: [needs translation sprint]",
         "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): vazão\n- penstock: conduto forçado\n- gross head (H_gross): altura bruta\n- net head (H_net): altura líquida\n- plant efficiency (η): eficiência da usina\n- head loss (h_L): perda de carga\n- run-of-river: fio d'água\n- headworks: obras de captação\n- junction loss (h_m): perdas localizadas\n- minor loss (h_m): perda de carga localizada",
         "mi": "Use these preferred technical term translations when relevant:\n- flow (Q): vazão\n- velocity (v): velocidade\n- hydraulic radius (R_h): raio hidráulico\n- wetted perimeter (P_w): perímetro molhado\n- Manning roughness (n): coeficiente de rugosidade de Manning\n- slope (S): declividade\n- irregular channel: canal de seção irregular",
         "mtc": "Use these preferred technical term translations when relevant:\n- flow (Q): vazão\n- velocity (v): velocidade\n- hydraulic radius (R_h): raio hidráulico\n- wetted perimeter (P_w): perímetro molhado\n- Manning roughness (n): coeficiente de rugosidade de Manning\n- slope (S): declividade",
@@ -153,7 +151,7 @@
                 "term": "low-quarter distribution uniformity",
                 "symbol": "DU_lq",
                 "context": "Irrigation statistic: average of the lowest quarter of measured emitter flows divided by the overall average. Referenced in Irrigation Pressure notes as \"textbook low-quarter Distribution Uniformity\".",
-                "translation_notes": "Use the established irrigation-engineering phrase; do not invent one. \"Textbook\" is an adjective meaning \"as defined in standard textbooks\" — fr rendered it \"manuel\" (manual check), wrong. he: uniformity = אחידות, never the nonword הוודות.",
+                "translation_notes": "Use the established irrigation-engineering phrase; do not invent one. \"Textbook\" is an adjective meaning \"as defined in standard textbooks\" — fr rendered it \"manuel\" (manual check), wrong. he: uniformity = אחידות, never the nonword הוודות. Wave-1 coinages (2026-07, category-4 sprint): fr=\"uniformité de distribution du quart inférieur\", ro=\"Uniformitatea Distribuției de sfert inferior\", ru=\"равномерность распределения по нижней четверти\", uk=\"рівномірність розподілу по низькій чверті\", bg=\"равномерност на разпределение по долната четвърт\", sr=\"равномерност расподеле нижег квартила\", hr=\"jednolikost distribucije niske grupe\", cs=\"Uniformita distribuce nízké čtvrtiny\", tr=\"düşük-çeyrek Dağıtım Uniformluğu\", id=\"Keseragaman Distribusi kuartal-bawah\". es\/pt\/it\/de already had glossary coverage pre-sprint. Not yet native-reviewed.",
                 "preferred_translation": "uniformidade de distribuição do quarto inferior"
             },
             {
@@ -225,50 +223,6 @@
                 "context": "Direction away from the supply, toward the outlet \/ last emitter.",
                 "translation_notes": "Never software \"downgrade\". ar: downstream = المصب \/ أسفل المجرى (a file used المنبعية = source-side, wrong).",
                 "preferred_translation": "a jusante"
-            }
-        ],
-        "irr": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered. ENGINEER CLARIFICATION (2026-07-06): 'дебит is a typical colloquial call of the word — regular people and non-hydraulic engineers use it. In university (hydraulic engineering) they used водно количество for Q, never дебит. I guess both work.' So both are acceptable; водно количество is the academic\/hydraulic-engineering register, дебит the general register. Still an open decision whether to standardize on водно количество suite-wide.",
-                "preferred_translation": "vazão"
-            },
-            {
-                "term": "weir",
-                "symbol": "",
-                "context": "A flow-measurement or water-control structure — a barrier across a channel over which water flows. Appears in Weir Flow Simple and Weir Flow Irregular calculators.",
-                "translation_notes": "WMO No. 385 entry 1665 confirms: es = 'vertedero', fr = 'déversoir', ru = 'водослив'. In an irrigation context, the term often overlaps with 'diversion dam' or 'check structure'. Use the term most common among irrigation field workers in the target language, not a purely civil-engineering dictionary term.",
-                "preferred_translation": "vertedor"
-            },
-            {
-                "term": "orifice",
-                "symbol": "",
-                "context": "A submerged or free-flowing opening through which water discharges under head. Appears in Orifice Flow and Orifice Drain Time calculators.",
-                "translation_notes": "In irrigation contexts, often the opening of a headgate or pipe turnout. Use the hydraulic engineering term, not a general word for 'hole' or 'opening'.",
-                "preferred_translation": "orifício"
-            },
-            {
-                "term": "seepage",
-                "symbol": "",
-                "context": "Water lost from a canal through the bed and banks by percolation into the soil. Appears in Canal Seepage calculator.",
-                "translation_notes": "Use the irrigation\/canal engineering term for slow percolation loss, not a word implying leakage through a crack or structural failure.",
-                "preferred_translation": "infiltração"
-            },
-            {
-                "term": "conveyance efficiency",
-                "symbol": "E_c",
-                "context": "Ratio of outflow to inflow in a canal reach — measures how much water delivered at the head is received at the tail. Appears in Canal Seepage calculator. E_c = Q_out \/ Q_in.",
-                "translation_notes": "This is the most terminology-sensitive term in the suite. 'Conveyance' means transport of water along a canal — do not use a general word for 'efficiency' alone. The term should convey 'how well the canal transports water without loss'.",
-                "preferred_translation": "eficiência de condução"
-            },
-            {
-                "term": "check structure",
-                "symbol": "",
-                "context": "A small flow-control structure (gate or board structure) in an irrigation canal, used to raise ('check') the upstream water level for diversion or measurement. 'Check' is part of the structure's name.",
-                "translation_notes": "Use the local irrigation term for a canal check\/control gate. 'Check' here is NOT the verb 'to verify\/inspect' — do not translate as 'inspect the structure'.",
-                "preferred_translation": ""
             }
         ],
         "mhp": [
@@ -626,8 +580,8 @@
         "ip_diameter": "D",
         "ip_roughness": "e",
         "ip_press": "Press.",
-        "irr_card_pressure_head": "Irrigation Pressure &amp; Uniformity",
-        "irr_card_pressure_desc": "Model the pressure and flow profile along a main-lateral-emitter branch to estimate distribution uniformity from the real test-path pressure, not just a catalog emitter flow rate."
+        "ip_hf": "h<sub>f<\/sub>",
+        "ip_hm": "h<sub>m<\/sub>"
     },
     "keys": {
         "calc_copy_link": "Copy link",
@@ -651,8 +605,8 @@
         "ip_diameter": "D",
         "ip_roughness": "e",
         "ip_press": "Press.",
-        "irr_card_pressure_head": "Irrigation Pressure &amp; Uniformity",
-        "irr_card_pressure_desc": "Model the pressure and flow profile along a main-lateral-emitter branch to estimate distribution uniformity from the real test-path pressure, not just a catalog emitter flow rate."
+        "ip_hf": "h<sub>f<\/sub>",
+        "ip_hm": "h<sub>m<\/sub>"
     },
     "key_context": {
         "calc_copy_link": {
@@ -938,7 +892,7 @@
                 },
                 "next_translated": {
                     "key": "ip_km",
-                    "value": "K<sub>m<\/sub> <span title=\"Coeficiente genérico de perda menor para acessórios\/válvulas\/acopladores deste trecho (≥0,5 mínimo sugerido)\" class=\"ec-tip\">?<\/span>",
+                    "value": "k<sub>m<\/sub> <span title=\"Coeficiente genérico de perda menor para acessórios\/válvulas\/acopladores deste trecho (≥0,5 mínimo sugerido)\" class=\"ec-tip\">?<\/span>",
                     "english": "k<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
                 }
             }
@@ -954,14 +908,14 @@
                 },
                 "next_translated": {
                     "key": "ip_km",
-                    "value": "K<sub>m<\/sub> <span title=\"Coeficiente genérico de perda menor para acessórios\/válvulas\/acopladores deste trecho (≥0,5 mínimo sugerido)\" class=\"ec-tip\">?<\/span>",
+                    "value": "k<sub>m<\/sub> <span title=\"Coeficiente genérico de perda menor para acessórios\/válvulas\/acopladores deste trecho (≥0,5 mínimo sugerido)\" class=\"ec-tip\">?<\/span>",
                     "english": "k<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
                 }
             }
         },
         "ip_roughness": {
-            "reason": "missing",
-            "current_value": null,
+            "reason": "equal_to_english",
+            "current_value": "e",
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
@@ -970,7 +924,7 @@
                 },
                 "next_translated": {
                     "key": "ip_km",
-                    "value": "K<sub>m<\/sub> <span title=\"Coeficiente genérico de perda menor para acessórios\/válvulas\/acopladores deste trecho (≥0,5 mínimo sugerido)\" class=\"ec-tip\">?<\/span>",
+                    "value": "k<sub>m<\/sub> <span title=\"Coeficiente genérico de perda menor para acessórios\/válvulas\/acopladores deste trecho (≥0,5 mínimo sugerido)\" class=\"ec-tip\">?<\/span>",
                     "english": "k<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
                 }
             }
@@ -985,38 +939,48 @@
                     "english": "Flow"
                 },
                 "next_translated": {
-                    "key": "ip_hf",
-                    "value": "H<sub>f<\/sub>",
-                    "english": "h<sub>f<\/sub>"
+                    "key": "ip_hl",
+                    "value": "h<sub>L<\/sub> <span title=\"Perda total do trecho, h_f + h_m\" class=\"ec-tip\">?<\/span>",
+                    "english": "h<sub>L<\/sub> <span title=\"Total reach loss, h_f + h_m\" class=\"ec-tip\">?<\/span>"
                 }
             }
         },
-        "irr_card_pressure_head": {
-            "reason": "missing",
-            "current_value": null,
+        "ip_hf": {
+            "reason": "equal_to_english",
+            "current_value": "h<sub>f<\/sub>",
             "neighbors": {
                 "previous_translated": {
-                    "key": "ip_notes_5_def",
-                    "value": "Taxa de aplicação e fluxo de sistema\/zona usam a vazão média estimada do emissor em campo (q<sub>avg,field<\/sub> — a média da própria lateral de teste, corrigida pela estimativa ΔPressão inserida), não uma taxa adivinhada: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub>, alimentada pelo valor modelado corrigido. Espaçamento e contagens de lateral\/emissor do sistema amplo são entradas separadas aqui porque o caminho de teste modela apenas uma ramificação de pior caso, não cada lateral no campo.",
-                    "english": "Application rate and system\/zone flow use the estimated field-average emitter flow (q<sub>avg,field<\/sub> &mdash; the test lateral&rsquo;s own average, corrected by the entered &Delta;pressure estimate), not a guessed rate: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub>, fed by the corrected modeled value. Spacing and system-wide lateral\/emitter counts are separate inputs here because the test path only models one worst-case branch, not every lateral in the field."
+                    "key": "ip_flow",
+                    "value": "Vazão",
+                    "english": "Flow"
                 },
-                "next_translated": null
+                "next_translated": {
+                    "key": "ip_hl",
+                    "value": "h<sub>L<\/sub> <span title=\"Perda total do trecho, h_f + h_m\" class=\"ec-tip\">?<\/span>",
+                    "english": "h<sub>L<\/sub> <span title=\"Total reach loss, h_f + h_m\" class=\"ec-tip\">?<\/span>"
+                }
             }
         },
-        "irr_card_pressure_desc": {
-            "reason": "missing",
-            "current_value": null,
+        "ip_hm": {
+            "reason": "equal_to_english",
+            "current_value": "h<sub>m<\/sub>",
             "neighbors": {
                 "previous_translated": {
-                    "key": "ip_notes_5_def",
-                    "value": "Taxa de aplicação e fluxo de sistema\/zona usam a vazão média estimada do emissor em campo (q<sub>avg,field<\/sub> — a média da própria lateral de teste, corrigida pela estimativa ΔPressão inserida), não uma taxa adivinhada: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub>, alimentada pelo valor modelado corrigido. Espaçamento e contagens de lateral\/emissor do sistema amplo são entradas separadas aqui porque o caminho de teste modela apenas uma ramificação de pior caso, não cada lateral no campo.",
-                    "english": "Application rate and system\/zone flow use the estimated field-average emitter flow (q<sub>avg,field<\/sub> &mdash; the test lateral&rsquo;s own average, corrected by the entered &Delta;pressure estimate), not a guessed rate: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub>, fed by the corrected modeled value. Spacing and system-wide lateral\/emitter counts are separate inputs here because the test path only models one worst-case branch, not every lateral in the field."
+                    "key": "ip_flow",
+                    "value": "Vazão",
+                    "english": "Flow"
                 },
-                "next_translated": null
+                "next_translated": {
+                    "key": "ip_hl",
+                    "value": "h<sub>L<\/sub> <span title=\"Perda total do trecho, h_f + h_m\" class=\"ec-tip\">?<\/span>",
+                    "english": "h<sub>L<\/sub> <span title=\"Total reach loss, h_f + h_m\" class=\"ec-tip\">?<\/span>"
+                }
             }
         }
     },
     "key_intent": {
-        "mi_n617": "The composite Manning roughness, n, of this region"
+        "mi_n617": "The composite Manning roughness, n, of this region",
+        "ip_hf": "Friction head loss.",
+        "ip_hm": "Minor (local) head loss."
     }
 }

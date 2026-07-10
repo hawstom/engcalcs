@@ -2,7 +2,7 @@
     "meta": {
         "language": "cs",
         "expected_key_count": 482,
-        "delta_key_count": 19,
+        "delta_key_count": 21,
         "active_prefixes": [
             "calc",
             "ip",
@@ -19,7 +19,7 @@
     },
     "prompt_context_by_prefix": {
         "calc": "Use these preferred technical term translations when relevant:\n- flow (Q): průtok\n- velocity (v): rychlost\n- slope (S): sklon",
-        "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): průtok\n- velocity (v): rychlost\n- head loss (h_L): ztráta tlakové výšky\n- emitter: kapač\n- distribution uniformity (DU): rovnoměrnost distribuce\n- low-quarter distribution uniformity (DU_lq): [needs translation sprint]\n- application rate (PR): intenzita závlahy\n- lateral: postranní větev\n- mainline: hlavní potrubí\n- reach: úsek\n- velocity head (H_v): rychlostní výška\n- friction loss (h_f): ztráta třením\n- minor loss (h_m): místní ztráta\n- energy grade line (EGL): čára energie\n- upstream: proti proudu\n- downstream: po proudu",
+        "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): průtok\n- velocity (v): rychlost\n- head loss (h_L): ztráta tlakové výšky\n- emitter: kapač\n- distribution uniformity (DU): rovnoměrnost distribuce\n- low-quarter distribution uniformity (DU_lq): Uniformita distribuce nízké čtvrtiny\n- application rate (PR): intenzita závlahy\n- lateral: postranní větev\n- mainline: hlavní potrubí\n- reach: úsek\n- velocity head (H_v): rychlostní výška\n- friction loss (h_f): ztráta třením\n- minor loss (h_m): místní ztráta\n- energy grade line (EGL): čára energie\n- upstream: proti proudu\n- downstream: po proudu",
         "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): průtok\n- penstock: tlakovod\n- gross head (H_gross): hrubý spád\n- net head (H_net): čistý spád\n- plant efficiency (η): účinnost elektrárny\n- head loss (h_L): ztráta tlakové výšky\n- run-of-river: průtočná vodní elektrárna\n- headworks: odběrný objekt\n- junction loss (h_m): místní ztráty\n- minor loss (h_m): místní ztráta",
         "mi": "Use these preferred technical term translations when relevant:\n- flow (Q): průtok\n- velocity (v): rychlost\n- hydraulic radius (R_h): hydraulický poloměr\n- wetted perimeter (P_w): smočený obvod\n- Manning roughness (n): Manningův součinitel drsnosti\n- slope (S): sklon\n- irregular channel: nepravidelný průřez",
         "mtc": "Use these preferred technical term translations when relevant:\n- flow (Q): průtok\n- velocity (v): rychlost\n- hydraulic radius (R_h): hydraulický poloměr\n- wetted perimeter (P_w): smočený obvod\n- Manning roughness (n): Manningův součinitel drsnosti\n- slope (S): sklon",
@@ -89,8 +89,8 @@
                 "term": "low-quarter distribution uniformity",
                 "symbol": "DU_lq",
                 "context": "Irrigation statistic: average of the lowest quarter of measured emitter flows divided by the overall average. Referenced in Irrigation Pressure notes as \"textbook low-quarter Distribution Uniformity\".",
-                "translation_notes": "Use the established irrigation-engineering phrase; do not invent one. \"Textbook\" is an adjective meaning \"as defined in standard textbooks\" — fr rendered it \"manuel\" (manual check), wrong. he: uniformity = אחידות, never the nonword הוודות.",
-                "preferred_translation": ""
+                "translation_notes": "Use the established irrigation-engineering phrase; do not invent one. \"Textbook\" is an adjective meaning \"as defined in standard textbooks\" — fr rendered it \"manuel\" (manual check), wrong. he: uniformity = אחידות, never the nonword הוודות. Wave-1 coinages (2026-07, category-4 sprint): fr=\"uniformité de distribution du quart inférieur\", ro=\"Uniformitatea Distribuției de sfert inferior\", ru=\"равномерность распределения по нижней четверти\", uk=\"рівномірність розподілу по низькій чверті\", bg=\"равномерност на разпределение по долната четвърт\", sr=\"равномерност расподеле нижег квартила\", hr=\"jednolikost distribucije niske grupe\", cs=\"Uniformita distribuce nízké čtvrtiny\", tr=\"düşük-çeyrek Dağıtım Uniformluğu\", id=\"Keseragaman Distribusi kuartal-bawah\". es\/pt\/it\/de already had glossary coverage pre-sprint. Not yet native-reviewed.",
+                "preferred_translation": "Uniformita distribuce nízké čtvrtiny"
             },
             {
                 "term": "application rate",
@@ -471,7 +471,9 @@
         "rc_pond_warn_tip": "No ponding upstream of the chute inlet; erosion could occur upstream. (USDA)",
         "ip_length": "L",
         "ip_diameter": "D",
-        "ip_roughness": "e"
+        "ip_roughness": "e",
+        "ip_hf": "h<sub>f<\/sub>",
+        "ip_hm": "h<sub>m<\/sub>"
     },
     "keys": {
         "calc_copy_link": "Copy link",
@@ -492,7 +494,9 @@
         "rc_pond_warn_tip": "No ponding upstream of the chute inlet; erosion could occur upstream. (USDA)",
         "ip_length": "L",
         "ip_diameter": "D",
-        "ip_roughness": "e"
+        "ip_roughness": "e",
+        "ip_hf": "h<sub>f<\/sub>",
+        "ip_hm": "h<sub>m<\/sub>"
     },
     "key_context": {
         "calc_copy_link": {
@@ -762,7 +766,7 @@
                 },
                 "next_translated": {
                     "key": "ip_km",
-                    "value": "K<sub>m<\/sub> <span title=\"Obecný součinitel místní ztráty pro armatury\/ventily\/spojky v tomto úseku (&ge;0,5 doporučené minimum)\" class=\"ec-tip\">?<\/span>",
+                    "value": "k<sub>m<\/sub> <span title=\"Obecný součinitel místní ztráty pro armatury\/ventily\/spojky v tomto úseku (&ge;0,5 doporučené minimum)\" class=\"ec-tip\">?<\/span>",
                     "english": "k<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
                 }
             }
@@ -778,14 +782,14 @@
                 },
                 "next_translated": {
                     "key": "ip_km",
-                    "value": "K<sub>m<\/sub> <span title=\"Obecný součinitel místní ztráty pro armatury\/ventily\/spojky v tomto úseku (&ge;0,5 doporučené minimum)\" class=\"ec-tip\">?<\/span>",
+                    "value": "k<sub>m<\/sub> <span title=\"Obecný součinitel místní ztráty pro armatury\/ventily\/spojky v tomto úseku (&ge;0,5 doporučené minimum)\" class=\"ec-tip\">?<\/span>",
                     "english": "k<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
                 }
             }
         },
         "ip_roughness": {
-            "reason": "missing",
-            "current_value": null,
+            "reason": "equal_to_english",
+            "current_value": "e",
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
@@ -794,13 +798,47 @@
                 },
                 "next_translated": {
                     "key": "ip_km",
-                    "value": "K<sub>m<\/sub> <span title=\"Obecný součinitel místní ztráty pro armatury\/ventily\/spojky v tomto úseku (&ge;0,5 doporučené minimum)\" class=\"ec-tip\">?<\/span>",
+                    "value": "k<sub>m<\/sub> <span title=\"Obecný součinitel místní ztráty pro armatury\/ventily\/spojky v tomto úseku (&ge;0,5 doporučené minimum)\" class=\"ec-tip\">?<\/span>",
                     "english": "k<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
+                }
+            }
+        },
+        "ip_hf": {
+            "reason": "equal_to_english",
+            "current_value": "h<sub>f<\/sub>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "ip_press",
+                    "value": "Tlak",
+                    "english": "Press."
+                },
+                "next_translated": {
+                    "key": "ip_hl",
+                    "value": "h<sub>L<\/sub> <span title=\"Celková ztráta v úseku, h_f + h_m\" class=\"ec-tip\">?<\/span>",
+                    "english": "h<sub>L<\/sub> <span title=\"Total reach loss, h_f + h_m\" class=\"ec-tip\">?<\/span>"
+                }
+            }
+        },
+        "ip_hm": {
+            "reason": "equal_to_english",
+            "current_value": "h<sub>m<\/sub>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "ip_press",
+                    "value": "Tlak",
+                    "english": "Press."
+                },
+                "next_translated": {
+                    "key": "ip_hl",
+                    "value": "h<sub>L<\/sub> <span title=\"Celková ztráta v úseku, h_f + h_m\" class=\"ec-tip\">?<\/span>",
+                    "english": "h<sub>L<\/sub> <span title=\"Total reach loss, h_f + h_m\" class=\"ec-tip\">?<\/span>"
                 }
             }
         }
     },
     "key_intent": {
-        "mi_station": "Station (chainage, distance along the alignment) of this point — \"Distance\" is an acceptable alias where the surveying sense of \"station\" has no natural short word"
+        "mi_station": "Station (chainage, distance along the alignment) of this point — \"Distance\" is an acceptable alias where the surveying sense of \"station\" has no natural short word",
+        "ip_hf": "Friction head loss.",
+        "ip_hm": "Minor (local) head loss."
     }
 }

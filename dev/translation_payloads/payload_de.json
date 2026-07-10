@@ -8,7 +8,6 @@
             "dw",
             "ec",
             "ip",
-            "irr",
             "mhp",
             "mi",
             "mtc",
@@ -25,7 +24,6 @@
         "dw": "Use these preferred technical term translations when relevant:\n- flow (Q): Durchfluss\n- velocity (v): Geschwindigkeit\n- head loss (h_L): Druckverlust\n- friction factor (f): Reibungskoeffizient\n- slope (S): Gefälle\n- laminar: laminar\n- transitional: Übergangsbereich\n- turbulent: turbulent",
         "ec": "Use these preferred technical term translations when relevant:\n- flow (Q): Durchfluss\n- velocity (v): Geschwindigkeit\n- slope (S): Gefälle",
         "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): Durchfluss\n- velocity (v): Geschwindigkeit\n- head loss (h_L): Druckverlust\n- emitter: Tropfer\n- distribution uniformity (DU): Verteilungsgleichmäßigkeit\n- low-quarter distribution uniformity (DU_lq): Verteilungsgleichmäßigkeit des unteren Viertels\n- application rate (PR): Beregnungsintensität\n- lateral: Lateral\n- mainline: Hauptleitung\n- reach: Strecke\n- velocity head (H_v): Geschwindigkeitshöhe\n- friction loss (h_f): Reibungsverlust\n- minor loss (h_m): Einzelverlust\n- energy grade line (EGL): Energielinie\n- upstream: oberstrom\n- downstream: unterstrom",
-        "irr": "Use these preferred technical term translations when relevant:\n- flow (Q): Durchfluss\n- weir: Wehr\n- orifice: Öffnung\n- seepage: Versickerung\n- conveyance efficiency (E_c): Transportwirkungsgrad\n- check structure: [needs translation sprint]",
         "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): Durchfluss\n- penstock: Druckleitung\n- gross head (H_gross): Bruttofallhöhe\n- net head (H_net): Nettofallhöhe\n- plant efficiency (η): Anlagenwirkungsgrad\n- head loss (h_L): Druckverlust\n- run-of-river: Laufwasserkraftwerk\n- headworks: Einlaufbauwerk\n- junction loss (h_m): örtliche Verluste\n- minor loss (h_m): Einzelverlust",
         "mi": "Use these preferred technical term translations when relevant:\n- flow (Q): Durchfluss\n- velocity (v): Geschwindigkeit\n- hydraulic radius (R_h): hydraulischer Radius\n- wetted perimeter (P_w): benetzter Umfang\n- Manning roughness (n): Manning-Rauheitskoeffizient\n- slope (S): Gefälle\n- irregular channel: unregelmäßiges Profil",
         "mtc": "Use these preferred technical term translations when relevant:\n- flow (Q): Durchfluss\n- velocity (v): Geschwindigkeit\n- hydraulic radius (R_h): hydraulischer Radius\n- wetted perimeter (P_w): benetzter Umfang\n- Manning roughness (n): Manning-Rauheitskoeffizient\n- slope (S): Gefälle",
@@ -176,7 +174,7 @@
                 "term": "low-quarter distribution uniformity",
                 "symbol": "DU_lq",
                 "context": "Irrigation statistic: average of the lowest quarter of measured emitter flows divided by the overall average. Referenced in Irrigation Pressure notes as \"textbook low-quarter Distribution Uniformity\".",
-                "translation_notes": "Use the established irrigation-engineering phrase; do not invent one. \"Textbook\" is an adjective meaning \"as defined in standard textbooks\" — fr rendered it \"manuel\" (manual check), wrong. he: uniformity = אחידות, never the nonword הוודות.",
+                "translation_notes": "Use the established irrigation-engineering phrase; do not invent one. \"Textbook\" is an adjective meaning \"as defined in standard textbooks\" — fr rendered it \"manuel\" (manual check), wrong. he: uniformity = אחידות, never the nonword הוודות. Wave-1 coinages (2026-07, category-4 sprint): fr=\"uniformité de distribution du quart inférieur\", ro=\"Uniformitatea Distribuției de sfert inferior\", ru=\"равномерность распределения по нижней четверти\", uk=\"рівномірність розподілу по низькій чверті\", bg=\"равномерност на разпределение по долната четвърт\", sr=\"равномерност расподеле нижег квартила\", hr=\"jednolikost distribucije niske grupe\", cs=\"Uniformita distribuce nízké čtvrtiny\", tr=\"düşük-çeyrek Dağıtım Uniformluğu\", id=\"Keseragaman Distribusi kuartal-bawah\". es\/pt\/it\/de already had glossary coverage pre-sprint. Not yet native-reviewed.",
                 "preferred_translation": "Verteilungsgleichmäßigkeit des unteren Viertels"
             },
             {
@@ -248,50 +246,6 @@
                 "context": "Direction away from the supply, toward the outlet \/ last emitter.",
                 "translation_notes": "Never software \"downgrade\". ar: downstream = المصب \/ أسفل المجرى (a file used المنبعية = source-side, wrong).",
                 "preferred_translation": "unterstrom"
-            }
-        ],
-        "irr": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered. ENGINEER CLARIFICATION (2026-07-06): 'дебит is a typical colloquial call of the word — regular people and non-hydraulic engineers use it. In university (hydraulic engineering) they used водно количество for Q, never дебит. I guess both work.' So both are acceptable; водно количество is the academic\/hydraulic-engineering register, дебит the general register. Still an open decision whether to standardize on водно количество suite-wide.",
-                "preferred_translation": "Durchfluss"
-            },
-            {
-                "term": "weir",
-                "symbol": "",
-                "context": "A flow-measurement or water-control structure — a barrier across a channel over which water flows. Appears in Weir Flow Simple and Weir Flow Irregular calculators.",
-                "translation_notes": "WMO No. 385 entry 1665 confirms: es = 'vertedero', fr = 'déversoir', ru = 'водослив'. In an irrigation context, the term often overlaps with 'diversion dam' or 'check structure'. Use the term most common among irrigation field workers in the target language, not a purely civil-engineering dictionary term.",
-                "preferred_translation": "Wehr"
-            },
-            {
-                "term": "orifice",
-                "symbol": "",
-                "context": "A submerged or free-flowing opening through which water discharges under head. Appears in Orifice Flow and Orifice Drain Time calculators.",
-                "translation_notes": "In irrigation contexts, often the opening of a headgate or pipe turnout. Use the hydraulic engineering term, not a general word for 'hole' or 'opening'.",
-                "preferred_translation": "Öffnung"
-            },
-            {
-                "term": "seepage",
-                "symbol": "",
-                "context": "Water lost from a canal through the bed and banks by percolation into the soil. Appears in Canal Seepage calculator.",
-                "translation_notes": "Use the irrigation\/canal engineering term for slow percolation loss, not a word implying leakage through a crack or structural failure.",
-                "preferred_translation": "Versickerung"
-            },
-            {
-                "term": "conveyance efficiency",
-                "symbol": "E_c",
-                "context": "Ratio of outflow to inflow in a canal reach — measures how much water delivered at the head is received at the tail. Appears in Canal Seepage calculator. E_c = Q_out \/ Q_in.",
-                "translation_notes": "This is the most terminology-sensitive term in the suite. 'Conveyance' means transport of water along a canal — do not use a general word for 'efficiency' alone. The term should convey 'how well the canal transports water without loss'.",
-                "preferred_translation": "Transportwirkungsgrad"
-            },
-            {
-                "term": "check structure",
-                "symbol": "",
-                "context": "A small flow-control structure (gate or board structure) in an irrigation canal, used to raise ('check') the upstream water level for diversion or measurement. 'Check' is part of the structure's name.",
-                "translation_notes": "Use the local irrigation term for a canal check\/control gate. 'Check' here is NOT the verb 'to verify\/inspect' — do not translate as 'inspect the structure'.",
-                "preferred_translation": ""
             }
         ],
         "mhp": [
@@ -607,8 +561,8 @@
         "ip_length": "L",
         "ip_diameter": "D",
         "ip_roughness": "e",
-        "irr_card_pressure_head": "Irrigation Pressure &amp; Uniformity",
-        "irr_card_pressure_desc": "Model the pressure and flow profile along a main-lateral-emitter branch to estimate distribution uniformity from the real test-path pressure, not just a catalog emitter flow rate."
+        "ip_hf": "h<sub>f<\/sub>",
+        "ip_hm": "h<sub>m<\/sub>"
     },
     "keys": {
         "ec_name_placeholder": "Name",
@@ -634,8 +588,8 @@
         "ip_length": "L",
         "ip_diameter": "D",
         "ip_roughness": "e",
-        "irr_card_pressure_head": "Irrigation Pressure &amp; Uniformity",
-        "irr_card_pressure_desc": "Model the pressure and flow profile along a main-lateral-emitter branch to estimate distribution uniformity from the real test-path pressure, not just a catalog emitter flow rate."
+        "ip_hf": "h<sub>f<\/sub>",
+        "ip_hm": "h<sub>m<\/sub>"
     },
     "key_context": {
         "ec_name_placeholder": {
@@ -964,12 +918,12 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "Emitter <span title=\"Laterale Reihen: Emitter in dieser Strecke nur. Hauptleitungsreihen: Gesamtemitter auf Leitungen AUSSER dieser, die von dieser Strecke abzweigen. Für die Strecke rechts neben der Abzweigstelle der Testleitung selbst zählen auch alle Leitungen noch weiter unten in der Hauptleitung oder an derselben Verbindung (z. B. eine Gegenleitung) — ihr Durchfluss fließt durch diese gleiche Strecke ab, ob hier aufgelistet oder nicht.\" class=\"ec-tip\">?<\/span>",
+                    "value": "Emitter <span title=\"Lateral-Zeilen: nur die Emitter in dieser Strecke. Hauptleitungs-Zeilen: Gesamtzahl der Emitter auf Lateralen AUSSER diesem, die von dieser Strecke abzweigen. Für die Strecke der Hauptleitung, die an der Testleitung endet, zählen zusätzlich alle Laterale, die weiter entlang der Hauptleitung liegen, oder die denselben Knotenpunkt teilen (z. B. ein gegenüberliegendes Lateral) — ihr Durchfluss zweigt ebenfalls von dieser Strecke ab.\" class=\"ec-tip\">?<\/span>",
                     "english": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>"
                 },
                 "next_translated": {
                     "key": "ip_km",
-                    "value": "K<sub>m<\/sub> <span title=\"Generischer Einzelwiderstands-Beiwert für Armaturen, Ventile und Kupplungen dieser Strecke (Minimum ≥0,5 empfohlen)\" class=\"ec-tip\">?<\/span>",
+                    "value": "k<sub>m<\/sub> <span title=\"Allgemeiner Einzelverlust-Beiwert für Armaturen, Ventile und Kupplungen dieser Strecke (empfohlener Mindestwert ≥0,5)\" class=\"ec-tip\">?<\/span>",
                     "english": "k<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
                 }
             }
@@ -980,58 +934,68 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "Emitter <span title=\"Laterale Reihen: Emitter in dieser Strecke nur. Hauptleitungsreihen: Gesamtemitter auf Leitungen AUSSER dieser, die von dieser Strecke abzweigen. Für die Strecke rechts neben der Abzweigstelle der Testleitung selbst zählen auch alle Leitungen noch weiter unten in der Hauptleitung oder an derselben Verbindung (z. B. eine Gegenleitung) — ihr Durchfluss fließt durch diese gleiche Strecke ab, ob hier aufgelistet oder nicht.\" class=\"ec-tip\">?<\/span>",
+                    "value": "Emitter <span title=\"Lateral-Zeilen: nur die Emitter in dieser Strecke. Hauptleitungs-Zeilen: Gesamtzahl der Emitter auf Lateralen AUSSER diesem, die von dieser Strecke abzweigen. Für die Strecke der Hauptleitung, die an der Testleitung endet, zählen zusätzlich alle Laterale, die weiter entlang der Hauptleitung liegen, oder die denselben Knotenpunkt teilen (z. B. ein gegenüberliegendes Lateral) — ihr Durchfluss zweigt ebenfalls von dieser Strecke ab.\" class=\"ec-tip\">?<\/span>",
                     "english": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>"
                 },
                 "next_translated": {
                     "key": "ip_km",
-                    "value": "K<sub>m<\/sub> <span title=\"Generischer Einzelwiderstands-Beiwert für Armaturen, Ventile und Kupplungen dieser Strecke (Minimum ≥0,5 empfohlen)\" class=\"ec-tip\">?<\/span>",
+                    "value": "k<sub>m<\/sub> <span title=\"Allgemeiner Einzelverlust-Beiwert für Armaturen, Ventile und Kupplungen dieser Strecke (empfohlener Mindestwert ≥0,5)\" class=\"ec-tip\">?<\/span>",
                     "english": "k<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
                 }
             }
         },
         "ip_roughness": {
-            "reason": "missing",
-            "current_value": null,
+            "reason": "equal_to_english",
+            "current_value": "e",
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "Emitter <span title=\"Laterale Reihen: Emitter in dieser Strecke nur. Hauptleitungsreihen: Gesamtemitter auf Leitungen AUSSER dieser, die von dieser Strecke abzweigen. Für die Strecke rechts neben der Abzweigstelle der Testleitung selbst zählen auch alle Leitungen noch weiter unten in der Hauptleitung oder an derselben Verbindung (z. B. eine Gegenleitung) — ihr Durchfluss fließt durch diese gleiche Strecke ab, ob hier aufgelistet oder nicht.\" class=\"ec-tip\">?<\/span>",
+                    "value": "Emitter <span title=\"Lateral-Zeilen: nur die Emitter in dieser Strecke. Hauptleitungs-Zeilen: Gesamtzahl der Emitter auf Lateralen AUSSER diesem, die von dieser Strecke abzweigen. Für die Strecke der Hauptleitung, die an der Testleitung endet, zählen zusätzlich alle Laterale, die weiter entlang der Hauptleitung liegen, oder die denselben Knotenpunkt teilen (z. B. ein gegenüberliegendes Lateral) — ihr Durchfluss zweigt ebenfalls von dieser Strecke ab.\" class=\"ec-tip\">?<\/span>",
                     "english": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>"
                 },
                 "next_translated": {
                     "key": "ip_km",
-                    "value": "K<sub>m<\/sub> <span title=\"Generischer Einzelwiderstands-Beiwert für Armaturen, Ventile und Kupplungen dieser Strecke (Minimum ≥0,5 empfohlen)\" class=\"ec-tip\">?<\/span>",
+                    "value": "k<sub>m<\/sub> <span title=\"Allgemeiner Einzelverlust-Beiwert für Armaturen, Ventile und Kupplungen dieser Strecke (empfohlener Mindestwert ≥0,5)\" class=\"ec-tip\">?<\/span>",
                     "english": "k<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
                 }
             }
         },
-        "irr_card_pressure_head": {
-            "reason": "missing",
-            "current_value": null,
+        "ip_hf": {
+            "reason": "equal_to_english",
+            "current_value": "h<sub>f<\/sub>",
             "neighbors": {
                 "previous_translated": {
-                    "key": "ip_notes_5_def",
-                    "value": "Anwendungsrate und System-\/Zonen-Durchfluss verwenden den geschätzten durchschnittlichen Emitter-Feldurchfluss (q<sub>avg,field<\/sub> — den eigenen Durchschnitt der Testleitung, korrigiert durch die eingegebene Druckunterschied-Schätzung), nicht einen geschätzten Satz: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub>, gespeist von dem korrigierten modellierten Wert. Abstand und systemweite Lateral-\/Emitter-Anzahlen sind separate Eingaben hier, da der Testpfad nur einen Schlechtfall-Zweig modelliert, nicht jeden Lateral im Feld.",
-                    "english": "Application rate and system\/zone flow use the estimated field-average emitter flow (q<sub>avg,field<\/sub> &mdash; the test lateral&rsquo;s own average, corrected by the entered &Delta;pressure estimate), not a guessed rate: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub>, fed by the corrected modeled value. Spacing and system-wide lateral\/emitter counts are separate inputs here because the test path only models one worst-case branch, not every lateral in the field."
+                    "key": "ip_press",
+                    "value": "Druck",
+                    "english": "Press."
                 },
-                "next_translated": null
+                "next_translated": {
+                    "key": "ip_hl",
+                    "value": "h<sub>L<\/sub> <span title=\"Gesamter Streckenverlust, h_f + h_m\" class=\"ec-tip\">?<\/span>",
+                    "english": "h<sub>L<\/sub> <span title=\"Total reach loss, h_f + h_m\" class=\"ec-tip\">?<\/span>"
+                }
             }
         },
-        "irr_card_pressure_desc": {
-            "reason": "missing",
-            "current_value": null,
+        "ip_hm": {
+            "reason": "equal_to_english",
+            "current_value": "h<sub>m<\/sub>",
             "neighbors": {
                 "previous_translated": {
-                    "key": "ip_notes_5_def",
-                    "value": "Anwendungsrate und System-\/Zonen-Durchfluss verwenden den geschätzten durchschnittlichen Emitter-Feldurchfluss (q<sub>avg,field<\/sub> — den eigenen Durchschnitt der Testleitung, korrigiert durch die eingegebene Druckunterschied-Schätzung), nicht einen geschätzten Satz: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub>, gespeist von dem korrigierten modellierten Wert. Abstand und systemweite Lateral-\/Emitter-Anzahlen sind separate Eingaben hier, da der Testpfad nur einen Schlechtfall-Zweig modelliert, nicht jeden Lateral im Feld.",
-                    "english": "Application rate and system\/zone flow use the estimated field-average emitter flow (q<sub>avg,field<\/sub> &mdash; the test lateral&rsquo;s own average, corrected by the entered &Delta;pressure estimate), not a guessed rate: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub>, fed by the corrected modeled value. Spacing and system-wide lateral\/emitter counts are separate inputs here because the test path only models one worst-case branch, not every lateral in the field."
+                    "key": "ip_press",
+                    "value": "Druck",
+                    "english": "Press."
                 },
-                "next_translated": null
+                "next_translated": {
+                    "key": "ip_hl",
+                    "value": "h<sub>L<\/sub> <span title=\"Gesamter Streckenverlust, h_f + h_m\" class=\"ec-tip\">?<\/span>",
+                    "english": "h<sub>L<\/sub> <span title=\"Total reach loss, h_f + h_m\" class=\"ec-tip\">?<\/span>"
+                }
             }
         }
     },
     "key_intent": {
-        "mi_station": "Station (chainage, distance along the alignment) of this point — \"Distance\" is an acceptable alias where the surveying sense of \"station\" has no natural short word"
+        "mi_station": "Station (chainage, distance along the alignment) of this point — \"Distance\" is an acceptable alias where the surveying sense of \"station\" has no natural short word",
+        "ip_hf": "Friction head loss.",
+        "ip_hm": "Minor (local) head loss."
     }
 }

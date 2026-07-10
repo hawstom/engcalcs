@@ -6,7 +6,6 @@
         "active_prefixes": [
             "calc",
             "ip",
-            "irr",
             "mhp",
             "mi",
             "odt",
@@ -20,8 +19,7 @@
     },
     "prompt_context_by_prefix": {
         "calc": "Use these preferred technical term translations when relevant:\n- flow (Q): protok\n- velocity (v): brzina\n- slope (S): nagib",
-        "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): protok\n- velocity (v): brzina\n- head loss (h_L): gubitak tlačne visine\n- emitter: emiter\n- distribution uniformity (DU): ravnomjernost raspodjele\n- low-quarter distribution uniformity (DU_lq): [needs translation sprint]\n- application rate (PR): intenzitet navodnjavanja\n- lateral: laterala\n- mainline: glavni cjevovod\n- reach: dionica\n- velocity head (H_v): brzinska visina\n- friction loss (h_f): gubici trenja\n- minor loss (h_m): lokalni gubici\n- energy grade line (EGL): energetska linija\n- upstream: uzvodno\n- downstream: nizvodno",
-        "irr": "Use these preferred technical term translations when relevant:\n- flow (Q): protok\n- weir: preljev\n- orifice: otvor\n- seepage: procjeđivanje\n- conveyance efficiency (E_c): učinkovitost prijenosa\n- check structure: [needs translation sprint]",
+        "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): protok\n- velocity (v): brzina\n- head loss (h_L): gubitak tlačne visine\n- emitter: emiter\n- distribution uniformity (DU): ravnomjernost raspodjele\n- low-quarter distribution uniformity (DU_lq): jednolikost distribucije niske grupe\n- application rate (PR): intenzitet navodnjavanja\n- lateral: laterala\n- mainline: glavni cjevovod\n- reach: dionica\n- velocity head (H_v): brzinska visina\n- friction loss (h_f): gubici trenja\n- minor loss (h_m): lokalni gubici\n- energy grade line (EGL): energetska linija\n- upstream: uzvodno\n- downstream: nizvodno",
         "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): protok\n- penstock: tlačni cjevovod\n- gross head (H_gross): bruto visinski pad\n- net head (H_net): neto visinski pad\n- plant efficiency (η): učinkovitost postrojenja\n- head loss (h_L): gubitak tlačne visine\n- run-of-river: protočna hidroelektrana\n- headworks: vodozahvatna građevina\n- junction loss (h_m): lokalni gubici\n- minor loss (h_m): lokalni gubici",
         "mi": "Use these preferred technical term translations when relevant:\n- flow (Q): protok\n- velocity (v): brzina\n- hydraulic radius (R_h): hidraulički polumjer\n- wetted perimeter (P_w): močeni opseg\n- Manning roughness (n): Manningov koeficijent hrapavosti\n- slope (S): nagib\n- irregular channel: kanal nepravilnog presjeka",
         "odt": "Use these preferred technical term translations when relevant:\n- orifice: otvor\n- discharge coefficient (C_d): koeficijent istjecanja\n- headwater elevation: razina uzvodne vode\n- tailwater elevation: razina nizvodne vode\n- crown: [needs translation sprint]",
@@ -91,8 +89,8 @@
                 "term": "low-quarter distribution uniformity",
                 "symbol": "DU_lq",
                 "context": "Irrigation statistic: average of the lowest quarter of measured emitter flows divided by the overall average. Referenced in Irrigation Pressure notes as \"textbook low-quarter Distribution Uniformity\".",
-                "translation_notes": "Use the established irrigation-engineering phrase; do not invent one. \"Textbook\" is an adjective meaning \"as defined in standard textbooks\" — fr rendered it \"manuel\" (manual check), wrong. he: uniformity = אחידות, never the nonword הוודות.",
-                "preferred_translation": ""
+                "translation_notes": "Use the established irrigation-engineering phrase; do not invent one. \"Textbook\" is an adjective meaning \"as defined in standard textbooks\" — fr rendered it \"manuel\" (manual check), wrong. he: uniformity = אחידות, never the nonword הוודות. Wave-1 coinages (2026-07, category-4 sprint): fr=\"uniformité de distribution du quart inférieur\", ro=\"Uniformitatea Distribuției de sfert inferior\", ru=\"равномерность распределения по нижней четверти\", uk=\"рівномірність розподілу по низькій чверті\", bg=\"равномерност на разпределение по долната четвърт\", sr=\"равномерност расподеле нижег квартила\", hr=\"jednolikost distribucije niske grupe\", cs=\"Uniformita distribuce nízké čtvrtiny\", tr=\"düşük-çeyrek Dağıtım Uniformluğu\", id=\"Keseragaman Distribusi kuartal-bawah\". es\/pt\/it\/de already had glossary coverage pre-sprint. Not yet native-reviewed.",
+                "preferred_translation": "jednolikost distribucije niske grupe"
             },
             {
                 "term": "application rate",
@@ -163,50 +161,6 @@
                 "context": "Direction away from the supply, toward the outlet \/ last emitter.",
                 "translation_notes": "Never software \"downgrade\". ar: downstream = المصب \/ أسفل المجرى (a file used المنبعية = source-side, wrong).",
                 "preferred_translation": "nizvodno"
-            }
-        ],
-        "irr": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered. ENGINEER CLARIFICATION (2026-07-06): 'дебит is a typical colloquial call of the word — regular people and non-hydraulic engineers use it. In university (hydraulic engineering) they used водно количество for Q, never дебит. I guess both work.' So both are acceptable; водно количество is the academic\/hydraulic-engineering register, дебит the general register. Still an open decision whether to standardize on водно количество suite-wide.",
-                "preferred_translation": "protok"
-            },
-            {
-                "term": "weir",
-                "symbol": "",
-                "context": "A flow-measurement or water-control structure — a barrier across a channel over which water flows. Appears in Weir Flow Simple and Weir Flow Irregular calculators.",
-                "translation_notes": "WMO No. 385 entry 1665 confirms: es = 'vertedero', fr = 'déversoir', ru = 'водослив'. In an irrigation context, the term often overlaps with 'diversion dam' or 'check structure'. Use the term most common among irrigation field workers in the target language, not a purely civil-engineering dictionary term.",
-                "preferred_translation": "preljev"
-            },
-            {
-                "term": "orifice",
-                "symbol": "",
-                "context": "A submerged or free-flowing opening through which water discharges under head. Appears in Orifice Flow and Orifice Drain Time calculators.",
-                "translation_notes": "In irrigation contexts, often the opening of a headgate or pipe turnout. Use the hydraulic engineering term, not a general word for 'hole' or 'opening'.",
-                "preferred_translation": "otvor"
-            },
-            {
-                "term": "seepage",
-                "symbol": "",
-                "context": "Water lost from a canal through the bed and banks by percolation into the soil. Appears in Canal Seepage calculator.",
-                "translation_notes": "Use the irrigation\/canal engineering term for slow percolation loss, not a word implying leakage through a crack or structural failure.",
-                "preferred_translation": "procjeđivanje"
-            },
-            {
-                "term": "conveyance efficiency",
-                "symbol": "E_c",
-                "context": "Ratio of outflow to inflow in a canal reach — measures how much water delivered at the head is received at the tail. Appears in Canal Seepage calculator. E_c = Q_out \/ Q_in.",
-                "translation_notes": "This is the most terminology-sensitive term in the suite. 'Conveyance' means transport of water along a canal — do not use a general word for 'efficiency' alone. The term should convey 'how well the canal transports water without loss'.",
-                "preferred_translation": "učinkovitost prijenosa"
-            },
-            {
-                "term": "check structure",
-                "symbol": "",
-                "context": "A small flow-control structure (gate or board structure) in an irrigation canal, used to raise ('check') the upstream water level for diversion or measurement. 'Check' is part of the structure's name.",
-                "translation_notes": "Use the local irrigation term for a canal check\/control gate. 'Check' here is NOT the verb 'to verify\/inspect' — do not translate as 'inspect the structure'.",
-                "preferred_translation": ""
             }
         ],
         "mhp": [
@@ -511,8 +465,8 @@
         "ip_length": "L",
         "ip_diameter": "D",
         "ip_roughness": "e",
-        "irr_card_pressure_head": "Irrigation Pressure &amp; Uniformity",
-        "irr_card_pressure_desc": "Model the pressure and flow profile along a main-lateral-emitter branch to estimate distribution uniformity from the real test-path pressure, not just a catalog emitter flow rate."
+        "ip_hf": "h<sub>f<\/sub>",
+        "ip_hm": "h<sub>m<\/sub>"
     },
     "keys": {
         "calc_copy_link": "Copy link",
@@ -534,8 +488,8 @@
         "ip_length": "L",
         "ip_diameter": "D",
         "ip_roughness": "e",
-        "irr_card_pressure_head": "Irrigation Pressure &amp; Uniformity",
-        "irr_card_pressure_desc": "Model the pressure and flow profile along a main-lateral-emitter branch to estimate distribution uniformity from the real test-path pressure, not just a catalog emitter flow rate."
+        "ip_hf": "h<sub>f<\/sub>",
+        "ip_hm": "h<sub>m<\/sub>"
     },
     "key_context": {
         "calc_copy_link": {
@@ -805,7 +759,7 @@
                 },
                 "next_translated": {
                     "key": "ip_km",
-                    "value": "K<sub>m<\/sub> <span title=\"Generički koeficijent lokalnog gubitka za fitinge\/ventile\/spojnice ove dionice (&ge;0,5 preporučeni minimum)\" class=\"ec-tip\">?<\/span>",
+                    "value": "k<sub>m<\/sub> <span title=\"Generički koeficijent lokalnog gubitka za fitinge\/ventile\/spojnice ove dionice (&ge;0,5 preporučeni minimum)\" class=\"ec-tip\">?<\/span>",
                     "english": "k<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
                 }
             }
@@ -821,14 +775,14 @@
                 },
                 "next_translated": {
                     "key": "ip_km",
-                    "value": "K<sub>m<\/sub> <span title=\"Generički koeficijent lokalnog gubitka za fitinge\/ventile\/spojnice ove dionice (&ge;0,5 preporučeni minimum)\" class=\"ec-tip\">?<\/span>",
+                    "value": "k<sub>m<\/sub> <span title=\"Generički koeficijent lokalnog gubitka za fitinge\/ventile\/spojnice ove dionice (&ge;0,5 preporučeni minimum)\" class=\"ec-tip\">?<\/span>",
                     "english": "k<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
                 }
             }
         },
         "ip_roughness": {
-            "reason": "missing",
-            "current_value": null,
+            "reason": "equal_to_english",
+            "current_value": "e",
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
@@ -837,35 +791,46 @@
                 },
                 "next_translated": {
                     "key": "ip_km",
-                    "value": "K<sub>m<\/sub> <span title=\"Generički koeficijent lokalnog gubitka za fitinge\/ventile\/spojnice ove dionice (&ge;0,5 preporučeni minimum)\" class=\"ec-tip\">?<\/span>",
+                    "value": "k<sub>m<\/sub> <span title=\"Generički koeficijent lokalnog gubitka za fitinge\/ventile\/spojnice ove dionice (&ge;0,5 preporučeni minimum)\" class=\"ec-tip\">?<\/span>",
                     "english": "k<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
                 }
             }
         },
-        "irr_card_pressure_head": {
-            "reason": "missing",
-            "current_value": null,
+        "ip_hf": {
+            "reason": "equal_to_english",
+            "current_value": "h<sub>f<\/sub>",
             "neighbors": {
                 "previous_translated": {
-                    "key": "ip_notes_5_def",
-                    "value": "Norma primjene i tok sustava\/zone koriste procijenjeni prosječan protok emitera na poljima (q<sub>avg,field<\/sub> — vlastiti prosječan testne laterale, ispravljeni unešenom procjenom &Delta;tlaka), ne pogađan tok: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub>, hranjena ispravljenom modeliranom vrijednosti. Razmak i broji laterala\/emitera na razini cijelog sustava su odvojeni unosi jer testni put modelira samo jednu najgoru granu, ne svaku lateralu u poljima.",
-                    "english": "Application rate and system\/zone flow use the estimated field-average emitter flow (q<sub>avg,field<\/sub> &mdash; the test lateral&rsquo;s own average, corrected by the entered &Delta;pressure estimate), not a guessed rate: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub>, fed by the corrected modeled value. Spacing and system-wide lateral\/emitter counts are separate inputs here because the test path only models one worst-case branch, not every lateral in the field."
+                    "key": "ip_press",
+                    "value": "Tlak",
+                    "english": "Press."
                 },
-                "next_translated": null
+                "next_translated": {
+                    "key": "ip_hl",
+                    "value": "h<sub>L<\/sub> <span title=\"Ukupan gubitak dionice, h_f + h_m\" class=\"ec-tip\">?<\/span>",
+                    "english": "h<sub>L<\/sub> <span title=\"Total reach loss, h_f + h_m\" class=\"ec-tip\">?<\/span>"
+                }
             }
         },
-        "irr_card_pressure_desc": {
-            "reason": "missing",
-            "current_value": null,
+        "ip_hm": {
+            "reason": "equal_to_english",
+            "current_value": "h<sub>m<\/sub>",
             "neighbors": {
                 "previous_translated": {
-                    "key": "ip_notes_5_def",
-                    "value": "Norma primjene i tok sustava\/zone koriste procijenjeni prosječan protok emitera na poljima (q<sub>avg,field<\/sub> — vlastiti prosječan testne laterale, ispravljeni unešenom procjenom &Delta;tlaka), ne pogađan tok: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub>, hranjena ispravljenom modeliranom vrijednosti. Razmak i broji laterala\/emitera na razini cijelog sustava su odvojeni unosi jer testni put modelira samo jednu najgoru granu, ne svaku lateralu u poljima.",
-                    "english": "Application rate and system\/zone flow use the estimated field-average emitter flow (q<sub>avg,field<\/sub> &mdash; the test lateral&rsquo;s own average, corrected by the entered &Delta;pressure estimate), not a guessed rate: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub>, fed by the corrected modeled value. Spacing and system-wide lateral\/emitter counts are separate inputs here because the test path only models one worst-case branch, not every lateral in the field."
+                    "key": "ip_press",
+                    "value": "Tlak",
+                    "english": "Press."
                 },
-                "next_translated": null
+                "next_translated": {
+                    "key": "ip_hl",
+                    "value": "h<sub>L<\/sub> <span title=\"Ukupan gubitak dionice, h_f + h_m\" class=\"ec-tip\">?<\/span>",
+                    "english": "h<sub>L<\/sub> <span title=\"Total reach loss, h_f + h_m\" class=\"ec-tip\">?<\/span>"
+                }
             }
         }
     },
-    "key_intent": []
+    "key_intent": {
+        "ip_hf": "Friction head loss.",
+        "ip_hm": "Minor (local) head loss."
+    }
 }

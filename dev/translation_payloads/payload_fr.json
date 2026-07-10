@@ -2,7 +2,7 @@
     "meta": {
         "language": "fr",
         "expected_key_count": 482,
-        "delta_key_count": 28,
+        "delta_key_count": 27,
         "active_prefixes": [
             "calc",
             "contact",
@@ -27,7 +27,7 @@
         "contact": "Use these preferred technical term translations when relevant:\n- flow (Q): débit\n- velocity (v): vitesse\n- slope (S): pente",
         "dw": "Use these preferred technical term translations when relevant:\n- flow (Q): débit\n- velocity (v): vitesse\n- head loss (h_L): perte de charge\n- friction factor (f): facteur de frottement\n- slope (S): pente\n- laminar: laminaire\n- transitional: de transition\n- turbulent: turbulent",
         "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): débit\n- velocity (v): vitesse\n- head loss (h_L): perte de charge\n- emitter: émetteur\n- distribution uniformity (DU): uniformité de distribution\n- low-quarter distribution uniformity (DU_lq): uniformité de distribution du quart inférieur\n- application rate (PR): taux d'application\n- lateral: rampe\n- mainline: conduite principale\n- reach: tronçon\n- velocity head (H_v): hauteur de vitesse\n- friction loss (h_f): perte de charge par frottement\n- minor loss (h_m): perte de charge singulière\n- energy grade line (EGL): ligne d'énergie\n- upstream: amont\n- downstream: aval",
-        "irr": "Use these preferred technical term translations when relevant:\n- flow (Q): débit\n- weir: déversoir\n- orifice: orifice\n- seepage: infiltration\n- conveyance efficiency (E_c): rendement de transport d'eau\n- check structure: [needs translation sprint]",
+        "irr": "Use these preferred technical term translations when relevant:\n- flow (Q): débit\n- weir: déversoir\n- orifice: orifice\n- seepage: infiltration\n- conveyance efficiency (E_c): rendement de transport d'eau\n- check structure: ouvrage de régulation",
         "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): débit\n- penstock: conduite forcée\n- gross head (H_gross): hauteur brute\n- net head (H_net): hauteur nette\n- plant efficiency (η): rendement de l'installation\n- head loss (h_L): perte de charge\n- run-of-river: au fil de l'eau\n- headworks: ouvrage de prise d'eau\n- junction loss (h_m): pertes singulières\n- minor loss (h_m): perte de charge singulière",
         "mi": "Use these preferred technical term translations when relevant:\n- flow (Q): débit\n- velocity (v): vitesse\n- hydraulic radius (R_h): rayon hydraulique\n- wetted perimeter (P_w): périmètre mouillé\n- Manning roughness (n): coefficient de rugosité de Manning\n- slope (S): pente\n- irregular channel: canal à section irrégulière",
         "mtc": "Use these preferred technical term translations when relevant:\n- flow (Q): débit\n- velocity (v): vitesse\n- hydraulic radius (R_h): rayon hydraulique\n- wetted perimeter (P_w): périmètre mouillé\n- Manning roughness (n): coefficient de rugosité de Manning\n- slope (S): pente",
@@ -180,7 +180,7 @@
                 "term": "low-quarter distribution uniformity",
                 "symbol": "DU_lq",
                 "context": "Irrigation statistic: average of the lowest quarter of measured emitter flows divided by the overall average. Referenced in Irrigation Pressure notes as \"textbook low-quarter Distribution Uniformity\".",
-                "translation_notes": "Use the established irrigation-engineering phrase; do not invent one. \"Textbook\" is an adjective meaning \"as defined in standard textbooks\" — fr rendered it \"manuel\" (manual check), wrong. he: uniformity = אחידות, never the nonword הוודות.",
+                "translation_notes": "Use the established irrigation-engineering phrase; do not invent one. \"Textbook\" is an adjective meaning \"as defined in standard textbooks\" — fr rendered it \"manuel\" (manual check), wrong. he: uniformity = אחידות, never the nonword הוודות. Wave-1 coinages (2026-07, category-4 sprint): fr=\"uniformité de distribution du quart inférieur\", ro=\"Uniformitatea Distribuției de sfert inferior\", ru=\"равномерность распределения по нижней четверти\", uk=\"рівномірність розподілу по низькій чверті\", bg=\"равномерност на разпределение по долната четвърт\", sr=\"равномерност расподеле нижег квартила\", hr=\"jednolikost distribucije niske grupe\", cs=\"Uniformita distribuce nízké čtvrtiny\", tr=\"düşük-çeyrek Dağıtım Uniformluğu\", id=\"Keseragaman Distribusi kuartal-bawah\". es\/pt\/it\/de already had glossary coverage pre-sprint. Not yet native-reviewed.",
                 "preferred_translation": "uniformité de distribution du quart inférieur"
             },
             {
@@ -294,8 +294,8 @@
                 "term": "check structure",
                 "symbol": "",
                 "context": "A small flow-control structure (gate or board structure) in an irrigation canal, used to raise ('check') the upstream water level for diversion or measurement. 'Check' is part of the structure's name.",
-                "translation_notes": "Use the local irrigation term for a canal check\/control gate. 'Check' here is NOT the verb 'to verify\/inspect' — do not translate as 'inspect the structure'.",
-                "preferred_translation": ""
+                "translation_notes": "Use the local irrigation term for a canal check\/control gate. 'Check' here is NOT the verb 'to verify\/inspect' — do not translate as 'inspect the structure'. Wave-1 coinages (2026-07, category-4 sprint, this term had zero prior translations): es=\"estructura de control\", pt=\"estrutura de controle\", fr=\"ouvrage de régulation\", it=\"struttura di regolazione\", de=\"Kontrollbauwerk\", ro=\"stăvilar de control\", ru=\"регулирующее сооружение\", uk=\"контрольна споруда\", bg=\"контролно съоръжение\", sr=\"устава\", hr=\"regulacijska ustava\", cs=\"regulační objekt\", tr=\"kontrol yapısı\", id=\"bangunan pengatur\". Not yet reviewed by a native speaker; propagate to waves 2-3 for consistency.",
+                "preferred_translation": "ouvrage de régulation"
             }
         ],
         "mhp": [
@@ -673,9 +673,8 @@
         "ip_diameter": "D",
         "ip_roughness": "e",
         "ip_press": "Press.",
-        "ip_notes_3_term": "Limitations",
-        "irr_card_pressure_head": "Irrigation Pressure &amp; Uniformity",
-        "irr_card_pressure_desc": "Model the pressure and flow profile along a main-lateral-emitter branch to estimate distribution uniformity from the real test-path pressure, not just a catalog emitter flow rate."
+        "ip_hf": "h<sub>f<\/sub>",
+        "ip_hm": "h<sub>m<\/sub>"
     },
     "keys": {
         "u_depthFrac": "fraction",
@@ -703,9 +702,8 @@
         "ip_diameter": "D",
         "ip_roughness": "e",
         "ip_press": "Press.",
-        "ip_notes_3_term": "Limitations",
-        "irr_card_pressure_head": "Irrigation Pressure &amp; Uniformity",
-        "irr_card_pressure_desc": "Model the pressure and flow profile along a main-lateral-emitter branch to estimate distribution uniformity from the real test-path pressure, not just a catalog emitter flow rate."
+        "ip_hf": "h<sub>f<\/sub>",
+        "ip_hm": "h<sub>m<\/sub>"
     },
     "key_context": {
         "u_depthFrac": {
@@ -891,7 +889,7 @@
                 },
                 "next_translated": {
                     "key": "irr_main_title",
-                    "value": "Calculateurs en ligne gratuits de mesure du débit d'irrigation",
+                    "value": "Calculateurs en ligne gratuits de mesure du d'ebit d'irrigation",
                     "english": "Free Online Irrigation Flow Measurement Calculators"
                 }
             }
@@ -1046,12 +1044,12 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "Goutteurs <span title=\"Rangées de rampe : goutteurs dans ce tronçon uniquement. Rangées de main : total des goutteurs sur les rampes AUTRES que celle-ci qui se ramifient à partir de ce tronçon. Pour le tronçon au point de prise de la rampe de test elle-même, ceci inclut également les rampes au-delà de ce point le long de la main, ou partageant la même jonction (par exemple, une rampe de l'autre côté) – leur débit se divise à partir de ce même tronçon aussi.\" class=\"ec-tip\">?<\/span>",
+                    "value": "Goutteurs <span title=\"Rangées de rampe : goutteurs présents dans ce tronçon uniquement. Rangées de conduite principale : nombre total de goutteurs sur les rampes AUTRES que celle testée qui se raccordent à ce tronçon. Pour le tronçon de la conduite principale qui aboutit à la rampe testée, ceci inclut aussi toute rampe située plus loin le long de la conduite principale au-delà de ce point, ou partageant le même embranchement (par exemple une rampe du côté opposé) — leur débit se sépare aussi à partir de ce même tronçon.\" class=\"ec-tip\">?<\/span>",
                     "english": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>"
                 },
                 "next_translated": {
                     "key": "ip_km",
-                    "value": "K<sub>m<\/sub> <span title=\"Coefficient générique de perte mineure pour les raccords\/vannes\/coupleurs de ce tronçon (minimum suggéré ≥ 0,5)\" class=\"ec-tip\">?<\/span>",
+                    "value": "k<sub>m<\/sub> <span title=\"Coefficient générique de perte de charge singulière pour les raccords\/vannes\/coupleurs de ce tronçon (minimum suggéré ≥ 0,5)\" class=\"ec-tip\">?<\/span>",
                     "english": "k<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
                 }
             }
@@ -1062,28 +1060,28 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "Goutteurs <span title=\"Rangées de rampe : goutteurs dans ce tronçon uniquement. Rangées de main : total des goutteurs sur les rampes AUTRES que celle-ci qui se ramifient à partir de ce tronçon. Pour le tronçon au point de prise de la rampe de test elle-même, ceci inclut également les rampes au-delà de ce point le long de la main, ou partageant la même jonction (par exemple, une rampe de l'autre côté) – leur débit se divise à partir de ce même tronçon aussi.\" class=\"ec-tip\">?<\/span>",
+                    "value": "Goutteurs <span title=\"Rangées de rampe : goutteurs présents dans ce tronçon uniquement. Rangées de conduite principale : nombre total de goutteurs sur les rampes AUTRES que celle testée qui se raccordent à ce tronçon. Pour le tronçon de la conduite principale qui aboutit à la rampe testée, ceci inclut aussi toute rampe située plus loin le long de la conduite principale au-delà de ce point, ou partageant le même embranchement (par exemple une rampe du côté opposé) — leur débit se sépare aussi à partir de ce même tronçon.\" class=\"ec-tip\">?<\/span>",
                     "english": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>"
                 },
                 "next_translated": {
                     "key": "ip_km",
-                    "value": "K<sub>m<\/sub> <span title=\"Coefficient générique de perte mineure pour les raccords\/vannes\/coupleurs de ce tronçon (minimum suggéré ≥ 0,5)\" class=\"ec-tip\">?<\/span>",
+                    "value": "k<sub>m<\/sub> <span title=\"Coefficient générique de perte de charge singulière pour les raccords\/vannes\/coupleurs de ce tronçon (minimum suggéré ≥ 0,5)\" class=\"ec-tip\">?<\/span>",
                     "english": "k<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
                 }
             }
         },
         "ip_roughness": {
-            "reason": "missing",
-            "current_value": null,
+            "reason": "equal_to_english",
+            "current_value": "e",
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "Goutteurs <span title=\"Rangées de rampe : goutteurs dans ce tronçon uniquement. Rangées de main : total des goutteurs sur les rampes AUTRES que celle-ci qui se ramifient à partir de ce tronçon. Pour le tronçon au point de prise de la rampe de test elle-même, ceci inclut également les rampes au-delà de ce point le long de la main, ou partageant la même jonction (par exemple, une rampe de l'autre côté) – leur débit se divise à partir de ce même tronçon aussi.\" class=\"ec-tip\">?<\/span>",
+                    "value": "Goutteurs <span title=\"Rangées de rampe : goutteurs présents dans ce tronçon uniquement. Rangées de conduite principale : nombre total de goutteurs sur les rampes AUTRES que celle testée qui se raccordent à ce tronçon. Pour le tronçon de la conduite principale qui aboutit à la rampe testée, ceci inclut aussi toute rampe située plus loin le long de la conduite principale au-delà de ce point, ou partageant le même embranchement (par exemple une rampe du côté opposé) — leur débit se sépare aussi à partir de ce même tronçon.\" class=\"ec-tip\">?<\/span>",
                     "english": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>"
                 },
                 "next_translated": {
                     "key": "ip_km",
-                    "value": "K<sub>m<\/sub> <span title=\"Coefficient générique de perte mineure pour les raccords\/vannes\/coupleurs de ce tronçon (minimum suggéré ≥ 0,5)\" class=\"ec-tip\">?<\/span>",
+                    "value": "k<sub>m<\/sub> <span title=\"Coefficient générique de perte de charge singulière pour les raccords\/vannes\/coupleurs de ce tronçon (minimum suggéré ≥ 0,5)\" class=\"ec-tip\">?<\/span>",
                     "english": "k<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
                 }
             }
@@ -1098,52 +1096,47 @@
                     "english": "Flow"
                 },
                 "next_translated": {
-                    "key": "ip_hf",
-                    "value": "H<sub>f<\/sub>",
-                    "english": "h<sub>f<\/sub>"
+                    "key": "ip_hl",
+                    "value": "h<sub>L<\/sub> <span title=\"Perte totale du tronçon, h_f + h_m\" class=\"ec-tip\">?<\/span>",
+                    "english": "h<sub>L<\/sub> <span title=\"Total reach loss, h_f + h_m\" class=\"ec-tip\">?<\/span>"
                 }
             }
         },
-        "ip_notes_3_term": {
+        "ip_hf": {
             "reason": "equal_to_english",
-            "current_value": "Limitations",
+            "current_value": "h<sub>f<\/sub>",
             "neighbors": {
                 "previous_translated": {
-                    "key": "ip_notes_2_def",
-                    "value": "Chaque rangée est un tronçon le long du seul cheminement hydrauliquement au pire cas (cheminement de test) de l'alimentation au dernier goutteur. Un tronçon Main ne transmet le débit qu'aux rampes ne faisant pas partie du cheminement de test, donc son prélèvement est une multiplication plate (débit de conception × compte total de goutteur du tronçon) – pas de sensibilité de pression locale. La main est une conduite-mère partagée, donc le tronçon au point de prise de la rampe de test elle-même doit inclure non seulement les rampes entre ses propres extrémités mais aussi les rampes encore plus bas le long de la main au-delà de cette prise, ou partageant la même jonction (par exemple, une rampe de l'autre côté) – leur débit se divise à partir de ce même tronçon avant de se diviser, qu'elles apparaissent ou non ailleurs dans ce tableau. Un tronçon Rampe est un segment de la rampe de test elle-même : le débit du goutteur est calculé à partir de la pression locale réelle via q = k·H<sup>x<\/sup>, et la perte par friction est réduite par le facteur F(n) de Christiansen pour tenir compte du débit diminuant à mesure que chaque goutteur du tronçon prélève.",
-                    "english": "Each row is one reach along the single hydraulically worst path (the test path) from the supply to the last emitter. A Main reach only passes flow to laterals not on the test path, so its withdrawal is a simple multiplication (design flow &times; the reach&rsquo;s total emitter count) &mdash; no local pressure sensitivity. The main is a shared trunk pipe, so the reach of the main line that ends at the test lateral line must include not just laterals between its own endpoints but also any laterals still further down the main beyond that point, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow travels through that same reach before splitting off, whether or not they appear anywhere else in this table. A Lateral reach is a segment of the test lateral itself: emitter discharge is computed from the actual local pressure via q = k&middot;H<sup>x<\/sup>, and friction loss is reduced by Christiansen&rsquo;s F(n) factor to account for flow decreasing as each emitter in the reach withdraws water."
+                    "key": "ip_flow",
+                    "value": "Débit",
+                    "english": "Flow"
                 },
                 "next_translated": {
-                    "key": "ip_notes_3_def",
-                    "value": "Modélise une pression d'admission fixe (pas de courbe de pompe), un seul cheminement de test (pas le champ complet), et une courbe de goutteur à 2 paramètres (réglez l'exposant près de 0 pour approximer un goutteur auto-régulant). Deux ratios différents sont rapportés, délibérément séparés : q<sub>dernier<\/sub>\/q<sub>moy,terrain<\/sub> est un contrôle d'uniformité, de forme similaire au contrôle manuel d'uniformité de distribution de bas quartile (moyenne du groupe bas ÷ moyenne de la population) mais calculé à partir des goutteurs modélisés de la rampe de test elle-même, corrigé par une estimation Δpression saisie plutôt qu'un échantillon statistique complet sur le terrain – la rampe de test est délibérément le pire cas présumé, sa moyenne brute non corrigée sous-estimerait la vraie moyenne de terrain et rendrait l'uniformité meilleure qu'elle ne l'est ; l'entrée Δpression existe spécifiquement pour contrer ce biais. Les valeurs à 1 ou au-dessus restent possibles (par exemple, l'estimation Δpression est trop faible, ou une course favorable en pente descendante). q<sub>dernier<\/sub>\/q<sub>conception<\/sub> est un contrôle différent, non-uniformité, contre le débit nominal du fabricant – utile pour détecter un système globalement sur- ou sous-pressurisé, mais pas un substitut au chiffre d'uniformité, puisque le débit de conception\/nominal n'a aucune relation nécessaire à la pression moyenne de fonctionnement réelle du système.",
-                    "english": "Models one fixed supply pressure (no pump curve), one test path only (not the full field), and a 2-parameter emitter curve (set the exponent near 0 to approximate a pressure-compensating emitter). Two different uniformity ratios are reported, deliberately kept separate: q<sub>last<\/sub>\/q<sub>avg,field<\/sub> is an approximation of the standard low-quarter Distribution Uniformity (low-group average &divide; population mean); but this is from a small modeled sample and a user-estimated correction instead of the standard full-field statistical sample. Also, the test lateral is deliberately the presumed worst case, so its raw, uncorrected average would understate the true field average and make uniformity look better than it is; the &Delta;pressure input exists specifically to counter that bias. Values for uniformity at or above 1 are still possible: they only mean that the last emitter&rsquo;s pressure is at or above the estimated field average, so some other emitter is the point of lowest pressure. This could be because the last emitter is on low ground or because the &Delta;pressure estimate is too small. q<sub>last<\/sub>\/q<sub>design<\/sub> is a different, non-uniformity check against the manufacturer&rsquo;s rated flow &mdash; useful for detecting an over- or under-pressured system overall, but it is a separate check to read alongside the uniformity number, since the design\/rated flow is independent of the system&rsquo;s actual mean operating pressure."
+                    "key": "ip_hl",
+                    "value": "h<sub>L<\/sub> <span title=\"Perte totale du tronçon, h_f + h_m\" class=\"ec-tip\">?<\/span>",
+                    "english": "h<sub>L<\/sub> <span title=\"Total reach loss, h_f + h_m\" class=\"ec-tip\">?<\/span>"
                 }
             }
         },
-        "irr_card_pressure_head": {
-            "reason": "missing",
-            "current_value": null,
+        "ip_hm": {
+            "reason": "equal_to_english",
+            "current_value": "h<sub>m<\/sub>",
             "neighbors": {
                 "previous_translated": {
-                    "key": "ip_notes_5_def",
-                    "value": "Le taux d'application et le débit de la zone\/système utilisent le débit moyen estimé du goutteur sur le terrain (q<sub>moy,terrain<\/sub> – la propre moyenne de la rampe de test, corrigée par l'estimation Δpression saisie), pas un taux deviné : PR = q<sub>moy,terrain<\/sub> \/ A<sub>e<\/sub>, alimenté par la valeur modélisée corrigée. L'espacement et les comptes latéraux\/goutteurs à l'échelle du système sont des entrées séparées ici car le cheminement de test modélise uniquement une branche au pire cas, pas chaque rampe du champ.",
-                    "english": "Application rate and system\/zone flow use the estimated field-average emitter flow (q<sub>avg,field<\/sub> &mdash; the test lateral&rsquo;s own average, corrected by the entered &Delta;pressure estimate), not a guessed rate: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub>, fed by the corrected modeled value. Spacing and system-wide lateral\/emitter counts are separate inputs here because the test path only models one worst-case branch, not every lateral in the field."
+                    "key": "ip_flow",
+                    "value": "Débit",
+                    "english": "Flow"
                 },
-                "next_translated": null
-            }
-        },
-        "irr_card_pressure_desc": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ip_notes_5_def",
-                    "value": "Le taux d'application et le débit de la zone\/système utilisent le débit moyen estimé du goutteur sur le terrain (q<sub>moy,terrain<\/sub> – la propre moyenne de la rampe de test, corrigée par l'estimation Δpression saisie), pas un taux deviné : PR = q<sub>moy,terrain<\/sub> \/ A<sub>e<\/sub>, alimenté par la valeur modélisée corrigée. L'espacement et les comptes latéraux\/goutteurs à l'échelle du système sont des entrées séparées ici car le cheminement de test modélise uniquement une branche au pire cas, pas chaque rampe du champ.",
-                    "english": "Application rate and system\/zone flow use the estimated field-average emitter flow (q<sub>avg,field<\/sub> &mdash; the test lateral&rsquo;s own average, corrected by the entered &Delta;pressure estimate), not a guessed rate: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub>, fed by the corrected modeled value. Spacing and system-wide lateral\/emitter counts are separate inputs here because the test path only models one worst-case branch, not every lateral in the field."
-                },
-                "next_translated": null
+                "next_translated": {
+                    "key": "ip_hl",
+                    "value": "h<sub>L<\/sub> <span title=\"Perte totale du tronçon, h_f + h_m\" class=\"ec-tip\">?<\/span>",
+                    "english": "h<sub>L<\/sub> <span title=\"Total reach loss, h_f + h_m\" class=\"ec-tip\">?<\/span>"
+                }
             }
         }
     },
-    "key_intent": []
+    "key_intent": {
+        "ip_hf": "Friction head loss.",
+        "ip_hm": "Minor (local) head loss."
+    }
 }
