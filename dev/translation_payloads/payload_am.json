@@ -2,10 +2,9 @@
     "meta": {
         "language": "am",
         "expected_key_count": 482,
-        "delta_key_count": 19,
+        "delta_key_count": 18,
         "active_prefixes": [
             "calc",
-            "dw",
             "ip",
             "irr",
             "mhp",
@@ -20,10 +19,9 @@
     },
     "prompt_context_by_prefix": {
         "calc": "Use these preferred technical term translations when relevant:\n- flow (Q): ፍሰት\n- velocity (v): ፍጥነት\n- slope (S): ቁልቁለት",
-        "dw": "Use these preferred technical term translations when relevant:\n- flow (Q): ፍሰት\n- velocity (v): ፍጥነት\n- head loss (h_L): ሄድ ኪሳራ\n- friction factor (f): ፍሪክሽን ፋክተር\n- slope (S): ቁልቁለት\n- laminar: ላሚናር\n- transitional: ሽግግራዊ\n- turbulent: ተርቡለንት",
-        "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): ፍሰት\n- velocity (v): ፍጥነት\n- head loss (h_L): ሄድ ኪሳራ\n- emitter: ኤሚተር\n- distribution uniformity (DU): የስርጭት ወጥነት\n- low-quarter distribution uniformity (DU_lq): [needs translation sprint]\n- application rate (PR): የልፍፍ መጠን\n- lateral: ላተራል\n- mainline: ዋና መስመር\n- reach: ክፍል\n- velocity head (H_v): [needs translation sprint]\n- friction loss (h_f): [needs translation sprint]\n- minor loss (h_m): [needs translation sprint]\n- energy grade line (EGL): የኃይል መስመር\n- upstream: [needs translation sprint]\n- downstream: [needs translation sprint]",
+        "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): ፍሰት\n- velocity (v): ፍጥነት\n- head loss (h_L): ሄድ ኪሳራ\n- emitter: ኤሚተር\n- distribution uniformity (DU): የስርጭት ወጥነት\n- low-quarter distribution uniformity (DU_lq): [needs translation sprint]\n- application rate (PR): የልፍፍ መጠን\n- lateral: ላተራል\n- mainline: ዋና መስመር\n- reach: ክፍል\n- velocity head (H_v): [needs translation sprint]\n- friction loss (h_f): ፍሪክሽን ኪሳራ\n- minor loss (h_m): ጥቃቅን (አካባቢያዊ) ኪሳራ\n- energy grade line (EGL): የኃይል መስመር\n- upstream: [needs translation sprint]\n- downstream: [needs translation sprint]",
         "irr": "Use these preferred technical term translations when relevant:\n- flow (Q): ፍሰት\n- weir: ዊር\n- orifice: ቀዳዳ\n- seepage: ዘልቆ ማለፍ\n- conveyance efficiency (E_c): የቦይ ማጓጓዝ ብቃት\n- check structure: [needs translation sprint]",
-        "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): ፍሰት\n- penstock: ፔንስቶክ\n- gross head (H_gross): ጠቅላላ ሄድ\n- net head (H_net): ተጣራ ሄድ\n- plant efficiency (η): የሃይል ማመንጫ ብቃት\n- head loss (h_L): ሄድ ኪሳራ\n- run-of-river: ወንዝ-ፍሰት ሀይል\n- headworks: ርዕስ ስራ\n- junction loss (h_m): ተፋሰስ ኪሳራ\n- minor loss (h_m): [needs translation sprint]",
+        "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): ፍሰት\n- penstock: ፔንስቶክ\n- gross head (H_gross): ጠቅላላ ሄድ\n- net head (H_net): ተጣራ ሄድ\n- plant efficiency (η): የሃይል ማመንጫ ብቃት\n- head loss (h_L): ሄድ ኪሳራ\n- run-of-river: ወንዝ-ፍሰት ሀይል\n- headworks: ርዕስ ስራ\n- junction loss (h_m): ተፋሰስ ኪሳራ\n- minor loss (h_m): ጥቃቅን (አካባቢያዊ) ኪሳራ",
         "mtc": "Use these preferred technical term translations when relevant:\n- flow (Q): ፍሰት\n- velocity (v): ፍጥነት\n- hydraulic radius (R_h): ሃይድሮሊካዊ ራዲዩስ\n- wetted perimeter (P_w): የተራሰ ዙሪያ\n- Manning roughness (n): የማኒንግ ሻካርነት\n- slope (S): ቁልቁለት",
         "rc": "Use these preferred technical term translations when relevant:\n- flow (Q): ፍሰት\n- velocity (v): ፍጥነት\n- riprap: ሪፕራፕ\n- slope (S): ቁልቁለት\n- rock chute: ድንጋይ-ምቀጫ ቦዮ\n- chute: ፈጣን ቦዮ\n- unit discharge (q, q_t): ስፋት-ወሰን ፍሰት\n- median rock size (D50): የድንጋይ መካከለኛ መጠን\n- gradation (SD): የድንጋይ ቅንብር ስርጭት\n- porosity (n_p): ስርቅ\n- specific gravity (sg): ልዩ ስበት\n- ponding: [needs translation sprint]\n- outlet apron: [needs translation sprint]\n- weir head (H_p): [needs translation sprint]\n- upstream: [needs translation sprint]\n- downstream: [needs translation sprint]\n- reach: ክፍል"
     },
@@ -51,64 +49,6 @@
                 "preferred_translation": "ቁልቁለት"
             }
         ],
-        "dw": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered. ENGINEER CLARIFICATION (2026-07-06): 'дебит is a typical colloquial call of the word — regular people and non-hydraulic engineers use it. In university (hydraulic engineering) they used водно количество for Q, never дебит. I guess both work.' So both are acceptable; водно количество is the academic\/hydraulic-engineering register, дебит the general register. Still an open decision whether to standardize on водно количество suite-wide.",
-                "preferred_translation": "ፍሰት"
-            },
-            {
-                "term": "velocity",
-                "symbol": "v",
-                "context": "Flow velocity (speed of water). Appears in all calculators.",
-                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
-                "preferred_translation": "ፍጥነት"
-            },
-            {
-                "term": "head loss",
-                "symbol": "h_L",
-                "context": "Energy loss expressed as a height of water column. Appears in Darcy-Weisbach, Hazen-Williams, Manning pipe, and Penstock calculators. Distinct from 'pressure drop' — use the hydraulic engineering term.",
-                "translation_notes": "'Head' in the hydraulic sense (energy per unit weight) does not translate literally in many languages — use the established civil\/hydraulic engineering phrase. Pre-2026 sr\/hr human translations used 'gubitak pritiska' (= pressure loss), which is technically the same concept expressed in pressure terms rather than head terms. The current 'губитак напора \/ gubitak tlačne visine' (= loss of hydraulic head) is more precise in a hydraulic engineering context and is preferred. DATA-ERROR FIX 2026-07-09 (category-3 wave-1 sprint): ro\/tr\/id translations were pressure-loss-sense ('pierdere de presiune'\/'basınç kaybı'\/'kehilangan tekanan'), contradicting this note's own guidance. Independently flagged by both the ro and tr wave-1 translation agents; corrected to head-loss-sense ('pierdere de sarcină'\/'yük kaybı'\/'kehilangan tinggi tekan') to match what both agents actually used in lib\/lang.ec.ro.php and lib\/lang.ec.tr.php. de's 'Druckverlust' was left as-is (not flagged; German engineering practice uses pressure\/head loss terms more interchangeably in pipe-flow context) but is worth a second look in a future audit. DATA-ERROR FIX 2026-07-09 (category-3 fa sprint): fa was 'افت فشار' (literally 'pressure loss', same pressure-loss-sense defect class as the ro\/tr\/id fix above), while the fa file's own mphl_ head-loss labels already used 'افت هد' (head loss) and 'هد' is an established loanword elsewhere in the file (هد سرعت = velocity head). Standardized to 'افت هد' suite-wide for fa and fixed dw_\/hw_ labels in lib\/lang.ec.fa.php to match.",
-                "preferred_translation": "ሄድ ኪሳራ"
-            },
-            {
-                "term": "friction factor",
-                "symbol": "f",
-                "context": "Darcy-Weisbach friction factor. Dimensionless coefficient in the Darcy-Weisbach head loss equation. Distinct from Hazen-Williams C coefficient.",
-                "translation_notes": "Use the hydraulic\/civil engineering term. In some languages, 'friction' and 'resistance' terms compete — prefer 'friction' to match the Darcy-Weisbach naming convention.",
-                "preferred_translation": "ፍሪክሽን ፋክተር"
-            },
-            {
-                "term": "slope",
-                "symbol": "S",
-                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
-                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
-                "preferred_translation": "ቁልቁለት"
-            },
-            {
-                "term": "laminar",
-                "symbol": "",
-                "context": "Flow regime in which fluid moves in parallel layers with no lateral mixing. Reynolds number below ~2000. Appears in Darcy-Weisbach calculator flow regime check.",
-                "translation_notes": "Nearly always a direct cognate or borrowing from the Latin in technical languages. Confirm the local engineering convention.",
-                "preferred_translation": "ላሚናር"
-            },
-            {
-                "term": "transitional",
-                "symbol": "",
-                "context": "Flow regime between laminar and turbulent — Reynolds number roughly 2000–4000. Appears in Darcy-Weisbach calculator flow regime check.",
-                "translation_notes": "Use the adjective form meaning 'between two states'. Some languages use 'critical flow' for this regime — check local hydraulics convention.",
-                "preferred_translation": "ሽግግራዊ"
-            },
-            {
-                "term": "turbulent",
-                "symbol": "",
-                "context": "Flow regime with chaotic, irregular mixing. Reynolds number above ~4000. Appears in Darcy-Weisbach calculator flow regime check.",
-                "translation_notes": "Nearly always a cognate. Some languages distinguish 'turbulent' (adjective) from 'turbulence' (noun) — use the adjective form.",
-                "preferred_translation": "ተርቡለንት"
-            }
-        ],
         "ip": [
             {
                 "term": "flow",
@@ -128,7 +68,7 @@
                 "term": "head loss",
                 "symbol": "h_L",
                 "context": "Energy loss expressed as a height of water column. Appears in Darcy-Weisbach, Hazen-Williams, Manning pipe, and Penstock calculators. Distinct from 'pressure drop' — use the hydraulic engineering term.",
-                "translation_notes": "'Head' in the hydraulic sense (energy per unit weight) does not translate literally in many languages — use the established civil\/hydraulic engineering phrase. Pre-2026 sr\/hr human translations used 'gubitak pritiska' (= pressure loss), which is technically the same concept expressed in pressure terms rather than head terms. The current 'губитак напора \/ gubitak tlačne visine' (= loss of hydraulic head) is more precise in a hydraulic engineering context and is preferred. DATA-ERROR FIX 2026-07-09 (category-3 wave-1 sprint): ro\/tr\/id translations were pressure-loss-sense ('pierdere de presiune'\/'basınç kaybı'\/'kehilangan tekanan'), contradicting this note's own guidance. Independently flagged by both the ro and tr wave-1 translation agents; corrected to head-loss-sense ('pierdere de sarcină'\/'yük kaybı'\/'kehilangan tinggi tekan') to match what both agents actually used in lib\/lang.ec.ro.php and lib\/lang.ec.tr.php. de's 'Druckverlust' was left as-is (not flagged; German engineering practice uses pressure\/head loss terms more interchangeably in pipe-flow context) but is worth a second look in a future audit. DATA-ERROR FIX 2026-07-09 (category-3 fa sprint): fa was 'افت فشار' (literally 'pressure loss', same pressure-loss-sense defect class as the ro\/tr\/id fix above), while the fa file's own mphl_ head-loss labels already used 'افت هد' (head loss) and 'هد' is an established loanword elsewhere in the file (هد سرعت = velocity head). Standardized to 'افت هد' suite-wide for fa and fixed dw_\/hw_ labels in lib\/lang.ec.fa.php to match.",
+                "translation_notes": "'Head' in the hydraulic sense (energy per unit weight) does not translate literally in many languages — use the established civil\/hydraulic engineering phrase. Pre-2026 sr\/hr human translations used 'gubitak pritiska' (= pressure loss), which is technically the same concept expressed in pressure terms rather than head terms. The current 'губитак напора \/ gubitak tlačne visine' (= loss of hydraulic head) is more precise in a hydraulic engineering context and is preferred. DATA-ERROR FIX 2026-07-09 (category-3 wave-1 sprint): ro\/tr\/id translations were pressure-loss-sense ('pierdere de presiune'\/'basınç kaybı'\/'kehilangan tekanan'), contradicting this note's own guidance. Independently flagged by both the ro and tr wave-1 translation agents; corrected to head-loss-sense ('pierdere de sarcină'\/'yük kaybı'\/'kehilangan tinggi tekan') to match what both agents actually used in lib\/lang.ec.ro.php and lib\/lang.ec.tr.php. de's 'Druckverlust' was left as-is (not flagged; German engineering practice uses pressure\/head loss terms more interchangeably in pipe-flow context) but is worth a second look in a future audit. DATA-ERROR FIX 2026-07-09 (category-3 fa sprint): fa was 'افت فشار' (literally 'pressure loss', same pressure-loss-sense defect class as the ro\/tr\/id fix above), while the fa file's own mphl_ head-loss labels already used 'افت هد' (head loss) and 'هد' is an established loanword elsewhere in the file (هد سرعت = velocity head). Standardized to 'افت هد' suite-wide for fa and fixed dw_\/hw_ labels in lib\/lang.ec.fa.php to match. DATA-ERROR FIX 2026-07-10 (category-3 sw wave-3 sprint): glossary sw value was 'upotevu wa shinikizo' (= pressure loss), the same pressure-loss-sense defect class as the ro\/tr\/id\/fa fixes above. But lib\/lang.ec.sw.php's own dw_main_desc\/dw_main_menu\/dw_main_title\/mphl_main_desc\/mphl_main_menu\/mphl_main_title (and mpf_velocity_head, ws_headWaterHeight, or_head, mhp_gross_head elsewhere in the file) all already establish 'Kichwa' (head) as the suite's real Swahili word for hydraulic head, not 'shinikizo' (pressure). Standardized the glossary to 'upotevu wa kichwa' to match the file's own established, correct usage instead of the stale pressure-sense glossary value. DATA-ERROR FIX 2026-07-10 (category-3 ps wave-3 sprint): glossary ps value was 'د سر زیان' (زیان = damage\/loss), but lib\/lang.ec.ps.php's own dw_\/hw_\/mpf_\/mphl_ head-loss labels (40+ occurrences suite-wide) all already use ضیاع, not زیان, for 'loss' (e.g. existing dw_main_menu 'Darcy-Weisbach د پایپ سر ضیاع', mphl_total_loss). زیان does not occur anywhere in the file. Standardized the glossary to 'د سر ضیاع' to match the file's actual established usage, same defect class as the sw fix above.",
                 "preferred_translation": "ሄድ ኪሳራ"
             },
             {
@@ -192,14 +132,14 @@
                 "symbol": "h_f",
                 "context": "Head loss along the pipe due to wall friction (Darcy-Weisbach). Symbol h_f (lowercase h reserved for loss components; capital H reserved for total\/gross\/net head, per label-normalization decision item 90, 2026-07-07). Manning Pipe Head Loss, Micro-Hydro Power, Irrigation Pressure table column.",
                 "translation_notes": "",
-                "preferred_translation": ""
+                "preferred_translation": "ፍሪክሽን ኪሳራ"
             },
             {
                 "term": "minor loss",
                 "symbol": "h_m",
                 "context": "Local head loss at fittings\/valves\/couplers (coefficient k_m). Canonical merged concept for the former 'junction loss' (mphl_) and 'minor loss' (mhp_\/ip_). Manning Pipe Head Loss, Micro-Hydro Power, Irrigation Pressure.",
-                "translation_notes": "CANONICAL ENGLISH LABEL: \"Minor (local) loss\" (label-normalization decision, item 90, 2026-07-07). 'Minor ⇄ local' — a local\/point loss at fittings, NOT a \"smaller\" loss; the '(local)' parenthetical fixes the mistranslation trap. Symbol h_m, coefficient k_m (lowercase h reserved for loss components; capital H reserved for total\/gross\/net head, per the same decision).",
-                "preferred_translation": ""
+                "translation_notes": "CANONICAL ENGLISH LABEL: \"Minor (local) loss\" (label-normalization decision, item 90, 2026-07-07). 'Minor ⇄ local' — a local\/point loss at fittings, NOT a \"smaller\" loss; the '(local)' parenthetical fixes the mistranslation trap. Symbol h_m, coefficient k_m (lowercase h reserved for loss components; capital H reserved for total\/gross\/net head, per the same decision). am ADDED (2026-07-10, category-3 am re-translation): 'ጥቃቅን (አካባቢያዊ) ኪሳራ' (tiqaqin (akababiyawi) kisara) mirrors the English structure word-for-word — 'ጥቃቅን' (minor\/small) followed by the parenthetical '(አካባቢያዊ)' (local, i.e. of a specific place\/area) — so the same mistranslation-blocking device English uses (the '(local)' qualifier preventing a 'smaller loss' misreading) is preserved in Amharic rather than silently dropped. Replaces the prior am file's 'የማያያዣ ኪሳራ' (connector\/joint loss), which named the physical fitting rather than the local\/point-loss concept. km ADDED (2026-07-10, category-3 km re-translation): 'ការបាត់បង់មូលដ្ឋាន' (local-basis loss) reuses មូលដ្ឋាន ('local', already established suite-wide for this exact merged concept in ip_km's tooltip 'មេគុណបាត់បង់មូលដ្ឋានសរុប' = 'total local-loss coefficient'), so category-3 now converges on the same word ip_ already uses rather than coining a second competing term. Deliberately avoids 'តូច' (small), sidestepping the minor⇄smaller mistranslation trap the English '(local)' parenthetical exists to block. Replaces the km file's prior mphl_junction_loss value 'ការបាត់បង់ junction' (untranslated English word left in place). ps ADDED (2026-07-10, category-3 ps wave-3 re-translation): 'ځایی ضیاع' (local loss) uses ځایی (local\/positional) + the established ps loss word ضیاع, following the majority pattern already set by ar\/fa\/es\/fr\/hr\/id\/it\/ro\/ru\/sr\/tr\/uk\/ur\/zh — all of which render this concept as 'local loss' alone rather than translating 'minor' literally, since the '(local)' qualifier is the operative disambiguator, not 'minor'. Deliberately avoids a word for 'small\/minor' (e.g. کوچنی) to sidestep the same minor⇄smaller trap the English parenthetical exists to block. Replaces the prior ps file's 'د جنکشن ضیاع' (junction loss — the pre-consolidation, pre-item-90 term) and fixes its symbol from capital H_m to lowercase h_m.",
+                "preferred_translation": "ጥቃቅን (አካባቢያዊ) ኪሳራ"
             },
             {
                 "term": "energy grade line",
@@ -307,7 +247,7 @@
                 "term": "head loss",
                 "symbol": "h_L",
                 "context": "Energy loss expressed as a height of water column. Appears in Darcy-Weisbach, Hazen-Williams, Manning pipe, and Penstock calculators. Distinct from 'pressure drop' — use the hydraulic engineering term.",
-                "translation_notes": "'Head' in the hydraulic sense (energy per unit weight) does not translate literally in many languages — use the established civil\/hydraulic engineering phrase. Pre-2026 sr\/hr human translations used 'gubitak pritiska' (= pressure loss), which is technically the same concept expressed in pressure terms rather than head terms. The current 'губитак напора \/ gubitak tlačne visine' (= loss of hydraulic head) is more precise in a hydraulic engineering context and is preferred. DATA-ERROR FIX 2026-07-09 (category-3 wave-1 sprint): ro\/tr\/id translations were pressure-loss-sense ('pierdere de presiune'\/'basınç kaybı'\/'kehilangan tekanan'), contradicting this note's own guidance. Independently flagged by both the ro and tr wave-1 translation agents; corrected to head-loss-sense ('pierdere de sarcină'\/'yük kaybı'\/'kehilangan tinggi tekan') to match what both agents actually used in lib\/lang.ec.ro.php and lib\/lang.ec.tr.php. de's 'Druckverlust' was left as-is (not flagged; German engineering practice uses pressure\/head loss terms more interchangeably in pipe-flow context) but is worth a second look in a future audit. DATA-ERROR FIX 2026-07-09 (category-3 fa sprint): fa was 'افت فشار' (literally 'pressure loss', same pressure-loss-sense defect class as the ro\/tr\/id fix above), while the fa file's own mphl_ head-loss labels already used 'افت هد' (head loss) and 'هد' is an established loanword elsewhere in the file (هد سرعت = velocity head). Standardized to 'افت هد' suite-wide for fa and fixed dw_\/hw_ labels in lib\/lang.ec.fa.php to match.",
+                "translation_notes": "'Head' in the hydraulic sense (energy per unit weight) does not translate literally in many languages — use the established civil\/hydraulic engineering phrase. Pre-2026 sr\/hr human translations used 'gubitak pritiska' (= pressure loss), which is technically the same concept expressed in pressure terms rather than head terms. The current 'губитак напора \/ gubitak tlačne visine' (= loss of hydraulic head) is more precise in a hydraulic engineering context and is preferred. DATA-ERROR FIX 2026-07-09 (category-3 wave-1 sprint): ro\/tr\/id translations were pressure-loss-sense ('pierdere de presiune'\/'basınç kaybı'\/'kehilangan tekanan'), contradicting this note's own guidance. Independently flagged by both the ro and tr wave-1 translation agents; corrected to head-loss-sense ('pierdere de sarcină'\/'yük kaybı'\/'kehilangan tinggi tekan') to match what both agents actually used in lib\/lang.ec.ro.php and lib\/lang.ec.tr.php. de's 'Druckverlust' was left as-is (not flagged; German engineering practice uses pressure\/head loss terms more interchangeably in pipe-flow context) but is worth a second look in a future audit. DATA-ERROR FIX 2026-07-09 (category-3 fa sprint): fa was 'افت فشار' (literally 'pressure loss', same pressure-loss-sense defect class as the ro\/tr\/id fix above), while the fa file's own mphl_ head-loss labels already used 'افت هد' (head loss) and 'هد' is an established loanword elsewhere in the file (هد سرعت = velocity head). Standardized to 'افت هد' suite-wide for fa and fixed dw_\/hw_ labels in lib\/lang.ec.fa.php to match. DATA-ERROR FIX 2026-07-10 (category-3 sw wave-3 sprint): glossary sw value was 'upotevu wa shinikizo' (= pressure loss), the same pressure-loss-sense defect class as the ro\/tr\/id\/fa fixes above. But lib\/lang.ec.sw.php's own dw_main_desc\/dw_main_menu\/dw_main_title\/mphl_main_desc\/mphl_main_menu\/mphl_main_title (and mpf_velocity_head, ws_headWaterHeight, or_head, mhp_gross_head elsewhere in the file) all already establish 'Kichwa' (head) as the suite's real Swahili word for hydraulic head, not 'shinikizo' (pressure). Standardized the glossary to 'upotevu wa kichwa' to match the file's own established, correct usage instead of the stale pressure-sense glossary value. DATA-ERROR FIX 2026-07-10 (category-3 ps wave-3 sprint): glossary ps value was 'د سر زیان' (زیان = damage\/loss), but lib\/lang.ec.ps.php's own dw_\/hw_\/mpf_\/mphl_ head-loss labels (40+ occurrences suite-wide) all already use ضیاع, not زیان, for 'loss' (e.g. existing dw_main_menu 'Darcy-Weisbach د پایپ سر ضیاع', mphl_total_loss). زیان does not occur anywhere in the file. Standardized the glossary to 'د سر ضیاع' to match the file's actual established usage, same defect class as the sw fix above.",
                 "preferred_translation": "ሄድ ኪሳራ"
             },
             {
@@ -335,8 +275,8 @@
                 "term": "minor loss",
                 "symbol": "h_m",
                 "context": "Local head loss at fittings\/valves\/couplers (coefficient k_m). Canonical merged concept for the former 'junction loss' (mphl_) and 'minor loss' (mhp_\/ip_). Manning Pipe Head Loss, Micro-Hydro Power, Irrigation Pressure.",
-                "translation_notes": "CANONICAL ENGLISH LABEL: \"Minor (local) loss\" (label-normalization decision, item 90, 2026-07-07). 'Minor ⇄ local' — a local\/point loss at fittings, NOT a \"smaller\" loss; the '(local)' parenthetical fixes the mistranslation trap. Symbol h_m, coefficient k_m (lowercase h reserved for loss components; capital H reserved for total\/gross\/net head, per the same decision).",
-                "preferred_translation": ""
+                "translation_notes": "CANONICAL ENGLISH LABEL: \"Minor (local) loss\" (label-normalization decision, item 90, 2026-07-07). 'Minor ⇄ local' — a local\/point loss at fittings, NOT a \"smaller\" loss; the '(local)' parenthetical fixes the mistranslation trap. Symbol h_m, coefficient k_m (lowercase h reserved for loss components; capital H reserved for total\/gross\/net head, per the same decision). am ADDED (2026-07-10, category-3 am re-translation): 'ጥቃቅን (አካባቢያዊ) ኪሳራ' (tiqaqin (akababiyawi) kisara) mirrors the English structure word-for-word — 'ጥቃቅን' (minor\/small) followed by the parenthetical '(አካባቢያዊ)' (local, i.e. of a specific place\/area) — so the same mistranslation-blocking device English uses (the '(local)' qualifier preventing a 'smaller loss' misreading) is preserved in Amharic rather than silently dropped. Replaces the prior am file's 'የማያያዣ ኪሳራ' (connector\/joint loss), which named the physical fitting rather than the local\/point-loss concept. km ADDED (2026-07-10, category-3 km re-translation): 'ការបាត់បង់មូលដ្ឋាន' (local-basis loss) reuses មូលដ្ឋាន ('local', already established suite-wide for this exact merged concept in ip_km's tooltip 'មេគុណបាត់បង់មូលដ្ឋានសរុប' = 'total local-loss coefficient'), so category-3 now converges on the same word ip_ already uses rather than coining a second competing term. Deliberately avoids 'តូច' (small), sidestepping the minor⇄smaller mistranslation trap the English '(local)' parenthetical exists to block. Replaces the km file's prior mphl_junction_loss value 'ការបាត់បង់ junction' (untranslated English word left in place). ps ADDED (2026-07-10, category-3 ps wave-3 re-translation): 'ځایی ضیاع' (local loss) uses ځایی (local\/positional) + the established ps loss word ضیاع, following the majority pattern already set by ar\/fa\/es\/fr\/hr\/id\/it\/ro\/ru\/sr\/tr\/uk\/ur\/zh — all of which render this concept as 'local loss' alone rather than translating 'minor' literally, since the '(local)' qualifier is the operative disambiguator, not 'minor'. Deliberately avoids a word for 'small\/minor' (e.g. کوچنی) to sidestep the same minor⇄smaller trap the English parenthetical exists to block. Replaces the prior ps file's 'د جنکشن ضیاع' (junction loss — the pre-consolidation, pre-item-90 term) and fixes its symbol from capital H_m to lowercase h_m.",
+                "preferred_translation": "ጥቃቅን (አካባቢያዊ) ኪሳራ"
             }
         ],
         "mtc": [
@@ -358,7 +298,7 @@
                 "term": "hydraulic radius",
                 "symbol": "R_h",
                 "context": "Cross-sectional flow area divided by wetted perimeter. Appears in Manning calculators.",
-                "translation_notes": "Use the standard hydraulic engineering phrase. Pre-2026 sr\/hr human translations used the Latin loanword 'hidraulički radijus' — this form is widely used in South Slavic engineering practice and may be more recognizable to field practitioners than the native Slavic equivalents 'полупречник' (sr) \/ 'polumjer' (hr). Both are correct; native Slavic engineers may encounter both forms.",
+                "translation_notes": "Use the standard hydraulic engineering phrase. Pre-2026 sr\/hr human translations used the Latin loanword 'hidraulički radijus' — this form is widely used in South Slavic engineering practice and may be more recognizable to field practitioners than the native Slavic equivalents 'полупречник' (sr) \/ 'polumjer' (hr). Both are correct; native Slavic engineers may encounter both forms. DATA-ERROR FIX 2026-07-10 (category-3 sw wave-3 sprint): previous sw value 'radius ya maji' (literally 'radius of water', English loanword 'radius' + 'of water') named the substance rather than the hydraulic-geometry property, and did not read as an engineering term. Changed to 'radiasi ya kihaidroliki' (radius + 'hydraulic', adjectival ki- form), matching the '[radius] + hydraulic' construction used by fr\/de\/it\/es\/ro\/tr (rayon hydraulique \/ hydraulischer Radius \/ raggio idraulico \/ radio hidráulico \/ raza hidraulică \/ hidrolik yarıçap). Used in lib\/lang.ec.sw.php's mpf_hydraulic_radius.",
                 "preferred_translation": "ሃይድሮሊካዊ ራዲዩስ"
             },
             {
@@ -508,7 +448,6 @@
     "keys_to_translate": {
         "calc_copy_link": "Copy link",
         "calc_copy_link_done": "Copied!",
-        "dw_roughness_tip": "<span title=\"Darcy-Weisbach roughness height\" class=\"ec-tip\">?<\/span>",
         "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
         "mhp_hl_warn_tip": "Consider larger pipe",
         "mhp_hl_bad_tip": "Resize pipe",
@@ -529,7 +468,6 @@
     "keys": {
         "calc_copy_link": "Copy link",
         "calc_copy_link_done": "Copied!",
-        "dw_roughness_tip": "<span title=\"Darcy-Weisbach roughness height\" class=\"ec-tip\">?<\/span>",
         "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
         "mhp_hl_warn_tip": "Consider larger pipe",
         "mhp_hl_bad_tip": "Resize pipe",
@@ -577,22 +515,6 @@
                     "key": "dw_main_menu",
                     "value": "Darcy-Weisbach የቧንቧ ጭንቅ ኪሳራ",
                     "english": "Darcy-Weisbach Pipe Head Loss"
-                }
-            }
-        },
-        "dw_roughness_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "dw_roughness",
-                    "value": "Darcy-Weisbach ፍጹም ሻካሪነት, e",
-                    "english": "Roughness, e"
-                },
-                "next_translated": {
-                    "key": "dw_kinematic_viscosity",
-                    "value": "ኪኔማቲክ ቪስኮሲቲ, ν <span title=\"1×10⁻⁶ m²\/s for clean water at 20°C\" class=\"ec-tip\">?<\/span>",
-                    "english": "Kinematic viscosity, &nu; <span title=\"1×10⁻⁶ m²\/s for clean water at 20°C\" class=\"ec-tip\">?<\/span>"
                 }
             }
         },
