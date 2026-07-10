@@ -584,9 +584,49 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 > one uk occurrence that had used the single-н form. `backtranslate_check.php` (meaning-level check)
 > was **not run this session** — no `ANTHROPIC_API_KEY` available in this environment; flagged as an
 > outstanding QA step before waves 2-3, not a blocker to recording wave 1 as done. Payloads
-> regenerated, `--check` FRESH. **Next**: category 3 wave 2 (zh ar he hi bn fa ur), then wave 3 (am
-> km my ps sw — mandatory native-review flag, and must apply the item-40 shear-stress term decision
-> for ps/ur specifically).
+> regenerated, `--check` FRESH.
+
+> **DONE 2026-07-09: wave-2 sprint executed for category 3 (pipe friction, 59 keys) into the 7
+> major-non-Latin languages: zh ar he hi bn fa ur.** Pre-sprint: payloads FRESH; glossary had all
+> category-3 terms populated for these 7 except `shear stress` (new term from wave 1, bound to
+> `mpf_`) — 0/7 coverage going in. Each agent established its own language's term and recorded it:
+> zh 切应力, ar إجهاد القص, he מאמץ גזירה, hi अपरूपण प्रतिबल, bn কৃন্তন পীড়ন, fa تنش برشی, ur برشی
+> دباؤ — all confirmed by their translating agents as the mechanical/hydraulic sense, not a
+> cutting/scissors false cognate. `ur` was pre-briefed on the item-40 قینچی/قیچی "scissors" trap
+> found in `mi_tau`/`mpf_shear_stress` by earlier audits; its agent confirmed `mpf_shear_stress`
+> already used the correct برشی دباؤ, not the scissors word (the scissors word remains only in
+> category 1's `mi_tau`, tracked separately under item 40). Complete re-translation of all 59 keys
+> per language (not assumed-correct deltas). **Real defects found and fixed in every one of the 7
+> languages, not just wording** — the same defect cluster wave 1 found in the anchor languages had
+> propagated identically here: `dw_roughness_tip` missing entirely; `mpf_friction_slope` mistranslated
+> as "pressure slope" with a broken `../pressureslope.php` link (should be `../frictionslope.php`) and
+> wrong symbol `S₀` instead of `S_f` (same wrong-symbol bug repeated in `mpf_solve_desc`); dropped/
+> wrong-case subscripts across `mpf_flow_area`/`mpf_pipe_area`/`mpf_area_ratio`/`mpf_full_flow`/
+> `mpf_full_flow_ratio` (lowercase `a`/missing `<sub>` tags); `mpf_froude_number` truncated to `F`
+> instead of `Fr`; literal `ν`/`tau` characters instead of `&nu;`/`&tau;` entities in
+> `dw_kinematic_viscosity`/`mpf_shear_stress`; and the item-90 loss-symbol case violation (capital
+> `H` instead of lowercase `h`/`k_m`) in `mphl_friction_loss`/`mphl_junction_loss`/`mphl_total_loss`/
+> `mphl_total_junction_k` in every language. **Additional defects found beyond the known checklist**:
+> bn's `mphl_note_1` had flipped "and" to "or," inverting the logic; hi's `mphl_note_1` mistranslated
+> "(and higher than the pipe!)" as "(or pipe!)"; he's `mphl_hgl_2` hardcoded an English "(See notes)"
+> placeholder instead of the required PHP concatenation of `$ec_lang['mpf_see_notes']`; fa found and
+> fixed a suite-internal inconsistency within its own file (`dw_`/`hw_` used a pressure-loss-sense
+> term for "head loss" while `mphl_` correctly used the head-loss sense) and corrected the fa
+> glossary `head loss` entry itself (afat fesar → afat had), the same defect class already documented
+> for ro/tr/id in wave 1. **Session-limit note**: the `hi` and `ur` agents both hit a session-limit
+> error; checked file state before retrying per the standing lesson (a session-limit error can fire
+> after the edit landed) — `ur`'s edit had already completed (59/59 keys, dw_roughness_tip added,
+> shear-stress term correct) and was kept as-is; `hi` had only added its glossary term before failing
+> and was re-run in full. **Post-sprint QA**: `lang_syntax_validate.php` clean across all 7 (15
+> findings, all `identical-to-english` advisory on pre-existing shared `calc_copy_link*` UI keys,
+> untouched by this sprint); a from-scratch tag-parity check (English vs. all 7 langs across the 59
+> keys, `<sub>/<sup>/<span>/<a>` sets) found zero issues; a literal-ν/τ-character sweep across all 7
+> found zero remaining instances (all correctly use `&nu;`/`&tau;` entities). `backtranslate_check.php`
+> **not run** — no `ANTHROPIC_API_KEY` available in this environment, same gap as wave 1; outstanding
+> QA step, not a blocker to recording wave 2 as done. Payloads regenerated, `--check` FRESH. **Next**:
+> category 3 wave 3 (am km my ps sw — mandatory native-review flag, and must apply the item-40
+> shear-stress term decision for ps specifically, following the same scissors-trap avoidance ur just
+> confirmed).
 
 - 85|[CC] Extend the rc_/ip_ audit treatment to the remaining calculators using the category-grid plan (agreed with Tom 2026-07-06). **Calculator categories (N=6):** (1) open channel: mtc_+mi_ (59 keys — first, because the Bulgarian engineer's "irregular"="нередовен" catch is likely systemic across languages); (2) weirs & orifices: ws_+wi_+or_+odt_ (78); (3) pipe friction: dw_+hw_+mpf_+mphl_ (59); (4) irrigation & seepage: cs_+irr_ (54); (5) micro-hydro: mhp_ (44); (6) shared UI/units: u_+calc_+menu_+points_ incl. the ~121 identical-to-english validator warnings. **Language tiers (M=3), run as sequential waves within each category, not parallel cells:** wave 1 anchors (es pt fr it de ro ru uk bg sr hr cs tr id — cognate language groups let one glossary decision propagate; review side-by-side within Slavic/Romance blocks; **wave 1 is also the English-reform gate (Tom's principle, 2026-07-06): tier-1 translators/reviewers must flag English source strings that resist translation — idioms, stacked modifiers, compressions like "right at"/"draw off"/"Est." — and those grievances are resolved by REWRITING THE ENGLISH (author-reviewable in cognate languages) rather than only patching intents, BEFORE waves 2-3 launch, so all remaining languages inherit the more translatable source**), wave 2 major non-Latin (zh ar he hi bn fa ur), wave 3 low-resource (am km my ps sw — run last against the glossary enriched by waves 1-2; mandatory backtranslate_check + native-review flag). Per category: audit read → mechanical fixes → intents (needs human authorization) → glossary + prefixToTermNames additions → wave-1 sprint → English-reform pass from wave-1 grievances (human approves English edits; re-run wave 1 on changed keys) → waves 2-3 → post-sprint QA chain. Prereq raised by this ordering: implement the per-key English source-hash in payloads so any later English edit re-flags all 26 translations (audit §10.5). ≈10-12 authorization events total; each paid sprint gated on explicit user go-ahead per CLAUDE.md.
   - **CORRECTION 2026-07-07 (Tom, supersedes the paragraph below where they conflict):** the "DEPENDS on a completed, FROZEN English source" framing was a **mistake**. English is NOT frozen after Wave 0, and item 90 neither finishes Wave 0 nor freezes English — **item 90 was about key consolidation only**. Item 85 **starts with** its own Wave 0 pass by Fable across all calculator categories, editing obvious colloquialisms, jargon, and lazy phrases into easily-translatable English. English freezes only after wave 1 (interactive anchors) — see the SEQUENCING RULE box.

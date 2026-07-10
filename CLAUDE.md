@@ -160,9 +160,15 @@ low-resource languages. Therefore:
 1. `php dev/scripts/lang_syntax_validate.php --lang=<codes>` — must be clean of escape-leakage,
    tag-imbalance, and foreign-script findings (identical-to-english warnings are advisory).
 2. Tag-parity check of the sprinted keys against English (`<sub>/<sup>/<span>` sets must match).
-3. Back-translation semantic check: `php dev/scripts/backtranslate_check.php --lang=<code> --prefix=<p>`
-   (needs `ANTHROPIC_API_KEY`) — flags meaning-level mistranslations by comparing the target string
-   against the English source.
+3. Back-translation semantic check — mandatory, has no "skip if no key" exception. If
+   `ANTHROPIC_API_KEY` is set, run `php dev/scripts/backtranslate_check.php --lang=<code> --prefix=<p>`.
+   **If it is not set (the common case in this environment), do NOT log the step as skipped.**
+   Instead the orchestrating AI performs the same check itself, inline, right after the translation
+   agents finish: for every sprinted key, read the target-language string, produce an independent
+   back-translation to English, and compare it against the source meaning — same rigor as the script,
+   no billing needed. (Policy established 2026-07-07 after this exact gap caused two sprints —
+   category 3 waves 1 and 2 — to be recorded as done with this step merely noted "not run"; see
+   `dev/ROADMAP.md` ~line 151 for the full history and the retroactive-enforcement clause.)
 
 **On retries:** If an agent hits a session limit, retry only that language. If quality issues are found after a sprint (wrong term, missing intent framing), fix the glossary and/or lang file directly — do not re-run the full sprint.
 
