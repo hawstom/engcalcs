@@ -6,7 +6,6 @@
         "active_prefixes": [
             "calc",
             "ip",
-            "irr",
             "mhp",
             "rc"
         ],
@@ -18,8 +17,7 @@
     },
     "prompt_context_by_prefix": {
         "calc": "Use these preferred technical term translations when relevant:\n- flow (Q): प्रवाह\n- velocity (v): वेग\n- slope (S): ढाल",
-        "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): प्रवाह\n- velocity (v): वेग\n- head loss (h_L): हेड हानि\n- emitter: उत्सर्जक\n- distribution uniformity (DU): वितरण एकरूपता\n- low-quarter distribution uniformity (DU_lq): [needs translation sprint]\n- application rate (PR): सिंचाई दर\n- lateral: पार्श्व नली\n- mainline: मुख्य नली\n- reach: खंड\n- velocity head (H_v): वेग शीर्ष\n- friction loss (h_f): घर्षण हानि\n- minor loss (h_m): स्थानीय हानि\n- energy grade line (EGL): ऊर्जा रेखा\n- upstream: ऊर्ध्वप्रवाह\n- downstream: अनुप्रवाह",
-        "irr": "Use these preferred technical term translations when relevant:\n- flow (Q): प्रवाह\n- weir: वियर\n- orifice: छिद्र\n- seepage: रिसाव\n- conveyance efficiency (E_c): वहन दक्षता\n- check structure: [needs translation sprint]",
+        "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): प्रवाह\n- velocity (v): वेग\n- head loss (h_L): हेड हानि\n- emitter: उत्सर्जक\n- distribution uniformity (DU): वितरण एकरूपता\n- low-quarter distribution uniformity (DU_lq): निम्न-चतुर्थांश वितरण एकरूपता\n- application rate (PR): सिंचाई दर\n- lateral: पार्श्व नली\n- mainline: मुख्य नली\n- reach: खंड\n- velocity head (H_v): वेग शीर्ष\n- friction loss (h_f): घर्षण हानि\n- minor loss (h_m): स्थानीय हानि\n- energy grade line (EGL): ऊर्जा रेखा\n- upstream: ऊर्ध्वप्रवाह\n- downstream: अनुप्रवाह",
         "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): प्रवाह\n- penstock: दबाव नली\n- gross head (H_gross): सकल हेड\n- net head (H_net): शुद्ध हेड\n- plant efficiency (η): प्लांट दक्षता\n- head loss (h_L): हेड हानि\n- run-of-river: नदी प्रवाह ऊर्जा\n- headworks: प्रवेश संरचना\n- junction loss (h_m): स्थानीय हानि\n- minor loss (h_m): स्थानीय हानि",
         "rc": "Use these preferred technical term translations when relevant:\n- flow (Q): प्रवाह\n- velocity (v): वेग\n- riprap: पत्थर आवरण\n- slope (S): ढाल\n- rock chute: शैल-युक्त तीव्र नालिका\n- chute: तीव्र नालिका\n- unit discharge (q, q_t): इकाई प्रवाह\n- median rock size (D50): माध्यिका पत्थर आकार\n- gradation (SD): ग्रेडेशन\n- porosity (n_p): सरंध्रता\n- specific gravity (sg): आपेक्षिक घनत्व\n- ponding: जलभराव\n- outlet apron: निर्गम एप्रन\n- weir head (H_p): वियर शीर्ष\n- upstream: ऊर्ध्वप्रवाह\n- downstream: अनुप्रवाह\n- reach: खंड"
     },
@@ -73,7 +71,7 @@
                 "term": "emitter",
                 "symbol": "",
                 "context": "A drip irrigation emitter (dripper\/micro-sprinkler) that delivers water at a controlled low flow rate directly to the soil or plant root zone. Appears in Drip\/Sprinkler calculator.",
-                "translation_notes": "Use the field term most familiar to irrigation practitioners in the target language. Arabic: 'قطارة' (dripper) is the field term, preferred over the academic 'مُصدِر'. Spanish: 'gotero' is field-common in Latin America alongside the technical 'emisor'. Ukrainian: 'крапельниця' is the field term used by irrigation workers.",
+                "translation_notes": "Use the field term most familiar to irrigation practitioners in the target language. Arabic: 'قطارة' (dripper) is the field term, preferred over the academic 'مُصدِر'. Spanish: 'gotero' is field-common in Latin America alongside the technical 'emisor'. Ukrainian: 'крапельниця' is the field term used by irrigation workers. zh CORRECTED (2026-07-10, category-4 wave-2 QA): the wave-2 zh translating agent initially deviated to the generic academic term '灌水器' throughout ip_ keys, reasoning that the calculator's emitter-exponent model (x from ~0 to 0.5) is generic rather than drip-only. Reverted to the established glossary field term '滴头' (dripper) for suite-wide consistency with the ar\/es\/uk pattern above — this glossary's own policy is field-term-over-academic-generality across all languages, and a generic hydraulic model doesn't change what practitioners actually call the part.",
                 "preferred_translation": "उत्सर्जक"
             },
             {
@@ -87,8 +85,8 @@
                 "term": "low-quarter distribution uniformity",
                 "symbol": "DU_lq",
                 "context": "Irrigation statistic: average of the lowest quarter of measured emitter flows divided by the overall average. Referenced in Irrigation Pressure notes as \"textbook low-quarter Distribution Uniformity\".",
-                "translation_notes": "Use the established irrigation-engineering phrase; do not invent one. \"Textbook\" is an adjective meaning \"as defined in standard textbooks\" — fr rendered it \"manuel\" (manual check), wrong. he: uniformity = אחידות, never the nonword הוודות. Wave-1 coinages (2026-07, category-4 sprint): fr=\"uniformité de distribution du quart inférieur\", ro=\"Uniformitatea Distribuției de sfert inferior\", ru=\"равномерность распределения по нижней четверти\", uk=\"рівномірність розподілу по низькій чверті\", bg=\"равномерност на разпределение по долната четвърт\", sr=\"равномерност расподеле нижег квартила\", hr=\"jednolikost distribucije niske grupe\", cs=\"Uniformita distribuce nízké čtvrtiny\", tr=\"düşük-çeyrek Dağıtım Uniformluğu\", id=\"Keseragaman Distribusi kuartal-bawah\". es\/pt\/it\/de already had glossary coverage pre-sprint. Not yet native-reviewed.",
-                "preferred_translation": ""
+                "translation_notes": "Use the established irrigation-engineering phrase; do not invent one. \"Textbook\" is an adjective meaning \"as defined in standard textbooks\" — fr rendered it \"manuel\" (manual check), wrong. he: uniformity = אחידות, never the nonword הוודות. Wave-1 coinages (2026-07, category-4 sprint): fr=\"uniformité de distribution du quart inférieur\", ro=\"Uniformitatea Distribuției de sfert inferior\", ru=\"равномерность распределения по нижней четверти\", uk=\"рівномірність розподілу по низькій чверті\", bg=\"равномерност на разпределение по долната четвърт\", sr=\"равномерност расподеле нижег квартила\", hr=\"jednolikost distribucije niske grupe\", cs=\"Uniformita distribuce nízké čtvrtiny\", tr=\"düşük-çeyrek Dağıtım Uniformluğu\", id=\"Keseragaman Distribusi kuartal-bawah\". es\/pt\/it\/de already had glossary coverage pre-sprint. Not yet native-reviewed. ur ADDED (2026-07-10, category-4 wave-2 sprint): \"نچلی چوتھائی تقسیم یکسانیت\" (lower-quarter distribution uniformity) reuses the established ur terms چوتھائی (quarter), تقسیم (distribution), یکسانیت (uniformity, already glossary term for plain \"distribution uniformity\"). Not yet native-reviewed. hi ADDED (2026-07-10, category-4 wave-2 re-translation): 'निम्न-चतुर्थांश वितरण एकरूपता' (low-quarter distribution uniformity) reuses the glossary's own hi=\"वितरण एकरूपता\" for the base \"distribution uniformity\" term and prefixes \"निम्न-चतुर्थांश\" (low-quarter), matching the wave-1 pattern of naming the concept literally (fr\/ru\/uk\/id etc.) rather than inventing a new metaphor. NOTE: the hi ip_ file's own pre-sprint text mistakenly used 'पाठ्यपुस्तक' (textbook) where the current English source says 'standard' — corrected to 'मानक' (standard) in lib\/lang.ec.hi.php during this sprint; do not reintroduce पाठ्यपुस्तक. ar ADDED (2026-07-10, category-4 wave-2 re-translation): 'انتظام التوزيع للربع الأدنى' (uniformity of distribution of the lowest quarter) reuses the glossary's own ar=\"انتظام التوزيع\" base term for plain \"distribution uniformity\" (switched suite-wide in this sprint from a prior 'توحيد' root to 'انتظام', which better conveys 'evenness' rather than 'unification') and appends 'للربع الأدنى' (of the lowest quarter), naming the concept literally like the fr\/ru\/uk\/id wave-1 coinages. Where the English source's own qualifier 'standard' appears in context (ip_du_estimate, ip_notes_3_def), it is rendered inline as 'القياسي' immediately after this base phrase, kept out of the pure glossary term here for parity with the other languages' entries. bn ADDED (2026-07-10, category-4 wave-2 re-translation): 'নিম্ন-চতুর্থাংশ বিতরণ সমতা' (low-quarter distribution uniformity), built on the glossary's own bn=\"বিতরণ সমতা\" base term, naming the concept literally. fa ADDED (2026-07-10, category-4 wave-2 re-translation): 'یکنواختی توزیع ربع پایین' (low-quarter distribution uniformity), built on the glossary's own fa=\"یکنواختی توزیع\" base term; where English says \"standard\" it is rendered inline as \"استاندارد\" immediately after this base phrase, same pattern as ar.",
+                "preferred_translation": "निम्न-चतुर्थांश वितरण एकरूपता"
             },
             {
                 "term": "application rate",
@@ -159,50 +157,6 @@
                 "context": "Direction away from the supply, toward the outlet \/ last emitter.",
                 "translation_notes": "Never software \"downgrade\". ar: downstream = المصب \/ أسفل المجرى (a file used المنبعية = source-side, wrong).",
                 "preferred_translation": "अनुप्रवाह"
-            }
-        ],
-        "irr": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered. ENGINEER CLARIFICATION (2026-07-06): 'дебит is a typical colloquial call of the word — regular people and non-hydraulic engineers use it. In university (hydraulic engineering) they used водно количество for Q, never дебит. I guess both work.' So both are acceptable; водно количество is the academic\/hydraulic-engineering register, дебит the general register. Still an open decision whether to standardize on водно количество suite-wide.",
-                "preferred_translation": "प्रवाह"
-            },
-            {
-                "term": "weir",
-                "symbol": "",
-                "context": "A flow-measurement or water-control structure — a barrier across a channel over which water flows. Appears in Weir Flow Simple and Weir Flow Irregular calculators.",
-                "translation_notes": "WMO No. 385 entry 1665 confirms: es = 'vertedero', fr = 'déversoir', ru = 'водослив'. In an irrigation context, the term often overlaps with 'diversion dam' or 'check structure'. Use the term most common among irrigation field workers in the target language, not a purely civil-engineering dictionary term.",
-                "preferred_translation": "वियर"
-            },
-            {
-                "term": "orifice",
-                "symbol": "",
-                "context": "A submerged or free-flowing opening through which water discharges under head. Appears in Orifice Flow and Orifice Drain Time calculators.",
-                "translation_notes": "In irrigation contexts, often the opening of a headgate or pipe turnout. Use the hydraulic engineering term, not a general word for 'hole' or 'opening'.",
-                "preferred_translation": "छिद्र"
-            },
-            {
-                "term": "seepage",
-                "symbol": "",
-                "context": "Water lost from a canal through the bed and banks by percolation into the soil. Appears in Canal Seepage calculator.",
-                "translation_notes": "Use the irrigation\/canal engineering term for slow percolation loss, not a word implying leakage through a crack or structural failure.",
-                "preferred_translation": "रिसाव"
-            },
-            {
-                "term": "conveyance efficiency",
-                "symbol": "E_c",
-                "context": "Ratio of outflow to inflow in a canal reach — measures how much water delivered at the head is received at the tail. Appears in Canal Seepage calculator. E_c = Q_out \/ Q_in.",
-                "translation_notes": "This is the most terminology-sensitive term in the suite. 'Conveyance' means transport of water along a canal — do not use a general word for 'efficiency' alone. The term should convey 'how well the canal transports water without loss'.",
-                "preferred_translation": "वहन दक्षता"
-            },
-            {
-                "term": "check structure",
-                "symbol": "",
-                "context": "A small flow-control structure (gate or board structure) in an irrigation canal, used to raise ('check') the upstream water level for diversion or measurement. 'Check' is part of the structure's name.",
-                "translation_notes": "Use the local irrigation term for a canal check\/control gate. 'Check' here is NOT the verb 'to verify\/inspect' — do not translate as 'inspect the structure'. Wave-1 coinages (2026-07, category-4 sprint, this term had zero prior translations): es=\"estructura de control\", pt=\"estrutura de controle\", fr=\"ouvrage de régulation\", it=\"struttura di regolazione\", de=\"Kontrollbauwerk\", ro=\"stăvilar de control\", ru=\"регулирующее сооружение\", uk=\"контрольна споруда\", bg=\"контролно съоръжение\", sr=\"устава\", hr=\"regulacijska ustava\", cs=\"regulační objekt\", tr=\"kontrol yapısı\", id=\"bangunan pengatur\". Not yet reviewed by a native speaker; propagate to waves 2-3 for consistency.",
-                "preferred_translation": ""
             }
         ],
         "mhp": [
@@ -415,8 +369,8 @@
         "ip_length": "L",
         "ip_diameter": "D",
         "ip_roughness": "e",
-        "irr_card_pressure_head": "Irrigation Pressure &amp; Uniformity",
-        "irr_card_pressure_desc": "Model the pressure and flow profile along a main-lateral-emitter branch to estimate distribution uniformity from the real test-path pressure, not just a catalog emitter flow rate."
+        "ip_hf": "h<sub>f<\/sub>",
+        "ip_hm": "h<sub>m<\/sub>"
     },
     "keys": {
         "calc_copy_link": "Copy link",
@@ -434,8 +388,8 @@
         "ip_length": "L",
         "ip_diameter": "D",
         "ip_roughness": "e",
-        "irr_card_pressure_head": "Irrigation Pressure &amp; Uniformity",
-        "irr_card_pressure_desc": "Model the pressure and flow profile along a main-lateral-emitter branch to estimate distribution uniformity from the real test-path pressure, not just a catalog emitter flow rate."
+        "ip_hf": "h<sub>f<\/sub>",
+        "ip_hm": "h<sub>m<\/sub>"
     },
     "key_context": {
         "calc_copy_link": {
@@ -641,7 +595,7 @@
                 },
                 "next_translated": {
                     "key": "ip_km",
-                    "value": "K<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach's fittings\/valves\/couplers (≥0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>",
+                    "value": "k<sub>m<\/sub> <span title=\"इस खंड की फिटिंग\/वाल्व\/कपलर के लिए सामान्य स्थानीय-हानि गुणांक (न्यूनतम ≥0.5 सुझाया गया)\" class=\"ec-tip\">?<\/span>",
                     "english": "k<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
                 }
             }
@@ -657,14 +611,14 @@
                 },
                 "next_translated": {
                     "key": "ip_km",
-                    "value": "K<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach's fittings\/valves\/couplers (≥0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>",
+                    "value": "k<sub>m<\/sub> <span title=\"इस खंड की फिटिंग\/वाल्व\/कपलर के लिए सामान्य स्थानीय-हानि गुणांक (न्यूनतम ≥0.5 सुझाया गया)\" class=\"ec-tip\">?<\/span>",
                     "english": "k<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
                 }
             }
         },
         "ip_roughness": {
-            "reason": "missing",
-            "current_value": null,
+            "reason": "equal_to_english",
+            "current_value": "e",
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
@@ -673,35 +627,46 @@
                 },
                 "next_translated": {
                     "key": "ip_km",
-                    "value": "K<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach's fittings\/valves\/couplers (≥0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>",
+                    "value": "k<sub>m<\/sub> <span title=\"इस खंड की फिटिंग\/वाल्व\/कपलर के लिए सामान्य स्थानीय-हानि गुणांक (न्यूनतम ≥0.5 सुझाया गया)\" class=\"ec-tip\">?<\/span>",
                     "english": "k<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
                 }
             }
         },
-        "irr_card_pressure_head": {
-            "reason": "missing",
-            "current_value": null,
+        "ip_hf": {
+            "reason": "equal_to_english",
+            "current_value": "h<sub>f<\/sub>",
             "neighbors": {
                 "previous_translated": {
-                    "key": "ip_notes_5_def",
-                    "value": "अनुप्रयोग दर और प्रणाली\/क्षेत्र प्रवाह अनुमानित खेत-औसत एमिटर प्रवाह (q<sub>avg,field<\/sub> — परीक्षण पार्श्व का अपना औसत, दर्ज की गई ∆दाब अनुमान से सही किया गया) का उपयोग करते हैं, एक अनुमानित दर नहीं: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub>, सही किए गए मॉडल किए गए मूल्य द्वारा संचालित। रिक्ति और प्रणाली-व्यापी पार्श्व\/एमिटर गणना यहाँ अलग इनपुट हैं क्योंकि परीक्षण पथ केवल एक सबसे बुरी स्थिति शाखा को मॉडल करता है, खेत में हर पार्श्व को नहीं।",
-                    "english": "Application rate and system\/zone flow use the estimated field-average emitter flow (q<sub>avg,field<\/sub> &mdash; the test lateral&rsquo;s own average, corrected by the entered &Delta;pressure estimate), not a guessed rate: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub>, fed by the corrected modeled value. Spacing and system-wide lateral\/emitter counts are separate inputs here because the test path only models one worst-case branch, not every lateral in the field."
+                    "key": "ip_press",
+                    "value": "दाब",
+                    "english": "Press."
                 },
-                "next_translated": null
+                "next_translated": {
+                    "key": "ip_hl",
+                    "value": "h<sub>L<\/sub> <span title=\"खंड की कुल हानि, h_f + h_m\" class=\"ec-tip\">?<\/span>",
+                    "english": "h<sub>L<\/sub> <span title=\"Total reach loss, h_f + h_m\" class=\"ec-tip\">?<\/span>"
+                }
             }
         },
-        "irr_card_pressure_desc": {
-            "reason": "missing",
-            "current_value": null,
+        "ip_hm": {
+            "reason": "equal_to_english",
+            "current_value": "h<sub>m<\/sub>",
             "neighbors": {
                 "previous_translated": {
-                    "key": "ip_notes_5_def",
-                    "value": "अनुप्रयोग दर और प्रणाली\/क्षेत्र प्रवाह अनुमानित खेत-औसत एमिटर प्रवाह (q<sub>avg,field<\/sub> — परीक्षण पार्श्व का अपना औसत, दर्ज की गई ∆दाब अनुमान से सही किया गया) का उपयोग करते हैं, एक अनुमानित दर नहीं: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub>, सही किए गए मॉडल किए गए मूल्य द्वारा संचालित। रिक्ति और प्रणाली-व्यापी पार्श्व\/एमिटर गणना यहाँ अलग इनपुट हैं क्योंकि परीक्षण पथ केवल एक सबसे बुरी स्थिति शाखा को मॉडल करता है, खेत में हर पार्श्व को नहीं।",
-                    "english": "Application rate and system\/zone flow use the estimated field-average emitter flow (q<sub>avg,field<\/sub> &mdash; the test lateral&rsquo;s own average, corrected by the entered &Delta;pressure estimate), not a guessed rate: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub>, fed by the corrected modeled value. Spacing and system-wide lateral\/emitter counts are separate inputs here because the test path only models one worst-case branch, not every lateral in the field."
+                    "key": "ip_press",
+                    "value": "दाब",
+                    "english": "Press."
                 },
-                "next_translated": null
+                "next_translated": {
+                    "key": "ip_hl",
+                    "value": "h<sub>L<\/sub> <span title=\"खंड की कुल हानि, h_f + h_m\" class=\"ec-tip\">?<\/span>",
+                    "english": "h<sub>L<\/sub> <span title=\"Total reach loss, h_f + h_m\" class=\"ec-tip\">?<\/span>"
+                }
             }
         }
     },
-    "key_intent": []
+    "key_intent": {
+        "ip_hf": "Friction head loss.",
+        "ip_hm": "Minor (local) head loss."
+    }
 }

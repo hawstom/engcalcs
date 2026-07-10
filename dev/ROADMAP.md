@@ -766,6 +766,44 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 > flagged not-yet-native-reviewed); payloads regenerated, `--check` FRESH. **Next**: wave 2 (zh ar he
 > hi bn fa ur) pending Tom's authorization.
 
+> **Category 4 wave 2 (major non-Latin: zh ar he hi bn fa ur) complete 2026-07-10 [CC].** Complete
+> re-translation of all 107 keys (cs_ 34, irr_ 17, ip_ 56) into each of the 7 languages, 7 agents
+> launched in parallel (Sonnet, background); all completed without hitting the session limit this
+> time. Every agent independently found and fixed the same defect classes wave-1 anchors had:
+> capitalized loss symbols (`H_f`/`H_m`/`H_l`/`K_m` → lowercase `h_f`/`h_m`/`h_L`/`k_m`), unauthorized
+> ✓/⚠ glyphs and marker words ("Warning:"/"تحذير:"/etc.) added to verdict strings not present in
+> English, and (ur/tr precedent from wave 1) translated-instead-of-preserved subscript tokens — none
+> of the 7 wave-2 languages repeated the subscript-translation mistake this time. Real terminology
+> defects also found and fixed beyond mechanical rule violations: he had "seepage" mistranslated
+> suite-wide as "leakage" (דליפה→חלחול) and weir/culvert conflated (שפיכון/מעביר disambiguated); hi
+> had "textbook low-quarter DU" instead of "standard" (पाठ्यपुस्तक→मानक, a real mistranslation, not
+> just a coinage gap); ar had "distribution uniformity" not using the glossary's own already-decided
+> term (توحيد→انتظام التوزيع, glossary-established but the shipped file wasn't using it). zh's agent
+> deviated from the suite-wide glossary policy (field term over academic term for practitioner-facing
+> vocabulary) by using generic 灌水器 instead of the established 滴头 for "emitter" — caught in
+> post-sprint QA and corrected suite-wide (22 occurrences) to match ar/es/uk precedent; glossary's
+> `emitter` entry annotated with the correction rationale so future sprints don't re-relitigate it.
+> ur's agent additionally removed 8 orphan keys (no longer in English source) that fa/zh/bn/ar/he/hi
+> all still carry untouched — a real inconsistency across the 7 files, left as-is (orphan keys are
+> confirmed unreferenced by any PHP/JS/template code, so harmless; flagged for a future full-suite
+> housekeeping pass rather than fixed ad hoc mid-sprint).
+> **Independent QA (orchestrating AI, not just agent self-reports, per the verify-agent-claims
+> practice)**: `php -l` clean on all 7 files; a from-scratch programmatic check (not
+> `lang_syntax_validate.php` alone) confirmed 107/107 keys present, zero HTML-tag-parity mismatches,
+> and zero subscript-token mismatches against English, across all 7 languages — this is a stronger
+> check than tag-set comparison alone, since it verifies the literal subscript content
+> (`avg,field`/`last`/`supply`/`design`) wasn't translated, not just that a `<sub>` tag exists.
+> `lang_syntax_validate.php --lang=zh,ar,he,hi,bn,fa,ur` reports only 15 pre-existing/unrelated
+> `identical-to-english` findings (calc_copy_link*, mhp_vel_high_short — outside cs_/irr_/ip_ scope).
+> Glossary updated: added zh/bn/fa translations for `check structure` (previously only had the 14
+> anchors + ar/he/hi/ur from earlier in this same wave) and for `low-quarter distribution uniformity`
+> (bn/fa were the only 2 of the 7 wave-2 languages still missing it after the agents' own work).
+> QUALITY scores: zh/ar/he/hi/bn/fa/ur were already correctly at the `0.85` tier in
+> `lib/Language.Settings.php` from prior categories — no change needed. Payloads regenerated,
+> `--check` FRESH. **Category 4 wave 2 is done for all 7 major non-Latin languages. Next**: wave 3
+> (low-resource: am km my ps sw) pending Tom's authorization, then the holistic cross-language
+> consistency pass (still outstanding from categories 3 and 4) can be scheduled.
+
 - 85|[CC] Extend the rc_/ip_ audit treatment to the remaining calculators using the category-grid plan (agreed with Tom 2026-07-06). **Calculator categories (N=6):** (1) open channel: mtc_+mi_ (59 keys — first, because the Bulgarian engineer's "irregular"="нередовен" catch is likely systemic across languages); (2) weirs & orifices: ws_+wi_+or_+odt_ (78); (3) pipe friction: dw_+hw_+mpf_+mphl_ (59); (4) irrigation & seepage: cs_+irr_ (54); (5) micro-hydro: mhp_ (44); (6) shared UI/units: u_+calc_+menu_+points_ incl. the ~121 identical-to-english validator warnings. **Language tiers (M=3), run as sequential waves within each category, not parallel cells:** wave 1 anchors (es pt fr it de ro ru uk bg sr hr cs tr id — cognate language groups let one glossary decision propagate; review side-by-side within Slavic/Romance blocks; **wave 1 is also the English-reform gate (Tom's principle, 2026-07-06): tier-1 translators/reviewers must flag English source strings that resist translation — idioms, stacked modifiers, compressions like "right at"/"draw off"/"Est." — and those grievances are resolved by REWRITING THE ENGLISH (author-reviewable in cognate languages) rather than only patching intents, BEFORE waves 2-3 launch, so all remaining languages inherit the more translatable source**), wave 2 major non-Latin (zh ar he hi bn fa ur), wave 3 low-resource (am km my ps sw — run last against the glossary enriched by waves 1-2; mandatory backtranslate_check + native-review flag). Per category: audit read → mechanical fixes → intents (needs human authorization) → glossary + prefixToTermNames additions → wave-1 sprint → English-reform pass from wave-1 grievances (human approves English edits; re-run wave 1 on changed keys) → waves 2-3 → post-sprint QA chain. Prereq raised by this ordering: implement the per-key English source-hash in payloads so any later English edit re-flags all 26 translations (audit §10.5). ≈10-12 authorization events total; each paid sprint gated on explicit user go-ahead per CLAUDE.md.
   - **CORRECTION 2026-07-07 (Tom, supersedes the paragraph below where they conflict):** the "DEPENDS on a completed, FROZEN English source" framing was a **mistake**. English is NOT frozen after Wave 0, and item 90 neither finishes Wave 0 nor freezes English — **item 90 was about key consolidation only**. Item 85 **starts with** its own Wave 0 pass by Fable across all calculator categories, editing obvious colloquialisms, jargon, and lazy phrases into easily-translatable English. English freezes only after wave 1 (interactive anchors) — see the SEQUENCING RULE box.
   - **DEPENDENCY / RESTRUCTURE 2026-07-07 (Tom + Opus; see CORRECTION above): item 85 no longer owns key consolidation.** The key-consolidation work is pulled *out* of item 85's per-calculator-category loop and done up front as a decoupled prerequisite: **item 90** (full-suite key consolidation, Opus — done). **Wave 0** (colloquialism cleanup, Fable) is item 85's first step, run externally across all categories. After Wave 0, item 85 proceeds **category by category** (all waves for a category before the next category) — a **complete re-translation** of every category (Tom's "be complete" call, 2026-07-07), tier by tier within each, with full QA. See the SEQUENCING RULE box for the authoritative recap. The old per-category "concept-level MERGE" and "English-reform pass from wave-1 grievances / re-run wave 1 on changed keys" steps are **superseded** (residual English grievances that wave-1 still surfaces become small, targeted English edits, not a structural loop). The §10.5 source-hash is deferred to *after* this complete pass. The sub-bullets below are retained as historical rationale; where they say "per category: … Wave 0 …" read Wave 0 as the single up-front English pass, not a per-category step.

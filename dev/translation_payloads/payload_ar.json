@@ -6,7 +6,6 @@
         "active_prefixes": [
             "calc",
             "ip",
-            "irr",
             "mhp",
             "rc"
         ],
@@ -18,8 +17,7 @@
     },
     "prompt_context_by_prefix": {
         "calc": "Use these preferred technical term translations when relevant:\n- flow (Q): تدفق\n- velocity (v): سرعة\n- slope (S): انحدار",
-        "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): تدفق\n- velocity (v): سرعة\n- head loss (h_L): فقدان الضغط\n- emitter: قطارة\n- distribution uniformity (DU): انتظام التوزيع\n- low-quarter distribution uniformity (DU_lq): [needs translation sprint]\n- application rate (PR): معدل التطبيق\n- lateral: الخط الجانبي\n- mainline: الخط الرئيسي\n- reach: قطاع\n- velocity head (H_v): علو السرعة\n- friction loss (h_f): فاقد الاحتكاك\n- minor loss (h_m): الفواقد الموضعية\n- energy grade line (EGL): خط الطاقة\n- upstream: أعلى المجرى\n- downstream: أسفل المجرى",
-        "irr": "Use these preferred technical term translations when relevant:\n- flow (Q): تدفق\n- weir: سد قياس التدفق\n- orifice: فتحة\n- seepage: تسرب\n- conveyance efficiency (E_c): كفاءة النقل\n- check structure: [needs translation sprint]",
+        "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): تدفق\n- velocity (v): سرعة\n- head loss (h_L): فقدان الضغط\n- emitter: قطارة\n- distribution uniformity (DU): انتظام التوزيع\n- low-quarter distribution uniformity (DU_lq): انتظام التوزيع للربع الأدنى\n- application rate (PR): معدل التطبيق\n- lateral: الخط الجانبي\n- mainline: الخط الرئيسي\n- reach: قطاع\n- velocity head (H_v): علو السرعة\n- friction loss (h_f): فاقد الاحتكاك\n- minor loss (h_m): الفواقد الموضعية\n- energy grade line (EGL): خط الطاقة\n- upstream: أعلى المجرى\n- downstream: أسفل المجرى",
         "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): تدفق\n- penstock: أنبوب الضغط\n- gross head (H_gross): الارتفاع الإجمالي\n- net head (H_net): الارتفاع الصافي\n- plant efficiency (η): كفاءة المحطة\n- head loss (h_L): فقدان الضغط\n- run-of-river: طاقة مجرى النهر\n- headworks: منشأة رأس القناة\n- junction loss (h_m): خسائر الوصلات\n- minor loss (h_m): الفواقد الموضعية",
         "rc": "Use these preferred technical term translations when relevant:\n- flow (Q): تدفق\n- velocity (v): سرعة\n- riprap: حجارة الحماية\n- slope (S): انحدار\n- rock chute: مزلق صخري\n- chute: مسرب سريع\n- unit discharge (q, q_t): التصريف الوحدوي\n- median rock size (D50): الحجم الوسطي للحجارة\n- gradation (SD): التدرج الحبيبي\n- porosity (n_p): المسامية\n- specific gravity (sg): الكثافة النسبية\n- ponding: التحوض\n- outlet apron: مصطبة المخرج\n- weir head (H_p): علو المياه فوق الهدار\n- upstream: أعلى المجرى\n- downstream: أسفل المجرى\n- reach: قطاع"
     },
@@ -73,7 +71,7 @@
                 "term": "emitter",
                 "symbol": "",
                 "context": "A drip irrigation emitter (dripper\/micro-sprinkler) that delivers water at a controlled low flow rate directly to the soil or plant root zone. Appears in Drip\/Sprinkler calculator.",
-                "translation_notes": "Use the field term most familiar to irrigation practitioners in the target language. Arabic: 'قطارة' (dripper) is the field term, preferred over the academic 'مُصدِر'. Spanish: 'gotero' is field-common in Latin America alongside the technical 'emisor'. Ukrainian: 'крапельниця' is the field term used by irrigation workers.",
+                "translation_notes": "Use the field term most familiar to irrigation practitioners in the target language. Arabic: 'قطارة' (dripper) is the field term, preferred over the academic 'مُصدِر'. Spanish: 'gotero' is field-common in Latin America alongside the technical 'emisor'. Ukrainian: 'крапельниця' is the field term used by irrigation workers. zh CORRECTED (2026-07-10, category-4 wave-2 QA): the wave-2 zh translating agent initially deviated to the generic academic term '灌水器' throughout ip_ keys, reasoning that the calculator's emitter-exponent model (x from ~0 to 0.5) is generic rather than drip-only. Reverted to the established glossary field term '滴头' (dripper) for suite-wide consistency with the ar\/es\/uk pattern above — this glossary's own policy is field-term-over-academic-generality across all languages, and a generic hydraulic model doesn't change what practitioners actually call the part.",
                 "preferred_translation": "قطارة"
             },
             {
@@ -87,8 +85,8 @@
                 "term": "low-quarter distribution uniformity",
                 "symbol": "DU_lq",
                 "context": "Irrigation statistic: average of the lowest quarter of measured emitter flows divided by the overall average. Referenced in Irrigation Pressure notes as \"textbook low-quarter Distribution Uniformity\".",
-                "translation_notes": "Use the established irrigation-engineering phrase; do not invent one. \"Textbook\" is an adjective meaning \"as defined in standard textbooks\" — fr rendered it \"manuel\" (manual check), wrong. he: uniformity = אחידות, never the nonword הוודות. Wave-1 coinages (2026-07, category-4 sprint): fr=\"uniformité de distribution du quart inférieur\", ro=\"Uniformitatea Distribuției de sfert inferior\", ru=\"равномерность распределения по нижней четверти\", uk=\"рівномірність розподілу по низькій чверті\", bg=\"равномерност на разпределение по долната четвърт\", sr=\"равномерност расподеле нижег квартила\", hr=\"jednolikost distribucije niske grupe\", cs=\"Uniformita distribuce nízké čtvrtiny\", tr=\"düşük-çeyrek Dağıtım Uniformluğu\", id=\"Keseragaman Distribusi kuartal-bawah\". es\/pt\/it\/de already had glossary coverage pre-sprint. Not yet native-reviewed.",
-                "preferred_translation": ""
+                "translation_notes": "Use the established irrigation-engineering phrase; do not invent one. \"Textbook\" is an adjective meaning \"as defined in standard textbooks\" — fr rendered it \"manuel\" (manual check), wrong. he: uniformity = אחידות, never the nonword הוודות. Wave-1 coinages (2026-07, category-4 sprint): fr=\"uniformité de distribution du quart inférieur\", ro=\"Uniformitatea Distribuției de sfert inferior\", ru=\"равномерность распределения по нижней четверти\", uk=\"рівномірність розподілу по низькій чверті\", bg=\"равномерност на разпределение по долната четвърт\", sr=\"равномерност расподеле нижег квартила\", hr=\"jednolikost distribucije niske grupe\", cs=\"Uniformita distribuce nízké čtvrtiny\", tr=\"düşük-çeyrek Dağıtım Uniformluğu\", id=\"Keseragaman Distribusi kuartal-bawah\". es\/pt\/it\/de already had glossary coverage pre-sprint. Not yet native-reviewed. ur ADDED (2026-07-10, category-4 wave-2 sprint): \"نچلی چوتھائی تقسیم یکسانیت\" (lower-quarter distribution uniformity) reuses the established ur terms چوتھائی (quarter), تقسیم (distribution), یکسانیت (uniformity, already glossary term for plain \"distribution uniformity\"). Not yet native-reviewed. hi ADDED (2026-07-10, category-4 wave-2 re-translation): 'निम्न-चतुर्थांश वितरण एकरूपता' (low-quarter distribution uniformity) reuses the glossary's own hi=\"वितरण एकरूपता\" for the base \"distribution uniformity\" term and prefixes \"निम्न-चतुर्थांश\" (low-quarter), matching the wave-1 pattern of naming the concept literally (fr\/ru\/uk\/id etc.) rather than inventing a new metaphor. NOTE: the hi ip_ file's own pre-sprint text mistakenly used 'पाठ्यपुस्तक' (textbook) where the current English source says 'standard' — corrected to 'मानक' (standard) in lib\/lang.ec.hi.php during this sprint; do not reintroduce पाठ्यपुस्तक. ar ADDED (2026-07-10, category-4 wave-2 re-translation): 'انتظام التوزيع للربع الأدنى' (uniformity of distribution of the lowest quarter) reuses the glossary's own ar=\"انتظام التوزيع\" base term for plain \"distribution uniformity\" (switched suite-wide in this sprint from a prior 'توحيد' root to 'انتظام', which better conveys 'evenness' rather than 'unification') and appends 'للربع الأدنى' (of the lowest quarter), naming the concept literally like the fr\/ru\/uk\/id wave-1 coinages. Where the English source's own qualifier 'standard' appears in context (ip_du_estimate, ip_notes_3_def), it is rendered inline as 'القياسي' immediately after this base phrase, kept out of the pure glossary term here for parity with the other languages' entries. bn ADDED (2026-07-10, category-4 wave-2 re-translation): 'নিম্ন-চতুর্থাংশ বিতরণ সমতা' (low-quarter distribution uniformity), built on the glossary's own bn=\"বিতরণ সমতা\" base term, naming the concept literally. fa ADDED (2026-07-10, category-4 wave-2 re-translation): 'یکنواختی توزیع ربع پایین' (low-quarter distribution uniformity), built on the glossary's own fa=\"یکنواختی توزیع\" base term; where English says \"standard\" it is rendered inline as \"استاندارد\" immediately after this base phrase, same pattern as ar.",
+                "preferred_translation": "انتظام التوزيع للربع الأدنى"
             },
             {
                 "term": "application rate",
@@ -159,50 +157,6 @@
                 "context": "Direction away from the supply, toward the outlet \/ last emitter.",
                 "translation_notes": "Never software \"downgrade\". ar: downstream = المصب \/ أسفل المجرى (a file used المنبعية = source-side, wrong).",
                 "preferred_translation": "أسفل المجرى"
-            }
-        ],
-        "irr": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered. ENGINEER CLARIFICATION (2026-07-06): 'дебит is a typical colloquial call of the word — regular people and non-hydraulic engineers use it. In university (hydraulic engineering) they used водно количество for Q, never дебит. I guess both work.' So both are acceptable; водно количество is the academic\/hydraulic-engineering register, дебит the general register. Still an open decision whether to standardize on водно количество suite-wide.",
-                "preferred_translation": "تدفق"
-            },
-            {
-                "term": "weir",
-                "symbol": "",
-                "context": "A flow-measurement or water-control structure — a barrier across a channel over which water flows. Appears in Weir Flow Simple and Weir Flow Irregular calculators.",
-                "translation_notes": "WMO No. 385 entry 1665 confirms: es = 'vertedero', fr = 'déversoir', ru = 'водослив'. In an irrigation context, the term often overlaps with 'diversion dam' or 'check structure'. Use the term most common among irrigation field workers in the target language, not a purely civil-engineering dictionary term.",
-                "preferred_translation": "سد قياس التدفق"
-            },
-            {
-                "term": "orifice",
-                "symbol": "",
-                "context": "A submerged or free-flowing opening through which water discharges under head. Appears in Orifice Flow and Orifice Drain Time calculators.",
-                "translation_notes": "In irrigation contexts, often the opening of a headgate or pipe turnout. Use the hydraulic engineering term, not a general word for 'hole' or 'opening'.",
-                "preferred_translation": "فتحة"
-            },
-            {
-                "term": "seepage",
-                "symbol": "",
-                "context": "Water lost from a canal through the bed and banks by percolation into the soil. Appears in Canal Seepage calculator.",
-                "translation_notes": "Use the irrigation\/canal engineering term for slow percolation loss, not a word implying leakage through a crack or structural failure.",
-                "preferred_translation": "تسرب"
-            },
-            {
-                "term": "conveyance efficiency",
-                "symbol": "E_c",
-                "context": "Ratio of outflow to inflow in a canal reach — measures how much water delivered at the head is received at the tail. Appears in Canal Seepage calculator. E_c = Q_out \/ Q_in.",
-                "translation_notes": "This is the most terminology-sensitive term in the suite. 'Conveyance' means transport of water along a canal — do not use a general word for 'efficiency' alone. The term should convey 'how well the canal transports water without loss'.",
-                "preferred_translation": "كفاءة النقل"
-            },
-            {
-                "term": "check structure",
-                "symbol": "",
-                "context": "A small flow-control structure (gate or board structure) in an irrigation canal, used to raise ('check') the upstream water level for diversion or measurement. 'Check' is part of the structure's name.",
-                "translation_notes": "Use the local irrigation term for a canal check\/control gate. 'Check' here is NOT the verb 'to verify\/inspect' — do not translate as 'inspect the structure'. Wave-1 coinages (2026-07, category-4 sprint, this term had zero prior translations): es=\"estructura de control\", pt=\"estrutura de controle\", fr=\"ouvrage de régulation\", it=\"struttura di regolazione\", de=\"Kontrollbauwerk\", ro=\"stăvilar de control\", ru=\"регулирующее сооружение\", uk=\"контрольна споруда\", bg=\"контролно съоръжение\", sr=\"устава\", hr=\"regulacijska ustava\", cs=\"regulační objekt\", tr=\"kontrol yapısı\", id=\"bangunan pengatur\". Not yet reviewed by a native speaker; propagate to waves 2-3 for consistency.",
-                "preferred_translation": ""
             }
         ],
         "mhp": [
@@ -415,8 +369,8 @@
         "ip_length": "L",
         "ip_diameter": "D",
         "ip_roughness": "e",
-        "irr_card_pressure_head": "Irrigation Pressure &amp; Uniformity",
-        "irr_card_pressure_desc": "Model the pressure and flow profile along a main-lateral-emitter branch to estimate distribution uniformity from the real test-path pressure, not just a catalog emitter flow rate."
+        "ip_hf": "h<sub>f<\/sub>",
+        "ip_hm": "h<sub>m<\/sub>"
     },
     "keys": {
         "calc_copy_link": "Copy link",
@@ -434,8 +388,8 @@
         "ip_length": "L",
         "ip_diameter": "D",
         "ip_roughness": "e",
-        "irr_card_pressure_head": "Irrigation Pressure &amp; Uniformity",
-        "irr_card_pressure_desc": "Model the pressure and flow profile along a main-lateral-emitter branch to estimate distribution uniformity from the real test-path pressure, not just a catalog emitter flow rate."
+        "ip_hf": "h<sub>f<\/sub>",
+        "ip_hm": "h<sub>m<\/sub>"
     },
     "key_context": {
         "calc_copy_link": {
@@ -636,12 +590,12 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "المشتتات <span title=\"صفوف الخطوط الجانبية: المشتتات في هذا القطاع فقط. صفوف الأنابيب الرئيسية: إجمالي المشتتات على الخطوط الجانبية الأخرى غير هذا الخط التي تتفرع من هذا القطاع. للقطاع في موقع انفصال الخط الجانبي للاختبار نفسه، يشمل هذا أيضاً أي خطوط جانبية أخرى على طول الأنبوب الرئيسي بعد ذلك الانفصال، أو تشارك نفس الوصلة (مثل خط جانبي على الجانب الآخر) — يتفرع تدفقها من نفس هذا القطاع أيضاً.\" class=\"ec-tip\">؟<\/span>",
+                    "value": "قطارات <span title=\"صفوف الخطوط الجانبية: القطارات في هذا القطاع فقط. صفوف الخط الرئيسي: إجمالي القطارات في الخطوط الجانبية الأخرى غير هذا الخط، والمتفرعة من هذا القطاع. أما قطاع الخط الرئيسي المنتهي عند الخط الجانبي للاختبار، فيشمل أيضاً أي خطوط جانبية أبعد على طول الخط الرئيسي بعد تلك النقطة، أو التي تشارك الوصلة نفسها (كخط جانبي على الجانب المقابل) — إذ يتفرع تدفقها من هذا القطاع نفسه أيضاً.\" class=\"ec-tip\">؟<\/span>",
                     "english": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>"
                 },
                 "next_translated": {
                     "key": "ip_km",
-                    "value": "K<sub>m<\/sub> <span title=\"معامل فاقد ثانوي عام لتجهيزات القطاع\/الصمامات\/الموصلات (يُوصى بالحد الأدنى ≥0.5)\" class=\"ec-tip\">؟<\/span>",
+                    "value": "k<sub>m<\/sub> <span title=\"معامل فاقد ثانوي عام لتجهيزات هذا القطاع من وصلات وصمامات ومقرنات (الحد الأدنى المقترح ≥0.5)\" class=\"ec-tip\">؟<\/span>",
                     "english": "k<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
                 }
             }
@@ -652,56 +606,67 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "المشتتات <span title=\"صفوف الخطوط الجانبية: المشتتات في هذا القطاع فقط. صفوف الأنابيب الرئيسية: إجمالي المشتتات على الخطوط الجانبية الأخرى غير هذا الخط التي تتفرع من هذا القطاع. للقطاع في موقع انفصال الخط الجانبي للاختبار نفسه، يشمل هذا أيضاً أي خطوط جانبية أخرى على طول الأنبوب الرئيسي بعد ذلك الانفصال، أو تشارك نفس الوصلة (مثل خط جانبي على الجانب الآخر) — يتفرع تدفقها من نفس هذا القطاع أيضاً.\" class=\"ec-tip\">؟<\/span>",
+                    "value": "قطارات <span title=\"صفوف الخطوط الجانبية: القطارات في هذا القطاع فقط. صفوف الخط الرئيسي: إجمالي القطارات في الخطوط الجانبية الأخرى غير هذا الخط، والمتفرعة من هذا القطاع. أما قطاع الخط الرئيسي المنتهي عند الخط الجانبي للاختبار، فيشمل أيضاً أي خطوط جانبية أبعد على طول الخط الرئيسي بعد تلك النقطة، أو التي تشارك الوصلة نفسها (كخط جانبي على الجانب المقابل) — إذ يتفرع تدفقها من هذا القطاع نفسه أيضاً.\" class=\"ec-tip\">؟<\/span>",
                     "english": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>"
                 },
                 "next_translated": {
                     "key": "ip_km",
-                    "value": "K<sub>m<\/sub> <span title=\"معامل فاقد ثانوي عام لتجهيزات القطاع\/الصمامات\/الموصلات (يُوصى بالحد الأدنى ≥0.5)\" class=\"ec-tip\">؟<\/span>",
+                    "value": "k<sub>m<\/sub> <span title=\"معامل فاقد ثانوي عام لتجهيزات هذا القطاع من وصلات وصمامات ومقرنات (الحد الأدنى المقترح ≥0.5)\" class=\"ec-tip\">؟<\/span>",
                     "english": "k<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
                 }
             }
         },
         "ip_roughness": {
-            "reason": "missing",
-            "current_value": null,
+            "reason": "equal_to_english",
+            "current_value": "e",
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "المشتتات <span title=\"صفوف الخطوط الجانبية: المشتتات في هذا القطاع فقط. صفوف الأنابيب الرئيسية: إجمالي المشتتات على الخطوط الجانبية الأخرى غير هذا الخط التي تتفرع من هذا القطاع. للقطاع في موقع انفصال الخط الجانبي للاختبار نفسه، يشمل هذا أيضاً أي خطوط جانبية أخرى على طول الأنبوب الرئيسي بعد ذلك الانفصال، أو تشارك نفس الوصلة (مثل خط جانبي على الجانب الآخر) — يتفرع تدفقها من نفس هذا القطاع أيضاً.\" class=\"ec-tip\">؟<\/span>",
+                    "value": "قطارات <span title=\"صفوف الخطوط الجانبية: القطارات في هذا القطاع فقط. صفوف الخط الرئيسي: إجمالي القطارات في الخطوط الجانبية الأخرى غير هذا الخط، والمتفرعة من هذا القطاع. أما قطاع الخط الرئيسي المنتهي عند الخط الجانبي للاختبار، فيشمل أيضاً أي خطوط جانبية أبعد على طول الخط الرئيسي بعد تلك النقطة، أو التي تشارك الوصلة نفسها (كخط جانبي على الجانب المقابل) — إذ يتفرع تدفقها من هذا القطاع نفسه أيضاً.\" class=\"ec-tip\">؟<\/span>",
                     "english": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>"
                 },
                 "next_translated": {
                     "key": "ip_km",
-                    "value": "K<sub>m<\/sub> <span title=\"معامل فاقد ثانوي عام لتجهيزات القطاع\/الصمامات\/الموصلات (يُوصى بالحد الأدنى ≥0.5)\" class=\"ec-tip\">؟<\/span>",
+                    "value": "k<sub>m<\/sub> <span title=\"معامل فاقد ثانوي عام لتجهيزات هذا القطاع من وصلات وصمامات ومقرنات (الحد الأدنى المقترح ≥0.5)\" class=\"ec-tip\">؟<\/span>",
                     "english": "k<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
                 }
             }
         },
-        "irr_card_pressure_head": {
-            "reason": "missing",
-            "current_value": null,
+        "ip_hf": {
+            "reason": "equal_to_english",
+            "current_value": "h<sub>f<\/sub>",
             "neighbors": {
                 "previous_translated": {
-                    "key": "ip_notes_5_def",
-                    "value": "معدل التطبيق وتدفق النظام\/المنطقة يستخدمان تدفق المشتت المتوسط الحقلي المقدَّر (q<sub>avg,field<\/sub> — متوسط الخط الجانبي للاختبار الخاص به، معدَّل بفرق الضغط المُدخل)، وليس معدل مخمَّن: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub>، مُغذَّى بالقيمة المنمذجة المعدَّلة. التباعد وعدد الخطوط الجانبية\/المشتتات على مستوى النظام مدخلات منفصلة هنا لأن مسار الاختبار ينمذج فقط فرعاً واحداً أسوأ حالة، وليس كل خط جانبي في الحقل.",
-                    "english": "Application rate and system\/zone flow use the estimated field-average emitter flow (q<sub>avg,field<\/sub> &mdash; the test lateral&rsquo;s own average, corrected by the entered &Delta;pressure estimate), not a guessed rate: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub>, fed by the corrected modeled value. Spacing and system-wide lateral\/emitter counts are separate inputs here because the test path only models one worst-case branch, not every lateral in the field."
+                    "key": "ip_press",
+                    "value": "ضغط",
+                    "english": "Press."
                 },
-                "next_translated": null
+                "next_translated": {
+                    "key": "ip_hl",
+                    "value": "h<sub>L<\/sub> <span title=\"إجمالي فاقد القطاع، h_f + h_m\" class=\"ec-tip\">؟<\/span>",
+                    "english": "h<sub>L<\/sub> <span title=\"Total reach loss, h_f + h_m\" class=\"ec-tip\">?<\/span>"
+                }
             }
         },
-        "irr_card_pressure_desc": {
-            "reason": "missing",
-            "current_value": null,
+        "ip_hm": {
+            "reason": "equal_to_english",
+            "current_value": "h<sub>m<\/sub>",
             "neighbors": {
                 "previous_translated": {
-                    "key": "ip_notes_5_def",
-                    "value": "معدل التطبيق وتدفق النظام\/المنطقة يستخدمان تدفق المشتت المتوسط الحقلي المقدَّر (q<sub>avg,field<\/sub> — متوسط الخط الجانبي للاختبار الخاص به، معدَّل بفرق الضغط المُدخل)، وليس معدل مخمَّن: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub>، مُغذَّى بالقيمة المنمذجة المعدَّلة. التباعد وعدد الخطوط الجانبية\/المشتتات على مستوى النظام مدخلات منفصلة هنا لأن مسار الاختبار ينمذج فقط فرعاً واحداً أسوأ حالة، وليس كل خط جانبي في الحقل.",
-                    "english": "Application rate and system\/zone flow use the estimated field-average emitter flow (q<sub>avg,field<\/sub> &mdash; the test lateral&rsquo;s own average, corrected by the entered &Delta;pressure estimate), not a guessed rate: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub>, fed by the corrected modeled value. Spacing and system-wide lateral\/emitter counts are separate inputs here because the test path only models one worst-case branch, not every lateral in the field."
+                    "key": "ip_press",
+                    "value": "ضغط",
+                    "english": "Press."
                 },
-                "next_translated": null
+                "next_translated": {
+                    "key": "ip_hl",
+                    "value": "h<sub>L<\/sub> <span title=\"إجمالي فاقد القطاع، h_f + h_m\" class=\"ec-tip\">؟<\/span>",
+                    "english": "h<sub>L<\/sub> <span title=\"Total reach loss, h_f + h_m\" class=\"ec-tip\">?<\/span>"
+                }
             }
         }
     },
-    "key_intent": []
+    "key_intent": {
+        "ip_hf": "Friction head loss.",
+        "ip_hm": "Minor (local) head loss."
+    }
 }

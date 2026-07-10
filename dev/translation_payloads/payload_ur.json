@@ -2,7 +2,7 @@
     "meta": {
         "language": "ur",
         "expected_key_count": 482,
-        "delta_key_count": 15,
+        "delta_key_count": 17,
         "active_prefixes": [
             "calc",
             "ip",
@@ -17,7 +17,7 @@
     },
     "prompt_context_by_prefix": {
         "calc": "Use these preferred technical term translations when relevant:\n- flow (Q): بہاؤ\n- velocity (v): رفتار\n- slope (S): ڈھلوان",
-        "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): بہاؤ\n- velocity (v): رفتار\n- head loss (h_L): ہیڈ لاس\n- emitter: خارج کنندہ\n- distribution uniformity (DU): تقسیم یکسانیت\n- low-quarter distribution uniformity (DU_lq): [needs translation sprint]\n- application rate (PR): اطلاق کی شرح\n- lateral: لیٹرل\n- mainline: مرکزی پائپ\n- reach: حصہ\n- velocity head (H_v): رفتار ہیڈ\n- friction loss (h_f): رگڑ نقصان\n- minor loss (h_m): مقامی نقصان\n- energy grade line (EGL): توانائی لائن\n- upstream: بالائی رخ\n- downstream: زیریں رخ",
+        "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): بہاؤ\n- velocity (v): رفتار\n- head loss (h_L): ہیڈ لاس\n- emitter: خارج کنندہ\n- distribution uniformity (DU): تقسیم یکسانیت\n- low-quarter distribution uniformity (DU_lq): نچلی چوتھائی تقسیم یکسانیت\n- application rate (PR): اطلاق کی شرح\n- lateral: لیٹرل\n- mainline: مرکزی پائپ\n- reach: حصہ\n- velocity head (H_v): رفتار ہیڈ\n- friction loss (h_f): رگڑ نقصان\n- minor loss (h_m): مقامی نقصان\n- energy grade line (EGL): توانائی لائن\n- upstream: بالائی رخ\n- downstream: زیریں رخ",
         "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): بہاؤ\n- penstock: دباؤ پائپ\n- gross head (H_gross): مجموعی ہیڈ\n- net head (H_net): خالص ہیڈ\n- plant efficiency (η): پلانٹ کارکردگی\n- head loss (h_L): ہیڈ لاس\n- run-of-river: ندی کی بہاؤ سے بجلی\n- headworks: آبی سرچشمہ ڈھانچہ\n- junction loss (h_m): جنکشن کا نقصان\n- minor loss (h_m): مقامی نقصان",
         "rc": "Use these preferred technical term translations when relevant:\n- flow (Q): بہاؤ\n- velocity (v): رفتار\n- riprap: پتھر کی حفاظت\n- slope (S): ڈھلوان\n- rock chute: پتھریلا تیز نالہ\n- chute: تیز نالہ\n- unit discharge (q, q_t): اکائی بہاؤ\n- median rock size (D50): اوسط پتھر کا سائز\n- gradation (SD): درجہ بندی\n- porosity (n_p): مسامیت\n- specific gravity (sg): مخصوص کثافت\n- ponding: پانی جمع ہونا\n- outlet apron: آؤٹ لیٹ ایپرن\n- weir head (H_p): [needs translation sprint]\n- upstream: بالائی رخ\n- downstream: زیریں رخ\n- reach: حصہ"
     },
@@ -71,7 +71,7 @@
                 "term": "emitter",
                 "symbol": "",
                 "context": "A drip irrigation emitter (dripper\/micro-sprinkler) that delivers water at a controlled low flow rate directly to the soil or plant root zone. Appears in Drip\/Sprinkler calculator.",
-                "translation_notes": "Use the field term most familiar to irrigation practitioners in the target language. Arabic: 'قطارة' (dripper) is the field term, preferred over the academic 'مُصدِر'. Spanish: 'gotero' is field-common in Latin America alongside the technical 'emisor'. Ukrainian: 'крапельниця' is the field term used by irrigation workers.",
+                "translation_notes": "Use the field term most familiar to irrigation practitioners in the target language. Arabic: 'قطارة' (dripper) is the field term, preferred over the academic 'مُصدِر'. Spanish: 'gotero' is field-common in Latin America alongside the technical 'emisor'. Ukrainian: 'крапельниця' is the field term used by irrigation workers. zh CORRECTED (2026-07-10, category-4 wave-2 QA): the wave-2 zh translating agent initially deviated to the generic academic term '灌水器' throughout ip_ keys, reasoning that the calculator's emitter-exponent model (x from ~0 to 0.5) is generic rather than drip-only. Reverted to the established glossary field term '滴头' (dripper) for suite-wide consistency with the ar\/es\/uk pattern above — this glossary's own policy is field-term-over-academic-generality across all languages, and a generic hydraulic model doesn't change what practitioners actually call the part.",
                 "preferred_translation": "خارج کنندہ"
             },
             {
@@ -85,8 +85,8 @@
                 "term": "low-quarter distribution uniformity",
                 "symbol": "DU_lq",
                 "context": "Irrigation statistic: average of the lowest quarter of measured emitter flows divided by the overall average. Referenced in Irrigation Pressure notes as \"textbook low-quarter Distribution Uniformity\".",
-                "translation_notes": "Use the established irrigation-engineering phrase; do not invent one. \"Textbook\" is an adjective meaning \"as defined in standard textbooks\" — fr rendered it \"manuel\" (manual check), wrong. he: uniformity = אחידות, never the nonword הוודות. Wave-1 coinages (2026-07, category-4 sprint): fr=\"uniformité de distribution du quart inférieur\", ro=\"Uniformitatea Distribuției de sfert inferior\", ru=\"равномерность распределения по нижней четверти\", uk=\"рівномірність розподілу по низькій чверті\", bg=\"равномерност на разпределение по долната четвърт\", sr=\"равномерност расподеле нижег квартила\", hr=\"jednolikost distribucije niske grupe\", cs=\"Uniformita distribuce nízké čtvrtiny\", tr=\"düşük-çeyrek Dağıtım Uniformluğu\", id=\"Keseragaman Distribusi kuartal-bawah\". es\/pt\/it\/de already had glossary coverage pre-sprint. Not yet native-reviewed.",
-                "preferred_translation": ""
+                "translation_notes": "Use the established irrigation-engineering phrase; do not invent one. \"Textbook\" is an adjective meaning \"as defined in standard textbooks\" — fr rendered it \"manuel\" (manual check), wrong. he: uniformity = אחידות, never the nonword הוודות. Wave-1 coinages (2026-07, category-4 sprint): fr=\"uniformité de distribution du quart inférieur\", ro=\"Uniformitatea Distribuției de sfert inferior\", ru=\"равномерность распределения по нижней четверти\", uk=\"рівномірність розподілу по низькій чверті\", bg=\"равномерност на разпределение по долната четвърт\", sr=\"равномерност расподеле нижег квартила\", hr=\"jednolikost distribucije niske grupe\", cs=\"Uniformita distribuce nízké čtvrtiny\", tr=\"düşük-çeyrek Dağıtım Uniformluğu\", id=\"Keseragaman Distribusi kuartal-bawah\". es\/pt\/it\/de already had glossary coverage pre-sprint. Not yet native-reviewed. ur ADDED (2026-07-10, category-4 wave-2 sprint): \"نچلی چوتھائی تقسیم یکسانیت\" (lower-quarter distribution uniformity) reuses the established ur terms چوتھائی (quarter), تقسیم (distribution), یکسانیت (uniformity, already glossary term for plain \"distribution uniformity\"). Not yet native-reviewed. hi ADDED (2026-07-10, category-4 wave-2 re-translation): 'निम्न-चतुर्थांश वितरण एकरूपता' (low-quarter distribution uniformity) reuses the glossary's own hi=\"वितरण एकरूपता\" for the base \"distribution uniformity\" term and prefixes \"निम्न-चतुर्थांश\" (low-quarter), matching the wave-1 pattern of naming the concept literally (fr\/ru\/uk\/id etc.) rather than inventing a new metaphor. NOTE: the hi ip_ file's own pre-sprint text mistakenly used 'पाठ्यपुस्तक' (textbook) where the current English source says 'standard' — corrected to 'मानक' (standard) in lib\/lang.ec.hi.php during this sprint; do not reintroduce पाठ्यपुस्तक. ar ADDED (2026-07-10, category-4 wave-2 re-translation): 'انتظام التوزيع للربع الأدنى' (uniformity of distribution of the lowest quarter) reuses the glossary's own ar=\"انتظام التوزيع\" base term for plain \"distribution uniformity\" (switched suite-wide in this sprint from a prior 'توحيد' root to 'انتظام', which better conveys 'evenness' rather than 'unification') and appends 'للربع الأدنى' (of the lowest quarter), naming the concept literally like the fr\/ru\/uk\/id wave-1 coinages. Where the English source's own qualifier 'standard' appears in context (ip_du_estimate, ip_notes_3_def), it is rendered inline as 'القياسي' immediately after this base phrase, kept out of the pure glossary term here for parity with the other languages' entries. bn ADDED (2026-07-10, category-4 wave-2 re-translation): 'নিম্ন-চতুর্থাংশ বিতরণ সমতা' (low-quarter distribution uniformity), built on the glossary's own bn=\"বিতরণ সমতা\" base term, naming the concept literally. fa ADDED (2026-07-10, category-4 wave-2 re-translation): 'یکنواختی توزیع ربع پایین' (low-quarter distribution uniformity), built on the glossary's own fa=\"یکنواختی توزیع\" base term; where English says \"standard\" it is rendered inline as \"استاندارد\" immediately after this base phrase, same pattern as ar.",
+                "preferred_translation": "نچلی چوتھائی تقسیم یکسانیت"
             },
             {
                 "term": "application rate",
@@ -368,7 +368,9 @@
         "rc_pond_warn_tip": "No ponding upstream of the chute inlet; erosion could occur upstream. (USDA)",
         "ip_length": "L",
         "ip_diameter": "D",
-        "ip_roughness": "e"
+        "ip_roughness": "e",
+        "ip_hf": "h<sub>f<\/sub>",
+        "ip_hm": "h<sub>m<\/sub>"
     },
     "keys": {
         "calc_copy_link": "Copy link",
@@ -385,7 +387,9 @@
         "rc_pond_warn_tip": "No ponding upstream of the chute inlet; erosion could occur upstream. (USDA)",
         "ip_length": "L",
         "ip_diameter": "D",
-        "ip_roughness": "e"
+        "ip_roughness": "e",
+        "ip_hf": "h<sub>f<\/sub>",
+        "ip_hm": "h<sub>m<\/sub>"
     },
     "key_context": {
         "calc_copy_link": {
@@ -586,12 +590,12 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "ایمیٹرز <span title=\"لیٹرل قطاریں: صرف اس حصے کے ایمیٹرز۔ مرکزی قطاریں: اس حصے سے شاخ بننے والے دیگر لیٹرلز کے کل ایمیٹرز۔ ٹیسٹ لیٹرل کے اپنے اخذ مقام والے حصے کے لیے اس میں وہ تمام لیٹرلز بھی شامل ہیں جو اس مقام سے آگے مرکزی پائپ پر ہیں، یا وہی جوڑ استعمال کرتے ہیں (مثلاً مخالف سمت کا لیٹرل) &mdash; ان کا بہاؤ بھی اسی حصے سے گزرتا ہے۔\" class=\"ec-tip\">?<\/span>",
+                    "value": "ایمیٹرز <span title=\"لیٹرل قطاریں: صرف اس ریچ کے ایمیٹرز۔ مرکزی قطاریں: اس ریچ سے شاخ ہونے والے دیگر لیٹرلز کے کل ایمیٹرز۔ ٹیسٹ لیٹرل لائن پر ختم ہونے والے مرکزی لائن کے ریچ کے لیے، اس میں وہ تمام لیٹرلز بھی شامل ہیں جو اس مقام سے آگے مرکزی لائن پر ہیں، یا وہی جوڑ بانٹتے ہیں (مثلاً مخالف سمت کا لیٹرل) &mdash; ان کا بہاؤ بھی اسی ریچ سے گزرتا ہے۔\" class=\"ec-tip\">?<\/span>",
                     "english": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>"
                 },
                 "next_translated": {
                     "key": "ip_km",
-                    "value": "K<sub>m<\/sub> <span title=\"اس حصے کی فٹنگز\/والوز\/جوڑوں کے لیے مجموعی مقامی نقصان کا معامل (تجویز کردہ کم از کم &ge;0.5)\" class=\"ec-tip\">?<\/span>",
+                    "value": "k<sub>m<\/sub> <span title=\"اس ریچ کی فٹنگز\/والوز\/جوڑنے والوں کے لیے عمومی مقامی نقصان کا عامل (تجویز کردہ کم از کم &ge;0.5)\" class=\"ec-tip\">?<\/span>",
                     "english": "k<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
                 }
             }
@@ -602,32 +606,67 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "ایمیٹرز <span title=\"لیٹرل قطاریں: صرف اس حصے کے ایمیٹرز۔ مرکزی قطاریں: اس حصے سے شاخ بننے والے دیگر لیٹرلز کے کل ایمیٹرز۔ ٹیسٹ لیٹرل کے اپنے اخذ مقام والے حصے کے لیے اس میں وہ تمام لیٹرلز بھی شامل ہیں جو اس مقام سے آگے مرکزی پائپ پر ہیں، یا وہی جوڑ استعمال کرتے ہیں (مثلاً مخالف سمت کا لیٹرل) &mdash; ان کا بہاؤ بھی اسی حصے سے گزرتا ہے۔\" class=\"ec-tip\">?<\/span>",
+                    "value": "ایمیٹرز <span title=\"لیٹرل قطاریں: صرف اس ریچ کے ایمیٹرز۔ مرکزی قطاریں: اس ریچ سے شاخ ہونے والے دیگر لیٹرلز کے کل ایمیٹرز۔ ٹیسٹ لیٹرل لائن پر ختم ہونے والے مرکزی لائن کے ریچ کے لیے، اس میں وہ تمام لیٹرلز بھی شامل ہیں جو اس مقام سے آگے مرکزی لائن پر ہیں، یا وہی جوڑ بانٹتے ہیں (مثلاً مخالف سمت کا لیٹرل) &mdash; ان کا بہاؤ بھی اسی ریچ سے گزرتا ہے۔\" class=\"ec-tip\">?<\/span>",
                     "english": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>"
                 },
                 "next_translated": {
                     "key": "ip_km",
-                    "value": "K<sub>m<\/sub> <span title=\"اس حصے کی فٹنگز\/والوز\/جوڑوں کے لیے مجموعی مقامی نقصان کا معامل (تجویز کردہ کم از کم &ge;0.5)\" class=\"ec-tip\">?<\/span>",
+                    "value": "k<sub>m<\/sub> <span title=\"اس ریچ کی فٹنگز\/والوز\/جوڑنے والوں کے لیے عمومی مقامی نقصان کا عامل (تجویز کردہ کم از کم &ge;0.5)\" class=\"ec-tip\">?<\/span>",
                     "english": "k<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
                 }
             }
         },
         "ip_roughness": {
-            "reason": "missing",
-            "current_value": null,
+            "reason": "equal_to_english",
+            "current_value": "e",
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "ایمیٹرز <span title=\"لیٹرل قطاریں: صرف اس حصے کے ایمیٹرز۔ مرکزی قطاریں: اس حصے سے شاخ بننے والے دیگر لیٹرلز کے کل ایمیٹرز۔ ٹیسٹ لیٹرل کے اپنے اخذ مقام والے حصے کے لیے اس میں وہ تمام لیٹرلز بھی شامل ہیں جو اس مقام سے آگے مرکزی پائپ پر ہیں، یا وہی جوڑ استعمال کرتے ہیں (مثلاً مخالف سمت کا لیٹرل) &mdash; ان کا بہاؤ بھی اسی حصے سے گزرتا ہے۔\" class=\"ec-tip\">?<\/span>",
+                    "value": "ایمیٹرز <span title=\"لیٹرل قطاریں: صرف اس ریچ کے ایمیٹرز۔ مرکزی قطاریں: اس ریچ سے شاخ ہونے والے دیگر لیٹرلز کے کل ایمیٹرز۔ ٹیسٹ لیٹرل لائن پر ختم ہونے والے مرکزی لائن کے ریچ کے لیے، اس میں وہ تمام لیٹرلز بھی شامل ہیں جو اس مقام سے آگے مرکزی لائن پر ہیں، یا وہی جوڑ بانٹتے ہیں (مثلاً مخالف سمت کا لیٹرل) &mdash; ان کا بہاؤ بھی اسی ریچ سے گزرتا ہے۔\" class=\"ec-tip\">?<\/span>",
                     "english": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>"
                 },
                 "next_translated": {
                     "key": "ip_km",
-                    "value": "K<sub>m<\/sub> <span title=\"اس حصے کی فٹنگز\/والوز\/جوڑوں کے لیے مجموعی مقامی نقصان کا معامل (تجویز کردہ کم از کم &ge;0.5)\" class=\"ec-tip\">?<\/span>",
+                    "value": "k<sub>m<\/sub> <span title=\"اس ریچ کی فٹنگز\/والوز\/جوڑنے والوں کے لیے عمومی مقامی نقصان کا عامل (تجویز کردہ کم از کم &ge;0.5)\" class=\"ec-tip\">?<\/span>",
                     "english": "k<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
+                }
+            }
+        },
+        "ip_hf": {
+            "reason": "equal_to_english",
+            "current_value": "h<sub>f<\/sub>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "ip_press",
+                    "value": "دباؤ",
+                    "english": "Press."
+                },
+                "next_translated": {
+                    "key": "ip_hl",
+                    "value": "h<sub>L<\/sub> <span title=\"ریچ کا کل نقصان، h_f + h_m\" class=\"ec-tip\">?<\/span>",
+                    "english": "h<sub>L<\/sub> <span title=\"Total reach loss, h_f + h_m\" class=\"ec-tip\">?<\/span>"
+                }
+            }
+        },
+        "ip_hm": {
+            "reason": "equal_to_english",
+            "current_value": "h<sub>m<\/sub>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "ip_press",
+                    "value": "دباؤ",
+                    "english": "Press."
+                },
+                "next_translated": {
+                    "key": "ip_hl",
+                    "value": "h<sub>L<\/sub> <span title=\"ریچ کا کل نقصان، h_f + h_m\" class=\"ec-tip\">?<\/span>",
+                    "english": "h<sub>L<\/sub> <span title=\"Total reach loss, h_f + h_m\" class=\"ec-tip\">?<\/span>"
                 }
             }
         }
     },
-    "key_intent": []
+    "key_intent": {
+        "ip_hf": "Friction head loss.",
+        "ip_hm": "Minor (local) head loss."
+    }
 }
