@@ -152,7 +152,7 @@ $ec_lang['mpf_wetted_perimeter']='Perímetro molhado, P<sub>w</sub>';
 $ec_lang['mpf_hydraulic_radius']='Raio hidráulico, R<sub>h</sub>';
 $ec_lang['mpf_top_width']='Largura superior, T';
 $ec_lang['mpf_froude_number']='Número de Froude, Fr';
-$ec_lang['mpf_shear_stress']='Tensão de cisalhamento média (força de arrasto), &tau;';
+$ec_lang['mpf_shear_stress']='Tensão de cisalhamento média (força trativa), &tau;';
 $ec_lang['mpf_full_flow']='Vazão a seção plena, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Razão em relação à seção plena, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>Este é o escoamento e a profundidade no interior de um tubo <em>infinitamente longo</em>.</dt><dd>Fazer o escoamento entrar no tubo pode exigir uma profundidade de água significativamente maior. Acrescente pelo menos 1,5 vezes a carga de velocidade para obter a profundidade de água a montante ou <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">veja meu tutorial de 2 minutos</a> sobre cálculos padrão de nível de água em bueiros usando HY-8.</dd>';
