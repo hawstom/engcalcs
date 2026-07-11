@@ -6,7 +6,6 @@
         "active_prefixes": [
             "calc",
             "ip",
-            "irr",
             "mhp",
             "rc"
         ],
@@ -19,7 +18,6 @@
     "prompt_context_by_prefix": {
         "calc": "Use these preferred technical term translations when relevant:\n- flow (Q): លំហូរ\n- velocity (v): ល្បឿន\n- slope (S): ជម្រាល",
         "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): លំហូរ\n- velocity (v): ល្បឿន\n- head loss (h_L): ការបាត់បង់ថ្ពល\n- emitter: ឧបករណ៍ចំណោចទឹក\n- distribution uniformity (DU): ឯកសណ្ឋានភាពចែកចាយ\n- low-quarter distribution uniformity (DU_lq): [needs translation sprint]\n- application rate (PR): អត្រាដាក់ទឹក\n- lateral: បំពង់រង\n- mainline: បំពង់មេ\n- reach: ចម្រៀកបំពង់\n- velocity head (H_v): កម្ពស់ល្បឿន\n- friction loss (h_f): ការបាត់បង់ដោយកកិត\n- minor loss (h_m): ការបាត់បង់មូលដ្ឋាន\n- energy grade line (EGL): ខ្សែថាមពល\n- upstream: [needs translation sprint]\n- downstream: [needs translation sprint]",
-        "irr": "Use these preferred technical term translations when relevant:\n- flow (Q): លំហូរ\n- weir: ស្ទីង\n- orifice: ប្រហោងទឹក\n- seepage: ការជ្រាបទឹក\n- conveyance efficiency (E_c): ប្រសិទ្ធភាពដឹកជញ្ជូន\n- check structure: [needs translation sprint]",
         "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): លំហូរ\n- penstock: បំពង់សម្ពាធ\n- gross head (H_gross): ថ្ពល់សរុប\n- net head (H_net): ថ្ពល់សុទ្ធ\n- plant efficiency (η): ប្រសិទ្ធភាពរោងចក្រ\n- head loss (h_L): ការបាត់បង់ថ្ពល\n- run-of-river: ថាមពលទឹករត់\n- headworks: រចនាសម្ព័ន្ធទទួលទឹក\n- junction loss (h_m): ការបាត់បង់ក្នុងចំណុច\n- minor loss (h_m): ការបាត់បង់មូលដ្ឋាន",
         "rc": "Use these preferred technical term translations when relevant:\n- flow (Q): លំហូរ\n- velocity (v): ល្បឿន\n- riprap: ថ្មការពារ\n- slope (S): ជម្រាល\n- rock chute: ប្រឡាយថ្មជម្រាល\n- chute: ប្រឡាយលំហូរខ្លាំង\n- unit discharge (q, q_t): ល្បឿនហូរតាមឯកតា\n- median rock size (D50): ទំហំថ្មមធ្យម\n- gradation (SD): ការចាត់ថ្នាក់ទំហំថ្ម\n- porosity (n_p): ភាពប្រហោង\n- specific gravity (sg): ទំងន់ចំពោះ\n- ponding: [needs translation sprint]\n- outlet apron: [needs translation sprint]\n- weir head (H_p): [needs translation sprint]\n- upstream: [needs translation sprint]\n- downstream: [needs translation sprint]\n- reach: ចម្រៀកបំពង់"
     },
@@ -158,50 +156,6 @@
                 "symbol": "",
                 "context": "Direction away from the supply, toward the outlet \/ last emitter.",
                 "translation_notes": "Never software \"downgrade\". ar: downstream = المصب \/ أسفل المجرى (a file used المنبعية = source-side, wrong).",
-                "preferred_translation": ""
-            }
-        ],
-        "irr": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered. ENGINEER CLARIFICATION (2026-07-06): 'дебит is a typical colloquial call of the word — regular people and non-hydraulic engineers use it. In university (hydraulic engineering) they used водно количество for Q, never дебит. I guess both work.' So both are acceptable; водно количество is the academic\/hydraulic-engineering register, дебит the general register. Still an open decision whether to standardize on водно количество suite-wide.",
-                "preferred_translation": "លំហូរ"
-            },
-            {
-                "term": "weir",
-                "symbol": "",
-                "context": "A flow-measurement or water-control structure — a barrier across a channel over which water flows. Appears in Weir Flow Simple and Weir Flow Irregular calculators.",
-                "translation_notes": "WMO No. 385 entry 1665 confirms: es = 'vertedero', fr = 'déversoir', ru = 'водослив'. In an irrigation context, the term often overlaps with 'diversion dam' or 'check structure'. Use the term most common among irrigation field workers in the target language, not a purely civil-engineering dictionary term.",
-                "preferred_translation": "ស្ទីង"
-            },
-            {
-                "term": "orifice",
-                "symbol": "",
-                "context": "A submerged or free-flowing opening through which water discharges under head. Appears in Orifice Flow and Orifice Drain Time calculators.",
-                "translation_notes": "In irrigation contexts, often the opening of a headgate or pipe turnout. Use the hydraulic engineering term, not a general word for 'hole' or 'opening'.",
-                "preferred_translation": "ប្រហោងទឹក"
-            },
-            {
-                "term": "seepage",
-                "symbol": "",
-                "context": "Water lost from a canal through the bed and banks by percolation into the soil. Appears in Canal Seepage calculator.",
-                "translation_notes": "Use the irrigation\/canal engineering term for slow percolation loss, not a word implying leakage through a crack or structural failure.",
-                "preferred_translation": "ការជ្រាបទឹក"
-            },
-            {
-                "term": "conveyance efficiency",
-                "symbol": "E_c",
-                "context": "Ratio of outflow to inflow in a canal reach — measures how much water delivered at the head is received at the tail. Appears in Canal Seepage calculator. E_c = Q_out \/ Q_in.",
-                "translation_notes": "This is the most terminology-sensitive term in the suite. 'Conveyance' means transport of water along a canal — do not use a general word for 'efficiency' alone. The term should convey 'how well the canal transports water without loss'. DATA-ERROR FIX 2026-07-10 (category-4 wave-2 hi re-translation): glossary hi value was 'वहन दक्षता' (vahan dakshata), but lib\/lang.ec.hi.php's own cs_ and irr_ keys (cs_main_menu, cs_main_title, cs_Ec, cs_Ec_check, cs_notes_1_def, cs_notes_2_term, irr_card_seepage_head, etc. — 10+ occurrences, predating this sprint) all already establish 'संवहन दक्षता' (sanvahan dakshata) as the incumbent term. Standardized the glossary to match established suite usage, same defect class as prior DATA-ERROR FIX entries in this file.",
-                "preferred_translation": "ប្រសិទ្ធភាពដឹកជញ្ជូន"
-            },
-            {
-                "term": "check structure",
-                "symbol": "",
-                "context": "A small flow-control structure (gate or board structure) in an irrigation canal, used to raise ('check') the upstream water level for diversion or measurement. 'Check' is part of the structure's name.",
-                "translation_notes": "Use the local irrigation term for a canal check\/control gate. 'Check' here is NOT the verb 'to verify\/inspect' — do not translate as 'inspect the structure'. Wave-1 coinages (2026-07, category-4 sprint, this term had zero prior translations): es=\"estructura de control\", pt=\"estrutura de controle\", fr=\"ouvrage de régulation\", it=\"struttura di regolazione\", de=\"Kontrollbauwerk\", ro=\"stăvilar de control\", ru=\"регулирующее сооружение\", uk=\"контрольна споруда\", bg=\"контролно съоръжение\", sr=\"устава\", hr=\"regulacijska ustava\", cs=\"regulační objekt\", tr=\"kontrol yapısı\", id=\"bangunan pengatur\". Not yet reviewed by a native speaker; propagate to waves 2-3 for consistency. ur ADDED (2026-07-10, category-4 wave-2 sprint): \"کنٹرول ڈھانچہ\" (control structure) follows the majority \"control structure\" pattern (es\/pt\/it\/de\/ro\/ru\/uk\/bg\/hr\/cs\/tr\/id) rather than a literal \"check\", avoiding the check=verify mistranslation trap. Matches the term already used consistently in the shipped ur file (irr_ keys) prior to this sprint. Not yet native-reviewed. hi ADDED (2026-07-10, category-4 wave-2 re-translation): 'नियंत्रण संरचना' (control\/regulating structure) follows the majority wave-1 pattern (es\/pt=\"estructura\/estrutura de control(e)\", fr=\"ouvrage de régulation\", ru=\"регулирующее сооружение\") and matches the suite's own established incumbent Hindi phrase for this exact control-structure concept already used in lib\/lang.ec.hi.php (irr_card_weir_irregular_desc: \"बहु-खंड नियंत्रण संरचनाएं\" = multi-section control structures, predates this sprint). ar ADDED (2026-07-10, category-4 wave-2 re-translation): 'منشأة تحكم' (control structure\/facility) follows the same majority 'control structure' pattern, and matches the incumbent phrasing already used in the shipped ar file's irr_card_weir_uniform_desc and irr_quickref_html prior to this sprint (both already said منشأة تحكم\/منشأة التحكم for this exact concept) — no change to established suite usage, just confirmed and propagated to the glossary. تحكم (control\/regulation) keeps the 'check' = control-gate sense and avoids the verb-of-inspection trap. zh ADDED (2026-07-10, category-4 wave-2 re-translation): '节制闸' (jiézhìzhá, control\/check gate) is the standard Chinese irrigation-engineering term for exactly this structure type, distinct from any 'inspect' sense. bn ADDED (2026-07-10, category-4 wave-2 re-translation): 'নিয়ন্ত্রণ কাঠামো' (control structure) follows the majority pattern. fa ADDED (2026-07-10, category-4 wave-2 re-translation): 'سازه کنترل' (control structure) follows the majority pattern.",
                 "preferred_translation": ""
             }
         ],
@@ -415,8 +369,8 @@
         "ip_length": "L",
         "ip_diameter": "D",
         "ip_roughness": "e",
-        "irr_card_pressure_head": "Irrigation Pressure &amp; Uniformity",
-        "irr_card_pressure_desc": "Model the pressure and flow profile along a main-lateral-emitter branch to estimate distribution uniformity from the real test-path pressure, not just a catalog emitter flow rate."
+        "ip_hf": "h<sub>f<\/sub>",
+        "ip_hm": "h<sub>m<\/sub>"
     },
     "keys": {
         "calc_copy_link": "Copy link",
@@ -434,8 +388,8 @@
         "ip_length": "L",
         "ip_diameter": "D",
         "ip_roughness": "e",
-        "irr_card_pressure_head": "Irrigation Pressure &amp; Uniformity",
-        "irr_card_pressure_desc": "Model the pressure and flow profile along a main-lateral-emitter branch to estimate distribution uniformity from the real test-path pressure, not just a catalog emitter flow rate."
+        "ip_hf": "h<sub>f<\/sub>",
+        "ip_hm": "h<sub>m<\/sub>"
     },
     "key_context": {
         "calc_copy_link": {
@@ -641,7 +595,7 @@
                 },
                 "next_translated": {
                     "key": "ip_km",
-                    "value": "K<sub>m<\/sub> <span title=\"មេគុណបាត់បង់មូលដ្ឋានសរុបសម្រាប់គ្រឿងតភ្ជាប់\/សន្ទះបិទបើក\/ក្បាលតបំពង់នៃចម្រៀកនេះ (អប្បបរមាដែលណែនាំ &ge;0.5)\" class=\"ec-tip\">?<\/span>",
+                    "value": "k<sub>m<\/sub> <span title=\"មេគុណបាត់បង់មូលដ្ឋានសរុបសម្រាប់គ្រឿងតភ្ជាប់\/សន្ទះបិទបើក\/ក្បាលតបំពង់នៃចម្រៀកនេះ (អប្បបរមាដែលណែនាំ &ge;0.5)\" class=\"ec-tip\">?<\/span>",
                     "english": "k<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
                 }
             }
@@ -657,14 +611,14 @@
                 },
                 "next_translated": {
                     "key": "ip_km",
-                    "value": "K<sub>m<\/sub> <span title=\"មេគុណបាត់បង់មូលដ្ឋានសរុបសម្រាប់គ្រឿងតភ្ជាប់\/សន្ទះបិទបើក\/ក្បាលតបំពង់នៃចម្រៀកនេះ (អប្បបរមាដែលណែនាំ &ge;0.5)\" class=\"ec-tip\">?<\/span>",
+                    "value": "k<sub>m<\/sub> <span title=\"មេគុណបាត់បង់មូលដ្ឋានសរុបសម្រាប់គ្រឿងតភ្ជាប់\/សន្ទះបិទបើក\/ក្បាលតបំពង់នៃចម្រៀកនេះ (អប្បបរមាដែលណែនាំ &ge;0.5)\" class=\"ec-tip\">?<\/span>",
                     "english": "k<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
                 }
             }
         },
         "ip_roughness": {
-            "reason": "missing",
-            "current_value": null,
+            "reason": "equal_to_english",
+            "current_value": "e",
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
@@ -673,35 +627,46 @@
                 },
                 "next_translated": {
                     "key": "ip_km",
-                    "value": "K<sub>m<\/sub> <span title=\"មេគុណបាត់បង់មូលដ្ឋានសរុបសម្រាប់គ្រឿងតភ្ជាប់\/សន្ទះបិទបើក\/ក្បាលតបំពង់នៃចម្រៀកនេះ (អប្បបរមាដែលណែនាំ &ge;0.5)\" class=\"ec-tip\">?<\/span>",
+                    "value": "k<sub>m<\/sub> <span title=\"មេគុណបាត់បង់មូលដ្ឋានសរុបសម្រាប់គ្រឿងតភ្ជាប់\/សន្ទះបិទបើក\/ក្បាលតបំពង់នៃចម្រៀកនេះ (អប្បបរមាដែលណែនាំ &ge;0.5)\" class=\"ec-tip\">?<\/span>",
                     "english": "k<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
                 }
             }
         },
-        "irr_card_pressure_head": {
-            "reason": "missing",
-            "current_value": null,
+        "ip_hf": {
+            "reason": "equal_to_english",
+            "current_value": "h<sub>f<\/sub>",
             "neighbors": {
                 "previous_translated": {
-                    "key": "ip_notes_5_def",
-                    "value": "អត្រាដាក់ទឹក និងលំហូរប្រព័ន្ធ\/តំបន់ ប្រើលំហូរមធ្យមប៉ាន់ស្មានរបស់ក្បាលបញ្ចេញទឹកទាំងវាល (q<sub>avg,field<\/sub> &mdash; មធ្យមរបស់បំពង់រងសាកល្បងខ្លួនឯង កែតម្រូវដោយការប៉ាន់ស្មាន &Delta;សម្ពាធដែលបានបញ្ចូល) មិនមែនអត្រាទាយស្មានទេ: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub> ផ្គត់ផ្គង់ដោយតម្លៃគំរូដែលបានកែតម្រូវ។ គម្លាត និងចំនួនបំពង់រង\/ក្បាលបញ្ចេញទឹកទាំងប្រព័ន្ធជាការបញ្ចូលដាច់ដោយឡែកនៅទីនេះ ព្រោះផ្លូវសាកល្បងធ្វើគំរូតែសាខាករណីអាក្រក់បំផុតមួយប៉ុណ្ណោះ មិនមែនបំពង់រងនីមួយៗក្នុងវាលទេ។",
-                    "english": "Application rate and system\/zone flow use the estimated field-average emitter flow (q<sub>avg,field<\/sub> &mdash; the test lateral&rsquo;s own average, corrected by the entered &Delta;pressure estimate), not a guessed rate: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub>, fed by the corrected modeled value. Spacing and system-wide lateral\/emitter counts are separate inputs here because the test path only models one worst-case branch, not every lateral in the field."
+                    "key": "ip_press",
+                    "value": "សម្ពាធ",
+                    "english": "Press."
                 },
-                "next_translated": null
+                "next_translated": {
+                    "key": "ip_hl",
+                    "value": "h<sub>L<\/sub> <span title=\"ការបាត់បង់សរុបនៃចម្រៀក, h_f + h_m\" class=\"ec-tip\">?<\/span>",
+                    "english": "h<sub>L<\/sub> <span title=\"Total reach loss, h_f + h_m\" class=\"ec-tip\">?<\/span>"
+                }
             }
         },
-        "irr_card_pressure_desc": {
-            "reason": "missing",
-            "current_value": null,
+        "ip_hm": {
+            "reason": "equal_to_english",
+            "current_value": "h<sub>m<\/sub>",
             "neighbors": {
                 "previous_translated": {
-                    "key": "ip_notes_5_def",
-                    "value": "អត្រាដាក់ទឹក និងលំហូរប្រព័ន្ធ\/តំបន់ ប្រើលំហូរមធ្យមប៉ាន់ស្មានរបស់ក្បាលបញ្ចេញទឹកទាំងវាល (q<sub>avg,field<\/sub> &mdash; មធ្យមរបស់បំពង់រងសាកល្បងខ្លួនឯង កែតម្រូវដោយការប៉ាន់ស្មាន &Delta;សម្ពាធដែលបានបញ្ចូល) មិនមែនអត្រាទាយស្មានទេ: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub> ផ្គត់ផ្គង់ដោយតម្លៃគំរូដែលបានកែតម្រូវ។ គម្លាត និងចំនួនបំពង់រង\/ក្បាលបញ្ចេញទឹកទាំងប្រព័ន្ធជាការបញ្ចូលដាច់ដោយឡែកនៅទីនេះ ព្រោះផ្លូវសាកល្បងធ្វើគំរូតែសាខាករណីអាក្រក់បំផុតមួយប៉ុណ្ណោះ មិនមែនបំពង់រងនីមួយៗក្នុងវាលទេ។",
-                    "english": "Application rate and system\/zone flow use the estimated field-average emitter flow (q<sub>avg,field<\/sub> &mdash; the test lateral&rsquo;s own average, corrected by the entered &Delta;pressure estimate), not a guessed rate: PR = q<sub>avg,field<\/sub> \/ A<sub>e<\/sub>, fed by the corrected modeled value. Spacing and system-wide lateral\/emitter counts are separate inputs here because the test path only models one worst-case branch, not every lateral in the field."
+                    "key": "ip_press",
+                    "value": "សម្ពាធ",
+                    "english": "Press."
                 },
-                "next_translated": null
+                "next_translated": {
+                    "key": "ip_hl",
+                    "value": "h<sub>L<\/sub> <span title=\"ការបាត់បង់សរុបនៃចម្រៀក, h_f + h_m\" class=\"ec-tip\">?<\/span>",
+                    "english": "h<sub>L<\/sub> <span title=\"Total reach loss, h_f + h_m\" class=\"ec-tip\">?<\/span>"
+                }
             }
         }
     },
-    "key_intent": []
+    "key_intent": {
+        "ip_hf": "Friction head loss.",
+        "ip_hm": "Minor (local) head loss."
+    }
 }

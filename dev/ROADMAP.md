@@ -804,6 +804,54 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 > (low-resource: am km my ps sw) pending Tom's authorization, then the holistic cross-language
 > consistency pass (still outstanding from categories 3 and 4) can be scheduled.
 
+> **Category 4 wave 3 (low-resource: am km my ps sw) complete 2026-07-10 [CC].** Complete
+> re-translation of all 107 keys (cs_ 34, irr_ 17, ip_ 56) into each of the 5 languages, 5 Sonnet
+> agents launched in parallel in the background. First launch hit the per-session API rate limit on
+> all 5 agents simultaneously before any file write landed (`git status` confirmed zero changes on
+> all 5 lang files) — per the session-limit-retry practice, verified no partial edits existed, waited
+> for the stated reset time, then relaunched all 5 (this was a retry of the same failed task, not a
+> duplicate sprint). All 5 completed on the second attempt. Same defect classes as waves 1-2 were
+> present in every language's prior pass and fixed: capitalized loss symbols (`H_f`/`H_m`/`H_l`/`K_m`
+> → `h_f`/`h_m`/`h_L`/`k_m`), unauthorized `✓`/`⚠` glyphs and marker words ("Warning:"/etc.) baked
+> into verdict strings that `EngCalcs.writeCheckHTML()` already prepends programmatically (km's
+> agent specifically identified the double-glyph mechanism), and glossary-term drift (wrong words for
+> seepage/weir/orifice/reach in am/km/ps in place of established glossary terms). Real content bugs
+> also found and fixed beyond mechanical rule violations: am/km both had garbled/nonsensical
+> `ip_worst_case_warn` and `ip_notes_2_term` text in the prior pass requiring full rewrite, not
+> patching; am/km both still carried the "textbook" vs. "standard" low-quarter DU mistranslation
+> (same defect class as hi in wave 2) in `ip_du_estimate`/`ip_notes_3_def`; ps had `cs_L` (reach
+> length) mistranslated as reach *width*; sw had "taji" (crown) as a mistranslation of "lateral"
+> throughout `ip_`, and "elevation" mistranslated as "length" in two keys. All 5 languages added the
+> 3 keys missing from their prior pass (`ip_roughness` replacing a stale orphaned `ip_e`,
+> `irr_card_pressure_head`, `irr_card_pressure_desc`).
+> **Independent QA (orchestrating AI, not agent self-reports)**: `php -l` clean on all 5 files.
+> `lang_syntax_validate.php --lang=am,km,my,ps,sw` reports only 14 pre-existing/unrelated
+> `identical-to-english` findings (calc_copy_link*, u_gradePercent, mtc_blodgett_v_bathurst,
+> wi_notes_we_def — outside cs_/irr_/ip_ scope). A from-scratch programmatic check confirmed
+> 107/107 keys present, zero tag-name mismatches, zero subscript-token mismatches, and zero
+> capitalized-loss-symbol matches against English across all 5 languages (first pass of this check
+> used a too-strict full-tag-string comparison that flagged 13 false positives per language, purely
+> from translated tooltip text inside `title="..."` attributes changing the raw string — re-verified
+> with a tag-*name*-only comparison, which is what actually matters for rendering, and got a clean
+> 0/107 across the board). **Manual back-translation check performed inline (no `ANTHROPIC_API_KEY`
+> set)**: read the 18 highest-risk long strings (`*_notes_*_def`, `*_warn` keys) across all 5
+> languages and independently back-translated each against the English source — all semantically
+> faithful, no meaning flips (e.g. no "worst case" inverted to "best case"), only compression/
+> paraphrase-level differences of the kind normal between languages.
+> **Glossary**: added am/km/ps/sw translations for `check structure` (my's agent had already added
+> its own); DATA-ERROR FIX for `conveyance efficiency` ps value — glossary had 'د اوبو د رسولو
+> موثریت' but the shipped ps file's own irr_ keys (15+ occurrences, predating this sprint) already
+> established 'د لیږدولو اغیزمنتیا' as the incumbent term, same defect class as the hi DATA-ERROR-FIX
+> from wave 2 — glossary corrected to match established suite usage rather than the file rewritten
+> mid-sprint. Payloads regenerated, `--check` FRESH.
+> QUALITY scores: am/km/my/ps/sw were already correctly at the `0.65` wave-3 tier in
+> `lib/Language.Settings.php` — no change needed (this sprint's QA depth matches exactly what that
+> tier assumes: agent self-check + independent structural check + inline manual back-translation
+> spot-check, no second-agent QA pass, no native review yet).
+> **Category 4 (cs_/irr_/ip_, all 3 waves, 21 languages total) is now complete.** Next: the holistic
+> cross-language consistency pass (Opus, still outstanding from categories 3 and 4) can be scheduled,
+> or item 85 can proceed to category 5 (micro-hydro: mhp_) pending Tom's direction.
+
 - 85|[CC] Extend the rc_/ip_ audit treatment to the remaining calculators using the category-grid plan (agreed with Tom 2026-07-06). **Calculator categories (N=6):** (1) open channel: mtc_+mi_ (59 keys — first, because the Bulgarian engineer's "irregular"="нередовен" catch is likely systemic across languages); (2) weirs & orifices: ws_+wi_+or_+odt_ (78); (3) pipe friction: dw_+hw_+mpf_+mphl_ (59); (4) irrigation & seepage: cs_+irr_ (54); (5) micro-hydro: mhp_ (44); (6) shared UI/units: u_+calc_+menu_+points_ incl. the ~121 identical-to-english validator warnings. **Language tiers (M=3), run as sequential waves within each category, not parallel cells:** wave 1 anchors (es pt fr it de ro ru uk bg sr hr cs tr id — cognate language groups let one glossary decision propagate; review side-by-side within Slavic/Romance blocks; **wave 1 is also the English-reform gate (Tom's principle, 2026-07-06): tier-1 translators/reviewers must flag English source strings that resist translation — idioms, stacked modifiers, compressions like "right at"/"draw off"/"Est." — and those grievances are resolved by REWRITING THE ENGLISH (author-reviewable in cognate languages) rather than only patching intents, BEFORE waves 2-3 launch, so all remaining languages inherit the more translatable source**), wave 2 major non-Latin (zh ar he hi bn fa ur), wave 3 low-resource (am km my ps sw — run last against the glossary enriched by waves 1-2; mandatory backtranslate_check + native-review flag). Per category: audit read → mechanical fixes → intents (needs human authorization) → glossary + prefixToTermNames additions → wave-1 sprint → English-reform pass from wave-1 grievances (human approves English edits; re-run wave 1 on changed keys) → waves 2-3 → post-sprint QA chain. Prereq raised by this ordering: implement the per-key English source-hash in payloads so any later English edit re-flags all 26 translations (audit §10.5). ≈10-12 authorization events total; each paid sprint gated on explicit user go-ahead per CLAUDE.md.
   - **CORRECTION 2026-07-07 (Tom, supersedes the paragraph below where they conflict):** the "DEPENDS on a completed, FROZEN English source" framing was a **mistake**. English is NOT frozen after Wave 0, and item 90 neither finishes Wave 0 nor freezes English — **item 90 was about key consolidation only**. Item 85 **starts with** its own Wave 0 pass by Fable across all calculator categories, editing obvious colloquialisms, jargon, and lazy phrases into easily-translatable English. English freezes only after wave 1 (interactive anchors) — see the SEQUENCING RULE box.
   - **DEPENDENCY / RESTRUCTURE 2026-07-07 (Tom + Opus; see CORRECTION above): item 85 no longer owns key consolidation.** The key-consolidation work is pulled *out* of item 85's per-calculator-category loop and done up front as a decoupled prerequisite: **item 90** (full-suite key consolidation, Opus — done). **Wave 0** (colloquialism cleanup, Fable) is item 85's first step, run externally across all categories. After Wave 0, item 85 proceeds **category by category** (all waves for a category before the next category) — a **complete re-translation** of every category (Tom's "be complete" call, 2026-07-07), tier by tier within each, with full QA. See the SEQUENCING RULE box for the authoritative recap. The old per-category "concept-level MERGE" and "English-reform pass from wave-1 grievances / re-run wave 1 on changed keys" steps are **superseded** (residual English grievances that wave-1 still surfaces become small, targeted English edits, not a structural loop). The §10.5 source-hash is deferred to *after* this complete pass. The sub-bullets below are retained as historical rationale; where they say "per category: … Wave 0 …" read Wave 0 as the single up-front English pass, not a per-category step.
