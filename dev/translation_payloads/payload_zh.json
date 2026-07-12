@@ -2,12 +2,10 @@
     "meta": {
         "language": "zh",
         "expected_key_count": 482,
-        "delta_key_count": 17,
+        "delta_key_count": 7,
         "active_prefixes": [
             "calc",
-            "ip",
-            "mhp",
-            "rc"
+            "ip"
         ],
         "requested_prefix": null,
         "notes": "Translate only keys in keys_to_translate; preserve HTML, units, and symbols.",
@@ -17,9 +15,7 @@
     },
     "prompt_context_by_prefix": {
         "calc": "Use these preferred technical term translations when relevant:\n- flow (Q): 流量\n- velocity (v): 流速\n- slope (S): 坡度",
-        "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): 流量\n- velocity (v): 流速\n- head loss (h_L): 水头损失\n- emitter: 滴头\n- distribution uniformity (DU): 分布均匀度\n- low-quarter distribution uniformity (DU_lq): 低四分之一分布均匀度\n- application rate (PR): 灌水强度\n- lateral: 毛管\n- mainline: 干管\n- reach: 管段\n- velocity head (H_v): 流速水头\n- friction loss (h_f): 沿程水头损失\n- minor loss (h_m): 局部水头损失\n- energy grade line (EGL): 能量坡度线\n- upstream: 上游\n- downstream: 下游",
-        "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): 流量\n- penstock: 压力管道\n- gross head (H_gross): 毛水头\n- net head (H_net): 净水头\n- plant efficiency (η): 机组效率\n- head loss (h_L): 水头损失\n- run-of-river: 径流式水电\n- headworks: 取水枢纽\n- junction loss (h_m): 局部水头损失\n- minor loss (h_m): 局部水头损失",
-        "rc": "Use these preferred technical term translations when relevant:\n- flow (Q): 流量\n- velocity (v): 流速\n- riprap: 抛石\n- slope (S): 坡度\n- rock chute: 块石陡槽\n- chute: 陡槽\n- unit discharge (q, q_t): 单宽流量\n- median rock size (D50): 中值粒径\n- gradation (SD): 级配\n- porosity (n_p): 孔隙率\n- specific gravity (sg): 比重\n- ponding: 壅水\n- outlet apron: 护坦\n- weir head (H_p): 堰上水头\n- upstream: 上游\n- downstream: 下游\n- reach: 管段"
+        "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): 流量\n- velocity (v): 流速\n- head loss (h_L): 水头损失\n- emitter: 滴头\n- distribution uniformity (DU): 分布均匀度\n- low-quarter distribution uniformity (DU_lq): 低四分之一分布均匀度\n- application rate (PR): 灌水强度\n- lateral: 毛管\n- mainline: 干管\n- reach: 管段\n- velocity head (H_v): 流速水头\n- friction loss (h_f): 沿程水头损失\n- minor loss (h_m): 局部水头损失\n- energy grade line (EGL): 能量坡度线\n- upstream: 上游\n- downstream: 下游"
     },
     "glossary_terms_by_prefix": {
         "calc": [
@@ -158,214 +154,11 @@
                 "translation_notes": "Never software \"downgrade\". ar: downstream = المصب \/ أسفل المجرى (a file used المنبعية = source-side, wrong).",
                 "preferred_translation": "下游"
             }
-        ],
-        "mhp": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered. ENGINEER CLARIFICATION (2026-07-06): 'дебит is a typical colloquial call of the word — regular people and non-hydraulic engineers use it. In university (hydraulic engineering) they used водно количество for Q, never дебит. I guess both work.' So both are acceptable; водно количество is the academic\/hydraulic-engineering register, дебит the general register. Still an open decision whether to standardize on водно количество suite-wide.",
-                "preferred_translation": "流量"
-            },
-            {
-                "term": "penstock",
-                "symbol": "",
-                "context": "Pressure pipe carrying water from a reservoir or headpond down to a turbine in a micro-hydro system. Appears in Micro-Hydro Power calculator.",
-                "translation_notes": "'Penstock' is a specialized term with no exact one-word equivalent in many languages. Use the established civil\/hydro engineering phrase for 'pressure conduit' or 'force main to turbine'. Czech: 'tlakovod' (pressure main) is preferred over the generic 'přiváděcí potrubí' (supply pipe). Serbian: 'напорни цевовод' is the standard hydraulic engineering term.",
-                "preferred_translation": "压力管道"
-            },
-            {
-                "term": "gross head",
-                "symbol": "H_gross",
-                "context": "Total elevation difference between the headpond water surface and the turbine — before subtracting penstock losses. Appears in Micro-Hydro Power calculator.",
-                "translation_notes": "'Gross' means total\/before-deduction. Pair with 'net head' for clarity. Use the hydro-power standard term.",
-                "preferred_translation": "毛水头"
-            },
-            {
-                "term": "net head",
-                "symbol": "H_net",
-                "context": "Effective head available at the turbine after subtracting penstock friction and minor losses from gross head. H_net = H_gross - h_L.",
-                "translation_notes": "'Net' means after-deduction. Pair with 'gross head'. Use the hydro-power standard term. WMO No. 385 entry 111 ('available head') gives the Russian term 'полезный напор' (useful head) \/ syn. 'располагаемый напор' — these overlap with net head in Russian hydro engineering practice.",
-                "preferred_translation": "净水头"
-            },
-            {
-                "term": "plant efficiency",
-                "symbol": "η",
-                "context": "Overall efficiency of a micro-hydro power plant — product of turbine, generator, and transmission efficiencies. Dimensionless, 0–1. Appears in Micro-Hydro Power calculator.",
-                "translation_notes": "'Plant' here means the power plant\/installation, not a living plant. Use the energy\/electrical engineering term for overall system efficiency.",
-                "preferred_translation": "机组效率"
-            },
-            {
-                "term": "head loss",
-                "symbol": "h_L",
-                "context": "Energy loss expressed as a height of water column. Appears in Darcy-Weisbach, Hazen-Williams, Manning pipe, and Penstock calculators. Distinct from 'pressure drop' — use the hydraulic engineering term.",
-                "translation_notes": "'Head' in the hydraulic sense (energy per unit weight) does not translate literally in many languages — use the established civil\/hydraulic engineering phrase. Pre-2026 sr\/hr human translations used 'gubitak pritiska' (= pressure loss), which is technically the same concept expressed in pressure terms rather than head terms. The current 'губитак напора \/ gubitak tlačne visine' (= loss of hydraulic head) is more precise in a hydraulic engineering context and is preferred. DATA-ERROR FIX 2026-07-09 (category-3 wave-1 sprint): ro\/tr\/id translations were pressure-loss-sense ('pierdere de presiune'\/'basınç kaybı'\/'kehilangan tekanan'), contradicting this note's own guidance. Independently flagged by both the ro and tr wave-1 translation agents; corrected to head-loss-sense ('pierdere de sarcină'\/'yük kaybı'\/'kehilangan tinggi tekan') to match what both agents actually used in lib\/lang.ec.ro.php and lib\/lang.ec.tr.php. de's 'Druckverlust' was left as-is (not flagged; German engineering practice uses pressure\/head loss terms more interchangeably in pipe-flow context) but is worth a second look in a future audit. DATA-ERROR FIX 2026-07-09 (category-3 fa sprint): fa was 'افت فشار' (literally 'pressure loss', same pressure-loss-sense defect class as the ro\/tr\/id fix above), while the fa file's own mphl_ head-loss labels already used 'افت هد' (head loss) and 'هد' is an established loanword elsewhere in the file (هد سرعت = velocity head). Standardized to 'افت هد' suite-wide for fa and fixed dw_\/hw_ labels in lib\/lang.ec.fa.php to match. DATA-ERROR FIX 2026-07-10 (category-3 sw wave-3 sprint): glossary sw value was 'upotevu wa shinikizo' (= pressure loss), the same pressure-loss-sense defect class as the ro\/tr\/id\/fa fixes above. But lib\/lang.ec.sw.php's own dw_main_desc\/dw_main_menu\/dw_main_title\/mphl_main_desc\/mphl_main_menu\/mphl_main_title (and mpf_velocity_head, ws_headWaterHeight, or_head, mhp_gross_head elsewhere in the file) all already establish 'Kichwa' (head) as the suite's real Swahili word for hydraulic head, not 'shinikizo' (pressure). Standardized the glossary to 'upotevu wa kichwa' to match the file's own established, correct usage instead of the stale pressure-sense glossary value. DATA-ERROR FIX 2026-07-10 (category-3 ps wave-3 sprint): glossary ps value was 'د سر زیان' (زیان = damage\/loss), but lib\/lang.ec.ps.php's own dw_\/hw_\/mpf_\/mphl_ head-loss labels (40+ occurrences suite-wide) all already use ضیاع, not زیان, for 'loss' (e.g. existing dw_main_menu 'Darcy-Weisbach د پایپ سر ضیاع', mphl_total_loss). زیان does not occur anywhere in the file. Standardized the glossary to 'د سر ضیاع' to match the file's actual established usage, same defect class as the sw fix above.",
-                "preferred_translation": "水头损失"
-            },
-            {
-                "term": "run-of-river",
-                "symbol": "",
-                "context": "A hydropower configuration that uses natural river flow without a dam or significant storage reservoir. Power output varies with seasonal river flow. Appears in Micro-Hydro Power calculator.",
-                "translation_notes": "Use the established energy\/hydropower sector term. 'Run' means natural river current — do not translate as jogging or running. WMO No. 385 entry 1263 gives the full facility names: Spanish 'central hidroeléctrica de pasada', French 'usine hydroélectrique au fil de l'eau', Russian 'русловая гидроэлектростанция' — these are the authoritative terms for the power plant noun. The abbreviated forms 'filo de agua' (es), 'au fil de l'eau' (fr), and 'русловая ГЭС' (ru) are standard in engineering use. German: 'Laufwasserkraftwerk'. Chinese: '径流式水电'.",
-                "preferred_translation": "径流式水电"
-            },
-            {
-                "term": "headworks",
-                "symbol": "",
-                "context": "The intake structure at the upstream end of a penstock or canal, where water is diverted from the river or reservoir into the conveyance system. Appears in Micro-Hydro Power calculator (penstock diameter and length descriptions).",
-                "translation_notes": "Use the civil\/irrigation engineering term for a water intake or diversion structure. Spanish: 'obra de toma'. French: 'ouvrage de prise d'eau'. Russian: 'водозаборное сооружение'. German: 'Einlaufbauwerk'. In many languages, 'intake structure' is preferred over a literal translation of 'headworks'.",
-                "preferred_translation": "取水枢纽"
-            },
-            {
-                "term": "junction loss",
-                "symbol": "h_m",
-                "context": "Energy loss at pipe junctions, bends, fittings, and entrance — a local (point) loss as opposed to distributed friction loss along the pipe. h_m = k_m × v²\/(2g). Appears in Manning Pipe Head Loss and Micro-Hydro Power calculators.",
-                "translation_notes": "CANONICAL ENGLISH (label-normalization decision, item 90, 2026-07-07): the suite-wide English label for this concept is \"Minor (local) loss\" — 'junction loss' (formerly mphl_) and 'minor loss' (mhp_\/ip_) are merged into it; see the 'minor loss' entry for the canonical treatment. The term 'minor' is conventional but misleading — do not imply these losses are always small; the parenthetical '(local)' carries the true sense. Use the hydraulic engineering term for local\/point losses at fittings. French: 'perte singulière'. Spanish: 'pérdida local' or 'pérdida por accesorio'. Russian: 'местные потери'. Chinese: '局部水头损失'.",
-                "preferred_translation": "局部水头损失"
-            },
-            {
-                "term": "minor loss",
-                "symbol": "h_m",
-                "context": "Local head loss at fittings\/valves\/couplers (coefficient k_m). Canonical merged concept for the former 'junction loss' (mphl_) and 'minor loss' (mhp_\/ip_). Manning Pipe Head Loss, Micro-Hydro Power, Irrigation Pressure.",
-                "translation_notes": "CANONICAL ENGLISH LABEL: \"Minor (local) loss\" (label-normalization decision, item 90, 2026-07-07). 'Minor ⇄ local' — a local\/point loss at fittings, NOT a \"smaller\" loss; the '(local)' parenthetical fixes the mistranslation trap. Symbol h_m, coefficient k_m (lowercase h reserved for loss components; capital H reserved for total\/gross\/net head, per the same decision). am ADDED (2026-07-10, category-3 am re-translation): 'ጥቃቅን (አካባቢያዊ) ኪሳራ' (tiqaqin (akababiyawi) kisara) mirrors the English structure word-for-word — 'ጥቃቅን' (minor\/small) followed by the parenthetical '(አካባቢያዊ)' (local, i.e. of a specific place\/area) — so the same mistranslation-blocking device English uses (the '(local)' qualifier preventing a 'smaller loss' misreading) is preserved in Amharic rather than silently dropped. Replaces the prior am file's 'የማያያዣ ኪሳራ' (connector\/joint loss), which named the physical fitting rather than the local\/point-loss concept. km ADDED (2026-07-10, category-3 km re-translation): 'ការបាត់បង់មូលដ្ឋាន' (local-basis loss) reuses មូលដ្ឋាន ('local', already established suite-wide for this exact merged concept in ip_km's tooltip 'មេគុណបាត់បង់មូលដ្ឋានសរុប' = 'total local-loss coefficient'), so category-3 now converges on the same word ip_ already uses rather than coining a second competing term. Deliberately avoids 'តូច' (small), sidestepping the minor⇄smaller mistranslation trap the English '(local)' parenthetical exists to block. Replaces the km file's prior mphl_junction_loss value 'ការបាត់បង់ junction' (untranslated English word left in place). ps ADDED (2026-07-10, category-3 ps wave-3 re-translation): 'ځایی ضیاع' (local loss) uses ځایی (local\/positional) + the established ps loss word ضیاع, following the majority pattern already set by ar\/fa\/es\/fr\/hr\/id\/it\/ro\/ru\/sr\/tr\/uk\/ur\/zh — all of which render this concept as 'local loss' alone rather than translating 'minor' literally, since the '(local)' qualifier is the operative disambiguator, not 'minor'. Deliberately avoids a word for 'small\/minor' (e.g. کوچنی) to sidestep the same minor⇄smaller trap the English parenthetical exists to block. Replaces the prior ps file's 'د جنکشن ضیاع' (junction loss — the pre-consolidation, pre-item-90 term) and fixes its symbol from capital H_m to lowercase h_m.",
-                "preferred_translation": "局部水头损失"
-            }
-        ],
-        "rc": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered. ENGINEER CLARIFICATION (2026-07-06): 'дебит is a typical colloquial call of the word — regular people and non-hydraulic engineers use it. In university (hydraulic engineering) they used водно количество for Q, never дебит. I guess both work.' So both are acceptable; водно количество is the academic\/hydraulic-engineering register, дебит the general register. Still an open decision whether to standardize on водно количество suite-wide.",
-                "preferred_translation": "流量"
-            },
-            {
-                "term": "velocity",
-                "symbol": "v",
-                "context": "Flow velocity (speed of water). Appears in all calculators.",
-                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
-                "preferred_translation": "流速"
-            },
-            {
-                "term": "riprap",
-                "symbol": "",
-                "context": "Angular rock placed to resist erosion on channel beds and banks. Appears in Manning Trapezoidal Channel and Rock Chute calculators.",
-                "translation_notes": "No direct single-word equivalent in most languages. Use the established local engineering term — this varies significantly by country. In Spanish, 'enrocado' (general) or 'escollera' (bank protection) are both used; lead with 'enrocado'. Bulgarian terms verified\/corrected by a native Bulgarian engineer, 2026-07 (dev\/Bulgarian-engineer-feedback.md). bg: 'каменна облицовка' (stone lining), not 'каменна наброска'.",
-                "preferred_translation": "抛石"
-            },
-            {
-                "term": "slope",
-                "symbol": "S",
-                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
-                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
-                "preferred_translation": "坡度"
-            },
-            {
-                "term": "rock chute",
-                "symbol": "",
-                "context": "A steep rock-lined drop structure (also called a 'rock ramp') that conveys water rapidly down a slope in irrigation, drainage, or watershed management. Key concepts for translation: rock-lined, steep gradient, spillway or drop structure — translate the concept, not the English word 'chute'. The rock riprap matrix dissipates energy and resists erosion. Appears in Rock Chute Design (Robinson) and Robinson Rock Chute calculators.",
-                "translation_notes": "CRITICAL: 'Robinson' is the surname of K.M. Robinson, co-author of Robinson, Rice & Kadavy (1998) — it is a proper noun and must NEVER be translated or modified in any language. Translate only 'Rock Chute'. Concept to translate: 'rock-lined steep channel' or 'rock-lined spillway' — the drop\/descent nature must be conveyed; a generic 'rock channel' is insufficient. CRITICAL for French: WMO No. 385 entry 517 establishes that the French word 'chute' means 'fall' (elevation difference) — it cannot name this structure. Use 'coursier en enrochement' (coursier = steep channel structure; enrochement = riprap). Spanish: USDA uses 'bajante de rocado' — 'bajante' (from bajar = to descend) correctly conveys the drop-structure nature; 'de rocado' = rock-lined. Russian: 'каменный быстроток' ('быстроток' = fast-flow\/steep channel). Portuguese: changed from 'calha' (generic trough) to 'rampa em enrocamento' (rampa = ramp\/slope, enrocamento = riprap) to convey steep character. Serbian: changed from 'жлеб' (gutter\/trough) to 'брзоток' (fast-flow structure), consistent with ru\/uk pattern. Bengali: changed from borrowed 'চ্যুট' (conveys nothing) to 'পাথর-আবৃত খাড়া নালা' (rock-lined steep channel). Persian: changed from generic 'آبراه سنگی' (stone waterway) to 'آبراه تند سنگچین' (تند = steep\/swift, سنگچین = stone-laid\/riprap). Pashto: added 'تند' (steep\/swift) to original. Khmer: changed 'ចំហ' (open) to 'ជម្រាល' (sloped\/inclined). NEEDS HUMAN REVIEW: am (ምቀጫ meaning uncertain), my (ထောင် may not clearly convey steep to all readers), de (Steinschütte is standard engineering term but doesn't explicitly say 'steep channel'). Turkish: changed to 'taş düşü' — 'düşü' is the established Turkish hydraulics term for a drop\/chute structure (2026-07 audit; previous 'taş eğimli kanal' was descriptive but nonstandard). Spanish: NEEDS HUMAN VERIFICATION — 'bajante de rocado' claims a USDA source but 'rocado' is not standard Spanish ('enrocado' is); verify the USDA document or switch to 'bajante de enrocado'. 2026-07 reconciliation: fr\/ro\/ru\/uk lang files updated to match this entry. NOT reconciled pending human review of the GLOSSARY side: hr 'kameni skluz' (consider 'kameni brzotok', parallel to sr\/ru), bg 'каменна бързина' (consider 'каменен бързоток'), de 'Steinschütte' vs shipped 'Steingerinne' (both defensible - pick one). RESOLVED bg: native Bulgarian engineer confirmed 'каменен бързоток' (2026-07); lang file updated.",
-                "preferred_translation": "块石陡槽"
-            },
-            {
-                "term": "chute",
-                "symbol": "",
-                "context": "A steep open channel or drop structure for conveying water rapidly down a slope. Distinct from a gentle-slope irrigation canal. Per ec_lang_intent guidance: translate as 'steep channel' or 'spillway' — not as the word 'chute' borrowed into another language. Appears in Rock Chute Design (Robinson), Manning Trapezoidal Channel, and related drop-structure calculators.",
-                "translation_notes": "CRITICAL for French: WMO No. 385 entry 517 defines the English word 'fall' (elevation difference) as French 'chute', Spanish 'caída', and Russian 'падение'. The same pattern holds in all three WMO languages: the word for 'fall' (elevation difference) is NOT available for this hydraulic structure. 'Coursier' is the correct French term for the structure. Spanish: 'canal rápido'. Russian: 'быстроток' (the steep channel structure — distinct from 'падение' which means elevation fall). Chinese: '陡槽'.",
-                "preferred_translation": "陡槽"
-            },
-            {
-                "term": "unit discharge",
-                "symbol": "q, q_t",
-                "context": "Flow rate per unit width of channel (Q\/B), in m²\/s or ft²\/s. The primary design input for the Robinson rock chute method. Appears in Rock Chute Design calculator.",
-                "translation_notes": "Use the hydraulic engineering term. 'Unit' here means 'per unit channel width' — not related to measurement units. Spanish: 'caudal unitario'. French: 'débit unitaire'. German: 'spezifischer Abfluss'. Russian: 'удельный расход'. Chinese: '单宽流量'. Bulgarian terms verified\/corrected by a native Bulgarian engineer, 2026-07 (dev\/Bulgarian-engineer-feedback.md). bg hydraulics uses 'водно количество' for discharge, not 'дебит'.",
-                "preferred_translation": "单宽流量"
-            },
-            {
-                "term": "median rock size",
-                "symbol": "D50",
-                "context": "The particle size at which 50% of the rock is finer by weight. The primary output of the Robinson rock chute method. Also used in Manning Trapezoidal Channel riprap sizing. The symbol D50 is universal — translate only the descriptive label.",
-                "translation_notes": "D50 (or D₅₀) is a universal engineering symbol — do not translate it. Translate only the label 'median rock size' or 'median particle size'. Most languages express this as 'median diameter'. Do not use 'average' (average ≠ median statistically). Spanish: 'tamaño mediano de roca'. French: 'taille médiane des rochers'. Chinese: '中值粒径'.",
-                "preferred_translation": "中值粒径"
-            },
-            {
-                "term": "gradation",
-                "symbol": "SD",
-                "context": "The spread or uniformity of rock particle sizes. In the Robinson method, gradation is expressed as SD = D84.1\/D50. Uniform rock ≈ 1.25; Robinson valid range 1.15–1.47. Appears in Rock Chute Design calculator.",
-                "translation_notes": "Use the geotechnical\/hydraulic engineering term for grain size distribution or grading. Do not translate as 'grade' (implies quality). The symbol 'SD' and ratio notation D84.1\/D50 are universal. Spanish\/Portuguese: 'granulometría'\/'granulometria'. French: 'granulométrie'. Russian\/Bulgarian\/Serbian: 'гранулометрический состав'. Chinese: '级配'. bg: engineer proposed 'коефициент на едрозърнестост' for the D84.1\/D50 gradation SD label (2026-07); applied, but ASK for the standard source — Bulgarian soil mechanics also uses 'коефициент на разнозърненост' for grain-size uniformity.",
-                "preferred_translation": "级配"
-            },
-            {
-                "term": "porosity",
-                "symbol": "n_p",
-                "context": "The fraction of the rock layer volume that is void space (air + water). Default 0.45 for angular crushed rock. Determines how much flow passes through the rock mantle versus over the surface. Appears in Rock Chute Design calculator. Distinct from Manning's n (roughness coefficient) — do not confuse the two.",
-                "translation_notes": "Standard hydraulic\/geotechnical term with cognates in most European languages. Always distinguish from Manning 'n' in context — they appear in the same calculator.",
-                "preferred_translation": "孔隙率"
-            },
-            {
-                "term": "specific gravity",
-                "symbol": "sg",
-                "context": "Dimensionless ratio of a material's density to the density of water. Typical crushed granite or basalt ≈ 2.65. Robinson method valid range: 2.54–2.82. Appears in Rock Chute Design and Manning Trapezoidal Channel calculators.",
-                "translation_notes": "Dimensionless ratio — not specific weight, which has units (ro \"greutatea specifică\" wrong; use \"densitate relativă\"; same trap hit de \"spezifisches Gewicht\"→\"relative Dichte\" and ru \"удельный вес\"→\"относительная плотность\" in the category-1 wave-1 back-translation QA, 2026-07-08). Where local practice uses the specific-weight word for this ratio (tr \"özgül ağırlık\", sr \"специфична тежина\", hr \"specifična težina\"), keep local practice but never attach units.",
-                "preferred_translation": "比重"
-            },
-            {
-                "term": "ponding",
-                "symbol": "",
-                "context": "Water pooling\/backing up upstream of the chute inlet; beneficial in the Robinson design context.",
-                "translation_notes": "Backwater pooling, not flooding: sw \"mafuriko\" (floods) wrong — use \"kutuama kwa maji\". Keep one term per language (sw and it files alternate).",
-                "preferred_translation": "壅水"
-            },
-            {
-                "term": "outlet apron",
-                "symbol": "",
-                "context": "Flat protective pad of rock\/concrete at the chute outlet (hydraulic-structures term). Rock Chute output and sketch label.",
-                "translation_notes": "Never clothing: it \"grembiule\" (kitchen apron) wrong — use \"platea\"; tr \"önlük\" (bib) wrong. Use the stilling-basin\/apron family term: platea\/radier\/护坦.",
-                "preferred_translation": "护坦"
-            },
-            {
-                "term": "weir head",
-                "symbol": "H_p",
-                "context": "Upstream water-surface height above the weir crest — a length, not a pressure. Appears in Rock Chute inlet check.",
-                "translation_notes": "Not a pressure (hr \"tlak na pragu\" wrong). it: head over a weir = \"carico sullo stramazzo\" (soglia = sill; \"soglio\" = throne, wrong).",
-                "preferred_translation": "堰上水头"
-            },
-            {
-                "term": "upstream",
-                "symbol": "",
-                "context": "Direction toward the water source\/supply.",
-                "translation_notes": "Hydraulics direction, never software \"upgrade\" (my file error). tr: memba = upstream, mansap = downstream — a tr file flipped these; pin them.",
-                "preferred_translation": "上游"
-            },
-            {
-                "term": "downstream",
-                "symbol": "",
-                "context": "Direction away from the supply, toward the outlet \/ last emitter.",
-                "translation_notes": "Never software \"downgrade\". ar: downstream = المصب \/ أسفل المجرى (a file used المنبعية = source-side, wrong).",
-                "preferred_translation": "下游"
-            },
-            {
-                "term": "reach",
-                "symbol": "",
-                "context": "A segment of pipe or channel between two nodes\/cross-sections. Table rows in Irrigation Pressure are reaches.",
-                "translation_notes": "Hydraulics noun, NOT \"arrival\/reaching\" (ps \"رسیدل\" wrong), NOT \"agent\" (sw \"mwakala\" wrong), NOT \"stripe\" (km wrong). Bisection is the numerical root-finding method used to close the pressure loop in the Irrigation Pressure notes. (Wave 0, 2026-07-07, removed the former \"right at the takeoff\" and \"draw off\" wording from the English source.)",
-                "preferred_translation": "管段"
-            }
         ]
     },
     "keys_to_translate": {
         "calc_copy_link": "Copy link",
         "calc_copy_link_done": "Copied!",
-        "mhp_hl_warn_tip": "Consider larger pipe",
-        "mhp_hl_bad_tip": "Resize pipe",
-        "rc_sg_ok_tip": "2.54–2.82 (Robinson)",
-        "rc_sg_low_tip": "Valid range: 2.54–2.82",
-        "rc_sg_high_tip": "Valid range: 2.54–2.82",
-        "rc_SD_ok_tip": "1.15–1.47 (Robinson)",
-        "rc_SD_low_tip": "Valid range: 1.15–1.47",
-        "rc_SD_high_tip": "Valid range: 1.15–1.47",
-        "rc_pond_ok_tip": "Ponding upstream of the chute inlet is good; it reduces erosion upstream. (USDA)",
-        "rc_pond_warn_tip": "No ponding upstream of the chute inlet; erosion could occur upstream. (USDA)",
         "ip_length": "L",
         "ip_diameter": "D",
         "ip_roughness": "e",
@@ -375,16 +168,6 @@
     "keys": {
         "calc_copy_link": "Copy link",
         "calc_copy_link_done": "Copied!",
-        "mhp_hl_warn_tip": "Consider larger pipe",
-        "mhp_hl_bad_tip": "Resize pipe",
-        "rc_sg_ok_tip": "2.54–2.82 (Robinson)",
-        "rc_sg_low_tip": "Valid range: 2.54–2.82",
-        "rc_sg_high_tip": "Valid range: 2.54–2.82",
-        "rc_SD_ok_tip": "1.15–1.47 (Robinson)",
-        "rc_SD_low_tip": "Valid range: 1.15–1.47",
-        "rc_SD_high_tip": "Valid range: 1.15–1.47",
-        "rc_pond_ok_tip": "Ponding upstream of the chute inlet is good; it reduces erosion upstream. (USDA)",
-        "rc_pond_warn_tip": "No ponding upstream of the chute inlet; erosion could occur upstream. (USDA)",
         "ip_length": "L",
         "ip_diameter": "D",
         "ip_roughness": "e",
@@ -421,166 +204,6 @@
                     "key": "dw_main_menu",
                     "value": "达西-韦斯巴赫管道水头损失",
                     "english": "Darcy-Weisbach Pipe Head Loss"
-                }
-            }
-        },
-        "mhp_hl_warn_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mhp_hl_warn",
-                    "value": "超过 10% 目标 — 考虑更大管径 ⚠",
-                    "english": "exceeds 10% target"
-                },
-                "next_translated": {
-                    "key": "mhp_hl_bad",
-                    "value": "超过 20% — 重新核算管道尺寸",
-                    "english": "exceeds 20%"
-                }
-            }
-        },
-        "mhp_hl_bad_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mhp_hl_bad",
-                    "value": "超过 20% — 重新核算管道尺寸",
-                    "english": "exceeds 20%"
-                },
-                "next_translated": {
-                    "key": "mhp_notes_1_term",
-                    "value": "水头损失",
-                    "english": "Head Loss"
-                }
-            }
-        },
-        "rc_sg_ok_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sg_ok",
-                    "value": "sg 在有效范围内（2.54–2.82）✓",
-                    "english": "sg in valid range"
-                },
-                "next_translated": {
-                    "key": "rc_sg_low",
-                    "value": "警告：sg < 2.54 — 低于 Robinson 有效范围",
-                    "english": "sg below Robinson range"
-                }
-            }
-        },
-        "rc_sg_low_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sg_low",
-                    "value": "警告：sg < 2.54 — 低于 Robinson 有效范围",
-                    "english": "sg below Robinson range"
-                },
-                "next_translated": {
-                    "key": "rc_sg_high",
-                    "value": "警告：sg > 2.82 — 高于 Robinson 有效范围",
-                    "english": "sg above Robinson range"
-                }
-            }
-        },
-        "rc_sg_high_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sg_high",
-                    "value": "警告：sg > 2.82 — 高于 Robinson 有效范围",
-                    "english": "sg above Robinson range"
-                },
-                "next_translated": {
-                    "key": "rc_SD_ok",
-                    "value": "SD 在有效范围内（1.15–1.47）✓",
-                    "english": "SD in valid range"
-                }
-            }
-        },
-        "rc_SD_ok_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_SD_ok",
-                    "value": "SD 在有效范围内（1.15–1.47）✓",
-                    "english": "SD in valid range"
-                },
-                "next_translated": {
-                    "key": "rc_SD_low",
-                    "value": "警告：SD < 1.15 — 低于 Robinson 有效范围",
-                    "english": "SD below Robinson range"
-                }
-            }
-        },
-        "rc_SD_low_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_SD_low",
-                    "value": "警告：SD < 1.15 — 低于 Robinson 有效范围",
-                    "english": "SD below Robinson range"
-                },
-                "next_translated": {
-                    "key": "rc_SD_high",
-                    "value": "警告：SD > 1.47 — 高于 Robinson 有效范围",
-                    "english": "SD above Robinson range"
-                }
-            }
-        },
-        "rc_SD_high_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_SD_high",
-                    "value": "警告：SD > 1.47 — 高于 Robinson 有效范围",
-                    "english": "SD above Robinson range"
-                },
-                "next_translated": {
-                    "key": "rc_layer",
-                    "value": "块石层厚度（2 × D<sub>50<\/sub>）",
-                    "english": "Rock layer thickness (2 &times; D<sub>50<\/sub>)"
-                }
-            }
-        },
-        "rc_pond_ok_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_pond_ok",
-                    "value": "Hp > yn — 上游积水 ✓",
-                    "english": "H<sub>p<\/sub> > y<sub>n<\/sub> — ponding upstream"
-                },
-                "next_translated": {
-                    "key": "rc_pond_warn",
-                    "value": "⚠ Hp ≤ yn — 无积水 — 检查进口是否发生冲刷",
-                    "english": "H<sub>p<\/sub> ≤ y<sub>n<\/sub> — no ponding — inlet erosion potential"
-                }
-            }
-        },
-        "rc_pond_warn_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_pond_warn",
-                    "value": "⚠ Hp ≤ yn — 无积水 — 检查进口是否发生冲刷",
-                    "english": "H<sub>p<\/sub> ≤ y<sub>n<\/sub> — no ponding — inlet erosion potential"
-                },
-                "next_translated": {
-                    "key": "rc_eq1",
-                    "value": "公式 1（S0 < 0.10）— 缓坡",
-                    "english": "Eq. 1 (S<sub>0<\/sub> < 0.10) — gentle slope"
                 }
             }
         },

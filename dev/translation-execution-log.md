@@ -996,3 +996,149 @@ Still-open threads that were surfaced by these entries live as active bullets in
 >
 > **Not yet done:** waves 2 (zh ar he hi bn fa ur) and 3 (am km my ps sw) for category 5, pending
 > Tom's go-ahead per the standard per-wave authorization gate.
+
+## Category 5 wave 2 (zh ar he hi bn fa ur) — 2026-07-12
+
+Complete re-translation of all 97 mhp_/rc_ keys into the 7 major-non-Latin wave-2 languages,
+authorized after proposing counts/risks up front. Pre-sprint: payloads regenerated (`--check`
+FRESH), `payload_cat5_{lang}.json` built for these 7 languages (mirroring wave 1's format — the
+generic per-language payloads only carry the missing-delta, not full re-translation scope, so a
+one-off script assembled the complete-re-translation payload from the English source + glossary +
+each language's existing file). Two glossary gaps found before launch (no `preferred_translation`
+for "outlet apron" in fa, "weir head" in he/ur) — filled with best-judgment terms (fa "پاشنه خروجی",
+he "גובה מים מעל כתר הסכר", ur "ویئر ہیڈ") before spawning agents, flagged to each affected
+language's agent as new/not-battle-tested.
+
+7 agents launched in parallel (Sonnet, background). 6 completed cleanly on the first pass. **ur hit
+a session-limit failure mid-sprint** — per the session-limit retry protocol, checked `git status`
+and found the file *had* been partially modified (not a clean zero-change failure), so it was not
+eligible for a blind full relaunch. A diagnostic comparing the file against the payload found 8 of
+the new `_tip` keys missing entirely and ~19 of 97 keys visibly changed from their pre-sprint value;
+the remaining ~70 keys still matched the payload's stale `current_translation` baseline exactly and
+so were presumptively untouched. Relaunched a single retry agent scoped to diagnose-then-complete
+(not a full redo), with instructions to re-check every key rather than trust the stale/changed
+split at face value. It found that most of the ~70 "presumptively untouched" keys had, in fact,
+already been correctly retranslated before the crash — they matched `current_translation` only
+because the correct new wording happened to equal the old one for those particular strings — so the
+diagnostic's byte-equality heuristic wasn't a reliable proxy for "not yet done." The retry agent
+inserted the 8 missing keys, fixed lingering baked-in ✓/⚠/"warning" verdict strings and legacy
+tooltip `style=` attributes the crashed run left behind, and reconciled two internal-consistency
+deviations from the glossary (kept the file's already-established loanwords for
+penstock/discharge/riprap/chute rather than fragmenting ur's internal consistency — logged as
+glossary-reconciliation raw material, item 42).
+
+**Post-sprint QA (orchestrator-run, in order):**
+1. `lang_syntax_validate.php --lang=zh,ar,he,hi,bn,fa,ur` — 26 findings, all advisory
+   `identical-to-english` (2 legitimately-numeric Robinson-range tooltips per language, plus
+   pre-existing untouched `calc_copy_link*` keys). Zero escape-leakage/tag-imbalance/foreign-script
+   findings.
+2. Tag-parity check (`<sub>/<sup>/<span>/<em>/<a>` counts vs. English) across all 97×7 — found 8 real
+   mismatches: he `rc_eq1`/`rc_eq2` and hi `rc_pond_ok`/`rc_pond_warn`/`rc_eq1`/`rc_eq2`/
+   `rc_eq_warn_low`/`rc_eq_warn_high` had dropped `<sub>` tags around S₀/H_p/y_n. Also found hi's
+   `rc_eq_warn_low`/`rc_eq_warn_high` still carried a baked-in "चेतावनी:" (Warning:) prefix the
+   translating agent's own report didn't list as fixed (it only claimed to have fixed the `_sg_/_SD_/
+   _pond_/mhp_hl_` triads, missing the `rc_eq_warn_*` pair which follow the identical
+   `writeCheckHTML()` convention — same gap class documented in wave 1's log). Fixed directly by
+   the orchestrator (not re-sprinted), re-checked: 0 mismatches remaining.
+3. Back-translation semantic check (no `ANTHROPIC_API_KEY` set — performed inline by the
+   orchestrator per SOP, scoped to the highest-risk trap terms every agent was explicitly warned
+   about: gross/net head, specific gravity, weir head, outlet apron, ponding, minor/local loss,
+   upstream/downstream) across all 7 languages side-by-side. All checked out correctly — no
+   false-cognate or wrong-sense errors found (he's "משקל סגולי" for specific gravity is literally
+   "specific weight," the same register choice already accepted for tr/sr/hr per the glossary's own
+   carve-out, and correctly carries no units attached).
+4. Independent key-completeness verification: 97/97 present, zero empty/null, `php -l` clean, all 7
+   languages.
+
+**Not fixed this pass, logged for the standing cross-cutting items:** ur's incumbent-term deviations
+from glossary (penstock/discharge/riprap/chute) — item 42. Category 5 still awaits wave 3
+(am km my ps sw) before the holistic Opus consistency pass, per THE SEQUENCING RULE.
+
+## Category 5 wave 3 (am km my ps sw) — 2026-07-12
+
+Complete re-translation of all 97 mhp_/rc_ keys into the 5 low-resource wave-3 languages,
+authorized after proposing counts/risks up front. Pre-sprint: payloads regenerated
+(`--check` FRESH), full-suite glossary coverage for all 5 languages confirmed (55/55 terms
+have `translations` entries for am/km/my/ps/sw — no gaps to fill before launch, unlike wave 2).
+`payload_cat5_{lang}.json` built via a one-off script mirroring waves 1–2's format (complete
+re-translation scope, not the generic per-language delta payloads).
+
+5 agents launched in parallel (Sonnet, background), all completed cleanly on the first pass —
+no session-limit retries needed this wave. Each agent's self-report surfaced real bugs found and
+fixed in the incumbent (pre-sprint) text, not just fresh translation:
+
+- **am:** "head" family was using ጫና (pressure/burden — the same pressure-sense defect class
+  already flagged for ro/tr/id/fa/sw) instead of the correct ሄድ; fixed within the 97 sprinted
+  keys. Note: `mhp_flow`/`mhp_roughness`/`mhp_km`/`mhp_nu`/`mhp_velocity`/`mhp_f`/`mhp_hf`/`mhp_hm`/
+  `mhp_hl` are *not* in this payload and still use the wrong ጫና — a visible inconsistency within
+  the same file now, flagged for a future full-suite pass. Also fixed "specific gravity" (was
+  "specific weight," the same ro/de/ru-flagged unit-bearing trap) and "chute" (was mistranslated
+  as ቱቦ, "pipe/tube," throughout rc_).
+- **km:** fixed D50 (was "median-**method**-size," wrong word), specific gravity (was "type/species
+  weight"), and "apron" (prior file used ក្រណាត់ "cloth" and ធុងទឹកចេញ "outgoing water tank" — both
+  violate the glossary's explicit "never clothing" warning for this term). Found and fixed a
+  structural defect in `rc_Hp`'s tooltip: `<sub>` tags had been placed inside a `title=` attribute,
+  where they render as literal text, not markup — corrected to plain-text subscripts matching the
+  English source's own convention in that attribute.
+- **my:** corrected "erosion" from ရေကြောင်းနွမ်းမှု (roughly "channel weakening") to the standard
+  hydraulic term ရေတိုက်စားမှု (water scouring), applied consistently across 5 keys — flagged as a
+  substantive term change from the prior file. Restored a citation title ("Design of rock chutes")
+  that the old file had partially translated into Burmese; per convention, citation titles stay in
+  the original published language.
+- **ps:** did **not** use the glossary's `preferred_translation` for "specific gravity"
+  (`ستومانه وزن`, literally "heavy weight") — flagged it as the same specific-weight mistranslation
+  trap already documented for ro/de/ru, kept the file's existing correct term (`ځانګړی ثقل`)
+  instead. **Glossary entry flagged as likely wrong, not yet fixed — needs a human/native check.**
+  Also corrected two apparent Urdu/Hindi-script contamination bugs in the incumbent text:
+  `mhp_vel_ok_short` used `ٹھیک` (retroflex `ٹ`, not valid Pashto) and `rc_S0` used `بیڈ`
+  (retroflex `ڈ`) — both corrected to native Pashto forms.
+- **sw:** fixed baked-in ✓/⚠ glyphs and translated "Onyo:" (Warning:) marker text in verdict
+  strings (violates the suite-wide check-string convention — the glyph is the marker, added by JS,
+  never baked into the translated string). Fixed "minor loss" mistranslated as "small loss"
+  (ᐅ literally the trap the English "(local)" parenthetical exists to prevent, per the item-90
+  decision), porosity/density confusion (msongamano = density, the *opposite* of porosity), and
+  "ponding" mistranslated as "flooding" (mafuriko) — the glossary explicitly flags this as wrong
+  for a beneficial design condition. Note: `rc_notes_7_term` has this same ponding/flooding bug but
+  is *not* in the 97-key payload — left untouched, flagged for a future pass (same orphan noted
+  independently by the am agent, which also spotted `rc_notes_7_term` as a pre-existing
+  no-English-key duplicate of `rc_ponding_check`).
+
+**Independent orchestrator QA (in order):**
+1. `lang_syntax_validate.php --lang=am,km,my,ps,sw` — 24 findings, all advisory
+   `identical-to-english` (numeric Robinson-range tooltips `rc_sg_ok_tip`/`rc_SD_ok_tip` — genuinely
+   numeric, correctly identical across all 5 languages — plus pre-existing untouched
+   `calc_copy_link*`/`u_gradePercent`/`mtc_blodgett_v_bathurst`/`wi_notes_we_def` keys outside this
+   payload). Zero escape-leakage/tag-imbalance/foreign-script findings.
+2. Scripted tag-parity check (`<sub>/<sup>/<span>/<em>/<a>` sets vs. English) across all 97×5 = 485
+   keys — 0 mismatches, 0 missing keys.
+3. Independent key-completeness verification: 97/97 present, zero empty/null, `php -l` clean, all
+   5 languages.
+4. Back-translation semantic check (no `ANTHROPIC_API_KEY` — performed inline by the orchestrator
+   per SOP) on the highest-risk trap terms across all 5 languages side-by-side: specific gravity,
+   gradation SD, weir head (Hp/yn), outlet apron, ponding, minor/local loss, net head. All read
+   correctly — **except** ps's `rc_pond_ok` carried a baked-in `✓` glyph the agent's own report
+   didn't flag (same convention-gap class as wave 1/2's `rc_eq_warn_*` misses). A follow-up scripted
+   sweep for stray `✓`/`⚠` characters across all 5 languages found 13 total violations, all in ps
+   (`mhp_hl_ok/warn/bad`, `rc_sg_ok/low/high`, `rc_SD_ok/low/high`, `rc_pond_ok/warn`,
+   `rc_eq_warn_low/high`) — confirmed none of these have a glyph baked into the English source.
+   Fixed directly by the orchestrator (not re-sprinted); re-swept am/km/my/sw clean, re-verified
+   `php -l` on ps after the fix.
+
+**Not fixed this pass, logged for the standing cross-cutting items:**
+- ps's "specific gravity" glossary entry (`ستومانه وزن`) is likely a specific-weight mistranslation
+  trap and should be corrected — same class as the already-known ro/de/ru errors — item 42-style
+  glossary reconciliation.
+- am's `mhp_flow`/`mhp_roughness`/`mhp_km`/`mhp_nu`/`mhp_velocity`/`mhp_f`/`mhp_hf`/`mhp_hm`/
+  `mhp_hl` still use the wrong pressure-sense ጫና for "head" (outside this payload's 97 keys) while
+  the 97 sprinted keys now correctly use ሄድ — an internal inconsistency for a future full-suite
+  pass.
+- `rc_notes_7_term` (orphaned, no English key, duplicates `rc_ponding_check`) — noted independently
+  by both the am and sw agents; not part of this payload, not touched.
+- sw's incumbent-term deviations from glossary (head loss, gross/net head, radius, rc_main_menu
+  wording) — item 42-style glossary-reconciliation raw material, consistent with the wave 1/2
+  pattern of keeping a file's internally-consistent incumbent term over a fragmenting glossary
+  swap.
+
+Category 5 is now complete across all three waves (14 anchor + 7 major-non-Latin + 5 low-resource
+= 26 languages). Per THE SEQUENCING RULE, the holistic Opus consistency pass for category 5 is
+next, before starting category 6.
