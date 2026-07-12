@@ -93,15 +93,15 @@ $ec_lang['dw_flow_regime']='بہاؤ کی نوع';
 $ec_lang['dw_regime_laminar']='ورقی';
 $ec_lang['dw_regime_transitional']='انتقالی';
 $ec_lang['dw_regime_turbulent']='مضطرب';
-$ec_lang['dw_friction_factor_method']='رگڑ کے گنجینے کا طریقہ';
-$ec_lang['dw_friction_factor']='رگڑ کا گنجینہ، f';
+$ec_lang['dw_friction_factor_method']='رگڑ کے عامل کا طریقہ';
+$ec_lang['dw_friction_factor']='رگڑ کا عامل، f';
 // Hazen-Williams. See mphl_ for missing text.
 $ec_lang['hw_main_menu']='ہیزن-ولیمز پائپ دباؤ نقصان';
 $ec_lang['hw_main_title']='مفت آنلائن ہیزن-ولیمز پائپ دباؤ نقصان حاسبہ';
 $ec_lang['hw_main_desc']='دیے گئے قطر، کھردرا پن اور بہاؤ پر ہیزن-ولیمز پائپ دباؤ نقصان';
 $ec_lang['hw_hgl_1']='پست آب HGL';
 $ec_lang['hw_hgl_2']='بالا آب HGL';
-$ec_lang['hw_roughness']='ہیزن-ولیمز گنجینہ، C';
+$ec_lang['hw_roughness']='ہیزن-ولیمز عامل، C';
 // Manning Irregular
 $ec_lang['mi_menu']='مانینگ غیر یکساں مقطع نالہ';
 $ec_lang['mi_main_title']='مفت آنلائن مانینگ غیر یکساں مقطع نالہ حاسبہ';
@@ -165,7 +165,7 @@ $ec_lang['mphl_main_title']='مفت آنلائن مانینگ پائپ دباؤ 
 $ec_lang['mphl_main_desc']='دیے گئے مکمل بہاؤ پر مانینگ فارمولا دباؤ نقصان';
 $ec_lang['mphl_pipe_length']='پائپ لمبائی، L';
 $ec_lang['mphl_area']='رقبہ، A';
-$ec_lang['mphl_total_junction_k']='معمولی (مقامی) نقصان گنجینہ، k<sub>m</sub>';
+$ec_lang['mphl_total_junction_k']='معمولی (مقامی) نقصان عامل، k<sub>m</sub>';
 $ec_lang['mphl_friction_slope']='رگڑ ڈھلان';
 $ec_lang['mphl_friction_loss']='رگڑ نقصان، h<sub>f</sub>';
 $ec_lang['mphl_junction_loss']='معمولی (مقامی) نقصان، h<sub>m</sub>';
@@ -211,7 +211,7 @@ $ec_lang['ws_main_title']='مفت آنلائن سادہ چوڑی-شیخر ویر
 $ec_lang['ws_main_desc']='سادہ چوڑی-شیخر ویر بہاؤ حاسبہ';
 $ec_lang['ws_weirLength']='ویر لمبائی، L';
 $ec_lang['ws_headWaterHeight']='سر، h';
-$ec_lang['ws_weirCoefficient']='ویر گنجینہ، C<sub>w</sub>';
+$ec_lang['ws_weirCoefficient']='ویر عامل، C<sub>w</sub>';
 $ec_lang['ws_notes_heading']='نوٹ';
 $ec_lang['ws_notes_we_term']='ویر مساوات';
 // Weir Flow Irregular. See ws_ for missing text.
@@ -240,7 +240,7 @@ $ec_lang['or_width']='چوڑائی، W <span title="صرف مستطیل کھلن
 $ec_lang['or_invert']='انورٹ بلندی <span title="کھلنے کی تہہ" class="ec-tip">?</span>';
 $ec_lang['or_hwe']='بالا آب بلندی';
 $ec_lang['or_twe']='پست آب بلندی';
-$ec_lang['or_cd']='اخراج گنجینہ، C<sub>d</sub>';
+$ec_lang['or_cd']='اخراج عامل، C<sub>d</sub>';
 $ec_lang['or_centroid_elev']='مرکز ثقل بلندی';
 $ec_lang['or_head']='مؤثر سر، h';
 $ec_lang['or_area']='کھلنے کا رقبہ، A';
@@ -258,7 +258,7 @@ $ec_lang['or_notes_1_term']='سوراخ مساوات';
 $ec_lang['or_notes_1_def']='Q = C<sub>d</sub> × A × √(2gh)۔ آزاد اخراج: h = HWE − مرکز ثقل۔ ڈوبا ہوا بہاؤ (انورٹ کے اوپر TWE): h = HWE − TWE۔';
 $ec_lang['or_notes_2_term']='سوراخ کی حالت';
 $ec_lang['or_notes_2_def']='سوراخ بہاؤ مساوات اس وقت لاگو ہوتی ہیں جب بالا آب سطح کھلنے کے تاج سے اوپر ہو۔ جب بالا آب تاج سے نیچے ہو، تو ویر مساوات استعمال کریں۔';
-$ec_lang['or_notes_3_term']='اخراج گنجینہ';
+$ec_lang['or_notes_3_term']='اخراج عامل';
 $ec_lang['or_notes_3_def']='تیز کنارے والے سوراخوں کے لیے C<sub>d</sub> تقریباً 0.60–0.65 تک ہوتا ہے۔ گول یا دوبارہ داخل ہونے والے ان لیٹس مختلف اقدار استعمال کرتے ہیں۔ رہنمائی کے لیے <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venture-d_590.html">Engineering Toolbox</a> یا HEC-RAS ہائیڈرولک حوالہ دستی دیکھیں۔';
 $ec_lang['or_notes_4_term']='ڈوبنا';
 $ec_lang['or_notes_4_def']='جب TWE کھلنے کی انورٹ کے اوپر ہو، تو یہ حاسبہ خودکار طور پر h = HWE − TWE استعمال کرتے ہوئے ڈوبا ہوا سوراخ مساوات لاگو کرتا ہے۔ جب TWE انورٹ پر یا اس سے نیچے ہو، تو آزاد اخراج فرض کیا جاتا ہے اور h = HWE − مرکز ثقل۔';

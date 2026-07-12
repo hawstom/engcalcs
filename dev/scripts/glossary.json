@@ -376,10 +376,10 @@
         "sw": "mgawo wa kutokwa kwa maji",
         "tr": "debi katsayısı",
         "uk": "коефіцієнт витрати",
-        "ur": "گنجینہ",
+        "ur": "اخراج عامل",
         "zh": "流量系数"
       },
-      "source": "ai-generated; ur corrected 2026-07-08 from stale 'اخراج گتانک' to 'گنجینہ' (matches actual established usage across hw_/mphl_/ws_/wi_/or_, per category-2 wave-2 agent finding); am corrected 2026-07-08 from stale/wrong 'ፍሰት ኮፊሸንት' to 'የፍሰት ቅንጅት' (category-2 wave-3 agent finding, verified against actual established usage); km corrected 2026-07-08 from stale/wrong 'ស្ថេរភាពលំហូរ' to 'មេគុណលំហូរ' (category-2 wave-3 agent finding, verified against actual established usage)"
+      "source": "ai-generated; ur corrected 2026-07-08 from stale 'اخراج گتانک' to 'گنجینہ' (matches actual established usage across hw_/mphl_/ws_/wi_/or_, per category-2 wave-2 agent finding); am corrected 2026-07-08 from stale/wrong 'ፍሰት ኮፊሸንት' to 'የፍሰት ቅንጅት' (category-2 wave-3 agent finding, verified against actual established usage); km corrected 2026-07-08 from stale/wrong 'ស្ថេរភាពលំហូរ' to 'មេគុណលំហូរ' (category-2 wave-3 agent finding, verified against actual established usage). DATA-ERROR FIX 2026-07-11 (cross-category coefficient/factor term unification, flagged by category-3 holistic Opus pass): 'گنجینہ' (ganjina) literally means 'treasure/repository/thesaurus' in Urdu, not 'coefficient' — the 2026-07-08 correction had matched the *shipped file's* then-incumbent usage, but that incumbent usage was itself wrong (likely an earlier bulk-translation error propagated as a false 'established' pattern), not a genuine Urdu engineering term. Corrected to 'عامل' (aamil, 'factor/agent'), the term already independently established as correct elsewhere in the same file for the identical concept (mhp_km='ثانوی نقصان عامل' i.e. 'secondary loss factor', category 1; ip_km, ip_notes_2_def's Christiansen F(n) factor, category 4) and already matching the pre-existing 'friction factor' glossary entry's own ur value 'رگڑ عامل' in this same file (which had NOT been corrupted to گنجینہ, showing the two terms had drifted apart from a single earlier concept). Applied to all 7 occurrences in lib/lang.ec.ur.php (dw_friction_factor, dw_friction_factor_method, hw_roughness, mphl_total_junction_k, ws_weirCoefficient, or_cd, or_notes_3_term), unifying the suite's ur coefficient/factor terminology on one word."
     },
     {
       "term": "weir",
@@ -487,7 +487,7 @@
       "term": "conveyance efficiency",
       "symbol": "E_c",
       "context": "Ratio of outflow to inflow in a canal reach — measures how much water delivered at the head is received at the tail. Appears in Canal Seepage calculator. E_c = Q_out / Q_in.",
-      "translation_notes": "This is the most terminology-sensitive term in the suite. 'Conveyance' means transport of water along a canal — do not use a general word for 'efficiency' alone. The term should convey 'how well the canal transports water without loss'. DATA-ERROR FIX 2026-07-10 (category-4 wave-2 hi re-translation): glossary hi value was 'वहन दक्षता' (vahan dakshata), but lib/lang.ec.hi.php's own cs_ and irr_ keys (cs_main_menu, cs_main_title, cs_Ec, cs_Ec_check, cs_notes_1_def, cs_notes_2_term, irr_card_seepage_head, etc. — 10+ occurrences, predating this sprint) all already establish 'संवहन दक्षता' (sanvahan dakshata) as the incumbent term. Standardized the glossary to match established suite usage, same defect class as prior DATA-ERROR FIX entries in this file. DATA-ERROR FIX 2026-07-10 (category-4 wave-3 ps re-translation): glossary ps value was 'د اوبو د رسولو موثریت', but lib/lang.ec.ps.php's own irr_ keys (irr_quickref_html and others, 15+ occurrences, predating this sprint) all already establish 'د لیږدولو اغیزمنتیا' as the incumbent term. Standardized the glossary to match established suite usage rather than switch the shipped file mid-sprint.",
+      "translation_notes": "This is the most terminology-sensitive term in the suite. 'Conveyance' means transport of water along a canal — do not use a general word for 'efficiency' alone. The term should convey 'how well the canal transports water without loss'. DATA-ERROR FIX 2026-07-10 (category-4 wave-2 hi re-translation): glossary hi value was 'वहन दक्षता' (vahan dakshata), but lib/lang.ec.hi.php's own cs_ and irr_ keys (cs_main_menu, cs_main_title, cs_Ec, cs_Ec_check, cs_notes_1_def, cs_notes_2_term, irr_card_seepage_head, etc. — 10+ occurrences, predating this sprint) all already establish 'संवहन दक्षता' (sanvahan dakshata) as the incumbent term. Standardized the glossary to match established suite usage, same defect class as prior DATA-ERROR FIX entries in this file. DATA-ERROR FIX 2026-07-10 (category-4 wave-3 ps re-translation): glossary ps value was 'د اوبو د رسولو موثریت', but lib/lang.ec.ps.php's own irr_ keys (irr_quickref_html and others, 15+ occurrences, predating this sprint) all already establish 'د لیږدولو اغیزمنتیا' as the incumbent term. Standardized the glossary to match established suite usage rather than switch the shipped file mid-sprint. DATA-ERROR FIX 2026-07-10 (category-4 holistic pass, hr): glossary hr value was \"učinkovitost prijenosa\", but lib/lang.ec.hr.php own cs_ keys (cs_main_desc, cs_Ec, cs_Ec_check, cs_notes_1_def, cs_notes_2_term, cs_notes_2_def, cs_Ec_target — 7 occurrences, predating this pass) all already establish \"korisnost transporta\" as the incumbent term; irr_card_seepage_head/desc had drifted to the minority \"učinkovitost prijenosa\" and were corrected to match. Standardized glossary to match established suite usage, same defect class as prior DATA-ERROR FIX entries in this file.",
       "translations": {
         "am": "የቦይ ማጓጓዝ ብቃት",
         "ar": "كفاءة النقل",
@@ -500,7 +500,7 @@
         "fr": "rendement de transport d'eau",
         "he": "יעילות הולכה",
         "hi": "संवहन दक्षता",
-        "hr": "učinkovitost prijenosa",
+        "hr": "korisnost transporta",
         "id": "efisiensi saluran",
         "it": "efficienza di trasporto",
         "km": "ប្រសិទ្ធភាពដឹកជញ្ជូន",

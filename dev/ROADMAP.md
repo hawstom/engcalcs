@@ -851,6 +851,115 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 > **Category 4 (cs_/irr_/ip_, all 3 waves, 21 languages total) is now complete.** Next: the holistic
 > cross-language consistency pass (Opus, still outstanding from categories 3 and 4) can be scheduled,
 > or item 85 can proceed to category 5 (micro-hydro: mhp_) pending Tom's direction.
+>
+> **DONE 2026-07-10: holistic Opus consistency pass executed and closed out for category 4** (all
+> ~107 `cs_`/`irr_`/`ip_` keys read side-by-side across all 26 non-English languages plus English).
+> First launch hit a session-limit API error mid-run; git status showed the in-flight fixes (7 files)
+> had already landed cleanly and correctly (verified against English source before resuming — no
+> partial/corrupt edits), so the same agent was resumed from transcript rather than relaunched fresh.
+> **Confirmed clean across all 26 languages:** tag parity and subscript/superscript symbol-content
+> parity (programmatic check vs. English, 0 mismatches after the one hr fix below); escape leakage
+> (none); the "check structure" check≠verify glossary trap; the bg "irregular" geometric-vs-temporal
+> trap on the weir-irregular keys; `lang_syntax_validate.php` (0 new findings, all pre-existing
+> `identical-to-english` advisories). **7 real findings, all fixed:**
+> 1. **Baked/duplicated verdict glyph** — cs/es/hr/pt/ru/tr/uk all had a literal trailing `⚠` baked
+>    into `ip_pressure_warn_short` and `ip_elev_ds_missing_warn`, duplicating the glyph
+>    `EngCalcs.writeCheckHTML()` (js/irrigation-pressure.js) already prepends at render time (English
+>    source carries no glyph on these keys). Stripped the trailing glyph from all 14 strings, 7 files
+>    — same defect class category 2's pass found in fa/hi/ur, now confirmed recurring in category 4.
+> 2. **Symbol-convention violation** — hr's `ip_elev_supply` had translated the literal subscript
+>    `z<sub>supply</sub>` to `z<sub>napajanja</sub>`. Reverted to `supply`.
+> 3. **Suite-internal spelling defect** — tr used "kotü" (invalid Turkish) in 3 `ip_` strings while
+>    tr's own 20+ other elevation keys (`or_`/`odt_`/`mi_`/`rc_`) consistently use "kotu". Fixed all 3.
+> 4. **English leftovers/calques** — pt left "textbook"/"downhill" untranslated in
+>    `ip_du_estimate`/`ip_q_ratio`/`ip_notes_3_def`; hr and uk left literal "Distribution Uniformity"
+>    untranslated in the same key cluster. Replaced with proper-language equivalents.
+> 5. **English leftover — technical term** — ps and tr left "(bisection)" untranslated in
+>    `ip_notes_1_def` while every other translated language rendered a native term for the method.
+>    Fixed: ps → "(دوه‌ویشنې میتود)", tr → "(ikiye bölme yöntemi)".
+> 6. **Terminology-splitting within km** — km's own `mtc_main_title`/weir-irregular keys already
+>    translate "Trapezoidal"/"Irregular" natively, but `irr_card_canal_desc` left both as bare
+>    English. Fixed to match km's own established terms.
+> 7. **Terminology-splitting within hr (most significant finding)** — hr's `cs_` keys (7 occurrences)
+>    establish "korisnost transporta" as the incumbent term for "conveyance efficiency," but
+>    `irr_card_seepage_head`/`irr_card_seepage_desc` independently used "učinkovitost prijenosa."
+>    Fixed the minority usage to match, and corrected the hr entry in `glossary.json`'s `conveyance
+>    efficiency` term to match (shipped-file incumbent usage wins over the glossary, same
+>    DATA-ERROR-FIX precedent as prior category-4 wave entries), with a note documenting the fix.
+> **Not fixed, correctly identified as non-issues:** km's untranslated "culvert" in
+> `irr_card_orifice_desc` matches km's own pre-existing suite-wide incumbent convention (also present
+> in `mpf_note_1`/`mphl_note_1`, outside category 4) — flagged for a separate future km-wide pass, not
+> a category-4-introduced defect; my's untranslated "Trapezoidal" in `irr_card_canal_desc` matches my's
+> own established incumbent usage in `mtc_menu`/`mtc_main_title`, so it's internally consistent, not a
+> defect; proper nouns and citation titles (Manning, Christiansen, USBR *Water Measurement Manual*,
+> ASAE/ASABE) correctly left in English suite-wide. **Post-fix QA:** `php -l` clean on all 9 touched
+> files (cs/es/hr/km/ps/pt/ru/tr/uk); `lang_syntax_validate.php --lang=cs,es,hr,km,ps,pt,ru,tr,uk` —
+> 35 findings, all pre-existing advisories, 0 new; `generate_translation_payloads.php --check` was
+> initially STALE (glossary.json edit), regenerated, re-checked FRESH across all 26 payloads. No
+> `$ec_lang_intent` entries touched (read-only, per CLAUDE.md's AI restriction).
+>
+> **Category 4 fully closed 2026-07-10** — all three translation waves and the holistic Opus
+> consistency pass are complete, every fix independently verified. Outstanding, logged separately,
+> not blocking closure: native-review flags for am/km/my/ps/sw; the category-3 holistic pass remains
+> the sole outstanding holistic-pass item before item 85 can proceed cleanly to category 5
+> (micro-hydro: mhp_), pending Tom's direction.
+>
+> **DONE 2026-07-11: holistic Opus consistency pass executed for category 3** (all 59 `dw_`/`hw_`/
+> `mpf_`/`mphl_` keys read side-by-side across all 26 non-English languages plus English). **Result:
+> zero real defects found — a genuine clean result, not a skipped check.** Confirmed clean, each
+> independently re-verified rather than trusted from prior notes: no baked verdict glyph in any key
+> in any language (Category 3 has no `_ok`/`_check`/`_warn`/`_verdict` keys, and the render-time glyph
+> injection in `js/Calculators.lib.js` was confirmed as the sole source); symbol convention intact for
+> every token (f, e, C, A, R_h, P_w, S_f, h_f/h_m/h_L, k_m, h_v, &tau;, &nu;) across all 26 including
+> RTL and non-Latin scripts; tag/entity parity exact in all 26×59 (including re-confirming zh's
+> `&tau;`-entity fix from the wave sprint is still in place, and no other language regressed to bare
+> Latin for a Greek-letter symbol); **item-40 shear-stress scissors trap independently re-verified
+> fixed in both ps (`برشي`) and ur (`برشی`)** — the prior sprint's "fixed" claim was not taken on
+> faith, the actual current file content was read and confirms it; fresh scan of all 26 languages'
+> `mpf_shear_stress` found no other language using a cutting/scissors-tool root; no upstream/downstream
+> or HGL/EGL direction flips and no AND/OR logic flips in `mphl_note_1`/`mpf_note_1` in any language;
+> no terminology-splitting within any single language across friction slope/friction factor/roughness/
+> hydraulic radius/wetted perimeter/velocity head/the friction-minor-total loss triplet; the "Minor
+> (local) loss" convention holds suite-wide with no "smaller loss" mistranslation; `lang_syntax_
+> validate.php` clean (advisory-only). **Not fixed, correctly identified as non-issues or as needing
+> native review rather than a unilateral override:** ur's `گنجینہ` for "coefficient/factor" (literally
+> "treasure/repository") reads suspect for a math coefficient, but is a *consistent* 6-occurrence
+> incumbent spanning categories 1/3/4 (`dw_friction_factor`, `hw_roughness`, `mphl_total_junction_k`,
+> `ws_weirCoefficient`, `or_cd`, `or_notes_3_term`) that survived all three prior holistic passes —
+> fixing only the 3 Category-3 instances would itself create a fresh cross-category split, so this is
+> flagged for native-review + a possible dedicated cross-category term-unification pass
+> (candidate: `عنصر`/`عامل`, matching ar `معامل`/ps `ضریب`), not force-changed here; km's
+> `តានតឹងកាត់` and sw's `Msongo … wa mkato` shear-stress terms re-confirmed as the already-reviewed
+> action-noun construction (not the scissors-tool sense) and left as-is; am/km/my's low-resource
+> transliterations/partial-untranslated terms (`ፍሪክሽን`/`ፋክተር`/`ሺር ስትሬስ`, "culvert," "spreadsheet")
+> are appropriate for their existing 0.65 native-review flag, not inline defects; bg's `Хидравличен
+> наклон` for friction slope is an intentional, consistently-applied native-reviewed synonym. **No
+> files were edited** (git status confirmed zero diff from this pass); no `$ec_lang_intent` entries
+> touched. `generate_translation_payloads.php --check`: FRESH, unchanged.
+>
+> **All four completed calculator categories (1–4) now have a closed-out holistic Opus consistency
+> pass.** Item 85 may proceed to category 5 (micro-hydro: `mhp_`) pending Tom's direction. The
+> ur `گنجینہ` cross-category coefficient/factor term and the am/km/my/ps/sw native-review backlog are
+> the only open threads carried forward, both already logged above and not blocking category 5.
+>
+> **DONE 2026-07-11: ur `گنجینہ` cross-category coefficient/factor term fixed [CC].** `گنجینہ`
+> (ganjina) literally means "treasure/repository/thesaurus" in Urdu — wrong sense for a math
+> coefficient. Confirmed by direct file read (all 7 occurrences, one more than the 6 originally
+> flagged — `dw_friction_factor_method` also had it): `dw_friction_factor`, `dw_friction_factor_method`,
+> `hw_roughness`, `mphl_total_junction_k`, `ws_weirCoefficient`, `or_cd`, `or_notes_3_term`. Replaced
+> with `عامل` (aamil, "factor/agent") suite-wide across these 7 keys — not a new coinage: `عامل` is
+> already the established correct Urdu term for the identical concept elsewhere in the same file
+> (`mhp_km`="ثانوی نقصان عامل"/secondary loss factor, category 1; `ip_km`/`ip_notes_2_def`'s
+> Christiansen F(n) factor, category 4) and already matches the pre-existing, uncorrupted
+> `glossary.json` "friction factor" entry's own ur value "رگڑ عامل" — the two related terms had
+> simply drifted apart from a single earlier bulk-translation-era error. Also corrected the
+> `glossary.json` "discharge coefficient" entry's stale ur value (was `گنجینہ`, now "اخراج عامل"),
+> with a DATA-ERROR-FIX note explaining the 2026-07-08 "corrected" value had matched a
+> then-incumbent-but-wrong shipped-file pattern, not genuine Urdu usage. **QA:** `php -l` clean;
+> `lang_syntax_validate.php --lang=ur` — 2 pre-existing unrelated advisories, 0 new; glossary.json
+> JSON-valid; `generate_translation_payloads.php --check` was STALE (glossary edit), regenerated,
+> re-checked FRESH across all 26. No native review yet on this specific fix (ur is not yet at the
+> `0.95` native-reviewed tier) — same status as before, not a regression.
 
 - 85|[CC] Extend the rc_/ip_ audit treatment to the remaining calculators using the category-grid plan (agreed with Tom 2026-07-06). **Calculator categories (N=6):** (1) open channel: mtc_+mi_ (59 keys — first, because the Bulgarian engineer's "irregular"="нередовен" catch is likely systemic across languages); (2) weirs & orifices: ws_+wi_+or_+odt_ (78); (3) pipe friction: dw_+hw_+mpf_+mphl_ (59); (4) irrigation & seepage: cs_+irr_ (54); (5) micro-hydro: mhp_ (44); (6) shared UI/units: u_+calc_+menu_+points_ incl. the ~121 identical-to-english validator warnings. **Language tiers (M=3), run as sequential waves within each category, not parallel cells:** wave 1 anchors (es pt fr it de ro ru uk bg sr hr cs tr id — cognate language groups let one glossary decision propagate; review side-by-side within Slavic/Romance blocks; **wave 1 is also the English-reform gate (Tom's principle, 2026-07-06): tier-1 translators/reviewers must flag English source strings that resist translation — idioms, stacked modifiers, compressions like "right at"/"draw off"/"Est." — and those grievances are resolved by REWRITING THE ENGLISH (author-reviewable in cognate languages) rather than only patching intents, BEFORE waves 2-3 launch, so all remaining languages inherit the more translatable source**), wave 2 major non-Latin (zh ar he hi bn fa ur), wave 3 low-resource (am km my ps sw — run last against the glossary enriched by waves 1-2; mandatory backtranslate_check + native-review flag). Per category: audit read → mechanical fixes → intents (needs human authorization) → glossary + prefixToTermNames additions → wave-1 sprint → English-reform pass from wave-1 grievances (human approves English edits; re-run wave 1 on changed keys) → waves 2-3 → post-sprint QA chain. Prereq raised by this ordering: implement the per-key English source-hash in payloads so any later English edit re-flags all 26 translations (audit §10.5). ≈10-12 authorization events total; each paid sprint gated on explicit user go-ahead per CLAUDE.md.
   - **CORRECTION 2026-07-07 (Tom, supersedes the paragraph below where they conflict):** the "DEPENDS on a completed, FROZEN English source" framing was a **mistake**. English is NOT frozen after Wave 0, and item 90 neither finishes Wave 0 nor freezes English — **item 90 was about key consolidation only**. Item 85 **starts with** its own Wave 0 pass by Fable across all calculator categories, editing obvious colloquialisms, jargon, and lazy phrases into easily-translatable English. English freezes only after wave 1 (interactive anchors) — see the SEQUENCING RULE box.
