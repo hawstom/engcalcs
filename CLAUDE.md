@@ -130,6 +130,8 @@ The 26 non-English languages: am, ar, bg, bn, cs, de, es, fa, fr, he, hi, hr, id
 
 ## Translation Sprints
 
+This section is the authoritative home for sprint **mechanics**. The *sequencing* of sprints (when to run which, in what order — the three scenarios and THE SEQUENCING RULE) lives in `dev/translation-process.md`; the dated blow-by-blow history is in `dev/translation-execution-log.md`.
+
 When translating a new calculator's keys into all 26 non-English languages, **spawn one agent per language in parallel** — not one agent for all languages sequentially. Reasons: faster (minutes not hours), better quality (each agent starts with a fresh context focused on one language), and easier to retry a single language if quality is poor.
 
 **REQUIRED: Get explicit user authorization before launching any sprint.** A sprint spawns up to 26 paid agents. The correct pattern is always: propose → confirm → launch. Never infer authorization from a general "proceed" or a question about paths. The user must say something equivalent to "go ahead" or "run it" in response to a specific sprint proposal.
@@ -147,28 +149,18 @@ When translating a new calculator's keys into all 26 non-English languages, **sp
 
 Always announce the launch count before spawning so the user knows what is happening.
 
-**Model policy (lesson from the 2026-07 rc_/ip_ sprint — see dev/translation-audit-rc-ip-2026-07.md):**
-Haiku, even with full glossary + intent injection, reliably mistranslated polysemous words in long
-technical prose and produced foreign-script contamination, escape leakage, and truncation in
-low-resource languages. Therefore:
-- Long strings (tooltip `title="..."` text and `*_notes_*_def`) go to **Sonnet**, 1–2 long strings
-  per request, or are translated inline by the orchestrating model.
-- Low-resource languages (am, km, my, ps) get Sonnet for everything plus a native-review flag.
-- Short labels only → Haiku is acceptable.
+**Model policy** (why Sonnet is the default — evidence: the 2026-07 rc_/ip_ sprint, `dev/translation-audit-rc-ip-2026-07.md`): Haiku mistranslated polysemous words in long prose and produced script contamination, escape leakage, and truncation in low-resource languages even with full glossary + intent injection. So: long strings (`title="..."`, `*_notes_*_def`) → **Sonnet** (1–2 per request) or inline by the orchestrator; low-resource langs (am/km/my/ps) → Sonnet for everything + native-review flag; short-labels-only batches → Haiku acceptable.
 
 **Post-sprint QA (mandatory, in order):**
 1. `php dev/scripts/lang_syntax_validate.php --lang=<codes>` — must be clean of escape-leakage,
    tag-imbalance, and foreign-script findings (identical-to-english warnings are advisory).
 2. Tag-parity check of the sprinted keys against English (`<sub>/<sup>/<span>` sets must match).
-3. Back-translation semantic check — mandatory, has no "skip if no key" exception. If
+3. Back-translation semantic check — mandatory, no "skip if no key" exception. If
    `ANTHROPIC_API_KEY` is set, run `php dev/scripts/backtranslate_check.php --lang=<code> --prefix=<p>`.
-   **If it is not set (the common case in this environment), do NOT log the step as skipped.**
-   Instead the orchestrating AI performs the same check itself, inline, right after the translation
-   agents finish: for every sprinted key, read the target-language string, produce an independent
-   back-translation to English, and compare it against the source meaning — same rigor as the script,
-   no billing needed. (Policy established 2026-07-07 after this exact gap caused two sprints —
-   category 3 waves 1 and 2 — to be recorded as done with this step merely noted "not run"; see
-   `dev/ROADMAP.md` ~line 151 for the full history and the retroactive-enforcement clause.)
+   **If it is not set (the common case here), do NOT log the step as skipped** — the orchestrating AI
+   performs the same check inline: for every sprinted key, read the target-language string,
+   back-translate it to English independently, and compare against the source meaning (same rigor, no
+   billing). Applies retroactively to any wave that was closed without it.
 
 **On retries:** If an agent hits a session limit, retry only that language. If quality issues are found after a sprint (wrong term, missing intent framing), fix the glossary and/or lang file directly — do not re-run the full sprint.
 

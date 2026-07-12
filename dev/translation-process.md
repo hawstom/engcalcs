@@ -8,8 +8,25 @@ intent format, model policy) are the authoritative rules already in `CLAUDE.md` 
 restate them, it sequences them.
 
 This SOP is distilled from the 2026-07 item-85/item-90 project (full-suite key consolidation +
-category-by-category re-translation). See `dev/ROADMAP.md` items 85 and 90 for the decision history
-if you want the reasoning behind a rule, not just the rule.
+category-by-category re-translation). For the reasoning behind a rule (not just the rule), see
+`dev/translation-execution-log.md` — the dated, category-by-category record — plus item 90's entry
+in `dev/ROADMAP.md`'s Completed section for the key-consolidation decisions.
+
+## What Tom said → which scenario (routing table)
+
+Tom will name the event in plain language; pick the scenario from it. **Whatever the trigger, the
+sequence is always propose (scope + agent/language counts + what it costs) → get explicit
+authorization → launch.** Never auto-run a paid sprint off the trigger phrase alone.
+
+| Tom says something like… | Scenario | Weight |
+|---|---|---|
+| "We've **added/changed** calculator X — propagate it to all languages using our translation SOP." | **A** (→ B, scoped to just the new/changed keys) | **Light: delta only.** Translate just the new or edited keys. **Not** a full re-translation — new keys have no legacy content to distrust (Scenario A step 6). Audit only if the change reworded *many existing* keys enough to risk drift (then it tips into C). |
+| "Add **language** X." | **B** (whole suite into the new language) | Medium: one full pass of every key, wave order still applies. |
+| "**Audit** category N" / "the X translations feel stale" / a native reviewer flags a systemic issue. | **C** | Heavy: for existing legacy content. See the economy note in Scenario C before assuming a full re-translation is the right size. |
+
+So Tom's standing one-liner — *"We've added/changed X. Propagate it to all languages using our
+translation SOP."* — always means **Scenario A, delta sprint**, then a proposal back to him with
+counts before anything paid launches.
 
 ## The three background structures everything else hangs on
 
@@ -29,6 +46,11 @@ if you want the reasoning behind a rule, not just the rule.
   - **Wave 2 — major non-Latin:** zh ar he hi bn fa ur.
   - **Wave 3 — low-resource:** am km my ps sw. Always Sonnet (never Haiku), always flagged for
     native review, always run last so the glossary is as mature as possible.
+- **THE SEQUENCING RULE (the one rule this whole SOP exists to enforce):** finish **all three
+  waves of a calculator category — plus that category's holistic Opus consistency pass — before
+  starting the next category.** Never interleave categories. (This was violated once, 2026-07-07,
+  when category 2's wave 1 ran before category 1's waves 2–3; the correction cost a re-sequencing.
+  See the execution log if you want the incident.)
 - **Never say "families"** for calculator groupings — say "calculator categories." Reserve "family"
   for nothing; it was retired 2026-07-07 for ambiguity with language families.
 
@@ -123,6 +145,38 @@ executing for category 2 onward):
 4. **Waves 2–3** — complete re-translation, full QA chain, native-review flag per Scenario B.
 5. Update `dev/ROADMAP.md` item 85 (or its successor tracking item) with what was done, and update
    `glossary.json` with any new/confirmed terms.
+
+**Cost-scoping note (from the 2026-07 project — "be scientific about cost," Tom).** The QA layers
+(back-translation, tag-parity, holistic pass) are *not* the lever to cut for cost — measured yield
+varied wildly between categories using an identical QA process, and the difference tracked how
+stale each category's legacy translations were, not the QA. The real cost driver is re-translating
+already-decent content wholesale. So the targeted optimization is **up front**: gauge a category's
+existing translation quality *before* committing to a full re-translation wave, and scope the wave
+to what is actually stale. A complete re-translation is the safe default for legacy content of
+unknown vintage; it is not automatically the cheapest path once a category has already been
+audited.
+
+**How to run an *economical* audit (cheapest first).** An audit is only open-ended if it's
+unscoped. Keep it economical by fixing two dials: **scope** (one category, never "the whole suite")
+and **depth** (pick from the ladder below, start low). The right default answer to "give me an
+economical audit" is: **the AI reads the target category first (cheap, read-only) and proposes the
+lowest rung that covers the risk**, rather than defaulting to a full re-translation.
+
+1. **Read-only assessment** — one agent (or the orchestrator) skims one category across all 26
+   languages and reports staleness/defect signals. No file writes, no paid per-language sprint.
+   This is the "gauge before committing" step and is often all that's needed to decide.
+2. **Holistic consistency pass** — one Opus agent reads that category's keys side-by-side across all
+   26 languages, findings-only; the orchestrator applies fixes directly. Catches cross-language
+   drift, baked verdict glyphs, term-splitting. One agent, not 26 — the cheapest real audit.
+3. **Back-translation QA pass** — per-language meaning check (findings-only, fix directly, no
+   re-sprint). More thorough than #2 on single-string mistranslations; costs one read per language.
+4. **Full Scenario C re-translation** — the 3-wave complete re-translation above. The most expensive
+   rung; reserve it for genuinely stale legacy content that #1 shows is beyond patching.
+
+So the economical request is *scoped and depth-aware*: **"Audit category N — assess it read-only
+first, then propose the lightest pass that covers the risk, with counts."** That routes to rung 1,
+then lets the evidence pick the rest. "Audit everything thoroughly" is the anti-pattern — unscoped
+and forced to the top rung.
 
 ## Standing content rules (apply in all three scenarios)
 
