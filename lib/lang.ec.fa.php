@@ -482,7 +482,6 @@ $ec_lang['rc_notes_5_term']='محدوده معتبر اندازه سنگ';
 $ec_lang['rc_notes_5_def']='این معادلات با استفاده از محدوده D<sub>50</sub> از 15&nbsp;میلی‌متر تا 278&nbsp;میلی‌متر توسعه یافته‌اند. نتایج خارج از این محدوده برون‌یابی‌شده هستند و باید همراه با قضاوت مهندسی اضافی به‌کار روند.';
 $ec_lang['rc_notes_6_term']='تراز پاشنه خروجی';
 $ec_lang['rc_notes_6_def']='تراز روی سنگ‌چین در بازه خروجی باید برابر یا پایین‌تر از تراز بستر کانال پایین‌دست باشد. در غیر این صورت، سنگ‌های خروجی ناپایدار خواهند بود.';
-$ec_lang['rc_notes_7_term']='بررسی تجمع آب در ورودی';
 $ec_lang['rc_notes_7_def']='هنگامی که عمق نرمال در کانال ورودی کمتر از هد سرریز (H<sub>p</sub>) مورد نیاز برای عبور q<sub>t</sub> باشد، جریان محدود یا آبگیری در بالادست ورودی آبراه رخ می‌دهد. این وضعیت عموماً قابل‌قبول است &mdash; آبگیری سرعت را کاهش می‌دهد و از فرسایش در بالادست جلوگیری می‌کند. برای بررسی: از یک ماشین‌حساب جریان سرریز برای یافتن H<sub>p</sub> با q<sub>t</sub> و عرض تاج داده‌شده استفاده کنید و آن را با عمق نرمال کانال ورودی مقایسه کنید. اگر H<sub>p</sub> از عمق نرمال بیشتر شود، آبگیری رخ خواهد داد.';
 $ec_lang['rc_notes_4_term']='مرجع';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). &ldquo;<a target="_blank" href="https://www.fs.usda.gov/biology/nsaec/fishxing/fplibrary/Robinson_1998_Design_of_Rock_Chutes.pdf">Design of rock chutes</a>.&rdquo; <em>Transactions of the ASAE</em>, 41(3), 621&ndash;626. USDA ARS همچنین یک <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">صفحه گسترده Excel</a> بر پایه همین روش منتشر کرده است.';

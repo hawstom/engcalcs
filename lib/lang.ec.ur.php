@@ -476,7 +476,6 @@ $ec_lang['rc_notes_5_term']='چٹان سائز کی درست حد';
 $ec_lang['rc_notes_5_def']='مساوات D<sub>50</sub> کی 15 ملی میٹر سے 278 ملی میٹر کی حد استعمال کرتے ہوئے بنائی گئی تھیں۔ اس حد سے باہر کے نتائج اضافی تخمینے ہیں اور انہیں اضافی انجینیئرنگ فیصلے کے ساتھ استعمال کرنا چاہیے۔';
 $ec_lang['rc_notes_6_term']='آؤٹ لیٹ ایپرن کی بلندی';
 $ec_lang['rc_notes_6_def']='آؤٹ لیٹ ریچ میں ریپ‌ریپ کے اوپری حصے کی بلندی نیچے کی جانب چینل کے بیڈ کی بلندی کے برابر یا کم ہونی چاہیے۔ اگر زیادہ ہو تو آؤٹ لیٹ کی چٹانیں غیر مستحکم ہوں گی۔';
-$ec_lang['rc_notes_7_term']='ان لیٹ پونڈنگ چیک';
 $ec_lang['rc_notes_7_def']='جب ان لیٹ چینل میں نارمل گہرائی اس ویئر ہیڈ (H<sub>p</sub>) سے کم ہو جو q<sub>t</sub> گزارنے کے لیے درکار ہے، تو چوٹ کے ان لیٹ سے بالائی جانب محدود بہاؤ یا پانی جمع ہوتا ہے۔ یہ عموماً قابل قبول ہے — پانی جمع ہونے سے رفتار کم ہوتی ہے اور بالائی جانب کٹاؤ روکتا ہے۔ جانچ کے لیے: ویئر فلو کیلکولیٹر استعمال کریں تاکہ دیے گئے q<sub>t</sub> اور کرسٹ چوڑائی کے لیے H<sub>p</sub> معلوم ہو، اور اس کا موازنہ ان لیٹ چینل کی نارمل گہرائی سے کریں۔ اگر H<sub>p</sub> نارمل گہرائی سے زیادہ ہو تو پانی جمع ہوگا۔';
 $ec_lang['rc_notes_4_term']='حوالہ';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). "<a target="_blank" href="https://www.fs.usda.gov/biology/nsaec/fishxing/fplibrary/Robinson_1998_Design_of_Rock_Chutes.pdf">Design of rock chutes</a>." <em>Transactions of the ASAE</em>, 41(3), 621–626. USDA ARS اسی طریقہ پر مبنی ایک <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">Excel اسپریڈ شیٹ</a> بھی شائع کرتی ہے۔';

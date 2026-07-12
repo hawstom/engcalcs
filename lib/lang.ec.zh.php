@@ -479,7 +479,6 @@ $ec_lang['rc_notes_5_term']='有效块石粒径范围';
 $ec_lang['rc_notes_5_def']='该公式的开发数据中 D<sub>50</sub> 范围为 15 mm 至 278 mm。超出此范围的计算结果为外推值，使用时应结合额外的工程判断。';
 $ec_lang['rc_notes_6_term']='出口护坦高程';
 $ec_lang['rc_notes_6_def']='出口段护坡顶面高程应不高于下游渠道底高程。若高于下游河床，出口块石将不稳定。';
-$ec_lang['rc_notes_7_term']='进口积水检验';
 $ec_lang['rc_notes_7_def']='当进口渠道正常水深小于通过 q<sub>t</sub> 所需的堰顶水头（H<sub>p</sub>）时，陡槽进口上游将出现受阻壅水。这通常是可以接受的——壅水可降低流速，防止上游冲刷。检验方法：使用堰流计算器，根据给定的 q<sub>t</sub> 和堰顶宽度求出 H<sub>p</sub>，并与进口渠道正常水深比较。若 H<sub>p</sub> 超过正常水深，则将发生壅水。';
 $ec_lang['rc_notes_4_term']='参考文献';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). "<a target="_blank" href="https://www.fs.usda.gov/biology/nsaec/fishxing/fplibrary/Robinson_1998_Design_of_Rock_Chutes.pdf">Design of rock chutes</a>." <em>Transactions of the ASAE</em>, 41(3), 621–626. USDA ARS 亦发布了基于同一方法的 <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">Excel 计算表</a>。';

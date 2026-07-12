@@ -534,7 +534,6 @@ $ec_lang['rc_notes_5_term']='نطاق حجم الصخر الصحيح';
 $ec_lang['rc_notes_5_def']='طُوِّرت المعادلات باستخدام نطاق D<sub>50</sub> من 15 مم إلى 278 مم. النتائج خارج هذا النطاق تُعدّ استقراءً وينبغي استخدامها بحكم هندسي إضافي.';
 $ec_lang['rc_notes_6_term']='منسوب مصطبة المخرج';
 $ec_lang['rc_notes_6_def']='ينبغي أن يكون منسوب أعلى حجارة الحماية في قطاع المخرج مساوياً لمنسوب قاع القناة في أسفل المجرى أو أقل منه. إذا كان أعلى، فستكون حجارة المخرج غير مستقرة.';
-$ec_lang['rc_notes_7_term']='فحص التحوض عند المدخل';
 $ec_lang['rc_notes_7_def']='عندما يكون العمق الطبيعي في قناة المدخل أقل من علو المياه فوق الهدار (H<sub>p</sub>) اللازم لتمرير q<sub>t</sub>، يحدث تدفق مقيّد أو تجمّع للمياه في أعلى مدخل المزلق. هذا مقبول عموماً — فتجمّع المياه يقلل السرعة ويمنع التآكل في أعلى المجرى. للتحقق: استخدم حاسبة تدفق الهدار لإيجاد H<sub>p</sub> لقيمة q<sub>t</sub> وعرض التاج المعطيين، وقارِن الناتج بالعمق الطبيعي لقناة المدخل. إذا تجاوز H<sub>p</sub> العمق الطبيعي، سيحدث تجمّع للمياه.';
 $ec_lang['rc_notes_4_term']='المرجع';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). "<a target="_blank" href="https://www.fs.usda.gov/biology/nsaec/fishxing/fplibrary/Robinson_1998_Design_of_Rock_Chutes.pdf">Design of rock chutes</a>." <em>Transactions of the ASAE</em>, 41(3), 621–626. تنشر وزارة الزراعة الأمريكية (USDA ARS) أيضاً <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">جدول Excel</a> يعتمد على نفس الطريقة.';

@@ -1175,3 +1175,29 @@ next, before starting category 6.
 > `--check` FRESH.
 > **Category 5 (all 3 waves + holistic pass, 26 languages) is now fully closed.** Per THE SEQUENCING
 > RULE, item 85 may proceed to category 6 (`u_`/`calc_`/`menu_`/`points_`) pending Tom's direction.
+
+> **Follow-up 2026-07-12 (Tom's ruling on the 3 flagged items above):**
+> - **`rc_notes_7_term` deleted from all 26 non-English lang files.** Confirmed genuinely orphaned:
+>   `Rock-Chute.php`'s notes `<dl>` only renders `rc_notes_4_term`/`_def` (Reference) — `rc_notes_1`,
+>   `_2`, `_3`, `_5`, `_6`, `_7` are all defined in English but none are rendered on the page.
+>   `rc_notes_7_def` does have an English source (with real ponding/weir-head content) but no
+>   `rc_notes_7_term` was ever added for it — only the 26 translations independently invented a
+>   heading for it, which is what made it read as an in-scope key during the holistic pass. Tom:
+>   "an English rendering would have helped" — i.e. if `rc_notes_7_term` had existed in English,
+>   the payload generator would have caught it as a normal in-scope key instead of it surfacing as a
+>   one-off orphan discovered by translation agents. **Left untouched, flagged separately (bigger
+>   than a translation fix):** the wider fact that notes 1/2/3/5/6/7 are fully authored in English
+>   and in every language but never rendered anywhere in `Rock-Chute.php` — this is a page-content/
+>   product decision (wire them into the `<dl>`, or delete the dead content suite-wide), not a
+>   translation-QA call, so it wasn't acted on here.
+> - **he `rc_sg`** ("משקל סגולי") left unchanged — Tom's own read is that "specific weight" or
+>   "relative weight" sounds correct to him too, but he deferred to an actual Hebrew speaker for a
+>   final call. No cognate cohort exists to cross-check against, so this stays a standing low-
+>   confidence note rather than a fix.
+> - **"Native review" language retired as a pending-status framing.** Tom: real native review is a
+>   pipe dream — no native speaker will ever see these flags, so logging languages as "awaiting
+>   native review" implies a resolution that isn't coming. CLAUDE.md and translation-process.md
+>   updated: the `QUALITY` score itself must carry our own honest, current estimate of defect risk
+>   (the `0.65` low-resource tier already does this); "native review" is only ever real when
+>   feedback actually lands as a file (e.g. `dev/Bulgarian-engineer-feedback.md`), which is a
+>   completed event, not a scheduled one.

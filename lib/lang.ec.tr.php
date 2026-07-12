@@ -482,7 +482,6 @@ $ec_lang['rc_notes_5_term']='Geçerli Kaya Boyutu Aralığı';
 $ec_lang['rc_notes_5_def']='Denklemler 15 mm ile 278 mm arasındaki D<sub>50</sub> aralığı kullanılarak geliştirilmiştir. Bu aralık dışındaki sonuçlar ekstrapolasyon değeridir ve ek mühendislik değerlendirmesiyle kullanılmalıdır.';
 $ec_lang['rc_notes_6_term']='Çıkış Apronu Kotu';
 $ec_lang['rc_notes_6_def']='Çıkış kesimindeki parça taşının üst yüzey kotu, mansap kanal taban kotunda veya altında olmalıdır. Daha yüksekse çıkıştaki taş kararsız olacaktır.';
-$ec_lang['rc_notes_7_term']='Giriş Göllenmesi Kontrolü';
 $ec_lang['rc_notes_7_def']='Giriş kanalındaki normal derinlik, q<sub>t</sub>\'yi iletmek için gerekli savak yükü (H<sub>p</sub>)\'ndan az olduğunda, düşü girişinin membasında kısıtlı akış veya göllenme oluşur. Bu genellikle kabul edilebilirdir — göllenme hızı düşürür ve memba erozyonunu önler. Kontrol için: verilen q<sub>t</sub> ve eşik genişliği için bir savak hesap makinesiyle H<sub>p</sub>\'yi bulun ve giriş kanalı normal derinliğiyle karşılaştırın. H<sub>p</sub> normal derinliği aşarsa göllenme oluşacaktır.';
 $ec_lang['rc_notes_4_term']='Kaynak';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). "<a target="_blank" href="https://www.fs.usda.gov/biology/nsaec/fishxing/fplibrary/Robinson_1998_Design_of_Rock_Chutes.pdf">Design of rock chutes</a>." <em>Transactions of the ASAE</em>, 41(3), 621–626. USDA ARS aynı yönteme dayalı bir <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">Excel tablosu</a> da yayınlamaktadır.';

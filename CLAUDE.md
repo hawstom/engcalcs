@@ -149,7 +149,7 @@ When translating a new calculator's keys into all 26 non-English languages, **sp
 
 Always announce the launch count before spawning so the user knows what is happening.
 
-**Model policy** (why Sonnet is the default — evidence: the 2026-07 rc_/ip_ sprint, `dev/translation-audit-rc-ip-2026-07.md`): Haiku mistranslated polysemous words in long prose and produced script contamination, escape leakage, and truncation in low-resource languages even with full glossary + intent injection. So: long strings (`title="..."`, `*_notes_*_def`) → **Sonnet** (1–2 per request) or inline by the orchestrator; low-resource langs (am/km/my/ps) → Sonnet for everything + native-review flag; short-labels-only batches → Haiku acceptable.
+**Model policy** (why Sonnet is the default — evidence: the 2026-07 rc_/ip_ sprint, `dev/translation-audit-rc-ip-2026-07.md`): Haiku mistranslated polysemous words in long prose and produced script contamination, escape leakage, and truncation in low-resource languages even with full glossary + intent injection. So: long strings (`title="..."`, `*_notes_*_def`) → **Sonnet** (1–2 per request) or inline by the orchestrator; low-resource langs (am/km/my/ps) → Sonnet for everything, held at the honest `0.65` QUALITY tier; short-labels-only batches → Haiku acceptable.
 
 **Post-sprint QA (mandatory, in order):**
 1. `php dev/scripts/lang_syntax_validate.php --lang=<codes>` — must be clean of escape-leakage,
@@ -164,12 +164,20 @@ Always announce the launch count before spawning so the user knows what is happe
 
 **On retries:** If an agent hits a session limit, retry only that language. If quality issues are found after a sprint (wrong term, missing intent framing), fix the glossary and/or lang file directly — do not re-run the full sprint.
 
-**Native review:** Machine output for am, km, my, ps (and any language without a strong reviewer)
-should be marked for native-speaker review. Native feedback arrives as files under `dev/`
-(e.g. `dev/Bulgarian-engineer-feedback.md`); apply the corrections to the lang file AND record the
-verified terms in `glossary.json` citing the feedback file, so the next sprint inherits them.
+**Native review is real only when feedback actually lands, never as a pending to-do (Tom,
+2026-07-12).** "Flagged for native review" describes a state where no native speaker will ever
+realistically see the flag or act on it — treating it as an open action item is a pipe dream, not
+QA. The honest move is the reverse: don't log languages as "awaiting native review" as if resolution
+is coming; instead make the `QUALITY` score in `lib/Language.Settings.php` carry our own best,
+current estimate of defect risk for that language, right now, based on what our own passes (agent
+self-check, structural QA, holistic Opus pass) actually found or suspect. Native feedback is only
+ever real when a file like `dev/Bulgarian-engineer-feedback.md` actually exists — that's a completed
+event, not a promise. If a holistic-pass agent surfaces a language-specific concern it can't verify
+itself (e.g. a single-example term with no cognate cohort to check against), record the concern in
+the execution log so it's visible, but don't invent a "flagged, pending" limbo state or imply future
+resolution that isn't scheduled.
 
-**A native-review flag with no visible consequence is not honest QA (Tom, 2026-07-08).** The flag
+**A quality flag with no visible consequence is not honest QA (Tom, 2026-07-08).** The signal
 must show up in `lib/Language.Settings.php`'s per-language `QUALITY` value (this app's own weight in
 browser Accept-Language negotiation — see the comment at the top of that file), not just live as a
 note in `dev/ROADMAP.md`. Tiers, calibrated 2026-07-08 against category 1's audit depth (the deepest

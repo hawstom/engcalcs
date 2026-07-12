@@ -480,7 +480,6 @@ $ec_lang['rc_notes_5_term']='טווח גודל סלע תקף';
 $ec_lang['rc_notes_5_def']='המשוואות פותחו בטווח D<sub>50</sub> שבין 15 מ״מ ל-278 מ״מ. תוצאות מחוץ לטווח זה הן החצנה ויש להשתמש בהן בשיקול דעת הנדסי נוסף.';
 $ec_lang['rc_notes_6_term']='גובה מצוע המוצא';
 $ec_lang['rc_notes_6_def']='גובה ראש הסלעים במקטע המוצא צריך להיות שווה או נמוך מגובה קרקעית הערוץ המורד. אם הוא גבוה יותר, סלעי המוצא יהיו בלתי יציבים.';
-$ec_lang['rc_notes_7_term']='בדיקת הצטברות מים בכניסה';
 $ec_lang['rc_notes_7_def']='כאשר העומק הנורמלי בתעלת הכניסה קטן מגובה המים בכתר (H<sub>p</sub>) הנדרש להעברת q<sub>t</sub>, נוצרת זרימה מוגבלת או הצטברות מים במעלה כניסת המגלשה. זה בדרך כלל מקובל — הצטברות מים מפחיתה מהירות ומונעת סחיפה במעלה הזרם. לבדיקה: השתמשו במחשבון ספיקת שפך כדי למצוא את H<sub>p</sub> עבור q<sub>t</sub> ורוחב הכתר הנתונים, והשוו לעומק הנורמלי של תעלת הכניסה. אם H<sub>p</sub> עולה על העומק הנורמלי, תהיה הצטברות מים.';
 $ec_lang['rc_notes_4_term']='מקור';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). "<a target="_blank" href="https://www.fs.usda.gov/biology/nsaec/fishxing/fplibrary/Robinson_1998_Design_of_Rock_Chutes.pdf">Design of rock chutes</a>." <em>Transactions of the ASAE</em>, 41(3), 621–626. USDA ARS מפרסמת גם <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">גיליון Excel</a> המבוסס על אותה שיטה.';

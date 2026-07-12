@@ -110,11 +110,13 @@ section verbatim. Sequence recap:
    key-count verification the agent would have run (`missing: []` against the category's English
    key list) — a language that's already 74/75 or 75/75 needs a small targeted fix, not a full
    relaunch. Only relaunch languages with zero file changes.
-6. **Native review flag**: am, km, my, ps (and any language without a strong reviewer) always get
-   flagged for native-speaker review regardless of how clean the automated QA looks. When native
-   feedback arrives (a file under `dev/`, e.g. `dev/Bulgarian-engineer-feedback.md`), apply it to
-   the lang file **and** record the verified terms in `glossary.json` citing the feedback file — the
-   next sprint must inherit it, not rediscover it.
+6. **Quality tier, not a "pending native review" flag** (Tom, 2026-07-12): am, km, my, ps, sw stay
+   at the honest `0.65` QUALITY tier regardless of how clean automated QA looks — real native review
+   essentially never arrives for these, so don't log them as "awaiting" it as if resolution is
+   scheduled. When native feedback *does* actually land (a file under `dev/`, e.g.
+   `dev/Bulgarian-engineer-feedback.md` — a completed event, not a hoped-for one), apply it to the
+   lang file, record the verified terms in `glossary.json` citing the feedback file, and raise that
+   language's QUALITY tier to reflect it.
 
 ## Scenario C — Periodic deep language audit
 

@@ -479,7 +479,6 @@ $ec_lang['rc_notes_5_term']='Platný rozsah velikosti kamene';
 $ec_lang['rc_notes_5_def']='Rovnice byly vyvinuty pro rozsah D<sub>50</sub> od 15 mm do 278 mm. Výsledky mimo tento rozsah jsou extrapolované a měly by být použity s dodatečným inženýrským posouzením.';
 $ec_lang['rc_notes_6_term']='Výška vývarové desky na výtoku';
 $ec_lang['rc_notes_6_def']='Výška horní plochy záhozu ve výtokovém úseku by měla být na úrovni nebo pod úrovní dna dolního koryta. Pokud je výše, zához na výtoku bude nestabilní.';
-$ec_lang['rc_notes_7_term']='Kontrola vzdutí na vtoku';
 $ec_lang['rc_notes_7_def']='Pokud je normální hloubka ve vtokové stoce menší než přepadová výška (H<sub>p</sub>) potřebná k převedení q<sub>t</sub>, dochází k omezení průtoku nebo vzdutí proti proudu od vtoku skluzu. To je obecně přijatelné — vzdutí snižuje rychlost a zabraňuje erozi proti proudu. Kontrola: pomocí kalkulačky přelivu zjistěte H<sub>p</sub> pro dané q<sub>t</sub> a šířku koruny a porovnejte ji s normální hloubkou ve vtokové stoce. Pokud H<sub>p</sub> překračuje normální hloubku, dojde ke vzdutí.';
 $ec_lang['rc_notes_4_term']='Literatura';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). "<a target="_blank" href="https://www.fs.usda.gov/biology/nsaec/fishxing/fplibrary/Robinson_1998_Design_of_Rock_Chutes.pdf">Design of rock chutes</a>." <em>Transactions of the ASAE</em>, 41(3), 621–626. USDA ARS také zveřejňuje <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">tabulku Excel</a> založenou na stejné metodě.';

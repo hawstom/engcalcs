@@ -480,7 +480,6 @@ $ec_lang['rc_notes_5_term']='ትክክለኛ የድንጋይ መጠን ወሰን
 $ec_lang['rc_notes_5_def']='ቀመሮቹ ከ15&nbsp;ሚሜ እስከ 278&nbsp;ሚሜ የ D<sub>50</sub> ወሰን ተጠቅመው ተዘጋጅተዋል። ከዚህ ወሰን ውጭ ያሉ ውጤቶች በግምት የተሰሉ ሲሆኑ ተጨማሪ የምህንድስና ፍርድ ጋር ጥቅም ላይ መዋል አለባቸው።';
 $ec_lang['rc_notes_6_term']='የመውጫ ሰሌዳ ከፍታ';
 $ec_lang['rc_notes_6_def']='በመውጫ ክፍል ውስጥ ያለው የሪፕራፕ ጫፍ ከፍታ ከታችኛው ቦይ ወለል ከፍታ ጋር እኩል ወይም ከዚያ በታች መሆን አለበት። ከዚያ ከፍ ካለ፣ የመውጫ ድንጋይ አይረጋጋም።';
-$ec_lang['rc_notes_7_term']='የመግቢያ ውሃ ማቆርቆሪያ ምርመራ';
 $ec_lang['rc_notes_7_def']='የመግቢያ ቦይ ውስጥ ያለው መደበኛ ጥልቀት q<sub>t</sub>ን ለማሳለፍ ከሚያስፈልገው ዌር ሄድ (H<sub>p</sub>) ያነሰ ሲሆን፣ ገደብ ያለው ፍሰት ወይም ኩሬ መያዝ ከፈጣን ቦዩ መግቢያ ከላይ በኩል ይከሰታል። ይህ በአጠቃላይ ተቀባይነት አለው &mdash; ኩሬ መያዝ ፍጥነትን ይቀንሳል እና ከላይ በኩል ያለውን ሸርሸራ ይከላከላል። ለማረጋገጥ፦ ለተሰጠው q<sub>t</sub> እና የጫፍ ስፋት H<sub>p</sub>ን ለማግኘት የዌር ፍሰት ካልኩሌተር ይጠቀሙ፣ ከመግቢያ ቦዩ መደበኛ ጥልቀት ጋርም ያወዳድሩት። H<sub>p</sub> ከመደበኛ ጥልቀት ቢበልጥ፣ ኩሬ መያዝ ይከሰታል።';
 $ec_lang['rc_notes_4_term']='ማጣቀሻ';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). &ldquo;<a target="_blank" href="https://www.fs.usda.gov/biology/nsaec/fishxing/fplibrary/Robinson_1998_Design_of_Rock_Chutes.pdf">የድንጋይ-ምቀጫ ቦዮች ዲዛይን</a>.&rdquo; <em>Transactions of the ASAE</em>, 41(3), 621–626. USDA ARS ደግሞ በተመሳሳይ ዘዴ ላይ የተመሠረተ <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">Excel ሰነድ</a> ያትማል።';

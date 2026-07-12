@@ -482,7 +482,6 @@ $ec_lang['rc_notes_5_term']='د کاڼو اندازې سمه لړۍ';
 $ec_lang['rc_notes_5_def']='معادلې د D<sub>50</sub> د 15&nbsp;mm تر 278&nbsp;mm لړۍ په کارولو سره جوړې شوې دي. د دې لړۍ نه بهر پایلې اټکل شوي دي او باید د اضافي انجینیري قضاوت سره وکارول شي.';
 $ec_lang['rc_notes_6_term']='د وتنځي اپرون لوړوالی';
 $ec_lang['rc_notes_6_def']='د وتنځي برخې کې د کاڼو د پاسنۍ سطحې لوړوالی باید د ښکته‌اړخ کانال د تله لوړوالي په کچه یا ترې لاندې وي. که چیرې لوړ وي، د وتنځي کاڼي به بې‌ثباته وي.';
-$ec_lang['rc_notes_7_term']='د ننوتلو د اوبو ټولیدلو کتنه';
 $ec_lang['rc_notes_7_def']='کله چې د ننوتنځي کانال کې نورمال ژوروالی د هغه ویر سر (H<sub>p</sub>) نه کم وي چې د q<sub>t</sub> تیرولو لپاره اړین دی، نو د چوټ ننوتنځي نه پورته محدود بهاو یا د اوبو راټولیدل رامنځته کیږي. دا په عمومي ډول د منلو وړ دي — د اوبو راټولیدل سرعت کموي او پورته فرسایش مخنیوی کوي. د کتنې لپاره: د ورکړل شوي q<sub>t</sub> او د سر پلنوالي لپاره H<sub>p</sub> موندلو ته د ویر بهاو محاسبګر وکاروئ، او دا د ننوتنځي کانال نورمال ژوروالي سره پرتله کړئ. که H<sub>p</sub> د نورمال ژوروالي نه ډیر شي، اوبه به راټولېږي.';
 $ec_lang['rc_notes_4_term']='سرچینه';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). "<a target="_blank" href="https://www.fs.usda.gov/biology/nsaec/fishxing/fplibrary/Robinson_1998_Design_of_Rock_Chutes.pdf">Design of rock chutes</a>." <em>Transactions of the ASAE</em>, 41(3), 621&ndash;626. USDA ARS د ورته میتود پر بنسټ یو <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">Excel سپریډشیټ</a> هم خپروي.';
