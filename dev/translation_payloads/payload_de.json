@@ -2,7 +2,7 @@
     "meta": {
         "language": "de",
         "expected_key_count": 482,
-        "delta_key_count": 25,
+        "delta_key_count": 15,
         "active_prefixes": [
             "calc",
             "dw",
@@ -547,16 +547,6 @@
         "mi_station": "Sta",
         "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
         "mhp_vel_ok_short": "OK",
-        "mhp_hl_warn_tip": "Consider larger pipe",
-        "mhp_hl_bad_tip": "Resize pipe",
-        "rc_sg_ok_tip": "2.54–2.82 (Robinson)",
-        "rc_sg_low_tip": "Valid range: 2.54–2.82",
-        "rc_sg_high_tip": "Valid range: 2.54–2.82",
-        "rc_SD_ok_tip": "1.15–1.47 (Robinson)",
-        "rc_SD_low_tip": "Valid range: 1.15–1.47",
-        "rc_SD_high_tip": "Valid range: 1.15–1.47",
-        "rc_pond_ok_tip": "Ponding upstream of the chute inlet is good; it reduces erosion upstream. (USDA)",
-        "rc_pond_warn_tip": "No ponding upstream of the chute inlet; erosion could occur upstream. (USDA)",
         "rc_sketch_filter": "Filter",
         "ip_length": "L",
         "ip_diameter": "D",
@@ -574,16 +564,6 @@
         "mi_station": "Sta",
         "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
         "mhp_vel_ok_short": "OK",
-        "mhp_hl_warn_tip": "Consider larger pipe",
-        "mhp_hl_bad_tip": "Resize pipe",
-        "rc_sg_ok_tip": "2.54–2.82 (Robinson)",
-        "rc_sg_low_tip": "Valid range: 2.54–2.82",
-        "rc_sg_high_tip": "Valid range: 2.54–2.82",
-        "rc_SD_ok_tip": "1.15–1.47 (Robinson)",
-        "rc_SD_low_tip": "Valid range: 1.15–1.47",
-        "rc_SD_high_tip": "Valid range: 1.15–1.47",
-        "rc_pond_ok_tip": "Ponding upstream of the chute inlet is good; it reduces erosion upstream. (USDA)",
-        "rc_pond_warn_tip": "No ponding upstream of the chute inlet; erosion could occur upstream. (USDA)",
         "rc_sketch_filter": "Filter",
         "ip_length": "L",
         "ip_diameter": "D",
@@ -736,166 +716,6 @@
                 }
             }
         },
-        "mhp_hl_warn_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mhp_hl_warn",
-                    "value": "überschreitet 10-%-Ziel — größeres Rohr erwägen ⚠",
-                    "english": "exceeds 10% target"
-                },
-                "next_translated": {
-                    "key": "mhp_hl_bad",
-                    "value": "überschreitet 20 % — Rohr neu dimensionieren",
-                    "english": "exceeds 20%"
-                }
-            }
-        },
-        "mhp_hl_bad_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mhp_hl_bad",
-                    "value": "überschreitet 20 % — Rohr neu dimensionieren",
-                    "english": "exceeds 20%"
-                },
-                "next_translated": {
-                    "key": "mhp_notes_1_term",
-                    "value": "Druckverlust",
-                    "english": "Head Loss"
-                }
-            }
-        },
-        "rc_sg_ok_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sg_ok",
-                    "value": "sg im gültigen Bereich (2,54–2,82) ✓",
-                    "english": "sg in valid range"
-                },
-                "next_translated": {
-                    "key": "rc_sg_low",
-                    "value": "Warnung: sg < 2,54 — unterhalb des Robinson-Bereichs",
-                    "english": "sg below Robinson range"
-                }
-            }
-        },
-        "rc_sg_low_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sg_low",
-                    "value": "Warnung: sg < 2,54 — unterhalb des Robinson-Bereichs",
-                    "english": "sg below Robinson range"
-                },
-                "next_translated": {
-                    "key": "rc_sg_high",
-                    "value": "Warnung: sg > 2,82 — oberhalb des Robinson-Bereichs",
-                    "english": "sg above Robinson range"
-                }
-            }
-        },
-        "rc_sg_high_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sg_high",
-                    "value": "Warnung: sg > 2,82 — oberhalb des Robinson-Bereichs",
-                    "english": "sg above Robinson range"
-                },
-                "next_translated": {
-                    "key": "rc_SD_ok",
-                    "value": "SD im gültigen Bereich (1,15–1,47) ✓",
-                    "english": "SD in valid range"
-                }
-            }
-        },
-        "rc_SD_ok_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_SD_ok",
-                    "value": "SD im gültigen Bereich (1,15–1,47) ✓",
-                    "english": "SD in valid range"
-                },
-                "next_translated": {
-                    "key": "rc_SD_low",
-                    "value": "Warnung: SD < 1,15 — unterhalb des Robinson-Bereichs",
-                    "english": "SD below Robinson range"
-                }
-            }
-        },
-        "rc_SD_low_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_SD_low",
-                    "value": "Warnung: SD < 1,15 — unterhalb des Robinson-Bereichs",
-                    "english": "SD below Robinson range"
-                },
-                "next_translated": {
-                    "key": "rc_SD_high",
-                    "value": "Warnung: SD > 1,47 — oberhalb des Robinson-Bereichs",
-                    "english": "SD above Robinson range"
-                }
-            }
-        },
-        "rc_SD_high_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_SD_high",
-                    "value": "Warnung: SD > 1,47 — oberhalb des Robinson-Bereichs",
-                    "english": "SD above Robinson range"
-                },
-                "next_translated": {
-                    "key": "rc_layer",
-                    "value": "Steinlagenstärke (2 × D<sub>50<\/sub>)",
-                    "english": "Rock layer thickness (2 &times; D<sub>50<\/sub>)"
-                }
-            }
-        },
-        "rc_pond_ok_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_pond_ok",
-                    "value": "Hp > yn — Einstau oberstrom ✓",
-                    "english": "H<sub>p<\/sub> > y<sub>n<\/sub> — ponding upstream"
-                },
-                "next_translated": {
-                    "key": "rc_pond_warn",
-                    "value": "⚠ Hp ≤ yn — kein Einstau — Einlauf auf Erosion prüfen",
-                    "english": "H<sub>p<\/sub> ≤ y<sub>n<\/sub> — no ponding — inlet erosion potential"
-                }
-            }
-        },
-        "rc_pond_warn_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_pond_warn",
-                    "value": "⚠ Hp ≤ yn — kein Einstau — Einlauf auf Erosion prüfen",
-                    "english": "H<sub>p<\/sub> ≤ y<sub>n<\/sub> — no ponding — inlet erosion potential"
-                },
-                "next_translated": {
-                    "key": "rc_eq1",
-                    "value": "Gl. 1 (S0 < 0,10) — flaches Gefälle",
-                    "english": "Eq. 1 (S<sub>0<\/sub> < 0.10) — gentle slope"
-                }
-            }
-        },
         "rc_sketch_filter": {
             "reason": "equal_to_english",
             "current_value": "Filter",
@@ -907,7 +727,7 @@
                 },
                 "next_translated": {
                     "key": "rc_sketch_top_crest_curve",
-                    "value": "Einlaufkurve",
+                    "value": "Oberkantenkurve",
                     "english": "Top Crest Curve"
                 }
             }

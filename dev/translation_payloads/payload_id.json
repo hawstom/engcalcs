@@ -2,7 +2,7 @@
     "meta": {
         "language": "id",
         "expected_key_count": 482,
-        "delta_key_count": 22,
+        "delta_key_count": 14,
         "active_prefixes": [
             "calc",
             "dw",
@@ -519,16 +519,8 @@
         "mi_station": "Sta",
         "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
         "mhp_vel_ok_short": "OK",
-        "mhp_hl_warn_tip": "Consider larger pipe",
-        "mhp_hl_bad_tip": "Resize pipe",
         "rc_sg_ok_tip": "2.54–2.82 (Robinson)",
-        "rc_sg_low_tip": "Valid range: 2.54–2.82",
-        "rc_sg_high_tip": "Valid range: 2.54–2.82",
         "rc_SD_ok_tip": "1.15–1.47 (Robinson)",
-        "rc_SD_low_tip": "Valid range: 1.15–1.47",
-        "rc_SD_high_tip": "Valid range: 1.15–1.47",
-        "rc_pond_ok_tip": "Ponding upstream of the chute inlet is good; it reduces erosion upstream. (USDA)",
-        "rc_pond_warn_tip": "No ponding upstream of the chute inlet; erosion could occur upstream. (USDA)",
         "rc_sketch_filter": "Filter",
         "ip_length": "L",
         "ip_diameter": "D",
@@ -543,16 +535,8 @@
         "mi_station": "Sta",
         "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
         "mhp_vel_ok_short": "OK",
-        "mhp_hl_warn_tip": "Consider larger pipe",
-        "mhp_hl_bad_tip": "Resize pipe",
         "rc_sg_ok_tip": "2.54–2.82 (Robinson)",
-        "rc_sg_low_tip": "Valid range: 2.54–2.82",
-        "rc_sg_high_tip": "Valid range: 2.54–2.82",
         "rc_SD_ok_tip": "1.15–1.47 (Robinson)",
-        "rc_SD_low_tip": "Valid range: 1.15–1.47",
-        "rc_SD_high_tip": "Valid range: 1.15–1.47",
-        "rc_pond_ok_tip": "Ponding upstream of the chute inlet is good; it reduces erosion upstream. (USDA)",
-        "rc_pond_warn_tip": "No ponding upstream of the chute inlet; erosion could occur upstream. (USDA)",
         "rc_sketch_filter": "Filter",
         "ip_length": "L",
         "ip_diameter": "D",
@@ -657,163 +641,35 @@
                 }
             }
         },
-        "mhp_hl_warn_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mhp_hl_warn",
-                    "value": "melebihi target 10% — pertimbangkan pipa lebih besar ⚠",
-                    "english": "exceeds 10% target"
-                },
-                "next_translated": {
-                    "key": "mhp_hl_bad",
-                    "value": "melebihi 20% — ubah ukuran pipa",
-                    "english": "exceeds 20%"
-                }
-            }
-        },
-        "mhp_hl_bad_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mhp_hl_bad",
-                    "value": "melebihi 20% — ubah ukuran pipa",
-                    "english": "exceeds 20%"
-                },
-                "next_translated": {
-                    "key": "mhp_notes_1_term",
-                    "value": "Kehilangan Tinggi",
-                    "english": "Head Loss"
-                }
-            }
-        },
         "rc_sg_ok_tip": {
-            "reason": "missing",
-            "current_value": null,
+            "reason": "equal_to_english",
+            "current_value": "2.54–2.82 (Robinson)",
             "neighbors": {
                 "previous_translated": {
                     "key": "rc_sg_ok",
-                    "value": "sg dalam rentang valid (2.54–2.82) ✓",
+                    "value": "sg dalam rentang valid",
                     "english": "sg in valid range"
                 },
                 "next_translated": {
                     "key": "rc_sg_low",
-                    "value": "Peringatan: sg < 2.54 — di bawah rentang Robinson",
+                    "value": "sg di bawah rentang Robinson",
                     "english": "sg below Robinson range"
-                }
-            }
-        },
-        "rc_sg_low_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sg_low",
-                    "value": "Peringatan: sg < 2.54 — di bawah rentang Robinson",
-                    "english": "sg below Robinson range"
-                },
-                "next_translated": {
-                    "key": "rc_sg_high",
-                    "value": "Peringatan: sg > 2.82 — di atas rentang Robinson",
-                    "english": "sg above Robinson range"
-                }
-            }
-        },
-        "rc_sg_high_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sg_high",
-                    "value": "Peringatan: sg > 2.82 — di atas rentang Robinson",
-                    "english": "sg above Robinson range"
-                },
-                "next_translated": {
-                    "key": "rc_SD_ok",
-                    "value": "SD dalam rentang valid (1.15–1.47) ✓",
-                    "english": "SD in valid range"
                 }
             }
         },
         "rc_SD_ok_tip": {
-            "reason": "missing",
-            "current_value": null,
+            "reason": "equal_to_english",
+            "current_value": "1.15–1.47 (Robinson)",
             "neighbors": {
                 "previous_translated": {
                     "key": "rc_SD_ok",
-                    "value": "SD dalam rentang valid (1.15–1.47) ✓",
+                    "value": "SD dalam rentang valid",
                     "english": "SD in valid range"
                 },
                 "next_translated": {
                     "key": "rc_SD_low",
-                    "value": "Peringatan: SD < 1.15 — di bawah rentang Robinson",
+                    "value": "SD di bawah rentang Robinson",
                     "english": "SD below Robinson range"
-                }
-            }
-        },
-        "rc_SD_low_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_SD_low",
-                    "value": "Peringatan: SD < 1.15 — di bawah rentang Robinson",
-                    "english": "SD below Robinson range"
-                },
-                "next_translated": {
-                    "key": "rc_SD_high",
-                    "value": "Peringatan: SD > 1.47 — di atas rentang Robinson",
-                    "english": "SD above Robinson range"
-                }
-            }
-        },
-        "rc_SD_high_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_SD_high",
-                    "value": "Peringatan: SD > 1.47 — di atas rentang Robinson",
-                    "english": "SD above Robinson range"
-                },
-                "next_translated": {
-                    "key": "rc_layer",
-                    "value": "Ketebalan lapisan batu (2 × D<sub>50<\/sub>)",
-                    "english": "Rock layer thickness (2 &times; D<sub>50<\/sub>)"
-                }
-            }
-        },
-        "rc_pond_ok_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_pond_ok",
-                    "value": "Hp > yn — genangan di hulu ✓",
-                    "english": "H<sub>p<\/sub> > y<sub>n<\/sub> — ponding upstream"
-                },
-                "next_translated": {
-                    "key": "rc_pond_warn",
-                    "value": "⚠ Hp ≤ yn — tidak ada genangan — periksa inlet terhadap erosi",
-                    "english": "H<sub>p<\/sub> ≤ y<sub>n<\/sub> — no ponding — inlet erosion potential"
-                }
-            }
-        },
-        "rc_pond_warn_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_pond_warn",
-                    "value": "⚠ Hp ≤ yn — tidak ada genangan — periksa inlet terhadap erosi",
-                    "english": "H<sub>p<\/sub> ≤ y<sub>n<\/sub> — no ponding — inlet erosion potential"
-                },
-                "next_translated": {
-                    "key": "rc_eq1",
-                    "value": "Pers. 1 (S0 < 0.10) — kemiringan landai",
-                    "english": "Eq. 1 (S<sub>0<\/sub> < 0.10) — gentle slope"
                 }
             }
         },
@@ -823,12 +679,12 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "rc_notes_4_def",
-                    "value": "Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). \"<a target=\"_blank\" href=\"https:\/\/www.fs.usda.gov\/biology\/nsaec\/fishxing\/fplibrary\/Robinson_1998_Design_of_Rock_Chutes.pdf\">Desain peluncur batu<\/a>.\" <em>Transactions of the ASAE<\/em>, 41(3), 621–626. USDA ARS juga menerbitkan <a target=\"_blank\" href=\"https:\/\/data.nal.usda.gov\/dataset\/rock-chute-design\">lembar kerja Excel<\/a> berdasarkan metode yang sama.",
+                    "value": "Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). \"<a target=\"_blank\" href=\"https:\/\/www.fs.usda.gov\/biology\/nsaec\/fishxing\/fplibrary\/Robinson_1998_Design_of_Rock_Chutes.pdf\">Desain saluran curam berbatu<\/a>.\" <em>Transactions of the ASAE<\/em>, 41(3), 621–626. USDA ARS juga menerbitkan <a target=\"_blank\" href=\"https:\/\/data.nal.usda.gov\/dataset\/rock-chute-design\">lembar kerja Excel<\/a> berdasarkan metode yang sama.",
                     "english": "Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). &ldquo;<a target=\"_blank\" href=\"https:\/\/www.fs.usda.gov\/biology\/nsaec\/fishxing\/fplibrary\/Robinson_1998_Design_of_Rock_Chutes.pdf\">Design of rock chutes<\/a>.&rdquo; <em>Transactions of the ASAE<\/em>, 41(3), 621&ndash;626. USDA ARS also publishes an <a target=\"_blank\" href=\"https:\/\/data.nal.usda.gov\/dataset\/rock-chute-design\">Excel spreadsheet<\/a> based on the same method."
                 },
                 "next_translated": {
                     "key": "rc_sketch_top_crest_curve",
-                    "value": "Lengkung Puncak",
+                    "value": "Kurva Mercu Atas",
                     "english": "Top Crest Curve"
                 }
             }

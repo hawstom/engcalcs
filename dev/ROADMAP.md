@@ -34,41 +34,34 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 ## Translation improvements
 
-> **SEQUENCING RULE (authoritative — Tom's approved recap, 2026-07-07; read this before touching item 85 or Wave 0):**
-> The Wave 0 restructure does NOT supersede the category-by-category wave/tier stepping plan; it
-> merely puts Wave 0 **external to** (before) that plan. Item 90 was about key consolidation only —
-> it neither finished Wave 0 nor froze English.
+> **PROCESS (authoritative, current — see `dev/translation-process.md` Scenario C for the full
+> mechanics; this box is the status summary, not a second copy of the SOP):**
+> Wave 0 (suite-wide English reform) and item 90 (full-suite key consolidation) are both
+> prerequisites that ran once, up front, across all 6 calculator categories, and are both complete
+> — see their own Completed entries. With those done, item 85 proceeds **one calculator category
+> at a time**, all three language tiers before the next category starts: wave 1 (anchor languages)
+> first, which is also the last point where a genuinely untranslatable English string can trigger a
+> small targeted English edit before the source freezes; then waves 2–3 (major non-Latin,
+> low-resource) against the now-frozen source. Every wave is a **complete re-translation of the
+> category's full key set**, never a missing-key delta — pre-existing content predates the Wave
+> 0/item-90 reforms and isn't assumed correct. Full QA chain every wave (payload-freshness gate,
+> `lang_syntax_validate.php`, independent tag-parity check, inline back-translation check, native-
+> review flag for am/km/my/ps/sw), plus one holistic Opus consistency pass across all 26 languages
+> once a category's three waves close.
 >
-> - **Wave 0 (external, up front, all calculators):** Fable checks the English on ALL calculator
->   categories for lazy wording that is hard to translate — colloquialisms, jargon, compressions —
->   and reforms it into easily-translatable English. Runs to completion before wave 1 starts on
->   ANY category (including category 1, whose own Wave 0 is already done). No interleaving of
->   "Wave 0 category N → wave 1 category N". **English is NOT frozen after Wave 0.**
-> - **Waves 1+ (category by category):** do ALL waves for each category before proceeding to the
->   next category. (Tom, 2026-07-07: "I don't know whether this was a good plan, but it's our plan
->   unless somebody screams against it.")
-> - **Wave 1 (within a category):** translate the category into the tier-1 anchor languages.
->   Feed back to English: where wording is still untranslatable, revise the English with human
->   advice (re-translate the changed keys).
-> - **Waves 2+ (within a category):** **English is now frozen** for that category. Translate the
->   category wave by wave, tier by tier, using all our tools, processes, and checks (glossary,
->   intents, payload freshness gate, lang_syntax_validate, tag parity, backtranslate_check,
->   native-review flags).
->
-> Status: **Wave 0 COMPLETE 2026-07-07 for all 6 calculator categories + rc_/ip_** (see
-> `dev/english-review-wave0.md` "Implementation status" + "Closeout"). Both discussion items
-> resolved (cs_Ec = conveyance label + conservation intent, both-registers; crown =
-> definition-first glossary entry), the D1 `mtc_vel_high`→`mhp_vel_high` merge executed, and the
-> stacked-negatives pass applied (Tom's standing directive: watch for negatives in every future
-> linguistic pass). QA clean, payloads FRESH. **Wave 1 (item 85, category 1 anchors) is
-> unblocked** — sprint launch still requires explicit authorization per CLAUDE.md.
+> **Category order and status** (see the dated entries below for what was actually done/found in
+> each): (1) open channel `mtc_`/`mi_` — closed. (2) weirs & orifices `ws_`/`wi_`/`or_`/`odt_` —
+> closed. (3) pipe friction `dw_`/`hw_`/`mpf_`/`mphl_` — closed. (4) irrigation & seepage
+> `cs_`/`irr_`/`ip_` — closed. (5) micro-hydro `mhp_`/`rc_` — wave 1 done, waves 2–3 pending
+> authorization. (6) shared UI/units `u_`/`calc_`/`menu_`/`points_` — not started. Each wave's
+> paid sprint requires explicit go-ahead per CLAUDE.md § "Translation Sprints".
 >
 > **CONFIRMED 2026-07-07 (Tom): "complete re-translation" means all 53 current `mtc_`/`mi_` keys,
 > not just the unfilled delta.** A pre-launch payload check found category 1's anchor languages
 > already carry translations for all but ~17 key-instances (4 short labels: `mi_groupPoint`,
 > `mi_groupSegment`, `mi_station`, `mtc_blodgett_v_bathurst` — leftover gaps from the item-90 IA
-> reorder). That near-complete delta does **not** mean wave 1 is nearly done: per the
-> DEPENDENCY/RESTRUCTURE bullet above, wave 1 is a **complete original/comparative re-translation**
+> reorder). That near-complete delta does **not** mean wave 1 is nearly done: per the PROCESS box
+> above, wave 1 is a **complete original/comparative re-translation**
 > of the full 53-key set per anchor language — the existing strings predate Wave 0's English
 > reform and item-90 consolidation and are not assumed correct. Do not shrink the sprint to just
 > the delta keys. (Also found and left alone: 6 orphan keys — `mi_notes`, `mtc_vel_check`,
@@ -961,21 +954,78 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 > re-checked FRESH across all 26. No native review yet on this specific fix (ur is not yet at the
 > `0.95` native-reviewed tier) — same status as before, not a regression.
 
-- 85|[CC] Extend the rc_/ip_ audit treatment to the remaining calculators using the category-grid plan (agreed with Tom 2026-07-06). **Calculator categories (N=6):** (1) open channel: mtc_+mi_ (59 keys — first, because the Bulgarian engineer's "irregular"="нередовен" catch is likely systemic across languages); (2) weirs & orifices: ws_+wi_+or_+odt_ (78); (3) pipe friction: dw_+hw_+mpf_+mphl_ (59); (4) irrigation & seepage: cs_+irr_ (54); (5) micro-hydro: mhp_ (44); (6) shared UI/units: u_+calc_+menu_+points_ incl. the ~121 identical-to-english validator warnings. **Language tiers (M=3), run as sequential waves within each category, not parallel cells:** wave 1 anchors (es pt fr it de ro ru uk bg sr hr cs tr id — cognate language groups let one glossary decision propagate; review side-by-side within Slavic/Romance blocks; **wave 1 is also the English-reform gate (Tom's principle, 2026-07-06): tier-1 translators/reviewers must flag English source strings that resist translation — idioms, stacked modifiers, compressions like "right at"/"draw off"/"Est." — and those grievances are resolved by REWRITING THE ENGLISH (author-reviewable in cognate languages) rather than only patching intents, BEFORE waves 2-3 launch, so all remaining languages inherit the more translatable source**), wave 2 major non-Latin (zh ar he hi bn fa ur), wave 3 low-resource (am km my ps sw — run last against the glossary enriched by waves 1-2; mandatory backtranslate_check + native-review flag). Per category: audit read → mechanical fixes → intents (needs human authorization) → glossary + prefixToTermNames additions → wave-1 sprint → English-reform pass from wave-1 grievances (human approves English edits; re-run wave 1 on changed keys) → waves 2-3 → post-sprint QA chain. Prereq raised by this ordering: implement the per-key English source-hash in payloads so any later English edit re-flags all 26 translations (audit §10.5). ≈10-12 authorization events total; each paid sprint gated on explicit user go-ahead per CLAUDE.md.
-  - **CORRECTION 2026-07-07 (Tom, supersedes the paragraph below where they conflict):** the "DEPENDS on a completed, FROZEN English source" framing was a **mistake**. English is NOT frozen after Wave 0, and item 90 neither finishes Wave 0 nor freezes English — **item 90 was about key consolidation only**. Item 85 **starts with** its own Wave 0 pass by Fable across all calculator categories, editing obvious colloquialisms, jargon, and lazy phrases into easily-translatable English. English freezes only after wave 1 (interactive anchors) — see the SEQUENCING RULE box.
-  - **DEPENDENCY / RESTRUCTURE 2026-07-07 (Tom + Opus; see CORRECTION above): item 85 no longer owns key consolidation.** The key-consolidation work is pulled *out* of item 85's per-calculator-category loop and done up front as a decoupled prerequisite: **item 90** (full-suite key consolidation, Opus — done). **Wave 0** (colloquialism cleanup, Fable) is item 85's first step, run externally across all categories. After Wave 0, item 85 proceeds **category by category** (all waves for a category before the next category) — a **complete re-translation** of every category (Tom's "be complete" call, 2026-07-07), tier by tier within each, with full QA. See the SEQUENCING RULE box for the authoritative recap. The old per-category "concept-level MERGE" and "English-reform pass from wave-1 grievances / re-run wave 1 on changed keys" steps are **superseded** (residual English grievances that wave-1 still surfaces become small, targeted English edits, not a structural loop). The §10.5 source-hash is deferred to *after* this complete pass. The sub-bullets below are retained as historical rationale; where they say "per category: … Wave 0 …" read Wave 0 as the single up-front English pass, not a per-category step.
-  - **STRATEGY CHANGE 2026-07-06 (Tom): promote the English-reform gate to a standalone Wave 0 English review that runs BEFORE any translation wave, across ALL categories including the already-translated ip_/rc_.** Rationale: the existing `$ec_lang_intent` strings are themselves the grievance list — ~11 of 70 non-empty intents exist only to decode Sonnet-authored colloquialisms/calque-traps ("right at the lateral", "textbook low-quarter DU", "draw off", "favorable downhill run"), clustered in ip_/rc_. Fixing the English source once benefits all 26 languages, lets those workaround intents be deleted, and removes the plan's wasteful "re-run wave 1 on changed keys" step. Tom accepted that revising ip_/rc_ English invalidates their existing 26-language translations (audit already rated ip_ quality poor, so re-translation was coming anyway). **Corrected order (per-category framing below is superseded — see the SEQUENCING RULE box above): audit → mechanical → Wave 0 English review, run once across ALL categories (Fable sweep of the 35 long-string `*_notes_*_def`/tooltip keys + harvest of existing colloquialism-explaining intents; human approves each English edit) → only then does wave 1 begin, category by category → waves 2-3.** §10.5 per-key English source-hash still wanted so ip_/rc_ edits re-flag stale translations, but no longer a hard blocker since re-translation is accepted.
-    - **Wave 0 operating method (Tom, 2026-07-06):** for each non-empty `$ec_lang_intent`, ask *"How could the English be rewritten so this intent note is no longer needed?"* — then reform the English and DELETE the obsoleted intent. The intent strings are the pre-collected grievance list; an intent that decodes a colloquialism ("right at"=exactly at, "draw off"=withdraw, "textbook"=as in standard texts, "more for"=better suited to) is a bug report against the source, not permanent guidance. Keep only intents that survive perfect English (genuine calque-traps like the "irregular"=cross-section sense).
-    - **Refinement (Tom, 2026-07-06): Wave 0 does NOT replace wave 1 as a detector — it pre-filters for it.** The translation act is the truest detector (that's how Fable found the colloquialisms); a monolingual proofread would miss latent problems. So keep the "flag English that resists translation" imperative IN wave 1. Wave 0 (cheap Fable translation-driven sweep) removes the obvious ~80%; wave 1's paid cognate work still surfaces the residual ~20% that only appears in real cross-language translation; only that small residual triggers an English re-edit + targeted wave-1 re-run. For ip_/rc_ specifically the detection already happened — the intents ARE the surfaced grievances — so Wave 0 there is harvesting, not speculation.
-    - **Model plan (per feedback_model_switch_reminder):** collaborative English-reform decisions + layout-critical CSS = Opus; the bulk Wave 0 linguistic sweep = Fable (its demonstrated strength; bounded, high-value); paid short-label waves = Sonnet/Haiku per CLAUDE.md. Remind Tom to hand off + clear + switch to Fable at the Wave 0 sweep boundary.
-  - **Batch 1 (open channel mtc_+mi_) prep done 2026-07-06 [CC], stopped at the wave-1 authorization gate.** Mechanical state is clean: the only validator class present for mtc_/mi_ is `identical-to-english` (18), and those are legit — pure symbols (`mi_a/rh/t/pw/fr617/…`) plus real cognates (`Point`/`Segment`/`Notes` are actual words in fr/de/cs/hr/ro) plus proper nouns (`mtc_blodgett_v_bathurst` = surnames). No escape/tag/foreign-script bugs. Genuine remaining defect is bn `mtc_vel_high_short`="High" (Latin in a non-Latin lang — wave-2). **Applied:** bg `mi_menu` "Нередовен канал"→"Канал с неправилно сечение по Манинг" (the menu was missed when the Bulgarian engineer corrected the title/desc; removes the exact rejected temporal-sense word). **Glossary v1.3:** added `irregular channel` entry (geometric cross-section sense; translation_notes warns against temporal "нередовен/нерегулярний" and evaluative ru "неправильное русло"), bound it into `mi` and `wi` prefixToTermNames, payloads regenerated (verified bound in payload_uk.json). **Wrong-sense flags for wave-1 cognate review (NOT yet changed in lang files):** ru `Неправильное русло` (reads "incorrect channel"), uk `Нерегулярне русло` (temporal sense), sr/hr `неправилни/nepravilni` (borderline "incorrect"); cs/de are best-in-class (`nepravidelný průřez`/`unregelmäßiges Profil`). **English-reform candidates (mtc_/mi_) for wave-1 grievance pass (need human approval before editing English):** compressed abbreviations/stacked modifiers — `mi_station`="Sta", `mi_elevation`="Elev", `mi_n617`="Comp. n", `mi_tau`="Bot. shear τ", `mi_d50in`="Lining median rock size", `mi_n`="n for seg-ment" (hard hyphenation). **RESOLVED 2026-07-07 (Tom):** 4 of 6 were already fixed during Wave 0 (`mi_elevation`→"Elevation", `mi_tau`→"Bottom shear", `mi_n`→"n"; `mi_d50in` reworded but turns out to be **dead code** — unreferenced in any PHP/JS file, left in place, candidate for deletion later). The remaining 2 (`mi_station`="Sta", `mi_n617`="Comp.<br />n") were checked against actual category-2 wave-1 output rather than assumed: all 14 anchor languages produced natural short forms with zero translator friction — **kept as-is, not a translation obstacle.** Principle captured in `CLAUDE.md`'s `layout: column heading` tag section. Gate closed, no English edit made. **Cross-category carry-over:** bg still has 2 `Нередов*` in `irr_card_weir_irregular_head` and `irr_quickref_html` ("Нередовен Преливник") — engineer rejected this word for weirs too (feedback line 10); left for category 2 (wi_/weirs) / category 4 (irr_). **Next gated actions requiring your go-ahead:** (a) authorize `$ec_lang_intent` additions for the "irregular" sense on mtc_/mi_ keys; (b) authorize the wave-1 paid sprint (14 anchor languages).
-  - **Wave 0 English reform + IA reorder applied for mtc_/mi_ (2026-07-06, see dev/english-review-wave0.md).** Section A rewords + approved intents applied; `mi_` results-table `n` column moved Point→Segment (IA fix; `tau` confirmed Point per code), `mi_n`→`n`. Introduced a **reusable versioned cookie-migration mechanism** in `js/Cookies.lib.js` (`cookieFormatVersion` + `v<N>` token + `normalizeCookieValue` + per-page `migrateCookie`); Manning-Irregular is v2. This is the pattern for any future results-table reorder in ip_/wi_ — bump that page's `cookieFormatVersion` and supply a `migrateCookie`. Migration unit-tested; browser-verified good by Tom 2026-07-07 (new layout + legacy saved section both load correctly).
-  - **HANDOFF note 2026-07-07 [CC/Opus → Fable] — `$ec_lang_intent` format hardened; ready for Wave 0 categories 2–6.**
-    - `Done:` Established the `<intent> | <commentary>` pipe convention (CLAUDE.md "Language Keys") with a tag vocabulary — `layout: column heading`, `avoid: <sense>`, `gloss: <term>`, `symbol` (flag). Generator `collectKeyIntent()` now strips everything from the first `|` before payloads are built. Migrated all `ip_` and `mi_` intents to it: subscript strings → `| symbol`; the tripled `ip_notes_1/2/3_def` and `mi_menu/main_title/main_desc` "irregular" blocks collapsed to `| gloss:` pointers (senses moved into glossary `reach`/`energy grade line`/`irregular channel` entries, which `ip`/`mi` already inject); buried "never X" notes → `| avoid:`. Recorded the bg engineer's `flow` clarification in glossary.json. Added roadmap item 40; logged the engineer response in item 80.
-    - `Ready:` Wave 0 English-reform sweep for categories 2–6, per the operating method in the sub-bullets above. Batch-1 (mtc_/mi_) Wave 0 already applied. **This is the sole remaining blocker before wave 1 (item 85) can start on anything, per the SEQUENCING RULE box at the top of this section — wave 1 does not begin on category 1 or any other category until 2–6 are done.**
-    - `Next:` (Fable) Tom hands off → `/clear` → switch to Fable pointed at `dev/english-review-wave0.md`. For each non-empty intent ask "how to reword the English so this note is unneeded," reform the English + delete the obsoleted intent; keep only genuine calque-traps. NOTE: commentary tags after the `|` (layout/avoid/gloss/symbol) are STRIPPED reminders, not grievances — do not treat them as English bug reports; the left-of-pipe intent is the only translatable content. Payload regeneration is the launcher's job, not the user's: the sprint launcher runs `generate_translation_payloads.php --check` as a hard gate (exit 1 = stale = regenerate first). This session's edits are already regenerated + fresh.
-    - `Blocker:` none. (Batch-1 browser verification by Tom is still open but does not block Wave 0 of other categories.)
-    - `Files:` CLAUDE.md, lib/lang.ec.en.php, dev/scripts/generate_translation_payloads.php, dev/scripts/glossary.json, dev/ROADMAP.md.
+> **DONE 2026-07-11/12: Category 5 (micro-hydro, `mhp_`+`rc_`, 97 keys) wave 1 — complete
+> re-translation into all 14 anchor languages (es pt fr it de ro ru uk bg sr hr cs tr id).**
+> Pre-sprint checklist per CLAUDE.md: payloads FRESH, Wave 0 already covered this category
+> (2026-07-07), item 90 key consolidation already applied, glossary coverage confirmed for all 20
+> `mhp`/`rc` terms (5 terms missing am/km only — wave-3-only gap, not a wave-1 blocker). Custom
+> full-key-set payloads built (the standard generator only emits missing-key deltas; Scenario C
+> needs every key) at `dev/translation_payloads/payload_cat5_<lang>.json`. 14 agents launched in
+> parallel, Sonnet, each retranslating all 97 keys from scratch (existing content treated as
+> context only, not trusted). 3 agents (ro, sr, hr) hit session-limit errors; per the
+> session-limit-retry lesson, checked `git status`/key-completeness before relaunching — ro was
+> actually complete (0 missing), hr was 89/97 (missing only the 8 new `rc_*_tip` keys), sr had 0
+> file changes. Resumed hr from transcript (its second pass found the `rc_` block, though present,
+> was stale pre-Wave-0 content needing full re-translation, not just the 8 missing keys — redid all
+> 97) and relaunched sr fresh with incremental-checkpoint instructions to avoid a second session-limit
+> loss. All 14 finished; `php -l` clean on every file.
+>
+> **Independent orchestrator QA (not just trusting agent self-reports), per item-85 lesson:**
+> `lang_syntax_validate.php` clean (only pre-existing/legitimate `identical-to-english` advisories —
+> numeric Robinson ranges and true cognates like German/Croatian "Filter"). A scripted tag-parity
+> check (`<sub>/<sup>/<span>/<a>` sets vs. English) across all 97×14 found 36 real mismatches —
+> `rc_pond_ok`/`rc_pond_warn`/`rc_eq1`/`rc_eq2`/`rc_eq_warn_low`/`rc_eq_warn_high` had silently
+> dropped `<sub>` tags around S₀/H_p/y_n in es, fr, de, uk, bg (all 6 keys) and it (4 keys) and tr (2
+> keys) — fixed directly by the orchestrator, re-checked, 0 mismatches. Also found and fixed a
+> verdict-string convention gap the per-agent instructions had missed: `rc_eq_warn_low`/`rc_eq_warn_high`
+> render through `EngCalcs.writeCheckHTML()` (confirmed in `js/rock-chute.js`) exactly like the
+> `_ok`/`_low`/`_high` triads, so they may never carry a baked translated "Warning:" marker — fr, it,
+> uk, bg, tr had one; stripped from all 5.
+>
+> **One small English-source edit** (wave-1 grievance → targeted fix, per SOP): `rc_notes_7_def`
+> said "ponding occurs upstream of the **inlet apron**" — independently flagged as suspicious by 2
+> of 14 agents (uk, id) because "apron" is elsewhere defined strictly as the *outlet* toe-support
+> structure (`rc_apron_length`) with no corresponding inlet structure anywhere in the calculator.
+> Confirmed a genuine English-source slip, not a translation problem; changed to "upstream of the
+> chute inlet". 10 of 14 languages (es pt fr it ro uk sr hr cs tr) had faithfully translated the
+> flawed "apron" wording into a same-conceptual-error inlet-apron/slab phrase (reusing their own
+> outlet-apron term) — corrected all 10 to match; de/ru/bg had already used a generic inlet
+> term there and needed no change; id had already independently dropped "apron" as loose phrasing.
+>
+> **Cross-language pattern, not a defect:** 5 of 14 agents (it, pt, ru, tr, hr) independently
+> flagged the same class of finding — the file's already-established, internally-consistent term for
+> a concept (It. "pietrame" for riprap, Pt. "conduta forçada"/"Rendimento da instalação"/"Graduação",
+> Ru. "пенсток", Tr. "cebri boru"/"parça taşı", Hr. "kameni žlijeb") diverges from `glossary.json`'s
+> `preferred_translation` for the same term. Each agent correctly kept the file's incumbent term
+> per CLAUDE.md's ownership/incumbency principle rather than fragmenting one file's internal
+> consistency. Not fixed this pass — flagged here as raw material for a future glossary
+> reconciliation pass (item 90-style, cross-language not cross-category this time).
+>
+> **New finding, logged not fixed — glossary self-contradiction on "median rock size" (D50):**
+> `glossary.json`'s own `translation_notes` for this term explicitly warn "Do not use 'average'
+> (average ≠ median statistically)", yet its own `preferred_translation` values for bg/cs/de/hr/ro/
+> ru/sr/tr/uk/fa/ur all read as "mean/average size" (e.g. de `mittlere Korngröße`, ru `средний размер
+> камня`, uk `середній розмір каменю`) rather than a true median term — only es/fr/it/id/zh use a
+> genuine median word. This affects `mtc_` (category 1, already shipped) as well as `rc_D50` here.
+> Needs native-language verification (is "average/mean" colloquially used for median in these
+> languages' engineering registers, or is it a real error?) before any suite-wide fix — not
+> attempted in this session, logged for a future targeted glossary pass.
+>
+> **Not yet done:** waves 2 (zh ar he hi bn fa ur) and 3 (am km my ps sw) for category 5, pending
+> Tom's go-ahead per the standard per-wave authorization gate.
+
+- 85|[CC] Complete re-translation of every calculator category into all 26 languages, category by
+  category, per the process box at the top of this "Translation improvements" section and the
+  operational mechanics in `dev/translation-process.md` Scenario C. Status: categories 1–4 (open
+  channel, weirs & orifices, pipe friction, irrigation & seepage) fully closed, including their
+  holistic Opus consistency passes; category 5 (micro-hydro) wave 1 done, waves 2–3 pending
+  authorization; category 6 (shared UI/units) not started. Two suite-wide prerequisites this item
+  depends on — Wave 0 English reform and item 90 key consolidation — both ran once, up front, and
+  are both done (see their own Completed entries below). The dated log immediately below is the
+  record of what was actually done and found, category by category; earlier planning drafts from
+  2026-07-06/07 (an original per-category Wave 0 design, its later restructure, and Fable-specific
+  handoff notes — all superseded once Wave 0 and item 90 finished as one-time suite-wide passes)
+  were removed here on 2026-07-12 to keep this entry current and non-contradictory.
 
 - 80|[H] Bulgarian scope question for the native engineer (dev/Bulgarian-engineer-feedback.md): (1) should "дебит" become "водно количество" suite-wide (pipes/irrigation too) or only in open-channel/hydraulic-structure contexts? Currently applied only to rc_/or_ strings they corrected. (2) Confirm "коефициент на едрозърнестост" as the standard term for the D84.1/D50 gradation SD (vs "коефициент на разнозърненост"), ideally with a source. (3) Invite review of the freshly rewritten bg ip_ notes/tooltips and of Bulgarian menu-title casing (their corrections use sentence case; many bg titles are Title Case).
   - **RESPONSE received 2026-07-06 (Tom relayed engineer):** On (1) — engineer says *both* дебит and водно количество work: "дебит is a typical colloquial call… regular people and non-hydraulic engineers use it. In university (hydraulic engineering) they used водно количество for Q, never дебит." So водно количество is the academic/hydraulic register, дебит the general register; since both are acceptable, possibly we can use the longer in titles and descriptions and the shorter where we need to conserve width. Recorded verbatim in glossary.json `flow` translation_notes. On (2)/coefficient — engineer: "Коефициент на градация (SD) = D₈₄.₁ / D₅₀".
