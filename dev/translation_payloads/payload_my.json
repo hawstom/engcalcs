@@ -2,11 +2,10 @@
     "meta": {
         "language": "my",
         "expected_key_count": 482,
-        "delta_key_count": 19,
+        "delta_key_count": 11,
         "active_prefixes": [
             "calc",
             "ip",
-            "mhp",
             "rc",
             "u"
         ],
@@ -19,7 +18,6 @@
     "prompt_context_by_prefix": {
         "calc": "Use these preferred technical term translations when relevant:\n- flow (Q): ရေစီးနှုန်း\n- velocity (v): ရေအလျင်နှုန်း\n- slope (S): လျောစောင်း",
         "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): ရေစီးနှုန်း\n- velocity (v): ရေအလျင်နှုန်း\n- head loss (h_L): ဖိမြင့်ဆင့်ဆုံးရှုံးမှု\n- emitter: ရေထုတ်ကိရိယာ\n- distribution uniformity (DU): ဖြန့်ဝေမှုညီမျှမှု\n- low-quarter distribution uniformity (DU_lq): [needs translation sprint]\n- application rate (PR): ရေသွင်းနှုန်း\n- lateral: ဘေးပိုက်\n- mainline: ပင်မပိုက်\n- reach: ပိုက်အပိုင်း\n- velocity head (H_v): [needs translation sprint]\n- friction loss (h_f): ပွတ်တိုက်ဆုံးရှုံးမှု\n- minor loss (h_m): ဒေသဆိုင်ရာ ဆုံးရှုံးမှု\n- energy grade line (EGL): စွမ်းအင်မျဉ်း\n- upstream: [needs translation sprint]\n- downstream: [needs translation sprint]",
-        "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): ရေစီးနှုန်း\n- penstock: ဖိအားရေပိုက်\n- gross head (H_gross): စုစုပေါင်းဖိမြင့်ဆင့်\n- net head (H_net): အသားတင်ဖိမြင့်ဆင့်\n- plant efficiency (η): စက်ရုံထိရောက်မှု\n- head loss (h_L): ဖိမြင့်ဆင့်ဆုံးရှုံးမှု\n- run-of-river: မြစ်စီးဆင်းမှုနှင့်ဆိုလာ\n- headworks: ရေပေးမှုဆောက်လုပ်ရေး\n- junction loss (h_m): ချိတ်ဆက်မှုဆုံးရှုံးမှု\n- minor loss (h_m): ဒေသဆိုင်ရာ ဆုံးရှုံးမှု",
         "rc": "Use these preferred technical term translations when relevant:\n- flow (Q): ရေစီးနှုန်း\n- velocity (v): ရေအလျင်နှုန်း\n- riprap: ကျောက်ကာ\n- slope (S): လျောစောင်း\n- rock chute: ကျောက်ထောင်ချောင်း\n- chute: မြန်ဆန်သောချောင်း\n- unit discharge (q, q_t): ယူနစ်ရေထွက်နှုန်း\n- median rock size (D50): ကျောက်အလယ်အလတ်အရွယ်အစား\n- gradation (SD): ကျောက်အရွယ်အစားဖြန့်ဝေမှု\n- porosity (n_p): အပေါက်ပါမှုနှုန်း\n- specific gravity (sg): တိကျသောဆွဲငင်အား\n- ponding: [needs translation sprint]\n- outlet apron: [needs translation sprint]\n- weir head (H_p): [needs translation sprint]\n- upstream: [needs translation sprint]\n- downstream: [needs translation sprint]\n- reach: ပိုက်အပိုင်း",
         "u": "Use these preferred technical term translations when relevant:\n- flow (Q): ရေစီးနှုန်း\n- velocity (v): ရေအလျင်နှုန်း\n- slope (S): လျောစောင်း"
     },
@@ -159,78 +157,6 @@
                 "context": "Direction away from the supply, toward the outlet \/ last emitter.",
                 "translation_notes": "Never software \"downgrade\". ar: downstream = المصب \/ أسفل المجرى (a file used المنبعية = source-side, wrong).",
                 "preferred_translation": ""
-            }
-        ],
-        "mhp": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered. ENGINEER CLARIFICATION (2026-07-06): 'дебит is a typical colloquial call of the word — regular people and non-hydraulic engineers use it. In university (hydraulic engineering) they used водно количество for Q, never дебит. I guess both work.' So both are acceptable; водно количество is the academic\/hydraulic-engineering register, дебит the general register. Still an open decision whether to standardize on водно количество suite-wide.",
-                "preferred_translation": "ရေစီးနှုန်း"
-            },
-            {
-                "term": "penstock",
-                "symbol": "",
-                "context": "Pressure pipe carrying water from a reservoir or headpond down to a turbine in a micro-hydro system. Appears in Micro-Hydro Power calculator.",
-                "translation_notes": "'Penstock' is a specialized term with no exact one-word equivalent in many languages. Use the established civil\/hydro engineering phrase for 'pressure conduit' or 'force main to turbine'. Czech: 'tlakovod' (pressure main) is preferred over the generic 'přiváděcí potrubí' (supply pipe). Serbian: 'напорни цевовод' is the standard hydraulic engineering term.",
-                "preferred_translation": "ဖိအားရေပိုက်"
-            },
-            {
-                "term": "gross head",
-                "symbol": "H_gross",
-                "context": "Total elevation difference between the headpond water surface and the turbine — before subtracting penstock losses. Appears in Micro-Hydro Power calculator.",
-                "translation_notes": "'Gross' means total\/before-deduction. Pair with 'net head' for clarity. Use the hydro-power standard term.",
-                "preferred_translation": "စုစုပေါင်းဖိမြင့်ဆင့်"
-            },
-            {
-                "term": "net head",
-                "symbol": "H_net",
-                "context": "Effective head available at the turbine after subtracting penstock friction and minor losses from gross head. H_net = H_gross - h_L.",
-                "translation_notes": "'Net' means after-deduction. Pair with 'gross head'. Use the hydro-power standard term. WMO No. 385 entry 111 ('available head') gives the Russian term 'полезный напор' (useful head) \/ syn. 'располагаемый напор' — these overlap with net head in Russian hydro engineering practice.",
-                "preferred_translation": "အသားတင်ဖိမြင့်ဆင့်"
-            },
-            {
-                "term": "plant efficiency",
-                "symbol": "η",
-                "context": "Overall efficiency of a micro-hydro power plant — product of turbine, generator, and transmission efficiencies. Dimensionless, 0–1. Appears in Micro-Hydro Power calculator.",
-                "translation_notes": "'Plant' here means the power plant\/installation, not a living plant. Use the energy\/electrical engineering term for overall system efficiency.",
-                "preferred_translation": "စက်ရုံထိရောက်မှု"
-            },
-            {
-                "term": "head loss",
-                "symbol": "h_L",
-                "context": "Energy loss expressed as a height of water column. Appears in Darcy-Weisbach, Hazen-Williams, Manning pipe, and Penstock calculators. Distinct from 'pressure drop' — use the hydraulic engineering term.",
-                "translation_notes": "'Head' in the hydraulic sense (energy per unit weight) does not translate literally in many languages — use the established civil\/hydraulic engineering phrase. Pre-2026 sr\/hr human translations used 'gubitak pritiska' (= pressure loss), which is technically the same concept expressed in pressure terms rather than head terms. The current 'губитак напора \/ gubitak tlačne visine' (= loss of hydraulic head) is more precise in a hydraulic engineering context and is preferred. DATA-ERROR FIX 2026-07-09 (category-3 wave-1 sprint): ro\/tr\/id translations were pressure-loss-sense ('pierdere de presiune'\/'basınç kaybı'\/'kehilangan tekanan'), contradicting this note's own guidance. Independently flagged by both the ro and tr wave-1 translation agents; corrected to head-loss-sense ('pierdere de sarcină'\/'yük kaybı'\/'kehilangan tinggi tekan') to match what both agents actually used in lib\/lang.ec.ro.php and lib\/lang.ec.tr.php. de's 'Druckverlust' was left as-is (not flagged; German engineering practice uses pressure\/head loss terms more interchangeably in pipe-flow context) but is worth a second look in a future audit. DATA-ERROR FIX 2026-07-09 (category-3 fa sprint): fa was 'افت فشار' (literally 'pressure loss', same pressure-loss-sense defect class as the ro\/tr\/id fix above), while the fa file's own mphl_ head-loss labels already used 'افت هد' (head loss) and 'هد' is an established loanword elsewhere in the file (هد سرعت = velocity head). Standardized to 'افت هد' suite-wide for fa and fixed dw_\/hw_ labels in lib\/lang.ec.fa.php to match. DATA-ERROR FIX 2026-07-10 (category-3 sw wave-3 sprint): glossary sw value was 'upotevu wa shinikizo' (= pressure loss), the same pressure-loss-sense defect class as the ro\/tr\/id\/fa fixes above. But lib\/lang.ec.sw.php's own dw_main_desc\/dw_main_menu\/dw_main_title\/mphl_main_desc\/mphl_main_menu\/mphl_main_title (and mpf_velocity_head, ws_headWaterHeight, or_head, mhp_gross_head elsewhere in the file) all already establish 'Kichwa' (head) as the suite's real Swahili word for hydraulic head, not 'shinikizo' (pressure). Standardized the glossary to 'upotevu wa kichwa' to match the file's own established, correct usage instead of the stale pressure-sense glossary value. DATA-ERROR FIX 2026-07-10 (category-3 ps wave-3 sprint): glossary ps value was 'د سر زیان' (زیان = damage\/loss), but lib\/lang.ec.ps.php's own dw_\/hw_\/mpf_\/mphl_ head-loss labels (40+ occurrences suite-wide) all already use ضیاع, not زیان, for 'loss' (e.g. existing dw_main_menu 'Darcy-Weisbach د پایپ سر ضیاع', mphl_total_loss). زیان does not occur anywhere in the file. Standardized the glossary to 'د سر ضیاع' to match the file's actual established usage, same defect class as the sw fix above.",
-                "preferred_translation": "ဖိမြင့်ဆင့်ဆုံးရှုံးမှု"
-            },
-            {
-                "term": "run-of-river",
-                "symbol": "",
-                "context": "A hydropower configuration that uses natural river flow without a dam or significant storage reservoir. Power output varies with seasonal river flow. Appears in Micro-Hydro Power calculator.",
-                "translation_notes": "Use the established energy\/hydropower sector term. 'Run' means natural river current — do not translate as jogging or running. WMO No. 385 entry 1263 gives the full facility names: Spanish 'central hidroeléctrica de pasada', French 'usine hydroélectrique au fil de l'eau', Russian 'русловая гидроэлектростанция' — these are the authoritative terms for the power plant noun. The abbreviated forms 'filo de agua' (es), 'au fil de l'eau' (fr), and 'русловая ГЭС' (ru) are standard in engineering use. German: 'Laufwasserkraftwerk'. Chinese: '径流式水电'.",
-                "preferred_translation": "မြစ်စီးဆင်းမှုနှင့်ဆိုလာ"
-            },
-            {
-                "term": "headworks",
-                "symbol": "",
-                "context": "The intake structure at the upstream end of a penstock or canal, where water is diverted from the river or reservoir into the conveyance system. Appears in Micro-Hydro Power calculator (penstock diameter and length descriptions).",
-                "translation_notes": "Use the civil\/irrigation engineering term for a water intake or diversion structure. Spanish: 'obra de toma'. French: 'ouvrage de prise d'eau'. Russian: 'водозаборное сооружение'. German: 'Einlaufbauwerk'. In many languages, 'intake structure' is preferred over a literal translation of 'headworks'.",
-                "preferred_translation": "ရေပေးမှုဆောက်လုပ်ရေး"
-            },
-            {
-                "term": "junction loss",
-                "symbol": "h_m",
-                "context": "Energy loss at pipe junctions, bends, fittings, and entrance — a local (point) loss as opposed to distributed friction loss along the pipe. h_m = k_m × v²\/(2g). Appears in Manning Pipe Head Loss and Micro-Hydro Power calculators.",
-                "translation_notes": "CANONICAL ENGLISH (label-normalization decision, item 90, 2026-07-07): the suite-wide English label for this concept is \"Minor (local) loss\" — 'junction loss' (formerly mphl_) and 'minor loss' (mhp_\/ip_) are merged into it; see the 'minor loss' entry for the canonical treatment. The term 'minor' is conventional but misleading — do not imply these losses are always small; the parenthetical '(local)' carries the true sense. Use the hydraulic engineering term for local\/point losses at fittings. French: 'perte singulière'. Spanish: 'pérdida local' or 'pérdida por accesorio'. Russian: 'местные потери'. Chinese: '局部水头损失'.",
-                "preferred_translation": "ချိတ်ဆက်မှုဆုံးရှုံးမှု"
-            },
-            {
-                "term": "minor loss",
-                "symbol": "h_m",
-                "context": "Local head loss at fittings\/valves\/couplers (coefficient k_m). Canonical merged concept for the former 'junction loss' (mphl_) and 'minor loss' (mhp_\/ip_). Manning Pipe Head Loss, Micro-Hydro Power, Irrigation Pressure.",
-                "translation_notes": "CANONICAL ENGLISH LABEL: \"Minor (local) loss\" (label-normalization decision, item 90, 2026-07-07). 'Minor ⇄ local' — a local\/point loss at fittings, NOT a \"smaller\" loss; the '(local)' parenthetical fixes the mistranslation trap. Symbol h_m, coefficient k_m (lowercase h reserved for loss components; capital H reserved for total\/gross\/net head, per the same decision). am ADDED (2026-07-10, category-3 am re-translation): 'ጥቃቅን (አካባቢያዊ) ኪሳራ' (tiqaqin (akababiyawi) kisara) mirrors the English structure word-for-word — 'ጥቃቅን' (minor\/small) followed by the parenthetical '(አካባቢያዊ)' (local, i.e. of a specific place\/area) — so the same mistranslation-blocking device English uses (the '(local)' qualifier preventing a 'smaller loss' misreading) is preserved in Amharic rather than silently dropped. Replaces the prior am file's 'የማያያዣ ኪሳራ' (connector\/joint loss), which named the physical fitting rather than the local\/point-loss concept. km ADDED (2026-07-10, category-3 km re-translation): 'ការបាត់បង់មូលដ្ឋាន' (local-basis loss) reuses មូលដ្ឋាន ('local', already established suite-wide for this exact merged concept in ip_km's tooltip 'មេគុណបាត់បង់មូលដ្ឋានសរុប' = 'total local-loss coefficient'), so category-3 now converges on the same word ip_ already uses rather than coining a second competing term. Deliberately avoids 'តូច' (small), sidestepping the minor⇄smaller mistranslation trap the English '(local)' parenthetical exists to block. Replaces the km file's prior mphl_junction_loss value 'ការបាត់បង់ junction' (untranslated English word left in place). ps ADDED (2026-07-10, category-3 ps wave-3 re-translation): 'ځایی ضیاع' (local loss) uses ځایی (local\/positional) + the established ps loss word ضیاع, following the majority pattern already set by ar\/fa\/es\/fr\/hr\/id\/it\/ro\/ru\/sr\/tr\/uk\/ur\/zh — all of which render this concept as 'local loss' alone rather than translating 'minor' literally, since the '(local)' qualifier is the operative disambiguator, not 'minor'. Deliberately avoids a word for 'small\/minor' (e.g. کوچنی) to sidestep the same minor⇄smaller trap the English parenthetical exists to block. Replaces the prior ps file's 'د جنکشن ضیاع' (junction loss — the pre-consolidation, pre-item-90 term) and fixes its symbol from capital H_m to lowercase h_m.",
-                "preferred_translation": "ဒေသဆိုင်ရာ ဆုံးရှုံးမှု"
             }
         ],
         "rc": [
@@ -383,16 +309,8 @@
         "u_grade": "rise\/run",
         "calc_copy_link": "Copy link",
         "calc_copy_link_done": "Copied!",
-        "mhp_hl_warn_tip": "Consider larger pipe",
-        "mhp_hl_bad_tip": "Resize pipe",
         "rc_sg_ok_tip": "2.54–2.82 (Robinson)",
-        "rc_sg_low_tip": "Valid range: 2.54–2.82",
-        "rc_sg_high_tip": "Valid range: 2.54–2.82",
         "rc_SD_ok_tip": "1.15–1.47 (Robinson)",
-        "rc_SD_low_tip": "Valid range: 1.15–1.47",
-        "rc_SD_high_tip": "Valid range: 1.15–1.47",
-        "rc_pond_ok_tip": "Ponding upstream of the chute inlet is good; it reduces erosion upstream. (USDA)",
-        "rc_pond_warn_tip": "No ponding upstream of the chute inlet; erosion could occur upstream. (USDA)",
         "ip_length": "L",
         "ip_diameter": "D",
         "ip_roughness": "e",
@@ -404,16 +322,8 @@
         "u_grade": "rise\/run",
         "calc_copy_link": "Copy link",
         "calc_copy_link_done": "Copied!",
-        "mhp_hl_warn_tip": "Consider larger pipe",
-        "mhp_hl_bad_tip": "Resize pipe",
         "rc_sg_ok_tip": "2.54–2.82 (Robinson)",
-        "rc_sg_low_tip": "Valid range: 2.54–2.82",
-        "rc_sg_high_tip": "Valid range: 2.54–2.82",
         "rc_SD_ok_tip": "1.15–1.47 (Robinson)",
-        "rc_SD_low_tip": "Valid range: 1.15–1.47",
-        "rc_SD_high_tip": "Valid range: 1.15–1.47",
-        "rc_pond_ok_tip": "Ponding upstream of the chute inlet is good; it reduces erosion upstream. (USDA)",
-        "rc_pond_warn_tip": "No ponding upstream of the chute inlet; erosion could occur upstream. (USDA)",
         "ip_length": "L",
         "ip_diameter": "D",
         "ip_roughness": "e",
@@ -485,163 +395,35 @@
                 }
             }
         },
-        "mhp_hl_warn_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mhp_hl_warn",
-                    "value": "၁၀% ပစ်မှတ်ကျော်လွန် — ကြီးမားသောပိုက်ကို ထည့်သွင်းစဉ်းစားပါ ⚠",
-                    "english": "exceeds 10% target"
-                },
-                "next_translated": {
-                    "key": "mhp_hl_bad",
-                    "value": "၂၀% ကျော်လွန် — သွတ်ပိုက် ပြန်လည်အရွယ်တိုင်းပါ",
-                    "english": "exceeds 20%"
-                }
-            }
-        },
-        "mhp_hl_bad_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mhp_hl_bad",
-                    "value": "၂၀% ကျော်လွန် — သွတ်ပိုက် ပြန်လည်အရွယ်တိုင်းပါ",
-                    "english": "exceeds 20%"
-                },
-                "next_translated": {
-                    "key": "mhp_notes_1_term",
-                    "value": "ခေါင်းဆုံးဆုံးရှုံးမှု",
-                    "english": "Head Loss"
-                }
-            }
-        },
         "rc_sg_ok_tip": {
-            "reason": "missing",
-            "current_value": null,
+            "reason": "equal_to_english",
+            "current_value": "2.54–2.82 (Robinson)",
             "neighbors": {
                 "previous_translated": {
                     "key": "rc_sg_ok",
-                    "value": "sg စစ်မှန်သောအပိုင်းအခြားတွင်ရှိ (2.54–2.82) ✓",
+                    "value": "sg သည် သက်ဆိုင်သည့် အပိုင်းအခြားအတွင်းရှိသည်",
                     "english": "sg in valid range"
                 },
                 "next_translated": {
                     "key": "rc_sg_low",
-                    "value": "သတိပေးချက်: sg < 2.54 — Robinson အပိုင်းအခြားအောက်",
+                    "value": "sg သည် Robinson အပိုင်းအခြားအောက် ကျဆင်း",
                     "english": "sg below Robinson range"
-                }
-            }
-        },
-        "rc_sg_low_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sg_low",
-                    "value": "သတိပေးချက်: sg < 2.54 — Robinson အပိုင်းအခြားအောက်",
-                    "english": "sg below Robinson range"
-                },
-                "next_translated": {
-                    "key": "rc_sg_high",
-                    "value": "သတိပေးချက်: sg > 2.82 — Robinson အပိုင်းအခြားအထက်",
-                    "english": "sg above Robinson range"
-                }
-            }
-        },
-        "rc_sg_high_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_sg_high",
-                    "value": "သတိပေးချက်: sg > 2.82 — Robinson အပိုင်းအခြားအထက်",
-                    "english": "sg above Robinson range"
-                },
-                "next_translated": {
-                    "key": "rc_SD_ok",
-                    "value": "SD စစ်မှန်သောအပိုင်းအခြားတွင်ရှိ (1.15–1.47) ✓",
-                    "english": "SD in valid range"
                 }
             }
         },
         "rc_SD_ok_tip": {
-            "reason": "missing",
-            "current_value": null,
+            "reason": "equal_to_english",
+            "current_value": "1.15–1.47 (Robinson)",
             "neighbors": {
                 "previous_translated": {
                     "key": "rc_SD_ok",
-                    "value": "SD စစ်မှန်သောအပိုင်းအခြားတွင်ရှိ (1.15–1.47) ✓",
+                    "value": "SD သည် သက်ဆိုင်သည့် အပိုင်းအခြားအတွင်းရှိသည်",
                     "english": "SD in valid range"
                 },
                 "next_translated": {
                     "key": "rc_SD_low",
-                    "value": "သတိပေးချက်: SD < 1.15 — Robinson အပိုင်းအခြားအောက်",
+                    "value": "SD သည် Robinson အပိုင်းအခြားအောက် ကျဆင်း",
                     "english": "SD below Robinson range"
-                }
-            }
-        },
-        "rc_SD_low_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_SD_low",
-                    "value": "သတိပေးချက်: SD < 1.15 — Robinson အပိုင်းအခြားအောက်",
-                    "english": "SD below Robinson range"
-                },
-                "next_translated": {
-                    "key": "rc_SD_high",
-                    "value": "သတိပေးချက်: SD > 1.47 — Robinson အပိုင်းအခြားအထက်",
-                    "english": "SD above Robinson range"
-                }
-            }
-        },
-        "rc_SD_high_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_SD_high",
-                    "value": "သတိပေးချက်: SD > 1.47 — Robinson အပိုင်းအခြားအထက်",
-                    "english": "SD above Robinson range"
-                },
-                "next_translated": {
-                    "key": "rc_layer",
-                    "value": "ကျောက်အလွှာထူမှုပမာဏ (2 × D<sub>50<\/sub>)",
-                    "english": "Rock layer thickness (2 &times; D<sub>50<\/sub>)"
-                }
-            }
-        },
-        "rc_pond_ok_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_pond_ok",
-                    "value": "Hp > yn — အပေါ်စီးတွင် ရေဝပ်မှုရှိ ✓",
-                    "english": "H<sub>p<\/sub> > y<sub>n<\/sub> — ponding upstream"
-                },
-                "next_translated": {
-                    "key": "rc_pond_warn",
-                    "value": "⚠ Hp ≤ yn — ရေဝပ်မှုမရှိ — ဝင်ပေါက်တွင် ရေကြောင်းနွမ်းမှု စစ်ဆေးပါ",
-                    "english": "H<sub>p<\/sub> ≤ y<sub>n<\/sub> — no ponding — inlet erosion potential"
-                }
-            }
-        },
-        "rc_pond_warn_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "rc_pond_warn",
-                    "value": "⚠ Hp ≤ yn — ရေဝပ်မှုမရှိ — ဝင်ပေါက်တွင် ရေကြောင်းနွမ်းမှု စစ်ဆေးပါ",
-                    "english": "H<sub>p<\/sub> ≤ y<sub>n<\/sub> — no ponding — inlet erosion potential"
-                },
-                "next_translated": {
-                    "key": "rc_eq1",
-                    "value": "Eq. 1 (S0 < 0.10) — ညင်သာသောစောင်း",
-                    "english": "Eq. 1 (S<sub>0<\/sub> < 0.10) — gentle slope"
                 }
             }
         },

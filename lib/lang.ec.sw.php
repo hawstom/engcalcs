@@ -460,7 +460,7 @@ $ec_lang['rc_Vm']='Kasi kupitia tabaka la mawe, V<sub>m</sub> <span title="Sehem
 $ec_lang['rc_qm']='Mtiririko wa kila upana kupitia tabaka la mawe, q<sub>m</sub>';
 $ec_lang['rc_qs']='Mtiririko wa kila upana wa juu ya uso, q<sub>s</sub> (q<sub>t</sub> − q<sub>m</sub>)';
 $ec_lang['rc_d']='Kina cha mtiririko juu ya uso wa mawe, d';
-$ec_lang['rc_Hp']='Kichwa cha weir cha ingizo, H<sub>p</sub> <span title="Kutuama kwa maji (Hp > yn) ni jambo zuri — hupunguza mmomonyoko juu ya mkondo. (USDA)" class="ec-tip">?</span>';
+$ec_lang['rc_Hp']='Kichwa cha bwawa cha ingizo, H<sub>p</sub> <span title="Kutuama kwa maji (Hp > yn) ni jambo zuri — hupunguza mmomonyoko juu ya mkondo. (USDA)" class="ec-tip">?</span>';
 $ec_lang['rc_ponding_check']='Ukaguzi wa kutuama kwa maji kwenye ingizo';
 $ec_lang['rc_pond_ok']='H<sub>p</sub> > y<sub>n</sub> — maji yanatuama juu ya mkondo';
 $ec_lang['rc_pond_ok_tip']='Maji kutuama juu ya mkondo kabla ya ingizo la mfereji ni jambo zuri; hupunguza mmomonyoko juu ya mkondo. (USDA)';
@@ -481,7 +481,7 @@ $ec_lang['rc_notes_5_def']='Milinganyo ilitengenezwa ikitumia wigo wa D<sub>50</
 $ec_lang['rc_notes_6_term']='Mwinuko wa Sakafu ya Kutokea';
 $ec_lang['rc_notes_6_def']='Mwinuko wa juu ya mawe katika mkondo wa kutokea unapaswa kuwa sawa na au chini ya mwinuko wa sakafu ya mkondo wa chini. Ukiwa juu zaidi, mawe ya kutokea hayatakuwa thabiti.';
 $ec_lang['rc_notes_7_term']='Ukaguzi wa Mafuriko ya Ingizo';
-$ec_lang['rc_notes_7_def']='Kina cha kawaida katika njia ya ingizo kinapokuwa chini ya kichwa cha weir (H<sub>p</sub>) kinachohitajika kupitisha q<sub>t</sub>, mtiririko mdogo au kutuama kwa maji hutokea juu ya mkondo kabla ya ingizo la mfereji. Hii kwa ujumla inakubalika — kutuama kwa maji hupunguza kasi na huzuia mmomonyoko juu ya mkondo. Kukagua: tumia kikokotoo cha mtiririko wa weir kupata H<sub>p</sub> kwa q<sub>t</sub> na upana wa kilele uliopewa, kisha ulinganishe na kina cha kawaida cha njia ya ingizo. Ikiwa H<sub>p</sub> inazidi kina cha kawaida, kutuama kwa maji kutatokea.';
+$ec_lang['rc_notes_7_def']='Kina cha kawaida katika njia ya ingizo kinapokuwa chini ya kichwa cha bwawa (H<sub>p</sub>) kinachohitajika kupitisha q<sub>t</sub>, mtiririko mdogo au kutuama kwa maji hutokea juu ya mkondo kabla ya ingizo la mfereji. Hii kwa ujumla inakubalika — kutuama kwa maji hupunguza kasi na huzuia mmomonyoko juu ya mkondo. Kukagua: tumia kikokotoo cha mtiririko wa bwawa kupata H<sub>p</sub> kwa q<sub>t</sub> na upana wa kilele uliopewa, kisha ulinganishe na kina cha kawaida cha njia ya ingizo. Ikiwa H<sub>p</sub> inazidi kina cha kawaida, kutuama kwa maji kutatokea.';
 $ec_lang['rc_notes_4_term']='Marejeo';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). "<a target="_blank" href="https://www.fs.usda.gov/biology/nsaec/fishxing/fplibrary/Robinson_1998_Design_of_Rock_Chutes.pdf">Usanifu wa mifereji ya mawe ya mwinuko</a>." <em>Transactions of the ASAE</em>, 41(3), 621–626. USDA ARS pia inachapisha <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">lahajedwali la Excel</a> linalotumia mbinu ile ile.';
 // Sketch labels

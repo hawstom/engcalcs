@@ -483,12 +483,12 @@ $ec_lang['rc_main_desc']='Dimenzioniranje kamenitog nasipa za žlijeb &mdash; Ro
 $ec_lang['rc_S0']='Nagib dna žlijeba, S<sub>0</sub>';
 $ec_lang['rc_qt']='Ukupni jedinični protok, q<sub>t</sub> <span title="Protok po jedinici širine na ulazu u kameni žlijeb. Za kanal širine dna B s ukupnim protokom Q koristite q_t = Q / B." class="ec-tip">?</span>';
 $ec_lang['rc_np']='Poroznost kamenitog nasipa, n<sub>p</sub>';
-$ec_lang['rc_sg']='Specifična težina kamena, sg <span title="Tipičan drobljeni granit ili bazalt ≈ 2,65. Robinsonov važeći raspon: 2,54 do 2,82." class="ec-tip">?</span>';
+$ec_lang['rc_sg']='Relativna gustoća kamena, sg <span title="Tipičan drobljeni granit ili bazalt ≈ 2,65. Robinsonov važeći raspon: 2,54 do 2,82." class="ec-tip">?</span>';
 $ec_lang['rc_SD']='Gradacija SD = D<sub>84.1</sub>/D<sub>50</sub> <span title="Standardna devijacija granulometrijskog sastava. Jednoličan kamen ≈ 1,25. Robinsonov važeći raspon: 1,15 do 1,47." class="ec-tip">?</span>';
 $ec_lang['rc_yn']='Normalna dubina u ulaznom kanalu, y<sub>n</sub> <span title="Uspor (Hp &gt; yn) je dobar &mdash; smanjuje eroziju uzvodno. (USDA)" class="ec-tip">?</span>';
 $ec_lang['rc_D50']='Potrebna medijalna veličina kamena, D<sub>50</sub> <span title="Jedn. 1 (S0 &lt; 0,10) ili Jedn. 2 (0,10-0,40). Važeće: D50 15-278 mm, S0 0,02-0,40. Izvan raspona: ekstrapolacija." class="ec-tip">?</span>';
 $ec_lang['rc_eq_used']='Primijenjena jednadžba';
-$ec_lang['rc_sg_check']='Provjera specifične težine';
+$ec_lang['rc_sg_check']='Provjera relativne gustoće';
 $ec_lang['rc_SD_check']='Provjera gradacije SD';
 $ec_lang['rc_sg_ok']='sg u važećem rasponu';
 $ec_lang['rc_sg_ok_tip']='2,54–2,82 (Robinson)';

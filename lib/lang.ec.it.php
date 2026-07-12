@@ -366,12 +366,12 @@ $ec_lang['rc_main_desc']='Dimensionamento del Pietrame per Scivolo — Robinson,
 $ec_lang['rc_S0']='Pendenza del fondo dello scivolo, S<sub>0</sub>';
 $ec_lang['rc_qt']='Portata specifica totale, q<sub>t</sub> <span title="Portata per unità di larghezza all\'ingresso dello scivolo. Per un canale di larghezza di fondo B con portata totale Q, usare q_t = Q / B." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['rc_np']='Porosità del pietrame, n<sub>p</sub>';
-$ec_lang['rc_sg']='Peso specifico relativo della roccia, sg <span title="Granito frantumato o basalto tipico ≈ 2,65. Intervallo valido Robinson: 2,54 a 2,82." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
+$ec_lang['rc_sg']='Densità relativa della roccia, sg <span title="Granito frantumato o basalto tipico ≈ 2,65. Intervallo valido Robinson: 2,54 a 2,82." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['rc_SD']='Gradazione SD = D<sub>84.1</sub>/D<sub>50</sub> <span title="Deviazione standard granulometrica. Roccia uniforme ≈ 1,25. Intervallo valido Robinson: 1,15 a 1,47." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['rc_yn']='Tirante normale nel canale di ingresso, y<sub>n</sub> <span title="Il rigurgito (Hp > yn) è favorevole — riduce l\'erosione a monte. (USDA)" style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['rc_D50']='Dimensione mediana richiesta della roccia, D<sub>50</sub> <span title="Eq. 1 (S0 < 0,10) o Eq. 2 (0,10–0,40). Valido: D50 15–278 mm, S0 0,02–0,40. Fuori intervallo: estrapolato." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['rc_eq_used']='Equazione applicata';
-$ec_lang['rc_sg_check']='Verifica del peso specifico relativo';
+$ec_lang['rc_sg_check']='Verifica della densità relativa';
 $ec_lang['rc_SD_check']='Verifica della gradazione SD';
 $ec_lang['rc_sg_ok']   ='sg nell\'intervallo valido';
 $ec_lang['rc_sg_ok_tip']='2,54–2,82 (Robinson)';
@@ -394,7 +394,7 @@ $ec_lang['rc_Vm']='Velocità attraverso il mantello di roccia, V<sub>m</sub> <sp
 $ec_lang['rc_qm']='Portata specifica nel mantello, q<sub>m</sub>';
 $ec_lang['rc_qs']='Portata specifica superficiale, q<sub>s</sub> (q<sub>t</sub> − q<sub>m</sub>)';
 $ec_lang['rc_d']='Altezza idrica sopra la superficie del pietrame, d';
-$ec_lang['rc_Hp']='Carico al soglio di ingresso, H<sub>p</sub> <span title="Il rigurgito (Hp > yn) è favorevole — riduce l\'erosione a monte. (USDA)" style="cursor:help;color:#06c;font-size:0.9em">?</span>';
+$ec_lang['rc_Hp']='Carico sulla soglia di ingresso, H<sub>p</sub> <span title="Il rigurgito (Hp > yn) è favorevole — riduce l\'erosione a monte. (USDA)" style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['rc_ponding_check']='Verifica del rigurgito all\'imbocco';
 $ec_lang['rc_pond_ok']  ='H<sub>p</sub> > y<sub>n</sub> — rigurgito a monte';
 $ec_lang['rc_pond_ok_tip']='Il rigurgito a monte dell\'imbocco dello scivolo è favorevole; riduce l\'erosione a monte. (USDA)';

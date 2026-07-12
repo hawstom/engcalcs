@@ -83,7 +83,7 @@ This section holds only the forward-looking tracking item (85) and its current s
 | 2 | Weirs & orifices | `ws_`/`wi_`/`or_`/`odt_` | ✅ closed — 3 waves + holistic Opus pass |
 | 3 | Pipe friction | `dw_`/`hw_`/`mpf_`/`mphl_` | ✅ closed — 3 waves + holistic Opus pass |
 | 4 | Irrigation & seepage | `cs_`/`irr_`/`ip_` | ✅ closed — 3 waves + holistic Opus pass |
-| 5 | Micro-hydro | `mhp_`/`rc_` | ◑ waves 1–2 done; wave 3 pending authorization |
+| 5 | Micro-hydro | `mhp_`/`rc_` | ✅ closed — 3 waves + holistic Opus pass |
 | 6 | Shared UI/units | `u_`/`calc_`/`menu_`/`points_` | ☐ not started |
 
 Two suite-wide prerequisites item 85 depended on — **Wave 0** English reform and **item 90** key

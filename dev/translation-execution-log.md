@@ -1142,3 +1142,36 @@ fixed in the incumbent (pre-sprint) text, not just fresh translation:
 Category 5 is now complete across all three waves (14 anchor + 7 major-non-Latin + 5 low-resource
 = 26 languages). Per THE SEQUENCING RULE, the holistic Opus consistency pass for category 5 is
 next, before starting category 6.
+
+> **DONE 2026-07-12: holistic Opus consistency pass executed and closed out for category 5** (all
+> 96 `mhp_`/`rc_` keys read side-by-side across English plus all 26 non-English languages). Payloads
+> regenerated and confirmed FRESH before launch.
+> **Result: 9 string edits across 5 files.** Glossary-term drift (specific-gravity units trap —
+> intent note explicitly warns "not specific weight, which has units"; it/hr/sr were outliers using
+> specific-*weight* wording against the established Slavic/Romance relative-density cohort):
+> it/hr/sr `rc_sg`/`rc_sg_check` corrected to relative-density terms. Wrong-sense mistranslation:
+> it `rc_Hp` had "soglio" (throne) for "sill" — corrected to "soglia". Untranslated English leftover
+> ("weir"): my and sw `rc_Hp`/`rc_notes_7_def` (4 occurrences total) substituted with each
+> language's own established weir term from its ws_/wi_ calculators (my: ဆည်တမံ; sw: bwawa).
+> **Clean across all 26 languages:** baked verdict glyphes (0), loss-symbol case h_f/h_m/h_L/k_m
+> (0 violations), subscript/symbol preservation (0 missing across 20 symbol-bearing keys), tag
+> parity vs. English (0 mismatches), ponding-vs-flooding trap in the 96 in-scope keys (all clean —
+> backwater/ponding terms used, no flooding words), all 96 keys present and non-empty in all 26
+> languages.
+> **Left unfixed, flagged for a human decision:**
+> - `rc_notes_7_term` — an orphan key present in all 26 non-English files but **absent from
+>   English** and not rendered by `Rock-Chute.php` (which only outputs note 4). Outside the 96-key
+>   scope. sw's value still contains the previously-flagged "Mafuriko" (flooding) mistranslation —
+>   needs an English-source decision (add the key, or delete the vestigial translations) before it
+>   can be fixed.
+> - he `rc_sg` ("משקל סגולי", literally specific-weight) may be idiomatic Hebrew for specific
+>   gravity with no cohort to compare against — left as-is, low confidence either way.
+> - km `mhp_main_*` keeps "Micro-Hydro" in Latin script rather than native-script transliteration
+>   (bn/hi/my transliterate); km is already native-review-flagged.
+> - am's ጫና/ሄድ head-terminology split (flagged in the prior wave-3 entry above) remains open, outside
+>   this pass's 96-key scope; am is already native-review-flagged.
+> **QA:** `php -l` clean on all 5 touched files (it, hr, sr, my, sw); tag-parity/symbol/glyph
+> re-check clean; back-translation of every edit verified faithful to English; payloads regenerated,
+> `--check` FRESH.
+> **Category 5 (all 3 waves + holistic pass, 26 languages) is now fully closed.** Per THE SEQUENCING
+> RULE, item 85 may proceed to category 6 (`u_`/`calc_`/`menu_`/`points_`) pending Tom's direction.
