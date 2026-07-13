@@ -21,15 +21,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   category-1-only fix would create suite-wide inconsistency; needs a correct replacement term decided
   once per language and applied everywhere `قیچي`/`قینچی` is used for "shear," not per-category.
 
-- 44|[H] **Glossary self-contradiction — "median rock size" (D₅₀) rendered as mean/average.**
-  `glossary.json`'s `translation_notes` for this term explicitly warn "Do not use 'average' (average
-  ≠ median statistically)," yet its own `preferred_translation` for bg/cs/de/hr/ro/ru/sr/tr/uk/fa/ur
-  reads as "mean/average size" (e.g. de `mittlere Korngröße`, ru `средний размер камня`); only
-  es/fr/it/id/zh use a genuine median word. Affects `mtc_` (category 1, already shipped) and `rc_D50`
-  (category 5). Needs native verification per language — is "average/mean" the accepted engineering
-  register for median, or a real error? — before any suite-wide fix. Logged by the category-5 wave-1
-  pass 2026-07-11, not yet attempted.
-
 - 43|[H] **Native-review backlog (consolidated).** am/km/my/ps/sw carry the standing mandatory
   native-review flag across every category (reflected in their `0.65` QUALITY tier in
   `lib/Language.Settings.php`); no verified native reviewer has yet touched them. Specific
@@ -125,6 +116,22 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|[CC] **DONE 2026-07-13: Item 44 closed — D50 "median" mistranslation resolved via 12-language
+  research vote, not native review.** Tom's call: since no native reviewer was available, research
+  each flagged language's actual geotechnical/sedimentology literature (web search) to see how the
+  vote leans overall, rather than blocking on human input per language. Spawned one research agent
+  per language for bg/cs/de/hr/ro/ru/sr/tr/uk/fa/ur plus am (added per Tom's steer: "it's certainly
+  not as though nobody can do real math in Amharic"). Result: 7 of 12 (de/cs/uk/tr/fa/ur/sr) had a
+  directly-cited real median term in that language's technical literature — genuine errors, fixed.
+  2 (bg, uk) turned out to already be correct in the actual lang files (glossary.json was simply
+  stale — same pattern as item 42); 2 more (hr, ro) were likewise already correct in-file. Only
+  am had no distinct median-vs-average term in circulating usage at all (confirmed even by Amharic
+  dictionaries) — left unchanged, nothing more correct to fix it to. Edited `mi_d50in`/`rc_D50`/
+  `rc_notes_1_def` in lib/lang.ec.{de,cs,ru,tr,fa,ur,sr}.php and refreshed glossary.json's `median
+  rock size` entry (translations + a dated research note) to match. `php -l` clean on all 7 touched
+  files; `lang_syntax_validate.php` shows only pre-existing, unrelated `identical-to-english`
+  advisories. Full per-language findings and citations in the conversation record.
 
 - 0|[CC] **DONE 2026-07-12: Item 45 closed — suite-wide baked-in verdict-glyph sweep.** Ran the
   mechanical grep the item called for across every verdict-string key actually passed as

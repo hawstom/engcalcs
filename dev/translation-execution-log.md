@@ -1287,3 +1287,71 @@ from the (different, existing) `$ec_lang['mhp_vel_high']` PHP key; no defect.
 **Item 45 closed suite-wide, including the previously-unchecked category-1 `mtc_vel_*`
 consumers.** No lang-file edits were needed — the earlier category-2/5 fixes were the only real
 instances of this defect class; the rest of the suite was already clean.
+
+## 2026-07-13: Item 44 closed — D50 "median" mistranslation, resolved by 12-language research vote
+
+Item 44 flagged that `glossary.json`'s own rule ("Do not use 'average' — average ≠ median
+statistically") contradicted its own `preferred_translation` for D₅₀ ("median rock size") in
+bg/cs/de/hr/ro/ru/sr/tr/uk/fa/ur, which read as mean/average wording. It was tagged `[H]` because
+resolving it properly needs to know whether "average/mean" is genuinely the accepted engineering
+register in each language or a real translation error — normally a native-speaker call.
+
+**Tom had no native reviewer available and gave a different instruction: since the underlying
+question is empirical (what do real engineering sources in that language actually call D50?), have
+research agents check the literature directly and let the vote across languages show the general
+lean, rather than blocking on a human per language.** Tom also named Amharic specifically ("it's
+certainly not as though nobody can do real math in Amharic") to make sure a low-resource language
+wasn't skipped out of assumption.
+
+Spawned 12 parallel research agents (Sonnet, web search), one per language: bg, cs, de, hr, ro, ru,
+sr, tr, uk, fa, ur, am. Each was asked to find real geotechnical/sedimentology/riprap literature in
+that language and report whether a genuine "median" cognate is the term actually used for D50, with
+citations and a confidence level — not just asked to translate the phrase again.
+
+**Results — 7 of 12 confirmed real errors with direct citations:**
+- **de**: German Federal Waterways Institute (BAW) sedimentology data product uses "Median-/medianer
+  Korndurchmesser," not "mittlere Korngröße."
+- **cs**: Charles University hydraulics course explicitly labels D50 "Medián zrna."
+- **uk**: granulometric-analysis literature defines D50 as "медіанний розмір" — turned out to
+  already be the wording live in the lang file; only `glossary.json` was stale (see item 42's
+  "glossary is what's stale" pattern).
+- **tr**: riprap/scour-protection academic papers use "medyan"/"ortanca" for D50 explicitly; "orta
+  taş boyutu" doesn't appear in any engineering source (only as an unrelated gemstone-size term).
+- **fa**: Persian technical sources define D50 via the percentile point on the gradation curve and
+  call it "قطر میانه," never "قطر متوسط."
+- **ur**: Urdu statistical vocabulary (mirroring its Arabic source, الوسيط vs المتوسط) cleanly
+  separates وسیط (median) from اوسط (average); "اوسط"/"درمیانی" was simply the wrong word.
+- **sr**: a Serbian river-engineering course script states "D50 предстaвља медијан величине зрна"
+  outright; colloquial mining sources loosely say "средња," which is where the ambiguity came from.
+
+**2 more (bg, hr, ro) turned out to already be correct in the actual lang files** — `glossary.json`
+was simply stale, repeating item 42's finding that the glossary drifts out of sync with lang-file
+reality. bg's `mi_d50in`/`rc_D50`/`rc_notes_1_def` already said "медианен размер"; hr already said
+"medijalna veličina" (an adjective form of medijan); ro already said "dimensiunea mediană." **ru**
+was half-stale: `rc_D50` already correctly said "медианный," but `mi_d50in` still said "средний" —
+fixed for internal consistency.
+
+**1 (am) had no real fix available.** Amharic dictionaries themselves gloss "median" as "መካከለኛ" —
+the same word used for "middle/average" — with no distinct statistical-median term in circulating
+use. Left unchanged; there's nothing more correct to change it to. This is a genuine "no such
+distinction exists yet in this language's practice" finding, not a resourcing gap to flag for later
+— nothing is pending.
+
+**Fixes applied:** `mi_d50in`, `rc_D50`, and (where present) `rc_notes_1_def` in
+`lib/lang.ec.{de,cs,ru,tr,fa,ur,sr}.php`. `glossary.json`'s `median rock size` entry's
+`translations` map updated for bg/cs/de/hr/ro/ru/sr/tr/uk/fa/ur (am left as-is), plus a dated note
+in `translation_notes` recording the research findings and citations so a future pass doesn't
+re-litigate this from scratch. `mtc_d50_*` keys were checked and found to never say "average" or
+"median" in any language (English source doesn't use either word there, just "size" + the D50
+symbol) — no changes needed.
+
+**QA:** `php -l` clean on all 7 touched lang files. `lang_syntax_validate.php --lang=de,cs,ru,tr,fa,
+ur,sr` shows only pre-existing, unrelated `identical-to-english` advisories (none touch the edited
+keys). `glossary.json` re-validated as parseable JSON after the edit.
+
+**Item 44 closed.** Precedent for future `[H]`-tagged terminology disputes with no native reviewer
+available: a multi-language research vote (citing real technical literature, not just re-asking for
+a translation) can substitute for native review when the underlying question is empirical rather
+than a matter of taste — but only when, as here, most languages return a clear, citable answer. A
+minority of genuinely inconclusive results (had one arisen) would still need a human or native
+reviewer, not a tie-break by majority vote.
