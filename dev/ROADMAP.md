@@ -65,29 +65,47 @@ as their own items above: 42 (glossary reconciliation), 38 (orphan-key housekeep
 prerequisites item 85 depended on — **Wave 0** English reform and **item 90** key consolidation —
 both ran once, up front, and are done (see their own Completed entries).
 
-- 80|[H] Bulgarian scope question for the native engineer (dev/Bulgarian-engineer-feedback.md):
-  (1) should "дебит" become "водно количество" suite-wide (pipes/irrigation too) or only in
-  open-channel/hydraulic-structure contexts? Currently applied only to rc_/or_ strings they
-  corrected. (3) Invite review of the freshly rewritten bg ip_ notes/tooltips and of Bulgarian
+- 30|[H] Bulgarian scope question for the native engineer (dev/Bulgarian-engineer-feedback.md):
+  (3) Invite review of the freshly rewritten bg ip_ notes/tooltips and of Bulgarian
   menu-title casing (their corrections use sentence case; many bg titles are Title Case).
+  Priority dropped 80→30 now that (1) and (2), the substantive terminology questions, are closed —
+  only the review-solicitation thread (3) remains.
   - **(2) CLOSED 2026-07-13:** engineer's 2026-07-06 answer — "Коефициент на градация (SD) =
     D₈₄.₁ / D₅₀" — is the standard term, superseding both candidates originally asked about
     (`едрозърнестост` and `разнозърненост`). Applied to `rc_SD`/`rc_SD_check` in
     `lib/lang.ec.bg.php` and recorded in `glossary.json`'s `gradation` entry; no longer an open
     question.
-  - **(1) still open, no action taken:** engineer's 2026-07-06 answer confirms *both* дебит and
-    водно количество are acceptable — "дебит is a typical colloquial call… regular people and
-    non-hydraulic engineers use it. In university (hydraulic engineering) they used водно
-    количество for Q, never дебит." водно количество is the academic/hydraulic register, дебит
-    the general register. This is a judgment call on suite-wide register (long form in
-    titles/descriptions, short form where width is tight), not a fact to look up — needs Tom's
-    call before any file changes. Recorded verbatim in glossary.json `flow` translation_notes.
+  - **(1) CLOSED 2026-07-13 — decided and executed.** Tom: "I would put водно количество
+    everywhere." Suite-wide, all bg calculator categories (pipes/irrigation included, not just
+    open-channel/hydraulic-structure). Every `дебит` occurrence in `lib/lang.ec.bg.php` (35 across
+    dw_/hw_/mpf_/mphl_/mi_/mtc_/ws_/wi_/or_/odt_/irr_/mhp_/cs_/ip_) replaced with `водно количество`,
+    with grammatical gender agreement fixed throughout (дебит is masculine, водно количество is
+    neuter — adjective/article/pronoun endings adjusted on every occurrence, e.g. `пълен дебит`→
+    `пълно водно количество`, `техният дебит`→`тяхното водно количество`). `glossary.json`'s `flow`
+    entry bg value updated to `водно количество` and `translation_notes` updated to record the
+    resolution (version 1.6→1.7). `php -l` and `lang_syntax_validate.php --lang=bg` both clean.
   - **(3) still open:** no review has been sent or received on the bg ip_ notes/tooltips or
     menu-title casing. Per the item-40/43 precedent (native review is only real once feedback
     actually lands — see CLAUDE.md's "Translation Sprints" section), don't log this as "awaiting
     review" indefinitely — either send it to the engineer as a concrete, bounded ask, or close it
     via our own best-effort sentence-case sweep if no review is realistically coming.
 
+
+- 24|English improvements: 
+1. Change 
+"Do you have a great vision for a calculator to add here? Can you help me improve translations, program, or host these calculators?"
+to
+"Do you have great ideas for expanding or improving these calculators or their translations?
+2. Change
+"Please give us your valued words of suggestion or praise."
+to
+"Please share your valued words of suggestion or praise."
+3. Change (in mphl, hw, and dw and wherever used, hopefully a single re-used key)
+"Average shear stress (tractive force), τ"
+to
+"Average shear stress, τ". Add to _intent Parallel or tangential tractive force per unit area on the bottom or bed of the cross section.
+4. Clarify in _intent and in glossary that for rc_ "Rock specific gravity, sg ?", the more standard term is "Relative density of rock".
+10. Propagate these changes to all languages with discretion, or in other words, improve all languages if appropriate in light of these changes. Probably an Opus task.
 
 ## AI Efficiency Scripting (Overhead)
 
