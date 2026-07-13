@@ -92,11 +92,21 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## CSS Standardization Follow-up
 
-- 55|[CC] **Tips standard: blue `?` affordance + whole-label hover/tap target (decided by Tom 2026-07-07).** A tip with no visible marker fails to signal that help exists ("doesn't tickle the user"); a marker you must hit precisely is a poor touch target. Resolution: keep the visible blue `?` as the affordance, but make the **entire label** the hover/tap region. **Non-breaking design:** `.ec-tip` stays exactly as-is (the blue `?` marker: `cursor:help; color:steelblue; font-size:0.9em`); add a wrapper class (e.g. `.ec-help { cursor:help }`) that carries the `title` and wraps the whole label; pattern `<span class="ec-help" title="…">Label <span class="ec-tip">?</span></span>`. Also update the Bootstrap tooltip-init selector to match the wrapper. Scope: ~643 `class="ec-tip"` occurrences across the 27 lang files to migrate (additive, so existing tips keep working during migration) + 1 CSS class + 1 JS selector line. `mi_q_617` (Manning-Irregular composite-flow tip, added 2026-07-07) is the reference instance. Relates to the older tooltip-icon CSS-standardization item (migrating inline `style="cursor:help;color:#06c;…"` spans to `ec-tip`). Do as one mechanical pass, not a translation sprint.
-
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|[CC] **DONE 2026-07-13: Item 55 closed — whole-label hover/tap target for tips.** Added
+  `.ec-help { cursor: help; }` to `css/engcalcs.css`, updated the Bootstrap tooltip-init selector in
+  `js/Calculators.lib.js` to also match `.ec-help[title]`, and mechanically migrated all 956
+  `class="ec-tip"` occurrences across all 27 `lib/lang.ec.*.php` files to the
+  `<span class="ec-help" title="…">Label <span class="ec-tip">?</span></span>` pattern (title moved
+  from the inner span to the wrapper; inner `.ec-tip` markup/CSS unchanged, so it stays non-breaking).
+  Fixed one pre-existing bug found along the way: `lib/lang.ec.sr.php` `rc_apron_length` had a raw
+  unescaped `"` inside its `title` attribute (should have been `&quot;` like the English/Russian
+  versions) which would have broken the HTML attribute boundary — corrected to `&quot;`.
+  `$ec_lang_intent` entries were untouched. `dev/scripts/lang_syntax_validate.php` clean (only
+  pre-existing, unrelated `identical-to-english` advisories); `php -l` clean on all 27 files.
 
 - 0|[CC] **DONE 2026-07-12: Item 85 closed — complete re-translation of every calculator category
   into all 26 languages, category by category** — rules & sequence in

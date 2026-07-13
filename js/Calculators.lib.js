@@ -6,7 +6,7 @@ var EngCalcs = EngCalcs || {};
 // Touch-friendly tooltips: activate Bootstrap tooltips on all cursor:help elements
 // so they respond to tap (click trigger) in addition to hover on desktop.
 document.addEventListener('DOMContentLoaded', function () {
-	document.querySelectorAll('[title][style*="cursor:help"]').forEach(function (el) {
+	document.querySelectorAll('[title][style*="cursor:help"], .ec-help[title]').forEach(function (el) {
 		new bootstrap.Tooltip(el, { trigger: 'hover focus click' });
 	});
 });

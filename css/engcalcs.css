@@ -63,3 +63,9 @@ input[type=number] {
 	color: steelblue;
 	font-size: 0.9em;
 }
+
+/* Whole-label wrapper: makes the entire label (not just the ? icon) the hover/tap
+   target for the tip carried in .ec-tip's title attribute. */
+.ec-help {
+	cursor: help;
+}
