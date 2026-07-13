@@ -29,7 +29,7 @@
                 "term": "flow",
                 "symbol": "Q",
                 "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered. ENGINEER CLARIFICATION (2026-07-06): 'дебит is a typical colloquial call of the word — regular people and non-hydraulic engineers use it. In university (hydraulic engineering) they used водно количество for Q, never дебит. I guess both work.' So both are acceptable; водно количество is the academic\/hydraulic-engineering register, дебит the general register. Still an open decision whether to standardize on водно количество suite-wide.",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg RESOLVED (Tom, 2026-07-13): native engineer's 2026-07-06 clarification confirmed both 'дебит' (colloquial\/general register) and 'водно количество' (academic\/hydraulic-engineering register, used at university for Q) are acceptable. Tom decided suite-wide standardization on 'водно количество' — \"I would put водно количество everywhere\" — applied across all bg calculator categories (pipes\/irrigation included, not just the hydraulic-structure\/open-channel strings the engineer originally corrected). 'дебит' fully replaced in lib\/lang.ec.bg.php 2026-07-13.",
                 "preferred_translation": "caudal"
             },
             {
@@ -87,7 +87,7 @@
                 "term": "flow",
                 "symbol": "Q",
                 "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered. ENGINEER CLARIFICATION (2026-07-06): 'дебит is a typical colloquial call of the word — regular people and non-hydraulic engineers use it. In university (hydraulic engineering) they used водно количество for Q, never дебит. I guess both work.' So both are acceptable; водно количество is the academic\/hydraulic-engineering register, дебит the general register. Still an open decision whether to standardize on водно количество suite-wide.",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg RESOLVED (Tom, 2026-07-13): native engineer's 2026-07-06 clarification confirmed both 'дебит' (colloquial\/general register) and 'водно количество' (academic\/hydraulic-engineering register, used at university for Q) are acceptable. Tom decided suite-wide standardization on 'водно количество' — \"I would put водно количество everywhere\" — applied across all bg calculator categories (pipes\/irrigation included, not just the hydraulic-structure\/open-channel strings the engineer originally corrected). 'дебит' fully replaced in lib\/lang.ec.bg.php 2026-07-13.",
                 "preferred_translation": "caudal"
             },
             {
@@ -201,14 +201,14 @@
                 "term": "flow",
                 "symbol": "Q",
                 "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered. ENGINEER CLARIFICATION (2026-07-06): 'дебит is a typical colloquial call of the word — regular people and non-hydraulic engineers use it. In university (hydraulic engineering) they used водно количество for Q, never дебит. I guess both work.' So both are acceptable; водно количество is the academic\/hydraulic-engineering register, дебит the general register. Still an open decision whether to standardize on водно количество suite-wide.",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg RESOLVED (Tom, 2026-07-13): native engineer's 2026-07-06 clarification confirmed both 'дебит' (colloquial\/general register) and 'водно количество' (academic\/hydraulic-engineering register, used at university for Q) are acceptable. Tom decided suite-wide standardization on 'водно количество' — \"I would put водно количество everywhere\" — applied across all bg calculator categories (pipes\/irrigation included, not just the hydraulic-structure\/open-channel strings the engineer originally corrected). 'дебит' fully replaced in lib\/lang.ec.bg.php 2026-07-13.",
                 "preferred_translation": "caudal"
             },
             {
                 "term": "penstock",
                 "symbol": "",
                 "context": "Pressure pipe carrying water from a reservoir or headpond down to a turbine in a micro-hydro system. Appears in Micro-Hydro Power calculator.",
-                "translation_notes": "'Penstock' is a specialized term with no exact one-word equivalent in many languages. Use the established civil\/hydro engineering phrase for 'pressure conduit' or 'force main to turbine'. Czech: 'tlakovod' (pressure main) is preferred over the generic 'přiváděcí potrubí' (supply pipe). Serbian: 'напорни цевовод' is the standard hydraulic engineering term.",
+                "translation_notes": "'Penstock' is a specialized term with no exact one-word equivalent in many languages. Use the established civil\/hydro engineering phrase for 'pressure conduit' or 'force main to turbine'. Czech: 'tlakovod' (pressure main) is preferred over the generic 'přiváděcí potrubí' (supply pipe). Serbian: 'напорни цевовод' is the standard hydraulic engineering term. 2026-07-13 reconciliation pass (roadmap item 42): glossary updated to match incumbent, internally-consistent lang-file usage discovered by 5 independent category-5-wave-1 translation agents (it, pt, ru, tr) — glossary values were stale, not the shipped files.",
                 "preferred_translation": "tubería de presión"
             },
             {
@@ -229,7 +229,7 @@
                 "term": "plant efficiency",
                 "symbol": "η",
                 "context": "Overall efficiency of a micro-hydro power plant — product of turbine, generator, and transmission efficiencies. Dimensionless, 0–1. Appears in Micro-Hydro Power calculator.",
-                "translation_notes": "'Plant' here means the power plant\/installation, not a living plant. Use the energy\/electrical engineering term for overall system efficiency.",
+                "translation_notes": "'Plant' here means the power plant\/installation, not a living plant. Use the energy\/electrical engineering term for overall system efficiency. 2026-07-13 reconciliation pass (roadmap item 42): glossary updated to match incumbent, internally-consistent lang-file usage discovered by 5 independent category-5-wave-1 translation agents (it, pt, ru, tr) — glossary values were stale, not the shipped files.",
                 "preferred_translation": "eficiencia de la planta"
             },
             {
@@ -243,7 +243,7 @@
                 "term": "run-of-river",
                 "symbol": "",
                 "context": "A hydropower configuration that uses natural river flow without a dam or significant storage reservoir. Power output varies with seasonal river flow. Appears in Micro-Hydro Power calculator.",
-                "translation_notes": "Use the established energy\/hydropower sector term. 'Run' means natural river current — do not translate as jogging or running. WMO No. 385 entry 1263 gives the full facility names: Spanish 'central hidroeléctrica de pasada', French 'usine hydroélectrique au fil de l'eau', Russian 'русловая гидроэлектростанция' — these are the authoritative terms for the power plant noun. The abbreviated forms 'filo de agua' (es), 'au fil de l'eau' (fr), and 'русловая ГЭС' (ru) are standard in engineering use. German: 'Laufwasserkraftwerk'. Chinese: '径流式水电'.",
+                "translation_notes": "Use the established energy\/hydropower sector term. 'Run' means natural river current — do not translate as jogging or running. WMO No. 385 entry 1263 gives the full facility names: Spanish 'central hidroeléctrica de pasada', French 'usine hydroélectrique au fil de l'eau', Russian 'русловая гидроэлектростанция' — these are the authoritative terms for the power plant noun. The abbreviated forms 'filo de agua' (es), 'au fil de l'eau' (fr), and 'русловая ГЭС' (ru) are standard in engineering use. German: 'Laufwasserkraftwerk'. Chinese: '径流式水电'. Task 98 audit (2026-07-13): 'micro-hydro' (the companion term this concept pairs with in mhp_ keys) had been left completely untranslated\/transliterated in 4 languages, not just run-of-river — sw and km kept the raw Latin 'Micro-Hydro' embedded in otherwise-native sentences; km and ps also left 'Run-of-River' in an English parenthetical even where the surrounding sentence already translated the concept; ps separately phonetically transliterated 'مایکرو هایدرو' as its own word throughout (same defect, different script). All 4 fixed: sw → 'Umeme Mdogo wa Maji' (small electricity of water), km → 'ថាមពលវារីអគ្គិសនីខ្នាតតូច' (small-scale hydroelectric power, reusing km's own native hydro vocabulary), ps → 'کوچنی آبي ځواک' (small water-power, real Pashto not transliteration) with the redundant English '(Run-of-River)' parenthetical dropped in both km and ps since their own sentences already conveyed it. ar ('الطاقة الكهرومائية الصغيرة') and zh ('微型水力发电') were already clean and served as the quality reference for the fixes.",
                 "preferred_translation": "filo de agua"
             },
             {
@@ -273,7 +273,7 @@
                 "term": "flow",
                 "symbol": "Q",
                 "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered. ENGINEER CLARIFICATION (2026-07-06): 'дебит is a typical colloquial call of the word — regular people and non-hydraulic engineers use it. In university (hydraulic engineering) they used водно количество for Q, never дебит. I guess both work.' So both are acceptable; водно количество is the academic\/hydraulic-engineering register, дебит the general register. Still an open decision whether to standardize on водно количество suite-wide.",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg RESOLVED (Tom, 2026-07-13): native engineer's 2026-07-06 clarification confirmed both 'дебит' (colloquial\/general register) and 'водно количество' (academic\/hydraulic-engineering register, used at university for Q) are acceptable. Tom decided suite-wide standardization on 'водно количество' — \"I would put водно количество everywhere\" — applied across all bg calculator categories (pipes\/irrigation included, not just the hydraulic-structure\/open-channel strings the engineer originally corrected). 'дебит' fully replaced in lib\/lang.ec.bg.php 2026-07-13.",
                 "preferred_translation": "caudal"
             },
             {
@@ -317,7 +317,7 @@
                 "term": "flow",
                 "symbol": "Q",
                 "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered. ENGINEER CLARIFICATION (2026-07-06): 'дебит is a typical colloquial call of the word — regular people and non-hydraulic engineers use it. In university (hydraulic engineering) they used водно количество for Q, never дебит. I guess both work.' So both are acceptable; водно количество is the academic\/hydraulic-engineering register, дебит the general register. Still an open decision whether to standardize on водно количество suite-wide.",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg RESOLVED (Tom, 2026-07-13): native engineer's 2026-07-06 clarification confirmed both 'дебит' (colloquial\/general register) and 'водно количество' (academic\/hydraulic-engineering register, used at university for Q) are acceptable. Tom decided suite-wide standardization on 'водно количество' — \"I would put водно количество everywhere\" — applied across all bg calculator categories (pipes\/irrigation included, not just the hydraulic-structure\/open-channel strings the engineer originally corrected). 'дебит' fully replaced in lib\/lang.ec.bg.php 2026-07-13.",
                 "preferred_translation": "caudal"
             },
             {
@@ -409,8 +409,8 @@
                 },
                 "next_translated": {
                     "key": "mtc_d50_bottom",
-                    "value": "Tamaño de roca angular requerido en el fondo, D<sub>50<\/sub> (Isbash y MC) <span title=\"Según Isbash (1936) y el condado de Maricopa, Arizona, EE. UU.\" class=\"ec-tip\">?<\/span>",
-                    "english": "Required bottom angular rock size, D<sub>50<\/sub> (Isbash & MC) <span title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\" class=\"ec-tip\">?<\/span>"
+                    "value": "<span class=\"ec-help\" title=\"Según Isbash (1936) y el condado de Maricopa, Arizona, EE. UU.\">Tamaño de roca angular requerido en el fondo, D<sub>50<\/sub> (Isbash y MC) <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\">Required bottom angular rock size, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -425,8 +425,8 @@
                 },
                 "next_translated": {
                     "key": "or_diameter",
-                    "value": "Diámetro o altura, D <span title=\"Diámetro para circular; altura para rectangular\" class=\"ec-tip\">?<\/span>",
-                    "english": "Diameter or height, D <span title=\"Diameter for circular; height for rectangular\" class=\"ec-tip\">?<\/span>"
+                    "value": "<span class=\"ec-help\" title=\"Diámetro para circular; altura para rectangular\">Diámetro o altura, D <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Diameter for circular; height for rectangular\">Diameter or height, D <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -441,8 +441,8 @@
                 },
                 "next_translated": {
                     "key": "or_diameter",
-                    "value": "Diámetro o altura, D <span title=\"Diámetro para circular; altura para rectangular\" class=\"ec-tip\">?<\/span>",
-                    "english": "Diameter or height, D <span title=\"Diameter for circular; height for rectangular\" class=\"ec-tip\">?<\/span>"
+                    "value": "<span class=\"ec-help\" title=\"Diámetro para circular; altura para rectangular\">Diámetro o altura, D <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Diameter for circular; height for rectangular\">Diameter or height, D <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -468,13 +468,13 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "Emisores <span title=\"Filas de laterales: emisores en este tramo solo. Filas de tubería principal: total de emisores en laterales OTROS que este que se ramifican desde este tramo. Para el tramo justo en el punto de extracción de la lateral de prueba, esto también incluye cualquier lateral más abajo en la tubería principal más allá de ese punto, o compartiendo la misma unión (p. ej., una lateral del lado opuesto) — su caudal se ramifica desde este mismo tramo también.\" class=\"ec-tip\">?<\/span>",
-                    "english": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>"
+                    "value": "<span class=\"ec-help\" title=\"Filas de laterales: emisores en este tramo solo. Filas de tubería principal: total de emisores en laterales OTROS que este que se ramifican desde este tramo. Para el tramo justo en el punto de extracción de la lateral de prueba, esto también incluye cualquier lateral más abajo en la tubería principal más allá de ese punto, o compartiendo la misma unión (p. ej., una lateral del lado opuesto) — su caudal se ramifica desde este mismo tramo también.\">Emisores <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_km",
-                    "value": "k<sub>m<\/sub> <span title=\"Coeficiente genérico de pérdida menor para los accesorios\/válvulas\/acoples de este tramo (≥0,5 mínimo sugerido)\" class=\"ec-tip\">?<\/span>",
-                    "english": "k<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
+                    "value": "<span class=\"ec-help\" title=\"Coeficiente genérico de pérdida menor para los accesorios\/válvulas\/acoples de este tramo (≥0,5 mínimo sugerido)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -484,13 +484,13 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "Emisores <span title=\"Filas de laterales: emisores en este tramo solo. Filas de tubería principal: total de emisores en laterales OTROS que este que se ramifican desde este tramo. Para el tramo justo en el punto de extracción de la lateral de prueba, esto también incluye cualquier lateral más abajo en la tubería principal más allá de ese punto, o compartiendo la misma unión (p. ej., una lateral del lado opuesto) — su caudal se ramifica desde este mismo tramo también.\" class=\"ec-tip\">?<\/span>",
-                    "english": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>"
+                    "value": "<span class=\"ec-help\" title=\"Filas de laterales: emisores en este tramo solo. Filas de tubería principal: total de emisores en laterales OTROS que este que se ramifican desde este tramo. Para el tramo justo en el punto de extracción de la lateral de prueba, esto también incluye cualquier lateral más abajo en la tubería principal más allá de ese punto, o compartiendo la misma unión (p. ej., una lateral del lado opuesto) — su caudal se ramifica desde este mismo tramo también.\">Emisores <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_km",
-                    "value": "k<sub>m<\/sub> <span title=\"Coeficiente genérico de pérdida menor para los accesorios\/válvulas\/acoples de este tramo (≥0,5 mínimo sugerido)\" class=\"ec-tip\">?<\/span>",
-                    "english": "k<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
+                    "value": "<span class=\"ec-help\" title=\"Coeficiente genérico de pérdida menor para los accesorios\/válvulas\/acoples de este tramo (≥0,5 mínimo sugerido)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -500,13 +500,13 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "Emisores <span title=\"Filas de laterales: emisores en este tramo solo. Filas de tubería principal: total de emisores en laterales OTROS que este que se ramifican desde este tramo. Para el tramo justo en el punto de extracción de la lateral de prueba, esto también incluye cualquier lateral más abajo en la tubería principal más allá de ese punto, o compartiendo la misma unión (p. ej., una lateral del lado opuesto) — su caudal se ramifica desde este mismo tramo también.\" class=\"ec-tip\">?<\/span>",
-                    "english": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>"
+                    "value": "<span class=\"ec-help\" title=\"Filas de laterales: emisores en este tramo solo. Filas de tubería principal: total de emisores en laterales OTROS que este que se ramifican desde este tramo. Para el tramo justo en el punto de extracción de la lateral de prueba, esto también incluye cualquier lateral más abajo en la tubería principal más allá de ese punto, o compartiendo la misma unión (p. ej., una lateral del lado opuesto) — su caudal se ramifica desde este mismo tramo también.\">Emisores <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_km",
-                    "value": "k<sub>m<\/sub> <span title=\"Coeficiente genérico de pérdida menor para los accesorios\/válvulas\/acoples de este tramo (≥0,5 mínimo sugerido)\" class=\"ec-tip\">?<\/span>",
-                    "english": "k<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
+                    "value": "<span class=\"ec-help\" title=\"Coeficiente genérico de pérdida menor para los accesorios\/válvulas\/acoples de este tramo (≥0,5 mínimo sugerido)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -521,8 +521,8 @@
                 },
                 "next_translated": {
                     "key": "ip_hl",
-                    "value": "h<sub>L<\/sub> <span title=\"Pérdida total del tramo, h_f + h_m\" class=\"ec-tip\">?<\/span>",
-                    "english": "h<sub>L<\/sub> <span title=\"Total reach loss, h_f + h_m\" class=\"ec-tip\">?<\/span>"
+                    "value": "<span class=\"ec-help\" title=\"Pérdida total del tramo, h_f + h_m\">h<sub>L<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Total reach loss, h_f + h_m\">h<sub>L<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -537,8 +537,8 @@
                 },
                 "next_translated": {
                     "key": "ip_hl",
-                    "value": "h<sub>L<\/sub> <span title=\"Pérdida total del tramo, h_f + h_m\" class=\"ec-tip\">?<\/span>",
-                    "english": "h<sub>L<\/sub> <span title=\"Total reach loss, h_f + h_m\" class=\"ec-tip\">?<\/span>"
+                    "value": "<span class=\"ec-help\" title=\"Pérdida total del tramo, h_f + h_m\">h<sub>L<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Total reach loss, h_f + h_m\">h<sub>L<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         }

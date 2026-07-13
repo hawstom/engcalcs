@@ -21,7 +21,7 @@
                 "term": "flow",
                 "symbol": "Q",
                 "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered. ENGINEER CLARIFICATION (2026-07-06): 'дебит is a typical colloquial call of the word — regular people and non-hydraulic engineers use it. In university (hydraulic engineering) they used водно количество for Q, never дебит. I guess both work.' So both are acceptable; водно количество is the academic\/hydraulic-engineering register, дебит the general register. Still an open decision whether to standardize on водно количество suite-wide.",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg RESOLVED (Tom, 2026-07-13): native engineer's 2026-07-06 clarification confirmed both 'дебит' (colloquial\/general register) and 'водно количество' (academic\/hydraulic-engineering register, used at university for Q) are acceptable. Tom decided suite-wide standardization on 'водно количество' — \"I would put водно количество everywhere\" — applied across all bg calculator categories (pipes\/irrigation included, not just the hydraulic-structure\/open-channel strings the engineer originally corrected). 'дебит' fully replaced in lib\/lang.ec.bg.php 2026-07-13.",
                 "preferred_translation": "debi"
             },
             {
@@ -152,13 +152,13 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "Damlatıcılar <span title=\"Lateral satırları: bu hattaki damlatıcılar sadece. Ana satırları: bu hattan branşlanan diğer lateral'lerdeki toplam damlatıcılar. Test lateral'inin kendi alındığı hat için, bu aynı zamanda o alındıktan sonra ana hat boyunca diğer lateral'leri veya aynı kavşağı paylaşan (örneğin ters taraf lateral) damlatıcıları içerir — akışları bu aynı hattan branşlanır, bu tabloda başka yerde göründükleri olsa da.\" class=\"ec-tip\">?<\/span>",
-                    "english": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>"
+                    "value": "<span class=\"ec-help\" title=\"Lateral satırları: bu hattaki damlatıcılar sadece. Ana satırları: bu hattan branşlanan diğer lateral'lerdeki toplam damlatıcılar. Test lateral'inin kendi alındığı hat için, bu aynı zamanda o alındıktan sonra ana hat boyunca diğer lateral'leri veya aynı kavşağı paylaşan (örneğin ters taraf lateral) damlatıcıları içerir — akışları bu aynı hattan branşlanır, bu tabloda başka yerde göründükleri olsa da.\">Damlatıcılar <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_km",
-                    "value": "k<sub>m<\/sub> <span title=\"Bu hattaki tertibatlar\/valflar\/bağlantılar için jenerik ikincil kayıp katsayısı (≥0,5 önerilen minimum)\" class=\"ec-tip\">?<\/span>",
-                    "english": "k<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
+                    "value": "<span class=\"ec-help\" title=\"Bu hattaki tertibatlar\/valflar\/bağlantılar için jenerik ikincil kayıp katsayısı (≥0,5 önerilen minimum)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -168,13 +168,13 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "Damlatıcılar <span title=\"Lateral satırları: bu hattaki damlatıcılar sadece. Ana satırları: bu hattan branşlanan diğer lateral'lerdeki toplam damlatıcılar. Test lateral'inin kendi alındığı hat için, bu aynı zamanda o alındıktan sonra ana hat boyunca diğer lateral'leri veya aynı kavşağı paylaşan (örneğin ters taraf lateral) damlatıcıları içerir — akışları bu aynı hattan branşlanır, bu tabloda başka yerde göründükleri olsa da.\" class=\"ec-tip\">?<\/span>",
-                    "english": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>"
+                    "value": "<span class=\"ec-help\" title=\"Lateral satırları: bu hattaki damlatıcılar sadece. Ana satırları: bu hattan branşlanan diğer lateral'lerdeki toplam damlatıcılar. Test lateral'inin kendi alındığı hat için, bu aynı zamanda o alındıktan sonra ana hat boyunca diğer lateral'leri veya aynı kavşağı paylaşan (örneğin ters taraf lateral) damlatıcıları içerir — akışları bu aynı hattan branşlanır, bu tabloda başka yerde göründükleri olsa da.\">Damlatıcılar <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_km",
-                    "value": "k<sub>m<\/sub> <span title=\"Bu hattaki tertibatlar\/valflar\/bağlantılar için jenerik ikincil kayıp katsayısı (≥0,5 önerilen minimum)\" class=\"ec-tip\">?<\/span>",
-                    "english": "k<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
+                    "value": "<span class=\"ec-help\" title=\"Bu hattaki tertibatlar\/valflar\/bağlantılar için jenerik ikincil kayıp katsayısı (≥0,5 önerilen minimum)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -184,13 +184,13 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "Damlatıcılar <span title=\"Lateral satırları: bu hattaki damlatıcılar sadece. Ana satırları: bu hattan branşlanan diğer lateral'lerdeki toplam damlatıcılar. Test lateral'inin kendi alındığı hat için, bu aynı zamanda o alındıktan sonra ana hat boyunca diğer lateral'leri veya aynı kavşağı paylaşan (örneğin ters taraf lateral) damlatıcıları içerir — akışları bu aynı hattan branşlanır, bu tabloda başka yerde göründükleri olsa da.\" class=\"ec-tip\">?<\/span>",
-                    "english": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>"
+                    "value": "<span class=\"ec-help\" title=\"Lateral satırları: bu hattaki damlatıcılar sadece. Ana satırları: bu hattan branşlanan diğer lateral'lerdeki toplam damlatıcılar. Test lateral'inin kendi alındığı hat için, bu aynı zamanda o alındıktan sonra ana hat boyunca diğer lateral'leri veya aynı kavşağı paylaşan (örneğin ters taraf lateral) damlatıcıları içerir — akışları bu aynı hattan branşlanır, bu tabloda başka yerde göründükleri olsa da.\">Damlatıcılar <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_km",
-                    "value": "k<sub>m<\/sub> <span title=\"Bu hattaki tertibatlar\/valflar\/bağlantılar için jenerik ikincil kayıp katsayısı (≥0,5 önerilen minimum)\" class=\"ec-tip\">?<\/span>",
-                    "english": "k<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
+                    "value": "<span class=\"ec-help\" title=\"Bu hattaki tertibatlar\/valflar\/bağlantılar için jenerik ikincil kayıp katsayısı (≥0,5 önerilen minimum)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -205,8 +205,8 @@
                 },
                 "next_translated": {
                     "key": "ip_hl",
-                    "value": "h<sub>L<\/sub> <span title=\"Toplam hat kaybı, h_f + h_m\" class=\"ec-tip\">?<\/span>",
-                    "english": "h<sub>L<\/sub> <span title=\"Total reach loss, h_f + h_m\" class=\"ec-tip\">?<\/span>"
+                    "value": "<span class=\"ec-help\" title=\"Toplam hat kaybı, h_f + h_m\">h<sub>L<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Total reach loss, h_f + h_m\">h<sub>L<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -221,8 +221,8 @@
                 },
                 "next_translated": {
                     "key": "ip_hl",
-                    "value": "h<sub>L<\/sub> <span title=\"Toplam hat kaybı, h_f + h_m\" class=\"ec-tip\">?<\/span>",
-                    "english": "h<sub>L<\/sub> <span title=\"Total reach loss, h_f + h_m\" class=\"ec-tip\">?<\/span>"
+                    "value": "<span class=\"ec-help\" title=\"Toplam hat kaybı, h_f + h_m\">h<sub>L<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Total reach loss, h_f + h_m\">h<sub>L<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         }

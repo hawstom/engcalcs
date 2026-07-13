@@ -13,7 +13,7 @@
         "intent_notes": "Use key_intent when present; these entries provide terse disambiguation comments only where translation risk exists."
     },
     "prompt_context_by_prefix": {
-        "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): дебит\n- velocity (v): скорост\n- head loss (h_L): загуба на напор\n- emitter: капкоотделител\n- distribution uniformity (DU): равномерност на разпределение\n- low-quarter distribution uniformity (DU_lq): равномерност на разпределение по долната четвърт\n- application rate (PR): норма на поливане\n- lateral: латерал\n- mainline: главен тръбопровод\n- reach: участък\n- velocity head (H_v): скоростен напор\n- friction loss (h_f): загуби от триене\n- minor loss (h_m): местни загуби\n- energy grade line (EGL): енергийна линия\n- upstream: нагоре по течението\n- downstream: надолу по течението"
+        "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): водно количество\n- velocity (v): скорост\n- head loss (h_L): загуба на напор\n- emitter: капкоотделител\n- distribution uniformity (DU): равномерност на разпределение\n- low-quarter distribution uniformity (DU_lq): равномерност на разпределение по долната четвърт\n- application rate (PR): норма на поливане\n- lateral: латерал\n- mainline: главен тръбопровод\n- reach: участък\n- velocity head (H_v): скоростен напор\n- friction loss (h_f): загуби от триене\n- minor loss (h_m): местни загуби\n- energy grade line (EGL): енергийна линия\n- upstream: нагоре по течението\n- downstream: надолу по течението"
     },
     "glossary_terms_by_prefix": {
         "ip": [
@@ -21,8 +21,8 @@
                 "term": "flow",
                 "symbol": "Q",
                 "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered. ENGINEER CLARIFICATION (2026-07-06): 'дебит is a typical colloquial call of the word — regular people and non-hydraulic engineers use it. In university (hydraulic engineering) they used водно количество for Q, never дебит. I guess both work.' So both are acceptable; водно количество is the academic\/hydraulic-engineering register, дебит the general register. Still an open decision whether to standardize on водно количество suite-wide.",
-                "preferred_translation": "дебит"
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg RESOLVED (Tom, 2026-07-13): native engineer's 2026-07-06 clarification confirmed both 'дебит' (colloquial\/general register) and 'водно количество' (academic\/hydraulic-engineering register, used at university for Q) are acceptable. Tom decided suite-wide standardization on 'водно количество' — \"I would put водно количество everywhere\" — applied across all bg calculator categories (pipes\/irrigation included, not just the hydraulic-structure\/open-channel strings the engineer originally corrected). 'дебит' fully replaced in lib\/lang.ec.bg.php 2026-07-13.",
+                "preferred_translation": "водно количество"
             },
             {
                 "term": "velocity",
@@ -152,13 +152,13 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "Емитери <span title=\"Редове за латерал: емитерите само в този участък. Редове за главен тръбопровод: общият брой емитери на латерали, РАЗЛИЧНИ от този, които се отклоняват от този участък. За участъка на главния тръбопровод, който завършва при пробния латерал, това включва и всички латерали по-нататък по главния тръбопровод след тази точка, както и споделящите същия възел (напр. латерал от срещуположната страна) &mdash; техният дебит също се отклонява от този участък.\" class=\"ec-tip\">?<\/span>",
-                    "english": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>"
+                    "value": "<span class=\"ec-help\" title=\"Редове за латерал: емитерите само в този участък. Редове за главен тръбопровод: общият брой емитери на латерали, РАЗЛИЧНИ от този, които се отклоняват от този участък. За участъка на главния тръбопровод, който завършва при пробния латерал, това включва и всички латерали по-нататък по главния тръбопровод след тази точка, както и споделящите същия възел (напр. латерал от срещуположната страна) &mdash; тяхното водно количество също се отклонява от този участък.\">Емитери <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_km",
-                    "value": "k<sub>m<\/sub> <span title=\"Общ коефициент на местни загуби за фитингите\/крановете\/съединителите на този участък (&ge;0,5 препоръчителен минимум)\" class=\"ec-tip\">?<\/span>",
-                    "english": "k<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
+                    "value": "<span class=\"ec-help\" title=\"Общ коефициент на местни загуби за фитингите\/крановете\/съединителите на този участък (&ge;0,5 препоръчителен минимум)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -168,13 +168,13 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "Емитери <span title=\"Редове за латерал: емитерите само в този участък. Редове за главен тръбопровод: общият брой емитери на латерали, РАЗЛИЧНИ от този, които се отклоняват от този участък. За участъка на главния тръбопровод, който завършва при пробния латерал, това включва и всички латерали по-нататък по главния тръбопровод след тази точка, както и споделящите същия възел (напр. латерал от срещуположната страна) &mdash; техният дебит също се отклонява от този участък.\" class=\"ec-tip\">?<\/span>",
-                    "english": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>"
+                    "value": "<span class=\"ec-help\" title=\"Редове за латерал: емитерите само в този участък. Редове за главен тръбопровод: общият брой емитери на латерали, РАЗЛИЧНИ от този, които се отклоняват от този участък. За участъка на главния тръбопровод, който завършва при пробния латерал, това включва и всички латерали по-нататък по главния тръбопровод след тази точка, както и споделящите същия възел (напр. латерал от срещуположната страна) &mdash; тяхното водно количество също се отклонява от този участък.\">Емитери <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_km",
-                    "value": "k<sub>m<\/sub> <span title=\"Общ коефициент на местни загуби за фитингите\/крановете\/съединителите на този участък (&ge;0,5 препоръчителен минимум)\" class=\"ec-tip\">?<\/span>",
-                    "english": "k<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
+                    "value": "<span class=\"ec-help\" title=\"Общ коефициент на местни загуби за фитингите\/крановете\/съединителите на този участък (&ge;0,5 препоръчителен минимум)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -184,13 +184,13 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "Емитери <span title=\"Редове за латерал: емитерите само в този участък. Редове за главен тръбопровод: общият брой емитери на латерали, РАЗЛИЧНИ от този, които се отклоняват от този участък. За участъка на главния тръбопровод, който завършва при пробния латерал, това включва и всички латерали по-нататък по главния тръбопровод след тази точка, както и споделящите същия възел (напр. латерал от срещуположната страна) &mdash; техният дебит също се отклонява от този участък.\" class=\"ec-tip\">?<\/span>",
-                    "english": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>"
+                    "value": "<span class=\"ec-help\" title=\"Редове за латерал: емитерите само в този участък. Редове за главен тръбопровод: общият брой емитери на латерали, РАЗЛИЧНИ от този, които се отклоняват от този участък. За участъка на главния тръбопровод, който завършва при пробния латерал, това включва и всички латерали по-нататък по главния тръбопровод след тази точка, както и споделящите същия възел (напр. латерал от срещуположната страна) &mdash; тяхното водно количество също се отклонява от този участък.\">Емитери <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_km",
-                    "value": "k<sub>m<\/sub> <span title=\"Общ коефициент на местни загуби за фитингите\/крановете\/съединителите на този участък (&ge;0,5 препоръчителен минимум)\" class=\"ec-tip\">?<\/span>",
-                    "english": "k<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
+                    "value": "<span class=\"ec-help\" title=\"Общ коефициент на местни загуби за фитингите\/крановете\/съединителите на този участък (&ge;0,5 препоръчителен минимум)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -205,8 +205,8 @@
                 },
                 "next_translated": {
                     "key": "ip_hl",
-                    "value": "h<sub>L<\/sub> <span title=\"Обща загуба в участъка, h_f + h_m\" class=\"ec-tip\">?<\/span>",
-                    "english": "h<sub>L<\/sub> <span title=\"Total reach loss, h_f + h_m\" class=\"ec-tip\">?<\/span>"
+                    "value": "<span class=\"ec-help\" title=\"Обща загуба в участъка, h_f + h_m\">h<sub>L<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Total reach loss, h_f + h_m\">h<sub>L<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -221,8 +221,8 @@
                 },
                 "next_translated": {
                     "key": "ip_hl",
-                    "value": "h<sub>L<\/sub> <span title=\"Обща загуба в участъка, h_f + h_m\" class=\"ec-tip\">?<\/span>",
-                    "english": "h<sub>L<\/sub> <span title=\"Total reach loss, h_f + h_m\" class=\"ec-tip\">?<\/span>"
+                    "value": "<span class=\"ec-help\" title=\"Обща загуба в участъка, h_f + h_m\">h<sub>L<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Total reach loss, h_f + h_m\">h<sub>L<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         }

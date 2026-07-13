@@ -44,27 +44,24 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   `Micro-Hydro-Power.php` `vel_check`/`hl_check` rows) — those use `<strong>` and inline radio
   buttons rather than a bare link, so may or may not share the same fix shape; scope not checked.
 
-- 100|102|[H] **Consider a generalized version of mhp's `k_m` typical-values guidance for dw/hw/mphl
-  too (Tom, 2026-07-13) — form not yet decided: tooltip, separate page, or alert?** Only
-  Micro-Hydro-Power has real in-app guidance for choosing `k_m` — `mhp_notes_4_def` gives typical
-  coefficients per fitting (sharp intake entrance 0.5, each 45° bend 0.2–0.3, gate valve 0.1,
-  butterfly valve 0.2) and default-assumption reasoning (1.5 assumes one entrance + two bends).
-  Darcy-Weisbach and Hazen-Williams have **no Notes section at all** (confirmed by grep — nothing for
-  `(See notes)` to have ever pointed to on those two pages, which is presumably why those 2 call
-  sites never had `mpf_see_notes` appended, unlike mhp's). Manning-Pipe-Head-Loss has one Notes
-  section (`mphl_note_1`) but it's about culvert inlet-control HGL/EGL checking, unrelated to `k_m`
-  values. So 3 of the 4 calculators that ask for `k_m` give the user no in-app help picking a value
-  beyond the external engineeringtoolbox.com link. Options to weigh, not yet decided: (a) fold a
-  short version of mhp's typical-values table into the new `k_m` tooltip (`title` text) added by
-  Task 101 — cheapest, but title attributes are plain-text/single-line, awkward for a multi-fitting
-  table; (b) give dw/hw/mphl a small Notes-section entry mirroring `mhp_notes_4_term`/`_def`,
-  reusing/adapting that content rather than writing new text; (c) an alert/expandable panel triggered
-  from the field, not yet used anywhere else in the suite (new UI pattern — evaluate against existing
-  `.ec-help`/`.ec-tip` and `ws_notes_heading` conventions before introducing a third one). Needs a
-  decision on form before any execution; touches 3 calculators × up to 27 languages depending on
-  which option is picked.
+- 90|103| Would it be acceptable to use a synonym like "Supply line" instead of "Penstock"? Or to put "Supply line" in a tooltip?
 
-- 90|102| Would it be acceptable to use a synonym like "Supply line" instead of "Penstock"? Or to put "Supply line" in a tooltip?
+- 100|104| **Repeat the Task 102 treatment for the `e` (roughness height) field on dw, mhp, ip
+  (Tom, 2026-07-13).** Task 101 already flagged this as the identical stacking problem left open for
+  `k_m` (`dw_roughness` link + `dw_roughness_tip` +, on mhp only, `mpf_see_notes`) — confirmed still
+  present on all 3 call sites (`Darcy-Weisbach.php`, `Micro-Hydro-Power.php`, `Irrigation-Pressure.php`;
+  Hazen-Williams has no `e` field, it uses a C coefficient instead, so out of scope). `dw_roughness_tip`
+  today is just a static one-line tip ("Darcy-Weisbach roughness height") with no real typical-values
+  guidance, unlike what Task 102 built for `k_m`. Follow the same pattern: fold real guidance (typical
+  roughness heights per pipe material — PVC, concrete, steel, etc., likely sourced from the same
+  engineeringtoolbox.com page already linked) into one shared tooltip key, verbatim across all 3
+  call sites. **Additionally, shrink the visible label to just `e`** — `ip_roughness` already reads
+  as bare `'e'`; `dw_roughness` currently reads `'Roughness, e'` and should match ip's shorter form
+  (mirrors Task 101's `k_m`-label-shortening move). Interview Tom before executing: confirm the
+  shared roughness-value content, confirm the label-shrink to `e` for dw's field specifically
+  (mhp's `e` field already uses `dw_roughness` — verify current visible label there matches after the
+  change), and confirm scope/translation-sprint authorization per the standard sprint checklist in
+  CLAUDE.md before spawning any agents.
 
 ## Translation Standardization (Glossary Project)
 
@@ -98,6 +95,34 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|102| **Generalized `k_m` typical-values guidance for dw/hw/mphl/mhp — DONE 2026-07-13.** Tom
+  interviewed and decided: form is option (a), folded into the `k_m` tooltip (`title` text) added by
+  Task 101 — not a Notes-section entry, not a new alert/panel. New shared key
+  `mphl_total_junction_k_tip` (owner: `mphl_`, per existing incumbency of `mphl_total_junction_k`)
+  holds the full definition + typical-values text and is used verbatim at all 4 call sites (dw, hw,
+  mphl, mhp), replacing the old `strip_tags($ec_lang['mphl_total_junction_k'])` + (mhp only)
+  `mpf_see_notes` composition. mhp's old Notes-section entry (`mhp_notes_4_term`/`_def`) is retired —
+  deleted from all 27 language files (plus their empty `$ec_lang_intent` lines, with Tom's explicit
+  sign-off since `$ec_lang_intent` edits are otherwise off-limits to AI) — so all 4 calculators now
+  have identical `k_m` treatment, per Tom's stated direction to converge the suite on one pattern.
+  **Content changed, not just relocated:** exit loss (sudden expansion to reservoir/atmosphere, k≈1.0)
+  was missing from the original mhp note's typical-values list even though a "short penstock" framing
+  implied one; added on Tom's call after he flagged the gap mid-session. New typical-values list:
+  sharp intake entrance 0.5, each 45° bend 0.2–0.3, gate valve (fully open) 0.1, butterfly valve 0.2,
+  exit (to reservoir or atmosphere) 1.0. **Default value changed from inconsistent per-calculator
+  values (dw/hw/mphl were `10`, a generic placeholder never tied to any worked example; mhp was `1.5`,
+  tied to the old "one entrance + two bends" note) to one shared, internally-consistent `2.0`** on all
+  4 calculators — derived as the literal sum of the typical-values list for "one entrance + one exit +
+  two 45° bends" (0.5 + 1.0 + 2×0.25 = 2.0), so a user reading the tooltip can verify the default by
+  adding the listed numbers themselves. Full 26-language translation sprint run (Sonnet, one agent per
+  language, scoped strictly to this one key — each payload also carried unrelated pre-existing `ip_`
+  deltas from other unfinished work, deliberately left untouched). Post-sprint QA: `php -l` clean on
+  all 27 lang files + 4 calculator PHP files; `lang_syntax_validate.php` shows only the same
+  pre-existing 65 advisory findings (no new issues, none touching the new key); `<sub>`/`</sub>` tag-
+  parity confirmed 4-for-4 across all 26 languages; inline back-translation-equivalent check (no
+  `ANTHROPIC_API_KEY` set) confirmed all 6 numeric values (0.5, 0.2–0.3, 0.1, 1.0, 2.0, 45°) present
+  in every language's string — no dropped clauses. Payloads regenerated post-sprint (FRESH).
 
 - 0|98|[CC] **DONE 2026-07-13: Task 98 closed — all 7 English-improvement items done.**
   1. `template_translation_help` reworded from "Do you have a great vision for a calculator to
