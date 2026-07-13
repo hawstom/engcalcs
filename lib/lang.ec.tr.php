@@ -169,6 +169,7 @@ $ec_lang['mphl_main_desc']='Belirli Tam Akışta Manning Formülü Yük Kaybı';
 $ec_lang['mphl_pipe_length']='Uzunluk, L';
 $ec_lang['mphl_area']='Alan, A';
 $ec_lang['mphl_total_junction_k']='Küçük (yerel) kayıp katsayısı, k<sub>m</sub>';
+$ec_lang['mphl_total_junction_k_short']='Kayıp katsayısı, k<sub>m</sub>';
 $ec_lang['mphl_friction_slope']='Sürtünme eğimi';
 $ec_lang['mphl_friction_loss']='Sürtünme kaybı, h<sub>f</sub>';
 $ec_lang['mphl_junction_loss']='Küçük (yerel) kayıp, h<sub>m</sub>';

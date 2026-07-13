@@ -167,6 +167,7 @@ $ec_lang['mphl_main_desc']='Manning formula — gubitak tlačne visine pri zadan
 $ec_lang['mphl_pipe_length']='Duljina cijevi, L';
 $ec_lang['mphl_area']='Površina, A';
 $ec_lang['mphl_total_junction_k']='Koeficijent manjeg (lokalnog) gubitka, k<sub>m</sub>';
+$ec_lang['mphl_total_junction_k_short']='Koeficijent gubitka, k<sub>m</sub>';
 $ec_lang['mphl_friction_slope']='Nagib trenja';
 $ec_lang['mphl_friction_loss']='Gubici trenja, h<sub>f</sub>';
 $ec_lang['mphl_junction_loss']='Manji (lokalni) gubitak, h<sub>m</sub>';

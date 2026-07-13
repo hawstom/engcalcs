@@ -64,23 +64,41 @@ etc.):
 - This makes future calculators' checks a drop-in and lets the duplicated `mtc_`/`mhp_`
   velocity-check block (7 keys) and the four ad-hoc verdict styles collapse to one.
 
-### D8 — Reference-linked labels: symbol link + separate reusable tip (Tom, 2026-07-07)
+### D8 — Reference-linked labels: symbol link + separate reusable tip (Tom, 2026-07-07; refreshed 2026-07-13)
 Some input labels carry an **external reference link** applied in the PHP page (not the lang string)
 — it wraps the label in `<a href="…">` (e.g. EPA roughness tables on Darcy-Weisbach/Micro-Hydro `e`;
-engineeringtoolbox on Manning `n`, Hazen-Williams `c`). For these, a help tip must **not** nest
-inside the anchor (a tap on the `?` would navigate away). Pattern — **two separate affordances:**
+engineeringtoolbox on Manning `n`, Hazen-Williams `c`, and the `k_m` minor-loss coefficient on
+Darcy-Weisbach/Hazen-Williams/Manning-Pipe-Head-Loss/Micro-Hydro). For these, a help tip must **not**
+nest inside the anchor (a tap on the `?` would navigate away). Pattern — **two separate affordances:**
 
-- **Linked label** = the bare **symbol only** (e.g. `e`), default HTML anchor styling (blue,
-  underlined), **no `?`**. Because it is a bare symbol it becomes a **universal key** (identical in
-  all 27 languages, no translation).
-- **A separate `?` help tip**, in its **own lang key**, placed **outside** the `</a>`, carrying the
-  `ec-tip` tooltip (e.g. title "Darcy-Weisbach roughness"). The `?` disambiguates the bare symbol.
+- **Linked label** = a **short descriptive phrase, not the bare symbol alone** — e.g. `Roughness, e`,
+  not bare `e`. *(Superseded 2026-07-07 by item 86 (f87a7de): the original bare-symbol-only rule below
+  was tried and reversed for wide forms; bare-symbol-only survives only as `ip_roughness`='e' for a
+  narrow results-table column. Wide input-form labels keep a short "Word(s), symbol" phrase — this is
+  the live, applied pattern, and what any new reference-linked label should copy.)* Default HTML
+  anchor styling (blue, underlined). No `?` inside the anchor.
+- **A separate `?` help tip**, in its **own lang key** (or reusing an existing definition key as the
+  tip's `title` content — either is fine), placed **outside** the `</a>`, carrying the `ec-tip`
+  tooltip (e.g. title "Darcy-Weisbach roughness"). The `?` disambiguates/expands the short label.
+- **Any "(See notes)" pointer belongs inside the tip's `title`, not as separate trailing visible
+  text** (Tom, 2026-07-13) — the pointer to the on-page Notes section is worth keeping (users
+  genuinely need to know detailed guidance/typical values live there), but it doesn't need its own
+  permanently-visible words next to the field; fold it into the same tooltip as the definition.
 - **The tip key is reusable** across every calculator sharing the concept (one roughness tip for
-  dw/mhp/ip; one Manning-`n` tip for mpf/mphl/mtc). Net: verbose per-calculator labels collapse to
-  **one symbol key + one shared tip key** — a large key saving.
+  dw/mhp/ip; one Manning-`n` tip for mpf/mphl/mtc; one `k_m` tip for dw/hw/mphl/mhp). Net: verbose
+  per-calculator labels collapse to **one short symbol-labeled key + one shared tip key** — a large
+  key saving.
 
-PHP shape: `<a href="…ref…">{symbol_key}</a> {tip_key}`. This supersedes the earlier "link OR tip,
-never both" idea — we keep both, as two distinct elements.
+PHP shape: `<a href="…ref…">{short_symbol_label_key}</a><span class="ec-help" title="{definition_key}
+{see_notes_key}"><span class="ec-tip">?</span></span>`. This supersedes the earlier "link OR tip,
+never both" idea — we keep both, as two distinct elements, and it supersedes literal bare-symbol
+linked text as the default (kept only for narrow-column contexts).
+
+**Known gap as of 2026-07-13:** `k_m` (`mphl_total_junction_k`, shared by 4 calculators, 5 call
+sites) still uses the *pre-D8* shape — the full definition text ("Minor (local) loss coefficient,
+k_m") sits inside the `<a>`, with `(See notes)` trailing as separate visible text and no `?` tip at
+all. `e` (`dw_roughness`/`dw_roughness_tip`) already got the D8 treatment; `k_m` did not. Tracked as
+Task 101 in `dev/ROADMAP.md`.
 
 ### D6 — Sequencing ~~merge per calculator-category~~ → REVERSED 2026-07-07: one full-suite pass
 > **⚠ D6 as originally written was WRONG and is reversed. Superseded text kept struck-through for the record.**

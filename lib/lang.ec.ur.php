@@ -169,6 +169,7 @@ $ec_lang['mphl_main_desc']='دیے گئے مکمل بہاؤ پر مانینگ ف
 $ec_lang['mphl_pipe_length']='پائپ لمبائی، L';
 $ec_lang['mphl_area']='رقبہ، A';
 $ec_lang['mphl_total_junction_k']='معمولی (مقامی) نقصان عامل، k<sub>m</sub>';
+$ec_lang['mphl_total_junction_k_short']='نقصان عامل، k<sub>m</sub>';
 $ec_lang['mphl_friction_slope']='رگڑ ڈھلان';
 $ec_lang['mphl_friction_loss']='رگڑ نقصان، h<sub>f</sub>';
 $ec_lang['mphl_junction_loss']='معمولی (مقامی) نقصان، h<sub>m</sub>';

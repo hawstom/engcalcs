@@ -168,6 +168,7 @@ $ec_lang['mphl_main_desc']='Manning-Formel Verlusthöhe bei gegebenem Vollfüllu
 $ec_lang['mphl_pipe_length']='Rohrlänge, L';
 $ec_lang['mphl_area']='Fläche, A';
 $ec_lang['mphl_total_junction_k']='Örtlicher (Einzel-)Verlustbeiwert, k<sub>m</sub>';
+$ec_lang['mphl_total_junction_k_short']='Verlustbeiwert, k<sub>m</sub>';
 $ec_lang['mphl_friction_slope']='Reibungsgefälle';
 $ec_lang['mphl_friction_loss']='Reibungsverlust, h<sub>f</sub>';
 $ec_lang['mphl_junction_loss']='Örtlicher (Einzel-)Verlust, h<sub>m</sub>';

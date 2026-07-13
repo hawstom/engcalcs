@@ -169,6 +169,7 @@ $ec_lang['mphl_main_desc']='Perda de carga pela Fórmula de Manning para vazão 
 $ec_lang['mphl_pipe_length']='Comprimento, L';
 $ec_lang['mphl_area']='Área, A';
 $ec_lang['mphl_total_junction_k']='Coeficiente de perda localizada, k<sub>m</sub>';
+$ec_lang['mphl_total_junction_k_short']='Coeficiente de perda, k<sub>m</sub>';
 $ec_lang['mphl_friction_slope']='Declividade de atrito';
 $ec_lang['mphl_friction_loss']='Perda de carga por atrito, h<sub>f</sub>';
 $ec_lang['mphl_junction_loss']='Perda de carga localizada, h<sub>m</sub>';

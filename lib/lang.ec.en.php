@@ -324,6 +324,7 @@ $ec_lang['mphl_area']='Area, A';
 $ec_lang_intent['mphl_area']='';
 $ec_lang['mphl_total_junction_k']='Minor (local) loss coefficient, k<sub>m</sub>';
 $ec_lang_intent['mphl_total_junction_k']='';
+$ec_lang['mphl_total_junction_k_short']='Loss coeff., k<sub>m</sub>';
 $ec_lang['mphl_friction_slope']='Friction slope';
 $ec_lang_intent['mphl_friction_slope']='';
 $ec_lang['mphl_friction_loss']='Friction loss, h<sub>f</sub>';

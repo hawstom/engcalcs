@@ -168,6 +168,7 @@ $ec_lang['mphl_main_desc']='Rumus Manning untuk Kehilangan Tinggi Tekan pada Ali
 $ec_lang['mphl_pipe_length']='Panjang, L';
 $ec_lang['mphl_area']='Luas, A';
 $ec_lang['mphl_total_junction_k']='Koefisien kehilangan kecil (lokal), k<sub>m</sub>';
+$ec_lang['mphl_total_junction_k_short']='Koefisien kehilangan, k<sub>m</sub>';
 $ec_lang['mphl_friction_slope']='Kemiringan gesekan';
 $ec_lang['mphl_friction_loss']='Kehilangan gesekan, h<sub>f</sub>';
 $ec_lang['mphl_junction_loss']='Kehilangan kecil (lokal), h<sub>m</sub>';

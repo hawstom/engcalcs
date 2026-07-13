@@ -169,6 +169,7 @@ $ec_lang['mphl_main_desc']='រូបមន្ត Manning ការបាត់�
 $ec_lang['mphl_pipe_length']='ប្រវែងបំពង់, L';
 $ec_lang['mphl_area']='ផ្ទៃ, A';
 $ec_lang['mphl_total_junction_k']='មេគុណការបាត់បង់មូលដ្ឋាន, k<sub>m</sub>';
+$ec_lang['mphl_total_junction_k_short']='មេគុណការបាត់បង់, k<sub>m</sub>';
 $ec_lang['mphl_friction_slope']='ជម្រាលកកិត';
 $ec_lang['mphl_friction_loss']='ការបាត់បង់ដោយកកិត, h<sub>f</sub>';
 $ec_lang['mphl_junction_loss']='ការបាត់បង់មូលដ្ឋាន, h<sub>m</sub>';

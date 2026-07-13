@@ -168,6 +168,7 @@ $ec_lang['mphl_main_desc']='নির্দিষ্ট পূর্ণ প্�
 $ec_lang['mphl_pipe_length']='দৈর্ঘ্য, L';
 $ec_lang['mphl_area']='ক্ষেত্রফল, A';
 $ec_lang['mphl_total_junction_k']='স্থানীয় ক্ষতি সহগ, k<sub>m</sub>';
+$ec_lang['mphl_total_junction_k_short']='ক্ষতি সহগ, k<sub>m</sub>';
 $ec_lang['mphl_friction_slope']='ঘর্ষণ ঢাল';
 $ec_lang['mphl_friction_loss']='ঘর্ষণ ক্ষতি, h<sub>f</sub>';
 $ec_lang['mphl_junction_loss']='স্থানীয় ক্ষতি, h<sub>m</sub>';

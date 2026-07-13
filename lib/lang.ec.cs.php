@@ -168,6 +168,7 @@ $ec_lang['mphl_main_desc']='Manningova rovnice ztráty tlakové výšky při pln
 $ec_lang['mphl_pipe_length']='Délka, L';
 $ec_lang['mphl_area']='Plocha, A';
 $ec_lang['mphl_total_junction_k']='Součinitel místní ztráty, k<sub>m</sub>';
+$ec_lang['mphl_total_junction_k_short']='Součinitel ztráty, k<sub>m</sub>';
 $ec_lang['mphl_friction_slope']='Třecí sklon';
 $ec_lang['mphl_friction_loss']='Ztráta třením, h<sub>f</sub>';
 $ec_lang['mphl_junction_loss']='Místní ztráta, h<sub>m</sub>';

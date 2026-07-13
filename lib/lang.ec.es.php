@@ -172,6 +172,7 @@ $ec_lang['mphl_main_desc']='Pérdida de carga en tubería llena a partir del cau
 $ec_lang['mphl_pipe_length']='Longitud, L';
 $ec_lang['mphl_area']='Área, A';
 $ec_lang['mphl_total_junction_k']='Coeficiente de pérdida localizada (menor), k<sub>m</sub>';
+$ec_lang['mphl_total_junction_k_short']='Coeficiente de pérdida, k<sub>m</sub>';
 $ec_lang['mphl_friction_slope']='Pendiente de fricción';
 $ec_lang['mphl_friction_loss']='Pérdida por fricción, h<sub>f</sub>';
 $ec_lang['mphl_junction_loss']='Pérdida localizada (menor), h<sub>m</sub>';

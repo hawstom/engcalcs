@@ -169,6 +169,7 @@ $ec_lang['mphl_main_desc']='د Manning فارمول سر ضیاع د ورکړل 
 $ec_lang['mphl_pipe_length']='د پایپ اوږدوالی، L';
 $ec_lang['mphl_area']='مساحت، A';
 $ec_lang['mphl_total_junction_k']='د ځایی ضیاع ضریب، k<sub>m</sub>';
+$ec_lang['mphl_total_junction_k_short']='د ضیاع ضریب، k<sub>m</sub>';
 $ec_lang['mphl_friction_slope']='د اصطکاک میل';
 $ec_lang['mphl_friction_loss']='د اصطکاک ضیاع، h<sub>f</sub>';
 $ec_lang['mphl_junction_loss']='ځایی ضیاع، h<sub>m</sub>';

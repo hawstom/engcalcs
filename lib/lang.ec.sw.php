@@ -169,6 +169,7 @@ $ec_lang['mphl_main_desc']='Upotevu wa Kichwa wa Fomula ya Manning kwa Mtiririko
 $ec_lang['mphl_pipe_length']='Urefu wa bomba, L';
 $ec_lang['mphl_area']='Eneo, A';
 $ec_lang['mphl_total_junction_k']='Mgawo wa upotevu wa ndani, k<sub>m</sub>';
+$ec_lang['mphl_total_junction_k_short']='Mgawo wa upotevu, k<sub>m</sub>';
 $ec_lang['mphl_friction_slope']='Mteremko wa msuguano';
 $ec_lang['mphl_friction_loss']='Upotevu wa msuguano, h<sub>f</sub>';
 $ec_lang['mphl_junction_loss']='Upotevu wa ndani, h<sub>m</sub>';

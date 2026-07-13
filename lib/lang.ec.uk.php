@@ -169,6 +169,7 @@ $ec_lang['mphl_main_desc']='Втрати напору за формулою Mann
 $ec_lang['mphl_pipe_length']='Довжина труби, L';
 $ec_lang['mphl_area']='Площа, A';
 $ec_lang['mphl_total_junction_k']='Коефіцієнт місцевих втрат, k<sub>m</sub>';
+$ec_lang['mphl_total_junction_k_short']='Коефіцієнт втрат, k<sub>m</sub>';
 $ec_lang['mphl_friction_slope']='Ухил тертя';
 $ec_lang['mphl_friction_loss']='Втрати на тертя, h<sub>f</sub>';
 $ec_lang['mphl_junction_loss']='Місцеві втрати, h<sub>m</sub>';

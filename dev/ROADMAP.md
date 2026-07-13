@@ -10,6 +10,62 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 ## Calculator Improvements
 
+- 95|101|[H] **`k_m` label stacking fixed 2026-07-13; `e`/roughness field's identical problem
+  still open.** Surfaced investigating why bg's rendered `km` label looked long ("Коефициент на
+  местни (локални) загуби, k<sub>m</sub> (Вижте бележките)"). The length itself turned out not to be
+  a bg defect — measured against 12 other languages, bg's `mphl_total_junction_k` value (40 chars)
+  sits mid-pack (fr 53, it 48, es 44, ro 41, bg/hr 40, sr/ru 39 — all longer or equal; en 33 shortest
+  as expected) — normal Indo-European grammatical expansion, not a translation error; already checked
+  once before in Task 96 item (2) sub-item 2 ("no change" verdict) and re-confirmed here. The real
+  problem Tom identified: regardless of per-language length, the *rendered field label* concatenated
+  three things never meant to coexist for width: the full noun-phrase label, a bare
+  `<a target="_blank">` link to engineeringtoolbox.com with no tooltip, and a trailing
+  `(See notes)` appended outside the link.
+  **DONE 2026-07-13 for `k_m`, all 5 call sites** (`Darcy-Weisbach.php`, `Hazen-Williams.php`,
+  `Manning-Pipe-Head-Loss.php`, `Micro-Hydro-Power.php` ×2 fields), per Tom's direction: keep the
+  hyperlink as-is (style-guide refresh instead of removal — see below), fold `(See notes)` into the
+  tooltip rather than dropping it (it points to real, useful typical-value guidance), and shorten the
+  visible label. New key `mphl_total_junction_k_short` = "Loss coeff., k<sub>m</sub>" (en) added to
+  all 27 languages (26 translated directly by Claude Code, not a full agent sprint — one short
+  formulaic phrase derived from each language's own already-translated `mphl_total_junction_k`
+  wording, same effort class as Tasks 94/96/99). PHP shape at all 5 sites:
+  `<a href="…">{short label}</a><span class="ec-help" title="{strip_tags(full definition)} {see
+  notes text}"><span class="ec-tip">?</span></span>` — the tooltip text needed **zero new
+  translation**, assembled in PHP by reusing the existing `mphl_total_junction_k` and
+  `mpf_see_notes` keys as-is. `php -l` clean on all touched files; `lang_syntax_validate.php` shows
+  only the same pre-existing 65 advisory findings, no new issues. Style guide refreshed in
+  `dev/label-normalization-decision.md` D8: documents the actual live pattern (short "Word(s),
+  symbol" label, not bare-symbol-only, which was tried and reversed for wide forms) and adds the
+  rule that a "(See notes)" pointer belongs inside the tip, not as separate permanently-visible text.
+  **Still open:** the `e`/roughness field on the same 4 calculators has the identical stacking
+  problem (`dw_roughness` link + `dw_roughness_tip` + `mpf_see_notes`) — not touched, scope was
+  `k_m` only this round. When picked up, also check whether `mpf_see_notes` has other stacking
+  offenders worth folding into the same sweep (`Manning-Pipe-Flow.php:53`, `Manning-Trap.php:21,30`,
+  `Micro-Hydro-Power.php` `vel_check`/`hl_check` rows) — those use `<strong>` and inline radio
+  buttons rather than a bare link, so may or may not share the same fix shape; scope not checked.
+
+- 100|102|[H] **Consider a generalized version of mhp's `k_m` typical-values guidance for dw/hw/mphl
+  too (Tom, 2026-07-13) — form not yet decided: tooltip, separate page, or alert?** Only
+  Micro-Hydro-Power has real in-app guidance for choosing `k_m` — `mhp_notes_4_def` gives typical
+  coefficients per fitting (sharp intake entrance 0.5, each 45° bend 0.2–0.3, gate valve 0.1,
+  butterfly valve 0.2) and default-assumption reasoning (1.5 assumes one entrance + two bends).
+  Darcy-Weisbach and Hazen-Williams have **no Notes section at all** (confirmed by grep — nothing for
+  `(See notes)` to have ever pointed to on those two pages, which is presumably why those 2 call
+  sites never had `mpf_see_notes` appended, unlike mhp's). Manning-Pipe-Head-Loss has one Notes
+  section (`mphl_note_1`) but it's about culvert inlet-control HGL/EGL checking, unrelated to `k_m`
+  values. So 3 of the 4 calculators that ask for `k_m` give the user no in-app help picking a value
+  beyond the external engineeringtoolbox.com link. Options to weigh, not yet decided: (a) fold a
+  short version of mhp's typical-values table into the new `k_m` tooltip (`title` text) added by
+  Task 101 — cheapest, but title attributes are plain-text/single-line, awkward for a multi-fitting
+  table; (b) give dw/hw/mphl a small Notes-section entry mirroring `mhp_notes_4_term`/`_def`,
+  reusing/adapting that content rather than writing new text; (c) an alert/expandable panel triggered
+  from the field, not yet used anywhere else in the suite (new UI pattern — evaluate against existing
+  `.ec-help`/`.ec-tip` and `ws_notes_heading` conventions before introducing a third one). Needs a
+  decision on form before any execution; touches 3 calculators × up to 27 languages depending on
+  which option is picked.
+
+- 90|102| Would it be acceptable to use a synonym like "Supply line" instead of "Penstock"? Or to put "Supply line" in a tooltip?
+
 ## Translation Standardization (Glossary Project)
 
 ## Translation improvements

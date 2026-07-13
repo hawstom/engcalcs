@@ -168,6 +168,7 @@ $ec_lang['mphl_main_desc']='Потери напора по формуле Ман
 $ec_lang['mphl_pipe_length']='Длина, L';
 $ec_lang['mphl_area']='Площадь, A';
 $ec_lang['mphl_total_junction_k']='Суммарный коэффициент местных потерь, k<sub>m</sub>';
+$ec_lang['mphl_total_junction_k_short']='Коэффициент потерь, k<sub>m</sub>';
 $ec_lang['mphl_friction_slope']='Уклон трения';
 $ec_lang['mphl_friction_loss']='Потери на трение, h<sub>f</sub>';
 $ec_lang['mphl_junction_loss']='Местные потери, h<sub>m</sub>';

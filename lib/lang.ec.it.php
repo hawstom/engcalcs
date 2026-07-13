@@ -168,6 +168,7 @@ $ec_lang['mphl_main_desc']='Formula di Manning perdita di carico a portata piena
 $ec_lang['mphl_pipe_length']='Lunghezza, L';
 $ec_lang['mphl_area']='Area, A';
 $ec_lang['mphl_total_junction_k']='Coefficiente di perdita di carico concentrata, k<sub>m</sub>';
+$ec_lang['mphl_total_junction_k_short']='Coefficiente di perdita, k<sub>m</sub>';
 $ec_lang['mphl_friction_slope']='Pendenza di attrito';
 $ec_lang['mphl_friction_loss']='Perdita di carico distribuita, h<sub>f</sub>';
 $ec_lang['mphl_junction_loss']='Perdita di carico concentrata, h<sub>m</sub>';

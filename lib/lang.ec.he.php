@@ -169,6 +169,7 @@ $ec_lang['mphl_main_desc']='אובדן לחץ לפי נוסחת Manning בזרי
 $ec_lang['mphl_pipe_length']='אורך, L';
 $ec_lang['mphl_area']='שטח, A';
 $ec_lang['mphl_total_junction_k']='מקדם הפסד מקומי, k<sub>m</sub>';
+$ec_lang['mphl_total_junction_k_short']='מקדם הפסד, k<sub>m</sub>';
 $ec_lang['mphl_friction_slope']='שיפוע חיכוך';
 $ec_lang['mphl_friction_loss']='הפסד חיכוך, h<sub>f</sub>';
 $ec_lang['mphl_junction_loss']='הפסד מקומי, h<sub>m</sub>';

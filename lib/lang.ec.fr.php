@@ -169,6 +169,7 @@ $ec_lang['mphl_main_desc']='Formule de Manning — perte de charge pour un débi
 $ec_lang['mphl_pipe_length']='Longueur de conduite, L';
 $ec_lang['mphl_area']='Section, A';
 $ec_lang['mphl_total_junction_k']='Coefficient de perte de charge singulière (locale), k<sub>m</sub>';
+$ec_lang['mphl_total_junction_k_short']='Coefficient de perte, k<sub>m</sub>';
 $ec_lang['mphl_friction_slope']='Pente de frottement';
 $ec_lang['mphl_friction_loss']='Perte de charge par frottement, h<sub>f</sub>';
 $ec_lang['mphl_junction_loss']='Perte de charge singulière (locale), h<sub>m</sub>';

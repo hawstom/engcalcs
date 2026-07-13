@@ -169,6 +169,7 @@ $ec_lang['mphl_main_desc']='दिए गए पूर्ण प्रवाह 
 $ec_lang['mphl_pipe_length']='पाइप लंबाई, L';
 $ec_lang['mphl_area']='क्षेत्रफल, A';
 $ec_lang['mphl_total_junction_k']='मामूली (स्थानीय) हानि गुणांक, k<sub>m</sub>';
+$ec_lang['mphl_total_junction_k_short']='हानि गुणांक, k<sub>m</sub>';
 $ec_lang['mphl_friction_slope']='घर्षण ढलान';
 $ec_lang['mphl_friction_loss']='घर्षण हानि, h<sub>f</sub>';
 $ec_lang['mphl_junction_loss']='मामूली (स्थानीय) हानि, h<sub>m</sub>';

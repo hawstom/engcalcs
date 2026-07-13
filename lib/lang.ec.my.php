@@ -170,6 +170,7 @@ $ec_lang['mphl_main_desc']='သတ်မှတ်အပြည့်စီးဆ�
 $ec_lang['mphl_pipe_length']='အရှည်, L';
 $ec_lang['mphl_area']='ဧရိယာ, A';
 $ec_lang['mphl_total_junction_k']='ဒေသဆိုင်ရာ ဆုံးရှုံးမှုကိန်း, k<sub>m</sub>';
+$ec_lang['mphl_total_junction_k_short']='ဆုံးရှုံးမှုကိန်း, k<sub>m</sub>';
 $ec_lang['mphl_friction_slope']='ပွတ်တိုက်မှုအစောက်';
 $ec_lang['mphl_friction_loss']='ပွတ်တိုက်ဆုံးရှုံးမှု, h<sub>f</sub>';
 $ec_lang['mphl_junction_loss']='ဒေသဆိုင်ရာ ဆုံးရှုံးမှု, h<sub>m</sub>';

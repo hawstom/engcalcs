@@ -170,6 +170,7 @@ $ec_lang['mphl_main_desc']='Загуба на напор по формулата
 $ec_lang['mphl_pipe_length']='Дължина, L';
 $ec_lang['mphl_area']='Площ, A';
 $ec_lang['mphl_total_junction_k']='Коефициент на местни (локални) загуби, k<sub>m</sub>';
+$ec_lang['mphl_total_junction_k_short']='Коефициент на загуби, k<sub>m</sub>';
 $ec_lang['mphl_friction_slope']='Хидравличен наклон';
 $ec_lang['mphl_friction_loss']='Загуби от триене, h<sub>f</sub>';
 $ec_lang['mphl_junction_loss']='Местни (локални) загуби, h<sub>m</sub>';

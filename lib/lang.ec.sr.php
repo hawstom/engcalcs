@@ -167,6 +167,7 @@ $ec_lang['mphl_main_desc']='Манингова формула губитка н�
 $ec_lang['mphl_pipe_length']='Дужина цеви, L';
 $ec_lang['mphl_area']='Површина, A';
 $ec_lang['mphl_total_junction_k']='Коефицијент мањег (локалног) губитка, k<sub>m</sub>';
+$ec_lang['mphl_total_junction_k_short']='Коефицијент губитка, k<sub>m</sub>';
 $ec_lang['mphl_friction_slope']='Нагиб трења';
 $ec_lang['mphl_friction_loss']='Губици услед трења, h<sub>f</sub>';
 $ec_lang['mphl_junction_loss']='Мањи (локални) губитак, h<sub>m</sub>';

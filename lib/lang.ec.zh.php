@@ -168,6 +168,7 @@ $ec_lang['mphl_main_desc']='在给定满流流量条件下的曼宁公式水头�
 $ec_lang['mphl_pipe_length']='管道长度，L';
 $ec_lang['mphl_area']='面积，A';
 $ec_lang['mphl_total_junction_k']='局部损失系数，k<sub>m</sub>';
+$ec_lang['mphl_total_junction_k_short']='损失系数，k<sub>m</sub>';
 $ec_lang['mphl_friction_slope']='摩擦坡度';
 $ec_lang['mphl_friction_loss']='沿程水头损失，h<sub>f</sub>';
 $ec_lang['mphl_junction_loss']='局部水头损失，h<sub>m</sub>';

@@ -167,6 +167,7 @@ $ec_lang['mphl_main_desc']='Formula Manning Pierdere de Sarcină la Curgere Plin
 $ec_lang['mphl_pipe_length']='Lungimea conductei, L';
 $ec_lang['mphl_area']='Arie, A';
 $ec_lang['mphl_total_junction_k']='Coeficient de pierdere minoră (locală), k<sub>m</sub>';
+$ec_lang['mphl_total_junction_k_short']='Coeficient de pierdere, k<sub>m</sub>';
 $ec_lang['mphl_friction_slope']='Panta de frecare';
 $ec_lang['mphl_friction_loss']='Pierdere prin frecare, h<sub>f</sub>';
 $ec_lang['mphl_junction_loss']='Pierdere minoră (locală), h<sub>m</sub>';

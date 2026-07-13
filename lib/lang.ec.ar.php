@@ -171,6 +171,7 @@ $ec_lang['mphl_main_desc']='فاقد الضغط بمعادلة مانينغ عن
 $ec_lang['mphl_pipe_length']='طول الأنبوب، L';
 $ec_lang['mphl_area']='المساحة، A';
 $ec_lang['mphl_total_junction_k']='معامل الفاقد الموضعي، k<sub>m</sub>';
+$ec_lang['mphl_total_junction_k_short']='معامل الفقد، k<sub>m</sub>';
 $ec_lang['mphl_friction_slope']='ميل الاحتكاك';
 $ec_lang['mphl_friction_loss']='فاقد الاحتكاك، h<sub>f</sub>';
 $ec_lang['mphl_junction_loss']='الفاقد الموضعي، h<sub>m</sub>';

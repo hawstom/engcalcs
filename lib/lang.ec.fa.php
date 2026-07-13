@@ -169,6 +169,7 @@ $ec_lang['mphl_main_desc']='افت هد با فرمول Manning برای جری�
 $ec_lang['mphl_pipe_length']='طول، L';
 $ec_lang['mphl_area']='سطح مقطع، A';
 $ec_lang['mphl_total_junction_k']='ضریب افت موضعی (جزئی)، k<sub>m</sub>';
+$ec_lang['mphl_total_junction_k_short']='ضریب افت، k<sub>m</sub>';
 $ec_lang['mphl_friction_slope']='شیب اصطکاک';
 $ec_lang['mphl_friction_loss']='افت اصطکاکی، h<sub>f</sub>';
 $ec_lang['mphl_junction_loss']='افت موضعی (جزئی)، h<sub>m</sub>';
