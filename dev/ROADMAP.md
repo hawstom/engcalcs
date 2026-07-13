@@ -55,37 +55,35 @@ The rules, sequence, and QA chain for translation work are **not** restated here
 - **`CLAUDE.md` § "Translation Sprints"** — sprint mechanics, model policy, pre/post-sprint checklist.
 - **`dev/translation-execution-log.md`** — the full dated, category-by-category execution record.
 
-This section holds only the forward-looking tracking item (85) and its current status.
+Item 85 (category-by-category complete re-translation, all 6 calculator categories) is **closed**
+— see its Completed entry below for the full status table and history. Its open threads live on
+as their own items above: 42 (glossary reconciliation), 38 (orphan-key housekeeping). Items 40,
+43, 44, and 45 (also spun off from 85) were separately closed 2026-07-13. The two suite-wide
+prerequisites item 85 depended on — **Wave 0** English reform and **item 90** key consolidation —
+both ran once, up front, and are done (see their own Completed entries).
 
-**Item 85 status — category-by-category complete re-translation, as of 2026-07-12:**
-
-| # | Calculator category | Prefixes | Status |
-|---|---------------------|----------|--------|
-| 1 | Open channel | `mtc_`/`mi_` | ✅ closed — 3 waves + holistic Opus pass |
-| 2 | Weirs & orifices | `ws_`/`wi_`/`or_`/`odt_` | ✅ closed — 3 waves + holistic Opus pass |
-| 3 | Pipe friction | `dw_`/`hw_`/`mpf_`/`mphl_` | ✅ closed — 3 waves + holistic Opus pass |
-| 4 | Irrigation & seepage | `cs_`/`irr_`/`ip_` | ✅ closed — 3 waves + holistic Opus pass |
-| 5 | Micro-hydro | `mhp_`/`rc_` | ✅ closed — 3 waves + holistic Opus pass |
-| 6 | Shared UI/units | `u_`/`calc_`/`menu_`/`points_` | ✅ closed — delta sprint + holistic pass |
-
-**All 6 calculator categories are now closed; item 85's category-by-category loop is complete.**
-Category 6 didn't get a full 3-wave re-translation — a read-only assessment found its existing
-content already high quality (translated organically, never stale), so per the SOP's cost-scoping
-note the lightest rung that covered the risk was used instead: a delta sprint for the genuine gaps
-plus a holistic Opus pass. Details: `dev/translation-execution-log.md`, 2026-07-12 entry.
-
-Two suite-wide prerequisites item 85 depended on — **Wave 0** English reform and **item 90** key
-consolidation — both ran once, up front, and are done (see their Completed entries).
-
-- 85|[CC] Complete re-translation of every calculator category into all 26 languages, category by
-  category — rules & sequence in `dev/translation-process.md` Scenario C, mechanics in CLAUDE.md
-  § "Translation Sprints." Status: see the table above. Full dated execution history:
-  `dev/translation-execution-log.md`. Open threads carried forward, each tracked as its own item
-  under "Translation Standardization" above: items 45, 44 (D₅₀ median), 42 (glossary reconciliation),
-  38 (orphan-key housekeeping). Items 40 and 43 closed 2026-07-13 (see Completed).
-
-- 80|[H] Bulgarian scope question for the native engineer (dev/Bulgarian-engineer-feedback.md): (1) should "дебит" become "водно количество" suite-wide (pipes/irrigation too) or only in open-channel/hydraulic-structure contexts? Currently applied only to rc_/or_ strings they corrected. (2) Confirm "коефициент на едрозърнестост" as the standard term for the D84.1/D50 gradation SD (vs "коефициент на разнозърненост"), ideally with a source. (3) Invite review of the freshly rewritten bg ip_ notes/tooltips and of Bulgarian menu-title casing (their corrections use sentence case; many bg titles are Title Case).
-  - **RESPONSE received 2026-07-06 (Tom relayed engineer):** On (1) — engineer says *both* дебит and водно количество work: "дебит is a typical colloquial call… regular people and non-hydraulic engineers use it. In university (hydraulic engineering) they used водно количество for Q, never дебит." So водно количество is the academic/hydraulic register, дебит the general register; since both are acceptable, possibly we can use the longer in titles and descriptions and the shorter where we need to conserve width. Recorded verbatim in glossary.json `flow` translation_notes. On (2)/coefficient — engineer: "Коефициент на градация (SD) = D₈₄.₁ / D₅₀".
+- 80|[H] Bulgarian scope question for the native engineer (dev/Bulgarian-engineer-feedback.md):
+  (1) should "дебит" become "водно количество" suite-wide (pipes/irrigation too) or only in
+  open-channel/hydraulic-structure contexts? Currently applied only to rc_/or_ strings they
+  corrected. (3) Invite review of the freshly rewritten bg ip_ notes/tooltips and of Bulgarian
+  menu-title casing (their corrections use sentence case; many bg titles are Title Case).
+  - **(2) CLOSED 2026-07-13:** engineer's 2026-07-06 answer — "Коефициент на градация (SD) =
+    D₈₄.₁ / D₅₀" — is the standard term, superseding both candidates originally asked about
+    (`едрозърнестост` and `разнозърненост`). Applied to `rc_SD`/`rc_SD_check` in
+    `lib/lang.ec.bg.php` and recorded in `glossary.json`'s `gradation` entry; no longer an open
+    question.
+  - **(1) still open, no action taken:** engineer's 2026-07-06 answer confirms *both* дебит and
+    водно количество are acceptable — "дебит is a typical colloquial call… regular people and
+    non-hydraulic engineers use it. In university (hydraulic engineering) they used водно
+    количество for Q, never дебит." водно количество is the academic/hydraulic register, дебит
+    the general register. This is a judgment call on suite-wide register (long form in
+    titles/descriptions, short form where width is tight), not a fact to look up — needs Tom's
+    call before any file changes. Recorded verbatim in glossary.json `flow` translation_notes.
+  - **(3) still open:** no review has been sent or received on the bg ip_ notes/tooltips or
+    menu-title casing. Per the item-40/43 precedent (native review is only real once feedback
+    actually lands — see CLAUDE.md's "Translation Sprints" section), don't log this as "awaiting
+    review" indefinitely — either send it to the engineer as a concrete, bounded ask, or close it
+    via our own best-effort sentence-case sweep if no review is realistically coming.
 
 
 ## AI Efficiency Scripting (Overhead)
@@ -99,6 +97,28 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|[CC] **DONE 2026-07-12: Item 85 closed — complete re-translation of every calculator category
+  into all 26 languages, category by category** — rules & sequence in
+  `dev/translation-process.md` Scenario C, mechanics in CLAUDE.md § "Translation Sprints."
+
+  | # | Calculator category | Prefixes | Status |
+  |---|---------------------|----------|--------|
+  | 1 | Open channel | `mtc_`/`mi_` | ✅ closed — 3 waves + holistic Opus pass |
+  | 2 | Weirs & orifices | `ws_`/`wi_`/`or_`/`odt_` | ✅ closed — 3 waves + holistic Opus pass |
+  | 3 | Pipe friction | `dw_`/`hw_`/`mpf_`/`mphl_` | ✅ closed — 3 waves + holistic Opus pass |
+  | 4 | Irrigation & seepage | `cs_`/`irr_`/`ip_` | ✅ closed — 3 waves + holistic Opus pass |
+  | 5 | Micro-hydro | `mhp_`/`rc_` | ✅ closed — 3 waves + holistic Opus pass |
+  | 6 | Shared UI/units | `u_`/`calc_`/`menu_`/`points_` | ✅ closed — delta sprint + holistic pass |
+
+  Category 6 didn't get a full 3-wave re-translation — a read-only assessment found its existing
+  content already high quality (translated organically, never stale), so per the SOP's
+  cost-scoping note the lightest rung that covered the risk was used instead: a delta sprint for
+  the genuine gaps plus a holistic Opus pass. Full dated execution history:
+  `dev/translation-execution-log.md`. Open threads spun off as their own standing items rather
+  than closed with 85: 42 (glossary reconciliation), 38 (orphan-key housekeeping) — both still
+  open, tracked above under "Translation Standardization." Items 40, 43, 44, and 45 (also spun off
+  from 85) were separately closed 2026-07-13.
 
 - 0|[CC] **DONE 2026-07-13: Items 40 and 43 closed — native-review backlog resolved by best-effort
   verification instead of waiting for a native reviewer (Tom's call: "it's pie-in-the-sky to wait for

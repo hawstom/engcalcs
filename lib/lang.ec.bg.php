@@ -440,12 +440,12 @@ $ec_lang['rc_S0']='Наклон на дъното на бързотока, S<sub
 $ec_lang['rc_qt']='Специфично водно количество, q<sub>t</sub> <span title="Водно количество на единица ширина при входа на бързотока. За канал с ширина на дъното B и общо водно количество Q използвайте q_t = Q / B." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['rc_np']='Порьозност на каменната облицовка, n<sub>p</sub>';
 $ec_lang['rc_sg']='Относителна плътност на камъка, sg <span title="Типичен натрошен гранит или базалт ≈ 2,65. Диапазон по Robinson: 2,54 до 2,82." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
-$ec_lang['rc_SD']='Коефициент на едрозърнестост SD = D<sub>84.1</sub>/D<sub>50</sub> <span title="Стандартно отклонение на гранулометричния състав. Еднороден камък ≈ 1,25. Диапазон по Robinson: 1,15 до 1,47." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
+$ec_lang['rc_SD']='Коефициент на градация SD = D<sub>84.1</sub>/D<sub>50</sub> <span title="Стандартно отклонение на гранулометричния състав. Еднороден камък ≈ 1,25. Диапазон по Robinson: 1,15 до 1,47." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['rc_yn']='Дълбочина на равномерно течение във входния канал, y<sub>n</sub> <span title="Подпор (Hp > yn) е добре — намалява ерозията нагоре по течението. (USDA)" style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['rc_D50']='Необходим медианен размер на камъка, D<sub>50</sub> <span title="Ур. 1 (S0 < 0,10) или Ур. 2 (0,10–0,40). Валиден: D50 15–278 мм, S0 0,02–0,40. Извън диапазона: екстраполация." style="cursor:help;color:#06c;font-size:0.9em">?</span>';
 $ec_lang['rc_eq_used']='Приложено уравнение';
 $ec_lang['rc_sg_check']='Проверка на относителната плътност';
-$ec_lang['rc_SD_check']='Проверка на коефициента на едрозърнестост';
+$ec_lang['rc_SD_check']='Проверка на коефициента на градация';
 $ec_lang['rc_sg_ok']   ='sg в допустимия диапазон';
 $ec_lang['rc_sg_ok_tip']   ='2,54–2,82 (Robinson)';
 $ec_lang['rc_sg_low']  ='sg под диапазона на Robinson';

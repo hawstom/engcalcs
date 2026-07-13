@@ -1430,3 +1430,36 @@ shows only 7 pre-existing, unrelated `identical-to-english` advisories (none tou
 `glossary.json` re-validated as parseable JSON after both edits.
 
 **Items 40 and 43 closed.**
+
+## 2026-07-13: Item 80(2) closed — Bulgarian gradation-coefficient term applied; roadmap archival cleanup
+
+Tom asked why priority-85 and -80 roadmap items were still open while active work was down at
+priority ≤45, and whether that reflected a forgotten archival step. It did: item 85's
+category-by-category loop had been fully closed (all 6 categories, see its own status table) but
+was never moved to the Completed section, and its lingering text still listed items 44 and 45 as
+open "carried forward" threads even though both were closed in the two commits immediately prior
+to this one (`9dfad1e`, `ea70fa0`). Moved item 85 to Completed with corrected text; items 42 and 38
+remain open under "Translation Standardization" as its real still-open threads.
+
+Item 80 (Bulgarian native-engineer scope question) turned out to be genuinely still open on two of
+its three sub-questions, not just administratively stale:
+- **(2) — now closed.** The engineer's 2026-07-06 relayed answer, "Коефициент на градация (SD) =
+  D₈₄.₁ / D₅₀", had been sitting in the roadmap text as a quote but was never applied — the file
+  still read `rc_SD`/`rc_SD_check` = "коефициент на едрозърнестост" (an earlier proposal), and
+  `glossary.json`'s `gradation` entry still asked to "ASK for the standard source" for a decision
+  the engineer had already given. Applied "Коефициент на градация" to both `lib/lang.ec.bg.php`
+  keys and updated the glossary note to record the resolution.
+- **(1) — still open**, not a lookup: both дебит (general register) and водно количество
+  (academic/hydraulic register) are confirmed acceptable per the engineer; whether to standardize
+  suite-wide (and where) is a judgment call for Tom, not something to decide unilaterally.
+- **(3) — still open**, no review sent or received on bg ip_ notes/menu-title casing.
+
+**QA:** `php -l` clean on `lib/lang.ec.bg.php`, `contact.php`, `formmailsuccess.php`.
+`glossary.json` re-validated as parseable JSON after the edit.
+
+Separately, fixed `contact.php`/`formmailsuccess.php`: both used `echoHeader("Normal", ...)`, a
+leftover from when contact.php lived on the parent hawsedc.com site. Since it moved into engcalcs
+and is now linked from the app's main menu (`lib/Menus.lib.php`), `"Normal"` meant visiting it via
+that menu link landed on a page with no engcalcs CSS and no way back to the app menu. Changed both
+to `echoHeader("EngCalcs", ..., false)`, matching the existing `About.php`/`Install.php` pattern
+for non-calculator content pages.

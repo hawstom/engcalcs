@@ -1176,7 +1176,7 @@
       "term": "gradation",
       "symbol": "SD",
       "context": "The spread or uniformity of rock particle sizes. In the Robinson method, gradation is expressed as SD = D84.1/D50. Uniform rock ≈ 1.25; Robinson valid range 1.15–1.47. Appears in Rock Chute Design calculator.",
-      "translation_notes": "Use the geotechnical/hydraulic engineering term for grain size distribution or grading. Do not translate as 'grade' (implies quality). The symbol 'SD' and ratio notation D84.1/D50 are universal. Spanish/Portuguese: 'granulometría'/'granulometria'. French: 'granulométrie'. Russian/Bulgarian/Serbian: 'гранулометрический состав'. Chinese: '级配'. bg: engineer proposed 'коефициент на едрозърнестост' for the D84.1/D50 gradation SD label (2026-07); applied, but ASK for the standard source — Bulgarian soil mechanics also uses 'коефициент на разнозърненост' for grain-size uniformity.",
+      "translation_notes": "Use the geotechnical/hydraulic engineering term for grain size distribution or grading. Do not translate as 'grade' (implies quality). The symbol 'SD' and ratio notation D84.1/D50 are universal. Spanish/Portuguese: 'granulometría'/'granulometria'. French: 'granulométrie'. Russian/Bulgarian/Serbian: 'гранулометрический состав'. Chinese: '级配'. bg: native engineer confirmed 2026-07-06 the standard term for the D84.1/D50 gradation SD label is 'Коефициент на градация' (superseding the earlier 'коефициент на едрозърнестост' proposal and the alternative 'коефициент на разнозърненост'); applied in rc_SD/rc_SD_check.",
       "translations": {
         "am": "የድንጋይ ቅንብር ስርጭት",
         "ar": "التدرج الحبيبي",
