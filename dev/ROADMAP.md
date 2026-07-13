@@ -122,9 +122,29 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
      `php -l` and `lang_syntax_validate.php` clean for all 4 touched languages (bg, sw, km, ps) and
      suite-wide (same 65 pre-existing advisory findings, no new issues).
   7. **DONE 2026-07-13.** `ip_main_desc` changed from "Test Branch Pressure and Uniformity
-     Estimate" to "Test Branch Pressure and Estimated Uniformity" in `lib/lang.ec.en.php`. Checked
-     all 26 translations first — each already conveys the same meaning under either English word
-     order, so no propagation was needed.
+     Estimate" to "Test Branch Pressure and Estimated Uniformity" in `lib/lang.ec.en.php`. The
+     point of the reword (Tom, 2026-07-13): disambiguate that "Estimate(d)" modifies *only*
+     "Uniformity" — the test-branch pressure itself is directly calculated, not an estimate. The
+     old wording read as "[Test Branch Pressure] and [Uniformity Estimate]", ambiguous between
+     that and "Estimate of both [Test Branch Pressure] and [Uniformity]". Re-checked all 26
+     translations against this specific scope question (an initial "no propagation needed" note
+     was wrong — it only checked for meaning-equivalence, not for this ambiguity) and found 4 with
+     the identical wrong-scope defect, where a single leading "estimate" noun grammatically governs
+     both pressure and uniformity: `bg` ("Оценка на налягането и равномерността..." — "Estimate of
+     the pressure and the uniformity..."), `cs` ("Odhad tlaku a uniformity..." — "Estimate of
+     pressure and uniformity..."), `hr` ("Procjena tlaka... i jednolikosti" — "Estimate of
+     pressure... and uniformity"), `pt` ("Estimativa de Pressão e Uniformidade..." — "Estimate of
+     Pressure and Uniformity..."). `ru`/`uk` already used the correct separated structure (a
+     distinct "test/pressure" phrase and a distinct "estimate/uniformity" phrase joined by "and")
+     and served as the model for the fix: `bg` → "Налягане в пробния клон и оценена равномерност"
+     (pressure in the test branch and estimated uniformity), `cs` → "Tlak ve zkušební větvi a
+     odhadovaná uniformita", `hr` → "Tlak u testnoj grani i procijenjena jednolikost", `pt` →
+     "Pressão no Ramo de Teste e Uniformidade Estimada" — all now attach the estimate word as an
+     adjective directly on uniformity only, matching the corrected English's scope exactly. The
+     other 22 translations were re-verified clean (their own "estimate" word already binds only to
+     uniformity, via a trailing compound or genitive construction). `php -l` and
+     `lang_syntax_validate.php --lang=bg,cs,hr,pt` clean (only the same pre-existing advisory
+     `identical-to-english` findings, no new issues).
   10. **Closed after scoping — no Opus pass needed.** Checked what items 1-4's English changes
       actually implied for the other 26 languages before propagating anything:
       - `mpf_shear_stress`: every one of the 26 translations still carried the "(tractive force)"

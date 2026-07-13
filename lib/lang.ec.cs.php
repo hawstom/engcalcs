@@ -470,7 +470,7 @@ $ec_lang['rc_sketch_radius']          = 'poloměr';
 // Irrigation Pressure
 $ec_lang['ip_main_menu']='Závlahový tlak';
 $ec_lang['ip_main_title']='Bezplatný online kalkulátor tlaku závlahy a uniformity distribuce';
-$ec_lang['ip_main_desc']='Odhad tlaku a uniformity testovací cesty';
+$ec_lang['ip_main_desc']='Tlak ve zkušební větvi a odhadovaná uniformita';
 $ec_lang['ip_h_supply']='Tlak na vstupu';
 $ec_lang['ip_elev_supply']='Nadmořská výška vstupu, z<sub>supply</sub>';
 $ec_lang['ip_q_design']='Návrhový průtok emitoru, q<sub>design</sub>';
