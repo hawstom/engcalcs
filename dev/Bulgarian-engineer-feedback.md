@@ -8,3 +8,11 @@
 Нормална дълбочина във входния канал => Дълбочина на равномерно течение във входния канал
 Дебит през отвор — Свободно или потопено изтичане => Водно количество през отвор — свободно или потопено изтичане
 Калкулатор за преливник с нередовна геометрия => Калкулатор за преливник с неправилно сечение
+
+---
+
+Note, 2026-07-13, re: the дебит vs. водно количество decision (roadmap item, closed): engineer's
+own words — "If you want you can also use водно количество (дебит). I guess дебит works for other
+types of engineers. But in my university not a single teacher or professor used it." Recorded here
+as supporting rationale for the suite-wide switch to водно количество (дебит kept parenthetically
+as a recognized synonym), not as a new open question.

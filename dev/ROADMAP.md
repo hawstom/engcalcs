@@ -26,12 +26,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   substituted in? Left untouched pending that judgment call rather than a blind find-replace on
   shipped translated text.
 
-- 38|[CC] **Orphan-key full-suite housekeeping.** Several non-English lang files still carry keys no
-  longer present in the English source (e.g. 8 orphan `ip_`-era keys in fa/zh/bn/ar/he/hi after ur
-  removed them in category 4; `mi_notes`/`mtc_vel_*` orphans in category 1). All confirmed
-  unreferenced by any PHP/JS/template code, so harmless — but inconsistent across files. Do one
-  mechanical suite-wide pass to delete orphans everywhere rather than ad hoc mid-sprint.
-
 - 30|[H] **Localization-bypass audit findings, 2026-07-12 (Tom's "holistic closing audit" for item
   85 surfaced this gap class — hardcoded strings that never route through `$ec_lang`, so no
   translation-quality pass would ever catch them).** Two content pages exist entirely outside the
@@ -59,9 +53,9 @@ The rules, sequence, and QA chain for translation work are **not** restated here
 - **`dev/translation-execution-log.md`** — the full dated, category-by-category execution record.
 
 Item 85 (category-by-category complete re-translation, all 6 calculator categories) is **closed**
-— see its Completed entry below for the full status table and history. Its open threads live on
-as their own items above: 42 (glossary reconciliation), 38 (orphan-key housekeeping). Items 40,
-43, 44, and 45 (also spun off from 85) were separately closed 2026-07-13. The two suite-wide
+— see its Completed entry below for the full status table and history. Its open threads (42
+glossary reconciliation, 38 orphan-key housekeeping, 40/43/44/45 native-review backlog) were all
+separately closed 2026-07-13. The two suite-wide
 prerequisites item 85 depended on — **Wave 0** English reform and **item 90** key consolidation —
 both ran once, up front, and are done (see their own Completed entries).
 
@@ -88,7 +82,7 @@ both ran once, up front, and are done (see their own Completed entries).
     menu-title casing. Per the item-40/43 precedent (native review is only real once feedback
     actually lands — see CLAUDE.md's "Translation Sprints" section), don't log this as "awaiting
     review" indefinitely — either send it to the engineer as a concrete, bounded ask, or close it
-    via our own best-effort sentence-case sweep if no review is realistically coming.
+    via our own best-effort sentence-case sweep if no review is realistically coming. Feedback 2026-07-13 from bg engineer: In the language menu, maybe you can make Български with a capital Б, I guess it could bother someone it's the only language with a small letter. In the dw calculator, the label for e is more verbose than English; is this a problem in many languages? Дължина на провеждащия тръбопровод или улей
 
 
 - 24|English improvements: 
@@ -116,6 +110,26 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|[CC] **DONE 2026-07-13: Item 38 closed — orphan-key full-suite housekeeping.** Ran
+  `dev/scripts/lang_parity_check.php` across all 26 non-English lang files to get the authoritative
+  "extra" (present in translated file, absent from English source) list: 30 keys — `cs_notes_1_term`,
+  `cs_notes_4_term`, `cs_wp`, `ip_e`, `ip_hv`, `ip_notes_1_term`, `ip_notes_4_term`, `ip_v`, `mhp_f`,
+  `mhp_flow`, `mhp_hf`, `mhp_hl`, `mhp_hm`, `mhp_km`, `mhp_nu`, `mhp_roughness`, `mhp_velocity`,
+  `mi_notes`, `mtc_vel_check`, `mtc_vel_high`, `mtc_vel_high_short`, `mtc_vel_low_short`,
+  `mtc_vel_ok_short`, `odt_h_orifice`, `or_flow`, `or_velocity`, `wi_elevation`,
+  `wi_headWaterelevation`, `wi_notes_we_term`, `wi_station`. Verified each with a word-boundary grep
+  across all PHP/JS before deleting — two looked live at first grep but turned out to be false
+  positives on the identical string used for something else: `cs_wp` is a form-field `name`
+  (labelled via the shared `mpf_wetted_perimeter` key, not its own), and `mtc_vel_high` is a JS
+  `pageConfig` variable name fed from `$ec_lang['mhp_vel_high']`, not `$ec_lang['mtc_vel_high']`.
+  Deleted both the `$ec_lang[...]` and `$ec_lang_intent[...]` lines for all 30 keys from all 26 files
+  (759 lines total; English file untouched since these keys never existed there). Also fixed 4 stale
+  references to the same dead keys (`or_flow`, `mhp_flow`, `mhp_hf`, `mhp_hm`) in
+  `dev/scripts/glossary_compliance_audit.php`'s `TERM_KEYS` map, which had been silently no-op-ing on
+  them. `php -l` clean on all 28 touched files; `lang_parity_check.php --strict` now reports
+  `extra: 0` suite-wide (was 759 nonzero across languages); `lang_syntax_validate.php` clean (only
+  pre-existing, unrelated `identical-to-english` advisories).
 
 - 0|[CC] **DONE 2026-07-13: Item 42 closed — cross-language glossary reconciliation pass.**
   Checked `glossary.json`'s `preferred_translation` against actual shipped lang-file usage for the
@@ -161,8 +175,8 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
   cost-scoping note the lightest rung that covered the risk was used instead: a delta sprint for
   the genuine gaps plus a holistic Opus pass. Full dated execution history:
   `dev/translation-execution-log.md`. Open threads spun off as their own standing items rather
-  than closed with 85: 42 (glossary reconciliation), 38 (orphan-key housekeeping) — both still
-  open, tracked above under "Translation Standardization." Items 40, 43, 44, and 45 (also spun off
+  than closed with 85 (42 glossary reconciliation, 38 orphan-key housekeeping) were both closed
+  separately, 2026-07-13. Items 40, 43, 44, and 45 (also spun off
   from 85) were separately closed 2026-07-13.
 
 - 0|[CC] **DONE 2026-07-13: Items 40 and 43 closed — native-review backlog resolved by best-effort
