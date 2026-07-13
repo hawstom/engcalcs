@@ -2,9 +2,8 @@
     "meta": {
         "language": "id",
         "expected_key_count": 482,
-        "delta_key_count": 14,
+        "delta_key_count": 12,
         "active_prefixes": [
-            "calc",
             "dw",
             "ip",
             "mhp",
@@ -19,7 +18,6 @@
         "intent_notes": "Use key_intent when present; these entries provide terse disambiguation comments only where translation risk exists."
     },
     "prompt_context_by_prefix": {
-        "calc": "Use these preferred technical term translations when relevant:\n- flow (Q): debit\n- velocity (v): kecepatan\n- slope (S): kemiringan",
         "dw": "Use these preferred technical term translations when relevant:\n- flow (Q): debit\n- velocity (v): kecepatan\n- head loss (h_L): kehilangan tinggi tekan\n- friction factor (f): faktor gesekan\n- slope (S): kemiringan\n- laminar: laminar\n- transitional: transisi\n- turbulent: turbulen",
         "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): debit\n- velocity (v): kecepatan\n- head loss (h_L): kehilangan tinggi tekan\n- emitter: emiter\n- distribution uniformity (DU): keseragaman distribusi\n- low-quarter distribution uniformity (DU_lq): Keseragaman Distribusi kuartal-bawah\n- application rate (PR): laju pemberian air\n- lateral: pipa lateral\n- mainline: pipa utama\n- reach: segmen\n- velocity head (H_v): tinggi kecepatan\n- friction loss (h_f): kehilangan gesekan\n- minor loss (h_m): kehilangan lokal\n- energy grade line (EGL): garis energi\n- upstream: hulu\n- downstream: hilir",
         "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): debit\n- penstock: pipa tekanan\n- gross head (H_gross): tinggi jatuh bruto\n- net head (H_net): tinggi jatuh neto\n- plant efficiency (η): efisiensi instalasi\n- head loss (h_L): kehilangan tinggi tekan\n- run-of-river: pembangkit listrik tenaga air aliran langsung\n- headworks: bangunan pengambilan air\n- junction loss (h_m): kehilangan lokal\n- minor loss (h_m): kehilangan lokal",
@@ -28,29 +26,6 @@
         "rc": "Use these preferred technical term translations when relevant:\n- flow (Q): debit\n- velocity (v): kecepatan\n- riprap: batu pasangan\n- slope (S): kemiringan\n- rock chute: saluran curam berbatu\n- chute: saluran curam\n- unit discharge (q, q_t): debit per satuan lebar\n- median rock size (D50): ukuran median batu\n- gradation (SD): gradasi butir\n- porosity (n_p): porositas\n- specific gravity (sg): berat jenis\n- ponding: genangan\n- outlet apron: lantai hilir\n- weir head (H_p): tinggi muka air di atas mercu\n- upstream: hulu\n- downstream: hilir\n- reach: segmen"
     },
     "glossary_terms_by_prefix": {
-        "calc": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered. ENGINEER CLARIFICATION (2026-07-06): 'дебит is a typical colloquial call of the word — regular people and non-hydraulic engineers use it. In university (hydraulic engineering) they used водно количество for Q, never дебит. I guess both work.' So both are acceptable; водно количество is the academic\/hydraulic-engineering register, дебит the general register. Still an open decision whether to standardize on водно количество suite-wide.",
-                "preferred_translation": "debit"
-            },
-            {
-                "term": "velocity",
-                "symbol": "v",
-                "context": "Flow velocity (speed of water). Appears in all calculators.",
-                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
-                "preferred_translation": "kecepatan"
-            },
-            {
-                "term": "slope",
-                "symbol": "S",
-                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
-                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
-                "preferred_translation": "kemiringan"
-            }
-        ],
         "dw": [
             {
                 "term": "flow",
@@ -513,8 +488,6 @@
         ]
     },
     "keys_to_translate": {
-        "calc_copy_link": "Copy link",
-        "calc_copy_link_done": "Copied!",
         "dw_regime_laminar": "laminar",
         "mi_station": "Sta",
         "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
@@ -529,8 +502,6 @@
         "ip_hm": "h<sub>m<\/sub>"
     },
     "keys": {
-        "calc_copy_link": "Copy link",
-        "calc_copy_link_done": "Copied!",
         "dw_regime_laminar": "laminar",
         "mi_station": "Sta",
         "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
@@ -545,38 +516,6 @@
         "ip_hm": "h<sub>m<\/sub>"
     },
     "key_context": {
-        "calc_copy_link": {
-            "reason": "equal_to_english",
-            "current_value": "Copy link",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ec_name_hint",
-                    "value": "Menyimpan nilai masukan ini ke URL untuk penanda halaman, pengambilan riwayat, dan berbagi",
-                    "english": "Saves these inputs to the URL for bookmarking, history retrieval, and sharing"
-                },
-                "next_translated": {
-                    "key": "dw_main_menu",
-                    "value": "Kehilangan Tinggi Tekan Pipa Darcy-Weisbach",
-                    "english": "Darcy-Weisbach Pipe Head Loss"
-                }
-            }
-        },
-        "calc_copy_link_done": {
-            "reason": "equal_to_english",
-            "current_value": "Copied!",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ec_name_hint",
-                    "value": "Menyimpan nilai masukan ini ke URL untuk penanda halaman, pengambilan riwayat, dan berbagi",
-                    "english": "Saves these inputs to the URL for bookmarking, history retrieval, and sharing"
-                },
-                "next_translated": {
-                    "key": "dw_main_menu",
-                    "value": "Kehilangan Tinggi Tekan Pipa Darcy-Weisbach",
-                    "english": "Darcy-Weisbach Pipe Head Loss"
-                }
-            }
-        },
         "dw_regime_laminar": {
             "reason": "equal_to_english",
             "current_value": "laminar",

@@ -35,9 +35,12 @@ Still-open threads that were surfaced by these entries live as active bullets in
 > **Category order and status** (see the dated entries below for what was actually done/found in
 > each): (1) open channel `mtc_`/`mi_` — closed. (2) weirs & orifices `ws_`/`wi_`/`or_`/`odt_` —
 > closed. (3) pipe friction `dw_`/`hw_`/`mpf_`/`mphl_` — closed. (4) irrigation & seepage
-> `cs_`/`irr_`/`ip_` — closed. (5) micro-hydro `mhp_`/`rc_` — wave 1 done, waves 2–3 pending
-> authorization. (6) shared UI/units `u_`/`calc_`/`menu_`/`points_` — not started. Each wave's
-> paid sprint requires explicit go-ahead per CLAUDE.md § "Translation Sprints".
+> `cs_`/`irr_`/`ip_` — closed. (5) micro-hydro `mhp_`/`rc_` — closed (all 3 waves + holistic pass).
+> (6) shared UI/units `u_`/`calc_`/`menu_`/`points_` — closed (light delta sprint + holistic pass,
+> 2026-07-12 — see dated entry below; existing content was already high quality so a full 3-wave
+> re-translation wasn't warranted per the cost-scoping note). **All 6 calculator categories are now
+> closed; item 85's category-by-category loop is complete.** Each wave's paid sprint requires
+> explicit go-ahead per CLAUDE.md § "Translation Sprints".
 >
 > **CONFIRMED 2026-07-07 (Tom): "complete re-translation" means all 53 current `mtc_`/`mi_` keys,
 > not just the unfilled delta.** A pre-launch payload check found category 1's anchor languages
@@ -1201,3 +1204,58 @@ next, before starting category 6.
 >   (the `0.65` low-resource tier already does this); "native review" is only ever real when
 >   feedback actually lands as a file (e.g. `dev/Bulgarian-engineer-feedback.md`), which is a
 >   completed event, not a scheduled one.
+
+> **DONE 2026-07-12: category 6 (`u_`/`calc_`/`menu_`/`points_`, 62 keys) closed — light delta
+> sprint + holistic pass, not a full 3-wave re-translation.** Per the SOP's cost-scoping note, a
+> read-only assessment ran first: existing content across all 26 languages (spot-checked across all
+> 3 tiers) was already high quality — this category had been translated organically and carefully,
+> just never through the formal wave process. Tom authorized the lightest rung that covered the
+> risk instead of a full re-translation.
+> **Real gaps found (not staleness, just never-propagated new keys):** `calc_copy_link` /
+> `calc_copy_link_done` (added in commit `2c8918a`, missing in all 26 non-English files) and
+> `calc_defaults_confirm` (present in all 26 files but holding *stale untranslated English* —
+> `'Reset calculator to factory defaults?'`, predating a later English-source edit to "the original
+> default values?"), plus 4 scattered instances (`u_depthFrac` fr — turned out to be a legitimate
+> French cognate, no fix needed; `u_grade`/`u_gradePercent` missing in my, ps; `menu_brand` missing
+> in uk).
+> **Delta sprint:** all 3 short strings qualified as a short-labels-only batch (≤8 words, no
+> tooltips) per the model policy, so Haiku was used for 20 languages; Sonnet for the 5 low-resource
+> languages needing the extra u_/menu_ keys (my, ps, sw) plus one language (uk) with 4 keys. One
+> agent per language, 26 total, run in two waves after the first wave partially failed on an
+> orchestrator-side session-limit error (mid-sprint; verified via file-diff, not a blind full
+> relaunch, per the session-limit-retry lesson — only the languages with zero file changes were
+> relaunched, others got small targeted follow-ups for just their remaining unfinished keys).
+> **Holistic Opus pass** (all 62 keys × 26 languages) found and fixed 2 defects directly: hr
+> `u_grade`/`u_gradePercent` used `trčanje` ("running" the activity) for "run" the horizontal slope
+> leg — wrong sense; pt `points_data_title` was the only language missing the `<br />` tag present
+> in English and all other languages. It also flagged (not auto-fixed, referred to Tom):
+> - **A recurring "rise/run" mistranslation independently made by 5 languages** — hi, he, sw, km, tr
+>   all used a word for the *activity* of running/walking/jogging for "run" the horizontal leg of a
+>   v/h slope ratio (हिन्दी दौड़="race", he ריצה="jogging", sw kutembea="to walk", km
+>   ដំណើរ="journey", tr İlerleme="progress"). Per the "bake lessons into English" rule, 4+
+>   independent misses on the same key is an English-source ambiguity signal, not translator error.
+>   **Tom's ruling:** fix the `$ec_lang_intent` for `u_grade`/`u_gradePercent` to state the v/h
+>   (vertical/horizontal, rise/dy over run/dx) distinction explicitly and unmistakably, rather than
+>   relying on prose alone — done (both intent strings now name "vertical rise (height, elevation
+>   change, dy)" / "horizontal run (horizontal distance, dx)" and carry an explicit `avoid:` tag for
+>   the activity sense). Then hi/he/sw/km/tr were each dispatched a small follow-up fix using a
+>   natural v/h-based term (hi आधार, he מרחק אופקי, sw mlalo, km ចម្ងាយផ្ដេក, tr Yatay Mesafe) while
+>   keeping the existing (correct) rise/ascent half of each pair unchanged.
+> - **ps `calc_defaults`/`calc_defaults_confirm` used لاسليک ("signature") for "default"** — a
+>   pre-existing defect, not introduced by this sprint (the delta sprint's `calc_defaults_confirm`
+>   correctly matched the pre-existing but wrong `calc_defaults` for internal consistency). Fixed:
+>   both now use ډيفالټ (the standard Pashto tech-UI borrowing for "default").
+> - am `calc_copy_link_done` typo (`ተቅዷል!` missing a syllable from the copy verb ቅዳ) — flagged
+>   during the delta sprint, corrected during the holistic pass to `ተቀድቷል!` (~70% confidence,
+>   competent-but-not-native; low-harm either way — a transient toast string).
+> - Minor, not acted on: es `calc_inputs`='Ingresos' reads more like "income/revenue" than "inputs"
+>   in most Spanish registers (pt's `Entradas` is more standard) — flagged only, not fixed, low
+>   confidence this is actually wrong vs. a valid regional choice.
+> **QA:** `php -l` clean on every touched file; `lang_syntax_validate.php --lang=<all 26>` clean of
+> escape-leakage/tag-imbalance/foreign-script findings (identical-to-english findings present are
+> pre-existing and outside category 6's key set); payloads regenerated, `--check` FRESH.
+> **Category 6 (delta sprint + holistic pass, 26 languages) is now closed.** All 6 calculator
+> categories (open channel, weirs & orifices, pipe friction, irrigation & seepage, micro-hydro,
+> shared UI/units) have now been through item 85. Suite-wide translation project status: see
+> `dev/ROADMAP.md` for what remains (native-review backlog, glossary reconciliation, orphan-key
+> housekeeping — all standing cross-cutting items, not category-specific).

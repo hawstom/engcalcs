@@ -84,11 +84,16 @@ This section holds only the forward-looking tracking item (85) and its current s
 | 3 | Pipe friction | `dw_`/`hw_`/`mpf_`/`mphl_` | ✅ closed — 3 waves + holistic Opus pass |
 | 4 | Irrigation & seepage | `cs_`/`irr_`/`ip_` | ✅ closed — 3 waves + holistic Opus pass |
 | 5 | Micro-hydro | `mhp_`/`rc_` | ✅ closed — 3 waves + holistic Opus pass |
-| 6 | Shared UI/units | `u_`/`calc_`/`menu_`/`points_` | ☐ not started |
+| 6 | Shared UI/units | `u_`/`calc_`/`menu_`/`points_` | ✅ closed — delta sprint + holistic pass |
+
+**All 6 calculator categories are now closed; item 85's category-by-category loop is complete.**
+Category 6 didn't get a full 3-wave re-translation — a read-only assessment found its existing
+content already high quality (translated organically, never stale), so per the SOP's cost-scoping
+note the lightest rung that covered the risk was used instead: a delta sprint for the genuine gaps
+plus a holistic Opus pass. Details: `dev/translation-execution-log.md`, 2026-07-12 entry.
 
 Two suite-wide prerequisites item 85 depended on — **Wave 0** English reform and **item 90** key
-consolidation — both ran once, up front, and are done (see their Completed entries). Each remaining
-paid wave requires explicit authorization per CLAUDE.md § "Translation Sprints."
+consolidation — both ran once, up front, and are done (see their Completed entries).
 
 - 85|[CC] Complete re-translation of every calculator category into all 26 languages, category by
   category — rules & sequence in `dev/translation-process.md` Scenario C, mechanics in CLAUDE.md

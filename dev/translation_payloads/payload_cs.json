@@ -2,9 +2,8 @@
     "meta": {
         "language": "cs",
         "expected_key_count": 482,
-        "delta_key_count": 11,
+        "delta_key_count": 9,
         "active_prefixes": [
-            "calc",
             "ip",
             "mhp",
             "mi",
@@ -17,36 +16,12 @@
         "intent_notes": "Use key_intent when present; these entries provide terse disambiguation comments only where translation risk exists."
     },
     "prompt_context_by_prefix": {
-        "calc": "Use these preferred technical term translations when relevant:\n- flow (Q): průtok\n- velocity (v): rychlost\n- slope (S): sklon",
         "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): průtok\n- velocity (v): rychlost\n- head loss (h_L): ztráta tlakové výšky\n- emitter: kapač\n- distribution uniformity (DU): rovnoměrnost distribuce\n- low-quarter distribution uniformity (DU_lq): Uniformita distribuce nízké čtvrtiny\n- application rate (PR): intenzita závlahy\n- lateral: postranní větev\n- mainline: hlavní potrubí\n- reach: úsek\n- velocity head (H_v): rychlostní výška\n- friction loss (h_f): ztráta třením\n- minor loss (h_m): místní ztráta\n- energy grade line (EGL): čára energie\n- upstream: proti proudu\n- downstream: po proudu",
         "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): průtok\n- penstock: tlakovod\n- gross head (H_gross): hrubý spád\n- net head (H_net): čistý spád\n- plant efficiency (η): účinnost elektrárny\n- head loss (h_L): ztráta tlakové výšky\n- run-of-river: průtočná vodní elektrárna\n- headworks: odběrný objekt\n- junction loss (h_m): místní ztráty\n- minor loss (h_m): místní ztráta",
         "mi": "Use these preferred technical term translations when relevant:\n- flow (Q): průtok\n- velocity (v): rychlost\n- hydraulic radius (R_h): hydraulický poloměr\n- wetted perimeter (P_w): smočený obvod\n- Manning roughness (n): Manningův součinitel drsnosti\n- slope (S): sklon\n- irregular channel: nepravidelný průřez",
         "mtc": "Use these preferred technical term translations when relevant:\n- flow (Q): průtok\n- velocity (v): rychlost\n- hydraulic radius (R_h): hydraulický poloměr\n- wetted perimeter (P_w): smočený obvod\n- Manning roughness (n): Manningův součinitel drsnosti\n- slope (S): sklon"
     },
     "glossary_terms_by_prefix": {
-        "calc": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered. ENGINEER CLARIFICATION (2026-07-06): 'дебит is a typical colloquial call of the word — regular people and non-hydraulic engineers use it. In university (hydraulic engineering) they used водно количество for Q, never дебит. I guess both work.' So both are acceptable; водно количество is the academic\/hydraulic-engineering register, дебит the general register. Still an open decision whether to standardize on водно количество suite-wide.",
-                "preferred_translation": "průtok"
-            },
-            {
-                "term": "velocity",
-                "symbol": "v",
-                "context": "Flow velocity (speed of water). Appears in all calculators.",
-                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
-                "preferred_translation": "rychlost"
-            },
-            {
-                "term": "slope",
-                "symbol": "S",
-                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
-                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
-                "preferred_translation": "sklon"
-            }
-        ],
         "ip": [
             {
                 "term": "flow",
@@ -330,8 +305,6 @@
         ]
     },
     "keys_to_translate": {
-        "calc_copy_link": "Copy link",
-        "calc_copy_link_done": "Copied!",
         "mi_groupSegment": "Segment",
         "mi_station": "Sta",
         "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
@@ -343,8 +316,6 @@
         "ip_hm": "h<sub>m<\/sub>"
     },
     "keys": {
-        "calc_copy_link": "Copy link",
-        "calc_copy_link_done": "Copied!",
         "mi_groupSegment": "Segment",
         "mi_station": "Sta",
         "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
@@ -356,38 +327,6 @@
         "ip_hm": "h<sub>m<\/sub>"
     },
     "key_context": {
-        "calc_copy_link": {
-            "reason": "equal_to_english",
-            "current_value": "Copy link",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ec_name_hint",
-                    "value": "Uloží tyto zadané hodnoty do adresy URL pro přidání do záložek, načtení z historie a sdílení",
-                    "english": "Saves these inputs to the URL for bookmarking, history retrieval, and sharing"
-                },
-                "next_translated": {
-                    "key": "dw_main_menu",
-                    "value": "Ztráta tlakové výšky v potrubí Darcy-Weisbach",
-                    "english": "Darcy-Weisbach Pipe Head Loss"
-                }
-            }
-        },
-        "calc_copy_link_done": {
-            "reason": "equal_to_english",
-            "current_value": "Copied!",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ec_name_hint",
-                    "value": "Uloží tyto zadané hodnoty do adresy URL pro přidání do záložek, načtení z historie a sdílení",
-                    "english": "Saves these inputs to the URL for bookmarking, history retrieval, and sharing"
-                },
-                "next_translated": {
-                    "key": "dw_main_menu",
-                    "value": "Ztráta tlakové výšky v potrubí Darcy-Weisbach",
-                    "english": "Darcy-Weisbach Pipe Head Loss"
-                }
-            }
-        },
         "mi_groupSegment": {
             "reason": "equal_to_english",
             "current_value": "Segment",

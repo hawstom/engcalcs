@@ -2,12 +2,10 @@
     "meta": {
         "language": "my",
         "expected_key_count": 482,
-        "delta_key_count": 11,
+        "delta_key_count": 7,
         "active_prefixes": [
-            "calc",
             "ip",
-            "rc",
-            "u"
+            "rc"
         ],
         "requested_prefix": null,
         "notes": "Translate only keys in keys_to_translate; preserve HTML, units, and symbols.",
@@ -16,35 +14,10 @@
         "intent_notes": "Use key_intent when present; these entries provide terse disambiguation comments only where translation risk exists."
     },
     "prompt_context_by_prefix": {
-        "calc": "Use these preferred technical term translations when relevant:\n- flow (Q): ရေစီးနှုန်း\n- velocity (v): ရေအလျင်နှုန်း\n- slope (S): လျောစောင်း",
         "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): ရေစီးနှုန်း\n- velocity (v): ရေအလျင်နှုန်း\n- head loss (h_L): ဖိမြင့်ဆင့်ဆုံးရှုံးမှု\n- emitter: ရေထုတ်ကိရိယာ\n- distribution uniformity (DU): ဖြန့်ဝေမှုညီမျှမှု\n- low-quarter distribution uniformity (DU_lq): [needs translation sprint]\n- application rate (PR): ရေသွင်းနှုန်း\n- lateral: ဘေးပိုက်\n- mainline: ပင်မပိုက်\n- reach: ပိုက်အပိုင်း\n- velocity head (H_v): [needs translation sprint]\n- friction loss (h_f): ပွတ်တိုက်ဆုံးရှုံးမှု\n- minor loss (h_m): ဒေသဆိုင်ရာ ဆုံးရှုံးမှု\n- energy grade line (EGL): စွမ်းအင်မျဉ်း\n- upstream: [needs translation sprint]\n- downstream: [needs translation sprint]",
-        "rc": "Use these preferred technical term translations when relevant:\n- flow (Q): ရေစီးနှုန်း\n- velocity (v): ရေအလျင်နှုန်း\n- riprap: ကျောက်ကာ\n- slope (S): လျောစောင်း\n- rock chute: ကျောက်ထောင်ချောင်း\n- chute: မြန်ဆန်သောချောင်း\n- unit discharge (q, q_t): ယူနစ်ရေထွက်နှုန်း\n- median rock size (D50): ကျောက်အလယ်အလတ်အရွယ်အစား\n- gradation (SD): ကျောက်အရွယ်အစားဖြန့်ဝေမှု\n- porosity (n_p): အပေါက်ပါမှုနှုန်း\n- specific gravity (sg): တိကျသောဆွဲငင်အား\n- ponding: [needs translation sprint]\n- outlet apron: [needs translation sprint]\n- weir head (H_p): [needs translation sprint]\n- upstream: [needs translation sprint]\n- downstream: [needs translation sprint]\n- reach: ပိုက်အပိုင်း",
-        "u": "Use these preferred technical term translations when relevant:\n- flow (Q): ရေစီးနှုန်း\n- velocity (v): ရေအလျင်နှုန်း\n- slope (S): လျောစောင်း"
+        "rc": "Use these preferred technical term translations when relevant:\n- flow (Q): ရေစီးနှုန်း\n- velocity (v): ရေအလျင်နှုန်း\n- riprap: ကျောက်ကာ\n- slope (S): လျောစောင်း\n- rock chute: ကျောက်ထောင်ချောင်း\n- chute: မြန်ဆန်သောချောင်း\n- unit discharge (q, q_t): ယူနစ်ရေထွက်နှုန်း\n- median rock size (D50): ကျောက်အလယ်အလတ်အရွယ်အစား\n- gradation (SD): ကျောက်အရွယ်အစားဖြန့်ဝေမှု\n- porosity (n_p): အပေါက်ပါမှုနှုန်း\n- specific gravity (sg): တိကျသောဆွဲငင်အား\n- ponding: [needs translation sprint]\n- outlet apron: [needs translation sprint]\n- weir head (H_p): [needs translation sprint]\n- upstream: [needs translation sprint]\n- downstream: [needs translation sprint]\n- reach: ပိုက်အပိုင်း"
     },
     "glossary_terms_by_prefix": {
-        "calc": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered. ENGINEER CLARIFICATION (2026-07-06): 'дебит is a typical colloquial call of the word — regular people and non-hydraulic engineers use it. In university (hydraulic engineering) they used водно количество for Q, never дебит. I guess both work.' So both are acceptable; водно количество is the academic\/hydraulic-engineering register, дебит the general register. Still an open decision whether to standardize on водно количество suite-wide.",
-                "preferred_translation": "ရေစီးနှုန်း"
-            },
-            {
-                "term": "velocity",
-                "symbol": "v",
-                "context": "Flow velocity (speed of water). Appears in all calculators.",
-                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
-                "preferred_translation": "ရေအလျင်နှုန်း"
-            },
-            {
-                "term": "slope",
-                "symbol": "S",
-                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
-                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
-                "preferred_translation": "လျောစောင်း"
-            }
-        ],
         "ip": [
             {
                 "term": "flow",
@@ -279,36 +252,9 @@
                 "translation_notes": "Hydraulics noun, NOT \"arrival\/reaching\" (ps \"رسیدل\" wrong), NOT \"agent\" (sw \"mwakala\" wrong), NOT \"stripe\" (km wrong). Bisection is the numerical root-finding method used to close the pressure loop in the Irrigation Pressure notes. (Wave 0, 2026-07-07, removed the former \"right at the takeoff\" and \"draw off\" wording from the English source.)",
                 "preferred_translation": "ပိုက်အပိုင်း"
             }
-        ],
-        "u": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered. ENGINEER CLARIFICATION (2026-07-06): 'дебит is a typical colloquial call of the word — regular people and non-hydraulic engineers use it. In university (hydraulic engineering) they used водно количество for Q, never дебит. I guess both work.' So both are acceptable; водно количество is the academic\/hydraulic-engineering register, дебит the general register. Still an open decision whether to standardize on водно количество suite-wide.",
-                "preferred_translation": "ရေစီးနှုန်း"
-            },
-            {
-                "term": "velocity",
-                "symbol": "v",
-                "context": "Flow velocity (speed of water). Appears in all calculators.",
-                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
-                "preferred_translation": "ရေအလျင်နှုန်း"
-            },
-            {
-                "term": "slope",
-                "symbol": "S",
-                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
-                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
-                "preferred_translation": "လျောစောင်း"
-            }
         ]
     },
     "keys_to_translate": {
-        "u_gradePercent": "% rise\/run",
-        "u_grade": "rise\/run",
-        "calc_copy_link": "Copy link",
-        "calc_copy_link_done": "Copied!",
         "rc_sg_ok_tip": "2.54–2.82 (Robinson)",
         "rc_SD_ok_tip": "1.15–1.47 (Robinson)",
         "ip_length": "L",
@@ -318,10 +264,6 @@
         "ip_hm": "h<sub>m<\/sub>"
     },
     "keys": {
-        "u_gradePercent": "% rise\/run",
-        "u_grade": "rise\/run",
-        "calc_copy_link": "Copy link",
-        "calc_copy_link_done": "Copied!",
         "rc_sg_ok_tip": "2.54–2.82 (Robinson)",
         "rc_SD_ok_tip": "1.15–1.47 (Robinson)",
         "ip_length": "L",
@@ -331,70 +273,6 @@
         "ip_hm": "h<sub>m<\/sub>"
     },
     "key_context": {
-        "u_gradePercent": {
-            "reason": "equal_to_english",
-            "current_value": "% rise\/run",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "u_depthFrac",
-                    "value": "အပိုင်းကိန်း",
-                    "english": "fraction"
-                },
-                "next_translated": {
-                    "key": "menu_brand",
-                    "value": "HawsEDC တွက်ချက်မှုကိရိယာများ",
-                    "english": "HawsEDC Calculators"
-                }
-            }
-        },
-        "u_grade": {
-            "reason": "equal_to_english",
-            "current_value": "rise\/run",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "u_depthFrac",
-                    "value": "အပိုင်းကိန်း",
-                    "english": "fraction"
-                },
-                "next_translated": {
-                    "key": "menu_brand",
-                    "value": "HawsEDC တွက်ချက်မှုကိရိယာများ",
-                    "english": "HawsEDC Calculators"
-                }
-            }
-        },
-        "calc_copy_link": {
-            "reason": "equal_to_english",
-            "current_value": "Copy link",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ec_name_hint",
-                    "value": "ထည့်သွင်းချက်များကို URL သို့သိမ်းဆည်းကာ စာမှတ်မုံးခြင်း၊ မှတ်တမ်းများ ပြန်လည်ရယူခြင်းနှင့် မျှဝေခြင်းအတွက်ဖြစ်သည်။",
-                    "english": "Saves these inputs to the URL for bookmarking, history retrieval, and sharing"
-                },
-                "next_translated": {
-                    "key": "dw_main_menu",
-                    "value": "Darcy-Weisbach သွတ်ပိုက် ဖိမြင့်ဆင့်ဆုံးရှုံးမှု",
-                    "english": "Darcy-Weisbach Pipe Head Loss"
-                }
-            }
-        },
-        "calc_copy_link_done": {
-            "reason": "equal_to_english",
-            "current_value": "Copied!",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ec_name_hint",
-                    "value": "ထည့်သွင်းချက်များကို URL သို့သိမ်းဆည်းကာ စာမှတ်မုံးခြင်း၊ မှတ်တမ်းများ ပြန်လည်ရယူခြင်းနှင့် မျှဝေခြင်းအတွက်ဖြစ်သည်။",
-                    "english": "Saves these inputs to the URL for bookmarking, history retrieval, and sharing"
-                },
-                "next_translated": {
-                    "key": "dw_main_menu",
-                    "value": "Darcy-Weisbach သွတ်ပိုက် ဖိမြင့်ဆင့်ဆုံးရှုံးမှု",
-                    "english": "Darcy-Weisbach Pipe Head Loss"
-                }
-            }
-        },
         "rc_sg_ok_tip": {
             "reason": "equal_to_english",
             "current_value": "2.54–2.82 (Robinson)",
@@ -509,8 +387,6 @@
         }
     },
     "key_intent": {
-        "u_gradePercent": "Slope as a percent: vertical rise divided by horizontal run, times 100.",
-        "u_grade": "Slope as a ratio: vertical rise divided by horizontal run.",
         "ip_hf": "Friction head loss.",
         "ip_hm": "Minor (local) head loss."
     }

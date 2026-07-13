@@ -2,9 +2,8 @@
     "meta": {
         "language": "de",
         "expected_key_count": 482,
-        "delta_key_count": 15,
+        "delta_key_count": 13,
         "active_prefixes": [
-            "calc",
             "dw",
             "ec",
             "ip",
@@ -20,7 +19,6 @@
         "intent_notes": "Use key_intent when present; these entries provide terse disambiguation comments only where translation risk exists."
     },
     "prompt_context_by_prefix": {
-        "calc": "Use these preferred technical term translations when relevant:\n- flow (Q): Durchfluss\n- velocity (v): Geschwindigkeit\n- slope (S): Gefälle",
         "dw": "Use these preferred technical term translations when relevant:\n- flow (Q): Durchfluss\n- velocity (v): Geschwindigkeit\n- head loss (h_L): Druckverlust\n- friction factor (f): Reibungskoeffizient\n- slope (S): Gefälle\n- laminar: laminar\n- transitional: Übergangsbereich\n- turbulent: turbulent",
         "ec": "Use these preferred technical term translations when relevant:\n- flow (Q): Durchfluss\n- velocity (v): Geschwindigkeit\n- slope (S): Gefälle",
         "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): Durchfluss\n- velocity (v): Geschwindigkeit\n- head loss (h_L): Druckverlust\n- emitter: Tropfer\n- distribution uniformity (DU): Verteilungsgleichmäßigkeit\n- low-quarter distribution uniformity (DU_lq): Verteilungsgleichmäßigkeit des unteren Viertels\n- application rate (PR): Beregnungsintensität\n- lateral: Lateral\n- mainline: Hauptleitung\n- reach: Strecke\n- velocity head (H_v): Geschwindigkeitshöhe\n- friction loss (h_f): Reibungsverlust\n- minor loss (h_m): Einzelverlust\n- energy grade line (EGL): Energielinie\n- upstream: oberstrom\n- downstream: unterstrom",
@@ -30,29 +28,6 @@
         "rc": "Use these preferred technical term translations when relevant:\n- flow (Q): Durchfluss\n- velocity (v): Geschwindigkeit\n- riprap: Steinschüttung\n- slope (S): Gefälle\n- rock chute: Steinschütte\n- chute: Schussrinne\n- unit discharge (q, q_t): spezifischer Abfluss\n- median rock size (D50): mittlere Korngröße\n- gradation (SD): Kornabstufung\n- porosity (n_p): Porosität\n- specific gravity (sg): relative Dichte\n- ponding: Einstau\n- outlet apron: Tosbeckensohle\n- weir head (H_p): Überfallhöhe\n- upstream: oberstrom\n- downstream: unterstrom\n- reach: Strecke"
     },
     "glossary_terms_by_prefix": {
-        "calc": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered. ENGINEER CLARIFICATION (2026-07-06): 'дебит is a typical colloquial call of the word — regular people and non-hydraulic engineers use it. In university (hydraulic engineering) they used водно количество for Q, never дебит. I guess both work.' So both are acceptable; водно количество is the academic\/hydraulic-engineering register, дебит the general register. Still an open decision whether to standardize on водно количество suite-wide.",
-                "preferred_translation": "Durchfluss"
-            },
-            {
-                "term": "velocity",
-                "symbol": "v",
-                "context": "Flow velocity (speed of water). Appears in all calculators.",
-                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
-                "preferred_translation": "Geschwindigkeit"
-            },
-            {
-                "term": "slope",
-                "symbol": "S",
-                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
-                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
-                "preferred_translation": "Gefälle"
-            }
-        ],
         "dw": [
             {
                 "term": "flow",
@@ -539,8 +514,6 @@
     },
     "keys_to_translate": {
         "ec_name_placeholder": "Name",
-        "calc_copy_link": "Copy link",
-        "calc_copy_link_done": "Copied!",
         "dw_regime_laminar": "laminar",
         "dw_regime_turbulent": "turbulent",
         "mi_groupSegment": "Segment",
@@ -556,8 +529,6 @@
     },
     "keys": {
         "ec_name_placeholder": "Name",
-        "calc_copy_link": "Copy link",
-        "calc_copy_link_done": "Copied!",
         "dw_regime_laminar": "laminar",
         "dw_regime_turbulent": "turbulent",
         "mi_groupSegment": "Segment",
@@ -585,38 +556,6 @@
                     "key": "ec_name_hint",
                     "value": "Speichert diese Eingaben in der URL zum Lesezeichen, zum Abrufen aus dem Verlauf und zum Teilen",
                     "english": "Saves these inputs to the URL for bookmarking, history retrieval, and sharing"
-                }
-            }
-        },
-        "calc_copy_link": {
-            "reason": "equal_to_english",
-            "current_value": "Copy link",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ec_name_hint",
-                    "value": "Speichert diese Eingaben in der URL zum Lesezeichen, zum Abrufen aus dem Verlauf und zum Teilen",
-                    "english": "Saves these inputs to the URL for bookmarking, history retrieval, and sharing"
-                },
-                "next_translated": {
-                    "key": "dw_main_menu",
-                    "value": "Rohrreibungsverlust Darcy-Weisbach",
-                    "english": "Darcy-Weisbach Pipe Head Loss"
-                }
-            }
-        },
-        "calc_copy_link_done": {
-            "reason": "equal_to_english",
-            "current_value": "Copied!",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ec_name_hint",
-                    "value": "Speichert diese Eingaben in der URL zum Lesezeichen, zum Abrufen aus dem Verlauf und zum Teilen",
-                    "english": "Saves these inputs to the URL for bookmarking, history retrieval, and sharing"
-                },
-                "next_translated": {
-                    "key": "dw_main_menu",
-                    "value": "Rohrreibungsverlust Darcy-Weisbach",
-                    "english": "Darcy-Weisbach Pipe Head Loss"
                 }
             }
         },

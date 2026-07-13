@@ -2,9 +2,8 @@
     "meta": {
         "language": "sw",
         "expected_key_count": 482,
-        "delta_key_count": 9,
+        "delta_key_count": 7,
         "active_prefixes": [
-            "calc",
             "ip",
             "rc"
         ],
@@ -15,34 +14,10 @@
         "intent_notes": "Use key_intent when present; these entries provide terse disambiguation comments only where translation risk exists."
     },
     "prompt_context_by_prefix": {
-        "calc": "Use these preferred technical term translations when relevant:\n- flow (Q): mtiririko\n- velocity (v): kasi\n- slope (S): mteremko",
         "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): mtiririko\n- velocity (v): kasi\n- head loss (h_L): upotevu wa kichwa\n- emitter: kituo cha maji\n- distribution uniformity (DU): usawa wa usambazaji wa maji\n- low-quarter distribution uniformity (DU_lq): [needs translation sprint]\n- application rate (PR): kiwango cha kunyunyizia maji\n- lateral: bomba la tawi\n- mainline: bomba kuu\n- reach: sehemu ya bomba\n- velocity head (H_v): kimo cha kasi\n- friction loss (h_f): upotevu wa msuguano\n- minor loss (h_m): upotevu wa ndani\n- energy grade line (EGL): mstari wa nishati\n- upstream: juu ya mkondo\n- downstream: chini ya mkondo",
         "rc": "Use these preferred technical term translations when relevant:\n- flow (Q): mtiririko\n- velocity (v): kasi\n- riprap: mawe ya kuzuia mmomonyoko\n- slope (S): mteremko\n- rock chute: mfereji wa mawe mwinuko\n- chute: mfereji wa mwinuko\n- unit discharge (q, q_t): mtiririko kwa kila upana\n- median rock size (D50): ukubwa wa kati wa mawe\n- gradation (SD): mgawanyiko wa ukubwa wa mawe\n- porosity (n_p): upenyo\n- specific gravity (sg): uzito maalum\n- ponding: kutuama kwa maji\n- outlet apron: [needs translation sprint]\n- weir head (H_p): [needs translation sprint]\n- upstream: juu ya mkondo\n- downstream: chini ya mkondo\n- reach: sehemu ya bomba"
     },
     "glossary_terms_by_prefix": {
-        "calc": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered. ENGINEER CLARIFICATION (2026-07-06): 'дебит is a typical colloquial call of the word — regular people and non-hydraulic engineers use it. In university (hydraulic engineering) they used водно количество for Q, never дебит. I guess both work.' So both are acceptable; водно количество is the academic\/hydraulic-engineering register, дебит the general register. Still an open decision whether to standardize on водно количество suite-wide.",
-                "preferred_translation": "mtiririko"
-            },
-            {
-                "term": "velocity",
-                "symbol": "v",
-                "context": "Flow velocity (speed of water). Appears in all calculators.",
-                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
-                "preferred_translation": "kasi"
-            },
-            {
-                "term": "slope",
-                "symbol": "S",
-                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
-                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
-                "preferred_translation": "mteremko"
-            }
-        ],
         "ip": [
             {
                 "term": "flow",
@@ -280,8 +255,6 @@
         ]
     },
     "keys_to_translate": {
-        "calc_copy_link": "Copy link",
-        "calc_copy_link_done": "Copied!",
         "rc_sg_ok_tip": "2.54–2.82 (Robinson)",
         "rc_SD_ok_tip": "1.15–1.47 (Robinson)",
         "ip_length": "L",
@@ -291,8 +264,6 @@
         "ip_hm": "h<sub>m<\/sub>"
     },
     "keys": {
-        "calc_copy_link": "Copy link",
-        "calc_copy_link_done": "Copied!",
         "rc_sg_ok_tip": "2.54–2.82 (Robinson)",
         "rc_SD_ok_tip": "1.15–1.47 (Robinson)",
         "ip_length": "L",
@@ -302,38 +273,6 @@
         "ip_hm": "h<sub>m<\/sub>"
     },
     "key_context": {
-        "calc_copy_link": {
-            "reason": "equal_to_english",
-            "current_value": "Copy link",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ec_name_hint",
-                    "value": "Huhifadhi maingizo haya kwenye URL kwa ajili ya kuweka alama, kurejea historia, na kushiriki",
-                    "english": "Saves these inputs to the URL for bookmarking, history retrieval, and sharing"
-                },
-                "next_translated": {
-                    "key": "dw_main_menu",
-                    "value": "Upotevu wa Kichwa cha Bomba la Darcy-Weisbach",
-                    "english": "Darcy-Weisbach Pipe Head Loss"
-                }
-            }
-        },
-        "calc_copy_link_done": {
-            "reason": "equal_to_english",
-            "current_value": "Copied!",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ec_name_hint",
-                    "value": "Huhifadhi maingizo haya kwenye URL kwa ajili ya kuweka alama, kurejea historia, na kushiriki",
-                    "english": "Saves these inputs to the URL for bookmarking, history retrieval, and sharing"
-                },
-                "next_translated": {
-                    "key": "dw_main_menu",
-                    "value": "Upotevu wa Kichwa cha Bomba la Darcy-Weisbach",
-                    "english": "Darcy-Weisbach Pipe Head Loss"
-                }
-            }
-        },
         "rc_sg_ok_tip": {
             "reason": "equal_to_english",
             "current_value": "2.54–2.82 (Robinson)",
