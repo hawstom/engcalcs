@@ -54,14 +54,6 @@ The rules, sequence, and QA chain for translation work are **not** restated here
 - **`CLAUDE.md` § "Translation Sprints"** — sprint mechanics, model policy, pre/post-sprint checklist.
 - **`dev/translation-execution-log.md`** — the full dated, category-by-category execution record.
 
-Task 91 (category-by-category complete re-translation, all 6 calculator categories) is
-**closed** — see its Completed entry below for the full status table and history. Its open
-threads (Task 93 glossary reconciliation, Task 94 orphan-key housekeeping, Task 90 native-review
-backlog, Task 89 D50 median fix, Task 88 verdict-glyph sweep) were all separately closed
-2026-07-13. The two suite-wide prerequisites Task 91 depended on — **Wave 0** English reform and
-**Task 87** key consolidation — both ran once, up front, and are done (see their own Completed
-entries).
-
 - 30|96|[H] Bulgarian scope question for the native engineer (dev/Bulgarian-engineer-feedback.md):
   (3) Invite review of the freshly rewritten bg ip_ notes/tooltips and of Bulgarian
   menu-title casing (their corrections use sentence case; many bg titles are Title Case).
@@ -178,9 +170,11 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
   cost-scoping note the lightest rung that covered the risk was used instead: a delta sprint for
   the genuine gaps plus a holistic Opus pass. Full dated execution history:
   `dev/translation-execution-log.md`. Open threads spun off as their own standing items rather
-  than closed with 85 (42 glossary reconciliation, 38 orphan-key housekeeping) were both closed
-  separately, 2026-07-13. Items 40, 43, 44, and 45 (also spun off
-  from 85) were separately closed 2026-07-13.
+  than closed with this task (Task 93 glossary reconciliation, Task 94 orphan-key housekeeping,
+  Task 90 native-review backlog, Task 89 D50 median fix, Task 88 verdict-glyph sweep) were all
+  separately closed 2026-07-13. The two suite-wide prerequisites this task depended on — **Wave 0**
+  English reform and **Task 87** key consolidation — both ran once, up front, ahead of this task
+  (see their own Completed entries).
 
 - 0|90|[CC] **DONE 2026-07-13: Task 90 closed — native-review backlog resolved by best-effort
   verification instead of waiting for a native reviewer (Tom's call: "it's pie-in-the-sky to wait for
