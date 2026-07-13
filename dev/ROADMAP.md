@@ -101,6 +101,35 @@ to
    findings only, no new structural issues). Items 1-4 and 10 above remain open; full 12-calculator
    Simple English audit deferred pending review of how this pilot lands (Tom's call, 2026-07-13:
    pilot rc_ only for now).
+6. **DONE 2026-07-13: Cross-calculator jargon audit (Tom's candidate list: head, irregular,
+   micro-hydro/run-of-river, seepage) — evidence-based, no English renames needed.** None of the
+   other 11 calculators cite a specific published paper by name the way rc_ cites Robinson, so the
+   identity-vs-explanatory tension from item 5 doesn't recur as a *naming* decision elsewhere; this
+   was purely a defect hunt. Checked actual shipped translations (not just glossary notes) against
+   each candidate term:
+   - **"head"** (dw_/hw_/mphl_/mhp_): no action. Core hydraulic vocabulary, not jargon — already had
+     6 languages' worth of documented wrong-sense fixes (pressure-loss vs. head-loss confusion) in
+     ro/tr/id/fa/sw/ps between 2026-07-09 and 07-10; re-verified all still clean. Eponym calculators
+     (Darcy-Weisbach/Hazen-Williams/Manning) already correctly keep their formula names untranslated.
+   - **"irregular"** (mi_/wi_): bg was shipping the exact evaluative-sense defect
+     (`неправилно` = "incorrect") the glossary's own "irregular channel" entry warns against, despite
+     uk/ru already being fixed for the identical problem. Fixed bg's 7 occurrences to `произволно
+     сечение` ("arbitrary cross-section"), matching the uk/ru pattern. Lesson: a documented glossary
+     warning doesn't guarantee every flagged language was corrected — verify shipped state.
+   - **"micro-hydro" / "run-of-river"** (mhp_): sw and km left "Micro-Hydro" as raw untranslated
+     Latin English embedded in native sentences; km and ps also left "(Run-of-River)" as a redundant
+     English parenthetical even where the surrounding sentence already translated the concept; ps
+     separately phonetically transliterated "مایکرو هایدرو" as its own word throughout (same defect,
+     different script — not caught by a Latin-script-only grep). Same failure class as the rc_
+     "riprap" defect. Fixed all 4: sw → "Umeme Mdogo wa Maji", km → "ថាមពលវារីអគ្គិសនីខ្នាតតូច",
+     ps → "کوچنی آبي ځواک" — all real native phrases, none forced to calque the English wording (per
+     item 5's "don't force a calque" rule). ar and zh were already clean and served as the quality
+     bar.
+   - **"seepage"** (cs_): no defects found. Checked actual translated values (not key names, which
+     falsely matched "seepage" as a literal substring of every `irr_card_seepage_*` key) across all
+     26 languages — every one has a real native infiltration/percolation term.
+   `php -l` and `lang_syntax_validate.php` clean for all 4 touched languages (bg, sw, km, ps) and
+   suite-wide (same 65 pre-existing advisory findings, no new issues).
 10. Propagate these changes to all languages with discretion, or in other words, improve all languages if appropriate in light of these changes. Probably an Opus task.
 
 ## AI Efficiency Scripting (Overhead)

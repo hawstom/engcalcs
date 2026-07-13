@@ -255,9 +255,9 @@ $ec_lang['or_notes_3_def']='C<sub>d</sub> inaanzia takriban 0.60–0.65 kwa matu
 $ec_lang['or_notes_4_term']='Kuzama';
 $ec_lang['or_notes_4_def']='Wakati TWE iko juu ya invert ya ufunguzi, kikokotoo hiki kinatumia kiotomatiki mlinganyo wa tundu lililozama ukitumia h = HWE − TWE. Wakati TWE iko kwenye au chini ya invert, kutoka huru kunakadiriwa na h = HWE − katikati.';
 // Micro-Hydro Power
-$ec_lang['mhp_main_menu']='Nguvu ya Micro-Hydro';
-$ec_lang['mhp_main_title']='Kikokotoo cha Bure cha Mtandaoni cha Nguvu ya Micro-Hydro';
-$ec_lang['mhp_main_desc']='Kikokotoo cha Uzalishaji wa Nguvu ya Micro-Hydro ya Mtiririko wa Mto (Bila Bwawa)';
+$ec_lang['mhp_main_menu']='Umeme Mdogo wa Maji';
+$ec_lang['mhp_main_title']='Kikokotoo cha Bure cha Mtandaoni cha Umeme Mdogo wa Maji';
+$ec_lang['mhp_main_desc']='Kikokotoo cha Uzalishaji wa Umeme Mdogo wa Maji kutoka Mtiririko wa Mto (Bila Bwawa)';
 $ec_lang['mhp_gross_head']='Kichwa jumla, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='Kipenyo cha bomba la shinikizo, D';
 $ec_lang['mhp_length']='<span class="ec-help" title="Urefu wa bomba au mfereji wa kupelekea maji kutoka kwenye mfumo wa ulaji wa maji">Urefu, L <span class="ec-tip">?</span></span>';
@@ -286,9 +286,9 @@ $ec_lang['mhp_notes_3_def']='Upotezaji wa bomba la shinikizo chini ya 10% ya kic
 $ec_lang['mhp_notes_4_term']='Upotezaji wa Ndani, k<sub>m</sub>';
 $ec_lang['mhp_notes_4_def']='Upotezaji huu hutokea kwenye makutano ya mabomba, milango ya kuingilia, mipinda, na valvu — neno "ndogo" ni la kawaida lakini linapotosha; katika bomba fupi la shinikizo, upotezaji huu unaweza kuwa sawa na au kuzidi upotezaji wa msuguano. Thamani za kawaida za k: mlango mkali wa kuingilia 0.5, kila mpinda wa 45° kati ya 0.2–0.3, valvu ya lango (iliyofunguka kabisa) 0.1, valvu ya kipepeo 0.2. Jumlisha viungo vyote kupata k<sub>m</sub> jumla. Chaguo-msingi la 1.5 linadhania mlango mmoja wa kuingilia na mipinda miwili.';
 $ec_lang['mhp_notes_5_term']='Ugumu wa Bomba, e';
-$ec_lang['mhp_notes_5_def']='Ugumu kamili wa kawaida: chuma (kipya) 0.046 mm, chuma (kilichotumika) 0.15 mm, HDPE 0.003 mm, PVC/uPVC 0.0015 mm, zege 0.3–3 mm. HDPE ni ya kawaida kwa mabomba madogo ya shinikizo ya micro-hydro.';
+$ec_lang['mhp_notes_5_def']='Ugumu kamili wa kawaida: chuma (kipya) 0.046 mm, chuma (kilichotumika) 0.15 mm, HDPE 0.003 mm, PVC/uPVC 0.0015 mm, zege 0.3–3 mm. HDPE ni ya kawaida kwa mabomba madogo ya shinikizo ya umeme mdogo wa maji.';
 $ec_lang['mhp_notes_6_term']='Ufanisi';
-$ec_lang['mhp_notes_6_def']='Ufanisi wa kawaida wa kiwanda η huanzia 0.70 hadi 0.85 kwa turbine za Pelton na turbine za mtiririko mtambuka zinazotumika sana katika mitambo midogo ya micro-hydro. Tumia 0.75 kama makadirio ya awali ya kihafidhina.';
+$ec_lang['mhp_notes_6_def']='Ufanisi wa kawaida wa kiwanda η huanzia 0.70 hadi 0.85 kwa turbine za Pelton na turbine za mtiririko mtambuka zinazotumika sana katika mitambo midogo ya umeme wa maji. Tumia 0.75 kama makadirio ya awali ya kihafidhina.';
 $ec_lang['mhp_notes_7_term']='Nishati ya Kila Mwaka';
 $ec_lang['mhp_notes_7_def']='Nishati ya kila mwaka inadhania uendeshaji endelevu wa mtiririko kamili (masaa 8760 kwa mwaka). Uzalishaji halisi utakuwa mdogo zaidi kutokana na mabadiliko ya msimu wa mtiririko, muda wa kusimama kwa matengenezo, na kipengele cha mzigo.';
 
