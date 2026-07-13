@@ -167,7 +167,7 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     calculator-specific key) was genuine Title Case with a stray Latin "O" typo
     ("Безплатни Oнлайн Инженерни Калкулатори") — fixed to sentence case ("Безплатни онлайн
     инженерни калкулатори"), matching `ru`'s pattern for the same string. Spot-checked bg's
-    `ip_` notes/tooltips for terminology consistency with the суite-wide `водно количество`
+    `ip_` notes/tooltips for terminology consistency with the suite-wide `водно количество`
     decision (item 1) — clean, no defects found. (Note in passing, out of scope for this task:
     both bg and ru also Title-Case a handful of `<h3>` section headings in `about_body_html`
     (e.g. "Лицензия с Открытым Исходным Кодом") — a separate, suite-wide heading-casing question
