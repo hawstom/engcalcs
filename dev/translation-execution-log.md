@@ -1259,3 +1259,31 @@ next, before starting category 6.
 > shared UI/units) have now been through item 85. Suite-wide translation project status: see
 > `dev/ROADMAP.md` for what remains (native-review backlog, glossary reconciliation, orphan-key
 > housekeeping — all standing cross-cutting items, not category-specific).
+
+## 2026-07-12: Item 45 closed — suite-wide baked-in verdict-glyph sweep
+
+Ran the mechanical suite-wide grep roadmap item 45 called for (previously only confirmed in
+category 2's `or_*`/`odt_*` and spot-checked in category 5's `mhp_hl_*`/`rc_sg_*`; category 1's
+`mtc_vel_*` had never been checked). Enumerated every verdict-string key actually passed as the
+`shortText` argument to `EngCalcs.writeCheckHTML()`/`writeVelocityCheck()` across all JS files
+(the only strings the convention says must never carry a baked-in ✓/⚠ glyph or translated
+"Warning:"/"OK:" prefix, since the glyph is injected programmatically):
+
+`mhp_vel_ok_short`, `mhp_vel_high_short`, `mhp_vel_low_short`, `or_regime_valid`,
+`or_regime_submerged`, `or_regime_warn`, `or_regime_twe_above_hwe`, `mhp_hl_ok`, `mhp_hl_warn`,
+`mhp_hl_bad`, `odt_h2_ok`, `odt_h2_warn`, `cs_loss_negative`, `cs_Ec_good`, `cs_Ec_fair`,
+`cs_Ec_poor`, `rc_pond_ok`, `rc_pond_warn`, `rc_eq_warn_low`, `rc_eq_warn_high`, `rc_sg_ok`,
+`rc_sg_low`, `rc_sg_high`, `rc_SD_ok`, `rc_SD_low`, `rc_SD_high`, `ip_elev_ds_missing_warn`,
+`ip_pressure_warn_short` (27 keys).
+
+Wrote a script (`include`-ing each of the 26 non-English `lib/lang.ec.??.php` files and regexing
+those 27 keys' values for `✓✔⚠⚡❌✗×` or `Warning:`/`Caution:`/leading `OK:`) — **zero matches**
+across all 26 languages × 27 keys. Verified the pattern itself fires correctly against a synthetic
+`✓ Test string` before trusting the all-clean result. Also verified in passing that
+`manning-irregular.js`/`manning-trap.js`'s `pageConfig.mtc_vel_high` (referenced as `highTip`)
+isn't a missing-key bug — `Manning-Trap.php`/`Manning-Irregular.php` populate that JS-side name
+from the (different, existing) `$ec_lang['mhp_vel_high']` PHP key; no defect.
+
+**Item 45 closed suite-wide, including the previously-unchecked category-1 `mtc_vel_*`
+consumers.** No lang-file edits were needed — the earlier category-2/5 fixes were the only real
+instances of this defect class; the rest of the suite was already clean.

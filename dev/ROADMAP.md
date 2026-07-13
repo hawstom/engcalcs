@@ -21,17 +21,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   category-1-only fix would create suite-wide inconsistency; needs a correct replacement term decided
   once per language and applied everywhere `قیچي`/`قینچی` is used for "shear," not per-category.
 
-- 45|[CC] Suite-wide baked-in verdict-glyph defect class: legacy translations across multiple
-  categories manually baked ✓/⚠ glyphs, translated "Warning:"-style prefixes, and inline explanatory
-  text into verdict strings, contradicting the actual convention (`js/Calculators.lib.js`'s
-  `writeCheckHTML()` injects the glyph programmatically; English source strings never contain one).
-  Confirmed and fixed in all 7 category-2 wave-2 languages 2026-07-08 (`or_regime_*`/`odt_h2_*`); the
-  zh agent also found it in category 5's `mhp_hl_ok`/`rc_sg_ok`. Category 1's `mtc_vel_*`/wave-1
-  languages haven't had this specific check run — do a mechanical suite-wide grep for baked-in ✓/⚠/
-  translated-"Warning:" text in verdict-string keys across all categories/languages before assuming
-  any already-closed category is clean of this pattern, rather than waiting to rediscover it
-  category by category.
-
 - 44|[H] **Glossary self-contradiction — "median rock size" (D₅₀) rendered as mean/average.**
   `glossary.json`'s `translation_notes` for this term explicitly warn "Do not use 'average' (average
   ≠ median statistically)," yet its own `preferred_translation` for bg/cs/de/hr/ro/ru/sr/tr/uk/fa/ur
@@ -136,6 +125,16 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|[CC] **DONE 2026-07-12: Item 45 closed — suite-wide baked-in verdict-glyph sweep.** Ran the
+  mechanical grep the item called for across every verdict-string key actually passed as
+  `writeCheckHTML()`/`writeVelocityCheck()`'s `shortText` argument (27 keys spanning
+  `mhp_vel_*_short`, `or_regime_*`, `mhp_hl_*`, `odt_h2_*`, `cs_loss_negative`/`cs_Ec_*`, `rc_pond_*`/
+  `rc_eq_warn_*`/`rc_sg_*`/`rc_SD_*`, `ip_elev_ds_missing_warn`, `ip_pressure_warn_short`) against
+  all 26 non-English lang files for baked-in ✓/⚠/×/etc. glyphs or translated "Warning:"/"OK:"
+  prefixes. Zero matches — the category-2/5 instances already fixed were the only real occurrences;
+  category 1's previously-unchecked `mtc_vel_*` consumers are clean. Full method and results:
+  `dev/translation-execution-log.md`, 2026-07-12 entry.
 
 - 0|[CC/H] **DONE 2026-07-07: Concept-level label normalization (design exploration; raised by Tom 2026-07-06).** The original design attempted to economize by using atomized language variables at the *word* level, which made both translation and maintenance hard. Explore revisiting economizing by normalizing at the *concept* level instead: adopt one canonical, reusable label per concept — borrowed from whichever existing calculator has a good set — rather than per-calculator wording. First candidates to review critically: (a) **elevation** — use identical label wording wherever any calculator asks for an elevation, with the tooltip optionally broken into a few per-context variants; (b) **length** — drop the qualifier ("channel"/"reach"/"pipe") from "channel length"/"reach length"/"pipe length" and lean on the page title for disambiguation. Payoff: shrinks the translation surface and eases maintenance across the suite. Do a reuse-candidate audit before committing. Model split: Fable for the cross-calculator language survey; Opus/Tom for the reuse-architecture decision. Priority number provisional.
   - **Fable survey DONE 2026-07-07 → `dev/label-normalization-survey.md`.** Key findings: cross-prefix borrowing already exists (Darcy-Weisbach.php uses mpf_/mphl_/hw_ keys), so the decision is ownership policy, not mechanism; ~18 exact-duplicate keys mergeable with zero wording decisions (incl. the 7-key mtc_/mhp_ velocity-check block); strongest wording cluster is the head-loss triad + minor/junction-loss coefficient across mphl_/mhp_/ip_; candidate (a) elevation supported as shared-bare-key + closed qualified set (Orifice Flow needs 4 distinct elevations on one page, so bare-only is too strong); candidate (b) length supported for mphl_/mhp_ only — keep "Reach length" (cs_) and "Weir length" (ws_) as load-bearing. Survey §6 has the ranked shortlist.
