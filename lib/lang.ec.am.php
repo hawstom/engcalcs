@@ -159,6 +159,10 @@ $ec_lang['mpf_note_1']='<dl><dt>ይህ <em>ወሰን የሌለው</em> ቧንቧ
 $ec_lang['mpf_solve_for_dd0']='Q ሲሰጥ y/d<sub>0</sub> ፍታ';
 $ec_lang['mpf_solve_desc']='ከካልኩሌተር ቅጹ ላይ d<sub>0</sub>, n እና S<sub>f</sub> ተጠቅሞ፣ ለተሰጠ Q ዝቅተኛ y/d<sub>0</sub> ያገኛል።';
 $ec_lang['mpf_solve_button']='ፍታ';
+$ec_lang['mpf_solver_enter_positive_q']='አዎንታዊ ዒላማ Q ያስገቡ።';
+$ec_lang_intent['mpf_solver_enter_positive_q']='';
+$ec_lang['mpf_solver_no_solution']='ውጤት የለም፦ Q ከቧንቧው አቅም ይበልጣል y/d0 = 93.8% ላይ (Qmax = {qmax} በተመረጡት አሃዶች)።';
+$ec_lang_intent['mpf_solver_no_solution']='';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Manning የቧንቧ ጭንቅ ኪሳራ';
 $ec_lang['mphl_main_title']='ነፃ ኦንላይን Manning የቧንቧ ጭንቅ ኪሳራ ካልኩሌተር';

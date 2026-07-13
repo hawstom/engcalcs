@@ -158,6 +158,10 @@ $ec_lang['mpf_note_1']='<dl><dt>Dies ist der Durchfluss und die Tiefe innerhalb 
 $ec_lang['mpf_solve_for_dd0']='y/d<sub>0</sub> für gegebenes Q berechnen';
 $ec_lang['mpf_solve_desc']='Mit d<sub>0</sub>, n und S<sub>f</sub> aus dem Rechnerformular wird das kleinste y/d<sub>0</sub> für ein gegebenes Q ermittelt.';
 $ec_lang['mpf_solve_button']='Berechnen';
+$ec_lang['mpf_solver_enter_positive_q']='Geben Sie ein positives Ziel-Q ein.';
+$ec_lang_intent['mpf_solver_enter_positive_q']='';
+$ec_lang['mpf_solver_no_solution']='Keine Lösung: Q übersteigt die Rohrkapazität bei y/d0 = 93.8% (Qmax = {qmax} in den gewählten Einheiten).';
+$ec_lang_intent['mpf_solver_no_solution']='';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Rohrverlusthöhe Manning';
 $ec_lang['mphl_main_title']='Kostenloser Online-Rechner Rohrverlusthöhe Manning';

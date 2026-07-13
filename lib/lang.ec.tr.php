@@ -159,6 +159,10 @@ $ec_lang['mpf_note_1']='<dl><dt>Bu, <em>sonsuz uzunluktaki</em> bir borunun içi
 $ec_lang['mpf_solve_for_dd0']='Verilen Q için y/d<sub>0</sub> hesapla';
 $ec_lang['mpf_solve_desc']="Hesaplayıcı formundan d<sub>0</sub>, n ve S<sub>f</sub> kullanarak belirli bir Q için en düşük y/d<sub>0</sub>'ı bulur.";
 $ec_lang['mpf_solve_button']='Hesapla';
+$ec_lang['mpf_solver_enter_positive_q']='Pozitif bir hedef Q girin.';
+$ec_lang_intent['mpf_solver_enter_positive_q']='';
+$ec_lang['mpf_solver_no_solution']="Çözüm yok: Q, y/d0 = 93.8%'de boru kapasitesini aşıyor (Qmax = {qmax}, seçilen birimlerde).";
+$ec_lang_intent['mpf_solver_no_solution']='';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Manning Boru Yük Kaybı';
 $ec_lang['mphl_main_title']='Ücretsiz Çevrimiçi Manning Boru Yük Kaybı Hesaplayıcısı';

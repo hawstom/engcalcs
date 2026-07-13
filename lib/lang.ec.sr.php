@@ -157,6 +157,10 @@ $ec_lang['mpf_note_1']='<dl><dt>Ово је протицај и дубина у�
 $ec_lang['mpf_solve_for_dd0']='Израчунај y/d<sub>0</sub> за дато Q';
 $ec_lang['mpf_solve_desc']='Користећи d<sub>0</sub>, n и S<sub>f</sub> из формулара калкулатора, проналази најмањи y/d<sub>0</sub> за дато Q.';
 $ec_lang['mpf_solve_button']='Израчунај';
+$ec_lang['mpf_solver_enter_positive_q']='Унесите позитиван циљани Q.';
+$ec_lang_intent['mpf_solver_enter_positive_q']='';
+$ec_lang['mpf_solver_no_solution']='Нема решења: Q премашује капацитет цеви при y/d0 = 93.8% (Qmax = {qmax} у изабраним јединицама).';
+$ec_lang_intent['mpf_solver_no_solution']='';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Губитак напора у цевима по Manningу';
 $ec_lang['mphl_main_title']='Бесплатни онлајн калкулатор губитка напора у цевима по Manningу';

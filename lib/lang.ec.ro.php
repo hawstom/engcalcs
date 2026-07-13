@@ -157,6 +157,10 @@ $ec_lang['mpf_note_1']='<dl><dt>Acesta este debitul și adâncimea în interioru
 $ec_lang['mpf_solve_for_dd0']='Calculează y/d<sub>0</sub> pentru Q dat';
 $ec_lang['mpf_solve_desc']='Folosind d<sub>0</sub>, n și S<sub>f</sub> din formularul calculatorului, găsește cel mai mic y/d<sub>0</sub> pentru un Q dat.';
 $ec_lang['mpf_solve_button']='Calculează';
+$ec_lang['mpf_solver_enter_positive_q']='Introduceți un Q țintă pozitiv.';
+$ec_lang_intent['mpf_solver_enter_positive_q']='';
+$ec_lang['mpf_solver_no_solution']='Fără soluție: Q depășește capacitatea conductei la y/d0 = 93.8% (Qmax = {qmax} în unitățile selectate).';
+$ec_lang_intent['mpf_solver_no_solution']='';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Manning Pierdere de Sarcină Conductă';
 $ec_lang['mphl_main_title']='Calculator Gratuit Online Manning Pierdere de Sarcină Conductă';

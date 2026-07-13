@@ -159,6 +159,10 @@ $ec_lang['mpf_note_1']='<dl><dt>Il s\'agit du débit (et de la profondeur) à l\
 $ec_lang['mpf_solve_for_dd0']='Calculer y/d<sub>0</sub> pour un Q donné';
 $ec_lang['mpf_solve_desc']='En utilisant d<sub>0</sub>, n et S<sub>f</sub> du formulaire, trouve le plus petit y/d<sub>0</sub> pour un Q donné.';
 $ec_lang['mpf_solve_button']='Calculer';
+$ec_lang['mpf_solver_enter_positive_q']='Entrez un Q cible positif.';
+$ec_lang_intent['mpf_solver_enter_positive_q']='';
+$ec_lang['mpf_solver_no_solution']='Aucune solution : Q dépasse la capacité de la conduite à y/d0 = 93.8% (Qmax = {qmax} dans les unités sélectionnées).';
+$ec_lang_intent['mpf_solver_no_solution']='';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Perte de charge Manning en conduite';
 $ec_lang['mphl_main_title']='Calculateur gratuit en ligne de perte de charge Manning en conduite';

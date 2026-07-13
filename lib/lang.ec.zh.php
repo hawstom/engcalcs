@@ -158,6 +158,10 @@ $ec_lang['mpf_note_1']='<dl><dt>这是<em>无限长</em>管道内部的流量和
 $ec_lang['mpf_solve_for_dd0']='已知 Q 求 y/d<sub>0</sub>';
 $ec_lang['mpf_solve_desc']='使用计算器表单中的 d<sub>0</sub>、n 和 S<sub>f</sub>，求给定 Q 对应的最小 y/d<sub>0</sub>。';
 $ec_lang['mpf_solve_button']='求解';
+$ec_lang['mpf_solver_enter_positive_q']='请输入正值目标流量 Q。';
+$ec_lang_intent['mpf_solver_enter_positive_q']='';
+$ec_lang['mpf_solver_no_solution']='无解：在 y/d0 = 93.8% 处，Q 已超过管道通流能力（所选单位下 Qmax = {qmax}）。';
+$ec_lang_intent['mpf_solver_no_solution']='';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='曼宁管道水头损失';
 $ec_lang['mphl_main_title']='免费在线曼宁管道水头损失计算器';

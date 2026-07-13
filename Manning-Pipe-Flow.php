@@ -70,7 +70,9 @@ EngCalcs.pageConfig = {
 	mhp_vel_high_short: <?=json_encode($ec_lang['mhp_vel_high_short'])?>,
 	mhp_vel_low_short:  <?=json_encode($ec_lang['mhp_vel_low_short'])?>,
 	mhp_vel_high:       <?=json_encode($ec_lang['mhp_vel_high'])?>,
-	mhp_vel_low:        <?=json_encode($ec_lang['mhp_vel_low'])?>
+	mhp_vel_low:        <?=json_encode($ec_lang['mhp_vel_low'])?>,
+	mpf_solver_enter_positive_q: <?=json_encode($ec_lang['mpf_solver_enter_positive_q'])?>,
+	mpf_solver_no_solution:      <?=json_encode($ec_lang['mpf_solver_no_solution'])?>
 };
 </script>
 <script src="/engcalcs/js/manning-pipe-flow.js?v=<?=filemtime(__DIR__.'/js/manning-pipe-flow.js')?>"></script>

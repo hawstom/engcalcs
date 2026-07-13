@@ -158,6 +158,10 @@ $ec_lang['mpf_note_1']='<dl><dt>Questo è il flusso e la profondità all\'intern
 $ec_lang['mpf_solve_for_dd0']='Calcola y/d<sub>0</sub> dato Q';
 $ec_lang['mpf_solve_desc']='Usando d<sub>0</sub>, n e S<sub>f</sub> dal modulo, trova il minimo y/d<sub>0</sub> per un dato Q.';
 $ec_lang['mpf_solve_button']='Calcola';
+$ec_lang['mpf_solver_enter_positive_q']='Inserire un valore positivo per Q.';
+$ec_lang_intent['mpf_solver_enter_positive_q']='';
+$ec_lang['mpf_solver_no_solution']='Nessuna soluzione: Q supera la capacità della tubazione a y/d0 = 93.8% (Qmax = {qmax} nelle unità selezionate).';
+$ec_lang_intent['mpf_solver_no_solution']='';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Perdita di carico in tubazione Manning';
 $ec_lang['mphl_main_title']='Calcolatore gratuito online perdita di carico in tubazione Manning';

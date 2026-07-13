@@ -99,15 +99,14 @@ EngCalcs.solveForDd0 = function() {
 	}
 
 	if (isNaN(q_target) || q_target <= 0) {
-		msgEl.textContent = 'Enter a positive target Q.';
+		msgEl.textContent = EngCalcs.pageConfig.mpf_solver_enter_positive_q;
 		return;
 	}
 
 	var DD0_PEAK = 0.9376;
 	var q_max = computeQ(DD0_PEAK);
 	if (q_target > q_max) {
-		msgEl.textContent = 'No solution: Q exceeds pipe capacity at y/d0 = 93.8% '
-			+ '(Qmax = ' + (q_max * qu).toFixed(4) + ' in selected units).';
+		msgEl.textContent = EngCalcs.pageConfig.mpf_solver_no_solution.replace('{qmax}', (q_max * qu).toFixed(4));
 		return;
 	}
 

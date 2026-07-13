@@ -159,6 +159,10 @@ $ec_lang['mpf_note_1']='<dl><dt>Huu ni mtiririko na kina ndani ya bomba la <em>u
 $ec_lang['mpf_solve_for_dd0']='Suluhisha y/d<sub>0</sub> ikitolewa Q';
 $ec_lang['mpf_solve_desc']='Ukitumia d<sub>0</sub>, n, na S<sub>f</sub> kutoka kwa fomu ya kikokotoo, inapata y/d<sub>0</sub> ya chini kabisa kwa Q iliyopewa.';
 $ec_lang['mpf_solve_button']='Suluhisha';
+$ec_lang['mpf_solver_enter_positive_q']='Weka Q lengwa chanya.';
+$ec_lang_intent['mpf_solver_enter_positive_q']='';
+$ec_lang['mpf_solver_no_solution']='Hakuna suluhisho: Q inazidi uwezo wa bomba katika y/d0 = 93.8% (Qmax = {qmax} katika vitengo vilivyochaguliwa).';
+$ec_lang_intent['mpf_solver_no_solution']='';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Upotevu wa Kichwa cha Bomba la Manning';
 $ec_lang['mphl_main_title']='Kikokotoo cha Bure Mtandaoni cha Upotevu wa Kichwa cha Bomba la Manning';

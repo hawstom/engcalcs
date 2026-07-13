@@ -157,6 +157,10 @@ $ec_lang['mpf_note_1']='<dl><dt>Ovo je protok i dubina unutar <em>beskonačno du
 $ec_lang['mpf_solve_for_dd0']='Izračunaj y/d<sub>0</sub> za zadani Q';
 $ec_lang['mpf_solve_desc']='Koristeći d<sub>0</sub>, n i S<sub>f</sub> iz obrasca kalkulatora, pronalazi najmanji y/d<sub>0</sub> za zadani Q.';
 $ec_lang['mpf_solve_button']='Izračunaj';
+$ec_lang['mpf_solver_enter_positive_q']='Unesite pozitivan ciljani Q.';
+$ec_lang_intent['mpf_solver_enter_positive_q']='';
+$ec_lang['mpf_solver_no_solution']='Nema rješenja: Q premašuje kapacitet cijevi pri y/d0 = 93.8% (Qmax = {qmax} u odabranim jedinicama).';
+$ec_lang_intent['mpf_solver_no_solution']='';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Manning gubitak tlačne visine u cijevi';
 $ec_lang['mphl_main_title']='Besplatni online kalkulator Manning gubitka tlačne visine u cijevi';

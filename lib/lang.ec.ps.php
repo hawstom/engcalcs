@@ -159,6 +159,10 @@ $ec_lang['mpf_note_1']='<dl><dt>دا د یوه <em>بې نهایته اوږد</e
 $ec_lang['mpf_solve_for_dd0']='د ورکړل شوي Q لپاره y/d<sub>0</sub> حل کول';
 $ec_lang['mpf_solve_desc']='د محاسبې فورمه د d<sub>0</sub>، n، او S<sub>f</sub> کارولو سره، د ورکړل شوي Q لپاره ټیټ ترین y/d<sub>0</sub> پیدا کوي.';
 $ec_lang['mpf_solve_button']='حل کړئ';
+$ec_lang['mpf_solver_enter_positive_q']='یو مثبت موخه‌یز Q ولیکئ.';
+$ec_lang_intent['mpf_solver_enter_positive_q']='';
+$ec_lang['mpf_solver_no_solution']='حل نشته: Q په y/d0 = 93.8% کې د پایپ له ظرفیت څخه زیات دی (Qmax = {qmax} په ټاکل شویو واحدونو کې).';
+$ec_lang_intent['mpf_solver_no_solution']='';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Manning د پایپ سر ضیاع';
 $ec_lang['mphl_main_title']='وړیا آنلاین Manning د پایپ سر ضیاع محاسبه';

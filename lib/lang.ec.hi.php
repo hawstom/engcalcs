@@ -159,6 +159,10 @@ $ec_lang['mpf_note_1']='<dl><dt>यह एक <em>अनंत लंबे</em>
 $ec_lang['mpf_solve_for_dd0']='दिए गए Q के लिए y/d<sub>0</sub> हल करें';
 $ec_lang['mpf_solve_desc']='कैलकुलेटर फ़ॉर्म से d<sub>0</sub>, n और S<sub>f</sub> का उपयोग करके दिए गए Q के लिए न्यूनतम y/d<sub>0</sub> खोजता है।';
 $ec_lang['mpf_solve_button']='हल करें';
+$ec_lang['mpf_solver_enter_positive_q']='एक धनात्मक लक्ष्य Q दर्ज करें।';
+$ec_lang_intent['mpf_solver_enter_positive_q']='';
+$ec_lang['mpf_solver_no_solution']='कोई हल नहीं: y/d0 = 93.8% पर Q पाइप की क्षमता से अधिक है (चयनित इकाइयों में Qmax = {qmax})।';
+$ec_lang_intent['mpf_solver_no_solution']='';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='मैनिंग पाइप शीर्ष हानि';
 $ec_lang['mphl_main_title']='मुफ़्त ऑनलाइन मैनिंग पाइप शीर्ष हानि कैलकुलेटर';

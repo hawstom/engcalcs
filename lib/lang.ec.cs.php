@@ -158,6 +158,10 @@ $ec_lang['mpf_note_1']='<dl><dt>Toto je průtok a hloubka uvnitř <em>nekonečn�
 $ec_lang['mpf_solve_for_dd0']='Vypočítat y/d<sub>0</sub> pro dané Q';
 $ec_lang['mpf_solve_desc']='Pomocí d<sub>0</sub>, n a S<sub>f</sub> z formuláře kalkulátoru najde nejnižší y/d<sub>0</sub> pro dané Q.';
 $ec_lang['mpf_solve_button']='Vypočítat';
+$ec_lang['mpf_solver_enter_positive_q']='Zadejte kladnou cílovou hodnotu Q.';
+$ec_lang_intent['mpf_solver_enter_positive_q']='';
+$ec_lang['mpf_solver_no_solution']='Žádné řešení: Q překračuje kapacitu potrubí při y/d0 = 93.8% (Qmax = {qmax} ve zvolených jednotkách).';
+$ec_lang_intent['mpf_solver_no_solution']='';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Ztráta tlakové výšky v potrubí Manning';
 $ec_lang['mphl_main_title']='Bezplatný online kalkulátor ztráty tlakové výšky v potrubí Manning';

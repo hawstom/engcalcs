@@ -160,6 +160,10 @@ $ec_lang['mpf_note_1']='<dl><dt><em>အဆုံးမဲ့ရှည်</em>သ
 $ec_lang['mpf_solve_for_dd0']='Q ပေးချက်မှ y/d<sub>0</sub> ဖြေရှင်းရန်';
 $ec_lang['mpf_solve_desc']='တွက်ချက်မှုကိရိယာပုံစံမှ d<sub>0</sub>, n, နှင့် S<sub>f</sub> ကို အသုံးပြု၍ သတ်မှတ် Q အတွက် အနိမ့်ဆုံး y/d<sub>0</sub> ကို ရှာဖွေသည်။';
 $ec_lang['mpf_solve_button']='ဖြေရှင်းရန်';
+$ec_lang['mpf_solver_enter_positive_q']='အသုံးပြုလိုသော Q တန်ဖိုးကို အပြုသဘောဂဏန်းဖြင့် ထည့်ပါ။';
+$ec_lang_intent['mpf_solver_enter_positive_q']='';
+$ec_lang['mpf_solver_no_solution']='အဖြေမရှိပါ: y/d0 = 93.8% တွင် Q သည် ပိုက်၏ စွမ်းဆောင်ရည်ကို ကျော်လွန်နေသည် (Qmax = {qmax}, ရွေးချယ်ထားသော ယူနစ်များဖြင့်)။';
+$ec_lang_intent['mpf_solver_no_solution']='';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Manning သွတ်ပိုက် ဖိမြင့်ဆင့်ဆုံးရှုံးမှု';
 $ec_lang['mphl_main_title']='အခမဲ့ အွန်လိုင်း Manning သွတ်ပိုက် ဖိမြင့်ဆင့်ဆုံးရှုံးမှု တွက်ချက်မှုကိရိယာ';

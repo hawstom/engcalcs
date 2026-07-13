@@ -159,6 +159,10 @@ $ec_lang['mpf_note_1']='<dl><dt>Це витрата і глибина всере
 $ec_lang['mpf_solve_for_dd0']='Визначити y/d<sub>0</sub> при заданій Q';
 $ec_lang['mpf_solve_desc']='Використовуючи d<sub>0</sub>, n та S<sub>f</sub> з форми калькулятора, знаходить найменше y/d<sub>0</sub> для заданої Q.';
 $ec_lang['mpf_solve_button']='Розрахувати';
+$ec_lang['mpf_solver_enter_positive_q']='Введіть додатне цільове значення Q.';
+$ec_lang_intent['mpf_solver_enter_positive_q']='';
+$ec_lang['mpf_solver_no_solution']='Рішення відсутнє: Q перевищує пропускну здатність труби при y/d0 = 93.8% (Qmax = {qmax} у вибраних одиницях).';
+$ec_lang_intent['mpf_solver_no_solution']='';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Manning — Втрати напору в трубі';
 $ec_lang['mphl_main_title']='Безкоштовний онлайн-калькулятор втрат напору в трубі за Manning';

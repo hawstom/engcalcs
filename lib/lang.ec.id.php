@@ -158,6 +158,10 @@ $ec_lang['mpf_note_1']='<dl><dt>Ini adalah debit dan kedalaman di dalam pipa yan
 $ec_lang['mpf_solve_for_dd0']='Cari y/d<sub>0</sub> berdasarkan Q';
 $ec_lang['mpf_solve_desc']='Menggunakan d<sub>0</sub>, n, dan S<sub>f</sub> dari formulir kalkulator, mencari nilai y/d<sub>0</sub> terendah untuk Q tertentu.';
 $ec_lang['mpf_solve_button']='Hitung';
+$ec_lang['mpf_solver_enter_positive_q']='Masukkan Q target yang positif.';
+$ec_lang_intent['mpf_solver_enter_positive_q']='';
+$ec_lang['mpf_solver_no_solution']='Tidak ada solusi: Q melebihi kapasitas pipa pada y/d0 = 93.8% (Qmax = {qmax} dalam satuan yang dipilih).';
+$ec_lang_intent['mpf_solver_no_solution']='';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Kehilangan Tinggi Tekan Pipa Manning';
 $ec_lang['mphl_main_title']='Kalkulator Kehilangan Tinggi Tekan Pipa Manning Gratis Daring';

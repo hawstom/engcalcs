@@ -121,7 +121,7 @@ function echoEngCalcsMenu ($html_title = '', $show_name_field = false, $calc_nam
 			</li>
 		</ul>
 <?php if ($show_name_field) : ?>
-		<button id="ec-install-btn" type="button" class="btn btn-sm btn-outline-primary ms-3" style="display:none" onclick="EngCalcs.installPWA()">⬇ Install</button>
+		<button id="ec-install-btn" type="button" class="btn btn-sm btn-outline-primary ms-3" style="display:none" onclick="EngCalcs.installPWA()">⬇ <?=$ec_lang['install_main_menu']?></button>
 		<form class="d-flex align-items-center ms-3" style="gap:0.4em" onsubmit="return false;">
 			<label for="ec_calc_name" class="small fw-semibold text-nowrap mb-0"><?=$ec_lang['ec_name_label'] ?? 'Label:'?></label><span title="<?=htmlspecialchars($ec_lang['ec_name_hint'] ?? '', ENT_QUOTES, 'UTF-8')?>" style="cursor:help;color:steelblue;font-size:0.9em" tabindex="0">?</span>
 			<input type="text" id="ec_calc_name"

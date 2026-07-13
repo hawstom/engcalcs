@@ -144,12 +144,12 @@ When translating a new calculator's keys into all 26 non-English languages, **sp
 
 **Standard launch pattern:**
 1. Tell the user: "Starting N agents, one for each language." (always say this before launching)
-2. Spawn all agents in a single message with `run_in_background: true` and `model: "sonnet"` — Sonnet is the default model for translation agents. Haiku is permitted ONLY for batches consisting solely of short labels (≤ ~8 words, no tooltips, no `*_notes_*_def` keys); it is deprecated for everything else.
+2. Spawn all agents in a single message with `run_in_background: true` and `model: "sonnet"` — Sonnet is mandatory for all translation agents, no exceptions. Haiku is deprecated for translation entirely (see Model policy below).
 3. Each agent receives: the payload JSON path, the target lang file path, and full instructions including glossary terms, intent notes, and all translation rules
 
 Always announce the launch count before spawning so the user knows what is happening.
 
-**Model policy** (why Sonnet is the default — evidence: the 2026-07 rc_/ip_ sprint, `dev/translation-audit-rc-ip-2026-07.md`): Haiku mistranslated polysemous words in long prose and produced script contamination, escape leakage, and truncation in low-resource languages even with full glossary + intent injection. So: long strings (`title="..."`, `*_notes_*_def`) → **Sonnet** (1–2 per request) or inline by the orchestrator; low-resource langs (am/km/my/ps) → Sonnet for everything, held at the honest `0.65` QUALITY tier; short-labels-only batches → Haiku acceptable.
+**Model policy** (Haiku fully deprecated for translation, 2026-07-12 — Tom): evidence from the 2026-07 rc_/ip_ sprint (`dev/translation-audit-rc-ip-2026-07.md`) showed Haiku mistranslated polysemous words in long prose and produced script contamination, escape leakage, and truncation in low-resource languages even with full glossary + intent injection. The suite previously carved out an exception allowing Haiku for "short-labels-only" batches; that exception is **removed** — even short labels carry real mistranslation risk (a wrong word in a 3-word label is just as wrong as one in a paragraph), and a standing exception is an easy trap to fall back into by habit. **Sonnet is mandatory for every translation agent, every batch size, every language, no exceptions.** Do not propose, launch, or accept Haiku for any translation task, including future sprints reasoning "it's just a short string."
 
 **Post-sprint QA (mandatory, in order):**
 1. `php dev/scripts/lang_syntax_validate.php --lang=<codes>` — must be clean of escape-leakage,

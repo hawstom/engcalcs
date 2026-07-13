@@ -160,6 +160,10 @@ $ec_lang['mpf_note_1']='<dl><dt>Това е дебитът и дълбочина
 $ec_lang['mpf_solve_for_dd0']='Намерете y/d<sub>0</sub> при дадено Q';
 $ec_lang['mpf_solve_desc']='Използвайки d<sub>0</sub>, n и S<sub>f</sub> от формуляра на калкулатора, намира най-ниското y/d<sub>0</sub> за даденото Q.';
 $ec_lang['mpf_solve_button']='Изчисли';
+$ec_lang['mpf_solver_enter_positive_q']='Въведете положителна целева стойност на Q.';
+$ec_lang_intent['mpf_solver_enter_positive_q']='';
+$ec_lang['mpf_solver_no_solution']='Няма решение: Q надвишава капацитета на тръбата при y/d0 = 93.8% (Qmax = {qmax} в избраните мерни единици).';
+$ec_lang_intent['mpf_solver_no_solution']='';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Загуба на напор в тръбопровод по Манинг';
 $ec_lang['mphl_main_title']='Безплатен онлайн калкулатор за загуба на напор в тръбопровод по Манинг';

@@ -159,6 +159,10 @@ $ec_lang['mpf_note_1']='<dl><dt>یہ ایک <em>لامحدود لمبے</em> پ�
 $ec_lang['mpf_solve_for_dd0']='دیے گئے Q کے لیے y/d<sub>0</sub> حل کریں';
 $ec_lang['mpf_solve_desc']='حاسبہ فارم سے d<sub>0</sub>، n اور S<sub>f</sub> استعمال کرتے ہوئے دیے گئے Q کے لیے کم سے کم y/d<sub>0</sub> تلاش کرتا ہے۔';
 $ec_lang['mpf_solve_button']='حل کریں';
+$ec_lang['mpf_solver_enter_positive_q']='براہ کرم مثبت ہدف Q درج کریں۔';
+$ec_lang_intent['mpf_solver_enter_positive_q']='';
+$ec_lang['mpf_solver_no_solution']='کوئی حل نہیں: y/d0 = 93.8% پر Q پائپ کی گنجائش سے تجاوز کر جاتا ہے (منتخب اکائیوں میں Qmax = {qmax})۔';
+$ec_lang_intent['mpf_solver_no_solution']='';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='مانینگ پائپ دباؤ نقصان';
 $ec_lang['mphl_main_title']='مفت آنلائن مانینگ پائپ دباؤ نقصان حاسبہ';

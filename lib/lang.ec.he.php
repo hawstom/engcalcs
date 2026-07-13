@@ -159,6 +159,10 @@ $ec_lang['mpf_note_1']='<dl><dt>זהו הזרימה והעומק בתוך צינ
 $ec_lang['mpf_solve_for_dd0']='חשב y/d<sub>0</sub> עבור Q נתון';
 $ec_lang['mpf_solve_desc']='תוך שימוש ב-d<sub>0</sub>, n ו-S<sub>f</sub> מטופס המחשבון, מוצא את ה-y/d<sub>0</sub> הנמוך ביותר עבור Q נתון.';
 $ec_lang['mpf_solve_button']='חשב';
+$ec_lang['mpf_solver_enter_positive_q']='הזן ערך Q יעד חיובי.';
+$ec_lang_intent['mpf_solver_enter_positive_q']='';
+$ec_lang['mpf_solver_no_solution']='אין פתרון: Q עולה על קיבולת הצינור ב-y/d0 = 93.8% (Qmax = {qmax} ביחידות הנבחרות).';
+$ec_lang_intent['mpf_solver_no_solution']='';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='אובדן לחץ בצינור — Manning';
 $ec_lang['mphl_main_title']='מחשבון אובדן לחץ בצינור לפי Manning — חינם מקוון';

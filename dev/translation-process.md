@@ -44,7 +44,7 @@ counts before anything paid launches.
     Slavic) lets one glossary/wording decision propagate and be checked side-by-side. This is also
     the last point at which English source wording gets reformed — see below.
   - **Wave 2 — major non-Latin:** zh ar he hi bn fa ur.
-  - **Wave 3 — low-resource:** am km my ps sw. Always Sonnet (never Haiku), always flagged for
+  - **Wave 3 — low-resource:** am km my ps sw. Always Sonnet, always flagged for
     native review, always run last so the glossary is as mature as possible.
 - **THE SEQUENCING RULE (the one rule this whole SOP exists to enforce):** finish **all three
   waves of a calculator category — plus that category's holistic Opus consistency pass — before
@@ -89,7 +89,8 @@ section verbatim. Sequence recap:
 2. **Get explicit authorization** — state the launch count before spawning, always. Never infer
    "go ahead" from an unrelated "proceed."
 3. **Launch**: one agent per language, single message, `run_in_background: true`, model `sonnet`
-   (Haiku only for short-label-only batches — deprecated otherwise). Each agent gets: payload path,
+   (mandatory, no exceptions — Haiku is fully deprecated for translation, see CLAUDE.md § "Translation
+   Sprints" Model policy, 2026-07-12). Each agent gets: payload path,
    target lang file path, full instructions (glossary terms + values + notes, relevant
    `$ec_lang_intent` entries, HTML/symbol-preservation rules, any known wrong-sense traps carried
    over from prior audits of related terms in that language family).

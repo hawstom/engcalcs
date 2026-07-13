@@ -1,7 +1,7 @@
 {
     "meta": {
         "language": "zh",
-        "expected_key_count": 482,
+        "expected_key_count": 484,
         "delta_key_count": 5,
         "active_prefixes": [
             "ip"

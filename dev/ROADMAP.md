@@ -66,6 +66,25 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   unreferenced by any PHP/JS/template code, so harmless — but inconsistent across files. Do one
   mechanical suite-wide pass to delete orphans everywhere rather than ad hoc mid-sprint.
 
+- 30|[H] **Localization-bypass audit findings, 2026-07-12 (Tom's "holistic closing audit" for item
+  85 surfaced this gap class — hardcoded strings that never route through `$ec_lang`, so no
+  translation-quality pass would ever catch them).** Two content pages exist entirely outside the
+  localization system, unlike `About.php` (which correctly routes its body through
+  `$ec_lang['about_body_html']`):
+  - `Install.php` (66 lines, PWA install instructions) — 100% hardcoded English body.
+  - `Orifice-Drain-Time-Ref.php` (786 lines, equation derivation reference) — 100% hardcoded
+    English body; also linked from `Orifice-Drain-Time.php:47` via a hardcoded "Derivation"/
+    "Equation derivation" link.
+  Needs a scope decision before any translation work starts: (1) restructure each page's body into
+  one `$ec_lang['*_body_html']` key (About.php's pattern) so it becomes translatable, (2) decide
+  whether these auxiliary/reference pages are in scope for full 26-language translation at all given
+  their length (786 lines is a full new translation sprint on its own), or (3) something narrower
+  (e.g. English-only with a note, or machine-translate with lower quality tier). Two small hardcoded
+  radio-button labels were also found in `Manning-Trap.php` (`Strickler`/`B/B`/`Isbash`/`Maynord`/
+  `Searcy`) — likely fine to leave untranslated as formula proper nouns, but flagged for confirmation
+  rather than assumed. `Compare-Languages.php` and `formmail.php` are internal/dev-utility pages, not
+  user-facing app content — out of scope, no action needed.
+
 ## Translation improvements
 
 The rules, sequence, and QA chain for translation work are **not** restated here. They live in:

@@ -158,6 +158,10 @@ $ec_lang['mpf_note_1']='<dl><dt>এটি একটি <em>অসীম দী�
 $ec_lang['mpf_solve_for_dd0']='Q দেওয়া y/d<sub>0</sub> খুঁজুন';
 $ec_lang['mpf_solve_desc']='ক্যালকুলেটর ফর্ম থেকে d<sub>0</sub>, n, এবং S<sub>f</sub> ব্যবহার করে, নির্দিষ্ট Q-এর জন্য সর্বনিম্ন y/d<sub>0</sub> খুঁজে বের করে।';
 $ec_lang['mpf_solve_button']='সমাধান করুন';
+$ec_lang['mpf_solver_enter_positive_q']='একটি ধনাত্মক লক্ষ্য Q প্রবেশ করান।';
+$ec_lang_intent['mpf_solver_enter_positive_q']='';
+$ec_lang['mpf_solver_no_solution']='কোনো সমাধান নেই: y/d0 = 93.8%-এ Q পাইপের ধারণক্ষমতা অতিক্রম করে (Qmax = {qmax} নির্বাচিত এককে)।';
+$ec_lang_intent['mpf_solver_no_solution']='';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='ম্যানিং পাইপ হেড লস';
 $ec_lang['mphl_main_title']='বিনামূল্যে অনলাইন ম্যানিং পাইপ হেড লস ক্যালকুলেটর';

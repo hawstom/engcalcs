@@ -162,6 +162,10 @@ $ec_lang['mpf_note_1']='<dl><dt>Este es el caudal (y la profundidad) dentro de u
 $ec_lang['mpf_solve_for_dd0']='Calcular y/d<sub>0</sub> para un Q dado';
 $ec_lang['mpf_solve_desc']='Usando d<sub>0</sub>, n y S<sub>f</sub> del formulario de la calculadora, encuentra el menor y/d<sub>0</sub> para un Q dado.';
 $ec_lang['mpf_solve_button']='Calcular';
+$ec_lang['mpf_solver_enter_positive_q']='Ingrese un Q objetivo positivo.';
+$ec_lang_intent['mpf_solver_enter_positive_q']='';
+$ec_lang['mpf_solver_no_solution']='Sin solución: Q excede la capacidad de la tubería en y/d0 = 93.8% (Qmax = {qmax} en las unidades seleccionadas).';
+$ec_lang_intent['mpf_solver_no_solution']='';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Pérdida de carga en tubería según Manning';
 $ec_lang['mphl_main_title']='Calculadora gratis en línea de pérdida de carga en tubería según Manning';

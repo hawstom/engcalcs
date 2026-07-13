@@ -159,6 +159,10 @@ $ec_lang['mpf_note_1']='<dl><dt>នេះជាការហូរ និងជ�
 $ec_lang['mpf_solve_for_dd0']='រកដំណោះស្រាយ y/d<sub>0</sub> ពី Q';
 $ec_lang['mpf_solve_desc']='ដោយប្រើ d<sub>0</sub>, n, និង S<sub>f</sub> ពីទម្រង់ម៉ាស៊ីនគណនា រក y/d<sub>0</sub> ទាបបំផុត សម្រាប់ Q ដែលបានកំណត់។';
 $ec_lang['mpf_solve_button']='ដោះស្រាយ';
+$ec_lang['mpf_solver_enter_positive_q']='សូមបញ្ចូល Q គោលដៅជាចំនួនវិជ្ជមាន។';
+$ec_lang_intent['mpf_solver_enter_positive_q']='';
+$ec_lang['mpf_solver_no_solution']='គ្មានដំណោះស្រាយ៖ Q លើសសមត្ថភាពបំពង់នៅ y/d0 = 93.8% (Qmax = {qmax} គិតជាឯកតាដែលបានជ្រើសរើស)។';
+$ec_lang_intent['mpf_solver_no_solution']='';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Manning ការបាត់បង់ទំនាប់ក្នុងបំពង់';
 $ec_lang['mphl_main_title']='ម៉ាស៊ីនគណនា Manning ការបាត់បង់ទំនាប់ក្នុងបំពង់ ឥតគិតថ្លៃ';

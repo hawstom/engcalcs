@@ -161,6 +161,10 @@ $ec_lang['mpf_note_1']='<dl><dt>هذا هو الجريان والعمق داخل
 $ec_lang['mpf_solve_for_dd0']='احسب y/d<sub>0</sub> لقيمة Q معطاة';
 $ec_lang['mpf_solve_desc']='باستخدام d<sub>0</sub> وn وS<sub>f</sub> من نموذج الحاسبة، يجد أدنى y/d<sub>0</sub> لقيمة Q معطاة.';
 $ec_lang['mpf_solve_button']='احسب';
+$ec_lang['mpf_solver_enter_positive_q']='أدخل قيمة موجبة لـ Q المستهدف.';
+$ec_lang_intent['mpf_solver_enter_positive_q']='';
+$ec_lang['mpf_solver_no_solution']='لا يوجد حل: تتجاوز Q سعة الأنبوب عند y/d0 = 93.8% (Qmax = {qmax} بالوحدات المختارة).';
+$ec_lang_intent['mpf_solver_no_solution']='';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='فاقد الضغط في الأنابيب — مانينغ';
 $ec_lang['mphl_main_title']='حاسبة فاقد الضغط في الأنابيب بمانينغ المجانية عبر الإنترنت';

@@ -159,6 +159,10 @@ $ec_lang['mpf_note_1']='<dl><dt>این جریان و عمق داخل یک لول
 $ec_lang['mpf_solve_for_dd0']='محاسبه y/d<sub>0</sub> برای Q مشخص';
 $ec_lang['mpf_solve_desc']='با استفاده از d<sub>0</sub>، n و S<sub>f</sub> از فرم ماشین‌حساب، کمترین مقدار y/d<sub>0</sub> را برای Q مشخص پیدا می‌کند.';
 $ec_lang['mpf_solve_button']='محاسبه';
+$ec_lang['mpf_solver_enter_positive_q']='یک Q هدف مثبت وارد کنید.';
+$ec_lang_intent['mpf_solver_enter_positive_q']='';
+$ec_lang['mpf_solver_no_solution']='راه‌حلی وجود ندارد: Q از ظرفیت لوله در y/d0 = 93.8% بیشتر است (Qmax = {qmax} در واحدهای انتخابی).';
+$ec_lang_intent['mpf_solver_no_solution']='';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='افت هد لوله Manning';
 $ec_lang['mphl_main_title']='ماشین‌حساب رایگان آنلاین افت هد لوله Manning';
