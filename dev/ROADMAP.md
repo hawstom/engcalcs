@@ -26,42 +26,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   substituted in? Left untouched pending that judgment call rather than a blind find-replace on
   shipped translated text.
 
-- 0|95|[CC] **DONE 2026-07-13: Localization-bypass audit findings, 2026-07-12 (Tom's "holistic
-  closing audit" for Task 91 surfaced this gap class — hardcoded strings that never route through
-  `$ec_lang`, so no translation-quality pass would ever catch them).** Two content pages exist
-  entirely outside the localization system, unlike `About.php` (which correctly routes its body
-  through `$ec_lang['about_body_html']`):
-  - `Install.php` (66 lines, PWA install instructions) — 100% hardcoded English body.
-  - `Orifice-Drain-Time-Ref.php` (786 lines, equation derivation reference) — 100% hardcoded
-    English body; also linked from `Orifice-Drain-Time.php:47` via a hardcoded "Derivation"/
-    "Equation derivation" link.
-  Three scope questions, all resolved 2026-07-13 (Tom):
-  1. **`Install.php`: translate it — moved to Task 100.** Tom's instinct was that it might be
-     redundant now that there's an in-app `⬇ Install` button (`EngCalcs.installPWA()`,
-     `js/Calculators.lib.js:29`). Checked and it isn't: that button only fires on browsers that
-     support `beforeinstallprompt` (Chrome/Edge), so it's silently useless on iOS Safari and
-     Firefox — which is most of Install.php's content (the iOS Share-menu steps, the "Firefox
-     doesn't support PWA install" note, the "what gets cached" explainer). Install.php is the only
-     working install path for those platforms, so it stays in scope and needs translating like any
-     other user-facing page. Execution (wave-0 English cleanup, then translate) split off as
-     **Task 100** rather than folded into this closure, since a 66-line page + a 786-line reference
-     page is a real undertaking, not a quick sub-item.
-  2. **`Orifice-Drain-Time-Ref.php`: English-only, permanently — including the "Derivation" /
-     "Equation derivation" link text.** 786 lines of equation-manipulation prose ("integrating both
-     sides," "substituting into," "rearranging yields") has a much higher mistranslation-consequence-
-     per-word ratio than UI labels — a wrong verb tense changes what the math claims — and
-     translating it right would be its own sprint for a page most users never open. English-only
-     reference links are a normal pattern (engineering software routinely links out to English-only
-     derivations/papers). No further action.
-  3. **`Manning-Trap.php` radio labels (`Strickler`/`B/B`, `Isbash`/`Maynord`/`Searcy`): leave
-     untranslated.** These are the surnames of the formulas' originators (citations, not descriptive
-     text). Confirmed this matches existing suite convention — `lib/lang.ec.ar.php` and
-     `lib/lang.ec.zh.php` already keep "Manning," "Darcy-Weisbach," and "Hazen-Williams" in Latin
-     script inline even in RTL/CJK text (zh glosses with a transliteration once, then reverts to
-     plain Latin). No script-rendering need; no code change.
-  `Compare-Languages.php` and `formmail.php` are internal/dev-utility pages, not user-facing app
-  content — out of scope, no action needed.
-
 ## Translation improvements
 
 The rules, sequence, and QA chain for translation work are **not** restated here. They live in:
@@ -133,6 +97,42 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|95|[CC] **DONE 2026-07-13: Localization-bypass audit findings, 2026-07-12 (Tom's "holistic
+  closing audit" for Task 91 surfaced this gap class — hardcoded strings that never route through
+  `$ec_lang`, so no translation-quality pass would ever catch them).** Two content pages exist
+  entirely outside the localization system, unlike `About.php` (which correctly routes its body
+  through `$ec_lang['about_body_html']`):
+  - `Install.php` (66 lines, PWA install instructions) — 100% hardcoded English body.
+  - `Orifice-Drain-Time-Ref.php` (786 lines, equation derivation reference) — 100% hardcoded
+    English body; also linked from `Orifice-Drain-Time.php:47` via a hardcoded "Derivation"/
+    "Equation derivation" link.
+  Three scope questions, all resolved 2026-07-13 (Tom):
+  1. **`Install.php`: translate it — moved to Task 100.** Tom's instinct was that it might be
+     redundant now that there's an in-app `⬇ Install` button (`EngCalcs.installPWA()`,
+     `js/Calculators.lib.js:29`). Checked and it isn't: that button only fires on browsers that
+     support `beforeinstallprompt` (Chrome/Edge), so it's silently useless on iOS Safari and
+     Firefox — which is most of Install.php's content (the iOS Share-menu steps, the "Firefox
+     doesn't support PWA install" note, the "what gets cached" explainer). Install.php is the only
+     working install path for those platforms, so it stays in scope and needs translating like any
+     other user-facing page. Execution (wave-0 English cleanup, then translate) split off as
+     **Task 100** rather than folded into this closure, since a 66-line page + a 786-line reference
+     page is a real undertaking, not a quick sub-item.
+  2. **`Orifice-Drain-Time-Ref.php`: English-only, permanently — including the "Derivation" /
+     "Equation derivation" link text.** 786 lines of equation-manipulation prose ("integrating both
+     sides," "substituting into," "rearranging yields") has a much higher mistranslation-consequence-
+     per-word ratio than UI labels — a wrong verb tense changes what the math claims — and
+     translating it right would be its own sprint for a page most users never open. English-only
+     reference links are a normal pattern (engineering software routinely links out to English-only
+     derivations/papers). No further action.
+  3. **`Manning-Trap.php` radio labels (`Strickler`/`B/B`, `Isbash`/`Maynord`/`Searcy`): leave
+     untranslated.** These are the surnames of the formulas' originators (citations, not descriptive
+     text). Confirmed this matches existing suite convention — `lib/lang.ec.ar.php` and
+     `lib/lang.ec.zh.php` already keep "Manning," "Darcy-Weisbach," and "Hazen-Williams" in Latin
+     script inline even in RTL/CJK text (zh glosses with a transliteration once, then reverts to
+     plain Latin). No script-rendering need; no code change.
+  `Compare-Languages.php` and `formmail.php` are internal/dev-utility pages, not user-facing app
+  content — out of scope, no action needed.
 
 - 0|94|[CC] **DONE 2026-07-13: Task 94 closed — orphan-key full-suite housekeeping.** Ran
   `dev/scripts/lang_parity_check.php` across all 26 non-English lang files to get the authoritative
