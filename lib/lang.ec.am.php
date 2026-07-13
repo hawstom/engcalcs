@@ -405,8 +405,8 @@ $ec_lang['contactSpamPostfix']='(እባክህ በቃላት ፃፍ። 1=አንድ
 $ec_lang['contactSubmitButton']='መልዕክት ላክ';
 $ec_lang['contact_success']='ለመጻፍ ጊዜ ለወጣህ አመሰግናለሁ።';
 // Rock Chute Design (Robinson, Rice & Kadavy 1998). Prefix rc_.
-$ec_lang['rc_main_menu']='የፈጣን ቦዩ ድንጋይ ሽፋን ዲዛይን (Robinson)';
-$ec_lang['rc_main_title']='ነፃ የመስመር ላይ የፈጣን ቦዩ ድንጋይ ሽፋን ዲዛይን ካልኩሌተር — Robinson (1998)';
+$ec_lang['rc_main_menu']='የድንጋይ-ምቀጫ ቦዩ ዲዛይን (Robinson)';
+$ec_lang['rc_main_title']='ነፃ የመስመር ላይ የድንጋይ-ምቀጫ ቦዩ ዲዛይን ካልኩሌተር — Robinson (1998)';
 $ec_lang['rc_main_desc']='የፈጣን ቦዩ ድንጋይ ሽፋን መጠን &mdash; Robinson, Rice &amp; Kadavy (1998)';
 $ec_lang['rc_S0']='የፈጣን ቦዩ ወለል ቁልቁለት, S<sub>0</sub>';
 $ec_lang['rc_qt']='<span class="ec-help" title="በድንጋይ-ምቀጫ ቦዩ መግቢያ ላይ በአሃድ ስፋት ያለ ፍሰት። ጠቅላላ ፍሰት Q ላለው B የታች ስፋት ቦይ, q_t = Q / B ይጠቀሙ።">ጠቅላላ የአሃድ ፍሰት, q<sub>t</sub> <span class="ec-tip">?</span></span>';

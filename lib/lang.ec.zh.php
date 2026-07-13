@@ -404,8 +404,8 @@ $ec_lang['contactSpamPostfix']='（请用英文拼写。1=one 2=two 3=three 4=fo
 $ec_lang['contactSubmitButton']='发送消息';
 $ec_lang['contact_success']='感谢您抽出宝贵的时间来写信。';
 // Rock Chute Design (Robinson, Rice & Kadavy 1998). Prefix rc_.
-$ec_lang['rc_main_menu']='陡槽护坡设计（Robinson）';
-$ec_lang['rc_main_title']='免费在线陡槽护坡设计计算器 — Robinson (1998)';
+$ec_lang['rc_main_menu']='块石陡槽设计（Robinson）';
+$ec_lang['rc_main_title']='免费在线块石陡槽设计计算器 — Robinson (1998)';
 $ec_lang['rc_main_desc']='陡槽护坡尺寸设计 — Robinson, Rice & Kadavy (1998)';
 $ec_lang['rc_S0']='陡槽底坡, S<sub>0</sub>';
 $ec_lang['rc_qt']='总单宽流量, q<sub>t</sub> <span title="陡槽进口处单宽流量。对于底宽为 B、总流量为 Q 的渠道，取 q_t = Q / B。" style="cursor:help;color:#06c;font-size:0.9em">?</span>';

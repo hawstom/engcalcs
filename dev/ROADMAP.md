@@ -74,20 +74,33 @@ to
 4. Clarify in _intent and in glossary that for rc_ "Rock specific gravity, sg ?", the more standard term is "Relative density of rock".
 5. **DONE 2026-07-13: Simple English pilot on rc_ (Rock Chute).** Tom's direction: this is a
    multilingual project with an established English user base, so prioritize translatability over
-   English SEO/idiom — captured as a standing principle in CLAUDE.md ("Write English source strings
-   in Simple English"). Audit found "riprap" had been phonetically transliterated (not translated)
-   in 6/26 languages (am, bn, he, hi, id, ur) and "chute" in 2 more (hi, ur) — concrete evidence
-   that jargon-shaped English invites transliteration in lower-resource languages. Renamed English
-   source throughout rc_: "Rock Chute" → "Steep Channel", "Riprap" → "Rock Lining" (citations/
-   Robinson's name/paper title left untouched — not jargon, legitimate proper nouns). Fixed all 7
-   affected language files (one Sonnet agent per language) reusing each language's own already-
-   successful translation pattern found elsewhere in its file; also fixed zh's pre-existing 3-way
-   term inconsistency (块石/护坡/抛石 → standardized on 护坡). `php -l` and
+   English SEO/idiom for *explanatory* content — but identity strings (menu + `<title>`) still match
+   the authoritative source's own name. Captured as a standing principle in CLAUDE.md ("Write
+   English source strings in Simple English"). Audit found "riprap" had been phonetically
+   transliterated (not translated) in 6/26 languages (am, bn, he, hi, id, ur) and "chute" in 2 more
+   (hi, ur). First pass (over-corrected, caught by Tom): renamed English "Rock Chute" → "Steep
+   Channel" and "Riprap" → "Rock Lining" *everywhere* including `rc_main_menu`/`rc_main_title`, and
+   force-fit all 7 languages' identity strings to the "Steep Channel" concept. Tom's correction:
+   Robinson's paper is literally titled "Design of Rock Chutes" — the calculator's *name* (menu +
+   title) should keep matching that, only the *explanatory* text (description, tooltips, labels)
+   should simplify; and no language should be forced into a specific English calque either way.
+   Checked the evidence: 5 of the 6 flagged languages (am, bn, he, id, zh) already had natural,
+   non-transliterated "Rock Chute" translations in their menu/title *before* any of this — proving
+   transliteration risk tracks translation-pass quality, not UI tier, and that forcing "Steep
+   Channel" onto them would have overwritten good translations that didn't need touching. Reverted:
+   English `rc_main_menu`/`rc_main_title` back to "Rock Chute Design (Robinson)" /
+   "Free Online Rock Chute Design Calculator — Robinson (1998)"; am/bn/he/id/zh's menu/title back to
+   their original (already-natural) text; hi/ur's menu/title re-done (2 more small agent passes) as
+   natural, non-calqued "rock chute" phrases (हिन्दी "चट्टानी ढाल संरचना", Urdu "پتھریلی گزرگاہ") —
+   real transliteration fixes, not forced steep-channel translations. Explanatory strings
+   (`rc_main_desc` and all rc_ body labels/tooltips/notes) keep the Simple English wording in all 7
+   languages — those were the actual defect locus. zh's pre-existing 3-way term inconsistency
+   (块石/护坡/抛石 in explanatory strings → standardized on 护坡) also kept; zh's menu/title reverted
+   to its original 块石 wording, matching the identity/explanatory split. `php -l` and
    `lang_syntax_validate.php` clean suite-wide (65 pre-existing advisory identical-to-english
-   findings only, no new structural issues). The other 19 languages already had good native terms
-   and needed no change. Items 1-4 and 10 above remain open; full 12-calculator Simple English
-   audit deferred pending review of how this pilot lands (Tom's call, 2026-07-13: pilot rc_ only for
-   now).
+   findings only, no new structural issues). Items 1-4 and 10 above remain open; full 12-calculator
+   Simple English audit deferred pending review of how this pilot lands (Tom's call, 2026-07-13:
+   pilot rc_ only for now).
 10. Propagate these changes to all languages with discretion, or in other words, improve all languages if appropriate in light of these changes. Probably an Opus task.
 
 ## AI Efficiency Scripting (Overhead)

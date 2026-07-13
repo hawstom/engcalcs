@@ -404,8 +404,8 @@ $ec_lang['contactSpamPostfix']='(براہ کرم انگریزی میں لکھی�
 $ec_lang['contactSubmitButton']='پیغام بھیجیں';
 $ec_lang['contact_success']='آپ کا وقت لگا کر لکھنے کے لیے شکریہ۔';
 // Rock Chute Design (Robinson, Rice & Kadavy 1998). Prefix rc_.
-$ec_lang['rc_main_menu']='کھڑی نالی پتھر کی حفاظت کا ڈیزائن (Robinson)';
-$ec_lang['rc_main_title']='مفت آن لائن کھڑی نالی پتھر کی حفاظت ڈیزائن کیلکولیٹر — Robinson (1998)';
+$ec_lang['rc_main_menu']='پتھریلی گزرگاہ کا ڈیزائن (Robinson)';
+$ec_lang['rc_main_title']='مفت آن لائن پتھریلی گزرگاہ ڈیزائن کیلکولیٹر — Robinson (1998)';
 $ec_lang['rc_main_desc']='کھڑی نالی پتھر کی حفاظت کا سائز — Robinson, Rice & Kadavy (1998)';
 $ec_lang['rc_S0']='کھڑی نالی کے بیڈ کی ڈھلان، S<sub>0</sub>';
 $ec_lang['rc_qt']='<span class="ec-help" title="کھڑی نالی کے ان لیٹ پر فی یونٹ چوڑائی بہاؤ۔ نچلی چوڑائی B اور کل بہاؤ Q والی نہر کے لیے q_t = Q / B استعمال کریں۔">کل یونٹ ڈسچارج، q<sub>t</sub> <span class="ec-tip">?</span></span>';

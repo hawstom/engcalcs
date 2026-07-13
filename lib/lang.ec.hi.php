@@ -405,8 +405,8 @@ $ec_lang['contactSpamPostfix']='(कृपया अंग्रेज़ी म
 $ec_lang['contactSubmitButton']='संदेश भेजें';
 $ec_lang['contact_success']='आपका समय लेने के लिए धन्यवाद।';
 // Rock Chute Design (Robinson, Rice & Kadavy 1998). Prefix rc_.
-$ec_lang['rc_main_menu']='तीव्र ढाल चैनल चट्टान अस्तर डिज़ाइन (Robinson)';
-$ec_lang['rc_main_title']='मुफ्त ऑनलाइन तीव्र ढाल चैनल चट्टान अस्तर डिज़ाइन कैलकुलेटर — Robinson (1998)';
+$ec_lang['rc_main_menu']='चट्टानी ढाल संरचना डिज़ाइन (Robinson)';
+$ec_lang['rc_main_title']='मुफ्त ऑनलाइन चट्टानी ढाल संरचना डिज़ाइन कैलकुलेटर — Robinson (1998)';
 $ec_lang['rc_main_desc']='तीव्र ढाल चैनल चट्टान अस्तर आकार — Robinson, Rice & Kadavy (1998)';
 $ec_lang['rc_S0']='तीव्र ढाल चैनल तल ढाल, S<sub>0</sub>';
 $ec_lang['rc_qt']='कुल इकाई प्रवाह, q<sub>t</sub> <span title="तीव्र ढाल चैनल इनलेट पर प्रति इकाई चौड़ाई प्रवाह। तल चौड़ाई B वाले चैनल में कुल प्रवाह Q के लिए, q_t = Q / B उपयोग करें।" style="cursor:help;color:#06c;font-size:0.9em">?</span>';

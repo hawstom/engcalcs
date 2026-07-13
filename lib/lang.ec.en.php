@@ -780,9 +780,9 @@ $ec_lang_intent['contactSubmitButton']='';
 $ec_lang['contact_success']='Thank you for taking the time to write.';
 $ec_lang_intent['contact_success']='';
 // Rock Chute Design (Robinson, Rice & Kadavy 1998). Prefix rc_.
-$ec_lang['rc_main_menu']='Steep Channel Rock Lining Design (Robinson)';
+$ec_lang['rc_main_menu']='Rock Chute Design (Robinson)';
 $ec_lang_intent['rc_main_menu']='Design of a rock-lined steep channel or spillway or rock ramp using the method published by Robinson';
-$ec_lang['rc_main_title']='Free Online Steep Channel Rock Lining Design Calculator — Robinson (1998)';
+$ec_lang['rc_main_title']='Free Online Rock Chute Design Calculator — Robinson (1998)';
 $ec_lang_intent['rc_main_title']='Design of a rock-lined steep channel or spillway or rock ramp using the method published by Robinson in 1998';
 $ec_lang['rc_main_desc']='Steep Channel Rock Lining Size &mdash; Robinson, Rice &amp; Kadavy (1998)';
 $ec_lang_intent['rc_main_desc']='This is for determining the required median size of riprap (angular rock lining) for a steep channel, spillway, or ramp that is lined with rock for erosion protection. This uses the method of design that was published by Robinson, Rice, and Kadavy in 1998.';

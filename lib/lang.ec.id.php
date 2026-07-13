@@ -406,8 +406,8 @@ $ec_lang['contactSpamPostfix']='(Tulis dalam bahasa Inggris. 1=one 2=two 3=three
 $ec_lang['contactSubmitButton']='Kirim Pesan';
 $ec_lang['contact_success']='Terima kasih telah meluangkan waktu untuk menulis.';
 // Rock Chute Design (Robinson, Rice & Kadavy 1998). Prefix rc_.
-$ec_lang['rc_main_menu']='Desain Lapisan Batu Saluran Curam (Robinson)';
-$ec_lang['rc_main_title']='Kalkulator Desain Lapisan Batu Saluran Curam Gratis Online — Robinson (1998)';
+$ec_lang['rc_main_menu']='Desain Saluran Curam Berbatu (Robinson)';
+$ec_lang['rc_main_title']='Kalkulator Desain Saluran Curam Berbatu Gratis Online — Robinson (1998)';
 $ec_lang['rc_main_desc']='Penentuan Ukuran Lapisan Batu untuk Saluran Curam — Robinson, Rice & Kadavy (1998)';
 $ec_lang['rc_S0']='Kemiringan dasar saluran curam, S<sub>0</sub>';
 $ec_lang['rc_qt']='<span class="ec-help" title="Debit per satuan lebar di inlet saluran curam berbatu. Untuk saluran dengan lebar dasar B dan debit total Q, gunakan q_t = Q / B.">Debit satuan total, q<sub>t</sub> <span class="ec-tip">?</span></span>';
