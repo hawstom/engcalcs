@@ -6,15 +6,17 @@ The format of each task is: Priority/status|Description. 0 means "Completed" and
 
 Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Copilot, `[H]` = Human decision needed, `[CC→CP]` / `[CP→CC]` = split task (first actor works, then updates tag to the next plain tag when handing off). Untagged = actor-agnostic. See `cross-platform-planning.md` §2.2.2 for the full tag lifecycle.
 
+**IDs vs. priority (added 2026-07-13):** Priority is mutable — it changes as a task is reprioritized, and it collapses to `0` on completion, so it is never a safe thing to reference a task by later (e.g. the Bulgarian task below moved from priority 80 to 30 while remaining the same task). Any task that gets referenced by number elsewhere in this file — in another task's text, in a commit message, in `dev/` docs — must carry a permanent **ID**, written as `id:NN` right after the priority/status segment (e.g. `- 30|[H] id:80 ...`). An ID is assigned once, at the point a task first needs to be referenced by number, and is never changed or reused, even after the task closes and its priority drops to 0. Write `id:NN` on the Completed entry too, so the closed task stays findable by the same number that's cited elsewhere. Not every historical entry below has been retrofitted with an ID — only ones that are actually cross-referenced by number; the great majority of Completed entries are unique enough by description alone and don't need one.
+
 # Tasks
 
 ## Calculator Improvements
 
-- 20|Bug (pre-existing, ~2021): `Manning-Irregular.php` velocity unit selects (`echoUnitSelect($name='v617u', ...)`, two occurrences around line 93) offer `mph` as a velocity unit choice, but `$ec_units['mph']` and `$ec_lang['u_mph']` don't exist (`lib/Units.lib.php` only defines `mps`/`ftps` for velocity). Produces PHP warnings and an empty/broken option in the unit dropdown. Fix: either add a proper `mph` conversion factor + label, or (more likely correct, since mph is unusual for open-channel velocities) drop `mph` from the Array and use `mps`/`ftps` only, matching every other velocity selector in the suite.
+- 20|id:91 Bug (pre-existing, ~2021): `Manning-Irregular.php` velocity unit selects (`echoUnitSelect($name='v617u', ...)`, two occurrences around line 93) offer `mph` as a velocity unit choice, but `$ec_units['mph']` and `$ec_lang['u_mph']` don't exist (`lib/Units.lib.php` only defines `mps`/`ftps` for velocity). Produces PHP warnings and an empty/broken option in the unit dropdown. Fix: either add a proper `mph` conversion factor + label, or (more likely correct, since mph is unusual for open-channel velocities) drop `mph` from the Array and use `mps`/`ftps` only, matching every other velocity selector in the suite.
 
 ## Translation Standardization (Glossary Project)
 
-- 25|[H] **tr riprap term inconsistency, found during the item-42 glossary sweep (2026-07-13),
+- 25|[H] id:92 **tr riprap term inconsistency, found during the item-42 glossary sweep (2026-07-13),
   not fixed this pass.** `lib/lang.ec.tr.php` uses two different words for the same riprap concept:
   `mtc_bend_angle` (category 1, older) says "taş dolgu"; all 4 riprap mentions in `rc_` (category 5,
   Rock Chute, newer) say "parça taşı" instead. `glossary.json`'s tr riprap entry already said "taş
@@ -26,8 +28,8 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   substituted in? Left untouched pending that judgment call rather than a blind find-replace on
   shipped translated text.
 
-- 30|[H] **Localization-bypass audit findings, 2026-07-12 (Tom's "holistic closing audit" for item
-  85 surfaced this gap class — hardcoded strings that never route through `$ec_lang`, so no
+- 30|[H] id:93 **Localization-bypass audit findings, 2026-07-12 (Tom's "holistic closing audit" for
+  id:85 surfaced this gap class — hardcoded strings that never route through `$ec_lang`, so no
   translation-quality pass would ever catch them).** Two content pages exist entirely outside the
   localization system, unlike `About.php` (which correctly routes its body through
   `$ec_lang['about_body_html']`):
@@ -52,14 +54,14 @@ The rules, sequence, and QA chain for translation work are **not** restated here
 - **`CLAUDE.md` § "Translation Sprints"** — sprint mechanics, model policy, pre/post-sprint checklist.
 - **`dev/translation-execution-log.md`** — the full dated, category-by-category execution record.
 
-Item 85 (category-by-category complete re-translation, all 6 calculator categories) is **closed**
-— see its Completed entry below for the full status table and history. Its open threads (42
-glossary reconciliation, 38 orphan-key housekeeping, 40/43/44/45 native-review backlog) were all
-separately closed 2026-07-13. The two suite-wide
-prerequisites item 85 depended on — **Wave 0** English reform and **item 90** key consolidation —
-both ran once, up front, and are done (see their own Completed entries).
+Task id:85 (category-by-category complete re-translation, all 6 calculator categories) is
+**closed** — see its Completed entry below for the full status table and history. Its open
+threads (id:42 glossary reconciliation, id:38 orphan-key housekeeping, id:40/id:43/id:44/id:45
+native-review backlog) were all separately closed 2026-07-13. The two suite-wide prerequisites
+id:85 depended on — **Wave 0** English reform and **id:90** key consolidation — both ran once, up
+front, and are done (see their own Completed entries).
 
-- 30|[H] Bulgarian scope question for the native engineer (dev/Bulgarian-engineer-feedback.md):
+- 30|[H] id:80 Bulgarian scope question for the native engineer (dev/Bulgarian-engineer-feedback.md):
   (3) Invite review of the freshly rewritten bg ip_ notes/tooltips and of Bulgarian
   menu-title casing (their corrections use sentence case; many bg titles are Title Case).
   Priority dropped 80→30 now that (1) and (2), the substantive terminology questions, are closed —
@@ -85,7 +87,7 @@ both ran once, up front, and are done (see their own Completed entries).
     via our own best-effort sentence-case sweep if no review is realistically coming. Feedback 2026-07-13 from bg engineer: In the language menu, maybe you can make Български with a capital Б, I guess it could bother someone it's the only language with a small letter. In the dw calculator, the label for e is more verbose than English; is this a problem in many languages? Дължина на провеждащия тръбопровод или улей
 
 
-- 24|English improvements: 
+- 24|id:94 English improvements: 
 1. Change 
 "Do you have a great vision for a calculator to add here? Can you help me improve translations, program, or host these calculators?"
 to
@@ -111,7 +113,7 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Completed
 
-- 0|[CC] **DONE 2026-07-13: Item 38 closed — orphan-key full-suite housekeeping.** Ran
+- 0|[CC] id:38 **DONE 2026-07-13: Item 38 closed — orphan-key full-suite housekeeping.** Ran
   `dev/scripts/lang_parity_check.php` across all 26 non-English lang files to get the authoritative
   "extra" (present in translated file, absent from English source) list: 30 keys — `cs_notes_1_term`,
   `cs_notes_4_term`, `cs_wp`, `ip_e`, `ip_hv`, `ip_notes_1_term`, `ip_notes_4_term`, `ip_v`, `mhp_f`,
@@ -131,7 +133,7 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
   `extra: 0` suite-wide (was 759 nonzero across languages); `lang_syntax_validate.php` clean (only
   pre-existing, unrelated `identical-to-english` advisories).
 
-- 0|[CC] **DONE 2026-07-13: Item 42 closed — cross-language glossary reconciliation pass.**
+- 0|[CC] id:42 **DONE 2026-07-13: Item 42 closed — cross-language glossary reconciliation pass.**
   Checked `glossary.json`'s `preferred_translation` against actual shipped lang-file usage for the
   5 terms flagged by independent category-5-wave-1 agents (it, pt×3, ru, tr). Confirmed 6 genuine
   glossary-stale entries and updated them to match the incumbent, internally-consistent file terms:
@@ -145,7 +147,7 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
   riprap, `taş dolgu` vs `parça taşı`) — logged as a new item above rather than silently editing
   shipped translated sentences. No lang files changed; `glossary.json` only (version 1.5→1.6).
 
-- 0|[CC] **DONE 2026-07-13: Item 55 closed — whole-label hover/tap target for tips.** Added
+- 0|[CC] id:55 **DONE 2026-07-13: Item 55 closed — whole-label hover/tap target for tips.** Added
   `.ec-help { cursor: help; }` to `css/engcalcs.css`, updated the Bootstrap tooltip-init selector in
   `js/Calculators.lib.js` to also match `.ec-help[title]`, and mechanically migrated all 956
   `class="ec-tip"` occurrences across all 27 `lib/lang.ec.*.php` files to the
@@ -157,7 +159,7 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
   `$ec_lang_intent` entries were untouched. `dev/scripts/lang_syntax_validate.php` clean (only
   pre-existing, unrelated `identical-to-english` advisories); `php -l` clean on all 27 files.
 
-- 0|[CC] **DONE 2026-07-12: Item 85 closed — complete re-translation of every calculator category
+- 0|[CC] id:85 **DONE 2026-07-12: Item 85 closed — complete re-translation of every calculator category
   into all 26 languages, category by category** — rules & sequence in
   `dev/translation-process.md` Scenario C, mechanics in CLAUDE.md § "Translation Sprints."
 
@@ -179,7 +181,7 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
   separately, 2026-07-13. Items 40, 43, 44, and 45 (also spun off
   from 85) were separately closed 2026-07-13.
 
-- 0|[CC] **DONE 2026-07-13: Items 40 and 43 closed — native-review backlog resolved by best-effort
+- 0|[CC] id:40 id:43 **DONE 2026-07-13: Items 40 and 43 closed — native-review backlog resolved by best-effort
   verification instead of waiting for a native reviewer (Tom's call: "it's pie-in-the-sky to wait for
   human review that may never come").** Ran a research pass over every item-43-flagged concern for
   am/km/my/ps/sw plus the he/hi/ur/ps/ur items item 43 named explicitly, checked current lang-file
@@ -230,7 +232,7 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     requires the full back-translation-checked + cross-language-consistency-checked treatment across
     the whole file, not a targeted patch.
 
-- 0|[CC] **DONE 2026-07-13: Item 44 closed — D50 "median" mistranslation resolved via 12-language
+- 0|[CC] id:44 **DONE 2026-07-13: Item 44 closed — D50 "median" mistranslation resolved via 12-language
   research vote, not native review.** Tom's call: since no native reviewer was available, research
   each flagged language's actual geotechnical/sedimentology literature (web search) to see how the
   vote leans overall, rather than blocking on human input per language. Spawned one research agent
@@ -246,7 +248,7 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
   files; `lang_syntax_validate.php` shows only pre-existing, unrelated `identical-to-english`
   advisories. Full per-language findings and citations in the conversation record.
 
-- 0|[CC] **DONE 2026-07-12: Item 45 closed — suite-wide baked-in verdict-glyph sweep.** Ran the
+- 0|[CC] id:45 **DONE 2026-07-12: Item 45 closed — suite-wide baked-in verdict-glyph sweep.** Ran the
   mechanical grep the item called for across every verdict-string key actually passed as
   `writeCheckHTML()`/`writeVelocityCheck()`'s `shortText` argument (27 keys spanning
   `mhp_vel_*_short`, `or_regime_*`, `mhp_hl_*`, `odt_h2_*`, `cs_loss_negative`/`cs_Ec_*`, `rc_pond_*`/
@@ -259,10 +261,10 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 - 0|[CC/H] **DONE 2026-07-07: Concept-level label normalization (design exploration; raised by Tom 2026-07-06).** The original design attempted to economize by using atomized language variables at the *word* level, which made both translation and maintenance hard. Explore revisiting economizing by normalizing at the *concept* level instead: adopt one canonical, reusable label per concept — borrowed from whichever existing calculator has a good set — rather than per-calculator wording. First candidates to review critically: (a) **elevation** — use identical label wording wherever any calculator asks for an elevation, with the tooltip optionally broken into a few per-context variants; (b) **length** — drop the qualifier ("channel"/"reach"/"pipe") from "channel length"/"reach length"/"pipe length" and lean on the page title for disambiguation. Payoff: shrinks the translation surface and eases maintenance across the suite. Do a reuse-candidate audit before committing. Model split: Fable for the cross-calculator language survey; Opus/Tom for the reuse-architecture decision. Priority number provisional.
   - **Fable survey DONE 2026-07-07 → `dev/label-normalization-survey.md`.** Key findings: cross-prefix borrowing already exists (Darcy-Weisbach.php uses mpf_/mphl_/hw_ keys), so the decision is ownership policy, not mechanism; ~18 exact-duplicate keys mergeable with zero wording decisions (incl. the 7-key mtc_/mhp_ velocity-check block); strongest wording cluster is the head-loss triad + minor/junction-loss coefficient across mphl_/mhp_/ip_; candidate (a) elevation supported as shared-bare-key + closed qualified set (Orifice Flow needs 4 distinct elevations on one page, so bare-only is too strong); candidate (b) length supported for mphl_/mhp_ only — keep "Reach length" (cs_) and "Weir length" (ws_) as load-bearing. Survey §6 has the ranked shortlist.
   - **Opus/Tom architecture decision DONE 2026-07-07 → `dev/label-normalization-decision.md`.** Six rulings: **D1** borrow-from-owner, no neutral prefix, **menu order** breaks ties (`mpf_→mphl_→hw_→dw_→mtc_→mi_→rc_→mhp_→or_→odt_→ws_→wi_→cs_→ip_`); **D2** menu order picks the surviving *key*, best cluster wording picks its *value*; **D3** "**Minor (local) loss**" canonical (merges mphl_ "junction loss" + mhp_/ip_ "minor loss"; rename `mphl_total_junction_k`); **D4** lowercase loss symbols `h_f`/`h_m`/`h_L`, coeff `k_m`, capital `H` reserved for total/gross/net head; **D5** verdict strings = leading `✓`/`⚠` glyph (decorative, untranslated) + short text, **whole string is the `ec-tip` tooltip target** (fixes `writeVelocityCheck`'s glyph-only tap target); **D6** merges execute **per category, just before its Wave 0/wave-1** (not one suite pass), so each shrinks the paid sprint that follows. Recorded in glossary.json (v1.4: minor⇄local, lowercase loss symbols) and CLAUDE.md (Concept-level label reuse + Verdict convention subsections). **Execution backlog (8 items, ranked value÷risk)** — see decision doc's "Execution backlog" and §6 of the survey. (Ruling **D6 was REVERSED 2026-07-07** — see next bullet; it originally, wrongly, handed execution to item 85's per-calculator-category loop.)
-  - **CORRECTION 2026-07-07 (Tom + Opus) — item 90 REOPENED as a standalone, FULL-SUITE project; ruling D6 REVERSED.** Closing 90 as "decision-only" and routing its merges through item 85's per-calculator-category loop was the mistake that poisoned 85. Key consolidation is inherently cross-cutting: a duplicate label's two halves live in *different* calculator categories, so no per-category view can make the merge/ownership call (proved this session — open-channel's merge candidates were shared with weirs, irrigation, and micro-hydro). **New structure:** item 90 = **one English-only pass over ALL calculators**, executed by **Opus** (context-hot; this is architecture/sequencing, not a linguistic sweep; Fable's survey is already done). It is a prerequisite English-reform step, **decoupled from item 85**; the merge step that had been inserted into item 85's per-category loop is removed. **Corrected end-to-end sequence:** (1) item 90 full-suite key consolidation [Opus, English-only, applies D1–D5 + D7 merge method] **+** Wave 0 colloquialism cleanup for the remaining calculator categories [Fable] → (2) **translation tier/wave 1 (anchors) — INTERACTIVE**; translating into cognates is how we still catch garbage English, so wave 1 may still reform the source → (3) **English then FREEZES for tiers/waves 2+** → complete re-translation of waves 2–3 [major non-Latin → low-resource; full backtranslate + native-review QA] → (4) build the §10.5 per-key English **source-hash LAST** (deferred: with a complete re-translation there is nothing to delta-gate *this* pass; the hash earns its keep only for *future* incremental English edits). Terminology throughout: **"calculator categories"** (the 6 calc groupings; Tom's word, 2026-07-07) vs **"translation tiers/waves"** (language groupings) — never bare "families". The tips standard (blue `?` affordance + whole-label hover/tap target) is split off as its own item under CSS Standardization Follow-up. **Scope reminder (Tom, 2026-07-07): item 90 is NOT finished until the ENTIRE survey (`dev/label-normalization-survey.md`, §1–§6) is addressed** — executed or explicitly dispositioned keep-as-is. Progress is tracked row-by-row in **`dev/label-normalization-tracker.md`** (the completion gate: every row ☑/◇, 5 open wording decisions ruled, QA clean). The exact-duplicate merges (§2) are only the first of ~10 survey areas. **Status:** roadmap decoupled 2026-07-07; tracker built; 5 open wording decisions surfaced (velocity-shorts, elevation owners, roughness-`e`, weir "height"vs"head", S₀↔S_f safety) — resolve those, then execute top-to-bottom on Opus.
+  - **CORRECTION 2026-07-07 (Tom + Opus) — item 90 (id:90) REOPENED as a standalone, FULL-SUITE project; ruling D6 REVERSED.** Closing 90 as "decision-only" and routing its merges through item 85's per-calculator-category loop was the mistake that poisoned 85. Key consolidation is inherently cross-cutting: a duplicate label's two halves live in *different* calculator categories, so no per-category view can make the merge/ownership call (proved this session — open-channel's merge candidates were shared with weirs, irrigation, and micro-hydro). **New structure:** item 90 = **one English-only pass over ALL calculators**, executed by **Opus** (context-hot; this is architecture/sequencing, not a linguistic sweep; Fable's survey is already done). It is a prerequisite English-reform step, **decoupled from item 85**; the merge step that had been inserted into item 85's per-category loop is removed. **Corrected end-to-end sequence:** (1) item 90 full-suite key consolidation [Opus, English-only, applies D1–D5 + D7 merge method] **+** Wave 0 colloquialism cleanup for the remaining calculator categories [Fable] → (2) **translation tier/wave 1 (anchors) — INTERACTIVE**; translating into cognates is how we still catch garbage English, so wave 1 may still reform the source → (3) **English then FREEZES for tiers/waves 2+** → complete re-translation of waves 2–3 [major non-Latin → low-resource; full backtranslate + native-review QA] → (4) build the §10.5 per-key English **source-hash LAST** (deferred: with a complete re-translation there is nothing to delta-gate *this* pass; the hash earns its keep only for *future* incremental English edits). Terminology throughout: **"calculator categories"** (the 6 calc groupings; Tom's word, 2026-07-07) vs **"translation tiers/waves"** (language groupings) — never bare "families". The tips standard (blue `?` affordance + whole-label hover/tap target) is split off as its own item under CSS Standardization Follow-up. **Scope reminder (Tom, 2026-07-07): item 90 is NOT finished until the ENTIRE survey (`dev/label-normalization-survey.md`, §1–§6) is addressed** — executed or explicitly dispositioned keep-as-is. Progress is tracked row-by-row in **`dev/label-normalization-tracker.md`** (the completion gate: every row ☑/◇, 5 open wording decisions ruled, QA clean). The exact-duplicate merges (§2) are only the first of ~10 survey areas. **Status:** roadmap decoupled 2026-07-07; tracker built; 5 open wording decisions surfaced (velocity-shorts, elevation owners, roughness-`e`, weir "height"vs"head", S₀↔S_f safety) — resolve those, then execute top-to-bottom on Opus.
   - **DONE 2026-07-07 — full execution complete, every `dev/label-normalization-tracker.md` row ☑/◇.** §1–§3 (ownership policy, ~18 exact-duplicate merges, 8 concept clusters) executed in prior sessions this same day. §4 typography ride-alongs: area symbols standardized to uppercase `A`/`A₀` (owner incumbency over mpf_'s lowercase `a`), `Q₀`/`z₁`/`z₂` given proper `<sub>` subscripts, Froude `F`→`Fr`, `tau`→`&tau;`, `mi_hv617` `H_v`→`h_v` (incl. its `$ec_lang_intent`, Tom-authorized), and all 10 remaining `style="cursor:help;color:#06c;…"` spans (mtc_/rc_) converted to `class="ec-tip"`. §5 verdict convention (D5): new shared `EngCalcs.writeCheckHTML(ok, shortText, tipText)` in `js/Calculators.lib.js`; `writeVelocityCheck` rewritten so the whole string (not just the ⚠ glyph) is the `.ec-tip` tap target. The other 5 ad-hoc verdict groups (`or_regime_*`, `odt_h2_*`, `cs_loss_*`, `mhp_hl_*`, `rc_sg_*`/`rc_SD_*` — the latter rode along, same defect as `rc_sg_*` though not separately listed in the tracker) had their baked-in long strings split into a short label + new English-only `*_tip` key per D7. QA: `php -l` + `node --check` clean on every touched file, `lang_syntax_validate.php` clean, all touched calculator pages render with no fatals via CLI PHP. New `_tip`/split keys show as "missing" in the 26 non-English files — expected propagation worklist for item 85 (D7), not a defect.
 
-- 0|[CC] **DONE 2026-07-07:** Reversed the `dw_roughness` over-consolidation (was item 86). `dw_roughness` restored to `'Roughness, e'` (dw_/mhp_ wide-form labels); new key `ip_roughness`='e' added for Irrigation-Pressure's narrow table column; both keep sharing `dw_roughness_tip`. English-only per item 90 convention (`dev/label-normalization-decision.md`: non-English files aren't touched during consolidation work) — Tom confirmed deferring the 26-language propagation to item 85, or leaving the key empty/English-fallback in the interim is fine. `ip_roughness` doesn't yet exist in the 26 non-English files, so it silently falls back to the English value there (same load order as any other missing key) until propagated.
+- 0|[CC] id:86 **DONE 2026-07-07:** Reversed the `dw_roughness` over-consolidation (was item 86). `dw_roughness` restored to `'Roughness, e'` (dw_/mhp_ wide-form labels); new key `ip_roughness`='e' added for Irrigation-Pressure's narrow table column; both keep sharing `dw_roughness_tip`. English-only per item 90 convention (`dev/label-normalization-decision.md`: non-English files aren't touched during consolidation work) — Tom confirmed deferring the 26-language propagation to item 85, or leaving the key empty/English-fallback in the interim is fine. `ip_roughness` doesn't yet exist in the 26 non-English files, so it silently falls back to the English value there (same load order as any other missing key) until propagated.
 
 - 0|TypeScript migration item closed as stale, 2026-07-05 (Human authorization): item was conditional on its own face ("only worthwhile if the project scope grows significantly") and no such growth has occurred — no bundler, no npm dependencies, no build step exist in this codebase today, and adding a `tsc` toolchain would cut against that simplicity for no observed type-safety pain. Closed with no code changes; revisit if the project scope grows enough to justify the tooling.
 
