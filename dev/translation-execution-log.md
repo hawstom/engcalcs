@@ -1355,3 +1355,78 @@ a translation) can substitute for native review when the underlying question is 
 than a matter of taste — but only when, as here, most languages return a clear, citable answer. A
 minority of genuinely inconclusive results (had one arisen) would still need a human or native
 reviewer, not a tie-break by majority vote.
+
+## 2026-07-13: Items 40 and 43 closed — native-review backlog resolved by best-effort verification
+
+Tom's directive: waiting on native review that may never arrive is a pipe dream (already
+memorialized 2026-07-12); do our own best-effort verification now and let the language's `QUALITY`
+score itself carry the honest "needs review" signal, rather than parking item 43 open indefinitely.
+
+**Research pass:** an Explore agent read `dev/ROADMAP.md` item 43 and the full execution log,
+cross-checked every flagged concern against the *current* lang-file contents (several log entries
+were stale — e.g. `mi_station` had already been fixed in the 2026-07-08 pass but the item-43 text
+still described it as unresolved), and produced a complete current-state inventory organized by
+language and key. Full inventory available in the conversation record; summary of dispositions
+below.
+
+**Fixed:**
+- **ps/ur `mi_tau` (item 40, second half).** The wave-3 sprint fixed `mpf_shear_stress` for both
+  languages but explicitly left `mi_tau` (category 1) out of scope. Confirmed both still carried the
+  literal scissors word — ps `قیچي`, ur `قینچی`. Changed both to `برش` (the same shear/cut-noun root
+  each language's own `mpf_shear_stress` already uses correctly), preserving the existing `<br />`
+  column-heading layout (`لاندینۍ<br />برش<br />&tau;` / `تہ کی<br />برش &tau;`). **Item 40 is now
+  fully closed** — no more scissors false-cognates in either language.
+- **sw `or_hwe` asymmetry.** Was `'Kiwango cha maji juu ya mlango'` (level of water above the gate)
+  paired with `'Kiwango cha maji ya mkia'` (level of the tail-water) — an odd construction, since
+  every other language pairs headwater/tailwater with a parallel grammatical structure (fr
+  amont/aval, es arriba/abajo, ar علوية/سفلية, hi अपस्ट्रीम/डाउनस्ट्रीम, am's own
+  የላይ ዳርቻ ከፍታ/የወረድ ዳርቻ ከፍታ). Changed to `'Kiwango cha maji ya kichwa'` (head-water), now a
+  parallel head/tail pair with the existing `mkia` (tail-water) — mirrors the English
+  headwater/tailwater metaphor directly and is a minimal, low-risk change (only the `hwe` side
+  touched, `mkia` untouched).
+- **ps `rc_sg` glossary entry.** `glossary.json`'s ps translation (`ستومانه وزن`, literally "heavy
+  weight") was stale and didn't even match the file's own already-correct term (`ځانګړی ثقل`) —
+  same "glossary is stale, file is fine" pattern as item 42. Corrected the glossary entry to match
+  the incumbent file term.
+
+**Verified as correct, not touched:**
+- **km/sw `mpf_shear_stress` action-noun shear-stress root.** Checked the actual roots: sw `mkato`
+  (a cut/incision, from *kata* "to cut") and km `កាត់` (the verb "to cut") are action/process nouns
+  — distinct from the scissors-*tool* nouns (sw `mkasi`, km `កន្ត្រៃ`) that would repeat the item-40
+  trap. Same non-error class as Arabic's own standard term `إجهاد القص` and Hebrew's `מאמץ גזירה`,
+  both built on cutting roots and both accepted engineering usage (shear stress and cutting are
+  etymologically related in English too — sheep *shears*). Confirmed distinct from a real
+  false-cognate; left as-is.
+- **he `rc_sg` "specific weight" term.** `משקל סגולי` verified as the standard Hebrew
+  physics-curriculum term for this dimensionless ratio, the same accepted local-practice exception
+  already on file for tr `özgül ağırlık` / sr `специфична тежина` / hr `specifična težina`. Added he
+  to that exception list in `glossary.json`'s `translation_notes` rather than "fixing" it into an
+  error.
+
+**Discovered, out of scope (not a translation defect):** am's `mhp_flow`/`mhp_roughness`/`mhp_km`/
+`mhp_nu`/`mhp_velocity`/`mhp_f`/`mhp_hf`/`mhp_hm`/`mhp_hl` keys don't exist in
+`lib/lang.ec.en.php` at all and aren't referenced by `Micro-Hydro-Power.php` (only `mhp_hl_check`,
+which already correctly says "Head loss check," is live) — dead orphaned keys unique to the am file
+from some earlier design, not a translation quality issue. Left for a future dead-key cleanup pass.
+
+**Left open — genuinely needs a fluent reviewer, no safe fix available:** am `mi_tau`'s shear
+rendering (`ሸርፍ`, plausible but not independently confirmable); km's `mtc_vel_low` sedimentation
+word choice, `wi_pondingHeight` term choice, the kept-in-Latin-script "re-entrant" in
+`or_notes_3_def` and "Micro-Hydro" in `mhp_main_title`; my `ws_headWaterHeight` phrasing; ps
+register in `or_notes_3_def`/`odt_notes_2_def`; sw's "tooltip phrasing" flag (no specific key was
+ever recorded against it in the log, so there's nothing concrete to act on) and sw's
+incumbent-vs-glossary term choices (already correctly kept per the incumbency principle — an item-42
+glossary-reconciliation question, not an item-43 native-review one).
+
+**QUALITY scores intentionally left unchanged** (am/km/my/ps/sw stay at `0.65`). This pass verified
+specific flagged concerns, not the whole suite for these 5 languages end-to-end — per CLAUDE.md's
+tier policy, `0.65`→`0.85` requires full back-translation-checked + cross-language-consistency-checked
+coverage of the entire file, which this targeted pass doesn't constitute. The `0.65` score itself is
+the intended, honest, standing "needs review" signal per Tom's framing — it isn't a to-do that gets
+silently cleared by a partial pass.
+
+**QA:** `php -l` clean on `lib/lang.ec.{ps,ur,sw}.php`. `lang_syntax_validate.php --lang=ps,ur,sw`
+shows only 7 pre-existing, unrelated `identical-to-english` advisories (none touch the edited keys).
+`glossary.json` re-validated as parseable JSON after both edits.
+
+**Items 40 and 43 closed.**

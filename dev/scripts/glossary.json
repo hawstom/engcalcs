@@ -1760,7 +1760,7 @@
       "term": "specific gravity",
       "symbol": "sg",
       "context": "Dimensionless ratio of a material's density to the density of water. Typical crushed granite or basalt ≈ 2.65. Robinson method valid range: 2.54–2.82. Appears in Rock Chute Design and Manning Trapezoidal Channel calculators.",
-      "translation_notes": "Dimensionless ratio — not specific weight, which has units (ro \"greutatea specifică\" wrong; use \"densitate relativă\"; same trap hit de \"spezifisches Gewicht\"→\"relative Dichte\" and ru \"удельный вес\"→\"относительная плотность\" in the category-1 wave-1 back-translation QA, 2026-07-08). Where local practice uses the specific-weight word for this ratio (tr \"özgül ağırlık\", sr \"специфична тежина\", hr \"specifična težina\"), keep local practice but never attach units.",
+      "translation_notes": "Dimensionless ratio — not specific weight, which has units (ro \"greutatea specifică\" wrong; use \"densitate relativă\"; same trap hit de \"spezifisches Gewicht\"→\"relative Dichte\" and ru \"удельный вес\"→\"относительная плотность\" in the category-1 wave-1 back-translation QA, 2026-07-08). Where local practice uses the specific-weight word for this ratio (tr \"özgül ağırlık\", sr \"специфична тежина\", hr \"specifična težina\", he \"משקל סגולי\" — the standard Hebrew physics-curriculum term, verified 2026-07-13 as a naming-convention match rather than a units error, same class as tr/sr/hr), keep local practice but never attach units. ps glossary entry corrected 2026-07-13 from a stale \"heavy weight\" mistranslation (ستومانه وزن) to match the already-correct incumbent file term ځانګړی ثقل (lit. \"specific gravitas,\" the standard Perso-Arabic-derived scientific term — parallel to English's own \"gravity\" naming, not a units error).",
       "translations": {
         "am": "ልዩ ስበት",
         "ar": "الكثافة النسبية",
@@ -1778,7 +1778,7 @@
         "it": "peso specifico relativo",
         "km": "ទំងន់ចំពោះ",
         "my": "တိကျသောဆွဲငင်အား",
-        "ps": "ستومانه وزن",
+        "ps": "ځانګړی ثقل",
         "pt": "densidade relativa",
         "ro": "densitate relativă",
         "ru": "относительная плотность",

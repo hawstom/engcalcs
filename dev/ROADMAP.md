@@ -14,23 +14,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 ## Translation Standardization (Glossary Project)
 
-- 40|[H] Suite-wide Pashto (ps) **and Urdu (ur)** false-cognate: "shear" is rendered as `قیچي`/`قینچی`
-  (both literally "scissors" — cognate words) in both `mi_tau` (category 1) and `mpf_shear_stress`
-  (category 3), found by the category-1 wave-3 (ps) and retroactive wave-2 QA (ur) agents 2026-07-08.
-  Not fixed in category 1 alone — it's the established term across categories in both languages, so a
-  category-1-only fix would create suite-wide inconsistency; needs a correct replacement term decided
-  once per language and applied everywhere `قیچي`/`قینچی` is used for "shear," not per-category.
-
-- 43|[H] **Native-review backlog (consolidated).** am/km/my/ps/sw carry the standing mandatory
-  native-review flag across every category (reflected in their `0.65` QUALITY tier in
-  `lib/Language.Settings.php`); no verified native reviewer has yet touched them. Specific
-  higher-confidence-needed items surfaced during item 85 and awaiting a native check: the he/hi/ur
-  "station"→surveying-chainage terminology (category 1), sw's asymmetric headwater/tailwater
-  construction (category 2), km/sw action-noun shear-stress terms (category 3), and assorted
-  per-sprint residual-uncertainty flags recorded in `dev/translation-execution-log.md`. When a native
-  reviewer lands, apply corrections to the lang file, record verified terms in `glossary.json`, and
-  bump the language's QUALITY score per CLAUDE.md's tier policy.
-
 - 42|[CC] **Cross-language glossary reconciliation pass (item-90-style, but cross-language not
   cross-category).** Multiple languages carry an internally-consistent incumbent file term that
   diverges from `glossary.json`'s `preferred_translation` for the same concept (e.g. it `pietrame`
@@ -98,8 +81,8 @@ consolidation — both ran once, up front, and are done (see their Completed ent
   category — rules & sequence in `dev/translation-process.md` Scenario C, mechanics in CLAUDE.md
   § "Translation Sprints." Status: see the table above. Full dated execution history:
   `dev/translation-execution-log.md`. Open threads carried forward, each tracked as its own item
-  under "Translation Standardization" above: items 40, 45, 44 (D₅₀ median), 43 (native-review
-  backlog), 42 (glossary reconciliation), 38 (orphan-key housekeeping).
+  under "Translation Standardization" above: items 45, 44 (D₅₀ median), 42 (glossary reconciliation),
+  38 (orphan-key housekeeping). Items 40 and 43 closed 2026-07-13 (see Completed).
 
 - 80|[H] Bulgarian scope question for the native engineer (dev/Bulgarian-engineer-feedback.md): (1) should "дебит" become "водно количество" suite-wide (pipes/irrigation too) or only in open-channel/hydraulic-structure contexts? Currently applied only to rc_/or_ strings they corrected. (2) Confirm "коефициент на едрозърнестост" as the standard term for the D84.1/D50 gradation SD (vs "коефициент на разнозърненост"), ideally with a source. (3) Invite review of the freshly rewritten bg ip_ notes/tooltips and of Bulgarian menu-title casing (their corrections use sentence case; many bg titles are Title Case).
   - **RESPONSE received 2026-07-06 (Tom relayed engineer):** On (1) — engineer says *both* дебит and водно количество work: "дебит is a typical colloquial call… regular people and non-hydraulic engineers use it. In university (hydraulic engineering) they used водно количество for Q, never дебит." So водно количество is the academic/hydraulic register, дебит the general register; since both are acceptable, possibly we can use the longer in titles and descriptions and the shorter where we need to conserve width. Recorded verbatim in glossary.json `flow` translation_notes. On (2)/coefficient — engineer: "Коефициент на градация (SD) = D₈₄.₁ / D₅₀".
@@ -116,6 +99,57 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|[CC] **DONE 2026-07-13: Items 40 and 43 closed — native-review backlog resolved by best-effort
+  verification instead of waiting for a native reviewer (Tom's call: "it's pie-in-the-sky to wait for
+  human review that may never come").** Ran a research pass over every item-43-flagged concern for
+  am/km/my/ps/sw plus the he/hi/ur/ps/ur items item 43 named explicitly, checked current lang-file
+  values against the concern, and fixed what could be fixed without inventing new risk:
+  - **Item 40 (ps/ur "shear"=scissors false-cognate) fully closed.** `mpf_shear_stress` was already
+    fixed in both languages; `mi_tau` (category 1) was the one instance still carrying the literal
+    scissors word (`قیچي` ps / `قینچی` ur). Changed both to `برش` (the shear/cut-noun root already
+    established as correct in each language's own `mpf_shear_stress`), keeping the existing `<br />`
+    column-heading layout. `php -l` clean on both files.
+  - **sw `or_hwe`/`or_twe` asymmetry fixed.** Was `'Kiwango cha maji juu ya mlango'` (level of water
+    above the gate) paired with `'Kiwango cha maji ya mkia'` (level of the tail-water) — two different
+    grammatical constructions where every other language (fr amont/aval, es arriba/abajo, ar
+    علوية/سفلية, hi अपस्ट्रीम/डाउनस्ट्रीम) uses a parallel pair. Changed `or_hwe` to
+    `'Kiwango cha maji ya kichwa'` (head-water), mirroring the existing `mkia` (tail-water) — now a
+    parallel head/tail pair matching the English metaphor exactly, minimal change to the established
+    `mkia` term.
+  - **km/sw `mpf_shear_stress` action-noun root verified, not a defect.** Checked the actual root
+    words: sw `mkato` (a cut/incision, from *kata* "to cut") and km `កាត់` (the verb "to cut") are
+    action/process nouns, not the scissors-tool nouns (sw `mkasi`, km `កន្ត្រៃ`) — the same
+    non-error class as Arabic's own standard `إجهاد القص` and Hebrew's `מאמץ גזירה`, both built on
+    cutting roots and both accepted engineering terms. Confirmed distinct from the real item-40
+    scissors-tool trap; left as-is.
+  - **ps `rc_sg`/he `rc_sg` "specific gravity" glossary check.** ps's glossary.json entry
+    (`ستومانه وزن`, literally "heavy weight") was stale and did not even match the file's own
+    already-correct term (`ځانګړی ثقل`, the standard Perso-Arabic scientific term parallel to
+    English's own "gravity" naming) — glossary corrected to match the incumbent file term, same
+    pattern as item 42. he's `משקל סגولی` ("specific weight") verified as the standard Hebrew
+    physics-curriculum term for this ratio, same accepted local-practice exception already
+    documented for tr/özgül ağırlık/sr/hr — added to that exception list in glossary.json rather
+    than "corrected" into an error.
+  - **Discovered and left alone (out of scope):** am's `mhp_flow`/`mhp_roughness`/`mhp_km`/`mhp_nu`/
+    `mhp_velocity`/`mhp_f`/`mhp_hf`/`mhp_hm`/`mhp_hl` keys don't exist in `lib/lang.ec.en.php` at all
+    and aren't referenced by `Micro-Hydro-Power.php` — dead orphaned keys unique to the am file, not
+    a translation defect. Left for a future dead-key cleanup pass (item 38 territory), not touched
+    here.
+  - **Left open, genuinely needing a fluent reviewer (documented, not fixed):** am `mi_tau`'s shear
+    rendering (`ሸርፍ`) — plausible but I can't independently confirm Amharic engineering usage; km's
+    `mtc_vel_low` sedimentation word choice, `wi_pondingHeight`, the kept-in-Latin-script
+    "re-entrant" in `or_notes_3_def` and "Micro-Hydro" in `mhp_main_title`; my `ws_headWaterHeight`
+    phrasing; ps register in `or_notes_3_def`/`odt_notes_2_def`; sw's unnamed "tooltip phrasing" flag
+    (no specific key was ever recorded, so nothing to act on) and its incumbent-vs-glossary term
+    choices (already correctly kept per the incumbency principle, an item-42 question not an item-43
+    one).
+  - **QUALITY scores intentionally left unchanged** (am/km/my/ps/sw stay at `0.65`). Per Tom's framing,
+    the low score itself is the honest, permanent "needs review" flag — it wasn't earned by full-suite
+    independent back-translation coverage (only these specific flagged concerns got a second look), so
+    bumping it now would overstate verification depth. Per CLAUDE.md's tier policy, `0.65`→`0.85`
+    requires the full back-translation-checked + cross-language-consistency-checked treatment across
+    the whole file, not a targeted patch.
 
 - 0|[CC] **DONE 2026-07-13: Item 44 closed — D50 "median" mistranslation resolved via 12-language
   research vote, not native review.** Tom's call: since no native reviewer was available, research

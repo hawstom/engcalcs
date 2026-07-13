@@ -242,7 +242,7 @@ $ec_lang['or_shape_rectangular']='Mstatili';
 $ec_lang['or_diameter']='Kipenyo au urefu, D <span title="Kipenyo kwa duara; urefu kwa mstatili" class="ec-tip">?</span>';
 $ec_lang['or_width']='Upana, W <span title="Fursa za mstatili tu" class="ec-tip">?</span>';
 $ec_lang['or_invert']='Kiwango cha chini <span title="Chini ya ufunguzi" class="ec-tip">?</span>';
-$ec_lang['or_hwe']='Kiwango cha maji juu ya mlango';
+$ec_lang['or_hwe']='Kiwango cha maji ya kichwa';
 $ec_lang['or_twe']='Kiwango cha maji ya mkia';
 $ec_lang['or_cd']='Mgawo wa kutoka, C<sub>d</sub>';
 $ec_lang['or_centroid_elev']='Kiwango cha katikati';
