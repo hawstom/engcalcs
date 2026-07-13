@@ -12,18 +12,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 ## Translation Standardization (Glossary Project)
 
-- 75|97|[H] **tr riprap term inconsistency, found during the Task 93 glossary sweep (2026-07-13),
-  not fixed this pass.** `lib/lang.ec.tr.php` uses two different words for the same riprap concept:
-  `mtc_bend_angle` (category 1, older) says "taş dolgu"; all 4 riprap mentions in `rc_` (category 5,
-  Rock Chute, newer) say "parça taşı" instead. `glossary.json`'s tr riprap entry already said "taş
-  dolgu" — matching the older mtc_ term — before this pass, so the rock-chute translation agent
-  diverged from both the glossary and the established suite term, unlike the it/pt/ru/tr-penstock
-  cases in this same sweep where the glossary was what was stale. Needs a human call before editing:
-  is "parça taşı" actually a legitimate riprap synonym Turkish speakers would accept swapped for "taş
-  dolgu" in the 4 rc_ sentences (grammatical agreement/suffixes may differ), or should "taş dolgu" be
-  substituted in? Left untouched pending that judgment call rather than a blind find-replace on
-  shipped translated text.
-
 ## Translation improvements
 
 The rules, sequence, and QA chain for translation work are **not** restated here. They live in:
@@ -95,6 +83,24 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|97|[CC] **DONE 2026-07-13: Task 97 closed — tr riprap term unified on "taş dolgu".** Tom had no
+  way to adjudicate the Turkish-native judgment call himself ("I have no way of helping... you will
+  have to do your best"), so resolved via an Opus pass reasoning from suite convention rather than
+  native review: the English source treats "riprap" as one concept in all 5 spots (bulk material
+  and D₅₀ particle-size sizing alike), and every other language (es "enrocado", fr "enrochement",
+  pt "enrocamento", ru "каменная наброска") uses one bulk-material term throughout rather than
+  switching to a particle/fragment word for the sizing context — Turkish should match. Verdict:
+  "parça taşı" ("piece stone"/rock fragment) is not a real Turkish hydraulics term for riprap;
+  "taş dolgu" ("stone fill") is the established DSİ/TS term (cf. "taş dolgu baraj" = rockfill dam)
+  and already matched `mtc_bend_angle` (category 1, incumbent) and `glossary.json`. Replaced all 4
+  `rc_` occurrences (`rc_apron_length`, `rc_notes_1_def`, `rc_notes_3_def`, `rc_notes_6_def`) with
+  grammatically correct "taş dolgu" inflections (genitive "taş dolgunun" where the original had
+  possessive "parça taşının"; bare attributive "taş dolgu" elsewhere) — not a blind find-replace,
+  since Turkish compound/genitive suffixes differ by construction. `php -l` and
+  `lang_syntax_validate.php --lang=tr` both clean. No native Turkish review has occurred; this
+  stands as our own best-effort resolution (per the Task 90 native-review precedent), not a
+  pending "awaiting review" item.
 
 - 0|99|[CC] **DONE 2026-07-13: Task 99 closed — removed broken `mph` option from
   `Manning-Irregular.php`'s velocity unit select.** `echoUnitSelect($name='v617u', ...)` offered
