@@ -2,9 +2,7 @@
 
 This is a prioritized, bulleted roadmap for the EngCalcs hydraulic calculator suite.
 
-The format of each task is: `Priority|ID|status Description`. Priority: 0 means "Completed" and 100 means top priority; ties (same priority for multiple tasks) are okay; any whole number 0-100 can be used; priority is mutable and gets reused across tasks, and always drops to 0 on completion. ID is a permanent, ordinal task number — never reused, never changed, unrelated to priority — used whenever a task needs to be referenced by number (in another task's text, in a commit message, in `dev/` docs). Refer to a task in prose as "Task N", never "item N".
-
-**How IDs are assigned (2026-07-13):** every task in this file, open and completed, is numbered exactly once, in one continuous sequence: starting at the *bottom* of the `## Completed` section (the oldest completed entry = Task 1) and counting upward to the *top* of `## Completed` (the most recently completed entry gets the highest number in that block); numbering then continues into the still-open tasks above, ordered by priority from highest to lowest (ties broken by whichever appears first in the file). This is a one-time historical assignment — from now on, a newly created task gets the next unused ID at the moment it's first created or first needs to be cross-referenced, appended to the end of the current sequence; existing IDs are never renumbered to make room.
+The format of each task is: `Priority|ID|status Description`. Priority: 0 means "Completed" and 100 means top priority; ties (same priority for multiple tasks) are okay; any whole number 0-100 can be used; priority is mutable and gets reused across tasks, and always drops to 0 on completion. ID is a permanent, ordinal task number — never reused, never changed, unrelated to priority — used whenever a task needs to be referenced by number (in another task's text, in a commit message, in `dev/` docs). Refer to a task in prose as "Task N".
 
 Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Copilot, `[H]` = Human decision needed, `[CC→CP]` / `[CP→CC]` = split task (first actor works, then updates tag to the next plain tag when handing off). Untagged = actor-agnostic. See `cross-platform-planning.md` §2.2.2 for the full tag lifecycle.
 
@@ -12,11 +10,11 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 ## Calculator Improvements
 
-- 20|99|Bug (pre-existing, ~2021): `Manning-Irregular.php` velocity unit selects (`echoUnitSelect($name='v617u', ...)`, two occurrences around line 93) offer `mph` as a velocity unit choice, but `$ec_units['mph']` and `$ec_lang['u_mph']` don't exist (`lib/Units.lib.php` only defines `mps`/`ftps` for velocity). Produces PHP warnings and an empty/broken option in the unit dropdown. Fix: either add a proper `mph` conversion factor + label, or (more likely correct, since mph is unusual for open-channel velocities) drop `mph` from the Array and use `mps`/`ftps` only, matching every other velocity selector in the suite.
+- 80|99|Bug (pre-existing, ~2021): `Manning-Irregular.php` velocity unit selects (`echoUnitSelect($name='v617u', ...)`, two occurrences around line 93) offer `mph` as a velocity unit choice, but `$ec_units['mph']` and `$ec_lang['u_mph']` don't exist (`lib/Units.lib.php` only defines `mps`/`ftps` for velocity). Produces PHP warnings and an empty/broken option in the unit dropdown. Fix: either add a proper `mph` conversion factor + label, or (more likely correct, since mph is unusual for open-channel velocities) drop `mph` from the Array and use `mps`/`ftps` only, matching every other velocity selector in the suite.
 
 ## Translation Standardization (Glossary Project)
 
-- 25|97|[H] **tr riprap term inconsistency, found during the Task 93 glossary sweep (2026-07-13),
+- 75|97|[H] **tr riprap term inconsistency, found during the Task 93 glossary sweep (2026-07-13),
   not fixed this pass.** `lib/lang.ec.tr.php` uses two different words for the same riprap concept:
   `mtc_bend_angle` (category 1, older) says "taş dolgu"; all 4 riprap mentions in `rc_` (category 5,
   Rock Chute, newer) say "parça taşı" instead. `glossary.json`'s tr riprap entry already said "taş
@@ -28,24 +26,41 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   substituted in? Left untouched pending that judgment call rather than a blind find-replace on
   shipped translated text.
 
-- 30|95|[H] **Localization-bypass audit findings, 2026-07-12 (Tom's "holistic closing audit" for
-  Task 91 surfaced this gap class — hardcoded strings that never route through `$ec_lang`, so no
-  translation-quality pass would ever catch them).** Two content pages exist entirely outside the
-  localization system, unlike `About.php` (which correctly routes its body through
-  `$ec_lang['about_body_html']`):
+- 0|95|[CC] **DONE 2026-07-13: Localization-bypass audit findings, 2026-07-12 (Tom's "holistic
+  closing audit" for Task 91 surfaced this gap class — hardcoded strings that never route through
+  `$ec_lang`, so no translation-quality pass would ever catch them).** Two content pages exist
+  entirely outside the localization system, unlike `About.php` (which correctly routes its body
+  through `$ec_lang['about_body_html']`):
   - `Install.php` (66 lines, PWA install instructions) — 100% hardcoded English body.
   - `Orifice-Drain-Time-Ref.php` (786 lines, equation derivation reference) — 100% hardcoded
     English body; also linked from `Orifice-Drain-Time.php:47` via a hardcoded "Derivation"/
     "Equation derivation" link.
-  Needs a scope decision before any translation work starts: (1) restructure each page's body into
-  one `$ec_lang['*_body_html']` key (About.php's pattern) so it becomes translatable, (2) decide
-  whether these auxiliary/reference pages are in scope for full 26-language translation at all given
-  their length (786 lines is a full new translation sprint on its own), or (3) something narrower
-  (e.g. English-only with a note, or machine-translate with lower quality tier). Two small hardcoded
-  radio-button labels were also found in `Manning-Trap.php` (`Strickler`/`B/B`/`Isbash`/`Maynord`/
-  `Searcy`) — likely fine to leave untranslated as formula proper nouns, but flagged for confirmation
-  rather than assumed. `Compare-Languages.php` and `formmail.php` are internal/dev-utility pages, not
-  user-facing app content — out of scope, no action needed.
+  Three scope questions, all resolved 2026-07-13 (Tom):
+  1. **`Install.php`: translate it — moved to Task 100.** Tom's instinct was that it might be
+     redundant now that there's an in-app `⬇ Install` button (`EngCalcs.installPWA()`,
+     `js/Calculators.lib.js:29`). Checked and it isn't: that button only fires on browsers that
+     support `beforeinstallprompt` (Chrome/Edge), so it's silently useless on iOS Safari and
+     Firefox — which is most of Install.php's content (the iOS Share-menu steps, the "Firefox
+     doesn't support PWA install" note, the "what gets cached" explainer). Install.php is the only
+     working install path for those platforms, so it stays in scope and needs translating like any
+     other user-facing page. Execution (wave-0 English cleanup, then translate) split off as
+     **Task 100** rather than folded into this closure, since a 66-line page + a 786-line reference
+     page is a real undertaking, not a quick sub-item.
+  2. **`Orifice-Drain-Time-Ref.php`: English-only, permanently — including the "Derivation" /
+     "Equation derivation" link text.** 786 lines of equation-manipulation prose ("integrating both
+     sides," "substituting into," "rearranging yields") has a much higher mistranslation-consequence-
+     per-word ratio than UI labels — a wrong verb tense changes what the math claims — and
+     translating it right would be its own sprint for a page most users never open. English-only
+     reference links are a normal pattern (engineering software routinely links out to English-only
+     derivations/papers). No further action.
+  3. **`Manning-Trap.php` radio labels (`Strickler`/`B/B`, `Isbash`/`Maynord`/`Searcy`): leave
+     untranslated.** These are the surnames of the formulas' originators (citations, not descriptive
+     text). Confirmed this matches existing suite convention — `lib/lang.ec.ar.php` and
+     `lib/lang.ec.zh.php` already keep "Manning," "Darcy-Weisbach," and "Hazen-Williams" in Latin
+     script inline even in RTL/CJK text (zh glosses with a transliteration once, then reverts to
+     plain Latin). No script-rendering need; no code change.
+  `Compare-Languages.php` and `formmail.php` are internal/dev-utility pages, not user-facing app
+  content — out of scope, no action needed.
 
 ## Translation improvements
 
@@ -54,7 +69,7 @@ The rules, sequence, and QA chain for translation work are **not** restated here
 - **`CLAUDE.md` § "Translation Sprints"** — sprint mechanics, model policy, pre/post-sprint checklist.
 - **`dev/translation-execution-log.md`** — the full dated, category-by-category execution record.
 
-- 30|96|[H] Bulgarian scope question for the native engineer (dev/Bulgarian-engineer-feedback.md):
+- 19|96|[H] Bulgarian scope question for the native engineer (dev/Bulgarian-engineer-feedback.md):
   (3) Invite review of the freshly rewritten bg ip_ notes/tooltips and of Bulgarian
   menu-title casing (their corrections use sentence case; many bg titles are Title Case).
   Priority dropped 80→30 now that (1) and (2), the substantive terminology questions, are closed —
@@ -79,6 +94,19 @@ The rules, sequence, and QA chain for translation work are **not** restated here
     review" indefinitely — either send it to the engineer as a concrete, bounded ask, or close it
     via our own best-effort sentence-case sweep if no review is realistically coming. Feedback 2026-07-13 from bg engineer: In the language menu, maybe you can make Български with a capital Б, I guess it could bother someone it's the only language with a small letter. In the dw calculator, the label for e is more verbose than English; is this a problem in many languages? Дължина на провеждащия тръбопровод или улей
 
+- 18|100|[H] **`Install.php` localization (split from Task 95, 2026-07-13).** `Install.php` (66
+  lines, PWA install instructions) is 100% hardcoded English body text, outside `$ec_lang` entirely
+  — unlike `About.php`'s `$ec_lang['about_body_html']` pattern. Scope, per Tom 2026-07-13: it must
+  be translated (it's the only working install path on iOS Safari and Firefox, where the in-app
+  `⬇ Install` button silently does nothing — see Task 95 resolution #1). Sequence, Task-87-style:
+  (1) **Wave 0 first** — tighten and clarify the English body for concision before any translation
+  work starts, same discipline as Task 87's English-reform pass; this is a much smaller page than
+  Task 87's full-suite sweep, so likely doesn't need Opus, but re-evaluate if the pass turns out to
+  be nontrivial. (2) Restructure the body into `$ec_lang['install_body_html']` (or a small set of
+  section keys if a single blob is awkward — e.g. separate Android/iOS/Desktop/Firefox sections),
+  following `About.php`'s convention. (3) Run through the normal translation-sprint pipeline
+  (`dev/translation-process.md`) once the English is settled. Not yet scoped: whether this earns a
+  standalone sprint or rides along with an upcoming category's wave.
 
 - 24|98|English improvements: 
 1. Change 
