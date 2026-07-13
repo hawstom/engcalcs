@@ -10,8 +10,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 ## Calculator Improvements
 
-- 80|99|Bug (pre-existing, ~2021): `Manning-Irregular.php` velocity unit selects (`echoUnitSelect($name='v617u', ...)`, two occurrences around line 93) offer `mph` as a velocity unit choice, but `$ec_units['mph']` and `$ec_lang['u_mph']` don't exist (`lib/Units.lib.php` only defines `mps`/`ftps` for velocity). Produces PHP warnings and an empty/broken option in the unit dropdown. Fix: either add a proper `mph` conversion factor + label, or (more likely correct, since mph is unusual for open-channel velocities) drop `mph` from the Array and use `mps`/`ftps` only, matching every other velocity selector in the suite.
-
 ## Translation Standardization (Glossary Project)
 
 - 75|97|[H] **tr riprap term inconsistency, found during the Task 93 glossary sweep (2026-07-13),
@@ -97,6 +95,14 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|99|[CC] **DONE 2026-07-13: Task 99 closed — removed broken `mph` option from
+  `Manning-Irregular.php`'s velocity unit select.** `echoUnitSelect($name='v617u', ...)` offered
+  `mps`/`ftps`/`mph`, but `mph` has no backing `$ec_units['mph']` conversion factor or
+  `$ec_lang['u_mph']` label — the option rendered broken. Only one live occurrence found (the
+  original roadmap note said "two"; the second no longer exists). Fixed by dropping `mph` from the
+  Array, matching the `mps`/`ftps`-only pattern used by every other velocity selector in the suite
+  (verified against `Irrigation-Pressure.php:107`, the only other velocity selector). `php -l` clean.
 
 - 0|95|[CC] **DONE 2026-07-13: Localization-bypass audit findings, 2026-07-12 (Tom's "holistic
   closing audit" for Task 91 surfaced this gap class — hardcoded strings that never route through
