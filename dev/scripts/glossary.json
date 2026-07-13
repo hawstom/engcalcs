@@ -1,6 +1,6 @@
 {
   "meta": {
-    "version": "1.5",
+    "version": "1.6",
     "description": "Engineering term glossary for EngCalcs translation prompts. Preferred translations per language to prevent term drift across calculators and sprints. Covers all calculators including Rock Chute Design (Robinson), Micro-Hydro Power, and Manning series.",
     "usage": "Inject relevant entries as context in translation prompts: 'Use these preferred translations for technical terms: [terms for this calculator prefix]'. Entries with empty strings need a sprint to fill.",
     "language_codes": [
@@ -452,7 +452,7 @@
     {
       "term": "riprap",
       "context": "Angular rock placed to resist erosion on channel beds and banks. Appears in Manning Trapezoidal Channel and Rock Chute calculators.",
-      "translation_notes": "No direct single-word equivalent in most languages. Use the established local engineering term — this varies significantly by country. In Spanish, 'enrocado' (general) or 'escollera' (bank protection) are both used; lead with 'enrocado'. Bulgarian terms verified/corrected by a native Bulgarian engineer, 2026-07 (dev/Bulgarian-engineer-feedback.md). bg: 'каменна облицовка' (stone lining), not 'каменна наброска'.",
+      "translation_notes": "No direct single-word equivalent in most languages. Use the established local engineering term — this varies significantly by country. In Spanish, 'enrocado' (general) or 'escollera' (bank protection) are both used; lead with 'enrocado'. Bulgarian terms verified/corrected by a native Bulgarian engineer, 2026-07 (dev/Bulgarian-engineer-feedback.md). bg: 'каменна облицовка' (stone lining), not 'каменна наброска'. 2026-07-13 reconciliation pass (roadmap item 42): glossary updated to match incumbent, internally-consistent lang-file usage discovered by 5 independent category-5-wave-1 translation agents (it, pt, ru, tr) — glossary values were stale, not the shipped files.",
       "translations": {
         "am": "ሪፕራፕ",
         "ar": "حجارة الحماية",
@@ -467,7 +467,7 @@
         "hi": "पत्थर आवरण",
         "hr": "kameniti nasip",
         "id": "batu pasangan",
-        "it": "scogliera",
+        "it": "pietrame",
         "km": "ថ្មការពារ",
         "my": "ကျောက်ကာ",
         "ps": "د سیلاب مخنیوي ډبرې",
@@ -555,7 +555,7 @@
     {
       "term": "penstock",
       "context": "Pressure pipe carrying water from a reservoir or headpond down to a turbine in a micro-hydro system. Appears in Micro-Hydro Power calculator.",
-      "translation_notes": "'Penstock' is a specialized term with no exact one-word equivalent in many languages. Use the established civil/hydro engineering phrase for 'pressure conduit' or 'force main to turbine'. Czech: 'tlakovod' (pressure main) is preferred over the generic 'přiváděcí potrubí' (supply pipe). Serbian: 'напорни цевовод' is the standard hydraulic engineering term.",
+      "translation_notes": "'Penstock' is a specialized term with no exact one-word equivalent in many languages. Use the established civil/hydro engineering phrase for 'pressure conduit' or 'force main to turbine'. Czech: 'tlakovod' (pressure main) is preferred over the generic 'přiváděcí potrubí' (supply pipe). Serbian: 'напорни цевовод' is the standard hydraulic engineering term. 2026-07-13 reconciliation pass (roadmap item 42): glossary updated to match incumbent, internally-consistent lang-file usage discovered by 5 independent category-5-wave-1 translation agents (it, pt, ru, tr) — glossary values were stale, not the shipped files.",
       "translations": {
         "am": "ፔንስቶክ",
         "ar": "أنبوب الضغط",
@@ -574,12 +574,12 @@
         "km": "បំពង់សម្ពាធ",
         "my": "ဖိအားရေပိုက်",
         "ps": "د فشار لوله",
-        "pt": "conduto forçado",
+        "pt": "conduta forçada",
         "ro": "conductă sub presiune",
-        "ru": "напорный трубопровод",
+        "ru": "пенсток",
         "sr": "напорни цевовод",
         "sw": "bomba la shinikizo",
-        "tr": "basınç borusu",
+        "tr": "cebri boru",
         "uk": "напірний трубопровід",
         "ur": "دباؤ پائپ",
         "zh": "压力管道"
@@ -660,7 +660,7 @@
       "term": "plant efficiency",
       "symbol": "η",
       "context": "Overall efficiency of a micro-hydro power plant — product of turbine, generator, and transmission efficiencies. Dimensionless, 0–1. Appears in Micro-Hydro Power calculator.",
-      "translation_notes": "'Plant' here means the power plant/installation, not a living plant. Use the energy/electrical engineering term for overall system efficiency.",
+      "translation_notes": "'Plant' here means the power plant/installation, not a living plant. Use the energy/electrical engineering term for overall system efficiency. 2026-07-13 reconciliation pass (roadmap item 42): glossary updated to match incumbent, internally-consistent lang-file usage discovered by 5 independent category-5-wave-1 translation agents (it, pt, ru, tr) — glossary values were stale, not the shipped files.",
       "translations": {
         "am": "የሃይል ማመንጫ ብቃት",
         "ar": "كفاءة المحطة",
@@ -679,7 +679,7 @@
         "km": "ប្រសិទ្ធភាពរោងចក្រ",
         "my": "စက်ရုံထိရောက်မှု",
         "ps": "د پلانټ موثریت",
-        "pt": "eficiência da usina",
+        "pt": "rendimento da instalação",
         "ro": "eficiența instalației",
         "ru": "КПД установки",
         "sr": "ефикасност постројења",
@@ -1176,7 +1176,7 @@
       "term": "gradation",
       "symbol": "SD",
       "context": "The spread or uniformity of rock particle sizes. In the Robinson method, gradation is expressed as SD = D84.1/D50. Uniform rock ≈ 1.25; Robinson valid range 1.15–1.47. Appears in Rock Chute Design calculator.",
-      "translation_notes": "Use the geotechnical/hydraulic engineering term for grain size distribution or grading. Do not translate as 'grade' (implies quality). The symbol 'SD' and ratio notation D84.1/D50 are universal. Spanish/Portuguese: 'granulometría'/'granulometria'. French: 'granulométrie'. Russian/Bulgarian/Serbian: 'гранулометрический состав'. Chinese: '级配'. bg: native engineer confirmed 2026-07-06 the standard term for the D84.1/D50 gradation SD label is 'Коефициент на градация' (superseding the earlier 'коефициент на едрозърнестост' proposal and the alternative 'коефициент на разнозърненост'); applied in rc_SD/rc_SD_check.",
+      "translation_notes": "Use the geotechnical/hydraulic engineering term for grain size distribution or grading. Do not translate as 'grade' (implies quality). The symbol 'SD' and ratio notation D84.1/D50 are universal. Spanish/Portuguese: 'granulometría'/'granulometria'. French: 'granulométrie'. Russian/Bulgarian/Serbian: 'гранулометрический состав'. Chinese: '级配'. bg: native engineer confirmed 2026-07-06 the standard term for the D84.1/D50 gradation SD label is 'Коефициент на градация' (superseding the earlier 'коефициент на едрозърнестост' proposal and the alternative 'коефициент на разнозърненост'); applied in rc_SD/rc_SD_check. 2026-07-13 reconciliation pass (roadmap item 42): glossary updated to match incumbent, internally-consistent lang-file usage discovered by 5 independent category-5-wave-1 translation agents (it, pt, ru, tr) — glossary values were stale, not the shipped files.",
       "translations": {
         "am": "የድንጋይ ቅንብር ስርጭት",
         "ar": "التدرج الحبيبي",
@@ -1195,7 +1195,7 @@
         "km": "ការចាត់ថ្នាក់ទំហំថ្ម",
         "my": "ကျောက်အရွယ်အစားဖြန့်ဝေမှု",
         "ps": "د کاڼو د اندازو درجه‌بندي",
-        "pt": "granulometria",
+        "pt": "graduação",
         "ro": "granulometrie",
         "ru": "гранулометрический состав",
         "sr": "гранулометрија",

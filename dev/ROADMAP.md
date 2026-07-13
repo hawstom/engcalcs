@@ -14,14 +14,17 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 ## Translation Standardization (Glossary Project)
 
-- 42|[CC] **Cross-language glossary reconciliation pass (item-90-style, but cross-language not
-  cross-category).** Multiple languages carry an internally-consistent incumbent file term that
-  diverges from `glossary.json`'s `preferred_translation` for the same concept (e.g. it `pietrame`
-  for riprap, ru `пенсток` for penstock, hr `kameni žlijeb` — flagged by 5 of 14 agents in category
-  5 wave 1). Per the incumbency/ownership principle the agents correctly kept the file term; the
-  glossary is what's stale. Sweep the glossary against actual established file usage across all
-  languages and reconcile (the recurring "DATA-ERROR-FIX: glossary corrected to match incumbent
-  usage" pattern throughout the execution log, done reactively so far — do it once, deliberately).
+- 25|[H] **tr riprap term inconsistency, found during the item-42 glossary sweep (2026-07-13),
+  not fixed this pass.** `lib/lang.ec.tr.php` uses two different words for the same riprap concept:
+  `mtc_bend_angle` (category 1, older) says "taş dolgu"; all 4 riprap mentions in `rc_` (category 5,
+  Rock Chute, newer) say "parça taşı" instead. `glossary.json`'s tr riprap entry already said "taş
+  dolgu" — matching the older mtc_ term — before this pass, so the rock-chute translation agent
+  diverged from both the glossary and the established suite term, unlike the it/pt/ru/tr-penstock
+  cases in this same sweep where the glossary was what was stale. Needs a human call before editing:
+  is "parça taşı" actually a legitimate riprap synonym Turkish speakers would accept swapped for "taş
+  dolgu" in the 4 rc_ sentences (grammatical agreement/suffixes may differ), or should "taş dolgu" be
+  substituted in? Left untouched pending that judgment call rather than a blind find-replace on
+  shipped translated text.
 
 - 38|[CC] **Orphan-key full-suite housekeeping.** Several non-English lang files still carry keys no
   longer present in the English source (e.g. 8 orphan `ip_`-era keys in fa/zh/bn/ar/he/hi after ur
@@ -95,6 +98,20 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|[CC] **DONE 2026-07-13: Item 42 closed — cross-language glossary reconciliation pass.**
+  Checked `glossary.json`'s `preferred_translation` against actual shipped lang-file usage for the
+  5 terms flagged by independent category-5-wave-1 agents (it, pt×3, ru, tr). Confirmed 6 genuine
+  glossary-stale entries and updated them to match the incumbent, internally-consistent file terms:
+  it riprap `scogliera`→`pietrame`; pt penstock `conduto forçado`→`conduta forçada`; pt plant
+  efficiency `eficiência da usina`→`rendimento da instalação`; pt gradation `granulometria`→
+  `graduação`; ru penstock `напорный трубопровод`→`пенсток`; tr penstock `basınç borusu`→`cebri
+  boru`. hr rock chute (`kameni skluz` vs shipped `kameni žlijeb`) was left as-is — glossary already
+  flagged it "NEEDS HUMAN REVIEW" pending a decision on whether the *file* should change to parallel
+  sr/ru (`kameni brzotok`), not the glossary, so out of scope for a glossary-only reconciliation.
+  Along the way found one case where the glossary was actually right and the file had drifted (tr
+  riprap, `taş dolgu` vs `parça taşı`) — logged as a new item above rather than silently editing
+  shipped translated sentences. No lang files changed; `glossary.json` only (version 1.5→1.6).
 
 - 0|[CC] **DONE 2026-07-13: Item 55 closed — whole-label hover/tap target for tips.** Added
   `.ec-help { cursor: help; }` to `css/engcalcs.css`, updated the Bootstrap tooltip-init selector in

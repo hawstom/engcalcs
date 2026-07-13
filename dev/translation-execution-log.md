@@ -1463,3 +1463,50 @@ and is now linked from the app's main menu (`lib/Menus.lib.php`), `"Normal"` mea
 that menu link landed on a page with no engcalcs CSS and no way back to the app menu. Changed both
 to `echoHeader("EngCalcs", ..., false)`, matching the existing `About.php`/`Install.php` pattern
 for non-calculator content pages.
+
+## 2026-07-13: Item 42 closed — cross-language glossary reconciliation pass
+
+Roadmap item 42 asked for a deliberate sweep of `glossary.json`'s `preferred_translation` values
+against actual shipped lang-file usage, prompted by the category-5-wave-1 log entry where 5 of 14
+independent rock-chute translation agents (it, pt, ru, tr, hr) each flagged, unprompted, that their
+file's established term for a concept diverged from the glossary — and each correctly kept the file
+term per the incumbency principle, leaving the glossary as the confirmed stale side.
+
+**Checked each flagged case against the actual shipped file text** (not just trusting the log's
+paraphrase):
+
+- it riprap: file uses `pietrame` consistently (7 occurrences across rc_/mtc_). Glossary said
+  `scogliera`. Updated glossary → `pietrame`.
+- pt penstock: file uses `conduta forçada` consistently (5 occurrences, mhp_). Glossary said
+  `conduto forçado` (different grammatical gender). Updated glossary → `conduta forçada`.
+- pt plant efficiency: file's only occurrence (`mhp_efficiency`) is `Rendimento da instalação`.
+  Glossary said `eficiência da usina`. Updated glossary → `rendimento da instalação`.
+- pt gradation: file's only occurrences (`rc_SD`/`rc_SD_check`) use `Graduação`/`graduação`;
+  `granulometria` does not appear anywhere in the pt file. Glossary said `granulometria`. Updated
+  glossary → `graduação`.
+- ru penstock: file uses `пенсток` consistently (5 occurrences, mhp_). Glossary said `напорный
+  трубопровод`. Updated glossary → `пенсток`.
+- tr penstock: file uses `cebri boru` consistently (5 occurrences, mhp_). Glossary said `basınç
+  borusu`. Updated glossary → `cebri boru`.
+- hr rock chute (`kameni žlijeb` shipped vs glossary `kameni skluz`): **not touched.** The glossary
+  entry's own translation_notes already flagged this "NOT reconciled pending human review of the
+  GLOSSARY side" — the open question is whether the *hr file* should be changed to `kameni brzotok`
+  to parallel the sr/ru convention, which is the opposite direction from a glossary-catch-up edit.
+  Left as an open `[H]` item, not silently resolved either direction.
+
+**New finding, not a glossary-staleness case — logged as a new roadmap item instead of fixed
+here:** tr riprap has an internal inconsistency the log's framing didn't capture. `glossary.json`
+already said `taş dolgu` for tr riprap (matching the one occurrence in `mtc_bend_angle`, category 1,
+the older calculator) *before* this pass. But all 4 riprap mentions in `rc_` (category 5, newer) say
+`parça taşı` instead — so for tr specifically, the rock-chute translation agent diverged from an
+already-correct glossary and from the pre-existing suite term, the reverse of the it/pt/ru/tr-
+penstock pattern above. Fixing this means editing already-shipped Turkish sentences (grammatical
+suffix agreement needs checking, not a blind find-replace), so it was left as a new `[H]`-tagged
+roadmap item rather than resolved unilaterally in this pass.
+
+**Scope note:** this pass reconciled the specific terms raised by the category-5-wave-1 log entry,
+not an exhaustive sweep of all 55 glossary terms × 26 languages — that remains a larger undertaking
+if a future need surfaces it.
+
+**QA:** `glossary.json` re-validated as parseable JSON after edits (`meta.version` 1.5→1.6). No
+`lib/lang.ec.*.php` files changed — this was a glossary-metadata-only pass.
