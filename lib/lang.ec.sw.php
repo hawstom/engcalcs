@@ -151,7 +151,7 @@ $ec_lang['mpf_wetted_perimeter']='Mzingo ulioloweshwa, P<sub>w</sub>';
 $ec_lang['mpf_hydraulic_radius']='Radiasi ya kihaidroliki, R<sub>h</sub>';
 $ec_lang['mpf_top_width']='Upana wa juu, T';
 $ec_lang['mpf_froude_number']='Nambari ya Froude, Fr';
-$ec_lang['mpf_shear_stress']='Msongo wastani wa mkato (nguvu ya kukokota), &tau;';
+$ec_lang['mpf_shear_stress']='Msongo wastani wa mkato, &tau;';
 $ec_lang['mpf_full_flow']='Mtiririko kamili, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Uwiano wa mtiririko kamili, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>Huu ni mtiririko na kina ndani ya bomba la <em>urefu usio na kikomo</em>.</dt><dd>Kuingiza mtiririko kwenye bomba kunaweza kuhitaji kina cha maji juu ya mlango kinachozidi zaidi. Ongeza angalau mara 1.5 ya kichwa cha kasi ili kupata kina hicho, au <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">tazama mafunzo yangu ya dakika 2</a> kwa mahesabu ya kawaida ya kichwa cha maji ya bomba la kupita ukitumia HY-8.</dd>';

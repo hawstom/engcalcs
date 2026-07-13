@@ -150,7 +150,7 @@ $ec_lang['mpf_wetted_perimeter']='Смоченный периметр, P<sub>w</
 $ec_lang['mpf_hydraulic_radius']='Гидравлический радиус, R<sub>h</sub>';
 $ec_lang['mpf_top_width']='Ширина по зеркалу воды, T';
 $ec_lang['mpf_froude_number']='Число Фруда, Fr';
-$ec_lang['mpf_shear_stress']='Среднее касательное напряжение (влекущая сила), &tau;';
+$ec_lang['mpf_shear_stress']='Среднее касательное напряжение, &tau;';
 $ec_lang['mpf_full_flow']='Расход при полном сечении, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Отношение к полному расходу, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>Это расход и глубина внутри <em>бесконечно длинной</em> трубы.</dt><dd>Для подачи расхода в трубу может потребоваться значительно большая высота уровня воды. Добавьте не менее 1,5 скоростного напора к глубине уровня подпора или <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">см. 2-минутное руководство</a> по стандартным расчётам водопропускных труб с помощью HY-8.</dd>';

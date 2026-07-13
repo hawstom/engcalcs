@@ -150,7 +150,7 @@ $ec_lang['mpf_wetted_perimeter']='湿周，P<sub>w</sub>';
 $ec_lang['mpf_hydraulic_radius']='水力半径，R<sub>h</sub>';
 $ec_lang['mpf_top_width']='水面宽，T';
 $ec_lang['mpf_froude_number']='弗劳德数，Fr';
-$ec_lang['mpf_shear_stress']='平均切应力（曳引力），&tau;';
+$ec_lang['mpf_shear_stress']='平均切应力，&tau;';
 $ec_lang['mpf_full_flow']='满流流量，Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='流量比，Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>这是<em>无限长</em>管道内部的流量和水深。</dt><dd>使水流进入管道可能需要明显更高的上游水位。请在水深基础上至少加 1.5 倍流速水头来估算上游水位，或 <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">参见 2 分钟教程</a>，了解使用 HY-8 进行标准涵洞水位计算的方法。</dd>';

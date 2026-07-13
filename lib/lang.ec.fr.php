@@ -151,7 +151,7 @@ $ec_lang['mpf_wetted_perimeter']='Périmètre mouillé, P<sub>w</sub>';
 $ec_lang['mpf_hydraulic_radius']='Rayon hydraulique, R<sub>h</sub>';
 $ec_lang['mpf_top_width']='Largeur au miroir, T';
 $ec_lang['mpf_froude_number']='Nombre de Froude, Fr';
-$ec_lang['mpf_shear_stress']='Contrainte de cisaillement moyenne (force tractrice), &tau;';
+$ec_lang['mpf_shear_stress']='Contrainte de cisaillement moyenne, &tau;';
 $ec_lang['mpf_full_flow']='Débit à section pleine, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Rapport au débit plein, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>Il s\'agit du débit (et de la profondeur) à l\'intérieur d\'une conduite de <em>longueur infinie</em>.</dt><dd>Faire entrer le débit dans la conduite peut nécessiter une charge amont nettement plus élevée. Ajoutez au moins 1,5 fois la charge cinétique pour obtenir la charge amont, ou <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">consultez mon tutoriel de 2 minutes</a> pour les calculs standard de charge amont de buse avec HY-8.</dd>';

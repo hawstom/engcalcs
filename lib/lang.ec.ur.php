@@ -151,7 +151,7 @@ $ec_lang['mpf_wetted_perimeter']='تر محیط، P<sub>w</sub>';
 $ec_lang['mpf_hydraulic_radius']='آبی نصف قطر، R<sub>h</sub>';
 $ec_lang['mpf_top_width']='اوپری چوڑائی، T';
 $ec_lang['mpf_froude_number']='فرود عدد، Fr';
-$ec_lang['mpf_shear_stress']='اوسط برشی دباؤ (کشش قوت)، &tau;';
+$ec_lang['mpf_shear_stress']='اوسط برشی دباؤ، &tau;';
 $ec_lang['mpf_full_flow']='مکمل بہاؤ، Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='مکمل بہاؤ سے نسبت، Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>یہ ایک <em>لامحدود لمبے</em> پائپ کے اندر بہاؤ اور گہرائی ہے۔</dt><dd>پائپ میں بہاؤ داخل کرانے کے لیے کافی زیادہ بالادست گہرائی درکار ہو سکتی ہے۔ بالادست گہرائی پانے کے لیے رفتار سر کا کم از کم 1.5 گنا جوڑیں یا HY-8 استعمال کرتے ہوئے معیاری پائپنالی سر آب حساب کے لیے <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">میرا 2 منٹ کا ٹیوٹوریل</a> دیکھیں۔</dd>';

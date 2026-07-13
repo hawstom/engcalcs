@@ -151,7 +151,7 @@ $ec_lang['mpf_wetted_perimeter']='គ្រែទឹក, P<sub>w</sub>';
 $ec_lang['mpf_hydraulic_radius']='កាំធារ, R<sub>h</sub>';
 $ec_lang['mpf_top_width']='ទទឹងខាងលើ, T';
 $ec_lang['mpf_froude_number']='លេខ Froude, Fr';
-$ec_lang['mpf_shear_stress']='តានតឹងកាត់មធ្យម (កម្លាំងទាញ), &tau;';
+$ec_lang['mpf_shear_stress']='តានតឹងកាត់មធ្យម, &tau;';
 $ec_lang['mpf_full_flow']='ហូរពេញ, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='សមាមាត្រទៅនឹងហូរពេញ, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>នេះជាការហូរ និងជម្រៅនៅខាងក្នុងបំពង់ <em>វែងឥតកំណត់</em>។</dt><dd>ការទទួលទឹកចូលបំពង់អាចត្រូវការជម្រៅទឹកខាងលើខ្ពស់ជាងច្រើន។ បន្ថែមយ៉ាងហោចណាស់ 1.5 ដងទំនាប់ល្បឿន ដើម្បីទទួលបានជម្រៅទឹកខាងលើ ឬ <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">មើលការណែនាំ 2 នាទីរបស់ខ្ញុំ</a> សម្រាប់ការគណនាទំនាប់ទឹក culvert ស្ដង់ដារ ដោយប្រើ HY-8។</dd>';

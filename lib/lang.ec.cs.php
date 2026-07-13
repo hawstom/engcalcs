@@ -150,7 +150,7 @@ $ec_lang['mpf_wetted_perimeter']='Smočený obvod, P<sub>w</sub>';
 $ec_lang['mpf_hydraulic_radius']='Hydraulický poloměr, R<sub>h</sub>';
 $ec_lang['mpf_top_width']='Šířka hladiny, T';
 $ec_lang['mpf_froude_number']='Froudovo číslo, Fr';
-$ec_lang['mpf_shear_stress']='Průměrné smykové napětí (trakční síla), &tau;';
+$ec_lang['mpf_shear_stress']='Průměrné smykové napětí, &tau;';
 $ec_lang['mpf_full_flow']='Průtok při plném plnění, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Poměr k plnému průtoku, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>Toto je průtok a hloubka uvnitř <em>nekonečně dlouhého</em> potrubí.</dt><dd>Aby průtok vůbec vtekl do potrubí, může být zapotřebí výrazně vyšší hloubka vzduté hladiny na vtoku. Pro odhad hloubky vzdutí přičtěte alespoň 1,5násobek rychlostní výšky, nebo <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">zhlédněte můj 2minutový výukový program</a> o standardním výpočtu vzdutí u propustků pomocí HY-8.</dd>';

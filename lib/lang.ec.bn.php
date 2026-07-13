@@ -150,7 +150,7 @@ $ec_lang['mpf_wetted_perimeter']='ভেজা পরিধি, P<sub>w</sub>';
 $ec_lang['mpf_hydraulic_radius']='হাইড্রোলিক ব্যাসার্ধ, R<sub>h</sub>';
 $ec_lang['mpf_top_width']='শীর্ষ প্রস্থ, T';
 $ec_lang['mpf_froude_number']='ফ্রুড সংখ্যা, Fr';
-$ec_lang['mpf_shear_stress']='গড় কৃন্তন পীড়ন (ট্র্যাকটিভ বল), &tau;';
+$ec_lang['mpf_shear_stress']='গড় কৃন্তন পীড়ন, &tau;';
 $ec_lang['mpf_full_flow']='পূর্ণ প্রবাহ, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='পূর্ণ প্রবাহের অনুপাত, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>এটি একটি <em>অসীম দীর্ঘ</em> পাইপের মধ্যে প্রবাহ ও গভীরতা।</dt><dd>পাইপে প্রবাহ প্রবেশ করাতে উল্লেখযোগ্যভাবে বেশি আপস্ট্রিম গভীরতার প্রয়োজন হতে পারে। আপস্ট্রিম গভীরতা পেতে বেগ হেডের অন্তত ১.৫ গুণ যোগ করুন অথবা HY-8 ব্যবহার করে স্ট্যান্ডার্ড কালভার্ট হেডওয়াটার গণনার জন্য <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">আমার ২ মিনিটের টিউটোরিয়াল</a> দেখুন।</dd>';

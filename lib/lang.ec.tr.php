@@ -151,7 +151,7 @@ $ec_lang['mpf_wetted_perimeter']='Islak çevre, P<sub>w</sub>';
 $ec_lang['mpf_hydraulic_radius']='Hidrolik yarıçap, R<sub>h</sub>';
 $ec_lang['mpf_top_width']='Üst genişlik, T';
 $ec_lang['mpf_froude_number']='Froude sayısı, Fr';
-$ec_lang['mpf_shear_stress']='Ortalama kayma gerilmesi (sürükleme kuvveti), &tau;';
+$ec_lang['mpf_shear_stress']='Ortalama kayma gerilmesi, &tau;';
 $ec_lang['mpf_full_flow']='Tam akış, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Tam akışa oran, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>Bu, <em>sonsuz uzunluktaki</em> bir borunun içindeki akış ve derinliktir.</dt><dd>Akışın boruya girmesi için önemli ölçüde daha yüksek memba derinliği gerekebilir. Memba derinliğini elde etmek için en az 1,5 hız yükü ekleyin ya da HY-8 kullanarak standart menfez memba hesaplamaları için <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">2 dakikalık öğreticime bakın</a>.</dd>';

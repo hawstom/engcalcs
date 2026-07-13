@@ -154,7 +154,7 @@ $ec_lang['mpf_wetted_perimeter']='Perímetro mojado, P<sub>w</sub>';
 $ec_lang['mpf_hydraulic_radius']='Radio hidráulico, R<sub>h</sub>';
 $ec_lang['mpf_top_width']='Ancho de lámina libre, T';
 $ec_lang['mpf_froude_number']='Número de Froude, Fr';
-$ec_lang['mpf_shear_stress']='Tensión tangencial promedio (fuerza de tracción), &tau;';
+$ec_lang['mpf_shear_stress']='Tensión tangencial promedio, &tau;';
 $ec_lang['mpf_full_flow']='Caudal lleno, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Relación de caudales, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>Este es el caudal (y la profundidad) dentro de una tubería <em>de longitud infinita</em>.</dt><dd>Lograr que el caudal entre en la tubería puede requerir una profundidad de agua de entrada (cabezal) bastante mayor. Agregue por lo menos 1,5 veces la carga de velocidad para estimar la profundidad de agua de entrada, o <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">vea mi tutorial de 2 minutos</a> sobre los cálculos estándar de cabezal de entrada en alcantarillas usando HY-8.</dd>';

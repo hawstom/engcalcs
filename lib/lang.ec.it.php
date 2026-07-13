@@ -150,7 +150,7 @@ $ec_lang['mpf_wetted_perimeter']='Perimetro bagnato, P<sub>w</sub>';
 $ec_lang['mpf_hydraulic_radius']='Raggio idraulico, R<sub>h</sub>';
 $ec_lang['mpf_top_width']='Larghezza pelo libero, T';
 $ec_lang['mpf_froude_number']='Numero di Froude, Fr';
-$ec_lang['mpf_shear_stress']='Tensione tangenziale media (forza trattiva), &tau;';
+$ec_lang['mpf_shear_stress']='Tensione tangenziale media, &tau;';
 $ec_lang['mpf_full_flow']='Portata a sezione piena, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Rapporto alla portata piena, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>Questo è il flusso e la profondità all\'interno di una tubazione <em>infinitamente lunga</em>.</dt><dd>L\'immissione del flusso nella tubazione può richiedere un\'altezza idraulica significativamente maggiore. Aggiungere almeno 1,5 volte l\'altezza cinetica per l\'altezza idraulica o <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">vedere il tutorial di 2 minuti</a> per i calcoli standard del livello idraulico nei tombini con HY-8.</dd>';

@@ -153,7 +153,7 @@ $ec_lang['mpf_wetted_perimeter']='المحيط المبلل، P<sub>w</sub>';
 $ec_lang['mpf_hydraulic_radius']='نصف القطر الهيدروليكي، R<sub>h</sub>';
 $ec_lang['mpf_top_width']='العرض العلوي، T';
 $ec_lang['mpf_froude_number']='رقم فرود، Fr';
-$ec_lang['mpf_shear_stress']='متوسط إجهاد القص (القوة الجارّة)، &tau;';
+$ec_lang['mpf_shear_stress']='متوسط إجهاد القص، &tau;';
 $ec_lang['mpf_full_flow']='الجريان الكامل، Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='النسبة إلى الجريان الكامل، Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>هذا هو الجريان والعمق داخل أنبوب <em>لانهائي الطول</em>.</dt><dd>قد يتطلب إدخال الجريان إلى الأنبوب منسوب مياه مرتفعاً بشكل كبير. أضف ما لا يقل عن 1.5 ضعف الرأس الحركي للحصول على منسوب المياه، أو <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">راجع درسي القصير مدته دقيقتان</a> لحسابات منسوب مياه الداخل للعبارات القياسية باستخدام HY-8.</dd>';

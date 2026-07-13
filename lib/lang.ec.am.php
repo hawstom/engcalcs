@@ -151,7 +151,7 @@ $ec_lang['mpf_wetted_perimeter']='የረጠበ ዙሪያ, P<sub>w</sub>';
 $ec_lang['mpf_hydraulic_radius']='ሃይድሮሊካዊ ራዲዩስ, R<sub>h</sub>';
 $ec_lang['mpf_top_width']='የላይ ስፋት, T';
 $ec_lang['mpf_froude_number']='Froude ቁጥር, Fr';
-$ec_lang['mpf_shear_stress']='አማካይ ሺር ስትሬስ (ሳቢ ኃይል), &tau;';
+$ec_lang['mpf_shear_stress']='አማካይ ሺር ስትሬስ, &tau;';
 $ec_lang['mpf_full_flow']='ሙሉ ፍሰት, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='ከሙሉ ፍሰት ጋር ያለ ጥምርታ, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>ይህ <em>ወሰን የሌለው</em> ቧንቧ ውስጥ ያለ ፍሰት እና ጥልቀት ነው።</dt><dd>ፍሰቱን ወደ ቧንቧ ለማስገባት ከፍ ያለ ጭንቅ ውሃ ጥልቀት ሊያስፈልግ ይችላል። ጭንቅ ውሃ ጥልቀቱን ለማግኘት ቢያንስ 1.5 እጥፍ የፍጥነት ጭንቅ ጨምር ወይም <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">የ2 ደቂቃ ትምህርቴን ይመልከቱ</a> HY-8 ተጠቅሞ ለተለመደ culvert ጭንቅ ውሃ ስሌቶች።</dd>';

@@ -151,7 +151,7 @@ $ec_lang['mpf_wetted_perimeter']='محیط تر، P<sub>w</sub>';
 $ec_lang['mpf_hydraulic_radius']='شعاع هیدرولیکی، R<sub>h</sub>';
 $ec_lang['mpf_top_width']='عرض سطح آب، T';
 $ec_lang['mpf_froude_number']='عدد فرود، Fr';
-$ec_lang['mpf_shear_stress']='تنش برشی متوسط (نیروی کششی)، &tau;';
+$ec_lang['mpf_shear_stress']='تنش برشی متوسط، &tau;';
 $ec_lang['mpf_full_flow']='دبی کامل، Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='نسبت به دبی کامل، Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>این جریان و عمق داخل یک لوله <em>بی‌نهایت بلند</em> است.</dt><dd>برای هدایت جریان به داخل لوله ممکن است به عمق هد آب بالاتری نیاز باشد. حداقل ۱.۵ برابر هد سرعت را برای به‌دست آوردن عمق هد آب اضافه کنید یا <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">آموزش ۲ دقیقه‌ای من</a> را برای محاسبات استاندارد هد آب کالورت با HY-8 ببینید.</dd>';

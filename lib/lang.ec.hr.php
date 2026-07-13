@@ -149,7 +149,7 @@ $ec_lang['mpf_wetted_perimeter']='Močeni opseg, P<sub>w</sub>';
 $ec_lang['mpf_hydraulic_radius']='Hidraulički polumjer, R<sub>h</sub>';
 $ec_lang['mpf_top_width']='Gornja širina, T';
 $ec_lang['mpf_froude_number']='Froudeov broj, Fr';
-$ec_lang['mpf_shear_stress']='Prosječno posmično naprezanje (vučna sila), &tau;';
+$ec_lang['mpf_shear_stress']='Prosječno posmično naprezanje, &tau;';
 $ec_lang['mpf_full_flow']='Puni protok, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Omjer prema punom protoku, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>Ovo je protok i dubina unutar <em>beskonačno dugačke</em> cijevi.</dt><dd>Uvođenje protoka u cijev može zahtijevati znatno veću dubinu uzvodne vode. Dodajte barem 1,5 puta brzinsku visinu za procjenu dubine uzvodne vode, ili <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">pogledajte moj 2-minutni tutorial</a> za standardne proračune uzvodne razine propusta pomoću HY-8.</dd>';

@@ -151,7 +151,7 @@ $ec_lang['mpf_wetted_perimeter']='Змочений периметр, P<sub>w</su
 $ec_lang['mpf_hydraulic_radius']='Гідравлічний радіус, R<sub>h</sub>';
 $ec_lang['mpf_top_width']='Ширина по поверхні, T';
 $ec_lang['mpf_froude_number']='Число Фруда, Fr';
-$ec_lang['mpf_shear_stress']='Середнє дотичне напруження (тягнуча сила), &tau;';
+$ec_lang['mpf_shear_stress']='Середнє дотичне напруження, &tau;';
 $ec_lang['mpf_full_flow']='Витрата при повному заповненні, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Відношення до повної витрати, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>Це витрата і глибина всередині <em>нескінченно довгої</em> труби.</dt><dd>Для забезпечення надходження потоку в трубу може знадобитися значно більша глибина підпору. Додайте не менше 1.5 швидкісного напору для визначення глибини підпору, або <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">дивіться мій 2-хвилинний посібник</a> зі стандартних розрахунків підпору водопропускних труб за HY-8.</dd>';

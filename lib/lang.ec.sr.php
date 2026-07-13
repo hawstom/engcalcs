@@ -149,7 +149,7 @@ $ec_lang['mpf_wetted_perimeter']='Квашени периметар, P<sub>w</su
 $ec_lang['mpf_hydraulic_radius']='Хидраулички полупречник, R<sub>h</sub>';
 $ec_lang['mpf_top_width']='Површинска ширина, T';
 $ec_lang['mpf_froude_number']='Фрудов број, Fr';
-$ec_lang['mpf_shear_stress']='Просечан напон смицања (вучна сила), &tau;';
+$ec_lang['mpf_shear_stress']='Просечан напон смицања, &tau;';
 $ec_lang['mpf_full_flow']='Пуни протицај, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Однос према пуном протицају, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>Ово је протицај и дубина унутар <em>бесконачно дугачке</em> цеви.</dt><dd>За унос воде у цев може бити потребна знатно већа дубина нивоа воде. Додајте најмање 1,5 пута енергетску висину брзине да бисте добили дубину нивоа воде или <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">погледајте мој 2-минутни туторијал</a> за стандардна израчунавања нивоа воде на пропусту помоћу HY-8.</dd>';

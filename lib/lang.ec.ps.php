@@ -151,7 +151,7 @@ $ec_lang['mpf_wetted_perimeter']='د لندوالي محیط، P<sub>w</sub>';
 $ec_lang['mpf_hydraulic_radius']='هایدرولیکي شعاع، R<sub>h</sub>';
 $ec_lang['mpf_top_width']='پورتني پلنوالی، T';
 $ec_lang['mpf_froude_number']='د Froude عدد، Fr';
-$ec_lang['mpf_shear_stress']='منځنی برشي فشار (کششي ځواک)، &tau;';
+$ec_lang['mpf_shear_stress']='منځنی برشي فشار، &tau;';
 $ec_lang['mpf_full_flow']='بشپړ بهاو، Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='د بشپړ بهاو نسبت، Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>دا د یوه <em>بې نهایته اوږد</em> پایپ دننه بهاو او ژوروالی دی.</dt><dd>د پایپ ته د بهاو داخلولو لپاره ممکن د پام وړ لوړ سرسر ژوروالی ته اړتیا وي. د سرسر ژوروالي ترلاسه کولو لپاره لږ تر لږه ۱.۵ ځله د سرعت سر زیات کړئ، یا د HY-8 کارولو سره د معیاري کلورټ سرسر محاسبو لپاره <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">زما دوه دقیقو ټیوټوریل وګورئ</a>.</dd>';

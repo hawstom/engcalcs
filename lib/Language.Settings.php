@@ -66,7 +66,7 @@ $all_language_settings['bn']=array(
 //-- settings for bulgarian
 $all_language_settings['bg']=array(
 'QUALITY'=>'0.95',
-'LANGNAME'=>'български',
+'LANGNAME'=>'Български',
 // Title words is a list of words that are not capitalized in titles.
 'TITLE_WORDS'=>array(),
 );

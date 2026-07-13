@@ -150,7 +150,7 @@ $ec_lang['mpf_wetted_perimeter']='Keliling basah, P<sub>w</sub>';
 $ec_lang['mpf_hydraulic_radius']='Jari-jari hidrolik, R<sub>h</sub>';
 $ec_lang['mpf_top_width']='Lebar permukaan air, T';
 $ec_lang['mpf_froude_number']='Bilangan Froude, Fr';
-$ec_lang['mpf_shear_stress']='Tegangan geser rata-rata (gaya traksi), &tau;';
+$ec_lang['mpf_shear_stress']='Tegangan geser rata-rata, &tau;';
 $ec_lang['mpf_full_flow']='Aliran penuh, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Rasio terhadap aliran penuh, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>Ini adalah debit dan kedalaman di dalam pipa yang panjangnya <em>tak terhingga</em>.</dt><dd>Memasukkan aliran ke dalam pipa mungkin memerlukan kedalaman air hulu yang jauh lebih tinggi. Tambahkan setidaknya 1,5 kali tinggi kecepatan untuk memperkirakan kedalaman air hulu, atau <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">lihat tutorial 2 menit saya</a> untuk perhitungan standar air hulu gorong-gorong menggunakan HY-8.</dd>';

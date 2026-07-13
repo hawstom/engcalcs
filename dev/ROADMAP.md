@@ -42,7 +42,23 @@ The rules, sequence, and QA chain for translation work are **not** restated here
     menu-title casing. Per the Task 90 precedent (native review is only real once feedback
     actually lands — see CLAUDE.md's "Translation Sprints" section), don't log this as "awaiting
     review" indefinitely — either send it to the engineer as a concrete, bounded ask, or close it
-    via our own best-effort sentence-case sweep if no review is realistically coming. Feedback 2026-07-13 from bg engineer: In the language menu, maybe you can make Български with a capital Б, I guess it could bother someone it's the only language with a small letter. In the dw calculator, the label for e is more verbose than English; is this a problem in many languages? Дължина на провеждащия тръбопровод или улей
+    via our own best-effort sentence-case sweep if no review is realistically coming.
+  - **New feedback 2026-07-13 from bg engineer, ADDRESSED same day:**
+    1. Language-menu capitalization: `LANGNAME` for bg was the only lowercase entry
+       (`български`) among all 26 non-English languages (every other Latin/Cyrillic entry —
+       `Hrvatski`, `Русский`, `Türkçe`, `Українська`, etc. — is capitalized). Fixed
+       `lib/Language.Settings.php` to `Български`.
+    2. mhp calculator's `e`/`L`/`Km` labels "more verbose than English": checked all three —
+       `Km` (`mphl_total_junction_k`, shared with mphl_) was already a fair parallel of the
+       English, no change. `e`'s tooltip (`dw_roughness_tip`, shared with dw_) had a genuinely
+       extra "по метода на" ("by the method of") that no other language's equivalent tooltip
+       carries — trimmed to "Височина на грапавостта по Дарси-Вайсбах". `L` (`mhp_length`) had
+       expanded the main label into a full descriptive phrase ("Дължина на напорния
+       тръбопровод, L") where English keeps it terse ("Length, L") and pushes detail into the
+       tooltip — shortened the label to "Дължина, L" and applied the engineer's own suggested
+       tooltip wording ("Дължина на провеждащия тръбопровод или улей", dropping the redundant
+       "подвеждащия (входен)" parenthetical). `php -l` and `lang_syntax_validate.php --lang=bg`
+       both clean.
 
 - 18|100|[H] **`Install.php` localization (split from Task 95, 2026-07-13).** `Install.php` (66
   lines, PWA install instructions) is 100% hardcoded English body text, outside `$ec_lang` entirely
@@ -59,19 +75,23 @@ The rules, sequence, and QA chain for translation work are **not** restated here
   standalone sprint or rides along with an upcoming category's wave.
 
 - 24|98|English improvements: 
-1. Change 
-"Do you have a great vision for a calculator to add here? Can you help me improve translations, program, or host these calculators?"
-to
-"Do you have great ideas for expanding or improving these calculators or their translations?
-2. Change
-"Please give us your valued words of suggestion or praise."
-to
-"Please share your valued words of suggestion or praise."
-3. Change (in mphl, hw, and dw and wherever used, hopefully a single re-used key)
-"Average shear stress (tractive force), τ"
-to
-"Average shear stress, τ". Add to _intent Parallel or tangential tractive force per unit area on the bottom or bed of the cross section.
-4. Clarify in _intent and in glossary that for rc_ "Rock specific gravity, sg ?", the more standard term is "Relative density of rock".
+1. **DONE 2026-07-13.** `template_translation_help` changed from "Do you have a great vision for
+   a calculator to add here?  Can you help me improve translations, program, or host these
+   calculators?" to "Do you have great ideas for expanding or improving these calculators or
+   their translations?" in `lib/lang.ec.en.php`.
+2. **DONE 2026-07-13.** `template_feedback` changed "Please give us your valued words of
+   suggestion or praise." to "Please share your valued words of suggestion or praise." (second
+   sentence unchanged).
+3. **DONE 2026-07-13.** `mpf_shear_stress` (already the single shared key used by mpf_/hw_/dw_/
+   mtc_/mphl_ — confirmed via grep, no duplicate keys to consolidate) changed from "Average shear
+   stress (tractive force), &tau;" to "Average shear stress, &tau;"; `$ec_lang_intent` updated to
+   "Parallel or tangential tractive force per unit area on the bottom or bed of the cross
+   section. | symbol" (edited with Tom's explicit in-task authorization, per CLAUDE.md's
+   `$ec_lang_intent` AI-off-limits rule).
+4. **DONE 2026-07-13.** `rc_sg`'s `$ec_lang_intent` rewritten to lead with "Relative density of
+   rock" as the more standard modern term, explaining "specific gravity" is kept in the visible
+   label only for continuity with Robinson's paper (same authorization basis as item 3).
+   `glossary.json`'s `specific gravity` entry `context` field updated to match.
 5. **DONE 2026-07-13: Simple English pilot on rc_ (Rock Chute).** Tom's direction: this is a
    multilingual project with an established English user base, so prioritize translatability over
    English SEO/idiom for *explanatory* content — but identity strings (menu + `<title>`) still match
@@ -98,9 +118,9 @@ to
    (块石/护坡/抛石 in explanatory strings → standardized on 护坡) also kept; zh's menu/title reverted
    to its original 块石 wording, matching the identity/explanatory split. `php -l` and
    `lang_syntax_validate.php` clean suite-wide (65 pre-existing advisory identical-to-english
-   findings only, no new structural issues). Items 1-4 and 10 above remain open; full 12-calculator
-   Simple English audit deferred pending review of how this pilot lands (Tom's call, 2026-07-13:
-   pilot rc_ only for now).
+   findings only, no new structural issues). Item 10 below remains open (items 1-4 closed
+   2026-07-13); full 12-calculator Simple English audit deferred pending review of how this pilot
+   lands (Tom's call, 2026-07-13: pilot rc_ only for now).
 6. **DONE 2026-07-13: Cross-calculator jargon audit (Tom's candidate list: head, irregular,
    micro-hydro/run-of-river, seepage) — evidence-based, no English renames needed.** None of the
    other 11 calculators cite a specific published paper by name the way rc_ cites Robinson, so the
@@ -130,7 +150,27 @@ to
      26 languages — every one has a real native infiltration/percolation term.
    `php -l` and `lang_syntax_validate.php` clean for all 4 touched languages (bg, sw, km, ps) and
    suite-wide (same 65 pre-existing advisory findings, no new issues).
-10. Propagate these changes to all languages with discretion, or in other words, improve all languages if appropriate in light of these changes. Probably an Opus task.
+7. Change ip_ 
+"Test Branch Pressure and Uniformity Estimate"
+to
+"Test Branch Pressure and Estimated Uniformity"
+10. **DONE 2026-07-13: closed after scoping — no Opus pass needed.** Checked what items 1-4's
+    English changes actually implied for the other 26 languages before propagating anything:
+    - `mpf_shear_stress`: every one of the 26 translations still carried the "(tractive force)"
+      parenthetical the English dropped. This was a mechanical deletion of an already-correct
+      fragment (not a new-translation task), so no agent was needed — stripped it from all 26
+      files directly (zh used full-width parens/comma, handled separately). `php -l` clean on all
+      27 files; `lang_syntax_validate.php` shows only the same 65 pre-existing advisory findings.
+    - `rc_sg`: only the invisible `$ec_lang_intent` changed — nothing visible to propagate.
+    - `template_translation_help` / `template_feedback`: reviewed all 26 translations and found
+      propagation would be a regression, not an improvement — most languages (ru, ar, hr, sw, zh,
+      cs, uk, sr, ur, ro, bg, etc.) already independently phrase "share" rather than "give", ahead
+      of where the old English was; the old `template_translation_help` asked volunteers for
+      translation/programming/hosting help specifically, content the new terser English dropped
+      but which all 26 translations still usefully carry; and Turkish's string carries a
+      hand-written translator credit (Mustafa Özbay) that must not be mechanically overwritten.
+      Left all 26 as-is.
+    Item 7 above (`ip_` uniformity-estimate wording) is unrelated to this item and remains open.
 
 ## AI Efficiency Scripting (Overhead)
 

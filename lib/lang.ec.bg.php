@@ -87,7 +87,7 @@ $ec_lang['dw_main_menu']='Загуба на напор в тръбопровод
 $ec_lang['dw_main_title']='Безплатен онлайн калкулатор за загуба на напор по Дарси-Вайсбах';
 $ec_lang['dw_main_desc']='Загуба на напор по Дарси-Вайсбах при зададени диаметър, грапавост и водно количество';
 $ec_lang['dw_roughness']='Грапавост, e';
-$ec_lang['dw_roughness_tip']='<span class="ec-help" title="Височина на грапавостта по метода на Дарси-Вайсбах"><span class="ec-tip">?</span></span>';
+$ec_lang['dw_roughness_tip']='<span class="ec-help" title="Височина на грапавостта по Дарси-Вайсбах"><span class="ec-tip">?</span></span>';
 $ec_lang['dw_kinematic_viscosity']='<span class="ec-help" title="1×10⁻⁶ m²/s за чиста вода при 20°C">Кинематична вискозност, &nu; <span class="ec-tip">?</span></span>';
 $ec_lang['dw_reynolds_number']='Число на Рейнолдс, Re';
 $ec_lang['dw_flow_regime']='Режим на течението';
@@ -152,7 +152,7 @@ $ec_lang['mpf_wetted_perimeter']='Навлажнен периметър, P<sub>w
 $ec_lang['mpf_hydraulic_radius']='Хидравличен радиус, R<sub>h</sub>';
 $ec_lang['mpf_top_width']='Горна ширина, T';
 $ec_lang['mpf_froude_number']='Число на Фруд, Fr';
-$ec_lang['mpf_shear_stress']='Средно срязващо напрежение (теглителна сила), &tau;';
+$ec_lang['mpf_shear_stress']='Средно срязващо напрежение, &tau;';
 $ec_lang['mpf_full_flow']='Пълно водно количество, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Съотношение към пълно водно количество, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>Това е водното количество и дълбочината в <em>безкрайно дълга</em> тръба.</dt><dd>За вкарването на потока в тръбата може да е необходима значително по-голяма дълбочина на горната вода. Добавете поне 1,5 пъти скоростния напор за да получите дълбочината на горната вода или <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">вижте моя 2-минутен урок</a> за стандартни изчисления на горна вода за водостоци с HY-8.</dd>';
@@ -261,7 +261,7 @@ $ec_lang['mhp_main_title']='Безплатен онлайн калкулатор
 $ec_lang['mhp_main_desc']='Калкулатор за изходна мощност на микро-ВЕЦ с деривационна схема';
 $ec_lang['mhp_gross_head']='Брутен напор, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='Диаметър на напорния тръбопровод, D';
-$ec_lang['mhp_length']='<span class="ec-help" title="Дължина на подвеждащия (входен) тръбопровод или улей">Дължина на напорния тръбопровод, L <span class="ec-tip">?</span></span>';
+$ec_lang['mhp_length']='<span class="ec-help" title="Дължина на провеждащия тръбопровод или улей">Дължина, L <span class="ec-tip">?</span></span>';
 $ec_lang['mhp_efficiency']='КПД на централата, η (0–1)';
 $ec_lang['mhp_vel_check']='Проверка на скоростта';
 $ec_lang['mhp_hl_check']='Проверка на загубата на напор';

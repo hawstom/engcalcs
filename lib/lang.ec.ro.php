@@ -149,7 +149,7 @@ $ec_lang['mpf_wetted_perimeter']='Perimetrul udat, P<sub>w</sub>';
 $ec_lang['mpf_hydraulic_radius']='Raza hidraulică, R<sub>h</sub>';
 $ec_lang['mpf_top_width']='Lățimea suprafeței libere, T';
 $ec_lang['mpf_froude_number']='Numărul Froude, Fr';
-$ec_lang['mpf_shear_stress']='Efortul tangențial mediu (forța tractivă), &tau;';
+$ec_lang['mpf_shear_stress']='Efortul tangențial mediu, &tau;';
 $ec_lang['mpf_full_flow']='Debit la plin, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Raport față de debitul la plin, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>Acesta este debitul și adâncimea în interiorul unei conducte <em>infinit lungi</em>.</dt><dd>Introducerea debitului în conductă poate necesita o adâncime a apei din amonte semnificativ mai mare. Adăugați cel puțin de 1,5 ori sarcina de viteză pentru a obține adâncimea din amonte sau <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">consultați tutorialul meu de 2 minute</a> pentru calculele standard ale nivelului din amonte ale podețelor folosind HY-8.</dd>';

@@ -151,7 +151,7 @@ $ec_lang['mpf_wetted_perimeter']='היקף רטוב, P<sub>w</sub>';
 $ec_lang['mpf_hydraulic_radius']='רדיוס הידראולי, R<sub>h</sub>';
 $ec_lang['mpf_top_width']='רוחב פני הנוזל, T';
 $ec_lang['mpf_froude_number']='מספר Froude, Fr';
-$ec_lang['mpf_shear_stress']='מאמץ גזירה ממוצע (כוח גרר), &tau;';
+$ec_lang['mpf_shear_stress']='מאמץ גזירה ממוצע, &tau;';
 $ec_lang['mpf_full_flow']='זרימה מלאה, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='יחס לזרימה מלאה, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>זהו הזרימה והעומק בתוך צינור <em>ארוך אינסופית</em>.</dt><dd>כדי לקבל את הזרימה לתוך הצינור ייתכן שיידרש גובה מים עליון גבוה הרבה יותר. הוסף לפחות 1.5 פעמים ראש המהירות כדי לקבל את גובה המים העליון, או <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">ראה את המדריך הקצר שלי</a> לחישובי גובה מים עליון לתעלות ניקוז סטנדרטיות באמצעות HY-8.</dd>';

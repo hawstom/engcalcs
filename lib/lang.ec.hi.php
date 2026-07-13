@@ -151,7 +151,7 @@ $ec_lang['mpf_wetted_perimeter']='आर्द्र परिधि, P<sub>w</s
 $ec_lang['mpf_hydraulic_radius']='हाइड्रोलिक त्रिज्या, R<sub>h</sub>';
 $ec_lang['mpf_top_width']='शीर्ष चौड़ाई, T';
 $ec_lang['mpf_froude_number']='फ्रूड संख्या, Fr';
-$ec_lang['mpf_shear_stress']='औसत अपरूपण प्रतिबल (कर्षण बल), &tau;';
+$ec_lang['mpf_shear_stress']='औसत अपरूपण प्रतिबल, &tau;';
 $ec_lang['mpf_full_flow']='पूर्ण प्रवाह, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='पूर्ण प्रवाह से अनुपात, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>यह एक <em>अनंत लंबे</em> पाइप के अंदर का प्रवाह और गहराई है।</dt><dd>पाइप में प्रवाह प्रवेश कराने के लिए काफी अधिक उर्ध्वप्रवाह गहराई की आवश्यकता हो सकती है। उर्ध्वप्रवाह गहराई पाने के लिए वेग शीर्ष का कम से कम 1.5 गुना जोड़ें या HY-8 का उपयोग करके मानक पाइपनाली शीर्ष जल गणना के लिए <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">मेरा 2-मिनट का ट्यूटोरियल</a> देखें।</dd>';

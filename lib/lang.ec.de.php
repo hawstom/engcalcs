@@ -150,7 +150,7 @@ $ec_lang['mpf_wetted_perimeter']='Benetzter Umfang, P<sub>w</sub>';
 $ec_lang['mpf_hydraulic_radius']='Hydraulischer Radius, R<sub>h</sub>';
 $ec_lang['mpf_top_width']='Wasserspiegelbreite, T';
 $ec_lang['mpf_froude_number']='Froude-Zahl, Fr';
-$ec_lang['mpf_shear_stress']='Mittlere Sohlschubspannung (Schleppkraft), &tau;';
+$ec_lang['mpf_shear_stress']='Mittlere Sohlschubspannung, &tau;';
 $ec_lang['mpf_full_flow']='Vollfüllung, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Füllungsverhältnis, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>Dies ist der Durchfluss und die Tiefe innerhalb eines <em>unendlich langen</em> Rohres.</dt><dd>Um den Durchfluss in das Rohr zu leiten, kann eine erheblich höhere Einstauhöhe erforderlich sein. Addieren Sie mindestens das 1,5-fache der Geschwindigkeitshöhe zur Einstauhöhe oder <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">sehen Sie das 2-Minuten-Tutorial</a> für Standard-Durchlassberechnungen mit HY-8.</dd>';
