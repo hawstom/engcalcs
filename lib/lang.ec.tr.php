@@ -409,10 +409,10 @@ $ec_lang['contact_success']='Yazmanız için zaman ayırdığınız için teşek
 // Rock Chute Design (Robinson, Rice & Kadavy 1998). Prefix rc_.
 $ec_lang['rc_main_menu']='Taş Düşü Tasarımı (Robinson)';
 $ec_lang['rc_main_title']='Ücretsiz Çevrimiçi Taş Düşü Tasarım Hesap Makinesi — Robinson (1998)';
-$ec_lang['rc_main_desc']='Taş Düşü Parça Taşı Boyutlandırması — Robinson, Rice & Kadavy (1998)';
+$ec_lang['rc_main_desc']='Taş Düşü Taş Dolgu Boyutlandırması — Robinson, Rice & Kadavy (1998)';
 $ec_lang['rc_S0']='Düşü taban eğimi, S<sub>0</sub>';
 $ec_lang['rc_qt']='<span class="ec-help" title="Düşü girişinde birim genişlik başına debi. B taban genişliğinde ve Q toplam debili bir kanal için q_t = Q / B kullanın.">Toplam birim debi, q<sub>t</sub> <span class="ec-tip">?</span></span>';
-$ec_lang['rc_np']='Parça taşı gözenekliliği, n<sub>p</sub>';
+$ec_lang['rc_np']='Taş dolgu gözenekliliği, n<sub>p</sub>';
 $ec_lang['rc_sg']='<span class="ec-help" title="Tipik kırma granit veya bazalt ≈ 2,65. Robinson geçerli aralığı: 2,54–2,82.">Kaya özgül ağırlığı, sg <span class="ec-tip">?</span></span>';
 $ec_lang['rc_SD']='<span class="ec-help" title="Granülometri standart sapması. Tekdüze kaya ≈ 1,25. Robinson geçerli aralığı: 1,15–1,47.">Granülometri SD = D<sub>84.1</sub>/D<sub>50</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['rc_yn']='<span class="ec-help" title="Göllenme (Hp > yn) olumludur — memba erozyonunu azaltır. (USDA)">Giriş kanalında normal derinlik, y<sub>n</sub> <span class="ec-tip">?</span></span>';
@@ -440,7 +440,7 @@ $ec_lang['rc_n_chute']='Düşüde Manning pürüzlülüğü, n';
 $ec_lang['rc_Vm']='<span class="ec-help" title="Kaya gözeneklerinden geçen qt fraksiyonu. Kalan qs yüzeyden akar. Varsayılan np = 0,45 köşeli kırma kaya için tipiktir.">Taş mantosu içindeki hız, V<sub>m</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['rc_qm']='Manto içinden birim debi, q<sub>m</sub>';
 $ec_lang['rc_qs']='Yüzey birim debisi, q<sub>s</sub> (q<sub>t</sub> − q<sub>m</sub>)';
-$ec_lang['rc_d']='Parça taşı yüzeyi üzerindeki akış derinliği, d';
+$ec_lang['rc_d']='Taş dolgu yüzeyi üzerindeki akış derinliği, d';
 $ec_lang['rc_Hp']='<span class="ec-help" title="Göllenme (Hp > yn) olumludur — memba erozyonunu azaltır. (USDA)">Giriş savak yükü, H<sub>p</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['rc_ponding_check']='Giriş göllenmesi kontrolü';
 $ec_lang['rc_pond_ok']  ='H<sub>p</sub> > y<sub>n</sub> — memba göllenmesi';

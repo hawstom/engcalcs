@@ -86,6 +86,29 @@ All check/verdict outputs (velocity, regime, loss-sign, head-loss %, …) use on
 
 All display strings live in `lib/lang.ec.??.php` (27 files: en + 26 non-English). Keys follow the pattern `prefix_description`, e.g. `dw_friction_factor`, `mpf_flow`. Add keys to **all** language files when adding a new calculator — use English text as the fallback where translations aren't available yet.
 
+### Write English source strings in Simple English (Task 98, 2026-07-13)
+
+This is a multilingual project with an established English user base going back many years — for
+new and edited `$ec_lang` strings, **prioritize translatability over English SEO/idiom.** Concretely:
+
+- **Prefer transparent, compositional English over jargon or proper-noun-styled category names.**
+  A word that *looks* like an opaque loanword (e.g. "riprap") invites translators — especially in
+  lower-resource languages — to phonetically transliterate it rather than translate the concept,
+  because there's nothing to compositionally parse. Two ordinary words a translator can actually
+  translate (e.g. "rock lining") are safer than one jargon word, even if the jargon word is the
+  more "correct" or citation-matching term. Evidence: an audit of the Rock Chute calculator found 6
+  of 26 languages (am, bn, he, hi, id, ur) had phonetically transliterated "riprap" as a loanword
+  instead of translating it, and 2 more (hi, ur) had done the same to "chute" — concrete proof this
+  isn't a hypothetical risk. Fixed 2026-07-13 by renaming the English source ("Rock Chute" → "Steep
+  Channel", "Riprap" → "Rock Lining") and correcting the 7 affected language files.
+- **Don't rename eponyms or bibliographic citations** — "Manning," "Darcy-Weisbach," "Robinson" (the
+  Rock Chute method's author), and actual paper titles in citations stay as published; the jargon
+  risk is specifically generic descriptive terms dressed up in Title Case or borrowed technical
+  slang, not legitimate proper nouns.
+- This principle governs new calculators from day one, not just retrofits — pick plain, composable
+  English wording for labels and titles when a calculator is first written, so it never needs this
+  fix later.
+
 **`$ec_lang_intent` is off-limits to AI.** This array provides human-authored translation guidance that is interleaved with `$ec_lang` for human review. AI must never add, change, or remove any `$ec_lang_intent` entry without explicit written permission from the human in that conversation.
 
 ### `$ec_lang_intent` format: `<intent> | <commentary>`
