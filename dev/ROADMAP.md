@@ -19,16 +19,132 @@ The rules, sequence, and QA chain for translation work are **not** restated here
 - **`CLAUDE.md` § "Translation Sprints"** — sprint mechanics, model policy, pre/post-sprint checklist.
 - **`dev/translation-execution-log.md`** — the full dated, category-by-category execution record.
 
-- 19|96|[H] Bulgarian scope question for the native engineer (dev/Bulgarian-engineer-feedback.md):
-  (3) Invite review of the freshly rewritten bg ip_ notes/tooltips and of Bulgarian
-  menu-title casing (their corrections use sentence case; many bg titles are Title Case).
-  Priority dropped 80→30 now that (1) and (2), the substantive terminology questions, are closed —
-  only the review-solicitation thread (3) remains.
-  - **(2) CLOSED 2026-07-13:** engineer's 2026-07-06 answer — "Коефициент на градация (SD) =
-    D₈₄.₁ / D₅₀" — is the standard term, superseding both candidates originally asked about
-    (`едрозърнестост` and `разнозърненост`). Applied to `rc_SD`/`rc_SD_check` in
-    `lib/lang.ec.bg.php` and recorded in `glossary.json`'s `gradation` entry; no longer an open
-    question.
+- 18|100|[H] **`Install.php` localization (split from Task 95, 2026-07-13).** `Install.php` (66
+  lines, PWA install instructions) is 100% hardcoded English body text, outside `$ec_lang` entirely
+  — unlike `About.php`'s `$ec_lang['about_body_html']` pattern. Scope, per Tom 2026-07-13: it must
+  be translated (it's the only working install path on iOS Safari and Firefox, where the in-app
+  `⬇ Install` button silently does nothing — see Task 95 resolution #1). Sequence, Task-87-style:
+  (1) **Wave 0 first** — tighten and clarify the English body for concision before any translation
+  work starts, same discipline as Task 87's English-reform pass; this is a much smaller page than
+  Task 87's full-suite sweep, so likely doesn't need Opus, but re-evaluate if the pass turns out to
+  be nontrivial. (2) Restructure the body into `$ec_lang['install_body_html']` (or a small set of
+  section keys if a single blob is awkward — e.g. separate Android/iOS/Desktop/Firefox sections),
+  following `About.php`'s convention. (3) Run through the normal translation-sprint pipeline
+  (`dev/translation-process.md`) once the English is settled. Not yet scoped: whether this earns a
+  standalone sprint or rides along with an upcoming category's wave.
+
+## AI Efficiency Scripting (Overhead)
+
+These tasks reduce the AI token cost of routine maintenance by replacing repeated AI judgment with deterministic scripts. Copilot owns execution (all tagged `[CP]`); Claude Code specs any script whose output feeds back into translation quality work.
+
+## CSS Standardization Follow-up
+
+## Low Priority / Nice-to-Have
+
+## Completed
+
+- 0|98|[CC] **DONE 2026-07-13: Task 98 closed — all 7 English-improvement items done.**
+  1. `template_translation_help` reworded from "Do you have a great vision for a calculator to
+     add here?  Can you help me improve translations, program, or host these calculators?" to
+     "Do you have great ideas for expanding or improving these calculators or their
+     translations?" in `lib/lang.ec.en.php`.
+  2. `template_feedback` reworded "Please give us your valued words of suggestion or praise." to
+     "Please share your valued words of suggestion or praise." (second sentence unchanged).
+  3. `mpf_shear_stress` (already the single shared key used by mpf_/hw_/dw_/mtc_/mphl_ — confirmed
+     via grep, no duplicate keys to consolidate) changed from "Average shear stress (tractive
+     force), &tau;" to "Average shear stress, &tau;"; `$ec_lang_intent` updated to "Parallel or
+     tangential tractive force per unit area on the bottom or bed of the cross section. | symbol"
+     (edited with Tom's explicit in-task authorization, per CLAUDE.md's `$ec_lang_intent`
+     AI-off-limits rule).
+  4. `rc_sg`'s `$ec_lang_intent` rewritten to lead with "Relative density of rock" as the more
+     standard modern term, explaining "specific gravity" is kept in the visible label only for
+     continuity with Robinson's paper (same authorization basis as item 3). `glossary.json`'s
+     `specific gravity` entry `context` field updated to match.
+  5. **Simple English pilot on rc_ (Rock Chute).** Tom's direction: this is a multilingual project
+     with an established English user base, so prioritize translatability over English SEO/idiom
+     for *explanatory* content — but identity strings (menu + `<title>`) still match the
+     authoritative source's own name. Captured as a standing principle in CLAUDE.md ("Write
+     English source strings in Simple English"). Audit found "riprap" had been phonetically
+     transliterated (not translated) in 6/26 languages (am, bn, he, hi, id, ur) and "chute" in 2
+     more (hi, ur). First pass (over-corrected, caught by Tom): renamed English "Rock Chute" →
+     "Steep Channel" and "Riprap" → "Rock Lining" *everywhere* including
+     `rc_main_menu`/`rc_main_title`, and force-fit all 7 languages' identity strings to the "Steep
+     Channel" concept. Tom's correction: Robinson's paper is literally titled "Design of Rock
+     Chutes" — the calculator's *name* (menu + title) should keep matching that, only the
+     *explanatory* text (description, tooltips, labels) should simplify; and no language should be
+     forced into a specific English calque either way. Checked the evidence: 5 of the 6 flagged
+     languages (am, bn, he, id, zh) already had natural, non-transliterated "Rock Chute"
+     translations in their menu/title *before* any of this — proving transliteration risk tracks
+     translation-pass quality, not UI tier, and that forcing "Steep Channel" onto them would have
+     overwritten good translations that didn't need touching. Reverted: English
+     `rc_main_menu`/`rc_main_title` back to "Rock Chute Design (Robinson)" / "Free Online Rock
+     Chute Design Calculator — Robinson (1998)"; am/bn/he/id/zh's menu/title back to their original
+     (already-natural) text; hi/ur's menu/title re-done (2 more small agent passes) as natural,
+     non-calqued "rock chute" phrases (हिन्दी "चट्टानी ढाल संरचना", Urdu "پتھریلی گزرگاہ") — real
+     transliteration fixes, not forced steep-channel translations. Explanatory strings
+     (`rc_main_desc` and all rc_ body labels/tooltips/notes) keep the Simple English wording in
+     all 7 languages — those were the actual defect locus. zh's pre-existing 3-way term
+     inconsistency (块石/护坡/抛石 in explanatory strings → standardized on 护坡) also kept; zh's
+     menu/title reverted to its original 块石 wording, matching the identity/explanatory split.
+     `php -l` and `lang_syntax_validate.php` clean suite-wide (65 pre-existing advisory
+     identical-to-english findings only, no new structural issues). Full 12-calculator Simple
+     English audit deferred pending review of how this pilot lands (Tom's call, 2026-07-13: pilot
+     rc_ only for now).
+  6. **Cross-calculator jargon audit (Tom's candidate list: head, irregular, micro-hydro/
+     run-of-river, seepage) — evidence-based, no English renames needed.** None of the other 11
+     calculators cite a specific published paper by name the way rc_ cites Robinson, so the
+     identity-vs-explanatory tension from item 5 doesn't recur as a *naming* decision elsewhere;
+     this was purely a defect hunt. Checked actual shipped translations (not just glossary notes)
+     against each candidate term:
+     - **"head"** (dw_/hw_/mphl_/mhp_): no action. Core hydraulic vocabulary, not jargon — already
+       had 6 languages' worth of documented wrong-sense fixes (pressure-loss vs. head-loss
+       confusion) in ro/tr/id/fa/sw/ps between 2026-07-09 and 07-10; re-verified all still clean.
+       Eponym calculators (Darcy-Weisbach/Hazen-Williams/Manning) already correctly keep their
+       formula names untranslated.
+     - **"irregular"** (mi_/wi_): bg was shipping the exact evaluative-sense defect (`неправилно`
+       = "incorrect") the glossary's own "irregular channel" entry warns against, despite uk/ru
+       already being fixed for the identical problem. Fixed bg's 7 occurrences to `произволно
+       сечение` ("arbitrary cross-section"), matching the uk/ru pattern. Lesson: a documented
+       glossary warning doesn't guarantee every flagged language was corrected — verify shipped
+       state.
+     - **"micro-hydro" / "run-of-river"** (mhp_): sw and km left "Micro-Hydro" as raw untranslated
+       Latin English embedded in native sentences; km and ps also left "(Run-of-River)" as a
+       redundant English parenthetical even where the surrounding sentence already translated the
+       concept; ps separately phonetically transliterated "مایکرو هایدرو" as its own word
+       throughout (same defect, different script — not caught by a Latin-script-only grep). Same
+       failure class as the rc_ "riprap" defect. Fixed all 4: sw → "Umeme Mdogo wa Maji", km →
+       "ថាមពលវារីអគ្គិសនីខ្នាតតូច", ps → "کوچنی آبي ځواک" — all real native phrases, none forced to
+       calque the English wording (per item 5's "don't force a calque" rule). ar and zh were
+       already clean and served as the quality bar.
+     - **"seepage"** (cs_): no defects found. Checked actual translated values (not key names,
+       which falsely matched "seepage" as a literal substring of every `irr_card_seepage_*` key)
+       across all 26 languages — every one has a real native infiltration/percolation term.
+     `php -l` and `lang_syntax_validate.php` clean for all 4 touched languages (bg, sw, km, ps) and
+     suite-wide (same 65 pre-existing advisory findings, no new issues).
+  7. **DONE 2026-07-13.** `ip_main_desc` changed from "Test Branch Pressure and Uniformity
+     Estimate" to "Test Branch Pressure and Estimated Uniformity" in `lib/lang.ec.en.php`. Checked
+     all 26 translations first — each already conveys the same meaning under either English word
+     order, so no propagation was needed.
+  10. **Closed after scoping — no Opus pass needed.** Checked what items 1-4's English changes
+      actually implied for the other 26 languages before propagating anything:
+      - `mpf_shear_stress`: every one of the 26 translations still carried the "(tractive force)"
+        parenthetical the English dropped. This was a mechanical deletion of an already-correct
+        fragment (not a new-translation task), so no agent was needed — stripped it from all 26
+        files directly (zh used full-width parens/comma, handled separately). `php -l` clean on
+        all 27 files; `lang_syntax_validate.php` shows only the same 65 pre-existing advisory
+        findings.
+      - `rc_sg`: only the invisible `$ec_lang_intent` changed — nothing visible to propagate.
+      - `template_translation_help` / `template_feedback`: reviewed all 26 translations and found
+        propagation would be a regression, not an improvement — most languages (ru, ar, hr, sw,
+        zh, cs, uk, sr, ur, ro, bg, etc.) already independently phrase "share" rather than "give",
+        ahead of where the old English was; the old `template_translation_help` asked volunteers
+        for translation/programming/hosting help specifically, content the new terser English
+        dropped but which all 26 translations still usefully carry; and Turkish's string carries a
+        hand-written translator credit (Mustafa Özbay) that must not be mechanically overwritten.
+        Left all 26 as-is.
+
+- 0|96|[CC] **DONE 2026-07-13: Task 96 closed — Bulgarian scope question resolved, all 3 sub-items
+  addressed.**
   - **(1) CLOSED 2026-07-13 — decided and executed.** Tom: "I would put водно количество
     everywhere." Suite-wide, all bg calculator categories (pipes/irrigation included, not just
     open-channel/hydraulic-structure). Every `дебит` occurrence in `lib/lang.ec.bg.php` (35 across
@@ -38,12 +154,25 @@ The rules, sequence, and QA chain for translation work are **not** restated here
     `пълно водно количество`, `техният дебит`→`тяхното водно количество`). `glossary.json`'s `flow`
     entry bg value updated to `водно количество` and `translation_notes` updated to record the
     resolution (version 1.6→1.7). `php -l` and `lang_syntax_validate.php --lang=bg` both clean.
-  - **(3) still open:** no review has been sent or received on the bg ip_ notes/tooltips or
-    menu-title casing. Per the Task 90 precedent (native review is only real once feedback
-    actually lands — see CLAUDE.md's "Translation Sprints" section), don't log this as "awaiting
-    review" indefinitely — either send it to the engineer as a concrete, bounded ask, or close it
-    via our own best-effort sentence-case sweep if no review is realistically coming.
-  - **New feedback 2026-07-13 from bg engineer, ADDRESSED same day:**
+  - **(2) CLOSED 2026-07-13:** engineer's 2026-07-06 answer — "Коефициент на градация (SD) =
+    D₈₄.₁ / D₅₀" — is the standard term, superseding both candidates originally asked about
+    (`едрозърнестост` and `разнозърненост`). Applied to `rc_SD`/`rc_SD_check` in
+    `lib/lang.ec.bg.php` and recorded in `glossary.json`'s `gradation` entry.
+  - **(3) CLOSED 2026-07-13 — resolved via best-effort review, no native review realistically
+    forthcoming (Task 90 precedent).** Checked bg menu-title casing: `main_menu`/`main_title`
+    across all 12 calculators were already sentence case (only first word + proper nouns
+    capitalized), matching the engineer's corrections in `dev/Bulgarian-engineer-feedback.md`
+    (e.g. "Проектиране на Каменен Улей" → "Проектиране на каменен бързоток" is a sentence-case
+    correction). One real miss found: `index_title` (the site's homepage title, not a
+    calculator-specific key) was genuine Title Case with a stray Latin "O" typo
+    ("Безплатни Oнлайн Инженерни Калкулатори") — fixed to sentence case ("Безплатни онлайн
+    инженерни калкулатори"), matching `ru`'s pattern for the same string. Spot-checked bg's
+    `ip_` notes/tooltips for terminology consistency with the суite-wide `водно количество`
+    decision (item 1) — clean, no defects found. (Note in passing, out of scope for this task:
+    both bg and ru also Title-Case a handful of `<h3>` section headings in `about_body_html`
+    (e.g. "Лицензия с Открытым Исходным Кодом") — a separate, suite-wide heading-casing question
+    shared across languages, not a bg-specific defect; left untouched.)
+  - **New feedback 2026-07-13 from bg engineer, addressed same day:**
     1. Language-menu capitalization: `LANGNAME` for bg was the only lowercase entry
        (`български`) among all 26 non-English languages (every other Latin/Cyrillic entry —
        `Hrvatski`, `Русский`, `Türkçe`, `Українська`, etc. — is capitalized). Fixed
@@ -59,128 +188,6 @@ The rules, sequence, and QA chain for translation work are **not** restated here
        tooltip wording ("Дължина на провеждащия тръбопровод или улей", dropping the redundant
        "подвеждащия (входен)" parenthetical). `php -l` and `lang_syntax_validate.php --lang=bg`
        both clean.
-
-- 18|100|[H] **`Install.php` localization (split from Task 95, 2026-07-13).** `Install.php` (66
-  lines, PWA install instructions) is 100% hardcoded English body text, outside `$ec_lang` entirely
-  — unlike `About.php`'s `$ec_lang['about_body_html']` pattern. Scope, per Tom 2026-07-13: it must
-  be translated (it's the only working install path on iOS Safari and Firefox, where the in-app
-  `⬇ Install` button silently does nothing — see Task 95 resolution #1). Sequence, Task-87-style:
-  (1) **Wave 0 first** — tighten and clarify the English body for concision before any translation
-  work starts, same discipline as Task 87's English-reform pass; this is a much smaller page than
-  Task 87's full-suite sweep, so likely doesn't need Opus, but re-evaluate if the pass turns out to
-  be nontrivial. (2) Restructure the body into `$ec_lang['install_body_html']` (or a small set of
-  section keys if a single blob is awkward — e.g. separate Android/iOS/Desktop/Firefox sections),
-  following `About.php`'s convention. (3) Run through the normal translation-sprint pipeline
-  (`dev/translation-process.md`) once the English is settled. Not yet scoped: whether this earns a
-  standalone sprint or rides along with an upcoming category's wave.
-
-- 24|98|English improvements: 
-1. **DONE 2026-07-13.** `template_translation_help` changed from "Do you have a great vision for
-   a calculator to add here?  Can you help me improve translations, program, or host these
-   calculators?" to "Do you have great ideas for expanding or improving these calculators or
-   their translations?" in `lib/lang.ec.en.php`.
-2. **DONE 2026-07-13.** `template_feedback` changed "Please give us your valued words of
-   suggestion or praise." to "Please share your valued words of suggestion or praise." (second
-   sentence unchanged).
-3. **DONE 2026-07-13.** `mpf_shear_stress` (already the single shared key used by mpf_/hw_/dw_/
-   mtc_/mphl_ — confirmed via grep, no duplicate keys to consolidate) changed from "Average shear
-   stress (tractive force), &tau;" to "Average shear stress, &tau;"; `$ec_lang_intent` updated to
-   "Parallel or tangential tractive force per unit area on the bottom or bed of the cross
-   section. | symbol" (edited with Tom's explicit in-task authorization, per CLAUDE.md's
-   `$ec_lang_intent` AI-off-limits rule).
-4. **DONE 2026-07-13.** `rc_sg`'s `$ec_lang_intent` rewritten to lead with "Relative density of
-   rock" as the more standard modern term, explaining "specific gravity" is kept in the visible
-   label only for continuity with Robinson's paper (same authorization basis as item 3).
-   `glossary.json`'s `specific gravity` entry `context` field updated to match.
-5. **DONE 2026-07-13: Simple English pilot on rc_ (Rock Chute).** Tom's direction: this is a
-   multilingual project with an established English user base, so prioritize translatability over
-   English SEO/idiom for *explanatory* content — but identity strings (menu + `<title>`) still match
-   the authoritative source's own name. Captured as a standing principle in CLAUDE.md ("Write
-   English source strings in Simple English"). Audit found "riprap" had been phonetically
-   transliterated (not translated) in 6/26 languages (am, bn, he, hi, id, ur) and "chute" in 2 more
-   (hi, ur). First pass (over-corrected, caught by Tom): renamed English "Rock Chute" → "Steep
-   Channel" and "Riprap" → "Rock Lining" *everywhere* including `rc_main_menu`/`rc_main_title`, and
-   force-fit all 7 languages' identity strings to the "Steep Channel" concept. Tom's correction:
-   Robinson's paper is literally titled "Design of Rock Chutes" — the calculator's *name* (menu +
-   title) should keep matching that, only the *explanatory* text (description, tooltips, labels)
-   should simplify; and no language should be forced into a specific English calque either way.
-   Checked the evidence: 5 of the 6 flagged languages (am, bn, he, id, zh) already had natural,
-   non-transliterated "Rock Chute" translations in their menu/title *before* any of this — proving
-   transliteration risk tracks translation-pass quality, not UI tier, and that forcing "Steep
-   Channel" onto them would have overwritten good translations that didn't need touching. Reverted:
-   English `rc_main_menu`/`rc_main_title` back to "Rock Chute Design (Robinson)" /
-   "Free Online Rock Chute Design Calculator — Robinson (1998)"; am/bn/he/id/zh's menu/title back to
-   their original (already-natural) text; hi/ur's menu/title re-done (2 more small agent passes) as
-   natural, non-calqued "rock chute" phrases (हिन्दी "चट्टानी ढाल संरचना", Urdu "پتھریلی گزرگاہ") —
-   real transliteration fixes, not forced steep-channel translations. Explanatory strings
-   (`rc_main_desc` and all rc_ body labels/tooltips/notes) keep the Simple English wording in all 7
-   languages — those were the actual defect locus. zh's pre-existing 3-way term inconsistency
-   (块石/护坡/抛石 in explanatory strings → standardized on 护坡) also kept; zh's menu/title reverted
-   to its original 块石 wording, matching the identity/explanatory split. `php -l` and
-   `lang_syntax_validate.php` clean suite-wide (65 pre-existing advisory identical-to-english
-   findings only, no new structural issues). Item 10 below remains open (items 1-4 closed
-   2026-07-13); full 12-calculator Simple English audit deferred pending review of how this pilot
-   lands (Tom's call, 2026-07-13: pilot rc_ only for now).
-6. **DONE 2026-07-13: Cross-calculator jargon audit (Tom's candidate list: head, irregular,
-   micro-hydro/run-of-river, seepage) — evidence-based, no English renames needed.** None of the
-   other 11 calculators cite a specific published paper by name the way rc_ cites Robinson, so the
-   identity-vs-explanatory tension from item 5 doesn't recur as a *naming* decision elsewhere; this
-   was purely a defect hunt. Checked actual shipped translations (not just glossary notes) against
-   each candidate term:
-   - **"head"** (dw_/hw_/mphl_/mhp_): no action. Core hydraulic vocabulary, not jargon — already had
-     6 languages' worth of documented wrong-sense fixes (pressure-loss vs. head-loss confusion) in
-     ro/tr/id/fa/sw/ps between 2026-07-09 and 07-10; re-verified all still clean. Eponym calculators
-     (Darcy-Weisbach/Hazen-Williams/Manning) already correctly keep their formula names untranslated.
-   - **"irregular"** (mi_/wi_): bg was shipping the exact evaluative-sense defect
-     (`неправилно` = "incorrect") the glossary's own "irregular channel" entry warns against, despite
-     uk/ru already being fixed for the identical problem. Fixed bg's 7 occurrences to `произволно
-     сечение` ("arbitrary cross-section"), matching the uk/ru pattern. Lesson: a documented glossary
-     warning doesn't guarantee every flagged language was corrected — verify shipped state.
-   - **"micro-hydro" / "run-of-river"** (mhp_): sw and km left "Micro-Hydro" as raw untranslated
-     Latin English embedded in native sentences; km and ps also left "(Run-of-River)" as a redundant
-     English parenthetical even where the surrounding sentence already translated the concept; ps
-     separately phonetically transliterated "مایکرو هایدرو" as its own word throughout (same defect,
-     different script — not caught by a Latin-script-only grep). Same failure class as the rc_
-     "riprap" defect. Fixed all 4: sw → "Umeme Mdogo wa Maji", km → "ថាមពលវារីអគ្គិសនីខ្នាតតូច",
-     ps → "کوچنی آبي ځواک" — all real native phrases, none forced to calque the English wording (per
-     item 5's "don't force a calque" rule). ar and zh were already clean and served as the quality
-     bar.
-   - **"seepage"** (cs_): no defects found. Checked actual translated values (not key names, which
-     falsely matched "seepage" as a literal substring of every `irr_card_seepage_*` key) across all
-     26 languages — every one has a real native infiltration/percolation term.
-   `php -l` and `lang_syntax_validate.php` clean for all 4 touched languages (bg, sw, km, ps) and
-   suite-wide (same 65 pre-existing advisory findings, no new issues).
-7. Change ip_ 
-"Test Branch Pressure and Uniformity Estimate"
-to
-"Test Branch Pressure and Estimated Uniformity"
-10. **DONE 2026-07-13: closed after scoping — no Opus pass needed.** Checked what items 1-4's
-    English changes actually implied for the other 26 languages before propagating anything:
-    - `mpf_shear_stress`: every one of the 26 translations still carried the "(tractive force)"
-      parenthetical the English dropped. This was a mechanical deletion of an already-correct
-      fragment (not a new-translation task), so no agent was needed — stripped it from all 26
-      files directly (zh used full-width parens/comma, handled separately). `php -l` clean on all
-      27 files; `lang_syntax_validate.php` shows only the same 65 pre-existing advisory findings.
-    - `rc_sg`: only the invisible `$ec_lang_intent` changed — nothing visible to propagate.
-    - `template_translation_help` / `template_feedback`: reviewed all 26 translations and found
-      propagation would be a regression, not an improvement — most languages (ru, ar, hr, sw, zh,
-      cs, uk, sr, ur, ro, bg, etc.) already independently phrase "share" rather than "give", ahead
-      of where the old English was; the old `template_translation_help` asked volunteers for
-      translation/programming/hosting help specifically, content the new terser English dropped
-      but which all 26 translations still usefully carry; and Turkish's string carries a
-      hand-written translator credit (Mustafa Özbay) that must not be mechanically overwritten.
-      Left all 26 as-is.
-    Item 7 above (`ip_` uniformity-estimate wording) is unrelated to this item and remains open.
-
-## AI Efficiency Scripting (Overhead)
-
-These tasks reduce the AI token cost of routine maintenance by replacing repeated AI judgment with deterministic scripts. Copilot owns execution (all tagged `[CP]`); Claude Code specs any script whose output feeds back into translation quality work.
-
-## CSS Standardization Follow-up
-
-## Low Priority / Nice-to-Have
-
-## Completed
 
 - 0|97|[CC] **DONE 2026-07-13: Task 97 closed — tr riprap term unified on "taş dolgu".** Tom had no
   way to adjudicate the Turkish-native judgment call himself ("I have no way of helping... you will
