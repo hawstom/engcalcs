@@ -76,7 +76,7 @@ function echoCalculatorFormAppend() {
 					<?php echoUnitSelect($name = 'diameteru', $units = Array('mm', 'in', 'm', 'ft'), $indent_string); ?>
 				</th>
 				<th>
-					<a target="_blank" href="https://nepis.epa.gov/Exe/ZyNET.exe/P1007WWU.txt?ZyActionD=ZyDocument&Client=EPA&Index=2000%20Thru%202005&SearchMethod=1&TocRestrict=n&&IntQFieldOp=0&ExtQFieldOp=0&XmlQuery=&File=D%3A%5CZYFILES%5CINDEX%20DATA%5C00THRU05%5CTXT%5C00000024%5CP1007WWU.txt&User=ANONYMOUS&Password=anonymous&SortMethod=h%7C-&MaximumDocuments=1&FuzzyDegree=0&ImageQuality=r75g8/r75g8/x150y150g16/i425&Display=hpfr&DefSeekPage=x&SearchBack=ZyActionL&Back=ZyActionS&BackDesc=Results%20page&MaximumPages=1&ZyEntry=31"><?=$ec_lang['ip_roughness']?></a> <?=$ec_lang['dw_roughness_tip']?><br />
+					<a target="_blank" href="https://nepis.epa.gov/Exe/ZyNET.exe/P1007WWU.txt?ZyActionD=ZyDocument&Client=EPA&Index=2000%20Thru%202005&SearchMethod=1&TocRestrict=n&&IntQFieldOp=0&ExtQFieldOp=0&XmlQuery=&File=D%3A%5CZYFILES%5CINDEX%20DATA%5C00THRU05%5CTXT%5C00000024%5CP1007WWU.txt&User=ANONYMOUS&Password=anonymous&SortMethod=h%7C-&MaximumDocuments=1&FuzzyDegree=0&ImageQuality=r75g8/r75g8/x150y150g16/i425&Display=hpfr&DefSeekPage=x&SearchBack=ZyActionL&Back=ZyActionS&BackDesc=Results%20page&MaximumPages=1&ZyEntry=31"><?=$ec_lang['ip_roughness']?></a><span class="ec-help" title="<?=htmlspecialchars(strip_tags($ec_lang['dw_roughness_tip']))?>"><span class="ec-tip">?</span></span><br />
 					<?php echoUnitSelect($name = 'roughnessu', $units = Array('mm', 'in', 'm', 'ft'), $indent_string); ?>
 				</th>
 				<th>

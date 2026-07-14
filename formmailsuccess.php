@@ -1,6 +1,6 @@
 <?php 
 require_once('lib/base.inc.php');
-echoHeader("Normal", $ec_lang['contact_main_menu']);
+echoHeader("EngCalcs", $ec_lang['contact_main_menu'], "", false);
 ?>
 <p><?php echo $ec_lang['contact_success']; ?></p>
 

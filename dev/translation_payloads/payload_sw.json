@@ -1,9 +1,10 @@
 {
     "meta": {
         "language": "sw",
-        "expected_key_count": 484,
-        "delta_key_count": 7,
+        "expected_key_count": 483,
+        "delta_key_count": 8,
         "active_prefixes": [
+            "dw",
             "ip",
             "rc"
         ],
@@ -14,16 +15,75 @@
         "intent_notes": "Use key_intent when present; these entries provide terse disambiguation comments only where translation risk exists."
     },
     "prompt_context_by_prefix": {
+        "dw": "Use these preferred technical term translations when relevant:\n- flow (Q): mtiririko\n- velocity (v): kasi\n- head loss (h_L): upotevu wa kichwa\n- friction factor (f): sababu ya msuguano\n- slope (S): mteremko\n- laminar: mtiririko laini\n- transitional: mpito\n- turbulent: mtiririko msukosuko",
         "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): mtiririko\n- velocity (v): kasi\n- head loss (h_L): upotevu wa kichwa\n- emitter: kituo cha maji\n- distribution uniformity (DU): usawa wa usambazaji wa maji\n- low-quarter distribution uniformity (DU_lq): [needs translation sprint]\n- application rate (PR): kiwango cha kunyunyizia maji\n- lateral: bomba la tawi\n- mainline: bomba kuu\n- reach: sehemu ya bomba\n- velocity head (H_v): kimo cha kasi\n- friction loss (h_f): upotevu wa msuguano\n- minor loss (h_m): upotevu wa ndani\n- energy grade line (EGL): mstari wa nishati\n- upstream: juu ya mkondo\n- downstream: chini ya mkondo",
         "rc": "Use these preferred technical term translations when relevant:\n- flow (Q): mtiririko\n- velocity (v): kasi\n- riprap: mawe ya kuzuia mmomonyoko\n- slope (S): mteremko\n- rock chute: mfereji wa mawe mwinuko\n- chute: mfereji wa mwinuko\n- unit discharge (q, q_t): mtiririko kwa kila upana\n- median rock size (D50): ukubwa wa kati wa mawe\n- gradation (SD): mgawanyiko wa ukubwa wa mawe\n- porosity (n_p): upenyo\n- specific gravity (sg): uzito maalum\n- ponding: kutuama kwa maji\n- outlet apron: [needs translation sprint]\n- weir head (H_p): [needs translation sprint]\n- upstream: juu ya mkondo\n- downstream: chini ya mkondo\n- reach: sehemu ya bomba"
     },
     "glossary_terms_by_prefix": {
+        "dw": [
+            {
+                "term": "flow",
+                "symbol": "Q",
+                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg RESOLVED (Tom, 2026-07-13): native engineer's 2026-07-06 clarification confirmed both 'дебит' (colloquial\/general register) and 'водно количество' (academic\/hydraulic-engineering register, used at university for Q) are acceptable. Tom decided suite-wide standardization on 'водно количество' — \"I would put водно количество everywhere\" — applied across all bg calculator categories (pipes\/irrigation included, not just the hydraulic-structure\/open-channel strings the engineer originally corrected). 'дебит' fully replaced in lib\/lang.ec.bg.php 2026-07-13.",
+                "preferred_translation": "mtiririko"
+            },
+            {
+                "term": "velocity",
+                "symbol": "v",
+                "context": "Flow velocity (speed of water). Appears in all calculators.",
+                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
+                "preferred_translation": "kasi"
+            },
+            {
+                "term": "head loss",
+                "symbol": "h_L",
+                "context": "Energy loss expressed as a height of water column. Appears in Darcy-Weisbach, Hazen-Williams, Manning pipe, and Penstock calculators. Distinct from 'pressure drop' — use the hydraulic engineering term.",
+                "translation_notes": "'Head' in the hydraulic sense (energy per unit weight) does not translate literally in many languages — use the established civil\/hydraulic engineering phrase. Pre-2026 sr\/hr human translations used 'gubitak pritiska' (= pressure loss), which is technically the same concept expressed in pressure terms rather than head terms. The current 'губитак напора \/ gubitak tlačne visine' (= loss of hydraulic head) is more precise in a hydraulic engineering context and is preferred. DATA-ERROR FIX 2026-07-09 (category-3 wave-1 sprint): ro\/tr\/id translations were pressure-loss-sense ('pierdere de presiune'\/'basınç kaybı'\/'kehilangan tekanan'), contradicting this note's own guidance. Independently flagged by both the ro and tr wave-1 translation agents; corrected to head-loss-sense ('pierdere de sarcină'\/'yük kaybı'\/'kehilangan tinggi tekan') to match what both agents actually used in lib\/lang.ec.ro.php and lib\/lang.ec.tr.php. de's 'Druckverlust' was left as-is (not flagged; German engineering practice uses pressure\/head loss terms more interchangeably in pipe-flow context) but is worth a second look in a future audit. DATA-ERROR FIX 2026-07-09 (category-3 fa sprint): fa was 'افت فشار' (literally 'pressure loss', same pressure-loss-sense defect class as the ro\/tr\/id fix above), while the fa file's own mphl_ head-loss labels already used 'افت هد' (head loss) and 'هد' is an established loanword elsewhere in the file (هد سرعت = velocity head). Standardized to 'افت هد' suite-wide for fa and fixed dw_\/hw_ labels in lib\/lang.ec.fa.php to match. DATA-ERROR FIX 2026-07-10 (category-3 sw wave-3 sprint): glossary sw value was 'upotevu wa shinikizo' (= pressure loss), the same pressure-loss-sense defect class as the ro\/tr\/id\/fa fixes above. But lib\/lang.ec.sw.php's own dw_main_desc\/dw_main_menu\/dw_main_title\/mphl_main_desc\/mphl_main_menu\/mphl_main_title (and mpf_velocity_head, ws_headWaterHeight, or_head, mhp_gross_head elsewhere in the file) all already establish 'Kichwa' (head) as the suite's real Swahili word for hydraulic head, not 'shinikizo' (pressure). Standardized the glossary to 'upotevu wa kichwa' to match the file's own established, correct usage instead of the stale pressure-sense glossary value. DATA-ERROR FIX 2026-07-10 (category-3 ps wave-3 sprint): glossary ps value was 'د سر زیان' (زیان = damage\/loss), but lib\/lang.ec.ps.php's own dw_\/hw_\/mpf_\/mphl_ head-loss labels (40+ occurrences suite-wide) all already use ضیاع, not زیان, for 'loss' (e.g. existing dw_main_menu 'Darcy-Weisbach د پایپ سر ضیاع', mphl_total_loss). زیان does not occur anywhere in the file. Standardized the glossary to 'د سر ضیاع' to match the file's actual established usage, same defect class as the sw fix above.",
+                "preferred_translation": "upotevu wa kichwa"
+            },
+            {
+                "term": "friction factor",
+                "symbol": "f",
+                "context": "Darcy-Weisbach friction factor. Dimensionless coefficient in the Darcy-Weisbach head loss equation. Distinct from Hazen-Williams C coefficient.",
+                "translation_notes": "Use the hydraulic\/civil engineering term. In some languages, 'friction' and 'resistance' terms compete — prefer 'friction' to match the Darcy-Weisbach naming convention. DATA-ERROR FIX 2026-07-10 (category-3 km re-translation): km was 'កត្តាស្ទះ' (literally 'blockage\/obstruction factor', wrong sense — ស្ទះ means 'clogged\/blocked', not 'friction'), contradicting the file's own established usage: dw_friction_factor and mhp_f both already use 'កត្តាកកិត' (កកិត = friction\/rubbing) in lib\/lang.ec.km.php. Corrected to 'កត្តាកកិត' to match established incumbent usage. DATA-ERROR FIX 2026-07-10 (category-3 ps wave-3 re-translation): glossary ps value was 'د مالښ ضریب' (مالښ, a native Pashto word for friction\/rubbing), but مالښ does not occur anywhere in lib\/lang.ec.ps.php — the file's own established word for 'friction' is اصطکاک (14+ occurrences: dw_friction_factor, mpf_friction_slope, mphl_friction_slope, mphl_friction_loss, etc.), already correctly used in dw_friction_factor's existing string 'د اصطکاک فاکتور، f'. Kept dw_friction_factor unchanged and standardized the glossary to 'د اصطکاک فاکتور' to match established incumbent usage, same defect class as the km fix above.",
+                "preferred_translation": "sababu ya msuguano"
+            },
+            {
+                "term": "slope",
+                "symbol": "S",
+                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
+                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
+                "preferred_translation": "mteremko"
+            },
+            {
+                "term": "laminar",
+                "symbol": "",
+                "context": "Flow regime in which fluid moves in parallel layers with no lateral mixing. Reynolds number below ~2000. Appears in Darcy-Weisbach calculator flow regime check.",
+                "translation_notes": "Nearly always a direct cognate or borrowing from the Latin in technical languages. Confirm the local engineering convention.",
+                "preferred_translation": "mtiririko laini"
+            },
+            {
+                "term": "transitional",
+                "symbol": "",
+                "context": "Flow regime between laminar and turbulent — Reynolds number roughly 2000–4000. Appears in Darcy-Weisbach calculator flow regime check.",
+                "translation_notes": "Use the adjective form meaning 'between two states'. Some languages use 'critical flow' for this regime — check local hydraulics convention.",
+                "preferred_translation": "mpito"
+            },
+            {
+                "term": "turbulent",
+                "symbol": "",
+                "context": "Flow regime with chaotic, irregular mixing. Reynolds number above ~4000. Appears in Darcy-Weisbach calculator flow regime check.",
+                "translation_notes": "Nearly always a cognate. Some languages distinguish 'turbulent' (adjective) from 'turbulence' (noun) — use the adjective form.",
+                "preferred_translation": "mtiririko msukosuko"
+            }
+        ],
         "ip": [
             {
                 "term": "flow",
                 "symbol": "Q",
                 "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered. ENGINEER CLARIFICATION (2026-07-06): 'дебит is a typical colloquial call of the word — regular people and non-hydraulic engineers use it. In university (hydraulic engineering) they used водно количество for Q, never дебит. I guess both work.' So both are acceptable; водно количество is the academic\/hydraulic-engineering register, дебит the general register. Still an open decision whether to standardize on водно количество suite-wide.",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg RESOLVED (Tom, 2026-07-13): native engineer's 2026-07-06 clarification confirmed both 'дебит' (colloquial\/general register) and 'водно количество' (academic\/hydraulic-engineering register, used at university for Q) are acceptable. Tom decided suite-wide standardization on 'водно количество' — \"I would put водно количество everywhere\" — applied across all bg calculator categories (pipes\/irrigation included, not just the hydraulic-structure\/open-channel strings the engineer originally corrected). 'дебит' fully replaced in lib\/lang.ec.bg.php 2026-07-13.",
                 "preferred_translation": "mtiririko"
             },
             {
@@ -137,7 +197,7 @@
                 "term": "flow",
                 "symbol": "Q",
                 "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered. ENGINEER CLARIFICATION (2026-07-06): 'дебит is a typical colloquial call of the word — regular people and non-hydraulic engineers use it. In university (hydraulic engineering) they used водно количество for Q, never дебит. I guess both work.' So both are acceptable; водно количество is the academic\/hydraulic-engineering register, дебит the general register. Still an open decision whether to standardize on водно количество suite-wide.",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg RESOLVED (Tom, 2026-07-13): native engineer's 2026-07-06 clarification confirmed both 'дебит' (colloquial\/general register) and 'водно количество' (academic\/hydraulic-engineering register, used at university for Q) are acceptable. Tom decided suite-wide standardization on 'водно количество' — \"I would put водно количество everywhere\" — applied across all bg calculator categories (pipes\/irrigation included, not just the hydraulic-structure\/open-channel strings the engineer originally corrected). 'дебит' fully replaced in lib\/lang.ec.bg.php 2026-07-13.",
                 "preferred_translation": "mtiririko"
             },
             {
@@ -151,7 +211,7 @@
                 "term": "riprap",
                 "symbol": "",
                 "context": "Angular rock placed to resist erosion on channel beds and banks. Appears in Manning Trapezoidal Channel and Rock Chute calculators.",
-                "translation_notes": "No direct single-word equivalent in most languages. Use the established local engineering term — this varies significantly by country. In Spanish, 'enrocado' (general) or 'escollera' (bank protection) are both used; lead with 'enrocado'. Bulgarian terms verified\/corrected by a native Bulgarian engineer, 2026-07 (dev\/Bulgarian-engineer-feedback.md). bg: 'каменна облицовка' (stone lining), not 'каменна наброска'.",
+                "translation_notes": "No direct single-word equivalent in most languages. Use the established local engineering term — this varies significantly by country. In Spanish, 'enrocado' (general) or 'escollera' (bank protection) are both used; lead with 'enrocado'. Bulgarian terms verified\/corrected by a native Bulgarian engineer, 2026-07 (dev\/Bulgarian-engineer-feedback.md). bg: 'каменна облицовка' (stone lining), not 'каменна наброска'. 2026-07-13 reconciliation pass (roadmap item 42): glossary updated to match incumbent, internally-consistent lang-file usage discovered by 5 independent category-5-wave-1 translation agents (it, pt, ru, tr) — glossary values were stale, not the shipped files. Task 97 (2026-07-13): tr's rock-chute (rc_) translation agent had actually diverged from this glossary value, using 'parça taşı' (rock fragment\/piece) in 4 places instead of 'taş dolgu'; no native Turkish reviewer was available, so resolved by an AI (Opus) judgment call reasoning from suite convention — 'taş dolgu' ('stone fill', the established DSİ\/TS term, cf. 'taş dolgu baraj' = rockfill dam) is correct for both the bulk-material and D50 particle-sizing senses, matching how es\/fr\/pt\/ru all keep one bulk-material word rather than switching to a fragment\/particle term for sizing contexts. Lang file corrected to 'taş dolgu' throughout; treat as our best-effort resolution, not pending native review (see CLAUDE.md 'Native review is real only when feedback actually lands'). Task 98 riprap audit (2026-07-13): found 6 of 26 languages (am, bn, he, hi, id, ur) had phonetically TRANSLITERATED the English word 'riprap' as a borrowed loanword instead of translating the concept — a real translation-quality defect, not a stylistic choice, concentrated in this specific bare\/short-label term. English source renamed 'riprap' → 'rock lining' (see CLAUDE.md 'Write English source strings in Simple English') specifically because a transparent two-word English compound is much less likely to be transliterated than an opaque-looking jargon word; all 6 languages' rc_\/mtc_ occurrences were corrected to real native terms in the same pass (each reusing that language's own already-successful translation pattern found elsewhere in its file). zh was separately found to use three inconsistent terms (块石\/护坡\/抛石) for this concept across different rc_ keys — not a transliteration issue, but the same 'pick one term and use it everywhere' defect — resolved by standardizing on 护坡 (slope protection\/lining), which best matches the 'lining' sense and was already the plurality incumbent. The other 19 languages already had good native terms and needed no change — the concept translated fine, only the English word choice invited transliteration risk in weaker-resourced languages.",
                 "preferred_translation": "mawe ya kuzuia mmomonyoko"
             },
             {
@@ -165,7 +225,7 @@
                 "term": "rock chute",
                 "symbol": "",
                 "context": "A steep rock-lined drop structure (also called a 'rock ramp') that conveys water rapidly down a slope in irrigation, drainage, or watershed management. Key concepts for translation: rock-lined, steep gradient, spillway or drop structure — translate the concept, not the English word 'chute'. The rock riprap matrix dissipates energy and resists erosion. Appears in Rock Chute Design (Robinson) and Robinson Rock Chute calculators.",
-                "translation_notes": "CRITICAL: 'Robinson' is the surname of K.M. Robinson, co-author of Robinson, Rice & Kadavy (1998) — it is a proper noun and must NEVER be translated or modified in any language. Translate only 'Rock Chute'. Concept to translate: 'rock-lined steep channel' or 'rock-lined spillway' — the drop\/descent nature must be conveyed; a generic 'rock channel' is insufficient. CRITICAL for French: WMO No. 385 entry 517 establishes that the French word 'chute' means 'fall' (elevation difference) — it cannot name this structure. Use 'coursier en enrochement' (coursier = steep channel structure; enrochement = riprap). Spanish: USDA uses 'bajante de rocado' — 'bajante' (from bajar = to descend) correctly conveys the drop-structure nature; 'de rocado' = rock-lined. Russian: 'каменный быстроток' ('быстроток' = fast-flow\/steep channel). Portuguese: changed from 'calha' (generic trough) to 'rampa em enrocamento' (rampa = ramp\/slope, enrocamento = riprap) to convey steep character. Serbian: changed from 'жлеб' (gutter\/trough) to 'брзоток' (fast-flow structure), consistent with ru\/uk pattern. Bengali: changed from borrowed 'চ্যুট' (conveys nothing) to 'পাথর-আবৃত খাড়া নালা' (rock-lined steep channel). Persian: changed from generic 'آبراه سنگی' (stone waterway) to 'آبراه تند سنگچین' (تند = steep\/swift, سنگچین = stone-laid\/riprap). Pashto: added 'تند' (steep\/swift) to original. Khmer: changed 'ចំហ' (open) to 'ជម្រាល' (sloped\/inclined). NEEDS HUMAN REVIEW: am (ምቀጫ meaning uncertain), my (ထောင် may not clearly convey steep to all readers), de (Steinschütte is standard engineering term but doesn't explicitly say 'steep channel'). Turkish: changed to 'taş düşü' — 'düşü' is the established Turkish hydraulics term for a drop\/chute structure (2026-07 audit; previous 'taş eğimli kanal' was descriptive but nonstandard). Spanish: NEEDS HUMAN VERIFICATION — 'bajante de rocado' claims a USDA source but 'rocado' is not standard Spanish ('enrocado' is); verify the USDA document or switch to 'bajante de enrocado'. 2026-07 reconciliation: fr\/ro\/ru\/uk lang files updated to match this entry. NOT reconciled pending human review of the GLOSSARY side: hr 'kameni skluz' (consider 'kameni brzotok', parallel to sr\/ru), bg 'каменна бързина' (consider 'каменен бързоток'), de 'Steinschütte' vs shipped 'Steingerinne' (both defensible - pick one). RESOLVED bg: native Bulgarian engineer confirmed 'каменен бързоток' (2026-07); lang file updated.",
+                "translation_notes": "CRITICAL: 'Robinson' is the surname of K.M. Robinson, co-author of Robinson, Rice & Kadavy (1998) — it is a proper noun and must NEVER be translated or modified in any language. Translate only 'Rock Chute'. Concept to translate: 'rock-lined steep channel' or 'rock-lined spillway' — the drop\/descent nature must be conveyed; a generic 'rock channel' is insufficient. CRITICAL for French: WMO No. 385 entry 517 establishes that the French word 'chute' means 'fall' (elevation difference) — it cannot name this structure. Use 'coursier en enrochement' (coursier = steep channel structure; enrochement = riprap). Spanish: USDA uses 'bajante de rocado' — 'bajante' (from bajar = to descend) correctly conveys the drop-structure nature; 'de rocado' = rock-lined. Russian: 'каменный быстроток' ('быстроток' = fast-flow\/steep channel). Portuguese: changed from 'calha' (generic trough) to 'rampa em enrocamento' (rampa = ramp\/slope, enrocamento = riprap) to convey steep character. Serbian: changed from 'жлеб' (gutter\/trough) to 'брзоток' (fast-flow structure), consistent with ru\/uk pattern. Bengali: changed from borrowed 'চ্যুট' (conveys nothing) to 'পাথর-আবৃত খাড়া নালা' (rock-lined steep channel). Persian: changed from generic 'آبراه سنگی' (stone waterway) to 'آبراه تند سنگچین' (تند = steep\/swift, سنگچین = stone-laid\/riprap). Pashto: added 'تند' (steep\/swift) to original. Khmer: changed 'ចំហ' (open) to 'ជម្រាល' (sloped\/inclined). NEEDS HUMAN REVIEW: am (ምቀጫ meaning uncertain), my (ထောင် may not clearly convey steep to all readers), de (Steinschütte is standard engineering term but doesn't explicitly say 'steep channel'). Turkish: changed to 'taş düşü' — 'düşü' is the established Turkish hydraulics term for a drop\/chute structure (2026-07 audit; previous 'taş eğimli kanal' was descriptive but nonstandard). Spanish: NEEDS HUMAN VERIFICATION — 'bajante de rocado' claims a USDA source but 'rocado' is not standard Spanish ('enrocado' is); verify the USDA document or switch to 'bajante de enrocado'. 2026-07 reconciliation: fr\/ro\/ru\/uk lang files updated to match this entry. NOT reconciled pending human review of the GLOSSARY side: hr 'kameni skluz' (consider 'kameni brzotok', parallel to sr\/ru), bg 'каменна бързина' (consider 'каменен бързоток'), de 'Steinschütte' vs shipped 'Steingerinne' (both defensible - pick one). RESOLVED bg: native Bulgarian engineer confirmed 'каменен бързоток' (2026-07); lang file updated. Task 98 (2026-07-13): English source renamed 'Rock Chute' → 'Steep Channel' throughout the rc_ prefix (see CLAUDE.md 'Write English source strings in Simple English') — 'chute' itself is jargon-shaped English that some languages transliterated rather than translated. The earlier Bengali fix noted above only reached the calculator's title-level strings (rc_main_menu\/rc_main_desc); a full-file grep found 'চ্যুট' still transliterated in 7 more rc_ body keys (rc_S0, rc_qt, rc_n_chute, rc_pond_ok_tip, rc_pond_warn_tip, rc_notes_2_def, rc_notes_3_def, rc_notes_7_def) — fixed 2026-07-13 to match the title's 'খাড়া নালা'. Hindi and Urdu had the same bare-transliteration defect suite-wide ('चूट'\/'چوٹ') despite their titles being fine in some cases — fixed to 'तीव्र ढाल चैनल' (hi) and 'کھڑی نالی' (ur), applied consistently across every rc_ occurrence. Lesson: a healthy title-level translation does not guarantee the same concept was translated (vs. transliterated) in every short body label — check the whole file, not just the title strings, when auditing a jargon term.",
                 "preferred_translation": "mfereji wa mawe mwinuko"
             },
             {
@@ -186,14 +246,14 @@
                 "term": "median rock size",
                 "symbol": "D50",
                 "context": "The particle size at which 50% of the rock is finer by weight. The primary output of the Robinson rock chute method. Also used in Manning Trapezoidal Channel riprap sizing. The symbol D50 is universal — translate only the descriptive label.",
-                "translation_notes": "D50 (or D₅₀) is a universal engineering symbol — do not translate it. Translate only the label 'median rock size' or 'median particle size'. Most languages express this as 'median diameter'. Do not use 'average' (average ≠ median statistically). Spanish: 'tamaño mediano de roca'. French: 'taille médiane des rochers'. Chinese: '中值粒径'.",
+                "translation_notes": "D50 (or D₅₀) is a universal engineering symbol — do not translate it. Translate only the label 'median rock size' or 'median particle size'. Most languages express this as 'median diameter'. Do not use 'average' (average ≠ median statistically). Spanish: 'tamaño mediano de roca'. French: 'taille médiane des rochers'. Chinese: '中值粒径'. **2026-07-13 cross-language research pass (item 44):** researched whether 'average\/mean'-register wording (found in several languages' initial translations) is a real engineering error or defensible practice-register, using web research into each language's actual geotechnical\/sedimentology literature. Confirmed real errors, corrected in both the lang files and this glossary: de ('mittlere'→'mediane'\/'medianer', citing German BAW government sedimentology usage), cs ('střední'→'mediánová', citing Charles University hydraulics course), ru ('средний'→'медианный' for mi_d50in; rc_D50 already correct), tr ('orta'→'ortanca', matching the term already correct in rc_D50\/rc_notes_1_def), fa ('متوسط'→'میانه', citing Persian percentile-based technical definitions), ur ('اوسط'\/'درمیانی'\/'درمیانہ'→'وسیط', mirroring Arabic's وسيط\/متوسط distinction), sr ('средња'→'медијанска', matching mi_d50in which already used 'Медијана'). Found already correct in the lang files (glossary was simply stale, not the file — see item 42): bg ('медианен размер', confirmed live in mi_d50in\/rc_D50\/rc_notes_1_def), uk ('медіанний розмір'), hr ('medijalna veličina', an adjective form of medijan\/medijana), ro ('dimensiunea mediană'). One language, am (Amharic), was researched and found to have no distinct circulating median-vs-average term at all — even Amharic dictionaries gloss 'median' as 'መካከለኛ' (same word used for 'middle\/average') — so 'የድንጋይ መካከለኛ መጠን' was left unchanged; there's no more-correct term available in practice.",
                 "preferred_translation": "ukubwa wa kati wa mawe"
             },
             {
                 "term": "gradation",
                 "symbol": "SD",
                 "context": "The spread or uniformity of rock particle sizes. In the Robinson method, gradation is expressed as SD = D84.1\/D50. Uniform rock ≈ 1.25; Robinson valid range 1.15–1.47. Appears in Rock Chute Design calculator.",
-                "translation_notes": "Use the geotechnical\/hydraulic engineering term for grain size distribution or grading. Do not translate as 'grade' (implies quality). The symbol 'SD' and ratio notation D84.1\/D50 are universal. Spanish\/Portuguese: 'granulometría'\/'granulometria'. French: 'granulométrie'. Russian\/Bulgarian\/Serbian: 'гранулометрический состав'. Chinese: '级配'. bg: engineer proposed 'коефициент на едрозърнестост' for the D84.1\/D50 gradation SD label (2026-07); applied, but ASK for the standard source — Bulgarian soil mechanics also uses 'коефициент на разнозърненост' for grain-size uniformity.",
+                "translation_notes": "Use the geotechnical\/hydraulic engineering term for grain size distribution or grading. Do not translate as 'grade' (implies quality). The symbol 'SD' and ratio notation D84.1\/D50 are universal. Spanish\/Portuguese: 'granulometría'\/'granulometria'. French: 'granulométrie'. Russian\/Bulgarian\/Serbian: 'гранулометрический состав'. Chinese: '级配'. bg: native engineer confirmed 2026-07-06 the standard term for the D84.1\/D50 gradation SD label is 'Коефициент на градация' (superseding the earlier 'коефициент на едрозърнестост' proposal and the alternative 'коефициент на разнозърненост'); applied in rc_SD\/rc_SD_check. 2026-07-13 reconciliation pass (roadmap item 42): glossary updated to match incumbent, internally-consistent lang-file usage discovered by 5 independent category-5-wave-1 translation agents (it, pt, ru, tr) — glossary values were stale, not the shipped files.",
                 "preferred_translation": "mgawanyiko wa ukubwa wa mawe"
             },
             {
@@ -206,8 +266,8 @@
             {
                 "term": "specific gravity",
                 "symbol": "sg",
-                "context": "Dimensionless ratio of a material's density to the density of water. Typical crushed granite or basalt ≈ 2.65. Robinson method valid range: 2.54–2.82. Appears in Rock Chute Design and Manning Trapezoidal Channel calculators.",
-                "translation_notes": "Dimensionless ratio — not specific weight, which has units (ro \"greutatea specifică\" wrong; use \"densitate relativă\"; same trap hit de \"spezifisches Gewicht\"→\"relative Dichte\" and ru \"удельный вес\"→\"относительная плотность\" in the category-1 wave-1 back-translation QA, 2026-07-08). Where local practice uses the specific-weight word for this ratio (tr \"özgül ağırlık\", sr \"специфична тежина\", hr \"specifična težina\"), keep local practice but never attach units.",
+                "context": "Dimensionless ratio of a material's density to the density of water. \"Relative density\" is the more standard modern technical term for this quantity; \"specific gravity\" is kept in the English source label for continuity with Robinson's paper (rc_ prefix cites it by name), not because it's the preferred term. Typical crushed granite or basalt ≈ 2.65. Robinson method valid range: 2.54–2.82. Appears in Rock Chute Design and Manning Trapezoidal Channel calculators.",
+                "translation_notes": "Dimensionless ratio — not specific weight, which has units (ro \"greutatea specifică\" wrong; use \"densitate relativă\"; same trap hit de \"spezifisches Gewicht\"→\"relative Dichte\" and ru \"удельный вес\"→\"относительная плотность\" in the category-1 wave-1 back-translation QA, 2026-07-08). Where local practice uses the specific-weight word for this ratio (tr \"özgül ağırlık\", sr \"специфична тежина\", hr \"specifična težina\", he \"משקל סגולי\" — the standard Hebrew physics-curriculum term, verified 2026-07-13 as a naming-convention match rather than a units error, same class as tr\/sr\/hr), keep local practice but never attach units. ps glossary entry corrected 2026-07-13 from a stale \"heavy weight\" mistranslation (ستومانه وزن) to match the already-correct incumbent file term ځانګړی ثقل (lit. \"specific gravitas,\" the standard Perso-Arabic-derived scientific term — parallel to English's own \"gravity\" naming, not a units error).",
                 "preferred_translation": "uzito maalum"
             },
             {
@@ -255,6 +315,7 @@
         ]
     },
     "keys_to_translate": {
+        "dw_roughness": "e",
         "rc_sg_ok_tip": "2.54–2.82 (Robinson)",
         "rc_SD_ok_tip": "1.15–1.47 (Robinson)",
         "ip_length": "L",
@@ -264,6 +325,7 @@
         "ip_hm": "h<sub>m<\/sub>"
     },
     "keys": {
+        "dw_roughness": "e",
         "rc_sg_ok_tip": "2.54–2.82 (Robinson)",
         "rc_SD_ok_tip": "1.15–1.47 (Robinson)",
         "ip_length": "L",
@@ -273,6 +335,22 @@
         "ip_hm": "h<sub>m<\/sub>"
     },
     "key_context": {
+        "dw_roughness": {
+            "reason": "equal_to_english",
+            "current_value": "e",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "dw_main_desc",
+                    "value": "Upotevu wa Kichwa cha Bomba la Darcy-Weisbach kwa Kipenyo, Ukakamavu, na Mtiririko Uliowekwa",
+                    "english": "Darcy-Weisbach Pipe Head Loss at Given Diameter, Roughness, and Flow"
+                },
+                "next_translated": {
+                    "key": "dw_roughness_tip",
+                    "value": "Kina kamili cha ukakamavu, e, wa ukuta wa bomba. Thamani za kawaida: chuma (kipya) 0.046 mm, chuma (kilichotumika) 0.15 mm, HDPE 0.003 mm, PVC\/uPVC 0.0015 mm, zege 0.3–3 mm.",
+                    "english": "Absolute roughness height, e, of the pipe wall. Typical values: steel (new) 0.046 mm, steel (used) 0.15 mm, HDPE 0.003 mm, PVC\/uPVC 0.0015 mm, concrete 0.3–3 mm."
+                }
+            }
+        },
         "rc_sg_ok_tip": {
             "reason": "equal_to_english",
             "current_value": "2.54–2.82 (Robinson)",
@@ -311,13 +389,13 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "Vituo vya Maji <span title=\"Safu za tawi: vituo vya maji vilivyo katika sehemu hii tu. Safu za bomba kuu: jumla ya vituo vya maji kwenye mabomba ya tawi MENGINE yanayotokana na sehemu hii. Kwa sehemu ya bomba kuu inayoishia kwenye bomba la tawi la jaribio, hii pia inajumuisha mabomba yoyote ya tawi yaliyo mbele zaidi kwenye bomba kuu, au yanayoshiriki kiungo kile kile (k.m. tawi la upande wa pili) &mdash; mtiririko wake pia hutokana na sehemu hii hii.\" class=\"ec-tip\">?<\/span>",
-                    "english": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>"
+                    "value": "<span class=\"ec-help\" title=\"Safu za tawi: vituo vya maji vilivyo katika sehemu hii tu. Safu za bomba kuu: jumla ya vituo vya maji kwenye mabomba ya tawi MENGINE yanayotokana na sehemu hii. Kwa sehemu ya bomba kuu inayoishia kwenye bomba la tawi la jaribio, hii pia inajumuisha mabomba yoyote ya tawi yaliyo mbele zaidi kwenye bomba kuu, au yanayoshiriki kiungo kile kile (k.m. tawi la upande wa pili) &mdash; mtiririko wake pia hutokana na sehemu hii hii.\">Vituo vya Maji <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_km",
-                    "value": "k<sub>m<\/sub> <span title=\"Mgawo wa jumla wa upotevu wa ndani kwa viunganishi\/vali\/viungio vya sehemu hii (kiwango cha chini kinachopendekezwa &ge;0.5)\" class=\"ec-tip\">?<\/span>",
-                    "english": "k<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
+                    "value": "<span class=\"ec-help\" title=\"Mgawo wa jumla wa upotevu wa ndani kwa viunganishi\/vali\/viungio vya sehemu hii (kiwango cha chini kinachopendekezwa &ge;0.5)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -327,13 +405,13 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "Vituo vya Maji <span title=\"Safu za tawi: vituo vya maji vilivyo katika sehemu hii tu. Safu za bomba kuu: jumla ya vituo vya maji kwenye mabomba ya tawi MENGINE yanayotokana na sehemu hii. Kwa sehemu ya bomba kuu inayoishia kwenye bomba la tawi la jaribio, hii pia inajumuisha mabomba yoyote ya tawi yaliyo mbele zaidi kwenye bomba kuu, au yanayoshiriki kiungo kile kile (k.m. tawi la upande wa pili) &mdash; mtiririko wake pia hutokana na sehemu hii hii.\" class=\"ec-tip\">?<\/span>",
-                    "english": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>"
+                    "value": "<span class=\"ec-help\" title=\"Safu za tawi: vituo vya maji vilivyo katika sehemu hii tu. Safu za bomba kuu: jumla ya vituo vya maji kwenye mabomba ya tawi MENGINE yanayotokana na sehemu hii. Kwa sehemu ya bomba kuu inayoishia kwenye bomba la tawi la jaribio, hii pia inajumuisha mabomba yoyote ya tawi yaliyo mbele zaidi kwenye bomba kuu, au yanayoshiriki kiungo kile kile (k.m. tawi la upande wa pili) &mdash; mtiririko wake pia hutokana na sehemu hii hii.\">Vituo vya Maji <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_km",
-                    "value": "k<sub>m<\/sub> <span title=\"Mgawo wa jumla wa upotevu wa ndani kwa viunganishi\/vali\/viungio vya sehemu hii (kiwango cha chini kinachopendekezwa &ge;0.5)\" class=\"ec-tip\">?<\/span>",
-                    "english": "k<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
+                    "value": "<span class=\"ec-help\" title=\"Mgawo wa jumla wa upotevu wa ndani kwa viunganishi\/vali\/viungio vya sehemu hii (kiwango cha chini kinachopendekezwa &ge;0.5)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -343,13 +421,13 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "Vituo vya Maji <span title=\"Safu za tawi: vituo vya maji vilivyo katika sehemu hii tu. Safu za bomba kuu: jumla ya vituo vya maji kwenye mabomba ya tawi MENGINE yanayotokana na sehemu hii. Kwa sehemu ya bomba kuu inayoishia kwenye bomba la tawi la jaribio, hii pia inajumuisha mabomba yoyote ya tawi yaliyo mbele zaidi kwenye bomba kuu, au yanayoshiriki kiungo kile kile (k.m. tawi la upande wa pili) &mdash; mtiririko wake pia hutokana na sehemu hii hii.\" class=\"ec-tip\">?<\/span>",
-                    "english": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>"
+                    "value": "<span class=\"ec-help\" title=\"Safu za tawi: vituo vya maji vilivyo katika sehemu hii tu. Safu za bomba kuu: jumla ya vituo vya maji kwenye mabomba ya tawi MENGINE yanayotokana na sehemu hii. Kwa sehemu ya bomba kuu inayoishia kwenye bomba la tawi la jaribio, hii pia inajumuisha mabomba yoyote ya tawi yaliyo mbele zaidi kwenye bomba kuu, au yanayoshiriki kiungo kile kile (k.m. tawi la upande wa pili) &mdash; mtiririko wake pia hutokana na sehemu hii hii.\">Vituo vya Maji <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_km",
-                    "value": "k<sub>m<\/sub> <span title=\"Mgawo wa jumla wa upotevu wa ndani kwa viunganishi\/vali\/viungio vya sehemu hii (kiwango cha chini kinachopendekezwa &ge;0.5)\" class=\"ec-tip\">?<\/span>",
-                    "english": "k<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
+                    "value": "<span class=\"ec-help\" title=\"Mgawo wa jumla wa upotevu wa ndani kwa viunganishi\/vali\/viungio vya sehemu hii (kiwango cha chini kinachopendekezwa &ge;0.5)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -364,8 +442,8 @@
                 },
                 "next_translated": {
                     "key": "ip_hl",
-                    "value": "h<sub>L<\/sub> <span title=\"Jumla ya upotevu wa sehemu, h_f + h_m\" class=\"ec-tip\">?<\/span>",
-                    "english": "h<sub>L<\/sub> <span title=\"Total reach loss, h_f + h_m\" class=\"ec-tip\">?<\/span>"
+                    "value": "<span class=\"ec-help\" title=\"Jumla ya upotevu wa sehemu, h_f + h_m\">h<sub>L<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Total reach loss, h_f + h_m\">h<sub>L<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -380,8 +458,8 @@
                 },
                 "next_translated": {
                     "key": "ip_hl",
-                    "value": "h<sub>L<\/sub> <span title=\"Jumla ya upotevu wa sehemu, h_f + h_m\" class=\"ec-tip\">?<\/span>",
-                    "english": "h<sub>L<\/sub> <span title=\"Total reach loss, h_f + h_m\" class=\"ec-tip\">?<\/span>"
+                    "value": "<span class=\"ec-help\" title=\"Jumla ya upotevu wa sehemu, h_f + h_m\">h<sub>L<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Total reach loss, h_f + h_m\">h<sub>L<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         }

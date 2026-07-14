@@ -5,7 +5,7 @@ $html_head = '
 	<meta name="Description" content="' . htmlspecialchars($html_title, ENT_QUOTES, 'UTF-8') . '" />
 	<meta name="Keywords" content="open source hydraulic calculators humanitarian mission contribute GPL" />
 ';
-echoHeader("Normal", $html_title, $html_head, false);
+echoHeader("EngCalcs", $html_title, $html_head, false);
 ?>
 <p>Tom Haws, Professional Engineer (Civil)<br />
 859 N Lafayette<br />

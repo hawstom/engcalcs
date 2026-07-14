@@ -90,7 +90,7 @@ function echoCalculatorFormAppend() {
 				<th>
 					<?=$ec_lang['mi_v617']?>
 					<br />
-					<?php echoUnitSelect($name = 'v617u', $units = Array('mps', 'ftps', 'mph'), $indent_string); ?>
+					<?php echoUnitSelect($name = 'v617u', $units = Array('mps', 'ftps'), $indent_string); ?>
 				</th>
 				<th>
 					<?=$ec_lang['mi_hv617']?>

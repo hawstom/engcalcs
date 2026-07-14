@@ -18,20 +18,20 @@ echoCalculatorForm(
 		Array('name' => 'hgross', 'type' => 'number', 'default' => '50',   'units' => Array('m','ft'),                  'label' => $ec_lang['mhp_gross_head']),
 		Array('name' => 'd',      'type' => 'number', 'default' => '100',  'units' => Array('mm','m','in','ft'),         'label' => $ec_lang['mhp_diameter']),
 		Array('name' => 'l',      'type' => 'number', 'default' => '200',  'units' => Array('m','ft'),                  'label' => $ec_lang['mhp_length']),
-		Array('name' => 'e',      'type' => 'number', 'default' => '0.05', 'units' => Array('mm','m','in','ft'),         'label' => '<a target="_blank" href="https://nepis.epa.gov/Exe/ZyNET.exe/P1007WWU.txt?ZyActionD=ZyDocument&Client=EPA&Index=2000%20Thru%202005&SearchMethod=1&TocRestrict=n&&IntQFieldOp=0&ExtQFieldOp=0&XmlQuery=&File=D%3A%5CZYFILES%5CINDEX%20DATA%5C00THRU05%5CTXT%5C00000024%5CP1007WWU.txt&User=ANONYMOUS&Password=anonymous&SortMethod=h%7C-&MaximumDocuments=1&FuzzyDegree=0&ImageQuality=r75g8/r75g8/x150y150g16/i425&Display=hpfr&DefSeekPage=x&SearchBack=ZyActionL&Back=ZyActionS&BackDesc=Results%20page&MaximumPages=1&ZyEntry=31">'.$ec_lang['dw_roughness'].'</a> '.$ec_lang['dw_roughness_tip'].' '.$ec_lang['mpf_see_notes']),
-		Array('name' => 'km',     'type' => 'number', 'default' => '1.5',  'units' => NULL,                             'label' => '<a target="_blank" href="https://www.engineeringtoolbox.com/minor-loss-coefficients-pipes-d_626.html">'.$ec_lang['mphl_total_junction_k'].'</a> '.$ec_lang['mpf_see_notes']),
+		Array('name' => 'e',      'type' => 'number', 'default' => '0.05', 'units' => Array('mm','m','in','ft'),         'label' => '<a target="_blank" href="https://nepis.epa.gov/Exe/ZyNET.exe/P1007WWU.txt?ZyActionD=ZyDocument&Client=EPA&Index=2000%20Thru%202005&SearchMethod=1&TocRestrict=n&&IntQFieldOp=0&ExtQFieldOp=0&XmlQuery=&File=D%3A%5CZYFILES%5CINDEX%20DATA%5C00THRU05%5CTXT%5C00000024%5CP1007WWU.txt&User=ANONYMOUS&Password=anonymous&SortMethod=h%7C-&MaximumDocuments=1&FuzzyDegree=0&ImageQuality=r75g8/r75g8/x150y150g16/i425&Display=hpfr&DefSeekPage=x&SearchBack=ZyActionL&Back=ZyActionS&BackDesc=Results%20page&MaximumPages=1&ZyEntry=31">'.$ec_lang['dw_roughness'].'</a><span class="ec-help" title="'.htmlspecialchars(strip_tags($ec_lang['dw_roughness_tip'])).'"><span class="ec-tip">?</span></span>'),
+		Array('name' => 'km',     'type' => 'number', 'default' => '2.0',  'units' => NULL,                             'label' => '<a target="_blank" href="https://www.engineeringtoolbox.com/minor-loss-coefficients-pipes-d_626.html">'.$ec_lang['mphl_total_junction_k_short'].'</a><span class="ec-help" title="'.htmlspecialchars(strip_tags($ec_lang['mphl_total_junction_k_tip'])).'"><span class="ec-tip">?</span></span>'),
 		Array('name' => 'nu',     'type' => 'number', 'default' => '1e-6', 'units' => NULL,                             'label' => $ec_lang['dw_kinematic_viscosity']),
 		Array('name' => 'eta',    'type' => 'number', 'default' => '0.75', 'units' => NULL,                             'label' => $ec_lang['mhp_efficiency']),
 	),
 	//Results
 	Array(
 		Array('name' => 'vel',        'units' => Array('mps','ftps'),      'label' => $ec_lang['mpf_velocity']),
-		Array('name' => 'vel_check',  'units' => NULL,                     'label' => $ec_lang['mhp_vel_check'].' '.$ec_lang['mpf_see_notes']),
+		Array('name' => 'vel_check',  'units' => NULL,                     'label' => $ec_lang['mhp_vel_check']),
 		Array('name' => 'f',          'units' => NULL,                     'label' => $ec_lang['dw_friction_factor']),
 		Array('name' => 'hf',         'units' => Array('m','mm','ft','in'),'label' => $ec_lang['mphl_friction_loss']),
 		Array('name' => 'hm',         'units' => Array('m','mm','ft','in'),'label' => $ec_lang['mphl_junction_loss']),
 		Array('name' => 'hl',         'units' => Array('m','mm','ft','in'),'label' => $ec_lang['mphl_total_loss']),
-		Array('name' => 'hl_check',   'units' => NULL,                     'label' => $ec_lang['mhp_hl_check'].' '.$ec_lang['mpf_see_notes']),
+		Array('name' => 'hl_check',   'units' => NULL,                     'label' => $ec_lang['mhp_hl_check']),
 		Array('name' => 'hnet',       'units' => Array('m','mm','ft','in'),'label' => $ec_lang['mhp_hnet']),
 		Array('name' => 'power',      'units' => Array('kw','mw','hp'),    'label' => $ec_lang['mhp_power']),
 		Array('name' => 'annual_kwh', 'units' => Array('kwh_yr','mwh_yr'),  'label' => $ec_lang['mhp_annual_kwh']),
@@ -46,8 +46,6 @@ echoCalculatorForm(
 	<dt><?=$ec_lang['mhp_notes_1_term']?></dt><dd><?=$ec_lang['mhp_notes_1_def']?></dd>
 	<dt><?=$ec_lang['mhp_notes_2_term']?></dt><dd><?=$ec_lang['mhp_notes_2_def']?></dd>
 	<dt><?=$ec_lang['mhp_notes_3_term']?></dt><dd><?=$ec_lang['mhp_notes_3_def']?></dd>
-	<dt><?=$ec_lang['mhp_notes_4_term']?></dt><dd><?=$ec_lang['mhp_notes_4_def']?></dd>
-	<dt><?=$ec_lang['mhp_notes_5_term']?></dt><dd><?=$ec_lang['mhp_notes_5_def']?></dd>
 	<dt><?=$ec_lang['mhp_notes_6_term']?></dt><dd><?=$ec_lang['mhp_notes_6_def']?></dd>
 	<dt><?=$ec_lang['mhp_notes_7_term']?></dt><dd><?=$ec_lang['mhp_notes_7_def']?></dd>
 </dl>
@@ -60,11 +58,10 @@ EngCalcs.pageConfig = {
 	mhp_vel_ok_short:   <?=json_encode($ec_lang['mhp_vel_ok_short'])?>,
 	mhp_vel_high_short: <?=json_encode($ec_lang['mhp_vel_high_short'])?>,
 	mhp_vel_low_short:  <?=json_encode($ec_lang['mhp_vel_low_short'])?>,
-	hl_ok:    <?=json_encode($ec_lang['mhp_hl_ok'])?>,
-	hl_warn:  <?=json_encode($ec_lang['mhp_hl_warn'])?>,
+	mhp_vel_ok_tip: <?=json_encode($ec_lang['mhp_vel_ok_tip'])?>,
+	hl_ok_tip:   <?=json_encode($ec_lang['mhp_hl_ok_tip'])?>,
 	hl_warn_tip: <?=json_encode($ec_lang['mhp_hl_warn_tip'])?>,
-	hl_bad:   <?=json_encode($ec_lang['mhp_hl_bad'])?>,
-	hl_bad_tip: <?=json_encode($ec_lang['mhp_hl_bad_tip'])?>
+	hl_bad_tip:  <?=json_encode($ec_lang['mhp_hl_bad_tip'])?>
 };
 </script>
 <script src="/engcalcs/js/micro-hydro-power.js?v=<?=filemtime(__DIR__.'/js/micro-hydro-power.js')?>"></script>

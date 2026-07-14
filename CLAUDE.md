@@ -86,6 +86,46 @@ All check/verdict outputs (velocity, regime, loss-sign, head-loss %, …) use on
 
 All display strings live in `lib/lang.ec.??.php` (27 files: en + 26 non-English). Keys follow the pattern `prefix_description`, e.g. `dw_friction_factor`, `mpf_flow`. Add keys to **all** language files when adding a new calculator — use English text as the fallback where translations aren't available yet.
 
+### Write English source strings in Simple English (Task 98, 2026-07-13)
+
+This is a multilingual project with an established English user base going back many years — for
+new and edited `$ec_lang` strings, **prioritize translatability over English SEO/idiom, but only
+for explanatory content — not for a calculator's identity.** Two different string roles, two
+different rules:
+
+- **Identity strings (menu entry + `<title>` tag) match the authoritative published source's own
+  terminology**, when the calculator is named after one. Robinson's paper is literally titled
+  "Design of Rock Chutes" — `rc_main_menu`/`rc_main_title` say "Rock Chute Design (Robinson)",
+  matching it. This is a continuity/recognition call, not a translatability one: the menu entry and
+  title are the calculator's *name* — what a returning English-speaking user searches for, bookmarks,
+  and calls it in conversation — so don't casually rename it even if a plainer word exists.
+- **Explanatory strings (on-page description, tooltips, notes, body labels) prioritize Simple
+  English.** `rc_main_desc` says "Steep Channel Rock Lining Size", not "Rock Chute Riprap Sizing" —
+  a word that *looks* like an opaque loanword (e.g. "riprap") invites translators, especially in
+  lower-resource languages, to phonetically transliterate it rather than translate the concept,
+  because there's nothing to compositionally parse. Two ordinary words a translator can actually
+  translate ("rock lining") are safer than one jargon word here, even though that same jargon word
+  is fine — even preferred — in the identity strings above.
+- **Don't force any language into a specific calque of the English wording**, in either string role.
+  An audit of the Rock Chute calculator found 6 of 26 languages (am, bn, he, hi, id, ur) had
+  phonetically transliterated "riprap" as a loanword, and 2 more (hi, ur) had done the same to
+  "chute" — real defects, fixed 2026-07-13. But the fix is "translate the concept naturally,"
+  not "match this exact English phrase": 5 of those 6 languages already had perfectly natural,
+  non-transliterated identity-string translations of "Rock Chute" *before* any of this — proving the
+  transliteration risk tracks translation-pass quality, not which UI tier a string lives in, and
+  that forcing a uniform calque (e.g. requiring every language's identity string to literally
+  decompose into "steep" + "channel") would have overwritten good, idiomatic translations that
+  didn't need touching. When fixing a transliteration defect, let the translator/agent choose
+  whatever real, established phrase native engineers would use — matching the *concept*, not the
+  specific English words chosen for that string's role.
+- **Don't rename eponyms or bibliographic citations** — "Manning," "Darcy-Weisbach," "Robinson," and
+  actual paper titles in citations stay as published in every string role; the jargon risk is
+  specifically generic descriptive terms dressed up in Title Case or borrowed technical slang, not
+  legitimate proper nouns.
+- This principle governs new calculators from day one, not just retrofits — pick an identity name
+  matching the source method (if any) and plain, composable English for explanatory content, when a
+  calculator is first written, so it never needs this fix later.
+
 **`$ec_lang_intent` is off-limits to AI.** This array provides human-authored translation guidance that is interleaved with `$ec_lang` for human review. AI must never add, change, or remove any `$ec_lang_intent` entry without explicit written permission from the human in that conversation.
 
 ### `$ec_lang_intent` format: `<intent> | <commentary>`

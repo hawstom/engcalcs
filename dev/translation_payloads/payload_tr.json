@@ -1,9 +1,10 @@
 {
     "meta": {
         "language": "tr",
-        "expected_key_count": 484,
-        "delta_key_count": 5,
+        "expected_key_count": 483,
+        "delta_key_count": 6,
         "active_prefixes": [
+            "dw",
             "ip"
         ],
         "requested_prefix": null,
@@ -13,15 +14,74 @@
         "intent_notes": "Use key_intent when present; these entries provide terse disambiguation comments only where translation risk exists."
     },
     "prompt_context_by_prefix": {
+        "dw": "Use these preferred technical term translations when relevant:\n- flow (Q): debi\n- velocity (v): hız\n- head loss (h_L): yük kaybı\n- friction factor (f): sürtünme faktörü\n- slope (S): eğim\n- laminar: laminar\n- transitional: geçişli\n- turbulent: türbülanslı",
         "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): debi\n- velocity (v): hız\n- head loss (h_L): yük kaybı\n- emitter: damlatıcı\n- distribution uniformity (DU): dağılım düzgünlüğü\n- low-quarter distribution uniformity (DU_lq): düşük-çeyrek Dağıtım Uniformluğu\n- application rate (PR): sulama yoğunluğu\n- lateral: lateral\n- mainline: ana boru hattı\n- reach: hat kesimi\n- velocity head (H_v): hız yükü\n- friction loss (h_f): sürtünme kaybı\n- minor loss (h_m): yerel kayıp\n- energy grade line (EGL): enerji çizgisi\n- upstream: memba\n- downstream: mansap"
     },
     "glossary_terms_by_prefix": {
+        "dw": [
+            {
+                "term": "flow",
+                "symbol": "Q",
+                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg RESOLVED (Tom, 2026-07-13): native engineer's 2026-07-06 clarification confirmed both 'дебит' (colloquial\/general register) and 'водно количество' (academic\/hydraulic-engineering register, used at university for Q) are acceptable. Tom decided suite-wide standardization on 'водно количество' — \"I would put водно количество everywhere\" — applied across all bg calculator categories (pipes\/irrigation included, not just the hydraulic-structure\/open-channel strings the engineer originally corrected). 'дебит' fully replaced in lib\/lang.ec.bg.php 2026-07-13.",
+                "preferred_translation": "debi"
+            },
+            {
+                "term": "velocity",
+                "symbol": "v",
+                "context": "Flow velocity (speed of water). Appears in all calculators.",
+                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
+                "preferred_translation": "hız"
+            },
+            {
+                "term": "head loss",
+                "symbol": "h_L",
+                "context": "Energy loss expressed as a height of water column. Appears in Darcy-Weisbach, Hazen-Williams, Manning pipe, and Penstock calculators. Distinct from 'pressure drop' — use the hydraulic engineering term.",
+                "translation_notes": "'Head' in the hydraulic sense (energy per unit weight) does not translate literally in many languages — use the established civil\/hydraulic engineering phrase. Pre-2026 sr\/hr human translations used 'gubitak pritiska' (= pressure loss), which is technically the same concept expressed in pressure terms rather than head terms. The current 'губитак напора \/ gubitak tlačne visine' (= loss of hydraulic head) is more precise in a hydraulic engineering context and is preferred. DATA-ERROR FIX 2026-07-09 (category-3 wave-1 sprint): ro\/tr\/id translations were pressure-loss-sense ('pierdere de presiune'\/'basınç kaybı'\/'kehilangan tekanan'), contradicting this note's own guidance. Independently flagged by both the ro and tr wave-1 translation agents; corrected to head-loss-sense ('pierdere de sarcină'\/'yük kaybı'\/'kehilangan tinggi tekan') to match what both agents actually used in lib\/lang.ec.ro.php and lib\/lang.ec.tr.php. de's 'Druckverlust' was left as-is (not flagged; German engineering practice uses pressure\/head loss terms more interchangeably in pipe-flow context) but is worth a second look in a future audit. DATA-ERROR FIX 2026-07-09 (category-3 fa sprint): fa was 'افت فشار' (literally 'pressure loss', same pressure-loss-sense defect class as the ro\/tr\/id fix above), while the fa file's own mphl_ head-loss labels already used 'افت هد' (head loss) and 'هد' is an established loanword elsewhere in the file (هد سرعت = velocity head). Standardized to 'افت هد' suite-wide for fa and fixed dw_\/hw_ labels in lib\/lang.ec.fa.php to match. DATA-ERROR FIX 2026-07-10 (category-3 sw wave-3 sprint): glossary sw value was 'upotevu wa shinikizo' (= pressure loss), the same pressure-loss-sense defect class as the ro\/tr\/id\/fa fixes above. But lib\/lang.ec.sw.php's own dw_main_desc\/dw_main_menu\/dw_main_title\/mphl_main_desc\/mphl_main_menu\/mphl_main_title (and mpf_velocity_head, ws_headWaterHeight, or_head, mhp_gross_head elsewhere in the file) all already establish 'Kichwa' (head) as the suite's real Swahili word for hydraulic head, not 'shinikizo' (pressure). Standardized the glossary to 'upotevu wa kichwa' to match the file's own established, correct usage instead of the stale pressure-sense glossary value. DATA-ERROR FIX 2026-07-10 (category-3 ps wave-3 sprint): glossary ps value was 'د سر زیان' (زیان = damage\/loss), but lib\/lang.ec.ps.php's own dw_\/hw_\/mpf_\/mphl_ head-loss labels (40+ occurrences suite-wide) all already use ضیاع, not زیان, for 'loss' (e.g. existing dw_main_menu 'Darcy-Weisbach د پایپ سر ضیاع', mphl_total_loss). زیان does not occur anywhere in the file. Standardized the glossary to 'د سر ضیاع' to match the file's actual established usage, same defect class as the sw fix above.",
+                "preferred_translation": "yük kaybı"
+            },
+            {
+                "term": "friction factor",
+                "symbol": "f",
+                "context": "Darcy-Weisbach friction factor. Dimensionless coefficient in the Darcy-Weisbach head loss equation. Distinct from Hazen-Williams C coefficient.",
+                "translation_notes": "Use the hydraulic\/civil engineering term. In some languages, 'friction' and 'resistance' terms compete — prefer 'friction' to match the Darcy-Weisbach naming convention. DATA-ERROR FIX 2026-07-10 (category-3 km re-translation): km was 'កត្តាស្ទះ' (literally 'blockage\/obstruction factor', wrong sense — ស្ទះ means 'clogged\/blocked', not 'friction'), contradicting the file's own established usage: dw_friction_factor and mhp_f both already use 'កត្តាកកិត' (កកិត = friction\/rubbing) in lib\/lang.ec.km.php. Corrected to 'កត្តាកកិត' to match established incumbent usage. DATA-ERROR FIX 2026-07-10 (category-3 ps wave-3 re-translation): glossary ps value was 'د مالښ ضریب' (مالښ, a native Pashto word for friction\/rubbing), but مالښ does not occur anywhere in lib\/lang.ec.ps.php — the file's own established word for 'friction' is اصطکاک (14+ occurrences: dw_friction_factor, mpf_friction_slope, mphl_friction_slope, mphl_friction_loss, etc.), already correctly used in dw_friction_factor's existing string 'د اصطکاک فاکتور، f'. Kept dw_friction_factor unchanged and standardized the glossary to 'د اصطکاک فاکتور' to match established incumbent usage, same defect class as the km fix above.",
+                "preferred_translation": "sürtünme faktörü"
+            },
+            {
+                "term": "slope",
+                "symbol": "S",
+                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
+                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
+                "preferred_translation": "eğim"
+            },
+            {
+                "term": "laminar",
+                "symbol": "",
+                "context": "Flow regime in which fluid moves in parallel layers with no lateral mixing. Reynolds number below ~2000. Appears in Darcy-Weisbach calculator flow regime check.",
+                "translation_notes": "Nearly always a direct cognate or borrowing from the Latin in technical languages. Confirm the local engineering convention.",
+                "preferred_translation": "laminar"
+            },
+            {
+                "term": "transitional",
+                "symbol": "",
+                "context": "Flow regime between laminar and turbulent — Reynolds number roughly 2000–4000. Appears in Darcy-Weisbach calculator flow regime check.",
+                "translation_notes": "Use the adjective form meaning 'between two states'. Some languages use 'critical flow' for this regime — check local hydraulics convention.",
+                "preferred_translation": "geçişli"
+            },
+            {
+                "term": "turbulent",
+                "symbol": "",
+                "context": "Flow regime with chaotic, irregular mixing. Reynolds number above ~4000. Appears in Darcy-Weisbach calculator flow regime check.",
+                "translation_notes": "Nearly always a cognate. Some languages distinguish 'turbulent' (adjective) from 'turbulence' (noun) — use the adjective form.",
+                "preferred_translation": "türbülanslı"
+            }
+        ],
         "ip": [
             {
                 "term": "flow",
                 "symbol": "Q",
                 "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg OPEN QUESTION (2026-07): native engineer corrected 'дебит' to 'водно количество' in hydraulic-structure\/open-channel strings (rc_, or_). Whether to replace 'дебит' suite-wide (incl. pipes\/irrigation) is pending their clarification; keep 'дебит' elsewhere until answered. ENGINEER CLARIFICATION (2026-07-06): 'дебит is a typical colloquial call of the word — regular people and non-hydraulic engineers use it. In university (hydraulic engineering) they used водно количество for Q, never дебит. I guess both work.' So both are acceptable; водно количество is the academic\/hydraulic-engineering register, дебит the general register. Still an open decision whether to standardize on водно количество suite-wide.",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg RESOLVED (Tom, 2026-07-13): native engineer's 2026-07-06 clarification confirmed both 'дебит' (colloquial\/general register) and 'водно количество' (academic\/hydraulic-engineering register, used at university for Q) are acceptable. Tom decided suite-wide standardization on 'водно количество' — \"I would put водно количество everywhere\" — applied across all bg calculator categories (pipes\/irrigation included, not just the hydraulic-structure\/open-channel strings the engineer originally corrected). 'дебит' fully replaced in lib\/lang.ec.bg.php 2026-07-13.",
                 "preferred_translation": "debi"
             },
             {
@@ -132,6 +192,7 @@
         ]
     },
     "keys_to_translate": {
+        "dw_roughness": "e",
         "ip_length": "L",
         "ip_diameter": "D",
         "ip_roughness": "e",
@@ -139,6 +200,7 @@
         "ip_hm": "h<sub>m<\/sub>"
     },
     "keys": {
+        "dw_roughness": "e",
         "ip_length": "L",
         "ip_diameter": "D",
         "ip_roughness": "e",
@@ -146,19 +208,35 @@
         "ip_hm": "h<sub>m<\/sub>"
     },
     "key_context": {
+        "dw_roughness": {
+            "reason": "equal_to_english",
+            "current_value": "e",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "dw_main_desc",
+                    "value": "Verilen Çap, Pürüzlülük ve Akış için Darcy-Weisbach Boru Yük Kaybı",
+                    "english": "Darcy-Weisbach Pipe Head Loss at Given Diameter, Roughness, and Flow"
+                },
+                "next_translated": {
+                    "key": "dw_roughness_tip",
+                    "value": "Boru cidarının mutlak pürüzlülük yüksekliği, e. Tipik değerler: çelik (yeni) 0,046 mm, çelik (kullanılmış) 0,15 mm, HDPE 0,003 mm, PVC\/uPVC 0,0015 mm, beton 0,3–3 mm.",
+                    "english": "Absolute roughness height, e, of the pipe wall. Typical values: steel (new) 0.046 mm, steel (used) 0.15 mm, HDPE 0.003 mm, PVC\/uPVC 0.0015 mm, concrete 0.3–3 mm."
+                }
+            }
+        },
         "ip_length": {
             "reason": "equal_to_english",
             "current_value": "L",
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "Damlatıcılar <span title=\"Lateral satırları: bu hattaki damlatıcılar sadece. Ana satırları: bu hattan branşlanan diğer lateral'lerdeki toplam damlatıcılar. Test lateral'inin kendi alındığı hat için, bu aynı zamanda o alındıktan sonra ana hat boyunca diğer lateral'leri veya aynı kavşağı paylaşan (örneğin ters taraf lateral) damlatıcıları içerir — akışları bu aynı hattan branşlanır, bu tabloda başka yerde göründükleri olsa da.\" class=\"ec-tip\">?<\/span>",
-                    "english": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>"
+                    "value": "<span class=\"ec-help\" title=\"Lateral satırları: bu hattaki damlatıcılar sadece. Ana satırları: bu hattan branşlanan diğer lateral'lerdeki toplam damlatıcılar. Test lateral'inin kendi alındığı hat için, bu aynı zamanda o alındıktan sonra ana hat boyunca diğer lateral'leri veya aynı kavşağı paylaşan (örneğin ters taraf lateral) damlatıcıları içerir — akışları bu aynı hattan branşlanır, bu tabloda başka yerde göründükleri olsa da.\">Damlatıcılar <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_km",
-                    "value": "k<sub>m<\/sub> <span title=\"Bu hattaki tertibatlar\/valflar\/bağlantılar için jenerik ikincil kayıp katsayısı (≥0,5 önerilen minimum)\" class=\"ec-tip\">?<\/span>",
-                    "english": "k<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
+                    "value": "<span class=\"ec-help\" title=\"Bu hattaki tertibatlar\/valflar\/bağlantılar için jenerik ikincil kayıp katsayısı (≥0,5 önerilen minimum)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -168,13 +246,13 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "Damlatıcılar <span title=\"Lateral satırları: bu hattaki damlatıcılar sadece. Ana satırları: bu hattan branşlanan diğer lateral'lerdeki toplam damlatıcılar. Test lateral'inin kendi alındığı hat için, bu aynı zamanda o alındıktan sonra ana hat boyunca diğer lateral'leri veya aynı kavşağı paylaşan (örneğin ters taraf lateral) damlatıcıları içerir — akışları bu aynı hattan branşlanır, bu tabloda başka yerde göründükleri olsa da.\" class=\"ec-tip\">?<\/span>",
-                    "english": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>"
+                    "value": "<span class=\"ec-help\" title=\"Lateral satırları: bu hattaki damlatıcılar sadece. Ana satırları: bu hattan branşlanan diğer lateral'lerdeki toplam damlatıcılar. Test lateral'inin kendi alındığı hat için, bu aynı zamanda o alındıktan sonra ana hat boyunca diğer lateral'leri veya aynı kavşağı paylaşan (örneğin ters taraf lateral) damlatıcıları içerir — akışları bu aynı hattan branşlanır, bu tabloda başka yerde göründükleri olsa da.\">Damlatıcılar <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_km",
-                    "value": "k<sub>m<\/sub> <span title=\"Bu hattaki tertibatlar\/valflar\/bağlantılar için jenerik ikincil kayıp katsayısı (≥0,5 önerilen minimum)\" class=\"ec-tip\">?<\/span>",
-                    "english": "k<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
+                    "value": "<span class=\"ec-help\" title=\"Bu hattaki tertibatlar\/valflar\/bağlantılar için jenerik ikincil kayıp katsayısı (≥0,5 önerilen minimum)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -184,13 +262,13 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "Damlatıcılar <span title=\"Lateral satırları: bu hattaki damlatıcılar sadece. Ana satırları: bu hattan branşlanan diğer lateral'lerdeki toplam damlatıcılar. Test lateral'inin kendi alındığı hat için, bu aynı zamanda o alındıktan sonra ana hat boyunca diğer lateral'leri veya aynı kavşağı paylaşan (örneğin ters taraf lateral) damlatıcıları içerir — akışları bu aynı hattan branşlanır, bu tabloda başka yerde göründükleri olsa da.\" class=\"ec-tip\">?<\/span>",
-                    "english": "Emitters <span title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\" class=\"ec-tip\">?<\/span>"
+                    "value": "<span class=\"ec-help\" title=\"Lateral satırları: bu hattaki damlatıcılar sadece. Ana satırları: bu hattan branşlanan diğer lateral'lerdeki toplam damlatıcılar. Test lateral'inin kendi alındığı hat için, bu aynı zamanda o alındıktan sonra ana hat boyunca diğer lateral'leri veya aynı kavşağı paylaşan (örneğin ters taraf lateral) damlatıcıları içerir — akışları bu aynı hattan branşlanır, bu tabloda başka yerde göründükleri olsa da.\">Damlatıcılar <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_km",
-                    "value": "k<sub>m<\/sub> <span title=\"Bu hattaki tertibatlar\/valflar\/bağlantılar için jenerik ikincil kayıp katsayısı (≥0,5 önerilen minimum)\" class=\"ec-tip\">?<\/span>",
-                    "english": "k<sub>m<\/sub> <span title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\" class=\"ec-tip\">?<\/span>"
+                    "value": "<span class=\"ec-help\" title=\"Bu hattaki tertibatlar\/valflar\/bağlantılar için jenerik ikincil kayıp katsayısı (≥0,5 önerilen minimum)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -205,8 +283,8 @@
                 },
                 "next_translated": {
                     "key": "ip_hl",
-                    "value": "h<sub>L<\/sub> <span title=\"Toplam hat kaybı, h_f + h_m\" class=\"ec-tip\">?<\/span>",
-                    "english": "h<sub>L<\/sub> <span title=\"Total reach loss, h_f + h_m\" class=\"ec-tip\">?<\/span>"
+                    "value": "<span class=\"ec-help\" title=\"Toplam hat kaybı, h_f + h_m\">h<sub>L<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Total reach loss, h_f + h_m\">h<sub>L<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -221,8 +299,8 @@
                 },
                 "next_translated": {
                     "key": "ip_hl",
-                    "value": "h<sub>L<\/sub> <span title=\"Toplam hat kaybı, h_f + h_m\" class=\"ec-tip\">?<\/span>",
-                    "english": "h<sub>L<\/sub> <span title=\"Total reach loss, h_f + h_m\" class=\"ec-tip\">?<\/span>"
+                    "value": "<span class=\"ec-help\" title=\"Toplam hat kaybı, h_f + h_m\">h<sub>L<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Total reach loss, h_f + h_m\">h<sub>L<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         }

@@ -6,7 +6,7 @@ var EngCalcs = EngCalcs || {};
 // Touch-friendly tooltips: activate Bootstrap tooltips on all cursor:help elements
 // so they respond to tap (click trigger) in addition to hover on desktop.
 document.addEventListener('DOMContentLoaded', function () {
-	document.querySelectorAll('[title][style*="cursor:help"]').forEach(function (el) {
+	document.querySelectorAll('[title][style*="cursor:help"], .ec-help[title]').forEach(function (el) {
 		new bootstrap.Tooltip(el, { trigger: 'hover focus click' });
 	});
 });
@@ -255,7 +255,7 @@ EngCalcs.writeVelocityCheck = function (elId, status, labels) {
 			status === 'high' ? labels.highTip : labels.lowTip);
 		el.classList.add('ec-status-warn');
 	} else if (status === 'ok') {
-		el.innerHTML = EngCalcs.writeCheckHTML(true, labels.ok);
+		el.innerHTML = EngCalcs.writeCheckHTML(true, labels.ok, labels.okTip);
 		el.classList.add('ec-status-ok');
 	} else {
 		el.innerHTML = '';

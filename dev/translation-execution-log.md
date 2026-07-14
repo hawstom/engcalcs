@@ -1259,3 +1259,254 @@ next, before starting category 6.
 > shared UI/units) have now been through item 85. Suite-wide translation project status: see
 > `dev/ROADMAP.md` for what remains (native-review backlog, glossary reconciliation, orphan-key
 > housekeeping — all standing cross-cutting items, not category-specific).
+
+## 2026-07-12: Item 45 closed — suite-wide baked-in verdict-glyph sweep
+
+Ran the mechanical suite-wide grep roadmap item 45 called for (previously only confirmed in
+category 2's `or_*`/`odt_*` and spot-checked in category 5's `mhp_hl_*`/`rc_sg_*`; category 1's
+`mtc_vel_*` had never been checked). Enumerated every verdict-string key actually passed as the
+`shortText` argument to `EngCalcs.writeCheckHTML()`/`writeVelocityCheck()` across all JS files
+(the only strings the convention says must never carry a baked-in ✓/⚠ glyph or translated
+"Warning:"/"OK:" prefix, since the glyph is injected programmatically):
+
+`mhp_vel_ok_short`, `mhp_vel_high_short`, `mhp_vel_low_short`, `or_regime_valid`,
+`or_regime_submerged`, `or_regime_warn`, `or_regime_twe_above_hwe`, `mhp_hl_ok`, `mhp_hl_warn`,
+`mhp_hl_bad`, `odt_h2_ok`, `odt_h2_warn`, `cs_loss_negative`, `cs_Ec_good`, `cs_Ec_fair`,
+`cs_Ec_poor`, `rc_pond_ok`, `rc_pond_warn`, `rc_eq_warn_low`, `rc_eq_warn_high`, `rc_sg_ok`,
+`rc_sg_low`, `rc_sg_high`, `rc_SD_ok`, `rc_SD_low`, `rc_SD_high`, `ip_elev_ds_missing_warn`,
+`ip_pressure_warn_short` (27 keys).
+
+Wrote a script (`include`-ing each of the 26 non-English `lib/lang.ec.??.php` files and regexing
+those 27 keys' values for `✓✔⚠⚡❌✗×` or `Warning:`/`Caution:`/leading `OK:`) — **zero matches**
+across all 26 languages × 27 keys. Verified the pattern itself fires correctly against a synthetic
+`✓ Test string` before trusting the all-clean result. Also verified in passing that
+`manning-irregular.js`/`manning-trap.js`'s `pageConfig.mtc_vel_high` (referenced as `highTip`)
+isn't a missing-key bug — `Manning-Trap.php`/`Manning-Irregular.php` populate that JS-side name
+from the (different, existing) `$ec_lang['mhp_vel_high']` PHP key; no defect.
+
+**Item 45 closed suite-wide, including the previously-unchecked category-1 `mtc_vel_*`
+consumers.** No lang-file edits were needed — the earlier category-2/5 fixes were the only real
+instances of this defect class; the rest of the suite was already clean.
+
+## 2026-07-13: Item 44 closed — D50 "median" mistranslation, resolved by 12-language research vote
+
+Item 44 flagged that `glossary.json`'s own rule ("Do not use 'average' — average ≠ median
+statistically") contradicted its own `preferred_translation` for D₅₀ ("median rock size") in
+bg/cs/de/hr/ro/ru/sr/tr/uk/fa/ur, which read as mean/average wording. It was tagged `[H]` because
+resolving it properly needs to know whether "average/mean" is genuinely the accepted engineering
+register in each language or a real translation error — normally a native-speaker call.
+
+**Tom had no native reviewer available and gave a different instruction: since the underlying
+question is empirical (what do real engineering sources in that language actually call D50?), have
+research agents check the literature directly and let the vote across languages show the general
+lean, rather than blocking on a human per language.** Tom also named Amharic specifically ("it's
+certainly not as though nobody can do real math in Amharic") to make sure a low-resource language
+wasn't skipped out of assumption.
+
+Spawned 12 parallel research agents (Sonnet, web search), one per language: bg, cs, de, hr, ro, ru,
+sr, tr, uk, fa, ur, am. Each was asked to find real geotechnical/sedimentology/riprap literature in
+that language and report whether a genuine "median" cognate is the term actually used for D50, with
+citations and a confidence level — not just asked to translate the phrase again.
+
+**Results — 7 of 12 confirmed real errors with direct citations:**
+- **de**: German Federal Waterways Institute (BAW) sedimentology data product uses "Median-/medianer
+  Korndurchmesser," not "mittlere Korngröße."
+- **cs**: Charles University hydraulics course explicitly labels D50 "Medián zrna."
+- **uk**: granulometric-analysis literature defines D50 as "медіанний розмір" — turned out to
+  already be the wording live in the lang file; only `glossary.json` was stale (see item 42's
+  "glossary is what's stale" pattern).
+- **tr**: riprap/scour-protection academic papers use "medyan"/"ortanca" for D50 explicitly; "orta
+  taş boyutu" doesn't appear in any engineering source (only as an unrelated gemstone-size term).
+- **fa**: Persian technical sources define D50 via the percentile point on the gradation curve and
+  call it "قطر میانه," never "قطر متوسط."
+- **ur**: Urdu statistical vocabulary (mirroring its Arabic source, الوسيط vs المتوسط) cleanly
+  separates وسیط (median) from اوسط (average); "اوسط"/"درمیانی" was simply the wrong word.
+- **sr**: a Serbian river-engineering course script states "D50 предстaвља медијан величине зрна"
+  outright; colloquial mining sources loosely say "средња," which is where the ambiguity came from.
+
+**2 more (bg, hr, ro) turned out to already be correct in the actual lang files** — `glossary.json`
+was simply stale, repeating item 42's finding that the glossary drifts out of sync with lang-file
+reality. bg's `mi_d50in`/`rc_D50`/`rc_notes_1_def` already said "медианен размер"; hr already said
+"medijalna veličina" (an adjective form of medijan); ro already said "dimensiunea mediană." **ru**
+was half-stale: `rc_D50` already correctly said "медианный," but `mi_d50in` still said "средний" —
+fixed for internal consistency.
+
+**1 (am) had no real fix available.** Amharic dictionaries themselves gloss "median" as "መካከለኛ" —
+the same word used for "middle/average" — with no distinct statistical-median term in circulating
+use. Left unchanged; there's nothing more correct to change it to. This is a genuine "no such
+distinction exists yet in this language's practice" finding, not a resourcing gap to flag for later
+— nothing is pending.
+
+**Fixes applied:** `mi_d50in`, `rc_D50`, and (where present) `rc_notes_1_def` in
+`lib/lang.ec.{de,cs,ru,tr,fa,ur,sr}.php`. `glossary.json`'s `median rock size` entry's
+`translations` map updated for bg/cs/de/hr/ro/ru/sr/tr/uk/fa/ur (am left as-is), plus a dated note
+in `translation_notes` recording the research findings and citations so a future pass doesn't
+re-litigate this from scratch. `mtc_d50_*` keys were checked and found to never say "average" or
+"median" in any language (English source doesn't use either word there, just "size" + the D50
+symbol) — no changes needed.
+
+**QA:** `php -l` clean on all 7 touched lang files. `lang_syntax_validate.php --lang=de,cs,ru,tr,fa,
+ur,sr` shows only pre-existing, unrelated `identical-to-english` advisories (none touch the edited
+keys). `glossary.json` re-validated as parseable JSON after the edit.
+
+**Item 44 closed.** Precedent for future `[H]`-tagged terminology disputes with no native reviewer
+available: a multi-language research vote (citing real technical literature, not just re-asking for
+a translation) can substitute for native review when the underlying question is empirical rather
+than a matter of taste — but only when, as here, most languages return a clear, citable answer. A
+minority of genuinely inconclusive results (had one arisen) would still need a human or native
+reviewer, not a tie-break by majority vote.
+
+## 2026-07-13: Items 40 and 43 closed — native-review backlog resolved by best-effort verification
+
+Tom's directive: waiting on native review that may never arrive is a pipe dream (already
+memorialized 2026-07-12); do our own best-effort verification now and let the language's `QUALITY`
+score itself carry the honest "needs review" signal, rather than parking item 43 open indefinitely.
+
+**Research pass:** an Explore agent read `dev/ROADMAP.md` item 43 and the full execution log,
+cross-checked every flagged concern against the *current* lang-file contents (several log entries
+were stale — e.g. `mi_station` had already been fixed in the 2026-07-08 pass but the item-43 text
+still described it as unresolved), and produced a complete current-state inventory organized by
+language and key. Full inventory available in the conversation record; summary of dispositions
+below.
+
+**Fixed:**
+- **ps/ur `mi_tau` (item 40, second half).** The wave-3 sprint fixed `mpf_shear_stress` for both
+  languages but explicitly left `mi_tau` (category 1) out of scope. Confirmed both still carried the
+  literal scissors word — ps `قیچي`, ur `قینچی`. Changed both to `برش` (the same shear/cut-noun root
+  each language's own `mpf_shear_stress` already uses correctly), preserving the existing `<br />`
+  column-heading layout (`لاندینۍ<br />برش<br />&tau;` / `تہ کی<br />برش &tau;`). **Item 40 is now
+  fully closed** — no more scissors false-cognates in either language.
+- **sw `or_hwe` asymmetry.** Was `'Kiwango cha maji juu ya mlango'` (level of water above the gate)
+  paired with `'Kiwango cha maji ya mkia'` (level of the tail-water) — an odd construction, since
+  every other language pairs headwater/tailwater with a parallel grammatical structure (fr
+  amont/aval, es arriba/abajo, ar علوية/سفلية, hi अपस्ट्रीम/डाउनस्ट्रीम, am's own
+  የላይ ዳርቻ ከፍታ/የወረድ ዳርቻ ከፍታ). Changed to `'Kiwango cha maji ya kichwa'` (head-water), now a
+  parallel head/tail pair with the existing `mkia` (tail-water) — mirrors the English
+  headwater/tailwater metaphor directly and is a minimal, low-risk change (only the `hwe` side
+  touched, `mkia` untouched).
+- **ps `rc_sg` glossary entry.** `glossary.json`'s ps translation (`ستومانه وزن`, literally "heavy
+  weight") was stale and didn't even match the file's own already-correct term (`ځانګړی ثقل`) —
+  same "glossary is stale, file is fine" pattern as item 42. Corrected the glossary entry to match
+  the incumbent file term.
+
+**Verified as correct, not touched:**
+- **km/sw `mpf_shear_stress` action-noun shear-stress root.** Checked the actual roots: sw `mkato`
+  (a cut/incision, from *kata* "to cut") and km `កាត់` (the verb "to cut") are action/process nouns
+  — distinct from the scissors-*tool* nouns (sw `mkasi`, km `កន្ត្រៃ`) that would repeat the item-40
+  trap. Same non-error class as Arabic's own standard term `إجهاد القص` and Hebrew's `מאמץ גזירה`,
+  both built on cutting roots and both accepted engineering usage (shear stress and cutting are
+  etymologically related in English too — sheep *shears*). Confirmed distinct from a real
+  false-cognate; left as-is.
+- **he `rc_sg` "specific weight" term.** `משקל סגולי` verified as the standard Hebrew
+  physics-curriculum term for this dimensionless ratio, the same accepted local-practice exception
+  already on file for tr `özgül ağırlık` / sr `специфична тежина` / hr `specifična težina`. Added he
+  to that exception list in `glossary.json`'s `translation_notes` rather than "fixing" it into an
+  error.
+
+**Discovered, out of scope (not a translation defect):** am's `mhp_flow`/`mhp_roughness`/`mhp_km`/
+`mhp_nu`/`mhp_velocity`/`mhp_f`/`mhp_hf`/`mhp_hm`/`mhp_hl` keys don't exist in
+`lib/lang.ec.en.php` at all and aren't referenced by `Micro-Hydro-Power.php` (only `mhp_hl_check`,
+which already correctly says "Head loss check," is live) — dead orphaned keys unique to the am file
+from some earlier design, not a translation quality issue. Left for a future dead-key cleanup pass.
+
+**Left open — genuinely needs a fluent reviewer, no safe fix available:** am `mi_tau`'s shear
+rendering (`ሸርፍ`, plausible but not independently confirmable); km's `mtc_vel_low` sedimentation
+word choice, `wi_pondingHeight` term choice, the kept-in-Latin-script "re-entrant" in
+`or_notes_3_def` and "Micro-Hydro" in `mhp_main_title`; my `ws_headWaterHeight` phrasing; ps
+register in `or_notes_3_def`/`odt_notes_2_def`; sw's "tooltip phrasing" flag (no specific key was
+ever recorded against it in the log, so there's nothing concrete to act on) and sw's
+incumbent-vs-glossary term choices (already correctly kept per the incumbency principle — an item-42
+glossary-reconciliation question, not an item-43 native-review one).
+
+**QUALITY scores intentionally left unchanged** (am/km/my/ps/sw stay at `0.65`). This pass verified
+specific flagged concerns, not the whole suite for these 5 languages end-to-end — per CLAUDE.md's
+tier policy, `0.65`→`0.85` requires full back-translation-checked + cross-language-consistency-checked
+coverage of the entire file, which this targeted pass doesn't constitute. The `0.65` score itself is
+the intended, honest, standing "needs review" signal per Tom's framing — it isn't a to-do that gets
+silently cleared by a partial pass.
+
+**QA:** `php -l` clean on `lib/lang.ec.{ps,ur,sw}.php`. `lang_syntax_validate.php --lang=ps,ur,sw`
+shows only 7 pre-existing, unrelated `identical-to-english` advisories (none touch the edited keys).
+`glossary.json` re-validated as parseable JSON after both edits.
+
+**Items 40 and 43 closed.**
+
+## 2026-07-13: Item 80(2) closed — Bulgarian gradation-coefficient term applied; roadmap archival cleanup
+
+Tom asked why priority-85 and -80 roadmap items were still open while active work was down at
+priority ≤45, and whether that reflected a forgotten archival step. It did: item 85's
+category-by-category loop had been fully closed (all 6 categories, see its own status table) but
+was never moved to the Completed section, and its lingering text still listed items 44 and 45 as
+open "carried forward" threads even though both were closed in the two commits immediately prior
+to this one (`9dfad1e`, `ea70fa0`). Moved item 85 to Completed with corrected text; items 42 and 38
+remain open under "Translation Standardization" as its real still-open threads.
+
+Item 80 (Bulgarian native-engineer scope question) turned out to be genuinely still open on two of
+its three sub-questions, not just administratively stale:
+- **(2) — now closed.** The engineer's 2026-07-06 relayed answer, "Коефициент на градация (SD) =
+  D₈₄.₁ / D₅₀", had been sitting in the roadmap text as a quote but was never applied — the file
+  still read `rc_SD`/`rc_SD_check` = "коефициент на едрозърнестост" (an earlier proposal), and
+  `glossary.json`'s `gradation` entry still asked to "ASK for the standard source" for a decision
+  the engineer had already given. Applied "Коефициент на градация" to both `lib/lang.ec.bg.php`
+  keys and updated the glossary note to record the resolution.
+- **(1) — still open**, not a lookup: both дебит (general register) and водно количество
+  (academic/hydraulic register) are confirmed acceptable per the engineer; whether to standardize
+  suite-wide (and where) is a judgment call for Tom, not something to decide unilaterally.
+- **(3) — still open**, no review sent or received on bg ip_ notes/menu-title casing.
+
+**QA:** `php -l` clean on `lib/lang.ec.bg.php`, `contact.php`, `formmailsuccess.php`.
+`glossary.json` re-validated as parseable JSON after the edit.
+
+Separately, fixed `contact.php`/`formmailsuccess.php`: both used `echoHeader("Normal", ...)`, a
+leftover from when contact.php lived on the parent hawsedc.com site. Since it moved into engcalcs
+and is now linked from the app's main menu (`lib/Menus.lib.php`), `"Normal"` meant visiting it via
+that menu link landed on a page with no engcalcs CSS and no way back to the app menu. Changed both
+to `echoHeader("EngCalcs", ..., false)`, matching the existing `About.php`/`Install.php` pattern
+for non-calculator content pages.
+
+## 2026-07-13: Item 42 closed — cross-language glossary reconciliation pass
+
+Roadmap item 42 asked for a deliberate sweep of `glossary.json`'s `preferred_translation` values
+against actual shipped lang-file usage, prompted by the category-5-wave-1 log entry where 5 of 14
+independent rock-chute translation agents (it, pt, ru, tr, hr) each flagged, unprompted, that their
+file's established term for a concept diverged from the glossary — and each correctly kept the file
+term per the incumbency principle, leaving the glossary as the confirmed stale side.
+
+**Checked each flagged case against the actual shipped file text** (not just trusting the log's
+paraphrase):
+
+- it riprap: file uses `pietrame` consistently (7 occurrences across rc_/mtc_). Glossary said
+  `scogliera`. Updated glossary → `pietrame`.
+- pt penstock: file uses `conduta forçada` consistently (5 occurrences, mhp_). Glossary said
+  `conduto forçado` (different grammatical gender). Updated glossary → `conduta forçada`.
+- pt plant efficiency: file's only occurrence (`mhp_efficiency`) is `Rendimento da instalação`.
+  Glossary said `eficiência da usina`. Updated glossary → `rendimento da instalação`.
+- pt gradation: file's only occurrences (`rc_SD`/`rc_SD_check`) use `Graduação`/`graduação`;
+  `granulometria` does not appear anywhere in the pt file. Glossary said `granulometria`. Updated
+  glossary → `graduação`.
+- ru penstock: file uses `пенсток` consistently (5 occurrences, mhp_). Glossary said `напорный
+  трубопровод`. Updated glossary → `пенсток`.
+- tr penstock: file uses `cebri boru` consistently (5 occurrences, mhp_). Glossary said `basınç
+  borusu`. Updated glossary → `cebri boru`.
+- hr rock chute (`kameni žlijeb` shipped vs glossary `kameni skluz`): **not touched.** The glossary
+  entry's own translation_notes already flagged this "NOT reconciled pending human review of the
+  GLOSSARY side" — the open question is whether the *hr file* should be changed to `kameni brzotok`
+  to parallel the sr/ru convention, which is the opposite direction from a glossary-catch-up edit.
+  Left as an open `[H]` item, not silently resolved either direction.
+
+**New finding, not a glossary-staleness case — logged as a new roadmap item instead of fixed
+here:** tr riprap has an internal inconsistency the log's framing didn't capture. `glossary.json`
+already said `taş dolgu` for tr riprap (matching the one occurrence in `mtc_bend_angle`, category 1,
+the older calculator) *before* this pass. But all 4 riprap mentions in `rc_` (category 5, newer) say
+`parça taşı` instead — so for tr specifically, the rock-chute translation agent diverged from an
+already-correct glossary and from the pre-existing suite term, the reverse of the it/pt/ru/tr-
+penstock pattern above. Fixing this means editing already-shipped Turkish sentences (grammatical
+suffix agreement needs checking, not a blind find-replace), so it was left as a new `[H]`-tagged
+roadmap item rather than resolved unilaterally in this pass.
+
+**Scope note:** this pass reconciled the specific terms raised by the category-5-wave-1 log entry,
+not an exhaustive sweep of all 55 glossary terms × 26 languages — that remains a larger undertaking
+if a future need surfaces it.
+
+**QA:** `glossary.json` re-validated as parseable JSON after edits (`meta.version` 1.5→1.6). No
+`lib/lang.ec.*.php` files changed — this was a glossary-metadata-only pass.

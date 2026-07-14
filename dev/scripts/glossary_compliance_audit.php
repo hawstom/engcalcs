@@ -19,12 +19,12 @@ const GLOSSARY_FILE = __DIR__ . '/glossary.json';
 // Keys that carry each high-drift term as their primary meaning (compound
 // keys like mpf_flow_area or dw_flow_regime were excluded as distinct concepts).
 const TERM_KEYS = [
-    'flow' => ['mpf_flow', 'or_flow', 'mhp_flow'],
+    'flow' => ['mpf_flow'],
     'head loss' => [
         'dw_main_menu', 'dw_main_title', 'dw_main_desc',
         'hw_main_menu', 'hw_main_title', 'hw_main_desc',
         'mphl_main_menu', 'mphl_main_title', 'mphl_main_desc',
-        'mhp_hf', 'mhp_hm', 'mhp_hl_check', 'mhp_notes_1_term', 'mhp_notes_3_term',
+        'mhp_hl_check', 'mhp_notes_1_term', 'mhp_notes_3_term',
     ],
     'weir' => [
         'irr_card_weir_uniform_head', 'irr_card_weir_uniform_desc',
