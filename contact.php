@@ -10,7 +10,6 @@ echoHeader("Normal", $html_title, $html_head, false);
 <p>Tom Haws, Professional Engineer (Civil)<br />
 859 N Lafayette<br />
 Mesa, AZ  85201<br />
-Phone: 480-389-4583 (Google voice)<br />
 <br />
 </p>
 
