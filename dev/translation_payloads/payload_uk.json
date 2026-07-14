@@ -1,10 +1,11 @@
 {
     "meta": {
         "language": "uk",
-        "expected_key_count": 483,
-        "delta_key_count": 6,
+        "expected_key_count": 497,
+        "delta_key_count": 8,
         "active_prefixes": [
             "dw",
+            "install",
             "ip"
         ],
         "requested_prefix": null,
@@ -15,6 +16,7 @@
     },
     "prompt_context_by_prefix": {
         "dw": "Use these preferred technical term translations when relevant:\n- flow (Q): витрата\n- velocity (v): швидкість\n- head loss (h_L): втрати напору\n- friction factor (f): коефіцієнт опору\n- slope (S): ухил\n- laminar: ламінарний\n- transitional: перехідний\n- turbulent: турбулентний",
+        "install": "Use these preferred technical term translations when relevant:\n- flow (Q): витрата\n- velocity (v): швидкість\n- slope (S): ухил",
         "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): витрата\n- velocity (v): швидкість\n- head loss (h_L): втрати напору\n- emitter: крапельниця\n- distribution uniformity (DU): рівномірність розподілу\n- low-quarter distribution uniformity (DU_lq): рівномірність розподілу по низькій чверті\n- application rate (PR): інтенсивність зрошення\n- lateral: латераль\n- mainline: магістральний трубопровід\n- reach: ділянка\n- velocity head (H_v): швидкісний напір\n- friction loss (h_f): втрати на тертя\n- minor loss (h_m): місцеві втрати\n- energy grade line (EGL): лінія енергії\n- upstream: вище за течією\n- downstream: нижче за течією"
     },
     "glossary_terms_by_prefix": {
@@ -74,6 +76,29 @@
                 "context": "Flow regime with chaotic, irregular mixing. Reynolds number above ~4000. Appears in Darcy-Weisbach calculator flow regime check.",
                 "translation_notes": "Nearly always a cognate. Some languages distinguish 'turbulent' (adjective) from 'turbulence' (noun) — use the adjective form.",
                 "preferred_translation": "турбулентний"
+            }
+        ],
+        "install": [
+            {
+                "term": "flow",
+                "symbol": "Q",
+                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg RESOLVED (Tom, 2026-07-13): native engineer's 2026-07-06 clarification confirmed both 'дебит' (colloquial\/general register) and 'водно количество' (academic\/hydraulic-engineering register, used at university for Q) are acceptable. Tom decided suite-wide standardization on 'водно количество' — \"I would put водно количество everywhere\" — applied across all bg calculator categories (pipes\/irrigation included, not just the hydraulic-structure\/open-channel strings the engineer originally corrected). 'дебит' fully replaced in lib\/lang.ec.bg.php 2026-07-13.",
+                "preferred_translation": "витрата"
+            },
+            {
+                "term": "velocity",
+                "symbol": "v",
+                "context": "Flow velocity (speed of water). Appears in all calculators.",
+                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
+                "preferred_translation": "швидкість"
+            },
+            {
+                "term": "slope",
+                "symbol": "S",
+                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
+                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
+                "preferred_translation": "ухил"
             }
         ],
         "ip": [
@@ -193,6 +218,8 @@
     },
     "keys_to_translate": {
         "dw_roughness": "e",
+        "install_android_heading": "Android (Chrome)",
+        "install_ios_heading": "iOS (Safari)",
         "ip_length": "L",
         "ip_diameter": "D",
         "ip_roughness": "e",
@@ -201,6 +228,8 @@
     },
     "keys": {
         "dw_roughness": "e",
+        "install_android_heading": "Android (Chrome)",
+        "install_ios_heading": "iOS (Safari)",
         "ip_length": "L",
         "ip_diameter": "D",
         "ip_roughness": "e",
@@ -221,6 +250,38 @@
                     "key": "dw_roughness_tip",
                     "value": "Абсолютна висота нерівностей (шорсткість) стінки труби, e. Типові значення: сталь (нова) 0,046 мм, сталь (уживана) 0,15 мм, HDPE 0,003 мм, PVC\/uPVC 0,0015 мм, бетон 0,3–3 мм.",
                     "english": "Absolute roughness height, e, of the pipe wall. Typical values: steel (new) 0.046 mm, steel (used) 0.15 mm, HDPE 0.003 mm, PVC\/uPVC 0.0015 mm, concrete 0.3–3 mm."
+                }
+            }
+        },
+        "install_android_heading": {
+            "reason": "equal_to_english",
+            "current_value": "Android (Chrome)",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "install_intro",
+                    "value": "EngCalcs — це прогресивний веб-застосунок (PWA). Після встановлення всі калькулятори повністю працюють офлайн — інтернет-з’єднання не потрібне.",
+                    "english": "EngCalcs is a Progressive Web App (PWA). Once installed, all calculators work fully offline — no internet connection needed."
+                },
+                "next_translated": {
+                    "key": "install_android_steps_html",
+                    "value": "<li>Відкрийте будь-яку сторінку калькулятора в Chrome.<\/li><li>Натисніть кнопку <strong>⬇ Встановити<\/strong> на верхній панелі навігації або відкрийте меню браузера (⋮) і виберіть <strong>Додати на головний екран<\/strong>.<\/li><li>Натисніть <strong>Встановити<\/strong> у вікні, що з’явиться.<\/li><li>Значок EngCalcs з’явиться на головному екрані, і застосунок працюватиме офлайн.<\/li>",
+                    "english": "<li>Open any calculator page in Chrome.<\/li><li>Tap the <strong>⬇ Install<\/strong> button in the top navigation bar, or tap the browser menu (⋮) and choose <strong>Add to Home screen<\/strong>.<\/li><li>Tap <strong>Install<\/strong> in the prompt that appears.<\/li><li>EngCalcs appears on your home screen and works offline.<\/li>"
+                }
+            }
+        },
+        "install_ios_heading": {
+            "reason": "equal_to_english",
+            "current_value": "iOS (Safari)",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "install_prompt_unavailable",
+                    "value": "Вікно встановлення недоступне — скористайтеся меню браузера.",
+                    "english": "Install prompt not available — use your browser menu instead."
+                },
+                "next_translated": {
+                    "key": "install_ios_steps_html",
+                    "value": "<li>Відкрийте будь-яку сторінку калькулятора в Safari.<\/li><li>Натисніть кнопку <strong>Поділитися<\/strong> (значок у вигляді квадрата зі стрілкою вгору).<\/li><li>Прогорніть униз і виберіть <strong>Додати на головний екран<\/strong>.<\/li><li>Натисніть <strong>Додати<\/strong>. Значок EngCalcs з’явиться на головному екрані.<\/li>",
+                    "english": "<li>Open any calculator page in Safari.<\/li><li>Tap the <strong>Share<\/strong> button (box with arrow pointing up).<\/li><li>Scroll down and tap <strong>Add to Home Screen<\/strong>.<\/li><li>Tap <strong>Add<\/strong>. EngCalcs appears on your home screen.<\/li>"
                 }
             }
         },

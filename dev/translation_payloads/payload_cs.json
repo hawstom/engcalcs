@@ -1,10 +1,11 @@
 {
     "meta": {
         "language": "cs",
-        "expected_key_count": 483,
-        "delta_key_count": 10,
+        "expected_key_count": 497,
+        "delta_key_count": 12,
         "active_prefixes": [
             "dw",
+            "install",
             "ip",
             "mhp",
             "mi",
@@ -18,6 +19,7 @@
     },
     "prompt_context_by_prefix": {
         "dw": "Use these preferred technical term translations when relevant:\n- flow (Q): průtok\n- velocity (v): rychlost\n- head loss (h_L): ztráta tlakové výšky\n- friction factor (f): součinitel tření\n- slope (S): sklon\n- laminar: laminární\n- transitional: přechodný\n- turbulent: turbulentní",
+        "install": "Use these preferred technical term translations when relevant:\n- flow (Q): průtok\n- velocity (v): rychlost\n- slope (S): sklon",
         "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): průtok\n- velocity (v): rychlost\n- head loss (h_L): ztráta tlakové výšky\n- emitter: kapač\n- distribution uniformity (DU): rovnoměrnost distribuce\n- low-quarter distribution uniformity (DU_lq): Uniformita distribuce nízké čtvrtiny\n- application rate (PR): intenzita závlahy\n- lateral: postranní větev\n- mainline: hlavní potrubí\n- reach: úsek\n- velocity head (H_v): rychlostní výška\n- friction loss (h_f): ztráta třením\n- minor loss (h_m): místní ztráta\n- energy grade line (EGL): čára energie\n- upstream: proti proudu\n- downstream: po proudu",
         "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): průtok\n- penstock: tlakovod\n- gross head (H_gross): hrubý spád\n- net head (H_net): čistý spád\n- plant efficiency (η): účinnost elektrárny\n- head loss (h_L): ztráta tlakové výšky\n- run-of-river: průtočná vodní elektrárna\n- headworks: odběrný objekt\n- junction loss (h_m): místní ztráty\n- minor loss (h_m): místní ztráta",
         "mi": "Use these preferred technical term translations when relevant:\n- flow (Q): průtok\n- velocity (v): rychlost\n- hydraulic radius (R_h): hydraulický poloměr\n- wetted perimeter (P_w): smočený obvod\n- Manning roughness (n): Manningův součinitel drsnosti\n- slope (S): sklon\n- irregular channel: nepravidelný průřez",
@@ -80,6 +82,29 @@
                 "context": "Flow regime with chaotic, irregular mixing. Reynolds number above ~4000. Appears in Darcy-Weisbach calculator flow regime check.",
                 "translation_notes": "Nearly always a cognate. Some languages distinguish 'turbulent' (adjective) from 'turbulence' (noun) — use the adjective form.",
                 "preferred_translation": "turbulentní"
+            }
+        ],
+        "install": [
+            {
+                "term": "flow",
+                "symbol": "Q",
+                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg RESOLVED (Tom, 2026-07-13): native engineer's 2026-07-06 clarification confirmed both 'дебит' (colloquial\/general register) and 'водно количество' (academic\/hydraulic-engineering register, used at university for Q) are acceptable. Tom decided suite-wide standardization on 'водно количество' — \"I would put водно количество everywhere\" — applied across all bg calculator categories (pipes\/irrigation included, not just the hydraulic-structure\/open-channel strings the engineer originally corrected). 'дебит' fully replaced in lib\/lang.ec.bg.php 2026-07-13.",
+                "preferred_translation": "průtok"
+            },
+            {
+                "term": "velocity",
+                "symbol": "v",
+                "context": "Flow velocity (speed of water). Appears in all calculators.",
+                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
+                "preferred_translation": "rychlost"
+            },
+            {
+                "term": "slope",
+                "symbol": "S",
+                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
+                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
+                "preferred_translation": "sklon"
             }
         ],
         "ip": [
@@ -370,6 +395,8 @@
         "mi_station": "Sta",
         "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
         "mhp_vel_ok_short": "OK",
+        "install_android_heading": "Android (Chrome)",
+        "install_ios_heading": "iOS (Safari)",
         "ip_length": "L",
         "ip_diameter": "D",
         "ip_roughness": "e",
@@ -382,6 +409,8 @@
         "mi_station": "Sta",
         "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
         "mhp_vel_ok_short": "OK",
+        "install_android_heading": "Android (Chrome)",
+        "install_ios_heading": "iOS (Safari)",
         "ip_length": "L",
         "ip_diameter": "D",
         "ip_roughness": "e",
@@ -466,6 +495,38 @@
                     "key": "mhp_vel_high_short",
                     "value": "Vysoká",
                     "english": "High"
+                }
+            }
+        },
+        "install_android_heading": {
+            "reason": "equal_to_english",
+            "current_value": "Android (Chrome)",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "install_intro",
+                    "value": "EngCalcs je progresivní webová aplikace (PWA). Po instalaci fungují všechny kalkulačky zcela offline — není potřeba připojení k internetu.",
+                    "english": "EngCalcs is a Progressive Web App (PWA). Once installed, all calculators work fully offline — no internet connection needed."
+                },
+                "next_translated": {
+                    "key": "install_android_steps_html",
+                    "value": "<li>Otevřete libovolnou stránku kalkulačky v Chromu.<\/li><li>Klepněte na tlačítko <strong>⬇ Instalovat<\/strong> v horní navigační liště, nebo klepněte na nabídku prohlížeče (⋮) a zvolte <strong>Přidat na plochu<\/strong>.<\/li><li>V zobrazené výzvě klepněte na <strong>Instalovat<\/strong>.<\/li><li>EngCalcs se objeví na ploše vašeho zařízení a funguje offline.<\/li>",
+                    "english": "<li>Open any calculator page in Chrome.<\/li><li>Tap the <strong>⬇ Install<\/strong> button in the top navigation bar, or tap the browser menu (⋮) and choose <strong>Add to Home screen<\/strong>.<\/li><li>Tap <strong>Install<\/strong> in the prompt that appears.<\/li><li>EngCalcs appears on your home screen and works offline.<\/li>"
+                }
+            }
+        },
+        "install_ios_heading": {
+            "reason": "equal_to_english",
+            "current_value": "iOS (Safari)",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "install_prompt_unavailable",
+                    "value": "Výzva k instalaci není k dispozici — použijte místo toho nabídku prohlížeče.",
+                    "english": "Install prompt not available — use your browser menu instead."
+                },
+                "next_translated": {
+                    "key": "install_ios_steps_html",
+                    "value": "<li>Otevřete libovolnou stránku kalkulačky v Safari.<\/li><li>Klepněte na tlačítko <strong>Sdílet<\/strong> (obdélník se šipkou nahoru).<\/li><li>Posuňte se dolů a klepněte na <strong>Přidat na plochu<\/strong>.<\/li><li>Klepněte na <strong>Přidat<\/strong>. EngCalcs se objeví na ploše vašeho zařízení.<\/li>",
+                    "english": "<li>Open any calculator page in Safari.<\/li><li>Tap the <strong>Share<\/strong> button (box with arrow pointing up).<\/li><li>Scroll down and tap <strong>Add to Home Screen<\/strong>.<\/li><li>Tap <strong>Add<\/strong>. EngCalcs appears on your home screen.<\/li>"
                 }
             }
         },

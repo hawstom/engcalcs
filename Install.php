@@ -10,18 +10,15 @@ echoHeader("EngCalcs", $html_title, $html_head, false);
 <h2><?=$ec_lang['install_main_desc']?></h2>
 <?php echoHelpWanted(); ?>
 
-<p>EngCalcs works as a <strong>Progressive Web App (PWA)</strong>. Once installed, all calculators run fully offline — no internet connection needed.</p>
+<p><?=$ec_lang['install_intro']?></p>
 
-<h3>Android (Chrome)</h3>
+<h3><?=$ec_lang['install_android_heading']?></h3>
 <ol>
-  <li>Open any calculator page in Chrome.</li>
-  <li>Tap the <strong>⬇ Install</strong> button in the top navigation bar, <em>or</em> tap the browser menu (⋮) and choose <strong>Add to Home screen</strong>.</li>
-  <li>Tap <strong>Install</strong> in the prompt that appears.</li>
-  <li>EngCalcs appears on your home screen and works offline.</li>
+<?=$ec_lang['install_android_steps_html']?>
 </ol>
 <p>
-  <button class="btn btn-primary" onclick="EngCalcs.installPWA()" id="install-page-btn">⬇ Install Now</button>
-  <span id="install-page-unavailable" style="display:none" class="text-muted small ms-2">Install prompt not available — use your browser menu instead.</span>
+  <button class="btn btn-primary" onclick="EngCalcs.installPWA()" id="install-page-btn"><?=$ec_lang['install_now_btn']?></button>
+  <span id="install-page-unavailable" style="display:none" class="text-muted small ms-2"><?=$ec_lang['install_prompt_unavailable']?></span>
 </p>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -38,27 +35,22 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 
-<h3>iOS (Safari)</h3>
+<h3><?=$ec_lang['install_ios_heading']?></h3>
 <ol>
-  <li>Open any calculator page in Safari.</li>
-  <li>Tap the <strong>Share</strong> button (box with arrow pointing up).</li>
-  <li>Scroll down and tap <strong>Add to Home Screen</strong>.</li>
-  <li>Tap <strong>Add</strong>. EngCalcs appears on your home screen.</li>
+<?=$ec_lang['install_ios_steps_html']?>
 </ol>
-<p class="text-muted small">Note: On iOS, the PWA runs in Safari's engine. The install prompt does not appear automatically — use the Share menu as described above.</p>
+<p class="text-muted small"><?=$ec_lang['install_ios_note']?></p>
 
-<h3>Desktop (Chrome / Edge)</h3>
+<h3><?=$ec_lang['install_desktop_heading']?></h3>
 <ol>
-  <li>Open any calculator page.</li>
-  <li>Click the <strong>install icon</strong> (⊕ or computer icon) in the browser's address bar, or open the browser menu and choose <strong>Install EngCalcs…</strong></li>
-  <li>Click <strong>Install</strong>. EngCalcs opens as a standalone app window.</li>
+<?=$ec_lang['install_desktop_steps_html']?>
 </ol>
 
-<h3>Firefox / Other Browsers</h3>
-<p>Firefox does not support PWA installation on desktop. Use the browser normally — all calculators still work fully in-browser, and the service worker caches pages for offline use after your first visit.</p>
+<h3><?=$ec_lang['install_firefox_heading']?></h3>
+<p><?=$ec_lang['install_firefox_body']?></p>
 
-<h3>What Gets Cached</h3>
-<p>On first install, all 16 calculator pages and their assets (JavaScript, CSS, Bootstrap) are cached automatically. After that, everything works without a network connection. Language choice is preserved from your last online visit.</p>
+<h3><?=$ec_lang['install_cached_heading']?></h3>
+<p><?=$ec_lang['install_cached_body']?></p>
 
 <?php echoFeedback(); ?>
 <?php

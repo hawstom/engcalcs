@@ -1,10 +1,11 @@
 {
     "meta": {
         "language": "ps",
-        "expected_key_count": 483,
-        "delta_key_count": 9,
+        "expected_key_count": 497,
+        "delta_key_count": 10,
         "active_prefixes": [
             "dw",
+            "install",
             "ip",
             "rc",
             "wi"
@@ -17,6 +18,7 @@
     },
     "prompt_context_by_prefix": {
         "dw": "Use these preferred technical term translations when relevant:\n- flow (Q): بهاو\n- velocity (v): سرعت\n- head loss (h_L): د سر ضیاع\n- friction factor (f): د اصطکاک فاکتور\n- slope (S): شیب\n- laminar: طبقاتي\n- transitional: انتقالي\n- turbulent: آشفته",
+        "install": "Use these preferred technical term translations when relevant:\n- flow (Q): بهاو\n- velocity (v): سرعت\n- slope (S): شیب",
         "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): بهاو\n- velocity (v): سرعت\n- head loss (h_L): د سر ضیاع\n- emitter: وریز\n- distribution uniformity (DU): د ویش یو‌شانتیا\n- low-quarter distribution uniformity (DU_lq): [needs translation sprint]\n- application rate (PR): د اوبو د لګولو نرخ\n- lateral: جانبي نل\n- mainline: اصلي نل\n- reach: د نل برخه\n- velocity head (H_v): د سرعت لوړوالی\n- friction loss (h_f): د اصطکاک ضیاع\n- minor loss (h_m): ځایی ضیاع\n- energy grade line (EGL): د انرژۍ کرښه\n- upstream: [needs translation sprint]\n- downstream: [needs translation sprint]",
         "rc": "Use these preferred technical term translations when relevant:\n- flow (Q): بهاو\n- velocity (v): سرعت\n- riprap: د سیلاب مخنیوي ډبرې\n- slope (S): شیب\n- rock chute: د کاڼو تند اوبو لار\n- chute: تیز اوبه لار\n- unit discharge (q, q_t): د واحد بهاو\n- median rock size (D50): د کاڼي منځني اندازه\n- gradation (SD): د کاڼو د اندازو درجه‌بندي\n- porosity (n_p): سوري والتیا\n- specific gravity (sg): ځانګړی ثقل\n- ponding: [needs translation sprint]\n- outlet apron: [needs translation sprint]\n- weir head (H_p): [needs translation sprint]\n- upstream: [needs translation sprint]\n- downstream: [needs translation sprint]\n- reach: د نل برخه",
         "wi": "Use these preferred technical term translations when relevant:\n- flow (Q): بهاو\n- weir: ویر\n- headwater elevation: د پورته اوبو سطح\n- tailwater elevation: د ښکته اوبو سطح\n- discharge coefficient (C_d): د بهاو ضریب\n- irregular channel: غیریکسانې مقطع"
@@ -78,6 +80,29 @@
                 "context": "Flow regime with chaotic, irregular mixing. Reynolds number above ~4000. Appears in Darcy-Weisbach calculator flow regime check.",
                 "translation_notes": "Nearly always a cognate. Some languages distinguish 'turbulent' (adjective) from 'turbulence' (noun) — use the adjective form.",
                 "preferred_translation": "آشفته"
+            }
+        ],
+        "install": [
+            {
+                "term": "flow",
+                "symbol": "Q",
+                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg RESOLVED (Tom, 2026-07-13): native engineer's 2026-07-06 clarification confirmed both 'дебит' (colloquial\/general register) and 'водно количество' (academic\/hydraulic-engineering register, used at university for Q) are acceptable. Tom decided suite-wide standardization on 'водно количество' — \"I would put водно количество everywhere\" — applied across all bg calculator categories (pipes\/irrigation included, not just the hydraulic-structure\/open-channel strings the engineer originally corrected). 'дебит' fully replaced in lib\/lang.ec.bg.php 2026-07-13.",
+                "preferred_translation": "بهاو"
+            },
+            {
+                "term": "velocity",
+                "symbol": "v",
+                "context": "Flow velocity (speed of water). Appears in all calculators.",
+                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
+                "preferred_translation": "سرعت"
+            },
+            {
+                "term": "slope",
+                "symbol": "S",
+                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
+                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
+                "preferred_translation": "شیب"
             }
         ],
         "ip": [
@@ -363,6 +388,7 @@
     "keys_to_translate": {
         "dw_roughness": "e",
         "wi_notes_we_def": "q = if (length = 0) then 0 else if (slope=0) then cw*length*d<sub>0<\/sub><sup>1.5<\/sup> else cw\/(2.5*slope) * (d<sub>0<\/sub><sup>2.5<\/sup> - d<sub>1<\/sub><sup>2.5<\/sup>) where d<sub>1<\/sub> and d<sub>0<\/sub> are always positive or zero",
+        "install_ios_heading": "iOS (Safari)",
         "rc_sg_ok_tip": "2.54–2.82 (Robinson)",
         "rc_SD_ok_tip": "1.15–1.47 (Robinson)",
         "ip_length": "L",
@@ -374,6 +400,7 @@
     "keys": {
         "dw_roughness": "e",
         "wi_notes_we_def": "q = if (length = 0) then 0 else if (slope=0) then cw*length*d<sub>0<\/sub><sup>1.5<\/sup> else cw\/(2.5*slope) * (d<sub>0<\/sub><sup>2.5<\/sup> - d<sub>1<\/sub><sup>2.5<\/sup>) where d<sub>1<\/sub> and d<sub>0<\/sub> are always positive or zero",
+        "install_ios_heading": "iOS (Safari)",
         "rc_sg_ok_tip": "2.54–2.82 (Robinson)",
         "rc_SD_ok_tip": "1.15–1.47 (Robinson)",
         "ip_length": "L",
@@ -412,6 +439,22 @@
                     "key": "or_main_menu",
                     "value": "د سوري بهاو",
                     "english": "Orifice Flow"
+                }
+            }
+        },
+        "install_ios_heading": {
+            "reason": "equal_to_english",
+            "current_value": "iOS (Safari)",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "install_prompt_unavailable",
+                    "value": "د نصب کولو پیغام شتون نلري — پرځای یې د خپل براوزر مینو وکاروئ.",
+                    "english": "Install prompt not available — use your browser menu instead."
+                },
+                "next_translated": {
+                    "key": "install_ios_steps_html",
+                    "value": "<li>په Safari کې د هر محاسبه‌کوونکي پاڼه پرانیزئ.<\/li><li>د <strong>شریکول<\/strong> تڼۍ کېکاږئ (هغه بکس چې غشی یې پورته اشاره کوي).<\/li><li>ښکته لاړ شئ او <strong>ټکی پاڼه ته اضافه کول<\/strong> کېکاږئ.<\/li><li><strong>اضافه کول<\/strong> کېکاږئ. EngCalcs به ستاسو په کور پاڼه کې ښکاره شي.<\/li>",
+                    "english": "<li>Open any calculator page in Safari.<\/li><li>Tap the <strong>Share<\/strong> button (box with arrow pointing up).<\/li><li>Scroll down and tap <strong>Add to Home Screen<\/strong>.<\/li><li>Tap <strong>Add<\/strong>. EngCalcs appears on your home screen.<\/li>"
                 }
             }
         },

@@ -1,10 +1,11 @@
 {
     "meta": {
         "language": "ro",
-        "expected_key_count": 483,
-        "delta_key_count": 12,
+        "expected_key_count": 497,
+        "delta_key_count": 15,
         "active_prefixes": [
             "dw",
+            "install",
             "ip",
             "mhp",
             "mi",
@@ -18,6 +19,7 @@
     },
     "prompt_context_by_prefix": {
         "dw": "Use these preferred technical term translations when relevant:\n- flow (Q): debit\n- velocity (v): viteză\n- head loss (h_L): pierdere de sarcină\n- friction factor (f): factor de frecare\n- slope (S): pantă\n- laminar: laminar\n- transitional: tranzitoriu\n- turbulent: turbulent",
+        "install": "Use these preferred technical term translations when relevant:\n- flow (Q): debit\n- velocity (v): viteză\n- slope (S): pantă",
         "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): debit\n- velocity (v): viteză\n- head loss (h_L): pierdere de sarcină\n- emitter: emițător\n- distribution uniformity (DU): uniformitatea distribuției\n- low-quarter distribution uniformity (DU_lq): Uniformitatea Distribuției de sfert inferior\n- application rate (PR): rata de aplicare\n- lateral: conductă laterală\n- mainline: conductă principală\n- reach: tronson\n- velocity head (H_v): înălțime cinetică\n- friction loss (h_f): pierdere prin frecare\n- minor loss (h_m): pierdere locală\n- energy grade line (EGL): linia energetică\n- upstream: amonte\n- downstream: aval",
         "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): debit\n- penstock: conductă sub presiune\n- gross head (H_gross): cădere brută\n- net head (H_net): cădere netă\n- plant efficiency (η): eficiența instalației\n- head loss (h_L): pierdere de sarcină\n- run-of-river: centrală hidroelectrică la cursul apei\n- headworks: lucrări de captare\n- junction loss (h_m): pierderi locale\n- minor loss (h_m): pierdere locală",
         "mi": "Use these preferred technical term translations when relevant:\n- flow (Q): debit\n- velocity (v): viteză\n- hydraulic radius (R_h): raza hidraulică\n- wetted perimeter (P_w): perimetru udat\n- Manning roughness (n): coeficientul de rugozitate Manning\n- slope (S): pantă\n- irregular channel: canal cu secțiune neregulată",
@@ -80,6 +82,29 @@
                 "context": "Flow regime with chaotic, irregular mixing. Reynolds number above ~4000. Appears in Darcy-Weisbach calculator flow regime check.",
                 "translation_notes": "Nearly always a cognate. Some languages distinguish 'turbulent' (adjective) from 'turbulence' (noun) — use the adjective form.",
                 "preferred_translation": "turbulent"
+            }
+        ],
+        "install": [
+            {
+                "term": "flow",
+                "symbol": "Q",
+                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg RESOLVED (Tom, 2026-07-13): native engineer's 2026-07-06 clarification confirmed both 'дебит' (colloquial\/general register) and 'водно количество' (academic\/hydraulic-engineering register, used at university for Q) are acceptable. Tom decided suite-wide standardization on 'водно количество' — \"I would put водно количество everywhere\" — applied across all bg calculator categories (pipes\/irrigation included, not just the hydraulic-structure\/open-channel strings the engineer originally corrected). 'дебит' fully replaced in lib\/lang.ec.bg.php 2026-07-13.",
+                "preferred_translation": "debit"
+            },
+            {
+                "term": "velocity",
+                "symbol": "v",
+                "context": "Flow velocity (speed of water). Appears in all calculators.",
+                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
+                "preferred_translation": "viteză"
+            },
+            {
+                "term": "slope",
+                "symbol": "S",
+                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
+                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
+                "preferred_translation": "pantă"
             }
         ],
         "ip": [
@@ -372,6 +397,9 @@
         "mi_station": "Sta",
         "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
         "mhp_vel_ok_short": "OK",
+        "install_android_heading": "Android (Chrome)",
+        "install_ios_heading": "iOS (Safari)",
+        "install_desktop_heading": "Desktop (Chrome \/ Edge)",
         "ip_length": "L",
         "ip_diameter": "D",
         "ip_roughness": "e",
@@ -386,6 +414,9 @@
         "mi_station": "Sta",
         "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
         "mhp_vel_ok_short": "OK",
+        "install_android_heading": "Android (Chrome)",
+        "install_ios_heading": "iOS (Safari)",
+        "install_desktop_heading": "Desktop (Chrome \/ Edge)",
         "ip_length": "L",
         "ip_diameter": "D",
         "ip_roughness": "e",
@@ -502,6 +533,54 @@
                     "key": "mhp_vel_high_short",
                     "value": "Ridicată",
                     "english": "High"
+                }
+            }
+        },
+        "install_android_heading": {
+            "reason": "equal_to_english",
+            "current_value": "Android (Chrome)",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "install_intro",
+                    "value": "EngCalcs este o aplicație web progresivă (PWA). Odată instalată, toate calculatoarele funcționează complet offline — nu este nevoie de conexiune la internet.",
+                    "english": "EngCalcs is a Progressive Web App (PWA). Once installed, all calculators work fully offline — no internet connection needed."
+                },
+                "next_translated": {
+                    "key": "install_android_steps_html",
+                    "value": "<li>Deschideți orice pagină de calculator în Chrome.<\/li><li>Atingeți butonul <strong>⬇ Instalare<\/strong> din bara de navigare de sus sau atingeți meniul browserului (⋮) și alegeți <strong>Adăugare pe ecranul de start<\/strong>.<\/li><li>Atingeți <strong>Instalare<\/strong> în fereastra care apare.<\/li><li>EngCalcs apare pe ecranul de start și funcționează offline.<\/li>",
+                    "english": "<li>Open any calculator page in Chrome.<\/li><li>Tap the <strong>⬇ Install<\/strong> button in the top navigation bar, or tap the browser menu (⋮) and choose <strong>Add to Home screen<\/strong>.<\/li><li>Tap <strong>Install<\/strong> in the prompt that appears.<\/li><li>EngCalcs appears on your home screen and works offline.<\/li>"
+                }
+            }
+        },
+        "install_ios_heading": {
+            "reason": "equal_to_english",
+            "current_value": "iOS (Safari)",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "install_prompt_unavailable",
+                    "value": "Fereastra de instalare nu este disponibilă — folosiți meniul browserului.",
+                    "english": "Install prompt not available — use your browser menu instead."
+                },
+                "next_translated": {
+                    "key": "install_ios_steps_html",
+                    "value": "<li>Deschideți orice pagină de calculator în Safari.<\/li><li>Atingeți butonul <strong>Distribuire<\/strong> (pătrat cu săgeată în sus).<\/li><li>Derulați în jos și atingeți <strong>Adăugare pe ecranul de pornire<\/strong>.<\/li><li>Atingeți <strong>Adaugă<\/strong>. EngCalcs apare pe ecranul de start.<\/li>",
+                    "english": "<li>Open any calculator page in Safari.<\/li><li>Tap the <strong>Share<\/strong> button (box with arrow pointing up).<\/li><li>Scroll down and tap <strong>Add to Home Screen<\/strong>.<\/li><li>Tap <strong>Add<\/strong>. EngCalcs appears on your home screen.<\/li>"
+                }
+            }
+        },
+        "install_desktop_heading": {
+            "reason": "equal_to_english",
+            "current_value": "Desktop (Chrome \/ Edge)",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "install_ios_note",
+                    "value": "Pe iOS, instalarea se face întotdeauna prin meniul Distribuire — nu există o fereastră automată de instalare.",
+                    "english": "On iOS, installing always uses the Share menu — there is no automatic install prompt."
+                },
+                "next_translated": {
+                    "key": "install_desktop_steps_html",
+                    "value": "<li>Deschideți orice pagină de calculator.<\/li><li>Faceți clic pe <strong>pictograma de instalare<\/strong> (⊕ sau pictograma unui computer) din bara de adrese a browserului sau deschideți meniul browserului și alegeți <strong>Instalare EngCalcs…<\/strong><\/li><li>Faceți clic pe <strong>Instalare<\/strong>. EngCalcs se deschide ca o aplicație independentă.<\/li>",
+                    "english": "<li>Open any calculator page.<\/li><li>Click the <strong>install icon<\/strong> (⊕ or computer icon) in the browser's address bar, or open the browser menu and choose <strong>Install EngCalcs…<\/strong><\/li><li>Click <strong>Install<\/strong>. EngCalcs opens as a standalone app window.<\/li>"
                 }
             }
         },

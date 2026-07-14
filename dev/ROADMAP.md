@@ -10,6 +10,123 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 ## Calculator Improvements
 
+## New Calculators (Mission Expansion)
+
+Tom, 2026-07-14: interested in expanding beyond hydraulic-structure/irrigation calculators toward
+the kind of design work that normally only lives in mission/NGO field manuals (Peace Corps water &
+sanitation guides, CAWST, RWSN, Engineers Without Borders) — "systematize what's normally esoteric,"
+staying true to the suite's mission (serving engineers and field workers in water-scarce,
+low-resource regions). Three ideas from a 2026-07-14 brainstorm were approved to flesh out; keep
+searching for more (Tom: "I love all these... keep searching!"). None of these are scoped for build
+yet — each needs a full spec pass (inputs/outputs, formulas, unit sets, worked-example verification,
+new-calculator checklist per `CLAUDE.md`) before implementation starts, same as any new calculator.
+
+- 60|106| **Rainwater Harvesting (roof/catchment sizing).** Sizes a rooftop rainwater harvesting
+  system: catchment area → runoff coefficient → harvestable volume → storage tank sizing, plus
+  first-flush diverter volume. Core method: rational-method roof runoff (`Q = C × I × A`) combined
+  with a monthly rainfall-vs-demand water balance to size storage (same family of method as the
+  Texas Rainwater Harvesting Manual / Engineers Without Borders rainwater guides). Inputs: catchment
+  area, roofing-material runoff coefficient (metal ≈0.9, tile ≈0.8, thatch ≈0.2 — needs a References
+  table), monthly/annual rainfall, household size, daily per-person demand. Outputs: annual
+  harvestable volume, recommended tank size (dry-season storage need, or full monthly-balance
+  reliability curve), first-flush diverter volume (typical rule of thumb ≈1–2 L per m² of catchment
+  to divert initial dirty runoff — needs a cited source). Strong fit: directly extends the existing
+  `cs_`/`ip_` water-supply-and-storage calculators rather than opening a new domain. Candidate prefix
+  `rwh_` — not yet claimed, confirm no collision before use.
+- 60|107| **Water treatment — biosand/slow sand filter design.** Sizes a household or community
+  biosand filter per the CAWST Biosand Filter Construction Manual (the standard reference NGOs
+  actually build from) — filtration rate (~0.4 m/hr, ~600 L/day for a household unit), sand bed
+  depth (~55 cm minimum + separating/gravel drainage layers), sand specification checks (effective
+  size 0.15–0.20 mm, uniformity coefficient <2.5), and pause-period guidance (1–48 hr) for the
+  biolayer (schmutzdecke) to develop. Inputs: household size or community population, daily demand,
+  available container/tank diameter. Outputs: required filter surface area, bed-depth confirmation,
+  flow rate, daily-capacity check, pause-period recommendation. This is the strongest "esoteric
+  mission-textbook, systematize it" fit of the three — real design content that's genuinely hard to
+  find outside NGO field manuals, and currently zero overlap with anything already in the suite (new
+  domain: water treatment, not just conveyance/storage). Candidate prefix `bsf_` — not yet claimed.
+- 60|108| **Spring box / gravity-fed water supply design.** Spring capture structure sizing (spring
+  box) plus gravity-fed transmission-line feasibility, per Peace Corps Water Supply & Sanitation
+  Technical Training Manual / RWSN spring-protection guidelines: spring yield (bucket-and-stopwatch
+  method), spring box minimum freeboard/sizing, and — this is the efficient part — the transmission
+  line itself is mostly a front-end wrapper around the **existing** `dw_`/`hw_`/`mphl_` pipe-flow and
+  head-loss engines, plus break-pressure-tank spacing logic for where static head would otherwise
+  exceed pipe pressure rating. Lowest net-new engineering-code cost of the three since it reuses
+  proven calculators rather than opening new formula territory; the new work is mostly the
+  spring-yield/spring-box front end and the break-pressure-tank spacing logic. Candidate prefix
+  `sb_` or `gfs_` — not yet claimed, needs a final pick (avoid collision risk with any future
+  "storage bin"/similar prefix).
+
+**Candidates backlog (not yet fleshed out — surfaced during the 2026-07-14 brainstorm, keep adding
+as more come up):**
+- **Check dam / small earthen dam spillway sizing** — would directly extend the *existing*
+  `rc_` (Rock Chute, Robinson) calculator, which already does spillway rock-lining sizing; pairing a
+  dam/reservoir sizing front-end with the existing rock-chute spillway engine is a natural
+  low-marginal-cost companion, similar in spirit to Task 108's spring-box/pipe-flow reuse.
+- **Handpump / rope pump selection & sizing.**
+- **Chlorination dosing for small/community water systems** (CT value, contact time, dose calc).
+- **VIP/pit latrine sizing** (volume vs. use rate, safe setback distance from water sources per
+  Peace Corps guidelines) — sanitation rather than water-supply, but same low-resource-field-worker
+  audience and same "buried in NGO manuals" fit as Task 107.
+- **Pond/reservoir evaporation loss.**
+
+Solar/energy ideas that came up in the same brainstorm moved to the dedicated **Energy for Water**
+section below, per Tom's 2026-07-14 direction to track them separately rather than folding them in
+here — see that section for why (it's a distinct professional identity of Tom's, not scope creep off
+the water-conveyance identity).
+
+## Energy for Water
+
+Tom, 2026-07-14: "I have lifelong focus on water and energy development for humanity... we can dip
+our toe into energy (including heat), which is a strong interest of mine (instead of, say,
+structural)." Tom is a civil engineer — this is not scope creep from the hydraulic-calculator
+identity, it's a second, equally central professional focus, so it gets its own section rather than
+being folded into "New Calculators" as stretch/candidate material. The suite already has one
+foundational calculator here: `mhp_` (Micro-Hydro Power) — everything below either extends that
+anchor or opens the *consumption* side (using energy to move/treat/purify water) rather than only
+the *generation* side `mhp_` already covers.
+
+- 60|110| **Solar water pumping sizing.** Sizes a solar-PV-powered pump system for irrigation or
+  domestic supply: hydraulic power required (`P_h = ρgQH`, same physics already used throughout
+  `dw_`/`hw_`/`mphl_`/`mhp_`) → electrical power via pump + system efficiency → PV array size (Wp)
+  via daily peak-sun-hours and a derating factor. Standard method family used in USAID/World
+  Bank/manufacturer (Lorentz, Grundfos) solar-pump sizing guides. Efficient to build: total dynamic
+  head's friction-loss component can literally reuse the existing `dw_`/`hw_` engine rather than
+  duplicating it — this calculator is mostly a front-end (PV/pump matching) wrapped around
+  suite-internal machinery, same efficiency argument as Task 108's spring-box design. Inputs: target
+  flow rate, static lift, pipe run (for friction-loss reuse), daily peak sun hours (location input or
+  simple lookup table — needs a cited irradiance data source, not guessed values), pump efficiency,
+  system derating factor (~0.75–0.85 typical, needs a cited source before shipping as a default, not
+  a placeholder). Outputs: hydraulic power, electrical power required, recommended PV array size,
+  estimated daily deliverable volume. Candidate prefix `swp_` — not yet claimed.
+- 60|111| **Solar water pasteurization / SODIS exposure calculator.** Two closely related low-cost
+  heat/UV water-treatment methods, both genuinely "the esoteric mission-textbook content" Tom asked
+  to systematize — SODIS (Solar Water Disinfection) is a WHO/EAWAG-endorsed method taught directly in
+  humanitarian field contexts: clear water in PET bottles, direct sun exposure (6 hr sunny / 2 days
+  cloudy), with a turbidity ceiling (<30 NTU) below which it's considered effective. Solar
+  pasteurization is the thermal sibling — heat water to the WAPI threshold (65°C sustained) via solar
+  cooker/collector, calculated from a basic thermal energy balance (`Q = mcΔT`) and collector
+  efficiency. Real mission fit: directly serves the "universal love and healing" mission (safe
+  drinking water, the single highest-leverage low-resource health intervention) using heat as the
+  active ingredient, matching Tom's stated energy/heat interest exactly. Needs care before shipping
+  numeric defaults: turbidity threshold, exposure-time table, and collector-efficiency defaults must
+  cite the actual WHO/EAWAG/CAWST source values, not estimated placeholders — this is safety-critical
+  content (a wrong default could tell someone their water is safe when it isn't), so verification
+  against primary sources is a hard gate before release, not just before translation. Candidate
+  prefix `swt_` (solar water treatment) — may eventually split into two calculators (pasteurization
+  vs. SODIS) if the shared-page UI gets crowded; not decided yet.
+
+**Candidates backlog (not yet fleshed out):**
+- **Pico-hydro / hydrokinetic (damless, in-stream) turbine feasibility** — natural extension of the
+  existing `mhp_` calculator for very low-head remote sites where a conventional penstock/head
+  arrangement isn't available.
+- **Solar still (basin-type solar distillation) sizing** — small-scale desalination/purification,
+  same heat-for-water-treatment family as Task 111.
+- **Biogas digester sizing** — waste-to-energy, ties sanitation and energy generation together;
+  overlaps conceptually with the VIP-latrine candidate above (same waste stream, different endpoint).
+- **Passive/evaporative cooling calculator** — direct answer to Tom's original "shading/temperature
+  management" framing, properly homed here rather than treated as a stretch off the water-conveyance
+  identity, since evaporative cooling is inherently a water-consuming thermal process.
+
 ## Translation Standardization (Glossary Project)
 
 ## Translation improvements
@@ -19,19 +136,24 @@ The rules, sequence, and QA chain for translation work are **not** restated here
 - **`CLAUDE.md` § "Translation Sprints"** — sprint mechanics, model policy, pre/post-sprint checklist.
 - **`dev/translation-execution-log.md`** — the full dated, category-by-category execution record.
 
-- 18|100|[H] **`Install.php` localization (split from Task 95, 2026-07-13).** `Install.php` (66
-  lines, PWA install instructions) is 100% hardcoded English body text, outside `$ec_lang` entirely
-  — unlike `About.php`'s `$ec_lang['about_body_html']` pattern. Scope, per Tom 2026-07-13: it must
-  be translated (it's the only working install path on iOS Safari and Firefox, where the in-app
-  `⬇ Install` button silently does nothing — see Task 95 resolution #1). Sequence, Task-87-style:
-  (1) **Wave 0 first** — tighten and clarify the English body for concision before any translation
-  work starts, same discipline as Task 87's English-reform pass; this is a much smaller page than
-  Task 87's full-suite sweep, so likely doesn't need Opus, but re-evaluate if the pass turns out to
-  be nontrivial. (2) Restructure the body into `$ec_lang['install_body_html']` (or a small set of
-  section keys if a single blob is awkward — e.g. separate Android/iOS/Desktop/Firefox sections),
-  following `About.php`'s convention. (3) Run through the normal translation-sprint pipeline
-  (`dev/translation-process.md`) once the English is settled. Not yet scoped: whether this earns a
-  standalone sprint or rides along with an upcoming category's wave.
+- 70|109| **Cross-language consistency audit (Opus, suite-wide).** Tom, 2026-07-14: wants a
+  systematic pass, not just spot-checks reacting to a specific question — motivated directly by the
+  Task 18 post-close finding that Burmese had a real embedded-English defect sitting undetected
+  through a full translation sprint's own self-check and this session's own initial QA pass, only
+  caught because Tom asked a pointed question about one string. The gap: existing QA
+  (`lang_syntax_validate.php`, tag-parity, spot-check back-translation) catches structural defects
+  and can catch *sampled* meaning defects, but nothing currently does a systematic
+  terminology/tone-consistency read across all 26 languages × 12 calculators looking for the
+  Burmese-style failure mode (an agent leaving source-language fragments embedded, or drifting from
+  a language's own established terminology elsewhere in the same file). Scope not yet finalized —
+  given the size (26 × 12 is a lot of surface area for one pass), this should probably run
+  **staged by calculator category**, not as one monolithic review, and each stage still needs the
+  standard authorization gate before spawning Opus agents (same "propose → confirm → launch" rule as
+  a translation sprint — see `CLAUDE.md` § "Translation Sprints"). Model is Opus, not Sonnet (Fable
+  is unavailable — see `feedback_fable_unavailable_use_opus`), consistent with prior holistic
+  cross-language passes (Task 91's category re-translation quality bar, Task 93's glossary
+  reconciliation). Next step before launch: propose a staged plan (which categories first, what
+  the audit checklist actually checks for) and get Tom's authorization per stage.
 
 ## AI Efficiency Scripting (Overhead)
 
@@ -42,6 +164,56 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|108| **`Install.php` localization — DONE 2026-07-14.** Was 100% hardcoded English body text,
+  outside `$ec_lang` entirely — the only working PWA install path on iOS Safari/Firefox, where the
+  in-app `⬇ Install` button silently does nothing (Task 95 resolution #1). Executed per the split's
+  planned sequence, authorized standalone (not bundled with an upcoming category wave, per Tom's
+  call when asked): (1) **Wave 0** — tightened the English body for concision/Simple-English
+  compliance while restructuring. (2) Restructured into 15 new `$ec_lang['install_*']` keys (intro,
+  Android/iOS/Desktop/Firefox section headings+steps, cached-pages summary), one key set rather than
+  a single blob since the Android section interleaves a live install button and inline JS — matches
+  `About.php`'s `about_body_html` convention where a single blob fits. Dropped the old hardcoded "16
+  calculator pages" count in favor of "all calculator pages" so the text can't silently drift out of
+  sync with the actual page count again. (3) Full 26-agent Sonnet translation sprint, scoped strictly
+  to the 15 new keys (payload deltas also carried 5–15 unrelated pre-existing keys per language from
+  other unfinished work, left untouched per standard scoping precedent).
+  **Bug found and fixed while in this file, same session, per Tom's authorization:** `sw.js`'s PWA
+  precache lists (`STATIC_ASSETS`/`CALC_PAGES`) were stale — missing `Canal-Seepage.php`,
+  `Irrigation-Pressure.php`, `Rock-Chute.php` and their JS files, plus `Install.php` itself, so those
+  3 calculators silently didn't work offline after install. Added all missing entries and bumped
+  `CACHE_VERSION` to `v4` so installed users pick up the corrected list.
+  QA: `php -l` clean on `Install.php`, all 27 lang files, and `sw.js`; `node -c sw.js` clean;
+  `lang_syntax_validate.php` shows only advisory `identical-to-english` findings (all legitimate —
+  `install_android_heading`/`install_ios_heading` are brand names like "Android (Chrome)" that
+  correctly stay untranslated in most languages, same class as pre-existing eponym findings); tag-
+  parity script-verified 4-for-4 `<li>`/`<strong>` counts across all 26 languages for the three
+  step-list keys; no `&ndash;`/`&mdash;` entity-escaping bugs found; inline back-translation spot-
+  check (no `ANTHROPIC_API_KEY` set) across 8 languages spanning Latin/Cyrillic/Arabic/CJK/Devanagari
+  scripts (es, fr, de, ru, ar, zh, hi, sw) confirmed full meaning preserved, no dropped clauses, no
+  leftover English, natural non-calqued phrasing. Payloads regenerated post-sprint (FRESH).
+  **Post-close audit, same day, prompted by Tom questioning Wave 0/1 quality.** Tom specifically
+  flagged `install_intro`'s "Once installed, ..." construction as a possible translation-risk word.
+  Read all 26 languages' `install_intro` in full rather than assuming: 21 used a clean unambiguous
+  "after installation" construction; the other 5 (es, fr, it, ro, plus the Hindi/Urdu/Bengali "one
+  time X, after" pattern) rendered "once" via their own language's standard native idiom for it
+  (French "une fois que," Spanish "una vez," Italian "una volta," Romanian "odată," Hindi "ek
+  baar... ke baad" are textbook grammar for this meaning, not calques) — so the English wording
+  itself was not the defect and was left unchanged. Extended the check past just `install_intro`:
+  read every language's full `install_*` block and grepped fr/id/it/pt/ro for embedded-English
+  false positives (all cleared — native words/established loanwords, e.g. French "menu" is
+  original French vocabulary, not a leftover). Found one real defect: **my (Burmese) left the raw
+  English word "install" (and browser/prompt/cache/menu/icon/window) embedded untranslated inside
+  Burmese sentences across nearly every `install_*` key**, inconsistent with its own
+  `install_main_menu` key which already had the correct native word (ထည့်သွင်း) sitting in the same
+  file. Re-ran just that one language with an Opus agent (Sonnet had already had one clean shot and
+  produced this defect; evidence didn't support redoing the other 25 languages or the English
+  source). Independently verified the fix myself rather than trusting the agent's self-report:
+  `php -l` clean, tag-parity re-confirmed 4-for-4 for all 3 step-list keys, and a direct read of the
+  full file confirmed every ordinary tech-vocabulary word (install/browser/prompt/menu/icon/window)
+  is now real Burmese, with only brand names (Chrome, Safari, Firefox, Edge, Android, iOS, EngCalcs,
+  PWA) and the heading-position device label "Desktop" left in Latin script — matching the pattern
+  already accepted in the other clean headings. Payloads regenerated post-fix (FRESH).
 
 - 0|105| **Scoped and fixed the remaining `mpf_see_notes` stacking sites from Task 101, DONE
   2026-07-14.** Per-site fix shape (confirmed with Tom first, same as Task 104): (1)

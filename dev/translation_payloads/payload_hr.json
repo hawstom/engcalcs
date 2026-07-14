@@ -1,10 +1,11 @@
 {
     "meta": {
         "language": "hr",
-        "expected_key_count": 483,
-        "delta_key_count": 10,
+        "expected_key_count": 497,
+        "delta_key_count": 12,
         "active_prefixes": [
             "dw",
+            "install",
             "ip",
             "mhp",
             "mi",
@@ -19,6 +20,7 @@
     },
     "prompt_context_by_prefix": {
         "dw": "Use these preferred technical term translations when relevant:\n- flow (Q): protok\n- velocity (v): brzina\n- head loss (h_L): gubitak tlačne visine\n- friction factor (f): faktor trenja\n- slope (S): nagib\n- laminar: laminarno\n- transitional: prijelazno\n- turbulent: turbulentno",
+        "install": "Use these preferred technical term translations when relevant:\n- flow (Q): protok\n- velocity (v): brzina\n- slope (S): nagib",
         "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): protok\n- velocity (v): brzina\n- head loss (h_L): gubitak tlačne visine\n- emitter: emiter\n- distribution uniformity (DU): ravnomjernost raspodjele\n- low-quarter distribution uniformity (DU_lq): jednolikost distribucije niske grupe\n- application rate (PR): intenzitet navodnjavanja\n- lateral: laterala\n- mainline: glavni cjevovod\n- reach: dionica\n- velocity head (H_v): brzinska visina\n- friction loss (h_f): gubici trenja\n- minor loss (h_m): lokalni gubici\n- energy grade line (EGL): energetska linija\n- upstream: uzvodno\n- downstream: nizvodno",
         "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): protok\n- penstock: tlačni cjevovod\n- gross head (H_gross): bruto visinski pad\n- net head (H_net): neto visinski pad\n- plant efficiency (η): učinkovitost postrojenja\n- head loss (h_L): gubitak tlačne visine\n- run-of-river: protočna hidroelektrana\n- headworks: vodozahvatna građevina\n- junction loss (h_m): lokalni gubici\n- minor loss (h_m): lokalni gubici",
         "mi": "Use these preferred technical term translations when relevant:\n- flow (Q): protok\n- velocity (v): brzina\n- hydraulic radius (R_h): hidraulički polumjer\n- wetted perimeter (P_w): močeni opseg\n- Manning roughness (n): Manningov koeficijent hrapavosti\n- slope (S): nagib\n- irregular channel: kanal nepravilnog presjeka",
@@ -82,6 +84,29 @@
                 "context": "Flow regime with chaotic, irregular mixing. Reynolds number above ~4000. Appears in Darcy-Weisbach calculator flow regime check.",
                 "translation_notes": "Nearly always a cognate. Some languages distinguish 'turbulent' (adjective) from 'turbulence' (noun) — use the adjective form.",
                 "preferred_translation": "turbulentno"
+            }
+        ],
+        "install": [
+            {
+                "term": "flow",
+                "symbol": "Q",
+                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg RESOLVED (Tom, 2026-07-13): native engineer's 2026-07-06 clarification confirmed both 'дебит' (colloquial\/general register) and 'водно количество' (academic\/hydraulic-engineering register, used at university for Q) are acceptable. Tom decided suite-wide standardization on 'водно количество' — \"I would put водно количество everywhere\" — applied across all bg calculator categories (pipes\/irrigation included, not just the hydraulic-structure\/open-channel strings the engineer originally corrected). 'дебит' fully replaced in lib\/lang.ec.bg.php 2026-07-13.",
+                "preferred_translation": "protok"
+            },
+            {
+                "term": "velocity",
+                "symbol": "v",
+                "context": "Flow velocity (speed of water). Appears in all calculators.",
+                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
+                "preferred_translation": "brzina"
+            },
+            {
+                "term": "slope",
+                "symbol": "S",
+                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
+                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
+                "preferred_translation": "nagib"
             }
         ],
         "ip": [
@@ -485,6 +510,8 @@
         "mi_groupSegment": "Segment",
         "mhp_vel_ok_short": "OK",
         "odt_notes_1_term": "Formula",
+        "install_android_heading": "Android (Chrome)",
+        "install_ios_heading": "iOS (Safari)",
         "rc_sketch_filter": "Filter",
         "ip_length": "L",
         "ip_diameter": "D",
@@ -497,6 +524,8 @@
         "mi_groupSegment": "Segment",
         "mhp_vel_ok_short": "OK",
         "odt_notes_1_term": "Formula",
+        "install_android_heading": "Android (Chrome)",
+        "install_ios_heading": "iOS (Safari)",
         "rc_sketch_filter": "Filter",
         "ip_length": "L",
         "ip_diameter": "D",
@@ -566,6 +595,38 @@
                     "key": "odt_notes_1_def",
                     "value": "t = &radic;H<sub>1<\/sub> \/ (C<sub>d<\/sub> A<sub>or<\/sub> &radic;(2g)) &times; (2A<sub>x<\/sub>\/5 + 8&radic;(A<sub>x<\/sub>A<sub>0<\/sub>)\/15 + 16A<sub>0<\/sub>\/15) daje vrijeme pražnjenja od visine H do otvora. Vrijeme pražnjenja = t(H<sub>1<\/sub>,A<sub>1<\/sub>,A<sub>0<\/sub>) &minus; t(H<sub>2<\/sub>,A<sub>2<\/sub>,A<sub>0<\/sub>), gdje je H<sub>1<\/sub> = početna kota &minus; kota otvora, H<sub>2<\/sub> = završna kota &minus; kota otvora.",
                     "english": "t = &radic;H<sub>1<\/sub> \/ (C<sub>d<\/sub> A<sub>or<\/sub> &radic;(2g)) &times; (2A<sub>x<\/sub>\/5 + 8&radic;(A<sub>x<\/sub>A<sub>0<\/sub>)\/15 + 16A<sub>0<\/sub>\/15) gives drain time from head H to the orifice. Drain time = t(H<sub>1<\/sub>,A<sub>1<\/sub>,A<sub>0<\/sub>) &minus; t(H<sub>2<\/sub>,A<sub>2<\/sub>,A<sub>0<\/sub>), where H<sub>1<\/sub> = starting elevation &minus; orifice elevation, H<sub>2<\/sub> = ending elevation &minus; orifice elevation."
+                }
+            }
+        },
+        "install_android_heading": {
+            "reason": "equal_to_english",
+            "current_value": "Android (Chrome)",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "install_intro",
+                    "value": "EngCalcs je progresivna web aplikacija (PWA). Nakon instalacije svi kalkulatori u potpunosti rade bez interneta — internetska veza nije potrebna.",
+                    "english": "EngCalcs is a Progressive Web App (PWA). Once installed, all calculators work fully offline — no internet connection needed."
+                },
+                "next_translated": {
+                    "key": "install_android_steps_html",
+                    "value": "<li>Otvorite bilo koju stranicu s kalkulatorom u Chromeu.<\/li><li>Dodirnite gumb <strong>⬇ Instaliraj<\/strong> na gornjoj navigacijskoj traci ili dodirnite izbornik preglednika (⋮) i odaberite <strong>Dodaj na početni zaslon<\/strong>.<\/li><li>Dodirnite <strong>Instaliraj<\/strong> u prozoru koji se pojavi.<\/li><li>EngCalcs se pojavljuje na vašem početnom zaslonu i radi bez interneta.<\/li>",
+                    "english": "<li>Open any calculator page in Chrome.<\/li><li>Tap the <strong>⬇ Install<\/strong> button in the top navigation bar, or tap the browser menu (⋮) and choose <strong>Add to Home screen<\/strong>.<\/li><li>Tap <strong>Install<\/strong> in the prompt that appears.<\/li><li>EngCalcs appears on your home screen and works offline.<\/li>"
+                }
+            }
+        },
+        "install_ios_heading": {
+            "reason": "equal_to_english",
+            "current_value": "iOS (Safari)",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "install_prompt_unavailable",
+                    "value": "Poziv za instalaciju nije dostupan — umjesto toga upotrijebite izbornik preglednika.",
+                    "english": "Install prompt not available — use your browser menu instead."
+                },
+                "next_translated": {
+                    "key": "install_ios_steps_html",
+                    "value": "<li>Otvorite bilo koju stranicu s kalkulatorom u Safariju.<\/li><li>Dodirnite gumb <strong>Dijeli<\/strong> (kvadratić sa strelicom prema gore).<\/li><li>Pomaknite se prema dolje i dodirnite <strong>Dodaj na početni zaslon<\/strong>.<\/li><li>Dodirnite <strong>Dodaj<\/strong>. EngCalcs se pojavljuje na vašem početnom zaslonu.<\/li>",
+                    "english": "<li>Open any calculator page in Safari.<\/li><li>Tap the <strong>Share<\/strong> button (box with arrow pointing up).<\/li><li>Scroll down and tap <strong>Add to Home Screen<\/strong>.<\/li><li>Tap <strong>Add<\/strong>. EngCalcs appears on your home screen.<\/li>"
                 }
             }
         },

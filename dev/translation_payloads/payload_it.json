@@ -1,10 +1,11 @@
 {
     "meta": {
         "language": "it",
-        "expected_key_count": 483,
-        "delta_key_count": 11,
+        "expected_key_count": 497,
+        "delta_key_count": 14,
         "active_prefixes": [
             "dw",
+            "install",
             "ip",
             "mhp",
             "mphl",
@@ -19,6 +20,7 @@
     },
     "prompt_context_by_prefix": {
         "dw": "Use these preferred technical term translations when relevant:\n- flow (Q): portata\n- velocity (v): velocità\n- head loss (h_L): perdita di carico\n- friction factor (f): fattore di attrito\n- slope (S): pendenza\n- laminar: laminare\n- transitional: di transizione\n- turbulent: turbolento",
+        "install": "Use these preferred technical term translations when relevant:\n- flow (Q): portata\n- velocity (v): velocità\n- slope (S): pendenza",
         "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): portata\n- velocity (v): velocità\n- head loss (h_L): perdita di carico\n- emitter: emettitore\n- distribution uniformity (DU): uniformità di distribuzione\n- low-quarter distribution uniformity (DU_lq): uniformità di distribuzione del quarto inferiore\n- application rate (PR): tasso di applicazione\n- lateral: ala laterale\n- mainline: condotta principale\n- reach: tratto\n- velocity head (H_v): altezza cinetica\n- friction loss (h_f): perdita di carico distribuita\n- minor loss (h_m): perdita di carico concentrata\n- energy grade line (EGL): linea dei carichi totali\n- upstream: a monte\n- downstream: a valle",
         "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): portata\n- penstock: condotta forzata\n- gross head (H_gross): altezza lorda\n- net head (H_net): altezza netta\n- plant efficiency (η): rendimento dell'impianto\n- head loss (h_L): perdita di carico\n- run-of-river: ad acqua fluente\n- headworks: opera di presa\n- junction loss (h_m): perdite di carico locali\n- minor loss (h_m): perdita di carico concentrata",
         "mphl": "Use these preferred technical term translations when relevant:\n- flow (Q): portata\n- velocity (v): velocità\n- head loss (h_L): perdita di carico\n- friction loss (h_f): perdita di carico distribuita\n- minor loss (h_m): perdita di carico concentrata\n- hydraulic radius (R_h): raggio idraulico\n- wetted perimeter (P_w): perimetro bagnato\n- Manning roughness (n): coefficiente di scabrezza di Manning\n- slope (S): pendenza",
@@ -82,6 +84,29 @@
                 "context": "Flow regime with chaotic, irregular mixing. Reynolds number above ~4000. Appears in Darcy-Weisbach calculator flow regime check.",
                 "translation_notes": "Nearly always a cognate. Some languages distinguish 'turbulent' (adjective) from 'turbulence' (noun) — use the adjective form.",
                 "preferred_translation": "turbolento"
+            }
+        ],
+        "install": [
+            {
+                "term": "flow",
+                "symbol": "Q",
+                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg RESOLVED (Tom, 2026-07-13): native engineer's 2026-07-06 clarification confirmed both 'дебит' (colloquial\/general register) and 'водно количество' (academic\/hydraulic-engineering register, used at university for Q) are acceptable. Tom decided suite-wide standardization on 'водно количество' — \"I would put водно количество everywhere\" — applied across all bg calculator categories (pipes\/irrigation included, not just the hydraulic-structure\/open-channel strings the engineer originally corrected). 'дебит' fully replaced in lib\/lang.ec.bg.php 2026-07-13.",
+                "preferred_translation": "portata"
+            },
+            {
+                "term": "velocity",
+                "symbol": "v",
+                "context": "Flow velocity (speed of water). Appears in all calculators.",
+                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
+                "preferred_translation": "velocità"
+            },
+            {
+                "term": "slope",
+                "symbol": "S",
+                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
+                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
+                "preferred_translation": "pendenza"
             }
         ],
         "ip": [
@@ -423,6 +448,9 @@
         "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
         "mhp_vel_ok_short": "OK",
         "odt_notes_1_term": "Formula",
+        "install_android_heading": "Android (Chrome)",
+        "install_ios_heading": "iOS (Safari)",
+        "install_desktop_heading": "Desktop (Chrome \/ Edge)",
         "ip_length": "L",
         "ip_diameter": "D",
         "ip_roughness": "e",
@@ -436,6 +464,9 @@
         "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
         "mhp_vel_ok_short": "OK",
         "odt_notes_1_term": "Formula",
+        "install_android_heading": "Android (Chrome)",
+        "install_ios_heading": "iOS (Safari)",
+        "install_desktop_heading": "Desktop (Chrome \/ Edge)",
         "ip_length": "L",
         "ip_diameter": "D",
         "ip_roughness": "e",
@@ -521,6 +552,54 @@
                     "key": "odt_notes_1_def",
                     "value": "t = &radic;H<sub>1<\/sub> \/ (C<sub>d<\/sub> A<sub>or<\/sub> &radic;(2g)) &times; (2A<sub>x<\/sub>\/5 + 8&radic;(A<sub>x<\/sub>A<sub>0<\/sub>)\/15 + 16A<sub>0<\/sub>\/15) fornisce il tempo di svuotamento dal carico H all'orifizio. Tempo di svuotamento = t(H<sub>1<\/sub>,A<sub>1<\/sub>,A<sub>0<\/sub>) &minus; t(H<sub>2<\/sub>,A<sub>2<\/sub>,A<sub>0<\/sub>), dove H<sub>1<\/sub> = quota iniziale &minus; quota orifizio, H<sub>2<\/sub> = quota finale &minus; quota orifizio.",
                     "english": "t = &radic;H<sub>1<\/sub> \/ (C<sub>d<\/sub> A<sub>or<\/sub> &radic;(2g)) &times; (2A<sub>x<\/sub>\/5 + 8&radic;(A<sub>x<\/sub>A<sub>0<\/sub>)\/15 + 16A<sub>0<\/sub>\/15) gives drain time from head H to the orifice. Drain time = t(H<sub>1<\/sub>,A<sub>1<\/sub>,A<sub>0<\/sub>) &minus; t(H<sub>2<\/sub>,A<sub>2<\/sub>,A<sub>0<\/sub>), where H<sub>1<\/sub> = starting elevation &minus; orifice elevation, H<sub>2<\/sub> = ending elevation &minus; orifice elevation."
+                }
+            }
+        },
+        "install_android_heading": {
+            "reason": "equal_to_english",
+            "current_value": "Android (Chrome)",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "install_intro",
+                    "value": "EngCalcs è una Progressive Web App (PWA). Una volta installata, tutti i calcolatori funzionano completamente offline: non serve alcuna connessione a Internet.",
+                    "english": "EngCalcs is a Progressive Web App (PWA). Once installed, all calculators work fully offline — no internet connection needed."
+                },
+                "next_translated": {
+                    "key": "install_android_steps_html",
+                    "value": "<li>Apri una qualsiasi pagina di calcolo in Chrome.<\/li><li>Tocca il pulsante <strong>⬇ Installa<\/strong> nella barra di navigazione superiore, oppure tocca il menu del browser (⋮) e scegli <strong>Aggiungi a schermata Home<\/strong>.<\/li><li>Tocca <strong>Installa<\/strong> nella richiesta che compare.<\/li><li>EngCalcs comparirà nella schermata Home e funzionerà offline.<\/li>",
+                    "english": "<li>Open any calculator page in Chrome.<\/li><li>Tap the <strong>⬇ Install<\/strong> button in the top navigation bar, or tap the browser menu (⋮) and choose <strong>Add to Home screen<\/strong>.<\/li><li>Tap <strong>Install<\/strong> in the prompt that appears.<\/li><li>EngCalcs appears on your home screen and works offline.<\/li>"
+                }
+            }
+        },
+        "install_ios_heading": {
+            "reason": "equal_to_english",
+            "current_value": "iOS (Safari)",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "install_prompt_unavailable",
+                    "value": "Richiesta di installazione non disponibile: usa invece il menu del browser.",
+                    "english": "Install prompt not available — use your browser menu instead."
+                },
+                "next_translated": {
+                    "key": "install_ios_steps_html",
+                    "value": "<li>Apri una qualsiasi pagina di calcolo in Safari.<\/li><li>Tocca il pulsante <strong>Condividi<\/strong> (il riquadro con la freccia verso l'alto).<\/li><li>Scorri verso il basso e tocca <strong>Aggiungi a Home<\/strong>.<\/li><li>Tocca <strong>Aggiungi<\/strong>. EngCalcs comparirà nella schermata Home.<\/li>",
+                    "english": "<li>Open any calculator page in Safari.<\/li><li>Tap the <strong>Share<\/strong> button (box with arrow pointing up).<\/li><li>Scroll down and tap <strong>Add to Home Screen<\/strong>.<\/li><li>Tap <strong>Add<\/strong>. EngCalcs appears on your home screen.<\/li>"
+                }
+            }
+        },
+        "install_desktop_heading": {
+            "reason": "equal_to_english",
+            "current_value": "Desktop (Chrome \/ Edge)",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "install_ios_note",
+                    "value": "Su iOS l'installazione avviene sempre tramite il menu Condividi: non compare alcuna richiesta di installazione automatica.",
+                    "english": "On iOS, installing always uses the Share menu — there is no automatic install prompt."
+                },
+                "next_translated": {
+                    "key": "install_desktop_steps_html",
+                    "value": "<li>Apri una qualsiasi pagina di calcolo.<\/li><li>Fai clic sull'<strong>icona di installazione<\/strong> (⊕ o icona a forma di computer) nella barra degli indirizzi del browser, oppure apri il menu del browser e scegli <strong>Installa EngCalcs…<\/strong><\/li><li>Fai clic su <strong>Installa<\/strong>. EngCalcs si aprirà come app autonoma in una propria finestra.<\/li>",
+                    "english": "<li>Open any calculator page.<\/li><li>Click the <strong>install icon<\/strong> (⊕ or computer icon) in the browser's address bar, or open the browser menu and choose <strong>Install EngCalcs…<\/strong><\/li><li>Click <strong>Install<\/strong>. EngCalcs opens as a standalone app window.<\/li>"
                 }
             }
         },

@@ -1,10 +1,11 @@
 {
     "meta": {
         "language": "my",
-        "expected_key_count": 483,
-        "delta_key_count": 8,
+        "expected_key_count": 497,
+        "delta_key_count": 11,
         "active_prefixes": [
             "dw",
+            "install",
             "ip",
             "rc"
         ],
@@ -16,6 +17,7 @@
     },
     "prompt_context_by_prefix": {
         "dw": "Use these preferred technical term translations when relevant:\n- flow (Q): ရေစီးနှုန်း\n- velocity (v): ရေအလျင်နှုန်း\n- head loss (h_L): ဖိမြင့်ဆင့်ဆုံးရှုံးမှု\n- friction factor (f): ပွတ်တိုက်မှုကိန်း\n- slope (S): လျောစောင်း\n- laminar: ညီညာသောစီးဆင်းမှု\n- transitional: အကူးအပြောင်းစီးဆင်းမှု\n- turbulent: ဆူပူသောစီးဆင်းမှု",
+        "install": "Use these preferred technical term translations when relevant:\n- flow (Q): ရေစီးနှုန်း\n- velocity (v): ရေအလျင်နှုန်း\n- slope (S): လျောစောင်း",
         "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): ရေစီးနှုန်း\n- velocity (v): ရေအလျင်နှုန်း\n- head loss (h_L): ဖိမြင့်ဆင့်ဆုံးရှုံးမှု\n- emitter: ရေထုတ်ကိရိယာ\n- distribution uniformity (DU): ဖြန့်ဝေမှုညီမျှမှု\n- low-quarter distribution uniformity (DU_lq): [needs translation sprint]\n- application rate (PR): ရေသွင်းနှုန်း\n- lateral: ဘေးပိုက်\n- mainline: ပင်မပိုက်\n- reach: ပိုက်အပိုင်း\n- velocity head (H_v): [needs translation sprint]\n- friction loss (h_f): ပွတ်တိုက်ဆုံးရှုံးမှု\n- minor loss (h_m): ဒေသဆိုင်ရာ ဆုံးရှုံးမှု\n- energy grade line (EGL): စွမ်းအင်မျဉ်း\n- upstream: [needs translation sprint]\n- downstream: [needs translation sprint]",
         "rc": "Use these preferred technical term translations when relevant:\n- flow (Q): ရေစီးနှုန်း\n- velocity (v): ရေအလျင်နှုန်း\n- riprap: ကျောက်ကာ\n- slope (S): လျောစောင်း\n- rock chute: ကျောက်ထောင်ချောင်း\n- chute: မြန်ဆန်သောချောင်း\n- unit discharge (q, q_t): ယူနစ်ရေထွက်နှုန်း\n- median rock size (D50): ကျောက်အလယ်အလတ်အရွယ်အစား\n- gradation (SD): ကျောက်အရွယ်အစားဖြန့်ဝေမှု\n- porosity (n_p): အပေါက်ပါမှုနှုန်း\n- specific gravity (sg): တိကျသောဆွဲငင်အား\n- ponding: [needs translation sprint]\n- outlet apron: [needs translation sprint]\n- weir head (H_p): [needs translation sprint]\n- upstream: [needs translation sprint]\n- downstream: [needs translation sprint]\n- reach: ပိုက်အပိုင်း"
     },
@@ -76,6 +78,29 @@
                 "context": "Flow regime with chaotic, irregular mixing. Reynolds number above ~4000. Appears in Darcy-Weisbach calculator flow regime check.",
                 "translation_notes": "Nearly always a cognate. Some languages distinguish 'turbulent' (adjective) from 'turbulence' (noun) — use the adjective form.",
                 "preferred_translation": "ဆူပူသောစီးဆင်းမှု"
+            }
+        ],
+        "install": [
+            {
+                "term": "flow",
+                "symbol": "Q",
+                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg RESOLVED (Tom, 2026-07-13): native engineer's 2026-07-06 clarification confirmed both 'дебит' (colloquial\/general register) and 'водно количество' (academic\/hydraulic-engineering register, used at university for Q) are acceptable. Tom decided suite-wide standardization on 'водно количество' — \"I would put водно количество everywhere\" — applied across all bg calculator categories (pipes\/irrigation included, not just the hydraulic-structure\/open-channel strings the engineer originally corrected). 'дебит' fully replaced in lib\/lang.ec.bg.php 2026-07-13.",
+                "preferred_translation": "ရေစီးနှုန်း"
+            },
+            {
+                "term": "velocity",
+                "symbol": "v",
+                "context": "Flow velocity (speed of water). Appears in all calculators.",
+                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
+                "preferred_translation": "ရေအလျင်နှုန်း"
+            },
+            {
+                "term": "slope",
+                "symbol": "S",
+                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
+                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
+                "preferred_translation": "လျောစောင်း"
             }
         ],
         "ip": [
@@ -316,6 +341,9 @@
     },
     "keys_to_translate": {
         "dw_roughness": "e",
+        "install_android_heading": "Android (Chrome)",
+        "install_ios_heading": "iOS (Safari)",
+        "install_desktop_heading": "Desktop (Chrome \/ Edge)",
         "rc_sg_ok_tip": "2.54–2.82 (Robinson)",
         "rc_SD_ok_tip": "1.15–1.47 (Robinson)",
         "ip_length": "L",
@@ -326,6 +354,9 @@
     },
     "keys": {
         "dw_roughness": "e",
+        "install_android_heading": "Android (Chrome)",
+        "install_ios_heading": "iOS (Safari)",
+        "install_desktop_heading": "Desktop (Chrome \/ Edge)",
         "rc_sg_ok_tip": "2.54–2.82 (Robinson)",
         "rc_SD_ok_tip": "1.15–1.47 (Robinson)",
         "ip_length": "L",
@@ -348,6 +379,54 @@
                     "key": "dw_roughness_tip",
                     "value": "ပိုက်နံရံ၏ အကြမ်းတမ်းအမြင့်, e။ ပုံမှန်တန်ဖိုးများ: သံမဏိ (အသစ်) 0.046 mm, သံမဏိ (အသုံးပြုပြီး) 0.15 mm, HDPE 0.003 mm, PVC\/uPVC 0.0015 mm, ကွန်ကရစ် 0.3–3 mm။",
                     "english": "Absolute roughness height, e, of the pipe wall. Typical values: steel (new) 0.046 mm, steel (used) 0.15 mm, HDPE 0.003 mm, PVC\/uPVC 0.0015 mm, concrete 0.3–3 mm."
+                }
+            }
+        },
+        "install_android_heading": {
+            "reason": "equal_to_english",
+            "current_value": "Android (Chrome)",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "install_intro",
+                    "value": "EngCalcs သည် Progressive Web App (PWA) တစ်ခုဖြစ်သည်။ တစ်ကြိမ်ထည့်သွင်းပြီးလျှင် တွက်ချက်စက်အားလုံးကို အင်တာနက်မလိုဘဲ အပြည့်အဝ အသုံးပြုနိုင်ပါသည်။",
+                    "english": "EngCalcs is a Progressive Web App (PWA). Once installed, all calculators work fully offline — no internet connection needed."
+                },
+                "next_translated": {
+                    "key": "install_android_steps_html",
+                    "value": "<li>တွက်ချက်စက်စာမျက်နှာတစ်ခုခုကို Chrome ဖြင့်ဖွင့်ပါ။<\/li><li>အပေါ်ဘက် လမ်းညွှန်ဘားရှိ <strong>⬇ ထည့်သွင်းရန်<\/strong> ခလုတ်ကိုနှိပ်ပါ၊ သို့မဟုတ် ဘရောက်ဇာ မီနူး (⋮) ကိုနှိပ်ပြီး <strong>ပင်မစာမျက်နှာသို့ ထည့်ရန်<\/strong> ကိုရွေးပါ။<\/li><li>ပေါ်လာသော ညွှန်ကြားချက်ဘောက်တွင် <strong>ထည့်သွင်းရန်<\/strong> ကိုနှိပ်ပါ။<\/li><li>EngCalcs သည် သင့်ဖုန်း ပင်မစာမျက်နှာပေါ်တွင်ပေါ်လာပြီး အင်တာနက်မလိုဘဲ အလုပ်လုပ်ပါလိမ့်မည်။<\/li>",
+                    "english": "<li>Open any calculator page in Chrome.<\/li><li>Tap the <strong>⬇ Install<\/strong> button in the top navigation bar, or tap the browser menu (⋮) and choose <strong>Add to Home screen<\/strong>.<\/li><li>Tap <strong>Install<\/strong> in the prompt that appears.<\/li><li>EngCalcs appears on your home screen and works offline.<\/li>"
+                }
+            }
+        },
+        "install_ios_heading": {
+            "reason": "equal_to_english",
+            "current_value": "iOS (Safari)",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "install_prompt_unavailable",
+                    "value": "ထည့်သွင်းမှု ညွှန်ကြားချက်ဘောက် မရရှိနိုင်ပါ — ကျေးဇူးပြု၍ သင့်ဘရောက်ဇာ မီနူးကို အသုံးပြုပါ။",
+                    "english": "Install prompt not available — use your browser menu instead."
+                },
+                "next_translated": {
+                    "key": "install_ios_steps_html",
+                    "value": "<li>တွက်ချက်စက်စာမျက်နှာတစ်ခုခုကို Safari ဖြင့်ဖွင့်ပါ။<\/li><li>အပေါ်သို့ချိန်ညွှန်နေသော မြှားပါသည့် <strong>မျှဝေရန်<\/strong> ခလုတ်ကိုနှိပ်ပါ။<\/li><li>အောက်သို့ဆွဲချပြီး <strong>ပင်မစာမျက်နှာသို့ ထည့်ရန်<\/strong> ကိုနှိပ်ပါ။<\/li><li><strong>ထည့်ရန်<\/strong> ကိုနှိပ်ပါ။ EngCalcs သည် သင့်ပင်မစာမျက်နှာပေါ်တွင်ပေါ်လာပါလိမ့်မည်။<\/li>",
+                    "english": "<li>Open any calculator page in Safari.<\/li><li>Tap the <strong>Share<\/strong> button (box with arrow pointing up).<\/li><li>Scroll down and tap <strong>Add to Home Screen<\/strong>.<\/li><li>Tap <strong>Add<\/strong>. EngCalcs appears on your home screen.<\/li>"
+                }
+            }
+        },
+        "install_desktop_heading": {
+            "reason": "equal_to_english",
+            "current_value": "Desktop (Chrome \/ Edge)",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "install_ios_note",
+                    "value": "iOS တွင် ထည့်သွင်းရန်အတွက် မျှဝေရန် မီနူးကိုသာ အမြဲအသုံးပြုရပြီး၊ အလိုအလျောက်ပေါ်လာသော ထည့်သွင်းမှု ညွှန်ကြားချက်ဘောက် မရှိပါ။",
+                    "english": "On iOS, installing always uses the Share menu — there is no automatic install prompt."
+                },
+                "next_translated": {
+                    "key": "install_desktop_steps_html",
+                    "value": "<li>တွက်ချက်စက်စာမျက်နှာတစ်ခုခုကိုဖွင့်ပါ။<\/li><li>ဘရောက်ဇာ၏ လိပ်စာဘားရှိ <strong>ထည့်သွင်းမှုသင်္ကေတ<\/strong> (⊕ သို့မဟုတ် ကွန်ပျူတာပုံ) ကိုနှိပ်ပါ၊ သို့မဟုတ် ဘရောက်ဇာ မီနူးကိုဖွင့်ပြီး <strong>EngCalcs ထည့်သွင်းရန်…<\/strong> ကိုရွေးပါ။<\/li><li><strong>ထည့်သွင်းရန်<\/strong> ကိုနှိပ်ပါ။ EngCalcs သည် သီးခြားအက်ပလီကေးရှင်း ဝင်းဒိုးတစ်ခုအနေဖြင့် ပွင့်လာပါလိမ့်မည်။<\/li>",
+                    "english": "<li>Open any calculator page.<\/li><li>Click the <strong>install icon<\/strong> (⊕ or computer icon) in the browser's address bar, or open the browser menu and choose <strong>Install EngCalcs…<\/strong><\/li><li>Click <strong>Install<\/strong>. EngCalcs opens as a standalone app window.<\/li>"
                 }
             }
         },

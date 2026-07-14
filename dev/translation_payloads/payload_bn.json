@@ -1,10 +1,11 @@
 {
     "meta": {
         "language": "bn",
-        "expected_key_count": 483,
-        "delta_key_count": 8,
+        "expected_key_count": 497,
+        "delta_key_count": 9,
         "active_prefixes": [
             "dw",
+            "install",
             "ip",
             "rc"
         ],
@@ -16,6 +17,7 @@
     },
     "prompt_context_by_prefix": {
         "dw": "Use these preferred technical term translations when relevant:\n- flow (Q): প্রবাহ\n- velocity (v): প্রবাহ বেগ\n- head loss (h_L): পানিশীর্ষ ক্ষতি\n- friction factor (f): ঘর্ষণ গুণাঙ্ক\n- slope (S): ঢাল\n- laminar: স্তরীয়\n- transitional: ক্রান্তিকালীন\n- turbulent: অশান্ত",
+        "install": "Use these preferred technical term translations when relevant:\n- flow (Q): প্রবাহ\n- velocity (v): প্রবাহ বেগ\n- slope (S): ঢাল",
         "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): প্রবাহ\n- velocity (v): প্রবাহ বেগ\n- head loss (h_L): পানিশীর্ষ ক্ষতি\n- emitter: ড্রিপার\n- distribution uniformity (DU): বিতরণ সমতা\n- low-quarter distribution uniformity (DU_lq): নিম্ন-চতুর্থাংশ বিতরণ সমতা\n- application rate (PR): পানি প্রয়োগ হার\n- lateral: ল্যাটারাল\n- mainline: প্রধান লাইন\n- reach: অংশ\n- velocity head (H_v): বেগ হেড\n- friction loss (h_f): ঘর্ষণ ক্ষতি\n- minor loss (h_m): স্থানীয় ক্ষতি\n- energy grade line (EGL): শক্তি রেখা\n- upstream: উজান\n- downstream: ভাটি",
         "rc": "Use these preferred technical term translations when relevant:\n- flow (Q): প্রবাহ\n- velocity (v): প্রবাহ বেগ\n- riprap: পাথর পিচিং\n- slope (S): ঢাল\n- rock chute: পাথর-আবৃত খাড়া নালা\n- chute: চ্যুট\n- unit discharge (q, q_t): একক প্রবাহ হার\n- median rock size (D50): মধ্যমা শিলার আকার\n- gradation (SD): গ্রেডেশন\n- porosity (n_p): ছিদ্রতা\n- specific gravity (sg): আপেক্ষিক গুরুত্ব\n- ponding: জলাবদ্ধতা\n- outlet apron: আউটলেট এপ্রন\n- weir head (H_p): ওয়্যার হেড\n- upstream: উজান\n- downstream: ভাটি\n- reach: অংশ"
     },
@@ -76,6 +78,29 @@
                 "context": "Flow regime with chaotic, irregular mixing. Reynolds number above ~4000. Appears in Darcy-Weisbach calculator flow regime check.",
                 "translation_notes": "Nearly always a cognate. Some languages distinguish 'turbulent' (adjective) from 'turbulence' (noun) — use the adjective form.",
                 "preferred_translation": "অশান্ত"
+            }
+        ],
+        "install": [
+            {
+                "term": "flow",
+                "symbol": "Q",
+                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg RESOLVED (Tom, 2026-07-13): native engineer's 2026-07-06 clarification confirmed both 'дебит' (colloquial\/general register) and 'водно количество' (academic\/hydraulic-engineering register, used at university for Q) are acceptable. Tom decided suite-wide standardization on 'водно количество' — \"I would put водно количество everywhere\" — applied across all bg calculator categories (pipes\/irrigation included, not just the hydraulic-structure\/open-channel strings the engineer originally corrected). 'дебит' fully replaced in lib\/lang.ec.bg.php 2026-07-13.",
+                "preferred_translation": "প্রবাহ"
+            },
+            {
+                "term": "velocity",
+                "symbol": "v",
+                "context": "Flow velocity (speed of water). Appears in all calculators.",
+                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
+                "preferred_translation": "প্রবাহ বেগ"
+            },
+            {
+                "term": "slope",
+                "symbol": "S",
+                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
+                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
+                "preferred_translation": "ঢাল"
             }
         ],
         "ip": [
@@ -316,6 +341,7 @@
     },
     "keys_to_translate": {
         "dw_roughness": "e",
+        "install_ios_heading": "iOS (Safari)",
         "rc_sg_ok_tip": "2.54–2.82 (Robinson)",
         "rc_SD_ok_tip": "1.15–1.47 (Robinson)",
         "ip_length": "L",
@@ -326,6 +352,7 @@
     },
     "keys": {
         "dw_roughness": "e",
+        "install_ios_heading": "iOS (Safari)",
         "rc_sg_ok_tip": "2.54–2.82 (Robinson)",
         "rc_SD_ok_tip": "1.15–1.47 (Robinson)",
         "ip_length": "L",
@@ -348,6 +375,22 @@
                     "key": "dw_roughness_tip",
                     "value": "পাইপের দেয়ালের পরম রুক্ষতার উচ্চতা, e। সাধারণ মান: ইস্পাত (নতুন) 0.046 mm, ইস্পাত (ব্যবহৃত) 0.15 mm, HDPE 0.003 mm, PVC\/uPVC 0.0015 mm, কংক্রিট 0.3–3 mm।",
                     "english": "Absolute roughness height, e, of the pipe wall. Typical values: steel (new) 0.046 mm, steel (used) 0.15 mm, HDPE 0.003 mm, PVC\/uPVC 0.0015 mm, concrete 0.3–3 mm."
+                }
+            }
+        },
+        "install_ios_heading": {
+            "reason": "equal_to_english",
+            "current_value": "iOS (Safari)",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "install_prompt_unavailable",
+                    "value": "ইনস্টল প্রম্পট পাওয়া যাচ্ছে না — এর পরিবর্তে আপনার ব্রাউজার মেনু ব্যবহার করুন।",
+                    "english": "Install prompt not available — use your browser menu instead."
+                },
+                "next_translated": {
+                    "key": "install_ios_steps_html",
+                    "value": "<li>Safari-তে যেকোনো ক্যালকুলেটর পৃষ্ঠা খুলুন।<\/li><li><strong>শেয়ার<\/strong> বোতামে চাপুন (উপরের দিকে তীরচিহ্নযুক্ত বাক্স)।<\/li><li>নিচে স্ক্রল করুন এবং <strong>Add to Home Screen<\/strong>-এ চাপুন।<\/li><li><strong>Add<\/strong>-এ চাপুন। EngCalcs আপনার হোম স্ক্রিনে দেখা যাবে।<\/li>",
+                    "english": "<li>Open any calculator page in Safari.<\/li><li>Tap the <strong>Share<\/strong> button (box with arrow pointing up).<\/li><li>Scroll down and tap <strong>Add to Home Screen<\/strong>.<\/li><li>Tap <strong>Add<\/strong>. EngCalcs appears on your home screen.<\/li>"
                 }
             }
         },
