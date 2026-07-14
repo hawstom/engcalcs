@@ -77,8 +77,8 @@
         "dw_main_menu": "Darcy-Weisbach Pipe Head Loss",
         "dw_main_title": "Free Online Darcy-Weisbach Pipe Head Loss Calculator",
         "dw_main_desc": "Darcy-Weisbach Pipe Head Loss at Given Diameter, Roughness, and Flow",
-        "dw_roughness": "Roughness, e",
-        "dw_roughness_tip": "<span class=\"ec-help\" title=\"Darcy-Weisbach roughness height\"><span class=\"ec-tip\">?<\/span><\/span>",
+        "dw_roughness": "e",
+        "dw_roughness_tip": "Absolute roughness height, e, of the pipe wall. Typical values: steel (new) 0.046 mm, steel (used) 0.15 mm, HDPE 0.003 mm, PVC\/uPVC 0.0015 mm, concrete 0.3–3 mm.",
         "dw_kinematic_viscosity": "<span class=\"ec-help\" title=\"1×10⁻⁶ m²\/s for clean water at 20°C\">Kinematic viscosity, &nu; <span class=\"ec-tip\">?<\/span><\/span>",
         "dw_reynolds_number": "Reynolds number, Re",
         "dw_flow_regime": "Flow regime",
@@ -266,8 +266,6 @@
         "mhp_notes_2_def": "Check that velocity is reasonable for the available drop and pipe cost. Very low velocity may indicate oversizing; very high velocity can increase friction losses and water hammer risk.",
         "mhp_notes_3_term": "Head Loss Target",
         "mhp_notes_3_def": "Penstock losses below 10% of gross head are generally economical. The optimal trade-off between pipe cost and lost power often falls around 4&ndash;6% where electricity is most valuable.",
-        "mhp_notes_5_term": "Pipe Roughness e",
-        "mhp_notes_5_def": "Typical absolute roughness: steel (new) 0.046&nbsp;mm, steel (used) 0.15&nbsp;mm, HDPE 0.003&nbsp;mm, PVC\/uPVC 0.0015&nbsp;mm, concrete 0.3&ndash;3&nbsp;mm. HDPE is common for small micro-hydro penstocks.",
         "mhp_notes_6_term": "Efficiency",
         "mhp_notes_6_def": "Typical plant efficiency &eta; ranges from 0.70 to 0.85 for Pelton and cross-flow turbines common in micro-hydro. Use 0.75 as a conservative first estimate.",
         "mhp_notes_7_term": "Annual Energy",
@@ -486,7 +484,7 @@
         "irr_card_pressure_head": "Irrigation Pressure &amp; Uniformity",
         "irr_card_pressure_desc": "Model the pressure and flow profile along a main-lateral-emitter branch to estimate distribution uniformity from the real test-path pressure, not just a catalog emitter flow rate."
     },
-    "count": 484,
+    "count": 482,
     "active_prefixes": [
         "about",
         "calc",

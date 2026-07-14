@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ro",
-        "expected_key_count": 484,
-        "delta_key_count": 11,
+        "expected_key_count": 482,
+        "delta_key_count": 12,
         "active_prefixes": [
             "dw",
             "ip",
@@ -365,6 +365,7 @@
         ]
     },
     "keys_to_translate": {
+        "dw_roughness": "e",
         "dw_regime_laminar": "laminar",
         "dw_regime_turbulent": "turbulent",
         "mi_groupSegment": "Segment",
@@ -378,6 +379,7 @@
         "ip_hm": "h<sub>m<\/sub>"
     },
     "keys": {
+        "dw_roughness": "e",
         "dw_regime_laminar": "laminar",
         "dw_regime_turbulent": "turbulent",
         "mi_groupSegment": "Segment",
@@ -391,6 +393,22 @@
         "ip_hm": "h<sub>m<\/sub>"
     },
     "key_context": {
+        "dw_roughness": {
+            "reason": "equal_to_english",
+            "current_value": "e",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "dw_main_desc",
+                    "value": "Pierdere de Sarcină Conductă Darcy-Weisbach la Diametru, Rugozitate și Debit Date",
+                    "english": "Darcy-Weisbach Pipe Head Loss at Given Diameter, Roughness, and Flow"
+                },
+                "next_translated": {
+                    "key": "dw_roughness_tip",
+                    "value": "Înălțimea de rugozitate absolută, e, a peretelui conductei. Valori tipice: oțel (nou) 0,046 mm, oțel (uzat) 0,15 mm, HDPE 0,003 mm, PVC\/uPVC 0,0015 mm, beton 0,3–3 mm.",
+                    "english": "Absolute roughness height, e, of the pipe wall. Typical values: steel (new) 0.046 mm, steel (used) 0.15 mm, HDPE 0.003 mm, PVC\/uPVC 0.0015 mm, concrete 0.3–3 mm."
+                }
+            }
+        },
         "dw_regime_laminar": {
             "reason": "equal_to_english",
             "current_value": "laminar",

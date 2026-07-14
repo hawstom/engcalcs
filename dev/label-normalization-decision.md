@@ -76,7 +76,12 @@ nest inside the anchor (a tap on the `?` would navigate away). Pattern — **two
   was tried and reversed for wide forms; bare-symbol-only survives only as `ip_roughness`='e' for a
   narrow results-table column. Wide input-form labels keep a short "Word(s), symbol" phrase — this is
   the live, applied pattern, and what any new reference-linked label should copy.)* Default HTML
-  anchor styling (blue, underlined). No `?` inside the anchor.
+  anchor styling (blue, underlined). No `?` inside the anchor. *(Task 104, 2026-07-13, Tom's direct
+  call for this specific field: `dw_roughness` itself was further shrunk from `Roughness, e` to bare
+  `e` on wide forms too, once the `?` tip fully carries the definition — this is a deliberate,
+  Tom-approved exception to "not bare symbol alone" for this one field, not a reversal of the general
+  rule; new reference-linked labels should still default to the short phrase unless similarly
+  directed.)*
 - **A separate `?` help tip**, in its **own lang key** (or reusing an existing definition key as the
   tip's `title` content — either is fine), placed **outside** the `</a>`, carrying the `ec-tip`
   tooltip (e.g. title "Darcy-Weisbach roughness"). The `?` disambiguates/expands the short label.
@@ -94,11 +99,14 @@ PHP shape: `<a href="…ref…">{short_symbol_label_key}</a><span class="ec-help
 never both" idea — we keep both, as two distinct elements, and it supersedes literal bare-symbol
 linked text as the default (kept only for narrow-column contexts).
 
-**Known gap as of 2026-07-13:** `k_m` (`mphl_total_junction_k`, shared by 4 calculators, 5 call
-sites) still uses the *pre-D8* shape — the full definition text ("Minor (local) loss coefficient,
-k_m") sits inside the `<a>`, with `(See notes)` trailing as separate visible text and no `?` tip at
-all. `e` (`dw_roughness`/`dw_roughness_tip`) already got the D8 treatment; `k_m` did not. Tracked as
-Task 101 in `dev/ROADMAP.md`.
+**Both known gaps closed as of 2026-07-13.** `k_m` (`mphl_total_junction_k`, 4 calculators, 5 call
+sites) got the full D8 treatment under Tasks 101/102 (short link label + `?` tip carrying the
+definition and the "(See notes)" pointer). `e` (`dw_roughness`/`dw_roughness_tip`, 3 calculators —
+Darcy-Weisbach, Micro-Hydro-Power, Irrigation-Pressure) had the D8 shape already but still stacked a
+low-value static tip ("Darcy-Weisbach roughness height") plus, on Micro-Hydro-Power only, a trailing
+`mpf_see_notes` pointing at a duplicate on-page note (`mhp_notes_5`) — fixed under Task 104: real
+typical-roughness-value guidance (steel/HDPE/PVC/uPVC/concrete) now lives directly in
+`dw_roughness_tip`, `mhp_notes_5` was deleted as redundant, and the `mpf_see_notes` stacking is gone.
 
 ### D6 — Sequencing ~~merge per calculator-category~~ → REVERSED 2026-07-07: one full-suite pass
 > **⚠ D6 as originally written was WRONG and is reversed. Superseded text kept struck-through for the record.**

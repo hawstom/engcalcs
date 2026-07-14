@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "fr",
-        "expected_key_count": 484,
-        "delta_key_count": 15,
+        "expected_key_count": 482,
+        "delta_key_count": 16,
         "active_prefixes": [
             "contact",
             "dw",
@@ -501,6 +501,7 @@
     },
     "keys_to_translate": {
         "u_depthFrac": "fraction",
+        "dw_roughness": "e",
         "dw_regime_turbulent": "turbulent",
         "mi_groupPoint": "Point",
         "mi_groupSegment": "Segment",
@@ -518,6 +519,7 @@
     },
     "keys": {
         "u_depthFrac": "fraction",
+        "dw_roughness": "e",
         "dw_regime_turbulent": "turbulent",
         "mi_groupPoint": "Point",
         "mi_groupSegment": "Segment",
@@ -543,6 +545,22 @@
                     "key": "u_ft3ps",
                     "value": "ft^3\/s",
                     "english": "cfs"
+                }
+            }
+        },
+        "dw_roughness": {
+            "reason": "equal_to_english",
+            "current_value": "e",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "dw_main_desc",
+                    "value": "Perte de charge Darcy-Weisbach pour un diamètre, une rugosité et un débit donnés",
+                    "english": "Darcy-Weisbach Pipe Head Loss at Given Diameter, Roughness, and Flow"
+                },
+                "next_translated": {
+                    "key": "dw_roughness_tip",
+                    "value": "Hauteur de rugosité absolue, e, de la paroi de la conduite. Valeurs typiques : acier (neuf) 0,046 mm, acier (usagé) 0,15 mm, HDPE 0,003 mm, PVC\/uPVC 0,0015 mm, béton 0,3–3 mm.",
+                    "english": "Absolute roughness height, e, of the pipe wall. Typical values: steel (new) 0.046 mm, steel (used) 0.15 mm, HDPE 0.003 mm, PVC\/uPVC 0.0015 mm, concrete 0.3–3 mm."
                 }
             }
         },

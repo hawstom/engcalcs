@@ -37,31 +37,28 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   `dev/label-normalization-decision.md` D8: documents the actual live pattern (short "Word(s),
   symbol" label, not bare-symbol-only, which was tried and reversed for wide forms) and adds the
   rule that a "(See notes)" pointer belongs inside the tip, not as separate permanently-visible text.
-  **Still open:** the `e`/roughness field on the same 4 calculators has the identical stacking
-  problem (`dw_roughness` link + `dw_roughness_tip` + `mpf_see_notes`) — not touched, scope was
-  `k_m` only this round. When picked up, also check whether `mpf_see_notes` has other stacking
-  offenders worth folding into the same sweep (`Manning-Pipe-Flow.php:53`, `Manning-Trap.php:21,30`,
-  `Micro-Hydro-Power.php` `vel_check`/`hl_check` rows) — those use `<strong>` and inline radio
-  buttons rather than a bare link, so may or may not share the same fix shape; scope not checked.
+  **Still open (was):** the `e`/roughness field had the identical stacking problem — resolved by
+  Task 104.
 
 - 90|103| Would it be acceptable to use a synonym like "Supply line" instead of "Penstock"? Or to put "Supply line" in a tooltip?
 
-- 100|104| **Repeat the Task 102 treatment for the `e` (roughness height) field on dw, mhp, ip
-  (Tom, 2026-07-13).** Task 101 already flagged this as the identical stacking problem left open for
-  `k_m` (`dw_roughness` link + `dw_roughness_tip` +, on mhp only, `mpf_see_notes`) — confirmed still
-  present on all 3 call sites (`Darcy-Weisbach.php`, `Micro-Hydro-Power.php`, `Irrigation-Pressure.php`;
-  Hazen-Williams has no `e` field, it uses a C coefficient instead, so out of scope). `dw_roughness_tip`
-  today is just a static one-line tip ("Darcy-Weisbach roughness height") with no real typical-values
-  guidance, unlike what Task 102 built for `k_m`. Follow the same pattern: fold real guidance (typical
-  roughness heights per pipe material — PVC, concrete, steel, etc., likely sourced from the same
-  engineeringtoolbox.com page already linked) into one shared tooltip key, verbatim across all 3
-  call sites. **Additionally, shrink the visible label to just `e`** — `ip_roughness` already reads
-  as bare `'e'`; `dw_roughness` currently reads `'Roughness, e'` and should match ip's shorter form
-  (mirrors Task 101's `k_m`-label-shortening move). Interview Tom before executing: confirm the
-  shared roughness-value content, confirm the label-shrink to `e` for dw's field specifically
-  (mhp's `e` field already uses `dw_roughness` — verify current visible label there matches after the
-  change), and confirm scope/translation-sprint authorization per the standard sprint checklist in
-  CLAUDE.md before spawning any agents.
+- 60|105| **Scope the remaining `mpf_see_notes` stacking sites flagged at the end of Task 101 (not
+  fixed by Task 104 — Task 104 was scoped strictly to the `e`/roughness field).** Five sites, still
+  unscoped: `Manning-Pipe-Flow.php:53` (`<strong>{mpf_flow}</strong> {mpf_see_notes}`),
+  `Manning-Trap.php:21` (`n_in` roughness field with inline `n_radio` Strickler/B&B radio buttons +
+  `{mpf_see_notes}`), `Manning-Trap.php:30` (`d50_radio` field with inline Isbash/Maynord/Searcy
+  radio buttons + `{mpf_see_notes}`), `Micro-Hydro-Power.php:29` (`vel_check` + `{mpf_see_notes}`),
+  `Micro-Hydro-Power.php:34` (`hl_check` + `{mpf_see_notes}`). Task 101 explicitly left these
+  unscoped: "those use `<strong>` and inline radio buttons rather than a bare link, so may or may not
+  share the same fix shape." Before applying the D8 pattern (short label + `?` tip, per
+  `dev/label-normalization-decision.md`), check: (1) whether `vel_check`/`hl_check` are governed by
+  the separate D5 verdict/check-string convention in CLAUDE.md (leading glyph + `ec-tip` on the whole
+  string) rather than D8's reference-link pattern — they may need a different fix shape entirely;
+  (2) what "(See notes)" is actually pointing to for each of the 5 sites (confirm a real Notes-section
+  entry exists for each, the way it did for `k_m`/roughness, before assuming the fold-into-tooltip fix
+  applies); (3) whether the radio-button sites even want a link/tip pair at all, or whether
+  `mpf_see_notes` there is doing a materially different job than the roughness/`k_m` cases.
+  Interview Tom before executing, same as Task 104.
 
 ## Translation Standardization (Glossary Project)
 
@@ -123,6 +120,41 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
   parity confirmed 4-for-4 across all 26 languages; inline back-translation-equivalent check (no
   `ANTHROPIC_API_KEY` set) confirmed all 6 numeric values (0.5, 0.2–0.3, 0.1, 1.0, 2.0, 45°) present
   in every language's string — no dropped clauses. Payloads regenerated post-sprint (FRESH).
+
+- 0|104| **`e`/roughness field D8 content-and-stacking fix on dw/mhp/ip — DONE 2026-07-13.** Task
+  101's flagged gap (identical `dw_roughness_tip` + `mpf_see_notes` stacking left open when `k_m` was
+  fixed) closed after interviewing Tom. Decisions confirmed in interview: (1) content — generalize
+  the existing mhp Notes-section entry (`mhp_notes_5_def`'s typical absolute-roughness values for
+  steel/HDPE/PVC-uPVC/concrete), dropping its mhp-specific last sentence ("HDPE is common for small
+  micro-hydro penstocks"), rather than drafting fresh Moody-chart values; (2) `dw_roughness` label
+  shrunk from `'Roughness, e'` to bare `'e'` (matches `ip_roughness`, a deliberate Tom-approved
+  exception to D8's general "not bare symbol alone" rule, documented as such in
+  `dev/label-normalization-decision.md`); (3) full 26-agent Sonnet translation sprint authorized for
+  the new `dw_roughness_tip` prose (not a hand-translated short label like Task 101's `k_m` label,
+  since this is a full sentence of technical content). Execution: `dw_roughness_tip` changed from a
+  baked-in `<span class="ec-help" title="…">` markup string to plain prose text, with the PHP call
+  sites (`Darcy-Weisbach.php`, `Micro-Hydro-Power.php`, `Irrigation-Pressure.php`) now assembling the
+  tip via `htmlspecialchars(strip_tags($ec_lang['dw_roughness_tip']))`, matching the `k_m` pattern
+  from Task 102. `mhp_notes_5_term`/`_def` deleted from all 27 lang files (content now lives in the
+  shared tip) along with its `<dt>/<dd>` row in `Micro-Hydro-Power.php`'s Notes section. `dw_roughness`
+  set to bare `'e'` directly in all 27 lang files without a sprint (confirmed via `ip_roughness`
+  precedent that a bare Latin symbol needs zero translation in any of the 26 languages). Sprint: 26
+  agents (Sonnet, one per language) translated `dw_roughness_tip`'s new prose in parallel; one
+  (Hindi) ran long and was completed directly (Claude Code) when the delay exceeded other languages'
+  completion times — its independent re-run afterwards produced an identical string, confirming the
+  direct translation was correct. Post-sprint QA: `php -l` clean on all 27 lang files + 3 calculator
+  PHP files; `lang_syntax_validate.php` shows only the same pre-existing 65 advisory findings (no new
+  issues); no stray HTML tags introduced in any of the 26 translated strings; inline read-through of
+  all 26 strings against the English source confirmed semantic parity (materials, values, and units
+  present in every language). **Bug caught and fixed during QA:** cs and he agents used the
+  `&ndash;` HTML entity for the value range instead of a literal en-dash character; since the tip is
+  passed through `htmlspecialchars()` at render time, `&` would have been double-escaped to literal
+  visible text `&ndash;` — corrected to the literal `–` character in both files, then re-verified by
+  rendering the PHP call sites directly (`Darcy-Weisbach.php`, `Micro-Hydro-Power.php`,
+  `Irrigation-Pressure.php` all confirmed to render the correct tooltip text, `mpf_see_notes` stacking
+  confirmed gone from mhp). `dev/label-normalization-decision.md` D8 updated: both known gaps (k_m
+  from Tasks 101/102, roughness from this task) marked closed, and the bare-`e`-label exception for
+  `dw_roughness` documented as Tom's specific call, not a general D8 rule reversal.
 
 - 0|98|[CC] **DONE 2026-07-13: Task 98 closed — all 7 English-improvement items done.**
   1. `template_translation_help` reworded from "Do you have a great vision for a calculator to

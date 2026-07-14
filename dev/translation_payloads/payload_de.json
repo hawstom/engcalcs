@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "de",
-        "expected_key_count": 484,
-        "delta_key_count": 13,
+        "expected_key_count": 482,
+        "delta_key_count": 14,
         "active_prefixes": [
             "dw",
             "ec",
@@ -514,6 +514,7 @@
     },
     "keys_to_translate": {
         "ec_name_placeholder": "Name",
+        "dw_roughness": "e",
         "dw_regime_laminar": "laminar",
         "dw_regime_turbulent": "turbulent",
         "mi_groupSegment": "Segment",
@@ -529,6 +530,7 @@
     },
     "keys": {
         "ec_name_placeholder": "Name",
+        "dw_roughness": "e",
         "dw_regime_laminar": "laminar",
         "dw_regime_turbulent": "turbulent",
         "mi_groupSegment": "Segment",
@@ -556,6 +558,22 @@
                     "key": "ec_name_hint",
                     "value": "Speichert diese Eingaben in der URL zum Lesezeichen, zum Abrufen aus dem Verlauf und zum Teilen",
                     "english": "Saves these inputs to the URL for bookmarking, history retrieval, and sharing"
+                }
+            }
+        },
+        "dw_roughness": {
+            "reason": "equal_to_english",
+            "current_value": "e",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "dw_main_desc",
+                    "value": "Rohrreibungsverlust nach Darcy-Weisbach bei gegebenem Durchmesser, Rauheit und Durchfluss",
+                    "english": "Darcy-Weisbach Pipe Head Loss at Given Diameter, Roughness, and Flow"
+                },
+                "next_translated": {
+                    "key": "dw_roughness_tip",
+                    "value": "Absolute Rauheitshöhe, e, der Rohrwand. Typische Werte: Stahl (neu) 0,046 mm, Stahl (gebraucht) 0,15 mm, HDPE 0,003 mm, PVC\/uPVC 0,0015 mm, Beton 0,3–3 mm.",
+                    "english": "Absolute roughness height, e, of the pipe wall. Typical values: steel (new) 0.046 mm, steel (used) 0.15 mm, HDPE 0.003 mm, PVC\/uPVC 0.0015 mm, concrete 0.3–3 mm."
                 }
             }
         },
