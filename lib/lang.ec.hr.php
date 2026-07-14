@@ -260,7 +260,7 @@ $ec_lang['mhp_main_title']='Besplatni online kalkulator za malu hidroelektranu';
 $ec_lang['mhp_main_desc']='Kalkulator izlazne snage male hidroelektrane protočnog tipa';
 $ec_lang['mhp_gross_head']='Bruto visinski pad, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='Promjer dovodne cijevi, D';
-$ec_lang['mhp_length']='<span class="ec-help" title="Duljina dovodne cijevi ili žlijeba na ulaznoj (vodozahvatnoj) građevini">Duljina, L <span class="ec-tip">?</span></span>';
+$ec_lang['mhp_length']='Duljina, L';
 $ec_lang['mhp_efficiency']='Učinkovitost postrojenja, &eta; (0&ndash;1)';
 $ec_lang['mhp_vel_check']='Provjera brzine';
 $ec_lang['mhp_hl_check']='Provjera gubitka tlačne visine';

@@ -262,7 +262,7 @@ $ec_lang['mhp_main_title']='Безкоштовний онлайн-калькул
 $ec_lang['mhp_main_desc']='Калькулятор потужності руслової мікро-ГЕС';
 $ec_lang['mhp_gross_head']='Повний напір, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='Діаметр напірного трубопроводу, D';
-$ec_lang['mhp_length']='<span class="ec-help" title="Довжина підвідної труби або лотка від водозабірної споруди">Довжина, L <span class="ec-tip">?</span></span>';
+$ec_lang['mhp_length']='Довжина, L';
 $ec_lang['mhp_efficiency']='Ефективність установки, η (0–1)';
 $ec_lang['mhp_vel_check']='Перевірка швидкості';
 $ec_lang['mhp_hl_check']='Перевірка втрат напору';

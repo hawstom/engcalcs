@@ -262,7 +262,7 @@ $ec_lang['mhp_main_title']='Calculateur Gratuit de Puissance Micro-Hydroélectri
 $ec_lang['mhp_main_desc']='Calculateur de Puissance Micro-Hydroélectrique au Fil de l\'Eau';
 $ec_lang['mhp_gross_head']='Hauteur brute, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='Diamètre de la conduite forcée, D';
-$ec_lang['mhp_length']='Longueur, L <span title="Longueur de la conduite ou du canal d\'amenée depuis l\'ouvrage de prise d\'eau" style="cursor:help;color:#06c;font-size:0.9em">?</span>';
+$ec_lang['mhp_length']='Longueur, L';
 $ec_lang['mhp_efficiency']='Rendement de l\'installation, η (0–1)';
 $ec_lang['mhp_vel_check']='Vérification de la vitesse';
 $ec_lang['mhp_hl_check']='Vérification de la perte de charge';

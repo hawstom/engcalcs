@@ -265,7 +265,7 @@ $ec_lang['mhp_main_title']='Calculadora Gratuita de Potencia Micro-Hidroeléctri
 $ec_lang['mhp_main_desc']='Calculadora de Potencia de Micro-Hidroeléctrica de Pasada';
 $ec_lang['mhp_gross_head']='Carga bruta, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='Diámetro de la tubería de presión, D';
-$ec_lang['mhp_length']='<span class="ec-help" title="Longitud de la tubería de conducción de entrada (obra de toma) o del canal">Longitud, L <span class="ec-tip">?</span></span>';
+$ec_lang['mhp_length']='Longitud, L';
 $ec_lang['mhp_efficiency']='Rendimiento de la instalación, η (0–1)';
 $ec_lang['mhp_vel_check']='Verificación de velocidad';
 $ec_lang['mhp_hl_check']='Verificación de pérdida de carga';

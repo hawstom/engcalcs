@@ -263,7 +263,7 @@ $ec_lang['mhp_main_title']='အခမဲ့ အွန်လိုင်း မ�
 $ec_lang['mhp_main_desc']='မြစ်ရေစီးအတိုင်း မိုက်ခရိုဟိုက်ဒရို ပါဝါ ထုတ်လုပ်မှု တွက်ချက်စက်';
 $ec_lang['mhp_gross_head']='စုစုပေါင်းဖိမြင့်ဆင့်, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='ဖိအားရေပိုက် အချင်း, D';
-$ec_lang['mhp_length']='<span class="ec-help" title="ဝင်ပေါက် (ရေပေးဆောက်လုပ်ရေး) ပို့ဆောင်ပိုက် သို့မဟုတ် ရေလှောင်ကွန်း၏ အလျား">အလျား, L <span class="ec-tip">?</span></span>';
+$ec_lang['mhp_length']='အလျား, L';
 $ec_lang['mhp_efficiency']='စက်ရုံထိရောက်မှု, η (0–1)';
 $ec_lang['mhp_vel_check']='ရေအလျင်နှုန်း စစ်ဆေးမှု';
 $ec_lang['mhp_hl_check']='ဖိမြင့်ဆင့်ဆုံးရှုံးမှု စစ်ဆေးမှု';

@@ -261,7 +261,7 @@ $ec_lang['mhp_main_title']='Calcolatore Gratuito di Potenza Micro-Idroelettrica'
 $ec_lang['mhp_main_desc']='Calcolatore di Potenza Micro-Idroelettrica ad Acqua Fluente';
 $ec_lang['mhp_gross_head']='Altezza lorda, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='Diametro della condotta forzata, D';
-$ec_lang['mhp_length']='<span class="ec-help" title="Lunghezza della tubazione o del canale di adduzione dall\'opera di presa">Lunghezza, L <span class="ec-tip">?</span></span>';
+$ec_lang['mhp_length']='Lunghezza, L';
 $ec_lang['mhp_efficiency']='Rendimento dell\'impianto, η (0–1)';
 $ec_lang['mhp_vel_check']='Verifica della velocità';
 $ec_lang['mhp_hl_check']='Verifica della perdita di carico';

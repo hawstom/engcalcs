@@ -260,7 +260,7 @@ $ec_lang['mhp_main_title']='Calculator gratuit online de micro-hidroenergie';
 $ec_lang['mhp_main_desc']='Calculator de putere pentru micro-hidrocentrale la cursul apei (fără baraj)';
 $ec_lang['mhp_gross_head']='Cădere brută, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='Diametrul conductei sub presiune, D';
-$ec_lang['mhp_length']='<span class="ec-help" title="Lungimea conductei de aducțiune sau a jgheabului de la lucrările de captare">Lungimea, L <span class="ec-tip">?</span></span>';
+$ec_lang['mhp_length']='Lungimea, L';
 $ec_lang['mhp_efficiency']='Randamentul centralei, η (0–1)';
 $ec_lang['mhp_vel_check']='Verificarea vitezei';
 $ec_lang['mhp_hl_check']='Verificarea pierderii de sarcină';

@@ -262,7 +262,7 @@ $ec_lang['mhp_main_title']='Kikokotoo cha Bure cha Mtandaoni cha Umeme Mdogo wa 
 $ec_lang['mhp_main_desc']='Kikokotoo cha Uzalishaji wa Umeme Mdogo wa Maji kutoka Mtiririko wa Mto (Bila Bwawa)';
 $ec_lang['mhp_gross_head']='Kichwa jumla, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='Kipenyo cha bomba la shinikizo, D';
-$ec_lang['mhp_length']='<span class="ec-help" title="Urefu wa bomba au mfereji wa kupelekea maji kutoka kwenye mfumo wa ulaji wa maji">Urefu, L <span class="ec-tip">?</span></span>';
+$ec_lang['mhp_length']='Urefu, L';
 $ec_lang['mhp_efficiency']='Ufanisi wa kiwanda, η (0–1)';
 $ec_lang['mhp_vel_check']='Ukaguzi wa kasi';
 $ec_lang['mhp_hl_check']='Ukaguzi wa upotezaji wa kichwa';

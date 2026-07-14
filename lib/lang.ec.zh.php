@@ -261,7 +261,7 @@ $ec_lang['mhp_main_title']='免费在线微型水力发电计算器';
 $ec_lang['mhp_main_desc']='径流式微型水力发电功率计算器';
 $ec_lang['mhp_gross_head']='毛水头，H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='压力管道直径，D';
-$ec_lang['mhp_length']='<span class="ec-help" title="进水（取水枢纽）输水管道或渠槽长度">压力管道长度，L <span class="ec-tip">?</span></span>';
+$ec_lang['mhp_length']='长度，L';
 $ec_lang['mhp_efficiency']='机组效率，η（0–1）';
 $ec_lang['mhp_vel_check']='流速校核';
 $ec_lang['mhp_hl_check']='水头损失校核';

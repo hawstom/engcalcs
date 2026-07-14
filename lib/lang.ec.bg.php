@@ -263,7 +263,7 @@ $ec_lang['mhp_main_title']='Безплатен онлайн калкулатор
 $ec_lang['mhp_main_desc']='Калкулатор за изходна мощност на микро-ВЕЦ с деривационна схема';
 $ec_lang['mhp_gross_head']='Брутен напор, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='Диаметър на напорния тръбопровод, D';
-$ec_lang['mhp_length']='<span class="ec-help" title="Дължина на провеждащия тръбопровод или улей">Дължина, L <span class="ec-tip">?</span></span>';
+$ec_lang['mhp_length']='Дължина, L';
 $ec_lang['mhp_efficiency']='КПД на централата, η (0–1)';
 $ec_lang['mhp_vel_check']='Проверка на скоростта';
 $ec_lang['mhp_hl_check']='Проверка на загубата на напор';

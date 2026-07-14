@@ -262,7 +262,7 @@ $ec_lang['mhp_main_title']='מחשבון הידרו-כוח זעיר חינמי �
 $ec_lang['mhp_main_desc']='מחשבון הספק הידרו-כוח זעיר עם זרימה טבעית בנהר';
 $ec_lang['mhp_gross_head']='גובה ברוטו, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='קוטר צינור הלחץ, D';
-$ec_lang['mhp_length']='<span class="ec-help" title="אורך צינור ההולכה או התעלה בכניסה (מבנה הקצה)">אורך, L <span class="ec-tip">?</span></span>';
+$ec_lang['mhp_length']='אורך, L';
 $ec_lang['mhp_efficiency']='יעילות מתקן, η (0–1)';
 $ec_lang['mhp_vel_check']='בדיקת מהירות';
 $ec_lang['mhp_hl_check']='בדיקת אובדן לחץ';

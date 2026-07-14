@@ -261,7 +261,7 @@ $ec_lang['mhp_main_title']='Kalkulator Tenaga Mikro-Hidro Online Gratis';
 $ec_lang['mhp_main_desc']='Kalkulator Daya Keluaran Mikro-Hidro Aliran Langsung (Tanpa Bendungan)';
 $ec_lang['mhp_gross_head']='Tinggi jatuh bruto, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='Diameter pipa tekanan, D';
-$ec_lang['mhp_length']='<span class="ec-help" title="Panjang pipa atau saluran pembawa air dari bangunan pengambilan air (headworks) ke turbin">Panjang, L <span class="ec-tip">?</span></span>';
+$ec_lang['mhp_length']='Panjang, L';
 $ec_lang['mhp_efficiency']='Efisiensi instalasi, η (0–1)';
 $ec_lang['mhp_vel_check']='Pemeriksaan kecepatan';
 $ec_lang['mhp_hl_check']='Pemeriksaan kehilangan tinggi tekan';

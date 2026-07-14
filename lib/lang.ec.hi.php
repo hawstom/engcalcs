@@ -262,7 +262,7 @@ $ec_lang['mhp_main_title']='निःशुल्क ऑनलाइन मा�
 $ec_lang['mhp_main_desc']='नदी-प्रवाह माइक्रो-हाइड्रो पावर आउटपुट कैलकुलेटर';
 $ec_lang['mhp_gross_head']='सकल हेड, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='दबाव नली व्यास, D';
-$ec_lang['mhp_length']='<span class="ec-help" title="इनलेट (प्रवेश संरचना) आपूर्ति पाइप या फ्ल्यूम की लंबाई">लंबाई, L <span class="ec-tip">?</span></span>';
+$ec_lang['mhp_length']='लंबाई, L';
 $ec_lang['mhp_efficiency']='प्लांट दक्षता, &eta; (0&ndash;1)';
 $ec_lang['mhp_vel_check']='वेग जाँच';
 $ec_lang['mhp_hl_check']='हेड हानि जाँच';

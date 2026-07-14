@@ -262,7 +262,7 @@ $ec_lang['mhp_main_title']='وړیا آنلاین کوچنی آبي ځواک م�
 $ec_lang['mhp_main_desc']='د سیند د طبیعي بهاو پر بنسټ د کوچني آبي ځواک محصول محاسبه';
 $ec_lang['mhp_gross_head']='ناخالص سر، H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='د فشار لولې قطر، D';
-$ec_lang['mhp_length']='<span class="ec-help" title="د ننوتنځي (د اوبو د اخیستو ودانۍ) رسوونکی پایپ یا فلیوم اوږدوالی">اوږدوالی، L <span class="ec-tip">?</span></span>';
+$ec_lang['mhp_length']='اوږدوالی، L';
 $ec_lang['mhp_efficiency']='د پلانټ موثریت، η (0–1)';
 $ec_lang['mhp_vel_check']='د سرعت کتنه';
 $ec_lang['mhp_hl_check']='د سر ضیاع کتنه';

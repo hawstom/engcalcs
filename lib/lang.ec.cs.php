@@ -261,7 +261,7 @@ $ec_lang['mhp_main_title']='Bezplatná online kalkulačka výkonu mikro-vodní e
 $ec_lang['mhp_main_desc']='Kalkulačka výkonu průtočné mikro-vodní elektrárny';
 $ec_lang['mhp_gross_head']='Hrubý spád, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='Průměr tlakovodu, D';
-$ec_lang['mhp_length']='<span class="ec-help" title="Délka přiváděcího potrubí nebo žlabu od vtokového (odběrného) objektu">Délka, L <span class="ec-tip">?</span></span>';
+$ec_lang['mhp_length']='Délka, L';
 $ec_lang['mhp_efficiency']='Účinnost elektrárny, η (0–1)';
 $ec_lang['mhp_vel_check']='Kontrola rychlosti';
 $ec_lang['mhp_hl_check']='Kontrola ztráty tlakové výšky';

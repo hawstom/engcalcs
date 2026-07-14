@@ -262,7 +262,7 @@ $ec_lang['mhp_main_title']='ម៉ាស៊ីនគណនាថាមពលវ�
 $ec_lang['mhp_main_desc']='ម៉ាស៊ីនគណនាផលិតថាមពលវារីអគ្គិសនីខ្នាតតូច ថាមពលទឹករត់';
 $ec_lang['mhp_gross_head']='ក្បាលទឹកសរុប, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='អង្កត់ផ្ចិតបំពង់សម្ពាធ, D';
-$ec_lang['mhp_length']='<span class="ec-help" title="ប្រវែងបំពង់ ឬប្រឡាយបញ្ជូនទឹកពីរចនាសម្ព័ន្ធទទួលទឹក">ប្រវែង, L <span class="ec-tip">?</span></span>';
+$ec_lang['mhp_length']='ប្រវែង, L';
 $ec_lang['mhp_efficiency']='ប្រសិទ្ធភាពរោងចក្រ, η (0–1)';
 $ec_lang['mhp_vel_check']='ការត្រួតពិនិត្យល្បឿន';
 $ec_lang['mhp_hl_check']='ការត្រួតពិនិត្យការបាត់បង់ក្បាលទឹក';

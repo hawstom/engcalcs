@@ -262,7 +262,7 @@ $ec_lang['mhp_main_title']='ماشین‌حساب رایگان آنلاین تو
 $ec_lang['mhp_main_desc']='ماشین‌حساب توان خروجی میکرو-هیدرو جریان‌رودی';
 $ec_lang['mhp_gross_head']='هد ناخالص، H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='قطر لوله فشار (پنستاک)، D';
-$ec_lang['mhp_length']='<span class="ec-help" title="طول لوله یا فلوم انتقال آب ورودی (سازه سردهانه)">طول، L <span class="ec-tip">?</span></span>';
+$ec_lang['mhp_length']='طول، L';
 $ec_lang['mhp_efficiency']='راندمان نیروگاه، &eta; (0&ndash;1)';
 $ec_lang['mhp_vel_check']='بررسی سرعت';
 $ec_lang['mhp_hl_check']='بررسی افت هد';

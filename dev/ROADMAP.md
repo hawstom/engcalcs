@@ -10,8 +10,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 ## Calculator Improvements
 
-- 90|103| Would it be acceptable to use a synonym like "Supply line" instead of "Penstock"? Or to put "Supply line" in a tooltip?
-
 - 60|105| **Scope the remaining `mpf_see_notes` stacking sites flagged at the end of Task 101 (not
   fixed by Task 104 — Task 104 was scoped strictly to the `e`/roughness field).** Five sites, still
   unscoped: `Manning-Pipe-Flow.php:53` (`<strong>{mpf_flow}</strong> {mpf_see_notes}`),
@@ -62,6 +60,49 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|103| **"Penstock" kept as the primary term across all mhp fields, "(supply pipe)"
+  disambiguated once rather than repeated, DONE 2026-07-13.** Unlike "riprap" (US slang prone to
+  phonetic mistranslation), "penstock" is established international hydraulic-engineering
+  vocabulary with real translations in most languages, so full replacement wasn't warranted — but
+  per the Simple English policy (explanatory strings should still carry a plain-English anchor), a
+  synonym was added once rather than leaving the bare jargon term unglossed everywhere. Scope
+  narrowed after review: `e` (roughness) and `km` (minor-loss coefficient) tooltips are *shared*
+  generic strings (`dw_roughness_tip`, `mphl_total_junction_k_tip`) reused verbatim across
+  Darcy-Weisbach/Hazen-Williams/Manning-Pipe-Head-Loss — left untouched, since injecting "penstock"
+  into those would corrupt their meaning in every other calculator that reuses them. Only `D` is
+  mhp-owned and names the pipe: `mhp_diameter` = "Penstock diameter, D" with `ec-help`/`ec-tip`
+  tooltip "Penstock (supply pipe) diameter" (full disambiguation, once, only place it appears).
+  `mhp_length` was simplified to plain "Length, L" with no tooltip and no repeated "Penstock" —
+  consistent with `e`/`km`, which are also plain generic attributes that never name the pipe
+  themselves; `D` alone anchors what pipe the form is about. Also dropped stale "or flume" wording
+  from both fields' visible text, tooltip, and `$ec_lang_intent` (intent edit made with Tom's
+  explicit permission per the intent-editing rule) — the calculator only models a closed
+  pressurized pipe (Darcy-Weisbach h_f,
+  k_m minor losses), so "flume" never fit the physics. `mhp_notes_1_def`/`mhp_notes_3_def` prose
+  got "(supply pipe)" added inline on first mention.
+
+  **Full-suite propagation, same day.** Carried the D/L wording change to all 26 non-English
+  languages: 21 mechanical (mhp_length simplified to a bare "Length, L"-style label, no tooltip,
+  no pipe-name repetition, matching `e`/`km`'s style — done directly, no agent needed) + 5 agent-run
+  (am, bn, ru, ur, fa) where the change required real translation judgment. The agent pass also
+  uncovered and fixed a real defect while auditing existing translations: **am, bn, ru, and ur had
+  phonetically transliterated "penstock"** (ፔንስቶክ / পেনস্টক / пенсток / پینسٹاک) instead of
+  translating the underlying "pressure pipe" concept — the same defect class as the earlier
+  "riprap" audit. Per Tom's fallback instruction ("if there is no good 'Penstock' translation, use
+  'Supply pipe (or line)'"), each agent constructed a natural compositional "pressure pipe" phrase
+  (am የግፊት ቧንቧ, bn চাপ পাইপ, ru напорный трубопровод, ur دباؤ پائپ) and added a "(supply pipe)"-style
+  synonym gloss once, matching the English mhp_diameter tooltip pattern. fa was already correct
+  (لوله فشار (پنستاک) — concept-first with jargon as a parenthetical aside) and only needed its
+  `mhp_length` tidied. `dev/scripts/glossary.json`'s stale am/bn/ru "penstock" entries were also
+  corrected to match (ur/fa glossary entries were already right — only the shipped lang files had
+  drifted). QA: `php -l` clean on all 27 files; `lang_syntax_validate.php --lang=am,bn,ru,ur,fa`
+  clean (only pre-existing, unrelated advisory `identical-to-english` findings on rc_/mtc_ keys);
+  tag-parity check confirmed identical HTML/symbol structure across all 27 files for
+  `mhp_length`/`mhp_notes_1_def`/`mhp_notes_3_def` (the `mhp_diameter` tag differences — tooltip
+  present only in en/am/bn/ru/ur — are the intentional design, not a defect); inline
+  back-translation semantic check (no `ANTHROPIC_API_KEY` set) confirmed all 5 agent-translated
+  strings match source meaning.
 
 - 0|101| **`k_m` label stacking fixed 2026-07-13; `e`/roughness field's identical problem DONE
   2026-07-13 via Task 104.** Surfaced investigating why bg's rendered `km` label looked long

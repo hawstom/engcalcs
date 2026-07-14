@@ -260,7 +260,7 @@ $ec_lang['mhp_main_title']='Бесплатни онлајн калкулатор
 $ec_lang['mhp_main_desc']='Калкулатор излазне снаге мале хидроелектране проточног типа';
 $ec_lang['mhp_gross_head']='Бруто пад, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='Пречник цевовода, D';
-$ec_lang['mhp_length']='<span class="ec-help" title="Дужина доводне цеви или канала на водозахвату (улазу)">Дужина, L <span class="ec-tip">?</span></span>';
+$ec_lang['mhp_length']='Дужина, L';
 $ec_lang['mhp_efficiency']='Ефикасност постројења, η (0–1)';
 $ec_lang['mhp_vel_check']='Провера брзине';
 $ec_lang['mhp_hl_check']='Провера губитка напора';

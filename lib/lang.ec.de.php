@@ -261,7 +261,7 @@ $ec_lang['mhp_main_title']='Kostenloser Online-Rechner für Mikro-Wasserkraft';
 $ec_lang['mhp_main_desc']='Leistungsrechner für Laufwasser-Mikro-Wasserkraftanlagen';
 $ec_lang['mhp_gross_head']='Bruttofallhöhe, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='Rohrdurchmesser der Druckrohrleitung, D';
-$ec_lang['mhp_length']='<span class="ec-help" title="Länge der Zuleitungsrohrleitung oder des Zuleitungsgerinnes am Einlaufbauwerk">Länge, L <span class="ec-tip">?</span></span>';
+$ec_lang['mhp_length']='Länge, L';
 $ec_lang['mhp_efficiency']='Anlagenwirkungsgrad, η (0–1)';
 $ec_lang['mhp_vel_check']='Geschwindigkeitsprüfung';
 $ec_lang['mhp_hl_check']='Druckverlustprüfung';

@@ -262,7 +262,7 @@ $ec_lang['mhp_main_title']='Ücretsiz Çevrimiçi Mikro-Hidroelektrik Güç Hesa
 $ec_lang['mhp_main_desc']='Nehir Akışı Mikro-Hidroelektrik Güç Çıkışı Hesaplayıcısı';
 $ec_lang['mhp_gross_head']='Brüt düşü, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='Cebri boru çapı, D';
-$ec_lang['mhp_length']='<span class="ec-help" title="Giriş (su alma yapısı) besleme borusu veya oluğunun uzunluğu">Uzunluk, L <span class="ec-tip">?</span></span>';
+$ec_lang['mhp_length']='Uzunluk, L';
 $ec_lang['mhp_efficiency']='Tesis verimi, η (0–1)';
 $ec_lang['mhp_vel_check']='Hız kontrolü';
 $ec_lang['mhp_hl_check']='Yük kaybı kontrolü';

@@ -264,7 +264,7 @@ $ec_lang['mhp_main_title']='حاسبة الطاقة الكهرومائية ال�
 $ec_lang['mhp_main_desc']='حاسبة إنتاج الطاقة الكهرومائية الصغيرة بنظام مجرى النهر';
 $ec_lang['mhp_gross_head']='الارتفاع الإجمالي، H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='قطر أنبوب الضغط، D';
-$ec_lang['mhp_length']='<span class="ec-help" title="طول أنبوب أو قناة التوصيل من منشأة الرأس (headworks) إلى التوربين">الطول، L <span class="ec-tip">?</span></span>';
+$ec_lang['mhp_length']='الطول، L';
 $ec_lang['mhp_efficiency']='كفاءة المحطة، η (0–1)';
 $ec_lang['mhp_vel_check']='فحص السرعة';
 $ec_lang['mhp_hl_check']='فحص فقد الضغط';

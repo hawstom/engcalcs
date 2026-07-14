@@ -262,7 +262,7 @@ $ec_lang['mhp_main_title']='Calculadora Gratuita de Potência Micro-Hidroelétri
 $ec_lang['mhp_main_desc']='Calculadora de Potência de Micro-Hidroelétrica a Fio d\'Água';
 $ec_lang['mhp_gross_head']='Altura bruta, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='Diâmetro da conduta forçada, D';
-$ec_lang['mhp_length']='<span class="ec-help" title="Comprimento da tubagem ou canal de adução na entrada (obras de captação)">Comprimento, L <span class="ec-tip">?</span></span>';
+$ec_lang['mhp_length']='Comprimento, L';
 $ec_lang['mhp_efficiency']='Rendimento da instalação, η (0–1)';
 $ec_lang['mhp_vel_check']='Verificação da velocidade';
 $ec_lang['mhp_hl_check']='Verificação da perda de carga';
