@@ -26,12 +26,12 @@ echoCalculatorForm(
 	//Results
 	Array(
 		Array('name' => 'vel',        'units' => Array('mps','ftps'),      'label' => $ec_lang['mpf_velocity']),
-		Array('name' => 'vel_check',  'units' => NULL,                     'label' => $ec_lang['mhp_vel_check'].' '.$ec_lang['mpf_see_notes']),
+		Array('name' => 'vel_check',  'units' => NULL,                     'label' => $ec_lang['mhp_vel_check']),
 		Array('name' => 'f',          'units' => NULL,                     'label' => $ec_lang['dw_friction_factor']),
 		Array('name' => 'hf',         'units' => Array('m','mm','ft','in'),'label' => $ec_lang['mphl_friction_loss']),
 		Array('name' => 'hm',         'units' => Array('m','mm','ft','in'),'label' => $ec_lang['mphl_junction_loss']),
 		Array('name' => 'hl',         'units' => Array('m','mm','ft','in'),'label' => $ec_lang['mphl_total_loss']),
-		Array('name' => 'hl_check',   'units' => NULL,                     'label' => $ec_lang['mhp_hl_check'].' '.$ec_lang['mpf_see_notes']),
+		Array('name' => 'hl_check',   'units' => NULL,                     'label' => $ec_lang['mhp_hl_check']),
 		Array('name' => 'hnet',       'units' => Array('m','mm','ft','in'),'label' => $ec_lang['mhp_hnet']),
 		Array('name' => 'power',      'units' => Array('kw','mw','hp'),    'label' => $ec_lang['mhp_power']),
 		Array('name' => 'annual_kwh', 'units' => Array('kwh_yr','mwh_yr'),  'label' => $ec_lang['mhp_annual_kwh']),
@@ -58,11 +58,10 @@ EngCalcs.pageConfig = {
 	mhp_vel_ok_short:   <?=json_encode($ec_lang['mhp_vel_ok_short'])?>,
 	mhp_vel_high_short: <?=json_encode($ec_lang['mhp_vel_high_short'])?>,
 	mhp_vel_low_short:  <?=json_encode($ec_lang['mhp_vel_low_short'])?>,
-	hl_ok:    <?=json_encode($ec_lang['mhp_hl_ok'])?>,
-	hl_warn:  <?=json_encode($ec_lang['mhp_hl_warn'])?>,
+	mhp_vel_ok_tip: <?=json_encode($ec_lang['mhp_vel_ok_tip'])?>,
+	hl_ok_tip:   <?=json_encode($ec_lang['mhp_hl_ok_tip'])?>,
 	hl_warn_tip: <?=json_encode($ec_lang['mhp_hl_warn_tip'])?>,
-	hl_bad:   <?=json_encode($ec_lang['mhp_hl_bad'])?>,
-	hl_bad_tip: <?=json_encode($ec_lang['mhp_hl_bad_tip'])?>
+	hl_bad_tip:  <?=json_encode($ec_lang['mhp_hl_bad_tip'])?>
 };
 </script>
 <script src="/engcalcs/js/micro-hydro-power.js?v=<?=filemtime(__DIR__.'/js/micro-hydro-power.js')?>"></script>

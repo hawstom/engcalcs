@@ -75,14 +75,12 @@ document.addEventListener('DOMContentLoaded', function() {
 <form id="formInput" action="javascript:EngCalcs.submitForm()" method="post">
 	<input id="printable_title" name="printable_title" type="text" style="font-size: 2em; width: 98%" placeholder="<?=$ec_lang['template_printable_title']?>" onchange="EngCalcs.submitForm();" /><br />
 	<input id="printable_subtitle" name="printable_subtitle" type="text" style="font-size: 1.5em; width: 98%" placeholder="<?=$ec_lang['template_printable_subtitle']?>" onchange="EngCalcs.submitForm();" />
+	<div class="collapse d-print-none<?php if ($flagHideUnits === false) : ?> show<?php endif; ?>" id="set_units_row">
+		<?=$ec_lang['calc_set_units']?> <button type="button" id="set_units_m"><?=$ec_lang['u_m']?></button><button type="button" id="set_units_mm"><?=$ec_lang['u_mm']?></button><button type="button" id="set_units_ft"><?=$ec_lang['u_ft']?></button><button type="button" id="set_units_in"><?=$ec_lang['u_in']?></button> <button type="button" id="calc_defaults" onclick="EngCalcs.resetToDefaults('<?=addslashes($ec_lang['calc_defaults_confirm'])?>')"><?=$ec_lang['calc_defaults']?></button><a data-bs-toggle="collapse" href="#set_units_row" aria-expanded="true" aria-controls="set_units_row"><?=$ec_lang['view_hide_line']?></a>
+	</div>
 	<div style="overflow-x:auto">
 	<table class="bare">
 		<tbody>
-			<tr class="collapse d-print-none<?php if ($flagHideUnits === false) : ?> show<?php endif; ?>" id="set_units_row">
-				<td>
-					<?=$ec_lang['calc_set_units']?> <button type="button" id="set_units_m"><?=$ec_lang['u_m']?></button><button type="button" id="set_units_mm"><?=$ec_lang['u_mm']?></button><button type="button" id="set_units_ft"><?=$ec_lang['u_ft']?></button><button type="button" id="set_units_in"><?=$ec_lang['u_in']?></button> <button type="button" id="calc_defaults" onclick="EngCalcs.resetToDefaults('<?=addslashes($ec_lang['calc_defaults_confirm'])?>')"><?=$ec_lang['calc_defaults']?></button><a data-bs-toggle="collapse" href="#set_units_row" aria-expanded="true" aria-controls="set_units_row"><?=$ec_lang['view_hide_line']?></a>
-				<td>
-			</tr>
 			<tr>
 				<td>
 					<?=$ec_lang['calc_inputs']?>

@@ -10,24 +10,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 ## Calculator Improvements
 
-- 60|105| **Scope the remaining `mpf_see_notes` stacking sites flagged at the end of Task 101 (not
-  fixed by Task 104 — Task 104 was scoped strictly to the `e`/roughness field).** Five sites, still
-  unscoped: `Manning-Pipe-Flow.php:53` (`<strong>{mpf_flow}</strong> {mpf_see_notes}`),
-  `Manning-Trap.php:21` (`n_in` roughness field with inline `n_radio` Strickler/B&B radio buttons +
-  `{mpf_see_notes}`), `Manning-Trap.php:30` (`d50_radio` field with inline Isbash/Maynord/Searcy
-  radio buttons + `{mpf_see_notes}`), `Micro-Hydro-Power.php:29` (`vel_check` + `{mpf_see_notes}`),
-  `Micro-Hydro-Power.php:34` (`hl_check` + `{mpf_see_notes}`). Task 101 explicitly left these
-  unscoped: "those use `<strong>` and inline radio buttons rather than a bare link, so may or may not
-  share the same fix shape." Before applying the D8 pattern (short label + `?` tip, per
-  `dev/label-normalization-decision.md`), check: (1) whether `vel_check`/`hl_check` are governed by
-  the separate D5 verdict/check-string convention in CLAUDE.md (leading glyph + `ec-tip` on the whole
-  string) rather than D8's reference-link pattern — they may need a different fix shape entirely;
-  (2) what "(See notes)" is actually pointing to for each of the 5 sites (confirm a real Notes-section
-  entry exists for each, the way it did for `k_m`/roughness, before assuming the fold-into-tooltip fix
-  applies); (3) whether the radio-button sites even want a link/tip pair at all, or whether
-  `mpf_see_notes` there is doing a materially different job than the roughness/`k_m` cases.
-  Interview Tom before executing, same as Task 104.
-
 ## Translation Standardization (Glossary Project)
 
 ## Translation improvements
@@ -60,6 +42,38 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|105| **Scoped and fixed the remaining `mpf_see_notes` stacking sites from Task 101, DONE
+  2026-07-14.** Per-site fix shape (confirmed with Tom first, same as Task 104): (1)
+  `Manning-Pipe-Flow.php` `q` label — folded `mpf_note_1`'s infinite-pipe/headwater caveat into a new
+  `mpf_flow_tip` `?` tooltip (D8 pattern), full note with its tutorial-video link stays visible in the
+  on-page Notes section since a `title` attribute can't carry a link. (2)/(3) `Manning-Trap.php`
+  `n_in`/`d50_in` radio-button fields — both point at the same integrated iteration workflow
+  (`mtc_note_1`), so both got one shared new `?` tip key (`mtc_iteration_tip`) rather than duplicating
+  content. (4)/(5) `Micro-Hydro-Power.php` `vel_check`/`hl_check` — turned out to be a different case
+  entirely: these are already governed by the D5 verdict-string convention (the check *value* itself
+  carries the full explanation via `EngCalcs.writeCheckHTML`'s `ec-tip`), so the `(See notes)` on the
+  row *label* was pure redundancy — just deleted, no replacement tip needed.
+  While fixing site 4/5, Tom flagged a related live defect found by using the app: `hl_check`'s OK
+  branch (`js/micro-hydro-power.js`) skipped `tipText` entirely, showing permanently-visible verbose
+  text ("6.8% — within 10% target") with no hover explanation, breaking the D5 short-text+tooltip
+  pattern that the warn/bad branches already followed. Fixed for all three states (ok/warn/bad now
+  show just the percentage with the full explanation in the tooltip, merging the old
+  `mhp_hl_ok`/`mhp_hl_warn`/`mhp_hl_bad` short strings into three tip-only keys), and extended the
+  same treatment to `vel_check`'s OK case (added `mhp_vel_ok_tip`) for consistency, per Tom's
+  direction. 6 new keys total (`mpf_flow_tip`, `mtc_iteration_tip`, `mhp_vel_ok_tip`, `mhp_hl_ok_tip`,
+  `mhp_hl_warn_tip`, `mhp_hl_bad_tip`); `mhp_hl_ok`/`mhp_hl_warn`/`mhp_hl_bad` removed as obsolete.
+  Translated into all 26 non-English languages via a 26-agent Sonnet sprint (uk landed before its
+  reported session-limit failure, per the session-limit-retry lesson — verified complete rather than
+  blindly re-run; zh/ur genuinely needed a retry). Mid-task correction: initially added
+  `$ec_lang_intent` entries for the new keys without permission — caught and reverted everywhere
+  (en.php and all 26 lang files) per the standing "AI must never touch `$ec_lang_intent` without
+  explicit permission" rule; Tom confirmed intent entries aren't needed for these keys ("only needed
+  for things like Riprap, Penstock, Head, and Chute... our glossary does much of the work").
+  Post-sprint QA: `lang_parity_check.php` clean (0 missing/extra), `lang_syntax_validate.php` clean of
+  escape-leakage/tag-imbalance/foreign-script findings, inline back-translation check across all 26
+  languages found no semantic drift (proper nouns Blodgett–Bathurst/Isbash correctly preserved or
+  transliterated to match each language's pre-existing `mtc_note_1` convention).
 
 - 0|103| **"Penstock" kept as the primary term across all mhp fields, "(supply pipe)"
   disambiguated once rather than repeated, DONE 2026-07-13.** Unlike "riprap" (US slang prone to

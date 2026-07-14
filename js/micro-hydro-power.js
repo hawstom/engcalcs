@@ -59,6 +59,7 @@ EngCalcs.pageCalculator = function(objForm) {
 		ok: EngCalcs.pageConfig.mhp_vel_ok_short,
 		high: EngCalcs.pageConfig.mhp_vel_high_short,
 		low: EngCalcs.pageConfig.mhp_vel_low_short,
+		okTip: EngCalcs.pageConfig.mhp_vel_ok_tip,
 		highTip: EngCalcs.pageConfig.mhp_vel_high,
 		lowTip: EngCalcs.pageConfig.mhp_vel_low
 	});
@@ -69,13 +70,13 @@ EngCalcs.pageCalculator = function(objForm) {
 		var hlPct = this.var.hl / this.var.hgross * 100;
 		hlEl.className = '';
 		if (hlPct <= 10) {
-			hlEl.innerHTML = EngCalcs.writeCheckHTML(true, hlPct.toFixed(1) + '% — ' + EngCalcs.pageConfig.hl_ok);
+			hlEl.innerHTML = EngCalcs.writeCheckHTML(true, hlPct.toFixed(1) + '%', EngCalcs.pageConfig.hl_ok_tip);
 			hlEl.classList.add('ec-status-ok');
 		} else if (hlPct <= 20) {
-			hlEl.innerHTML = EngCalcs.writeCheckHTML(false, hlPct.toFixed(1) + '% — ' + EngCalcs.pageConfig.hl_warn, EngCalcs.pageConfig.hl_warn_tip);
+			hlEl.innerHTML = EngCalcs.writeCheckHTML(false, hlPct.toFixed(1) + '%', EngCalcs.pageConfig.hl_warn_tip);
 			hlEl.classList.add('ec-status-warn');
 		} else {
-			hlEl.innerHTML = EngCalcs.writeCheckHTML(false, hlPct.toFixed(1) + '% — ' + EngCalcs.pageConfig.hl_bad, EngCalcs.pageConfig.hl_bad_tip);
+			hlEl.innerHTML = EngCalcs.writeCheckHTML(false, hlPct.toFixed(1) + '%', EngCalcs.pageConfig.hl_bad_tip);
 			hlEl.classList.add('ec-status-bad');
 		}
 	}

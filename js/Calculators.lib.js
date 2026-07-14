@@ -255,7 +255,7 @@ EngCalcs.writeVelocityCheck = function (elId, status, labels) {
 			status === 'high' ? labels.highTip : labels.lowTip);
 		el.classList.add('ec-status-warn');
 	} else if (status === 'ok') {
-		el.innerHTML = EngCalcs.writeCheckHTML(true, labels.ok);
+		el.innerHTML = EngCalcs.writeCheckHTML(true, labels.ok, labels.okTip);
 		el.classList.add('ec-status-ok');
 	} else {
 		el.innerHTML = '';
