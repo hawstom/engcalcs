@@ -10,36 +10,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 ## Calculator Improvements
 
-- 95|101|[H] **`k_m` label stacking fixed 2026-07-13; `e`/roughness field's identical problem
-  still open.** Surfaced investigating why bg's rendered `km` label looked long ("Коефициент на
-  местни (локални) загуби, k<sub>m</sub> (Вижте бележките)"). The length itself turned out not to be
-  a bg defect — measured against 12 other languages, bg's `mphl_total_junction_k` value (40 chars)
-  sits mid-pack (fr 53, it 48, es 44, ro 41, bg/hr 40, sr/ru 39 — all longer or equal; en 33 shortest
-  as expected) — normal Indo-European grammatical expansion, not a translation error; already checked
-  once before in Task 96 item (2) sub-item 2 ("no change" verdict) and re-confirmed here. The real
-  problem Tom identified: regardless of per-language length, the *rendered field label* concatenated
-  three things never meant to coexist for width: the full noun-phrase label, a bare
-  `<a target="_blank">` link to engineeringtoolbox.com with no tooltip, and a trailing
-  `(See notes)` appended outside the link.
-  **DONE 2026-07-13 for `k_m`, all 5 call sites** (`Darcy-Weisbach.php`, `Hazen-Williams.php`,
-  `Manning-Pipe-Head-Loss.php`, `Micro-Hydro-Power.php` ×2 fields), per Tom's direction: keep the
-  hyperlink as-is (style-guide refresh instead of removal — see below), fold `(See notes)` into the
-  tooltip rather than dropping it (it points to real, useful typical-value guidance), and shorten the
-  visible label. New key `mphl_total_junction_k_short` = "Loss coeff., k<sub>m</sub>" (en) added to
-  all 27 languages (26 translated directly by Claude Code, not a full agent sprint — one short
-  formulaic phrase derived from each language's own already-translated `mphl_total_junction_k`
-  wording, same effort class as Tasks 94/96/99). PHP shape at all 5 sites:
-  `<a href="…">{short label}</a><span class="ec-help" title="{strip_tags(full definition)} {see
-  notes text}"><span class="ec-tip">?</span></span>` — the tooltip text needed **zero new
-  translation**, assembled in PHP by reusing the existing `mphl_total_junction_k` and
-  `mpf_see_notes` keys as-is. `php -l` clean on all touched files; `lang_syntax_validate.php` shows
-  only the same pre-existing 65 advisory findings, no new issues. Style guide refreshed in
-  `dev/label-normalization-decision.md` D8: documents the actual live pattern (short "Word(s),
-  symbol" label, not bare-symbol-only, which was tried and reversed for wide forms) and adds the
-  rule that a "(See notes)" pointer belongs inside the tip, not as separate permanently-visible text.
-  **Still open (was):** the `e`/roughness field had the identical stacking problem — resolved by
-  Task 104.
-
 - 90|103| Would it be acceptable to use a synonym like "Supply line" instead of "Penstock"? Or to put "Supply line" in a tooltip?
 
 - 60|105| **Scope the remaining `mpf_see_notes` stacking sites flagged at the end of Task 101 (not
@@ -92,6 +62,39 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|101| **`k_m` label stacking fixed 2026-07-13; `e`/roughness field's identical problem DONE
+  2026-07-13 via Task 104.** Surfaced investigating why bg's rendered `km` label looked long
+  ("Коефициент на местни (локални) загуби, k<sub>m</sub> (Вижте бележките)"). The length itself
+  turned out not to be a bg defect — measured against 12 other languages, bg's
+  `mphl_total_junction_k` value (40 chars) sits mid-pack (fr 53, it 48, es 44, ro 41, bg/hr 40,
+  sr/ru 39 — all longer or equal; en 33 shortest as expected) — normal Indo-European grammatical
+  expansion, not a translation error; already checked once before in Task 96 item (2) sub-item 2
+  ("no change" verdict) and re-confirmed here. The real problem Tom identified: regardless of
+  per-language length, the *rendered field label* concatenated three things never meant to coexist
+  for width: the full noun-phrase label, a bare `<a target="_blank">` link to
+  engineeringtoolbox.com with no tooltip, and a trailing `(See notes)` appended outside the link.
+  **DONE 2026-07-13 for `k_m`, all 5 call sites** (`Darcy-Weisbach.php`, `Hazen-Williams.php`,
+  `Manning-Pipe-Head-Loss.php`, `Micro-Hydro-Power.php` ×2 fields), per Tom's direction: keep the
+  hyperlink as-is (style-guide refresh instead of removal — see below), fold `(See notes)` into the
+  tooltip rather than dropping it (it points to real, useful typical-value guidance), and shorten the
+  visible label. New key `mphl_total_junction_k_short` = "Loss coeff., k<sub>m</sub>" (en) added to
+  all 27 languages (26 translated directly by Claude Code, not a full agent sprint — one short
+  formulaic phrase derived from each language's own already-translated `mphl_total_junction_k`
+  wording, same effort class as Tasks 94/96/99). PHP shape at all 5 sites:
+  `<a href="…">{short label}</a><span class="ec-help" title="{strip_tags(full definition)} {see
+  notes text}"><span class="ec-tip">?</span></span>` — the tooltip text needed **zero new
+  translation**, assembled in PHP by reusing the existing `mphl_total_junction_k` and
+  `mpf_see_notes` keys as-is. `php -l` clean on all touched files; `lang_syntax_validate.php` shows
+  only the same pre-existing 65 advisory findings, no new issues. Style guide refreshed in
+  `dev/label-normalization-decision.md` D8: documents the actual live pattern (short "Word(s),
+  symbol" label, not bare-symbol-only, which was tried and reversed for wide forms) and adds the
+  rule that a "(See notes)" pointer belongs inside the tip, not as separate permanently-visible text.
+  **Left open at the time:** the `e`/roughness field had the identical stacking problem — resolved
+  by Task 104. A tail note in this same task also flagged 5 further `mpf_see_notes` stacking sites
+  (Manning-Pipe-Flow, Manning-Trap ×2, Micro-Hydro-Power vel_check/hl_check) as unscoped
+  reconnaissance, never part of this task's own defined scope (`k_m` bare-link stacking) — tracked
+  separately as Task 105, not a blocker on closing this task.
 
 - 0|102| **Generalized `k_m` typical-values guidance for dw/hw/mphl/mhp — DONE 2026-07-13.** Tom
   interviewed and decided: form is option (a), folded into the `k_m` tooltip (`title` text) added by
