@@ -40,6 +40,7 @@ EngCalcs.pageTitle = '';
 EngCalcs.namePattern = /^[A-Za-z0-9 _.-]*$/;
 EngCalcs._loadTime = Date.now();
 EngCalcs._calcUsageLogged = false;
+EngCalcs.sessionAgeMs = EngCalcs.sessionAgeMs || 0;
 
 // Logs one confirmed-human calculator-usage event (see log-calc-event.php),
 // gated to real user-triggered recalculation at least 10s after page load so
@@ -57,6 +58,31 @@ EngCalcs.maybeLogCalcUsage = function () {
 	});
 	navigator.sendBeacon('/engcalcs/log-calc-event.php', data);
 };
+
+// Logs one confirmed-human page-view event (see log-human-view.php) -- the "window
+// shopping" tier between raw reach (LANG_LOG) and confirmed calculator use
+// (CALC_USAGE_LOG). No calculation required, just dwelling until the SESSION (not
+// this page) is 10s old: EngCalcs.sessionAgeMs was already that old when this page
+// was served, so a session that proved itself human earlier doesn't make later pages
+// wait out their own 10s -- only a brand-new session waits the full 10s here.
+// If the visitor navigates away before the timer fires, nothing is logged, which is
+// correct: they didn't dwell long enough to count as a confirmed view.
+EngCalcs.maybeLogHumanView = function () {
+	'use strict';
+	if (!navigator.sendBeacon) return;
+	var delay = Math.max(0, 10000 - this.sessionAgeMs);
+	var self = this;
+	setTimeout(function () {
+		var data = new URLSearchParams({
+			page: self.cookieName || '',
+			lang: document.documentElement.lang || ''
+		});
+		navigator.sendBeacon('/engcalcs/log-human-view.php', data);
+	}, delay);
+};
+document.addEventListener('DOMContentLoaded', function () {
+	EngCalcs.maybeLogHumanView();
+});
 
 EngCalcs.updateUrl = function () {
 	'use strict';

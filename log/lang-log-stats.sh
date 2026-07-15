@@ -28,7 +28,18 @@
 #      languages do visitors actually want (raw, unsupported langs visible too, incl. bounces
 #      that never used a calculator)? 'cookie' = which languages retain users across sessions?
 #
-#   2. engcalcs-calc-usage.log — CONFIRMED HUMAN usage signal (bots essentially never reach this;
+#   2. engcalcs-human-view.log — CONFIRMED HUMAN page-view signal, the "window shopping" tier
+#      (bots essentially never reach this; it only fires once the visitor's SESSION -- not just
+#      this page -- is at least 10s old, whether or not they ever calculate). Written by
+#      log-human-view.php via navigator.sendBeacon from EngCalcs.maybeLogHumanView() in
+#      js/Calculators.lib.js. Deduped once per (session, page, lang).
+#      Tab-separated, one line per confirmed-human page view:
+#        timestamp   page   lang   browser_lang
+#        2026-07-15T14:01:05Z   Manning-Pipe-Flow   es   es-MX
+#      This answers: how many real (non-bot) humans reached this page, regardless of whether
+#      they went on to calculate.
+#
+#   3. engcalcs-calc-usage.log — CONFIRMED HUMAN usage signal (bots essentially never reach this;
 #      it only fires after a real, user-triggered calculation at least 10s after page load).
 #      Written by log-calc-event.php via a navigator.sendBeacon call from
 #      EngCalcs.maybeLogCalcUsage() in js/Calculators.lib.js. Deduped once per (session, page).
@@ -39,12 +50,15 @@
 #      i.e. "AWStats with the robots pruned" — plus a raw browser_lang column for cross-checking
 #      against engcalcs-lang.log's browser source among only-confirmed-human visits.
 #
-# WHY BOTH LOGS: engcalcs-lang.log can't tell you which visits were bots vs. bounces vs. real
-# usage; engcalcs-calc-usage.log can't tell you about visitors who left before calculating
-# (including demand for languages we don't even support yet). Combined, they also let you
-# estimate an engagement/bot-noise ratio per calculator — see the last section below.
+# WHY ALL THREE LOGS: engcalcs-lang.log can't tell you which visits were bots vs. bounces vs.
+# real usage; engcalcs-human-view.log can't tell you who actually got value out of the page vs.
+# who just looked and left; engcalcs-calc-usage.log can't tell you about visitors who left before
+# calculating (including demand for languages we don't even support yet). Combined, they form a
+# funnel: raw reach -> confirmed-human view ("% human") -> confirmed-human calculation ("% used")
+# — see the last section below.
 
 LOG="$(dirname "$0")/engcalcs-lang.log"
+VIEW_LOG="$(dirname "$0")/engcalcs-human-view.log"
 USAGE_LOG="$(dirname "$0")/engcalcs-calc-usage.log"
 
 if [ ! -f "$LOG" ]; then
@@ -98,6 +112,34 @@ echo ""
 echo "--- Most recent 10 entries ---"
 tail -10 "$LOG"
 
+if [ -f "$VIEW_LOG" ]; then
+    VIEW_TOTAL=$(wc -l < "$VIEW_LOG")
+    echo ""
+    echo "========================================="
+    echo " EngCalcs confirmed-human page-view stats (\"window shopping\")"
+    echo " $VIEW_LOG"
+    echo " $VIEW_TOTAL total confirmed-human page-view entries"
+    echo "========================================="
+
+    echo ""
+    echo "--- Page reach (confirmed human, calculated or not) ---"
+    awk -F'\t' '{print $2}' "$VIEW_LOG" | sort | uniq -c | sort -rn
+
+    echo ""
+    echo "--- Confirmed-human page views per day ---"
+    awk -F'\t' '{print substr($1,1,10)}' "$VIEW_LOG" | sort | uniq -c
+
+    echo ""
+    echo "--- Most recent 10 confirmed-human page-view entries ---"
+    tail -10 "$VIEW_LOG"
+else
+    echo ""
+    echo "========================================="
+    echo " No confirmed-human page-view log yet: $VIEW_LOG"
+    echo " (No one has dwelt on a page since this feature shipped.)"
+    echo "========================================="
+fi
+
 if [ ! -f "$USAGE_LOG" ]; then
     echo ""
     echo "========================================="
@@ -136,22 +178,35 @@ echo "--- Most recent 10 confirmed-human entries ---"
 tail -10 "$USAGE_LOG"
 
 echo ""
-echo "--- Engagement rate by calculator (lang-log reach vs. confirmed-human use) ---"
-echo "    (rough bot/bounce-noise estimate: low ratio = mostly bots/bounces on that page)"
+echo "--- Funnel by calculator: reach -> confirmed-human view (% human) -> confirmed-human use (% used) ---"
+echo "    reach = raw engcalcs-lang.log page mentions (includes bots/bounces)"
+echo "    human = confirmed-human page views (window shopping included)"
+echo "    used  = confirmed-human calculations"
+echo "    %human = human/reach -- a LOWER BOUND on true human reach, not an estimate of it: a real"
+echo "             human who bounces inside the first 10s of a new session is indistinguishable"
+echo "             from a bot and can't be confirmed, so they count against %human too. Low %human"
+echo "             means 'mostly bots, or mostly fast bounces, or both' -- not 'mostly bots.'"
+echo "    %used  = used/human (of confirmed humans who reached the page, how many calculated)"
 {
     awk -F'\t' '{print $4}' "$LOG" | sort | uniq -c | awk '{print $2"\treach\t"$1}'
+    [ -f "$VIEW_LOG" ] && awk -F'\t' '{print $2}' "$VIEW_LOG" | sort | uniq -c | awk '{print $2"\thuman\t"$1}'
     awk -F'\t' '{print $2}' "$USAGE_LOG" | sort | uniq -c | awk '{print $2"\tused\t"$1}'
 } | awk -F'\t' '
     {
         if ($2=="reach") reach[$1]=$3
+        else if ($2=="human") human[$1]=$3
         else used[$1]=$3
         pages[$1]=1
     }
     END {
         for (p in pages) {
             r = (p in reach) ? reach[p] : 0
+            h = (p in human) ? human[p] : 0
             u = (p in used) ? used[p] : 0
-            rate = (r > 0) ? (u/r)*100 : -1
-            printf "%.4f\t%s\t%d\t%d\t%s\n", rate, p, r, u, (rate >= 0 ? sprintf("%.0f%%", rate) : "n/a")
+            hrate = (r > 0) ? (h/r)*100 : -1
+            urate = (h > 0) ? (u/h)*100 : -1
+            printf "%.4f\t%s\t%d\t%d\t%d\t%s\t%s\n", hrate, p, r, h, u, \
+                (hrate >= 0 ? sprintf("%.0f%%", hrate) : "n/a"), \
+                (urate >= 0 ? sprintf("%.0f%%", urate) : "n/a")
         }
-    }' | sort -t$'\t' -k1 -rn | awk -F'\t' 'BEGIN {printf "%-28s %10s %10s %10s\n", "page", "reach", "used", "rate"} {printf "%-28s %10d %10d %10s\n", $2, $3, $4, $5}'
+    }' | sort -t$'\t' -k1 -rn | awk -F'\t' 'BEGIN {printf "%-28s %8s %8s %8s %8s %8s\n", "page", "reach", "human", "used", "%human", "%used"} {printf "%-28s %8d %8d %8d %8s %8s\n", $2, $3, $4, $5, $6, $7}'

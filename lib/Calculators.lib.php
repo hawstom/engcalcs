@@ -141,6 +141,7 @@ function echoCookieScript ()
 	// On load, read cookie and calc.
 	EngCalcs.debugMode = <?=DEBUG_MODE ? 'true' : 'false' ?>;
 	EngCalcs.cookieName='<?php $p=pathinfo($_SERVER['SCRIPT_NAME']); echo $p['filename']; ?>';
+	EngCalcs.sessionAgeMs = <?=json_encode($GLOBALS['ec_sessionAgeMs'] ?? 0)?>;
 	EngCalcs.readCookieAndCalc(document.forms['formInput']);
 <?php
 }

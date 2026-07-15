@@ -45,3 +45,15 @@ define('LANG_LOG', dirname(__DIR__) . '/log/engcalcs-lang.log');
 // never run this far), as opposed to LANG_LOG's raw browser-preference/demand signal.
 // Run log/lang-log-stats.sh to analyze.
 define('CALC_USAGE_LOG', dirname(__DIR__) . '/log/engcalcs-calc-usage.log');
+
+// Confirmed-human PAGE-VIEW log — the "window shopping" tier between LANG_LOG (raw
+// reach, includes bots) and CALC_USAGE_LOG (confirmed human who actually calculated).
+// Written by log-human-view.php, called via navigator.sendBeacon from
+// EngCalcs.maybeLogHumanView() (js/Calculators.lib.js) once the visitor's *session*
+// (not just this page) is at least 10s old, whether or not they ever calculate.
+// Session age, not page age, is the gate: once a session has proven itself human on
+// one page, later pages in the same session don't need their own 10s wait. Deduped
+// once per (session, page, lang) so reloads don't inflate counts.
+// Each line: ISO-8601 UTC timestamp TAB page-basename TAB served-lang TAB raw-Accept-Language
+// Run log/lang-log-stats.sh to analyze.
+define('HUMAN_VIEW_LOG', dirname(__DIR__) . '/log/engcalcs-human-view.log');

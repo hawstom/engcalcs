@@ -28,6 +28,13 @@
  */
 // Start the session here and here only.
 session_start();
+// First request of this session: mark when it started, so pages can tell how long
+// this visitor has been around (used by the confirmed-human page-view log, which
+// gates on session age rather than this single page's age).
+if (empty($_SESSION['SESSION_START'])) {
+    $_SESSION['SESSION_START'] = time();
+}
+$ec_sessionAgeMs = (time() - $_SESSION['SESSION_START']) * 1000;
 // Load the config.  It's in this directory.
 require_once('config.inc.php');
 
