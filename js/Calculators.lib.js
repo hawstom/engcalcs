@@ -38,6 +38,25 @@ EngCalcs.numCalcRows = 0;
 EngCalcs.cookieSlotsLength = 0;
 EngCalcs.pageTitle = '';
 EngCalcs.namePattern = /^[A-Za-z0-9 _.-]*$/;
+EngCalcs._loadTime = Date.now();
+EngCalcs._calcUsageLogged = false;
+
+// Logs one confirmed-human calculator-usage event (see log-calc-event.php),
+// gated to real user-triggered recalculation at least 10s after page load so
+// the automatic initial calc-on-load and fast/scripted interaction don't count.
+// Deduped in-memory per page load; server-side dedup covers repeat page loads.
+EngCalcs.maybeLogCalcUsage = function () {
+	'use strict';
+	if (this._calcUsageLogged) return;
+	if (Date.now() - this._loadTime < 10000) return;
+	if (!navigator.sendBeacon) return;
+	this._calcUsageLogged = true;
+	var data = new URLSearchParams({
+		page: this.cookieName || '',
+		lang: document.documentElement.lang || ''
+	});
+	navigator.sendBeacon('/engcalcs/log-calc-event.php', data);
+};
 
 EngCalcs.updateUrl = function () {
 	'use strict';
@@ -105,6 +124,7 @@ EngCalcs.calcAndSave = function (objForm) {
 	this.formToCookie(objForm);
 	this.pageCalculator(objForm);
 	this.adjustInputWidth();
+	this.maybeLogCalcUsage();
 };
 
 // Explicit "Copy link" action -- URL sync is opt-in, not automatic on every keystroke

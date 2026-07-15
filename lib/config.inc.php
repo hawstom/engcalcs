@@ -33,3 +33,15 @@ define('BASE_DIRECTORY', $basedirectory);
 //   source='browser' raw first Accept-Language tag (e.g. es-MX, zh-TW) — logged once ever per browser via ec_blang cookie
 // Run log/lang-log-stats.sh to analyze.
 define('LANG_LOG', dirname(__DIR__) . '/log/engcalcs-lang.log');
+
+// Confirmed-human calculator-usage log — a separate question from LANG_LOG above.
+// Written by log-calc-event.php, called via navigator.sendBeacon from
+// EngCalcs.maybeLogCalcUsage() (js/Calculators.lib.js) the first time a real,
+// user-triggered calculation happens at least 10s after page load in a given
+// session for a given calculator. Deduped once per (session, page) so reloads
+// and repeated recalculation of the same calculator don't inflate counts.
+// Each line: ISO-8601 UTC timestamp TAB page-basename TAB served-lang TAB raw-Accept-Language
+// Answers "what calculators/languages are humans actually using" (bots essentially
+// never run this far), as opposed to LANG_LOG's raw browser-preference/demand signal.
+// Run log/lang-log-stats.sh to analyze.
+define('CALC_USAGE_LOG', dirname(__DIR__) . '/log/engcalcs-calc-usage.log');
