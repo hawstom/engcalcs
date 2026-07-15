@@ -23,6 +23,11 @@
 // $source: 'get' = explicit ?lang=XX (every occurrence)
 //          'cookie' = returning user with saved preference (once per session)
 //          'browser' = Accept-Language auto-detection (once per session)
+//          'view' = a later page in a session whose language was already pinned by one of the
+//                   above (once per session per page). Exists purely so LANG_LOG's page/lang
+//                   breakdown covers every page visited, not just the page that pinned the
+//                   language -- excluded from the "language demand" sections in
+//                   lang-log-stats.sh, since it would just double-count the session's language.
 function logLanguageSelection($lang, $source) {
     $logFile = defined('LANG_LOG') ? LANG_LOG : null;
     if (!$logFile) return;
@@ -64,6 +69,16 @@ function chooseLanguage($all_language_settings) {
         }
     } elseif (!empty($_SESSION["CLANGUAGE"]) && !empty($all_language_settings[$_SESSION["CLANGUAGE"]])) {
         // Else if a valid language was already determined in this session, use it.
+        // Still log a page-view hit (source='view'), once per session per page, so LANG_LOG's
+        // page/lang breakdown reflects every page a session visits -- not just the entry page
+        // where the language was first pinned. Without this, 'reach' undercounts every non-entry
+        // page relative to engcalcs-human-view.log, which dedupes per (session, page, lang)
+        // rather than per session -- producing >100% "%human" in the funnel report.
+        $page = isset($_SERVER['SCRIPT_NAME']) ? basename($_SERVER['SCRIPT_NAME'], '.php') : '';
+        if (empty($_SESSION['LANG_VIEW_LOGGED'][$page])) {
+            $_SESSION['LANG_VIEW_LOGGED'][$page] = true;
+            logLanguageSelection($_SESSION["CLANGUAGE"], 'view');
+        }
         return $_SESSION["CLANGUAGE"];
     } elseif (!empty($_COOKIE["ec_language"]) && ctype_alpha($_COOKIE["ec_language"]) && strlen($_COOKIE["ec_language"]) == 2 && !empty($all_language_settings[$cookieLang = normalizeLang($_COOKIE["ec_language"])])) {
         // Else if a valid language cookie exists from a previous browser session, use it.

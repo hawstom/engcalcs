@@ -20,6 +20,13 @@
 #        cookie  — returning user whose prior selection was saved in a cookie (once per session)
 #        browser — raw first Accept-Language tag from the browser (e.g. es-MX, zh-TW), logged once
 #                  ever per browser via the ec_blang cookie; may not be a language we support
+#        view    — a later page in a session whose language was already pinned by get/cookie/
+#                  browser above (once per session per page). Exists only so the page/lang
+#                  breakdown covers every page a session visits, matching the per-page dedup in
+#                  engcalcs-human-view.log below -- the "language demand" sections exclude it (it
+#                  would just double-count the session's already-counted language); the funnel
+#                  section at the bottom deliberately includes it, since that's what makes "reach"
+#                  comparable to "human" there.
 #      SUB-LANGUAGE NOTE: browser entries may contain subtags (es-MX, zh-TW, pt-BR, en-US, etc.).
 #      get/cookie entries are always plain 2-letter codes. Most sections aggregate subtags to
 #      their primary code (es-MX → es) so all sources are comparable; the raw browser breakdown
@@ -97,12 +104,12 @@ echo "--- Language demand: returning users with saved preference (source=cookie)
 awk -F'\t' '$3=="cookie" {print $2}' "$LOG" | sort | uniq -c | sort -rn
 
 echo ""
-echo "--- Overall language demand: all sources combined, aggregated ---"
-awk -F'\t' '{split($2,a,"-"); print a[1]}' "$LOG" | sort | uniq -c | sort -rn
+echo "--- Overall language demand: all sources combined, aggregated (excludes source=view -- see below) ---"
+awk -F'\t' '$3!="view" {split($2,a,"-"); print a[1]}' "$LOG" | sort | uniq -c | sort -rn
 
 echo ""
-echo "--- Non-English demand by page, aggregated (all sources) ---"
-awk -F'\t' '{split($2,a,"-"); if (a[1]!="en") print a[1]"\t"$4}' "$LOG" | sort | uniq -c | sort -rn
+echo "--- Non-English demand by page, aggregated (excludes source=view -- see below) ---"
+awk -F'\t' '$3!="view" {split($2,a,"-"); if (a[1]!="en") print a[1]"\t"$4}' "$LOG" | sort | uniq -c | sort -rn
 
 echo ""
 echo "--- Entries per day ---"
