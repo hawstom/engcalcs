@@ -43,9 +43,11 @@ if [ ! -f "$LOG" ]; then
 fi
 
 TOTAL=$(wc -l < "$LOG")
+FIRST_DATE=$(head -1 "$LOG" | awk -F'\t' '{print $1}')
 echo "========================================="
 echo " EngCalcs language selection log stats"
 echo " $LOG"
+echo " Logging began: $FIRST_DATE"
 echo " $TOTAL total log entries"
 echo "========================================="
 
