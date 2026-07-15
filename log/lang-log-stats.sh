@@ -210,3 +210,32 @@ echo "    %used  = used/human (of confirmed humans who reached the page, how man
                 (urate >= 0 ? sprintf("%.0f%%", urate) : "n/a")
         }
     }' | sort -t$'\t' -k1 -rn | awk -F'\t' 'BEGIN {printf "%-28s %8s %8s %8s %8s %8s\n", "page", "reach", "human", "used", "%human", "%used"} {printf "%-28s %8d %8d %8d %8s %8s\n", $2, $3, $4, $5, $6, $7}'
+
+echo ""
+echo "--- Funnel by language: reach -> confirmed-human view (% human) -> confirmed-human use (% used) ---"
+echo "    Same three tiers and same %human/%used caveats as the by-calculator funnel above, grouped"
+echo "    by served language instead of page. reach aggregates engcalcs-lang.log subtags (es-MX -> es)"
+echo "    to match human/used, which only ever log the plain 2-letter served language."
+{
+    awk -F'\t' '{split($2,a,"-"); print a[1]}' "$LOG" | sort | uniq -c | awk '{print $2"\treach\t"$1}'
+    [ -f "$VIEW_LOG" ] && awk -F'\t' '{print $3}' "$VIEW_LOG" | sort | uniq -c | awk '{print $2"\thuman\t"$1}'
+    awk -F'\t' '{print $3}' "$USAGE_LOG" | sort | uniq -c | awk '{print $2"\tused\t"$1}'
+} | awk -F'\t' '
+    {
+        if ($2=="reach") reach[$1]=$3
+        else if ($2=="human") human[$1]=$3
+        else used[$1]=$3
+        langs[$1]=1
+    }
+    END {
+        for (l in langs) {
+            r = (l in reach) ? reach[l] : 0
+            h = (l in human) ? human[l] : 0
+            u = (l in used) ? used[l] : 0
+            hrate = (r > 0) ? (h/r)*100 : -1
+            urate = (h > 0) ? (u/h)*100 : -1
+            printf "%.4f\t%s\t%d\t%d\t%d\t%s\t%s\n", hrate, l, r, h, u, \
+                (hrate >= 0 ? sprintf("%.0f%%", hrate) : "n/a"), \
+                (urate >= 0 ? sprintf("%.0f%%", urate) : "n/a")
+        }
+    }' | sort -t$'\t' -k1 -rn | awk -F'\t' 'BEGIN {printf "%-28s %8s %8s %8s %8s %8s\n", "lang", "reach", "human", "used", "%human", "%used"} {printf "%-28s %8d %8d %8d %8s %8s\n", $2, $3, $4, $5, $6, $7}'
