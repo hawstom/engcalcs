@@ -63,7 +63,7 @@ USAGE_LOG="$(dirname "$0")/engcalcs-calc-usage.log"
 
 if [ ! -f "$LOG" ]; then
     echo "Log file not found: $LOG"
-    echo "(No language selections have been recorded yet.)"
+    echo "(No page access has been recorded yet.)"
     exit 1
 fi
 
