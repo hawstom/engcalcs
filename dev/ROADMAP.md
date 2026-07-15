@@ -43,7 +43,7 @@ institutional, paywalled, or non-English tools may exist that search didn't surf
 below reflect this research; re-run the same 4-axis check before adding new candidates rather than
 prioritizing on mission-fit intuition alone.
 
-- 80|107| **Water treatment — biosand/slow sand filter design.** Sizes a household or community
+- 80|110| **Water treatment — biosand/slow sand filter design.** Sizes a household or community
   biosand filter per the CAWST Biosand Filter Construction Manual (the standard reference NGOs
   actually build from) — filtration rate (~0.4 m/hr, ~600 L/day for a household unit), sand bed
   depth (~55 cm minimum + separating/gravel drainage layers), sand specification checks (effective
@@ -56,7 +56,7 @@ prioritizing on mission-fit intuition alone.
   org, biosand filters are a WHO/CAWST household-treatment staple). New domain for the suite (water
   treatment, not just conveyance/storage) — zero overlap with existing calculators. Candidate prefix
   `bsf_` — not yet claimed.
-- 80|108| **Spring box / gravity-fed water supply design.** Spring capture structure sizing (spring
+- 80|111| **Spring box / gravity-fed water supply design.** Spring capture structure sizing (spring
   box) plus gravity-fed transmission-line feasibility, per Peace Corps Water Supply & Sanitation
   Technical Training Manual / RWSN spring-protection guidelines: spring yield (bucket-and-stopwatch
   method), spring box minimum freeboard/sizing, and — this is the efficient part — the transmission
@@ -70,7 +70,7 @@ prioritizing on mission-fit intuition alone.
   since it reuses proven calculators rather than opening new formula territory. Candidate prefix
   `sb_` or `gfs_` — not yet claimed, needs a final pick (avoid collision risk with any future
   "storage bin"/similar prefix).
-- 75|112| **VIP/pit latrine sizing.** Volume/depth sizing vs. household size and design life
+- 7|112| **VIP/pit latrine sizing.** Volume/depth sizing vs. household size and design life
   (sludge accumulation rate ≈0.04–0.06 m³/person/year is the published WEDC/World Bank/UNICEF
   figure — needs primary-source citation before shipping as a default, not just this note), vent
   pipe diameter, and safe setback distance from water sources per Peace Corps/WEDC guidelines.
@@ -81,7 +81,7 @@ prioritizing on mission-fit intuition alone.
   pass (was initially filed as a lower-confidence backlog item; the gap turned out to be real and the
   formulas simple, making it one of the cleanest build candidates of the whole set). Candidate prefix
   `vip_` or `lat_` — not yet claimed.
-- 65|113| **Handpump / rope pump selection & sizing.** Selects/sizes a handpump or rope pump by
+- 6|113| **Handpump / rope pump selection & sizing.** Selects/sizes a handpump or rope pump by
   depth, diameter, and required discharge. **Research-confirmed genuine gap — the strongest
   availability-axis gap found of any candidate**: motorized-pump sizing tools are abundant, but
   nothing addresses rope-pump/handpump selection; that domain is served only by static PDF manuals
@@ -91,7 +91,7 @@ prioritizing on mission-fit intuition alone.
   likely a narrower/simpler selection-table calculator (pump type by depth/diameter/discharge) rather
   than complex hydraulics — verify actual formula complexity before committing to full-calculator
   scope. Candidate prefix `hp_` — not yet claimed (watch for collision with `mhp_`).
-- 60|114| **Check dam / small earthen dam spillway sizing.** Small/informal check-dam sizing:
+- 4|114| **Check dam / small earthen dam spillway sizing.** Small/informal check-dam sizing:
   catchment runoff estimate + spillway sizing + freeboard, aimed at low-resource construction rather
   than engineered large-dam design. Directly extends the *existing* `rc_` (Rock Chute, Robinson)
   calculator, which already does spillway rock-lining sizing — pairing a dam/reservoir sizing
@@ -101,8 +101,8 @@ prioritizing on mission-fit intuition alone.
   — a gap in the middle. Strong demand signal: heavily promoted in India/Africa watershed programs
   (Rajasthan/Gujarat/MP case studies, TAAT-Africa catalog) for groundwater recharge and farm water
   storage. Promoted from the candidates backlog after the 2026-07-14 research pass. Candidate prefix
-  `cd_` — not yet claimed.
-- 25|106| **Rainwater Harvesting (roof/catchment sizing).** Sizes a rooftop rainwater harvesting
+  `cd_` — not yet claimed. Tom is (naively?) worried about the technical demand of global PMP/PMF estimation; are there good methods.
+- 2|115| **Rainwater Harvesting (roof/catchment sizing).** Sizes a rooftop rainwater harvesting
   system: catchment area → runoff coefficient → harvestable volume → storage tank sizing, plus
   first-flush diverter volume. Core method: rational-method roof runoff (`Q = C × I × A`) combined
   with a monthly rainfall-vs-demand water balance to size storage. **Research-downgraded, 2026-07-14
@@ -135,7 +135,7 @@ anchor or opens the *consumption* side (using energy to move/treat/purify water)
 the *generation* side `mhp_` already covers. Same 4-axis prioritization framework as the New
 Calculators section above; see that section's header for the methodology and honest-caveat note.
 
-- 55|110| **Solar water pumping sizing.** Sizes a solar-PV-powered pump system for irrigation or
+- 3|116| **Solar water pumping sizing.** Sizes a solar-PV-powered pump system for irrigation or
   domestic supply: hydraulic power required (`P_h = ρgQH`, same physics already used throughout
   `dw_`/`hw_`/`mphl_`/`mhp_`) → electrical power via pump + system efficiency → PV array size (Wp)
   via daily peak-sun-hours and a derating factor. Efficient to build: total dynamic head's
@@ -151,7 +151,7 @@ Calculators section above; see that section's header for the methodology and hon
   peak sun hours (needs a cited irradiance data source, not guessed values), pump efficiency, system
   derating factor (~0.75–0.85 typical, needs a cited source before shipping as a default). Candidate
   prefix `swp_` — not yet claimed.
-- 45|116| **Pico-hydro / hydrokinetic (damless, in-stream) turbine feasibility.** Natural extension
+- 5|117| **Pico-hydro / hydrokinetic (damless, in-stream) turbine feasibility.** Natural extension
   of the existing `mhp_` calculator for very low-head remote sites where a conventional
   penstock/head arrangement isn't available. **Research finding, 2026-07-14**: strong
   technology-emergence signal — market projected $4.9M (2023) → $29M (2030) at ~29% CAGR; a 2025
@@ -161,7 +161,7 @@ Calculators section above; see that section's header for the methodology and hon
   because the audience fit is narrower than the water-focused candidates above (site-dependent on
   perennial-stream availability, and it's a power calculator, not a water one, so it sits one step
   further from the suite's hydraulic-engineering core). Candidate prefix `phk_` — not yet claimed.
-- 25|111| **Solar water pasteurization / SODIS exposure calculator.** Two closely related low-cost
+- 1|118| **Solar water pasteurization / SODIS exposure calculator.** Two closely related low-cost
   heat/UV water-treatment methods — SODIS (WHO/EAWAG-endorsed: clear PET bottles, 6 hr sunny/2 days
   cloudy exposure, <30 NTU turbidity ceiling) and solar pasteurization (heat to the WAPI 65°C
   threshold via solar cooker/collector, `Q = mcΔT` + collector efficiency). **Research finding,
@@ -229,7 +229,7 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Completed
 
-- 0|18| **`Install.php` localization — DONE 2026-07-14.** Was 100% hardcoded English body text,
+- 0|108| **`Install.php` localization — DONE 2026-07-14.** Was 100% hardcoded English body text,
   outside `$ec_lang` entirely — the only working PWA install path on iOS Safari/Firefox, where the
   in-app `⬇ Install` button silently does nothing (Task 95 resolution #1). Executed per the split's
   planned sequence, authorized standalone (not bundled with an upcoming category wave, per Tom's

@@ -47,8 +47,8 @@ Mesa, AZ  85201<br />
   <p><?php echo $ec_lang['contact_message'];?><br>
      <textarea name="message" rows="12" cols="50"></textarea>
   </p>
-  <p><?php echo $ec_lang['contactSpamPrefix'];?> <input type="text" size="4" name="test" /> <?php echo $ec_lang['contactSpamPostfix'];?>
-  </p>
+  <!-- <p><?php echo $ec_lang['contactSpamPrefix'];?> <input type="text" size="4" name="test" /> <?php echo $ec_lang['contactSpamPostfix'];?>
+  </p>  -->
   <p>
     <input
       type="submit"

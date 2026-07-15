@@ -28,9 +28,10 @@ $errspam='Sorry, you need to enter '.$testanswer.' in the last box.';
 
 // We read the POST variables below.
 
+// 2026-07-15 Trying the form without this.
 // Get the spam test or abort.
-$test = $_POST['test'];
-if (strtoupper($test) !== strtoupper($testanswer)) die($errspam);
+// $test = $_POST['test'];
+// if (strtoupper($test) !== strtoupper($testanswer)) die($errspam);
 
 // Get the commentor's name
 if (preg_match("/(\r|\n)/", $_POST['name']) or preg_match("/@/",$_POST['name'])) {
