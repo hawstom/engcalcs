@@ -26,16 +26,13 @@ if ($page === '') {
     exit;
 }
 
-// Trust-but-verify the client's claim of session age: a spoofed beacon could claim
-// any age, but so could a spoofed page-age gate — this is best-effort bot filtering,
-// not a security boundary. Re-derive from the server-side session anyway, since it's
-// free and slightly harder to spoof than trusting the POST body alone.
-$sessionStart = $_SESSION['SESSION_START'] ?? time();
-if ((time() - $sessionStart) < 10) {
-    http_response_code(204);
-    exit;
-}
-
+// Trust the client's JS timer for the 10s session-age gate, same as log-calc-event.php
+// trusts its page-age timer: this is best-effort bot filtering, not a security boundary,
+// so a spoofed beacon isn't a meaningfully bigger risk than a spoofed client-side gate.
+// A prior version re-derived session age here from $_SESSION['SESSION_START'], but that
+// fails closed on any request where the session data isn't present (expired, GC'd, cookie
+// not attached) by silently treating "unknown" as "session just started" and rejecting —
+// which can drop every legitimate view with no trace. Not worth re-litigating server-side.
 $dedupKey = $page . '|' . $lang;
 if (empty($_SESSION['HUMAN_VIEW_LOGGED'][$dedupKey])) {
     $_SESSION['HUMAN_VIEW_LOGGED'][$dedupKey] = true;
