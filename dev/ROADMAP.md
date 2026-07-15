@@ -10,6 +10,18 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 ## Calculator Improvements
 
+- 15|119| **Offline usage logging (queue-and-flush).** Right now `EngCalcs.maybeLogHumanView()` and
+  `maybeLogCalcUsage()` (`js/Calculators.lib.js`) fire `navigator.sendBeacon` calls that fail
+  silently when offline — `sw.js`'s network-first strategy still lets the PWA serve cached
+  calculators fully offline, but that usage leaves zero trace in any of the three logs
+  (`engcalcs-lang.log`, `engcalcs-human-view.log`, `engcalcs-calc-usage.log`). Today we can't tell
+  "no one used it" from "someone used it offline." Fix: queue failed/undeliverable beacon payloads
+  client-side (IndexedDB, or a Background Sync registration if browser support is sufficient) and
+  flush them to the existing `log-human-view.php`/`log-calc-event.php` endpoints next time the app
+  is back online. Surfaced 2026-07-15 while confirming installed-PWA logging behavior; not scoped
+  beyond this description yet — needs a design pass on queue storage, flush retry/backoff, and
+  whether flushed entries should carry their original (offline) timestamp or the flush time.
+
 ## New Calculators (Mission Expansion)
 
 Tom, 2026-07-14: interested in expanding beyond hydraulic-structure/irrigation calculators toward
