@@ -216,7 +216,7 @@ echo "    %used  = used/human (of confirmed humans who reached the page, how man
                 (hrate >= 0 ? sprintf("%.0f%%", hrate) : "n/a"), \
                 (urate >= 0 ? sprintf("%.0f%%", urate) : "n/a")
         }
-    }' | sort -t$'\t' -k1 -rn | awk -F'\t' 'BEGIN {printf "%-28s %8s %8s %8s %8s %8s\n", "page", "reach", "human", "used", "%human", "%used"} {printf "%-28s %8d %8d %8d %8s %8s\n", $2, $3, $4, $5, $6, $7}'
+    }' | sort -t$'\t' -k1 -rn | awk -F'\t' 'BEGIN {printf "%-28s %8s %8s %8s %8s %8s\n", "page", "reach", "human", "used", "%human", "%used"; printf "%-28s %8s %8s %8s %8s %8s\n", "", "", "", "", "(of reach)", "(of human)"} {printf "%-28s %8d %8d %8d %8s %8s\n", $2, $3, $4, $5, $6, $7}'
 
 echo ""
 echo "--- Funnel by language: reach -> confirmed-human view (% human) -> confirmed-human use (% used) ---"
@@ -245,4 +245,4 @@ echo "    to match human/used, which only ever log the plain 2-letter served lan
                 (hrate >= 0 ? sprintf("%.0f%%", hrate) : "n/a"), \
                 (urate >= 0 ? sprintf("%.0f%%", urate) : "n/a")
         }
-    }' | sort -t$'\t' -k1 -rn | awk -F'\t' 'BEGIN {printf "%-28s %8s %8s %8s %8s %8s\n", "lang", "reach", "human", "used", "%human", "%used"} {printf "%-28s %8d %8d %8d %8s %8s\n", $2, $3, $4, $5, $6, $7}'
+    }' | sort -t$'\t' -k1 -rn | awk -F'\t' 'BEGIN {printf "%-28s %8s %8s %8s %8s %8s\n", "lang", "reach", "human", "used", "%human", "%used"; printf "%-28s %8s %8s %8s %8s %8s\n", "", "", "", "", "(of reach)", "(of human)"} {printf "%-28s %8d %8d %8d %8s %8s\n", $2, $3, $4, $5, $6, $7}'
