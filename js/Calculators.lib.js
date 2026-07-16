@@ -42,6 +42,146 @@ EngCalcs._loadTime = Date.now();
 EngCalcs._calcUsageLogged = false;
 EngCalcs.sessionAgeMs = EngCalcs.sessionAgeMs || 0;
 
+// Task 119: queue-and-flush for offline usage logging. The PWA's network-first
+// service worker (sw.js) still serves calculators fully from cache when offline,
+// but a plain sendBeacon to a log-*.php endpoint fails silently with no trace and
+// no way to retry -- "no one used it" and "someone used it offline" looked
+// identical. sendBeacon's return value only means "the browser accepted this for
+// delivery," not "it reached the server," so it can't drive retry logic; fetch
+// with keepalive (survives page unload like sendBeacon does) gives us a real
+// success/failure signal to decide whether to queue.
+//
+// Queued records carry the *original* attempt's client timestamp (offline_ts), sent
+// on retry so the server can log when the usage actually happened rather than when
+// connectivity happened to return -- the gap between those two can be hours for a
+// field worker. log-calc-event.php/log-human-view.php sanity-check and use it when
+// present.
+EngCalcs._QUEUE_DB = 'engcalcs-offline-queue';
+EngCalcs._QUEUE_STORE = 'queue';
+EngCalcs._QUEUE_MAX_ATTEMPTS = 20;
+
+EngCalcs._openQueueDB = function () {
+	'use strict';
+	return new Promise(function (resolve, reject) {
+		if (!window.indexedDB) { reject(new Error('no indexedDB')); return; }
+		var req = indexedDB.open(EngCalcs._QUEUE_DB, 1);
+		req.onupgradeneeded = function () {
+			req.result.createObjectStore(EngCalcs._QUEUE_STORE, { keyPath: 'id', autoIncrement: true });
+		};
+		req.onsuccess = function () { resolve(req.result); };
+		req.onerror = function () { reject(req.error); };
+	});
+};
+
+EngCalcs._queueBeacon = function (url, params) {
+	'use strict';
+	return this._openQueueDB().then(function (db) {
+		return new Promise(function (resolve, reject) {
+			var tx = db.transaction(EngCalcs._QUEUE_STORE, 'readwrite');
+			tx.objectStore(EngCalcs._QUEUE_STORE).add({
+				url: url,
+				params: params,
+				offline_ts: new Date().toISOString(),
+				attempts: 0
+			});
+			tx.oncomplete = resolve;
+			tx.onerror = function () { reject(tx.error); };
+		});
+	}).then(function () {
+		if (navigator.serviceWorker && navigator.serviceWorker.ready) {
+			navigator.serviceWorker.ready.then(function (reg) {
+				if (reg.sync) reg.sync.register('engcalcs-flush-queue').catch(function () {});
+			}).catch(function () {});
+		}
+	}).catch(function () {
+		// No IndexedDB (very old browser, private-mode restriction, etc.) -- nothing
+		// more we can do; the event is lost same as it always was pre-Task 119.
+	});
+};
+
+// Sends one beacon-style log POST, queueing it for later retry if the network
+// request itself fails (offline). Used by both maybeLogCalcUsage and
+// maybeLogHumanView so the retry/queue behavior lives in one place.
+EngCalcs._sendOrQueue = function (url, params) {
+	'use strict';
+	var body = new URLSearchParams(params);
+	if (!window.fetch) {
+		if (navigator.sendBeacon) navigator.sendBeacon(url, body);
+		return;
+	}
+	fetch(url, { method: 'POST', body: body, keepalive: true, credentials: 'same-origin' })
+		.then(function (resp) {
+			if (!resp.ok) EngCalcs._queueBeacon(url, params);
+		})
+		.catch(function () {
+			EngCalcs._queueBeacon(url, params);
+		});
+};
+
+// Reads every queued record into a plain array. Kept as its own short-lived
+// transaction (no awaits inside it) because IndexedDB transactions auto-commit
+// once there's no pending request in the microtask queue -- interleaving an
+// awaited fetch() inside a cursor loop would let the transaction die underneath
+// later cursor.update()/delete() calls and throw TransactionInactiveError.
+EngCalcs._readQueue = function (db) {
+	'use strict';
+	return new Promise(function (resolve, reject) {
+		var tx = db.transaction(EngCalcs._QUEUE_STORE, 'readonly');
+		var records = [];
+		tx.objectStore(EngCalcs._QUEUE_STORE).openCursor().onsuccess = function (event) {
+			var cursor = event.target.result;
+			if (!cursor) { resolve(records); return; }
+			records.push(cursor.value);
+			cursor.continue();
+		};
+		tx.onerror = function () { reject(tx.error); };
+	});
+};
+
+EngCalcs._deleteQueueRecord = function (db, id) {
+	'use strict';
+	var tx = db.transaction(EngCalcs._QUEUE_STORE, 'readwrite');
+	tx.objectStore(EngCalcs._QUEUE_STORE).delete(id);
+};
+
+EngCalcs._updateQueueRecord = function (db, record) {
+	'use strict';
+	var tx = db.transaction(EngCalcs._QUEUE_STORE, 'readwrite');
+	tx.objectStore(EngCalcs._QUEUE_STORE).put(record);
+};
+
+// Retries every queued record. Records that fail are left in place for the next
+// flush (triggered again on 'online' or next page load); records that have failed
+// EngCalcs._QUEUE_MAX_ATTEMPTS times are dropped so a permanently-unreachable
+// endpoint can't grow the queue forever.
+EngCalcs.flushQueue = function () {
+	'use strict';
+	if (!window.fetch) return;
+	var self = this;
+	this._openQueueDB().then(function (db) {
+		return self._readQueue(db).then(function (records) {
+			return Promise.all(records.map(function (record) {
+				var params = Object.assign({}, record.params, { offline_ts: record.offline_ts });
+				return fetch(record.url, {
+					method: 'POST',
+					body: new URLSearchParams(params),
+					credentials: 'same-origin'
+				}).then(function (resp) {
+					if (resp.ok || record.attempts + 1 >= EngCalcs._QUEUE_MAX_ATTEMPTS) {
+						self._deleteQueueRecord(db, record.id);
+					} else {
+						self._updateQueueRecord(db, Object.assign({}, record, { attempts: record.attempts + 1 }));
+					}
+				}).catch(function () {
+					// Still offline; leave the record queued for the next flush trigger.
+				});
+			}));
+		});
+	}).catch(function () {});
+};
+window.addEventListener('online', function () { EngCalcs.flushQueue(); });
+document.addEventListener('DOMContentLoaded', function () { EngCalcs.flushQueue(); });
+
 // Logs one confirmed-human calculator-usage event (see log-calc-event.php),
 // gated to real user-triggered recalculation at least 10s after page load so
 // the automatic initial calc-on-load and fast/scripted interaction don't count.
@@ -50,13 +190,11 @@ EngCalcs.maybeLogCalcUsage = function () {
 	'use strict';
 	if (this._calcUsageLogged) return;
 	if (Date.now() - this._loadTime < 10000) return;
-	if (!navigator.sendBeacon) return;
 	this._calcUsageLogged = true;
-	var data = new URLSearchParams({
+	this._sendOrQueue('/engcalcs/log-calc-event.php', {
 		page: this.cookieName || '',
 		lang: document.documentElement.lang || ''
 	});
-	navigator.sendBeacon('/engcalcs/log-calc-event.php', data);
 };
 
 // Logs one confirmed-human page-view event (see log-human-view.php) -- the "window
@@ -69,15 +207,13 @@ EngCalcs.maybeLogCalcUsage = function () {
 // correct: they didn't dwell long enough to count as a confirmed view.
 EngCalcs.maybeLogHumanView = function () {
 	'use strict';
-	if (!navigator.sendBeacon) return;
 	var delay = Math.max(0, 10000 - this.sessionAgeMs);
 	var self = this;
 	setTimeout(function () {
-		var data = new URLSearchParams({
+		self._sendOrQueue('/engcalcs/log-human-view.php', {
 			page: self.cookieName || '',
 			lang: document.documentElement.lang || ''
 		});
-		navigator.sendBeacon('/engcalcs/log-human-view.php', data);
 	}, delay);
 };
 document.addEventListener('DOMContentLoaded', function () {

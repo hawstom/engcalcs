@@ -26,6 +26,24 @@ if ($page === '') {
     exit;
 }
 
+// Task 119: a beacon retried from the offline queue (js/Calculators.lib.js) carries the
+// client's original attempt time, so a flush that lands hours later after connectivity
+// returns still logs when the usage happened, not when the flush happened. Best-effort
+// only, same trust model as the 10s gate above -- accept it if it parses and falls in a
+// sane recent window, otherwise fall back to server "now" like a live beacon would.
+$eventTime = gmdate('Y-m-d\TH:i:s\Z');
+if (isset($_POST['offline_ts'])) {
+    $ts = DateTime::createFromFormat('Y-m-d\TH:i:s.v\Z', $_POST['offline_ts'], new DateTimeZone('UTC'))
+        ?: DateTime::createFromFormat('Y-m-d\TH:i:s\Z', $_POST['offline_ts'], new DateTimeZone('UTC'));
+    if ($ts !== false) {
+        $now = new DateTime('now', new DateTimeZone('UTC'));
+        $ageDays = ($now->getTimestamp() - $ts->getTimestamp()) / 86400;
+        if ($ageDays >= 0 && $ageDays <= 90) {
+            $eventTime = $ts->format('Y-m-d\TH:i:s\Z');
+        }
+    }
+}
+
 // Trust the client's JS timer for the 10s session-age gate, same as log-calc-event.php
 // trusts its page-age timer: this is best-effort bot filtering, not a security boundary,
 // so a spoofed beacon isn't a meaningfully bigger risk than a spoofed client-side gate.
@@ -46,7 +64,7 @@ if (empty($_SESSION['HUMAN_VIEW_LOGGED'][$dedupKey])) {
     if (!is_dir($dir)) {
         @mkdir($dir, 0750, true);
     }
-    $line = gmdate('Y-m-d\TH:i:s\Z') . "\t" . $page . "\t" . $lang . "\t" . $browserLang . "\n";
+    $line = $eventTime . "\t" . $page . "\t" . $lang . "\t" . $browserLang . "\n";
     @file_put_contents(HUMAN_VIEW_LOG, $line, FILE_APPEND | LOCK_EX);
 }
 

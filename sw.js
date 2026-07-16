@@ -1,6 +1,6 @@
 // EngCalcs Service Worker
 // Cache version — bump this string when static assets change
-const CACHE_VERSION = 'engcalcs-v4';
+const CACHE_VERSION = 'engcalcs-v5';
 const ASSET_CACHE = CACHE_VERSION + '-assets';
 const PAGE_CACHE  = CACHE_VERSION + '-pages';
 
@@ -148,4 +148,86 @@ function stripQueryParams(request) {
   const url = new URL(request.url);
   url.search = '';
   return new Request(url.toString(), { method: request.method, headers: request.headers });
+}
+
+// Task 119: Background Sync flush for the offline usage-log queue. Calculators.lib.js
+// (main thread) queues failed/offline log-*.php POSTs into IndexedDB and registers this
+// tag; the browser fires 'sync' here once connectivity returns, even if no EngCalcs page
+// is open. Where Background Sync isn't supported (e.g. Safari), the queue still flushes
+// on the next page load / 'online' event via Calculators.lib.js's own flushQueue().
+// Keep this DB/store name and record shape in sync with Calculators.lib.js -- it's
+// duplicated rather than shared because a service worker can't import page-context JS.
+const QUEUE_DB = 'engcalcs-offline-queue';
+const QUEUE_STORE = 'queue';
+const QUEUE_MAX_ATTEMPTS = 20;
+
+self.addEventListener('sync', event => {
+  if (event.tag === 'engcalcs-flush-queue') {
+    event.waitUntil(flushOfflineQueue());
+  }
+});
+
+function openQueueDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(QUEUE_DB, 1);
+    req.onupgradeneeded = () => {
+      req.result.createObjectStore(QUEUE_STORE, { keyPath: 'id', autoIncrement: true });
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+// Reads every queued record into a plain array in its own short-lived transaction.
+// IndexedDB transactions auto-commit once there's no pending request in the
+// microtask queue, so awaiting fetch() inside a cursor loop would let the
+// transaction die before a later cursor.update()/delete() call -- read everything
+// first, then do the async network work with separate write transactions.
+function readQueue(db) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(QUEUE_STORE, 'readonly');
+    const records = [];
+    tx.objectStore(QUEUE_STORE).openCursor().onsuccess = event => {
+      const cursor = event.target.result;
+      if (!cursor) { resolve(records); return; }
+      records.push(cursor.value);
+      cursor.continue();
+    };
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+function deleteQueueRecord(db, id) {
+  db.transaction(QUEUE_STORE, 'readwrite').objectStore(QUEUE_STORE).delete(id);
+}
+
+function updateQueueRecord(db, record) {
+  db.transaction(QUEUE_STORE, 'readwrite').objectStore(QUEUE_STORE).put(record);
+}
+
+async function flushOfflineQueue() {
+  let db;
+  try {
+    db = await openQueueDB();
+  } catch {
+    return;
+  }
+  const records = await readQueue(db);
+  await Promise.all(records.map(async record => {
+    try {
+      const params = Object.assign({}, record.params, { offline_ts: record.offline_ts });
+      const resp = await fetch(record.url, {
+        method: 'POST',
+        body: new URLSearchParams(params),
+        credentials: 'same-origin'
+      });
+      if (resp.ok || record.attempts + 1 >= QUEUE_MAX_ATTEMPTS) {
+        deleteQueueRecord(db, record.id);
+      } else {
+        updateQueueRecord(db, Object.assign({}, record, { attempts: record.attempts + 1 }));
+      }
+    } catch {
+      // Still offline; leave the record queued for the next sync/flush.
+    }
+  }));
 }

@@ -24,6 +24,21 @@ if ($page === '') {
     exit;
 }
 
+// Task 119: see log-human-view.php for why an offline-queue retry carries and trusts
+// (within a sane window) the client's original attempt time instead of "now".
+$eventTime = gmdate('Y-m-d\TH:i:s\Z');
+if (isset($_POST['offline_ts'])) {
+    $ts = DateTime::createFromFormat('Y-m-d\TH:i:s.v\Z', $_POST['offline_ts'], new DateTimeZone('UTC'))
+        ?: DateTime::createFromFormat('Y-m-d\TH:i:s\Z', $_POST['offline_ts'], new DateTimeZone('UTC'));
+    if ($ts !== false) {
+        $now = new DateTime('now', new DateTimeZone('UTC'));
+        $ageDays = ($now->getTimestamp() - $ts->getTimestamp()) / 86400;
+        if ($ageDays >= 0 && $ageDays <= 90) {
+            $eventTime = $ts->format('Y-m-d\TH:i:s\Z');
+        }
+    }
+}
+
 if (empty($_SESSION['CALC_USAGE_LOGGED'][$page])) {
     $_SESSION['CALC_USAGE_LOGGED'][$page] = true;
 
@@ -36,7 +51,7 @@ if (empty($_SESSION['CALC_USAGE_LOGGED'][$page])) {
     if (!is_dir($dir)) {
         @mkdir($dir, 0750, true);
     }
-    $line = gmdate('Y-m-d\TH:i:s\Z') . "\t" . $page . "\t" . $lang . "\t" . $browserLang . "\n";
+    $line = $eventTime . "\t" . $page . "\t" . $lang . "\t" . $browserLang . "\n";
     @file_put_contents(CALC_USAGE_LOG, $line, FILE_APPEND | LOCK_EX);
 }
 

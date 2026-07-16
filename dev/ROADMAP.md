@@ -10,18 +10,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 ## Calculator Improvements
 
-- 15|119| **Offline usage logging (queue-and-flush).** Right now `EngCalcs.maybeLogHumanView()` and
-  `maybeLogCalcUsage()` (`js/Calculators.lib.js`) fire `navigator.sendBeacon` calls that fail
-  silently when offline — `sw.js`'s network-first strategy still lets the PWA serve cached
-  calculators fully offline, but that usage leaves zero trace in any of the three logs
-  (`engcalcs-lang.log`, `engcalcs-human-view.log`, `engcalcs-calc-usage.log`). Today we can't tell
-  "no one used it" from "someone used it offline." Fix: queue failed/undeliverable beacon payloads
-  client-side (IndexedDB, or a Background Sync registration if browser support is sufficient) and
-  flush them to the existing `log-human-view.php`/`log-calc-event.php` endpoints next time the app
-  is back online. Surfaced 2026-07-15 while confirming installed-PWA logging behavior; not scoped
-  beyond this description yet — needs a design pass on queue storage, flush retry/backoff, and
-  whether flushed entries should carry their original (offline) timestamp or the flush time.
-
 ## New Calculators (Mission Expansion)
 
 Tom, 2026-07-14: interested in expanding beyond hydraulic-structure/irrigation calculators toward
@@ -55,7 +43,7 @@ institutional, paywalled, or non-English tools may exist that search didn't surf
 below reflect this research; re-run the same 4-axis check before adding new candidates rather than
 prioritizing on mission-fit intuition alone.
 
-- 80|110| **Water treatment — biosand/slow sand filter design.** Sizes a household or community
+- 8|110| **Water treatment — biosand/slow sand filter design.** Sizes a household or community
   biosand filter per the CAWST Biosand Filter Construction Manual (the standard reference NGOs
   actually build from) — filtration rate (~0.4 m/hr, ~600 L/day for a household unit), sand bed
   depth (~55 cm minimum + separating/gravel drainage layers), sand specification checks (effective
@@ -68,7 +56,7 @@ prioritizing on mission-fit intuition alone.
   org, biosand filters are a WHO/CAWST household-treatment staple). New domain for the suite (water
   treatment, not just conveyance/storage) — zero overlap with existing calculators. Candidate prefix
   `bsf_` — not yet claimed.
-- 80|111| **Spring box / gravity-fed water supply design.** Spring capture structure sizing (spring
+- 8|111| **Spring box / gravity-fed water supply design.** Spring capture structure sizing (spring
   box) plus gravity-fed transmission-line feasibility, per Peace Corps Water Supply & Sanitation
   Technical Training Manual / RWSN spring-protection guidelines: spring yield (bucket-and-stopwatch
   method), spring box minimum freeboard/sizing, and — this is the efficient part — the transmission
@@ -240,6 +228,24 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|119| **Offline usage logging (queue-and-flush) — DONE 2026-07-16.**
+  `EngCalcs.maybeLogHumanView()`/`maybeLogCalcUsage()` (`js/Calculators.lib.js`) now send via
+  `fetch(..., {keepalive:true})` instead of bare `sendBeacon` (sendBeacon's return value only means
+  "browser accepted for delivery," not "reached the server," so it couldn't drive retry logic). A
+  failed/offline request is queued into an IndexedDB store (`engcalcs-offline-queue`) via the new
+  shared `EngCalcs._sendOrQueue()`. The queue flushes on the `online` event, on next page load
+  (`EngCalcs.flushQueue()`), and — where Background Sync is supported — from `sw.js` itself via a
+  registered `engcalcs-flush-queue` sync tag, so it can flush even with no EngCalcs tab open. Records
+  that fail `_QUEUE_MAX_ATTEMPTS` (20) times are dropped rather than growing forever. Design-pass
+  question resolved: queued retries carry the *original* client attempt time (`offline_ts`, ISO
+  string) rather than the flush time — `log-human-view.php`/`log-calc-event.php` parse and use it
+  (clamped to a 0–90 day sane window, else fall back to server "now") so a beacon that finally lands
+  hours later logs when the usage actually happened. `sw.js` cache version bumped to `engcalcs-v5`.
+  Not covered: `engcalcs-lang.log` (`LANG_LOG`) is written synchronously by PHP on page request, so
+  when the SW serves a page fully from cache while offline, PHP never runs and there's nothing
+  client-side to queue — that gap is structural, not a queue-and-flush gap, and was out of scope per
+  the original task description (which named only the two beacon calls).
 
 - 0|108| **`Install.php` localization — DONE 2026-07-14.** Was 100% hardcoded English body text,
   outside `$ec_lang` entirely — the only working PWA install path on iOS Safari/Firefox, where the
