@@ -90,6 +90,10 @@ $ec_lang['dw_main_desc']='فاقد الضغط في الأنابيب بداركي
 $ec_lang['dw_roughness']='e';
 $ec_lang['dw_roughness_tip']='ارتفاع الخشونة المطلقة، e، لجدار الأنبوب. قيم نموذجية: الفولاذ (جديد) 0.046 مم، الفولاذ (مستعمل) 0.15 مم، HDPE 0.003 مم، PVC/uPVC 0.0015 مم، الخرسانة 0.3–3 مم.';
 $ec_lang['dw_kinematic_viscosity']='<span class="ec-help" title="1×10⁻⁶ m²/s للماء النظيف عند 20°C">اللزوجة الحركية، &nu; <span class="ec-tip">?</span></span>';
+$ec_lang['dw_kinematic_viscosity_short']='اللزوجة الحركية، &nu;';
+$ec_lang_intent['dw_kinematic_viscosity_short']='';
+$ec_lang['dw_kinematic_viscosity_tip']='1×10⁻⁶ m²/s للماء النظيف عند 20°C';
+$ec_lang_intent['dw_kinematic_viscosity_tip']='';
 $ec_lang['dw_reynolds_number']='رقم رينولدز، Re';
 $ec_lang['dw_flow_regime']='نظام الجريان';
 $ec_lang['dw_regime_laminar']='صفحي';
@@ -140,7 +144,7 @@ $ec_lang['mpf_main_desc']='جريان منتظم في الأنابيب بمعا�
 $ec_lang['mpf_spreadheet_notice']='راجع النسخة الجدولية من هذه الحاسبة';
 $ec_lang['mpf_pipe_diameter']='قطر الأنبوب، d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='معامل خشونة مانينغ، n';
-$ec_lang['mpf_friction_slope']='ميل الاحتكاك (يساوي أحياناً <a target="_blank" href="../frictionslope.php">؟</a> ميل الأنبوب)، S<sub>f</sub>';
+$ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">ميل الاحتكاك، S<sub>f</sub></a><span class="ec-help" title="يساوي أحياناً ميل الأنبوب. اتبع الرابط للحصول على شرح (باللغة الإنجليزية فقط)."><span class="ec-tip">?</span></span>';
 $ec_lang['mpf_depth_ratio']='نسبة عمق الجريان، y/d<sub>0</sub>';
 $ec_lang['mpf_see_notes']='(انظر الملاحظات)';
 $ec_lang['mpf_flow']='التدفق، Q';
@@ -191,7 +195,7 @@ $ec_lang['mtc_side_slope_1']='الميل الجانبي 1، z<sub>1</sub> (أف�
 $ec_lang['mtc_side_slope_2']='الميل الجانبي 2، z<sub>2</sub> (أفقي/رأسي)';
 $ec_lang['mtc_channel_slope']='انحدار القناة، S';
 $ec_lang['mtc_flow_depth']='عمق الجريان، y';
-$ec_lang['mtc_bend_angle']='زاوية الانحناء، β <a target="_blank" href="riprap-bend-angle.png" title="انقر لعرض الصورة">؟</a> (لتحديد حجم الريبراب)';
+$ec_lang['mtc_bend_angle']='<a target="_blank" href="riprap-bend-angle.png">زاوية الانحناء، β</a><span class="ec-help" title="لتحديد حجم الريبراب. اتبع الرابط لعرض المخطط."><span class="ec-tip">?</span></span>';
 $ec_lang['mtc_sgrock']='<span class="ec-help" title="القيمة النموذجية &asymp; 2.65 للصخور المكسّرة">الكثافة النوعية للصخور، sg <span class="ec-tip">؟</span></span>';
 $ec_lang['mtc_d50_in']='حجم الصخور التصميمي، D<sub>50</sub>';
 $ec_lang['mtc_n_strickler']='n لحجم الصخور التصميمي (طريقة Strickler)';
@@ -205,7 +209,7 @@ $ec_lang['mtc_d50_mra']='حجم الصخور الزاوية المطلوب، D<s
 $ec_lang['mtc_d50_searcy']='حجم الصخور الزاوية المطلوب، D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='السرعة معقولة بالنسبة إلى افتراضات الجريان المنتظم.';
 $ec_lang['mtc_vel_low']='السرعة منخفضة؛ خطر الترسّب.';
-$ec_lang['mtc_iteration_tip']='اختر خيار خشونة (يُوصى بطريقة Blodgett–Bathurst) وخيار حجم صخور تصميمي (يُوصى بطريقة Isbash) للتكرار التلقائي نحو حجم صخور موحّد يحقق التدفق المستهدف. راجع الملاحظات أدناه للاطلاع على الطريقة الكاملة، أو أدخل قيمة الخشونة الخاصة بك وتجاهل حجم الصخور لتخطي التكرار.';
+$ec_lang['mtc_iteration_tip']='اختر خيار خشونة (يُوصى بطريقة Blodgett–Bathurst) وخيار حجم صخور تصميمي (يُوصى بطريقة Isbash) للتكرار التلقائي نحو حجم صخور موحّد يحقق التدفق المستهدف. راجع الملاحظات أدناه للاطلاع على الطريقة الكاملة، أو أدخل قيمة الخشونة الخاصة بك (اتبع الرابط للإرشاد) وتجاهل حجم الصخور لتخطي التكرار.';
 $ec_lang['mtc_note_1']='<dl><dt>التكرار التلقائي لتصميم حجم الصخور والخشونة</dt><dd>اختر خيار الخشونة (يُوصى بطريقة Blodgett–Bathurst) وخيار حجم الصخور التصميمي (يُوصى بطريقة Isbash). اضبط العمق ومعامل أمان حجم الصخور للوصول إلى التدفق المستهدف بحجم صخور موحّد. في كل مرة تُغيّر فيها أحد المدخلات، تكرر الحاسبة الخطوات التالية: 1. تُحسب الخشونة من حجم الصخور التصميمي. 2. تُنسخ قيمة الخشونة المحسوبة إلى حقل الخشونة المُدخلة. 3. يُحسب تدفق القناة وحجم الصخور المطلوب. 4. يُعدَّل حجم الصخور التصميمي. 5. تُكرَّر الخطوات حتى يصبح الخطأ في حجم الصخور التصميمي ضئيلاً جداً.</dd><dt>الحاسبة الأساسية (بدون تكرار)</dt><dd>أدخل قيمة الخشونة المطلوبة، وتجاهل منطقة إدخال حجم الصخور التصميمي.</dd></dl>';
 $ec_lang['mtc_note_2_term']='فحص السرعة';
 $ec_lang['mtc_note_2_def']='السرعة العالية تعني وجود هبوط كبير في المنسوب أدى إلى طاقة نوعية مرتفعة بهذا القدر. يمكن أن تُفقد هذه الطاقة بسرعة عند التوسعات أو الانحناءات أو العوائق. تحقق من أن ذلك معقول لموقع المشروع.';
@@ -370,7 +374,6 @@ $ec_lang['ip_count']='<span class="ec-help" title="صفوف الخطوط الج�
 $ec_lang['ip_length']='L';
 $ec_lang['ip_diameter']='D';
 $ec_lang['ip_roughness']='e';
-$ec_lang['ip_km']='<span class="ec-help" title="معامل فاقد ثانوي عام لتجهيزات هذا القطاع من وصلات وصمامات ومقرنات (الحد الأدنى المقترح ≥0.5)">k<sub>m</sub> <span class="ec-tip">؟</span></span>';
 $ec_lang['ip_elev_ds']='<span class="ec-help" title="منسوب نهاية هذا القطاع من جهة المصب. اختياري في الصفوف الداخلية (الافتراضي: مستوٍ / نفس منسوب العقدة السابقة إذا تُرك فارغاً). مطلوب في الصف الأخير: هذه القيمة هي منسوب آخر قطارة، وهي التي تحدد ضغط الإمداد المطلوب مباشرة.">منسوب المصب <span class="ec-tip">؟</span></span>';
 $ec_lang['ip_elev_ds_missing_warn']='منسوب آخر قطارة (الصف الأخير) تُرك فارغاً وافتُرض مستوياً — أدخله للحصول على نتيجة دقيقة';
 $ec_lang['ip_flow']='التدفق';

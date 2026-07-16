@@ -87,6 +87,10 @@ $ec_lang['dw_main_desc']='Ztráta tlakové výšky v potrubí dle Darcy-Weisbach
 $ec_lang['dw_roughness']='e';
 $ec_lang['dw_roughness_tip']='Absolutní drsnost stěny potrubí, e. Typické hodnoty: ocel (nová) 0,046 mm, ocel (použitá) 0,15 mm, HDPE 0,003 mm, PVC/uPVC 0,0015 mm, beton 0,3–3 mm.';
 $ec_lang['dw_kinematic_viscosity']='<span class="ec-help" title="1×10⁻⁶ m²/s pro čistou vodu při 20°C">Kinematická viskozita, &nu; <span class="ec-tip">?</span></span>';
+$ec_lang['dw_kinematic_viscosity_short']='Kinematická viskozita, &nu;';
+$ec_lang_intent['dw_kinematic_viscosity_short']='';
+$ec_lang['dw_kinematic_viscosity_tip']='1×10⁻⁶ m²/s pro čistou vodu při 20°C';
+$ec_lang_intent['dw_kinematic_viscosity_tip']='';
 $ec_lang['dw_reynolds_number']='Reynoldsovo číslo, Re';
 $ec_lang['dw_flow_regime']='Režim proudění';
 $ec_lang['dw_regime_laminar']='laminární';
@@ -137,7 +141,7 @@ $ec_lang['mpf_main_desc']='Manningova rovnice pro rovnoměrný průtok v potrub�
 $ec_lang['mpf_spreadheet_notice']='Vyzkoušejte tabulkovou verzi tohoto kalkulátoru';
 $ec_lang['mpf_pipe_diameter']='Průměr potrubí, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Manningův součinitel drsnosti, n';
-$ec_lang['mpf_friction_slope']='Třecí sklon (někdy <a target="_blank" href="../frictionslope.php">?</a> roven sklonu potrubí), S<sub>f</sub>';
+$ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Třecí sklon, S<sub>f</sub></a><span class="ec-help" title="Někdy roven sklonu potrubí. Sledujte odkaz pro vysvětlení (pouze v angličtině)."><span class="ec-tip">?</span></span>';
 $ec_lang['mpf_depth_ratio']='Poměrná hloubka plnění, y/d<sub>0</sub>';
 $ec_lang['mpf_see_notes']='(Viz poznámky)';
 $ec_lang['mpf_flow']='Průtok, Q';
@@ -188,7 +192,7 @@ $ec_lang['mtc_side_slope_1']='Sklon svahu 1, z<sub>1</sub> (vodorovně/svisle)';
 $ec_lang['mtc_side_slope_2']='Sklon svahu 2, z<sub>2</sub> (vodorovně/svisle)';
 $ec_lang['mtc_channel_slope']='Sklon koryta, S';
 $ec_lang['mtc_flow_depth']='Hloubka proudění, y';
-$ec_lang['mtc_bend_angle']='Úhel oblouku, β <a target="_blank" href="riprap-bend-angle.png" title="Klikněte pro obrázek">?</a> (pro velikost záhozu)';
+$ec_lang['mtc_bend_angle']='<a target="_blank" href="riprap-bend-angle.png">Úhel oblouku, β</a><span class="ec-help" title="Pro velikost záhozu. Sledujte odkaz pro schéma."><span class="ec-tip">?</span></span>';
 $ec_lang['mtc_sgrock']='<span class="ec-help" title="Typicky &asymp; 2,65 pro lomový kámen">Relativní hustota kamene, sg <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_in']='Návrhová velikost kamene, D<sub>50</sub>';
 $ec_lang['mtc_n_strickler']='n pro návrhovou velikost kamene dle Stricklera';
@@ -202,7 +206,7 @@ $ec_lang['mtc_d50_mra']='Požadovaná velikost lomového kamene, D<sub>50</sub> 
 $ec_lang['mtc_d50_searcy']='Požadovaná velikost lomového kamene, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='Rychlost přiměřená pro předpoklady rovnoměrného proudění.';
 $ec_lang['mtc_vel_low']='Rychlost nízká — riziko sedimentace.';
-$ec_lang['mtc_iteration_tip']='Zvolte přepínač pro drsnost (doporučeno Blodgett–Bathurst) a přepínač pro velikost kamene (doporučeno Isbash), aby se automaticky iterovala rovnoměrná velikost kamene pro požadovaný průtok. Úplný postup najdete v poznámkách níže, nebo zadejte vlastní hodnotu drsnosti a velikost kamene ignorujte, chcete-li iteraci přeskočit.';
+$ec_lang['mtc_iteration_tip']='Zvolte přepínač pro drsnost (doporučeno Blodgett–Bathurst) a přepínač pro velikost kamene (doporučeno Isbash), aby se automaticky iterovala rovnoměrná velikost kamene pro požadovaný průtok. Úplný postup najdete v poznámkách níže, nebo zadejte vlastní hodnotu drsnosti (viz odkaz pro pomoc) a velikost kamene ignorujte, chcete-li iteraci přeskočit.';
 $ec_lang['mtc_note_1']='<dl><dt>Automatická iterace návrhu kamene a drsnosti</dt><dd>Zvolte přepínač pro drsnost (doporučeno Blodgett–Bathurst) a přepínač pro návrhovou velikost kamene (doporučeno Isbash). Dolaďte hloubku a bezpečnostní faktor kamene pro dosažení požadovaného průtoku s rovnoměrnou velikostí kamene. Každá změna vstupní hodnoty spustí iterační cyklus: 1. Drsnost je vypočtena z návrhové velikosti kamene. 2. Požadovaný výpočet drsnosti je zkopírován do vstupní drsnosti. 3. Průtok v korytě a požadovaná velikost kamene jsou vypočteny. 4. Návrhová velikost kamene je upravena. 5. Opakovat dokud chyba v návrhové velikosti kamene není velmi malá.</dd><dt>Základní kalkulátor (bez iterace)</dt><dd>Zadejte požadovanou hodnotu drsnosti. Ignorujte oblast zadávání návrhové velikosti kamene.</dd></dl>';
 $ec_lang['mtc_note_2_term']='Kontrola rychlosti';
 $ec_lang['mtc_note_2_def']='Vysoká rychlost znamená vysokou specifickou energii z dostupného spádu. Tato energie může být rychle ztracena na rozšířeních, obloucích nebo překážkách. Ověřte, zda je to pro danou lokalitu přiměřené.';
@@ -499,7 +503,6 @@ $ec_lang['ip_count']='<span class="ec-help" title="Postranní řady: emitory v t
 $ec_lang['ip_length']='L';
 $ec_lang['ip_diameter']='D';
 $ec_lang['ip_roughness']='e';
-$ec_lang['ip_km']='<span class="ec-help" title="Obecný součinitel místní ztráty pro armatury/ventily/spojky v tomto úseku (&ge;0,5 doporučené minimum)">k<sub>m</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['ip_elev_ds']='<span class="ec-help" title="Nadmořská výška dolního konce úseku. Volitelná v interních řadách (pokud ponecháno prázdné, defaultuje na vodorovně / stejně jako uzel výše). Povinná v poslední řadě: tato hodnota je nadmořská výška posledního emitoru, která přímo určuje požadovaný vstupní tlak.">DS Nadm. výška <span class="ec-tip">?</span></span>';
 $ec_lang['ip_elev_ds_missing_warn']='Nadmořská výška posledního emitoru (poslední řada) byla ponechána prázdná a defaultovala na vodorovně &mdash; zadejte ji pro přesný výsledek';
 $ec_lang['ip_flow']='Průtok';

@@ -88,6 +88,10 @@ $ec_lang['dw_main_desc']='אובדן לחץ בצינור Darcy-Weisbach בקוט
 $ec_lang['dw_roughness']='e';
 $ec_lang['dw_roughness_tip']='גובה חספוס מוחלט, e, של דופן הצינור. ערכים אופייניים: פלדה (חדשה) 0.046 מ״מ, פלדה (משומשת) 0.15 מ״מ, HDPE 0.003 מ״מ, PVC/uPVC 0.0015 מ״מ, בטון 0.3–3 מ״מ.';
 $ec_lang['dw_kinematic_viscosity']='<span class="ec-help" title="1×10⁻⁶ m²/s למים נקיים ב-20°C">צמיגות קינמטית, &nu; <span class="ec-tip">?</span></span>';
+$ec_lang['dw_kinematic_viscosity_short']='צמיגות קינמטית, &nu;';
+$ec_lang_intent['dw_kinematic_viscosity_short']='';
+$ec_lang['dw_kinematic_viscosity_tip']='1×10⁻⁶ m²/s למים נקיים ב-20°C';
+$ec_lang_intent['dw_kinematic_viscosity_tip']='';
 $ec_lang['dw_reynolds_number']='מספר Reynolds, Re';
 $ec_lang['dw_flow_regime']='משטר זרימה';
 $ec_lang['dw_regime_laminar']='למינרי';
@@ -138,7 +142,7 @@ $ec_lang['mpf_main_desc']='זרימה אחידה בצינור לפי נוסחת 
 $ec_lang['mpf_spreadheet_notice']='עיין בגרסת הגיליון האלקטרוני של מחשבון זה';
 $ec_lang['mpf_pipe_diameter']='קוטר הצינור, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='מקדם החספוס של מנינג, n';
-$ec_lang['mpf_friction_slope']='שיפוע חיכוך (לעתים <a target="_blank" href="../frictionslope.php">?</a> שווה לשיפוע הצינור), S<sub>f</sub>';
+$ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">שיפוע חיכוך, S<sub>f</sub></a><span class="ec-help" title="לעתים שווה לשיפוע הצינור. עקוב אחר הקישור להסבר (באנגלית בלבד)."><span class="ec-tip">?</span></span>';
 $ec_lang['mpf_depth_ratio']='עומק זרימה יחסי, y/d<sub>0</sub>';
 $ec_lang['mpf_see_notes']='(ראה הערות)';
 $ec_lang['mpf_flow']='ספיקה, Q';
@@ -189,7 +193,7 @@ $ec_lang['mtc_side_slope_1']='שיפוע צד 1, z<sub>1</sub> (אופקי/אנ�
 $ec_lang['mtc_side_slope_2']= 'שיפוע צד 2, z<sub>2</sub> (אופקי/אנכי)';
 $ec_lang['mtc_channel_slope']='שיפוע התעלה, S';
 $ec_lang['mtc_flow_depth']='עומק הזרימה, y';
-$ec_lang['mtc_bend_angle']='זווית כיפוף, β <a target="_blank" href="riprap-bend-angle.png" title="לחץ לתמונה">?</a> (לממדי שכבת הסלע)';
+$ec_lang['mtc_bend_angle']='<a target="_blank" href="riprap-bend-angle.png">זווית כיפוף, β</a><span class="ec-help" title="לממדי שכבת הסלע. עקוב אחר הקישור לתרשים."><span class="ec-tip">?</span></span>';
 $ec_lang['mtc_sgrock']='<span class="ec-help" title="ערך אופייני ≈ 2.65 עבור סלע מרוסק">משקל סגולי של הסלע, sg <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_in']='גודל סלע העיצוב, D<sub>50</sub>';
 $ec_lang['mtc_n_strickler']='n לגודל סלע העיצוב לפי שיטת Strickler';
@@ -203,7 +207,7 @@ $ec_lang['mtc_d50_mra']='גודל סלע זוויתי נדרש, D<sub>50</sub> (
 $ec_lang['mtc_d50_searcy']='גודל סלע זוויתי נדרש, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='המהירות סבירה בהתאם להנחות הזרימה האחידה.';
 $ec_lang['mtc_vel_low']='מהירות נמוכה; קיים סיכון להשקעת סחף.';
-$ec_lang['mtc_iteration_tip']='בחרו אפשרות גסות (מומלץ Blodgett–Bathurst) ואפשרות גודל סלע (מומלץ Isbash) כדי לבצע איטרציה אוטומטית לגודל סלע אחיד עבור הזרימה הרצויה. ראו הערות למטה לשיטה המלאה, או הזינו ערך גסות משלכם והתעלמו משדה גודל הסלע כדי לדלג על האיטרציה.';
+$ec_lang['mtc_iteration_tip']='בחרו אפשרות גסות (מומלץ Blodgett–Bathurst) ואפשרות גודל סלע (מומלץ Isbash) כדי לבצע איטרציה אוטומטית לגודל סלע אחיד עבור הזרימה הרצויה. ראו הערות למטה לשיטה המלאה, או הזינו ערך גסות משלכם (עקוב אחר הקישור להנחיה) והתעלמו משדה גודל הסלע כדי לדלג על האיטרציה.';
 $ec_lang['mtc_note_1']='<dl><dt>איטרציה אוטומטית לתכנון גודל סלע וגסות</dt><dd>בחר אפשרות גסות (מומלץ Blodgett–Bathurst) ואפשרות גודל סלע עיצוב (מומלץ Isbash). כוונן את העומק ואת מקדם הביטחון של גודל הסלע כדי להגיע לזרימה הרצויה עם גודל סלע אחיד. בכל שינוי של ערך קלט חוזר המחשבון על השלבים הבאים: 1. הגסות מחושבת מתוך גודל סלע העיצוב. 2. הגסות המחושבת מועתקת לשדה הגסות הנקלטת. 3. זרימת התעלה וגודל הסלע הנדרש מחושבים. 4. גודל סלע העיצוב מותאם בהתאם. 5. התהליך חוזר על עצמו עד שהשגיאה בגודל סלע העיצוב קטנה מאוד.</dd><dt>מחשבון בסיסי (ללא איטרציה)</dt><dd>הזן את ערך הגסות הרצוי. התעלם משדה קלט גודל סלע העיצוב.</dd></dl>';
 $ec_lang['mtc_note_2_term']='בדיקת מהירות';
 $ec_lang['mtc_note_2_def']='מהירות גבוהה מעידה על ירידת גובה משמעותית שיצרה אנרגיה סגולית גבוהה כל כך. אנרגיה זו עלולה להתבזבז במהירות במעברי הרחבה, בעקומות או במכשולים. יש לוודא שהדבר סביר עבור האתר.';
@@ -499,7 +503,6 @@ $ec_lang['ip_count']='<span class="ec-help" title="שורות שלוחה: המט
 $ec_lang['ip_length']='L';
 $ec_lang['ip_diameter']='D';
 $ec_lang['ip_roughness']='e';
-$ec_lang['ip_km']='<span class="ec-help" title="מקדם הפסד מקומי כללי לאביזרים/מגופים/מחברים של קטע זה (מינימום מומלץ &ge;0.5)">k<sub>m</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['ip_elev_ds']='<span class="ec-help" title="רום קצה מורד הזרם של קטע זה. אופציונלי בשורות פנימיות (אם נשאר ריק, ברירת המחדל אופקי / זהה לצומת שמעליו). חובה בשורה האחרונה: ערך זה הוא רום המטפטף האחרון, הקובע ישירות את לחץ האספקה הנדרש.">רום מורד <span class="ec-tip">?</span></span>';
 $ec_lang['ip_elev_ds_missing_warn']='רום המטפטף האחרון (שורה אחרונה) נשאר ריק וברירת המחדל הוגדרה כאופקי &mdash; הזינו אותו לקבלת תוצאה מדויקת';
 $ec_lang['ip_flow']='ספיקה';

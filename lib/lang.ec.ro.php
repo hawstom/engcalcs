@@ -86,6 +86,10 @@ $ec_lang['dw_main_desc']='Pierdere de Sarcină Conductă Darcy-Weisbach la Diame
 $ec_lang['dw_roughness']='e';
 $ec_lang['dw_roughness_tip']='Înălțimea de rugozitate absolută, e, a peretelui conductei. Valori tipice: oțel (nou) 0,046 mm, oțel (uzat) 0,15 mm, HDPE 0,003 mm, PVC/uPVC 0,0015 mm, beton 0,3–3 mm.';
 $ec_lang['dw_kinematic_viscosity']='<span class="ec-help" title="1×10⁻⁶ m²/s pentru apă curată la 20°C">Vâscozitate cinematică, &nu; <span class="ec-tip">?</span></span>';
+$ec_lang['dw_kinematic_viscosity_short']='Vâscozitate cinematică, &nu;';
+$ec_lang_intent['dw_kinematic_viscosity_short']='';
+$ec_lang['dw_kinematic_viscosity_tip']='1×10⁻⁶ m²/s pentru apă curată la 20°C';
+$ec_lang_intent['dw_kinematic_viscosity_tip']='';
 $ec_lang['dw_reynolds_number']='Numărul Reynolds, Re';
 $ec_lang['dw_flow_regime']='Regimul de curgere';
 $ec_lang['dw_regime_laminar']='laminar';
@@ -136,7 +140,7 @@ $ec_lang['mpf_main_desc']='Formula Manning Curgere Uniformă în Conductă la Pa
 $ec_lang['mpf_spreadheet_notice']='Consultați versiunea de calcul tabelar a acestui calculator';
 $ec_lang['mpf_pipe_diameter']='Diametrul conductei, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Coeficientul de rugozitate Manning, n';
-$ec_lang['mpf_friction_slope']='Panta de frecare (uneori <a target="_blank" href="../frictionslope.php">?</a> egală cu panta conductei), S<sub>f</sub>';
+$ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Panta de frecare, S<sub>f</sub></a><span class="ec-help" title="Uneori egală cu panta conductei. Urmați linkul pentru explicație (doar în engleză)."><span class="ec-tip">?</span></span>';
 $ec_lang['mpf_depth_ratio']='Adâncime relativă de curgere, y/d<sub>0</sub>';
 $ec_lang['mpf_see_notes']='(Consultați notele)';
 $ec_lang['mpf_flow']='Debit, Q';
@@ -187,7 +191,7 @@ $ec_lang['mtc_side_slope_1']='Taluz 1, z<sub>1</sub> (orizontal/vertical)';
 $ec_lang['mtc_side_slope_2']='Taluz 2, z<sub>2</sub> (orizontal/vertical)';
 $ec_lang['mtc_channel_slope']='Panta canalului, S';
 $ec_lang['mtc_flow_depth']='Adâncimea de curgere, y';
-$ec_lang['mtc_bend_angle']='Unghi de curbă, β <a target="_blank" href="riprap-bend-angle.png" title="Faceți clic pentru imagine">?</a> (pentru dimensionarea anrocamentului)';
+$ec_lang['mtc_bend_angle']='<a target="_blank" href="riprap-bend-angle.png">Unghi de curbă, β</a><span class="ec-help" title="Pentru dimensionarea anrocamentului. Urmați linkul pentru schemă."><span class="ec-tip">?</span></span>';
 $ec_lang['mtc_sgrock']='<span class="ec-help" title="Valoare tipică &asymp; 2,65 pentru rocă concasată">Densitatea relativă a rocii, sg <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_in']='Dimensiunea de proiectare a rocii, D<sub>50</sub>';
 $ec_lang['mtc_n_strickler']='n pentru dimensiunea de proiectare a rocii conform Strickler';
@@ -201,7 +205,7 @@ $ec_lang['mtc_d50_mra']='Dimensiunea necesară a rocii unghiulare, D<sub>50</sub
 $ec_lang['mtc_d50_searcy']='Dimensiunea necesară a rocii unghiulare, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='Viteză rezonabilă pentru ipotezele de curgere uniformă.';
 $ec_lang['mtc_vel_low']='Viteză mică — risc de sedimentare.';
-$ec_lang['mtc_iteration_tip']='Alegeți o opțiune de rugozitate (Blodgett–Bathurst recomandat) și o opțiune de dimensiune a rocii (Isbash recomandat) pentru a itera automat către o dimensiune uniformă a rocii pentru debitul dorit. Vedeți Notele de mai jos pentru metoda completă, sau introduceți propria valoare de rugozitate și ignorați dimensiunea rocii pentru a evita iterația.';
+$ec_lang['mtc_iteration_tip']='Alegeți o opțiune de rugozitate (Blodgett–Bathurst recomandat) și o opțiune de dimensiune a rocii (Isbash recomandat) pentru a itera automat către o dimensiune uniformă a rocii pentru debitul dorit. Vedeți Notele de mai jos pentru metoda completă, sau introduceți propria valoare de rugozitate (urmați linkul pentru îndrumări) și ignorați dimensiunea rocii pentru a evita iterația.';
 $ec_lang['mtc_note_1']='<dl><dt>Iterație automată de dimensionare a rocii și rugozității</dt><dd>Alegeți o opțiune de rugozitate (Blodgett–Bathurst recomandat) și o opțiune de dimensiune de proiectare a rocii (Isbash recomandat). Ajustați adâncimea și factorul de siguranță al dimensiunii rocii pentru a atinge debitul dorit cu o dimensiune uniformă a rocii. De fiecare dată când modificați o valoare de intrare, calculatorul repetă acești pași: 1. Rugozitatea este calculată din dimensiunea de proiectare a rocii. 2. Calculul rugozității solicitate este copiat în rugozitatea de intrare. 3. Debitul canalului și dimensiunea necesară a rocii sunt calculate. 4. Dimensiunea de proiectare a rocii este ajustată. 5. Repetați până când eroarea din dimensiunea de proiectare a rocii este foarte mică.</dd><dt>Calculator de bază (fără iterație)</dt><dd>Introduceți valoarea dorită de rugozitate. Ignorați zona de intrare a dimensiunii de proiectare a rocii.</dd></dl>';
 $ec_lang['mtc_note_2_term']='Verificare viteză';
 $ec_lang['mtc_note_2_def']='Viteza mare indică faptul că a existat o cădere de nivel mare, care a generat o energie specifică atât de ridicată. Acea energie se poate pierde rapid la lărgiri, curbe sau obstacole. Verificați dacă acest lucru este rezonabil pentru amplasament.';
@@ -499,7 +503,6 @@ $ec_lang['ip_count']='<span class="ec-help" title="Rânduri laterale: emițător
 $ec_lang['ip_length']='L';
 $ec_lang['ip_diameter']='D';
 $ec_lang['ip_roughness']='e';
-$ec_lang['ip_km']='<span class="ec-help" title="Coeficient generic de pierdere locală pentru fitingurile/valvele/cuplajele acestui tronson (&ge;0,5 minim sugerat)">k<sub>m</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['ip_elev_ds']='<span class="ec-help" title="Cota capătului aval al acestui tronson. Opțional pe rândurile interioare (implicit plat / la fel ca nodul de deasupra dacă se lasă gol). Necesară pe rândul final: acea valoare este cota ultimului emițător, care stabilește direct presiunea de alimentare necesară.">Cota Aval <span class="ec-tip">?</span></span>';
 $ec_lang['ip_elev_ds_missing_warn']='Cota ultimului emițător (rândul final) a fost lăsată goală și s-a setat implicit la plat &mdash; introduceți-o pentru un rezultat exact';
 $ec_lang['ip_flow']='Debit';

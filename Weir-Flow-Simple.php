@@ -16,7 +16,7 @@ echoCalculatorForm(
 	Array(
 		Array('name' => 'l', 'type' => 'number', 'default' => '1', 'units' => NULL, 'label' => $ec_lang['ws_weirLength']),
 		Array('name' => 'h', 'type' => 'number', 'default' => '1', 'units' => NULL, 'label' => $ec_lang['ws_headWaterHeight']),
-		Array('name' => 'cw', 'type' => 'number', 'default' => '3', 'units' => NULL, 'label' => $ec_lang['ws_weirCoefficient'].'<a target="_blank" href="http://epg.modot.org/files/b/bc/749_Broad-Crested_Weir_Coefficients.pdf">?</a>'),
+		Array('name' => 'cw', 'type' => 'number', 'default' => '3', 'units' => NULL, 'label' => '<a target="_blank" href="http://epg.modot.org/files/b/bc/749_Broad-Crested_Weir_Coefficients.pdf">'.$ec_lang['ws_weirCoefficient'].'</a>'),
 	),
 	//Results
 	Array(

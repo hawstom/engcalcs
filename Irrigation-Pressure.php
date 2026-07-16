@@ -20,7 +20,7 @@ echoCalculatorForm(
 		Array('name' => 'h_design',        'type' => 'number', 'default' => '6',    'units' => Array('mh2o', 'mmh2o', 'kpa', 'fth2o', 'inh2o', 'psi'), 'label' => $ec_lang['ip_h_design']),
 		Array('name' => 'x',               'type' => 'number', 'default' => '0.5',  'units' => NULL,                                                    'label' => $ec_lang['ip_x']),
 		Array('name' => 'dp_avg',          'type' => 'number', 'default' => '0',    'units' => Array('mh2o', 'mmh2o', 'kpa', 'fth2o', 'inh2o', 'psi'), 'label' => $ec_lang['ip_dp_avg']),
-		Array('name' => 'visc',            'type' => 'number', 'default' => '1e-6', 'units' => NULL,                                                    'label' => '<a target="_blank" href="https://www.engineersedge.com/fluid_flow/kinematic-viscosity-table.htm">'.$ec_lang['dw_kinematic_viscosity'].'</a>'),
+		Array('name' => 'visc',            'type' => 'number', 'default' => '1e-6', 'units' => NULL,                                                    'label' => '<a target="_blank" href="https://www.engineersedge.com/fluid_flow/kinematic-viscosity-table.htm">'.$ec_lang['dw_kinematic_viscosity_short'].'</a><span class="ec-help" title="'.htmlspecialchars(strip_tags($ec_lang['dw_kinematic_viscosity_tip'])).'"><span class="ec-tip">?</span></span>'),
 		Array('name' => 'se',              'type' => 'number', 'default' => '0.5',  'units' => Array('m', 'mm', 'ft', 'in'),                            'label' => $ec_lang['ip_se']),
 		Array('name' => 'sl',              'type' => 'number', 'default' => '0.5',  'units' => Array('m', 'mm', 'ft', 'in'),                            'label' => $ec_lang['ip_sl']),
 		Array('name' => 'n_e',             'type' => 'number', 'default' => '10',   'units' => NULL,                                                    'label' => $ec_lang['ip_n_e']),
@@ -80,7 +80,7 @@ function echoCalculatorFormAppend() {
 					<?php echoUnitSelect($name = 'roughnessu', $units = Array('mm', 'in', 'm', 'ft'), $indent_string); ?>
 				</th>
 				<th>
-					<a target="_blank" href="https://www.engineeringtoolbox.com/minor-loss-coefficients-pipes-d_626.html"><?=$ec_lang['ip_km']?></a>
+					<a target="_blank" href="https://www.engineeringtoolbox.com/minor-loss-coefficients-pipes-d_626.html"><?=$ec_lang['mphl_total_junction_k_short']?></a><span class="ec-help" title="<?=htmlspecialchars(strip_tags($ec_lang['mphl_total_junction_k_tip']))?>"><span class="ec-tip">?</span></span>
 				</th>
 				<th>
 					<?=$ec_lang['ip_elev_ds']?><br />

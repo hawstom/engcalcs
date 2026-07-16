@@ -88,6 +88,10 @@ $ec_lang['dw_main_desc']='افت هد لوله Darcy-Weisbach برای قطر، 
 $ec_lang['dw_roughness']='e';
 $ec_lang['dw_roughness_tip']='ارتفاع زبری مطلق، e، جداره لوله. مقادیر معمول: فولاد (نو) 0.046 میلی‌متر، فولاد (کارکرده) 0.15 میلی‌متر، HDPE 0.003 میلی‌متر، PVC/uPVC 0.0015 میلی‌متر، بتن 0.3–3 میلی‌متر.';
 $ec_lang['dw_kinematic_viscosity']='<span class="ec-help" title="1×10⁻⁶ m²/s برای آب تمیز در 20°C">ویسکوزیته سینماتیک، &nu; <span class="ec-tip">?</span></span>';
+$ec_lang['dw_kinematic_viscosity_short']='ویسکوزیته سینماتیک، &nu;';
+$ec_lang_intent['dw_kinematic_viscosity_short']='';
+$ec_lang['dw_kinematic_viscosity_tip']='1×10⁻⁶ m²/s برای آب تمیز در 20°C';
+$ec_lang_intent['dw_kinematic_viscosity_tip']='';
 $ec_lang['dw_reynolds_number']='عدد رینولدز، Re';
 $ec_lang['dw_flow_regime']='رژیم جریان';
 $ec_lang['dw_regime_laminar']='آرام';
@@ -138,7 +142,7 @@ $ec_lang['mpf_main_desc']='جریان یکنواخت لوله با فرمول Ma
 $ec_lang['mpf_spreadheet_notice']='نسخه صفحه‌گسترده این ماشین‌حساب را ببینید';
 $ec_lang['mpf_pipe_diameter']='قطر لوله، d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='ضریب زبری Manning، n';
-$ec_lang['mpf_friction_slope']='شیب اصطکاک (گاهی <a target="_blank" href="../frictionslope.php">?</a> برابر شیب لوله)، S<sub>f</sub>';
+$ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">شیب اصطکاک، S<sub>f</sub></a><span class="ec-help" title="گاهی برابر شیب لوله. برای توضیحات روی پیوند کلیک کنید (فقط به انگلیسی)."><span class="ec-tip">?</span></span>';
 $ec_lang['mpf_depth_ratio']='نسبت عمق جریان، y/d<sub>0</sub>';
 $ec_lang['mpf_see_notes']='(به یادداشت‌ها مراجعه کنید)';
 $ec_lang['mpf_flow']='دبی، Q';
@@ -189,7 +193,7 @@ $ec_lang['mtc_side_slope_1']='شیب جانبی ۱، z<sub>1</sub> (افقی/ع�
 $ec_lang['mtc_side_slope_2']='شیب جانبی ۲، z<sub>2</sub> (افقی/عمودی)';
 $ec_lang['mtc_channel_slope']='شیب کانال، S';
 $ec_lang['mtc_flow_depth']='عمق جریان، y';
-$ec_lang['mtc_bend_angle']='زاویه خمش، β <a target="_blank" href="riprap-bend-angle.png" title="برای مشاهده تصویر کلیک کنید">?</a> (برای تعیین اندازه ریپ‌رپ)';
+$ec_lang['mtc_bend_angle']='<a target="_blank" href="riprap-bend-angle.png">زاویه خمش، β</a><span class="ec-help" title="برای تعیین اندازه ریپ‌رپ. برای مشاهده نمودار روی پیوند کلیک کنید."><span class="ec-tip">?</span></span>';
 $ec_lang['mtc_sgrock']='<span class="ec-help" title="معمولاً &asymp; ۲.۶۵ برای سنگ خردشده">وزن مخصوص نسبی سنگ، sg <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_in']='اندازه طراحی سنگ، D<sub>50</sub>';
 $ec_lang['mtc_n_strickler']='n برای اندازه طراحی سنگ (روش Strickler)';
@@ -203,7 +207,7 @@ $ec_lang['mtc_d50_mra']='اندازه سنگ زاویه‌دار مورد نیا
 $ec_lang['mtc_d50_searcy']='اندازه سنگ زاویه‌دار مورد نیاز، D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='سرعت برای فرض‌های جریان یکنواخت مناسب است.';
 $ec_lang['mtc_vel_low']='سرعت پایین است؛ خطر رسوب‌گذاری وجود دارد.';
-$ec_lang['mtc_iteration_tip']='یک گزینه زبری (روش Blodgett–Bathurst توصیه می‌شود) و یک گزینه اندازه سنگ (روش Isbash توصیه می‌شود) انتخاب کنید تا به‌طور خودکار به یک اندازه سنگ یکنواخت متناسب با دبی هدف شما تکرار شود. برای روش کامل به یادداشت‌های زیر مراجعه کنید، یا برای رد شدن از تکرار، مقدار زبری دلخواه خود را وارد کرده و اندازه سنگ را نادیده بگیرید.';
+$ec_lang['mtc_iteration_tip']='یک گزینه زبری (روش Blodgett–Bathurst توصیه می‌شود) و یک گزینه اندازه سنگ (روش Isbash توصیه می‌شود) انتخاب کنید تا به‌طور خودکار به یک اندازه سنگ یکنواخت متناسب با دبی هدف شما تکرار شود. برای روش کامل به یادداشت‌های زیر مراجعه کنید، یا برای رد شدن از تکرار، مقدار زبری دلخواه خود را (برای راهنمایی روی پیوند کلیک کنید) وارد کرده و اندازه سنگ را نادیده بگیرید.';
 $ec_lang['mtc_note_1']='<dl><dt>تکرار خودکار طراحی زبری و اندازه سنگ</dt><dd>یک گزینه زبری (روش Blodgett–Bathurst توصیه می‌شود) و یک گزینه اندازه طراحی سنگ (روش Isbash توصیه می‌شود) انتخاب کنید. عمق و ضریب ایمنی اندازه سنگ را تنظیم کنید تا با یک اندازه سنگ یکنواخت به دبی هدف خود برسید. هر بار که یک مقدار ورودی را تغییر می‌دهید، ماشین‌حساب این مراحل را تکرار می‌کند: ۱. زبری از روی اندازه طراحی سنگ محاسبه می‌شود. ۲. مقدار زبری محاسبه‌شده در فیلد زبری ورودی کپی می‌شود. ۳. جریان کانال و اندازه سنگ مورد نیاز محاسبه می‌شود. ۴. اندازه طراحی سنگ تنظیم می‌شود. ۵. این چرخه تا زمانی که خطای اندازه طراحی سنگ بسیار کوچک شود تکرار می‌گردد.</dd><dt>ماشین‌حساب پایه (بدون تکرار)</dt><dd>مقدار زبری دلخواه خود را وارد کنید و ناحیه ورودی اندازه طراحی سنگ را نادیده بگیرید.</dd></dl>';
 $ec_lang['mtc_note_2_term']='بررسی سرعت';
 $ec_lang['mtc_note_2_def']='سرعت بالا نشان‌دهنده افت ارتفاع زیادی است که چنین انرژی مخصوص بالایی ایجاد کرده است. این انرژی می‌تواند به‌سرعت در گسترش‌ها، خم‌ها یا موانع از بین برود. بررسی کنید که این وضعیت برای محل مورد نظر معقول است.';
@@ -500,7 +504,6 @@ $ec_lang['ip_count']='<span class="ec-help" title="ردیف‌های جانبی:
 $ec_lang['ip_length']='L';
 $ec_lang['ip_diameter']='D';
 $ec_lang['ip_roughness']='e';
-$ec_lang['ip_km']='<span class="ec-help" title="ضریب عام تلفات موضعی برای اتصالات/شیرها/کوپلرهای این بخش (حداقل پیشنهادی ≥0.5)">k<sub>m</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['ip_elev_ds']='<span class="ec-help" title="تراز انتهای پایین‌دست این بخش. در ردیف‌های میانی اختیاری است (در صورت خالی گذاشتن، به‌طور پیش‌فرض صاف / برابر با گره بالادست فرض می‌شود). در ردیف آخر الزامی است: این مقدار تراز آخرین قطره‌چکان است که مستقیماً فشار تامین موردنیاز را تعیین می‌کند.">تراز پایین‌دست <span class="ec-tip">?</span></span>';
 $ec_lang['ip_elev_ds_missing_warn']='تراز آخرین قطره‌چکان (ردیف آخر) خالی گذاشته شد و به‌طور پیش‌فرض صاف در نظر گرفته شد — برای نتیجه دقیق آن را وارد کنید';
 $ec_lang['ip_flow']='جریان';

@@ -87,6 +87,10 @@ $ec_lang['dw_main_desc']='Kehilangan Tinggi Tekan Pipa Darcy-Weisbach pada Diame
 $ec_lang['dw_roughness']='e';
 $ec_lang['dw_roughness_tip']='Tinggi kekasaran absolut, e, dari dinding pipa. Nilai tipikal: baja (baru) 0,046 mm, baja (bekas pakai) 0,15 mm, HDPE 0,003 mm, PVC/uPVC 0,0015 mm, beton 0,3–3 mm.';
 $ec_lang['dw_kinematic_viscosity']='<span class="ec-help" title="1×10⁻⁶ m²/s untuk air bersih pada 20°C">Viskositas kinematik, &nu; <span class="ec-tip">?</span></span>';
+$ec_lang['dw_kinematic_viscosity_short']='Viskositas kinematik, &nu;';
+$ec_lang_intent['dw_kinematic_viscosity_short']='';
+$ec_lang['dw_kinematic_viscosity_tip']='1×10⁻⁶ m²/s untuk air bersih pada 20°C';
+$ec_lang_intent['dw_kinematic_viscosity_tip']='';
 $ec_lang['dw_reynolds_number']='Bilangan Reynolds, Re';
 $ec_lang['dw_flow_regime']='Rezim aliran';
 $ec_lang['dw_regime_laminar']='laminar';
@@ -137,7 +141,7 @@ $ec_lang['mpf_main_desc']='Rumus Manning untuk Aliran Pipa Seragam pada Kemiring
 $ec_lang['mpf_spreadheet_notice']='Coba versi spreadsheet dari kalkulator ini';
 $ec_lang['mpf_pipe_diameter']='Diameter pipa, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Koefisien kekasaran Manning, n';
-$ec_lang['mpf_friction_slope']='Kemiringan gesekan (terkadang <a target="_blank" href="../frictionslope.php">?</a> sama dengan kemiringan pipa), S<sub>f</sub>';
+$ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Kemiringan gesekan, S<sub>f</sub></a><span class="ec-help" title="Terkadang sama dengan kemiringan pipa. Ikuti tautan untuk penjelasan (hanya dalam bahasa Inggris)."><span class="ec-tip">?</span></span>';
 $ec_lang['mpf_depth_ratio']='Kedalaman aliran relatif, y/d<sub>0</sub>';
 $ec_lang['mpf_see_notes']='(Lihat catatan)';
 $ec_lang['mpf_flow']='Debit, Q';
@@ -188,7 +192,7 @@ $ec_lang['mtc_side_slope_1']='Kemiringan tebing 1, z<sub>1</sub> (horiz./vert.)'
 $ec_lang['mtc_side_slope_2']='Kemiringan tebing 2, z<sub>2</sub> (horiz./vert.)';
 $ec_lang['mtc_channel_slope']='Kemiringan saluran, S';
 $ec_lang['mtc_flow_depth']='Kedalaman aliran, y';
-$ec_lang['mtc_bend_angle']='Sudut belokan, β <a target="_blank" href="riprap-bend-angle.png" title="Klik untuk gambar">?</a> (untuk ukuran lapisan batu)';
+$ec_lang['mtc_bend_angle']='<a target="_blank" href="riprap-bend-angle.png">Sudut belokan, β</a><span class="ec-help" title="Untuk ukuran lapisan batu. Ikuti tautan untuk diagram."><span class="ec-tip">?</span></span>';
 $ec_lang['mtc_sgrock']='<span class="ec-help" title="Umumnya &asymp; 2,65 untuk batu pecah">Berat jenis batu, sg <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_in']='Ukuran batu rencana, D<sub>50</sub>';
 $ec_lang['mtc_n_strickler']='n untuk ukuran batu rencana menurut Strickler';
@@ -202,7 +206,7 @@ $ec_lang['mtc_d50_mra']='Ukuran batu sudut yang dibutuhkan, D<sub>50</sub> (Mayn
 $ec_lang['mtc_d50_searcy']='Ukuran batu sudut yang dibutuhkan, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='Kecepatan wajar untuk asumsi aliran seragam.';
 $ec_lang['mtc_vel_low']='Kecepatan rendah — risiko sedimentasi.';
-$ec_lang['mtc_iteration_tip']='Pilih opsi kekasaran (Blodgett–Bathurst direkomendasikan) dan opsi ukuran batu (Isbash direkomendasikan) untuk melakukan iterasi otomatis menuju ukuran batu seragam sesuai debit target Anda. Lihat Catatan di bawah untuk metode lengkapnya, atau masukkan nilai kekasaran Anda sendiri dan abaikan ukuran batu untuk melewati iterasi.';
+$ec_lang['mtc_iteration_tip']='Pilih opsi kekasaran (Blodgett–Bathurst direkomendasikan) dan opsi ukuran batu (Isbash direkomendasikan) untuk melakukan iterasi otomatis menuju ukuran batu seragam sesuai debit target Anda. Lihat Catatan di bawah untuk metode lengkapnya, atau masukkan nilai kekasaran Anda sendiri (ikuti tautan untuk panduan) dan abaikan ukuran batu untuk melewati iterasi.';
 $ec_lang['mtc_note_1']='<dl><dt>Iterasi otomatis ukuran batu dan kekasaran</dt><dd>Pilih opsi kekasaran (Blodgett–Bathurst direkomendasikan) dan opsi ukuran batu rencana (Isbash direkomendasikan). Sesuaikan kedalaman dan faktor keamanan ukuran batu untuk mendapatkan debit yang diinginkan dengan ukuran batu yang seragam. Setiap kali Anda mengubah nilai masukan, siklus iterasi berikut terjadi: 1. Kekasaran dihitung dari ukuran batu rencana. 2. Perhitungan kekasaran yang diminta disalin ke kekasaran masukan. 3. Debit saluran dan ukuran batu yang diperlukan dihitung. 4. Ukuran batu rencana disesuaikan. 5. Ulangi hingga galat pada ukuran batu rencana sangat kecil.</dd><dt>Kalkulator dasar (tanpa iterasi)</dt><dd>Masukkan nilai kekasaran yang Anda inginkan. Abaikan area masukan ukuran batu rencana.</dd></dl>';
 $ec_lang['mtc_note_2_term']='Pemeriksaan kecepatan';
 $ec_lang['mtc_note_2_def']='Kecepatan tinggi mengimplikasikan energi spesifik tinggi dari beda tinggi yang tersedia. Energi tersebut dapat hilang dengan cepat pada ekspansi, belokan, atau hambatan. Verifikasi bahwa ini wajar untuk kondisi lapangan.';
@@ -500,7 +504,6 @@ $ec_lang['ip_count']='<span class="ec-help" title="Baris lateral: emiter pada se
 $ec_lang['ip_length']='L';
 $ec_lang['ip_diameter']='D';
 $ec_lang['ip_roughness']='e';
-$ec_lang['ip_km']='<span class="ec-help" title="Koefisien kehilangan lokal umum untuk fiting/katup/kopler segmen ini (disarankan minimum ≥0.5)">k<sub>m</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['ip_elev_ds']='<span class="ec-help" title="Elevasi ujung hilir segmen ini. Opsional pada baris tengah (default datar / sama dengan simpul di atasnya jika dikosongkan). Wajib pada baris terakhir: nilai tersebut adalah elevasi emiter terakhir, yang secara langsung menentukan tekanan pasokan yang diperlukan.">Elev. Hilir <span class="ec-tip">?</span></span>';
 $ec_lang['ip_elev_ds_missing_warn']='Elevasi emiter terakhir (baris terakhir) dibiarkan kosong dan menggunakan default datar — masukkan nilainya untuk hasil yang akurat';
 $ec_lang['ip_flow']='Debit';

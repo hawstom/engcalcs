@@ -91,6 +91,10 @@ $ec_lang['dw_main_desc']='Pérdida de carga en tubería a partir del diámetro, 
 $ec_lang['dw_roughness']='e';
 $ec_lang['dw_roughness_tip']='Altura de rugosidad absoluta, e, de la pared de la tubería. Valores típicos: acero (nuevo) 0,046 mm, acero (usado) 0,15 mm, HDPE 0,003 mm, PVC/uPVC 0,0015 mm, concreto 0,3–3 mm.';
 $ec_lang['dw_kinematic_viscosity']='<span class="ec-help" title="1×10⁻⁶ m²/s para agua limpia a 20°C">Viscosidad cinemática, &nu; <span class="ec-tip">?</span></span>';
+$ec_lang['dw_kinematic_viscosity_short']='Viscosidad cinemática, &nu;';
+$ec_lang_intent['dw_kinematic_viscosity_short']='';
+$ec_lang['dw_kinematic_viscosity_tip']='1×10⁻⁶ m²/s para agua limpia a 20°C';
+$ec_lang_intent['dw_kinematic_viscosity_tip']='';
 $ec_lang['dw_reynolds_number']='Número de Reynolds, Re';
 $ec_lang['dw_flow_regime']='Régimen de flujo';
 $ec_lang['dw_regime_laminar']='laminar';
@@ -141,7 +145,7 @@ $ec_lang['mpf_main_desc']='Caudal y velocidad de flujo uniforme en tuberías seg
 $ec_lang['mpf_spreadheet_notice']='Pruebe la versión de esta calculadora en hoja de cálculo';
 $ec_lang['mpf_pipe_diameter']='Diámetro de la tubería, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Coeficiente de rugosidad de Manning, n';
-$ec_lang['mpf_friction_slope']='Pendiente de fricción (a veces <a target="_blank" href="../frictionslope.php">?</a> igual a la pendiente de la tubería), S<sub>f</sub>';
+$ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Pendiente de fricción, S<sub>f</sub></a><span class="ec-help" title="A veces igual a la pendiente de la tubería. Siga el enlace para la explicación (solo en inglés)."><span class="ec-tip">?</span></span>';
 $ec_lang['mpf_depth_ratio']='Relación de calados, y/d<sub>0</sub>';
 $ec_lang['mpf_see_notes']='(Véanse las notas)';
 $ec_lang['mpf_flow']='Caudal, Q';
@@ -192,7 +196,7 @@ $ec_lang['mtc_side_slope_1']='Pendiente de lado 1, z<sub>1</sub> (horiz./vert.)'
 $ec_lang['mtc_side_slope_2']='Pendiente de lado 2, z<sub>2</sub> (horiz./vert.)';
 $ec_lang['mtc_channel_slope']='Pendiente del canal, S';
 $ec_lang['mtc_flow_depth']='Calado de la lámina de agua, y';
-$ec_lang['mtc_bend_angle']='Ángulo de la curva, β <a target="_blank" href="riprap-bend-angle.png" title="Haga clic para ver imagen">?</a> (para el tamaño de roca)';
+$ec_lang['mtc_bend_angle']='<a target="_blank" href="riprap-bend-angle.png">Ángulo de la curva, β</a><span class="ec-help" title="Para el tamaño de roca. Siga el enlace para ver el diagrama."><span class="ec-tip">?</span></span>';
 $ec_lang['mtc_sgrock']='<span class="ec-help" title="Típicamente &asymp; 2.65 para roca triturada">Gravedad específica de la roca, sg <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_in']='Tamaño de roca de diseño, D<sub>50</sub>';
 $ec_lang['mtc_n_strickler']='n para el tamaño de roca de diseño según Strickler';
@@ -206,7 +210,7 @@ $ec_lang['mtc_d50_mra']='Tamaño de roca angular requerido, D<sub>50</sub>, seg�
 $ec_lang['mtc_d50_searcy']='Tamaño de roca angular requerido, D<sub>50</sub>, según Searcy (1967)';
 $ec_lang['mtc_vel_ok']='Velocidad razonable para supuestos de flujo uniforme.';
 $ec_lang['mtc_vel_low']='Velocidad baja — riesgo de sedimentación.';
-$ec_lang['mtc_iteration_tip']='Elija una opción de rugosidad (se recomienda Blodgett–Bathurst) y una opción de tamaño de roca (se recomienda Isbash) para iterar automáticamente hacia un tamaño de roca uniforme para su caudal objetivo. Vea las Notas más abajo para el método completo, o ingrese su propio valor de rugosidad e ignore el tamaño de roca para omitir la iteración.';
+$ec_lang['mtc_iteration_tip']='Elija una opción de rugosidad (se recomienda Blodgett–Bathurst) y una opción de tamaño de roca (se recomienda Isbash) para iterar automáticamente hacia un tamaño de roca uniforme para su caudal objetivo. Vea las Notas más abajo para el método completo, o ingrese su propio valor de rugosidad (siga el enlace para más orientación) e ignore el tamaño de roca para omitir la iteración.';
 $ec_lang['mtc_note_1']='<dl><dt>Iteración automática para diseño de tamaño y rugosidad de roca</dt><dd>Elija una opción de rugosidad (se recomienda Blodgett–Bathurst) y una opción para el tamaño de roca de diseño (se recomienda Isbash). Ajuste la profundidad y el factor de seguridad del tamaño de roca para obtener el caudal deseado con un tamaño de roca uniforme. Cada vez que cambie cualquier valor de entrada, ocurre el siguiente ciclo de iteración: 1. Se calcula la rugosidad a partir del tamaño de roca de diseño. 2. El cálculo de rugosidad solicitado se copia al campo de rugosidad. 3. Se calculan el caudal del canal y el tamaño de roca requerido. 4. Se ajusta el tamaño de roca de diseño. 5. Se repite hasta que el error en el tamaño de roca de diseño sea muy pequeño.</dd><dt>Calculadora básica (sin iteración)</dt><dd>Ingrese el valor de rugosidad deseado. Ignore el área de entrada del tamaño de roca de diseño.</dd></dl>';
 $ec_lang['mtc_note_2_term']='Verificación de velocidad';
 $ec_lang['mtc_note_2_def']='La velocidad elevada implica que hubo una caída de elevación considerable que generó una energía específica tan alta. Esa energía puede disiparse rápidamente en expansiones, curvas u obstrucciones. Verifique que esto sea razonable para el sitio.';
@@ -501,7 +505,6 @@ $ec_lang['ip_count']='<span class="ec-help" title="Filas de laterales: emisores 
 $ec_lang['ip_length']='L';
 $ec_lang['ip_diameter']='D';
 $ec_lang['ip_roughness']='e';
-$ec_lang['ip_km']='<span class="ec-help" title="Coeficiente genérico de pérdida menor para los accesorios/válvulas/acoples de este tramo (≥0,5 mínimo sugerido)">k<sub>m</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['ip_elev_ds']='<span class="ec-help" title="Elevación aguas abajo del tramo. Opcional en filas interiores (por defecto plano / igual que el nodo anterior si se deja en blanco). Requerido en la última fila: ese valor es la elevación del último emisor, que directamente establece la presión de suministro requerida.">Elev. abajo <span class="ec-tip">?</span></span>';
 $ec_lang['ip_elev_ds_missing_warn']='Elevación del último emisor (última fila) se dejó en blanco y se asumió como plana — ingrese su valor para un resultado preciso';
 $ec_lang['ip_flow']='Caudal';

@@ -87,6 +87,10 @@ $ec_lang['dw_main_desc']='Rohrreibungsverlust nach Darcy-Weisbach bei gegebenem 
 $ec_lang['dw_roughness']='e';
 $ec_lang['dw_roughness_tip']='Absolute Rauheitshöhe, e, der Rohrwand. Typische Werte: Stahl (neu) 0,046 mm, Stahl (gebraucht) 0,15 mm, HDPE 0,003 mm, PVC/uPVC 0,0015 mm, Beton 0,3–3 mm.';
 $ec_lang['dw_kinematic_viscosity']='<span class="ec-help" title="1×10⁻⁶ m²/s für sauberes Wasser bei 20°C">Kinematische Viskosität, &nu; <span class="ec-tip">?</span></span>';
+$ec_lang['dw_kinematic_viscosity_short']='Kinematische Viskosität, &nu;';
+$ec_lang_intent['dw_kinematic_viscosity_short']='';
+$ec_lang['dw_kinematic_viscosity_tip']='1×10⁻⁶ m²/s für sauberes Wasser bei 20°C';
+$ec_lang_intent['dw_kinematic_viscosity_tip']='';
 $ec_lang['dw_reynolds_number']='Reynolds-Zahl, Re';
 $ec_lang['dw_flow_regime']='Strömungsregime';
 $ec_lang['dw_regime_laminar']='laminar';
@@ -137,7 +141,7 @@ $ec_lang['mpf_main_desc']='Manning-Formel für gleichförmigen Rohrdurchfluss be
 $ec_lang['mpf_spreadheet_notice']='Probieren Sie die Tabellenversion dieses Rechners aus';
 $ec_lang['mpf_pipe_diameter']='Rohrdurchmesser, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Manning-Rauheitskoeffizient, n';
-$ec_lang['mpf_friction_slope']='Reibungsgefälle (mitunter <a target="_blank" href="../frictionslope.php">?</a> gleich dem Rohrgefälle), S<sub>f</sub>';
+$ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Reibungsgefälle, S<sub>f</sub></a><span class="ec-help" title="Mitunter gleich dem Rohrgefälle. Dem Link für die Erklärung folgen (nur auf Englisch)."><span class="ec-tip">?</span></span>';
 $ec_lang['mpf_depth_ratio']='Relative Füllhöhe, y/d<sub>0</sub>';
 $ec_lang['mpf_see_notes']='(Siehe Hinweise)';
 $ec_lang['mpf_flow']='Durchfluss, Q';
@@ -188,7 +192,7 @@ $ec_lang['mtc_side_slope_1']='Böschung 1, z<sub>1</sub> (horiz./vert.)';
 $ec_lang['mtc_side_slope_2']='Böschung 2, z<sub>2</sub> (horiz./vert.)';
 $ec_lang['mtc_channel_slope']='Kanalgefälle, S';
 $ec_lang['mtc_flow_depth']='Fließtiefe, y';
-$ec_lang['mtc_bend_angle']='Kurvenwinkel, β <a target="_blank" href="riprap-bend-angle.png" title="Klicken für Bild">?</a> (für Deckwerksbemessung)';
+$ec_lang['mtc_bend_angle']='<a target="_blank" href="riprap-bend-angle.png">Kurvenwinkel, β</a><span class="ec-help" title="Für Deckwerksbemessung. Dem Link für die Skizze folgen."><span class="ec-tip">?</span></span>';
 $ec_lang['mtc_sgrock']='<span class="ec-help" title="Typisch &asymp; 2,65 für Schotter">Relative Dichte des Steins, sg <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_in']='Bemessungskorngröße, D<sub>50</sub>';
 $ec_lang['mtc_n_strickler']='n für Bemessungskorngröße nach Strickler';
@@ -202,7 +206,7 @@ $ec_lang['mtc_d50_mra']='Erforderliche Körnung kantenreicher Steine, D<sub>50</
 $ec_lang['mtc_d50_searcy']='Erforderliche Körnung kantenreicher Steine, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='Geschwindigkeit plausibel für Gleichströmungsannahmen.';
 $ec_lang['mtc_vel_low']='Geschwindigkeit niedrig – Sedimentationsrisiko.';
-$ec_lang['mtc_iteration_tip']='Wählen Sie eine Rauheitsoption (Blodgett–Bathurst empfohlen) und eine Option für die Korngröße (Isbash empfohlen), um automatisch auf eine gleichmäßige Korngröße für Ihren Zieldurchfluss zu iterieren. Die vollständige Methode finden Sie unten in den Hinweisen, oder geben Sie Ihren eigenen Rauheitswert ein und ignorieren Sie die Korngröße, um die Iteration zu überspringen.';
+$ec_lang['mtc_iteration_tip']='Wählen Sie eine Rauheitsoption (Blodgett–Bathurst empfohlen) und eine Option für die Korngröße (Isbash empfohlen), um automatisch auf eine gleichmäßige Korngröße für Ihren Zieldurchfluss zu iterieren. Die vollständige Methode finden Sie unten in den Hinweisen, oder geben Sie Ihren eigenen Rauheitswert ein (dem Link für Hinweise folgen) und ignorieren Sie die Korngröße, um die Iteration zu überspringen.';
 $ec_lang['mtc_note_1']='<dl><dt>Automatische Iteration Steinbemessung und Rauheit</dt><dd>Wählen Sie einen Rauheits-Radioknopf (Blodgett–Bathurst empfohlen) und einen Radioknopf für die Bemessungskorngröße (Isbash empfohlen). Stellen Sie Tiefe und Steinbemessungsfaktor ein, um den gewünschten Durchfluss mit einer gleichmäßigen Korngröße zu erzielen. Bei jeder Änderung eines Eingabewerts startet der Iterationszyklus: 1. Die Rauheit wird aus der Bemessungskorngröße berechnet. 2. Der berechnete Rauheitswert wird in die Eingaberauheit kopiert. 3. Kanaldurchfluss und erforderliche Korngröße werden berechnet. 4. Die Bemessungskorngröße wird angepasst. 5. Wiederholen bis der Fehler sehr klein ist.</dd><dt>Grundrechner (ohne Iteration)</dt><dd>Geben Sie den gewünschten Rauheitswert ein. Ignorieren Sie den Eingabebereich für die Bemessungskorngröße.</dd></dl>';
 $ec_lang['mtc_note_2_term']='Geschwindigkeitsprüfung';
 $ec_lang['mtc_note_2_def']='Hohe Geschwindigkeit impliziert hohe spezifische Energie aus einem verfügbaren Absturz. Diese Energie kann schnell an Aufweitungen, Bögen oder Hindernissen abgebaut werden. Prüfen Sie, ob dies für den Standort plausibel ist.';
@@ -368,7 +372,6 @@ $ec_lang['ip_count']='<span class="ec-help" title="Lateral-Zeilen: nur die Emitt
 $ec_lang['ip_length']='L';
 $ec_lang['ip_diameter']='D';
 $ec_lang['ip_roughness']='e';
-$ec_lang['ip_km']='<span class="ec-help" title="Allgemeiner Einzelverlust-Beiwert für Armaturen, Ventile und Kupplungen dieser Strecke (empfohlener Mindestwert ≥0,5)">k<sub>m</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['ip_elev_ds']='<span class="ec-help" title="Höhe am unterstromigen Ende dieser Strecke. Optional bei inneren Zeilen (Standard: eben / gleich wie der Knoten darüber, falls leer gelassen). Erforderlich in der letzten Zeile: dieser Wert ist die Höhe des letzten Emitters, der direkt den erforderlichen Versorgungsdruck bestimmt.">US Höhe <span class="ec-tip">?</span></span>';
 $ec_lang['ip_elev_ds_missing_warn']='Höhe des letzten Emitters (letzte Zeile) wurde leer gelassen und standardmäßig auf eben gesetzt — für ein genaues Ergebnis bitte eingeben';
 $ec_lang['ip_flow']='Durchfluss';

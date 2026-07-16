@@ -88,6 +88,10 @@ $ec_lang['dw_main_desc']='Verilen Çap, Pürüzlülük ve Akış için Darcy-Wei
 $ec_lang['dw_roughness']='e';
 $ec_lang['dw_roughness_tip']='Boru cidarının mutlak pürüzlülük yüksekliği, e. Tipik değerler: çelik (yeni) 0,046 mm, çelik (kullanılmış) 0,15 mm, HDPE 0,003 mm, PVC/uPVC 0,0015 mm, beton 0,3–3 mm.';
 $ec_lang['dw_kinematic_viscosity']='<span class="ec-help" title="Temiz su için 20°C\'de 1×10⁻⁶ m²/s">Kinematik viskozite, &nu; <span class="ec-tip">?</span></span>';
+$ec_lang['dw_kinematic_viscosity_short']='Kinematik viskozite, &nu;';
+$ec_lang_intent['dw_kinematic_viscosity_short']='';
+$ec_lang['dw_kinematic_viscosity_tip']='Temiz su için 20°C\'de 1×10⁻⁶ m²/s';
+$ec_lang_intent['dw_kinematic_viscosity_tip']='';
 $ec_lang['dw_reynolds_number']='Reynolds sayısı, Re';
 $ec_lang['dw_flow_regime']='Akış rejimi';
 $ec_lang['dw_regime_laminar']='laminer';
@@ -138,7 +142,7 @@ $ec_lang['mpf_main_desc']="Belirli Eğim ve Derinlikte Manning Formülü ile Dü
 $ec_lang['mpf_spreadheet_notice']='Bu hesaplayıcının elektronik tablo sürümüne göz atın';
 $ec_lang['mpf_pipe_diameter']="Boru çapı, d<sub>0</sub>";
 $ec_lang['mpf_manningRoughness']='Manning pürüzlülük katsayısı, n';
-$ec_lang['mpf_friction_slope']='Sürtünme eğimi (bazen <a target="_blank" href="../frictionslope.php">?</a> boru eğimine eşit), S<sub>f</sub>';
+$ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Sürtünme eğimi, S<sub>f</sub></a><span class="ec-help" title="Bazen boru eğimine eşit. Açıklama için bağlantıyı izleyin (yalnızca İngilizce)."><span class="ec-tip">?</span></span>';
 $ec_lang['mpf_depth_ratio']='Göreli akış derinliği, y/d<sub>0</sub>';
 $ec_lang['mpf_see_notes']='(Notlara bakın)';
 $ec_lang['mpf_flow']='Debi, Q';
@@ -189,7 +193,7 @@ $ec_lang['mtc_side_slope_1']='Yan Eğim 1, z<sub>1</sub> (yatay / dikey)';
 $ec_lang['mtc_side_slope_2']='Yan Eğim 2, z<sub>2</sub> (yatay / dikey)';
 $ec_lang['mtc_channel_slope']='Kanal Eğimi, S';
 $ec_lang['mtc_flow_depth']='Akış Derinliği, y';
-$ec_lang['mtc_bend_angle']='Kurp Açısı, β<a target="_blank" href="riprap-bend-angle.png" title="Görsel için tıklayın">?</a> (taş dolgu boyutlandırması için)';
+$ec_lang['mtc_bend_angle']='<a target="_blank" href="riprap-bend-angle.png">Kurp Açısı, β</a><span class="ec-help" title="Taş dolgu boyutlandırması için. Şema için bağlantıyı izleyin."><span class="ec-tip">?</span></span>';
 $ec_lang['mtc_sgrock']='<span class="ec-help" title="Kırma taş için tipik &asymp; 2.65">Taşın özgül ağırlığı, sg <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_in']='Tasarım taş boyutu, D<sub>50</sub>';
 $ec_lang['mtc_n_strickler']='Tasarım taş boyutu için n (Strickler\'e göre)';
@@ -203,7 +207,7 @@ $ec_lang['mtc_d50_mra']='Gerekli köşeli taş boyutu, D<sub>50</sub> (Maynord, 
 $ec_lang['mtc_d50_searcy']='Gerekli köşeli taş boyutu, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='Hız, düzgün akış varsayımları için makul.';
 $ec_lang['mtc_vel_low']='Hız düşük — çökelme riski.';
-$ec_lang['mtc_iteration_tip']='Hedef akışınız için düzgün bir taş boyutuna otomatik olarak yaklaşmak üzere bir pürüzlülük seçeneği (Blodgett–Bathurst önerilir) ve bir taş boyutu seçeneği (Isbash önerilir) seçin. Tam yöntem için aşağıdaki Notlar bölümüne bakın veya döngüyü atlamak için kendi pürüzlülük değerinizi girip taş boyutunu yoksayın.';
+$ec_lang['mtc_iteration_tip']='Hedef akışınız için düzgün bir taş boyutuna otomatik olarak yaklaşmak üzere bir pürüzlülük seçeneği (Blodgett–Bathurst önerilir) ve bir taş boyutu seçeneği (Isbash önerilir) seçin. Tam yöntem için aşağıdaki Notlar bölümüne bakın veya döngüyü atlamak için kendi pürüzlülük değerinizi (rehberlik için bağlantıyı izleyin) girip taş boyutunu yoksayın.';
 $ec_lang['mtc_note_1']='<dl><dt>Otomatik taş boyutu ve pürüzlülük tasarım döngüsü</dt><dd>Bir pürüzlülük seçeneği (Blodgett–Bathurst önerilir) ve bir tasarım taş boyutu seçeneği (Isbash önerilir) seçin. İstenen akışı düzgün bir taş boyutuyla elde etmek için derinliği ve taş boyutu güvenlik faktörünü ince ayarlayın. Her giriş değeri değiştiğinde şu döngü gerçekleşir: 1. Pürüzlülük, tasarım taş boyutundan hesaplanır. 2. İstenen pürüzlülük hesabı giriş pürüzlülüğüne kopyalanır. 3. Kanal akışı ve gerekli taş boyutu hesaplanır. 4. Tasarım taş boyutu ayarlanır. 5. Tasarım taş boyutundaki hata çok küçük olana kadar tekrarlanır.</dd><dt>Temel hesaplayıcı (döngü yok)</dt><dd>İstediğiniz pürüzlülük değerini girin. Tasarım taş boyutu giriş alanını yoksayın.</dd></dl>';
 $ec_lang['mtc_note_2_term']='Hız kontrolü';
 $ec_lang['mtc_note_2_def']='Yüksek hız, bu denli yüksek özgül enerji yaratan büyük bir kot düşüşü olduğunu gösterir. Bu enerji, genişlemelerde, dirseklerde veya engellerde hızla kaybolabilir. Bunun saha için makul olduğunu doğrulayın.';
@@ -501,7 +505,6 @@ $ec_lang['ip_count']='<span class="ec-help" title="Lateral satırları: bu hatta
 $ec_lang['ip_length']='L';
 $ec_lang['ip_diameter']='D';
 $ec_lang['ip_roughness']='e';
-$ec_lang['ip_km']='<span class="ec-help" title="Bu hattaki tertibatlar/valflar/bağlantılar için jenerik ikincil kayıp katsayısı (≥0,5 önerilen minimum)">k<sub>m</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['ip_elev_ds']='<span class="ec-help" title="Bu hattın mansap uç kotu. İç satırlarda isteğe bağlı (boş bırakılırsa düz olarak varsayılır / yukarıdaki düğümle aynı). Son satırda gerekli: bu değer son damlatıcının kotudur, doğrudan gerekli beslenme basıncını belirler.">MS Kot. <span class="ec-tip">?</span></span>';
 $ec_lang['ip_elev_ds_missing_warn']='Son damlatıcı kotu (son satır) boş bırakıldı ve düz olarak varsayıldı — doğru sonuç için girin';
 $ec_lang['ip_flow']='Debi';

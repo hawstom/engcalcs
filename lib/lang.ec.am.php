@@ -88,6 +88,10 @@ $ec_lang['dw_main_desc']='Darcy-Weisbach የቧንቧ ጭንቅ ኪሳራ በተ
 $ec_lang['dw_roughness']='e';
 $ec_lang['dw_roughness_tip']='የቧንቧ ግድግዳ ፍጹም ሻካራነት ቁመት፣ e። የተለመዱ ዋጋዎች፦ ብረት (አዲስ) 0.046 ሚሜ፣ ብረት (የተጠቀመ) 0.15 ሚሜ፣ HDPE 0.003 ሚሜ፣ PVC/uPVC 0.0015 ሚሜ፣ ኮንክሪት 0.3–3 ሚሜ።';
 $ec_lang['dw_kinematic_viscosity']='<span class="ec-help" title="1×10⁻⁶ m²/s ለንጹህ ውሃ በ20°C">ኪኔማቲክ ቪስኮሲቲ, &nu; <span class="ec-tip">?</span></span>';
+$ec_lang['dw_kinematic_viscosity_short']='ኪኔማቲክ ቪስኮሲቲ, &nu;';
+$ec_lang_intent['dw_kinematic_viscosity_short']='';
+$ec_lang['dw_kinematic_viscosity_tip']='1×10⁻⁶ m²/s ለንጹህ ውሃ በ20°C';
+$ec_lang_intent['dw_kinematic_viscosity_tip']='';
 $ec_lang['dw_reynolds_number']='ሬይኖልዶስ ቁጥር, Re';
 $ec_lang['dw_flow_regime']='የፍሰት አገዛዝ';
 $ec_lang['dw_regime_laminar']='ላሚናር';
@@ -138,7 +142,7 @@ $ec_lang['mpf_main_desc']='Manning ቀመር ወጥ የቧንቧ ፍሰት በ�
 $ec_lang['mpf_spreadheet_notice']='የዚህ ካልኩሌተር ስፕሬድሺት እትሙን ይመልከቱ';
 $ec_lang['mpf_pipe_diameter']='የቧንቧ ዲያሜትር, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='የማኒንግ ሻካርነት, n';
-$ec_lang['mpf_friction_slope']='የፍሪክሽን ቁልቁለት (አንዳንዴ <a target="_blank" href="../frictionslope.php">?</a> ከቧንቧ ቁልቁለት ጋር እኩል), S<sub>f</sub>';
+$ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">የፍሪክሽን ቁልቁለት, S<sub>f</sub></a><span class="ec-help" title="አንዳንዴ ከቧንቧ ቁልቁለት ጋር እኩል። ማብራሪያ ለማግኘት አገናኙን ይከተሉ (በእንግሊዝኛ ብቻ)።"><span class="ec-tip">?</span></span>';
 $ec_lang['mpf_depth_ratio']='አንጻራዊ የፍሰት ጥልቀት, y/d<sub>0</sub>';
 $ec_lang['mpf_see_notes']='(ማስታወሻዎችን ይመልከቱ)';
 $ec_lang['mpf_flow']='ፍሰት, Q';
@@ -189,7 +193,7 @@ $ec_lang['mtc_side_slope_1']='የጎን ቁልቁለት 1, z<sub>1</sub> (አግ
 $ec_lang['mtc_side_slope_2']='የጎን ቁልቁለት 2, z<sub>2</sub> (አግድም/ቁመት)';
 $ec_lang['mtc_channel_slope']='የቦይ ቁልቁለት, S';
 $ec_lang['mtc_flow_depth']='የፍሰት ጥልቀት, y';
-$ec_lang['mtc_bend_angle']='የጥምዝ ማዕዘን, β <a target="_blank" href="riprap-bend-angle.png" title="ምስሉን ለማየት ጠቅ አድርግ">?</a> (ለ ድንጋይ ሽፋን ስሌት)';
+$ec_lang['mtc_bend_angle']='<a target="_blank" href="riprap-bend-angle.png">የጥምዝ ማዕዘን, β</a><span class="ec-help" title="ለ ድንጋይ ሽፋን ስሌት። ንድፍ ለማግኘት አገናኙን ይከተሉ።"><span class="ec-tip">?</span></span>';
 $ec_lang['mtc_sgrock']='<span class="ec-help" title="በተለምዶ &asymp; 2.65 ለተፈጨ ድንጋይ">የድንጋይ ልዩ ስበት, sg <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_in']='የንድፍ የድንጋይ መጠን, D<sub>50</sub>';
 $ec_lang['mtc_n_strickler']='n ለ Strickler ዘዴ ንድፍ የድንጋይ መጠን';
@@ -203,7 +207,7 @@ $ec_lang['mtc_d50_mra']='የሚፈለግ ማዕዘናዊ የድንጋይ መጠ�
 $ec_lang['mtc_d50_searcy']='የሚፈለግ ማዕዘናዊ የድንጋይ መጠን, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='ፍጥነቱ ለወጥ ፍሰት ግምቶች ምክንያታዊ ነው።';
 $ec_lang['mtc_vel_low']='ፍጥነቱ ዝቅ ያለ ነው - የደለል አደጋ አለ።';
-$ec_lang['mtc_iteration_tip']='የሻካሪነት አማራጭ (Blodgett–Bathurst ይመከራል) እና የድንጋይ መጠን አማራጭ (Isbash ይመከራል) ይምረጡ፣ ለታለመው ፍሰት ወጥ የድንጋይ መጠን በራስ-ሰር ለማስላት። ሙሉ ዘዴውን ለማየት ከታች ያሉትን ማስታወሻዎች ይመልከቱ፣ ወይም የራስዎን የሻካሪነት ዋጋ በማስገባት የድንጋይ መጠንን ችላ ብለው ድግግሞሽን ይዝለሉ።';
+$ec_lang['mtc_iteration_tip']='የሻካሪነት አማራጭ (Blodgett–Bathurst ይመከራል) እና የድንጋይ መጠን አማራጭ (Isbash ይመከራል) ይምረጡ፣ ለታለመው ፍሰት ወጥ የድንጋይ መጠን በራስ-ሰር ለማስላት። ሙሉ ዘዴውን ለማየት ከታች ያሉትን ማስታወሻዎች ይመልከቱ፣ ወይም የራስዎን የሻካሪነት ዋጋ (መመሪያ ለማግኘት አገናኙን ይመልከቱ) በማስገባት የድንጋይ መጠንን ችላ ብለው ድግግሞሽን ይዝለሉ።';
 $ec_lang['mtc_note_1']='<dl><dt>አውቶማቲክ የድንጋይ መጠን እና ሻካሪነት ንድፍ ድግግሞሽ</dt><dd>የሻካሪነት አማራጭ (Blodgett–Bathurst ይመከራል) እና የንድፍ የድንጋይ መጠን አማራጭ (Isbash ይመከራል) ይምረጡ። የሚፈለገውን ፍሰት በወጥ የድንጋይ መጠን ለማግኘት ጥልቀቱን እና የድንጋይ መጠን የደህንነት ሁኔታን ያስተካክሉ። ማንኛውንም ግቤት በቀየሩ ቁጥር ካልኩሌተሩ እነዚህን ደረጃዎች ይደግማል፦ 1. ሻካሪነት ከንድፍ የድንጋይ መጠን ይሰላል። 2. የተሰላው ሻካሪነት ወደ ግቤት ሻካሪነት ይገለበጣል። 3. የቦይ ፍሰት እና የሚፈለግ የድንጋይ መጠን ይሰላሉ። 4. የንድፍ የድንጋይ መጠን ይስተካከላል። 5. በንድፍ የድንጋይ መጠን ስህተት እጅግ አነስተኛ እስኪሆን ድረስ ይደገማል።</dd><dt>መሠረታዊ ካልኩሌተር (ያለ ድግግሞሽ)</dt><dd>የሚፈልጉትን የሻካሪነት ዋጋ ያስገቡ። የንድፍ የድንጋይ መጠን ግቤት ቦታን ችላ ይበሉ።</dd></dl>';
 $ec_lang['mtc_note_2_term']='የፍጥነት ምርመራ';
 $ec_lang['mtc_note_2_def']='ከፍተኛ ፍጥነት ከሚገኝ ቁልቁለት ከፍተኛ ልዩ ሃይልን ያሳያል። ያ ሃይል በስፋፊዎች፣ ጥምዞች ወይም እንቅፋቶች ላይ በፍጥነት ሊጠፋ ይችላል። ይህ ለቦታው ምክንያታዊ መሆኑን ያረጋግጡ።';
@@ -499,7 +503,6 @@ $ec_lang['ip_count']='<span class="ec-help" title="የላተራል ረድፎች:
 $ec_lang['ip_length']='L';
 $ec_lang['ip_diameter']='D';
 $ec_lang['ip_roughness']='e';
-$ec_lang['ip_km']='<span class="ec-help" title="ለዚህ ክፍል መገጣጠሚያዎች/ቫልቮች/ማያያዣዎች አጠቃላይ የአካባቢ ኪሳራ መጠን (&ge;0.5 የሚመከር ዝቅተኛ)">k<sub>m</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['ip_elev_ds']='<span class="ec-help" title="የዚህ ክፍል የታችኛው ጫፍ ከፍታ። ለውስጣዊ ረድፎች አማራጭ ነው (ባዶ ከተተወ ጠፍጣፋ / ከላይኛው ነጥብ ጋር እኩል ይወሰዳል)። ለመጨረሻው ረድፍ ግዴታ ነው: ያ እሴት የመጨረሻው ኤሚተር ከፍታ ነው፣ የሚያስፈልገውን የአቅርቦት ግፊት በቀጥታ ይወስናል።">የታች ከፍታ <span class="ec-tip">?</span></span>';
 $ec_lang['ip_elev_ds_missing_warn']='የመጨረሻው ኤሚተር ከፍታ (የመጨረሻ ረድፍ) ባዶ ተትቶ ወደ ጠፍጣፋ ነባሪ ሆኗል &mdash; ትክክለኛ ውጤት ለማግኘት ያስገቡት';
 $ec_lang['ip_flow']='ፍሰት';

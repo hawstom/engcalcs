@@ -87,6 +87,10 @@ $ec_lang['dw_main_desc']='在给定管径、粗糙度和流量条件下的达西
 $ec_lang['dw_roughness']='e';
 $ec_lang['dw_roughness_tip']='管壁的绝对粗糙度高度 e。典型值：钢管（新）0.046 mm，钢管（旧）0.15 mm，HDPE 0.003 mm，PVC/uPVC 0.0015 mm，混凝土 0.3–3 mm。';
 $ec_lang['dw_kinematic_viscosity']='<span class="ec-help" title="20°C清水的运动粘度约为1×10⁻⁶ m²/s">运动粘度，&nu; <span class="ec-tip">?</span></span>';
+$ec_lang['dw_kinematic_viscosity_short']='运动粘度，&nu;';
+$ec_lang_intent['dw_kinematic_viscosity_short']='';
+$ec_lang['dw_kinematic_viscosity_tip']='20°C清水的运动粘度约为1×10⁻⁶ m²/s';
+$ec_lang_intent['dw_kinematic_viscosity_tip']='';
 $ec_lang['dw_reynolds_number']='雷诺数，Re';
 $ec_lang['dw_flow_regime']='流态';
 $ec_lang['dw_regime_laminar']='层流';
@@ -137,7 +141,7 @@ $ec_lang['mpf_main_desc']='在给定坡度和水深条件下的曼宁公式均�
 $ec_lang['mpf_spreadheet_notice']='试用本计算器的电子表格版本';
 $ec_lang['mpf_pipe_diameter']='管径，d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='曼宁糙率系数，n';
-$ec_lang['mpf_friction_slope']='摩擦坡度（有时 <a target="_blank" href="../frictionslope.php">?</a> 等于管道坡度），S<sub>f</sub>';
+$ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">摩擦坡度，S<sub>f</sub></a><span class="ec-help" title="有时等于管道坡度。点击链接查看说明（仅英文）。"><span class="ec-tip">?</span></span>';
 $ec_lang['mpf_depth_ratio']='相对水深，y/d<sub>0</sub>';
 $ec_lang['mpf_see_notes']='（参见注释）';
 $ec_lang['mpf_flow']='流量，Q';
@@ -188,7 +192,7 @@ $ec_lang['mtc_side_slope_1']='边坡 1，z<sub>1</sub>（水平/垂直）';
 $ec_lang['mtc_side_slope_2']='边坡 2，z<sub>2</sub>（水平/垂直）';
 $ec_lang['mtc_channel_slope']='渠道坡度，S';
 $ec_lang['mtc_flow_depth']='水深，y';
-$ec_lang['mtc_bend_angle']='弯道角度，β <a target="_blank" href="riprap-bend-angle.png" title="点击查看图片">?</a>（用于护坡粒径设计）';
+$ec_lang['mtc_bend_angle']='<a target="_blank" href="riprap-bend-angle.png">弯道角度，β</a><span class="ec-help" title="用于护坡粒径设计。点击链接查看示意图。"><span class="ec-tip">?</span></span>';
 $ec_lang['mtc_sgrock']='<span class="ec-help" title="碎石典型值 &asymp; 2.65">石材比重，sg <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_in']='设计石材粒径，D<sub>50</sub>';
 $ec_lang['mtc_n_strickler']='设计石材粒径对应的 n 值（Strickler 法）';
@@ -202,7 +206,7 @@ $ec_lang['mtc_d50_mra']='所需棱角石材粒径，D<sub>50</sub>（Maynord、R
 $ec_lang['mtc_d50_searcy']='所需棱角石材粒径，D<sub>50</sub>（Searcy，1967）';
 $ec_lang['mtc_vel_ok']='流速符合均匀流假设，属合理范围。';
 $ec_lang['mtc_vel_low']='流速偏低，存在泥沙淤积风险。';
-$ec_lang['mtc_iteration_tip']='选择糙率计算方法（推荐 Blodgett–Bathurst 法）和石材粒径计算方法（推荐 Isbash 法），即可自动迭代求出满足目标流量的统一石材粒径。完整方法见下方注释；也可直接输入自定义糙率值并忽略石材粒径，以跳过迭代。';
+$ec_lang['mtc_iteration_tip']='选择糙率计算方法（推荐 Blodgett–Bathurst 法）和石材粒径计算方法（推荐 Isbash 法），即可自动迭代求出满足目标流量的统一石材粒径。完整方法见下方注释；也可直接输入自定义糙率值（点击链接查看指南）并忽略石材粒径，以跳过迭代。';
 $ec_lang['mtc_note_1']='<dl><dt>石材粒径与糙率自动迭代设计</dt><dd>选择糙率计算方法（推荐 Blodgett–Bathurst 法）和设计石材粒径方法（推荐 Isbash 法）。调整水深和石材粒径安全系数，以在统一石材粒径下达到目标流量。每次修改输入值时，计算器都会重复以下步骤：1. 由设计石材粒径计算糙率。2. 将所求糙率复制到输入糙率。3. 计算渠道流量和所需石材粒径。4. 调整设计石材粒径。5. 重复上述步骤，直至设计石材粒径的误差极小。</dd><dt>基础计算器（不迭代）</dt><dd>直接输入所需的糙率值，忽略设计石材粒径输入区域。</dd></dl>';
 $ec_lang['mtc_note_2_term']='流速校核';
 $ec_lang['mtc_note_2_def']='流速过高说明存在较大的高程落差，从而产生了较高的比能。该能量可能在扩散段、弯道或障碍物处迅速耗散。请核实这在现场条件下是否合理。';
@@ -498,7 +502,6 @@ $ec_lang['ip_count']='<span class="ec-help" title="毛管行：仅指该管段�
 $ec_lang['ip_length']='L';
 $ec_lang['ip_diameter']='D';
 $ec_lang['ip_roughness']='e';
-$ec_lang['ip_km']='<span class="ec-help" title="该管段管件/阀门/接头的通用局部损失系数（建议最小值&ge;0.5）">k<sub>m</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['ip_elev_ds']='<span class="ec-help" title="该管段下游端的高程。中间行可选（留空则默认为平坡，即与上方节点相同）。最后一行为必填项：该值即为最后滴头的高程，直接决定所需供水压力。">下游高程 <span class="ec-tip">?</span></span>';
 $ec_lang['ip_elev_ds_missing_warn']='最后滴头高程（最后一行）留空，已默认为平坡——请输入该值以获得准确结果';
 $ec_lang['ip_flow']='流量';

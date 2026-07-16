@@ -88,6 +88,10 @@ $ec_lang['dw_main_desc']='Darcy-Weisbach د پایپ سر ضیاع د ورکړل
 $ec_lang['dw_roughness']='e';
 $ec_lang['dw_roughness_tip']='د پایپ دیوال مطلق خشونت لوړوالی، e. عادي ارزښتونه: فولاد (نوی) 0.046 mm، فولاد (کارول شوی) 0.15 mm، HDPE 0.003 mm، PVC/uPVC 0.0015 mm، کانکریټ 0.3–3 mm.';
 $ec_lang['dw_kinematic_viscosity']='<span class="ec-help" title="د پاکو اوبو لپاره 1×10⁻⁶ m²/s په 20°C کې">د حرکتي ویسکوزیته، &nu; <span class="ec-tip">?</span></span>';
+$ec_lang['dw_kinematic_viscosity_short']='د حرکتي ویسکوزیته، &nu;';
+$ec_lang_intent['dw_kinematic_viscosity_short']='';
+$ec_lang['dw_kinematic_viscosity_tip']='د پاکو اوبو لپاره 1×10⁻⁶ m²/s په 20°C کې';
+$ec_lang_intent['dw_kinematic_viscosity_tip']='';
 $ec_lang['dw_reynolds_number']='د Reynolds عدد، Re';
 $ec_lang['dw_flow_regime']='د بهاو رژیم';
 $ec_lang['dw_regime_laminar']='لامینار';
@@ -138,7 +142,7 @@ $ec_lang['mpf_main_desc']='د Manning فارمول یکسان د پایپ بها
 $ec_lang['mpf_spreadheet_notice']='د دې محاسبې د سپریډشیټ نسخه وګورئ';
 $ec_lang['mpf_pipe_diameter']='د پایپ قطر، d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='د مانینګ خشونت، n';
-$ec_lang['mpf_friction_slope']='د اصطکاک میل (کله ناکله <a target="_blank" href="../frictionslope.php">?</a> د پایپ میل سره مساوي)، S<sub>f</sub>';
+$ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">د اصطکاک میل، S<sub>f</sub></a><span class="ec-help" title="کله ناکله د پایپ میل سره مساوي. د توضیح لپاره لینک تعقیب کړئ (یوازې په انګلیسي)."><span class="ec-tip">?</span></span>';
 $ec_lang['mpf_depth_ratio']='د بهاو نسبي ژوروالی، y/d<sub>0</sub>';
 $ec_lang['mpf_see_notes']='(یادداشتونه وګورئ)';
 $ec_lang['mpf_flow']='بهاو، Q';
@@ -189,7 +193,7 @@ $ec_lang['mtc_side_slope_1']='د اړخ میل ۱، z<sub>1</sub> (افقي/عم
 $ec_lang['mtc_side_slope_2']='د اړخ میل ۲، z<sub>2</sub> (افقي/عمودي)';
 $ec_lang['mtc_channel_slope']='د چینل میل، S';
 $ec_lang['mtc_flow_depth']='د بهاو ژوروالی، y';
-$ec_lang['mtc_bend_angle']='د ګوډ زاویه، β <a target="_blank" href="riprap-bend-angle.png" title="د انځور لپاره کلیک وکړئ">?</a> (د ریپراپ اندازه کولو لپاره)';
+$ec_lang['mtc_bend_angle']='<a target="_blank" href="riprap-bend-angle.png">د ګوډ زاویه، β</a><span class="ec-help" title="د ریپراپ اندازه کولو لپاره. د نقشې لپاره لینک تعقیب کړئ."><span class="ec-tip">?</span></span>';
 $ec_lang['mtc_sgrock']='<span class="ec-help" title="د ماتو شویو کاڼو لپاره معمولا &asymp; 2.65">د کاڼو ځانګړی ثقل، sg <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_in']='د ډیزاین کاڼو اندازه، D<sub>50</sub>';
 $ec_lang['mtc_n_strickler']='د Strickler له مخې د ډیزاین کاڼو اندازې لپاره n';
@@ -203,7 +207,7 @@ $ec_lang['mtc_d50_mra']='اړین زاویه لرونکي کاڼو اندازه�
 $ec_lang['mtc_d50_searcy']='اړین زاویه لرونکي کاڼو اندازه، D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='سرعت د یکنواخت بهاو فرضیو لپاره معقول دی.';
 $ec_lang['mtc_vel_low']='سرعت ټیټ دی — د رسوب خطر.';
-$ec_lang['mtc_iteration_tip']='یو د خشونت اختیار (Blodgett–Bathurst وړاندیز کیږي) او د کاڼو اندازې اختیار (Isbash وړاندیز کیږي) غوره کړئ ترڅو ستاسو د غوښتل شوي بهاو لپاره مساوي کاڼو اندازې ته اتوماتیک تکرار وشي. د بشپړ میتود لپاره لاندې یادښتونه وګورئ، یا خپل خشونت ارزښت داخل کړئ او د کاڼو اندازې ساحه له پامه غورځوئ ترڅو تکرار پرېږدئ.';
+$ec_lang['mtc_iteration_tip']='یو د خشونت اختیار (Blodgett–Bathurst وړاندیز کیږي) او د کاڼو اندازې اختیار (Isbash وړاندیز کیږي) غوره کړئ ترڅو ستاسو د غوښتل شوي بهاو لپاره مساوي کاڼو اندازې ته اتوماتیک تکرار وشي. د بشپړ میتود لپاره لاندې یادښتونه وګورئ، یا خپل خشونت ارزښت (د لارښود لپاره لینک وګورئ) داخل کړئ او د کاڼو اندازې ساحه له پامه غورځوئ ترڅو تکرار پرېږدئ.';
 $ec_lang['mtc_note_1']='<dl><dt>د کاڼو اندازه او خشونت ډیزاین اتوماتیک تکرار</dt><dd>یو د خشونت اختیار (Blodgett–Bathurst وړاندیز کیږي) او د ډیزاین کاڼو اندازې اختیار (Isbash وړاندیز کیږي) غوره کړئ. ژوروالی او د کاڼو اندازې امنیتي فاکتور سم کړئ ترڅو خپل غوښتل شوي بهاو د مساوي کاڼو اندازې سره ترلاسه کړئ. هر ځل چې تاسو کوم داخلي ارزښت بدل کړئ، لاندینی تکرار دور پیښیږي: ۱. خشونت د ډیزاین کاڼو اندازې له مخې محاسبه کیږي. ۲. غوښتل شوي خشونت محاسبه د داخلي خشونت ته کاپي کیږي. ۳. د چینل بهاو او اړین کاڼو اندازه محاسبه کیږي. ۴. د ډیزاین کاڼو اندازه تنظیمیږي. ۵. د ډیزاین کاڼو اندازې کې تیروتنه ډیره کوچنۍ شي پورې تکرار کیږي.</dd><dt>اساسي محاسبه (بدون تکرار)</dt><dd>خپل غوښتل شوي خشونت ارزښت داخل کړئ. د ډیزاین کاڼو اندازې داخلي ساحه له پامه غورځوئ.</dd></dl>';
 $ec_lang['mtc_note_2_term']='د سرعت کتنه';
 $ec_lang['mtc_note_2_def']='لوړ سرعت د شتون لرونکي لوېدل څخه لوړ ځانګړی انرژي ښيي. هغه انرژي کولی شي د پراختیاوو، ګوډونو، یا خنډونو کې ژر له لاسه ورکړل شي. تصدیق وکړئ چې دا د سایټ لپاره معقول دی.';
@@ -501,7 +505,6 @@ $ec_lang['ip_count']='<span class="ec-help" title="د جانبي نل کرښې: 
 $ec_lang['ip_length']='L';
 $ec_lang['ip_diameter']='D';
 $ec_lang['ip_roughness']='e';
-$ec_lang['ip_km']='<span class="ec-help" title="د دې برخې د فیټنګونو/والوونو/نښلوونکو لپاره عمومي ځایي-ضیاع ضریب (&ge;0.5 وړاندیز شوی کمترین)">k<sub>m</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['ip_elev_ds']='<span class="ec-help" title="د دې برخې د ښکتني پای لوړوالی. د منځني کرښو لپاره اختیاري دی (که خالي پریښودل شي، هوار / د پورتني نوډ سره یو شان ګڼل کیږي). د وروستۍ کرښې لپاره لازمي دی: هغه ارزښت د آخري وریز لوړوالی دی، کوم چې مستقیماً اړین تامین فشار ټاکي.">ښکتنی لوړوالی <span class="ec-tip">?</span></span>';
 $ec_lang['ip_elev_ds_missing_warn']='د آخري وریز لوړوالی (وروستۍ کرښه) خالي پاتې شو او هوار ګڼل شو &mdash; د دقیقې پایلې لپاره یې ولیکئ';
 $ec_lang['ip_flow']='بهاو';

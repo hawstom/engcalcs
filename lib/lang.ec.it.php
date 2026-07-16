@@ -87,6 +87,10 @@ $ec_lang['dw_main_desc']='Perdita di carico in tubazione con Darcy-Weisbach a di
 $ec_lang['dw_roughness']='e';
 $ec_lang['dw_roughness_tip']='Altezza di rugosità assoluta, e, della parete della tubazione. Valori tipici: acciaio (nuovo) 0,046 mm, acciaio (usato) 0,15 mm, HDPE 0,003 mm, PVC/uPVC 0,0015 mm, calcestruzzo 0,3–3 mm.';
 $ec_lang['dw_kinematic_viscosity']='<span class="ec-help" title="1×10⁻⁶ m²/s per acqua pulita a 20°C">Viscosità cinematica, &nu; <span class="ec-tip">?</span></span>';
+$ec_lang['dw_kinematic_viscosity_short']='Viscosità cinematica, &nu;';
+$ec_lang_intent['dw_kinematic_viscosity_short']='';
+$ec_lang['dw_kinematic_viscosity_tip']='1×10⁻⁶ m²/s per acqua pulita a 20°C';
+$ec_lang_intent['dw_kinematic_viscosity_tip']='';
 $ec_lang['dw_reynolds_number']='Numero di Reynolds, Re';
 $ec_lang['dw_flow_regime']='Regime di flusso';
 $ec_lang['dw_regime_laminar']='laminare';
@@ -137,7 +141,7 @@ $ec_lang['mpf_main_desc']='Formula di Manning per flusso uniforme in tubazione a
 $ec_lang['mpf_spreadheet_notice']='Scopri la versione foglio di calcolo di questo calcolatore';
 $ec_lang['mpf_pipe_diameter']='Diametro tubazione, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Scabrezza di Manning, n';
-$ec_lang['mpf_friction_slope']='Pendenza di attrito (talvolta <a target="_blank" href="../frictionslope.php">?</a> uguale alla pendenza della tubazione), S<sub>f</sub>';
+$ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Pendenza di attrito, S<sub>f</sub></a><span class="ec-help" title="Talvolta uguale alla pendenza della tubazione. Segui il link per la spiegazione (solo in inglese)."><span class="ec-tip">?</span></span>';
 $ec_lang['mpf_depth_ratio']='Rapporto di riempimento, y/d<sub>0</sub>';
 $ec_lang['mpf_see_notes']='(Vedi note)';
 $ec_lang['mpf_flow']='Portata, Q';
@@ -188,7 +192,7 @@ $ec_lang['mtc_side_slope_1']='Scarpata lato 1, z<sub>1</sub> (orizz./vert.)';
 $ec_lang['mtc_side_slope_2']='Scarpata lato 2, z<sub>2</sub> (orizz./vert.)';
 $ec_lang['mtc_channel_slope']='Pendenza canale, S';
 $ec_lang['mtc_flow_depth']='Profondità di flusso, y';
-$ec_lang['mtc_bend_angle']='Angolo di curva, β <a target="_blank" href="riprap-bend-angle.png" title="Clicca per immagine">?</a> (per dimensionamento massi)';
+$ec_lang['mtc_bend_angle']='<a target="_blank" href="riprap-bend-angle.png">Angolo di curva, β</a><span class="ec-help" title="Per dimensionamento massi. Segui il link per lo schema."><span class="ec-tip">?</span></span>';
 $ec_lang['mtc_sgrock']='<span class="ec-help" title="Tipicamente &asymp; 2,65 per roccia frantumata">Peso specifico relativo della roccia, sg <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_in']='Dimensione roccia di progetto, D<sub>50</sub>';
 $ec_lang['mtc_n_strickler']='n per dimensione roccia di progetto secondo Strickler';
@@ -202,7 +206,7 @@ $ec_lang['mtc_d50_mra']='Dimensione roccia angolare richiesta, D<sub>50</sub> (M
 $ec_lang['mtc_d50_searcy']='Dimensione roccia angolare richiesta, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='Velocità ragionevole per le ipotesi di flusso uniforme.';
 $ec_lang['mtc_vel_low']='Velocità bassa — rischio di sedimentazione.';
-$ec_lang['mtc_iteration_tip']='Scegliere un\'opzione di scabrezza (Blodgett-Bathurst raccomandato) e un\'opzione di dimensione roccia (Isbash raccomandato) per iterare automaticamente verso una dimensione roccia uniforme per la portata desiderata. Vedere le Note sotto per il metodo completo, oppure inserire un proprio valore di scabrezza e ignorare la dimensione roccia per saltare l\'iterazione.';
+$ec_lang['mtc_iteration_tip']='Scegliere un\'opzione di scabrezza (Blodgett-Bathurst raccomandato) e un\'opzione di dimensione roccia (Isbash raccomandato) per iterare automaticamente verso una dimensione roccia uniforme per la portata desiderata. Vedere le Note sotto per il metodo completo, oppure inserire un proprio valore di scabrezza (seguire il link per indicazioni) e ignorare la dimensione roccia per saltare l\'iterazione.';
 $ec_lang['mtc_note_1']='<dl><dt>Iterazione automatica dimensionamento roccia e scabrezza</dt><dd>Scegliere un pulsante radio per la scabrezza (Blodgett-Bathurst raccomandato) e uno per la dimensione roccia di progetto (Isbash raccomandato). Regolare profondità e fattore di sicurezza della roccia per ottenere il flusso desiderato con una dimensione roccia uniforme. Ogni modifica ai dati avvia il ciclo iterativo: 1. La scabrezza viene calcolata dalla dimensione roccia di progetto. 2. La scabrezza richiesta viene copiata nella scabrezza di input. 3. Il flusso nel canale e la dimensione roccia richiesta vengono calcolati. 4. La dimensione roccia di progetto viene aggiornata. 5. Si ripete fino a convergenza.</dd><dt>Calcolatore base (senza iterazione)</dt><dd>Inserire il valore di scabrezza desiderato. Ignorare l\'area di input della dimensione roccia di progetto.</dd></dl>';
 $ec_lang['mtc_note_2_term']='Controllo della velocità';
 $ec_lang['mtc_note_2_def']='Velocità elevata implica elevata energia specifica derivante da una caduta disponibile. Tale energia può dissiparsi rapidamente in corrispondenza di espansioni, curve o ostruzioni. Verificare che ciò sia ragionevole per il sito.';
@@ -495,7 +499,6 @@ $ec_lang['ip_count']='<span class="ec-help" title="Righe ala laterale: emettitor
 $ec_lang['ip_length']='L';
 $ec_lang['ip_diameter']='D';
 $ec_lang['ip_roughness']='e';
-$ec_lang['ip_km']='<span class="ec-help" title="Coefficiente generico di perdita concentrata per raccordi/valvole/giunti di questo tratto (minimo consigliato &ge;0,5)">k<sub>m</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['ip_elev_ds']='<span class="ec-help" title="Quota all\'estremità di valle di questo tratto. Facoltativa nelle righe interne (predefinita: piatta, cioè uguale al nodo superiore, se lasciata vuota). Obbligatoria nell\'ultima riga: quel valore è la quota dell\'ultimo emettitore, che determina direttamente la pressione di alimentazione richiesta.">Elev. V. <span class="ec-tip">?</span></span>';
 $ec_lang['ip_elev_ds_missing_warn']='La quota dell\'ultimo emettitore (ultima riga) è stata lasciata vuota ed è stata impostata come piatta per impostazione predefinita &mdash; inserirla per un risultato accurato';
 $ec_lang['ip_flow']='Portata';

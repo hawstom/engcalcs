@@ -86,6 +86,10 @@ $ec_lang['dw_main_desc']='Darcy-Weisbach gubitak tlačne visine u cijevi pri zad
 $ec_lang['dw_roughness']='e';
 $ec_lang['dw_roughness_tip']='Apsolutna visina hrapavosti, e, stijenke cijevi. Tipične vrijednosti: čelik (novi) 0,046 mm, čelik (rabljeni) 0,15 mm, HDPE 0,003 mm, PVC/uPVC 0,0015 mm, beton 0,3–3 mm.';
 $ec_lang['dw_kinematic_viscosity']='<span class="ec-help" title="1×10⁻⁶ m²/s za čistu vodu pri 20°C">Kinematička viskoznost, &nu; <span class="ec-tip">?</span></span>';
+$ec_lang['dw_kinematic_viscosity_short']='Kinematička viskoznost, &nu;';
+$ec_lang_intent['dw_kinematic_viscosity_short']='';
+$ec_lang['dw_kinematic_viscosity_tip']='1×10⁻⁶ m²/s za čistu vodu pri 20°C';
+$ec_lang_intent['dw_kinematic_viscosity_tip']='';
 $ec_lang['dw_reynolds_number']='Reynoldsov broj, Re';
 $ec_lang['dw_flow_regime']='Režim tečenja';
 $ec_lang['dw_regime_laminar']='laminarno';
@@ -136,7 +140,7 @@ $ec_lang['mpf_main_desc']='Manning formula — jednolik protok kroz cijev pri za
 $ec_lang['mpf_spreadheet_notice']='Isprobajte proračunsku tablicu ovog kalkulatora';
 $ec_lang['mpf_pipe_diameter']='Promjer cijevi, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Manningov koeficijent hrapavosti, n';
-$ec_lang['mpf_friction_slope']='Nagib trenja (ponekad <a target="_blank" href="../frictionslope.php">?</a> jednak nagibu cijevi), S<sub>f</sub>';
+$ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Nagib trenja, S<sub>f</sub></a><span class="ec-help" title="Ponekad jednak nagibu cijevi. Slijedite poveznicu za objašnjenje (samo na engleskom)."><span class="ec-tip">?</span></span>';
 $ec_lang['mpf_depth_ratio']='Relativna dubina toka, y/d<sub>0</sub>';
 $ec_lang['mpf_see_notes']='(Vidi napomene)';
 $ec_lang['mpf_flow']='Protok, Q';
@@ -187,7 +191,7 @@ $ec_lang['mtc_side_slope_1']='Nagib bočne strane 1, z<sub>1</sub> (horiz./vert.
 $ec_lang['mtc_side_slope_2']='Nagib bočne strane 2, z<sub>2</sub> (horiz./vert.)';
 $ec_lang['mtc_channel_slope']='Nagib kanala, S';
 $ec_lang['mtc_flow_depth']='Dubina tečenja, y';
-$ec_lang['mtc_bend_angle']='Kut zavoja, β <a target="_blank" href="riprap-bend-angle.png" title="Kliknite za sliku">?</a> (za dimenzioniranje kamenitog nasipa)';
+$ec_lang['mtc_bend_angle']='<a target="_blank" href="riprap-bend-angle.png">Kut zavoja, β</a><span class="ec-help" title="Za dimenzioniranje kamenitog nasipa. Slijedite poveznicu za shemu."><span class="ec-tip">?</span></span>';
 $ec_lang['mtc_sgrock']='<span class="ec-help" title="Tipično &asymp; 2,65 za drobljeni kamen">Specifična težina kamena, sg <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_in']='Projektna veličina kamena, D<sub>50</sub>';
 $ec_lang['mtc_n_strickler']='n za projektnu veličinu kamena prema Strickleru';
@@ -201,7 +205,7 @@ $ec_lang['mtc_d50_mra']='Potrebna veličina uglatog kamena, D<sub>50</sub> (Mayn
 $ec_lang['mtc_d50_searcy']='Potrebna veličina uglatog kamena, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='Brzina prihvatljiva za pretpostavke jednolikog tečenja.';
 $ec_lang['mtc_vel_low']='Brzina niska — opasnost od sedimentacije.';
-$ec_lang['mtc_iteration_tip']='Odaberite opciju hrapavosti (preporučuje se Blodgett–Bathurst) i opciju veličine kamena (preporučuje se Isbash) kako biste automatskom iteracijom dobili jedinstvenu veličinu kamena za željeni protok. Cjeloviti postupak potražite u Napomenama u nastavku, ili unesite vlastitu vrijednost hrapavosti i zanemarite veličinu kamena kako biste preskočili iteraciju.';
+$ec_lang['mtc_iteration_tip']='Odaberite opciju hrapavosti (preporučuje se Blodgett–Bathurst) i opciju veličine kamena (preporučuje se Isbash) kako biste automatskom iteracijom dobili jedinstvenu veličinu kamena za željeni protok. Cjeloviti postupak potražite u Napomenama u nastavku, ili unesite vlastitu vrijednost hrapavosti (slijedite poveznicu za smjernice) i zanemarite veličinu kamena kako biste preskočili iteraciju.';
 $ec_lang['mtc_note_1']='<dl><dt>Automatizirana iteracija dimenzioniranja kamena i hrapavosti</dt><dd>Odaberite radio gumb za hrapavost (preporučuje se Blodgett–Bathurst) i radio gumb za projektnu veličinu kamena (preporučuje se Isbash). Fino podesite dubinu i faktor sigurnosti veličine kamena kako biste dobili željeni protok s jednoličnom veličinom kamena. Svaki put kada promijenite bilo koji ulazni podatak, odvija se sljedeći iteracijski ciklus: 1. Hrapavost se izračunava iz projektne veličine kamena. 2. Traženi izračun hrapavosti kopira se na ulaznu hrapavost. 3. Izračunavaju se protok kroz kanal i potrebna veličina kamena. 4. Projektna veličina kamena se prilagođava. 5. Ponavljati dok pogreška u projektnoj veličini kamena nije vrlo mala.</dd><dt>Osnovni kalkulator (bez iteracije)</dt><dd>Unesite željenu vrijednost hrapavosti. Zanemarite područje unosa projektne veličine kamena.</dd></dl>';
 $ec_lang['mtc_note_2_term']='Provjera brzine';
 $ec_lang['mtc_note_2_def']='Visoka brzina podrazumijeva visoku specifičnu energiju uslijed raspoloživog pada. Ta energija može se brzo izgubiti na proširenjima, zavojima ili preprekama. Provjerite je li to razumno za dano gradilište.';
@@ -367,7 +371,6 @@ $ec_lang['ip_count']='<span class="ec-help" title="Lateralne dionice: emiteri sa
 $ec_lang['ip_length']='L';
 $ec_lang['ip_diameter']='D';
 $ec_lang['ip_roughness']='e';
-$ec_lang['ip_km']='<span class="ec-help" title="Generički koeficijent lokalnog gubitka za fitinge/ventile/spojnice ove dionice (&ge;0,5 preporučeni minimum)">k<sub>m</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['ip_elev_ds']='<span class="ec-help" title="Kota nizvodnog kraja ove dionice. Opcionalno u unutarnjim redacima (zadana vrijednost je ravno / ista kao čvor iznad ako je ostavljeno prazno). Obavezno u zadnjem redu: ta vrijednost je kota zadnjeg emitera, što izravno postavlja tlak opskrbe.">DS Kota <span class="ec-tip">?</span></span>';
 $ec_lang['ip_elev_ds_missing_warn']='Kota zadnjeg emitera (zadnji red) je ostala prazna i zadana vrijednost je ravno — unesite je za točan rezultat';
 $ec_lang['ip_flow']='Protok';

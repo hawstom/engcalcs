@@ -88,6 +88,10 @@ $ec_lang['dw_main_desc']='دیے گئے قطر، کھردرا پن اور بہا
 $ec_lang['dw_roughness']='e';
 $ec_lang['dw_roughness_tip']='پائپ کی دیوار کی مطلق کھردری اونچائی، e۔ عام قدریں: فولاد (نیا) 0.046 ملی میٹر، فولاد (استعمال شدہ) 0.15 ملی میٹر، HDPE 0.003 ملی میٹر، PVC/uPVC 0.0015 ملی میٹر، کنکریٹ 0.3–3 ملی میٹر۔';
 $ec_lang['dw_kinematic_viscosity']='<span class="ec-help" title="صاف پانی کے لیے 20°C پر 1×10⁻⁶ m²/s">حرکیاتی چپچپاہٹ، &nu; <span class="ec-tip">?</span></span>';
+$ec_lang['dw_kinematic_viscosity_short']='حرکیاتی چپچپاہٹ، &nu;';
+$ec_lang_intent['dw_kinematic_viscosity_short']='';
+$ec_lang['dw_kinematic_viscosity_tip']='صاف پانی کے لیے 20°C پر 1×10⁻⁶ m²/s';
+$ec_lang_intent['dw_kinematic_viscosity_tip']='';
 $ec_lang['dw_reynolds_number']='رینولڈز عدد، Re';
 $ec_lang['dw_flow_regime']='بہاؤ کی نوع';
 $ec_lang['dw_regime_laminar']='ورقی';
@@ -138,7 +142,7 @@ $ec_lang['mpf_main_desc']='دیے گئے ڈھلان اور گہرائی پر م�
 $ec_lang['mpf_spreadheet_notice']='اس حاسبے کا اسپریڈشیٹ ورژن دیکھیں';
 $ec_lang['mpf_pipe_diameter']='پائپ قطر، d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='مانینگ کھردرا پن، n';
-$ec_lang['mpf_friction_slope']='رگڑ ڈھلان (بعض اوقات <a target="_blank" href="../frictionslope.php">?</a> پائپ ڈھلان کے برابر)، S<sub>f</sub>';
+$ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">رگڑ ڈھلان، S<sub>f</sub></a><span class="ec-help" title="بعض اوقات پائپ ڈھلان کے برابر۔ وضاحت کے لیے لنک پر جائیں (صرف انگریزی میں)۔"><span class="ec-tip">?</span></span>';
 $ec_lang['mpf_depth_ratio']='نسبی بہاؤ گہرائی، y/d<sub>0</sub>';
 $ec_lang['mpf_see_notes']='(نوٹ دیکھیں)';
 $ec_lang['mpf_flow']='بہاؤ، Q';
@@ -189,7 +193,7 @@ $ec_lang['mtc_side_slope_1']='جانبی ڈھلان 1، z<sub>1</sub> (افقی/
 $ec_lang['mtc_side_slope_2']='جانبی ڈھلان 2، z<sub>2</sub> (افقی/عمودی)';
 $ec_lang['mtc_channel_slope']='نالے کا ڈھلان، S';
 $ec_lang['mtc_flow_depth']='بہاؤ کی گہرائی، y';
-$ec_lang['mtc_bend_angle']='موڑ کا زاویہ، β <a target="_blank" href="riprap-bend-angle.png" title="تصویر دیکھنے کے لیے کلک کریں">؟</a> (پتھر کی حفاظت کے حجم کے لیے)';
+$ec_lang['mtc_bend_angle']='<a target="_blank" href="riprap-bend-angle.png">موڑ کا زاویہ، β</a><span class="ec-help" title="پتھر کی حفاظت کے حجم کے لیے۔ خاکہ دیکھنے کے لیے لنک پر جائیں۔"><span class="ec-tip">?</span></span>';
 $ec_lang['mtc_sgrock']='<span class="ec-help" title="کچلے ہوئے پتھر کے لیے عام طور پر &asymp; 2.65">پتھر کی مخصوص کثافت، sg <span class="ec-tip">؟</span></span>';
 $ec_lang['mtc_d50_in']='ڈیزائن پتھر کا حجم، D<sub>50</sub>';
 $ec_lang['mtc_n_strickler']='ڈیزائن پتھر کے حجم کے لیے n (Strickler طریقہ)';
@@ -203,7 +207,7 @@ $ec_lang['mtc_d50_mra']='مطلوبہ زاویہ دار پتھر کا حجم، D
 $ec_lang['mtc_d50_searcy']='مطلوبہ زاویہ دار پتھر کا حجم، D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='رفتار یکساں بہاؤ کے مفروضات کے لیے مناسب ہے۔';
 $ec_lang['mtc_vel_low']='رفتار کم ہے؛ تلچھٹ جمع ہونے کا خطرہ ہے۔';
-$ec_lang['mtc_iteration_tip']='ایک کھردرے پن کا آپشن (Blodgett–Bathurst تجویز کردہ) اور ایک پتھر کے حجم کا آپشن (Isbash تجویز کردہ) منتخب کریں تاکہ آپ کے مطلوبہ بہاؤ کے لیے یکساں پتھر حجم کی طرف خودکار تکرار ہو۔ مکمل طریقہ کار کے لیے نیچے نوٹس دیکھیں، یا تکرار چھوڑنے کے لیے اپنی کھردرے پن کی قدر درج کریں اور پتھر حجم کو نظرانداز کریں۔';
+$ec_lang['mtc_iteration_tip']='ایک کھردرے پن کا آپشن (Blodgett–Bathurst تجویز کردہ) اور ایک پتھر کے حجم کا آپشن (Isbash تجویز کردہ) منتخب کریں تاکہ آپ کے مطلوبہ بہاؤ کے لیے یکساں پتھر حجم کی طرف خودکار تکرار ہو۔ مکمل طریقہ کار کے لیے نیچے نوٹس دیکھیں، یا تکرار چھوڑنے کے لیے اپنی کھردرے پن کی قدر (رہنمائی کے لیے لنک دیکھیں) درج کریں اور پتھر حجم کو نظرانداز کریں۔';
 $ec_lang['mtc_note_1']='<dl><dt>خودکار پتھر کے حجم اور کھردرے پن کی ڈیزائن تکرار</dt><dd>ایک کھردرے پن کا آپشن (Blodgett–Bathurst تجویز کردہ) اور ایک ڈیزائن پتھر حجم کا آپشن (Isbash تجویز کردہ) منتخب کریں۔ یکساں پتھر حجم کے ساتھ اپنے مطلوبہ بہاؤ تک پہنچنے کے لیے گہرائی اور پتھر حجم کے حفاظتی عامل کو ایڈجسٹ کریں۔ جب بھی آپ کوئی ان پٹ تبدیل کرتے ہیں، حاسبہ یہ مراحل دہراتا ہے: 1. ڈیزائن پتھر کے حجم سے کھردرا پن حساب کیا جاتا ہے۔ 2. درخواست کردہ کھردرے پن کا حساب ان پٹ کھردرے پن میں کاپی کیا جاتا ہے۔ 3. نالے کا بہاؤ اور مطلوبہ پتھر حجم حساب کیا جاتا ہے۔ 4. ڈیزائن پتھر کا حجم ایڈجسٹ کیا جاتا ہے۔ 5. جب تک ڈیزائن پتھر حجم میں خرابی بہت کم نہ ہو جائے، دہراتے رہیں۔</dd><dt>بنیادی حاسبہ (بغیر تکرار کے)</dt><dd>اپنی مطلوبہ کھردرے پن کی قدر درج کریں۔ ڈیزائن پتھر حجم کے ان پٹ حصے کو نظرانداز کریں۔</dd></dl>';
 $ec_lang['mtc_note_2_term']='رفتار کی جانچ';
 $ec_lang['mtc_note_2_def']='زیادہ رفتار ظاہر کرتی ہے کہ ایک بڑی بلندی میں کمی واقع ہوئی جس نے اتنی زیادہ مخصوص توانائی پیدا کی۔ یہ توانائی پھیلاؤ، موڑ، یا رکاوٹوں پر تیزی سے ضائع ہو سکتی ہے۔ تصدیق کریں کہ یہ مقام کے لیے مناسب ہے۔';
@@ -499,7 +503,6 @@ $ec_lang['ip_count']='<span class="ec-help" title="لیٹرل قطاریں: صر
 $ec_lang['ip_length']='L';
 $ec_lang['ip_diameter']='D';
 $ec_lang['ip_roughness']='e';
-$ec_lang['ip_km']='<span class="ec-help" title="اس ریچ کی فٹنگز/والوز/جوڑنے والوں کے لیے عمومی مقامی نقصان کا عامل (تجویز کردہ کم از کم &ge;0.5)">k<sub>m</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['ip_elev_ds']='<span class="ec-help" title="اس ریچ کے زیریں سرے کی بلندی۔ اندرونی قطاروں میں اختیاری ہے (خالی چھوڑنے پر ہموار / اوپر والے نوڈ کے برابر مانی جاتی ہے)۔ آخری قطار میں لازمی ہے: یہ قدر آخری ایمیٹر کی بلندی ہے، جو براہِ راست مطلوبہ سپلائی دباؤ متعین کرتی ہے۔">زیریں بلندی <span class="ec-tip">?</span></span>';
 $ec_lang['ip_elev_ds_missing_warn']='آخری ایمیٹر کی بلندی (آخری قطار) خالی چھوڑی گئی اور ہموار پر ڈیفالٹ ہو گئی &mdash; درست نتیجے کے لیے اسے درج کریں';
 $ec_lang['ip_flow']='بہاؤ';

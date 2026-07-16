@@ -82,6 +82,30 @@ All check/verdict outputs (velocity, regime, loss-sign, head-loss %, …) use on
   `title` (not just the glyph — a one-character tap target is bad on touch). Short visible text,
   long text in the tooltip (width-is-king).
 
+### Link + tip convention (item-90 decision, 2026-07-16)
+
+When a label needs both an external/reference link *and* a hover/tap explanation, use exactly one
+`?` glyph, and it is always the `.ec-help`/`.ec-tip` tip trigger — never a link:
+
+```
+<a target="_blank" href="URL">Label text</a><span class="ec-help" title="Tip text"><span class="ec-tip">?</span></span>
+```
+
+- **The link wraps the actual label text**, never a bare `?`. Words carry their own click affordance;
+  a lone `?` as a link has no visual signal that it navigates rather than explains.
+- **Never two `?` glyphs on one label.** A link-`?` immediately followed by a tip-`?`
+  (`<a href="...">?</a><span class="ec-tip">?</span>`) is the defect this convention replaces — it
+  reads as a doubled, unexplained glyph and gives no indication either one is a real hyperlink.
+- **A link with no tip needs no `.ec-help` wrapper**; a tip with no link never uses a bare `<a>`.
+  Only combine them when both are genuinely needed.
+- **Why the `.ec-help` wrapper matters even for links:** `js/Calculators.lib.js` only activates
+  touch-friendly (tap-triggered) tooltips on `.ec-help[title]` elements. A bare `<a title="...">` on
+  a touch device just navigates on first tap — the tip content in its `title` attribute is never
+  seen. Real explanatory content always goes in an `.ec-help`/`.ec-tip` tip, not a link's `title`.
+- If the linked page is not available in the visitor's language (e.g. `frictionslope.php` is
+  English-only with no language switcher), say so in the tip text (e.g. "Follow link for explanation
+  (English only)") so the visitor isn't surprised after clicking.
+
 ## Language Keys
 
 All display strings live in `lib/lang.ec.??.php` (27 files: en + 26 non-English). Keys follow the pattern `prefix_description`, e.g. `dw_friction_factor`, `mpf_flow`. Add keys to **all** language files when adding a new calculator — use English text as the fallback where translations aren't available yet.
@@ -125,6 +149,15 @@ different rules:
 - This principle governs new calculators from day one, not just retrofits — pick an identity name
   matching the source method (if any) and plain, composable English for explanatory content, when a
   calculator is first written, so it never needs this fix later.
+
+**`$ec_lang_intent` is reserved for jargon/transliteration risk, not general definitions.** If a
+label is already simple, directly-translatable technical English (e.g. "Friction slope"), it needs
+no intent entry — that's what Simple English source strings are for. Intent exists for words like
+"chute" or "riprap": terms a translator, especially in a lower-resource language, is liable to
+phonetically transliterate rather than translate because there's nothing to compositionally parse.
+Adding an intent string to a plain label is itself a defect — it burns translator attention on
+something that isn't at risk. Before adding one, confirm the term has real transliteration or
+polysemy risk, not just "could use more explanation."
 
 **`$ec_lang_intent` is off-limits to AI.** This array provides human-authored translation guidance that is interleaved with `$ec_lang` for human review. AI must never add, change, or remove any `$ec_lang_intent` entry without explicit written permission from the human in that conversation.
 

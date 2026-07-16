@@ -62,7 +62,7 @@ function echoCalculatorFormAppend() {
 					<?php echoUnitSelect($name = 'tauu', $units = Array('npm2', 'psf'), $indent_string); ?>
 				</th>
 				<th>
-					<?=$ec_lang['mi_n']?>
+					<a target="_blank" href="http://www.engineeringtoolbox.com/mannings-roughness-d_799.html"><?=$ec_lang['mi_n']?></a>
 				</th>
 				<th>
 					<?=$ec_lang['mi_t']?>

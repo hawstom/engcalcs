@@ -88,6 +88,10 @@ $ec_lang['dw_main_desc']='दिए गए व्यास, खुरदरा�
 $ec_lang['dw_roughness']='e';
 $ec_lang['dw_roughness_tip']='पाइप की दीवार की निरपेक्ष खुरदरापन ऊँचाई, e। विशिष्ट मान: इस्पात (नया) 0.046 mm, इस्पात (पुराना) 0.15 mm, HDPE 0.003 mm, PVC/uPVC 0.0015 mm, कंक्रीट 0.3–3 mm।';
 $ec_lang['dw_kinematic_viscosity']='<span class="ec-help" title="20°C पर स्वच्छ जल के लिए 1×10⁻⁶ मी²/से">गतिक श्यानता, &nu; <span class="ec-tip">?</span></span>';
+$ec_lang['dw_kinematic_viscosity_short']='गतिक श्यानता, &nu;';
+$ec_lang_intent['dw_kinematic_viscosity_short']='';
+$ec_lang['dw_kinematic_viscosity_tip']='20°C पर स्वच्छ जल के लिए 1×10⁻⁶ मी²/से';
+$ec_lang_intent['dw_kinematic_viscosity_tip']='';
 $ec_lang['dw_reynolds_number']='रेनॉल्ड्स संख्या, Re';
 $ec_lang['dw_flow_regime']='प्रवाह व्यवस्था';
 $ec_lang['dw_regime_laminar']='स्तरीय';
@@ -138,7 +142,7 @@ $ec_lang['mpf_main_desc']='दिए गए ढलान और गहराई 
 $ec_lang['mpf_spreadheet_notice']='इस कैलकुलेटर का स्प्रेडशीट संस्करण देखें';
 $ec_lang['mpf_pipe_diameter']='पाइप व्यास, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='मैनिंग खुरदरापन, n';
-$ec_lang['mpf_friction_slope']='घर्षण ढलान (कभी-कभी <a target="_blank" href="../frictionslope.php">?</a> पाइप ढलान के बराबर), S<sub>f</sub>';
+$ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">घर्षण ढलान, S<sub>f</sub></a><span class="ec-help" title="कभी-कभी पाइप ढलान के बराबर। व्याख्या के लिए लिंक पर जाएं (केवल अंग्रेज़ी में)।"><span class="ec-tip">?</span></span>';
 $ec_lang['mpf_depth_ratio']='सापेक्ष प्रवाह गहराई, y/d<sub>0</sub>';
 $ec_lang['mpf_see_notes']='(नोट देखें)';
 $ec_lang['mpf_flow']='प्रवाह, Q';
@@ -189,7 +193,7 @@ $ec_lang['mtc_side_slope_1']='पार्श्व ढलान 1, z<sub>1</sub
 $ec_lang['mtc_side_slope_2']='पार्श्व ढलान 2, z<sub>2</sub> (क्षैतिज/ऊर्ध्वाधर)';
 $ec_lang['mtc_channel_slope']='नाली ढलान, S';
 $ec_lang['mtc_flow_depth']='प्रवाह गहराई, y';
-$ec_lang['mtc_bend_angle']='मोड़ कोण, β <a target="_blank" href="riprap-bend-angle.png" title="चित्र के लिए क्लिक करें">?</a> (चट्टान अस्तर आकार निर्धारण के लिए)';
+$ec_lang['mtc_bend_angle']='<a target="_blank" href="riprap-bend-angle.png">मोड़ कोण, β</a><span class="ec-help" title="चट्टान अस्तर आकार निर्धारण के लिए। चित्र के लिए लिंक पर जाएं।"><span class="ec-tip">?</span></span>';
 $ec_lang['mtc_sgrock']='<span class="ec-help" title="कुचली हुई चट्टान के लिए सामान्यतः &asymp; 2.65">चट्टान का विशिष्ट गुरुत्व, sg <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_in']='डिज़ाइन चट्टान आकार, D<sub>50</sub>';
 $ec_lang['mtc_n_strickler']='डिज़ाइन चट्टान आकार के लिए n (Strickler विधि)';
@@ -203,7 +207,7 @@ $ec_lang['mtc_d50_mra']='आवश्यक कोणीय चट्टान �
 $ec_lang['mtc_d50_searcy']='आवश्यक कोणीय चट्टान आकार, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='वेग एकसमान-प्रवाह मान्यताओं के लिए उचित है।';
 $ec_lang['mtc_vel_low']='वेग कम है; अवसादन का जोखिम।';
-$ec_lang['mtc_iteration_tip']='अपने लक्षित प्रवाह के लिए एकसमान चट्टान आकार की ओर स्वचालित पुनरावृत्ति हेतु एक खुरदरापन विकल्प (Blodgett–Bathurst अनुशंसित) और एक चट्टान आकार विकल्प (Isbash अनुशंसित) चुनें। पूरी विधि के लिए नीचे नोट देखें, या पुनरावृत्ति छोड़ने के लिए अपना खुरदरापन मान स्वयं दर्ज करें और चट्टान आकार को अनदेखा करें।';
+$ec_lang['mtc_iteration_tip']='अपने लक्षित प्रवाह के लिए एकसमान चट्टान आकार की ओर स्वचालित पुनरावृत्ति हेतु एक खुरदरापन विकल्प (Blodgett–Bathurst अनुशंसित) और एक चट्टान आकार विकल्प (Isbash अनुशंसित) चुनें। पूरी विधि के लिए नीचे नोट देखें, या पुनरावृत्ति छोड़ने के लिए अपना खुरदरापन मान स्वयं (मार्गदर्शन के लिए लिंक देखें) दर्ज करें और चट्टान आकार को अनदेखा करें।';
 $ec_lang['mtc_note_1']='<dl><dt>स्वचालित चट्टान आकार और खुरदरापन डिज़ाइन पुनरावृत्ति</dt><dd>एक खुरदरापन विकल्प चुनें (Blodgett–Bathurst अनुशंसित) और एक डिज़ाइन चट्टान आकार विकल्प चुनें (Isbash अनुशंसित)। एकसमान चट्टान आकार के साथ अपना लक्षित प्रवाह प्राप्त करने के लिए गहराई और चट्टान आकार सुरक्षा कारक को समायोजित करें। जब भी आप कोई इनपुट बदलते हैं, कैलकुलेटर ये चरण दोहराता है: 1. डिज़ाइन चट्टान आकार से खुरदरापन की गणना की जाती है। 2. अनुरोधित खुरदरापन गणना को इनपुट खुरदरापन में कॉपी किया जाता है। 3. नाली प्रवाह और आवश्यक चट्टान आकार की गणना की जाती है। 4. डिज़ाइन चट्टान आकार समायोजित किया जाता है। 5. डिज़ाइन चट्टान आकार में त्रुटि बहुत छोटी होने तक दोहराएँ।</dd><dt>बुनियादी कैलकुलेटर (पुनरावृत्ति रहित)</dt><dd>अपना वांछित खुरदरापन मान दर्ज करें। डिज़ाइन चट्टान आकार इनपुट क्षेत्र को अनदेखा करें।</dd></dl>';
 $ec_lang['mtc_note_2_term']='वेग जाँच';
 $ec_lang['mtc_note_2_def']='उच्च वेग यह दर्शाता है कि एक बड़ा ऊँचाई ह्रास हुआ जिसने इतनी अधिक विशिष्ट ऊर्जा उत्पन्न की। वह ऊर्जा विस्तारों, मोड़ों या बाधाओं पर शीघ्रता से नष्ट हो सकती है। सत्यापित करें कि यह स्थल के लिए उचित है।';
@@ -499,7 +503,6 @@ $ec_lang['ip_count']='<span class="ec-help" title="पार्श्व नल�
 $ec_lang['ip_length']='L';
 $ec_lang['ip_diameter']='D';
 $ec_lang['ip_roughness']='e';
-$ec_lang['ip_km']='<span class="ec-help" title="इस खंड की फिटिंग/वाल्व/कपलर के लिए सामान्य स्थानीय-हानि गुणांक (न्यूनतम ≥0.5 सुझाया गया)">k<sub>m</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['ip_elev_ds']='<span class="ec-help" title="इस खंड का डाउनस्ट्रीम-छोर स्तर। आंतरिक पंक्तियों में वैकल्पिक (रिक्त छोड़ने पर समतल / ऊपर के नोड के समान डिफ़ॉल्ट)। अंतिम पंक्ति में आवश्यक: वह मान अंतिम उत्सर्जक का स्तर है, जो सीधे आवश्यक आपूर्ति दाब निर्धारित करता है।">DS स्तर <span class="ec-tip">?</span></span>';
 $ec_lang['ip_elev_ds_missing_warn']='अंतिम उत्सर्जक स्तर (अंतिम पंक्ति) रिक्त छोड़ दी गई और समतल को डिफ़ॉल्ट दिया गया — सटीक परिणाम के लिए इसे दर्ज करें';
 $ec_lang['ip_flow']='प्रवाह';

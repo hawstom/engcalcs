@@ -88,6 +88,10 @@ $ec_lang['dw_main_desc']='Upotevu wa Kichwa cha Bomba la Darcy-Weisbach kwa Kipe
 $ec_lang['dw_roughness']='e';
 $ec_lang['dw_roughness_tip']='Kina kamili cha ukakamavu, e, wa ukuta wa bomba. Thamani za kawaida: chuma (kipya) 0.046 mm, chuma (kilichotumika) 0.15 mm, HDPE 0.003 mm, PVC/uPVC 0.0015 mm, zege 0.3–3 mm.';
 $ec_lang['dw_kinematic_viscosity']='<span class="ec-help" title="1×10⁻⁶ m²/s kwa maji safi kwenye 20°C">Mnato wa kinematiki, &nu; <span class="ec-tip">?</span></span>';
+$ec_lang['dw_kinematic_viscosity_short']='Mnato wa kinematiki, &nu;';
+$ec_lang_intent['dw_kinematic_viscosity_short']='';
+$ec_lang['dw_kinematic_viscosity_tip']='1×10⁻⁶ m²/s kwa maji safi kwenye 20°C';
+$ec_lang_intent['dw_kinematic_viscosity_tip']='';
 $ec_lang['dw_reynolds_number']='Nambari ya Reynolds, Re';
 $ec_lang['dw_flow_regime']='Utaratibu wa mtiririko';
 $ec_lang['dw_regime_laminar']='tulivu';
@@ -138,7 +142,7 @@ $ec_lang['mpf_main_desc']='Mtiririko Sawia wa Bomba la Fomula ya Manning kwa Mte
 $ec_lang['mpf_spreadheet_notice']='Angalia toleo la lahajedwali la kikokotoo hiki';
 $ec_lang['mpf_pipe_diameter']='Kipenyo cha bomba, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Mgawo wa usuguo wa Manning, n';
-$ec_lang['mpf_friction_slope']='Mteremko wa msuguano (labda <a target="_blank" href="../frictionslope.php">?</a> sawa na mteremko wa bomba), S<sub>f</sub>';
+$ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Mteremko wa msuguano, S<sub>f</sub></a><span class="ec-help" title="Labda sawa na mteremko wa bomba. Fuata kiungo kwa maelezo (kwa Kiingereza pekee)."><span class="ec-tip">?</span></span>';
 $ec_lang['mpf_depth_ratio']='Uwiano wa kina cha mtiririko, y/d<sub>0</sub>';
 $ec_lang['mpf_see_notes']='(Angalia maelezo)';
 $ec_lang['mpf_flow']='Mtiririko, Q';
@@ -189,7 +193,7 @@ $ec_lang['mtc_side_slope_1']='Mteremko wa upande 1, z<sub>1</sub> (usawa/wima)';
 $ec_lang['mtc_side_slope_2']='Mteremko wa upande 2, z<sub>2</sub> (usawa/wima)';
 $ec_lang['mtc_channel_slope']='Mteremko wa mfereji, S';
 $ec_lang['mtc_flow_depth']='Kina cha mtiririko, y';
-$ec_lang['mtc_bend_angle']='Pembe ya Kona, β <a target="_blank" href="riprap-bend-angle.png" title="Bonyeza kwa picha">?</a> (kwa upangaji wa riprap)';
+$ec_lang['mtc_bend_angle']='<a target="_blank" href="riprap-bend-angle.png">Pembe ya Kona, β</a><span class="ec-help" title="Kwa upangaji wa riprap. Fuata kiungo kwa mchoro."><span class="ec-tip">?</span></span>';
 $ec_lang['mtc_sgrock']='<span class="ec-help" title="Kwa kawaida &asymp; 2.65 kwa jiwe lililopondwa">Uzito maalum wa jiwe, sg <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_in']='Ukubwa wa jiwe la kubuni, D<sub>50</sub>';
 $ec_lang['mtc_n_strickler']='n kwa ukubwa wa jiwe la kubuni kulingana na Strickler';
@@ -203,7 +207,7 @@ $ec_lang['mtc_d50_mra']='Ukubwa wa jiwe la pembe unaohitajika, D<sub>50</sub> (M
 $ec_lang['mtc_d50_searcy']='Ukubwa wa jiwe la pembe unaohitajika, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='Kasi inakubalika kwa makadirio ya mtiririko sawia.';
 $ec_lang['mtc_vel_low']='Kasi ya chini — hatari ya mashapo.';
-$ec_lang['mtc_iteration_tip']='Chagua chaguo la ukakamavu (Blodgett–Bathurst inapendekezwa) na chaguo la ukubwa wa jiwe (Isbash inapendekezwa) ili kikokotoo kirudie hatua kiotomatiki hadi kufikia ukubwa sawa wa jiwe kwa mtiririko unaolengwa. Angalia Maelezo hapa chini kwa mbinu kamili, au ingiza thamani yako ya ukakamavu na upuuze ukubwa wa jiwe ili kuruka marudio.';
+$ec_lang['mtc_iteration_tip']='Chagua chaguo la ukakamavu (Blodgett–Bathurst inapendekezwa) na chaguo la ukubwa wa jiwe (Isbash inapendekezwa) ili kikokotoo kirudie hatua kiotomatiki hadi kufikia ukubwa sawa wa jiwe kwa mtiririko unaolengwa. Angalia Maelezo hapa chini kwa mbinu kamili, au ingiza thamani yako ya ukakamavu (fuata kiungo kwa mwongozo) na upuuze ukubwa wa jiwe ili kuruka marudio.';
 $ec_lang['mtc_note_1']='<dl><dt>Marudio ya kiotomatiki ya ubunifu wa ukubwa wa jiwe na ukakamavu</dt><dd>Chagua chaguo la ukakamavu (Blodgett–Bathurst inapendekezwa) na chaguo la ukubwa wa jiwe la kubuni (Isbash inapendekezwa). Rekebisha kina na kipengele cha usalama cha ukubwa wa jiwe ili kufikia mtiririko unaolengwa kwa ukubwa sawa wa jiwe. Kila unapobadilisha thamani ya ingizo, kikokotoo hurudia hatua hizi: 1. Ukakamavu huhesabiwa kutoka ukubwa wa jiwe la kubuni. 2. Hesabu ya ukakamavu iliyoombwa hunakiliwa kwenye ukakamavu wa ingizo. 3. Mtiririko wa mfereji na ukubwa wa jiwe unaohitajika huhesabiwa. 4. Ukubwa wa jiwe la kubuni hurekebishwa. 5. Rudia hadi hitilafu katika ukubwa wa jiwe la kubuni iwe ndogo sana.</dd><dt>Kikokotoo cha msingi (bila marudio)</dt><dd>Ingiza thamani yako ya ukakamavu unayotaka. Puuza eneo la ingizo la ukubwa wa jiwe la kubuni.</dd></dl>';
 $ec_lang['mtc_note_2_term']='Ukaguzi wa kasi';
 $ec_lang['mtc_note_2_def']='Kasi ya juu inaonyesha kulikuwa na anguko kubwa la mwinuko lililosababisha nishati mahususi ya juu namna hiyo. Nishati hiyo inaweza kupotea haraka kwenye mapanuko, mapinda, au vizuizi. Thibitisha kwamba hii inafaa kwa eneo husika.';
@@ -500,7 +504,6 @@ $ec_lang['ip_count']='<span class="ec-help" title="Safu za tawi: vituo vya maji 
 $ec_lang['ip_length']='L';
 $ec_lang['ip_diameter']='D';
 $ec_lang['ip_roughness']='e';
-$ec_lang['ip_km']='<span class="ec-help" title="Mgawo wa jumla wa upotevu wa ndani kwa viunganishi/vali/viungio vya sehemu hii (kiwango cha chini kinachopendekezwa &ge;0.5)">k<sub>m</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['ip_elev_ds']='<span class="ec-help" title="Mwinuko wa ncha ya chini ya mkondo ya sehemu hii. Si lazima kwa safu za ndani (ikiachwa tupu huchukuliwa kuwa tambarare / sawa na nodi ya juu). Ni lazima kwa safu ya mwisho: thamani hiyo ni mwinuko wa kituo cha mwisho cha maji, unaoamua moja kwa moja shinikizo la usambazaji linalohitajika.">Mwinuko wa Chini <span class="ec-tip">?</span></span>';
 $ec_lang['ip_elev_ds_missing_warn']='Mwinuko wa kituo cha mwisho cha maji (safu ya mwisho) uliachwa tupu na ulichukuliwa kuwa tambarare &mdash; kiingize ili kupata matokeo sahihi';
 $ec_lang['ip_flow']='Mtiririko';

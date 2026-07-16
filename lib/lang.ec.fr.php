@@ -88,6 +88,10 @@ $ec_lang['dw_main_desc']='Perte de charge Darcy-Weisbach pour un diamètre, une 
 $ec_lang['dw_roughness']='e';
 $ec_lang['dw_roughness_tip']='Hauteur de rugosité absolue, e, de la paroi de la conduite. Valeurs typiques : acier (neuf) 0,046 mm, acier (usagé) 0,15 mm, HDPE 0,003 mm, PVC/uPVC 0,0015 mm, béton 0,3–3 mm.';
 $ec_lang['dw_kinematic_viscosity']='<span class="ec-help" title="1×10⁻⁶ m²/s pour l\'eau claire à 20°C">Viscosité cinématique, &nu; <span class="ec-tip">?</span></span>';
+$ec_lang['dw_kinematic_viscosity_short']='Viscosité cinématique, &nu;';
+$ec_lang_intent['dw_kinematic_viscosity_short']='';
+$ec_lang['dw_kinematic_viscosity_tip']='1×10⁻⁶ m²/s pour l\'eau claire à 20°C';
+$ec_lang_intent['dw_kinematic_viscosity_tip']='';
 $ec_lang['dw_reynolds_number']='Nombre de Reynolds, Re';
 $ec_lang['dw_flow_regime']='Régime d’écoulement';
 $ec_lang['dw_regime_laminar']='laminaire';
@@ -138,7 +142,7 @@ $ec_lang['mpf_main_desc']='Écoulement uniforme Manning en conduite à pente et 
 $ec_lang['mpf_spreadheet_notice']='Découvrez la version tableur de ce calculateur';
 $ec_lang['mpf_pipe_diameter']='Diamètre de la conduite, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Rugosité de Manning, n';
-$ec_lang['mpf_friction_slope']='Pente de frottement (parfois <a target="_blank" href="../frictionslope.php">?</a> égale à la pente de la conduite), S<sub>f</sub>';
+$ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Pente de frottement, S<sub>f</sub></a><span class="ec-help" title="Parfois égale à la pente de la conduite. Suivez le lien pour l\'explication (en anglais seulement)."><span class="ec-tip">?</span></span>';
 $ec_lang['mpf_depth_ratio']='Taux de remplissage, y/d<sub>0</sub>';
 $ec_lang['mpf_see_notes']='(voir notes)';
 $ec_lang['mpf_flow']='Débit, Q';
@@ -189,7 +193,7 @@ $ec_lang['mtc_side_slope_1']='Talus 1, z<sub>1</sub> (horiz./vert.)';
 $ec_lang['mtc_side_slope_2']='Talus 2, z<sub>2</sub> (horiz./vert.)';
 $ec_lang['mtc_channel_slope']='Pente du canal, S';
 $ec_lang['mtc_flow_depth']='Profondeur d\'écoulement, y';
-$ec_lang['mtc_bend_angle']='Angle de courbure, β <a target="_blank" href="riprap-bend-angle.png" title="Cliquer pour image">?</a> (pour le dimensionnement des enrochements)';
+$ec_lang['mtc_bend_angle']='<a target="_blank" href="riprap-bend-angle.png">Angle de courbure, β</a><span class="ec-help" title="Pour le dimensionnement des enrochements. Suivez le lien pour le schéma."><span class="ec-tip">?</span></span>';
 $ec_lang['mtc_sgrock']='<span class="ec-help" title="Typiquement &asymp; 2,65 pour la roche concassée">Densité relative de la roche, sg <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_in']='Granulométrie de conception, D<sub>50</sub>';
 $ec_lang['mtc_n_strickler']='n pour la granulométrie de conception selon Strickler';
@@ -203,7 +207,7 @@ $ec_lang['mtc_d50_mra']='Granulométrie d\'enrochement anguleux requise, D<sub>5
 $ec_lang['mtc_d50_searcy']='Granulométrie d\'enrochement anguleux requise, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='Vitesse raisonnable pour les hypothèses d\'écoulement uniforme.';
 $ec_lang['mtc_vel_low']='Vitesse faible — risque de sédimentation.';
-$ec_lang['mtc_iteration_tip']='Choisissez une option de rugosité (Blodgett–Bathurst recommandée) et une option de granulométrie (Isbash recommandée) pour itérer automatiquement vers une granulométrie uniforme adaptée à votre débit cible. Voir les notes ci-dessous pour la méthode complète, ou saisissez votre propre valeur de rugosité et ignorez la granulométrie pour éviter l\'itération.';
+$ec_lang['mtc_iteration_tip']='Choisissez une option de rugosité (Blodgett–Bathurst recommandée) et une option de granulométrie (Isbash recommandée) pour itérer automatiquement vers une granulométrie uniforme adaptée à votre débit cible. Voir les notes ci-dessous pour la méthode complète, ou saisissez votre propre valeur de rugosité (suivez le lien pour des conseils) et ignorez la granulométrie pour éviter l\'itération.';
 $ec_lang['mtc_note_1']='<dl><dt>Itération automatique de la granulométrie et de la rugosité</dt><dd>Choisissez une option de rugosité (Blodgett–Bathurst recommandée) et une option de granulométrie de conception (Isbash recommandée). Ajustez la profondeur et le coefficient de sécurité de la granulométrie pour atteindre le débit cible avec une granulométrie uniforme. À chaque modification d\'une entrée, le calculateur répète ces étapes : 1. La rugosité est calculée à partir de la granulométrie de conception. 2. La rugosité calculée est copiée dans le champ de rugosité en entrée. 3. Le débit du canal et la granulométrie requise sont calculés. 4. La granulométrie de conception est ajustée. 5. Répéter jusqu\'à ce que l\'écart sur la granulométrie de conception soit très faible.</dd><dt>Calculateur de base (sans itération)</dt><dd>Entrez la valeur de rugosité souhaitée. Ignorez la zone de saisie de la granulométrie de conception.</dd></dl>';
 $ec_lang['mtc_note_2_term']='Vérification de la vitesse';
 $ec_lang['mtc_note_2_def']='Une vitesse élevée implique une chute de niveau importante ayant produit une énergie spécifique élevée. Cette énergie peut être dissipée rapidement aux élargissements, coudes ou obstacles. Vérifiez que cela est raisonnable pour le site.';
@@ -501,7 +505,6 @@ $ec_lang['ip_count']='<span class="ec-help" title="Rangées de rampe : goutteurs
 $ec_lang['ip_length']='L';
 $ec_lang['ip_diameter']='D';
 $ec_lang['ip_roughness']='e';
-$ec_lang['ip_km']='<span class="ec-help" title="Coefficient générique de perte de charge singulière pour les raccords/vannes/coupleurs de ce tronçon (minimum suggéré ≥ 0,5)">k<sub>m</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['ip_elev_ds']='<span class="ec-help" title="Cote de l\'extrémité aval de ce tronçon. Optionnelle sur les rangées intérieures (par défaut plane / identique au nœud ci-dessus si laissée vide). Obligatoire sur la dernière rangée : cette valeur est la cote du dernier goutteur, qui détermine directement la pression d\'alimentation requise.">Cote av. <span class="ec-tip">?</span></span>';
 $ec_lang['ip_elev_ds_missing_warn']='La cote du dernier goutteur (dernière rangée) a été laissée vide et définie par défaut à plane — saisissez-la pour un résultat précis';
 $ec_lang['ip_flow']='Débit';
