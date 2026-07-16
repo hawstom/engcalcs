@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "my",
-        "expected_key_count": 497,
-        "delta_key_count": 11,
+        "expected_key_count": 499,
+        "delta_key_count": 10,
         "active_prefixes": [
             "dw",
             "install",
@@ -343,7 +343,6 @@
         "dw_roughness": "e",
         "install_android_heading": "Android (Chrome)",
         "install_ios_heading": "iOS (Safari)",
-        "install_desktop_heading": "Desktop (Chrome \/ Edge)",
         "rc_sg_ok_tip": "2.54–2.82 (Robinson)",
         "rc_SD_ok_tip": "1.15–1.47 (Robinson)",
         "ip_length": "L",
@@ -356,7 +355,6 @@
         "dw_roughness": "e",
         "install_android_heading": "Android (Chrome)",
         "install_ios_heading": "iOS (Safari)",
-        "install_desktop_heading": "Desktop (Chrome \/ Edge)",
         "rc_sg_ok_tip": "2.54–2.82 (Robinson)",
         "rc_SD_ok_tip": "1.15–1.47 (Robinson)",
         "ip_length": "L",
@@ -414,22 +412,6 @@
                 }
             }
         },
-        "install_desktop_heading": {
-            "reason": "equal_to_english",
-            "current_value": "Desktop (Chrome \/ Edge)",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "install_ios_note",
-                    "value": "iOS တွင် ထည့်သွင်းရန်အတွက် မျှဝေရန် မီနူးကိုသာ အမြဲအသုံးပြုရပြီး၊ အလိုအလျောက်ပေါ်လာသော ထည့်သွင်းမှု ညွှန်ကြားချက်ဘောက် မရှိပါ။",
-                    "english": "On iOS, installing always uses the Share menu — there is no automatic install prompt."
-                },
-                "next_translated": {
-                    "key": "install_desktop_steps_html",
-                    "value": "<li>တွက်ချက်စက်စာမျက်နှာတစ်ခုခုကိုဖွင့်ပါ။<\/li><li>ဘရောက်ဇာ၏ လိပ်စာဘားရှိ <strong>ထည့်သွင်းမှုသင်္ကေတ<\/strong> (⊕ သို့မဟုတ် ကွန်ပျူတာပုံ) ကိုနှိပ်ပါ၊ သို့မဟုတ် ဘရောက်ဇာ မီနူးကိုဖွင့်ပြီး <strong>EngCalcs ထည့်သွင်းရန်…<\/strong> ကိုရွေးပါ။<\/li><li><strong>ထည့်သွင်းရန်<\/strong> ကိုနှိပ်ပါ။ EngCalcs သည် သီးခြားအက်ပလီကေးရှင်း ဝင်းဒိုးတစ်ခုအနေဖြင့် ပွင့်လာပါလိမ့်မည်။<\/li>",
-                    "english": "<li>Open any calculator page.<\/li><li>Click the <strong>install icon<\/strong> (⊕ or computer icon) in the browser's address bar, or open the browser menu and choose <strong>Install EngCalcs…<\/strong><\/li><li>Click <strong>Install<\/strong>. EngCalcs opens as a standalone app window.<\/li>"
-                }
-            }
-        },
         "rc_sg_ok_tip": {
             "reason": "equal_to_english",
             "current_value": "2.54–2.82 (Robinson)",
@@ -472,9 +454,9 @@
                     "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
-                    "key": "ip_km",
-                    "value": "<span class=\"ec-help\" title=\"ဤပိုက်အပိုင်း၏ ဆက်စပ်ပစ္စည်း\/ဗားလ်ဗ်\/အဆက်များအတွက် အထွေထွေ ဒေသဆိုင်ရာဆုံးရှုံးမှု မြောက်ဖော်ကိန်း (အနည်းဆုံး &ge;0.5 အကြံပြုသည်)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
+                    "key": "ip_elev_ds",
+                    "value": "<span class=\"ec-help\" title=\"ဤပိုက်အပိုင်း၏ အောက်ဘက်စွန်းအမြင့်။ အတွင်းအတန်းများတွင် ရွေးချယ်နိုင်သည် (ဗလာထားလျှင် ညီညာသည်ဟု \/ အထက်ဆုံမှတ်နှင့်တူသည်ဟု ပုံသေယူဆသည်)။ နောက်ဆုံးအတန်းတွင် မဖြစ်မနေလိုအပ်သည်: ထိုတန်ဖိုးသည် နောက်ဆုံးရေထုတ်ကိရိယာ၏ အမြင့်ဖြစ်ပြီး လိုအပ်သောပေးသွင်းဖိအားကို တိုက်ရိုက် သတ်မှတ်သည်။\">ရေအောက်ဘက် အမြင့် <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -488,9 +470,9 @@
                     "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
-                    "key": "ip_km",
-                    "value": "<span class=\"ec-help\" title=\"ဤပိုက်အပိုင်း၏ ဆက်စပ်ပစ္စည်း\/ဗားလ်ဗ်\/အဆက်များအတွက် အထွေထွေ ဒေသဆိုင်ရာဆုံးရှုံးမှု မြောက်ဖော်ကိန်း (အနည်းဆုံး &ge;0.5 အကြံပြုသည်)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
+                    "key": "ip_elev_ds",
+                    "value": "<span class=\"ec-help\" title=\"ဤပိုက်အပိုင်း၏ အောက်ဘက်စွန်းအမြင့်။ အတွင်းအတန်းများတွင် ရွေးချယ်နိုင်သည် (ဗလာထားလျှင် ညီညာသည်ဟု \/ အထက်ဆုံမှတ်နှင့်တူသည်ဟု ပုံသေယူဆသည်)။ နောက်ဆုံးအတန်းတွင် မဖြစ်မနေလိုအပ်သည်: ထိုတန်ဖိုးသည် နောက်ဆုံးရေထုတ်ကိရိယာ၏ အမြင့်ဖြစ်ပြီး လိုအပ်သောပေးသွင်းဖိအားကို တိုက်ရိုက် သတ်မှတ်သည်။\">ရေအောက်ဘက် အမြင့် <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -504,9 +486,9 @@
                     "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
-                    "key": "ip_km",
-                    "value": "<span class=\"ec-help\" title=\"ဤပိုက်အပိုင်း၏ ဆက်စပ်ပစ္စည်း\/ဗားလ်ဗ်\/အဆက်များအတွက် အထွေထွေ ဒေသဆိုင်ရာဆုံးရှုံးမှု မြောက်ဖော်ကိန်း (အနည်းဆုံး &ge;0.5 အကြံပြုသည်)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
+                    "key": "ip_elev_ds",
+                    "value": "<span class=\"ec-help\" title=\"ဤပိုက်အပိုင်း၏ အောက်ဘက်စွန်းအမြင့်။ အတွင်းအတန်းများတွင် ရွေးချယ်နိုင်သည် (ဗလာထားလျှင် ညီညာသည်ဟု \/ အထက်ဆုံမှတ်နှင့်တူသည်ဟု ပုံသေယူဆသည်)။ နောက်ဆုံးအတန်းတွင် မဖြစ်မနေလိုအပ်သည်: ထိုတန်ဖိုးသည် နောက်ဆုံးရေထုတ်ကိရိယာ၏ အမြင့်ဖြစ်ပြီး လိုအပ်သောပေးသွင်းဖိအားကို တိုက်ရိုက် သတ်မှတ်သည်။\">ရေအောက်ဘက် အမြင့် <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },

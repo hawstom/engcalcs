@@ -79,6 +79,7 @@ $ec_lang['ec_name_label']='এই গণনা সংরক্ষণ করু�
 $ec_lang['ec_name_placeholder']='নাম';
 $ec_lang['ec_name_hint']='এই ইনপুটগুলি বুকমার্কিং, ইতিহাস পুনরুদ্ধার এবং শেয়ারিংয়ের জন্য URL-এ সংরক্ষণ করে';
 $ec_lang['calc_copy_link']='লিঙ্ক কপি করুন';
+$ec_lang['ec_related_calcs']='সম্পর্কিত ক্যালকুলেটর:';
 $ec_lang['calc_copy_link_done']='কপি করা হয়েছে!';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='ড্যার্সি-ওয়েইসবাখ পাইপ হেড লস';
@@ -138,7 +139,7 @@ $ec_lang['mi_notes_2_def']='পাথরের আস্তরণ ডিজা�
 $ec_lang['mpf_main_menu']='ম্যানিং পাইপ প্রবাহ';
 $ec_lang['mpf_main_title']='বিনামূল্যে অনলাইন ম্যানিং পাইপ প্রবাহ ক্যালকুলেটর';
 $ec_lang['mpf_main_desc']='নির্দিষ্ট ঢাল ও গভীরতায় ম্যানিং ফর্মুলা অভিন্ন পাইপ প্রবাহ';
-$ec_lang['mpf_spreadheet_notice']='এই ক্যালকুলেটরের স্প্রেডশিট সংস্করণটি দেখুন';
+$ec_lang['mpf_spreadheet_notice']='ম্যানিং পাইপ প্রবাহ স্প্রেডশিট';
 $ec_lang['mpf_pipe_diameter']='পাইপ ব্যাস, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='ম্যানিং রুক্ষতা, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">ঘর্ষণ ঢাল, S<sub>f</sub></a><span class="ec-help" title="কখনও কখনও পাইপ ঢালের সমান। ব্যাখ্যার জন্য লিঙ্ক অনুসরণ করুন (শুধুমাত্র ইংরেজিতে)।"><span class="ec-tip">?</span></span>';

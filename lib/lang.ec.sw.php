@@ -80,6 +80,7 @@ $ec_lang['ec_name_label']='Hifadhi hesabu hii:';
 $ec_lang['ec_name_placeholder']='Jina';
 $ec_lang['ec_name_hint']='Huhifadhi maingizo haya kwenye URL kwa ajili ya kuweka alama, kurejea historia, na kushiriki';
 $ec_lang['calc_copy_link']='Nakili kiungo';
+$ec_lang['ec_related_calcs']='Vikokotoo vinavyohusiana:';
 $ec_lang['calc_copy_link_done']='Imenakiliwa!';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Upotevu wa Kichwa cha Bomba la Darcy-Weisbach';
@@ -139,7 +140,7 @@ $ec_lang['mi_notes_2_def']='Tumia Kikokotoo cha Mfereji wa Trapezoidi wa Manning
 $ec_lang['mpf_main_menu']='Mtiririko wa Bomba la Manning';
 $ec_lang['mpf_main_title']='Kikokotoo cha Bure Mtandaoni cha Mtiririko wa Bomba la Manning';
 $ec_lang['mpf_main_desc']='Mtiririko Sawia wa Bomba la Fomula ya Manning kwa Mteremko na Kina Kilichowekwa';
-$ec_lang['mpf_spreadheet_notice']='Angalia toleo la lahajedwali la kikokotoo hiki';
+$ec_lang['mpf_spreadheet_notice']='Lahajedwali la Mtiririko wa Bomba la Manning';
 $ec_lang['mpf_pipe_diameter']='Kipenyo cha bomba, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Mgawo wa usuguo wa Manning, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Mteremko wa msuguano, S<sub>f</sub></a><span class="ec-help" title="Labda sawa na mteremko wa bomba. Fuata kiungo kwa maelezo (kwa Kiingereza pekee)."><span class="ec-tip">?</span></span>';

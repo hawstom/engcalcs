@@ -6,15 +6,6 @@ function echoHelpWanted(){
 <p class="collapse show d-print-none" id="helpWanted">
 	<a href="../contact.php"><?=$ec_lang['template_translation_help']?></a> <a data-bs-toggle="collapse" href="#helpWanted" aria-expanded="true" aria-controls="helpWanted"><?=$ec_lang['view_hide_line']?></a>
 </p>
-<?php
-if (basename($_SERVER['PHP_SELF']) == "Manning-Pipe-Flow.php") {
-?>
-<p class="collapse show d-print-none" id="spreadsheetNotice">   
-	<a href="spreadsheet/<?=basename($_SERVER['PHP_SELF'], '.php') . '.php';?>"><?=$ec_lang['mpf_spreadheet_notice']?></a> <a data-bs-toggle="collapse" href="#spreadsheetNotice" aria-expanded="true" aria-controls="spreadsheetNotice"><?=$ec_lang['view_hide_line']?></a>
-</p>
-<?php
-}
-?>
 <br />
 
 

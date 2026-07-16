@@ -80,6 +80,7 @@ $ec_lang['ec_name_label']='یہ حساب محفوظ کریں:';
 $ec_lang['ec_name_placeholder']='نام';
 $ec_lang['ec_name_hint']='ان درج کردہ قدریوں کو URL میں محفوظ کریں نشان زدگی، تاریخ سے بازیافت، اور شیئرنگ کے لیے';
 $ec_lang['calc_copy_link']='لنک کاپی کریں';
+$ec_lang['ec_related_calcs']='متعلقہ کیلکولیٹرز:';
 $ec_lang['calc_copy_link_done']='کاپی ہو گیا!';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='ڈارسی-وائسباخ پائپ دباؤ نقصان';
@@ -139,7 +140,7 @@ $ec_lang['mi_notes_2_def']='پتھر کی استر ڈیزائن کرنے کے ل
 $ec_lang['mpf_main_menu']='مانینگ پائپ بہاؤ';
 $ec_lang['mpf_main_title']='مفت آنلائن مانینگ پائپ بہاؤ حاسبہ';
 $ec_lang['mpf_main_desc']='دیے گئے ڈھلان اور گہرائی پر مانینگ فارمولا یکساں پائپ بہاؤ';
-$ec_lang['mpf_spreadheet_notice']='اس حاسبے کا اسپریڈشیٹ ورژن دیکھیں';
+$ec_lang['mpf_spreadheet_notice']='مانینگ پائپ بہاؤ اسپریڈشیٹ';
 $ec_lang['mpf_pipe_diameter']='پائپ قطر، d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='مانینگ کھردرا پن، n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">رگڑ ڈھلان، S<sub>f</sub></a><span class="ec-help" title="بعض اوقات پائپ ڈھلان کے برابر۔ وضاحت کے لیے لنک پر جائیں (صرف انگریزی میں)۔"><span class="ec-tip">?</span></span>';
@@ -397,7 +398,7 @@ $ec_lang['install_android_heading']='اینڈرائیڈ (Chrome)';
 $ec_lang['install_android_steps_html']='<li>Chrome میں کوئی بھی کیلکولیٹر صفحہ کھولیں۔</li><li>اوپر نیویگیشن بار میں <strong>⬇ انسٹال</strong> بٹن دبائیں، یا براؤزر مینو (⋮) کھول کر <strong>ہوم اسکرین پر شامل کریں</strong> منتخب کریں۔</li><li>ظاہر ہونے والے پرامپٹ میں <strong>انسٹال</strong> دبائیں۔</li><li>EngCalcs آپ کی ہوم اسکرین پر نظر آئے گا اور آف لائن کام کرے گا۔</li>';
 $ec_lang['install_now_btn']='⬇ ابھی انسٹال کریں';
 $ec_lang['install_prompt_unavailable']='انسٹال پرامپٹ دستیاب نہیں — براہ کرم اپنے براؤزر کا مینو استعمال کریں۔';
-$ec_lang['install_ios_heading']='iOS (Safari)';
+$ec_lang['install_ios_heading']='iOS (سفاری)';
 $ec_lang['install_ios_steps_html']='<li>Safari میں کوئی بھی کیلکولیٹر صفحہ کھولیں۔</li><li><strong>شیئر</strong> بٹن دبائیں (اوپر کی طرف تیر والا خانہ)۔</li><li>نیچے اسکرول کر کے <strong>ہوم اسکرین پر شامل کریں</strong> دبائیں۔</li><li><strong>شامل کریں</strong> دبائیں۔ EngCalcs آپ کی ہوم اسکرین پر نظر آئے گا۔</li>';
 $ec_lang['install_ios_note']='iOS پر، انسٹال کرنے کے لیے ہمیشہ شیئر مینو استعمال ہوتا ہے — خودکار انسٹال پرامپٹ دستیاب نہیں ہوتا۔';
 $ec_lang['install_desktop_heading']='ڈیسک ٹاپ (Chrome / Edge)';

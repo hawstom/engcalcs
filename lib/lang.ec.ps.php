@@ -81,6 +81,7 @@ $ec_lang['ec_name_placeholder']='نوم';
 $ec_lang['ec_name_hint']='دا ننوتنې URL ته خوندي کوي د نشان کتاب، تاریخ بیر کیدو، او شریکولو لپاره';
 $ec_lang['calc_copy_link']='لینک کاپي کړئ';
 $ec_lang['calc_copy_link_done']='کاپي شو!';
+$ec_lang['ec_related_calcs']='اړوند محاسبې:';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Darcy-Weisbach د پایپ سر ضیاع';
 $ec_lang['dw_main_title']='وړیا آنلاین Darcy-Weisbach د پایپ سر ضیاع محاسبه';
@@ -139,7 +140,7 @@ $ec_lang['mi_notes_2_def']='د کاڼو پوښ ډیزاین کولو لپاره 
 $ec_lang['mpf_main_menu']='Manning د پایپ بهاو';
 $ec_lang['mpf_main_title']='وړیا آنلاین Manning د پایپ بهاو محاسبه';
 $ec_lang['mpf_main_desc']='د Manning فارمول یکسان د پایپ بهاو د ورکړل شوي میل او ژوروالي سره';
-$ec_lang['mpf_spreadheet_notice']='د دې محاسبې د سپریډشیټ نسخه وګورئ';
+$ec_lang['mpf_spreadheet_notice']='Manning د پایپ بهاو محاسبې پاڼه';
 $ec_lang['mpf_pipe_diameter']='د پایپ قطر، d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='د مانینګ خشونت، n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">د اصطکاک میل، S<sub>f</sub></a><span class="ec-help" title="کله ناکله د پایپ میل سره مساوي. د توضیح لپاره لینک تعقیب کړئ (یوازې په انګلیسي)."><span class="ec-tip">?</span></span>';
@@ -229,7 +230,7 @@ $ec_lang['wi_pondingHeight']='د ډنډ لوړوالی';
 $ec_lang['wi_incrementalFlow']='برخوي بهاو';
 $ec_lang['wi_cumulativeFlow']='ټولیز بهاو';
 $ec_lang['wi_save_and_calculate']='خوندي کړئ او محاسبه وکړئ';
-$ec_lang['wi_notes_we_def']='q = if (length = 0) then 0 else if (slope=0) then cw*length*d<sub>0</sub><sup>1.5</sup> else cw/(2.5*slope) * (d<sub>0</sub><sup>2.5</sup> - d<sub>1</sub><sup>2.5</sup>) where d<sub>1</sub> and d<sub>0</sub> are always positive or zero';
+$ec_lang['wi_notes_we_def']='q = که (اوږدوالی = 0) نو 0 که نه که (شیب=0) نو cw*اوږدوالی*d<sub>0</sub><sup>1.5</sup> که نه cw/(2.5*شیب) * (d<sub>0</sub><sup>2.5</sup> - d<sub>1</sub><sup>2.5</sup>) چیرته چې d<sub>1</sub> او d<sub>0</sub> تل مثبت یا صفر دي';
 // Orifice Flow
 $ec_lang['or_main_menu']='د سوري بهاو';
 $ec_lang['or_main_title']='وړیا آنلاین د سوري بهاو محاسبه';

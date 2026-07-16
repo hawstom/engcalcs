@@ -82,6 +82,7 @@ $ec_lang['ec_name_placeholder']='Nombre';
 $ec_lang['ec_name_hint']='Guarda los datos de entrada en la URL para marcapáginas, recuperar del historial y compartir';
 $ec_lang['calc_copy_link']='Copiar enlace';
 $ec_lang_intent['calc_copy_link']='';
+$ec_lang['ec_related_calcs']='Calculadoras relacionadas:';
 $ec_lang['calc_copy_link_done']='¡Copiado!';
 $ec_lang_intent['calc_copy_link_done']='';
 // Darcy-Weisbach. See mphl_ for missing text.
@@ -142,7 +143,7 @@ $ec_lang['mi_notes_2_def']='Use la Calculadora de canal trapecial según Manning
 $ec_lang['mpf_main_menu']='Flujo según Manning en tuberías';
 $ec_lang['mpf_main_title']='Calculadora gratis en línea de la fórmula de Manning para flujo uniforme en tuberías';
 $ec_lang['mpf_main_desc']='Caudal y velocidad de flujo uniforme en tuberías según Manning, a partir de la pendiente y el calado';
-$ec_lang['mpf_spreadheet_notice']='Pruebe la versión de esta calculadora en hoja de cálculo';
+$ec_lang['mpf_spreadheet_notice']='Hoja de cálculo: Flujo según Manning en tuberías';
 $ec_lang['mpf_pipe_diameter']='Diámetro de la tubería, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Coeficiente de rugosidad de Manning, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Pendiente de fricción, S<sub>f</sub></a><span class="ec-help" title="A veces igual a la pendiente de la tubería. Siga el enlace para la explicación (solo en inglés)."><span class="ec-tip">?</span></span>';
@@ -280,7 +281,7 @@ $ec_lang['mhp_power']='Potencia producida, P';
 $ec_lang['mhp_annual_kwh']='Energía anual al 100% de capacidad';
 $ec_lang['mhp_vel_low']='Velocidad baja — riesgo de sedimentación y entrada de aire.';
 $ec_lang['mhp_vel_high']='Velocidad elevada — verificar pérdidas de transición, energía disponible y golpe de ariete.';
-$ec_lang['mhp_vel_ok_short']='OK';
+$ec_lang['mhp_vel_ok_short']='Bien';
 $ec_lang['mhp_vel_high_short']='Alto';
 $ec_lang['mhp_vel_low_short']='Bajo';
 $ec_lang['mhp_vel_ok_tip']='La velocidad está en el rango eficiente para el diseño de la tubería de presión.';

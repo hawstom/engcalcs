@@ -1,11 +1,10 @@
 {
     "meta": {
         "language": "ur",
-        "expected_key_count": 497,
-        "delta_key_count": 9,
+        "expected_key_count": 499,
+        "delta_key_count": 8,
         "active_prefixes": [
             "dw",
-            "install",
             "ip",
             "rc"
         ],
@@ -17,7 +16,6 @@
     },
     "prompt_context_by_prefix": {
         "dw": "Use these preferred technical term translations when relevant:\n- flow (Q): بہاؤ\n- velocity (v): رفتار\n- head loss (h_L): ہیڈ لاس\n- friction factor (f): رگڑ عامل\n- slope (S): ڈھلوان\n- laminar: سطحی بہاؤ\n- transitional: منتقلی بہاؤ\n- turbulent: ہنگامہ خیز بہاؤ",
-        "install": "Use these preferred technical term translations when relevant:\n- flow (Q): بہاؤ\n- velocity (v): رفتار\n- slope (S): ڈھلوان",
         "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): بہاؤ\n- velocity (v): رفتار\n- head loss (h_L): ہیڈ لاس\n- emitter: خارج کنندہ\n- distribution uniformity (DU): تقسیم یکسانیت\n- low-quarter distribution uniformity (DU_lq): نچلی چوتھائی تقسیم یکسانیت\n- application rate (PR): اطلاق کی شرح\n- lateral: لیٹرل\n- mainline: مرکزی پائپ\n- reach: حصہ\n- velocity head (H_v): رفتار ہیڈ\n- friction loss (h_f): رگڑ نقصان\n- minor loss (h_m): مقامی نقصان\n- energy grade line (EGL): توانائی لائن\n- upstream: بالائی رخ\n- downstream: زیریں رخ",
         "rc": "Use these preferred technical term translations when relevant:\n- flow (Q): بہاؤ\n- velocity (v): رفتار\n- riprap: پتھر کی حفاظت\n- slope (S): ڈھلوان\n- rock chute: پتھریلا تیز نالہ\n- chute: تیز نالہ\n- unit discharge (q, q_t): اکائی بہاؤ\n- median rock size (D50): وسیط پتھر کا سائز\n- gradation (SD): درجہ بندی\n- porosity (n_p): مسامیت\n- specific gravity (sg): مخصوص کثافت\n- ponding: پانی جمع ہونا\n- outlet apron: آؤٹ لیٹ ایپرن\n- weir head (H_p): ویئر ہیڈ\n- upstream: بالائی رخ\n- downstream: زیریں رخ\n- reach: حصہ"
     },
@@ -78,29 +76,6 @@
                 "context": "Flow regime with chaotic, irregular mixing. Reynolds number above ~4000. Appears in Darcy-Weisbach calculator flow regime check.",
                 "translation_notes": "Nearly always a cognate. Some languages distinguish 'turbulent' (adjective) from 'turbulence' (noun) — use the adjective form.",
                 "preferred_translation": "ہنگامہ خیز بہاؤ"
-            }
-        ],
-        "install": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg RESOLVED (Tom, 2026-07-13): native engineer's 2026-07-06 clarification confirmed both 'дебит' (colloquial\/general register) and 'водно количество' (academic\/hydraulic-engineering register, used at university for Q) are acceptable. Tom decided suite-wide standardization on 'водно количество' — \"I would put водно количество everywhere\" — applied across all bg calculator categories (pipes\/irrigation included, not just the hydraulic-structure\/open-channel strings the engineer originally corrected). 'дебит' fully replaced in lib\/lang.ec.bg.php 2026-07-13.",
-                "preferred_translation": "بہاؤ"
-            },
-            {
-                "term": "velocity",
-                "symbol": "v",
-                "context": "Flow velocity (speed of water). Appears in all calculators.",
-                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
-                "preferred_translation": "رفتار"
-            },
-            {
-                "term": "slope",
-                "symbol": "S",
-                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
-                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
-                "preferred_translation": "ڈھلوان"
             }
         ],
         "ip": [
@@ -341,7 +316,6 @@
     },
     "keys_to_translate": {
         "dw_roughness": "e",
-        "install_ios_heading": "iOS (Safari)",
         "rc_sg_ok_tip": "2.54–2.82 (Robinson)",
         "rc_SD_ok_tip": "1.15–1.47 (Robinson)",
         "ip_length": "L",
@@ -352,7 +326,6 @@
     },
     "keys": {
         "dw_roughness": "e",
-        "install_ios_heading": "iOS (Safari)",
         "rc_sg_ok_tip": "2.54–2.82 (Robinson)",
         "rc_SD_ok_tip": "1.15–1.47 (Robinson)",
         "ip_length": "L",
@@ -375,22 +348,6 @@
                     "key": "dw_roughness_tip",
                     "value": "پائپ کی دیوار کی مطلق کھردری اونچائی، e۔ عام قدریں: فولاد (نیا) 0.046 ملی میٹر، فولاد (استعمال شدہ) 0.15 ملی میٹر، HDPE 0.003 ملی میٹر، PVC\/uPVC 0.0015 ملی میٹر، کنکریٹ 0.3–3 ملی میٹر۔",
                     "english": "Absolute roughness height, e, of the pipe wall. Typical values: steel (new) 0.046 mm, steel (used) 0.15 mm, HDPE 0.003 mm, PVC\/uPVC 0.0015 mm, concrete 0.3–3 mm."
-                }
-            }
-        },
-        "install_ios_heading": {
-            "reason": "equal_to_english",
-            "current_value": "iOS (Safari)",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "install_prompt_unavailable",
-                    "value": "انسٹال پرامپٹ دستیاب نہیں — براہ کرم اپنے براؤزر کا مینو استعمال کریں۔",
-                    "english": "Install prompt not available — use your browser menu instead."
-                },
-                "next_translated": {
-                    "key": "install_ios_steps_html",
-                    "value": "<li>Safari میں کوئی بھی کیلکولیٹر صفحہ کھولیں۔<\/li><li><strong>شیئر<\/strong> بٹن دبائیں (اوپر کی طرف تیر والا خانہ)۔<\/li><li>نیچے اسکرول کر کے <strong>ہوم اسکرین پر شامل کریں<\/strong> دبائیں۔<\/li><li><strong>شامل کریں<\/strong> دبائیں۔ EngCalcs آپ کی ہوم اسکرین پر نظر آئے گا۔<\/li>",
-                    "english": "<li>Open any calculator page in Safari.<\/li><li>Tap the <strong>Share<\/strong> button (box with arrow pointing up).<\/li><li>Scroll down and tap <strong>Add to Home Screen<\/strong>.<\/li><li>Tap <strong>Add<\/strong>. EngCalcs appears on your home screen.<\/li>"
                 }
             }
         },
@@ -436,9 +393,9 @@
                     "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
-                    "key": "ip_km",
-                    "value": "<span class=\"ec-help\" title=\"اس ریچ کی فٹنگز\/والوز\/جوڑنے والوں کے لیے عمومی مقامی نقصان کا عامل (تجویز کردہ کم از کم &ge;0.5)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
+                    "key": "ip_elev_ds",
+                    "value": "<span class=\"ec-help\" title=\"اس ریچ کے زیریں سرے کی بلندی۔ اندرونی قطاروں میں اختیاری ہے (خالی چھوڑنے پر ہموار \/ اوپر والے نوڈ کے برابر مانی جاتی ہے)۔ آخری قطار میں لازمی ہے: یہ قدر آخری ایمیٹر کی بلندی ہے، جو براہِ راست مطلوبہ سپلائی دباؤ متعین کرتی ہے۔\">زیریں بلندی <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -452,9 +409,9 @@
                     "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
-                    "key": "ip_km",
-                    "value": "<span class=\"ec-help\" title=\"اس ریچ کی فٹنگز\/والوز\/جوڑنے والوں کے لیے عمومی مقامی نقصان کا عامل (تجویز کردہ کم از کم &ge;0.5)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
+                    "key": "ip_elev_ds",
+                    "value": "<span class=\"ec-help\" title=\"اس ریچ کے زیریں سرے کی بلندی۔ اندرونی قطاروں میں اختیاری ہے (خالی چھوڑنے پر ہموار \/ اوپر والے نوڈ کے برابر مانی جاتی ہے)۔ آخری قطار میں لازمی ہے: یہ قدر آخری ایمیٹر کی بلندی ہے، جو براہِ راست مطلوبہ سپلائی دباؤ متعین کرتی ہے۔\">زیریں بلندی <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -468,9 +425,9 @@
                     "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
-                    "key": "ip_km",
-                    "value": "<span class=\"ec-help\" title=\"اس ریچ کی فٹنگز\/والوز\/جوڑنے والوں کے لیے عمومی مقامی نقصان کا عامل (تجویز کردہ کم از کم &ge;0.5)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
+                    "key": "ip_elev_ds",
+                    "value": "<span class=\"ec-help\" title=\"اس ریچ کے زیریں سرے کی بلندی۔ اندرونی قطاروں میں اختیاری ہے (خالی چھوڑنے پر ہموار \/ اوپر والے نوڈ کے برابر مانی جاتی ہے)۔ آخری قطار میں لازمی ہے: یہ قدر آخری ایمیٹر کی بلندی ہے، جو براہِ راست مطلوبہ سپلائی دباؤ متعین کرتی ہے۔\">زیریں بلندی <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },

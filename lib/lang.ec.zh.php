@@ -80,6 +80,7 @@ $ec_lang['ec_name_placeholder']='名称';
 $ec_lang['ec_name_hint']='将这些输入值保存到网址中以便书签、历史记录和分享';
 $ec_lang['calc_copy_link']='复制链接';
 $ec_lang['calc_copy_link_done']='已复制！';
+$ec_lang['ec_related_calcs']='相关计算器：';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='达西-韦斯巴赫管道水头损失';
 $ec_lang['dw_main_title']='免费在线达西-韦斯巴赫管道水头损失计算器';
@@ -138,7 +139,7 @@ $ec_lang['mi_notes_2_def']='如需设计护坡石材，请使用曼宁梯形渠�
 $ec_lang['mpf_main_menu']='曼宁管流';
 $ec_lang['mpf_main_title']='免费在线曼宁管流计算器';
 $ec_lang['mpf_main_desc']='在给定坡度和水深条件下的曼宁公式均匀管流';
-$ec_lang['mpf_spreadheet_notice']='试用本计算器的电子表格版本';
+$ec_lang['mpf_spreadheet_notice']='曼宁管流电子表格';
 $ec_lang['mpf_pipe_diameter']='管径，d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='曼宁糙率系数，n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">摩擦坡度，S<sub>f</sub></a><span class="ec-help" title="有时等于管道坡度。点击链接查看说明（仅英文）。"><span class="ec-tip">?</span></span>';

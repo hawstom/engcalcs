@@ -79,6 +79,7 @@ $ec_lang['ec_name_label']='Simpan perhitungan ini:';
 $ec_lang['ec_name_placeholder']='Nama';
 $ec_lang['ec_name_hint']='Menyimpan nilai masukan ini ke URL untuk penanda halaman, pengambilan riwayat, dan berbagi';
 $ec_lang['calc_copy_link']='Salin tautan';
+$ec_lang['ec_related_calcs']='Kalkulator terkait:';
 $ec_lang['calc_copy_link_done']='Tersalin!';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Kehilangan Tinggi Tekan Pipa Darcy-Weisbach';
@@ -115,7 +116,7 @@ $ec_lang['mi_xSecPoints']='Titik penampang melintang';
 $ec_lang['mi_groupPoint']='Titik';
 $ec_lang['mi_groupSegment']='Segmen';
 $ec_lang['mi_groupRegion']='Zona';
-$ec_lang['mi_station']='Sta';
+$ec_lang['mi_station']='STA';
 $ec_lang['mi_elevation']='Elev';
 $ec_lang['mi_d50in']='Ukuran<br />median<br />batu<br />pelapis';
 $ec_lang['mi_n']='n<br />untuk<br />seg-<br />men';
@@ -138,7 +139,7 @@ $ec_lang['mi_notes_2_def']='Gunakan Kalkulator Saluran Trapesium Manning untuk m
 $ec_lang['mpf_main_menu']='Aliran Pipa Manning';
 $ec_lang['mpf_main_title']='Kalkulator Aliran Pipa Manning Gratis Daring';
 $ec_lang['mpf_main_desc']='Rumus Manning untuk Aliran Pipa Seragam pada Kemiringan dan Kedalaman Tertentu';
-$ec_lang['mpf_spreadheet_notice']='Coba versi spreadsheet dari kalkulator ini';
+$ec_lang['mpf_spreadheet_notice']='Spreadsheet Aliran Pipa Manning';
 $ec_lang['mpf_pipe_diameter']='Diameter pipa, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Koefisien kekasaran Manning, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Kemiringan gesekan, S<sub>f</sub></a><span class="ec-help" title="Terkadang sama dengan kemiringan pipa. Ikuti tautan untuk penjelasan (hanya dalam bahasa Inggris)."><span class="ec-tip">?</span></span>';

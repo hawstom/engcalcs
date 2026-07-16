@@ -1,14 +1,13 @@
 {
     "meta": {
         "language": "ps",
-        "expected_key_count": 497,
-        "delta_key_count": 10,
+        "expected_key_count": 499,
+        "delta_key_count": 9,
         "active_prefixes": [
             "dw",
             "install",
             "ip",
-            "rc",
-            "wi"
+            "rc"
         ],
         "requested_prefix": null,
         "notes": "Translate only keys in keys_to_translate; preserve HTML, units, and symbols.",
@@ -20,8 +19,7 @@
         "dw": "Use these preferred technical term translations when relevant:\n- flow (Q): بهاو\n- velocity (v): سرعت\n- head loss (h_L): د سر ضیاع\n- friction factor (f): د اصطکاک فاکتور\n- slope (S): شیب\n- laminar: طبقاتي\n- transitional: انتقالي\n- turbulent: آشفته",
         "install": "Use these preferred technical term translations when relevant:\n- flow (Q): بهاو\n- velocity (v): سرعت\n- slope (S): شیب",
         "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): بهاو\n- velocity (v): سرعت\n- head loss (h_L): د سر ضیاع\n- emitter: وریز\n- distribution uniformity (DU): د ویش یو‌شانتیا\n- low-quarter distribution uniformity (DU_lq): [needs translation sprint]\n- application rate (PR): د اوبو د لګولو نرخ\n- lateral: جانبي نل\n- mainline: اصلي نل\n- reach: د نل برخه\n- velocity head (H_v): د سرعت لوړوالی\n- friction loss (h_f): د اصطکاک ضیاع\n- minor loss (h_m): ځایی ضیاع\n- energy grade line (EGL): د انرژۍ کرښه\n- upstream: [needs translation sprint]\n- downstream: [needs translation sprint]",
-        "rc": "Use these preferred technical term translations when relevant:\n- flow (Q): بهاو\n- velocity (v): سرعت\n- riprap: د سیلاب مخنیوي ډبرې\n- slope (S): شیب\n- rock chute: د کاڼو تند اوبو لار\n- chute: تیز اوبه لار\n- unit discharge (q, q_t): د واحد بهاو\n- median rock size (D50): د کاڼي منځني اندازه\n- gradation (SD): د کاڼو د اندازو درجه‌بندي\n- porosity (n_p): سوري والتیا\n- specific gravity (sg): ځانګړی ثقل\n- ponding: [needs translation sprint]\n- outlet apron: [needs translation sprint]\n- weir head (H_p): [needs translation sprint]\n- upstream: [needs translation sprint]\n- downstream: [needs translation sprint]\n- reach: د نل برخه",
-        "wi": "Use these preferred technical term translations when relevant:\n- flow (Q): بهاو\n- weir: ویر\n- headwater elevation: د پورته اوبو سطح\n- tailwater elevation: د ښکته اوبو سطح\n- discharge coefficient (C_d): د بهاو ضریب\n- irregular channel: غیریکسانې مقطع"
+        "rc": "Use these preferred technical term translations when relevant:\n- flow (Q): بهاو\n- velocity (v): سرعت\n- riprap: د سیلاب مخنیوي ډبرې\n- slope (S): شیب\n- rock chute: د کاڼو تند اوبو لار\n- chute: تیز اوبه لار\n- unit discharge (q, q_t): د واحد بهاو\n- median rock size (D50): د کاڼي منځني اندازه\n- gradation (SD): د کاڼو د اندازو درجه‌بندي\n- porosity (n_p): سوري والتیا\n- specific gravity (sg): ځانګړی ثقل\n- ponding: [needs translation sprint]\n- outlet apron: [needs translation sprint]\n- weir head (H_p): [needs translation sprint]\n- upstream: [needs translation sprint]\n- downstream: [needs translation sprint]\n- reach: د نل برخه"
     },
     "glossary_terms_by_prefix": {
         "dw": [
@@ -339,55 +337,10 @@
                 "translation_notes": "Hydraulics noun, NOT \"arrival\/reaching\" (ps \"رسیدل\" wrong), NOT \"agent\" (sw \"mwakala\" wrong), NOT \"stripe\" (km wrong). Bisection is the numerical root-finding method used to close the pressure loop in the Irrigation Pressure notes. (Wave 0, 2026-07-07, removed the former \"right at the takeoff\" and \"draw off\" wording from the English source.)",
                 "preferred_translation": "د نل برخه"
             }
-        ],
-        "wi": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg RESOLVED (Tom, 2026-07-13): native engineer's 2026-07-06 clarification confirmed both 'дебит' (colloquial\/general register) and 'водно количество' (academic\/hydraulic-engineering register, used at university for Q) are acceptable. Tom decided suite-wide standardization on 'водно количество' — \"I would put водно количество everywhere\" — applied across all bg calculator categories (pipes\/irrigation included, not just the hydraulic-structure\/open-channel strings the engineer originally corrected). 'дебит' fully replaced in lib\/lang.ec.bg.php 2026-07-13.",
-                "preferred_translation": "بهاو"
-            },
-            {
-                "term": "weir",
-                "symbol": "",
-                "context": "A flow-measurement or water-control structure — a barrier across a channel over which water flows. Appears in Weir Flow Simple and Weir Flow Irregular calculators.",
-                "translation_notes": "WMO No. 385 entry 1665 confirms: es = 'vertedero', fr = 'déversoir', ru = 'водослив'. In an irrigation context, the term often overlaps with 'diversion dam' or 'check structure'. Use the term most common among irrigation field workers in the target language, not a purely civil-engineering dictionary term.",
-                "preferred_translation": "ویر"
-            },
-            {
-                "term": "headwater elevation",
-                "symbol": "",
-                "context": "Water surface elevation on the upstream side of a weir or orifice. Appears in Weir Flow and Orifice calculators.",
-                "translation_notes": "'Headwater' is an upstream water surface — do not confuse with 'head' (energy) or 'source' (origin of a stream). Use the hydraulic structure term. CORRECTED 2026-07 (category-2 sprint): tr was swapped with tailwater elevation ('mansap' is Turkish for downstream, not upstream — 'memba' is upstream); fixed to 'memba su seviyesi', matching the suite's existing correct usage in lib\/lang.ec.tr.php.",
-                "preferred_translation": "د پورته اوبو سطح"
-            },
-            {
-                "term": "tailwater elevation",
-                "symbol": "",
-                "context": "Water surface elevation on the downstream side of a weir or orifice. Appears in Orifice Flow calculator. When tailwater is above the invert, the orifice is submerged.",
-                "translation_notes": "Use the hydraulic structure term for downstream water level. Pair consistently with 'headwater elevation'. CORRECTED 2026-07 (category-2 sprint): tr was swapped with headwater elevation; fixed to 'mansap su seviyesi' (downstream), matching the suite's existing correct usage in lib\/lang.ec.tr.php.",
-                "preferred_translation": "د ښکته اوبو سطح"
-            },
-            {
-                "term": "discharge coefficient",
-                "symbol": "C_d",
-                "context": "Coefficient correcting theoretical orifice or weir flow for real-world contraction and friction effects. Appears in Orifice and Weir calculators.",
-                "translation_notes": "The 'discharge' here refers to flow rate, not the verb. Use the hydraulic engineering compound term.",
-                "preferred_translation": "د بهاو ضریب"
-            },
-            {
-                "term": "irregular channel",
-                "symbol": "",
-                "context": "A channel whose cross-section is non-uniform \/ non-prismatic — a natural or surveyed section defined by station-elevation points, as opposed to a regular trapezoidal shape. Titles the Manning Irregular Channel calculator (mi_) and, in the geometric sense, the Weir Flow Irregular calculator (wi_).",
-                "translation_notes": "\"Irregular\" here is GEOMETRIC: the cross-section is non-uniform \/ natural \/ arbitrary shape. It is NOT the temporal sense \"sporadic \/ occasional \/ not-regular\" (bg \"нередовен\" WRONG, uk \"нерегулярний\" WRONG per Bulgarian-engineer-feedback.md), and NOT \"incorrect \/ faulty\" (ru \"неправильное русло\" reads as \"wrong channel\" — prefer \"произвольного сечения\"). Where the language allows, name the cross-section explicitly (\"of irregular cross-section\") rather than a bare adjective that could be read as temporal or evaluative. Task 98 audit (2026-07-13): uk\/ru were already fixed to the geometric sense, but bg was still shipping the evaluative-sense defect this note itself warns against — \"неправилно сечение\" (= \"incorrect\/wrong cross-section\"), across 7 occurrences (mi_menu, mi_main_title, mi_main_desc, wi_menu, wi_main_title, wi_main_desc, irr_card_canal_desc). Fixed to \"произволно сечение\" (\"arbitrary cross-section\"), a direct grammatical parallel to the Russian fix. Lesson: a documented glossary warning doesn't guarantee every flagged language was actually corrected — verify current shipped state, don't assume a note describes present reality.",
-                "preferred_translation": "غیریکسانې مقطع"
-            }
         ]
     },
     "keys_to_translate": {
         "dw_roughness": "e",
-        "wi_notes_we_def": "q = if (length = 0) then 0 else if (slope=0) then cw*length*d<sub>0<\/sub><sup>1.5<\/sup> else cw\/(2.5*slope) * (d<sub>0<\/sub><sup>2.5<\/sup> - d<sub>1<\/sub><sup>2.5<\/sup>) where d<sub>1<\/sub> and d<sub>0<\/sub> are always positive or zero",
         "install_ios_heading": "iOS (Safari)",
         "rc_sg_ok_tip": "2.54–2.82 (Robinson)",
         "rc_SD_ok_tip": "1.15–1.47 (Robinson)",
@@ -399,7 +352,6 @@
     },
     "keys": {
         "dw_roughness": "e",
-        "wi_notes_we_def": "q = if (length = 0) then 0 else if (slope=0) then cw*length*d<sub>0<\/sub><sup>1.5<\/sup> else cw\/(2.5*slope) * (d<sub>0<\/sub><sup>2.5<\/sup> - d<sub>1<\/sub><sup>2.5<\/sup>) where d<sub>1<\/sub> and d<sub>0<\/sub> are always positive or zero",
         "install_ios_heading": "iOS (Safari)",
         "rc_sg_ok_tip": "2.54–2.82 (Robinson)",
         "rc_SD_ok_tip": "1.15–1.47 (Robinson)",
@@ -423,22 +375,6 @@
                     "key": "dw_roughness_tip",
                     "value": "د پایپ دیوال مطلق خشونت لوړوالی، e. عادي ارزښتونه: فولاد (نوی) 0.046 mm، فولاد (کارول شوی) 0.15 mm، HDPE 0.003 mm، PVC\/uPVC 0.0015 mm، کانکریټ 0.3–3 mm.",
                     "english": "Absolute roughness height, e, of the pipe wall. Typical values: steel (new) 0.046 mm, steel (used) 0.15 mm, HDPE 0.003 mm, PVC\/uPVC 0.0015 mm, concrete 0.3–3 mm."
-                }
-            }
-        },
-        "wi_notes_we_def": {
-            "reason": "equal_to_english",
-            "current_value": "q = if (length = 0) then 0 else if (slope=0) then cw*length*d<sub>0<\/sub><sup>1.5<\/sup> else cw\/(2.5*slope) * (d<sub>0<\/sub><sup>2.5<\/sup> - d<sub>1<\/sub><sup>2.5<\/sup>) where d<sub>1<\/sub> and d<sub>0<\/sub> are always positive or zero",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "wi_save_and_calculate",
-                    "value": "خوندي کړئ او محاسبه وکړئ",
-                    "english": "Save and Calculate"
-                },
-                "next_translated": {
-                    "key": "or_main_menu",
-                    "value": "د سوري بهاو",
-                    "english": "Orifice Flow"
                 }
             }
         },
@@ -500,9 +436,9 @@
                     "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
-                    "key": "ip_km",
-                    "value": "<span class=\"ec-help\" title=\"د دې برخې د فیټنګونو\/والوونو\/نښلوونکو لپاره عمومي ځایي-ضیاع ضریب (&ge;0.5 وړاندیز شوی کمترین)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
+                    "key": "ip_elev_ds",
+                    "value": "<span class=\"ec-help\" title=\"د دې برخې د ښکتني پای لوړوالی. د منځني کرښو لپاره اختیاري دی (که خالي پریښودل شي، هوار \/ د پورتني نوډ سره یو شان ګڼل کیږي). د وروستۍ کرښې لپاره لازمي دی: هغه ارزښت د آخري وریز لوړوالی دی، کوم چې مستقیماً اړین تامین فشار ټاکي.\">ښکتنی لوړوالی <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -516,9 +452,9 @@
                     "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
-                    "key": "ip_km",
-                    "value": "<span class=\"ec-help\" title=\"د دې برخې د فیټنګونو\/والوونو\/نښلوونکو لپاره عمومي ځایي-ضیاع ضریب (&ge;0.5 وړاندیز شوی کمترین)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
+                    "key": "ip_elev_ds",
+                    "value": "<span class=\"ec-help\" title=\"د دې برخې د ښکتني پای لوړوالی. د منځني کرښو لپاره اختیاري دی (که خالي پریښودل شي، هوار \/ د پورتني نوډ سره یو شان ګڼل کیږي). د وروستۍ کرښې لپاره لازمي دی: هغه ارزښت د آخري وریز لوړوالی دی، کوم چې مستقیماً اړین تامین فشار ټاکي.\">ښکتنی لوړوالی <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -532,9 +468,9 @@
                     "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
-                    "key": "ip_km",
-                    "value": "<span class=\"ec-help\" title=\"د دې برخې د فیټنګونو\/والوونو\/نښلوونکو لپاره عمومي ځایي-ضیاع ضریب (&ge;0.5 وړاندیز شوی کمترین)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
+                    "key": "ip_elev_ds",
+                    "value": "<span class=\"ec-help\" title=\"د دې برخې د ښکتني پای لوړوالی. د منځني کرښو لپاره اختیاري دی (که خالي پریښودل شي، هوار \/ د پورتني نوډ سره یو شان ګڼل کیږي). د وروستۍ کرښې لپاره لازمي دی: هغه ارزښت د آخري وریز لوړوالی دی، کوم چې مستقیماً اړین تامین فشار ټاکي.\">ښکتنی لوړوالی <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -572,7 +508,6 @@
         }
     },
     "key_intent": {
-        "wi_notes_we_def": "Weir equation written in if\/then\/else pseudocode.",
         "ip_hf": "Friction head loss.",
         "ip_hm": "Minor (local) head loss."
     }

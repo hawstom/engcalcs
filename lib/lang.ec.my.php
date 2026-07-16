@@ -81,6 +81,7 @@ $ec_lang['ec_name_placeholder']='အမည်';
 $ec_lang['ec_name_hint']='ထည့်သွင်းချက်များကို URL သို့သိမ်းဆည်းကာ စာမှတ်မုံးခြင်း၊ မှတ်တမ်းများ ပြန်လည်ရယူခြင်းနှင့် မျှဝေခြင်းအတွက်ဖြစ်သည်။';
 $ec_lang['calc_copy_link']='လင့်ခ် ကူးယူရန်';
 $ec_lang['calc_copy_link_done']='ကူးယူပြီးပါပြီ!';
+$ec_lang['ec_related_calcs']='ဆက်စပ်တွက်ချက်စက်များ:';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Darcy-Weisbach သွတ်ပိုက် ဖိမြင့်ဆင့်ဆုံးရှုံးမှု';
 $ec_lang['dw_main_title']='အခမဲ့ အွန်လိုင်း Darcy-Weisbach သွတ်ပိုက် ဖိမြင့်ဆင့်ဆုံးရှုံးမှု တွက်ချက်မှုကိရိယာ';
@@ -140,7 +141,7 @@ $ec_lang['mi_notes_2_def']='ကျောက်အကာ ဒီဇိုင်း
 $ec_lang['mpf_main_menu']='Manning သွတ်ပိုက် စီးဆင်းမှု';
 $ec_lang['mpf_main_title']='အခမဲ့ အွန်လိုင်း Manning သွတ်ပိုက် စီးဆင်းမှု တွက်ချက်မှုကိရိယာ';
 $ec_lang['mpf_main_desc']='သတ်မှတ်အစောက်နှင့် နက်ရှိုင်းမှုတွင် Manning ဖော်မြူလာ တစ်သမတ်တည်း သွတ်ပိုက် စီးဆင်းမှု';
-$ec_lang['mpf_spreadheet_notice']='ဤတွက်ချက်မှုကိရိယာ၏ spreadsheet ဗားရှင်းကို ကြည့်ပါ';
+$ec_lang['mpf_spreadheet_notice']='Manning သွတ်ပိုက် စီးဆင်းမှု ဇယားဖိုင်';
 $ec_lang['mpf_pipe_diameter']='သွတ်ပိုက် အချင်း, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='မန်းနင်းကြမ်းတမ်းမှုကိန်း, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">ပွတ်တိုက်မှုအစောက်, S<sub>f</sub></a><span class="ec-help" title="ပိုက်အစောက်နှင့် တူနိုင်။ ရှင်းလင်းချက်အတွက် လင့်ခ်ကိုနှိပ်ပါ (အင်္ဂလိပ်ဘာသာဖြင့်သာ)။"><span class="ec-tip">?</span></span>';
@@ -403,7 +404,7 @@ $ec_lang['install_prompt_unavailable']='ထည့်သွင်းမှု ည
 $ec_lang['install_ios_heading']='iOS (Safari)';
 $ec_lang['install_ios_steps_html']='<li>တွက်ချက်စက်စာမျက်နှာတစ်ခုခုကို Safari ဖြင့်ဖွင့်ပါ။</li><li>အပေါ်သို့ချိန်ညွှန်နေသော မြှားပါသည့် <strong>မျှဝေရန်</strong> ခလုတ်ကိုနှိပ်ပါ။</li><li>အောက်သို့ဆွဲချပြီး <strong>ပင်မစာမျက်နှာသို့ ထည့်ရန်</strong> ကိုနှိပ်ပါ။</li><li><strong>ထည့်ရန်</strong> ကိုနှိပ်ပါ။ EngCalcs သည် သင့်ပင်မစာမျက်နှာပေါ်တွင်ပေါ်လာပါလိမ့်မည်။</li>';
 $ec_lang['install_ios_note']='iOS တွင် ထည့်သွင်းရန်အတွက် မျှဝေရန် မီနူးကိုသာ အမြဲအသုံးပြုရပြီး၊ အလိုအလျောက်ပေါ်လာသော ထည့်သွင်းမှု ညွှန်ကြားချက်ဘောက် မရှိပါ။';
-$ec_lang['install_desktop_heading']='Desktop (Chrome / Edge)';
+$ec_lang['install_desktop_heading']='ကွန်ပျူတာ (Chrome / Edge)';
 $ec_lang['install_desktop_steps_html']='<li>တွက်ချက်စက်စာမျက်နှာတစ်ခုခုကိုဖွင့်ပါ။</li><li>ဘရောက်ဇာ၏ လိပ်စာဘားရှိ <strong>ထည့်သွင်းမှုသင်္ကေတ</strong> (⊕ သို့မဟုတ် ကွန်ပျူတာပုံ) ကိုနှိပ်ပါ၊ သို့မဟုတ် ဘရောက်ဇာ မီနူးကိုဖွင့်ပြီး <strong>EngCalcs ထည့်သွင်းရန်…</strong> ကိုရွေးပါ။</li><li><strong>ထည့်သွင်းရန်</strong> ကိုနှိပ်ပါ။ EngCalcs သည် သီးခြားအက်ပလီကေးရှင်း ဝင်းဒိုးတစ်ခုအနေဖြင့် ပွင့်လာပါလိမ့်မည်။</li>';
 $ec_lang['install_firefox_heading']='Firefox / အခြား ဘရောက်ဇာများ';
 $ec_lang['install_firefox_body']='Firefox သည် ဒက်စ်တော့ကွန်ပျူတာပေါ်တွင် PWA ထည့်သွင်းခြင်းကို ပံ့ပိုးမပေးပါ။ သို့သော်လည်း ဘရောက်ဇာ ထဲတွင် တွက်ချက်စက်အားလုံးကို ပုံမှန်အတိုင်း ဆက်လက်အသုံးပြုနိုင်ပါသည် — ပထမဆုံးအကြိမ်ဝင်ရောက်ကြည့်ရှုပြီးနောက် စာမျက်နှာများကို အင်တာနက်မလိုဘဲသုံးရန် အလိုအလျောက် သိမ်းဆည်းပေးပါလိမ့်မည်။';

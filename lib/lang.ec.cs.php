@@ -79,6 +79,7 @@ $ec_lang['ec_name_label']='Uložit tento výpočet:';
 $ec_lang['ec_name_placeholder']='Název';
 $ec_lang['ec_name_hint']='Uloží tyto zadané hodnoty do adresy URL pro přidání do záložek, načtení z historie a sdílení';
 $ec_lang['calc_copy_link']='Kopírovat odkaz';
+$ec_lang['ec_related_calcs']='Související kalkulačky:';
 $ec_lang['calc_copy_link_done']='Zkopírováno!';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Ztráta tlakové výšky v potrubí Darcy-Weisbach';
@@ -115,7 +116,7 @@ $ec_lang['mi_xSecPoints']='Body příčného řezu';
 $ec_lang['mi_groupPoint']='Bod';
 $ec_lang['mi_groupSegment']='Segment';
 $ec_lang['mi_groupRegion']='Oblast';
-$ec_lang['mi_station']='Sta';
+$ec_lang['mi_station']='Sta.';
 $ec_lang['mi_elevation']='Kóta';
 $ec_lang['mi_d50in']='Mediánová<br />velikost<br />kamene<br />opevnění';
 $ec_lang['mi_n']='n<br />seg-<br />mentu';
@@ -138,7 +139,7 @@ $ec_lang['mi_notes_2_def']='Pro návrh kamenného opevnění použijte kalkulát
 $ec_lang['mpf_main_menu']='Průtok v potrubí Manning';
 $ec_lang['mpf_main_title']='Bezplatný online kalkulátor průtoku v potrubí Manning';
 $ec_lang['mpf_main_desc']='Manningova rovnice pro rovnoměrný průtok v potrubí při daném sklonu a hloubce';
-$ec_lang['mpf_spreadheet_notice']='Vyzkoušejte tabulkovou verzi tohoto kalkulátoru';
+$ec_lang['mpf_spreadheet_notice']='Manningova tabulka průtoku v potrubí';
 $ec_lang['mpf_pipe_diameter']='Průměr potrubí, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Manningův součinitel drsnosti, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Třecí sklon, S<sub>f</sub></a><span class="ec-help" title="Někdy roven sklonu potrubí. Sledujte odkaz pro vysvětlení (pouze v angličtině)."><span class="ec-tip">?</span></span>';

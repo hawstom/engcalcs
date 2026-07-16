@@ -81,6 +81,7 @@ $ec_lang['ec_name_placeholder']='Nome';
 $ec_lang['ec_name_hint']='Salva esses valores na URL para favoritos, recuperação do histórico e compartilhamento';
 $ec_lang['calc_copy_link']='Copiar link';
 $ec_lang['calc_copy_link_done']='Copiado!';
+$ec_lang['ec_related_calcs']='Calculadoras relacionadas:';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Perda de carga em tubulação por Darcy-Weisbach';
 $ec_lang['dw_main_title']='Calculadora gratuita online de perda de carga em tubulação por Darcy-Weisbach';
@@ -139,7 +140,7 @@ $ec_lang['mi_notes_2_def']='Use a Calculadora de Canal Trapecial de Manning para
 $ec_lang['mpf_main_menu']='Vazão em tubulação por Manning';
 $ec_lang['mpf_main_title']='Calculadora gratuita online da fórmula de Manning para vazão em tubulação';
 $ec_lang['mpf_main_desc']='Escoamento uniforme pela Fórmula de Manning para declividade e profundidade informadas';
-$ec_lang['mpf_spreadheet_notice']='Confira a versão desta calculadora em planilha';
+$ec_lang['mpf_spreadheet_notice']='Planilha de Escoamento em Tubulação (Manning)';
 $ec_lang['mpf_pipe_diameter']='Diâmetro da tubulação, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Coeficiente de rugosidade de Manning, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Declividade de atrito, S<sub>f</sub></a><span class="ec-help" title="Às vezes igual à declividade da tubulação. Siga o link para a explicação (somente em inglês)."><span class="ec-tip">?</span></span>';
@@ -199,7 +200,7 @@ $ec_lang['mtc_d50_in']='Tamanho de rocha de projeto, D<sub>50</sub>';
 $ec_lang['mtc_n_strickler']='n para o tamanho de rocha de projeto (método de Strickler)';
 $ec_lang['mtc_n_blodgett']='n para o tamanho de rocha de projeto (método de Blodgett)';
 $ec_lang['mtc_n_bathurst']='n para o tamanho de rocha de projeto (método de Bathurst)';
-$ec_lang['mtc_blodgett_v_bathurst']='Blodgett vs. Bathurst';
+$ec_lang['mtc_blodgett_v_bathurst']='Blodgett x Bathurst';
 $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="Segundo Isbash (1936) e o Condado de Maricopa, Arizona, EUA.">Tamanho de rocha angular requerido no fundo, D<sub>50</sub> (Isbash e MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="Segundo Isbash (1936) e o Condado de Maricopa, Arizona, EUA.">Tamanho de rocha angular requerido no lado 1, D<sub>50</sub> (Isbash e MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="Segundo Isbash (1936) e o Condado de Maricopa, Arizona, EUA.">Tamanho de rocha angular requerido no lado 2, D<sub>50</sub> (Isbash e MC) <span class="ec-tip">?</span></span>';

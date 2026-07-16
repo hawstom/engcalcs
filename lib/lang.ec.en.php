@@ -155,6 +155,7 @@ $ec_lang['ec_name_hint']='Saves these inputs to the URL for bookmarking, history
 $ec_lang_intent['ec_name_hint']='';
 $ec_lang['calc_copy_link']='Copy link';
 $ec_lang_intent['calc_copy_link']='';
+$ec_lang['ec_related_calcs']='Related calculators:';
 $ec_lang['calc_copy_link_done']='Copied!';
 $ec_lang_intent['calc_copy_link_done']='';
 // Darcy-Weisbach. See mphl_ for missing text.
@@ -265,7 +266,7 @@ $ec_lang['mpf_main_title']='Free Online Manning Pipe Flow Calculator';
 $ec_lang_intent['mpf_main_title']='';
 $ec_lang['mpf_main_desc']='Manning Formula Uniform Pipe Flow at Given Slope and Depth';
 $ec_lang_intent['mpf_main_desc']='';
-$ec_lang['mpf_spreadheet_notice']='Try the spreadsheet version of this calculator';
+$ec_lang['mpf_spreadheet_notice']='Manning Pipe Flow spreadsheet';
 $ec_lang_intent['mpf_spreadheet_notice']='';
 $ec_lang['mpf_pipe_diameter']='Pipe diameter, d<sub>0</sub>';
 $ec_lang_intent['mpf_pipe_diameter']='';

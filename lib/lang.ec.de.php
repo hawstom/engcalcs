@@ -80,6 +80,7 @@ $ec_lang['ec_name_placeholder']='Name';
 $ec_lang['ec_name_hint']='Speichert diese Eingaben in der URL zum Lesezeichen, zum Abrufen aus dem Verlauf und zum Teilen';
 $ec_lang['calc_copy_link']='Link kopieren';
 $ec_lang['calc_copy_link_done']='Kopiert!';
+$ec_lang['ec_related_calcs']='Verwandte Rechner:';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Rohrreibungsverlust Darcy-Weisbach';
 $ec_lang['dw_main_title']='Kostenloser Online-Rechner Rohrreibungsverlust Darcy-Weisbach';
@@ -115,7 +116,7 @@ $ec_lang['mi_xSecPoints']='Querschnittspunkte';
 $ec_lang['mi_groupPoint']='Punkt';
 $ec_lang['mi_groupSegment']='Segment';
 $ec_lang['mi_groupRegion']='Bereich';
-$ec_lang['mi_station']='Sta';
+$ec_lang['mi_station']='Sta.';
 $ec_lang['mi_elevation']='Höhe';
 $ec_lang['mi_d50in']='Mediane<br />Korn-<br />größe<br />Deckwerk';
 $ec_lang['mi_n']='n';
@@ -138,7 +139,7 @@ $ec_lang['mi_notes_2_def']='Verwenden Sie den Manning-Trapezkanal-Rechner für d
 $ec_lang['mpf_main_menu']='Rohrdurchfluss Manning';
 $ec_lang['mpf_main_title']='Kostenloser Online-Rechner Rohrdurchfluss Manning';
 $ec_lang['mpf_main_desc']='Manning-Formel für gleichförmigen Rohrdurchfluss bei gegebenem Gefälle und Füllhöhe';
-$ec_lang['mpf_spreadheet_notice']='Probieren Sie die Tabellenversion dieses Rechners aus';
+$ec_lang['mpf_spreadheet_notice']='Manning-Rohrdurchfluss-Tabelle';
 $ec_lang['mpf_pipe_diameter']='Rohrdurchmesser, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Manning-Rauheitskoeffizient, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Reibungsgefälle, S<sub>f</sub></a><span class="ec-help" title="Mitunter gleich dem Rohrgefälle. Dem Link für die Erklärung folgen (nur auf Englisch)."><span class="ec-tip">?</span></span>';

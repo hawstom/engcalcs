@@ -79,6 +79,7 @@ $ec_lang['ec_name_placeholder']='Naziv';
 $ec_lang['ec_name_hint']='Sprema ove unesene vrijednosti u URL za zabilješke, preuzimanje iz povijesti i zajedničko korištenje';
 $ec_lang['calc_copy_link']='Kopiraj poveznicu';
 $ec_lang['calc_copy_link_done']='Kopirano!';
+$ec_lang['ec_related_calcs']='Povezani kalkulatori:';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Darcy-Weisbach gubitak tlačne visine u cijevi';
 $ec_lang['dw_main_title']='Besplatni online kalkulator Darcy-Weisbach gubitka tlačne visine u cijevi';
@@ -137,7 +138,7 @@ $ec_lang['mi_notes_2_def']='Koristite kalkulator trapezoidnog kanala prema Manni
 $ec_lang['mpf_main_menu']='Manning protok kroz cijev';
 $ec_lang['mpf_main_title']='Besplatni online kalkulator Manning protoka kroz cijev';
 $ec_lang['mpf_main_desc']='Manning formula — jednolik protok kroz cijev pri zadanom nagibu i dubini';
-$ec_lang['mpf_spreadheet_notice']='Isprobajte proračunsku tablicu ovog kalkulatora';
+$ec_lang['mpf_spreadheet_notice']='Excel tablica za Manningov protok kroz cijev';
 $ec_lang['mpf_pipe_diameter']='Promjer cijevi, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Manningov koeficijent hrapavosti, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Nagib trenja, S<sub>f</sub></a><span class="ec-help" title="Ponekad jednak nagibu cijevi. Slijedite poveznicu za objašnjenje (samo na engleskom)."><span class="ec-tip">?</span></span>';
@@ -275,7 +276,7 @@ $ec_lang['mhp_power']='Izlazna snaga, P';
 $ec_lang['mhp_annual_kwh']='Godišnja energija pri 100% kapaciteta';
 $ec_lang['mhp_vel_low']='Brzina niska — rizik od sedimentacije i usisa zraka.';
 $ec_lang['mhp_vel_high']='Brzina visoka — provjerite gubitke pri tranziciji, raspoloživu energiju i rizik od vodnog udara.';
-$ec_lang['mhp_vel_ok_short']='OK';
+$ec_lang['mhp_vel_ok_short']='U redu';
 $ec_lang['mhp_vel_high_short']='Visoka';
 $ec_lang['mhp_vel_low_short']='Niska';
 $ec_lang['mhp_vel_ok_tip']='Brzina je u učinkovitom rasponu za projektiranje dovodne cijevi.';
@@ -525,7 +526,7 @@ $ec_lang['rc_notes_7_def']='Kada je normalna dubina u ulaznom kanalu manja od vi
 $ec_lang['rc_notes_4_term']='Izvor';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). "<a target="_blank" href="https://www.fs.usda.gov/biology/nsaec/fishxing/fplibrary/Robinson_1998_Design_of_Rock_Chutes.pdf">Design of rock chutes</a>." <em>Transactions of the ASAE</em>, 41(3), 621–626. USDA ARS također objavljuje <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">Excel tablicu</a> temeljenu na istoj metodi.';
 // Sketch labels
-$ec_lang['rc_sketch_filter']          = 'Filter';
+$ec_lang['rc_sketch_filter']          = 'Filtar';
 $ec_lang['rc_sketch_top_crest_curve']='Krivulja grebena';
 $ec_lang['rc_sketch_outlet_apron']    = 'Izlazna ploča';
 $ec_lang['rc_sketch_radius']          = 'polumjer';

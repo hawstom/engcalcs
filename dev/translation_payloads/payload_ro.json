@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ro",
-        "expected_key_count": 497,
-        "delta_key_count": 15,
+        "expected_key_count": 499,
+        "delta_key_count": 13,
         "active_prefixes": [
             "dw",
             "install",
@@ -394,12 +394,10 @@
         "dw_regime_laminar": "laminar",
         "dw_regime_turbulent": "turbulent",
         "mi_groupSegment": "Segment",
-        "mi_station": "Sta",
         "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
         "mhp_vel_ok_short": "OK",
         "install_android_heading": "Android (Chrome)",
         "install_ios_heading": "iOS (Safari)",
-        "install_desktop_heading": "Desktop (Chrome \/ Edge)",
         "ip_length": "L",
         "ip_diameter": "D",
         "ip_roughness": "e",
@@ -411,12 +409,10 @@
         "dw_regime_laminar": "laminar",
         "dw_regime_turbulent": "turbulent",
         "mi_groupSegment": "Segment",
-        "mi_station": "Sta",
         "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
         "mhp_vel_ok_short": "OK",
         "install_android_heading": "Android (Chrome)",
         "install_ios_heading": "iOS (Safari)",
-        "install_desktop_heading": "Desktop (Chrome \/ Edge)",
         "ip_length": "L",
         "ip_diameter": "D",
         "ip_roughness": "e",
@@ -488,22 +484,6 @@
                 }
             }
         },
-        "mi_station": {
-            "reason": "equal_to_english",
-            "current_value": "Sta",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mi_groupRegion",
-                    "value": "Regiune",
-                    "english": "Region"
-                },
-                "next_translated": {
-                    "key": "mi_elevation",
-                    "value": "Cotă",
-                    "english": "Elevation"
-                }
-            }
-        },
         "mtc_blodgett_v_bathurst": {
             "reason": "equal_to_english",
             "current_value": "Blodgett vs. Bathurst",
@@ -568,22 +548,6 @@
                 }
             }
         },
-        "install_desktop_heading": {
-            "reason": "equal_to_english",
-            "current_value": "Desktop (Chrome \/ Edge)",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "install_ios_note",
-                    "value": "Pe iOS, instalarea se face întotdeauna prin meniul Distribuire — nu există o fereastră automată de instalare.",
-                    "english": "On iOS, installing always uses the Share menu — there is no automatic install prompt."
-                },
-                "next_translated": {
-                    "key": "install_desktop_steps_html",
-                    "value": "<li>Deschideți orice pagină de calculator.<\/li><li>Faceți clic pe <strong>pictograma de instalare<\/strong> (⊕ sau pictograma unui computer) din bara de adrese a browserului sau deschideți meniul browserului și alegeți <strong>Instalare EngCalcs…<\/strong><\/li><li>Faceți clic pe <strong>Instalare<\/strong>. EngCalcs se deschide ca o aplicație independentă.<\/li>",
-                    "english": "<li>Open any calculator page.<\/li><li>Click the <strong>install icon<\/strong> (⊕ or computer icon) in the browser's address bar, or open the browser menu and choose <strong>Install EngCalcs…<\/strong><\/li><li>Click <strong>Install<\/strong>. EngCalcs opens as a standalone app window.<\/li>"
-                }
-            }
-        },
         "ip_length": {
             "reason": "equal_to_english",
             "current_value": "L",
@@ -594,9 +558,9 @@
                     "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
-                    "key": "ip_km",
-                    "value": "<span class=\"ec-help\" title=\"Coeficient generic de pierdere locală pentru fitingurile\/valvele\/cuplajele acestui tronson (&ge;0,5 minim sugerat)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
+                    "key": "ip_elev_ds",
+                    "value": "<span class=\"ec-help\" title=\"Cota capătului aval al acestui tronson. Opțional pe rândurile interioare (implicit plat \/ la fel ca nodul de deasupra dacă se lasă gol). Necesară pe rândul final: acea valoare este cota ultimului emițător, care stabilește direct presiunea de alimentare necesară.\">Cota Aval <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -610,9 +574,9 @@
                     "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
-                    "key": "ip_km",
-                    "value": "<span class=\"ec-help\" title=\"Coeficient generic de pierdere locală pentru fitingurile\/valvele\/cuplajele acestui tronson (&ge;0,5 minim sugerat)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
+                    "key": "ip_elev_ds",
+                    "value": "<span class=\"ec-help\" title=\"Cota capătului aval al acestui tronson. Opțional pe rândurile interioare (implicit plat \/ la fel ca nodul de deasupra dacă se lasă gol). Necesară pe rândul final: acea valoare este cota ultimului emițător, care stabilește direct presiunea de alimentare necesară.\">Cota Aval <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -626,9 +590,9 @@
                     "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
-                    "key": "ip_km",
-                    "value": "<span class=\"ec-help\" title=\"Coeficient generic de pierdere locală pentru fitingurile\/valvele\/cuplajele acestui tronson (&ge;0,5 minim sugerat)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
+                    "key": "ip_elev_ds",
+                    "value": "<span class=\"ec-help\" title=\"Cota capătului aval al acestui tronson. Opțional pe rândurile interioare (implicit plat \/ la fel ca nodul de deasupra dacă se lasă gol). Necesară pe rândul final: acea valoare este cota ultimului emițător, care stabilește direct presiunea de alimentare necesară.\">Cota Aval <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -666,7 +630,6 @@
         }
     },
     "key_intent": {
-        "mi_station": "Station (chainage, distance along the alignment) of this point — \"Distance\" is an acceptable alias where the surveying sense of \"station\" has no natural short word",
         "ip_hf": "Friction head loss.",
         "ip_hm": "Minor (local) head loss."
     }

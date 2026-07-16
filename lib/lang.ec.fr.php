@@ -81,6 +81,7 @@ $ec_lang['ec_name_placeholder']='Nom';
 $ec_lang['ec_name_hint']='Enregistre les données saisies dans l\'URL pour les signets, la récupération de l\'historique et le partage';
 $ec_lang['calc_copy_link']='Copier le lien';
 $ec_lang['calc_copy_link_done']='Copié !';
+$ec_lang['ec_related_calcs']='Calculateurs associés :';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Perte de charge Darcy-Weisbach';
 $ec_lang['dw_main_title']='Calculateur gratuit en ligne de perte de charge Darcy-Weisbach';
@@ -139,7 +140,7 @@ $ec_lang['mi_notes_2_def']='Utilisez le calculateur de canal trapézoïdal Manni
 $ec_lang['mpf_main_menu']='Écoulement Manning en conduite';
 $ec_lang['mpf_main_title']='Calculateur gratuit en ligne de la formule Manning pour l\'écoulement en conduite';
 $ec_lang['mpf_main_desc']='Écoulement uniforme Manning en conduite à pente et taux de remplissage donnés';
-$ec_lang['mpf_spreadheet_notice']='Découvrez la version tableur de ce calculateur';
+$ec_lang['mpf_spreadheet_notice']='Feuille de calcul Écoulement Manning en conduite';
 $ec_lang['mpf_pipe_diameter']='Diamètre de la conduite, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Rugosité de Manning, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Pente de frottement, S<sub>f</sub></a><span class="ec-help" title="Parfois égale à la pente de la conduite. Suivez le lien pour l\'explication (en anglais seulement)."><span class="ec-tip">?</span></span>';
@@ -199,7 +200,7 @@ $ec_lang['mtc_d50_in']='Granulométrie de conception, D<sub>50</sub>';
 $ec_lang['mtc_n_strickler']='n pour la granulométrie de conception selon Strickler';
 $ec_lang['mtc_n_blodgett']='n pour la granulométrie de conception selon Blodgett';
 $ec_lang['mtc_n_bathurst']='n pour la granulométrie de conception selon Bathurst';
-$ec_lang['mtc_blodgett_v_bathurst']='Blodgett vs. Bathurst';
+$ec_lang['mtc_blodgett_v_bathurst']='Blodgett c. Bathurst';
 $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="Selon Isbash (1936) et le comté de Maricopa, Arizona, États-Unis.">Granulométrie d\'enrochement anguleux requise au fond, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="Selon Isbash (1936) et le comté de Maricopa, Arizona, États-Unis.">Granulométrie d\'enrochement anguleux requise sur talus 1, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="Selon Isbash (1936) et le comté de Maricopa, Arizona, États-Unis.">Granulométrie d\'enrochement anguleux requise sur talus 2, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';

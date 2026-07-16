@@ -81,6 +81,7 @@ $ec_lang['ec_name_placeholder']='ስም';
 $ec_lang['ec_name_hint']='እነዚህ ግቤቶች ወደ URL ያስቀምጣል በደንብ ምልክት ለመስጠት ታሪክ ማግኛ እና ማጋራት';
 $ec_lang['calc_copy_link']='ቅዳ ሊንክ';
 $ec_lang['calc_copy_link_done']='ተቀድቷል!';
+$ec_lang['ec_related_calcs']='ተዛማጅ ማስያዎች፦';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Darcy-Weisbach የቧንቧ ጭንቅ ኪሳራ';
 $ec_lang['dw_main_title']='ነፃ ኦንላይን Darcy-Weisbach የቧንቧ ጭንቅ ኪሳራ ካልኩሌተር';
@@ -139,7 +140,7 @@ $ec_lang['mi_notes_2_def']='የድንጋይ መስመር ለመንደፍ Manning
 $ec_lang['mpf_main_menu']='Manning የቧንቧ ፍሰት';
 $ec_lang['mpf_main_title']='ነፃ ኦንላይን Manning የቧንቧ ፍሰት ካልኩሌተር';
 $ec_lang['mpf_main_desc']='Manning ቀመር ወጥ የቧንቧ ፍሰት በተሰጠ ቁልቁለት እና ጥልቀት';
-$ec_lang['mpf_spreadheet_notice']='የዚህ ካልኩሌተር ስፕሬድሺት እትሙን ይመልከቱ';
+$ec_lang['mpf_spreadheet_notice']='Manning የቧንቧ ፍሰት ሰንጠረዥ';
 $ec_lang['mpf_pipe_diameter']='የቧንቧ ዲያሜትር, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='የማኒንግ ሻካርነት, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">የፍሪክሽን ቁልቁለት, S<sub>f</sub></a><span class="ec-help" title="አንዳንዴ ከቧንቧ ቁልቁለት ጋር እኩል። ማብራሪያ ለማግኘት አገናኙን ይከተሉ (በእንግሊዝኛ ብቻ)።"><span class="ec-tip">?</span></span>';
@@ -199,7 +200,7 @@ $ec_lang['mtc_d50_in']='የንድፍ የድንጋይ መጠን, D<sub>50</sub>';
 $ec_lang['mtc_n_strickler']='n ለ Strickler ዘዴ ንድፍ የድንጋይ መጠን';
 $ec_lang['mtc_n_blodgett']='n ለ Blodgett ዘዴ ንድፍ የድንጋይ መጠን';
 $ec_lang['mtc_n_bathurst']='n ለ Bathurst ዘዴ ንድፍ የድንጋይ መጠን';
-$ec_lang['mtc_blodgett_v_bathurst']='Blodgett vs. Bathurst';
+$ec_lang['mtc_blodgett_v_bathurst']='Blodgett ከ Bathurst ጋር';
 $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="በIsbash (1936) እና Maricopa County, Arizona, US. መሠረት">የሚፈለግ የታች ማዕዘናዊ የድንጋይ መጠን, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="በIsbash (1936) እና Maricopa County, Arizona, US. መሠረት">የሚፈለግ የጎን ቁልቁለት 1 ማዕዘናዊ የድንጋይ መጠን, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="በIsbash (1936) እና Maricopa County, Arizona, US. መሠረት">የሚፈለግ የጎን ቁልቁለት 2 ማዕዘናዊ የድንጋይ መጠን, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';

@@ -1,15 +1,14 @@
 {
     "meta": {
         "language": "pt",
-        "expected_key_count": 497,
-        "delta_key_count": 14,
+        "expected_key_count": 499,
+        "delta_key_count": 13,
         "active_prefixes": [
             "dw",
             "install",
             "ip",
             "mhp",
             "mi",
-            "mtc",
             "or"
         ],
         "requested_prefix": null,
@@ -24,7 +23,6 @@
         "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): vazão\n- velocity (v): velocidade\n- head loss (h_L): perda de carga\n- emitter: emissor\n- distribution uniformity (DU): uniformidade de distribuição\n- low-quarter distribution uniformity (DU_lq): uniformidade de distribuição do quarto inferior\n- application rate (PR): taxa de aplicação\n- lateral: linha lateral\n- mainline: linha principal\n- reach: trecho\n- velocity head (H_v): carga de velocidade\n- friction loss (h_f): perda de carga por atrito\n- minor loss (h_m): perda de carga localizada\n- energy grade line (EGL): linha de energia\n- upstream: a montante\n- downstream: a jusante",
         "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): vazão\n- penstock: conduta forçada\n- gross head (H_gross): altura bruta\n- net head (H_net): altura líquida\n- plant efficiency (η): rendimento da instalação\n- head loss (h_L): perda de carga\n- run-of-river: fio d'água\n- headworks: obras de captação\n- junction loss (h_m): perdas localizadas\n- minor loss (h_m): perda de carga localizada",
         "mi": "Use these preferred technical term translations when relevant:\n- flow (Q): vazão\n- velocity (v): velocidade\n- hydraulic radius (R_h): raio hidráulico\n- wetted perimeter (P_w): perímetro molhado\n- Manning roughness (n): coeficiente de rugosidade de Manning\n- slope (S): declividade\n- irregular channel: canal de seção irregular",
-        "mtc": "Use these preferred technical term translations when relevant:\n- flow (Q): vazão\n- velocity (v): velocidade\n- hydraulic radius (R_h): raio hidráulico\n- wetted perimeter (P_w): perímetro molhado\n- Manning roughness (n): coeficiente de rugosidade de Manning\n- slope (S): declividade",
         "or": "Use these preferred technical term translations when relevant:\n- flow (Q): vazão\n- orifice: orifício\n- discharge coefficient (C_d): coeficiente de descarga\n- headwater elevation: nível d'água a montante\n- tailwater elevation: nível d'água a jusante\n- crown: [needs translation sprint]"
     },
     "glossary_terms_by_prefix": {
@@ -346,50 +344,6 @@
                 "preferred_translation": "canal de seção irregular"
             }
         ],
-        "mtc": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg RESOLVED (Tom, 2026-07-13): native engineer's 2026-07-06 clarification confirmed both 'дебит' (colloquial\/general register) and 'водно количество' (academic\/hydraulic-engineering register, used at university for Q) are acceptable. Tom decided suite-wide standardization on 'водно количество' — \"I would put водно количество everywhere\" — applied across all bg calculator categories (pipes\/irrigation included, not just the hydraulic-structure\/open-channel strings the engineer originally corrected). 'дебит' fully replaced in lib\/lang.ec.bg.php 2026-07-13.",
-                "preferred_translation": "vazão"
-            },
-            {
-                "term": "velocity",
-                "symbol": "v",
-                "context": "Flow velocity (speed of water). Appears in all calculators.",
-                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
-                "preferred_translation": "velocidade"
-            },
-            {
-                "term": "hydraulic radius",
-                "symbol": "R_h",
-                "context": "Cross-sectional flow area divided by wetted perimeter. Appears in Manning calculators.",
-                "translation_notes": "Use the standard hydraulic engineering phrase. Pre-2026 sr\/hr human translations used the Latin loanword 'hidraulički radijus' — this form is widely used in South Slavic engineering practice and may be more recognizable to field practitioners than the native Slavic equivalents 'полупречник' (sr) \/ 'polumjer' (hr). Both are correct; native Slavic engineers may encounter both forms. DATA-ERROR FIX 2026-07-10 (category-3 sw wave-3 sprint): previous sw value 'radius ya maji' (literally 'radius of water', English loanword 'radius' + 'of water') named the substance rather than the hydraulic-geometry property, and did not read as an engineering term. Changed to 'radiasi ya kihaidroliki' (radius + 'hydraulic', adjectival ki- form), matching the '[radius] + hydraulic' construction used by fr\/de\/it\/es\/ro\/tr (rayon hydraulique \/ hydraulischer Radius \/ raggio idraulico \/ radio hidráulico \/ raza hidraulică \/ hidrolik yarıçap). Used in lib\/lang.ec.sw.php's mpf_hydraulic_radius.",
-                "preferred_translation": "raio hidráulico"
-            },
-            {
-                "term": "wetted perimeter",
-                "symbol": "P_w",
-                "context": "Length of the channel or pipe boundary in contact with flowing water. Appears in Manning calculators.",
-                "translation_notes": "WMO No. 385 entry 1682 confirms: es = 'perímetro mojado', fr = 'périmètre mouillé'. Use the standard hydraulic engineering phrase. 'Wetted' here means 'in contact with water', not 'soaked'. Pre-2026 sr human used 'okvašeni obim' (obim = natural South Slavic word for perimeter\/circumference); current uses 'квашени периметар' (периметар = Greek-derived loanword). Both are correct; 'obim\/opseg' is more natural in informal Serbian\/Croatian field use.",
-                "preferred_translation": "perímetro molhado"
-            },
-            {
-                "term": "Manning roughness",
-                "symbol": "n",
-                "context": "Manning's n — empirical roughness coefficient used in the Manning formula for open-channel and pipe flow.",
-                "translation_notes": "Always include 'Manning' as a proper noun. The coefficient itself (n) needs no translation — only the label does. Do not translate as generic 'roughness coefficient' without 'Manning'. TYPO FIX 2026-07-09 (category-3 wave-1 sprint): ru\/uk transliterations were single-н 'Манинга'\/'Манінга', flagged by the ru wave-1 agent as inconsistent with the established double-н transliteration ('Маннинга'\/'Маннінга') used 11+ times elsewhere in both lang files (predates this sprint). Corrected to double-н for consistency.",
-                "preferred_translation": "coeficiente de rugosidade de Manning"
-            },
-            {
-                "term": "slope",
-                "symbol": "S",
-                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
-                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
-                "preferred_translation": "declividade"
-            }
-        ],
         "or": [
             {
                 "term": "flow",
@@ -439,7 +393,6 @@
         "dw_roughness": "e",
         "dw_regime_laminar": "laminar",
         "mi_n617": "Comp.<br \/>n",
-        "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
         "or_shape_circular": "Circular",
         "mhp_vel_ok_short": "OK",
         "install_android_heading": "Android (Chrome)",
@@ -455,7 +408,6 @@
         "dw_roughness": "e",
         "dw_regime_laminar": "laminar",
         "mi_n617": "Comp.<br \/>n",
-        "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
         "or_shape_circular": "Circular",
         "mhp_vel_ok_short": "OK",
         "install_android_heading": "Android (Chrome)",
@@ -513,22 +465,6 @@
                     "key": "mi_notes_1_term",
                     "value": "n composto",
                     "english": "Composite n"
-                }
-            }
-        },
-        "mtc_blodgett_v_bathurst": {
-            "reason": "equal_to_english",
-            "current_value": "Blodgett vs. Bathurst",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mtc_n_bathurst",
-                    "value": "n para o tamanho de rocha de projeto (método de Bathurst)",
-                    "english": "n for design rock size (Bathurst method)"
-                },
-                "next_translated": {
-                    "key": "mtc_d50_bottom",
-                    "value": "<span class=\"ec-help\" title=\"Segundo Isbash (1936) e o Condado de Maricopa, Arizona, EUA.\">Tamanho de rocha angular requerido no fundo, D<sub>50<\/sub> (Isbash e MC) <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\">Required bottom angular rock size, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -606,9 +542,9 @@
                     "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
-                    "key": "ip_km",
-                    "value": "<span class=\"ec-help\" title=\"Coeficiente genérico de perda menor para acessórios\/válvulas\/acopladores deste trecho (≥0,5 mínimo sugerido)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
+                    "key": "ip_elev_ds",
+                    "value": "<span class=\"ec-help\" title=\"Elevação da extremidade a jusante deste trecho. Opcional em linhas interiores (padroniza para plano \/ mesma do nó acima se deixado em branco). Obrigatório na última linha: esse valor é a elevação do último emissor, que define diretamente a pressão de abastecimento necessária.\">Elev. JUS <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -622,9 +558,9 @@
                     "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
-                    "key": "ip_km",
-                    "value": "<span class=\"ec-help\" title=\"Coeficiente genérico de perda menor para acessórios\/válvulas\/acopladores deste trecho (≥0,5 mínimo sugerido)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
+                    "key": "ip_elev_ds",
+                    "value": "<span class=\"ec-help\" title=\"Elevação da extremidade a jusante deste trecho. Opcional em linhas interiores (padroniza para plano \/ mesma do nó acima se deixado em branco). Obrigatório na última linha: esse valor é a elevação do último emissor, que define diretamente a pressão de abastecimento necessária.\">Elev. JUS <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -638,9 +574,9 @@
                     "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
-                    "key": "ip_km",
-                    "value": "<span class=\"ec-help\" title=\"Coeficiente genérico de perda menor para acessórios\/válvulas\/acopladores deste trecho (≥0,5 mínimo sugerido)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
+                    "key": "ip_elev_ds",
+                    "value": "<span class=\"ec-help\" title=\"Elevação da extremidade a jusante deste trecho. Opcional em linhas interiores (padroniza para plano \/ mesma do nó acima se deixado em branco). Obrigatório na última linha: esse valor é a elevação do último emissor, que define diretamente a pressão de abastecimento necessária.\">Elev. JUS <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },

@@ -81,6 +81,7 @@ $ec_lang['ec_name_placeholder']='ឈ្មោះ';
 $ec_lang['ec_name_hint']='រក្សាទុកទិន្នន័យបញ្ចូលនេះទៅក្នុង URL សម្រាប់ការចាប់ផ្តើមវិញ ប្រវត្តិ ឬការចែងលែង';
 $ec_lang['calc_copy_link']='ចម្លងតំណ';
 $ec_lang['calc_copy_link_done']='បានចម្លង!';
+$ec_lang['ec_related_calcs']='ម៉ាស៊ីនគណនាដែលពាក់ព័ន្ធ៖';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Darcy-Weisbach ការបាត់បង់ទំនាប់ទឹកក្នុងបំពង់';
 $ec_lang['dw_main_title']='ម៉ាស៊ីនគណនា Darcy-Weisbach ការបាត់បង់ទំនាប់ទឹកក្នុងបំពង់ ឥតគិតថ្លៃ';
@@ -139,7 +140,7 @@ $ec_lang['mi_notes_2_def']='ប្រើម៉ាស៊ីនគណនា Mannin
 $ec_lang['mpf_main_menu']='Manning ការហូរទឹកក្នុងបំពង់';
 $ec_lang['mpf_main_title']='ម៉ាស៊ីនគណនា Manning ការហូរទឹកក្នុងបំពង់ ឥតគិតថ្លៃ';
 $ec_lang['mpf_main_desc']='រូបមន្ត Manning ការហូរទឹកបំពង់ឯកសណ្ឋានជាមួយ ជម្រាល និងជម្រៅដែលបានកំណត់';
-$ec_lang['mpf_spreadheet_notice']='ពិនិត្យកំណែសៀវភៅបញ្ជីរបស់ម៉ាស៊ីនគណនានេះ';
+$ec_lang['mpf_spreadheet_notice']='សៀវភៅបញ្ជីលំហូរបំពង់ Manning';
 $ec_lang['mpf_pipe_diameter']='ប្រឡោះបំពង់, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='ភាពក្រញ៉ោងម៉ាន់នីង, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">ជម្រាលកកិត, S<sub>f</sub></a><span class="ec-help" title="ជួនកាល ស្មើនឹងជម្រាលបំពង់។ តាមតំណភ្ជាប់សម្រាប់ការពន្យល់ (ជាភាសាអង់គ្លេសតែប៉ុណ្ណោះ)។"><span class="ec-tip">?</span></span>';

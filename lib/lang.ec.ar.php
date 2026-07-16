@@ -83,6 +83,7 @@ $ec_lang['calc_copy_link']='نسخ الرابط';
 $ec_lang_intent['calc_copy_link']='';
 $ec_lang['calc_copy_link_done']='تم النسخ!';
 $ec_lang_intent['calc_copy_link_done']='';
+$ec_lang['ec_related_calcs']='حاسبات ذات صلة:';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='فاقد الضغط في الأنابيب — داركي-وايسباخ';
 $ec_lang['dw_main_title']='حاسبة فاقد الضغط في الأنابيب داركي-وايسباخ المجانية عبر الإنترنت';
@@ -141,7 +142,7 @@ $ec_lang['mi_notes_2_def']='استخدم حاسبة قناة مانينغ شبه
 $ec_lang['mpf_main_menu']='جريان في الأنابيب — مانينغ';
 $ec_lang['mpf_main_title']='حاسبة جريان الأنابيب بمانينغ المجانية عبر الإنترنت';
 $ec_lang['mpf_main_desc']='جريان منتظم في الأنابيب بمعادلة مانينغ عند ميل وعمق معلومَين';
-$ec_lang['mpf_spreadheet_notice']='راجع النسخة الجدولية من هذه الحاسبة';
+$ec_lang['mpf_spreadheet_notice']='جدول بيانات جريان الأنابيب بمعادلة مانينغ';
 $ec_lang['mpf_pipe_diameter']='قطر الأنبوب، d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='معامل خشونة مانينغ، n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">ميل الاحتكاك، S<sub>f</sub></a><span class="ec-help" title="يساوي أحياناً ميل الأنبوب. اتبع الرابط للحصول على شرح (باللغة الإنجليزية فقط)."><span class="ec-tip">?</span></span>';

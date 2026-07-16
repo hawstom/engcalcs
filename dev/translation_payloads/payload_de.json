@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "de",
-        "expected_key_count": 497,
-        "delta_key_count": 17,
+        "expected_key_count": 499,
+        "delta_key_count": 16,
         "active_prefixes": [
             "dw",
             "ec",
@@ -543,7 +543,6 @@
         "dw_regime_laminar": "laminar",
         "dw_regime_turbulent": "turbulent",
         "mi_groupSegment": "Segment",
-        "mi_station": "Sta",
         "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
         "mhp_vel_ok_short": "OK",
         "install_android_heading": "Android (Chrome)",
@@ -562,7 +561,6 @@
         "dw_regime_laminar": "laminar",
         "dw_regime_turbulent": "turbulent",
         "mi_groupSegment": "Segment",
-        "mi_station": "Sta",
         "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
         "mhp_vel_ok_short": "OK",
         "install_android_heading": "Android (Chrome)",
@@ -653,22 +651,6 @@
                     "key": "mi_groupRegion",
                     "value": "Bereich",
                     "english": "Region"
-                }
-            }
-        },
-        "mi_station": {
-            "reason": "equal_to_english",
-            "current_value": "Sta",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mi_groupRegion",
-                    "value": "Bereich",
-                    "english": "Region"
-                },
-                "next_translated": {
-                    "key": "mi_elevation",
-                    "value": "Höhe",
-                    "english": "Elevation"
                 }
             }
         },
@@ -778,9 +760,9 @@
                     "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
-                    "key": "ip_km",
-                    "value": "<span class=\"ec-help\" title=\"Allgemeiner Einzelverlust-Beiwert für Armaturen, Ventile und Kupplungen dieser Strecke (empfohlener Mindestwert ≥0,5)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
+                    "key": "ip_elev_ds",
+                    "value": "<span class=\"ec-help\" title=\"Höhe am unterstromigen Ende dieser Strecke. Optional bei inneren Zeilen (Standard: eben \/ gleich wie der Knoten darüber, falls leer gelassen). Erforderlich in der letzten Zeile: dieser Wert ist die Höhe des letzten Emitters, der direkt den erforderlichen Versorgungsdruck bestimmt.\">US Höhe <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -794,9 +776,9 @@
                     "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
-                    "key": "ip_km",
-                    "value": "<span class=\"ec-help\" title=\"Allgemeiner Einzelverlust-Beiwert für Armaturen, Ventile und Kupplungen dieser Strecke (empfohlener Mindestwert ≥0,5)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
+                    "key": "ip_elev_ds",
+                    "value": "<span class=\"ec-help\" title=\"Höhe am unterstromigen Ende dieser Strecke. Optional bei inneren Zeilen (Standard: eben \/ gleich wie der Knoten darüber, falls leer gelassen). Erforderlich in der letzten Zeile: dieser Wert ist die Höhe des letzten Emitters, der direkt den erforderlichen Versorgungsdruck bestimmt.\">US Höhe <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -810,9 +792,9 @@
                     "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
-                    "key": "ip_km",
-                    "value": "<span class=\"ec-help\" title=\"Allgemeiner Einzelverlust-Beiwert für Armaturen, Ventile und Kupplungen dieser Strecke (empfohlener Mindestwert ≥0,5)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Generic minor-loss coefficient for this reach&rsquo;s fittings\/valves\/couplers (&ge;0.5 suggested minimum)\">k<sub>m<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
+                    "key": "ip_elev_ds",
+                    "value": "<span class=\"ec-help\" title=\"Höhe am unterstromigen Ende dieser Strecke. Optional bei inneren Zeilen (Standard: eben \/ gleich wie der Knoten darüber, falls leer gelassen). Erforderlich in der letzten Zeile: dieser Wert ist die Höhe des letzten Emitters, der direkt den erforderlichen Versorgungsdruck bestimmt.\">US Höhe <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -850,7 +832,6 @@
         }
     },
     "key_intent": {
-        "mi_station": "Station (chainage, distance along the alignment) of this point — \"Distance\" is an acceptable alias where the surveying sense of \"station\" has no natural short word",
         "ip_hf": "Friction head loss.",
         "ip_hm": "Minor (local) head loss."
     }

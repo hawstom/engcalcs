@@ -82,6 +82,7 @@ $ec_lang['ec_name_placeholder']='Име';
 $ec_lang['ec_name_hint']='Запазва тези входни стойности в URL адреса за добавяне в отметки, извличане от история и споделяне';
 $ec_lang['calc_copy_link']='Копирай линк';
 $ec_lang['calc_copy_link_done']='Копирано!';
+$ec_lang['ec_related_calcs']='Свързани калкулатори:';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Загуба на напор в тръбопровод по Дарси-Вайсбах';
 $ec_lang['dw_main_title']='Безплатен онлайн калкулатор за загуба на напор по Дарси-Вайсбах';
@@ -140,7 +141,7 @@ $ec_lang['mi_notes_2_def']='Използвайте калкулатора за �
 $ec_lang['mpf_main_menu']='Дебит в тръбопровод по Манинг';
 $ec_lang['mpf_main_title']='Безплатен онлайн калкулатор за водно количество в тръбопровод по Манинг';
 $ec_lang['mpf_main_desc']='Равномерно водно количество в тръбопровод по формулата на Манинг при зададени наклон и дълбочина';
-$ec_lang['mpf_spreadheet_notice']='Изпробвайте таблична (Excel) версия на този калкулатор';
+$ec_lang['mpf_spreadheet_notice']='Електронна таблица Manning Pipe Flow';
 $ec_lang['mpf_pipe_diameter']='Диаметър на тръбата, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Коефициент на грапавост на Манинг, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Хидравличен наклон, S<sub>f</sub></a><span class="ec-help" title="Понякога равен на наклона на тръбата. Последвайте връзката за обяснение (само на английски)."><span class="ec-tip">?</span></span>';

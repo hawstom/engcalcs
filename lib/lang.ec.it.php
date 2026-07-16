@@ -79,6 +79,7 @@ $ec_lang['ec_name_label']='Salva questo calcolo:';
 $ec_lang['ec_name_placeholder']='Nome';
 $ec_lang['ec_name_hint']='Salva questi dati inseriti nell\'URL per segnalibri, recupero della cronologia e condivisione';
 $ec_lang['calc_copy_link']='Copia collegamento';
+$ec_lang['ec_related_calcs']='Calcolatori correlati:';
 $ec_lang['calc_copy_link_done']='Copiato!';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Perdita di carico Darcy-Weisbach';
@@ -138,7 +139,7 @@ $ec_lang['mi_notes_2_def']='Usare il Calcolatore Canale Trapezoidale Manning per
 $ec_lang['mpf_main_menu']='Portata in tubazione Manning';
 $ec_lang['mpf_main_title']='Calcolatore gratuito online portata in tubazione Manning';
 $ec_lang['mpf_main_desc']='Formula di Manning per flusso uniforme in tubazione a pendenza e profondità date';
-$ec_lang['mpf_spreadheet_notice']='Scopri la versione foglio di calcolo di questo calcolatore';
+$ec_lang['mpf_spreadheet_notice']='Foglio di calcolo Portata in tubazione Manning';
 $ec_lang['mpf_pipe_diameter']='Diametro tubazione, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Scabrezza di Manning, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Pendenza di attrito, S<sub>f</sub></a><span class="ec-help" title="Talvolta uguale alla pendenza della tubazione. Segui il link per la spiegazione (solo in inglese)."><span class="ec-tip">?</span></span>';

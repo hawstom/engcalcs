@@ -80,6 +80,7 @@ $ec_lang['ec_name_placeholder']='Имя';
 $ec_lang['ec_name_hint']='Сохраняет входные данные в URL для сохранения в закладках, получения из истории и обмена';
 $ec_lang['calc_copy_link']='Копировать ссылку';
 $ec_lang['calc_copy_link_done']='Скопировано!';
+$ec_lang['ec_related_calcs']='Похожие калькуляторы:';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Потери напора в трубе Дарси-Вейсбах';
 $ec_lang['dw_main_title']='Бесплатный онлайн-калькулятор потерь напора в трубе Дарси-Вейсбах';
@@ -138,7 +139,7 @@ $ec_lang['mi_notes_2_def']='Для проектирования каменног
 $ec_lang['mpf_main_menu']='Расход в трубе по Маннингу';
 $ec_lang['mpf_main_title']='Бесплатный онлайн-калькулятор расхода в трубе по Маннингу';
 $ec_lang['mpf_main_desc']='Формула Маннинга для равномерного течения в трубе при заданном уклоне и глубине';
-$ec_lang['mpf_spreadheet_notice']='Ознакомьтесь с версией этого калькулятора в виде таблицы';
+$ec_lang['mpf_spreadheet_notice']='Таблица Excel: Расход в трубе по Маннингу';
 $ec_lang['mpf_pipe_diameter']='Диаметр трубы, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Коэффициент шероховатости Маннинга, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Уклон трения, S<sub>f</sub></a><span class="ec-help" title="Иногда равен уклону трубы. Перейдите по ссылке для объяснения (только на английском)."><span class="ec-tip">?</span></span>';

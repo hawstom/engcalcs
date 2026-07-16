@@ -81,6 +81,7 @@ $ec_lang['ec_name_placeholder']='Назва';
 $ec_lang['ec_name_hint']='Зберігає ці вхідні дані у URL для створення закладки, отримання історії та спільного доступу';
 $ec_lang['calc_copy_link']='Копіювати посилання';
 $ec_lang['calc_copy_link_done']='Скопійовано!';
+$ec_lang['ec_related_calcs']='Пов\'язані калькулятори:';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Втрати напору в трубі за Darcy-Weisbach';
 $ec_lang['dw_main_title']='Безкоштовний онлайн-калькулятор втрат напору в трубі за Darcy-Weisbach';
@@ -139,7 +140,7 @@ $ec_lang['mi_notes_2_def']='Для проектування кам\'яного �
 $ec_lang['mpf_main_menu']='Manning — Течія в трубі';
 $ec_lang['mpf_main_title']='Безкоштовний онлайн-калькулятор течії в трубі за Manning';
 $ec_lang['mpf_main_desc']='Рівномірна течія в трубі за формулою Manning при заданому похилі та глибині';
-$ec_lang['mpf_spreadheet_notice']='Ознайомтесь з табличною версією цього калькулятора';
+$ec_lang['mpf_spreadheet_notice']='Таблиця Manning Pipe Flow';
 $ec_lang['mpf_pipe_diameter']='Діаметр труби, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Коефіцієнт шорсткості Маннінга, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Ухил тертя, S<sub>f</sub></a><span class="ec-help" title="Іноді дорівнює ухилу труби. Перейдіть за посиланням для пояснення (лише англійською)."><span class="ec-tip">?</span></span>';

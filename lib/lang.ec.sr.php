@@ -79,6 +79,7 @@ $ec_lang['ec_name_placeholder']='Назив';
 $ec_lang['ec_name_hint']='Чува унете вредности у URL адресу за обележавање, преузимање из историје и дељење';
 $ec_lang['calc_copy_link']='Копирај линк';
 $ec_lang['calc_copy_link_done']='Копирано!';
+$ec_lang['ec_related_calcs']='Слични калкулатори:';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Губитак напора у цевима по Darcy-Weisbachу';
 $ec_lang['dw_main_title']='Бесплатни онлајн калкулатор губитка напора у цевима по Darcy-Weisbachу';
@@ -137,7 +138,7 @@ $ec_lang['mi_notes_2_def']='Користите калкулатор трапез
 $ec_lang['mpf_main_menu']='Протицај у цевима по Manningу';
 $ec_lang['mpf_main_title']='Бесплатни онлајн калкулатор протицаја у цевима по Manningу';
 $ec_lang['mpf_main_desc']='Манингова формула равномерног течења у цевима при задатом паду и дубини';
-$ec_lang['mpf_spreadheet_notice']='Погледајте верзију овог калкулатора у облику табеле';
+$ec_lang['mpf_spreadheet_notice']='Табела Manning протока у цевима';
 $ec_lang['mpf_pipe_diameter']='Пречник цеви, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Манингов коефицијент храпавости, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Нагиб трења, S<sub>f</sub></a><span class="ec-help" title="Понекад једнак нагибу цеви. Пратите везу за објашњење (само на енглеском)."><span class="ec-tip">?</span></span>';

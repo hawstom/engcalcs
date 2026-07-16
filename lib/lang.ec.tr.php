@@ -81,6 +81,7 @@ $ec_lang['ec_name_placeholder']='Ad';
 $ec_lang['ec_name_hint']='Bu girdileri URL\'ye kaydeder (yer işareti, geçmiş ve paylaşım için)';
 $ec_lang['calc_copy_link']='Bağlantıyı kopyala';
 $ec_lang['calc_copy_link_done']='Kopyalandı!';
+$ec_lang['ec_related_calcs']='İlgili hesaplayıcılar:';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Darcy-Weisbach Boru Yük Kaybı';
 $ec_lang['dw_main_title']='Ücretsiz Çevrimiçi Darcy-Weisbach Boru Yük Kaybı Hesaplayıcısı';
@@ -139,7 +140,7 @@ $ec_lang['mi_notes_2_def']='Taş kaplama tasarımı için Manning Trapezoidal Ka
 $ec_lang['mpf_main_menu']='Manning Boru Akışı';
 $ec_lang['mpf_main_title']="Ücretsiz Çevrimiçi Manning Boru Akışı Hesaplayıcısı";
 $ec_lang['mpf_main_desc']="Belirli Eğim ve Derinlikte Manning Formülü ile Düzgün Boru Akışı";
-$ec_lang['mpf_spreadheet_notice']='Bu hesaplayıcının elektronik tablo sürümüne göz atın';
+$ec_lang['mpf_spreadheet_notice']='Manning Boru Akışı elektronik tablosu';
 $ec_lang['mpf_pipe_diameter']="Boru çapı, d<sub>0</sub>";
 $ec_lang['mpf_manningRoughness']='Manning pürüzlülük katsayısı, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Sürtünme eğimi, S<sub>f</sub></a><span class="ec-help" title="Bazen boru eğimine eşit. Açıklama için bağlantıyı izleyin (yalnızca İngilizce)."><span class="ec-tip">?</span></span>';
