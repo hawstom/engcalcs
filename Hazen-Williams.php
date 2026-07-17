@@ -10,6 +10,9 @@ echoHeader("EngCalcs", $html_title, $html_head);
 
 ?>
 <h2><?=$ec_lang['hw_main_desc']?></h2>
+<p class="collapse show d-print-none" id="relatedCalcs">
+	<?=$ec_lang['ec_related_calcs']?> <a href="Darcy-Weisbach.php"><?=$ec_lang['dw_main_menu']?></a> &middot; <a href="Manning-Pipe-Head-Loss.php"><?=$ec_lang['mphl_main_menu']?></a> <a data-bs-toggle="collapse" href="#relatedCalcs" aria-expanded="true" aria-controls="relatedCalcs"><?=$ec_lang['view_hide_line']?></a>
+</p>
 <?php echoHelpWanted(); ?>
 
 <?php
