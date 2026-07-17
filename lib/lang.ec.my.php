@@ -201,7 +201,13 @@ $ec_lang['mtc_d50_in']='ဒီဇိုင်းကျောက်တုံး�
 $ec_lang['mtc_n_strickler']='Strickler အရ ဒီဇိုင်းကျောက်တုံးအရွယ်အတွက် n';
 $ec_lang['mtc_n_blodgett']='Blodgett အရ ဒီဇိုင်းကျောက်တုံးအရွယ်အတွက် n';
 $ec_lang['mtc_n_bathurst']='Bathurst အရ ဒီဇိုင်းကျောက်တုံးအရွယ်အတွက် n';
+$ec_lang['mtc_n_pi']='Phillips နှင့် Ingersoll အရ ဒီဇိုင်းကျောက်တုံးအရွယ်အတွက် n';
 $ec_lang['mtc_blodgett_v_bathurst']='Blodgett နှင့် Bathurst နှိုင်းယှဉ်မှု';
+$ec_lang['mtc_pi_range_check']='P&I အပိုင်းအခြားစစ်ဆေးမှု';
+$ec_lang['mtc_pi_ok']='d50 သည် P&I အပိုင်းအခြားအတွင်းရှိသည်';
+$ec_lang['mtc_pi_ok_tip']='0.28–0.36 ft (Phillips & Ingersoll, 1998)';
+$ec_lang['mtc_pi_out_of_range']='အပိုင်းအခြားပြင်ပ';
+$ec_lang['mtc_pi_tip']='ဤညီမျှခြင်း ရေတွက်ချက်ရာတွင်အခြေခံခဲ့သော 0.28–0.36 ft ဒေတာအပိုင်းအခြားအပြင်သို့ ရောက်ရှိနေခြင်းဖြစ်သည်— ဒီဇိုင်းအခြေခံအဖြစ်မဟုတ်ဘဲ ခန့်မှန်းစစ်ဆေးမှုတစ်ခုအဖြစ်သာ သဘောထားပါ';
 $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="Isbash (1936) နှင့် Maricopa County, Arizona, US အရ.">လိုအပ်သောအောက်ပိုင်းထောင့်ချောင်းကျောက်တုံးအရွယ်, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="Isbash (1936) နှင့် Maricopa County, Arizona, US အရ.">လိုအပ်သောဘေးစောက် ၁ ထောင့်ချောင်းကျောက်တုံးအရွယ်, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="Isbash (1936) နှင့် Maricopa County, Arizona, US အရ.">လိုအပ်သောဘေးစောက် ၂ ထောင့်ချောင်းကျောက်တုံးအရွယ်, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';

@@ -7,6 +7,7 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.var.alpha_blodgett = 0.319;
 	this.var.alpha_bathurst = 1.0;
 	this.var.max_err = 0.00001;
+	this.var.ft_per_m = 3.28084;
 	this.var.i = 0;
 	// Read and convert form inputs to this.var.___ as SI units
 	this.readFormInput(objForm, 'b', hasUnits = true);
@@ -44,6 +45,9 @@ EngCalcs.pageCalculator = function(objForm) {
 		this.var.tau = this.var.rh * this.var.s0;
 		this.var.n_blodgett = this.var.alpha_blodgett * Math.pow(this.var.da, 1/6) / (2.25 + 5.23 * Math.log10(this.var.da/this.var.d50_in));
 		this.var.n_bathurst = this.Manning.bathurst_n(this.var.alpha_bathurst, this.var.g, this.var.t, this.var.da, this.var.d50_in, this.var.froude);
+		this.var.rh_ft = this.var.rh * this.var.ft_per_m;
+		this.var.d50_ft = this.var.d50_in * this.var.ft_per_m;
+		this.var.n_pi = 0.0926 * Math.pow(this.var.rh_ft, 1/6) / (1.46 + 2.23 * Math.log10(this.var.rh_ft / this.var.d50_ft));
 		this.var.blodgett_v_bathurst = (this.var.da_over_d50 < 0.3) ? '----' : (this.var.da_over_d50 < 1.5) ? 'Bathurst' : (this.var.da_over_d50 <= 185) ? 'Blodgett' : '++++';
 		switch(this.var.n_radio) {
 			case 'bb':
@@ -60,6 +64,9 @@ EngCalcs.pageCalculator = function(objForm) {
 				break;
 			case 'strickler':
 				this.var.n_in = this.var.n_strickler;
+				break;
+			case 'pi':
+				this.var.n_in = this.var.n_pi;
 				break;
 			default:
 				this.var.iterate_p = false ; // n_in is manual. No need to iterate.
@@ -109,7 +116,19 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.writeFormResult(objForm, 'n_strickler', precision = 4, hasUnits = false);
 	this.writeFormResult(objForm, 'n_blodgett', precision = 4, hasUnits = false);
 	this.writeFormResult(objForm, 'n_bathurst', precision = 4, hasUnits = false);
+	this.writeFormResult(objForm, 'n_pi', precision = 4, hasUnits = false);
 	document.getElementById('blodgett_v_bathurst').innerHTML = (this.var.blodgett_v_bathurst);
+	var piEl = document.getElementById('pi_range_check');
+	if (piEl) {
+		piEl.className = '';
+		if (this.var.d50_ft < 0.28 || this.var.d50_ft > 0.36) {
+			piEl.innerHTML = EngCalcs.writeCheckHTML(false, EngCalcs.pageConfig.mtc_pi_out_of_range, EngCalcs.pageConfig.mtc_pi_tip);
+			piEl.classList.add('ec-status-warn');
+		} else {
+			piEl.innerHTML = EngCalcs.writeCheckHTML(true, EngCalcs.pageConfig.mtc_pi_ok, EngCalcs.pageConfig.mtc_pi_ok_tip);
+			piEl.classList.add('ec-status-ok');
+		}
+	}
 	this.writeVelocityCheck('v_check', this.var.v > 3.0 ? 'high' : (this.var.v < 0.6 ? 'low' : 'ok'), {
 		ok: EngCalcs.pageConfig.mhp_vel_ok_short,
 		high: EngCalcs.pageConfig.mhp_vel_high_short,

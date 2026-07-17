@@ -199,7 +199,13 @@ $ec_lang['mtc_d50_in']='নকশা পাথরের আকার, D<sub>50</
 $ec_lang['mtc_n_strickler']='নকশা পাথরের আকারের জন্য n (স্ট্রিকলার পদ্ধতি)';
 $ec_lang['mtc_n_blodgett']='নকশা পাথরের আকারের জন্য n (ব্লডগেট পদ্ধতি)';
 $ec_lang['mtc_n_bathurst']='নকশা পাথরের আকারের জন্য n (বাথার্স্ট পদ্ধতি)';
+$ec_lang['mtc_n_pi']='নকশা পাথরের আকারের জন্য n (Phillips & Ingersoll পদ্ধতি)';
 $ec_lang['mtc_blodgett_v_bathurst']='ব্লডগেট বনাম বাথার্স্ট';
+$ec_lang['mtc_pi_range_check']='P&I পরিসর যাচাই';
+$ec_lang['mtc_pi_ok']='d50, P&I পরিসরের মধ্যে';
+$ec_lang['mtc_pi_ok_tip']='0.28–0.36 ft (Phillips & Ingersoll, 1998)';
+$ec_lang['mtc_pi_out_of_range']='পরিসরের বাইরে';
+$ec_lang['mtc_pi_tip']='এই সমীকরণটি যে 0.28–0.36 ft তথ্য-পরিসর থেকে তৈরি করা হয়েছে, তার বাইরে বহির্বিস্তার করা হচ্ছে — একে সঠিক নকশার ভিত্তি নয়, বরং একটি মোটামুটি যাচাই হিসেবে বিবেচনা করুন';
 $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="Isbash (1936) এবং Maricopa County, Arizona, US অনুযায়ী।">তলদেশের জন্য প্রয়োজনীয় কৌণিক পাথরের আকার, D<sub>50</sub> (Isbash ও MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="Isbash (1936) এবং Maricopa County, Arizona, US অনুযায়ী।">পার্শ্ব ঢাল ১-এর জন্য প্রয়োজনীয় কৌণিক পাথরের আকার, D<sub>50</sub> (Isbash ও MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="Isbash (1936) এবং Maricopa County, Arizona, US অনুযায়ী।">পার্শ্ব ঢাল ২-এর জন্য প্রয়োজনীয় কৌণিক পাথরের আকার, D<sub>50</sub> (Isbash ও MC) <span class="ec-tip">?</span></span>';

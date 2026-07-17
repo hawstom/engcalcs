@@ -200,7 +200,13 @@ $ec_lang['mtc_d50_in']='डिज़ाइन चट्टान आकार, D
 $ec_lang['mtc_n_strickler']='डिज़ाइन चट्टान आकार के लिए n (Strickler विधि)';
 $ec_lang['mtc_n_blodgett']='डिज़ाइन चट्टान आकार के लिए n (Blodgett विधि)';
 $ec_lang['mtc_n_bathurst']='डिज़ाइन चट्टान आकार के लिए n (Bathurst विधि)';
+$ec_lang['mtc_n_pi']='डिज़ाइन चट्टान आकार के लिए n (Phillips & Ingersoll विधि)';
 $ec_lang['mtc_blodgett_v_bathurst']='Blodgett बनाम Bathurst';
+$ec_lang['mtc_pi_range_check']='P&I सीमा जाँच';
+$ec_lang['mtc_pi_ok']='d50, P&I सीमा में';
+$ec_lang['mtc_pi_ok_tip']='0.28–0.36 ft (Phillips & Ingersoll, 1998)';
+$ec_lang['mtc_pi_out_of_range']='सीमा से बाहर';
+$ec_lang['mtc_pi_tip']='यह समीकरण जिस 0.28–0.36 ft डेटासेट सीमा से विकसित किया गया था, उससे बाहर एक्सट्रापोलेशन (परिसीमा-बाह्य विस्तार) — इसे केवल एक मोटा जाँच मानें, डिज़ाइन आधार नहीं';
 $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="Isbash (1936) और Maricopa County, Arizona, US के अनुसार।">तल के लिए आवश्यक कोणीय चट्टान आकार, D<sub>50</sub> (Isbash और MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="Isbash (1936) और Maricopa County, Arizona, US के अनुसार।">पार्श्व ढलान 1 के लिए आवश्यक कोणीय चट्टान आकार, D<sub>50</sub> (Isbash और MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="Isbash (1936) और Maricopa County, Arizona, US के अनुसार।">पार्श्व ढलान 2 के लिए आवश्यक कोणीय चट्टान आकार, D<sub>50</sub> (Isbash और MC) <span class="ec-tip">?</span></span>';

@@ -199,7 +199,13 @@ $ec_lang['mtc_d50_in']='Расчётный размер камня, D<sub>50</su
 $ec_lang['mtc_n_strickler']='n для расчётного размера камня по Стриклеру';
 $ec_lang['mtc_n_blodgett']='n для расчётного размера камня по Блодгетту';
 $ec_lang['mtc_n_bathurst']='n для расчётного размера камня по Батхёрсту';
+$ec_lang['mtc_n_pi']='n для расчётного размера камня по методу Phillips & Ingersoll';
 $ec_lang['mtc_blodgett_v_bathurst']='Блодгетт vs. Батхёрст';
+$ec_lang['mtc_pi_range_check']='Проверка диапазона P&I';
+$ec_lang['mtc_pi_ok']='d50 в диапазоне P&I';
+$ec_lang['mtc_pi_ok_tip']='0,28–0,36 фута (Phillips & Ingersoll, 1998)';
+$ec_lang['mtc_pi_out_of_range']='Вне диапазона';
+$ec_lang['mtc_pi_tip']='Экстраполяция за пределы диапазона исходных данных 0,28–0,36 фута, на основе которого выведено это уравнение — используйте как приблизительную проверку, а не как основу для проектирования';
 $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="По Isbash (1936) и Maricopa County, Arizona, US.">Требуемый размер угловатого камня на дне, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="По Isbash (1936) и Maricopa County, Arizona, US.">Требуемый размер угловатого камня, откос 1, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="По Isbash (1936) и Maricopa County, Arizona, US.">Требуемый размер угловатого камня, откос 2, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';

@@ -10,36 +10,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 ## Calculator Improvements
 
-- 30|122| **Add Phillips & Ingersoll (1998) Manning's n option to `mtc_`.** Tom, 2026-07-16: found
-  this equation (Maricopa County Drainage Design Manual, Hydraulics Volume, Section 7.6.3, Figure
-  7.5) while chasing down Task 120/121's unresolved Bathurst-coefficient gap — it's what the manual
-  actually still contains, fully specified with units and a stated applicability range, unlike the
-  now-unrecoverable Bathurst formula (see Task 121's follow-up note). Formula:
-  `n = 0.0926·R^(1/6) / (1.46 + 2.23·log10(R/d50))`, where **R (hydraulic radius) and d50 are in
-  feet** — developed for central-Arizona lower-gradient channels with bed-material d50 ranging
-  0.28–0.36 ft (~85–110 mm) in the source dataset; the manual itself calls these equations "a check
-  or reference," not a sole design basis.
-  **Scoping notes for implementation:**
-  - **Unit conversion is the main risk, same class as the math-audit's SI/US-customary transcription
-    findings** (e.g. `hw_`'s `khw=0.849`): EngCalcs stores everything internally in SI meters, but
-    the `0.0926` constant is only valid with R/d50 in feet. The JS must explicitly convert `rh` and
-    `d50_in` from meters to feet before applying this formula (factor ≈3.28084), not just plug in
-    the SI-stored values.
-  - Tom's call (2026-07-16, asked and confirmed): add as a **third standalone radio option**
-    alongside the existing `n_radio` choices in `Manning-Trap.php` (`strickler`, `bb` for
-    Blodgett/Bathurst) — do **not** fold it into the `bb` auto-select logic or its da/d50 thresholds;
-    that auto-select stays untouched for now.
-  - Needs an applicability/validity check analogous to `rc_`'s specific-gravity/gradation checks or
-    `mtc_`'s existing `blodgett_v_bathurst` range logic — flag when d50 falls well outside the
-    0.28–0.36 ft dataset range the equation was developed from.
-  - New `$ec_lang` keys needed for the radio label (e.g. short "P&I" per the existing terse
-    "Strickler"/"B/B" label convention) and likely a `?` tip citing the source and applicability
-    range, per the link+tip convention in `CLAUDE.md`. Once English wording is final, this is a
-    small, scoped translation delta (a handful of keys) — standard 26-agent Sonnet sprint per
-    `CLAUDE.md` § "Translation Sprints", authorized separately when ready.
-  - Not yet spec'd in full (inputs/outputs/worked-example verification per the new-calculator-field
-    checklist) or implemented — this entry is the scoping/authorization record, not a completed task.
-
 ## New Calculators (Mission Expansion)
 
 Tom, 2026-07-14: interested in expanding beyond hydraulic-structure/irrigation calculators toward
@@ -258,6 +228,31 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|122| **Add Phillips & Ingersoll (1998) Manning's n option to `mtc_` — DONE 2026-07-16.**
+  Found this equation (Maricopa County Drainage Design Manual, Hydraulics Volume, Section 7.6.3,
+  Figure 7.5) while chasing down Task 120/121's unresolved Bathurst-coefficient gap — it's what the
+  manual actually still contains, fully specified with units and a stated applicability range,
+  unlike the now-unrecoverable Bathurst formula (see Task 121's follow-up note). Formula:
+  `n = 0.0926·R^(1/6) / (1.46 + 2.23·log10(R/d50))`, where **R (hydraulic radius) and d50 are in
+  feet** — developed for central-Arizona lower-gradient channels with bed-material d50 ranging
+  0.28–0.36 ft (~85–110 mm) in the source dataset; the manual itself calls these equations "a check
+  or reference," not a sole design basis.
+  **Implementation:** added as a third standalone `n_radio` option (`pi`) in `Manning-Trap.php`,
+  alongside `strickler`/`bb` — not folded into the `bb` auto-select logic, which stays untouched.
+  `js/manning-trap.js` converts `rh`/`d50_in` from SI meters to feet (factor 3.28084) before applying
+  the formula. Added a `pi_range_check` result row (always visible, mirroring the existing
+  `blodgett_v_bathurst` check) showing "d50 in P&I range" / "Outside range" via the suite-wide
+  ✓/⚠ `EngCalcs.writeCheckHTML` convention, with a tip explaining the 0.28–0.36 ft dataset-range
+  extrapolation risk either direction (consolidated into one shared out-of-range string + one shared
+  tip, not separate low/high wording, per Tom's simplification request). New keys: `mtc_n_pi`,
+  `mtc_pi_range_check`, `mtc_pi_ok(+tip)`, `mtc_pi_out_of_range`, `mtc_pi_tip` — translated into all
+  26 non-English languages via the standard 26-agent Sonnet sprint (plus a leftover pre-existing
+  untranslated `mtc_blodgett_v_bathurst` picked up in the same delta). Post-sprint QA passed:
+  `lang_syntax_validate.php` clean of real findings (identical-to-english flags were all either
+  deliberately-literal citation/unit strings or legitimate "vs." constructions), tag-parity verified
+  script-wide (one Khmer `<sub>` tag mismatch found and fixed), and inline back-translation review of
+  all 26 languages' final values against the English source.
 
 - 0|121| **Second-opinion (Opus) pass on the Task 120 mathematical audit — DONE 2026-07-16.**
   Independent re-check requested by Tom before fully closing the book on Task 120, since the first

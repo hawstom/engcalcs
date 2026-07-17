@@ -198,7 +198,13 @@ $ec_lang['mtc_d50_in']='Пројектована величина камена, 
 $ec_lang['mtc_n_strickler']='n за пројектовану величину камена по Strickleru';
 $ec_lang['mtc_n_blodgett']='n за пројектовану величину камена по Blodgettu';
 $ec_lang['mtc_n_bathurst']='n за пројектовану величину камена по Bathurstu';
+$ec_lang['mtc_n_pi']='n за пројектовану величину камена по методи Phillips & Ingersoll';
 $ec_lang['mtc_blodgett_v_bathurst']='Blodgett насупрот Bathurst';
+$ec_lang['mtc_pi_range_check']='P&I провера опсега';
+$ec_lang['mtc_pi_ok']='d50 у P&I опсегу';
+$ec_lang['mtc_pi_ok_tip']='0.28–0.36 ft (Phillips & Ingersoll, 1998)';
+$ec_lang['mtc_pi_out_of_range']='Ван опсега';
+$ec_lang['mtc_pi_tip']='Екстраполација ван опсега скупа података 0.28–0.36 ft на основу којег је ова једначина изведена — сматрати оквирном провером, а не основом за пројектовање';
 $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="По Isbashu (1936) и округу Maricopa, Аризона, САД.">Потребна величина угаоног камена дна, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="По Isbashu (1936) и округу Maricopa, Аризона, САД.">Потребна величина угаоног камена бочне стране 1, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="По Isbashu (1936) и округу Maricopa, Аризона, САД.">Потребна величина угаоног камена бочне стране 2, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';

@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "it",
-        "expected_key_count": 499,
-        "delta_key_count": 14,
+        "expected_key_count": 505,
+        "delta_key_count": 20,
         "active_prefixes": [
             "dw",
             "install",
@@ -445,7 +445,13 @@
     "keys_to_translate": {
         "dw_roughness": "e",
         "mphl_area": "Area, A",
+        "mtc_n_pi": "n for design rock size (Phillips & Ingersoll method)",
         "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
+        "mtc_pi_range_check": "P&I range check",
+        "mtc_pi_ok": "d50 in P&I range",
+        "mtc_pi_ok_tip": "0.28–0.36 ft (Phillips & Ingersoll, 1998)",
+        "mtc_pi_out_of_range": "Outside range",
+        "mtc_pi_tip": "Extrapolating outside the 0.28–0.36 ft dataset range this equation was developed from — treat as a rough check, not a design basis",
         "mhp_vel_ok_short": "OK",
         "odt_notes_1_term": "Formula",
         "install_android_heading": "Android (Chrome)",
@@ -461,7 +467,13 @@
     "keys": {
         "dw_roughness": "e",
         "mphl_area": "Area, A",
+        "mtc_n_pi": "n for design rock size (Phillips & Ingersoll method)",
         "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
+        "mtc_pi_range_check": "P&I range check",
+        "mtc_pi_ok": "d50 in P&I range",
+        "mtc_pi_ok_tip": "0.28–0.36 ft (Phillips & Ingersoll, 1998)",
+        "mtc_pi_out_of_range": "Outside range",
+        "mtc_pi_tip": "Extrapolating outside the 0.28–0.36 ft dataset range this equation was developed from — treat as a rough check, not a design basis",
         "mhp_vel_ok_short": "OK",
         "odt_notes_1_term": "Formula",
         "install_android_heading": "Android (Chrome)",
@@ -507,9 +519,105 @@
                 }
             }
         },
+        "mtc_n_pi": {
+            "reason": "equal_to_english",
+            "current_value": "n for design rock size (Phillips & Ingersoll method)",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "mtc_n_bathurst",
+                    "value": "n per dimensione roccia di progetto secondo Bathurst",
+                    "english": "n for design rock size (Bathurst method)"
+                },
+                "next_translated": {
+                    "key": "mtc_d50_bottom",
+                    "value": "<span class=\"ec-help\" title=\"Secondo Isbash (1936) e Maricopa County, Arizona, US.\">Dimensione roccia angolare richiesta sul fondo, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\">Required bottom angular rock size, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>"
+                }
+            }
+        },
         "mtc_blodgett_v_bathurst": {
             "reason": "equal_to_english",
             "current_value": "Blodgett vs. Bathurst",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "mtc_n_bathurst",
+                    "value": "n per dimensione roccia di progetto secondo Bathurst",
+                    "english": "n for design rock size (Bathurst method)"
+                },
+                "next_translated": {
+                    "key": "mtc_d50_bottom",
+                    "value": "<span class=\"ec-help\" title=\"Secondo Isbash (1936) e Maricopa County, Arizona, US.\">Dimensione roccia angolare richiesta sul fondo, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\">Required bottom angular rock size, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>"
+                }
+            }
+        },
+        "mtc_pi_range_check": {
+            "reason": "equal_to_english",
+            "current_value": "P&I range check",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "mtc_n_bathurst",
+                    "value": "n per dimensione roccia di progetto secondo Bathurst",
+                    "english": "n for design rock size (Bathurst method)"
+                },
+                "next_translated": {
+                    "key": "mtc_d50_bottom",
+                    "value": "<span class=\"ec-help\" title=\"Secondo Isbash (1936) e Maricopa County, Arizona, US.\">Dimensione roccia angolare richiesta sul fondo, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\">Required bottom angular rock size, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>"
+                }
+            }
+        },
+        "mtc_pi_ok": {
+            "reason": "equal_to_english",
+            "current_value": "d50 in P&I range",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "mtc_n_bathurst",
+                    "value": "n per dimensione roccia di progetto secondo Bathurst",
+                    "english": "n for design rock size (Bathurst method)"
+                },
+                "next_translated": {
+                    "key": "mtc_d50_bottom",
+                    "value": "<span class=\"ec-help\" title=\"Secondo Isbash (1936) e Maricopa County, Arizona, US.\">Dimensione roccia angolare richiesta sul fondo, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\">Required bottom angular rock size, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>"
+                }
+            }
+        },
+        "mtc_pi_ok_tip": {
+            "reason": "equal_to_english",
+            "current_value": "0.28–0.36 ft (Phillips & Ingersoll, 1998)",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "mtc_n_bathurst",
+                    "value": "n per dimensione roccia di progetto secondo Bathurst",
+                    "english": "n for design rock size (Bathurst method)"
+                },
+                "next_translated": {
+                    "key": "mtc_d50_bottom",
+                    "value": "<span class=\"ec-help\" title=\"Secondo Isbash (1936) e Maricopa County, Arizona, US.\">Dimensione roccia angolare richiesta sul fondo, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\">Required bottom angular rock size, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>"
+                }
+            }
+        },
+        "mtc_pi_out_of_range": {
+            "reason": "equal_to_english",
+            "current_value": "Outside range",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "mtc_n_bathurst",
+                    "value": "n per dimensione roccia di progetto secondo Bathurst",
+                    "english": "n for design rock size (Bathurst method)"
+                },
+                "next_translated": {
+                    "key": "mtc_d50_bottom",
+                    "value": "<span class=\"ec-help\" title=\"Secondo Isbash (1936) e Maricopa County, Arizona, US.\">Dimensione roccia angolare richiesta sul fondo, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\">Required bottom angular rock size, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>"
+                }
+            }
+        },
+        "mtc_pi_tip": {
+            "reason": "equal_to_english",
+            "current_value": "Extrapolating outside the 0.28–0.36 ft dataset range this equation was developed from — treat as a rough check, not a design basis",
             "neighbors": {
                 "previous_translated": {
                     "key": "mtc_n_bathurst",

@@ -1,11 +1,12 @@
 {
     "meta": {
         "language": "ur",
-        "expected_key_count": 499,
-        "delta_key_count": 8,
+        "expected_key_count": 505,
+        "delta_key_count": 14,
         "active_prefixes": [
             "dw",
             "ip",
+            "mtc",
             "rc"
         ],
         "requested_prefix": null,
@@ -17,6 +18,7 @@
     "prompt_context_by_prefix": {
         "dw": "Use these preferred technical term translations when relevant:\n- flow (Q): بہاؤ\n- velocity (v): رفتار\n- head loss (h_L): ہیڈ لاس\n- friction factor (f): رگڑ عامل\n- slope (S): ڈھلوان\n- laminar: سطحی بہاؤ\n- transitional: منتقلی بہاؤ\n- turbulent: ہنگامہ خیز بہاؤ",
         "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): بہاؤ\n- velocity (v): رفتار\n- head loss (h_L): ہیڈ لاس\n- emitter: خارج کنندہ\n- distribution uniformity (DU): تقسیم یکسانیت\n- low-quarter distribution uniformity (DU_lq): نچلی چوتھائی تقسیم یکسانیت\n- application rate (PR): اطلاق کی شرح\n- lateral: لیٹرل\n- mainline: مرکزی پائپ\n- reach: حصہ\n- velocity head (H_v): رفتار ہیڈ\n- friction loss (h_f): رگڑ نقصان\n- minor loss (h_m): مقامی نقصان\n- energy grade line (EGL): توانائی لائن\n- upstream: بالائی رخ\n- downstream: زیریں رخ",
+        "mtc": "Use these preferred technical term translations when relevant:\n- flow (Q): بہاؤ\n- velocity (v): رفتار\n- hydraulic radius (R_h): ہائیڈرولک رداس\n- wetted perimeter (P_w): بھیگا پریمیٹر\n- Manning roughness (n): مانیننگ کھردرا پن گتانک\n- slope (S): ڈھلوان",
         "rc": "Use these preferred technical term translations when relevant:\n- flow (Q): بہاؤ\n- velocity (v): رفتار\n- riprap: پتھر کی حفاظت\n- slope (S): ڈھلوان\n- rock chute: پتھریلا تیز نالہ\n- chute: تیز نالہ\n- unit discharge (q, q_t): اکائی بہاؤ\n- median rock size (D50): وسیط پتھر کا سائز\n- gradation (SD): درجہ بندی\n- porosity (n_p): مسامیت\n- specific gravity (sg): مخصوص کثافت\n- ponding: پانی جمع ہونا\n- outlet apron: آؤٹ لیٹ ایپرن\n- weir head (H_p): ویئر ہیڈ\n- upstream: بالائی رخ\n- downstream: زیریں رخ\n- reach: حصہ"
     },
     "glossary_terms_by_prefix": {
@@ -192,6 +194,50 @@
                 "preferred_translation": "زیریں رخ"
             }
         ],
+        "mtc": [
+            {
+                "term": "flow",
+                "symbol": "Q",
+                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg RESOLVED (Tom, 2026-07-13): native engineer's 2026-07-06 clarification confirmed both 'дебит' (colloquial\/general register) and 'водно количество' (academic\/hydraulic-engineering register, used at university for Q) are acceptable. Tom decided suite-wide standardization on 'водно количество' — \"I would put водно количество everywhere\" — applied across all bg calculator categories (pipes\/irrigation included, not just the hydraulic-structure\/open-channel strings the engineer originally corrected). 'дебит' fully replaced in lib\/lang.ec.bg.php 2026-07-13.",
+                "preferred_translation": "بہاؤ"
+            },
+            {
+                "term": "velocity",
+                "symbol": "v",
+                "context": "Flow velocity (speed of water). Appears in all calculators.",
+                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
+                "preferred_translation": "رفتار"
+            },
+            {
+                "term": "hydraulic radius",
+                "symbol": "R_h",
+                "context": "Cross-sectional flow area divided by wetted perimeter. Appears in Manning calculators.",
+                "translation_notes": "Use the standard hydraulic engineering phrase. Pre-2026 sr\/hr human translations used the Latin loanword 'hidraulički radijus' — this form is widely used in South Slavic engineering practice and may be more recognizable to field practitioners than the native Slavic equivalents 'полупречник' (sr) \/ 'polumjer' (hr). Both are correct; native Slavic engineers may encounter both forms. DATA-ERROR FIX 2026-07-10 (category-3 sw wave-3 sprint): previous sw value 'radius ya maji' (literally 'radius of water', English loanword 'radius' + 'of water') named the substance rather than the hydraulic-geometry property, and did not read as an engineering term. Changed to 'radiasi ya kihaidroliki' (radius + 'hydraulic', adjectival ki- form), matching the '[radius] + hydraulic' construction used by fr\/de\/it\/es\/ro\/tr (rayon hydraulique \/ hydraulischer Radius \/ raggio idraulico \/ radio hidráulico \/ raza hidraulică \/ hidrolik yarıçap). Used in lib\/lang.ec.sw.php's mpf_hydraulic_radius.",
+                "preferred_translation": "ہائیڈرولک رداس"
+            },
+            {
+                "term": "wetted perimeter",
+                "symbol": "P_w",
+                "context": "Length of the channel or pipe boundary in contact with flowing water. Appears in Manning calculators.",
+                "translation_notes": "WMO No. 385 entry 1682 confirms: es = 'perímetro mojado', fr = 'périmètre mouillé'. Use the standard hydraulic engineering phrase. 'Wetted' here means 'in contact with water', not 'soaked'. Pre-2026 sr human used 'okvašeni obim' (obim = natural South Slavic word for perimeter\/circumference); current uses 'квашени периметар' (периметар = Greek-derived loanword). Both are correct; 'obim\/opseg' is more natural in informal Serbian\/Croatian field use.",
+                "preferred_translation": "بھیگا پریمیٹر"
+            },
+            {
+                "term": "Manning roughness",
+                "symbol": "n",
+                "context": "Manning's n — empirical roughness coefficient used in the Manning formula for open-channel and pipe flow.",
+                "translation_notes": "Always include 'Manning' as a proper noun. The coefficient itself (n) needs no translation — only the label does. Do not translate as generic 'roughness coefficient' without 'Manning'. TYPO FIX 2026-07-09 (category-3 wave-1 sprint): ru\/uk transliterations were single-н 'Манинга'\/'Манінга', flagged by the ru wave-1 agent as inconsistent with the established double-н transliteration ('Маннинга'\/'Маннінга') used 11+ times elsewhere in both lang files (predates this sprint). Corrected to double-н for consistency.",
+                "preferred_translation": "مانیننگ کھردرا پن گتانک"
+            },
+            {
+                "term": "slope",
+                "symbol": "S",
+                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
+                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
+                "preferred_translation": "ڈھلوان"
+            }
+        ],
         "rc": [
             {
                 "term": "flow",
@@ -316,6 +362,12 @@
     },
     "keys_to_translate": {
         "dw_roughness": "e",
+        "mtc_n_pi": "n for design rock size (Phillips & Ingersoll method)",
+        "mtc_pi_range_check": "P&I range check",
+        "mtc_pi_ok": "d50 in P&I range",
+        "mtc_pi_ok_tip": "0.28–0.36 ft (Phillips & Ingersoll, 1998)",
+        "mtc_pi_out_of_range": "Outside range",
+        "mtc_pi_tip": "Extrapolating outside the 0.28–0.36 ft dataset range this equation was developed from — treat as a rough check, not a design basis",
         "rc_sg_ok_tip": "2.54–2.82 (Robinson)",
         "rc_SD_ok_tip": "1.15–1.47 (Robinson)",
         "ip_length": "L",
@@ -326,6 +378,12 @@
     },
     "keys": {
         "dw_roughness": "e",
+        "mtc_n_pi": "n for design rock size (Phillips & Ingersoll method)",
+        "mtc_pi_range_check": "P&I range check",
+        "mtc_pi_ok": "d50 in P&I range",
+        "mtc_pi_ok_tip": "0.28–0.36 ft (Phillips & Ingersoll, 1998)",
+        "mtc_pi_out_of_range": "Outside range",
+        "mtc_pi_tip": "Extrapolating outside the 0.28–0.36 ft dataset range this equation was developed from — treat as a rough check, not a design basis",
         "rc_sg_ok_tip": "2.54–2.82 (Robinson)",
         "rc_SD_ok_tip": "1.15–1.47 (Robinson)",
         "ip_length": "L",
@@ -348,6 +406,102 @@
                     "key": "dw_roughness_tip",
                     "value": "پائپ کی دیوار کی مطلق کھردری اونچائی، e۔ عام قدریں: فولاد (نیا) 0.046 ملی میٹر، فولاد (استعمال شدہ) 0.15 ملی میٹر، HDPE 0.003 ملی میٹر، PVC\/uPVC 0.0015 ملی میٹر، کنکریٹ 0.3–3 ملی میٹر۔",
                     "english": "Absolute roughness height, e, of the pipe wall. Typical values: steel (new) 0.046 mm, steel (used) 0.15 mm, HDPE 0.003 mm, PVC\/uPVC 0.0015 mm, concrete 0.3–3 mm."
+                }
+            }
+        },
+        "mtc_n_pi": {
+            "reason": "equal_to_english",
+            "current_value": "n for design rock size (Phillips & Ingersoll method)",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "mtc_n_bathurst",
+                    "value": "ڈیزائن پتھر کے حجم کے لیے n (Bathurst طریقہ)",
+                    "english": "n for design rock size (Bathurst method)"
+                },
+                "next_translated": {
+                    "key": "mtc_blodgett_v_bathurst",
+                    "value": "Blodgett بمقابلہ Bathurst",
+                    "english": "Blodgett vs. Bathurst"
+                }
+            }
+        },
+        "mtc_pi_range_check": {
+            "reason": "equal_to_english",
+            "current_value": "P&I range check",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "mtc_blodgett_v_bathurst",
+                    "value": "Blodgett بمقابلہ Bathurst",
+                    "english": "Blodgett vs. Bathurst"
+                },
+                "next_translated": {
+                    "key": "mtc_d50_bottom",
+                    "value": "<span class=\"ec-help\" title=\"Isbash (1936) اور Maricopa County، Arizona، US کے مطابق\">تہ کے لیے مطلوبہ زاویہ دار پتھر کا حجم، D<sub>50<\/sub> (Isbash اور MC) <span class=\"ec-tip\">؟<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\">Required bottom angular rock size, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>"
+                }
+            }
+        },
+        "mtc_pi_ok": {
+            "reason": "equal_to_english",
+            "current_value": "d50 in P&I range",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "mtc_blodgett_v_bathurst",
+                    "value": "Blodgett بمقابلہ Bathurst",
+                    "english": "Blodgett vs. Bathurst"
+                },
+                "next_translated": {
+                    "key": "mtc_d50_bottom",
+                    "value": "<span class=\"ec-help\" title=\"Isbash (1936) اور Maricopa County، Arizona، US کے مطابق\">تہ کے لیے مطلوبہ زاویہ دار پتھر کا حجم، D<sub>50<\/sub> (Isbash اور MC) <span class=\"ec-tip\">؟<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\">Required bottom angular rock size, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>"
+                }
+            }
+        },
+        "mtc_pi_ok_tip": {
+            "reason": "equal_to_english",
+            "current_value": "0.28–0.36 ft (Phillips & Ingersoll, 1998)",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "mtc_blodgett_v_bathurst",
+                    "value": "Blodgett بمقابلہ Bathurst",
+                    "english": "Blodgett vs. Bathurst"
+                },
+                "next_translated": {
+                    "key": "mtc_d50_bottom",
+                    "value": "<span class=\"ec-help\" title=\"Isbash (1936) اور Maricopa County، Arizona، US کے مطابق\">تہ کے لیے مطلوبہ زاویہ دار پتھر کا حجم، D<sub>50<\/sub> (Isbash اور MC) <span class=\"ec-tip\">؟<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\">Required bottom angular rock size, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>"
+                }
+            }
+        },
+        "mtc_pi_out_of_range": {
+            "reason": "equal_to_english",
+            "current_value": "Outside range",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "mtc_blodgett_v_bathurst",
+                    "value": "Blodgett بمقابلہ Bathurst",
+                    "english": "Blodgett vs. Bathurst"
+                },
+                "next_translated": {
+                    "key": "mtc_d50_bottom",
+                    "value": "<span class=\"ec-help\" title=\"Isbash (1936) اور Maricopa County، Arizona، US کے مطابق\">تہ کے لیے مطلوبہ زاویہ دار پتھر کا حجم، D<sub>50<\/sub> (Isbash اور MC) <span class=\"ec-tip\">؟<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\">Required bottom angular rock size, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>"
+                }
+            }
+        },
+        "mtc_pi_tip": {
+            "reason": "equal_to_english",
+            "current_value": "Extrapolating outside the 0.28–0.36 ft dataset range this equation was developed from — treat as a rough check, not a design basis",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "mtc_blodgett_v_bathurst",
+                    "value": "Blodgett بمقابلہ Bathurst",
+                    "english": "Blodgett vs. Bathurst"
+                },
+                "next_translated": {
+                    "key": "mtc_d50_bottom",
+                    "value": "<span class=\"ec-help\" title=\"Isbash (1936) اور Maricopa County، Arizona، US کے مطابق\">تہ کے لیے مطلوبہ زاویہ دار پتھر کا حجم، D<sub>50<\/sub> (Isbash اور MC) <span class=\"ec-tip\">؟<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\">Required bottom angular rock size, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },

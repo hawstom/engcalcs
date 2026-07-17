@@ -183,7 +183,13 @@
         "mtc_n_strickler": "n for design rock size (Strickler method)",
         "mtc_n_blodgett": "n for design rock size (Blodgett method)",
         "mtc_n_bathurst": "n for design rock size (Bathurst method)",
+        "mtc_n_pi": "n for design rock size (Phillips & Ingersoll method)",
         "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
+        "mtc_pi_range_check": "P&I range check",
+        "mtc_pi_ok": "d50 in P&I range",
+        "mtc_pi_ok_tip": "0.28–0.36 ft (Phillips & Ingersoll, 1998)",
+        "mtc_pi_out_of_range": "Outside range",
+        "mtc_pi_tip": "Extrapolating outside the 0.28–0.36 ft dataset range this equation was developed from — treat as a rough check, not a design basis",
         "mtc_d50_bottom": "<span class=\"ec-help\" title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\">Required bottom angular rock size, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>",
         "mtc_d50_z1": "<span class=\"ec-help\" title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\">Required side slope 1 angular rock size, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>",
         "mtc_d50_z2": "<span class=\"ec-help\" title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\">Required side slope 2 angular rock size, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>",
@@ -501,7 +507,7 @@
         "irr_card_pressure_head": "Irrigation Pressure &amp; Uniformity",
         "irr_card_pressure_desc": "Model the pressure and flow profile along a main-lateral-emitter branch to estimate distribution uniformity from the real test-path pressure, not just a catalog emitter flow rate."
     },
-    "count": 499,
+    "count": 505,
     "active_prefixes": [
         "about",
         "calc",

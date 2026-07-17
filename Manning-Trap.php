@@ -21,7 +21,7 @@ echoCalculatorForm(
 		Array('name' => 'b', 'type' => 'number', 'default' => '1', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mtc_bottom_width']),
 		Array('name' => 'z1', 'type' => 'number', 'default' => '4', 'units' => NULL, 'label' => $ec_lang['mtc_side_slope_1']),
 		Array('name' => 'z2', 'type' => 'number', 'default' => '4', 'units' => NULL, 'label' => $ec_lang['mtc_side_slope_2']),
-		Array('name' => 'n_in', 'type' => 'number', 'default' => '0.03', 'units' => NULL, 'label' => '<a target="_blank" href="http://www.engineeringtoolbox.com/mannings-roughness-d_799.html">'.$ec_lang['mpf_manningRoughness'].'</a><span class="ec-help" title="'.htmlspecialchars(strip_tags($ec_lang['mtc_iteration_tip'])).'"><span class="ec-tip">?</span></span>'.'<br /> <input type="radio" name="n_radio" id="n_radio_strickler" value="strickler" onchange="EngCalcs.submitForm()" /><label for="n_radio_strickler">Strickler</label> <input type="radio" name="n_radio" id="n_radio_bb" value="bb" onchange="EngCalcs.submitForm()" /><label for="n_radio_bb">B/B</label>'),
+		Array('name' => 'n_in', 'type' => 'number', 'default' => '0.03', 'units' => NULL, 'label' => '<a target="_blank" href="http://www.engineeringtoolbox.com/mannings-roughness-d_799.html">'.$ec_lang['mpf_manningRoughness'].'</a><span class="ec-help" title="'.htmlspecialchars(strip_tags($ec_lang['mtc_iteration_tip'])).'"><span class="ec-tip">?</span></span>'.'<br /> <input type="radio" name="n_radio" id="n_radio_strickler" value="strickler" onchange="EngCalcs.submitForm()" /><label for="n_radio_strickler">Strickler</label> <input type="radio" name="n_radio" id="n_radio_bb" value="bb" onchange="EngCalcs.submitForm()" /><label for="n_radio_bb">B/B</label> <input type="radio" name="n_radio" id="n_radio_pi" value="pi" onchange="EngCalcs.submitForm()" /><label for="n_radio_pi">P&amp;I</label>'),
 		Array('name' => 's0', 'type' => 'number', 'default' => '0.001', 'units' => Array('grade', 'gradePercent'), 'label' => $ec_lang['mtc_channel_slope']),
 		Array('name' => 'y', 'type' => 'number', 'default' => '1', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mtc_flow_depth']),
 		Array('name' => 'beta', 'type' => 'number', 'default' => '0', 'units' => NULL, 'label' => $ec_lang['mtc_bend_angle']),
@@ -48,6 +48,8 @@ echoCalculatorForm(
 		Array('name' => 'n_blodgett', 'units' => NULL, 'label' => $ec_lang['mtc_n_blodgett']),
 		Array('name' => 'n_bathurst', 'units' => NULL, 'label' => $ec_lang['mtc_n_bathurst']),
 		Array('name' => 'blodgett_v_bathurst', 'units' => NULL, 'label' => $ec_lang['mtc_blodgett_v_bathurst']),
+		Array('name' => 'n_pi', 'units' => NULL, 'label' => $ec_lang['mtc_n_pi']),
+		Array('name' => 'pi_range_check', 'units' => NULL, 'label' => $ec_lang['mtc_pi_range_check']),
 		Array('name' => 'd50_bottom', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mtc_d50_bottom']),
 		Array('name' => 'd50_z1', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mtc_d50_z1']),
 		Array('name' => 'd50_z2', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mtc_d50_z2']),
@@ -74,7 +76,11 @@ EngCalcs.pageConfig = {
 	mtc_vel_low: <?=json_encode($ec_lang['mtc_vel_low'])?>,
 	mhp_vel_ok_short: <?=json_encode($ec_lang['mhp_vel_ok_short'])?>,
 	mhp_vel_high_short: <?=json_encode($ec_lang['mhp_vel_high_short'])?>,
-	mhp_vel_low_short: <?=json_encode($ec_lang['mhp_vel_low_short'])?>
+	mhp_vel_low_short: <?=json_encode($ec_lang['mhp_vel_low_short'])?>,
+	mtc_pi_ok: <?=json_encode($ec_lang['mtc_pi_ok'])?>,
+	mtc_pi_ok_tip: <?=json_encode($ec_lang['mtc_pi_ok_tip'])?>,
+	mtc_pi_out_of_range: <?=json_encode($ec_lang['mtc_pi_out_of_range'])?>,
+	mtc_pi_tip: <?=json_encode($ec_lang['mtc_pi_tip'])?>
 };
 </script>
 <script src="/engcalcs/js/Manning.lib.js?v=<?=filemtime(__DIR__.'/js/Manning.lib.js')?>"></script>

@@ -200,7 +200,13 @@ $ec_lang['mtc_d50_in']='Розрахунковий розмір каменю, D<
 $ec_lang['mtc_n_strickler']='n для розрахункового розміру каменю за Strickler';
 $ec_lang['mtc_n_blodgett']='n для розрахункового розміру каменю за Blodgett';
 $ec_lang['mtc_n_bathurst']='n для розрахункового розміру каменю за Bathurst';
+$ec_lang['mtc_n_pi']='n для розрахункового розміру каменю за Phillips & Ingersoll';
 $ec_lang['mtc_blodgett_v_bathurst']='Blodgett проти Bathurst';
+$ec_lang['mtc_pi_range_check']='Перевірка діапазону P&I';
+$ec_lang['mtc_pi_ok']='d50 у діапазоні P&I';
+$ec_lang['mtc_pi_ok_tip']='0,28–0,36 фута (Phillips & Ingersoll, 1998)';
+$ec_lang['mtc_pi_out_of_range']='Поза діапазоном';
+$ec_lang['mtc_pi_tip']='Екстраполяція за межі діапазону вихідних даних 0,28–0,36 фута, на основі якого виведено це рівняння — використовуйте лише як орієнтовну перевірку, а не як основу для проєктування';
 $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="За Isbash (1936) та округом Марікопа, Аризона, США.">Необхідний розмір кутастого каменю для дна, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="За Isbash (1936) та округом Марікопа, Аризона, США.">Необхідний розмір кутастого каменю для укосу 1, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="За Isbash (1936) та округом Марікопа, Аризона, США.">Необхідний розмір кутастого каменю для укосу 2, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
