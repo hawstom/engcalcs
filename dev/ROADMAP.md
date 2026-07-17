@@ -10,6 +10,36 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 ## Calculator Improvements
 
+- 30|122| **Add Phillips & Ingersoll (1998) Manning's n option to `mtc_`.** Tom, 2026-07-16: found
+  this equation (Maricopa County Drainage Design Manual, Hydraulics Volume, Section 7.6.3, Figure
+  7.5) while chasing down Task 120/121's unresolved Bathurst-coefficient gap — it's what the manual
+  actually still contains, fully specified with units and a stated applicability range, unlike the
+  now-unrecoverable Bathurst formula (see Task 121's follow-up note). Formula:
+  `n = 0.0926·R^(1/6) / (1.46 + 2.23·log10(R/d50))`, where **R (hydraulic radius) and d50 are in
+  feet** — developed for central-Arizona lower-gradient channels with bed-material d50 ranging
+  0.28–0.36 ft (~85–110 mm) in the source dataset; the manual itself calls these equations "a check
+  or reference," not a sole design basis.
+  **Scoping notes for implementation:**
+  - **Unit conversion is the main risk, same class as the math-audit's SI/US-customary transcription
+    findings** (e.g. `hw_`'s `khw=0.849`): EngCalcs stores everything internally in SI meters, but
+    the `0.0926` constant is only valid with R/d50 in feet. The JS must explicitly convert `rh` and
+    `d50_in` from meters to feet before applying this formula (factor ≈3.28084), not just plug in
+    the SI-stored values.
+  - Tom's call (2026-07-16, asked and confirmed): add as a **third standalone radio option**
+    alongside the existing `n_radio` choices in `Manning-Trap.php` (`strickler`, `bb` for
+    Blodgett/Bathurst) — do **not** fold it into the `bb` auto-select logic or its da/d50 thresholds;
+    that auto-select stays untouched for now.
+  - Needs an applicability/validity check analogous to `rc_`'s specific-gravity/gradation checks or
+    `mtc_`'s existing `blodgett_v_bathurst` range logic — flag when d50 falls well outside the
+    0.28–0.36 ft dataset range the equation was developed from.
+  - New `$ec_lang` keys needed for the radio label (e.g. short "P&I" per the existing terse
+    "Strickler"/"B/B" label convention) and likely a `?` tip citing the source and applicability
+    range, per the link+tip convention in `CLAUDE.md`. Once English wording is final, this is a
+    small, scoped translation delta (a handful of keys) — standard 26-agent Sonnet sprint per
+    `CLAUDE.md` § "Translation Sprints", authorized separately when ready.
+  - Not yet spec'd in full (inputs/outputs/worked-example verification per the new-calculator-field
+    checklist) or implemented — this entry is the scoping/authorization record, not a completed task.
+
 ## New Calculators (Mission Expansion)
 
 Tom, 2026-07-14: interested in expanding beyond hydraulic-structure/irrigation calculators toward
@@ -228,6 +258,228 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|121| **Second-opinion (Opus) pass on the Task 120 mathematical audit — DONE 2026-07-16.**
+  Independent re-check requested by Tom before fully closing the book on Task 120, since the first
+  pass (Sonnet, self-derive-then-self-check) had already found one critical bug — meaning the base
+  rate for a second hiding defect wasn't zero, and self-derivation-then-self-check has a structural
+  blind spot (a shared conceptual slip in both deriving the "correct" formula and reading the code
+  would pass as "verified"). Scoped narrower than a full 14-calculator redo (see the original task
+  text in git history for the 5-point scope); launched as a single Opus agent per
+  `feedback_fable_unavailable_use_opus`, with instructions to work Part A (independent re-derivation
+  of the two shipped fixes) *before* reading the Task 120 write-up, to avoid anchoring. Hit a session
+  limit partway through Part B (mid-way through testing `mtc_`'s Blodgett-formula edge cases) — no
+  code was at risk since this was a report-only task; resumed from transcript via SendMessage rather
+  than relaunched from scratch, per `feedback_session_limit_retry`.
+
+  **Result: independently reached the same conclusions as the first pass on both shipped fixes,
+  via its own from-scratch derivation — no new critical bugs found.** Re-derived the Dunlop/EPANET
+  transitional friction-factor cubic independently and confirmed the same two-part diagnosis
+  (natural log required, not log10; the `x4` term needs its `-3·fa` component) — verified the
+  boundary identities algebraically (at `r=1`/Re=2000 the cubic collapses to exactly `0.032`; at
+  `r=2`/Re=4000 to exactly the Swamee-Jain value) and numerically (continuous to 6 decimals across
+  4 test pipes). Independently confirmed the Christiansen exponent `m=1.75` as the physically
+  correct Blasius/smooth-turbulent value for `ip_`'s Darcy-Weisbach-based lateral friction model,
+  citing the same Keller & Bliesner convention. Re-audited the self-derived-formula-matches-code
+  findings from stage 1/2 (`mpf_` geometry and peak-Q claim, `hw_`'s Hazen-Williams constant) and
+  reconfirmed both independently.
+
+  **Bathurst coefficients: still unverified, but the blocker is now better understood.** The agent
+  got further than the first pass — it downloaded the HEC-15 PDF and text-extracted ~1.8MB via a
+  Python/zlib script (no `pdftotext` needed) — but found Appendix C's equations are typeset as
+  images/special glyphs, not extractable text; the specific coefficients (13.434, 1.025, 0.755,
+  0.492, 0.118, 1.14) never appeared in the extracted text. It did confirm the formula returns
+  physically plausible Manning's-n values (≈0.044–0.054) for realistic riprap channels with no
+  NaN/negative results in its valid input range. Certifying the exact 9 constants against the
+  primary source still requires either a human with a readable copy of HEC-15 Appendix C.3, or an
+  OCR-capable tool this environment doesn't have.
+
+  **Follow-up, 2026-07-16 — Bathurst provenance now confirmed a dead end, not a pending to-do.**
+  Tom recalls originally sourcing the `bathurst_n` formula from the Maricopa County Drainage Design
+  Manual, Hydraulics Volume — but checked the current edition (Section 7.6.3, "Riprap Lined
+  Channels") and found Bathurst and Blodgett are no longer present there at all; that section now
+  covers only Limerinos (1970) and Phillips & Ingersoll (1998) base-n equations. The original
+  citation source is gone from the manual Tom actually used, not merely hard to fetch — so this is
+  closed out as a genuine dead end per `feedback_native_review_pipe_dream`'s spirit (don't log an
+  unrecoverable gap as a live pending action). Residual risk stands as characterized above
+  (structurally sound, behaviorally clean, coefficients unverifiable) and is accepted as-is; no
+  further search budget planned unless a new lead surfaces. See Task 122 for the resulting concrete
+  action (adding Phillips & Ingersoll as a new roughness option, since it's what's actually still in
+  the manual and is fully specified with units and an applicability range).
+
+  **Three new low-severity findings from the randomized edge-case sweep (Part C), none corrupting
+  an actual displayed design result — left open for Tom to decide on follow-up, not fixed:**
+  1. `mtc_`: `n_blodgett` (the reference/comparison column, not necessarily the selected n) goes
+     negative whenever `da/d50 < 0.3714` — outside Blodgett's own published validity range, where
+     the formula's denominator goes negative. Auto-select mode never picks Blodgett outside its
+     valid range (1.5 ≤ da/d50 ≤ 185), so the actual sizing output is unaffected, but the comparison
+     cell can show a nonsensical negative n.
+  2. `mtc_`: the auto-sizing iteration doesn't reach its `1e-5` convergence tolerance within the
+     100-iteration cap in a meaningful fraction of a realistic input sweep (~39%) — but never
+     diverges (d50 stays bounded, no NaN/Infinity), just settles slightly outside its own tight
+     precision target. A convergence-quality softness, not a hard bug.
+  3. `mi_`: a bank region that's entirely dry (above the water surface) makes `closeRegion()`'s
+     composite-n computation divide `0/0`, showing `NaN` in that region's own `n617`/`v617`/etc.
+     display cells. The suite total `q_617` output stays correct (the dry region correctly
+     contributes zero flow) — same defect class as the already-accepted `mpf_ dd0=0` gap, arguably
+     more reachable (any low-flow case with water surface below an overbank region).
+
+  Spot-checked and reconfirmed both minor findings from stage 2/4: `mi_`'s `n618`/`v618`/`fr618`
+  dead code (confirmed via grep — genuinely never written to any DOM element or referenced in the
+  PHP page) and `rc_`'s `Hp` weir-head formula misattribution (confirmed the formula is legitimate
+  broad-crested-weir physics, Cd≈0.851 implied by the `1.45` coefficient, but not one of Robinson/
+  Rice/Kadavy 1998's own numbered equations).
+
+- 0|120| **Holistic calculator mathematical audit — DONE 2026-07-16.** Review the mathematical and
+  checks logic of all calculators. Scoped 2026-07-16 into a per-calculator checklist and staged plan:
+  `dev/calculator-math-audit-checklist.md` (14 calculators identified, generic 7-point checklist,
+  calculator-specific risk notes, and a 4-stage plan grouped by shared physics — friction/pipe-flow,
+  open-channel, weir/orifice, standalone). Stage 1 (friction/pipe-flow cluster) started 2026-07-16.
+
+  **Critical bug found and fixed, stage 1, 2026-07-16: transitional-regime (2000 < Re < 4000)
+  friction factor was wrong by up to ~127×, always too high.** `Darcy-Weisbach.php`,
+  `Micro-Hydro-Power.php`, and `Irrigation-Pressure.php` each hand-copy the same Dunlop (1991)
+  cubic-interpolation friction-factor formula (the transitional bridge between Hagen-Poiseuille
+  laminar flow and the Swamee-Jain turbulent approximation, matching EPANET's method) — all three
+  had the identical defect. Verified against the published formula (web-confirmed via the `pyhyd`
+  reference implementation) and numerically via a Node harness requiring each JS file directly (per
+  `feedback_verify_calc_math_numerically`): the shipped code was discontinuous with both the laminar
+  and turbulent branches at their shared boundaries (e.g. `f`=0.661 just above Re=2000 vs. the
+  laminar branch's 0.032 just below it — should be continuous). Root cause, two independent
+  transcription errors, both required to fix: (1) the `y3` term used `Math.log10` where the formula
+  requires natural log (the `0.86859` constant is only valid paired with `Math.log`); (2) the `x4`
+  term was `0.032 * fa + 0.5 * fb`, missing a `-3·fa` component (correct: `0.032 - 3*fa + 0.5*fb`).
+  Fixed in all three files; also added a `re === 0` guard to `dw_`/`mhp_` (already present in `ip_`)
+  since `q=0` previously produced `f=Infinity` → `NaN` head-loss results. Post-fix verification:
+  Node harness confirms exact continuity at both Re=2000 and Re=4000 boundaries in all three files;
+  `php -l` clean on all three pages; `node -c` clean on all three JS files.
+
+  **Stage 1 completed, 2026-07-16 — remaining checks all clean, one open modeling question for
+  Tom.** `hw_`'s `S_f = 7.8828/D^4.8704 · (Q/(k·C))^1.852` with `k=0.849`: verified algebraically
+  and numerically equivalent (within constant-rounding, 10.674 vs. the commonly tabulated 10.67) to
+  the standard combined SI Hazen-Williams head-loss formula `S_f = 10.67·(Q/C)^1.852/D^4.8704` — no
+  defect. `mphl_`'s full-pipe `S_f = v²n²·6.3496/(c²·D^4/3)` (`c=1.0` SI Manning coefficient):
+  verified `6.3496 = 4^(4/3)`, the exact constant produced by substituting `R_h=D/4` into Manning's
+  equation solved for slope — confirms algebraically and numerically (matched a direct Manning
+  equation solve to 4 decimal places) — no defect. `ip_`'s bisection solver: the upper bound
+  `hi = hSupplyTarget + maxElevDrop + 1` is a real derived bound (proven via a no-losses energy
+  argument that the true root's far-end pressure must be strictly less than
+  `hSupplyTarget + maxElevDrop`), not an arbitrary guess, and the "no solution" check
+  (`ipMarch(hi) < target`) is mathematically sound given that bound — 60 bisection iterations is
+  far more than the ~37 needed to reach the `1e-9` exit tolerance from any realistic starting
+  range. `mhp_`'s `P = η·ρ·g·Q·H_net` power conversion and `annual_kwh = P/1000·8760` checked
+  dimensionally and numerically correct; velocity/head-loss-% verdict thresholds match the
+  suite-wide conventions already vetted in Tasks 101/102/105.
+
+  **Christiansen exponent corrected, 2026-07-16.** `ip_` had hardcoded `christiansenM = 1.852` (the
+  Hazen-Williams flow exponent) inside Christiansen's multi-outlet reduction factor `F(n)`, but
+  `ip_`'s own pipe friction is Darcy-Weisbach/Swamee-Jain, not Hazen-Williams. Tom's call after
+  discussion: changed to `1.75`, the Blasius/smooth-turbulent Darcy-Weisbach exponent
+  (`h_f ∝ Q^1.75`) — the physically correct match for `ip_`'s own friction model, and also the
+  value Keller & Bliesner's *Sprinkle and Trickle Irrigation* (the standard irrigation-engineering
+  reference) uses for this exact case, since laterals are small-diameter smooth plastic pipe
+  operating in the smooth-turbulent regime, not the fully-rough regime (`m=2.0`) or Hazen-Williams
+  pipe networks (`m=1.852`). `node -c`/`php -l` clean.
+
+  Minor robustness gaps noted but not fixed (no wrong-answer risk, just ungraceful degenerate
+  inputs): `ip_`'s `h_design=0` produces `k=Infinity`; a zero-diameter reach produces `Infinity`
+  velocity — both are invalid-input cases a user would immediately notice from the garbage output,
+  not silent wrong answers, so left as-is pending a UX pass rather than blocking stage 1 closure.
+
+  Stage 1 (`dw_`/`hw_`/`mphl_`/`mhp_`/`ip_`) is now complete. Next: authorize stage 2 (open-channel
+  cluster: `mpf_`, `mtc_`, `mi_`).
+
+  **Stage 2 (open-channel cluster) completed, 2026-07-16 — all formulas verified correct, no bugs
+  found.** `mpf_`: circular partial-full-pipe geometry (area, wetted perimeter, hydraulic radius,
+  top width, `Q_full`) all re-derived algebraically from the θ (half-angle) parameterization and
+  matched exactly; the bisection solver's claimed peak-flow depth ratio `y/d₀ ≈ 0.9376` verified
+  numerically against a fine-grained numerical search of the true peak (true peak ≈0.9382, giving
+  99.9997% of max Q at the coded value — a safe, correct approximation), and the solver's full
+  domain `[1e-4, 0.9376]` confirmed strictly monotonic in Q (no double-root risk, no
+  catastrophic-cancellation precision loss at the small-depth end). Minor, low-severity finding:
+  `dd0=0` or any value outside `(0,1)` produces `NaN` rather than a graceful message — visibly
+  broken, not silently wrong, left as a UX item rather than a math defect.
+
+  `mtc_`: trapezoidal area/wetted-perimeter/top-width formulas, Strickler's `n` (`D50^(1/6)/21.1`),
+  and Blodgett's riprap-channel `n` formula all verified algebraically and numerically exact against
+  their standard published forms. The Isbash rock-sizing formula in `js/Manning.lib.js`
+  (`mc_riprap_size`) verified exact against the classic Isbash stability equation
+  `V_c = c·√(2gD₅₀(Sg-1)·cosθ)` solved for D₅₀, including the side-slope angle correction
+  (`cosθ = cos(atan(1/z))`) and the `z=1000` trick used to represent the flat channel bottom case.
+  The Bathurst composite-roughness formula (also in `Manning.lib.js`) could not be verified
+  coefficient-by-coefficient against the primary source (HEC-15 Appendix C.3) — this sandboxed
+  environment has no PDF-text-extraction tooling (`pdftotext`, `pip`, and `apt`/`sudo` are all
+  unavailable) and web fetches of the FHWA PDF returned only binary/unparseable content. Structural
+  cross-checks that *did* succeed are reassuring: the code's `da/D50 < 1.5` Bathurst-applicability
+  threshold and its three-term denominator (Froude-based, roughness-geometry-based,
+  channel-geometry-based) both match published descriptions of the method exactly. Flagged rather
+  than silently trusted — if Tom has independent access to HEC-15 Appendix C.3, worth a direct
+  coefficient check against the 9 numeric constants in `EngCalcs.Manning.bathurst_n`. One harmless
+  documentation slip found: the iteration-relaxation comment says "move d50_in 75% of the way" but
+  the actual code moves 5/6 ≈ 83.3% of the way — cosmetic only, not a math defect.
+
+  `mi_`: verified by constructing a symmetric trapezoid test case in the general irregular-geometry
+  station/elevation formulas and confirming it reduces segment-by-segment to `mtc_`'s own exact
+  closed-form results (same area, wetted perimeter) — strong cross-calculator confirmation. The
+  `ncompterm617`/`ncompterm618` composite-Manning's-n formulas are legitimate published methods
+  (Horton-Einstein and its companion sqrt-based equation). One dead-code finding, not a defect:
+  `closeRegion()` computes a full second set of results (`n618`/`v618`/`fr618`/`q618`) that are
+  never written to the DOM anywhere in `manning-irregular.js` — silently computed and discarded
+  every run.
+
+  **Stage 3 (weir/orifice cluster) completed, 2026-07-16 — all formulas verified correct, no bugs
+  found.** `or_`: standard orifice equation `Q = Cd·A·√(2gh)`, centroid/crown geometry, and the
+  submerged-vs-free-flow head selection logic all confirmed correct (numeric check: circular
+  D=0.3m, h=1.35m, Q matched the hand-derived expected value exactly). `odt_`: independently
+  re-derived both the drain-time and drained-volume closed-form solutions from the underlying
+  differential equation (`dV/dt = -Cd·Aor·√(2gh)` with the conic pond-area model
+  `A(h)=(√A0+(√A1-√A0)·h/h1)²`) — both match the shipped antiderivatives term-for-term; the
+  flat-pond fallback (`A0≈A1`) correctly reduces to the simple `A0·(h1-h2)` limiting case. `ws_`:
+  confirmed the standard `Q=Cw·L·H^1.5` weir equation; its documented no-internal-unit-conversion
+  design (`Cw` itself encodes the unit system, US-customary ~3.0 vs. SI ~1.84) is an intentional,
+  commented simplification, not a defect. `wi_`: independently re-derived the sloped-crest
+  per-segment integral of `Cw·d(x)^1.5` and confirmed it matches the code exactly (cross-checked
+  against a 2-million-step direct numerical integration, agreement to 6 decimal places), and
+  confirmed the flat-crest case algebraically reduces to `ws_`'s own formula exactly.
+
+  Stages 1, 2, and 3 all complete — 12 of 14 calculators fully audited with only the Bathurst
+  coefficient question left open (needs Tom's own HEC-15 access). Next: authorize stage 4
+  (standalone: `rc_` Rock Chute regression coefficients against the Robinson paper, `cs_` — lowest
+  remaining risk, pure arithmetic).
+
+  **Stage 4 completed, 2026-07-16 — `cs_` clean, `rc_` fully verified against its primary source
+  with no bugs found.** `cs_`: every division in `canal-seepage.js` is guarded, the payback/recovery
+  logic degrades gracefully to `Infinity`/em-dash rather than `NaN`, and the ≥80%/≥60% conveyance-
+  efficiency thresholds match typical published irrigation-efficiency benchmarks — no defects.
+
+  `rc_`: unlike the Bathurst formula in stage 2, the primary source (Robinson, Rice & Kadavy 1998,
+  *Design of Rock Chutes*, Trans. ASAE 41(3):621-626) was successfully obtained and read in full.
+  Verified every equation in `rock-chute.js` directly against the paper, including running the
+  paper's own worked example (S₀=0.20, q=0.60 m³/s/m) through the actual JS via a Node harness: D50
+  (230.6mm vs. paper's 231mm), Manning's `n` (0.0513 vs. 0.051), mantle velocity `Vm` (0.1513 vs.
+  0.151 m/s), mantle discharge `qm` (0.0698 vs. 0.070 m³/s/m), and flow depth `d` (0.1864 vs. 0.186m)
+  all matched to the paper's own stated precision (trivial residual differences trace to the code's
+  more precise `g=9.806` vs. the paper's rounded `g=9.81`). The `40D50` crest radius, `2D50` layer
+  thickness, and `15D50` apron length constants, and the specific-gravity (2.54–2.82) and gradation
+  (1.15–1.47) validity-check bounds, all match the paper's stated test parameters exactly. One
+  citation-accuracy finding, not a math bug: the inlet-ponding weir-head formula
+  (`Hp=(qt/1.45)^(2/3)`) is commented as sourced from "Robinson, 1998," but that paper contains no
+  discussion of inlet ponding or approach-channel weir behavior at all (it covers only rock
+  stability, roughness, and outlet stability) — the underlying physics is legitimate (a standard SI
+  broad-crested-weir critical-flow relation; 1.45 is a commonly cited practical coefficient), it's
+  simply misattributed in the comment.
+
+  **All 4 stages and all 14 calculators now audited.** Summary across the full Task 120 pass: one
+  critical bug found and fixed (stage 1's transitional-friction-factor defect, up to ~127× error,
+  affecting `dw_`/`mhp_`/`ip_`), one modeling-judgment fix applied (`ip_`'s Christiansen exponent,
+  1.852→1.75), and otherwise a clean bill of health — every other formula across all 14 calculators
+  was independently re-derived or numerically verified against a primary source, published worked
+  example, or closed-form cross-check, with only cosmetic findings (stale comments, one
+  dead-code block in `mi_`, one misattributed citation in `rc_`) and one still-open item (Bathurst
+  coefficients in `mtc_`, blocked by lack of PDF tooling in this environment — flagged for Tom to
+  verify independently if he has HEC-15 access). Task 120 priority should be reviewed/lowered given
+  this completion; no further audit work is scheduled unless Tom wants the Bathurst check followed
+  up or a future re-audit after calculator changes.
 
 - 0|119| **Offline usage logging (queue-and-flush) — DONE 2026-07-16.**
   `EngCalcs.maybeLogHumanView()`/`maybeLogCalcUsage()` (`js/Calculators.lib.js`) now send via

@@ -21,15 +21,17 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.var.hv  = this.var.vel * this.var.vel / (2 * this.var.g);
 
 	// Friction factor (same as Darcy-Weisbach calculator)
-	if (this.var.re < 2000) {
+	if (this.var.re === 0) {
+		this.var.f = 0;
+	} else if (this.var.re < 2000) {
 		this.var.f = 64 / this.var.re;
 	} else if (this.var.re < 4000) {
 		var r  = this.var.re / 2000;
 		var y2 = this.var.e / (3.7 * this.var.d) + 5.74 / Math.pow(this.var.re, 0.9);
-		var y3 = -0.86859 * Math.log10(this.var.e / (3.7 * this.var.d) + 5.74 / Math.pow(4000, 0.9));
+		var y3 = -0.86859 * Math.log(this.var.e / (3.7 * this.var.d) + 5.74 / Math.pow(4000, 0.9));
 		var fa = Math.pow(y3, -2);
 		var fb = fa * (2 - 0.00514215 / (y2 * y3));
-		this.var.f = (7*fa - fb) + r * ((0.128 - 17*fa + 2.5*fb) + r * ((-0.128 + 13*fa - 2*fb) + r*(0.032*fa + 0.5*fb)));
+		this.var.f = (7*fa - fb) + r * ((0.128 - 17*fa + 2.5*fb) + r * ((-0.128 + 13*fa - 2*fb) + r*(0.032 - 3*fa + 0.5*fb)));
 	} else {
 		this.var.f = 0.25 / Math.pow(Math.log10(this.var.e / (3.7 * this.var.d) + 5.74 / Math.pow(this.var.re, 0.9)), 2);
 	}

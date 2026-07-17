@@ -6,7 +6,12 @@
 // here is a full row-by-row march instead of one closed-form formula.
 
 EngCalcs.g = 9.806;
-EngCalcs.christiansenM = 1.852; // fixed loss exponent used by Christiansen's F(n), not user-facing.
+// Fixed loss exponent used by Christiansen's F(n), not user-facing. 1.75, not the Hazen-Williams
+// 1.852, since this calculator's own friction model is Darcy-Weisbach/Swamee-Jain and irrigation
+// laterals (where F(n) applies) are small-diameter smooth plastic pipe in the Blasius
+// smooth-turbulent regime (h_f proportional to Q^1.75) -- matches Keller & Bliesner's Sprinkle and
+// Trickle Irrigation convention for this exact case.
+EngCalcs.christiansenM = 1.75;
 
 // Copy/paste data area: singletons = printable_title, printable_subtitle, and the 12 form
 // inputs; every reach row has 7 editable columns (is_lateral..elev_ds), the rest are outputs.
@@ -28,13 +33,13 @@ EngCalcs.ipFriction = function (q, d, e, visc) {
 	} else if (re < 4000) {
 		var r = re / 2000,
 			y2 = e / (3.7 * d) + 5.74 / Math.pow(re, 0.9),
-			y3 = -0.86859 * Math.log10(e / (3.7 * d) + 5.74 / Math.pow(4000, 0.9)),
+			y3 = -0.86859 * Math.log(e / (3.7 * d) + 5.74 / Math.pow(4000, 0.9)),
 			fa = Math.pow(y3, -2),
 			fb = fa * (2 - 0.00514215 / (y2 * y3)),
 			x1 = 7 * fa - fb,
 			x2 = 0.128 - 17 * fa + 2.5 * fb,
 			x3 = -0.128 + 13 * fa - 2 * fb,
-			x4 = r * (0.032 * fa + 0.5 * fb);
+			x4 = r * (0.032 - 3 * fa + 0.5 * fb);
 		f = x1 + r * (x2 + r * (x3 + x4));
 	} else {
 		f = 0.25 / Math.pow(Math.log10(e / (3.7 * d) + 5.74 / Math.pow(re, 0.9)), 2);
