@@ -144,7 +144,6 @@ $ec_lang['mpf_pipe_diameter']='Diameter pipa, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Koefisien kekasaran Manning, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Kemiringan gesekan, S<sub>f</sub></a><span class="ec-help" title="Terkadang sama dengan kemiringan pipa. Ikuti tautan untuk penjelasan (hanya dalam bahasa Inggris)."><span class="ec-tip">?</span></span>';
 $ec_lang['mpf_depth_ratio']='Kedalaman aliran relatif, y/d<sub>0</sub>';
-$ec_lang['mpf_see_notes']='(Lihat catatan)';
 $ec_lang['mpf_flow']='Debit, Q';
 $ec_lang['mpf_flow_tip']='Debit dan kedalaman dihitung untuk pipa yang sangat panjang (tak terhingga). Untuk mengalirkan debit ini ke dalam pipa mungkin diperlukan kedalaman air hulu yang lebih tinggi. Lihat Catatan di bawah untuk detail dan video tutorial.';
 $ec_lang['mpf_velocity']='Kecepatan, v';
@@ -182,8 +181,8 @@ $ec_lang['mphl_junction_loss']='Kehilangan kecil (lokal), h<sub>m</sub>';
 $ec_lang['mphl_total_loss']='Kehilangan total, h<sub>L</sub>';
 $ec_lang['mphl_egl_1']='EGL Hilir';
 $ec_lang['mphl_egl_2']='EGL Hulu';
-$ec_lang['mphl_hgl_2']='HGL Hulu di pipa ' . $ec_lang['mpf_see_notes'];
-$ec_lang['mphl_note_1']='<dl><dt>Untuk kondisi saluran masuk terbuka (gorong-gorong), perlu diperiksa kondisi kendali saluran masuk.</dt><dd>1. HGL hulu harus berada di atas elevasi aliran kedalaman normal hulu (dan lebih tinggi dari pipa!).</dd><dd>2. Air hulu gorong-gorong lebih baik diwakili oleh EGL hulu daripada HGL hulu.</dd><dd>3. Lihat <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">tutorial 2 menit saya</a> untuk perhitungan standar sederhana air hulu gorong-gorong menggunakan HY-8.</dd>';
+$ec_lang['mphl_hgl_egl_tip']='Mungkin tidak valid jika pipa tinggi. Lihat catatan.';
+$ec_lang['mphl_note_1']='<dl><dt>Kalkulator ini tidak memperhitungkan elevasi pipa.</dt><dd>Jika HGL turun di bawah bagian atas pipa pada titik mana pun, perhitungan ini mungkin tidak valid.</dd><dt>Untuk kondisi saluran masuk terbuka (gorong-gorong), perlu diperiksa kondisi kendali saluran masuk.</dt><dd>1. HGL hulu harus berada di atas elevasi aliran kedalaman normal hulu (dan lebih tinggi dari pipa!).</dd><dd>2. Air hulu gorong-gorong lebih baik diwakili oleh EGL hulu daripada HGL hulu.</dd><dd>3. Lihat <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">tutorial 2 menit saya</a> untuk perhitungan standar sederhana air hulu gorong-gorong menggunakan HY-8.</dd>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Saluran Trapesium Manning';
 $ec_lang['mtc_main_title']='Kalkulator Rumus Manning Saluran Trapesium Gratis Daring';
@@ -217,6 +216,9 @@ $ec_lang['mtc_iteration_tip']='Pilih opsi kekasaran (Blodgett–Bathurst direkom
 $ec_lang['mtc_note_1']='<dl><dt>Iterasi otomatis ukuran batu dan kekasaran</dt><dd>Pilih opsi kekasaran (Blodgett–Bathurst direkomendasikan) dan opsi ukuran batu rencana (Isbash direkomendasikan). Sesuaikan kedalaman dan faktor keamanan ukuran batu untuk mendapatkan debit yang diinginkan dengan ukuran batu yang seragam. Setiap kali Anda mengubah nilai masukan, siklus iterasi berikut terjadi: 1. Kekasaran dihitung dari ukuran batu rencana. 2. Perhitungan kekasaran yang diminta disalin ke kekasaran masukan. 3. Debit saluran dan ukuran batu yang diperlukan dihitung. 4. Ukuran batu rencana disesuaikan. 5. Ulangi hingga galat pada ukuran batu rencana sangat kecil.</dd><dt>Kalkulator dasar (tanpa iterasi)</dt><dd>Masukkan nilai kekasaran yang Anda inginkan. Abaikan area masukan ukuran batu rencana.</dd></dl>';
 $ec_lang['mtc_note_2_term']='Pemeriksaan kecepatan';
 $ec_lang['mtc_note_2_def']='Kecepatan tinggi mengimplikasikan energi spesifik tinggi dari beda tinggi yang tersedia. Energi tersebut dapat hilang dengan cepat pada ekspansi, belokan, atau hambatan. Verifikasi bahwa ini wajar untuk kondisi lapangan.';
+$ec_lang['mtc_solve_for_y']='Hitung kedalaman, y, berdasarkan Q';
+$ec_lang['mtc_solve_desc']='Menggunakan b, z<sub>1</sub>, z<sub>2</sub>, S, dan n dari formulir kalkulator, mencari kedalaman untuk Q tertentu.';
+$ec_lang['mtc_solver_no_solution']='Tidak ditemukan solusi untuk Q yang diberikan dengan input saluran ini.';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='Aliran Bendung Ukur Sederhana';
 $ec_lang['ws_main_title']='Kalkulator Aliran Bendung Ukur Bermercu Lebar Sederhana Gratis Daring';

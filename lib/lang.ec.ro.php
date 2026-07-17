@@ -143,7 +143,6 @@ $ec_lang['mpf_pipe_diameter']='Diametrul conductei, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Coeficientul de rugozitate Manning, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Panta de frecare, S<sub>f</sub></a><span class="ec-help" title="Uneori egală cu panta conductei. Urmați linkul pentru explicație (doar în engleză)."><span class="ec-tip">?</span></span>';
 $ec_lang['mpf_depth_ratio']='Adâncime relativă de curgere, y/d<sub>0</sub>';
-$ec_lang['mpf_see_notes']='(Consultați notele)';
 $ec_lang['mpf_flow']='Debit, Q';
 $ec_lang['mpf_flow_tip']='Debitul și adâncimea sunt calculate pentru o conductă infinit de lungă. Pentru a introduce acest debit în conductă poate fi necesară o adâncime mai mare a apei din amonte. Vedeți Notele de mai jos pentru detalii și un videoclip tutorial.';
 $ec_lang['mpf_velocity']='Viteză, v';
@@ -181,8 +180,8 @@ $ec_lang['mphl_junction_loss']='Pierdere minoră (locală), h<sub>m</sub>';
 $ec_lang['mphl_total_loss']='Pierdere totală, h<sub>L</sub>';
 $ec_lang['mphl_egl_1']='EGL aval';
 $ec_lang['mphl_egl_2']='EGL amonte';
-$ec_lang['mphl_hgl_2']='HGL amonte în conductă ' . $ec_lang['mpf_see_notes'];
-$ec_lang['mphl_note_1']='<dl><dt>Pentru o condiție de intrare deschisă (podeț), este necesar să se verifice condițiile de control la intrare.</dt><dd>1. HGL amonte nu poate fi mai jos decât cota de adâncime normală amonte a curgerii (sau sub conductă!).</dd><dd>2. Nivelul apei din amonte al unui podeț este mai bine reprezentat de EGL amonte decât de HGL amonte.</dd><dd>3. Consultați <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">tutorialul meu de 2 minute</a> pentru calculele simple standard ale nivelului din amonte ale podețelor folosind HY-8.</dd>';
+$ec_lang['mphl_hgl_egl_tip']='Poate să nu fie valid dacă conducta este ridicată. Vedeți notele.';
+$ec_lang['mphl_note_1']='<dl><dt>Acest calculator nu ia în calcul cota conductei.</dt><dd>Dacă HGL coboară sub partea superioară a conductei în orice punct, acest calcul poate să nu fie valid.</dd><dt>Pentru o condiție de intrare deschisă (podeț), este necesar să se verifice condițiile de control la intrare.</dt><dd>1. HGL amonte nu poate fi mai jos decât cota de adâncime normală amonte a curgerii (sau sub conductă!).</dd><dd>2. Nivelul apei din amonte al unui podeț este mai bine reprezentat de EGL amonte decât de HGL amonte.</dd><dd>3. Consultați <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">tutorialul meu de 2 minute</a> pentru calculele simple standard ale nivelului din amonte ale podețelor folosind HY-8.</dd>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Manning Canal Trapezoidal';
 $ec_lang['mtc_main_title']='Calculator Gratuit Online Formula Manning Canal Trapezoidal';
@@ -216,6 +215,9 @@ $ec_lang['mtc_iteration_tip']='Alegeți o opțiune de rugozitate (Blodgett–Bat
 $ec_lang['mtc_note_1']='<dl><dt>Iterație automată de dimensionare a rocii și rugozității</dt><dd>Alegeți o opțiune de rugozitate (Blodgett–Bathurst recomandat) și o opțiune de dimensiune de proiectare a rocii (Isbash recomandat). Ajustați adâncimea și factorul de siguranță al dimensiunii rocii pentru a atinge debitul dorit cu o dimensiune uniformă a rocii. De fiecare dată când modificați o valoare de intrare, calculatorul repetă acești pași: 1. Rugozitatea este calculată din dimensiunea de proiectare a rocii. 2. Calculul rugozității solicitate este copiat în rugozitatea de intrare. 3. Debitul canalului și dimensiunea necesară a rocii sunt calculate. 4. Dimensiunea de proiectare a rocii este ajustată. 5. Repetați până când eroarea din dimensiunea de proiectare a rocii este foarte mică.</dd><dt>Calculator de bază (fără iterație)</dt><dd>Introduceți valoarea dorită de rugozitate. Ignorați zona de intrare a dimensiunii de proiectare a rocii.</dd></dl>';
 $ec_lang['mtc_note_2_term']='Verificare viteză';
 $ec_lang['mtc_note_2_def']='Viteza mare indică faptul că a existat o cădere de nivel mare, care a generat o energie specifică atât de ridicată. Acea energie se poate pierde rapid la lărgiri, curbe sau obstacole. Verificați dacă acest lucru este rezonabil pentru amplasament.';
+$ec_lang['mtc_solve_for_y']='Calculați adâncimea, y, cunoscând Q';
+$ec_lang['mtc_solve_desc']='Folosind b, z<sub>1</sub>, z<sub>2</sub>, S și n din formularul calculatorului, determină adâncimea pentru un Q dat.';
+$ec_lang['mtc_solver_no_solution']='Nu s-a găsit nicio soluție pentru Q dat cu aceste date de intrare ale canalului.';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='Deversor Simplu';
 $ec_lang['ws_main_title']='Calculator Gratuit Online pentru Deversor Simplu cu Creastă Lată';

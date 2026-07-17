@@ -144,7 +144,6 @@ $ec_lang['mpf_pipe_diameter']='Rohrdurchmesser, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Manning-Rauheitskoeffizient, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Reibungsgefälle, S<sub>f</sub></a><span class="ec-help" title="Mitunter gleich dem Rohrgefälle. Dem Link für die Erklärung folgen (nur auf Englisch)."><span class="ec-tip">?</span></span>';
 $ec_lang['mpf_depth_ratio']='Relative Füllhöhe, y/d<sub>0</sub>';
-$ec_lang['mpf_see_notes']='(Siehe Hinweise)';
 $ec_lang['mpf_flow']='Durchfluss, Q';
 $ec_lang['mpf_flow_tip']='Durchfluss und Tiefe werden für ein unendlich langes Rohr berechnet. Um diesen Durchfluss tatsächlich in das Rohr einzuleiten, kann eine größere Oberwassertiefe erforderlich sein. Einzelheiten und ein Lehrvideo finden Sie unten in den Hinweisen.';
 $ec_lang['mpf_velocity']='Fließgeschwindigkeit, v';
@@ -182,8 +181,8 @@ $ec_lang['mphl_junction_loss']='Örtlicher (Einzel-)Verlust, h<sub>m</sub>';
 $ec_lang['mphl_total_loss']='Gesamtverlust, h<sub>L</sub>';
 $ec_lang['mphl_egl_1']='EGL flussabwärts';
 $ec_lang['mphl_egl_2']='EGL flussaufwärts';
-$ec_lang['mphl_hgl_2']='HGL im Rohr flussaufwärts ' . $ec_lang['mpf_see_notes'];
-$ec_lang['mphl_note_1']='<dl><dt>Für einen offenen Einlauf (Durchlass) müssen die Einlaufsteuerungsbedingungen geprüft werden.</dt><dd>1. Die HGL flussaufwärts muss über der normalen Fließtiefe flussaufwärts liegen (und höher als das Rohr!).</dd><dd>2. Der Einstaupegel eines Durchlasses wird besser durch die EGL flussaufwärts als durch die HGL flussaufwärts dargestellt.</dd><dd>3. Sehen Sie <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">das 2-Minuten-Tutorial</a> für einfache Standard-Durchlassberechnungen mit HY-8.</dd>';
+$ec_lang['mphl_hgl_egl_tip']='Möglicherweise nicht gültig, wenn das Rohr hoch liegt. Siehe Hinweise.';
+$ec_lang['mphl_note_1']='<dl><dt>Dieser Rechner berücksichtigt die Rohrhöhenlage nicht.</dt><dd>Liegt die HGL an irgendeiner Stelle unter der Rohroberkante, ist diese Berechnung möglicherweise nicht gültig.</dd><dt>Für einen offenen Einlauf (Durchlass) müssen die Einlaufsteuerungsbedingungen geprüft werden.</dt><dd>1. Die HGL flussaufwärts muss über der normalen Fließtiefe flussaufwärts liegen (und höher als das Rohr!).</dd><dd>2. Der Einstaupegel eines Durchlasses wird besser durch die EGL flussaufwärts als durch die HGL flussaufwärts dargestellt.</dd><dd>3. Sehen Sie <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">das 2-Minuten-Tutorial</a> für einfache Standard-Durchlassberechnungen mit HY-8.</dd>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Trapezprofil-Kanal Manning';
 $ec_lang['mtc_main_title']='Kostenloser Online-Rechner Trapezkanal Manning-Formel';
@@ -217,6 +216,9 @@ $ec_lang['mtc_iteration_tip']='Wählen Sie eine Rauheitsoption (Blodgett–Bathu
 $ec_lang['mtc_note_1']='<dl><dt>Automatische Iteration Steinbemessung und Rauheit</dt><dd>Wählen Sie einen Rauheits-Radioknopf (Blodgett–Bathurst empfohlen) und einen Radioknopf für die Bemessungskorngröße (Isbash empfohlen). Stellen Sie Tiefe und Steinbemessungsfaktor ein, um den gewünschten Durchfluss mit einer gleichmäßigen Korngröße zu erzielen. Bei jeder Änderung eines Eingabewerts startet der Iterationszyklus: 1. Die Rauheit wird aus der Bemessungskorngröße berechnet. 2. Der berechnete Rauheitswert wird in die Eingaberauheit kopiert. 3. Kanaldurchfluss und erforderliche Korngröße werden berechnet. 4. Die Bemessungskorngröße wird angepasst. 5. Wiederholen bis der Fehler sehr klein ist.</dd><dt>Grundrechner (ohne Iteration)</dt><dd>Geben Sie den gewünschten Rauheitswert ein. Ignorieren Sie den Eingabebereich für die Bemessungskorngröße.</dd></dl>';
 $ec_lang['mtc_note_2_term']='Geschwindigkeitsprüfung';
 $ec_lang['mtc_note_2_def']='Hohe Geschwindigkeit impliziert hohe spezifische Energie aus einem verfügbaren Absturz. Diese Energie kann schnell an Aufweitungen, Bögen oder Hindernissen abgebaut werden. Prüfen Sie, ob dies für den Standort plausibel ist.';
+$ec_lang['mtc_solve_for_y']='Tiefe y für gegebenes Q berechnen';
+$ec_lang['mtc_solve_desc']='Berechnet mit b, z<sub>1</sub>, z<sub>2</sub>, S und n aus dem Rechnerformular die Tiefe für ein gegebenes Q.';
+$ec_lang['mtc_solver_no_solution']='Für das gegebene Q wurde bei diesen Kanaleingaben keine Lösung gefunden.';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='Einfaches Wehr';
 $ec_lang['ws_main_title']='Kostenloser Online-Rechner für den Durchfluss über ein einfaches breitkroniges Wehr';

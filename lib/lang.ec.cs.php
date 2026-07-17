@@ -114,7 +114,7 @@ $ec_lang['mi_waterSurfaceElevation']='Kóta hladiny vody';
 $ec_lang['mi_q_617']='<span class="ec-help" title="Složený průtok Q s využitím složeného n pro každou oblast dle Chow 6-17, stejné rychlosti">Q <span class="ec-tip">?</span></span>';
 $ec_lang['mi_xSecPoints']='Body příčného řezu';
 $ec_lang['mi_groupPoint']='Bod';
-$ec_lang['mi_groupSegment']='Segment';
+$ec_lang['mi_groupSegment']='Úsek';
 $ec_lang['mi_groupRegion']='Oblast';
 $ec_lang['mi_station']='Sta.';
 $ec_lang['mi_elevation']='Kóta';
@@ -144,7 +144,6 @@ $ec_lang['mpf_pipe_diameter']='Průměr potrubí, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Manningův součinitel drsnosti, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Třecí sklon, S<sub>f</sub></a><span class="ec-help" title="Někdy roven sklonu potrubí. Sledujte odkaz pro vysvětlení (pouze v angličtině)."><span class="ec-tip">?</span></span>';
 $ec_lang['mpf_depth_ratio']='Poměrná hloubka plnění, y/d<sub>0</sub>';
-$ec_lang['mpf_see_notes']='(Viz poznámky)';
 $ec_lang['mpf_flow']='Průtok, Q';
 $ec_lang['mpf_flow_tip']='Průtok a hloubka jsou vypočteny pro nekonečně dlouhé potrubí. Pro dosažení tohoto průtoku v potrubí může být zapotřebí větší hloubka vzdutí na vtoku. Podrobnosti a výukové video naleznete v poznámkách níže.';
 $ec_lang['mpf_velocity']='Rychlost, v';
@@ -182,8 +181,8 @@ $ec_lang['mphl_junction_loss']='Místní ztráta, h<sub>m</sub>';
 $ec_lang['mphl_total_loss']='Celková ztráta, h<sub>L</sub>';
 $ec_lang['mphl_egl_1']='EGL po proudu';
 $ec_lang['mphl_egl_2']='EGL proti proudu';
-$ec_lang['mphl_hgl_2']='HGL proti proudu v potrubí ' . $ec_lang['mpf_see_notes'];
-$ec_lang['mphl_note_1']='<dl><dt>Pro podmínku otevřeného vtoku (propustek) je nutné zkontrolovat podmínky vtokového ovládání.</dt><dd>1. HGL proti proudu musí být výše než kóta hladiny při normální hloubce proudění (a výše než potrubí!).</dd><dd>2. Vzdutou hladinu propustku lépe vyjadřuje EGL proti proudu než HGL proti proudu.</dd><dd>3. Viz <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">2minutový výukový program</a> pro jednoduchý standardní výpočet vzdutí u propustků pomocí HY-8.</dd>';
+$ec_lang['mphl_hgl_egl_tip']='Nemusí platit, pokud je potrubí vysoko. Viz poznámky.';
+$ec_lang['mphl_note_1']='<dl><dt>Tato kalkulačka nezohledňuje nadmořskou výšku potrubí.</dt><dd>Pokud HGL v kterémkoli bodě klesne pod horní hranu potrubí, nemusí být tento výpočet platný.</dd><dt>Pro podmínku otevřeného vtoku (propustek) je nutné zkontrolovat podmínky vtokového ovládání.</dt><dd>1. HGL proti proudu musí být výše než kóta hladiny při normální hloubce proudění (a výše než potrubí!).</dd><dd>2. Vzdutou hladinu propustku lépe vyjadřuje EGL proti proudu než HGL proti proudu.</dd><dd>3. Viz <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">2minutový výukový program</a> pro jednoduchý standardní výpočet vzdutí u propustků pomocí HY-8.</dd>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Lichoběžníkové koryto Manning';
 $ec_lang['mtc_main_title']='Bezplatný online kalkulátor lichoběžníkového koryta Manning';
@@ -217,6 +216,9 @@ $ec_lang['mtc_iteration_tip']='Zvolte přepínač pro drsnost (doporučeno Blodg
 $ec_lang['mtc_note_1']='<dl><dt>Automatická iterace návrhu kamene a drsnosti</dt><dd>Zvolte přepínač pro drsnost (doporučeno Blodgett–Bathurst) a přepínač pro návrhovou velikost kamene (doporučeno Isbash). Dolaďte hloubku a bezpečnostní faktor kamene pro dosažení požadovaného průtoku s rovnoměrnou velikostí kamene. Každá změna vstupní hodnoty spustí iterační cyklus: 1. Drsnost je vypočtena z návrhové velikosti kamene. 2. Požadovaný výpočet drsnosti je zkopírován do vstupní drsnosti. 3. Průtok v korytě a požadovaná velikost kamene jsou vypočteny. 4. Návrhová velikost kamene je upravena. 5. Opakovat dokud chyba v návrhové velikosti kamene není velmi malá.</dd><dt>Základní kalkulátor (bez iterace)</dt><dd>Zadejte požadovanou hodnotu drsnosti. Ignorujte oblast zadávání návrhové velikosti kamene.</dd></dl>';
 $ec_lang['mtc_note_2_term']='Kontrola rychlosti';
 $ec_lang['mtc_note_2_def']='Vysoká rychlost znamená vysokou specifickou energii z dostupného spádu. Tato energie může být rychle ztracena na rozšířeních, obloucích nebo překážkách. Ověřte, zda je to pro danou lokalitu přiměřené.';
+$ec_lang['mtc_solve_for_y']='Výpočet hloubky, y, pro dané Q';
+$ec_lang['mtc_solve_desc']='Pomocí hodnot b, z<sub>1</sub>, z<sub>2</sub>, S a n z formuláře kalkulačky najde hloubku pro dané Q.';
+$ec_lang['mtc_solver_no_solution']='Pro dané Q nebylo se zadanými parametry koryta nalezeno žádné řešení.';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='Jednoduchý přepad';
 $ec_lang['ws_main_title']='Bezplatný online kalkulátor jednoduchého širokokorunového přepadu';

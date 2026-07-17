@@ -145,7 +145,6 @@ $ec_lang['mpf_pipe_diameter']="Boru çapı, d<sub>0</sub>";
 $ec_lang['mpf_manningRoughness']='Manning pürüzlülük katsayısı, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Sürtünme eğimi, S<sub>f</sub></a><span class="ec-help" title="Bazen boru eğimine eşit. Açıklama için bağlantıyı izleyin (yalnızca İngilizce)."><span class="ec-tip">?</span></span>';
 $ec_lang['mpf_depth_ratio']='Göreli akış derinliği, y/d<sub>0</sub>';
-$ec_lang['mpf_see_notes']='(Notlara bakın)';
 $ec_lang['mpf_flow']='Debi, Q';
 $ec_lang['mpf_flow_tip']='Akış ve derinlik, sonsuz uzunluktaki bir boru için hesaplanmıştır. Bu akışın boruya girebilmesi için daha yüksek bir memba derinliği gerekebilir. Ayrıntılar ve bir öğretici video için aşağıdaki Notlar bölümüne bakın.';
 $ec_lang['mpf_velocity']='Hız, v';
@@ -183,8 +182,8 @@ $ec_lang['mphl_junction_loss']='Küçük (yerel) kayıp, h<sub>m</sub>';
 $ec_lang['mphl_total_loss']='Toplam kayıp, h<sub>L</sub>';
 $ec_lang['mphl_egl_1']='Mansap EGL';
 $ec_lang['mphl_egl_2']='Memba EGL';
-$ec_lang['mphl_hgl_2']='Borudaki memba HGL ' . $ec_lang['mpf_see_notes'];
-$ec_lang['mphl_note_1']='<dl><dt>Açık giriş (menfez) koşulunda, giriş kontrolü koşullarının kontrol edilmesi gerekir.</dt><dd>1. Memba HGL\'si, memba normal derinlik akış kotundan (veya borudan) düşük olamaz.</dd><dd>2. Bir menfezin memba su yüzü, memba HGL\'sinden ziyade memba EGL\'si ile daha iyi temsil edilir.</dd><dd>3. HY-8 kullanarak basit standart menfez memba hesaplamaları için <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">2 dakikalık öğreticime bakın</a>.</dd>';
+$ec_lang['mphl_hgl_egl_tip']='Boru yüksekteyse geçerli olmayabilir. Notlara bakın.';
+$ec_lang['mphl_note_1']='<dl><dt>Bu hesap makinesi boru kotunu dikkate almaz.</dt><dd>HGL herhangi bir noktada boru üstünün altına düşerse, bu hesaplama geçerli olmayabilir.</dd><dt>Açık giriş (menfez) koşulunda, giriş kontrolü koşullarının kontrol edilmesi gerekir.</dt><dd>1. Memba HGL\'si, memba normal derinlik akış kotundan (veya borudan) düşük olamaz.</dd><dd>2. Bir menfezin memba su yüzü, memba HGL\'sinden ziyade memba EGL\'si ile daha iyi temsil edilir.</dd><dd>3. HY-8 kullanarak basit standart menfez memba hesaplamaları için <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">2 dakikalık öğreticime bakın</a>.</dd>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Manning Trapezoidal Kanal';
 $ec_lang['mtc_main_title']='Ücretsiz Çevrimiçi Manning Formülü Trapezoidal Kanal Hesaplayıcısı';
@@ -218,6 +217,9 @@ $ec_lang['mtc_iteration_tip']='Hedef akışınız için düzgün bir taş boyutu
 $ec_lang['mtc_note_1']='<dl><dt>Otomatik taş boyutu ve pürüzlülük tasarım döngüsü</dt><dd>Bir pürüzlülük seçeneği (Blodgett–Bathurst önerilir) ve bir tasarım taş boyutu seçeneği (Isbash önerilir) seçin. İstenen akışı düzgün bir taş boyutuyla elde etmek için derinliği ve taş boyutu güvenlik faktörünü ince ayarlayın. Her giriş değeri değiştiğinde şu döngü gerçekleşir: 1. Pürüzlülük, tasarım taş boyutundan hesaplanır. 2. İstenen pürüzlülük hesabı giriş pürüzlülüğüne kopyalanır. 3. Kanal akışı ve gerekli taş boyutu hesaplanır. 4. Tasarım taş boyutu ayarlanır. 5. Tasarım taş boyutundaki hata çok küçük olana kadar tekrarlanır.</dd><dt>Temel hesaplayıcı (döngü yok)</dt><dd>İstediğiniz pürüzlülük değerini girin. Tasarım taş boyutu giriş alanını yoksayın.</dd></dl>';
 $ec_lang['mtc_note_2_term']='Hız kontrolü';
 $ec_lang['mtc_note_2_def']='Yüksek hız, bu denli yüksek özgül enerji yaratan büyük bir kot düşüşü olduğunu gösterir. Bu enerji, genişlemelerde, dirseklerde veya engellerde hızla kaybolabilir. Bunun saha için makul olduğunu doğrulayın.';
+$ec_lang['mtc_solve_for_y']='Q verildiğinde derinlik y için çözüm';
+$ec_lang['mtc_solve_desc']='Hesap makinesi formundaki b, z<sub>1</sub>, z<sub>2</sub>, S ve n değerlerini kullanarak, verilen Q için derinliği bulur.';
+$ec_lang['mtc_solver_no_solution']='Bu kanal girdileriyle verilen Q için çözüm bulunamadı.';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='Basit Savak Debisi';
 $ec_lang['ws_main_title']='Ücretsiz Çevrimiçi Basit Geniş Kretli Savak Debisi Hesaplayıcı';

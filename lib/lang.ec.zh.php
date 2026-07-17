@@ -144,7 +144,6 @@ $ec_lang['mpf_pipe_diameter']='管径，d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='曼宁糙率系数，n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">摩擦坡度，S<sub>f</sub></a><span class="ec-help" title="有时等于管道坡度。点击链接查看说明（仅英文）。"><span class="ec-tip">?</span></span>';
 $ec_lang['mpf_depth_ratio']='相对水深，y/d<sub>0</sub>';
-$ec_lang['mpf_see_notes']='（参见注释）';
 $ec_lang['mpf_flow']='流量，Q';
 $ec_lang['mpf_flow_tip']='流量与水深按无限长管道计算。要使该流量进入管道，可能需要更高的上游水深。详情及教学视频见下方注释。';
 $ec_lang['mpf_velocity']='流速，v';
@@ -182,8 +181,8 @@ $ec_lang['mphl_junction_loss']='局部水头损失，h<sub>m</sub>';
 $ec_lang['mphl_total_loss']='总水头损失，h<sub>L</sub>';
 $ec_lang['mphl_egl_1']='下游能量坡降线';
 $ec_lang['mphl_egl_2']='上游能量坡降线';
-$ec_lang['mphl_hgl_2']='管内上游测压管水头线 ' . $ec_lang['mpf_see_notes'];
-$ec_lang['mphl_note_1']='<dl><dt>对于开口进水口（涵洞）情况，需检验进口控制条件。</dt><dd>1. 上游测压管水头线不得低于上游正常水深处高程（也不得低于管顶！）。</dd><dd>2. 涵洞水位更宜用上游能量坡降线而非测压管水头线表示。</dd><dd>3. <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">参见 2 分钟教程</a>，了解使用 HY-8 进行简单标准涵洞水位计算的方法。</dd>';
+$ec_lang['mphl_hgl_egl_tip']='管道高程较高时可能不适用，详见注释。';
+$ec_lang['mphl_note_1']='<dl><dt>本计算器未考虑管道高程。</dt><dd>若测压管水头线在任一位置低于管顶，本计算结果可能不适用。</dd><dt>对于开口进水口（涵洞）情况，需检验进口控制条件。</dt><dd>1. 上游测压管水头线不得低于上游正常水深处高程（也不得低于管顶！）。</dd><dd>2. 涵洞水位更宜用上游能量坡降线而非测压管水头线表示。</dd><dd>3. <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">参见 2 分钟教程</a>，了解使用 HY-8 进行简单标准涵洞水位计算的方法。</dd>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='曼宁梯形渠道';
 $ec_lang['mtc_main_title']='免费在线曼宁公式梯形渠道计算器';
@@ -217,6 +216,9 @@ $ec_lang['mtc_iteration_tip']='选择糙率计算方法（推荐 Blodgett–Bath
 $ec_lang['mtc_note_1']='<dl><dt>石材粒径与糙率自动迭代设计</dt><dd>选择糙率计算方法（推荐 Blodgett–Bathurst 法）和设计石材粒径方法（推荐 Isbash 法）。调整水深和石材粒径安全系数，以在统一石材粒径下达到目标流量。每次修改输入值时，计算器都会重复以下步骤：1. 由设计石材粒径计算糙率。2. 将所求糙率复制到输入糙率。3. 计算渠道流量和所需石材粒径。4. 调整设计石材粒径。5. 重复上述步骤，直至设计石材粒径的误差极小。</dd><dt>基础计算器（不迭代）</dt><dd>直接输入所需的糙率值，忽略设计石材粒径输入区域。</dd></dl>';
 $ec_lang['mtc_note_2_term']='流速校核';
 $ec_lang['mtc_note_2_def']='流速过高说明存在较大的高程落差，从而产生了较高的比能。该能量可能在扩散段、弯道或障碍物处迅速耗散。请核实这在现场条件下是否合理。';
+$ec_lang['mtc_solve_for_y']='由 Q 反算水深，y';
+$ec_lang['mtc_solve_desc']='根据计算器表单中的 b、z<sub>1</sub>、z<sub>2</sub>、S 和 n，求解给定流量 Q 对应的水深。';
+$ec_lang['mtc_solver_no_solution']='在当前渠道输入条件下，未找到满足给定流量 Q 的解。';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='简单堰流';
 $ec_lang['ws_main_title']='免费在线简单宽顶堰流计算器';

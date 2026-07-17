@@ -145,7 +145,6 @@ $ec_lang['mpf_pipe_diameter']='Diamètre de la conduite, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Rugosité de Manning, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Pente de frottement, S<sub>f</sub></a><span class="ec-help" title="Parfois égale à la pente de la conduite. Suivez le lien pour l\'explication (en anglais seulement)."><span class="ec-tip">?</span></span>';
 $ec_lang['mpf_depth_ratio']='Taux de remplissage, y/d<sub>0</sub>';
-$ec_lang['mpf_see_notes']='(voir notes)';
 $ec_lang['mpf_flow']='Débit, Q';
 $ec_lang['mpf_flow_tip']='Débit et profondeur calculés pour une conduite de longueur infinie. Faire entrer ce débit dans la conduite peut nécessiter une charge amont plus élevée. Voir les notes ci-dessous pour plus de détails et une vidéo explicative.';
 $ec_lang['mpf_velocity']='Vitesse, v';
@@ -183,8 +182,8 @@ $ec_lang['mphl_junction_loss']='Perte de charge singulière (locale), h<sub>m</s
 $ec_lang['mphl_total_loss']='Perte de charge totale, h<sub>L</sub>';
 $ec_lang['mphl_egl_1']='LHE aval';
 $ec_lang['mphl_egl_2']='LHE amont';
-$ec_lang['mphl_hgl_2']='LHP amont en conduite ' . $ec_lang['mpf_see_notes'];
-$ec_lang['mphl_note_1']='<dl><dt>Pour une entrée libre (buse), il est nécessaire de vérifier les conditions de contrôle à l\'entrée.</dt><dd>1. La LHP amont doit être supérieure à la cote de profondeur normale amont (et plus haute que la conduite elle-même !).</dd><dd>2. La charge amont d\'une buse est mieux représentée par la LHE amont que par la LHP amont.</dd><dd>3. Voir <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">mon tutoriel de 2 minutes</a> pour les calculs simples de charge amont de buse avec HY-8.</dd>';
+$ec_lang['mphl_hgl_egl_tip']='Peut ne pas être valide si la conduite est haute. Voir les notes.';
+$ec_lang['mphl_note_1']='<dl><dt>Cet outil de calcul ne tient pas compte de l\'altitude (la cote) de la conduite.</dt><dd>Si la LHP descend sous le sommet de la conduite en un point quelconque, ce calcul peut ne pas être valide.</dd><dt>Pour une entrée libre (buse), il est nécessaire de vérifier les conditions de contrôle à l\'entrée.</dt><dd>1. La LHP amont doit être supérieure à la cote de profondeur normale amont (et plus haute que la conduite elle-même !).</dd><dd>2. La charge amont d\'une buse est mieux représentée par la LHE amont que par la LHP amont.</dd><dd>3. Voir <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">mon tutoriel de 2 minutes</a> pour les calculs simples de charge amont de buse avec HY-8.</dd>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Canal trapézoïdal Manning';
 $ec_lang['mtc_main_title']='Calculateur gratuit en ligne de la formule Manning pour canal trapézoïdal';
@@ -218,6 +217,9 @@ $ec_lang['mtc_iteration_tip']='Choisissez une option de rugosité (Blodgett–Ba
 $ec_lang['mtc_note_1']='<dl><dt>Itération automatique de la granulométrie et de la rugosité</dt><dd>Choisissez une option de rugosité (Blodgett–Bathurst recommandée) et une option de granulométrie de conception (Isbash recommandée). Ajustez la profondeur et le coefficient de sécurité de la granulométrie pour atteindre le débit cible avec une granulométrie uniforme. À chaque modification d\'une entrée, le calculateur répète ces étapes : 1. La rugosité est calculée à partir de la granulométrie de conception. 2. La rugosité calculée est copiée dans le champ de rugosité en entrée. 3. Le débit du canal et la granulométrie requise sont calculés. 4. La granulométrie de conception est ajustée. 5. Répéter jusqu\'à ce que l\'écart sur la granulométrie de conception soit très faible.</dd><dt>Calculateur de base (sans itération)</dt><dd>Entrez la valeur de rugosité souhaitée. Ignorez la zone de saisie de la granulométrie de conception.</dd></dl>';
 $ec_lang['mtc_note_2_term']='Vérification de la vitesse';
 $ec_lang['mtc_note_2_def']='Une vitesse élevée implique une chute de niveau importante ayant produit une énergie spécifique élevée. Cette énergie peut être dissipée rapidement aux élargissements, coudes ou obstacles. Vérifiez que cela est raisonnable pour le site.';
+$ec_lang['mtc_solve_for_y']='Résoudre pour la profondeur, y, à partir de Q';
+$ec_lang['mtc_solve_desc']='À partir de b, z<sub>1</sub>, z<sub>2</sub>, S et n du formulaire, détermine la profondeur pour un Q donné.';
+$ec_lang['mtc_solver_no_solution']='Aucune solution trouvée pour le Q donné avec ces paramètres de canal.';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='Déversoir simple';
 $ec_lang['ws_main_title']='Calculateur gratuit en ligne de débit sur déversoir simple à seuil large';

@@ -143,7 +143,6 @@ $ec_lang['mpf_pipe_diameter']='Promjer cijevi, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Manningov koeficijent hrapavosti, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Nagib trenja, S<sub>f</sub></a><span class="ec-help" title="Ponekad jednak nagibu cijevi. Slijedite poveznicu za objašnjenje (samo na engleskom)."><span class="ec-tip">?</span></span>';
 $ec_lang['mpf_depth_ratio']='Relativna dubina toka, y/d<sub>0</sub>';
-$ec_lang['mpf_see_notes']='(Vidi napomene)';
 $ec_lang['mpf_flow']='Protok, Q';
 $ec_lang['mpf_flow_tip']='Protok i dubina izračunati su za beskonačno dugu cijev. Za postizanje ovog protoka pri ulazu u cijev možda će biti potrebna veća dubina uzvodne vode. Pojedinosti i video s uputama potražite u Napomenama u nastavku.';
 $ec_lang['mpf_velocity']='Brzina, v';
@@ -181,8 +180,8 @@ $ec_lang['mphl_junction_loss']='Manji (lokalni) gubitak, h<sub>m</sub>';
 $ec_lang['mphl_total_loss']='Ukupni gubitak, h<sub>L</sub>';
 $ec_lang['mphl_egl_1']='Nizvodni EGL';
 $ec_lang['mphl_egl_2']='Uzvodni EGL';
-$ec_lang['mphl_hgl_2']='Uzvodni HGL u cijevi ' . $ec_lang['mpf_see_notes'];
-$ec_lang['mphl_note_1']='<dl><dt>Za uvjete otvorenog ulaza (propust) potrebno je provjeriti uvjete kontrole ulaza.</dt><dd>1. Uzvodni HGL ne može biti niži od kote normalnog tečenja uzvodnog toka (niti niži od cijevi!).</dd><dd>2. Uzvodna razina propusta bolje je predstavljena uzvodnim EGL-om nego uzvodnim HGL-om.</dd><dd>3. Pogledajte <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">moj 2-minutni tutorial</a> za jednostavne standardne proračune uzvodne razine propusta pomoću HY-8.</dd>';
+$ec_lang['mphl_hgl_egl_tip']='Možda nije valjano ako je cijev visoko postavljena. Pogledajte napomene.';
+$ec_lang['mphl_note_1']='<dl><dt>Ovaj kalkulator ne uzima u obzir kotu cijevi.</dt><dd>Ako HGL na bilo kojoj točki padne ispod vrha cijevi, ovaj proračun možda nije valjan.</dd><dt>Za uvjete otvorenog ulaza (propust) potrebno je provjeriti uvjete kontrole ulaza.</dt><dd>1. Uzvodni HGL ne može biti niži od kote normalnog tečenja uzvodnog toka (niti niži od cijevi!).</dd><dd>2. Uzvodna razina propusta bolje je predstavljena uzvodnim EGL-om nego uzvodnim HGL-om.</dd><dd>3. Pogledajte <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">moj 2-minutni tutorial</a> za jednostavne standardne proračune uzvodne razine propusta pomoću HY-8.</dd>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Manning trapezoidni kanal';
 $ec_lang['mtc_main_title']='Besplatni online kalkulator Manning formule za trapezoidni kanal';
@@ -216,6 +215,9 @@ $ec_lang['mtc_iteration_tip']='Odaberite opciju hrapavosti (preporučuje se Blod
 $ec_lang['mtc_note_1']='<dl><dt>Automatizirana iteracija dimenzioniranja kamena i hrapavosti</dt><dd>Odaberite radio gumb za hrapavost (preporučuje se Blodgett–Bathurst) i radio gumb za projektnu veličinu kamena (preporučuje se Isbash). Fino podesite dubinu i faktor sigurnosti veličine kamena kako biste dobili željeni protok s jednoličnom veličinom kamena. Svaki put kada promijenite bilo koji ulazni podatak, odvija se sljedeći iteracijski ciklus: 1. Hrapavost se izračunava iz projektne veličine kamena. 2. Traženi izračun hrapavosti kopira se na ulaznu hrapavost. 3. Izračunavaju se protok kroz kanal i potrebna veličina kamena. 4. Projektna veličina kamena se prilagođava. 5. Ponavljati dok pogreška u projektnoj veličini kamena nije vrlo mala.</dd><dt>Osnovni kalkulator (bez iteracije)</dt><dd>Unesite željenu vrijednost hrapavosti. Zanemarite područje unosa projektne veličine kamena.</dd></dl>';
 $ec_lang['mtc_note_2_term']='Provjera brzine';
 $ec_lang['mtc_note_2_def']='Visoka brzina podrazumijeva visoku specifičnu energiju uslijed raspoloživog pada. Ta energija može se brzo izgubiti na proširenjima, zavojima ili preprekama. Provjerite je li to razumno za dano gradilište.';
+$ec_lang['mtc_solve_for_y']='Izračunaj dubinu, y, za zadani Q';
+$ec_lang['mtc_solve_desc']='Koristeći b, z<sub>1</sub>, z<sub>2</sub>, S i n s obrasca kalkulatora, izračunava dubinu za zadani Q.';
+$ec_lang['mtc_solver_no_solution']='Nije pronađeno rješenje za zadani Q s ovim ulaznim podacima kanala.';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='Protok preko jednostavnog preljeva';
 $ec_lang['ws_main_title']='Besplatni online kalkulator protoka preko jednostavnog preljeva široke krune';

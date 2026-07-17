@@ -1,12 +1,11 @@
 {
     "meta": {
         "language": "zh",
-        "expected_key_count": 505,
-        "delta_key_count": 12,
+        "expected_key_count": 507,
+        "delta_key_count": 6,
         "active_prefixes": [
             "dw",
-            "ip",
-            "mtc"
+            "ip"
         ],
         "requested_prefix": null,
         "notes": "Translate only keys in keys_to_translate; preserve HTML, units, and symbols.",
@@ -16,8 +15,7 @@
     },
     "prompt_context_by_prefix": {
         "dw": "Use these preferred technical term translations when relevant:\n- flow (Q): 流量\n- velocity (v): 流速\n- head loss (h_L): 水头损失\n- friction factor (f): 摩擦系数\n- slope (S): 坡度\n- laminar: 层流\n- transitional: 过渡流\n- turbulent: 紊流",
-        "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): 流量\n- velocity (v): 流速\n- head loss (h_L): 水头损失\n- emitter: 滴头\n- distribution uniformity (DU): 分布均匀度\n- low-quarter distribution uniformity (DU_lq): 低四分之一分布均匀度\n- application rate (PR): 灌水强度\n- lateral: 毛管\n- mainline: 干管\n- reach: 管段\n- velocity head (H_v): 流速水头\n- friction loss (h_f): 沿程水头损失\n- minor loss (h_m): 局部水头损失\n- energy grade line (EGL): 能量坡度线\n- upstream: 上游\n- downstream: 下游",
-        "mtc": "Use these preferred technical term translations when relevant:\n- flow (Q): 流量\n- velocity (v): 流速\n- hydraulic radius (R_h): 水力半径\n- wetted perimeter (P_w): 湿周\n- Manning roughness (n): 曼宁糙率系数\n- slope (S): 坡度"
+        "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): 流量\n- velocity (v): 流速\n- head loss (h_L): 水头损失\n- emitter: 滴头\n- distribution uniformity (DU): 分布均匀度\n- low-quarter distribution uniformity (DU_lq): 低四分之一分布均匀度\n- application rate (PR): 灌水强度\n- lateral: 毛管\n- mainline: 干管\n- reach: 管段\n- velocity head (H_v): 流速水头\n- friction loss (h_f): 沿程水头损失\n- minor loss (h_m): 局部水头损失\n- energy grade line (EGL): 能量坡度线\n- upstream: 上游\n- downstream: 下游"
     },
     "glossary_terms_by_prefix": {
         "dw": [
@@ -191,60 +189,10 @@
                 "translation_notes": "Never software \"downgrade\". ar: downstream = المصب \/ أسفل المجرى (a file used المنبعية = source-side, wrong).",
                 "preferred_translation": "下游"
             }
-        ],
-        "mtc": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg RESOLVED (Tom, 2026-07-13): native engineer's 2026-07-06 clarification confirmed both 'дебит' (colloquial\/general register) and 'водно количество' (academic\/hydraulic-engineering register, used at university for Q) are acceptable. Tom decided suite-wide standardization on 'водно количество' — \"I would put водно количество everywhere\" — applied across all bg calculator categories (pipes\/irrigation included, not just the hydraulic-structure\/open-channel strings the engineer originally corrected). 'дебит' fully replaced in lib\/lang.ec.bg.php 2026-07-13.",
-                "preferred_translation": "流量"
-            },
-            {
-                "term": "velocity",
-                "symbol": "v",
-                "context": "Flow velocity (speed of water). Appears in all calculators.",
-                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
-                "preferred_translation": "流速"
-            },
-            {
-                "term": "hydraulic radius",
-                "symbol": "R_h",
-                "context": "Cross-sectional flow area divided by wetted perimeter. Appears in Manning calculators.",
-                "translation_notes": "Use the standard hydraulic engineering phrase. Pre-2026 sr\/hr human translations used the Latin loanword 'hidraulički radijus' — this form is widely used in South Slavic engineering practice and may be more recognizable to field practitioners than the native Slavic equivalents 'полупречник' (sr) \/ 'polumjer' (hr). Both are correct; native Slavic engineers may encounter both forms. DATA-ERROR FIX 2026-07-10 (category-3 sw wave-3 sprint): previous sw value 'radius ya maji' (literally 'radius of water', English loanword 'radius' + 'of water') named the substance rather than the hydraulic-geometry property, and did not read as an engineering term. Changed to 'radiasi ya kihaidroliki' (radius + 'hydraulic', adjectival ki- form), matching the '[radius] + hydraulic' construction used by fr\/de\/it\/es\/ro\/tr (rayon hydraulique \/ hydraulischer Radius \/ raggio idraulico \/ radio hidráulico \/ raza hidraulică \/ hidrolik yarıçap). Used in lib\/lang.ec.sw.php's mpf_hydraulic_radius.",
-                "preferred_translation": "水力半径"
-            },
-            {
-                "term": "wetted perimeter",
-                "symbol": "P_w",
-                "context": "Length of the channel or pipe boundary in contact with flowing water. Appears in Manning calculators.",
-                "translation_notes": "WMO No. 385 entry 1682 confirms: es = 'perímetro mojado', fr = 'périmètre mouillé'. Use the standard hydraulic engineering phrase. 'Wetted' here means 'in contact with water', not 'soaked'. Pre-2026 sr human used 'okvašeni obim' (obim = natural South Slavic word for perimeter\/circumference); current uses 'квашени периметар' (периметар = Greek-derived loanword). Both are correct; 'obim\/opseg' is more natural in informal Serbian\/Croatian field use.",
-                "preferred_translation": "湿周"
-            },
-            {
-                "term": "Manning roughness",
-                "symbol": "n",
-                "context": "Manning's n — empirical roughness coefficient used in the Manning formula for open-channel and pipe flow.",
-                "translation_notes": "Always include 'Manning' as a proper noun. The coefficient itself (n) needs no translation — only the label does. Do not translate as generic 'roughness coefficient' without 'Manning'. TYPO FIX 2026-07-09 (category-3 wave-1 sprint): ru\/uk transliterations were single-н 'Манинга'\/'Манінга', flagged by the ru wave-1 agent as inconsistent with the established double-н transliteration ('Маннинга'\/'Маннінга') used 11+ times elsewhere in both lang files (predates this sprint). Corrected to double-н for consistency.",
-                "preferred_translation": "曼宁糙率系数"
-            },
-            {
-                "term": "slope",
-                "symbol": "S",
-                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
-                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
-                "preferred_translation": "坡度"
-            }
         ]
     },
     "keys_to_translate": {
         "dw_roughness": "e",
-        "mtc_n_pi": "n for design rock size (Phillips & Ingersoll method)",
-        "mtc_pi_range_check": "P&I range check",
-        "mtc_pi_ok": "d50 in P&I range",
-        "mtc_pi_ok_tip": "0.28–0.36 ft (Phillips & Ingersoll, 1998)",
-        "mtc_pi_out_of_range": "Outside range",
-        "mtc_pi_tip": "Extrapolating outside the 0.28–0.36 ft dataset range this equation was developed from — treat as a rough check, not a design basis",
         "ip_length": "L",
         "ip_diameter": "D",
         "ip_roughness": "e",
@@ -253,12 +201,6 @@
     },
     "keys": {
         "dw_roughness": "e",
-        "mtc_n_pi": "n for design rock size (Phillips & Ingersoll method)",
-        "mtc_pi_range_check": "P&I range check",
-        "mtc_pi_ok": "d50 in P&I range",
-        "mtc_pi_ok_tip": "0.28–0.36 ft (Phillips & Ingersoll, 1998)",
-        "mtc_pi_out_of_range": "Outside range",
-        "mtc_pi_tip": "Extrapolating outside the 0.28–0.36 ft dataset range this equation was developed from — treat as a rough check, not a design basis",
         "ip_length": "L",
         "ip_diameter": "D",
         "ip_roughness": "e",
@@ -279,102 +221,6 @@
                     "key": "dw_roughness_tip",
                     "value": "管壁的绝对粗糙度高度 e。典型值：钢管（新）0.046 mm，钢管（旧）0.15 mm，HDPE 0.003 mm，PVC\/uPVC 0.0015 mm，混凝土 0.3–3 mm。",
                     "english": "Absolute roughness height, e, of the pipe wall. Typical values: steel (new) 0.046 mm, steel (used) 0.15 mm, HDPE 0.003 mm, PVC\/uPVC 0.0015 mm, concrete 0.3–3 mm."
-                }
-            }
-        },
-        "mtc_n_pi": {
-            "reason": "equal_to_english",
-            "current_value": "n for design rock size (Phillips & Ingersoll method)",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mtc_n_bathurst",
-                    "value": "设计石材粒径对应的 n 值（Bathurst 法）",
-                    "english": "n for design rock size (Bathurst method)"
-                },
-                "next_translated": {
-                    "key": "mtc_blodgett_v_bathurst",
-                    "value": "Blodgett 法与 Bathurst 法对比",
-                    "english": "Blodgett vs. Bathurst"
-                }
-            }
-        },
-        "mtc_pi_range_check": {
-            "reason": "equal_to_english",
-            "current_value": "P&I range check",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mtc_blodgett_v_bathurst",
-                    "value": "Blodgett 法与 Bathurst 法对比",
-                    "english": "Blodgett vs. Bathurst"
-                },
-                "next_translated": {
-                    "key": "mtc_d50_bottom",
-                    "value": "<span class=\"ec-help\" title=\"依据 Isbash（1936）及美国亚利桑那州马里科帕县（Maricopa County）标准。\">渠底所需棱角石材粒径，D<sub>50<\/sub>（Isbash 与 MC）<span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\">Required bottom angular rock size, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>"
-                }
-            }
-        },
-        "mtc_pi_ok": {
-            "reason": "equal_to_english",
-            "current_value": "d50 in P&I range",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mtc_blodgett_v_bathurst",
-                    "value": "Blodgett 法与 Bathurst 法对比",
-                    "english": "Blodgett vs. Bathurst"
-                },
-                "next_translated": {
-                    "key": "mtc_d50_bottom",
-                    "value": "<span class=\"ec-help\" title=\"依据 Isbash（1936）及美国亚利桑那州马里科帕县（Maricopa County）标准。\">渠底所需棱角石材粒径，D<sub>50<\/sub>（Isbash 与 MC）<span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\">Required bottom angular rock size, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>"
-                }
-            }
-        },
-        "mtc_pi_ok_tip": {
-            "reason": "equal_to_english",
-            "current_value": "0.28–0.36 ft (Phillips & Ingersoll, 1998)",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mtc_blodgett_v_bathurst",
-                    "value": "Blodgett 法与 Bathurst 法对比",
-                    "english": "Blodgett vs. Bathurst"
-                },
-                "next_translated": {
-                    "key": "mtc_d50_bottom",
-                    "value": "<span class=\"ec-help\" title=\"依据 Isbash（1936）及美国亚利桑那州马里科帕县（Maricopa County）标准。\">渠底所需棱角石材粒径，D<sub>50<\/sub>（Isbash 与 MC）<span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\">Required bottom angular rock size, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>"
-                }
-            }
-        },
-        "mtc_pi_out_of_range": {
-            "reason": "equal_to_english",
-            "current_value": "Outside range",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mtc_blodgett_v_bathurst",
-                    "value": "Blodgett 法与 Bathurst 法对比",
-                    "english": "Blodgett vs. Bathurst"
-                },
-                "next_translated": {
-                    "key": "mtc_d50_bottom",
-                    "value": "<span class=\"ec-help\" title=\"依据 Isbash（1936）及美国亚利桑那州马里科帕县（Maricopa County）标准。\">渠底所需棱角石材粒径，D<sub>50<\/sub>（Isbash 与 MC）<span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\">Required bottom angular rock size, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>"
-                }
-            }
-        },
-        "mtc_pi_tip": {
-            "reason": "equal_to_english",
-            "current_value": "Extrapolating outside the 0.28–0.36 ft dataset range this equation was developed from — treat as a rough check, not a design basis",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mtc_blodgett_v_bathurst",
-                    "value": "Blodgett 法与 Bathurst 法对比",
-                    "english": "Blodgett vs. Bathurst"
-                },
-                "next_translated": {
-                    "key": "mtc_d50_bottom",
-                    "value": "<span class=\"ec-help\" title=\"依据 Isbash（1936）及美国亚利桑那州马里科帕县（Maricopa County）标准。\">渠底所需棱角石材粒径，D<sub>50<\/sub>（Isbash 与 MC）<span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\">Required bottom angular rock size, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },

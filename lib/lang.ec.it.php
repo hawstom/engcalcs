@@ -144,7 +144,6 @@ $ec_lang['mpf_pipe_diameter']='Diametro tubazione, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Scabrezza di Manning, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Pendenza di attrito, S<sub>f</sub></a><span class="ec-help" title="Talvolta uguale alla pendenza della tubazione. Segui il link per la spiegazione (solo in inglese)."><span class="ec-tip">?</span></span>';
 $ec_lang['mpf_depth_ratio']='Rapporto di riempimento, y/d<sub>0</sub>';
-$ec_lang['mpf_see_notes']='(Vedi note)';
 $ec_lang['mpf_flow']='Portata, Q';
 $ec_lang['mpf_flow_tip']='Portata e profondità calcolate per una tubazione infinitamente lunga. Per immettere questa portata nella tubazione può essere necessaria un\'altezza idraulica a monte maggiore. Vedere le Note sotto per i dettagli e un video tutorial.';
 $ec_lang['mpf_velocity']='Velocità, v';
@@ -182,8 +181,8 @@ $ec_lang['mphl_junction_loss']='Perdita di carico concentrata, h<sub>m</sub>';
 $ec_lang['mphl_total_loss']='Perdita di carico totale, h<sub>L</sub>';
 $ec_lang['mphl_egl_1']='EGL a valle';
 $ec_lang['mphl_egl_2']='EGL a monte';
-$ec_lang['mphl_hgl_2']='HGL a monte in tubazione ' . $ec_lang['mpf_see_notes'];
-$ec_lang['mphl_note_1']='<dl><dt>Per una condizione di imbocco aperto (tombino), è necessario verificare le condizioni di controllo all\'imbocco.</dt><dd>1. L\'HGL a monte non può essere inferiore alla quota di deflusso a profondità normale a monte (o inferiore alla tubazione!).</dd><dd>2. Il livello idraulico di un tombino è meglio rappresentato dall\'EGL a monte che dall\'HGL a monte.</dd><dd>3. <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">Vedere il tutorial di 2 minuti</a> per semplici calcoli standard del livello idraulico nei tombini con HY-8.</dd>';
+$ec_lang['mphl_hgl_egl_tip']='Potrebbe non essere valido se la tubazione è in rilievo. Vedere le note.';
+$ec_lang['mphl_note_1']='<dl><dt>Questo calcolatore non tiene conto della quota della tubazione.</dt><dd>Se l\'HGL scende sotto la sommità della tubazione in un qualsiasi punto, questo calcolo potrebbe non essere valido.</dd><dt>Per una condizione di imbocco aperto (tombino), è necessario verificare le condizioni di controllo all\'imbocco.</dt><dd>1. L\'HGL a monte non può essere inferiore alla quota di deflusso a profondità normale a monte (o inferiore alla tubazione!).</dd><dd>2. Il livello idraulico di un tombino è meglio rappresentato dall\'EGL a monte che dall\'HGL a monte.</dd><dd>3. <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">Vedere il tutorial di 2 minuti</a> per semplici calcoli standard del livello idraulico nei tombini con HY-8.</dd>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Canale trapezoidale Manning';
 $ec_lang['mtc_main_title']='Calcolatore gratuito online formula di Manning canale trapezoidale';
@@ -217,6 +216,9 @@ $ec_lang['mtc_iteration_tip']='Scegliere un\'opzione di scabrezza (Blodgett-Bath
 $ec_lang['mtc_note_1']='<dl><dt>Iterazione automatica dimensionamento roccia e scabrezza</dt><dd>Scegliere un pulsante radio per la scabrezza (Blodgett-Bathurst raccomandato) e uno per la dimensione roccia di progetto (Isbash raccomandato). Regolare profondità e fattore di sicurezza della roccia per ottenere il flusso desiderato con una dimensione roccia uniforme. Ogni modifica ai dati avvia il ciclo iterativo: 1. La scabrezza viene calcolata dalla dimensione roccia di progetto. 2. La scabrezza richiesta viene copiata nella scabrezza di input. 3. Il flusso nel canale e la dimensione roccia richiesta vengono calcolati. 4. La dimensione roccia di progetto viene aggiornata. 5. Si ripete fino a convergenza.</dd><dt>Calcolatore base (senza iterazione)</dt><dd>Inserire il valore di scabrezza desiderato. Ignorare l\'area di input della dimensione roccia di progetto.</dd></dl>';
 $ec_lang['mtc_note_2_term']='Controllo della velocità';
 $ec_lang['mtc_note_2_def']='Velocità elevata implica elevata energia specifica derivante da una caduta disponibile. Tale energia può dissiparsi rapidamente in corrispondenza di espansioni, curve o ostruzioni. Verificare che ciò sia ragionevole per il sito.';
+$ec_lang['mtc_solve_for_y']='Calcola la profondità, y, dato Q';
+$ec_lang['mtc_solve_desc']='Utilizzando b, z<sub>1</sub>, z<sub>2</sub>, S e n dal modulo del calcolatore, determina la profondità per un dato Q.';
+$ec_lang['mtc_solver_no_solution']='Nessuna soluzione trovata per il Q indicato con questi dati del canale.';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='Stramazzo semplice';
 $ec_lang['ws_main_title']='Calcolatore gratuito online del deflusso su stramazzo semplice a soglia larga';

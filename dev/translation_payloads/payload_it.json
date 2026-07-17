@@ -1,15 +1,14 @@
 {
     "meta": {
         "language": "it",
-        "expected_key_count": 505,
-        "delta_key_count": 20,
+        "expected_key_count": 507,
+        "delta_key_count": 13,
         "active_prefixes": [
             "dw",
             "install",
             "ip",
             "mhp",
             "mphl",
-            "mtc",
             "odt"
         ],
         "requested_prefix": null,
@@ -24,7 +23,6 @@
         "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): portata\n- velocity (v): velocità\n- head loss (h_L): perdita di carico\n- emitter: emettitore\n- distribution uniformity (DU): uniformità di distribuzione\n- low-quarter distribution uniformity (DU_lq): uniformità di distribuzione del quarto inferiore\n- application rate (PR): tasso di applicazione\n- lateral: ala laterale\n- mainline: condotta principale\n- reach: tratto\n- velocity head (H_v): altezza cinetica\n- friction loss (h_f): perdita di carico distribuita\n- minor loss (h_m): perdita di carico concentrata\n- energy grade line (EGL): linea dei carichi totali\n- upstream: a monte\n- downstream: a valle",
         "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): portata\n- penstock: condotta forzata\n- gross head (H_gross): altezza lorda\n- net head (H_net): altezza netta\n- plant efficiency (η): rendimento dell'impianto\n- head loss (h_L): perdita di carico\n- run-of-river: ad acqua fluente\n- headworks: opera di presa\n- junction loss (h_m): perdite di carico locali\n- minor loss (h_m): perdita di carico concentrata",
         "mphl": "Use these preferred technical term translations when relevant:\n- flow (Q): portata\n- velocity (v): velocità\n- head loss (h_L): perdita di carico\n- friction loss (h_f): perdita di carico distribuita\n- minor loss (h_m): perdita di carico concentrata\n- hydraulic radius (R_h): raggio idraulico\n- wetted perimeter (P_w): perimetro bagnato\n- Manning roughness (n): coefficiente di scabrezza di Manning\n- slope (S): pendenza",
-        "mtc": "Use these preferred technical term translations when relevant:\n- flow (Q): portata\n- velocity (v): velocità\n- hydraulic radius (R_h): raggio idraulico\n- wetted perimeter (P_w): perimetro bagnato\n- Manning roughness (n): coefficiente di scabrezza di Manning\n- slope (S): pendenza",
         "odt": "Use these preferred technical term translations when relevant:\n- orifice: orifizio\n- discharge coefficient (C_d): coefficiente di efflusso\n- headwater elevation: livello idrometrico a monte\n- tailwater elevation: livello idrometrico a valle\n- crown: [needs translation sprint]"
     },
     "glossary_terms_by_prefix": {
@@ -360,50 +358,6 @@
                 "preferred_translation": "pendenza"
             }
         ],
-        "mtc": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg RESOLVED (Tom, 2026-07-13): native engineer's 2026-07-06 clarification confirmed both 'дебит' (colloquial\/general register) and 'водно количество' (academic\/hydraulic-engineering register, used at university for Q) are acceptable. Tom decided suite-wide standardization on 'водно количество' — \"I would put водно количество everywhere\" — applied across all bg calculator categories (pipes\/irrigation included, not just the hydraulic-structure\/open-channel strings the engineer originally corrected). 'дебит' fully replaced in lib\/lang.ec.bg.php 2026-07-13.",
-                "preferred_translation": "portata"
-            },
-            {
-                "term": "velocity",
-                "symbol": "v",
-                "context": "Flow velocity (speed of water). Appears in all calculators.",
-                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
-                "preferred_translation": "velocità"
-            },
-            {
-                "term": "hydraulic radius",
-                "symbol": "R_h",
-                "context": "Cross-sectional flow area divided by wetted perimeter. Appears in Manning calculators.",
-                "translation_notes": "Use the standard hydraulic engineering phrase. Pre-2026 sr\/hr human translations used the Latin loanword 'hidraulički radijus' — this form is widely used in South Slavic engineering practice and may be more recognizable to field practitioners than the native Slavic equivalents 'полупречник' (sr) \/ 'polumjer' (hr). Both are correct; native Slavic engineers may encounter both forms. DATA-ERROR FIX 2026-07-10 (category-3 sw wave-3 sprint): previous sw value 'radius ya maji' (literally 'radius of water', English loanword 'radius' + 'of water') named the substance rather than the hydraulic-geometry property, and did not read as an engineering term. Changed to 'radiasi ya kihaidroliki' (radius + 'hydraulic', adjectival ki- form), matching the '[radius] + hydraulic' construction used by fr\/de\/it\/es\/ro\/tr (rayon hydraulique \/ hydraulischer Radius \/ raggio idraulico \/ radio hidráulico \/ raza hidraulică \/ hidrolik yarıçap). Used in lib\/lang.ec.sw.php's mpf_hydraulic_radius.",
-                "preferred_translation": "raggio idraulico"
-            },
-            {
-                "term": "wetted perimeter",
-                "symbol": "P_w",
-                "context": "Length of the channel or pipe boundary in contact with flowing water. Appears in Manning calculators.",
-                "translation_notes": "WMO No. 385 entry 1682 confirms: es = 'perímetro mojado', fr = 'périmètre mouillé'. Use the standard hydraulic engineering phrase. 'Wetted' here means 'in contact with water', not 'soaked'. Pre-2026 sr human used 'okvašeni obim' (obim = natural South Slavic word for perimeter\/circumference); current uses 'квашени периметар' (периметар = Greek-derived loanword). Both are correct; 'obim\/opseg' is more natural in informal Serbian\/Croatian field use.",
-                "preferred_translation": "perimetro bagnato"
-            },
-            {
-                "term": "Manning roughness",
-                "symbol": "n",
-                "context": "Manning's n — empirical roughness coefficient used in the Manning formula for open-channel and pipe flow.",
-                "translation_notes": "Always include 'Manning' as a proper noun. The coefficient itself (n) needs no translation — only the label does. Do not translate as generic 'roughness coefficient' without 'Manning'. TYPO FIX 2026-07-09 (category-3 wave-1 sprint): ru\/uk transliterations were single-н 'Манинга'\/'Манінга', flagged by the ru wave-1 agent as inconsistent with the established double-н transliteration ('Маннинга'\/'Маннінга') used 11+ times elsewhere in both lang files (predates this sprint). Corrected to double-н for consistency.",
-                "preferred_translation": "coefficiente di scabrezza di Manning"
-            },
-            {
-                "term": "slope",
-                "symbol": "S",
-                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
-                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
-                "preferred_translation": "pendenza"
-            }
-        ],
         "odt": [
             {
                 "term": "orifice",
@@ -445,13 +399,6 @@
     "keys_to_translate": {
         "dw_roughness": "e",
         "mphl_area": "Area, A",
-        "mtc_n_pi": "n for design rock size (Phillips & Ingersoll method)",
-        "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
-        "mtc_pi_range_check": "P&I range check",
-        "mtc_pi_ok": "d50 in P&I range",
-        "mtc_pi_ok_tip": "0.28–0.36 ft (Phillips & Ingersoll, 1998)",
-        "mtc_pi_out_of_range": "Outside range",
-        "mtc_pi_tip": "Extrapolating outside the 0.28–0.36 ft dataset range this equation was developed from — treat as a rough check, not a design basis",
         "mhp_vel_ok_short": "OK",
         "odt_notes_1_term": "Formula",
         "install_android_heading": "Android (Chrome)",
@@ -467,13 +414,6 @@
     "keys": {
         "dw_roughness": "e",
         "mphl_area": "Area, A",
-        "mtc_n_pi": "n for design rock size (Phillips & Ingersoll method)",
-        "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
-        "mtc_pi_range_check": "P&I range check",
-        "mtc_pi_ok": "d50 in P&I range",
-        "mtc_pi_ok_tip": "0.28–0.36 ft (Phillips & Ingersoll, 1998)",
-        "mtc_pi_out_of_range": "Outside range",
-        "mtc_pi_tip": "Extrapolating outside the 0.28–0.36 ft dataset range this equation was developed from — treat as a rough check, not a design basis",
         "mhp_vel_ok_short": "OK",
         "odt_notes_1_term": "Formula",
         "install_android_heading": "Android (Chrome)",
@@ -516,118 +456,6 @@
                     "key": "mphl_total_junction_k",
                     "value": "Coefficiente di perdita di carico concentrata, k<sub>m<\/sub>",
                     "english": "Minor (local) loss coefficient, k<sub>m<\/sub>"
-                }
-            }
-        },
-        "mtc_n_pi": {
-            "reason": "equal_to_english",
-            "current_value": "n for design rock size (Phillips & Ingersoll method)",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mtc_n_bathurst",
-                    "value": "n per dimensione roccia di progetto secondo Bathurst",
-                    "english": "n for design rock size (Bathurst method)"
-                },
-                "next_translated": {
-                    "key": "mtc_d50_bottom",
-                    "value": "<span class=\"ec-help\" title=\"Secondo Isbash (1936) e Maricopa County, Arizona, US.\">Dimensione roccia angolare richiesta sul fondo, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\">Required bottom angular rock size, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>"
-                }
-            }
-        },
-        "mtc_blodgett_v_bathurst": {
-            "reason": "equal_to_english",
-            "current_value": "Blodgett vs. Bathurst",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mtc_n_bathurst",
-                    "value": "n per dimensione roccia di progetto secondo Bathurst",
-                    "english": "n for design rock size (Bathurst method)"
-                },
-                "next_translated": {
-                    "key": "mtc_d50_bottom",
-                    "value": "<span class=\"ec-help\" title=\"Secondo Isbash (1936) e Maricopa County, Arizona, US.\">Dimensione roccia angolare richiesta sul fondo, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\">Required bottom angular rock size, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>"
-                }
-            }
-        },
-        "mtc_pi_range_check": {
-            "reason": "equal_to_english",
-            "current_value": "P&I range check",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mtc_n_bathurst",
-                    "value": "n per dimensione roccia di progetto secondo Bathurst",
-                    "english": "n for design rock size (Bathurst method)"
-                },
-                "next_translated": {
-                    "key": "mtc_d50_bottom",
-                    "value": "<span class=\"ec-help\" title=\"Secondo Isbash (1936) e Maricopa County, Arizona, US.\">Dimensione roccia angolare richiesta sul fondo, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\">Required bottom angular rock size, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>"
-                }
-            }
-        },
-        "mtc_pi_ok": {
-            "reason": "equal_to_english",
-            "current_value": "d50 in P&I range",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mtc_n_bathurst",
-                    "value": "n per dimensione roccia di progetto secondo Bathurst",
-                    "english": "n for design rock size (Bathurst method)"
-                },
-                "next_translated": {
-                    "key": "mtc_d50_bottom",
-                    "value": "<span class=\"ec-help\" title=\"Secondo Isbash (1936) e Maricopa County, Arizona, US.\">Dimensione roccia angolare richiesta sul fondo, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\">Required bottom angular rock size, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>"
-                }
-            }
-        },
-        "mtc_pi_ok_tip": {
-            "reason": "equal_to_english",
-            "current_value": "0.28–0.36 ft (Phillips & Ingersoll, 1998)",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mtc_n_bathurst",
-                    "value": "n per dimensione roccia di progetto secondo Bathurst",
-                    "english": "n for design rock size (Bathurst method)"
-                },
-                "next_translated": {
-                    "key": "mtc_d50_bottom",
-                    "value": "<span class=\"ec-help\" title=\"Secondo Isbash (1936) e Maricopa County, Arizona, US.\">Dimensione roccia angolare richiesta sul fondo, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\">Required bottom angular rock size, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>"
-                }
-            }
-        },
-        "mtc_pi_out_of_range": {
-            "reason": "equal_to_english",
-            "current_value": "Outside range",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mtc_n_bathurst",
-                    "value": "n per dimensione roccia di progetto secondo Bathurst",
-                    "english": "n for design rock size (Bathurst method)"
-                },
-                "next_translated": {
-                    "key": "mtc_d50_bottom",
-                    "value": "<span class=\"ec-help\" title=\"Secondo Isbash (1936) e Maricopa County, Arizona, US.\">Dimensione roccia angolare richiesta sul fondo, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\">Required bottom angular rock size, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>"
-                }
-            }
-        },
-        "mtc_pi_tip": {
-            "reason": "equal_to_english",
-            "current_value": "Extrapolating outside the 0.28–0.36 ft dataset range this equation was developed from — treat as a rough check, not a design basis",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mtc_n_bathurst",
-                    "value": "n per dimensione roccia di progetto secondo Bathurst",
-                    "english": "n for design rock size (Bathurst method)"
-                },
-                "next_translated": {
-                    "key": "mtc_d50_bottom",
-                    "value": "<span class=\"ec-help\" title=\"Secondo Isbash (1936) e Maricopa County, Arizona, US.\">Dimensione roccia angolare richiesta sul fondo, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\">Required bottom angular rock size, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },

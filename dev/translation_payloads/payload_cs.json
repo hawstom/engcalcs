@@ -1,15 +1,13 @@
 {
     "meta": {
         "language": "cs",
-        "expected_key_count": 505,
-        "delta_key_count": 17,
+        "expected_key_count": 507,
+        "delta_key_count": 9,
         "active_prefixes": [
             "dw",
             "install",
             "ip",
-            "mhp",
-            "mi",
-            "mtc"
+            "mhp"
         ],
         "requested_prefix": null,
         "notes": "Translate only keys in keys_to_translate; preserve HTML, units, and symbols.",
@@ -21,9 +19,7 @@
         "dw": "Use these preferred technical term translations when relevant:\n- flow (Q): průtok\n- velocity (v): rychlost\n- head loss (h_L): ztráta tlakové výšky\n- friction factor (f): součinitel tření\n- slope (S): sklon\n- laminar: laminární\n- transitional: přechodný\n- turbulent: turbulentní",
         "install": "Use these preferred technical term translations when relevant:\n- flow (Q): průtok\n- velocity (v): rychlost\n- slope (S): sklon",
         "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): průtok\n- velocity (v): rychlost\n- head loss (h_L): ztráta tlakové výšky\n- emitter: kapač\n- distribution uniformity (DU): rovnoměrnost distribuce\n- low-quarter distribution uniformity (DU_lq): Uniformita distribuce nízké čtvrtiny\n- application rate (PR): intenzita závlahy\n- lateral: postranní větev\n- mainline: hlavní potrubí\n- reach: úsek\n- velocity head (H_v): rychlostní výška\n- friction loss (h_f): ztráta třením\n- minor loss (h_m): místní ztráta\n- energy grade line (EGL): čára energie\n- upstream: proti proudu\n- downstream: po proudu",
-        "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): průtok\n- penstock: tlakovod\n- gross head (H_gross): hrubý spád\n- net head (H_net): čistý spád\n- plant efficiency (η): účinnost elektrárny\n- head loss (h_L): ztráta tlakové výšky\n- run-of-river: průtočná vodní elektrárna\n- headworks: odběrný objekt\n- junction loss (h_m): místní ztráty\n- minor loss (h_m): místní ztráta",
-        "mi": "Use these preferred technical term translations when relevant:\n- flow (Q): průtok\n- velocity (v): rychlost\n- hydraulic radius (R_h): hydraulický poloměr\n- wetted perimeter (P_w): smočený obvod\n- Manning roughness (n): Manningův součinitel drsnosti\n- slope (S): sklon\n- irregular channel: nepravidelný průřez",
-        "mtc": "Use these preferred technical term translations when relevant:\n- flow (Q): průtok\n- velocity (v): rychlost\n- hydraulic radius (R_h): hydraulický poloměr\n- wetted perimeter (P_w): smočený obvod\n- Manning roughness (n): Manningův součinitel drsnosti\n- slope (S): sklon"
+        "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): průtok\n- penstock: tlakovod\n- gross head (H_gross): hrubý spád\n- net head (H_net): čistý spád\n- plant efficiency (η): účinnost elektrárny\n- head loss (h_L): ztráta tlakové výšky\n- run-of-river: průtočná vodní elektrárna\n- headworks: odběrný objekt\n- junction loss (h_m): místní ztráty\n- minor loss (h_m): místní ztráta"
     },
     "glossary_terms_by_prefix": {
         "dw": [
@@ -292,113 +288,10 @@
                 "translation_notes": "CANONICAL ENGLISH LABEL: \"Minor (local) loss\" (label-normalization decision, item 90, 2026-07-07). 'Minor ⇄ local' — a local\/point loss at fittings, NOT a \"smaller\" loss; the '(local)' parenthetical fixes the mistranslation trap. Symbol h_m, coefficient k_m (lowercase h reserved for loss components; capital H reserved for total\/gross\/net head, per the same decision). am ADDED (2026-07-10, category-3 am re-translation): 'ጥቃቅን (አካባቢያዊ) ኪሳራ' (tiqaqin (akababiyawi) kisara) mirrors the English structure word-for-word — 'ጥቃቅን' (minor\/small) followed by the parenthetical '(አካባቢያዊ)' (local, i.e. of a specific place\/area) — so the same mistranslation-blocking device English uses (the '(local)' qualifier preventing a 'smaller loss' misreading) is preserved in Amharic rather than silently dropped. Replaces the prior am file's 'የማያያዣ ኪሳራ' (connector\/joint loss), which named the physical fitting rather than the local\/point-loss concept. km ADDED (2026-07-10, category-3 km re-translation): 'ការបាត់បង់មូលដ្ឋាន' (local-basis loss) reuses មូលដ្ឋាន ('local', already established suite-wide for this exact merged concept in ip_km's tooltip 'មេគុណបាត់បង់មូលដ្ឋានសរុប' = 'total local-loss coefficient'), so category-3 now converges on the same word ip_ already uses rather than coining a second competing term. Deliberately avoids 'តូច' (small), sidestepping the minor⇄smaller mistranslation trap the English '(local)' parenthetical exists to block. Replaces the km file's prior mphl_junction_loss value 'ការបាត់បង់ junction' (untranslated English word left in place). ps ADDED (2026-07-10, category-3 ps wave-3 re-translation): 'ځایی ضیاع' (local loss) uses ځایی (local\/positional) + the established ps loss word ضیاع, following the majority pattern already set by ar\/fa\/es\/fr\/hr\/id\/it\/ro\/ru\/sr\/tr\/uk\/ur\/zh — all of which render this concept as 'local loss' alone rather than translating 'minor' literally, since the '(local)' qualifier is the operative disambiguator, not 'minor'. Deliberately avoids a word for 'small\/minor' (e.g. کوچنی) to sidestep the same minor⇄smaller trap the English parenthetical exists to block. Replaces the prior ps file's 'د جنکشن ضیاع' (junction loss — the pre-consolidation, pre-item-90 term) and fixes its symbol from capital H_m to lowercase h_m.",
                 "preferred_translation": "místní ztráta"
             }
-        ],
-        "mi": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg RESOLVED (Tom, 2026-07-13): native engineer's 2026-07-06 clarification confirmed both 'дебит' (colloquial\/general register) and 'водно количество' (academic\/hydraulic-engineering register, used at university for Q) are acceptable. Tom decided suite-wide standardization on 'водно количество' — \"I would put водно количество everywhere\" — applied across all bg calculator categories (pipes\/irrigation included, not just the hydraulic-structure\/open-channel strings the engineer originally corrected). 'дебит' fully replaced in lib\/lang.ec.bg.php 2026-07-13.",
-                "preferred_translation": "průtok"
-            },
-            {
-                "term": "velocity",
-                "symbol": "v",
-                "context": "Flow velocity (speed of water). Appears in all calculators.",
-                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
-                "preferred_translation": "rychlost"
-            },
-            {
-                "term": "hydraulic radius",
-                "symbol": "R_h",
-                "context": "Cross-sectional flow area divided by wetted perimeter. Appears in Manning calculators.",
-                "translation_notes": "Use the standard hydraulic engineering phrase. Pre-2026 sr\/hr human translations used the Latin loanword 'hidraulički radijus' — this form is widely used in South Slavic engineering practice and may be more recognizable to field practitioners than the native Slavic equivalents 'полупречник' (sr) \/ 'polumjer' (hr). Both are correct; native Slavic engineers may encounter both forms. DATA-ERROR FIX 2026-07-10 (category-3 sw wave-3 sprint): previous sw value 'radius ya maji' (literally 'radius of water', English loanword 'radius' + 'of water') named the substance rather than the hydraulic-geometry property, and did not read as an engineering term. Changed to 'radiasi ya kihaidroliki' (radius + 'hydraulic', adjectival ki- form), matching the '[radius] + hydraulic' construction used by fr\/de\/it\/es\/ro\/tr (rayon hydraulique \/ hydraulischer Radius \/ raggio idraulico \/ radio hidráulico \/ raza hidraulică \/ hidrolik yarıçap). Used in lib\/lang.ec.sw.php's mpf_hydraulic_radius.",
-                "preferred_translation": "hydraulický poloměr"
-            },
-            {
-                "term": "wetted perimeter",
-                "symbol": "P_w",
-                "context": "Length of the channel or pipe boundary in contact with flowing water. Appears in Manning calculators.",
-                "translation_notes": "WMO No. 385 entry 1682 confirms: es = 'perímetro mojado', fr = 'périmètre mouillé'. Use the standard hydraulic engineering phrase. 'Wetted' here means 'in contact with water', not 'soaked'. Pre-2026 sr human used 'okvašeni obim' (obim = natural South Slavic word for perimeter\/circumference); current uses 'квашени периметар' (периметар = Greek-derived loanword). Both are correct; 'obim\/opseg' is more natural in informal Serbian\/Croatian field use.",
-                "preferred_translation": "smočený obvod"
-            },
-            {
-                "term": "Manning roughness",
-                "symbol": "n",
-                "context": "Manning's n — empirical roughness coefficient used in the Manning formula for open-channel and pipe flow.",
-                "translation_notes": "Always include 'Manning' as a proper noun. The coefficient itself (n) needs no translation — only the label does. Do not translate as generic 'roughness coefficient' without 'Manning'. TYPO FIX 2026-07-09 (category-3 wave-1 sprint): ru\/uk transliterations were single-н 'Манинга'\/'Манінга', flagged by the ru wave-1 agent as inconsistent with the established double-н transliteration ('Маннинга'\/'Маннінга') used 11+ times elsewhere in both lang files (predates this sprint). Corrected to double-н for consistency.",
-                "preferred_translation": "Manningův součinitel drsnosti"
-            },
-            {
-                "term": "slope",
-                "symbol": "S",
-                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
-                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
-                "preferred_translation": "sklon"
-            },
-            {
-                "term": "irregular channel",
-                "symbol": "",
-                "context": "A channel whose cross-section is non-uniform \/ non-prismatic — a natural or surveyed section defined by station-elevation points, as opposed to a regular trapezoidal shape. Titles the Manning Irregular Channel calculator (mi_) and, in the geometric sense, the Weir Flow Irregular calculator (wi_).",
-                "translation_notes": "\"Irregular\" here is GEOMETRIC: the cross-section is non-uniform \/ natural \/ arbitrary shape. It is NOT the temporal sense \"sporadic \/ occasional \/ not-regular\" (bg \"нередовен\" WRONG, uk \"нерегулярний\" WRONG per Bulgarian-engineer-feedback.md), and NOT \"incorrect \/ faulty\" (ru \"неправильное русло\" reads as \"wrong channel\" — prefer \"произвольного сечения\"). Where the language allows, name the cross-section explicitly (\"of irregular cross-section\") rather than a bare adjective that could be read as temporal or evaluative. Task 98 audit (2026-07-13): uk\/ru were already fixed to the geometric sense, but bg was still shipping the evaluative-sense defect this note itself warns against — \"неправилно сечение\" (= \"incorrect\/wrong cross-section\"), across 7 occurrences (mi_menu, mi_main_title, mi_main_desc, wi_menu, wi_main_title, wi_main_desc, irr_card_canal_desc). Fixed to \"произволно сечение\" (\"arbitrary cross-section\"), a direct grammatical parallel to the Russian fix. Lesson: a documented glossary warning doesn't guarantee every flagged language was actually corrected — verify current shipped state, don't assume a note describes present reality.",
-                "preferred_translation": "nepravidelný průřez"
-            }
-        ],
-        "mtc": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg RESOLVED (Tom, 2026-07-13): native engineer's 2026-07-06 clarification confirmed both 'дебит' (colloquial\/general register) and 'водно количество' (academic\/hydraulic-engineering register, used at university for Q) are acceptable. Tom decided suite-wide standardization on 'водно количество' — \"I would put водно количество everywhere\" — applied across all bg calculator categories (pipes\/irrigation included, not just the hydraulic-structure\/open-channel strings the engineer originally corrected). 'дебит' fully replaced in lib\/lang.ec.bg.php 2026-07-13.",
-                "preferred_translation": "průtok"
-            },
-            {
-                "term": "velocity",
-                "symbol": "v",
-                "context": "Flow velocity (speed of water). Appears in all calculators.",
-                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
-                "preferred_translation": "rychlost"
-            },
-            {
-                "term": "hydraulic radius",
-                "symbol": "R_h",
-                "context": "Cross-sectional flow area divided by wetted perimeter. Appears in Manning calculators.",
-                "translation_notes": "Use the standard hydraulic engineering phrase. Pre-2026 sr\/hr human translations used the Latin loanword 'hidraulički radijus' — this form is widely used in South Slavic engineering practice and may be more recognizable to field practitioners than the native Slavic equivalents 'полупречник' (sr) \/ 'polumjer' (hr). Both are correct; native Slavic engineers may encounter both forms. DATA-ERROR FIX 2026-07-10 (category-3 sw wave-3 sprint): previous sw value 'radius ya maji' (literally 'radius of water', English loanword 'radius' + 'of water') named the substance rather than the hydraulic-geometry property, and did not read as an engineering term. Changed to 'radiasi ya kihaidroliki' (radius + 'hydraulic', adjectival ki- form), matching the '[radius] + hydraulic' construction used by fr\/de\/it\/es\/ro\/tr (rayon hydraulique \/ hydraulischer Radius \/ raggio idraulico \/ radio hidráulico \/ raza hidraulică \/ hidrolik yarıçap). Used in lib\/lang.ec.sw.php's mpf_hydraulic_radius.",
-                "preferred_translation": "hydraulický poloměr"
-            },
-            {
-                "term": "wetted perimeter",
-                "symbol": "P_w",
-                "context": "Length of the channel or pipe boundary in contact with flowing water. Appears in Manning calculators.",
-                "translation_notes": "WMO No. 385 entry 1682 confirms: es = 'perímetro mojado', fr = 'périmètre mouillé'. Use the standard hydraulic engineering phrase. 'Wetted' here means 'in contact with water', not 'soaked'. Pre-2026 sr human used 'okvašeni obim' (obim = natural South Slavic word for perimeter\/circumference); current uses 'квашени периметар' (периметар = Greek-derived loanword). Both are correct; 'obim\/opseg' is more natural in informal Serbian\/Croatian field use.",
-                "preferred_translation": "smočený obvod"
-            },
-            {
-                "term": "Manning roughness",
-                "symbol": "n",
-                "context": "Manning's n — empirical roughness coefficient used in the Manning formula for open-channel and pipe flow.",
-                "translation_notes": "Always include 'Manning' as a proper noun. The coefficient itself (n) needs no translation — only the label does. Do not translate as generic 'roughness coefficient' without 'Manning'. TYPO FIX 2026-07-09 (category-3 wave-1 sprint): ru\/uk transliterations were single-н 'Манинга'\/'Манінга', flagged by the ru wave-1 agent as inconsistent with the established double-н transliteration ('Маннинга'\/'Маннінга') used 11+ times elsewhere in both lang files (predates this sprint). Corrected to double-н for consistency.",
-                "preferred_translation": "Manningův součinitel drsnosti"
-            },
-            {
-                "term": "slope",
-                "symbol": "S",
-                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
-                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
-                "preferred_translation": "sklon"
-            }
         ]
     },
     "keys_to_translate": {
         "dw_roughness": "e",
-        "mi_groupSegment": "Segment",
-        "mtc_n_pi": "n for design rock size (Phillips & Ingersoll method)",
-        "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
-        "mtc_pi_range_check": "P&I range check",
-        "mtc_pi_ok": "d50 in P&I range",
-        "mtc_pi_ok_tip": "0.28–0.36 ft (Phillips & Ingersoll, 1998)",
-        "mtc_pi_out_of_range": "Outside range",
-        "mtc_pi_tip": "Extrapolating outside the 0.28–0.36 ft dataset range this equation was developed from — treat as a rough check, not a design basis",
         "mhp_vel_ok_short": "OK",
         "install_android_heading": "Android (Chrome)",
         "install_ios_heading": "iOS (Safari)",
@@ -410,14 +303,6 @@
     },
     "keys": {
         "dw_roughness": "e",
-        "mi_groupSegment": "Segment",
-        "mtc_n_pi": "n for design rock size (Phillips & Ingersoll method)",
-        "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
-        "mtc_pi_range_check": "P&I range check",
-        "mtc_pi_ok": "d50 in P&I range",
-        "mtc_pi_ok_tip": "0.28–0.36 ft (Phillips & Ingersoll, 1998)",
-        "mtc_pi_out_of_range": "Outside range",
-        "mtc_pi_tip": "Extrapolating outside the 0.28–0.36 ft dataset range this equation was developed from — treat as a rough check, not a design basis",
         "mhp_vel_ok_short": "OK",
         "install_android_heading": "Android (Chrome)",
         "install_ios_heading": "iOS (Safari)",
@@ -441,134 +326,6 @@
                     "key": "dw_roughness_tip",
                     "value": "Absolutní drsnost stěny potrubí, e. Typické hodnoty: ocel (nová) 0,046 mm, ocel (použitá) 0,15 mm, HDPE 0,003 mm, PVC\/uPVC 0,0015 mm, beton 0,3–3 mm.",
                     "english": "Absolute roughness height, e, of the pipe wall. Typical values: steel (new) 0.046 mm, steel (used) 0.15 mm, HDPE 0.003 mm, PVC\/uPVC 0.0015 mm, concrete 0.3–3 mm."
-                }
-            }
-        },
-        "mi_groupSegment": {
-            "reason": "equal_to_english",
-            "current_value": "Segment",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mi_groupPoint",
-                    "value": "Bod",
-                    "english": "Point"
-                },
-                "next_translated": {
-                    "key": "mi_groupRegion",
-                    "value": "Oblast",
-                    "english": "Region"
-                }
-            }
-        },
-        "mtc_n_pi": {
-            "reason": "equal_to_english",
-            "current_value": "n for design rock size (Phillips & Ingersoll method)",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mtc_n_bathurst",
-                    "value": "n pro návrhovou velikost kamene dle Bathursta",
-                    "english": "n for design rock size (Bathurst method)"
-                },
-                "next_translated": {
-                    "key": "mtc_d50_bottom",
-                    "value": "<span class=\"ec-help\" title=\"Dle Isbash (1936) a Maricopa County, Arizona, USA.\">Požadovaná velikost lomového kamene na dně, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\">Required bottom angular rock size, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>"
-                }
-            }
-        },
-        "mtc_blodgett_v_bathurst": {
-            "reason": "equal_to_english",
-            "current_value": "Blodgett vs. Bathurst",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mtc_n_bathurst",
-                    "value": "n pro návrhovou velikost kamene dle Bathursta",
-                    "english": "n for design rock size (Bathurst method)"
-                },
-                "next_translated": {
-                    "key": "mtc_d50_bottom",
-                    "value": "<span class=\"ec-help\" title=\"Dle Isbash (1936) a Maricopa County, Arizona, USA.\">Požadovaná velikost lomového kamene na dně, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\">Required bottom angular rock size, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>"
-                }
-            }
-        },
-        "mtc_pi_range_check": {
-            "reason": "equal_to_english",
-            "current_value": "P&I range check",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mtc_n_bathurst",
-                    "value": "n pro návrhovou velikost kamene dle Bathursta",
-                    "english": "n for design rock size (Bathurst method)"
-                },
-                "next_translated": {
-                    "key": "mtc_d50_bottom",
-                    "value": "<span class=\"ec-help\" title=\"Dle Isbash (1936) a Maricopa County, Arizona, USA.\">Požadovaná velikost lomového kamene na dně, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\">Required bottom angular rock size, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>"
-                }
-            }
-        },
-        "mtc_pi_ok": {
-            "reason": "equal_to_english",
-            "current_value": "d50 in P&I range",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mtc_n_bathurst",
-                    "value": "n pro návrhovou velikost kamene dle Bathursta",
-                    "english": "n for design rock size (Bathurst method)"
-                },
-                "next_translated": {
-                    "key": "mtc_d50_bottom",
-                    "value": "<span class=\"ec-help\" title=\"Dle Isbash (1936) a Maricopa County, Arizona, USA.\">Požadovaná velikost lomového kamene na dně, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\">Required bottom angular rock size, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>"
-                }
-            }
-        },
-        "mtc_pi_ok_tip": {
-            "reason": "equal_to_english",
-            "current_value": "0.28–0.36 ft (Phillips & Ingersoll, 1998)",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mtc_n_bathurst",
-                    "value": "n pro návrhovou velikost kamene dle Bathursta",
-                    "english": "n for design rock size (Bathurst method)"
-                },
-                "next_translated": {
-                    "key": "mtc_d50_bottom",
-                    "value": "<span class=\"ec-help\" title=\"Dle Isbash (1936) a Maricopa County, Arizona, USA.\">Požadovaná velikost lomového kamene na dně, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\">Required bottom angular rock size, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>"
-                }
-            }
-        },
-        "mtc_pi_out_of_range": {
-            "reason": "equal_to_english",
-            "current_value": "Outside range",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mtc_n_bathurst",
-                    "value": "n pro návrhovou velikost kamene dle Bathursta",
-                    "english": "n for design rock size (Bathurst method)"
-                },
-                "next_translated": {
-                    "key": "mtc_d50_bottom",
-                    "value": "<span class=\"ec-help\" title=\"Dle Isbash (1936) a Maricopa County, Arizona, USA.\">Požadovaná velikost lomového kamene na dně, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\">Required bottom angular rock size, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>"
-                }
-            }
-        },
-        "mtc_pi_tip": {
-            "reason": "equal_to_english",
-            "current_value": "Extrapolating outside the 0.28–0.36 ft dataset range this equation was developed from — treat as a rough check, not a design basis",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mtc_n_bathurst",
-                    "value": "n pro návrhovou velikost kamene dle Bathursta",
-                    "english": "n for design rock size (Bathurst method)"
-                },
-                "next_translated": {
-                    "key": "mtc_d50_bottom",
-                    "value": "<span class=\"ec-help\" title=\"Dle Isbash (1936) a Maricopa County, Arizona, USA.\">Požadovaná velikost lomového kamene na dně, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\">Required bottom angular rock size, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },

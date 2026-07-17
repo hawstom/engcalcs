@@ -148,7 +148,6 @@ $ec_lang['mpf_pipe_diameter']='Diámetro de la tubería, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Coeficiente de rugosidad de Manning, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Pendiente de fricción, S<sub>f</sub></a><span class="ec-help" title="A veces igual a la pendiente de la tubería. Siga el enlace para la explicación (solo en inglés)."><span class="ec-tip">?</span></span>';
 $ec_lang['mpf_depth_ratio']='Relación de calados, y/d<sub>0</sub>';
-$ec_lang['mpf_see_notes']='(Véanse las notas)';
 $ec_lang['mpf_flow']='Caudal, Q';
 $ec_lang['mpf_flow_tip']='El caudal y la profundidad se calculan para una tubería de longitud infinita. Para lograr que este caudal entre en la tubería puede necesitarse una mayor profundidad de agua de entrada. Vea las Notas más abajo para más detalles y un video tutorial.';
 $ec_lang['mpf_velocity']='Velocidad, v';
@@ -186,8 +185,8 @@ $ec_lang['mphl_junction_loss']='Pérdida localizada (menor), h<sub>m</sub>';
 $ec_lang['mphl_total_loss']='Pérdida total, h<sub>L</sub>';
 $ec_lang['mphl_egl_1']='EGL aguas abajo';
 $ec_lang['mphl_egl_2']='EGL aguas arriba';
-$ec_lang['mphl_hgl_2']='HGL aguas arriba en la tubería ' . $ec_lang['mpf_see_notes'];
-$ec_lang['mphl_note_1']='<dl><dt>Para una entrada abierta (alcantarilla), es necesario verificar las condiciones de control de entrada.</dt><dd>1. El HGL aguas arriba debe estar por encima de la cota de flujo a profundidad normal aguas arriba (¡y por encima de la tubería!).</dd><dd>2. El cabezal de una alcantarilla se representa mejor con el EGL aguas arriba que con el HGL aguas arriba.</dd><dd>3. Véase <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">mi tutorial de 2 minutos</a> para cálculos estándar sencillos de cabezal en alcantarillas usando HY-8.</dd>';
+$ec_lang['mphl_hgl_egl_tip']='Puede no ser válido si la tubería está elevada. Véanse las notas.';
+$ec_lang['mphl_note_1']='<dl><dt>Esta calculadora no tiene en cuenta la elevación de la tubería.</dt><dd>Si el HGL desciende por debajo de la parte superior de la tubería en algún punto, este cálculo puede no ser válido.</dd><dt>Para una entrada abierta (alcantarilla), es necesario verificar las condiciones de control de entrada.</dt><dd>1. El HGL aguas arriba debe estar por encima de la cota de flujo a profundidad normal aguas arriba (¡y por encima de la tubería!).</dd><dd>2. El cabezal de una alcantarilla se representa mejor con el EGL aguas arriba que con el HGL aguas arriba.</dd><dd>3. Véase <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">mi tutorial de 2 minutos</a> para cálculos estándar sencillos de cabezal en alcantarillas usando HY-8.</dd>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Canal trapecial según Manning';
 $ec_lang['mtc_main_title']='Calculadora gratis en línea de la fórmula de Manning para canal trapecial';
@@ -221,6 +220,9 @@ $ec_lang['mtc_iteration_tip']='Elija una opción de rugosidad (se recomienda Blo
 $ec_lang['mtc_note_1']='<dl><dt>Iteración automática para diseño de tamaño y rugosidad de roca</dt><dd>Elija una opción de rugosidad (se recomienda Blodgett–Bathurst) y una opción para el tamaño de roca de diseño (se recomienda Isbash). Ajuste la profundidad y el factor de seguridad del tamaño de roca para obtener el caudal deseado con un tamaño de roca uniforme. Cada vez que cambie cualquier valor de entrada, ocurre el siguiente ciclo de iteración: 1. Se calcula la rugosidad a partir del tamaño de roca de diseño. 2. El cálculo de rugosidad solicitado se copia al campo de rugosidad. 3. Se calculan el caudal del canal y el tamaño de roca requerido. 4. Se ajusta el tamaño de roca de diseño. 5. Se repite hasta que el error en el tamaño de roca de diseño sea muy pequeño.</dd><dt>Calculadora básica (sin iteración)</dt><dd>Ingrese el valor de rugosidad deseado. Ignore el área de entrada del tamaño de roca de diseño.</dd></dl>';
 $ec_lang['mtc_note_2_term']='Verificación de velocidad';
 $ec_lang['mtc_note_2_def']='La velocidad elevada implica que hubo una caída de elevación considerable que generó una energía específica tan alta. Esa energía puede disiparse rápidamente en expansiones, curvas u obstrucciones. Verifique que esto sea razonable para el sitio.';
+$ec_lang['mtc_solve_for_y']='Calcular el calado, y, para un Q dado';
+$ec_lang['mtc_solve_desc']='Usando b, z<sub>1</sub>, z<sub>2</sub>, S y n del formulario de la calculadora, calcula el calado para un Q dado.';
+$ec_lang['mtc_solver_no_solution']='No se encontró solución para el Q dado con estos datos del canal.';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='Flujo en Vertedero Simple';
 $ec_lang['ws_main_title']='Calculadora gratuita en línea de flujo en vertedero simple de cresta ancha';

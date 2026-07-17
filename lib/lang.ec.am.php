@@ -145,7 +145,6 @@ $ec_lang['mpf_pipe_diameter']='የቧንቧ ዲያሜትር, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='የማኒንግ ሻካርነት, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">የፍሪክሽን ቁልቁለት, S<sub>f</sub></a><span class="ec-help" title="አንዳንዴ ከቧንቧ ቁልቁለት ጋር እኩል። ማብራሪያ ለማግኘት አገናኙን ይከተሉ (በእንግሊዝኛ ብቻ)።"><span class="ec-tip">?</span></span>';
 $ec_lang['mpf_depth_ratio']='አንጻራዊ የፍሰት ጥልቀት, y/d<sub>0</sub>';
-$ec_lang['mpf_see_notes']='(ማስታወሻዎችን ይመልከቱ)';
 $ec_lang['mpf_flow']='ፍሰት, Q';
 $ec_lang['mpf_flow_tip']='ፍሰት እና ጥልቀት ላልተወሰነ ርዝመት ቧንቧ ተሰልተዋል። ይህን ፍሰት ወደ ቧንቧው ለማስገባት ከፍ ያለ የላይኛው ውሃ ጥልቀት ሊያስፈልግ ይችላል። ዝርዝር እና የማስተማሪያ ቪዲዮ ለማግኘት ከታች ያሉትን ማስታወሻዎች ይመልከቱ።';
 $ec_lang['mpf_velocity']='ፍጥነት, v';
@@ -183,8 +182,8 @@ $ec_lang['mphl_junction_loss']='ጥቃቅን (አካባቢያዊ) ኪሳራ, h<s
 $ec_lang['mphl_total_loss']='ጠቅላላ ኪሳራ, h<sub>L</sub>';
 $ec_lang['mphl_egl_1']='ዝቅ ባለ ፍሰት EGL';
 $ec_lang['mphl_egl_2']='ወደ ላይ ባለ ፍሰት EGL';
-$ec_lang['mphl_hgl_2']='ወደ ላይ ባለ ፍሰት HGL ቧንቧ ውስጥ ' . $ec_lang['mpf_see_notes'];
-$ec_lang['mphl_note_1']='<dl><dt>ለክፍት መግቢያ (culvert) ሁኔታ፣ የመግቢያ ቁጥጥር ሁኔታዎችን ማረጋገጥ ያስፈልጋል።</dt><dd>1. የወደ ላይ ባለ ፍሰት HGL ከወደ ላይ ባለ ፍሰት ተፈጥሯዊ ጥልቀት ፍሰት ከፍታ በላይ (እንዲሁም ከቧንቧው በላይ) መሆን አለበት።</dd><dd>2. የ culvert ጭንቅ ውሃ ከወደ ላይ ባለ ፍሰት HGL ይልቅ በወደ ላይ ባለ ፍሰት EGL በተሻለ ይወከላል።</dd><dd>3. ቀለል ያለ የ culvert ጭንቅ ውሃ ስሌቶች HY-8 ተጠቅሞ ለማደረግ <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">የ2 ደቂቃ ትምህርቴን</a> ይመልከቱ።</dd>';
+$ec_lang['mphl_hgl_egl_tip']='ቧንቧው ከፍ ያለ ከሆነ ትክክለኛ ላይሆን ይችላል። ማስታወሻዎችን ይመልከቱ።';
+$ec_lang['mphl_note_1']='<dl><dt>ይህ ማስያ የቧንቧውን ከፍታ ግምት ውስጥ አያስገባም።</dt><dd>HGL በማንኛውም ቦታ ከቧንቧው ጫፍ በታች ከሆነ፣ ይህ ስሌት ትክክለኛ ላይሆን ይችላል።</dd><dt>ለክፍት መግቢያ (culvert) ሁኔታ፣ የመግቢያ ቁጥጥር ሁኔታዎችን ማረጋገጥ ያስፈልጋል።</dt><dd>1. የወደ ላይ ባለ ፍሰት HGL ከወደ ላይ ባለ ፍሰት ተፈጥሯዊ ጥልቀት ፍሰት ከፍታ በላይ (እንዲሁም ከቧንቧው በላይ) መሆን አለበት።</dd><dd>2. የ culvert ጭንቅ ውሃ ከወደ ላይ ባለ ፍሰት HGL ይልቅ በወደ ላይ ባለ ፍሰት EGL በተሻለ ይወከላል።</dd><dd>3. ቀለል ያለ የ culvert ጭንቅ ውሃ ስሌቶች HY-8 ተጠቅሞ ለማደረግ <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">የ2 ደቂቃ ትምህርቴን</a> ይመልከቱ።</dd>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Manning ትራፔዞይዳዊ ቦይ';
 $ec_lang['mtc_main_title']='ነፃ ኦንላይን Manning ቀመር ትራፔዞይዳዊ ቦይ ካልኩሌተር';
@@ -219,6 +218,9 @@ $ec_lang['mtc_note_1']='<dl><dt>አውቶማቲክ የድንጋይ መጠን እ
 $ec_lang['mtc_note_2_term']='የፍጥነት ምርመራ';
 $ec_lang['mtc_note_2_def']='ከፍተኛ ፍጥነት ከሚገኝ ቁልቁለት ከፍተኛ ልዩ ሃይልን ያሳያል። ያ ሃይል በስፋፊዎች፣ ጥምዞች ወይም እንቅፋቶች ላይ በፍጥነት ሊጠፋ ይችላል። ይህ ለቦታው ምክንያታዊ መሆኑን ያረጋግጡ።';
 // Weir Flow Simple
+$ec_lang['mtc_solve_for_y']='Q ከተሰጠ ጥልቀት y ፍታ';
+$ec_lang['mtc_solve_desc']='ከማስያ ቅጹ b, z<sub>1</sub>, z<sub>2</sub>, S እና n ን በመጠቀም፣ ለተሰጠው Q ጥልቀቱን ያገኛል።';
+$ec_lang['mtc_solver_no_solution']='በእነዚህ የቦዮ ግቤቶች ለተሰጠው Q መፍትሔ አልተገኘም።';
 $ec_lang['ws_main_menu']='ቀላል ዊር ፍሰት';
 $ec_lang['ws_main_title']='ነፃ ኦንላይን ቀላል ሰፊ-ጫፍ ዊር ፍሰት ካልኩሌተር';
 $ec_lang['ws_main_desc']='ቀላል ሰፊ-ጫፍ ዊር ፍሰት ካልኩሌተር';
