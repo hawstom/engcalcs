@@ -68,10 +68,10 @@ $ec_lang['index_title']='ماشین‌حساب‌های رایگان مهندس�
 $ec_lang['calc_set_units']='تنظیم واحدها:';
 $ec_lang['calc_defaults']='مقادیر پیش‌فرض';
 $ec_lang['calc_defaults_confirm']='بازگردانی ماشین‌حساب به مقادیر پیش‌فرض اصلی؟';
-$ec_lang['points_data_help']='(یا با استفاده از ناحیه داده کپی/پیست کنید)';
+$ec_lang['points_data_help']='(یا با استفاده از ناحیه داده کپی/چسباندن کنید)';
 $ec_lang['points_data_title']='داده‌های نقاط<br />(جداشده با کاما یا تب)';
 $ec_lang['points_data_copy']='کپی';
-$ec_lang['points_data_paste']='پیست';
+$ec_lang['points_data_paste']='چسباندن';
 $ec_lang['calc_inputs']='ورودی‌ها';
 $ec_lang['calc_results']='نتایج';
 $ec_lang['view_hide_line']='[پنهان کردن این خط]';
@@ -193,7 +193,7 @@ $ec_lang['mtc_side_slope_1']='شیب جانبی ۱، z<sub>1</sub> (افقی/ع�
 $ec_lang['mtc_side_slope_2']='شیب جانبی ۲، z<sub>2</sub> (افقی/عمودی)';
 $ec_lang['mtc_channel_slope']='شیب کانال، S';
 $ec_lang['mtc_flow_depth']='عمق جریان، y';
-$ec_lang['mtc_bend_angle']='<a target="_blank" href="riprap-bend-angle.png">زاویه خمش، β</a><span class="ec-help" title="برای تعیین اندازه ریپ‌رپ. برای مشاهده نمودار روی پیوند کلیک کنید."><span class="ec-tip">?</span></span>';
+$ec_lang['mtc_bend_angle']='<a target="_blank" href="riprap-bend-angle.png">زاویه خمش، β</a><span class="ec-help" title="برای تعیین اندازه سنگ‌چین. برای مشاهده نمودار روی پیوند کلیک کنید."><span class="ec-tip">?</span></span>';
 $ec_lang['mtc_sgrock']='<span class="ec-help" title="معمولاً &asymp; ۲.۶۵ برای سنگ خردشده">وزن مخصوص نسبی سنگ، sg <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_in']='اندازه طراحی سنگ، D<sub>50</sub>';
 $ec_lang['mtc_n_strickler']='n برای اندازه طراحی سنگ (روش Strickler)';

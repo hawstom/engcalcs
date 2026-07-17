@@ -80,7 +80,7 @@ $ec_lang['view_printable']='Версия за печат (презаредете
 $ec_lang['ec_name_label']='Запазете това изчисление:';
 $ec_lang['ec_name_placeholder']='Име';
 $ec_lang['ec_name_hint']='Запазва тези входни стойности в URL адреса за добавяне в отметки, извличане от история и споделяне';
-$ec_lang['calc_copy_link']='Копирай линк';
+$ec_lang['calc_copy_link']='Копирай връзка';
 $ec_lang['calc_copy_link_done']='Копирано!';
 $ec_lang['ec_related_calcs']='Свързани калкулатори:';
 // Darcy-Weisbach. See mphl_ for missing text.
@@ -188,12 +188,12 @@ $ec_lang['mphl_note_1']='<dl><dt>Този калкулатор не отчита
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Изчисления на трапецовидни канали по Манинг';
 $ec_lang['mtc_main_title']='Безплатен онлайн калкулатор за изчисления на трапецовидни канали по Манинг';
-$ec_lang['mtc_main_desc']='Формула на Манинг за равномерно движение в трапецовиден канал при зададени наклон и воден стълб';
+$ec_lang['mtc_main_desc']='Формула на Манинг за равномерно движение в трапецовиден канал при зададени наклон и дълбочина';
 $ec_lang['mtc_bottom_width']='Ширина на дъното, b';
 $ec_lang['mtc_side_slope_1']='Страничен откос 1, z<sub>1</sub> (хориз./верт.)';
 $ec_lang['mtc_side_slope_2']='Страничен откос 2, z<sub>2</sub> (хориз./верт.)';
 $ec_lang['mtc_channel_slope']='Наклон на канала, S';
-$ec_lang['mtc_flow_depth']='Воден стълб, y';
+$ec_lang['mtc_flow_depth']='Дълбочина, y';
 $ec_lang['mtc_bend_angle']='<a target="_blank" href="riprap-bend-angle.png">Ъгъл на завоя, β</a><span class="ec-help" title="За оразмеряване на каменната облицовка. Последвайте връзката за схема."><span class="ec-tip">?</span></span>';
 $ec_lang['mtc_sgrock']='<span class="ec-help" title="Обикновено &asymp; 2.65 за трошен камък">Относителна плътност на камъка, sg <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_in']='Проектен размер на камъните, D<sub>50</sub>';

@@ -35,7 +35,7 @@ $ec_lang['u_npm2']="N/m^2";
 $ec_lang['u_pa']="Pa";
 $ec_lang['u_psf']="psf";
 $ec_lang['u_psi']="psi";
-$ec_lang['u_s']="sec";
+$ec_lang['u_s']="sn";
 $ec_lang['u_lph']="L/hr";
 $ec_lang['u_gph']="gal/hr";
 $ec_lang['u_mmph']="mm/hr";
@@ -55,7 +55,7 @@ $ec_lang['u_ft2ps']='cfs/ft';
 // In page order for easiest maintenance.
 // Menu and General
 $ec_lang['menu_brand']='HawsEDC Hesap Makineleri';
-$ec_lang['menu_main_list']='Hesap makinası listesi';
+$ec_lang['menu_main_list']='Hesap makinesi listesi';
 $ec_lang['menu_main_hydraulics']='Hidrolik';
 $ec_lang['menu_main_language']='Dil';
 $ec_lang['menu_more']='Daha fazla';
@@ -120,7 +120,7 @@ $ec_lang['mi_groupRegion']='Bölge';
 $ec_lang['mi_station']='İst.';
 $ec_lang['mi_elevation']='Kot';
 $ec_lang['mi_d50in']='Kaplama<br />ortanca<br />taş<br />boyutu';
-$ec_lang['mi_n']='n<br />seg-<br />ment';
+$ec_lang['mi_n']='n<br />böl.';
 $ec_lang['mi_is_bank']='R<sub>h</sub>, Q<br />bölge<br />sınırı<br />(Kıyı)';
 $ec_lang['mi_tau']='Taban<br />kaym.<br />τ';
 $ec_lang['mi_t']='T';
@@ -218,7 +218,7 @@ $ec_lang['mtc_note_1']='<dl><dt>Otomatik taş boyutu ve pürüzlülük tasarım 
 $ec_lang['mtc_note_2_term']='Hız kontrolü';
 $ec_lang['mtc_note_2_def']='Yüksek hız, bu denli yüksek özgül enerji yaratan büyük bir kot düşüşü olduğunu gösterir. Bu enerji, genişlemelerde, dirseklerde veya engellerde hızla kaybolabilir. Bunun saha için makul olduğunu doğrulayın.';
 $ec_lang['mtc_solve_for_y']='Q verildiğinde derinlik y için çözüm';
-$ec_lang['mtc_solve_desc']='Hesap makinesi formundaki b, z<sub>1</sub>, z<sub>2</sub>, S ve n değerlerini kullanarak, verilen Q için derinliği bulur.';
+$ec_lang['mtc_solve_desc']='Hesaplayıcı formundaki b, z<sub>1</sub>, z<sub>2</sub>, S ve n değerlerini kullanarak, verilen Q için derinliği bulur.';
 $ec_lang['mtc_solver_no_solution']='Bu kanal girdileriyle verilen Q için çözüm bulunamadı.';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='Basit Savak Debisi';

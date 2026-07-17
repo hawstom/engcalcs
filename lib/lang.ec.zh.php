@@ -5,7 +5,7 @@
 // Units (alphabetical order)
 $ec_lang['u_depthFrac']="比例";
 $ec_lang['u_depthPercent']="%";
-$ec_lang['u_ft2']="ft^2";
+$ec_lang['u_ft2']="平方英尺";
 $ec_lang['u_ft3ps']="cfs";
 $ec_lang['u_ft']="英尺";
 $ec_lang['u_fth2o']="英尺水柱";
@@ -121,7 +121,7 @@ $ec_lang['mi_elevation']='高程';
 $ec_lang['mi_d50in']='护坡石材中值粒径';
 $ec_lang['mi_n']='n';
 $ec_lang['mi_is_bank']='R<sub>h</sub>、Q 分区边界（岸坡）';
-$ec_lang['mi_tau']='底部剪切力 &tau;';
+$ec_lang['mi_tau']='底部切应力 &tau;';
 $ec_lang['mi_t']='T';
 $ec_lang['mi_pw']='P<sub>w</sub>';
 $ec_lang['mi_a']='A';

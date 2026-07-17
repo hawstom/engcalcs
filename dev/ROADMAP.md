@@ -221,7 +221,7 @@ The rules, sequence, and QA chain for translation work are **not** restated here
 - **`CLAUDE.md` § "Translation Sprints"** — sprint mechanics, model policy, pre/post-sprint checklist.
 - **`dev/translation-execution-log.md`** — the full dated, category-by-category execution record.
 
-- 70|109| **Cross-language consistency audit (Opus, suite-wide).** Tom, 2026-07-14: wants a
+- 40|109| **Cross-language consistency audit (Opus, suite-wide) — PAUSED 2026-07-17 (cost).** Tom, 2026-07-14: wants a
   systematic pass, not just spot-checks reacting to a specific question — motivated directly by the
   Task 18 post-close finding that Burmese had a real embedded-English defect sitting undetected
   through a full translation sprint's own self-check and this session's own initial QA pass, only
@@ -237,8 +237,23 @@ The rules, sequence, and QA chain for translation work are **not** restated here
   a translation sprint — see `CLAUDE.md` § "Translation Sprints"). Model is Opus, not Sonnet (Fable
   is unavailable — see `feedback_fable_unavailable_use_opus`), consistent with prior holistic
   cross-language passes (Task 91's category re-translation quality bar, Task 93's glossary
-  reconciliation). Next step before launch: propose a staged plan (which categories first, what
-  the audit checklist actually checks for) and get Tom's authorization per stage.
+  reconciliation).
+  **Progress 2026-07-17:** stage 1 (category 6, 62 keys × 26 languages) and stage 2 (category 1,
+  63 keys × 26 languages) complete — 29 real defects found and fixed across both stages (10 in
+  stage 1, 19 in stage 2); the Burmese-style embedded-English fragment failure mode itself did not
+  recur, but a related pattern (transliterating "riprap" instead of translating it) surfaced
+  independently in ar/km/fa/sw/my, and several languages had genuine wrong-word/register-confusion
+  defects (sw "ukakamavu"=stiffness for roughness; he עיצוב "styling" vs תכן "design"; hr specific
+  gravity vs. specific weight). Full detail in `dev/translation-execution-log.md` ("Task 109 —
+  Cross-language consistency audit, stages 1–2").
+  **PAUSED 2026-07-17 (Tom): cost.** 52 Opus agents across two stages (26 languages × 2 categories,
+  plus a mid-run session-limit retry that re-ran 22 of them) is expensive for the defect yield —
+  real, but a low ratio of genuine fixes per agent-run. Stages 3–6 (categories 2–5: weirs &
+  orifices, pipe friction, irrigation & seepage, micro-hydro — category 6 already done as stage 1)
+  are deferred, not cancelled. Before resuming any future stage, reconsider whether the full
+  26-agent-per-category pattern is the right cost/yield shape (e.g. a cheaper sampling pass, or
+  fewer languages per category) rather than defaulting back to the same shape that was just judged
+  too expensive.
 
 ## AI Efficiency Scripting (Overhead)
 

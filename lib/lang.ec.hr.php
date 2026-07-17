@@ -192,7 +192,7 @@ $ec_lang['mtc_side_slope_2']='Nagib bočne strane 2, z<sub>2</sub> (horiz./vert.
 $ec_lang['mtc_channel_slope']='Nagib kanala, S';
 $ec_lang['mtc_flow_depth']='Dubina tečenja, y';
 $ec_lang['mtc_bend_angle']='<a target="_blank" href="riprap-bend-angle.png">Kut zavoja, β</a><span class="ec-help" title="Za dimenzioniranje kamenitog nasipa. Slijedite poveznicu za shemu."><span class="ec-tip">?</span></span>';
-$ec_lang['mtc_sgrock']='<span class="ec-help" title="Tipično &asymp; 2,65 za drobljeni kamen">Specifična težina kamena, sg <span class="ec-tip">?</span></span>';
+$ec_lang['mtc_sgrock']='<span class="ec-help" title="Tipično &asymp; 2,65 za drobljeni kamen">Relativna gustoća kamena, sg <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_in']='Projektna veličina kamena, D<sub>50</sub>';
 $ec_lang['mtc_n_strickler']='n za projektnu veličinu kamena prema Strickleru';
 $ec_lang['mtc_n_blodgett']='n za projektnu veličinu kamena prema Blodgettu';

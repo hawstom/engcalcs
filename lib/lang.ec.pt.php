@@ -6,17 +6,17 @@
 // Necessary for calculator units selectors
 $ec_lang['u_depthFrac']="fração";
 $ec_lang['u_depthPercent']="%";
-$ec_lang['u_ft2']="pés^2";
+$ec_lang['u_ft2']="ft^2";
 $ec_lang['u_ft3ps']="cfs";
-$ec_lang['u_ft']="pés";
+$ec_lang['u_ft']="ft";
 $ec_lang['u_fth2o']="ft H2O";
 $ec_lang['u_ftps']="ft/sec";
 $ec_lang['u_gpm']="gpm";
 $ec_lang['u_gradePercent']='% incl./compr.';
 $ec_lang['u_grade']="incl./compr.";
-$ec_lang['u_in2']="pol. quad.";
+$ec_lang['u_in2']="sq. in.";
 $ec_lang['u_inh2o']="in H2O";
-$ec_lang['u_in']="pol.";
+$ec_lang['u_in']="in";
 $ec_lang['u_knpcm2']="kN/cm^2";
 $ec_lang['u_knpm2']="kN/m^2";
 $ec_lang['u_kpa']="kPa";
@@ -185,9 +185,9 @@ $ec_lang['mphl_egl_2']='LE a montante';
 $ec_lang['mphl_hgl_egl_tip']='Pode não ser válido se a tubulação estiver elevada. Veja as notas.';
 $ec_lang['mphl_note_1']='<dl><dt>Esta calculadora não considera a elevação da tubulação.</dt><dd>Se a LP ficar abaixo do topo da tubulação em algum ponto, este cálculo pode não ser válido.</dd><dt>Para uma condição de entrada aberta (bueiro), é necessário verificar as condições de controle de entrada.</dt><dd>1. A LP a montante deve estar acima da elevação do escoamento à profundidade normal a montante (e acima da tubulação!).</dd><dd>2. O nível de água a montante de um bueiro é melhor representado pela LE a montante do que pela LP a montante.</dd><dd>3. Veja <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">meu tutorial de 2 minutos</a> para cálculos simples de nível de água em bueiros usando HY-8.</dd>';
 // Manning Trapezoid. See mpf_ for missing text.
-$ec_lang['mtc_menu']='Canal trapecial de acordo com Manning';
-$ec_lang['mtc_main_title']='Calculadora gratuita online da fórmula de Manning para canal trapecial';
-$ec_lang['mtc_main_desc']='Escoamento uniforme de Manning em canal trapecial à declividade e profundidade dadas';
+$ec_lang['mtc_menu']='Canal trapezoidal de acordo com Manning';
+$ec_lang['mtc_main_title']='Calculadora gratuita online da fórmula de Manning para canal trapezoidal';
+$ec_lang['mtc_main_desc']='Escoamento uniforme de Manning em canal trapezoidal à declividade e profundidade dadas';
 $ec_lang['mtc_bottom_width']='Largura da base, b';
 $ec_lang['mtc_side_slope_1']='Declividade do lado 1, z<sub>1</sub> (horiz./vert.)';
 $ec_lang['mtc_side_slope_2']='Declividade do lado 2, z<sub>2</sub> (horiz./vert.)';

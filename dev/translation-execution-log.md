@@ -1510,3 +1510,49 @@ if a future need surfaces it.
 
 **QA:** `glossary.json` re-validated as parseable JSON after edits (`meta.version` 1.5→1.6). No
 `lib/lang.ec.*.php` files changed — this was a glossary-metadata-only pass.
+
+## Task 109 — Cross-language consistency audit, stages 1–2 (2026-07-17)
+
+**Stage 1 (category 6: `u_`/`calc_`/`menu_`/`points_`, 62 keys × 26 languages) — DONE.** Piloted the
+audit checklist (embedded-source fragments, intra-file terminology drift, tone/register drift) on
+the smallest category first, per Tom's authorization. Result: the Burmese-style embedded-English
+failure mode did **not** recur in any of the 26 languages, including Burmese itself — a real negative
+result, not just an absence of looking. Found and fixed 10 concrete defects (ru `u_gpm` mixed-script
+Latin-in-Cyrillic; sr `menu_more` stray Latin in all-Cyrillic file; sw `menu_main_hydraulics`="Majimajii"
+wrong word; tr `menu_main_list` spelling drift; id `u_mld` real unit error (day→hour); es `calc_inputs`
+wrong sense; fa `points_data_paste`/`_help` "پیست" transliteration; bg `calc_copy_link` term drift; fr
+`calc_defaults_confirm` calculatrice/calculateur drift; ro `calc_set_units` grammar/diacritic/register).
+Also normalized a widespread minor pattern (~15 languages) where per-hour unit tokens were
+inconsistently localized within their own file (de/it/es/pt/am/hi/ru/tr/zh/ar/he/ur). All touched
+files re-verified `php -l` clean.
+
+**Stage 2 (category 1: `mtc_`/`mi_`, 63 keys × 26 languages) — DONE.** Larger, more technical category
+(Manning's n, hydraulic radius, D50 rock sizing, shear stress, water-surface profile terms). First
+launch hit a platform-wide session-limit error on 22 of 26 agents before any file edit landed
+(verified no partial edits — read-only audits, nothing to lose); waited out the reset and relaunched
+just the 22 failures per the session-limit retry procedure. Found and fixed 19 real defects across
+17 languages: am (rock-lining "lining" mistranslated as "line" in 3 keys); ar (riprap transliteration,
+`mi_station` wrong sense, tip-glyph convention); bn (`mi_tau` shear loanword drift); de (Radioknopf vs.
+Option drift, Design vs. Bemessung loanword); bg (воден стълб vs. дълбочина for flow depth, 2 keys);
+hr (`mtc_sgrock` specific gravity mistranslated as specific weight); pt (trapecial vs. trapezoidal
+identity-string split, 3 keys); it (flusso vs. portata for discharge, 2 keys); cs (kalkulačky vs.
+kalkulátor drift); km (riprap transliteration); zh (`mi_tau` shear force vs. shear stress); fa (riprap
+transliteration); sr (Manning script-mixing, проток/протицај drift ×2, нагиб/пад slope-term split);
+sw (roughness mistranslated "ukakamavu"=stiffness in 2 keys — same wrong-word failure class as
+stage 1's "Majimajii" — plus riprap transliteration); tr (`mi_n` embedded English "segment" fragment,
+Hesaplayıcı/Hesap makinesi drift); ru (`mtc_blodgett_v_bathurst` Latin "vs." in Cyrillic heading); ps
+(`mi_station` opaque transliteration, یکسان/یکنواخت drift, garbled `mtc_note_2_def` sentence); he
+(עיצוב "styling" vs. תכן "design" register confusion, 6 keys); my (riprap transliteration, ချောင်းကြောင်း
+vs. မြောင်းကြောင်း channel-term drift, garbled `mtc_note_2_def` "specific energy" sentence); ur
+(کیلکولیٹر/حاسبہ and چینل/نالہ drift, 5 tip-glyph convention fixes). ro, id, fr, hi, uk came back
+clean (in-scope); French and Hindi each flagged real but **out-of-scope** cross-category drift
+(calculatrice/calculateur pervasive elsewhere in fr.php; channel/slope/specific-gravity terms differ
+between category 1 and rc_/cs_ in hi.php) — logged here, not fixed, since fixing them means editing
+keys outside category 1's scope. All touched files re-verified `php -l` clean.
+
+**Recurring pattern across both stages:** the riprap-transliteration failure (ar/km/fa/sw/my) is the
+same defect class the 2026-07-13 Rock Chute audit fixed for a different, newer calculator (rc_) —
+confirms this is a systemic transliteration risk for this specific term, not a one-off.
+
+**Next:** stage 3 (category 2: weirs & orifices) pending Tom's authorization, per the same
+propose→confirm→launch gate as stages 1–2.

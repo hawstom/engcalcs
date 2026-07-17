@@ -217,7 +217,7 @@ $ec_lang['mtc_note_1']='<dl><dt>Automatická iterace návrhu kamene a drsnosti</
 $ec_lang['mtc_note_2_term']='Kontrola rychlosti';
 $ec_lang['mtc_note_2_def']='Vysoká rychlost znamená vysokou specifickou energii z dostupného spádu. Tato energie může být rychle ztracena na rozšířeních, obloucích nebo překážkách. Ověřte, zda je to pro danou lokalitu přiměřené.';
 $ec_lang['mtc_solve_for_y']='Výpočet hloubky, y, pro dané Q';
-$ec_lang['mtc_solve_desc']='Pomocí hodnot b, z<sub>1</sub>, z<sub>2</sub>, S a n z formuláře kalkulačky najde hloubku pro dané Q.';
+$ec_lang['mtc_solve_desc']='Pomocí hodnot b, z<sub>1</sub>, z<sub>2</sub>, S a n z formuláře kalkulátoru najde hloubku pro dané Q.';
 $ec_lang['mtc_solver_no_solution']='Pro dané Q nebylo se zadanými parametry koryta nalezeno žádné řešení.';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='Jednoduchý přepad';

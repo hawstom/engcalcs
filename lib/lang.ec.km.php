@@ -193,7 +193,7 @@ $ec_lang['mtc_side_slope_1']='ជម្រាលចំហៀង 1, z<sub>1</sub>
 $ec_lang['mtc_side_slope_2']='ជម្រាលចំហៀង 2, z<sub>2</sub> (ផ្ដេក/បញ្ឈរ)';
 $ec_lang['mtc_channel_slope']='ជម្រាលប្រឡាយ, S';
 $ec_lang['mtc_flow_depth']='ជម្រៅហូរ, y';
-$ec_lang['mtc_bend_angle']='<a target="_blank" href="riprap-bend-angle.png">មុំបត់, β</a><span class="ec-help" title="សម្រាប់ការកំណត់ទំហំ riprap។ តាមតំណភ្ជាប់សម្រាប់គំនូសតាង។"><span class="ec-tip">?</span></span>';
+$ec_lang['mtc_bend_angle']='<a target="_blank" href="riprap-bend-angle.png">មុំបត់, β</a><span class="ec-help" title="សម្រាប់ការកំណត់ទំហំថ្មការពារ។ តាមតំណភ្ជាប់សម្រាប់គំនូសតាង។"><span class="ec-tip">?</span></span>';
 $ec_lang['mtc_sgrock']='<span class="ec-help" title="ជាធម្មតា &asymp; 2.65 សម្រាប់ថ្មកិន">ទម្ងន់ជាក់លាក់ថ្ម, sg <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_in']='ទំហំថ្មរចនា, D<sub>50</sub>';
 $ec_lang['mtc_n_strickler']='n សម្រាប់ទំហំថ្មរចនា តាម Strickler';
