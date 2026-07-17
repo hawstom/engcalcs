@@ -80,9 +80,7 @@ $ec_lang['ec_name_label']='احفظ هذا الحساب:';
 $ec_lang['ec_name_placeholder']='الاسم';
 $ec_lang['ec_name_hint']='يحفظ المدخلات في عنوان URL للإشارات المرجعية واسترجاع السجل والمشاركة';
 $ec_lang['calc_copy_link']='نسخ الرابط';
-$ec_lang_intent['calc_copy_link']='';
 $ec_lang['calc_copy_link_done']='تم النسخ!';
-$ec_lang_intent['calc_copy_link_done']='';
 $ec_lang['ec_related_calcs']='حاسبات ذات صلة:';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='فاقد الضغط في الأنابيب — داركي-وايسباخ';
@@ -92,9 +90,7 @@ $ec_lang['dw_roughness']='e';
 $ec_lang['dw_roughness_tip']='ارتفاع الخشونة المطلقة، e، لجدار الأنبوب. قيم نموذجية: الفولاذ (جديد) 0.046 مم، الفولاذ (مستعمل) 0.15 مم، HDPE 0.003 مم، PVC/uPVC 0.0015 مم، الخرسانة 0.3–3 مم.';
 $ec_lang['dw_kinematic_viscosity']='<span class="ec-help" title="1×10⁻⁶ m²/s للماء النظيف عند 20°C">اللزوجة الحركية، &nu; <span class="ec-tip">?</span></span>';
 $ec_lang['dw_kinematic_viscosity_short']='اللزوجة الحركية، &nu;';
-$ec_lang_intent['dw_kinematic_viscosity_short']='';
 $ec_lang['dw_kinematic_viscosity_tip']='1×10⁻⁶ m²/s للماء النظيف عند 20°C';
-$ec_lang_intent['dw_kinematic_viscosity_tip']='';
 $ec_lang['dw_reynolds_number']='رقم رينولدز، Re';
 $ec_lang['dw_flow_regime']='نظام الجريان';
 $ec_lang['dw_regime_laminar']='صفحي';
@@ -166,9 +162,7 @@ $ec_lang['mpf_solve_for_dd0']='احسب y/d<sub>0</sub> لقيمة Q معطاة'
 $ec_lang['mpf_solve_desc']='باستخدام d<sub>0</sub> وn وS<sub>f</sub> من نموذج الحاسبة، يجد أدنى y/d<sub>0</sub> لقيمة Q معطاة.';
 $ec_lang['mpf_solve_button']='احسب';
 $ec_lang['mpf_solver_enter_positive_q']='أدخل قيمة موجبة لـ Q المستهدف.';
-$ec_lang_intent['mpf_solver_enter_positive_q']='';
 $ec_lang['mpf_solver_no_solution']='لا يوجد حل: تتجاوز Q سعة الأنبوب عند y/d0 = 93.8% (Qmax = {qmax} بالوحدات المختارة).';
-$ec_lang_intent['mpf_solver_no_solution']='';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='فاقد الضغط في الأنابيب — مانينغ';
 $ec_lang['mphl_main_title']='حاسبة فاقد الضغط في الأنابيب بمانينغ المجانية عبر الإنترنت';

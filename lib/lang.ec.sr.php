@@ -88,9 +88,7 @@ $ec_lang['dw_roughness']='e';
 $ec_lang['dw_roughness_tip']='Апсолутна храпавост зида цеви, e. Типичне вредности: челик (нов) 0,046 мм, челик (коришћен) 0,15 мм, HDPE 0,003 мм, PVC/uPVC 0,0015 мм, бетон 0,3–3 мм.';
 $ec_lang['dw_kinematic_viscosity']='<span class="ec-help" title="1×10⁻⁶ m²/s за чисту воду на 20°C">Кинематичка вискозност, &nu; <span class="ec-tip">?</span></span>';
 $ec_lang['dw_kinematic_viscosity_short']='Кинематичка вискозност, &nu;';
-$ec_lang_intent['dw_kinematic_viscosity_short']='';
 $ec_lang['dw_kinematic_viscosity_tip']='1×10⁻⁶ m²/s за чисту воду на 20°C';
-$ec_lang_intent['dw_kinematic_viscosity_tip']='';
 $ec_lang['dw_reynolds_number']='Рејнолдсов број, Re';
 $ec_lang['dw_flow_regime']='Режим течења';
 $ec_lang['dw_regime_laminar']='ламинарно';
@@ -162,9 +160,7 @@ $ec_lang['mpf_solve_for_dd0']='Израчунај y/d<sub>0</sub> за дато 
 $ec_lang['mpf_solve_desc']='Користећи d<sub>0</sub>, n и S<sub>f</sub> из формулара калкулатора, проналази најмањи y/d<sub>0</sub> за дато Q.';
 $ec_lang['mpf_solve_button']='Израчунај';
 $ec_lang['mpf_solver_enter_positive_q']='Унесите позитиван циљани Q.';
-$ec_lang_intent['mpf_solver_enter_positive_q']='';
 $ec_lang['mpf_solver_no_solution']='Нема решења: Q премашује капацитет цеви при y/d0 = 93.8% (Qmax = {qmax} у изабраним јединицама).';
-$ec_lang_intent['mpf_solver_no_solution']='';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Губитак напора у цевима по Manningу';
 $ec_lang['mphl_main_title']='Бесплатни онлајн калкулатор губитка напора у цевима по Manningу';

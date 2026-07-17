@@ -89,9 +89,7 @@ $ec_lang['dw_roughness']='e';
 $ec_lang['dw_roughness_tip']='Абсолютная высота шероховатости стенки трубы, e. Типичные значения: сталь (новая) 0,046 мм, сталь (бывшая в употреблении) 0,15 мм, HDPE 0,003 мм, PVC/uPVC 0,0015 мм, бетон 0,3–3 мм.';
 $ec_lang['dw_kinematic_viscosity']='<span class="ec-help" title="1×10⁻⁶ м²/с для чистой воды при 20°C">Кинематическая вязкость, &nu; <span class="ec-tip">?</span></span>';
 $ec_lang['dw_kinematic_viscosity_short']='Кинематическая вязкость, &nu;';
-$ec_lang_intent['dw_kinematic_viscosity_short']='';
 $ec_lang['dw_kinematic_viscosity_tip']='1×10⁻⁶ м²/с для чистой воды при 20°C';
-$ec_lang_intent['dw_kinematic_viscosity_tip']='';
 $ec_lang['dw_reynolds_number']='Число Рейнольдса, Re';
 $ec_lang['dw_flow_regime']='Режим течения';
 $ec_lang['dw_regime_laminar']='ламинарный';
@@ -163,9 +161,7 @@ $ec_lang['mpf_solve_for_dd0']='Найти y/d<sub>0</sub> при заданно�
 $ec_lang['mpf_solve_desc']='Используя d<sub>0</sub>, n и S<sub>f</sub> из формы, находит наименьшее y/d<sub>0</sub> для заданного Q.';
 $ec_lang['mpf_solve_button']='Вычислить';
 $ec_lang['mpf_solver_enter_positive_q']='Введите положительное значение целевого Q.';
-$ec_lang_intent['mpf_solver_enter_positive_q']='';
 $ec_lang['mpf_solver_no_solution']='Решение отсутствует: Q превышает пропускную способность трубы при y/d0 = 93.8% (Qmax = {qmax} в выбранных единицах измерения).';
-$ec_lang_intent['mpf_solver_no_solution']='';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Потери напора в трубе по Маннингу';
 $ec_lang['mphl_main_title']='Бесплатный онлайн-калькулятор потерь напора в трубе по Маннингу';

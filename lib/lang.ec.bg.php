@@ -68,7 +68,6 @@ $ec_lang['index_title']='Безплатни онлайн инженерни ка
 $ec_lang['calc_set_units']='Изберете мерни единици:';
 $ec_lang['calc_defaults']='Стандартни стойности';
 $ec_lang['calc_defaults_confirm']='Нулирай ли калкулатора до първоначалните стойности?';
-$ec_lang_intent['calc_defaults_confirm']='';
 $ec_lang['points_data_help']='(или Копиране/Поставяне чрез областта с данни)';
 $ec_lang['points_data_title']='Данни за точки<br />(разделени със запетая или табулация)';
 $ec_lang['points_data_copy']='Копирай';
@@ -91,9 +90,7 @@ $ec_lang['dw_roughness']='e';
 $ec_lang['dw_roughness_tip']='Абсолютна грапавост на стената на тръбата, e. Типични стойности: стомана (нова) 0,046 мм, стомана (употребявана) 0,15 мм, HDPE 0,003 мм, PVC/uPVC 0,0015 мм, бетон 0,3–3 мм.';
 $ec_lang['dw_kinematic_viscosity']='<span class="ec-help" title="1×10⁻⁶ m²/s за чиста вода при 20°C">Кинематична вискозност, &nu; <span class="ec-tip">?</span></span>';
 $ec_lang['dw_kinematic_viscosity_short']='Кинематична вискозност, &nu;';
-$ec_lang_intent['dw_kinematic_viscosity_short']='';
 $ec_lang['dw_kinematic_viscosity_tip']='1×10⁻⁶ m²/s за чиста вода при 20°C';
-$ec_lang_intent['dw_kinematic_viscosity_tip']='';
 $ec_lang['dw_reynolds_number']='Число на Рейнолдс, Re';
 $ec_lang['dw_flow_regime']='Режим на течението';
 $ec_lang['dw_regime_laminar']='ламинарен';
@@ -165,9 +162,7 @@ $ec_lang['mpf_solve_for_dd0']='Намерете y/d<sub>0</sub> при даде�
 $ec_lang['mpf_solve_desc']='Използвайки d<sub>0</sub>, n и S<sub>f</sub> от формуляра на калкулатора, намира най-ниското y/d<sub>0</sub> за даденото Q.';
 $ec_lang['mpf_solve_button']='Изчисли';
 $ec_lang['mpf_solver_enter_positive_q']='Въведете положителна целева стойност на Q.';
-$ec_lang_intent['mpf_solver_enter_positive_q']='';
 $ec_lang['mpf_solver_no_solution']='Няма решение: Q надвишава капацитета на тръбата при y/d0 = 93.8% (Qmax = {qmax} в избраните мерни единици).';
-$ec_lang_intent['mpf_solver_no_solution']='';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Загуба на напор в тръбопровод по Манинг';
 $ec_lang['mphl_main_title']='Безплатен онлайн калкулатор за загуба на напор в тръбопровод по Манинг';

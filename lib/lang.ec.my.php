@@ -90,9 +90,7 @@ $ec_lang['dw_roughness']='e';
 $ec_lang['dw_roughness_tip']='ပိုက်နံရံ၏ အကြမ်းတမ်းအမြင့်, e။ ပုံမှန်တန်ဖိုးများ: သံမဏိ (အသစ်) 0.046 mm, သံမဏိ (အသုံးပြုပြီး) 0.15 mm, HDPE 0.003 mm, PVC/uPVC 0.0015 mm, ကွန်ကရစ် 0.3–3 mm။';
 $ec_lang['dw_kinematic_viscosity']='<span class="ec-help" title="သန့်ရှင်းသောရေအတွက် 20°C တွင် 1×10⁻⁶ m²/s ဖြစ်သည်">ရွေ့လျားမှုဆိုင်ရာ စေးကပ်မှု, &nu; <span class="ec-tip">?</span></span>';
 $ec_lang['dw_kinematic_viscosity_short']='ရွေ့လျားမှုဆိုင်ရာ စေးကပ်မှု, &nu;';
-$ec_lang_intent['dw_kinematic_viscosity_short']='';
 $ec_lang['dw_kinematic_viscosity_tip']='သန့်ရှင်းသောရေအတွက် 20°C တွင် 1×10⁻⁶ m²/s ဖြစ်သည်';
-$ec_lang_intent['dw_kinematic_viscosity_tip']='';
 $ec_lang['dw_reynolds_number']='Reynolds ကိန်း, Re';
 
 $ec_lang['dw_flow_regime']='စီးဆင်းမှုပုံစံ';
@@ -165,9 +163,7 @@ $ec_lang['mpf_solve_for_dd0']='Q ပေးချက်မှ y/d<sub>0</sub> ဖ
 $ec_lang['mpf_solve_desc']='တွက်ချက်မှုကိရိယာပုံစံမှ d<sub>0</sub>, n, နှင့် S<sub>f</sub> ကို အသုံးပြု၍ သတ်မှတ် Q အတွက် အနိမ့်ဆုံး y/d<sub>0</sub> ကို ရှာဖွေသည်။';
 $ec_lang['mpf_solve_button']='ဖြေရှင်းရန်';
 $ec_lang['mpf_solver_enter_positive_q']='အသုံးပြုလိုသော Q တန်ဖိုးကို အပြုသဘောဂဏန်းဖြင့် ထည့်ပါ။';
-$ec_lang_intent['mpf_solver_enter_positive_q']='';
 $ec_lang['mpf_solver_no_solution']='အဖြေမရှိပါ: y/d0 = 93.8% တွင် Q သည် ပိုက်၏ စွမ်းဆောင်ရည်ကို ကျော်လွန်နေသည် (Qmax = {qmax}, ရွေးချယ်ထားသော ယူနစ်များဖြင့်)။';
-$ec_lang_intent['mpf_solver_no_solution']='';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Manning သွတ်ပိုက် ဖိမြင့်ဆင့်ဆုံးရှုံးမှု';
 $ec_lang['mphl_main_title']='အခမဲ့ အွန်လိုင်း Manning သွတ်ပိုက် ဖိမြင့်ဆင့်ဆုံးရှုံးမှု တွက်ချက်မှုကိရိယာ';

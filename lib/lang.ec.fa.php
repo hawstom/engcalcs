@@ -90,9 +90,7 @@ $ec_lang['dw_roughness']='e';
 $ec_lang['dw_roughness_tip']='ارتفاع زبری مطلق، e، جداره لوله. مقادیر معمول: فولاد (نو) 0.046 میلی‌متر، فولاد (کارکرده) 0.15 میلی‌متر، HDPE 0.003 میلی‌متر، PVC/uPVC 0.0015 میلی‌متر، بتن 0.3–3 میلی‌متر.';
 $ec_lang['dw_kinematic_viscosity']='<span class="ec-help" title="1×10⁻⁶ m²/s برای آب تمیز در 20°C">ویسکوزیته سینماتیک، &nu; <span class="ec-tip">?</span></span>';
 $ec_lang['dw_kinematic_viscosity_short']='ویسکوزیته سینماتیک، &nu;';
-$ec_lang_intent['dw_kinematic_viscosity_short']='';
 $ec_lang['dw_kinematic_viscosity_tip']='1×10⁻⁶ m²/s برای آب تمیز در 20°C';
-$ec_lang_intent['dw_kinematic_viscosity_tip']='';
 $ec_lang['dw_reynolds_number']='عدد رینولدز، Re';
 $ec_lang['dw_flow_regime']='رژیم جریان';
 $ec_lang['dw_regime_laminar']='آرام';
@@ -164,9 +162,7 @@ $ec_lang['mpf_solve_for_dd0']='محاسبه y/d<sub>0</sub> برای Q مشخص'
 $ec_lang['mpf_solve_desc']='با استفاده از d<sub>0</sub>، n و S<sub>f</sub> از فرم ماشین‌حساب، کمترین مقدار y/d<sub>0</sub> را برای Q مشخص پیدا می‌کند.';
 $ec_lang['mpf_solve_button']='محاسبه';
 $ec_lang['mpf_solver_enter_positive_q']='یک Q هدف مثبت وارد کنید.';
-$ec_lang_intent['mpf_solver_enter_positive_q']='';
 $ec_lang['mpf_solver_no_solution']='راه‌حلی وجود ندارد: Q از ظرفیت لوله در y/d0 = 93.8% بیشتر است (Qmax = {qmax} در واحدهای انتخابی).';
-$ec_lang_intent['mpf_solver_no_solution']='';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='افت هد لوله Manning';
 $ec_lang['mphl_main_title']='ماشین‌حساب رایگان آنلاین افت هد لوله Manning';

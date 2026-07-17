@@ -90,9 +90,7 @@ $ec_lang['dw_roughness']='e';
 $ec_lang['dw_roughness_tip']='د پایپ دیوال مطلق خشونت لوړوالی، e. عادي ارزښتونه: فولاد (نوی) 0.046 mm، فولاد (کارول شوی) 0.15 mm، HDPE 0.003 mm، PVC/uPVC 0.0015 mm، کانکریټ 0.3–3 mm.';
 $ec_lang['dw_kinematic_viscosity']='<span class="ec-help" title="د پاکو اوبو لپاره 1×10⁻⁶ m²/s په 20°C کې">د حرکتي ویسکوزیته، &nu; <span class="ec-tip">?</span></span>';
 $ec_lang['dw_kinematic_viscosity_short']='د حرکتي ویسکوزیته، &nu;';
-$ec_lang_intent['dw_kinematic_viscosity_short']='';
 $ec_lang['dw_kinematic_viscosity_tip']='د پاکو اوبو لپاره 1×10⁻⁶ m²/s په 20°C کې';
-$ec_lang_intent['dw_kinematic_viscosity_tip']='';
 $ec_lang['dw_reynolds_number']='د Reynolds عدد، Re';
 $ec_lang['dw_flow_regime']='د بهاو رژیم';
 $ec_lang['dw_regime_laminar']='لامینار';
@@ -164,9 +162,7 @@ $ec_lang['mpf_solve_for_dd0']='د ورکړل شوي Q لپاره y/d<sub>0</sub>
 $ec_lang['mpf_solve_desc']='د محاسبې فورمه د d<sub>0</sub>، n، او S<sub>f</sub> کارولو سره، د ورکړل شوي Q لپاره ټیټ ترین y/d<sub>0</sub> پیدا کوي.';
 $ec_lang['mpf_solve_button']='حل کړئ';
 $ec_lang['mpf_solver_enter_positive_q']='یو مثبت موخه‌یز Q ولیکئ.';
-$ec_lang_intent['mpf_solver_enter_positive_q']='';
 $ec_lang['mpf_solver_no_solution']='حل نشته: Q په y/d0 = 93.8% کې د پایپ له ظرفیت څخه زیات دی (Qmax = {qmax} په ټاکل شویو واحدونو کې).';
-$ec_lang_intent['mpf_solver_no_solution']='';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Manning د پایپ سر ضیاع';
 $ec_lang['mphl_main_title']='وړیا آنلاین Manning د پایپ سر ضیاع محاسبه';

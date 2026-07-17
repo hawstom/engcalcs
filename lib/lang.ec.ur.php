@@ -90,9 +90,7 @@ $ec_lang['dw_roughness']='e';
 $ec_lang['dw_roughness_tip']='پائپ کی دیوار کی مطلق کھردری اونچائی، e۔ عام قدریں: فولاد (نیا) 0.046 ملی میٹر، فولاد (استعمال شدہ) 0.15 ملی میٹر، HDPE 0.003 ملی میٹر، PVC/uPVC 0.0015 ملی میٹر، کنکریٹ 0.3–3 ملی میٹر۔';
 $ec_lang['dw_kinematic_viscosity']='<span class="ec-help" title="صاف پانی کے لیے 20°C پر 1×10⁻⁶ m²/s">حرکیاتی چپچپاہٹ، &nu; <span class="ec-tip">?</span></span>';
 $ec_lang['dw_kinematic_viscosity_short']='حرکیاتی چپچپاہٹ، &nu;';
-$ec_lang_intent['dw_kinematic_viscosity_short']='';
 $ec_lang['dw_kinematic_viscosity_tip']='صاف پانی کے لیے 20°C پر 1×10⁻⁶ m²/s';
-$ec_lang_intent['dw_kinematic_viscosity_tip']='';
 $ec_lang['dw_reynolds_number']='رینولڈز عدد، Re';
 $ec_lang['dw_flow_regime']='بہاؤ کی نوع';
 $ec_lang['dw_regime_laminar']='ورقی';
@@ -164,9 +162,7 @@ $ec_lang['mpf_solve_for_dd0']='دیے گئے Q کے لیے y/d<sub>0</sub> حل 
 $ec_lang['mpf_solve_desc']='حاسبہ فارم سے d<sub>0</sub>، n اور S<sub>f</sub> استعمال کرتے ہوئے دیے گئے Q کے لیے کم سے کم y/d<sub>0</sub> تلاش کرتا ہے۔';
 $ec_lang['mpf_solve_button']='حل کریں';
 $ec_lang['mpf_solver_enter_positive_q']='براہ کرم مثبت ہدف Q درج کریں۔';
-$ec_lang_intent['mpf_solver_enter_positive_q']='';
 $ec_lang['mpf_solver_no_solution']='کوئی حل نہیں: y/d0 = 93.8% پر Q پائپ کی گنجائش سے تجاوز کر جاتا ہے (منتخب اکائیوں میں Qmax = {qmax})۔';
-$ec_lang_intent['mpf_solver_no_solution']='';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='مانینگ پائپ دباؤ نقصان';
 $ec_lang['mphl_main_title']='مفت آنلائن مانینگ پائپ دباؤ نقصان حاسبہ';

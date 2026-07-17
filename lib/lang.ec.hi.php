@@ -90,9 +90,7 @@ $ec_lang['dw_roughness']='e';
 $ec_lang['dw_roughness_tip']='पाइप की दीवार की निरपेक्ष खुरदरापन ऊँचाई, e। विशिष्ट मान: इस्पात (नया) 0.046 mm, इस्पात (पुराना) 0.15 mm, HDPE 0.003 mm, PVC/uPVC 0.0015 mm, कंक्रीट 0.3–3 mm।';
 $ec_lang['dw_kinematic_viscosity']='<span class="ec-help" title="20°C पर स्वच्छ जल के लिए 1×10⁻⁶ मी²/से">गतिक श्यानता, &nu; <span class="ec-tip">?</span></span>';
 $ec_lang['dw_kinematic_viscosity_short']='गतिक श्यानता, &nu;';
-$ec_lang_intent['dw_kinematic_viscosity_short']='';
 $ec_lang['dw_kinematic_viscosity_tip']='20°C पर स्वच्छ जल के लिए 1×10⁻⁶ मी²/से';
-$ec_lang_intent['dw_kinematic_viscosity_tip']='';
 $ec_lang['dw_reynolds_number']='रेनॉल्ड्स संख्या, Re';
 $ec_lang['dw_flow_regime']='प्रवाह व्यवस्था';
 $ec_lang['dw_regime_laminar']='स्तरीय';
@@ -164,9 +162,7 @@ $ec_lang['mpf_solve_for_dd0']='दिए गए Q के लिए y/d<sub>0</su
 $ec_lang['mpf_solve_desc']='कैलकुलेटर फ़ॉर्म से d<sub>0</sub>, n और S<sub>f</sub> का उपयोग करके दिए गए Q के लिए न्यूनतम y/d<sub>0</sub> खोजता है।';
 $ec_lang['mpf_solve_button']='हल करें';
 $ec_lang['mpf_solver_enter_positive_q']='एक धनात्मक लक्ष्य Q दर्ज करें।';
-$ec_lang_intent['mpf_solver_enter_positive_q']='';
 $ec_lang['mpf_solver_no_solution']='कोई हल नहीं: y/d0 = 93.8% पर Q पाइप की क्षमता से अधिक है (चयनित इकाइयों में Qmax = {qmax})।';
-$ec_lang_intent['mpf_solver_no_solution']='';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='मैनिंग पाइप शीर्ष हानि';
 $ec_lang['mphl_main_title']='मुफ़्त ऑनलाइन मैनिंग पाइप शीर्ष हानि कैलकुलेटर';

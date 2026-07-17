@@ -89,9 +89,7 @@ $ec_lang['dw_roughness']='e';
 $ec_lang['dw_roughness_tip']='পাইপের দেয়ালের পরম রুক্ষতার উচ্চতা, e। সাধারণ মান: ইস্পাত (নতুন) 0.046 mm, ইস্পাত (ব্যবহৃত) 0.15 mm, HDPE 0.003 mm, PVC/uPVC 0.0015 mm, কংক্রিট 0.3–3 mm।';
 $ec_lang['dw_kinematic_viscosity']='<span class="ec-help" title="1×10⁻⁶ m²/s, ২০°সে তাপমাত্রায় বিশুদ্ধ পানির জন্য">গতিগত সান্দ্রতা, &nu; <span class="ec-tip">?</span></span>';
 $ec_lang['dw_kinematic_viscosity_short']='গতিগত সান্দ্রতা, &nu;';
-$ec_lang_intent['dw_kinematic_viscosity_short']='';
 $ec_lang['dw_kinematic_viscosity_tip']='1×10⁻⁶ m²/s, ২০°সে তাপমাত্রায় বিশুদ্ধ পানির জন্য';
-$ec_lang_intent['dw_kinematic_viscosity_tip']='';
 $ec_lang['dw_reynolds_number']='রেনোল্ডস সংখ্যা, Re';
 $ec_lang['dw_flow_regime']='প্রবাহ ব্যবস্থা';
 $ec_lang['dw_regime_laminar']='স্তরীয়';
@@ -163,9 +161,7 @@ $ec_lang['mpf_solve_for_dd0']='Q দেওয়া y/d<sub>0</sub> খুঁজ
 $ec_lang['mpf_solve_desc']='ক্যালকুলেটর ফর্ম থেকে d<sub>0</sub>, n, এবং S<sub>f</sub> ব্যবহার করে, নির্দিষ্ট Q-এর জন্য সর্বনিম্ন y/d<sub>0</sub> খুঁজে বের করে।';
 $ec_lang['mpf_solve_button']='সমাধান করুন';
 $ec_lang['mpf_solver_enter_positive_q']='একটি ধনাত্মক লক্ষ্য Q প্রবেশ করান।';
-$ec_lang_intent['mpf_solver_enter_positive_q']='';
 $ec_lang['mpf_solver_no_solution']='কোনো সমাধান নেই: y/d0 = 93.8%-এ Q পাইপের ধারণক্ষমতা অতিক্রম করে (Qmax = {qmax} নির্বাচিত এককে)।';
-$ec_lang_intent['mpf_solver_no_solution']='';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='ম্যানিং পাইপ হেড লস';
 $ec_lang['mphl_main_title']='বিনামূল্যে অনলাইন ম্যানিং পাইপ হেড লস ক্যালকুলেটর';

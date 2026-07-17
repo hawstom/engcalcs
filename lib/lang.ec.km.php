@@ -90,9 +90,7 @@ $ec_lang['dw_roughness']='e';
 $ec_lang['dw_roughness_tip']='កម្ពស់ភាពរញ៉េរញ៉ៃដាច់ខាត, e, នៃជញ្ជាំងបំពង់។ តម្លៃធម្មតា: ដែកថែប (ថ្មី) 0.046 mm, ដែកថែប (ចាស់) 0.15 mm, HDPE 0.003 mm, PVC/uPVC 0.0015 mm, បេតុង 0.3–3 mm។';
 $ec_lang['dw_kinematic_viscosity']='<span class="ec-help" title="1×10⁻⁶ m²/s សម្រាប់ទឹកស្អាតនៅ 20°C">ភាពខាប់ស៊ីណេម៉ាទិក, &nu; <span class="ec-tip">?</span></span>';
 $ec_lang['dw_kinematic_viscosity_short']='ភាពខាប់ស៊ីណេម៉ាទិក, &nu;';
-$ec_lang_intent['dw_kinematic_viscosity_short']='';
 $ec_lang['dw_kinematic_viscosity_tip']='1×10⁻⁶ m²/s សម្រាប់ទឹកស្អាតនៅ 20°C';
-$ec_lang_intent['dw_kinematic_viscosity_tip']='';
 $ec_lang['dw_reynolds_number']='លេខ Reynolds, Re';
 $ec_lang['dw_flow_regime']='របៀបហូរ';
 $ec_lang['dw_regime_laminar']='លំហូរស្រួល';
@@ -164,9 +162,7 @@ $ec_lang['mpf_solve_for_dd0']='រកដំណោះស្រាយ y/d<sub>0</s
 $ec_lang['mpf_solve_desc']='ដោយប្រើ d<sub>0</sub>, n, និង S<sub>f</sub> ពីទម្រង់ម៉ាស៊ីនគណនា រក y/d<sub>0</sub> ទាបបំផុត សម្រាប់ Q ដែលបានកំណត់។';
 $ec_lang['mpf_solve_button']='ដោះស្រាយ';
 $ec_lang['mpf_solver_enter_positive_q']='សូមបញ្ចូល Q គោលដៅជាចំនួនវិជ្ជមាន។';
-$ec_lang_intent['mpf_solver_enter_positive_q']='';
 $ec_lang['mpf_solver_no_solution']='គ្មានដំណោះស្រាយ៖ Q លើសសមត្ថភាពបំពង់នៅ y/d0 = 93.8% (Qmax = {qmax} គិតជាឯកតាដែលបានជ្រើសរើស)។';
-$ec_lang_intent['mpf_solver_no_solution']='';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Manning ការបាត់បង់ទំនាប់ក្នុងបំពង់';
 $ec_lang['mphl_main_title']='ម៉ាស៊ីនគណនា Manning ការបាត់បង់ទំនាប់ក្នុងបំពង់ ឥតគិតថ្លៃ';

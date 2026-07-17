@@ -193,27 +193,6 @@ Calculators section above; see that section's header for the methodology and hon
 
 ## Translation Standardization (Glossary Project)
 
-- 63|125| **Audit `$ec_lang_intent` keys.** Two-part audit requested by Tom:
-  1. **No non-English language file should have any `_intent` keys.** `$ec_lang_intent` is
-     English-only, human-authored translator guidance (per `CLAUDE.md` § Language Keys — "AI must
-     never add, change, or remove any `$ec_lang_intent` entry without explicit written permission");
-     it should never have leaked into any of the 26 `lib/lang.ec.??.php` files. Sweep all 26 for any
-     `$ec_lang_intent[...]=` assignment and report/remove any found (removal in a non-English file is
-     not covered by the AI-permission restriction, which applies to the canonical English array).
-  2. **Review the English `_intent` keys themselves for over-use.** Tom's stated expectation: "probably
-     much fewer than one-fourth of the en keys should need `_intent` keys" — cross-check against the
-     scope rule already in `CLAUDE.md` (`$ec_lang_intent` is reserved for real transliteration/
-     polysemy risk — jargon like "chute"/"riprap" — not general definitions; a plain, directly-
-     translatable label like "Friction slope" needs no intent entry, and adding one to a plain label
-     is itself a defect, since it burns translator attention on a non-risk). Audit should compute the
-     actual ratio (keys with non-empty `_intent` ÷ total keys) and flag candidates for removal:
-     superfluous restatements of an already-simple English label, and any intent that's really
-     production/layout commentary that should just use the `tag: value` vocabulary instead of prose.
-     This is a **review/report task, not a delete-on-sight task** — per the same AI-permission
-     restriction, any proposed English `_intent` removal needs Tom's explicit sign-off before editing
-     `lib/lang.ec.en.php`, since bullet 1's removal license (non-English leakage) does not extend to
-     bullet 2's English-array edits.
-
 ## Translation improvements
 
 The rules, sequence, and QA chain for translation work are **not** restated here. They live in:
@@ -264,6 +243,25 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|125| **Audit `$ec_lang_intent` keys — DONE 2026-07-17.** Two-part audit requested by Tom. Full
+  findings in `dev/ec-lang-intent-audit-2026-07.md`.
+  1. Swept all 26 non-English `lib/lang.ec.??.php` files for `$ec_lang_intent[...]=` leakage. Found
+     leakage in all 26 (110 lines total, all empty-string placeholders — scaffold artifact, not
+     authored content). Removed all 110 lines (licensed by CLAUDE.md's own carve-out: the
+     AI-permission restriction applies to the canonical English array, not removal of leakage
+     elsewhere). All 26 files verified `php -l` clean.
+  2. Computed ratio: 129 non-empty English `_intent` entries / 507 `$ec_lang` keys = 25.4% — at
+     Tom's "one-fourth" ceiling, not under it. Report bucketed the 129 into: ~30 legitimate (real
+     transliteration/polysemy risk, kept untouched), 32 that restated a `gloss:` term inline in
+     violation of the tag vocabulary's own "do not restate it inline" rule, 10 plain-symbol
+     column-heading restatements missing the `symbol` flag, 3 non-technical tone/mission strings
+     with no jargon risk, and 34 `rc_` (Rock Chute) entries that were unflagged leftover prose with
+     no named risk. Tom signed off per-bucket: trim gloss entries to bare `'| gloss: ...'` tag form
+     (done), trim symbol entries to `'| layout: column heading; symbol'` (done), leave the 3
+     tone/mission strings alone (no change), and remove the 34 unflagged `rc_` entries as a scope
+     violation (value set to `''`, matching the suite's existing empty-placeholder convention).
+     Final ratio: 95/507 = 18.7%, `php -l` clean.
 
 - 0|124| **Shared upstream-HGL/EGL warning for `mphl_`, `dw_`, and `hw_`, fixing `mphl_`'s
   "(See notes)" real-estate problem — DONE 2026-07-16.** Implemented per the finalized UI design
