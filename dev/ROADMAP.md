@@ -10,6 +10,49 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 ## Calculator Improvements
 
+- 65|123| **`mtc_`: add a solve-for-depth-given-Q mode.** Currently `mtc_` (Manning Trapezoidal
+  Channel) takes depth as an input and computes Q; add the inverse solver (input Q, solve for normal
+  depth) the way `mpf_` (Manning Pipe Flow) already does with its bisection solver over `[1e-4,
+  0.9376·d0]` (verified correct in Task 120 stage 2). Follow the same pattern: a solver radio/mode
+  toggle, bisection (or direct Newton) search on depth with area/wetted-perimeter/n as functions of
+  depth, and reuse of `mtc_`'s own already-audited trapezoidal geometry formulas — no new physics,
+  just an inverse-solve wrapper around what's already verified correct.
+
+- 64|124| **Do the following for `mphl_`, `dw_`, and `hw_`: give all three the following shared upstream-HGL/EGL warning that also fixes
+  `mphl_`'s own "(See notes)" real-estate problem.** Tom's finding request: `dw_` and
+  `hw_` both compute and display `hgl1`/`hgl2` (confirmed in `Darcy-Weisbach.php`/`Hazen-Williams.php`
+  + their JS — both call the identical `hgl = egl - hv` calc `mphl_` uses) but neither carries
+  `mphl_`'s inlet-control warning at all, so the gap is real, not just a hunch. `mphl_` currently
+  surfaces it by baking `" (See notes)"` into the `mphl_hgl_2` label string itself, which Tom flagged
+  as bad UX (burns result-row real estate, forces a blind scroll to a "Notes" heading below the
+  results table) — so this task is now a joint fix, not a copy of the existing pattern.
+
+  **Finalized UI design (Tom, 2026-07-16):** attach one shared `.ec-help`/`.ec-tip` `?` (tip-only, no
+  `<a>` — matches the suite's existing tip-only pattern, e.g. `mpf_flow` + `mpf_flow_tip`) to **both**
+  the "Upstream HGL" and "Upstream EGL" labels (not just HGL). Shared tip text: *"May not be valid if
+  pipe is high. See notes."* The full detail stays in the on-page Notes section below the results
+  table (unchanged location), which itself gets a **new first item** ahead of the existing
+  culvert-inlet-control one:
+  1. **New:** dt "This calculator doesn't account for pipe elevation." / dd "If the HGL goes below
+     the top of the pipe at any point, this calculation may not be valid." — this doesn't exist
+     anywhere today, including in `mphl_` itself.
+  2. **Existing** (verbatim, currently `mphl_note_1`): dt "For an open inlet (culvert) condition, it
+     is necessary to check for inlet control conditions." / dd 1. "The upstream HGL must be above the
+     upstream normal depth flow elevation (and higher than the pipe!)." / dd 2. "The headwater of a
+     culvert is better represented by the upstream EGL than the upstream HGL." / dd 3. "See [2-minute
+     HY-8 tutorial link] for simple standard culvert headwater calculations."
+
+  **Key/ownership implications:** `mphl_` is the incumbent owner of the underlying warning content
+  (item-90 convention), but the *labels* "Upstream HGL"/"Upstream EGL" are already shared across all
+  three calculators via `hw_hgl_2`/`mphl_egl_2` — so `mphl_hgl_2`'s current bespoke "(See notes)"
+  string is retired in favor of reusing those same plain shared labels (matching how `dw_`/`hw_`
+  already consume them) with the new tip span appended. The expanded two-item Notes block becomes the
+  new shared owning key (retiring/superseding `mphl_note_1`'s single-item content), consumed by all
+  three calculators identically. This is a genuine three-calculator retrofit, not just an addition to
+  `dw_`/`hw_` — `mphl_`'s own page changes too. Scope check before implementing: confirm `dw_`/`hw_`
+  are also full-pipe-flow contexts where an open/culvert inlet is realistic (same as `mphl_`) before
+  wiring the note in.
+
 ## New Calculators (Mission Expansion)
 
 Tom, 2026-07-14: interested in expanding beyond hydraulic-structure/irrigation calculators toward
@@ -192,6 +235,27 @@ Calculators section above; see that section's header for the methodology and hon
   through the 4-axis research pass.
 
 ## Translation Standardization (Glossary Project)
+
+- 63|125| **Audit `$ec_lang_intent` keys.** Two-part audit requested by Tom:
+  1. **No non-English language file should have any `_intent` keys.** `$ec_lang_intent` is
+     English-only, human-authored translator guidance (per `CLAUDE.md` § Language Keys — "AI must
+     never add, change, or remove any `$ec_lang_intent` entry without explicit written permission");
+     it should never have leaked into any of the 26 `lib/lang.ec.??.php` files. Sweep all 26 for any
+     `$ec_lang_intent[...]=` assignment and report/remove any found (removal in a non-English file is
+     not covered by the AI-permission restriction, which applies to the canonical English array).
+  2. **Review the English `_intent` keys themselves for over-use.** Tom's stated expectation: "probably
+     much fewer than one-fourth of the en keys should need `_intent` keys" — cross-check against the
+     scope rule already in `CLAUDE.md` (`$ec_lang_intent` is reserved for real transliteration/
+     polysemy risk — jargon like "chute"/"riprap" — not general definitions; a plain, directly-
+     translatable label like "Friction slope" needs no intent entry, and adding one to a plain label
+     is itself a defect, since it burns translator attention on a non-risk). Audit should compute the
+     actual ratio (keys with non-empty `_intent` ÷ total keys) and flag candidates for removal:
+     superfluous restatements of an already-simple English label, and any intent that's really
+     production/layout commentary that should just use the `tag: value` vocabulary instead of prose.
+     This is a **review/report task, not a delete-on-sight task** — per the same AI-permission
+     restriction, any proposed English `_intent` removal needs Tom's explicit sign-off before editing
+     `lib/lang.ec.en.php`, since bullet 1's removal license (non-English leakage) does not extend to
+     bullet 2's English-array edits.
 
 ## Translation improvements
 
