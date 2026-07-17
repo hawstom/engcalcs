@@ -412,6 +412,12 @@ $ec_lang['mtc_note_2_term']='Velocity check';
 $ec_lang_intent['mtc_note_2_term']='';
 $ec_lang['mtc_note_2_def']='High velocity implies that there was a large elevation drop that created such high specific energy. That energy can be lost quickly at expansions, bends, or obstructions. Verify that this is reasonable for the site.';
 $ec_lang_intent['mtc_note_2_def']='';
+$ec_lang['mtc_solve_for_y']='Solve for depth, y, given Q';
+$ec_lang_intent['mtc_solve_for_y']='';
+$ec_lang['mtc_solve_desc']='Using b, z<sub>1</sub>, z<sub>2</sub>, S, and n from the calculator form, finds the depth for a given Q.';
+$ec_lang_intent['mtc_solve_desc']='';
+$ec_lang['mtc_solver_no_solution']='No solution found for the given Q with these channel inputs.';
+$ec_lang_intent['mtc_solver_no_solution']='';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='Weir Flow Simple';
 $ec_lang_intent['ws_main_menu']='Simple weir flow calculator, for a weir with a level (uniform, single-elevation) crest. | "Simple" describes the calculator variant, not a weir type name; use natural word order.';

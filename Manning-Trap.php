@@ -14,6 +14,21 @@ echoHeader("EngCalcs", $html_title, $html_head);
 </p>
 <?php echoHelpWanted(); ?>
 
+<div class="d-print-none" id="mtc-solver">
+	<p>
+		<strong><?=$ec_lang['mtc_solve_for_y']?></strong> — <?=$ec_lang['mtc_solve_desc']?><br>
+		<?=$ec_lang['mpf_flow']?>:
+		<input class="input" type="number" step="any" id="solver_q" value="1.0" />
+		<select id="solver_qu">
+<?php foreach (['m3ps','lps','mld','ft3ps','gpm','mgd'] as $qu): ?>
+			<option value="<?=$ec_units[$qu]?>"><?=$ec_lang['u_'.$qu]?></option>
+<?php endforeach; ?>
+		</select>
+		<button type="button" onclick="EngCalcs.solveForY();"><?=$ec_lang['mpf_solve_button']?></button>
+		<span id="solver_msg" style="color:red;margin-left:0.5em;"></span>
+	</p>
+</div>
+
 <?php
 echoCalculatorForm(
 	//Inputs
@@ -80,7 +95,9 @@ EngCalcs.pageConfig = {
 	mtc_pi_ok: <?=json_encode($ec_lang['mtc_pi_ok'])?>,
 	mtc_pi_ok_tip: <?=json_encode($ec_lang['mtc_pi_ok_tip'])?>,
 	mtc_pi_out_of_range: <?=json_encode($ec_lang['mtc_pi_out_of_range'])?>,
-	mtc_pi_tip: <?=json_encode($ec_lang['mtc_pi_tip'])?>
+	mtc_pi_tip: <?=json_encode($ec_lang['mtc_pi_tip'])?>,
+	mpf_solver_enter_positive_q: <?=json_encode($ec_lang['mpf_solver_enter_positive_q'])?>,
+	mtc_solver_no_solution: <?=json_encode($ec_lang['mtc_solver_no_solution'])?>
 };
 </script>
 <script src="/engcalcs/js/Manning.lib.js?v=<?=filemtime(__DIR__.'/js/Manning.lib.js')?>"></script>

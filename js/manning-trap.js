@@ -3,12 +3,7 @@ EngCalcs.pageCalculator = function(objForm) {
 	var hasUnits, precision;
 	this.var = {};
 	this.var.g = 9.806;
-	this.var.c = 1.0;
-	this.var.alpha_blodgett = 0.319;
-	this.var.alpha_bathurst = 1.0;
-	this.var.max_err = 0.00001;
 	this.var.ft_per_m = 3.28084;
-	this.var.i = 0;
 	// Read and convert form inputs to this.var.___ as SI units
 	this.readFormInput(objForm, 'b', hasUnits = true);
 	this.readFormInput(objForm, 'y', hasUnits = true);
@@ -22,82 +17,34 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.readFormInput(objForm, 'd50_in', hasUnits = true);
 	this.var.d50_radio = objForm.d50_radio.value;
 	this.readFormInput(objForm, 'd50_safety', hasUnits = false);
-	if (this.var.d50_in === 0) {
-		this.var.d50_in = 0.1 * this.var.y; // Initial guess for D50
-	}
-	this.var.n_strickler = Math.pow(this.var.d50_in, 1 / 6) / 21.1;
-	if (this.var.n_in === 0) {
-		this.var.n_in = this.var.n_strickler; // Initial guess for n (Strickler)
-	}
-	this.var.iterate_p = true; // Always calculate once.
-	while (this.var.iterate_p === true && this.var.i < 100) {
-		this.var.i++;
-		this.var.a = this.var.y * (this.var.b + (+this.var.z1 + +this.var.z2) * this.var.y / 2);
-		this.var.pw = this.var.b + this.var.y * (Math.sqrt(1 + Math.pow(this.var.z1, 2)) + Math.sqrt(1 + Math.pow(this.var.z2, 2)));
-		this.var.rh = this.var.a / this.var.pw;
-		this.var.t = this.var.b + this.var.y * (+this.var.z1 + +this.var.z2);
-		this.var.da = this.var.a / this.var.t;
-		this.var.da_over_d50 = this.var.da / this.var.d50_in;
-		this.var.v = this.var.c/this.var.n_in*Math.pow(this.var.rh,2/3)*Math.pow(this.var.s0,0.5);
-		this.var.hv=Math.pow(this.var.v, 2) / (2 * this.var.g);
-		this.var.q = this.var.v * this.var.a;
-		this.var.froude = this.var.v * Math.sqrt(this.var.t/(this.var.g * this.var.a * Math.cos(Math.atan(this.var.s0))));
-		this.var.tau = this.var.rh * this.var.s0;
-		this.var.n_blodgett = this.var.alpha_blodgett * Math.pow(this.var.da, 1/6) / (2.25 + 5.23 * Math.log10(this.var.da/this.var.d50_in));
-		this.var.n_bathurst = this.Manning.bathurst_n(this.var.alpha_bathurst, this.var.g, this.var.t, this.var.da, this.var.d50_in, this.var.froude);
-		this.var.rh_ft = this.var.rh * this.var.ft_per_m;
-		this.var.d50_ft = this.var.d50_in * this.var.ft_per_m;
-		this.var.n_pi = 0.0926 * Math.pow(this.var.rh_ft, 1/6) / (1.46 + 2.23 * Math.log10(this.var.rh_ft / this.var.d50_ft));
-		this.var.blodgett_v_bathurst = (this.var.da_over_d50 < 0.3) ? '----' : (this.var.da_over_d50 < 1.5) ? 'Bathurst' : (this.var.da_over_d50 <= 185) ? 'Blodgett' : '++++';
-		switch(this.var.n_radio) {
-			case 'bb':
-				switch(this.var.blodgett_v_bathurst) {
-					case 'Blodgett':
-						this.var.n_in = this.var.n_blodgett;
-						break;
-					case 'Bathurst':
-						this.var.n_in = this.var.n_bathurst; // Bathurst is circular with froude. Must include in iteration.
-						break;
-					default:
-						this.var.n_in = this.var.n_strickler; // Fall back to Strickler.
-				}
-				break;
-			case 'strickler':
-				this.var.n_in = this.var.n_strickler;
-				break;
-			case 'pi':
-				this.var.n_in = this.var.n_pi;
-				break;
-			default:
-				this.var.iterate_p = false ; // n_in is manual. No need to iterate.
-		}
-		this.var.d50_mra = 0.031 * Math.pow(this.var.v, 2.5) / (Math.pow(this.var.sgrock - 1, 0.25) * Math.pow(this.var.y, 0.25) * ((this.var.beta <= 30) ? 1 : 1.5));
-		this.var.d50_searcy = 0.022 * Math.pow(this.var.v, 2);
-		this.var.c_isbash = (this.var.beta <= 30) ? 1.2 : 0.86;
-		this.var.d50_bottom = this.Manning.mc_riprap_size(this.var.y, this.var.a, this.var.v, this.var.g, 1000, this.var.s0, this.var.c_isbash, this.var.sgrock);
-		this.var.d50_z1 = this.Manning.mc_riprap_size(this.var.y, this.var.a, this.var.v, this.var.g, this.var.z1, this.var.s0, this.var.c_isbash, this.var.sgrock);
-		this.var.d50_z2 = this.Manning.mc_riprap_size(this.var.y, this.var.a, this.var.v, this.var.g, this.var.z2, this.var.s0, this.var.c_isbash, this.var.sgrock);
-		switch(this.var.d50_radio) {
-			case 'isbash':
-				this.var.d50_calc = Math.max(this.var.d50_bottom, this.var.d50_z1, this.var.d50_z2);
-				break;
-			case 'maynord':
-				this.var.d50_calc = this.var.d50_mra;
-				break;
-			case 'searcy':
-				this.var.d50_calc = this.var.d50_searcy;
-				break;
-			default:
-				this.var.d50_calc = this.var.d50_in;
-				this.var.iterate_p = false ; // d50_in is manual. No need to iterate.
-		}
-		if (this.var.iterate_p === true) {
-			this.var.iterate_p = (Math.abs(this.var.d50_safety * this.var.d50_calc / this.var.d50_in - 1) > this.var.max_err);
-			this.var.d50_in = (this.var.d50_in + 5 * this.var.d50_safety * this.var.d50_calc) / 6; // Move d50_in 75% of the way to d50calc for a cheap way to iterate.
-		} else {
-			this.var.d50_in = this.var.d50_safety * this.var.d50_calc;
-		}
-	}
+	var result = this.Manning.mtc_iterate({
+		b: this.var.b, y: this.var.y, z1: this.var.z1, z2: this.var.z2, s0: this.var.s0,
+		n_radio: this.var.n_radio, n_in: this.var.n_in,
+		d50_radio: this.var.d50_radio, d50_in: this.var.d50_in, d50_safety: this.var.d50_safety,
+		beta: this.var.beta, sgrock: this.var.sgrock
+	});
+	this.var.a = result.a;
+	this.var.pw = result.pw;
+	this.var.rh = result.rh;
+	this.var.t = result.t;
+	this.var.v = result.v;
+	this.var.hv = Math.pow(this.var.v, 2) / (2 * this.var.g);
+	this.var.q = result.q;
+	this.var.froude = result.froude;
+	this.var.tau = result.tau;
+	this.var.n_strickler = result.n_strickler;
+	this.var.n_blodgett = result.n_blodgett;
+	this.var.n_bathurst = result.n_bathurst;
+	this.var.n_pi = result.n_pi;
+	this.var.blodgett_v_bathurst = result.blodgett_v_bathurst;
+	this.var.d50_bottom = result.d50_bottom;
+	this.var.d50_z1 = result.d50_z1;
+	this.var.d50_z2 = result.d50_z2;
+	this.var.d50_mra = result.d50_mra;
+	this.var.d50_searcy = result.d50_searcy;
+	this.var.d50_ft = result.d50_in * this.var.ft_per_m;
+	this.var.n_in = result.n_in;
+	this.var.d50_in = result.d50_in;
 	if (this.var.n_radio !== '') {
 		objForm.n_in.value = this.var.n_in.toFixed(4);
 	}
@@ -177,6 +124,75 @@ EngCalcs.pageCalculator = function(objForm) {
 };
 
 EngCalcs.pageCalculatorInitialize = function (objForm) {
+};
+
+// Solves for depth y given a target Q, using b, z1, z2, s0, and the current
+// roughness/rock-size radio state from the main form. Depth and Q increase together
+// for this trapezoidal-channel geometry (no local peak, unlike a circular pipe), so a
+// plain bisection on y is valid even while n and d50 are re-iterated at every trial
+// depth via the same EngCalcs.Manning.mtc_iterate the main calculator uses.
+EngCalcs.solveForY = function() {
+	'use strict';
+	var objForm = document.forms['formInput'];
+	var b   = parseFloat(objForm['b'].value) / parseFloat(objForm['bu'].value);
+	var z1  = parseFloat(objForm['z1'].value);
+	var z2  = parseFloat(objForm['z2'].value);
+	var s0  = parseFloat(objForm['s0'].value) / parseFloat(objForm['s0u'].value);
+	var n_radio = objForm.n_radio.value;
+	var n_in = parseFloat(objForm['n_in'].value);
+	var beta = parseFloat(objForm['beta'].value);
+	var sgrock = parseFloat(objForm['sgrock'].value);
+	var d50_radio = objForm.d50_radio.value;
+	var d50_in = parseFloat(objForm['d50_in'].value) / parseFloat(objForm['d50_inu'].value);
+	var d50_safety = parseFloat(objForm['d50_safety'].value);
+	var qu = parseFloat(document.getElementById('solver_qu').value);
+	var q_target = parseFloat(document.getElementById('solver_q').value) / qu;
+	var msgEl = document.getElementById('solver_msg');
+
+	function computeQ(y) {
+		return EngCalcs.Manning.mtc_iterate({
+			b: b, y: y, z1: z1, z2: z2, s0: s0,
+			n_radio: n_radio, n_in: n_in,
+			d50_radio: d50_radio, d50_in: d50_in, d50_safety: d50_safety,
+			beta: beta, sgrock: sgrock
+		});
+	}
+
+	if (isNaN(q_target) || q_target <= 0) {
+		msgEl.textContent = EngCalcs.pageConfig.mpf_solver_enter_positive_q;
+		return;
+	}
+
+	var lo = 1e-6, hi = 1, i = 0, result;
+	result = computeQ(hi);
+	while (result.q < q_target && i < 60) { hi *= 2; result = computeQ(hi); i++; }
+	if (result.q < q_target || !result.converged) {
+		msgEl.textContent = EngCalcs.pageConfig.mtc_solver_no_solution;
+		return;
+	}
+
+	var mid = hi;
+	for (i = 0; i < 60; i++) {
+		mid = (lo + hi) / 2;
+		result = computeQ(mid);
+		if (result.q < q_target) { lo = mid; } else { hi = mid; }
+		if (hi - lo < 1e-10) { break; }
+	}
+	if (!result.converged) {
+		msgEl.textContent = EngCalcs.pageConfig.mtc_solver_no_solution;
+		return;
+	}
+
+	var yu = parseFloat(objForm['yu'].value);
+	objForm['y'].value = parseFloat((mid * yu).toPrecision(6));
+	if (n_radio !== '') {
+		objForm['n_in'].value = result.n_in.toFixed(4);
+	}
+	if (d50_radio !== '') {
+		objForm['d50_in'].value = (result.d50_in * parseFloat(objForm['d50_inu'].value)).toFixed(4);
+	}
+	msgEl.textContent = '';
+	EngCalcs.submitForm();
 };
 
 document.addEventListener('DOMContentLoaded', function() {

@@ -10,14 +10,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 ## Calculator Improvements
 
-- 65|123| **`mtc_`: add a solve-for-depth-given-Q mode.** Currently `mtc_` (Manning Trapezoidal
-  Channel) takes depth as an input and computes Q; add the inverse solver (input Q, solve for normal
-  depth) the way `mpf_` (Manning Pipe Flow) already does with its bisection solver over `[1e-4,
-  0.9376·d0]` (verified correct in Task 120 stage 2). Follow the same pattern: a solver radio/mode
-  toggle, bisection (or direct Newton) search on depth with area/wetted-perimeter/n as functions of
-  depth, and reuse of `mtc_`'s own already-audited trapezoidal geometry formulas — no new physics,
-  just an inverse-solve wrapper around what's already verified correct.
-
 - 64|124| **Do the following for `mphl_`, `dw_`, and `hw_`: give all three the following shared upstream-HGL/EGL warning that also fixes
   `mphl_`'s own "(See notes)" real-estate problem.** Tom's finding request: `dw_` and
   `hw_` both compute and display `hgl1`/`hgl2` (confirmed in `Darcy-Weisbach.php`/`Hazen-Williams.php`
@@ -292,6 +284,25 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|123| **`mtc_`: add a solve-for-depth-given-Q mode — DONE 2026-07-16.** Added a Q-input
+  solver above the main form (mirroring `mpf_`'s solve-for-y/d0 UI), with a new
+  `EngCalcs.solveForY()` in `js/manning-trap.js`.
+  **Scope grew beyond a plain inverse wrapper:** `mtc_` already has its own roughness/rock-size
+  auto-iteration (Blodgett/Bathurst/P&I `n`, Isbash/Maynord/Searcy `d50`), both of which are
+  functions of depth — so a naive fixed-`n` solver (the `mpf_` pattern) would have silently
+  returned a `y` inconsistent with a re-run of that auto-iteration. Tom's call: an honest
+  "didn't converge" beats a plausible-looking wrong answer. So the fix instead extracted the
+  main form's existing n/d50 iteration loop into one shared, verified function,
+  `EngCalcs.Manning.mtc_iterate()` in `js/Manning.lib.js` (used by both the main calculator and
+  the solver — no duplicated logic to drift out of sync), and the solver bisects on `y` while
+  re-running that full iteration at every trial depth, reporting `mtc_solver_no_solution` if the
+  inner iteration or the outer bracket fails to converge. Confirmed Q and y increase together
+  for trapezoidal geometry even under auto-iteration (no local peak like `mpf_`'s circular-pipe
+  case), so plain bisection is valid; verified numerically (both manual-n and Blodgett+Isbash
+  auto-iteration modes recover the seed depth exactly). New lang keys `mtc_solve_for_y`,
+  `mtc_solve_desc`, `mtc_solver_no_solution` added to `lib/lang.ec.en.php` only — not yet
+  sprinted to the other 26 languages.
 
 - 0|122| **Add Phillips & Ingersoll (1998) Manning's n option to `mtc_` — DONE 2026-07-16.**
   Found this equation (Maricopa County Drainage Design Manual, Hydraulics Volume, Section 7.6.3,
