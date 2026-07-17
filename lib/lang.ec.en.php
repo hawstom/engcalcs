@@ -276,8 +276,6 @@ $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">F
 $ec_lang_intent['mpf_friction_slope']='';
 $ec_lang['mpf_depth_ratio']='Relative flow depth, y/d<sub>0</sub>';
 $ec_lang_intent['mpf_depth_ratio']='';
-$ec_lang['mpf_see_notes']='(See notes)';
-$ec_lang_intent['mpf_see_notes']='';
 $ec_lang['mpf_flow']='Flow, Q';
 $ec_lang_intent['mpf_flow']='';
 $ec_lang['mpf_flow_tip']='Flow and depth calculated for an infinitely long pipe. Getting this flow into the pipe may need a higher headwater depth. See Notes below for details and a tutorial video.';
@@ -344,9 +342,9 @@ $ec_lang['mphl_egl_1']='Downstream EGL';
 $ec_lang_intent['mphl_egl_1']='';
 $ec_lang['mphl_egl_2']='Upstream EGL';
 $ec_lang_intent['mphl_egl_2']='';
-$ec_lang['mphl_hgl_2']='Upstream HGL in pipe ' . $ec_lang['mpf_see_notes'];
-$ec_lang_intent['mphl_hgl_2']='';
-$ec_lang['mphl_note_1']='<dl><dt>For an open inlet (culvert) condition, it is necessary to check for inlet control conditions.</dt><dd>1. The upstream HGL must be above the upstream normal depth flow elevation (and higher than the pipe!).</dd><dd>2. The headwater of a culvert is better represented by the upstream EGL than the upstream HGL.</dd><dd>3. See <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">my 2-minute tutorial</a> for simple standard culvert headwater calculations using HY-8.</dd>';
+$ec_lang['mphl_hgl_egl_tip']='May not be valid if pipe is high. See notes.';
+$ec_lang_intent['mphl_hgl_egl_tip']='';
+$ec_lang['mphl_note_1']='<dl><dt>This calculator doesn\'t account for pipe elevation.</dt><dd>If the HGL goes below the top of the pipe at any point, this calculation may not be valid.</dd><dt>For an open inlet (culvert) condition, it is necessary to check for inlet control conditions.</dt><dd>1. The upstream HGL must be above the upstream normal depth flow elevation (and higher than the pipe!).</dd><dd>2. The headwater of a culvert is better represented by the upstream EGL than the upstream HGL.</dd><dd>3. See <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">my 2-minute tutorial</a> for simple standard culvert headwater calculations using HY-8.</dd>';
 $ec_lang_intent['mphl_note_1']='';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Manning Trapezoidal Channel';

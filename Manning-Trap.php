@@ -45,7 +45,7 @@ echoCalculatorForm(
 			'name' => 'd50_in', 
 			'type' => 'number', 'default' => '0.1', 
 			'units' => Array('m', 'mm', 'ft', 'in'), 
-			'label' => $ec_lang['mtc_d50_in'] . '<span class="ec-help" title="' . htmlspecialchars(strip_tags($ec_lang['mtc_iteration_tip'])) . '"><span class="ec-tip">?</span></span>' . '<br /> <input type="radio" name="d50_radio" id="d50_radio_isbash" value="isbash" onchange="EngCalcs.submitForm()" /><label for="d50_radio_isbash">Isbash</label> <input type="radio" name="d50_radio" id="d50_radio_maynord" value="maynord" onchange="EngCalcs.submitForm()" /><label for="d50_radio_maynord">Maynord</label> <input type="radio" name="d50_radio" id="d50_radio_searcy" value="searcy" onchange="EngCalcs.submitForm()" /><label for="d50_radio_searcy">Searcy</label><br />*' . inputHtml('d50_safety', 'number', '1.25', '')),
+			'label' => '<span class="ec-help" title="' . htmlspecialchars(strip_tags($ec_lang['mtc_iteration_tip'])) . '">' . $ec_lang['mtc_d50_in'] . ' <span class="ec-tip">?</span></span>' . '<br /> <input type="radio" name="d50_radio" id="d50_radio_isbash" value="isbash" onchange="EngCalcs.submitForm()" /><label for="d50_radio_isbash">Isbash</label> <input type="radio" name="d50_radio" id="d50_radio_maynord" value="maynord" onchange="EngCalcs.submitForm()" /><label for="d50_radio_maynord">Maynord</label> <input type="radio" name="d50_radio" id="d50_radio_searcy" value="searcy" onchange="EngCalcs.submitForm()" /><label for="d50_radio_searcy">Searcy</label><br />*' . inputHtml('d50_safety', 'number', '1.25', '')),
 	),
 	//Results
 	Array(

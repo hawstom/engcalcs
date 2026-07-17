@@ -53,7 +53,7 @@ echoCalculatorForm(
 		Array('name' => 'vel_check', 'units' => NULL, 'label' => $ec_lang['mhp_vel_check']),
 		Array('name' => 'f', 'units' => NULL, 'label' => '<a target="_blank" href="https://www.engineeringtoolbox.com/froude-number-d_578.html">'.$ec_lang['mpf_froude_number'].'</a>'),
 		Array('name' => 'tau', 'units' => Array('npm2','psf'), 'label' => $ec_lang['mpf_shear_stress']),
-		Array('name' => 'q', 'units' => Array('m3ps','lps','mld','ft3ps','gpm','mgd'), 'label' => '<strong>' . $ec_lang['mpf_flow'] . '</strong><span class="ec-help" title="' . htmlspecialchars(strip_tags($ec_lang['mpf_flow_tip'])) . '"><span class="ec-tip">?</span></span>'),
+		Array('name' => 'q', 'units' => Array('m3ps','lps','mld','ft3ps','gpm','mgd'), 'label' => '<span class="ec-help" title="' . htmlspecialchars(strip_tags($ec_lang['mpf_flow_tip'])) . '"><strong>' . $ec_lang['mpf_flow'] . '</strong> <span class="ec-tip">?</span></span>'),
 		Array('name' => 'q0', 'units' => Array('m3ps','lps','mld','ft3ps','gpm','mgd'), 'label' => $ec_lang['mpf_full_flow']),
 		Array('name' => 'qq0', 'units' => Array('depthFrac','depthPercent'), 'label' => $ec_lang['mpf_full_flow_ratio']),
 	)

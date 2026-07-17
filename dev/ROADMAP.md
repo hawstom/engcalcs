@@ -10,41 +10,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 ## Calculator Improvements
 
-- 64|124| **Do the following for `mphl_`, `dw_`, and `hw_`: give all three the following shared upstream-HGL/EGL warning that also fixes
-  `mphl_`'s own "(See notes)" real-estate problem.** Tom's finding request: `dw_` and
-  `hw_` both compute and display `hgl1`/`hgl2` (confirmed in `Darcy-Weisbach.php`/`Hazen-Williams.php`
-  + their JS — both call the identical `hgl = egl - hv` calc `mphl_` uses) but neither carries
-  `mphl_`'s inlet-control warning at all, so the gap is real, not just a hunch. `mphl_` currently
-  surfaces it by baking `" (See notes)"` into the `mphl_hgl_2` label string itself, which Tom flagged
-  as bad UX (burns result-row real estate, forces a blind scroll to a "Notes" heading below the
-  results table) — so this task is now a joint fix, not a copy of the existing pattern.
-
-  **Finalized UI design (Tom, 2026-07-16):** attach one shared `.ec-help`/`.ec-tip` `?` (tip-only, no
-  `<a>` — matches the suite's existing tip-only pattern, e.g. `mpf_flow` + `mpf_flow_tip`) to **both**
-  the "Upstream HGL" and "Upstream EGL" labels (not just HGL). Shared tip text: *"May not be valid if
-  pipe is high. See notes."* The full detail stays in the on-page Notes section below the results
-  table (unchanged location), which itself gets a **new first item** ahead of the existing
-  culvert-inlet-control one:
-  1. **New:** dt "This calculator doesn't account for pipe elevation." / dd "If the HGL goes below
-     the top of the pipe at any point, this calculation may not be valid." — this doesn't exist
-     anywhere today, including in `mphl_` itself.
-  2. **Existing** (verbatim, currently `mphl_note_1`): dt "For an open inlet (culvert) condition, it
-     is necessary to check for inlet control conditions." / dd 1. "The upstream HGL must be above the
-     upstream normal depth flow elevation (and higher than the pipe!)." / dd 2. "The headwater of a
-     culvert is better represented by the upstream EGL than the upstream HGL." / dd 3. "See [2-minute
-     HY-8 tutorial link] for simple standard culvert headwater calculations."
-
-  **Key/ownership implications:** `mphl_` is the incumbent owner of the underlying warning content
-  (item-90 convention), but the *labels* "Upstream HGL"/"Upstream EGL" are already shared across all
-  three calculators via `hw_hgl_2`/`mphl_egl_2` — so `mphl_hgl_2`'s current bespoke "(See notes)"
-  string is retired in favor of reusing those same plain shared labels (matching how `dw_`/`hw_`
-  already consume them) with the new tip span appended. The expanded two-item Notes block becomes the
-  new shared owning key (retiring/superseding `mphl_note_1`'s single-item content), consumed by all
-  three calculators identically. This is a genuine three-calculator retrofit, not just an addition to
-  `dw_`/`hw_` — `mphl_`'s own page changes too. Scope check before implementing: confirm `dw_`/`hw_`
-  are also full-pipe-flow contexts where an open/culvert inlet is realistic (same as `mphl_`) before
-  wiring the note in.
-
 ## New Calculators (Mission Expansion)
 
 Tom, 2026-07-14: interested in expanding beyond hydraulic-structure/irrigation calculators toward
@@ -284,6 +249,22 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|124| **Shared upstream-HGL/EGL warning for `mphl_`, `dw_`, and `hw_`, fixing `mphl_`'s
+  "(See notes)" real-estate problem — DONE 2026-07-16.** Implemented per the finalized UI design
+  (Tom, 2026-07-16): a shared `.ec-help`/`.ec-tip` `?` (new key `mphl_hgl_egl_tip`, "May not be
+  valid if pipe is high. See notes.") now appears on both the "Upstream HGL" (`hw_hgl_2`) and
+  "Upstream EGL" (`mphl_egl_2`) result labels in all three calculators. `mphl_`'s bespoke
+  `mphl_hgl_2`/`mpf_see_notes` keys are retired (removed from all 27 lang files); `mphl_` now
+  reuses the shared `hw_hgl_2` label like `dw_`/`hw_` already did. `mphl_note_1` gained a new
+  first `dt`/`dd` item ("This calculator doesn't account for pipe elevation." / "If the HGL goes
+  below the top of the pipe at any point, this calculation may not be valid.") ahead of the
+  existing culvert-inlet-control item, and a matching Notes section (`ws_notes_heading` +
+  `mphl_note_1`) was added to `Darcy-Weisbach.php` and `Hazen-Williams.php`, which previously had
+  none. New/changed key `mphl_hgl_egl_tip` and the updated `mphl_note_1` text are English-only so
+  far — not yet sprinted to the other 26 languages (payload delta confirmed via
+  `generate_translation_payloads.php`; `mphl_hgl_egl_tip` appears in the fr delta, mixed in with
+  unrelated pre-existing untranslated keys from other recent tasks).
 
 - 0|123| **`mtc_`: add a solve-for-depth-given-Q mode — DONE 2026-07-16.** Added a Q-input
   solver above the main form (mirroring `mpf_`'s solve-for-y/d0 UI), with a new

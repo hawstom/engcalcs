@@ -106,6 +106,30 @@ When a label needs both an external/reference link *and* a hover/tap explanation
   English-only with no language switcher), say so in the tip text (e.g. "Follow link for explanation
   (English only)") so the visitor isn't surprised after clicking.
 
+**Tip-only labels (no link) wrap the whole label, not just the glyph (Tom, 2026-07-16):** when
+there is no link — only a hover/tap explanation — the `.ec-help` wrapper (with the `title`) goes
+*around the label text and the `?` glyph together*, not around the glyph alone:
+
+```
+<span class="ec-help" title="Tip text">Label text <span class="ec-tip">?</span></span>
+```
+
+- **Why:** `css/engcalcs.css`'s `.ec-help` rule is documented as a "whole-label wrapper" specifically
+  so the entire label — not a bare one-character `?` — is the hover/tap target (the same touch-target
+  reasoning as the Verdict/check-string convention above). A glyph-only `.ec-help` wrapper technically
+  works but produces a tap target too small to be reliably touch-friendly, defeating the CSS's own
+  documented intent.
+- **Only the `?` glyph gets the `.ec-tip` class** (its `color`/`font-size` styling is meant for the
+  small icon, not the label text) — `.ec-tip` nests inside `.ec-help`, wrapping only the glyph, while
+  `.ec-help` (carrying the `title`) wraps the label text plus that nested glyph span.
+- **This is the opposite nesting from the link+tip case above**: when there's a link, the label text
+  goes in the `<a>` (which is already a big, real click target) and only the glyph is
+  `.ec-help`/`.ec-tip`; when there's no link, the label text has no other big click target, so
+  `.ec-help` must wrap it directly.
+- Retrofitted 2026-07-16 from a glyph-only pattern found in `mpf_flow`/`mpf_flow_tip`
+  (`Manning-Pipe-Flow.php`) and `mtc_d50_in`/`mtc_iteration_tip` (`Manning-Trap.php`), both fixed to
+  match.
+
 ## Language Keys
 
 All display strings live in `lib/lang.ec.??.php` (27 files: en + 26 non-English). Keys follow the pattern `prefix_description`, e.g. `dw_friction_factor`, `mpf_flow`. Add keys to **all** language files when adding a new calculator — use English text as the fallback where translations aren't available yet.
