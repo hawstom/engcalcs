@@ -242,7 +242,7 @@ $ec_lang['or_shape']='孔口形状';
 $ec_lang['or_shape_circular']='圆形';
 $ec_lang['or_shape_rectangular']='矩形';
 $ec_lang['or_diameter']='<span class="ec-help" title="圆形取直径；矩形取高度">直径或高度，D <span class="ec-tip">?</span></span>';
-$ec_lang['or_width']='<span class="ec-help" title="仅适用于矩形开口">宽度，W <span class="ec-tip">?</span></span>';
+$ec_lang['or_width']='<span class="ec-help" title="仅适用于矩形孔口">宽度，W <span class="ec-tip">?</span></span>';
 $ec_lang['or_invert']='<span class="ec-help" title="孔口底部">底部高程 <span class="ec-tip">?</span></span>';
 $ec_lang['or_hwe']='上游水位高程';
 $ec_lang['or_twe']='下游水位高程';

@@ -200,7 +200,7 @@ The rules, sequence, and QA chain for translation work are **not** restated here
 - **`CLAUDE.md` § "Translation Sprints"** — sprint mechanics, model policy, pre/post-sprint checklist.
 - **`dev/translation-execution-log.md`** — the full dated, category-by-category execution record.
 
-- 40|109| **Cross-language consistency audit (Opus, suite-wide) — PAUSED 2026-07-17 (cost).** Tom, 2026-07-14: wants a
+- 40|109| **Cross-language consistency audit (Opus, suite-wide) — PAUSED 2026-07-17 (cost), stages 4-6 pending.** Tom, 2026-07-14: wants a
   systematic pass, not just spot-checks reacting to a specific question — motivated directly by the
   Task 18 post-close finding that Burmese had a real embedded-English defect sitting undetected
   through a full translation sprint's own self-check and this session's own initial QA pass, only
@@ -225,14 +225,24 @@ The rules, sequence, and QA chain for translation work are **not** restated here
   defects (sw "ukakamavu"=stiffness for roughness; he עיצוב "styling" vs תכן "design"; hr specific
   gravity vs. specific weight). Full detail in `dev/translation-execution-log.md` ("Task 109 —
   Cross-language consistency audit, stages 1–2").
-  **PAUSED 2026-07-17 (Tom): cost.** 52 Opus agents across two stages (26 languages × 2 categories,
-  plus a mid-run session-limit retry that re-ran 22 of them) is expensive for the defect yield —
-  real, but a low ratio of genuine fixes per agent-run. Stages 3–6 (categories 2–5: weirs &
-  orifices, pipe friction, irrigation & seepage, micro-hydro — category 6 already done as stage 1)
-  are deferred, not cancelled. Before resuming any future stage, reconsider whether the full
-  26-agent-per-category pattern is the right cost/yield shape (e.g. a cheaper sampling pass, or
-  fewer languages per category) rather than defaulting back to the same shape that was just judged
-  too expensive.
+  **PAUSED 2026-07-17 (Tom): cost — then RESUMED same day.** 52 Opus agents across two stages (26
+  languages × 2 categories, plus a mid-run session-limit retry that re-ran 22 of them) was expensive
+  for the defect yield — real, but a low ratio of genuine fixes per agent-run. Before resuming, Tom
+  was offered four shape options (same full shape / fewer languages / fewer-larger agents / hold
+  off) and chose to keep the same full 26-agent-per-category shape.
+  **Stage 3 (category 2: weirs & orifices, 48 keys × 26 languages) — DONE 2026-07-17.** 30 real
+  defects fixed across 10 languages (am, bn, bg, fa, he, hr, hi, my, uk, zh) + 8 more in sw (highest
+  single-language count of any stage so far); 16 languages clean. One cross-cutting defect
+  deliberately left unfixed (sw's "weir"=bwawa/dam confusion vs. the glossary term already used
+  correctly in that file's own irr_ keys — needs a suite-wide rename decision, not a single-category
+  patch); two more of the same cross-key-split class surfaced in pt and km or_/irr_ keys. Full
+  detail in `dev/translation-execution-log.md` ("Stage 3").
+  **PAUSED again 2026-07-17 (Tom): cost.** Same concern as the pre-stage-3 pause — real yield, but
+  expensive per agent-run at this shape. Tom is choosing his own timing to resume rather than
+  continuing stage-by-stage in the same session. Stages 4–6 (categories 3–5: pipe friction,
+  irrigation & seepage, micro-hydro) remain, each still needing its own propose→confirm→launch
+  authorization and its own shape decision (full 26-agent pattern vs. a cheaper alternative) when
+  Tom picks it back up.
 
 ## AI Efficiency Scripting (Overhead)
 

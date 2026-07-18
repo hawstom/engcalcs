@@ -264,7 +264,7 @@ $ec_lang['or_notes_1_def']='Q = C<sub>d</sub> × A × √(2gh). זרימה חו�
 $ec_lang['or_notes_2_term']='משטר הפתח';
 $ec_lang['or_notes_2_def']='משוואות זרימה דרך פתח חלות כאשר המפלס העליון גבוה מגג הפתח. כאשר המפלס נמוך מהגג, יש להשתמש במשוואת השפיכון.';
 $ec_lang['or_notes_3_term']='מקדם הספיקה';
-$ec_lang['or_notes_3_def']='C<sub>d</sub> נע בין 0.60 ל-0.65 לפתחים עם קצה חד. כניסות מעוגלות או שקועות מקבלות ערכים שונים. ראה <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venture-d_590.html">Engineering Toolbox</a> או מדריך הידרולוגיית HEC-RAS.';
+$ec_lang['or_notes_3_def']='C<sub>d</sub> נע בין 0.60 ל-0.65 לפתחים עם קצה חד. כניסות מעוגלות או שקועות מקבלות ערכים שונים. ראה <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venture-d_590.html">Engineering Toolbox</a> או מדריך העיון ההידראולי של HEC-RAS.';
 $ec_lang['or_notes_4_term']='טביעה';
 $ec_lang['or_notes_4_def']='כאשר TWE גבוה מתחתית הפתח, המחשבון מיישם אוטומטית את משוואת הפתח הטבוע עם h = HWE − TWE. כאשר TWE שווה לתחתית הפתח או נמוך ממנה, מניחים זרימה חופשית ו-h = HWE − צנטרואיד.';
 // Micro-Hydro Power

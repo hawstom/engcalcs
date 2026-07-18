@@ -236,9 +236,9 @@ $ec_lang['wi_cumulativeFlow']='Натрупано водно количеств�
 $ec_lang['wi_save_and_calculate']='Запази и изчисли';
 $ec_lang['wi_notes_we_def']='q = ако (дължина = 0) тогава 0 иначе ако (наклон=0) тогава cw*дължина*d<sub>0</sub><sup>1,5</sup> иначе cw/(2,5*наклон) * (d<sub>0</sub><sup>2,5</sup> - d<sub>1</sub><sup>2,5</sup>) където d<sub>1</sub> и d<sub>0</sub> са винаги положителни или нула';
 // Orifice Flow
-$ec_lang['or_main_menu']='Дебит през отвор';
+$ec_lang['or_main_menu']='Водно количество през отвор';
 $ec_lang['or_main_title']='Безплатен онлайн калкулатор за водно количество през отвор';
-$ec_lang['or_main_desc']='Дебит през отвор — свободно или потопено изтичане';
+$ec_lang['or_main_desc']='Водно количество през отвор — свободно или потопено изтичане';
 $ec_lang['or_shape']='Форма на отвора';
 $ec_lang['or_shape_circular']='Кръгъл';
 $ec_lang['or_shape_rectangular']='Правоъгълен';

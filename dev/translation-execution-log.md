@@ -1554,5 +1554,61 @@ keys outside category 1's scope. All touched files re-verified `php -l` clean.
 same defect class the 2026-07-13 Rock Chute audit fixed for a different, newer calculator (rc_) —
 confirms this is a systemic transliteration risk for this specific term, not a one-off.
 
-**Next:** stage 3 (category 2: weirs & orifices) pending Tom's authorization, per the same
-propose→confirm→launch gate as stages 1–2.
+**Stage 3 (category 2: `ws_`/`wi_`/`or_`, 48 keys × 26 languages) — DONE 2026-07-17.** Tom
+authorized resuming in the same full 26-agent shape (all four alternatives — full shape, fewer
+languages, fewer/larger agents, hold off — were offered; Tom chose full shape). Found and fixed 31
+real defects across 10 languages:
+- **am**: `ws_headWaterHeight`/`or_head` used ጭንቅ ("distress/anguish") for "head" instead of the
+  glossary term ሄድ (2 keys); `or_notes_1_def` had the English word "invert" embedded untranslated
+  (1 key).
+- **bn**: "centroid" mistranslated as কেন্দ্রচ্যুতি ("deviation/eccentricity") instead of
+  কেন্দ্রবিন্দু in 4 keys; পানি/জল ("water") intra-file drift in 3 keys.
+- **bg**: `or_main_menu`/`or_main_desc` still used দেবিট/дебит instead of the native-engineer-
+  confirmed suite standard водно количество (2 keys) — `or_main_desc` is the exact string
+  `dev/Bulgarian-engineer-feedback.md` had already corrected elsewhere but this instance was missed.
+- **fa**: `or_invert`/`or_centroid_elev` used ارتفاع ("height") instead of تراز ("datum elevation")
+  for two structural-elevation values feeding the h = HWE − centroid equation (2 keys).
+- **he**: `or_notes_3_def`'s reference to the "HEC-RAS **Hydraulic** Reference Manual" was rendered
+  with הידרולוגיה (*hydrology*, the wrong field) instead of הידראולי (*hydraulic*) — a field-
+  confusion wrong-word defect, the same class as stage 2's עיצוב/תכן register-confusion finding but
+  a different failure (1 key).
+- **hr**: `ws_headWaterHeight` read "Visina preljeva" (height *of the weir structure*) instead of
+  "Preljevna visina" (weir *head*) — the same head-vs-height physical-concept-confusion class as
+  stage 2's specific-gravity/specific-weight defect (1 key).
+- **hi**: `wi_pondingHeight` was a phonetic transliteration "पोंडिंग" of "ponding" instead of the
+  glossary term ताल (1 key).
+- **my**: embedded English "invert" left untranslated in 2 keys (`or_notes_1_def`,
+  `or_notes_4_def`, 3 occurrences); headwater term drift — ဦးရေ (ambiguous with "headcount") used
+  instead of the glossary/label term ရေတက်ဘက်ရေ in 3 more spots. Burmese's known failure class
+  (embedded-source fragments) recurred here for the third audit stage in a row.
+- **uk**: `or_hwe`/`or_twe` used "Позначка рівня" while every other elevation key in the file uses
+  "Відмітка" — intra-file drift, normalized to the dominant term (2 keys).
+- **zh**: `or_width`'s tooltip used 开口 for "opening" instead of 孔口 used everywhere else in the
+  category (1 key).
+- **sw**: the single highest per-language defect count of any language audited across all three
+  stages — 8 fixes: headwater/tailwater used a "kichwa" (head/energy) calque the glossary
+  explicitly warns against, plus a third divergent rendering in the tips (5 keys' worth of
+  headwater/tailwater drift); English word "invert" left embedded untranslated in 2 keys; "opening"
+  rendered inconsistently in 1 key (Fursa vs. ufunguzi). **Flagged but deliberately NOT fixed:**
+  `ws_`/`wi_` render "weir" as bwawa (= dam/pond/reservoir, wrong concept) while the glossary's
+  WMO-confirmed sw term is kizuizi cha maji — already used correctly in this same file's
+  out-of-scope `irr_` keys. Fixing only ws_/wi_ would create fresh cross-key drift against irr_, so
+  this is logged as a suite-wide rename needing its own decision, not patched here.
+
+16 of 26 languages came back clean for this category: ar, cs, de, es, fr, id, it, km, pt, ps,
+ro, ru, sr, tr, uk (clean apart from the one fix above), ur. Two additional out-of-scope
+observations were surfaced but correctly left unfixed (agent judgment, not oversight): pt's `irr_`
+keys use vertedouro/fluxo where in-scope or_/ws_/wi_ use vertedor/vazão (cross-key split, flagged
+for a future irr_-scoped pass); km's or_/odt_ keys use bare ប្រហោង where irr_/odt_ titles use the
+glossary's fuller ប្រហោងទឹក (same class of cross-key split). Both mirror the sw weir-term finding
+above — a pattern worth noting for whoever scopes the next full-suite consolidation pass.
+
+Post-sprint QA: `php -l` clean on all 26 touched/audited files; tag-parity check (`<sub>`/`<sup>`/
+`<span>` sets) run against English for every one of the ~30 edited keys — zero mismatches; no
+`ANTHROPIC_API_KEY` set, so back-translation-equivalent verification was done inline (reading each
+edited key's before/after against the English source meaning) rather than via
+`backtranslate_check.php` — same rigor, no billing, per the QA chain's documented no-skip rule.
+
+**Next:** stage 4 (category 3, pending Tom's authorization) — categories 3–5 (pipe friction,
+irrigation & seepage, micro-hydro) remain; category 6 = stage 1, category 1 = stage 2, category 2 =
+stage 3.
