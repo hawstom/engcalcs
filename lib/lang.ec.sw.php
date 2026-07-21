@@ -274,7 +274,7 @@ $ec_lang['mhp_main_menu']='Umeme Mdogo wa Maji';
 $ec_lang['mhp_main_title']='Kikokotoo cha Bure cha Mtandaoni cha Umeme Mdogo wa Maji';
 $ec_lang['mhp_main_desc']='Kikokotoo cha Uzalishaji wa Umeme Mdogo wa Maji kutoka Mtiririko wa Mto (Bila Bwawa)';
 $ec_lang['mhp_gross_head']='Kichwa jumla, H<sub>gross</sub>';
-$ec_lang['mhp_diameter']='Kipenyo cha bomba la shinikizo, D';
+$ec_lang['mhp_diameter']='<span class="ec-help" title="Kipenyo cha bomba la shinikizo (bomba la kusambaza maji)">Kipenyo cha bomba la shinikizo, D <span class="ec-tip">?</span></span>';
 $ec_lang['mhp_length']='Urefu, L';
 $ec_lang['mhp_efficiency']='Ufanisi wa kiwanda, η (0–1)';
 $ec_lang['mhp_vel_check']='Ukaguzi wa kasi';
@@ -303,9 +303,9 @@ $ec_lang['mhp_notes_7_term']='Nishati ya Kila Mwaka';
 $ec_lang['mhp_notes_7_def']='Nishati ya kila mwaka inadhania uendeshaji endelevu wa mtiririko kamili (masaa 8760 kwa mwaka). Uzalishaji halisi utakuwa mdogo zaidi kutokana na mabadiliko ya msimu wa mtiririko, muda wa kusimama kwa matengenezo, na kipengele cha mzigo.';
 
 // Orifice Drain Time
-$ec_lang['odt_main_menu']='Muda wa Kumwagika kwa Tundu';
-$ec_lang['odt_main_title']='Kikokotoo cha Bure Mtandaoni cha Muda wa Kumwagika kwa Tundu — Bwawa, Bonde, au Tanki';
-$ec_lang['odt_main_desc']='Muda wa Kumwagika kwa Bwawa au Bonde kwa Tundu — Njia ya Kiasi cha Koni';
+$ec_lang['odt_main_menu']='Muda wa Kumwagika kwa Bwawa na Tanki';
+$ec_lang['odt_main_title']='Kikokotoo cha Bure Mtandaoni cha Muda wa Kumwagika kwa Bwawa, Bonde, na Tanki (Tundu)';
+$ec_lang['odt_main_desc']='Muda wa Kumwagika kwa Bwawa, Bonde, au Tanki &mdash; Utokaji wa Tundu, Njia ya Kiasi cha Koni';
 $ec_lang['odt_h1_elev']='Kiwango cha awali cha uso wa maji';
 $ec_lang['odt_a1']='Eneo la awali, A<sub>1</sub>';
 $ec_lang['odt_h2_elev']='Kiwango cha mwisho cha uso wa maji';

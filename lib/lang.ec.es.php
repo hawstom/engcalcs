@@ -274,7 +274,7 @@ $ec_lang['mhp_main_menu']='Micro-Hidroeléctrica';
 $ec_lang['mhp_main_title']='Calculadora Gratuita de Potencia Micro-Hidroeléctrica';
 $ec_lang['mhp_main_desc']='Calculadora de Potencia de Micro-Hidroeléctrica de Pasada';
 $ec_lang['mhp_gross_head']='Carga bruta, H<sub>gross</sub>';
-$ec_lang['mhp_diameter']='Diámetro de la tubería de presión, D';
+$ec_lang['mhp_diameter']='<span class="ec-help" title="Diámetro de la tubería de presión (tubería de suministro)">Diámetro de la tubería de presión, D <span class="ec-tip">?</span></span>';
 $ec_lang['mhp_length']='Longitud, L';
 $ec_lang['mhp_efficiency']='Rendimiento de la instalación, η (0–1)';
 $ec_lang['mhp_vel_check']='Verificación de velocidad';
@@ -303,9 +303,9 @@ $ec_lang['mhp_notes_7_term']='Energía anual';
 $ec_lang['mhp_notes_7_def']='La energía anual supone operación continua a caudal completo (8760 horas/año). La producción real será menor debido a la variación estacional del caudal, paradas por mantenimiento y factor de carga.';
 
 // Orifice Drain Time
-$ec_lang['odt_main_menu']='Tiempo de vaciado por orificio';
-$ec_lang['odt_main_title']='Calculadora gratuita en línea de tiempo de vaciado por orificio — estanque, laguna o tanque';
-$ec_lang['odt_main_desc']='Tiempo de vaciado por orificio de estanque o laguna &mdash; método del volumen cónico';
+$ec_lang['odt_main_menu']='Tiempo de vaciado de estanque y tanque';
+$ec_lang['odt_main_title']='Calculadora gratuita en línea de tiempo de vaciado de estanque, cuenca y tanque (orificio)';
+$ec_lang['odt_main_desc']='Tiempo de vaciado de estanque, cuenca o tanque &mdash; salida por orificio, método del volumen cónico';
 $ec_lang['odt_h1_elev']='Elevación inicial de la superficie del agua';
 $ec_lang['odt_a1']='Área inicial, A<sub>1</sub>';
 $ec_lang['odt_h2_elev']='Elevación final de la superficie del agua';

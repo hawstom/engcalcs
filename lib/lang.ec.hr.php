@@ -272,7 +272,7 @@ $ec_lang['mhp_main_menu']='Mala hidroelektrana';
 $ec_lang['mhp_main_title']='Besplatni online kalkulator za malu hidroelektranu';
 $ec_lang['mhp_main_desc']='Kalkulator izlazne snage male hidroelektrane protočnog tipa';
 $ec_lang['mhp_gross_head']='Bruto visinski pad, H<sub>gross</sub>';
-$ec_lang['mhp_diameter']='Promjer dovodne cijevi, D';
+$ec_lang['mhp_diameter']='<span class="ec-help" title="Promjer tlačnog cjevovoda (dovodne cijevi)">Promjer dovodne cijevi, D <span class="ec-tip">?</span></span>';
 $ec_lang['mhp_length']='Duljina, L';
 $ec_lang['mhp_efficiency']='Učinkovitost postrojenja, &eta; (0&ndash;1)';
 $ec_lang['mhp_vel_check']='Provjera brzine';
@@ -301,9 +301,9 @@ $ec_lang['mhp_notes_7_term']='Godišnja energija';
 $ec_lang['mhp_notes_7_def']='Godišnja energija pretpostavlja neprekidan rad pri punom protoku (8760 sati/godišnje). Stvarna proizvodnja bit će niža zbog sezonskih varijacija protoka, zastoja za održavanje i faktora opterećenja.';
 
 // Orifice Drain Time
-$ec_lang['odt_main_menu']='Vrijeme pražnjenja otvora';
-$ec_lang['odt_main_title']='Besplatni online kalkulator vremena pražnjenja otvora — jezerce, bazen ili rezervoar';
-$ec_lang['odt_main_desc']='Vrijeme pražnjenja jezerca ili bazena kroz otvor &mdash; metoda koničnog volumena';
+$ec_lang['odt_main_menu']='Vrijeme pražnjenja jezerca i spremnika';
+$ec_lang['odt_main_title']='Besplatni online kalkulator vremena pražnjenja jezerca, bazena i spremnika (otvor)';
+$ec_lang['odt_main_desc']='Vrijeme pražnjenja jezerca, bazena ili spremnika &mdash; izljev kroz otvor, metoda koničnog volumena';
 $ec_lang['odt_h1_elev']='Početna kota razine vode';
 $ec_lang['odt_a1']='Početna površina, A<sub>1</sub>';
 $ec_lang['odt_h2_elev']='Završna kota razine vode';

@@ -200,18 +200,6 @@ The rules, sequence, and QA chain for translation work are **not** restated here
 - **`CLAUDE.md` § "Translation Sprints"** — sprint mechanics, model policy, pre/post-sprint checklist.
 - **`dev/translation-execution-log.md`** — the full dated, category-by-category execution record.
 
-- 92|127| **`mhp_diameter` tooltip — DECIDED 2026-07-21 (Tom): restore everywhere.** (Priority 6 to
-  match Task 130's priority — executes as a rider inside that sprint.) English is
-  correct as-is ("Penstock (supply pipe) diameter" with `.ec-help`); all languages match English.
-  Restore the `.ec-help` wrapper on the ~10 languages that dropped it (es/de/cs/fr/it/hr/ro/sw/uk/zh);
-  the languages that already restored it (11 langs: am/bn/fa/hi/id/km/my/ps/ru/tr/ur) are correct.
-  **Execution note (2026-07-21):** *not* a pure markup wrap after all — the 15 missing langs
-  (ar/bg/cs/de/es/fr/he/hr/it/pt/ro/sr/sw/uk/zh) have the *label* translated but **no tip text**;
-  English's tip adds a "(supply pipe)" gloss absent from the label, so restoring it requires
-  *translating* that gloss into 15 languages (several unverifiable inline). **Fold into the Task 130
-  authorized sprint as a one-key rider** — cheapest QA-honest path (Sonnet-per-language is the right
-  tool for the gloss; the SOP now permits cross-calculator maintenance bundling). Not doable as a
-  no-agent mechanical pass.
 - 82|129| **Stale-English-revision resync audit.** Independently flagged by ru/pt/uk in Task 109
   stage 5 (`ip_worst_case_warn`, `ip_du_estimate`, `ip_notes_3_def`, `ip_q_ratio`) and by uk again in
   stage 6 (`mhp_notes_2_def`): several translated strings read as faithful translations of an
@@ -231,60 +219,6 @@ The rules, sequence, and QA chain for translation work are **not** restated here
   filter** — i.e. this is a real (small) Sonnet delta sprint over the 5 flagged keys (only the
   drifted languages get rewritten; matching ones are left alone), not a scriptable fix. Needs
   authorization. Sweep for other keys whose en prose was shortened during Task 109 while translating.
-- 92|130| **`odt_` pass + rebrand as vessel-first drain time.** Two things in one authorized `odt_`
-  sprint (same keys, same 26 files): (a) **fix** am's confirmed head→distress calque and any sibling
-  mistranslations — `odt_` was outside all 6 Task 109 stages. (b) **rebrand for discoverability**
-  (Tom, 2026-07-21, from usage stats — `odt_` has ~zero human reach and is jargon-branded). `odt_`
-  is *not* named after a published method ("Conic Volume Method" is generic), so the Simple-English
-  identity rule *frees* us to rebrand — unlike Manning/Robinson. The title and desc already mention
-  "Pond, Basin, or Tank"; only the **menu entry still leads with "Orifice Drain Time"** (jargon-first
-  — and the menu is what browsing users read). Reorder the identity to lead with the goal/vessel,
-  orifice as method qualifier — **menu wording locked (Tom, 2026-07-21): "Pond & Tank Drain Time"** →
-  menu+title+desc re-translation across
-  26 languages alongside the am fix. One authorized Sonnet sprint; final menu wording is Tom's call
-  before launch.
-- 92|134| **Units English-side audit (then translations).** Tom, 2026-07-21: check `en` for frivolous
-  units and units gaps, *then* audit `u_` unit-token translations — English first, because cutting or
-  adding tokens before translating avoids wasted work. **Read-only audit already started
-  (2026-07-21), findings:** (1) **Not a trim problem — a gap problem.** `bar`, `atm`, `knpm2`,
-  `knpcm2` are defined in `$ec_units` but wired into **zero** dropdowns. Tom wants `bar`/`atm` (US-
-  pervasive) → *fill the gap* (wire into pressure fields); `knpm2`/`knpcm2` likely genuinely dead →
-  prune. (2) Nothing *offered* is clearly frivolous: `mgd`/`mld` paired on 13 flow fields each (keep
-  both), `gph`/`lph` on 9 (keep), `hp`/`mw`/`kw`/`mmph`/`inph` appear once each but are legitimately
-  calculator-specific (micro-hydro power, irrigation precip rate) — Tom's "we don't use power" is
-  slightly off; `mhp_` inherently outputs power. (3) **`kpa`+`npm2` dimensional redundancy is
-  harmless** — `setUnits()` matches unit *labels* by text (`option.innerHTML === unit`), not by
-  position, so aliases coexist; keep unless it causes confusion. (4) **Set-size asymmetry (metric 9
-  tokens, imperial 8) is NOT a problem** — same reason: sets are label-membership bags, not
-  positional field maps. **Units are UNIVERSAL, not per-language (Tom, 2026-07-21, correcting an
-  earlier misstatement):** dropdown contents are the same in every language — every unit token must
-  exist in all 27 lang files; there is no per-locale customization and the architecture does not
-  support one (adding any new system of measurement means adding it to the dropdowns for *all*
-  languages, or retooling). So a gap-fill (e.g. wiring `bar`/`atm` into pressure fields) is a
-  suite-wide change, and the AI research pass on regional unit norms informs *which universal units
-  to add/keep/prune*, not any per-language targeting. Spec cuts/adds before any lang-file `u_` work.
-  **Regional-norms research pass done 2026-07-21 (web-sourced) — pressure units:** (a) **`bar` —
-  strong ADD.** Dominant water/hydraulics pressure unit in Europe & Australia (BS EN sprinkler
-  standards etc.); already defined in `$ec_units`, just wire into pressure fields. (b) **`atm` —
-  research does NOT support it; recommend leave dead / prune.** It's a scientific/lab unit, not an
-  engineering water-pressure unit — US water engineering uses `psi`, not `atm`. This *contradicts
-  Tom's "atm pervasive in US" instinct* — flagging honestly for his call; the sources point to psi.
-  (c) **`kgf/cm²` (kg/cm²) — NEW gap Tom didn't anticipate; consider ADD.** Popular across Asia
-  (pipeline/valve specs, older technical docs), ≈0.98 bar. Not even *defined* in `$ec_units` today
-  (note: existing `knpcm2`/`knpm2` are kilonewton-based and different — likely dead, prune). The
-  suite serves many Asian languages (zh/hi/bn/id/fa/ur/km/my), so this gap has real reach. (d)
-  Confirmed keep: `psi` (US), `kPa` (SI), `mH2O`/`ftH2O` (pump/head, universal). Flow: `mgd` (US),
-  `mld` (metric water-utility) both justified. **DECIDED 2026-07-21 (Tom adopted the findings):**
-  **ADD `bar`** (wire into pressure fields; already defined) and **ADD `kgf/cm²`** (define in
-  `$ec_units` ≈0.980665 bar, wire into pressure fields — Asia norm); **PRUNE `atm`, `knpm2`,
-  `knpcm2`** (dead / not engineering water units); keep `psi`/`kPa`/`mH2O`/`ftH2O`/`mgd`/`mld`.
-  **Remaining execution (this is the open work of Task 134):** (1) add/prune the `$ec_units`
-  definitions; (2) wire `bar`+`kgf/cm²` into every pressure input/result field's unit list across the
-  calculators (suite-wide, English side, no translation); (3) add the two new `u_` unit-token lang
-  keys (`u_bar`, `u_kgfcm2`) to all 27 files — English first, then the 26-language translation of
-  just those 2 short `layout: unit token` keys (small delta sprint, needs authorization); (4)
-  numeric spot-check that a known pressure converts correctly in the new units.
-
 ## AI Efficiency Scripting (Overhead)
 
 These tasks reduce the AI token cost of routine maintenance by replacing repeated AI judgment with deterministic scripts. Copilot owns execution (all tagged `[CP]`); Claude Code specs any script whose output feeds back into translation quality work.
@@ -308,6 +242,31 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
   on all 11 files, `lang_syntax_validate.php` (only advisory identical-to-english findings on
   unrelated keys, none on the 7 migrated keys), ec-help==ec-tip tag-count parity, byte-level
   spot-check of escaped-apostrophe / `&quot;` / RTL cases against the English structure.
+- 0|130| **`odt_` fix + vessel-first rebrand — DONE 2026-07-21.** Authorized by Tom 2026-07-21. One
+  26-agent Sonnet sprint (hand-specified key list, because the payload delta is blind to
+  changed-English-under-stale-translation — same blind spot as Task 129). English `odt_` identity
+  rebranded (menu "Orifice Drain Time" → **"Pond & Tank Drain Time"** Tom-locked; title/desc reordered
+  vessel-first, orifice as method qualifier), then re-translated into all 26 languages. am's residual
+  `odt_` head→distress calque (ጭንቅ in `odt_h1`, `odt_notes_1_def`) fixed to ሄድ. Bundled riders:
+  **Task 127** (mhp_diameter "(supply pipe)" tooltip restored in the 15 langs that lacked it, existing
+  penstock terms reused) and **Task 134** unit-token translations (see below). QA all clean: 27×`php -l`,
+  `lang_syntax_validate` zero hard findings across all 26 (one he escape-leakage on `u_kgfcm2` fixed
+  inline), mhp_diameter tag-parity (ec-help+ec-tip) on all 15, es reach-weighted spot-check, entity
+  single-encoding verified (`&mdash;`/`&amp;` correct — an apparent double-encode was just notification
+  display escaping). Glossary write-back done (v1.10→1.11: head am-odt fix, orifice ps-odt fix, penstock
+  gloss note).
+- 0|127| **`mhp_diameter` tooltip restored suite-wide — DONE 2026-07-21 (rode in Task 130).** The 15
+  languages missing the `.ec-help` "(supply pipe)" tooltip got it added (translated gloss, existing
+  penstock term reused); the 11 that already had it were left intact. Tag-parity verified on all 26.
+- 0|134| **Units audit + bar/kgf-cm² gap-fill — DONE 2026-07-21.** English side (committed earlier):
+  defined `kgfcm2` (0.1 = 1 kgf/cm² per 10 m H₂O), refined `bar` (0.09806), pruned dead
+  `atm`/`knpm2`/`knpcm2`; wired `bar`+`kgf/cm²` into all 27 pressure/head dropdowns across 5 calculators
+  (shear-stress `tau` left as `npm2`/`psf`); added `u_bar`/`u_kgfcm2` to all 27 files. Regional-norms
+  web research drove the add/prune decisions (Tom adopted: add bar+kgf/cm², prune atm as lab-not-water,
+  kgf/cm² is the Asia norm). The 26-language `u_bar`/`u_kgfcm2` translations completed as a rider in the
+  Task 130 sprint. Numeric check: 30 m H₂O = 2.94 bar = 3.0 kgf/cm² = 294 kPa = 42.7 psi (consistent).
+  Design note: units are **universal**, not per-locale (architecture has no per-language dropdown
+  customization).
 - 0|131| **Translate the 5 trap-term tips into 26 languages — DONE 2026-07-21.** Authorized by Tom
   2026-07-21. Scenario-D slice: 26 Sonnet agents (one per language, run in parallel), 5 keys each
   (`or_head`, `ws_headWaterHeight`, `mpf_velocity_head`, `mtc_sgrock`, `rc_sg`), glossary + `avoid`

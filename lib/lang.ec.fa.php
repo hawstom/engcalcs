@@ -35,8 +35,8 @@ $ec_lang['u_npm2']="N/m^2";
 $ec_lang['u_pa']="Pa";
 $ec_lang['u_psf']="psf";
 $ec_lang['u_psi']="psi";
-$ec_lang['u_bar']="bar";
-$ec_lang['u_kgfcm2']="kgf/cm^2";
+$ec_lang['u_bar']="بار";
+$ec_lang['u_kgfcm2']="کیلوگرم‌نیرو/سانتی‌متر²";
 $ec_lang['u_s']="sec";
 $ec_lang['u_lph']="L/hr";
 $ec_lang['u_gph']="gal/hr";
@@ -303,9 +303,9 @@ $ec_lang['mhp_notes_7_term']='انرژی سالانه';
 $ec_lang['mhp_notes_7_def']='انرژی سالانه بر اساس عملکرد پیوسته با جریان کامل (8760 ساعت در سال) محاسبه می‌شود. تولید واقعی به دلیل تغییرات فصلی جریان، زمان توقف برای تعمیر و نگهداری، و ضریب بار کمتر خواهد بود.';
 
 // Orifice Drain Time
-$ec_lang['odt_main_menu']='زمان تخلیه دریچه';
-$ec_lang['odt_main_title']='ماشین‌حساب رایگان آنلاین زمان تخلیه دریچه — استخر، حوضچه یا مخزن';
-$ec_lang['odt_main_desc']='زمان تخلیه دریچه استخر یا حوضچه — روش حجم مخروطی';
+$ec_lang['odt_main_menu']='زمان تخلیه استخر &amp; مخزن';
+$ec_lang['odt_main_title']='ماشین‌حساب رایگان آنلاین زمان تخلیه استخر، حوضچه و مخزن (دریچه)';
+$ec_lang['odt_main_desc']='زمان تخلیه استخر، حوضچه یا مخزن &mdash; خروجی دریچه، روش حجم مخروطی';
 $ec_lang['odt_h1_elev']='ارتفاع سطح آب اولیه';
 $ec_lang['odt_a1']='مساحت اولیه، A<sub>1</sub>';
 $ec_lang['odt_h2_elev']='ارتفاع سطح آب نهایی';

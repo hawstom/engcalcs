@@ -273,7 +273,7 @@ $ec_lang['mhp_main_menu']='Micro-Idroelettrico';
 $ec_lang['mhp_main_title']='Calcolatore Gratuito di Potenza Micro-Idroelettrica';
 $ec_lang['mhp_main_desc']='Calcolatore di Potenza Micro-Idroelettrica ad Acqua Fluente';
 $ec_lang['mhp_gross_head']='Altezza lorda, H<sub>gross</sub>';
-$ec_lang['mhp_diameter']='Diametro della condotta forzata, D';
+$ec_lang['mhp_diameter']='<span class="ec-help" title="Diametro della condotta forzata (tubo di alimentazione)">Diametro della condotta forzata, D <span class="ec-tip">?</span></span>';
 $ec_lang['mhp_length']='Lunghezza, L';
 $ec_lang['mhp_efficiency']='Rendimento dell\'impianto, η (0–1)';
 $ec_lang['mhp_vel_check']='Verifica della velocità';
@@ -302,9 +302,9 @@ $ec_lang['mhp_notes_7_term']='Energia annua';
 $ec_lang['mhp_notes_7_def']='L\'energia annua presuppone un funzionamento continuativo a portata piena (8760 ore/anno). La produzione reale sarà inferiore a causa della variazione stagionale di portata, dei tempi di fermo per manutenzione e del fattore di carico.';
 
 // Orifice Drain Time
-$ec_lang['odt_main_menu']='Tempo di svuotamento a orifizio';
-$ec_lang['odt_main_title']='Calcolatore gratuito online del tempo di svuotamento a orifizio — laghetto, vasca o serbatoio';
-$ec_lang['odt_main_desc']='Tempo di svuotamento a orifizio di laghetto o vasca &mdash; Metodo del volume conico';
+$ec_lang['odt_main_menu']='Laghetto e serbatoio: tempo di svuotamento';
+$ec_lang['odt_main_title']='Calcolatore online gratuito del tempo di svuotamento di laghetto, vasca e serbatoio (orifizio)';
+$ec_lang['odt_main_desc']='Tempo di svuotamento di laghetto, vasca o serbatoio &mdash; Scarico a orifizio, metodo del volume conico';
 $ec_lang['odt_h1_elev']='Quota iniziale del pelo libero';
 $ec_lang['odt_a1']='Area iniziale, A<sub>1</sub>';
 $ec_lang['odt_h2_elev']='Quota finale del pelo libero';

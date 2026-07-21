@@ -303,9 +303,9 @@ $ec_lang['mhp_notes_7_term']='Yıllık Enerji';
 $ec_lang['mhp_notes_7_def']='Yıllık enerji, sürekli tam debi çalışmasını (yılda 8.760 saat) varsayar. Mevsimsel debi değişimi, bakım duruşları ve yük faktörü nedeniyle gerçek üretim daha düşük olacaktır.';
 
 // Orifice Drain Time
-$ec_lang['odt_main_menu']='Orifis Boşalma Süresi';
-$ec_lang['odt_main_title']='Ücretsiz Çevrimiçi Orifis Boşalma Süresi Hesaplayıcısı — Gölet, Havuz veya Depo';
-$ec_lang['odt_main_desc']='Gölet veya Havuz Orifis Boşalma Süresi — Konik Hacim Yöntemi';
+$ec_lang['odt_main_menu']='Gölet &amp; Depo Boşalma Süresi';
+$ec_lang['odt_main_title']='Ücretsiz Çevrimiçi Gölet, Havuz ve Depo Boşalma Süresi Hesaplayıcısı (Orifis)';
+$ec_lang['odt_main_desc']='Gölet, Havuz veya Depo Boşalma Süresi &mdash; Orifis Çıkışlı, Konik Hacim Yöntemi';
 $ec_lang['odt_h1_elev']='Başlangıç su yüzeyi kotu';
 $ec_lang['odt_a1']='Başlangıç alanı, A<sub>1</sub>';
 $ec_lang['odt_h2_elev']='Bitiş su yüzeyi kotu';

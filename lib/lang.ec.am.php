@@ -303,9 +303,9 @@ $ec_lang['mhp_notes_7_term']='ዓመታዊ ሃይል';
 $ec_lang['mhp_notes_7_def']='ዓመታዊ ሃይል ያለማቋረጥ ሙሉ-ፍሰት ስራ (8760 ሰዓት/ዓመት) እንዳለ ይገምታል። ትክክለኛው ምርት በወቅታዊ የፍሰት ልዩነት፣ የጥገና ማቆሚያ ጊዜ እና የጭነት መጠን ምክንያት ያንሳል።';
 
 // Orifice Drain Time
-$ec_lang['odt_main_menu']='ቀዳዳ ፍሳሽ ጊዜ';
-$ec_lang['odt_main_title']='ነፃ ኦንላይን ቀዳዳ ፍሳሽ ጊዜ ካልኩሌተር — ኩሬ፣ ቤዝን ወይም ታንክ';
-$ec_lang['odt_main_desc']='ኩሬ ወይም ቤዝን ቀዳዳ ፍሳሽ ጊዜ — ኮኒካዊ መጠን ዘዴ';
+$ec_lang['odt_main_menu']='ኩሬና ታንክ ፍሳሽ ጊዜ';
+$ec_lang['odt_main_title']='ነፃ ኦንላይን ኩሬ፣ ቤዝን እና ታንክ ፍሳሽ ጊዜ ካልኩሌተር (ቀዳዳ)';
+$ec_lang['odt_main_desc']='ኩሬ፣ ቤዝን ወይም ታንክ ፍሳሽ ጊዜ &mdash; የቀዳዳ መውጫ፣ ኮኒካዊ መጠን ዘዴ';
 $ec_lang['odt_h1_elev']='የጀምር የውሃ ወለል ከፍታ';
 $ec_lang['odt_a1']='የጀምር ስፋት, A<sub>1</sub>';
 $ec_lang['odt_h2_elev']='የማብቂያ የውሃ ወለል ከፍታ';
@@ -322,10 +322,10 @@ $ec_lang['odt_t_min']='ፍሳሽ ጊዜ (ደቂቃዎች)';
 $ec_lang['odt_t_hr']='ፍሳሽ ጊዜ (ሰዓታት)';
 $ec_lang['odt_t_day']='ፍሳሽ ጊዜ (ቀናት)';
 $ec_lang['odt_notes_1_term']='ቀመር';
-$ec_lang['odt_notes_1_def']='t = √H<sub>1</sub> / (C<sub>d</sub> A<sub>or</sub> √(2g)) × (2A<sub>x</sub>/5 + 8√(A<sub>x</sub>A<sub>0</sub>)/15 + 16A<sub>0</sub>/15) ከጭንቅ H እስከ ቀዳዳ ድረስ ያለውን የፍሳሽ ጊዜ ይሰጣል። ፍሳሽ ጊዜ = t(H<sub>1</sub>,A<sub>1</sub>,A<sub>0</sub>) − t(H<sub>2</sub>,A<sub>2</sub>,A<sub>0</sub>)፣ እዚህ ላይ H<sub>1</sub> = የጀምር ከፍታ − የቀዳዳ ከፍታ፣ H<sub>2</sub> = የማብቂያ ከፍታ − የቀዳዳ ከፍታ።';
+$ec_lang['odt_notes_1_def']='t = √H<sub>1</sub> / (C<sub>d</sub> A<sub>or</sub> √(2g)) × (2A<sub>x</sub>/5 + 8√(A<sub>x</sub>A<sub>0</sub>)/15 + 16A<sub>0</sub>/15) ከሄድ H እስከ ቀዳዳ ድረስ ያለውን የፍሳሽ ጊዜ ይሰጣል። ፍሳሽ ጊዜ = t(H<sub>1</sub>,A<sub>1</sub>,A<sub>0</sub>) − t(H<sub>2</sub>,A<sub>2</sub>,A<sub>0</sub>)፣ እዚህ ላይ H<sub>1</sub> = የጀምር ከፍታ − የቀዳዳ ከፍታ፣ H<sub>2</sub> = የማብቂያ ከፍታ − የቀዳዳ ከፍታ።';
 $ec_lang['odt_notes_2_term']='ዘዴ';
 $ec_lang['odt_notes_2_def']='ኮኒካዊ መጠን ዘዴ ኩሬውን ወይም ቤዝኑን ከጀምር ስፋት A<sub>1</sub> (በመጀመሪያው የውሃ ወለል) እስከ ስፋት A<sub>0</sub> (በቀዳዳው ማዕከል ከፍታ) ድረስ እንደ ኮኒካዊ ክፍል አድርጎ ያሞዳል። A<sub>2</sub>፣ ማለትም የኩሬው ስፋት በማብቂያ ከፍታ፣ ከ A<sub>1</sub> እና A<sub>0</sub> በኮኒካዊ ክፍል ሞዴል ተሰልቶ ይገኛል። ከጀምር እስከ ማብቂያ ከፍታ ያለው የፍሳሽ ጊዜ ከ H<sub>1</sub> እስከ ቀዳዳ ካለው ጠቅላላ የፍሳሽ ጊዜ ከ H<sub>2</sub> እስከ ቀዳዳ ከቀረው የፍሳሽ ጊዜ ሲቀነስ እኩል ይሆናል።';
-$ec_lang['odt_h1']='<span class="ec-help" title="የጀምር የውሃ ወለል ከፍታ ሲቀነስ የቀዳዳው ማዕከል ከፍታ">የጀምር ጭንቅ, H<sub>1</sub> <span class="ec-tip">?</span></span>';
+$ec_lang['odt_h1']='<span class="ec-help" title="የጀምር የውሃ ወለል ከፍታ ሲቀነስ የቀዳዳው ማዕከል ከፍታ">የጀምር ሄድ, H<sub>1</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['odt_q_max']='ከፍተኛ ፍሰት, Q<sub>max</sub>';
 $ec_lang['odt_vol']='የፈሰሰ መጠን';
 $ec_lang['odt_sketch_start']='ጅምር';

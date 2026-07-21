@@ -274,7 +274,7 @@ $ec_lang['mhp_main_menu']='Micro-Hydroélectricité';
 $ec_lang['mhp_main_title']='Calculateur Gratuit de Puissance Micro-Hydroélectrique';
 $ec_lang['mhp_main_desc']='Calculateur de Puissance Micro-Hydroélectrique au Fil de l\'Eau';
 $ec_lang['mhp_gross_head']='Hauteur brute, H<sub>gross</sub>';
-$ec_lang['mhp_diameter']='Diamètre de la conduite forcée, D';
+$ec_lang['mhp_diameter']='<span class="ec-help" title="Diamètre de la conduite forcée (conduite d\'alimentation)">Diamètre de la conduite forcée, D <span class="ec-tip">?</span></span>';
 $ec_lang['mhp_length']='Longueur, L';
 $ec_lang['mhp_efficiency']='Rendement de l\'installation, η (0–1)';
 $ec_lang['mhp_vel_check']='Vérification de la vitesse';
@@ -303,9 +303,9 @@ $ec_lang['mhp_notes_7_term']='Énergie annuelle';
 $ec_lang['mhp_notes_7_def']='L\'énergie annuelle suppose un fonctionnement continu à débit plein (8760 heures/an). La production réelle sera plus faible en raison de la variation saisonnière du débit, des temps d\'arrêt pour maintenance et du facteur de charge.';
 
 // Orifice Drain Time
-$ec_lang['odt_main_menu']='Temps de vidange par orifice';
-$ec_lang['odt_main_title']='Calculateur gratuit en ligne du temps de vidange par orifice — Bassin, étang ou réservoir';
-$ec_lang['odt_main_desc']='Temps de vidange d\'un bassin ou étang par orifice — Méthode du volume conique';
+$ec_lang['odt_main_menu']='Temps de vidange d\'étang et de réservoir';
+$ec_lang['odt_main_title']='Calculateur gratuit en ligne du temps de vidange d\'étang, de bassin et de réservoir (orifice)';
+$ec_lang['odt_main_desc']='Temps de vidange d\'un étang, bassin ou réservoir &mdash; Sortie par orifice, méthode du volume conique';
 $ec_lang['odt_h1_elev']='Cote initiale de la surface libre';
 $ec_lang['odt_a1']='Superficie initiale, A<sub>1</sub>';
 $ec_lang['odt_h2_elev']='Cote finale de la surface libre';

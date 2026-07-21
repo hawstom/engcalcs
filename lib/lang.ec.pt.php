@@ -274,7 +274,7 @@ $ec_lang['mhp_main_menu']='Micro-Hidroelétrica';
 $ec_lang['mhp_main_title']='Calculadora Gratuita de Potência Micro-Hidroelétrica';
 $ec_lang['mhp_main_desc']='Calculadora de Potência de Micro-Hidroelétrica a Fio d\'Água';
 $ec_lang['mhp_gross_head']='Altura bruta, H<sub>gross</sub>';
-$ec_lang['mhp_diameter']='Diâmetro da conduta forçada, D';
+$ec_lang['mhp_diameter']='<span class="ec-help" title="Diâmetro da conduta forçada (tubulação de adução)">Diâmetro da conduta forçada, D <span class="ec-tip">?</span></span>';
 $ec_lang['mhp_length']='Comprimento, L';
 $ec_lang['mhp_efficiency']='Rendimento da instalação, η (0–1)';
 $ec_lang['mhp_vel_check']='Verificação da velocidade';
@@ -303,9 +303,9 @@ $ec_lang['mhp_notes_7_term']='Energia Anual';
 $ec_lang['mhp_notes_7_def']='A energia anual pressupõe operação contínua a pleno escoamento (8760 horas/ano). A produção real será menor devido a variação sazonal de escoamento, tempo de paragem para manutenção e fator de carga.';
 
 // Orifice Drain Time
-$ec_lang['odt_main_menu']='Tempo de Esvaziamento por Orifício';
-$ec_lang['odt_main_title']='Calculadora Gratuita Online de Tempo de Esvaziamento por Orifício — Lagoa, Bacia ou Tanque';
-$ec_lang['odt_main_desc']='Tempo de Esvaziamento de Lagoa ou Bacia por Orifício &mdash; Método do Volume Cônico';
+$ec_lang['odt_main_menu']='Tempo de Esvaziamento de Lagoa e Tanque';
+$ec_lang['odt_main_title']='Calculadora Gratuita Online de Tempo de Esvaziamento de Lagoa, Bacia ou Tanque (Orifício)';
+$ec_lang['odt_main_desc']='Tempo de Esvaziamento de Lagoa, Bacia ou Tanque &mdash; Saída por Orifício, Método do Volume Cônico';
 $ec_lang['odt_h1_elev']='Cota inicial da superfície d\'água';
 $ec_lang['odt_a1']='Área inicial, A<sub>1</sub>';
 $ec_lang['odt_h2_elev']='Cota final da superfície d\'água';

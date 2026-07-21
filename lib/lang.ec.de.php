@@ -273,7 +273,7 @@ $ec_lang['mhp_main_menu']='Mikro-Wasserkraft';
 $ec_lang['mhp_main_title']='Kostenloser Online-Rechner für Mikro-Wasserkraft';
 $ec_lang['mhp_main_desc']='Leistungsrechner für Laufwasser-Mikro-Wasserkraftanlagen';
 $ec_lang['mhp_gross_head']='Bruttofallhöhe, H<sub>gross</sub>';
-$ec_lang['mhp_diameter']='Rohrdurchmesser der Druckrohrleitung, D';
+$ec_lang['mhp_diameter']='<span class="ec-help" title="Durchmesser der Druckrohrleitung (Zuleitung)">Rohrdurchmesser der Druckrohrleitung, D <span class="ec-tip">?</span></span>';
 $ec_lang['mhp_length']='Länge, L';
 $ec_lang['mhp_efficiency']='Anlagenwirkungsgrad, η (0–1)';
 $ec_lang['mhp_vel_check']='Geschwindigkeitsprüfung';
@@ -302,9 +302,9 @@ $ec_lang['mhp_notes_7_term']='Jahresenergie';
 $ec_lang['mhp_notes_7_def']='Die Jahresenergie setzt einen kontinuierlichen Vollbetrieb voraus (8760 Stunden/Jahr). Die tatsächliche Produktion ist aufgrund saisonaler Durchflussschwankungen, Wartungsausfallzeiten und des Lastfaktors geringer.';
 
 // Orifice Drain Time
-$ec_lang['odt_main_menu']='Entleerungszeit durch Öffnung';
-$ec_lang['odt_main_title']='Kostenloser Online-Rechner für die Entleerungszeit von Teich, Becken oder Behälter durch eine Öffnung';
-$ec_lang['odt_main_desc']='Entleerungszeit eines Teichs oder Beckens durch Öffnung — Kegelvolumenmethode';
+$ec_lang['odt_main_menu']='Teich- &amp; Behälter-Entleerungszeit';
+$ec_lang['odt_main_title']='Kostenloser Online-Rechner für die Entleerungszeit von Teich, Becken und Behälter (Öffnung)';
+$ec_lang['odt_main_desc']='Entleerungszeit von Teich, Becken oder Behälter &mdash; Auslauf durch Öffnung, Kegelvolumenmethode';
 $ec_lang['odt_h1_elev']='Anfangswasserspiegelhöhe';
 $ec_lang['odt_a1']='Anfangsfläche, A<sub>1</sub>';
 $ec_lang['odt_h2_elev']='Endwasserspiegelhöhe';

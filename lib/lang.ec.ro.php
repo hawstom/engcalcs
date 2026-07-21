@@ -272,7 +272,7 @@ $ec_lang['mhp_main_menu']='Micro-Hidroenergie';
 $ec_lang['mhp_main_title']='Calculator gratuit online de micro-hidroenergie';
 $ec_lang['mhp_main_desc']='Calculator de putere pentru micro-hidrocentrale la cursul apei (fără baraj)';
 $ec_lang['mhp_gross_head']='Cădere brută, H<sub>gross</sub>';
-$ec_lang['mhp_diameter']='Diametrul conductei sub presiune, D';
+$ec_lang['mhp_diameter']='<span class="ec-help" title="Diametrul conductei sub presiune (conducta de alimentare)">Diametrul conductei sub presiune, D <span class="ec-tip">?</span></span>';
 $ec_lang['mhp_length']='Lungimea, L';
 $ec_lang['mhp_efficiency']='Randamentul centralei, η (0–1)';
 $ec_lang['mhp_vel_check']='Verificarea vitezei';
@@ -301,9 +301,9 @@ $ec_lang['mhp_notes_7_term']='Energie anuală';
 $ec_lang['mhp_notes_7_def']='Energia anuală presupune funcționare continuă la debit maxim (8.760 de ore/an). Producția reală va fi mai mică din cauza variației sezoniere a debitului, întreruperii pentru întreținere și factorului de sarcină.';
 
 // Orifice Drain Time
-$ec_lang['odt_main_menu']='Timp de Golire prin Orificiu';
-$ec_lang['odt_main_title']='Calculator Gratuit Online Timp de Golire prin Orificiu — Iaz, Bazin sau Rezervor';
-$ec_lang['odt_main_desc']='Timp de Golire a Iazului sau Bazinului prin Orificiu &mdash; Metoda Volumului Conic';
+$ec_lang['odt_main_menu']='Timp de Golire a Iazului și Rezervorului';
+$ec_lang['odt_main_title']='Calculator Gratuit Online Timp de Golire a Iazului, Bazinului și Rezervorului (Orificiu)';
+$ec_lang['odt_main_desc']='Timp de Golire a Iazului, Bazinului sau Rezervorului &mdash; Evacuare prin Orificiu, Metoda Volumului Conic';
 $ec_lang['odt_h1_elev']='Cota inițială a suprafeței apei';
 $ec_lang['odt_a1']='Aria inițială, A<sub>1</sub>';
 $ec_lang['odt_h2_elev']='Cota finală a suprafeței apei';

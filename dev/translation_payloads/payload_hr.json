@@ -275,7 +275,7 @@
                 "term": "orifice",
                 "symbol": "",
                 "context": "A submerged or free-flowing opening through which water discharges under head. Appears in Orifice Flow and Orifice Drain Time calculators.",
-                "translation_notes": "In irrigation contexts, often the opening of a headgate or pipe turnout. Use the hydraulic engineering term, not a general word for 'hole' or 'opening'. Task 109 stage 3 (2026-07-19): zh confirmed on 孔口 — the tooltip 'opening' drift 开口 in or_width was aligned.",
+                "translation_notes": "In irrigation contexts, often the opening of a headgate or pipe turnout. Use the hydraulic engineering term, not a general word for 'hole' or 'opening'. Task 109 stage 3 (2026-07-19): zh confirmed on 孔口 — the tooltip 'opening' drift 开口 in or_width was aligned. Task 130 (2026-07-21): ps odt_ menu\/desc used سوري (generic hole); corrected to the glossary term منفذ.",
                 "preferred_translation": "otvor"
             },
             {

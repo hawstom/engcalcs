@@ -302,9 +302,9 @@ $ec_lang['mhp_notes_7_term']='Energi Tahunan';
 $ec_lang['mhp_notes_7_def']='Energi tahunan mengasumsikan operasi aliran penuh berkelanjutan (8.760 jam/tahun). Produksi aktual akan lebih rendah akibat variasi debit musiman, waktu henti pemeliharaan, dan faktor beban.';
 
 // Orifice Drain Time
-$ec_lang['odt_main_menu']='Waktu Pengosongan Lubang Aliran';
-$ec_lang['odt_main_title']='Kalkulator Waktu Pengosongan Lubang Aliran Gratis Daring — Kolam, Cekungan, atau Tangki';
-$ec_lang['odt_main_desc']='Waktu Pengosongan Kolam atau Cekungan melalui Lubang Aliran — Metode Volume Konik';
+$ec_lang['odt_main_menu']='Waktu Pengosongan Kolam & Tangki';
+$ec_lang['odt_main_title']='Kalkulator Waktu Pengosongan Kolam, Cekungan, dan Tangki Gratis Daring (Lubang Aliran)';
+$ec_lang['odt_main_desc']='Waktu Pengosongan Kolam, Cekungan, atau Tangki &mdash; Keluaran Lubang Aliran, Metode Volume Konik';
 $ec_lang['odt_h1_elev']='Elevasi permukaan air awal';
 $ec_lang['odt_a1']='Luas awal, A<sub>1</sub>';
 $ec_lang['odt_h2_elev']='Elevasi permukaan air akhir';

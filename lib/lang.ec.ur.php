@@ -35,7 +35,7 @@ $ec_lang['u_npm2']='N/m^2';
 $ec_lang['u_pa']='Pa';
 $ec_lang['u_psf']='psf';
 $ec_lang['u_psi']='psi';
-$ec_lang['u_bar']="bar";
+$ec_lang['u_bar']="بار";
 $ec_lang['u_kgfcm2']="kgf/cm^2";
 $ec_lang['u_s']='سیکنڈ';
 $ec_lang['u_lph']="L/hr";
@@ -303,9 +303,9 @@ $ec_lang['mhp_notes_7_term']='سالانہ توانائی';
 $ec_lang['mhp_notes_7_def']='سالانہ توانائی مسلسل مکمل بہاؤ آپریشن (8760 گھنٹے/سال) فرض کرتی ہے۔ موسمی بہاؤ تغیر، دیکھ بھال بند وقت اور بار گتانک کی وجہ سے اصل پیداوار کم ہوگی۔';
 
 // Orifice Drain Time
-$ec_lang['odt_main_menu']='سوراخ نکاسی وقت';
-$ec_lang['odt_main_title']='مفت آنلائن سوراخ نکاسی وقت حاسبہ — تالاب، حوض یا ٹینک';
-$ec_lang['odt_main_desc']='تالاب یا حوض سوراخ نکاسی وقت — مخروطی حجم طریقہ';
+$ec_lang['odt_main_menu']='تالاب اور ٹینک نکاسی وقت';
+$ec_lang['odt_main_title']='مفت آنلائن تالاب، حوض اور ٹینک نکاسی وقت حاسبہ (سوراخ)';
+$ec_lang['odt_main_desc']='تالاب، حوض یا ٹینک نکاسی وقت &mdash; سوراخ آؤٹ لیٹ، مخروطی حجم طریقہ';
 $ec_lang['odt_h1_elev']='ابتدائی سطح آب';
 $ec_lang['odt_a1']='ابتدائی رقبہ، A<sub>1</sub>';
 $ec_lang['odt_h2_elev']='آخری سطح آب';

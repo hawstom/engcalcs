@@ -273,7 +273,7 @@ $ec_lang['mhp_main_menu']='Mikro-vodní elektrárna';
 $ec_lang['mhp_main_title']='Bezplatný online kalkulátor výkonu mikro-vodní elektrárny';
 $ec_lang['mhp_main_desc']='Kalkulátor výkonu průtočné mikro-vodní elektrárny';
 $ec_lang['mhp_gross_head']='Hrubý spád, H<sub>gross</sub>';
-$ec_lang['mhp_diameter']='Průměr tlakovodu, D';
+$ec_lang['mhp_diameter']='<span class="ec-help" title="Průměr tlakovodu (přiváděcího potrubí)">Průměr tlakovodu, D <span class="ec-tip">?</span></span>';
 $ec_lang['mhp_length']='Délka, L';
 $ec_lang['mhp_efficiency']='Účinnost elektrárny, η (0–1)';
 $ec_lang['mhp_vel_check']='Kontrola rychlosti';
@@ -302,9 +302,9 @@ $ec_lang['mhp_notes_7_term']='Roční výroba energie';
 $ec_lang['mhp_notes_7_def']='Roční výroba energie předpokládá nepřetržitý provoz při plném průtoku (8760 hodin/rok). Skutečná výroba bude nižší z důvodu sezónní variability průtoku, prostojů při údržbě a faktoru zatížení.';
 
 // Orifice Drain Time
-$ec_lang['odt_main_menu']='Doba prázdnění otvorem';
-$ec_lang['odt_main_title']='Bezplatný online kalkulátor doby prázdnění otvorem — rybník, nádrž nebo jímka';
-$ec_lang['odt_main_desc']='Doba prázdnění rybníka nebo nádrže otvorem — metoda kónického objemu';
+$ec_lang['odt_main_menu']='Doba vypouštění rybníka a nádrže';
+$ec_lang['odt_main_title']='Bezplatný online kalkulátor doby vypouštění rybníka, jímky a nádrže (otvorem)';
+$ec_lang['odt_main_desc']='Doba vypouštění rybníka, jímky nebo nádrže &mdash; výtok otvorem, metoda kónického objemu';
 $ec_lang['odt_h1_elev']='Počáteční kóta hladiny vody';
 $ec_lang['odt_a1']='Počáteční plocha, A<sub>1</sub>';
 $ec_lang['odt_h2_elev']='Koncová kóta hladiny vody';
