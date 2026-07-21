@@ -1877,3 +1877,50 @@ gap and is a lighter-weight variant of the stage-4 retry procedure worth using a
 
 **Next:** stage 6 (category 5: micro-hydro `mhp_`/`rc_`) remains, still needing its own
 propose→confirm→launch authorization per CLAUDE.md.
+
+---
+
+## Task 129 — stale-English-revision resync (2026-07-21)
+
+Closes the "cross-language finding, not fixed in this stage" flagged at the end of stage 5 above:
+the `ip_`/`mhp_` note+tooltip strings that read as translations of an older, longer English source.
+Authorized by Tom 2026-07-21; committed `6a8203b`.
+
+**Scope:** 5 keys — `ip_du_estimate`, `ip_worst_case_warn`, `ip_q_ratio`, `ip_notes_3_def`,
+`mhp_notes_2_def`. The current English of all five was shortened in the Wave-0 reform (commit
+`7bfbda1`) after several languages had already translated the longer version. This is an
+English-sync gap, not per-language terminology drift.
+
+**Method:** explicit-key-slice sprint, 26 Sonnet agents (one per language), driven off the hand-
+specified key list — NOT the payload delta, which is blind to stale-but-present keys (same rationale
+as Tasks 130/131). Each agent did a semantic per-language read against current English and rewrote
+ONLY drifted keys, leaving matching ones untouched. Byte-length was explicitly rejected as a scoping
+filter (script encoding density conflates with real drift).
+
+**Result: 9 languages drifted and were rewritten; 17 were already current.**
+- am, km — `ip_notes_3_def` only (retired "inlet pressure" → "supply pressure").
+- ru — `ip_worst_case_warn`, `ip_q_ratio`.
+- hr — `ip_q_ratio`, `ip_notes_3_def`.
+- cs, es, pt, tr — all four `ip_` keys (cs also fixed a garbled-Czech artifact in `ip_notes_3_def`).
+- uk — `mhp_notes_2_def` (dropped the old "1–3 m/s target range" band) + three `ip_` keys.
+- Already-current (17): ar, bg, bn, de, fa, fr, he, hi, id, it, my, ps, ro, sr, sw, ur, zh.
+
+es/hi also had "textbook" → "standard" (low-quarter DU qualifier) aligned; Tom confirmed that
+distinction is negligible/synonymic, so it was NOT swept to the other languages.
+
+**Pre-sprint sweep** for other Wave-0-shortened keys: `7bfbda1` also shortened `mtc_`/`rc_`/`mi_`
+keys, but spot-checks (pt `mtc_note_2_def`, `rc_qt`) showed those were re-translated in the later
+full-category waves — drift was concentrated in the `ip_`/`mhp_` keys, which had been handled on a
+different track.
+
+**QA (all clean):** 9× `php -l`; `lang_syntax_validate` zero hard findings (only advisory
+identical-to-english on unrelated keys); tag-parity (`<sub>`/`<span>`/`<sup>` + `q<sub>` symbols)
+all-match vs English across 5 keys × 9 langs; entity check clean (no double-encode, no bare
+ampersands); inline back-translation of every rewritten string (no `ANTHROPIC_API_KEY`, so the
+orchestrator verified inline per the no-skip rule). Glossary write-back v1.11→1.12 (resync note on
+the low-quarter DU entry).
+
+**Log-maintenance note:** this log was behind — it ended at stage 5 and did not carry stage 6 or
+Tasks 126/127/130/131/133/134. Those are recorded in `dev/ROADMAP.md`'s `## Completed` section
+instead; only Task 129 is written up here because stage 5 explicitly deferred it to "its own
+investigation."
