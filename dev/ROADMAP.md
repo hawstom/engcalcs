@@ -200,8 +200,8 @@ The rules, sequence, and QA chain for translation work are **not** restated here
 - **`CLAUDE.md` § "Translation Sprints"** — sprint mechanics, model policy, pre/post-sprint checklist.
 - **`dev/translation-execution-log.md`** — the full dated, category-by-category execution record.
 
-- 6|127| **`mhp_diameter` tooltip — DECIDED 2026-07-21 (Tom): restore everywhere.** (Priority 6 to
-  match Task 130 — executes as a rider inside that sprint.) English is
+- 92|127| **`mhp_diameter` tooltip — DECIDED 2026-07-21 (Tom): restore everywhere.** (Priority 6 to
+  match Task 130's priority — executes as a rider inside that sprint.) English is
   correct as-is ("Penstock (supply pipe) diameter" with `.ec-help`); all languages match English.
   Restore the `.ec-help` wrapper on the ~10 languages that dropped it (es/de/cs/fr/it/hr/ro/sw/uk/zh);
   the languages that already restored it (11 langs: am/bn/fa/hi/id/km/my/ps/ru/tr/ur) are correct.
@@ -212,7 +212,7 @@ The rules, sequence, and QA chain for translation work are **not** restated here
   authorized sprint as a one-key rider** — cheapest QA-honest path (Sonnet-per-language is the right
   tool for the gloss; the SOP now permits cross-calculator maintenance bundling). Not doable as a
   no-agent mechanical pass.
-- 8|129| **Stale-English-revision resync audit.** Independently flagged by ru/pt/uk in Task 109
+- 82|129| **Stale-English-revision resync audit.** Independently flagged by ru/pt/uk in Task 109
   stage 5 (`ip_worst_case_warn`, `ip_du_estimate`, `ip_notes_3_def`, `ip_q_ratio`) and by uk again in
   stage 6 (`mhp_notes_2_def`): several translated strings read as faithful translations of an
   **older, longer English revision** that no longer matches the current, shortened English source —
@@ -231,7 +231,7 @@ The rules, sequence, and QA chain for translation work are **not** restated here
   filter** — i.e. this is a real (small) Sonnet delta sprint over the 5 flagged keys (only the
   drifted languages get rewritten; matching ones are left alone), not a scriptable fix. Needs
   authorization. Sweep for other keys whose en prose was shortened during Task 109 while translating.
-- 6|130| **`odt_` pass + rebrand as vessel-first drain time.** Two things in one authorized `odt_`
+- 92|130| **`odt_` pass + rebrand as vessel-first drain time.** Two things in one authorized `odt_`
   sprint (same keys, same 26 files): (a) **fix** am's confirmed head→distress calque and any sibling
   mistranslations — `odt_` was outside all 6 Task 109 stages. (b) **rebrand for discoverability**
   (Tom, 2026-07-21, from usage stats — `odt_` has ~zero human reach and is jargon-branded). `odt_`
@@ -243,7 +243,7 @@ The rules, sequence, and QA chain for translation work are **not** restated here
   menu+title+desc re-translation across
   26 languages alongside the am fix. One authorized Sonnet sprint; final menu wording is Tom's call
   before launch.
-- 9|134| **Units English-side audit (then translations).** Tom, 2026-07-21: check `en` for frivolous
+- 92|134| **Units English-side audit (then translations).** Tom, 2026-07-21: check `en` for frivolous
   units and units gaps, *then* audit `u_` unit-token translations — English first, because cutting or
   adding tokens before translating avoids wasted work. **Read-only audit already started
   (2026-07-21), findings:** (1) **Not a trim problem — a gap problem.** `bar`, `atm`, `knpm2`,

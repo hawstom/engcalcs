@@ -45,12 +45,10 @@ $ec_units['inh2o']=39.37;
 $ec_units['pa']=9806;
 $ec_units['kpa']=9.806;
 $ec_units['npm2']=9806;
-$ec_units['knpm2']=9.806;
-$ec_units['knpcm2']=98060;
-$ec_units['bar']=0.0981;
+$ec_units['bar']=0.09806;      // 1 m H2O = 0.09806 bar
+$ec_units['kgfcm2']=0.1;       // 1 kgf/cm2 = 10 m H2O (Asia pressure norm; Task 134)
 $ec_units['psf']=204.82;
 $ec_units['psi']=1.4223;
-$ec_units['atm']=0.0968;
 
 $ec_units['grade']=1;
 $ec_units['gradePercent']=100;

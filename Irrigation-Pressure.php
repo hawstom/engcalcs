@@ -14,12 +14,12 @@ echoHeader("EngCalcs", $html_title, $html_head);
 echoCalculatorForm(
 	// Inputs
 	Array(
-		Array('name' => 'h_supply',        'type' => 'number', 'default' => '7',    'units' => Array('mh2o', 'mmh2o', 'kpa', 'fth2o', 'inh2o', 'psi'), 'label' => $ec_lang['ip_h_supply']),
+		Array('name' => 'h_supply',        'type' => 'number', 'default' => '7',    'units' => Array('mh2o', 'mmh2o', 'kpa', 'bar', 'kgfcm2', 'fth2o', 'inh2o', 'psi'), 'label' => $ec_lang['ip_h_supply']),
 		Array('name' => 'elev_supply',     'type' => 'number', 'default' => '50',   'units' => Array('m', 'ft'),                                       'label' => $ec_lang['ip_elev_supply']),
 		Array('name' => 'q_design',        'type' => 'number', 'default' => '4',    'units' => Array('lph', 'gph'),                                    'label' => $ec_lang['ip_q_design']),
-		Array('name' => 'h_design',        'type' => 'number', 'default' => '6',    'units' => Array('mh2o', 'mmh2o', 'kpa', 'fth2o', 'inh2o', 'psi'), 'label' => $ec_lang['ip_h_design']),
+		Array('name' => 'h_design',        'type' => 'number', 'default' => '6',    'units' => Array('mh2o', 'mmh2o', 'kpa', 'bar', 'kgfcm2', 'fth2o', 'inh2o', 'psi'), 'label' => $ec_lang['ip_h_design']),
 		Array('name' => 'x',               'type' => 'number', 'default' => '0.5',  'units' => NULL,                                                    'label' => $ec_lang['ip_x']),
-		Array('name' => 'dp_avg',          'type' => 'number', 'default' => '0',    'units' => Array('mh2o', 'mmh2o', 'kpa', 'fth2o', 'inh2o', 'psi'), 'label' => $ec_lang['ip_dp_avg']),
+		Array('name' => 'dp_avg',          'type' => 'number', 'default' => '0',    'units' => Array('mh2o', 'mmh2o', 'kpa', 'bar', 'kgfcm2', 'fth2o', 'inh2o', 'psi'), 'label' => $ec_lang['ip_dp_avg']),
 		Array('name' => 'visc',            'type' => 'number', 'default' => '1e-6', 'units' => NULL,                                                    'label' => '<a target="_blank" href="https://www.engineersedge.com/fluid_flow/kinematic-viscosity-table.htm">'.$ec_lang['dw_kinematic_viscosity_short'].'</a><span class="ec-help" title="'.htmlspecialchars(strip_tags($ec_lang['dw_kinematic_viscosity_tip'])).'"><span class="ec-tip">?</span></span>'),
 		Array('name' => 'se',              'type' => 'number', 'default' => '0.5',  'units' => Array('m', 'mm', 'ft', 'in'),                            'label' => $ec_lang['ip_se']),
 		Array('name' => 'sl',              'type' => 'number', 'default' => '0.5',  'units' => Array('m', 'mm', 'ft', 'in'),                            'label' => $ec_lang['ip_sl']),
@@ -30,7 +30,7 @@ echoCalculatorForm(
 	// Results
 	Array(
 		Array('name' => 'q_supply',      'units' => Array('m3ps', 'lps', 'mld', 'ft3ps', 'gpm', 'mgd', 'lph', 'gph'), 'label' => $ec_lang['ip_q_supply']),
-		Array('name' => 'h_far',         'units' => Array('mh2o', 'mmh2o', 'kpa', 'fth2o', 'inh2o', 'psi'), 'label' => $ec_lang['ip_h_far']),
+		Array('name' => 'h_far',         'units' => Array('mh2o', 'mmh2o', 'kpa', 'bar', 'kgfcm2', 'fth2o', 'inh2o', 'psi'), 'label' => $ec_lang['ip_h_far']),
 		Array('name' => 'q_critical',    'units' => Array('lph', 'gph'),                                    'label' => $ec_lang['ip_q_critical']),
 		Array('name' => 'q_avg_lateral', 'units' => Array('lph', 'gph'),                                    'label' => $ec_lang['ip_q_avg_lateral']),
 		Array('name' => 'q_avg_field',   'units' => Array('lph', 'gph'),                                    'label' => $ec_lang['ip_q_avg_field']),
@@ -92,7 +92,7 @@ function echoCalculatorFormAppend() {
 				</th>
 				<th>
 					<?=$ec_lang['ip_press']?><br />
-					<?php echoUnitSelect($name = 'h_usu', $units = Array('mh2o', 'mmh2o', 'kpa', 'fth2o', 'inh2o', 'psi'), $indent_string); ?>
+					<?php echoUnitSelect($name = 'h_usu', $units = Array('mh2o', 'mmh2o', 'kpa', 'bar', 'kgfcm2', 'fth2o', 'inh2o', 'psi'), $indent_string); ?>
 				</th>
 				<th>
 					<?=$ec_lang['ip_flow']?><br />
@@ -100,7 +100,7 @@ function echoCalculatorFormAppend() {
 				</th>
 				<th>
 					<?=$ec_lang['ip_press']?><br />
-					<?php echoUnitSelect($name = 'h_dsu', $units = Array('mh2o', 'mmh2o', 'kpa', 'fth2o', 'inh2o', 'psi'), $indent_string); ?>
+					<?php echoUnitSelect($name = 'h_dsu', $units = Array('mh2o', 'mmh2o', 'kpa', 'bar', 'kgfcm2', 'fth2o', 'inh2o', 'psi'), $indent_string); ?>
 				</th>
 				<th>
 					<?=$ec_lang['mi_v617']?><br />
@@ -108,19 +108,19 @@ function echoCalculatorFormAppend() {
 				</th>
 				<th>
 					<?=$ec_lang['mi_hv617']?><br />
-					<?php echoUnitSelect($name = 'hvu', $units = Array('mh2o', 'mmh2o', 'kpa', 'fth2o', 'inh2o', 'psi'), $indent_string); ?>
+					<?php echoUnitSelect($name = 'hvu', $units = Array('mh2o', 'mmh2o', 'kpa', 'bar', 'kgfcm2', 'fth2o', 'inh2o', 'psi'), $indent_string); ?>
 				</th>
 				<th>
 					<?=$ec_lang['ip_hf']?><br />
-					<?php echoUnitSelect($name = 'hfu', $units = Array('mh2o', 'mmh2o', 'kpa', 'fth2o', 'inh2o', 'psi'), $indent_string); ?>
+					<?php echoUnitSelect($name = 'hfu', $units = Array('mh2o', 'mmh2o', 'kpa', 'bar', 'kgfcm2', 'fth2o', 'inh2o', 'psi'), $indent_string); ?>
 				</th>
 				<th>
 					<?=$ec_lang['ip_hm']?><br />
-					<?php echoUnitSelect($name = 'hmu', $units = Array('mh2o', 'mmh2o', 'kpa', 'fth2o', 'inh2o', 'psi'), $indent_string); ?>
+					<?php echoUnitSelect($name = 'hmu', $units = Array('mh2o', 'mmh2o', 'kpa', 'bar', 'kgfcm2', 'fth2o', 'inh2o', 'psi'), $indent_string); ?>
 				</th>
 				<th>
 					<?=$ec_lang['ip_hl']?><br />
-					<?php echoUnitSelect($name = 'hlu', $units = Array('mh2o', 'mmh2o', 'kpa', 'fth2o', 'inh2o', 'psi'), $indent_string); ?>
+					<?php echoUnitSelect($name = 'hlu', $units = Array('mh2o', 'mmh2o', 'kpa', 'bar', 'kgfcm2', 'fth2o', 'inh2o', 'psi'), $indent_string); ?>
 				</th>
 			</tr>
 		</thead>
