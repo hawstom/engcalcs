@@ -964,8 +964,13 @@
     {
       "term": "slope",
       "symbol": "S",
-      "context": "Dimensionless ratio of vertical drop to horizontal distance (rise/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
-      "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient/grade, not a geographic or topographic term.",
+      "avoid": [
+        "activity/fitness sense of 'grade' — the treadmill or trail incline for running/walking/jogging; this is the hydraulic energy gradient, not an exercise setting",
+        "geographic or topographic landform term",
+        "school grade / academic mark"
+      ],
+      "context": "Dimensionless ratio of vertical drop to horizontal distance (rise/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators. English aliases 'slope' and 'grade' (u_grade/u_gradePercent) both point here.",
+      "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient/grade, not a geographic or topographic term. [2026-07-21] Centralized the grade activity-sense guard here (was living only as u_grade/u_gradePercent label commentary): the 'avoid' array now carries the running/walking/jogging exercise-incline trap, so the slope entry is the single home for the grade→energy-gradient concept and its wrong senses.",
       "translations": {
         "am": "ቁልቁለት",
         "ar": "انحدار",
