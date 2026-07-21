@@ -46,11 +46,26 @@ counts before anything paid launches.
   - **Wave 2 — major non-Latin:** zh ar he hi bn fa ur.
   - **Wave 3 — low-resource:** am km my ps sw. Always Sonnet, always flagged for
     native review, always run last so the glossary is as mature as possible.
-- **THE SEQUENCING RULE (the one rule this whole SOP exists to enforce):** finish **all three
+- **THE SEQUENCING RULE (build-phase only — Tom, 2026-07-21):** finish **all three
   waves of a calculator category — plus that category's holistic Opus consistency pass — before
   starting the next category.** Never interleave categories. (This was violated once, 2026-07-07,
   when category 2's wave 1 ran before category 1's waves 2–3; the correction cost a re-sequencing.
-  See the execution log if you want the incident.)
+  See the execution log if you want the incident.) **Scope of this rule:** it governs the *initial
+  build-out* — translating a genuinely new calculator into languages for the first time, where
+  cognate-clustering is a real quality lever. That build-out is now complete (all 12 calculators ×
+  26 languages exist). **In maintenance** — targeted resyncs (Scenario C), term-centric sweeps
+  (Scenario D), defect fixes — do **not** re-impose category sequencing; those tasks are
+  cross-category or orphan-key by nature (e.g. an English-source drift spanning `ip_` + `mhp_`, or
+  an `odt_` fix that fits no category). Fix the **term or the defect**, reach-weighted, across
+  whatever calculators it touches.
+- **REACH-WEIGHTED QA (maintenance default — Tom, 2026-07-21):** actual human reach is wildly
+  uneven (en ~83%, es ~10%, then a long ≤1% tail). Two consequences: (1) **es is the standing
+  spot-check target** for every maintenance change — after English, a wrong string costs most in
+  Spanish; never ship a maintenance edit without eyeballing its es rendering. (2) **Zero *current*
+  reach ≠ low value.** Big languages with no measured reach yet (ru, it, bn, id, ur, cs, sr) are a
+  *discovery/SEO* gap, not a quality signal — es at 10% proves the door opens when identity strings
+  are discoverable. Do not deprioritize their translation quality on reach grounds; that's what the
+  wave-3 *low-resource* tier (am/km/my/ps/sw — small community **and** near-zero reach) is for.
 - **Never say "families"** for calculator groupings — say "calculator categories." Reserve "family"
   for nothing; it was retired 2026-07-07 for ambiguity with language families.
 
