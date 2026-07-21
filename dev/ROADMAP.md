@@ -200,25 +200,6 @@ The rules, sequence, and QA chain for translation work are **not** restated here
 - **`CLAUDE.md` § "Translation Sprints"** — sprint mechanics, model policy, pre/post-sprint checklist.
 - **`dev/translation-execution-log.md`** — the full dated, category-by-category execution record.
 
-- 82|129| **Stale-English-revision resync audit.** Independently flagged by ru/pt/uk in Task 109
-  stage 5 (`ip_worst_case_warn`, `ip_du_estimate`, `ip_notes_3_def`, `ip_q_ratio`) and by uk again in
-  stage 6 (`mhp_notes_2_def`): several translated strings read as faithful translations of an
-  **older, longer English revision** that no longer matches the current, shortened English source —
-  an English-source sync gap affecting multiple languages at once, not a per-language terminology
-  defect. Needs its own pass: diff current `lib/lang.ec.en.php` prose against these (and any other)
-  flagged keys across all 26 languages, then re-translate the drifted ones against current English.
-  **Read-only scoping done 2026-07-21:** drift is **CONFIRMED real** — spot-check of ru/pt/uk on
-  `ip_worst_case_warn`, `ip_q_ratio`, `mhp_notes_2_def` shows all three are translations of an older,
-  longer English (e.g. current en `ip_q_ratio` tip = "This is different than our approximation of the
-  standard uniformity measure." but pt/ru/uk carry a full "separate check, not a uniformity figure:
-  how far the last emitter operates from the design flow…" paragraph; uk `mhp_notes_2_def` still
-  carries an old "target range 1–3 m/s" version the current en dropped). **Byte-length is NOT a
-  usable scoping filter** — Cyrillic/Amharic/Burmese/Khmer inflate byte counts by encoding, zh
-  deflates them, so length ratio conflates script density with real drift. **Therefore scoping which
-  languages drifted requires a semantic per-language read against current en, not a mechanical
-  filter** — i.e. this is a real (small) Sonnet delta sprint over the 5 flagged keys (only the
-  drifted languages get rewritten; matching ones are left alone), not a scriptable fix. Needs
-  authorization. Sweep for other keys whose en prose was shortened during Task 109 while translating.
 ## AI Efficiency Scripting (Overhead)
 
 These tasks reduce the AI token cost of routine maintenance by replacing repeated AI judgment with deterministic scripts. Copilot owns execution (all tagged `[CP]`); Claude Code specs any script whose output feeds back into translation quality work.
@@ -229,6 +210,27 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Completed
 
+- 0|129| **Stale-English-revision resync audit — DONE 2026-07-21.** Authorized by Tom 2026-07-21.
+  Explicit-key-slice sprint (26 Sonnet agents, one per language) over the 5 keys flagged in Task 109
+  (`ip_du_estimate`, `ip_worst_case_warn`, `ip_q_ratio`, `ip_notes_3_def`, `mhp_notes_2_def`) whose
+  current English was shortened in the Wave-0 reform (commit 7bfbda1) while several languages still
+  carried translations of the older, longer English. Driven off the explicit key list, not the
+  payload delta (delta is blind to stale-but-present keys — same as Tasks 130/131). Each agent did a
+  semantic per-language read against current English and rewrote ONLY drifted keys. **9 languages
+  carried drift and were rewritten** (am, cs, es, hr, km, pt, ru, tr, uk); the other 17 already
+  reflected current English. Drift kinds fixed: retired "inlet pressure" → current "supply pressure"
+  (am/cs/es/hr/km/pt/tr/uk); ip_q_ratio's stale long "separate check" paragraph → current single
+  sentence (cs/es/hr/pt/ru/tr/uk); ip_worst_case_warn old long form → short two-sentence
+  (cs/es/pt/ru/tr/uk); uk's mhp_notes_2_def dropped-"1–3 m/s band" version → current; cs also fixed a
+  garbled-Czech artifact. es/hi "textbook"→"standard" aligned (Tom confirmed negligible/synonymic —
+  not swept to other languages). **Pre-sprint sweep for other Wave-0-shortened keys:** commit 7bfbda1
+  also shortened mtc_/rc_/mi_ keys, but spot-check (pt `mtc_note_2_def`, `rc_qt`) showed those were
+  re-translated in the later full-category waves — drift was concentrated in the ip_/mhp_ keys, which
+  ip_ was handled differently from. QA all clean: 9×`php -l`; `lang_syntax_validate` zero hard
+  findings (only advisory identical-to-english on unrelated keys); tag-parity (`<sub>`/`<span>`/`<sup>`
+  + `q<sub>` symbols) all-match vs English on all 5 keys × 9 langs; entity check clean (no
+  double-encode, no bare ampersands); inline back-translation of every rewritten string verified
+  against current English. Glossary write-back done (v1.11→1.12: resync note on low-quarter DU entry).
 - 0|126| **Suite-wide tooltip markup migration — DONE 2026-07-21.** Migrated the legacy
   inline-styled tooltip pattern (`<span title="..." style="cursor:help;...">?</span>`) to the
   touch-friendly `.ec-help`/`.ec-tip` convention (only `.ec-help[title]` fires tap tooltips in
