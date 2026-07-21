@@ -147,7 +147,7 @@ $ec_lang['mpf_depth_ratio']='နှိုင်းယှဉ်စီးဆင်
 $ec_lang['mpf_flow']='ရေစီးနှုန်း, Q';
 $ec_lang['mpf_flow_tip']='ရေစီးနှုန်းနှင့်နက်ရှိုင်းမှုကို အလျားအကန့်အသတ်မဲ့ရှည်သောပိုက်တစ်ခုအတွက် တွက်ချက်ထားသည်။ ဤရေစီးနှုန်းကို ပိုက်ထဲသို့ ဝင်ရောက်စေရန် ပိုမြင့်သောရေတက်ဘက်ရေနက်ရှိုင်းမှု လိုအပ်နိုင်သည်။ အသေးစိတ်အချက်များနှင့် သင်ခန်းစာဗီဒီယိုအတွက် အောက်ပါမှတ်ချက်များကို ကြည့်ပါ။';
 $ec_lang['mpf_velocity']='အမြန်နှုန်း, v';
-$ec_lang['mpf_velocity_head']='အမြန်နှုန်း ဖိမြင့်, h<sub>v</sub>';
+$ec_lang['mpf_velocity_head']='<span class="ec-help" title="ရွေ့လျားစွမ်းအင်ကို ရေတိုင်အမြင့်တစ်ခုအဖြစ် ဖော်ပြသည်, v&sup2;/2g">အမြန်နှုန်း ဖိမြင့်, h<sub>v</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['mpf_flow_area']='စီးဆင်းမှုဧရိယာ, A';
 $ec_lang['mpf_pipe_area']='သွတ်ပိုက်ဧရိယာ, A<sub>0</sub>';
 $ec_lang['mpf_area_ratio']='နှိုင်းယှဉ်ဧရိယာ, A/A<sub>0</sub>';
@@ -191,7 +191,7 @@ $ec_lang['mtc_side_slope_2']='ဘေးစောက် ၂, z<sub>2</sub> (အ�
 $ec_lang['mtc_channel_slope']='မြောင်းကြောင်း လျောစောင်း, S';
 $ec_lang['mtc_flow_depth']='စီးဆင်းမှုနက်ရှိုင်းမှု, y';
 $ec_lang['mtc_bend_angle']='<a target="_blank" href="riprap-bend-angle.png">ကောက်ကြောင်းထောင့်, β</a><span class="ec-help" title="ကျောက်အကာ အရွယ်အတွက်။ ပုံကြမ်းအတွက် လင့်ခ်ကိုနှိပ်ပါ။"><span class="ec-tip">?</span></span>';
-$ec_lang['mtc_sgrock']='<span class="ec-help" title="အကြမ်းချေထားသောကျောက်တုံးအတွက် ပုံမှန်အားဖြင့် &asymp; 2.65">ကျောက်တုံးအထူးဆွဲငင်အား, sg <span class="ec-tip">?</span></span>';
+$ec_lang['mtc_sgrock']='<span class="ec-help" title="ရေနှင့်နှိုင်းယှဉ်သော သိပ်သည်းဆ။ အကြမ်းချေထားသောကျောက်တုံးအတွက် ပုံမှန်အားဖြင့် &asymp; 2.65 ဖြစ်သည်။">ကျောက်တုံးအထူးဆွဲငင်အား, sg <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_in']='ဒီဇိုင်းကျောက်တုံးအရွယ်, D<sub>50</sub>';
 $ec_lang['mtc_n_strickler']='Strickler အရ ဒီဇိုင်းကျောက်တုံးအရွယ်အတွက် n';
 $ec_lang['mtc_n_blodgett']='Blodgett အရ ဒီဇိုင်းကျောက်တုံးအရွယ်အတွက် n';
@@ -222,7 +222,7 @@ $ec_lang['ws_main_menu']='ရိုးရှင်းသော ဆည်တမ�
 $ec_lang['ws_main_title']='အခမဲ့ အွန်လိုင်း ရိုးရှင်းသော ကျယ်ပြန့်ထိပ်ပါ ဆည်တမံ စီးဆင်းမှု တွက်ချက်မှုကိရိယာ';
 $ec_lang['ws_main_desc']='ရိုးရှင်းသော ကျယ်ပြန့်ထိပ်ပါ ဆည်တမံ စီးဆင်းမှု တွက်ချက်မှုကိရိယာ';
 $ec_lang['ws_weirLength']='ဆည်တမံအရှည်, L';
-$ec_lang['ws_headWaterHeight']='ခေါင်းဆုံး, h';
+$ec_lang['ws_headWaterHeight']='<span class="ec-help" title="ရေ၏ အလေးချိန်ယူနစ်တစ်ခုအတွက် စွမ်းအင်ဖြစ်ပြီး — ရေတိုင်၏ အမြင့်တစ်ခုအဖြစ် ဖော်ပြသည်၊ ဖိအားမဟုတ်ပါ။">ခေါင်းဆုံး, h <span class="ec-tip">?</span></span>';
 $ec_lang['ws_weirCoefficient']='ဆည်တမံကိန်းဂဏန်း, C<sub>w</sub>';
 $ec_lang['ws_notes_heading']='မှတ်ချက်များ';
 $ec_lang['ws_notes_we_term']='ဆည်တမံညီမျှခြင်း';
@@ -250,7 +250,7 @@ $ec_lang['or_hwe']='ရေတက်ဘက်ရေမြင့်ဆင့်';
 $ec_lang['or_twe']='ရေဆင်းဘက်ရေမြင့်ဆင့်';
 $ec_lang['or_cd']='ရေထွက်ကိန်း, C<sub>d</sub>';
 $ec_lang['or_centroid_elev']='ဗဟိုချက်အမြင့်';
-$ec_lang['or_head']='ထိရောက်သောခေါင်းဆုံး, h';
+$ec_lang['or_head']='<span class="ec-help" title="ရေ၏ အလေးချိန်ယူနစ်တစ်ခုအတွက် စွမ်းအင်ဖြစ်ပြီး — ရေတိုင်၏ အမြင့်တစ်ခုအဖြစ် ဖော်ပြသည်၊ ဖိအားမဟုတ်ပါ။">ထိရောက်သောခေါင်းဆုံး, h <span class="ec-tip">?</span></span>';
 $ec_lang['or_area']='ဖွင့်လှစ်ဧရိယာ, A';
 $ec_lang['or_regime']='ဂေါက်ဝပုံစံစစ်ဆေးမှု';
 $ec_lang['or_regime_valid']='လွတ်လပ်သောကျဆင်းမှု';
@@ -435,7 +435,7 @@ $ec_lang['rc_main_desc']='ကျောက်ထောင်ချောင်း
 $ec_lang['rc_S0']='ချောင်းကြမ်းခင်း လျောစောင်းနှုန်း, S<sub>0</sub>';
 $ec_lang['rc_qt']='<span class="ec-help" title="ကျောက်ထောင်ချောင်း ဝင်ပေါက်တွင် အနံတစ်ယူနစ်လျှင် စီးဆင်းမှု။ ကြမ်းခင်းအနံ B ရှိပြီး စီးဆင်းမှု စုစုပေါင်း Q ရှိသော ချောင်းတစ်ခုအတွက် q_t = Q / B ကို အသုံးပြုပါ။">ယူနစ်စီးဆင်းမှု စုစုပေါင်း, q<sub>t</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['rc_np']='ကျောက်ကာ အပေါက်ပါမှုနှုန်း, n<sub>p</sub>';
-$ec_lang['rc_sg']='<span class="ec-help" title="ပုံမှန် ကျောက်ကြေ (granite) သို့မဟုတ် ကျောက်နက် (basalt) ≈ 2.65။ Robinson သက်ဆိုင်မှုအပိုင်းအခြား: 2.54 မှ 2.82။">ကျောက် အလေးချိန်နှုန်း, sg <span class="ec-tip">?</span></span>';
+$ec_lang['rc_sg']='<span class="ec-help" title="ရေနှင့်နှိုင်းယှဉ်သော သိပ်သည်းဆ။ ပုံမှန် ကျောက်ကြေ (granite) သို့မဟုတ် ကျောက်နက် (basalt) ≈ 2.65 ဖြစ်သည်။ Robinson သက်ဆိုင်မှု အပိုင်းအခြား: 2.54 မှ 2.82။">ကျောက် အလေးချိန်နှုန်း, sg <span class="ec-tip">?</span></span>';
 $ec_lang['rc_SD']='<span class="ec-help" title="ကျောက်အရွယ်အစားဖြန့်ဝေမှု စံသွေဖည်ချက်။ တစ်ပုံစံတည်း ကျောက် ≈ 1.25။ Robinson သက်ဆိုင်သည့်အပိုင်းအခြား: 1.15 မှ 1.47။">ကျောက်အရွယ်အစားဖြန့်ဝေမှု SD = D<sub>84.1</sub>/D<sub>50</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['rc_yn']='<span class="ec-help" title="ရေဝပ်မှု (Hp > yn) ကောင်းသည် — အပေါ်ဘက် ရေတိုက်စားမှုကို လျှော့ချသည်။ (USDA)">ဝင်ပေါက်ချောင်းရှိ ပုံမှန်ရေနက်မှု, y<sub>n</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['rc_D50']='<span class="ec-help" title="ညီမျှခြင်း 1 (S0 &lt; 0.10) သို့မဟုတ် ညီမျှခြင်း 2 (0.10-0.40)။ သက်ဆိုင်မှု: D50 15-278 mm, S0 0.02-0.40။ အပိုင်းအခြားပြင်ပ: တွက်ချက်ခန့်မှန်းထားခြင်း။">လိုအပ်သော ကျောက်အလယ်အလတ်အရွယ်အစား, D<sub>50</sub> <span class="ec-tip">?</span></span>';

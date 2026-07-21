@@ -234,18 +234,16 @@ The rules, sequence, and QA chain for translation work are **not** restated here
   an English-source sync gap affecting multiple languages at once, not a per-language terminology
   defect. Needs its own pass: diff current `lib/lang.ec.en.php` prose against these (and any other)
   flagged keys across all 26 languages, then re-translate the drifted ones against current English.
-- 12|131| **Translate the 5 trap-term tips into 26 languages.** [needs auth to launch]
-  **Scoped down by the 2026-07-21 read-only assessment** (1 Opus agent over the 54-key trap-term
-  slice × 26 languages): the established head/specific-gravity terms are already correct and each
-  language's own standard, units are clean everywhere, and transliteration terms held — **so NO full
-  re-translation is warranted.** The only translation work left is the 5 English tip strings whose
-  values changed 2026-07-20 (`or_head`, `ws_headWaterHeight`, `mpf_velocity_head`, `mtc_sgrock`,
-  `rc_sg`) — all 26 languages now show the old label without the new definitional tip. A small,
-  low-risk Scenario-D slice: 26 Sonnet agents, 5 keys each, glossary + `avoid` injected; each agent
-  also re-adds the SG `.ec-help` tooltip wrapper where a language had dropped it (overlaps Task 127).
-  NB: the standard payload delta will NOT surface these (stale-but-present) — drive off the grep-slice
-  + `list_trap_terms.php`. Terminology-verification residue that the assessment could not self-confirm
-  is tracked separately in Task 128 (sw/my/he native checks); keep decoupled.
+- 8|133| **Cross-key specific-gravity LABEL consolidation (per-language).** Surfaced by the Task 131
+  tip sprint (2026-07-21): within a single language, `mtc_sgrock` and `rc_sg` disagree on the SG term —
+  one uses a weight-flavored label, the other a relative-density-flavored one — in pt (Gravidade
+  específica vs Densidade relativa), uk (Питома вага vs Відносна густина), ar (الكثافة النوعية vs
+  الكثافة النسبية), fa (وزن مخصوص نسبی vs چگالی نسبی), sr (Специфична тежина vs Релативна густина).
+  Each label is individually defensible under the defer-to-cultural-standard rule, but the two
+  calculators should agree within a language. This is a LABEL edit (not tip), so it needs its own
+  authorized pass; pick each language's dominant standard (glossary `specific gravity` translations)
+  and align both keys to it. Distinct from the he/my `head`-label items in Task 128. Recorded in
+  `glossary.json` `specific gravity` translation_notes.
 - 3|130| **`odt_` (Orifice Drain Time) category pass.** Not covered by any of Task 109's 6 planned
   stages. am's `odt_` keys have a confirmed-recurring ጭንቅ (head→distress/anguish calque)
   mistranslation, independently re-surfaced across multiple categories this audit — needs its own
@@ -261,6 +259,22 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|131| **Translate the 5 trap-term tips into 26 languages — DONE 2026-07-21.** Authorized by Tom
+  2026-07-21. Scenario-D slice: 26 Sonnet agents (one per language, run in parallel), 5 keys each
+  (`or_head`, `ws_headWaterHeight`, `mpf_velocity_head`, `mtc_sgrock`, `rc_sg`), glossary + `avoid`
+  injected; driven off the explicit grep-slice, not the payload delta (stale-but-present keys don't
+  surface there). Each agent preserved the existing translated label, added/updated the definitional
+  tip in the whole-label `.ec-help`/`.ec-tip` form, and converted `rc_sg` from the old bare-`?`
+  inline-style tooltip to the `.ec-help` wrapper where a language still had it (Task 127-style fix for
+  the SG label specifically). Post-sprint QA all clean: `lang_syntax_validate.php` (zero
+  escape/tag/foreign-script findings; only advisory identical-to-english on unrelated keys),
+  structural tag-parity on all 130 strings (exactly one `.ec-help` + one `.ec-tip`, balanced spans,
+  subscript parity, no raw ampersands), inline back-translation of every tip. Glossary write-back
+  done (`head` + `specific gravity` translation_notes). Findings spun out: am `head` re-verified
+  clean (ሄד loanword, no ጭንቅ); he/my `head` label issues re-confirmed open → stay in Task 128; new
+  cross-key SG *label* drift (pt/uk/ar/fa/sr) → new Task 133. Labels were preserved throughout —
+  tip-only scope.
 
 - 0|132|[CC] **`$ec_lang_intent` trimming — collapse duplicative definitions to `gloss:` pointers — DONE 2026-07-21.**
   Authorized by Tom 2026-07-20 (the single standing carve-out to the CLAUDE.md intent off-limits rule).

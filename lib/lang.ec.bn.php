@@ -145,7 +145,7 @@ $ec_lang['mpf_depth_ratio']='আপেক্ষিক প্রবাহ গভ�
 $ec_lang['mpf_flow']='প্রবাহ, Q';
 $ec_lang['mpf_flow_tip']='প্রবাহ ও গভীরতা একটি অসীম দৈর্ঘ্যের পাইপের জন্য গণনা করা হয়েছে। এই প্রবাহ পাইপে প্রবেশ করাতে বেশি হেডওয়াটার গভীরতার প্রয়োজন হতে পারে। বিস্তারিত ও একটি টিউটোরিয়াল ভিডিওর জন্য নিচের নোট দেখুন।';
 $ec_lang['mpf_velocity']='বেগ, v';
-$ec_lang['mpf_velocity_head']='বেগ হেড, h<sub>v</sub>';
+$ec_lang['mpf_velocity_head']='<span class="ec-help" title="পানির স্তম্ভের উচ্চতা হিসেবে গতিশক্তি, v&sup2;/2g">বেগ হেড, h<sub>v</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['mpf_flow_area']='প্রবাহ ক্ষেত্রফল, A';
 $ec_lang['mpf_pipe_area']='পাইপ ক্ষেত্রফল, A<sub>0</sub>';
 $ec_lang['mpf_area_ratio']='আপেক্ষিক ক্ষেত্রফল, A/A<sub>0</sub>';
@@ -189,7 +189,7 @@ $ec_lang['mtc_side_slope_2']='পার্শ্ব ঢাল ২, z<sub>2</sub>
 $ec_lang['mtc_channel_slope']='চ্যানেল ঢাল, S';
 $ec_lang['mtc_flow_depth']='প্রবাহ গভীরতা, y';
 $ec_lang['mtc_bend_angle']='<a target="_blank" href="riprap-bend-angle.png">বাঁক কোণ, β</a><span class="ec-help" title="পাথরের স্তরের আকার নির্ধারণের জন্য। চিত্রের জন্য লিঙ্ক অনুসরণ করুন।"><span class="ec-tip">?</span></span>';
-$ec_lang['mtc_sgrock']='<span class="ec-help" title="চূর্ণ পাথরের জন্য সাধারণত &asymp; 2.65">পাথরের আপেক্ষিক গুরুত্ব, sg <span class="ec-tip">?</span></span>';
+$ec_lang['mtc_sgrock']='<span class="ec-help" title="পানির সাপেক্ষে ঘনত্ব। চূর্ণ পাথরের জন্য সাধারণত &asymp; 2.65।">পাথরের আপেক্ষিক গুরুত্ব, sg <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_in']='নকশা পাথরের আকার, D<sub>50</sub>';
 $ec_lang['mtc_n_strickler']='নকশা পাথরের আকারের জন্য n (স্ট্রিকলার পদ্ধতি)';
 $ec_lang['mtc_n_blodgett']='নকশা পাথরের আকারের জন্য n (ব্লডগেট পদ্ধতি)';
@@ -220,7 +220,7 @@ $ec_lang['ws_main_menu']='সহজ ওয়্যার বা বাঁধ �
 $ec_lang['ws_main_title']='বিনামূল্যে অনলাইন সহজ বিস্তৃত-ক্রেস্ট ওয়্যার প্রবাহ ক্যালকুলেটর';
 $ec_lang['ws_main_desc']='সহজ বিস্তৃত-ক্রেস্ট ওয়্যার বা বাঁধ প্রবাহ ক্যালকুলেটর';
 $ec_lang['ws_weirLength']='ওয়্যার দৈর্ঘ্য, L';
-$ec_lang['ws_headWaterHeight']='হেড, h';
+$ec_lang['ws_headWaterHeight']='<span class="ec-help" title="পানির একক ওজনপ্রতি শক্তি — পানির স্তম্ভের একটি উচ্চতা, চাপ নয়">হেড, h <span class="ec-tip">?</span></span>';
 $ec_lang['ws_weirCoefficient']='ওয়্যার সহগ, C<sub>w</sub>';
 $ec_lang['ws_notes_heading']='নোট';
 $ec_lang['ws_notes_we_term']='ওয়্যার সমীকরণ';
@@ -248,7 +248,7 @@ $ec_lang['or_hwe']='উজানের পানির উচ্চতা';
 $ec_lang['or_twe']='ভাটির পানির উচ্চতা';
 $ec_lang['or_cd']='স্রাব সহগ, C<sub>d</sub>';
 $ec_lang['or_centroid_elev']='কেন্দ্রবিন্দুর উচ্চতা';
-$ec_lang['or_head']='কার্যকর হেড, h';
+$ec_lang['or_head']='<span class="ec-help" title="পানির একক ওজনপ্রতি শক্তি — পানির স্তম্ভের একটি উচ্চতা, চাপ নয়">কার্যকর হেড, h <span class="ec-tip">?</span></span>';
 $ec_lang['or_area']='খোলার ক্ষেত্রফল, A';
 $ec_lang['or_regime']='অরিফিস ব্যবস্থা পরীক্ষা';
 $ec_lang['or_regime_valid']='মুক্ত বহির্গমন';
@@ -432,7 +432,7 @@ $ec_lang['rc_main_desc']='খাড়া নালার পাথর স্ত
 $ec_lang['rc_S0']='খাড়া নালার তলদেশের ঢাল, S<sub>0</sub>';
 $ec_lang['rc_qt']='<span class="ec-help" title="খাড়া নালার ইনলেটে একক প্রস্থ প্রতি প্রবাহ। তলদেশের প্রস্থ B ও মোট প্রবাহ Q সহ একটি চ্যানেলের জন্য, q_t = Q / B ব্যবহার করুন।">মোট একক প্রবাহ, q<sub>t</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['rc_np']='পাথরের স্তরের ছিদ্রতা, n<sub>p</sub>';
-$ec_lang['rc_sg']='<span class="ec-help" title="সাধারণ ভাঙা গ্র্যানাইট বা ব্যাসাল্ট ≈ 2.65। Robinson বৈধ সীমা: 2.54 থেকে 2.82।">পাথরের আপেক্ষিক গুরুত্ব, sg <span class="ec-tip">?</span></span>';
+$ec_lang['rc_sg']='<span class="ec-help" title="পানির সাপেক্ষে ঘনত্ব। সাধারণ চূর্ণ গ্র্যানাইট বা ব্যাসাল্ট ≈ 2.65। Robinson বৈধ সীমা: 2.54 থেকে 2.82।">পাথরের আপেক্ষিক গুরুত্ব, sg <span class="ec-tip">?</span></span>';
 $ec_lang['rc_SD']='<span class="ec-help" title="গ্রেডেশনের মানক বিচ্যুতি। একসমান পাথরের জন্য ≈ 1.25। Robinson বৈধ সীমা: 1.15 থেকে 1.47।">গ্রেডেশন SD = D<sub>84.1</sub>/D<sub>50</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['rc_yn']='<span class="ec-help" title="পানি সঞ্চয় (Hp > yn) ভালো — উজানের ক্ষয় কমায়। (USDA)">ইনলেট চ্যানেলে স্বাভাবিক গভীরতা, y<sub>n</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['rc_D50']='<span class="ec-help" title="সমীকরণ 1 (S0 &lt; 0.10) অথবা সমীকরণ 2 (0.10-0.40)। বৈধ সীমা: D50 15-278 mm, S0 0.02-0.40। সীমার বাইরে হলে: বহির্বিস্তারিত (এক্সট্রাপোলেটেড)।">প্রয়োজনীয় মধ্যমা পাথরের আকার, D<sub>50</sub> <span class="ec-tip">?</span></span>';

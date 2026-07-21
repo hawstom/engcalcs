@@ -144,7 +144,7 @@ $ec_lang['mpf_depth_ratio']='Релативна дубина течења, y/d<s
 $ec_lang['mpf_flow']='Проток, Q';
 $ec_lang['mpf_flow_tip']='Проток и дубина су израчунати за бесконачно дугачку цев. За унос овог протока у цев можда је потребна већа дубина нивоа воде. Погледајте напомене испод за детаље и туторијал видео.';
 $ec_lang['mpf_velocity']='Брзина, v';
-$ec_lang['mpf_velocity_head']='Брзинска висина, h<sub>v</sub>';
+$ec_lang['mpf_velocity_head']='<span class="ec-help" title="Кинетичка енергија изражена као висина водног стуба, v&sup2;/2g">Брзинска висина, h<sub>v</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['mpf_flow_area']='Површина протицајног пресека, A';
 $ec_lang['mpf_pipe_area']='Површина цеви, A<sub>0</sub>';
 $ec_lang['mpf_area_ratio']='Релативна површина, A/A<sub>0</sub>';
@@ -188,7 +188,7 @@ $ec_lang['mtc_side_slope_2']='Нагиб бочне стране 2, z<sub>2</sub
 $ec_lang['mtc_channel_slope']='Пад канала, S';
 $ec_lang['mtc_flow_depth']='Дубина тецања, y';
 $ec_lang['mtc_bend_angle']='<a target="_blank" href="riprap-bend-angle.png">Угао скретања, β</a><span class="ec-help" title="За димензионисање камените насуте конструкције. Пратите везу за шему."><span class="ec-tip">?</span></span>';
-$ec_lang['mtc_sgrock']='<span class="ec-help" title="Типично &asymp; 2,65 за дробљени камен">Специфична тежина камена, sg <span class="ec-tip">?</span></span>';
+$ec_lang['mtc_sgrock']='<span class="ec-help" title="Густина у односу на воду. Типично &asymp; 2,65 за дробљени камен.">Специфична тежина камена, sg <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_in']='Пројектована величина камена, D<sub>50</sub>';
 $ec_lang['mtc_n_strickler']='n за пројектовану величину камена по Strickleru';
 $ec_lang['mtc_n_blodgett']='n за пројектовану величину камена по Blodgettu';
@@ -219,7 +219,7 @@ $ec_lang['ws_main_menu']='Проток преко простог прелива'
 $ec_lang['ws_main_title']='Бесплатни онлајн калкулатор протока преко простог ширококрунског прелива';
 $ec_lang['ws_main_desc']='Калкулатор протока преко простог ширококрунског прелива';
 $ec_lang['ws_weirLength']='Дужина прелива, L';
-$ec_lang['ws_headWaterHeight']='Напор, h';
+$ec_lang['ws_headWaterHeight']='<span class="ec-help" title="Енергија по јединици тежине воде — висина водног стуба, а не притисак">Напор, h <span class="ec-tip">?</span></span>';
 $ec_lang['ws_weirCoefficient']='Коефицијент прелива, C<sub>w</sub>';
 $ec_lang['ws_notes_heading']='Напомене';
 $ec_lang['ws_notes_we_term']='Једначина прелива';
@@ -247,7 +247,7 @@ $ec_lang['or_hwe']='Кота узводног нивоа воде';
 $ec_lang['or_twe']='Кота низводног нивоа воде';
 $ec_lang['or_cd']='Коефицијент протока, C<sub>d</sub>';
 $ec_lang['or_centroid_elev']='Кота тежишта';
-$ec_lang['or_head']='Ефективни напор, h';
+$ec_lang['or_head']='<span class="ec-help" title="Енергија по јединици тежине воде — висина водног стуба, а не притисак">Ефективни напор, h <span class="ec-tip">?</span></span>';
 $ec_lang['or_area']='Површина отвора, A';
 $ec_lang['or_regime']='Провера режима отвора';
 $ec_lang['or_regime_valid']='Слободно истицање';
@@ -433,7 +433,7 @@ $ec_lang['rc_main_desc']='Димензионисање Каменог Попло
 $ec_lang['rc_S0']='Пад дна брзотока, S<sub>0</sub>';
 $ec_lang['rc_qt']='<span class="ec-help" title="Проток по јединици ширине при улазу у брзоток. За канал са ширином дна B и укупним протоком Q користите q_t = Q / B.">Јединични проток, q<sub>t</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['rc_np']='Порозност каменог поплочавања, n<sub>p</sub>';
-$ec_lang['rc_sg']='<span class="ec-help" title="Типичан дробљени гранит или базалт ≈ 2,65. Опсег по Robinson: 2,54 до 2,82.">Релативна густина камена, sg <span class="ec-tip">?</span></span>';
+$ec_lang['rc_sg']='<span class="ec-help" title="Густина у односу на воду. Типичан дробљени гранит или базалт ≈ 2,65. Опсег по Robinson: 2,54 до 2,82.">Релативна густина камена, sg <span class="ec-tip">?</span></span>';
 $ec_lang['rc_SD']='<span class="ec-help" title="Стандардна девијација гранулометријског састава. Уједначен камен ≈ 1,25. Опсег по Robinson: 1,15 до 1,47.">Гранулометрија SD = D<sub>84.1</sub>/D<sub>50</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['rc_yn']='<span class="ec-help" title="Успор (Hp > yn) је пожељан — смањује ерозију узводно. (USDA)">Нормална дубина у улазном каналу, y<sub>n</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['rc_D50']='<span class="ec-help" title="Јед. 1 (S0 < 0,10) или Јед. 2 (0,10–0,40). Важи: D50 15–278 мм, S0 0,02–0,40. Ван опсега: екстраполација.">Потребна медијанска величина камена, D<sub>50</sub> <span class="ec-tip">?</span></span>';
