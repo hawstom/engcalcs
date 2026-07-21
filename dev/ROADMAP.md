@@ -234,17 +234,6 @@ The rules, sequence, and QA chain for translation work are **not** restated here
   an English-source sync gap affecting multiple languages at once, not a per-language terminology
   defect. Needs its own pass: diff current `lib/lang.ec.en.php` prose against these (and any other)
   flagged keys across all 26 languages, then re-translate the drifted ones against current English.
-- 10|132|[CC] **`$ec_lang_intent` trimming — collapse duplicative definitions to `gloss:` pointers.**
-  Authorized by Tom 2026-07-20 (this is the written permission the CLAUDE.md off-limits rule requires;
-  recorded as the single standing carve-out). Scope is strictly bounded: where an intent string's
-  left-of-pipe merely *restates* a concept already in `glossary.json` (e.g. `rc_sg`'s long "relative
-  density… not specific weight" text now duplicated by the glossary entry + the visible tip), replace
-  it with a `| gloss: <term>` pointer and nothing else. Preserve all label-level commentary
-  (`layout`/`symbol`/short-form/`avoid`) untouched — only the duplicative *definition* is trimmed.
-  Method: audit `$ec_lang_intent` in `lib/lang.ec.en.php` for entries whose left-of-pipe overlaps a
-  glossary concept; produce a diff for Tom's review before applying. Implements the "Division of labor:
-  glossary vs. intent vs. tips" rule in CLAUDE.md. Does NOT touch the 26 translated files (intent is
-  English-only).
 - 12|131| **Translate the 5 trap-term tips into 26 languages.** [needs auth to launch]
   **Scoped down by the 2026-07-21 read-only assessment** (1 Opus agent over the 54-key trap-term
   slice × 26 languages): the established head/specific-gravity terms are already correct and each
@@ -272,6 +261,20 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|132|[CC] **`$ec_lang_intent` trimming — collapse duplicative definitions to `gloss:` pointers — DONE 2026-07-21.**
+  Authorized by Tom 2026-07-20 (the single standing carve-out to the CLAUDE.md intent off-limits rule).
+  Audited every non-empty `$ec_lang_intent` left-of-pipe in `lib/lang.ec.en.php` against `glossary.json`;
+  trimmed 12 entries whose left-of-pipe merely restated a glossary concept to `| gloss: <term>` pointers,
+  preserving all label-level commentary (`layout`/`symbol`/`avoid`) — Tom approved Group A + B:
+  `rc_sg` (specific gravity), `rc_Hp` (weir head), `ip_pr` (application rate),
+  `mpf_shear_stress` (shear stress; +symbol), `mi_d50in` (median rock size; +layout),
+  `mhp_efficiency` (plant efficiency), `mhp_diameter`/`mhp_length` (penstock),
+  `rc_notes_6_def` (outlet apron, downstream), `rc_notes_7_def` (weir head, upstream, ponding),
+  `u_grade`/`u_gradePercent` (slope; +layout/avoid). Deliberately kept: `rc_apron_length` (label-specific
+  toe-support length), `rc_yn` (critical directional guidance), and methodology/identity strings with no
+  matching single glossary concept. All `gloss:` targets verified present in the glossary; `php -l` clean.
+  English-only — the 26 translated files were not touched.
 
 - 0|109| **Cross-language consistency audit (Opus, suite-wide) — DONE 2026-07-20, all 6 stages complete.** Tom, 2026-07-14: wants a
   systematic pass, not just spot-checks reacting to a specific question — motivated directly by the
