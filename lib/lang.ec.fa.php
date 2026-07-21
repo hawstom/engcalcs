@@ -190,7 +190,7 @@ $ec_lang['mtc_side_slope_2']='شیب جانبی ۲، z<sub>2</sub> (افقی/ع�
 $ec_lang['mtc_channel_slope']='شیب کانال، S';
 $ec_lang['mtc_flow_depth']='عمق جریان، y';
 $ec_lang['mtc_bend_angle']='<a target="_blank" href="riprap-bend-angle.png">زاویه خمش، β</a><span class="ec-help" title="برای تعیین اندازه سنگ‌چین. برای مشاهده نمودار روی پیوند کلیک کنید."><span class="ec-tip">?</span></span>';
-$ec_lang['mtc_sgrock']='<span class="ec-help" title="چگالی نسبت به آب. برای سنگ خردشده معمولاً &asymp; ۲.۶۵.">وزن مخصوص نسبی سنگ، sg <span class="ec-tip">?</span></span>';
+$ec_lang['mtc_sgrock']='<span class="ec-help" title="چگالی نسبت به آب. برای سنگ خردشده معمولاً &asymp; ۲.۶۵.">چگالی نسبی سنگ، sg <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_in']='اندازه طراحی سنگ، D<sub>50</sub>';
 $ec_lang['mtc_n_strickler']='n برای اندازه طراحی سنگ (روش Strickler)';
 $ec_lang['mtc_n_blodgett']='n برای اندازه طراحی سنگ (روش Blodgett)';

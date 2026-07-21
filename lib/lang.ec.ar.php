@@ -190,7 +190,7 @@ $ec_lang['mtc_side_slope_2']='الميل الجانبي 2، z<sub>2</sub> (أف�
 $ec_lang['mtc_channel_slope']='انحدار القناة، S';
 $ec_lang['mtc_flow_depth']='عمق الجريان، y';
 $ec_lang['mtc_bend_angle']='<a target="_blank" href="riprap-bend-angle.png">زاوية الانحناء، β</a><span class="ec-help" title="لتحديد حجم الصخور. اتبع الرابط لعرض المخطط."><span class="ec-tip">؟</span></span>';
-$ec_lang['mtc_sgrock']='<span class="ec-help" title="الكثافة النسبية إلى الماء. القيمة النموذجية &asymp; 2.65 للصخور المكسّرة.">الكثافة النوعية للصخور، sg <span class="ec-tip">؟</span></span>';
+$ec_lang['mtc_sgrock']='<span class="ec-help" title="الكثافة النسبية إلى الماء. القيمة النموذجية &asymp; 2.65 للصخور المكسّرة.">الكثافة النسبية للصخور، sg <span class="ec-tip">؟</span></span>';
 $ec_lang['mtc_d50_in']='حجم الصخور التصميمي، D<sub>50</sub>';
 $ec_lang['mtc_n_strickler']='n لحجم الصخور التصميمي (طريقة Strickler)';
 $ec_lang['mtc_n_blodgett']='n لحجم الصخور التصميمي (طريقة Blodgett)';

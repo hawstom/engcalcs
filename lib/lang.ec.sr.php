@@ -188,7 +188,7 @@ $ec_lang['mtc_side_slope_2']='Нагиб бочне стране 2, z<sub>2</sub
 $ec_lang['mtc_channel_slope']='Пад канала, S';
 $ec_lang['mtc_flow_depth']='Дубина тецања, y';
 $ec_lang['mtc_bend_angle']='<a target="_blank" href="riprap-bend-angle.png">Угао скретања, β</a><span class="ec-help" title="За димензионисање камените насуте конструкције. Пратите везу за шему."><span class="ec-tip">?</span></span>';
-$ec_lang['mtc_sgrock']='<span class="ec-help" title="Густина у односу на воду. Типично &asymp; 2,65 за дробљени камен.">Специфична тежина камена, sg <span class="ec-tip">?</span></span>';
+$ec_lang['mtc_sgrock']='<span class="ec-help" title="Густина у односу на воду. Типично &asymp; 2,65 за дробљени камен.">Релативна густина камена, sg <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_in']='Пројектована величина камена, D<sub>50</sub>';
 $ec_lang['mtc_n_strickler']='n за пројектовану величину камена по Strickleru';
 $ec_lang['mtc_n_blodgett']='n за пројектовану величину камена по Blodgettu';

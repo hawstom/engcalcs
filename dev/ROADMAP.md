@@ -216,17 +216,6 @@ The rules, sequence, and QA chain for translation work are **not** restated here
   state, not a single-language defect) — an inconsistent split across audit agents. Needs one
   decision: restore it everywhere (matching the languages that already fixed it) or intentionally
   drop it suite-wide (and revert the languages that added it back).
-- 3|128| **Trap-term native-confirmation residue (sw specific gravity + my/he head).** RESOLVED
-  2026-07-20/21 by defer-to-cultural-standard + the trap-term assessment: hr/sr/it glossary values
-  were stale vs. their shipped files and were corrected to each language's own standard (hr
-  "relativna gustoća", sr "релативна густина", it "densità relativa"); tr/he/ps keep their
-  weight-flavored standards (correct, not exceptions). Units clean in all 26. **Remaining, each needs
-  native/source confirmation, none auto-corrected:** (1) sw specific gravity "Uzito maalum" — confirm
-  it is the genuine Swahili standard for the dimensionless ratio (parallel to tr "özgül ağırlık"); if
-  so it stays. (2) my `or_head` "ခေါင်းဆုံး" contains anatomical ခေါင်း and mismatches the my head root
-  — possible anatomical-head calque. (3) he `or_head` "עומק" (depth) vs head root עומד — possibly an
-  intentional depth-to-centroid reading for orifice effective head. All flagged in `glossary.json`
-  (`head` + `specific gravity` entries).
 - 8|129| **Stale-English-revision resync audit.** Independently flagged by ru/pt/uk in Task 109
   stage 5 (`ip_worst_case_warn`, `ip_du_estimate`, `ip_notes_3_def`, `ip_q_ratio`) and by uk again in
   stage 6 (`mhp_notes_2_def`): several translated strings read as faithful translations of an
@@ -234,16 +223,6 @@ The rules, sequence, and QA chain for translation work are **not** restated here
   an English-source sync gap affecting multiple languages at once, not a per-language terminology
   defect. Needs its own pass: diff current `lib/lang.ec.en.php` prose against these (and any other)
   flagged keys across all 26 languages, then re-translate the drifted ones against current English.
-- 8|133| **Cross-key specific-gravity LABEL consolidation (per-language).** Surfaced by the Task 131
-  tip sprint (2026-07-21): within a single language, `mtc_sgrock` and `rc_sg` disagree on the SG term —
-  one uses a weight-flavored label, the other a relative-density-flavored one — in pt (Gravidade
-  específica vs Densidade relativa), uk (Питома вага vs Відносна густина), ar (الكثافة النوعية vs
-  الكثافة النسبية), fa (وزن مخصوص نسبی vs چگالی نسبی), sr (Специфична тежина vs Релативна густина).
-  Each label is individually defensible under the defer-to-cultural-standard rule, but the two
-  calculators should agree within a language. This is a LABEL edit (not tip), so it needs its own
-  authorized pass; pick each language's dominant standard (glossary `specific gravity` translations)
-  and align both keys to it. Distinct from the he/my `head`-label items in Task 128. Recorded in
-  `glossary.json` `specific gravity` translation_notes.
 - 3|130| **`odt_` (Orifice Drain Time) category pass.** Not covered by any of Task 109's 6 planned
   stages. am's `odt_` keys have a confirmed-recurring ጭንቅ (head→distress/anguish calque)
   mistranslation, independently re-surfaced across multiple categories this audit — needs its own
@@ -276,6 +255,35 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
   cross-key SG *label* drift (pt/uk/ar/fa/sr) → new Task 133. Labels were preserved throughout —
   tip-only scope.
 
+- 0|128| **Trap-term native-confirmation residue (sw specific gravity + my/he head) — CLOSED 2026-07-21.**
+  The specific-gravity portion (hr/sr/it stale-glossary corrections; tr/he/ps weight-flavored standards kept;
+  units clean in all 26) was already resolved 2026-07-20/21. The three residual items were closed on Tom's
+  2026-07-21 directive that **native review is not realistically available and we defer to the locally natural
+  term**: (1) sw `mtc_sgrock`/`rc_sg` "Uzito maalum" KEPT — a weight-flavored local standard parallel to tr
+  "özgül ağırlık", internally consistent, dimensionless guard satisfied. (2) my `or_head`/`ws_headWaterHeight`
+  "ခေါင်းဆုံး" KEPT — an anatomically-derived head word is NOT inherently wrong (English "head" is itself the
+  body-part word); it is a locally natural term, not a defect. (3) he `or_head`/`ws_headWaterHeight` "עומק"
+  (depth) KEPT — depth-to-centroid is a physically legitimate reading of orifice effective head, and it is a
+  natural term. Upstream fix: the glossary `head` family's blanket `avoid: "anatomical head"` was mistaken and
+  was reframed across all 7 entries (`head` root + head loss/gross/net/velocity/weir head/headwater elevation)
+  to forbid only *a lazy anatomical calque that is not the local standard* — an anatomically-derived word that
+  IS the dominant standard is now explicitly correct. This does NOT revert the documented cs/he/sw velocity-head
+  calque fixes (those anatomical renderings were not the natural term there, which the reframed guard still
+  catches). Glossary `head` `translation_notes` updated with the full resolution. The 3 intent entries that
+  read `avoid: anatomical "head"` (`mpf_velocity_head`, `ws_headWaterHeight`, `or_head` in `lib/lang.ec.en.php`)
+  were updated to `| gloss: head` pointers (Tom authorized 2026-07-21), so they defer to the reframed glossary
+  guard rather than restating the old blanket avoid.
+- 0|133| **Cross-key specific-gravity LABEL consolidation (per-language) — DONE 2026-07-21.** Authorized by
+  Tom 2026-07-21. In each of the 5 affected languages `mtc_sgrock`'s divergent weight-flavored label was
+  aligned to `rc_sg`'s relative-density-flavored label (which already held this language's dominant glossary
+  standard): pt→"Densidade relativa da rocha", uk→"Відносна густина каменю", ar→"الكثافة النسبية للصخور",
+  fa→"چگالی نسبی سنگ", sr→"Релативна густина камена". Both calculators now agree within each language (ar
+  retains a pre-existing singular/plural difference on the *rock* word only — للصخور vs للصخر — the SG term
+  itself is aligned). Tips were already consistent and left untouched (label-only edit, per the task scope).
+  `lang_syntax_validate.php` clean on all 5 (only advisory identical-to-english on unrelated keys). Glossary
+  `specific gravity` `translation_notes` updated with the resolution. Consolidation happened to align toward
+  relative-density because `rc_sg` held the standard in all 5; a weight-flavored standard would be equally
+  valid to consolidate toward where it is the dominant term — this does not contradict defer-to-cultural-standard.
 - 0|132|[CC] **`$ec_lang_intent` trimming — collapse duplicative definitions to `gloss:` pointers — DONE 2026-07-21.**
   Authorized by Tom 2026-07-20 (the single standing carve-out to the CLAUDE.md intent off-limits rule).
   Audited every non-empty `$ec_lang_intent` left-of-pipe in `lib/lang.ec.en.php` against `glossary.json`;

@@ -190,7 +190,7 @@ $ec_lang['mtc_side_slope_2']='Закладення укосу 2, z<sub>2</sub> (
 $ec_lang['mtc_channel_slope']='Ухил русла, S';
 $ec_lang['mtc_flow_depth']='Глибина течії, y';
 $ec_lang['mtc_bend_angle']='<a target="_blank" href="riprap-bend-angle.png">Кут повороту, β</a><span class="ec-help" title="Для підбору розміру каменю. Перейдіть за посиланням для схеми."><span class="ec-tip">?</span></span>';
-$ec_lang['mtc_sgrock']='<span class="ec-help" title="Густина відносно води. Типове значення &asymp; 2,65 для дробленого каменю.">Питома вага каменю, sg <span class="ec-tip">?</span></span>';
+$ec_lang['mtc_sgrock']='<span class="ec-help" title="Густина відносно води. Типове значення &asymp; 2,65 для дробленого каменю.">Відносна густина каменю, sg <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_in']='Розрахунковий розмір каменю, D<sub>50</sub>';
 $ec_lang['mtc_n_strickler']='n для розрахункового розміру каменю за Strickler';
 $ec_lang['mtc_n_blodgett']='n для розрахункового розміру каменю за Blodgett';

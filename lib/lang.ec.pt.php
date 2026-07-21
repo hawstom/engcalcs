@@ -190,7 +190,7 @@ $ec_lang['mtc_side_slope_2']='Declividade do lado 2, z<sub>2</sub> (horiz./vert.
 $ec_lang['mtc_channel_slope']='Declividade do canal, S';
 $ec_lang['mtc_flow_depth']='Profundidade do escoamento, y';
 $ec_lang['mtc_bend_angle']='<a target="_blank" href="riprap-bend-angle.png">Ângulo da curva, β</a><span class="ec-help" title="Para o tamanho de rocha. Siga o link para o diagrama."><span class="ec-tip">?</span></span>';
-$ec_lang['mtc_sgrock']='<span class="ec-help" title="Densidade relativa à água. Tipicamente &asymp; 2,65 para rocha britada">Gravidade específica da rocha, sg <span class="ec-tip">?</span></span>';
+$ec_lang['mtc_sgrock']='<span class="ec-help" title="Densidade relativa à água. Tipicamente &asymp; 2,65 para rocha britada">Densidade relativa da rocha, sg <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_in']='Tamanho de rocha de projeto, D<sub>50</sub>';
 $ec_lang['mtc_n_strickler']='n para o tamanho de rocha de projeto (método de Strickler)';
 $ec_lang['mtc_n_blodgett']='n para o tamanho de rocha de projeto (método de Blodgett)';
