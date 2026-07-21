@@ -297,7 +297,7 @@ $ec_lang['mhp_notes_3_term']='Objetivo de pérdida de carga';
 $ec_lang['mhp_notes_3_def']='Las pérdidas en la tubería de presión inferiores al 10% de la carga bruta son generalmente económicas. La compensación óptima entre el coste de la tubería y la potencia perdida suele situarse en torno al 4–6% para instalaciones de electricidad de alto valor.';
 $ec_lang['mhp_notes_6_term']='Rendimiento';
 $ec_lang['mhp_notes_6_def']='El rendimiento típico de la instalación η varía de 0,70 a 0,85 para turbinas Pelton y de flujo cruzado, comunes en microhidroeléctrica. Use 0,75 como estimación inicial conservadora.';
-$ec_lang['mhp_notes_7_term']='Energía Anual';
+$ec_lang['mhp_notes_7_term']='Energía anual';
 $ec_lang['mhp_notes_7_def']='La energía anual supone operación continua a caudal completo (8760 horas/año). La producción real será menor debido a la variación estacional del caudal, paradas por mantenimiento y factor de carga.';
 
 // Orifice Drain Time
@@ -351,12 +351,12 @@ $ec_lang['irr_quickref_html']='<h3>Referencia Rápida</h3><dl><dt>Presa de desv�
 $ec_lang['ip_se']='Espaciado de emisores, S<sub>e</sub>';
 $ec_lang['ip_sl']='Espaciado de laterales, S<sub>l</sub>';
 $ec_lang['ip_n_e']='Emisores por lateral, n<sub>e</sub>';
-$ec_lang['ip_n_l']='Laterales por sector, n<sub>l</sub>';
+$ec_lang['ip_n_l']='Laterales por zona, n<sub>l</sub>';
 $ec_lang['ip_d']='Lámina de riego objetivo, d';
 $ec_lang['ip_a_e']='Área por emisor, A<sub>e</sub>';
 $ec_lang['ip_pr']='Tasa de aplicación, PR';
 $ec_lang['ip_q_lat']='Caudal por lateral, Q<sub>lat</sub>';
-$ec_lang['ip_q_sys']='Caudal del sector, Q<sub>zone</sub>';
+$ec_lang['ip_q_sys']='Caudal de la zona, Q<sub>zone</sub>';
 $ec_lang['ip_t_run']='Tiempo de riego (horas)';
 // Canal Seepage / Conveyance Efficiency. Prefix cs_.
 $ec_lang['cs_main_menu']='Pérdida por Infiltración en Canales';
@@ -427,9 +427,9 @@ $ec_lang['contactSpamPostfix']='(Favor de escribirla en inglés con letras. 1=on
 $ec_lang['contactSubmitButton']='Enviar Mensaje';
 $ec_lang['contact_success']='Gracias por tomarse el tiempo para escribir.';
 // Rock Chute Design (Robinson, Rice & Kadavy 1998). Prefix rc_.
-$ec_lang['rc_main_menu']='Diseño de Bajante de Rocado (Robinson)';
-$ec_lang['rc_main_title']='Calculadora Gratuita de Diseño de Bajante de Rocado — Robinson (1998)';
-$ec_lang['rc_main_desc']='Dimensionamiento de Escollera para Bajante de Rocado — Robinson, Rice & Kadavy (1998)';
+$ec_lang['rc_main_menu']='Diseño de Bajante de Escollera (Robinson)';
+$ec_lang['rc_main_title']='Calculadora Gratuita de Diseño de Bajante de Escollera — Robinson (1998)';
+$ec_lang['rc_main_desc']='Dimensionamiento de Escollera para Bajante — Robinson, Rice & Kadavy (1998)';
 $ec_lang['rc_S0']='Pendiente del fondo del canal, S<sub>0</sub>';
 $ec_lang['rc_qt']='<span class="ec-help" title="Caudal por unidad de ancho en la entrada del canal. Para un canal de ancho de plantilla B con caudal total Q, usar q_t = Q / B.">Caudal unitario total, q<sub>t</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['rc_np']='Porosidad de la escollera, n<sub>p</sub>';

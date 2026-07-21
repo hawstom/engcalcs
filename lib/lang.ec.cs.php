@@ -178,7 +178,7 @@ $ec_lang['mphl_total_loss']='Celková ztráta, h<sub>L</sub>';
 $ec_lang['mphl_egl_1']='EGL po proudu';
 $ec_lang['mphl_egl_2']='EGL proti proudu';
 $ec_lang['mphl_hgl_egl_tip']='Nemusí platit, pokud je potrubí vysoko. Viz poznámky.';
-$ec_lang['mphl_note_1']='<dl><dt>Tato kalkulačka nezohledňuje nadmořskou výšku potrubí.</dt><dd>Pokud HGL v kterémkoli bodě klesne pod horní hranu potrubí, nemusí být tento výpočet platný.</dd><dt>Pro podmínku otevřeného vtoku (propustek) je nutné zkontrolovat podmínky vtokového ovládání.</dt><dd>1. HGL proti proudu musí být výše než kóta hladiny při normální hloubce proudění (a výše než potrubí!).</dd><dd>2. Vzdutou hladinu propustku lépe vyjadřuje EGL proti proudu než HGL proti proudu.</dd><dd>3. Viz <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">2minutový výukový program</a> pro jednoduchý standardní výpočet vzdutí u propustků pomocí HY-8.</dd>';
+$ec_lang['mphl_note_1']='<dl><dt>Tento kalkulátor nezohledňuje nadmořskou výšku potrubí.</dt><dd>Pokud HGL v kterémkoli bodě klesne pod horní hranu potrubí, nemusí být tento výpočet platný.</dd><dt>Pro podmínku otevřeného vtoku (propustek) je nutné zkontrolovat podmínky vtokového ovládání.</dt><dd>1. HGL proti proudu musí být výše než kóta hladiny při normální hloubce proudění (a výše než potrubí!).</dd><dd>2. Vzdutou hladinu propustku lépe vyjadřuje EGL proti proudu než HGL proti proudu.</dd><dd>3. Viz <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">2minutový výukový program</a> pro jednoduchý standardní výpočet vzdutí u propustků pomocí HY-8.</dd>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Lichoběžníkové koryto Manning';
 $ec_lang['mtc_main_title']='Bezplatný online kalkulátor lichoběžníkového koryta Manning';
@@ -268,8 +268,8 @@ $ec_lang['or_notes_4_term']='Zatopení';
 $ec_lang['or_notes_4_def']='Pokud je TWE nad dnem otvoru, tento kalkulátor automaticky použije rovnici zatopeného otvoru s h = HWE − TWE. Pokud je TWE na úrovni dna otvoru nebo níže, předpokládá se volný výtok a h = HWE − těžiště.';
 // Micro-Hydro Power
 $ec_lang['mhp_main_menu']='Mikro-vodní elektrárna';
-$ec_lang['mhp_main_title']='Bezplatná online kalkulačka výkonu mikro-vodní elektrárny';
-$ec_lang['mhp_main_desc']='Kalkulačka výkonu průtočné mikro-vodní elektrárny';
+$ec_lang['mhp_main_title']='Bezplatný online kalkulátor výkonu mikro-vodní elektrárny';
+$ec_lang['mhp_main_desc']='Kalkulátor výkonu průtočné mikro-vodní elektrárny';
 $ec_lang['mhp_gross_head']='Hrubý spád, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='Průměr tlakovodu, D';
 $ec_lang['mhp_length']='Délka, L';
@@ -293,7 +293,7 @@ $ec_lang['mhp_notes_1_def']='Celková ztráta v tlakovodu h<sub>L</sub> = h<sub>
 $ec_lang['mhp_notes_2_term']='Rychlost';
 $ec_lang['mhp_notes_2_def']='Zkontrolujte, zda je rychlost přiměřená vzhledem k dostupnému spádu a nákladům na potrubí. Velmi nízká rychlost může svědčit o předimenzování; velmi vysoká rychlost zvyšuje třecí ztráty a riziko vodního rázu.';
 $ec_lang['mhp_notes_3_term']='Cílová ztráta tlakové výšky';
-$ec_lang['mhp_notes_3_def']='Ztráty v přiváděcím potrubí pod 10% hrubé výšky jsou zpravidla hospodárné. Optimální kompromis mezi náklady na potrubí a ztrátou výkonu se obvykle pohybuje kolem 4–6% pro lokality s vysokou hodnotou elektřiny.';
+$ec_lang['mhp_notes_3_def']='Ztráty v přiváděcím potrubí pod 10% hrubého spádu jsou zpravidla hospodárné. Optimální kompromis mezi náklady na potrubí a ztrátou výkonu se obvykle pohybuje kolem 4–6% pro lokality s vysokou hodnotou elektřiny.';
 $ec_lang['mhp_notes_6_term']='Účinnost';
 $ec_lang['mhp_notes_6_def']='Typická účinnost elektrárny &eta; se pohybuje od 0,70 do 0,85 pro Peltonovy a příčné turbíny běžné v mikro-vodní energetice. Jako konzervativní první odhad použijte hodnotu 0,75.';
 $ec_lang['mhp_notes_7_term']='Roční výroba energie';
@@ -332,9 +332,9 @@ $ec_lang['odt_sketch_end']='Konec';
 
 // Irrigation
 $ec_lang['irr_main_menu']='Závlaha';
-$ec_lang['irr_main_title']='Bezplatné online kalkulačky pro měření průtoku závlahy';
+$ec_lang['irr_main_title']='Bezplatné online kalkulátory pro měření průtoku závlahy';
 $ec_lang['irr_main_desc']='Měření průtoku závlahy — přelivy a otvory';
-$ec_lang['irr_intro_html']='<p>Přelivy a otvory jsou standardní terénní nástroje pro měření průtoku vody v závlahových systémech. Vyberte kalkulačku odpovídající vaší konstrukci:</p>';
+$ec_lang['irr_intro_html']='<p>Přelivy a otvory jsou standardní terénní nástroje pro měření průtoku vody v závlahových systémech. Vyberte kalkulátor odpovídající vaší konstrukci:</p>';
 $ec_lang['irr_card_weir_uniform_head']='Přeliv — široká koruna (rovnoměrná šířka)';
 $ec_lang['irr_card_weir_uniform_desc']='Měřte průtok přes korunu odváděcího jezu, regulačního objektu nebo přelivné desky. Zadejte délku přelivu a hloubku vody nad korunou.';
 $ec_lang['irr_card_weir_irregular_head']='Přeliv — nepravidelný profil';
@@ -342,7 +342,7 @@ $ec_lang['irr_card_weir_irregular_desc']='Použijte, pokud se koruna přelivu m�
 $ec_lang['irr_card_orifice_head']='Otvor — hlavní šoupě nebo trubní výpust';
 $ec_lang['irr_card_orifice_desc']='Měřte průtok stavidlovým šoupětem, trubní odbočkou nebo otvorem propustku. Automaticky zohledňuje jak volný výtok, tak zatopené podmínky (vzdutí dolní vodou).';
 $ec_lang['irr_card_canal_head']='Návrh a analýza kanálu';
-$ec_lang['irr_card_canal_desc']='Navrhněte nebo posuďte závlahový kanál pomocí Manningova vzorce. Použijte lichoběžníkovou kalkulačku pro nové kanály; nepravidelnou kalkulačku pro stávající přirozené nebo vybudované průřezy.';
+$ec_lang['irr_card_canal_desc']='Navrhněte nebo posuďte závlahový kanál pomocí Manningova vzorce. Použijte lichoběžníkový kalkulátor pro nové kanály; nepravidelný kalkulátor pro stávající přirozené nebo vybudované průřezy.';
 $ec_lang['irr_card_seepage_head']='Průsak kanálu a efektivita dopravy vody';
 $ec_lang['irr_card_seepage_desc']='Odhadněte průsakovou ztrátu úseku kanálu na základě měření přítoku a odtoku. Vypočtěte efektivitu dopravy vody a roční ztrátu vody jako podklad pro stanovení priorit investic do zpevnění kanálu.';
 $ec_lang['irr_quickref_html']='<h3>Rychlá reference</h3><dl><dt>Odváděcí jez nebo regulační objekt</dt><dd>Změřte hloubku vody nad korunou přelivu. Použijte <a href="Weir-Flow-Simple.php">Jednoduchý přeliv</a> pro rovnoměrnou korunu, nebo <a href="Weir-Flow-Irregular.php">Nepravidelný přeliv</a> pro profilovanou nebo stupňovitou korunu.</dd><dt>Hradítko nebo trubní odbočka</dt><dd>Změřte nadmořskou výšku horní a dolní vody (nebo výšku dna při volném výtoku). Použijte <a href="Orifice.php">Průtok otvorem</a>. Pro kruhové potrubí D&nbsp;= průměr potrubí; pro obdélníkové šoupě zadejte šířku W a výšku D.</dd><dt>Doba vyprázdnění nádrže nebo rybníka</dt><dd>Použijte <a href="Orifice-Drain-Time.php">Dobu vyprázdnění otvorem</a> pro odhad doby potřebné ke snížení hladiny rybníka nebo nádrže spodním otvorem — užitečné pro plánování závlahové akumulace.</dd><dt>Terénní standardy</dt><dd>Rovnice průtoku přes přeliv a otvorem zde odpovídají postupům USBR <em>Water Measurement Manual</em> (3.&nbsp;vyd.), které běžně vyžadují správci vod a závlahové obvody.</dd></dl>';
@@ -359,7 +359,7 @@ $ec_lang['ip_q_sys']='Průtok zónou, Q<sub>zone</sub>';
 $ec_lang['ip_t_run']='Doba chodu (hodiny)';
 // Canal Seepage / Conveyance Efficiency. Prefix cs_.
 $ec_lang['cs_main_menu']='Průsak kanálu';
-$ec_lang['cs_main_title']='Bezplatná online kalkulačka průsakové ztráty kanálu a efektivity dopravy vody';
+$ec_lang['cs_main_title']='Bezplatný online kalkulátor průsakové ztráty kanálu a efektivity dopravy vody';
 $ec_lang['cs_main_desc']='Průsaková ztráta kanálu a efektivita dopravy vody — metoda přítok–odtok';
 $ec_lang['cs_Q_in']='Přítok, Q<sub>in</sub>';
 $ec_lang['cs_Q_out']='Odtok, Q<sub>out</sub>';
@@ -427,7 +427,7 @@ $ec_lang['contactSubmitButton']='Odeslat zprávu';
 $ec_lang['contact_success']='Děkujeme za váš čas věnovaný napsání.';
 // Rock Chute Design (Robinson, Rice & Kadavy 1998). Prefix rc_.
 $ec_lang['rc_main_menu']='Návrh kamenného skluzu (Robinson)';
-$ec_lang['rc_main_title']='Bezplatná online kalkulačka pro návrh kamenného skluzu — Robinson (1998)';
+$ec_lang['rc_main_title']='Bezplatný online kalkulátor pro návrh kamenného skluzu — Robinson (1998)';
 $ec_lang['rc_main_desc']='Dimenzování záhozu kamenného skluzu — Robinson, Rice & Kadavy (1998)';
 $ec_lang['rc_S0']='Sklon dna skluzu, S<sub>0</sub>';
 $ec_lang['rc_qt']='<span class="ec-help" title="Průtok na jednotku šířky na vtoku skluzu. Pro koryto o šířce dna B s celkovým průtokem Q použijte q_t = Q / B.">Celkový měrný průtok, q<sub>t</sub> <span class="ec-tip">?</span></span>';
@@ -480,7 +480,7 @@ $ec_lang['rc_notes_5_term']='Platný rozsah velikosti kamene';
 $ec_lang['rc_notes_5_def']='Rovnice byly vyvinuty pro rozsah D<sub>50</sub> od 15 mm do 278 mm. Výsledky mimo tento rozsah jsou extrapolované a měly by být použity s dodatečným inženýrským posouzením.';
 $ec_lang['rc_notes_6_term']='Výška vývarové desky na výtoku';
 $ec_lang['rc_notes_6_def']='Výška horní plochy záhozu ve výtokovém úseku by měla být na úrovni nebo pod úrovní dna dolního koryta. Pokud je výše, zához na výtoku bude nestabilní.';
-$ec_lang['rc_notes_7_def']='Pokud je normální hloubka ve vtokové stoce menší než přepadová výška (H<sub>p</sub>) potřebná k převedení q<sub>t</sub>, dochází k omezení průtoku nebo vzdutí proti proudu od vtoku skluzu. To je obecně přijatelné — vzdutí snižuje rychlost a zabraňuje erozi proti proudu. Kontrola: pomocí kalkulačky přelivu zjistěte H<sub>p</sub> pro dané q<sub>t</sub> a šířku koruny a porovnejte ji s normální hloubkou ve vtokové stoce. Pokud H<sub>p</sub> překračuje normální hloubku, dojde ke vzdutí.';
+$ec_lang['rc_notes_7_def']='Pokud je normální hloubka ve vtokové stoce menší než přepadová výška (H<sub>p</sub>) potřebná k převedení q<sub>t</sub>, dochází k omezení průtoku nebo vzdutí proti proudu od vtoku skluzu. To je obecně přijatelné — vzdutí snižuje rychlost a zabraňuje erozi proti proudu. Kontrola: pomocí kalkulátoru přelivu zjistěte H<sub>p</sub> pro dané q<sub>t</sub> a šířku koruny a porovnejte ji s normální hloubkou ve vtokové stoce. Pokud H<sub>p</sub> překračuje normální hloubku, dojde ke vzdutí.';
 $ec_lang['rc_notes_4_term']='Literatura';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). "<a target="_blank" href="https://www.fs.usda.gov/biology/nsaec/fishxing/fplibrary/Robinson_1998_Design_of_Rock_Chutes.pdf">Design of rock chutes</a>." <em>Transactions of the ASAE</em>, 41(3), 621–626. USDA ARS také zveřejňuje <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">tabulku Excel</a> založenou na stejné metodě.';
 // Sketch labels
@@ -492,7 +492,7 @@ $ec_lang['rc_sketch_radius']          = 'poloměr';
 // Irrigation Pressure
 $ec_lang['ip_main_menu']='Závlahový tlak';
 $ec_lang['ip_main_title']='Bezplatný online kalkulátor tlaku závlahy a uniformity distribuce';
-$ec_lang['ip_main_desc']='Tlak ve zkušební větvi a odhadovaná uniformita';
+$ec_lang['ip_main_desc']='Tlak v testovací cestě a odhadovaná uniformita';
 $ec_lang['ip_h_supply']='Tlak na vstupu';
 $ec_lang['ip_elev_supply']='Nadmořská výška vstupu, z<sub>supply</sub>';
 $ec_lang['ip_q_design']='Návrhový průtok emitoru, q<sub>design</sub>';
@@ -527,7 +527,7 @@ $ec_lang['ip_du_estimate']='<span class="ec-help" title="Vypočítaný průtok p
 $ec_lang['ip_worst_case_warn']='Tlak testovacího emitoru je roven nebo vyšší než tlak na vstupu &mdash; tato cesta pravděpodobně není vaše nejhorší postranní větev. Zkontrolujte vzdálenější nebo vysoce trecí postranní větev, nebo profil nadmořských výšek, který lépe reprezentuje skutečný nejhorší případ.';
 $ec_lang['ip_q_ratio']='<span class="ec-help" title="Odlišná kontrola, ne číslo uniformity: jak daleko běží poslední emitor od navrženého návrhu výrobce. Výše 1: běží výše svého návrhového bodu (např. z příznivého zisku nadmořské výšky dolů). Níže 1: běží pod návrhem (typický případ dominovaný třením).">Průtok posledního emitoru vs. návrhový průtok, q<sub>last</sub>/q<sub>design</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['ip_no_solution']='Žádné řešení: požadovaný vstupní tlak překračuje zadaný vstupní tlak. Zvyšte vstupní tlak, snižte poptávku, nebo použijte větší potrubí.';
-$ec_lang['ip_notes_1_def']='Odhadne tlak na posledním (nejdálejším) emitoru, poté postupuje Energetickou vrstvou zpět k vstupu, úsek po úseku, přidávaje tření a místní ztráty po cestě. Nadmořská výška a rychlostní hlava jsou extrahování na každém uzlu tak aby hlásily skutečný tlak tam. Odhadnutý tlak na konci je korigován (bisekce) až do té doby, než vypočítaný požadovaný vstupní tlak odpovídá zadaému vstupnímu tlaku &mdash; stejný problém uzavřené smyčky řešený řešičem průtoku potrubí na kalkulátoru Průtoku v Manningovém Potrubí, rozšířený na větvící se síť.';
+$ec_lang['ip_notes_1_def']='Odhadne tlak na posledním (nejdálejším) emitoru, poté postupuje po energetické čáře zpět k vstupu, úsek po úseku, přidávaje tření a místní ztráty po cestě. Nadmořská výška a rychlostní hlava jsou na každém uzlu odečítány tak, aby hlásily skutečný tlak tam. Odhadnutý tlak na konci je korigován (bisekce) až do té doby, než vypočítaný požadovaný vstupní tlak odpovídá zadanému vstupnímu tlaku &mdash; stejný problém uzavřené smyčky řešený řešičem průtoku potrubí na kalkulátoru Průtoku v Manningovém Potrubí, rozšířený na větvící se síť.';
 $ec_lang['ip_notes_2_term']='Hlavní vs. Postranní Úseky';
 $ec_lang['ip_notes_2_def']='Každý řádek je jeden úsek podél jedné hydraulicky nejhorší cesty (testovací cesty) od vstupu k poslednímu emitoru. Hlavní úsek pouze předává průtok postranním větvím mimo testovací cestu, takže jeho odběr je jednoduché násobení (návrhový průtok × celkový počet emitorů v úseku) &mdash; žádná citlivost na místní tlak. Hlavní potrubí je sdílený kmenový svod, takže úsek přímo v místě odebírání testovací postranní větve musí zahrnout nejen postranní větve mezi svými koncovými body, ale také všechny postranní větve stále dále po hlavním potrubí za tímto odebíráním, nebo sdílející stejný spoj (např. postranní větev na opačné straně) &mdash; jejich průtok cestuje stejným úsekem před rozštěpením, ať se v této tabulce objevují nebo ne. Postranní úsek je segment testovací postranní větve: výtok emitoru je vypočítán ze skutečného místního tlaku přes q = k·H<sup>x</sup>, a ztráta třením je snížena Christiansenův faktor F(n) aby se zohlednil pokles průtoku jak každý emitor v úseku odvádí vodu.';
 $ec_lang['ip_notes_3_term']='Omezení';
@@ -535,5 +535,5 @@ $ec_lang['ip_notes_3_def']='Modeluje jeden pevný vstupní tlak (žádná křivk
 $ec_lang['ip_notes_4_def']='Christiansen, J.E. (1942). &ldquo;Irrigation by sprinkling.&rdquo; California Agricultural Experiment Station Bulletin 670. Standardy ASAE/ASABE pro návrh mikroirrigace používají stejný přístup ztráty třením vícečetného výstupu.';
 $ec_lang['ip_notes_5_term']='Návrh aplikace';
 $ec_lang['ip_notes_5_def']='Dávka aplikace a průtok systému/zóny používá odhadovaný průtok průměrného emitoru v poli (q<sub>avg,field</sub> &mdash; vlastní průměr testovací postranní větve, korigovaný zadaným odhadem &Delta;tlaku), ne odhadovanou sazbu: PR = q<sub>avg,field</sub> / A<sub>e</sub>, podávaný korigovanou modelovanou hodnotou. Rozteče a počty postranních větví/emitorů v systému jsou oddělené vstupy zde, protože testovací cesta modeluje pouze jednu nejhorší větev, ne každou postranní větev v poli.';
-$ec_lang['irr_card_pressure_head']='Závlahový tlak & Uniformita';
+$ec_lang['irr_card_pressure_head']='Závlahový tlak &amp; Uniformita';
 $ec_lang['irr_card_pressure_desc']='Modelujte profil tlaku a průtoku podél větve hlavní-postranní-emitor pro odhad distribuční uniformity ze skutečného tlaku testovací cesty, ne jen z katalogového průtoku emitoru.';

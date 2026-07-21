@@ -200,7 +200,80 @@ The rules, sequence, and QA chain for translation work are **not** restated here
 - **`CLAUDE.md` § "Translation Sprints"** — sprint mechanics, model policy, pre/post-sprint checklist.
 - **`dev/translation-execution-log.md`** — the full dated, category-by-category execution record.
 
-- 40|109| **Cross-language consistency audit (Opus, suite-wide) — PAUSED 2026-07-17 (cost), stages 4-6 pending.** Tom, 2026-07-14: wants a
+- 15|126| **Suite-wide tooltip markup migration.** Task 109 stages 5–6 independently surfaced the
+  same finding in 8+ languages (de, fr, bg, ar, it, pt, ro, uk): many `ec_lang` tooltip strings still
+  use the legacy inline-styled pattern (`<span title="..." style="cursor:help;color:#06c;font-size:
+  0.9em">?</span>`) instead of the current `.ec-help`/`.ec-tip` class convention documented in
+  CLAUDE.md. Only es/ru/zh consistently use the new pattern. Since `js/Calculators.lib.js` only
+  activates touch-friendly (tap-triggered) tooltips on `.ec-help[title]` elements, every string still
+  on the old pattern is silently broken on touch devices. Needs a suite-wide audit + migration pass
+  (likely scriptable — a regex-based converter plus spot-check, not per-language agent translation),
+  not a per-language patch.
+- 10|127| **`mhp_diameter` tooltip — resolve inconsistent per-language treatment.** English has an
+  `.ec-help` tooltip on this label ("Penstock (supply pipe) diameter"); the tooltip wrapper was
+  dropped in many translations. During Task 109 stage 6, fa/id/hi/km/tr/ps/my restored it per-
+  language while es/de/cs/fr/it/hr/ro/sw/uk/zh left it as-is (reasoning it's pre-existing suite-wide
+  state, not a single-language defect) — an inconsistent split across audit agents. Needs one
+  decision: restore it everywhere (matching the languages that already fixed it) or intentionally
+  drop it suite-wide (and revert the languages that added it back).
+- 3|128| **Trap-term native-confirmation residue (sw specific gravity + my/he head).** RESOLVED
+  2026-07-20/21 by defer-to-cultural-standard + the trap-term assessment: hr/sr/it glossary values
+  were stale vs. their shipped files and were corrected to each language's own standard (hr
+  "relativna gustoća", sr "релативна густина", it "densità relativa"); tr/he/ps keep their
+  weight-flavored standards (correct, not exceptions). Units clean in all 26. **Remaining, each needs
+  native/source confirmation, none auto-corrected:** (1) sw specific gravity "Uzito maalum" — confirm
+  it is the genuine Swahili standard for the dimensionless ratio (parallel to tr "özgül ağırlık"); if
+  so it stays. (2) my `or_head` "ခေါင်းဆုံး" contains anatomical ခေါင်း and mismatches the my head root
+  — possible anatomical-head calque. (3) he `or_head` "עומק" (depth) vs head root עומד — possibly an
+  intentional depth-to-centroid reading for orifice effective head. All flagged in `glossary.json`
+  (`head` + `specific gravity` entries).
+- 8|129| **Stale-English-revision resync audit.** Independently flagged by ru/pt/uk in Task 109
+  stage 5 (`ip_worst_case_warn`, `ip_du_estimate`, `ip_notes_3_def`, `ip_q_ratio`) and by uk again in
+  stage 6 (`mhp_notes_2_def`): several translated strings read as faithful translations of an
+  **older, longer English revision** that no longer matches the current, shortened English source —
+  an English-source sync gap affecting multiple languages at once, not a per-language terminology
+  defect. Needs its own pass: diff current `lib/lang.ec.en.php` prose against these (and any other)
+  flagged keys across all 26 languages, then re-translate the drifted ones against current English.
+- 10|132|[CC] **`$ec_lang_intent` trimming — collapse duplicative definitions to `gloss:` pointers.**
+  Authorized by Tom 2026-07-20 (this is the written permission the CLAUDE.md off-limits rule requires;
+  recorded as the single standing carve-out). Scope is strictly bounded: where an intent string's
+  left-of-pipe merely *restates* a concept already in `glossary.json` (e.g. `rc_sg`'s long "relative
+  density… not specific weight" text now duplicated by the glossary entry + the visible tip), replace
+  it with a `| gloss: <term>` pointer and nothing else. Preserve all label-level commentary
+  (`layout`/`symbol`/short-form/`avoid`) untouched — only the duplicative *definition* is trimmed.
+  Method: audit `$ec_lang_intent` in `lib/lang.ec.en.php` for entries whose left-of-pipe overlaps a
+  glossary concept; produce a diff for Tom's review before applying. Implements the "Division of labor:
+  glossary vs. intent vs. tips" rule in CLAUDE.md. Does NOT touch the 26 translated files (intent is
+  English-only).
+- 12|131| **Translate the 5 trap-term tips into 26 languages.** [needs auth to launch]
+  **Scoped down by the 2026-07-21 read-only assessment** (1 Opus agent over the 54-key trap-term
+  slice × 26 languages): the established head/specific-gravity terms are already correct and each
+  language's own standard, units are clean everywhere, and transliteration terms held — **so NO full
+  re-translation is warranted.** The only translation work left is the 5 English tip strings whose
+  values changed 2026-07-20 (`or_head`, `ws_headWaterHeight`, `mpf_velocity_head`, `mtc_sgrock`,
+  `rc_sg`) — all 26 languages now show the old label without the new definitional tip. A small,
+  low-risk Scenario-D slice: 26 Sonnet agents, 5 keys each, glossary + `avoid` injected; each agent
+  also re-adds the SG `.ec-help` tooltip wrapper where a language had dropped it (overlaps Task 127).
+  NB: the standard payload delta will NOT surface these (stale-but-present) — drive off the grep-slice
+  + `list_trap_terms.php`. Terminology-verification residue that the assessment could not self-confirm
+  is tracked separately in Task 128 (sw/my/he native checks); keep decoupled.
+- 3|130| **`odt_` (Orifice Drain Time) category pass.** Not covered by any of Task 109's 6 planned
+  stages. am's `odt_` keys have a confirmed-recurring ጭንቅ (head→distress/anguish calque)
+  mistranslation, independently re-surfaced across multiple categories this audit — needs its own
+  stage/pass to actually fix, most likely folded into whichever category `odt_` logically belongs to
+  or run as a standalone 27th key-set.
+
+## AI Efficiency Scripting (Overhead)
+
+These tasks reduce the AI token cost of routine maintenance by replacing repeated AI judgment with deterministic scripts. Copilot owns execution (all tagged `[CP]`); Claude Code specs any script whose output feeds back into translation quality work.
+
+## CSS Standardization Follow-up
+
+## Low Priority / Nice-to-Have
+
+## Completed
+
+- 0|109| **Cross-language consistency audit (Opus, suite-wide) — DONE 2026-07-20, all 6 stages complete.** Tom, 2026-07-14: wants a
   systematic pass, not just spot-checks reacting to a specific question — motivated directly by the
   Task 18 post-close finding that Burmese had a real embedded-English defect sitting undetected
   through a full translation sprint's own self-check and this session's own initial QA pass, only
@@ -239,20 +312,77 @@ The rules, sequence, and QA chain for translation work are **not** restated here
   detail in `dev/translation-execution-log.md` ("Stage 3").
   **PAUSED again 2026-07-17 (Tom): cost.** Same concern as the pre-stage-3 pause — real yield, but
   expensive per agent-run at this shape. Tom is choosing his own timing to resume rather than
-  continuing stage-by-stage in the same session. Stages 4–6 (categories 3–5: pipe friction,
-  irrigation & seepage, micro-hydro) remain, each still needing its own propose→confirm→launch
-  authorization and its own shape decision (full 26-agent pattern vs. a cheaper alternative) when
-  Tom picks it back up.
-
-## AI Efficiency Scripting (Overhead)
-
-These tasks reduce the AI token cost of routine maintenance by replacing repeated AI judgment with deterministic scripts. Copilot owns execution (all tagged `[CP]`); Claude Code specs any script whose output feeds back into translation quality work.
-
-## CSS Standardization Follow-up
-
-## Low Priority / Nice-to-Have
-
-## Completed
+  continuing stage-by-stage in the same session.
+  **Stage 4 (category 3: `dw_`/`hw_`/`mpf_`/`mphl_`, 65 keys × 26 languages) — DONE 2026-07-18.**
+  Tom authorized resuming in the same full 26-agent shape. Real defects found and fixed in 20 of 26
+  languages (es/ru/zh clean); am had the heaviest defect load (head repeatedly mistranslated as
+  "distress/anguish", plus friction/roughness drift). 11 of 26 first-wave agents hit a platform
+  session-limit error mid-task and were individually relaunched per the session-limit retry
+  procedure — confirmed some had landed partial work already (pt, sr needed no further edits) and
+  others had landed nothing despite describing fixes (my, ps, sw, uk needed the full fix set).
+  Post-sprint QA (`php -l` + programmatic tag-parity check across all 65×26 keys) clean. Full detail
+  in `dev/translation-execution-log.md` ("Stage 4").
+  **Stage 5 (category 4: `cs_`/`irr_`/`ip_`, 106 keys × 26 languages) — DONE 2026-07-19.** Tom
+  authorized the same full 26-agent shape. Real defects found and fixed in 24 of 26 languages (sr,
+  fa clean); ur had the heaviest load (~5 defect classes: کیلکولیٹر calculator transliteration,
+  رسائی wrong-word for seepage, cs_/ip_ "reach" split between two wrong terms, ٹریپیزائیڈل
+  transliteration, upstream/downstream transliteration). A platform-wide session-limit error hit
+  twice — first wave (22 of 26 non-am agents) and a second wave mid-retry (11 agents) — each
+  resumed individually via SendMessage (not fresh relaunches) once the reset time passed, per the
+  session-limit retry procedure; `git diff`'s cs_/irr_/ip_-scoped line count per file (not raw
+  mtime, which is unreliable when a prior session's uncommitted edits share the same files) was
+  used to confirm which agents had already landed partial work before resuming. Three languages
+  (ru, pt, uk) independently flagged the same likely-systemic issue: several `ip_` note/tooltip
+  strings (`ip_worst_case_warn`, `ip_du_estimate`, `ip_notes_3_def`, `ip_q_ratio`) read as
+  translations of an **older, longer English revision** that no longer matches the current,
+  shortened English source — an English-source sync gap, not a per-language terminology defect;
+  needs its own investigation (compare current `lib/lang.ec.en.php` prose against these keys'
+  translations across all 26 languages) before any fix, not folded into this stage. `php -l` clean
+  on all 26 files post-stage. Full detail in `dev/translation-execution-log.md` ("Stage 5").
+  **Glossary write-back gap closed 2026-07-19/20 (Tom).** Discovered after stage 5 closed that none
+  of stages 1–5 had ever fed confirmed terminology fixes back into `glossary.json` — a structural
+  process gap, not a Sonnet-vs-Opus capability issue. Fixed two ways: (1) `CLAUDE.md` § "Translation
+  Sprints" now has a mandatory "Glossary write-back" step in the Post-sprint QA checklist, applying
+  identically to audit stages and translation sprints, with no "later" exception; (2) a dedicated
+  backfill agent read the full stages 1–5 execution log and wrote every confirmed decision into
+  `glossary.json` (v1.7→1.8, 55→59 terms; 7 stale glossary values corrected against what actually
+  shipped, ~20 terms got dated confirmation notes) before stage 6 was authorized, per Tom's explicit
+  instruction that stage 6 "needs to benefit from whatever we can give it."
+  **Stage 6 (category 5: `mhp_`/`rc_`, 92 keys × 26 languages) — DONE 2026-07-20.** Tom authorized
+  the same full 26-agent shape. Real defects found and fixed in 21 of 26 languages (ro, zh clean;
+  ar/es/fr/etc. — see log for full breakdown); ur had the heaviest load (19 fixes: کیلکولیٹر
+  calculator transliteration, پوروسٹی/گریڈیشن/یونٹ ڈسچارج/ریچ jargon transliteration, مخصوص کشش
+  ثقل wrong-word for specific gravity, plus cross-calculator drift on head loss/channel/normal
+  depth/default harmonized to the suite incumbent). sw and sr both had Manning-roughness/radius
+  wrong-word or transliteration defects (sw "Ugumu"=hardness for roughness, "Radi"=thunder for
+  radius; sr chute-stem drift брзотек→брзоток). Three separate platform failure waves hit this
+  stage — two ordinary session-limit resets and one "weekly limit" (a longer, account-wide
+  constraint distinct from the per-agent session limit) — plus a new failure mode on 3 agents
+  (ro/uk/zh) that returned status "stopped" with no completion record (no recoverable transcript,
+  possible mid-session teardown) rather than a normal limit error; all were resumed via SendMessage
+  once past their reported reset times, using `git diff`'s `mhp_`/`rc_`-scoped line count per file to
+  distinguish already-landed partial work from a clean redo, with the 3 no-record agents explicitly
+  told to redo the full audit from scratch since no prior reasoning could be assumed to have
+  survived. `php -l` clean on all 26 files post-stage. Confirmed terminology decisions (chute
+  sr/ps corrections, head loss ur correction, specific gravity sw/hr flags) written back to
+  `glossary.json` (v1.8→1.9) per the new mandatory rule, before this stage was declared closed. Full
+  detail in `dev/translation-execution-log.md` ("Stage 6").
+  **Cross-cutting issues surfaced but not fixed inline, need a coordinator decision:** (a) legacy
+  inline-styled tooltip HTML (`<span title="..." style="cursor:help...">?</span>`) vs. the current
+  `.ec-help`/`.ec-tip` class convention — independently flagged by 8+ languages across stages 5–6
+  (de, fr, bg, ar, it, pt, ro, uk) as a suite-wide, partially-completed markup migration (only
+  es/ru/zh consistently use the new pattern); (b) `mhp_diameter`'s dropped tooltip wrapper — fixed
+  per-language by fa/id/hi/km/tr/ps/my but left as-is by es/de/cs/fr/it/hr/ro/sw/uk/zh on the
+  reasoning that it's pre-existing suite-wide state — inconsistent treatment across agents, needs one
+  suite-wide decision either way; (c) hr's specific-gravity glossary-vs-file conflict
+  (specifična težina vs. shipped "Relativna gustoća") — flagged three times now (stage 1-5 backfill,
+  stage 6 hr audit), still needs Tom's human reconciliation; (d) sw's specific gravity
+  ("Uzito maalum" = specific weight, not density ratio) — same trap, no verified sw fix exists yet;
+  (e) crest terminology split in ur (کرسٹ in irr_ vs چوٹی in rc_ sketch) — flagged for a coordinator
+  call, not fixed to avoid introducing new inconsistency; (f) am's confirmed-recurring `odt_`
+  ጭንቅ (head→distress) mistranslation — `odt_` (Orifice Drain Time) isn't part of any of the 6
+  planned stages and needs its own future pass to actually get fixed.
+  **All 6 planned stages of Task 109 are now complete.**
 
 - 0|125| **Audit `$ec_lang_intent` keys — DONE 2026-07-17.** Two-part audit requested by Tom. Full
   findings in `dev/ec-lang-intent-audit-2026-07.md`.

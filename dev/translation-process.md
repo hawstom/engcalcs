@@ -181,11 +181,41 @@ first, then propose the lightest pass that covers the risk, with counts."** That
 then lets the evidence pick the rest. "Audit everything thoroughly" is the anti-pattern — unscoped
 and forced to the top rung.
 
+## Scenario D — Term-centric sweep (organize around a term, not a category)
+
+Tom's preference (2026-07-20): for a *terminology* problem — one hard/polysemous/units-trap term that
+keeps getting mistranslated across many calculators — sweep the **term**, not the calculator category.
+A calculator-centric audit re-derives the same term in every category it touches; a term-centric sweep
+fixes every occurrence together and consistently in one pass, and is cheap to re-run.
+
+The enabling artifact is the **trap-term watchlist**, a *derived* view of `glossary.json` — a term is
+on the watchlist exactly when its entry has a non-empty `"avoid"` array (never a second hand-list).
+Dump it with `php dev/scripts/list_trap_terms.php` (add `--lang=<code>` for one language's established
+terms, `--json` for machine form). That output is what a high-power agent is handed.
+
+Sequence:
+1. Pick a term (or trap cluster). Run `list_trap_terms.php` to get its `avoid` senses + per-language
+   established translations from the glossary.
+2. Gather **every** `$ec_lang` key across **all** calculators whose value contains the term
+   (`grep`), regardless of category — this is the slice to fix.
+3. Fix in all 26 languages with the glossary root entry + `avoid` guard injected (the payload
+   generator already emits the `DO NOT render as:` line). Sonnet per language, standard QA chain.
+4. Glossary write-back is mandatory (per CLAUDE.md) — confirm/repair each language's established term.
+
+Like the other scenarios, launching the paid multi-agent run needs explicit authorization; the
+read-only watchlist dump and grep-slice are free and can be done any time.
+
 ## Standing content rules (apply in all three scenarios)
 
 - **`$ec_lang_intent` is off-limits to AI** without explicit written permission each time — see
   `CLAUDE.md`. Format: `<intent> | <commentary>`, tag vocabulary (`layout`, `avoid`, `symbol`,
-  `gloss`) defined once there.
+  `gloss`) defined once there. (One standing carve-out: the bounded intent-trimming of ROADMAP
+  Task 132.)
+- **Division of labor — concept → glossary; label metadata → intent (pointing via `gloss:`);
+  user-facing definition → visible tip.** Never duplicate the same fact across two channels; a
+  weight-flavored/standard term a culture actually uses is correct — `avoid` forbids only physical
+  errors and lazy transliterations, never a genuine local standard. See `CLAUDE.md` § "Division of
+  labor" and § "Polysemy / units-trap protocol."
 - **Concept-level label reuse**: whole labels only, never fragment composition at render time.
   Owner = incumbency (most pages using the key), menu order is only the tiebreak. See
   `CLAUDE.md` § "Concept-level label reuse."

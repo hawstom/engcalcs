@@ -503,15 +503,15 @@ function prefixToTermNames(): array
     return [
         'dw' => ['flow', 'velocity', 'head loss', 'friction factor', 'slope', 'laminar', 'transitional', 'turbulent'],
         'hw' => ['flow', 'velocity', 'head loss', 'slope'],
-        'mpf' => ['flow', 'velocity', 'hydraulic radius', 'wetted perimeter', 'Manning roughness', 'slope', 'shear stress'],
+        'mpf' => ['flow', 'velocity', 'hydraulic radius', 'wetted perimeter', 'Manning roughness', 'slope', 'shear stress', 'head', 'velocity head'],
         'mphl' => ['flow', 'velocity', 'head loss', 'friction loss', 'minor loss', 'hydraulic radius', 'wetted perimeter', 'Manning roughness', 'slope'],
         'mtc' => ['flow', 'velocity', 'hydraulic radius', 'wetted perimeter', 'Manning roughness', 'slope'],
         'mi' => ['flow', 'velocity', 'hydraulic radius', 'wetted perimeter', 'Manning roughness', 'slope', 'irregular channel'],
         'wfs' => ['flow', 'weir', 'headwater elevation', 'tailwater elevation', 'discharge coefficient'],
         'wfi' => ['flow', 'weir', 'headwater elevation', 'tailwater elevation', 'discharge coefficient'],
-        'ws' => ['flow', 'weir', 'headwater elevation', 'tailwater elevation', 'discharge coefficient'],
+        'ws' => ['flow', 'weir', 'head', 'headwater elevation', 'tailwater elevation', 'discharge coefficient'],
         'wi' => ['flow', 'weir', 'headwater elevation', 'tailwater elevation', 'discharge coefficient', 'irregular channel'],
-        'or' => ['flow', 'orifice', 'discharge coefficient', 'headwater elevation', 'tailwater elevation', 'crown'],
+        'or' => ['flow', 'orifice', 'discharge coefficient', 'head', 'headwater elevation', 'tailwater elevation', 'crown'],
         'odt' => ['orifice', 'discharge coefficient', 'headwater elevation', 'tailwater elevation', 'crown'],
         'irr' => ['flow', 'weir', 'orifice', 'seepage', 'conveyance efficiency', 'check structure'],
         'ds' => ['flow', 'application rate', 'distribution uniformity', 'emitter'],
@@ -566,6 +566,12 @@ function buildPromptContext(array $terms, string $language): string
             $line .= ' (' . $symbol . ')';
         }
         $line .= ': ' . $translationDisplay;
+
+        $avoid = $term['avoid'] ?? [];
+        if (is_array($avoid) && count($avoid) > 0) {
+            $line .= "\n    DO NOT render as: " . implode('; ', $avoid);
+        }
+
         $lines[] = $line;
     }
 

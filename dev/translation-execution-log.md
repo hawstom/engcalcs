@@ -1612,3 +1612,268 @@ edited key's before/after against the English source meaning) rather than via
 **Next:** stage 4 (category 3, pending Tom's authorization) — categories 3–5 (pipe friction,
 irrigation & seepage, micro-hydro) remain; category 6 = stage 1, category 1 = stage 2, category 2 =
 stage 3.
+
+**Stage 4 (category 3: `dw_`/`hw_`/`mpf_`/`mphl_`, 65 keys × 26 languages) — DONE 2026-07-18.** Tom
+authorized the same full 26-agent shape. 11 of the 26 first-wave agents (ps, ru, uk, zh, sw, my, pt,
+ro, sr, tr, ur) hit a platform-wide session-limit error mid-task before the resumption of this
+conversation session; per the session-limit retry procedure, each was relaunched individually after
+confirming via `git diff`/`php -l` which had already landed partial edits (my/pt/ro/sr/tr/ur had
+partial diffs; ps/ru/uk/zh/sw had none) — every retry either confirmed the prior partial work was
+already complete or finished the remaining fixes. Real defects found and fixed in 20 of 26 languages;
+es, ru, zh came back fully clean both attempts.
+
+- **am**: the most defects of any language this stage — "head"/"head loss"/"headwater" mistranslated
+  throughout as ጭንቅ ("distress/anguish") instead of ሄድ (14 occurrences across 3 keys, matched to the
+  sibling `mhp_` calculator's own established term); "friction" bare-transliterated ፍሪክሽን instead of
+  the real word ግጭት (5 keys, also used correctly elsewhere in this same category); "roughness"
+  3-way spelling drift standardized to the file-dominant ሻካሪነት (2 keys). Flagged (not fixed, out of
+  scope): the same ጭንቅ=distress head-mistranslation recurs in `odt_h1`/`odt_notes_1_def` — needs its
+  own category's audit pass.
+- **ar**: 1 fix — `mphl_total_junction_k_short` loss-coefficient label used a different root
+  (الفقد) than the rest of the mphl_ "loss" cluster (فاقِد); aligned.
+- **bg**: 4 fixes — `mpf_main_menu`/`mpf_flow` still used дебит instead of the native-engineer-
+  confirmed suite standard водно количество (`dev/Bulgarian-engineer-feedback.md`); embedded English
+  "Manning Pipe Flow" left untranslated in `mpf_spreadheet_notice`; "wetted perimeter" wrong-word
+  (навлажнен="moistened" instead of омокрен) in `mpf_wetted_perimeter`.
+- **bn**: 2 fixes — "uniform" mistranslated as "identical" (অভিন্ন→সুষম) in `mpf_main_desc`; headwater
+  wrongly rendered "upstream" (আপস্ট্রিম→হেডওয়াটার) in `mpf_note_1`, drifting against the file's own
+  correct usage elsewhere.
+- **cs**: 1 fix — `mphl_note_1` used "kalkulačka" against the category's unanimous "kalkulátor"
+  (the exact drift class stage 2 first flagged for cs). Noted: the reverse drift (kalkulačka
+  dominant) holds suite-wide outside this category — a future full-suite decision, not fixed here.
+- **de**: 3 fixes, both in long note/tip strings — a "Minderverlust" (=lesser/reduced loss) wrong-
+  word in `mphl_total_junction_k_tip` that is exactly the "smaller loss" mistranslation the item-90
+  convention exists to block, corrected to "Örtlicher (Einzel-)Verlust" matching the labels; two
+  "headwater" terminology-drift fixes (Einstauhöhe/Einstaupegel → Oberwassertiefe/Oberwasserstand,
+  matching the glossary and sibling tooltip).
+- **es**: clean, no defects found.
+- **fa**: 6 fixes, both in note strings — the headwater calque هد آب ("water head", wrong concept)
+  recurring 5×, corrected to آب بالادست matching the file's own tooltip and the glossary; the
+  ارتفاع-vs-تراز elevation-datum confusion (flagged as a recurring fa failure class in prior stages)
+  recurring 2× in `mphl_note_1`, corrected to تراز.
+- **fr**: 1 fix — "full flow" rendered "débit plein" in `mpf_full_flow_ratio` against the category's
+  established "débit à section pleine". Confirmed no in-scope recurrence of the stage-1/2
+  calculatrice/calculateur drift (it exists only outside this category).
+- **he**: 3 fixes — velocity head رendered with a literal "head" calque (ראש) instead of the file's
+  own correct term עומד in `mpf_note_1`; total-loss terminology drift (אובדן vs. הפסד) in
+  `mphl_total_loss`; Manning Hebrew-transliterated in one outlier key (`mpf_manningRoughness`)
+  against every other in-category Manning reference kept in Latin script.
+- **hi**: 2 defect classes, multiple occurrences — the "minor (local) loss" convention phrase
+  order reversed in `mphl_total_junction_k_tip` against its own label; "headwater" conflated with
+  "upstream" (both rendered उर्ध्वप्रवाह) in 3 spots across `mpf_flow_tip`/`mpf_note_1`, corrected to
+  the file's established शीर्ष जल.
+- **hr**: 1 fix — `mphl_friction_loss` used plural "Gubici" (losses) against its two singular
+  siblings in the same results-table loss set. No recurrence of hr's previously-flagged head-vs-
+  height or specific-gravity-vs-weight confusion classes.
+- **id**: 1 fix — `mphl_total_junction_k_tip`'s opening reversed the "minor (local)" word order
+  against its own label.
+- **it**: 2 fixes — "roughness" drift (rugosità vs. the category-standard scabrezza) in
+  `dw_roughness_tip`; the stage-2-flagged flusso-vs-portata discharge drift recurred in `mpf_note_1`
+  (2 occurrences), confirming it as a systemic it pattern rather than a one-off.
+- **km**: 3 fixes — "wetted perimeter" wrong-word (គ្រែទឹក="water bed" instead of glossary
+  បរិវេណសើម); laminar/turbulent regime terms both wrong-word against the glossary, corrected to
+  match the already-correct "transitional" term for a parallel triad. No recurrence of km's
+  previously-flagged riprap-transliteration failure class (no riprap concept in this category).
+- **my**: 2 fixes (after session-limit retry confirmed the larger originally-described fix set had
+  NOT landed) — headwater rendered with the anatomical/ambiguous ခေါင်းရေ instead of the glossary-
+  confirmed ရေတက်ဘက်ရေ in `mpf_flow_tip`; Manning Burmese-transliterated in one outlier key against
+  12+ other in-file Latin-script Manning references. Retry explicitly confirmed velocity head was
+  already correctly non-anatomical (ဖိမြင့်) — the original attempt's claim to the contrary did not
+  match the actual file.
+- **ps**: 2 defect classes, 4 strings (after session-limit retry — no prior edits had landed) — a
+  garbled coined term "سرسر" for headwater (non-word) standardized to the file's own correct
+  پورتنیو اوبو across 5 occurrences in 2 notes; Manning transliterated in one outlier key against
+  the rest of the file's Latin-script eponym convention.
+- **pt**: 2 fixes, confirmed complete by the session-limit retry (both had actually landed before
+  the cutoff) — "tubo" vs. the file-standard "tubulação" in `mpf_note_1`; decimal separators
+  localized to comma in `mphl_total_junction_k_tip`.
+- **ro**: 2 fixes, confirmed complete by the session-limit retry (only 1 of 2 had landed before the
+  cutoff) — "flow section" drift (Secțiunea de curgere → Aria de curgere) matching the sibling area
+  keys; a stacked double-negative in `mphl_note_1` that had also flipped "and" to "or" in a safety-
+  critical HGL-above-pipe-elevation sentence, corrected to positive phrasing per CLAUDE.md's
+  stacked-negatives guidance.
+- **ru**: clean, no defects found (both original attempt and retry).
+- **sr**: multiple fixes (≈7–10 edits across the original landed diff — session-limit retry
+  confirmed 100% of the проток-vs-протицај and нагиб-vs-пад standardization work described was
+  already complete, with the two remaining protok/pad-looking substrings correctly identified as
+  false positives — протицајни пресек and падне are unrelated words, not instances of the flagged
+  nouns). Standardized "flow" on проток (glossary-confirmed authoritative term) throughout.
+- **sw**: 6 fixes (after session-limit retry — no prior edits had landed) — the flagged "kichwa"
+  anatomical-head calque recurred in 3 different concepts: "roughness" (Ukakamavu→Usuguo, 2 keys),
+  "velocity head" (Kichwa cha kasi→Kimo cha kasi, per glossary, 2 keys), and "headwater" (kichwa-based
+  phrasing→"maji ya juu ya mkondo", 3 keys) — confirming sw's established high-defect-rate pattern
+  continues into this category. Flagged (not fixed, out of scope): the same Ukakamavu roughness
+  wrong-word recurs a third time in `mtc_note_1` (category 1).
+- **tr**: 2 fixes, confirmed complete by the session-limit retry (only 1 of 2 had landed before the
+  cutoff) — calculator-word drift (hesap makinesi→hesaplayıcı) in `mphl_note_1`; a decimal/percent
+  localization defect (93.8%→%93,8) matching both the file's comma-decimal and sign-first-percent
+  conventions.
+- **uk**: 3 fixes (after session-limit retry — no prior edits had landed) — embedded English "Pipe
+  Flow" left untranslated in `mpf_spreadheet_notice`; EGL (energy grade line) wrong-concept term
+  "лінія питомої енергії" (specific-energy line — a distinct open-channel-hydraulics concept) used
+  in 3 spots instead of the glossary's лінія енергії.
+- **ur**: 3 fixes, confirmed complete by the session-limit retry (2 of 3 had NOT landed before the
+  cutoff) — "calculator" transliteration (کیلکولیٹر→حاسبہ, already landed); "headwater" phonetic
+  transliteration (ہیڈ واٹر→سر آب, still needed) in `mpf_flow_tip`; "minor (local) loss" convention
+  word dropped plus coefficient-word drift (عدد→عامل) in `mphl_total_junction_k_tip`, still needed.
+- **zh**: clean, no defects found (both original attempt and retry).
+
+Post-sprint QA: `php -l` clean on all 26 touched/audited files; tag-parity check
+(`<sub>`/`<sup>`/`<span>`/`<a>`/`<dl>`/`<dt>`/`<dd>`/`<em>` sets) run programmatically against
+English for all 65 keys × 26 languages — zero mismatches. No `ANTHROPIC_API_KEY` set, so back-
+translation-equivalent verification was done inline by each agent (reading edited keys' before/after
+against the English source meaning) rather than via `backtranslate_check.php` — same rigor, no
+billing, per the QA chain's documented no-skip rule.
+
+**Session-limit retry note:** this stage is the first to exercise the retry procedure at scale (11
+of 26 agents affected by a single platform-wide session-limit event). In every case, checking
+`git diff`/`php -l` before relaunching correctly distinguished "no edit landed" (ps/ru/uk/zh/sw) from
+"partial edit landed" (my/pt/ro/sr/tr/ur) — confirming the procedure's core caution (`a session-limit
+error can fire after the edit already landed`) held in both directions: some retried languages needed
+zero further work (pt, sr — fully landed already) and others needed the full remaining fix set
+(my, ps, sw, uk — nothing had landed despite the agent's summary describing specific fixes about to
+be applied).
+
+**Next:** stages 5–6 (categories 4–5: irrigation & seepage `cs_`/`irr_`/`ip_`; micro-hydro `mhp_`/
+`rc_`) remain, each still needing its own propose→confirm→launch authorization per CLAUDE.md.
+
+**Stage 5 (category 4: `cs_`/`irr_`/`ip_`, 106 keys × 26 languages) — DONE 2026-07-19.** Tom
+authorized the same full 26-agent shape. A platform-wide session-limit error hit the first wave
+twice: the initial 26-agent launch left only am/ar/bg/fr with any landed work (am complete, ar/bg/fr
+partial), and a retry of the other 22 lost 11 more mid-task. Both waves were resumed via SendMessage
+to the same agent IDs (not fresh relaunches, so each retry kept its own prior reasoning/context)
+once Phoenix-time reset had passed. Distinguishing "already landed" from "nothing landed" used
+`git diff <file> | grep -c "^[+-]\$ec_lang\['(cs_|irr_|ip_)"` per file — file mtime alone was
+unreliable here because every lang file already had uncommitted stage-4 edits sharing the same
+mtime neighborhood.
+
+Real defects found and fixed in 24 of 26 languages; **sr and fa came back clean** both times.
+`php -l` clean on all 26 files; git diff line counts per language: am 4, ar 10, bg 16, bn 6, cs 14,
+de 6, es 4, fa 0, fr 6, he 6, hi 6, hr 12, id 2, it 2, km 2, my 2, ps 6, pt 8, ro 2, ru 18, sr 0,
+sw 2, tr 26, uk 22, ur 50, zh 8.
+
+- **am**: 2 fixes — "Application Design" (አፈፃፀም=performance/execution, wrong sense of "application")
+  and "application rate" opening phrase, both corrected to match the glossary-endorsed ልፍፍ term
+  already used correctly elsewhere in the file. Known am head/friction-calque patterns from stage 4
+  checked clean here — not present in category 4.
+- **ar**: 2 defect classes, 5 edits — `cs_notes_2_def` "seepage losses" used a different root
+  (خسائر) than the rest of the cs_ loss cluster (فقد), fixed with verb/pronoun agreement; "reach"
+  split between مقطع (cs_, 4 keys) and قطاع (ip_) for the identical English concept, harmonized to
+  قطاع (also disambiguates مقطع, correctly left meaning "cross-section" elsewhere).
+- **bg**: 2 defect classes, 8 edits — دbit-type drift (Дебит used in 7 keys against the native-
+  engineer-confirmed suite standard Водно количество, per `dev/Bulgarian-engineer-feedback.md`);
+  wetted-perimeter term drift (мокър/мокрият/мокри vs. the mpf_-established Омокрен) in
+  `cs_notes_3_def`.
+- **bn**: 4 fixes, one class — "headwater"/"tailwater" phonetically transliterated (হেডওয়াটার/
+  টেলওয়াটার) across 4 irr_ keys, standardized to the glossary/or_-established উজান/ভাটি terms.
+  "uniform"≠"identical" checked clean (already সমান).
+- **cs**: 8 edits across 7 keys — the flagged kalkulačka-vs-kalkulátor drift (5 occurrences, with
+  gender-agreement fixes); a "test" adjective drift (zkušební vs. established testovací); a raw
+  `&amp;` HTML-entity defect; three wrong-word/typo errors in `ip_notes_1_def` (energy *layer*
+  instead of grade line, "extracted" instead of "subtracted", a typo).
+- **de**: 4 fixes — headwater-depth and headwater/tailwater-elevation terminology drift (3 keys,
+  standardized to the mpf_/or_-established Oberwassertiefe/Oberwasserstand/Unterwasserstand terms);
+  a minor-loss consistency gap (missing the item-90 "(local)"/örtlich qualifier) in `ip_notes_1_def`.
+  The flagged "Minderverlust" wrong-word was NOT present in this category.
+- **es**: 1 fix — "zone" (Q_zone) rendered "sector" in two field labels (`ip_n_l`, `ip_q_sys`) while
+  cross-referencing notes/tips used "zona"; standardized to "zona".
+- **fa**: clean, no defects found. Both known fa patterns (headwater calque, ارتفاع/تراز
+  elevation-datum confusion) checked and confirmed already correct throughout.
+- **fr**: 3 fixes, one class — calculatrice/calculateur gender drift in 3 body strings against the
+  category's masculine "Calculateur" (used in all 3 `_main_title` keys and the suite-dominant term
+  elsewhere), with adjective-agreement corrections.
+- **he**: 4 fixes — Manning/Christiansen Hebrew-transliterated in 3 keys against the suite's Latin-
+  script eponym convention; velocity-head term drift (גובה המהירות vs. the glossary/mpf_-established
+  עומד מהירות) in `ip_notes_1_def`. "total loss" אובדן/הפסד and "design" עיצוב/תכן both checked
+  clean — correctly split by sense, not a defect.
+- **hi**: 3 fixes — tailwater transliteration (टेलवाटर) in `irr_card_orifice_desc`, standardized to
+  match the linked or_ calculator's own field label; "application rate" drift (सिंचाई दर="irrigation
+  rate") in 2 keys, standardized to the dominant अनुप्रयोग term. Flagged (not fixed, out of scope): a
+  suite-wide अपस्ट्रीम/डाउनस्ट्रीम (transliterated) vs. ऊर्ध्वप्रवाह/अनुप्रवाह (native) split that
+  lives in the category-2 `or_` keys.
+- **hr**: 6 defects, 6 edits — embedded untranslated English in a tooltip; a terminology drift on
+  the suite's most sensitive term ("target efficiency" ciljnu iskoristivost vs. the incumbent
+  korisnost); a stale/nonsense-word warning string rewritten to match current English; a meaning
+  inversion ("subtracted" rendered as "returned/restored"); two typos. Flagged (not fixed): a
+  napajanje/opskrba "supply" synonym split, left for a human call.
+- **id**: 1 fix — the Christiansen citation title was translated into Indonesian instead of kept as
+  published (per CLAUDE.md citation-title policy; all comparison languages keep it in English).
+  Known id "minor (local) loss" word-order and riprap-transliteration patterns checked clean — not
+  present in this category.
+- **it**: 3 fixes, one class — `irr_quickref_html` calculator-link texts (Weir Simple/Irregular,
+  Orifice) didn't match the linked calculators' own Italian menu names; corrected to match. Known
+  rugosità/scabrezza and flusso/portata drift patterns checked clean — portata used consistently
+  throughout, no roughness term exists in this category.
+- **km**: 1 fix — embedded untranslated English "culvert" in `irr_card_orifice_desc`, replaced with
+  the suite-established លូ. Known wetted-perimeter/regime/riprap patterns checked clean.
+- **my**: 1 fix — embedded untranslated English "Micro-irrigation" in `ip_notes_4_def` (the same
+  defect class that originally motivated this whole Task 109 audit). Known headwater-calque and
+  Manning-transliteration patterns checked clean.
+- **ps**: 4 fixes across 3 lines — phonetic transliterations of "spillway" and "Trapezoidal", a
+  coined/wrong term for "drop structures", a minority culvert spelling normalized to the file-
+  dominant form. The flagged سرسر headwater garble was NOT present (headwater already consistently
+  correct).
+- **pt**: 4 fixes — embedded English left in a tooltip title; two "tubo"-vs-"tubulação" drift fixes
+  (the only 2 stray instances in the file); one weir-term identity-string drift ("Vertedores" vs.
+  the category's established "Vertedouros"). Flagged (not fixed, out of scope): several `ip_` notes
+  read as translated from an older/longer English revision (see cross-language note below); a raw
+  `&amp;` vs `&amp;amp;` entity convention gap, internally consistent so left alone.
+- **ro**: 1 fix — the Christiansen citation title was translated instead of kept published (matching
+  the id defect, same fix). Flow-section and stacked-double-negative patterns checked clean.
+- **ru**: 8 fixes — conveyance-efficiency terminology drift (2 keys); embedded untranslated English
+  in a tooltip; "Application Design" mistranslated as software-application design (4 occurrences,
+  fixed to "Проектирование полива"); a counts-vs-meters wrong-word plus an adjective-lateral drift;
+  a gender-agreement error; an application-rate term drift; a supply-pressure term drift. Previously
+  clean in stage 4; not clean this stage. Flagged (not fixed): the same stale-English-revision
+  observation as pt/uk (see below).
+- **sr**: clean, no defects found. Both known проток/протицај and нагиб/пад drift patterns checked
+  clean, with the flagged false-positive substrings (протицајни, падне) correctly left alone.
+  Flagged (not fixed, out of scope): a suite-wide Manning-name orthography inconsistency (Latin
+  adjective endings vs. Cyrillic Манингов- forms) spanning multiple categories.
+- **sw**: 1 fix — `ip_group_loss` column header used "Hasara" (financial loss/damage) against the
+  suite-standard "Upotevu" used by the very columns (h_f/h_m/h_L) it heads. The recurring kichwa/
+  Ukakamavu anatomical-calque pattern was checked and found clean in this category (correctly used
+  kimo/msuguano throughout).
+- **tr**: 26 edits, the largest fix set this stage — calculator word drift (hesap makinesi→
+  hesaplayıcı, 3 keys); "distribution uniformity" transliteration+wrong-word (Uniformluk/Dağıtım→
+  Düzgünlük/Dağılım, 7 keys); "branch" loanword-coinage drift (branş→dal, 3 keys); a mangled
+  bibliographic citation (embedded English + transliteration, restored to policy); assorted garbled/
+  embedded-English prose fixes (3 more spots).
+- **uk**: 7 fixes — the glossary-flagged EGL wrong-concept calque; two wrong-word confusions in
+  `ip_notes_1_def`/`ip_notes_2_def`; "annual value recovered" mistranslated as "annual value of
+  discrepancies" (3 sibling keys); "Application Design" mistranslated as "Program design" (5
+  occurrences); a locative-case grammar fix. Flagged (not fixed): the same stale-English-revision
+  observation as ru/pt (see below).
+- **ur**: the second-largest fix set — ~30 edits across 5 defect classes: کیلکولیٹر calculator
+  transliteration (6 keys); رسائی wrong-word for "seepage" (should be رساؤ, 9 keys); "reach" split
+  between two wrong terms (پہنچ in cs_, ریچ transliterated in ip_), harmonized to the glossary
+  حصہ (~12 keys); "Trapezoidal" transliteration; upstream/downstream transliteration (2 keys).
+  Flagged (not fixed, out of scope): a cross-category کیلکولیٹر/حاسبہ split in install_/about_/
+  mhp_/rc_ keys, and an orifice سوراخ/اوریفس split between the irr_ portal and the standalone or_
+  calculator.
+- **zh**: 1 fix — "Application Design" section heading and 3 cross-references drifted to the
+  generic/software sense 应用 instead of the irrigation-specific 灌水 already used correctly in the
+  input labels (`ip_d`, `ip_pr`).
+
+**Cross-language finding, not fixed in this stage:** three independent agents (ru, pt, uk) flagged
+the same likely-systemic issue without prompting each other — several `ip_` note/tooltip strings
+(`ip_worst_case_warn`, `ip_du_estimate`, `ip_notes_3_def`, `ip_q_ratio`) read as translations of an
+**older, longer English revision** that no longer matches the current, shortened English source
+(e.g. content about a "downhill run" or a "uniformity figure" that current English no longer
+contains). This is an English-source synchronization gap, not a per-language terminology defect —
+it needs its own investigation (diff the current English against what these keys' translations
+imply the source once said, across all 26 languages) before any fix is attempted, and should not be
+folded into a terminology-consistency stage.
+
+Post-stage QA: `php -l` clean on all 26 touched files. No `ANTHROPIC_API_KEY` set, so back-
+translation-equivalent verification was done inline by each agent per the QA chain's no-skip rule,
+same as prior stages.
+
+**Session-limit note:** two separate platform-wide session-limit events hit this stage (the first
+during the initial 26-agent launch, the second during the first retry wave). Both were resolved by
+resuming the same agent IDs via SendMessage once wall-clock time passed the reported reset, rather
+than spawning fresh agents — this preserved each agent's own partial reasoning/findings across the
+gap and is a lighter-weight variant of the stage-4 retry procedure worth using again.
+
+**Next:** stage 6 (category 5: micro-hydro `mhp_`/`rc_`) remains, still needing its own
+propose→confirm→launch authorization per CLAUDE.md.

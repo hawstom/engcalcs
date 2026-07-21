@@ -517,11 +517,11 @@ $ec_lang['ip_hl']='<span class="ec-help" title="管段总损失，h_f + h_m">h<s
 $ec_lang['ip_pressure_warn']='低压或负压——请检查是否存在低于大气压的情况';
 $ec_lang['ip_pressure_warn_short']='低';
 $ec_lang['ip_h_far']='最后滴头压力';
-$ec_lang['ip_q_supply']='<span class="ec-help" title="仅为进入所建模测试路径的流量——整个灌区/系统的流量见下方应用设计中的 Q_zone。">测试路径供水流量，Q<sub>supply</sub> <span class="ec-tip">?</span></span>';
+$ec_lang['ip_q_supply']='<span class="ec-help" title="仅为进入所建模测试路径的流量——整个灌区/系统的流量见下方灌水设计中的 Q_zone。">测试路径供水流量，Q<sub>supply</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['ip_q_critical']='最后滴头流量，q<sub>last</sub>';
 $ec_lang['ip_q_avg_lateral']='平均滴头流量（测试毛管），q<sub>avg</sub>';
-$ec_lang['ip_dp_avg']='<span class="ec-help" title="估计典型（平均）毛管相较于该测试毛管的压力高出（或低于）多少。测试毛管被有意设定为最不利情况，因此其自身平均值会低估田间平均值——若留空为0，下方的均匀度检查和应用设计数值将直接采用测试毛管自身（可能偏乐观）的平均值。">估计&Delta;压力，平均毛管与测试毛管之差 <span class="ec-tip">?</span></span>';
-$ec_lang['ip_q_avg_field']='<span class="ec-help" title="在每条毛管行的压力上加上前面输入的压力差后，重新计算q_avg_lateral&mdash;&mdash;用以修正测试毛管被设定为最不利情况（而非代表性情况）所带来的偏差。该值同时用于下方的均匀度检查和应用设计部分。">估计田间平均滴头流量，q<sub>avg,field</sub> <span class="ec-tip">?</span></span>';
+$ec_lang['ip_dp_avg']='<span class="ec-help" title="估计典型（平均）毛管相较于该测试毛管的压力高出（或低于）多少。测试毛管被有意设定为最不利情况，因此其自身平均值会低估田间平均值——若留空为0，下方的均匀度检查和灌水设计数值将直接采用测试毛管自身（可能偏乐观）的平均值。">估计&Delta;压力，平均毛管与测试毛管之差 <span class="ec-tip">?</span></span>';
+$ec_lang['ip_q_avg_field']='<span class="ec-help" title="在每条毛管行的压力上加上前面输入的压力差后，重新计算q_avg_lateral&mdash;&mdash;用以修正测试毛管被设定为最不利情况（而非代表性情况）所带来的偏差。该值同时用于下方的均匀度检查和灌水设计部分。">估计田间平均滴头流量，q<sub>avg,field</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['ip_du_estimate']='<span class="ec-help" title="最后滴头的计算流量除以估计的田间平均滴头流量&mdash;&mdash;这是对标准低四分之一分布均匀度（低分组平均值&divide;总体平均值）的近似，但数据来自小规模模型样本和用户估计的修正值，而非全田统计样本。数值等于或大于1也是可能且有效的：这仅表示最后滴头的压力已达到或高于估计的田间平均值，说明压力最低点在其他滴头上&mdash;&mdash;原因可能是最后滴头位于低处，或&Delta;压力估计值过小。">均匀度检查，q<sub>last</sub>/q<sub>avg,field</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['ip_worst_case_warn']='测试滴头处的压力&ge;供水压力。该滴头可能并非最不利情况，或管径可设计得更小。';
 $ec_lang['ip_q_ratio']='<span class="ec-help" title="这与我们对标准均匀度指标的近似值不同。">最后滴头流量 &divide; 设计流量，q<sub>last</sub>/q<sub>design</sub> <span class="ec-tip">?</span></span>';
@@ -532,7 +532,7 @@ $ec_lang['ip_notes_2_def']='表中每一行代表从供水端到最后滴头的�
 $ec_lang['ip_notes_3_term']='局限性';
 $ec_lang['ip_notes_3_def']='本模型仅考虑一个固定供水压力（不含泵曲线）、一条测试路径（而非整个田块），以及一个双参数滴头流量曲线（将指数设为接近0可近似模拟压力补偿滴头）。报告中给出两个不同的均匀度比值，二者有意保持独立：q<sub>last</sub>/q<sub>avg,field</sub> 是对标准低四分之一分布均匀度（低分组平均值&divide;总体平均值）的近似，但其数据来自小规模模型样本和用户估计的修正值，而非标准的全田统计样本。此外，测试毛管被有意设定为最不利情况，因此其未经修正的原始平均值会低估真实的田间平均值，使均匀度看起来比实际更好；&Delta;压力输入项正是为了抵消这一偏差而设置的。均匀度数值等于或大于1仍是可能的：这仅表示最后滴头的压力已达到或高于估计的田间平均值，说明压力最低点在其他滴头上&mdash;&mdash;原因可能是最后滴头位于低处，或&Delta;压力估计值过小。q<sub>last</sub>/q<sub>design</sub> 是另一项不同的、非均匀度性质的检查，用于与制造商额定流量进行对比&mdash;&mdash;有助于发现系统整体超压或欠压，但它是与均匀度数值分开阅读的独立检查，因为设计/额定流量与系统实际的平均运行压力无关。';
 $ec_lang['ip_notes_4_def']='Christiansen, J.E.（1942年）。&ldquo;Irrigation by sprinkling.&rdquo; 加利福尼亚州农业试验站公报670号。ASAE/ASABE 微灌设计标准采用相同的多出口沿程损失计算方法。';
-$ec_lang['ip_notes_5_term']='应用设计';
+$ec_lang['ip_notes_5_term']='灌水设计';
 $ec_lang['ip_notes_5_def']='灌水强度和系统/灌区流量采用估计的田间平均滴头流量（q<sub>avg,field</sub>&mdash;&mdash;即测试毛管自身平均值经输入的&Delta;压力估计修正后的结果），而非凭空猜测的速率：PR = q<sub>avg,field</sub> / A<sub>e</sub>，由修正后的模型值提供。间距及系统范围内的毛管/滴头数量在此为独立输入项，因为测试路径仅模拟一条最不利分支，而非田间所有毛管。';
 $ec_lang['irr_card_pressure_head']='灌溉压力与均匀度';
 $ec_lang['irr_card_pressure_desc']='沿干管—毛管—滴头分支模拟压力和流量分布，根据测试路径的实际压力（而非仅凭产品目录的滴头流量额定值）估算分布均匀度。';

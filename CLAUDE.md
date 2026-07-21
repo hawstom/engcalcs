@@ -183,7 +183,66 @@ Adding an intent string to a plain label is itself a defect — it burns transla
 something that isn't at risk. Before adding one, confirm the term has real transliteration or
 polysemy risk, not just "could use more explanation."
 
-**`$ec_lang_intent` is off-limits to AI.** This array provides human-authored translation guidance that is interleaved with `$ec_lang` for human review. AI must never add, change, or remove any `$ec_lang_intent` entry without explicit written permission from the human in that conversation.
+**`$ec_lang_intent` is off-limits to AI.** This array provides human-authored translation guidance that is interleaved with `$ec_lang` for human review. AI must never add, change, or remove any `$ec_lang_intent` entry without explicit written permission from the human in that conversation. **Standing exception (Tom, 2026-07-20):** the bounded intent-trimming operation in ROADMAP Task 132 is pre-authorized — where an intent's left-of-pipe merely *duplicates* a glossary concept, AI may replace it with a `| gloss: <term>` pointer (and nothing else), showing a diff for review. This one authorized, narrowly-scoped task is the only standing carve-out; all other intent edits still require in-conversation permission.
+
+### Division of labor: glossary vs. intent vs. tips (2026-07-20)
+
+Three channels carry translation guidance; keep each to its job and **do not duplicate a fact across
+them** (duplication is what let stale values drift):
+
+- **Glossary (`glossary.json`) — per *concept*.** One entry, referenced by every label/calculator that
+  uses the term. The single source of truth for: the definition, each language's dominant standard
+  translation, the `avoid` list, and sourcing. Terminology *consistency* lives here.
+- **`$ec_lang_intent` — per *label*, metadata only.** Its durable job is the right-of-pipe commentary
+  a concept can't express: `layout`, `symbol`, short-vs-long-form role, and a `gloss:` *pointer* to the
+  concept. Intent should **point** to the glossary (`| gloss: specific gravity`), never restate the
+  concept's definition or `avoid` list. The left-of-pipe (translatable definition) is now largely
+  superseded by visible tips and should be trimmed toward pointers (Task 132).
+- **Visible `.ec-help`/`.ec-tip` tips — user-facing definition.** Because a tip's text is translated
+  with the label, it is now the preferred home for a plain-language definition that helps the user AND
+  anchors the concept for translators (e.g. "Density relative to water"). This replaced intent's
+  old translatable-payload role.
+
+Rule of thumb: **concept → glossary; label metadata → intent (pointing at glossary); user-facing
+definition → tip.** If you find the same sentence in two of these, one copy is wrong.
+
+### Polysemy / units-trap protocol (2026-07-20)
+
+A **trap term** is one where the English word has a non-obvious technical meaning a translator is
+liable to get wrong — a polysemy (hydraulic "head" vs anatomical head vs pressure), a units confusion
+("specific gravity" is a dimensionless *ratio*, never a units-bearing "specific weight"), or a
+transliteration lure ("chute", "riprap", "penstock"). These cost the most because the same mistake
+recurs in language after language, sprint after sprint. When a term is (or turns out to be) a trap,
+give it **all three** of these, in this order:
+
+1. **English-reform gate first — the English is not sacred.** Ask whether the English wording itself
+   is weak/jargonistic; if so, reform the `$ec_lang` value (that fixes all 26 languages at the source).
+   Identity strings (menu/title) are exempt — they match the source method's name. Explanatory labels,
+   notes, and tooltips are fair game. Example: "station" (a bus-stop mistranslation trap) is best fixed
+   by allowing the plain alias "Distance", not by guarding the jargon.
+2. **A root glossary entry with a structured `"avoid"` array.** Put the concept — including the *root*
+   word, not only its compounds (there is a `head` entry, not just `head loss`/`velocity head`) — in
+   `glossary.json` with an `"avoid": [...]` list of the wrong senses. Keep **compounds** as the
+   authoritative *translatable* units (a compound's idiomatic translation is not the concatenation of
+   its atoms — "velocity head" → fr "hauteur de vitesse"); the root atom is an **anchor** carrying the
+   shared `avoid` guard, never an ingredient to compose from. **`avoid` may only forbid *physical/
+   structural* errors and lazy transliterations — never a term that is a language's genuine standard.**
+   We defer to each language's own dominant, culturally-standard term; **we are not the judges of
+   terminology, the culture is** (this is why the English source keeps "Specific gravity" rather than
+   "relative density"). So for a units trap, forbid *attaching units to the value*, not the *word* — a
+   weight-flavored term that is the local standard (tr "özgül ağırlık") is correct; keep it, just never
+   let the quantity carry units. See the "defer to cultural standard" principle.
+3. **A visible definitional tip on any input label**, in the whole-label `.ec-help`/`.ec-tip` form.
+   The tip both helps the user and — because its text is translated with the label — anchors the
+   concept for translators (e.g. specific gravity → "Density relative to water"; head → "Energy per
+   unit weight of water, a height of water column, not a pressure"). Plus a **commentary-only** intent
+   guard (`| avoid: anatomical "head"`) so no translatable payload is duplicated. (This is the one
+   sanctioned case where a documented-polysemy label *does* get an intent — it is not the "plain label"
+   defect above.)
+
+The `avoid` arrays are the single source of truth for the **trap-term watchlist**
+(`dev/scripts/list_trap_terms.php`) — a one-command dump handed to a high-power agent for an on-demand
+sweep. Never maintain a separate watchlist; it derives from the glossary.
 
 ### `$ec_lang_intent` format: `<intent> | <commentary>`
 
@@ -258,6 +317,20 @@ Always announce the launch count before spawning so the user knows what is happe
    performs the same check inline: for every sprinted key, read the target-language string,
    back-translate it to English independently, and compare against the source meaning (same rigor, no
    billing). Applies retroactively to any wave that was closed without it.
+4. **Glossary write-back — mandatory, not optional, no "later" exception (Tom, 2026-07-19).** Any
+   confirmed terminology decision this sprint/stage produced — a wrong-term fix, a cross-key drift
+   resolved, a new concept translated for the first time — gets written into `glossary.json`
+   (`translations[lang]` + a dated `translation_notes` entry) **before the sprint/stage is
+   considered closed**, not queued for a future cleanup pass. This applies identically to the
+   Task 109 cross-language consistency-audit stages, not just new-calculator sprints: an audit
+   agent's fix is exactly the kind of confirmed, reasoned decision the glossary exists to
+   memorialize. Rationale: every stage was re-deriving the same terminology judgments from scratch
+   because nothing fed audit findings back into the one place future agents actually consult —
+   discovered as a gap after stage 5 (106 keys × 26 languages) closed with zero write-back across 5
+   stages. A populated glossary entry turns a "re-read every sibling key and infer consistency"
+   task into a one-line lookup for the *next* agent, in the *next* category, in the *next* language
+   pass — savings that compound with every stage that follows, so back-filling the glossary now is
+   strictly more valuable than deferring it until "after this stage."
 
 **On retries:** If an agent hits a session limit, retry only that language. If quality issues are found after a sprint (wrong term, missing intent framing), fix the glossary and/or lang file directly — do not re-run the full sprint.
 
