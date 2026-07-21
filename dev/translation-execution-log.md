@@ -1880,6 +1880,66 @@ propose→confirm→launch authorization per CLAUDE.md.
 
 ---
 
+## Backfill: 2026-07-21 maintenance-phase batch (stage 6 + Tasks 126–134)
+
+This log had fallen behind after stage 5. The entries below reconstruct, from `dev/ROADMAP.md`'s
+`## Completed` section and git history, the translation-touching work done on 2026-07-21 between
+stage 5 and Task 129, in chronological (commit-time) order. The ROADMAP Completed blocks remain the
+fuller record; these are the translation-execution summaries.
+
+### Task 109 stage 6 — category 5 (`mhp_`/`rc_`) cross-language consistency audit — `72d7c16` (06:52)
+Final stage of the Task 109 consistency audit. 28 lang files touched. Also shipped the
+**polysemy/units-trap prevention system**: the `avoid`-array convention in `glossary.json`, the
+`dev/scripts/list_trap_terms.php` watchlist (derived from those arrays, never a separate list), and
+the three-part trap protocol (English-reform gate → root glossary entry with `avoid` → visible
+definitional tip). uk flagged `mhp_notes_2_def` here as still carrying the old "1–3 m/s" English —
+the seed of Task 129.
+
+### Task 132 — trim duplicative `$ec_lang_intent` to `gloss:` pointers — `97383c3` (08:20)
+Tom-authorized bounded intent-trimming (the one standing AI carve-out on `$ec_lang_intent`). Where an
+intent's left-of-pipe merely duplicated a glossary concept, replaced it with a `| gloss: <term>`
+pointer. English-side metadata only; no per-language translation, logged here because it changed the
+translation-guidance channel.
+
+### Task 131 — translate the 5 trap-term tips into 26 languages — `82f1156` (08:38)
+Scenario-D slice: 26 Sonnet agents, 5 keys each (`or_head`, `ws_headWaterHeight`,
+`mpf_velocity_head`, `mtc_sgrock`, `rc_sg`), glossary + `avoid` injected, driven off the explicit
+grep-slice (not payload delta). Each agent preserved the existing translated label and added/updated
+the whole-label `.ec-help`/`.ec-tip` definitional tip; `rc_sg` converted from the old bare-`?`
+inline-style tooltip where still present. QA all clean (lang_syntax_validate, tag-parity on all 130
+strings, inline back-translation). Glossary write-back on `head` + `specific gravity`. Spun out:
+he/my `head` label → Task 128; new SG *label* drift (pt/uk/ar/fa/sr) → Task 133.
+
+### Tasks 128 & 133 — trap-term residue + SG label consolidation — `71057df`, `6f3a455` (11:32)
+**128 (closed):** on Tom's directive that native review is not realistically available and we defer
+to the locally natural term — sw "Uzito maalum", my "ခေါင်းဆုံး", he "עומק" all KEPT as locally
+natural. Upstream fix: the `head` family's blanket `avoid: "anatomical head"` was reframed across all
+7 entries to forbid only a lazy anatomical calque that is NOT the local standard (an
+anatomically-derived word that IS the dominant standard is now explicitly correct). 3 intent entries
+→ `| gloss: head` pointers. **133 (done):** per-language SG *label* consolidation — `mtc_sgrock`
+aligned to `rc_sg`'s dominant-standard label in the 5 affected languages (pt/uk/ar/fa/sr). Glossary
+write-back on both.
+
+### Task 126 — suite-wide tooltip markup migration — `1d001e3` (12:17)
+Scripted, idempotent converter (`dev/scripts/migrate_legacy_tooltips.php`) moved 7 `rc_` keys across
+11 languages (ar, bg, de, fr, he, hi, it, pt, ro, uk, zh) from the legacy inline-styled
+`<span title=… style=…>?` pattern to the touch-friendly `.ec-help`/`.ec-tip` wrapper, relocating each
+language's translated label text (with `<sub>`, escaped quotes, `&quot;`, RTL) inside the wrapper.
+76 strings converted, 0 residual. Not a translation sprint, but a structural edit of 11 lang files.
+
+### Tasks 134 / 130 / 127 — units gap-fill + `odt_` rebrand + `mhp_diameter` tip — `e22dc35`, `2c5d54e`, `6f3647a` (12:27–16:24)
+English side first (`e22dc35`, `2c5d54e`): added `bar`/`kgf/cm²` pressure units and pruned dead
+units; rebranded `odt_` identity vessel-first ("Pond & Tank Drain Time", Tom-locked). Then one
+26-agent Sonnet sprint (`6f3647a`, hand-specified key list — payload delta is blind to
+changed-English-under-stale-translation, the same blind spot Task 129 addresses) carried three riders
+together: **130** re-translated the rebranded `odt_` identity + fixed am's residual head→distress
+calque (ጭንቅ→ሄድ); **127** restored the `mhp_diameter` "(supply pipe)" tooltip in the 15 languages that
+lacked it (existing penstock terms reused, tag-parity verified on all 26); **134** translated the new
+`u_bar`/`u_kgfcm2` unit tokens into all 26. QA all clean; one he escape-leakage on `u_kgfcm2` fixed
+inline. Glossary v1.10→1.11.
+
+---
+
 ## Task 129 — stale-English-revision resync (2026-07-21)
 
 Closes the "cross-language finding, not fixed in this stage" flagged at the end of stage 5 above:
