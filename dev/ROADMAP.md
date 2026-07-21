@@ -200,7 +200,8 @@ The rules, sequence, and QA chain for translation work are **not** restated here
 - **`CLAUDE.md` § "Translation Sprints"** — sprint mechanics, model policy, pre/post-sprint checklist.
 - **`dev/translation-execution-log.md`** — the full dated, category-by-category execution record.
 
-- 10|127| **`mhp_diameter` tooltip — DECIDED 2026-07-21 (Tom): restore everywhere.** English is
+- 6|127| **`mhp_diameter` tooltip — DECIDED 2026-07-21 (Tom): restore everywhere.** (Priority 6 to
+  match Task 130 — executes as a rider inside that sprint.) English is
   correct as-is ("Penstock (supply pipe) diameter" with `.ec-help`); all languages match English.
   Restore the `.ec-help` wrapper on the ~10 languages that dropped it (es/de/cs/fr/it/hr/ro/sw/uk/zh);
   the languages that already restored it (11 langs: am/bn/fa/hi/id/km/my/ps/ru/tr/ur) are correct.
@@ -218,6 +219,18 @@ The rules, sequence, and QA chain for translation work are **not** restated here
   an English-source sync gap affecting multiple languages at once, not a per-language terminology
   defect. Needs its own pass: diff current `lib/lang.ec.en.php` prose against these (and any other)
   flagged keys across all 26 languages, then re-translate the drifted ones against current English.
+  **Read-only scoping done 2026-07-21:** drift is **CONFIRMED real** — spot-check of ru/pt/uk on
+  `ip_worst_case_warn`, `ip_q_ratio`, `mhp_notes_2_def` shows all three are translations of an older,
+  longer English (e.g. current en `ip_q_ratio` tip = "This is different than our approximation of the
+  standard uniformity measure." but pt/ru/uk carry a full "separate check, not a uniformity figure:
+  how far the last emitter operates from the design flow…" paragraph; uk `mhp_notes_2_def` still
+  carries an old "target range 1–3 m/s" version the current en dropped). **Byte-length is NOT a
+  usable scoping filter** — Cyrillic/Amharic/Burmese/Khmer inflate byte counts by encoding, zh
+  deflates them, so length ratio conflates script density with real drift. **Therefore scoping which
+  languages drifted requires a semantic per-language read against current en, not a mechanical
+  filter** — i.e. this is a real (small) Sonnet delta sprint over the 5 flagged keys (only the
+  drifted languages get rewritten; matching ones are left alone), not a scriptable fix. Needs
+  authorization. Sweep for other keys whose en prose was shortened during Task 109 while translating.
 - 6|130| **`odt_` pass + rebrand as vessel-first drain time.** Two things in one authorized `odt_`
   sprint (same keys, same 26 files): (a) **fix** am's confirmed head→distress calque and any sibling
   mistranslations — `odt_` was outside all 6 Task 109 stages. (b) **rebrand for discoverability**
