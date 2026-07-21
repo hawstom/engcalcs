@@ -578,11 +578,11 @@ $ec_lang['mhp_notes_7_def']='Annual energy assumes continuous full-flow operatio
 $ec_lang_intent['mhp_notes_7_def']='';
 
 // Orifice Drain Time
-$ec_lang['odt_main_menu']='Orifice Drain Time';
+$ec_lang['odt_main_menu']='Pond &amp; Tank Drain Time';
 $ec_lang_intent['odt_main_menu']='';
-$ec_lang['odt_main_title']='Free Online Orifice Drain Time Calculator — Pond, Basin, or Tank';
+$ec_lang['odt_main_title']='Free Online Pond, Basin, and Tank Drain Time Calculator (Orifice)';
 $ec_lang_intent['odt_main_title']='';
-$ec_lang['odt_main_desc']='Pond or Basin Orifice Drain Time &mdash; Conic Volume Method';
+$ec_lang['odt_main_desc']='Pond, Basin, or Tank Drain Time &mdash; Orifice Outlet, Conic Volume Method';
 $ec_lang_intent['odt_main_desc']='';
 $ec_lang['odt_h1_elev']='Starting water surface elevation';
 $ec_lang_intent['odt_h1_elev']='';

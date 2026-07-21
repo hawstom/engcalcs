@@ -1,7 +1,7 @@
 {
     "meta": {
         "language": "ru",
-        "expected_key_count": 507,
+        "expected_key_count": 509,
         "delta_key_count": 8,
         "active_prefixes": [
             "dw",
@@ -15,9 +15,9 @@
         "intent_notes": "Use key_intent when present; these entries provide terse disambiguation comments only where translation risk exists."
     },
     "prompt_context_by_prefix": {
-        "dw": "Use these preferred technical term translations when relevant:\n- flow (Q): расход\n- velocity (v): скорость\n- head loss (h_L): потери напора\n    DO NOT render as: pressure loss \/ pressure drop (use the head-loss term, not the pressure term); anatomical head\n- friction factor (f): коэффициент сопротивления\n- slope (S): уклон\n- laminar: ламинарный\n- transitional: переходный\n- turbulent: турбулентный",
-        "install": "Use these preferred technical term translations when relevant:\n- flow (Q): расход\n- velocity (v): скорость\n- slope (S): уклон",
-        "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): расход\n- velocity (v): скорость\n- head loss (h_L): потери напора\n    DO NOT render as: pressure loss \/ pressure drop (use the head-loss term, not the pressure term); anatomical head\n- emitter: капельница\n- distribution uniformity (DU): равномерность распределения\n- low-quarter distribution uniformity (DU_lq): равномерность распределения по нижней четверти\n- application rate (PR): интенсивность полива\n- lateral: латераль\n- mainline: магистральный трубопровод\n- reach: участок\n- velocity head (H_v): скоростной напор\n    DO NOT render as: anatomical head; pressure\n- friction loss (h_f): потери на трение\n- minor loss (h_m): местные потери\n- energy grade line (EGL): линия энергии\n- upstream: выше по течению\n- downstream: ниже по течению"
+        "dw": "Use these preferred technical term translations when relevant:\n- flow (Q): расход\n- velocity (v): скорость\n- head loss (h_L): потери напора\n    DO NOT render as: pressure loss \/ pressure drop (use the head-loss term, not the pressure term); a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry\n- friction factor (f): коэффициент сопротивления\n- slope (S): уклон\n    DO NOT render as: activity\/fitness sense of 'grade' — the treadmill or trail incline for running\/walking\/jogging; this is the hydraulic energy gradient, not an exercise setting; geographic or topographic landform term; school grade \/ academic mark\n- laminar: ламинарный\n- transitional: переходный\n- turbulent: турбулентный",
+        "install": "Use these preferred technical term translations when relevant:\n- flow (Q): расход\n- velocity (v): скорость\n- slope (S): уклон\n    DO NOT render as: activity\/fitness sense of 'grade' — the treadmill or trail incline for running\/walking\/jogging; this is the hydraulic energy gradient, not an exercise setting; geographic or topographic landform term; school grade \/ academic mark",
+        "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): расход\n- velocity (v): скорость\n- head loss (h_L): потери напора\n    DO NOT render as: pressure loss \/ pressure drop (use the head-loss term, not the pressure term); a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry\n- emitter: капельница\n- distribution uniformity (DU): равномерность распределения\n- low-quarter distribution uniformity (DU_lq): равномерность распределения по нижней четверти\n- application rate (PR): интенсивность полива\n- lateral: латераль\n- mainline: магистральный трубопровод\n- reach: участок\n- velocity head (H_v): скоростной напор\n    DO NOT render as: a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry; pressure\n- friction loss (h_f): потери на трение\n- minor loss (h_m): местные потери\n- energy grade line (EGL): линия энергии\n- upstream: выше по течению\n- downstream: ниже по течению"
     },
     "glossary_terms_by_prefix": {
         "dw": [
@@ -52,8 +52,8 @@
             {
                 "term": "slope",
                 "symbol": "S",
-                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
-                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
+                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators. English aliases 'slope' and 'grade' (u_grade\/u_gradePercent) both point here.",
+                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term. [2026-07-21] Centralized the grade activity-sense guard here (was living only as u_grade\/u_gradePercent label commentary): the 'avoid' array now carries the running\/walking\/jogging exercise-incline trap, so the slope entry is the single home for the grade→energy-gradient concept and its wrong senses.",
                 "preferred_translation": "уклон"
             },
             {
@@ -96,8 +96,8 @@
             {
                 "term": "slope",
                 "symbol": "S",
-                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators.",
-                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term.",
+                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators. English aliases 'slope' and 'grade' (u_grade\/u_gradePercent) both point here.",
+                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term. [2026-07-21] Centralized the grade activity-sense guard here (was living only as u_grade\/u_gradePercent label commentary): the 'avoid' array now carries the running\/walking\/jogging exercise-incline trap, so the slope entry is the single home for the grade→energy-gradient concept and its wrong senses.",
                 "preferred_translation": "уклон"
             }
         ],
