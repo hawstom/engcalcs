@@ -242,8 +242,36 @@ read-only watchlist dump and grep-slice are free and can be done any time.
 - **Column-heading vs. tooltip width discipline**: shared label's short form goes in the
   column-heading key, long form in the tooltip — never the reverse (width-is-king).
 
+## English-drift tripwire (staleness detection)
+
+**The gap it closes:** the payload-delta only sees *missing* keys, so a key whose English was
+**changed** after a translation was written is invisible to it — the translation is present but now
+renders obsolete English. That "stale-but-present" pattern caused Task 129 and forced Tasks
+129/130/131 to run off hand-built key lists. `detect_english_drift.php` turns that lucky-catch into a
+standing tripwire.
+
+- **How:** a checked-in manifest (`dev/scripts/english_string_hashes.json`) holds the sha1 of every
+  `lang.ec.en.php` `$ec_lang` value *as of the last full sync*. A current-vs-manifest mismatch flags
+  that key `CHANGED` = translations may be stale.
+- **When to run it:** any time you edit English `$ec_lang` values (English-reform passes, label
+  consolidation, wording fixes) — and as a cheap standing check before proposing any sprint. It is the
+  auto-generated replacement for the hand-built resync key list.
+- **Workflow:**
+  1. `php dev/scripts/detect_english_drift.php` — human report of drifted keys.
+  2. `php dev/scripts/detect_english_drift.php --json` — bare `CHANGED` key list → feeds a
+     **Scenario D-style** resync (semantic per-language read vs current English; only drifted
+     languages get rewritten, as in Task 129).
+  3. After the resync brings every language into sync: `php dev/scripts/detect_english_drift.php
+     --update` to re-baseline the manifest. **Only `--update` once the resync is actually done**, or
+     you silently baseline away real drift.
+- **`--check`** exits non-zero if any key is `CHANGED` (gate/CI use). `NEW`/`REMOVED` keys are
+  informational only (NEW is already handled by the payload-delta).
+
 ## Scripts reference
 
+- `dev/scripts/detect_english_drift.php` — English-source staleness tripwire (see section above);
+  `--check` gates on any CHANGED key, `--json` emits the resync key list, `--update` re-baselines
+  `english_string_hashes.json`.
 - `dev/scripts/generate_translation_payloads.php` — build per-language JSON payloads;
   `--check` verifies freshness against lang files/glossary/generator (hard gate before any sprint).
 - `dev/scripts/lang_syntax_validate.php --lang=<codes>` — escape-leakage / tag-imbalance /

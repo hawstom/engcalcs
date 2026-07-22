@@ -297,6 +297,7 @@ When translating a new calculator's keys into all 26 non-English languages, **sp
 2. Verify `glossary.json` has `preferred_translation` populated for the calculator prefix's key terms, especially for anchor languages (es, fr, ru, ar). Check `translation_notes` for WMO-verified terms and terms with `$ec_lang_intent` framing requirements.
 3. State the delta count and which calculators are affected before asking for authorization.
 4. Note any known quality risks (new terms without glossary coverage, intent-guided terms, proper nouns).
+5. **Check for stale-but-present drift the payload-delta can't see:** `php dev/scripts/detect_english_drift.php`. The payload-delta only finds *missing* keys; this flags keys whose *English changed* after a translation was written (the Task-129 blind spot). `--json` emits the resync key list. After any resync completes, `--update` re-baselines the manifest. Full workflow in `dev/translation-process.md` § "English-drift tripwire".
 
 **Standard launch pattern:**
 1. Tell the user: "Starting N agents, one for each language." (always say this before launching)
