@@ -60,7 +60,7 @@ $ec_lang['menu_main_hydraulics']='Hidraulika';
 $ec_lang['menu_main_language']='Jezik';
 $ec_lang['menu_more']='Više';
 $ec_lang['template_welcome']='>> Ostavite strahove na ulazu; ovdje se govori ljubav. Ne kvarite sve. Uživajte u <a target="_blank" href="https://hawsedc.com/download.php">besplatnim HawsEDC AutoCAD alatima</a> također. <<';
-$ec_lang['template_translation_help']='Imate li sjajnu viziju za kalkulator koji biste ovdje dodali?  Možete li mi pomoći poboljšati prijevode, programirati ili ugostiti ove kalkulatore?  ';
+$ec_lang['template_translation_help']='Imate li ideje kako poboljšati ove kalkulatore? A ako je ovo vaš jezik &mdash; je li prijevod dobar? Javite nam.  ';
 $ec_lang['template_feedback']='Molimo podijelite svoje dragocjene prijedloge ili pohvale. Je li ovaj besplatni kalkulator premašio vaša očekivanja u svakom pogledu?';
 $ec_lang['template_printable_title']='Naslov za ispis';
 $ec_lang['template_printable_subtitle']='Podnaslov za ispis';

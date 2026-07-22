@@ -61,7 +61,7 @@ $ec_lang['menu_main_hydraulics']='Hydraulik';
 $ec_lang['menu_main_language']='Sprache';
 $ec_lang['menu_more']='Mehr';
 $ec_lang['template_welcome']='>> Lasst Eure Ängste an der Tür; hier wird Liebe gesprochen. Ihr ruiniert nicht alles. Genießt auch die <a target="_blank" href="https://hawsedc.com/download.php">kostenlosen HawsEDC AutoCAD-Tools.</a> <<';
-$ec_lang['template_translation_help']='Haben Sie eine großartige Idee für einen Rechner, der hier hinzugefügt werden soll?  Können Sie mir helfen, Übersetzungen zu verbessern, zu programmieren oder diese Rechner zu hosten?  ';
+$ec_lang['template_translation_help']='Haben Sie Ideen, wie wir diese Rechner verbessern können? Und falls dies Ihre Sprache ist &mdash; ist die Übersetzung gut gelungen? Wir freuen uns über Ihre Rückmeldung.  ';
 $ec_lang['template_feedback']='Bitte teilen Sie uns Ihre wertvollen Anmerkungen oder Ihr Lob mit. Hat dieser kostenlose Rechner Ihre Erwartungen übertroffen?';
 $ec_lang['template_printable_title']='Druckbarer Titel';
 $ec_lang['template_printable_subtitle']='Druckbarer Untertitel';

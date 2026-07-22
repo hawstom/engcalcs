@@ -117,7 +117,7 @@ $ec_lang['menu_more']='More';
 $ec_lang_intent['menu_more']='';
 $ec_lang['template_welcome']='&gt;&gt; Drop your fears at the door; love is spoken here. You are not ruining everything. Enjoy the <a target="_blank" href="https://hawsedc.com/download.php">free libre HawsEDC AutoCAD tools</a> too. &lt;&lt;';
 $ec_lang_intent['template_welcome']='Leave your fears behind when you enter this space; love is the language we speak here. You are not ruining everything.';
-$ec_lang['template_translation_help']='Do you have great ideas for expanding or improving these calculators or their translations?  ';
+$ec_lang['template_translation_help']='Do you have ideas to improve these calculators? And if this is your language &mdash; is the translation good? Please tell us.  ';
 $ec_lang_intent['template_translation_help']='';
 $ec_lang['template_feedback']='Please share your valued words of suggestion or praise.  Did this free calculator exceed your expectations in every way?';
 $ec_lang_intent['template_feedback']='Please send suggestions or compliments. Did this free calculator serve you well?';

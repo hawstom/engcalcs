@@ -61,7 +61,7 @@ $ec_lang['menu_main_hydraulics']='Гидравлика';
 $ec_lang['menu_main_language']='Язык';
 $ec_lang['menu_more']='Ещё';
 $ec_lang['template_welcome']='>> Оставьте страхи за дверью; здесь говорят на языке любви. Вы не разрушаете всё. Наслаждайтесь также <a target="_blank" href="https://hawsedc.com/download.php">бесплатными инструментами HawsEDC для AutoCAD.</a> <<';
-$ec_lang['template_translation_help']='Есть ли у вас отличная идея для калькулятора, который можно добавить сюда?  Можете ли вы помочь мне улучшить переводы, программирование или хостинг этих калькуляторов?  ';
+$ec_lang['template_translation_help']='Есть идеи, как улучшить эти калькуляторы? А если это ваш родной язык &mdash; хорош ли перевод? Пожалуйста, напишите нам.  ';
 $ec_lang['template_feedback']='Пожалуйста, поделитесь вашими ценными замечаниями или похвалой. Превзошёл ли этот бесплатный калькулятор ваши ожидания?';
 $ec_lang['template_printable_title']='Печатный заголовок';
 $ec_lang['template_printable_subtitle']='Печатный подзаголовок';

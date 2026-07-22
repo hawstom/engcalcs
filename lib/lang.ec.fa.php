@@ -62,7 +62,7 @@ $ec_lang['menu_main_hydraulics']='هیدرولیک';
 $ec_lang['menu_main_language']='زبان';
 $ec_lang['menu_more']='بیشتر';
 $ec_lang['template_welcome']='>> ترس‌هایت را پشت در بگذار؛ اینجا زبان محبت است. تو همه چیز را خراب نمی‌کنی. از <a target="_blank" href="https://hawsedc.com/download.php">ابزارهای رایگان HawsEDC AutoCAD</a> هم لذت ببر. <<';
-$ec_lang['template_translation_help']='آیا ایده‌ای عالی برای افزودن یک ماشین‌حساب دارید؟ آیا می‌توانید در بهبود ترجمه‌ها، برنامه‌نویسی، یا میزبانی این ماشین‌حساب‌ها کمک کنید؟  ';
+$ec_lang['template_translation_help']='آیا برای بهبود این ماشین‌حساب‌ها ایده‌ای دارید؟ و اگر این زبان شماست &mdash; آیا ترجمه خوب است؟ لطفاً به ما بگویید.  ';
 $ec_lang['template_feedback']='لطفاً نظرات ارزشمند خود را برای پیشنهاد یا تعریف با ما در میان بگذارید. آیا این ماشین‌حساب رایگان در همه جهات انتظارات شما را برآورده کرد؟';
 $ec_lang['template_printable_title']='عنوان قابل چاپ';
 $ec_lang['template_printable_subtitle']='زیرعنوان قابل چاپ';

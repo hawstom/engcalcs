@@ -61,7 +61,7 @@ $ec_lang['menu_main_hydraulics']='Hidraulika';
 $ec_lang['menu_main_language']='Bahasa';
 $ec_lang['menu_more']='Lainnya';
 $ec_lang['template_welcome']='>> Buang rasa takutmu di pintu; di sini cinta adalah bahasa kami. Kamu tidak merusak segalanya. Nikmati juga <a target="_blank" href="https://hawsedc.com/download.php">alat AutoCAD HawsEDC gratis</a>. <<';
-$ec_lang['template_translation_help']='Apakah Anda memiliki visi luar biasa untuk kalkulator yang ingin ditambahkan di sini?  Bisakah Anda membantu meningkatkan terjemahan, memprogram, atau meng-host kalkulator ini?  ';
+$ec_lang['template_translation_help']='Punya ide untuk menyempurnakan kalkulator ini? Dan jika ini bahasa Anda &mdash; apakah terjemahannya sudah pas? Beri tahu kami, ya.  ';
 $ec_lang['template_feedback']='Silakan berikan masukan atau pujian yang berharga. Apakah kalkulator gratis ini melebihi harapan Anda di segala hal?';
 $ec_lang['template_printable_title']='Judul Cetak';
 $ec_lang['template_printable_subtitle']='Subjudul Cetak';

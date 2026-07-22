@@ -212,19 +212,6 @@ The rules, sequence, and QA chain for translation work are **not** restated here
   earns (`0.95` if it becomes a real verified native review on file; otherwise adjust `0.65` to the
   honest post-review estimate). AI does NOT launch this — it waits on Tom's human contact. Prep the
   packet when Tom says go.
-- 4|136| **Reword `template_translation_help` to explicitly invite native-language review.** Current
-  English (`lib/lang.ec.en.php`): "Do you have great ideas for expanding or improving these
-  calculators or their translations?" — never expressly asks a native speaker to check their *own*
-  language. Because this string is translated into all 26 languages, a reworded invitation appears
-  *in-language* (a Swahili speaker sees the Swahili ask to review Swahili) — a passive, always-on
-  channel for the same native-review goal as Task 135. **Wording LOCKED (Tom, 2026-07-21):** "Do you
-  have ideas to improve these calculators? And if this is your language — is the translation good?
-  Please tell us." (draft C with "right"→"good"). Simple-English by design.
-  **This is an English `$ec_lang` edit → triggers a delta resync of `template_translation_help` into
-  all 26 languages** (and the `detect_english_drift.php` tripwire will flag it — that's the intended
-  loop). Do not deploy the English change until Tom picks the final wording and authorizes the small
-  sprint.
-
 ## AI Efficiency Scripting (Overhead)
 
 These tasks reduce the AI token cost of routine maintenance by replacing repeated AI judgment with deterministic scripts. Copilot owns execution (all tagged `[CP]`); Claude Code specs any script whose output feeds back into translation quality work.
@@ -235,6 +222,22 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Completed
 
+- 0|136| **Reworded `template_translation_help` to invite native-language review — DONE 2026-07-21.**
+  Authorized by Tom 2026-07-21 ("Deploy now"). English changed to the LOCKED wording "Do you have
+  ideas to improve these calculators? And if this is your language &mdash; is the translation good?
+  Please tell us." (draft C, "right"→"good"), then resynced into all 26 languages so the invitation
+  appears in-language (a native speaker sees the ask to review their own language — a passive,
+  always-on companion to the Task 135 sw review). One-key delta sprint, 26 Sonnet agents. The English
+  edit correctly tripped `detect_english_drift.php` (validated the tripwire end-to-end on a real
+  change), and the manifest was re-baselined after full sync. QA: 27×`php -l` clean; em-dash verified
+  single-encoded `&mdash;` in all 26 (the `&amp;mdash;` in agent reports was notification
+  display-escaping, per the Task-130 lesson); no double-encoding anywhere; trailing-space + string
+  termination verified. **Session-limit note:** the account-wide session limit fired mid-sprint; 6 of
+  7 "failed" agents (ru/sr/sw/tr/uk/ur) had already landed correct edits before erroring (per the
+  session-limit-retry lesson — verify before relaunch), and only **zh** truly missed. With retries
+  blocked by the limit and the rest ready, zh was completed inline by the orchestrator (Opus) rather
+  than stalling the deploy — a one-string, trap-free deviation from the Sonnet-agent process, flagged
+  for transparency; zh back-translation verified faithful.
 - 0|129| **Stale-English-revision resync audit — DONE 2026-07-21.** Authorized by Tom 2026-07-21.
   Explicit-key-slice sprint (26 Sonnet agents, one per language) over the 5 keys flagged in Task 109
   (`ip_du_estimate`, `ip_worst_case_warn`, `ip_q_ratio`, `ip_notes_3_def`, `mhp_notes_2_def`) whose
