@@ -1,6 +1,6 @@
 {
   "meta": {
-    "version": "1.12",
+    "version": "1.13",
     "description": "Engineering term glossary for EngCalcs translation prompts. Preferred translations per language to prevent term drift across calculators and sprints. Covers all calculators including Rock Chute Design (Robinson), Micro-Hydro Power, and Manning series.",
     "usage": "Inject relevant entries as context in translation prompts: 'Use these preferred translations for technical terms: [terms for this calculator prefix]'. Entries with empty strings need a sprint to fill.",
     "language_codes": [
@@ -181,7 +181,7 @@
         "source/origin of a stream"
       ],
       "context": "Hydraulic head — energy per unit weight of water, expressed as a height of water column. The ROOT concept behind head loss, velocity head, weir head, and gross/net head. A length, never a pressure. Appears as a bare label in Weir Flow (ws_headWaterHeight), Orifice (or_head), and Manning Pipe Flow (mpf_velocity_head).",
-      "translation_notes": "Newly seeded 2026-07-20 to close the long-standing gap where only the COMPOUNDS (head loss, velocity/weir/gross/net head) had entries but the root word 'head' did not — the root is what every agent re-derived (and sometimes mistranslated as anatomical head or pressure). Values below are the roots extracted from those compound entries and are best-effort/derived, not natively verified — confirm in the term-centric sweep (see ROADMAP). Several languages split the root by sense: the hydro-power 'fall' sense uses a different word than the pipe 'head' sense (cs spád vs tlaková výška; hr/sr visina·pad vs visina; ro sarcină vs cădere; tr yük vs düşü; ar علو/الارتفاع vs الضغط). Where that split exists, keep the pipe/energy-head root here and let the fall-sense compounds keep their own word. Slavic напор/напір, sw kichwa, and the هد/ہیډ/ہیڈ/हेड/ሄድ loanword family are consistent and documented across the suite (see 'head loss' notes). [2026-07-21 Task 128 RESOLVED — Tom decision] Native review is not realistically available for these; rely on AI guidance and defer to the locally natural term. Anatomically-derived head words are NOT inherently wrong (English 'head' is itself anatomical) — a blanket anatomical-head avoid was mistaken and has been reframed above. Accordingly: my or_head/ws_headWaterHeight 'ခေါင်းဆုံး' (contains ခေါင်း) is KEPT as a locally natural term — NOT a defect; the earlier ဖိမြင့်ဆင့် root is one acceptable variant, ခေါင်းဆုံး is another, both stand. he or_head/ws_headWaterHeight 'עומק' (depth) is KEPT as-is — for orifice effective head a depth-to-centroid reading is physically legitimate, and it is a natural term. This does NOT license reverting the documented cs/he/sw velocity-head calque fixes (rychlostní výška, עומד מהירות, kimo cha kasi): those were replaced because the anatomical word was not the natural term there, which the reframed avoid guard still forbids. hi: or_head uses शीर्ष, velocity-head same शीर्ष, root here is the हेड loanword — harmless internal variance, polish only. [2026-07-21 Task 131 tip sprint] Definitional tips now ship in all 26 languages on or_head/ws_headWaterHeight/mpf_velocity_head ('energy per unit weight of water, a height of water column, not a pressure' / 'kinetic energy as a height of water column'), anchoring the concept at point-of-use. am head re-verified CLEAN this pass: uses the ሄድ loanword, no ጭንቅ (distress) calque anywhere. my (ခေါင်းဆုံး) and he (עומק) or_head/ws labels CLOSED 2026-07-21 as locally natural (see Task 128 resolution above) — no label change made. Task 130 (2026-07-21): am odt_ keys (odt_h1, odt_notes_1_def) still carried the ጭንቅ (distress) calque for head, missed by earlier sweeps; fixed to ሄድ.",
+      "translation_notes": "Newly seeded 2026-07-20 to close the long-standing gap where only the COMPOUNDS (head loss, velocity/weir/gross/net head) had entries but the root word 'head' did not — the root is what every agent re-derived (and sometimes mistranslated as anatomical head or pressure). Values below are the roots extracted from those compound entries and are best-effort/derived, not natively verified — confirm in the term-centric sweep (see ROADMAP). Several languages split the root by sense: the hydro-power 'fall' sense uses a different word than the pipe 'head' sense (cs spád vs tlaková výška; hr/sr visina·pad vs visina; ro sarcină vs cădere; tr yük vs düşü; ar علو/الارتفاع vs الضغط). Where that split exists, keep the pipe/energy-head root here and let the fall-sense compounds keep their own word. Slavic напор/напір, sw kimo (corrected from kichwa — see 2026-07-22 note below), and the هد/ہیډ/ہیڈ/हेड/ሄድ loanword family are consistent and documented across the suite (see 'head loss' notes). [2026-07-21 Task 128 RESOLVED — Tom decision] Native review is not realistically available for these; rely on AI guidance and defer to the locally natural term. Anatomically-derived head words are NOT inherently wrong (English 'head' is itself anatomical) — a blanket anatomical-head avoid was mistaken and has been reframed above. Accordingly: my or_head/ws_headWaterHeight 'ခေါင်းဆုံး' (contains ခေါင်း) is KEPT as a locally natural term — NOT a defect; the earlier ဖိမြင့်ဆင့် root is one acceptable variant, ခေါင်းဆုံး is another, both stand. he or_head/ws_headWaterHeight 'עומק' (depth) is KEPT as-is — for orifice effective head a depth-to-centroid reading is physically legitimate, and it is a natural term. This does NOT license reverting the documented cs/he/sw velocity-head calque fixes (rychlostní výška, עומד מהירות, kimo cha kasi): those were replaced because the anatomical word was not the natural term there, which the reframed avoid guard still forbids. hi: or_head uses शीर्ष, velocity-head same शीर्ष, root here is the हेड loanword — harmless internal variance, polish only. [2026-07-21 Task 131 tip sprint] Definitional tips now ship in all 26 languages on or_head/ws_headWaterHeight/mpf_velocity_head ('energy per unit weight of water, a height of water column, not a pressure' / 'kinetic energy as a height of water column'), anchoring the concept at point-of-use. am head re-verified CLEAN this pass: uses the ሄድ loanword, no ጭንቅ (distress) calque anywhere. my (ခေါင်းဆုံး) and he (עומק) or_head/ws labels CLOSED 2026-07-21 as locally natural (see Task 128 resolution above) — no label change made. Task 130 (2026-07-21): am odt_ keys (odt_h1, odt_notes_1_def) still carried the ጭንቅ (distress) calque for head, missed by earlier sweeps; fixed to ሄድ. [2026-07-22 sw head family → kimo, Tom + Kenya-engineer input] REVERSES 'sw kichwa': kichwa (body-part head) is NOT the Swahili engineering term for hydraulic head. Anchor — velocity head was already 'kimo cha kasi' (the accepted descriptive term), so kimo is the register's word for head and kichwa was a body-part calque. Applied across the sw lang file (mhp_gross_head, mhp_hl_check, mhp_notes_3_def, rc_notes_7_def, odt_notes_1_def, or_head + ws_headWaterHeight labels): head=kimo cha maji, head loss=upotevu wa kimo, gross=kimo cha jumla cha maji, net=kimo halisi cha maji, weir head=kimo cha maji juu ya kizingiti. Ride-alongs same pass: crown taji(royal)→kilele (or_ orifice crown; rc_ crest already kilele); weir kizuizi/bwawa→kizingiti cha maji ('water sill', incl. ws_/wi_ calculator identities, Lenye→Chenye noun-class agreement); specific gravity uzito maalum KEPT. RATIONALE: for the 0.65 low-resource languages engineering discourse happens in English (TZ/KE engineering education is English-medium); the local tongue lives at the field/extension register, so there is no fixed engineering-Swahili standard to defer to — descriptive clarity for a Swahili-speaking field worker is the goal, and TANZANIA is the specific target audience (Tom's Kenya engineer). See memory project_low_resource_register_reality.",
       "translations": {
         "am": "ሄድ",
         "ar": "علو",
@@ -204,7 +204,7 @@
         "ro": "sarcină",
         "ru": "напор",
         "sr": "напор",
-        "sw": "kichwa",
+        "sw": "kimo cha maji",
         "tr": "yük",
         "uk": "напір",
         "ur": "ہیڈ",
@@ -243,7 +243,7 @@
         "ro": "pierdere de sarcină",
         "ru": "потери напора",
         "sr": "губитак напора",
-        "sw": "upotevu wa kichwa",
+        "sw": "upotevu wa kimo",
         "tr": "yük kaybı",
         "uk": "втрати напору",
         "ur": "دباؤ نقصان",
@@ -452,7 +452,7 @@
         "ro": "deversor",
         "ru": "водослив",
         "sr": "прелив",
-        "sw": "kizuizi cha maji",
+        "sw": "kizingiti cha maji",
         "tr": "savak",
         "uk": "водозлив",
         "ur": "ویر",
@@ -668,7 +668,7 @@
         "ro": "cădere brută",
         "ru": "полный напор",
         "sr": "бруто пад",
-        "sw": "kichwa cha maji jumla",
+        "sw": "kimo cha jumla cha maji",
         "tr": "brüt düşü",
         "uk": "повний напір",
         "ur": "مجموعی ہیڈ",
@@ -707,7 +707,7 @@
         "ro": "cădere netă",
         "ru": "рабочий напор",
         "sr": "нето пад",
-        "sw": "kichwa halisi cha maji",
+        "sw": "kimo halisi cha maji",
         "tr": "net düşü",
         "uk": "робочий напір",
         "ur": "خالص ہیڈ",
@@ -1693,7 +1693,7 @@
         "ro": "sarcina pe deversor",
         "ru": "напор на водосливе",
         "sr": "преливна висина",
-        "sw": "",
+        "sw": "kimo cha maji juu ya kizingiti",
         "tr": "savak yükü",
         "uk": "напір на водозливі",
         "ur": "ویئر ہیڈ",
@@ -2005,7 +2005,7 @@
         "km": "កំពូល",
         "my": "ထိပ်",
         "ps": "تاج",
-        "sw": "taji"
+        "sw": "kilele"
       },
       "source": "pending-wave-1; zh/ar/he/hi/bn/fa/ur added 2026-07-08 (category-2 wave-2 sprint); am/km/my/ps/sw added 2026-07-08 (category-2 wave-3 sprint)"
     },
