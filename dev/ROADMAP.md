@@ -200,6 +200,31 @@ The rules, sequence, and QA chain for translation work are **not** restated here
 - **`CLAUDE.md` § "Translation Sprints"** — sprint mechanics, model policy, pre/post-sprint checklist.
 - **`dev/translation-execution-log.md`** — the full dated, category-by-category execution record.
 
+- 5|135| **Swahili native review — the illustrative low-resource-tier quality probe.** Tom has a
+  contact he can probably convince to review the shipped Swahili (sw) pages. sw is one of the five
+  `0.65`-tier languages (am/km/my/ps/sw) that got only translating-agent self-check, never a native
+  read. Tom's framing (2026-07-21): done right, a single sw review is *illustrative of our quality on
+  these low-resource languages in general* — the first real-world data point on whether `0.65` is
+  honest, optimistic, or (unlikely) pessimistic. Mechanism: a `dev/Swahili-engineer-feedback.md`
+  packet modeled on the existing `dev/Bulgarian-engineer-feedback.md` (present the reviewer with the
+  in-context Swahili strings, ask for corrections, not raw lang-file diffs). On completion: apply
+  fixes, then set the sw `QUALITY` via `update_quality_score.php` to the tier the review actually
+  earns (`0.95` if it becomes a real verified native review on file; otherwise adjust `0.65` to the
+  honest post-review estimate). AI does NOT launch this — it waits on Tom's human contact. Prep the
+  packet when Tom says go.
+- 4|136| **Reword `template_translation_help` to explicitly invite native-language review.** Current
+  English (`lib/lang.ec.en.php`): "Do you have great ideas for expanding or improving these
+  calculators or their translations?" — never expressly asks a native speaker to check their *own*
+  language. Because this string is translated into all 26 languages, a reworded invitation appears
+  *in-language* (a Swahili speaker sees the Swahili ask to review Swahili) — a passive, always-on
+  channel for the same native-review goal as Task 135. Draft finalist (Tom to confirm): "Do you have
+  great ideas for expanding or improving these calculators or their translations? If this page is in
+  your own language, we would love your help checking and correcting it." Simple-English by design.
+  **This is an English `$ec_lang` edit → triggers a delta resync of `template_translation_help` into
+  all 26 languages** (and the `detect_english_drift.php` tripwire will flag it — that's the intended
+  loop). Do not deploy the English change until Tom picks the final wording and authorizes the small
+  sprint.
+
 ## AI Efficiency Scripting (Overhead)
 
 These tasks reduce the AI token cost of routine maintenance by replacing repeated AI judgment with deterministic scripts. Copilot owns execution (all tagged `[CP]`); Claude Code specs any script whose output feeds back into translation quality work.
