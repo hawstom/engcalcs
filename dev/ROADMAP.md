@@ -217,9 +217,9 @@ The rules, sequence, and QA chain for translation work are **not** restated here
   calculators or their translations?" — never expressly asks a native speaker to check their *own*
   language. Because this string is translated into all 26 languages, a reworded invitation appears
   *in-language* (a Swahili speaker sees the Swahili ask to review Swahili) — a passive, always-on
-  channel for the same native-review goal as Task 135. Draft finalist (Tom to confirm): "Do you have
-  great ideas for expanding or improving these calculators or their translations? If this page is in
-  your own language, we would love your help checking and correcting it." Simple-English by design.
+  channel for the same native-review goal as Task 135. **Wording LOCKED (Tom, 2026-07-21):** "Do you
+  have ideas to improve these calculators? And if this is your language — is the translation good?
+  Please tell us." (draft C with "right"→"good"). Simple-English by design.
   **This is an English `$ec_lang` edit → triggers a delta resync of `template_translation_help` into
   all 26 languages** (and the `detect_english_drift.php` tripwire will flag it — that's the intended
   loop). Do not deploy the English change until Tom picks the final wording and authorizes the small
