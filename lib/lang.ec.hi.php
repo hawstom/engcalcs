@@ -62,7 +62,7 @@ $ec_lang['menu_main_hydraulics']='जलगतिकी';
 $ec_lang['menu_main_language']='भाषा';
 $ec_lang['menu_more']='अधिक';
 $ec_lang['template_welcome']='>> दरवाज़े पर अपने डर छोड़ें; यहाँ प्यार हमारी भाषा है। आप सब कुछ बर्बाद नहीं कर रहे। <a target="_blank" href="https://hawsedc.com/download.php">मुफ़्त HawsEDC AutoCAD टूल</a> भी आज़माएँ। <<';
-$ec_lang['template_translation_help']='क्या इन कैलकुलेटरों को बेहतर बनाने के लिए आपके पास कोई सुझाव है? और अगर यह आपकी अपनी भाषा है &mdash; तो क्या अनुवाद अच्छा है? हमें ज़रूर बताएं।  ';
+$ec_lang['template_translation_help']='क्या आप बेहतर शब्दों या कुछ और सुझा सकते हैं? कृपया हमें बताएं।';
 $ec_lang['template_feedback']='कृपया अपने बहुमूल्य सुझाव या प्रशंसा दें। क्या इस मुफ़्त कैलकुलेटर ने हर तरह से आपकी उम्मीदों को पार किया?';
 $ec_lang['template_printable_title']='प्रिंट करने योग्य शीर्षक';
 $ec_lang['template_printable_subtitle']='प्रिंट करने योग्य उप-शीर्षक';
