@@ -85,9 +85,11 @@ EngCalcs.bpnFriction = function (line, method, visc) {
 		sf = line.rough * line.rough * v * v / Math.pow(rh, 4 / 3);
 		hf = sf * L;
 	} else if (method === 'hw') {
-		// Hazen-Williams (SI): hf = 10.67 L Q^1.852 / (C^1.852 d^4.87).
+		// Hazen-Williams, identical form to hazen-williams.js (khw = 0.849):
+		// Sf = 7.8828 / d^4.8704 * (Q / (0.849 C))^1.852.
 		if (!(line.rough > 0)) { return { hf: 0, v: v }; }
-		hf = 10.67 * L * Math.pow(Math.abs(q), 1.852) / (Math.pow(line.rough, 1.852) * Math.pow(d, 4.87));
+		sf = 7.8828 / Math.pow(d, 4.8704) * Math.pow(Math.abs(q) / (0.849 * line.rough), 1.852);
+		hf = sf * L;
 	} else {
 		// Darcy-Weisbach / Swamee-Jain.
 		f = this.bpnDwFriction(q, d, line.roughSi, visc);
@@ -285,7 +287,14 @@ EngCalcs.bpnSolve = function () {
 //               fitted). Falls back to a shutoff parabola on non-monotone data.
 EngCalcs.bpnSupplyHead = function (q) {
 	'use strict';
-	var pts = this.var.supplyPoints.slice().sort(function (a, b) { return a[0] - b[0]; });
+	var sorted = this.var.supplyPoints.slice().sort(function (a, b) { return a[0] - b[0]; }),
+		pts = [],
+		i;
+	// Drop any point that repeats the previous point's flow: two heads at one flow is
+	// contradictory and would divide by zero in the curve fits below.
+	for (i = 0; i < sorted.length; i += 1) {
+		if (i === 0 || sorted[i][0] !== sorted[i - 1][0]) { pts.push(sorted[i]); }
+	}
 	if (pts.length === 1) { return pts[0][1]; }
 	if (pts.length === 2) { return this.bpnParabolaHead(pts[0], pts[1], q); }
 	return this.bpnPowerCurveHead(pts, q);
