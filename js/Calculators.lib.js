@@ -340,6 +340,11 @@ EngCalcs.addCalcRow = function (arrColumns) {
 					} else {
 						if (column.inputType === 'checkbox' || column.inputType === 'radio') {
 							inputi.checked = !!column.value;
+						} else {
+							// text (and any other value-bearing) input: seed its value like number does.
+							inputi.size = "4";
+							inputi.value = (column.value === null || column.value === undefined) ? '' : String(column.value);
+							inputi.setAttribute('onkeyup', 'EngCalcs.submitForm()');
 						}
 						inputi.setAttribute('onchange', 'EngCalcs.submitForm()');
 					}

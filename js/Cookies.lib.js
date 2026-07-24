@@ -118,7 +118,7 @@ EngCalcs.cookieToForm = function (form) {
 				selectCounter = selectCounter + 1;
 				if (!form.getElementsByTagName("SELECT")[selectCounter]) { break; }
 				form.getElementsByTagName("SELECT")[selectCounter].value = '';
-				if (!isNaN(parseInt(cookieVarSplit[1]))) {
+				if (cookieVarSplit[1] !== undefined && cookieVarSplit[1] !== "") {
 					form.getElementsByTagName("SELECT")[selectCounter].value = cookieVarSplit[1];
 				}
 				break;

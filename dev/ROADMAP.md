@@ -10,6 +10,21 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 ## Calculator Improvements
 
+- 55|138| **Optimize suite-wide "Related calculators" links after Task 137 lands.** The pipe-flow
+  cluster has grown large (Manning-Pipe-Flow, Manning-Pipe-Head-Loss, Darcy-Weisbach, Hazen-Williams,
+  Irrigation-Pressure, and the new branched network — Task 137). Once 137 is in, re-evaluate the
+  *mutual* "Related calculators" links across all pipe-flow pages so genuinely related tools
+  cross-reference each other coherently — and only where genuinely related (no clutter/spam, per the
+  Golden-Rule linking standard). Cross-cutting UX pass, separate from the 137 build itself.
+- 40|139| **Fix Points-data copy/paste on Irrigation-Pressure (`ip_`).** The copy/paste data area is
+  non-functional on `ip` (Tom, 2026-07-23). The shared engine (`dataSingletonsCount` /
+  `dataColumnsFirstRowCount` / `dataColumnsOtherRowsCount` in the page JS, driving
+  `cookieValueToDataString`/`dataStringToCookieValue` in `Cookies.lib.js`) works on Manning-Irregular
+  and the new Branched-Network (Task 137) — `ip` likely just has wrong column/singleton counts or a
+  layout drift. Diagnose with a Node harness that evals `Cookies.lib.js` (note: its top-level
+  `var EngCalcs = EngCalcs || {}` shadows the global under `eval`, so append `global.EngCalcs=EngCalcs;`)
+  and round-trips a representative cookie, as was done for `bpn_`.
+
 ## New Calculators (Mission Expansion)
 
 Tom, 2026-07-14: interested in expanding beyond hydraulic-structure/irrigation calculators toward
@@ -43,77 +58,70 @@ institutional, paywalled, or non-English tools may exist that search didn't surf
 below reflect this research; re-run the same 4-axis check before adding new candidates rather than
 prioritizing on mission-fit intuition alone.
 
-- 8|110| **Water treatment — biosand/slow sand filter design.** Sizes a household or community
-  biosand filter per the CAWST Biosand Filter Construction Manual (the standard reference NGOs
-  actually build from) — filtration rate (~0.4 m/hr, ~600 L/day for a household unit), sand bed
-  depth (~55 cm minimum + separating/gravel drainage layers), sand specification checks (effective
-  size 0.15–0.20 mm, uniformity coefficient <2.5), and pause-period guidance (1–48 hr) for the
-  biolayer (schmutzdecke) to develop. Inputs: household size or community population, daily demand,
-  available container/tank diameter. Outputs: required filter surface area, bed-depth confirmation,
-  flow rate, daily-capacity check, pause-period recommendation. **Research-confirmed genuine gap**:
-  CAWST publishes manuals + one narrow sand-grain-size spreadsheet, but no general interactive
-  sizing/design calculator found; strong sector-wide demand (CAWST is a major global WASH training
-  org, biosand filters are a WHO/CAWST household-treatment staple). New domain for the suite (water
-  treatment, not just conveyance/storage) — zero overlap with existing calculators. Candidate prefix
-  `bsf_` — not yet claimed.
-- 8|111| **Spring box / gravity-fed water supply design.** Spring capture structure sizing (spring
-  box) plus gravity-fed transmission-line feasibility, per Peace Corps Water Supply & Sanitation
-  Technical Training Manual / RWSN spring-protection guidelines: spring yield (bucket-and-stopwatch
-  method), spring box minimum freeboard/sizing, and — this is the efficient part — the transmission
-  line itself is mostly a front-end wrapper around the **existing** `dw_`/`hw_`/`mphl_` pipe-flow and
-  head-loss engines, plus break-pressure-tank spacing logic for where static head would otherwise
-  exceed pipe pressure rating. **Research-confirmed genuine gap**: general gravity-flow calculators
-  and heavy engineering software (HYDROFLO) exist, but no integrated spring-capture-to-tap tool
-  (yield + transmission sizing + break-pressure tanks together) was found — reference material is
-  PDF manuals (SKAT/RWSN, IRC) only. Core RWSN/SKAT rural-water doctrine, foundational for
-  mountainous/hilly low-resource regions. Lowest net-new engineering-code cost of the top candidates
-  since it reuses proven calculators rather than opening new formula territory. Candidate prefix
-  `sb_` or `gfs_` — not yet claimed, needs a final pick (avoid collision risk with any future
-  "storage bin"/similar prefix).
-- 7|112| **VIP/pit latrine sizing.** Volume/depth sizing vs. household size and design life
-  (sludge accumulation rate ≈0.04–0.06 m³/person/year is the published WEDC/World Bank/UNICEF
-  figure — needs primary-source citation before shipping as a default, not just this note), vent
-  pipe diameter, and safe setback distance from water sources per Peace Corps/WEDC guidelines.
-  **Research-confirmed genuine gap**: extensive PDF/manual guidance exists (WEDC, World Bank, UNICEF
-  Ghana, SSWM) with clean, simple, well-published formulas, but no dedicated interactive calculator
-  was found anywhere. Very strong demand — VIP latrines are a WHO/WEDC/World Bank sanitation staple
-  across low-resource settings. Promoted from the candidates backlog after the 2026-07-14 research
-  pass (was initially filed as a lower-confidence backlog item; the gap turned out to be real and the
-  formulas simple, making it one of the cleanest build candidates of the whole set). Candidate prefix
-  `vip_` or `lat_` — not yet claimed.
-- 6|113| **Handpump / rope pump selection & sizing.** Selects/sizes a handpump or rope pump by
-  depth, diameter, and required discharge. **Research-confirmed genuine gap — the strongest
-  availability-axis gap found of any candidate**: motorized-pump sizing tools are abundant, but
-  nothing addresses rope-pump/handpump selection; that domain is served only by static PDF manuals
-  (PRACTICA Ethiopia manual, RWSN handpump standardization docs). High demand — RWSN/SKAT actively
-  maintain global handpump standardization as core rural-water infrastructure. Promoted from the
-  candidates backlog after the 2026-07-14 research pass. Scope carefully before speccing: this is
-  likely a narrower/simpler selection-table calculator (pump type by depth/diameter/discharge) rather
-  than complex hydraulics — verify actual formula complexity before committing to full-calculator
-  scope. Candidate prefix `hp_` — not yet claimed (watch for collision with `mhp_`).
-- 4|114| **Check dam / small earthen dam spillway sizing.** Small/informal check-dam sizing:
-  catchment runoff estimate + spillway sizing + freeboard, aimed at low-resource construction rather
-  than engineered large-dam design. Directly extends the *existing* `rc_` (Rock Chute, Robinson)
-  calculator, which already does spillway rock-lining sizing — pairing a dam/reservoir sizing
-  front-end with the existing rock-chute spillway engine is a natural low-marginal-cost companion,
-  same reuse pattern as Task 108. **Research-confirmed gap, moderate-high priority**: existing tools
-  are either too generic (weir/spillway-flow calculators) or too heavy (NRCS/USBR technical manuals)
-  — a gap in the middle. Strong demand signal: heavily promoted in India/Africa watershed programs
-  (Rajasthan/Gujarat/MP case studies, TAAT-Africa catalog) for groundwater recharge and farm water
-  storage. Promoted from the candidates backlog after the 2026-07-14 research pass. Candidate prefix
-  `cd_` — not yet claimed. Tom is (naively?) worried about the technical demand of global PMP/PMF estimation; are there good methods.
-- 2|115| **Rainwater Harvesting (roof/catchment sizing).** Sizes a rooftop rainwater harvesting
-  system: catchment area → runoff coefficient → harvestable volume → storage tank sizing, plus
-  first-flush diverter volume. Core method: rational-method roof runoff (`Q = C × I × A`) combined
-  with a monthly rainfall-vs-demand water balance to size storage. **Research-downgraded, 2026-07-14
-  (was the original lead candidate)**: this turns out to be a saturated market — 10+ dedicated free
-  calculators found (harvesth2o.com, watertankcalculator.com, BlueBarrel, rainwaterharvesting.co.uk)
-  already covering tank sizing, yield, and first-flush length with well-established formulas. Demand
-  for the *practice* is real and strong (Peace Corps Mexico, UN/Oxfam/ECHO all promote it), but that
-  demand is for implementation support, not for another calculation tool — no "there's no good tool"
-  gap found. Still directly extends the existing `cs_`/`ip_` water-supply-and-storage calculators if
-  built (low marginal engineering cost), so left on the roadmap rather than cut, but no longer the
-  lead candidate. Candidate prefix `rwh_` — not yet claimed.
+- 100|137|[CC] **Branched (distributary) pipe network calculator.** A quick, easy pressure/flow
+  calculator for distributary (dendritic/tree) pipe networks — source → main → branches delivering
+  fixed demands — filling the niche where EPANET is overkill (no loops, no iteration). Parent-pointer
+  topology (no node table; each line has one upstream line), single-pass fixed-demand solve
+  (bottom-up flows, top-down pressures), **series-by-default degradation** (`upstream` defaults to
+  the previous line, so a no-topology entry is a plain series pipeline — subsumes the old
+  "generic series multi-reach" idea), live Manning/HW/DW method switching, fixed k-value minor
+  losses, **break-pressure-tank spacing** (flags where static head would exceed pipe pressure rating
+  — absorbs the useful core of the former spring-box Task 111, now cut), a demand-multiplier
+  **system curve** with pump-curve overlay, and a "tall" topology sanity
+  sketch with toggleable per-cell data. **Phase 2** (feasibility-gated): an isolated Google Maps
+  elevation/length helper in a separate lazy-loaded window (core solve never depends on it, so it can
+  be aborted at zero cost). **Phase 3** (conditional, uncommitted): looped networks, only after we're
+  map-mashup experts or users ask. Springboards off Irrigation-Pressure (`ip_`) but built fresh —
+  **do not extract or degrade `ip`**. This is a **core-hydraulics** calculator in Tom's home
+  authority, so the 4-axis mission-expansion framework above does not gate it. Candidate prefix
+  `bpn_` (claimed 2026-07-23). Full spec: `dev/branched-network-calculator-scope.md`.
+- 4|114| **Reservoir / detention routing calculator (Modified Puls).** Re-scoped 2026-07-23 (Tom):
+  the original "check-dam *spillway sizing*" framing collapsed — a spillway is a weir (`wfs_`/`wfi_`)
+  plus rock lining (`rc_`) plus freeboard arithmetic, i.e. no new engine and largely subsumed by
+  existing calculators. The genuinely distinct, in-authority calculator is **storage-indication
+  (Modified Puls) reservoir routing** — a *time-stepping* engine, not a steady-state weir; time is
+  the real departure from the weir/orifice calcs. Scope: (a) a **composite outlet** stage-discharge
+  curve from **multiple orifices + weirs** (reuses `or_` and `wfs_` device equations, summed by
+  stage); (b) a **stage-storage** curve (user input / simple geometry); (c) **Modified Puls routing**
+  of an inflow hydrograph through it (build the 2S/Δt+O vs O curve once, table-lookup per step — no
+  per-step iteration). **Inflow is a deliberate punt-ladder, NOT rainfall-runoff:** user-table (bring
+  your own hydrograph), SCS dimensionless UH, and SCS triangular — the synthetic options are *shape
+  generators from a user-supplied peak Qp and time-to-peak Tp*, so the tool never does hydrology.
+  **Explicitly NO curve number / rainfall / area / runoff-volume** — CN is rainfall→runoff-volume,
+  the punted hydrology; the SCS input set is exactly **{Qpeak, Tp, peak-factor shape}** — two numbers
+  that scale the dimensionless UH plus a shape selector. **Take Tp (time-to-peak) or lag directly, not
+  Tc** — the Tc→Tp conversion embeds its own SCS assumption (Tp≈0.67·Tc) a user could swallow
+  unknowingly; taking Tp keeps the tool a pure shape-scaler. **Plot inflow AND routed outflow, plus each outlet
+  component's own hydrograph** — layers: inflow · total routed outflow · per-device discharge (each
+  orifice, each weir), all **checkbox-toggleable** (same toggle-layers UX as Task 137's sketch). Shows
+  *when each device kicks in* (e.g. the emergency weir waking up as stage tops its crest); mark peak
+  attenuation, ideally max stage. For a router the hydrograph plot *is* the primary result, distinct
+  from Task 137's topology-only sanity sketch.
+  **Hydrology is explicitly out of scope** — computing the design peak (Rational Method, TR-55,
+  PMP/PMF, regional regression, StreamStats) is truly hard, empirical, and regional; the user brings
+  Qp/Tc, the same boundary Tom has deliberately kept for his whole career (he has intentionally never
+  shipped a Rational Method calc). This is a clean modular boundary, not a flaw. **Inflow philosophy
+  (Tom, 2026-07-23): prefer "bring-your-own-*flood*" over "bring-your-own-*peak*."** Routing is
+  governed by flood *volume and duration*, not peak — so the user-table (full hydrograph) is the
+  *preferred* path, and the synthetic peak-based options get concise, non-pedantic guidance: a full
+  hydrograph beats a peak; a synthesized one also fixes a duration/volume that must match the storm;
+  and **test several durations** (critical-duration warning — the storm that drives the highest stage
+  is often not the highest-peak storm). SCS may well be the global default (used widely incl. India),
+  but its US-calibrated **peak factor 484** / Type II rainfall are not region-neutral — **expose the
+  peak factor** with a one-line note so arid/flat (≈300) or steep (≈600) watersheds adjust. The
+  design principle that resolves Tom's career-long reluctance: **the tool holds no opinion about
+  storms** — it routes the flood the local engineer brings and flags its own assumptions, so it never
+  has to model Indian-monsoon or African-convective floods it has no intuition for. **Candidate
+  peak-factor reference link** (for the SCS tip, English-only note per link+tip convention): Learn
+  Hydrology Studio "NRCS Unit Hydrograph Peak Factors"
+  (learn.hydrologystudio.com/hydrology-studio/knowledge-base/nrcs-unit-hydrograph-peak-factors/) as
+  the readable primary, HEC-HMS Technical Reference "SCS Unit Hydrograph Model" (USACE) as the
+  authoritative alternate; Wanielista et al. "Revisit of NRCS Unit Hydrograph Procedures" for spec-time
+  depth on the 3/8–5/8 volume-split assumption behind PRF 484. **Audience is broader
+  than the original NGO framing** — detention-pond/stormwater routing is mainstream civil practice;
+  paid tools (HydroCAD, PondPack) dominate, honest free web routers are rare. **Daunting (Tom's word),
+  bigger than Task 137 — do 137 first.** No internet mashup for hydrology. Candidate prefix
+  `rr_`/`route_`/`cd_` — not yet claimed. Full spec: TBD when Tom is ready.
 
 **Candidates backlog — researched, deprioritized (well-served, no clear gap found):**
 - **Chlorination dosing for small/community water systems** — well-served; multiple free calculators
