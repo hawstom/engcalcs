@@ -14,10 +14,19 @@ the design flow using the standard pump-curve equations: 1 pt = flat reservoir, 
 point 1's head is required, its flow defaults to 0 = the static head), and the tall SVG **Network Diagram** with per-cell toggles (ID · Length · Diameter ·
 Flow · Elevation · Pressure, each colour-coded, persisted in localStorage).
 
-**Deferred (not yet built):** global demand multiplier (peak-hour scaling — a standalone knob),
-the demand-multiplier **system-curve plot** with supply-curve overlay, and **break-pressure-tank
-spacing** (a static-head-vs-pipe-rating check flagging where a float-valve BPT is needed). Phase 2
-(Google Maps helper) and Phase 3 (loops) unchanged below.
+**Built (added 2026-07-24):** **excessive-pressure reporting** — an optional max. allowable head
+(pipe pressure rating) input; each line's downstream pressure is flagged inline when it exceeds that
+rating (and when it goes subatmospheric). Deliberately **no "break pressure tank" terminology
+anywhere in the UI or code** (Tom, 2026-07-24): the tool reports excessive pressure and stops there.
+It does not recommend, size, or place tanks, so naming a remedy it does not compute would overstate
+what it does. Also **global demand multiplier** — one knob scaling every line demand for a peak-hour
+or future-growth run.
+
+**Cut, not deferred (Tom, 2026-07-24):** the demand-multiplier **system-curve plot** with
+supply-curve overlay. Nice to have, but there is no place for it on the page, and the supply curve
+itself already does the load-bearing work (source head is read at the design flow). Do not
+reintroduce it without a fresh reason. Phase 2 (Google Maps helper) and Phase 3 (loops) unchanged
+below.
 
 ## Purpose
 
@@ -170,8 +179,14 @@ Reuse where clean: `ws_notes_heading` (Notes), `dw_kinematic_viscosity` (for DW)
 `mpf_velocity`, existing flow/Q and per-method roughness labels. Estimate new `bpn_` keys once the
 input set is final; keep the delta small for the eventual sprint.
 
-## Open questions
+## Resolved questions
 
-- Distributed-outflow model: carry over `ip`'s along-the-line outflow, or point-demand only in v1?
-- Identity string / menu name (Simple-English, not method-named).
-- Sketch medium: SVG (suite-consistent) vs. monospace text — leaning SVG with the grid algorithm.
+All three original open questions are settled — none remain.
+
+- **Distributed-outflow model — settled 2026-07-24 (Tom): point demand only, at the downstream end
+  of each line.** Do not carry over `ip`'s along-the-line outflow. A line delivers its demand at its
+  downstream node; model a distributed draw by splitting the run into more lines.
+- **Identity string / menu name** — settled by shipping: menu "Branched Pipe Network"; title "Free
+  Online Branched Pipe Network Pressure Calculator (No Loops)".
+- **Sketch medium** — settled by shipping: SVG with the grid algorithm, per-cell toggles persisted
+  in localStorage.
