@@ -75,6 +75,24 @@ prioritizing on mission-fit intuition alone.
   **do not extract or degrade `ip`**. This is a **core-hydraulics** calculator in Tom's home
   authority, so the 4-axis mission-expansion framework above does not gate it. Candidate prefix
   `bpn_` (claimed 2026-07-23). Full spec: `dev/branched-network-calculator-scope.md`.
+  **Status 2026-07-24 — build complete; only the translation sprint remains.** Decisions taken this
+  date (all recorded in the scope doc): excessive-pressure reporting built, with **no "break pressure
+  tank" terminology anywhere in UI or code** — the tool reports excessive pressure and does not size
+  or place tanks (`6394929`); global demand multiplier built (`160cdb9`); the demand-multiplier
+  **system-curve plot is CUT, not deferred** — no place for it on the page, do not reintroduce
+  without a fresh reason; distributed outflow settled as **point demand at the downstream end only**
+  (do not carry over `ip`'s along-the-line outflow); `ip_max_head_tip` reworded so it no longer
+  repeats its own label (`c7027f6`). Glossary gained `pressure rating` and `pressure reduction`,
+  both synonym-tolerant rather than calques (glossary 1.17).
+  **To close the task, run the sprint — 21 strings x 26 languages. Payload gate passes (`FRESH`).**
+  Two things the launcher MUST carry into the sprint prompt:
+  - **A do-not-translate guard.** The payload's `keys_to_translate` still contains symbols and
+    eponyms that must survive verbatim in every language, RTL included: `h<sub>f</sub>`,
+    `h<sub>m</sub>`, `L`, `D`, `e`, `ID`, and `Manning` / `Hazen-Williams` / `Darcy-Weisbach`. The
+    payload does not exempt them, so the prompt has to.
+  - **Glossary write-back is part of closing, not a follow-up.** `pressure rating` and
+    `pressure reduction` were created with empty `translations` — populate them from the sprint
+    output (plus a dated `translation_notes` line) before the task is marked done.
 - 4|114| **Reservoir / detention routing calculator (Modified Puls).** Re-scoped 2026-07-23 (Tom):
   the original "check-dam *spillway sizing*" framing collapsed — a spillway is a weir (`wfs_`/`wfi_`)
   plus rock lining (`rc_`) plus freeboard arithmetic, i.e. no new engine and largely subsumed by
