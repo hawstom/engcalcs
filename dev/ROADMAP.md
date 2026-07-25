@@ -303,24 +303,18 @@ The rules, sequence, and QA chain for translation work are **not** restated here
   problem will not fully end; that expectation is reasonable and already earned its keep once — it is
   what prompted the grep that found the 5 non-`title` attributes above.
 
-  **Execution: short-lived branches, one per step (Tom, 2026-07-24).** Steps 1 and 2 are mass
-  mechanical edits across all 27 `lib/lang.ec.*.php` files (~1200 entity replacements; 33 tooltips
-  restructured). Neither is reviewable as a blob on `master`, and a mistake in either is a mistake in
-  27 languages at once — so each gets its own branch, validated with
-  `php dev/scripts/lang_syntax_validate.php` plus a visual spot-check, then merged.
-  Suggested names: `task140-entities`, `task140-tooltip-extract`.
+  **Execution: commit direct to `master`, one step per commit (Tom, 2026-07-24 — this project does
+  not normally use branches; an earlier draft of this task proposed branches and was wrong).**
+  Steps 1 and 2 are mass mechanical edits across all 27 `lib/lang.ec.*.php` files (~1200 entity
+  replacements; 33 tooltips restructured). Keep each step its own commit so either can be reverted
+  cleanly, and run `php dev/scripts/lang_syntax_validate.php` plus a visual spot-check before
+  committing.
 
-  **The branch must stay short-lived — this is the real constraint, not the branching itself.**
-  `lib/lang.ec.*.php` is also the surface every translation sprint writes to. A Task 140 branch left
-  open across a sprint will conflict on all 27 files simultaneously, and the conflicts will be
-  meaning-level (which translation wins), not mechanical. Therefore:
+  **The real constraint is sequencing, not version control.** `lib/lang.ec.*.php` is also the surface
+  every translation sprint writes to, so:
   - Never run step 1 or step 2 concurrently with a translation sprint, and never run both at once.
-  - Merge each branch before starting the next thing that touches lang files.
   - If a sprint is queued, run the sprint first — sprint output is judgment work that is expensive to
     redo, while these mechanical passes are cheap to re-run against whatever the files then contain.
-
-  (Status note: the sprint work that was uncommitted on 2026-07-24 is now committed — `3f9b3de`,
-  `a89ad55`, `6394929` — so the tree is clean and a branch can be cut whenever the above holds.)
 
 ## AI Efficiency Scripting (Overhead)
 
