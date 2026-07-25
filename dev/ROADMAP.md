@@ -286,8 +286,13 @@ The rules, sequence, and QA chain for translation work are **not** restated here
      the existing translations are extracted mechanically** from inside the label strings across all
      27 files (they are already translated, just trapped) — not left empty for a future sprint.
      This is the load-bearing step: it is what makes tooltip content visible to any check at all.
-  3. Build the deriver + Rules B and C into `dev/scripts/lang_syntax_validate.php`, replacing the
-     too-narrowly-scoped `detectAttributeEntities()`.
+  3. Build the deriver + Rules B and C into `dev/scripts/lang_syntax_validate.php`.
+     **Partly built already — do not start from scratch.** Commit `3f9b3de` added
+     `attributeBoundKeys()`, which derives attribute-bound keys from the app source (PHP
+     `htmlspecialchars()`/`strip_tags()` labels, and JS tip properties / `writeCheckHTML()` 3rd
+     argument). What remains: it matches `htmlspecialchars(...)` and JS tip paths only, so it does
+     **not** see the five non-`title` plain-text attributes listed above — widen it to scan every
+     `attr="..."`, then add Rule B (tags) and Rule C (name-vs-derivation disagreement) on top.
   4. Fix `mphl_total_junction_k_tip` (drop the `<sub>`; 6 call sites).
   5. Leave page labels and documents alone.
 
@@ -298,10 +303,24 @@ The rules, sequence, and QA chain for translation work are **not** restated here
   problem will not fully end; that expectation is reasonable and already earned its keep once — it is
   what prompted the grep that found the 5 non-`title` attributes above.
 
-  **Sequencing constraint.** Steps 1 and 2 rewrite the same `lib/lang.ec.*.php` files the in-flight
-  translation sprint work is sitting in (27 lang files were modified/uncommitted as of 2026-07-24).
-  Sequencing against that uncommitted work matters more than the technical design does — settle it
-  before touching a file.
+  **Execution: short-lived branches, one per step (Tom, 2026-07-24).** Steps 1 and 2 are mass
+  mechanical edits across all 27 `lib/lang.ec.*.php` files (~1200 entity replacements; 33 tooltips
+  restructured). Neither is reviewable as a blob on `master`, and a mistake in either is a mistake in
+  27 languages at once — so each gets its own branch, validated with
+  `php dev/scripts/lang_syntax_validate.php` plus a visual spot-check, then merged.
+  Suggested names: `task140-entities`, `task140-tooltip-extract`.
+
+  **The branch must stay short-lived — this is the real constraint, not the branching itself.**
+  `lib/lang.ec.*.php` is also the surface every translation sprint writes to. A Task 140 branch left
+  open across a sprint will conflict on all 27 files simultaneously, and the conflicts will be
+  meaning-level (which translation wins), not mechanical. Therefore:
+  - Never run step 1 or step 2 concurrently with a translation sprint, and never run both at once.
+  - Merge each branch before starting the next thing that touches lang files.
+  - If a sprint is queued, run the sprint first — sprint output is judgment work that is expensive to
+    redo, while these mechanical passes are cheap to re-run against whatever the files then contain.
+
+  (Status note: the sprint work that was uncommitted on 2026-07-24 is now committed — `3f9b3de`,
+  `a89ad55`, `6394929` — so the tree is clean and a branch can be cut whenever the above holds.)
 
 ## AI Efficiency Scripting (Overhead)
 
