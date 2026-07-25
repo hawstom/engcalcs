@@ -522,7 +522,7 @@ $ec_lang['ip_pressure_warn_short']='Nízký';
 $ec_lang['ip_pressure_high']='High pressure locations need pressure reduction';
 $ec_lang['ip_pressure_high_short']='High';
 $ec_lang['ip_max_head']='Max. allow. pipe head';
-$ec_lang['ip_max_head_tip']='The pipe pressure rating (maximum allowable head). Lines whose pressure exceeds it are flagged for pressure reduction. Leave blank to skip the high-pressure check.';
+$ec_lang['ip_max_head_tip']='Lines whose pressure exceeds this value are flagged. Leave blank to skip the high-pressure check.';
 $ec_lang['ip_h_far']='Tlak posledního emitoru';
 $ec_lang['ip_q_supply']='<span class="ec-help" title="Průtok vstupující modelovanou testovací cestu pouze, ne celou zónu/systém &mdash; viz Q_zone v Návrhu aplikace níže pro systémový celkem.">Průtok vstupu testovací cesty, Q<sub>supply</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['ip_q_critical']='Průtok posledního emitoru, q<sub>last</sub>';

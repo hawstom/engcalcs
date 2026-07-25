@@ -524,7 +524,7 @@ $ec_lang['ip_pressure_warn_short']='နိမ့်';
 $ec_lang['ip_pressure_high']='High pressure locations need pressure reduction';
 $ec_lang['ip_pressure_high_short']='High';
 $ec_lang['ip_max_head']='Max. allow. pipe head';
-$ec_lang['ip_max_head_tip']='The pipe pressure rating (maximum allowable head). Lines whose pressure exceeds it are flagged for pressure reduction. Leave blank to skip the high-pressure check.';
+$ec_lang['ip_max_head_tip']='Lines whose pressure exceeds this value are flagged. Leave blank to skip the high-pressure check.';
 $ec_lang['ip_h_far']='နောက်ဆုံးရေထုတ်ကိရိယာ ဖိအား';
 $ec_lang['ip_q_supply']='<span class="ec-help" title="ပုံစံထုတ်ထားသော စမ်းသပ်လမ်းကြောင်းထဲသို့ ဝင်သည့်ရေစီးနှုန်းသာဖြစ်သည် — ဇုန်/စနစ်တစ်ခုလုံးအတွက် အောက်ရှိ အသုံးချဒီဇိုင်းအပိုင်းရှိ Q_zone ကို ကြည့်ပါ။">စမ်းသပ်လမ်းကြောင်း ပေးသွင်းရေစီးနှုန်း, Q<sub>supply</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['ip_q_critical']='နောက်ဆုံးရေထုတ်ကိရိယာ ရေစီးနှုန်း, q<sub>last</sub>';

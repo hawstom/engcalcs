@@ -523,7 +523,7 @@ $ec_lang['ip_pressure_warn_short']='Baixa';
 $ec_lang['ip_pressure_high']='High pressure locations need pressure reduction';
 $ec_lang['ip_pressure_high_short']='High';
 $ec_lang['ip_max_head']='Max. allow. pipe head';
-$ec_lang['ip_max_head_tip']='The pipe pressure rating (maximum allowable head). Lines whose pressure exceeds it are flagged for pressure reduction. Leave blank to skip the high-pressure check.';
+$ec_lang['ip_max_head_tip']='Lines whose pressure exceeds this value are flagged. Leave blank to skip the high-pressure check.';
 $ec_lang['ip_h_far']='Pressão do último emissor';
 $ec_lang['ip_q_supply']='<span class="ec-help" title="Fluxo entrando apenas no caminho de teste modelado, não a zona/sistema inteiro — ver Q_zone no Projeto de Aplicação abaixo para o total do sistema.">Vazão de abastecimento do caminho de teste, Q<sub>supply</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['ip_q_critical']='Vazão do último emissor, q<sub>last</sub>';

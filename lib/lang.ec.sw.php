@@ -523,7 +523,7 @@ $ec_lang['ip_pressure_warn_short']='Chini';
 $ec_lang['ip_pressure_high']='High pressure locations need pressure reduction';
 $ec_lang['ip_pressure_high_short']='High';
 $ec_lang['ip_max_head']='Max. allow. pipe head';
-$ec_lang['ip_max_head_tip']='The pipe pressure rating (maximum allowable head). Lines whose pressure exceeds it are flagged for pressure reduction. Leave blank to skip the high-pressure check.';
+$ec_lang['ip_max_head_tip']='Lines whose pressure exceeds this value are flagged. Leave blank to skip the high-pressure check.';
 $ec_lang['ip_h_far']='Shinikizo la kituo cha mwisho cha maji';
 $ec_lang['ip_q_supply']='<span class="ec-help" title="Mtiririko unaoingia kwenye njia ya jaribio iliyoigwa tu &mdash; kwa eneo/mfumo mzima, angalia Q_zone katika Usanifu wa Matumizi hapa chini.">Mtiririko wa usambazaji wa njia ya jaribio, Q<sub>supply</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['ip_q_critical']='Mtiririko wa kituo cha mwisho cha maji, q<sub>last</sub>';

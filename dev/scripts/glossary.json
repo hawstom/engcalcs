@@ -1,6 +1,6 @@
 {
   "meta": {
-    "version": "1.16",
+    "version": "1.17",
     "description": "Engineering term glossary for EngCalcs translation prompts. Preferred translations per language to prevent term drift across calculators and sprints. Covers all calculators including Rock Chute Design (Robinson), Micro-Hydro Power, and Manning series.",
     "usage": "Inject relevant entries as context in translation prompts: 'Use these preferred translations for technical terms: [terms for this calculator prefix]'. Entries with empty strings need a sprint to fill.",
     "language_codes": [
@@ -2531,6 +2531,31 @@
         "zh": "管线"
       },
       "source": "Branched Pipe Network calculator (bpn_), standard distributary-network hydraulics."
+    },
+    {
+      "term": "pressure rating",
+      "symbol": "",
+      "context": "The maximum internal pressure a pipe is built to withstand, expressed here as a head of water. Used as the upper bound for the high-pressure check. Equivalent everyday terms include maximum allowable pressure, maximum allowable head, rated pressure, pressure class, and (for plastic pipe) the PN or SDR class. Any of these that is the normal term in the target language is correct.",
+      "translation_notes": "Created 2026-07-24 for the bpn_/ip_ excessive-pressure check (ip_max_head, ip_max_head_tip). Tom, 2026-07-24: do not shoehorn languages into a calque of the English wording - provide and allow synonyms, and let each language use whatever pipe-industry or plumbing-code term its engineers actually use (pressure class and PN rating are common in metric-pipe markets). The quantity is a HEAD (a height of water column), not a force or a stress; keep it dimensionally a head wherever the language distinguishes.",
+      "avoid": [
+        "a stress or material strength rather than a water pressure",
+        "blood-pressure or tyre-pressure senses",
+        "a general word for strong or high"
+      ],
+      "translations": {},
+      "source": "Branched Pipe Network calculator (bpn_) / Irrigation Pressure (ip_) high-pressure check."
+    },
+    {
+      "term": "pressure reduction",
+      "symbol": "",
+      "context": "Lowering excessive water pressure in a line, for example with a pressure-reducing valve or a tank that re-establishes atmospheric pressure. The calculator only reports where pressure is excessive; it does not size or place any device.",
+      "translation_notes": "Created 2026-07-24. Plain, directly-translatable engineering language - use the ordinary term for reducing or relieving pressure. Tom, 2026-07-24 deliberately removed all break-pressure-tank terminology from this calculator, so do NOT reintroduce tank-specific vocabulary in any language; the concept is reducing pressure, not any particular device.",
+      "avoid": [
+        "naming a specific device (break pressure tank, BPT, pressure-reducing valve) as if the tool recommends one",
+        "depressurizing in the sense of emptying or draining the pipe"
+      ],
+      "translations": {},
+      "source": "Branched Pipe Network calculator (bpn_) / Irrigation Pressure (ip_) high-pressure check."
     }
   ]
 }

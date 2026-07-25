@@ -521,7 +521,7 @@ $ec_lang['ip_pressure_warn_short']='Baja';
 $ec_lang['ip_pressure_high']='High pressure locations need pressure reduction';
 $ec_lang['ip_pressure_high_short']='High';
 $ec_lang['ip_max_head']='Max. allow. pipe head';
-$ec_lang['ip_max_head_tip']='The pipe pressure rating (maximum allowable head). Lines whose pressure exceeds it are flagged for pressure reduction. Leave blank to skip the high-pressure check.';
+$ec_lang['ip_max_head_tip']='Lines whose pressure exceeds this value are flagged. Leave blank to skip the high-pressure check.';
 $ec_lang['ip_h_far']='Presión del último emisor';
 $ec_lang['ip_q_supply']='<span class="ec-help" title="Caudal que ingresa a la ruta de prueba modelada solo, no a toda la zona/sistema — ver Q_zone en Diseño de Aplicación abajo para el total del sistema.">Caudal de suministro de ruta de prueba, Q<sub>supply</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['ip_q_critical']='Caudal del último emisor, q<sub>last</sub>';

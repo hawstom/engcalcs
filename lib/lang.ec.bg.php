@@ -523,7 +523,7 @@ $ec_lang['ip_pressure_warn_short']='Ниско';
 $ec_lang['ip_pressure_high']='High pressure locations need pressure reduction';
 $ec_lang['ip_pressure_high_short']='High';
 $ec_lang['ip_max_head']='Max. allow. pipe head';
-$ec_lang['ip_max_head_tip']='The pipe pressure rating (maximum allowable head). Lines whose pressure exceeds it are flagged for pressure reduction. Leave blank to skip the high-pressure check.';
+$ec_lang['ip_max_head_tip']='Lines whose pressure exceeds this value are flagged. Leave blank to skip the high-pressure check.';
 $ec_lang['ip_h_far']='Налягане на последния емитер';
 $ec_lang['ip_q_supply']='<span class="ec-help" title="Водното количество, което постъпва само в моделирания пробен път &mdash; за целия обхват на зоната/системата вижте Q_zone в раздела Проектиране на поливането по-долу.">Водно количество на подаване по пробния път, Q<sub>supply</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['ip_q_critical']='Водно количество на последния емитер, q<sub>last</sub>';

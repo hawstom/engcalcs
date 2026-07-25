@@ -521,7 +521,7 @@ $ec_lang['ip_pressure_warn_short']='低';
 $ec_lang['ip_pressure_high']='High pressure locations need pressure reduction';
 $ec_lang['ip_pressure_high_short']='High';
 $ec_lang['ip_max_head']='Max. allow. pipe head';
-$ec_lang['ip_max_head_tip']='The pipe pressure rating (maximum allowable head). Lines whose pressure exceeds it are flagged for pressure reduction. Leave blank to skip the high-pressure check.';
+$ec_lang['ip_max_head_tip']='Lines whose pressure exceeds this value are flagged. Leave blank to skip the high-pressure check.';
 $ec_lang['ip_h_far']='最后滴头压力';
 $ec_lang['ip_q_supply']='<span class="ec-help" title="仅为进入所建模测试路径的流量——整个灌区/系统的流量见下方灌水设计中的 Q_zone。">测试路径供水流量，Q<sub>supply</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['ip_q_critical']='最后滴头流量，q<sub>last</sub>';

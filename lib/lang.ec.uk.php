@@ -393,7 +393,7 @@ $ec_lang['ip_pressure_warn_short']='Низький';
 $ec_lang['ip_pressure_high']='High pressure locations need pressure reduction';
 $ec_lang['ip_pressure_high_short']='High';
 $ec_lang['ip_max_head']='Max. allow. pipe head';
-$ec_lang['ip_max_head_tip']='The pipe pressure rating (maximum allowable head). Lines whose pressure exceeds it are flagged for pressure reduction. Leave blank to skip the high-pressure check.';
+$ec_lang['ip_max_head_tip']='Lines whose pressure exceeds this value are flagged. Leave blank to skip the high-pressure check.';
 $ec_lang['ip_h_far']='Тиск останнього емітера';
 $ec_lang['ip_q_supply']='<span class="ec-help" title="Витрата, що входить у змодельований тестовий шлях тільки, а не в усю зону/систему — дивіться Q_zone в Проектуванні поливу нижче для системного підсумку.">Витрата подачі тестового шляху, Q<sub>supply</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['ip_q_critical']='Витрата останнього емітера, q<sub>last</sub>';

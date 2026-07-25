@@ -524,7 +524,7 @@ $ec_lang['ip_pressure_warn_short']='Düşük';
 $ec_lang['ip_pressure_high']='High pressure locations need pressure reduction';
 $ec_lang['ip_pressure_high_short']='High';
 $ec_lang['ip_max_head']='Max. allow. pipe head';
-$ec_lang['ip_max_head_tip']='The pipe pressure rating (maximum allowable head). Lines whose pressure exceeds it are flagged for pressure reduction. Leave blank to skip the high-pressure check.';
+$ec_lang['ip_max_head_tip']='Lines whose pressure exceeds this value are flagged. Leave blank to skip the high-pressure check.';
 $ec_lang['ip_h_far']='Son damlatıcı basıncı';
 $ec_lang['ip_q_supply']='<span class="ec-help" title="Sadece modellenen test yoluna giren debi, tüm bölge/sistem değil — Uygulama Tasarımı aşağısında Q_zone için bkz.">Test yolu beslenme debisi, Q<sub>supply</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['ip_q_critical']='Son damlatıcı debisi, q<sub>last</sub>';

@@ -522,7 +522,7 @@ $ec_lang['ip_pressure_warn_short']='ទាប';
 $ec_lang['ip_pressure_high']='High pressure locations need pressure reduction';
 $ec_lang['ip_pressure_high_short']='High';
 $ec_lang['ip_max_head']='Max. allow. pipe head';
-$ec_lang['ip_max_head_tip']='The pipe pressure rating (maximum allowable head). Lines whose pressure exceeds it are flagged for pressure reduction. Leave blank to skip the high-pressure check.';
+$ec_lang['ip_max_head_tip']='Lines whose pressure exceeds this value are flagged. Leave blank to skip the high-pressure check.';
 $ec_lang['ip_h_far']='សម្ពាធក្បាលបញ្ចេញទឹកចុងក្រោយ';
 $ec_lang['ip_q_supply']='<span class="ec-help" title="លំហូរដែលចូលតែក្នុងផ្លូវសាកល្បងដែលបានធ្វើគំរូប៉ុណ្ណោះ មិនមែនតំបន់/ប្រព័ន្ធទាំងមូលទេ — សម្រាប់សរុបទាំងប្រព័ន្ធ សូមមើល Q_zone ក្នុងផ្នែករចនាខាងក្រោម។">លំហូរផ្គត់ផ្គង់នៃផ្លូវសាកល្បង, Q<sub>supply</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['ip_q_critical']='លំហូរក្បាលបញ្ចេញទឹកចុងក្រោយ, q<sub>last</sub>';
