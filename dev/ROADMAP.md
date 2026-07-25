@@ -208,6 +208,101 @@ The rules, sequence, and QA chain for translation work are **not** restated here
 - **`CLAUDE.md` § "Translation Sprints"** — sprint mechanics, model policy, pre/post-sprint checklist.
 - **`dev/translation-execution-log.md`** — the full dated, category-by-category execution record.
 
+- 60|140| **[H] Get HTML out of language strings where it cannot work, and enforce it mechanically.**
+  Design agreed with Tom 2026-07-24; **not started, nothing touched yet.** Written up for future
+  review because the session ran low on context — read this whole block before acting.
+
+  **The problem in one sentence.** A language string's HTML is sometimes fine and sometimes silently
+  broken, and *which one depends on the PHP/JS call site that consumes it*, not on anything visible
+  in the string — so the same string is correct in one place and wrong in another, with no error.
+
+  **The two things that break, and why.**
+  1. *Entities* (`&mdash;` `&asymp;` `&sup2;` …). An entity in an HTML attribute is decoded by the
+     browser and renders fine — Tom verified in Chrome, and the spec agrees. It breaks only when the
+     string passes through something that escapes `&` first. This suite has three attribute paths and
+     **two of them break entities**: raw echo (`lib/Menus.lib.php:91`) works;
+     `htmlspecialchars(strip_tags())` (`Branched-Network.php:56`) breaks; `escapeAttr`
+     (`js/Calculators.lib.js:406`) breaks. Both broken paths turn `&asymp;` into a literal
+     `&asymp;` on screen. Proof that entities are an unnecessary habit, not a need:
+     `dw_kinematic_viscosity` contains literal `×`, `⁻⁶`, `²`, `°` **and** an entity `&nu;` in the
+     same string — the literal form was already working right beside it.
+  2. *Tags* in an attribute. `title=`/`placeholder=`/`value=` hold plain text only; `<sub>` in a
+     `title` never renders as a subscript by any delivery route. Confirmed by Tom.
+
+  **Decisions already settled — do not relitigate.**
+  - Unicode subscripts **rejected** as a replacement for `<sub>`. Unicode has no subscript `c f w d g`,
+    **no capitals**, and no multi-letter forms — so `h_f` (most-used symbol in the suite), `C_d`,
+    `P_w`, `h_L`, `q_out`, `q_avg,field` are unwritable. ~66 of 177 subscript occurrences fail.
+    Mixing Unicode and markup also renders at visibly different sizes.
+  - Placeholder/symbol-table refactor **rejected** (it was proposed, then withdrawn as solving a
+    problem we can decline to have).
+  - Document keys (`about_body_html` 2691 chars, `irr_quickref_html`, the 30 keys >300 chars)
+    **keep their HTML** — Tom: they are only ever echoed raw by PHP, never read into JS or an
+    attribute, so their context is safe. Page labels keep `<sub>` too.
+  - `mphl_total_junction_k_tip` degrades acceptably to `km` — Tom confirmed.
+
+  **The three rules.**
+  - **Rule A — no `&...;` in any language string.** All 564 keys × 27 files, no exceptions. Absolute
+    *because* scoping requires judgment, and the previous check failed precisely by scoping itself to
+    "tip keys" (see `detectAttributeEntities()` in `dev/scripts/lang_syntax_validate.php`).
+  - **Rule B — no `<...>` in any plain-text-constrained string.** Constrained = named `_tip`/`_plain`
+    **or** found by a deriver inside any `attr="..."`.
+  - **Rule C (advisory, reports only)** — the name and the derivation must agree; report both
+    "reaches an attribute but isn't named" and "named but only used in page HTML".
+
+  **Naming convention.** Suffix `_plain` (**not** `_attrib` — rejected: it names the *destination*,
+  but 16 `_main_desc` keys have two destinations at once, `<h2>` **and** the menu `title=`;
+  and "attribute" is overloaded with the GIS/data-field sense). `_plain` names *what the string may
+  contain*, which is single-valued: the strictest destination wins. `_tip` stays as an established
+  special case of `_plain` (33 keys, 32 already compliant).
+  **The name is a hint, never the enforcement** — a name is a claim, the code is the fact. Derivation
+  enforces; the name covers what derivation can't see statically (a string assembled in PHP then
+  passed to an attribute).
+
+  **Measured scope (2026-07-24, read-only). Re-run any time with
+  `php dev/scripts/measure_lang_sinks.php` — it reproduces every number below.**
+  - Reference sites by destination: `raw-html` 670, `attr-escaped` 37, `attr-RAW` 16, pageConfig
+    (`json_encode`→JS) 62 keys. **93% of sites are raw-html, where everything works** — which is why
+    the habit never got punished and kept recurring.
+  - 134 English keys carry markup (`sub` 84, `span+sub` 19, `span` 18, `a` 8, `br` 3, `sup` 2).
+  - 55 English keys carry entities; ~1200 entity occurrences across all 27 files.
+  - **33 tooltips have their own `_tip` key — 1 is dirty. 33 more tooltips are buried inside other
+    keys as `title="…"` written into the middle of a label — 11 are dirty.** That 1-vs-11 contrast is
+    the core finding: a tooltip with its own name gets treated as tooltip text and stays clean; a
+    tooltip embedded in page HTML picks up page-HTML habits. Half the suite's tooltips are currently
+    invisible to any checker.
+  - Already-existing non-`title` plain-text attributes holding lang strings (5): `placeholder`
+    (`lib/Calculators.lib.php:67,68`, `lib/Menus.lib.php:131`), `value` (`contact.php:55`),
+    `data-copied-text` (`lib/Menus.lib.php:137`). **This is why the deriver must scan every
+    `attr="…"`, not just `title=`.**
+  - Four different escaping conventions are already in use across call sites (raw,
+    `htmlspecialchars`, `htmlspecialchars(strip_tags())`, `ENT_QUOTES` at `lib/Menus.lib.php:127`).
+
+  **Steps, in order.**
+  1. Convert all `&...;` to literal UTF-8 characters; turn Rule A on hard. English needs ~12 distinct
+     characters (`— × ÷ ≈ ≤ ≥ √ ² ν τ Δ –`); the check should name the replacement in its error text.
+     Independent of every step below.
+  2. Lift the 33 embedded tooltips into their own `_tip` keys, fixing the 11 dirty ones. **Tom agreed
+     the existing translations are extracted mechanically** from inside the label strings across all
+     27 files (they are already translated, just trapped) — not left empty for a future sprint.
+     This is the load-bearing step: it is what makes tooltip content visible to any check at all.
+  3. Build the deriver + Rules B and C into `dev/scripts/lang_syntax_validate.php`, replacing the
+     too-narrowly-scoped `detectAttributeEntities()`.
+  4. Fix `mphl_total_junction_k_tip` (drop the `<sub>`; 6 call sites).
+  5. Leave page labels and documents alone.
+
+  **Honest forecast (told to Tom, keep it honest).** Rule A should close permanently — it is absolute
+  and mechanical with no case to reason about. Rule B will keep a residue: the deriver sees
+  `attr="<?=$ec_lang['x']?>"` but will miss a string assembled in PHP first, or a delivery route not
+  yet imagined. Expect it to catch us again at least once. Tom's stated expectation is that the
+  problem will not fully end; that expectation is reasonable and already earned its keep once — it is
+  what prompted the grep that found the 5 non-`title` attributes above.
+
+  **Sequencing constraint.** Steps 1 and 2 rewrite the same `lib/lang.ec.*.php` files the in-flight
+  translation sprint work is sitting in (27 lang files were modified/uncommitted as of 2026-07-24).
+  Sequencing against that uncommitted work matters more than the technical design does — settle it
+  before touching a file.
+
 ## AI Efficiency Scripting (Overhead)
 
 These tasks reduce the AI token cost of routine maintenance by replacing repeated AI judgment with deterministic scripts. Copilot owns execution (all tagged `[CP]`); Claude Code specs any script whose output feeds back into translation quality work.
