@@ -107,6 +107,12 @@ EngCalcs.bpnReadRows = function (objForm) {
 		roughnessu = objForm['roughnessu'].value,
 		demandu = objForm['demandu'].value,
 		elevu = objForm['elevu'].value,
+		// Global demand multiplier -- scales every line demand at once for a peak-hour or
+		// future-growth run. Blank or unusable => 1 (use demands as entered). An explicit 0
+		// is honored: it is the legitimate no-draw / static case.
+		demandMultRaw = objForm['demand_mult'].value,
+		demandMult = (demandMultRaw === '' || !isFinite(+demandMultRaw) || +demandMultRaw < 0)
+			? 1 : +demandMultRaw,
 		lines = [],
 		idToIndex = {},
 		i,
@@ -146,7 +152,7 @@ EngCalcs.bpnReadRows = function (objForm) {
 			rough: +cellVal(row, 'bpn_roughness'),                 // raw: Manning n or HW C
 			roughSi: +cellVal(row, 'bpn_roughness') / roughnessu,   // as a length: DW e (m)
 			kMinor: +cellVal(row, 'bpn_k') || 0,
-			demand: (+cellVal(row, 'bpn_demand') || 0) / demandu,
+			demand: (+cellVal(row, 'bpn_demand') || 0) / demandu * demandMult,
 			elevDown: (elevRaw === '') ? null : (+elevRaw / elevu)
 		});
 	}
