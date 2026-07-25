@@ -995,10 +995,14 @@ $ec_lang['ip_hm']='h<sub>m</sub>';
 $ec_lang_intent['ip_hm']='Minor (local) head loss. | symbol';
 $ec_lang['ip_hl']='<span class="ec-help" title="Total reach loss, h_f + h_m">h<sub>L</sub> <span class="ec-tip">?</span></span>';
 $ec_lang_intent['ip_hl']='Total reach head loss. | symbol';
-$ec_lang['ip_pressure_warn']='Low/negative pressure &mdash; check for subatmospheric conditions';
+$ec_lang['ip_pressure_warn']='Low/negative pressure — check for subatmospheric conditions';
 $ec_lang_intent['ip_pressure_warn']='';
 $ec_lang['ip_pressure_warn_short']='Low';
 $ec_lang_intent['ip_pressure_warn_short']='';
+$ec_lang['ip_pressure_high']='High pressure locations need pressure reduction';
+$ec_lang['ip_pressure_high_short']='High';
+$ec_lang['ip_max_head']='Max. allow. pipe head';
+$ec_lang['ip_max_head_tip']='The pipe pressure rating (maximum allowable head). Lines whose pressure exceeds it are flagged for pressure reduction. Leave blank to skip the high-pressure check.';
 $ec_lang['ip_h_far']='Last emitter pressure';
 $ec_lang_intent['ip_h_far']='';
 $ec_lang['ip_q_supply']='<span class="ec-help" title="Flow entering the modeled test path only — for the whole zone/system, see Q_zone in Application Design below.">Test path supply flow, Q<sub>supply</sub> <span class="ec-tip">?</span></span>';
@@ -1042,7 +1046,7 @@ $ec_lang_intent['irr_card_pressure_desc']='';
 
 
 
-// --- Branched Pipe Network (bn_) --- English source / fallback (translation pending) ---
+// --- Branched Pipe Network (bpn_) --- English source ---
 $ec_lang['bpn_main_menu']='Branched Pipe Network';
 $ec_lang['bpn_main_title']='Free Online Branched Pipe Network Pressure Calculator (No Loops)';
 $ec_lang['bpn_main_desc']='Branched (Tree) Pipe Network Flow and Pressure';
@@ -1065,9 +1069,11 @@ $ec_lang['bpn_roughness_tip']='Pipe roughness for the selected friction method: 
 $ec_lang['bpn_demand']='Demand';
 $ec_lang['bpn_demand_tip']='Fixed flow delivered at this line\'s downstream end. Leave blank for a line that only carries flow onward.';
 $ec_lang['bpn_elev_down']='DS elev.';
+$ec_lang_intent['bpn_elev_down']='Downstream (DS) elevation — the ground/invert elevation at this pipe line\'s downstream end | layout: column heading';
 $ec_lang['bpn_q_line']='Line flow';
 $ec_lang['bpn_q_line_tip']='Total flow carried by this line: its own demand plus every downstream demand it feeds.';
 $ec_lang['bpn_p_down']='DS press.';
+$ec_lang_intent['bpn_p_down']='Downstream (DS) pressure — the gauge pressure head at this pipe line\'s downstream node | layout: column heading';
 $ec_lang['bpn_p_down_tip']='Gauge pressure head at this line\'s downstream node. A negative value (flagged) means subatmospheric pressure; check the design.';
 $ec_lang['bpn_sketch_title']='Network Diagram';
 $ec_lang['bpn_show_length']='Length';

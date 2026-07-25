@@ -261,12 +261,6 @@ EngCalcs.pageCalculator = function (objForm) {
 	warnEl.innerHTML = this.lastRowElevMissing ? EngCalcs.writeCheckHTML(false, EngCalcs.pageConfig.ip_elev_ds_missing_warn) : '';
 };
 
-EngCalcs.ipPressureWarnHtml = function (h) {
-	'use strict';
-	if (h >= 0) { return ''; }
-	return ' ' + EngCalcs.writeCheckHTML(false, EngCalcs.pageConfig.ip_pressure_warn_short, EngCalcs.pageConfig.ip_pressure_warn);
-};
-
 EngCalcs.ipWriteRows = function (objForm) {
 	'use strict';
 	var q_usu = objForm['q_usu'].value,
@@ -278,15 +272,30 @@ EngCalcs.ipWriteRows = function (objForm) {
 		hfu = objForm['hfu'].value,
 		hmu = objForm['hmu'].value,
 		hlu = objForm['hlu'].value,
+		cfg = EngCalcs.pageConfig,
+		// Max. allowable pipe head (pressure rating) for the high-pressure flag. Blank => null,
+		// which disables only the high side of the inline pressure check.
+		hMaxRaw = objForm['h_max_allow'].value,
+		hMaxAllow = (hMaxRaw === '') ? null : +hMaxRaw / objForm['h_max_allowu'].value,
+		// Inline pressure band: low = 0 (subatmospheric flag, unchanged); high = pipe rating.
+		pressureLabels = {
+			lowShort: cfg.ip_pressure_warn_short, lowTip: cfg.ip_pressure_warn,
+			highShort: cfg.ip_pressure_high_short, highTip: cfg.ip_pressure_high
+		},
+		// Velocity band: suite-standard fixed SI limits (<1 m/s low, >3 m/s high).
+		velocityLabels = {
+			lowShort: cfg.mhp_vel_low_short, lowTip: cfg.mhp_vel_low,
+			highShort: cfg.mhp_vel_high_short, highTip: cfg.mhp_vel_high
+		},
 		i,
 		r;
 	for (i = 0; i < this.rowResults.length; i += 1) {
 		r = this.rowResults[i];
 		document.getElementsByName('q_us')[i].innerHTML = (r.qUs * q_usu).toFixed(4);
-		document.getElementsByName('h_us')[i].innerHTML = (r.hUs * h_usu).toFixed(4) + this.ipPressureWarnHtml(r.hUs);
+		document.getElementsByName('h_us')[i].innerHTML = (r.hUs * h_usu).toFixed(4) + EngCalcs.inlineRangeWarnHtml(r.hUs, 0, hMaxAllow, pressureLabels);
 		document.getElementsByName('q_ds')[i].innerHTML = (r.qDs * q_dsu).toFixed(4);
-		document.getElementsByName('h_ds')[i].innerHTML = (r.hDs * h_dsu).toFixed(4) + this.ipPressureWarnHtml(r.hDs);
-		document.getElementsByName('v')[i].innerHTML = (r.v * vu).toFixed(4);
+		document.getElementsByName('h_ds')[i].innerHTML = (r.hDs * h_dsu).toFixed(4) + EngCalcs.inlineRangeWarnHtml(r.hDs, 0, hMaxAllow, pressureLabels);
+		document.getElementsByName('v')[i].innerHTML = (r.v * vu).toFixed(4) + EngCalcs.inlineRangeWarnHtml(r.v, 0.6, 3.0, velocityLabels);
 		document.getElementsByName('hv')[i].innerHTML = (r.hv * hvu).toFixed(4);
 		document.getElementsByName('hf')[i].innerHTML = (r.hf * hfu).toFixed(4);
 		document.getElementsByName('hm')[i].innerHTML = (r.hm * hmu).toFixed(4);

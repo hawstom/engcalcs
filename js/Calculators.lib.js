@@ -428,6 +428,26 @@ EngCalcs.writeCheckHTML = function (ok, shortText, tipText) {
 };
 
 /**
+	* inlineRangeWarnHtml() returns an inline verdict marker to append after a
+	* result cell whose value is out of its acceptable band: ' ' + '⚠ High' above
+	* highSI, ' ' + '⚠ Low' below lowSI, '' when in band (blank, not ✓, so busy
+	* result tables stay uncluttered). lowSI or highSI may be null to disable that
+	* side (e.g. no pipe rating entered => no high-pressure check). labels carries
+	* { highShort, highTip, lowShort, lowTip }. All numbers in SI. Built on
+	* writeCheckHTML so the ✓/⚠ glyph + ec-tip verdict convention comes for free.
+	*/
+EngCalcs.inlineRangeWarnHtml = function (valueSI, lowSI, highSI, labels) {
+	'use strict';
+	if (highSI != null && valueSI > highSI) {
+		return ' ' + EngCalcs.writeCheckHTML(false, labels.highShort, labels.highTip);
+	}
+	if (lowSI != null && valueSI < lowSI) {
+		return ' ' + EngCalcs.writeCheckHTML(false, labels.lowShort, labels.lowTip);
+	}
+	return '';
+};
+
+/**
 	* writeVelocityCheck() renders a short OK / High / Low velocity status
 	* into elId, with the full explanation available as a hover tip on the
 	* whole string. status is 'ok', 'high', 'low', or '' (blank/no result).

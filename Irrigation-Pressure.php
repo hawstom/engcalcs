@@ -26,6 +26,7 @@ echoCalculatorForm(
 		Array('name' => 'n_e',             'type' => 'number', 'default' => '10',   'units' => NULL,                                                    'label' => $ec_lang['ip_n_e']),
 		Array('name' => 'n_l',             'type' => 'number', 'default' => '10',   'units' => NULL,                                                    'label' => $ec_lang['ip_n_l']),
 		Array('name' => 'd',               'type' => 'number', 'default' => '25',   'units' => Array('mm', 'm', 'in', 'ft'),                            'label' => $ec_lang['ip_d']),
+		Array('name' => 'h_max_allow',     'type' => 'number', 'default' => '',     'units' => Array('mh2o', 'mmh2o', 'kpa', 'bar', 'kgfcm2', 'fth2o', 'inh2o', 'psi'), 'label' => '<span class="ec-help" title="'.htmlspecialchars(strip_tags($ec_lang['ip_max_head_tip'])).'">'.$ec_lang['ip_max_head'].' <span class="ec-tip">?</span></span>'),
 	),
 	// Results
 	Array(
@@ -156,6 +157,12 @@ EngCalcs.pageConfig = {
 	ip_elev_ds_missing_warn: <?=json_encode($ec_lang['ip_elev_ds_missing_warn'])?>,
 	ip_pressure_warn: <?=json_encode($ec_lang['ip_pressure_warn'])?>,
 	ip_pressure_warn_short: <?=json_encode($ec_lang['ip_pressure_warn_short'])?>,
+	ip_pressure_high: <?=json_encode($ec_lang['ip_pressure_high'])?>,
+	ip_pressure_high_short: <?=json_encode($ec_lang['ip_pressure_high_short'])?>,
+	mhp_vel_high: <?=json_encode($ec_lang['mhp_vel_high'])?>,
+	mhp_vel_high_short: <?=json_encode($ec_lang['mhp_vel_high_short'])?>,
+	mhp_vel_low: <?=json_encode($ec_lang['mhp_vel_low'])?>,
+	mhp_vel_low_short: <?=json_encode($ec_lang['mhp_vel_low_short'])?>,
 	ip_worst_case_warn: <?=json_encode($ec_lang['ip_worst_case_warn'])?>
 };
 </script>

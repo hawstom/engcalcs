@@ -343,6 +343,10 @@ EngCalcs.pageCalculator = function (objForm) {
 	this.var = {};
 	this.readFormInput(objForm, 'elev_source', hasUnits = true);
 	this.readFormInput(objForm, 'visc', hasUnits = false);
+	// Max. allowable pipe head (pressure rating) for the high-pressure flag. Blank => null,
+	// which disables only the high side of the inline pressure check (low/subatmospheric stays on).
+	var hMaxRaw = objForm['h_max_allow'].value;
+	this.var.hMaxAllow = (hMaxRaw === '') ? null : +hMaxRaw / objForm['h_max_allowu'].value;
 	// The method selector must never be blank. If anything (a layout-drift cookie bail,
 	// an old stored value) left it empty, fall back to the first method and fix the
 	// visible dropdown so it can't show an empty selection.
@@ -395,19 +399,24 @@ EngCalcs.bpnUpdateMethodUI = function () {
 	if (rSym) { rSym.innerHTML = (method === 'manning') ? 'n' : (method === 'hw') ? 'C' : 'e'; }
 };
 
-// Verdict marker appended to a pressure cell that has gone subatmospheric/negative.
-EngCalcs.bpnPressureWarnHtml = function (h) {
-	'use strict';
-	if (h >= 0) { return ''; }
-	return ' ' + EngCalcs.writeCheckHTML(false, EngCalcs.pageConfig.bpn_pressure_warn_short, EngCalcs.pageConfig.bpn_pressure_warn);
-};
-
 EngCalcs.bpnWriteRows = function (objForm) {
 	'use strict';
 	var q_lineu = objForm['q_lineu'].value,
 		vu = objForm['vu'].value,
 		hlu = objForm['hlu'].value,
 		p_downu = objForm['p_downu'].value,
+		cfg = EngCalcs.pageConfig,
+		// Inline pressure band: low = 0 (subatmospheric flag, unchanged); high = the entered
+		// pipe rating (null when blank => high check off).
+		pressureLabels = {
+			lowShort: cfg.bpn_pressure_warn_short, lowTip: cfg.bpn_pressure_warn,
+			highShort: cfg.ip_pressure_high_short, highTip: cfg.ip_pressure_high
+		},
+		// Velocity band: suite-standard fixed SI limits (<1 m/s low, >3 m/s high).
+		velocityLabels = {
+			lowShort: cfg.mhp_vel_low_short, lowTip: cfg.mhp_vel_low,
+			highShort: cfg.mhp_vel_high_short, highTip: cfg.mhp_vel_high
+		},
 		i,
 		line,
 		dash = '&mdash;';
@@ -415,9 +424,9 @@ EngCalcs.bpnWriteRows = function (objForm) {
 		line = this.lines[i];
 		if (line.reachable) {
 			document.getElementsByName('q_line')[i].innerHTML = (line.q * q_lineu).toFixed(4);
-			document.getElementsByName('v')[i].innerHTML = (line.v * vu).toFixed(4);
+			document.getElementsByName('v')[i].innerHTML = (line.v * vu).toFixed(4) + EngCalcs.inlineRangeWarnHtml(line.v, 0.6, 3.0, velocityLabels);
 			document.getElementsByName('hl')[i].innerHTML = (line.hl * hlu).toFixed(4);
-			document.getElementsByName('p_down')[i].innerHTML = (line.pDown * p_downu).toFixed(4) + this.bpnPressureWarnHtml(line.pDown);
+			document.getElementsByName('p_down')[i].innerHTML = (line.pDown * p_downu).toFixed(4) + EngCalcs.inlineRangeWarnHtml(line.pDown, 0, this.var.hMaxAllow, pressureLabels);
 		} else {
 			document.getElementsByName('q_line')[i].innerHTML = dash;
 			document.getElementsByName('v')[i].innerHTML = dash;

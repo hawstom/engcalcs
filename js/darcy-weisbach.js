@@ -60,7 +60,7 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.writeFormResult(objForm, 'rh', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'u', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'hv', precision = 4, hasUnits = true);
-	this.writeVelocityCheck('vel_check', (this.var.u >= 1.0 && this.var.u <= 3.0) ? 'ok' : (this.var.u > 3.0 ? 'high' : 'low'), {
+	this.writeVelocityCheck('vel_check', (this.var.u >= 0.6 && this.var.u <= 3.0) ? 'ok' : (this.var.u > 3.0 ? 'high' : 'low'), {
 		ok: EngCalcs.pageConfig.mhp_vel_ok_short,
 		high: EngCalcs.pageConfig.mhp_vel_high_short,
 		low: EngCalcs.pageConfig.mhp_vel_low_short,

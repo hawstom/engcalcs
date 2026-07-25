@@ -1,9 +1,10 @@
 {
     "meta": {
         "language": "hi",
-        "expected_key_count": 509,
-        "delta_key_count": 11,
+        "expected_key_count": 560,
+        "delta_key_count": 15,
         "active_prefixes": [
+            "bpn",
             "dw",
             "install",
             "ip",
@@ -17,6 +18,7 @@
         "intent_notes": "Use key_intent when present; these entries provide terse disambiguation comments only where translation risk exists."
     },
     "prompt_context_by_prefix": {
+        "bpn": "Use these preferred technical term translations when relevant:\n- flow (Q): प्रवाह\n- velocity (v): वेग\n- slope (S): ढाल\n    DO NOT render as: activity\/fitness sense of 'grade' — the treadmill or trail incline for running\/walking\/jogging; this is the hydraulic energy gradient, not an exercise setting; geographic or topographic landform term; school grade \/ academic mark",
         "dw": "Use these preferred technical term translations when relevant:\n- flow (Q): प्रवाह\n- velocity (v): वेग\n- head loss (h_L): हेड हानि\n    DO NOT render as: pressure loss \/ pressure drop (use the head-loss term, not the pressure term); a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry\n- friction factor (f): घर्षण कारक\n- slope (S): ढाल\n    DO NOT render as: activity\/fitness sense of 'grade' — the treadmill or trail incline for running\/walking\/jogging; this is the hydraulic energy gradient, not an exercise setting; geographic or topographic landform term; school grade \/ academic mark\n- laminar: स्तरीय\n- transitional: संक्रमणीय\n- turbulent: अशांत",
         "install": "Use these preferred technical term translations when relevant:\n- flow (Q): प्रवाह\n- velocity (v): वेग\n- slope (S): ढाल\n    DO NOT render as: activity\/fitness sense of 'grade' — the treadmill or trail incline for running\/walking\/jogging; this is the hydraulic energy gradient, not an exercise setting; geographic or topographic landform term; school grade \/ academic mark",
         "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): प्रवाह\n- velocity (v): वेग\n- head loss (h_L): हेड हानि\n    DO NOT render as: pressure loss \/ pressure drop (use the head-loss term, not the pressure term); a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry\n- emitter: उत्सर्जक\n- distribution uniformity (DU): वितरण एकरूपता\n- low-quarter distribution uniformity (DU_lq): निम्न-चतुर्थांश वितरण एकरूपता\n- application rate (PR): अनुप्रयोग दर\n- lateral: पार्श्व नली\n- mainline: मुख्य नली\n- reach: खंड\n- velocity head (H_v): वेग शीर्ष\n    DO NOT render as: a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry; pressure\n- friction loss (h_f): घर्षण हानि\n- minor loss (h_m): स्थानीय हानि\n- energy grade line (EGL): ऊर्जा रेखा\n- upstream: ऊर्ध्वप्रवाह\n- downstream: अनुप्रवाह",
@@ -24,6 +26,29 @@
         "rc": "Use these preferred technical term translations when relevant:\n- flow (Q): प्रवाह\n- velocity (v): वेग\n- riprap: पत्थर आवरण\n    DO NOT render as: phonetic transliteration of the English word — translate the concept (rock lining \/ stone protection), never borrow 'riprap' as a loanword\n- slope (S): ढाल\n    DO NOT render as: activity\/fitness sense of 'grade' — the treadmill or trail incline for running\/walking\/jogging; this is the hydraulic energy gradient, not an exercise setting; geographic or topographic landform term; school grade \/ academic mark\n- rock chute: शैल-युक्त तीव्र नालिका\n- chute: तीव्र नालिका\n    DO NOT render as: phonetic transliteration of the English word — translate the concept (steep channel \/ spillway); the 'fall'\/elevation-difference sense (fr chute, es caída, ru падение) — that word is NOT available for this structure\n- unit discharge (q, q_t): इकाई प्रवाह\n- median rock size (D50): माध्यिका पत्थर आकार\n- gradation (SD): ग्रेडेशन\n- porosity (n_p): सरंध्रता\n- specific gravity (sg): आपेक्षिक घनत्व\n    DO NOT render as: attaching units to the value — it is a dimensionless ratio (≈2.65 for rock); a weight-flavored term is fine but the QUANTITY never carries units; a non-standard or transliterated coinage — use each language's own dominant, culturally-standard term for this concept, whatever its literal parts; we do not judge terminology, culture does\n- ponding: जलभराव\n- outlet apron: निर्गम एप्रन\n- weir head (H_p): वियर शीर्ष\n    DO NOT render as: pressure; a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry\n- upstream: ऊर्ध्वप्रवाह\n- downstream: अनुप्रवाह\n- reach: खंड"
     },
     "glossary_terms_by_prefix": {
+        "bpn": [
+            {
+                "term": "flow",
+                "symbol": "Q",
+                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg RESOLVED (Tom, 2026-07-13): native engineer's 2026-07-06 clarification confirmed both 'дебит' (colloquial\/general register) and 'водно количество' (academic\/hydraulic-engineering register, used at university for Q) are acceptable. Tom decided suite-wide standardization on 'водно количество' — \"I would put водно количество everywhere\" — applied across all bg calculator categories (pipes\/irrigation included, not just the hydraulic-structure\/open-channel strings the engineer originally corrected). 'дебит' fully replaced in lib\/lang.ec.bg.php 2026-07-13. Task 109 stages 3-5 (2026-07-19): bg standardized on водно количество (дебит drift removed from or_\/mpf_\/cs_ per Bulgarian-engineer-feedback.md); sr standardized on проток (stage 4); it confirmed on portata (flusso drift removed).",
+                "preferred_translation": "प्रवाह"
+            },
+            {
+                "term": "velocity",
+                "symbol": "v",
+                "context": "Flow velocity (speed of water). Appears in all calculators.",
+                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
+                "preferred_translation": "वेग"
+            },
+            {
+                "term": "slope",
+                "symbol": "S",
+                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators. English aliases 'slope' and 'grade' (u_grade\/u_gradePercent) both point here.",
+                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term. [2026-07-21] Centralized the grade activity-sense guard here (was living only as u_grade\/u_gradePercent label commentary): the 'avoid' array now carries the running\/walking\/jogging exercise-incline trap, so the slope entry is the single home for the grade→energy-gradient concept and its wrong senses.",
+                "preferred_translation": "ढाल"
+            }
+        ],
         "dw": [
             {
                 "term": "flow",
@@ -252,7 +277,7 @@
                 "term": "Manning roughness",
                 "symbol": "n",
                 "context": "Manning's n — empirical roughness coefficient used in the Manning formula for open-channel and pipe flow.",
-                "translation_notes": "Always include 'Manning' as a proper noun. The coefficient itself (n) needs no translation — only the label does. Do not translate as generic 'roughness coefficient' without 'Manning'. TYPO FIX 2026-07-09 (category-3 wave-1 sprint): ru\/uk transliterations were single-н 'Манинга'\/'Манінга', flagged by the ru wave-1 agent as inconsistent with the established double-н transliteration ('Маннинга'\/'Маннінга') used 11+ times elsewhere in both lang files (predates this sprint). Corrected to double-н for consistency. Task 109 stage 4 (2026-07-19): am 3-way 'roughness' spelling drift standardized to file-dominant ሻካሪነት (was ሻካርነት); it confirmed on scabrezza and sw on usuguo (both already glossary-correct).",
+                "translation_notes": "Always include 'Manning' as a proper noun. The coefficient itself (n) needs no translation — only the label does. Do not translate as generic 'roughness coefficient' without 'Manning'. TYPO FIX 2026-07-09 (category-3 wave-1 sprint): ru\/uk transliterations were single-н 'Манинга'\/'Манінга', flagged by the ru wave-1 agent as inconsistent with the established double-н transliteration ('Маннинга'\/'Маннінга') used 11+ times elsewhere in both lang files (predates this sprint). Corrected to double-н for consistency. Task 109 stage 4 (2026-07-19): am 3-way 'roughness' spelling drift standardized to file-dominant ሻካሪነት (was ሻካርነት); it confirmed on scabrezza and sw on usuguo (both already glossary-correct). [2026-07-24] he corrected: was transliterated 'מנינג'; shipped lang.ec.he.php uses Latin 'Manning' throughout (mi_\/mpf_\/mphl_ menus), so glossary now matches file practice.",
                 "preferred_translation": "मैनिंग खुरदरापन गुणांक"
             },
             {
@@ -396,7 +421,11 @@
         "ip_diameter": "D",
         "ip_roughness": "e",
         "ip_hf": "h<sub>f<\/sub>",
-        "ip_hm": "h<sub>m<\/sub>"
+        "ip_hm": "h<sub>m<\/sub>",
+        "bpn_method_hw": "Hazen-Williams",
+        "bpn_method_dw": "Darcy-Weisbach",
+        "bpn_method_manning": "Manning",
+        "bpn_id": "ID"
     },
     "keys": {
         "dw_roughness": "e",
@@ -409,7 +438,11 @@
         "ip_diameter": "D",
         "ip_roughness": "e",
         "ip_hf": "h<sub>f<\/sub>",
-        "ip_hm": "h<sub>m<\/sub>"
+        "ip_hm": "h<sub>m<\/sub>",
+        "bpn_method_hw": "Hazen-Williams",
+        "bpn_method_dw": "Darcy-Weisbach",
+        "bpn_method_manning": "Manning",
+        "bpn_id": "ID"
     },
     "key_context": {
         "dw_roughness": {
@@ -585,6 +618,70 @@
                     "key": "ip_hl",
                     "value": "<span class=\"ec-help\" title=\"खंड की कुल हानि, h_f + h_m\">h<sub>L<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
                     "english": "<span class=\"ec-help\" title=\"Total reach loss, h_f + h_m\">h<sub>L<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
+                }
+            }
+        },
+        "bpn_method_hw": {
+            "reason": "equal_to_english",
+            "current_value": "Hazen-Williams",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_method",
+                    "value": "घर्षण विधि",
+                    "english": "Friction method"
+                },
+                "next_translated": {
+                    "key": "bpn_line_table_title",
+                    "value": "पाइप लाइनें",
+                    "english": "Pipe lines"
+                }
+            }
+        },
+        "bpn_method_dw": {
+            "reason": "equal_to_english",
+            "current_value": "Darcy-Weisbach",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_method",
+                    "value": "घर्षण विधि",
+                    "english": "Friction method"
+                },
+                "next_translated": {
+                    "key": "bpn_line_table_title",
+                    "value": "पाइप लाइनें",
+                    "english": "Pipe lines"
+                }
+            }
+        },
+        "bpn_method_manning": {
+            "reason": "equal_to_english",
+            "current_value": "Manning",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_method",
+                    "value": "घर्षण विधि",
+                    "english": "Friction method"
+                },
+                "next_translated": {
+                    "key": "bpn_line_table_title",
+                    "value": "पाइप लाइनें",
+                    "english": "Pipe lines"
+                }
+            }
+        },
+        "bpn_id": {
+            "reason": "equal_to_english",
+            "current_value": "ID",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_line_table_title",
+                    "value": "पाइप लाइनें",
+                    "english": "Pipe lines"
+                },
+                "next_translated": {
+                    "key": "bpn_id_tip",
+                    "value": "इस पाइप लाइन का नाम। अन्य लाइनें इसे ऊर्ध्वप्रवाह कॉलम में संदर्भित करती हैं।",
+                    "english": "Name of this pipe line. Other lines refer to it in the Upstream column."
                 }
             }
         }

@@ -1,9 +1,10 @@
 {
     "meta": {
         "language": "ar",
-        "expected_key_count": 509,
-        "delta_key_count": 8,
+        "expected_key_count": 560,
+        "delta_key_count": 11,
         "active_prefixes": [
+            "bpn",
             "dw",
             "ip",
             "rc"
@@ -15,11 +16,35 @@
         "intent_notes": "Use key_intent when present; these entries provide terse disambiguation comments only where translation risk exists."
     },
     "prompt_context_by_prefix": {
+        "bpn": "Use these preferred technical term translations when relevant:\n- flow (Q): تدفق\n- velocity (v): سرعة\n- slope (S): انحدار\n    DO NOT render as: activity\/fitness sense of 'grade' — the treadmill or trail incline for running\/walking\/jogging; this is the hydraulic energy gradient, not an exercise setting; geographic or topographic landform term; school grade \/ academic mark",
         "dw": "Use these preferred technical term translations when relevant:\n- flow (Q): تدفق\n- velocity (v): سرعة\n- head loss (h_L): فقدان الضغط\n    DO NOT render as: pressure loss \/ pressure drop (use the head-loss term, not the pressure term); a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry\n- friction factor (f): معامل الاحتكاك\n- slope (S): انحدار\n    DO NOT render as: activity\/fitness sense of 'grade' — the treadmill or trail incline for running\/walking\/jogging; this is the hydraulic energy gradient, not an exercise setting; geographic or topographic landform term; school grade \/ academic mark\n- laminar: انسيابي\n- transitional: انتقالي\n- turbulent: مضطرب",
         "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): تدفق\n- velocity (v): سرعة\n- head loss (h_L): فقدان الضغط\n    DO NOT render as: pressure loss \/ pressure drop (use the head-loss term, not the pressure term); a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry\n- emitter: قطارة\n- distribution uniformity (DU): انتظام التوزيع\n- low-quarter distribution uniformity (DU_lq): انتظام التوزيع للربع الأدنى\n- application rate (PR): معدل التطبيق\n- lateral: الخط الجانبي\n- mainline: الخط الرئيسي\n- reach: قطاع\n- velocity head (H_v): علو السرعة\n    DO NOT render as: a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry; pressure\n- friction loss (h_f): فاقد الاحتكاك\n- minor loss (h_m): الفواقد الموضعية\n- energy grade line (EGL): خط الطاقة\n- upstream: أعلى المجرى\n- downstream: أسفل المجرى",
         "rc": "Use these preferred technical term translations when relevant:\n- flow (Q): تدفق\n- velocity (v): سرعة\n- riprap: حجارة الحماية\n    DO NOT render as: phonetic transliteration of the English word — translate the concept (rock lining \/ stone protection), never borrow 'riprap' as a loanword\n- slope (S): انحدار\n    DO NOT render as: activity\/fitness sense of 'grade' — the treadmill or trail incline for running\/walking\/jogging; this is the hydraulic energy gradient, not an exercise setting; geographic or topographic landform term; school grade \/ academic mark\n- rock chute: مزلق صخري\n- chute: مسرب سريع\n    DO NOT render as: phonetic transliteration of the English word — translate the concept (steep channel \/ spillway); the 'fall'\/elevation-difference sense (fr chute, es caída, ru падение) — that word is NOT available for this structure\n- unit discharge (q, q_t): التصريف الوحدوي\n- median rock size (D50): الحجم الوسطي للحجارة\n- gradation (SD): التدرج الحبيبي\n- porosity (n_p): المسامية\n- specific gravity (sg): الكثافة النسبية\n    DO NOT render as: attaching units to the value — it is a dimensionless ratio (≈2.65 for rock); a weight-flavored term is fine but the QUANTITY never carries units; a non-standard or transliterated coinage — use each language's own dominant, culturally-standard term for this concept, whatever its literal parts; we do not judge terminology, culture does\n- ponding: التحوض\n- outlet apron: مصطبة المخرج\n- weir head (H_p): علو المياه فوق الهدار\n    DO NOT render as: pressure; a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry\n- upstream: أعلى المجرى\n- downstream: أسفل المجرى\n- reach: قطاع"
     },
     "glossary_terms_by_prefix": {
+        "bpn": [
+            {
+                "term": "flow",
+                "symbol": "Q",
+                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg RESOLVED (Tom, 2026-07-13): native engineer's 2026-07-06 clarification confirmed both 'дебит' (colloquial\/general register) and 'водно количество' (academic\/hydraulic-engineering register, used at university for Q) are acceptable. Tom decided suite-wide standardization on 'водно количество' — \"I would put водно количество everywhere\" — applied across all bg calculator categories (pipes\/irrigation included, not just the hydraulic-structure\/open-channel strings the engineer originally corrected). 'дебит' fully replaced in lib\/lang.ec.bg.php 2026-07-13. Task 109 stages 3-5 (2026-07-19): bg standardized on водно количество (дебит drift removed from or_\/mpf_\/cs_ per Bulgarian-engineer-feedback.md); sr standardized on проток (stage 4); it confirmed on portata (flusso drift removed).",
+                "preferred_translation": "تدفق"
+            },
+            {
+                "term": "velocity",
+                "symbol": "v",
+                "context": "Flow velocity (speed of water). Appears in all calculators.",
+                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
+                "preferred_translation": "سرعة"
+            },
+            {
+                "term": "slope",
+                "symbol": "S",
+                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators. English aliases 'slope' and 'grade' (u_grade\/u_gradePercent) both point here.",
+                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term. [2026-07-21] Centralized the grade activity-sense guard here (was living only as u_grade\/u_gradePercent label commentary): the 'avoid' array now carries the running\/walking\/jogging exercise-incline trap, so the slope entry is the single home for the grade→energy-gradient concept and its wrong senses.",
+                "preferred_translation": "انحدار"
+            }
+        ],
         "dw": [
             {
                 "term": "flow",
@@ -322,7 +347,10 @@
         "ip_diameter": "D",
         "ip_roughness": "e",
         "ip_hf": "h<sub>f<\/sub>",
-        "ip_hm": "h<sub>m<\/sub>"
+        "ip_hm": "h<sub>m<\/sub>",
+        "bpn_method_hw": "Hazen-Williams",
+        "bpn_method_dw": "Darcy-Weisbach",
+        "bpn_method_manning": "Manning"
     },
     "keys": {
         "dw_roughness": "e",
@@ -332,7 +360,10 @@
         "ip_diameter": "D",
         "ip_roughness": "e",
         "ip_hf": "h<sub>f<\/sub>",
-        "ip_hm": "h<sub>m<\/sub>"
+        "ip_hm": "h<sub>m<\/sub>",
+        "bpn_method_hw": "Hazen-Williams",
+        "bpn_method_dw": "Darcy-Weisbach",
+        "bpn_method_manning": "Manning"
     },
     "key_context": {
         "dw_roughness": {
@@ -460,6 +491,54 @@
                     "key": "ip_hl",
                     "value": "<span class=\"ec-help\" title=\"إجمالي فاقد القطاع، h_f + h_m\">h<sub>L<\/sub> <span class=\"ec-tip\">؟<\/span><\/span>",
                     "english": "<span class=\"ec-help\" title=\"Total reach loss, h_f + h_m\">h<sub>L<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
+                }
+            }
+        },
+        "bpn_method_hw": {
+            "reason": "equal_to_english",
+            "current_value": "Hazen-Williams",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_method",
+                    "value": "طريقة الاحتكاك",
+                    "english": "Friction method"
+                },
+                "next_translated": {
+                    "key": "bpn_line_table_title",
+                    "value": "خطوط الأنابيب",
+                    "english": "Pipe lines"
+                }
+            }
+        },
+        "bpn_method_dw": {
+            "reason": "equal_to_english",
+            "current_value": "Darcy-Weisbach",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_method",
+                    "value": "طريقة الاحتكاك",
+                    "english": "Friction method"
+                },
+                "next_translated": {
+                    "key": "bpn_line_table_title",
+                    "value": "خطوط الأنابيب",
+                    "english": "Pipe lines"
+                }
+            }
+        },
+        "bpn_method_manning": {
+            "reason": "equal_to_english",
+            "current_value": "Manning",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_method",
+                    "value": "طريقة الاحتكاك",
+                    "english": "Friction method"
+                },
+                "next_translated": {
+                    "key": "bpn_line_table_title",
+                    "value": "خطوط الأنابيب",
+                    "english": "Pipe lines"
                 }
             }
         }
