@@ -11,6 +11,8 @@
  * - <sub>/<span>/<sup> tag-count imbalance within a value
  * - foreign-script characters (Hangul/Kana) that indicate model contamination
  * - values byte-identical to the English source (untranslated content)
+ * - HTML entities in strings bound to a title="" attribute (they double-escape and show
+ *   literally in the tooltip); the key set is derived from the app source, not hand-listed
  *
  * Usage:
  *   php scripts/lang_syntax_validate.php
@@ -33,6 +35,7 @@ function main(array $argv): void
 
     $issues = [];
     $enValues = extractValues((string)file_get_contents(DEFAULT_LANG_DIR . '/lang.ec.en.php'));
+    $attrKeys = attributeBoundKeys();
 
     foreach ($files as $file) {
         if (!preg_match('/lang\.ec\.([a-z]{2})\.php$/', $file, $m)) {
@@ -53,6 +56,7 @@ function main(array $argv): void
         $issues = array_merge($issues, detectEscapeLeakage($file, $content));
         $issues = array_merge($issues, detectTagImbalance($file, $content));
         $issues = array_merge($issues, detectForeignScript($file, $content));
+        $issues = array_merge($issues, detectAttributeEntities($file, $content, $attrKeys));
         if ($lang !== 'en') {
             $issues = array_merge($issues, detectUntranslatedValues($file, $content, $enValues));
         }
@@ -245,6 +249,64 @@ function detectForeignScript(string $file, string $content): array
     if (preg_match_all('/[\x{AC00}-\x{D7AF}\x{1100}-\x{11FF}\x{3040}-\x{30FF}]/u', $content, $m, PREG_OFFSET_CAPTURE)) {
         foreach ($m[0] as $hit) {
             $issues[] = formatIssue($file, lineAtOffset($content, (int)$hit[1]), 'foreign-script', 'Hangul/Kana character "' . $hit[0] . '" — likely model contamination.');
+        }
+    }
+    return $issues;
+}
+
+/**
+ * Derives (from the app source, never a hand-maintained list) the set of $ec_lang keys whose
+ * value ends up inside an HTML title="" attribute -- via PHP htmlspecialchars() in a label, or
+ * via JS EngCalcs.escapeAttr() as a verdict/check tip. Both re-escape '&' -> '&amp;', so an HTML
+ * entity in such a string (e.g. &mdash;) becomes &amp;mdash; and shows literally in the tooltip.
+ * These keys must use literal Unicode characters, never entities. Self-maintaining: add a tip and
+ * the guard covers it automatically -- this is the durable replacement for "remember not to".
+ */
+function attributeBoundKeys(): array
+{
+    $root = __DIR__ . '/../..';
+    $keys = [];
+
+    // PHP path: htmlspecialchars( [strip_tags(] $ec_lang['KEY'] ... ) -- label title attributes.
+    foreach (glob($root . '/*.php') as $f) {
+        $c = (string)file_get_contents($f);
+        if (preg_match_all('/htmlspecialchars\(\s*(?:strip_tags\(\s*)?\$ec_lang\[\'([^\']+)\'\]/', $c, $m)) {
+            foreach ($m[1] as $k) { $keys[$k] = true; }
+        }
+    }
+
+    // JS path: keys passed as tip text to the verdict helpers -- either the value of any *Tip /
+    // *tip object property (highTip, lowTip, okTip, ...) or the 3rd argument of writeCheckHTML().
+    // A pageConfig/cfg property name is identical to its $ec_lang key.
+    foreach (glob($root . '/js/*.js') as $f) {
+        $c = (string)file_get_contents($f);
+        if (preg_match_all('/\w*[Tt]ip\s*:\s*(?:EngCalcs\.)?(?:pageConfig|cfg)\.([A-Za-z0-9_]+)/', $c, $m)) {
+            foreach ($m[1] as $k) { $keys[$k] = true; }
+        }
+        if (preg_match_all('/writeCheckHTML\s*\(([^)]*)\)/', $c, $m)) {
+            foreach ($m[1] as $args) {
+                $parts = explode(',', $args);
+                if (count($parts) >= 3 && preg_match('/(?:pageConfig|cfg)\.([A-Za-z0-9_]+)/', $parts[2], $mm)) {
+                    $keys[$mm[1]] = true;
+                }
+            }
+        }
+    }
+
+    return array_keys($keys);
+}
+
+/** HTML entities in a title-attribute-bound value double-escape ('&' -> '&amp;') and show literally. */
+function detectAttributeEntities(string $file, string $content, array $attrKeys): array
+{
+    $issues = [];
+    $set = array_flip($attrKeys);
+    foreach (extractValues($content) as $key => $value) {
+        if (!isset($set[$key])) {
+            continue;
+        }
+        if (preg_match('/&(#\d+|#x[0-9a-fA-F]+|[a-zA-Z][a-zA-Z0-9]+);/', $value, $m)) {
+            $issues[] = formatIssue($file, lineAtOffset($content, (int)strpos($content, "['" . $key . "']")), 'entity-in-attribute-tip', $key . ': HTML entity "' . $m[0] . '" double-escapes in a title attribute — use a literal character.');
         }
     }
     return $issues;
