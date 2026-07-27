@@ -2,7 +2,7 @@
     "meta": {
         "language": "he",
         "expected_key_count": 566,
-        "delta_key_count": 18,
+        "delta_key_count": 12,
         "active_prefixes": [
             "bpn",
             "dw",
@@ -395,15 +395,9 @@
         "ip_roughness": "e",
         "ip_hf": "h<sub>f<\/sub>",
         "ip_hm": "h<sub>m<\/sub>",
-        "ip_pressure_high": "High pressure locations need pressure reduction",
-        "ip_pressure_high_short": "High",
-        "ip_max_head": "Max. allow. pipe head",
-        "ip_max_head_tip": "Lines whose pressure exceeds this value are flagged. Leave blank to skip the high-pressure check.",
         "bpn_method_hw": "Hazen-Williams",
         "bpn_method_dw": "Darcy-Weisbach",
-        "bpn_method_manning": "Manning",
-        "bpn_demand_mult": "Demand multiplier",
-        "bpn_demand_mult_tip": "Scales every line demand at once, for a peak-hour or future-growth run. Use 1 for the demands as entered."
+        "bpn_method_manning": "Manning"
     },
     "keys": {
         "dw_roughness": "e",
@@ -415,15 +409,9 @@
         "ip_roughness": "e",
         "ip_hf": "h<sub>f<\/sub>",
         "ip_hm": "h<sub>m<\/sub>",
-        "ip_pressure_high": "High pressure locations need pressure reduction",
-        "ip_pressure_high_short": "High",
-        "ip_max_head": "Max. allow. pipe head",
-        "ip_max_head_tip": "Lines whose pressure exceeds this value are flagged. Leave blank to skip the high-pressure check.",
         "bpn_method_hw": "Hazen-Williams",
         "bpn_method_dw": "Darcy-Weisbach",
-        "bpn_method_manning": "Manning",
-        "bpn_demand_mult": "Demand multiplier",
-        "bpn_demand_mult_tip": "Scales every line demand at once, for a peak-hour or future-growth run. Use 1 for the demands as entered."
+        "bpn_method_manning": "Manning"
     },
     "key_context": {
         "dw_roughness": {
@@ -570,70 +558,6 @@
                 }
             }
         },
-        "ip_pressure_high": {
-            "reason": "equal_to_english",
-            "current_value": "High pressure locations need pressure reduction",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ip_pressure_warn_short",
-                    "value": "נמוך",
-                    "english": "Low"
-                },
-                "next_translated": {
-                    "key": "ip_h_far",
-                    "value": "לחץ המטפטף האחרון",
-                    "english": "Last emitter pressure"
-                }
-            }
-        },
-        "ip_pressure_high_short": {
-            "reason": "equal_to_english",
-            "current_value": "High",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ip_pressure_warn_short",
-                    "value": "נמוך",
-                    "english": "Low"
-                },
-                "next_translated": {
-                    "key": "ip_h_far",
-                    "value": "לחץ המטפטף האחרון",
-                    "english": "Last emitter pressure"
-                }
-            }
-        },
-        "ip_max_head": {
-            "reason": "equal_to_english",
-            "current_value": "Max. allow. pipe head",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ip_pressure_warn_short",
-                    "value": "נמוך",
-                    "english": "Low"
-                },
-                "next_translated": {
-                    "key": "ip_h_far",
-                    "value": "לחץ המטפטף האחרון",
-                    "english": "Last emitter pressure"
-                }
-            }
-        },
-        "ip_max_head_tip": {
-            "reason": "equal_to_english",
-            "current_value": "Lines whose pressure exceeds this value are flagged. Leave blank to skip the high-pressure check.",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ip_pressure_warn_short",
-                    "value": "נמוך",
-                    "english": "Low"
-                },
-                "next_translated": {
-                    "key": "ip_h_far",
-                    "value": "לחץ המטפטף האחרון",
-                    "english": "Last emitter pressure"
-                }
-            }
-        },
         "bpn_method_hw": {
             "reason": "equal_to_english",
             "current_value": "Hazen-Williams",
@@ -679,38 +603,6 @@
                     "key": "bpn_line_table_title",
                     "value": "קווי צנרת",
                     "english": "Pipe lines"
-                }
-            }
-        },
-        "bpn_demand_mult": {
-            "reason": "equal_to_english",
-            "current_value": "Demand multiplier",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "bpn_demand_tip",
-                    "value": "ספיקה קבועה המסופקת בקצה מורד הזרם של קו זה. השאירו ריק עבור קו שרק מעביר ספיקה הלאה.",
-                    "english": "Fixed flow delivered at this line's downstream end. Leave blank for a line that only carries flow onward."
-                },
-                "next_translated": {
-                    "key": "bpn_elev_down",
-                    "value": "רום מורד",
-                    "english": "DS elev."
-                }
-            }
-        },
-        "bpn_demand_mult_tip": {
-            "reason": "equal_to_english",
-            "current_value": "Scales every line demand at once, for a peak-hour or future-growth run. Use 1 for the demands as entered.",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "bpn_demand_tip",
-                    "value": "ספיקה קבועה המסופקת בקצה מורד הזרם של קו זה. השאירו ריק עבור קו שרק מעביר ספיקה הלאה.",
-                    "english": "Fixed flow delivered at this line's downstream end. Leave blank for a line that only carries flow onward."
-                },
-                "next_translated": {
-                    "key": "bpn_elev_down",
-                    "value": "רום מורד",
-                    "english": "DS elev."
                 }
             }
         }

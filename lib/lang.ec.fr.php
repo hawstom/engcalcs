@@ -5,6 +5,7 @@
 // Units (alphabetical order)
 // Necessary for calculator units selectors
 $ec_lang['u_depthFrac']="fraction";
+
 $ec_lang['u_depthPercent']="%";
 $ec_lang['u_ft2']="ft^2";
 $ec_lang['u_ft3ps']="ft^3/s";
@@ -521,10 +522,10 @@ $ec_lang['ip_hm']='h<sub>m</sub>';
 $ec_lang['ip_hl']='<span class="ec-help" title="Perte totale du tronçon, h_f + h_m">h<sub>L</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['ip_pressure_warn']='Pression faible ou négative — vérifiez les conditions sous-atmosphériques';
 $ec_lang['ip_pressure_warn_short']='Faible';
-$ec_lang['ip_pressure_high']='High pressure locations need pressure reduction';
-$ec_lang['ip_pressure_high_short']='High';
-$ec_lang['ip_max_head']='Max. allow. pipe head';
-$ec_lang['ip_max_head_tip']='Lines whose pressure exceeds this value are flagged. Leave blank to skip the high-pressure check.';
+$ec_lang['ip_pressure_high']='Pression élevée — nécessite une réduction de pression';
+$ec_lang['ip_pressure_high_short']='Élevée';
+$ec_lang['ip_max_head']='Charge adm. max. conduite';
+$ec_lang['ip_max_head_tip']='Les tronçons dont la pression dépasse cette valeur sont signalés. Laisser vide pour ignorer le contrôle de pression élevée.';
 $ec_lang['ip_h_far']='Pression du dernier goutteur';
 $ec_lang['ip_q_supply']='<span class="ec-help" title="Débit entrant uniquement dans le cheminement de test modélisé — pour l\'ensemble de la zone/du système, voir Q_zone dans Conception d\'Application ci-dessous.">Débit d\'alimentation du cheminement de test, Q<sub>supply</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['ip_q_critical']='Débit du dernier goutteur, q<sub>last</sub>';
@@ -567,8 +568,8 @@ $ec_lang['bpn_upstream_tip']='ID du tronçon qui alimente celui-ci. Laisser vide
 $ec_lang['bpn_roughness_tip']='Rugosité de la conduite pour la méthode de frottement sélectionnée : n de Manning, C de Hazen-Williams, ou hauteur de rugosité e de Darcy-Weisbach (une longueur). Conduite plastique lisse typique : n environ 0,009, C environ 150, e environ 0,0015 mm.';
 $ec_lang['bpn_demand']='Demande';
 $ec_lang['bpn_demand_tip']='Débit fixe livré à l\'extrémité aval de ce tronçon. Laisser vide pour un tronçon qui ne fait que transporter le débit plus loin.';
-$ec_lang['bpn_demand_mult']='Demand multiplier';
-$ec_lang['bpn_demand_mult_tip']='Scales every line demand at once, for a peak-hour or future-growth run. Use 1 for the demands as entered.';
+$ec_lang['bpn_demand_mult']='Multiplicateur de demande';
+$ec_lang['bpn_demand_mult_tip']='Multiplie simultanément toutes les demandes des tronçons, pour un calcul en heure de pointe ou de croissance future. Utiliser 1 pour les demandes telles que saisies.';
 $ec_lang['bpn_elev_down']='Cote av.';
 $ec_lang['bpn_q_line']='Débit du tronçon';
 $ec_lang['bpn_q_line_tip']='Débit total transporté par ce tronçon : sa propre demande plus toutes les demandes aval qu\'il alimente.';

@@ -2,7 +2,7 @@
     "meta": {
         "language": "bg",
         "expected_key_count": 566,
-        "delta_key_count": 15,
+        "delta_key_count": 9,
         "active_prefixes": [
             "bpn",
             "dw",
@@ -250,13 +250,7 @@
         "ip_roughness": "e",
         "ip_hf": "h<sub>f<\/sub>",
         "ip_hm": "h<sub>m<\/sub>",
-        "ip_pressure_high": "High pressure locations need pressure reduction",
-        "ip_pressure_high_short": "High",
-        "ip_max_head": "Max. allow. pipe head",
-        "ip_max_head_tip": "Lines whose pressure exceeds this value are flagged. Leave blank to skip the high-pressure check.",
-        "bpn_id": "ID",
-        "bpn_demand_mult": "Demand multiplier",
-        "bpn_demand_mult_tip": "Scales every line demand at once, for a peak-hour or future-growth run. Use 1 for the demands as entered."
+        "bpn_id": "ID"
     },
     "keys": {
         "dw_roughness": "e",
@@ -267,13 +261,7 @@
         "ip_roughness": "e",
         "ip_hf": "h<sub>f<\/sub>",
         "ip_hm": "h<sub>m<\/sub>",
-        "ip_pressure_high": "High pressure locations need pressure reduction",
-        "ip_pressure_high_short": "High",
-        "ip_max_head": "Max. allow. pipe head",
-        "ip_max_head_tip": "Lines whose pressure exceeds this value are flagged. Leave blank to skip the high-pressure check.",
-        "bpn_id": "ID",
-        "bpn_demand_mult": "Demand multiplier",
-        "bpn_demand_mult_tip": "Scales every line demand at once, for a peak-hour or future-growth run. Use 1 for the demands as entered."
+        "bpn_id": "ID"
     },
     "key_context": {
         "dw_roughness": {
@@ -404,70 +392,6 @@
                 }
             }
         },
-        "ip_pressure_high": {
-            "reason": "equal_to_english",
-            "current_value": "High pressure locations need pressure reduction",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ip_pressure_warn_short",
-                    "value": "Ниско",
-                    "english": "Low"
-                },
-                "next_translated": {
-                    "key": "ip_h_far",
-                    "value": "Налягане на последния емитер",
-                    "english": "Last emitter pressure"
-                }
-            }
-        },
-        "ip_pressure_high_short": {
-            "reason": "equal_to_english",
-            "current_value": "High",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ip_pressure_warn_short",
-                    "value": "Ниско",
-                    "english": "Low"
-                },
-                "next_translated": {
-                    "key": "ip_h_far",
-                    "value": "Налягане на последния емитер",
-                    "english": "Last emitter pressure"
-                }
-            }
-        },
-        "ip_max_head": {
-            "reason": "equal_to_english",
-            "current_value": "Max. allow. pipe head",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ip_pressure_warn_short",
-                    "value": "Ниско",
-                    "english": "Low"
-                },
-                "next_translated": {
-                    "key": "ip_h_far",
-                    "value": "Налягане на последния емитер",
-                    "english": "Last emitter pressure"
-                }
-            }
-        },
-        "ip_max_head_tip": {
-            "reason": "equal_to_english",
-            "current_value": "Lines whose pressure exceeds this value are flagged. Leave blank to skip the high-pressure check.",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ip_pressure_warn_short",
-                    "value": "Ниско",
-                    "english": "Low"
-                },
-                "next_translated": {
-                    "key": "ip_h_far",
-                    "value": "Налягане на последния емитер",
-                    "english": "Last emitter pressure"
-                }
-            }
-        },
         "bpn_id": {
             "reason": "equal_to_english",
             "current_value": "ID",
@@ -481,38 +405,6 @@
                     "key": "bpn_id_tip",
                     "value": "Име на този тръбопроводен участък. Другите участъци го посочват в колоната Нагоре по течението ID.",
                     "english": "Name of this pipe line. Other lines refer to it in the Upstream column."
-                }
-            }
-        },
-        "bpn_demand_mult": {
-            "reason": "equal_to_english",
-            "current_value": "Demand multiplier",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "bpn_demand_tip",
-                    "value": "Фиксирано водно количество, доставяно в долния край на този участък. Оставете празно за участък, който само пренася водното количество нататък.",
-                    "english": "Fixed flow delivered at this line's downstream end. Leave blank for a line that only carries flow onward."
-                },
-                "next_translated": {
-                    "key": "bpn_elev_down",
-                    "value": "Долна кота",
-                    "english": "DS elev."
-                }
-            }
-        },
-        "bpn_demand_mult_tip": {
-            "reason": "equal_to_english",
-            "current_value": "Scales every line demand at once, for a peak-hour or future-growth run. Use 1 for the demands as entered.",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "bpn_demand_tip",
-                    "value": "Фиксирано водно количество, доставяно в долния край на този участък. Оставете празно за участък, който само пренася водното количество нататък.",
-                    "english": "Fixed flow delivered at this line's downstream end. Leave blank for a line that only carries flow onward."
-                },
-                "next_translated": {
-                    "key": "bpn_elev_down",
-                    "value": "Долна кота",
-                    "english": "DS elev."
                 }
             }
         }

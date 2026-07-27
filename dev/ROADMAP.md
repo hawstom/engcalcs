@@ -58,41 +58,6 @@ institutional, paywalled, or non-English tools may exist that search didn't surf
 below reflect this research; re-run the same 4-axis check before adding new candidates rather than
 prioritizing on mission-fit intuition alone.
 
-- 100|137|[CC] **Branched (distributary) pipe network calculator.** A quick, easy pressure/flow
-  calculator for distributary (dendritic/tree) pipe networks — source → main → branches delivering
-  fixed demands — filling the niche where EPANET is overkill (no loops, no iteration). Parent-pointer
-  topology (no node table; each line has one upstream line), single-pass fixed-demand solve
-  (bottom-up flows, top-down pressures), **series-by-default degradation** (`upstream` defaults to
-  the previous line, so a no-topology entry is a plain series pipeline — subsumes the old
-  "generic series multi-reach" idea), live Manning/HW/DW method switching, fixed k-value minor
-  losses, **break-pressure-tank spacing** (flags where static head would exceed pipe pressure rating
-  — absorbs the useful core of the former spring-box Task 111, now cut), a demand-multiplier
-  **system curve** with pump-curve overlay, and a "tall" topology sanity
-  sketch with toggleable per-cell data. **Phase 2** (feasibility-gated): an isolated Google Maps
-  elevation/length helper in a separate lazy-loaded window (core solve never depends on it, so it can
-  be aborted at zero cost). **Phase 3** (conditional, uncommitted): looped networks, only after we're
-  map-mashup experts or users ask. Springboards off Irrigation-Pressure (`ip_`) but built fresh —
-  **do not extract or degrade `ip`**. This is a **core-hydraulics** calculator in Tom's home
-  authority, so the 4-axis mission-expansion framework above does not gate it. Candidate prefix
-  `bpn_` (claimed 2026-07-23). Full spec: `dev/branched-network-calculator-scope.md`.
-  **Status 2026-07-24 — build complete; only the translation sprint remains.** Decisions taken this
-  date (all recorded in the scope doc): excessive-pressure reporting built, with **no "break pressure
-  tank" terminology anywhere in UI or code** — the tool reports excessive pressure and does not size
-  or place tanks (`6394929`); global demand multiplier built (`160cdb9`); the demand-multiplier
-  **system-curve plot is CUT, not deferred** — no place for it on the page, do not reintroduce
-  without a fresh reason; distributed outflow settled as **point demand at the downstream end only**
-  (do not carry over `ip`'s along-the-line outflow); `ip_max_head_tip` reworded so it no longer
-  repeats its own label (`c7027f6`). Glossary gained `pressure rating` and `pressure reduction`,
-  both synonym-tolerant rather than calques (glossary 1.17).
-  **To close the task, run the sprint — 21 strings x 26 languages. Payload gate passes (`FRESH`).**
-  Two things the launcher MUST carry into the sprint prompt:
-  - **A do-not-translate guard.** The payload's `keys_to_translate` still contains symbols and
-    eponyms that must survive verbatim in every language, RTL included: `h<sub>f</sub>`,
-    `h<sub>m</sub>`, `L`, `D`, `e`, `ID`, and `Manning` / `Hazen-Williams` / `Darcy-Weisbach`. The
-    payload does not exempt them, so the prompt has to.
-  - **Glossary write-back is part of closing, not a follow-up.** `pressure rating` and
-    `pressure reduction` were created with empty `translations` — populate them from the sprint
-    output (plus a dated `translation_notes` line) before the task is marked done.
 - 4|114| **Reservoir / detention routing calculator (Modified Puls).** Re-scoped 2026-07-23 (Tom):
   the original "check-dam *spillway sizing*" framing collapsed — a spillway is a weir (`wfs_`/`wfi_`)
   plus rock lining (`rc_`) plus freeboard arithmetic, i.e. no new engine and largely subsumed by
@@ -226,6 +191,20 @@ The rules, sequence, and QA chain for translation work are **not** restated here
 - **`CLAUDE.md` § "Translation Sprints"** — sprint mechanics, model policy, pre/post-sprint checklist.
 - **`dev/translation-execution-log.md`** — the full dated, category-by-category execution record.
 
+- 20|141| **Check whether `Kichwa` (sw) and `الرأس` (ar) are really the hydraulic-head term.**
+  Narrow follow-up from the Task 137 sprint, 2026-07-27. **Scope corrected the same day (Tom): an
+  earlier version of this entry claimed a 7-of-26 head-term inconsistency by comparing each language's
+  `ip_max_head` (pipe pressure head) against `ws_headWaterHeight` (weir head). That baseline was
+  wrong — those are different quantities and SHOULD differ; weir head is the depth over the crest, so
+  he `עומק`, de `Überfallhöhe`, cs `Přepadová výška` are all correct. That finding is withdrawn; the
+  head terminology was already settled and stays settled.**
+  What remains is one small question, not a defect list: Swahili uses `Kichwa` — the ordinary word for
+  the body part — as the hydraulic-head term in the `dw_`/`mhp_` strings, and the sprint's new
+  `ip_max_head` followed that incumbent for consistency. Arabic's `ws_headWaterHeight` uses `الرأس`
+  the same way. In many languages the body-part word IS the standard hydraulic term (English "head"
+  is itself exactly this), so this may be entirely correct. Worth one native or high-confidence check
+  for those two languages only — **do not bulk-rewrite, and do not re-open the other 24.**
+
 - 60|140| **[H] Get HTML out of language strings where it cannot work, and enforce it mechanically.**
   Design agreed with Tom 2026-07-24; **not started, nothing touched yet.** Written up for future
   review because the session ran low on context — read this whole block before acting.
@@ -343,6 +322,52 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|137|[CC] **Branched (distributary) pipe network calculator — DONE 2026-07-27.** A quick, easy pressure/flow
+  calculator for distributary (dendritic/tree) pipe networks — source → main → branches delivering
+  fixed demands — filling the niche where EPANET is overkill (no loops, no iteration). Parent-pointer
+  topology (no node table; each line has one upstream line), single-pass fixed-demand solve
+  (bottom-up flows, top-down pressures), **series-by-default degradation** (`upstream` defaults to
+  the previous line, so a no-topology entry is a plain series pipeline — subsumes the old
+  "generic series multi-reach" idea), live Manning/HW/DW method switching, fixed k-value minor
+  losses, **break-pressure-tank spacing** (flags where static head would exceed pipe pressure rating
+  — absorbs the useful core of the former spring-box Task 111, now cut), a demand-multiplier
+  **system curve** with pump-curve overlay, and a "tall" topology sanity
+  sketch with toggleable per-cell data. **Phase 2** (feasibility-gated): an isolated Google Maps
+  elevation/length helper in a separate lazy-loaded window (core solve never depends on it, so it can
+  be aborted at zero cost). **Phase 3** (conditional, uncommitted): looped networks, only after we're
+  map-mashup experts or users ask. Springboards off Irrigation-Pressure (`ip_`) but built fresh —
+  **do not extract or degrade `ip`**. This is a **core-hydraulics** calculator in Tom's home
+  authority, so the 4-axis mission-expansion framework above does not gate it. Candidate prefix
+  `bpn_` (claimed 2026-07-23). Full spec: `dev/branched-network-calculator-scope.md`.
+  **Status 2026-07-24 — build complete; only the translation sprint remains.** Decisions taken this
+  date (all recorded in the scope doc): excessive-pressure reporting built, with **no "break pressure
+  tank" terminology anywhere in UI or code** — the tool reports excessive pressure and does not size
+  or place tanks (`6394929`); global demand multiplier built (`160cdb9`); the demand-multiplier
+  **system-curve plot is CUT, not deferred** — no place for it on the page, do not reintroduce
+  without a fresh reason; distributed outflow settled as **point demand at the downstream end only**
+  (do not carry over `ip`'s along-the-line outflow); `ip_max_head_tip` reworded so it no longer
+  repeats its own label (`c7027f6`). Glossary gained `pressure rating` and `pressure reduction`,
+  both synonym-tolerant rather than calques (glossary 1.17).
+  **Sprint run and closed 2026-07-27** (authorized by Tom the same date). 26 Sonnet agents, one per
+  language. Per-language deltas ran 15-24 keys, not a uniform 21 — the count varies with what each
+  file was still missing. The six real strings (`ip_pressure_high`, `ip_pressure_high_short`,
+  `ip_max_head`, `ip_max_head_tip`, `bpn_demand_mult`, `bpn_demand_mult_tip`) are translated in all
+  26; the do-not-translate guard held (symbols/eponyms verbatim everywhere, RTL included).
+  `ip_pressure_warn` was carried as a resync key (English had drifted); every language independently
+  confirmed its existing translation still matched, so none was rewritten, and the drift manifest is
+  re-baselined to 2026-07-27. QA: `lang_syntax_validate.php` across all 26 returns 180 findings, all
+  advisory `identical-to-english` (the frozen symbols) — zero escape-leakage, tag-imbalance,
+  foreign-script, or entity-in-attribute. Tag-parity and entity checks on the six keys clean in all
+  26. Back-translation done inline (no `ANTHROPIC_API_KEY` here), not skipped. Glossary write-back
+  done as part of closing, not deferred: `pressure rating` and `pressure reduction` both populated
+  for all 26 with dated notes (glossary 1.18). The residual payload delta (365 keys) is entirely
+  frozen symbols, eponyms, product names, citations, and genuine cross-language cognates (`Name` in
+  de, `Source`/`Notes`/`fraction` in fr, `Diameter` in id) — it will never reach zero and that is
+  correct. One loose end, deliberately not fixed: `ip_max_head`'s label says "pipe head" while its own
+  tip `ip_max_head_tip` says "pressure" — a one-word English nit, not a bug; changing it would stale
+  that key in 26 languages, so it is left alone pending a reason to touch it. A separate, much
+  narrower sw/ar terminology question is Task 141.
 
 - 0|136| **Reworded `template_translation_help` to invite native-language review — DONE 2026-07-21.**
   Authorized by Tom 2026-07-21 ("Deploy now"). English changed to the LOCKED wording "Do you have
