@@ -232,6 +232,9 @@ The rules, sequence, and QA chain for translation work are **not** restated here
 - 60|140| **[H] Get HTML out of language strings where it cannot work, and enforce it mechanically.**
   Design agreed with Tom 2026-07-24; **not started, nothing touched yet.** Written up for future
   review because the session ran low on context — read this whole block before acting.
+  **Start with step 1 alone — a plain entity-cleanup pass (Tom, 2026-07-27).** The evidence now says
+  this is a historical mess, not an ongoing discipline failure, so do the cheap mechanical fix first
+  and re-judge the rest afterward. Full reasoning under "Do step 1 first" below.
 
   **The problem in one sentence.** A language string's HTML is sometimes fine and sometimes silently
   broken, and *which one depends on the PHP/JS call site that consumes it*, not on anything visible
@@ -311,10 +314,18 @@ The rules, sequence, and QA chain for translation work are **not** restated here
   holds. That supports Rule A being absolute (step 1) and argues the expensive part of this task is
   the historical cleanup and the deriver, not the ongoing discipline.
 
+  **Do step 1 first, on its own, as a plain cleanup pass (Tom, 2026-07-27).** Given the sprint
+  evidence above — the problem looks *historical* rather than ongoing — the right first move is the
+  simple mechanical cleanup, not the deriver and not the architecture. Convert the entities, turn
+  Rule A on, ship it, and see what is actually left. **Do not bundle steps 2-4 into that pass**;
+  step 1 is independent by design and its value does not depend on the rest of this task ever being
+  done. If the historical reading is right, step 1 plus Rule A removes most of the recurring pain for
+  a fraction of the effort, and what remains can be judged with real evidence instead of forecast.
+
   **Steps, in order.**
   1. Convert all `&...;` to literal UTF-8 characters; turn Rule A on hard. English needs ~12 distinct
      characters (`— × ÷ ≈ ≤ ≥ √ ² ν τ Δ –`); the check should name the replacement in its error text.
-     Independent of every step below.
+     Independent of every step below. **This is the sanctioned starting point — see the note above.**
   2. Lift the 33 embedded tooltips into their own `_tip` keys, fixing the 11 dirty ones. **Tom agreed
      the existing translations are extracted mechanically** from inside the label strings across all
      27 files (they are already translated, just trapped) — not left empty for a future sprint.
