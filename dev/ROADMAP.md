@@ -205,6 +205,30 @@ The rules, sequence, and QA chain for translation work are **not** restated here
   is itself exactly this), so this may be entirely correct. Worth one native or high-confidence check
   for those two languages only — **do not bulk-rewrite, and do not re-open the other 24.**
 
+- 25|142| **`ip_max_head`'s label and its own tip name two different quantities.** Split out of Task
+  137 on close, 2026-07-27 (Tom's rule: a loose end left inside a closed task is a lost loose end —
+  either it gets its own task or the parent does not close). The label reads "Max. allow. pipe
+  **head**"; its `?` tip `ip_max_head_tip` reads "Lines whose **pressure** exceeds this value are
+  flagged." Head and pressure are different quantities, and this is a documented trap term whose
+  glossary entry insists the value stays dimensionally a head. **Severity: low — a one-word English
+  wording nit, not a calculation bug, and nothing renders wrong.** Caught during the Task 137 sprint
+  by the sw agent, which translated both faithfully rather than silently reconciling them, so all 26
+  languages now carry the same mismatch. **Cost of fixing:** editing the English stales that one key
+  in 26 languages and needs a 1-key resync (one string × 26 — not a sprint). Decide the wording
+  first; "pressure" in the tip is arguably how engineers actually speak, so leaving it is a
+  legitimate outcome. Do not fix it silently as a drive-by during other work — the resync is the
+  reason it needs deciding rather than doing.
+
+- 30|143| **Move the solver control into the depth label on `mtc_` and `mpf_`, if feasible.** Requested
+  by Tom 2026-07-27. Better UX: rather than a separate solver control sitting apart from the field it
+  acts on, put it inside the depth label itself so the thing you are solving for and the control that
+  solves it are one element. **Plan and discuss before building** — optimal wording and presentation
+  are the substance of this task, not an afterthought, and "if feasible" is real: check that the
+  label markup, the `.ec-help`/`.ec-tip` conventions, and the narrow-column constraints can carry a
+  control without crowding. Applies to Manning Trap Channel (`mtc_`) and Manning Pipe Flow (`mpf_`).
+  **Translate as needed** — any new or reworded string goes through the normal sprint path, and
+  wording should be settled before translation so it is not done twice.
+
 - 60|140| **[H] Get HTML out of language strings where it cannot work, and enforce it mechanically.**
   Design agreed with Tom 2026-07-24; **not started, nothing touched yet.** Written up for future
   review because the session ran low on context — read this whole block before acting.
@@ -274,6 +298,18 @@ The rules, sequence, and QA chain for translation work are **not** restated here
     `attr="…"`, not just `title=`.**
   - Four different escaping conventions are already in use across call sites (raw,
     `htmlspecialchars`, `htmlspecialchars(strip_tags())`, `ENT_QUOTES` at `lib/Menus.lib.php:127`).
+
+  **Evidence from the Task 137 sprint, 2026-07-27 — Rule A is cheap to hold at write time.** The
+  sprint brief told all 26 translation agents, in one line, "never emit HTML entities, use literal
+  UTF-8" and "preserve all markup exactly — same tags, same count as English." Result across 26
+  languages × 6 real strings: **zero entity findings and zero tag-parity failures**, checked
+  independently rather than taken from the agents' self-reports. Two agents also correctly declined
+  to translate numeric/bibliographic strings (`2.54–2.82 (Robinson)`) and real cognates (`laminar`,
+  `Circular`) after being told a value equal to English is not automatically a missing translation.
+  **Reading:** entities are a habit acquired from *editing existing strings*, not something writers
+  reach for unprompted — when the rule is stated at the moment of writing, it costs one sentence and
+  holds. That supports Rule A being absolute (step 1) and argues the expensive part of this task is
+  the historical cleanup and the deriver, not the ongoing discipline.
 
   **Steps, in order.**
   1. Convert all `&...;` to literal UTF-8 characters; turn Rule A on hard. English needs ~12 distinct
@@ -364,10 +400,8 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
   for all 26 with dated notes (glossary 1.18). The residual payload delta (365 keys) is entirely
   frozen symbols, eponyms, product names, citations, and genuine cross-language cognates (`Name` in
   de, `Source`/`Notes`/`fraction` in fr, `Diameter` in id) — it will never reach zero and that is
-  correct. One loose end, deliberately not fixed: `ip_max_head`'s label says "pipe head" while its own
-  tip `ip_max_head_tip` says "pressure" — a one-word English nit, not a bug; changing it would stale
-  that key in 26 languages, so it is left alone pending a reason to touch it. A separate, much
-  narrower sw/ar terminology question is Task 141.
+  correct. Two follow-ups were split out rather than left dangling inside this closed block: Task 142
+  (`ip_max_head` label/tip wording) and Task 141 (a narrow sw/ar terminology question).
 
 - 0|136| **Reworded `template_translation_help` to invite native-language review — DONE 2026-07-21.**
   Authorized by Tom 2026-07-21 ("Deploy now"). English changed to the LOCKED wording "Do you have
