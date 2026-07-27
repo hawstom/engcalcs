@@ -10,12 +10,34 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 ## Calculator Improvements
 
-- 55|138| **Optimize suite-wide "Related calculators" links after Task 137 lands.** The pipe-flow
-  cluster has grown large (Manning-Pipe-Flow, Manning-Pipe-Head-Loss, Darcy-Weisbach, Hazen-Williams,
-  Irrigation-Pressure, and the new branched network — Task 137). Once 137 is in, re-evaluate the
-  *mutual* "Related calculators" links across all pipe-flow pages so genuinely related tools
-  cross-reference each other coherently — and only where genuinely related (no clutter/spam, per the
-  Golden-Rule linking standard). Cross-cutting UX pass, separate from the 137 build itself.
+- 45|144| **Diagnose the Hazen-Williams conversion leak.** Per the 2026-07-27 usage snapshot
+  (`dev/usage-data-log.md`), HW draws 580 confirmed-human views — the suite's second-biggest genuine
+  front door, at 18% human-of-reach vs Darcy-Weisbach's 4% — but only 11% of those humans ever
+  calculate, against a 51–67% band on six comparable pages (and DW's 37% on a structurally identical
+  page). That is ~517 lost humans per period, roughly 5× more than exist on every page below
+  Manning-Trap combined, making it the largest single UX prize in the suite. Instrumentation is
+  shared and identical across pages, so this is real behavior, not a measurement artifact. Traffic is
+  well-targeted, which deepens the puzzle: per Tom, English users dominate and search "Hazen Williams"
+  by name, so these are people who wanted *this* calculator. Cause unknown — worth checking whether
+  the default inputs read as "already answered" (suppressing the user-triggered recalc that `used`
+  requires), whether the form's units/roughness defaults mismatch what a searcher arrives with, or
+  whether the page answers the question without interaction. Do not guess a fix; instrument or
+  observe first.
+  **Tom's leading hypothesis (2026-07-27) — the page may be too small for the job.** People searching
+  "Hazen-Williams" may simply not be satisfied by a *single-line* calculator. They arrive with a
+  *network* to solve and find one pipe segment. What they may actually be hoping for is `bpn_`
+  (branched networks — Task 137, now shipped) or, against all their fears, a **simple Hardy Cross
+  looped-network calculator** — the Phase 3 idea in Task 137, envisioned as following the Google Maps
+  mashup (Phase 2). On this reading HW is not broken at all; it is just **not enough for their needs**,
+  and the 89% who leave are being driven yet again to EPANET or (gasp) WATERCAD. Two things follow.
+  First, it makes the Task 138 HW→BPN link a partial test of the hypothesis, and cheap to observe:
+  if BPN's human count climbs while HW's conversion stays flat, the leak is scope, not usability.
+  Second, it reframes Phase 3 from "conditional, uncommitted" toward **evidence-backed** — 517 lost
+  humans per period is exactly the "or users ask" trigger that gate was waiting for, arriving as
+  behavior rather than as a request. **Phase 3 is now Task 146** (extracted from 137's closed block
+  2026-07-27); a confirmed finding here promotes it. Weigh this against the mundane usability causes above before
+  committing; a scope explanation is more flattering to the suite than a defect explanation, which is
+  precisely why it deserves evidence and not assumption.
 - 40|139| **Fix Points-data copy/paste on Irrigation-Pressure (`ip_`).** The copy/paste data area is
   non-functional on `ip` (Tom, 2026-07-23). The shared engine (`dataSingletonsCount` /
   `dataColumnsFirstRowCount` / `dataColumnsOtherRowsCount` in the page JS, driving
@@ -24,6 +46,25 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   layout drift. Diagnose with a Node harness that evals `Cookies.lib.js` (note: its top-level
   `var EngCalcs = EngCalcs || {}` shadows the global under `eval`, so append `global.EngCalcs=EngCalcs;`)
   and round-trips a representative cookie, as was done for `bpn_`.
+- 18|146| **Looped-network (Hardy Cross) solving — was Task 137 "Phase 3", extracted 2026-07-27.**
+  Extend `bpn_` (or build alongside it) to solve networks with loops, iterating to convergence —
+  the case the shipped branched calculator explicitly excludes ("no loops, no iteration"). Kept
+  deliberately *simple*: the point is a tool for someone who does not want to stand up EPANET, not an
+  EPANET clone. **Original gate (Task 137): "conditional, uncommitted — only after we're map-mashup
+  experts or users ask."** That gate is an **OR**, and the second branch may already be satisfied:
+  Task 144 records Tom's hypothesis that Hazen-Williams' ~517 lost humans per period are people who
+  arrived with a *network* and found a single-line calculator, then went back to EPANET or WATERCAD.
+  If Task 144 confirms that, this is promoted on evidence and **does not have to wait for Task 145** —
+  the two branches are independent. Until then it stays uncommitted. Do not start this before 144
+  produces a finding; the whole point of extracting it is that it now has a real trigger to wait for
+  rather than a vague someday.
+- 15|145| **Google Maps elevation/length helper for `bpn_` — was Task 137 "Phase 2", extracted
+  2026-07-27.** An isolated map mashup that pulls pipe lengths and node elevations into the branched
+  network, in a **separate lazy-loaded window**, with the hard architectural constraint from the
+  original spec: **the core solve never depends on it**, so the whole feature can be aborted at zero
+  cost if it proves infeasible or the API terms turn hostile. Feasibility-gated — investigate cost,
+  key management, and terms of service before building. Note this also feeds Task 146's original
+  "after we're map-mashup experts" branch.
 
 ## New Calculators (Mission Expansion)
 
@@ -370,6 +411,30 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Completed
 
+- 0|138|[CC] **Optimize suite-wide "Related calculators" links — DONE 2026-07-27.** Re-scoped from a
+  full cross-cutting graph pass to a handful of links, on the evidence of the 2026-07-27 usage
+  snapshot (`dev/usage-data-log.md`). Findings that drove it: only 4 of 15 calculator pages carried a
+  Related line at all and **no link was reciprocated** (all 11 targets were dead ends); human views
+  are extremely concentrated (**MPF alone = 67% of all human views; MPF + HW + MTC = 92%**), so a
+  link on a long-tail page is seen by 6–17 humans; and the combined downstream traffic of MPF's four
+  existing outbound links is ≤3.6% of MPF's own, so re-curation has small expected yield regardless.
+  **Reciprocity was explicitly rejected** (Tom): it would spend 11 page edits placing links in front
+  of a rounding error. Links are only worth adding where the humans already are.
+  Shipped — three pages, five links, no new `$ec_lang` keys and therefore **no translation work**:
+  - `Hazen-Williams.php` — added Manning-Pipe-Flow and Branched-Network (kept DW, MPHL). The one real
+    opportunity: 580 humans converting at 11%, previously offered only the suite's two *least*
+    trafficked pipe pages. MPF converts at 67%; BPN does HW loss natively. See Task 144.
+  - `Manning-Trap.php` — added Manning-Pipe-Flow (kept MI, RC, CS). Both Manning open-channel; low
+    stakes, and MPF needs no promotion (Tom) — it is for the MTC visitor's benefit, not MPF's.
+  - `Irrigation-Pressure.php` — new Related line: Branched-Network, Manning-Pipe-Flow. Justified by
+    the **dead end in the suite's highest-value flow**, not by IP's own 46 humans: MPF actively feeds
+    IP, IP converts at 4%, and there was no onward path. IP (main/lateral pressure, DU) and BPN
+    (branched fixed-demand network) are the same person's problem at different scales.
+  - Every other page deliberately left unchanged; MPF's own line left alone (already a reasonable
+    length, and its links are the long tail's only distribution channel).
+  **IP's 4% remains un-diagnosed** — the tempting "broken copy/paste" explanation (Task 139) was
+  tested and rejected by Tom: Paste is indeed broken but only a rare, experienced user touches that
+  area, far too few to explain 44 of 46 visitors not calculating.
 - 0|137|[CC] **Branched (distributary) pipe network calculator — DONE 2026-07-27.** A quick, easy pressure/flow
   calculator for distributary (dendritic/tree) pipe networks — source → main → branches delivering
   fixed demands — filling the niche where EPANET is overkill (no loops, no iteration). Parent-pointer
@@ -380,10 +445,15 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
   losses, **break-pressure-tank spacing** (flags where static head would exceed pipe pressure rating
   — absorbs the useful core of the former spring-box Task 111, now cut), a demand-multiplier
   **system curve** with pump-curve overlay, and a "tall" topology sanity
-  sketch with toggleable per-cell data. **Phase 2** (feasibility-gated): an isolated Google Maps
-  elevation/length helper in a separate lazy-loaded window (core solve never depends on it, so it can
-  be aborted at zero cost). **Phase 3** (conditional, uncommitted): looped networks, only after we're
-  map-mashup experts or users ask. Springboards off Irrigation-Pressure (`ip_`) but built fresh —
+  sketch with toggleable per-cell data. **Phases 2 and 3 were EXTRACTED to Tasks 145 and 146 on
+  2026-07-27 and are no longer tracked here** — Phase 2 = the feasibility-gated Google Maps
+  elevation/length helper (isolated, lazy-loaded, core solve never depends on it); Phase 3 = looped
+  (Hardy Cross) networks, originally "conditional, uncommitted, only after we're map-mashup experts
+  or users ask." **Filing lesson (Tom, 2026-07-27):** leaving unbuilt phases inside a `- 0|…|` block
+  in `## Completed` means nothing will ever surface them again — closed blocks are not scanned during
+  prioritization, so the only retrieval mechanism was Tom personally remembering. Future work must
+  never be parked inside a DONE block; extract it to its own task, even if the priority is low and
+  the gate is unmet. Springboards off Irrigation-Pressure (`ip_`) but built fresh —
   **do not extract or degrade `ip`**. This is a **core-hydraulics** calculator in Tom's home
   authority, so the 4-axis mission-expansion framework above does not gate it. Candidate prefix
   `bpn_` (claimed 2026-07-23). Full spec: `dev/branched-network-calculator-scope.md`.

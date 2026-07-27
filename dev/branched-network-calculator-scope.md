@@ -168,6 +168,13 @@ optionally a spatial data view second.
   expert at the map mashup (loops need a map to stay sane) **or** if users ask for it. Brings back
   iteration (Hardy-Cross et al.); do not start it before the map is solid.
 
+> **Tracking note (2026-07-27):** Phases 2 and 3 are now **ROADMAP Tasks 145 and 146**, extracted
+> because Task 137 closed and unbuilt phases parked inside a completed block never resurface during
+> prioritization. The phase descriptions above remain the design spec; the roadmap tasks carry the
+> priority and the gate. Task 146 also notes that Phase 3's gate is an **OR** — the "users ask"
+> branch may be satisfied independently of the map work by Task 144's Hazen-Williams finding, in
+> which case "do not start it before the map is solid" no longer binds.
+
 ## Honesty / framing
 
 - Distributary/branched only; **no loops** — state plainly so users don't expect EPANET behavior.
