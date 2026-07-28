@@ -19,7 +19,7 @@ function echoHeader($type="normal", $html_title = "", $html_head = "", $show_nam
     **/
 function echoHTMLHead($type, $html_title, $html_head, $show_name_field = true) {
 
-global $ec_lang, $clanguage;
+global $ec_lang, $clanguage, $all_language_settings;
 $html_lang = isset($clanguage) ? $clanguage : 'en';
 $html_dir  = in_array($html_lang, ['ar', 'fa', 'he', 'ps', 'ur']) ? ' dir="rtl"' : '';
 $calc_name = $show_name_field ? trim($_GET['name'] ?? '') : '';
@@ -36,6 +36,24 @@ $page_title = $calc_name ? $safe_name . ' — ' . $html_title : $html_title;
 	<?=$html_head?>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title><?=$calc_name ? $safe_name . ' — ' . $html_title : $html_title?></title>
+<?php
+// Canonical + hreflang (ROADMAP Task 149). Emitted here, in the one function every page's
+// <head> passes through, so all 23 pages get it at once and a new calculator gets it for free.
+//
+// The canonical is self-referencing: this page in the language actually being served. That is
+// what gives each ?lang=xx URL an identity of its own; the bare URL (no lang parameter) simply
+// canonicalises to whichever language it negotiated, so it consolidates instead of competing.
+// x-default points at the English URL rather than the bare one, precisely because the bare URL
+// is not self-canonical -- an x-default aimed at a URL that canonicalises elsewhere is a signal
+// Google is entitled to ignore. Naming ?lang=en for both en and x-default is explicitly allowed.
+$ec_canonical = ec_canonical_url($html_lang);
+?>
+	<link rel="canonical" href="<?=htmlspecialchars($ec_canonical, ENT_QUOTES, 'UTF-8')?>" />
+<?php foreach ($all_language_settings as $ec_alt_lang => $ec_alt_settings) : ?>
+	<link rel="alternate" hreflang="<?=$ec_alt_lang?>" href="<?=htmlspecialchars(ec_canonical_url($ec_alt_lang), ENT_QUOTES, 'UTF-8')?>" />
+<?php endforeach; ?>
+	<link rel="alternate" hreflang="x-default" href="<?=htmlspecialchars(ec_canonical_url('en'), ENT_QUOTES, 'UTF-8')?>" />
+<?php unset($ec_alt_lang, $ec_alt_settings); ?>
 	<link rel="manifest" href="/engcalcs/manifest.json">
 	<meta name="theme-color" content="#1a6faf">
 	<meta name="apple-mobile-web-app-capable" content="yes">

@@ -26,6 +26,14 @@ define('DEBUG_MODE', getenv('APP_ENV') === 'development');
 
 define('BASE_DIRECTORY', $basedirectory);
 
+// The one origin every canonical/hreflang/sitemap URL is built from (ROADMAP Task 149).
+// Deliberately NOT derived from $_SERVER['HTTP_HOST']: that is client-supplied, so a spoofed
+// Host header would emit a poisoned <link rel="canonical"> pointing search engines off-site.
+// The server currently answers on all four of http/https x www/non-www with no redirect, so
+// this constant is the only thing telling Google which one to index. Non-www https matches the
+// form used in 27 of the 29 hard-coded site URLs across the repo and the parent site.
+define('CANONICAL_ORIGIN', 'https://hawsedc.com');
+
 // Language demand log — stored in log/ at the project root, blocked from HTTP by log/.htaccess.
 // Each line: ISO-8601 UTC timestamp TAB lang-code TAB source TAB page-basename
 //   source='get'     explicit ?lang=XX selection — logged every occurrence

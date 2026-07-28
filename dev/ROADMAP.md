@@ -10,7 +10,7 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 ## Calculator Improvements
 
-- 45|144| **Diagnose the Hazen-Williams conversion leak.** Per the 2026-07-27 usage snapshot
+- 15|144| **Diagnose the Hazen-Williams conversion leak.** Per the 2026-07-27 usage snapshot
   (`dev/usage-data-log.md`), HW draws 580 confirmed-human views — the suite's second-biggest genuine
   front door, at 18% human-of-reach vs Darcy-Weisbach's 4% — but only 11% of those humans ever
   calculate, against a 51–67% band on six comparable pages (and DW's 37% on a structurally identical
@@ -241,24 +241,41 @@ circling one question — *is Manning valid for full/pressurized pipe, and is R 
 impressions, zero clicks; and one query was `"kikokotoo" -site:reddit.com …`, the Swahili word taken
 straight from `lib/lang.ec.sw.php`, i.e. an agent searching our own translated string.
 
-- 55|149|[CC] **Non-English pages are effectively absent from the search index — fix `hreflang`,
-  canonical, and sitemap.** Root cause: one URL serves every language, chosen at request time by
-  cookie / `Accept-Language` (`lib/Language.lib.php`). `?lang=xx` URLs exist (emitted by the language
-  dropdown in `lib/Menus.lib.php:148`) but **nothing declares them** — no `hreflang`, no `canonical`,
-  and `hawsedc.com/sitemap.xml` returns 404 (verified 2026-07-27). Googlebot crawls from US IPs with
-  `Accept-Language: en`, so it indexes the English rendering of every calculator and the other 26
-  languages never enter the index. **This suppresses all 26 non-English languages, not just Spanish** —
-  which makes it a mission problem (reach), not merely an SEO one. Diagnostic signature in the data:
-  `calculo de canales trapezoidal online` ranks **position 2.8 with 0% CTR** (34 impressions);
-  `formula de manning` 80 impressions, position 8.8, zero clicks. Ranking well while converting zero
-  is what a language-mismatched snippet looks like — Google knows the page is topically right and
-  shows a Spanish searcher an English snippet. **Decided (Tom, 2026-07-27): keep `?lang=xx` as the
-  canonical URL form** — "fine and simple for now" — rather than moving to `/es/…` paths; cheaper,
-  reversible, needs no rewrite rules. Work: emit `<link rel="alternate" hreflang="xx">` for all 27
-  languages plus `x-default`, and a self-referencing `<link rel="canonical">`, from `echoHTMLHead()`
-  in `lib/HeadersFooters.lib.php` — one function, every page at once. Then generate `sitemap.xml`
-  (every calculator × every language). **This is the highest-reach item on the board**; do it before
-  any content-level SEO work, since descriptions on unindexed URLs buy nothing.
+- 50|155|[H] **Deploy and verify the Task 149 search-index fix.** Extracted from 149 on close,
+  2026-07-28, rather than left as a to-do inside a closed block. Status:
+  1. ~~Upload `../sitemap.xml` to the site root~~ — **DONE 2026-07-28**, verified live: 200, 66 KB,
+     543 `<loc>` entries, `sewslope.php` and `peakfact.php` both present. Regenerate with
+     `php dev/scripts/generate_sitemap.php` whenever pages or languages change, then re-upload.
+  2. ~~Add `Sitemap: https://hawsedc.com/sitemap.xml` to the live `robots.txt`~~ — **DONE
+     2026-07-28**, verified live. (That file is at the site root and is **not** in the local `../`
+     copy; it carries a long `Disallow:` list for `/hawsedc/phpGedView/` that a locally-rebuilt file
+     would drop, so it must be edited in place.)
+  3. ~~Submit the sitemap in Google Search Console~~ — **DONE 2026-07-28** (Tom).
+  4. **Push the app code to production — still outstanding as of the commit that closed 149.** The
+     sitemap went up by hand, but `canonical`/`hreflang` come from the PHP; until a `git pull` runs
+     on the server, Google is crawling 543 sitemap URLs that carry no alternate-language
+     relationship at all. Confirm with:
+     `curl -s "https://hawsedc.com/engcalcs/Manning-Pipe-Flow.php?lang=es" | grep -c hreflang`
+     — expect 28, not 0.
+  5. **One canonical origin — decided 2026-07-28.** Search Console reports on `https://hawsedc.com`,
+     which matches `CANONICAL_ORIGIN` in `lib/config.inc.php`, so no constant change is needed. Tom
+     is adding a 301 at the parent-site root `.htaccess` (server-side, not in this repo). **The
+     motive is not SEO** — the canonical tag already handles Google. It is that
+     `lib/Language.lib.php` sets `ec_language`/`ec_blang` with `'secure' => true`, and browsers
+     reject `Secure` cookies over plain http; with all four of http/https × www/non-www answering
+     200 and no redirect or HSTS (verified 2026-07-28), **a visitor who arrives on `http://` loses
+     language persistence entirely** — they pick Spanish and get English again next visit. That is a
+     defect in the exact feature this task exists to serve. Two hazards recorded for whoever tests
+     it: if the host terminates SSL at a proxy, `%{HTTPS}` is always `off` inside Apache and the
+     naive rule loops infinitely (hence the `X-Forwarded-Proto` companion condition), and a
+     subdirectory `.htaccess` overrides a parent's mod_rewrite rules *when it defines rewrite
+     directives of its own* — `engcalcs/.htaccess` currently has none, so the parent rule should
+     reach the calculators, but that is worth confirming rather than trusting. HSTS deliberately
+     **not** bundled in: browsers cache the policy for its full max-age and it cannot be recalled.
+  6. **Then verify, no sooner than a few weeks out:** `site:hawsedc.com inurl:lang=es` should start
+     returning results, and the Task 149 diagnostic query `calculo de canales trapezoidal online`
+     (position 2.8, 0% CTR) should begin converting. That query is the cleanest single tell that the
+     fix worked, because it already ranks — only the snippet language is wrong.
 
 - 40|150|[CC] **Every page's meta description is just its own title repeated.** All 23 pages build
   `$html_head` with `<meta name="Description" content="'. $html_title .'" />`. Google routinely
@@ -279,10 +296,10 @@ straight from `lib/lang.ec.sw.php`, i.e. an agent searching our own translated s
   `hawsedc.com/sewslope.php` already has Table 1 (minimum slope, 4″–96″), Table 2 (slope by Manning n
   and target velocity), and the 2–3 ft/s cleansing-velocity basis. **Do not build a calculator for
   this** — it would duplicate parent-site content, which is against standing policy. The doc's actual
-  defects (verified live 2026-07-27): **no meta description** (title tag only), **no sitemap entry**
-  (site has no sitemap at all — see Task 149), and **inches-only, English-only while the demand is
-  neither**. The single largest query in the whole export is `4 inch sewer pipe minimum slope **in
-  mm**` (135 impressions, 0.74% CTR); add `6 inch … in mm`, `8 inch … in mm`, `pendiente mínima
+  defects (verified live 2026-07-27): **no meta description** (title tag only), ~~no sitemap entry~~
+  (**fixed by Task 149** — both files are in `sitemap.xml`, uploaded and submitted 2026-07-28), and
+  **inches-only, English-only while the demand is neither**. The single largest query in the whole
+  export is `4 inch sewer pipe minimum slope **in mm**` (135 impressions, 0.74% CTR); add `6 inch … in mm`, `8 inch … in mm`, `pendiente mínima
   tubería pvc sanitaria`, `kanalizasyon eğim tablosu`, `tabela de inclinação de esgoto`. The table
   answers every one of them and none of them can read it. Cheap high-yield fix: add an SI column
   (mm/m or %) to Table 1, write a real meta description, cross-link from Manning Pipe Flow.
@@ -380,6 +397,41 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|149|[CC] **Non-English pages were effectively absent from the search index — `hreflang`,
+  canonical, and sitemap now emitted. DONE 2026-07-28.** Root cause: one URL served every language,
+  chosen at request time by cookie / `Accept-Language` (`lib/Language.lib.php`). `?lang=xx` URLs
+  existed (language dropdown, `lib/Menus.lib.php:148`) but **nothing declared them** — no `hreflang`,
+  no `canonical`, and `hawsedc.com/sitemap.xml` returned 404. Googlebot crawls from US IPs with
+  `Accept-Language: en`, so it indexed the English rendering of every calculator and the other 26
+  languages never entered the index — a mission problem (reach), not merely an SEO one. Diagnostic
+  signature in the 2026-07-27 Search Console export: `calculo de canales trapezoidal online` ranked
+  **position 2.8 with 0% CTR** (34 impressions); `formula de manning` 80 impressions, position 8.8,
+  zero clicks — ranking well while converting zero is what a language-mismatched snippet looks like.
+  **Decided (Tom, 2026-07-27): `?lang=xx` stays the canonical URL form** rather than `/es/…` paths.
+  What shipped:
+  - `ec_canonical_url($lang)` in `lib/Language.lib.php`, built from **`SCRIPT_NAME`, not `PHP_SELF`
+    or `REQUEST_URI`** — either of those would let a visitor's own URL nominate itself as canonical
+    via trailing `PATH_INFO` or arbitrary query junk. Every parameter except `lang` is dropped, which
+    also stops `?name=` (the bookmark/share label) from minting an indexable variant per label.
+    `/index.php` collapses to the directory URL.
+  - `CANONICAL_ORIGIN` in `lib/config.inc.php` — **deliberately not `$_SERVER['HTTP_HOST']`**, which
+    is client-supplied: a spoofed `Host` would emit a canonical pointing search engines off-site.
+  - `echoHTMLHead()` in `lib/HeadersFooters.lib.php` emits a self-referencing `<link rel="canonical">`
+    plus 27 `hreflang` alternates and `x-default`, so all 23 pages got it in one edit and a new
+    calculator gets it for free. **`x-default` points at `?lang=en`, not the bare URL**: the bare URL
+    is not self-canonical (it canonicalises to whatever it negotiated), and an `x-default` aimed at a
+    URL that canonicalises elsewhere is a signal Google may ignore. Naming `?lang=en` for both `en`
+    and `x-default` is explicitly permitted.
+  - `dev/scripts/generate_sitemap.php` → `../sitemap.xml`, 543 URLs (20 pages × 27 languages + 3
+    parent-site pages). Languages are read from `Language.Settings.php`, so adding a language needs no
+    second edit. `sewslope.php` and `peakfact.php` are included on purpose — Task 151's "no sitemap
+    entry" defect, fixed here. The sitemap does **not** repeat the hreflang set as `xhtml:link`; the
+    HTML head already carries it, and repeating it would multiply the file ~27× for no added signal.
+  Verified by rendering against a local PHP server: `?lang=es` self-canonicalises, `?name=` is
+  dropped, `?lang=zz` and the bare URL both consolidate to a valid language, `/engcalcs/index.php`
+  collapses to `/engcalcs/`, and the XML parses. **Deploy and verification are Task 155** — nothing
+  reaches Google until the sitemap is uploaded, `robots.txt` names it, and Search Console gets it.
 
 - 0|153| **Resync `template_feedback` — 26 languages brought in line with the reformed
   English. DONE 2026-07-28.** The string was `'Please share your valued words of suggestion or praise.  Did this free calculator

@@ -200,6 +200,35 @@ function chooseLanguage($all_language_settings) {
 }
 
 
+/**
+ * Build the canonical URL of a page in one specific language (ROADMAP Task 149).
+ *
+ * One URL serves every language here, chosen at request time from cookie/Accept-Language, so
+ * without an explicit ?lang=xx in the URL there is nothing for a search engine to index per
+ * language -- Googlebot crawls from US IPs with Accept-Language: en and only ever sees the
+ * English rendering. ?lang=xx is kept as the canonical URL form (decided 2026-07-27) rather than
+ * moving to /es/... paths: cheaper, reversible, and needs no rewrite rules.
+ *
+ * Deliberate choices:
+ *   - SCRIPT_NAME, not PHP_SELF or REQUEST_URI. PHP_SELF carries any trailing PATH_INFO a
+ *     visitor appends, and REQUEST_URI carries the whole query string; either would let an
+ *     arbitrary URL nominate itself as canonical.
+ *   - Every query parameter except lang is dropped. ?name= in particular produces a
+ *     user-labelled variant of the same calculator (see echoHTMLHead) -- those are for
+ *     bookmarking and sharing, not for indexing as separate pages.
+ *   - /index.php collapses to the directory URL, so the suite front page has one address.
+ *
+ * @param string|null $lang  language code; defaults to the language being served
+ * @return string            absolute URL, unescaped (escape at the point of output)
+ */
+function ec_canonical_url($lang = null) {
+    global $clanguage;
+    if ($lang === null) $lang = isset($clanguage) ? $clanguage : 'en';
+    $path = isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : '/engcalcs/index.php';
+    if (substr($path, -10) === '/index.php') $path = substr($path, 0, -9);
+    return CANONICAL_ORIGIN . $path . '?lang=' . $lang;
+}
+
 $clanguage=chooseLanguage($all_language_settings);
 
 // Reduce language settings to the current language
