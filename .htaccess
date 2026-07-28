@@ -11,3 +11,15 @@ Redirect 301 /engcalcs/lib/Calculators.lib.js /engcalcs/js/Calculators.lib.js
 <FilesMatch "\.(md|txt)$">
     Require all denied
 </FilesMatch>
+
+# Block the .git directory. FilesMatch above matches FILENAMES only, so it never
+# covered this: .git's contents are named config, HEAD, index, objects/ -- none of
+# them start with a dot. Production deploys by `git pull`, so .git is present, and
+# it was fully readable: /engcalcs/.git/ served a browsable index, refs/heads/master
+# gave the tip SHA, and objects/pack/*.pack downloaded intact (verified 2026-07-28).
+# The suite is GPL v3, so published source is not the concern -- the concern is that
+# dev/.htaccess deliberately blocks dev/ over HTTP while the packfiles handed out the
+# same content anyway, plus the reflog carries committer names and addresses.
+# mod_alias, the same override level as the Redirect rules above, so this is known to
+# be permitted here -- unlike Options, which needs a separate AllowOverride grant.
+RedirectMatch 404 "/\.git(/|$)"
