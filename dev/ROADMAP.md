@@ -260,16 +260,6 @@ The rules, sequence, and QA chain for translation work are **not** restated here
   legitimate outcome. Do not fix it silently as a drive-by during other work — the resync is the
   reason it needs deciding rather than doing.
 
-- 30|143| **Move the solver control into the depth label on `mtc_` and `mpf_`, if feasible.** Requested
-  by Tom 2026-07-27. Better UX: rather than a separate solver control sitting apart from the field it
-  acts on, put it inside the depth label itself so the thing you are solving for and the control that
-  solves it are one element. **Plan and discuss before building** — optimal wording and presentation
-  are the substance of this task, not an afterthought, and "if feasible" is real: check that the
-  label markup, the `.ec-help`/`.ec-tip` conventions, and the narrow-column constraints can carry a
-  control without crowding. Applies to Manning Trap Channel (`mtc_`) and Manning Pipe Flow (`mpf_`).
-  **Translate as needed** — any new or reworded string goes through the normal sprint path, and
-  wording should be settled before translation so it is not done twice.
-
 - 60|140| **[H] Get HTML out of language strings where it cannot work, and enforce it mechanically.**
   Design agreed with Tom 2026-07-24; **not started, nothing touched yet.** Written up for future
   review because the session ran low on context — read this whole block before acting.
@@ -410,6 +400,47 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|143|[CC] **Move the solver control into the depth label on `mtc_` and `mpf_` — DONE 2026-07-27.**
+  Requested by Tom 2026-07-27 and built the same day (commit `b3fd396`). The "solve for depth given
+  Q" control was a banner above the form, separated from the field it writes into by the units row
+  and several inputs; it now sits on the second line of that field's own label (`dd0` on
+  Manning-Pipe-Flow, `y` on Manning-Trap), so the thing you are solving for and the control that
+  solves it are one element. Feasible as hoped — the label markup already carried links, tips,
+  radios and a second number input on `mtc_`, and the narrow-column constraint governs the
+  *results* table, not the inputs column.
+  Shipped:
+  - `echoCalculatorForm()` inputs take an optional `'control'` key, rendered **after** `</label>`.
+    This also fixes a pre-existing wart: `mtc_`'s radio groups had been nesting form controls
+    (and nested `<label>`s) inside `<label for=…>`.
+  - `solverControlHtml()` in `lib/Calculators.lib.php` holds the shared control, rendering
+    `[Solve] for Flow, Q = __ [units]`. Same `solver_q` / `solver_qu` / `solver_msg` ids, so
+    **no solver JS logic changed**.
+  - `.ec-solverline` is deliberately plain — no rule, no indent glyph. An arrow glyph would have
+    needed RTL mirroring, and the original `line-height: 2` was being inherited by the Q input and
+    inflating its height.
+  - **One new key, `mpf_solve_for_flow`** (`"for Flow, Q ="`), translated into all 26 languages.
+    The connective is one whole key, never a preposition composed with a separate noun at render
+    time, so word order and case agreement stayed the translator's to decide — case-governed
+    prepositions inflect (ru `для расхода`, uk `для витрати`, cs/hr/sr accusative) and
+    postpositions go where they belong (tr `debi için`, my/ur/hi/ps). Every language reuses its own
+    glossary `flow` term, verified mechanically. `=` was chosen over `:` (Tom): it says only "here
+    comes a value", and unlike a colon it needs no per-language typographic convention.
+  - Four keys retired from all 27 files — `mpf_solve_desc`, `mtc_solve_desc`, `mpf_solve_for_dd0`,
+    `mtc_solve_for_y`. Neither depth label had a tip before the change and neither has one now; an
+    interim attempt to rehome the banner's prose in a label tip was rejected (Tom) as both wrong
+    for the content and unnecessary once the solver is targeted.
+  - **Cookie format bumped to v2 on both pages.** Non-obvious and the main risk in the task: moving
+    the control inside the form makes its Q input and units select form elements holding two
+    *positional* cookie slots, so an unmigrated v1 cookie would fail the slot-count guard in
+    `cookieToForm` and silently reset every returning visitor's saved inputs — on two of the three
+    highest-reach calculators. `insertSolverCookieSlots()` in `js/Cookies.lib.js` splices the slots
+    in at page defaults (`solver_q` is INPUT #6 on MPF, #11 on MTC — the `n_radio` buttons count).
+    Side effect, benign: the target Q now persists like any other field.
+  QA: `lang_syntax_validate.php` clean of the new key; `php -l` clean on all 27 files; payloads
+  regenerated and `--check` FRESH; drift manifest re-baselined; back-translation checked inline per
+  language. **Glossary needed no write-back** — the `flow` entry already carried all 26 terms and no
+  new terminology decision was made.
 
 - 0|138|[CC] **Optimize suite-wide "Related calculators" links — DONE 2026-07-27.** Re-scoped from a
   full cross-cutting graph pass to a handful of links, on the evidence of the 2026-07-27 usage
