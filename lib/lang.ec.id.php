@@ -66,6 +66,7 @@ $ec_lang['template_feedback']='Silakan kirim saran atau pujian. Apakah kalkulato
 $ec_lang['template_printable_title']='Judul Cetak';
 $ec_lang['template_printable_subtitle']='Subjudul Cetak';
 $ec_lang['index_title']='Kalkulator Teknik Gratis Daring';
+$ec_lang['index_meta_desc_plain']='Kalkulator teknik hidraulika gratis untuk pipa, saluran, ambang, dan irigasi. Berjalan di peramban Anda, bisa dipakai luring, dan tersedia dalam 27 bahasa.';
 $ec_lang['calc_set_units']='Atur satuan:';
 $ec_lang['calc_defaults']='Nilai Default';
 $ec_lang['calc_defaults_confirm']='Setel ulang kalkulator ke nilai default asli?';
@@ -158,7 +159,8 @@ $ec_lang['mpf_froude_number']='Bilangan Froude, Fr';
 $ec_lang['mpf_shear_stress']='Tegangan geser rata-rata, τ';
 $ec_lang['mpf_full_flow']='Aliran penuh, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Rasio terhadap aliran penuh, Q/Q<sub>0</sub>';
-$ec_lang['mpf_note_1']='<dl><dt>Ini adalah debit dan kedalaman di dalam pipa yang panjangnya <em>tak terhingga</em>.</dt><dd>Memasukkan aliran ke dalam pipa mungkin memerlukan kedalaman air hulu yang jauh lebih tinggi. Tambahkan setidaknya 1,5 kali tinggi kecepatan untuk memperkirakan kedalaman air hulu, atau <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">lihat tutorial 2 menit saya</a> untuk perhitungan standar air hulu gorong-gorong menggunakan HY-8.</dd>';
+$ec_lang['mpf_note_1']='<dl><dt>Ini adalah debit dan kedalaman di dalam pipa yang panjangnya <em>tak terhingga</em>.</dt><dd>Memasukkan aliran ke dalam pipa mungkin memerlukan kedalaman air hulu yang jauh lebih tinggi. Tambahkan setidaknya 1,5 kali tinggi kecepatan untuk memperkirakan kedalaman air hulu, atau <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">lihat tutorial 2 menit saya</a> untuk perhitungan standar air hulu gorong-gorong menggunakan <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, program gorong-gorong gratis dari Badan Jalan Raya Federal Amerika Serikat (U.S. Federal Highway Administration).</dd>';
+$ec_lang['mpf_sewer_ref']='<dl><dt>Sedang merancang saluran air limbah?</dt><dd>Lihat <a target="_blank" href="/sewslope.php">tabel kemiringan minimum saluran limbah</a> untuk pipa 4 hingga 96 inci (100 hingga 2400 mm), dinyatakan dalam m/m, mm/m, dan persen, serta studi <a target="_blank" href="/peakfact.php">faktor puncak untuk debit sangat rendah</a>. Keduanya adalah dokumen referensi dalam bahasa Inggris saja.</dd></dl>';
 $ec_lang['mpf_solve_button']='Hitung';
 $ec_lang['mpf_solve_for_flow']='untuk debit, Q =';
 $ec_lang['mpf_solver_enter_positive_q']='Masukkan Q target yang positif.';
@@ -179,7 +181,7 @@ $ec_lang['mphl_total_loss']='Kehilangan total, h<sub>L</sub>';
 $ec_lang['mphl_egl_1']='EGL Hilir';
 $ec_lang['mphl_egl_2']='EGL Hulu';
 $ec_lang['mphl_hgl_egl_tip']='Mungkin tidak valid jika pipa tinggi. Lihat catatan.';
-$ec_lang['mphl_note_1']='<dl><dt>Kalkulator ini tidak memperhitungkan elevasi pipa.</dt><dd>Jika HGL turun di bawah bagian atas pipa pada titik mana pun, perhitungan ini mungkin tidak valid.</dd><dt>Untuk kondisi saluran masuk terbuka (gorong-gorong), perlu diperiksa kondisi kendali saluran masuk.</dt><dd>1. HGL hulu harus berada di atas elevasi aliran kedalaman normal hulu (dan lebih tinggi dari pipa!).</dd><dd>2. Air hulu gorong-gorong lebih baik diwakili oleh EGL hulu daripada HGL hulu.</dd><dd>3. Lihat <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">tutorial 2 menit saya</a> untuk perhitungan standar sederhana air hulu gorong-gorong menggunakan HY-8.</dd>';
+$ec_lang['mphl_note_1']='<dl><dt>Kalkulator ini tidak memperhitungkan elevasi pipa.</dt><dd>Jika HGL turun di bawah bagian atas pipa pada titik mana pun, perhitungan ini mungkin tidak valid.</dd><dt>Untuk kondisi saluran masuk terbuka (gorong-gorong), perlu diperiksa kondisi kendali saluran masuk.</dt><dd>1. HGL hulu harus berada di atas elevasi aliran kedalaman normal hulu (dan lebih tinggi dari pipa!).</dd><dd>2. Air hulu gorong-gorong lebih baik diwakili oleh EGL hulu daripada HGL hulu.</dd><dd>3. Lihat <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">tutorial 2 menit saya</a> untuk perhitungan standar sederhana air hulu gorong-gorong menggunakan <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, program gorong-gorong gratis dari Badan Jalan Raya Federal Amerika Serikat (U.S. Federal Highway Administration).</dd><dd>4. Halaman ini hanya menyelesaikan kasus kendali saluran keluar: pipa mengalir penuh, dengan kondisi hilir yang menentukan tinggi tekan. Desain gorong-gorong adalah tugas menentukan apakah kendali saluran masuk atau kendali saluran keluar yang berlaku, jadi gunakan HY-8 kapan pun keduanya mungkin berlaku.</dd>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Saluran Trapesium Manning';
 $ec_lang['mtc_main_title']='Kalkulator Rumus Manning Saluran Trapesium Gratis Daring';
@@ -520,7 +522,7 @@ $ec_lang['ip_pressure_warn']='Tekanan rendah/negatif — periksa kemungkinan kon
 $ec_lang['ip_pressure_warn_short']='Rendah';
 $ec_lang['ip_pressure_high']='Lokasi tekanan tinggi memerlukan reduksi tekanan';
 $ec_lang['ip_pressure_high_short']='Tinggi';
-$ec_lang['ip_max_head']='Tinggi tekan pipa maks.';
+$ec_lang['ip_max_head']='Tek. kerja maks. pipa';
 $ec_lang['ip_max_head_tip']='Jalur yang tekanannya melebihi nilai ini akan ditandai. Biarkan kosong untuk melewati pemeriksaan tekanan tinggi.';
 $ec_lang['ip_h_far']='Tekanan emiter terakhir';
 $ec_lang['ip_q_supply']='<span class="ec-help" title="Debit yang masuk ke jalur pengujian model ini saja — untuk seluruh zona/sistem, lihat Q_zone pada Desain Aplikasi di bawah.">Debit pasokan jalur pengujian, Q<sub>supply</sub> <span class="ec-tip">?</span></span>';

@@ -66,6 +66,7 @@ $ec_lang['template_feedback']='Pošlete nám prosím návrhy nebo pochvalu. Posl
 $ec_lang['template_printable_title']='Tisknutelný název';
 $ec_lang['template_printable_subtitle']='Tisknutelný podtitul';
 $ec_lang['index_title']='Bezplatné inženýrské kalkulačky online';
+$ec_lang['index_meta_desc_plain']='Bezplatné inženýrské kalkulátory pro potrubí, koryta, přelivy a závlahy. Fungují přímo v prohlížeči, pracují offline a jsou dostupné ve 27 jazycích.';
 $ec_lang['calc_set_units']='Nastavit jednotky:';
 $ec_lang['calc_defaults']='Výchozí hodnoty';
 $ec_lang['calc_defaults_confirm']='Resetovat kalkulačku na výchozí hodnoty?';
@@ -158,7 +159,9 @@ $ec_lang['mpf_froude_number']='Froudovo číslo, Fr';
 $ec_lang['mpf_shear_stress']='Průměrné smykové napětí, τ';
 $ec_lang['mpf_full_flow']='Průtok při plném plnění, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Poměr k plnému průtoku, Q/Q<sub>0</sub>';
-$ec_lang['mpf_note_1']='<dl><dt>Toto je průtok a hloubka uvnitř <em>nekonečně dlouhého</em> potrubí.</dt><dd>Aby průtok vůbec vtekl do potrubí, může být zapotřebí výrazně vyšší hloubka vzduté hladiny na vtoku. Pro odhad hloubky vzdutí přičtěte alespoň 1,5násobek rychlostní výšky, nebo <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">zhlédněte můj 2minutový výukový program</a> o standardním výpočtu vzdutí u propustků pomocí HY-8.</dd>';
+$ec_lang['mpf_note_1']='<dl><dt>Toto je průtok a hloubka uvnitř <em>nekonečně dlouhého</em> potrubí.</dt><dd>Aby průtok vůbec vtekl do potrubí, může být zapotřebí výrazně vyšší hloubka vzduté hladiny na vtoku. Pro odhad hloubky vzdutí přičtěte alespoň 1,5násobek rychlostní výšky, nebo <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">zhlédněte můj 2minutový výukový program</a> o standardním výpočtu vzdutí u propustků pomocí programu <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, bezplatného programu pro propustky od Federální správy dálnic USA (U.S. Federal Highway Administration).</dd>';
+
+$ec_lang['mpf_sewer_ref']='<dl><dt>Navrhujete splaškovou kanalizaci?</dt><dd>Viz <a target="_blank" href="/sewslope.php">tabulky minimálního sklonu kanalizace</a> pro potrubí o průměru 4 až 96 palců (100 až 2400 mm), uvedené v m/m, mm/m a procentech, a studii <a target="_blank" href="/peakfact.php">špičkových součinitelů pro velmi nízké průtoky</a>. Oba dokumenty jsou k dispozici pouze v angličtině.</dd></dl>';
 $ec_lang['mpf_solve_button']='Vypočítat';
 $ec_lang['mpf_solve_for_flow']='pro průtok, Q =';
 $ec_lang['mpf_solver_enter_positive_q']='Zadejte kladnou cílovou hodnotu Q.';
@@ -179,7 +182,7 @@ $ec_lang['mphl_total_loss']='Celková ztráta, h<sub>L</sub>';
 $ec_lang['mphl_egl_1']='EGL po proudu';
 $ec_lang['mphl_egl_2']='EGL proti proudu';
 $ec_lang['mphl_hgl_egl_tip']='Nemusí platit, pokud je potrubí vysoko. Viz poznámky.';
-$ec_lang['mphl_note_1']='<dl><dt>Tento kalkulátor nezohledňuje nadmořskou výšku potrubí.</dt><dd>Pokud HGL v kterémkoli bodě klesne pod horní hranu potrubí, nemusí být tento výpočet platný.</dd><dt>Pro podmínku otevřeného vtoku (propustek) je nutné zkontrolovat podmínky vtokového ovládání.</dt><dd>1. HGL proti proudu musí být výše než kóta hladiny při normální hloubce proudění (a výše než potrubí!).</dd><dd>2. Vzdutou hladinu propustku lépe vyjadřuje EGL proti proudu než HGL proti proudu.</dd><dd>3. Viz <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">2minutový výukový program</a> pro jednoduchý standardní výpočet vzdutí u propustků pomocí HY-8.</dd>';
+$ec_lang['mphl_note_1']='<dl><dt>Tento kalkulátor nezohledňuje nadmořskou výšku potrubí.</dt><dd>Pokud HGL v kterémkoli bodě klesne pod horní hranu potrubí, nemusí být tento výpočet platný.</dd><dt>Pro podmínku otevřeného vtoku (propustek) je nutné zkontrolovat podmínky vtokového ovládání.</dt><dd>1. HGL proti proudu musí být výše než kóta hladiny při normální hloubce proudění (a výše než potrubí!).</dd><dd>2. Vzdutou hladinu propustku lépe vyjadřuje EGL proti proudu než HGL proti proudu.</dd><dd>3. Viz <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">2minutový výukový program</a> pro jednoduchý standardní výpočet vzdutí u propustků pomocí programu <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, bezplatného programu pro propustky od Federální správy dálnic USA (U.S. Federal Highway Administration).</dd><dd>4. Tato stránka řeší pouze případ výtokového ovládání: potrubí protéká zcela plné, kdy podmínky po proudu určují vzdutou výšku. Návrh propustku spočívá v rozhodnutí, zda převažuje vtokové, nebo výtokové ovládání, proto použijte HY-8, kdykoli by mohlo převažovat kterékoli z nich.</dd>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Lichoběžníkové koryto Manning';
 $ec_lang['mtc_main_title']='Bezplatný online kalkulátor lichoběžníkového koryta Manning';
@@ -518,7 +521,7 @@ $ec_lang['ip_pressure_warn']='Nízký/záporný tlak — kontrolujte podmínky p
 $ec_lang['ip_pressure_warn_short']='Nízký';
 $ec_lang['ip_pressure_high']='Místa s vysokým tlakem vyžadují redukci tlaku';
 $ec_lang['ip_pressure_high_short']='Vysoký';
-$ec_lang['ip_max_head']='Max. dov. výška potrubí';
+$ec_lang['ip_max_head']='Max. dov. tlak potrubí';
 $ec_lang['ip_max_head_tip']='Řady, jejichž tlak překročí tuto hodnotu, jsou označeny. Ponechte prázdné pro vynechání kontroly vysokého tlaku.';
 $ec_lang['ip_h_far']='Tlak posledního emitoru';
 $ec_lang['ip_q_supply']='<span class="ec-help" title="Průtok vstupující modelovanou testovací cestu pouze, ne celou zónu/systém — viz Q_zone v Návrhu aplikace níže pro systémový celkem.">Průtok vstupu testovací cesty, Q<sub>supply</sub> <span class="ec-tip">?</span></span>';

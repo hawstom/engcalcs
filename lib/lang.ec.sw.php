@@ -67,6 +67,7 @@ $ec_lang['template_feedback']='Tafadhali tutumie mapendekezo au sifa. Je, kikoko
 $ec_lang['template_printable_title']='Kichwa cha Kuchapishwa';
 $ec_lang['template_printable_subtitle']='Kichwa Kidogo cha Kuchapishwa';
 $ec_lang['index_title']='Vikokotoo vya Uhandisi Bure Mtandaoni';
+$ec_lang['index_meta_desc_plain']='Vikokotoo bure vya uhandisi wa majimaji kwa ajili ya mabomba, mifereji, vizingiti vya maji na umwagiliaji. Hufanya kazi kwenye kivinjari chako, hufanya kazi bila mtandao, na vinapatikana katika lugha 27.';
 $ec_lang['calc_set_units']='Weka vitengo:';
 $ec_lang['calc_defaults']='Maadili ya kawaida';
 $ec_lang['calc_defaults_confirm']='Weka upya kikokotoo hadi maadili ya kawaida ya awali?';
@@ -159,7 +160,8 @@ $ec_lang['mpf_froude_number']='Nambari ya Froude, Fr';
 $ec_lang['mpf_shear_stress']='Msongo wastani wa mkato, τ';
 $ec_lang['mpf_full_flow']='Mtiririko kamili, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Uwiano wa mtiririko kamili, Q/Q<sub>0</sub>';
-$ec_lang['mpf_note_1']='<dl><dt>Huu ni mtiririko na kina ndani ya bomba la <em>urefu usio na kikomo</em>.</dt><dd>Kuingiza mtiririko kwenye bomba kunaweza kuhitaji kina cha maji juu ya mlango kinachozidi zaidi. Ongeza angalau mara 1.5 ya kimo cha kasi ili kupata kina hicho, au <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">tazama mafunzo yangu ya dakika 2</a> kwa mahesabu ya kawaida ya maji ya juu ya mkondo ya bomba la kupita ukitumia HY-8.</dd>';
+$ec_lang['mpf_note_1']='<dl><dt>Huu ni mtiririko na kina ndani ya bomba la <em>urefu usio na kikomo</em>.</dt><dd>Kuingiza mtiririko kwenye bomba kunaweza kuhitaji kina cha maji juu ya mlango kinachozidi zaidi. Ongeza angalau mara 1.5 ya kimo cha kasi ili kupata kina hicho, au <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">tazama mafunzo yangu ya dakika 2</a> kwa mahesabu ya kawaida ya maji ya juu ya mkondo ya bomba la kupita ukitumia <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, programu huru ya bomba la kupita kutoka Utawala wa Shirikisho wa Barabara Kuu wa Marekani.</dd>';
+$ec_lang['mpf_sewer_ref']='<dl><dt>Unabuni mfereji wa maji taka?</dt><dd>Angalia <a target="_blank" href="/sewslope.php">majedwali ya mteremko wa chini kabisa wa mfereji wa maji taka</a> kwa bomba la inchi 4 hadi 96 (mm 100 hadi 2400), yaliyotolewa katika m/m, mm/m na asilimia, na utafiti wa <a target="_blank" href="/peakfact.php">vigezo vya kilele kwa mtiririko mdogo sana</a>. Nyaraka zote mbili ni za marejeleo kwa Kiingereza pekee.</dd></dl>';
 $ec_lang['mpf_solve_button']='Suluhisha';
 $ec_lang['mpf_solve_for_flow']='kwa mtiririko, Q =';
 $ec_lang['mpf_solver_enter_positive_q']='Weka Q lengwa chanya.';
@@ -180,7 +182,7 @@ $ec_lang['mphl_total_loss']='Upotevu jumla, h<sub>L</sub>';
 $ec_lang['mphl_egl_1']='EGL ya Chini ya Mkondo';
 $ec_lang['mphl_egl_2']='EGL ya Juu ya Mkondo';
 $ec_lang['mphl_hgl_egl_tip']='Huenda isiwe sahihi ikiwa bomba liko juu. Tazama maelezo.';
-$ec_lang['mphl_note_1']='<dl><dt>Kikokotoo hiki hakizingatii mwinuko wa bomba.</dt><dd>Ikiwa HGL inashuka chini ya sehemu ya juu ya bomba popote, hesabu hii huenda isiwe sahihi.</dd><dt>Kwa hali ya mlango wazi (bomba la kupita), ni lazima kukagua hali za udhibiti wa mlango.</dt><dd>1. HGL ya juu ya mkondo lazima iwe juu ya kiwango cha mtiririko wa kina cha kawaida cha juu ya mkondo (na juu ya bomba!).</dd><dd>2. Maji ya juu ya mkondo ya bomba la kupita yanawakilishwa vizuri zaidi na EGL ya juu ya mkondo kuliko HGL ya juu ya mkondo.</dd><dd>3. Tazama <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">mafunzo yangu ya dakika 2</a> kwa mahesabu rahisi ya kawaida ya maji ya juu ya mkondo ya bomba la kupita ukitumia HY-8.</dd>';
+$ec_lang['mphl_note_1']='<dl><dt>Kikokotoo hiki hakizingatii mwinuko wa bomba.</dt><dd>Ikiwa HGL inashuka chini ya sehemu ya juu ya bomba popote, hesabu hii huenda isiwe sahihi.</dd><dt>Kwa hali ya mlango wazi (bomba la kupita), ni lazima kukagua hali za udhibiti wa mlango.</dt><dd>1. HGL ya juu ya mkondo lazima iwe juu ya kiwango cha mtiririko wa kina cha kawaida cha juu ya mkondo (na juu ya bomba!).</dd><dd>2. Maji ya juu ya mkondo ya bomba la kupita yanawakilishwa vizuri zaidi na EGL ya juu ya mkondo kuliko HGL ya juu ya mkondo.</dd><dd>3. Tazama <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">mafunzo yangu ya dakika 2</a> kwa mahesabu rahisi ya kawaida ya maji ya juu ya mkondo ya bomba la kupita ukitumia <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, programu huru ya bomba la kupita kutoka Utawala wa Shirikisho wa Barabara Kuu wa Marekani.</dd><dd>4. Ukurasa huu hutatua hali ya udhibiti wa mlango wa kutokea pekee: bomba linalotiririsha likiwa limejaa, ambapo hali za chini ya mkondo ndizo huamua kimo. Ubunifu wa bomba la kupita ni kazi ya kuamua kama udhibiti wa mlango wa kuingia au mlango wa kutokea ndio unaotawala, hivyo tumia HY-8 wakati wowote ambapo lolote kati ya hayo linaweza kutokea.</dd>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Mfereji wa Trapezoidi wa Manning';
 $ec_lang['mtc_main_title']='Kikokotoo cha Bure Mtandaoni cha Mfereji wa Trapezoidi wa Fomula ya Manning';
@@ -519,7 +521,7 @@ $ec_lang['ip_pressure_warn']='Shinikizo la chini/hasi — angalia hali za chini 
 $ec_lang['ip_pressure_warn_short']='Chini';
 $ec_lang['ip_pressure_high']='Sehemu zenye shinikizo kubwa zinahitaji kupunguza shinikizo';
 $ec_lang['ip_pressure_high_short']='Juu';
-$ec_lang['ip_max_head']='Kimo cha juu kinachoruhusiwa cha bomba';
+$ec_lang['ip_max_head']='Shinikizo la juu linaloruhusiwa la bomba';
 $ec_lang['ip_max_head_tip']='Mistari ambayo shinikizo lake linazidi thamani hii huwekwa alama. Acha wazi ili kuruka ukaguzi wa shinikizo kubwa.';
 $ec_lang['ip_h_far']='Shinikizo la kituo cha mwisho cha maji';
 $ec_lang['ip_q_supply']='<span class="ec-help" title="Mtiririko unaoingia kwenye njia ya jaribio iliyoigwa tu — kwa eneo/mfumo mzima, angalia Q_zone katika Usanifu wa Matumizi hapa chini.">Mtiririko wa usambazaji wa njia ya jaribio, Q<sub>supply</sub> <span class="ec-tip">?</span></span>';

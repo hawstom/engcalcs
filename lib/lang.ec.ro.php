@@ -65,6 +65,7 @@ $ec_lang['template_feedback']='Trimiteți-ne sugestii sau aprecieri. V-a fost ut
 $ec_lang['template_printable_title']='Titlu tipărit';
 $ec_lang['template_printable_subtitle']='Subtitlu tipărit';
 $ec_lang['index_title']='Calculatoare Inginerești Gratuite Online';
+$ec_lang['index_meta_desc_plain']='Calculatoare gratuite de inginerie hidraulică pentru conducte, canale, deversoare și irigații. Rulează direct în browser, funcționează offline și sunt disponibile în 27 de limbi.';
 $ec_lang['calc_set_units']='Alegeți unitatea de măsură:';
 $ec_lang['calc_defaults']='Valori implicite';
 $ec_lang['calc_defaults_confirm']='Resetează calculatorul la valorile implicite inițiale?';
@@ -157,7 +158,8 @@ $ec_lang['mpf_froude_number']='Numărul Froude, Fr';
 $ec_lang['mpf_shear_stress']='Efortul tangențial mediu, τ';
 $ec_lang['mpf_full_flow']='Debit la plin, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Raport față de debitul la plin, Q/Q<sub>0</sub>';
-$ec_lang['mpf_note_1']='<dl><dt>Acesta este debitul și adâncimea în interiorul unei conducte <em>infinit lungi</em>.</dt><dd>Introducerea debitului în conductă poate necesita o adâncime a apei din amonte semnificativ mai mare. Adăugați cel puțin de 1,5 ori sarcina de viteză pentru a obține adâncimea din amonte sau <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">consultați tutorialul meu de 2 minute</a> pentru calculele standard ale nivelului din amonte ale podețelor folosind HY-8.</dd>';
+$ec_lang['mpf_note_1']='<dl><dt>Acesta este debitul și adâncimea în interiorul unei conducte <em>infinit lungi</em>.</dt><dd>Introducerea debitului în conductă poate necesita o adâncime a apei din amonte semnificativ mai mare. Adăugați cel puțin de 1,5 ori sarcina de viteză pentru a obține adâncimea din amonte sau <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">consultați tutorialul meu de 2 minute</a> pentru calculele standard ale nivelului din amonte ale podețelor folosind <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, programul gratuit pentru podețe al Administrației Federale a Autostrăzilor din S.U.A. (U.S. Federal Highway Administration).</dd>';
+$ec_lang['mpf_sewer_ref']='<dl><dt>Proiectați o rețea de canalizare menajeră?</dt><dd>Consultați <a target="_blank" href="/sewslope.php">tabelele cu pantele minime ale canalizării</a> pentru conducte de la 4 la 96 inci (100 până la 2400 mm), date în m/m, mm/m și procente, și studiul <a target="_blank" href="/peakfact.php">factorilor de vârf pentru debite foarte mici</a>. Ambele sunt documente de referință disponibile doar în limba engleză.</dd></dl>';
 $ec_lang['mpf_solve_button']='Calculează';
 $ec_lang['mpf_solve_for_flow']='pentru debit, Q =';
 $ec_lang['mpf_solver_enter_positive_q']='Introduceți un Q țintă pozitiv.';
@@ -178,7 +180,7 @@ $ec_lang['mphl_total_loss']='Pierdere totală, h<sub>L</sub>';
 $ec_lang['mphl_egl_1']='EGL aval';
 $ec_lang['mphl_egl_2']='EGL amonte';
 $ec_lang['mphl_hgl_egl_tip']='Poate să nu fie valid dacă conducta este ridicată. Vedeți notele.';
-$ec_lang['mphl_note_1']='<dl><dt>Acest calculator nu ia în calcul cota conductei.</dt><dd>Dacă HGL coboară sub partea superioară a conductei în orice punct, acest calcul poate să nu fie valid.</dd><dt>Pentru o condiție de intrare deschisă (podeț), este necesar să se verifice condițiile de control la intrare.</dt><dd>1. HGL amonte trebuie să fie deasupra cotei de adâncime normală amonte a curgerii (și mai sus decât conducta!).</dd><dd>2. Nivelul apei din amonte al unui podeț este mai bine reprezentat de EGL amonte decât de HGL amonte.</dd><dd>3. Consultați <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">tutorialul meu de 2 minute</a> pentru calculele simple standard ale nivelului din amonte ale podețelor folosind HY-8.</dd>';
+$ec_lang['mphl_note_1']='<dl><dt>Acest calculator nu ia în calcul cota conductei.</dt><dd>Dacă HGL coboară sub partea superioară a conductei în orice punct, acest calcul poate să nu fie valid.</dd><dt>Pentru o condiție de intrare deschisă (podeț), este necesar să se verifice condițiile de control la intrare.</dt><dd>1. HGL amonte trebuie să fie deasupra cotei de adâncime normală amonte a curgerii (și mai sus decât conducta!).</dd><dd>2. Nivelul apei din amonte al unui podeț este mai bine reprezentat de EGL amonte decât de HGL amonte.</dd><dd>3. Consultați <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">tutorialul meu de 2 minute</a> pentru calculele simple standard ale nivelului din amonte ale podețelor folosind <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, programul gratuit pentru podețe al Administrației Federale a Autostrăzilor din S.U.A.</dd><dd>4. Această pagină rezolvă doar cazul de control la ieșire: o conductă care curge plină, unde condițiile din aval determină sarcina. Proiectarea podețelor înseamnă a decide dacă predomină controlul la intrare sau la ieșire, așa că folosiți HY-8 ori de câte ori oricare dintre cele două ar putea predomina.</dd>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Manning Canal Trapezoidal';
 $ec_lang['mtc_main_title']='Calculator Gratuit Online Formula Manning Canal Trapezoidal';
@@ -518,7 +520,7 @@ $ec_lang['ip_pressure_warn']='Presiune scăzută/negativă — verificați condi
 $ec_lang['ip_pressure_warn_short']='Scăzută';
 $ec_lang['ip_pressure_high']='Presiune ridicată — necesită reducerea presiunii';
 $ec_lang['ip_pressure_high_short']='Ridicată';
-$ec_lang['ip_max_head']='Sarcină max. adm. conductă';
+$ec_lang['ip_max_head']='Presiune max. adm. conductă';
 $ec_lang['ip_max_head_tip']='Tronsoanele a căror presiune depășește această valoare sunt semnalate. Lăsați necompletat pentru a omite verificarea presiunii ridicate.';
 $ec_lang['ip_h_far']='Presiunea ultimului emițător';
 $ec_lang['ip_q_supply']='<span class="ec-help" title="Debitul care intră doar în calea test modelată — pentru întreaga zonă/sistem, vezi Q_zone în Proiectarea Aplicației de mai jos.">Debitul de alimentare al căii test, Q<sub>supply</sub> <span class="ec-tip">?</span></span>';

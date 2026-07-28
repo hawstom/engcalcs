@@ -67,6 +67,7 @@ $ec_lang['template_feedback']='Envie-nos sugestões ou elogios. Esta calculadora
 $ec_lang['template_printable_title']='Título imprimível';
 $ec_lang['template_printable_subtitle']='Subtítulo imprimível';
 $ec_lang['index_title']='Calculadoras de Engenharia Gratuitas Online';
+$ec_lang['index_meta_desc_plain']='Calculadoras gratuitas de engenharia hidráulica para tubulações, canais, vertedouros e irrigação. Funcionam no navegador, offline, e estão disponíveis em 27 idiomas.';
 $ec_lang['calc_set_units']='Definir unidades:';
 $ec_lang['calc_defaults']='Valores padrão';
 $ec_lang['calc_defaults_confirm']='Restaurar calculadora aos valores padrão originais?';
@@ -159,7 +160,8 @@ $ec_lang['mpf_froude_number']='Número de Froude, Fr';
 $ec_lang['mpf_shear_stress']='Tensão de cisalhamento média, τ';
 $ec_lang['mpf_full_flow']='Vazão a seção plena, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Razão em relação à seção plena, Q/Q<sub>0</sub>';
-$ec_lang['mpf_note_1']='<dl><dt>Este é o escoamento e a profundidade no interior de uma tubulação <em>infinitamente longa</em>.</dt><dd>Fazer o escoamento entrar na tubulação pode exigir uma profundidade de água significativamente maior. Acrescente pelo menos 1,5 vezes a carga de velocidade para obter a profundidade de água a montante ou <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">veja meu tutorial de 2 minutos</a> sobre cálculos padrão de nível de água em bueiros usando HY-8.</dd>';
+$ec_lang['mpf_note_1']='<dl><dt>Este é o escoamento e a profundidade no interior de uma tubulação <em>infinitamente longa</em>.</dt><dd>Fazer o escoamento entrar na tubulação pode exigir uma profundidade de água significativamente maior. Acrescente pelo menos 1,5 vezes a carga de velocidade para estimar a profundidade de água a montante, ou <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">veja meu tutorial de 2 minutos</a> sobre cálculos padrão de nível de água em bueiros usando o <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, o programa gratuito de bueiros da Administração Federal de Rodovias dos EUA (U.S. Federal Highway Administration).</dd>';
+$ec_lang['mpf_sewer_ref']='<dl><dt>Projetando um esgoto sanitário?</dt><dd>Veja as <a target="_blank" href="/sewslope.php">tabelas de declividade mínima de esgoto</a> para tubulações de 4 a 96 polegadas (100 a 2400 mm), dadas em m/m, mm/m e porcentagem, e o estudo de <a target="_blank" href="/peakfact.php">fatores de pico para vazões muito baixas</a>. Ambos são documentos de referência somente em inglês.</dd></dl>';
 $ec_lang['mpf_solve_button']='Calcular';
 $ec_lang['mpf_solve_for_flow']='para vazão, Q =';
 $ec_lang['mpf_solver_enter_positive_q']='Informe um Q alvo positivo.';
@@ -180,7 +182,7 @@ $ec_lang['mphl_total_loss']='Perda total, h<sub>L</sub>';
 $ec_lang['mphl_egl_1']='LE a jusante';
 $ec_lang['mphl_egl_2']='LE a montante';
 $ec_lang['mphl_hgl_egl_tip']='Pode não ser válido se a tubulação estiver elevada. Veja as notas.';
-$ec_lang['mphl_note_1']='<dl><dt>Esta calculadora não considera a elevação da tubulação.</dt><dd>Se a LP ficar abaixo do topo da tubulação em algum ponto, este cálculo pode não ser válido.</dd><dt>Para uma condição de entrada aberta (bueiro), é necessário verificar as condições de controle de entrada.</dt><dd>1. A LP a montante deve estar acima da elevação do escoamento à profundidade normal a montante (e acima da tubulação!).</dd><dd>2. O nível de água a montante de um bueiro é melhor representado pela LE a montante do que pela LP a montante.</dd><dd>3. Veja <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">meu tutorial de 2 minutos</a> para cálculos simples de nível de água em bueiros usando HY-8.</dd>';
+$ec_lang['mphl_note_1']='<dl><dt>Esta calculadora não considera a elevação da tubulação.</dt><dd>Se a LP ficar abaixo do topo da tubulação em algum ponto, este cálculo pode não ser válido.</dd><dt>Para uma condição de entrada aberta (bueiro), é necessário verificar as condições de controle de entrada.</dt><dd>1. A LP a montante deve estar acima da elevação do escoamento à profundidade normal a montante (e acima da tubulação!).</dd><dd>2. O nível de água a montante de um bueiro é melhor representado pela LE a montante do que pela LP a montante.</dd><dd>3. Veja <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">meu tutorial de 2 minutos</a> para cálculos simples de nível de água em bueiros usando o <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, o programa gratuito de bueiros da Administração Federal de Rodovias dos EUA (U.S. Federal Highway Administration).</dd><dd>4. Esta página resolve apenas o caso de controle de saída: uma tubulação escoando plena, em que as condições a jusante determinam a carga. O projeto de bueiros é a tarefa de decidir se o controle é de entrada ou de saída, portanto use o HY-8 sempre que qualquer um dos dois puder governar.</dd>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Canal trapezoidal de acordo com Manning';
 $ec_lang['mtc_main_title']='Calculadora gratuita online da fórmula de Manning para canal trapezoidal';
@@ -519,7 +521,7 @@ $ec_lang['ip_pressure_warn']='Pressão baixa/negativa — verificar condições 
 $ec_lang['ip_pressure_warn_short']='Baixa';
 $ec_lang['ip_pressure_high']='Locais com pressão alta precisam de redução de pressão';
 $ec_lang['ip_pressure_high_short']='Alta';
-$ec_lang['ip_max_head']='Carga máx. adm. tubo';
+$ec_lang['ip_max_head']='Pressão máx. adm. tubo';
 $ec_lang['ip_max_head_tip']='Trechos cuja pressão exceder este valor são sinalizados. Deixe em branco para pular a verificação de alta pressão.';
 $ec_lang['ip_h_far']='Pressão do último emissor';
 $ec_lang['ip_q_supply']='<span class="ec-help" title="Fluxo entrando apenas no caminho de teste modelado, não a zona/sistema inteiro — ver Q_zone no Projeto de Aplicação abaixo para o total do sistema.">Vazão de abastecimento do caminho de teste, Q<sub>supply</sub> <span class="ec-tip">?</span></span>';

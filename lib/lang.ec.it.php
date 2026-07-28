@@ -66,6 +66,7 @@ $ec_lang['template_feedback']='Inviateci suggerimenti o elogi. Questo calcolator
 $ec_lang['template_printable_title']='Titolo stampabile';
 $ec_lang['template_printable_subtitle']='Sottotitolo stampabile';
 $ec_lang['index_title']='Calcolatori ingegneristici gratuiti online';
+$ec_lang['index_meta_desc_plain']='Calcolatori gratuiti di ingegneria idraulica per tubazioni, canali, stramazzi e irrigazione. Funzionano nel browser, anche offline, e sono disponibili in 27 lingue.';
 $ec_lang['calc_set_units']='Imposta unità:';
 $ec_lang['calc_defaults']='Valori predefiniti';
 $ec_lang['calc_defaults_confirm']='Ripristinare il calcolatore ai valori predefiniti originali?';
@@ -158,7 +159,8 @@ $ec_lang['mpf_froude_number']='Numero di Froude, Fr';
 $ec_lang['mpf_shear_stress']='Tensione tangenziale media, τ';
 $ec_lang['mpf_full_flow']='Portata a sezione piena, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Rapporto alla portata piena, Q/Q<sub>0</sub>';
-$ec_lang['mpf_note_1']='<dl><dt>Questa è la portata e la profondità all\'interno di una tubazione <em>infinitamente lunga</em>.</dt><dd>L\'immissione della portata nella tubazione può richiedere un\'altezza idraulica significativamente maggiore. Aggiungere almeno 1,5 volte l\'altezza cinetica per l\'altezza idraulica o <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">vedere il tutorial di 2 minuti</a> per i calcoli standard del livello idraulico nei tombini con HY-8.</dd>';
+$ec_lang['mpf_note_1']='<dl><dt>Questa è la portata e la profondità all\'interno di una tubazione <em>infinitamente lunga</em>.</dt><dd>L\'immissione della portata nella tubazione può richiedere un\'altezza idraulica significativamente maggiore. Aggiungere almeno 1,5 volte l\'altezza cinetica per l\'altezza idraulica o <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">vedere il tutorial di 2 minuti</a> per i calcoli standard del livello idraulico nei tombini con <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, il programma gratuito per tombini della U.S. Federal Highway Administration (l\'amministrazione federale delle autostrade degli Stati Uniti).</dd>';
+$ec_lang['mpf_sewer_ref']='<dl><dt>Stai progettando una fognatura nera?</dt><dd>Consulta le <a target="_blank" href="/sewslope.php">tabelle delle pendenze minime delle fognature</a> per tubazioni da 4 a 96 pollici (100 a 2400 mm), espresse in m/m, mm/m e percentuale, e lo studio sui <a target="_blank" href="/peakfact.php">fattori di punta per portate molto basse</a>. Entrambi sono documenti di riferimento solo in inglese.</dd></dl>';
 $ec_lang['mpf_solve_button']='Calcola';
 $ec_lang['mpf_solve_for_flow']='per portata, Q =';
 $ec_lang['mpf_solver_enter_positive_q']='Inserire un valore positivo per Q.';
@@ -179,7 +181,7 @@ $ec_lang['mphl_total_loss']='Perdita di carico totale, h<sub>L</sub>';
 $ec_lang['mphl_egl_1']='EGL a valle';
 $ec_lang['mphl_egl_2']='EGL a monte';
 $ec_lang['mphl_hgl_egl_tip']='Potrebbe non essere valido se la tubazione è in rilievo. Vedere le note.';
-$ec_lang['mphl_note_1']='<dl><dt>Questo calcolatore non tiene conto della quota della tubazione.</dt><dd>Se l\'HGL scende sotto la sommità della tubazione in un qualsiasi punto, questo calcolo potrebbe non essere valido.</dd><dt>Per una condizione di imbocco aperto (tombino), è necessario verificare le condizioni di controllo all\'imbocco.</dt><dd>1. L\'HGL a monte non può essere inferiore alla quota di deflusso a profondità normale a monte (o inferiore alla tubazione!).</dd><dd>2. Il livello idraulico di un tombino è meglio rappresentato dall\'EGL a monte che dall\'HGL a monte.</dd><dd>3. <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">Vedere il tutorial di 2 minuti</a> per semplici calcoli standard del livello idraulico nei tombini con HY-8.</dd>';
+$ec_lang['mphl_note_1']='<dl><dt>Questo calcolatore non tiene conto della quota della tubazione.</dt><dd>Se l\'HGL scende sotto la sommità della tubazione in un qualsiasi punto, questo calcolo potrebbe non essere valido.</dd><dt>Per una condizione di imbocco aperto (tombino), è necessario verificare le condizioni di controllo all\'imbocco.</dt><dd>1. L\'HGL a monte non può essere inferiore alla quota di deflusso a profondità normale a monte (o inferiore alla tubazione!).</dd><dd>2. Il livello idraulico di un tombino è meglio rappresentato dall\'EGL a monte che dall\'HGL a monte.</dd><dd>3. <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">Vedere il tutorial di 2 minuti</a> per semplici calcoli standard del livello idraulico nei tombini con <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, il programma gratuito per tombini della U.S. Federal Highway Administration (l\'amministrazione federale delle autostrade degli Stati Uniti).</dd><dd>4. Questa pagina risolve solo il caso di controllo allo sbocco: una tubazione che scorre a sezione piena, in cui le condizioni a valle determinano il carico idraulico. La progettazione di un tombino consiste nello stabilire se prevale il controllo all\'imbocco o allo sbocco, quindi usare HY-8 ogni volta che entrambi i casi sono possibili.</dd>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Canale trapezoidale Manning';
 $ec_lang['mtc_main_title']='Calcolatore gratuito online formula di Manning canale trapezoidale';
@@ -514,7 +516,7 @@ $ec_lang['ip_pressure_warn']='Pressione bassa/negativa — verificare eventuali 
 $ec_lang['ip_pressure_warn_short']='Bassa';
 $ec_lang['ip_pressure_high']='Pressione alta — necessaria la riduzione della pressione';
 $ec_lang['ip_pressure_high_short']='Alta';
-$ec_lang['ip_max_head']='Carico max. amm. tubo';
+$ec_lang['ip_max_head']='Press. max. amm. tubo';
 $ec_lang['ip_max_head_tip']='Le linee la cui pressione supera questo valore vengono segnalate. Lasciare vuoto per saltare il controllo dell\'alta pressione.';
 $ec_lang['ip_h_far']='Pressione all\'ultimo emettitore';
 $ec_lang['ip_q_supply']='<span class="ec-help" title="Portata in ingresso al solo percorso di prova modellato — per l\'intera zona/sistema, vedere Q_zone in Progettazione dell\'applicazione qui sotto.">Portata di alimentazione del percorso di prova, Q<sub>supply</sub> <span class="ec-tip">?</span></span>';

@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "bn",
-        "expected_key_count": 563,
-        "delta_key_count": 14,
+        "expected_key_count": 565,
+        "delta_key_count": 15,
         "active_prefixes": [
             "bpn",
             "dw",
@@ -413,6 +413,7 @@
     "keys_to_translate": {
         "dw_roughness": "e",
         "mtc_pi_ok_tip": "0.28–0.36 ft (Phillips & Ingersoll, 1998)",
+        "install_android_heading": "Android (Chrome)",
         "install_ios_heading": "iOS (Safari)",
         "rc_sg_ok_tip": "2.54–2.82 (Robinson)",
         "rc_SD_ok_tip": "1.15–1.47 (Robinson)",
@@ -429,6 +430,7 @@
     "keys": {
         "dw_roughness": "e",
         "mtc_pi_ok_tip": "0.28–0.36 ft (Phillips & Ingersoll, 1998)",
+        "install_android_heading": "Android (Chrome)",
         "install_ios_heading": "iOS (Safari)",
         "rc_sg_ok_tip": "2.54–2.82 (Robinson)",
         "rc_SD_ok_tip": "1.15–1.47 (Robinson)",
@@ -472,6 +474,22 @@
                     "key": "mtc_pi_out_of_range",
                     "value": "পরিসরের বাইরে",
                     "english": "Outside range"
+                }
+            }
+        },
+        "install_android_heading": {
+            "reason": "equal_to_english",
+            "current_value": "Android (Chrome)",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "install_intro",
+                    "value": "EngCalcs একটি প্রোগ্রেসিভ ওয়েব অ্যাপ (PWA)। একবার ইনস্টল করলে, সব ক্যালকুলেটর সম্পূর্ণ অফলাইনে কাজ করে — কোনো ইন্টারনেট সংযোগের প্রয়োজন হয় না।",
+                    "english": "EngCalcs is a Progressive Web App (PWA). Once installed, all calculators work fully offline — no internet connection needed."
+                },
+                "next_translated": {
+                    "key": "install_android_steps_html",
+                    "value": "<li>Chrome-এ যেকোনো ক্যালকুলেটর পৃষ্ঠা খুলুন।<\/li><li>উপরের নেভিগেশন বারে <strong>⬇ ইনস্টল<\/strong> বোতামে চাপুন, অথবা ব্রাউজার মেনুতে (⋮) চাপুন এবং <strong>হোম স্ক্রিনে যোগ করুন<\/strong> নির্বাচন করুন।<\/li><li>প্রদর্শিত প্রম্পটে <strong>ইনস্টল<\/strong>-এ চাপুন।<\/li><li>EngCalcs আপনার হোম স্ক্রিনে দেখা যাবে এবং অফলাইনে কাজ করবে।<\/li>",
+                    "english": "<li>Open any calculator page in Chrome.<\/li><li>Tap the <strong>⬇ Install<\/strong> button in the top navigation bar, or tap the browser menu (⋮) and choose <strong>Add to Home screen<\/strong>.<\/li><li>Tap <strong>Install<\/strong> in the prompt that appears.<\/li><li>EngCalcs appears on your home screen and works offline.<\/li>"
                 }
             }
         },

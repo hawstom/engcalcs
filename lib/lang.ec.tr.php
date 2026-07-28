@@ -67,6 +67,7 @@ $ec_lang['template_feedback']='Lütfen önerilerinizi veya beğenilerinizi gönd
 $ec_lang['template_printable_title']='Yazdırılabilir Başlık';
 $ec_lang['template_printable_subtitle']='Yazdırılabilir Alt Başlık';
 $ec_lang['index_title']='Bedava çevrimiçi mühendislik hesaplayıcıları';
+$ec_lang['index_meta_desc_plain']='Boru, kanal, savak ve sulama için ücretsiz hidrolik mühendislik hesaplayıcıları. Tarayıcınızda çalışır, çevrimdışı kullanılabilir ve 27 dilde sunulur.';
 $ec_lang['calc_set_units']='Birimleri ayarla:';
 $ec_lang['calc_defaults']='Varsayılanlar';
 $ec_lang['calc_defaults_confirm']='Hesap makinesini varsayılan değerlere sıfırla?';
@@ -159,7 +160,8 @@ $ec_lang['mpf_froude_number']='Froude sayısı, Fr';
 $ec_lang['mpf_shear_stress']='Ortalama kayma gerilmesi, τ';
 $ec_lang['mpf_full_flow']='Tam akış, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Tam akışa oran, Q/Q<sub>0</sub>';
-$ec_lang['mpf_note_1']='<dl><dt>Bu, <em>sonsuz uzunluktaki</em> bir borunun içindeki akış ve derinliktir.</dt><dd>Akışın boruya girmesi için önemli ölçüde daha yüksek memba derinliği gerekebilir. Memba derinliğini elde etmek için en az 1,5 hız yükü ekleyin ya da HY-8 kullanarak standart menfez memba hesaplamaları için <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">2 dakikalık öğreticime bakın</a>.</dd>';
+$ec_lang['mpf_note_1']='<dl><dt>Bu, <em>sonsuz uzunluktaki</em> bir borunun içindeki akış ve derinliktir.</dt><dd>Akışın boruya girmesi için önemli ölçüde daha yüksek memba derinliği gerekebilir. Memba derinliğini elde etmek için en az 1,5 hız yükü ekleyin ya da standart menfez memba hesaplamaları için <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">2 dakikalık öğreticime bakın</a>; bu hesaplamalarda ABD Federal Karayolları İdaresi\'nin (FHWA) ücretsiz menfez programı olan <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>\'i kullanır.</dd>';
+$ec_lang['mpf_sewer_ref']='<dl><dt>Atıksu kanalizasyon hattı mı tasarlıyorsunuz?</dt><dd>4 ila 96 inç (100 ila 2400 mm) arası borular için m/m, mm/m ve yüzde cinsinden verilen <a target="_blank" href="/sewslope.php">minimum kanalizasyon eğim tablolarına</a> ve çok düşük debiler için <a target="_blank" href="/peakfact.php">tepe debi faktörleri</a> çalışmasına bakın. Her ikisi de yalnızca İngilizce referans belgeleridir.</dd></dl>';
 $ec_lang['mpf_solve_button']='Hesapla';
 $ec_lang['mpf_solve_for_flow']='debi için, Q =';
 $ec_lang['mpf_solver_enter_positive_q']='Pozitif bir hedef Q girin.';
@@ -180,7 +182,7 @@ $ec_lang['mphl_total_loss']='Toplam kayıp, h<sub>L</sub>';
 $ec_lang['mphl_egl_1']='Mansap EGL';
 $ec_lang['mphl_egl_2']='Memba EGL';
 $ec_lang['mphl_hgl_egl_tip']='Boru yüksekteyse geçerli olmayabilir. Notlara bakın.';
-$ec_lang['mphl_note_1']='<dl><dt>Bu hesaplayıcı boru kotunu dikkate almaz.</dt><dd>HGL herhangi bir noktada boru üstünün altına düşerse, bu hesaplama geçerli olmayabilir.</dd><dt>Açık giriş (menfez) koşulunda, giriş kontrolü koşullarının kontrol edilmesi gerekir.</dt><dd>1. Memba HGL\'si, memba normal derinlik akış kotundan (veya borudan) düşük olamaz.</dd><dd>2. Bir menfezin memba su yüzü, memba HGL\'sinden ziyade memba EGL\'si ile daha iyi temsil edilir.</dd><dd>3. HY-8 kullanarak basit standart menfez memba hesaplamaları için <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">2 dakikalık öğreticime bakın</a>.</dd>';
+$ec_lang['mphl_note_1']='<dl><dt>Bu hesaplayıcı boru kotunu dikkate almaz.</dt><dd>HGL herhangi bir noktada boru üstünün altına düşerse, bu hesaplama geçerli olmayabilir.</dd><dt>Açık giriş (menfez) koşulunda, giriş kontrolü koşullarının kontrol edilmesi gerekir.</dt><dd>1. Memba HGL\'si, memba normal derinlik akış kotundan (veya borudan) düşük olamaz.</dd><dd>2. Bir menfezin memba su yüzü, memba HGL\'sinden ziyade memba EGL\'si ile daha iyi temsil edilir.</dd><dd>3. Basit standart menfez memba hesaplamaları için <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">2 dakikalık öğreticime bakın</a>; bu hesaplamalarda ABD Federal Karayolları İdaresi\'nin (FHWA) ücretsiz menfez programı olan <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>\'i kullanır.</dd><dd>4. Bu sayfa yalnızca çıkış kontrolü durumunu çözer: mansap koşullarının yükü belirlediği, tam dolu akan bir boru. Menfez tasarımı, giriş kontrolünün mü yoksa çıkış kontrolünün mü geçerli olduğuna karar vermeyi gerektirir; bu yüzden ikisinden biri geçerli olabiliyorsa HY-8 kullanın.</dd>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Manning Trapezoidal Kanal';
 $ec_lang['mtc_main_title']='Ücretsiz Çevrimiçi Manning Formülü Trapezoidal Kanal Hesaplayıcısı';
@@ -520,7 +522,7 @@ $ec_lang['ip_pressure_warn']='Düşük/negatif basınç — atmosfer altı koşu
 $ec_lang['ip_pressure_warn_short']='Düşük';
 $ec_lang['ip_pressure_high']='Yüksek basınçlı yerlerde basınç düşürme gerekir';
 $ec_lang['ip_pressure_high_short']='Yüksek';
-$ec_lang['ip_max_head']='İzin ver. maks. boru yükü';
+$ec_lang['ip_max_head']='İzin ver. maks. boru basıncı';
 $ec_lang['ip_max_head_tip']='Basıncı bu değeri aşan hatlar işaretlenir. Yüksek basınç kontrolünü atlamak için boş bırakın.';
 $ec_lang['ip_h_far']='Son damlatıcı basıncı';
 $ec_lang['ip_q_supply']='<span class="ec-help" title="Sadece modellenen test yoluna giren debi, tüm bölge/sistem değil — Uygulama Tasarımı aşağısında Q_zone için bkz.">Test yolu beslenme debisi, Q<sub>supply</sub> <span class="ec-tip">?</span></span>';

@@ -67,6 +67,7 @@ $ec_lang['template_feedback']='Envíenos sugerencias o elogios. ¿Le resultó ú
 $ec_lang['template_printable_title']='Título Imprimible';
 $ec_lang['template_printable_subtitle']='Subtítulo Imprimible';
 $ec_lang['index_title']='Calculadoras para ingenieros gratis en línea';
+$ec_lang['index_meta_desc_plain']='Calculadoras hidráulicas gratuitas para tuberías, canales, vertederos y riego. Funcionan en su navegador, sin conexión a internet, y están disponibles en 27 idiomas.';
 $ec_lang['calc_set_units']='Cambiar sistema de medidas:';
 $ec_lang['calc_defaults']='Valores predeterminados';
 $ec_lang['calc_defaults_confirm']='¿Restablecer la calculadora a los valores predeterminados originales?';
@@ -159,7 +160,8 @@ $ec_lang['mpf_froude_number']='Número de Froude, Fr';
 $ec_lang['mpf_shear_stress']='Tensión tangencial promedio, τ';
 $ec_lang['mpf_full_flow']='Caudal lleno, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Relación de caudales, Q/Q<sub>0</sub>';
-$ec_lang['mpf_note_1']='<dl><dt>Este es el caudal (y la profundidad) dentro de una tubería <em>de longitud infinita</em>.</dt><dd>Lograr que el caudal entre en la tubería puede requerir una profundidad de agua de entrada (cabezal) bastante mayor. Agregue por lo menos 1,5 veces la carga de velocidad para estimar la profundidad de agua de entrada, o <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">vea mi tutorial de 2 minutos</a> sobre los cálculos estándar de cabezal de entrada en alcantarillas usando HY-8.</dd>';
+$ec_lang['mpf_note_1']='<dl><dt>Este es el caudal (y la profundidad) dentro de una tubería <em>de longitud infinita</em>.</dt><dd>Lograr que el caudal entre en la tubería puede requerir una profundidad de agua de entrada (cabezal) bastante mayor. Agregue por lo menos 1,5 veces la carga de velocidad para estimar la profundidad de agua de entrada, o <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">vea mi tutorial de 2 minutos</a> sobre los cálculos estándar de cabezal de entrada en alcantarillas usando <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, el programa gratuito de alcantarillas de la Administración Federal de Carreteras de los Estados Unidos.</dd>';
+$ec_lang['mpf_sewer_ref']='<dl><dt>¿Está diseñando un alcantarillado sanitario?</dt><dd>Vea las <a target="_blank" href="/sewslope.php">tablas de pendiente mínima de alcantarillado</a> para tuberías de 4 a 96 pulgadas (100 a 2400 mm), expresadas en m/m, mm/m y porcentaje, y el estudio de <a target="_blank" href="/peakfact.php">factores pico para caudales muy bajos</a>. Ambos son documentos de referencia solo en inglés.</dd></dl>';
 $ec_lang['mpf_solve_button']='Calcular';
 $ec_lang['mpf_solve_for_flow']='para caudal, Q =';
 $ec_lang['mpf_solver_enter_positive_q']='Ingrese un Q objetivo positivo.';
@@ -180,7 +182,7 @@ $ec_lang['mphl_total_loss']='Pérdida total, h<sub>L</sub>';
 $ec_lang['mphl_egl_1']='EGL aguas abajo';
 $ec_lang['mphl_egl_2']='EGL aguas arriba';
 $ec_lang['mphl_hgl_egl_tip']='Puede no ser válido si la tubería está elevada. Véanse las notas.';
-$ec_lang['mphl_note_1']='<dl><dt>Esta calculadora no tiene en cuenta la elevación de la tubería.</dt><dd>Si el HGL desciende por debajo de la parte superior de la tubería en algún punto, este cálculo puede no ser válido.</dd><dt>Para una entrada abierta (alcantarilla), es necesario verificar las condiciones de control de entrada.</dt><dd>1. El HGL aguas arriba debe estar por encima de la cota de flujo a profundidad normal aguas arriba (¡y por encima de la tubería!).</dd><dd>2. El cabezal de una alcantarilla se representa mejor con el EGL aguas arriba que con el HGL aguas arriba.</dd><dd>3. Véase <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">mi tutorial de 2 minutos</a> para cálculos estándar sencillos de cabezal en alcantarillas usando HY-8.</dd>';
+$ec_lang['mphl_note_1']='<dl><dt>Esta calculadora no tiene en cuenta la elevación de la tubería.</dt><dd>Si el HGL desciende por debajo de la parte superior de la tubería en algún punto, este cálculo puede no ser válido.</dd><dt>Para una entrada abierta (alcantarilla), es necesario verificar las condiciones de control de entrada.</dt><dd>1. El HGL aguas arriba debe estar por encima de la cota de flujo a profundidad normal aguas arriba (¡y por encima de la tubería!).</dd><dd>2. El cabezal de una alcantarilla se representa mejor con el EGL aguas arriba que con el HGL aguas arriba.</dd><dd>3. Véase <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">mi tutorial de 2 minutos</a> para cálculos estándar sencillos de cabezal en alcantarillas usando <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, el programa gratuito de alcantarillas de la Administración Federal de Carreteras de los Estados Unidos.</dd><dd>4. Esta página resuelve solo el caso de control de salida: una tubería que fluye llena, donde las condiciones aguas abajo determinan el cabezal. El diseño de alcantarillas consiste en decidir si predomina el control de entrada o el control de salida, así que use HY-8 siempre que cualquiera de los dos pueda predominar.</dd>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Canal trapecial según Manning';
 $ec_lang['mtc_main_title']='Calculadora gratis en línea de la fórmula de Manning para canal trapecial';
@@ -517,7 +519,7 @@ $ec_lang['ip_pressure_warn']='Presión baja/negativa — verificar condiciones s
 $ec_lang['ip_pressure_warn_short']='Baja';
 $ec_lang['ip_pressure_high']='Los puntos de presión alta necesitan reducción de presión';
 $ec_lang['ip_pressure_high_short']='Alta';
-$ec_lang['ip_max_head']='Carga máx. adm. tubería';
+$ec_lang['ip_max_head']='Presión máx. adm. tubería';
 $ec_lang['ip_max_head_tip']='Se marcan los tramos cuya presión supere este valor. Déjelo en blanco para omitir la verificación de alta presión.';
 $ec_lang['ip_h_far']='Presión del último emisor';
 $ec_lang['ip_q_supply']='<span class="ec-help" title="Caudal que ingresa a la ruta de prueba modelada solo, no a toda la zona/sistema — ver Q_zone en Diseño de Aplicación abajo para el total del sistema.">Caudal de suministro de ruta de prueba, Q<sub>supply</sub> <span class="ec-tip">?</span></span>';

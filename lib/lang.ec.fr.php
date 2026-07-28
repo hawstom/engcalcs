@@ -68,6 +68,7 @@ $ec_lang['template_feedback']='Envoyez-nous vos suggestions ou vos éloges. Ce c
 $ec_lang['template_printable_title']='Titre imprimable';
 $ec_lang['template_printable_subtitle']='Sous-titre imprimable';
 $ec_lang['index_title']='Calculateurs d\'ingénierie gratuits en ligne';
+$ec_lang['index_meta_desc_plain']='Calculateurs gratuits d\'ingénierie hydraulique pour conduites, canaux, déversoirs et irrigation. Ils fonctionnent dans votre navigateur, hors ligne, et sont disponibles en 27 langues.';
 $ec_lang['calc_set_units']='Définir les unités:';
 $ec_lang['calc_defaults']='Valeurs par défaut';
 $ec_lang['calc_defaults_confirm']='Réinitialiser le calculateur aux valeurs par défaut d\'origine ?';
@@ -160,7 +161,8 @@ $ec_lang['mpf_froude_number']='Nombre de Froude, Fr';
 $ec_lang['mpf_shear_stress']='Contrainte de cisaillement moyenne, τ';
 $ec_lang['mpf_full_flow']='Débit à section pleine, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Rapport au débit à section pleine, Q/Q<sub>0</sub>';
-$ec_lang['mpf_note_1']='<dl><dt>Il s\'agit du débit (et de la profondeur) à l\'intérieur d\'une conduite de <em>longueur infinie</em>.</dt><dd>Faire entrer le débit dans la conduite peut nécessiter une charge amont nettement plus élevée. Ajoutez au moins 1,5 fois la charge cinétique pour obtenir la charge amont, ou <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">consultez mon tutoriel de 2 minutes</a> pour les calculs standard de charge amont de buse avec HY-8.</dd>';
+$ec_lang['mpf_note_1']='<dl><dt>Il s\'agit du débit (et de la profondeur) à l\'intérieur d\'une conduite de <em>longueur infinie</em>.</dt><dd>Faire entrer le débit dans la conduite peut nécessiter une charge amont nettement plus élevée. Ajoutez au moins 1,5 fois la charge cinétique pour obtenir la charge amont, ou <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">consultez mon tutoriel de 2 minutes</a> pour les calculs standard de charge amont de buse à l\'aide de <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, le logiciel gratuit de calcul de buses de la Federal Highway Administration (administration fédérale des routes) des États-Unis.</dd>';
+$ec_lang['mpf_sewer_ref']='<dl><dt>Vous concevez un égout sanitaire ?</dt><dd>Consultez les <a target="_blank" href="/sewslope.php">tableaux de pente minimale d\'égout</a> pour les conduites de 4 à 96 pouces (100 à 2400 mm), donnés en m/m, mm/m et pourcentage, ainsi que l\'étude sur les <a target="_blank" href="/peakfact.php">facteurs de pointe pour les très faibles débits</a>. Ces deux documents de référence sont uniquement en anglais.</dd></dl>';
 $ec_lang['mpf_solve_button']='Calculer';
 $ec_lang['mpf_solve_for_flow']='pour débit, Q =';
 $ec_lang['mpf_solver_enter_positive_q']='Entrez un Q cible positif.';
@@ -181,7 +183,7 @@ $ec_lang['mphl_total_loss']='Perte de charge totale, h<sub>L</sub>';
 $ec_lang['mphl_egl_1']='LHE aval';
 $ec_lang['mphl_egl_2']='LHE amont';
 $ec_lang['mphl_hgl_egl_tip']='Peut ne pas être valide si la conduite est haute. Voir les notes.';
-$ec_lang['mphl_note_1']='<dl><dt>Cet outil de calcul ne tient pas compte de l\'altitude (la cote) de la conduite.</dt><dd>Si la LHP descend sous le sommet de la conduite en un point quelconque, ce calcul peut ne pas être valide.</dd><dt>Pour une entrée libre (buse), il est nécessaire de vérifier les conditions de contrôle à l\'entrée.</dt><dd>1. La LHP amont doit être supérieure à la cote de profondeur normale amont (et plus haute que la conduite elle-même !).</dd><dd>2. La charge amont d\'une buse est mieux représentée par la LHE amont que par la LHP amont.</dd><dd>3. Voir <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">mon tutoriel de 2 minutes</a> pour les calculs simples de charge amont de buse avec HY-8.</dd>';
+$ec_lang['mphl_note_1']='<dl><dt>Cet outil de calcul ne tient pas compte de l\'altitude (la cote) de la conduite.</dt><dd>Si la LHP descend sous le sommet de la conduite en un point quelconque, ce calcul peut ne pas être valide.</dd><dt>Pour une entrée libre (buse), il est nécessaire de vérifier les conditions de contrôle à l\'entrée.</dt><dd>1. La LHP amont doit être supérieure à la cote de profondeur normale amont (et plus haute que la conduite elle-même !).</dd><dd>2. La charge amont d\'une buse est mieux représentée par la LHE amont que par la LHP amont.</dd><dd>3. Voir <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">mon tutoriel de 2 minutes</a> pour les calculs simples et standard de charge amont de buse à l\'aide de <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, le logiciel gratuit de calcul de buses de la Federal Highway Administration (administration fédérale des routes) des États-Unis.</dd><dd>4. Cette page ne résout que le cas du contrôle à la sortie : une conduite en charge sur toute sa longueur, où les conditions aval déterminent la charge. La conception d\'une buse consiste justement à déterminer si c\'est le contrôle à l\'entrée ou à la sortie qui gouverne, donc utilisez HY-8 dès que l\'un des deux cas est possible.</dd>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Canal trapézoïdal Manning';
 $ec_lang['mtc_main_title']='Calculateur gratuit en ligne de la formule Manning pour canal trapézoïdal';
@@ -521,7 +523,7 @@ $ec_lang['ip_pressure_warn']='Pression faible ou négative — vérifiez les con
 $ec_lang['ip_pressure_warn_short']='Faible';
 $ec_lang['ip_pressure_high']='Pression élevée — nécessite une réduction de pression';
 $ec_lang['ip_pressure_high_short']='Élevée';
-$ec_lang['ip_max_head']='Charge adm. max. conduite';
+$ec_lang['ip_max_head']='Pression adm. max. conduite';
 $ec_lang['ip_max_head_tip']='Les tronçons dont la pression dépasse cette valeur sont signalés. Laisser vide pour ignorer le contrôle de pression élevée.';
 $ec_lang['ip_h_far']='Pression du dernier goutteur';
 $ec_lang['ip_q_supply']='<span class="ec-help" title="Débit entrant uniquement dans le cheminement de test modélisé — pour l\'ensemble de la zone/du système, voir Q_zone dans Conception d\'Application ci-dessous.">Débit d\'alimentation du cheminement de test, Q<sub>supply</sub> <span class="ec-tip">?</span></span>';

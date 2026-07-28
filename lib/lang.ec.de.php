@@ -66,6 +66,7 @@ $ec_lang['template_feedback']='Bitte senden Sie uns Anregungen oder Lob. Hat Ihn
 $ec_lang['template_printable_title']='Druckbarer Titel';
 $ec_lang['template_printable_subtitle']='Druckbarer Untertitel';
 $ec_lang['index_title']='Kostenlose Ingenieurrechner online';
+$ec_lang['index_meta_desc_plain']='Kostenlose Ingenieurrechner für Hydraulik: Rohre, Kanäle, Wehre und Bewässerung. Sie laufen im Browser, funktionieren offline und sind in 27 Sprachen verfügbar.';
 $ec_lang['calc_set_units']='Einheiten festlegen:';
 $ec_lang['calc_defaults']='Standardwerte';
 $ec_lang['calc_defaults_confirm']='Rechner auf die ursprünglichen Standardwerte zurücksetzen?';
@@ -158,7 +159,8 @@ $ec_lang['mpf_froude_number']='Froude-Zahl, Fr';
 $ec_lang['mpf_shear_stress']='Mittlere Sohlschubspannung, τ';
 $ec_lang['mpf_full_flow']='Vollfüllung, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Füllungsverhältnis, Q/Q<sub>0</sub>';
-$ec_lang['mpf_note_1']='<dl><dt>Dies ist der Durchfluss und die Tiefe innerhalb eines <em>unendlich langen</em> Rohres.</dt><dd>Um den Durchfluss in das Rohr zu leiten, kann eine erheblich höhere Oberwassertiefe erforderlich sein. Addieren Sie mindestens das 1,5-fache der Geschwindigkeitshöhe zur Oberwassertiefe oder <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">sehen Sie das 2-Minuten-Tutorial</a> für Standard-Durchlassberechnungen mit HY-8.</dd>';
+$ec_lang['mpf_note_1']='<dl><dt>Dies ist der Durchfluss und die Tiefe innerhalb eines <em>unendlich langen</em> Rohres.</dt><dd>Um den Durchfluss in das Rohr zu leiten, kann eine erheblich höhere Oberwassertiefe erforderlich sein. Addieren Sie mindestens das 1,5-fache der Geschwindigkeitshöhe zur Oberwassertiefe oder <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">sehen Sie das 2-Minuten-Tutorial</a> für Standard-Durchlassberechnungen mit <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, dem kostenlosen Durchlassprogramm der US-amerikanischen Bundesstraßenverwaltung (FHWA).</dd>';
+$ec_lang['mpf_sewer_ref']='<dl><dt>Planen Sie einen Schmutzwasserkanal?</dt><dd>Siehe die <a target="_blank" href="/sewslope.php">Tabellen für das Mindestgefälle von Abwasserkanälen</a> für Rohre von 4 bis 96 Zoll (100 bis 2400 mm), angegeben in m/m, mm/m und Prozent, sowie die Studie <a target="_blank" href="/peakfact.php">Spitzenfaktoren für sehr geringe Durchflüsse</a>. Beide sind Referenzdokumente ausschließlich in englischer Sprache.</dd></dl>';
 $ec_lang['mpf_solve_button']='Berechnen';
 $ec_lang['mpf_solve_for_flow']='für Durchfluss, Q =';
 $ec_lang['mpf_solver_enter_positive_q']='Geben Sie ein positives Ziel-Q ein.';
@@ -179,7 +181,7 @@ $ec_lang['mphl_total_loss']='Gesamtverlust, h<sub>L</sub>';
 $ec_lang['mphl_egl_1']='EGL flussabwärts';
 $ec_lang['mphl_egl_2']='EGL flussaufwärts';
 $ec_lang['mphl_hgl_egl_tip']='Möglicherweise nicht gültig, wenn das Rohr hoch liegt. Siehe Hinweise.';
-$ec_lang['mphl_note_1']='<dl><dt>Dieser Rechner berücksichtigt die Rohrhöhenlage nicht.</dt><dd>Liegt die HGL an irgendeiner Stelle unter der Rohroberkante, ist diese Berechnung möglicherweise nicht gültig.</dd><dt>Für einen offenen Einlauf (Durchlass) müssen die Einlaufsteuerungsbedingungen geprüft werden.</dt><dd>1. Die HGL flussaufwärts muss über der normalen Fließtiefe flussaufwärts liegen (und höher als das Rohr!).</dd><dd>2. Der Oberwasserstand eines Durchlasses wird besser durch die EGL flussaufwärts als durch die HGL flussaufwärts dargestellt.</dd><dd>3. Sehen Sie <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">das 2-Minuten-Tutorial</a> für einfache Standard-Durchlassberechnungen mit HY-8.</dd>';
+$ec_lang['mphl_note_1']='<dl><dt>Dieser Rechner berücksichtigt die Rohrhöhenlage nicht.</dt><dd>Liegt die HGL an irgendeiner Stelle unter der Rohroberkante, ist diese Berechnung möglicherweise nicht gültig.</dd><dt>Für einen offenen Einlauf (Durchlass) müssen die Einlaufsteuerungsbedingungen geprüft werden.</dt><dd>1. Die HGL flussaufwärts muss über der normalen Fließtiefe flussaufwärts liegen (und höher als das Rohr!).</dd><dd>2. Der Oberwasserstand eines Durchlasses wird besser durch die EGL flussaufwärts als durch die HGL flussaufwärts dargestellt.</dd><dd>3. Sehen Sie <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">das 2-Minuten-Tutorial</a> für einfache Standard-Durchlassberechnungen mit <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, dem kostenlosen Durchlassprogramm der US-amerikanischen Bundesstraßenverwaltung (FHWA).</dd><dd>4. Diese Seite löst nur den Fall der Auslasssteuerung: ein vollständig durchströmtes Rohr, bei dem die Bedingungen flussabwärts die Höhe (den Druck) vorgeben. Bei der Durchlassbemessung muss entschieden werden, ob Einlauf- oder Auslasssteuerung maßgebend ist; verwenden Sie daher HY-8, wann immer beides infrage kommen könnte.</dd>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Trapezprofil-Kanal Manning';
 $ec_lang['mtc_main_title']='Kostenloser Online-Rechner Trapezkanal Manning-Formel';
@@ -387,7 +389,7 @@ $ec_lang['ip_pressure_warn']='Niedriger/negativer Druck — auf subatmosphärisc
 $ec_lang['ip_pressure_warn_short']='Niedrig';
 $ec_lang['ip_pressure_high']='Hoher Druck — Druckminderung erforderlich';
 $ec_lang['ip_pressure_high_short']='Hoch';
-$ec_lang['ip_max_head']='Max. zul. Druckhöhe';
+$ec_lang['ip_max_head']='Max. zul. Druck';
 $ec_lang['ip_max_head_tip']='Leitungen, deren Druck diesen Wert überschreitet, werden markiert. Leer lassen, um die Prüfung auf zu hohen Druck zu überspringen.';
 $ec_lang['ip_h_far']='Druck am letzten Emitter';
 $ec_lang['ip_q_supply']='<span class="ec-help" title="Durchfluss, der nur in den modellierten Testpfad eintritt — für die gesamte Zone/das System siehe Q_zone unter Anwendungsauslegung weiter unten.">Versorgungsdurchfluss des Testpfads, Q<sub>supply</sub> <span class="ec-tip">?</span></span>';

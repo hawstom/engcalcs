@@ -1984,3 +1984,61 @@ the low-quarter DU entry).
 Tasks 126/127/130/131/133/134. Those are recorded in `dev/ROADMAP.md`'s `## Completed` section
 instead; only Task 129 is written up here because stage 5 explicitly deferred it to "its own
 investigation."
+
+### Task 159 — 5-key resync/fill sprint, all 26 languages — 2026-07-28
+
+Authorized by Tom in-session the same day the task was created (he had asked whether translation
+debt was tracked anywhere; it was not, so Task 159 was opened to be that watch, then executed).
+
+**Scope: 5 keys × 26 languages = 130 strings.**
+- *Stale (English edited after translation, caught by `detect_english_drift.php`):* `ip_max_head`,
+  `mpf_note_1`, `mphl_note_1`.
+- *New (caught by the payload delta):* `index_meta_desc_plain`, `mpf_sewer_ref`.
+
+**Method:** explicit-key-slice sprint, 26 Sonnet agents, one per language, driven off a hand-specified
+key list — NOT the payload delta, which is blind to stale-but-present keys (same rationale as Tasks
+129/130/131). Pre-sprint gate run and passed: payloads regenerated, `--check` = FRESH, exit 0.
+
+**The `ip_max_head` terminology decision (Task 142) was the substantive content of this sprint.**
+Tom decided 2026-07-28 to reconcile the label/tip mismatch on **pressure**, not head — overruling
+CC's recommendation, which had leaned on two prior glossary notes saying "keep it dimensionally a
+head." Agents were given the glossary entries and told to use their own language's natural
+pipe-pressure-rating term and explicitly *not* to calque the English. **All 26 complied.** Every
+language produced a genuine pressure term; none rendered it as a mechanical stress or material
+strength, which was the documented risk. Notable: `id` chose *tekanan kerja* ("working pressure"),
+the phrase actually printed on Indonesian PVC pipe; `sw` moved from *kimo* (head) to *shinikizo*,
+already the file's established pressure word.
+
+**QA (all four steps, in order):**
+1. `php -l` — clean on all 26.
+2. `lang_syntax_validate.php` over all 27 files — **zero hard findings**; 181 `identical-to-english`,
+   all advisory (see ROADMAP Task 161 for why that count cannot reach zero).
+3. Independent structural re-verification by the orchestrator — **not** agent self-reports: key
+   presence, tag-set parity vs English, entity leakage, tags-in-plain-text-key, href survival, link
+   counts, residual English. All 26 pass.
+4. Back-translation semantic check — performed inline by the orchestrator (no `ANTHROPIC_API_KEY`),
+   per the no-skip rule; each agent also returned a back-translation of `ip_max_head` and
+   `index_meta_desc_plain`.
+5. **Glossary write-back (v1.18 → v1.19):** `pressure rating` and `maximum allowable head` re-populated
+   with all 26 new labels and given a dated decision note. The stale head-era values were still
+   present and were caught by the **bn agent**, which flagged them as out of its own edit scope
+   rather than silently leaving them — the write-back rule working as intended.
+6. Drift manifest re-baselined (`--update`): 3 re-synced, 2 added. **Standing debt is now zero.**
+
+**Process notes worth carrying forward:**
+- **Under-launch:** the first wave was 20 agents, not 26 — the six low-resource languages (am, bn, km,
+  my, ps, sw) were missed and needed a second wave. Count the list against `lib/Language.Settings.php`
+  before spawning.
+- **Two agents reported `failed`** (km: stalled stream; my: session limit). Per the standing
+  session-limit rule the files were diffed *before* relaunching: `my` was missing one key, `km` three.
+  Two narrow finishing agents closed them; a full re-run of either would have been wasted spend and
+  would have risked overwriting good work.
+- **`glossary.json` reformat hazard:** a write-back script using `JSON_PRETTY_PRINT` (4-space) against
+  the file's 2-space convention rewrote all 2,612 lines and buried the real change. Halve the
+  indentation when rewriting that file.
+- **Most of the payload delta was not real work.** Agents repeatedly reported that the Group 3/4 keys
+  already existed correctly; the generator counts identical-to-English as delta. Real work was 5 keys
+  per language, matching the drift tripwire's count, not the delta's. See ROADMAP Task 161.
+- **One agent judgment worth honouring:** zh already had `bpn_id` as 编号 (a real translation) rather
+  than a bare "ID". It left it and asked rather than overwriting — correct; the "copy verbatim"
+  instruction was too blunt for that key.

@@ -10,6 +10,53 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 ## Calculator Improvements
 
+- 25|162|[H] **Rebuild the unit presets around real-world usage: "US" and "SI" buttons, and honest
+  per-page defaults.** Tom's direction, 2026-07-28, arising from the Task 144 Hazen-Williams analysis
+  but explicitly **not** HW-specific: *"I think there could be big across-the-board gains from paying
+  closer attention to [defaults and units]."* Recorded verbatim because this was a design decision
+  taken in conversation and would otherwise have been lost.
+  **Tom's stated position (his words, condensed):** the current unit sets are *"more or less honest,
+  but also largely inappropriate."* There is more horizontal room now, so **button labels can be
+  longer**, and they can carry **button tips / `?` tips**. He wants to **add "US" and "SI" buttons and
+  maybe retire the old four**, and to **default to US**. He raised having formal definitions attached
+  to "US defaults" and "SI defaults" buttons, and offered to **take a turn himself setting defaults he
+  considers realistic**. He called it *"a big change, but I think maybe it's right"* and *"could be a
+  big project. Just thinking for now"* — so **this is a direction, not yet an authorization to build.**
+  **Two concrete defects in the existing `in` preset, found by reading `EngCalcs.setUnits` and
+  `lib/Units.lib.php` (2026-07-28) — these are facts, not opinions:**
+  1. **`setUnits` walks the set in order and sets `option.selected = true` on every matching option,
+     so later entries silently overwrite earlier ones.** The `in` set is
+     `[in, ft/s, gpm, in², psi, inH₂O, ft³, kW]`; on any field offering both `psi` and `inH₂O` — which
+     is every head-loss field on `hw_`/`dw_`/`mphl_` — psi is selected first and then **inH₂O
+     overwrites it**. A waterline or fire-sprinkler engineer who clicks "in" gets head loss in *inches
+     of water*, which nobody quotes.
+  2. **The `in` preset maps every length field to inches, including pipe length.** A 1,000 ft main
+     renders as 12,000 in.
+  **Root cause:** unit sets are **one-dimensional** — one unit per quantity, matched by *translated
+  label text* across all selects — while real practice is **per-field**: diameter in inches, length in
+  feet, loss in psi. The present mechanism cannot express that, which is why this is a rebuild rather
+  than a re-ordering.
+  **Three architectures, with their translation cost — the choice gates everything else:**
+  - **(A)** Keep the four presets; only reorder each page's `units` arrays so the *initial* selection
+    is right. Cheapest, **zero new strings**, but the preset buttons stay wrong.
+  - **(B)** Keep the same four buttons, but let a page declare what "in"/"ft" mean *for its own
+    fields*. Fixes both defects suite-wide, still **zero new strings**.
+  - **(C)** New named presets ("US", "SI") with tips — **Tom's stated preference**. Needs new language
+    keys for the button labels and tips, so it must be batched into a translation sprint.
+  **Two facts that de-risk this:** (i) the `in` unit set already maps to in/gpm/psi/ft², so the US
+  vocabulary exists and needs no new unit definitions; (ii) **the cookie stores each select's option
+  *value* (the conversion factor), not its index** — so reordering a page's `units` arrays cannot
+  corrupt a returning user's saved settings. Default changes reach **first-time visitors only**, which
+  is exactly the population Task 144 is about.
+  **Open questions for Tom before any build:** (1) which architecture, A/B/C; (2) the canonical default
+  case per page — he offered to set these himself, and they are engineering judgment, not something to
+  invent; (3) scope — HW only, the top three by reach (MPF + HW + MTC = 92% of all human views), or
+  all 15 pages. **Do not build against reciprocity/completeness reasoning** — reach-weighting is why
+  Task 138 was cut down.
+  **Caution carried from Task 144:** Hazen-Williams is standard practice in Brazil and Mexico as well
+  as the US, so a metric Latin American segment may exist in the traffic. Pull the HW query export
+  before defaulting the whole suite to US.
+
 - 15|144| **Diagnose the Hazen-Williams conversion leak.** Per the 2026-07-27 usage snapshot
   (`dev/usage-data-log.md`), HW draws 580 confirmed-human views — the suite's second-biggest genuine
   front door, at 18% human-of-reach vs Darcy-Weisbach's 4% — but only 11% of those humans ever
@@ -38,6 +85,83 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   2026-07-27); a confirmed finding here promotes it. Weigh this against the mundane usability causes above before
   committing; a scope explanation is more flattering to the suite than a defect explanation, which is
   precisely why it deserves evidence and not assumption.
+  **CC analysis 2026-07-28 (source read, no fix attempted — task is below the priority cutoff).**
+  Tom raised five candidate causes; four die on one filter. **`Hazen-Williams.php`,
+  `Darcy-Weisbach.php` and `Manning-Pipe-Head-Loss.php` are structurally near-identical** — verified
+  by reading all three: same inputs (`q`=1, `d`=1, `l`=1000, `km`=2.0, `egl1`=0), same SI-first unit
+  lists, same EGL/HGL result rows, same tips. They differ only in the roughness input (C vs e+ν vs n)
+  and DW's extra Reynolds/regime/f rows. **Anything identical across pages cannot explain why HW sits
+  at 11% while its twins sit at 37% and 58%.** That kills, as *page-design* explanations: (1)
+  pressure-vs-head — every head field on all three already offers psi/kPa/bar/mH2O, so pressure is
+  available today and the elevation gap is shared; (3) EGL-vs-HGL input; (4) too much on the page.
+  Questions (2) top-down-vs-bottom-up and (5) US defaults survive **only as audience-composition
+  differences, not page differences** — the same metric-first defaults hurt more if HW's audience
+  skews more US than DW's. Note `MPF` converts at **67% with those identical metric defaults**, which
+  is strong evidence they are not independently fatal. Separately: the `in` unit set already maps to
+  in/gpm/psi/ft²/ftps, so "US defaults" needs no new unit work — only a decision about the *initial*
+  selection, which today is simply the first entry in each `units` array.
+  **The task's measurement claim is a non sequitur and should not be relied on.** "Instrumentation is
+  shared and identical across pages, so this is real behavior, not a measurement artifact" — identical
+  instrumentation does not imply identical *traffic composition*. Read what the two tiers actually
+  require (`js/Calculators.lib.js`): **`human` = JS executed + session ≥10s old. Nothing else.**
+  `used` = a *user-triggered recalculation* ≥10s after load. So any visitor that renders JS and dwells
+  but never types — a JS-rendering AI/preview crawler, or **a person reading the page for reference** —
+  inflates `human` and deflates `%used` simultaneously. **HW is precisely the page with the anomalous
+  numerator: 18% human-of-reach against 3–5% for its structural twins.** One traffic-composition cause
+  explains both anomalies at once; no UX fix would ever move it.
+  **Sixth hypothesis, not previously on the list, and it fits the data better than the others:
+  "Hazen-Williams" names a *formula*, not a task.** People search it to look up the **equation or the
+  C coefficient**, not necessarily to compute — and the page links out to a C-value table. Those
+  visits are *satisfied*, not lost, and would be miscounted as a leak by construction. (DW is also a
+  formula name but draws 4% human-of-reach, i.e. it is not pulling that reference crowd at scale.)
+  **Cheapest decisive next step, and it is observation not guessing:** pull the **HW page's own query
+  export** from Search Console — the same source that produced the sewer-slope query data in Task 151.
+  If the queries are `hazen williams c values` / `formula` / `equation`, this is reference demand and
+  the right response is to put a C-value table *on the page* (turning a bounce into a satisfied visit,
+  possibly into a calculation) — not a network solver. If they are `hazen williams calculator` /
+  `pipe pressure loss calculator`, it is a real UX leak and Task 146 gets its evidence. **Do not
+  promote Task 146 on the strength of the 11% number alone** — that number does not yet distinguish
+  the two.
+  **Tom's correction, 2026-07-28 — the three pages do not share an audience, so the "identical pages"
+  filter above is weaker than CC presented it.** Tom's domain model: **`mphl_` is a storm drain and
+  culvert calculator, `hw_` is a waterline calculator, and `dw_` is what engineers outside the US
+  use.** That is correct, and it changes the weighting: identical page design does not license
+  expecting identical conversion, because the same default can be neutral for one audience and
+  disqualifying for another. CC's filter was valid only in its narrow form — *any* explanation must
+  run through an audience difference — but CC ranked the audience-difference survivors (Tom's Q2 and
+  Q5) as weak when this domain model makes them the **leading** candidates.
+  **Why HW is the page where SI-first defaults cost the most.** Hazen-Williams is empirical,
+  water-only, and its user base is unusually unit-monolingual: US municipal water distribution (AWWA)
+  and **NFPA 13 fire-sprinkler hydraulics, which mandates Hazen-Williams by name**, both work
+  natively and almost exclusively in **gpm, psi, inches, feet**. So the arriving visitor's expected
+  input set is the `in` unit set, and the page opens on `m3ps`/`m`/`mh2o`. Worse than the units is the
+  **scale**: the default q = 1 m³/s is **15,850 gpm** through a 1 m (39") main — a city transmission
+  line — when a typical arrival wants a 6" main at 400 gpm. Every field is wrong *and* off by a
+  factor of ~40. A DW visitor, being metric already, changes numbers; an HW visitor must change four
+  unit dropdowns *and* four numbers before the page says anything true. The `C` default of 100 ("old
+  pipe") compounds it — new-main practice is 130–140, NFPA wants 120 (steel) or 150 (CPVC).
+  **A page difference CC missed by comparing HW only to DW/MPHL and not to the pages that convert:
+  `Manning-Pipe-Flow.php` and `Manning-Trap.php` are the only two calculators in the suite with an
+  inverse solver** (`solverControlHtml`), and they are the two highest converters (67%, 61%). HW, DW,
+  MPHL, IP and Orifice have none. This is Tom's Q2 (top-down vs bottom-up) as a concrete, checkable
+  asymmetry: a waterline designer's actual job is *sizing* — given flow, length and allowable loss,
+  find the diameter — which matches the suite's own design-not-analysis principle, and HW offers only
+  the forward direction. **It is not a complete explanation** — MI/MPHL/WFS/WFI convert at 51–59%
+  with no solver — but it is the one structural difference between HW and the 67% page, and it was
+  absent from the five hypotheses.
+  **What to ask the query export, given the domain model.** Segment HW's queries for: (a) fire
+  protection (`sprinkler`, `NFPA`, `fire flow`, `friction loss psi`) — a large US audience with rigid
+  unit expectations; (b) unit words (`gpm`, `psi`, `inch`) — direct confirmation of Q5; (c) sizing
+  intent (`pipe size for`, `water main sizing`) — direct confirmation of Q2; (d) `c factor` /
+  `c value` — the reference-lookup reading, which Tom does not buy and which this export can settle
+  either way; (e) Spanish/Portuguese (`pérdida de carga`, `perda de carga`) — Hazen-Williams is also
+  standard practice in Latin America, so a non-US metric segment may be present and would argue
+  *against* flipping defaults wholesale.
+  **Cheap candidate intervention, if the export supports Q5:** default `Hazen-Williams.php` to the
+  `in` unit set with a realistic waterline scale (e.g. 6", 400 gpm, 1000 ft, C = 130). This needs
+  **no new translation** — the unit sets already exist and defaults are numbers — making it the
+  cheapest testable change on the board. Do not ship it before the export; per-page default divergence
+  is a real cost and (e) could argue against it.
 - 18|146| **Looped-network (Hardy Cross) solving — was Task 137 "Phase 3", extracted 2026-07-27.**
   Extend `bpn_` (or build alongside it) to solve networks with loops, iterating to convergence —
   the case the shipped branched calculator explicitly excludes ("no loops, no iteration"). Kept
@@ -300,118 +424,55 @@ straight from `lib/lang.ec.sw.php`, i.e. an agent searching our own translated s
   **Task 150 (meta descriptions) is unblocked by this.** It was sequenced behind 149 on the reasoning
   that descriptions on unindexed URLs buy nothing; the URLs are no longer unindexed.
 
-- 30|157| **`index.php` has no meta description at all — the one page reuse could not cover.** Task 150
-  fixed 19 pages for free by pointing `$html_desc` at each page's existing `*_main_desc`. Two pages
-  own no such key: `contact.php` (fine — a utility page with nothing to say in a search result) and
-  **`index.php`, which is the suite's front door**. Its only candidate, `index_title` ("Free Online
-  Engineering Calculators"), *is* the title, so using it would reinstate the exact duplicate-of-title
-  defect Task 150 removed. It therefore emits no description and Google will auto-generate a snippet
-  from a page that is nothing but a menu of links.
-  **Cost if fixed: one key × 26 languages = 26 strings**, which rides the normal payload delta into
-  the next authorized sprint — two orders of magnitude cheaper than the 520-string per-page scheme
-  rejected on 2026-07-28, and aimed at the single page where a description carries the most weight.
-  Write it in Simple English, one or two sentences: what the suite is, who it is for, that it is free
-  and runs in the browser. Name it `index_meta_desc_plain` (the `_plain` suffix is what makes
-  `lang_syntax_validate.php` hold it to Rules A and B; `plainTextBoundKeys()` picks it up from the
-  `$html_desc` assignment). **Decide first whether one page is worth a bespoke key at all** — the
-  standing decision is reuse-or-nothing, and this is the deliberate exception to it, not a reopening.
-
-- 35|151| **The sewer-slope demand is already answered — by a tech doc nobody can find.** ~950
-  impressions at 0.5% CTR across 169 slope/grade queries, and **there is no content gap**:
-  `hawsedc.com/sewslope.php` already has Table 1 (minimum slope, 4″–96″), Table 2 (slope by Manning n
-  and target velocity), and the 2–3 ft/s cleansing-velocity basis. **Do not build a calculator for
-  this** — it would duplicate parent-site content, which is against standing policy. The doc's actual
-  defects (verified live 2026-07-27): **no meta description** (title tag only), ~~no sitemap entry~~
-  (**fixed by Task 149** — both files are in `sitemap.xml`, uploaded and submitted 2026-07-28), and
-  **inches-only, English-only while the demand is neither**. The single largest query in the whole
-  export is `4 inch sewer pipe minimum slope **in mm**` (135 impressions, 0.74% CTR); add `6 inch … in mm`, `8 inch … in mm`, `pendiente mínima
-  tubería pvc sanitaria`, `kanalizasyon eğim tablosu`, `tabela de inclinação de esgoto`. The table
-  answers every one of them and none of them can read it. Cheap high-yield fix: add an SI column
-  (mm/m or %) to Table 1, write a real meta description, cross-link from Manning Pipe Flow.
-  **Note the cross-link is one-directional already** — `sewslope.php` links *to*
-  `engcalcs/Manning-Pipe-Flow.php`; what is missing is the calculator linking *back* to the doc.
-  **Same story for `hawsedc.com/peakfact.php`** — has the Harmon formula plus genuinely original
-  low-flow research (peaking factors derived from the UPC for 10–300 person systems), links to zero
-  calculators, draws 62 impressions / 1 click.
-  **Edit location — settled 2026-07-27.** Both files live on the parent site, **not in this
-  repository**, but Tom has brought the production sources local to
-  `/var/www/cnm/public_html/hawsedc/` (i.e. `../` from the repo root): **`../sewslope.php` and
-  `../peakfact.php` are where they get edited.** That directory is outside the repo and is not a git
-  repo itself, so there is exactly one local copy, git never sees it, and no drift trap is created —
-  Tom uploads the edited files to deploy. **Do not stage copies under `dev/`.** Also note: fetching
-  the live *rendered* HTML is not a substitute for the source — these are PHP pages with
-  include-driven header/footer, so anything rebuilt from rendered output would silently flatten into
-  a static file.
-  **`../hawsedc.lib.php` is editable — authorized by Tom, 2026-07-27.** An earlier draft of this task
-  treated it as a possibly-stale dev shim to be diffed against production first; that blocker is
-  **withdrawn**. Edit it directly along with the two page files.
-  **How to add the meta descriptions:** `echoHawsEDCHeader(string $title)` currently takes a title and
-  nothing else, so it cannot emit a per-page `<meta name="description">` as written. Add an **optional
-  second parameter** (`$description = ''`) and emit the tag only when it is non-empty — backward
-  compatible, so every other page on the parent site that still calls the function with one argument
-  keeps working untouched. Then pass a real description from `sewslope.php` and `peakfact.php`.
-  **Still true of the neighbours:** `edc.lib.php`, `hawsedc.css` and `index.php` in `../` are local
-  dev shims, not verified against production — do not upload those.
-  If parent-site edits become frequent, the real fix is putting the parent site under its own version
-  control — a separate decision, not part of this task.
-
-- 20|152| **Link HY-8 itself from the culvert-adjacent notes — and do not build a culvert
-  calculator.** The 3-minute HY-8 QuickStart video is *already* linked from both `mpf_note_1` and
-  `mphl_note_1`; what is missing is a link to **HY-8 itself**, which both notes name in text without
-  pointing anywhere. Add it (FHWA download page) plus one honest sentence on `mphl_` about when that
-  page suffices (outlet control, full flow) and when it does not. **Decision — no culvert calculator
-  (Tom + CC, 2026-07-27).** Three reasons. (1) Reach: culvert is 66 impressions / 2 clicks, the
-  smallest cluster on the board except orifice, against ~950 for sewer slope. (2) `mphl_` is only
-  *like* a culvert calculator for the outlet-control case — culvert design **is** the
-  inlet-vs-outlet-control governance decision, so shipping outlet-control-only is not a subset of
-  HY-8, it is a tool that disagrees with HY-8 exactly where a designer most needs to be right,
-  published under Tom's name against the free FHWA reference. That is the false-precision trap.
-  (3) A real HY-8 clone means the HDS-5 inlet-control nomograph coefficients for every
-  shape/material/edge combination plus validation across that matrix — a serious project for 66
-  impressions. If ever revisited, the scope must be stated as "validated against HY-8", never a
-  partial. **Editing the two notes stales 1–2 keys × 26 languages** (small resync, not a sprint).
+- 15|158| **`sewslope.php` and `peakfact.php` are English-only while the sewer-slope demand is not.**
+  Extracted from Task 151 on close, 2026-07-28 — the one part of that task deliberately left undone.
+  The query export shows real non-English demand for exactly the content `sewslope.php` already has:
+  `pendiente mínima tubería pvc sanitaria`, `kanalizasyon eğim tablosu`, `tabela de inclinação de
+  esgoto`. **Task 151 half-mitigated this** by adding mm diameters and mm/m + percent slope columns:
+  a metric engineer in any language can now read the *numbers*, which is most of what a lookup table
+  is for. What remains untranslated is the prose (introduction, cleansing-velocity basis, headings).
+  **This is a different project from the engcalcs translation pipeline, which is why it was not done
+  inline.** These are parent-site pages: no `$ec_lang`, no language switcher, no payload generator,
+  no drift tripwire — none of the machinery a sprint depends on. Decide the shape *first*, and the
+  cheap options are real ones: three static translated copies (es/tr/pt, matching the observed
+  demand) may beat building any language infrastructure for two documents.
+  **Do not assume this is worth doing** — verify the demand is still there and weigh it against
+  Task 151's finding that these queries already *rank*; the CTR problem may be snippet quality (now
+  fixed) rather than language.
 
 ## Translation Standardization (Glossary Project)
 
 ## Translation improvements
 
-- 20|154| **Scan `lib/lang.ec.tr.php` for ASCII-folded Turkish (missing ş/ğ/ı/İ/ö/ü/ç).** Found
-  while closing Task 153: the pre-resync value of `template_feedback` read `'Lütfen görüslerinizi ve
-  begenileriniz bizimle paylasin. Bu ücretsiz hesap makinesi beklentilerinizi karsilayabildi mi?'` —
-  `görüslerinizi`/`begenileriniz`/`paylasin`/`karsilayabildi` should be
-  `görüşlerinizi`/`beğenileriniz`/`paylaşın`/`karşılayabildi`. Note the fold is *partial*: `Lütfen`
-  and `ücretsiz` kept their diacritics in the same string, so this is not a whole-file encoding
-  problem — it looks like hand-typing on a non-Turkish keyboard in whichever pass wrote those keys.
-  That is why it needs a scan, not a bulk transform: only some keys are affected and only some
-  letters within them. **This key is already fixed** (its Task 153 replacement is correctly
-  accented); the question is how many other tr keys carry the same fold. **Why it matters:** to a
-  Turkish reader a dotless/undotted swap is not a cosmetic accent — `paylasin` vs `paylaşın` is a
-  misspelling, and it silently drags tr's real quality below its recorded `QUALITY` tier in
-  `lib/Language.Settings.php`. **Approach:** grep tr for words containing `s`/`g`/`i`/`c`/`o`/`u`
-  where the Turkish spelling takes the dotted/cedilla form — cheapest as one Sonnet pass over the
-  whole tr file reporting suspect lines, then hand-confirm. Check whether any *other* language file
-  shows the same fold pattern (e.g. ro `ș/ț`, hr/cs/sr diacritics) before assuming tr is unique.
-  No English changes, so no drift and no resync — this is a repair of existing translations only.
+- 25|161| **The payload delta can never reach zero — 15 keys are permanent false positives.**
+  Found while closing Task 159, 2026-07-28. `generate_translation_payloads.php` treats a key whose
+  translation is *byte-identical to English* as needing translation. For 15 keys that is permanently
+  wrong by design, not by neglect:
+  - **Symbols** (`dw_roughness`=e, `ip_length`=L, `ip_diameter`=D, `ip_roughness`=e, `ip_hf`, `ip_hm`,
+    `bpn_id`) — the `symbol` rule requires them identical in every language and script.
+  - **Eponyms** (`bpn_method_hw`, `bpn_method_dw`, `bpn_method_manning`) — surnames, never renamed.
+  - **Brands** (`install_android_heading`, `install_ios_heading`).
+  - **Coincidental cognates** (`dw_regime_laminar`, `or_shape_circular`, `or_shape_rectangular`) —
+    genuinely translated, but Spanish/Portuguese/others land on the same string.
+  **Why this matters more than it looks:** the delta count is the number a sprint proposal is
+  justified with, and "15 keys outstanding" reads as real debt to anyone who has not traced each key.
+  Task 159's sprint proposal had to hand-classify all 15 to avoid 26 agents "translating" the letter
+  `L`. The next session will re-derive that same classification from scratch unless this is fixed.
+  **Fix:** teach the generator an exclusion — either a `symbol`-tag lookup from `$ec_lang_intent`, or
+  an explicit exempt-key list, so `identical-to-english` on an exempt key is not counted as delta.
+  Then **delta zero means zero**, which is the only version of that number worth reading.
+  **Until then, treat 15 as the floor**, and read `detect_english_drift.php` (which has no such
+  blind spot) as the authoritative debt signal.
 
-
-The rules, sequence, and QA chain for translation work are **not** restated here. They live in:
-- **`dev/translation-process.md`** — the SOP: the three scenarios, THE SEQUENCING RULE, the QA chain.
-- **`CLAUDE.md` § "Translation Sprints"** — sprint mechanics, model policy, pre/post-sprint checklist.
-- **`dev/translation-execution-log.md`** — the full dated, category-by-category execution record.
-
-- 25|142| **`ip_max_head`'s label and its own tip name two different quantities.** Split out of Task
-  137 on close, 2026-07-27 (Tom's rule: a loose end left inside a closed task is a lost loose end —
-  either it gets its own task or the parent does not close). The label reads "Max. allow. pipe
-  **head**"; its `?` tip `ip_max_head_tip` reads "Lines whose **pressure** exceeds this value are
-  flagged." Head and pressure are different quantities, and this is a documented trap term whose
-  glossary entry insists the value stays dimensionally a head. **Severity: low — a one-word English
-  wording nit, not a calculation bug, and nothing renders wrong.** Caught during the Task 137 sprint
-  by the sw agent, which translated both faithfully rather than silently reconciling them, so all 26
-  languages now carry the same mismatch. **Cost of fixing:** editing the English stales that one key
-  in 26 languages and needs a 1-key resync (one string × 26 — not a sprint). Decide the wording
-  first; "pressure" in the tip is arguably how engineers actually speak, so leaving it is a
-  legitimate outcome. Do not fix it silently as a drive-by during other work — the resync is the
-  reason it needs deciding rather than doing.
+- 5|160| **`lib/lang.ec.tr.php` disagrees with itself on vowel harmony for the app name.**
+  Extracted from Task 154 on close, 2026-07-28. Three keys write `EngCalcs'i`
+  (`install_main_title`, `install_desktop_steps_html`, `install_cached_body`) and one writes
+  `EngCalcs'ı`. Turkish picks the accusative suffix by the last vowel *as pronounced*, so exactly one
+  form is right and the file ships both. **CC deliberately did not guess** — choosing between them is
+  a native phonological judgment about how a Turkish speaker vocalizes "EngCalcs", and getting it
+  wrong would replace an inconsistency with a uniform error. **Low priority and low stakes:** it is a
+  one-character suffix on a proper noun, affecting only the Install page. Best resolved by whoever
+  next does verified tr work, or by the Task 159 sprint's tr agent as a ride-along question.
 
 ## AI Efficiency Scripting (Overhead)
 
@@ -422,6 +483,159 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|159|[CC] **Translation debt resync sprint — 26 languages, DONE 2026-07-28.** Authorized by Tom
+  in-session. Created earlier the same day when Tom asked whether translation debt was tracked
+  anywhere and it was not; closed the same day.
+  **Scope: 5 keys × 26 languages.** Three stale resyncs — `ip_max_head` (Task 142 label head →
+  pressure), `mpf_note_1` and `mphl_note_1` (Task 152 HY-8 link + outlet-control item) — plus two new
+  keys, `index_meta_desc_plain` (Task 157) and `mpf_sewer_ref` (Task 151).
+  **Method:** explicit-key-slice sprint, 26 Sonnet agents, one per language, driven off a
+  hand-specified key list rather than the payload delta (which is blind to stale-but-present keys).
+  The pre-sprint gate was run: payloads regenerated, `--check` returned FRESH and exit 0.
+  **Result: all 26 pass independent verification.** Not the agents' self-reports — CC re-checked every
+  file directly for key presence, tag-set parity against English, entity leakage, tags in the
+  plain-text meta key, href survival, link counts, and residual English. `php -l` clean on all 26;
+  `lang_syntax_validate.php` across all 27 files shows **zero hard findings** (181
+  `identical-to-english`, all advisory and expected — see Task 161).
+  **The Task 142 terminology decision landed in every language.** All 26 moved off the head word onto
+  a genuine pressure term (Presión / Pression / давление / ضغط / Druck / 压力 / दाब / basınç /
+  tekanan kerja / тиск / налягане / tlak / притисак / فشار / shinikizo / …). None calqued the English;
+  none drifted into a stress or material-strength sense, which was the specific risk the glossary
+  flagged. **Glossary write-back done in the same session** — `pressure rating` and `maximum allowable
+  head` now carry all 26 new labels, replacing the stale head-era values a translating agent correctly
+  flagged as still wrong. Drift manifest re-baselined (`--update`): **debt is zero.**
+  **Three process lessons, recorded because each cost something:**
+  1. **CC under-launched: 20 agents for 26 languages**, missing the six low-resource ones (am, bn, km,
+     my, ps, sw). Nothing was lost — they were launched in a second wave — but the sprint took two
+     launches. Count the language list against `lib/Language.Settings.php` before spawning.
+  2. **The session-limit retry rule paid off again.** Two agents (km, my) reported *failed* — one on a
+     session limit, one on a stalled stream. Per the standing rule, CC checked the files before
+     relaunching: `my` needed only one key, `km` needed three, and neither needed the full 20-key
+     prompt re-run. Two narrow finishing agents closed them. **Never relaunch a "failed" translation
+     agent without diffing its file first.**
+  3. **A JSON write-back can silently reformat the whole glossary.** CC's first write-back re-encoded
+     `glossary.json` with `JSON_PRETTY_PRINT` (4-space) against the file's own 2-space convention,
+     producing a 2,612-line diff that buried the 4 lines of real change. Fixed by re-indenting.
+     **Any script that rewrites `glossary.json` must halve `JSON_PRETTY_PRINT`'s indentation.**
+  **Extracted, not left inside this block:** the payload delta's permanent false-positive floor is
+  **Task 161**.
+
+- 0|151|[CC] **Sewer-slope demand: the doc was findable all along; the real gaps were SI units,
+  no meta description, and no back-link — DONE 2026-07-28.**
+  **The task's own headline was wrong, and Tom corrected it 2026-07-28: `sewslope.php` is *not*
+  unfindable.** Google sends users straight to it — that is where the ~950 impressions across 169
+  slope/grade queries come from. The 0.5% CTR was read as a discovery failure; it is better read as
+  a *satisfaction* failure, because the page ranked, got seen, and did not get clicked. Everything
+  else in the task survived that correction, which is why it still had meat.
+  **Shipped (all in `/var/www/cnm/public_html/hawsedc/`, outside this repo — Tom uploads to deploy):**
+  - `hawsedc.lib.php` — `echoHawsEDCHeader()` gained an optional second parameter
+    `$description = ''`, emitting `<meta name="description">` only when non-empty. Backward
+    compatible: every other parent-site page still calling it with one argument is untouched.
+  - `sewslope.php` — real meta description; **Table 1 rebuilt with SI**: added a pipe-diameter mm
+    column (100–2400 mm, rounded in the same style Table 2 already used) and expressed the same
+    minimum slope in three forms side by side — ratio (m/m or ft/ft), **mm/m**, and **percent**.
+    Added a "note on slope units" paragraph under Table 2 explaining that slope is a dimensionless
+    ratio, so the number is identical in feet and meters; ×1000 gives mm/m, ×100 gives percent.
+  - `peakfact.php` — real meta description naming the Harmon formula and the original 10–300 person
+    UPC-derived low-flow research.
+  - **Back-link added** (`Manning-Pipe-Flow.php` + new `mpf_sewer_ref` key): MPF now points at both
+    `/sewslope.php` and `/peakfact.php`, closing the one-directional link the task identified. This
+    is the single highest-leverage placement available — MPF carries 2,721 human views, 67% of the
+    suite's entire human audience.
+  **A correction to the task's premise: Table 2 already had mm diameters.** The "inches-only" claim
+  was true of Table 1 only. What no table had, and what the top query (`4 inch sewer pipe minimum
+  slope **in mm**`, 135 impressions) actually wants, is the **slope** in a millimeter form — hence
+  mm/m rather than only a diameter column.
+  **Still open, deliberately not done:** the doc is English-only while the demand is not (`pendiente
+  mínima tubería pvc sanitaria`, `kanalizasyon eğim tablosu`, `tabela de inclinação de esgoto`).
+  Translating a parent-site tech doc is a different project from the engcalcs translation pipeline
+  and was not in scope; the SI columns at least make the tables *readable* to a metric engineer in
+  any language, since numbers need no translation. **Extracted to Task 158.**
+  **Not done, by standing policy:** no sewer-slope calculator was built — that would duplicate
+  parent-site content.
+
+- 0|157|[CC] **`index.php` now has a real meta description — DONE 2026-07-28.**
+  The suite's front door was the one page Task 150's reuse trick could not cover, because its only
+  candidate key (`index_title`) *is* the title, and pointing at it would have reinstated the exact
+  duplicate-of-title defect Task 150 removed. It emitted nothing, leaving Google to auto-generate a
+  snippet from a page that is nothing but a menu of links.
+  **Decision taken (the task asked for it explicitly): yes, one bespoke key is warranted here.** The
+  standing rule is reuse-or-nothing; this is the deliberate, single exception, on the page where a
+  description carries the most weight. Cost is 1 key × 26 = 26 strings riding the normal payload
+  delta — two orders of magnitude below the 520-string per-page scheme rejected 2026-07-28.
+  **Shipped:** `index_meta_desc_plain` = "Free hydraulic engineering calculators for pipes, channels,
+  weirs and irrigation. They run in your browser, work offline, and are available in 27 languages."
+  Simple English, 154 characters, no tags, no entities. `index.php` sets `$html_desc` from it.
+  Verified: `lang_syntax_validate.php` clean, `--rule-c` reports no name/derivation disagreement (so
+  `plainTextBoundKeys()` correctly picked the `_plain` key up from the `$html_desc` assignment), and
+  the rendered page emits the tag.
+
+- 0|142|[CC] **`ip_max_head` label vs. tip mismatch — resolved on PRESSURE — DONE 2026-07-28.**
+  The label read "Max. allow. pipe **head**" while its own tip read "Lines whose **pressure**
+  exceeds this value are flagged."
+  **Decision: Tom, 2026-07-28 — change the LABEL to pressure, not the tip to head.** `ip_max_head` is
+  now **"Max. allow. pipe pressure"**; the tip is unchanged, so exactly **one** key stales.
+  **CC initially recommended the opposite and was overruled**, on the strength of two prior glossary
+  notes (2026-07-24, 2026-07-27) recording "keep it dimensionally a head" and confirming all 26
+  translations had been built that way. Tom's call stands on better ground: a pipe **pressure
+  rating** is how irrigation designers actually specify this limit (PVC class 160, PN 10), and the
+  field already offers psi/kPa/bar alongside mH2O/ftH2O — so the label now matches both the trade's
+  vocabulary and what the user is most likely to type.
+  **Scope of the override, recorded precisely:** the underlying quantity and its unit list are
+  **unchanged**. Only this label's English noun changed. The head-vs-pressure guard in the root
+  `head` glossary entry's `avoid` array still holds everywhere else in the suite.
+  **Glossary write-back done in the same session (v1.18 → v1.19)**, per the mandatory-write-back
+  rule: both `maximum allowable head` and `pressure rating` carry a dated note stating the decision,
+  that it supersedes the earlier framing *for this label only*, that all 26 translations are now
+  stale for this key, and that translators should use their own language's natural pipe
+  pressure-rating term (pressure class, PN rating) rather than calquing the English.
+
+- 0|152|[CC] **HY-8 itself is now linked from both culvert-adjacent notes — DONE 2026-07-28.**
+  Both `mpf_note_1` and `mphl_note_1` named HY-8 in text while linking only to the 2-minute tutorial
+  video. Both now link the program itself at the FHWA page
+  (`https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/` — verified live, HTTP 200), styled
+  as "HY-8, the free culvert program from the U.S. Federal Highway Administration" so the link says
+  what it is rather than assuming the reader knows.
+  **The honest scope sentence the task asked for** was added to `mphl_note_1` as a fourth item: "This
+  page solves the outlet control case only: a pipe flowing full, where the downstream conditions set
+  the head. Culvert design is the job of deciding whether inlet control or outlet control governs, so
+  use HY-8 whenever either one could."
+  **Ride-along fix:** both notes opened a `<dl>` and never closed it. Closing it inside the language
+  string would have staled 26 translations for a markup bug, so the `</dl>` is emitted by
+  `Manning-Pipe-Flow.php` and `Manning-Pipe-Head-Loss.php` instead — zero translation cost.
+  **Decision reaffirmed, not reopened: no culvert calculator.** (Reach is 66 impressions; `mphl_` is
+  only *like* a culvert calculator in outlet control, and shipping outlet-control-only would disagree
+  with HY-8 exactly where a designer most needs to be right.)
+  **Cost incurred: 2 keys × 26 languages stale** (`mpf_note_1`, `mphl_note_1`) — a resync, not a
+  sprint. Tracked by the drift tripwire and rolled into Task 159.
+
+- 0|154|[CC] **Turkish ASCII-fold scan — tr is clean; no fold found in any language — DONE
+  2026-07-28.**
+  **Method: deterministic self-evidence, not an agent pass.** Rather than the Sonnet read the task
+  proposed, CC wrote a scanner keyed on a fact that needs no dictionary: **if the same word appears
+  in the same file both with and without its diacritics, the bare form is a fold.** Ran it over all
+  ten diacritic-bearing lang files (tr, ro, hr, cs, sr, pt, es, de, fr, it).
+  **Result for tr — clean.** Four candidates, all verified false positives, all correct as shipped:
+  `kotu` (×22) is *kot* "elevation" + suffix, a real surveying term, not `kötü` "bad"; `Islak`
+  (`mpf_wetted_perimeter`) is the correct **dotless-I** capitalization of `ıslak`; `Bas.` (`ip_press`)
+  is a correct truncation of `Basınç`, not `baş`. A second, independent probe for ~40 common Turkish
+  words that always carry a diacritic (`için`, `değer`, `yüksek`, `çap`, `akış`, `basınç`, …) found
+  **zero** ASCII-folded occurrences. **The `template_feedback` string fixed during Task 153 was the
+  only instance in the file.**
+  **Other languages: no confirmed fold either, but the method cannot close the question there.** In
+  Romance and Slavic files the signal is swamped by legitimate homographs where the unaccented form
+  is its own real word — es `que`/`qué` and `esta`/`está`, ro `baza` (definite article) vs `bază`,
+  cs `plocha` (noun) vs `plochá` (adjective), fr `base`/`basé`. Precision is high for Turkish
+  (diacritics are not optional there) and low for these, so a clean tr result is meaningful while a
+  ro/cs candidate list is not evidence of a defect. hr, sr and it returned zero candidates outright.
+  **One real, non-fold finding in tr, left unfixed on purpose:** the file disagrees with itself on
+  vowel harmony for the app name — `EngCalcs'i` (3×: `install_main_title`, `install_desktop_steps_html`,
+  `install_cached_body`) vs `EngCalcs'ı` (1×). One of the two is wrong, but which depends on how a
+  Turkish speaker vocalizes "EngCalcs", and CC will not guess a native phonological judgment to
+  change three shipped strings. **Extracted to Task 160.**
+  **`QUALITY` unchanged for tr** — the scan found no defect, so there is nothing to lower it for, and
+  a clean automated scan is not grounds to raise it either.
 
 - 0|150|[CC] **Every page's meta description was just its own title repeated — DONE 2026-07-28.**
   All 21 pages that carried a description built `$html_head` with

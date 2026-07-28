@@ -1,6 +1,6 @@
 {
   "meta": {
-    "version": "1.18",
+    "version": "1.19",
     "description": "Engineering term glossary for EngCalcs translation prompts. Preferred translations per language to prevent term drift across calculators and sprints. Covers all calculators including Rock Chute Design (Robinson), Micro-Hydro Power, and Manning series.",
     "usage": "Inject relevant entries as context in translation prompts: 'Use these preferred translations for technical terms: [terms for this calculator prefix]'. Entries with empty strings need a sprint to fill.",
     "language_codes": [
@@ -99,7 +99,7 @@
       }
     },
     "source_values": "wmo-385 (directly cited from WMO No. 385), wmo-385-indirect (inferred from WMO context), iate (cited from IATE), unterm (cited from UNTERM), human-pre2026 (pre-2026 human translation — see bibliography for per-language caveats), ai-generated (no authoritative citation)",
-    "last_updated": "2026-07-27"
+    "last_updated": "2026-07-28"
   },
   "terms": [
     {
@@ -2370,8 +2370,35 @@
       "avoid": [
         "the operating / computed head (this is a fixed design limit, not the pressure the network actually develops)"
       ],
-      "translation_notes": "Seeded 2026-07-24 for the 'Max. allow. pipe head' input (ip_max_head) added to ip_/bpn_ high-pressure check. Translations to be filled by the follow-up delta sprint, then written back.",
-      "translations": [],
+      "translation_notes": "Seeded 2026-07-24 for the 'Max. allow. pipe head' input (ip_max_head) added to ip_/bpn_ high-pressure check. Translations to be filled by the follow-up delta sprint, then written back. [2026-07-28 Tom decision — English label now says PRESSURE, not head] ip_max_head was changed from \"Max. allow. pipe head\" to \"Max. allow. pipe pressure\". Task 142 flagged that the label said head while its own tip (ip_max_head_tip) said pressure; Tom chose to reconcile them on PRESSURE rather than on head, because a pipe pressure rating is how irrigation designers actually specify the limit (PVC class 160, PN 10) and the field already offers psi/kPa/bar alongside mH2O/ftH2O. This SUPERSEDES the earlier \"keep it dimensionally a head\" framing for THIS LABEL ONLY: the underlying quantity and its units are unchanged, and the head-vs-pressure guard still holds everywhere else in the suite (see the root \"head\" entry avoid list). For translators: use the natural pipe pressure-rating term in your language (pressure class, PN rating, maximum allowable pressure) — do NOT calque the English, and do not attach a stress or material-strength sense. RESYNC COMPLETE 2026-07-28 (ROADMAP Task 159): all 26 translations below were re-derived from the new English by a per-language Sonnet pass and independently re-verified. Every language landed on a genuine pressure term; none calqued the English and none drifted into a stress or material-strength sense.",
+      "translations": {
+        "am": "ከፍ. የተፈቀደ የቧንቧ ግፊት",
+        "ar": "أقصى ضغط مسموح للأنبوب",
+        "bg": "Макс. доп. налягане в тръбата",
+        "bn": "সর্বোচ্চ অনু. পাইপ চাপ",
+        "cs": "Max. dov. tlak potrubí",
+        "de": "Max. zul. Druck",
+        "es": "Presión máx. adm. tubería",
+        "fa": "حداکثر فشار مجاز لوله",
+        "fr": "Pression adm. max. conduite",
+        "he": "לחץ מקס׳ מותר לצינור",
+        "hi": "अधि. अनुज्ञेय पाइप दाब",
+        "hr": "Maks. dop. tlak cijevi",
+        "id": "Tek. kerja maks. pipa",
+        "it": "Press. max. amm. tubo",
+        "km": "សម្ពាធអនុញ្ញាតអតិបរមា",
+        "my": "အများဆုံးခွင့်ပြု ပိုက်ဖိအား",
+        "ps": "د پایپ اعظمي مجاز فشار",
+        "pt": "Pressão máx. adm. tubo",
+        "ro": "Presiune max. adm. conductă",
+        "ru": "Макс. доп. давление",
+        "sr": "Макс. доз. притисак цеви",
+        "sw": "Shinikizo la juu linaloruhusiwa la bomba",
+        "tr": "İzin ver. maks. boru basıncı",
+        "uk": "Макс. доп. тиск труби",
+        "ur": "زیادہ سے زیادہ جائز پائپ دباؤ",
+        "zh": "最大允许管道压力"
+      },
       "source": "Irrigation Pressure (ip_) and Branched Pipe Network (bpn_) calculators — pipe pressure rating for the high-pressure flag."
     },
     {
@@ -2536,39 +2563,39 @@
       "term": "pressure rating",
       "symbol": "",
       "context": "The maximum internal pressure a pipe is built to withstand, expressed here as a head of water. Used as the upper bound for the high-pressure check. Equivalent everyday terms include maximum allowable pressure, maximum allowable head, rated pressure, pressure class, and (for plastic pipe) the PN or SDR class. Any of these that is the normal term in the target language is correct.",
-      "translation_notes": "Created 2026-07-24 for the bpn_/ip_ excessive-pressure check (ip_max_head, ip_max_head_tip). Tom, 2026-07-24: do not shoehorn languages into a calque of the English wording - provide and allow synonyms, and let each language use whatever pipe-industry or plumbing-code term its engineers actually use (pressure class and PN rating are common in metric-pipe markets). The quantity is a HEAD (a height of water column), not a force or a stress; keep it dimensionally a head wherever the language distinguishes. 2026-07-27 (bpn_ sprint, Task 137): populated all 26 from the ip_max_head label, which is this concept's only surface in the UI. Values are the full field label (\"max. allowable pipe head\"), often abbreviated to fit a narrow column, not a bare noun phrase — read them as attested label forms. Every language kept the quantity dimensionally a HEAD; none rendered it as a stress or a pressure class. NOTE: an initial read of this sprint claimed a suite-wide head-term inconsistency by comparing ip_max_head against ws_headWaterHeight; that comparison was invalid (weir head and pipe pressure head are different quantities and correctly differ) and the claim was withdrawn 2026-07-27. The only open question is whether sw Kichwa and ar الرأس are the standard hydraulic term in those two languages - see ROADMAP Task 141. The other 24 are not in question.",
+      "translation_notes": "Created 2026-07-24 for the bpn_/ip_ excessive-pressure check (ip_max_head, ip_max_head_tip). Tom, 2026-07-24: do not shoehorn languages into a calque of the English wording - provide and allow synonyms, and let each language use whatever pipe-industry or plumbing-code term its engineers actually use (pressure class and PN rating are common in metric-pipe markets). The quantity is a HEAD (a height of water column), not a force or a stress; keep it dimensionally a head wherever the language distinguishes. 2026-07-27 (bpn_ sprint, Task 137): populated all 26 from the ip_max_head label, which is this concept's only surface in the UI. Values are the full field label (\"max. allowable pipe head\"), often abbreviated to fit a narrow column, not a bare noun phrase — read them as attested label forms. Every language kept the quantity dimensionally a HEAD; none rendered it as a stress or a pressure class. NOTE: an initial read of this sprint claimed a suite-wide head-term inconsistency by comparing ip_max_head against ws_headWaterHeight; that comparison was invalid (weir head and pipe pressure head are different quantities and correctly differ) and the claim was withdrawn 2026-07-27. The only open question is whether sw Kichwa and ar الرأس are the standard hydraulic term in those two languages - see ROADMAP Task 141. The other 24 are not in question. [2026-07-28 Tom decision — English label now says PRESSURE, not head] ip_max_head was changed from \"Max. allow. pipe head\" to \"Max. allow. pipe pressure\". Task 142 flagged that the label said head while its own tip (ip_max_head_tip) said pressure; Tom chose to reconcile them on PRESSURE rather than on head, because a pipe pressure rating is how irrigation designers actually specify the limit (PVC class 160, PN 10) and the field already offers psi/kPa/bar alongside mH2O/ftH2O. This SUPERSEDES the earlier \"keep it dimensionally a head\" framing for THIS LABEL ONLY: the underlying quantity and its units are unchanged, and the head-vs-pressure guard still holds everywhere else in the suite (see the root \"head\" entry avoid list). For translators: use the natural pipe pressure-rating term in your language (pressure class, PN rating, maximum allowable pressure) — do NOT calque the English, and do not attach a stress or material-strength sense. RESYNC COMPLETE 2026-07-28 (ROADMAP Task 159): all 26 translations below were re-derived from the new English by a per-language Sonnet pass and independently re-verified. Every language landed on a genuine pressure term; none calqued the English and none drifted into a stress or material-strength sense.",
       "avoid": [
         "a stress or material strength rather than a water pressure",
         "blood-pressure or tyre-pressure senses",
         "a general word for strong or high"
       ],
       "translations": {
-        "am": "ከፍ. የተፈቀደ የቧንቧ ሄድ",
-        "ar": "أقصى علو مسموح للأنبوب",
-        "bg": "Макс. доп. напор в тръбата",
-        "bn": "সর্বোচ্চ অনু. পাইপ হেড",
-        "cs": "Max. dov. výška potrubí",
-        "de": "Max. zul. Druckhöhe",
-        "es": "Carga máx. adm. tubería",
-        "fa": "حداکثر هد مجاز لوله",
-        "fr": "Charge adm. max. conduite",
-        "he": "עומד מקס׳ מותר לצינור",
-        "hi": "अधि. अनुज्ञेय पाइप शीर्ष",
-        "hr": "Maks. dop. tlačna visina cijevi",
-        "id": "Tinggi tekan pipa maks.",
-        "it": "Carico max. amm. tubo",
-        "km": "កម្ពស់អនុញ្ញាតអតិបរមា",
-        "my": "အများဆုံးခွင့်ပြု ပိုက်ဖိမြင့်",
-        "ps": "د پایپ اعظمي مجاز لوړوالی",
-        "pt": "Carga máx. adm. tubo",
-        "ro": "Sarcină max. adm. conductă",
-        "ru": "Макс. доп. напор",
-        "sr": "Макс. доз. напор цеви",
-        "sw": "Kichwa cha juu kinachoruhusiwa cha bomba",
-        "tr": "İzin ver. maks. boru yükü",
-        "uk": "Макс. доп. напір труби",
-        "ur": "زیادہ سے زیادہ جائز پائپ ہیڈ",
-        "zh": "最大允许管道水头"
+        "am": "ከፍ. የተፈቀደ የቧንቧ ግፊት",
+        "ar": "أقصى ضغط مسموح للأنبوب",
+        "bg": "Макс. доп. налягане в тръбата",
+        "bn": "সর্বোচ্চ অনু. পাইপ চাপ",
+        "cs": "Max. dov. tlak potrubí",
+        "de": "Max. zul. Druck",
+        "es": "Presión máx. adm. tubería",
+        "fa": "حداکثر فشار مجاز لوله",
+        "fr": "Pression adm. max. conduite",
+        "he": "לחץ מקס׳ מותר לצינור",
+        "hi": "अधि. अनुज्ञेय पाइप दाब",
+        "hr": "Maks. dop. tlak cijevi",
+        "id": "Tek. kerja maks. pipa",
+        "it": "Press. max. amm. tubo",
+        "km": "សម្ពាធអនុញ្ញាតអតិបរមា",
+        "my": "အများဆုံးခွင့်ပြု ပိုက်ဖိအား",
+        "ps": "د پایپ اعظمي مجاز فشار",
+        "pt": "Pressão máx. adm. tubo",
+        "ro": "Presiune max. adm. conductă",
+        "ru": "Макс. доп. давление",
+        "sr": "Макс. доз. притисак цеви",
+        "sw": "Shinikizo la juu linaloruhusiwa la bomba",
+        "tr": "İzin ver. maks. boru basıncı",
+        "uk": "Макс. доп. тиск труби",
+        "ur": "زیادہ سے زیادہ جائز پائپ دباؤ",
+        "zh": "最大允许管道压力"
       },
       "source": "Branched Pipe Network calculator (bpn_) / Irrigation Pressure (ip_) high-pressure check. Translations: ai-generated (bpn_ sprint 2026-07-27)."
     },

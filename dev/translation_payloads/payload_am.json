@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "am",
-        "expected_key_count": 563,
-        "delta_key_count": 14,
+        "expected_key_count": 565,
+        "delta_key_count": 15,
         "active_prefixes": [
             "bpn",
             "dw",
@@ -424,7 +424,8 @@
         "ip_hm": "h<sub>m<\/sub>",
         "bpn_method_hw": "Hazen-Williams",
         "bpn_method_dw": "Darcy-Weisbach",
-        "bpn_method_manning": "Manning"
+        "bpn_method_manning": "Manning",
+        "bpn_id": "ID"
     },
     "keys": {
         "dw_roughness": "e",
@@ -440,7 +441,8 @@
         "ip_hm": "h<sub>m<\/sub>",
         "bpn_method_hw": "Hazen-Williams",
         "bpn_method_dw": "Darcy-Weisbach",
-        "bpn_method_manning": "Manning"
+        "bpn_method_manning": "Manning",
+        "bpn_id": "ID"
     },
     "key_context": {
         "dw_roughness": {
@@ -664,6 +666,22 @@
                     "key": "bpn_line_table_title",
                     "value": "የቧንቧ መስመሮች",
                     "english": "Pipe lines"
+                }
+            }
+        },
+        "bpn_id": {
+            "reason": "equal_to_english",
+            "current_value": "ID",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_line_table_title",
+                    "value": "የቧንቧ መስመሮች",
+                    "english": "Pipe lines"
+                },
+                "next_translated": {
+                    "key": "bpn_id_tip",
+                    "value": "የዚህ የቧንቧ መስመር ስም። ሌሎች መስመሮች በ«የላይኛው መለያ» ዓምድ ውስጥ ይህንኑ ይጠቅሳሉ።",
+                    "english": "Name of this pipe line. Other lines refer to it in the Upstream column."
                 }
             }
         }

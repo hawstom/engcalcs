@@ -65,6 +65,7 @@ $ec_lang['template_feedback']='Molimo pošaljite prijedloge ili pohvale. Je li v
 $ec_lang['template_printable_title']='Naslov za ispis';
 $ec_lang['template_printable_subtitle']='Podnaslov za ispis';
 $ec_lang['index_title']='Besplatni online inženjerski kalkulatori';
+$ec_lang['index_meta_desc_plain']='Besplatni hidrotehnički kalkulatori za cijevi, kanale, preljeve i navodnjavanje. Rade u vašem pregledniku, funkcioniraju bez interneta i dostupni su na 27 jezika.';
 $ec_lang['calc_set_units']='Postavi jedinice:';
 $ec_lang['calc_defaults']='Zadane vrijednosti';
 $ec_lang['calc_defaults_confirm']='Resetiraj kalkulator na izvorne zadane vrijednosti?';
@@ -157,7 +158,8 @@ $ec_lang['mpf_froude_number']='Froudeov broj, Fr';
 $ec_lang['mpf_shear_stress']='Prosječno posmično naprezanje, τ';
 $ec_lang['mpf_full_flow']='Puni protok, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Omjer prema punom protoku, Q/Q<sub>0</sub>';
-$ec_lang['mpf_note_1']='<dl><dt>Ovo je protok i dubina unutar <em>beskonačno dugačke</em> cijevi.</dt><dd>Uvođenje protoka u cijev može zahtijevati znatno veću dubinu uzvodne vode. Dodajte barem 1,5 puta brzinsku visinu za procjenu dubine uzvodne vode, ili <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">pogledajte moj 2-minutni tutorial</a> za standardne proračune uzvodne razine propusta pomoću HY-8.</dd>';
+$ec_lang['mpf_note_1']='<dl><dt>Ovo je protok i dubina unutar <em>beskonačno dugačke</em> cijevi.</dt><dd>Uvođenje protoka u cijev može zahtijevati znatno veću dubinu uzvodne vode. Dodajte barem 1,5 puta brzinsku visinu za procjenu dubine uzvodne vode, ili <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">pogledajte moj 2-minutni tutorial</a> za standardne proračune uzvodne razine propusta pomoću <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, besplatnog programa za propuste Savezne uprave za autoceste SAD-a (U.S. Federal Highway Administration).</dd>';
+$ec_lang['mpf_sewer_ref']='<dl><dt>Projektirate sanitarnu kanalizaciju?</dt><dd>Pogledajte <a target="_blank" href="/sewslope.php">tablice minimalnog nagiba kanalizacije</a> za cijevi od 4 do 96 inča (100 do 2400 mm), izražene u m/m, mm/m i postotku, te studiju <a target="_blank" href="/peakfact.php">faktora vršnog opterećenja za vrlo male protoke</a>. Oba dokumenta dostupna su samo na engleskom jeziku.</dd></dl>';
 $ec_lang['mpf_solve_button']='Izračunaj';
 $ec_lang['mpf_solve_for_flow']='za protok, Q =';
 $ec_lang['mpf_solver_enter_positive_q']='Unesite pozitivan ciljani Q.';
@@ -178,7 +180,7 @@ $ec_lang['mphl_total_loss']='Ukupni gubitak, h<sub>L</sub>';
 $ec_lang['mphl_egl_1']='Nizvodni EGL';
 $ec_lang['mphl_egl_2']='Uzvodni EGL';
 $ec_lang['mphl_hgl_egl_tip']='Možda nije valjano ako je cijev visoko postavljena. Pogledajte napomene.';
-$ec_lang['mphl_note_1']='<dl><dt>Ovaj kalkulator ne uzima u obzir kotu cijevi.</dt><dd>Ako HGL na bilo kojoj točki padne ispod vrha cijevi, ovaj proračun možda nije valjan.</dd><dt>Za uvjete otvorenog ulaza (propust) potrebno je provjeriti uvjete kontrole ulaza.</dt><dd>1. Uzvodni HGL ne može biti niži od kote normalnog tečenja uzvodnog toka (niti niži od cijevi!).</dd><dd>2. Uzvodna razina propusta bolje je predstavljena uzvodnim EGL-om nego uzvodnim HGL-om.</dd><dd>3. Pogledajte <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">moj 2-minutni tutorial</a> za jednostavne standardne proračune uzvodne razine propusta pomoću HY-8.</dd>';
+$ec_lang['mphl_note_1']='<dl><dt>Ovaj kalkulator ne uzima u obzir kotu cijevi.</dt><dd>Ako HGL na bilo kojoj točki padne ispod vrha cijevi, ovaj proračun možda nije valjan.</dd><dt>Za uvjete otvorenog ulaza (propust) potrebno je provjeriti uvjete kontrole ulaza.</dt><dd>1. Uzvodni HGL ne može biti niži od kote normalnog tečenja uzvodnog toka (niti niži od cijevi!).</dd><dd>2. Uzvodna razina propusta bolje je predstavljena uzvodnim EGL-om nego uzvodnim HGL-om.</dd><dd>3. Pogledajte <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">moj 2-minutni tutorial</a> za jednostavne standardne proračune uzvodne razine propusta pomoću <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, besplatnog programa za propuste Savezne uprave za autoceste SAD-a (U.S. Federal Highway Administration).</dd><dd>4. Ova stranica rješava samo slučaj kontrole na izlazu: cijev koja teče puna, gdje nizvodni uvjeti određuju tlačnu visinu. Projektiranje propusta uključuje odluku o tome vlada li kontrola na ulazu ili na izlazu, stoga koristite HY-8 kad god je moguće bilo koje od toga.</dd>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Manning trapezoidni kanal';
 $ec_lang['mtc_main_title']='Besplatni online kalkulator Manning formule za trapezoidni kanal';
@@ -386,7 +388,7 @@ $ec_lang['ip_pressure_warn']='Nizak/negativan tlak — provjerite subatmosferske
 $ec_lang['ip_pressure_warn_short']='Nisko';
 $ec_lang['ip_pressure_high']='Mjesta s visokim tlakom zahtijevaju smanjenje tlaka';
 $ec_lang['ip_pressure_high_short']='Visoko';
-$ec_lang['ip_max_head']='Maks. dop. tlačna visina cijevi';
+$ec_lang['ip_max_head']='Maks. dop. tlak cijevi';
 $ec_lang['ip_max_head_tip']='Dionice čiji tlak prelazi ovu vrijednost bit će označene. Ostavite prazno za preskakanje provjere visokog tlaka.';
 $ec_lang['ip_h_far']='Tlak zadnjeg emitera';
 $ec_lang['ip_q_supply']='<span class="ec-help" title="Protok koji ulazi u modelirani testni put samo, ne u cijelu zonu/sustav — vidi Q_zone u Projektiranju primjene dolje za ukupan sustav.">Protok opskrbe testnog puta, Q<sub>supply</sub> <span class="ec-tip">?</span></span>';

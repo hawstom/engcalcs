@@ -1,7 +1,7 @@
 {
     "meta": {
         "language": "fr",
-        "expected_key_count": 563,
+        "expected_key_count": 565,
         "delta_key_count": 22,
         "active_prefixes": [
             "bpn",

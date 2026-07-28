@@ -66,6 +66,7 @@ $ec_lang['template_feedback']='请发送建议或赞扬的话。此免费计算�
 $ec_lang['template_printable_title']='可打印标题';
 $ec_lang['template_printable_subtitle']='可打印副标题';
 $ec_lang['index_title']='免费在线工程计算器';
+$ec_lang['index_meta_desc_plain']='免费的水力工程计算器，涵盖管道、渠道、堰和灌溉。可在浏览器中直接运行，支持离线使用，并提供27种语言。';
 $ec_lang['calc_set_units']='单位设置：';
 $ec_lang['calc_defaults']='默认值';
 $ec_lang['calc_defaults_confirm']='将计算器重置为原始默认值吗？';
@@ -158,7 +159,8 @@ $ec_lang['mpf_froude_number']='弗劳德数，Fr';
 $ec_lang['mpf_shear_stress']='平均切应力，τ';
 $ec_lang['mpf_full_flow']='满流流量，Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='流量比，Q/Q<sub>0</sub>';
-$ec_lang['mpf_note_1']='<dl><dt>这是<em>无限长</em>管道内部的流量和水深。</dt><dd>使水流进入管道可能需要明显更高的上游水位。请在水深基础上至少加 1.5 倍流速水头来估算上游水位，或 <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">参见 2 分钟教程</a>，了解使用 HY-8 进行标准涵洞水位计算的方法。</dd>';
+$ec_lang['mpf_note_1']='<dl><dt>这是<em>无限长</em>管道内部的流量和水深。</dt><dd>使水流进入管道可能需要明显更高的上游水位。请在水深基础上至少加 1.5 倍流速水头来估算上游水位，或 <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">参见 2 分钟教程</a>，了解使用 <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>（美国联邦公路管理局提供的免费涵洞计算程序）进行标准涵洞水位计算的方法。</dd>';
+$ec_lang['mpf_sewer_ref']='<dl><dt>正在设计生活污水管道？</dt><dd>请参阅 <a target="_blank" href="/sewslope.php">最小污水管道坡度表</a>（适用于4至96英寸（100至2400毫米）管道，以m/m、mm/m和百分比给出），以及 <a target="_blank" href="/peakfact.php">极低流量高峰系数</a>研究报告。两者均仅提供英文版本。</dd></dl>';
 $ec_lang['mpf_solve_button']='求解';
 $ec_lang['mpf_solve_for_flow']='对于流量，Q =';
 $ec_lang['mpf_solver_enter_positive_q']='请输入正值目标流量 Q。';
@@ -179,7 +181,7 @@ $ec_lang['mphl_total_loss']='总水头损失，h<sub>L</sub>';
 $ec_lang['mphl_egl_1']='下游能量坡降线';
 $ec_lang['mphl_egl_2']='上游能量坡降线';
 $ec_lang['mphl_hgl_egl_tip']='管道高程较高时可能不适用，详见注释。';
-$ec_lang['mphl_note_1']='<dl><dt>本计算器未考虑管道高程。</dt><dd>若测压管水头线在任一位置低于管顶，本计算结果可能不适用。</dd><dt>对于开口进水口（涵洞）情况，需检验进口控制条件。</dt><dd>1. 上游测压管水头线不得低于上游正常水深处高程（也不得低于管顶！）。</dd><dd>2. 涵洞水位更宜用上游能量坡降线而非测压管水头线表示。</dd><dd>3. <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">参见 2 分钟教程</a>，了解使用 HY-8 进行简单标准涵洞水位计算的方法。</dd>';
+$ec_lang['mphl_note_1']='<dl><dt>本计算器未考虑管道高程。</dt><dd>若测压管水头线在任一位置低于管顶，本计算结果可能不适用。</dd><dt>对于开口进水口（涵洞）情况，需检验进口控制条件。</dt><dd>1. 上游测压管水头线不得低于上游正常水深处高程（也不得低于管顶！）。</dd><dd>2. 涵洞水位更宜用上游能量坡降线而非测压管水头线表示。</dd><dd>3. <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">参见 2 分钟教程</a>，了解使用 <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>（美国联邦公路管理局提供的免费涵洞计算程序）进行简单标准涵洞水位计算的方法。</dd><dd>4. 本页仅求解出流控制情况：管道满流，由下游条件决定水头。涵洞设计的任务是判断进流控制还是出流控制起控制作用，因此在两者都可能起作用时应使用 HY-8。</dd>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='曼宁梯形渠道';
 $ec_lang['mtc_main_title']='免费在线曼宁公式梯形渠道计算器';
@@ -517,7 +519,7 @@ $ec_lang['ip_pressure_warn']='低压或负压——请检查是否存在低于�
 $ec_lang['ip_pressure_warn_short']='低';
 $ec_lang['ip_pressure_high']='高压部位需要减压';
 $ec_lang['ip_pressure_high_short']='高';
-$ec_lang['ip_max_head']='最大允许管道水头';
+$ec_lang['ip_max_head']='最大允许管道压力';
 $ec_lang['ip_max_head_tip']='压力超过该值的管线将被标记。留空则跳过高压检查。';
 $ec_lang['ip_h_far']='最后滴头压力';
 $ec_lang['ip_q_supply']='<span class="ec-help" title="仅为进入所建模测试路径的流量——整个灌区/系统的流量见下方灌水设计中的 Q_zone。">测试路径供水流量，Q<sub>supply</sub> <span class="ec-tip">?</span></span>';
