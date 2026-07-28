@@ -38,23 +38,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   2026-07-27); a confirmed finding here promotes it. Weigh this against the mundane usability causes above before
   committing; a scope explanation is more flattering to the suite than a defect explanation, which is
   precisely why it deserves evidence and not assumption.
-- 30|147| **Finish the sw `kichwa` → `kimo` head-term conversion — 16 keys still carry the rejected
-  term.** Found 2026-07-27 while closing Task 141. The 2026-07-22 decision (glossary `head`
-  `translation_notes`, Tom + Kenya-engineer input) established that Swahili `kichwa` (the body-part
-  word) is NOT the engineering term for hydraulic head and that `kimo` is — but the pass that applied
-  it only converted the keys it explicitly listed (`mhp_gross_head`, `mhp_hl_check`,
-  `mhp_notes_3_def`, `rc_notes_7_def`, `odt_notes_1_def`, `or_head`, `ws_headWaterHeight`).
-  `lib/lang.ec.sw.php` is now split almost exactly in half: **15 keys use `kimo`, 16 still use
-  `kichwa`** — the same concept rendered two ways in one file. The stragglers are
-  `dw_main_menu`/`_title`/`_desc`, `hw_main_menu`/`_title`/`_desc`,
-  `mphl_main_menu`/`_title`/`_desc`, `mhp_hnet`, `mhp_notes_1_term`, `mhp_notes_1_def`,
-  `mhp_notes_3_term`, `odt_h1`, `rc_Hp`, and `ip_max_head`. Note that nine of them are the
-  **calculator identity strings for all three head-loss calculators** (menu entry + `<title>`), so
-  this is what a Swahili speaker sees first, and `ip_max_head` is the Task 137 sprint following the
-  wrong incumbent. Per the glossary: head loss = `upotevu wa kimo`, net head = `kimo halisi cha
-  maji`. **Do NOT touch `template_printable_title`/`_subtitle`** — there `Kichwa` correctly means
-  "title/heading" and is not the hydraulic sense. Mechanical per-key edit against the glossary, not a
-  sprint; write the completion back to the glossary `head` entry per the write-back rule.
 - 18|146| **Looped-network (Hardy Cross) solving — was Task 137 "Phase 3", extracted 2026-07-27.**
   Extend `bpn_` (or build alongside it) to solve networks with loops, iterating to convergence —
   the case the shipped branched calculator explicitly excludes ("no loops, no iteration"). Kept
@@ -428,6 +411,30 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|147|[CC] **sw `kichwa` → `kimo` head-term conversion finished — DONE 2026-07-27.** Authorized by
+  Tom the same day it was filed. Converted all 16 stragglers in `lib/lang.ec.sw.php`:
+  `dw_`/`hw_`/`mphl_` `main_menu`+`main_title`+`main_desc`, `mhp_hnet`, `mhp_notes_1_term`,
+  `mhp_notes_1_def`, `mhp_notes_3_term`, `odt_h1`, `rc_Hp`, `ip_max_head`. Head loss is now
+  "Upotevu wa Kimo" (Title Case in identity strings, lowercase in prose, matching the already-correct
+  `mhp_hl_check`); net head is "Kimo halisi", parallel to `mhp_gross_head` "Kimo cha jumla". The file
+  now reads `kimo` in all 37 hydraulic uses and `Kichwa` only in
+  `template_printable_title`/`_subtitle`, where it correctly means "title/heading".
+  **Why a straight word swap was safe:** `kichwa` and `kimo` are both noun class 7, so every
+  `cha`/`wa`/`kinacho-` concord marker in the surrounding text stayed valid — no regrammaring needed.
+  **QA:** `php -l` clean; `lang_syntax_validate.php --lang=sw` clean of every structural category (7
+  advisory `identical-to-english` findings, all pre-existing and unrelated); tag-name parity against
+  English verified on all 16; and each string back-translated to English inline (no `ANTHROPIC_API_KEY`
+  here, so the orchestrator does the check rather than logging it skipped). Two apparent tag mismatches
+  were a naive-regex artifact of Rule A: `rc_Hp`'s `&gt;` is now a literal `>` inside a `title="…"`.
+  Checked with a real parser (`DOMDocument`) rather than dismissed — the attribute reads back intact
+  with zero libxml errors, confirming the Task 140 step-1 judgment that `>` is safe in a quoted
+  attribute value. Glossary `head` entry updated with the completion per the mandatory write-back rule.
+  **Left deliberately alone:** `rc_Hp` keeps `bwawa` for "weir", matching its already-converted sibling
+  `rc_notes_7_def`; the `ws_`/`wi_` `kizingiti` standardization is a separate concern, not this task.
+  **Lesson worth keeping:** the 2026-07-22 glossary note *listed the keys it changed*, which reads as
+  completion but was a partial pass — a terminology decision is not applied until someone greps the
+  whole file for the rejected term.
 
 - 0|139|[CC] **Points-data copy/paste on Irrigation-Pressure (`ip_`) — DONE 2026-07-27.** Diagnosed
   and fixed the same day Tom asked. Root cause was exactly the "wrong singleton count" the task
