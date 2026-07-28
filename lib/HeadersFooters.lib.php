@@ -66,7 +66,7 @@ echoEngCalcsMenu($html_title, $show_name_field, $calc_name);
 endif;
 ?>
 <h1 class="d-print-none"><?=$html_title?></h1>
-<p class="d-print-none"><?=$ec_lang['template_welcome']?></p>
+<p class="d-print-none ec-welcome"><?=$ec_lang['template_welcome']?></p>
 <script>EngCalcs.pageTitle = <?=json_encode($html_title)?>;</script>
 <?php
 }

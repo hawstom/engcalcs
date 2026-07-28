@@ -60,7 +60,7 @@ $ec_lang['menu_main_list']='Daftar Kalkulator';
 $ec_lang['menu_main_hydraulics']='Hidraulika';
 $ec_lang['menu_main_language']='Bahasa';
 $ec_lang['menu_more']='Lainnya';
-$ec_lang['template_welcome']='>> Buang rasa takutmu di pintu; di sini cinta adalah bahasa kami. Kamu tidak merusak segalanya. Nikmati juga <a target="_blank" href="https://hawsedc.com/download.php">alat AutoCAD HawsEDC gratis</a>. <<';
+$ec_lang['template_welcome']='Buang rasa takutmu di pintu; di sini cinta adalah bahasa kami. Kamu tidak merusak segalanya. Nikmati juga <a target="_blank" href="https://hawsedc.com/download.php">alat AutoCAD HawsEDC gratis</a>.';
 $ec_lang['template_translation_help']='Bisakah Anda menyarankan susunan kata yang lebih baik atau hal lainnya? Beri tahu kami, ya.';
 $ec_lang['template_feedback']='Silakan berikan masukan atau pujian yang berharga. Apakah kalkulator gratis ini melebihi harapan Anda di segala hal?';
 $ec_lang['template_printable_title']='Judul Cetak';

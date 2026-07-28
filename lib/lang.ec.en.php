@@ -115,7 +115,7 @@ $ec_lang['menu_main_language']='Language';
 $ec_lang_intent['menu_main_language']='';
 $ec_lang['menu_more']='More';
 $ec_lang_intent['menu_more']='';
-$ec_lang['template_welcome']='» Drop your fears at the door; love is spoken here. You are not ruining everything. Enjoy the <a target="_blank" href="https://hawsedc.com/download.php">free libre HawsEDC AutoCAD tools</a> too. «';
+$ec_lang['template_welcome']='Drop your fears at the door; love is spoken here. You are not ruining everything. Enjoy the <a target="_blank" href="https://hawsedc.com/download.php">free libre HawsEDC AutoCAD tools</a> too.';
 $ec_lang_intent['template_welcome']='Leave your fears behind when you enter this space; love is the language we speak here. You are not ruining everything.';
 $ec_lang['template_translation_help']='Can you suggest better wording or anything else? Please tell us.';
 $ec_lang_intent['template_translation_help']='';

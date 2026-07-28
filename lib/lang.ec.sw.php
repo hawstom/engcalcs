@@ -61,7 +61,7 @@ $ec_lang['menu_main_list']='Orodha ya Vikokotoo';
 $ec_lang['menu_main_hydraulics']='Haidroliki';
 $ec_lang['menu_main_language']='Lugha';
 $ec_lang['menu_more']='Zaidi';
-$ec_lang['template_welcome']='>> Acha wasiwasi wako mlangoni; hapa upendo unasemwa. Huharibu kila kitu. Furahia <a target="_blank" href="https://hawsedc.com/download.php">zana za bure za HawsEDC AutoCAD</a> pia. <<';
+$ec_lang['template_welcome']='Acha wasiwasi wako mlangoni; hapa upendo unasemwa. Huharibu kila kitu. Furahia <a target="_blank" href="https://hawsedc.com/download.php">zana za bure za HawsEDC AutoCAD</a> pia.';
 $ec_lang['template_translation_help']='Je, unaweza kupendekeza maneno bora zaidi au kitu kingine chochote? Tafadhali tuambie.';
 $ec_lang['template_feedback']='Tafadhali tupe maoni yako ya thamani au sifa. Je, kikokotoo hiki cha bure kilivuka matarajio yako kwa kila njia?';
 $ec_lang['template_printable_title']='Kichwa cha Kuchapishwa';

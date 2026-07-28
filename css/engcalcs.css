@@ -80,3 +80,31 @@ input[type=number] {
 .ec-help {
 	cursor: help;
 }
+
+/* The welcome line under the page title (template_welcome). Set apart with italics
+   rather than the >> ... << that used to be typed into all 27 language strings: those
+   are not standard English or typography (Tom, 2026-07-27), they are directional
+   decoration that would have to be mirrored for the RTL languages -- the same reason
+   .ec-solverline above carries no indent glyph -- and they put presentation inside a
+   translated string, where every translator had to copy them by hand. */
+.ec-welcome {
+	font-style: italic;
+}
+
+/* Scripts with no italic tradition, where the browser can only synthesize a slanted
+   face and the result reads as a rendering fault rather than as emphasis: Arabic,
+   Hebrew, Han, Ethiopic, Devanagari/Bengali, Khmer, Burmese. The line is already its
+   own paragraph under the <h1>, so it stays legible with no substitute decoration. */
+html[lang="am"] .ec-welcome,
+html[lang="ar"] .ec-welcome,
+html[lang="bn"] .ec-welcome,
+html[lang="fa"] .ec-welcome,
+html[lang="he"] .ec-welcome,
+html[lang="hi"] .ec-welcome,
+html[lang="km"] .ec-welcome,
+html[lang="my"] .ec-welcome,
+html[lang="ps"] .ec-welcome,
+html[lang="ur"] .ec-welcome,
+html[lang="zh"] .ec-welcome {
+	font-style: normal;
+}

@@ -238,18 +238,6 @@ The rules, sequence, and QA chain for translation work are **not** restated here
   legitimate outcome. Do not fix it silently as a drive-by during other work — the resync is the
   reason it needs deciding rather than doing.
 
-- 30|148| **English's `template_welcome` says `»` where all 26 translations say `>>`.** Found
-  2026-07-27 while closing Task 140, and extracted rather than fixed silently (Tom's rule: a loose end
-  left inside a closed task is a lost loose end). Task 140 step 1 converted English's `&gt;&gt;` to a
-  literal `»`, which was the right call for an entity — but the 26 other language files held a
-  *literal* `>>` all along, never an entity, so Rule A never touched them and they still read `>>`.
-  Nothing is broken; it is a one-glyph cosmetic divergence on the welcome banner. **Severity: low.**
-  **Recommended fix:** make all 27 use `»`. It is a decorative direction mark, not a quote, and `»`
-  has Unicode `Bidi_Mirrored=Yes`, so it renders mirrored (leftward) in the five RTL languages
-  automatically — no per-language judgment needed. **Cost:** a one-character replacement in 26 files
-  with zero translation impact, plus a `detect_english_drift.php --update` re-baseline. The other
-  option — reverting English to `>>` — is equally consistent and cheaper still; Tom's call which.
-
 ## AI Efficiency Scripting (Overhead)
 
 These tasks reduce the AI token cost of routine maintenance by replacing repeated AI judgment with deterministic scripts. Copilot owns execution (all tagged `[CP]`); Claude Code specs any script whose output feeds back into translation quality work.
@@ -259,6 +247,37 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|148| **`template_welcome`'s `>> ... <<` markers replaced with CSS italics — DONE 2026-07-27.**
+  Filed and closed the same day. Tom, on reading the finding: "could use italics `<em>`? instead of
+  `>> ____ <<`, I suppose. The symbols are not standard English or typography." Correct on both
+  counts, and it makes the divergence moot rather than merely consistent.
+
+  **What was there.** All 27 files wrapped the welcome line in directional markers — English in
+  `»`/`«` (Task 140 step 1 converted its `&gt;&gt;` entity), the other 26 in a literal ASCII
+  `>> ... <<` that Rule A never touched because it was never an entity.
+
+  **Done as CSS, not `<em>`, for two reasons beyond Tom's typography point.**
+  1. **It gets presentation out of the language strings entirely** — the same theme as Task 140
+     itself. An `<em>` in the string would have left 27 translators hand-copying markup, which is how
+     the markers ended up inconsistent in the first place. The strings now carry only words; the
+     emphasis lives in `.ec-welcome` (`css/engcalcs.css`) and the class is added once in
+     `lib/HeadersFooters.lib.php`.
+  2. **It allows a per-script exception that markup in the string could not express.** Italics are
+     applied by default but switched off via `html[lang="…"]` for the 11 languages whose scripts have
+     no italic tradition (am, ar, bn, fa, he, hi, km, my, ps, ur, zh) — there the browser can only
+     synthesize a slanted face, which reads as a rendering fault rather than as emphasis. Those
+     languages lose nothing: the line is already its own paragraph under the `<h1>`.
+
+  This also retires the directional-decoration problem the CSS had already documented once, for
+  `.ec-solverline`: a `>>`/`<<` pair has to be mirrored for the five RTL languages, and now nothing
+  needs mirroring.
+
+  **QA.** All 27 `php -l` clean; `lang_syntax_validate.php` clean of every structural category.
+  Rendered `Manning-Pipe-Flow.php` in en/es/ar/zh and confirmed the markers are gone, the
+  `ec-welcome` class is on the paragraph, and the `html[lang="…"]` selector matches the real markup
+  (`<html lang="ar" dir="rtl">`). Drift manifest re-baselined — markup-only, no words changed, so no
+  language is stale and no resync is owed.
 
 - 0|140| **[H] Get HTML out of language strings where it cannot work, and enforce it mechanically —
   DONE 2026-07-27.** Closed after evaluating steps 2-4 against what step 1 actually left behind, per
@@ -337,7 +356,9 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
   **Loose end extracted rather than buried (Tom's rule):** step 1 turned English's `template_welcome`
   `&gt;&gt;` into `»`, but the 26 other languages held a *literal* `>>` all along and so were never
-  touched — English now shows `»` where every translation shows `>>`. Filed as **Task 148**.
+  touched — English now showed `»` where every translation showed `>>`. Filed as **Task 148**, and
+  closed the same day: Tom's answer was that the markers are not standard typography at all, so all
+  27 lost them and the emphasis moved into CSS.
 
   **Prediction vs. outcome, kept honest.** The block forecast that Rule A "should close permanently"
   and that Rule B "will keep a residue… expect it to catch us again at least once." Rule A did close.
