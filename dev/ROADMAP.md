@@ -238,169 +238,17 @@ The rules, sequence, and QA chain for translation work are **not** restated here
   legitimate outcome. Do not fix it silently as a drive-by during other work — the resync is the
   reason it needs deciding rather than doing.
 
-- 60|140| **[H] Get HTML out of language strings where it cannot work, and enforce it mechanically.**
-  Design agreed with Tom 2026-07-24. **STEP 1 IS DONE (2026-07-27); steps 2-4 remain — re-judge them
-  against what step 1 actually left behind, per Tom's "ship it and see" instruction.**
-
-  **Step 1 result, 2026-07-27 (Tom authorized proceeding).** All **1204 entity occurrences across all
-  27 `lib/lang.ec.*.php` files** converted to literal UTF-8; **zero entities remain** in any language
-  string, and all 27 files are `php -l` clean. Rule A is now enforced hard: the validator's
-  `detectAttributeEntities()` was replaced by `detectEntities()`, which flags *any* entity in *any*
-  language string (no attribute-key scoping — the scoping is what made the old check miss things) and
-  names the literal replacement in the error text. `lang_syntax_validate.php` is clean of every
-  structural category; the 180 remaining findings are all pre-existing advisory
-  `identical-to-english` warnings.
-  - **`$ec_lang_intent` was never touched** — checked first, and it contained no entities at all, so
-    step 1 needed no permission against the off-limits rule.
-  - **The four HTML-syntax escapes needed judgment, not blind conversion,** and the roadmap's
-    "~12 distinct characters" forecast did not cover them. `&lt;`/`&gt;`/`&amp;` turned out to be
-    **always followed by a space** in all 27 files (verified before converting, not assumed), so the
-    literal `<`/`>`/`&` is unambiguous to the HTML parser — no fake tags, no ambiguous ampersand.
-    `&gt;&gt;`/`&lt;&lt;` in `template_welcome` became `»`/`«`. The 41 `&quot;` are all one key
-    (`rc_apron_length`, the Robinson quotation) and became curly `“ ”`, which is both typographically
-    right and safe inside the `title="…"` they live in — a literal `"` there would have terminated
-    the attribute. One genuine edge case: `sr` had already used its native opening `„` and escaped
-    only the closer, and `“` *is* the correct Serbian closing quote, so it landed right.
-  - **Confirmed the fix on the paths that were actually broken**, not just the file contents: the
-    menu `title=` path (`Menus.lib.php`, `ENT_QUOTES`) now renders `Pond, Basin, or Tank Drain Time —
-    …` instead of a doubled `&mdash;`. Conversely `ip_main_title`'s literal `&` now arrives in a meta
-    attribute as a correctly single-escaped `&amp;` — which is the whole point of the rule.
-  - Entities still present in *rendered* output (`&copy;`, `&ndash;`, `&iacute;`) are hardcoded in
-    `lib/HeadersFooters.lib.php` and per-page SEO meta tags, **not** language strings — out of Rule
-    A's scope by design. Worth a decision later whether Rule A should grow to cover them.
-  - **Prediction to check against:** the honest forecast below says Rule A "should close permanently."
-    Step 1 cost far less than the block implies — the risk was concentrated entirely in the ~150
-    syntax escapes, not the ~1050 typographic ones. Step 2 (lifting the 33 embedded tooltips) is the
-    load-bearing step and is still untouched.
-
-  Original design notes follow — read the whole block before acting on steps 2-4.
-  **Start with step 1 alone — a plain entity-cleanup pass (Tom, 2026-07-27).** The evidence now says
-  this is a historical mess, not an ongoing discipline failure, so do the cheap mechanical fix first
-  and re-judge the rest afterward. Full reasoning under "Do step 1 first" below.
-
-  **The problem in one sentence.** A language string's HTML is sometimes fine and sometimes silently
-  broken, and *which one depends on the PHP/JS call site that consumes it*, not on anything visible
-  in the string — so the same string is correct in one place and wrong in another, with no error.
-
-  **The two things that break, and why.**
-  1. *Entities* (`&mdash;` `&asymp;` `&sup2;` …). An entity in an HTML attribute is decoded by the
-     browser and renders fine — Tom verified in Chrome, and the spec agrees. It breaks only when the
-     string passes through something that escapes `&` first. This suite has three attribute paths and
-     **two of them break entities**: raw echo (`lib/Menus.lib.php:91`) works;
-     `htmlspecialchars(strip_tags())` (`Branched-Network.php:56`) breaks; `escapeAttr`
-     (`js/Calculators.lib.js:406`) breaks. Both broken paths turn `&asymp;` into a literal
-     `&asymp;` on screen. Proof that entities are an unnecessary habit, not a need:
-     `dw_kinematic_viscosity` contains literal `×`, `⁻⁶`, `²`, `°` **and** an entity `&nu;` in the
-     same string — the literal form was already working right beside it.
-  2. *Tags* in an attribute. `title=`/`placeholder=`/`value=` hold plain text only; `<sub>` in a
-     `title` never renders as a subscript by any delivery route. Confirmed by Tom.
-
-  **Decisions already settled — do not relitigate.**
-  - Unicode subscripts **rejected** as a replacement for `<sub>`. Unicode has no subscript `c f w d g`,
-    **no capitals**, and no multi-letter forms — so `h_f` (most-used symbol in the suite), `C_d`,
-    `P_w`, `h_L`, `q_out`, `q_avg,field` are unwritable. ~66 of 177 subscript occurrences fail.
-    Mixing Unicode and markup also renders at visibly different sizes.
-  - Placeholder/symbol-table refactor **rejected** (it was proposed, then withdrawn as solving a
-    problem we can decline to have).
-  - Document keys (`about_body_html` 2691 chars, `irr_quickref_html`, the 30 keys >300 chars)
-    **keep their HTML** — Tom: they are only ever echoed raw by PHP, never read into JS or an
-    attribute, so their context is safe. Page labels keep `<sub>` too.
-  - `mphl_total_junction_k_tip` degrades acceptably to `km` — Tom confirmed.
-
-  **The three rules.**
-  - **Rule A — no `&...;` in any language string.** All 564 keys × 27 files, no exceptions. Absolute
-    *because* scoping requires judgment, and the previous check failed precisely by scoping itself to
-    "tip keys" (see `detectAttributeEntities()` in `dev/scripts/lang_syntax_validate.php`).
-  - **Rule B — no `<...>` in any plain-text-constrained string.** Constrained = named `_tip`/`_plain`
-    **or** found by a deriver inside any `attr="..."`.
-  - **Rule C (advisory, reports only)** — the name and the derivation must agree; report both
-    "reaches an attribute but isn't named" and "named but only used in page HTML".
-
-  **Naming convention.** Suffix `_plain` (**not** `_attrib` — rejected: it names the *destination*,
-  but 16 `_main_desc` keys have two destinations at once, `<h2>` **and** the menu `title=`;
-  and "attribute" is overloaded with the GIS/data-field sense). `_plain` names *what the string may
-  contain*, which is single-valued: the strictest destination wins. `_tip` stays as an established
-  special case of `_plain` (33 keys, 32 already compliant).
-  **The name is a hint, never the enforcement** — a name is a claim, the code is the fact. Derivation
-  enforces; the name covers what derivation can't see statically (a string assembled in PHP then
-  passed to an attribute).
-
-  **Measured scope (2026-07-24, read-only). Re-run any time with
-  `php dev/scripts/measure_lang_sinks.php` — it reproduces every number below.**
-  - Reference sites by destination: `raw-html` 670, `attr-escaped` 37, `attr-RAW` 16, pageConfig
-    (`json_encode`→JS) 62 keys. **93% of sites are raw-html, where everything works** — which is why
-    the habit never got punished and kept recurring.
-  - 134 English keys carry markup (`sub` 84, `span+sub` 19, `span` 18, `a` 8, `br` 3, `sup` 2).
-  - 55 English keys carry entities; ~1200 entity occurrences across all 27 files.
-  - **33 tooltips have their own `_tip` key — 1 is dirty. 33 more tooltips are buried inside other
-    keys as `title="…"` written into the middle of a label — 11 are dirty.** That 1-vs-11 contrast is
-    the core finding: a tooltip with its own name gets treated as tooltip text and stays clean; a
-    tooltip embedded in page HTML picks up page-HTML habits. Half the suite's tooltips are currently
-    invisible to any checker.
-  - Already-existing non-`title` plain-text attributes holding lang strings (5): `placeholder`
-    (`lib/Calculators.lib.php:67,68`, `lib/Menus.lib.php:131`), `value` (`contact.php:55`),
-    `data-copied-text` (`lib/Menus.lib.php:137`). **This is why the deriver must scan every
-    `attr="…"`, not just `title=`.**
-  - Four different escaping conventions are already in use across call sites (raw,
-    `htmlspecialchars`, `htmlspecialchars(strip_tags())`, `ENT_QUOTES` at `lib/Menus.lib.php:127`).
-
-  **Evidence from the Task 137 sprint, 2026-07-27 — Rule A is cheap to hold at write time.** The
-  sprint brief told all 26 translation agents, in one line, "never emit HTML entities, use literal
-  UTF-8" and "preserve all markup exactly — same tags, same count as English." Result across 26
-  languages × 6 real strings: **zero entity findings and zero tag-parity failures**, checked
-  independently rather than taken from the agents' self-reports. Two agents also correctly declined
-  to translate numeric/bibliographic strings (`2.54–2.82 (Robinson)`) and real cognates (`laminar`,
-  `Circular`) after being told a value equal to English is not automatically a missing translation.
-  **Reading:** entities are a habit acquired from *editing existing strings*, not something writers
-  reach for unprompted — when the rule is stated at the moment of writing, it costs one sentence and
-  holds. That supports Rule A being absolute (step 1) and argues the expensive part of this task is
-  the historical cleanup and the deriver, not the ongoing discipline.
-
-  **Do step 1 first, on its own, as a plain cleanup pass (Tom, 2026-07-27).** Given the sprint
-  evidence above — the problem looks *historical* rather than ongoing — the right first move is the
-  simple mechanical cleanup, not the deriver and not the architecture. Convert the entities, turn
-  Rule A on, ship it, and see what is actually left. **Do not bundle steps 2-4 into that pass**;
-  step 1 is independent by design and its value does not depend on the rest of this task ever being
-  done. If the historical reading is right, step 1 plus Rule A removes most of the recurring pain for
-  a fraction of the effort, and what remains can be judged with real evidence instead of forecast.
-
-  **Steps, in order.**
-  1. Convert all `&...;` to literal UTF-8 characters; turn Rule A on hard. English needs ~12 distinct
-     characters (`— × ÷ ≈ ≤ ≥ √ ² ν τ Δ –`); the check should name the replacement in its error text.
-     Independent of every step below. **This is the sanctioned starting point — see the note above.**
-  2. Lift the 33 embedded tooltips into their own `_tip` keys, fixing the 11 dirty ones. **Tom agreed
-     the existing translations are extracted mechanically** from inside the label strings across all
-     27 files (they are already translated, just trapped) — not left empty for a future sprint.
-     This is the load-bearing step: it is what makes tooltip content visible to any check at all.
-  3. Build the deriver + Rules B and C into `dev/scripts/lang_syntax_validate.php`.
-     **Partly built already — do not start from scratch.** Commit `3f9b3de` added
-     `attributeBoundKeys()`, which derives attribute-bound keys from the app source (PHP
-     `htmlspecialchars()`/`strip_tags()` labels, and JS tip properties / `writeCheckHTML()` 3rd
-     argument). What remains: it matches `htmlspecialchars(...)` and JS tip paths only, so it does
-     **not** see the five non-`title` plain-text attributes listed above — widen it to scan every
-     `attr="..."`, then add Rule B (tags) and Rule C (name-vs-derivation disagreement) on top.
-  4. Fix `mphl_total_junction_k_tip` (drop the `<sub>`; 6 call sites).
-  5. Leave page labels and documents alone.
-
-  **Honest forecast (told to Tom, keep it honest).** Rule A should close permanently — it is absolute
-  and mechanical with no case to reason about. Rule B will keep a residue: the deriver sees
-  `attr="<?=$ec_lang['x']?>"` but will miss a string assembled in PHP first, or a delivery route not
-  yet imagined. Expect it to catch us again at least once. Tom's stated expectation is that the
-  problem will not fully end; that expectation is reasonable and already earned its keep once — it is
-  what prompted the grep that found the 5 non-`title` attributes above.
-
-  **Execution: commit direct to `master`, one step per commit (Tom, 2026-07-24 — this project does
-  not normally use branches; an earlier draft of this task proposed branches and was wrong).**
-  Steps 1 and 2 are mass mechanical edits across all 27 `lib/lang.ec.*.php` files (~1200 entity
-  replacements; 33 tooltips restructured). Keep each step its own commit so either can be reverted
-  cleanly, and run `php dev/scripts/lang_syntax_validate.php` plus a visual spot-check before
-  committing.
-
-  **The real constraint is sequencing, not version control.** `lib/lang.ec.*.php` is also the surface
-  every translation sprint writes to, so:
-  - Never run step 1 or step 2 concurrently with a translation sprint, and never run both at once.
-  - If a sprint is queued, run the sprint first — sprint output is judgment work that is expensive to
-    redo, while these mechanical passes are cheap to re-run against whatever the files then contain.
+- 30|148| **English's `template_welcome` says `»` where all 26 translations say `>>`.** Found
+  2026-07-27 while closing Task 140, and extracted rather than fixed silently (Tom's rule: a loose end
+  left inside a closed task is a lost loose end). Task 140 step 1 converted English's `&gt;&gt;` to a
+  literal `»`, which was the right call for an entity — but the 26 other language files held a
+  *literal* `>>` all along, never an entity, so Rule A never touched them and they still read `>>`.
+  Nothing is broken; it is a one-glyph cosmetic divergence on the welcome banner. **Severity: low.**
+  **Recommended fix:** make all 27 use `»`. It is a decorative direction mark, not a quote, and `»`
+  has Unicode `Bidi_Mirrored=Yes`, so it renders mirrored (leftward) in the five RTL languages
+  automatically — no per-language judgment needed. **Cost:** a one-character replacement in 26 files
+  with zero translation impact, plus a `detect_english_drift.php --update` re-baseline. The other
+  option — reverting English to `>>` — is equally consistent and cheaper still; Tom's call which.
 
 ## AI Efficiency Scripting (Overhead)
 
@@ -411,6 +259,256 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|140| **[H] Get HTML out of language strings where it cannot work, and enforce it mechanically —
+  DONE 2026-07-27.** Closed after evaluating steps 2-4 against what step 1 actually left behind, per
+  Tom's "ship it and see" instruction. Tom's call on the close: do step 4 + the enforcement, and
+  **retire step 2 permanently as superseded by step 1**.
+
+  **The measurement that decided it.** Re-measured before touching anything, rather than trusting the
+  block's own forecast:
+  - **Step 2's payload was gone.** Its justification was "33 tooltips buried inside other keys as
+    `title="…"` — **11 are dirty**." Re-measured: **39** such keys in English, **1053** strings across
+    all 27 files, and **zero dirty** — no tags, no entities, and every embedded `title="…"` parses
+    with no stray quote breaking out of the attribute. All 11 dirty ones were *entity* defects, and
+    step 1 fixed them as a side effect. What remained was only *future visibility*, and that turned
+    out to cost ~40 lines of validator instead of restructuring ~1050 translated strings.
+  - **Rule B had exactly one thing to catch, suite-wide:** `mphl_total_junction_k_tip`, in all 27
+    languages. Nothing else. Every other `_tip` key and every plain-text-bound key was already clean.
+  - **No literal markup was reaching any screen.** Checked the four no-`strip_tags` attribute sites
+    (`lib/Menus.lib.php:127,131,132,137`) and the JS `escapeAttr` path; every key reaching them was
+    tag-free.
+
+  **What shipped.**
+  - **Step 4 — done.** `k<sub>m</sub>` → `km` in `mphl_total_junction_k_tip`, 54 replacements (2 per
+    file × 27), line-scoped to that key so the same symbol in its three raw-HTML siblings
+    (`mphl_total_junction_k`, `_short`, `mhp_notes_1_def`) was left alone. Zero visible change: all 6
+    call sites already ran `strip_tags`, so `km` is exactly what rendered before. All 27 `php -l` clean.
+  - **Step 3 — done.** `attributeBoundKeys()` (which was **dead code** — assigned and immediately
+    `unset()` at the old `lang_syntax_validate.php:41-42`) became `plainTextBoundKeys()`, widened to
+    scan `lib/*.php` as well as the page PHP, and to match **every** plain-text attribute
+    (`title|placeholder|value|alt|aria-label|data-*`) rather than `htmlspecialchars()` alone — so it
+    now sees the five non-`title` attributes the task had flagged. Added `detectPlainTextTags()`
+    (Rule B), `detectEmbeddedTipDefects()` (Rule B for tooltips written inside other keys), and
+    `detectNameDerivationMismatch()` (Rule C, advisory, behind `--rule-c`).
+  - **Step 2 — retired, not deferred.** `detectEmbeddedTipDefects()` gives the visibility that lifting
+    the tooltips was meant to give, at ~1% of the cost. Do not re-propose the lift; the reason it
+    existed is gone.
+  - **Step 5 — page labels and documents left alone,** as designed.
+
+  **`strip_tags()` is deliberately NOT an exemption in Rule B.** It means the tag silently vanishes
+  rather than showing literally — a degraded string, not a correct one. Making the rule strict cost
+  one real fix (step 4) and left it with no exceptions to reason about, which is the same reasoning
+  that made Rule A absolute.
+
+  **Rule C earned its keep within minutes, exactly as the honest forecast predicted.** Its first run
+  reported six `named-but-unconstrained` keys (`or_regime_*_tip`, `mhp_hl_*_tip`, `odt_h2_warn_tip`),
+  which exposed **two real holes in the deriver**, not two false positives:
+  1. **A pageConfig property name is not its `$ec_lang` key** — the page PHP drops the calculator
+     prefix (`or_regime_submerged_tip` → `regime_submerged_tip`). The original deriver's comment
+     asserted they were identical, so **the entire JS tip route silently resolved to nothing**. Fixed
+     with `pageConfigPropertyMap()`, which reads the `prop: json_encode($ec_lang['key'])` lines out of
+     the page PHP; a property defined differently on two pages is recorded as a collision and left
+     unmapped rather than guessed.
+  2. **A naive `/\(([^)]*)\)/` truncates at a nested paren** — `writeCheckHTML(true, hlPct.toFixed(1)
+     + '%', cfg.hl_ok_tip)` stopped at `toFixed(1)`, hiding the three `mhp_hl_*_tip` keys. Fixed with
+     `callArguments()`, which balances parens and splits on top-level commas only.
+  After both fixes, `named-but-unconstrained` is **empty** — every `_tip` key in the suite now
+  resolves to a real call site. That is the load-bearing verification: the deriver is no longer
+  quietly enforcing Rule B over a set it could not see.
+
+  **Rule C ships advisory and off by default (`--rule-c`).** 29 keys disagree on purpose — chiefly the
+  16 `_main_desc` keys, which the original design already noted have two destinations at once (`<h2>`
+  and the menu `title=`), so no single name fits. Leaving it on would have buried the actionable
+  findings in known noise.
+
+  **QA.** Validator `php -l` clean; default run clean of every structural category (180 findings, all
+  pre-existing advisory `identical-to-english`). **Negative-tested rather than assumed** — injected a
+  `<sub>` into a `_tip` key, a `<b>` inside an embedded `title=`, and a `&mdash;` inside an embedded
+  `title=` in `lib/lang.ec.es.php`; all three fired with the right category and file:line, and the
+  file was restored. English-drift manifest re-baselined (`detect_english_drift.php --update`, 56
+  keys): **verified cosmetic before re-baselining**, by decoding entities in the pre-step-1 English
+  and normalizing markup — 54 of 56 matched exactly, and the 2 that did not (`rc_apron_length`'s
+  `&quot;`→curly, `template_welcome`'s `&gt;&gt;`→`»`) are precisely step 1's two documented judgment
+  calls. No translation was stale, so no resync was owed.
+
+  **A self-inflicted trap worth remembering:** writing `<?=…?>` inside a `//` comment in a PHP file
+  ends PHP mode and breaks the file. The comment in `plainTextBoundKeys()` now says so.
+
+  **Loose end extracted rather than buried (Tom's rule):** step 1 turned English's `template_welcome`
+  `&gt;&gt;` into `»`, but the 26 other languages held a *literal* `>>` all along and so were never
+  touched — English now shows `»` where every translation shows `>>`. Filed as **Task 148**.
+
+  **Prediction vs. outcome, kept honest.** The block forecast that Rule A "should close permanently"
+  and that Rule B "will keep a residue… expect it to catch us again at least once." Rule A did close.
+  Rule B's residue arrived immediately — but from the *deriver's own blind spots*, found by Rule C,
+  not from a new delivery route. The forecast was right about the shape and optimistic about the
+  timing.
+
+  **Original text follows.**
+  **[Original priority 60 header]** **[H] Get HTML out of language strings where it cannot work, and enforce it mechanically.**
+    Design agreed with Tom 2026-07-24. **STEP 1 IS DONE (2026-07-27); steps 2-4 remain — re-judge them
+    against what step 1 actually left behind, per Tom's "ship it and see" instruction.**
+
+    **Step 1 result, 2026-07-27 (Tom authorized proceeding).** All **1204 entity occurrences across all
+    27 `lib/lang.ec.*.php` files** converted to literal UTF-8; **zero entities remain** in any language
+    string, and all 27 files are `php -l` clean. Rule A is now enforced hard: the validator's
+    `detectAttributeEntities()` was replaced by `detectEntities()`, which flags *any* entity in *any*
+    language string (no attribute-key scoping — the scoping is what made the old check miss things) and
+    names the literal replacement in the error text. `lang_syntax_validate.php` is clean of every
+    structural category; the 180 remaining findings are all pre-existing advisory
+    `identical-to-english` warnings.
+    - **`$ec_lang_intent` was never touched** — checked first, and it contained no entities at all, so
+      step 1 needed no permission against the off-limits rule.
+    - **The four HTML-syntax escapes needed judgment, not blind conversion,** and the roadmap's
+      "~12 distinct characters" forecast did not cover them. `&lt;`/`&gt;`/`&amp;` turned out to be
+      **always followed by a space** in all 27 files (verified before converting, not assumed), so the
+      literal `<`/`>`/`&` is unambiguous to the HTML parser — no fake tags, no ambiguous ampersand.
+      `&gt;&gt;`/`&lt;&lt;` in `template_welcome` became `»`/`«`. The 41 `&quot;` are all one key
+      (`rc_apron_length`, the Robinson quotation) and became curly `“ ”`, which is both typographically
+      right and safe inside the `title="…"` they live in — a literal `"` there would have terminated
+      the attribute. One genuine edge case: `sr` had already used its native opening `„` and escaped
+      only the closer, and `“` *is* the correct Serbian closing quote, so it landed right.
+    - **Confirmed the fix on the paths that were actually broken**, not just the file contents: the
+      menu `title=` path (`Menus.lib.php`, `ENT_QUOTES`) now renders `Pond, Basin, or Tank Drain Time —
+      …` instead of a doubled `&mdash;`. Conversely `ip_main_title`'s literal `&` now arrives in a meta
+      attribute as a correctly single-escaped `&amp;` — which is the whole point of the rule.
+    - Entities still present in *rendered* output (`&copy;`, `&ndash;`, `&iacute;`) are hardcoded in
+      `lib/HeadersFooters.lib.php` and per-page SEO meta tags, **not** language strings — out of Rule
+      A's scope by design. Worth a decision later whether Rule A should grow to cover them.
+    - **Prediction to check against:** the honest forecast below says Rule A "should close permanently."
+      Step 1 cost far less than the block implies — the risk was concentrated entirely in the ~150
+      syntax escapes, not the ~1050 typographic ones. Step 2 (lifting the 33 embedded tooltips) is the
+      load-bearing step and is still untouched.
+
+    Original design notes follow — read the whole block before acting on steps 2-4.
+    **Start with step 1 alone — a plain entity-cleanup pass (Tom, 2026-07-27).** The evidence now says
+    this is a historical mess, not an ongoing discipline failure, so do the cheap mechanical fix first
+    and re-judge the rest afterward. Full reasoning under "Do step 1 first" below.
+
+    **The problem in one sentence.** A language string's HTML is sometimes fine and sometimes silently
+    broken, and *which one depends on the PHP/JS call site that consumes it*, not on anything visible
+    in the string — so the same string is correct in one place and wrong in another, with no error.
+
+    **The two things that break, and why.**
+    1. *Entities* (`&mdash;` `&asymp;` `&sup2;` …). An entity in an HTML attribute is decoded by the
+       browser and renders fine — Tom verified in Chrome, and the spec agrees. It breaks only when the
+       string passes through something that escapes `&` first. This suite has three attribute paths and
+       **two of them break entities**: raw echo (`lib/Menus.lib.php:91`) works;
+       `htmlspecialchars(strip_tags())` (`Branched-Network.php:56`) breaks; `escapeAttr`
+       (`js/Calculators.lib.js:406`) breaks. Both broken paths turn `&asymp;` into a literal
+       `&asymp;` on screen. Proof that entities are an unnecessary habit, not a need:
+       `dw_kinematic_viscosity` contains literal `×`, `⁻⁶`, `²`, `°` **and** an entity `&nu;` in the
+       same string — the literal form was already working right beside it.
+    2. *Tags* in an attribute. `title=`/`placeholder=`/`value=` hold plain text only; `<sub>` in a
+       `title` never renders as a subscript by any delivery route. Confirmed by Tom.
+
+    **Decisions already settled — do not relitigate.**
+    - Unicode subscripts **rejected** as a replacement for `<sub>`. Unicode has no subscript `c f w d g`,
+      **no capitals**, and no multi-letter forms — so `h_f` (most-used symbol in the suite), `C_d`,
+      `P_w`, `h_L`, `q_out`, `q_avg,field` are unwritable. ~66 of 177 subscript occurrences fail.
+      Mixing Unicode and markup also renders at visibly different sizes.
+    - Placeholder/symbol-table refactor **rejected** (it was proposed, then withdrawn as solving a
+      problem we can decline to have).
+    - Document keys (`about_body_html` 2691 chars, `irr_quickref_html`, the 30 keys >300 chars)
+      **keep their HTML** — Tom: they are only ever echoed raw by PHP, never read into JS or an
+      attribute, so their context is safe. Page labels keep `<sub>` too.
+    - `mphl_total_junction_k_tip` degrades acceptably to `km` — Tom confirmed.
+
+    **The three rules.**
+    - **Rule A — no `&...;` in any language string.** All 564 keys × 27 files, no exceptions. Absolute
+      *because* scoping requires judgment, and the previous check failed precisely by scoping itself to
+      "tip keys" (see `detectAttributeEntities()` in `dev/scripts/lang_syntax_validate.php`).
+    - **Rule B — no `<...>` in any plain-text-constrained string.** Constrained = named `_tip`/`_plain`
+      **or** found by a deriver inside any `attr="..."`.
+    - **Rule C (advisory, reports only)** — the name and the derivation must agree; report both
+      "reaches an attribute but isn't named" and "named but only used in page HTML".
+
+    **Naming convention.** Suffix `_plain` (**not** `_attrib` — rejected: it names the *destination*,
+    but 16 `_main_desc` keys have two destinations at once, `<h2>` **and** the menu `title=`;
+    and "attribute" is overloaded with the GIS/data-field sense). `_plain` names *what the string may
+    contain*, which is single-valued: the strictest destination wins. `_tip` stays as an established
+    special case of `_plain` (33 keys, 32 already compliant).
+    **The name is a hint, never the enforcement** — a name is a claim, the code is the fact. Derivation
+    enforces; the name covers what derivation can't see statically (a string assembled in PHP then
+    passed to an attribute).
+
+    **Measured scope (2026-07-24, read-only). Re-run any time with
+    `php dev/scripts/measure_lang_sinks.php` — it reproduces every number below.**
+    - Reference sites by destination: `raw-html` 670, `attr-escaped` 37, `attr-RAW` 16, pageConfig
+      (`json_encode`→JS) 62 keys. **93% of sites are raw-html, where everything works** — which is why
+      the habit never got punished and kept recurring.
+    - 134 English keys carry markup (`sub` 84, `span+sub` 19, `span` 18, `a` 8, `br` 3, `sup` 2).
+    - 55 English keys carry entities; ~1200 entity occurrences across all 27 files.
+    - **33 tooltips have their own `_tip` key — 1 is dirty. 33 more tooltips are buried inside other
+      keys as `title="…"` written into the middle of a label — 11 are dirty.** That 1-vs-11 contrast is
+      the core finding: a tooltip with its own name gets treated as tooltip text and stays clean; a
+      tooltip embedded in page HTML picks up page-HTML habits. Half the suite's tooltips are currently
+      invisible to any checker.
+    - Already-existing non-`title` plain-text attributes holding lang strings (5): `placeholder`
+      (`lib/Calculators.lib.php:67,68`, `lib/Menus.lib.php:131`), `value` (`contact.php:55`),
+      `data-copied-text` (`lib/Menus.lib.php:137`). **This is why the deriver must scan every
+      `attr="…"`, not just `title=`.**
+    - Four different escaping conventions are already in use across call sites (raw,
+      `htmlspecialchars`, `htmlspecialchars(strip_tags())`, `ENT_QUOTES` at `lib/Menus.lib.php:127`).
+
+    **Evidence from the Task 137 sprint, 2026-07-27 — Rule A is cheap to hold at write time.** The
+    sprint brief told all 26 translation agents, in one line, "never emit HTML entities, use literal
+    UTF-8" and "preserve all markup exactly — same tags, same count as English." Result across 26
+    languages × 6 real strings: **zero entity findings and zero tag-parity failures**, checked
+    independently rather than taken from the agents' self-reports. Two agents also correctly declined
+    to translate numeric/bibliographic strings (`2.54–2.82 (Robinson)`) and real cognates (`laminar`,
+    `Circular`) after being told a value equal to English is not automatically a missing translation.
+    **Reading:** entities are a habit acquired from *editing existing strings*, not something writers
+    reach for unprompted — when the rule is stated at the moment of writing, it costs one sentence and
+    holds. That supports Rule A being absolute (step 1) and argues the expensive part of this task is
+    the historical cleanup and the deriver, not the ongoing discipline.
+
+    **Do step 1 first, on its own, as a plain cleanup pass (Tom, 2026-07-27).** Given the sprint
+    evidence above — the problem looks *historical* rather than ongoing — the right first move is the
+    simple mechanical cleanup, not the deriver and not the architecture. Convert the entities, turn
+    Rule A on, ship it, and see what is actually left. **Do not bundle steps 2-4 into that pass**;
+    step 1 is independent by design and its value does not depend on the rest of this task ever being
+    done. If the historical reading is right, step 1 plus Rule A removes most of the recurring pain for
+    a fraction of the effort, and what remains can be judged with real evidence instead of forecast.
+
+    **Steps, in order.**
+    1. Convert all `&...;` to literal UTF-8 characters; turn Rule A on hard. English needs ~12 distinct
+       characters (`— × ÷ ≈ ≤ ≥ √ ² ν τ Δ –`); the check should name the replacement in its error text.
+       Independent of every step below. **This is the sanctioned starting point — see the note above.**
+    2. Lift the 33 embedded tooltips into their own `_tip` keys, fixing the 11 dirty ones. **Tom agreed
+       the existing translations are extracted mechanically** from inside the label strings across all
+       27 files (they are already translated, just trapped) — not left empty for a future sprint.
+       This is the load-bearing step: it is what makes tooltip content visible to any check at all.
+    3. Build the deriver + Rules B and C into `dev/scripts/lang_syntax_validate.php`.
+       **Partly built already — do not start from scratch.** Commit `3f9b3de` added
+       `attributeBoundKeys()`, which derives attribute-bound keys from the app source (PHP
+       `htmlspecialchars()`/`strip_tags()` labels, and JS tip properties / `writeCheckHTML()` 3rd
+       argument). What remains: it matches `htmlspecialchars(...)` and JS tip paths only, so it does
+       **not** see the five non-`title` plain-text attributes listed above — widen it to scan every
+       `attr="..."`, then add Rule B (tags) and Rule C (name-vs-derivation disagreement) on top.
+    4. Fix `mphl_total_junction_k_tip` (drop the `<sub>`; 6 call sites).
+    5. Leave page labels and documents alone.
+
+    **Honest forecast (told to Tom, keep it honest).** Rule A should close permanently — it is absolute
+    and mechanical with no case to reason about. Rule B will keep a residue: the deriver sees
+    `attr="<?=$ec_lang['x']?>"` but will miss a string assembled in PHP first, or a delivery route not
+    yet imagined. Expect it to catch us again at least once. Tom's stated expectation is that the
+    problem will not fully end; that expectation is reasonable and already earned its keep once — it is
+    what prompted the grep that found the 5 non-`title` attributes above.
+
+    **Execution: commit direct to `master`, one step per commit (Tom, 2026-07-24 — this project does
+    not normally use branches; an earlier draft of this task proposed branches and was wrong).**
+    Steps 1 and 2 are mass mechanical edits across all 27 `lib/lang.ec.*.php` files (~1200 entity
+    replacements; 33 tooltips restructured). Keep each step its own commit so either can be reverted
+    cleanly, and run `php dev/scripts/lang_syntax_validate.php` plus a visual spot-check before
+    committing.
+
+    **The real constraint is sequencing, not version control.** `lib/lang.ec.*.php` is also the surface
+    every translation sprint writes to, so:
+    - Never run step 1 or step 2 concurrently with a translation sprint, and never run both at once.
+    - If a sprint is queued, run the sprint first — sprint output is judgment work that is expensive to
+      redo, while these mechanical passes are cheap to re-run against whatever the files then contain.
 
 - 0|147|[CC] **sw `kichwa` → `kimo` head-term conversion finished — DONE 2026-07-27.** Authorized by
   Tom the same day it was filed. Converted all 16 stragglers in `lib/lang.ec.sw.php`:

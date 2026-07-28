@@ -302,9 +302,35 @@ by scoping itself* to attribute-bound keys.
 `php dev/scripts/lang_syntax_validate.php` enforces this (`entity-in-lang-string`) and names the
 literal replacement in its error text. Trust the tool — don't add more rules on top of it.
 
-Two things this rule does **not** cover: hardcoded entities in `lib/HeadersFooters.lib.php` and
-per-page SEO meta tags (not language strings), and the plain-text-attribute tag rules (Rules B and C),
-which are Task 140 steps 2-4 and not yet built.
+The one thing this rule does **not** cover: hardcoded entities in `lib/HeadersFooters.lib.php` and
+per-page SEO meta tags — those are not language strings.
+
+### Rule B: never write an HTML tag in a plain-text-constrained string (Task 140, enforced 2026-07-27)
+
+A plain-text attribute (`title` `placeholder` `value` `alt` `aria-label` `data-*`) holds text only.
+`<sub>` in a `title=` is **never** a subscript by any delivery route — depending on the call site it
+is either silently stripped or shown literally. Two forms, both enforced by
+`php dev/scripts/lang_syntax_validate.php`:
+
+- **`tag-in-plain-text-string`** — the whole string reaches plain text. "Reaches" is **derived from
+  the app source** by `plainTextBoundKeys()`, not from the key's name: a name is a claim, the code is
+  the fact. The `_tip`/`_plain` naming is enforced *too*, as a second net for a string assembled in
+  PHP before it reaches an attribute — but derivation is what actually decides.
+- **`tag-in-embedded-tip`** / **`entity-in-embedded-tip`** — a tooltip written *inside* another key's
+  value as `title="…"`. 39 English keys (1053 strings across the 27 files) do this, and until this
+  check existed **every one was invisible to the validator**: the outer key is page HTML, so Rule B
+  does not apply to it, while the text inside its `title=""` is under exactly the plain-text
+  constraint. This check is why lifting those 39 tooltips into their own keys was retired as
+  unnecessary — see the Task 140 record in `dev/ROADMAP.md`.
+
+**Rule C is advisory and off by default** — run `lang_syntax_validate.php --rule-c`. It reports where
+the name and the derivation disagree. 29 keys disagree *on purpose* (the 16 `_main_desc` keys have two
+destinations at once, `<h2>` and the menu `title=`, so no single name fits), which is why it would
+otherwise be noise. Run it after touching a call site: it is what caught the deriver missing the
+entire JS tip route in the first place.
+
+**When adding a tooltip or an attribute-bound label, you need do nothing** — the deriver picks it up
+automatically. That is the point: it replaces "remember not to."
 
 ## Translation Sprints
 

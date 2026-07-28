@@ -11,8 +11,16 @@
  * - <sub>/<span>/<sup> tag-count imbalance within a value
  * - foreign-script characters (Hangul/Kana) that indicate model contamination
  * - values byte-identical to the English source (untranslated content)
- * - HTML entities in strings bound to a title="" attribute (they double-escape and show
- *   literally in the tooltip); the key set is derived from the app source, not hand-listed
+ * - Rule A: HTML entities in ANY language string (they double-escape on two of the three
+ *   attribute paths and show literally on screen)
+ * - Rule B: HTML tags in a plain-text-constrained string -- one bound to a plain-text
+ *   attribute (title/placeholder/value/alt/aria-label/data-*) or named _tip/_plain. The
+ *   bound key set is derived from the app source, never hand-listed.
+ * - Rule B (embedded): tags or entities inside a title="..." that a language string writes
+ *   itself. Half the suite's tooltips live inside label strings this way; without this pass
+ *   they are invisible to every other check.
+ * - Rule C (advisory): the name and the derivation disagree -- a key reaching a plain-text
+ *   attribute without a _tip/_plain name, or named but only ever used in page HTML.
  *
  * Usage:
  *   php scripts/lang_syntax_validate.php
@@ -20,6 +28,16 @@
  */
 
 const DEFAULT_LANG_DIR = __DIR__ . '/../../lib';
+
+/**
+ * Attributes that hold plain text only. A tag written into one of these never renders as
+ * markup by any delivery route -- <sub> in a title="" is not a subscript, it is either
+ * stripped or shown literally depending on the call site's escaping.
+ *
+ * href/src/class/id/style are deliberately absent: they are not displayed text, and a
+ * language string has no business in them anyway.
+ */
+const PLAIN_TEXT_ATTRS = 'title|placeholder|value|alt|aria-label|data-[a-z-]+';
 
 main($argv);
 
@@ -35,11 +53,10 @@ function main(array $argv): void
 
     $issues = [];
     $enValues = extractValues((string)file_get_contents(DEFAULT_LANG_DIR . '/lang.ec.en.php'));
-    // Derived attribute-bound key list. Rule A (detectEntities) is absolute and needs no
-    // scoping, so nothing consumes this yet -- it is the foundation for Task 140 steps 3
-    // (Rules B and C). Keep it wired up here so that work starts from a live call site.
-    $attrKeys = attributeBoundKeys();
-    unset($attrKeys);
+    // Derived plain-text-bound key list, shared by Rules B and C. Rule A (detectEntities) is
+    // absolute and needs no scoping; Rule B does, and this derivation -- not a hand-list and
+    // not the key's name -- is what enforces it. A name is a claim; the code is the fact.
+    $plainKeys = plainTextBoundKeys();
 
     foreach ($files as $file) {
         if (!preg_match('/lang\.ec\.([a-z]{2})\.php$/', $file, $m)) {
@@ -61,6 +78,11 @@ function main(array $argv): void
         $issues = array_merge($issues, detectTagImbalance($file, $content));
         $issues = array_merge($issues, detectForeignScript($file, $content));
         $issues = array_merge($issues, detectEntities($file, $content));
+        $issues = array_merge($issues, detectPlainTextTags($file, $content, $plainKeys));
+        $issues = array_merge($issues, detectEmbeddedTipDefects($file, $content));
+        if ($lang === 'en' && $opts['ruleC']) {
+            $issues = array_merge($issues, detectNameDerivationMismatch($file, $content, $plainKeys));
+        }
         if ($lang !== 'en') {
             $issues = array_merge($issues, detectUntranslatedValues($file, $content, $enValues));
         }
@@ -81,13 +103,18 @@ function main(array $argv): void
 
 function parseArgs(array $argv): array
 {
-    $opts = ['languages' => []];
+    $opts = ['languages' => [], 'ruleC' => false];
 
     for ($i = 1; $i < count($argv); $i++) {
         $arg = $argv[$i];
 
         if (strpos($arg, '--lang=') === 0) {
             $opts['languages'] = splitCsv(substr($arg, strlen('--lang=')));
+            continue;
+        }
+
+        if ($arg === '--rule-c') {
+            $opts['ruleC'] = true;
             continue;
         }
 
@@ -106,6 +133,9 @@ function printHelpAndExit(): void
     echo "Usage: php scripts/lang_syntax_validate.php [options]\n";
     echo "\nOptions:\n";
     echo "  --lang=es,fr      Limit to specific language codes\n";
+    echo "  --rule-c          Also report Rule C advisories (name vs. derivation disagreement).\n";
+    echo "                    Off by default: 29 keys disagree on purpose -- the 16 _main_desc\n";
+    echo "                    keys have two destinations at once, so no single name fits.\n";
     echo "  -h, --help        Show this help\n";
     exit(0);
 }
@@ -260,44 +290,239 @@ function detectForeignScript(string $file, string $content): array
 
 /**
  * Derives (from the app source, never a hand-maintained list) the set of $ec_lang keys whose
- * value ends up inside an HTML title="" attribute -- via PHP htmlspecialchars() in a label, or
- * via JS EngCalcs.escapeAttr() as a verdict/check tip. Both re-escape '&' -> '&amp;', so an HTML
- * entity in such a string (e.g. &mdash;) becomes &amp;mdash; and shows literally in the tooltip.
- * These keys must use literal Unicode characters, never entities. Self-maintaining: add a tip and
- * the guard covers it automatically -- this is the durable replacement for "remember not to".
+ * value ends up somewhere that can hold plain text only -- an HTML attribute in the page PHP,
+ * or a JS verdict/check tip fed through EngCalcs.escapeAttr().
+ *
+ * Returns key => short description of where it lands, so a finding can name the call site.
+ *
+ * Widened for Task 140 step 3 (2026-07-27) from the original htmlspecialchars()-only version,
+ * which saw neither lib/*.php nor the five non-title plain-text attributes the suite already
+ * uses (placeholder in Calculators.lib.php and Menus.lib.php, value in contact.php,
+ * data-copied-text in Menus.lib.php). Scanning every attr="..." rather than title= alone is
+ * the whole point: the previous narrow scoping is how the old entity check missed things.
+ *
+ * Self-maintaining: add a tip or a new attribute-bound label and the guard covers it
+ * automatically -- the durable replacement for "remember not to".
  */
-function attributeBoundKeys(): array
+function plainTextBoundKeys(): array
 {
     $root = __DIR__ . '/../..';
     $keys = [];
 
-    // PHP path: htmlspecialchars( [strip_tags(] $ec_lang['KEY'] ... ) -- label title attributes.
-    foreach (glob($root . '/*.php') as $f) {
+    $phpFiles = array_merge(glob($root . '/*.php') ?: [], glob($root . '/lib/*.php') ?: []);
+    foreach ($phpFiles as $f) {
         $c = (string)file_get_contents($f);
-        if (preg_match_all('/htmlspecialchars\(\s*(?:strip_tags\(\s*)?\$ec_lang\[\'([^\']+)\'\]/', $c, $m)) {
-            foreach ($m[1] as $k) { $keys[$k] = true; }
-        }
-    }
+        $rel = basename(dirname($f)) === 'lib' ? 'lib/' . basename($f) : basename($f);
 
-    // JS path: keys passed as tip text to the verdict helpers -- either the value of any *Tip /
-    // *tip object property (highTip, lowTip, okTip, ...) or the 3rd argument of writeCheckHTML().
-    // A pageConfig/cfg property name is identical to its $ec_lang key.
-    foreach (glob($root . '/js/*.js') as $f) {
-        $c = (string)file_get_contents($f);
-        if (preg_match_all('/\w*[Tt]ip\s*:\s*(?:EngCalcs\.)?(?:pageConfig|cfg)\.([A-Za-z0-9_]+)/', $c, $m)) {
-            foreach ($m[1] as $k) { $keys[$k] = true; }
+        // Explicit escaping around a lang key -- htmlspecialchars( [strip_tags(] $ec_lang['KEY'] ).
+        // strip_tags() is NOT treated as an exemption: it means the tag silently vanishes rather
+        // than showing literally, which is a degraded string, not a correct one.
+        if (preg_match_all('/htmlspecialchars\(\s*(?:strip_tags\(\s*)?\$ec_lang\[\'([^\']+)\'\]/', $c, $m)) {
+            foreach ($m[1] as $k) { $keys[$k] = $rel . ' (escaped attribute)'; }
         }
-        if (preg_match_all('/writeCheckHTML\s*\(([^)]*)\)/', $c, $m)) {
-            foreach ($m[1] as $args) {
-                $parts = explode(',', $args);
-                if (count($parts) >= 3 && preg_match('/(?:pageConfig|cfg)\.([A-Za-z0-9_]+)/', $parts[2], $mm)) {
-                    $keys[$mm[1]] = true;
+
+        // Generic attribute scan: any plain-text attribute whose value references a lang key,
+        // whether short-echo interpolated or concatenated (' . $ec_lang['k'] . ').
+        // Textual on purpose -- the attribute quotes survive both PHP forms unchanged.
+        // (Deliberately not spelling out the short-echo tag here: a literal close-tag inside a
+        // // comment ends PHP mode, which broke this file once already.)
+        if (preg_match_all('/\b(' . PLAIN_TEXT_ATTRS . ')\s*=\s*"([^"]*)"/i', $c, $m, PREG_SET_ORDER)) {
+            foreach ($m as $hit) {
+                if (preg_match_all('/\$ec_lang\[\'([^\']+)\'\]/', $hit[2], $km)) {
+                    foreach ($km[1] as $k) { $keys[$k] = $rel . ' (' . strtolower($hit[1]) . '="")'; }
                 }
             }
         }
     }
 
-    return array_keys($keys);
+    // A pageConfig property name is NOT identical to its $ec_lang key -- the page PHP drops the
+    // calculator prefix (or_regime_submerged_tip becomes regime_submerged_tip). The original
+    // deriver assumed they matched, so the entire JS tip route silently resolved to nothing.
+    // Found 2026-07-27 by Rule C's own 'named-but-unconstrained' advisory, which is exactly the
+    // disagreement between name and derivation that Rule C exists to surface.
+    $propToKey = pageConfigPropertyMap($phpFiles);
+
+    // JS path: keys passed as tip text to the verdict helpers -- either the value of any *Tip /
+    // *tip object property (highTip, lowTip, okTip, ...) or the 3rd argument of writeCheckHTML().
+    // escapeAttr() does not strip tags, so a tag here shows literally in the tooltip.
+    foreach (glob($root . '/js/*.js') as $f) {
+        $c = (string)file_get_contents($f);
+        $props = [];
+        if (preg_match_all('/\w*[Tt]ip\s*:\s*(?:EngCalcs\.)?(?:pageConfig|cfg)\.([A-Za-z0-9_]+)/', $c, $m)) {
+            foreach ($m[1] as $p) { $props[$p] = 'tip property'; }
+        }
+        foreach (callArguments($c, 'writeCheckHTML') as $parts) {
+            if (count($parts) >= 3 && preg_match('/(?:pageConfig|cfg)\.([A-Za-z0-9_]+)/', $parts[2], $mm)) {
+                $props[$mm[1]] = 'writeCheckHTML tip';
+            }
+        }
+        foreach ($props as $prop => $how) {
+            // Resolve through the page's own pageConfig block; fall back to the bare property
+            // name for the pages that do use an unprefixed key.
+            $k = $propToKey[$prop] ?? $prop;
+            $keys[$k] = 'js/' . basename($f) . ' (' . $how . ')';
+        }
+    }
+
+    return $keys;
+}
+
+/**
+ * Splits every call to $fn( ... ) in $code into its top-level arguments, balancing parentheses
+ * so a nested call does not truncate the list.
+ *
+ * A naive /\(([^)]*)\)/ misses any call with a nested paren -- which silently hid the three
+ * mhp_hl_*_tip keys, whose second argument is hlPct.toFixed(1). Splitting on top-level commas
+ * only, for the same reason.
+ */
+function callArguments(string $code, string $fn): array
+{
+    $calls = [];
+    $offset = 0;
+    while (($pos = strpos($code, $fn . '(', $offset)) !== false) {
+        $i = $pos + strlen($fn) + 1;
+        $depth = 1;
+        $arg = '';
+        $parts = [];
+        for (; $i < strlen($code) && $depth > 0; $i++) {
+            $ch = $code[$i];
+            if ($ch === '(') { $depth++; }
+            elseif ($ch === ')') { $depth--; if ($depth === 0) { break; } }
+            if ($depth === 1 && $ch === ',') { $parts[] = $arg; $arg = ''; continue; }
+            $arg .= $ch;
+        }
+        $parts[] = $arg;
+        $calls[] = $parts;
+        $offset = $pos + strlen($fn) + 1;
+    }
+    return $calls;
+}
+
+/**
+ * Maps a JS pageConfig property name to the $ec_lang key that fills it, by reading the
+ * "prop: <?= json_encode($ec_lang['key']) ?>," lines in the page PHP. Needed because the pages
+ * drop the calculator prefix when naming the property, so the JS side alone cannot name the key.
+ *
+ * A property defined on more than one page with different keys is recorded as a collision and
+ * left unmapped rather than guessed -- a wrong mapping would silently constrain the wrong string.
+ */
+function pageConfigPropertyMap(array $phpFiles): array
+{
+    $map = [];
+    $collided = [];
+    foreach ($phpFiles as $f) {
+        $c = (string)file_get_contents($f);
+        if (!preg_match_all('/([A-Za-z0-9_]+)\s*:\s*(?:<\?=|<\?php\s+echo\s+)?\s*json_encode\(\s*\$ec_lang\[\'([^\']+)\'\]/', $c, $m, PREG_SET_ORDER)) {
+            continue;
+        }
+        foreach ($m as $hit) {
+            [$prop, $key] = [$hit[1], $hit[2]];
+            if (isset($map[$prop]) && $map[$prop] !== $key) {
+                $collided[$prop] = true;
+            }
+            $map[$prop] = $key;
+        }
+    }
+    foreach (array_keys($collided) as $prop) {
+        unset($map[$prop]);
+    }
+    return $map;
+}
+
+/**
+ * ROADMAP Task 140, Rule B: no HTML tag in a plain-text-constrained string.
+ *
+ * Constrained means either derived (the string reaches a plain-text attribute or a JS tip) or
+ * named (_tip / _plain). Both, because neither alone is sufficient: derivation cannot see a
+ * string assembled in PHP before it reaches an attribute, and a name is only a claim.
+ */
+function detectPlainTextTags(string $file, string $content, array $plainKeys): array
+{
+    $issues = [];
+    foreach (extractValues($content) as $key => $value) {
+        $named = (bool)preg_match('/_(tip|plain)$/', $key);
+        $bound = isset($plainKeys[$key]);
+        if (!$named && !$bound) {
+            continue;
+        }
+        if (!preg_match('/<\s*\/?\s*([a-zA-Z][a-zA-Z0-9]*)\b[^>]*>/', $value, $m)) {
+            continue;
+        }
+        $where = $bound ? $plainKeys[$key] : 'named _' . ($named ? 'tip/_plain' : '');
+        $issues[] = formatIssue(
+            $file,
+            lineAtOffset($content, (int)strpos($content, "['" . $key . "']")),
+            'tag-in-plain-text-string',
+            $key . ': HTML tag "' . $m[0] . '" is not allowed — this string reaches plain text only ['
+                . $where . ']. Write the text without markup.'
+        );
+    }
+    return $issues;
+}
+
+/**
+ * ROADMAP Task 140, Rule B (embedded case): a tooltip written *inside* another key's value as
+ * title="...".
+ *
+ * 39 English keys do this (1053 strings across the 27 files), and before this check every one of
+ * them was invisible to the validator -- the outer key is page HTML, so Rule B does not apply to
+ * it, while the text inside its title="" is under exactly the plain-text constraint. This is the
+ * cheap substitute for lifting all 39 tooltips into their own keys (Task 140 step 2, retired):
+ * it buys the visibility without restructuring ~1050 translated strings.
+ */
+function detectEmbeddedTipDefects(string $file, string $content): array
+{
+    $issues = [];
+    foreach (extractValues($content) as $key => $value) {
+        if (strpos($value, 'title=') === false) {
+            continue;
+        }
+        $line = lineAtOffset($content, (int)strpos($content, "['" . $key . "']"));
+
+        if (!preg_match_all('/title\s*=\s*"([^"]*)"/i', $value, $m)) {
+            $issues[] = formatIssue($file, $line, 'embedded-tip-unparseable',
+                $key . ': contains title= but no well-formed title="..." — check for a stray or missing quote.');
+            continue;
+        }
+        foreach ($m[1] as $tip) {
+            if (preg_match('/<\s*\/?\s*[a-zA-Z][a-zA-Z0-9]*\b[^>]*>/', $tip, $t)) {
+                $issues[] = formatIssue($file, $line, 'tag-in-embedded-tip',
+                    $key . ': HTML tag "' . $t[0] . '" inside an embedded title="" — a tooltip holds plain text only.');
+            }
+            if (preg_match('/&(#\d+|#x[0-9a-fA-F]+|[a-zA-Z][a-zA-Z0-9]+);/', $tip, $e)) {
+                $issues[] = formatIssue($file, $line, 'entity-in-embedded-tip',
+                    $key . ': HTML entity "' . $e[0] . '" inside an embedded title="" — use the literal UTF-8 character.');
+            }
+        }
+    }
+    return $issues;
+}
+
+/**
+ * ROADMAP Task 140, Rule C -- advisory only, reports and never fails the intent of a name.
+ *
+ * Run against English alone (the naming is a property of the key, not of a translation).
+ * Two directions, both worth seeing: a string that reaches an attribute without a name saying
+ * so is a trap for the next writer, and a _tip/_plain name that no call site actually constrains
+ * is either dead or delivered by a route the deriver cannot see.
+ */
+function detectNameDerivationMismatch(string $file, string $content, array $plainKeys): array
+{
+    $issues = [];
+    foreach (extractValues($content) as $key => $value) {
+        $named = (bool)preg_match('/_(tip|plain)$/', $key);
+        $bound = isset($plainKeys[$key]);
+        $line = lineAtOffset($content, (int)strpos($content, "['" . $key . "']"));
+
+        if ($bound && !$named) {
+            $issues[] = formatIssue($file, $line, 'plain-text-unnamed',
+                $key . ' reaches plain text [' . $plainKeys[$key] . '] but is not named _tip/_plain.');
+        } elseif ($named && !$bound) {
+            $issues[] = formatIssue($file, $line, 'named-but-unconstrained',
+                $key . ' is named _tip/_plain but no derived call site constrains it — dead key, or a delivery route the deriver cannot see.');
+        }
+    }
+    return $issues;
 }
 
 /**
