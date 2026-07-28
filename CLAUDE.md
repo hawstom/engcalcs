@@ -15,10 +15,40 @@ A PHP/JS suite of hydraulic engineering calculators. 12 calculators, 11 language
 5. Write `EngCalcs.pageCalculator = function(objForm) { ... }` in the `<script>` block at the bottom.
 6. Call `echoHeader`, `echoCalculatorForm`, `echoFeedback`, then `echoFooter` — that's the full page structure.
 7. Add the new calculator to the menus in `lib/Menus.lib.php`.
-8. Include the calculator JS using `filemtime()` for automatic cache-busting — never use a hardcoded `?v=N`:
+8. Set `$html_desc = $ec_lang['prefix_meta_desc_plain'];` before `echoHeader()` — see "Meta description" below.
+9. Include the calculator JS using `filemtime()` for automatic cache-busting — never use a hardcoded `?v=N`:
    ```php
    <script src="/engcalcs/js/my-calc.js?v=<?=filemtime(__DIR__.'/js/my-calc.js')?>"></script>
    ```
+
+### Meta description (ROADMAP Task 150)
+
+Each page sets one global before `echoHeader()`; `echoHTMLHead()` escapes it into
+`<meta name="Description">` for every page at once:
+
+```php
+$html_desc = $ec_lang['mpf_main_desc'];
+```
+
+- **Reuse `<prefix>_main_desc` — do not add a meta-description key.** `*_main_desc` is already
+  written, already translated into all 26 languages, and already says something different from the
+  title (the title is "Free Online Manning Pipe Flow Calculator"; the desc is "Manning Formula
+  Uniform Pipe Flow at Given Slope and Depth"), so it fixes the duplicate-of-title defect at zero
+  translation cost. **This is a decision, not an oversight** (Tom, 2026-07-28): a dedicated
+  meta-description key per page reads better as a search snippet, but it costs 20 × 26 = 520 new
+  strings — roughly tripling the standing translation delta — for an incremental SEO gain. A
+  free fix that is 80% as good beat a paid one. Weigh any future proposal to add prose descriptions
+  against that same arithmetic.
+- **Never point `$html_desc` at `$html_title` or at a `*_main_title` key.** Repeating the title is
+  the original Task 150 defect: Google discards a duplicate-of-title description and auto-generates
+  a snippet from a page whose visible content is a form.
+- **A page with no `*_main_desc` sets nothing** — no `$html_desc`, no tag emitted. `index.php`,
+  `contact.php`, `Compare-Languages.php`, and `formmailsuccess.php` have none. (`index.php` is the
+  one place this genuinely costs something; see ROADMAP Task 157.)
+- **Whatever key you point it at is plain-text-constrained** — no tags, no entities.
+  `plainTextBoundKeys()` derives it from the `$html_desc` assignment, so Rules A and B cover it
+  automatically. If you ever do introduce a purpose-written key here, name it `_plain` so the name
+  and the derivation agree.
 
 ## Application Bootstrap
 
@@ -324,9 +354,9 @@ is either silently stripped or shown literally. Two forms, both enforced by
   unnecessary — see the Task 140 record in `dev/ROADMAP.md`.
 
 **Rule C is advisory and off by default** — run `lang_syntax_validate.php --rule-c`. It reports where
-the name and the derivation disagree. 29 keys disagree *on purpose* (the 16 `_main_desc` keys have two
-destinations at once, `<h2>` and the menu `title=`, so no single name fits), which is why it would
-otherwise be noise. Run it after touching a call site: it is what caught the deriver missing the
+the name and the derivation disagree. 31 keys disagree *on purpose* (the 18 `_main_desc` keys have
+three destinations at once — `<h2>`, the menu `title=`, and since Task 150 the meta description — so
+no single name fits), which is why it would otherwise be noise. Run it after touching a call site: it is what caught the deriver missing the
 entire JS tip route in the first place.
 
 **When adding a tooltip or an attribute-bound label, you need do nothing** — the deriver picks it up

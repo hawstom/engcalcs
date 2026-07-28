@@ -1,10 +1,7 @@
 <?php
 require_once('lib/base.inc.php');
 $html_title = $ec_lang['contact_main_menu'];
-$html_head = '
-	<meta name="Description" content="' . htmlspecialchars($html_title, ENT_QUOTES, 'UTF-8') . '" />
-';
-echoHeader("EngCalcs", $html_title, $html_head, false);
+echoHeader("EngCalcs", $html_title, "", false);
 ?>
 <p>Tom Haws, Professional Engineer (Civil)<br />
 859 N Lafayette<br />

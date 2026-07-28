@@ -134,7 +134,7 @@ function printHelpAndExit(): void
     echo "\nOptions:\n";
     echo "  --lang=es,fr      Limit to specific language codes\n";
     echo "  --rule-c          Also report Rule C advisories (name vs. derivation disagreement).\n";
-    echo "                    Off by default: 29 keys disagree on purpose -- the 16 _main_desc\n";
+    echo "                    Off by default: 31 keys disagree on purpose -- the 18 _main_desc\n";
     echo "                    keys have two destinations at once, so no single name fits.\n";
     echo "  -h, --help        Show this help\n";
     exit(0);
@@ -332,6 +332,15 @@ function plainTextBoundKeys(): array
                     foreach ($km[1] as $k) { $keys[$k] = $rel . ' (' . strtolower($hit[1]) . '="")'; }
                 }
             }
+        }
+
+        // Meta-description route (Task 150): a page assigns $html_desc, and echoHTMLHead() escapes
+        // it into <meta name="Description" content="...">. The attribute scan above cannot see it
+        // -- the key and the attribute live in different files -- so the variable is the join.
+        // Today every such key is a *_main_desc, already bound by Menus.lib.php's title=""; the
+        // rule is here so a future page pointing $html_desc at some other key is still covered.
+        if (preg_match_all('/\$html_desc\s*=\s*\$ec_lang\[\'([^\']+)\'\]/', $c, $m)) {
+            foreach ($m[1] as $k) { $keys[$k] = $rel . ' (meta description)'; }
         }
     }
 

@@ -484,13 +484,13 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "<span class=\"ec-help\" title=\"שורות שלוחה: המטפטפים בקטע זה בלבד. שורות קו ראשי: סך המטפטפים בשלוחות האחרות, השונות מזו, המסתעפות מקטע זה. עבור קטע קו הראשי המסתיים בשלוחת הבדיקה, נכללות גם כל השלוחות שמעבר לנקודה זו לאורך הקו הראשי, וכן שלוחות החולקות אותו צומת (למשל שלוחה מהצד הנגדי) &mdash; גם ספיקתן מסתעפת מקטע זה.\">מטפטפים <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
+                    "value": "<span class=\"ec-help\" title=\"שורות שלוחה: המטפטפים בקטע זה בלבד. שורות קו ראשי: סך המטפטפים בשלוחות האחרות, השונות מזו, המסתעפות מקטע זה. עבור קטע קו הראשי המסתיים בשלוחת הבדיקה, נכללות גם כל השלוחות שמעבר לנקודה זו לאורך הקו הראשי, וכן שלוחות החולקות אותו צומת (למשל שלוחה מהצד הנגדי) — גם ספיקתן מסתעפת מקטע זה.\">מטפטפים <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_elev_ds",
                     "value": "<span class=\"ec-help\" title=\"רום קצה מורד הזרם של קטע זה. אופציונלי בשורות פנימיות (אם נשאר ריק, ברירת המחדל אופקי \/ זהה לצומת שמעליו). חובה בשורה האחרונה: ערך זה הוא רום המטפטף האחרון, הקובע ישירות את לחץ האספקה הנדרש.\">רום מורד <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter’s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -500,13 +500,13 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "<span class=\"ec-help\" title=\"שורות שלוחה: המטפטפים בקטע זה בלבד. שורות קו ראשי: סך המטפטפים בשלוחות האחרות, השונות מזו, המסתעפות מקטע זה. עבור קטע קו הראשי המסתיים בשלוחת הבדיקה, נכללות גם כל השלוחות שמעבר לנקודה זו לאורך הקו הראשי, וכן שלוחות החולקות אותו צומת (למשל שלוחה מהצד הנגדי) &mdash; גם ספיקתן מסתעפת מקטע זה.\">מטפטפים <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
+                    "value": "<span class=\"ec-help\" title=\"שורות שלוחה: המטפטפים בקטע זה בלבד. שורות קו ראשי: סך המטפטפים בשלוחות האחרות, השונות מזו, המסתעפות מקטע זה. עבור קטע קו הראשי המסתיים בשלוחת הבדיקה, נכללות גם כל השלוחות שמעבר לנקודה זו לאורך הקו הראשי, וכן שלוחות החולקות אותו צומת (למשל שלוחה מהצד הנגדי) — גם ספיקתן מסתעפת מקטע זה.\">מטפטפים <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_elev_ds",
                     "value": "<span class=\"ec-help\" title=\"רום קצה מורד הזרם של קטע זה. אופציונלי בשורות פנימיות (אם נשאר ריק, ברירת המחדל אופקי \/ זהה לצומת שמעליו). חובה בשורה האחרונה: ערך זה הוא רום המטפטף האחרון, הקובע ישירות את לחץ האספקה הנדרש.\">רום מורד <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter’s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -516,13 +516,13 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "<span class=\"ec-help\" title=\"שורות שלוחה: המטפטפים בקטע זה בלבד. שורות קו ראשי: סך המטפטפים בשלוחות האחרות, השונות מזו, המסתעפות מקטע זה. עבור קטע קו הראשי המסתיים בשלוחת הבדיקה, נכללות גם כל השלוחות שמעבר לנקודה זו לאורך הקו הראשי, וכן שלוחות החולקות אותו צומת (למשל שלוחה מהצד הנגדי) &mdash; גם ספיקתן מסתעפת מקטע זה.\">מטפטפים <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
+                    "value": "<span class=\"ec-help\" title=\"שורות שלוחה: המטפטפים בקטע זה בלבד. שורות קו ראשי: סך המטפטפים בשלוחות האחרות, השונות מזו, המסתעפות מקטע זה. עבור קטע קו הראשי המסתיים בשלוחת הבדיקה, נכללות גם כל השלוחות שמעבר לנקודה זו לאורך הקו הראשי, וכן שלוחות החולקות אותו צומת (למשל שלוחה מהצד הנגדי) — גם ספיקתן מסתעפת מקטע זה.\">מטפטפים <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_elev_ds",
                     "value": "<span class=\"ec-help\" title=\"רום קצה מורד הזרם של קטע זה. אופציונלי בשורות פנימיות (אם נשאר ריק, ברירת המחדל אופקי \/ זהה לצומת שמעליו). חובה בשורה האחרונה: ערך זה הוא רום המטפטף האחרון, הקובע ישירות את לחץ האספקה הנדרש.\">רום מורד <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter’s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },

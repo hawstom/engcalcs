@@ -300,19 +300,21 @@ straight from `lib/lang.ec.sw.php`, i.e. an agent searching our own translated s
   **Task 150 (meta descriptions) is unblocked by this.** It was sequenced behind 149 on the reasoning
   that descriptions on unindexed URLs buy nothing; the URLs are no longer unindexed.
 
-- 40|150|[CC] **Every page's meta description is just its own title repeated.** All 23 pages build
-  `$html_head` with `<meta name="Description" content="'. $html_title .'" />`. Google routinely
-  discards a duplicate-of-title description and auto-generates a snippet instead — from a page whose
-  visible content above the fold is a form, not prose. Replace with a real per-calculator description
-  sourced from a **new language key** (one per calculator, alongside `*_main_desc`) so it translates
-  with everything else and lands correctly on the `?lang=xx` URLs from Task 149. Sequence after 149.
-  Note the Simple-English rule applies: these are explanatory strings, not identity strings.
-  **Partially done 2026-07-27:** the companion `<meta name="Keywords">` tags were deleted from all 20
-  pages that carried them (Tom: "Once upon a time that was a main purpose of keywords… let's
-  modernize"). They were both ignored by search engines and actively wrong — `Manning-Trap.php` and
-  `Weir-Flow-Simple.php` carried `"wier vetedero calculacíon…"` (weir keywords on the *trapezoidal
-  channel* page, "wier" misspelled), with `pipie`/`tobus` typos elsewhere and `&iacute;` HTML entities
-  inside meta content. Description work is what remains.
+- 30|157| **`index.php` has no meta description at all — the one page reuse could not cover.** Task 150
+  fixed 19 pages for free by pointing `$html_desc` at each page's existing `*_main_desc`. Two pages
+  own no such key: `contact.php` (fine — a utility page with nothing to say in a search result) and
+  **`index.php`, which is the suite's front door**. Its only candidate, `index_title` ("Free Online
+  Engineering Calculators"), *is* the title, so using it would reinstate the exact duplicate-of-title
+  defect Task 150 removed. It therefore emits no description and Google will auto-generate a snippet
+  from a page that is nothing but a menu of links.
+  **Cost if fixed: one key × 26 languages = 26 strings**, which rides the normal payload delta into
+  the next authorized sprint — two orders of magnitude cheaper than the 520-string per-page scheme
+  rejected on 2026-07-28, and aimed at the single page where a description carries the most weight.
+  Write it in Simple English, one or two sentences: what the suite is, who it is for, that it is free
+  and runs in the browser. Name it `index_meta_desc_plain` (the `_plain` suffix is what makes
+  `lang_syntax_validate.php` hold it to Rules A and B; `plainTextBoundKeys()` picks it up from the
+  `$html_desc` assignment). **Decide first whether one page is worth a bespoke key at all** — the
+  standing decision is reuse-or-nothing, and this is the deliberate exception to it, not a reopening.
 
 - 35|151| **The sewer-slope demand is already answered — by a tech doc nobody can find.** ~950
   impressions at 0.5% CTR across 169 slope/grade queries, and **there is no content gap**:
@@ -420,6 +422,56 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|150|[CC] **Every page's meta description was just its own title repeated — DONE 2026-07-28.**
+  All 21 pages that carried a description built `$html_head` with
+  `<meta name="Description" content="'. $html_title .'" />`. Google routinely discards a
+  duplicate-of-title description and auto-generates a snippet instead — from a page whose visible
+  content above the fold is a form, not prose.
+  **What shipped: reuse, not new strings.** 19 pages now point `$html_desc` at their own existing
+  `<prefix>_main_desc` — a key that is already written, already translated into all 26 languages, and
+  already distinct from the title ("Free Online Manning Pipe Flow Calculator" vs "Manning Formula
+  Uniform Pipe Flow at Given Slope and Depth"). The defect is fixed **in every language today at zero
+  translation cost**. `Orifice-Drain-Time-Ref.php` keeps a literal English string, being an
+  English-only reference page with no language switcher.
+  **This task was first built the expensive way, and Tom caught it (2026-07-28).** The original
+  implementation wrote 20 purpose-authored `*_meta_desc_plain` keys (98–151 characters of prose:
+  what the calculator finds, then what the user enters) and seeded all 27 lang files, which pushed
+  the standing translation delta from **365 strings to 885** — avg 14 per language to 34, i.e. +520
+  strings, roughly tripling it. His question was the right one: *why new descriptions when
+  descriptions already exist?* The prose does read better as a search snippet, but that is an
+  incremental SEO gain bought with a full extra sprint's worth of translation, and it was never put
+  to him as a trade before the strings were written. Reverted in full; delta measured back at
+  exactly 365. **The standing rule is now reuse-or-nothing, recorded in `CLAUDE.md`** — weigh any
+  future "let's write real descriptions" proposal against that same arithmetic before starting.
+  **Emission moved into `echoHTMLHead()`**, on the Task 149 precedent: a page sets the global
+  `$html_desc` before `echoHeader()`, and the one function every page's `<head>` passes through does
+  the escaping. Three consequences worth keeping. (1) The 12 pages that had been interpolating
+  `$html_title` **unescaped** are now escaped by construction, not by remembering. (2) A new
+  calculator gets the tag right for free — the recipe is one line, documented in `CLAUDE.md`. (3) The
+  tag is emitted **only when non-empty**, so `index.php`, `contact.php`, `Compare-Languages.php`, and
+  `formmailsuccess.php` correctly have none: repeating the title is worse than silence, so a page
+  with nothing real to say says nothing. `index.php` is the one place that genuinely costs something
+  — **extracted as Task 157**, a 26-string exception, rather than left as a loose end here.
+  **`plainTextBoundKeys()` gained a derivation rule for the `$html_desc` assignment**, so whatever
+  key a page points at is held to Rule A (no entities) and Rule B (no tags). It is redundant today —
+  every such key is a `*_main_desc`, already bound via `Menus.lib.php`'s `title=""` — and kept
+  precisely for the day a page points `$html_desc` somewhere new. Rule C's advisory count went
+  **29 → 31**: `about_main_desc` and `install_main_desc` are the two `_main_desc` keys whose menu
+  entries carry no `title=`, so nothing derived them until now. Same intentional class as the other
+  16 — a `_main_desc` has three destinations at once and no single name fits. Counts updated in
+  `CLAUDE.md` and the validator's `--help`.
+  **Verified by rendering all 23 pages** in en, and es/ar/ru for the translated path: 19 unique
+  descriptions, no duplicates, none repeating its own title, none empty where one was expected.
+  **Partially done 2026-07-27 (unchanged):** the companion `<meta name="Keywords">` tags were deleted
+  from all 20 pages that carried them (Tom: "Once upon a time that was a main purpose of keywords…
+  let's modernize"). They were both ignored by search engines and actively wrong — `Manning-Trap.php`
+  and `Weir-Flow-Simple.php` carried `"wier vetedero calculacíon…"` (weir keywords on the
+  *trapezoidal channel* page, "wier" misspelled), with `pipie`/`tobus` typos elsewhere and
+  `&iacute;` HTML entities inside meta content.
+  **Unrelated pre-existing finding, not touched:** `formmail.php` does not parse (`php -l`:
+  "Unclosed '{' on line 80"). Confirmed present before this task by stashing the change and
+  re-linting. Left alone deliberately — it is not a meta-description defect and deserves its own look.
 
 - 0|156|[CC] **`.git` and directory listings were readable over HTTP — closed. DONE 2026-07-28.**
   Found while answering "is `engcalcs/.htaccess` even needed?" during Task 155, not by looking for

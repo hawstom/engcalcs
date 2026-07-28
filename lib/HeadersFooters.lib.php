@@ -19,7 +19,7 @@ function echoHeader($type="normal", $html_title = "", $html_head = "", $show_nam
     **/
 function echoHTMLHead($type, $html_title, $html_head, $show_name_field = true) {
 
-global $ec_lang, $clanguage, $all_language_settings;
+global $ec_lang, $clanguage, $all_language_settings, $html_desc;
 $html_lang = isset($clanguage) ? $clanguage : 'en';
 $html_dir  = in_array($html_lang, ['ar', 'fa', 'he', 'ps', 'ur']) ? ' dir="rtl"' : '';
 $calc_name = $show_name_field ? trim($_GET['name'] ?? '') : '';
@@ -33,6 +33,21 @@ $page_title = $calc_name ? $safe_name . ' — ' . $html_title : $html_title;
 	<meta name="Generator" content="Notepad++"  />
 	<meta name="Author" content="Thomas Gail Haws" />
 	<meta name="Copyright" content="Copyright &copy; 2009&ndash;2026 Thomas Gail Haws. Licensed under the GNU GPL v3.0 or later." />
+<?php
+// Meta description (ROADMAP Task 150). Emitted here rather than in each page's $html_head for the
+// same reason as the canonical/hreflang block below: one place, every page, and a new calculator
+// gets it right for free. A page supplies it by setting the global $html_desc before calling
+// echoHeader() -- normally from a *_meta_desc_plain language key, so it translates onto the
+// ?lang=xx URLs Task 149 made indexable.
+//
+// Deliberately emitted only when non-empty. What this task replaced was a description that merely
+// repeated the title on all 23 pages, which Google discards in favour of an auto-generated snippet
+// scraped from a page whose above-the-fold content is a form. Repeating the title is worse than
+// silence, so a page with nothing real to say gets no description tag at all.
+if (isset($html_desc) && trim((string)$html_desc) !== '') :
+?>
+	<meta name="Description" content="<?=htmlspecialchars(trim((string)$html_desc), ENT_QUOTES, 'UTF-8')?>" />
+<?php endif; ?>
 	<?=$html_head?>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title><?=$calc_name ? $safe_name . ' — ' . $html_title : $html_title?></title>

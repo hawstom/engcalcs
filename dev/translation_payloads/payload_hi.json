@@ -548,12 +548,12 @@
                 "previous_translated": {
                     "key": "ip_count",
                     "value": "<span class=\"ec-help\" title=\"पार्श्व नली पंक्तियाँ: केवल इस खंड में उत्सर्जक। मुख्य नली पंक्तियाँ: इस खंड से शाखा लेने वाली अन्य पार्श्व नलियों पर कुल उत्सर्जक। परीक्षण पार्श्व नली के अपने निकालने के ठीक स्थान पर खंड के लिए, इसमें मुख्य नली के साथ उस बिंदु के बाद कोई भी पार्श्व नली, या समान जंक्शन साझा करने वाली (उदा. विपरीत-पक्ष की पार्श्व नली) भी शामिल है — उनका प्रवाह भी इसी खंड से शाखा लेता है।\">उत्सर्जक <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_elev_ds",
                     "value": "<span class=\"ec-help\" title=\"इस खंड का डाउनस्ट्रीम-छोर स्तर। आंतरिक पंक्तियों में वैकल्पिक (रिक्त छोड़ने पर समतल \/ ऊपर के नोड के समान डिफ़ॉल्ट)। अंतिम पंक्ति में आवश्यक: वह मान अंतिम उत्सर्जक का स्तर है, जो सीधे आवश्यक आपूर्ति दाब निर्धारित करता है।\">DS स्तर <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter’s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -564,12 +564,12 @@
                 "previous_translated": {
                     "key": "ip_count",
                     "value": "<span class=\"ec-help\" title=\"पार्श्व नली पंक्तियाँ: केवल इस खंड में उत्सर्जक। मुख्य नली पंक्तियाँ: इस खंड से शाखा लेने वाली अन्य पार्श्व नलियों पर कुल उत्सर्जक। परीक्षण पार्श्व नली के अपने निकालने के ठीक स्थान पर खंड के लिए, इसमें मुख्य नली के साथ उस बिंदु के बाद कोई भी पार्श्व नली, या समान जंक्शन साझा करने वाली (उदा. विपरीत-पक्ष की पार्श्व नली) भी शामिल है — उनका प्रवाह भी इसी खंड से शाखा लेता है।\">उत्सर्जक <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_elev_ds",
                     "value": "<span class=\"ec-help\" title=\"इस खंड का डाउनस्ट्रीम-छोर स्तर। आंतरिक पंक्तियों में वैकल्पिक (रिक्त छोड़ने पर समतल \/ ऊपर के नोड के समान डिफ़ॉल्ट)। अंतिम पंक्ति में आवश्यक: वह मान अंतिम उत्सर्जक का स्तर है, जो सीधे आवश्यक आपूर्ति दाब निर्धारित करता है।\">DS स्तर <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter’s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -580,12 +580,12 @@
                 "previous_translated": {
                     "key": "ip_count",
                     "value": "<span class=\"ec-help\" title=\"पार्श्व नली पंक्तियाँ: केवल इस खंड में उत्सर्जक। मुख्य नली पंक्तियाँ: इस खंड से शाखा लेने वाली अन्य पार्श्व नलियों पर कुल उत्सर्जक। परीक्षण पार्श्व नली के अपने निकालने के ठीक स्थान पर खंड के लिए, इसमें मुख्य नली के साथ उस बिंदु के बाद कोई भी पार्श्व नली, या समान जंक्शन साझा करने वाली (उदा. विपरीत-पक्ष की पार्श्व नली) भी शामिल है — उनका प्रवाह भी इसी खंड से शाखा लेता है।\">उत्सर्जक <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_elev_ds",
                     "value": "<span class=\"ec-help\" title=\"इस खंड का डाउनस्ट्रीम-छोर स्तर। आंतरिक पंक्तियों में वैकल्पिक (रिक्त छोड़ने पर समतल \/ ऊपर के नोड के समान डिफ़ॉल्ट)। अंतिम पंक्ति में आवश्यक: वह मान अंतिम उत्सर्जक का स्तर है, जो सीधे आवश्यक आपूर्ति दाब निर्धारित करता है।\">DS स्तर <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter’s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },

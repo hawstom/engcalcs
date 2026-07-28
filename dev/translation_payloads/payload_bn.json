@@ -529,13 +529,13 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "<span class=\"ec-help\" title=\"ল্যাটারাল সারি: শুধুমাত্র এই অংশের ড্রিপার। প্রধান লাইন সারি: এই অংশ থেকে শাখা নেওয়া, এই ল্যাটারাল ব্যতীত অন্য ল্যাটারালগুলোর মোট ড্রিপার। পরীক্ষা ল্যাটারাল লাইনে শেষ হওয়া প্রধান লাইনের অংশের জন্য, এতে সেই বিন্দুর পরে প্রধান লাইন বরাবর যেকোনো ল্যাটারাল, বা একই জাংশন শেয়ার করা (যেমন বিপরীত-পাশের ল্যাটারাল) অন্তর্ভুক্ত হয় &mdash; তাদের প্রবাহও এই একই অংশ থেকে শাখা নেয়।\">ড্রিপার <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
+                    "value": "<span class=\"ec-help\" title=\"ল্যাটারাল সারি: শুধুমাত্র এই অংশের ড্রিপার। প্রধান লাইন সারি: এই অংশ থেকে শাখা নেওয়া, এই ল্যাটারাল ব্যতীত অন্য ল্যাটারালগুলোর মোট ড্রিপার। পরীক্ষা ল্যাটারাল লাইনে শেষ হওয়া প্রধান লাইনের অংশের জন্য, এতে সেই বিন্দুর পরে প্রধান লাইন বরাবর যেকোনো ল্যাটারাল, বা একই জাংশন শেয়ার করা (যেমন বিপরীত-পাশের ল্যাটারাল) অন্তর্ভুক্ত হয় — তাদের প্রবাহও এই একই অংশ থেকে শাখা নেয়।\">ড্রিপার <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_elev_ds",
                     "value": "<span class=\"ec-help\" title=\"এই অংশের ভাটি-প্রান্তের উচ্চতা। অভ্যন্তরীণ সারিতে ঐচ্ছিক (ফাঁকা রাখলে সমতল \/ উপরের নোডের মতো ডিফল্ট হয়)। শেষ সারিতে আবশ্যক: সেই মান শেষ ড্রিপারের উচ্চতা, যা সরাসরি প্রয়োজনীয় সরবরাহ চাপ নির্ধারণ করে।\">ভাটি উচ্চতা <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter’s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -545,13 +545,13 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "<span class=\"ec-help\" title=\"ল্যাটারাল সারি: শুধুমাত্র এই অংশের ড্রিপার। প্রধান লাইন সারি: এই অংশ থেকে শাখা নেওয়া, এই ল্যাটারাল ব্যতীত অন্য ল্যাটারালগুলোর মোট ড্রিপার। পরীক্ষা ল্যাটারাল লাইনে শেষ হওয়া প্রধান লাইনের অংশের জন্য, এতে সেই বিন্দুর পরে প্রধান লাইন বরাবর যেকোনো ল্যাটারাল, বা একই জাংশন শেয়ার করা (যেমন বিপরীত-পাশের ল্যাটারাল) অন্তর্ভুক্ত হয় &mdash; তাদের প্রবাহও এই একই অংশ থেকে শাখা নেয়।\">ড্রিপার <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
+                    "value": "<span class=\"ec-help\" title=\"ল্যাটারাল সারি: শুধুমাত্র এই অংশের ড্রিপার। প্রধান লাইন সারি: এই অংশ থেকে শাখা নেওয়া, এই ল্যাটারাল ব্যতীত অন্য ল্যাটারালগুলোর মোট ড্রিপার। পরীক্ষা ল্যাটারাল লাইনে শেষ হওয়া প্রধান লাইনের অংশের জন্য, এতে সেই বিন্দুর পরে প্রধান লাইন বরাবর যেকোনো ল্যাটারাল, বা একই জাংশন শেয়ার করা (যেমন বিপরীত-পাশের ল্যাটারাল) অন্তর্ভুক্ত হয় — তাদের প্রবাহও এই একই অংশ থেকে শাখা নেয়।\">ড্রিপার <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_elev_ds",
                     "value": "<span class=\"ec-help\" title=\"এই অংশের ভাটি-প্রান্তের উচ্চতা। অভ্যন্তরীণ সারিতে ঐচ্ছিক (ফাঁকা রাখলে সমতল \/ উপরের নোডের মতো ডিফল্ট হয়)। শেষ সারিতে আবশ্যক: সেই মান শেষ ড্রিপারের উচ্চতা, যা সরাসরি প্রয়োজনীয় সরবরাহ চাপ নির্ধারণ করে।\">ভাটি উচ্চতা <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter’s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -561,13 +561,13 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "<span class=\"ec-help\" title=\"ল্যাটারাল সারি: শুধুমাত্র এই অংশের ড্রিপার। প্রধান লাইন সারি: এই অংশ থেকে শাখা নেওয়া, এই ল্যাটারাল ব্যতীত অন্য ল্যাটারালগুলোর মোট ড্রিপার। পরীক্ষা ল্যাটারাল লাইনে শেষ হওয়া প্রধান লাইনের অংশের জন্য, এতে সেই বিন্দুর পরে প্রধান লাইন বরাবর যেকোনো ল্যাটারাল, বা একই জাংশন শেয়ার করা (যেমন বিপরীত-পাশের ল্যাটারাল) অন্তর্ভুক্ত হয় &mdash; তাদের প্রবাহও এই একই অংশ থেকে শাখা নেয়।\">ড্রিপার <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
+                    "value": "<span class=\"ec-help\" title=\"ল্যাটারাল সারি: শুধুমাত্র এই অংশের ড্রিপার। প্রধান লাইন সারি: এই অংশ থেকে শাখা নেওয়া, এই ল্যাটারাল ব্যতীত অন্য ল্যাটারালগুলোর মোট ড্রিপার। পরীক্ষা ল্যাটারাল লাইনে শেষ হওয়া প্রধান লাইনের অংশের জন্য, এতে সেই বিন্দুর পরে প্রধান লাইন বরাবর যেকোনো ল্যাটারাল, বা একই জাংশন শেয়ার করা (যেমন বিপরীত-পাশের ল্যাটারাল) অন্তর্ভুক্ত হয় — তাদের প্রবাহও এই একই অংশ থেকে শাখা নেয়।\">ড্রিপার <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_elev_ds",
                     "value": "<span class=\"ec-help\" title=\"এই অংশের ভাটি-প্রান্তের উচ্চতা। অভ্যন্তরীণ সারিতে ঐচ্ছিক (ফাঁকা রাখলে সমতল \/ উপরের নোডের মতো ডিফল্ট হয়)। শেষ সারিতে আবশ্যক: সেই মান শেষ ড্রিপারের উচ্চতা, যা সরাসরি প্রয়োজনীয় সরবরাহ চাপ নির্ধারণ করে।\">ভাটি উচ্চতা <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter’s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },

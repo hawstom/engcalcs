@@ -483,13 +483,13 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "<span class=\"ec-help\" title=\"ជួរបំពង់រង: ក្បាលបញ្ចេញទឹកក្នុងចម្រៀកនេះតែប៉ុណ្ណោះ។ ជួរបំពង់មេ: ចំនួនសរុបនៃក្បាលបញ្ចេញទឹកលើបំពង់រងផ្សេងទៀតដែលបែកចេញពីចម្រៀកនេះ។ សម្រាប់ចម្រៀកនៅត្រង់កន្លែងបែកចេញរបស់បំពង់រងសាកល្បងខ្លួនឯង ត្រូវរាប់បញ្ចូលទាំងបំពង់រងទាំងឡាយដែលនៅបន្តទៀតតាមបំពង់មេហួសពីចំណុចនោះ ឬដែលចែករំលែកថ្នាំងតែមួយ (ឧ. បំពង់រងនៅម្ខាងទៀត) &mdash; លំហូររបស់វាក៏ឆ្លងកាត់ចម្រៀកនេះដែរ។\">ក្បាលបញ្ចេញទឹក <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
+                    "value": "<span class=\"ec-help\" title=\"ជួរបំពង់រង: ក្បាលបញ្ចេញទឹកក្នុងចម្រៀកនេះតែប៉ុណ្ណោះ។ ជួរបំពង់មេ: ចំនួនសរុបនៃក្បាលបញ្ចេញទឹកលើបំពង់រងផ្សេងទៀតដែលបែកចេញពីចម្រៀកនេះ។ សម្រាប់ចម្រៀកនៅត្រង់កន្លែងបែកចេញរបស់បំពង់រងសាកល្បងខ្លួនឯង ត្រូវរាប់បញ្ចូលទាំងបំពង់រងទាំងឡាយដែលនៅបន្តទៀតតាមបំពង់មេហួសពីចំណុចនោះ ឬដែលចែករំលែកថ្នាំងតែមួយ (ឧ. បំពង់រងនៅម្ខាងទៀត) — លំហូររបស់វាក៏ឆ្លងកាត់ចម្រៀកនេះដែរ។\">ក្បាលបញ្ចេញទឹក <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_elev_ds",
                     "value": "<span class=\"ec-help\" title=\"កម្ពស់ចុងខាងក្រោមទឹកនៃចម្រៀកនេះ។ ជាជម្រើសសម្រាប់ជួរខាងក្នុង (បើទុកទទេ នឹងចាត់ទុកជារាបស្មើ \/ ស្មើនឹងថ្នាំងខាងលើ)។ ចាំបាច់សម្រាប់ជួរចុងក្រោយ: តម្លៃនោះជាកម្ពស់ក្បាលបញ្ចេញទឹកចុងក្រោយ ដែលកំណត់ដោយផ្ទាល់នូវសម្ពាធផ្គត់ផ្គង់ដែលត្រូវការ។\">កម្ពស់ក្រោម <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter’s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -499,13 +499,13 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "<span class=\"ec-help\" title=\"ជួរបំពង់រង: ក្បាលបញ្ចេញទឹកក្នុងចម្រៀកនេះតែប៉ុណ្ណោះ។ ជួរបំពង់មេ: ចំនួនសរុបនៃក្បាលបញ្ចេញទឹកលើបំពង់រងផ្សេងទៀតដែលបែកចេញពីចម្រៀកនេះ។ សម្រាប់ចម្រៀកនៅត្រង់កន្លែងបែកចេញរបស់បំពង់រងសាកល្បងខ្លួនឯង ត្រូវរាប់បញ្ចូលទាំងបំពង់រងទាំងឡាយដែលនៅបន្តទៀតតាមបំពង់មេហួសពីចំណុចនោះ ឬដែលចែករំលែកថ្នាំងតែមួយ (ឧ. បំពង់រងនៅម្ខាងទៀត) &mdash; លំហូររបស់វាក៏ឆ្លងកាត់ចម្រៀកនេះដែរ។\">ក្បាលបញ្ចេញទឹក <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
+                    "value": "<span class=\"ec-help\" title=\"ជួរបំពង់រង: ក្បាលបញ្ចេញទឹកក្នុងចម្រៀកនេះតែប៉ុណ្ណោះ។ ជួរបំពង់មេ: ចំនួនសរុបនៃក្បាលបញ្ចេញទឹកលើបំពង់រងផ្សេងទៀតដែលបែកចេញពីចម្រៀកនេះ។ សម្រាប់ចម្រៀកនៅត្រង់កន្លែងបែកចេញរបស់បំពង់រងសាកល្បងខ្លួនឯង ត្រូវរាប់បញ្ចូលទាំងបំពង់រងទាំងឡាយដែលនៅបន្តទៀតតាមបំពង់មេហួសពីចំណុចនោះ ឬដែលចែករំលែកថ្នាំងតែមួយ (ឧ. បំពង់រងនៅម្ខាងទៀត) — លំហូររបស់វាក៏ឆ្លងកាត់ចម្រៀកនេះដែរ។\">ក្បាលបញ្ចេញទឹក <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_elev_ds",
                     "value": "<span class=\"ec-help\" title=\"កម្ពស់ចុងខាងក្រោមទឹកនៃចម្រៀកនេះ។ ជាជម្រើសសម្រាប់ជួរខាងក្នុង (បើទុកទទេ នឹងចាត់ទុកជារាបស្មើ \/ ស្មើនឹងថ្នាំងខាងលើ)។ ចាំបាច់សម្រាប់ជួរចុងក្រោយ: តម្លៃនោះជាកម្ពស់ក្បាលបញ្ចេញទឹកចុងក្រោយ ដែលកំណត់ដោយផ្ទាល់នូវសម្ពាធផ្គត់ផ្គង់ដែលត្រូវការ។\">កម្ពស់ក្រោម <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter’s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -515,13 +515,13 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "<span class=\"ec-help\" title=\"ជួរបំពង់រង: ក្បាលបញ្ចេញទឹកក្នុងចម្រៀកនេះតែប៉ុណ្ណោះ។ ជួរបំពង់មេ: ចំនួនសរុបនៃក្បាលបញ្ចេញទឹកលើបំពង់រងផ្សេងទៀតដែលបែកចេញពីចម្រៀកនេះ។ សម្រាប់ចម្រៀកនៅត្រង់កន្លែងបែកចេញរបស់បំពង់រងសាកល្បងខ្លួនឯង ត្រូវរាប់បញ្ចូលទាំងបំពង់រងទាំងឡាយដែលនៅបន្តទៀតតាមបំពង់មេហួសពីចំណុចនោះ ឬដែលចែករំលែកថ្នាំងតែមួយ (ឧ. បំពង់រងនៅម្ខាងទៀត) &mdash; លំហូររបស់វាក៏ឆ្លងកាត់ចម្រៀកនេះដែរ។\">ក្បាលបញ្ចេញទឹក <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
+                    "value": "<span class=\"ec-help\" title=\"ជួរបំពង់រង: ក្បាលបញ្ចេញទឹកក្នុងចម្រៀកនេះតែប៉ុណ្ណោះ។ ជួរបំពង់មេ: ចំនួនសរុបនៃក្បាលបញ្ចេញទឹកលើបំពង់រងផ្សេងទៀតដែលបែកចេញពីចម្រៀកនេះ។ សម្រាប់ចម្រៀកនៅត្រង់កន្លែងបែកចេញរបស់បំពង់រងសាកល្បងខ្លួនឯង ត្រូវរាប់បញ្ចូលទាំងបំពង់រងទាំងឡាយដែលនៅបន្តទៀតតាមបំពង់មេហួសពីចំណុចនោះ ឬដែលចែករំលែកថ្នាំងតែមួយ (ឧ. បំពង់រងនៅម្ខាងទៀត) — លំហូររបស់វាក៏ឆ្លងកាត់ចម្រៀកនេះដែរ។\">ក្បាលបញ្ចេញទឹក <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_elev_ds",
                     "value": "<span class=\"ec-help\" title=\"កម្ពស់ចុងខាងក្រោមទឹកនៃចម្រៀកនេះ។ ជាជម្រើសសម្រាប់ជួរខាងក្នុង (បើទុកទទេ នឹងចាត់ទុកជារាបស្មើ \/ ស្មើនឹងថ្នាំងខាងលើ)។ ចាំបាច់សម្រាប់ជួរចុងក្រោយ: តម្លៃនោះជាកម្ពស់ក្បាលបញ្ចេញទឹកចុងក្រោយ ដែលកំណត់ដោយផ្ទាល់នូវសម្ពាធផ្គត់ផ្គង់ដែលត្រូវការ។\">កម្ពស់ក្រោម <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter’s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },

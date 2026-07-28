@@ -388,13 +388,13 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "<span class=\"ec-help\" title=\"Редови латерале: емитери само у овој деоници. Редови магистрале: укупан број емитера на латералама ОСИМ ове, које се одвајају од ове деонице. За деоницу магистрале која се завршава код тестне латерале, ово укључује и све латерале даље низ магистралу иза те тачке, или које деле исти чвор (нпр. латерала на супротној страни) &mdash; и њихов проток се такође одваја од исте деонице.\">Емитери <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
+                    "value": "<span class=\"ec-help\" title=\"Редови латерале: емитери само у овој деоници. Редови магистрале: укупан број емитера на латералама ОСИМ ове, које се одвајају од ове деонице. За деоницу магистрале која се завршава код тестне латерале, ово укључује и све латерале даље низ магистралу иза те тачке, или које деле исти чвор (нпр. латерала на супротној страни) — и њихов проток се такође одваја од исте деонице.\">Емитери <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_elev_ds",
                     "value": "<span class=\"ec-help\" title=\"Кота низводног краја ове деонице. Опционо код унутрашњих редова (подразумевано равно \/ исто као претходни чвор ако се остави празно). Обавезно у последњем реду: та вредност је кота последњег емитера, која директно одређује потребан притисак напајања.\">Низв. кота <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter’s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -404,13 +404,13 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "<span class=\"ec-help\" title=\"Редови латерале: емитери само у овој деоници. Редови магистрале: укупан број емитера на латералама ОСИМ ове, које се одвајају од ове деонице. За деоницу магистрале која се завршава код тестне латерале, ово укључује и све латерале даље низ магистралу иза те тачке, или које деле исти чвор (нпр. латерала на супротној страни) &mdash; и њихов проток се такође одваја од исте деонице.\">Емитери <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
+                    "value": "<span class=\"ec-help\" title=\"Редови латерале: емитери само у овој деоници. Редови магистрале: укупан број емитера на латералама ОСИМ ове, које се одвајају од ове деонице. За деоницу магистрале која се завршава код тестне латерале, ово укључује и све латерале даље низ магистралу иза те тачке, или које деле исти чвор (нпр. латерала на супротној страни) — и њихов проток се такође одваја од исте деонице.\">Емитери <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_elev_ds",
                     "value": "<span class=\"ec-help\" title=\"Кота низводног краја ове деонице. Опционо код унутрашњих редова (подразумевано равно \/ исто као претходни чвор ако се остави празно). Обавезно у последњем реду: та вредност је кота последњег емитера, која директно одређује потребан притисак напајања.\">Низв. кота <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter’s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -420,13 +420,13 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "<span class=\"ec-help\" title=\"Редови латерале: емитери само у овој деоници. Редови магистрале: укупан број емитера на латералама ОСИМ ове, које се одвајају од ове деонице. За деоницу магистрале која се завршава код тестне латерале, ово укључује и све латерале даље низ магистралу иза те тачке, или које деле исти чвор (нпр. латерала на супротној страни) &mdash; и њихов проток се такође одваја од исте деонице.\">Емитери <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
+                    "value": "<span class=\"ec-help\" title=\"Редови латерале: емитери само у овој деоници. Редови магистрале: укупан број емитера на латералама ОСИМ ове, које се одвајају од ове деонице. За деоницу магистрале која се завршава код тестне латерале, ово укључује и све латерале даље низ магистралу иза те тачке, или које деле исти чвор (нпр. латерала на супротној страни) — и њихов проток се такође одваја од исте деонице.\">Емитери <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_elev_ds",
                     "value": "<span class=\"ec-help\" title=\"Кота низводног краја ове деонице. Опционо код унутрашњих редова (подразумевано равно \/ исто као претходни чвор ако се остави празно). Обавезно у последњем реду: та вредност је кота последњег емитера, која директно одређује потребан притисак напајања.\">Низв. кота <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter’s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },

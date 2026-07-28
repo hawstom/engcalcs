@@ -465,13 +465,13 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "<span class=\"ec-help\" title=\"د جانبي نل کرښې: یوازې په دې برخه کې وریزونه. د اصلي نل کرښې: پر هغو جانبي نلونو ټول وریزونه چې د دې برخې غیر له نورو څخه شاخه کیږي. د اصلي نل هغه برخې لپاره چې د ازموینې جانبي نل ته رسیږي، دا هم په اصلي نل کې تر دې ځای وروسته پاتې هر جانبي نل، یا په ورته جنکشن کې شریک (لکه مخالف اړخ جانبي نل) شاملوي &mdash; د دوی بهاو هم له همدې برخې څخه شاخه کیږي.\">وریزونه <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
+                    "value": "<span class=\"ec-help\" title=\"د جانبي نل کرښې: یوازې په دې برخه کې وریزونه. د اصلي نل کرښې: پر هغو جانبي نلونو ټول وریزونه چې د دې برخې غیر له نورو څخه شاخه کیږي. د اصلي نل هغه برخې لپاره چې د ازموینې جانبي نل ته رسیږي، دا هم په اصلي نل کې تر دې ځای وروسته پاتې هر جانبي نل، یا په ورته جنکشن کې شریک (لکه مخالف اړخ جانبي نل) شاملوي — د دوی بهاو هم له همدې برخې څخه شاخه کیږي.\">وریزونه <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_elev_ds",
                     "value": "<span class=\"ec-help\" title=\"د دې برخې د ښکتني پای لوړوالی. د منځني کرښو لپاره اختیاري دی (که خالي پریښودل شي، هوار \/ د پورتني نوډ سره یو شان ګڼل کیږي). د وروستۍ کرښې لپاره لازمي دی: هغه ارزښت د آخري وریز لوړوالی دی، کوم چې مستقیماً اړین تامین فشار ټاکي.\">ښکتنی لوړوالی <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter’s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -481,13 +481,13 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "<span class=\"ec-help\" title=\"د جانبي نل کرښې: یوازې په دې برخه کې وریزونه. د اصلي نل کرښې: پر هغو جانبي نلونو ټول وریزونه چې د دې برخې غیر له نورو څخه شاخه کیږي. د اصلي نل هغه برخې لپاره چې د ازموینې جانبي نل ته رسیږي، دا هم په اصلي نل کې تر دې ځای وروسته پاتې هر جانبي نل، یا په ورته جنکشن کې شریک (لکه مخالف اړخ جانبي نل) شاملوي &mdash; د دوی بهاو هم له همدې برخې څخه شاخه کیږي.\">وریزونه <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
+                    "value": "<span class=\"ec-help\" title=\"د جانبي نل کرښې: یوازې په دې برخه کې وریزونه. د اصلي نل کرښې: پر هغو جانبي نلونو ټول وریزونه چې د دې برخې غیر له نورو څخه شاخه کیږي. د اصلي نل هغه برخې لپاره چې د ازموینې جانبي نل ته رسیږي، دا هم په اصلي نل کې تر دې ځای وروسته پاتې هر جانبي نل، یا په ورته جنکشن کې شریک (لکه مخالف اړخ جانبي نل) شاملوي — د دوی بهاو هم له همدې برخې څخه شاخه کیږي.\">وریزونه <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_elev_ds",
                     "value": "<span class=\"ec-help\" title=\"د دې برخې د ښکتني پای لوړوالی. د منځني کرښو لپاره اختیاري دی (که خالي پریښودل شي، هوار \/ د پورتني نوډ سره یو شان ګڼل کیږي). د وروستۍ کرښې لپاره لازمي دی: هغه ارزښت د آخري وریز لوړوالی دی، کوم چې مستقیماً اړین تامین فشار ټاکي.\">ښکتنی لوړوالی <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter’s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -497,13 +497,13 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "<span class=\"ec-help\" title=\"د جانبي نل کرښې: یوازې په دې برخه کې وریزونه. د اصلي نل کرښې: پر هغو جانبي نلونو ټول وریزونه چې د دې برخې غیر له نورو څخه شاخه کیږي. د اصلي نل هغه برخې لپاره چې د ازموینې جانبي نل ته رسیږي، دا هم په اصلي نل کې تر دې ځای وروسته پاتې هر جانبي نل، یا په ورته جنکشن کې شریک (لکه مخالف اړخ جانبي نل) شاملوي &mdash; د دوی بهاو هم له همدې برخې څخه شاخه کیږي.\">وریزونه <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
+                    "value": "<span class=\"ec-help\" title=\"د جانبي نل کرښې: یوازې په دې برخه کې وریزونه. د اصلي نل کرښې: پر هغو جانبي نلونو ټول وریزونه چې د دې برخې غیر له نورو څخه شاخه کیږي. د اصلي نل هغه برخې لپاره چې د ازموینې جانبي نل ته رسیږي، دا هم په اصلي نل کې تر دې ځای وروسته پاتې هر جانبي نل، یا په ورته جنکشن کې شریک (لکه مخالف اړخ جانبي نل) شاملوي — د دوی بهاو هم له همدې برخې څخه شاخه کیږي.\">وریزونه <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_elev_ds",
                     "value": "<span class=\"ec-help\" title=\"د دې برخې د ښکتني پای لوړوالی. د منځني کرښو لپاره اختیاري دی (که خالي پریښودل شي، هوار \/ د پورتني نوډ سره یو شان ګڼل کیږي). د وروستۍ کرښې لپاره لازمي دی: هغه ارزښت د آخري وریز لوړوالی دی، کوم چې مستقیماً اړین تامین فشار ټاکي.\">ښکتنی لوړوالی <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter’s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },

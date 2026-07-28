@@ -1,10 +1,8 @@
 <?php
 require_once ('lib/base.inc.php');
 $html_title = $ec_lang['mtc_main_title'];
-$html_head='
-	<meta name="Description" content="'. $html_title .'" />
-';
-echoHeader("EngCalcs", $html_title, $html_head);
+$html_desc = $ec_lang['mtc_main_desc'];
+echoHeader("EngCalcs", $html_title, "");
 
 ?>
 <h2><?=$ec_lang['mtc_main_desc']?></h2>

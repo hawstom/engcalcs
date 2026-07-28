@@ -698,7 +698,7 @@
                 "previous_translated": {
                     "key": "rc_notes_4_def",
                     "value": "Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). \"<a target=\"_blank\" href=\"https:\/\/www.fs.usda.gov\/biology\/nsaec\/fishxing\/fplibrary\/Robinson_1998_Design_of_Rock_Chutes.pdf\">Design of rock chutes<\/a>.\" <em>Transactions of the ASAE<\/em>, 41(3), 621–626. USDA ARS juga menerbitkan <a target=\"_blank\" href=\"https:\/\/data.nal.usda.gov\/dataset\/rock-chute-design\">lembar kerja Excel<\/a> berdasarkan metode yang sama.",
-                    "english": "Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). &ldquo;<a target=\"_blank\" href=\"https:\/\/www.fs.usda.gov\/biology\/nsaec\/fishxing\/fplibrary\/Robinson_1998_Design_of_Rock_Chutes.pdf\">Design of rock chutes<\/a>.&rdquo; <em>Transactions of the ASAE<\/em>, 41(3), 621&ndash;626. USDA ARS also publishes an <a target=\"_blank\" href=\"https:\/\/data.nal.usda.gov\/dataset\/rock-chute-design\">Excel spreadsheet<\/a> based on the same method."
+                    "english": "Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). “<a target=\"_blank\" href=\"https:\/\/www.fs.usda.gov\/biology\/nsaec\/fishxing\/fplibrary\/Robinson_1998_Design_of_Rock_Chutes.pdf\">Design of rock chutes<\/a>.” <em>Transactions of the ASAE<\/em>, 41(3), 621–626. USDA ARS also publishes an <a target=\"_blank\" href=\"https:\/\/data.nal.usda.gov\/dataset\/rock-chute-design\">Excel spreadsheet<\/a> based on the same method."
                 },
                 "next_translated": {
                     "key": "rc_sketch_top_crest_curve",
@@ -714,12 +714,12 @@
                 "previous_translated": {
                     "key": "ip_count",
                     "value": "<span class=\"ec-help\" title=\"Baris lateral: emiter pada segmen ini saja. Baris pipa utama: total emiter pada lateral SELAIN lateral ini yang bercabang dari segmen ini. Untuk segmen pipa utama yang berakhir pada lateral pengujian, ini juga mencakup lateral mana pun yang lebih jauh di sepanjang pipa utama melewati titik tersebut, atau yang berbagi persimpangan yang sama (misalnya lateral di sisi berlawanan) — debit lateral tersebut juga bercabang dari segmen yang sama ini.\">Emiter <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_elev_ds",
                     "value": "<span class=\"ec-help\" title=\"Elevasi ujung hilir segmen ini. Opsional pada baris tengah (default datar \/ sama dengan simpul di atasnya jika dikosongkan). Wajib pada baris terakhir: nilai tersebut adalah elevasi emiter terakhir, yang secara langsung menentukan tekanan pasokan yang diperlukan.\">Elev. Hilir <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter’s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -730,12 +730,12 @@
                 "previous_translated": {
                     "key": "ip_count",
                     "value": "<span class=\"ec-help\" title=\"Baris lateral: emiter pada segmen ini saja. Baris pipa utama: total emiter pada lateral SELAIN lateral ini yang bercabang dari segmen ini. Untuk segmen pipa utama yang berakhir pada lateral pengujian, ini juga mencakup lateral mana pun yang lebih jauh di sepanjang pipa utama melewati titik tersebut, atau yang berbagi persimpangan yang sama (misalnya lateral di sisi berlawanan) — debit lateral tersebut juga bercabang dari segmen yang sama ini.\">Emiter <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_elev_ds",
                     "value": "<span class=\"ec-help\" title=\"Elevasi ujung hilir segmen ini. Opsional pada baris tengah (default datar \/ sama dengan simpul di atasnya jika dikosongkan). Wajib pada baris terakhir: nilai tersebut adalah elevasi emiter terakhir, yang secara langsung menentukan tekanan pasokan yang diperlukan.\">Elev. Hilir <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter’s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -746,12 +746,12 @@
                 "previous_translated": {
                     "key": "ip_count",
                     "value": "<span class=\"ec-help\" title=\"Baris lateral: emiter pada segmen ini saja. Baris pipa utama: total emiter pada lateral SELAIN lateral ini yang bercabang dari segmen ini. Untuk segmen pipa utama yang berakhir pada lateral pengujian, ini juga mencakup lateral mana pun yang lebih jauh di sepanjang pipa utama melewati titik tersebut, atau yang berbagi persimpangan yang sama (misalnya lateral di sisi berlawanan) — debit lateral tersebut juga bercabang dari segmen yang sama ini.\">Emiter <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_elev_ds",
                     "value": "<span class=\"ec-help\" title=\"Elevasi ujung hilir segmen ini. Opsional pada baris tengah (default datar \/ sama dengan simpul di atasnya jika dikosongkan). Wajib pada baris terakhir: nilai tersebut adalah elevasi emiter terakhir, yang secara langsung menentukan tekanan pasokan yang diperlukan.\">Elev. Hilir <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter’s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },

@@ -421,12 +421,12 @@
                 "previous_translated": {
                     "key": "ip_count",
                     "value": "<span class=\"ec-help\" title=\"ردیف‌های جانبی: فقط قطره‌چکان‌های همین بخش. ردیف‌های خط اصلی: مجموع قطره‌چکان‌های جانبی‌های دیگری غیر از این که از این بخش منشعب می‌شوند. برای بخشی از خط اصلی که به جانبی آزمایش می‌رسد، این عدد شامل هر جانبی فراتر از آن نقطه در امتداد خط اصلی یا هم‌گره با آن (مانند جانبی سمت مقابل) نیز می‌شود — جریان آن‌ها نیز از همین بخش عبور می‌کند.\">قطره‌چکان‌ها <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_elev_ds",
                     "value": "<span class=\"ec-help\" title=\"تراز انتهای پایین‌دست این بخش. در ردیف‌های میانی اختیاری است (در صورت خالی گذاشتن، به‌طور پیش‌فرض صاف \/ برابر با گره بالادست فرض می‌شود). در ردیف آخر الزامی است: این مقدار تراز آخرین قطره‌چکان است که مستقیماً فشار تامین موردنیاز را تعیین می‌کند.\">تراز پایین‌دست <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter’s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -437,12 +437,12 @@
                 "previous_translated": {
                     "key": "ip_count",
                     "value": "<span class=\"ec-help\" title=\"ردیف‌های جانبی: فقط قطره‌چکان‌های همین بخش. ردیف‌های خط اصلی: مجموع قطره‌چکان‌های جانبی‌های دیگری غیر از این که از این بخش منشعب می‌شوند. برای بخشی از خط اصلی که به جانبی آزمایش می‌رسد، این عدد شامل هر جانبی فراتر از آن نقطه در امتداد خط اصلی یا هم‌گره با آن (مانند جانبی سمت مقابل) نیز می‌شود — جریان آن‌ها نیز از همین بخش عبور می‌کند.\">قطره‌چکان‌ها <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_elev_ds",
                     "value": "<span class=\"ec-help\" title=\"تراز انتهای پایین‌دست این بخش. در ردیف‌های میانی اختیاری است (در صورت خالی گذاشتن، به‌طور پیش‌فرض صاف \/ برابر با گره بالادست فرض می‌شود). در ردیف آخر الزامی است: این مقدار تراز آخرین قطره‌چکان است که مستقیماً فشار تامین موردنیاز را تعیین می‌کند.\">تراز پایین‌دست <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter’s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -453,12 +453,12 @@
                 "previous_translated": {
                     "key": "ip_count",
                     "value": "<span class=\"ec-help\" title=\"ردیف‌های جانبی: فقط قطره‌چکان‌های همین بخش. ردیف‌های خط اصلی: مجموع قطره‌چکان‌های جانبی‌های دیگری غیر از این که از این بخش منشعب می‌شوند. برای بخشی از خط اصلی که به جانبی آزمایش می‌رسد، این عدد شامل هر جانبی فراتر از آن نقطه در امتداد خط اصلی یا هم‌گره با آن (مانند جانبی سمت مقابل) نیز می‌شود — جریان آن‌ها نیز از همین بخش عبور می‌کند.\">قطره‌چکان‌ها <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_elev_ds",
                     "value": "<span class=\"ec-help\" title=\"تراز انتهای پایین‌دست این بخش. در ردیف‌های میانی اختیاری است (در صورت خالی گذاشتن، به‌طور پیش‌فرض صاف \/ برابر با گره بالادست فرض می‌شود). در ردیف آخر الزامی است: این مقدار تراز آخرین قطره‌چکان است که مستقیماً فشار تامین موردنیاز را تعیین می‌کند.\">تراز پایین‌دست <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter’s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },

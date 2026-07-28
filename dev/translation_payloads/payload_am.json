@@ -545,13 +545,13 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "<span class=\"ec-help\" title=\"የላተራል ረድፎች: በዚህ ክፍል ውስጥ ያሉ ኤሚተሮች ብቻ። የዋና መስመር ረድፎች: ከዚህ ክፍል በሚወጡ ሌሎች ላተራሎች ላይ ያሉ ጠቅላላ ኤሚተሮች። የሙከራው ላተራል በሚወጣበት ቦታ ላለው ክፍል፣ ከዚያ ነጥብ በኋላ በዋናው መስመር ላይ ያሉ ላተራሎች እና ያንኑ መገናኛ የሚጋሩ (ለምሳሌ በተቃራኒ በኩል ያለ ላተራል) ጭምር ይካተታሉ &mdash; ፍሰታቸው በዚሁ ክፍል በኩል ያልፋልና።\">ኤሚተሮች <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
+                    "value": "<span class=\"ec-help\" title=\"የላተራል ረድፎች: በዚህ ክፍል ውስጥ ያሉ ኤሚተሮች ብቻ። የዋና መስመር ረድፎች: ከዚህ ክፍል በሚወጡ ሌሎች ላተራሎች ላይ ያሉ ጠቅላላ ኤሚተሮች። የሙከራው ላተራል በሚወጣበት ቦታ ላለው ክፍል፣ ከዚያ ነጥብ በኋላ በዋናው መስመር ላይ ያሉ ላተራሎች እና ያንኑ መገናኛ የሚጋሩ (ለምሳሌ በተቃራኒ በኩል ያለ ላተራል) ጭምር ይካተታሉ — ፍሰታቸው በዚሁ ክፍል በኩል ያልፋልና።\">ኤሚተሮች <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_elev_ds",
                     "value": "<span class=\"ec-help\" title=\"የዚህ ክፍል የታችኛው ጫፍ ከፍታ። ለውስጣዊ ረድፎች አማራጭ ነው (ባዶ ከተተወ ጠፍጣፋ \/ ከላይኛው ነጥብ ጋር እኩል ይወሰዳል)። ለመጨረሻው ረድፍ ግዴታ ነው: ያ እሴት የመጨረሻው ኤሚተር ከፍታ ነው፣ የሚያስፈልገውን የአቅርቦት ግፊት በቀጥታ ይወስናል።\">የታች ከፍታ <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter’s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -561,13 +561,13 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "<span class=\"ec-help\" title=\"የላተራል ረድፎች: በዚህ ክፍል ውስጥ ያሉ ኤሚተሮች ብቻ። የዋና መስመር ረድፎች: ከዚህ ክፍል በሚወጡ ሌሎች ላተራሎች ላይ ያሉ ጠቅላላ ኤሚተሮች። የሙከራው ላተራል በሚወጣበት ቦታ ላለው ክፍል፣ ከዚያ ነጥብ በኋላ በዋናው መስመር ላይ ያሉ ላተራሎች እና ያንኑ መገናኛ የሚጋሩ (ለምሳሌ በተቃራኒ በኩል ያለ ላተራል) ጭምር ይካተታሉ &mdash; ፍሰታቸው በዚሁ ክፍል በኩል ያልፋልና።\">ኤሚተሮች <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
+                    "value": "<span class=\"ec-help\" title=\"የላተራል ረድፎች: በዚህ ክፍል ውስጥ ያሉ ኤሚተሮች ብቻ። የዋና መስመር ረድፎች: ከዚህ ክፍል በሚወጡ ሌሎች ላተራሎች ላይ ያሉ ጠቅላላ ኤሚተሮች። የሙከራው ላተራል በሚወጣበት ቦታ ላለው ክፍል፣ ከዚያ ነጥብ በኋላ በዋናው መስመር ላይ ያሉ ላተራሎች እና ያንኑ መገናኛ የሚጋሩ (ለምሳሌ በተቃራኒ በኩል ያለ ላተራል) ጭምር ይካተታሉ — ፍሰታቸው በዚሁ ክፍል በኩል ያልፋልና።\">ኤሚተሮች <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_elev_ds",
                     "value": "<span class=\"ec-help\" title=\"የዚህ ክፍል የታችኛው ጫፍ ከፍታ። ለውስጣዊ ረድፎች አማራጭ ነው (ባዶ ከተተወ ጠፍጣፋ \/ ከላይኛው ነጥብ ጋር እኩል ይወሰዳል)። ለመጨረሻው ረድፍ ግዴታ ነው: ያ እሴት የመጨረሻው ኤሚተር ከፍታ ነው፣ የሚያስፈልገውን የአቅርቦት ግፊት በቀጥታ ይወስናል።\">የታች ከፍታ <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter’s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -577,13 +577,13 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "<span class=\"ec-help\" title=\"የላተራል ረድፎች: በዚህ ክፍል ውስጥ ያሉ ኤሚተሮች ብቻ። የዋና መስመር ረድፎች: ከዚህ ክፍል በሚወጡ ሌሎች ላተራሎች ላይ ያሉ ጠቅላላ ኤሚተሮች። የሙከራው ላተራል በሚወጣበት ቦታ ላለው ክፍል፣ ከዚያ ነጥብ በኋላ በዋናው መስመር ላይ ያሉ ላተራሎች እና ያንኑ መገናኛ የሚጋሩ (ለምሳሌ በተቃራኒ በኩል ያለ ላተራል) ጭምር ይካተታሉ &mdash; ፍሰታቸው በዚሁ ክፍል በኩል ያልፋልና።\">ኤሚተሮች <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
+                    "value": "<span class=\"ec-help\" title=\"የላተራል ረድፎች: በዚህ ክፍል ውስጥ ያሉ ኤሚተሮች ብቻ። የዋና መስመር ረድፎች: ከዚህ ክፍል በሚወጡ ሌሎች ላተራሎች ላይ ያሉ ጠቅላላ ኤሚተሮች። የሙከራው ላተራል በሚወጣበት ቦታ ላለው ክፍል፣ ከዚያ ነጥብ በኋላ በዋናው መስመር ላይ ያሉ ላተራሎች እና ያንኑ መገናኛ የሚጋሩ (ለምሳሌ በተቃራኒ በኩል ያለ ላተራል) ጭምር ይካተታሉ — ፍሰታቸው በዚሁ ክፍል በኩል ያልፋልና።\">ኤሚተሮች <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_elev_ds",
                     "value": "<span class=\"ec-help\" title=\"የዚህ ክፍል የታችኛው ጫፍ ከፍታ። ለውስጣዊ ረድፎች አማራጭ ነው (ባዶ ከተተወ ጠፍጣፋ \/ ከላይኛው ነጥብ ጋር እኩል ይወሰዳል)። ለመጨረሻው ረድፍ ግዴታ ነው: ያ እሴት የመጨረሻው ኤሚተር ከፍታ ነው፣ የሚያስፈልገውን የአቅርቦት ግፊት በቀጥታ ይወስናል።\">የታች ከፍታ <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter’s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },

@@ -325,12 +325,12 @@
                 "previous_translated": {
                     "key": "ip_count",
                     "value": "<span class=\"ec-help\" title=\"Рядки латеральей: емітери у цій ділянці тільки. Рядки магістралей: загальна кількість емітерів на латеральях, ніж цій, що відводяться від цієї ділянки. Для ділянки прямо в місці відвору тестової латеральі, це також включає будь-які латеральі далі вниз по магістралі, або у тому ж з'єднанні (наприклад, латераль з іншого боку) — їхня витрата проходить через цю саму ділянку перед розділенням, незалежно від того, наявні вони в цій таблиці чи ні.\">Емітери <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_elev_ds",
                     "value": "<span class=\"ec-help\" title=\"Відмітка нижньої (кінцевої) частини цієї ділянки. Опціонально на проміжних рядках (за замовчуванням горизонтально \/ таке ж як у вузлі вище, якщо залишено порожнім). Обов'язково на останньому рядку: це значення — відмітка останнього емітера, що безпосередньо встановлює необхідний тиск подачі.\">DS Відм. <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter’s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -341,12 +341,12 @@
                 "previous_translated": {
                     "key": "ip_count",
                     "value": "<span class=\"ec-help\" title=\"Рядки латеральей: емітери у цій ділянці тільки. Рядки магістралей: загальна кількість емітерів на латеральях, ніж цій, що відводяться від цієї ділянки. Для ділянки прямо в місці відвору тестової латеральі, це також включає будь-які латеральі далі вниз по магістралі, або у тому ж з'єднанні (наприклад, латераль з іншого боку) — їхня витрата проходить через цю саму ділянку перед розділенням, незалежно від того, наявні вони в цій таблиці чи ні.\">Емітери <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_elev_ds",
                     "value": "<span class=\"ec-help\" title=\"Відмітка нижньої (кінцевої) частини цієї ділянки. Опціонально на проміжних рядках (за замовчуванням горизонтально \/ таке ж як у вузлі вище, якщо залишено порожнім). Обов'язково на останньому рядку: це значення — відмітка останнього емітера, що безпосередньо встановлює необхідний тиск подачі.\">DS Відм. <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter’s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -357,12 +357,12 @@
                 "previous_translated": {
                     "key": "ip_count",
                     "value": "<span class=\"ec-help\" title=\"Рядки латеральей: емітери у цій ділянці тільки. Рядки магістралей: загальна кількість емітерів на латеральях, ніж цій, що відводяться від цієї ділянки. Для ділянки прямо в місці відвору тестової латеральі, це також включає будь-які латеральі далі вниз по магістралі, або у тому ж з'єднанні (наприклад, латераль з іншого боку) — їхня витрата проходить через цю саму ділянку перед розділенням, незалежно від того, наявні вони в цій таблиці чи ні.\">Емітери <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_elev_ds",
                     "value": "<span class=\"ec-help\" title=\"Відмітка нижньої (кінцевої) частини цієї ділянки. Опціонально на проміжних рядках (за замовчуванням горизонтально \/ таке ж як у вузлі вище, якщо залишено порожнім). Обов'язково на останньому рядку: це значення — відмітка останнього емітера, що безпосередньо встановлює необхідний тиск подачі.\">DS Відм. <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter’s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },

@@ -422,13 +422,13 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "<span class=\"ec-help\" title=\"لیٹرل قطاریں: صرف اس حصے کے ایمیٹرز۔ مرکزی قطاریں: اس حصے سے شاخ ہونے والے دیگر لیٹرلز کے کل ایمیٹرز۔ ٹیسٹ لیٹرل لائن پر ختم ہونے والے مرکزی لائن کے حصے کے لیے، اس میں وہ تمام لیٹرلز بھی شامل ہیں جو اس مقام سے آگے مرکزی لائن پر ہیں، یا وہی جوڑ بانٹتے ہیں (مثلاً مخالف سمت کا لیٹرل) &mdash; ان کا بہاؤ بھی اسی حصے سے گزرتا ہے۔\">ایمیٹرز <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
+                    "value": "<span class=\"ec-help\" title=\"لیٹرل قطاریں: صرف اس حصے کے ایمیٹرز۔ مرکزی قطاریں: اس حصے سے شاخ ہونے والے دیگر لیٹرلز کے کل ایمیٹرز۔ ٹیسٹ لیٹرل لائن پر ختم ہونے والے مرکزی لائن کے حصے کے لیے، اس میں وہ تمام لیٹرلز بھی شامل ہیں جو اس مقام سے آگے مرکزی لائن پر ہیں، یا وہی جوڑ بانٹتے ہیں (مثلاً مخالف سمت کا لیٹرل) — ان کا بہاؤ بھی اسی حصے سے گزرتا ہے۔\">ایمیٹرز <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_elev_ds",
                     "value": "<span class=\"ec-help\" title=\"اس حصے کے زیریں سرے کی بلندی۔ اندرونی قطاروں میں اختیاری ہے (خالی چھوڑنے پر ہموار \/ اوپر والے نوڈ کے برابر مانی جاتی ہے)۔ آخری قطار میں لازمی ہے: یہ قدر آخری ایمیٹر کی بلندی ہے، جو براہِ راست مطلوبہ سپلائی دباؤ متعین کرتی ہے۔\">زیریں بلندی <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter’s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -438,13 +438,13 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "<span class=\"ec-help\" title=\"لیٹرل قطاریں: صرف اس حصے کے ایمیٹرز۔ مرکزی قطاریں: اس حصے سے شاخ ہونے والے دیگر لیٹرلز کے کل ایمیٹرز۔ ٹیسٹ لیٹرل لائن پر ختم ہونے والے مرکزی لائن کے حصے کے لیے، اس میں وہ تمام لیٹرلز بھی شامل ہیں جو اس مقام سے آگے مرکزی لائن پر ہیں، یا وہی جوڑ بانٹتے ہیں (مثلاً مخالف سمت کا لیٹرل) &mdash; ان کا بہاؤ بھی اسی حصے سے گزرتا ہے۔\">ایمیٹرز <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
+                    "value": "<span class=\"ec-help\" title=\"لیٹرل قطاریں: صرف اس حصے کے ایمیٹرز۔ مرکزی قطاریں: اس حصے سے شاخ ہونے والے دیگر لیٹرلز کے کل ایمیٹرز۔ ٹیسٹ لیٹرل لائن پر ختم ہونے والے مرکزی لائن کے حصے کے لیے، اس میں وہ تمام لیٹرلز بھی شامل ہیں جو اس مقام سے آگے مرکزی لائن پر ہیں، یا وہی جوڑ بانٹتے ہیں (مثلاً مخالف سمت کا لیٹرل) — ان کا بہاؤ بھی اسی حصے سے گزرتا ہے۔\">ایمیٹرز <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_elev_ds",
                     "value": "<span class=\"ec-help\" title=\"اس حصے کے زیریں سرے کی بلندی۔ اندرونی قطاروں میں اختیاری ہے (خالی چھوڑنے پر ہموار \/ اوپر والے نوڈ کے برابر مانی جاتی ہے)۔ آخری قطار میں لازمی ہے: یہ قدر آخری ایمیٹر کی بلندی ہے، جو براہِ راست مطلوبہ سپلائی دباؤ متعین کرتی ہے۔\">زیریں بلندی <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter’s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -454,13 +454,13 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "ip_count",
-                    "value": "<span class=\"ec-help\" title=\"لیٹرل قطاریں: صرف اس حصے کے ایمیٹرز۔ مرکزی قطاریں: اس حصے سے شاخ ہونے والے دیگر لیٹرلز کے کل ایمیٹرز۔ ٹیسٹ لیٹرل لائن پر ختم ہونے والے مرکزی لائن کے حصے کے لیے، اس میں وہ تمام لیٹرلز بھی شامل ہیں جو اس مقام سے آگے مرکزی لائن پر ہیں، یا وہی جوڑ بانٹتے ہیں (مثلاً مخالف سمت کا لیٹرل) &mdash; ان کا بہاؤ بھی اسی حصے سے گزرتا ہے۔\">ایمیٹرز <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) &mdash; their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
+                    "value": "<span class=\"ec-help\" title=\"لیٹرل قطاریں: صرف اس حصے کے ایمیٹرز۔ مرکزی قطاریں: اس حصے سے شاخ ہونے والے دیگر لیٹرلز کے کل ایمیٹرز۔ ٹیسٹ لیٹرل لائن پر ختم ہونے والے مرکزی لائن کے حصے کے لیے، اس میں وہ تمام لیٹرلز بھی شامل ہیں جو اس مقام سے آگے مرکزی لائن پر ہیں، یا وہی جوڑ بانٹتے ہیں (مثلاً مخالف سمت کا لیٹرل) — ان کا بہاؤ بھی اسی حصے سے گزرتا ہے۔\">ایمیٹرز <span class=\"ec-tip\">?<\/span><\/span>",
+                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
                 },
                 "next_translated": {
                     "key": "ip_elev_ds",
                     "value": "<span class=\"ec-help\" title=\"اس حصے کے زیریں سرے کی بلندی۔ اندرونی قطاروں میں اختیاری ہے (خالی چھوڑنے پر ہموار \/ اوپر والے نوڈ کے برابر مانی جاتی ہے)۔ آخری قطار میں لازمی ہے: یہ قدر آخری ایمیٹر کی بلندی ہے، جو براہِ راست مطلوبہ سپلائی دباؤ متعین کرتی ہے۔\">زیریں بلندی <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter&rsquo;s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
+                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter’s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },

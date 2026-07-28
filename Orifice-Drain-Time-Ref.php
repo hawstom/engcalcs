@@ -1,8 +1,9 @@
 <?php
 require_once ('lib/base.inc.php');
 $html_title = 'Orifice Drain Time &mdash; Equation Derivation';
+// English-only reference page (no language switcher), so the description is a literal, not a key.
+$html_desc = 'Derivation of the orifice drain time equation for a pond or tank of conic-section shape, from the orifice equation and the changing water surface area.';
 $html_head='
-	<meta name="Description" content="Derivation of the orifice drain time equation for a conic-section pond." />
 	<style>
 		math[display="block"] { margin-top: 0.2em; margin-bottom: 1.5em; display: block; }
 	</style>
