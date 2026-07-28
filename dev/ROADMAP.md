@@ -286,19 +286,33 @@ straight from `lib/lang.ec.sw.php`, i.e. an agent searching our own translated s
   tubería pvc sanitaria`, `kanalizasyon eğim tablosu`, `tabela de inclinação de esgoto`. The table
   answers every one of them and none of them can read it. Cheap high-yield fix: add an SI column
   (mm/m or %) to Table 1, write a real meta description, cross-link from Manning Pipe Flow.
+  **Note the cross-link is one-directional already** — `sewslope.php` links *to*
+  `engcalcs/Manning-Pipe-Flow.php`; what is missing is the calculator linking *back* to the doc.
   **Same story for `hawsedc.com/peakfact.php`** — has the Harmon formula plus genuinely original
   low-flow research (peaking factors derived from the UPC for 10–300 person systems), links to zero
   calculators, draws 62 impressions / 1 click.
-  **Both files live on the parent site, not in this repository, and are not present locally either** —
-  `/var/www/cnm/public_html/hawsedc/` holds only the dev shims (`hawsedc.lib.php`, `edc.lib.php`, a
-  stub `index.php`) and is not a git repo. **Workflow when this task is actually run (agreed
-  2026-07-27):** Tom downloads the two `.php` sources from production → they are edited in a scratch
-  dir → Tom uploads them back. **Do not stage copies under `dev/`.** Fetching the live *rendered*
-  HTML is not a substitute: these are PHP pages with include-driven header/footer, so reconstructing
-  from rendered output would silently flatten them into static files. And committing a second copy of
-  a file whose master lives on another host creates exactly the drift trap this roadmap keeps warning
-  about. If parent-site edits become frequent, the real fix is putting the parent site under its own
-  version control — a separate decision, not part of this task.
+  **Edit location — settled 2026-07-27.** Both files live on the parent site, **not in this
+  repository**, but Tom has brought the production sources local to
+  `/var/www/cnm/public_html/hawsedc/` (i.e. `../` from the repo root): **`../sewslope.php` and
+  `../peakfact.php` are where they get edited.** That directory is outside the repo and is not a git
+  repo itself, so there is exactly one local copy, git never sees it, and no drift trap is created —
+  Tom uploads the edited files to deploy. **Do not stage copies under `dev/`.** Also note: fetching
+  the live *rendered* HTML is not a substitute for the source — these are PHP pages with
+  include-driven header/footer, so anything rebuilt from rendered output would silently flatten into
+  a static file.
+  **Caveat — `../` is a mix of production files and dev shims.** `sewslope.php` and `peakfact.php`
+  are genuine production sources (verified: both open with `require_once('hawsedc.lib.php')` and
+  `echoHawsEDCHeader(...)`). But `hawsedc.lib.php`, `edc.lib.php`, `hawsedc.css` and `index.php` in
+  that same directory are **local shims** written for dev rendering and may not match production.
+  Never upload one of those on the assumption it is current.
+  **Blocker for the meta-description half:** `echoHawsEDCHeader(string $title)` takes a title and
+  nothing else, so there is no way to emit a per-page `<meta name="description">` without changing
+  the shared header function — which lives in one of those shim files. Before touching it, have Tom
+  download the **production** `hawsedc.lib.php` and diff it against the local shim. Then add an
+  optional second parameter (`$description = ''`), which is backward compatible and leaves every
+  other page on the parent site working unchanged.
+  If parent-site edits become frequent, the real fix is putting the parent site under its own version
+  control — a separate decision, not part of this task.
 
 - 20|152| **Link HY-8 itself from the culvert-adjacent notes — and do not build a culvert
   calculator.** The 3-minute HY-8 QuickStart video is *already* linked from both `mpf_note_1` and
