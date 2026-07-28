@@ -300,17 +300,16 @@ straight from `lib/lang.ec.sw.php`, i.e. an agent searching our own translated s
   the live *rendered* HTML is not a substitute for the source — these are PHP pages with
   include-driven header/footer, so anything rebuilt from rendered output would silently flatten into
   a static file.
-  **Caveat — `../` is a mix of production files and dev shims.** `sewslope.php` and `peakfact.php`
-  are genuine production sources (verified: both open with `require_once('hawsedc.lib.php')` and
-  `echoHawsEDCHeader(...)`). But `hawsedc.lib.php`, `edc.lib.php`, `hawsedc.css` and `index.php` in
-  that same directory are **local shims** written for dev rendering and may not match production.
-  Never upload one of those on the assumption it is current.
-  **Blocker for the meta-description half:** `echoHawsEDCHeader(string $title)` takes a title and
-  nothing else, so there is no way to emit a per-page `<meta name="description">` without changing
-  the shared header function — which lives in one of those shim files. Before touching it, have Tom
-  download the **production** `hawsedc.lib.php` and diff it against the local shim. Then add an
-  optional second parameter (`$description = ''`), which is backward compatible and leaves every
-  other page on the parent site working unchanged.
+  **`../hawsedc.lib.php` is editable — authorized by Tom, 2026-07-27.** An earlier draft of this task
+  treated it as a possibly-stale dev shim to be diffed against production first; that blocker is
+  **withdrawn**. Edit it directly along with the two page files.
+  **How to add the meta descriptions:** `echoHawsEDCHeader(string $title)` currently takes a title and
+  nothing else, so it cannot emit a per-page `<meta name="description">` as written. Add an **optional
+  second parameter** (`$description = ''`) and emit the tag only when it is non-empty — backward
+  compatible, so every other page on the parent site that still calls the function with one argument
+  keeps working untouched. Then pass a real description from `sewslope.php` and `peakfact.php`.
+  **Still true of the neighbours:** `edc.lib.php`, `hawsedc.css` and `index.php` in `../` are local
+  dev shims, not verified against production — do not upload those.
   If parent-site edits become frequent, the real fix is putting the parent site under its own version
   control — a separate decision, not part of this task.
 
