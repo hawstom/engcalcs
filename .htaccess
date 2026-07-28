@@ -23,3 +23,14 @@ Redirect 301 /engcalcs/lib/Calculators.lib.js /engcalcs/js/Calculators.lib.js
 # mod_alias, the same override level as the Redirect rules above, so this is known to
 # be permitted here -- unlike Options, which needs a separate AllowOverride grant.
 RedirectMatch 404 "/\.git(/|$)"
+
+# Turn off directory listings. Without this, /engcalcs/lib/, /js/ and /css/ each
+# served a full file index (verified 2026-07-28) -- not a source leak on its own,
+# but it hands an attacker the exact filename list to probe.
+#
+# CAUTION: unlike everything above this line, Options needs `AllowOverride Options`,
+# which is a SEPARATE grant from the FileInfo/Limit the rest of this file relies on.
+# Where it is not granted Apache returns 500 for every request under /engcalcs/ --
+# it fails loud, not silent. Confirmed working on this host 2026-07-28; if the site
+# is ever moved, re-test this line first and delete it if the new host 500s.
+Options -Indexes
