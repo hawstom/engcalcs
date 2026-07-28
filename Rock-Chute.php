@@ -11,29 +11,29 @@ echoHeader("EngCalcs", $html_title, "");
 echoCalculatorForm(
 	// Inputs
 	Array(
-		Array('name' => 'rc_S0', 'type' => 'number', 'default' => '0.2',  'units' => Array('grade', 'gradePercent'), 'label' => $ec_lang['rc_S0']),
-		Array('name' => 'rc_qt', 'type' => 'number', 'default' => '0.5',  'units' => Array('m2ps', 'ft2ps'),         'label' => $ec_lang['rc_qt']),
+		Array('name' => 'rc_S0', 'type' => 'number', 'default' => '0.2',  'units' => 'slope', 'label' => $ec_lang['rc_S0']),
+		Array('name' => 'rc_qt', 'type' => 'number', 'default' => Array('us' => '5', 'si' => '0.5'),  'units' => 'unit_discharge',         'label' => $ec_lang['rc_qt']),
 		Array('name' => 'rc_np', 'type' => 'number', 'default' => '0.45', 'units' => NULL, 'label' => $ec_lang['rc_np']),
 		Array('name' => 'rc_sg', 'type' => 'number', 'default' => '2.65', 'units' => NULL, 'label' => $ec_lang['rc_sg']),
 		Array('name' => 'rc_SD', 'type' => 'number', 'default' => '1.30', 'units' => NULL, 'label' => $ec_lang['rc_SD']),
-		Array('name' => 'rc_yn', 'type' => 'number', 'default' => '',     'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['rc_yn']),
+		Array('name' => 'rc_yn', 'type' => 'number', 'default' => '',     'units' => 'distance_medium', 'label' => $ec_lang['rc_yn']),
 	),
 	// Results
 	Array(
-		Array('name' => 'rc_D50',          'units' => Array('mm', 'm', 'in', 'ft'), 'label' => $ec_lang['rc_D50']),
+		Array('name' => 'rc_D50',          'units' => 'distance_small', 'label' => $ec_lang['rc_D50']),
 		Array('name' => 'rc_eq_used',      'units' => NULL,                        'label' => $ec_lang['rc_eq_used']),
 		Array('name' => 'rc_sg_check',     'units' => NULL,                        'label' => $ec_lang['rc_sg_check']),
 		Array('name' => 'rc_SD_check',     'units' => NULL,                        'label' => $ec_lang['rc_SD_check']),
-		Array('name' => 'rc_layer',        'units' => Array('mm', 'm', 'in', 'ft'),'label' => $ec_lang['rc_layer']),
-		Array('name' => 'rc_crest_radius', 'units' => Array('mm', 'm', 'in', 'ft'),'label' => $ec_lang['rc_crest_radius']),
-		Array('name' => 'rc_crest_length', 'units' => Array('m', 'mm', 'ft', 'in'),'label' => $ec_lang['rc_crest_length']),
-		Array('name' => 'rc_apron_length', 'units' => Array('m', 'mm', 'ft', 'in'),'label' => $ec_lang['rc_apron_length']),
+		Array('name' => 'rc_layer',        'units' => 'distance_small','label' => $ec_lang['rc_layer']),
+		Array('name' => 'rc_crest_radius', 'units' => 'distance_medium','label' => $ec_lang['rc_crest_radius']),
+		Array('name' => 'rc_crest_length', 'units' => 'distance_medium','label' => $ec_lang['rc_crest_length']),
+		Array('name' => 'rc_apron_length', 'units' => 'distance_medium','label' => $ec_lang['rc_apron_length']),
 		Array('name' => 'rc_n_chute',      'units' => NULL,                        'label' => $ec_lang['rc_n_chute']),
-		Array('name' => 'rc_Vm',           'units' => Array('mps', 'ftps'),        'label' => $ec_lang['rc_Vm']),
-		Array('name' => 'rc_qm',           'units' => Array('m2ps', 'ft2ps'),      'label' => $ec_lang['rc_qm']),
-		Array('name' => 'rc_qs',           'units' => Array('m2ps', 'ft2ps'),      'label' => $ec_lang['rc_qs']),
-		Array('name' => 'rc_d',            'units' => Array('m', 'mm', 'ft', 'in'),'label' => $ec_lang['rc_d']),
-		Array('name' => 'rc_Hp',             'units' => Array('m', 'mm', 'ft', 'in'),'label' => $ec_lang['rc_Hp']),
+		Array('name' => 'rc_Vm',           'units' => 'velocity',        'label' => $ec_lang['rc_Vm']),
+		Array('name' => 'rc_qm',           'units' => 'unit_discharge',      'label' => $ec_lang['rc_qm']),
+		Array('name' => 'rc_qs',           'units' => 'unit_discharge',      'label' => $ec_lang['rc_qs']),
+		Array('name' => 'rc_d',            'units' => 'distance_medium','label' => $ec_lang['rc_d']),
+		Array('name' => 'rc_Hp',             'units' => 'distance_medium','label' => $ec_lang['rc_Hp']),
 		Array('name' => 'rc_ponding_check',  'units' => NULL,                        'label' => $ec_lang['rc_ponding_check']),
 	)
 );

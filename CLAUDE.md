@@ -15,6 +15,8 @@ A PHP/JS suite of hydraulic engineering calculators. 12 calculators, 11 language
 5. Write `EngCalcs.pageCalculator = function(objForm) { ... }` in the `<script>` block at the bottom.
 6. Call `echoHeader`, `echoCalculatorForm`, `echoFeedback`, then `echoFooter` — that's the full page structure.
 7. Add the new calculator to the menus in `lib/Menus.lib.php`.
+   Declare each field's units as a **family name** (`'units' => 'distance_small'`), never an inline
+   array — see "Unit Sets" below.
 8. Set `$html_desc = $ec_lang['prefix_meta_desc_plain'];` before `echoHeader()` — see "Meta description" below.
 9. Include the calculator JS using `filemtime()` for automatic cache-busting — never use a hardcoded `?v=N`:
    ```php
@@ -371,9 +373,9 @@ When translating a new calculator's keys into all 26 non-English languages, **sp
 **REQUIRED: Get explicit user authorization before launching any sprint.** A sprint spawns up to 26 paid agents. The correct pattern is always: propose → confirm → launch. Never infer authorization from a general "proceed" or a question about paths. The user must say something equivalent to "go ahead" or "run it" in response to a specific sprint proposal.
 
 **Pre-sprint checklist (complete before proposing to the user):**
-1. Regenerate payloads so the delta count reflects the *current* lang files: `wsl -e php /var/www/cnm/public_html/hawsedc/engcalcs/dev/scripts/generate_translation_payloads.php`. This is the orchestrating AI's job, never the user's — the user must never have to remember to call for it. **Enforcement:** the launcher MUST run `generate_translation_payloads.php --check` immediately before spawning agents; it prints `FRESH`/`STALE` and exits non-zero if any payload is older than its inputs (English source, that lang file, glossary, or the generator itself). A non-zero exit is a hard stop — regenerate, then re-check — so a sprint can never launch on a stale delta.
+1. Regenerate payloads so the delta count reflects the *current* lang files: `wsl -e php /var/www/cnm/public_html/hawsedc/engcalcs/dev/scripts/generate_translation_payloads.php`. This is the orchestrating AI's job, never the user's — the user must never have to remember to call for it. **Enforcement:** the launcher MUST run `generate_translation_payloads.php --check` immediately before spawning agents; it prints `FRESH`/`STALE` and exits non-zero if any payload is older than its inputs (English source, that lang file, glossary, the exempt-key list, or the generator itself). A non-zero exit is a hard stop — regenerate, then re-check — so a sprint can never launch on a stale delta.
 2. Verify `glossary.json` has `preferred_translation` populated for the calculator prefix's key terms, especially for anchor languages (es, fr, ru, ar). Check `translation_notes` for WMO-verified terms and terms with `$ec_lang_intent` framing requirements.
-3. State the delta count and which calculators are affected before asking for authorization.
+3. State the delta count and which calculators are affected before asking for authorization. **Delta zero now means zero** (Task 161): keys that are *correctly* byte-identical to English — symbols, eponyms, brand names, per-language cognates — are listed in `dev/scripts/translation_exempt_keys.json` and are not counted, so you no longer hand-classify a residue before proposing. They *are* still reported when missing or blank. `generate_translation_payloads.php`, `lang_parity_check.php`, `translation_completion_matrix.php` and `lang_syntax_validate.php` all read that one list via `dev/scripts/exempt_keys.inc.php`, so a disagreement between those four counts is a bug, not a nuance. **Add a key there only when identical-to-English is permanently correct** — never to quiet a number you don't want to fix.
 4. Note any known quality risks (new terms without glossary coverage, intent-guided terms, proper nouns).
 5. **Check for stale-but-present drift the payload-delta can't see:** `php dev/scripts/detect_english_drift.php`. The payload-delta only finds *missing* keys; this flags keys whose *English changed* after a translation was written (the Task-129 blind spot). `--json` emits the resync key list. After any resync completes, `--update` re-baselines the manifest. Full workflow in `dev/translation-process.md` § "English-drift tripwire".
 
@@ -447,16 +449,52 @@ update the score in the same session as the finding, not as a deferred follow-up
 
 ## Unit Sets
 
-Four unit sets let users switch all units at once (`lib/Units.lib.php`):
+A field declares a **named unit family**, never an inline array (ROADMAP Task 162):
 
-| Set  | Primary length | Typical use |
-|------|---------------|-------------|
-| `m`  | meters        | SI metric |
-| `mm` | millimeters   | SI metric (small pipes) |
-| `ft` | feet          | US customary |
-| `in` | inches        | US customary (small pipes) |
+```php
+Array('name' => 'd', 'type' => 'number', 'default' => '6', 'units' => 'distance_small', ...)
+```
 
-Unit conversion factors are stored as "number of that unit per SI unit" — multiply a SI value by the factor to display it, divide to store it.
+Families live in `lib/Units.lib.php` (`$ec_unit_families`), and the two presets — `us` and `si` —
+map every family to one unit (`$ec_unit_sets`). `EC_DEFAULT_UNIT_SET` picks which preset a
+first-time visitor sees, **derived from the current language**: `en` gets `us`, every other language
+gets `si`. Returning visitors are unaffected — the cookie stores each select's option value.
+
+- **Split a family when two fields want different *defaults*, not when they want different
+  *options*.** `distance_small` and `distance_large` offer the identical four units and exist purely
+  to carry different defaults (inches for a pipe diameter, feet for a pipe length). Merging them
+  re-creates the original defect, where a 1,000 ft main rendered as 12,000 in, because one family
+  can only name one default. Where two families share a list, share the PHP variable rather than
+  duplicating it.
+- **Which family a field names is a per-page choice**, not a global property of the field name. The
+  same concept is `distance_small` on a pipe page and `distance_large` on a channel page; `flow_pipe`
+  (gpm) on a waterline calculator and `flow_channel` (cfs) on a storm drain or channel one. There is
+  no page-level override mechanism because the page already chooses.
+- **Every family must appear in every preset.** A missing entry silently leaves that field alone,
+  which is the class of bug this design removed. Adding a family means adding it to `us` and `si`.
+- **A page's `default` number is in the *displayed* unit**, so a unit-bearing field declares one per
+  preset: `'default' => Array('us' => '6', 'si' => '150')`. A scalar is correct only when the value
+  is unit-independent (dimensionless, blank, or exactly `0`). Getting this wrong is silent — a
+  scalar `6` reads as 6 in under `us` and 6 mm under `si`.
+- **A page that seeds sample rows from JS must seed them per preset too**, keying off
+  `EngCalcs.defaultUnitSet`. Hard-coded metric seeds read under `us` produced a 100-inch pipe.
+- **Changing a unit select reinterprets the typed number, it does not convert it** (1 becomes 1 ft
+  instead of 1 m). Long-standing and deliberate — reviewed and kept 2026-07-28. Do not "fix" it.
+- **Keep one page's cross-section geometry in one family.** A pipe page reads diameter, depth, top
+  width, wetted perimeter and hydraulic radius all in inches; a channel page reads them all in feet.
+  Mixing them within a page (an 18 in pipe reporting `T` = 1.5 ft) is the defect to avoid.
+- **Choose defaults that open on a *passing* design.** Every calculator's velocity/verdict check
+  should read OK on arrival; a page that greets a first-time visitor with a warning is worse than one
+  that greets them with a worked example. Verify by running the page's own `pageCalculator` against
+  its rendered HTML, not by inspection.
+- **`echoUnitSelect()` still accepts a raw array** for backward compatibility, but such a select gets
+  no family and is therefore **invisible to the preset buttons**. Never leave a new one that way —
+  this is how 32 row-table selects were nearly shipped ignoring the presets.
+
+Unit conversion factors (`$ec_units`) are "number of that unit per SI unit" — multiply a SI value by
+the factor to display it, divide to store it.
+
+Full design record and per-field rationale: `dev/unit-families.md`.
 
 ## Environment / Config
 

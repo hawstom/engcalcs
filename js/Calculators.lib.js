@@ -535,12 +535,21 @@ EngCalcs.resetToDefaults = function(confirmMessage) {
 	window.location.href = window.location.pathname;
 };
 
+// Applies a preset (Task 162). A preset is a family => unit-key map, and each unit
+// <select> declares its family, so exactly one option per select is chosen and nothing
+// can overwrite anything. The old version walked a flat list of TRANSLATED LABELS and
+// set every text match across the whole page, so a later entry silently overwrote an
+// earlier one -- that is how the 'in' preset selected psi and then replaced it with
+// inH2O on every head field.
 EngCalcs.setUnits = function(unitSet) {
 	'use strict';
-	EngCalcs.unitSets[unitSet].forEach(function(unit) {
-		document.querySelectorAll('select option').forEach(function(option) {
-			if (option.innerHTML === unit) option.selected = true;
-		});
+	var preset = this.unitSets[unitSet];
+	if (!preset) { return; }
+	document.querySelectorAll('select[data-family]').forEach(function(select) {
+		var unit = preset[select.dataset.family];
+		if (!unit) { return; }
+		var option = select.querySelector('option[data-unit="' + unit + '"]');
+		if (option) { option.selected = true; }
 	});
 	this.submitForm();
 };

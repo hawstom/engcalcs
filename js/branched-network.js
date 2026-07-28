@@ -654,13 +654,21 @@ EngCalcs.addBranchedNetworkLine = function (id, upstream, length, diameter, roug
 EngCalcs.pageAddCalcRow = function () {
 	'use strict';
 	var id, up, length, diameter, roughness, kMinor, demand, elevDown, prev = this.numCalcRows - 1;
+	// Sample rows are read in the units the page rendered in, so they need one set of
+	// numbers per preset -- a metric sample under the US preset would be a 100-inch pipe.
+	// Roughness stays 150 in both: for the default Hazen-Williams method it is C, a
+	// dimensionless coefficient, not a length (the unit selector appears only for D-W).
+	var us = (this.defaultUnitSet === 'us');
 	if (this.numCalcRows === 0) {
 		// First line: upstream = null renders no input (always fed by the source).
-		id = '1'; up = null; length = 200; diameter = 100; roughness = 150; kMinor = 2; demand = 0; elevDown = 90;
+		id = '1'; up = null; roughness = 150; kMinor = 2; demand = 0;
+		length = us ? 650 : 200; diameter = us ? 4 : 100; elevDown = us ? 295 : 90;
 	} else if (this.numCalcRows === 1) {
-		id = '2'; up = ''; length = 150; diameter = 75; roughness = 150; kMinor = 2; demand = 5; elevDown = 82;
+		id = '2'; up = ''; roughness = 150; kMinor = 2;
+		length = us ? 500 : 150; diameter = us ? 3 : 75; demand = us ? 80 : 5; elevDown = us ? 270 : 82;
 	} else if (this.numCalcRows === 2) {
-		id = '3'; up = '1'; length = 150; diameter = 75; roughness = 150; kMinor = 2; demand = 5; elevDown = 84;
+		id = '3'; up = '1'; roughness = 150; kMinor = 2;
+		length = us ? 500 : 150; diameter = us ? 3 : 75; demand = us ? 80 : 5; elevDown = us ? 275 : 84;
 	} else {
 		// New rows extend the series by default (blank upstream = the previous line).
 		id = String(this.numCalcRows + 1);

@@ -12,12 +12,12 @@ echoHeader("EngCalcs", $html_title, "");
 echoCalculatorForm(
 	//Inputs
 	Array(
-		Array('name' => 'ws', 'type' => 'number', 'default' => '1', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mi_waterSurfaceElevation']),
-		Array('name' => 's0', 'type' => 'number', 'default' => '0.001', 'units' => Array('grade', 'gradePercent'), 'label' => $ec_lang['mtc_channel_slope']),
+		Array('name' => 'ws', 'type' => 'number', 'default' => Array('us' => '3', 'si' => '1'), 'units' => 'distance_medium', 'label' => $ec_lang['mi_waterSurfaceElevation']),
+		Array('name' => 's0', 'type' => 'number', 'default' => '0.001', 'units' => 'slope', 'label' => $ec_lang['mtc_channel_slope']),
 	),
 	//Results
 	Array(
-		Array('name' => 'q_617', 'units' => Array('m3ps', 'lps', 'mld', 'ft3ps', 'gpm', 'mgd'), 'label' => $ec_lang['mi_q_617']),
+		Array('name' => 'q_617', 'units' => 'flow_channel', 'label' => $ec_lang['mi_q_617']),
 		Array('name' => 'v_check', 'units' => NULL, 'label' => $ec_lang['mhp_vel_check']),
 	),
 	$flagFormAppend = true
@@ -43,12 +43,12 @@ function echoCalculatorFormAppend() {
 				<th>
 					<?=$ec_lang['mi_station']?><br />
 					<br />
-					<?php echoUnitSelect($name = 'stationu', $units = Array('m', 'mm', 'ft', 'in'), $indent_string); ?>
+					<?php echoUnitSelect($name = 'stationu', $units = 'distance_medium', $indent_string); ?>
 				</th>
 				<th>
 					<span class="ec-narrowcol"><?=$ec_lang['mi_elevation']?></span>
 					<br />
-					<?php echoUnitSelect($name = 'elevationu', $units = Array('m', 'mm', 'ft', 'in'), $indent_string); ?>
+					<?php echoUnitSelect($name = 'elevationu', $units = 'distance_medium', $indent_string); ?>
 				</th>
 				<th>
 					<span class="ec-narrowcol"><?=$ec_lang['mi_is_bank']?></span>
@@ -56,7 +56,7 @@ function echoCalculatorFormAppend() {
 				<th>
 					<span class="ec-narrowcol" style="width:3.5em"><?=$ec_lang['mi_tau']?></span>
 					<br />
-					<?php echoUnitSelect($name = 'tauu', $units = Array('npm2', 'psf'), $indent_string); ?>
+					<?php echoUnitSelect($name = 'tauu', $units = 'stress', $indent_string); ?>
 				</th>
 				<th>
 					<a target="_blank" href="http://www.engineeringtoolbox.com/mannings-roughness-d_799.html"><?=$ec_lang['mi_n']?></a>
@@ -64,22 +64,22 @@ function echoCalculatorFormAppend() {
 				<th>
 					<?=$ec_lang['mi_t']?>
 					<br />
-					<?php echoUnitSelect($name = 'tu', $units = Array('m', 'mm', 'ft', 'in'), $indent_string); ?>
+					<?php echoUnitSelect($name = 'tu', $units = 'distance_medium', $indent_string); ?>
 				</th>
 				<th>
 					<?=$ec_lang['mi_pw']?>
 					<br />
-					<?php echoUnitSelect($name = 'pwu', $units = Array('m', 'mm', 'ft', 'in'), $indent_string); ?>
+					<?php echoUnitSelect($name = 'pwu', $units = 'distance_medium', $indent_string); ?>
 				</th>
 				<th>
 					<?=$ec_lang['mi_a']?>
 					<br />
-					<?php echoUnitSelect($name = 'au', $units = Array('m2', 'mm2', 'ft2', 'in2'), $indent_string); ?>
+					<?php echoUnitSelect($name = 'au', $units = 'flow_area', $indent_string); ?>
 				</th>
 				<th>
 					<?=$ec_lang['mi_rh']?>
 					<br />
-					<?php echoUnitSelect($name = 'rhu', $units = Array('m', 'mm', 'ft', 'in'), $indent_string); ?>
+					<?php echoUnitSelect($name = 'rhu', $units = 'distance_medium', $indent_string); ?>
 				</th>
 				<th>
 					<?=$ec_lang['mi_n617']?>
@@ -87,12 +87,12 @@ function echoCalculatorFormAppend() {
 				<th>
 					<?=$ec_lang['mi_v617']?>
 					<br />
-					<?php echoUnitSelect($name = 'v617u', $units = Array('mps', 'ftps'), $indent_string); ?>
+					<?php echoUnitSelect($name = 'v617u', $units = 'velocity', $indent_string); ?>
 				</th>
 				<th>
 					<?=$ec_lang['mi_hv617']?>
 					<br />
-					<?php echoUnitSelect($name = 'hv617u', $units = Array('m', 'mm', 'ft', 'in'), $indent_string); ?>
+					<?php echoUnitSelect($name = 'hv617u', $units = 'velocity_head', $indent_string); ?>
 				</th>
 				<th>
 					<?=$ec_lang['mi_fr617']?>
@@ -100,7 +100,7 @@ function echoCalculatorFormAppend() {
 				<th>
 					<?=$ec_lang['mi_q617']?>
 					<br />
-					<?php echoUnitSelect($name = 'q617u', $units = Array('m3ps', 'lps', 'mld', 'ft3ps', 'gpm', 'mgd'), $indent_string); ?>
+					<?php echoUnitSelect($name = 'q617u', $units = 'flow_channel', $indent_string); ?>
 				</th>
 			</tr>
 		</thead>

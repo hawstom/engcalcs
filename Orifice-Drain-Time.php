@@ -11,22 +11,22 @@ echoHeader("EngCalcs", $html_title, "");
 echoCalculatorForm(
 	//Inputs
 	Array(
-		Array('name' => 'h1_elev', 'type' => 'number', 'default' => '3',    'units' => Array('m','mm','ft','in'),         'label' => $ec_lang['odt_h1_elev']),
-		Array('name' => 'a1',      'type' => 'number', 'default' => '1000', 'units' => Array('m2','mm2','ft2','in2'),      'label' => $ec_lang['odt_a1']),
-		Array('name' => 'h2_elev',   'type' => 'number', 'default' => '0',   'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['odt_h2_elev']),
-		Array('name' => 'h_orifice', 'type' => 'number', 'default' => '0',   'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['or_centroid_elev']),
-		Array('name' => 'a0',        'type' => 'number', 'default' => '100',  'units' => Array('m2','mm2','ft2','in2'), 'label' => $ec_lang['odt_a0']),
-		Array('name' => 'd',       'type' => 'number', 'default' => '0.1',  'units' => Array('m','mm','ft','in'),         'label' => $ec_lang['odt_d'] . '<br /><input type="radio" name="shape" id="shape_circ" value="circular" checked onchange="EngCalcs.submitForm()"> <label for="shape_circ">' . $ec_lang['or_shape_circular'] . '</label> <input type="radio" name="shape" id="shape_rect" value="rectangular" onchange="EngCalcs.submitForm()"> <label for="shape_rect">' . $ec_lang['or_shape_rectangular'] . '</label>'),
-		Array('name' => 'w',       'type' => 'number', 'default' => '0.3',  'units' => Array('m','mm','ft','in'),         'label' => $ec_lang['odt_w']),
+		Array('name' => 'h1_elev', 'type' => 'number', 'default' => Array('us' => '10', 'si' => '3'),    'units' => 'distance_medium',         'label' => $ec_lang['odt_h1_elev']),
+		Array('name' => 'a1',      'type' => 'number', 'default' => Array('us' => '40000', 'si' => '4000'), 'units' => 'flow_area',      'label' => $ec_lang['odt_a1']),
+		Array('name' => 'h2_elev',   'type' => 'number', 'default' => Array('us' => '0.5', 'si' => '0.15'),   'units' => 'distance_medium', 'label' => $ec_lang['odt_h2_elev']),
+		Array('name' => 'h_orifice', 'type' => 'number', 'default' => '0',   'units' => 'distance_medium', 'label' => $ec_lang['or_centroid_elev']),
+		Array('name' => 'a0',        'type' => 'number', 'default' => Array('us' => '20000', 'si' => '2000'),  'units' => 'flow_area', 'label' => $ec_lang['odt_a0']),
+		Array('name' => 'd',       'type' => 'number', 'default' => Array('us' => '6', 'si' => '150'),  'units' => 'distance_small',         'label' => $ec_lang['odt_d'] . '<br /><input type="radio" name="shape" id="shape_circ" value="circular" checked onchange="EngCalcs.submitForm()"> <label for="shape_circ">' . $ec_lang['or_shape_circular'] . '</label> <input type="radio" name="shape" id="shape_rect" value="rectangular" onchange="EngCalcs.submitForm()"> <label for="shape_rect">' . $ec_lang['or_shape_rectangular'] . '</label>'),
+		Array('name' => 'w',       'type' => 'number', 'default' => Array('us' => '12', 'si' => '300'),  'units' => 'distance_small',         'label' => $ec_lang['odt_w']),
 		Array('name' => 'cd',      'type' => 'number', 'default' => '0.61', 'units' => NULL,                              'label' => '<a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venturi-d_590.html">'.$ec_lang['or_cd'].'</a>'),
 	),
 	//Results
 	Array(
-		Array('name' => 'h1',      'units' => Array('m','mm','ft','in'),                         'label' => $ec_lang['odt_h1']),
-		Array('name' => 'q_max',   'units' => Array('m3ps','lps','mld','ft3ps','gpm','mgd'),      'label' => $ec_lang['odt_q_max']),
-		Array('name' => 'a_ending','units' => Array('m2','mm2','ft2','in2'),                      'label' => $ec_lang['odt_a_ending']),
+		Array('name' => 'h1',      'units' => 'distance_medium',                         'label' => $ec_lang['odt_h1']),
+		Array('name' => 'q_max',   'units' => 'flow_channel',      'label' => $ec_lang['odt_q_max']),
+		Array('name' => 'a_ending','units' => 'flow_area',                      'label' => $ec_lang['odt_a_ending']),
 		Array('name' => 'h2_check','units' => NULL,                                               'label' => $ec_lang['odt_h2_check']),
-		Array('name' => 'vol',     'units' => Array('m3','ft3','acft'),                           'label' => $ec_lang['odt_vol']),
+		Array('name' => 'vol',     'units' => 'volume',                           'label' => $ec_lang['odt_vol']),
 		Array('name' => 't_sec',   'units' => NULL,                                               'label' => $ec_lang['odt_t_sec']),
 		Array('name' => 't_min',   'units' => NULL,                                               'label' => $ec_lang['odt_t_min']),
 		Array('name' => 't_hr',    'units' => NULL,                                               'label' => $ec_lang['odt_t_hr']),

@@ -1,13 +1,23 @@
 {
     "meta": {
         "language": "ru",
-        "expected_key_count": 565,
-        "delta_key_count": 9,
+        "expected_key_count": 575,
+        "delta_key_count": 10,
+        "exempt_key_count": 9,
+        "exempt_keys": [
+            "dw_roughness",
+            "install_android_heading",
+            "install_ios_heading",
+            "ip_length",
+            "ip_diameter",
+            "ip_roughness",
+            "ip_hf",
+            "ip_hm",
+            "bpn_id"
+        ],
         "active_prefixes": [
-            "bpn",
-            "dw",
-            "install",
-            "ip"
+            "calc",
+            "hw"
         ],
         "requested_prefix": null,
         "notes": "Translate only keys in keys_to_translate; preserve HTML, units, and symbols.",
@@ -16,13 +26,11 @@
         "intent_notes": "Use key_intent when present; these entries provide terse disambiguation comments only where translation risk exists."
     },
     "prompt_context_by_prefix": {
-        "bpn": "Use these preferred technical term translations when relevant:\n- flow (Q): расход\n- velocity (v): скорость\n- slope (S): уклон\n    DO NOT render as: activity\/fitness sense of 'grade' — the treadmill or trail incline for running\/walking\/jogging; this is the hydraulic energy gradient, not an exercise setting; geographic or topographic landform term; school grade \/ academic mark",
-        "dw": "Use these preferred technical term translations when relevant:\n- flow (Q): расход\n- velocity (v): скорость\n- head loss (h_L): потери напора\n    DO NOT render as: pressure loss \/ pressure drop (use the head-loss term, not the pressure term); a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry\n- friction factor (f): коэффициент сопротивления\n- slope (S): уклон\n    DO NOT render as: activity\/fitness sense of 'grade' — the treadmill or trail incline for running\/walking\/jogging; this is the hydraulic energy gradient, not an exercise setting; geographic or topographic landform term; school grade \/ academic mark\n- laminar: ламинарный\n- transitional: переходный\n- turbulent: турбулентный",
-        "install": "Use these preferred technical term translations when relevant:\n- flow (Q): расход\n- velocity (v): скорость\n- slope (S): уклон\n    DO NOT render as: activity\/fitness sense of 'grade' — the treadmill or trail incline for running\/walking\/jogging; this is the hydraulic energy gradient, not an exercise setting; geographic or topographic landform term; school grade \/ academic mark",
-        "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): расход\n- velocity (v): скорость\n- head loss (h_L): потери напора\n    DO NOT render as: pressure loss \/ pressure drop (use the head-loss term, not the pressure term); a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry\n- emitter: капельница\n- distribution uniformity (DU): равномерность распределения\n- low-quarter distribution uniformity (DU_lq): равномерность распределения по нижней четверти\n- application rate (PR): интенсивность полива\n- lateral: латераль\n- mainline: магистральный трубопровод\n- reach: участок\n- velocity head (H_v): скоростной напор\n    DO NOT render as: a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry; pressure\n- friction loss (h_f): потери на трение\n- minor loss (h_m): местные потери\n- energy grade line (EGL): линия энергии\n- upstream: выше по течению\n- downstream: ниже по течению"
+        "calc": "Use these preferred technical term translations when relevant:\n- flow (Q): расход\n- velocity (v): скорость\n- slope (S): уклон\n    DO NOT render as: activity\/fitness sense of 'grade' — the treadmill or trail incline for running\/walking\/jogging; this is the hydraulic energy gradient, not an exercise setting; geographic or topographic landform term; school grade \/ academic mark",
+        "hw": "Use these preferred technical term translations when relevant:\n- flow (Q): расход\n- velocity (v): скорость\n- head loss (h_L): потери напора\n    DO NOT render as: pressure loss \/ pressure drop (use the head-loss term, not the pressure term); a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry\n- slope (S): уклон\n    DO NOT render as: activity\/fitness sense of 'grade' — the treadmill or trail incline for running\/walking\/jogging; this is the hydraulic energy gradient, not an exercise setting; geographic or topographic landform term; school grade \/ academic mark"
     },
     "glossary_terms_by_prefix": {
-        "bpn": [
+        "calc": [
             {
                 "term": "flow",
                 "symbol": "Q",
@@ -45,7 +53,7 @@
                 "preferred_translation": "уклон"
             }
         ],
-        "dw": [
+        "hw": [
             {
                 "term": "flow",
                 "symbol": "Q",
@@ -68,349 +76,199 @@
                 "preferred_translation": "потери напора"
             },
             {
-                "term": "friction factor",
-                "symbol": "f",
-                "context": "Darcy-Weisbach friction factor. Dimensionless coefficient in the Darcy-Weisbach head loss equation. Distinct from Hazen-Williams C coefficient.",
-                "translation_notes": "Use the hydraulic\/civil engineering term. In some languages, 'friction' and 'resistance' terms compete — prefer 'friction' to match the Darcy-Weisbach naming convention. DATA-ERROR FIX 2026-07-10 (category-3 km re-translation): km was 'កត្តាស្ទះ' (literally 'blockage\/obstruction factor', wrong sense — ស្ទះ means 'clogged\/blocked', not 'friction'), contradicting the file's own established usage: dw_friction_factor and mhp_f both already use 'កត្តាកកិត' (កកិត = friction\/rubbing) in lib\/lang.ec.km.php. Corrected to 'កត្តាកកិត' to match established incumbent usage. DATA-ERROR FIX 2026-07-10 (category-3 ps wave-3 re-translation): glossary ps value was 'د مالښ ضریب' (مالښ, a native Pashto word for friction\/rubbing), but مالښ does not occur anywhere in lib\/lang.ec.ps.php — the file's own established word for 'friction' is اصطکاک (14+ occurrences: dw_friction_factor, mpf_friction_slope, mphl_friction_slope, mphl_friction_loss, etc.), already correctly used in dw_friction_factor's existing string 'د اصطکاک فاکتور، f'. Kept dw_friction_factor unchanged and standardized the glossary to 'د اصطکاک فاکتور' to match established incumbent usage, same defect class as the km fix above. Task 109 stage 4 (2026-07-19): am bare-transliteration 'ፍሪክሽን ፋክተር' corrected to real word 'ግጭት ፋክተር' (matches shipped dw_friction_factor\/dw_friction_factor_method).",
-                "preferred_translation": "коэффициент сопротивления"
-            },
-            {
                 "term": "slope",
                 "symbol": "S",
                 "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators. English aliases 'slope' and 'grade' (u_grade\/u_gradePercent) both point here.",
                 "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term. [2026-07-21] Centralized the grade activity-sense guard here (was living only as u_grade\/u_gradePercent label commentary): the 'avoid' array now carries the running\/walking\/jogging exercise-incline trap, so the slope entry is the single home for the grade→energy-gradient concept and its wrong senses.",
                 "preferred_translation": "уклон"
-            },
-            {
-                "term": "laminar",
-                "symbol": "",
-                "context": "Flow regime in which fluid moves in parallel layers with no lateral mixing. Reynolds number below ~2000. Appears in Darcy-Weisbach calculator flow regime check.",
-                "translation_notes": "Nearly always a direct cognate or borrowing from the Latin in technical languages. Confirm the local engineering convention.",
-                "preferred_translation": "ламинарный"
-            },
-            {
-                "term": "transitional",
-                "symbol": "",
-                "context": "Flow regime between laminar and turbulent — Reynolds number roughly 2000–4000. Appears in Darcy-Weisbach calculator flow regime check.",
-                "translation_notes": "Use the adjective form meaning 'between two states'. Some languages use 'critical flow' for this regime — check local hydraulics convention.",
-                "preferred_translation": "переходный"
-            },
-            {
-                "term": "turbulent",
-                "symbol": "",
-                "context": "Flow regime with chaotic, irregular mixing. Reynolds number above ~4000. Appears in Darcy-Weisbach calculator flow regime check.",
-                "translation_notes": "Nearly always a cognate. Some languages distinguish 'turbulent' (adjective) from 'turbulence' (noun) — use the adjective form.",
-                "preferred_translation": "турбулентный"
-            }
-        ],
-        "install": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg RESOLVED (Tom, 2026-07-13): native engineer's 2026-07-06 clarification confirmed both 'дебит' (colloquial\/general register) and 'водно количество' (academic\/hydraulic-engineering register, used at university for Q) are acceptable. Tom decided suite-wide standardization on 'водно количество' — \"I would put водно количество everywhere\" — applied across all bg calculator categories (pipes\/irrigation included, not just the hydraulic-structure\/open-channel strings the engineer originally corrected). 'дебит' fully replaced in lib\/lang.ec.bg.php 2026-07-13. Task 109 stages 3-5 (2026-07-19): bg standardized on водно количество (дебит drift removed from or_\/mpf_\/cs_ per Bulgarian-engineer-feedback.md); sr standardized on проток (stage 4); it confirmed on portata (flusso drift removed).",
-                "preferred_translation": "расход"
-            },
-            {
-                "term": "velocity",
-                "symbol": "v",
-                "context": "Flow velocity (speed of water). Appears in all calculators.",
-                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
-                "preferred_translation": "скорость"
-            },
-            {
-                "term": "slope",
-                "symbol": "S",
-                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators. English aliases 'slope' and 'grade' (u_grade\/u_gradePercent) both point here.",
-                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term. [2026-07-21] Centralized the grade activity-sense guard here (was living only as u_grade\/u_gradePercent label commentary): the 'avoid' array now carries the running\/walking\/jogging exercise-incline trap, so the slope entry is the single home for the grade→energy-gradient concept and its wrong senses.",
-                "preferred_translation": "уклон"
-            }
-        ],
-        "ip": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg RESOLVED (Tom, 2026-07-13): native engineer's 2026-07-06 clarification confirmed both 'дебит' (colloquial\/general register) and 'водно количество' (academic\/hydraulic-engineering register, used at university for Q) are acceptable. Tom decided suite-wide standardization on 'водно количество' — \"I would put водно количество everywhere\" — applied across all bg calculator categories (pipes\/irrigation included, not just the hydraulic-structure\/open-channel strings the engineer originally corrected). 'дебит' fully replaced in lib\/lang.ec.bg.php 2026-07-13. Task 109 stages 3-5 (2026-07-19): bg standardized on водно количество (дебит drift removed from or_\/mpf_\/cs_ per Bulgarian-engineer-feedback.md); sr standardized on проток (stage 4); it confirmed on portata (flusso drift removed).",
-                "preferred_translation": "расход"
-            },
-            {
-                "term": "velocity",
-                "symbol": "v",
-                "context": "Flow velocity (speed of water). Appears in all calculators.",
-                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
-                "preferred_translation": "скорость"
-            },
-            {
-                "term": "head loss",
-                "symbol": "h_L",
-                "context": "Energy loss expressed as a height of water column. Appears in Darcy-Weisbach, Hazen-Williams, Manning pipe, and Penstock calculators. Distinct from 'pressure drop' — use the hydraulic engineering term.",
-                "translation_notes": "'Head' in the hydraulic sense (energy per unit weight) does not translate literally in many languages — use the established civil\/hydraulic engineering phrase. Pre-2026 sr\/hr human translations used 'gubitak pritiska' (= pressure loss), which is technically the same concept expressed in pressure terms rather than head terms. The current 'губитак напора \/ gubitak tlačne visine' (= loss of hydraulic head) is more precise in a hydraulic engineering context and is preferred. DATA-ERROR FIX 2026-07-09 (category-3 wave-1 sprint): ro\/tr\/id translations were pressure-loss-sense ('pierdere de presiune'\/'basınç kaybı'\/'kehilangan tekanan'), contradicting this note's own guidance. Independently flagged by both the ro and tr wave-1 translation agents; corrected to head-loss-sense ('pierdere de sarcină'\/'yük kaybı'\/'kehilangan tinggi tekan') to match what both agents actually used in lib\/lang.ec.ro.php and lib\/lang.ec.tr.php. de's 'Druckverlust' was left as-is (not flagged; German engineering practice uses pressure\/head loss terms more interchangeably in pipe-flow context) but is worth a second look in a future audit. DATA-ERROR FIX 2026-07-09 (category-3 fa sprint): fa was 'افت فشار' (literally 'pressure loss', same pressure-loss-sense defect class as the ro\/tr\/id fix above), while the fa file's own mphl_ head-loss labels already used 'افت هد' (head loss) and 'هد' is an established loanword elsewhere in the file (هد سرعت = velocity head). Standardized to 'افت هد' suite-wide for fa and fixed dw_\/hw_ labels in lib\/lang.ec.fa.php to match. DATA-ERROR FIX 2026-07-10 (category-3 sw wave-3 sprint): glossary sw value was 'upotevu wa shinikizo' (= pressure loss), the same pressure-loss-sense defect class as the ro\/tr\/id\/fa fixes above. But lib\/lang.ec.sw.php's own dw_main_desc\/dw_main_menu\/dw_main_title\/mphl_main_desc\/mphl_main_menu\/mphl_main_title (and mpf_velocity_head, ws_headWaterHeight, or_head, mhp_gross_head elsewhere in the file) all already establish 'Kichwa' (head) as the suite's real Swahili word for hydraulic head, not 'shinikizo' (pressure). Standardized the glossary to 'upotevu wa kichwa' to match the file's own established, correct usage instead of the stale pressure-sense glossary value. DATA-ERROR FIX 2026-07-10 (category-3 ps wave-3 sprint): glossary ps value was 'د سر زیان' (زیان = damage\/loss), but lib\/lang.ec.ps.php's own dw_\/hw_\/mpf_\/mphl_ head-loss labels (40+ occurrences suite-wide) all already use ضیاع, not زیان, for 'loss' (e.g. existing dw_main_menu 'Darcy-Weisbach د پایپ سر ضیاع', mphl_total_loss). زیان does not occur anywhere in the file. Standardized the glossary to 'د سر ضیاع' to match the file's actual established usage, same defect class as the sw fix above. Task 109 stages 4-5 (2026-07-19): am confirmed on ሄድ (the ጭንቅ 'distress' mistranslation of 'head' was corrected suite-wide in this category); sw 'loss' must be Upotevu, not Hasara (financial loss) — fixed in ip_group_loss. | [2026-07-20] Stage-6 ur audit found the glossary's own value (ہیڈ لاس, a transliteration) was outdated; corrected to دباؤ نقصان, the suite incumbent used 9x across dw_\/hw_\/mphl_ and now applied in mhp_ for consistency.",
-                "preferred_translation": "потери напора"
-            },
-            {
-                "term": "emitter",
-                "symbol": "",
-                "context": "A drip irrigation emitter (dripper\/micro-sprinkler) that delivers water at a controlled low flow rate directly to the soil or plant root zone. Appears in Drip\/Sprinkler calculator.",
-                "translation_notes": "Use the field term most familiar to irrigation practitioners in the target language. Arabic: 'قطارة' (dripper) is the field term, preferred over the academic 'مُصدِر'. Spanish: 'gotero' is field-common in Latin America alongside the technical 'emisor'. Ukrainian: 'крапельниця' is the field term used by irrigation workers. zh CORRECTED (2026-07-10, category-4 wave-2 QA): the wave-2 zh translating agent initially deviated to the generic academic term '灌水器' throughout ip_ keys, reasoning that the calculator's emitter-exponent model (x from ~0 to 0.5) is generic rather than drip-only. Reverted to the established glossary field term '滴头' (dripper) for suite-wide consistency with the ar\/es\/uk pattern above — this glossary's own policy is field-term-over-academic-generality across all languages, and a generic hydraulic model doesn't change what practitioners actually call the part.",
-                "preferred_translation": "капельница"
-            },
-            {
-                "term": "distribution uniformity",
-                "symbol": "DU",
-                "context": "Ratio of minimum to average emitter flow rate in a drip or sprinkler system. DU = q_min \/ q_avg. Appears in Drip\/Sprinkler calculator.",
-                "translation_notes": "Use the irrigation engineering standard term. 'Uniformity' refers to how evenly water is distributed across the field, not physical evenness of the system. When the source says 'low-quarter DU', see the separate 'low-quarter distribution uniformity' entry. Hebrew: אחידות — never the nonword הוודות (found in shipped he file). Task 109 stage 5 (2026-07-19): tr confirmed on dağılım düzgünlüğü — transliteration+wrong-word forms Uniformluk\/Dağıtım were corrected across 7 keys.",
-                "preferred_translation": "равномерность распределения"
-            },
-            {
-                "term": "low-quarter distribution uniformity",
-                "symbol": "DU_lq",
-                "context": "Irrigation statistic: average of the lowest quarter of measured emitter flows divided by the overall average. Referenced in Irrigation Pressure notes as \"textbook low-quarter Distribution Uniformity\".",
-                "translation_notes": "Use the established irrigation-engineering phrase; do not invent one. \"Textbook\" is an adjective meaning \"as defined in standard textbooks\" — fr rendered it \"manuel\" (manual check), wrong. he: uniformity = אחידות, never the nonword הוודות. Wave-1 coinages (2026-07, category-4 sprint): fr=\"uniformité de distribution du quart inférieur\", ro=\"Uniformitatea Distribuției de sfert inferior\", ru=\"равномерность распределения по нижней четверти\", uk=\"рівномірність розподілу по низькій чверті\", bg=\"равномерност на разпределение по долната четвърт\", sr=\"равномерност расподеле нижег квартила\", hr=\"jednolikost distribucije niske grupe\", cs=\"Uniformita distribuce nízké čtvrtiny\", tr=\"düşük-çeyrek Dağıtım Uniformluğu\", id=\"Keseragaman Distribusi kuartal-bawah\". es\/pt\/it\/de already had glossary coverage pre-sprint. Not yet native-reviewed. ur ADDED (2026-07-10, category-4 wave-2 sprint): \"نچلی چوتھائی تقسیم یکسانیت\" (lower-quarter distribution uniformity) reuses the established ur terms چوتھائی (quarter), تقسیم (distribution), یکسانیت (uniformity, already glossary term for plain \"distribution uniformity\"). Not yet native-reviewed. hi ADDED (2026-07-10, category-4 wave-2 re-translation): 'निम्न-चतुर्थांश वितरण एकरूपता' (low-quarter distribution uniformity) reuses the glossary's own hi=\"वितरण एकरूपता\" for the base \"distribution uniformity\" term and prefixes \"निम्न-चतुर्थांश\" (low-quarter), matching the wave-1 pattern of naming the concept literally (fr\/ru\/uk\/id etc.) rather than inventing a new metaphor. NOTE: the hi ip_ file's own pre-sprint text mistakenly used 'पाठ्यपुस्तक' (textbook) where the current English source says 'standard' — corrected to 'मानक' (standard) in lib\/lang.ec.hi.php during this sprint; do not reintroduce पाठ्यपुस्तक. ar ADDED (2026-07-10, category-4 wave-2 re-translation): 'انتظام التوزيع للربع الأدنى' (uniformity of distribution of the lowest quarter) reuses the glossary's own ar=\"انتظام التوزيع\" base term for plain \"distribution uniformity\" (switched suite-wide in this sprint from a prior 'توحيد' root to 'انتظام', which better conveys 'evenness' rather than 'unification') and appends 'للربع الأدنى' (of the lowest quarter), naming the concept literally like the fr\/ru\/uk\/id wave-1 coinages. Where the English source's own qualifier 'standard' appears in context (ip_du_estimate, ip_notes_3_def), it is rendered inline as 'القياسي' immediately after this base phrase, kept out of the pure glossary term here for parity with the other languages' entries. bn ADDED (2026-07-10, category-4 wave-2 re-translation): 'নিম্ন-চতুর্থাংশ বিতরণ সমতা' (low-quarter distribution uniformity), built on the glossary's own bn=\"বিতরণ সমতা\" base term, naming the concept literally. fa ADDED (2026-07-10, category-4 wave-2 re-translation): 'یکنواختی توزیع ربع پایین' (low-quarter distribution uniformity), built on the glossary's own fa=\"یکنواختی توزیع\" base term; where English says \"standard\" it is rendered inline as \"استاندارد\" immediately after this base phrase, same pattern as ar. Task 129 STALE-ENGLISH RESYNC (2026-07-21): the ip_ keys ip_du_estimate\/ip_q_ratio\/ip_notes_3_def (plus ip_worst_case_warn and mhp_notes_2_def) were resynced against the CURRENT English, which was shortened in the Wave-0 reform (commit 7bfbda1) after several languages had already translated the older, longer version. Canonical wording is now 'supply pressure' (NOT the retired 'inlet pressure') and ip_q_ratio's tooltip is ONE short sentence ('This is different than our approximation of the standard uniformity measure.'), not the old separate-check paragraph; mhp_notes_2_def dropped its old '1-3 m\/s target range' numeric band. 9 languages carried drift and were rewritten (am, cs, es, hr, km, pt, ru, tr, uk); the other 17 already reflected current English. es\/hi also had 'textbook'->'standard' aligned (Tom: negligible\/synonymic, not swept elsewhere).",
-                "preferred_translation": "равномерность распределения по нижней четверти"
-            },
-            {
-                "term": "application rate",
-                "symbol": "PR",
-                "context": "Depth of water applied per unit time by a drip or sprinkler system. PR = q \/ A_e. Appears in Drip\/Sprinkler calculator.",
-                "translation_notes": "In irrigation, 'application rate' or 'precipitation rate' (for sprinklers) or 'irrigation rate'. Use the field irrigation term. Do not use a water-quality or chemical-application connotation. Task 109 stage 5 (2026-07-19): hi 'सिंचाई दर' (irrigation rate) drift standardized to file-dominant अनुप्रयोग term (ip_pr='अनुप्रयोग दर'); am confirmed on ልፍፍ.",
-                "preferred_translation": "интенсивность полива"
-            },
-            {
-                "term": "lateral",
-                "symbol": "",
-                "context": "Irrigation branch line carrying emitters, fed by the mainline. Pairs with \"mainline\". Appears throughout Irrigation Pressure.",
-                "translation_notes": "Branch pipe of a drip\/sprinkler system — NOT the adjective \"side\/lateral\". Wrong renderings found: sw \"taji\" (crown). fr irrigation standard is \"rampe\". Keep one word per language and never alternate (it file mixed \"laterale\" and \"manichetta\").",
-                "preferred_translation": "латераль"
-            },
-            {
-                "term": "mainline",
-                "symbol": "",
-                "context": "The trunk\/supply pipe feeding the laterals in an irrigation system. Pairs with \"lateral\".",
-                "translation_notes": "Translate \"main\/mainline\" as the trunk pipe, not the adjective \"main\". fr file left \"main\" untranslated (\"Tronçons Main\") — wrong.",
-                "preferred_translation": "магистральный трубопровод"
-            },
-            {
-                "term": "reach",
-                "symbol": "",
-                "context": "A segment of pipe or channel between two nodes\/cross-sections. Table rows in Irrigation Pressure are reaches.",
-                "translation_notes": "Hydraulics noun, NOT \"arrival\/reaching\" (ps \"رسیدل\" wrong), NOT \"agent\" (sw \"mwakala\" wrong), NOT \"stripe\" (km wrong). Bisection is the numerical root-finding method used to close the pressure loop in the Irrigation Pressure notes. (Wave 0, 2026-07-07, removed the former \"right at the takeoff\" and \"draw off\" wording from the English source.) Task 109 stage 5 (2026-07-19): confirmed the single suite term per language — ar=قطاع (harmonized from a مقطع\/قطاع split, مقطع left meaning cross-section) and ur=حصہ (harmonized from پہنچ in cs_ vs transliterated ریچ in ip_).",
-                "preferred_translation": "участок"
-            },
-            {
-                "term": "velocity head",
-                "symbol": "H_v",
-                "context": "Kinetic energy per unit weight, V²\/2g — a height of water column.",
-                "translation_notes": "\"Head\" is a height of water column, never anatomical (cs \"rychlostní hlava\" wrong — use \"rychlostní výška\"). Task 109 stages 4-5 (2026-07-19): confirmed he=עומד מהירות (literal ראש 'head' calque removed) and sw=kimo cha kasi (Kichwa cha kasi calque removed).",
-                "preferred_translation": "скоростной напор"
-            },
-            {
-                "term": "friction loss",
-                "symbol": "h_f",
-                "context": "Head loss along the pipe due to wall friction (Darcy-Weisbach). Symbol h_f (lowercase h reserved for loss components; capital H reserved for total\/gross\/net head, per label-normalization decision item 90, 2026-07-07). Manning Pipe Head Loss, Micro-Hydro Power, Irrigation Pressure table column.",
-                "translation_notes": "Task 109 stage 4 (2026-07-19): am 'ፍሪክሽን ኪሳራ' transliteration corrected to 'ግጭት ኪሳራ' (matches shipped mphl_friction_loss); same 'friction' fix applied across 5 keys.",
-                "preferred_translation": "потери на трение"
-            },
-            {
-                "term": "minor loss",
-                "symbol": "h_m",
-                "context": "Local head loss at fittings\/valves\/couplers (coefficient k_m). Canonical merged concept for the former 'junction loss' (mphl_) and 'minor loss' (mhp_\/ip_). Manning Pipe Head Loss, Micro-Hydro Power, Irrigation Pressure.",
-                "translation_notes": "CANONICAL ENGLISH LABEL: \"Minor (local) loss\" (label-normalization decision, item 90, 2026-07-07). 'Minor ⇄ local' — a local\/point loss at fittings, NOT a \"smaller\" loss; the '(local)' parenthetical fixes the mistranslation trap. Symbol h_m, coefficient k_m (lowercase h reserved for loss components; capital H reserved for total\/gross\/net head, per the same decision). am ADDED (2026-07-10, category-3 am re-translation): 'ጥቃቅን (አካባቢያዊ) ኪሳራ' (tiqaqin (akababiyawi) kisara) mirrors the English structure word-for-word — 'ጥቃቅን' (minor\/small) followed by the parenthetical '(አካባቢያዊ)' (local, i.e. of a specific place\/area) — so the same mistranslation-blocking device English uses (the '(local)' qualifier preventing a 'smaller loss' misreading) is preserved in Amharic rather than silently dropped. Replaces the prior am file's 'የማያያዣ ኪሳራ' (connector\/joint loss), which named the physical fitting rather than the local\/point-loss concept. km ADDED (2026-07-10, category-3 km re-translation): 'ការបាត់បង់មូលដ្ឋាន' (local-basis loss) reuses មូលដ្ឋាន ('local', already established suite-wide for this exact merged concept in ip_km's tooltip 'មេគុណបាត់បង់មូលដ្ឋានសរុប' = 'total local-loss coefficient'), so category-3 now converges on the same word ip_ already uses rather than coining a second competing term. Deliberately avoids 'តូច' (small), sidestepping the minor⇄smaller mistranslation trap the English '(local)' parenthetical exists to block. Replaces the km file's prior mphl_junction_loss value 'ការបាត់បង់ junction' (untranslated English word left in place). ps ADDED (2026-07-10, category-3 ps wave-3 re-translation): 'ځایی ضیاع' (local loss) uses ځایی (local\/positional) + the established ps loss word ضیاع, following the majority pattern already set by ar\/fa\/es\/fr\/hr\/id\/it\/ro\/ru\/sr\/tr\/uk\/ur\/zh — all of which render this concept as 'local loss' alone rather than translating 'minor' literally, since the '(local)' qualifier is the operative disambiguator, not 'minor'. Deliberately avoids a word for 'small\/minor' (e.g. کوچنی) to sidestep the same minor⇄smaller trap the English parenthetical exists to block. Replaces the prior ps file's 'د جنکشن ضیاع' (junction loss — the pre-consolidation, pre-item-90 term) and fixes its symbol from capital H_m to lowercase h_m. Task 109 stage 4 (2026-07-19): de 'Minderverlust' (=lesser\/reduced loss — the exact 'smaller loss' mistranslation the item-90 convention blocks) corrected to 'Örtlicher (Einzel-)Verlust' matching the labels.",
-                "preferred_translation": "местные потери"
-            },
-            {
-                "term": "energy grade line",
-                "symbol": "EGL",
-                "context": "The total-head line (elevation + pressure head + velocity head) along a pipe or channel. Appears in Irrigation Pressure Method note.",
-                "translation_notes": "Use the established hydraulics term for the total-head line. NEVER calque word-by-word: es \"Linea de Grado de Energia\", fr \"ligne d'energie grade\", it \"Linea di Grado Energia\", ro \"Linia Gradului Energetic\", bg\/uk \"line of the energy class\", cs \"energy layer\" are all wrong renderings found in shipped files. Task 109 stages 4-5 (2026-07-19): uk must be лінія енергії — the wrong-concept calque 'лінія питомої енергії' (specific-energy line, a distinct concept) was removed; cs 'energy layer' also corrected to grade line.",
-                "preferred_translation": "линия энергии"
-            },
-            {
-                "term": "upstream",
-                "symbol": "",
-                "context": "Direction toward the water source\/supply.",
-                "translation_notes": "Hydraulics direction, never software \"upgrade\" (my file error). tr: memba = upstream, mansap = downstream — a tr file flipped these; pin them.",
-                "preferred_translation": "выше по течению"
-            },
-            {
-                "term": "downstream",
-                "symbol": "",
-                "context": "Direction away from the supply, toward the outlet \/ last emitter.",
-                "translation_notes": "Never software \"downgrade\". ar: downstream = المصب \/ أسفل المجرى (a file used المنبعية = source-side, wrong).",
-                "preferred_translation": "ниже по течению"
             }
         ]
     },
     "keys_to_translate": {
-        "dw_roughness": "e",
-        "install_android_heading": "Android (Chrome)",
-        "install_ios_heading": "iOS (Safari)",
-        "ip_length": "L",
-        "ip_diameter": "D",
-        "ip_roughness": "e",
-        "ip_hf": "h<sub>f<\/sub>",
-        "ip_hm": "h<sub>m<\/sub>",
-        "bpn_id": "ID"
+        "calc_units_us": "US",
+        "calc_units_si": "SI",
+        "hw_elev_up": "Upstream elevation",
+        "hw_pressure_up": "Upstream pressure",
+        "hw_elev_down": "Downstream elevation",
+        "hw_pressure_down": "Downstream pressure",
+        "hw_pressure_check": "Pressure check",
+        "hw_pressure_ok_short": "Positive pressure",
+        "hw_pressure_neg_short": "Negative pressure",
+        "hw_pressure_neg": "Downstream pressure is below zero. The hydraulic grade line falls below the pipe, so the pipe would not flow full and this result may not be valid."
     },
     "keys": {
-        "dw_roughness": "e",
-        "install_android_heading": "Android (Chrome)",
-        "install_ios_heading": "iOS (Safari)",
-        "ip_length": "L",
-        "ip_diameter": "D",
-        "ip_roughness": "e",
-        "ip_hf": "h<sub>f<\/sub>",
-        "ip_hm": "h<sub>m<\/sub>",
-        "bpn_id": "ID"
+        "calc_units_us": "US",
+        "calc_units_si": "SI",
+        "hw_elev_up": "Upstream elevation",
+        "hw_pressure_up": "Upstream pressure",
+        "hw_elev_down": "Downstream elevation",
+        "hw_pressure_down": "Downstream pressure",
+        "hw_pressure_check": "Pressure check",
+        "hw_pressure_ok_short": "Positive pressure",
+        "hw_pressure_neg_short": "Negative pressure",
+        "hw_pressure_neg": "Downstream pressure is below zero. The hydraulic grade line falls below the pipe, so the pipe would not flow full and this result may not be valid."
     },
     "key_context": {
-        "dw_roughness": {
+        "calc_units_us": {
             "reason": "equal_to_english",
-            "current_value": "e",
+            "current_value": "US",
             "neighbors": {
                 "previous_translated": {
-                    "key": "dw_main_desc",
-                    "value": "Потери напора в трубе по Дарси-Вейсбах при заданных диаметре, шероховатости и расходе",
-                    "english": "Darcy-Weisbach Pipe Head Loss at Given Diameter, Roughness, and Flow"
+                    "key": "calc_set_units",
+                    "value": "Установить единицы:",
+                    "english": "Set units:"
                 },
                 "next_translated": {
-                    "key": "dw_roughness_tip",
-                    "value": "Абсолютная высота шероховатости стенки трубы, e. Типичные значения: сталь (новая) 0,046 мм, сталь (бывшая в употреблении) 0,15 мм, HDPE 0,003 мм, PVC\/uPVC 0,0015 мм, бетон 0,3–3 мм.",
-                    "english": "Absolute roughness height, e, of the pipe wall. Typical values: steel (new) 0.046 mm, steel (used) 0.15 mm, HDPE 0.003 mm, PVC\/uPVC 0.0015 mm, concrete 0.3–3 mm."
+                    "key": "calc_defaults",
+                    "value": "Значения по умолчанию",
+                    "english": "Restore defaults"
                 }
             }
         },
-        "install_android_heading": {
+        "calc_units_si": {
             "reason": "equal_to_english",
-            "current_value": "Android (Chrome)",
+            "current_value": "SI",
             "neighbors": {
                 "previous_translated": {
-                    "key": "install_intro",
-                    "value": "EngCalcs — это прогрессивное веб-приложение (PWA). После установки все калькуляторы полностью работают без интернета — подключение не требуется.",
-                    "english": "EngCalcs is a Progressive Web App (PWA). Once installed, all calculators work fully offline — no internet connection needed."
+                    "key": "calc_set_units",
+                    "value": "Установить единицы:",
+                    "english": "Set units:"
                 },
                 "next_translated": {
-                    "key": "install_android_steps_html",
-                    "value": "<li>Откройте любую страницу калькулятора в Chrome.<\/li><li>Нажмите кнопку <strong>⬇ Установить<\/strong> на верхней панели навигации либо откройте меню браузера (⋮) и выберите <strong>Добавить на главный экран<\/strong>.<\/li><li>В появившемся окне нажмите <strong>Установить<\/strong>.<\/li><li>Значок EngCalcs появится на главном экране, и приложение будет работать без интернета.<\/li>",
-                    "english": "<li>Open any calculator page in Chrome.<\/li><li>Tap the <strong>⬇ Install<\/strong> button in the top navigation bar, or tap the browser menu (⋮) and choose <strong>Add to Home screen<\/strong>.<\/li><li>Tap <strong>Install<\/strong> in the prompt that appears.<\/li><li>EngCalcs appears on your home screen and works offline.<\/li>"
+                    "key": "calc_defaults",
+                    "value": "Значения по умолчанию",
+                    "english": "Restore defaults"
                 }
             }
         },
-        "install_ios_heading": {
+        "hw_elev_up": {
             "reason": "equal_to_english",
-            "current_value": "iOS (Safari)",
+            "current_value": "Upstream elevation",
             "neighbors": {
                 "previous_translated": {
-                    "key": "install_prompt_unavailable",
-                    "value": "Предложение установить недоступно — используйте меню браузера.",
-                    "english": "Install prompt not available — use your browser menu instead."
+                    "key": "hw_hgl_2",
+                    "value": "ГГЛ выше по потоку",
+                    "english": "Upstream HGL"
                 },
                 "next_translated": {
-                    "key": "install_ios_steps_html",
-                    "value": "<li>Откройте любую страницу калькулятора в Safari.<\/li><li>Нажмите кнопку <strong>«Поделиться»<\/strong> (квадрат со стрелкой вверх).<\/li><li>Прокрутите вниз и выберите <strong>«На экран «Домой»»<\/strong>.<\/li><li>Нажмите <strong>«Добавить»<\/strong>. Значок EngCalcs появится на главном экране.<\/li>",
-                    "english": "<li>Open any calculator page in Safari.<\/li><li>Tap the <strong>Share<\/strong> button (box with arrow pointing up).<\/li><li>Scroll down and tap <strong>Add to Home Screen<\/strong>.<\/li><li>Tap <strong>Add<\/strong>. EngCalcs appears on your home screen.<\/li>"
+                    "key": "hw_roughness",
+                    "value": "Коэффициент Хазен-Уильямс, C",
+                    "english": "Hazen-Williams coefficient, C"
                 }
             }
         },
-        "ip_length": {
+        "hw_pressure_up": {
             "reason": "equal_to_english",
-            "current_value": "L",
+            "current_value": "Upstream pressure",
             "neighbors": {
                 "previous_translated": {
-                    "key": "ip_count",
-                    "value": "<span class=\"ec-help\" title=\"Строки латерали: эмиттеры только в этом участке. Строки магистрали: всего эмиттеров на латеральных ветвях, КРОМЕ данной, отходящих от этого участка. Для участка, расположенного в точке подключения собственной тестовой латерали, это также включает любые латерали, расположенные ниже по магистрали после подключения или соединённые в одной точке (например, латераль с противоположной стороны) — поток через них проходит также через этот же участок перед разделением, независимо от их наличия в этой таблице.\">Эмиттеры <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
+                    "key": "hw_hgl_2",
+                    "value": "ГГЛ выше по потоку",
+                    "english": "Upstream HGL"
                 },
                 "next_translated": {
-                    "key": "ip_elev_ds",
-                    "value": "<span class=\"ec-help\" title=\"Отметка нижнего (конечного) узла участка. Дополнительная для промежуточных строк (при отсутствии принимается горизонтально \/ равна узлу выше). Обязательна для последней строки: это отметка последнего эмиттера, которая непосредственно определяет требуемое давление подачи.\">Отм. НБ <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter’s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
+                    "key": "hw_roughness",
+                    "value": "Коэффициент Хазен-Уильямс, C",
+                    "english": "Hazen-Williams coefficient, C"
                 }
             }
         },
-        "ip_diameter": {
+        "hw_elev_down": {
             "reason": "equal_to_english",
-            "current_value": "D",
+            "current_value": "Downstream elevation",
             "neighbors": {
                 "previous_translated": {
-                    "key": "ip_count",
-                    "value": "<span class=\"ec-help\" title=\"Строки латерали: эмиттеры только в этом участке. Строки магистрали: всего эмиттеров на латеральных ветвях, КРОМЕ данной, отходящих от этого участка. Для участка, расположенного в точке подключения собственной тестовой латерали, это также включает любые латерали, расположенные ниже по магистрали после подключения или соединённые в одной точке (например, латераль с противоположной стороны) — поток через них проходит также через этот же участок перед разделением, независимо от их наличия в этой таблице.\">Эмиттеры <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
+                    "key": "hw_hgl_2",
+                    "value": "ГГЛ выше по потоку",
+                    "english": "Upstream HGL"
                 },
                 "next_translated": {
-                    "key": "ip_elev_ds",
-                    "value": "<span class=\"ec-help\" title=\"Отметка нижнего (конечного) узла участка. Дополнительная для промежуточных строк (при отсутствии принимается горизонтально \/ равна узлу выше). Обязательна для последней строки: это отметка последнего эмиттера, которая непосредственно определяет требуемое давление подачи.\">Отм. НБ <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter’s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
+                    "key": "hw_roughness",
+                    "value": "Коэффициент Хазен-Уильямс, C",
+                    "english": "Hazen-Williams coefficient, C"
                 }
             }
         },
-        "ip_roughness": {
+        "hw_pressure_down": {
             "reason": "equal_to_english",
-            "current_value": "e",
+            "current_value": "Downstream pressure",
             "neighbors": {
                 "previous_translated": {
-                    "key": "ip_count",
-                    "value": "<span class=\"ec-help\" title=\"Строки латерали: эмиттеры только в этом участке. Строки магистрали: всего эмиттеров на латеральных ветвях, КРОМЕ данной, отходящих от этого участка. Для участка, расположенного в точке подключения собственной тестовой латерали, это также включает любые латерали, расположенные ниже по магистрали после подключения или соединённые в одной точке (например, латераль с противоположной стороны) — поток через них проходит также через этот же участок перед разделением, независимо от их наличия в этой таблице.\">Эмиттеры <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
+                    "key": "hw_hgl_2",
+                    "value": "ГГЛ выше по потоку",
+                    "english": "Upstream HGL"
                 },
                 "next_translated": {
-                    "key": "ip_elev_ds",
-                    "value": "<span class=\"ec-help\" title=\"Отметка нижнего (конечного) узла участка. Дополнительная для промежуточных строк (при отсутствии принимается горизонтально \/ равна узлу выше). Обязательна для последней строки: это отметка последнего эмиттера, которая непосредственно определяет требуемое давление подачи.\">Отм. НБ <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter’s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
+                    "key": "hw_roughness",
+                    "value": "Коэффициент Хазен-Уильямс, C",
+                    "english": "Hazen-Williams coefficient, C"
                 }
             }
         },
-        "ip_hf": {
+        "hw_pressure_check": {
             "reason": "equal_to_english",
-            "current_value": "h<sub>f<\/sub>",
+            "current_value": "Pressure check",
             "neighbors": {
                 "previous_translated": {
-                    "key": "ip_press",
-                    "value": "Давл.",
-                    "english": "Press."
+                    "key": "hw_hgl_2",
+                    "value": "ГГЛ выше по потоку",
+                    "english": "Upstream HGL"
                 },
                 "next_translated": {
-                    "key": "ip_hl",
-                    "value": "<span class=\"ec-help\" title=\"Полная потеря участка, h_f + h_m\">h<sub>L<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Total reach loss, h_f + h_m\">h<sub>L<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
+                    "key": "hw_roughness",
+                    "value": "Коэффициент Хазен-Уильямс, C",
+                    "english": "Hazen-Williams coefficient, C"
                 }
             }
         },
-        "ip_hm": {
+        "hw_pressure_ok_short": {
             "reason": "equal_to_english",
-            "current_value": "h<sub>m<\/sub>",
+            "current_value": "Positive pressure",
             "neighbors": {
                 "previous_translated": {
-                    "key": "ip_press",
-                    "value": "Давл.",
-                    "english": "Press."
+                    "key": "hw_hgl_2",
+                    "value": "ГГЛ выше по потоку",
+                    "english": "Upstream HGL"
                 },
                 "next_translated": {
-                    "key": "ip_hl",
-                    "value": "<span class=\"ec-help\" title=\"Полная потеря участка, h_f + h_m\">h<sub>L<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Total reach loss, h_f + h_m\">h<sub>L<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
+                    "key": "hw_roughness",
+                    "value": "Коэффициент Хазен-Уильямс, C",
+                    "english": "Hazen-Williams coefficient, C"
                 }
             }
         },
-        "bpn_id": {
+        "hw_pressure_neg_short": {
             "reason": "equal_to_english",
-            "current_value": "ID",
+            "current_value": "Negative pressure",
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_line_table_title",
-                    "value": "Участки трубопровода",
-                    "english": "Pipe lines"
+                    "key": "hw_hgl_2",
+                    "value": "ГГЛ выше по потоку",
+                    "english": "Upstream HGL"
                 },
                 "next_translated": {
-                    "key": "bpn_id_tip",
-                    "value": "Название этого участка трубопровода. Другие участки ссылаются на него в столбце «Вышестоящий».",
-                    "english": "Name of this pipe line. Other lines refer to it in the Upstream column."
+                    "key": "hw_roughness",
+                    "value": "Коэффициент Хазен-Уильямс, C",
+                    "english": "Hazen-Williams coefficient, C"
+                }
+            }
+        },
+        "hw_pressure_neg": {
+            "reason": "equal_to_english",
+            "current_value": "Downstream pressure is below zero. The hydraulic grade line falls below the pipe, so the pipe would not flow full and this result may not be valid.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "hw_hgl_2",
+                    "value": "ГГЛ выше по потоку",
+                    "english": "Upstream HGL"
+                },
+                "next_translated": {
+                    "key": "hw_roughness",
+                    "value": "Коэффициент Хазен-Уильямс, C",
+                    "english": "Hazen-Williams coefficient, C"
                 }
             }
         }
     },
-    "key_intent": {
-        "ip_hf": "Friction head loss.",
-        "ip_hm": "Minor (local) head loss."
-    }
+    "key_intent": []
 }

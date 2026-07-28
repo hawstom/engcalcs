@@ -14,33 +14,33 @@ echoHeader("EngCalcs", $html_title, "");
 echoCalculatorForm(
 	// Inputs
 	Array(
-		Array('name' => 'h_supply',        'type' => 'number', 'default' => '7',    'units' => Array('mh2o', 'mmh2o', 'kpa', 'bar', 'kgfcm2', 'fth2o', 'inh2o', 'psi'), 'label' => $ec_lang['ip_h_supply']),
-		Array('name' => 'elev_supply',     'type' => 'number', 'default' => '50',   'units' => Array('m', 'ft'),                                       'label' => $ec_lang['ip_elev_supply']),
-		Array('name' => 'q_design',        'type' => 'number', 'default' => '4',    'units' => Array('lph', 'gph'),                                    'label' => $ec_lang['ip_q_design']),
-		Array('name' => 'h_design',        'type' => 'number', 'default' => '6',    'units' => Array('mh2o', 'mmh2o', 'kpa', 'bar', 'kgfcm2', 'fth2o', 'inh2o', 'psi'), 'label' => $ec_lang['ip_h_design']),
+		Array('name' => 'h_supply',        'type' => 'number', 'default' => Array('us' => '30', 'si' => '20'),    'units' => 'partial_head', 'label' => $ec_lang['ip_h_supply']),
+		Array('name' => 'elev_supply',     'type' => 'number', 'default' => Array('us' => '165', 'si' => '50'),   'units' => 'distance_site',                                       'label' => $ec_lang['ip_elev_supply']),
+		Array('name' => 'q_design',        'type' => 'number', 'default' => Array('us' => '1', 'si' => '4'),    'units' => 'flow_emitter',                                    'label' => $ec_lang['ip_q_design']),
+		Array('name' => 'h_design',        'type' => 'number', 'default' => Array('us' => '15', 'si' => '10'),    'units' => 'partial_head', 'label' => $ec_lang['ip_h_design']),
 		Array('name' => 'x',               'type' => 'number', 'default' => '0.5',  'units' => NULL,                                                    'label' => $ec_lang['ip_x']),
-		Array('name' => 'dp_avg',          'type' => 'number', 'default' => '0',    'units' => Array('mh2o', 'mmh2o', 'kpa', 'bar', 'kgfcm2', 'fth2o', 'inh2o', 'psi'), 'label' => $ec_lang['ip_dp_avg']),
+		Array('name' => 'dp_avg',          'type' => 'number', 'default' => '0',    'units' => 'partial_head', 'label' => $ec_lang['ip_dp_avg']),
 		Array('name' => 'visc',            'type' => 'number', 'default' => '1e-6', 'units' => NULL,                                                    'label' => '<a target="_blank" href="https://www.engineersedge.com/fluid_flow/kinematic-viscosity-table.htm">'.$ec_lang['dw_kinematic_viscosity_short'].'</a><span class="ec-help" title="'.htmlspecialchars(strip_tags($ec_lang['dw_kinematic_viscosity_tip'])).'"><span class="ec-tip">?</span></span>'),
-		Array('name' => 'se',              'type' => 'number', 'default' => '0.5',  'units' => Array('m', 'mm', 'ft', 'in'),                            'label' => $ec_lang['ip_se']),
-		Array('name' => 'sl',              'type' => 'number', 'default' => '0.5',  'units' => Array('m', 'mm', 'ft', 'in'),                            'label' => $ec_lang['ip_sl']),
+		Array('name' => 'se',              'type' => 'number', 'default' => Array('us' => '2', 'si' => '0.6'),  'units' => 'distance_medium',                            'label' => $ec_lang['ip_se']),
+		Array('name' => 'sl',              'type' => 'number', 'default' => Array('us' => '5', 'si' => '1.5'),  'units' => 'distance_medium',                            'label' => $ec_lang['ip_sl']),
 		Array('name' => 'n_e',             'type' => 'number', 'default' => '10',   'units' => NULL,                                                    'label' => $ec_lang['ip_n_e']),
 		Array('name' => 'n_l',             'type' => 'number', 'default' => '10',   'units' => NULL,                                                    'label' => $ec_lang['ip_n_l']),
-		Array('name' => 'd',               'type' => 'number', 'default' => '25',   'units' => Array('mm', 'm', 'in', 'ft'),                            'label' => $ec_lang['ip_d']),
-		Array('name' => 'h_max_allow',     'type' => 'number', 'default' => '',     'units' => Array('mh2o', 'mmh2o', 'kpa', 'bar', 'kgfcm2', 'fth2o', 'inh2o', 'psi'), 'label' => '<span class="ec-help" title="'.htmlspecialchars(strip_tags($ec_lang['ip_max_head_tip'])).'">'.$ec_lang['ip_max_head'].' <span class="ec-tip">?</span></span>'),
+		Array('name' => 'd',               'type' => 'number', 'default' => Array('us' => '0.75', 'si' => '20'),   'units' => 'distance_small',                            'label' => $ec_lang['ip_d']),
+		Array('name' => 'h_max_allow',     'type' => 'number', 'default' => '',     'units' => 'partial_head', 'label' => '<span class="ec-help" title="'.htmlspecialchars(strip_tags($ec_lang['ip_max_head_tip'])).'">'.$ec_lang['ip_max_head'].' <span class="ec-tip">?</span></span>'),
 	),
 	// Results
 	Array(
-		Array('name' => 'q_supply',      'units' => Array('m3ps', 'lps', 'mld', 'ft3ps', 'gpm', 'mgd', 'lph', 'gph'), 'label' => $ec_lang['ip_q_supply']),
-		Array('name' => 'h_far',         'units' => Array('mh2o', 'mmh2o', 'kpa', 'bar', 'kgfcm2', 'fth2o', 'inh2o', 'psi'), 'label' => $ec_lang['ip_h_far']),
-		Array('name' => 'q_critical',    'units' => Array('lph', 'gph'),                                    'label' => $ec_lang['ip_q_critical']),
-		Array('name' => 'q_avg_lateral', 'units' => Array('lph', 'gph'),                                    'label' => $ec_lang['ip_q_avg_lateral']),
-		Array('name' => 'q_avg_field',   'units' => Array('lph', 'gph'),                                    'label' => $ec_lang['ip_q_avg_field']),
+		Array('name' => 'q_supply',      'units' => 'flow_supply', 'label' => $ec_lang['ip_q_supply']),
+		Array('name' => 'h_far',         'units' => 'partial_head', 'label' => $ec_lang['ip_h_far']),
+		Array('name' => 'q_critical',    'units' => 'flow_emitter',                                    'label' => $ec_lang['ip_q_critical']),
+		Array('name' => 'q_avg_lateral', 'units' => 'flow_emitter',                                    'label' => $ec_lang['ip_q_avg_lateral']),
+		Array('name' => 'q_avg_field',   'units' => 'flow_emitter',                                    'label' => $ec_lang['ip_q_avg_field']),
 		Array('name' => 'du_estimate',   'units' => NULL,                                                   'label' => $ec_lang['ip_du_estimate']),
 		Array('name' => 'q_ratio',       'units' => NULL,                                                   'label' => $ec_lang['ip_q_ratio']),
-		Array('name' => 'a_e',           'units' => Array('m2', 'mm2', 'ft2', 'in2'),                        'label' => $ec_lang['ip_a_e']),
-		Array('name' => 'pr',            'units' => Array('mmph', 'inph'),                                   'label' => $ec_lang['ip_pr']),
-		Array('name' => 'q_lat',         'units' => Array('lph', 'gph'),                                     'label' => $ec_lang['ip_q_lat']),
-		Array('name' => 'q_sys',         'units' => Array('lph', 'gph'),                                     'label' => $ec_lang['ip_q_sys']),
+		Array('name' => 'a_e',           'units' => 'flow_area',                        'label' => $ec_lang['ip_a_e']),
+		Array('name' => 'pr',            'units' => 'application_rate',                                   'label' => $ec_lang['ip_pr']),
+		Array('name' => 'q_lat',         'units' => 'flow_emitter',                                     'label' => $ec_lang['ip_q_lat']),
+		Array('name' => 'q_sys',         'units' => 'flow_emitter',                                     'label' => $ec_lang['ip_q_sys']),
 		Array('name' => 't_run',         'units' => NULL,                                                    'label' => $ec_lang['ip_t_run']),
 	),
 	$flagFormAppend = true
@@ -70,58 +70,58 @@ function echoCalculatorFormAppend() {
 				<th><?=$ec_lang['ip_count']?></th>
 				<th>
 					<?=$ec_lang['ip_length']?><br />
-					<?php echoUnitSelect($name = 'lengthu', $units = Array('m', 'ft'), $indent_string); ?>
+					<?php echoUnitSelect($name = 'lengthu', $units = 'distance_site', $indent_string); ?>
 				</th>
 				<th>
 					<?=$ec_lang['ip_diameter']?><br />
-					<?php echoUnitSelect($name = 'diameteru', $units = Array('mm', 'in', 'm', 'ft'), $indent_string); ?>
+					<?php echoUnitSelect($name = 'diameteru', $units = 'distance_small', $indent_string); ?>
 				</th>
 				<th>
 					<a target="_blank" href="https://nepis.epa.gov/Exe/ZyNET.exe/P1007WWU.txt?ZyActionD=ZyDocument&Client=EPA&Index=2000%20Thru%202005&SearchMethod=1&TocRestrict=n&&IntQFieldOp=0&ExtQFieldOp=0&XmlQuery=&File=D%3A%5CZYFILES%5CINDEX%20DATA%5C00THRU05%5CTXT%5C00000024%5CP1007WWU.txt&User=ANONYMOUS&Password=anonymous&SortMethod=h%7C-&MaximumDocuments=1&FuzzyDegree=0&ImageQuality=r75g8/r75g8/x150y150g16/i425&Display=hpfr&DefSeekPage=x&SearchBack=ZyActionL&Back=ZyActionS&BackDesc=Results%20page&MaximumPages=1&ZyEntry=31"><?=$ec_lang['ip_roughness']?></a><span class="ec-help" title="<?=htmlspecialchars(strip_tags($ec_lang['dw_roughness_tip']))?>"><span class="ec-tip">?</span></span><br />
-					<?php echoUnitSelect($name = 'roughnessu', $units = Array('mm', 'in', 'm', 'ft'), $indent_string); ?>
+					<?php echoUnitSelect($name = 'roughnessu', $units = 'roughness', $indent_string); ?>
 				</th>
 				<th>
 					<a target="_blank" href="https://www.engineeringtoolbox.com/minor-loss-coefficients-pipes-d_626.html"><?=$ec_lang['mphl_total_junction_k_short']?></a><span class="ec-help" title="<?=htmlspecialchars(strip_tags($ec_lang['mphl_total_junction_k_tip']))?>"><span class="ec-tip">?</span></span>
 				</th>
 				<th>
 					<?=$ec_lang['ip_elev_ds']?><br />
-					<?php echoUnitSelect($name = 'elevu', $units = Array('m', 'ft'), $indent_string); ?>
+					<?php echoUnitSelect($name = 'elevu', $units = 'distance_site', $indent_string); ?>
 				</th>
 				<th>
 					<?=$ec_lang['ip_flow']?><br />
-					<?php echoUnitSelect($name = 'q_usu', $units = Array('lph', 'gph', 'lps', 'm3ps', 'ft3ps', 'gpm'), $indent_string); ?>
+					<?php echoUnitSelect($name = 'q_usu', $units = 'flow_emitter', $indent_string); ?>
 				</th>
 				<th>
 					<?=$ec_lang['ip_press']?><br />
-					<?php echoUnitSelect($name = 'h_usu', $units = Array('mh2o', 'mmh2o', 'kpa', 'bar', 'kgfcm2', 'fth2o', 'inh2o', 'psi'), $indent_string); ?>
+					<?php echoUnitSelect($name = 'h_usu', $units = 'partial_head', $indent_string); ?>
 				</th>
 				<th>
 					<?=$ec_lang['ip_flow']?><br />
-					<?php echoUnitSelect($name = 'q_dsu', $units = Array('lph', 'gph', 'lps', 'm3ps', 'ft3ps', 'gpm'), $indent_string); ?>
+					<?php echoUnitSelect($name = 'q_dsu', $units = 'flow_emitter', $indent_string); ?>
 				</th>
 				<th>
 					<?=$ec_lang['ip_press']?><br />
-					<?php echoUnitSelect($name = 'h_dsu', $units = Array('mh2o', 'mmh2o', 'kpa', 'bar', 'kgfcm2', 'fth2o', 'inh2o', 'psi'), $indent_string); ?>
+					<?php echoUnitSelect($name = 'h_dsu', $units = 'partial_head', $indent_string); ?>
 				</th>
 				<th>
 					<?=$ec_lang['mi_v617']?><br />
-					<?php echoUnitSelect($name = 'vu', $units = Array('mps', 'ftps'), $indent_string); ?>
+					<?php echoUnitSelect($name = 'vu', $units = 'velocity', $indent_string); ?>
 				</th>
 				<th>
 					<?=$ec_lang['mi_hv617']?><br />
-					<?php echoUnitSelect($name = 'hvu', $units = Array('mh2o', 'mmh2o', 'kpa', 'bar', 'kgfcm2', 'fth2o', 'inh2o', 'psi'), $indent_string); ?>
+					<?php echoUnitSelect($name = 'hvu', $units = 'velocity_head', $indent_string); ?>
 				</th>
 				<th>
 					<?=$ec_lang['ip_hf']?><br />
-					<?php echoUnitSelect($name = 'hfu', $units = Array('mh2o', 'mmh2o', 'kpa', 'bar', 'kgfcm2', 'fth2o', 'inh2o', 'psi'), $indent_string); ?>
+					<?php echoUnitSelect($name = 'hfu', $units = 'partial_head', $indent_string); ?>
 				</th>
 				<th>
 					<?=$ec_lang['ip_hm']?><br />
-					<?php echoUnitSelect($name = 'hmu', $units = Array('mh2o', 'mmh2o', 'kpa', 'bar', 'kgfcm2', 'fth2o', 'inh2o', 'psi'), $indent_string); ?>
+					<?php echoUnitSelect($name = 'hmu', $units = 'partial_head', $indent_string); ?>
 				</th>
 				<th>
 					<?=$ec_lang['ip_hl']?><br />
-					<?php echoUnitSelect($name = 'hlu', $units = Array('mh2o', 'mmh2o', 'kpa', 'bar', 'kgfcm2', 'fth2o', 'inh2o', 'psi'), $indent_string); ?>
+					<?php echoUnitSelect($name = 'hlu', $units = 'partial_head', $indent_string); ?>
 				</th>
 			</tr>
 		</thead>

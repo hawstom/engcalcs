@@ -141,9 +141,19 @@ EngCalcs.cookieToForm = function (form) {
 			case 's':
 				selectCounter = selectCounter + 1;
 				if (!form.getElementsByTagName("SELECT")[selectCounter]) { break; }
-				form.getElementsByTagName("SELECT")[selectCounter].value = '';
+				var savedSelect = form.getElementsByTagName("SELECT")[selectCounter];
+				savedSelect.value = '';
 				if (cookieVarSplit[1] !== undefined && cookieVarSplit[1] !== "") {
-					form.getElementsByTagName("SELECT")[selectCounter].value = cookieVarSplit[1];
+					savedSelect.value = cookieVarSplit[1];
+				}
+				// A saved unit that this select no longer offers leaves selectedIndex at -1,
+				// which would silently break every calculation on the page. Fall back to the
+				// server-rendered default instead. Needed because unit option lists can change
+				// (Task 162 dropped psi from EGL/HGL, where it never made sense), and a stored
+				// cookie outlives any such change.
+				if (savedSelect.selectedIndex < 0) {
+					var fallback = savedSelect.querySelector('option[selected]') || savedSelect.options[0];
+					if (fallback) { fallback.selected = true; }
 				}
 				break;
 			}

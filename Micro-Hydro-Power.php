@@ -11,27 +11,27 @@ echoHeader("EngCalcs", $html_title, "");
 echoCalculatorForm(
 	//Inputs
 	Array(
-		Array('name' => 'q',      'type' => 'number', 'default' => '10',   'units' => Array('lps','m3ps','ft3ps','gpm'), 'label' => $ec_lang['mpf_flow']),
-		Array('name' => 'hgross', 'type' => 'number', 'default' => '50',   'units' => Array('m','ft'),                  'label' => $ec_lang['mhp_gross_head']),
-		Array('name' => 'd',      'type' => 'number', 'default' => '100',  'units' => Array('mm','m','in','ft'),         'label' => $ec_lang['mhp_diameter']),
-		Array('name' => 'l',      'type' => 'number', 'default' => '200',  'units' => Array('m','ft'),                  'label' => $ec_lang['mhp_length']),
-		Array('name' => 'e',      'type' => 'number', 'default' => '0.05', 'units' => Array('mm','m','in','ft'),         'label' => '<a target="_blank" href="https://nepis.epa.gov/Exe/ZyNET.exe/P1007WWU.txt?ZyActionD=ZyDocument&Client=EPA&Index=2000%20Thru%202005&SearchMethod=1&TocRestrict=n&&IntQFieldOp=0&ExtQFieldOp=0&XmlQuery=&File=D%3A%5CZYFILES%5CINDEX%20DATA%5C00THRU05%5CTXT%5C00000024%5CP1007WWU.txt&User=ANONYMOUS&Password=anonymous&SortMethod=h%7C-&MaximumDocuments=1&FuzzyDegree=0&ImageQuality=r75g8/r75g8/x150y150g16/i425&Display=hpfr&DefSeekPage=x&SearchBack=ZyActionL&Back=ZyActionS&BackDesc=Results%20page&MaximumPages=1&ZyEntry=31">'.$ec_lang['dw_roughness'].'</a><span class="ec-help" title="'.htmlspecialchars(strip_tags($ec_lang['dw_roughness_tip'])).'"><span class="ec-tip">?</span></span>'),
+		Array('name' => 'q',      'type' => 'number', 'default' => Array('us' => '500', 'si' => '30'),   'units' => 'flow_turbine', 'label' => $ec_lang['mpf_flow']),
+		Array('name' => 'hgross', 'type' => 'number', 'default' => Array('us' => '160', 'si' => '50'),   'units' => 'distance_site',                  'label' => $ec_lang['mhp_gross_head']),
+		Array('name' => 'd',      'type' => 'number', 'default' => Array('us' => '6', 'si' => '150'),  'units' => 'distance_small',         'label' => $ec_lang['mhp_diameter']),
+		Array('name' => 'l',      'type' => 'number', 'default' => Array('us' => '600', 'si' => '200'),  'units' => 'distance_site',                  'label' => $ec_lang['mhp_length']),
+		Array('name' => 'e',      'type' => 'number', 'default' => Array('us' => '0.00015', 'si' => '0.05'), 'units' => 'roughness',         'label' => '<a target="_blank" href="https://nepis.epa.gov/Exe/ZyNET.exe/P1007WWU.txt?ZyActionD=ZyDocument&Client=EPA&Index=2000%20Thru%202005&SearchMethod=1&TocRestrict=n&&IntQFieldOp=0&ExtQFieldOp=0&XmlQuery=&File=D%3A%5CZYFILES%5CINDEX%20DATA%5C00THRU05%5CTXT%5C00000024%5CP1007WWU.txt&User=ANONYMOUS&Password=anonymous&SortMethod=h%7C-&MaximumDocuments=1&FuzzyDegree=0&ImageQuality=r75g8/r75g8/x150y150g16/i425&Display=hpfr&DefSeekPage=x&SearchBack=ZyActionL&Back=ZyActionS&BackDesc=Results%20page&MaximumPages=1&ZyEntry=31">'.$ec_lang['dw_roughness'].'</a><span class="ec-help" title="'.htmlspecialchars(strip_tags($ec_lang['dw_roughness_tip'])).'"><span class="ec-tip">?</span></span>'),
 		Array('name' => 'km',     'type' => 'number', 'default' => '2.0',  'units' => NULL,                             'label' => '<a target="_blank" href="https://www.engineeringtoolbox.com/minor-loss-coefficients-pipes-d_626.html">'.$ec_lang['mphl_total_junction_k_short'].'</a><span class="ec-help" title="'.htmlspecialchars(strip_tags($ec_lang['mphl_total_junction_k_tip'])).'"><span class="ec-tip">?</span></span>'),
 		Array('name' => 'nu',     'type' => 'number', 'default' => '1e-6', 'units' => NULL,                             'label' => $ec_lang['dw_kinematic_viscosity']),
 		Array('name' => 'eta',    'type' => 'number', 'default' => '0.75', 'units' => NULL,                             'label' => $ec_lang['mhp_efficiency']),
 	),
 	//Results
 	Array(
-		Array('name' => 'vel',        'units' => Array('mps','ftps'),      'label' => $ec_lang['mpf_velocity']),
+		Array('name' => 'vel',        'units' => 'velocity',      'label' => $ec_lang['mpf_velocity']),
 		Array('name' => 'vel_check',  'units' => NULL,                     'label' => $ec_lang['mhp_vel_check']),
 		Array('name' => 'f',          'units' => NULL,                     'label' => $ec_lang['dw_friction_factor']),
-		Array('name' => 'hf',         'units' => Array('m','mm','ft','in'),'label' => $ec_lang['mphl_friction_loss']),
-		Array('name' => 'hm',         'units' => Array('m','mm','ft','in'),'label' => $ec_lang['mphl_junction_loss']),
-		Array('name' => 'hl',         'units' => Array('m','mm','ft','in'),'label' => $ec_lang['mphl_total_loss']),
+		Array('name' => 'hf',         'units' => 'distance_medium','label' => $ec_lang['mphl_friction_loss']),
+		Array('name' => 'hm',         'units' => 'distance_medium','label' => $ec_lang['mphl_junction_loss']),
+		Array('name' => 'hl',         'units' => 'distance_medium','label' => $ec_lang['mphl_total_loss']),
 		Array('name' => 'hl_check',   'units' => NULL,                     'label' => $ec_lang['mhp_hl_check']),
-		Array('name' => 'hnet',       'units' => Array('m','mm','ft','in'),'label' => $ec_lang['mhp_hnet']),
-		Array('name' => 'power',      'units' => Array('kw','mw','hp'),    'label' => $ec_lang['mhp_power']),
-		Array('name' => 'annual_kwh', 'units' => Array('kwh_yr','mwh_yr'),  'label' => $ec_lang['mhp_annual_kwh']),
+		Array('name' => 'hnet',       'units' => 'distance_medium','label' => $ec_lang['mhp_hnet']),
+		Array('name' => 'power',      'units' => 'power',    'label' => $ec_lang['mhp_power']),
+		Array('name' => 'annual_kwh', 'units' => 'energy',  'label' => $ec_lang['mhp_annual_kwh']),
 	)
 );
 ?>

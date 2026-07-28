@@ -1,11 +1,26 @@
 {
     "meta": {
         "language": "it",
-        "expected_key_count": 565,
-        "delta_key_count": 17,
+        "expected_key_count": 575,
+        "delta_key_count": 15,
+        "exempt_key_count": 12,
+        "exempt_keys": [
+            "dw_roughness",
+            "install_android_heading",
+            "install_ios_heading",
+            "ip_length",
+            "ip_diameter",
+            "ip_roughness",
+            "ip_hf",
+            "ip_hm",
+            "bpn_method_hw",
+            "bpn_method_dw",
+            "bpn_method_manning",
+            "bpn_id"
+        ],
         "active_prefixes": [
-            "bpn",
-            "dw",
+            "calc",
+            "hw",
             "install",
             "ip",
             "mhp",
@@ -19,8 +34,8 @@
         "intent_notes": "Use key_intent when present; these entries provide terse disambiguation comments only where translation risk exists."
     },
     "prompt_context_by_prefix": {
-        "bpn": "Use these preferred technical term translations when relevant:\n- flow (Q): portata\n- velocity (v): velocità\n- slope (S): pendenza\n    DO NOT render as: activity\/fitness sense of 'grade' — the treadmill or trail incline for running\/walking\/jogging; this is the hydraulic energy gradient, not an exercise setting; geographic or topographic landform term; school grade \/ academic mark",
-        "dw": "Use these preferred technical term translations when relevant:\n- flow (Q): portata\n- velocity (v): velocità\n- head loss (h_L): perdita di carico\n    DO NOT render as: pressure loss \/ pressure drop (use the head-loss term, not the pressure term); a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry\n- friction factor (f): fattore di attrito\n- slope (S): pendenza\n    DO NOT render as: activity\/fitness sense of 'grade' — the treadmill or trail incline for running\/walking\/jogging; this is the hydraulic energy gradient, not an exercise setting; geographic or topographic landform term; school grade \/ academic mark\n- laminar: laminare\n- transitional: di transizione\n- turbulent: turbolento",
+        "calc": "Use these preferred technical term translations when relevant:\n- flow (Q): portata\n- velocity (v): velocità\n- slope (S): pendenza\n    DO NOT render as: activity\/fitness sense of 'grade' — the treadmill or trail incline for running\/walking\/jogging; this is the hydraulic energy gradient, not an exercise setting; geographic or topographic landform term; school grade \/ academic mark",
+        "hw": "Use these preferred technical term translations when relevant:\n- flow (Q): portata\n- velocity (v): velocità\n- head loss (h_L): perdita di carico\n    DO NOT render as: pressure loss \/ pressure drop (use the head-loss term, not the pressure term); a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry\n- slope (S): pendenza\n    DO NOT render as: activity\/fitness sense of 'grade' — the treadmill or trail incline for running\/walking\/jogging; this is the hydraulic energy gradient, not an exercise setting; geographic or topographic landform term; school grade \/ academic mark",
         "install": "Use these preferred technical term translations when relevant:\n- flow (Q): portata\n- velocity (v): velocità\n- slope (S): pendenza\n    DO NOT render as: activity\/fitness sense of 'grade' — the treadmill or trail incline for running\/walking\/jogging; this is the hydraulic energy gradient, not an exercise setting; geographic or topographic landform term; school grade \/ academic mark",
         "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): portata\n- velocity (v): velocità\n- head loss (h_L): perdita di carico\n    DO NOT render as: pressure loss \/ pressure drop (use the head-loss term, not the pressure term); a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry\n- emitter: emettitore\n- distribution uniformity (DU): uniformità di distribuzione\n- low-quarter distribution uniformity (DU_lq): uniformità di distribuzione del quarto inferiore\n- application rate (PR): tasso di applicazione\n- lateral: ala laterale\n- mainline: condotta principale\n- reach: tratto\n- velocity head (H_v): altezza cinetica\n    DO NOT render as: a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry; pressure\n- friction loss (h_f): perdita di carico distribuita\n- minor loss (h_m): perdita di carico concentrata\n- energy grade line (EGL): linea dei carichi totali\n- upstream: a monte\n- downstream: a valle",
         "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): portata\n- penstock: condotta forzata\n    DO NOT render as: phonetic transliteration of the English word — translate the concept (pressure pipe \/ force main to turbine), never borrow 'penstock' as a loanword\n- gross head (H_gross): altezza lorda\n    DO NOT render as: a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry; pressure\n- net head (H_net): altezza netta\n    DO NOT render as: a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry; pressure\n- plant efficiency (η): rendimento dell'impianto\n- head loss (h_L): perdita di carico\n    DO NOT render as: pressure loss \/ pressure drop (use the head-loss term, not the pressure term); a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry\n- run-of-river: ad acqua fluente\n- headworks: opera di presa\n- junction loss (h_m): perdite di carico locali\n- minor loss (h_m): perdita di carico concentrata",
@@ -28,7 +43,7 @@
         "odt": "Use these preferred technical term translations when relevant:\n- orifice: orifizio\n- discharge coefficient (C_d): coefficiente di efflusso\n- headwater elevation: livello idrometrico a monte\n    DO NOT render as: head (energy); source\/origin of a stream; a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry\n- tailwater elevation: livello idrometrico a valle\n- crown: [needs translation sprint]\n    DO NOT render as: royal crown; anatomical crown (of the head\/tooth)"
     },
     "glossary_terms_by_prefix": {
-        "bpn": [
+        "calc": [
             {
                 "term": "flow",
                 "symbol": "Q",
@@ -51,7 +66,7 @@
                 "preferred_translation": "pendenza"
             }
         ],
-        "dw": [
+        "hw": [
             {
                 "term": "flow",
                 "symbol": "Q",
@@ -74,39 +89,11 @@
                 "preferred_translation": "perdita di carico"
             },
             {
-                "term": "friction factor",
-                "symbol": "f",
-                "context": "Darcy-Weisbach friction factor. Dimensionless coefficient in the Darcy-Weisbach head loss equation. Distinct from Hazen-Williams C coefficient.",
-                "translation_notes": "Use the hydraulic\/civil engineering term. In some languages, 'friction' and 'resistance' terms compete — prefer 'friction' to match the Darcy-Weisbach naming convention. DATA-ERROR FIX 2026-07-10 (category-3 km re-translation): km was 'កត្តាស្ទះ' (literally 'blockage\/obstruction factor', wrong sense — ស្ទះ means 'clogged\/blocked', not 'friction'), contradicting the file's own established usage: dw_friction_factor and mhp_f both already use 'កត្តាកកិត' (កកិត = friction\/rubbing) in lib\/lang.ec.km.php. Corrected to 'កត្តាកកិត' to match established incumbent usage. DATA-ERROR FIX 2026-07-10 (category-3 ps wave-3 re-translation): glossary ps value was 'د مالښ ضریب' (مالښ, a native Pashto word for friction\/rubbing), but مالښ does not occur anywhere in lib\/lang.ec.ps.php — the file's own established word for 'friction' is اصطکاک (14+ occurrences: dw_friction_factor, mpf_friction_slope, mphl_friction_slope, mphl_friction_loss, etc.), already correctly used in dw_friction_factor's existing string 'د اصطکاک فاکتور، f'. Kept dw_friction_factor unchanged and standardized the glossary to 'د اصطکاک فاکتور' to match established incumbent usage, same defect class as the km fix above. Task 109 stage 4 (2026-07-19): am bare-transliteration 'ፍሪክሽን ፋክተር' corrected to real word 'ግጭት ፋክተር' (matches shipped dw_friction_factor\/dw_friction_factor_method).",
-                "preferred_translation": "fattore di attrito"
-            },
-            {
                 "term": "slope",
                 "symbol": "S",
                 "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators. English aliases 'slope' and 'grade' (u_grade\/u_gradePercent) both point here.",
                 "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term. [2026-07-21] Centralized the grade activity-sense guard here (was living only as u_grade\/u_gradePercent label commentary): the 'avoid' array now carries the running\/walking\/jogging exercise-incline trap, so the slope entry is the single home for the grade→energy-gradient concept and its wrong senses.",
                 "preferred_translation": "pendenza"
-            },
-            {
-                "term": "laminar",
-                "symbol": "",
-                "context": "Flow regime in which fluid moves in parallel layers with no lateral mixing. Reynolds number below ~2000. Appears in Darcy-Weisbach calculator flow regime check.",
-                "translation_notes": "Nearly always a direct cognate or borrowing from the Latin in technical languages. Confirm the local engineering convention.",
-                "preferred_translation": "laminare"
-            },
-            {
-                "term": "transitional",
-                "symbol": "",
-                "context": "Flow regime between laminar and turbulent — Reynolds number roughly 2000–4000. Appears in Darcy-Weisbach calculator flow regime check.",
-                "translation_notes": "Use the adjective form meaning 'between two states'. Some languages use 'critical flow' for this regime — check local hydraulics convention.",
-                "preferred_translation": "di transizione"
-            },
-            {
-                "term": "turbulent",
-                "symbol": "",
-                "context": "Flow regime with chaotic, irregular mixing. Reynolds number above ~4000. Appears in Darcy-Weisbach calculator flow regime check.",
-                "translation_notes": "Nearly always a cognate. Some languages distinguish 'turbulent' (adjective) from 'turbulence' (noun) — use the adjective form.",
-                "preferred_translation": "turbolento"
             }
         ],
         "install": [
@@ -422,57 +409,197 @@
         ]
     },
     "keys_to_translate": {
-        "dw_roughness": "e",
+        "calc_units_us": "US",
+        "calc_units_si": "SI",
+        "hw_elev_up": "Upstream elevation",
+        "hw_pressure_up": "Upstream pressure",
+        "hw_elev_down": "Downstream elevation",
+        "hw_pressure_down": "Downstream pressure",
+        "hw_pressure_check": "Pressure check",
+        "hw_pressure_ok_short": "Positive pressure",
+        "hw_pressure_neg_short": "Negative pressure",
+        "hw_pressure_neg": "Downstream pressure is below zero. The hydraulic grade line falls below the pipe, so the pipe would not flow full and this result may not be valid.",
         "mphl_area": "Area, A",
         "mhp_vel_ok_short": "OK",
         "odt_notes_1_term": "Formula",
-        "install_android_heading": "Android (Chrome)",
-        "install_ios_heading": "iOS (Safari)",
         "install_desktop_heading": "Desktop (Chrome \/ Edge)",
-        "ip_length": "L",
-        "ip_diameter": "D",
-        "ip_roughness": "e",
-        "ip_press": "Press.",
-        "ip_hf": "h<sub>f<\/sub>",
-        "ip_hm": "h<sub>m<\/sub>",
-        "bpn_method_hw": "Hazen-Williams",
-        "bpn_method_dw": "Darcy-Weisbach",
-        "bpn_method_manning": "Manning",
-        "bpn_id": "ID"
+        "ip_press": "Press."
     },
     "keys": {
-        "dw_roughness": "e",
+        "calc_units_us": "US",
+        "calc_units_si": "SI",
+        "hw_elev_up": "Upstream elevation",
+        "hw_pressure_up": "Upstream pressure",
+        "hw_elev_down": "Downstream elevation",
+        "hw_pressure_down": "Downstream pressure",
+        "hw_pressure_check": "Pressure check",
+        "hw_pressure_ok_short": "Positive pressure",
+        "hw_pressure_neg_short": "Negative pressure",
+        "hw_pressure_neg": "Downstream pressure is below zero. The hydraulic grade line falls below the pipe, so the pipe would not flow full and this result may not be valid.",
         "mphl_area": "Area, A",
         "mhp_vel_ok_short": "OK",
         "odt_notes_1_term": "Formula",
-        "install_android_heading": "Android (Chrome)",
-        "install_ios_heading": "iOS (Safari)",
         "install_desktop_heading": "Desktop (Chrome \/ Edge)",
-        "ip_length": "L",
-        "ip_diameter": "D",
-        "ip_roughness": "e",
-        "ip_press": "Press.",
-        "ip_hf": "h<sub>f<\/sub>",
-        "ip_hm": "h<sub>m<\/sub>",
-        "bpn_method_hw": "Hazen-Williams",
-        "bpn_method_dw": "Darcy-Weisbach",
-        "bpn_method_manning": "Manning",
-        "bpn_id": "ID"
+        "ip_press": "Press."
     },
     "key_context": {
-        "dw_roughness": {
+        "calc_units_us": {
             "reason": "equal_to_english",
-            "current_value": "e",
+            "current_value": "US",
             "neighbors": {
                 "previous_translated": {
-                    "key": "dw_main_desc",
-                    "value": "Perdita di carico in tubazione con Darcy-Weisbach a diametro, scabrezza e portata dati",
-                    "english": "Darcy-Weisbach Pipe Head Loss at Given Diameter, Roughness, and Flow"
+                    "key": "calc_set_units",
+                    "value": "Imposta unità:",
+                    "english": "Set units:"
                 },
                 "next_translated": {
-                    "key": "dw_roughness_tip",
-                    "value": "Altezza di scabrezza assoluta, e, della parete della tubazione. Valori tipici: acciaio (nuovo) 0,046 mm, acciaio (usato) 0,15 mm, HDPE 0,003 mm, PVC\/uPVC 0,0015 mm, calcestruzzo 0,3–3 mm.",
-                    "english": "Absolute roughness height, e, of the pipe wall. Typical values: steel (new) 0.046 mm, steel (used) 0.15 mm, HDPE 0.003 mm, PVC\/uPVC 0.0015 mm, concrete 0.3–3 mm."
+                    "key": "calc_defaults",
+                    "value": "Valori predefiniti",
+                    "english": "Restore defaults"
+                }
+            }
+        },
+        "calc_units_si": {
+            "reason": "equal_to_english",
+            "current_value": "SI",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "calc_set_units",
+                    "value": "Imposta unità:",
+                    "english": "Set units:"
+                },
+                "next_translated": {
+                    "key": "calc_defaults",
+                    "value": "Valori predefiniti",
+                    "english": "Restore defaults"
+                }
+            }
+        },
+        "hw_elev_up": {
+            "reason": "equal_to_english",
+            "current_value": "Upstream elevation",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "hw_hgl_2",
+                    "value": "HGL a monte",
+                    "english": "Upstream HGL"
+                },
+                "next_translated": {
+                    "key": "hw_roughness",
+                    "value": "Coefficiente Hazen-Williams, C",
+                    "english": "Hazen-Williams coefficient, C"
+                }
+            }
+        },
+        "hw_pressure_up": {
+            "reason": "equal_to_english",
+            "current_value": "Upstream pressure",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "hw_hgl_2",
+                    "value": "HGL a monte",
+                    "english": "Upstream HGL"
+                },
+                "next_translated": {
+                    "key": "hw_roughness",
+                    "value": "Coefficiente Hazen-Williams, C",
+                    "english": "Hazen-Williams coefficient, C"
+                }
+            }
+        },
+        "hw_elev_down": {
+            "reason": "equal_to_english",
+            "current_value": "Downstream elevation",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "hw_hgl_2",
+                    "value": "HGL a monte",
+                    "english": "Upstream HGL"
+                },
+                "next_translated": {
+                    "key": "hw_roughness",
+                    "value": "Coefficiente Hazen-Williams, C",
+                    "english": "Hazen-Williams coefficient, C"
+                }
+            }
+        },
+        "hw_pressure_down": {
+            "reason": "equal_to_english",
+            "current_value": "Downstream pressure",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "hw_hgl_2",
+                    "value": "HGL a monte",
+                    "english": "Upstream HGL"
+                },
+                "next_translated": {
+                    "key": "hw_roughness",
+                    "value": "Coefficiente Hazen-Williams, C",
+                    "english": "Hazen-Williams coefficient, C"
+                }
+            }
+        },
+        "hw_pressure_check": {
+            "reason": "equal_to_english",
+            "current_value": "Pressure check",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "hw_hgl_2",
+                    "value": "HGL a monte",
+                    "english": "Upstream HGL"
+                },
+                "next_translated": {
+                    "key": "hw_roughness",
+                    "value": "Coefficiente Hazen-Williams, C",
+                    "english": "Hazen-Williams coefficient, C"
+                }
+            }
+        },
+        "hw_pressure_ok_short": {
+            "reason": "equal_to_english",
+            "current_value": "Positive pressure",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "hw_hgl_2",
+                    "value": "HGL a monte",
+                    "english": "Upstream HGL"
+                },
+                "next_translated": {
+                    "key": "hw_roughness",
+                    "value": "Coefficiente Hazen-Williams, C",
+                    "english": "Hazen-Williams coefficient, C"
+                }
+            }
+        },
+        "hw_pressure_neg_short": {
+            "reason": "equal_to_english",
+            "current_value": "Negative pressure",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "hw_hgl_2",
+                    "value": "HGL a monte",
+                    "english": "Upstream HGL"
+                },
+                "next_translated": {
+                    "key": "hw_roughness",
+                    "value": "Coefficiente Hazen-Williams, C",
+                    "english": "Hazen-Williams coefficient, C"
+                }
+            }
+        },
+        "hw_pressure_neg": {
+            "reason": "equal_to_english",
+            "current_value": "Downstream pressure is below zero. The hydraulic grade line falls below the pipe, so the pipe would not flow full and this result may not be valid.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "hw_hgl_2",
+                    "value": "HGL a monte",
+                    "english": "Upstream HGL"
+                },
+                "next_translated": {
+                    "key": "hw_roughness",
+                    "value": "Coefficiente Hazen-Williams, C",
+                    "english": "Hazen-Williams coefficient, C"
                 }
             }
         },
@@ -524,38 +651,6 @@
                 }
             }
         },
-        "install_android_heading": {
-            "reason": "equal_to_english",
-            "current_value": "Android (Chrome)",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "install_intro",
-                    "value": "EngCalcs è una Progressive Web App (PWA). Una volta installata, tutti i calcolatori funzionano completamente offline: non serve alcuna connessione a Internet.",
-                    "english": "EngCalcs is a Progressive Web App (PWA). Once installed, all calculators work fully offline — no internet connection needed."
-                },
-                "next_translated": {
-                    "key": "install_android_steps_html",
-                    "value": "<li>Apri una qualsiasi pagina di calcolo in Chrome.<\/li><li>Tocca il pulsante <strong>⬇ Installa<\/strong> nella barra di navigazione superiore, oppure tocca il menu del browser (⋮) e scegli <strong>Aggiungi a schermata Home<\/strong>.<\/li><li>Tocca <strong>Installa<\/strong> nella richiesta che compare.<\/li><li>EngCalcs comparirà nella schermata Home e funzionerà offline.<\/li>",
-                    "english": "<li>Open any calculator page in Chrome.<\/li><li>Tap the <strong>⬇ Install<\/strong> button in the top navigation bar, or tap the browser menu (⋮) and choose <strong>Add to Home screen<\/strong>.<\/li><li>Tap <strong>Install<\/strong> in the prompt that appears.<\/li><li>EngCalcs appears on your home screen and works offline.<\/li>"
-                }
-            }
-        },
-        "install_ios_heading": {
-            "reason": "equal_to_english",
-            "current_value": "iOS (Safari)",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "install_prompt_unavailable",
-                    "value": "Richiesta di installazione non disponibile: usa invece il menu del browser.",
-                    "english": "Install prompt not available — use your browser menu instead."
-                },
-                "next_translated": {
-                    "key": "install_ios_steps_html",
-                    "value": "<li>Apri una qualsiasi pagina di calcolo in Safari.<\/li><li>Tocca il pulsante <strong>Condividi<\/strong> (il riquadro con la freccia verso l'alto).<\/li><li>Scorri verso il basso e tocca <strong>Aggiungi a Home<\/strong>.<\/li><li>Tocca <strong>Aggiungi<\/strong>. EngCalcs comparirà nella schermata Home.<\/li>",
-                    "english": "<li>Open any calculator page in Safari.<\/li><li>Tap the <strong>Share<\/strong> button (box with arrow pointing up).<\/li><li>Scroll down and tap <strong>Add to Home Screen<\/strong>.<\/li><li>Tap <strong>Add<\/strong>. EngCalcs appears on your home screen.<\/li>"
-                }
-            }
-        },
         "install_desktop_heading": {
             "reason": "equal_to_english",
             "current_value": "Desktop (Chrome \/ Edge)",
@@ -569,54 +664,6 @@
                     "key": "install_desktop_steps_html",
                     "value": "<li>Apri una qualsiasi pagina di calcolo.<\/li><li>Fai clic sull'<strong>icona di installazione<\/strong> (⊕ o icona a forma di computer) nella barra degli indirizzi del browser, oppure apri il menu del browser e scegli <strong>Installa EngCalcs…<\/strong><\/li><li>Fai clic su <strong>Installa<\/strong>. EngCalcs si aprirà come app autonoma in una propria finestra.<\/li>",
                     "english": "<li>Open any calculator page.<\/li><li>Click the <strong>install icon<\/strong> (⊕ or computer icon) in the browser's address bar, or open the browser menu and choose <strong>Install EngCalcs…<\/strong><\/li><li>Click <strong>Install<\/strong>. EngCalcs opens as a standalone app window.<\/li>"
-                }
-            }
-        },
-        "ip_length": {
-            "reason": "equal_to_english",
-            "current_value": "L",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ip_count",
-                    "value": "<span class=\"ec-help\" title=\"Righe ala laterale: emettitori solo in questo tratto. Righe condotta principale: numero totale di emettitori sulle ali laterali DIVERSE da questa che si diramano da questo tratto. Per il tratto della condotta principale che termina all'ala laterale di prova, questo include anche tutte le ali laterali oltre quel punto lungo la condotta principale, o che condividono lo stesso nodo (ad esempio un'ala laterale sul lato opposto) — anche la loro portata si dirama da questo stesso tratto.\">Emettitori <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
-                },
-                "next_translated": {
-                    "key": "ip_elev_ds",
-                    "value": "<span class=\"ec-help\" title=\"Quota all'estremità di valle di questo tratto. Facoltativa nelle righe interne (predefinita: piatta, cioè uguale al nodo superiore, se lasciata vuota). Obbligatoria nell'ultima riga: quel valore è la quota dell'ultimo emettitore, che determina direttamente la pressione di alimentazione richiesta.\">Elev. V. <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter’s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
-                }
-            }
-        },
-        "ip_diameter": {
-            "reason": "equal_to_english",
-            "current_value": "D",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ip_count",
-                    "value": "<span class=\"ec-help\" title=\"Righe ala laterale: emettitori solo in questo tratto. Righe condotta principale: numero totale di emettitori sulle ali laterali DIVERSE da questa che si diramano da questo tratto. Per il tratto della condotta principale che termina all'ala laterale di prova, questo include anche tutte le ali laterali oltre quel punto lungo la condotta principale, o che condividono lo stesso nodo (ad esempio un'ala laterale sul lato opposto) — anche la loro portata si dirama da questo stesso tratto.\">Emettitori <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
-                },
-                "next_translated": {
-                    "key": "ip_elev_ds",
-                    "value": "<span class=\"ec-help\" title=\"Quota all'estremità di valle di questo tratto. Facoltativa nelle righe interne (predefinita: piatta, cioè uguale al nodo superiore, se lasciata vuota). Obbligatoria nell'ultima riga: quel valore è la quota dell'ultimo emettitore, che determina direttamente la pressione di alimentazione richiesta.\">Elev. V. <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter’s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
-                }
-            }
-        },
-        "ip_roughness": {
-            "reason": "equal_to_english",
-            "current_value": "e",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ip_count",
-                    "value": "<span class=\"ec-help\" title=\"Righe ala laterale: emettitori solo in questo tratto. Righe condotta principale: numero totale di emettitori sulle ali laterali DIVERSE da questa che si diramano da questo tratto. Per il tratto della condotta principale che termina all'ala laterale di prova, questo include anche tutte le ali laterali oltre quel punto lungo la condotta principale, o che condividono lo stesso nodo (ad esempio un'ala laterale sul lato opposto) — anche la loro portata si dirama da questo stesso tratto.\">Emettitori <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?<\/span><\/span>"
-                },
-                "next_translated": {
-                    "key": "ip_elev_ds",
-                    "value": "<span class=\"ec-help\" title=\"Quota all'estremità di valle di questo tratto. Facoltativa nelle righe interne (predefinita: piatta, cioè uguale al nodo superiore, se lasciata vuota). Obbligatoria nell'ultima riga: quel valore è la quota dell'ultimo emettitore, che determina direttamente la pressione di alimentazione richiesta.\">Elev. V. <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat \/ same as the node above if left blank). Required on the last row: that value is the last emitter’s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
         },
@@ -635,106 +682,7 @@
                     "english": "<span class=\"ec-help\" title=\"Total reach loss, h_f + h_m\">h<sub>L<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
                 }
             }
-        },
-        "ip_hf": {
-            "reason": "equal_to_english",
-            "current_value": "h<sub>f<\/sub>",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ip_flow",
-                    "value": "Portata",
-                    "english": "Flow"
-                },
-                "next_translated": {
-                    "key": "ip_hl",
-                    "value": "<span class=\"ec-help\" title=\"Perdita totale del tratto, h_f + h_m\">h<sub>L<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Total reach loss, h_f + h_m\">h<sub>L<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
-                }
-            }
-        },
-        "ip_hm": {
-            "reason": "equal_to_english",
-            "current_value": "h<sub>m<\/sub>",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ip_flow",
-                    "value": "Portata",
-                    "english": "Flow"
-                },
-                "next_translated": {
-                    "key": "ip_hl",
-                    "value": "<span class=\"ec-help\" title=\"Perdita totale del tratto, h_f + h_m\">h<sub>L<\/sub> <span class=\"ec-tip\">?<\/span><\/span>",
-                    "english": "<span class=\"ec-help\" title=\"Total reach loss, h_f + h_m\">h<sub>L<\/sub> <span class=\"ec-tip\">?<\/span><\/span>"
-                }
-            }
-        },
-        "bpn_method_hw": {
-            "reason": "equal_to_english",
-            "current_value": "Hazen-Williams",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "bpn_method",
-                    "value": "Metodo di attrito",
-                    "english": "Friction method"
-                },
-                "next_translated": {
-                    "key": "bpn_line_table_title",
-                    "value": "Tratti di tubazione",
-                    "english": "Pipe lines"
-                }
-            }
-        },
-        "bpn_method_dw": {
-            "reason": "equal_to_english",
-            "current_value": "Darcy-Weisbach",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "bpn_method",
-                    "value": "Metodo di attrito",
-                    "english": "Friction method"
-                },
-                "next_translated": {
-                    "key": "bpn_line_table_title",
-                    "value": "Tratti di tubazione",
-                    "english": "Pipe lines"
-                }
-            }
-        },
-        "bpn_method_manning": {
-            "reason": "equal_to_english",
-            "current_value": "Manning",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "bpn_method",
-                    "value": "Metodo di attrito",
-                    "english": "Friction method"
-                },
-                "next_translated": {
-                    "key": "bpn_line_table_title",
-                    "value": "Tratti di tubazione",
-                    "english": "Pipe lines"
-                }
-            }
-        },
-        "bpn_id": {
-            "reason": "equal_to_english",
-            "current_value": "ID",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "bpn_line_table_title",
-                    "value": "Tratti di tubazione",
-                    "english": "Pipe lines"
-                },
-                "next_translated": {
-                    "key": "bpn_id_tip",
-                    "value": "Nome di questo tratto di tubazione. Altri tratti lo richiamano nella colonna Monte.",
-                    "english": "Name of this pipe line. Other lines refer to it in the Upstream column."
-                }
-            }
         }
     },
-    "key_intent": {
-        "ip_hf": "Friction head loss.",
-        "ip_hm": "Minor (local) head loss."
-    }
+    "key_intent": []
 }

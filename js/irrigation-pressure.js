@@ -346,12 +346,19 @@ EngCalcs.addIrrigationPressureReach = function (isLateral, count, length, diamet
 EngCalcs.pageAddCalcRow = function () {
 	'use strict';
 	var isLateral, count, length, diameter, roughness, kMinor, elevDs, prev = this.numCalcRows - 1;
+	// One set of seed numbers per preset -- these are read in the units the page
+	// rendered in. Roughness is a length here (D-W e), so it converts too: 0.0015 mm
+	// of smooth plastic tubing is 0.000005 ft.
+	var us = (this.defaultUnitSet === 'us');
 	if (this.numCalcRows === 0) {
-		isLateral = false; count = 60; length = 50; diameter = 25; roughness = 0.0015; kMinor = 1; elevDs = 49.5;
+		isLateral = false; count = 60; kMinor = 1;
+		length = us ? 165 : 50; diameter = us ? 1 : 25; roughness = us ? 0.000005 : 0.0015; elevDs = us ? 162 : 49.5;
 	} else if (this.numCalcRows === 1) {
-		isLateral = true; count = 20; length = 10; diameter = 12; roughness = 0.0015; kMinor = 1; elevDs = 49.0;
+		isLateral = true; count = 20; kMinor = 1;
+		length = us ? 33 : 10; diameter = us ? 0.5 : 12; roughness = us ? 0.000005 : 0.0015; elevDs = us ? 160 : 49.0;
 	} else if (this.numCalcRows === 2) {
-		isLateral = true; count = 20; length = 10; diameter = 12; roughness = 0.0015; kMinor = 1; elevDs = 48.5;
+		isLateral = true; count = 20; kMinor = 1;
+		length = us ? 33 : 10; diameter = us ? 0.5 : 12; roughness = us ? 0.000005 : 0.0015; elevDs = us ? 158 : 48.5;
 	} else {
 		isLateral = document.getElementsByName('is_lateral')[prev].checked;
 		count = +document.getElementsByName('count')[prev].value;

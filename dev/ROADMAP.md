@@ -10,52 +10,46 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 ## Calculator Improvements
 
-- 25|162|[H] **Rebuild the unit presets around real-world usage: "US" and "SI" buttons, and honest
-  per-page defaults.** Tom's direction, 2026-07-28, arising from the Task 144 Hazen-Williams analysis
-  but explicitly **not** HW-specific: *"I think there could be big across-the-board gains from paying
-  closer attention to [defaults and units]."* Recorded verbatim because this was a design decision
-  taken in conversation and would otherwise have been lost.
-  **Tom's stated position (his words, condensed):** the current unit sets are *"more or less honest,
-  but also largely inappropriate."* There is more horizontal room now, so **button labels can be
-  longer**, and they can carry **button tips / `?` tips**. He wants to **add "US" and "SI" buttons and
-  maybe retire the old four**, and to **default to US**. He raised having formal definitions attached
-  to "US defaults" and "SI defaults" buttons, and offered to **take a turn himself setting defaults he
-  considers realistic**. He called it *"a big change, but I think maybe it's right"* and *"could be a
-  big project. Just thinking for now"* — so **this is a direction, not yet an authorization to build.**
-  **Two concrete defects in the existing `in` preset, found by reading `EngCalcs.setUnits` and
-  `lib/Units.lib.php` (2026-07-28) — these are facts, not opinions:**
-  1. **`setUnits` walks the set in order and sets `option.selected = true` on every matching option,
-     so later entries silently overwrite earlier ones.** The `in` set is
-     `[in, ft/s, gpm, in², psi, inH₂O, ft³, kW]`; on any field offering both `psi` and `inH₂O` — which
-     is every head-loss field on `hw_`/`dw_`/`mphl_` — psi is selected first and then **inH₂O
-     overwrites it**. A waterline or fire-sprinkler engineer who clicks "in" gets head loss in *inches
-     of water*, which nobody quotes.
-  2. **The `in` preset maps every length field to inches, including pipe length.** A 1,000 ft main
-     renders as 12,000 in.
-  **Root cause:** unit sets are **one-dimensional** — one unit per quantity, matched by *translated
-  label text* across all selects — while real practice is **per-field**: diameter in inches, length in
-  feet, loss in psi. The present mechanism cannot express that, which is why this is a rebuild rather
-  than a re-ordering.
-  **Three architectures, with their translation cost — the choice gates everything else:**
-  - **(A)** Keep the four presets; only reorder each page's `units` arrays so the *initial* selection
-    is right. Cheapest, **zero new strings**, but the preset buttons stay wrong.
-  - **(B)** Keep the same four buttons, but let a page declare what "in"/"ft" mean *for its own
-    fields*. Fixes both defects suite-wide, still **zero new strings**.
-  - **(C)** New named presets ("US", "SI") with tips — **Tom's stated preference**. Needs new language
-    keys for the button labels and tips, so it must be batched into a translation sprint.
-  **Two facts that de-risk this:** (i) the `in` unit set already maps to in/gpm/psi/ft², so the US
-  vocabulary exists and needs no new unit definitions; (ii) **the cookie stores each select's option
-  *value* (the conversion factor), not its index** — so reordering a page's `units` arrays cannot
-  corrupt a returning user's saved settings. Default changes reach **first-time visitors only**, which
-  is exactly the population Task 144 is about.
-  **Open questions for Tom before any build:** (1) which architecture, A/B/C; (2) the canonical default
-  case per page — he offered to set these himself, and they are engineering judgment, not something to
-  invent; (3) scope — HW only, the top three by reach (MPF + HW + MTC = 92% of all human views), or
-  all 15 pages. **Do not build against reciprocity/completeness reasoning** — reach-weighting is why
-  Task 138 was cut down.
-  **Caution carried from Task 144:** Hazen-Williams is standard practice in Brazil and Mexico as well
-  as the US, so a metric Latin American segment may exist in the traffic. Pull the HW query export
-  before defaulting the whole suite to US.
+- 25|166| **Three UI-chrome keys need translating: `calc_defaults` (changed), `calc_units_us` and
+  `calc_units_si` (new).** Created 2026-07-28 out of Task 162/165 so the debt is visible rather than
+  buried in a closed block. `detect_english_drift.php` reports `calc_defaults` as **CHANGED** — its
+  English went "Default values" → "Restore defaults" (Tom's preference; it names what the control
+  does), so the 26 existing translations are **soft-stale**: still accurate about the button's
+  effect, but the noun form where English is now imperative. The other two are the US/SI preset
+  buttons, seeded as English.
+  **Now 11 keys** — Task 167 added eight more (`hw_elev_up`, `hw_pressure_up`, `hw_elev_down`,
+  `hw_pressure_down`, `hw_pressure_check`, `hw_pressure_ok_short`, `hw_pressure_neg_short`,
+  `hw_pressure_neg`), all seeded as English. 11 × 26 = 286 strings, which is now a defensible sprint
+  on its own if nothing else is queued.
+  **3 keys × 26 languages = 78 strings — too small to justify its own 26-agent sprint.** Batch it
+  into the next sprint that runs for any other reason. Until then the buttons read "US"/"SI"
+  (international abbreviations, harmless untranslated) and the defaults button reads correctly if
+  slightly less imperative in the other 26 languages.
+  **Do not run `detect_english_drift.php --update` before the resync lands** — that re-baselines the
+  manifest and would erase the only record that `calc_defaults` drifted.
+
+- 20|168| **Extend the Task 167 upstream-first rework to Darcy-Weisbach.** `Darcy-Weisbach.php`
+  still takes a single "Downstream EGL" and solves upstream, the form Task 167 replaced on
+  Hazen-Williams. Deliberately **not** done in the same pass: reach-weighting says HW (580 humans)
+  earns the change and DW (67 humans) has to earn it separately, and doing both at once would have
+  been the reciprocity reasoning that Task 138 was cut down for. **The eight language keys already
+  exist** (`hw_elev_up`, `hw_pressure_up`, `hw_elev_down`, `hw_pressure_down`, `hw_pressure_check`,
+  `hw_pressure_*_short`, `hw_pressure_neg`) and are borrowed under the concept-level label reuse
+  rule, so this costs **no new translation** — only the page and JS edits. Worth doing once HW's
+  version has been seen working.
+  **Manning Pipe Head Loss should NOT get this.** Storm drain and culvert design genuinely runs
+  downstream-to-upstream from a known tailwater, so its current form fits its audience. This is the
+  clearest case in the suite of two pages that look identical needing opposite treatment.
+
+- 12|169| **`mphl_note_1` now overstates its limitation on the Hazen-Williams page.** It opens
+  *"This calculator doesn't account for pipe elevation"*, which stopped being true for HW when Task
+  167 gave it upstream and downstream elevations. The note is **still fully true for
+  Manning-Pipe-Head-Loss**, and still partly true for HW — the *pipe profile between the two ends* is
+  not modelled, so the HGL can dip below the pipe mid-run even when both endpoints are fine. The key
+  is shared by both pages, so fixing it means either an HW-specific note (a new key, 26 translations)
+  or a rewording that stays true on both (no new key, but a CHANGED key and a resync). **Prefer the
+  rewording** — something that says the profile between the ends is not modelled, which is the real
+  limitation on both pages. Low priority: the note is misleading in emphasis, not wrong.
 
 - 15|144| **Diagnose the Hazen-Williams conversion leak.** Per the 2026-07-27 usage snapshot
   (`dev/usage-data-log.md`), HW draws 580 confirmed-human views — the suite's second-biggest genuine
@@ -149,6 +143,8 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   the forward direction. **It is not a complete explanation** — MI/MPHL/WFS/WFI convert at 51–59%
   with no solver — but it is the one structural difference between HW and the 67% page, and it was
   absent from the five hypotheses.
+  **Q3 (EGL-vs-HGL input) is now Task 167**, extracted 2026-07-28 — the "identical pages" filter that
+  dismissed it does not survive Tom's correction that the three pages have different audiences.
   **What to ask the query export, given the domain model.** Segment HW's queries for: (a) fire
   protection (`sprinkler`, `NFPA`, `fire flow`, `friction loss psi`) — a large US audience with rigid
   unit expectations; (b) unit words (`gpm`, `psi`, `inch`) — direct confirmation of Q5; (c) sizing
@@ -444,25 +440,21 @@ straight from `lib/lang.ec.sw.php`, i.e. an agent searching our own translated s
 
 ## Translation improvements
 
-- 25|161| **The payload delta can never reach zero — 15 keys are permanent false positives.**
-  Found while closing Task 159, 2026-07-28. `generate_translation_payloads.php` treats a key whose
-  translation is *byte-identical to English* as needing translation. For 15 keys that is permanently
-  wrong by design, not by neglect:
-  - **Symbols** (`dw_roughness`=e, `ip_length`=L, `ip_diameter`=D, `ip_roughness`=e, `ip_hf`, `ip_hm`,
-    `bpn_id`) — the `symbol` rule requires them identical in every language and script.
-  - **Eponyms** (`bpn_method_hw`, `bpn_method_dw`, `bpn_method_manning`) — surnames, never renamed.
-  - **Brands** (`install_android_heading`, `install_ios_heading`).
-  - **Coincidental cognates** (`dw_regime_laminar`, `or_shape_circular`, `or_shape_rectangular`) —
-    genuinely translated, but Spanish/Portuguese/others land on the same string.
-  **Why this matters more than it looks:** the delta count is the number a sprint proposal is
-  justified with, and "15 keys outstanding" reads as real debt to anyone who has not traced each key.
-  Task 159's sprint proposal had to hand-classify all 15 to avoid 26 agents "translating" the letter
-  `L`. The next session will re-derive that same classification from scratch unless this is fixed.
-  **Fix:** teach the generator an exclusion — either a `symbol`-tag lookup from `$ec_lang_intent`, or
-  an explicit exempt-key list, so `identical-to-english` on an exempt key is not counted as delta.
-  Then **delta zero means zero**, which is the only version of that number worth reading.
-  **Until then, treat 15 as the floor**, and read `detect_english_drift.php` (which has no such
-  blind spot) as the authoritative debt signal.
+- 8|163| **`lang_syntax_validate.php` cannot see double-quoted lang assignments.** Found while
+  closing Task 161, 2026-07-28 — incidental, not part of that task. `extractValues()` matches only
+  `$ec_lang['key']='...';` (single quotes). About 43 keys per file — ~1,160 strings suite-wide — are
+  written with double quotes and are therefore invisible to **every** check built on that helper,
+  including Rule A (`entity-in-lang-string`) and Rule B (`tag-in-plain-text-string`), the two rules
+  CLAUDE.md describes as absolute and tool-enforced. **The gap is currently benign and that is why
+  the priority is low, not because the hole is small:** all 43 double-quoted keys in
+  `lang.ec.en.php` are `u_` unit tokens (`u_psi`, `u_mh2o`, `u_kgfcm2`, …), and a grep for entities
+  inside double-quoted values across all 27 files returns **zero** hits. So nothing is hiding there
+  today. The risk is future: nothing stops the next edit from writing a real label with double
+  quotes (an apostrophe in the text is the obvious reason someone would), and it would then be
+  exempt from Rule A and Rule B **silently**. Fix is one regex — extend the pattern to the
+  double-quoted form, as `lang_parity_check.php`'s `parseLangAssignments()` already does — plus a
+  check that nothing new lights up. Note `parseLangAssignments()` in the parity checker is the
+  working reference implementation; the two helpers should probably converge.
 
 - 5|160| **`lib/lang.ec.tr.php` disagrees with itself on vowel harmony for the app name.**
   Extracted from Task 154 on close, 2026-07-28. Three keys write `EngCalcs'i`
@@ -483,6 +475,189 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|167|[CC] **Hazen-Williams reworked to solve downstream from the end the user knows — DONE
+  2026-07-28.** The page took a single input labelled **"Downstream EGL"** and computed upstream
+  (`egl2 = egl1 + h_L`), asking a waterline engineer for the one number they do not have. Tom:
+  *"Starting at the downstream is feeling to me like it will be unwelcome to new visitors."*
+  **What changed.** One input (`egl1`) became three — **Upstream elevation, Upstream pressure,
+  Downstream elevation** — and the headline result is now **Downstream pressure**, the residual the
+  visitor actually came for. EGL and HGL are still reported at both ends, reusing the existing
+  `hw_hgl_1/2` and `mphl_egl_1/2` labels rather than minting new ones. Defaults tell a small story on
+  arrival: 400 gpm through 1,000 ft of 6 in C-130 main, 60 psi at elevation 100 ft, rising 20 ft →
+  **45.2 psi residual** (SI: 25 L/s, 150 mm, 300 m, 40 m H₂O at 30 m rising to 36 m → 29.5 m H₂O).
+  **Separating elevation from pressure bought a real check, not just a nicer form.** A negative
+  downstream pressure means the hydraulic grade line has fallen below the pipe — it would not flow
+  full and the answer is invalid. The old single-EGL form could only warn about this in prose
+  (`mphl_note_1`); the page now **detects** it, using the standard ✓/⚠ verdict convention. Verified:
+  z_down 120 ft → 45.2 psi ✓; 200 ft → 10.5 psi ✓; 250 ft → −11.2 psi ⚠.
+  **Why this was worth building without waiting for the query export** (Task 144): "the page asks for
+  the wrong end" is defensible on engineering grounds alone. The export would only say whether it is
+  *the* cause of HW's 11% conversion. Note this is the same defect class as the missing inverse
+  solver — Manning Pipe Flow and Manning Trap are the only calculators that solve for what the user
+  wants, and the two highest converters. **No solver was added here** (Tom: *"we just need to fix the
+  presentation"*); the page now simply asks for what the visitor has.
+  **8 new language keys**, seeded as English in all 27 files — pending translation with the Task 166
+  batch. **Returning visitors are safe**: the input count went 6 → 8, and `cookieToForm`'s
+  slot-count guard bails to a fresh, correctly-initialised page rather than misapplying a stale
+  cookie — verified, not assumed.
+  **Extracted rather than left inside this block:** Darcy-Weisbach is **Task 168**, `mphl_note_1`'s
+  now-overstated warning is **Task 169**.
+
+- 0|165|[CC] **Default unit preset is chosen by language — DONE 2026-07-28.** English gets US
+  customary; every other language gets SI.
+  **How it arose, recorded because the process matters more than the outcome:** the "default to US"
+  decision was taken in a document titled *Hazen-Williams worked example*, in a section whose
+  reasoning was entirely HW-specific. CC implemented it as one global constant across all 13 pages
+  and reported it as settled **without flagging that it had generalised an HW-framed answer to the
+  whole suite**. Tom caught it by observing behaviour — *"I don't see that mpf defaults to SI when es
+  is the language; I see US"* — not by reading the diff. The lesson is narrow and worth keeping: when
+  a decision is taken inside a worked example, say explicitly how far you are about to apply it.
+  **Why language rather than global or per-page.** Measured per-language human reach is **en 83%,
+  es 10%, then a ≤1% tail**, and the English audience is dominated by US municipal and storm-drain
+  work quoted in inches, feet, cfs, gpm and psi — while essentially every other language in the suite
+  is spoken where SI is the working system. A single global default had to be wrong for one of those
+  two groups. Per-page was rejected because two pages in one session could then disagree.
+  **Known limitation, deliberately accepted:** "English" is not "United States" — a visitor in the
+  UK, Australia, India, Ireland, New Zealand, Nigeria or South Africa works in SI but reads English
+  and lands on US units. Fixing it means reading the region subtag (`en-GB` vs `en-US`) from
+  Accept-Language instead of the app's normalised two-letter code, and **one exception to the
+  two-letter code the entire language system is built on is worse than one imperfect default**. Those
+  visitors get a correct page, one click from right.
+  **This was free to do because Task 164 had already made every default preset-aware** — no number on
+  any page needed changing. Verified end to end: `?lang=en` opens Manning Pipe Flow at an 18 in pipe
+  in in/cfs/psi, `?lang=es|fr|sw|hi` at 450 mm in mm/m³s/mH₂O, every velocity check passes in both,
+  and the JS-seeded sample rows on Branched Network and Irrigation Pressure follow the language too.
+
+- 0|164|[CC] **Realistic defaults on every calculator, and per-preset default declarations —
+  DONE 2026-07-28.** Opened when Task 162 closed with faithful-but-ugly conversions (Manning Pipe
+  Flow opening at d₀ = 39.4 in); Tom asked for a best effort across all pages the same day, so it
+  closed the same day rather than waiting for his own pass.
+  **Two mechanism changes were needed before any number could be chosen.** (1) A default is
+  expressed in the *displayed* unit, so one number cannot serve both presets — under SI,
+  Hazen-Williams' `6` reads as 6 mm. Declarations now accept
+  `'default' => Array('us' => '6', 'si' => '150')`, resolved by `ecDefaultValue()`. **This decouples
+  every number from the choice of default preset**, so Task 165 can be decided either way without
+  reworking anything. (2) A `roughness` family split from `distance_small`, because US practice
+  quotes absolute roughness ε in **feet** (0.0005 ft commercial steel), not inches — the
+  split-on-different-defaults rule doing its job.
+  **45 defaults across 12 pages replaced with deliberate design cases**, e.g. Manning Pipe Flow at an
+  18 in concrete pipe (n 0.013) on 0.5% grade flowing half full → v = 4.2 ft/s, Q = 3.7 cfs; Manning
+  Trap at a 4 ft-bottom 2:1 earthen canal → v = 2.17 ft/s, Fr 0.33; Orifice Drain Time at a 39.6-hour
+  pond drawdown. **Every velocity check passes on arrival in both presets** — verified by running
+  each page's real `pageCalculator` against its own rendered HTML through a stub DOM, not by
+  inspection.
+  **Three defects exposed by actually running the pages, all fixed:**
+  1. **Orifice Drain Time has always opened on an invalid case** — its guard needs the ending water
+     level above the orifice *top* (`h2 >= d/2`) and the page shipped `h2_elev = 0` with the centroid
+     also at 0, so it rendered **zeros and a NaN** on arrival. **This predates Task 162** and is a
+     plausible cause of its 0% used-of-human. Now opens on a real drawdown.
+  2. **`rc_crest_radius` sat in `distance_small`**, rendering an 8 m crest radius as **317 inches**.
+     Moved to `distance_medium`.
+  3. **The JS-seeded sample rows on Branched Network and Irrigation Pressure were hard-coded metric**
+     and would have been read in US units — Branched Network's sample main became a **100-inch
+     pipe**. Both now carry one seed set per preset via a new `EngCalcs.defaultUnitSet`.
+  **Judgment calls open to reversal:** Manning Trap side slopes 4:1 → 2:1 and n 0.03 → 0.025 (at 0.03
+  the page opened on a *failing* velocity check); Manning Pipe Flow and Manning Pipe Head Loss
+  n 0.01 → 0.013, matching their storm-drain audience. Full table: `dev/unit-families.md`.
+
+- 0|162|[CC] **Unit presets rebuilt on named unit families — DONE 2026-07-28.** Replaces the
+  three-architecture (A/B/C) framing the task carried; the built design is Tom's array-splitting
+  instinct taken to its logical end, and it is neither A, B nor C as originally sketched.
+  **The mechanism.** `'units' => Array('m','mm','ft','in')` became `'units' => 'distance_small'` — a
+  **named family** defined once in `lib/Units.lib.php`, carrying both the option list and the
+  identity a preset keys on. Presets are `family → unit` maps. **No new field key was needed**: the
+  existing `units` key just takes a name instead of an array, which is why the `role` attribute
+  proposed in review was dropped.
+  **Why named families rather than simply splitting the arrays** (Tom's first proposal, and the
+  better instinct): splitting works where the split lists are disjoint in the units a preset names —
+  diameter `[mm, in]` vs length `[m, ft]`. It fails on the head family, where line pressure, EGL/HGL
+  and losses all legitimately want the same units offered. Naming the family lets several families
+  share one option list, which is exactly what content-splitting cannot express.
+  **The rule that came out of it, worth keeping:** *split a family when two fields want different
+  defaults, not when they want different options.* `distance_small` and `distance_large` offer the
+  identical four units and exist purely to carry different defaults — merging them would re-create
+  the 12,000-inch defect, because one family can only name one default.
+  **Both original defects are structurally gone, not merely patched.** Per-family lookup fixes the
+  overwrite (each select is assigned the one unit its family names, so nothing can overwrite
+  anything); named families fix the length granularity. A third hazard was removed on the way: the
+  old matcher compared against **translated label text**, so a translator editing `u_psi` silently
+  broke the preset buttons in that language. Matching now uses a `data-unit` attribute.
+  **Scope: 25 families, 174 field declarations + 32 row-table selects across 13 pages, zero inline
+  unit arrays left.** Verified rather than assumed — option lists diffed field-by-field against git
+  HEAD (154 unchanged, 20 changed and all 20 intended), every rendered select on every page carries a
+  family and a marked default, and both presets were simulated against the rendered HTML to confirm
+  **exactly one selection per select on all 13 pages**.
+  **Two defects found during the work, both fixed:** the 32 repeating-row selects (Manning
+  Irregular's points, Branched Network's nodes, Irrigation Pressure's laterals) call
+  `echoUnitSelect()` directly and would have **ignored the preset buttons entirely**, leaving table
+  columns in metric; and a stored cookie holding a unit that no longer exists left `selectedIndex` at
+  −1 and silently broke every calculation on the page, so `js/Cookies.lib.js` now falls back to the
+  server-rendered default (a guard worth having independent of this task).
+  **Defaults were converted, not relabelled.** A page's `default` number is expressed in the
+  displayed unit, so switching the initial preset to US changed what all 49 affected defaults *mean*
+  — Hazen-Williams would have opened at 1 gpm through a 1-inch pipe. Each was converted to preserve
+  its physical value, then rounded to 3 significant figures. **Hazen-Williams additionally got Tom's
+  numbers** (6 in, 400 gpm, 1,000 ft, C = 130), verified numerically: v = 4.54 ft/s, inside the
+  velocity check band, and h_f = 13.59 ft H₂O ≈ 5.9 psi, cross-checked to within 1.7% against the
+  independent US-customary Hazen-Williams form. **The other 12 pages' defaults are faithful but
+  unpolished — extracted as Task 164**, since rounding them is engineering judgment Tom offered to
+  do himself.
+  **Buttons: four (m/mm/ft/in) became two (US/SI), shipped in the same change rather than deferred.**
+  Phase 1 would have made the old labels lie *worse* than before — "in" would set diameter to inches,
+  length to feet and loss to psi — so relabelling was a correctness requirement, not phase-2 polish.
+  `calc_units_us` and `calc_units_si` were seeded as English in all 27 files (+52 payload delta) for
+  the next sprint. Tips were dropped as unnecessary; four Large/Small buttons were rejected because
+  the size axis is now carried by which family each page names.
+  **US is the default preset for first-time visitors** (Tom's call, overriding the Task 144 caution
+  about a possible metric Latin American segment). Cheap to revisit: it is one constant,
+  `EC_DEFAULT_UNIT_SET` in `lib/Units.lib.php`, and returning visitors are unaffected because the
+  cookie stores each select's option *value*.
+  Full design record, per-field rationale and the conversion table: `dev/unit-families.md`.
+
+- 0|161|[CC] **Payload-delta false positives eliminated — DONE 2026-07-28.** The delta could never
+  reach zero because `generate_translation_payloads.php` counted any key byte-identical to English
+  as untranslated, which is permanently wrong for 15 keys: **symbols** (`dw_roughness`,
+  `ip_length`, `ip_diameter`, `ip_roughness`, `ip_hf`, `ip_hm`, `bpn_id`), **eponyms**
+  (`bpn_method_hw`, `bpn_method_dw`, `bpn_method_manning`), **brands** (`install_android_heading`,
+  `install_ios_heading`), and **coincidental cognates** (`dw_regime_laminar`, `or_shape_circular`,
+  `or_shape_rectangular`).
+  **Result: the suite-wide delta fell from 341 to 68, and six languages (bg, es, ru, tr, uk, zh) now
+  read exactly zero for the first time.** That zero is now worth reading.
+  **What was built:**
+  - `dev/scripts/translation_exempt_keys.json` — the classification, one entry per key with a
+    category and a written reason, so no future session re-derives it by hand.
+  - `dev/scripts/exempt_keys.inc.php` — shared loader (`ecLoadExemptMap`,
+    `ecIsExemptFromEnglishEquality`, `ecIsUniversalKey`).
+  **Two design decisions worth keeping:**
+  1. **The `$ec_lang_intent` `symbol` tag was rejected as the exemption source** — the task offered
+     it as one of two options and it does not work. `symbol` means *"keep the symbols inside this
+     string intact"*, not *"this whole string is a symbol"*: `ip_notes_1_def`, `ip_notes_2_def` and
+     `wi_notes_we_def` carry the tag and are full prose that must be translated. Only 2 of the 7
+     symbol-only keys (`ip_hf`, `ip_hm`) even carry it. An explicit list is the honest mechanism.
+     Recorded so the idea is not re-proposed as an obvious improvement later.
+  2. **Cognates are exempted per-language, not globally.** `dw_regime_laminar` is exempt only for
+     de/es/id/pt/ro; `or_shape_circular` only for es/pt; `or_shape_rectangular` only for es. A global
+     exemption would have hidden a genuinely untranslated "Circular" in an unrelated script. A
+     language added later is reported until someone confirms the cognate holds — which is the
+     correct default.
+  **Exemption never suppresses a missing or blank value** — verified empirically, not by reading the
+  code: blanking `bpn_id` in `lang.ec.zh.php` reported `reason=blank`, deleting it reported
+  `reason=missing`, and the file was restored clean. The `--check` freshness gate was extended to
+  treat the exempt list as an input and was confirmed to print STALE when it post-dates the payloads.
+  **Scope note — three sibling scripts were fixed too, beyond the task's literal wording.** The task
+  named only the generator, but `lang_parity_check.php`, `translation_completion_matrix.php` and
+  `lang_syntax_validate.php` each recomputed the same "untranslated" number independently and would
+  have kept contradicting it. All four now share `exempt_keys.inc.php`, and the first three report
+  **identical per-language counts**. Doing this also required moving the generator's `u_`/`mi_`
+  universal-key heuristic into the shared include: the parity checker had never had it, so its
+  headline `equal_to_english` was **1237** against the generator's 68 — the same "which number do I
+  trust" defect this task exists to remove. Parity now reports 68 with 1468 separately labelled
+  `exempt_identical`, and `--strict` becomes usable for the first time.
+  `lang_syntax_validate.php`'s `identical-to-english` warnings fell 181 → 60 (it stays lower than 68
+  by its own documented ≥4-letter-word filter, plus it does not entity-normalize before comparing).
+  **Follow-up logged as Task 163** (validator blind to double-quoted assignments), found incidentally
+  during this work.
 
 - 0|159|[CC] **Translation debt resync sprint — 26 languages, DONE 2026-07-28.** Authorized by Tom
   in-session. Created earlier the same day when Tom asked whether translation debt was tracked
