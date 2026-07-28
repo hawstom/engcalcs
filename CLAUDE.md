@@ -285,6 +285,27 @@ $ec_lang_intent['mi_is_bank']='Boundary (divider, edge, break, or bank as in HEC
 
 The 26 non-English languages: am, ar, bg, bn, cs, de, es, fa, fr, he, hi, hr, id, it, km, my, ps, pt, ro, ru, sr, sw, tr, uk, ur, zh.
 
+### Rule A: never write an HTML entity in a language string (ROADMAP Task 140, enforced 2026-07-27)
+
+Use the literal UTF-8 character — `—` not `&mdash;`, `×` not `&times;`, `≈` not `&asymp;`, `²` not
+`&sup2;`, `ν` not `&nu;`, `&` not `&amp;`, `<`/`>` not `&lt;`/`&gt;`, `“ ”` not `&quot;`. This holds
+for **every key in every one of the 27 lang files, with no exceptions** — page labels, tips, notes,
+and document keys alike.
+
+**Why absolute rather than scoped:** whether an entity survives depends on the PHP/JS call site that
+consumes the string, which is invisible from the string itself. Of the suite's three attribute paths,
+two escape `&` first (`htmlspecialchars(strip_tags())` in page PHP, `escapeAttr` in
+`js/Calculators.lib.js`), turning `&asymp;` into a literal `&asymp;` on screen. A literal character is
+correct on all three paths, so there is no case to reason about. The previous check failed *precisely
+by scoping itself* to attribute-bound keys.
+
+`php dev/scripts/lang_syntax_validate.php` enforces this (`entity-in-lang-string`) and names the
+literal replacement in its error text. Trust the tool — don't add more rules on top of it.
+
+Two things this rule does **not** cover: hardcoded entities in `lib/HeadersFooters.lib.php` and
+per-page SEO meta tags (not language strings), and the plain-text-attribute tag rules (Rules B and C),
+which are Task 140 steps 2-4 and not yet built.
+
 ## Translation Sprints
 
 This section is the authoritative home for sprint **mechanics**. The *sequencing* of sprints (when to run which, in what order — the three scenarios and THE SEQUENCING RULE) lives in `dev/translation-process.md`; the dated blow-by-blow history is in `dev/translation-execution-log.md`.

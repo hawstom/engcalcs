@@ -38,14 +38,23 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   2026-07-27); a confirmed finding here promotes it. Weigh this against the mundane usability causes above before
   committing; a scope explanation is more flattering to the suite than a defect explanation, which is
   precisely why it deserves evidence and not assumption.
-- 40|139| **Fix Points-data copy/paste on Irrigation-Pressure (`ip_`).** The copy/paste data area is
-  non-functional on `ip` (Tom, 2026-07-23). The shared engine (`dataSingletonsCount` /
-  `dataColumnsFirstRowCount` / `dataColumnsOtherRowsCount` in the page JS, driving
-  `cookieValueToDataString`/`dataStringToCookieValue` in `Cookies.lib.js`) works on Manning-Irregular
-  and the new Branched-Network (Task 137) — `ip` likely just has wrong column/singleton counts or a
-  layout drift. Diagnose with a Node harness that evals `Cookies.lib.js` (note: its top-level
-  `var EngCalcs = EngCalcs || {}` shadows the global under `eval`, so append `global.EngCalcs=EngCalcs;`)
-  and round-trips a representative cookie, as was done for `bpn_`.
+- 30|147| **Finish the sw `kichwa` → `kimo` head-term conversion — 16 keys still carry the rejected
+  term.** Found 2026-07-27 while closing Task 141. The 2026-07-22 decision (glossary `head`
+  `translation_notes`, Tom + Kenya-engineer input) established that Swahili `kichwa` (the body-part
+  word) is NOT the engineering term for hydraulic head and that `kimo` is — but the pass that applied
+  it only converted the keys it explicitly listed (`mhp_gross_head`, `mhp_hl_check`,
+  `mhp_notes_3_def`, `rc_notes_7_def`, `odt_notes_1_def`, `or_head`, `ws_headWaterHeight`).
+  `lib/lang.ec.sw.php` is now split almost exactly in half: **15 keys use `kimo`, 16 still use
+  `kichwa`** — the same concept rendered two ways in one file. The stragglers are
+  `dw_main_menu`/`_title`/`_desc`, `hw_main_menu`/`_title`/`_desc`,
+  `mphl_main_menu`/`_title`/`_desc`, `mhp_hnet`, `mhp_notes_1_term`, `mhp_notes_1_def`,
+  `mhp_notes_3_term`, `odt_h1`, `rc_Hp`, and `ip_max_head`. Note that nine of them are the
+  **calculator identity strings for all three head-loss calculators** (menu entry + `<title>`), so
+  this is what a Swahili speaker sees first, and `ip_max_head` is the Task 137 sprint following the
+  wrong incumbent. Per the glossary: head loss = `upotevu wa kimo`, net head = `kimo halisi cha
+  maji`. **Do NOT touch `template_printable_title`/`_subtitle`** — there `Kichwa` correctly means
+  "title/heading" and is not the hydraulic sense. Mechanical per-key edit against the glossary, not a
+  sprint; write the completion back to the glossary `head` entry per the write-back rule.
 - 18|146| **Looped-network (Hardy Cross) solving — was Task 137 "Phase 3", extracted 2026-07-27.**
   Extend `bpn_` (or build alongside it) to solve networks with loops, iterating to convergence —
   the case the shipped branched calculator explicitly excludes ("no loops, no iteration"). Kept
@@ -232,20 +241,6 @@ The rules, sequence, and QA chain for translation work are **not** restated here
 - **`CLAUDE.md` § "Translation Sprints"** — sprint mechanics, model policy, pre/post-sprint checklist.
 - **`dev/translation-execution-log.md`** — the full dated, category-by-category execution record.
 
-- 20|141| **Check whether `Kichwa` (sw) and `الرأس` (ar) are really the hydraulic-head term.**
-  Narrow follow-up from the Task 137 sprint, 2026-07-27. **Scope corrected the same day (Tom): an
-  earlier version of this entry claimed a 7-of-26 head-term inconsistency by comparing each language's
-  `ip_max_head` (pipe pressure head) against `ws_headWaterHeight` (weir head). That baseline was
-  wrong — those are different quantities and SHOULD differ; weir head is the depth over the crest, so
-  he `עומק`, de `Überfallhöhe`, cs `Přepadová výška` are all correct. That finding is withdrawn; the
-  head terminology was already settled and stays settled.**
-  What remains is one small question, not a defect list: Swahili uses `Kichwa` — the ordinary word for
-  the body part — as the hydraulic-head term in the `dw_`/`mhp_` strings, and the sprint's new
-  `ip_max_head` followed that incumbent for consistency. Arabic's `ws_headWaterHeight` uses `الرأس`
-  the same way. In many languages the body-part word IS the standard hydraulic term (English "head"
-  is itself exactly this), so this may be entirely correct. Worth one native or high-confidence check
-  for those two languages only — **do not bulk-rewrite, and do not re-open the other 24.**
-
 - 25|142| **`ip_max_head`'s label and its own tip name two different quantities.** Split out of Task
   137 on close, 2026-07-27 (Tom's rule: a loose end left inside a closed task is a lost loose end —
   either it gets its own task or the parent does not close). The label reads "Max. allow. pipe
@@ -261,8 +256,41 @@ The rules, sequence, and QA chain for translation work are **not** restated here
   reason it needs deciding rather than doing.
 
 - 60|140| **[H] Get HTML out of language strings where it cannot work, and enforce it mechanically.**
-  Design agreed with Tom 2026-07-24; **not started, nothing touched yet.** Written up for future
-  review because the session ran low on context — read this whole block before acting.
+  Design agreed with Tom 2026-07-24. **STEP 1 IS DONE (2026-07-27); steps 2-4 remain — re-judge them
+  against what step 1 actually left behind, per Tom's "ship it and see" instruction.**
+
+  **Step 1 result, 2026-07-27 (Tom authorized proceeding).** All **1204 entity occurrences across all
+  27 `lib/lang.ec.*.php` files** converted to literal UTF-8; **zero entities remain** in any language
+  string, and all 27 files are `php -l` clean. Rule A is now enforced hard: the validator's
+  `detectAttributeEntities()` was replaced by `detectEntities()`, which flags *any* entity in *any*
+  language string (no attribute-key scoping — the scoping is what made the old check miss things) and
+  names the literal replacement in the error text. `lang_syntax_validate.php` is clean of every
+  structural category; the 180 remaining findings are all pre-existing advisory
+  `identical-to-english` warnings.
+  - **`$ec_lang_intent` was never touched** — checked first, and it contained no entities at all, so
+    step 1 needed no permission against the off-limits rule.
+  - **The four HTML-syntax escapes needed judgment, not blind conversion,** and the roadmap's
+    "~12 distinct characters" forecast did not cover them. `&lt;`/`&gt;`/`&amp;` turned out to be
+    **always followed by a space** in all 27 files (verified before converting, not assumed), so the
+    literal `<`/`>`/`&` is unambiguous to the HTML parser — no fake tags, no ambiguous ampersand.
+    `&gt;&gt;`/`&lt;&lt;` in `template_welcome` became `»`/`«`. The 41 `&quot;` are all one key
+    (`rc_apron_length`, the Robinson quotation) and became curly `“ ”`, which is both typographically
+    right and safe inside the `title="…"` they live in — a literal `"` there would have terminated
+    the attribute. One genuine edge case: `sr` had already used its native opening `„` and escaped
+    only the closer, and `“` *is* the correct Serbian closing quote, so it landed right.
+  - **Confirmed the fix on the paths that were actually broken**, not just the file contents: the
+    menu `title=` path (`Menus.lib.php`, `ENT_QUOTES`) now renders `Pond, Basin, or Tank Drain Time —
+    …` instead of a doubled `&mdash;`. Conversely `ip_main_title`'s literal `&` now arrives in a meta
+    attribute as a correctly single-escaped `&amp;` — which is the whole point of the rule.
+  - Entities still present in *rendered* output (`&copy;`, `&ndash;`, `&iacute;`) are hardcoded in
+    `lib/HeadersFooters.lib.php` and per-page SEO meta tags, **not** language strings — out of Rule
+    A's scope by design. Worth a decision later whether Rule A should grow to cover them.
+  - **Prediction to check against:** the honest forecast below says Rule A "should close permanently."
+    Step 1 cost far less than the block implies — the risk was concentrated entirely in the ~150
+    syntax escapes, not the ~1050 typographic ones. Step 2 (lifting the 33 embedded tooltips) is the
+    load-bearing step and is still untouched.
+
+  Original design notes follow — read the whole block before acting on steps 2-4.
   **Start with step 1 alone — a plain entity-cleanup pass (Tom, 2026-07-27).** The evidence now says
   this is a historical mess, not an ongoing discipline failure, so do the cheap mechanical fix first
   and re-judge the rest afterward. Full reasoning under "Do step 1 first" below.
@@ -400,6 +428,53 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|139|[CC] **Points-data copy/paste on Irrigation-Pressure (`ip_`) — DONE 2026-07-27.** Diagnosed
+  and fixed the same day Tom asked. Root cause was exactly the "wrong singleton count" the task
+  predicted, off by one: `js/irrigation-pressure.js` declared `dataSingletonsCount = 14` while the
+  form renders **15** INPUT elements above the reach table — `h_max_allow` was added later without
+  bumping the count (its comment still read "the 12 form inputs"). Effect: Copy emitted a grid
+  shifted one cell left (leading with `40`, h_max_allow's own value, and dropping the last row's
+  `elev_ds`), and Paste wrote that shift straight back into the form. Reproduced and verified with
+  the Node harness the task specified (eval `Cookies.lib.js` + `global.EngCalcs=EngCalcs;`), driving
+  a cookie built in real `form.elements` order: at 14 the round-trip fails, at 15 it is byte-identical.
+  **Second, unasked-for find — `bpn_` had the same defect, worse.** A generic check (render each page,
+  count INPUTs before `id="CalcsBody"`, compare to the declared constant) cleared Manning-Irregular
+  and Weir-Flow-Irregular but flagged Branched-Network at **declared 9 vs actual 11** — `h_max_allow`
+  *and* `demand_mult` were both added after the count was written, and a stale 5-singleton comment
+  from an earlier layout was still sitting above the live one. Fixed to 11 and verified by the same
+  round-trip. So the Task 137 note that bpn's copy/paste "works" was true when written and had since
+  rotted. Both comments now state the invariant (count INPUTs only — unit SELECTs are `s:` slots and
+  never reach the input counter) and warn that adding a singleton input means bumping the number.
+  **Worth keeping:** this bug is silent and recurs every time a field is added above a row table.
+  The render-and-count check is three lines of throwaway script; a permanent version belongs in
+  `dev/scripts/` if it bites a third time.
+
+- 0|141| **Check whether `Kichwa` (sw) and `الرأس` (ar) are really the hydraulic-head term — CLOSED
+  2026-07-27 as already answered.** Tom, 2026-07-27: "I believe it's stale. We already determined
+  that the answer is 'No'." Confirmed against the record — the determination predates the task by
+  five days. The sw half was settled **2026-07-22** (glossary `head` `translation_notes`, Tom +
+  Kenya-engineer input): `kichwa` is the body-part word and NOT the Swahili engineering term for
+  hydraulic head; `kimo` is, anchored by `kimo cha kasi` already being the accepted term for velocity
+  head. The ar half is settled by the **Task 128 resolution (2026-07-21)**: the blanket
+  `avoid: anatomical "head"` guard was itself the mistake, and an anatomically-derived word that IS
+  the dominant local standard is explicitly correct (English "head" is itself the body-part word) —
+  so `الرأس` needs no change under defer-to-cultural-standard. No native check is owed on either.
+  **Closing this surfaced real unfinished work, extracted to Task 147:** the 2026-07-22 sw decision
+  was only applied to the seven keys it named, leaving 16 keys still on `kichwa` against 15 on
+  `kimo`. The question is closed; the cleanup is not.
+  **Original text follows.** **Scope corrected 2026-07-27 (Tom): an
+  earlier version of this entry claimed a 7-of-26 head-term inconsistency by comparing each language's
+  `ip_max_head` (pipe pressure head) against `ws_headWaterHeight` (weir head). That baseline was
+  wrong — those are different quantities and SHOULD differ; weir head is the depth over the crest, so
+  he `עומק`, de `Überfallhöhe`, cs `Přepadová výška` are all correct. That finding is withdrawn; the
+  head terminology was already settled and stays settled.**
+  What remains is one small question, not a defect list: Swahili uses `Kichwa` — the ordinary word for
+  the body part — as the hydraulic-head term in the `dw_`/`mhp_` strings, and the sprint's new
+  `ip_max_head` followed that incumbent for consistency. Arabic's `ws_headWaterHeight` uses `الرأس`
+  the same way. In many languages the body-part word IS the standard hydraulic term (English "head"
+  is itself exactly this), so this may be entirely correct. Worth one native or high-confidence check
+  for those two languages only — **do not bulk-rewrite, and do not re-open the other 24.**
 
 - 0|143|[CC] **Move the solver control into the depth label on `mtc_` and `mpf_` — DONE 2026-07-27.**
   Requested by Tom 2026-07-27 and built the same day (commit `b3fd396`). The "solve for depth given
