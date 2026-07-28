@@ -5,6 +5,11 @@
  * Writes per-language JSON payloads containing only missing/untranslated keys,
  * plus neighboring translated context for tone/register consistency.
  *
+ * Keys listed in translation_exempt_keys.json are allowed to be byte-identical to
+ * English (symbols, eponyms, brands, cognates) and are not counted as delta, so a
+ * delta of zero means zero -- ROADMAP Task 161. They are still reported when
+ * missing or blank, and are echoed back in payload['meta']['exempt_keys'].
+ *
  * Optional sibling map support in lib/lang.ec.en.php:
  *   $ec_lang_intent['some_key'] = 'Expanded semantic intent for translators';
  * When present and different from the base English value, intent is emitted to
@@ -26,6 +31,8 @@ const TARGET_LANGS = [
     'ps', 'pt', 'ro', 'ru', 'sr', 'sw', 'tr', 'uk', 'ur', 'zh',
 ];
 
+require_once __DIR__ . '/exempt_keys.inc.php';
+
 main($argv);
 
 function main(array $argv): void
@@ -37,6 +44,9 @@ function main(array $argv): void
     }
     if (!file_exists(GLOSSARY_PATH)) {
         fail('Glossary file not found: ' . GLOSSARY_PATH);
+    }
+    if (!file_exists(EC_EXEMPT_KEYS_PATH)) {
+        fail('Exempt-key file not found: ' . EC_EXEMPT_KEYS_PATH);
     }
 
     if ($opts['check']) {
@@ -58,6 +68,7 @@ function main(array $argv): void
         fail('Invalid glossary JSON structure in: ' . GLOSSARY_PATH);
     }
 
+    $exemptMap = ecLoadExemptMap();
     $termIndex = termIndexByName($glossaryData['terms']);
     $prefixMap = prefixToTermNames();
 
@@ -86,6 +97,7 @@ function main(array $argv): void
 
     $langs = resolveTargetLanguages($opts['languages']);
     $generatedCount = 0;
+    $exemptTotal = 0;
 
     foreach ($langs as $lang) {
         $targetFile = DEFAULT_LANG_DIR . "/lang.ec.{$lang}.php";
@@ -95,8 +107,10 @@ function main(array $argv): void
         }
 
         $current = loadLangArray($targetFile);
-        [$deltaKeys, $keyContext] = collectDeltaAndContext($enKeys, $current, $activePrefixes);
+        [$deltaKeys, $keyContext, $exemptKeys] =
+            collectDeltaAndContext($enKeys, $current, $activePrefixes, $lang, $exemptMap);
         $keyIntent = collectKeyIntent($deltaKeys, $enKeys, $enIntent);
+        $exemptTotal += count($exemptKeys);
 
         $prefixesInDelta = detectPrefixes($deltaKeys);
         $prefixGlossary = buildPrefixGlossary($prefixesInDelta, $termIndex, $prefixMap);
@@ -121,6 +135,11 @@ function main(array $argv): void
                 'language' => $lang,
                 'expected_key_count' => count($enKeys),
                 'delta_key_count' => count($deltaKeys),
+                // Keys that equal English legitimately (symbols, eponyms, brands, cognates) and were
+                // therefore NOT counted as delta. Listed so the suppression is visible and auditable
+                // rather than silent. See translation_exempt_keys.json (ROADMAP Task 161).
+                'exempt_key_count' => count($exemptKeys),
+                'exempt_keys' => $exemptKeys,
                 'active_prefixes' => $prefixesInDelta,
                 'requested_prefix' => $opts['requested_prefix'],
                 'notes' => 'Translate only keys in keys_to_translate; preserve HTML, units, and symbols.',
@@ -146,6 +165,7 @@ function main(array $argv): void
 
     echo "Generated {$generatedCount} payload files in: {$opts['output_dir']}\n";
     echo 'Active prefixes: ' . implode(', ', $activePrefixes) . "\n";
+    echo "Exempt (correctly identical to English, not counted as delta): {$exemptTotal} across all languages.\n";
 }
 
 function parseArgs(array $argv): array
@@ -206,13 +226,14 @@ function printHelpAndExit(): void
 /**
  * Freshness gate for sprint launchers. A payload is stale if it is older than any
  * of its inputs: the English source, that language's lang file, the glossary, or
- * this generator itself. Prints a FRESH/STALE verdict and returns a shell exit
+ * this generator itself, or the exempt-key list (which changes what counts as delta).
+ * Prints a FRESH/STALE verdict and returns a shell exit
  * code (0 = fresh, 1 = stale/missing) so a sprint cannot launch on an old delta
  * without a human ever having to remember to regenerate.
  */
 function runFreshnessCheck(array $opts): int
 {
-    $commonInputs = [EN_FILE, GLOSSARY_PATH, __FILE__];
+    $commonInputs = [EN_FILE, GLOSSARY_PATH, EC_EXEMPT_KEYS_PATH, __DIR__ . '/exempt_keys.inc.php', __FILE__];
     $commonNewest = 0;
     foreach ($commonInputs as $f) {
         $commonNewest = max($commonNewest, (int) @filemtime($f));
@@ -383,34 +404,19 @@ function detectPrefixes(array $keys): array
 }
 
 /**
- * Returns true when a key's English value is inherently universal (unit symbols,
- * single-letter variable names) and should never be flagged as equal_to_english.
- *
- * u_ prefix rule: no consecutive letter run ≥ 4 chars.
- *   Passes: "ft", "cfs", "kWh/yr", "ft H2O", "sec", "gpm" (all ≤ 3 alpha chars).
- *   Fails: "fraction" (8), "rise/run" (rise=4) — correctly sent for translation.
- *
- * mi_ prefix rule: 1–2 alphanumeric chars after stripping HTML tags.
- *   Passes: 'Q', 'Fr', 'P<sub>w</sub>'→"Pw", 'R<sub>h</sub>'→"Rh", 'H<sub>v</sub>'→"Hv".
- *   Fails: 'Sta' (3), 'Elev' (4), compound strings with real words.
+ * Returns [delta, context, exemptKeys]. exemptKeys lists the keys that equalled
+ * English but were legitimately exempt, so the suppression stays visible.
  */
-function isUniversalKey(string $key, string $englishValue): bool
-{
-    $prefix = keyPrefix($key);
-    if ($prefix === 'u') {
-        return !preg_match('/[a-zA-Z]{4}/', $englishValue);
-    }
-    if ($prefix === 'mi') {
-        $stripped = preg_replace('/<[^>]+>/', '', $englishValue);
-        return (bool) preg_match('/^[a-zA-Z0-9]{1,2}$/', $stripped);
-    }
-    return false;
-}
-
-function collectDeltaAndContext(array $enKeys, array $current, array $activePrefixes): array
-{
+function collectDeltaAndContext(
+    array $enKeys,
+    array $current,
+    array $activePrefixes,
+    string $lang,
+    array $exemptMap
+): array {
     $delta = [];
     $context = [];
+    $exemptKeys = [];
     $orderedKeys = array_keys($enKeys);
 
     for ($i = 0; $i < count($orderedKeys); $i++) {
@@ -429,7 +435,9 @@ function collectDeltaAndContext(array $enKeys, array $current, array $activePref
         } elseif ($currentValue === '') {
             $reason = 'blank';
         } elseif (normalizeForCompare($currentValue) === normalizeForCompare($english)) {
-            if (!isUniversalKey($key, $english)) {
+            if (ecIsExemptFromEnglishEquality($key, $lang, $exemptMap)) {
+                $exemptKeys[] = $key;
+            } elseif (!ecIsUniversalKey($key, $english)) {
                 $reason = 'equal_to_english';
             }
         }
@@ -449,7 +457,7 @@ function collectDeltaAndContext(array $enKeys, array $current, array $activePref
         ];
     }
 
-    return [$delta, $context];
+    return [$delta, $context, $exemptKeys];
 }
 
 function findNeighbor(array $orderedKeys, array $enKeys, array $current, int $startIndex, int $direction): ?array

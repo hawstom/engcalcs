@@ -10,7 +10,8 @@
  * - JSON-escape leakage: literal \/ or \" inside values (renders as garbage HTML)
  * - <sub>/<span>/<sup> tag-count imbalance within a value
  * - foreign-script characters (Hangul/Kana) that indicate model contamination
- * - values byte-identical to the English source (untranslated content)
+ * - values byte-identical to the English source (untranslated content), skipping keys
+ *   that are correctly identical per exempt_keys.inc.php (ROADMAP Task 161)
  * - Rule A: HTML entities in ANY language string (they double-escape on two of the three
  *   attribute paths and show literally on screen)
  * - Rule B: HTML tags in a plain-text-constrained string -- one bound to a plain-text
@@ -39,6 +40,8 @@ const DEFAULT_LANG_DIR = __DIR__ . '/../../lib';
  */
 const PLAIN_TEXT_ATTRS = 'title|placeholder|value|alt|aria-label|data-[a-z-]+';
 
+require_once __DIR__ . '/exempt_keys.inc.php';
+
 main($argv);
 
 function main(array $argv): void
@@ -57,6 +60,9 @@ function main(array $argv): void
     // absolute and needs no scoping; Rule B does, and this derivation -- not a hand-list and
     // not the key's name -- is what enforces it. A name is a claim; the code is the fact.
     $plainKeys = plainTextBoundKeys();
+    // Keys allowed to be byte-identical to English (ROADMAP Task 161); shared with the
+    // payload generator, parity checker, and completion matrix so all four agree.
+    $exemptMap = ecLoadExemptMap();
 
     foreach ($files as $file) {
         if (!preg_match('/lang\.ec\.([a-z]{2})\.php$/', $file, $m)) {
@@ -84,7 +90,7 @@ function main(array $argv): void
             $issues = array_merge($issues, detectNameDerivationMismatch($file, $content, $plainKeys));
         }
         if ($lang !== 'en') {
-            $issues = array_merge($issues, detectUntranslatedValues($file, $content, $enValues));
+            $issues = array_merge($issues, detectUntranslatedValues($file, $content, $enValues, $lang, $exemptMap));
         }
     }
 
@@ -579,13 +585,21 @@ function detectEntities(string $file, string $content): array
     return $issues;
 }
 
-/** Value byte-identical to English where English contains a real word (>=4 letters). Warning-grade. */
-function detectUntranslatedValues(string $file, string $content, array $enValues): array
+/**
+ * Value byte-identical to English where English contains a real word (>=4 letters).
+ * Warning-grade. Keys that are correctly identical -- symbols, eponyms, brands, and
+ * per-language cognates -- are skipped via the shared exempt list, so this warning
+ * agrees with the payload generator's delta instead of contradicting it.
+ */
+function detectUntranslatedValues(string $file, string $content, array $enValues, string $lang, array $exemptMap): array
 {
     $issues = [];
     foreach (extractValues($content) as $key => $value) {
         $en = $enValues[$key] ?? null;
         if ($en === null || $value !== $en) {
+            continue;
+        }
+        if (ecIsExemptFromEnglishEquality($key, $lang, $exemptMap) || ecIsUniversalKey($key, (string)$en)) {
             continue;
         }
         $plain = preg_replace('/&\w+;|<[^>]+>/', '', $en);

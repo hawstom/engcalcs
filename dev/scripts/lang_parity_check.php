@@ -5,7 +5,8 @@
  * Compares lib/lang.ec.*.php files against lib/lang.ec.en.php and reports:
  * - missing keys
  * - extra keys
- * - values still equal to English
+ * - values still equal to English (excluding keys in translation_exempt_keys.json,
+ *   which are correctly identical -- symbols, eponyms, brands, cognates; ROADMAP Task 161)
  *
  * Usage:
  *   php scripts/lang_parity_check.php
@@ -15,6 +16,8 @@
 
 const DEFAULT_LANG_DIR = __DIR__ . '/../../lib';
 const EN_FILE = DEFAULT_LANG_DIR . '/lang.ec.en.php';
+
+require_once __DIR__ . '/exempt_keys.inc.php';
 
 main($argv);
 
@@ -37,9 +40,12 @@ function main(array $argv): void
     }
     sort($langFiles);
 
+    $exemptMap = ecLoadExemptMap();
+
     $totalMissing = 0;
     $totalExtra = 0;
     $totalEnglish = 0;
+    $totalExempt = 0;
 
     foreach ($langFiles as $file) {
         if (!preg_match('/lang\.ec\.([a-z]{2})\.php$/', $file, $m)) {
@@ -57,16 +63,19 @@ function main(array $argv): void
 
         $parsed = parseLangAssignments((string)file_get_contents($file));
 
-        [$missing, $extra, $englishEqual] = compareLanguage($en, $parsed, $opts['prefixes']);
+        [$missing, $extra, $englishEqual, $exempt] =
+            compareLanguage($en, $parsed, $opts['prefixes'], $lang, $exemptMap);
 
         $totalMissing += count($missing);
         $totalExtra += count($extra);
         $totalEnglish += count($englishEqual);
+        $totalExempt += count($exempt);
 
         echo "\n[{$lang}] " . basename($file) . "\n";
         echo '  missing: ' . count($missing) . "\n";
         echo '  extra: ' . count($extra) . "\n";
         echo '  equal_to_english: ' . count($englishEqual) . "\n";
+        echo '  exempt_identical: ' . count($exempt) . "\n";
 
         printList('missing_keys', $missing);
         printList('extra_keys', $extra);
@@ -77,6 +86,7 @@ function main(array $argv): void
     echo 'missing: ' . $totalMissing . "\n";
     echo 'extra: ' . $totalExtra . "\n";
     echo 'equal_to_english: ' . $totalEnglish . "\n";
+    echo 'exempt_identical: ' . $totalExempt . " (correctly identical to English; not debt)\n";
 
     if ($opts['strict'] && ($totalMissing > 0 || $totalExtra > 0 || $totalEnglish > 0)) {
         exit(1);
@@ -138,11 +148,21 @@ function splitCsv(string $value): array
     return array_values(array_unique($parts));
 }
 
-function compareLanguage(array $en, array $current, array $prefixes): array
+/**
+ * Returns [missing, extra, englishEqual, exempt]. A key that equals English but is
+ * correctly so -- listed in translation_exempt_keys.json for this language, or a
+ * universal u_/mi_ symbol -- lands in `exempt`, not in `englishEqual`: it is correct,
+ * not debt. Missing keys are reported regardless of exemption.
+ *
+ * Both tests come from exempt_keys.inc.php, shared with the payload generator, so the
+ * two tools cannot report different "untranslated" counts for the same files.
+ */
+function compareLanguage(array $en, array $current, array $prefixes, string $lang, array $exemptMap): array
 {
     $missing = [];
     $extra = [];
     $englishEqual = [];
+    $exempt = [];
 
     foreach ($en as $key => $enValue) {
         if (!prefixAllowed($key, $prefixes)) {
@@ -155,7 +175,12 @@ function compareLanguage(array $en, array $current, array $prefixes): array
         }
 
         if (normalizeForCompare((string)$current[$key]) === normalizeForCompare((string)$enValue)) {
-            $englishEqual[] = $key;
+            if (ecIsExemptFromEnglishEquality($key, $lang, $exemptMap)
+                || ecIsUniversalKey($key, (string)$enValue)) {
+                $exempt[] = $key;
+            } else {
+                $englishEqual[] = $key;
+            }
         }
     }
 
@@ -172,8 +197,9 @@ function compareLanguage(array $en, array $current, array $prefixes): array
     sort($missing);
     sort($extra);
     sort($englishEqual);
+    sort($exempt);
 
-    return [$missing, $extra, $englishEqual];
+    return [$missing, $extra, $englishEqual, $exempt];
 }
 
 function prefixAllowed(string $key, array $prefixes): bool

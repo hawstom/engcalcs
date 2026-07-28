@@ -1,0 +1,47 @@
+{
+  "_comment": [
+    "Keys whose translation is CORRECTLY byte-identical to the English source.",
+    "",
+    "Why this file exists (ROADMAP Task 161): generate_translation_payloads.php counts a value",
+    "that equals English as 'equal_to_english' delta. For the keys below that is permanently",
+    "wrong by design, not by neglect, so the delta count could never reach zero and every sprint",
+    "proposal had to re-derive the same hand-classification from scratch. With this file, delta",
+    "zero means zero.",
+    "",
+    "SCOPE: this suppresses ONLY the equal_to_english reason. A key listed here that is MISSING",
+    "or BLANK in a lang file is still reported as delta -- exemption says 'identical is allowed',",
+    "never 'this key does not need a value'.",
+    "",
+    "'languages': '*' means every language; an explicit array means only those languages may",
+    "legitimately land on the English string. Use the array form for coincidental cognates -- a",
+    "global exemption there would hide a genuinely untranslated string in an unrelated script.",
+    "A language added later is therefore reported until someone confirms the cognate holds.",
+    "",
+    "NOTE ON THE $ec_lang_intent 'symbol' TAG: it is NOT a usable exemption source and was",
+    "rejected as the mechanism here. 'symbol' means 'keep the symbols inside this string intact',",
+    "not 'this whole string is a symbol' -- ip_notes_1_def, ip_notes_2_def and wi_notes_we_def",
+    "carry the tag and are full prose that must be translated. Only 2 of the 7 symbol-only keys",
+    "below even carry the tag. An explicit list is the honest mechanism."
+  ],
+
+  "exempt": {
+    "dw_roughness":            { "category": "symbol",  "languages": "*", "reason": "e -- absolute roughness symbol; identical in every language and script." },
+    "ip_length":               { "category": "symbol",  "languages": "*", "reason": "L -- length symbol." },
+    "ip_diameter":             { "category": "symbol",  "languages": "*", "reason": "D -- diameter symbol." },
+    "ip_roughness":            { "category": "symbol",  "languages": "*", "reason": "e -- absolute roughness symbol." },
+    "ip_hf":                   { "category": "symbol",  "languages": "*", "reason": "h_f -- friction head loss symbol; carries the intent 'symbol' tag." },
+    "ip_hm":                   { "category": "symbol",  "languages": "*", "reason": "h_m -- minor (local) head loss symbol; carries the intent 'symbol' tag." },
+    "bpn_id":                  { "category": "symbol",  "languages": "*", "reason": "ID -- node identifier column heading, used as a symbol." },
+
+    "bpn_method_hw":           { "category": "eponym",  "languages": "*", "reason": "Hazen-Williams -- surnames are never renamed (CLAUDE.md, Simple English section)." },
+    "bpn_method_dw":           { "category": "eponym",  "languages": "*", "reason": "Darcy-Weisbach -- surnames are never renamed." },
+    "bpn_method_manning":      { "category": "eponym",  "languages": "*", "reason": "Manning -- surname, never renamed." },
+
+    "install_android_heading": { "category": "brand",   "languages": "*", "reason": "Android (Chrome) -- product names. Languages that transliterate into their own script are still free to; this only permits the identical form." },
+    "install_ios_heading":     { "category": "brand",   "languages": "*", "reason": "iOS (Safari) -- product names, same reasoning as install_android_heading." },
+
+    "dw_regime_laminar":       { "category": "cognate", "languages": ["de", "es", "id", "pt", "ro"], "reason": "'Laminar' is the correct word in these languages. Others (fr laminaire, it laminare, cs/hr laminarni) genuinely differ, so this is not a global exemption." },
+    "or_shape_circular":       { "category": "cognate", "languages": ["es", "pt"], "reason": "'Circular' is correct Spanish and Portuguese." },
+    "or_shape_rectangular":    { "category": "cognate", "languages": ["es"], "reason": "'Rectangular' is correct Spanish; Portuguese is 'Retangular'." }
+  }
+}

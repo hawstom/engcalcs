@@ -5,6 +5,10 @@
  * Produces a compact table with languages as rows and key prefixes as columns,
  * where each cell is the count of untranslated keys (missing, blank, or equal to English).
  *
+ * Keys that are CORRECTLY identical to English -- symbols, eponyms, brands, cognates --
+ * are not counted, via the shared list in exempt_keys.inc.php (ROADMAP Task 161), so this
+ * matrix reports the same debt the payload generator and parity checker do.
+ *
  * Usage:
  *   php scripts/translation_completion_matrix.php
  *   php scripts/translation_completion_matrix.php --lang=fr,uk --prefix=dw,rc
@@ -13,6 +17,8 @@
 
 const DEFAULT_LANG_DIR = __DIR__ . '/../../lib';
 const EN_FILE = DEFAULT_LANG_DIR . '/lang.ec.en.php';
+
+require_once __DIR__ . '/exempt_keys.inc.php';
 
 main($argv);
 
@@ -25,6 +31,7 @@ function main(array $argv): void
     }
 
     $en = loadLangArray(EN_FILE);
+    $exemptMap = ecLoadExemptMap();
     $allPrefixes = detectPrefixes($en);
     $prefixes = filterPrefixes($allPrefixes, $opts['prefixes']);
     if (count($prefixes) === 0) {
@@ -55,7 +62,7 @@ function main(array $argv): void
         $row = ['lang' => $lang];
         $total = 0;
         foreach ($prefixes as $prefix) {
-            $count = untranslatedCountForPrefix($en, $cur, $prefix);
+            $count = untranslatedCountForPrefix($en, $cur, $prefix, $lang, $exemptMap);
             $row[$prefix] = $count;
             $total += $count;
         }
@@ -172,7 +179,12 @@ function filterPrefixes(array $all, array $selected): array
     }));
 }
 
-function untranslatedCountForPrefix(array $en, array $cur, string $prefix): int
+/**
+ * Counts real untranslated keys for one prefix. A value equal to English is only
+ * counted when it is not legitimately identical -- a missing or blank value always
+ * counts, exempt or not.
+ */
+function untranslatedCountForPrefix(array $en, array $cur, string $prefix, string $lang, array $exemptMap): int
 {
     $count = 0;
     foreach ($en as $key => $enValue) {
@@ -186,7 +198,15 @@ function untranslatedCountForPrefix(array $en, array $cur, string $prefix): int
         }
 
         $val = trim((string)$cur[$key]);
-        if ($val === '' || $val === trim((string)$enValue)) {
+        if ($val === '') {
+            $count++;
+            continue;
+        }
+        if ($val !== trim((string)$enValue)) {
+            continue;
+        }
+        if (!ecIsExemptFromEnglishEquality($key, $lang, $exemptMap)
+            && !ecIsUniversalKey($key, (string)$enValue)) {
             $count++;
         }
     }
