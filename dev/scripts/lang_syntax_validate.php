@@ -35,7 +35,11 @@ function main(array $argv): void
 
     $issues = [];
     $enValues = extractValues((string)file_get_contents(DEFAULT_LANG_DIR . '/lang.ec.en.php'));
+    // Derived attribute-bound key list. Rule A (detectEntities) is absolute and needs no
+    // scoping, so nothing consumes this yet -- it is the foundation for Task 140 steps 3
+    // (Rules B and C). Keep it wired up here so that work starts from a live call site.
     $attrKeys = attributeBoundKeys();
+    unset($attrKeys);
 
     foreach ($files as $file) {
         if (!preg_match('/lang\.ec\.([a-z]{2})\.php$/', $file, $m)) {
@@ -56,7 +60,7 @@ function main(array $argv): void
         $issues = array_merge($issues, detectEscapeLeakage($file, $content));
         $issues = array_merge($issues, detectTagImbalance($file, $content));
         $issues = array_merge($issues, detectForeignScript($file, $content));
-        $issues = array_merge($issues, detectAttributeEntities($file, $content, $attrKeys));
+        $issues = array_merge($issues, detectEntities($file, $content));
         if ($lang !== 'en') {
             $issues = array_merge($issues, detectUntranslatedValues($file, $content, $enValues));
         }
@@ -296,18 +300,47 @@ function attributeBoundKeys(): array
     return array_keys($keys);
 }
 
-/** HTML entities in a title-attribute-bound value double-escape ('&' -> '&amp;') and show literally. */
-function detectAttributeEntities(string $file, string $content, array $attrKeys): array
+/**
+ * ROADMAP Task 140, Rule A: no HTML entity in ANY language string, no exceptions.
+ *
+ * Absolute on purpose. The previous version of this check scoped itself to
+ * attribute-bound keys, and that scoping is exactly how it failed: whether an
+ * entity survives depends on the PHP/JS call site that consumes the string, which
+ * is invisible from the string itself. Of this suite's three attribute paths, two
+ * escape '&' first (htmlspecialchars(strip_tags()) in the page PHP, escapeAttr in
+ * js/Calculators.lib.js), turning '&asymp;' into a literal '&asymp;' on screen.
+ * A literal UTF-8 character is correct on all three paths, so there is no case to
+ * reason about — which is the whole value of making the rule absolute.
+ */
+function detectEntities(string $file, string $content): array
 {
+    // Named replacements for everything the suite actually used before the Task 140
+    // step-1 cleanup, so the finding tells the writer what to type instead.
+    static $literals = [
+        'mdash' => '—', 'ndash' => '–', 'minus' => '−', 'times' => '×',
+        'divide' => '÷', 'asymp' => '≈', 'le' => '≤', 'ge' => '≥',
+        'radic' => '√', 'sup2' => '²', 'middot' => '·', 'Delta' => 'Δ',
+        'nu' => 'ν', 'tau' => 'τ', 'eta' => 'η', 'ldquo' => '“',
+        'rdquo' => '”', 'rsquo' => '’', 'hellip' => '…', 'copy' => '©',
+        'amp' => '&', 'lt' => '<', 'gt' => '>', 'quot' => '“ or ”',
+        'nbsp' => 'a literal non-breaking space (U+00A0)',
+    ];
+
     $issues = [];
-    $set = array_flip($attrKeys);
     foreach (extractValues($content) as $key => $value) {
-        if (!isset($set[$key])) {
+        if (!preg_match('/&(#\d+|#x[0-9a-fA-F]+|[a-zA-Z][a-zA-Z0-9]+);/', $value, $m)) {
             continue;
         }
-        if (preg_match('/&(#\d+|#x[0-9a-fA-F]+|[a-zA-Z][a-zA-Z0-9]+);/', $value, $m)) {
-            $issues[] = formatIssue($file, lineAtOffset($content, (int)strpos($content, "['" . $key . "']")), 'entity-in-attribute-tip', $key . ': HTML entity "' . $m[0] . '" double-escapes in a title attribute — use a literal character.');
-        }
+        $name = trim($m[1]);
+        $hint = isset($literals[$name])
+            ? 'use the literal character ' . $literals[$name] . ' instead'
+            : 'use the literal UTF-8 character instead';
+        $issues[] = formatIssue(
+            $file,
+            lineAtOffset($content, (int)strpos($content, "['" . $key . "']")),
+            'entity-in-lang-string',
+            $key . ': HTML entity "' . $m[0] . '" is not allowed in a language string — ' . $hint . '.'
+        );
     }
     return $issues;
 }

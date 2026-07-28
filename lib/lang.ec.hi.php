@@ -90,8 +90,8 @@ $ec_lang['dw_main_title']='मुफ़्त ऑनलाइन डार्स
 $ec_lang['dw_main_desc']='दिए गए व्यास, खुरदरापन और प्रवाह पर डार्सी-वाइसबाख पाइप शीर्ष हानि';
 $ec_lang['dw_roughness']='e';
 $ec_lang['dw_roughness_tip']='पाइप की दीवार की निरपेक्ष खुरदरापन ऊँचाई, e। विशिष्ट मान: इस्पात (नया) 0.046 mm, इस्पात (पुराना) 0.15 mm, HDPE 0.003 mm, PVC/uPVC 0.0015 mm, कंक्रीट 0.3–3 mm।';
-$ec_lang['dw_kinematic_viscosity']='<span class="ec-help" title="20°C पर स्वच्छ जल के लिए 1×10⁻⁶ मी²/से">गतिक श्यानता, &nu; <span class="ec-tip">?</span></span>';
-$ec_lang['dw_kinematic_viscosity_short']='गतिक श्यानता, &nu;';
+$ec_lang['dw_kinematic_viscosity']='<span class="ec-help" title="20°C पर स्वच्छ जल के लिए 1×10⁻⁶ मी²/से">गतिक श्यानता, ν <span class="ec-tip">?</span></span>';
+$ec_lang['dw_kinematic_viscosity_short']='गतिक श्यानता, ν';
 $ec_lang['dw_kinematic_viscosity_tip']='20°C पर स्वच्छ जल के लिए 1×10⁻⁶ मी²/से';
 $ec_lang['dw_reynolds_number']='रेनॉल्ड्स संख्या, Re';
 $ec_lang['dw_flow_regime']='प्रवाह व्यवस्था';
@@ -122,7 +122,7 @@ $ec_lang['mi_elevation']='ऊँचाई';
 $ec_lang['mi_d50in']='अस्तर मध्यिका चट्टान आकार';
 $ec_lang['mi_n']='n';
 $ec_lang['mi_is_bank']='R<sub>h</sub>, Q क्षेत्र सीमा (तट)';
-$ec_lang['mi_tau']='तल अपरूपण &tau;';
+$ec_lang['mi_tau']='तल अपरूपण τ';
 $ec_lang['mi_t']='T';
 $ec_lang['mi_pw']='P<sub>w</sub>';
 $ec_lang['mi_a']='A';
@@ -148,7 +148,7 @@ $ec_lang['mpf_depth_ratio']='सापेक्ष प्रवाह गहर�
 $ec_lang['mpf_flow']='प्रवाह, Q';
 $ec_lang['mpf_flow_tip']='प्रवाह और गहराई की गणना एक अनंत लंबे पाइप के लिए की गई है। इतना प्रवाह पाइप में प्रवेश कराने के लिए अधिक शीर्ष जल गहराई की आवश्यकता हो सकती है। विवरण और ट्यूटोरियल वीडियो के लिए नीचे नोट देखें।';
 $ec_lang['mpf_velocity']='वेग, v';
-$ec_lang['mpf_velocity_head']='<span class="ec-help" title="जल स्तंभ की ऊँचाई के रूप में गतिज ऊर्जा, v&sup2;/2g">वेग शीर्ष, h<sub>v</sub> <span class="ec-tip">?</span></span>';
+$ec_lang['mpf_velocity_head']='<span class="ec-help" title="जल स्तंभ की ऊँचाई के रूप में गतिज ऊर्जा, v²/2g">वेग शीर्ष, h<sub>v</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['mpf_flow_area']='प्रवाह क्षेत्रफल, A';
 $ec_lang['mpf_pipe_area']='पाइप क्षेत्रफल, A<sub>0</sub>';
 $ec_lang['mpf_area_ratio']='सापेक्ष क्षेत्रफल, A/A<sub>0</sub>';
@@ -156,7 +156,7 @@ $ec_lang['mpf_wetted_perimeter']='आर्द्र परिधि, P<sub>w</s
 $ec_lang['mpf_hydraulic_radius']='हाइड्रोलिक त्रिज्या, R<sub>h</sub>';
 $ec_lang['mpf_top_width']='शीर्ष चौड़ाई, T';
 $ec_lang['mpf_froude_number']='फ्रूड संख्या, Fr';
-$ec_lang['mpf_shear_stress']='औसत अपरूपण प्रतिबल, &tau;';
+$ec_lang['mpf_shear_stress']='औसत अपरूपण प्रतिबल, τ';
 $ec_lang['mpf_full_flow']='पूर्ण प्रवाह, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='पूर्ण प्रवाह से अनुपात, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>यह एक <em>अनंत लंबे</em> पाइप के अंदर का प्रवाह और गहराई है।</dt><dd>पाइप में प्रवाह प्रवेश कराने के लिए काफी अधिक शीर्ष जल गहराई की आवश्यकता हो सकती है। शीर्ष जल गहराई पाने के लिए वेग शीर्ष का कम से कम 1.5 गुना जोड़ें या HY-8 का उपयोग करके मानक पाइपनाली शीर्ष जल गणना के लिए <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">मेरा 2-मिनट का ट्यूटोरियल</a> देखें।</dd>';
@@ -191,7 +191,7 @@ $ec_lang['mtc_side_slope_2']='पार्श्व ढलान 2, z<sub>2</sub
 $ec_lang['mtc_channel_slope']='नाली ढलान, S';
 $ec_lang['mtc_flow_depth']='प्रवाह गहराई, y';
 $ec_lang['mtc_bend_angle']='<a target="_blank" href="riprap-bend-angle.png">मोड़ कोण, β</a><span class="ec-help" title="चट्टान अस्तर आकार निर्धारण के लिए। चित्र के लिए लिंक पर जाएं।"><span class="ec-tip">?</span></span>';
-$ec_lang['mtc_sgrock']='<span class="ec-help" title="पानी की तुलना में घनत्व। कुचली हुई चट्टान के लिए सामान्यतः &asymp; 2.65">चट्टान का विशिष्ट गुरुत्व, sg <span class="ec-tip">?</span></span>';
+$ec_lang['mtc_sgrock']='<span class="ec-help" title="पानी की तुलना में घनत्व। कुचली हुई चट्टान के लिए सामान्यतः ≈ 2.65">चट्टान का विशिष्ट गुरुत्व, sg <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_in']='डिज़ाइन चट्टान आकार, D<sub>50</sub>';
 $ec_lang['mtc_n_strickler']='डिज़ाइन चट्टान आकार के लिए n (Strickler विधि)';
 $ec_lang['mtc_n_blodgett']='डिज़ाइन चट्टान आकार के लिए n (Blodgett विधि)';
@@ -273,7 +273,7 @@ $ec_lang['mhp_main_desc']='नदी-प्रवाह माइक्रो-�
 $ec_lang['mhp_gross_head']='सकल हेड, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='<span class="ec-help" title="दबाव नली (आपूर्ति पाइप) का व्यास">दबाव नली व्यास, D <span class="ec-tip">?</span></span>';
 $ec_lang['mhp_length']='लंबाई, L';
-$ec_lang['mhp_efficiency']='प्लांट दक्षता, &eta; (0&ndash;1)';
+$ec_lang['mhp_efficiency']='प्लांट दक्षता, η (0–1)';
 $ec_lang['mhp_vel_check']='वेग जाँच';
 $ec_lang['mhp_hl_check']='हेड हानि जाँच';
 $ec_lang['mhp_hnet']='शुद्ध हेड, H<sub>net</sub>';
@@ -289,20 +289,20 @@ $ec_lang['mhp_hl_ok_tip']='10% लक्ष्य के भीतर — कि
 $ec_lang['mhp_hl_warn_tip']='10% लक्ष्य से अधिक है। बड़े पाइप पर विचार करें।';
 $ec_lang['mhp_hl_bad_tip']='20% लक्ष्य से अधिक है। पाइप का आकार बदलें।';
 $ec_lang['mhp_notes_1_term']='हेड हानि';
-$ec_lang['mhp_notes_1_def']='कुल दबाव नली (आपूर्ति पाइप) हानि h<sub>L</sub> = h<sub>f</sub> + h<sub>m</sub>, जहाँ h<sub>f</sub> = f(L/D)(v&sup2;/2g) डार्सी-वाइसबैक घर्षण हानि है और h<sub>m</sub> = k<sub>m</sub>&middot;v&sup2;/2g प्रवेश, मोड़ और वाल्वों को शामिल करती है। शुद्ध हेड H<sub>net</sub> = H<sub>gross</sub> &minus; h<sub>L</sub>.';
+$ec_lang['mhp_notes_1_def']='कुल दबाव नली (आपूर्ति पाइप) हानि h<sub>L</sub> = h<sub>f</sub> + h<sub>m</sub>, जहाँ h<sub>f</sub> = f(L/D)(v²/2g) डार्सी-वाइसबैक घर्षण हानि है और h<sub>m</sub> = k<sub>m</sub>·v²/2g प्रवेश, मोड़ और वाल्वों को शामिल करती है। शुद्ध हेड H<sub>net</sub> = H<sub>gross</sub> − h<sub>L</sub>.';
 $ec_lang['mhp_notes_2_term']='वेग';
 $ec_lang['mhp_notes_2_def']='जाँचें कि वेग उपलब्ध ड्रॉप और पाइप लागत के लिए उचित है। बहुत कम वेग अत्यधिक बड़े आकार का संकेत हो सकता है; बहुत अधिक वेग घर्षण हानि और वाटर हैमर के जोखिम को बढ़ा सकता है।';
 $ec_lang['mhp_notes_3_term']='हेड हानि लक्ष्य';
-$ec_lang['mhp_notes_3_def']='सकल हेड के 10% से कम दबाव नली (आपूर्ति पाइप) हानि सामान्यतः किफ़ायती होती है। पाइप लागत और खोई शक्ति के बीच इष्टतम संतुलन प्रायः 4&ndash;6% के आसपास होता है, जहाँ बिजली सबसे मूल्यवान होती है।';
+$ec_lang['mhp_notes_3_def']='सकल हेड के 10% से कम दबाव नली (आपूर्ति पाइप) हानि सामान्यतः किफ़ायती होती है। पाइप लागत और खोई शक्ति के बीच इष्टतम संतुलन प्रायः 4–6% के आसपास होता है, जहाँ बिजली सबसे मूल्यवान होती है।';
 $ec_lang['mhp_notes_6_term']='दक्षता';
-$ec_lang['mhp_notes_6_def']='माइक्रो-हाइड्रो में सामान्य Pelton और क्रॉस-फ्लो टर्बाइनों के लिए विशिष्ट प्लांट दक्षता &eta; 0.70 से 0.85 तक होती है। एक रूढ़िवादी प्रारंभिक अनुमान के रूप में 0.75 का उपयोग करें।';
+$ec_lang['mhp_notes_6_def']='माइक्रो-हाइड्रो में सामान्य Pelton और क्रॉस-फ्लो टर्बाइनों के लिए विशिष्ट प्लांट दक्षता η 0.70 से 0.85 तक होती है। एक रूढ़िवादी प्रारंभिक अनुमान के रूप में 0.75 का उपयोग करें।';
 $ec_lang['mhp_notes_7_term']='वार्षिक ऊर्जा';
 $ec_lang['mhp_notes_7_def']='वार्षिक ऊर्जा निरंतर पूर्ण-प्रवाह संचालन (8760 घंटे/वर्ष) मानती है। मौसमी प्रवाह भिन्नता, रखरखाव डाउनटाइम और लोड फैक्टर के कारण वास्तविक उत्पादन कम होगा।';
 
 // Orifice Drain Time
 $ec_lang['odt_main_menu']='तालाब और टंकी निकासी समय';
 $ec_lang['odt_main_title']='मुफ़्त ऑनलाइन तालाब, बेसिन और टंकी निकासी समय कैलकुलेटर (छिद्र)';
-$ec_lang['odt_main_desc']='तालाब, बेसिन या टंकी निकासी समय &mdash; छिद्र आउटलेट, शंक्वाकार आयतन विधि';
+$ec_lang['odt_main_desc']='तालाब, बेसिन या टंकी निकासी समय — छिद्र आउटलेट, शंक्वाकार आयतन विधि';
 $ec_lang['odt_h1_elev']='प्रारंभिक जल सतह स्तर';
 $ec_lang['odt_a1']='प्रारंभिक क्षेत्रफल, A<sub>1</sub>';
 $ec_lang['odt_h2_elev']='अंतिम जल सतह स्तर';
@@ -428,14 +428,14 @@ $ec_lang['contact_success']='आपका समय लेने के लि�
 // Rock Chute Design (Robinson, Rice & Kadavy 1998). Prefix rc_.
 $ec_lang['rc_main_menu']='चट्टानी ढाल संरचना डिज़ाइन (Robinson)';
 $ec_lang['rc_main_title']='मुफ्त ऑनलाइन चट्टानी ढाल संरचना डिज़ाइन कैलकुलेटर — Robinson (1998)';
-$ec_lang['rc_main_desc']='तीव्र ढाल चैनल चट्टान अस्तर आकार — Robinson, Rice &amp; Kadavy (1998)';
+$ec_lang['rc_main_desc']='तीव्र ढाल चैनल चट्टान अस्तर आकार — Robinson, Rice & Kadavy (1998)';
 $ec_lang['rc_S0']='तीव्र ढाल चैनल तल ढाल, S<sub>0</sub>';
 $ec_lang['rc_qt']='<span class="ec-help" title="तीव्र ढाल चैनल इनलेट पर प्रति इकाई चौड़ाई प्रवाह। तल चौड़ाई B वाले चैनल में कुल प्रवाह Q के लिए, q_t = Q / B उपयोग करें।">कुल इकाई प्रवाह, q<sub>t</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['rc_np']='चट्टान अस्तर सरंध्रता, n<sub>p</sub>';
 $ec_lang['rc_sg']='<span class="ec-help" title="पानी की तुलना में घनत्व। सामान्य कुचली ग्रेनाइट या बेसाल्ट के लिए ≈ 2.65। Robinson वैध सीमा: 2.54 से 2.82।">चट्टान आपेक्षिक घनत्व, sg <span class="ec-tip">?</span></span>';
 $ec_lang['rc_SD']='<span class="ec-help" title="श्रेणीकरण मानक विचलन। एकसमान चट्टान ≈ 1.25। Robinson वैध सीमा: 1.15 से 1.47।">श्रेणीकरण SD = D<sub>84.1</sub>/D<sub>50</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['rc_yn']='<span class="ec-help" title="ताल बनना (Hp > yn) अच्छा है — अपस्ट्रीम कटाव कम करता है। (USDA)">इनलेट चैनल में सामान्य गहराई, y<sub>n</sub> <span class="ec-tip">?</span></span>';
-$ec_lang['rc_D50']='<span class="ec-help" title="समी. 1 (S0 &lt; 0.10) या समी. 2 (0.10-0.40)। वैध: D50 15-278 mm, S0 0.02-0.40। सीमा के बाहर: बहिर्वेशित।">आवश्यक माध्यिका चट्टान आकार, D<sub>50</sub> <span class="ec-tip">?</span></span>';
+$ec_lang['rc_D50']='<span class="ec-help" title="समी. 1 (S0 < 0.10) या समी. 2 (0.10-0.40)। वैध: D50 15-278 mm, S0 0.02-0.40। सीमा के बाहर: बहिर्वेशित।">आवश्यक माध्यिका चट्टान आकार, D<sub>50</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['rc_eq_used']='लागू समीकरण';
 $ec_lang['rc_sg_check']='आपेक्षिक घनत्व जाँच';
 $ec_lang['rc_SD_check']='श्रेणीकरण SD जाँच';
@@ -454,7 +454,7 @@ $ec_lang['rc_SD_high_tip']='वैध सीमा: 1.15–1.47';
 $ec_lang['rc_layer']='चट्टान परत मोटाई (2 × D<sub>50</sub>)';
 $ec_lang['rc_crest_radius']='शीर्ष क्रेस्ट वक्र त्रिज्या (40 × D<sub>50</sub>)';
 $ec_lang['rc_crest_length']='शीर्ष क्रेस्ट वक्र चाप लंबाई';
-$ec_lang['rc_apron_length']='<span class="ec-help" title="तीव्र ढाल चैनल की चट्टान अस्तर के संरचनात्मक समर्थन के लिए आवश्यक। &quot;निर्गम खंड और अनुप्रवाह चैनल प्रतिरोध के परिणामस्वरूप उत्पन्न न्यूनतम अनुप्रवाह जल निर्गम खंड में चट्टान अस्तर की स्थिरता सुनिश्चित करने के लिए पर्याप्त है।&quot; (Robinson)">निर्गम एप्रन लंबाई (15 × D<sub>50</sub>) <span class="ec-tip">?</span></span>';
+$ec_lang['rc_apron_length']='<span class="ec-help" title="तीव्र ढाल चैनल की चट्टान अस्तर के संरचनात्मक समर्थन के लिए आवश्यक। “निर्गम खंड और अनुप्रवाह चैनल प्रतिरोध के परिणामस्वरूप उत्पन्न न्यूनतम अनुप्रवाह जल निर्गम खंड में चट्टान अस्तर की स्थिरता सुनिश्चित करने के लिए पर्याप्त है।” (Robinson)">निर्गम एप्रन लंबाई (15 × D<sub>50</sub>) <span class="ec-tip">?</span></span>';
 $ec_lang['rc_n_chute']='तीव्र ढाल चैनल में Manning खुरदरापन, n';
 $ec_lang['rc_Vm']='<span class="ec-help" title="q_t का वह भाग जो चट्टान के छिद्रों से बहता है। शेष q_s सतह पर बहता है। कोणीय कुचली चट्टान के लिए डिफ़ॉल्ट n_p = 0.45।">चट्टान आवरण से गुज़रता वेग, V<sub>m</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['rc_qm']='आवरण से इकाई प्रवाह, q<sub>m</sub>';
@@ -471,7 +471,7 @@ $ec_lang['rc_eq2']='समी. 2 (0.10 ≤ S<sub>0</sub> ≤ 0.40) — तीव
 $ec_lang['rc_eq_warn_low']='S<sub>0</sub> < 0.02 — Robinson सत्यापन सीमा से नीचे';
 $ec_lang['rc_eq_warn_high']='S<sub>0</sub> > 0.40 — Robinson सत्यापन सीमा से ऊपर';
 $ec_lang['rc_notes_1_term']='चट्टान साइज़िंग समीकरण';
-$ec_lang['rc_notes_1_def']='Robinson, Rice &amp; Kadavy (1998) ने तीव्र ढाल चैनल की ढाल और इकाई प्रवाह के आधार पर माध्यिका चट्टान अस्तर आकार D<sub>50</sub> के लिए दो अनुभवजन्य समीकरण विकसित किए। समीकरण 1 सौम्य ढालों के लिए लागू होता है (S<sub>0</sub> &lt; 0.10); समीकरण 2 तीव्र ढालों के लिए लागू होता है (0.10 &le; S<sub>0</sub> &le; 0.40)। दोनों समीकरणों में q<sub>t</sub> m²/s में आवश्यक है और D<sub>50</sub> mm में प्राप्त होता है। सत्यापित सीमा 0.02 ≤ S<sub>0</sub> ≤ 0.40 है।';
+$ec_lang['rc_notes_1_def']='Robinson, Rice & Kadavy (1998) ने तीव्र ढाल चैनल की ढाल और इकाई प्रवाह के आधार पर माध्यिका चट्टान अस्तर आकार D<sub>50</sub> के लिए दो अनुभवजन्य समीकरण विकसित किए। समीकरण 1 सौम्य ढालों के लिए लागू होता है (S<sub>0</sub> < 0.10); समीकरण 2 तीव्र ढालों के लिए लागू होता है (0.10 ≤ S<sub>0</sub> ≤ 0.40)। दोनों समीकरणों में q<sub>t</sub> m²/s में आवश्यक है और D<sub>50</sub> mm में प्राप्त होता है। सत्यापित सीमा 0.02 ≤ S<sub>0</sub> ≤ 0.40 है।';
 $ec_lang['rc_notes_2_term']='इकाई प्रवाह';
 $ec_lang['rc_notes_2_def']='q<sub>t</sub> तीव्र ढाल चैनल क्रेस्ट पर कुल इकाई प्रवाह है (प्रति इकाई चौड़ाई कुल प्रवाह)। तल चौड़ाई B और कुल प्रवाह Q वाले चैनल के लिए, q<sub>t</sub> ≈ Q / B अनुमानित करें, या तीव्र ढाल चैनल इनलेट पर क्रांतिक गहराई की स्थिति से इसकी गणना करें।';
 $ec_lang['rc_notes_3_term']='चट्टान आवरण से प्रवाह';
