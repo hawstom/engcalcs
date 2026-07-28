@@ -421,6 +421,34 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Completed
 
+- 0|156|[CC] **`.git` and directory listings were readable over HTTP — closed. DONE 2026-07-28.**
+  Found while answering "is `engcalcs/.htaccess` even needed?" during Task 155, not by looking for
+  it. Two defects, both now fixed and verified live:
+  - **`.git` was fully retrievable.** `/engcalcs/.git/` served a browsable index,
+    `.git/refs/heads/master` gave the tip SHA, and `objects/pack/*.pack` downloaded intact (937 KB,
+    HTTP 200). **Why the existing guard missed it:** `<FilesMatch "^\.">` matches *filenames*, not
+    directories, and `.git`'s contents are named `config`, `HEAD`, `index`, `objects/` — not one of
+    them starts with a dot. Production deploys by `git pull`, so `.git` is necessarily present.
+    **The real cost was not source disclosure** — the suite is GPL v3 — **it is that `dev/.htaccess`
+    deliberately blocks `dev/` over HTTP while the packfiles served the same content anyway**, making
+    that block decorative. The reflog also carried committer names and addresses. History was scanned
+    for committed credentials: **none** (the `x-api-key` hits are `$apiKey` variable references
+    reading from the environment). Fixed with `RedirectMatch 404 "/\.git(/|$)"`.
+  - **Directory listings were on** — `/lib/`, `/js/`, `/css/`, `/icons/` each served a full file
+    index. Fixed with `Options -Indexes`.
+  **Shipped as two commits on purpose** (`c089fc9`, then `a012927`), pulled and verified separately.
+  `RedirectMatch` is mod_alias, the same override level as the `Redirect 301` rules already working
+  in the file, so it was known-safe. **`Options` is not** — it needs `AllowOverride Options`, a
+  separate grant, and where that is missing Apache returns **500 for every request under
+  `/engcalcs/`** rather than ignoring the line. **Confirmed granted on this host 2026-07-28**; if the
+  site ever moves, re-test that line first and drop it if the new host 500s. Splitting the commits is
+  what made the risky half independently revertable.
+  **Also assessed and left alone:** the three `Redirect 301` lines for pre-reorg `/engcalcs/lib/`
+  asset paths are **spent** — the reorg was `fe2af01`, 2026-06-16; nothing in the codebase references
+  those paths, `sw.js` (v5) precaches only the new ones, and pages are served `no-store, no-cache` so
+  no stale HTML points at them. They fire correctly but have nothing left to catch. Harmless to keep,
+  safe to delete whenever.
+
 - 0|149|[CC] **Non-English pages were effectively absent from the search index — `hreflang`,
   canonical, and sitemap now emitted. DONE 2026-07-28.** Root cause: one URL served every language,
   chosen at request time by cookie / `Accept-Language` (`lib/Language.lib.php`). `?lang=xx` URLs
