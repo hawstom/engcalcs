@@ -63,7 +63,7 @@ $ec_lang['menu_main_language']='Idioma';
 $ec_lang['menu_more']='Más';
 $ec_lang['template_welcome']='Dejad vuestros miedos en la puerta; el amor se habla aquí. No estáis arruinando todo. Disfrutad también <a target="_blank" href="https://hawsedc.com/download.php">las herramientas libres HawsEDC para AutoCAD.</a>';
 $ec_lang['template_translation_help']='¿Puede sugerir una mejor redacción o cualquier otra cosa? Cuéntenos.';
-$ec_lang['template_feedback']='Tenga la amabilidad de enviarnos sus comentarios. ¿Le fue útil esta calculadora?';
+$ec_lang['template_feedback']='Envíenos sugerencias o elogios. ¿Le resultó útil esta calculadora gratuita?';
 $ec_lang['template_printable_title']='Título Imprimible';
 $ec_lang['template_printable_subtitle']='Subtítulo Imprimible';
 $ec_lang['index_title']='Calculadoras para ingenieros gratis en línea';

@@ -63,7 +63,7 @@ $ec_lang['menu_main_language']='Език';
 $ec_lang['menu_more']='Още';
 $ec_lang['template_welcome']='Оставете страховете си на прага; тук любовта е нашият език. Не съсипвате всичко. Насладете се и на <a target="_blank" href="https://hawsedc.com/download.php">безплатните инструменти HawsEDC за AutoCAD.</a>';
 $ec_lang['template_translation_help']='Можете ли да предложите по-добра формулировка или нещо друго? Моля, споделете с нас.';
-$ec_lang['template_feedback']='Моля споделете мнението си под формата на предложение или похвала. Този безплатен калкулатор надмина ли всичките ви очаквания?';
+$ec_lang['template_feedback']='Моля, изпратете предложения или похвала. Този безплатен калкулатор помогна ли ви?';
 $ec_lang['template_printable_title']='Заглавие за принтиране';
 $ec_lang['template_printable_subtitle']='Подзаглавие за принтиране';
 $ec_lang['index_title']='Безплатни онлайн инженерни калкулатори';

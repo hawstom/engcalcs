@@ -329,29 +329,28 @@ straight from `lib/lang.ec.sw.php`, i.e. an agent searching our own translated s
   impressions. If ever revisited, the scope must be stated as "validated against HY-8", never a
   partial. **Editing the two notes stales 1–2 keys × 26 languages** (small resync, not a sprint).
 
-- 15|153| **Resync `template_feedback` — English reformed 2026-07-27, 26 languages now stale.** The
-  string was `'Please share your valued words of suggestion or praise.  Did this free calculator
-  exceed your expectations in every way?'` and is now `'Please send suggestions or praise. Did this
-  free calculator serve you well?'`. Rationale: the old wording was flattery-fishing and failed the
-  Simple-English rule, and the 26 languages already showed the strain — es and ar had quietly dropped
-  "or praise" and softened to "was it useful?", while sw and zh calqued the whole thing literally.
-  Tell: `$ec_lang_intent['template_feedback']` had *already* rewritten it to almost exactly the new
-  wording, i.e. the intent was doing repair work the source string should have done. Caught by
-  `detect_english_drift.php`, which now reports it as the sole CHANGED key. **Also considered and
-  rejected:** replacing the ask with "Tell your friends!" evangelism and dropping the Contact link.
-  Rejected because (a) the link is the only in-context ask at the moment the user just got their
-  answer, and it is the channel that actually paid — `dev/Bulgarian-engineer-feedback.md` exists
-  because someone clicked it; menu presence is not equivalent; (b) "friends" reads personal-social in
-  most of the 26 target languages while the real sharing act is professional; (c) evangelism is
-  unmeasurable and unharvestable where feedback is neither. If a share mechanism is ever wanted, it
-  should be a copy-link affordance near the results, not a sentence. **`$ec_lang_intent` for this key
-  was emptied** — authorized by Tom in-conversation 2026-07-27; the old intent had become redundant
-  with the reformed English, and a plain, directly-translatable label needs no intent entry.
-  1 key × 26 languages: a resync, not a sprint. Run `detect_english_drift.php --update` after.
-
 ## Translation Standardization (Glossary Project)
 
 ## Translation improvements
+
+- 20|154| **Scan `lib/lang.ec.tr.php` for ASCII-folded Turkish (missing ş/ğ/ı/İ/ö/ü/ç).** Found
+  while closing Task 153: the pre-resync value of `template_feedback` read `'Lütfen görüslerinizi ve
+  begenileriniz bizimle paylasin. Bu ücretsiz hesap makinesi beklentilerinizi karsilayabildi mi?'` —
+  `görüslerinizi`/`begenileriniz`/`paylasin`/`karsilayabildi` should be
+  `görüşlerinizi`/`beğenileriniz`/`paylaşın`/`karşılayabildi`. Note the fold is *partial*: `Lütfen`
+  and `ücretsiz` kept their diacritics in the same string, so this is not a whole-file encoding
+  problem — it looks like hand-typing on a non-Turkish keyboard in whichever pass wrote those keys.
+  That is why it needs a scan, not a bulk transform: only some keys are affected and only some
+  letters within them. **This key is already fixed** (its Task 153 replacement is correctly
+  accented); the question is how many other tr keys carry the same fold. **Why it matters:** to a
+  Turkish reader a dotless/undotted swap is not a cosmetic accent — `paylasin` vs `paylaşın` is a
+  misspelling, and it silently drags tr's real quality below its recorded `QUALITY` tier in
+  `lib/Language.Settings.php`. **Approach:** grep tr for words containing `s`/`g`/`i`/`c`/`o`/`u`
+  where the Turkish spelling takes the dotted/cedilla form — cheapest as one Sonnet pass over the
+  whole tr file reporting suspect lines, then hand-confirm. Check whether any *other* language file
+  shows the same fold pattern (e.g. ro `ș/ț`, hr/cs/sr diacritics) before assuming tr is unique.
+  No English changes, so no drift and no resync — this is a repair of existing translations only.
+
 
 The rules, sequence, and QA chain for translation work are **not** restated here. They live in:
 - **`dev/translation-process.md`** — the SOP: the three scenarios, THE SEQUENCING RULE, the QA chain.
@@ -381,6 +380,43 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|153| **Resync `template_feedback` — 26 languages brought in line with the reformed
+  English. DONE 2026-07-28.** The string was `'Please share your valued words of suggestion or praise.  Did this free calculator
+  exceed your expectations in every way?'` and is now `'Please send suggestions or praise. Did this
+  free calculator serve you well?'`. Rationale: the old wording was flattery-fishing and failed the
+  Simple-English rule, and the 26 languages already showed the strain — es and ar had quietly dropped
+  "or praise" and softened to "was it useful?", while sw and zh calqued the whole thing literally.
+  Tell: `$ec_lang_intent['template_feedback']` had *already* rewritten it to almost exactly the new
+  wording, i.e. the intent was doing repair work the source string should have done. Caught by
+  `detect_english_drift.php`, which now reports it as the sole CHANGED key. **Also considered and
+  rejected:** replacing the ask with "Tell your friends!" evangelism and dropping the Contact link.
+  Rejected because (a) the link is the only in-context ask at the moment the user just got their
+  answer, and it is the channel that actually paid — `dev/Bulgarian-engineer-feedback.md` exists
+  because someone clicked it; menu presence is not equivalent; (b) "friends" reads personal-social in
+  most of the 26 target languages while the real sharing act is professional; (c) evangelism is
+  unmeasurable and unharvestable where feedback is neither. If a share mechanism is ever wanted, it
+  should be a copy-link affordance near the results, not a sentence. **`$ec_lang_intent` for this key
+  was emptied** — authorized by Tom in-conversation 2026-07-27; the old intent had become redundant
+  with the reformed English, and a plain, directly-translatable label needs no intent entry.
+  1 key × 26 languages: a resync, not a sprint.
+
+  **Done inline, not as a sprint.** One short, wholly non-technical sentence with no glossary terms
+  and no markup — Opus wrote all 26 directly, so no agents were spawned and no payload regeneration
+  was needed. The sprint-authorization rule is about fanning out paid agents; there was nothing to
+  fan out.
+
+  **QA run:** `php -l` on all 27 files; `lang_syntax_validate.php` (180 findings, all pre-existing
+  advisory `identical-to-english`, none on this key — no entity, tag, or escape findings);
+  back-translation of every one of the 26 against the new English. All 26 read back as "send
+  suggestions or praise" + "was it useful / did it serve you well" — the flattery clause
+  ("exceed your expectations in every way") is gone everywhere, including the es/ar softenings and
+  the sw/zh calques the task named. No glossary write-back: the string carries no engineering
+  terminology, so there was no terminology decision to memorialize.
+  `detect_english_drift.php --update` run; drift now reports CHANGED: none.
+
+  **Found in passing, extracted to Task 154:** the old tr value was ASCII-folded (missing ş/ğ/ı).
+  Out of scope here; filed as its own task rather than left inside a closed block.
 
 - 0|148| **`template_welcome`'s `>> ... <<` markers replaced with CSS italics — DONE 2026-07-27.**
   Filed and closed the same day. Tom, on reading the finding: "could use italics `<em>`? instead of

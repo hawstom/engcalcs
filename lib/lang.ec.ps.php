@@ -63,7 +63,7 @@ $ec_lang['menu_main_language']='ژبه';
 $ec_lang['menu_more']='نور';
 $ec_lang['template_welcome']='خپل ویرونه دروازې ته پرېږده؛ دلته مینه زموږ ژبه ده. ته هر څه خرابوي نه یې. د <a target="_blank" href="https://hawsedc.com/download.php">وړیا HawsEDC AutoCAD وسیلو</a> خوند هم واخله.';
 $ec_lang['template_translation_help']='آیا تاسو کولی شئ ښه عبارت یا بل هر څه وړاندیز وکړئ؟ مهرباني وکړئ موږ ته ووایاست.';
-$ec_lang['template_feedback']='مهرباني وکړئ خپلې ارزښتناکې وړاندیزونه یا ستاینې موږ ته راولیږئ. ایا دې وړیا محاسبې ستاسو تمې له هر اړخه پوره کړل؟';
+$ec_lang['template_feedback']='مهرباني وکړئ وړاندیزونه یا ستاینې راولېږئ. ایا دا وړیا محاسبه ستاسو لپاره ګټوره وه؟';
 $ec_lang['template_printable_title']='د چاپ سرلیک';
 $ec_lang['template_printable_subtitle']='د چاپ فرعي سرلیک';
 $ec_lang['index_title']='وړیا آنلاین انجینري محاسبې';

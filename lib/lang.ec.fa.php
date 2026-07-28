@@ -63,7 +63,7 @@ $ec_lang['menu_main_language']='زبان';
 $ec_lang['menu_more']='بیشتر';
 $ec_lang['template_welcome']='ترس‌هایت را پشت در بگذار؛ اینجا زبان محبت است. تو همه چیز را خراب نمی‌کنی. از <a target="_blank" href="https://hawsedc.com/download.php">ابزارهای رایگان HawsEDC AutoCAD</a> هم لذت ببر.';
 $ec_lang['template_translation_help']='آیا می‌توانید عبارت‌بندی بهتر یا هر چیز دیگری را پیشنهاد دهید؟ لطفاً به ما بگویید.';
-$ec_lang['template_feedback']='لطفاً نظرات ارزشمند خود را برای پیشنهاد یا تعریف با ما در میان بگذارید. آیا این ماشین‌حساب رایگان در همه جهات انتظارات شما را برآورده کرد؟';
+$ec_lang['template_feedback']='لطفاً پیشنهادها یا نظرات تحسین‌آمیز خود را برای ما بفرستید. آیا این ماشین‌حساب رایگان به شما کمک کرد؟';
 $ec_lang['template_printable_title']='عنوان قابل چاپ';
 $ec_lang['template_printable_subtitle']='زیرعنوان قابل چاپ';
 $ec_lang['index_title']='ماشین‌حساب‌های رایگان مهندسی آنلاین';
