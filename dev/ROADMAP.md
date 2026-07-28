@@ -17,7 +17,8 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   does), so the 26 existing translations are **soft-stale**: still accurate about the button's
   effect, but the noun form where English is now imperative. The other two are the US/SI preset
   buttons, seeded as English.
-  **Now 11 keys** — Task 167 added eight more (`hw_elev_up`, `hw_pressure_up`, `hw_elev_down`,
+  **Now 11 new keys plus 2 changed** — Task 169 made `mphl_note_1` a second CHANGED key needing a
+  semantic resync, alongside `calc_defaults`. Task 167 added eight more (`hw_elev_up`, `hw_pressure_up`, `hw_elev_down`,
   `hw_pressure_down`, `hw_pressure_check`, `hw_pressure_ok_short`, `hw_pressure_neg_short`,
   `hw_pressure_neg`), all seeded as English. 11 × 26 = 286 strings, which is now a defensible sprint
   on its own if nothing else is queued.
@@ -28,28 +29,21 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   **Do not run `detect_english_drift.php --update` before the resync lands** — that re-baselines the
   manifest and would erase the only record that `calc_defaults` drifted.
 
-- 20|168| **Extend the Task 167 upstream-first rework to Darcy-Weisbach.** `Darcy-Weisbach.php`
-  still takes a single "Downstream EGL" and solves upstream, the form Task 167 replaced on
-  Hazen-Williams. Deliberately **not** done in the same pass: reach-weighting says HW (580 humans)
-  earns the change and DW (67 humans) has to earn it separately, and doing both at once would have
-  been the reciprocity reasoning that Task 138 was cut down for. **The eight language keys already
-  exist** (`hw_elev_up`, `hw_pressure_up`, `hw_elev_down`, `hw_pressure_down`, `hw_pressure_check`,
-  `hw_pressure_*_short`, `hw_pressure_neg`) and are borrowed under the concept-level label reuse
-  rule, so this costs **no new translation** — only the page and JS edits. Worth doing once HW's
-  version has been seen working.
-  **Manning Pipe Head Loss should NOT get this.** Storm drain and culvert design genuinely runs
-  downstream-to-upstream from a known tailwater, so its current form fits its audience. This is the
-  clearest case in the suite of two pages that look identical needing opposite treatment.
-
-- 12|169| **`mphl_note_1` now overstates its limitation on the Hazen-Williams page.** It opens
-  *"This calculator doesn't account for pipe elevation"*, which stopped being true for HW when Task
-  167 gave it upstream and downstream elevations. The note is **still fully true for
-  Manning-Pipe-Head-Loss**, and still partly true for HW — the *pipe profile between the two ends* is
-  not modelled, so the HGL can dip below the pipe mid-run even when both endpoints are fine. The key
-  is shared by both pages, so fixing it means either an HW-specific note (a new key, 26 translations)
-  or a rewording that stays true on both (no new key, but a CHANGED key and a resync). **Prefer the
-  rewording** — something that says the profile between the ends is not modelled, which is the real
-  limitation on both pages. Low priority: the note is misleading in emphasis, not wrong.
+- 15|170| **The shared `mphl_note_1` is mostly culvert material, and only one of its three pages is
+  a culvert calculator.** Found while doing Task 169, 2026-07-28, and deliberately not fixed there.
+  Beyond the one sentence Task 169 corrected, the note's bulk is an open-inlet/culvert discussion:
+  inlet-control checks, headwater represented by EGL, a link to Tom's HY-8 tutorial, and a statement
+  that the page solves outlet control only. That is exactly right for **Manning Pipe Head Loss** (a
+  storm drain and culvert calculator) and largely noise on **Hazen-Williams** and **Darcy-Weisbach**,
+  which after Tasks 167/168 are explicitly waterline calculators taking upstream pressure and
+  reporting downstream residual pressure. A waterline engineer has no use for HY-8.
+  **This is the same pattern as Task 167 one level up:** three pages sharing content that fits one
+  audience, surviving because the pages look alike. Tom's Task 144 domain model keeps paying out.
+  **Cost:** a waterline-appropriate note is a new key (26 translations). What it should say is
+  genuinely different — pipe profile and negative pressure, pump/tank boundary conditions, minor-loss
+  K sourcing — not a trimmed version of the culvert text. **Reach-weight it:** HW is 580 humans,
+  DW is 67, so this is really a question about the HW page. Do not split the note on symmetry
+  grounds alone.
 
 - 15|144| **Diagnose the Hazen-Williams conversion leak.** Per the 2026-07-27 usage snapshot
   (`dev/usage-data-log.md`), HW draws 580 confirmed-human views — the suite's second-biggest genuine
@@ -475,6 +469,30 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|168|[CC] **Darcy-Weisbach reworked upstream-first — DONE 2026-07-28.** Applied the Task 167
+  form: the single "Downstream EGL" input became Upstream elevation, Upstream pressure and Downstream
+  elevation, with Downstream pressure as the headline result and the negative-pressure check. **Zero
+  new language keys** — the eight `hw_*` labels were borrowed whole under the concept-level label
+  reuse rule, which is exactly the case that rule exists for.
+  Verified: opens at 45.19 psi residual (SI 29.49 m H₂O), the check flips to ⚠ at z_down = 250 ft
+  (−11.17 psi), and **DW and HW agree to within 0.4% on head loss for the same pipe** (6.143 vs
+  6.168 psi) — a useful independent cross-check, since one is Hazen-Williams C = 130 and the other is
+  Darcy-Weisbach with ε = 0.0005 ft.
+  **Manning Pipe Head Loss was deliberately left alone.** Storm drain and culvert design genuinely
+  runs downstream-to-upstream from a known tailwater, so its current form fits its audience. Three
+  pages that look identical, and the right answer for the third is the opposite of the other two.
+
+- 0|169|[CC] **Reworded `mphl_note_1`'s opening claim — DONE 2026-07-28.** It said *"This calculator
+  doesn't account for pipe elevation,"* which stopped being true for Hazen-Williams and
+  Darcy-Weisbach once Tasks 167/168 gave them endpoint elevations. Now reads *"This calculator does
+  not model the pipe profile between the two ends"* — true on all three pages, and it names the real
+  limitation rather than a superseded one: the HGL can still dip below the pipe mid-run even when
+  both endpoints are satisfactory. The consequence sentence that follows is unchanged.
+  A shared key was reworded rather than a page-specific note added, so this costs **no new key** —
+  but it is now a CHANGED key, and `detect_english_drift.php` reports it alongside `calc_defaults`
+  for the pending resync. **The larger finding it exposed — that the note's remaining bulk is
+  culvert material irrelevant to the two waterline pages — is Task 170.**
 
 - 0|167|[CC] **Hazen-Williams reworked to solve downstream from the end the user knows — DONE
   2026-07-28.** The page took a single input labelled **"Downstream EGL"** and computed upstream

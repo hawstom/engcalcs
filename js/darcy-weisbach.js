@@ -10,7 +10,9 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.readFormInput(objForm, 'e', hasUnits = true);
 	this.readFormInput(objForm, 'v', hasUnits = false);
 	this.readFormInput(objForm, 'km', hasUnits = false);
-	this.readFormInput(objForm, 'egl1', hasUnits = true);
+	this.readFormInput(objForm, 'z_up', hasUnits = true);
+	this.readFormInput(objForm, 'p_up', hasUnits = true);
+	this.readFormInput(objForm, 'z_down', hasUnits = true);
 	this.var.a = (Math.PI * Math.pow(this.var.d, 2) / 4);
 	this.var.pw = Math.PI * this.var.d;
 	this.var.rh = this.var.d / 4;
@@ -49,12 +51,18 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.var.sf = this.var.f * Math.pow(this.var.u, 2) / (2 * this.var.d * this.var.g);
 	this.var.tau = this.var.rh * this.var.sf;
 	this.var.hv = Math.pow(this.var.u,2) / (2 * this.var.g);
-	this.var.hgl1 = +this.var.egl1 - +this.var.hv;
+
 	this.var.hf = this.var.sf * this.var.l;
 	this.var.hm = this.var.hv * this.var.km;
 	this.var.hl = +this.var.hf + +this.var.hm;
-	this.var.egl2 = +this.var.egl1 + +this.var.hl;
-	this.var.hgl2 = +this.var.egl2 - +this.var.hv;
+	// Solve DOWNSTREAM from the known upstream end (Task 168, mirroring Task 167 on
+	// Hazen-Williams). Velocity head is equal at both ends, so it cancels out of
+	// p_down; it is still carried so the EGL/HGL rows stay honest.
+	this.var.hgl_up   = +this.var.z_up + +this.var.p_up;
+	this.var.egl_up   = +this.var.hgl_up + +this.var.hv;
+	this.var.egl_down = +this.var.egl_up - +this.var.hl;
+	this.var.hgl_down = +this.var.egl_down - +this.var.hv;
+	this.var.p_down   = +this.var.hgl_down - +this.var.z_down;
 	this.writeFormResult(objForm, 'a', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'pw', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'rh', precision = 4, hasUnits = true);
@@ -76,9 +84,18 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.writeFormResult(objForm, 'hf', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'hm', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'hl', precision = 4, hasUnits = true);
-	this.writeFormResult(objForm, 'hgl1', precision = 4, hasUnits = true);
-	this.writeFormResult(objForm, 'egl2', precision = 4, hasUnits = true);
-	this.writeFormResult(objForm, 'hgl2', precision = 4, hasUnits = true);
+	this.writeFormResult(objForm, 'p_down', precision = 4, hasUnits = true);
+	// Negative downstream pressure = HGL below the pipe: it would not flow full and the
+	// result is not valid. Checkable only because elevation and pressure are separate.
+	this.writeVelocityCheck('p_check', (this.var.p_down >= 0) ? 'ok' : 'low', {
+		ok:     EngCalcs.pageConfig.hw_pressure_ok_short,
+		low:    EngCalcs.pageConfig.hw_pressure_neg_short,
+		lowTip: EngCalcs.pageConfig.hw_pressure_neg
+	});
+	this.writeFormResult(objForm, 'hgl_up', precision = 4, hasUnits = true);
+	this.writeFormResult(objForm, 'egl_up', precision = 4, hasUnits = true);
+	this.writeFormResult(objForm, 'egl_down', precision = 4, hasUnits = true);
+	this.writeFormResult(objForm, 'hgl_down', precision = 4, hasUnits = true);
 };
 
 EngCalcs.pageCalculatorInitialize = function (objForm) {

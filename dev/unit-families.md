@@ -375,5 +375,11 @@ mechanism.
 reviewed and deliberately kept (Tom, 2026-07-28). Typing 1 and switching m → ft gives 1 ft, not
 0.305 ft. Conversion was considered and rejected as more confusing, not less. **Do not "fix" this.**
 
+**Darcy-Weisbach and Hazen-Williams now share the upstream-first form** (Tasks 167/168): Upstream
+elevation + Upstream pressure + Downstream elevation in, Downstream pressure out, with a
+negative-pressure check that is only possible because elevation and pressure are separate fields.
+Manning Pipe Head Loss keeps the downstream-first form on purpose — storm drain and culvert design
+runs from a known tailwater upstream.
+
 **Translation of the two new button labels.** `calc_units_us` = "US" and `calc_units_si` = "SI" are
 seeded as English in all 27 files and add 52 to the payload delta. They ride the next sprint.
