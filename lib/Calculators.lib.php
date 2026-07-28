@@ -28,6 +28,28 @@ function inputHtml($name, $type, $default, $indent_string)
 
 }
 
+// Inline "solve this field from a target flow" control. Returned as HTML for an input
+// array's 'control' key, so echoCalculatorForm() renders it in the label cell just after
+// </label> -- the field being solved for and the control that solves it are one element.
+// Reuses the solver_q / solver_qu / solver_msg ids the page's own solver JS already reads.
+// The line reads "[Solve] for Flow, Q = __ [units]": the connective is ONE whole language
+// key (mpf_solve_for_flow), never a preposition composed with a separate noun at render
+// time, so word order and case agreement stay the translator's to decide.
+function solverControlHtml($onclick, $units = Array('m3ps','lps','mld','ft3ps','gpm','mgd'))
+{
+    global $ec_lang, $ec_units;
+    $html = "\n" . '<span class="ec-solverline d-print-none">'
+        . '<button type="button" onclick="' . $onclick . '">' . $ec_lang['mpf_solve_button'] . '</button> '
+        . $ec_lang['mpf_solve_for_flow'] . ' '
+        . '<input class="input" type="number" step="any" id="solver_q" value="1.0" />'
+        . ' <select id="solver_qu" onchange="EngCalcs.submitForm()">';
+    foreach ($units as $unit) {
+        $html .= '<option value="' . $ec_units[$unit] . '">' . $ec_lang['u_' . $unit] . '</option>';
+    }
+    $html .= '</select> <span id="solver_msg" class="ec-status-bad"></span></span>';
+    return $html;
+}
+
 function echoUnitSelect($name, $units, $indent_string)
 {
     if ($units !== NULL) {
@@ -81,7 +103,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	foreach ($arrayInputs as $input) {
 ?>
 							<tr class="collapse show" id="<?=$input['name']?>_row">
-								<td><label for='<?=$input['name']?>'><?=$input['label']?></label></td>
+								<td><label for='<?=$input['name']?>'><?=$input['label']?></label><?php if (!empty($input['control'])) echo $input['control']; ?></td>
 								<td>
 									<?php echo inputHtml($input['name'], $input['type'], $input['default'], "\t\t\t\t\t\t\t\t\t");?><?php if (!empty($input['separator'])) echo ' ' . $input['separator'] . ' '; ?><?php echoUnitSelect($input['name'].'u', $input['units'], "\t\t\t\t\t\t\t\t\t");?>
 								</td>

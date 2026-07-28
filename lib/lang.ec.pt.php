@@ -160,9 +160,8 @@ $ec_lang['mpf_shear_stress']='Tensão de cisalhamento média, &tau;';
 $ec_lang['mpf_full_flow']='Vazão a seção plena, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Razão em relação à seção plena, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>Este é o escoamento e a profundidade no interior de uma tubulação <em>infinitamente longa</em>.</dt><dd>Fazer o escoamento entrar na tubulação pode exigir uma profundidade de água significativamente maior. Acrescente pelo menos 1,5 vezes a carga de velocidade para obter a profundidade de água a montante ou <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">veja meu tutorial de 2 minutos</a> sobre cálculos padrão de nível de água em bueiros usando HY-8.</dd>';
-$ec_lang['mpf_solve_for_dd0']='Calcular y/d<sub>0</sub> para um Q dado';
-$ec_lang['mpf_solve_desc']='Usando d<sub>0</sub>, n e S<sub>f</sub> do formulário da calculadora, encontra o menor y/d<sub>0</sub> para um Q dado.';
 $ec_lang['mpf_solve_button']='Calcular';
+$ec_lang['mpf_solve_for_flow']='para vazão, Q =';
 $ec_lang['mpf_solver_enter_positive_q']='Informe um Q alvo positivo.';
 $ec_lang['mpf_solver_no_solution']='Sem solução: Q excede a capacidade da tubulação em y/d0 = 93.8% (Qmax = {qmax} nas unidades selecionadas).';
 // Manning Pipe Head Loss. See mpf_ for missing text.
@@ -215,8 +214,6 @@ $ec_lang['mtc_iteration_tip']='Escolha uma opção de rugosidade (recomenda-se B
 $ec_lang['mtc_note_1']='<dl><dt>Iteração automatizada de dimensionamento de rocha e rugosidade</dt><dd>Escolha uma opção de rugosidade (recomenda-se Blodgett–Bathurst) e uma opção de tamanho de rocha de projeto (recomenda-se Isbash). Ajuste a profundidade e o fator de segurança do tamanho de rocha para atingir a vazão desejada com um tamanho de rocha uniforme. A cada alteração de um valor de entrada, a calculadora repete estas etapas: 1. A rugosidade é calculada a partir do tamanho de rocha de projeto. 2. O cálculo de rugosidade solicitado é copiado para a rugosidade de entrada. 3. A vazão do canal e o tamanho de rocha requerido são calculados. 4. O tamanho de rocha de projeto é ajustado. 5. Repete-se até que o erro no tamanho de rocha de projeto seja muito pequeno.</dd><dt>Calculadora básica (sem iteração)</dt><dd>Digite o valor de rugosidade desejado. Ignore a área de entrada do tamanho de rocha de projeto.</dd></dl>';
 $ec_lang['mtc_note_2_term']='Verificação de velocidade';
 $ec_lang['mtc_note_2_def']='Velocidade alta implica que houve uma grande queda de elevação, que gerou essa energia específica elevada. Essa energia pode se dissipar rapidamente em expansões, curvas ou obstruções. Verifique se isso é razoável para o local.';
-$ec_lang['mtc_solve_for_y']='Determinar a profundidade, y, dada Q';
-$ec_lang['mtc_solve_desc']='Usando b, z<sub>1</sub>, z<sub>2</sub>, S e n do formulário da calculadora, encontra a profundidade para uma vazão Q dada.';
 $ec_lang['mtc_solver_no_solution']='Nenhuma solução encontrada para a vazão Q dada com estas entradas do canal.';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='Vertedor Simples';

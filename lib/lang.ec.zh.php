@@ -159,9 +159,8 @@ $ec_lang['mpf_shear_stress']='平均切应力，&tau;';
 $ec_lang['mpf_full_flow']='满流流量，Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='流量比，Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>这是<em>无限长</em>管道内部的流量和水深。</dt><dd>使水流进入管道可能需要明显更高的上游水位。请在水深基础上至少加 1.5 倍流速水头来估算上游水位，或 <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">参见 2 分钟教程</a>，了解使用 HY-8 进行标准涵洞水位计算的方法。</dd>';
-$ec_lang['mpf_solve_for_dd0']='已知 Q 求 y/d<sub>0</sub>';
-$ec_lang['mpf_solve_desc']='使用计算器表单中的 d<sub>0</sub>、n 和 S<sub>f</sub>，求给定 Q 对应的最小 y/d<sub>0</sub>。';
 $ec_lang['mpf_solve_button']='求解';
+$ec_lang['mpf_solve_for_flow']='对于流量，Q =';
 $ec_lang['mpf_solver_enter_positive_q']='请输入正值目标流量 Q。';
 $ec_lang['mpf_solver_no_solution']='无解：在 y/d0 = 93.8% 处，Q 已超过管道通流能力（所选单位下 Qmax = {qmax}）。';
 // Manning Pipe Head Loss. See mpf_ for missing text.
@@ -214,8 +213,6 @@ $ec_lang['mtc_iteration_tip']='选择糙率计算方法（推荐 Blodgett–Bath
 $ec_lang['mtc_note_1']='<dl><dt>石材粒径与糙率自动迭代设计</dt><dd>选择糙率计算方法（推荐 Blodgett–Bathurst 法）和设计石材粒径方法（推荐 Isbash 法）。调整水深和石材粒径安全系数，以在统一石材粒径下达到目标流量。每次修改输入值时，计算器都会重复以下步骤：1. 由设计石材粒径计算糙率。2. 将所求糙率复制到输入糙率。3. 计算渠道流量和所需石材粒径。4. 调整设计石材粒径。5. 重复上述步骤，直至设计石材粒径的误差极小。</dd><dt>基础计算器（不迭代）</dt><dd>直接输入所需的糙率值，忽略设计石材粒径输入区域。</dd></dl>';
 $ec_lang['mtc_note_2_term']='流速校核';
 $ec_lang['mtc_note_2_def']='流速过高说明存在较大的高程落差，从而产生了较高的比能。该能量可能在扩散段、弯道或障碍物处迅速耗散。请核实这在现场条件下是否合理。';
-$ec_lang['mtc_solve_for_y']='由 Q 反算水深，y';
-$ec_lang['mtc_solve_desc']='根据计算器表单中的 b、z<sub>1</sub>、z<sub>2</sub>、S 和 n，求解给定流量 Q 对应的水深。';
 $ec_lang['mtc_solver_no_solution']='在当前渠道输入条件下，未找到满足给定流量 Q 的解。';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='简单堰流';

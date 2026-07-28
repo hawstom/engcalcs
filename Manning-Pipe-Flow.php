@@ -15,21 +15,6 @@ echoHeader("EngCalcs", $html_title, $html_head);
 </p>
 <?php echoHelpWanted(); ?>
 
-<div class="d-print-none" id="mpf-solver">
-	<p>
-		<strong><?=$ec_lang['mpf_solve_for_dd0']?></strong> — <?=$ec_lang['mpf_solve_desc']?><br>
-		<?=$ec_lang['mpf_flow']?>:
-		<input class="input" type="number" step="any" id="solver_q" value="1.0" />
-		<select id="solver_qu">
-<?php foreach (['m3ps','lps','mld','ft3ps','gpm','mgd'] as $qu): ?>
-			<option value="<?=$ec_units[$qu]?>"><?=$ec_lang['u_'.$qu]?></option>
-<?php endforeach; ?>
-		</select>
-		<button type="button" onclick="EngCalcs.solveForDd0();"><?=$ec_lang['mpf_solve_button']?></button>
-		<span id="solver_msg" style="color:red;margin-left:0.5em;"></span>
-	</p>
-</div>
-
 <?php
 echoCalculatorForm(
 	//Inputs
@@ -37,7 +22,7 @@ echoCalculatorForm(
 		Array('name' => 'd0', 'type' => 'number', 'default' => '1', 'units' => Array('m','mm','ft','in'), 'label' => $ec_lang['mpf_pipe_diameter']),
 		Array('name' => 'n', 'type' => 'number', 'default' => '0.01', 'units' => NULL, 'label' => '<a target="_blank" href="http://www.engineeringtoolbox.com/mannings-roughness-d_799.html">'.$ec_lang['mpf_manningRoughness'].'</a>'),
 		Array('name' => 'sf', 'type' => 'number', 'default' => '0.001', 'units' => Array('grade','gradePercent'), 'label' => $ec_lang['mpf_friction_slope']),
-		Array('name' => 'dd0', 'type' => 'number', 'default' => '0.5', 'units' => Array('depthFrac','depthPercent'), 'label' => $ec_lang['mpf_depth_ratio']),
+		Array('name' => 'dd0', 'type' => 'number', 'default' => '0.5', 'units' => Array('depthFrac','depthPercent'), 'label' => $ec_lang['mpf_depth_ratio'], 'control' => solverControlHtml('EngCalcs.solveForDd0();')),
 	),
 	//Results
 	Array(

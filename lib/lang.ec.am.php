@@ -160,9 +160,8 @@ $ec_lang['mpf_shear_stress']='አማካይ ሺር ስትሬስ, &tau;';
 $ec_lang['mpf_full_flow']='ሙሉ ፍሰት, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='ከሙሉ ፍሰት ጋር ያለ ጥምርታ, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>ይህ <em>ወሰን የሌለው</em> ቧንቧ ውስጥ ያለ ፍሰት እና ጥልቀት ነው።</dt><dd>ፍሰቱን ወደ ቧንቧ ለማስገባት ከፍ ያለ የላይኛው ውሃ ጥልቀት ሊያስፈልግ ይችላል። የላይኛው ውሃ ጥልቀቱን ለማግኘት ቢያንስ 1.5 እጥፍ የፍጥነት ሄድ ጨምር ወይም <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">የ2 ደቂቃ ትምህርቴን ይመልከቱ</a> HY-8 ተጠቅሞ ለተለመደ culvert የላይኛው ውሃ ስሌቶች።</dd>';
-$ec_lang['mpf_solve_for_dd0']='Q ሲሰጥ y/d<sub>0</sub> ፍታ';
-$ec_lang['mpf_solve_desc']='ከካልኩሌተር ቅጹ ላይ d<sub>0</sub>, n እና S<sub>f</sub> ተጠቅሞ፣ ለተሰጠ Q ዝቅተኛ y/d<sub>0</sub> ያገኛል።';
 $ec_lang['mpf_solve_button']='ፍታ';
+$ec_lang['mpf_solve_for_flow']='ለፍሰት, Q =';
 $ec_lang['mpf_solver_enter_positive_q']='አዎንታዊ ዒላማ Q ያስገቡ።';
 $ec_lang['mpf_solver_no_solution']='ውጤት የለም፦ Q ከቧንቧው አቅም ይበልጣል y/d0 = 93.8% ላይ (Qmax = {qmax} በተመረጡት አሃዶች)።';
 // Manning Pipe Head Loss. See mpf_ for missing text.
@@ -216,8 +215,6 @@ $ec_lang['mtc_note_1']='<dl><dt>አውቶማቲክ የድንጋይ መጠን እ
 $ec_lang['mtc_note_2_term']='የፍጥነት ምርመራ';
 $ec_lang['mtc_note_2_def']='ከፍተኛ ፍጥነት ከሚገኝ ቁልቁለት ከፍተኛ ልዩ ሃይልን ያሳያል። ያ ሃይል በስፋፊዎች፣ ጥምዞች ወይም እንቅፋቶች ላይ በፍጥነት ሊጠፋ ይችላል። ይህ ለቦታው ምክንያታዊ መሆኑን ያረጋግጡ።';
 // Weir Flow Simple
-$ec_lang['mtc_solve_for_y']='Q ከተሰጠ ጥልቀት y ፍታ';
-$ec_lang['mtc_solve_desc']='ከማስያ ቅጹ b, z<sub>1</sub>, z<sub>2</sub>, S እና n ን በመጠቀም፣ ለተሰጠው Q ጥልቀቱን ያገኛል።';
 $ec_lang['mtc_solver_no_solution']='በእነዚህ የቦዮ ግቤቶች ለተሰጠው Q መፍትሔ አልተገኘም።';
 $ec_lang['ws_main_menu']='ቀላል ዊር ፍሰት';
 $ec_lang['ws_main_title']='ነፃ ኦንላይን ቀላል ሰፊ-ጫፍ ዊር ፍሰት ካልኩሌተር';

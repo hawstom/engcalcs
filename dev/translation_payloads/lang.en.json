@@ -151,9 +151,8 @@
         "mpf_note_1": "<dl><dt>This is the flow and depth inside an <em>infinitely long<\/em> pipe.<\/dt><dd>Getting the flow into the pipe may require significantly higher headwater depth. Add at least 1.5 times the velocity head to estimate the headwater depth, or <a target=\"_blank\" href=\"https:\/\/www.youtube.com\/watch?v=0O1Ezk8SVxU\">see my 2-minute tutorial<\/a> for standard culvert headwater calculations using HY-8.<\/dd>",
         "mpf_solver_enter_positive_q": "Enter a positive target Q.",
         "mpf_solver_no_solution": "No solution: Q exceeds pipe capacity at y\/d0 = 93.8% (Qmax = {qmax} in selected units).",
-        "mpf_solve_for_dd0": "Solve for y\/d<sub>0<\/sub> given Q",
-        "mpf_solve_desc": "Using d<sub>0<\/sub>, n, and S<sub>f<\/sub> from the calculator form, finds the lowest y\/d<sub>0<\/sub> for a given Q.",
         "mpf_solve_button": "Solve",
+        "mpf_solve_for_flow": "for Flow, Q =",
         "mphl_main_menu": "Manning Pipe Head Loss",
         "mphl_main_title": "Free Online Manning Pipe Head Loss Calculator",
         "mphl_main_desc": "Manning Formula Head Loss at Given Full Flow",
@@ -202,8 +201,6 @@
         "mtc_note_1": "<dl><dt>Automated rock size and roughness design iteration<\/dt><dd>Choose a roughness option (Blodgett–Bathurst recommended) and a design rock size option (Isbash recommended). Adjust depth and rock size safety factor to reach your target flow with a uniform rock size. Each time you change an input, the calculator repeats these steps: 1. Roughness is calculated from design rock size. 2. The requested roughness calculation is copied to input roughness. 3. Channel flow and required rock size are calculated. 4. Design rock size is adjusted. 5. Repeat until error in the design rock size is very small.<\/dd><dt>Basic calculator (no iteration)<\/dt><dd>Enter your desired roughness value. Ignore the design rock size input area.<\/dd><\/dl>",
         "mtc_note_2_term": "Velocity check",
         "mtc_note_2_def": "High velocity implies that there was a large elevation drop that created such high specific energy. That energy can be lost quickly at expansions, bends, or obstructions. Verify that this is reasonable for the site.",
-        "mtc_solve_for_y": "Solve for depth, y, given Q",
-        "mtc_solve_desc": "Using b, z<sub>1<\/sub>, z<sub>2<\/sub>, S, and n from the calculator form, finds the depth for a given Q.",
         "mtc_solver_no_solution": "No solution found for the given Q with these channel inputs.",
         "ws_main_menu": "Weir Flow Simple",
         "ws_main_title": "Free Online Simple Broad-crested Weir Flow Calculator",
@@ -568,7 +565,7 @@
         "bpn_show_elevation": "Elevation",
         "bpn_supply1_h": "Static supply head"
     },
-    "count": 566,
+    "count": 563,
     "active_prefixes": [
         "about",
         "bpn",

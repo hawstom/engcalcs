@@ -64,6 +64,17 @@ input[type=number] {
 	font-size: 0.9em;
 }
 
+/* Second line of an input label carrying that field's inline solver control
+   (solverControlHtml() in lib/Calculators.lib.php). Deliberately plain: no rule, no
+   indent glyph -- the leading button is enough to mark the line as a control, and any
+   directional decoration would have to be mirrored for the RTL languages. Line height
+   is left alone so the Q input keeps its natural height. */
+.ec-solverline {
+	display: block;
+	margin-top: 2px;
+	font-weight: normal;
+}
+
 /* Whole-label wrapper: makes the entire label (not just the ? icon) the hover/tap
    target for the tip carried in .ec-tip's title attribute. */
 .ec-help {

@@ -161,9 +161,8 @@ $ec_lang['mpf_shear_stress']='Contrainte de cisaillement moyenne, &tau;';
 $ec_lang['mpf_full_flow']='Débit à section pleine, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Rapport au débit à section pleine, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>Il s\'agit du débit (et de la profondeur) à l\'intérieur d\'une conduite de <em>longueur infinie</em>.</dt><dd>Faire entrer le débit dans la conduite peut nécessiter une charge amont nettement plus élevée. Ajoutez au moins 1,5 fois la charge cinétique pour obtenir la charge amont, ou <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">consultez mon tutoriel de 2 minutes</a> pour les calculs standard de charge amont de buse avec HY-8.</dd>';
-$ec_lang['mpf_solve_for_dd0']='Calculer y/d<sub>0</sub> pour un Q donné';
-$ec_lang['mpf_solve_desc']='En utilisant d<sub>0</sub>, n et S<sub>f</sub> du formulaire, trouve le plus petit y/d<sub>0</sub> pour un Q donné.';
 $ec_lang['mpf_solve_button']='Calculer';
+$ec_lang['mpf_solve_for_flow']='pour débit, Q =';
 $ec_lang['mpf_solver_enter_positive_q']='Entrez un Q cible positif.';
 $ec_lang['mpf_solver_no_solution']='Aucune solution : Q dépasse la capacité de la conduite à y/d0 = 93.8% (Qmax = {qmax} dans les unités sélectionnées).';
 // Manning Pipe Head Loss. See mpf_ for missing text.
@@ -216,8 +215,6 @@ $ec_lang['mtc_iteration_tip']='Choisissez une option de rugosité (Blodgett–Ba
 $ec_lang['mtc_note_1']='<dl><dt>Itération automatique de la granulométrie et de la rugosité</dt><dd>Choisissez une option de rugosité (Blodgett–Bathurst recommandée) et une option de granulométrie de conception (Isbash recommandée). Ajustez la profondeur et le coefficient de sécurité de la granulométrie pour atteindre le débit cible avec une granulométrie uniforme. À chaque modification d\'une entrée, le calculateur répète ces étapes : 1. La rugosité est calculée à partir de la granulométrie de conception. 2. La rugosité calculée est copiée dans le champ de rugosité en entrée. 3. Le débit du canal et la granulométrie requise sont calculés. 4. La granulométrie de conception est ajustée. 5. Répéter jusqu\'à ce que l\'écart sur la granulométrie de conception soit très faible.</dd><dt>Calculateur de base (sans itération)</dt><dd>Entrez la valeur de rugosité souhaitée. Ignorez la zone de saisie de la granulométrie de conception.</dd></dl>';
 $ec_lang['mtc_note_2_term']='Vérification de la vitesse';
 $ec_lang['mtc_note_2_def']='Une vitesse élevée implique une chute de niveau importante ayant produit une énergie spécifique élevée. Cette énergie peut être dissipée rapidement aux élargissements, coudes ou obstacles. Vérifiez que cela est raisonnable pour le site.';
-$ec_lang['mtc_solve_for_y']='Résoudre pour la profondeur, y, à partir de Q';
-$ec_lang['mtc_solve_desc']='À partir de b, z<sub>1</sub>, z<sub>2</sub>, S et n du formulaire, détermine la profondeur pour un Q donné.';
 $ec_lang['mtc_solver_no_solution']='Aucune solution trouvée pour le Q donné avec ces paramètres de canal.';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='Déversoir simple';

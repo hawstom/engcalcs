@@ -159,9 +159,8 @@ $ec_lang['mpf_shear_stress']='Mittlere Sohlschubspannung, &tau;';
 $ec_lang['mpf_full_flow']='Vollfüllung, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Füllungsverhältnis, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>Dies ist der Durchfluss und die Tiefe innerhalb eines <em>unendlich langen</em> Rohres.</dt><dd>Um den Durchfluss in das Rohr zu leiten, kann eine erheblich höhere Oberwassertiefe erforderlich sein. Addieren Sie mindestens das 1,5-fache der Geschwindigkeitshöhe zur Oberwassertiefe oder <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">sehen Sie das 2-Minuten-Tutorial</a> für Standard-Durchlassberechnungen mit HY-8.</dd>';
-$ec_lang['mpf_solve_for_dd0']='y/d<sub>0</sub> für gegebenes Q berechnen';
-$ec_lang['mpf_solve_desc']='Mit d<sub>0</sub>, n und S<sub>f</sub> aus dem Rechnerformular wird das kleinste y/d<sub>0</sub> für ein gegebenes Q ermittelt.';
 $ec_lang['mpf_solve_button']='Berechnen';
+$ec_lang['mpf_solve_for_flow']='für Durchfluss, Q =';
 $ec_lang['mpf_solver_enter_positive_q']='Geben Sie ein positives Ziel-Q ein.';
 $ec_lang['mpf_solver_no_solution']='Keine Lösung: Q übersteigt die Rohrkapazität bei y/d0 = 93.8% (Qmax = {qmax} in den gewählten Einheiten).';
 // Manning Pipe Head Loss. See mpf_ for missing text.
@@ -214,8 +213,6 @@ $ec_lang['mtc_iteration_tip']='Wählen Sie eine Rauheitsoption (Blodgett–Bathu
 $ec_lang['mtc_note_1']='<dl><dt>Automatische Iteration Steinbemessung und Rauheit</dt><dd>Wählen Sie eine Rauheitsoption (Blodgett–Bathurst empfohlen) und eine Option für die Bemessungskorngröße (Isbash empfohlen). Stellen Sie Tiefe und Steinbemessungsfaktor ein, um den gewünschten Durchfluss mit einer gleichmäßigen Korngröße zu erzielen. Bei jeder Änderung eines Eingabewerts startet der Iterationszyklus: 1. Die Rauheit wird aus der Bemessungskorngröße berechnet. 2. Der berechnete Rauheitswert wird in die Eingaberauheit kopiert. 3. Kanaldurchfluss und erforderliche Korngröße werden berechnet. 4. Die Bemessungskorngröße wird angepasst. 5. Wiederholen bis der Fehler sehr klein ist.</dd><dt>Grundrechner (ohne Iteration)</dt><dd>Geben Sie den gewünschten Rauheitswert ein. Ignorieren Sie den Eingabebereich für die Bemessungskorngröße.</dd></dl>';
 $ec_lang['mtc_note_2_term']='Geschwindigkeitsprüfung';
 $ec_lang['mtc_note_2_def']='Hohe Geschwindigkeit impliziert hohe spezifische Energie aus einem verfügbaren Absturz. Diese Energie kann schnell an Aufweitungen, Bögen oder Hindernissen abgebaut werden. Prüfen Sie, ob dies für den Standort plausibel ist.';
-$ec_lang['mtc_solve_for_y']='Tiefe y für gegebenes Q berechnen';
-$ec_lang['mtc_solve_desc']='Berechnet mit b, z<sub>1</sub>, z<sub>2</sub>, S und n aus dem Rechnerformular die Tiefe für ein gegebenes Q.';
 $ec_lang['mtc_solver_no_solution']='Für das gegebene Q wurde bei diesen Kanaleingaben keine Lösung gefunden.';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='Einfaches Wehr';

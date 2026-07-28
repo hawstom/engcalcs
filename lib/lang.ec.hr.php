@@ -158,9 +158,8 @@ $ec_lang['mpf_shear_stress']='Prosječno posmično naprezanje, &tau;';
 $ec_lang['mpf_full_flow']='Puni protok, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Omjer prema punom protoku, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>Ovo je protok i dubina unutar <em>beskonačno dugačke</em> cijevi.</dt><dd>Uvođenje protoka u cijev može zahtijevati znatno veću dubinu uzvodne vode. Dodajte barem 1,5 puta brzinsku visinu za procjenu dubine uzvodne vode, ili <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">pogledajte moj 2-minutni tutorial</a> za standardne proračune uzvodne razine propusta pomoću HY-8.</dd>';
-$ec_lang['mpf_solve_for_dd0']='Izračunaj y/d<sub>0</sub> za zadani Q';
-$ec_lang['mpf_solve_desc']='Koristeći d<sub>0</sub>, n i S<sub>f</sub> iz obrasca kalkulatora, pronalazi najmanji y/d<sub>0</sub> za zadani Q.';
 $ec_lang['mpf_solve_button']='Izračunaj';
+$ec_lang['mpf_solve_for_flow']='za protok, Q =';
 $ec_lang['mpf_solver_enter_positive_q']='Unesite pozitivan ciljani Q.';
 $ec_lang['mpf_solver_no_solution']='Nema rješenja: Q premašuje kapacitet cijevi pri y/d0 = 93.8% (Qmax = {qmax} u odabranim jedinicama).';
 // Manning Pipe Head Loss. See mpf_ for missing text.
@@ -213,8 +212,6 @@ $ec_lang['mtc_iteration_tip']='Odaberite opciju hrapavosti (preporučuje se Blod
 $ec_lang['mtc_note_1']='<dl><dt>Automatizirana iteracija dimenzioniranja kamena i hrapavosti</dt><dd>Odaberite radio gumb za hrapavost (preporučuje se Blodgett–Bathurst) i radio gumb za projektnu veličinu kamena (preporučuje se Isbash). Fino podesite dubinu i faktor sigurnosti veličine kamena kako biste dobili željeni protok s jednoličnom veličinom kamena. Svaki put kada promijenite bilo koji ulazni podatak, odvija se sljedeći iteracijski ciklus: 1. Hrapavost se izračunava iz projektne veličine kamena. 2. Traženi izračun hrapavosti kopira se na ulaznu hrapavost. 3. Izračunavaju se protok kroz kanal i potrebna veličina kamena. 4. Projektna veličina kamena se prilagođava. 5. Ponavljati dok pogreška u projektnoj veličini kamena nije vrlo mala.</dd><dt>Osnovni kalkulator (bez iteracije)</dt><dd>Unesite željenu vrijednost hrapavosti. Zanemarite područje unosa projektne veličine kamena.</dd></dl>';
 $ec_lang['mtc_note_2_term']='Provjera brzine';
 $ec_lang['mtc_note_2_def']='Visoka brzina podrazumijeva visoku specifičnu energiju uslijed raspoloživog pada. Ta energija može se brzo izgubiti na proširenjima, zavojima ili preprekama. Provjerite je li to razumno za dano gradilište.';
-$ec_lang['mtc_solve_for_y']='Izračunaj dubinu, y, za zadani Q';
-$ec_lang['mtc_solve_desc']='Koristeći b, z<sub>1</sub>, z<sub>2</sub>, S i n s obrasca kalkulatora, izračunava dubinu za zadani Q.';
 $ec_lang['mtc_solver_no_solution']='Nije pronađeno rješenje za zadani Q s ovim ulaznim podacima kanala.';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='Protok preko jednostavnog preljeva';

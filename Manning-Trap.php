@@ -14,21 +14,6 @@ echoHeader("EngCalcs", $html_title, $html_head);
 </p>
 <?php echoHelpWanted(); ?>
 
-<div class="d-print-none" id="mtc-solver">
-	<p>
-		<strong><?=$ec_lang['mtc_solve_for_y']?></strong> — <?=$ec_lang['mtc_solve_desc']?><br>
-		<?=$ec_lang['mpf_flow']?>:
-		<input class="input" type="number" step="any" id="solver_q" value="1.0" />
-		<select id="solver_qu">
-<?php foreach (['m3ps','lps','mld','ft3ps','gpm','mgd'] as $qu): ?>
-			<option value="<?=$ec_units[$qu]?>"><?=$ec_lang['u_'.$qu]?></option>
-<?php endforeach; ?>
-		</select>
-		<button type="button" onclick="EngCalcs.solveForY();"><?=$ec_lang['mpf_solve_button']?></button>
-		<span id="solver_msg" style="color:red;margin-left:0.5em;"></span>
-	</p>
-</div>
-
 <?php
 echoCalculatorForm(
 	//Inputs
@@ -38,7 +23,7 @@ echoCalculatorForm(
 		Array('name' => 'z2', 'type' => 'number', 'default' => '4', 'units' => NULL, 'label' => $ec_lang['mtc_side_slope_2']),
 		Array('name' => 'n_in', 'type' => 'number', 'default' => '0.03', 'units' => NULL, 'label' => '<a target="_blank" href="http://www.engineeringtoolbox.com/mannings-roughness-d_799.html">'.$ec_lang['mpf_manningRoughness'].'</a><span class="ec-help" title="'.htmlspecialchars(strip_tags($ec_lang['mtc_iteration_tip'])).'"><span class="ec-tip">?</span></span>'.'<br /> <input type="radio" name="n_radio" id="n_radio_strickler" value="strickler" onchange="EngCalcs.submitForm()" /><label for="n_radio_strickler">Strickler</label> <input type="radio" name="n_radio" id="n_radio_bb" value="bb" onchange="EngCalcs.submitForm()" /><label for="n_radio_bb">B/B</label> <input type="radio" name="n_radio" id="n_radio_pi" value="pi" onchange="EngCalcs.submitForm()" /><label for="n_radio_pi">P&amp;I</label>'),
 		Array('name' => 's0', 'type' => 'number', 'default' => '0.001', 'units' => Array('grade', 'gradePercent'), 'label' => $ec_lang['mtc_channel_slope']),
-		Array('name' => 'y', 'type' => 'number', 'default' => '1', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mtc_flow_depth']),
+		Array('name' => 'y', 'type' => 'number', 'default' => '1', 'units' => Array('m', 'mm', 'ft', 'in'), 'label' => $ec_lang['mtc_flow_depth'], 'control' => solverControlHtml('EngCalcs.solveForY();')),
 		Array('name' => 'beta', 'type' => 'number', 'default' => '0', 'units' => NULL, 'label' => $ec_lang['mtc_bend_angle']),
 		Array('name' => 'sgrock', 'type' => 'number', 'default' => '2.65', 'units' => NULL, 'label' => $ec_lang['mtc_sgrock']),
 		Array(

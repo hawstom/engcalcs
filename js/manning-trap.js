@@ -126,6 +126,18 @@ EngCalcs.pageCalculator = function(objForm) {
 EngCalcs.pageCalculatorInitialize = function (objForm) {
 };
 
+// v2 (2026-07-27): the solver moved out of a standalone banner above the form and into the
+// depth field's own label (ROADMAP Task 143), so its Q input and units select are now form
+// elements holding two positional cookie slots, immediately ahead of y -- solver_q is the
+// 11th INPUT in the form (the three n_radio buttons count too). Insert those two slots at
+// their page defaults so a v1 cookie's saved inputs still land in the right fields.
+EngCalcs.cookieFormatVersion = 2;
+EngCalcs.migrateCookie = function (cookieVars, fromVersion) {
+	'use strict';
+	if (fromVersion >= 2) { return cookieVars; }
+	return this.insertSolverCookieSlots(cookieVars, 11);
+};
+
 // Solves for depth y given a target Q, using b, z1, z2, s0, and the current
 // roughness/rock-size radio state from the main form. Depth and Q increase together
 // for this trapezoidal-channel geometry (no local peak, unlike a circular pipe), so a

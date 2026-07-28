@@ -79,6 +79,18 @@ EngCalcs.pageCalculator = function(objForm) {
 EngCalcs.pageCalculatorInitialize = function (objForm) {
 };
 
+// v2 (2026-07-27): the solver moved out of a standalone banner above the form and into the
+// depth field's own label (ROADMAP Task 143), so its Q input and units select are now form
+// elements holding two positional cookie slots, immediately ahead of dd0 -- solver_q is the
+// 6th INPUT in the form. Insert those two slots at their page defaults so a v1 cookie's
+// saved inputs still land in the right fields.
+EngCalcs.cookieFormatVersion = 2;
+EngCalcs.migrateCookie = function (cookieVars, fromVersion) {
+	'use strict';
+	if (fromVersion >= 2) { return cookieVars; }
+	return this.insertSolverCookieSlots(cookieVars, 6);
+};
+
 // Solves for y/d0 given a target Q, using d0, n, sf from the main form.
 // Q for a circular Manning pipe peaks at y/d0 ≈ 0.9376; no solution above that.
 EngCalcs.solveForDd0 = function() {

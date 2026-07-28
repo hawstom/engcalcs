@@ -160,9 +160,8 @@ $ec_lang['mpf_shear_stress']='Msongo wastani wa mkato, &tau;';
 $ec_lang['mpf_full_flow']='Mtiririko kamili, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Uwiano wa mtiririko kamili, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>Huu ni mtiririko na kina ndani ya bomba la <em>urefu usio na kikomo</em>.</dt><dd>Kuingiza mtiririko kwenye bomba kunaweza kuhitaji kina cha maji juu ya mlango kinachozidi zaidi. Ongeza angalau mara 1.5 ya kimo cha kasi ili kupata kina hicho, au <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">tazama mafunzo yangu ya dakika 2</a> kwa mahesabu ya kawaida ya maji ya juu ya mkondo ya bomba la kupita ukitumia HY-8.</dd>';
-$ec_lang['mpf_solve_for_dd0']='Suluhisha y/d<sub>0</sub> ikitolewa Q';
-$ec_lang['mpf_solve_desc']='Ukitumia d<sub>0</sub>, n, na S<sub>f</sub> kutoka kwa fomu ya kikokotoo, inapata y/d<sub>0</sub> ya chini kabisa kwa Q iliyopewa.';
 $ec_lang['mpf_solve_button']='Suluhisha';
+$ec_lang['mpf_solve_for_flow']='kwa mtiririko, Q =';
 $ec_lang['mpf_solver_enter_positive_q']='Weka Q lengwa chanya.';
 $ec_lang['mpf_solver_no_solution']='Hakuna suluhisho: Q inazidi uwezo wa bomba katika y/d0 = 93.8% (Qmax = {qmax} katika vitengo vilivyochaguliwa).';
 // Manning Pipe Head Loss. See mpf_ for missing text.
@@ -215,8 +214,6 @@ $ec_lang['mtc_iteration_tip']='Chagua chaguo la usuguo (Blodgett–Bathurst inap
 $ec_lang['mtc_note_1']='<dl><dt>Marudio ya kiotomatiki ya ubunifu wa ukubwa wa jiwe na usuguo</dt><dd>Chagua chaguo la usuguo (Blodgett–Bathurst inapendekezwa) na chaguo la ukubwa wa jiwe la kubuni (Isbash inapendekezwa). Rekebisha kina na kipengele cha usalama cha ukubwa wa jiwe ili kufikia mtiririko unaolengwa kwa ukubwa sawa wa jiwe. Kila unapobadilisha thamani ya ingizo, kikokotoo hurudia hatua hizi: 1. Ukakamavu huhesabiwa kutoka ukubwa wa jiwe la kubuni. 2. Hesabu ya usuguo iliyoombwa hunakiliwa kwenye usuguo wa ingizo. 3. Mtiririko wa mfereji na ukubwa wa jiwe unaohitajika huhesabiwa. 4. Ukubwa wa jiwe la kubuni hurekebishwa. 5. Rudia hadi hitilafu katika ukubwa wa jiwe la kubuni iwe ndogo sana.</dd><dt>Kikokotoo cha msingi (bila marudio)</dt><dd>Ingiza thamani yako ya usuguo unayotaka. Puuza eneo la ingizo la ukubwa wa jiwe la kubuni.</dd></dl>';
 $ec_lang['mtc_note_2_term']='Ukaguzi wa kasi';
 $ec_lang['mtc_note_2_def']='Kasi ya juu inaonyesha kulikuwa na anguko kubwa la mwinuko lililosababisha nishati mahususi ya juu namna hiyo. Nishati hiyo inaweza kupotea haraka kwenye mapanuko, mapinda, au vizuizi. Thibitisha kwamba hii inafaa kwa eneo husika.';
-$ec_lang['mtc_solve_for_y']='Tafuta kina, y, ukijua Q';
-$ec_lang['mtc_solve_desc']='Kwa kutumia b, z<sub>1</sub>, z<sub>2</sub>, S, na n kutoka fomu ya kikokotoo, hutafuta kina kwa Q iliyotolewa.';
 $ec_lang['mtc_solver_no_solution']='Hakuna suluhisho lililopatikana kwa Q iliyotolewa na ingizo hizi za mfereji.';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='Mtiririko wa Kizingiti cha Maji Rahisi';

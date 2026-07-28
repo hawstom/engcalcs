@@ -160,9 +160,8 @@ $ec_lang['mpf_shear_stress']='Tensión tangencial promedio, &tau;';
 $ec_lang['mpf_full_flow']='Caudal lleno, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Relación de caudales, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>Este es el caudal (y la profundidad) dentro de una tubería <em>de longitud infinita</em>.</dt><dd>Lograr que el caudal entre en la tubería puede requerir una profundidad de agua de entrada (cabezal) bastante mayor. Agregue por lo menos 1,5 veces la carga de velocidad para estimar la profundidad de agua de entrada, o <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">vea mi tutorial de 2 minutos</a> sobre los cálculos estándar de cabezal de entrada en alcantarillas usando HY-8.</dd>';
-$ec_lang['mpf_solve_for_dd0']='Calcular y/d<sub>0</sub> para un Q dado';
-$ec_lang['mpf_solve_desc']='Usando d<sub>0</sub>, n y S<sub>f</sub> del formulario de la calculadora, encuentra el menor y/d<sub>0</sub> para un Q dado.';
 $ec_lang['mpf_solve_button']='Calcular';
+$ec_lang['mpf_solve_for_flow']='para caudal, Q =';
 $ec_lang['mpf_solver_enter_positive_q']='Ingrese un Q objetivo positivo.';
 $ec_lang['mpf_solver_no_solution']='Sin solución: Q excede la capacidad de la tubería en y/d0 = 93.8% (Qmax = {qmax} en las unidades seleccionadas).';
 // Manning Pipe Head Loss. See mpf_ for missing text.
@@ -215,8 +214,6 @@ $ec_lang['mtc_iteration_tip']='Elija una opción de rugosidad (se recomienda Blo
 $ec_lang['mtc_note_1']='<dl><dt>Iteración automática para diseño de tamaño y rugosidad de roca</dt><dd>Elija una opción de rugosidad (se recomienda Blodgett–Bathurst) y una opción para el tamaño de roca de diseño (se recomienda Isbash). Ajuste la profundidad y el factor de seguridad del tamaño de roca para obtener el caudal deseado con un tamaño de roca uniforme. Cada vez que cambie cualquier valor de entrada, ocurre el siguiente ciclo de iteración: 1. Se calcula la rugosidad a partir del tamaño de roca de diseño. 2. El cálculo de rugosidad solicitado se copia al campo de rugosidad. 3. Se calculan el caudal del canal y el tamaño de roca requerido. 4. Se ajusta el tamaño de roca de diseño. 5. Se repite hasta que el error en el tamaño de roca de diseño sea muy pequeño.</dd><dt>Calculadora básica (sin iteración)</dt><dd>Ingrese el valor de rugosidad deseado. Ignore el área de entrada del tamaño de roca de diseño.</dd></dl>';
 $ec_lang['mtc_note_2_term']='Verificación de velocidad';
 $ec_lang['mtc_note_2_def']='La velocidad elevada implica que hubo una caída de elevación considerable que generó una energía específica tan alta. Esa energía puede disiparse rápidamente en expansiones, curvas u obstrucciones. Verifique que esto sea razonable para el sitio.';
-$ec_lang['mtc_solve_for_y']='Calcular el calado, y, para un Q dado';
-$ec_lang['mtc_solve_desc']='Usando b, z<sub>1</sub>, z<sub>2</sub>, S y n del formulario de la calculadora, calcula el calado para un Q dado.';
 $ec_lang['mtc_solver_no_solution']='No se encontró solución para el Q dado con estos datos del canal.';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='Flujo en Vertedero Simple';

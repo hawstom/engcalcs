@@ -160,9 +160,8 @@ $ec_lang['mpf_shear_stress']='Ortalama kayma gerilmesi, &tau;';
 $ec_lang['mpf_full_flow']='Tam akış, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Tam akışa oran, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>Bu, <em>sonsuz uzunluktaki</em> bir borunun içindeki akış ve derinliktir.</dt><dd>Akışın boruya girmesi için önemli ölçüde daha yüksek memba derinliği gerekebilir. Memba derinliğini elde etmek için en az 1,5 hız yükü ekleyin ya da HY-8 kullanarak standart menfez memba hesaplamaları için <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">2 dakikalık öğreticime bakın</a>.</dd>';
-$ec_lang['mpf_solve_for_dd0']='Verilen Q için y/d<sub>0</sub> hesapla';
-$ec_lang['mpf_solve_desc']="Hesaplayıcı formundan d<sub>0</sub>, n ve S<sub>f</sub> kullanarak belirli bir Q için en düşük y/d<sub>0</sub>'ı bulur.";
 $ec_lang['mpf_solve_button']='Hesapla';
+$ec_lang['mpf_solve_for_flow']='debi için, Q =';
 $ec_lang['mpf_solver_enter_positive_q']='Pozitif bir hedef Q girin.';
 $ec_lang['mpf_solver_no_solution']="Çözüm yok: Q, y/d0 = %93,8'de boru kapasitesini aşıyor (Qmax = {qmax}, seçilen birimlerde).";
 // Manning Pipe Head Loss. See mpf_ for missing text.
@@ -215,8 +214,6 @@ $ec_lang['mtc_iteration_tip']='Hedef akışınız için düzgün bir taş boyutu
 $ec_lang['mtc_note_1']='<dl><dt>Otomatik taş boyutu ve pürüzlülük tasarım döngüsü</dt><dd>Bir pürüzlülük seçeneği (Blodgett–Bathurst önerilir) ve bir tasarım taş boyutu seçeneği (Isbash önerilir) seçin. İstenen akışı düzgün bir taş boyutuyla elde etmek için derinliği ve taş boyutu güvenlik faktörünü ince ayarlayın. Her giriş değeri değiştiğinde şu döngü gerçekleşir: 1. Pürüzlülük, tasarım taş boyutundan hesaplanır. 2. İstenen pürüzlülük hesabı giriş pürüzlülüğüne kopyalanır. 3. Kanal akışı ve gerekli taş boyutu hesaplanır. 4. Tasarım taş boyutu ayarlanır. 5. Tasarım taş boyutundaki hata çok küçük olana kadar tekrarlanır.</dd><dt>Temel hesaplayıcı (döngü yok)</dt><dd>İstediğiniz pürüzlülük değerini girin. Tasarım taş boyutu giriş alanını yoksayın.</dd></dl>';
 $ec_lang['mtc_note_2_term']='Hız kontrolü';
 $ec_lang['mtc_note_2_def']='Yüksek hız, bu denli yüksek özgül enerji yaratan büyük bir kot düşüşü olduğunu gösterir. Bu enerji, genişlemelerde, dirseklerde veya engellerde hızla kaybolabilir. Bunun saha için makul olduğunu doğrulayın.';
-$ec_lang['mtc_solve_for_y']='Q verildiğinde derinlik y için çözüm';
-$ec_lang['mtc_solve_desc']='Hesaplayıcı formundaki b, z<sub>1</sub>, z<sub>2</sub>, S ve n değerlerini kullanarak, verilen Q için derinliği bulur.';
 $ec_lang['mtc_solver_no_solution']='Bu kanal girdileriyle verilen Q için çözüm bulunamadı.';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='Basit Savak Debisi';

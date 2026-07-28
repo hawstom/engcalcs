@@ -311,12 +311,10 @@ $ec_lang['mpf_solver_enter_positive_q']='Enter a positive target Q.';
 $ec_lang_intent['mpf_solver_enter_positive_q']='';
 $ec_lang['mpf_solver_no_solution']='No solution: Q exceeds pipe capacity at y/d0 = 93.8% (Qmax = {qmax} in selected units).';
 $ec_lang_intent['mpf_solver_no_solution']='';
-$ec_lang['mpf_solve_for_dd0']='Solve for y/d<sub>0</sub> given Q';
-$ec_lang_intent['mpf_solve_for_dd0']='';
-$ec_lang['mpf_solve_desc']='Using d<sub>0</sub>, n, and S<sub>f</sub> from the calculator form, finds the lowest y/d<sub>0</sub> for a given Q.';
-$ec_lang_intent['mpf_solve_desc']='';
 $ec_lang['mpf_solve_button']='Solve';
 $ec_lang_intent['mpf_solve_button']='';
+$ec_lang['mpf_solve_for_flow']='for Flow, Q =';
+$ec_lang_intent['mpf_solve_for_flow']='';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Manning Pipe Head Loss';
 $ec_lang_intent['mphl_main_menu']='| gloss: head loss';
@@ -412,10 +410,6 @@ $ec_lang['mtc_note_2_term']='Velocity check';
 $ec_lang_intent['mtc_note_2_term']='';
 $ec_lang['mtc_note_2_def']='High velocity implies that there was a large elevation drop that created such high specific energy. That energy can be lost quickly at expansions, bends, or obstructions. Verify that this is reasonable for the site.';
 $ec_lang_intent['mtc_note_2_def']='';
-$ec_lang['mtc_solve_for_y']='Solve for depth, y, given Q';
-$ec_lang_intent['mtc_solve_for_y']='';
-$ec_lang['mtc_solve_desc']='Using b, z<sub>1</sub>, z<sub>2</sub>, S, and n from the calculator form, finds the depth for a given Q.';
-$ec_lang_intent['mtc_solve_desc']='';
 $ec_lang['mtc_solver_no_solution']='No solution found for the given Q with these channel inputs.';
 $ec_lang_intent['mtc_solver_no_solution']='';
 // Weir Flow Simple

@@ -159,9 +159,8 @@ $ec_lang['mpf_shear_stress']='Tensione tangenziale media, &tau;';
 $ec_lang['mpf_full_flow']='Portata a sezione piena, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Rapporto alla portata piena, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>Questa è la portata e la profondità all\'interno di una tubazione <em>infinitamente lunga</em>.</dt><dd>L\'immissione della portata nella tubazione può richiedere un\'altezza idraulica significativamente maggiore. Aggiungere almeno 1,5 volte l\'altezza cinetica per l\'altezza idraulica o <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">vedere il tutorial di 2 minuti</a> per i calcoli standard del livello idraulico nei tombini con HY-8.</dd>';
-$ec_lang['mpf_solve_for_dd0']='Calcola y/d<sub>0</sub> dato Q';
-$ec_lang['mpf_solve_desc']='Usando d<sub>0</sub>, n e S<sub>f</sub> dal modulo, trova il minimo y/d<sub>0</sub> per un dato Q.';
 $ec_lang['mpf_solve_button']='Calcola';
+$ec_lang['mpf_solve_for_flow']='per portata, Q =';
 $ec_lang['mpf_solver_enter_positive_q']='Inserire un valore positivo per Q.';
 $ec_lang['mpf_solver_no_solution']='Nessuna soluzione: Q supera la capacità della tubazione a y/d0 = 93.8% (Qmax = {qmax} nelle unità selezionate).';
 // Manning Pipe Head Loss. See mpf_ for missing text.
@@ -214,8 +213,6 @@ $ec_lang['mtc_iteration_tip']='Scegliere un\'opzione di scabrezza (Blodgett-Bath
 $ec_lang['mtc_note_1']='<dl><dt>Iterazione automatica dimensionamento roccia e scabrezza</dt><dd>Scegliere un pulsante radio per la scabrezza (Blodgett-Bathurst raccomandato) e uno per la dimensione roccia di progetto (Isbash raccomandato). Regolare profondità e fattore di sicurezza della roccia per ottenere la portata desiderata con una dimensione roccia uniforme. Ogni modifica ai dati avvia il ciclo iterativo: 1. La scabrezza viene calcolata dalla dimensione roccia di progetto. 2. La scabrezza richiesta viene copiata nella scabrezza di input. 3. La portata nel canale e la dimensione roccia richiesta vengono calcolati. 4. La dimensione roccia di progetto viene aggiornata. 5. Si ripete fino a convergenza.</dd><dt>Calcolatore base (senza iterazione)</dt><dd>Inserire il valore di scabrezza desiderato. Ignorare l\'area di input della dimensione roccia di progetto.</dd></dl>';
 $ec_lang['mtc_note_2_term']='Controllo della velocità';
 $ec_lang['mtc_note_2_def']='Velocità elevata implica elevata energia specifica derivante da una caduta disponibile. Tale energia può dissiparsi rapidamente in corrispondenza di espansioni, curve o ostruzioni. Verificare che ciò sia ragionevole per il sito.';
-$ec_lang['mtc_solve_for_y']='Calcola la profondità, y, dato Q';
-$ec_lang['mtc_solve_desc']='Utilizzando b, z<sub>1</sub>, z<sub>2</sub>, S e n dal modulo del calcolatore, determina la profondità per un dato Q.';
 $ec_lang['mtc_solver_no_solution']='Nessuna soluzione trovata per il Q indicato con questi dati del canale.';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='Stramazzo semplice';

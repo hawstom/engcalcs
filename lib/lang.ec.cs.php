@@ -159,9 +159,8 @@ $ec_lang['mpf_shear_stress']='Průměrné smykové napětí, &tau;';
 $ec_lang['mpf_full_flow']='Průtok při plném plnění, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Poměr k plnému průtoku, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>Toto je průtok a hloubka uvnitř <em>nekonečně dlouhého</em> potrubí.</dt><dd>Aby průtok vůbec vtekl do potrubí, může být zapotřebí výrazně vyšší hloubka vzduté hladiny na vtoku. Pro odhad hloubky vzdutí přičtěte alespoň 1,5násobek rychlostní výšky, nebo <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">zhlédněte můj 2minutový výukový program</a> o standardním výpočtu vzdutí u propustků pomocí HY-8.</dd>';
-$ec_lang['mpf_solve_for_dd0']='Vypočítat y/d<sub>0</sub> pro dané Q';
-$ec_lang['mpf_solve_desc']='Pomocí d<sub>0</sub>, n a S<sub>f</sub> z formuláře kalkulátoru najde nejnižší y/d<sub>0</sub> pro dané Q.';
 $ec_lang['mpf_solve_button']='Vypočítat';
+$ec_lang['mpf_solve_for_flow']='pro průtok, Q =';
 $ec_lang['mpf_solver_enter_positive_q']='Zadejte kladnou cílovou hodnotu Q.';
 $ec_lang['mpf_solver_no_solution']='Žádné řešení: Q překračuje kapacitu potrubí při y/d0 = 93.8% (Qmax = {qmax} ve zvolených jednotkách).';
 // Manning Pipe Head Loss. See mpf_ for missing text.
@@ -214,8 +213,6 @@ $ec_lang['mtc_iteration_tip']='Zvolte přepínač pro drsnost (doporučeno Blodg
 $ec_lang['mtc_note_1']='<dl><dt>Automatická iterace návrhu kamene a drsnosti</dt><dd>Zvolte přepínač pro drsnost (doporučeno Blodgett–Bathurst) a přepínač pro návrhovou velikost kamene (doporučeno Isbash). Dolaďte hloubku a bezpečnostní faktor kamene pro dosažení požadovaného průtoku s rovnoměrnou velikostí kamene. Každá změna vstupní hodnoty spustí iterační cyklus: 1. Drsnost je vypočtena z návrhové velikosti kamene. 2. Požadovaný výpočet drsnosti je zkopírován do vstupní drsnosti. 3. Průtok v korytě a požadovaná velikost kamene jsou vypočteny. 4. Návrhová velikost kamene je upravena. 5. Opakovat dokud chyba v návrhové velikosti kamene není velmi malá.</dd><dt>Základní kalkulátor (bez iterace)</dt><dd>Zadejte požadovanou hodnotu drsnosti. Ignorujte oblast zadávání návrhové velikosti kamene.</dd></dl>';
 $ec_lang['mtc_note_2_term']='Kontrola rychlosti';
 $ec_lang['mtc_note_2_def']='Vysoká rychlost znamená vysokou specifickou energii z dostupného spádu. Tato energie může být rychle ztracena na rozšířeních, obloucích nebo překážkách. Ověřte, zda je to pro danou lokalitu přiměřené.';
-$ec_lang['mtc_solve_for_y']='Výpočet hloubky, y, pro dané Q';
-$ec_lang['mtc_solve_desc']='Pomocí hodnot b, z<sub>1</sub>, z<sub>2</sub>, S a n z formuláře kalkulátoru najde hloubku pro dané Q.';
 $ec_lang['mtc_solver_no_solution']='Pro dané Q nebylo se zadanými parametry koryta nalezeno žádné řešení.';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='Jednoduchý přepad';

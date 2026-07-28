@@ -158,9 +158,8 @@ $ec_lang['mpf_shear_stress']='Efortul tangențial mediu, &tau;';
 $ec_lang['mpf_full_flow']='Debit la plin, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Raport față de debitul la plin, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>Acesta este debitul și adâncimea în interiorul unei conducte <em>infinit lungi</em>.</dt><dd>Introducerea debitului în conductă poate necesita o adâncime a apei din amonte semnificativ mai mare. Adăugați cel puțin de 1,5 ori sarcina de viteză pentru a obține adâncimea din amonte sau <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">consultați tutorialul meu de 2 minute</a> pentru calculele standard ale nivelului din amonte ale podețelor folosind HY-8.</dd>';
-$ec_lang['mpf_solve_for_dd0']='Calculează y/d<sub>0</sub> pentru Q dat';
-$ec_lang['mpf_solve_desc']='Folosind d<sub>0</sub>, n și S<sub>f</sub> din formularul calculatorului, găsește cel mai mic y/d<sub>0</sub> pentru un Q dat.';
 $ec_lang['mpf_solve_button']='Calculează';
+$ec_lang['mpf_solve_for_flow']='pentru debit, Q =';
 $ec_lang['mpf_solver_enter_positive_q']='Introduceți un Q țintă pozitiv.';
 $ec_lang['mpf_solver_no_solution']='Fără soluție: Q depășește capacitatea conductei la y/d0 = 93.8% (Qmax = {qmax} în unitățile selectate).';
 // Manning Pipe Head Loss. See mpf_ for missing text.
@@ -213,8 +212,6 @@ $ec_lang['mtc_iteration_tip']='Alegeți o opțiune de rugozitate (Blodgett–Bat
 $ec_lang['mtc_note_1']='<dl><dt>Iterație automată de dimensionare a rocii și rugozității</dt><dd>Alegeți o opțiune de rugozitate (Blodgett–Bathurst recomandat) și o opțiune de dimensiune de proiectare a rocii (Isbash recomandat). Ajustați adâncimea și factorul de siguranță al dimensiunii rocii pentru a atinge debitul dorit cu o dimensiune uniformă a rocii. De fiecare dată când modificați o valoare de intrare, calculatorul repetă acești pași: 1. Rugozitatea este calculată din dimensiunea de proiectare a rocii. 2. Calculul rugozității solicitate este copiat în rugozitatea de intrare. 3. Debitul canalului și dimensiunea necesară a rocii sunt calculate. 4. Dimensiunea de proiectare a rocii este ajustată. 5. Repetați până când eroarea din dimensiunea de proiectare a rocii este foarte mică.</dd><dt>Calculator de bază (fără iterație)</dt><dd>Introduceți valoarea dorită de rugozitate. Ignorați zona de intrare a dimensiunii de proiectare a rocii.</dd></dl>';
 $ec_lang['mtc_note_2_term']='Verificare viteză';
 $ec_lang['mtc_note_2_def']='Viteza mare indică faptul că a existat o cădere de nivel mare, care a generat o energie specifică atât de ridicată. Acea energie se poate pierde rapid la lărgiri, curbe sau obstacole. Verificați dacă acest lucru este rezonabil pentru amplasament.';
-$ec_lang['mtc_solve_for_y']='Calculați adâncimea, y, cunoscând Q';
-$ec_lang['mtc_solve_desc']='Folosind b, z<sub>1</sub>, z<sub>2</sub>, S și n din formularul calculatorului, determină adâncimea pentru un Q dat.';
 $ec_lang['mtc_solver_no_solution']='Nu s-a găsit nicio soluție pentru Q dat cu aceste date de intrare ale canalului.';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='Deversor Simplu';

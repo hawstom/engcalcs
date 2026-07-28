@@ -75,6 +75,30 @@ EngCalcs.normalizeCookieValue = function () {
 	this.cookieValue = vars.join(",");
 };
 
+// Splices the inline solver's two positional slots -- its Q input and its units select --
+// into a cookie written before the solver moved inside the form (ROADMAP Task 143), using
+// whatever defaults the page currently renders. solverInputIndex is the 1-based position of
+// solver_q among the form's INPUT elements. Without this, the slot-count guard in
+// cookieToForm rejects the whole cookie and the visitor silently loses their saved inputs.
+EngCalcs.insertSolverCookieSlots = function (cookieVars, solverInputIndex) {
+	"use strict";
+	var i,
+		inputCount = 0,
+		elQ = document.getElementById('solver_q'),
+		elQu = document.getElementById('solver_qu');
+	if (!elQ || !elQu) { return cookieVars; }
+	for (i = 0; i < cookieVars.length; i = i + 1) {
+		if (cookieVars[i].split(':')[0] === 'i') {
+			inputCount = inputCount + 1;
+			if (inputCount === solverInputIndex) {
+				cookieVars.splice(i, 0, 'i:' + elQ.value, 's:' + elQu.value);
+				break;
+			}
+		}
+	}
+	return cookieVars;
+};
+
 EngCalcs.cookieToForm = function (form) {
 	"use strict";
 	var

@@ -1,7 +1,7 @@
 {
     "description": "sha1 of each lang.ec.en.php $ec_lang value as of the last full translation sync. Maintained by detect_english_drift.php --update. A current-vs-manifest hash mismatch means that key's English changed and translations may be stale. Do not hand-edit.",
-    "updated": "2026-07-27",
-    "count": 566,
+    "updated": "2026-07-28",
+    "count": 563,
     "hashes": {
         "about_body_html": "1fe41501e2d7d6cd201acb73a492c1be17e66690",
         "about_main_desc": "11e87516dcc0c7ec37ed448c384ecc23eebb661b",
@@ -314,8 +314,7 @@
         "mpf_pipe_diameter": "06fd91ab37171a8ba6a7a4348bff681d89ce2a21",
         "mpf_shear_stress": "f8b2e0fd417beced86bf9784fbbcb253e36a4e99",
         "mpf_solve_button": "67b7724f11a3a7386859cdcde2ea054eb85f0c4b",
-        "mpf_solve_desc": "94eb7f247426b00d444e9aecc4726ab79cc64f54",
-        "mpf_solve_for_dd0": "7272e9e99f443faae14fad6e7b55db8a258e0cea",
+        "mpf_solve_for_flow": "084fc8a608147bb4173af65a607bad3eca755004",
         "mpf_solver_enter_positive_q": "b22c35a784776a90e5a4edc78e68f7741ce55ab9",
         "mpf_solver_no_solution": "76dacc801a4d56dd44952848ae8f9ac1046892a4",
         "mpf_spreadheet_notice": "53e8163a2feddeadbf852cca3dfdc651668cf3a4",
@@ -369,8 +368,6 @@
         "mtc_sgrock": "19e54cf0b955c8f31127d9f74357184403a1c240",
         "mtc_side_slope_1": "1b983bb04cfd549575566ff724ad7bf93bfd4bf3",
         "mtc_side_slope_2": "db505d5b35df72daadb979aca213d7134c679738",
-        "mtc_solve_desc": "a89ed1712f8414c686c6ada75c3051fd4d06e475",
-        "mtc_solve_for_y": "fafa5093eb994efea19fe2da2c514c81682db3c2",
         "mtc_solver_no_solution": "1b2d59dd0bbc298efe227075df9703bc6edbde13",
         "mtc_vel_low": "fb4cce16e31d950dda5c21dbd7ebf61f98a2421b",
         "mtc_vel_ok": "0eba95fd1f5bba7b8843206e9b1d0cc501dff4f1",

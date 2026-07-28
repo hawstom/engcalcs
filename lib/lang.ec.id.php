@@ -159,9 +159,8 @@ $ec_lang['mpf_shear_stress']='Tegangan geser rata-rata, &tau;';
 $ec_lang['mpf_full_flow']='Aliran penuh, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Rasio terhadap aliran penuh, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>Ini adalah debit dan kedalaman di dalam pipa yang panjangnya <em>tak terhingga</em>.</dt><dd>Memasukkan aliran ke dalam pipa mungkin memerlukan kedalaman air hulu yang jauh lebih tinggi. Tambahkan setidaknya 1,5 kali tinggi kecepatan untuk memperkirakan kedalaman air hulu, atau <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">lihat tutorial 2 menit saya</a> untuk perhitungan standar air hulu gorong-gorong menggunakan HY-8.</dd>';
-$ec_lang['mpf_solve_for_dd0']='Cari y/d<sub>0</sub> berdasarkan Q';
-$ec_lang['mpf_solve_desc']='Menggunakan d<sub>0</sub>, n, dan S<sub>f</sub> dari formulir kalkulator, mencari nilai y/d<sub>0</sub> terendah untuk Q tertentu.';
 $ec_lang['mpf_solve_button']='Hitung';
+$ec_lang['mpf_solve_for_flow']='untuk debit, Q =';
 $ec_lang['mpf_solver_enter_positive_q']='Masukkan Q target yang positif.';
 $ec_lang['mpf_solver_no_solution']='Tidak ada solusi: Q melebihi kapasitas pipa pada y/d0 = 93.8% (Qmax = {qmax} dalam satuan yang dipilih).';
 // Manning Pipe Head Loss. See mpf_ for missing text.
@@ -214,8 +213,6 @@ $ec_lang['mtc_iteration_tip']='Pilih opsi kekasaran (Blodgett–Bathurst direkom
 $ec_lang['mtc_note_1']='<dl><dt>Iterasi otomatis ukuran batu dan kekasaran</dt><dd>Pilih opsi kekasaran (Blodgett–Bathurst direkomendasikan) dan opsi ukuran batu rencana (Isbash direkomendasikan). Sesuaikan kedalaman dan faktor keamanan ukuran batu untuk mendapatkan debit yang diinginkan dengan ukuran batu yang seragam. Setiap kali Anda mengubah nilai masukan, siklus iterasi berikut terjadi: 1. Kekasaran dihitung dari ukuran batu rencana. 2. Perhitungan kekasaran yang diminta disalin ke kekasaran masukan. 3. Debit saluran dan ukuran batu yang diperlukan dihitung. 4. Ukuran batu rencana disesuaikan. 5. Ulangi hingga galat pada ukuran batu rencana sangat kecil.</dd><dt>Kalkulator dasar (tanpa iterasi)</dt><dd>Masukkan nilai kekasaran yang Anda inginkan. Abaikan area masukan ukuran batu rencana.</dd></dl>';
 $ec_lang['mtc_note_2_term']='Pemeriksaan kecepatan';
 $ec_lang['mtc_note_2_def']='Kecepatan tinggi mengimplikasikan energi spesifik tinggi dari beda tinggi yang tersedia. Energi tersebut dapat hilang dengan cepat pada ekspansi, belokan, atau hambatan. Verifikasi bahwa ini wajar untuk kondisi lapangan.';
-$ec_lang['mtc_solve_for_y']='Hitung kedalaman, y, berdasarkan Q';
-$ec_lang['mtc_solve_desc']='Menggunakan b, z<sub>1</sub>, z<sub>2</sub>, S, dan n dari formulir kalkulator, mencari kedalaman untuk Q tertentu.';
 $ec_lang['mtc_solver_no_solution']='Tidak ditemukan solusi untuk Q yang diberikan dengan input saluran ini.';
 // Weir Flow Simple
 $ec_lang['ws_main_menu']='Aliran Bendung Ukur Sederhana';
