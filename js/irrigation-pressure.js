@@ -13,9 +13,11 @@ EngCalcs.g = 9.806;
 // Trickle Irrigation convention for this exact case.
 EngCalcs.christiansenM = 1.75;
 
-// Copy/paste data area: singletons = printable_title, printable_subtitle, and the 12 form
-// inputs; every reach row has 7 editable columns (is_lateral..elev_ds), the rest are outputs.
-EngCalcs.dataSingletonsCount = 14;
+// Copy/paste data area: singletons = printable_title, printable_subtitle, and the 13 form
+// inputs (h_supply..h_max_allow); every reach row has 7 editable columns (is_lateral..elev_ds),
+// the rest are outputs. Count only INPUT elements -- the unit SELECTs are stored as 's:' slots
+// and never reach the input counter in cookieValueToDataString.
+EngCalcs.dataSingletonsCount = 15;
 EngCalcs.dataColumnsFirstRowCount = 7;
 EngCalcs.dataColumnsOtherRowsCount = 7;
 

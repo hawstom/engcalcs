@@ -17,13 +17,14 @@
 
 EngCalcs.g = 9.806;
 
-// Copy/paste data area bookkeeping: 5 singleton 'i' inputs (printable_title,
-// printable_subtitle, h_source, elev_source, visc) precede the table; every row
-// has 8 editable columns (id, upstream, length, diameter, roughness, k, demand,
-// elev_down), the rest are outputs.
-// 9 singleton 'i' inputs precede the table: printable_title, printable_subtitle,
-// elev_source, h_source1, h_source2, q_source2, h_source3, q_source3, visc.
-EngCalcs.dataSingletonsCount = 9;
+// Copy/paste data area bookkeeping. 11 singleton 'i' inputs precede the table:
+// printable_title, printable_subtitle, elev_source, h_source1, h_source2, q_source2,
+// h_source3, q_source3, visc, h_max_allow, demand_mult. Every row has 8 editable
+// columns (id, upstream, length, diameter, roughness, k, demand, elev_down), the rest
+// are outputs. Count only INPUT elements -- the unit SELECTs are stored as 's:' slots
+// and never reach the input counter in cookieValueToDataString. Adding any singleton
+// input above the table means bumping this number, or Copy silently emits a shifted grid.
+EngCalcs.dataSingletonsCount = 11;
 // The first row has no "upstream" input (it is always the source), so it carries
 // one fewer editable cell than the others -- mirrors Manning-Irregular's first row.
 EngCalcs.dataColumnsFirstRowCount = 7;
