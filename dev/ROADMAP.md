@@ -241,8 +241,12 @@ circling one question — *is Manning valid for full/pressurized pipe, and is R 
 impressions, zero clicks; and one query was `"kikokotoo" -site:reddit.com …`, the Swahili word taken
 straight from `lib/lang.ec.sw.php`, i.e. an agent searching our own translated string.
 
-- 50|155|[H] **Deploy and verify the Task 149 search-index fix.** Extracted from 149 on close,
-  2026-07-28, rather than left as a to-do inside a closed block. Status:
+- 10|155|[H] **Deploy and verify the Task 149 search-index fix — deployed, awaiting Search Console
+  confirmation.** Extracted from 149 on close, 2026-07-28, rather than left as a to-do inside a
+  closed block. **Steps 1–5 are done and verified live 2026-07-28; only step 6 is open, and it is a
+  calendar wait rather than work** — which is why the priority dropped 50 → 10. Do not close this
+  until step 6 actually reports, and do not re-verify 1–5 by hand: the evidence is recorded below.
+  Status:
   1. ~~Upload `../sitemap.xml` to the site root~~ — **DONE 2026-07-28**, verified live: 200, 66 KB,
      543 `<loc>` entries, `sewslope.php` and `peakfact.php` both present. Regenerate with
      `php dev/scripts/generate_sitemap.php` whenever pages or languages change, then re-upload.
@@ -251,31 +255,50 @@ straight from `lib/lang.ec.sw.php`, i.e. an agent searching our own translated s
      copy; it carries a long `Disallow:` list for `/hawsedc/phpGedView/` that a locally-rebuilt file
      would drop, so it must be edited in place.)
   3. ~~Submit the sitemap in Google Search Console~~ — **DONE 2026-07-28** (Tom).
-  4. **Push the app code to production — still outstanding as of the commit that closed 149.** The
-     sitemap went up by hand, but `canonical`/`hreflang` come from the PHP; until a `git pull` runs
-     on the server, Google is crawling 543 sitemap URLs that carry no alternate-language
-     relationship at all. Confirm with:
-     `curl -s "https://hawsedc.com/engcalcs/Manning-Pipe-Flow.php?lang=es" | grep -c hreflang`
-     — expect 28, not 0.
-  5. **One canonical origin — decided 2026-07-28.** Search Console reports on `https://hawsedc.com`,
-     which matches `CANONICAL_ORIGIN` in `lib/config.inc.php`, so no constant change is needed. Tom
-     is adding a 301 at the parent-site root `.htaccess` (server-side, not in this repo). **The
-     motive is not SEO** — the canonical tag already handles Google. It is that
-     `lib/Language.lib.php` sets `ec_language`/`ec_blang` with `'secure' => true`, and browsers
-     reject `Secure` cookies over plain http; with all four of http/https × www/non-www answering
-     200 and no redirect or HSTS (verified 2026-07-28), **a visitor who arrives on `http://` loses
-     language persistence entirely** — they pick Spanish and get English again next visit. That is a
-     defect in the exact feature this task exists to serve. Two hazards recorded for whoever tests
-     it: if the host terminates SSL at a proxy, `%{HTTPS}` is always `off` inside Apache and the
-     naive rule loops infinitely (hence the `X-Forwarded-Proto` companion condition), and a
-     subdirectory `.htaccess` overrides a parent's mod_rewrite rules *when it defines rewrite
-     directives of its own* — `engcalcs/.htaccess` currently has none, so the parent rule should
-     reach the calculators, but that is worth confirming rather than trusting. HSTS deliberately
-     **not** bundled in: browsers cache the policy for its full max-age and it cannot be recalled.
-  6. **Then verify, no sooner than a few weeks out:** `site:hawsedc.com inurl:lang=es` should start
-     returning results, and the Task 149 diagnostic query `calculo de canales trapezoidal online`
-     (position 2.8, 0% CTR) should begin converting. That query is the cleanest single tell that the
-     fix worked, because it already ranks — only the snippet language is wrong.
+  4. ~~Push the app code to production~~ — **DONE 2026-07-28** (commit `190c28f`, pulled on the
+     server). Verified live across all 20 sitemap pages: every one returns 200 with 28 tags
+     (27 languages + `x-default`) and a canonical matching the requested URL, no exceptions. Edge
+     cases confirmed in production, not just locally: `?name=My Job 123` renders in the `<title>` but
+     is stripped from the canonical, so bookmark labels mint no indexable variants; `?lang=zz`
+     consolidates to `en`; `/engcalcs/index.php` collapses to `/engcalcs/`; a bare URL with
+     `Accept-Language: ar` self-canonicalises to `?lang=ar` and renders `<html lang="ar" dir="rtl">`.
+     **The reciprocity Google requires holds** — the `es` page lists `hreflang="es"` pointing at
+     itself, and the `ar` page links back to `es`.
+  5. ~~One canonical origin~~ — **DONE 2026-07-28.** Search Console reports on `https://hawsedc.com`,
+     matching `CANONICAL_ORIGIN` in `lib/config.inc.php`, so no constant change was needed; Tom added
+     a 301 at the parent-site root `.htaccess` (server-side, not in this repo). **The motive was not
+     SEO** — the canonical tag already handles Google. It is that `lib/Language.lib.php` sets
+     `ec_language`/`ec_blang` with `'secure' => true` and browsers reject `Secure` cookies over plain
+     http, so with all four of http/https × www/non-www answering 200, **a visitor arriving on
+     `http://` lost language persistence entirely** — picked Spanish, got English again next visit.
+     That bug is now closed as a side effect: http visitors land on https before the app ever tries
+     to set the cookie. Both hazards flagged beforehand were **resolved empirically rather than by
+     reasoning**, and the evidence is worth keeping:
+     - `https://hawsedc.com/…` returns **200, not a redirect** → `%{HTTPS}` is read correctly here
+       and the host does *not* terminate SSL at a proxy, so no infinite loop. The
+       `X-Forwarded-Proto` companion condition is belt-and-braces on this host, not load-bearing.
+     - `http://` and `www` both redirect **into `/engcalcs/`** → `engcalcs/.htaccess` does **not**
+       shadow the parent rewrite. That is the confirmation the rule about subdirectory `.htaccess`
+       overriding a parent's mod_rewrite only when it defines rewrite directives of its own; the
+       engcalcs file has only `Redirect 301` (mod_alias) and `FilesMatch`, and the parent rule
+       reaches through. **Anyone adding a `RewriteRule` to `engcalcs/.htaccess` later will silently
+       break the origin 301 for every calculator** — add `RewriteOptions inherit` there if that day
+       comes.
+     - The double fault (`http://www.…`) resolves in **one hop**, and `?lang=es&name=Job+7` survives
+       intact. Site root, `sewslope.php` and `robots.txt` redirect too, so the parent site is
+       covered, not only the calculators.
+     HSTS deliberately **not** bundled in: browsers cache the policy for its full max-age and it
+     cannot be recalled. A separate, deliberate decision if ever wanted.
+  6. **Remaining — verify in Search Console, no sooner than a few weeks out.** This is the only open
+     step and it is a wait, not work: `site:hawsedc.com inurl:lang=es` should start returning
+     results, and the Task 149 diagnostic query `calculo de canales trapezoidal online` (position
+     2.8, 0% CTR) should begin converting. That query is the cleanest single tell, because it already
+     ranks — only the snippet language was wrong. **If it does not move**, the next suspects are
+     Google's own hreflang report in Search Console (it names reciprocity failures explicitly) and
+     whether the `?lang=xx` URLs are being indexed at all versus indexed-and-not-ranked; those are
+     different problems with different fixes, so read the report before assuming either.
+  **Task 150 (meta descriptions) is unblocked by this.** It was sequenced behind 149 on the reasoning
+  that descriptions on unindexed URLs buy nothing; the URLs are no longer unindexed.
 
 - 40|150|[CC] **Every page's meta description is just its own title repeated.** All 23 pages build
   `$html_head` with `<meta name="Description" content="'. $html_title .'" />`. Google routinely
