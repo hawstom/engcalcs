@@ -3,7 +3,6 @@ require_once ('lib/base.inc.php');
 $html_title = $ec_lang['ws_main_title'];
 $html_head='
 	<meta name="Description" content="'. $html_title .'" />
-	<meta name="Keywords" content="wier vetedero calculac&iacute;on calcular calculacion calculation" />
 ';
 echoHeader("EngCalcs", $html_title, $html_head);
 

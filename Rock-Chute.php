@@ -3,7 +3,6 @@ require_once('lib/base.inc.php');
 $html_title = $ec_lang['rc_main_title'];
 $html_head = '
 	<meta name="Description" content="' . htmlspecialchars($html_title, ENT_QUOTES, 'UTF-8') . '" />
-	<meta name="Keywords" content="rock chute design riprap sizing Robinson 1998 unit discharge D50 median rock size erosion control grade stabilization" />
 ';
 echoHeader("EngCalcs", $html_title, $html_head);
 ?>

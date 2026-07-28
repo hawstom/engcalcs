@@ -3,7 +3,6 @@ require_once('lib/base.inc.php');
 $html_title = $ec_lang['bpn_main_title'];
 $html_head = '
 	<meta name="Description" content="' . htmlspecialchars($html_title, ENT_QUOTES, 'UTF-8') . '" />
-	<meta name="Keywords" content="branched pipe network tree distributary gravity flow water supply branch line pressure head loss no loops EPANET alternative Manning Hazen-Williams Darcy-Weisbach" />
 ';
 echoHeader("EngCalcs", $html_title, $html_head);
 ?>

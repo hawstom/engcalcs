@@ -4,7 +4,6 @@ require_once ('lib/base.inc.php');
 $html_title = $ec_lang['dw_main_title'];
 $html_head='
 	<meta name="Description" content="'. $html_title .'" />
-	<meta name="Keywords" content="Darcy-Weisbach sizing pipie pipes rate tubo tobus tubos calculac&iacute;on calcular calculacion calculation" />
 ';
 echoHeader("EngCalcs", $html_title, $html_head);
 

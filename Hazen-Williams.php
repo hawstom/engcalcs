@@ -4,7 +4,6 @@ require_once ('lib/base.inc.php');
 $html_title = $ec_lang['hw_main_title'];
 $html_head='
 	<meta name="Description" content="'. $html_title .'" />
-	<meta name="Keywords" content="mannings sizing pipie pipes rate chezy-manning tubo tobus tubos calculac&iacute;on calcular calculacion calculation" />
 ';
 echoHeader("EngCalcs", $html_title, $html_head);
 

@@ -3,7 +3,6 @@ require_once('lib/base.inc.php');
 $html_title = $ec_lang['install_main_title'];
 $html_head = '
 	<meta name="Description" content="' . htmlspecialchars($html_title, ENT_QUOTES, 'UTF-8') . '" />
-	<meta name="Keywords" content="install PWA offline app home screen engcalcs hydraulic calculators" />
 ';
 echoHeader("EngCalcs", $html_title, $html_head, false);
 ?>

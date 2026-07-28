@@ -215,6 +215,127 @@ Calculators section above; see that section's header for the methodology and hon
   belongs in this section rather than as a stretch off the water-conveyance identity. Not yet run
   through the 4-axis research pass.
 
+## Discoverability (Search Reach)
+
+Evidence base for this whole section: the 2026-07-27 Google Search Console export (`dev/Queries.csv`,
+999 queries, 5,621 impressions, 565 clicks — a temporary file, not committed; the numbers below are
+the durable record). Aggregate by cluster:
+
+| Cluster | Queries | Impressions | Clicks | CTR |
+|---|---|---|---|---|
+| Manning | 196 | 1,468 | 366 | **25%** |
+| Sewer / drainage | 188 | 1,007 | 11 | **1.1%** |
+| Slope / grade / fall | 169 | 946 | 5 | **0.5%** |
+| Hazen-Williams | 54 | 305 | 16 | 5% |
+| Channel / trapezoid | 51 | 377 | 18 | 5% |
+| Darcy / friction factor | 41 | 128 | 1 | 0.8% |
+| Weir | 19 | 91 | 6 | 7% |
+| Culvert | 11 | 66 | 2 | 3% |
+| Peaking factor / Harmon | 11 | 62 | 1 | 1.6% |
+| Orifice | 11 | 21 | 0 | 0% |
+
+The headline: **Manning is won and needs nothing** (position 1, 25% CTR). The sewer-slope cluster is
+comparable in size and converts at 1%. Two smaller findings worth keeping: 55 queries are
+LLM-retrieval-shaped (`… source`, `… authoritative source`, `… engineering reference`, `… pdf`), all
+circling one question — *is Manning valid for full/pressurized pipe, and is R = D/4?* — 118
+impressions, zero clicks; and one query was `"kikokotoo" -site:reddit.com …`, the Swahili word taken
+straight from `lib/lang.ec.sw.php`, i.e. an agent searching our own translated string.
+
+- 55|149|[CC] **Non-English pages are effectively absent from the search index — fix `hreflang`,
+  canonical, and sitemap.** Root cause: one URL serves every language, chosen at request time by
+  cookie / `Accept-Language` (`lib/Language.lib.php`). `?lang=xx` URLs exist (emitted by the language
+  dropdown in `lib/Menus.lib.php:148`) but **nothing declares them** — no `hreflang`, no `canonical`,
+  and `hawsedc.com/sitemap.xml` returns 404 (verified 2026-07-27). Googlebot crawls from US IPs with
+  `Accept-Language: en`, so it indexes the English rendering of every calculator and the other 26
+  languages never enter the index. **This suppresses all 26 non-English languages, not just Spanish** —
+  which makes it a mission problem (reach), not merely an SEO one. Diagnostic signature in the data:
+  `calculo de canales trapezoidal online` ranks **position 2.8 with 0% CTR** (34 impressions);
+  `formula de manning` 80 impressions, position 8.8, zero clicks. Ranking well while converting zero
+  is what a language-mismatched snippet looks like — Google knows the page is topically right and
+  shows a Spanish searcher an English snippet. **Decided (Tom, 2026-07-27): keep `?lang=xx` as the
+  canonical URL form** — "fine and simple for now" — rather than moving to `/es/…` paths; cheaper,
+  reversible, needs no rewrite rules. Work: emit `<link rel="alternate" hreflang="xx">` for all 27
+  languages plus `x-default`, and a self-referencing `<link rel="canonical">`, from `echoHTMLHead()`
+  in `lib/HeadersFooters.lib.php` — one function, every page at once. Then generate `sitemap.xml`
+  (every calculator × every language). **This is the highest-reach item on the board**; do it before
+  any content-level SEO work, since descriptions on unindexed URLs buy nothing.
+
+- 40|150|[CC] **Every page's meta description is just its own title repeated.** All 23 pages build
+  `$html_head` with `<meta name="Description" content="'. $html_title .'" />`. Google routinely
+  discards a duplicate-of-title description and auto-generates a snippet instead — from a page whose
+  visible content above the fold is a form, not prose. Replace with a real per-calculator description
+  sourced from a **new language key** (one per calculator, alongside `*_main_desc`) so it translates
+  with everything else and lands correctly on the `?lang=xx` URLs from Task 149. Sequence after 149.
+  Note the Simple-English rule applies: these are explanatory strings, not identity strings.
+  **Partially done 2026-07-27:** the companion `<meta name="Keywords">` tags were deleted from all 20
+  pages that carried them (Tom: "Once upon a time that was a main purpose of keywords… let's
+  modernize"). They were both ignored by search engines and actively wrong — `Manning-Trap.php` and
+  `Weir-Flow-Simple.php` carried `"wier vetedero calculacíon…"` (weir keywords on the *trapezoidal
+  channel* page, "wier" misspelled), with `pipie`/`tobus` typos elsewhere and `&iacute;` HTML entities
+  inside meta content. Description work is what remains.
+
+- 35|151| **The sewer-slope demand is already answered — by a tech doc nobody can find.** ~950
+  impressions at 0.5% CTR across 169 slope/grade queries, and **there is no content gap**:
+  `hawsedc.com/sewslope.php` already has Table 1 (minimum slope, 4″–96″), Table 2 (slope by Manning n
+  and target velocity), and the 2–3 ft/s cleansing-velocity basis. **Do not build a calculator for
+  this** — it would duplicate parent-site content, which is against standing policy. The doc's actual
+  defects (verified live 2026-07-27): **no meta description** (title tag only), **no sitemap entry**
+  (site has no sitemap at all — see Task 149), and **inches-only, English-only while the demand is
+  neither**. The single largest query in the whole export is `4 inch sewer pipe minimum slope **in
+  mm**` (135 impressions, 0.74% CTR); add `6 inch … in mm`, `8 inch … in mm`, `pendiente mínima
+  tubería pvc sanitaria`, `kanalizasyon eğim tablosu`, `tabela de inclinação de esgoto`. The table
+  answers every one of them and none of them can read it. Cheap high-yield fix: add an SI column
+  (mm/m or %) to Table 1, write a real meta description, cross-link from Manning Pipe Flow.
+  **Same story for `hawsedc.com/peakfact.php`** — has the Harmon formula plus genuinely original
+  low-flow research (peaking factors derived from the UPC for 10–300 person systems), links to zero
+  calculators, draws 62 impressions / 1 click.
+  **Both files live on the parent site, not in this repository, and are not present locally either** —
+  `/var/www/cnm/public_html/hawsedc/` holds only the dev shims (`hawsedc.lib.php`, `edc.lib.php`, a
+  stub `index.php`) and is not a git repo. **Workflow when this task is actually run (agreed
+  2026-07-27):** Tom downloads the two `.php` sources from production → they are edited in a scratch
+  dir → Tom uploads them back. **Do not stage copies under `dev/`.** Fetching the live *rendered*
+  HTML is not a substitute: these are PHP pages with include-driven header/footer, so reconstructing
+  from rendered output would silently flatten them into static files. And committing a second copy of
+  a file whose master lives on another host creates exactly the drift trap this roadmap keeps warning
+  about. If parent-site edits become frequent, the real fix is putting the parent site under its own
+  version control — a separate decision, not part of this task.
+
+- 20|152| **Link HY-8 itself from the culvert-adjacent notes — and do not build a culvert
+  calculator.** The 3-minute HY-8 QuickStart video is *already* linked from both `mpf_note_1` and
+  `mphl_note_1`; what is missing is a link to **HY-8 itself**, which both notes name in text without
+  pointing anywhere. Add it (FHWA download page) plus one honest sentence on `mphl_` about when that
+  page suffices (outlet control, full flow) and when it does not. **Decision — no culvert calculator
+  (Tom + CC, 2026-07-27).** Three reasons. (1) Reach: culvert is 66 impressions / 2 clicks, the
+  smallest cluster on the board except orifice, against ~950 for sewer slope. (2) `mphl_` is only
+  *like* a culvert calculator for the outlet-control case — culvert design **is** the
+  inlet-vs-outlet-control governance decision, so shipping outlet-control-only is not a subset of
+  HY-8, it is a tool that disagrees with HY-8 exactly where a designer most needs to be right,
+  published under Tom's name against the free FHWA reference. That is the false-precision trap.
+  (3) A real HY-8 clone means the HDS-5 inlet-control nomograph coefficients for every
+  shape/material/edge combination plus validation across that matrix — a serious project for 66
+  impressions. If ever revisited, the scope must be stated as "validated against HY-8", never a
+  partial. **Editing the two notes stales 1–2 keys × 26 languages** (small resync, not a sprint).
+
+- 15|153| **Resync `template_feedback` — English reformed 2026-07-27, 26 languages now stale.** The
+  string was `'Please share your valued words of suggestion or praise.  Did this free calculator
+  exceed your expectations in every way?'` and is now `'Please send suggestions or praise. Did this
+  free calculator serve you well?'`. Rationale: the old wording was flattery-fishing and failed the
+  Simple-English rule, and the 26 languages already showed the strain — es and ar had quietly dropped
+  "or praise" and softened to "was it useful?", while sw and zh calqued the whole thing literally.
+  Tell: `$ec_lang_intent['template_feedback']` had *already* rewritten it to almost exactly the new
+  wording, i.e. the intent was doing repair work the source string should have done. Caught by
+  `detect_english_drift.php`, which now reports it as the sole CHANGED key. **Also considered and
+  rejected:** replacing the ask with "Tell your friends!" evangelism and dropping the Contact link.
+  Rejected because (a) the link is the only in-context ask at the moment the user just got their
+  answer, and it is the channel that actually paid — `dev/Bulgarian-engineer-feedback.md` exists
+  because someone clicked it; menu presence is not equivalent; (b) "friends" reads personal-social in
+  most of the 26 target languages while the real sharing act is professional; (c) evangelism is
+  unmeasurable and unharvestable where feedback is neither. If a share mechanism is ever wanted, it
+  should be a copy-link affordance near the results, not a sentence. **`$ec_lang_intent` for this key
+  was emptied** — authorized by Tom in-conversation 2026-07-27; the old intent had become redundant
+  with the reformed English, and a plain, directly-translatable label needs no intent entry.
+  1 key × 26 languages: a resync, not a sprint. Run `detect_english_drift.php --update` after.
+
 ## Translation Standardization (Glossary Project)
 
 ## Translation improvements

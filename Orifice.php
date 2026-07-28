@@ -3,7 +3,6 @@ require_once ('lib/base.inc.php');
 $html_title = $ec_lang['or_main_title'];
 $html_head='
 	<meta name="Description" content="'. $html_title .'" />
-	<meta name="Keywords" content="orifice flow culvert outlet discharge coefficient hydraulics calculator" />
 ';
 echoHeader("EngCalcs", $html_title, $html_head);
 ?>
