@@ -469,9 +469,9 @@ through `escapeAttr` and use the whole-label `.ec-help` / `.ec-tip` nesting.
 
 ## Phasing
 
-**Phase 0 — canvas spike, 1 day, throwaway.** Settles the technology empirically. Full acceptance
-criteria are in the ROADMAP Task 146 entry. Canvas technology is **deliberately uncommitted** until
-this runs (Tom's call). Includes a registered backdrop image, per the Backdrop section above.
+**Phase 0 — canvas spike. DONE 2026-07-29.** SVG DOM confirmed as the technology — no Leaflet
+fallback needed. Full history in `dev/lpn-spike/phase0-acceptance.md`; summary in the ROADMAP Task
+146 entry.
 
 **Phase 0.5 — headless solver. DONE 2026-07-29.** `js/lpn-solver.js` + `dev/lpn-spike/`, 46 checks
 passing against the real EPANET engine, closed-form cases, and machine-precision residuals. See

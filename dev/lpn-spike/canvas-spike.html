@@ -189,12 +189,20 @@ function buildDom(){
   labels.forEach((lb,i)=>{
     const an=nodeById(lb.anchorNode);
     const leader=el('line',{x1:an.x,y1:an.y,x2:an.x+lb.x,y2:an.y+lb.y,class:'leader'},labelsLayer);
+    // dominant-baseline:central, not the SVG default (alphabetic baseline): without it, y=py sits
+    // near the BOTTOM of the glyphs (baseline, not vertical center), so both the text and the leader
+    // endpoint that tracks it look low. This makes y=py the true vertical center.
     const text=el('text',{x:an.x+lb.x,y:an.y+lb.y,class:'lbl draglbl',style:'font-size:3px',
-      'text-anchor':'middle','data-lbl':i},labelsLayer);
+      'text-anchor':'middle','dominant-baseline':'central','data-lbl':i},labelsLayer);
     text.textContent=lb.text;
     let w=10; try{w=text.getBBox().width;}catch(err){}
     labelEls[i]={leader,text,side:'right',width:w};
     labelsByAnchor[lb.anchorNode].push(i);
+    // updateLabelGeometry (not the raw x2=an.x+lb.x above) is what actually applies the side/halfW
+    // offset — without this call, the leader drawn here pointed straight at the text's own center
+    // (text-anchor:middle's anchor point) until the first drag ever touched it, which is exactly
+    // "attaches at label middle instead of at the end" on a fresh load.
+    updateLabelGeometry(i);
   });
 }
 function updateLinkGeometry(id){
@@ -284,8 +292,8 @@ function bbox(){
   });
   labels.forEach((lb,i)=>{
     const an=nodeById(lb.anchorNode),px=an.x+lb.x,py=an.y+lb.y;
-    const le=labelEls[i]||{width:10},h=4,halfW=le.width/2; // text is text-anchor:middle, symmetric around px
-    inc(px-halfW,py-h);inc(px+halfW,py+h*0.3);
+    const le=labelEls[i]||{width:10},h=2,halfW=le.width/2; // dominant-baseline:central: symmetric around px AND py now
+    inc(px-halfW,py-h);inc(px+halfW,py+h);
   });
   const VR=1.1; // vertex handle radius (0.9) plus a hair — bends can poke outside the node bbox
   links.forEach(l=>l.verts.forEach(v=>{inc(v.x-VR,v.y-VR);inc(v.x+VR,v.y+VR);}));

@@ -169,23 +169,23 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   *closing a parent*, because blocks in `## Completed` are never re-scanned. This parent is open and
   gets scanned every pass, so extraction bought nothing and only scattered the design.)
 
-  - **Phase 0 — canvas spike (1 day, throwaway).** Settles the technology empirically. One standalone
-    HTML file, no PHP, no lang keys, no solver, no persistence: a ~15-node two-loop network built
-    from real SVG DOM nodes (`createElementNS`, **not** the `innerHTML` string-rebuild every sketch
-    in the suite uses today), plus a generated 200-node grid behind a toggle as a headroom check.
-    Must demonstrate pan, wheel zoom about the cursor, pinch, double-tap zoom, click-to-popup with a
-    field that writes back, node drag with incident links following, link vertex handles,
-    zoom-extent, a draggable label with a leader, **one Arabic and one Amharic label**, a
-    **registered background image** (see the backdrop note below), and a print preview.
-    **Acceptance criteria are written down before starting, and the fps gate is at target scale, not
-    headroom scale:** drag visually smooth at ~20 nodes **on a real mid-range phone**; the 200-node
-    grid degrades gracefully rather than freezing; pinch works on iOS Safari and Android Chrome
-    without fighting page scroll; a 2 px link is finger-tappable; Arabic shapes and orders correctly
-    and neither label mirrors the network geometry; print is crisp vector; ≤300 LOC. Fail any one →
-    run the identical spike on Leaflet + `CRS.Simple` (half a day) and compare artifacts. **Commit to
-    a technology only then.** Expectation-setter: hit-testing is the part people assume is hard and
-    is the part SVG does natively; the real architectural change — giving up the `innerHTML` rebuild
-    — is forced by *every* candidate, so it is not a differentiator.
+  - **Phase 0 — canvas spike. DONE 2026-07-29, on branch `lpn-solver`.** `dev/lpn-spike/canvas-spike.html`
+    (standalone, no PHP/lang keys/solver/persistence) plus the full round-by-round record in
+    `dev/lpn-spike/phase0-acceptance.md`. Settled the technology empirically: **SVG DOM
+    (`createElementNS`, not `innerHTML` rebuilds) is the chosen technology** — 12 rounds of on-device
+    iteration with Tom plus an independent Opus subagent review found no SVG-blocking issue, so the
+    Leaflet + `CRS.Simple` fallback was never triggered. Demonstrated: pan, wheel zoom about the
+    cursor, pinch, double-tap zoom, click-to-popup with a writeback field, node/vertex/label drag,
+    **arbitrary-vertex link editing** (not capped at one — see the Phase 1 note below), zoom-extent
+    fitted to rendered extent (not bare coordinates), a draggable label with a leader (Arabic and
+    Amharic shape and order correctly), a two-point-registered backdrop image with separate Scale/
+    Position steps, a 200-node headroom grid, and print output. On-device phone pass (drag
+    smoothness, pinch vs. page scroll, tap-target size) confirmed 2026-07-29. Real bugs found and
+    fixed along the way — several are suite-relevant beyond this spike: SVG is a CSS replaced
+    element and won't stretch from `position:absolute` insets alone (needs `width`/`height`
+    attributes); combining top+bottom insets *with* an explicit height over-constrains the box per
+    CSS2.1 §10.6.4 and silently drops one constraint; `setPointerCapture` retargets the synthesized
+    `click` event to the capturing element on desktop Chrome, breaking naive tap-detection.
   - **Phase 0.5 — headless GGA solver. DONE 2026-07-29, on branch `lpn-solver`.**
     `js/lpn-solver.js` + `dev/lpn-spike/`; `node dev/lpn-spike/validate.js`, 46 checks, no network
     access or `node_modules` needed.

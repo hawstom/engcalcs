@@ -33,12 +33,12 @@ Per ROADMAP Task 146. `canvas-spike.html` is a standalone SVG DOM spike (`create
 - A 200-node grid behind a toggle, kept in its own hidden `<g>` so it costs nothing until shown.
 - An fps counter (rAF-based, counts real pointermove frames) for the on-device check in #1.
 
-## What still needs a real device before Phase 0 can be called closed
+## Phase 0 closed — 2026-07-29 (round 13)
 
-Items 1, 3, 4 above are UI/perf claims a desktop browser can't validate. Test on: one iOS Safari
-device, one mid-range Android Chrome device. If any of the four device-dependent criteria fail,
-the ROADMAP entry's fallback applies: spike the identical scenarios on Leaflet + `CRS.Simple` and
-compare artifacts before committing to a canvas technology.
+The on-device phone pass (items 1, 3, 4 above) is complete with no SVG-blocking issue found across
+13 rounds of iteration plus an independent Opus subagent review. **SVG DOM is the confirmed
+technology; the Leaflet + `CRS.Simple` fallback was never triggered.** See the ROADMAP Task 146
+entry and the scope doc's Phasing section for the closure record.
 
 ## LOC count
 
@@ -403,3 +403,22 @@ removed across earlier rounds' rewrites, not just superficially replaced.
    bear on Phase 0's actual go/no-go criteria (pan/zoom/drag/touch/text-shaping/print). If it matters
    later, the next thing worth trying is probably a native `cursor: url(...)` custom image (bypasses
    whatever native cursor-hit-test path is misbehaving) rather than another CSS-class approach.
+
+## Round 13 (Tom) — leader attachment bugs, then on-device phone pass — Phase 0 closed
+
+1. **"Attaches at label middle instead of at the end" on load.** `buildDom()` drew each leader
+   straight to `(px,py)` — the text's own `text-anchor:middle` anchor point — and only got corrected
+   to the near edge (`px∓halfW`) on the *first drag*, since that offset logic lived solely in
+   `updateLabelGeometry`. A label never dragged (i.e. every label, on a fresh load) showed the wrong
+   attachment point. Fixed by having `buildDom()` call `updateLabelGeometry(i)` immediately after
+   building each label, instead of duplicating a simplified (and wrong) version of the same logic.
+2. **Leader always attaching near the bottom of the text, not the middle.** SVG text defaults to
+   alphabetic baseline positioning, so `y=py` sat near the bottom of the glyphs (most of a
+   character's height is above the baseline, only descenders go below) — both the text itself and
+   the leader endpoint that tracks it read as attached low. Added `dominant-baseline:central` to the
+   text element, making `py` the true vertical center; `bbox()`'s label padding updated to match
+   (was asymmetric for the old baseline assumption, now symmetric).
+3. **Phone testing done, Phase 0 closed.** With the on-device pass complete and no SVG-blocking
+   issue found across 13 rounds, Phase 0 is DONE — see the ROADMAP Task 146 entry and the scope
+   doc's Phasing section, both updated. SVG DOM is the confirmed technology; the Leaflet + CRS.Simple
+   fallback was never triggered.
