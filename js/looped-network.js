@@ -430,6 +430,12 @@ var EngCalcs = EngCalcs || {};
 		j2.elev = 8; j2.demand = 0.01;
 		var pipe = addLink('pipe', j1.id, j2.id);
 		pipe.verts.push({ x: 30, y: -5 });
+		// addLink() computed .length before this vertex existed (straight node-to-node distance);
+		// rebuildLink() only rebuilds the DOM, not the length -- recompute explicitly, or the
+		// initial displayed length undercounts the bend until the vertex is next dragged (which
+		// goes through updateVertex()/updateLinkGeometry(), where lenAuto recomputation already
+		// happens correctly). Tom caught this: 25ft shown, jumped to 28ft only after a drag.
+		pipe.length = linkGeomLength(pipe);
 		rebuildLink(pipe);
 		updateEmptyHint();
 		zoomExtent();
@@ -580,22 +586,41 @@ var EngCalcs = EngCalcs || {};
 		requestAnimationFrame(tick);
 	}
 
+	// ---- units ----
+	// Every stored value is SI (CLAUDE.md's schema rule) -- the units strip's <select> options
+	// carry the "number of that unit per SI unit" factor directly as their `value` (the same
+	// mechanism echoUnitSelect()/EngCalcs.setUnits() already use suite-wide), so reading it back
+	// needs no separate JS-side unit table. Multiply SI by the factor to display; divide a typed
+	// value by the factor to store it back as SI.
+	// Looked up by element id, not by unit family: Length/Map and Elevation/Head both draw their
+	// option list from a distance-flavored family (distance_site / total_head) but must stay
+	// independently selectable (Tom, 2026-07-30) -- Length/Map is a declarative label with no
+	// real conversion (see lengthField() below), Elevation/Head is a real SI-converted quantity,
+	// and conflating them under one shared control was confusing once seen in practice.
+	// x/y positions are deliberately NOT run through this at all: they're schematic map/canvas
+	// coordinates with no established real-world scale until Task 145's backdrop registration.
+	// By [name=], not getElementById: echoUnitSelect() (lib/Calculators.lib.php) emits name=
+	// only, never id= -- these names double as the lookup key here.
+	function unitEl(name) { return document.querySelector('select[name="' + name + '"]'); }
+	function unitFactor(name) { var s = unitEl(name); return s ? parseFloat(s.value) : 1; }
+	function unitLabel(name) { var s = unitEl(name); return s ? s.options[s.selectedIndex].textContent : ''; }
+
 	// ---- minimal property popup ----
 	// Real, not a stub: id (readonly) plus the fields that already exist on the element
 	// (Elevation+Demand for a junction, Fixed head for a reservoir, Diameter+Roughness+Length
-	// for a pipe). Raw numbers, no units strip integration yet, and pump curve entry isn't
-	// implemented -- the full field set and units wiring are the next pass (ROADMAP Task 146
-	// Phase 1 continues).
+	// for a pipe). Pump curve entry isn't implemented -- see the scope doc's design note.
+	var currentPopup = null; // {kind:'node'|'link', id} -- lets a unit-strip change refresh the open popup in place
 	function wirePopup() {
 		document.getElementById('lpn_popup_close').addEventListener('click', function () {
 			document.getElementById('lpn_popup').style.display = 'none';
+			currentPopup = null;
 		});
 	}
-	function numberField(fields, labelText, value, onChange) {
-		var label = document.createElement('label'), input = document.createElement('input');
-		input.type = 'number'; input.value = value;
-		input.addEventListener('change', function () { onChange(+input.value); });
-		label.textContent = labelText + ' ';
+	function unitNumberField(fields, labelText, unitId, getSI, setSI) {
+		var f = unitFactor(unitId), label = document.createElement('label'), input = document.createElement('input');
+		input.type = 'number'; input.value = (getSI() * f).toFixed(4);
+		input.addEventListener('change', function () { setSI(+input.value / f); });
+		label.textContent = labelText + ' (' + unitLabel(unitId) + ') ';
 		label.appendChild(input);
 		fields.appendChild(label);
 		fields.appendChild(document.createElement('br'));
@@ -613,6 +638,12 @@ var EngCalcs = EngCalcs || {};
 	}
 	// Length pairs with an Auto checkbox (the lenAuto design logged in the scope doc): typing a
 	// value takes manual control; re-checking Auto snaps back to the live geometric distance.
+	// Auto and manual get IDENTICAL treatment (Tom, 2026-07-30) -- no SI conversion for length at
+	// all, in either mode. Canvas/grid units are declared, AutoCAD-style: the distance_site
+	// selector's current unit is just the LABEL for what a grid unit means, not a multiplier: 1
+	// grid unit IS 1 ft or 1 m, whichever is currently selected, by declaration. This is
+	// different from Elevation/Demand/Head/Diameter, which are independently-typed real
+	// quantities with genuine SI storage -- length is tied to drawn geometry, so it isn't.
 	function lengthField(fields, l) {
 		var pc = EngCalcs.pageConfig || {}, label = document.createElement('label'),
 			input = document.createElement('input'), autoLabel = document.createElement('label'),
@@ -624,7 +655,7 @@ var EngCalcs = EngCalcs || {};
 			l.lenAuto = auto.checked;
 			if (l.lenAuto) { l.length = linkGeomLength(l); input.value = l.length.toFixed(2); }
 		});
-		label.textContent = (pc.lpn_field_length || 'Length') + ' ';
+		label.textContent = (pc.lpn_field_length || 'Length') + ' (' + unitLabel('lpn_u_length') + ') ';
 		label.appendChild(input);
 		autoLabel.appendChild(auto);
 		autoLabel.appendChild(document.createTextNode(' ' + (pc.lpn_field_auto || 'Auto')));
@@ -632,39 +663,123 @@ var EngCalcs = EngCalcs || {};
 		fields.appendChild(document.createElement('br'));
 	}
 	function openPopupAt(sx, sy) {
-		var popup = document.getElementById('lpn_popup');
+		var popup = document.getElementById('lpn_popup'), r;
 		popup.style.left = sx + 'px'; popup.style.top = sy + 'px'; popup.style.display = 'block';
+		// Clamp into the viewport (Tom, tall/phone mode: the popup opened partly off-screen).
+		// Measured after display:block since an element's size isn't known while display:none.
+		r = popup.getBoundingClientRect();
+		popup.style.left = Math.max(4, Math.min(sx, window.innerWidth - r.width - 4)) + 'px';
+		popup.style.top = Math.max(4, Math.min(sy, window.innerHeight - r.height - 4)) + 'px';
 		EngCalcs.initTips(popup);
 	}
-	function openPopup(nodeId, sx, sy) {
-		var n = nodeById(nodeId), title = document.getElementById('lpn_popup_title'),
-			fields = document.getElementById('lpn_popup_fields'), pc = EngCalcs.pageConfig || {};
-		title.textContent = n.id;
+	// ---- rename (Tom: EPANET allows editing an element's ID, so must this) ----
+	function allIds() {
+		return doc.nodes.map(function (x) { return x.id; })
+			.concat(doc.links.map(function (x) { return x.id; }))
+			.concat(doc.labels.map(function (x) { return x.id; }));
+	}
+	function validateNewId(newId, oldId) {
+		var pc = EngCalcs.pageConfig || {};
+		if (newId === oldId) { return true; }
+		if (!newId || /[\s'"]/.test(newId)) { return pc.lpn_id_invalid || 'ID must be non-empty with no spaces or quotes.'; }
+		if (allIds().indexOf(newId) !== -1) { return pc.lpn_id_taken || 'That ID is already in use.'; }
+		return true;
+	}
+	// A text input in place of the static title -- shared by both popups since the validation/
+	// cascading-reference-update logic (below) only differs in which maps get re-keyed.
+	function idField(currentId, onRename) {
+		var title = document.getElementById('lpn_popup_title'), input = document.createElement('input');
+		title.textContent = '';
+		input.type = 'text'; input.value = currentId;
+		input.addEventListener('change', function () {
+			var newId = input.value, result = validateNewId(newId, currentId);
+			if (result !== true) { alert(result); input.value = currentId; return; }
+			if (newId !== currentId) { saveUndoSnapshot(); onRename(newId); }
+		});
+		title.appendChild(input);
+	}
+	function renameNode(oldId, newId) {
+		var n = nodeById(oldId), i;
+		n.id = newId;
+		nodeEls[newId] = nodeEls[oldId]; delete nodeEls[oldId];
+		incidentLinks[newId] = incidentLinks[oldId]; delete incidentLinks[oldId];
+		labelsByAnchor[newId] = labelsByAnchor[oldId]; delete labelsByAnchor[oldId];
+		nodeEls[newId].circle.setAttribute('data-node', newId);
+		doc.links.forEach(function (l) {
+			if (l.from === oldId) { l.from = newId; }
+			if (l.to === oldId) { l.to = newId; }
+		});
+		doc.labels.forEach(function (lb) { if (lb.anchorNode === oldId) { lb.anchorNode = newId; } });
+		currentPopup = { kind: 'node', id: newId };
+		renderNodeFields(newId);
+	}
+	function renameLink(oldId, newId) {
+		var l = linkById(oldId);
+		l.id = newId;
+		linkEls[newId] = linkEls[oldId]; delete linkEls[oldId];
+		linkEls[newId].line.setAttribute('data-link', newId);
+		linkEls[newId].handles.forEach(function (h) { h.setAttribute('data-link', newId); });
+		currentPopup = { kind: 'link', id: newId };
+		renderLinkFields(newId);
+	}
+	function renderNodeFields(nodeId) {
+		var n = nodeById(nodeId), fields = document.getElementById('lpn_popup_fields'), pc = EngCalcs.pageConfig || {};
+		idField(n.id, function (newId) { renameNode(nodeId, newId); });
 		fields.innerHTML = '';
 		if (n.type === 'reservoir') {
-			numberField(fields, pc.lpn_field_head || 'Fixed head', n.head, function (v) { n.head = v; updateNode(nodeId); });
+			unitNumberField(fields, pc.lpn_field_head || 'Fixed head', 'lpn_u_elevhead',
+				function () { return n.head; }, function (v) { n.head = v; updateNode(nodeId); });
 		} else {
-			numberField(fields, pc.lpn_field_elev || 'Elevation', n.elev, function (v) { n.elev = v; updateNode(nodeId); });
-			numberField(fields, pc.bpn_demand || 'Demand', n.demand, function (v) { n.demand = v; updateNode(nodeId); });
+			unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
+				function () { return n.elev; }, function (v) { n.elev = v; updateNode(nodeId); });
+			unitNumberField(fields, pc.bpn_demand || 'Demand', 'lpn_u_flow',
+				function () { return n.demand; }, function (v) { n.demand = v; updateNode(nodeId); });
 		}
 		readonlyField(fields, pc.lpn_field_x || 'X', n.x);
 		readonlyField(fields, pc.lpn_field_y || 'Y', n.y);
+	}
+	function openPopup(nodeId, sx, sy) {
+		currentPopup = { kind: 'node', id: nodeId };
+		renderNodeFields(nodeId);
 		openPopupAt(sx, sy);
 	}
-	function openLinkPopup(linkId, sx, sy) {
-		var l = linkById(linkId), title = document.getElementById('lpn_popup_title'),
-			fields = document.getElementById('lpn_popup_fields'), pc = EngCalcs.pageConfig || {};
-		title.textContent = l.id;
+	function renderLinkFields(linkId) {
+		var l = linkById(linkId), fields = document.getElementById('lpn_popup_fields'), pc = EngCalcs.pageConfig || {};
+		idField(l.id, function (newId) { renameLink(linkId, newId); });
 		fields.innerHTML = '';
 		if (l.type === 'pump') {
 			fields.appendChild(document.createTextNode(pc.lpn_pump_notice || 'Pump curve entry is not yet implemented.'));
 			fields.appendChild(document.createElement('br'));
 		} else {
-			numberField(fields, pc.lpn_field_diameter || 'Diameter', l.diameter, function (v) { l.diameter = v; });
-			numberField(fields, pc.lpn_field_roughness || 'Roughness', l.roughness, function (v) { l.roughness = v; });
+			unitNumberField(fields, pc.lpn_field_diameter || 'Diameter', 'lpn_u_diameter',
+				function () { return l.diameter; }, function (v) { l.diameter = v; });
+			numberFieldPlain(fields, pc.lpn_field_roughness || 'Roughness', l.roughness, function (v) { l.roughness = v; });
 			lengthField(fields, l);
 		}
+	}
+	function openLinkPopup(linkId, sx, sy) {
+		currentPopup = { kind: 'link', id: linkId };
+		renderLinkFields(linkId);
 		openPopupAt(sx, sy);
+	}
+	// Roughness has no unit selector for now: Phase 1 assumes Hazen-Williams (js/lpn-solver.js's
+	// default), whose C-factor is dimensionless. Darcy-Weisbach's roughness HEIGHT does need
+	// units (the scope doc's roughness family is "DW only") -- revisit once a friction-method
+	// selector exists (matching bpn_'s own method switch) and this can be genuinely conditional.
+	function numberFieldPlain(fields, labelText, value, onChange) {
+		var label = document.createElement('label'), input = document.createElement('input');
+		input.type = 'number'; input.value = value;
+		input.addEventListener('change', function () { onChange(+input.value); });
+		label.textContent = labelText + ' ';
+		label.appendChild(input);
+		fields.appendChild(label);
+		fields.appendChild(document.createElement('br'));
+	}
+	function refreshPopupIfOpen() {
+		var popup = document.getElementById('lpn_popup');
+		if (!currentPopup || popup.style.display !== 'block') { return; }
+		if (currentPopup.kind === 'node') { renderNodeFields(currentPopup.id); }
+		else { renderLinkFields(currentPopup.id); }
 	}
 
 	// One-step undo (Tom, after losing a deleted pipe's data). A full multi-step undo with a
@@ -688,9 +803,12 @@ var EngCalcs = EngCalcs || {};
 		if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); undo(); }
 	});
 
-	// calcAndSave() calls this unconditionally (e.g. from the unit-preset buttons in
-	// echoUnitsRow()). The real debounced GGA solve wiring lands with the property popups.
+	// calcAndSave() calls this unconditionally -- from the units strip's own selects
+	// (echoUnitSelect() hardcodes onchange="EngCalcs.submitForm()") and from echoUnitsRow()'s
+	// US/SI preset buttons. Re-render the open popup in place so switching units doesn't leave
+	// it showing a stale-unit number. The real debounced GGA solve wiring is still to come.
 	EngCalcs.pageCalculator = function (objForm) {
+		refreshPopupIfOpen();
 	};
 
 	document.addEventListener('DOMContentLoaded', function () {

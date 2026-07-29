@@ -291,14 +291,25 @@ Rules, stated as rules because each is silently wrong when broken:
   from the Phase 0 spike was a two-level control, not a single toggle. Per-link, in the Pipe
   property popup: an Auto/manual switch for *this* link only — **done**: the Length field pairs
   with an Auto checkbox; typing a value clears it (manual override), re-checking it snaps back to
-  the live geometric distance (`linkGeomLength()` in `js/looped-network.js`, schematic map-unit
-  distance, not a real ground length — that needs Task 145's backdrop scale). **Still not built**:
+  the live geometric distance (`linkGeomLength()` in `js/looped-network.js`). **Still not built**:
   the suite-wide half, in the gear/settings panel — a default for new links (auto by default) plus
   bulk operations over existing links, "force all to auto," and some release/disconnect verb for
   the opposite (Tom's own words: "orphan/freeze/disconnect/release all auto lengths") for taking a
   whole network off auto-length at once, e.g. before a `.inp` export where schematic auto-lengths
   would be misleading. Design the exact verb and semantics when the gear panel is actually built
   (Phase 2) — this half is still a placeholder for the idea, not a spec.
+  **Auto and manual length are numerically identical, no SI conversion for either (Tom,
+  2026-07-30) — this is the AutoCAD "unitless drawing units" convention, deliberately.** Grid/
+  canvas coordinates and lengths carry no independent real-world scale in Phase 1; the units
+  strip's distance_site selector is a *label* for what one grid unit is declared to mean (a foot,
+  a meter, whatever), not a conversion multiplier — 1 grid unit **is** 1 of the selected unit, by
+  declaration, the same way an AutoCAD drawing is unitless until the operator says otherwise. This
+  is categorically different from Elevation/Demand/Head/Diameter, which are independently *typed*
+  real quantities with genuine SI storage and real US⇄SI conversion on unit switch — length is
+  *tied to drawn geometry*, so it isn't. A `lenAuto` manual override is therefore just a plain
+  number in declared units, not a separately-tracked real-world length; the earlier round's design
+  (auto = unitless canvas distance, manual = SI-converted real length) was an unnecessary split
+  and has been removed.
 
 - **Pump curve entry — not yet designed, Tom's sketch (2026-07-30):** rather than a separate
   Pump Curve UI, let the Pump property popup accept *either* an inline curve table (2-point or
