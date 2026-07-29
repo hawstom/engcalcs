@@ -287,6 +287,15 @@ Rules, stated as rules because each is silently wrong when broken:
 - **`len` is stored and overridable, not derived.** Map geometry is schematic until Task 145 supplies
   real coordinates, so a computed-only length would be a lie. `lenAuto` records whether the user has
   taken control.
+  **UI for `lenAuto` — not yet designed, Tom's sketch from the Phase 0 spike (2026-07-29):** a
+  two-level control, not a single toggle. Per-link, in the Pipe property popup: an Auto/manual
+  switch for *this* link only. Suite-wide, in the gear/settings panel: a default for new links
+  (auto by default) plus bulk operations over existing links — "force all to auto," and some
+  release/disconnect verb for the opposite (Tom's own words: "orphan/freeze/disconnect/release all
+  auto lengths") for taking a whole network off auto-length at once, e.g. before a `.inp` export
+  where schematic auto-lengths would be misleading. Design the exact verb and semantics when the
+  property popup and gear panel are actually built (Phase 1 and Phase 2 respectively) — this is a
+  placeholder for the idea, not a spec.
 - **Versioning:** `v` is a monotonic integer. `v > CURRENT` refuses to load and says so — never
   silently drop unknown fields. `v < CURRENT` runs an ordered chain of pure migrations, keeping a
   `_backup` copy first, because there is no undo in localStorage.

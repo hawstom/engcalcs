@@ -158,3 +158,113 @@ PC. Four new items, all design/UX requests rather than bug reports:
    not compounded onto whatever the first pass already did. Position is new: click a reference point
    on the image, then either click a network node to snap that point onto it, or Cancel the prompt
    to type target X,Y directly — the "click and select node or enter" split Tom asked for.
+
+## Round 5 (Tom) — grab-offset, zoom-extent, backdrop registration UX
+
+1. **Drag grab-offset.** Reported for labels, but the same bug existed (less visibly, since the
+   node/vertex circles are small) for node and vertex drags too: the element snapped so its anchor
+   point sat exactly under the mouse on the first `pointermove`, instead of staying wherever within
+   the element you actually grabbed it. Fixed uniformly for all three drag types: `pointerdown` now
+   records `offX/offY` (the vector from the click's world point to the element's actual position)
+   and every subsequent frame applies that same offset, so the element stays under the cursor at the
+   point you grabbed rather than jumping to be centered on it.
+2. **Zoom-extent still clipping — two things `bbox()` never accounted for.** The node ID/elevation
+   text (e.g. "N12 104") drawn beside each node's circle wasn't in the box at all — only the circle's
+   own radius was. Neither were a link's bend vertices — the demo pipe's pre-set bend pokes above the
+   top row of nodes and was invisible to `zoomExtent()` entirely. Both fixed: node text width is
+   cached via `getBBox()` (and re-measured on an elevation edit, since the string length can change),
+   and every link's `verts` array is now included with a small handle-radius pad.
+3. **Backdrop registration: three real bugs, one redesign.** All from the same root cause — a
+   registration click was still visible to *normal* interaction, since nothing suppressed it.
+   Introduced `regMode`, a flag that blanks `pointerdown`'s normal drag/tap handling for the
+   duration of a click sequence; this fixes (a) clicking the alignment node also opening its
+   properties popup, and (b) a node sitting on top of the backdrop image intercepting what was
+   meant as an image click (dropped the `elementFromPoint===backdropImg` gate entirely — with
+   regMode suppressing normal handling, whatever pointerup arrives next during a sequence is simply
+   taken at face value). Position's flow was also redesigned per Tom's three modes: click a
+   reference point, then either click a node (snaps exactly) or click anywhere else (uses that raw
+   point) — auto-detected from the second click, no need to declare intent first — with typed X,Y
+   demoted to its own separate, lower-priority "Position (coords)" button, matching Tom's own read
+   that it's the rare case (mainly useful for an initial "origin is defined as 1000,1000" setup).
+4. **Auto Length UX — logged as a design placeholder, not built.** Tom's sketch (per-link Auto/
+   manual toggle in the property popup; a settings-panel default plus bulk force/release-all
+   operations) recorded in `dev/looped-network-calculator-scope.md` next to the existing `lenAuto`
+   schema field it builds on. Real Phase 1/2 design work, out of scope for the spike itself.
+
+## Round 6 (Tom) — leader-jump, disjoint zoom-extent, mobile viewport, explicit Position modes
+
+0. PC-primary testing confirmed as the intended approach for this session; phone checks stay
+   reserved for touch-specific behavior (pinch, tap targets) rather than routine, per Tom's own
+   RSI/eyesight tradeoff. Noted, not something to fix.
+1. **Leader jumps, not text.** The round-5 flip changed `text-anchor` (start↔end), which visibly
+   jumped the *glyphs* sideways at the decision point. Text is now always `text-anchor:middle` and
+   tracks the drag point continuously with no jump; only the leader line's attachment edge (left or
+   right side of the text's bounding box) flips at the 80%-width threshold — a thin line relocating
+   reads as nothing, where glyph relocation read as a jump. `bbox()`'s label term updated to match
+   (the text box is now symmetric around its point, not offset to one side).
+3. **Two distinct bugs, not one.** (a) PC: asymmetric margins when a label sits above a visible
+   grid. Root cause wasn't arithmetic — it was architectural: the grid (x:100-214) and the network
+   (x:0-32) are spatially disjoint, so fitting both into one box forces a huge, mostly-empty span
+   between them, and whichever axis ends up non-binding gets all its slack dumped in one lump. Fixed
+   by not trying to fit them together at all: `bbox()` now fits *only* the grid while it's visible,
+   network entirely excluded, since the grid was only ever meant to be a rendering/pan headroom
+   check, not something to view alongside the network. (b) Android Chrome: bottom row always
+   clipped. This is the well-known mobile "100vh problem" — `html,body{height:100%}` cascades from
+   the *layout* viewport (assumes the address bar is collapsed), so `#canvas`'s `bottom:0` sits below
+   what's actually on-screen whenever the address bar is showing. Fixed with `height:100dvh` layered
+   after the `100%` fallback (dvh tracks the real, currently-visible viewport; browsers that don't
+   support it just keep the fallback).
+4. **Position target: explicit radio choice, not auto-detection.** Round 5's "click a node to snap,
+   click anywhere else for a free point" auto-detected intent from what the second click happened to
+   land on — which silently assumes a click near a node always *means* the node, with no way to
+   express "I want a free point right next to this node." Replaced with a "Target:" radio group
+   (Node / Free point / Coords) selected *before* the click sequence starts: Node mode ignores any
+   click that isn't on an actual node (keeps waiting rather than falling back); Free mode takes the
+   raw coordinate unconditionally, even directly on top of a node; Coords folds the old separate
+   button into the same flow. Net effect: three unambiguous, separately-selectable behaviors instead
+   of one button guessing.
+
+## Round 7 (Tom) — label-flip math corrected, real CSS over-constraint bug found, cursor + wizard UX
+
+1. **Label flip threshold — actual bug, not just a bad guess.** The round-6 `0.8` coefficient was
+   measured from the wrong baseline (px crossing zero) rather than from a properly defined 0%/100%.
+   Redefined precisely: 0% adverse = the text's *near* edge sits exactly at the anchor's vertical
+   line (a zero-length leader); 100% = the text's *far* edge reaches that line, i.e. the whole box
+   has crossed — Tom's hard cap, since flipping any later means the leader has to reach clear across
+   the text. Under this definition the old `0.8` constant actually worked out to ~130% adverse,
+   already past the cap Tom just set, which is consistent with what he saw (~160%, eyeballed).
+   Replaced with `ADVERSE_FRAC=0.75` (mid of the stated 50-100% band), applied as
+   `halfW*(1-2*ADVERSE_FRAC)`.
+2. **Bottom nodes clipped on both platforms — a real, separate CSS bug, not incomplete dvh coverage.**
+   `#canvas` had `top:34px; left:0; right:0; bottom:0` (CSS) *and* `width="100%" height="100%"` (the
+   HTML attributes added earlier to fix SVG's replaced-element sizing). Combined, that's three
+   non-auto constraints per axis (top, height, bottom) — an over-constrained box per CSS2.1 §10.6.4,
+   and the spec requires the browser to silently drop one. Dropping `bottom` means the SVG's real
+   height becomes a full 100% of body *regardless* of the 34px top offset, so the element's own box
+   extends exactly 34px past the visible fold — clipped away by `overflow:hidden` on the page, but
+   `getBoundingClientRect()` (which `zoomExtent()` reads) still reports the oversized box, so nodes
+   got placed inside the part that was never actually visible. Worse on Android because `dvh`
+   shrinks further while the address bar is showing, compounding the same overflow. Fixed by
+   dropping `right`/`bottom` entirely and driving both axes from exactly two non-auto constraints
+   each (`top`+`height`, `left`+`width`), which can't conflict.
+3. **(a) Cursor still signaled interactivity during registration.** `regMode` correctly suppressed
+   real interaction, but the CSS `cursor:pointer`/`cursor:move` rules on `.node`/`.link`/`.vhandle`/
+   `.draglbl` fire purely from hover, independent of any JS state — so hovering a node during Scale
+   or Position still looked clickable, which is exactly wrong for "Free" mode where clicking directly
+   on a node must be ignored. Added a `.regmode` class (toggled by a new `setRegMode()` helper
+   alongside the `regMode` flag itself) that forces `cursor:crosshair` everywhere inside the canvas
+   while a sequence is active. **(b) "Target:" radio group demoted to wizard step.** Was sitting in
+   the toolbar permanently, visible and relevant even when no Position sequence was running. Now
+   hidden by default and shown only for the duration of a Position click sequence (mode is still read
+   once, at the moment "Position" is clicked, before the sequence starts). Tom flagged the group's
+   own layout/spacing as rough but explicitly out of scope for the spike — left as is.
+
+## Known broken at this commit (Tom, going into round 8 — flagged, not yet fixed)
+
+- **3a. Crosshair-forcing has momentary lapses near nodes, not reliably reproducible.** The
+  `.regmode` cursor override works most of the time but occasionally the pointer/move cursor peeks
+  through near a node during a Scale/Position sequence. Root cause not yet identified.
+- **3b. Position wizard (reference point → target) is "pretty much broken and unclear."** Alert-based
+  step instructions are wrong/misleading and the click sequencing doesn't hold up. The whole
+  alert()-driven, nested-listener approach needs to be rethought together with Tom rather than
+  patched again — next session starts there, not with another quick fix.
