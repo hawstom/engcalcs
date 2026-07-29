@@ -71,7 +71,7 @@ $ec_lang['index_meta_desc_plain']='Calculadoras hidráulicas gratuitas para tube
 $ec_lang['calc_set_units']='Cambiar sistema de medidas:';
 $ec_lang['calc_units_us']='US';
 $ec_lang['calc_units_si']='SI';
-$ec_lang['calc_defaults']='Valores predeterminados';
+$ec_lang['calc_defaults']='Restaurar valores predeterminados';
 $ec_lang['calc_defaults_confirm']='¿Restablecer la calculadora a los valores predeterminados originales?';
 $ec_lang['points_data_help']='(o bien Copiar/Pegar usando el área de datos)';
 $ec_lang['points_data_title']='Datos de los puntos<br />(separados por comas o tabulaciones)';
@@ -109,15 +109,16 @@ $ec_lang['hw_main_title']='Calculadora gratis en línea de pérdida de carga en 
 $ec_lang['hw_main_desc']='Pérdida de carga en tubería a partir del diámetro, el coeficiente C de Hazen-Williams y el caudal';
 $ec_lang['hw_hgl_1']='HGL aguas abajo';
 $ec_lang['hw_hgl_2']='HGL aguas arriba';
-$ec_lang['hw_elev_up']='Upstream elevation';
-$ec_lang['hw_pressure_up']='Upstream pressure';
-$ec_lang['hw_elev_down']='Downstream elevation';
-$ec_lang['hw_pressure_down']='Downstream pressure';
-$ec_lang['hw_pressure_check']='Pressure check';
-$ec_lang['hw_pressure_ok_short']='Positive pressure';
-$ec_lang['hw_pressure_neg_short']='Negative pressure';
-$ec_lang['hw_pressure_neg']='Downstream pressure is below zero. The hydraulic grade line falls below the pipe, so the pipe would not flow full and this result may not be valid.';
+$ec_lang['hw_elev_up']='Elevación aguas arriba';
+$ec_lang['hw_pressure_up']='Presión aguas arriba';
+$ec_lang['hw_elev_down']='Elevación aguas abajo';
+$ec_lang['hw_pressure_down']='Presión aguas abajo';
+$ec_lang['hw_pressure_check']='Verificación de presión';
+$ec_lang['hw_pressure_ok_short']='Presión positiva';
+$ec_lang['hw_pressure_neg_short']='Presión negativa';
+$ec_lang['hw_pressure_neg']='La presión aguas abajo es menor que cero. El HGL queda por debajo de la tubería, por lo que la tubería no fluiría llena y este resultado puede no ser válido.';
 $ec_lang['hw_roughness']='Coeficiente de Hazen-Williams, C';
+$ec_lang['hw_note_1']='<dl><dt>Esta calculadora no representa el perfil de la tubería entre los dos extremos.</dt><dd>Usa solo las elevaciones aguas arriba y aguas abajo que usted ingresa. Si el terreno se eleva por encima de cualquiera de los dos extremos en algún punto intermedio, la presión en ese punto alto es menor que cualquier presión indicada aquí. Vuelva a ejecutar la calculadora para el tramo desde el extremo aguas arriba hasta el punto alto para verificarlo.</dd><dd>Donde el HGL queda por debajo de la tubería, el agua está bajo presión negativa. El aire sale de la solución, una tubería de paredes delgadas puede colapsar, y puede ingresar agua subterránea contaminada a través de las juntas. Mantenga la línea bajo presión positiva en todo su recorrido, y considere una válvula de aire en cada punto alto.</dd><dt>La presión aguas arriba es una condición de frontera que usted proporciona.</dt><dd>Léala en un manómetro, en el nivel de agua de un tanque (la altura de agua sobre la tubería), o en la curva de un bombeo. Un bombeo entrega menos presión a medida que aumenta el caudal, así que use el punto de la curva que corresponda al caudal ingresado arriba.</dd><dt>Sume usted mismo los coeficientes de pérdida localizada.</dt><dd>Sume los valores de K de cada válvula, codo, tee, medidor y entrada en la línea, e ingrese ese total. Siga el enlace de ese campo para ver valores típicos. En una línea de conducción larga estas pérdidas son pequeñas frente a la fricción, pero en tuberías cortas dentro de una estación pueden ser la mayor parte de la pérdida.</dd></dl>';
 // Manning Irregular
 $ec_lang['mi_menu']='Canal de sección irregular según Manning';
 $ec_lang['mi_main_title']='Calculadora gratis en línea de Manning para canal de sección irregular';
@@ -192,7 +193,7 @@ $ec_lang['mphl_total_loss']='Pérdida total, h<sub>L</sub>';
 $ec_lang['mphl_egl_1']='EGL aguas abajo';
 $ec_lang['mphl_egl_2']='EGL aguas arriba';
 $ec_lang['mphl_hgl_egl_tip']='Puede no ser válido si la tubería está elevada. Véanse las notas.';
-$ec_lang['mphl_note_1']='<dl><dt>Esta calculadora no tiene en cuenta la elevación de la tubería.</dt><dd>Si el HGL desciende por debajo de la parte superior de la tubería en algún punto, este cálculo puede no ser válido.</dd><dt>Para una entrada abierta (alcantarilla), es necesario verificar las condiciones de control de entrada.</dt><dd>1. El HGL aguas arriba debe estar por encima de la cota de flujo a profundidad normal aguas arriba (¡y por encima de la tubería!).</dd><dd>2. El cabezal de una alcantarilla se representa mejor con el EGL aguas arriba que con el HGL aguas arriba.</dd><dd>3. Véase <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">mi tutorial de 2 minutos</a> para cálculos estándar sencillos de cabezal en alcantarillas usando <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, el programa gratuito de alcantarillas de la Administración Federal de Carreteras de los Estados Unidos.</dd><dd>4. Esta página resuelve solo el caso de control de salida: una tubería que fluye llena, donde las condiciones aguas abajo determinan el cabezal. El diseño de alcantarillas consiste en decidir si predomina el control de entrada o el control de salida, así que use HY-8 siempre que cualquiera de los dos pueda predominar.</dd>';
+$ec_lang['mphl_note_1']='<dl><dt>Esta calculadora no representa el perfil de la tubería entre los dos extremos.</dt><dd>Si el HGL desciende por debajo de la parte superior de la tubería en algún punto, este cálculo puede no ser válido.</dd><dt>Para una entrada abierta (alcantarilla), es necesario verificar las condiciones de control de entrada.</dt><dd>1. El HGL aguas arriba debe estar por encima de la cota de flujo a profundidad normal aguas arriba (¡y por encima de la tubería!).</dd><dd>2. El cabezal de una alcantarilla se representa mejor con el EGL aguas arriba que con el HGL aguas arriba.</dd><dd>3. Véase <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">mi tutorial de 2 minutos</a> para cálculos estándar sencillos de cabezal en alcantarillas usando <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, el programa gratuito de alcantarillas de la Administración Federal de Carreteras de los Estados Unidos.</dd><dd>4. Esta página resuelve solo el caso de control de salida: una tubería que fluye llena, donde las condiciones aguas abajo determinan el cabezal. El diseño de alcantarillas consiste en decidir si predomina el control de entrada o el control de salida, así que use HY-8 siempre que cualquiera de los dos pueda predominar.</dd></dl>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Canal trapecial según Manning';
 $ec_lang['mtc_main_title']='Calculadora gratis en línea de la fórmula de Manning para canal trapecial';

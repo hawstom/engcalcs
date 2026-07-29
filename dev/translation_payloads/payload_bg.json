@@ -1,10 +1,12 @@
 {
     "meta": {
         "language": "bg",
-        "expected_key_count": 575,
-        "delta_key_count": 10,
-        "exempt_key_count": 9,
+        "expected_key_count": 576,
+        "delta_key_count": 0,
+        "exempt_key_count": 11,
         "exempt_keys": [
+            "calc_units_us",
+            "calc_units_si",
             "dw_roughness",
             "install_android_heading",
             "install_ios_heading",
@@ -15,260 +17,17 @@
             "ip_hm",
             "bpn_id"
         ],
-        "active_prefixes": [
-            "calc",
-            "hw"
-        ],
+        "active_prefixes": [],
         "requested_prefix": null,
         "notes": "Translate only keys in keys_to_translate; preserve HTML, units, and symbols.",
         "glossary_injection_notes": "Use prompt_context_by_prefix and glossary_terms_by_prefix.preferred_translation when available.",
         "context_notes": "Use key_context.neighbors to keep register consistent with nearby translated strings.",
         "intent_notes": "Use key_intent when present; these entries provide terse disambiguation comments only where translation risk exists."
     },
-    "prompt_context_by_prefix": {
-        "calc": "Use these preferred technical term translations when relevant:\n- flow (Q): водно количество\n- velocity (v): скорост\n- slope (S): наклон\n    DO NOT render as: activity\/fitness sense of 'grade' — the treadmill or trail incline for running\/walking\/jogging; this is the hydraulic energy gradient, not an exercise setting; geographic or topographic landform term; school grade \/ academic mark",
-        "hw": "Use these preferred technical term translations when relevant:\n- flow (Q): водно количество\n- velocity (v): скорост\n- head loss (h_L): загуба на напор\n    DO NOT render as: pressure loss \/ pressure drop (use the head-loss term, not the pressure term); a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry\n- slope (S): наклон\n    DO NOT render as: activity\/fitness sense of 'grade' — the treadmill or trail incline for running\/walking\/jogging; this is the hydraulic energy gradient, not an exercise setting; geographic or topographic landform term; school grade \/ academic mark"
-    },
-    "glossary_terms_by_prefix": {
-        "calc": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg RESOLVED (Tom, 2026-07-13): native engineer's 2026-07-06 clarification confirmed both 'дебит' (colloquial\/general register) and 'водно количество' (academic\/hydraulic-engineering register, used at university for Q) are acceptable. Tom decided suite-wide standardization on 'водно количество' — \"I would put водно количество everywhere\" — applied across all bg calculator categories (pipes\/irrigation included, not just the hydraulic-structure\/open-channel strings the engineer originally corrected). 'дебит' fully replaced in lib\/lang.ec.bg.php 2026-07-13. Task 109 stages 3-5 (2026-07-19): bg standardized on водно количество (дебит drift removed from or_\/mpf_\/cs_ per Bulgarian-engineer-feedback.md); sr standardized on проток (stage 4); it confirmed on portata (flusso drift removed).",
-                "preferred_translation": "водно количество"
-            },
-            {
-                "term": "velocity",
-                "symbol": "v",
-                "context": "Flow velocity (speed of water). Appears in all calculators.",
-                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
-                "preferred_translation": "скорост"
-            },
-            {
-                "term": "slope",
-                "symbol": "S",
-                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators. English aliases 'slope' and 'grade' (u_grade\/u_gradePercent) both point here.",
-                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term. [2026-07-21] Centralized the grade activity-sense guard here (was living only as u_grade\/u_gradePercent label commentary): the 'avoid' array now carries the running\/walking\/jogging exercise-incline trap, so the slope entry is the single home for the grade→energy-gradient concept and its wrong senses.",
-                "preferred_translation": "наклон"
-            }
-        ],
-        "hw": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg RESOLVED (Tom, 2026-07-13): native engineer's 2026-07-06 clarification confirmed both 'дебит' (colloquial\/general register) and 'водно количество' (academic\/hydraulic-engineering register, used at university for Q) are acceptable. Tom decided suite-wide standardization on 'водно количество' — \"I would put водно количество everywhere\" — applied across all bg calculator categories (pipes\/irrigation included, not just the hydraulic-structure\/open-channel strings the engineer originally corrected). 'дебит' fully replaced in lib\/lang.ec.bg.php 2026-07-13. Task 109 stages 3-5 (2026-07-19): bg standardized on водно количество (дебит drift removed from or_\/mpf_\/cs_ per Bulgarian-engineer-feedback.md); sr standardized on проток (stage 4); it confirmed on portata (flusso drift removed).",
-                "preferred_translation": "водно количество"
-            },
-            {
-                "term": "velocity",
-                "symbol": "v",
-                "context": "Flow velocity (speed of water). Appears in all calculators.",
-                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
-                "preferred_translation": "скорост"
-            },
-            {
-                "term": "head loss",
-                "symbol": "h_L",
-                "context": "Energy loss expressed as a height of water column. Appears in Darcy-Weisbach, Hazen-Williams, Manning pipe, and Penstock calculators. Distinct from 'pressure drop' — use the hydraulic engineering term.",
-                "translation_notes": "'Head' in the hydraulic sense (energy per unit weight) does not translate literally in many languages — use the established civil\/hydraulic engineering phrase. Pre-2026 sr\/hr human translations used 'gubitak pritiska' (= pressure loss), which is technically the same concept expressed in pressure terms rather than head terms. The current 'губитак напора \/ gubitak tlačne visine' (= loss of hydraulic head) is more precise in a hydraulic engineering context and is preferred. DATA-ERROR FIX 2026-07-09 (category-3 wave-1 sprint): ro\/tr\/id translations were pressure-loss-sense ('pierdere de presiune'\/'basınç kaybı'\/'kehilangan tekanan'), contradicting this note's own guidance. Independently flagged by both the ro and tr wave-1 translation agents; corrected to head-loss-sense ('pierdere de sarcină'\/'yük kaybı'\/'kehilangan tinggi tekan') to match what both agents actually used in lib\/lang.ec.ro.php and lib\/lang.ec.tr.php. de's 'Druckverlust' was left as-is (not flagged; German engineering practice uses pressure\/head loss terms more interchangeably in pipe-flow context) but is worth a second look in a future audit. DATA-ERROR FIX 2026-07-09 (category-3 fa sprint): fa was 'افت فشار' (literally 'pressure loss', same pressure-loss-sense defect class as the ro\/tr\/id fix above), while the fa file's own mphl_ head-loss labels already used 'افت هد' (head loss) and 'هد' is an established loanword elsewhere in the file (هد سرعت = velocity head). Standardized to 'افت هد' suite-wide for fa and fixed dw_\/hw_ labels in lib\/lang.ec.fa.php to match. DATA-ERROR FIX 2026-07-10 (category-3 sw wave-3 sprint): glossary sw value was 'upotevu wa shinikizo' (= pressure loss), the same pressure-loss-sense defect class as the ro\/tr\/id\/fa fixes above. But lib\/lang.ec.sw.php's own dw_main_desc\/dw_main_menu\/dw_main_title\/mphl_main_desc\/mphl_main_menu\/mphl_main_title (and mpf_velocity_head, ws_headWaterHeight, or_head, mhp_gross_head elsewhere in the file) all already establish 'Kichwa' (head) as the suite's real Swahili word for hydraulic head, not 'shinikizo' (pressure). Standardized the glossary to 'upotevu wa kichwa' to match the file's own established, correct usage instead of the stale pressure-sense glossary value. DATA-ERROR FIX 2026-07-10 (category-3 ps wave-3 sprint): glossary ps value was 'د سر زیان' (زیان = damage\/loss), but lib\/lang.ec.ps.php's own dw_\/hw_\/mpf_\/mphl_ head-loss labels (40+ occurrences suite-wide) all already use ضیاع, not زیان, for 'loss' (e.g. existing dw_main_menu 'Darcy-Weisbach د پایپ سر ضیاع', mphl_total_loss). زیان does not occur anywhere in the file. Standardized the glossary to 'د سر ضیاع' to match the file's actual established usage, same defect class as the sw fix above. Task 109 stages 4-5 (2026-07-19): am confirmed on ሄድ (the ጭንቅ 'distress' mistranslation of 'head' was corrected suite-wide in this category); sw 'loss' must be Upotevu, not Hasara (financial loss) — fixed in ip_group_loss. | [2026-07-20] Stage-6 ur audit found the glossary's own value (ہیڈ لاس, a transliteration) was outdated; corrected to دباؤ نقصان, the suite incumbent used 9x across dw_\/hw_\/mphl_ and now applied in mhp_ for consistency.",
-                "preferred_translation": "загуба на напор"
-            },
-            {
-                "term": "slope",
-                "symbol": "S",
-                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators. English aliases 'slope' and 'grade' (u_grade\/u_gradePercent) both point here.",
-                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term. [2026-07-21] Centralized the grade activity-sense guard here (was living only as u_grade\/u_gradePercent label commentary): the 'avoid' array now carries the running\/walking\/jogging exercise-incline trap, so the slope entry is the single home for the grade→energy-gradient concept and its wrong senses.",
-                "preferred_translation": "наклон"
-            }
-        ]
-    },
-    "keys_to_translate": {
-        "calc_units_us": "US",
-        "calc_units_si": "SI",
-        "hw_elev_up": "Upstream elevation",
-        "hw_pressure_up": "Upstream pressure",
-        "hw_elev_down": "Downstream elevation",
-        "hw_pressure_down": "Downstream pressure",
-        "hw_pressure_check": "Pressure check",
-        "hw_pressure_ok_short": "Positive pressure",
-        "hw_pressure_neg_short": "Negative pressure",
-        "hw_pressure_neg": "Downstream pressure is below zero. The hydraulic grade line falls below the pipe, so the pipe would not flow full and this result may not be valid."
-    },
-    "keys": {
-        "calc_units_us": "US",
-        "calc_units_si": "SI",
-        "hw_elev_up": "Upstream elevation",
-        "hw_pressure_up": "Upstream pressure",
-        "hw_elev_down": "Downstream elevation",
-        "hw_pressure_down": "Downstream pressure",
-        "hw_pressure_check": "Pressure check",
-        "hw_pressure_ok_short": "Positive pressure",
-        "hw_pressure_neg_short": "Negative pressure",
-        "hw_pressure_neg": "Downstream pressure is below zero. The hydraulic grade line falls below the pipe, so the pipe would not flow full and this result may not be valid."
-    },
-    "key_context": {
-        "calc_units_us": {
-            "reason": "equal_to_english",
-            "current_value": "US",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "calc_set_units",
-                    "value": "Изберете мерни единици:",
-                    "english": "Set units:"
-                },
-                "next_translated": {
-                    "key": "calc_defaults",
-                    "value": "Стандартни стойности",
-                    "english": "Restore defaults"
-                }
-            }
-        },
-        "calc_units_si": {
-            "reason": "equal_to_english",
-            "current_value": "SI",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "calc_set_units",
-                    "value": "Изберете мерни единици:",
-                    "english": "Set units:"
-                },
-                "next_translated": {
-                    "key": "calc_defaults",
-                    "value": "Стандартни стойности",
-                    "english": "Restore defaults"
-                }
-            }
-        },
-        "hw_elev_up": {
-            "reason": "equal_to_english",
-            "current_value": "Upstream elevation",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "hw_hgl_2",
-                    "value": "HGL нагоре по течението",
-                    "english": "Upstream HGL"
-                },
-                "next_translated": {
-                    "key": "hw_roughness",
-                    "value": "Коефициент на Хейзен-Уилямс, C",
-                    "english": "Hazen-Williams coefficient, C"
-                }
-            }
-        },
-        "hw_pressure_up": {
-            "reason": "equal_to_english",
-            "current_value": "Upstream pressure",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "hw_hgl_2",
-                    "value": "HGL нагоре по течението",
-                    "english": "Upstream HGL"
-                },
-                "next_translated": {
-                    "key": "hw_roughness",
-                    "value": "Коефициент на Хейзен-Уилямс, C",
-                    "english": "Hazen-Williams coefficient, C"
-                }
-            }
-        },
-        "hw_elev_down": {
-            "reason": "equal_to_english",
-            "current_value": "Downstream elevation",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "hw_hgl_2",
-                    "value": "HGL нагоре по течението",
-                    "english": "Upstream HGL"
-                },
-                "next_translated": {
-                    "key": "hw_roughness",
-                    "value": "Коефициент на Хейзен-Уилямс, C",
-                    "english": "Hazen-Williams coefficient, C"
-                }
-            }
-        },
-        "hw_pressure_down": {
-            "reason": "equal_to_english",
-            "current_value": "Downstream pressure",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "hw_hgl_2",
-                    "value": "HGL нагоре по течението",
-                    "english": "Upstream HGL"
-                },
-                "next_translated": {
-                    "key": "hw_roughness",
-                    "value": "Коефициент на Хейзен-Уилямс, C",
-                    "english": "Hazen-Williams coefficient, C"
-                }
-            }
-        },
-        "hw_pressure_check": {
-            "reason": "equal_to_english",
-            "current_value": "Pressure check",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "hw_hgl_2",
-                    "value": "HGL нагоре по течението",
-                    "english": "Upstream HGL"
-                },
-                "next_translated": {
-                    "key": "hw_roughness",
-                    "value": "Коефициент на Хейзен-Уилямс, C",
-                    "english": "Hazen-Williams coefficient, C"
-                }
-            }
-        },
-        "hw_pressure_ok_short": {
-            "reason": "equal_to_english",
-            "current_value": "Positive pressure",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "hw_hgl_2",
-                    "value": "HGL нагоре по течението",
-                    "english": "Upstream HGL"
-                },
-                "next_translated": {
-                    "key": "hw_roughness",
-                    "value": "Коефициент на Хейзен-Уилямс, C",
-                    "english": "Hazen-Williams coefficient, C"
-                }
-            }
-        },
-        "hw_pressure_neg_short": {
-            "reason": "equal_to_english",
-            "current_value": "Negative pressure",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "hw_hgl_2",
-                    "value": "HGL нагоре по течението",
-                    "english": "Upstream HGL"
-                },
-                "next_translated": {
-                    "key": "hw_roughness",
-                    "value": "Коефициент на Хейзен-Уилямс, C",
-                    "english": "Hazen-Williams coefficient, C"
-                }
-            }
-        },
-        "hw_pressure_neg": {
-            "reason": "equal_to_english",
-            "current_value": "Downstream pressure is below zero. The hydraulic grade line falls below the pipe, so the pipe would not flow full and this result may not be valid.",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "hw_hgl_2",
-                    "value": "HGL нагоре по течението",
-                    "english": "Upstream HGL"
-                },
-                "next_translated": {
-                    "key": "hw_roughness",
-                    "value": "Коефициент на Хейзен-Уилямс, C",
-                    "english": "Hazen-Williams coefficient, C"
-                }
-            }
-        }
-    },
+    "prompt_context_by_prefix": [],
+    "glossary_terms_by_prefix": [],
+    "keys_to_translate": [],
+    "keys": [],
+    "key_context": [],
     "key_intent": []
 }

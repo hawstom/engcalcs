@@ -71,7 +71,7 @@ $ec_lang['index_meta_desc_plain']='ነፃ የሃይድሮሊክ ምህንድስ�
 $ec_lang['calc_set_units']='አሃዶችን አዘጋጅ:';
 $ec_lang['calc_units_us']='US';
 $ec_lang['calc_units_si']='SI';
-$ec_lang['calc_defaults']='ነባር ዋጋዎች';
+$ec_lang['calc_defaults']='ነባሪዎችን መልስ';
 $ec_lang['calc_defaults_confirm']='ካልኩሌተሩን ወደ ነባር ዋጋዎች ማስጀምር?';
 $ec_lang['points_data_help']='(ወይም የውሂብ ቦታ ተጠቅሞ ቅዳ/ለጥፍ)';
 $ec_lang['points_data_title']='የነጥቦች ውሂብ<br />(በኮማ ወይም ታብ የተለዩ)';
@@ -109,15 +109,16 @@ $ec_lang['hw_main_title']='ነፃ ኦንላይን Hazen-Williams የቧንቧ �
 $ec_lang['hw_main_desc']='Hazen-Williams የቧንቧ ሄድ ኪሳራ በተሰጠ ዲያሜትር፣ ሻካሪነት እና ፍሰት';
 $ec_lang['hw_hgl_1']='ዝቅ ባለ ፍሰት HGL';
 $ec_lang['hw_hgl_2']='ወደ ላይ ባለ ፍሰት HGL';
-$ec_lang['hw_elev_up']='Upstream elevation';
-$ec_lang['hw_pressure_up']='Upstream pressure';
-$ec_lang['hw_elev_down']='Downstream elevation';
-$ec_lang['hw_pressure_down']='Downstream pressure';
-$ec_lang['hw_pressure_check']='Pressure check';
-$ec_lang['hw_pressure_ok_short']='Positive pressure';
-$ec_lang['hw_pressure_neg_short']='Negative pressure';
-$ec_lang['hw_pressure_neg']='Downstream pressure is below zero. The hydraulic grade line falls below the pipe, so the pipe would not flow full and this result may not be valid.';
+$ec_lang['hw_elev_up']='ወደ ላይ ባለ ፍሰት ከፍታ';
+$ec_lang['hw_pressure_up']='ወደ ላይ ባለ ፍሰት ግፊት';
+$ec_lang['hw_elev_down']='ዝቅ ባለ ፍሰት ከፍታ';
+$ec_lang['hw_pressure_down']='ዝቅ ባለ ፍሰት ግፊት';
+$ec_lang['hw_pressure_check']='የግፊት ማረጋገጫ';
+$ec_lang['hw_pressure_ok_short']='አዎንታዊ ግፊት';
+$ec_lang['hw_pressure_neg_short']='አሉታዊ ግፊት';
+$ec_lang['hw_pressure_neg']='የዝቅ ባለ ፍሰት ግፊት ከዜሮ በታች ነው። HGL ከቧንቧው በታች ወርዷል፣ ስለዚህ ቧንቧው ሙሉ ሆኖ ላይፈስ ይችላል፣ ይህ ውጤትም ትክክለኛ ላይሆን ይችላል።';
 $ec_lang['hw_roughness']='Hazen-Williams ቅንጅት, C';
+$ec_lang['hw_note_1']='<dl><dt>ይህ ማስያ በሁለቱ ጫፎች መካከል ያለውን የቧንቧ መገለጫ (ፕሮፋይል) አይቀርጽም።</dt><dd>የሚጠቀመው እርስዎ ያስገቡትን ወደ ላይ እና ዝቅ ባለ ፍሰት ከፍታዎች ብቻ ነው። መሬቱ በመሃል ላይ ከሁለቱም ጫፎች ከፍ ካለ፣ በዚያ ከፍተኛ ነጥብ ላይ ያለው ግፊት እዚህ ከተዘገበው ግፊት ያንሳል። ያንን ለማረጋገጥ ካልኩሌተሩን ከወደ ላይ ባለ ፍሰት ጫፍ እስከ ከፍተኛው ነጥብ ላለው ርዝመት እንደገና ያሂዱት።</dd><dd>HGL ከቧንቧው በታች በሚወድቅበት ቦታ ውሃው በአሉታዊ ግፊት ውስጥ ነው። አየር ከመፍትሄው ይወጣል፣ ቀጭን ግድግዳ ያለው ቧንቧ ሊሰነጠቅ ይችላል፣ ቆሻሻ የከርሰ ምድር ውሃም በመገጣጠሚያዎቹ በኩል ሊገባ ይችላል። መስመሩን በሁሉም ቦታ በአዎንታዊ ግፊት ስር ያቆዩት፣ በእያንዳንዱ ከፍተኛ ነጥብ ላይ የአየር ቫልቭ ማካተትንም ያስቡበት።</dd><dt>ወደ ላይ ባለ ፍሰት ግፊት እርስዎ የሚያቀርቡት የድንበር ሁኔታ ነው።</dt><dd>ከመለኪያ (gauge)፣ ከማጠራቀሚያ ታንክ የውሃ ወለል (ከቧንቧው በላይ ያለው የውሃ ከፍታ)፣ ወይም ከፓምፕ ኩርባ ያንብቡት። ፍሰቱ እየጨመረ ሲሄድ ፓምፕ ያነሰ ግፊት ይሰጣል፣ ስለዚህ ከላይ ከገባው ፍሰት ጋር የሚዛመደውን የኩርባ ነጥብ ይጠቀሙ።</dd><dt>ጥቃቅን (አካባቢያዊ) ኪሳራ ቅንጅቶችን እራስዎ ይደምሩ።</dt><dd>በመስመሩ ላይ ላለ ለእያንዳንዱ ቫልቭ፣ መታጠፊያ፣ ቲ፣ ሜትር እና መግቢያ ያሉትን K ዋጋዎች ይደምሩ፣ ያንንም ድምር ያስገቡ። የተለመዱ ዋጋዎችን ለማግኘት በዚያ ግቤት ላይ ያለውን አገናኝ ይከተሉ። በረጅም ማስተላለፊያ ዋና ቧንቧ ላይ እነዚህ ኪሳራዎች ከግጭት አንፃር ትንሽ ናቸው፣ ነገር ግን በአጭር የጣቢያ ቧንቧ ውስጥ አብዛኛውን ኪሳራ ሊሆኑ ይችላሉ።</dd></dl>';
 // Manning Irregular
 $ec_lang['mi_menu']='Manning ያልተስተካከለ ቅርጽ ቦይ';
 $ec_lang['mi_main_title']='ነፃ ኦንላይን Manning ያልተስተካከለ ቅርጽ ቦይ ካልኩሌተር';
@@ -192,7 +193,7 @@ $ec_lang['mphl_total_loss']='ጠቅላላ ኪሳራ, h<sub>L</sub>';
 $ec_lang['mphl_egl_1']='ዝቅ ባለ ፍሰት EGL';
 $ec_lang['mphl_egl_2']='ወደ ላይ ባለ ፍሰት EGL';
 $ec_lang['mphl_hgl_egl_tip']='ቧንቧው ከፍ ያለ ከሆነ ትክክለኛ ላይሆን ይችላል። ማስታወሻዎችን ይመልከቱ።';
-$ec_lang['mphl_note_1']='<dl><dt>ይህ ማስያ የቧንቧውን ከፍታ ግምት ውስጥ አያስገባም።</dt><dd>HGL በማንኛውም ቦታ ከቧንቧው ጫፍ በታች ከሆነ፣ ይህ ስሌት ትክክለኛ ላይሆን ይችላል።</dd><dt>ለክፍት መግቢያ (culvert) ሁኔታ፣ የመግቢያ ቁጥጥር ሁኔታዎችን ማረጋገጥ ያስፈልጋል።</dt><dd>1. የወደ ላይ ባለ ፍሰት HGL ከወደ ላይ ባለ ፍሰት ተፈጥሯዊ ጥልቀት ፍሰት ከፍታ በላይ (እንዲሁም ከቧንቧው በላይ) መሆን አለበት።</dd><dd>2. የ culvert የላይኛው ውሃ ከወደ ላይ ባለ ፍሰት HGL ይልቅ በወደ ላይ ባለ ፍሰት EGL በተሻለ ይወከላል።</dd><dd>3. ለቀላል መደበኛ culvert የላይኛው ውሃ ስሌቶች <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">የ2 ደቂቃ ትምህርቴን</a> ይመልከቱ፣ ከዩ.ኤስ. የፌዴራል ሀይዌይ አስተዳደር የተገኘ ነጻ የ culvert ፕሮግራም የሆነውን <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a> ተጠቅሞ።</dd><dd>4. ይህ ገጽ የሚፈታው የውጤት ቁጥጥር (outlet control) ሁኔታን ብቻ ነው፦ ሙሉ ሆኖ የሚፈስ ቧንቧ፣ የታችኛው ውሃ ሁኔታዎች ሄዱን የሚወስኑበት። የ culvert ንድፍ ስራ የመግቢያ ቁጥጥር (inlet control) ወይም የውጤት ቁጥጥር (outlet control) እንደሚቆጣጠር መወሰን ነው፣ ስለዚህ ሁለቱም ሊሆኑ በሚችሉበት ጊዜ ሁሉ HY-8ን ተጠቀም።</dd>';
+$ec_lang['mphl_note_1']='<dl><dt>ይህ ማስያ በሁለቱ ጫፎች መካከል ያለውን የቧንቧ መገለጫ (ፕሮፋይል) አይቀርጽም።</dt><dd>HGL በማንኛውም ቦታ ከቧንቧው ጫፍ በታች ከሆነ፣ ይህ ስሌት ትክክለኛ ላይሆን ይችላል።</dd><dt>ለክፍት መግቢያ (culvert) ሁኔታ፣ የመግቢያ ቁጥጥር ሁኔታዎችን ማረጋገጥ ያስፈልጋል።</dt><dd>1. የወደ ላይ ባለ ፍሰት HGL ከወደ ላይ ባለ ፍሰት ተፈጥሯዊ ጥልቀት ፍሰት ከፍታ በላይ (እንዲሁም ከቧንቧው በላይ) መሆን አለበት።</dd><dd>2. የ culvert የላይኛው ውሃ ከወደ ላይ ባለ ፍሰት HGL ይልቅ በወደ ላይ ባለ ፍሰት EGL በተሻለ ይወከላል።</dd><dd>3. ለቀላል መደበኛ culvert የላይኛው ውሃ ስሌቶች <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">የ2 ደቂቃ ትምህርቴን</a> ይመልከቱ፣ ከዩ.ኤስ. የፌዴራል ሀይዌይ አስተዳደር የተገኘ ነጻ የ culvert ፕሮግራም የሆነውን <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a> ተጠቅሞ።</dd><dd>4. ይህ ገጽ የሚፈታው የውጤት ቁጥጥር (outlet control) ሁኔታን ብቻ ነው፦ ሙሉ ሆኖ የሚፈስ ቧንቧ፣ የታችኛው ውሃ ሁኔታዎች ሄዱን የሚወስኑበት። የ culvert ንድፍ ስራ የመግቢያ ቁጥጥር (inlet control) ወይም የውጤት ቁጥጥር (outlet control) እንደሚቆጣጠር መወሰን ነው፣ ስለዚህ ሁለቱም ሊሆኑ በሚችሉበት ጊዜ ሁሉ HY-8ን ተጠቀም።</dd></dl>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Manning ትራፔዞይዳዊ ቦይ';
 $ec_lang['mtc_main_title']='ነፃ ኦንላይን Manning ቀመር ትራፔዞይዳዊ ቦይ ካልኩሌተር';

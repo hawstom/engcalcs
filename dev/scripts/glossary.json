@@ -1,6 +1,6 @@
 {
   "meta": {
-    "version": "1.19",
+    "version": "1.20",
     "description": "Engineering term glossary for EngCalcs translation prompts. Preferred translations per language to prevent term drift across calculators and sprints. Covers all calculators including Rock Chute Design (Robinson), Micro-Hydro Power, and Manning series.",
     "usage": "Inject relevant entries as context in translation prompts: 'Use these preferred translations for technical terms: [terms for this calculator prefix]'. Entries with empty strings need a sprint to fill.",
     "language_codes": [
@@ -2637,6 +2637,87 @@
         "zh": "减压"
       },
       "source": "Branched Pipe Network calculator (bpn_) / Irrigation Pressure (ip_) high-pressure check. Translations: ai-generated (bpn_ sprint 2026-07-27)."
+    },
+    {
+      "term": "pressure",
+      "symbol": "p",
+      "context": "Water pressure as a gauge would read it, in psi / kPa / bar / m or ft of water. Distinct from HEAD, which is the same energy expressed as a height of water column. Appears as the upstream input and downstream residual on the waterline calculators (Hazen-Williams hw_pressure_up/hw_pressure_down, Darcy-Weisbach) and in the negative-pressure check.",
+      "translation_notes": "Created 2026-07-28 (ROADMAP Task 166 sprint) to close a real gap: the suite had entries for 'head', 'head loss' and 'pressure rating' but none for the bare concept, so every agent re-derived it and the head-vs-pressure trap had to be re-explained in each sprint prompt. Values below are the ATTESTED LABEL FORMS of hw_pressure_up ('Upstream pressure') as each language's own agent wrote it in this sprint, independently re-verified afterwards — read the pressure word out of the phrase, not the whole label. Every language landed on its ordinary water-pressure word and none reached for the head term. Note the pre-existing ar tension: head loss there is 'فقدان الضغط', which reads literally as 'pressure loss' while pressure itself is 'ضغط'; this is long-standing shipped ar usage and was deliberately not touched by this sprint (see ROADMAP if it is ever revisited).",
+      "avoid": [
+        "the HEAD term (a height of water column) — pressure here is what a gauge reads",
+        "atmospheric or meteorological pressure senses",
+        "a stress or material-strength sense",
+        "figurative 'pressure' (urgency, coercion)"
+      ],
+      "translations": {
+        "am": "ወደ ላይ ባለ ፍሰት ግፊት",
+        "ar": "ضغط المنبع",
+        "bg": "Налягане нагоре по течението",
+        "bn": "উজানের চাপ",
+        "cs": "Tlak proti proudu",
+        "de": "Druck flussaufwärts",
+        "es": "Presión aguas arriba",
+        "fa": "فشار بالادست",
+        "fr": "Pression amont",
+        "he": "לחץ מעלה",
+        "hi": "उर्ध्वप्रवाह दाब",
+        "hr": "Uzvodni tlak",
+        "id": "Tekanan hulu",
+        "it": "Pressione a monte",
+        "km": "សម្ពាធចំហៀងលើ",
+        "my": "အပေါ်ဘက် ဖိအား",
+        "ps": "پورتنی فشار",
+        "pt": "Pressão a montante",
+        "ro": "Presiune amonte",
+        "ru": "Давление выше по потоку",
+        "sr": "Узводни притисак",
+        "sw": "Shinikizo la juu ya mkondo",
+        "tr": "Memba basıncı",
+        "uk": "Тиск вище за течією",
+        "ur": "بالائی رخ کا دباؤ",
+        "zh": "上游压力"
+      },
+      "source": "Hazen-Williams (hw_) waterline rework, Task 167/168. Translations: ai-generated (Task 166 sprint 2026-07-28), attested label forms."
+    },
+    {
+      "term": "elevation",
+      "symbol": "z",
+      "context": "Height of a point above a datum — ground, pipe invert, or water surface. On the waterline calculators the user enters the upstream and downstream elevations (hw_elev_up / hw_elev_down) and the page derives the HGL and the residual pressure from them.",
+      "translation_notes": "Created 2026-07-28 (ROADMAP Task 166 sprint). Values are the ATTESTED LABEL FORMS of hw_elev_up ('Upstream elevation') as each language's own agent wrote it, independently re-verified. Most languages used their surveying term for a levelled height (kota / cotă / Cote / quota / отметка / тераз), not a generic 'height' word; where a file already had an established elevation word elsewhere (mi_elevation, or_centroid_elev) the agent matched it rather than inventing one. Do not conflate with HEAD: an elevation is measured from a datum, a head is an energy expressed as a height.",
+      "avoid": [
+        "the HEAD term — an elevation is a position above a datum, not an energy",
+        "a generic 'tall/high' adjective where the language has a surveying term",
+        "altitude in the aviation or geographic sense where a levelled survey term exists"
+      ],
+      "translations": {
+        "am": "ወደ ላይ ባለ ፍሰት ከፍታ",
+        "ar": "منسوب المنبع",
+        "bg": "Кота нагоре по течението",
+        "bn": "উজানের উচ্চতা",
+        "cs": "Kóta proti proudu",
+        "de": "Höhe flussaufwärts",
+        "es": "Elevación aguas arriba",
+        "fa": "تراز بالادست",
+        "fr": "Cote amont",
+        "he": "גובה מעלה",
+        "hi": "उर्ध्वप्रवाह ऊँचाई",
+        "hr": "Uzvodna kota",
+        "id": "Elevasi hulu",
+        "it": "Quota a monte",
+        "km": "កម្ពស់ចំហៀងលើ",
+        "my": "အပေါ်ဘက် အမြင့်",
+        "ps": "پورتنی لوړوالی",
+        "pt": "Elevação a montante",
+        "ro": "Cotă amonte",
+        "ru": "Отметка выше по потоку",
+        "sr": "Узводна кота",
+        "sw": "Mwinuko wa juu ya mkondo",
+        "tr": "Memba kotu",
+        "uk": "Відмітка вище за течією",
+        "ur": "بالائی رخ کی بلندی",
+        "zh": "上游高程"
+      },
+      "source": "Hazen-Williams (hw_) waterline rework, Task 167/168. Translations: ai-generated (Task 166 sprint 2026-07-28), attested label forms."
     }
   ]
 }

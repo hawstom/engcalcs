@@ -71,7 +71,7 @@ $ec_lang['index_meta_desc_plain']='Boru, kanal, savak ve sulama için ücretsiz 
 $ec_lang['calc_set_units']='Birimleri ayarla:';
 $ec_lang['calc_units_us']='US';
 $ec_lang['calc_units_si']='SI';
-$ec_lang['calc_defaults']='Varsayılanlar';
+$ec_lang['calc_defaults']='Varsayılanları geri yükle';
 $ec_lang['calc_defaults_confirm']='Hesap makinesini varsayılan değerlere sıfırla?';
 $ec_lang['points_data_help']='(veya veri alanını kullanarak Kopyala/Yapıştır)';
 $ec_lang['points_data_title']='Nokta verileri<br />(virgül veya sekme ile ayrılmış)';
@@ -109,15 +109,16 @@ $ec_lang['hw_main_title']='Ücretsiz Çevrimiçi Hazen-Williams Boru Yük Kaybı
 $ec_lang['hw_main_desc']='Verilen Çap, Pürüzlülük ve Akış için Hazen-Williams Boru Yük Kaybı';
 $ec_lang['hw_hgl_1']='Mansap HGL';
 $ec_lang['hw_hgl_2']='Memba HGL';
-$ec_lang['hw_elev_up']='Upstream elevation';
-$ec_lang['hw_pressure_up']='Upstream pressure';
-$ec_lang['hw_elev_down']='Downstream elevation';
-$ec_lang['hw_pressure_down']='Downstream pressure';
-$ec_lang['hw_pressure_check']='Pressure check';
-$ec_lang['hw_pressure_ok_short']='Positive pressure';
-$ec_lang['hw_pressure_neg_short']='Negative pressure';
-$ec_lang['hw_pressure_neg']='Downstream pressure is below zero. The hydraulic grade line falls below the pipe, so the pipe would not flow full and this result may not be valid.';
+$ec_lang['hw_elev_up']='Memba kotu';
+$ec_lang['hw_pressure_up']='Memba basıncı';
+$ec_lang['hw_elev_down']='Mansap kotu';
+$ec_lang['hw_pressure_down']='Mansap basıncı';
+$ec_lang['hw_pressure_check']='Basınç kontrolü';
+$ec_lang['hw_pressure_ok_short']='Pozitif basınç';
+$ec_lang['hw_pressure_neg_short']='Negatif basınç';
+$ec_lang['hw_pressure_neg']='Mansap basıncı sıfırın altında. HGL borunun altına düşüyor, bu nedenle boru tam dolu akmayabilir ve bu sonuç geçerli olmayabilir.';
 $ec_lang['hw_roughness']='Hazen-Williams katsayısı, C';
+$ec_lang['hw_note_1']='<dl><dt>Bu hesaplayıcı, iki uç arasındaki boru profilini modellemez.</dt><dd>Yalnızca girdiğiniz memba ve mansap kotlarını kullanır. Zemin, aradaki bir noktada her iki uçtan daha yükseğe çıkıyorsa, o yüksek noktadaki basınç burada bildirilen basınçlardan daha düşüktür. Bunu kontrol etmek için hesaplayıcıyı, memba ucundan yüksek noktaya kadar olan uzunluk için tekrar çalıştırın.</dd><dd>HGL\'nin borunun altına düştüğü yerlerde, su negatif basınç altındadır. Hava çözeltiden çıkar, ince cidarlı bir boru çökebilir ve kirli yeraltı suyu eklem yerlerinden içeri çekilebilir. Hattı her yerde pozitif basınç altında tutun ve her yüksek noktada bir hava vanası kullanmayı düşünün.</dd><dt>Memba basıncı, sizin sağladığınız bir sınır koşuludur.</dt><dd>Bunu bir manometreden, bir tank su seviyesinden (borunun üzerindeki su yüksekliği) veya bir pompa eğrisinden okuyun. Debi arttıkça pompa daha az basınç sağlar, bu yüzden yukarıda girilen debiye karşılık gelen eğri üzerindeki noktayı kullanın.</dd><dt>Yerel kayıp katsayılarını kendiniz toplayın.</dt><dd>Hat üzerindeki her vana, dirsek, T-parçası, sayaç ve giriş için K değerlerini toplayın ve bu toplamı girin. Tipik değerler için o girdinin yanındaki bağlantıyı izleyin. Uzun bir iletim hattında bu kayıplar sürtünmenin yanında küçüktür, ancak kısa istasyon borulamasında kayıpların çoğunu oluşturabilirler.</dd></dl>';
 // Manning Irregular
 $ec_lang['mi_menu']='Manning Düzensiz Kesitli Kanal';
 $ec_lang['mi_main_title']='Ücretsiz Çevrimiçi Manning Düzensiz Kesitli Kanal Hesaplayıcısı';
@@ -192,7 +193,7 @@ $ec_lang['mphl_total_loss']='Toplam kayıp, h<sub>L</sub>';
 $ec_lang['mphl_egl_1']='Mansap EGL';
 $ec_lang['mphl_egl_2']='Memba EGL';
 $ec_lang['mphl_hgl_egl_tip']='Boru yüksekteyse geçerli olmayabilir. Notlara bakın.';
-$ec_lang['mphl_note_1']='<dl><dt>Bu hesaplayıcı boru kotunu dikkate almaz.</dt><dd>HGL herhangi bir noktada boru üstünün altına düşerse, bu hesaplama geçerli olmayabilir.</dd><dt>Açık giriş (menfez) koşulunda, giriş kontrolü koşullarının kontrol edilmesi gerekir.</dt><dd>1. Memba HGL\'si, memba normal derinlik akış kotundan (veya borudan) düşük olamaz.</dd><dd>2. Bir menfezin memba su yüzü, memba HGL\'sinden ziyade memba EGL\'si ile daha iyi temsil edilir.</dd><dd>3. Basit standart menfez memba hesaplamaları için <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">2 dakikalık öğreticime bakın</a>; bu hesaplamalarda ABD Federal Karayolları İdaresi\'nin (FHWA) ücretsiz menfez programı olan <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>\'i kullanır.</dd><dd>4. Bu sayfa yalnızca çıkış kontrolü durumunu çözer: mansap koşullarının yükü belirlediği, tam dolu akan bir boru. Menfez tasarımı, giriş kontrolünün mü yoksa çıkış kontrolünün mü geçerli olduğuna karar vermeyi gerektirir; bu yüzden ikisinden biri geçerli olabiliyorsa HY-8 kullanın.</dd>';
+$ec_lang['mphl_note_1']='<dl><dt>Bu hesaplayıcı, iki uç arasındaki boru profilini modellemez.</dt><dd>HGL herhangi bir noktada boru üstünün altına düşerse, bu hesaplama geçerli olmayabilir.</dd><dt>Açık giriş (menfez) koşulunda, giriş kontrolü koşullarının kontrol edilmesi gerekir.</dt><dd>1. Memba HGL\'si, memba normal derinlik akış kotundan (veya borudan) düşük olamaz.</dd><dd>2. Bir menfezin memba su yüzü, memba HGL\'sinden ziyade memba EGL\'si ile daha iyi temsil edilir.</dd><dd>3. Basit standart menfez memba hesaplamaları için <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">2 dakikalık öğreticime bakın</a>; bu hesaplamalarda ABD Federal Karayolları İdaresi\'nin (FHWA) ücretsiz menfez programı olan <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>\'i kullanır.</dd><dd>4. Bu sayfa yalnızca çıkış kontrolü durumunu çözer: mansap koşullarının yükü belirlediği, tam dolu akan bir boru. Menfez tasarımı, giriş kontrolünün mü yoksa çıkış kontrolünün mü geçerli olduğuna karar vermeyi gerektirir; bu yüzden ikisinden biri geçerli olabiliyorsa HY-8 kullanın.</dd></dl>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Manning Trapezoidal Kanal';
 $ec_lang['mtc_main_title']='Ücretsiz Çevrimiçi Manning Formülü Trapezoidal Kanal Hesaplayıcısı';

@@ -72,7 +72,7 @@ $ec_lang['index_meta_desc_plain']='Calculateurs gratuits d\'ingénierie hydrauli
 $ec_lang['calc_set_units']='Définir les unités:';
 $ec_lang['calc_units_us']='US';
 $ec_lang['calc_units_si']='SI';
-$ec_lang['calc_defaults']='Valeurs par défaut';
+$ec_lang['calc_defaults']='Rétablir les valeurs par défaut';
 $ec_lang['calc_defaults_confirm']='Réinitialiser le calculateur aux valeurs par défaut d\'origine ?';
 $ec_lang['points_data_help']='(ou Copier/Coller via la zone de données)';
 $ec_lang['points_data_title']='Données des points<br />(séparés par virgule ou tabulation)';
@@ -110,15 +110,16 @@ $ec_lang['hw_main_title']='Calculateur gratuit en ligne de perte de charge Hazen
 $ec_lang['hw_main_desc']='Perte de charge Hazen-Williams pour un diamètre, un coefficient de Hazen-Williams C et un débit donnés';
 $ec_lang['hw_hgl_1']='LHP aval';
 $ec_lang['hw_hgl_2']='LHP amont';
-$ec_lang['hw_elev_up']='Upstream elevation';
-$ec_lang['hw_pressure_up']='Upstream pressure';
-$ec_lang['hw_elev_down']='Downstream elevation';
-$ec_lang['hw_pressure_down']='Downstream pressure';
-$ec_lang['hw_pressure_check']='Pressure check';
-$ec_lang['hw_pressure_ok_short']='Positive pressure';
-$ec_lang['hw_pressure_neg_short']='Negative pressure';
-$ec_lang['hw_pressure_neg']='Downstream pressure is below zero. The hydraulic grade line falls below the pipe, so the pipe would not flow full and this result may not be valid.';
+$ec_lang['hw_elev_up']='Cote amont';
+$ec_lang['hw_pressure_up']='Pression amont';
+$ec_lang['hw_elev_down']='Cote aval';
+$ec_lang['hw_pressure_down']='Pression aval';
+$ec_lang['hw_pressure_check']='Vérification de la pression';
+$ec_lang['hw_pressure_ok_short']='Pression positive';
+$ec_lang['hw_pressure_neg_short']='Pression négative';
+$ec_lang['hw_pressure_neg']='La pression aval est inférieure à zéro. La LHP passe sous la conduite, si bien que celle-ci ne s\'écoulerait pas pleine et ce résultat peut ne pas être valide.';
 $ec_lang['hw_roughness']='Coefficient Hazen-Williams, C';
+$ec_lang['hw_note_1']='<dl><dt>Cet outil de calcul ne modélise pas le profil de la conduite entre les deux extrémités.</dt><dd>Il n\'utilise que les cotes amont et aval que vous saisissez. Si le terrain s\'élève plus haut que l\'une ou l\'autre extrémité en un point intermédiaire, la pression en ce point haut est inférieure à toute pression indiquée ici. Relancez le calcul pour la longueur allant de l\'extrémité amont jusqu\'au point haut afin de le vérifier.</dd><dd>Là où la LHP passe sous la conduite, l\'eau est sous pression négative. L\'air sort de solution, une conduite à paroi mince peut s\'effondrer, et de l\'eau souterraine contaminée peut être aspirée par les joints. Maintenez une pression positive partout le long de la conduite et prévoyez une ventouse (purgeur d\'air) à chaque point haut.</dd><dt>La pression amont est une condition aux limites que vous fournissez.</dt><dd>Relevez-la sur un manomètre, à partir du niveau d\'eau d\'un réservoir (la hauteur d\'eau au-dessus de la conduite), ou à partir d\'une courbe de pompe. Une pompe fournit une pression moindre lorsque le débit augmente ; utilisez donc le point de la courbe correspondant au débit saisi ci-dessus.</dd><dt>Additionnez vous-même les coefficients de perte de charge singulière.</dt><dd>Totalisez les valeurs K de chaque vanne, coude, té, compteur et entrée de la conduite, et saisissez ce total. Suivez le lien de ce champ pour des valeurs typiques. Sur une conduite d\'adduction longue, ces pertes sont faibles par rapport au frottement, mais dans une tuyauterie de station courte, elles peuvent représenter l\'essentiel de la perte.</dd></dl>';
 // Manning Irregular
 $ec_lang['mi_menu']='Canal à section irrégulière Manning';
 $ec_lang['mi_main_title']='Calculateur Manning gratuit en ligne de canal à section irrégulière';
@@ -193,7 +194,7 @@ $ec_lang['mphl_total_loss']='Perte de charge totale, h<sub>L</sub>';
 $ec_lang['mphl_egl_1']='LHE aval';
 $ec_lang['mphl_egl_2']='LHE amont';
 $ec_lang['mphl_hgl_egl_tip']='Peut ne pas être valide si la conduite est haute. Voir les notes.';
-$ec_lang['mphl_note_1']='<dl><dt>Cet outil de calcul ne tient pas compte de l\'altitude (la cote) de la conduite.</dt><dd>Si la LHP descend sous le sommet de la conduite en un point quelconque, ce calcul peut ne pas être valide.</dd><dt>Pour une entrée libre (buse), il est nécessaire de vérifier les conditions de contrôle à l\'entrée.</dt><dd>1. La LHP amont doit être supérieure à la cote de profondeur normale amont (et plus haute que la conduite elle-même !).</dd><dd>2. La charge amont d\'une buse est mieux représentée par la LHE amont que par la LHP amont.</dd><dd>3. Voir <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">mon tutoriel de 2 minutes</a> pour les calculs simples et standard de charge amont de buse à l\'aide de <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, le logiciel gratuit de calcul de buses de la Federal Highway Administration (administration fédérale des routes) des États-Unis.</dd><dd>4. Cette page ne résout que le cas du contrôle à la sortie : une conduite en charge sur toute sa longueur, où les conditions aval déterminent la charge. La conception d\'une buse consiste justement à déterminer si c\'est le contrôle à l\'entrée ou à la sortie qui gouverne, donc utilisez HY-8 dès que l\'un des deux cas est possible.</dd>';
+$ec_lang['mphl_note_1']='<dl><dt>Cet outil de calcul ne modélise pas le profil de la conduite entre les deux extrémités.</dt><dd>Si la LHP descend sous le sommet de la conduite en un point quelconque, ce calcul peut ne pas être valide.</dd><dt>Pour une entrée libre (buse), il est nécessaire de vérifier les conditions de contrôle à l\'entrée.</dt><dd>1. La LHP amont doit être supérieure à la cote de profondeur normale amont (et plus haute que la conduite elle-même !).</dd><dd>2. La charge amont d\'une buse est mieux représentée par la LHE amont que par la LHP amont.</dd><dd>3. Voir <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">mon tutoriel de 2 minutes</a> pour les calculs simples et standard de charge amont de buse à l\'aide de <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, le logiciel gratuit de calcul de buses de la Federal Highway Administration (administration fédérale des routes) des États-Unis.</dd><dd>4. Cette page ne résout que le cas du contrôle à la sortie : une conduite en charge sur toute sa longueur, où les conditions aval déterminent la charge. La conception d\'une buse consiste justement à déterminer si c\'est le contrôle à l\'entrée ou à la sortie qui gouverne, donc utilisez HY-8 dès que l\'un des deux cas est possible.</dd></dl>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Canal trapézoïdal Manning';
 $ec_lang['mtc_main_title']='Calculateur gratuit en ligne de la formule Manning pour canal trapézoïdal';

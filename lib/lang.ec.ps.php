@@ -71,7 +71,7 @@ $ec_lang['index_meta_desc_plain']='وړیا هایدرولیکي انجینري 
 $ec_lang['calc_set_units']='واحدونه تنظیم کړئ:';
 $ec_lang['calc_units_us']='US';
 $ec_lang['calc_units_si']='SI';
-$ec_lang['calc_defaults']='د ډيفالټ ارزښتونه';
+$ec_lang['calc_defaults']='ډيفالټ ارزښتونه بيرته راولئ';
 $ec_lang['calc_defaults_confirm']='ایا محاسبه اصلي (لومړنیو) ډيفالټ ارزښتونو ته بیرته تنظیم شي؟';
 $ec_lang['points_data_help']='(یا د معلوماتو ساحې له لارې کاپي/پیسټ وکړئ)';
 $ec_lang['points_data_title']='د نقطو معلومات<br />(د کوما یا ټب لخوا جلا شوي)';
@@ -109,15 +109,16 @@ $ec_lang['hw_main_title']='وړیا آنلاین Hazen-Williams د پایپ سر
 $ec_lang['hw_main_desc']='Hazen-Williams د پایپ سر ضیاع د ورکړل شوي قطر، خشونت، او بهاو سره';
 $ec_lang['hw_hgl_1']='ښکته HGL';
 $ec_lang['hw_hgl_2']='پورته HGL';
-$ec_lang['hw_elev_up']='Upstream elevation';
-$ec_lang['hw_pressure_up']='Upstream pressure';
-$ec_lang['hw_elev_down']='Downstream elevation';
-$ec_lang['hw_pressure_down']='Downstream pressure';
-$ec_lang['hw_pressure_check']='Pressure check';
-$ec_lang['hw_pressure_ok_short']='Positive pressure';
-$ec_lang['hw_pressure_neg_short']='Negative pressure';
-$ec_lang['hw_pressure_neg']='Downstream pressure is below zero. The hydraulic grade line falls below the pipe, so the pipe would not flow full and this result may not be valid.';
+$ec_lang['hw_elev_up']='پورتنی لوړوالی';
+$ec_lang['hw_pressure_up']='پورتنی فشار';
+$ec_lang['hw_elev_down']='ښکتنی لوړوالی';
+$ec_lang['hw_pressure_down']='ښکتنی فشار';
+$ec_lang['hw_pressure_check']='د فشار کتنه';
+$ec_lang['hw_pressure_ok_short']='مثبت فشار';
+$ec_lang['hw_pressure_neg_short']='منفي فشار';
+$ec_lang['hw_pressure_neg']='ښکتنی فشار له صفر څخه ښکته دی. د HGL کرښه د پایپ نه ښکته راځي، نو پایپ به په بشپړ ډول ډک نه بهیږي، او دا پایله ممکن سمه نه وي.';
 $ec_lang['hw_roughness']='Hazen-Williams ضریب، C';
+$ec_lang['hw_note_1']='<dl><dt>دا محاسبه د دواړو څنډو ترمنځ د پایپ پروفایل نه ماډل کوي.</dt><dd>دا یوازې هغه پورتنی او ښکتنی لوړوالی کاروي چې تاسو یې لیکئ. که ځمکه د دواړو څنډو ترمنځ په کوم ځای کې د هرې څنډې نه لوړه شي، په هغه لوړ ټکي کې فشار له هر دلته راپور شوي فشار نه ټیټ دی. دا کتلو لپاره، محاسبه د پورتني سر نه تر لوړ ټکي پورې اوږدوالي لپاره بیا پرمخ بوځئ.</dd><dd>چېرې چې د HGL کرښه د پایپ نه ښکته راځي، اوبه د منفي فشار لاندې دي. هوا له محلول نه وځي، نری‌دیواله پایپ کولی شي ړنګ شي، او ککړ تحت‌الارضي اوبه کولی شي د پیوستون ځایونو له لارې دننه راکاږل شي. کرښه هر ځای کې د مثبت فشار لاندې وساتئ، او په هر لوړ ټکي کې د هوا سوپاپ ته پام وکړئ.</dd><dt>پورتنی فشار هغه د پولې شرط دی چې تاسو یې ورکوئ.</dt><dd>دا له ګیج نه، د ټانکي د اوبو کچې نه (د پایپ نه پورته د اوبو لوړوالی)، یا د پمپ منحني نه ولولئ. پمپ لکه څنګه چې بهاو زیاتیږي کم فشار ورکوي، نو هغه ټکی وکاروئ چې د پورته لیکل شوي بهاو سره سمون خوري.</dd><dt>ځایي (سیمه‌ییز) ضیاع ضریبونه پخپله جمع کړئ.</dt><dd>د کرښې د هر سوپاپ، ګونۍ، ټي، متر، او ننوتنځای لپاره د K ارزښتونه ټول کړئ، او هغه ټول ولیکئ. د معمولو ارزښتونو لپاره په دې ننوت کې لینک تعقیب کړئ. په اوږده لېږد اصلي کرښه کې دا ضیاعات د اصطکاک په پرتله کوچني دي، خو په لنډه د سټیشن پایپ کارۍ کې دا کولی شي د ډیرې ضیاع برخه وي.</dd></dl>';
 // Manning Irregular
 $ec_lang['mi_menu']='Manning د غیریکسانې مقطع چینل';
 $ec_lang['mi_main_title']='وړیا آنلاین Manning د غیریکسانې مقطع چینل محاسبه';
@@ -192,7 +193,7 @@ $ec_lang['mphl_total_loss']='ټول ضیاع، h<sub>L</sub>';
 $ec_lang['mphl_egl_1']='ښکته EGL';
 $ec_lang['mphl_egl_2']='پورته EGL';
 $ec_lang['mphl_hgl_egl_tip']='که پایپ لوړ وي، ممکن سم نه وي. یادښتونه وګورئ.';
-$ec_lang['mphl_note_1']='<dl><dt>دا محاسبه د پایپ لوړوالی نه ګڼي.</dt><dd>که HGL په هر ځای کې د پایپ له سر څخه ښکته شي، دا محاسبه ممکن سمه نه وي.</dd><dt>د خلاص دننه ننوت (کلورټ) د حالت لپاره، د ننوت کنترول حالتونو چک کول اړین دي.</dt><dd>۱. پورتني HGL د پورتني نورمال ژوروالي د بهاو لوړوالي (یا د پایپ لاندې) کمیدلی نشي.</dd><dd>۲. د کلورټ پورتنۍ اوبه د پورتني EGL له خوا د پورتني HGL پر ځای ښه استازولی کیږي.</dd><dd>۳. د ساده معیاري کلورټ د پورتنیو اوبو محاسبو لپاره <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">زما دوه دقیقو ټیوټوریل وګورئ</a>، چې <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a> کاروي، د متحده ایالاتو د فدرالي لارو ادارې وړیا کلورټ پروګرام.</dd><dd>۴. دا پاڼه یوازې د وتلو کنترول حالت حل کوي: یو پایپ چې په بشپړ ډول ډک بهیږي، چېرې چې ښکته اړخ شرایط سر ټاکي. د کلورټ ډیزاین کار دا دی چې پرېکړه وکړي چې ننوت کنترول یا وتلو کنترول کوم یو حاکم دی، نو کله چې دواړه امکان ولري HY-8 وکاروئ.</dd>';
+$ec_lang['mphl_note_1']='<dl><dt>دا محاسبه د دواړو څنډو ترمنځ د پایپ پروفایل نه ماډل کوي.</dt><dd>که HGL په هر ځای کې د پایپ له سر څخه ښکته شي، دا محاسبه ممکن سمه نه وي.</dd><dt>د خلاص دننه ننوت (کلورټ) د حالت لپاره، د ننوت کنترول حالتونو چک کول اړین دي.</dt><dd>۱. پورتني HGL د پورتني نورمال ژوروالي د بهاو لوړوالي (یا د پایپ لاندې) کمیدلی نشي.</dd><dd>۲. د کلورټ پورتنۍ اوبه د پورتني EGL له خوا د پورتني HGL پر ځای ښه استازولی کیږي.</dd><dd>۳. د ساده معیاري کلورټ د پورتنیو اوبو محاسبو لپاره <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">زما دوه دقیقو ټیوټوریل وګورئ</a>، چې <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a> کاروي، د متحده ایالاتو د فدرالي لارو ادارې وړیا کلورټ پروګرام.</dd><dd>۴. دا پاڼه یوازې د وتلو کنترول حالت حل کوي: یو پایپ چې په بشپړ ډول ډک بهیږي، چېرې چې ښکته اړخ شرایط سر ټاکي. د کلورټ ډیزاین کار دا دی چې پرېکړه وکړي چې ننوت کنترول یا وتلو کنترول کوم یو حاکم دی، نو کله چې دواړه امکان ولري HY-8 وکاروئ.</dd></dl>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Manning ذوزنقه چینل';
 $ec_lang['mtc_main_title']='وړیا آنلاین Manning فارمول ذوزنقه چینل محاسبه';

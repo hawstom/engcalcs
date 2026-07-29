@@ -10,41 +10,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 ## Calculator Improvements
 
-- 25|166| **Three UI-chrome keys need translating: `calc_defaults` (changed), `calc_units_us` and
-  `calc_units_si` (new).** Created 2026-07-28 out of Task 162/165 so the debt is visible rather than
-  buried in a closed block. `detect_english_drift.php` reports `calc_defaults` as **CHANGED** — its
-  English went "Default values" → "Restore defaults" (Tom's preference; it names what the control
-  does), so the 26 existing translations are **soft-stale**: still accurate about the button's
-  effect, but the noun form where English is now imperative. The other two are the US/SI preset
-  buttons, seeded as English.
-  **Now 11 new keys plus 2 changed** — Task 169 made `mphl_note_1` a second CHANGED key needing a
-  semantic resync, alongside `calc_defaults`. Task 167 added eight more (`hw_elev_up`, `hw_pressure_up`, `hw_elev_down`,
-  `hw_pressure_down`, `hw_pressure_check`, `hw_pressure_ok_short`, `hw_pressure_neg_short`,
-  `hw_pressure_neg`), all seeded as English. 11 × 26 = 286 strings, which is now a defensible sprint
-  on its own if nothing else is queued.
-  **3 keys × 26 languages = 78 strings — too small to justify its own 26-agent sprint.** Batch it
-  into the next sprint that runs for any other reason. Until then the buttons read "US"/"SI"
-  (international abbreviations, harmless untranslated) and the defaults button reads correctly if
-  slightly less imperative in the other 26 languages.
-  **Do not run `detect_english_drift.php --update` before the resync lands** — that re-baselines the
-  manifest and would erase the only record that `calc_defaults` drifted.
-
-- 15|170| **The shared `mphl_note_1` is mostly culvert material, and only one of its three pages is
-  a culvert calculator.** Found while doing Task 169, 2026-07-28, and deliberately not fixed there.
-  Beyond the one sentence Task 169 corrected, the note's bulk is an open-inlet/culvert discussion:
-  inlet-control checks, headwater represented by EGL, a link to Tom's HY-8 tutorial, and a statement
-  that the page solves outlet control only. That is exactly right for **Manning Pipe Head Loss** (a
-  storm drain and culvert calculator) and largely noise on **Hazen-Williams** and **Darcy-Weisbach**,
-  which after Tasks 167/168 are explicitly waterline calculators taking upstream pressure and
-  reporting downstream residual pressure. A waterline engineer has no use for HY-8.
-  **This is the same pattern as Task 167 one level up:** three pages sharing content that fits one
-  audience, surviving because the pages look alike. Tom's Task 144 domain model keeps paying out.
-  **Cost:** a waterline-appropriate note is a new key (26 translations). What it should say is
-  genuinely different — pipe profile and negative pressure, pump/tank boundary conditions, minor-loss
-  K sourcing — not a trimmed version of the culvert text. **Reach-weight it:** HW is 580 humans,
-  DW is 67, so this is really a question about the HW page. Do not split the note on symmetry
-  grounds alone.
-
 - 15|144| **Diagnose the Hazen-Williams conversion leak.** Per the 2026-07-27 usage snapshot
   (`dev/usage-data-log.md`), HW draws 580 confirmed-human views — the suite's second-biggest genuine
   front door, at 18% human-of-reach vs Darcy-Weisbach's 4% — but only 11% of those humans ever
@@ -152,7 +117,7 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   **no new translation** — the unit sets already exist and defaults are numbers — making it the
   cheapest testable change on the board. Do not ship it before the export; per-page default divergence
   is a real cost and (e) could argue against it.
-- 18|146| **Looped-network (Hardy Cross) solving — was Task 137 "Phase 3", extracted 2026-07-27.**
+- 70|146| **Looped-network (Hardy Cross) solving — was Task 137 "Phase 3", extracted 2026-07-27.**
   Extend `bpn_` (or build alongside it) to solve networks with loops, iterating to convergence —
   the case the shipped branched calculator explicitly excludes ("no loops, no iteration"). Kept
   deliberately *simple*: the point is a tool for someone who does not want to stand up EPANET, not an
@@ -164,7 +129,7 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   the two branches are independent. Until then it stays uncommitted. Do not start this before 144
   produces a finding; the whole point of extracting it is that it now has a real trigger to wait for
   rather than a vague someday.
-- 15|145| **Google Maps elevation/length helper for `bpn_` — was Task 137 "Phase 2", extracted
+- 11|145| **Google Maps elevation/length helper for `bpn_` — was Task 137 "Phase 2", extracted
   2026-07-27.** An isolated map mashup that pulls pipe lengths and node elevations into the branched
   network, in a **separate lazy-loaded window**, with the hard architectural constraint from the
   original spec: **the core solve never depends on it**, so the whole feature can be aborted at zero
@@ -414,7 +379,7 @@ straight from `lib/lang.ec.sw.php`, i.e. an agent searching our own translated s
   **Task 150 (meta descriptions) is unblocked by this.** It was sequenced behind 149 on the reasoning
   that descriptions on unindexed URLs buy nothing; the URLs are no longer unindexed.
 
-- 15|158| **`sewslope.php` and `peakfact.php` are English-only while the sewer-slope demand is not.**
+- 12|158| **`sewslope.php` and `peakfact.php` are English-only while the sewer-slope demand is not.**
   Extracted from Task 151 on close, 2026-07-28 — the one part of that task deliberately left undone.
   The query export shows real non-English demand for exactly the content `sewslope.php` already has:
   `pendiente mínima tubería pvc sanitaria`, `kanalizasyon eğim tablosu`, `tabela de inclinação de
@@ -469,6 +434,64 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|166|[CC] **The 26-language sprint ran — DONE 2026-07-28.** 26 Sonnet agents, one per language,
+  covering 11 new keys common to every language (`calc_units_us`, `calc_units_si`, the eight `hw_*`
+  pressure/elevation keys from Task 167, and `hw_note_1` from Task 170), the per-language stragglers
+  the delta had swept up, and a semantic **resync** of the two CHANGED keys (`calc_defaults`,
+  `mphl_note_1`) that the payload-delta structurally cannot see. ~406 strings.
+  **Verification (the agent reports were not taken at face value, per the standing rule):**
+  `lang_syntax_validate.php` clean of every non-advisory finding; `php -l` clean on all 27 files;
+  tag/URL parity checked programmatically for `hw_note_1`, `mphl_note_1` and `hw_pressure_neg`
+  against English; every one of the 10 core keys confirmed non-identical to English in all 26 files;
+  and an inline back-translation read of all 26 languages' short labels.
+  **Four defects the self-reports missed, found by that verification and fixed by hand:**
+  1. **fa, sw and my each reported `mphl_note_1` "already in sync" — none of them were.** All three
+     still carried the pre-Task-169 opening `<dt>` ("does not consider pipe elevation"). Caught by
+     `git diff` per file: an agent that reports a resync but never edited the file is the signal.
+  2. **my silently skipped `calc_defaults`** (self-reported honestly, to its credit).
+  3. **ru rendered `calc_defaults` as "По умолчанию"** ("By default") — a noun label, the exact
+     defect the English reform removed. Reset to "Восстановить значения по умолчанию". The agent's
+     width justification did not hold: de and es ship 30–33-character imperatives on the same button.
+  4. **pt "fixed" `mphl_note_1` by adding a `</dl>`**, breaking tag parity with English.
+  **The `</dl>` finding was real and is now fixed at the source.** `mphl_note_1` opened `<dl>` and
+  never closed it, with `Manning-Pipe-Head-Loss.php` appending `</dl>` in the page — so Hazen-Williams
+  and Darcy-Weisbach, which never appended it, had been shipping an unclosed list. Both the pt agent
+  and the ur agent flagged it independently. The key is now self-closing in all 27 files and the
+  page's trailing `</dl>` is gone; all three pages verified to emit balanced tags.
+  **Glossary write-back (mandatory, done before close):** added root concepts **`pressure`** and
+  **`elevation`**, each with all 26 attested label forms and an `avoid` array guarding the
+  head-vs-pressure trap. The suite had `head`, `head loss` and `pressure rating` but no entry for
+  either root, so every sprint re-derived them and the trap had to be re-explained in each prompt.
+  Recorded there too: the pre-existing ar tension where head loss is "فقدان الضغط" (literally
+  "pressure loss") while pressure itself is "ضغط" — deliberately not touched by this sprint.
+  **`calc_units_us`/`calc_units_si` moved to `translation_exempt_keys.json`** (`"*"`): all 26
+  languages independently kept "US"/"SI", which is what permanent-identical looks like.
+  **Residual delta is 68, all pre-existing** — per-language cognates ("Segment", "Filter", "OK",
+  "turbulent") and numeric citation tips. Not exempted here: each is a per-language claim taken from
+  an agent's word, and the exempt list is for things verified permanently correct, not for quieting
+  a number. That is Task 161 hygiene, not this sprint's scope.
+  Drift manifest re-baselined (`--update`) only after the resync actually landed, as the task warned.
+
+- 0|170|[CC] **Hazen-Williams and Darcy-Weisbach got their own waterline note — DONE 2026-07-28.**
+  New key `hw_note_1` (owner: HW, by the concept-level label reuse rule and by reach — 580 humans vs
+  DW's 67) replaces `mphl_note_1` on both waterline pages. `Manning-Pipe-Head-Loss.php` keeps
+  `mphl_note_1` unchanged, so the culvert material — inlet control, HY-8, outlet-control-only — now
+  lives only on the culvert calculator.
+  The new note covers what a waterline engineer actually needs, per the task spec: (1) the profile
+  between the two ends is not modeled — an intermediate high point sees lower pressure than anything
+  reported, and the fix is to re-run the page for the upstream-end-to-high-point length; (2)
+  negative-pressure consequences (air out of solution, thin-wall collapse, groundwater drawn in at
+  the joints) and air valves at high points; (3) upstream pressure is a boundary condition the user
+  supplies — gauge, tank level, or a pump curve read *at the entered flow*; (4) the minor-loss K
+  total is theirs to sum, small next to friction on a transmission main and dominant in station
+  piping.
+  **Fixed a latent HTML defect in passing:** `mphl_note_1` opens `<dl>` but never closes it —
+  `Manning-Pipe-Head-Loss.php` appends `</dl>` in the page, while HW and DW never did, so both had
+  been shipping an unclosed `<dl>`. `hw_note_1` closes its own list, so neither page needs a trailing
+  tag.
+  Seeded as English in all 26 non-English files; `lang_syntax_validate.php` clean apart from the
+  expected advisory identical-to-english. Translation debt rolled into Task 166.
 
 - 0|168|[CC] **Darcy-Weisbach reworked upstream-first — DONE 2026-07-28.** Applied the Task 167
   form: the single "Downstream EGL" input became Upstream elevation, Upstream pressure and Downstream

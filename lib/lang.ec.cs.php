@@ -70,7 +70,7 @@ $ec_lang['index_meta_desc_plain']='Bezplatné inženýrské kalkulátory pro pot
 $ec_lang['calc_set_units']='Nastavit jednotky:';
 $ec_lang['calc_units_us']='US';
 $ec_lang['calc_units_si']='SI';
-$ec_lang['calc_defaults']='Výchozí hodnoty';
+$ec_lang['calc_defaults']='Obnovit výchozí hodnoty';
 $ec_lang['calc_defaults_confirm']='Resetovat kalkulačku na výchozí hodnoty?';
 $ec_lang['points_data_help']='(nebo Kopírovat/Vložit pomocí datové oblasti)';
 $ec_lang['points_data_title']='Data bodů<br />(oddělena čárkou nebo tabulátorem)';
@@ -108,15 +108,16 @@ $ec_lang['hw_main_title']='Bezplatný online kalkulátor ztráty tlakové výšk
 $ec_lang['hw_main_desc']='Ztráta tlakové výšky v potrubí dle Hazen-Williams při daném průměru, drsnosti a průtoku';
 $ec_lang['hw_hgl_1']='HGL po proudu';
 $ec_lang['hw_hgl_2']='HGL proti proudu';
-$ec_lang['hw_elev_up']='Upstream elevation';
-$ec_lang['hw_pressure_up']='Upstream pressure';
-$ec_lang['hw_elev_down']='Downstream elevation';
-$ec_lang['hw_pressure_down']='Downstream pressure';
-$ec_lang['hw_pressure_check']='Pressure check';
-$ec_lang['hw_pressure_ok_short']='Positive pressure';
-$ec_lang['hw_pressure_neg_short']='Negative pressure';
-$ec_lang['hw_pressure_neg']='Downstream pressure is below zero. The hydraulic grade line falls below the pipe, so the pipe would not flow full and this result may not be valid.';
+$ec_lang['hw_elev_up']='Kóta proti proudu';
+$ec_lang['hw_pressure_up']='Tlak proti proudu';
+$ec_lang['hw_elev_down']='Kóta po proudu';
+$ec_lang['hw_pressure_down']='Tlak po proudu';
+$ec_lang['hw_pressure_check']='Kontrola tlaku';
+$ec_lang['hw_pressure_ok_short']='Kladný tlak';
+$ec_lang['hw_pressure_neg_short']='Záporný tlak';
+$ec_lang['hw_pressure_neg']='Tlak po proudu je pod nulou. Čára HGL klesá pod potrubí, takže by potrubí neproudilo zcela plné a tento výsledek nemusí být platný.';
 $ec_lang['hw_roughness']='Hazen-Williamsův součinitel, C';
+$ec_lang['hw_note_1']='<dl><dt>Tento kalkulátor nemodeluje profil potrubí mezi oběma konci.</dt><dd>Používá pouze kóty proti proudu a po proudu, které zadáte. Pokud terén mezi oběma konci stoupá výše než kterýkoli z nich, je tlak v tomto vysokém bodě nižší než jakýkoli tlak zde uvedený. Spusťte výpočet znovu pro úsek od konce proti proudu po tento vysoký bod, abyste jej ověřili.</dd><dd>Tam, kde čára HGL klesne pod potrubí, je voda pod záporným tlakem. Z vody se uvolňuje vzduch, tenkostěnné potrubí se může zhroutit a spárami může být nasáta znečištěná podzemní voda. Udržujte na celé trase kladný tlak a zvažte osazení vzdušníku v každém vysokém bodě.</dd><dt>Tlak proti proudu je okrajová podmínka, kterou zadáváte sami.</dt><dd>Odečtěte jej z manometru, z hladiny vody v nádrži (výška vody nad potrubím) nebo z charakteristiky čerpadla. Čerpadlo dodává s rostoucím průtokem nižší tlak, proto použijte bod na křivce odpovídající průtoku zadanému výše.</dd><dt>Součinitele místních (lokálních) ztrát si sečtěte sami.</dt><dd>Sečtěte hodnoty K pro každý ventil, koleno, T-kus, vodoměr a vstup na trase a zadejte jejich součet. Typické hodnoty najdete přes odkaz u tohoto pole. U dlouhého přivaděče jsou tyto ztráty ve srovnání s třením malé, ale u krátkého potrubí ve stanici mohou tvořit většinu ztráty.</dd></dl>';
 // Manning Irregular
 $ec_lang['mi_menu']='Nepravidelné koryto Manning';
 $ec_lang['mi_main_title']='Bezplatný online kalkulátor nepravidelného koryta Manning';
@@ -192,7 +193,7 @@ $ec_lang['mphl_total_loss']='Celková ztráta, h<sub>L</sub>';
 $ec_lang['mphl_egl_1']='EGL po proudu';
 $ec_lang['mphl_egl_2']='EGL proti proudu';
 $ec_lang['mphl_hgl_egl_tip']='Nemusí platit, pokud je potrubí vysoko. Viz poznámky.';
-$ec_lang['mphl_note_1']='<dl><dt>Tento kalkulátor nezohledňuje nadmořskou výšku potrubí.</dt><dd>Pokud HGL v kterémkoli bodě klesne pod horní hranu potrubí, nemusí být tento výpočet platný.</dd><dt>Pro podmínku otevřeného vtoku (propustek) je nutné zkontrolovat podmínky vtokového ovládání.</dt><dd>1. HGL proti proudu musí být výše než kóta hladiny při normální hloubce proudění (a výše než potrubí!).</dd><dd>2. Vzdutou hladinu propustku lépe vyjadřuje EGL proti proudu než HGL proti proudu.</dd><dd>3. Viz <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">2minutový výukový program</a> pro jednoduchý standardní výpočet vzdutí u propustků pomocí programu <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, bezplatného programu pro propustky od Federální správy dálnic USA (U.S. Federal Highway Administration).</dd><dd>4. Tato stránka řeší pouze případ výtokového ovládání: potrubí protéká zcela plné, kdy podmínky po proudu určují vzdutou výšku. Návrh propustku spočívá v rozhodnutí, zda převažuje vtokové, nebo výtokové ovládání, proto použijte HY-8, kdykoli by mohlo převažovat kterékoli z nich.</dd>';
+$ec_lang['mphl_note_1']='<dl><dt>Tento kalkulátor nemodeluje profil potrubí mezi oběma konci.</dt><dd>Pokud HGL v kterémkoli bodě klesne pod horní hranu potrubí, nemusí být tento výpočet platný.</dd><dt>Pro podmínku otevřeného vtoku (propustek) je nutné zkontrolovat podmínky vtokového ovládání.</dt><dd>1. HGL proti proudu musí být výše než kóta hladiny při normální hloubce proudění (a výše než potrubí!).</dd><dd>2. Vzdutou hladinu propustku lépe vyjadřuje EGL proti proudu než HGL proti proudu.</dd><dd>3. Viz <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">2minutový výukový program</a> pro jednoduchý standardní výpočet vzdutí u propustků pomocí programu <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, bezplatného programu pro propustky od Federální správy dálnic USA (U.S. Federal Highway Administration).</dd><dd>4. Tato stránka řeší pouze případ výtokového ovládání: potrubí protéká zcela plné, kdy podmínky po proudu určují vzdutou výšku. Návrh propustku spočívá v rozhodnutí, zda převažuje vtokové, nebo výtokové ovládání, proto použijte HY-8, kdykoli by mohlo převažovat kterékoli z nich.</dd></dl>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Lichoběžníkové koryto Manning';
 $ec_lang['mtc_main_title']='Bezplatný online kalkulátor lichoběžníkového koryta Manning';

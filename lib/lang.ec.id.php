@@ -70,7 +70,7 @@ $ec_lang['index_meta_desc_plain']='Kalkulator teknik hidraulika gratis untuk pip
 $ec_lang['calc_set_units']='Atur satuan:';
 $ec_lang['calc_units_us']='US';
 $ec_lang['calc_units_si']='SI';
-$ec_lang['calc_defaults']='Nilai Default';
+$ec_lang['calc_defaults']='Pulihkan Default';
 $ec_lang['calc_defaults_confirm']='Setel ulang kalkulator ke nilai default asli?';
 $ec_lang['points_data_help']='(atau Salin/Tempel menggunakan area data)';
 $ec_lang['points_data_title']='Data titik<br />(dipisah koma atau tabulasi)';
@@ -108,15 +108,16 @@ $ec_lang['hw_main_title']='Kalkulator Kehilangan Tinggi Tekan Pipa Hazen-William
 $ec_lang['hw_main_desc']='Kehilangan Tinggi Tekan Pipa Hazen-Williams pada Diameter, Kekasaran, dan Debit Tertentu';
 $ec_lang['hw_hgl_1']='HGL Hilir';
 $ec_lang['hw_hgl_2']='HGL Hulu';
-$ec_lang['hw_elev_up']='Upstream elevation';
-$ec_lang['hw_pressure_up']='Upstream pressure';
-$ec_lang['hw_elev_down']='Downstream elevation';
-$ec_lang['hw_pressure_down']='Downstream pressure';
-$ec_lang['hw_pressure_check']='Pressure check';
-$ec_lang['hw_pressure_ok_short']='Positive pressure';
-$ec_lang['hw_pressure_neg_short']='Negative pressure';
-$ec_lang['hw_pressure_neg']='Downstream pressure is below zero. The hydraulic grade line falls below the pipe, so the pipe would not flow full and this result may not be valid.';
+$ec_lang['hw_elev_up']='Elevasi hulu';
+$ec_lang['hw_pressure_up']='Tekanan hulu';
+$ec_lang['hw_elev_down']='Elevasi hilir';
+$ec_lang['hw_pressure_down']='Tekanan hilir';
+$ec_lang['hw_pressure_check']='Cek tekanan';
+$ec_lang['hw_pressure_ok_short']='Tekanan positif';
+$ec_lang['hw_pressure_neg_short']='Tekanan negatif';
+$ec_lang['hw_pressure_neg']='Tekanan hilir di bawah nol. Garis tinggi tekan hidrolik (HGL) turun di bawah pipa, sehingga pipa tidak akan mengalir penuh dan hasil ini mungkin tidak valid.';
 $ec_lang['hw_roughness']='Koefisien Hazen-Williams, C';
+$ec_lang['hw_note_1']='<dl><dt>Kalkulator ini tidak memodelkan profil pipa di antara kedua ujungnya.</dt><dd>Kalkulator hanya menggunakan elevasi hulu dan hilir yang Anda masukkan. Jika permukaan tanah naik lebih tinggi daripada salah satu ujung di suatu titik di antaranya, tekanan pada titik tertinggi itu lebih rendah daripada tekanan mana pun yang dilaporkan di sini. Jalankan kembali kalkulator untuk panjang dari ujung hulu hingga titik tertinggi tersebut untuk memeriksanya.</dd><dd>Ketika garis tinggi tekan hidrolik (HGL) turun di bawah pipa, air berada dalam tekanan negatif. Udara keluar dari larutan, pipa berdinding tipis dapat runtuh, dan air tanah yang kotor dapat tertarik masuk melalui sambungan. Jaga agar jalur tetap berada dalam tekanan positif di semua titik, dan pertimbangkan pemasangan katup udara di setiap titik tertinggi.</dd><dt>Tekanan hulu adalah kondisi batas yang Anda tetapkan sendiri.</dt><dd>Baca nilainya dari alat ukur tekanan (gauge), dari muka air tangki (tinggi air di atas pipa), atau dari kurva pompa. Pompa menghasilkan tekanan yang lebih rendah seiring meningkatnya debit, jadi gunakan titik pada kurva yang sesuai dengan debit yang dimasukkan di atas.</dd><dt>Jumlahkan sendiri koefisien kehilangan kecil (lokal).</dt><dd>Totalkan nilai K untuk setiap katup, belokan, tee, meter, dan lubang masuk pada jalur pipa, lalu masukkan jumlah tersebut. Ikuti tautan pada input tersebut untuk nilai-nilai umum. Pada pipa transmisi utama yang panjang, kehilangan ini kecil dibandingkan dengan gesekan, tetapi pada pipa pendek di dalam stasiun pompa, kehilangan ini bisa menjadi bagian terbesar dari total kehilangan.</dd></dl>';
 // Manning Irregular
 $ec_lang['mi_menu']='Saluran Penampang Tidak Beraturan Manning';
 $ec_lang['mi_main_title']='Kalkulator Saluran Penampang Tidak Beraturan Manning Gratis Daring';
@@ -191,7 +192,7 @@ $ec_lang['mphl_total_loss']='Kehilangan total, h<sub>L</sub>';
 $ec_lang['mphl_egl_1']='EGL Hilir';
 $ec_lang['mphl_egl_2']='EGL Hulu';
 $ec_lang['mphl_hgl_egl_tip']='Mungkin tidak valid jika pipa tinggi. Lihat catatan.';
-$ec_lang['mphl_note_1']='<dl><dt>Kalkulator ini tidak memperhitungkan elevasi pipa.</dt><dd>Jika HGL turun di bawah bagian atas pipa pada titik mana pun, perhitungan ini mungkin tidak valid.</dd><dt>Untuk kondisi saluran masuk terbuka (gorong-gorong), perlu diperiksa kondisi kendali saluran masuk.</dt><dd>1. HGL hulu harus berada di atas elevasi aliran kedalaman normal hulu (dan lebih tinggi dari pipa!).</dd><dd>2. Air hulu gorong-gorong lebih baik diwakili oleh EGL hulu daripada HGL hulu.</dd><dd>3. Lihat <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">tutorial 2 menit saya</a> untuk perhitungan standar sederhana air hulu gorong-gorong menggunakan <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, program gorong-gorong gratis dari Badan Jalan Raya Federal Amerika Serikat (U.S. Federal Highway Administration).</dd><dd>4. Halaman ini hanya menyelesaikan kasus kendali saluran keluar: pipa mengalir penuh, dengan kondisi hilir yang menentukan tinggi tekan. Desain gorong-gorong adalah tugas menentukan apakah kendali saluran masuk atau kendali saluran keluar yang berlaku, jadi gunakan HY-8 kapan pun keduanya mungkin berlaku.</dd>';
+$ec_lang['mphl_note_1']='<dl><dt>Kalkulator ini tidak memodelkan profil pipa di antara kedua ujungnya.</dt><dd>Jika HGL turun di bawah bagian atas pipa pada titik mana pun, perhitungan ini mungkin tidak valid.</dd><dt>Untuk kondisi saluran masuk terbuka (gorong-gorong), perlu diperiksa kondisi kendali saluran masuk.</dt><dd>1. HGL hulu harus berada di atas elevasi aliran kedalaman normal hulu (dan lebih tinggi dari pipa!).</dd><dd>2. Air hulu gorong-gorong lebih baik diwakili oleh EGL hulu daripada HGL hulu.</dd><dd>3. Lihat <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">tutorial 2 menit saya</a> untuk perhitungan standar sederhana air hulu gorong-gorong menggunakan <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, program gorong-gorong gratis dari Badan Jalan Raya Federal Amerika Serikat (U.S. Federal Highway Administration).</dd><dd>4. Halaman ini hanya menyelesaikan kasus kendali saluran keluar: pipa mengalir penuh, dengan kondisi hilir yang menentukan tinggi tekan. Desain gorong-gorong adalah tugas menentukan apakah kendali saluran masuk atau kendali saluran keluar yang berlaku, jadi gunakan HY-8 kapan pun keduanya mungkin berlaku.</dd></dl>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Saluran Trapesium Manning';
 $ec_lang['mtc_main_title']='Kalkulator Rumus Manning Saluran Trapesium Gratis Daring';

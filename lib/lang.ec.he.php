@@ -71,7 +71,7 @@ $ec_lang['index_meta_desc_plain']='מחשבוני הנדסה הידראולית 
 $ec_lang['calc_set_units']='הגדרת יחידות';
 $ec_lang['calc_units_us']='US';
 $ec_lang['calc_units_si']='SI';
-$ec_lang['calc_defaults']='ערכים ברירת מחדל';
+$ec_lang['calc_defaults']='אפס לברירת מחדל';
 $ec_lang['calc_defaults_confirm']='האם לאפס את המחשבון לערכים ברירת המחדל?';
 $ec_lang['points_data_help']='(או העתק/הדבק באמצעות אזור הנתונים)';
 $ec_lang['points_data_title']='נתוני נקודות<br />(מופרדות בפסיקים או טאבים)';
@@ -109,15 +109,16 @@ $ec_lang['hw_main_title']='מחשבון אובדן לחץ בצינור Hazen-Wil
 $ec_lang['hw_main_desc']='אובדן לחץ בצינור Hazen-Williams בקוטר, גסות וספיקה נתונים';
 $ec_lang['hw_hgl_1']='HGL מורד';
 $ec_lang['hw_hgl_2']='HGL מעלה';
-$ec_lang['hw_elev_up']='Upstream elevation';
-$ec_lang['hw_pressure_up']='Upstream pressure';
-$ec_lang['hw_elev_down']='Downstream elevation';
-$ec_lang['hw_pressure_down']='Downstream pressure';
-$ec_lang['hw_pressure_check']='Pressure check';
-$ec_lang['hw_pressure_ok_short']='Positive pressure';
-$ec_lang['hw_pressure_neg_short']='Negative pressure';
-$ec_lang['hw_pressure_neg']='Downstream pressure is below zero. The hydraulic grade line falls below the pipe, so the pipe would not flow full and this result may not be valid.';
+$ec_lang['hw_elev_up']='גובה מעלה';
+$ec_lang['hw_pressure_up']='לחץ מעלה';
+$ec_lang['hw_elev_down']='גובה מורד';
+$ec_lang['hw_pressure_down']='לחץ מורד';
+$ec_lang['hw_pressure_check']='בדיקת לחץ';
+$ec_lang['hw_pressure_ok_short']='לחץ חיובי';
+$ec_lang['hw_pressure_neg_short']='לחץ שלילי';
+$ec_lang['hw_pressure_neg']='לחץ המורד נמוך מאפס. קו גובה המים (HGL) יורד מתחת לצינור, כך שהצינור לא יזרום מלא, וייתכן שתוצאה זו אינה תקפה.';
 $ec_lang['hw_roughness']='מקדם Hazen-Williams, C';
+$ec_lang['hw_note_1']='<dl><dt>מחשבון זה אינו מדמה את פרופיל הצינור בין שני הקצוות.</dt><dd>הוא משתמש רק בגבהים במעלה ובמורד שהזנת. אם הקרקע עולה גבוה יותר משני הקצוות באמצע המסלול, הלחץ באותה נקודה גבוהה נמוך מכל לחץ המדווח כאן. הפעל את המחשבון שוב עבור האורך מהקצה במעלה ועד לנקודה הגבוהה כדי לבדוק זאת.</dd><dd>במקום שבו קו גובה המים (HGL) יורד מתחת לצינור, המים נמצאים בלחץ שלילי. אוויר משתחרר מהתמיסה, צינור דק-דופן עלול לקרוס, ומי תהום מזוהמים עלולים להישאב פנימה דרך המפרקים. שמור על לחץ חיובי לאורך כל הקו, ושקול התקנת שסתום אוויר בכל נקודה גבוהה.</dd><dt>לחץ המעלה הוא תנאי גבול שאתה מספק.</dt><dd>קרא אותו ממד לחץ, ממפלס המים במיכל (גובה המים מעל הצינור), או מעקומת משאבה. משאבה מספקת לחץ נמוך יותר ככל שהספיקה עולה, לכן השתמש בנקודה על העקומה המתאימה לספיקה שהוזנה למעלה.</dd><dt>סכם בעצמך את מקדמי ההפסד המקומי.</dt><dd>סכם את ערכי ה-K עבור כל שסתום, עיקול, מסתעף, מד ספיקה וכניסה בקו, והזן את הסכום. עקוב אחר הקישור בשדה זה לערכים טיפוסיים. בקו הולכה ראשי וארוך הפסדים אלה קטנים לעומת החיכוך, אך בצנרת קצרה בתחנה הם עשויים להוות את רוב ההפסד.</dd></dl>';
 // Manning Irregular
 $ec_lang['mi_menu']='תעלה בעלת חתך לא סדיר — Manning';
 $ec_lang['mi_main_title']='מחשבון תעלה בעלת חתך לא סדיר לפי Manning — חינם מקוון';
@@ -192,7 +193,7 @@ $ec_lang['mphl_total_loss'] = 'הפסד כולל, h<sub>L</sub>';
 $ec_lang['mphl_egl_1']='EGL מורד';
 $ec_lang['mphl_egl_2']='EGL מעלה';
 $ec_lang['mphl_hgl_egl_tip']='ייתכן שאינו תקף אם הצינור גבוה. ראה הערות.';
-$ec_lang['mphl_note_1']='<dl><dt>מחשבון זה אינו מתחשב בגובה הצינור.</dt><dd>אם קו גובה המים (HGL) יורד מתחת לחלק העליון של הצינור בנקודה כלשהי, ייתכן שחישוב זה אינו תקף.</dd><dt>עבור כניסה פתוחה (תעלת ניקוז), יש לבדוק תנאי שליטה בכניסה.</dt><dd>1. HGL המעלה אינו יכול להיות נמוך מגובה זרימה נורמלית במעלה (ולא נמוך מהצינור!).</dd><dd>2. גובה המים העליון של תעלת ניקוז מיוצג טוב יותר על ידי EGL המעלה מאשר HGL המעלה.</dd><dd>3. ראה <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">את המדריך הקצר שלי</a> לחישובי גובה מים עליון פשוטים לתעלות ניקוז סטנדרטיות באמצעות <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, תוכנת תעלות הניקוז החינמית של מנהל הדרכים הפדרלי של ארצות הברית.</dd><dd>4. עמוד זה פותר רק את מקרה שליטת היציאה: צינור הזורם מלא, כאשר תנאי המורד קובעים את גובה המים. תכנון תעלת ניקוז כרוך בהחלטה האם שליטת הכניסה או שליטת היציאה קובעת, ולכן יש להשתמש ב-HY-8 בכל מקרה שבו אחת מהן עשויה לחול.</dd>';
+$ec_lang['mphl_note_1']='<dl><dt>מחשבון זה אינו מדמה את פרופיל הצינור בין שני הקצוות.</dt><dd>אם קו גובה המים (HGL) יורד מתחת לחלק העליון של הצינור בנקודה כלשהי, ייתכן שחישוב זה אינו תקף.</dd><dt>עבור כניסה פתוחה (תעלת ניקוז), יש לבדוק תנאי שליטה בכניסה.</dt><dd>1. HGL המעלה אינו יכול להיות נמוך מגובה זרימה נורמלית במעלה (ולא נמוך מהצינור!).</dd><dd>2. גובה המים העליון של תעלת ניקוז מיוצג טוב יותר על ידי EGL המעלה מאשר HGL המעלה.</dd><dd>3. ראה <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">את המדריך הקצר שלי</a> לחישובי גובה מים עליון פשוטים לתעלות ניקוז סטנדרטיות באמצעות <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, תוכנת תעלות הניקוז החינמית של מנהל הדרכים הפדרלי של ארצות הברית.</dd><dd>4. עמוד זה פותר רק את מקרה שליטת היציאה: צינור הזורם מלא, כאשר תנאי המורד קובעים את גובה המים. תכנון תעלת ניקוז כרוך בהחלטה האם שליטת הכניסה או שליטת היציאה קובעת, ולכן יש להשתמש ב-HY-8 בכל מקרה שבו אחת מהן עשויה לחול.</dd></dl>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='תעלה טרפזואידית — Manning';
 $ec_lang['mtc_main_title']='מחשבון תעלה טרפזואידית לפי נוסחת Manning — חינם מקוון';

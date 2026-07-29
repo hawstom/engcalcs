@@ -70,7 +70,7 @@ $ec_lang['index_meta_desc_plain']='免费的水力工程计算器，涵盖管道
 $ec_lang['calc_set_units']='单位设置：';
 $ec_lang['calc_units_us']='US';
 $ec_lang['calc_units_si']='SI';
-$ec_lang['calc_defaults']='默认值';
+$ec_lang['calc_defaults']='恢复默认值';
 $ec_lang['calc_defaults_confirm']='将计算器重置为原始默认值吗？';
 $ec_lang['points_data_help']='（或使用数据区域复制/粘贴）';
 $ec_lang['points_data_title']='测点数据<br />（逗号或制表符分隔）';
@@ -108,15 +108,16 @@ $ec_lang['hw_main_title']='免费在线哈森-威廉管道水头损失计算器'
 $ec_lang['hw_main_desc']='在给定管径、粗糙度和流量条件下的哈森-威廉管道水头损失';
 $ec_lang['hw_hgl_1']='下游测压管水头线';
 $ec_lang['hw_hgl_2']='上游测压管水头线';
-$ec_lang['hw_elev_up']='Upstream elevation';
-$ec_lang['hw_pressure_up']='Upstream pressure';
-$ec_lang['hw_elev_down']='Downstream elevation';
-$ec_lang['hw_pressure_down']='Downstream pressure';
-$ec_lang['hw_pressure_check']='Pressure check';
-$ec_lang['hw_pressure_ok_short']='Positive pressure';
-$ec_lang['hw_pressure_neg_short']='Negative pressure';
-$ec_lang['hw_pressure_neg']='Downstream pressure is below zero. The hydraulic grade line falls below the pipe, so the pipe would not flow full and this result may not be valid.';
+$ec_lang['hw_elev_up']='上游高程';
+$ec_lang['hw_pressure_up']='上游压力';
+$ec_lang['hw_elev_down']='下游高程';
+$ec_lang['hw_pressure_down']='下游压力';
+$ec_lang['hw_pressure_check']='压力检查';
+$ec_lang['hw_pressure_ok_short']='正压力';
+$ec_lang['hw_pressure_neg_short']='负压力';
+$ec_lang['hw_pressure_neg']='下游压力低于零。测压管水头线低于管道，管道将无法满流，本结果可能无效。';
 $ec_lang['hw_roughness']='哈森-威廉系数，C';
+$ec_lang['hw_note_1']='<dl><dt>本计算器不考虑两端之间的管道高程变化。</dt><dd>计算仅使用您输入的上游和下游高程。若地面在两端之间某处高于两端高程，该最高点处的实际压力将低于本计算器报告的任何压力。请针对从上游端到该最高点的管长重新运行本计算器进行检验。</dd><dd>当测压管水头线低于管道时，管内水处于负压状态。此时空气会从水中析出，薄壁管道可能发生塌陷，脏污地下水也可能从接口处被吸入。应使管线各处保持正压，并考虑在每个最高点设置进排气阀。</dd><dt>上游压力是您提供的边界条件。</dt><dd>可从压力表读取，也可根据水箱水位（管道以上的水深）或水泵特性曲线确定。水泵在流量增大时所提供的压力会降低，因此应使用与上方所输入流量相匹配的曲线上的点。</dd><dt>局部水头损失系数需自行累加。</dt><dd>将管线上每个阀门、弯头、三通、水表和进水口的 K 值相加，并输入其总和。可通过该输入项旁的链接查看典型值。在长距离输水干管中，这些损失相对于沿程摩擦损失而言较小，但在较短的站内管道中，它们可能占损失的大部分。</dd></dl>';
 // Manning Irregular
 $ec_lang['mi_menu']='曼宁不规则断面明渠';
 $ec_lang['mi_main_title']='免费在线曼宁不规则断面明渠计算器';
@@ -191,7 +192,7 @@ $ec_lang['mphl_total_loss']='总水头损失，h<sub>L</sub>';
 $ec_lang['mphl_egl_1']='下游能量坡降线';
 $ec_lang['mphl_egl_2']='上游能量坡降线';
 $ec_lang['mphl_hgl_egl_tip']='管道高程较高时可能不适用，详见注释。';
-$ec_lang['mphl_note_1']='<dl><dt>本计算器未考虑管道高程。</dt><dd>若测压管水头线在任一位置低于管顶，本计算结果可能不适用。</dd><dt>对于开口进水口（涵洞）情况，需检验进口控制条件。</dt><dd>1. 上游测压管水头线不得低于上游正常水深处高程（也不得低于管顶！）。</dd><dd>2. 涵洞水位更宜用上游能量坡降线而非测压管水头线表示。</dd><dd>3. <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">参见 2 分钟教程</a>，了解使用 <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>（美国联邦公路管理局提供的免费涵洞计算程序）进行简单标准涵洞水位计算的方法。</dd><dd>4. 本页仅求解出流控制情况：管道满流，由下游条件决定水头。涵洞设计的任务是判断进流控制还是出流控制起控制作用，因此在两者都可能起作用时应使用 HY-8。</dd>';
+$ec_lang['mphl_note_1']='<dl><dt>本计算器不模拟两端之间的管道剖面。</dt><dd>若测压管水头线在任一位置低于管顶，本计算结果可能不适用。</dd><dt>对于开口进水口（涵洞）情况，需检验进口控制条件。</dt><dd>1. 上游测压管水头线不得低于上游正常水深处高程（也不得低于管顶！）。</dd><dd>2. 涵洞水位更宜用上游能量坡降线而非测压管水头线表示。</dd><dd>3. <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">参见 2 分钟教程</a>，了解使用 <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>（美国联邦公路管理局提供的免费涵洞计算程序）进行简单标准涵洞水位计算的方法。</dd><dd>4. 本页仅求解出流控制情况：管道满流，由下游条件决定水头。涵洞设计的任务是判断进流控制还是出流控制起控制作用，因此在两者都可能起作用时应使用 HY-8。</dd></dl>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='曼宁梯形渠道';
 $ec_lang['mtc_main_title']='免费在线曼宁公式梯形渠道计算器';

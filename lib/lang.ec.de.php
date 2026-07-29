@@ -70,7 +70,7 @@ $ec_lang['index_meta_desc_plain']='Kostenlose Ingenieurrechner für Hydraulik: R
 $ec_lang['calc_set_units']='Einheiten festlegen:';
 $ec_lang['calc_units_us']='US';
 $ec_lang['calc_units_si']='SI';
-$ec_lang['calc_defaults']='Standardwerte';
+$ec_lang['calc_defaults']='Standardwerte wiederherstellen';
 $ec_lang['calc_defaults_confirm']='Rechner auf die ursprünglichen Standardwerte zurücksetzen?';
 $ec_lang['points_data_help']='(oder Kopieren/Einfügen im Datenbereich)';
 $ec_lang['points_data_title']='Punktdaten<br />(durch Komma oder Tabulator getrennt)';
@@ -108,15 +108,16 @@ $ec_lang['hw_main_title']='Kostenloser Online-Rechner Rohrreibungsverlust Hazen-
 $ec_lang['hw_main_desc']='Rohrreibungsverlust nach Hazen-Williams bei gegebenem Durchmesser, Rauheit und Durchfluss';
 $ec_lang['hw_hgl_1']='HGL flussabwärts';
 $ec_lang['hw_hgl_2']='HGL flussaufwärts';
-$ec_lang['hw_elev_up']='Upstream elevation';
-$ec_lang['hw_pressure_up']='Upstream pressure';
-$ec_lang['hw_elev_down']='Downstream elevation';
-$ec_lang['hw_pressure_down']='Downstream pressure';
-$ec_lang['hw_pressure_check']='Pressure check';
-$ec_lang['hw_pressure_ok_short']='Positive pressure';
-$ec_lang['hw_pressure_neg_short']='Negative pressure';
-$ec_lang['hw_pressure_neg']='Downstream pressure is below zero. The hydraulic grade line falls below the pipe, so the pipe would not flow full and this result may not be valid.';
+$ec_lang['hw_elev_up']='Höhe flussaufwärts';
+$ec_lang['hw_pressure_up']='Druck flussaufwärts';
+$ec_lang['hw_elev_down']='Höhe flussabwärts';
+$ec_lang['hw_pressure_down']='Druck flussabwärts';
+$ec_lang['hw_pressure_check']='Druckprüfung';
+$ec_lang['hw_pressure_ok_short']='Positiver Druck';
+$ec_lang['hw_pressure_neg_short']='Negativer Druck';
+$ec_lang['hw_pressure_neg']='Der Druck flussabwärts liegt unter null. Die HGL fällt unter das Rohr, sodass das Rohr nicht vollständig durchströmt wäre und dieses Ergebnis möglicherweise nicht gültig ist.';
 $ec_lang['hw_roughness']='Hazen-Williams-Koeffizient, C';
+$ec_lang['hw_note_1']='<dl><dt>Dieser Rechner bildet den Rohrverlauf zwischen den beiden Enden nicht ab.</dt><dd>Er verwendet nur die von Ihnen eingegebenen Höhen flussaufwärts und flussabwärts. Steigt das Gelände irgendwo dazwischen höher an als beide Enden, ist der Druck an diesem Hochpunkt niedriger als jeder hier angezeigte Druck. Führen Sie den Rechner erneut für die Strecke vom flussaufwärtigen Ende bis zum Hochpunkt aus, um dies zu prüfen.</dd><dd>Fällt die HGL unter das Rohr, steht das Wasser unter negativem Druck. Luft tritt aus der Lösung aus, ein dünnwandiges Rohr kann einbrechen, und verunreinigtes Grundwasser kann durch die Rohrverbindungen eindringen. Halten Sie die Leitung überall unter positivem Druck, und ziehen Sie an jedem Hochpunkt ein Entlüftungsventil in Betracht.</dd><dt>Der Druck flussaufwärts ist eine von Ihnen vorgegebene Randbedingung.</dt><dd>Lesen Sie ihn von einem Manometer, vom Wasserstand eines Behälters (der Höhe des Wassers über dem Rohr) oder von einer Pumpenkennlinie ab. Eine Pumpe liefert bei steigendem Durchfluss weniger Druck; verwenden Sie daher den Punkt auf der Kennlinie, der dem oben eingegebenen Durchfluss entspricht.</dd><dt>Addieren Sie die örtlichen (Einzel-)Verlustbeiwerte selbst.</dt><dd>Addieren Sie die K-Werte für jeden Schieber, jede Krümmung, jedes T-Stück, jeden Zähler und jeden Einlauf auf der Leitung, und geben Sie diese Summe ein. Folgen Sie dem Link bei dieser Eingabe für typische Werte. Bei einer langen Transportleitung sind diese Verluste im Vergleich zur Reibung gering, in kurzer Stationsverrohrung können sie jedoch den Großteil des Verlusts ausmachen.</dd></dl>';
 // Manning Irregular
 $ec_lang['mi_menu']='Unregelmäßiges Profil Manning';
 $ec_lang['mi_main_title']='Kostenloser Online-Rechner unregelmäßiges Profil Manning';
@@ -191,7 +192,7 @@ $ec_lang['mphl_total_loss']='Gesamtverlust, h<sub>L</sub>';
 $ec_lang['mphl_egl_1']='EGL flussabwärts';
 $ec_lang['mphl_egl_2']='EGL flussaufwärts';
 $ec_lang['mphl_hgl_egl_tip']='Möglicherweise nicht gültig, wenn das Rohr hoch liegt. Siehe Hinweise.';
-$ec_lang['mphl_note_1']='<dl><dt>Dieser Rechner berücksichtigt die Rohrhöhenlage nicht.</dt><dd>Liegt die HGL an irgendeiner Stelle unter der Rohroberkante, ist diese Berechnung möglicherweise nicht gültig.</dd><dt>Für einen offenen Einlauf (Durchlass) müssen die Einlaufsteuerungsbedingungen geprüft werden.</dt><dd>1. Die HGL flussaufwärts muss über der normalen Fließtiefe flussaufwärts liegen (und höher als das Rohr!).</dd><dd>2. Der Oberwasserstand eines Durchlasses wird besser durch die EGL flussaufwärts als durch die HGL flussaufwärts dargestellt.</dd><dd>3. Sehen Sie <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">das 2-Minuten-Tutorial</a> für einfache Standard-Durchlassberechnungen mit <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, dem kostenlosen Durchlassprogramm der US-amerikanischen Bundesstraßenverwaltung (FHWA).</dd><dd>4. Diese Seite löst nur den Fall der Auslasssteuerung: ein vollständig durchströmtes Rohr, bei dem die Bedingungen flussabwärts die Höhe (den Druck) vorgeben. Bei der Durchlassbemessung muss entschieden werden, ob Einlauf- oder Auslasssteuerung maßgebend ist; verwenden Sie daher HY-8, wann immer beides infrage kommen könnte.</dd>';
+$ec_lang['mphl_note_1']='<dl><dt>Dieser Rechner bildet den Rohrverlauf zwischen den beiden Enden nicht ab.</dt><dd>Liegt die HGL an irgendeiner Stelle unter der Rohroberkante, ist diese Berechnung möglicherweise nicht gültig.</dd><dt>Für einen offenen Einlauf (Durchlass) müssen die Einlaufsteuerungsbedingungen geprüft werden.</dt><dd>1. Die HGL flussaufwärts muss über der normalen Fließtiefe flussaufwärts liegen (und höher als das Rohr!).</dd><dd>2. Der Oberwasserstand eines Durchlasses wird besser durch die EGL flussaufwärts als durch die HGL flussaufwärts dargestellt.</dd><dd>3. Sehen Sie <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">das 2-Minuten-Tutorial</a> für einfache Standard-Durchlassberechnungen mit <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, dem kostenlosen Durchlassprogramm der US-amerikanischen Bundesstraßenverwaltung (FHWA).</dd><dd>4. Diese Seite löst nur den Fall der Auslasssteuerung: ein vollständig durchströmtes Rohr, bei dem die Bedingungen flussabwärts die Höhe (den Druck) vorgeben. Bei der Durchlassbemessung muss entschieden werden, ob Einlauf- oder Auslasssteuerung maßgebend ist; verwenden Sie daher HY-8, wann immer beides infrage kommen könnte.</dd></dl>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Trapezprofil-Kanal Manning';
 $ec_lang['mtc_main_title']='Kostenloser Online-Rechner Trapezkanal Manning-Formel';

@@ -70,7 +70,7 @@ $ec_lang['index_meta_desc_plain']='Calcolatori gratuiti di ingegneria idraulica 
 $ec_lang['calc_set_units']='Imposta unità:';
 $ec_lang['calc_units_us']='US';
 $ec_lang['calc_units_si']='SI';
-$ec_lang['calc_defaults']='Valori predefiniti';
+$ec_lang['calc_defaults']='Ripristina predefiniti';
 $ec_lang['calc_defaults_confirm']='Ripristinare il calcolatore ai valori predefiniti originali?';
 $ec_lang['points_data_help']='(o Copia/Incolla usando l\'area dati)';
 $ec_lang['points_data_title']='Dati punti<br />(separati da virgola o tabulazione)';
@@ -108,15 +108,16 @@ $ec_lang['hw_main_title']='Calcolatore gratuito online perdita di carico Hazen-W
 $ec_lang['hw_main_desc']='Perdita di carico in tubazione con Hazen-Williams a diametro, scabrezza e portata dati';
 $ec_lang['hw_hgl_1']='HGL a valle';
 $ec_lang['hw_hgl_2']='HGL a monte';
-$ec_lang['hw_elev_up']='Upstream elevation';
-$ec_lang['hw_pressure_up']='Upstream pressure';
-$ec_lang['hw_elev_down']='Downstream elevation';
-$ec_lang['hw_pressure_down']='Downstream pressure';
-$ec_lang['hw_pressure_check']='Pressure check';
-$ec_lang['hw_pressure_ok_short']='Positive pressure';
-$ec_lang['hw_pressure_neg_short']='Negative pressure';
-$ec_lang['hw_pressure_neg']='Downstream pressure is below zero. The hydraulic grade line falls below the pipe, so the pipe would not flow full and this result may not be valid.';
+$ec_lang['hw_elev_up']='Quota a monte';
+$ec_lang['hw_pressure_up']='Pressione a monte';
+$ec_lang['hw_elev_down']='Quota a valle';
+$ec_lang['hw_pressure_down']='Pressione a valle';
+$ec_lang['hw_pressure_check']='Verifica della pressione';
+$ec_lang['hw_pressure_ok_short']='Pressione positiva';
+$ec_lang['hw_pressure_neg_short']='Pressione negativa';
+$ec_lang['hw_pressure_neg']='La pressione a valle è inferiore a zero. La linea piezometrica scende sotto la tubazione, quindi la tubazione non scorrerebbe a sezione piena e questo risultato potrebbe non essere valido.';
 $ec_lang['hw_roughness']='Coefficiente Hazen-Williams, C';
+$ec_lang['hw_note_1']='<dl><dt>Questo calcolatore non tiene conto del profilo della tubazione tra le due estremità.</dt><dd>Utilizza solo le quote a monte e a valle inserite dall\'utente. Se il terreno si innalza al di sopra di una delle due estremità in un punto intermedio, la pressione in quel punto alto è inferiore a qualsiasi pressione qui riportata. Eseguire nuovamente il calcolo per la lunghezza dall\'estremità a monte al punto alto per verificarla.</dd><dd>Dove la linea piezometrica scende sotto la tubazione, l\'acqua è in pressione negativa. L\'aria fuoriesce dalla soluzione, una tubazione a parete sottile può collassare e l\'acqua di falda contaminata può essere richiamata attraverso i giunti. Mantenere la linea in pressione positiva ovunque e prevedere una valvola d\'aria in ogni punto alto.</dd><dt>La pressione a monte è una condizione al contorno fornita dall\'utente.</dt><dd>Leggerla da un manometro, dal livello dell\'acqua in un serbatoio (l\'altezza dell\'acqua sopra la tubazione) o dalla curva caratteristica di una pompa. Una pompa fornisce meno pressione all\'aumentare della portata, quindi utilizzare il punto della curva corrispondente alla portata inserita sopra.</dd><dt>Sommare autonomamente i coefficienti di perdita di carico concentrata.</dt><dd>Sommare i valori di K per ogni valvola, curva, raccordo a T, contatore e imbocco presenti sulla linea, e inserire quel totale. Seguire il collegamento su quel campo per i valori tipici. Su una condotta di adduzione lunga queste perdite sono piccole rispetto all\'attrito, ma nelle tubazioni corte di una stazione di pompaggio possono costituire la maggior parte della perdita.</dd></dl>';
 // Manning Irregular
 $ec_lang['mi_menu']='Canale irregolare Manning';
 $ec_lang['mi_main_title']='Calcolatore gratuito online di Manning per canale a sezione irregolare';
@@ -191,7 +192,7 @@ $ec_lang['mphl_total_loss']='Perdita di carico totale, h<sub>L</sub>';
 $ec_lang['mphl_egl_1']='EGL a valle';
 $ec_lang['mphl_egl_2']='EGL a monte';
 $ec_lang['mphl_hgl_egl_tip']='Potrebbe non essere valido se la tubazione è in rilievo. Vedere le note.';
-$ec_lang['mphl_note_1']='<dl><dt>Questo calcolatore non tiene conto della quota della tubazione.</dt><dd>Se l\'HGL scende sotto la sommità della tubazione in un qualsiasi punto, questo calcolo potrebbe non essere valido.</dd><dt>Per una condizione di imbocco aperto (tombino), è necessario verificare le condizioni di controllo all\'imbocco.</dt><dd>1. L\'HGL a monte non può essere inferiore alla quota di deflusso a profondità normale a monte (o inferiore alla tubazione!).</dd><dd>2. Il livello idraulico di un tombino è meglio rappresentato dall\'EGL a monte che dall\'HGL a monte.</dd><dd>3. <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">Vedere il tutorial di 2 minuti</a> per semplici calcoli standard del livello idraulico nei tombini con <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, il programma gratuito per tombini della U.S. Federal Highway Administration (l\'amministrazione federale delle autostrade degli Stati Uniti).</dd><dd>4. Questa pagina risolve solo il caso di controllo allo sbocco: una tubazione che scorre a sezione piena, in cui le condizioni a valle determinano il carico idraulico. La progettazione di un tombino consiste nello stabilire se prevale il controllo all\'imbocco o allo sbocco, quindi usare HY-8 ogni volta che entrambi i casi sono possibili.</dd>';
+$ec_lang['mphl_note_1']='<dl><dt>Questo calcolatore non tiene conto del profilo della tubazione tra le due estremità.</dt><dd>Se l\'HGL scende sotto la sommità della tubazione in un qualsiasi punto, questo calcolo potrebbe non essere valido.</dd><dt>Per una condizione di imbocco aperto (tombino), è necessario verificare le condizioni di controllo all\'imbocco.</dt><dd>1. L\'HGL a monte non può essere inferiore alla quota di deflusso a profondità normale a monte (o inferiore alla tubazione!).</dd><dd>2. Il livello idraulico di un tombino è meglio rappresentato dall\'EGL a monte che dall\'HGL a monte.</dd><dd>3. <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">Vedere il tutorial di 2 minuti</a> per semplici calcoli standard del livello idraulico nei tombini con <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, il programma gratuito per tombini della U.S. Federal Highway Administration (l\'amministrazione federale delle autostrade degli Stati Uniti).</dd><dd>4. Questa pagina risolve solo il caso di controllo allo sbocco: una tubazione che scorre a sezione piena, in cui le condizioni a valle determinano il carico idraulico. La progettazione di un tombino consiste nello stabilire se prevale il controllo all\'imbocco o allo sbocco, quindi usare HY-8 ogni volta che entrambi i casi sono possibili.</dd></dl>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Canale trapezoidale Manning';
 $ec_lang['mtc_main_title']='Calcolatore gratuito online formula di Manning canale trapezoidale';

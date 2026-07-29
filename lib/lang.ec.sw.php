@@ -71,7 +71,7 @@ $ec_lang['index_meta_desc_plain']='Vikokotoo bure vya uhandisi wa majimaji kwa a
 $ec_lang['calc_set_units']='Weka vitengo:';
 $ec_lang['calc_units_us']='US';
 $ec_lang['calc_units_si']='SI';
-$ec_lang['calc_defaults']='Maadili ya kawaida';
+$ec_lang['calc_defaults']='Rejesha chaguo-msingi';
 $ec_lang['calc_defaults_confirm']='Weka upya kikokotoo hadi maadili ya kawaida ya awali?';
 $ec_lang['points_data_help']='(au Nakili/Bandika ukitumia eneo la data)';
 $ec_lang['points_data_title']='Data za vituo<br />(kwa mkato au kichupo)';
@@ -109,15 +109,16 @@ $ec_lang['hw_main_title']='Kikokotoo cha Bure Mtandaoni cha Upotevu wa Kimo cha 
 $ec_lang['hw_main_desc']='Upotevu wa Kimo cha Bomba la Hazen-Williams kwa Kipenyo, Usuguo, na Mtiririko Uliowekwa';
 $ec_lang['hw_hgl_1']='HGL ya Chini ya Mkondo';
 $ec_lang['hw_hgl_2']='HGL ya Juu ya Mkondo';
-$ec_lang['hw_elev_up']='Upstream elevation';
-$ec_lang['hw_pressure_up']='Upstream pressure';
-$ec_lang['hw_elev_down']='Downstream elevation';
-$ec_lang['hw_pressure_down']='Downstream pressure';
-$ec_lang['hw_pressure_check']='Pressure check';
-$ec_lang['hw_pressure_ok_short']='Positive pressure';
-$ec_lang['hw_pressure_neg_short']='Negative pressure';
-$ec_lang['hw_pressure_neg']='Downstream pressure is below zero. The hydraulic grade line falls below the pipe, so the pipe would not flow full and this result may not be valid.';
+$ec_lang['hw_elev_up']='Mwinuko wa juu ya mkondo';
+$ec_lang['hw_pressure_up']='Shinikizo la juu ya mkondo';
+$ec_lang['hw_elev_down']='Mwinuko wa chini ya mkondo';
+$ec_lang['hw_pressure_down']='Shinikizo la chini ya mkondo';
+$ec_lang['hw_pressure_check']='Ukaguzi wa shinikizo';
+$ec_lang['hw_pressure_ok_short']='Shinikizo chanya';
+$ec_lang['hw_pressure_neg_short']='Shinikizo hasi';
+$ec_lang['hw_pressure_neg']='Shinikizo la chini ya mkondo liko chini ya sifuri. HGL inashuka chini ya bomba, hivyo bomba halitatiririsha likiwa limejaa, na matokeo haya huenda yasiwe sahihi.';
 $ec_lang['hw_roughness']='Mgawo wa Hazen-Williams, C';
+$ec_lang['hw_note_1']='<dl><dt>Kikokotoo hiki hakiigi mwinuko wa bomba kati ya ncha mbili.</dt><dd>Hutumia tu miinuko ya juu na chini ya mkondo unayoingiza. Ikiwa ardhi inapanda juu zaidi ya ncha yoyote mahali fulani katikati, shinikizo katika sehemu hiyo ya juu kabisa ni ndogo kuliko shinikizo lolote lililoripotiwa hapa. Endesha kikokotoo tena kwa urefu kutoka ncha ya juu ya mkondo hadi sehemu ya juu kabisa ili kuikagua.</dd><dd>Pale HGL inaposhuka chini ya bomba, maji huwa chini ya shinikizo hasi. Hewa hutoka kwenye myeyusho, bomba lenye kuta nyembamba linaweza kubonyea, na maji machafu ya ardhini yanaweza kuvutwa ndani kupitia viungio. Weka bomba chini ya shinikizo chanya kila mahali, na fikiria kuweka vali ya hewa kwenye kila sehemu ya juu kabisa.</dd><dt>Shinikizo la juu ya mkondo ni hali ya mpaka unayoitoa wewe mwenyewe.</dt><dd>Lisome kutoka kwa kipimo (gauge), kutoka kwa kiwango cha maji cha tangi (kimo cha maji juu ya bomba), au kutoka kwa mkondo wa pampu (pump curve). Pampu hutoa shinikizo dogo zaidi kadiri mtiririko unavyoongezeka, hivyo tumia sehemu ya mkondo huo inayolingana na mtiririko ulioingizwa hapo juu.</dd><dt>Jumlisha mgawo wa upotevu mdogo (wa ndani) K mwenyewe.</dt><dd>Jumlisha thamani za K za kila vali, kigeuzo, tee, mita, na muingilio kwenye mstari, kisha ingiza jumla hiyo. Fuata kiungo kwenye ingizo hilo kupata thamani za kawaida. Katika bomba kuu refu la usafirishaji, upotevu huu ni mdogo ukilinganisha na msuguano, lakini katika mabomba mafupi ya kituo unaweza kuwa sehemu kubwa ya upotevu.</dd></dl>';
 // Manning Irregular
 $ec_lang['mi_menu']='Mfereji wa Mkato Usio wa Kawaida wa Manning';
 $ec_lang['mi_main_title']='Kikokotoo cha Bure Mtandaoni cha Mfereji wa Mkato Usio wa Kawaida wa Manning';
@@ -192,7 +193,7 @@ $ec_lang['mphl_total_loss']='Upotevu jumla, h<sub>L</sub>';
 $ec_lang['mphl_egl_1']='EGL ya Chini ya Mkondo';
 $ec_lang['mphl_egl_2']='EGL ya Juu ya Mkondo';
 $ec_lang['mphl_hgl_egl_tip']='Huenda isiwe sahihi ikiwa bomba liko juu. Tazama maelezo.';
-$ec_lang['mphl_note_1']='<dl><dt>Kikokotoo hiki hakizingatii mwinuko wa bomba.</dt><dd>Ikiwa HGL inashuka chini ya sehemu ya juu ya bomba popote, hesabu hii huenda isiwe sahihi.</dd><dt>Kwa hali ya mlango wazi (bomba la kupita), ni lazima kukagua hali za udhibiti wa mlango.</dt><dd>1. HGL ya juu ya mkondo lazima iwe juu ya kiwango cha mtiririko wa kina cha kawaida cha juu ya mkondo (na juu ya bomba!).</dd><dd>2. Maji ya juu ya mkondo ya bomba la kupita yanawakilishwa vizuri zaidi na EGL ya juu ya mkondo kuliko HGL ya juu ya mkondo.</dd><dd>3. Tazama <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">mafunzo yangu ya dakika 2</a> kwa mahesabu rahisi ya kawaida ya maji ya juu ya mkondo ya bomba la kupita ukitumia <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, programu huru ya bomba la kupita kutoka Utawala wa Shirikisho wa Barabara Kuu wa Marekani.</dd><dd>4. Ukurasa huu hutatua hali ya udhibiti wa mlango wa kutokea pekee: bomba linalotiririsha likiwa limejaa, ambapo hali za chini ya mkondo ndizo huamua kimo. Ubunifu wa bomba la kupita ni kazi ya kuamua kama udhibiti wa mlango wa kuingia au mlango wa kutokea ndio unaotawala, hivyo tumia HY-8 wakati wowote ambapo lolote kati ya hayo linaweza kutokea.</dd>';
+$ec_lang['mphl_note_1']='<dl><dt>Kikokotoo hiki hakizingatii mwinuko wa bomba kati ya ncha zake mbili.</dt><dd>Ikiwa HGL inashuka chini ya sehemu ya juu ya bomba popote, hesabu hii huenda isiwe sahihi.</dd><dt>Kwa hali ya mlango wazi (bomba la kupita), ni lazima kukagua hali za udhibiti wa mlango.</dt><dd>1. HGL ya juu ya mkondo lazima iwe juu ya kiwango cha mtiririko wa kina cha kawaida cha juu ya mkondo (na juu ya bomba!).</dd><dd>2. Maji ya juu ya mkondo ya bomba la kupita yanawakilishwa vizuri zaidi na EGL ya juu ya mkondo kuliko HGL ya juu ya mkondo.</dd><dd>3. Tazama <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">mafunzo yangu ya dakika 2</a> kwa mahesabu rahisi ya kawaida ya maji ya juu ya mkondo ya bomba la kupita ukitumia <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, programu huru ya bomba la kupita kutoka Utawala wa Shirikisho wa Barabara Kuu wa Marekani.</dd><dd>4. Ukurasa huu hutatua hali ya udhibiti wa mlango wa kutokea pekee: bomba linalotiririsha likiwa limejaa, ambapo hali za chini ya mkondo ndizo huamua kimo. Ubunifu wa bomba la kupita ni kazi ya kuamua kama udhibiti wa mlango wa kuingia au mlango wa kutokea ndio unaotawala, hivyo tumia HY-8 wakati wowote ambapo lolote kati ya hayo linaweza kutokea.</dd></dl>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Mfereji wa Trapezoidi wa Manning';
 $ec_lang['mtc_main_title']='Kikokotoo cha Bure Mtandaoni cha Mfereji wa Trapezoidi wa Fomula ya Manning';

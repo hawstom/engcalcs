@@ -71,7 +71,7 @@ $ec_lang['index_meta_desc_plain']='Calculadoras gratuitas de engenharia hidrául
 $ec_lang['calc_set_units']='Definir unidades:';
 $ec_lang['calc_units_us']='US';
 $ec_lang['calc_units_si']='SI';
-$ec_lang['calc_defaults']='Valores padrão';
+$ec_lang['calc_defaults']='Restaurar padrões';
 $ec_lang['calc_defaults_confirm']='Restaurar calculadora aos valores padrão originais?';
 $ec_lang['points_data_help']='(ou Copiar/Colar usando a área de dados)';
 $ec_lang['points_data_title']='Dados dos pontos<br />(separados por vírgula ou tabulação)';
@@ -109,15 +109,16 @@ $ec_lang['hw_main_title']='Calculadora gratuita online de perda de carga em tubu
 $ec_lang['hw_main_desc']='Perda de carga em tubulação para diâmetro, coeficiente C e vazão informados, por Hazen-Williams';
 $ec_lang['hw_hgl_1']='LP a jusante';
 $ec_lang['hw_hgl_2']='LP a montante';
-$ec_lang['hw_elev_up']='Upstream elevation';
-$ec_lang['hw_pressure_up']='Upstream pressure';
-$ec_lang['hw_elev_down']='Downstream elevation';
-$ec_lang['hw_pressure_down']='Downstream pressure';
-$ec_lang['hw_pressure_check']='Pressure check';
-$ec_lang['hw_pressure_ok_short']='Positive pressure';
-$ec_lang['hw_pressure_neg_short']='Negative pressure';
-$ec_lang['hw_pressure_neg']='Downstream pressure is below zero. The hydraulic grade line falls below the pipe, so the pipe would not flow full and this result may not be valid.';
+$ec_lang['hw_elev_up']='Elevação a montante';
+$ec_lang['hw_pressure_up']='Pressão a montante';
+$ec_lang['hw_elev_down']='Elevação a jusante';
+$ec_lang['hw_pressure_down']='Pressão a jusante';
+$ec_lang['hw_pressure_check']='Verificação de pressão';
+$ec_lang['hw_pressure_ok_short']='Pressão positiva';
+$ec_lang['hw_pressure_neg_short']='Pressão negativa';
+$ec_lang['hw_pressure_neg']='A pressão a jusante está abaixo de zero. A linha piezométrica fica abaixo da tubulação, portanto a tubulação não escoaria plena e este resultado pode não ser válido.';
 $ec_lang['hw_roughness']='Coeficiente de Hazen-Williams, C';
+$ec_lang['hw_note_1']='<dl><dt>Esta calculadora não modela o perfil da tubulação entre as duas extremidades.</dt><dd>Ela utiliza apenas as elevações a montante e a jusante que você informa. Se o terreno subir mais alto que qualquer uma das extremidades em algum ponto intermediário, a pressão nesse ponto alto será menor que qualquer pressão apresentada aqui. Execute a calculadora novamente para o trecho entre a extremidade a montante e o ponto alto para verificar essa condição.</dd><dd>Onde a linha piezométrica fica abaixo da tubulação, a água está sob pressão negativa. O ar sai de solução, uma tubulação de parede fina pode colapsar, e água subterrânea contaminada pode ser succionada pelas juntas. Mantenha a linha sob pressão positiva em todos os pontos e considere uma válvula de ar em cada ponto alto.</dd><dt>A pressão a montante é uma condição de contorno que você fornece.</dt><dd>Leia-a em um manômetro, no nível de água de um reservatório (a altura da água acima da tubulação), ou em uma curva da bomba. Uma bomba fornece menos pressão à medida que a vazão aumenta, portanto use o ponto da curva que corresponde à vazão informada acima.</dd><dt>Some você mesmo os coeficientes de perda de carga localizada.</dt><dd>Some os valores de K de todas as válvulas, curvas, tês, medidores e entradas na linha, e informe esse total. Siga o link desse campo para valores típicos. Em uma adutora de transmissão longa, essas perdas são pequenas em comparação ao atrito, mas em tubulações curtas de estação elevatória elas podem representar a maior parte da perda.</dd></dl>';
 // Manning Irregular
 $ec_lang['mi_menu']='Canal de seção irregular de acordo com Manning';
 $ec_lang['mi_main_title']='Calculadora gratuita online de canal de seção irregular de acordo com Manning';
@@ -192,7 +193,7 @@ $ec_lang['mphl_total_loss']='Perda total, h<sub>L</sub>';
 $ec_lang['mphl_egl_1']='LE a jusante';
 $ec_lang['mphl_egl_2']='LE a montante';
 $ec_lang['mphl_hgl_egl_tip']='Pode não ser válido se a tubulação estiver elevada. Veja as notas.';
-$ec_lang['mphl_note_1']='<dl><dt>Esta calculadora não considera a elevação da tubulação.</dt><dd>Se a LP ficar abaixo do topo da tubulação em algum ponto, este cálculo pode não ser válido.</dd><dt>Para uma condição de entrada aberta (bueiro), é necessário verificar as condições de controle de entrada.</dt><dd>1. A LP a montante deve estar acima da elevação do escoamento à profundidade normal a montante (e acima da tubulação!).</dd><dd>2. O nível de água a montante de um bueiro é melhor representado pela LE a montante do que pela LP a montante.</dd><dd>3. Veja <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">meu tutorial de 2 minutos</a> para cálculos simples de nível de água em bueiros usando o <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, o programa gratuito de bueiros da Administração Federal de Rodovias dos EUA (U.S. Federal Highway Administration).</dd><dd>4. Esta página resolve apenas o caso de controle de saída: uma tubulação escoando plena, em que as condições a jusante determinam a carga. O projeto de bueiros é a tarefa de decidir se o controle é de entrada ou de saída, portanto use o HY-8 sempre que qualquer um dos dois puder governar.</dd>';
+$ec_lang['mphl_note_1']='<dl><dt>Esta calculadora não modela o perfil da tubulação entre as duas extremidades.</dt><dd>Se a LP ficar abaixo do topo da tubulação em algum ponto, este cálculo pode não ser válido.</dd><dt>Para uma condição de entrada aberta (bueiro), é necessário verificar as condições de controle de entrada.</dt><dd>1. A LP a montante deve estar acima da elevação do escoamento à profundidade normal a montante (e acima da tubulação!).</dd><dd>2. O nível de água a montante de um bueiro é melhor representado pela LE a montante do que pela LP a montante.</dd><dd>3. Veja <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">meu tutorial de 2 minutos</a> para cálculos simples de nível de água em bueiros usando o <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, o programa gratuito de bueiros da Administração Federal de Rodovias dos EUA (U.S. Federal Highway Administration).</dd><dd>4. Esta página resolve apenas o caso de controle de saída: uma tubulação escoando plena, em que as condições a jusante determinam a carga. O projeto de bueiros é a tarefa de decidir se o controle é de entrada ou de saída, portanto use o HY-8 sempre que qualquer um dos dois puder governar.</dd></dl>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Canal trapezoidal de acordo com Manning';
 $ec_lang['mtc_main_title']='Calculadora gratuita online da fórmula de Manning para canal trapezoidal';

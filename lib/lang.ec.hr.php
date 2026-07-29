@@ -69,7 +69,7 @@ $ec_lang['index_meta_desc_plain']='Besplatni hidrotehnički kalkulatori za cijev
 $ec_lang['calc_set_units']='Postavi jedinice:';
 $ec_lang['calc_units_us']='US';
 $ec_lang['calc_units_si']='SI';
-$ec_lang['calc_defaults']='Zadane vrijednosti';
+$ec_lang['calc_defaults']='Vrati zadane vrijednosti';
 $ec_lang['calc_defaults_confirm']='Resetiraj kalkulator na izvorne zadane vrijednosti?';
 $ec_lang['points_data_help']='(ili Kopiraj/Zalijepi pomoću područja podataka)';
 $ec_lang['points_data_title']='Podaci točaka<br />(odvojeni zarezom ili tabulatorom)';
@@ -107,15 +107,16 @@ $ec_lang['hw_main_title']='Besplatni online kalkulator Hazen-Williams gubitka tl
 $ec_lang['hw_main_desc']='Hazen-Williams gubitak tlačne visine u cijevi pri zadanom promjeru, Hazen-Williams koeficijentu C i protoku';
 $ec_lang['hw_hgl_1']='Nizvodni HGL';
 $ec_lang['hw_hgl_2']='Uzvodni HGL';
-$ec_lang['hw_elev_up']='Upstream elevation';
-$ec_lang['hw_pressure_up']='Upstream pressure';
-$ec_lang['hw_elev_down']='Downstream elevation';
-$ec_lang['hw_pressure_down']='Downstream pressure';
-$ec_lang['hw_pressure_check']='Pressure check';
-$ec_lang['hw_pressure_ok_short']='Positive pressure';
-$ec_lang['hw_pressure_neg_short']='Negative pressure';
-$ec_lang['hw_pressure_neg']='Downstream pressure is below zero. The hydraulic grade line falls below the pipe, so the pipe would not flow full and this result may not be valid.';
+$ec_lang['hw_elev_up']='Uzvodna kota';
+$ec_lang['hw_pressure_up']='Uzvodni tlak';
+$ec_lang['hw_elev_down']='Nizvodna kota';
+$ec_lang['hw_pressure_down']='Nizvodni tlak';
+$ec_lang['hw_pressure_check']='Provjera tlaka';
+$ec_lang['hw_pressure_ok_short']='Pozitivan tlak';
+$ec_lang['hw_pressure_neg_short']='Negativan tlak';
+$ec_lang['hw_pressure_neg']='Nizvodni tlak je ispod nule. Hidraulička linija (HGL) pada ispod cijevi, pa cijev ne bi tekla puna i ovaj rezultat možda nije valjan.';
 $ec_lang['hw_roughness']='Hazen-Williams koeficijent, C';
+$ec_lang['hw_note_1']='<dl><dt>Ovaj kalkulator ne modelira profil cijevi između dva kraja.</dt><dd>Koristi samo uzvodnu i nizvodnu kotu koje unesete. Ako teren negdje između ta dva kraja raste više od bilo kojeg od njih, tlak na toj najvišoj točki niži je od bilo kojeg tlaka prikazanog ovdje. Pokrenite kalkulator ponovno za dužinu od uzvodnog kraja do najviše točke kako biste to provjerili.</dd><dd>Tamo gdje hidraulička linija (HGL) padne ispod cijevi, voda je pod negativnim tlakom. Zrak izlazi iz otopine, tankostjena cijev može se urušiti, a onečišćena podzemna voda može se uvući kroz spojeve. Održavajte pozitivan tlak u cijeloj dionici i razmotrite ugradnju zračnog ventila na svakoj visokoj točki.</dd><dt>Uzvodni tlak je rubni uvjet koji sami unosite.</dt><dd>Očitajte ga s manometra, s razine vode u spremniku (visina vode iznad cijevi) ili s krivulje pumpe. Pumpa isporučuje niži tlak kako protok raste, stoga koristite točku na krivulji koja odgovara protoku unesenom iznad.</dd><dt>Zbrojite koeficijente lokalnih (manjih) gubitaka sami.</dt><dd>Zbrojite K vrijednosti za svaki ventil, koljeno, T-komad, mjerač i ulaz na dionici i unesite taj zbroj. Slijedite poveznicu uz to polje za tipične vrijednosti. Na dugom transportnom cjevovodu ti su gubici mali u odnosu na trenje, ali u kratkim cjevovodima unutar postrojenja mogu činiti većinu ukupnog gubitka.</dd></dl>';
 // Manning Irregular
 $ec_lang['mi_menu']='Manning kanal nepravilnog presjeka';
 $ec_lang['mi_main_title']='Besplatni online Manningov kalkulator za kanal nepravilnog presjeka';
@@ -190,7 +191,7 @@ $ec_lang['mphl_total_loss']='Ukupni gubitak, h<sub>L</sub>';
 $ec_lang['mphl_egl_1']='Nizvodni EGL';
 $ec_lang['mphl_egl_2']='Uzvodni EGL';
 $ec_lang['mphl_hgl_egl_tip']='Možda nije valjano ako je cijev visoko postavljena. Pogledajte napomene.';
-$ec_lang['mphl_note_1']='<dl><dt>Ovaj kalkulator ne uzima u obzir kotu cijevi.</dt><dd>Ako HGL na bilo kojoj točki padne ispod vrha cijevi, ovaj proračun možda nije valjan.</dd><dt>Za uvjete otvorenog ulaza (propust) potrebno je provjeriti uvjete kontrole ulaza.</dt><dd>1. Uzvodni HGL ne može biti niži od kote normalnog tečenja uzvodnog toka (niti niži od cijevi!).</dd><dd>2. Uzvodna razina propusta bolje je predstavljena uzvodnim EGL-om nego uzvodnim HGL-om.</dd><dd>3. Pogledajte <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">moj 2-minutni tutorial</a> za jednostavne standardne proračune uzvodne razine propusta pomoću <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, besplatnog programa za propuste Savezne uprave za autoceste SAD-a (U.S. Federal Highway Administration).</dd><dd>4. Ova stranica rješava samo slučaj kontrole na izlazu: cijev koja teče puna, gdje nizvodni uvjeti određuju tlačnu visinu. Projektiranje propusta uključuje odluku o tome vlada li kontrola na ulazu ili na izlazu, stoga koristite HY-8 kad god je moguće bilo koje od toga.</dd>';
+$ec_lang['mphl_note_1']='<dl><dt>Ovaj kalkulator ne modelira profil cijevi između dva kraja.</dt><dd>Ako HGL na bilo kojoj točki padne ispod vrha cijevi, ovaj proračun možda nije valjan.</dd><dt>Za uvjete otvorenog ulaza (propust) potrebno je provjeriti uvjete kontrole ulaza.</dt><dd>1. Uzvodni HGL ne može biti niži od kote normalnog tečenja uzvodnog toka (niti niži od cijevi!).</dd><dd>2. Uzvodna razina propusta bolje je predstavljena uzvodnim EGL-om nego uzvodnim HGL-om.</dd><dd>3. Pogledajte <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">moj 2-minutni tutorial</a> za jednostavne standardne proračune uzvodne razine propusta pomoću <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, besplatnog programa za propuste Savezne uprave za autoceste SAD-a (U.S. Federal Highway Administration).</dd><dd>4. Ova stranica rješava samo slučaj kontrole na izlazu: cijev koja teče puna, gdje nizvodni uvjeti određuju tlačnu visinu. Projektiranje propusta uključuje odluku o tome vlada li kontrola na ulazu ili na izlazu, stoga koristite HY-8 kad god je moguće bilo koje od toga.</dd></dl>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Manning trapezoidni kanal';
 $ec_lang['mtc_main_title']='Besplatni online kalkulator Manning formule za trapezoidni kanal';

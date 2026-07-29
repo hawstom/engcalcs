@@ -57,7 +57,7 @@ echoCalculatorForm(
 <div id="sketch"></div>
 
 <h2><?=$ec_lang['ws_notes_heading']?></h2>
-<?php echo $ec_lang['mphl_note_1']; ?>
+<?php echo $ec_lang['hw_note_1']; ?>
 
 <?php echoFeedback(); ?>
 

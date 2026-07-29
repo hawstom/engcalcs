@@ -69,7 +69,7 @@ $ec_lang['index_meta_desc_plain']='Calculatoare gratuite de inginerie hidraulic�
 $ec_lang['calc_set_units']='Alegeți unitatea de măsură:';
 $ec_lang['calc_units_us']='US';
 $ec_lang['calc_units_si']='SI';
-$ec_lang['calc_defaults']='Valori implicite';
+$ec_lang['calc_defaults']='Resetează';
 $ec_lang['calc_defaults_confirm']='Resetează calculatorul la valorile implicite inițiale?';
 $ec_lang['points_data_help']='(sau Copiați/Lipiți folosind zona de date)';
 $ec_lang['points_data_title']='Date puncte<br />(separate prin virgulă sau tabulație)';
@@ -107,15 +107,16 @@ $ec_lang['hw_main_title']='Calculator Gratuit Online Pierdere de Sarcină Conduc
 $ec_lang['hw_main_desc']='Pierdere de Sarcină Conductă Hazen-Williams la Diametru, Rugozitate și Debit Date';
 $ec_lang['hw_hgl_1']='HGL aval';
 $ec_lang['hw_hgl_2']='HGL amonte';
-$ec_lang['hw_elev_up']='Upstream elevation';
-$ec_lang['hw_pressure_up']='Upstream pressure';
-$ec_lang['hw_elev_down']='Downstream elevation';
-$ec_lang['hw_pressure_down']='Downstream pressure';
-$ec_lang['hw_pressure_check']='Pressure check';
-$ec_lang['hw_pressure_ok_short']='Positive pressure';
-$ec_lang['hw_pressure_neg_short']='Negative pressure';
-$ec_lang['hw_pressure_neg']='Downstream pressure is below zero. The hydraulic grade line falls below the pipe, so the pipe would not flow full and this result may not be valid.';
+$ec_lang['hw_elev_up']='Cotă amonte';
+$ec_lang['hw_pressure_up']='Presiune amonte';
+$ec_lang['hw_elev_down']='Cotă aval';
+$ec_lang['hw_pressure_down']='Presiune aval';
+$ec_lang['hw_pressure_check']='Verificare presiune';
+$ec_lang['hw_pressure_ok_short']='Presiune pozitivă';
+$ec_lang['hw_pressure_neg_short']='Presiune negativă';
+$ec_lang['hw_pressure_neg']='Presiunea aval este sub zero. HGL coboară sub conductă, astfel încât conducta nu ar curge plină, iar acest rezultat poate să nu fie valid.';
 $ec_lang['hw_roughness']='Coeficientul Hazen-Williams, C';
+$ec_lang['hw_note_1']='<dl><dt>Acest calculator nu modelează profilul conductei între cele două capete.</dt><dd>Utilizează doar cotele amonte și aval introduse de dumneavoastră. Dacă terenul se ridică mai sus decât oricare dintre capete undeva între ele, presiunea în acel punct înalt este mai mică decât orice presiune raportată aici. Rulați din nou calculatorul pentru lungimea de la capătul amonte până la punctul înalt pentru a-l verifica.</dd><dd>Acolo unde HGL coboară sub conductă, apa este sub presiune negativă. Aerul iese din soluție, o conductă cu pereți subțiri se poate prăbuși, iar apă subterană murdară poate fi atrasă prin îmbinări. Mențineți linia sub presiune pozitivă peste tot și luați în considerare o supapă de aer la fiecare punct înalt.</dd><dt>Presiunea amonte este o condiție la limită pe care o furnizați dumneavoastră.</dt><dd>Citiți-o de pe un manometru, de la nivelul apei dintr-un rezervor (înălțimea apei deasupra conductei) sau de pe curba pompei. O pompă furnizează o presiune mai mică pe măsură ce debitul crește, așa că folosiți punctul de pe curbă care corespunde debitului introdus mai sus.</dd><dt>Adunați dumneavoastră coeficienții de pierdere minoră (locală).</dt><dd>Însumați valorile K pentru fiecare vană, cot, teu, contor și intrare de pe linie și introduceți acel total. Urmați linkul de la acel câmp pentru valori tipice. Pe o magistrală de transport lungă, aceste pierderi sunt mici în comparație cu frecarea, dar în conductele scurte dintr-o stație ele pot reprezenta cea mai mare parte a pierderii.</dd></dl>';
 // Manning Irregular
 $ec_lang['mi_menu']='Manning Canal cu Secțiune Neregulată';
 $ec_lang['mi_main_title']='Calculator Gratuit Online Manning pentru Canal cu Secțiune Neregulată';
@@ -190,7 +191,7 @@ $ec_lang['mphl_total_loss']='Pierdere totală, h<sub>L</sub>';
 $ec_lang['mphl_egl_1']='EGL aval';
 $ec_lang['mphl_egl_2']='EGL amonte';
 $ec_lang['mphl_hgl_egl_tip']='Poate să nu fie valid dacă conducta este ridicată. Vedeți notele.';
-$ec_lang['mphl_note_1']='<dl><dt>Acest calculator nu ia în calcul cota conductei.</dt><dd>Dacă HGL coboară sub partea superioară a conductei în orice punct, acest calcul poate să nu fie valid.</dd><dt>Pentru o condiție de intrare deschisă (podeț), este necesar să se verifice condițiile de control la intrare.</dt><dd>1. HGL amonte trebuie să fie deasupra cotei de adâncime normală amonte a curgerii (și mai sus decât conducta!).</dd><dd>2. Nivelul apei din amonte al unui podeț este mai bine reprezentat de EGL amonte decât de HGL amonte.</dd><dd>3. Consultați <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">tutorialul meu de 2 minute</a> pentru calculele simple standard ale nivelului din amonte ale podețelor folosind <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, programul gratuit pentru podețe al Administrației Federale a Autostrăzilor din S.U.A.</dd><dd>4. Această pagină rezolvă doar cazul de control la ieșire: o conductă care curge plină, unde condițiile din aval determină sarcina. Proiectarea podețelor înseamnă a decide dacă predomină controlul la intrare sau la ieșire, așa că folosiți HY-8 ori de câte ori oricare dintre cele două ar putea predomina.</dd>';
+$ec_lang['mphl_note_1']='<dl><dt>Acest calculator nu modelează profilul conductei între cele două capete.</dt><dd>Dacă HGL coboară sub partea superioară a conductei în orice punct, acest calcul poate să nu fie valid.</dd><dt>Pentru o condiție de intrare deschisă (podeț), este necesar să se verifice condițiile de control la intrare.</dt><dd>1. HGL amonte trebuie să fie deasupra cotei de adâncime normală amonte a curgerii (și mai sus decât conducta!).</dd><dd>2. Nivelul apei din amonte al unui podeț este mai bine reprezentat de EGL amonte decât de HGL amonte.</dd><dd>3. Consultați <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">tutorialul meu de 2 minute</a> pentru calculele simple standard ale nivelului din amonte ale podețelor folosind <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, programul gratuit pentru podețe al Administrației Federale a Autostrăzilor din S.U.A.</dd><dd>4. Această pagină rezolvă doar cazul de control la ieșire: o conductă care curge plină, unde condițiile din aval determină sarcina. Proiectarea podețelor înseamnă a decide dacă predomină controlul la intrare sau la ieșire, așa că folosiți HY-8 ori de câte ori oricare dintre cele două ar putea predomina.</dd></dl>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Manning Canal Trapezoidal';
 $ec_lang['mtc_main_title']='Calculator Gratuit Online Formula Manning Canal Trapezoidal';
