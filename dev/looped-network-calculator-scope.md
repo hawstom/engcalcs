@@ -3,6 +3,14 @@
 Status: **scoped 2026-07-28, not started.** ROADMAP Task 146, whose entry carries the phase list and
 the decision log. Prefix **`lpn_`**; page `Looped-Network.php`; JS `js/looped-network.js`.
 
+**This calculator is only loosely related to the rest of the suite (Tom, 2026-07-29), and that is a
+standing instruction, not an observation.** Much of it is its own strategy: its own UI paradigm (a
+drawing surface, not a form), its own persistence (a localStorage document, not the shared cookie),
+its own solver, its own page chrome. Where it *does* touch the suite — unit families and the US/SI
+preset buttons, the `$ec_lang` key rules, the tooltip conventions, the header and footer — it must
+conform exactly. Everywhere else, do not reach for a suite pattern just because one exists, and do
+not generalise a decision made here back onto the other twelve calculators without a separate reason.
+
 Sibling of `bpn_` / `Branched-Network.php`, which stays **exactly as shipped** — this is a new page,
 not an evolution of that one. The row-table form is genuinely better for a simple series run, and
 `bpn_` has 53 keys translated into 26 languages that a UX rewrite would put at risk for no gain.
@@ -107,28 +115,63 @@ These are algebraically the same as the shipped forms in `js/branched-network.js
 For Darcy-Weisbach, `f` depends on `Q`, so recompute `f` from the previous iteration's flow and treat
 it as frozen when forming the derivative — what EPANET does; convergence stays fast.
 
-### Three things that will bite, listed because they are easy to miss
+### Four things that will bite — rewritten 2026-07-29 from what Phase 0.5 actually found
 
-1. **Zero-flow linearization is mandatory, not a corner case.** At `Q = 0` with the HW exponent,
-   `p → 0` and `1/p → ∞`. That is not an edge case — it is the state of a freshly drawn network on
-   iteration 1. Below `Qmin = 1e-8 m³/s`, linearize: `h = r·Qmin^(n−1)·Q`, `p = r·Qmin^(n−1)`. Two
-   lines, and it is the difference between "solver works" and "NaN on the default network." Note
-   `bpnFriction` sidesteps this entirely with an early `q === 0` return — correct for a direct
-   solve, useless here.
-2. **Damping.** When the relative change still exceeds 0.1 after ~10 iterations, apply a 0.6
-   relaxation factor to the flow update. Three lines, and without it networks with pumps or emitters
-   oscillate indefinitely.
-3. **Pump singularity.** With a fitted exponent `b < 1`, `p → ∞` at `Q = 0`. Same `Qmin` guard.
+The first two items here replaced what this section originally said. Both original claims were
+plausible and both were wrong, which is the whole reason the spike came before the UI.
+
+1. **Guard the GRADIENT, not the flow.** At `Q = 0` with the HW exponent, `dh/dQ → 0`, so
+   conductance `1/p → ∞`. The original plan was a flow cutoff (`|Q| < Qmin` → linearize). That is
+   *not sufficient*, and EPANET does not do it: a flow cutoff leaves the gradient unbounded just
+   above the cutoff, so a link near zero flow gets an enormous conductance and swings wildly.
+   **EPANET Net3 reproduces this exactly** — with a flow cutoff, pipe 333 oscillated between 0 and
+   −2.28 gpm forever and the network never converged past 6e−5, while every other link had settled.
+   The fix is a floor on `dh/dQ`, matching EPANET's `RQtol` default of 1e−6 ft/cfs converted to SI.
+   (A tiny `Qmin` still exists, but only to keep zero out of `Q^(b−1)`, the Reynolds number, and the
+   emitter derivative — never as a head-loss guard.)
+2. **Damping turned out to be unnecessary — and the version first specified here was a bug.** The
+   original text called for "a 0.6 relaxation factor once late iterations stall, without which pumps
+   and emitters oscillate forever." No such oscillation exists once the gradient floor is in place:
+   Net1, Net2, Net3, pumps, emitters and minor losses all converge in 5–16 iterations with no
+   relaxation at all. Worse, the relaxation as written multiplied *every flow* by 0.6, which is not
+   under-relaxation but arbitrary shrinkage — and since the GGA flow update satisfies continuity
+   exactly, it would have destroyed that property every time it fired. **Do not reintroduce damping
+   without a network that demonstrably needs it**, and if one appears, write it as
+   `Q = Q_old + w·(Q_new − Q_old)`.
+3. **Convergence must be normalised by total DEMAND, not by total flow.** Total flow is the wrong
+   yardstick twice: it grows with link count, so equal physical accuracy reads differently on a
+   bigger network; and when the solution decays toward zero it shrinks *alongside* the change,
+   pinning the ratio at a constant. A zero-demand looped network shows this plainly — the relative
+   change sits at 1.174 forever while the circulating flow halves every iteration.
+4. **Stagnation detection is required, not a nicety.** Newton converges quadratically until it hits
+   the roundoff floor of the dense factorization and then stops improving: on the 201-node grid,
+   8e−1, 8e−2, 4e−3, 3e−5, 2e−7, 2e−8, then a plateau at ~5e−8 indefinitely. Without a stall check
+   the solver spends 100 iterations and 330 ms re-deriving the answer it already had at iteration 6,
+   **on every keystroke**. Stalling counts as converged only when the *absolute* change is also
+   negligible — otherwise the zero-demand case above stops after 7 iterations and reports a
+   circulating 0.04 L/s in a network with no demand at all.
+5. **Pump singularity.** With a fitted exponent `b < 1`, `p → ∞` at `Q = 0`. Guarded with `Qmin`.
 
 ### Linear solve — dense, deliberately
 
 `A` is a weighted graph Laplacian, assembled by looping links (~25 lines; no incidence matrices), and
 is symmetric positive definite given at least one grounded node.
 
-**Use a dense Cholesky (LLᵀ): ~30 lines, microseconds, nothing to get wrong.** A 20×20 factorization
-is ~2,700 flops. Even the 200-node headroom case is ~2.7 M flops — a few milliseconds, still
-comfortably inside a debounced edit. Keep it behind one function, `solveSPD(A, b)`, so the sparse
-upgrade stays a local change if the scale assumption ever turns out wrong.
+**Use a dense Cholesky (LLᵀ): ~30 lines, nothing to get wrong.** Keep it behind one function,
+`solveSPD(A, b)`, so the sparse upgrade stays a local change if the scale assumption ever turns out
+wrong.
+
+Measured in Phase 0.5, replacing the estimate that was here before:
+
+| Network | Nodes / links | Iterations | Time per solve |
+|---|---|---|---|
+| target scale | 21 / 32 | 5 | **0.4 ms** |
+| EPANET Net3 | 97 / 119 | 16 | ~5 ms |
+| headroom grid | 201 / 371 | 11 | **30 ms** |
+
+The original estimate said the 200-node case would be "a few milliseconds"; that was wrong — it
+counted a single factorization and forgot to multiply by the iteration count. 30 ms is still
+comfortably inside a debounced edit, so **the decision holds even though the arithmetic did not**.
 
 ### Diagnostics run *before* the solve
 
@@ -144,6 +187,46 @@ Never diagnose topology by watching the solver fail. Four checks, four distinct 
 
 The real fix for #2 is **snap-on-create** in the editor: a click within N screen pixels of an
 existing node reuses it rather than creating a new one. Design that in on day one.
+
+## Validation (Phase 0.5, done)
+
+`js/lpn-solver.js` plus `dev/lpn-spike/`. Run with `node dev/lpn-spike/validate.js` — no network
+access, no `node_modules`, 46 checks, exits non-zero on failure.
+
+**The reference is the real EPANET engine, not transcribed numbers.** `epanet-js` (the EPANET C
+engine compiled to WASM) runs EPA's own Net1, Net2 and Net3 and its results are committed to
+`dev/lpn-spike/reference/`. `make_reference.js` regenerates them and needs `npm i epanet-js`; nothing
+else does. Two things it does deliberately:
+
+- **Tightens EPANET's own `ACCURACY` to 1e−8** before running. At EPANET's default of 1e−3 the
+  reference itself carries a visible residual, and a near-dead-end pipe in Net2 was reported with a
+  flow off by more than the flow itself — which showed up as a 0.404 gpm "disagreement" that was
+  entirely EPANET stopping early. With a converged reference the same link agrees to 0.00000 gpm.
+- **Records each link's status at t=0**, because status is boundary data for that instant's problem
+  exactly like demands and tank heads. Net3 has a pump closed by `[STATUS]` and links switched by
+  controls; evaluating controls is on the cut list, so they are read, not computed.
+
+Four independent kinds of check, because "the solver agrees with itself" is not evidence:
+
+1. **Residuals** — continuity and the constitutive head-loss equation, both to machine precision
+   (~1e−15). For a network with at least one fixed head and monotone head-loss functions the
+   steady-state solution is unique, so satisfying the equations *is* being right.
+2. **Closed form** — a parallel-pipe split derived by hand and an emitter solved by independent
+   bisection; both match to 1e−12.
+3. **EPANET** — heads within 0.0002 ft and flows within 0.004 gpm on all three networks, run in
+   `epanet` constants mode so constant choice is not confounded with solver error. The harness also
+   computes EPANET's *own* continuity residual, so any disagreement can be attributed rather than
+   assumed.
+4. **Suite consistency** — the head-loss kernel is exact to 1e−12 against `branched-network.js` for
+   all three methods.
+
+**One finding worth carrying forward: this suite's Hazen-Williams and EPANET's are not the same
+equation.** EngCalcs uses `Sf = 7.8828/d^4.8704 · (Q/(0.849 C))^1.852`; EPANET uses
+`hL = 4.727 L Q^1.852/(C^1.852 d^4.871)`. Converted to SI the coefficients and the diameter exponent
+both differ slightly — about **0.012%** in head loss. `lpn-solver.js` therefore carries both sets and
+**defaults to `engcalcs`**: a new page disagreeing with the Hazen-Williams calculator sitting next to
+it in the menu is a defect users would actually see, whereas matching EPANET to four decimals is
+something only we check.
 
 ## Reuse
 
@@ -242,9 +325,34 @@ offset and optionally rotation. This is exactly what EPANET does, and it is deli
 - Stored as a data URI or an object reference in the document, subject to the localStorage budget —
   a scanned plan can be large, so downscale on import and record the original dimensions.
 
+**The canonical use case, and the canonical test case, is a screenshot with a bar scale on it**
+(Tom, 2026-07-29) — commonly a Google Maps screenshot, which is a very different thing from a Google
+Maps *integration*: it is a plain image the user already has, with no API, no key, and no terms of
+service. It is also the reason two-point registration is the right mechanism rather than a
+scale-factor field: **the user clicks the two ends of the bar scale and types what it says.** That is
+a single sentence of instruction, it needs no knowledge of projections or units-per-pixel, and it
+works identically for a scanned plan sheet, a CAD export, and a phone photo of a drawing on a wall.
+
+Build the spike's backdrop case as a screenshot with a visible bar scale, and make registering it the
+acceptance test.
+
 **Design consequence for the Phase 0 spike:** the coordinate seam must be able to place and scale a
 backdrop image from day one, so the spike includes one. Retrofitting a backdrop into a view layer
 that assumed nothing behind the network is the kind of rework this doc exists to prevent.
+
+### The empty canvas
+
+A blank project should not be a blank rectangle. Emblazon placeholder text across it — *"Start by
+adding a background image using the toolbar"* — which does three jobs at once: it says what to do
+first, it teaches that this calculator is backdrop-first rather than form-first, and it removes the
+"is this broken?" moment that an empty drawing surface otherwise produces.
+
+**Open question, deliberately not decided yet: what a new project actually starts with.** The options
+are a genuinely empty canvas, a worked example network (the rest of the suite's convention — every
+other calculator opens on a passing design, and `CLAUDE.md` makes that a rule), or an empty canvas
+plus the prompt above. These pull in opposite directions: the suite-wide rule argues for a worked
+example, while a map page's whole premise is that the user brings their own site. Decide it when the
+editor exists and can be looked at, not on paper.
 
 ### Phase 4 (Task 145): tiles, and the two traps they bring
 
@@ -356,8 +464,9 @@ through `escapeAttr` and use the whole-label `.ec-help` / `.ec-tip` nesting.
 criteria are in the ROADMAP Task 146 entry. Canvas technology is **deliberately uncommitted** until
 this runs (Tom's call). Includes a registered backdrop image, per the Backdrop section above.
 
-**Phase 0.5 — headless solver, 2–3 days, independent of Phase 0**, validated against published
-EPANET Net1/Net2 output.
+**Phase 0.5 — headless solver. DONE 2026-07-29.** `js/lpn-solver.js` + `dev/lpn-spike/`, 46 checks
+passing against the real EPANET engine, closed-form cases, and machine-precision residuals. See
+"Validation" above.
 
 **Phase 1 — smallest shippable.** Page, prefix, menu entry, `sw.js` entry, English-only strings.
 Junction / Pipe / Reservoir / Pump / Text. Toolbar: Select, Pan, Add-each, Delete, Zoom Extent.

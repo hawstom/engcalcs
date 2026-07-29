@@ -1,0 +1,277 @@
+{
+  "source": "Net1.inp",
+  "nodes": [
+    {
+      "id": "10",
+      "type": "Junction",
+      "elevation": 710,
+      "demand": 0,
+      "head": 1004.3473918932657,
+      "pressure": 127.54072490735203
+    },
+    {
+      "id": "11",
+      "type": "Junction",
+      "elevation": 710,
+      "demand": 150,
+      "head": 985.23037328545,
+      "pressure": 119.2573207445855
+    },
+    {
+      "id": "12",
+      "type": "Junction",
+      "elevation": 700,
+      "demand": 150,
+      "head": 970.0698222645816,
+      "pressure": 117.02125398724321
+    },
+    {
+      "id": "13",
+      "type": "Junction",
+      "elevation": 695,
+      "demand": 100,
+      "head": 968.8726602267078,
+      "pressure": 118.6690236762325
+    },
+    {
+      "id": "21",
+      "type": "Junction",
+      "elevation": 700,
+      "demand": 150,
+      "head": 971.5466354884464,
+      "pressure": 117.66115715714385
+    },
+    {
+      "id": "22",
+      "type": "Junction",
+      "elevation": 695,
+      "demand": 200,
+      "head": 969.0783615159205,
+      "pressure": 118.75815404484835
+    },
+    {
+      "id": "23",
+      "type": "Junction",
+      "elevation": 690,
+      "demand": 150,
+      "head": 968.6452000649792,
+      "pressure": 120.73696518815551
+    },
+    {
+      "id": "31",
+      "type": "Junction",
+      "elevation": 700,
+      "demand": 100,
+      "head": 967.3915991841831,
+      "pressure": 115.86077992650652
+    },
+    {
+      "id": "32",
+      "type": "Junction",
+      "elevation": 710,
+      "demand": 100,
+      "head": 965.6893263475148,
+      "pressure": 110.79018510637816
+    },
+    {
+      "id": "9",
+      "type": "Reservoir",
+      "elevation": 800,
+      "demand": -1866.1758299956102,
+      "head": 800,
+      "pressure": 0
+    },
+    {
+      "id": "2",
+      "type": "Tank",
+      "elevation": 850,
+      "demand": 766.1758299953873,
+      "head": 970,
+      "pressure": 51.996
+    }
+  ],
+  "links": [
+    {
+      "id": "10",
+      "type": "Pipe",
+      "from": "10",
+      "to": "11",
+      "length": 10530,
+      "diameter": 18,
+      "roughness": 100,
+      "minorLoss": 0,
+      "status": "open",
+      "flow": 1866.1758299956118,
+      "velocity": 2.352866658476875,
+      "headloss": 19.11701860781568
+    },
+    {
+      "id": "11",
+      "type": "Pipe",
+      "from": "11",
+      "to": "12",
+      "length": 5280,
+      "diameter": 14,
+      "roughness": 100,
+      "minorLoss": 0,
+      "status": "open",
+      "flow": 1234.2071802783216,
+      "velocity": 2.5723008591958005,
+      "headloss": 15.16055102086841
+    },
+    {
+      "id": "12",
+      "type": "Pipe",
+      "from": "12",
+      "to": "13",
+      "length": 5280,
+      "diameter": 10,
+      "roughness": 100,
+      "minorLoss": 0,
+      "status": "open",
+      "flow": 129.33513428839584,
+      "velocity": 0.5283312311303147,
+      "headloss": 1.1971620378737953
+    },
+    {
+      "id": "21",
+      "type": "Pipe",
+      "from": "21",
+      "to": "22",
+      "length": 5280,
+      "diameter": 10,
+      "roughness": 100,
+      "minorLoss": 0,
+      "status": "open",
+      "flow": 191.15813058731118,
+      "velocity": 0.7808768362088058,
+      "headloss": 2.4682739725259353
+    },
+    {
+      "id": "22",
+      "type": "Pipe",
+      "from": "22",
+      "to": "23",
+      "length": 5280,
+      "diameter": 12,
+      "roughness": 100,
+      "minorLoss": 0,
+      "status": "open",
+      "flow": 120.66486571162241,
+      "velocity": 0.34230095221630336,
+      "headloss": 0.43316145094127023
+    },
+    {
+      "id": "31",
+      "type": "Pipe",
+      "from": "31",
+      "to": "32",
+      "length": 5280,
+      "diameter": 6,
+      "roughness": 100,
+      "minorLoss": 0,
+      "status": "open",
+      "flow": 40.810519129996266,
+      "velocity": 0.463083581993954,
+      "headloss": 1.7022728366682713
+    },
+    {
+      "id": "110",
+      "type": "Pipe",
+      "from": "2",
+      "to": "12",
+      "length": 200,
+      "diameter": 18,
+      "roughness": 100,
+      "minorLoss": 0,
+      "status": "open",
+      "flow": -766.1758299953873,
+      "velocity": 0.9659912726075935,
+      "headloss": 0.06982226458160312
+    },
+    {
+      "id": "111",
+      "type": "Pipe",
+      "from": "11",
+      "to": "21",
+      "length": 5280,
+      "diameter": 10,
+      "roughness": 100,
+      "minorLoss": 0,
+      "status": "open",
+      "flow": 481.9686497172995,
+      "velocity": 1.9688315280483137,
+      "headloss": 13.683737797003573
+    },
+    {
+      "id": "112",
+      "type": "Pipe",
+      "from": "12",
+      "to": "22",
+      "length": 5280,
+      "diameter": 12,
+      "roughness": 100,
+      "minorLoss": 0,
+      "status": "open",
+      "flow": 188.69621599435246,
+      "velocity": 0.5352916446187924,
+      "headloss": 0.9914607486610976
+    },
+    {
+      "id": "113",
+      "type": "Pipe",
+      "from": "13",
+      "to": "23",
+      "length": 5280,
+      "diameter": 8,
+      "roughness": 100,
+      "minorLoss": 0,
+      "status": "open",
+      "flow": 29.33513428841573,
+      "velocity": 0.18723967219017054,
+      "headloss": 0.22746016172857253
+    },
+    {
+      "id": "121",
+      "type": "Pipe",
+      "from": "21",
+      "to": "31",
+      "length": 5280,
+      "diameter": 8,
+      "roughness": 100,
+      "minorLoss": 0,
+      "status": "open",
+      "flow": 140.81051912999067,
+      "velocity": 0.8987623913226366,
+      "headloss": 4.155036304263376
+    },
+    {
+      "id": "122",
+      "type": "Pipe",
+      "from": "22",
+      "to": "32",
+      "length": 5280,
+      "diameter": 6,
+      "roughness": 100,
+      "minorLoss": 0,
+      "status": "open",
+      "flow": 59.18948087000208,
+      "velocity": 0.671632642807935,
+      "headloss": 3.3890351684057123
+    },
+    {
+      "id": "9",
+      "type": "Pump",
+      "from": "9",
+      "to": "10",
+      "length": 0,
+      "diameter": 0,
+      "roughness": 0,
+      "minorLoss": 0,
+      "status": "open",
+      "flow": 1866.1758299956102,
+      "velocity": 0,
+      "headloss": -204.3473918932657
+    }
+  ]
+}
