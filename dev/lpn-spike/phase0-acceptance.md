@@ -23,7 +23,8 @@ Per ROADMAP Task 146. `canvas-spike.html` is a standalone SVG DOM spike (`create
 
 - Pan (drag on empty canvas), wheel zoom about the cursor, zoom-extent button.
 - Node drag with incident links (straight and vertex-bent) following live.
-- One link vertex handle, draggable independently of its endpoints.
+- Arbitrary link vertices (round 4): double-click a link to add a bend, double-click a bend to
+  remove it — not capped at one, superseding the single-vertex description this bullet used to have.
 - Click-to-popup on a node with an Elevation field that writes back and re-renders the node label.
 - A draggable label with a leader line, independent of its anchor node — one in Arabic
   ("خزان (reservoir)"), one in Amharic ("መስቀለኛ መንገድ (junction)").
@@ -268,3 +269,137 @@ PC. Four new items, all design/UX requests rather than bug reports:
   step instructions are wrong/misleading and the click sequencing doesn't hold up. The whole
   alert()-driven, nested-listener approach needs to be rethought together with Tom rather than
   patched again — next session starts there, not with another quick fix.
+
+## Round 8 (Tom) — full backdrop-UX rebuild: dropdown, mutual exclusion, radios→select
+
+**This round's log entry was missed at the time and reconstructed after an Opus review caught the
+gap (see the round after next) — the code changes below all genuinely happened in round 8, this
+paragraph is just late.** Tom's round-7-adjacent message raised four problems at once: (1) three
+loose toolbar buttons (Scale/Position/etc.) read as visually unrelated to "Backdrop"; (2) the cursor
+flicker persisted; (3) the Start-button UX for Position was "not a workable UX... maybe we need to
+start over"; (4) wizards could collide if invoked while another was mid-sequence.
+
+1. **One `<select id="backdropMenu">` dropdown** ("Backdrop...", "Add image", "Scale", "Position")
+   replaced the separate toolbar buttons. Selecting "Add image" programmatically clicks the hidden
+   file input; Scale/Position options stay disabled until an image is loaded.
+2. **`activeCancel` + `cancelActive()`: a single mutual-exclusion point.** Every sequence (Scale,
+   Position, the target-mode panel) registers its own teardown function in the module-level
+   `activeCancel` variable; every entry point calls `cancelActive()` first. This is what makes a
+   wizard "cancel self and each other when invoked" (Tom) instead of stacking listeners.
+3. **Position rebuilt to Tom's exact sequence:** (a) pick Position from the dropdown, (b) alert
+   asking for a reference point, (c) click it, (d) alert announcing the target-mode step, (e) a
+   floating `targetPanel` div (not toolbar-embedded) appears with a `<select id="targetModeSelect">`
+   for Node/Free point/Coords — a `<select>`, not radio buttons, specifically because the toolbar's
+   `#toolbar label{...}` CSS was styling radio labels to look like buttons, which Tom flagged as
+   confusing — (f) Continue commits the choice.
+4. **Node mode's own cursor-affordance problem was already visible in this round** and got its
+   `.regmode-node` fix the round after next (round 9) once Tom reported it specifically.
+
+## Round 9 (Tom) — cursor-repaint mechanism, node-mode affordance, panel placement, trimmed alert
+
+Tom: "The UX is salvageable now" — four refinements, not a redesign this time.
+
+1. **Cursor flicker — different mechanism than round-8's fix addressed. Superseded again in round
+   10, see below — this attempt didn't hold either.** Round 8 assumed it was overlapping sequences
+   fighting over `.regmode`; the cancellation rework fixed real bugs but the flicker itself
+   persisted, pointing at something else: Chrome/Firefox only re-evaluate `cursor` on an actual
+   mousemove hit-test, not on a JS class change with no accompanying pointer event. `setRegMode()`
+   tracked the last known pointer position and dispatched a synthetic same-position `mousemove`
+   immediately after toggling the class, meant to force an immediate repaint.
+2. **Node mode forced crosshair even over the valid target.** In Node mode the node *is* the thing
+   you're supposed to click, so overriding its cursor to crosshair removed the one useful affordance.
+   Added a second class, `.regmode-node` (toggled only while actually waiting for the node click),
+   with a more specific selector (`#canvas.regmode.regmode-node .node{cursor:pointer!important}`)
+   that wins the specificity tie against the blanket `.regmode *` rule.
+3. **Target panel appeared at screen-center, disconnected from what triggered it.** Now anchored
+   just below the Backdrop dropdown's own bounding rect instead of a fixed center-screen position.
+4. **Dropped the "now click the target" alert for Node/Free modes.** Tom's call: the panel +
+   Continue transition is clear enough on its own now that the extra blocking dialog was redundant.
+   The Coords prompt stays (it's real input, not just a step announcement).
+
+Tom's aesthetic note, no action taken: the toolbar's current look ("black buttons," the dropdown's
+native styling) isn't pretty but works; he's reserving judgment on a UI theme pass until more of the
+page exists to look at holistically, not asking for polish now.
+
+## Round 10 (Tom) — cursor flicker, third attempt: reflow instead of synthetic dispatch
+
+Tom's report was specific enough to be diagnostic: "reverts to a pointer when there is no motion, or
+maybe on a certain sort of motion... or maybe returning to where it was at the last poll." That
+pattern is hard to explain if round 9's synthetic `mousemove` were actually forcing a real repaint —
+more consistent with the dispatch doing very little, since `dispatchEvent()` only fires listeners
+*we* registered, not the browser's own native hover/cursor hit-testing (driven by real OS input, not
+the DOM event bus). Replaced with the standard "force a style recalculation" pattern: remove the
+class, force a synchronous reflow by reading a layout-triggering property, then re-add. **Turned out
+to still be a no-op** — see the Opus-review round below; `svg.offsetWidth` doesn't exist on an
+`SVGElement` (that property is `HTMLElement`-only), so the forced read did nothing and the two
+`classList` calls just coalesced into one recalculation, identical to a plain `toggle()`. Fixed for
+real in the review-fix round using `svg.getBoundingClientRect()`, which is defined on every
+`Element` and does force a reflow.
+
+## Round 11 — Opus subagent review (Tom requested a second set of eyes)
+
+After 10 rounds of live on-device patching, Tom asked for an Opus subagent to review
+`canvas-spike.html` fresh, given the full round-by-round history in this file for context (so it
+wouldn't flag deliberate decisions — `regMode`, `activeCancel`, the two-constraint CSS rule, the
+`ADVERSE_FRAC` math — as bugs). Each finding was independently verified against the code before
+fixing (an agent's report describes what it found, not gospel). Real, concrete issues, now fixed:
+
+1. **The round-10 cursor fix was a genuine no-op.** Confirmed above.
+2. **`Backdrop ▸ Add image` never called `cancelActive()`**, contradicting the comment asserting every
+   entry point does. Concrete failure: start Position, reach the target-click step, then pick "Add
+   image" mid-sequence — the old sequence's listener stayed bound with a stale `refWorld`, `regMode`
+   stuck on (canvas fully inert), and the *next* click silently mispositioned the *new* image against
+   the *old* reference point. Fixed: the `'add'` branch now calls `cancelActive()` too.
+3. **Pinch drags were never cleared in `endPointer`.** The pinch drag object carries no `pointerId`
+   (it spans two pointers), but `endPointer` only cleared `drag` by matching `pointerId` — so lifting
+   one finger of a two-finger pinch left `drag` stuck at `type:'pinch'` with one pointer remaining;
+   `applyDrag`'s pinch branch requires exactly 2 and silently no-ops every frame after that, freezing
+   the remaining finger until it was lifted and re-pressed. Fixed with an explicit pinch case in
+   `endPointer`.
+4. **`#hint` and `#fps` blocked pointer events over the canvas.** Both are overlays stacked above
+   `#canvas` (its top-left and top-right corners) with no `pointer-events:none` — a registration click
+   landing in either strip never reached the SVG at all, which would read as "the wizard just isn't
+   responding to my click." Added `pointer-events:none` to both.
+5. **No lower/upper bound on `state.s`.** Pinch fingers converging to near-zero distance drove the
+   zoom scale toward 0 (and the next frame's divide-by-`state.s` toward `Infinity`/`NaN`), with no
+   recovery short of pressing Zoom Extent. Added a `MIN_SCALE`/`MAX_SCALE` clamp in `zoomAbout`.
+6. **`dblclick` (add/remove a link bend) wasn't suppressed during `regMode`.** Two registration
+   clicks landing on the same link within the double-click interval — plausible on a short bar-scale
+   segment — would also insert a bend mid-sequence. Added the same `if(regMode)return;` guard the
+   other interaction listeners already have.
+7. **No way to abandon a Scale/Position sequence except re-opening the dropdown.** `regMode` blanks
+   all normal interaction with no dedicated cancel affordance — a user who simply changed their mind
+   had an inert canvas with no visible way out. Added an `Escape` key handler that calls
+   `cancelActive()`.
+8. **Print CSS didn't hide `#hint`, `#fps`, or `#targetPanel`** — all three are `position:fixed`
+   overlays that would print on top of the drawing, undermining pass condition 6 (crisp vector
+   output). Added to the existing `@media print` hide list.
+9. **Two real documentation gaps, both fixed**: round 8 (the dropdown/`activeCancel`/`<select>`
+   rebuild) was never logged at all — reconstructed above from the actual code changes — and round
+   9's cursor-fix description no longer matched the code after round 10 replaced it. Also corrected
+   the "What this build demonstrates" summary's stale "one link vertex handle" line (superseded by
+   round 4's arbitrary-vertex model) and trimmed an unused `ml` computation in the target-panel
+   Continue handler (round 9 dropped the alert that was its only other consumer).
+
+**Reviewed and found NOT to be bugs** (confirmed by re-reading rather than assumed): toggling the
+200-node grid mid-registration-sequence is safe (Scale/Position store click positions in
+image-local/world space, not view-relative, so a `zoomExtent()` re-fit mid-sequence doesn't corrupt
+anything); a window resize mid-drag is likewise safe (`screenToWorld` re-reads
+`getBoundingClientRect()` on every call, never caches it). No abandoned `vx`/`vy` single-vertex code,
+no leftover `btnPositionCoords`/`posModeWrap`, no auto-detect Position flow remnants — all fully
+removed across earlier rounds' rewrites, not just superficially replaced.
+
+## Round 12 (Tom) — leader styling; cursor flicker logged as a known, non-blocking limitation
+
+1. **Leader lines: narrow, solid black instead of dashed grey.** `.leader` changed from
+   `stroke:#999;stroke-width:1;stroke-dasharray:2,2` to `stroke:#000;stroke-width:0.125` (1/8 of the
+   previous width, dash removed) — a pure styling ask, no behavior change.
+2. **Crosshair-reverts-to-pointer-on-pause: closed out as a known limitation, not fixed.** Four
+   dedicated attempts across rounds 8–12 (overlapping-sequence theory, synthetic mousemove dispatch,
+   forced reflow, periodic re-assertion every 200ms) — the periodic-reassert attempt in round "11.5"
+   targeted the newest information (the reversion develops purely from the pointer sitting still, not
+   from any toggle-time event) but Tom's verdict is that it's "not a showstopper for now," so this
+   stops here rather than continuing to chase a browser-internal cursor-caching quirk that doesn't
+   bear on Phase 0's actual go/no-go criteria (pan/zoom/drag/touch/text-shaping/print). If it matters
+   later, the next thing worth trying is probably a native `cursor: url(...)` custom image (bypasses
+   whatever native cursor-hit-test path is misbehaving) rather than another CSS-class approach.

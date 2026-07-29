@@ -14,8 +14,12 @@
     padding:6px 8px;display:flex;gap:6px;align-items:center;flex-wrap:wrap;box-sizing:border-box}
   #toolbar button,#toolbar label{background:#444;color:#fff;border:1px solid #666;
     padding:4px 6px;border-radius:3px;cursor:pointer;font-size:12px;white-space:nowrap}
+  /* pointer-events:none on both this and #hint below: they're overlays stacked above #canvas with
+     no pointer handling of their own, so without this a click landing in their strip (top-left and
+     top-right corners of the canvas) never reaches the SVG at all — during a registration sequence
+     that reads as the wizard silently ignoring a click. */
   #fps{position:fixed;top:4px;right:4px;z-index:11;font-family:monospace;background:#000;
-    color:#0f0;padding:2px 6px;border-radius:3px}
+    color:#0f0;padding:2px 6px;border-radius:3px;pointer-events:none}
   /* width/height, not right/bottom insets: the <svg> also carries width="100%" height="100%"
      attributes (needed because SVG is a CSS replaced element and won't stretch from insets alone —
      see the earlier fix). Combining top+bottom insets WITH an explicit height is an over-constrained
@@ -31,17 +35,21 @@
   .link.pump{stroke:#a52}
   .vhandle{fill:#fff;stroke:#a52;stroke-width:1;cursor:move}
   .lbl{font-size:11px;fill:#333;pointer-events:none;user-select:none}
-  .leader{stroke:#999;stroke-width:1;stroke-dasharray:2,2}
+  .leader{stroke:#000;stroke-width:0.125}
   .draglbl{cursor:move;pointer-events:all}
   /* During a Scale/Position click sequence, regMode already suppresses real interaction (see the
      pointerdown comment below) — but the per-element cursor: pointer/move rules still fired on
      hover, visually implying "this is clickable/draggable" when it must be fully ignored. */
   #canvas.regmode, #canvas.regmode *{cursor:crosshair!important}
+  /* Node-mode target step: nodes ARE the valid click target here, so forcing crosshair over them
+     removes the one affordance that actually matters. More specific than the rule above (extra
+     class), so it wins the !important tie on specificity. */
+  #canvas.regmode.regmode-node .node{cursor:pointer!important}
   #popup{position:absolute;z-index:20;background:#fff;border:1px solid #333;padding:8px;
     box-shadow:2px 2px 6px rgba(0,0,0,.3);display:none}
   #popup input{width:80px}
   @media print{
-    #toolbar,#popup{display:none!important}
+    #toolbar,#popup,#hint,#fps,#targetPanel{display:none!important}
     #canvas{position:static;width:100%;height:100vh}
   }
 </style>
@@ -50,20 +58,30 @@
 <div id="toolbar">
   <button id="btnGrid">200-node grid</button>
   <button id="btnExtent">Zoom extent</button>
-  <label>Backdrop <input id="fileBackdrop" type="file" accept="image/*" style="display:none"></label>
-  <button id="btnScale" disabled title="Click 2 points on the image, then enter the real distance">Scale</button>
-  <button id="btnPosition" disabled title="Click a reference point on the image, then supply the target per the mode selected">Position</button>
-  <!-- Part of the Position wizard, not permanent toolbar chrome: hidden until Position starts,
-       hidden again once the click sequence resolves. Layout here is rough — fine for the spike. -->
-  <span id="posModeWrap" style="display:none;font-size:11px">Target:
-    <label><input type="radio" name="posmode" value="node" checked>Node</label>
-    <label><input type="radio" name="posmode" value="free">Free point</label>
-    <label><input type="radio" name="posmode" value="coords">Coords</label>
-  </span>
+  <input id="fileBackdrop" type="file" accept="image/*" style="display:none">
+  <select id="backdropMenu">
+    <option value="" selected>Backdrop...</option>
+    <option value="add">Add image</option>
+    <option value="scale" id="optScale" disabled>Scale</option>
+    <option value="position" id="optPosition" disabled>Position</option>
+  </select>
   <button id="btnPrint">Print</button>
 </div>
-<div id="hint" style="position:fixed;top:34px;left:4px;z-index:9;font-size:11px;color:#666">
+<div id="hint" style="position:fixed;top:34px;left:4px;z-index:9;font-size:11px;color:#666;pointer-events:none">
   Double-click a link to add a bend; double-click a bend to remove it.
+</div>
+<!-- A real floating panel, not toolbar chrome — appears only for the "choose target mode" step of
+     the Position sequence. A <select> rather than radio buttons: our toolbar's `label{...}` CSS was
+     making the radios look like buttons; a <select> is a distinct native control, immune to that. -->
+<div id="targetPanel" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+  z-index:30;background:#fff;border:1px solid #333;padding:12px;box-shadow:2px 2px 8px rgba(0,0,0,.4)">
+  Target mode:
+  <select id="targetModeSelect">
+    <option value="node">Node</option>
+    <option value="free">Free point</option>
+    <option value="coords">Coords</option>
+  </select>
+  <button id="btnTargetContinue">Continue</button>
 </div>
 <span id="fps">fps: --</span>
 <svg id="canvas" width="100%" height="100%">
@@ -291,11 +309,12 @@ const pointers=new Map();
 let drag=null; // {type,pointerId,startX,startY,...}
 let dragDirty=false;
 let lastTap=null;
+const MIN_SCALE=0.05, MAX_SCALE=500; // guards pinch fingers converging to ~0 distance -> state.s -> 0/NaN
 function zoomAbout(sx,sy,factor){
   const r=svg.getBoundingClientRect();
   const lx=sx-r.left, ly=sy-r.top;
   const wx=(lx-state.tx)/state.s, wy=(ly-state.ty)/state.s;
-  state.s*=factor;
+  state.s=Math.min(MAX_SCALE,Math.max(MIN_SCALE,state.s*factor));
   state.tx=lx-wx*state.s; state.ty=ly-wy*state.s;
   setTransform();
 }
@@ -310,7 +329,29 @@ svg.addEventListener('wheel',e=>{
 // The .regmode class also forces the cursor to crosshair, overriding the per-element pointer/move
 // cursors that would otherwise (mis)signal that nodes/links/labels are still interactive.
 let regMode=false;
-function setRegMode(v){regMode=v; svg.classList.toggle('regmode',v);}
+let cursorNudgeTimer=null;
+function nudgeCursor(){
+  svg.classList.remove('regmode');
+  void svg.getBoundingClientRect(); // forces a real reflow/style recalc, not just a class-membership change
+  svg.classList.add('regmode');
+}
+function setRegMode(v){
+  regMode=v;
+  // Rounds 9 and 10 both targeted the MOMENT of toggling regMode — but Tom's report ("reverts to a
+  // pointer on pause") describes a reversion that develops purely from the mouse sitting still,
+  // with no code running at all. A one-time fix at toggle-time can't touch that; the class is
+  // already correctly set the whole time, and something in the browser's own cursor caching drifts
+  // back regardless. Pragmatic workaround: periodically re-assert the class while a sequence is
+  // active, rather than only once at the start.
+  if(v){
+    nudgeCursor();
+    if(!cursorNudgeTimer)cursorNudgeTimer=setInterval(nudgeCursor,200);
+  } else {
+    svg.classList.remove('regmode');
+    if(cursorNudgeTimer){clearInterval(cursorNudgeTimer); cursorNudgeTimer=null;}
+  }
+}
+function setNodeCursorAllowed(v){svg.classList.toggle('regmode-node',v);}
 svg.addEventListener('pointerdown',e=>{
   if(regMode)return;
   svg.setPointerCapture(e.pointerId);
@@ -386,6 +427,11 @@ function applyDrag(){
 // that platform inconsistency entirely.
 function endPointer(e){
   pointers.delete(e.pointerId);
+  // A pinch drag has no pointerId (it spans two), so the id check below never matches it — without
+  // this, lifting one finger of a pinch left `drag` stuck at type:'pinch' with only one pointer
+  // left, and applyDrag's pinch branch bails every frame (needs exactly 2), silently freezing that
+  // remaining finger until it's lifted and re-pressed.
+  if(drag && drag.type==='pinch' && pointers.size<2){drag=null; dragDirty=false; return;}
   if(drag && drag.pointerId===e.pointerId){
     if(drag.type==='node' && Math.hypot(e.clientX-drag.startX,e.clientY-drag.startY)<4){
       openPopup(drag.id,e.clientX,e.clientY);
@@ -399,6 +445,7 @@ svg.addEventListener('pointercancel',endPointer);
 // ---- arbitrary-vertex link editing: double-click a link to bend it, a bend to remove it ----
 // elementFromPoint again, not e.target, for the same setPointerCapture-retargeting reason as above.
 svg.addEventListener('dblclick',e=>{
+  if(regMode)return; // otherwise two registration clicks landing on the same link also bend it
   const t=document.elementFromPoint(e.clientX,e.clientY);
   if(!t||!t.dataset)return;
   if(t.classList.contains('vhandle'))removeVertex(t.dataset.link,+t.dataset.vidx);
@@ -451,16 +498,41 @@ document.getElementById('fileBackdrop').onchange=e=>{
     backdropState={tx:0,ty:0,s:1};
     backdropImg=el('image',{href:ev.target.result,x:0,y:0,width:40,height:30},backdropLayer);
     applyBackdropTransform();
-    document.getElementById('btnScale').disabled=false;
-    document.getElementById('btnPosition').disabled=false;
+    document.getElementById('optScale').disabled=false;
+    document.getElementById('optPosition').disabled=false;
   };
   reader.readAsDataURL(f);
+};
+// One dropdown for all Backdrop actions (Tom: three loose toolbar buttons read as unrelated).
+// activeCancel is the single mutual-exclusion point: every sequence below registers a teardown
+// function here, and every entry point calls cancelActive() first. That's what makes a wizard
+// "cancel self and each other when invoked" (Tom) — re-picking the same action mid-sequence tears
+// down and restarts it, picking a DIFFERENT action tears down whatever else was running. This is
+// also almost certainly what caused the reported cursor flicker: two overlapping sequences each
+// independently flipping regMode true/false/true fights over the same .regmode class.
+let activeCancel=null;
+function cancelActive(){
+  if(activeCancel){const c=activeCancel; activeCancel=null; c();}
+}
+// Escape is the one dedicated "get me out" affordance: before this, the only way to abandon a
+// Scale/Position sequence was to re-open the dropdown and pick something else, which isn't
+// discoverable as a cancel action — a user who simply changed their mind had a canvas that looked
+// dead (regMode blanks all normal interaction) with no visible way out.
+document.addEventListener('keydown',e=>{if(e.key==='Escape')cancelActive();});
+const backdropMenu=document.getElementById('backdropMenu');
+backdropMenu.onchange=()=>{
+  const v=backdropMenu.value;
+  backdropMenu.value='';
+  if(v==='add'){cancelActive(); document.getElementById('fileBackdrop').click();}
+  else if(v==='scale')startScale();
+  else if(v==='position')startPosition();
 };
 // regMode blanks out normal interaction for the duration of a click sequence (see the pointerdown
 // comment above), so every listener here just takes whatever pointerup arrives next at face value —
 // no elementFromPoint===backdropImg gate, which is also the "ignore nodes sitting on top of the
 // image" fix: with regMode on, a click is never misread as a node tap in the first place.
-document.getElementById('btnScale').onclick=()=>{
+function startScale(){
+  cancelActive();
   const clicks=[];
   setRegMode(true);
   alert('Click two points on the backdrop image (e.g. the two ends of a bar scale), then enter the real distance.');
@@ -468,62 +540,76 @@ document.getElementById('btnScale').onclick=()=>{
     clicks.push(worldToImageLocal(screenToWorld(e.clientX,e.clientY)));
     if(clicks.length===2){
       svg.removeEventListener('pointerup',handler,true);
-      setRegMode(false);
+      activeCancel=null; setRegMode(false);
       const pxDist=Math.hypot(clicks[1].x-clicks[0].x,clicks[1].y-clicks[0].y);
       const real=+prompt('Real-world distance between the two points (world units):','30');
       if(real>0){backdropState.s=real/pxDist; applyBackdropTransform();}
     }
   };
   svg.addEventListener('pointerup',handler,true);
-};
-// Position: click a reference point on the image, then supply the target under an EXPLICITLY
-// chosen mode (the "Target:" radio group) rather than auto-detecting from what the second click
-// happens to land on. Auto-detect was tried and rejected (Tom): it silently assumes a click near a
-// node always MEANS the node, which breaks the moment someone genuinely wants a free point close to
-// one — there's no way to express that intent without an explicit mode to opt out of snapping.
+  activeCancel=()=>{svg.removeEventListener('pointerup',handler,true); setRegMode(false);};
+}
 function positionTo(refWorld,target){
   backdropState.tx+=target.x-refWorld.x; backdropState.ty+=target.y-refWorld.y;
   applyBackdropTransform();
 }
-// posModeWrap (the "Target:" radio group) is part of this wizard, not permanent toolbar chrome —
-// shown only while a Position sequence is actually in progress (Tom).
-function endPositionSequence(){
-  setRegMode(false);
-  document.getElementById('posModeWrap').style.display='none';
-}
-document.getElementById('btnPosition').onclick=()=>{
-  document.getElementById('posModeWrap').style.display='inline';
-  const mode=document.querySelector('input[name=posmode]:checked').value;
+// Position, per Tom's exact sequence: (a) click Backdrop > Position, (b) alert asking for a
+// reference point, (c) user clicks it, (d) alert announcing the target-mode step, (e) the
+// targetPanel (a real floating <select>, not toolbar-embedded radios) is shown for the user to pick
+// Node/Free point/Coords, (f) Continue. Each step registers its own activeCancel so an interruption
+// at any point tears down cleanly instead of leaving orphaned listeners or regMode stuck on.
+const MODE_LABEL={node:'Node',free:'Free point',coords:'Coords'};
+function startPosition(){
+  cancelActive();
   setRegMode(true);
-  alert('Click a reference point on the backdrop image.');
+  alert('Reference point: Click anywhere on the backdrop image.');
   const handler=e=>{
     svg.removeEventListener('pointerup',handler,true);
     const refWorld=screenToWorld(e.clientX,e.clientY);
+    alert('Target mode: Choose target mode, then click Continue.');
+    showTargetPanel(refWorld);
+  };
+  svg.addEventListener('pointerup',handler,true);
+  activeCancel=()=>{svg.removeEventListener('pointerup',handler,true); setRegMode(false);};
+}
+function showTargetPanel(refWorld){
+  const panel=document.getElementById('targetPanel');
+  const r=backdropMenu.getBoundingClientRect(); // anchor under the Backdrop dropdown, not screen-center
+  panel.style.transform='';
+  panel.style.top=(r.bottom+4)+'px';
+  panel.style.left=r.left+'px';
+  panel.style.display='block';
+  activeCancel=()=>{panel.style.display='none'; setRegMode(false);};
+  document.getElementById('btnTargetContinue').onclick=()=>{
+    const mode=document.getElementById('targetModeSelect').value;
+    panel.style.display='none';
     if(mode==='coords'){
-      endPositionSequence();
-      const txt=prompt('Target X,Y (world units) for that reference point:','1000,1000');
+      activeCancel=null; setRegMode(false);
+      const txt=prompt(`Mode: ${MODE_LABEL[mode]}. Target X,Y (world units) for that reference point:`,'1000,1000');
       const parts=(txt||'').split(',').map(Number);
       if(txt && !isNaN(parts[0]) && !isNaN(parts[1]))positionTo(refWorld,{x:parts[0],y:parts[1]});
       return;
     }
-    alert(mode==='node' ? 'Now click the target node.' : 'Now click the target point (any location).');
+    // No more "now click the target" alert here (Tom): the panel + Continue already made the
+    // transition clear enough that a further blocking dialog was redundant.
+    if(mode==='node')setNodeCursorAllowed(true);
     const handler2=e2=>{
       if(mode==='node'){
         const t=document.elementFromPoint(e2.clientX,e2.clientY);
         if(!t||!t.dataset||!t.dataset.node)return; // not a node — keep waiting, don't fall back to a free point
         svg.removeEventListener('pointerup',handler2,true);
-        endPositionSequence();
+        activeCancel=null; setNodeCursorAllowed(false); setRegMode(false);
         positionTo(refWorld,nodeById(t.dataset.node));
       } else {
         svg.removeEventListener('pointerup',handler2,true);
-        endPositionSequence();
+        activeCancel=null; setRegMode(false);
         positionTo(refWorld,screenToWorld(e2.clientX,e2.clientY)); // 'free': the raw point, never snapped
       }
     };
     svg.addEventListener('pointerup',handler2,true);
+    activeCancel=()=>{svg.removeEventListener('pointerup',handler2,true); setNodeCursorAllowed(false); setRegMode(false);};
   };
-  svg.addEventListener('pointerup',handler,true);
-};
+}
 
 // ---- single rAF loop: applies the latest pending drag (if any), then measures real paint fps ----
 let frameCount=0,lastFpsT=performance.now(),lastFrameCount=0;
