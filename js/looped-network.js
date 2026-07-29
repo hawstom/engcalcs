@@ -105,43 +105,46 @@ var EngCalcs = EngCalcs || {};
 				'class': 'lpn-vhandle', 'data-link': l.id, 'data-vidx': i
 			}, linksLayer));
 		}
-		// Flow-direction arrow (Tom, 2026-07-30, matching EPANET): a small triangle at the
-		// midpoint, hidden until a solve result exists. Points +x by default; positioned/rotated
+		// Flow-direction arrows (Tom, 2026-07-30, matching EPANET): an open chevron ">" per
+		// POLYLINE SEGMENT, not just one at the overall midpoint (Tom asked for this once the
+		// single-arrow version looked good) -- a bent pipe gets one arrow on each straight run.
+		// Not a filled triangle -- that read as absorbed into the pipe's own color. Hidden until
+		// a solve result exists. Points +x by default, protruding to +-1.2 world units above/
+		// below the line -- well past the pipe's own 0.5-unit stroke width. Positioned/rotated
 		// entirely via `transform` in updateArrow() below, never via its own x/y/points.
-		var arrow = el('polygon', {
-			points: '-1,-0.6 -1,0.6 1,0', 'class': 'lpn-arrow', 'data-link': l.id, style: 'display:none'
-		}, linksLayer);
-		linkEls[l.id] = { line: line, handles: handles, arrow: arrow };
+		var segCount = l.verts.length + 1, arrows = [], j;
+		for (j = 0; j < segCount; j++) {
+			arrows.push(el('polyline', {
+				points: '-0.8,-1.2 0.8,0 -0.8,1.2', fill: 'none',
+				'class': 'lpn-arrow', 'data-link': l.id, style: 'display:none'
+			}, linksLayer));
+		}
+		linkEls[l.id] = { line: line, handles: handles, arrows: arrows };
 	}
-	// Midpoint (by arc length, so a bent pipe's arrow sits mid-path, not mid-bounding-box) and
-	// the local tangent angle there, walking a->verts->b.
-	function linkMidpoint(l) {
-		var pts = [nodeById(l.from)].concat(l.verts, [nodeById(l.to)]), segLens = [], total = 0, i, target, acc = 0, t, a, b;
+	// Midpoint and local tangent angle of every segment, walking a->verts->b -- one entry per
+	// straight run, so a bent pipe's arrows follow each segment's own direction.
+	function segmentMidpoints(l) {
+		var pts = [nodeById(l.from)].concat(l.verts, [nodeById(l.to)]), out = [], i, a, b;
 		for (i = 0; i < pts.length - 1; i++) {
-			var d = Math.hypot(pts[i + 1].x - pts[i].x, pts[i + 1].y - pts[i].y);
-			segLens.push(d); total += d;
+			a = pts[i]; b = pts[i + 1];
+			out.push({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2, angle: Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI });
 		}
-		target = total / 2;
-		for (i = 0; i < segLens.length; i++) {
-			if (acc + segLens[i] >= target || i === segLens.length - 1) {
-				a = pts[i]; b = pts[i + 1];
-				t = segLens[i] > 0 ? (target - acc) / segLens[i] : 0;
-				return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t, angle: Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI };
-			}
-			acc += segLens[i];
-		}
-		return null;
+		return out;
 	}
 	// Direction only makes sense once flows are known -- hidden until lastSolveResult exists,
 	// then rotated 180 degrees from the link's own from->to direction when Q is negative (flow
-	// actually runs to->from). Called both on geometry changes (drag) and after every solve.
+	// actually runs to->from; the same sign applies to every segment of one link, since it's a
+	// single pipe/pump, not a per-segment flow). Called both on geometry changes (drag) and
+	// after every solve.
 	function updateArrow(id) {
-		var le = linkEls[id]; if (!le || !le.arrow) { return; }
-		var md = linkMidpoint(linkById(id)), flow = lastSolveResult ? lastSolveResult.flows[id] : undefined;
-		if (!md || flow === undefined) { le.arrow.style.display = 'none'; return; }
-		var angle = md.angle + (flow < 0 ? 180 : 0);
-		le.arrow.setAttribute('transform', 'translate(' + md.x + ',' + md.y + ') rotate(' + angle + ')');
-		le.arrow.style.display = '';
+		var le = linkEls[id]; if (!le || !le.arrows) { return; }
+		var mids = segmentMidpoints(linkById(id)), flow = lastSolveResult ? lastSolveResult.flows[id] : undefined, i;
+		for (i = 0; i < le.arrows.length; i++) {
+			if (!mids[i] || flow === undefined) { le.arrows[i].style.display = 'none'; continue; }
+			var angle = mids[i].angle + (flow < 0 ? 180 : 0);
+			le.arrows[i].setAttribute('transform', 'translate(' + mids[i].x + ',' + mids[i].y + ') rotate(' + angle + ')');
+			le.arrows[i].style.display = '';
+		}
 	}
 	function buildLabelEls(lb) {
 		var an = lb.anchorNode ? nodeById(lb.anchorNode) : { x: lb.x, y: lb.y },
@@ -233,7 +236,7 @@ var EngCalcs = EngCalcs || {};
 	function rebuildLink(l) {
 		linkEls[l.id].line.remove();
 		linkEls[l.id].handles.forEach(function (h) { h.remove(); });
-		linkEls[l.id].arrow.remove();
+		linkEls[l.id].arrows.forEach(function (a) { a.remove(); });
 		buildLinkEls(l);
 		updateArrow(l.id);
 	}
@@ -314,6 +317,7 @@ var EngCalcs = EngCalcs || {};
 	var mode = 'select';
 	var pendingLinkFrom = null;
 	var setModeUI = null; // wired by wireToolbar(); lets non-toolbar code (Draw Example) reset the UI too
+	var pendingLinkPopupTimer = null; // see wirePointerEvents(): delays a link-tap popup so a double-click (add vertex) can cancel it
 
 	function setMode(newMode) {
 		mode = newMode; pendingLinkFrom = null;
@@ -419,55 +423,65 @@ var EngCalcs = EngCalcs || {};
 		requestAnimationFrame(tick);
 	}
 
+	// Three visually separated groups (Tom, 2026-07-30): Add (the five element types), Edit
+	// (Delete, Undo, Select -- in that order), and everything else (Zoom Extent, Draw Example).
 	function wireToolbar() {
-		var toolbar = document.getElementById('lpn_toolbar'), i;
-		var tools = [
-			{ mode: 'select', key: 'lpn_tool_select' },
-			{ mode: 'add-junction', key: 'lpn_tool_add_junction' },
-			{ mode: 'add-reservoir', key: 'lpn_tool_add_reservoir' },
-			{ mode: 'add-pipe', key: 'lpn_tool_add_pipe' },
-			{ mode: 'add-pump', key: 'lpn_tool_add_pump' },
-			{ mode: 'add-text', key: 'lpn_tool_add_text' },
-			{ mode: 'delete', key: 'lpn_tool_delete' }
-		];
-		var pc = EngCalcs.pageConfig || {};
+		var toolbar = document.getElementById('lpn_toolbar'), pc = EngCalcs.pageConfig || {};
 		setModeUI = function () {
 			toolbar.querySelectorAll('button[data-tool]').forEach(function (b) {
 				b.setAttribute('aria-pressed', b.dataset.tool === mode ? 'true' : 'false');
 			});
 		};
-		for (i = 0; i < tools.length; i++) {
-			(function (t) {
-				var btn = document.createElement('button');
-				btn.type = 'button';
-				btn.textContent = pc[t.key] || t.mode;
-				btn.setAttribute('aria-pressed', t.mode === mode ? 'true' : 'false');
-				btn.addEventListener('click', function () {
-					// Clicking the already-active tool toggles back to Select (Tom) rather than
-					// leaving no way to "turn off" Add/Delete except picking a different tool.
-					setMode(mode === t.mode && t.mode !== 'select' ? 'select' : t.mode);
-				});
-				btn.dataset.tool = t.mode;
-				toolbar.appendChild(btn);
-			}(tools[i]));
+		function group() {
+			var g = document.createElement('span');
+			g.className = 'lpn-toolbar-group';
+			toolbar.appendChild(g);
+			return g;
 		}
-		var extentBtn = document.createElement('button');
-		extentBtn.type = 'button';
-		extentBtn.textContent = pc.lpn_tool_zoom_extent || 'Zoom Extent';
-		extentBtn.addEventListener('click', zoomExtent);
-		toolbar.appendChild(extentBtn);
+		function modeButton(t, into) {
+			var btn = document.createElement('button');
+			btn.type = 'button';
+			btn.textContent = pc[t.key] || t.mode;
+			btn.setAttribute('aria-pressed', t.mode === mode ? 'true' : 'false');
+			btn.addEventListener('click', function () {
+				// Clicking the already-active tool toggles back to Select (Tom) rather than
+				// leaving no way to "turn off" Add/Delete except picking a different tool.
+				setMode(mode === t.mode && t.mode !== 'select' ? 'select' : t.mode);
+			});
+			btn.dataset.tool = t.mode;
+			into.appendChild(btn);
+		}
 
-		var exampleBtn = document.createElement('button');
-		exampleBtn.type = 'button';
-		exampleBtn.textContent = pc.lpn_tool_example || 'Draw example network';
-		exampleBtn.addEventListener('click', drawExampleNetwork);
-		toolbar.appendChild(exampleBtn);
+		var addGroup = group();
+		[
+			// Reservoir first (Tom, 2026-07-30): a great starting place for a network.
+			{ mode: 'add-reservoir', key: 'lpn_tool_add_reservoir' },
+			{ mode: 'add-junction', key: 'lpn_tool_add_junction' },
+			{ mode: 'add-pipe', key: 'lpn_tool_add_pipe' },
+			{ mode: 'add-pump', key: 'lpn_tool_add_pump' },
+			{ mode: 'add-text', key: 'lpn_tool_add_text' }
+		].forEach(function (t) { modeButton(t, addGroup); });
 
+		var editGroup = group();
+		modeButton({ mode: 'delete', key: 'lpn_tool_delete' }, editGroup);
 		var undoBtn = document.createElement('button');
 		undoBtn.type = 'button';
 		undoBtn.textContent = pc.lpn_tool_undo || 'Undo';
 		undoBtn.addEventListener('click', undo);
-		toolbar.appendChild(undoBtn);
+		editGroup.appendChild(undoBtn);
+		modeButton({ mode: 'select', key: 'lpn_tool_select' }, editGroup);
+
+		var miscGroup = group();
+		var extentBtn = document.createElement('button');
+		extentBtn.type = 'button';
+		extentBtn.textContent = pc.lpn_tool_zoom_extent || 'Zoom Extent';
+		extentBtn.addEventListener('click', zoomExtent);
+		miscGroup.appendChild(extentBtn);
+		var exampleBtn = document.createElement('button');
+		exampleBtn.type = 'button';
+		exampleBtn.textContent = pc.lpn_tool_example || 'Draw example network';
+		exampleBtn.addEventListener('click', drawExampleNetwork);
+		miscGroup.appendChild(exampleBtn);
 	}
 
 	// One reservoir, one pump (a link, per the header comment above), one junction between
@@ -562,6 +576,11 @@ var EngCalcs = EngCalcs || {};
 		svg.addEventListener('pointercancel', endPointer);
 
 		svg.addEventListener('dblclick', function (e) {
+			// Cancel a pending "open the link popup" from the first tap (see below) -- otherwise
+			// that popup opens right at the click point, covering it, so the second tap of this
+			// same double-click lands on the popup instead of the canvas and this dblclick event
+			// never fires at all. Tom caught this: double-click stopped adding vertices entirely.
+			if (pendingLinkPopupTimer) { clearTimeout(pendingLinkPopupTimer); pendingLinkPopupTimer = null; }
 			var t = document.elementFromPoint(e.clientX, e.clientY);
 			if (!t || !t.dataset) { return; }
 			if (t.classList.contains('lpn-vhandle')) { removeVertex(t.dataset.link, +t.dataset.vidx); }
@@ -608,7 +627,19 @@ var EngCalcs = EngCalcs || {};
 			} else if (mode === 'select' && t.dataset.node) {
 				openPopup(t.dataset.node, e.clientX, e.clientY);
 			} else if (mode === 'select' && t.dataset.link !== undefined && !t.classList.contains('lpn-vhandle')) {
-				openLinkPopup(t.dataset.link, e.clientX, e.clientY);
+				// Delayed, not immediate: gives the native dblclick listener above a chance to
+				// cancel this if a second tap arrives (add-a-vertex), matching the browser's own
+				// double-click timing window. Clear any PRIOR pending timer first -- the second
+				// tap of the double-click also lands here, and without this the first tap's timer
+				// was silently orphaned (its reference overwritten) rather than cancelled, so it
+				// fired anyway regardless of what dblclick cleared. Tom caught this too.
+				if (pendingLinkPopupTimer) { clearTimeout(pendingLinkPopupTimer); }
+				(function (linkId, sx, sy) {
+					pendingLinkPopupTimer = setTimeout(function () {
+						pendingLinkPopupTimer = null;
+						openLinkPopup(linkId, sx, sy);
+					}, 300);
+				}(t.dataset.link, e.clientX, e.clientY));
 			}
 		});
 	}

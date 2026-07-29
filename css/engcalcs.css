@@ -114,12 +114,17 @@ html[lang="zh"] .ec-welcome {
 #lpn_canvas { touch-action: none; cursor: default; }
 .lpn-node { fill: #2a6; stroke: #144; stroke-width: 1; cursor: pointer; }
 .lpn-node-reservoir { fill: #26a; }
-.lpn-link { stroke: #557; stroke-width: 2; cursor: pointer; }
+/* stroke-width was 2 -- too wide relative to a 1.6-2.2 radius node (Tom, 2026-07-30), and it was
+   also why the arrow read as absorbed into the pipe rather than a distinct mark. */
+.lpn-link { stroke: #557; stroke-width: 0.5; cursor: pointer; }
 .lpn-link-pump { stroke: #a52; }
 /* Flow-direction arrow at each link's midpoint (Tom, 2026-07-30, matching EPANET) -- hidden
    until a solve result exists (see updateArrow() in looped-network.js). pointer-events:none so
-   it never intercepts a click meant for the link/vertex underneath it. */
-.lpn-arrow { fill: #557; pointer-events: none; }
+   it never intercepts a click meant for the link/vertex underneath it.
+   An open chevron (unfilled polyline), not a solid triangle: a filled shape in the link's own
+   color read as absorbed into the (formerly thick) pipe stroke. Black and open protrudes above
+   and below the line instead of blending into it. */
+.lpn-arrow { fill: none; stroke: #000; stroke-width: 0.3; pointer-events: none; }
 .lpn-vhandle { fill: #fff; stroke: #a52; stroke-width: 1; cursor: move; }
 /* No font-size here -- it must be set inline in world units at each text element (see the
    buildNodeEls/buildLabelEls comments in looped-network.js for why a screen-pixel-flavored
@@ -130,3 +135,6 @@ html[lang="zh"] .ec-welcome {
 /* A leading checkmark, not just bold/outline (Tom) -- reads as a standard menu "this is
    active" mark rather than a generic emphasis style. */
 #lpn_toolbar button[aria-pressed="true"]::before { content: "\2713 "; }
+/* Three groups (Add / Delete-Undo-Select / Zoom-Example) -- a wider gap, not a line, separates
+   them (Tom, 2026-07-30: a divider line was more than needed). */
+.lpn-toolbar-group { display: inline-flex; gap: 6px; margin-right: 14px; }
