@@ -1,0 +1,296 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>LPN Phase 0 canvas spike (throwaway)</title>
+<style>
+  html,body{margin:0;height:100%;overflow:hidden;font:13px sans-serif;background:#eee}
+  #toolbar{position:fixed;top:0;left:0;right:0;z-index:10;background:#222;color:#fff;
+    padding:6px 8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  #toolbar button,#toolbar label{background:#444;color:#fff;border:1px solid #666;
+    padding:4px 8px;border-radius:3px;cursor:pointer}
+  #fps{margin-left:auto;font-family:monospace}
+  #canvas{position:absolute;top:34px;left:0;right:0;bottom:0;touch-action:none;background:#f7f7f2}
+  .node{fill:#2a6;stroke:#144;stroke-width:1;cursor:pointer}
+  .node.reservoir{fill:#26a}
+  .link{stroke:#557;stroke-width:2;cursor:pointer}
+  .link.pump{stroke:#a52}
+  .vhandle{fill:#fff;stroke:#a52;stroke-width:1;cursor:move}
+  .lbl{font-size:11px;fill:#333;pointer-events:none;user-select:none}
+  .leader{stroke:#999;stroke-width:1;stroke-dasharray:2,2}
+  .draglbl{cursor:move;pointer-events:all}
+  #popup{position:absolute;z-index:20;background:#fff;border:1px solid #333;padding:8px;
+    box-shadow:2px 2px 6px rgba(0,0,0,.3);display:none}
+  #popup input{width:80px}
+  @media print{
+    #toolbar,#popup{display:none!important}
+    #canvas{position:static;width:100%;height:100vh}
+  }
+</style>
+</head>
+<body>
+<div id="toolbar">
+  <button id="btnGrid">Toggle 200-node grid</button>
+  <button id="btnExtent">Zoom extent</button>
+  <label>Backdrop <input id="fileBackdrop" type="file" accept="image/*" style="display:none"></label>
+  <button id="btnRegister" disabled>Register backdrop (2 clicks + distance)</button>
+  <button id="btnPrint">Print preview</button>
+  <span id="fps">fps: --</span>
+</div>
+<svg id="canvas">
+  <g id="world">
+    <g id="backdropLayer"></g>
+    <g id="grid" style="display:none"></g>
+    <g id="linksLayer"></g>
+    <g id="nodesLayer"></g>
+    <g id="labelsLayer"></g>
+  </g>
+</svg>
+<div id="popup">
+  <div id="popupTitle"></div>
+  Elevation <input id="popupElev" type="number">
+  <button id="popupClose">Close</button>
+</div>
+<script>
+const NS='http://www.w3.org/2000/svg';
+const svg=document.getElementById('canvas');
+const world=document.getElementById('world');
+const linksLayer=document.getElementById('linksLayer');
+const nodesLayer=document.getElementById('nodesLayer');
+const labelsLayer=document.getElementById('labelsLayer');
+const backdropLayer=document.getElementById('backdropLayer');
+const gridLayer=document.getElementById('grid');
+
+const state={tx:60,ty:60,s:6};
+let nodes=[],links=[],labels=[];
+function el(tag,attrs,parent){
+  const e=document.createElementNS(NS,tag);
+  for(const k in attrs)e.setAttribute(k,attrs[k]);
+  if(parent)parent.appendChild(e);
+  return e;
+}
+function setTransform(){world.setAttribute('transform',`translate(${state.tx},${state.ty}) scale(${state.s})`);}
+function screenToWorld(sx,sy){const r=svg.getBoundingClientRect();
+  return {x:(sx-r.left-state.tx)/state.s, y:(sy-r.top-state.ty)/state.s};}
+
+// ---- build ~15-node, 2-loop network (3x5 grid graph) ----
+function buildNetwork(){
+  const cols=5,rows=3,dx=8,dy=8;
+  let id=0;
+  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
+    nodes.push({id:'N'+(id++),x:c*dx,y:r*dy,elev:100+r*2,reservoir:(r==0&&c==0)});
+  }
+  const at=(r,c)=>nodes[r*cols+c];
+  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
+    if(c<cols-1)links.push({id:'L'+links.length,a:at(r,c).id,b:at(r,c+1).id});
+    if(r<rows-1)links.push({id:'L'+links.length,a:at(r,c).id,b:at(r+1,c).id});
+  }
+  links[0].pump=true;
+  links[3].vx=at(0,2).x+dx*0.4; links[3].vy=at(0,2).y-3; // one link gets a bend vertex
+  labels.push({text:'خزان (reservoir)',x:-4,y:-6,anchorNode:'N0'});
+  labels.push({text:'መስቀለኛ መንገድ (junction)',x:20,y:22,anchorNode:'N7'});
+}
+
+// ---- 200-node headroom grid, hidden by default ----
+function buildGrid(){
+  const cols=20,rows=10,dx=6,dy=6,gn=[],gl=[];
+  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++)gn.push({x:100+c*dx,y:r*dy});
+  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
+    const i=r*cols+c;
+    if(c<cols-1)gl.push([i,i+1]);
+    if(r<rows-1)gl.push([i,i+cols]);
+  }
+  gl.forEach(([a,b])=>el('line',{x1:gn[a].x,y1:gn[a].y,x2:gn[b].x,y2:gn[b].y,class:'link'},gridLayer));
+  gn.forEach(n=>el('circle',{cx:n.x,cy:n.y,r:0.8,class:'node'},gridLayer));
+}
+
+function nodeById(id){return nodes.find(n=>n.id===id);}
+function render(){
+  linksLayer.innerHTML='';nodesLayer.innerHTML='';labelsLayer.innerHTML='';
+  links.forEach(l=>{
+    const a=nodeById(l.a),b=nodeById(l.b);
+    let e;
+    if(l.vx!==undefined){
+      e=el('polyline',{points:`${a.x},${a.y} ${l.vx},${l.vy} ${b.x},${b.y}`,
+        fill:'none',class:'link'+(l.pump?' pump':'')},linksLayer);
+      el('circle',{cx:l.vx,cy:l.vy,r:0.9,class:'vhandle','data-link':l.id},linksLayer);
+    } else {
+      e=el('line',{x1:a.x,y1:a.y,x2:b.x,y2:b.y,class:'link'+(l.pump?' pump':'')},linksLayer);
+    }
+    e.dataset.link=l.id;
+  });
+  nodes.forEach(n=>{
+    el('circle',{cx:n.x,cy:n.y,r:1.6,class:'node'+(n.reservoir?' reservoir':''),
+      'data-node':n.id},nodesLayer);
+    el('text',{x:n.x+2,y:n.y-2,class:'lbl',style:'font-size:'+(2)+'px'},nodesLayer).textContent=n.id+' '+n.elev;
+  });
+  labels.forEach((lb,i)=>{
+    const an=nodeById(lb.anchorNode);
+    el('line',{x1:an.x,y1:an.y,x2:an.x+lb.x,y2:an.y+lb.y,class:'leader'},labelsLayer);
+    const t=el('text',{x:an.x+lb.x,y:an.y+lb.y,class:'lbl draglbl',style:'font-size:3px',
+      'data-lbl':i},labelsLayer);
+    t.textContent=lb.text;
+  });
+}
+
+function bbox(){
+  const xs=nodes.map(n=>n.x),ys=nodes.map(n=>n.y);
+  return {minx:Math.min(...xs),maxx:Math.max(...xs),miny:Math.min(...ys),maxy:Math.max(...ys)};
+}
+function zoomExtent(){
+  const b=bbox(),r=svg.getBoundingClientRect(),pad=10;
+  const w=Math.max(b.maxx-b.minx,1),h=Math.max(b.maxy-b.miny,1);
+  state.s=Math.min((r.width-2*pad)/w,(r.height-2*pad)/h);
+  state.tx=pad-b.minx*state.s+ (r.width-2*pad-w*state.s)/2;
+  state.ty=pad-b.miny*state.s+ (r.height-2*pad-h*state.s)/2;
+  setTransform();
+}
+
+// ---- pointer interaction: pan, node drag, vertex drag, label drag, pinch, double-tap ----
+const pointers=new Map();
+let drag=null; // {type,...}
+let lastTap=null;
+function zoomAbout(sx,sy,factor){
+  const r=svg.getBoundingClientRect();
+  const lx=sx-r.left, ly=sy-r.top;
+  const wx=(lx-state.tx)/state.s, wy=(ly-state.ty)/state.s;
+  state.s*=factor;
+  state.tx=lx-wx*state.s; state.ty=ly-wy*state.s;
+  setTransform();
+}
+svg.addEventListener('wheel',e=>{
+  e.preventDefault();
+  zoomAbout(e.clientX,e.clientY, e.deltaY<0?1.1:1/1.1);
+},{passive:false});
+
+svg.addEventListener('pointerdown',e=>{
+  svg.setPointerCapture(e.pointerId);
+  pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(pointers.size===2){
+    const pts=[...pointers.values()];
+    drag={type:'pinch',d0:Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y),s0:state.s};
+    return;
+  }
+  const t=e.target;
+  if(t.dataset.node){
+    drag={type:'node',id:t.dataset.node};
+  } else if(t.dataset.link!==undefined && t.classList.contains('vhandle')){
+    drag={type:'vertex',id:t.dataset.link};
+  } else if(t.dataset.lbl!==undefined){
+    drag={type:'label',idx:+t.dataset.lbl};
+  } else {
+    drag={type:'pan',x0:e.clientX,y0:e.clientY,tx0:state.tx,ty0:state.ty};
+    // double-tap detection (touch only, background)
+    if(e.pointerType==='touch'){
+      const now=Date.now();
+      if(lastTap && now-lastTap.t<300 && Math.hypot(e.clientX-lastTap.x,e.clientY-lastTap.y)<20){
+        zoomAbout(e.clientX,e.clientY,1.6); lastTap=null; drag=null;
+      } else lastTap={t:now,x:e.clientX,y:e.clientY};
+    }
+  }
+});
+svg.addEventListener('pointermove',e=>{
+  if(!pointers.has(e.pointerId))return;
+  pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  frameCount++;
+  if(!drag)return;
+  if(drag.type==='pinch'&&pointers.size===2){
+    const pts=[...pointers.values()];
+    const d=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y);
+    const mx=(pts[0].x+pts[1].x)/2, my=(pts[0].y+pts[1].y)/2;
+    const factor=(d/drag.d0)*drag.s0/state.s;
+    zoomAbout(mx,my,factor);
+    return;
+  }
+  if(drag.type==='pan'){
+    state.tx=drag.tx0+(e.clientX-drag.x0); state.ty=drag.ty0+(e.clientY-drag.y0);
+    setTransform();
+  } else if(drag.type==='node'){
+    const w=screenToWorld(e.clientX,e.clientY);
+    const n=nodeById(drag.id); n.x=w.x; n.y=w.y; render();
+  } else if(drag.type==='vertex'){
+    const w=screenToWorld(e.clientX,e.clientY);
+    const l=links.find(l=>l.id===drag.id); l.vx=w.x; l.vy=w.y; render();
+  } else if(drag.type==='label'){
+    const w=screenToWorld(e.clientX,e.clientY);
+    const lb=labels[drag.idx]; const an=nodeById(lb.anchorNode);
+    lb.x=w.x-an.x; lb.y=w.y-an.y; render();
+  }
+});
+function endPointer(e){
+  pointers.delete(e.pointerId);
+  drag=null;
+}
+svg.addEventListener('pointerup',endPointer);
+svg.addEventListener('pointercancel',endPointer);
+svg.addEventListener('click',e=>{
+  if(e.target.dataset&&e.target.dataset.node)openPopup(e.target.dataset.node,e.clientX,e.clientY);
+});
+
+// ---- popup: click-to-popup with a field that writes back ----
+const popup=document.getElementById('popup');
+function openPopup(nodeId,sx,sy){
+  const n=nodeById(nodeId);
+  document.getElementById('popupTitle').textContent=nodeId;
+  document.getElementById('popupElev').value=n.elev;
+  popup.style.left=sx+'px'; popup.style.top=sy+'px'; popup.style.display='block';
+  document.getElementById('popupElev').onchange=ev=>{n.elev=+ev.target.value; render();};
+}
+document.getElementById('popupClose').onclick=()=>popup.style.display='none';
+
+// ---- 200-node headroom toggle ----
+document.getElementById('btnGrid').onclick=()=>{
+  gridLayer.style.display = gridLayer.style.display==='none' ? 'inline' : 'none';
+};
+document.getElementById('btnExtent').onclick=zoomExtent;
+document.getElementById('btnPrint').onclick=()=>window.print();
+
+// ---- registered backdrop image (two-point registration) ----
+let backdropImg=null, regClicks=[];
+document.getElementById('fileBackdrop').onchange=e=>{
+  const f=e.target.files[0]; if(!f)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    backdropLayer.innerHTML='';
+    backdropImg=el('image',{href:ev.target.result,x:0,y:0,width:40,height:30},backdropLayer);
+    backdropImg.setAttribute('transform','translate(0,0) scale(1)');
+    document.getElementById('btnRegister').disabled=false;
+  };
+  reader.readAsDataURL(f);
+};
+document.getElementById('btnRegister').onclick=()=>{
+  regClicks=[];
+  alert('Click two points on the backdrop image (e.g. the two ends of a bar scale), then enter the real distance.');
+  const handler=e=>{
+    if(e.target!==backdropImg)return;
+    const w=screenToWorld(e.clientX,e.clientY);
+    regClicks.push(w);
+    if(regClicks.length===2){
+      svg.removeEventListener('click',handler,true);
+      const pxDist=Math.hypot(regClicks[1].x-regClicks[0].x,regClicks[1].y-regClicks[0].y);
+      const real=+prompt('Real-world distance between the two points (world units):','30');
+      if(real>0){
+        const scale=real/pxDist;
+        backdropImg.setAttribute('transform',`translate(0,0) scale(${scale})`);
+      }
+    }
+  };
+  svg.addEventListener('click',handler,true);
+};
+
+// ---- fps meter (rAF-based, honest during actual drag) ----
+let frameCount=0,lastFpsT=performance.now(),lastFrameCount=0;
+function fpsLoop(t){
+  if(t-lastFpsT>500){
+    const fps=Math.round((frameCount-lastFrameCount)/((t-lastFpsT)/1000));
+    document.getElementById('fps').textContent='fps: '+fps;
+    lastFpsT=t; lastFrameCount=frameCount;
+  }
+  requestAnimationFrame(fpsLoop);
+}
+requestAnimationFrame(fpsLoop);
+
+buildNetwork(); buildGrid(); render(); zoomExtent();
+</script>
+</body>
+</html>
