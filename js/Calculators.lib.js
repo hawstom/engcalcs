@@ -5,11 +5,17 @@ var EngCalcs = EngCalcs || {};
 
 // Touch-friendly tooltips: activate Bootstrap tooltips on all cursor:help elements
 // so they respond to tap (click trigger) in addition to hover on desktop.
-document.addEventListener('DOMContentLoaded', function () {
-	document.querySelectorAll('[title][style*="cursor:help"], .ec-help[title]').forEach(function (el) {
-		new bootstrap.Tooltip(el, { trigger: 'hover focus click' });
+// Call again with the new subtree's root after building any UI at runtime (a dynamically
+// constructed property popup, for instance) — tooltips built after this ran once are otherwise
+// dead on touch, since a bare <a title> only navigates on first tap with no hover to fall back on.
+// getOrCreateInstance (not `new Tooltip`) makes this safe to call repeatedly on overlapping roots,
+// including document itself, without creating duplicate tooltip instances on the same element.
+EngCalcs.initTips = function (root) {
+	(root || document).querySelectorAll('[title][style*="cursor:help"], .ec-help[title]').forEach(function (el) {
+		bootstrap.Tooltip.getOrCreateInstance(el, { trigger: 'hover focus click' });
 	});
-});
+};
+document.addEventListener('DOMContentLoaded', function () { EngCalcs.initTips(document); });
 
 // PWA install prompt
 EngCalcs._deferredInstallPrompt = null;
