@@ -22,6 +22,9 @@
  *   they are invisible to every other check.
  * - Rule C (advisory): the name and the derivation disagree -- a key reaching a plain-text
  *   attribute without a _tip/_plain name, or named but only ever used in page HTML.
+ * - Rule D: double-quoted assignments. Single quotes are the standard because a
+ *   double-quoted value interpolates ($ec_lang[...] inside it silently depends on
+ *   assignment order) and because the old parser could not see one at all.
  *
  * Usage:
  *   php scripts/lang_syntax_validate.php
@@ -41,6 +44,7 @@ const DEFAULT_LANG_DIR = __DIR__ . '/../../lib';
 const PLAIN_TEXT_ATTRS = 'title|placeholder|value|alt|aria-label|data-[a-z-]+';
 
 require_once __DIR__ . '/exempt_keys.inc.php';
+require_once __DIR__ . '/lang_parse.inc.php';
 
 main($argv);
 
@@ -79,6 +83,7 @@ function main(array $argv): void
         $issues = array_merge($issues, lintFile($file));
         $issues = array_merge($issues, detectCloseTagIssues($file, $content));
         $issues = array_merge($issues, detectOutOfScopeAssignments($file, $content));
+        $issues = array_merge($issues, detectDoubleQuotedAssignments($file, $content));
         $issues = array_merge($issues, detectDuplicateKeys($file, $content));
         $issues = array_merge($issues, detectEscapeLeakage($file, $content));
         $issues = array_merge($issues, detectTagImbalance($file, $content));
@@ -214,6 +219,44 @@ function detectOutOfScopeAssignments(string $file, string $content): array
     return $issues;
 }
 
+/**
+ * Rule D: language strings are single-quoted (ROADMAP Task 163).
+ *
+ * The delimiter is not a style preference here, it is a correctness guard with two
+ * distinct failure modes, both of which had already happened in this repo:
+ *
+ * 1. A double-quoted assignment was invisible to every check built on the old
+ *    single-quote-only extractValues(), including Rules A and B. Eight real translated
+ *    keys sat unchecked in that blind spot for years.
+ * 2. A double-quoted value INTERPOLATES. lang.ec.es.php carried
+ *    $ec_lang['u_in2']="$ec_lang[u_in]^2" -- a value silently depending on another key
+ *    being assigned earlier in the same file. Reorder the file (the key-order normalizer
+ *    does exactly that) and the string becomes empty or wrong, with nothing to see in a
+ *    diff of the line itself.
+ *
+ * Single quotes remove both. An apostrophe in the text is escaped \'.
+ */
+function detectDoubleQuotedAssignments(string $file, string $content): array
+{
+    $issues = [];
+
+    $pattern = '/\$ec_lang(?:_intent)?\[\'[^\']+\'\]\s*=\s*"/m';
+    if (!preg_match_all($pattern, $content, $matches, PREG_OFFSET_CAPTURE)) {
+        return $issues;
+    }
+
+    foreach ($matches[0] as $m) {
+        $issues[] = formatIssue(
+            $file,
+            lineAtOffset($content, (int)$m[1]),
+            'double-quoted-assignment',
+            'Language strings are single-quoted. Rewrite with \' and escape any apostrophe as \\\'.'
+        );
+    }
+
+    return $issues;
+}
+
 function detectDuplicateKeys(string $file, string $content): array
 {
     $issues = [];
@@ -241,15 +284,18 @@ function detectDuplicateKeys(string $file, string $content): array
     return $issues;
 }
 
+/**
+ * Values as written in the source, escapes intact -- the right view for syntax rules,
+ * which check the literal text an author typed.
+ *
+ * This used to carry its own single-quote-only regex, which made every double-quoted
+ * assignment invisible to Rules A and B (ROADMAP Task 163). It now defers to the shared
+ * parser so this file and lang_parity_check.php cannot disagree about what a language
+ * file contains.
+ */
 function extractValues(string $content): array
 {
-    $values = [];
-    if (preg_match_all("/\\\$ec_lang\\['([^']+)'\\]\\s*=\\s*'((?:[^'\\\\]|\\\\.)*)';/", $content, $m, PREG_SET_ORDER)) {
-        foreach ($m as $match) {
-            $values[$match[1]] = $match[2];
-        }
-    }
-    return $values;
+    return ecLangRawValues($content);
 }
 
 /** Literal \/ or \" inside a single-quoted PHP value renders as garbage in HTML. */

@@ -117,25 +117,116 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   **no new translation** — the unit sets already exist and defaults are numbers — making it the
   cheapest testable change on the board. Do not ship it before the export; per-page default divergence
   is a real cost and (e) could argue against it.
-- 70|146| **Looped-network (Hardy Cross) solving — was Task 137 "Phase 3", extracted 2026-07-27.**
-  Extend `bpn_` (or build alongside it) to solve networks with loops, iterating to convergence —
-  the case the shipped branched calculator explicitly excludes ("no loops, no iteration"). Kept
-  deliberately *simple*: the point is a tool for someone who does not want to stand up EPANET, not an
-  EPANET clone. **Original gate (Task 137): "conditional, uncommitted — only after we're map-mashup
-  experts or users ask."** That gate is an **OR**, and the second branch may already be satisfied:
-  Task 144 records Tom's hypothesis that Hazen-Williams' ~517 lost humans per period are people who
-  arrived with a *network* and found a single-line calculator, then went back to EPANET or WATERCAD.
-  If Task 144 confirms that, this is promoted on evidence and **does not have to wait for Task 145** —
-  the two branches are independent. Until then it stays uncommitted. Do not start this before 144
-  produces a finding; the whole point of extracting it is that it now has a real trigger to wait for
-  rather than a vague someday.
-- 11|145| **Google Maps elevation/length helper for `bpn_` — was Task 137 "Phase 2", extracted
-  2026-07-27.** An isolated map mashup that pulls pipe lengths and node elevations into the branched
-  network, in a **separate lazy-loaded window**, with the hard architectural constraint from the
-  original spec: **the core solve never depends on it**, so the whole feature can be aborted at zero
-  cost if it proves infeasible or the API terms turn hostile. Feasibility-gated — investigate cost,
-  key management, and terms of service before building. Note this also feeds Task 146's original
-  "after we're map-mashup experts" branch.
+- 70|146| **Looped pipe network calculator with a map interface — new page `lpn_`. Scoped with Tom
+  2026-07-28; was "Looped-network (Hardy Cross) solving", extracted from Task 137 on 2026-07-27.**
+  A canvas/map-centric calculator where the interface *is* a drawing surface: elements (Junction,
+  Pipe, Reservoir, Pump, Text) added from a toolbar, properties edited in a popup, loops solved to
+  convergence. Full design record: **`dev/looped-network-calculator-scope.md`** — read that before
+  starting anything; this entry is the summary and the decision log.
+
+  **Three corrections to the entry this replaces, each a real change of direction:**
+  1. **New page and new prefix — not "extend `bpn_` (or build alongside it)".** `bpn_` /
+     `Branched-Network.php` stays exactly as shipped; the row-table form is genuinely better for a
+     simple series run, and this is a different UX with a different audience. `lpn_`,
+     `Looped-Network.php`, `js/looped-network.js`.
+  2. **Global gradient algorithm (Todini), not Hardy Cross.** Hardy Cross needs an explicit
+     independent-loop set, pseudo-loops through every pair of fixed-head sources, and an initial flow
+     distribution that *already* satisfies continuity at every node — all of which get re-derived
+     every time a user draws one more pipe on a map. GGA needs none of the three and is
+     Newton-quadratic. Hardy Cross is now recorded as the method **not** chosen, with that reason.
+  3. **Target scale is ~10–20 nodes, and that is a design decision, not a shortfall (Tom).** An
+     engineer with a 200-node model would rather crack open EPANET, and 200 nodes is past the
+     comfortable usability limit of a browser canvas unless we are *very* good at this. **Our
+     strength is the map interface, not capacity.** 200 nodes survives only as a headroom check —
+     we must not fall over — never as the sizing target. This single decision **deletes the hardest
+     part of the solver**: at 20 nodes a dense Cholesky is ~30 lines and microseconds, so the CSR /
+     conjugate-gradient / fill-reducing-ordering machinery is **cut, not deferred**.
+
+  **Identity strings** (decided 2026-07-28): menu "Looped Pipe Network (Map Interface)"; title "Free
+  Online Looped Pipe Network Calculator with Map Interface"; desc "Pressure and Flow in a Looped Pipe
+  Network You Draw on a Map". **"…on a Map" alone was rejected**: it reads as a *geographic overlay*,
+  which is Phase 4 and may never ship, whereas what actually distinguishes this page is that the
+  interface is a drawing surface. Do not let a later edit quietly shorten it back.
+
+  **Gate: satisfied.** Task 137's original gate was an OR — "after we're map-mashup experts **or**
+  users ask" — and it is now moot from a third direction: Tom committed to the calculator directly,
+  and Task 145 moved here (below), so this page is *how* we become map-mashup experts rather than
+  something waiting on it. Task 144's finding is still welcome evidence but is no longer a blocker.
+
+  **Risk is carried by two cheap spikes instead of by the gate** (Tasks 171 and 172 below): a
+  one-day throwaway canvas spike and a 2–3-day headless solver validated against published EPANET
+  output. Canvas technology is **deliberately uncommitted** until the spike runs — Tom's call, and
+  the right one: the honest comparison (in-house SVG vs Leaflet `CRS.Simple`) turns on touch
+  behavior and text rendering that argument cannot settle.
+
+  **Build on a dedicated git branch** so it never blocks other work on `master`. The scope doc and
+  these roadmap entries are planning artifacts and belong on `master`.
+
+  **Biggest standing risk is scope gravity toward EPANET.** The scope doc opens with a "Cut, not
+  deferred" list (extended-period simulation, water quality, PRV/PSV/FCV, demand patterns, energy
+  cost, **Tank** — Tom is right that it is a time-modeling element in a steady-state tool). Second
+  biggest is translation cost: ~85–95 new keys ≈ 1.7× the `bpn_` sprint, which is why **Phase 1
+  ships English-only** and the sprint waits until the string set stops moving.
+- 70|171| **Phase 0 spike: settle the canvas technology empirically (1 day, throwaway).** Prerequisite
+  for Task 146. One standalone HTML file, no PHP, no lang keys, no solver, no persistence: a ~15-node
+  two-loop network built from real SVG DOM nodes (`createElementNS`, **not** the `innerHTML`
+  string-rebuild every sketch in the suite uses today), plus a generated 200-node grid behind a
+  toggle as a headroom check. Must demonstrate pan, wheel zoom about the cursor, pinch, double-tap
+  zoom, click-to-popup with a field that writes back, node drag with incident links following, link
+  vertex handles, zoom-extent, a draggable label with a leader, **one Arabic and one Amharic label**,
+  and a print preview. **Acceptance criteria are written down before starting and the fps gate is at
+  target scale, not headroom scale:** drag visually smooth at ~20 nodes **on a real mid-range
+  phone**; the 200-node grid degrades gracefully rather than freezing; pinch works on iOS Safari and
+  Android Chrome without fighting page scroll; a 2 px link is finger-tappable; Arabic shapes and
+  orders correctly and neither label mirrors the network geometry; print is crisp vector; ≤300 LOC.
+  Fail any one → run the identical spike on Leaflet + `CRS.Simple` (half a day, since Leaflet gives
+  pan/zoom and `fitBounds` free) and compare the two artifacts. **Commit to a technology only then.**
+  Note the finding that should shape expectations: hit-testing is the part people assume is hard and
+  is the part SVG does natively; the real architectural change — giving up the `innerHTML` rebuild —
+  is forced by *every* candidate technology, so it is not a differentiator.
+- 70|172| **Phase 0.5 spike: headless GGA solver validated against published EPANET output (2–3
+  days).** Prerequisite for Task 146, **independent of Task 171** so a failure in one wastes nothing
+  from the other. `js/lpn-solver.js` plus a plain HTML harness over hardcoded networks: a two-loop
+  textbook case, one with a pump, one with an emitter, a disconnected one, a zero-demand one.
+  **Validate against EPANET's own published Net1 and Net2 results** — a network solver that is subtly
+  wrong is worse than none, and this suite's credibility is its only real asset. Design points that
+  must be got right and are easy to miss: the **zero-flow linearization is mandatory, not a corner
+  case** (a freshly drawn network sits at Q = 0 on iteration 1, where `1/p → ∞` with the
+  Hazen-Williams exponent — cut over below `Qmin = 1e-8 m³/s`); a **0.6 relaxation factor** once late
+  iterations stall, without which pumps and emitters oscillate forever; and **structural diagnostics
+  that run before the solve**, never by watching it fail.
+- 11|145| **Google Maps elevation/length helper — MOVED from `bpn_` to `lpn_` (Tom, 2026-07-28).**
+  Was "Google Maps elevation/length helper for `bpn_`", extracted from Task 137 "Phase 2" on
+  2026-07-27. Tom's reason for the move, recorded because it is a genuine prioritization signal and
+  not a technicality: he cannot get excited about the mashup on the branched calculator, and would
+  rather break it in on the map-centric page — which is where it belongs, since that page already
+  has a view layer, coordinates, and a reason to know where things are. **`bpn_` therefore has no map
+  phase at all now**; nothing should go looking for one.
+  An isolated map mashup that pulls pipe lengths and node elevations into the network, in a
+  **separate lazy-loaded window**, keeping the hard architectural constraint from the original spec —
+  **the core solve never depends on it**, so the whole feature can be aborted at zero cost if it
+  proves infeasible or the API terms turn hostile. That constraint matters *more* here, not less.
+  Feasibility-gated: investigate cost, key management, and terms of service before building. Note it
+  is no longer a prerequisite for Task 146 in either direction — Task 146 is now how we get the map
+  expertise, rather than something waiting on it.
+
+- 30|173| **`EngCalcs.initTips(root)` — tooltips built after page load are dead on touch.**
+  `js/Calculators.lib.js:8-12` activates Bootstrap tooltips exactly once, on `DOMContentLoaded`. Any
+  `.ec-help[title]` created later by JS therefore never gets a tooltip instance, and on a touch
+  device that means **the tip content is unreachable** — first tap does nothing, and there is no
+  hover to fall back on. This is precisely the failure CLAUDE.md's link+tip convention warns about
+  ("a bare `<a title>` just navigates on first tap"), reached by a different route. Fix is six lines:
+  extract the body into `EngCalcs.initTips(root)`, call it with `document` on `DOMContentLoaded`, and
+  call it again after building any dynamic UI. **Worth doing on its own merits, not only for Task
+  146** — but it is a hard prerequisite there, where every property popup is built at runtime.
+- 25|174| **Extract `echoUnitsRow()` from `echoCalculatorForm()`.** `lib/Calculators.lib.php:172-179`
+  emits the Restore-defaults / US / SI row inline, so it is reachable only by pages that call
+  `echoCalculatorForm()`. Any page that cannot use the fixed two-column input table — Task 146's map
+  page is the first, since its inputs are a per-element property sheet whose fields change with the
+  element type — must copy-paste suite chrome to keep the unit presets working. Pull the block into
+  its own function called by both. Mechanical, zero translation cost, and it keeps the preset buttons
+  a suite-level feature rather than something each new page re-implements. Note the shared JS already
+  cooperates: `EngCalcs.setUnits()` targets any `select[data-family]` anywhere on the page.
 
 ## New Calculators (Mission Expansion)
 
@@ -399,22 +490,6 @@ straight from `lib/lang.ec.sw.php`, i.e. an agent searching our own translated s
 
 ## Translation improvements
 
-- 8|163| **`lang_syntax_validate.php` cannot see double-quoted lang assignments.** Found while
-  closing Task 161, 2026-07-28 — incidental, not part of that task. `extractValues()` matches only
-  `$ec_lang['key']='...';` (single quotes). About 43 keys per file — ~1,160 strings suite-wide — are
-  written with double quotes and are therefore invisible to **every** check built on that helper,
-  including Rule A (`entity-in-lang-string`) and Rule B (`tag-in-plain-text-string`), the two rules
-  CLAUDE.md describes as absolute and tool-enforced. **The gap is currently benign and that is why
-  the priority is low, not because the hole is small:** all 43 double-quoted keys in
-  `lang.ec.en.php` are `u_` unit tokens (`u_psi`, `u_mh2o`, `u_kgfcm2`, …), and a grep for entities
-  inside double-quoted values across all 27 files returns **zero** hits. So nothing is hiding there
-  today. The risk is future: nothing stops the next edit from writing a real label with double
-  quotes (an apostrophe in the text is the obvious reason someone would), and it would then be
-  exempt from Rule A and Rule B **silently**. Fix is one regex — extend the pattern to the
-  double-quoted form, as `lang_parity_check.php`'s `parseLangAssignments()` already does — plus a
-  check that nothing new lights up. Note `parseLangAssignments()` in the parity checker is the
-  working reference implementation; the two helpers should probably converge.
-
 - 5|160| **`lib/lang.ec.tr.php` disagrees with itself on vowel harmony for the app name.**
   Extracted from Task 154 on close, 2026-07-28. Three keys write `EngCalcs'i`
   (`install_main_title`, `install_desktop_steps_html`, `install_cached_body`) and one writes
@@ -434,6 +509,56 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|163|[CC] **Language strings standardized on single quotes; the validator's blind spot closed —
+  DONE 2026-07-28.** Was: "`lang_syntax_validate.php` cannot see double-quoted lang assignments"
+  (priority 8, found incidentally while closing Task 161). `extractValues()` matched only
+  `$ec_lang['key']='...';`, so every double-quoted assignment was invisible to **every** check built
+  on it, including Rule A (`entity-in-lang-string`) and Rule B (`tag-in-plain-text-string`) — the two
+  rules CLAUDE.md calls absolute and tool-enforced.
+
+  **The original entry's central claim was wrong, and the correction is the most useful thing here.**
+  It said "the gap is currently benign … all 43 double-quoted keys in `lang.ec.en.php` are `u_` unit
+  tokens … nothing is hiding there today," and rated the risk as purely future. In fact **660
+  double-quoted assignments existed across the 27 files**, and eight were real translated content:
+  `mpf_main_title`, `mpf_main_desc`, `mpf_pipe_diameter`, `mpf_solver_no_solution` and
+  `contactSendMessage` in `lang.ec.tr.php`, `contact_title` in `lang.ec.bg.php`, and
+  `contactSpamPostfix` in bg and fr. The future risk had already happened; the estimate was low
+  because it was taken from the English file alone and generalized to all 27. **Lesson: when sizing a
+  defect that spans the language files, count in all 27 — English is the least representative one,
+  because it is the file that gets edited most carefully.**
+
+  **A second, worse defect surfaced only because the fix was verified rather than assumed.** Two
+  Spanish values were double-quoted *for interpolation*: `$ec_lang['u_gradePercent']="% $ec_lang[u_grade]"`
+  and `$ec_lang['u_in2']="$ec_lang[u_in]^2"`. Those strings silently depended on another key being
+  assigned earlier **in the same file** — and `lang_key_order_normalizer.php` exists specifically to
+  reorder these files, which would have blanked both with nothing visible in the diff of the changed
+  line. Spanish is the suite's second-largest audience (10% of human reach). Both are now literals.
+  The naive conversion to single quotes broke them exactly as it should have; a `var_export` diff of
+  every value PHP produces, before vs after, is what caught it. **Never land a mechanical rewrite of
+  the language files without that diff** — `php -l` passes happily on a string whose meaning changed.
+
+  **Shipped:**
+  1. `dev/scripts/lang_parse.inc.php` — one parser for all four tools. Exposes two deliberate views:
+     `ecLangRawValues()` (escapes intact, for syntax rules that check the literal text an author
+     typed) and `ecLangValues()` (escapes resolved, for comparison, where `Haws\'a` must equal
+     `Haws'a`). It still reads both quote forms on purpose — a parser that only understood the
+     standard could not report a violation of it.
+  2. All 660 double-quoted assignments converted to single quotes; 3 apostrophes escaped `\'`.
+     **Zero string values changed**, proven by diffing PHP's own evaluated output across 27 files and
+     15,552 keys.
+  3. **Rule D** (`double-quoted-assignment`) in `lang_syntax_validate.php`, covering `$ec_lang` and
+     `$ec_lang_intent`, a hard error, verified by injecting a violation and confirming it fires
+     rather than trusting a clean run.
+  4. `u_depthFrac` added to `translation_exempt_keys.json` for **fr only** — the one genuinely new
+     finding the closed hole exposed. French "fraction" is spelled identically; es/it/pt/ro/de all
+     differ, so it is not a global exemption.
+  5. Rule D documented in CLAUDE.md's Language Keys section, next to Rules A–C.
+
+  **Verified:** `lang_syntax_validate.php` byte-identical to its pre-change baseline (60 advisory
+  identical-to-english findings, no new class); `lang_parity_check.php` differs only by the intended
+  `u_depthFrac` reclassification (equal_to_english 68 → 67, exempt 1520 → 1521); payloads regenerated
+  to FRESH, with `payload_fr.json`'s delta 10 → 9 as the sole content change.
 
 - 0|166|[CC] **The 26-language sprint ran — DONE 2026-07-28.** 26 Sonnet agents, one per language,
   covering 11 new keys common to every language (`calc_units_us`, `calc_units_si`, the eight `hw_*`
@@ -1436,7 +1561,10 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
   2026-07-27 and are no longer tracked here** — Phase 2 = the feasibility-gated Google Maps
   elevation/length helper (isolated, lazy-loaded, core solve never depends on it); Phase 3 = looped
   (Hardy Cross) networks, originally "conditional, uncommitted, only after we're map-mashup experts
-  or users ask." **Filing lesson (Tom, 2026-07-27):** leaving unbuilt phases inside a `- 0|…|` block
+  or users ask." **Both have since left `bpn_` entirely (2026-07-28):** Task 146 became a separate
+  map-interface calculator with its own prefix (`lpn_`), using the global gradient algorithm rather
+  than Hardy Cross, and Task 145's map mashup moved onto that page with it. **`bpn_` therefore has no
+  remaining phases and no map work** — nothing should go looking for either here. **Filing lesson (Tom, 2026-07-27):** leaving unbuilt phases inside a `- 0|…|` block
   in `## Completed` means nothing will ever surface them again — closed blocks are not scanned during
   prioritization, so the only retrieval mechanism was Tom personally remembering. Future work must
   never be parked inside a DONE block; extract it to its own task, even if the priority is low and

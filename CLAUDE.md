@@ -78,6 +78,7 @@ Each calculator owns a short prefix for its language keys and JS variables:
 | `cs_`  | Canal Seepage & Conveyance Efficiency |
 | `ip_`  | Irrigation Pressure (main/lateral branch pressure profile, DU estimate & application design) |
 | `bpn_` | Branched Pipe Network (distributary/tree network; parent-pointer topology, two-pass fixed-demand solve, series-by-default, Manning/HW/DW switching) |
+| `lpn_` | Looped Pipe Network, Map Interface — **claimed 2026-07-28, not built.** Canvas/map-centric looped network solved by the global gradient algorithm. Sibling of `bpn_`, which is unaffected. Scope: `dev/looped-network-calculator-scope.md`; ROADMAP Task 146 |
 
 New calculators must define a new unique prefix and document it here.
 
@@ -363,6 +364,31 @@ entire JS tip route in the first place.
 
 **When adding a tooltip or an attribute-bound label, you need do nothing** — the deriver picks it up
 automatically. That is the point: it replaces "remember not to."
+
+### Rule D: language strings are single-quoted (ROADMAP Task 163, enforced 2026-07-28)
+
+`$ec_lang['k']='value';` — never `"value"`. An apostrophe inside the text is escaped `\'`. Enforced
+for both `$ec_lang` and `$ec_lang_intent` by `lang_syntax_validate.php`
+(`double-quoted-assignment`); all 660 pre-existing double-quoted assignments were converted, so the
+count is zero and any new one is a hard error.
+
+**This is a correctness guard, not a style preference.** Two failure modes, both of which had
+already happened here:
+
+- **A double-quoted value interpolates.** `lang.ec.es.php` carried
+  `$ec_lang['u_in2']="$ec_lang[u_in]^2"` — a string silently depending on another key being
+  assigned *earlier in the same file*. `lang_key_order_normalizer.php` reorders these files, which
+  would have blanked it with nothing visible in the diff of that line. Both Spanish cases are now
+  literals.
+- **Nothing could see it.** The old `extractValues()` matched single quotes only, so every
+  double-quoted assignment was exempt from Rules A and B — the two rules this file calls absolute —
+  *silently*. Eight real translated keys sat in that blind spot, four of them in `lang.ec.tr.php`.
+
+Both parsers now come from `dev/scripts/lang_parse.inc.php`, which still reads either form on
+purpose: a parser that only understood the standard could not report a violation of it. It exposes
+two views of a value, and callers pick deliberately — `ecLangRawValues()` (escapes intact, for
+syntax rules, which check the literal text an author typed) and `ecLangValues()` (escapes resolved,
+for comparison, where `Haws\'a` must equal `Haws'a`).
 
 ## Translation Sprints
 

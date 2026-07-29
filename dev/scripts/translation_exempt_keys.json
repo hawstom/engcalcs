@@ -43,6 +43,7 @@
     "dw_regime_laminar":       { "category": "cognate", "languages": ["de", "es", "id", "pt", "ro"], "reason": "'Laminar' is the correct word in these languages. Others (fr laminaire, it laminare, cs/hr laminarni) genuinely differ, so this is not a global exemption." },
     "or_shape_circular":       { "category": "cognate", "languages": ["es", "pt"], "reason": "'Circular' is correct Spanish and Portuguese." },
     "or_shape_rectangular":    { "category": "cognate", "languages": ["es"], "reason": "'Rectangular' is correct Spanish; Portuguese is 'Retangular'." },
+    "u_depthFrac":             { "category": "cognate", "languages": ["fr"], "reason": "'Fraction' is the correct French word, spelled identically. Surfaced only when Task 163 taught the validator to read double-quoted assignments -- this key had never been checked. Not global: es fraccion, it frazione, pt fracao, ro fractie, de Anteil all genuinely differ." },
 
     "calc_units_us":           { "category": "abbreviation", "languages": "*", "reason": "US -- the unit-preset button. All 26 languages independently kept it in the Task 166 sprint; it is the international abbreviation for the customary system and renders in a narrow button beside SI." },
     "calc_units_si":           { "category": "abbreviation", "languages": "*", "reason": "SI -- Systeme International, an international abbreviation by definition. Same button pair as calc_units_us." }

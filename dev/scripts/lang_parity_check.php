@@ -18,6 +18,7 @@ const DEFAULT_LANG_DIR = __DIR__ . '/../../lib';
 const EN_FILE = DEFAULT_LANG_DIR . '/lang.ec.en.php';
 
 require_once __DIR__ . '/exempt_keys.inc.php';
+require_once __DIR__ . '/lang_parse.inc.php';
 
 main($argv);
 
@@ -225,24 +226,19 @@ function printList(string $label, array $keys): void
     echo '  ' . $label . ': ' . implode(', ', $keys) . "\n";
 }
 
+/**
+ * Values as PHP would produce them -- escapes resolved, which is what comparison needs
+ * (Haws\'a must equal Haws'a).
+ *
+ * This was the working reference implementation while lang_syntax_validate.php carried a
+ * weaker single-quote-only regex; both now defer to the shared parser (ROADMAP Task 163)
+ * so the two tools cannot disagree about what a language file contains. Behavior is
+ * unchanged except that escapes are unescaped per PHP's actual rules rather than by
+ * stripcslashes(), which also resolves \n and \t that a single-quoted PHP string does not.
+ */
 function parseLangAssignments(string $content): array
 {
-    $pattern = '/\$ec_lang\[\'([^\']+)\'\]\s*=\s*(\'((?:[^\'\\\\]|\\\\.)*)\'|"((?:[^"\\\\]|\\\\.)*)"|([^;]*));/m';
-    preg_match_all($pattern, $content, $matches, PREG_SET_ORDER);
-
-    $values = [];
-    foreach ($matches as $m) {
-        $key = $m[1];
-        if (isset($m[3]) && $m[3] !== '') {
-            $values[$key] = stripcslashes($m[3]);
-        } elseif (isset($m[4]) && $m[4] !== '') {
-            $values[$key] = stripcslashes($m[4]);
-        } else {
-            $values[$key] = trim($m[5] ?? '');
-        }
-    }
-
-    return $values;
+    return ecLangValues($content);
 }
 
 /**
