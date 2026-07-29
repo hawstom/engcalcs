@@ -153,12 +153,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   and Task 145 moved here (below), so this page is *how* we become map-mashup experts rather than
   something waiting on it. Task 144's finding is still welcome evidence but is no longer a blocker.
 
-  **Risk is carried by two cheap spikes instead of by the gate** (Tasks 171 and 172 below): a
-  one-day throwaway canvas spike and a 2–3-day headless solver validated against published EPANET
-  output. Canvas technology is **deliberately uncommitted** until the spike runs — Tom's call, and
-  the right one: the honest comparison (in-house SVG vs Leaflet `CRS.Simple`) turns on touch
-  behavior and text rendering that argument cannot settle.
-
   **Build on a dedicated git branch** so it never blocks other work on `master`. The scope doc and
   these roadmap entries are planning artifacts and belong on `master`.
 
@@ -167,34 +161,52 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   cost, **Tank** — Tom is right that it is a time-modeling element in a steady-state tool). Second
   biggest is translation cost: ~85–95 new keys ≈ 1.7× the `bpn_` sprint, which is why **Phase 1
   ships English-only** and the sprint waits until the string set stops moving.
-- 70|171| **Phase 0 spike: settle the canvas technology empirically (1 day, throwaway).** Prerequisite
-  for Task 146. One standalone HTML file, no PHP, no lang keys, no solver, no persistence: a ~15-node
-  two-loop network built from real SVG DOM nodes (`createElementNS`, **not** the `innerHTML`
-  string-rebuild every sketch in the suite uses today), plus a generated 200-node grid behind a
-  toggle as a headroom check. Must demonstrate pan, wheel zoom about the cursor, pinch, double-tap
-  zoom, click-to-popup with a field that writes back, node drag with incident links following, link
-  vertex handles, zoom-extent, a draggable label with a leader, **one Arabic and one Amharic label**,
-  and a print preview. **Acceptance criteria are written down before starting and the fps gate is at
-  target scale, not headroom scale:** drag visually smooth at ~20 nodes **on a real mid-range
-  phone**; the 200-node grid degrades gracefully rather than freezing; pinch works on iOS Safari and
-  Android Chrome without fighting page scroll; a 2 px link is finger-tappable; Arabic shapes and
-  orders correctly and neither label mirrors the network geometry; print is crisp vector; ≤300 LOC.
-  Fail any one → run the identical spike on Leaflet + `CRS.Simple` (half a day, since Leaflet gives
-  pan/zoom and `fitBounds` free) and compare the two artifacts. **Commit to a technology only then.**
-  Note the finding that should shape expectations: hit-testing is the part people assume is hard and
-  is the part SVG does natively; the real architectural change — giving up the `innerHTML` rebuild —
-  is forced by *every* candidate technology, so it is not a differentiator.
-- 70|172| **Phase 0.5 spike: headless GGA solver validated against published EPANET output (2–3
-  days).** Prerequisite for Task 146, **independent of Task 171** so a failure in one wastes nothing
-  from the other. `js/lpn-solver.js` plus a plain HTML harness over hardcoded networks: a two-loop
-  textbook case, one with a pump, one with an emitter, a disconnected one, a zero-demand one.
-  **Validate against EPANET's own published Net1 and Net2 results** — a network solver that is subtly
-  wrong is worse than none, and this suite's credibility is its only real asset. Design points that
-  must be got right and are easy to miss: the **zero-flow linearization is mandatory, not a corner
-  case** (a freshly drawn network sits at Q = 0 on iteration 1, where `1/p → ∞` with the
-  Hazen-Williams exponent — cut over below `Qmin = 1e-8 m³/s`); a **0.6 relaxation factor** once late
-  iterations stall, without which pumps and emitters oscillate forever; and **structural diagnostics
-  that run before the solve**, never by watching it fail.
+
+  **Phases. Risk is carried by two cheap spikes rather than by the old gate.** The two spikes are
+  **independent of each other**, so a failure in one wastes nothing from the other, and each is a
+  real abort point. (These were briefly filed as separate Tasks 171/172 on 2026-07-28 and folded back
+  the same day — the "extract unbuilt phases to their own task" lesson from Task 137 applies to
+  *closing a parent*, because blocks in `## Completed` are never re-scanned. This parent is open and
+  gets scanned every pass, so extraction bought nothing and only scattered the design.)
+
+  - **Phase 0 — canvas spike (1 day, throwaway).** Settles the technology empirically. One standalone
+    HTML file, no PHP, no lang keys, no solver, no persistence: a ~15-node two-loop network built
+    from real SVG DOM nodes (`createElementNS`, **not** the `innerHTML` string-rebuild every sketch
+    in the suite uses today), plus a generated 200-node grid behind a toggle as a headroom check.
+    Must demonstrate pan, wheel zoom about the cursor, pinch, double-tap zoom, click-to-popup with a
+    field that writes back, node drag with incident links following, link vertex handles,
+    zoom-extent, a draggable label with a leader, **one Arabic and one Amharic label**, a
+    **registered background image** (see the backdrop note below), and a print preview.
+    **Acceptance criteria are written down before starting, and the fps gate is at target scale, not
+    headroom scale:** drag visually smooth at ~20 nodes **on a real mid-range phone**; the 200-node
+    grid degrades gracefully rather than freezing; pinch works on iOS Safari and Android Chrome
+    without fighting page scroll; a 2 px link is finger-tappable; Arabic shapes and orders correctly
+    and neither label mirrors the network geometry; print is crisp vector; ≤300 LOC. Fail any one →
+    run the identical spike on Leaflet + `CRS.Simple` (half a day) and compare artifacts. **Commit to
+    a technology only then.** Expectation-setter: hit-testing is the part people assume is hard and
+    is the part SVG does natively; the real architectural change — giving up the `innerHTML` rebuild
+    — is forced by *every* candidate, so it is not a differentiator.
+  - **Phase 0.5 — headless GGA solver (2–3 days).** `js/lpn-solver.js` plus a plain HTML harness over
+    hardcoded networks: a two-loop textbook case, one with a pump, one with an emitter, a
+    disconnected one, a zero-demand one. **Validate against EPANET's own published Net1 and Net2
+    results** — a network solver that is subtly wrong is worse than none, and this suite's
+    credibility is its only real asset. Easy-to-miss design points: the **zero-flow linearization is
+    mandatory, not a corner case** (a freshly drawn network sits at Q = 0 on iteration 1, where
+    `1/p → ∞` with the Hazen-Williams exponent — cut over below `Qmin = 1e-8 m³/s`); a **0.6
+    relaxation factor** once late iterations stall, without which pumps and emitters oscillate
+    forever; and **structural diagnostics that run before the solve**, never by watching it fail.
+  - **Phases 1–4** are in the scope doc.
+
+  **Backdrop: the network is drawn over a background, and the background is usually not a map (Tom,
+  2026-07-28).** Nobody uses EPANET without a backdrop, and in practice that backdrop is a plan
+  sheet, a CAD export, or a local aerial — **not** a Google map or Google aerial. So the primary
+  backdrop feature is **a user-supplied image with a two-point scale/rotate registration**, in the
+  page's own flat Cartesian world coordinates, with **no projection anywhere**. That is what EPANET
+  itself does, it is a Phase 2-sized feature rather than a Phase 4 one, and it needs no API key, no
+  terms of service, and no network connection — so it survives offline in the PWA. **Tiled online
+  maps (Task 145) then become one more backdrop type that happens to arrive pre-registered**, not
+  the foundation. Design consequence for Phase 0: the coordinate seam must be able to place and
+  scale a backdrop image from day one, which is why the spike now includes one.
 - 11|145| **Google Maps elevation/length helper — MOVED from `bpn_` to `lpn_` (Tom, 2026-07-28).**
   Was "Google Maps elevation/length helper for `bpn_`", extracted from Task 137 "Phase 2" on
   2026-07-27. Tom's reason for the move, recorded because it is a genuine prioritization signal and
@@ -209,6 +221,25 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   Feasibility-gated: investigate cost, key management, and terms of service before building. Note it
   is no longer a prerequisite for Task 146 in either direction — Task 146 is now how we get the map
   expertise, rather than something waiting on it.
+
+  **Demoted from foundation to one backdrop type among several (Tom, 2026-07-28).** Tom's own read:
+  the mashup is very cool and gets cooler with time, but its importance is unproven — and in real
+  practice a network is drawn over a plan sheet, a CAD export, or a local aerial, essentially **never**
+  over a Google map or Google aerial. So Task 146 builds a **projection-free user-supplied backdrop**
+  first (see its Backdrop note), and this task adds tiles as a *pre-registered* backdrop later. That
+  ordering also means the offline PWA case keeps working, which a tile-dependent design would break.
+
+  **Two real problems this task must solve, neither of which the projection-free backdrop has:**
+  1. **Projection.** Tiles are Web Mercator; a plan sheet is State Plane, UTM, or a site grid.
+     Mixing them means an actual coordinate transformation, not a scale factor. **Do not let Web
+     Mercator become the document's coordinate system** — the document stays flat Cartesian, and
+     georeferencing is a property of the *backdrop layer*, not of the network.
+  2. **Web Mercator distances are not ground distances.** Scale error is `1/cos(latitude)`: ~15% at
+     40°, ~30% at 50°, and unbounded toward the poles. A pipe length measured naively off a tiled
+     backdrop is therefore *wrong by more than most engineering tolerances*, silently, and in a way
+     that looks perfectly reasonable on screen. Any length derived from tiles must be corrected, or
+     computed geodesically from lat/lng rather than from screen geometry. This is the strongest
+     argument for the existing rule that **`len` is stored and overridable, never derived**.
 
 - 30|173| **`EngCalcs.initTips(root)` — tooltips built after page load are dead on touch.**
   `js/Calculators.lib.js:8-12` activates Bootstrap tooltips exactly once, on `DOMContentLoaded`. Any

@@ -1,7 +1,7 @@
 # Looped Pipe Network Calculator (Map Interface) — Scope
 
-Status: **scoped 2026-07-28, not started.** ROADMAP Task 146, with spikes as Tasks 171 (canvas) and
-172 (solver). Prefix **`lpn_`**; page `Looped-Network.php`; JS `js/looped-network.js`.
+Status: **scoped 2026-07-28, not started.** ROADMAP Task 146, whose entry carries the phase list and
+the decision log. Prefix **`lpn_`**; page `Looped-Network.php`; JS `js/looped-network.js`.
 
 Sibling of `bpn_` / `Branched-Network.php`, which stays **exactly as shipped** — this is a new page,
 not an evolution of that one. The row-table form is genuinely better for a simple series run, and
@@ -71,6 +71,9 @@ with a new reason, not an appeal to completeness.
 - **Sparse linear algebra** — CSR storage, conjugate gradient, fill-reducing orderings, cached
   symbolic factorization. Cut *because of* the 10–20 node target; see below.
 - **Any matrix library.** math.js is ~180 KB for a function that is thirty lines here.
+- **Being a GIS.** No coordinate reference systems to choose, no reprojection, no datum handling, no
+  shapefile or GeoJSON import. The document is flat Cartesian and stays that way; see "Backdrop and
+  coordinates". Tiled maps (Phase 4) are a backdrop layer's problem, never the network's.
 
 ## Solver
 
@@ -207,6 +210,67 @@ Rules, stated as rules because each is silently wrong when broken:
 - **IDs restricted to EPANET-legal characters** (no spaces, no quotes), validated on entry. Costs
   nothing now and keeps a future `.inp` exporter a pure function.
 
+## Backdrop and coordinates
+
+**A network is drawn over something, and that something is usually not a map (Tom, 2026-07-28.)**
+Nobody uses EPANET without a backdrop, and in practice the backdrop is a plan sheet, a CAD export, or
+a local aerial — **never** a Google map or Google aerial, though it could be. This reorders the work:
+the valuable, tractable feature is a *user-supplied* backdrop; online tiles are a later, optional
+enhancement rather than the foundation.
+
+### The document is flat Cartesian, always
+
+One rule holds the whole design together: **the document's coordinates are a plain flat Cartesian
+world system with no projection, no datum, and no units beyond a scale the user sets.** Every element
+position, every length, every backdrop registration lives in that system. This is not a simplification
+to be regretted later — it is what keeps the calculator honest about being a hydraulic tool that
+happens to have a map, rather than a GIS.
+
+Georeferencing, when it arrives, is a property of a **backdrop layer**, never of the network.
+
+### Phase 2: user-supplied backdrop, projection-free
+
+An image (PNG/JPG, and a scanned plan is the common case) placed by **two-point registration**: the
+user clicks two points on the image and states the real distance between them, which yields scale,
+offset and optionally rotation. This is exactly what EPANET does, and it is deliberately dumb:
+
+- **No projection, no transformation library, no coordinate system to choose.** Two points and a
+  distance.
+- **No API key, no terms of service, no attribution obligations.**
+- **No network connection** — so it survives offline in the PWA, which is a real part of this suite's
+  audience. A tile-dependent design would break exactly the field user we care most about.
+- Stored as a data URI or an object reference in the document, subject to the localStorage budget —
+  a scanned plan can be large, so downscale on import and record the original dimensions.
+
+**Design consequence for the Phase 0 spike:** the coordinate seam must be able to place and scale a
+backdrop image from day one, so the spike includes one. Retrofitting a backdrop into a view layer
+that assumed nothing behind the network is the kind of rework this doc exists to prevent.
+
+### Phase 4 (Task 145): tiles, and the two traps they bring
+
+If online tiles land, they are **one more backdrop type that happens to arrive pre-registered**. Two
+problems appear that the user-supplied backdrop simply does not have, and both are silent:
+
+1. **Projection.** Tiles are Web Mercator; a plan sheet is State Plane, UTM, or a site grid. Mixing
+   them is a real coordinate transformation, not a scale factor. **Do not let Web Mercator become the
+   document's coordinate system** — that is the failure mode, and it is one-way.
+2. **Web Mercator distances are not ground distances.** The scale error is `1/cos(latitude)`: about
+   15% at 40°, 30% at 50°, unbounded toward the poles. A pipe length measured naively off a tiled
+   backdrop is therefore wrong by far more than any engineering tolerance, silently, while looking
+   entirely reasonable on screen. Lengths from tiles must be computed geodesically from lat/lng or
+   corrected for latitude — never taken from screen geometry.
+
+Trap 2 is the strongest argument for the existing schema rule that **`len` is stored and overridable,
+never derived**. It was written for a different reason (schematic geometry is not real geometry) and
+turns out to be exactly the guard this needs.
+
+### Effect on the canvas technology choice
+
+This weakens the Leaflet case rather than strengthening it, which is the opposite of what the Task 145
+move suggested on its own. Leaflet's central gift is tile handling; a registered static image is an
+`ImageOverlay` in Leaflet and an `<image>` with a transform in SVG — comparably easy either way. So
+the spike still decides, and it decides on touch behavior and text rendering as before.
+
 ## Suite integration
 
 **The page emits its own `<form id="formInput">`** rather than calling `echoCalculatorForm()`. Its
@@ -288,12 +352,12 @@ through `escapeAttr` and use the whole-label `.ec-help` / `.ec-tip` nesting.
 
 ## Phasing
 
-**Phase 0 (Task 171) — canvas spike, 1 day, throwaway.** Settles the technology empirically. See the
-roadmap entry for the full acceptance criteria. Canvas technology is **deliberately uncommitted**
-until this runs (Tom's call).
+**Phase 0 — canvas spike, 1 day, throwaway.** Settles the technology empirically. Full acceptance
+criteria are in the ROADMAP Task 146 entry. Canvas technology is **deliberately uncommitted** until
+this runs (Tom's call). Includes a registered backdrop image, per the Backdrop section above.
 
-**Phase 0.5 (Task 172) — headless solver, 2–3 days, independent of Phase 0**, validated against
-published EPANET Net1/Net2 output.
+**Phase 0.5 — headless solver, 2–3 days, independent of Phase 0**, validated against published
+EPANET Net1/Net2 output.
 
 **Phase 1 — smallest shippable.** Page, prefix, menu entry, `sw.js` entry, English-only strings.
 Junction / Pipe / Reservoir / Pump / Text. Toolbar: Select, Pan, Add-each, Delete, Zoom Extent.
@@ -311,17 +375,21 @@ A Notes list stating honestly what the tool does not do.
   (not localStorage) and wire Ctrl-Z. ~15 lines given a serializable document, and a map editor
   without it makes users quit.
 
-**Phase 2 — reporting and legibility.** Node and link report tables, the EPANET-style element browser
-list, the full label toggle set with extrema over/underline marks, the gear/settings panel (ID
-prefixes J/L/P/R, emitter exponent, text size and its map-vs-screen units toggle, tolerance),
-multiple named saved networks. **The translation sprint goes here.**
+**Phase 2 — reporting, legibility, and the backdrop.** Node and link report tables, the EPANET-style
+element browser list, the full label toggle set with extrema over/underline marks, the gear/settings
+panel (ID prefixes J/L/P/R, emitter exponent, text size and its map-vs-screen units toggle,
+tolerance), multiple named saved networks, and the **user-supplied backdrop image with two-point
+registration** — projection-free, offline-capable, and the thing that actually makes the map
+interface useful for real work. **The translation sprint goes here.**
 
 **Phase 3 — polish and reach.** Polyline pipes with vertex editing; draggable labels with leaders and
 collision avoidance; map insets for congested areas; `.inp` export/import; **valves as a link
 property (status + setting), not a fifth element type** — Tom's instinct matches EPANET's own data
 model.
 
-**Phase 4 — Task 145**, the Google/OSM map and elevation mashup, moved here from `bpn_`.
+**Phase 4 — Task 145**, the Google/OSM tiled map and elevation mashup, moved here from `bpn_`. By
+this point it is one more backdrop *type*, not a foundation — and it brings the projection and
+Web-Mercator-distance traps documented in the Backdrop section.
 
 ## Abort points
 
