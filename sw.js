@@ -1,6 +1,6 @@
 // EngCalcs Service Worker
 // Cache version — bump this string when static assets change
-const CACHE_VERSION = 'engcalcs-v5';
+const CACHE_VERSION = 'engcalcs-v6';
 const ASSET_CACHE = CACHE_VERSION + '-assets';
 const PAGE_CACHE  = CACHE_VERSION + '-pages';
 
@@ -24,6 +24,7 @@ const STATIC_ASSETS = [
   '/engcalcs/js/canal-seepage.js',
   '/engcalcs/js/irrigation-pressure.js',
   '/engcalcs/js/rock-chute.js',
+  '/engcalcs/js/looped-network.js',
   '/engcalcs/icons/icon.svg',
   '/engcalcs/icons/icon-192.png',
   '/engcalcs/icons/icon-512.png',
@@ -51,6 +52,7 @@ const CALC_PAGES = [
   '/engcalcs/Canal-Seepage.php',
   '/engcalcs/Irrigation-Pressure.php',
   '/engcalcs/Rock-Chute.php',
+  '/engcalcs/Looped-Network.php',
   '/engcalcs/Install.php',
 ];
 

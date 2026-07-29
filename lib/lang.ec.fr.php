@@ -5,7 +5,6 @@
 // Units (alphabetical order)
 // Necessary for calculator units selectors
 $ec_lang['u_depthFrac']='fraction';
-
 $ec_lang['u_depthPercent']='%';
 $ec_lang['u_ft2']='ft^2';
 $ec_lang['u_ft3ps']='ft^3/s';
@@ -86,8 +85,8 @@ $ec_lang['ec_name_label']='Enregistrer ce calcul :';
 $ec_lang['ec_name_placeholder']='Nom';
 $ec_lang['ec_name_hint']='Enregistre les données saisies dans l\'URL pour les signets, la récupération de l\'historique et le partage';
 $ec_lang['calc_copy_link']='Copier le lien';
-$ec_lang['calc_copy_link_done']='Copié !';
 $ec_lang['ec_related_calcs']='Calculateurs associés :';
+$ec_lang['calc_copy_link_done']='Copié !';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Perte de charge Darcy-Weisbach';
 $ec_lang['dw_main_title']='Calculateur gratuit en ligne de perte de charge Darcy-Weisbach';
@@ -174,10 +173,10 @@ $ec_lang['mpf_full_flow']='Débit à section pleine, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Rapport au débit à section pleine, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>Il s\'agit du débit (et de la profondeur) à l\'intérieur d\'une conduite de <em>longueur infinie</em>.</dt><dd>Faire entrer le débit dans la conduite peut nécessiter une charge amont nettement plus élevée. Ajoutez au moins 1,5 fois la charge cinétique pour obtenir la charge amont, ou <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">consultez mon tutoriel de 2 minutes</a> pour les calculs standard de charge amont de buse à l\'aide de <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, le logiciel gratuit de calcul de buses de la Federal Highway Administration (administration fédérale des routes) des États-Unis.</dd>';
 $ec_lang['mpf_sewer_ref']='<dl><dt>Vous concevez un égout sanitaire ?</dt><dd>Consultez les <a target="_blank" href="/sewslope.php">tableaux de pente minimale d\'égout</a> pour les conduites de 4 à 96 pouces (100 à 2400 mm), donnés en m/m, mm/m et pourcentage, ainsi que l\'étude sur les <a target="_blank" href="/peakfact.php">facteurs de pointe pour les très faibles débits</a>. Ces deux documents de référence sont uniquement en anglais.</dd></dl>';
-$ec_lang['mpf_solve_button']='Calculer';
-$ec_lang['mpf_solve_for_flow']='pour débit, Q =';
 $ec_lang['mpf_solver_enter_positive_q']='Entrez un Q cible positif.';
 $ec_lang['mpf_solver_no_solution']='Aucune solution : Q dépasse la capacité de la conduite à y/d0 = 93.8% (Qmax = {qmax} dans les unités sélectionnées).';
+$ec_lang['mpf_solve_button']='Calculer';
+$ec_lang['mpf_solve_for_flow']='pour débit, Q =';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Perte de charge Manning en conduite';
 $ec_lang['mphl_main_title']='Calculateur gratuit en ligne de perte de charge Manning en conduite';
@@ -341,7 +340,6 @@ $ec_lang['odt_q_max']='Débit max, Q<sub>max</sub>';
 $ec_lang['odt_vol']='Volume vidangé';
 $ec_lang['odt_sketch_start']='Début';
 $ec_lang['odt_sketch_end']='Fin';
-// Erosion Setback and Scour Calc.
 // Contact us.
 
 // Irrigation
@@ -360,8 +358,6 @@ $ec_lang['irr_card_canal_desc']='Concevez ou vérifiez un canal d\'irrigation à
 $ec_lang['irr_card_seepage_head']='Infiltration en Canal & Rendement de Transport d\'Eau';
 $ec_lang['irr_card_seepage_desc']='Estimez les pertes par infiltration d\'un bief de canal à partir des mesures de débit entrant et sortant. Calculez le rendement de transport d\'eau et le volume d\'eau perdu annuellement pour aider à prioriser les investissements de revêtement.';
 $ec_lang['irr_quickref_html']='<h3>Référence Rapide</h3><dl><dt>Barrage de dérivation ou ouvrage de régulation</dt><dd>Mesurez la hauteur d\'eau amont au-dessus de la crête du déversoir. Utilisez <a href="Weir-Flow-Simple.php">Déversoir Simple</a> pour une crête uniforme, ou <a href="Weir-Flow-Irregular.php">Déversoir Irrégulier</a> pour une crête profilée ou à gradins.</dd><dt>Vanne de prise ou sortie de canalisation</dt><dd>Mesurez la cote de l\'eau amont et la cote de l\'eau aval (ou la cote du radier en cas de déversement libre). Utilisez <a href="Orifice.php">Débit par Orifice</a>. Pour une canalisation circulaire, D = diamètre de la canalisation ; pour une vanne rectangulaire, saisissez la largeur W et la hauteur D.</dd><dt>Temps de vidange de réservoir ou d\'étang</dt><dd>Utilisez <a href="Orifice-Drain-Time.php">Temps de Vidange par Orifice</a> pour estimer le temps nécessaire pour abaisser le niveau d\'un étang ou d\'un réservoir par un orifice de fond — utile pour la planification du stockage d\'irrigation.</dd><dt>Normes de terrain</dt><dd>Les équations de débit par déversoir et orifice utilisées ici correspondent aux procédures du <em>Water Measurement Manual</em> (3e éd.) de l\'USBR, couramment exigées par les gestionnaires de l\'eau et les districts d\'irrigation.</dd></dl>';
-$ec_lang['irr_card_pressure_head']='Pression d\'Irrigation & Uniformité';
-$ec_lang['irr_card_pressure_desc']='Modélisez le profil de pression et de débit le long d\'une branche conduite principale-rampe-goutteur pour estimer l\'uniformité de distribution à partir de la pression réelle du cheminement de test, et non simplement du débit catalogue du goutteur.';
 // Drip / Sprinkler Application Rate
 $ec_lang['ip_se']='Espacement des goutteurs, S<sub>e</sub>';
 $ec_lang['ip_sl']='Espacement des rampes, S<sub>l</sub>';
@@ -504,7 +500,7 @@ $ec_lang['rc_sketch_filter']          = 'Filtre';
 $ec_lang['rc_sketch_top_crest_curve'] = 'Courbe de crête';
 $ec_lang['rc_sketch_outlet_apron']    = 'Radier de sortie';
 $ec_lang['rc_sketch_radius']          = 'rayon';
-// Irrigation Pressure (ip_)
+// Irrigation Pressure Calculator (branch pipe-network pressure/DU estimate). Prefix ip_.
 $ec_lang['ip_main_menu']='Pression d\'Irrigation';
 $ec_lang['ip_main_title']='Calculateur gratuit en ligne de pression d\'irrigation et d\'uniformité de distribution';
 $ec_lang['ip_main_desc']='Pression de la branche de test et estimation de l\'uniformité';
@@ -554,9 +550,12 @@ $ec_lang['ip_notes_3_def']='Modélise une seule pression d\'alimentation fixe (p
 $ec_lang['ip_notes_4_def']='Christiansen, J.E. (1942). “Irrigation by sprinkling.” California Agricultural Experiment Station Bulletin 670. Les normes ASAE/ASABE pour la conception de la micro-irrigation utilisent la même approche de perte de charge par frottement à sorties multiples.';
 $ec_lang['ip_notes_5_term']='Conception d\'Application';
 $ec_lang['ip_notes_5_def']='Le taux d\'application et le débit du système/de la zone utilisent le débit moyen estimé des goutteurs sur le terrain (q<sub>avg,field</sub> — la moyenne propre de la rampe testée, corrigée par l\'estimation de Δpression saisie), et non un taux deviné : PR = q<sub>avg,field</sub> / A<sub>e</sub>, alimenté par la valeur modélisée corrigée. L\'espacement et le nombre de rampes/goutteurs à l\'échelle du système sont des entrées séparées ici, car le cheminement de test ne modélise qu\'une seule branche dans le cas le plus défavorable, et non chaque rampe du champ.';
+$ec_lang['irr_card_pressure_head']='Pression d\'Irrigation & Uniformité';
+$ec_lang['irr_card_pressure_desc']='Modélisez le profil de pression et de débit le long d\'une branche conduite principale-rampe-goutteur pour estimer l\'uniformité de distribution à partir de la pression réelle du cheminement de test, et non simplement du débit catalogue du goutteur.';
 
 
-// --- Branched Pipe Network (bn_) --- English source / fallback (translation pending) ---
+
+// --- Branched Pipe Network (bpn_) --- English source ---
 $ec_lang['bpn_main_menu']='Réseau de conduites ramifié';
 $ec_lang['bpn_main_title']='Calculateur en ligne gratuit de pression pour réseau de conduites ramifié (sans boucles)';
 $ec_lang['bpn_main_desc']='Débit et pression d\'un réseau de conduites ramifié (arborescent)';

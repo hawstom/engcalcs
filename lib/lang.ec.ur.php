@@ -173,10 +173,10 @@ $ec_lang['mpf_full_flow']='مکمل بہاؤ، Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='مکمل بہاؤ سے نسبت، Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>یہ ایک <em>لامحدود لمبے</em> پائپ کے اندر بہاؤ اور گہرائی ہے۔</dt><dd>پائپ میں بہاؤ داخل کرانے کے لیے کافی زیادہ بالادست گہرائی درکار ہو سکتی ہے۔ بالادست گہرائی پانے کے لیے رفتار سر کا کم از کم 1.5 گنا جوڑیں، یا معیاری پائپنالی سر آب حساب کے لیے <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">میرا 2 منٹ کا ٹیوٹوریل</a> دیکھیں، جس میں <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a> استعمال ہوتا ہے، جو یو ایس فیڈرل ہائی وے ایڈمنسٹریشن کا مفت پائپنالی پروگرام ہے۔</dd>';
 $ec_lang['mpf_sewer_ref']='<dl><dt>سینیٹری سیور ڈیزائن کر رہے ہیں؟</dt><dd>4 سے 96 انچ (100 سے 2400 ملی میٹر) پائپ کے لیے <a target="_blank" href="/sewslope.php">کم از کم سیور ڈھلوان جدولیں</a> دیکھیں، جو m/m، mm/m اور فیصد میں دی گئی ہیں، اور بہت کم بہاؤ کے لیے <a target="_blank" href="/peakfact.php">عروج عوامل</a> کا مطالعہ دیکھیں۔ دونوں صرف انگریزی میں حوالہ جاتی دستاویزات ہیں۔</dd></dl>';
-$ec_lang['mpf_solve_button']='حل کریں';
-$ec_lang['mpf_solve_for_flow']='بہاؤ کے لیے، Q =';
 $ec_lang['mpf_solver_enter_positive_q']='براہ کرم مثبت ہدف Q درج کریں۔';
 $ec_lang['mpf_solver_no_solution']='کوئی حل نہیں: y/d0 = 93.8% پر Q پائپ کی گنجائش سے تجاوز کر جاتا ہے (منتخب اکائیوں میں Qmax = {qmax})۔';
+$ec_lang['mpf_solve_button']='حل کریں';
+$ec_lang['mpf_solve_for_flow']='بہاؤ کے لیے، Q =';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='مانینگ پائپ دباؤ نقصان';
 $ec_lang['mphl_main_title']='مفت آنلائن مانینگ پائپ دباؤ نقصان حاسبہ';
@@ -340,7 +340,6 @@ $ec_lang['odt_q_max']='زیادہ سے زیادہ بہاؤ، Q<sub>max</sub>';
 $ec_lang['odt_vol']='نکالا گیا حجم';
 $ec_lang['odt_sketch_start']='آغاز';
 $ec_lang['odt_sketch_end']='اختتام';
-// Erosion Setback and Scour Calc.
 // Contact us.
 
 // Irrigation
@@ -359,6 +358,7 @@ $ec_lang['irr_card_canal_desc']='Manning کے فارمولے سے آبپاشی �
 $ec_lang['irr_card_seepage_head']='نہر رساؤ & انتقالی کارکردگی';
 $ec_lang['irr_card_seepage_desc']='آمد اور خروج کی پیمائشوں سے نہر کے حصے میں رساؤ نقصان کا تخمینہ لگائیں۔ استرکاری میں سرمایہ کاری کی ترجیح طے کرنے میں مدد کے لیے انتقالی کارکردگی اور سالانہ پانی کے ضیاع کا حساب لگائیں۔';
 $ec_lang['irr_quickref_html']='<h3>فوری حوالہ</h3><dl><dt>ڈائیورژن ڈیم یا کنٹرول ڈھانچہ</dt><dd>ویئر کرسٹ کے اوپر پانی کی گہرائی ناپیں۔ یکساں کرسٹ کے لیے <a href="Weir-Flow-Simple.php">سادہ ویئر بہاؤ</a> اور پروفائل یا زینہ دار کرسٹ کے لیے <a href="Weir-Flow-Irregular.php">بے قاعدہ ویئر بہاؤ</a> استعمال کریں۔</dd><dt>ہیڈ گیٹ یا پائپ آؤٹ لیٹ</dt><dd>اوپر اور نیچے سطح آب کی بلندی ناپیں (یا آزاد اخراج کی صورت میں پائپ کی تہ کی بلندی)۔ <a href="Orifice.php">اوریفس بہاؤ</a> استعمال کریں۔ گول پائپ کے لیے D = پائپ کا قطر؛ مستطیل گیٹ کے لیے چوڑائی W اور اونچائی D درج کریں۔</dd><dt>ذخیرے یا تالاب کے نکاسی کا وقت</dt><dd>تالاب یا ذخیرے کو نچلے اوریفس سے کم کرنے میں لگنے والا وقت تخمین لگانے کے لیے <a href="Orifice-Drain-Time.php">اوریفس نکاسی وقت</a> استعمال کریں — آبپاشی ذخیرہ منصوبہ بندی کے لیے مفید۔</dd><dt>میدانی معیارات</dt><dd>یہاں استعمال شدہ ویئر اور اوریفس بہاؤ مساوات USBR <em>Water Measurement Manual</em> (تیسرا ایڈیشن) کے طریقہ کار سے مطابقت رکھتی ہیں، جو عموماً واٹر ماسٹرز اور آبپاشی اضلاع کو درکار ہوتی ہیں۔</dd></dl>';
+// Drip / Sprinkler Application Rate
 $ec_lang['ip_se']='ایمیٹر فاصلہ، S<sub>e</sub>';
 $ec_lang['ip_sl']='لیٹرل فاصلہ، S<sub>l</sub>';
 $ec_lang['ip_n_e']='ایمیٹرز فی لیٹرل، n<sub>e</sub>';
@@ -500,8 +500,7 @@ $ec_lang['rc_sketch_filter']          = 'فلٹر';
 $ec_lang['rc_sketch_top_crest_curve'] = 'چوٹی کا منحنی';
 $ec_lang['rc_sketch_outlet_apron']    = 'آؤٹ لیٹ ایپرن';
 $ec_lang['rc_sketch_radius']          = 'نصف قطر';
-
-// Irrigation Pressure. Prefix ip_.
+// Irrigation Pressure Calculator (branch pipe-network pressure/DU estimate). Prefix ip_.
 $ec_lang['ip_main_menu']='آبپاشی دباؤ';
 $ec_lang['ip_main_title']='مفت آن لائن آبپاشی دباؤ & تقسیم یکسانیت حاسبہ';
 $ec_lang['ip_main_desc']='ٹیسٹ برانچ دباؤ اور یکسانیت کا تخمینہ';
@@ -555,7 +554,8 @@ $ec_lang['irr_card_pressure_head']='آبپاشی دباؤ & یکسانیت';
 $ec_lang['irr_card_pressure_desc']='اصل ٹیسٹ پاتھ دباؤ سے تقسیم یکسانیت کا تخمینہ لگانے کے لیے ایک مرکزی-لیٹرل-ایمیٹر برانچ کے ساتھ دباؤ اور بہاؤ پروفائل ماڈل کریں، نہ کہ صرف کیٹلاگ ایمیٹر بہاؤ کی شرح۔';
 
 
-// --- Branched Pipe Network (bn_) --- English source / fallback (translation pending) ---
+
+// --- Branched Pipe Network (bpn_) --- English source ---
 $ec_lang['bpn_main_menu']='برانچڈ پائپ نیٹ ورک';
 $ec_lang['bpn_main_title']='مفت آن لائن برانچڈ پائپ نیٹ ورک دباؤ حاسبہ (بغیر لوپ)';
 $ec_lang['bpn_main_desc']='برانچڈ (شاخ دار) پائپ نیٹ ورک بہاؤ اور دباؤ';

@@ -172,10 +172,10 @@ $ec_lang['mpf_full_flow']='Aliran penuh, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Rasio terhadap aliran penuh, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>Ini adalah debit dan kedalaman di dalam pipa yang panjangnya <em>tak terhingga</em>.</dt><dd>Memasukkan aliran ke dalam pipa mungkin memerlukan kedalaman air hulu yang jauh lebih tinggi. Tambahkan setidaknya 1,5 kali tinggi kecepatan untuk memperkirakan kedalaman air hulu, atau <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">lihat tutorial 2 menit saya</a> untuk perhitungan standar air hulu gorong-gorong menggunakan <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, program gorong-gorong gratis dari Badan Jalan Raya Federal Amerika Serikat (U.S. Federal Highway Administration).</dd>';
 $ec_lang['mpf_sewer_ref']='<dl><dt>Sedang merancang saluran air limbah?</dt><dd>Lihat <a target="_blank" href="/sewslope.php">tabel kemiringan minimum saluran limbah</a> untuk pipa 4 hingga 96 inci (100 hingga 2400 mm), dinyatakan dalam m/m, mm/m, dan persen, serta studi <a target="_blank" href="/peakfact.php">faktor puncak untuk debit sangat rendah</a>. Keduanya adalah dokumen referensi dalam bahasa Inggris saja.</dd></dl>';
-$ec_lang['mpf_solve_button']='Hitung';
-$ec_lang['mpf_solve_for_flow']='untuk debit, Q =';
 $ec_lang['mpf_solver_enter_positive_q']='Masukkan Q target yang positif.';
 $ec_lang['mpf_solver_no_solution']='Tidak ada solusi: Q melebihi kapasitas pipa pada y/d0 = 93.8% (Qmax = {qmax} dalam satuan yang dipilih).';
+$ec_lang['mpf_solve_button']='Hitung';
+$ec_lang['mpf_solve_for_flow']='untuk debit, Q =';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Kehilangan Tinggi Tekan Pipa Manning';
 $ec_lang['mphl_main_title']='Kalkulator Kehilangan Tinggi Tekan Pipa Manning Gratis Daring';
@@ -339,7 +339,6 @@ $ec_lang['odt_q_max']='Debit maksimum, Q<sub>max</sub>';
 $ec_lang['odt_vol']='Volume yang dikosongkan';
 $ec_lang['odt_sketch_start']='Mulai';
 $ec_lang['odt_sketch_end']='Akhir';
-// Erosion Setback and Scour Calc.
 // Contact us.
 
 // Irrigation
@@ -357,8 +356,6 @@ $ec_lang['irr_card_canal_head']='Desain & Analisis Saluran';
 $ec_lang['irr_card_canal_desc']='Desain atau periksa saluran irigasi menggunakan rumus Manning. Gunakan kalkulator Trapesium untuk saluran baru; kalkulator Tidak Beraturan untuk penampang alami atau buatan yang sudah ada.';
 $ec_lang['irr_card_seepage_head']='Rembesan Saluran & Efisiensi Saluran';
 $ec_lang['irr_card_seepage_desc']='Perkirakan kehilangan rembesan dari segmen saluran menggunakan pengukuran debit masuk dan keluar. Hitung efisiensi saluran dan kehilangan air tahunan untuk membantu memprioritaskan investasi pelapisan saluran.';
-$ec_lang['irr_card_pressure_head']='Tekanan Irigasi & Keseragaman';
-$ec_lang['irr_card_pressure_desc']='Modelkan profil tekanan dan debit di sepanjang cabang saluran utama-lateral-emiter untuk memperkirakan keseragaman distribusi dari tekanan jalur uji yang sebenarnya, bukan hanya laju debit emiter dari katalog.';
 $ec_lang['irr_quickref_html']='<h3>Referensi Cepat</h3><dl><dt>Bendung pengalih atau bangunan pengatur</dt><dd>Ukur kedalaman air hulu di atas mercu bendung. Gunakan <a href="Weir-Flow-Simple.php">Aliran Bendung Ukur Sederhana</a> untuk mercu seragam, atau <a href="Weir-Flow-Irregular.php">Aliran Bendung Ukur Tidak Beraturan</a> untuk mercu berprofil atau bertangga.</dd><dt>Pintu air atau sambungan pipa</dt><dd>Ukur elevasi muka air hulu dan hilir (atau elevasi dasar pipa jika mengalir bebas). Gunakan <a href="Orifice.php">Debit Lubang Aliran</a>. Untuk pipa bulat, D = diameter pipa; untuk pintu persegi panjang, masukkan lebar W dan tinggi D.</dd><dt>Waktu pengosongan waduk atau kolam</dt><dd>Gunakan <a href="Orifice-Drain-Time.php">Waktu Pengosongan Lubang Aliran</a> untuk memperkirakan berapa lama waktu yang diperlukan untuk menurunkan kolam atau waduk melalui lubang aliran dasar — berguna untuk perencanaan tampungan irigasi.</dd><dt>Standar lapangan</dt><dd>Persamaan debit bendung ukur dan lubang aliran yang digunakan di sini sesuai dengan prosedur USBR <em>Water Measurement Manual</em> (edisi ke-3), yang umumnya disyaratkan oleh pengelola air dan distrik irigasi.</dd></dl>';
 // Drip / Sprinkler Application Rate
 $ec_lang['ip_se']='Jarak emiter, S<sub>e</sub>';
@@ -499,11 +496,10 @@ $ec_lang['rc_notes_4_term']='Referensi';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). "<a target="_blank" href="https://www.fs.usda.gov/biology/nsaec/fishxing/fplibrary/Robinson_1998_Design_of_Rock_Chutes.pdf">Design of rock chutes</a>." <em>Transactions of the ASAE</em>, 41(3), 621–626. USDA ARS juga menerbitkan <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">lembar kerja Excel</a> berdasarkan metode yang sama.';
 // Sketch labels
 $ec_lang['rc_sketch_filter']='Filter';
-
 $ec_lang['rc_sketch_top_crest_curve']='Kurva Mercu Atas';
 $ec_lang['rc_sketch_outlet_apron']='Lantai Hilir';
 $ec_lang['rc_sketch_radius']='jari-jari';
-// Irrigation Pressure. Prefix ip_.
+// Irrigation Pressure Calculator (branch pipe-network pressure/DU estimate). Prefix ip_.
 $ec_lang['ip_main_menu']='Tekanan Irigasi';
 $ec_lang['ip_main_title']='Kalkulator Tekanan Irigasi & Keseragaman Distribusi Gratis Daring';
 $ec_lang['ip_main_desc']='Tekanan Cabang Pengujian dan Estimasi Keseragaman';
@@ -553,9 +549,12 @@ $ec_lang['ip_notes_3_def']='Memodelkan satu tekanan pasokan tetap (tanpa kurva p
 $ec_lang['ip_notes_4_def']='Christiansen, J.E. (1942). “Irrigation by sprinkling.” California Agricultural Experiment Station Bulletin 670. Standar ASAE/ASABE untuk desain mikroirigasi menggunakan pendekatan kehilangan gesekan multi-outlet yang sama.';
 $ec_lang['ip_notes_5_term']='Desain Aplikasi';
 $ec_lang['ip_notes_5_def']='Laju pemberian air dan debit sistem/zona menggunakan estimasi debit emiter rata-rata lapangan (q<sub>avg,field</sub> — rata-rata lateral pengujian itu sendiri, dikoreksi oleh estimasi Δtekanan yang dimasukkan), bukan laju yang ditebak: PR = q<sub>avg,field</sub> / A<sub>e</sub>, dipasok oleh nilai model yang telah dikoreksi. Jarak dan jumlah lateral/emiter seluruh sistem merupakan input terpisah di sini karena jalur pengujian hanya memodelkan satu cabang kasus terburuk, bukan setiap lateral di lapangan.';
+$ec_lang['irr_card_pressure_head']='Tekanan Irigasi & Keseragaman';
+$ec_lang['irr_card_pressure_desc']='Modelkan profil tekanan dan debit di sepanjang cabang saluran utama-lateral-emiter untuk memperkirakan keseragaman distribusi dari tekanan jalur uji yang sebenarnya, bukan hanya laju debit emiter dari katalog.';
 
 
-// --- Branched Pipe Network (bn_) --- English source / fallback (translation pending) ---
+
+// --- Branched Pipe Network (bpn_) --- English source ---
 $ec_lang['bpn_main_menu']='Jaringan Pipa Bercabang';
 $ec_lang['bpn_main_title']='Kalkulator Tekanan Jaringan Pipa Bercabang Online Gratis (Tanpa Loop)';
 $ec_lang['bpn_main_desc']='Debit dan Tekanan Jaringan Pipa Bercabang (Pohon)';

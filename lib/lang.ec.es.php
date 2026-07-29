@@ -12,11 +12,11 @@ $ec_lang['u_ft']='pies';
 $ec_lang['u_fth2o']='pies ca';
 $ec_lang['u_ftps']='pies/seg.';
 $ec_lang['u_gpm']='gal/min';
-$ec_lang['u_grade']='vert./horiz.';
 $ec_lang['u_gradePercent']='% vert./horiz.';
-$ec_lang['u_in']='pulg.';
+$ec_lang['u_grade']='vert./horiz.';
 $ec_lang['u_in2']='pulg.^2';
 $ec_lang['u_inh2o']='pulg. ca';
+$ec_lang['u_in']='pulg.';
 $ec_lang['u_knpcm2']='kN/cm^2';
 $ec_lang['u_knpm2']='kN/m^2';
 $ec_lang['u_kpa']='kPa';
@@ -173,10 +173,10 @@ $ec_lang['mpf_full_flow']='Caudal lleno, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Relación de caudales, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>Este es el caudal (y la profundidad) dentro de una tubería <em>de longitud infinita</em>.</dt><dd>Lograr que el caudal entre en la tubería puede requerir una profundidad de agua de entrada (cabezal) bastante mayor. Agregue por lo menos 1,5 veces la carga de velocidad para estimar la profundidad de agua de entrada, o <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">vea mi tutorial de 2 minutos</a> sobre los cálculos estándar de cabezal de entrada en alcantarillas usando <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, el programa gratuito de alcantarillas de la Administración Federal de Carreteras de los Estados Unidos.</dd>';
 $ec_lang['mpf_sewer_ref']='<dl><dt>¿Está diseñando un alcantarillado sanitario?</dt><dd>Vea las <a target="_blank" href="/sewslope.php">tablas de pendiente mínima de alcantarillado</a> para tuberías de 4 a 96 pulgadas (100 a 2400 mm), expresadas en m/m, mm/m y porcentaje, y el estudio de <a target="_blank" href="/peakfact.php">factores pico para caudales muy bajos</a>. Ambos son documentos de referencia solo en inglés.</dd></dl>';
-$ec_lang['mpf_solve_button']='Calcular';
-$ec_lang['mpf_solve_for_flow']='para caudal, Q =';
 $ec_lang['mpf_solver_enter_positive_q']='Ingrese un Q objetivo positivo.';
 $ec_lang['mpf_solver_no_solution']='Sin solución: Q excede la capacidad de la tubería en y/d0 = 93.8% (Qmax = {qmax} en las unidades seleccionadas).';
+$ec_lang['mpf_solve_button']='Calcular';
+$ec_lang['mpf_solve_for_flow']='para caudal, Q =';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Pérdida de carga en tubería según Manning';
 $ec_lang['mphl_main_title']='Calculadora gratis en línea de pérdida de carga en tubería según Manning';
@@ -340,7 +340,6 @@ $ec_lang['odt_q_max']='Caudal máximo, Q<sub>max</sub>';
 $ec_lang['odt_vol']='Volumen vaciado';
 $ec_lang['odt_sketch_start']='Inicio';
 $ec_lang['odt_sketch_end']='Fin';
-// Erosion Setback and Scour Calc.
 // Contact us.
 
 // Irrigation
@@ -501,6 +500,7 @@ $ec_lang['rc_sketch_filter']          = 'Filtro';
 $ec_lang['rc_sketch_top_crest_curve'] = 'Curva de cresta';
 $ec_lang['rc_sketch_outlet_apron']    = 'Zampeado de salida';
 $ec_lang['rc_sketch_radius']          = 'radio';
+// Irrigation Pressure Calculator (branch pipe-network pressure/DU estimate). Prefix ip_.
 $ec_lang['ip_main_menu']='Presión en Riego';
 $ec_lang['ip_main_title']='Calculadora Gratuita en Línea de Presión en Riego y Uniformidad de Distribución';
 $ec_lang['ip_main_desc']='Presión de Rama de Prueba y Estimación de Uniformidad';
@@ -554,7 +554,8 @@ $ec_lang['irr_card_pressure_head']='Presión en Riego y Uniformidad';
 $ec_lang['irr_card_pressure_desc']='Modele el perfil de presión y caudal a lo largo de una rama tubería principal-lateral-emisor para estimar la uniformidad de distribución a partir de la presión real de la ruta de prueba, no solo una tasa de caudal del catálogo del emisor.';
 
 
-// --- Branched Pipe Network (bn_) --- English source / fallback (translation pending) ---
+
+// --- Branched Pipe Network (bpn_) --- English source ---
 $ec_lang['bpn_main_menu']='Red de tuberías ramificada';
 $ec_lang['bpn_main_title']='Calculadora gratuita en línea de presión para redes de tuberías ramificadas (sin bucles)';
 $ec_lang['bpn_main_desc']='Caudal y presión en red de tuberías ramificada (en árbol)';

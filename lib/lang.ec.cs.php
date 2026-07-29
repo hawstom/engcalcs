@@ -171,12 +171,11 @@ $ec_lang['mpf_shear_stress']='Průměrné smykové napětí, τ';
 $ec_lang['mpf_full_flow']='Průtok při plném plnění, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Poměr k plnému průtoku, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>Toto je průtok a hloubka uvnitř <em>nekonečně dlouhého</em> potrubí.</dt><dd>Aby průtok vůbec vtekl do potrubí, může být zapotřebí výrazně vyšší hloubka vzduté hladiny na vtoku. Pro odhad hloubky vzdutí přičtěte alespoň 1,5násobek rychlostní výšky, nebo <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">zhlédněte můj 2minutový výukový program</a> o standardním výpočtu vzdutí u propustků pomocí programu <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, bezplatného programu pro propustky od Federální správy dálnic USA (U.S. Federal Highway Administration).</dd>';
-
 $ec_lang['mpf_sewer_ref']='<dl><dt>Navrhujete splaškovou kanalizaci?</dt><dd>Viz <a target="_blank" href="/sewslope.php">tabulky minimálního sklonu kanalizace</a> pro potrubí o průměru 4 až 96 palců (100 až 2400 mm), uvedené v m/m, mm/m a procentech, a studii <a target="_blank" href="/peakfact.php">špičkových součinitelů pro velmi nízké průtoky</a>. Oba dokumenty jsou k dispozici pouze v angličtině.</dd></dl>';
-$ec_lang['mpf_solve_button']='Vypočítat';
-$ec_lang['mpf_solve_for_flow']='pro průtok, Q =';
 $ec_lang['mpf_solver_enter_positive_q']='Zadejte kladnou cílovou hodnotu Q.';
 $ec_lang['mpf_solver_no_solution']='Žádné řešení: Q překračuje kapacitu potrubí při y/d0 = 93.8% (Qmax = {qmax} ve zvolených jednotkách).';
+$ec_lang['mpf_solve_button']='Vypočítat';
+$ec_lang['mpf_solve_for_flow']='pro průtok, Q =';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Ztráta tlakové výšky v potrubí Manning';
 $ec_lang['mphl_main_title']='Bezplatný online kalkulátor ztráty tlakové výšky v potrubí Manning';
@@ -340,7 +339,6 @@ $ec_lang['odt_q_max']='Maximální průtok, Q<sub>max</sub>';
 $ec_lang['odt_vol']='Vyčerpaný objem';
 $ec_lang['odt_sketch_start']='Začátek';
 $ec_lang['odt_sketch_end']='Konec';
-// Erosion Setback and Scour Calc.
 // Contact us.
 
 // Irrigation
@@ -501,8 +499,7 @@ $ec_lang['rc_sketch_filter']          = 'Filtr';
 $ec_lang['rc_sketch_top_crest_curve'] = 'Oblouk na koruně';
 $ec_lang['rc_sketch_outlet_apron']    = 'Vývarová deska';
 $ec_lang['rc_sketch_radius']          = 'poloměr';
-
-// Irrigation Pressure
+// Irrigation Pressure Calculator (branch pipe-network pressure/DU estimate). Prefix ip_.
 $ec_lang['ip_main_menu']='Závlahový tlak';
 $ec_lang['ip_main_title']='Bezplatný online kalkulátor tlaku závlahy a uniformity distribuce';
 $ec_lang['ip_main_desc']='Tlak v testovací cestě a odhadovaná uniformita';
@@ -556,7 +553,8 @@ $ec_lang['irr_card_pressure_head']='Závlahový tlak & Uniformita';
 $ec_lang['irr_card_pressure_desc']='Modelujte profil tlaku a průtoku podél větve hlavní-postranní-emitor pro odhad distribuční uniformity ze skutečného tlaku testovací cesty, ne jen z katalogového průtoku emitoru.';
 
 
-// --- Branched Pipe Network (bn_) --- English source / fallback (translation pending) ---
+
+// --- Branched Pipe Network (bpn_) --- English source ---
 $ec_lang['bpn_main_menu']='Větvená potrubní síť';
 $ec_lang['bpn_main_title']='Bezplatný online kalkulátor tlaku ve větvené potrubní síti (bez okruhů)';
 $ec_lang['bpn_main_desc']='Průtok a tlak ve větvené (stromové) potrubní síti';

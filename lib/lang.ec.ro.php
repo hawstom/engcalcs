@@ -171,10 +171,10 @@ $ec_lang['mpf_full_flow']='Debit la plin, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Raport față de debitul la plin, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>Acesta este debitul și adâncimea în interiorul unei conducte <em>infinit lungi</em>.</dt><dd>Introducerea debitului în conductă poate necesita o adâncime a apei din amonte semnificativ mai mare. Adăugați cel puțin de 1,5 ori sarcina de viteză pentru a obține adâncimea din amonte sau <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">consultați tutorialul meu de 2 minute</a> pentru calculele standard ale nivelului din amonte ale podețelor folosind <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, programul gratuit pentru podețe al Administrației Federale a Autostrăzilor din S.U.A. (U.S. Federal Highway Administration).</dd>';
 $ec_lang['mpf_sewer_ref']='<dl><dt>Proiectați o rețea de canalizare menajeră?</dt><dd>Consultați <a target="_blank" href="/sewslope.php">tabelele cu pantele minime ale canalizării</a> pentru conducte de la 4 la 96 inci (100 până la 2400 mm), date în m/m, mm/m și procente, și studiul <a target="_blank" href="/peakfact.php">factorilor de vârf pentru debite foarte mici</a>. Ambele sunt documente de referință disponibile doar în limba engleză.</dd></dl>';
-$ec_lang['mpf_solve_button']='Calculează';
-$ec_lang['mpf_solve_for_flow']='pentru debit, Q =';
 $ec_lang['mpf_solver_enter_positive_q']='Introduceți un Q țintă pozitiv.';
 $ec_lang['mpf_solver_no_solution']='Fără soluție: Q depășește capacitatea conductei la y/d0 = 93.8% (Qmax = {qmax} în unitățile selectate).';
+$ec_lang['mpf_solve_button']='Calculează';
+$ec_lang['mpf_solve_for_flow']='pentru debit, Q =';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Manning Pierdere de Sarcină Conductă';
 $ec_lang['mphl_main_title']='Calculator Gratuit Online Manning Pierdere de Sarcină Conductă';
@@ -338,7 +338,6 @@ $ec_lang['odt_q_max']='Debit maxim, Q<sub>max</sub>';
 $ec_lang['odt_vol']='Volum golit';
 $ec_lang['odt_sketch_start']='Început';
 $ec_lang['odt_sketch_end']='Sfârșit';
-// Erosion Setback and Scour Calc.
 // Contact us.
 
 // Irrigation
@@ -357,8 +356,6 @@ $ec_lang['irr_card_canal_desc']='Proiectați sau verificați un canal de irigaț
 $ec_lang['irr_card_seepage_head']='Infiltrația Canalului & Eficiența de Transport';
 $ec_lang['irr_card_seepage_desc']='Estimați pierderile prin infiltrație dintr-un tronson de canal folosind măsurătorile de influx și eflux. Calculați eficiența de transport și volumul anual de apă pierdut pentru a ajuta la prioritizarea investițiilor în căptușire.';
 $ec_lang['irr_quickref_html']='<h3>Referință Rapidă</h3><dl><dt>Baraj de derivație sau stăvilar de control</dt><dd>Măsurați adâncimea apei în amonte deasupra crestei deversorului. Utilizați <a href="Weir-Flow-Simple.php">Deversor Simplu</a> pentru o creastă uniformă, sau <a href="Weir-Flow-Irregular.php">Deversor Neregulat</a> pentru o creastă profilată sau în trepte.</dd><dt>Vană de cap sau branșament de conductă</dt><dd>Măsurați cota apei în amonte și cota apei în aval (sau cota radierului dacă descărcarea este liberă). Utilizați <a href="Orifice.php">Debit prin Orificiu</a>. Pentru o conductă circulară, D = diametrul conductei; pentru o vană dreptunghiulară, introduceți lățimea W și înălțimea D.</dd><dt>Timpul de golire a unui rezervor sau iaz</dt><dd>Utilizați <a href="Orifice-Drain-Time.php">Timp de Golire prin Orificiu</a> pentru a estima cât timp durează coborârea nivelului unui iaz sau rezervor printr-un orificiu de fund — util pentru planificarea stocării apei de irigație.</dd><dt>Standarde de teren</dt><dd>Ecuațiile de debit pentru deversor și orificiu utilizate aici corespund procedurilor din USBR <em>Water Measurement Manual</em> (ediția a 3-a), solicitate frecvent de administratorii de apă și districtele de irigații.</dd></dl>';
-$ec_lang['irr_card_pressure_head']='Presiune de Irigație & Uniformitate';
-$ec_lang['irr_card_pressure_desc']='Modelați profilul de presiune și debit de-a lungul unei ramuri principal-lateral-emițător pentru a estima uniformitatea distribuției din presiunea reală a căii test, nu doar dintr-un debit de catalog al emițătorului.';
 // Drip / Sprinkler Application Rate
 $ec_lang['ip_se']='Distanța dintre emițătoare, S<sub>e</sub>';
 $ec_lang['ip_sl']='Distanța dintre laterale, S<sub>l</sub>';
@@ -501,7 +498,7 @@ $ec_lang['rc_sketch_filter']          = 'Filtru';
 $ec_lang['rc_sketch_top_crest_curve'] = 'Curbă de coronament';
 $ec_lang['rc_sketch_outlet_apron']    = 'Radier de ieșire';
 $ec_lang['rc_sketch_radius']          = 'rază';
-// Irrigation Pressure (ip_ prefix)
+// Irrigation Pressure Calculator (branch pipe-network pressure/DU estimate). Prefix ip_.
 $ec_lang['ip_main_menu']='Presiune Irigație';
 $ec_lang['ip_main_title']='Calculator Online Gratuit pentru Presiunea de Irigație & Uniformitatea Distribuției';
 $ec_lang['ip_main_desc']='Presiunea Ramurii Test și Estimarea Uniformității';
@@ -551,9 +548,12 @@ $ec_lang['ip_notes_3_def']='Modelează o singură presiune de alimentare fixă (
 $ec_lang['ip_notes_4_def']='Christiansen, J.E. (1942). “Irrigation by sprinkling.” Buletin 670 al Stației de Experiment Agricol California. Standardele ASAE/ASABE pentru proiectarea microirigației folosesc aceeași abordare a pierderii prin frecare cu ieșiri multiple.';
 $ec_lang['ip_notes_5_term']='Proiectarea Aplicației';
 $ec_lang['ip_notes_5_def']='Rata de aplicare și debitul sistemului/zonei folosesc debitul mediu estimat al emițătorului pe teren (q<sub>avg,field</sub> — media proprie a lateralului test, corectată prin estimarea Δpresiune introdusă), nu o rată ghicită: PR = q<sub>avg,field</sub> / A<sub>e</sub>, alimentată de valoarea modelată corectată. Distanța și numărul de laterale/emițători la nivelul întregului sistem sunt intrări separate aici, deoarece calea test modelează doar o singură ramură de caz cel mai defavorabil, nu fiecare lateral din teren.';
+$ec_lang['irr_card_pressure_head']='Presiune de Irigație & Uniformitate';
+$ec_lang['irr_card_pressure_desc']='Modelați profilul de presiune și debit de-a lungul unei ramuri principal-lateral-emițător pentru a estima uniformitatea distribuției din presiunea reală a căii test, nu doar dintr-un debit de catalog al emițătorului.';
 
 
-// --- Branched Pipe Network (bn_) --- English source / fallback (translation pending) ---
+
+// --- Branched Pipe Network (bpn_) --- English source ---
 $ec_lang['bpn_main_menu']='Rețea de conducte ramificată';
 $ec_lang['bpn_main_title']='Calculator online gratuit de presiune pentru rețele de conducte ramificate (fără bucle)';
 $ec_lang['bpn_main_desc']='Debit și presiune în rețea de conducte ramificată (arborescentă)';

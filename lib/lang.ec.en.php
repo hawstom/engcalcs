@@ -1120,3 +1120,6 @@ $ec_lang['bpn_h_supply']='Supply head';
 $ec_lang['bpn_h_supply_tip']='Source head at the design flow, read from the supply curve. Equals the entered source head when the curve is flat (a reservoir).';
 $ec_lang['bpn_show_elevation']='Elevation';
 $ec_lang['bpn_supply1_h']='Static supply head';
+$ec_lang['lpn_main_menu']='Looped Pipe Network (Map Interface)';
+$ec_lang['lpn_main_title']='Free Online Looped Pipe Network Calculator with Map Interface';
+$ec_lang['lpn_main_desc']='Pressure and Flow in a Looped Pipe Network You Draw on a Map';

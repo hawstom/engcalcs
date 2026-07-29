@@ -85,8 +85,8 @@ $ec_lang['ec_name_label']='دا محاسبه خوندي کړئ:';
 $ec_lang['ec_name_placeholder']='نوم';
 $ec_lang['ec_name_hint']='دا ننوتنې URL ته خوندي کوي د نشان کتاب، تاریخ بیر کیدو، او شریکولو لپاره';
 $ec_lang['calc_copy_link']='لینک کاپي کړئ';
-$ec_lang['calc_copy_link_done']='کاپي شو!';
 $ec_lang['ec_related_calcs']='اړوند محاسبې:';
+$ec_lang['calc_copy_link_done']='کاپي شو!';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Darcy-Weisbach د پایپ سر ضیاع';
 $ec_lang['dw_main_title']='وړیا آنلاین Darcy-Weisbach د پایپ سر ضیاع محاسبه';
@@ -173,10 +173,10 @@ $ec_lang['mpf_full_flow']='بشپړ بهاو، Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='د بشپړ بهاو نسبت، Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>دا د یوه <em>بې نهایته اوږد</em> پایپ دننه بهاو او ژوروالی دی.</dt><dd>د پایپ ته د بهاو داخلولو لپاره ممکن د پورتنیو اوبو د پام وړ لوړ ژوروالي ته اړتیا وي. د پورتنیو اوبو ژوروالي اټکل کولو لپاره لږ تر لږه ۱.۵ ځله د سرعت سر ورزیات کړئ، یا د معیاري کلورټ د پورتنیو اوبو محاسبو لپاره <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">زما دوه دقیقو ټیوټوریل وګورئ</a>، چې <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a> کاروي، د متحده ایالاتو د فدرالي لارو ادارې وړیا کلورټ پروګرام.</dd>';
 $ec_lang['mpf_sewer_ref']='<dl><dt>د فاضلو اوبو د ناله ډیزاین کوئ؟</dt><dd>د ۴ څخه تر ۹۶ انچ (۱۰۰ څخه تر ۲۴۰۰ mm) پایپ لپاره <a target="_blank" href="/sewslope.php">د ناله د لږترلږه میلان جدولونه</a> وګورئ، چې په m/m، mm/m او سلنه کې ورکړل شوي، او <a target="_blank" href="/peakfact.php">د ډېر ټیټ بهاونو لپاره د لوړوالي فکتورونو</a> مطالعه وګورئ. دواړه مرجع اسناد یوازې په انګلیسي ژبه کې دي.</dd></dl>';
-$ec_lang['mpf_solve_button']='حل کړئ';
-$ec_lang['mpf_solve_for_flow']='د بهاو لپاره، Q =';
 $ec_lang['mpf_solver_enter_positive_q']='یو مثبت موخه‌یز Q ولیکئ.';
 $ec_lang['mpf_solver_no_solution']='حل نشته: Q په y/d0 = 93.8% کې د پایپ له ظرفیت څخه زیات دی (Qmax = {qmax} په ټاکل شویو واحدونو کې).';
+$ec_lang['mpf_solve_button']='حل کړئ';
+$ec_lang['mpf_solve_for_flow']='د بهاو لپاره، Q =';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Manning د پایپ سر ضیاع';
 $ec_lang['mphl_main_title']='وړیا آنلاین Manning د پایپ سر ضیاع محاسبه';
@@ -340,7 +340,6 @@ $ec_lang['odt_q_max']='اعظمي بهاو، Q<sub>max</sub>';
 $ec_lang['odt_vol']='ایستل شوی حجم';
 $ec_lang['odt_sketch_start']='پیل';
 $ec_lang['odt_sketch_end']='پای';
-// Erosion Setback and Scour Calc.
 // Contact us.
 
 // Irrigation
@@ -356,8 +355,6 @@ $ec_lang['irr_card_orifice_head']='منفذ — سردروازه یا پایپ �
 $ec_lang['irr_card_orifice_desc']='د سلوس دروازې، پایپ ایستنځي، یا کلورټ خلاصوالي له لارې بهاو اندازه کړئ. دواړه آزاد وتون او ډوب شوي (ښکتنۍ اوبو) شرایط په اتومات ډول اداره کوي.';
 $ec_lang['irr_card_canal_head']='د کانال ډیزاین & تحلیل';
 $ec_lang['irr_card_canal_desc']='د Manning فورمول په مرسته د اوبولګولو کانال ډیزاین یا وګورئ. د نویو نهرونو لپاره د ذوزنقه کالکولېټر وکاروئ؛ د موجودو طبیعي یا جوړ شوو برخو لپاره غیرمنظم کالکولېټر.';
-$ec_lang['irr_card_pressure_head']='د اوبو د لګولو فشار & یو‌شانتیا';
-$ec_lang['irr_card_pressure_desc']='د اصلي نل-جانبي نل-وریز یوې څانګې پر اوږدو فشار او بهاو پروفایل نمونه کړئ ترڅو د حقیقي ازموینې-لار فشار له مخې د ویش یو‌شانتیا اټکل کړئ، نه یوازې د کتالوګ وریز بهاو کچه.';
 $ec_lang['irr_card_seepage_head']='د کانال چوړ & د لیږدولو اغیزمنتیا';
 $ec_lang['irr_card_seepage_desc']='د ننوت او وتون اندازو په کارولو سره د یوې کانال برخې څخه د چوړ ضیاع اټکل کړئ. د لیږدولو اغیزمنتیا او کلنی اوبو ضیاع محاسبه کړئ ترڅو د کښلو پانګونې ته لومړیتوب ورکولو کې مرسته وشي.';
 $ec_lang['irr_quickref_html']='<h3>ګړندۍ لارښوونه</h3><dl><dt>انحرافي بند یا کنترول جوړښت</dt><dd>د ویر سر پورته د پورتنیو اوبو ژوروالی اندازه کړئ. د یو شان سر لپاره <a href="Weir-Flow-Simple.php">ساده ویر بهاو</a>، یا د پروفایل شوي یا زینه‌یز سر لپاره <a href="Weir-Flow-Irregular.php">غیرمنظم ویر بهاو</a> وکاروئ.</dd><dt>سردروازه یا پایپ ایستنځی</dt><dd>د پورتنیو اوبو لوړوالی او د ښکتنیو اوبو لوړوالی اندازه کړئ (یا که آزاده تخلیه کیږي نو د پایپ بېخ). <a href="Orifice.php">منفذ بهاو</a> وکاروئ. د دایروي پایپ لپاره D = د پایپ قطر؛ د مستطیل دروازې لپاره پلنوالی W او لوړوالی D ولیکئ.</dd><dt>د ذخیرې یا حوض د خالي کیدو وخت</dt><dd>د یو تالاب یا ذخیرې د سطحې د ښکته کولو لپاره د بېخ منفذ له لارې د اړین وخت اټکل لپاره <a href="Orifice-Drain-Time.php">منفذ نکاسي وخت</a> وکاروئ — د اوبولګولو ذخیرې پلان جوړولو لپاره ګټور.</dd><dt>د ساحې معیارونه</dt><dd>دلته کارول شوي د ویر او منفذ بهاو معادلې د USBR <em>Water Measurement Manual</em> (درېیم چاپ) طرزالعملونو سره سمون خوري چې معمولاً د اوبو مسؤلینو او اوبولګولو ولسوالیو لخوا اړین ګڼل کیږي.</dd></dl>';
@@ -503,7 +500,7 @@ $ec_lang['rc_sketch_filter']='فلتر';
 $ec_lang['rc_sketch_top_crest_curve']='د پورتني کرسټ منحني';
 $ec_lang['rc_sketch_outlet_apron']='د وتنځي اپرون';
 $ec_lang['rc_sketch_radius']='شعاع';
-// Irrigation Pressure. Prefix ip_.
+// Irrigation Pressure Calculator (branch pipe-network pressure/DU estimate). Prefix ip_.
 $ec_lang['ip_main_menu']='د اوبو د لګولو فشار';
 $ec_lang['ip_main_title']='وړیا آنلاین د اوبو د لګولو فشار & د ویش یو‌شانتیا کالکولېټر';
 $ec_lang['ip_main_desc']='د ازموینې څانګې فشار او یو‌شانتیا اټکل';
@@ -553,9 +550,12 @@ $ec_lang['ip_notes_3_def']='یو ثابت تامین فشار (بې پمپ من�
 $ec_lang['ip_notes_4_def']='Christiansen, J.E. (1942). “Irrigation by sprinkling.” California Agricultural Experiment Station Bulletin 670. د میکرو-اوبولګولو ډیزاین لپاره د ASAE/ASABE معیارونه ورته څو-خارجي اصطکاک-ضیاع طریقه کاروي.';
 $ec_lang['ip_notes_5_term']='د کارونې ډیزاین';
 $ec_lang['ip_notes_5_def']='د کارونې کچه او د سیستم/زون بهاو د ساحې اټکل شوي اوسط وریز بهاو (q<sub>avg,field</sub> — د ازموینې جانبي نل خپل اوسط، د لیکل شوي Δفشار اټکل له مخې سم شوی) کاروي، نه یو اټکل شوی کچه: PR = q<sub>avg,field</sub> / A<sub>e</sub>، د سم شوي نمونه‌یي ارزښت لخوا تغذیه شوی. د واټن او د ټول سیستم جانبي/وریز شمېرونه دلته بېل ننوتونه دي ځکه چې د ازموینې لار یوازې یوه بدترینه-حالته څانګه نمونه کوي، نه د ساحې هر جانبي نل.';
+$ec_lang['irr_card_pressure_head']='د اوبو د لګولو فشار & یو‌شانتیا';
+$ec_lang['irr_card_pressure_desc']='د اصلي نل-جانبي نل-وریز یوې څانګې پر اوږدو فشار او بهاو پروفایل نمونه کړئ ترڅو د حقیقي ازموینې-لار فشار له مخې د ویش یو‌شانتیا اټکل کړئ، نه یوازې د کتالوګ وریز بهاو کچه.';
 
 
-// --- Branched Pipe Network (bpn_) ---
+
+// --- Branched Pipe Network (bpn_) --- English source ---
 $ec_lang['bpn_main_menu']='د پایپ څانګه‌یزه شبکه';
 $ec_lang['bpn_main_title']='وړیا آنلاین د پایپ څانګه‌یزې شبکې د فشار کالکولېټر (پرته له حلقو)';
 $ec_lang['bpn_main_desc']='د پایپ څانګه‌یزې (ونیزې) شبکې بهاو او فشار';

@@ -173,10 +173,10 @@ $ec_lang['mpf_full_flow']='पूर्ण प्रवाह, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='पूर्ण प्रवाह से अनुपात, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>यह एक <em>अनंत लंबे</em> पाइप के अंदर का प्रवाह और गहराई है।</dt><dd>पाइप में प्रवाह प्रवेश कराने के लिए काफी अधिक शीर्ष जल गहराई की आवश्यकता हो सकती है। शीर्ष जल गहराई का अनुमान लगाने के लिए वेग शीर्ष का कम से कम 1.5 गुना जोड़ें, या मानक पाइपनाली शीर्ष जल गणना के लिए <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">मेरा 2-मिनट का ट्यूटोरियल</a> देखें, जिसमें <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a> का उपयोग होता है, जो अमेरिकी संघीय राजमार्ग प्रशासन (U.S. Federal Highway Administration) का निःशुल्क पाइपनाली कार्यक्रम है।</dd>';
 $ec_lang['mpf_sewer_ref']='<dl><dt>क्या आप स्वच्छता सीवर डिज़ाइन कर रहे हैं?</dt><dd>4 से 96 इंच (100 से 2400 मिमी) पाइप के लिए <a target="_blank" href="/sewslope.php">न्यूनतम सीवर ढाल तालिकाएँ</a> देखें, जो m/m, mm/m और प्रतिशत में दी गई हैं, और बहुत कम प्रवाह के लिए <a target="_blank" href="/peakfact.php">पीक कारक</a> अध्ययन देखें। दोनों केवल अंग्रेज़ी में संदर्भ दस्तावेज़ हैं।</dd></dl>';
-$ec_lang['mpf_solve_button']='हल करें';
-$ec_lang['mpf_solve_for_flow']='प्रवाह के लिए, Q =';
 $ec_lang['mpf_solver_enter_positive_q']='एक धनात्मक लक्ष्य Q दर्ज करें।';
 $ec_lang['mpf_solver_no_solution']='कोई हल नहीं: y/d0 = 93.8% पर Q पाइप की क्षमता से अधिक है (चयनित इकाइयों में Qmax = {qmax})।';
+$ec_lang['mpf_solve_button']='हल करें';
+$ec_lang['mpf_solve_for_flow']='प्रवाह के लिए, Q =';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='मैनिंग पाइप शीर्ष हानि';
 $ec_lang['mphl_main_title']='मुफ़्त ऑनलाइन मैनिंग पाइप शीर्ष हानि कैलकुलेटर';
@@ -340,7 +340,6 @@ $ec_lang['odt_q_max']='अधिकतम प्रवाह, Q<sub>max</sub>';
 $ec_lang['odt_vol']='निकाला गया आयतन';
 $ec_lang['odt_sketch_start']='प्रारंभ';
 $ec_lang['odt_sketch_end']='अंत';
-// Erosion Setback and Scour Calc.
 // Contact us.
 
 // Irrigation
@@ -501,7 +500,7 @@ $ec_lang['rc_sketch_filter']          = 'फ़िल्टर';
 $ec_lang['rc_sketch_top_crest_curve'] = 'शीर्ष क्रेस्ट वक्र';
 $ec_lang['rc_sketch_outlet_apron']    = 'निर्गम एप्रन';
 $ec_lang['rc_sketch_radius']          = 'त्रिज्या';
-// Irrigation Pressure. 45 additional keys below (ip_main_menu through ip_notes_5_def)
+// Irrigation Pressure Calculator (branch pipe-network pressure/DU estimate). Prefix ip_.
 $ec_lang['ip_main_menu']='सिंचाई दाब';
 $ec_lang['ip_main_title']='मुफ़्त ऑनलाइन सिंचाई दाब और वितरण एकरूपता कैलकुलेटर';
 $ec_lang['ip_main_desc']='परीक्षण शाखा दाब और एकरूपता अनुमान';
@@ -555,7 +554,8 @@ $ec_lang['irr_card_pressure_head']='सिंचाई दाब और एक�
 $ec_lang['irr_card_pressure_desc']='वितरण एकरूपता का अनुमान वास्तविक परीक्षण-पथ दाब से लगाने के लिए — केवल कैटलॉग उत्सर्जक प्रवाह दर से नहीं — मुख्य-पार्श्व-उत्सर्जक शाखा के साथ दाब और प्रवाह प्रोफाइल को मॉडल करें।';
 
 
-// --- Branched Pipe Network (bn_) --- English source / fallback (translation pending) ---
+
+// --- Branched Pipe Network (bpn_) --- English source ---
 $ec_lang['bpn_main_menu']='शाखायुक्त पाइप नेटवर्क';
 $ec_lang['bpn_main_title']='मुफ़्त ऑनलाइन शाखायुक्त पाइप नेटवर्क दाब कैलकुलेटर (कोई लूप नहीं)';
 $ec_lang['bpn_main_desc']='शाखायुक्त (वृक्ष) पाइप नेटवर्क प्रवाह और दाब';

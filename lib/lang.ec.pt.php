@@ -85,8 +85,8 @@ $ec_lang['ec_name_label']='Salvar este cálculo:';
 $ec_lang['ec_name_placeholder']='Nome';
 $ec_lang['ec_name_hint']='Salva esses valores na URL para favoritos, recuperação do histórico e compartilhamento';
 $ec_lang['calc_copy_link']='Copiar link';
-$ec_lang['calc_copy_link_done']='Copiado!';
 $ec_lang['ec_related_calcs']='Calculadoras relacionadas:';
+$ec_lang['calc_copy_link_done']='Copiado!';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Perda de carga em tubulação por Darcy-Weisbach';
 $ec_lang['dw_main_title']='Calculadora gratuita online de perda de carga em tubulação por Darcy-Weisbach';
@@ -173,10 +173,10 @@ $ec_lang['mpf_full_flow']='Vazão a seção plena, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Razão em relação à seção plena, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>Este é o escoamento e a profundidade no interior de uma tubulação <em>infinitamente longa</em>.</dt><dd>Fazer o escoamento entrar na tubulação pode exigir uma profundidade de água significativamente maior. Acrescente pelo menos 1,5 vezes a carga de velocidade para estimar a profundidade de água a montante, ou <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">veja meu tutorial de 2 minutos</a> sobre cálculos padrão de nível de água em bueiros usando o <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, o programa gratuito de bueiros da Administração Federal de Rodovias dos EUA (U.S. Federal Highway Administration).</dd>';
 $ec_lang['mpf_sewer_ref']='<dl><dt>Projetando um esgoto sanitário?</dt><dd>Veja as <a target="_blank" href="/sewslope.php">tabelas de declividade mínima de esgoto</a> para tubulações de 4 a 96 polegadas (100 a 2400 mm), dadas em m/m, mm/m e porcentagem, e o estudo de <a target="_blank" href="/peakfact.php">fatores de pico para vazões muito baixas</a>. Ambos são documentos de referência somente em inglês.</dd></dl>';
-$ec_lang['mpf_solve_button']='Calcular';
-$ec_lang['mpf_solve_for_flow']='para vazão, Q =';
 $ec_lang['mpf_solver_enter_positive_q']='Informe um Q alvo positivo.';
 $ec_lang['mpf_solver_no_solution']='Sem solução: Q excede a capacidade da tubulação em y/d0 = 93.8% (Qmax = {qmax} nas unidades selecionadas).';
+$ec_lang['mpf_solve_button']='Calcular';
+$ec_lang['mpf_solve_for_flow']='para vazão, Q =';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Perda de carga em tubulação por Manning';
 $ec_lang['mphl_main_title']='Calculadora gratuita online de perda de carga em tubulação por Manning';
@@ -340,7 +340,6 @@ $ec_lang['odt_q_max']='Vazão máxima, Q<sub>max</sub>';
 $ec_lang['odt_vol']='Volume esvaziado';
 $ec_lang['odt_sketch_start']='Início';
 $ec_lang['odt_sketch_end']='Fim';
-// Erosion Setback and Scour Calc.
 // Contact us.
 
 // Irrigation
@@ -358,8 +357,6 @@ $ec_lang['irr_card_canal_head']='Projeto & Análise de Canal';
 $ec_lang['irr_card_canal_desc']='Projete ou verifique um canal de irrigação usando a fórmula de Manning. Use a calculadora Trapezoidal para novos canais; a calculadora Irregular para seções naturais ou construídas existentes.';
 $ec_lang['irr_card_seepage_head']='Infiltração em Canal & Eficiência de Condução';
 $ec_lang['irr_card_seepage_desc']='Estime a perda por infiltração em um trecho de canal usando medições de entrada e saída. Calcule a eficiência de condução e a perda anual de água para ajudar a priorizar investimentos em revestimento.';
-$ec_lang['irr_card_pressure_head']='Pressão de Irrigação & Uniformidade';
-$ec_lang['irr_card_pressure_desc']='Modele o perfil de pressão e vazão ao longo de um ramal principal-lateral-emissor para estimar a uniformidade de distribuição a partir da pressão real do caminho de teste, não apenas uma vazão nominal de catálogo do emissor.';
 $ec_lang['irr_quickref_html']='<h3>Referência Rápida</h3><dl><dt>Barragem de desvio ou estrutura de controle</dt><dd>Meça a profundidade da água acima da crista do vertedouro. Use <a href="Weir-Flow-Simple.php">Vertedouro Simples</a> para uma crista uniforme, ou <a href="Weir-Flow-Irregular.php">Vertedouro Irregular</a> para uma crista perfilada ou escalonada.</dd><dt>Comporta de cabeçal ou saída de tubulação</dt><dd>Meça a elevação da água a montante e a jusante (ou a cota de fundo se a descarga for livre). Use <a href="Orifice.php">Fluxo por Orifício</a>. Para uma tubulação circular, D = diâmetro da tubulação; para uma comporta retangular, insira a largura W e a altura D.</dd><dt>Tempo de esvaziamento de reservatório ou lagoa</dt><dd>Use <a href="Orifice-Drain-Time.php">Tempo de Drenagem por Orifício</a> para estimar quanto tempo leva para baixar o nível de uma lagoa ou reservatório através de um orifício no fundo — útil para o planejamento do armazenamento de irrigação.</dd><dt>Padrões de campo</dt><dd>As equações de fluxo por vertedouro e orifício usadas aqui correspondem aos procedimentos do <em>Manual de Medição de Água</em> (3.ª ed.) do USBR, comumente exigidos por administradores de água e distritos de irrigação.</dd></dl>';
 // Drip / Sprinkler Application Rate
 $ec_lang['ip_se']='Espaçamento de emissores, S<sub>e</sub>';
@@ -503,6 +500,7 @@ $ec_lang['rc_sketch_filter']          = 'Filtro';
 $ec_lang['rc_sketch_top_crest_curve'] = 'Curva de crista superior';
 $ec_lang['rc_sketch_outlet_apron']    = 'Laje de saída';
 $ec_lang['rc_sketch_radius']          = 'raio';
+// Irrigation Pressure Calculator (branch pipe-network pressure/DU estimate). Prefix ip_.
 $ec_lang['ip_main_menu']='Pressão em Irrigação';
 $ec_lang['ip_main_title']='Calculadora Gratuita Online de Pressão em Irrigação e Uniformidade de Distribuição';
 $ec_lang['ip_main_desc']='Pressão no Ramo de Teste e Uniformidade Estimada';
@@ -552,9 +550,12 @@ $ec_lang['ip_notes_3_def']='Modela uma pressão de abastecimento fixa (sem curva
 $ec_lang['ip_notes_4_def']='Christiansen, J.E. (1942). “Irrigation by sprinkling.” California Agricultural Experiment Station Bulletin 670. Padrões ASAE/ASABE para projeto de microirrigação usam a mesma abordagem de perda de fricção de saída múltipla.';
 $ec_lang['ip_notes_5_term']='Projeto de Aplicação';
 $ec_lang['ip_notes_5_def']='Taxa de aplicação e fluxo de sistema/zona usam a vazão média estimada do emissor em campo (q<sub>avg,field</sub> — a média da própria lateral de teste, corrigida pela estimativa ΔPressão inserida), não uma taxa adivinhada: PR = q<sub>avg,field</sub> / A<sub>e</sub>, alimentada pelo valor modelado corrigido. Espaçamento e contagens de lateral/emissor do sistema amplo são entradas separadas aqui porque o caminho de teste modela apenas uma ramificação de pior caso, não cada lateral no campo.';
+$ec_lang['irr_card_pressure_head']='Pressão de Irrigação & Uniformidade';
+$ec_lang['irr_card_pressure_desc']='Modele o perfil de pressão e vazão ao longo de um ramal principal-lateral-emissor para estimar a uniformidade de distribuição a partir da pressão real do caminho de teste, não apenas uma vazão nominal de catálogo do emissor.';
 
 
-// --- Branched Pipe Network (bn_) --- English source / fallback (translation pending) ---
+
+// --- Branched Pipe Network (bpn_) --- English source ---
 $ec_lang['bpn_main_menu']='Rede de Tubulações Ramificada';
 $ec_lang['bpn_main_title']='Calculadora Gratuita Online de Pressão em Rede de Tubulações Ramificada (Sem Malhas)';
 $ec_lang['bpn_main_desc']='Vazão e Pressão em Rede de Tubulações Ramificada (Árvore)';

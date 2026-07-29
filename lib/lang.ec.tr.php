@@ -85,8 +85,8 @@ $ec_lang['ec_name_label']='Bu hesaplamayı kaydet:';
 $ec_lang['ec_name_placeholder']='Ad';
 $ec_lang['ec_name_hint']='Bu girdileri URL\'ye kaydeder (yer işareti, geçmiş ve paylaşım için)';
 $ec_lang['calc_copy_link']='Bağlantıyı kopyala';
-$ec_lang['calc_copy_link_done']='Kopyalandı!';
 $ec_lang['ec_related_calcs']='İlgili hesaplayıcılar:';
+$ec_lang['calc_copy_link_done']='Kopyalandı!';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Darcy-Weisbach Boru Yük Kaybı';
 $ec_lang['dw_main_title']='Ücretsiz Çevrimiçi Darcy-Weisbach Boru Yük Kaybı Hesaplayıcısı';
@@ -173,10 +173,10 @@ $ec_lang['mpf_full_flow']='Tam akış, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Tam akışa oran, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>Bu, <em>sonsuz uzunluktaki</em> bir borunun içindeki akış ve derinliktir.</dt><dd>Akışın boruya girmesi için önemli ölçüde daha yüksek memba derinliği gerekebilir. Memba derinliğini elde etmek için en az 1,5 hız yükü ekleyin ya da standart menfez memba hesaplamaları için <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">2 dakikalık öğreticime bakın</a>; bu hesaplamalarda ABD Federal Karayolları İdaresi\'nin (FHWA) ücretsiz menfez programı olan <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>\'i kullanır.</dd>';
 $ec_lang['mpf_sewer_ref']='<dl><dt>Atıksu kanalizasyon hattı mı tasarlıyorsunuz?</dt><dd>4 ila 96 inç (100 ila 2400 mm) arası borular için m/m, mm/m ve yüzde cinsinden verilen <a target="_blank" href="/sewslope.php">minimum kanalizasyon eğim tablolarına</a> ve çok düşük debiler için <a target="_blank" href="/peakfact.php">tepe debi faktörleri</a> çalışmasına bakın. Her ikisi de yalnızca İngilizce referans belgeleridir.</dd></dl>';
-$ec_lang['mpf_solve_button']='Hesapla';
-$ec_lang['mpf_solve_for_flow']='debi için, Q =';
 $ec_lang['mpf_solver_enter_positive_q']='Pozitif bir hedef Q girin.';
 $ec_lang['mpf_solver_no_solution']='Çözüm yok: Q, y/d0 = %93,8\'de boru kapasitesini aşıyor (Qmax = {qmax}, seçilen birimlerde).';
+$ec_lang['mpf_solve_button']='Hesapla';
+$ec_lang['mpf_solve_for_flow']='debi için, Q =';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Manning Boru Yük Kaybı';
 $ec_lang['mphl_main_title']='Ücretsiz Çevrimiçi Manning Boru Yük Kaybı Hesaplayıcısı';
@@ -340,7 +340,6 @@ $ec_lang['odt_q_max']='Maksimum debi, Q<sub>max</sub>';
 $ec_lang['odt_vol']='Boşaltılan hacim';
 $ec_lang['odt_sketch_start']='Başlangıç';
 $ec_lang['odt_sketch_end']='Bitiş';
-// Erosion Setback and Scour Calc.
 // Contact us.
 
 // Irrigation
@@ -358,8 +357,6 @@ $ec_lang['irr_card_canal_head']='Kanal Tasarımı & Analizi';
 $ec_lang['irr_card_canal_desc']='Manning formülünü kullanarak bir sulama kanalı tasarlayın veya kontrol edin. Yeni kanallar için Trapez hesaplayıcısını; mevcut doğal veya yapay kesitler için Düzensiz hesaplayıcısını kullanın.';
 $ec_lang['irr_card_seepage_head']='Kanal Sızıntısı & İletim Verimliliği';
 $ec_lang['irr_card_seepage_desc']='Giriş ve çıkış ölçümlerini kullanarak bir kanal güzergahındaki sızıntı kaybını tahmin edin. İletim verimliliğini ve yıllık su kaybını hesaplayarak astar yatırımlarının önceliklendirilmesine yardımcı olun.';
-$ec_lang['irr_card_pressure_head']='Sulama Basıncı ve Dağılım Düzgünlüğü';
-$ec_lang['irr_card_pressure_desc']='Dağılım düzgünlüğünü, yalnızca katalog damlatıcı debisinden değil gerçek test yolu basıncından tahmin etmek için bir ana hat-lateral-damlatıcı dalı boyunca basınç ve debi profilini modelleyin.';
 $ec_lang['irr_quickref_html']='<h3>Hızlı Başvuru</h3><dl><dt>Derivasyon barajı veya kontrol yapısı</dt><dd>Savak kreti üzerindeki memba su derinliğini ölçün. Tekdüze bir kret için <a href="Weir-Flow-Simple.php">Basit Savak Akışı</a>\'nı, profilli veya kademeli bir kret için <a href="Weir-Flow-Irregular.php">Düzensiz Savak Akışı</a>\'nı kullanın.</dd><dt>Baş kapak veya boru çıkışı</dt><dd>Memba su yüzü kotunu ve mansap su yüzü kotunu ölçün (serbest akışta taban kotunu kullanın). <a href="Orifice.php">Orifis Akışı</a>\'nı kullanın. Dairesel bir boru için D = boru çapı; dikdörtgen bir kapak için genişlik W ve yükseklik D girin.</dd><dt>Rezervuar veya gölet boşalma süresi</dt><dd>Bir gölet veya rezervuarı taban orifisinden ne kadar sürede boşaltacağınızı tahmin etmek için <a href="Orifice-Drain-Time.php">Orifis Boşalma Süresi</a>\'ni kullanın — sulama depolama planlaması için kullanışlıdır.</dd><dt>Saha standartları</dt><dd>Burada kullanılan savak ve orifis akış denklemleri, su yöneticileri ve sulama birlikleri tarafından genellikle şart koşulan USBR <em>Water Measurement Manual</em> (3. baskı) prosedürleriyle örtüşür.</dd></dl>';
 // Drip / Sprinkler Application Rate
 $ec_lang['ip_se']='Damlatıcı aralığı, S<sub>e</sub>';
@@ -503,7 +500,7 @@ $ec_lang['rc_sketch_filter']          = 'Filtre';
 $ec_lang['rc_sketch_top_crest_curve'] = 'Üst Eşik Eğrisi';
 $ec_lang['rc_sketch_outlet_apron']    = 'Çıkış Apronu';
 $ec_lang['rc_sketch_radius']          = 'yarıçap';
-// Irrigation Pressure. Prefix ip_.
+// Irrigation Pressure Calculator (branch pipe-network pressure/DU estimate). Prefix ip_.
 $ec_lang['ip_main_menu']='Sulama Basıncı';
 $ec_lang['ip_main_title']='Ücretsiz Çevrimiçi Sulama Basıncı ve Dağılım Düzgünlüğü Hesaplayıcısı';
 $ec_lang['ip_main_desc']='Test Dalı Basıncı ve Düzgünlük Tahmini';
@@ -553,9 +550,12 @@ $ec_lang['ip_notes_3_def']='Tek bir sabit besleme basıncı (pompa eğrisi yok),
 $ec_lang['ip_notes_4_def']='Christiansen, J.E. (1942). “Irrigation by sprinkling.” California Tarımsal Deneme İstasyonu Bülteni 670. ASAE/ASABE mikrosulama tasarımı standartları aynı çok çıkışlı sürtünme-kayıp yaklaşımını kullanır.';
 $ec_lang['ip_notes_5_term']='Uygulama Tasarımı';
 $ec_lang['ip_notes_5_def']='Uygulama oranı ve sistem/bölge debi tahmini saha-ortalama damlatıcı debisini (q<sub>avg,field</sub> — test lateral\'inin kendi ortalaması, girilen Δbasınç tahmini tarafından düzeltilmiş), tahmin edilen oran değil kullanır: PR = q<sub>avg,field</sub> / A<sub>e</sub>, düzeltilmiş modellenen değer tarafından beslenmiş. Aralık ve sistem-geniş lateral/damlatıcı sayıları ayrı girdilerdir çünkü test yolu sadece bir en kötü durum dalı modeller, sahada her lateral değil.';
+$ec_lang['irr_card_pressure_head']='Sulama Basıncı ve Dağılım Düzgünlüğü';
+$ec_lang['irr_card_pressure_desc']='Dağılım düzgünlüğünü, yalnızca katalog damlatıcı debisinden değil gerçek test yolu basıncından tahmin etmek için bir ana hat-lateral-damlatıcı dalı boyunca basınç ve debi profilini modelleyin.';
 
 
-// --- Branched Pipe Network (bn_) --- English source / fallback (translation pending) ---
+
+// --- Branched Pipe Network (bpn_) --- English source ---
 $ec_lang['bpn_main_menu']='Dallı Boru Şebekesi';
 $ec_lang['bpn_main_title']='Ücretsiz Çevrimiçi Dallı Boru Şebekesi Basınç Hesaplayıcısı (Döngüsüz)';
 $ec_lang['bpn_main_desc']='Dallı (Ağaç) Boru Şebekesi Debi ve Basınç';

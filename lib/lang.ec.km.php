@@ -85,8 +85,8 @@ $ec_lang['ec_name_label']='រក្សាទុកការគណនានេ�
 $ec_lang['ec_name_placeholder']='ឈ្មោះ';
 $ec_lang['ec_name_hint']='រក្សាទុកទិន្នន័យបញ្ចូលនេះទៅក្នុង URL សម្រាប់ការចាប់ផ្តើមវិញ ប្រវត្តិ ឬការចែងលែង';
 $ec_lang['calc_copy_link']='ចម្លងតំណ';
-$ec_lang['calc_copy_link_done']='បានចម្លង!';
 $ec_lang['ec_related_calcs']='ម៉ាស៊ីនគណនាដែលពាក់ព័ន្ធ៖';
+$ec_lang['calc_copy_link_done']='បានចម្លង!';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Darcy-Weisbach ការបាត់បង់ទំនាប់ទឹកក្នុងបំពង់';
 $ec_lang['dw_main_title']='ម៉ាស៊ីនគណនា Darcy-Weisbach ការបាត់បង់ទំនាប់ទឹកក្នុងបំពង់ ឥតគិតថ្លៃ';
@@ -173,10 +173,10 @@ $ec_lang['mpf_full_flow']='ហូរពេញ, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='សមាមាត្រទៅនឹងហូរពេញ, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>នេះជាការហូរ និងជម្រៅនៅខាងក្នុងបំពង់ <em>វែងឥតកំណត់</em>។</dt><dd>ការទទួលទឹកចូលបំពង់អាចត្រូវការជម្រៅទឹកខាងលើខ្ពស់ជាងច្រើន។ បន្ថែមយ៉ាងហោចណាស់ 1.5 ដងទំនាប់ល្បឿន ដើម្បីទទួលបានជម្រៅទឹកខាងលើ ឬ <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">មើលការណែនាំ 2 នាទីរបស់ខ្ញុំ</a> សម្រាប់ការគណនាទំនាប់ទឹក culvert ស្ដង់ដារ ដោយប្រើ <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a> ដែលជាកម្មវិធីគណនា culvert ឥតគិតថ្លៃ ពីរដ្ឋបាលផ្លូវហាយវេសហព័ន្ធសហរដ្ឋអាមេរិក។</dd>';
 $ec_lang['mpf_sewer_ref']='<dl><dt>តើអ្នកកំពុងរចនាបំពង់លូទឹកកខ្វក់ (sanitary sewer)?</dt><dd>សូមមើល <a target="_blank" href="/sewslope.php">តារាងជម្រាលអប្បបរមាបំពង់លូ</a> សម្រាប់បំពង់ទំហំ 4 ដល់ 96 អ៊ិន្ឈ៍ (100 ដល់ 2400 mm) ដែលបានផ្ដល់ជា m/m, mm/m និងភាគរយ ព្រមទាំង <a target="_blank" href="/peakfact.php">ការសិក្សាអំពីមេគុណកំពូល (peaking factors) សម្រាប់លំហូរទាបខ្លាំង</a>។ ឯកសារយោងទាំងពីរនេះមានតែជាភាសាអង់គ្លេសប៉ុណ្ណោះ។</dd></dl>';
-$ec_lang['mpf_solve_button']='ដោះស្រាយ';
-$ec_lang['mpf_solve_for_flow']='សម្រាប់លំហូរ, Q =';
 $ec_lang['mpf_solver_enter_positive_q']='សូមបញ្ចូល Q គោលដៅជាចំនួនវិជ្ជមាន។';
 $ec_lang['mpf_solver_no_solution']='គ្មានដំណោះស្រាយ៖ Q លើសសមត្ថភាពបំពង់នៅ y/d0 = 93.8% (Qmax = {qmax} គិតជាឯកតាដែលបានជ្រើសរើស)។';
+$ec_lang['mpf_solve_button']='ដោះស្រាយ';
+$ec_lang['mpf_solve_for_flow']='សម្រាប់លំហូរ, Q =';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Manning ការបាត់បង់ទំនាប់ក្នុងបំពង់';
 $ec_lang['mphl_main_title']='ម៉ាស៊ីនគណនា Manning ការបាត់បង់ទំនាប់ក្នុងបំពង់ ឥតគិតថ្លៃ';
@@ -340,7 +340,6 @@ $ec_lang['odt_q_max']='លំហូរអតិបរមា, Q<sub>max</sub>';
 $ec_lang['odt_vol']='បរិមាណដែលបានបង្ហូរ';
 $ec_lang['odt_sketch_start']='ចាប់ផ្ដើម';
 $ec_lang['odt_sketch_end']='ចប់';
-// Erosion Setback and Scour Calc.
 // Contact us.
 
 // Irrigation
@@ -501,7 +500,7 @@ $ec_lang['rc_sketch_filter']='តម្រង';
 $ec_lang['rc_sketch_top_crest_curve']='ខ្សែកោងកំពូល';
 $ec_lang['rc_sketch_outlet_apron']='បន្ទះការពារច្រកចេញ';
 $ec_lang['rc_sketch_radius']='កាំ';
-// Irrigation Pressure (main calculator). Prefix ip_.
+// Irrigation Pressure Calculator (branch pipe-network pressure/DU estimate). Prefix ip_.
 $ec_lang['ip_main_menu']='សម្ពាធស្រោចស្រព';
 $ec_lang['ip_main_title']='ម៉ាស៊ីនគណនាសម្ពាធស្រោចស្រព និងឯកសណ្ឋានភាពចែកចាយ ឥតគិតថ្លៃតាមអ៊ីនធឺណិត';
 $ec_lang['ip_main_desc']='សម្ពាធសាខាសាកល្បង និងការប៉ាន់ស្មានឯកសណ្ឋានភាព';
@@ -555,7 +554,8 @@ $ec_lang['irr_card_pressure_head']='សម្ពាធស្រោចស្រ�
 $ec_lang['irr_card_pressure_desc']='ធ្វើគំរូទម្រង់សម្ពាធ និងលំហូរតាមបណ្ដោយសាខាបំពង់មេ-បំពង់រង-ក្បាលបញ្ចេញទឹក ដើម្បីប៉ាន់ស្មានឯកសណ្ឋានភាពចែកចាយពីសម្ពាធពិតនៃផ្លូវសាកល្បង មិនមែនត្រឹមតែអត្រាលំហូរក្បាលបញ្ចេញទឹកតាមកាតាឡុកទេ។';
 
 
-// --- Branched Pipe Network (bn_) --- English source / fallback (translation pending) ---
+
+// --- Branched Pipe Network (bpn_) --- English source ---
 $ec_lang['bpn_main_menu']='បណ្ដាញបំពង់បែកសាខា';
 $ec_lang['bpn_main_title']='ម៉ាស៊ីនគណនាសម្ពាធបណ្ដាញបំពង់បែកសាខា ឥតគិតថ្លៃតាមអ៊ីនធឺណិត (គ្មានរង្វិលបិទ)';
 $ec_lang['bpn_main_desc']='លំហូរ និងសម្ពាធនៃបណ្ដាញបំពង់បែកសាខា (ដូចមែកឈើ)';

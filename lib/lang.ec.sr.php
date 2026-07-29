@@ -83,8 +83,8 @@ $ec_lang['ec_name_label']='Сачувајте овај прорачун:';
 $ec_lang['ec_name_placeholder']='Назив';
 $ec_lang['ec_name_hint']='Чува унете вредности у URL адресу за обележавање, преузимање из историје и дељење';
 $ec_lang['calc_copy_link']='Копирај линк';
-$ec_lang['calc_copy_link_done']='Копирано!';
 $ec_lang['ec_related_calcs']='Слични калкулатори:';
+$ec_lang['calc_copy_link_done']='Копирано!';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Губитак напора у цевима по Darcy-Weisbachу';
 $ec_lang['dw_main_title']='Бесплатни онлајн калкулатор губитка напора у цевима по Darcy-Weisbachу';
@@ -171,10 +171,10 @@ $ec_lang['mpf_full_flow']='Пуни проток, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Однос према пуном протоку, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>Ово је проток и дубина унутар <em>бесконачно дугачке</em> цеви.</dt><dd>За унос воде у цев може бити потребна знатно већа дубина нивоа воде. Додајте најмање 1,5 пута брзинску висину да бисте добили дубину нивоа воде или <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">погледајте мој 2-минутни туторијал</a> за стандардна израчунавања нивоа воде на пропусту помоћу <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, бесплатног програма за пропусте Управе за аутопутеве САД (U.S. Federal Highway Administration).</dd>';
 $ec_lang['mpf_sewer_ref']='<dl><dt>Пројектујете санитарну канализацију?</dt><dd>Погледајте <a target="_blank" href="/sewslope.php">табеле минималних падова канализације</a> за цеви од 4 до 96 инча (100 до 2400 mm), дате у m/m, mm/m и процентима, и студију <a target="_blank" href="/peakfact.php">фактора врха за веома мале протоке</a>. Оба су референтна документа само на енглеском језику.</dd></dl>';
-$ec_lang['mpf_solve_button']='Израчунај';
-$ec_lang['mpf_solve_for_flow']='за проток, Q =';
 $ec_lang['mpf_solver_enter_positive_q']='Унесите позитиван циљани Q.';
 $ec_lang['mpf_solver_no_solution']='Нема решења: Q премашује капацитет цеви при y/d0 = 93.8% (Qmax = {qmax} у изабраним јединицама).';
+$ec_lang['mpf_solve_button']='Израчунај';
+$ec_lang['mpf_solve_for_flow']='за проток, Q =';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Губитак напора у цевима по Manningу';
 $ec_lang['mphl_main_title']='Бесплатни онлајн калкулатор губитка напора у цевима по Manningу';
@@ -338,7 +338,6 @@ $ec_lang['odt_q_max']='Максимални проток, Q<sub>max</sub>';
 $ec_lang['odt_vol']='Испражњена запремина';
 $ec_lang['odt_sketch_start']='Почетак';
 $ec_lang['odt_sketch_end']='Крај';
-// Erosion Setback and Scour Calc.
 // Contact us.
 
 // Irrigation
@@ -357,8 +356,6 @@ $ec_lang['irr_card_canal_desc']='Пројектујте или проверит�
 $ec_lang['irr_card_seepage_head']='Процеђивање из канала и ефикасност транспорта воде';
 $ec_lang['irr_card_seepage_desc']='Процените губитак процеђивањем из деонице канала помоћу мерења притицаја и отицаја. Израчунајте ефикасност транспорта воде и годишњи губитак воде ради приоритизације улагања у облагање.';
 $ec_lang['irr_quickref_html']='<h3>Брзи водич</h3><dl><dt>Одводна брана или устава</dt><dd>Измерите дубину узводне воде изнад круне прелива. Користите <a href="Weir-Flow-Simple.php">Прелив — равномерна круна</a> за равномерну круну, или <a href="Weir-Flow-Irregular.php">Прелив — неуједначени профил</a> за профилисану или степенасту круну.</dd><dt>Главна устава или цевни излаз</dt><dd>Измерите коту узводне и низводне воде (или коту дна ако слободно истиче). Користите <a href="Orifice.php">Проток кроз отвор</a>. За кружну цев D = пречник цеви; за правоугаону уставу унесите ширину W и висину D.</dd><dt>Време пражњења резервоара или рибњака</dt><dd>Користите <a href="Orifice-Drain-Time.php">Трајање пражњења кроз отвор</a> за процену колико је потребно да се ниво рибњака или резервоара спусти кроз донски отвор — корисно за планирање акумулације за наводњавање.</dd><dt>Теренски стандарди</dt><dd>Овде коришћене једначине протока кроз прелив и отвор одговарају поступцима из USBR <em>Water Measurement Manual</em> (3. изд.), које обично захтевају управници вода и наводњавачки окрузи.</dd></dl>';
-$ec_lang['irr_card_pressure_head']='Притисак и уједначеност наводњавања';
-$ec_lang['irr_card_pressure_desc']='Моделирајте профил притиска и протока дуж гране магистрала–латерала–емитер да бисте проценили уједначеност дистрибуције на основу стварног притиска путање теста, а не само каталошког протока емитера.';
 // Drip / Sprinkler Application Rate
 $ec_lang['ip_se']='Растојање емитера, S<sub>e</sub>';
 $ec_lang['ip_sl']='Растојање латерала, S<sub>l</sub>';
@@ -501,7 +498,7 @@ $ec_lang['rc_sketch_filter']          = 'Филтер';
 $ec_lang['rc_sketch_top_crest_curve'] = 'Крива гребена';
 $ec_lang['rc_sketch_outlet_apron']    = 'Излазна плоча';
 $ec_lang['rc_sketch_radius']          = 'полупречник';
-// Irrigation Pressure (Irrigation Pressure main menu and calculator)
+// Irrigation Pressure Calculator (branch pipe-network pressure/DU estimate). Prefix ip_.
 $ec_lang['ip_main_menu']='Притисак наводњавања';
 $ec_lang['ip_main_title']='Бесплатни онлајн калкулатор притиска и уједначености дистрибуције наводњавања';
 $ec_lang['ip_main_desc']='Притисак тестне гране и процена уједначености';
@@ -551,9 +548,12 @@ $ec_lang['ip_notes_3_def']='Моделира један фиксни прити�
 $ec_lang['ip_notes_4_def']='Christiansen, J.E. (1942). “Irrigation by sprinkling.” California Agricultural Experiment Station Bulletin 670. ASAE/ASABE стандарди за пројектовање микронаводњавања користе исти приступ прорачуна губитака трењем за вишеструке изливне тачке.';
 $ec_lang['ip_notes_5_term']='Пројектовање примене';
 $ec_lang['ip_notes_5_def']='Интензитет наводњавања и проток система/зоне користе процењени просечан проток емитера на терену (q<sub>avg,field</sub> — сопствени просек тестне латерале, исправљен унетом проценом Δпритиска), а не претпостављену вредност: PR = q<sub>avg,field</sub> / A<sub>e</sub>, заснован на исправљеној моделираној вредности. Размак и укупан број латерала/емитера у систему су овде одвојени улази, јер путања теста моделира само једну најнеповољнију грану, а не сваку латералу на терену.';
+$ec_lang['irr_card_pressure_head']='Притисак и уједначеност наводњавања';
+$ec_lang['irr_card_pressure_desc']='Моделирајте профил притиска и протока дуж гране магистрала–латерала–емитер да бисте проценили уједначеност дистрибуције на основу стварног притиска путање теста, а не само каталошког протока емитера.';
 
 
-// --- Branched Pipe Network (bn_) --- English source / fallback (translation pending) ---
+
+// --- Branched Pipe Network (bpn_) --- English source ---
 $ec_lang['bpn_main_menu']='Разграната цевна мрежа';
 $ec_lang['bpn_main_title']='Бесплатни онлајн калкулатор притиска у разгранатој цевној мрежи (без петљи)';
 $ec_lang['bpn_main_desc']='Проток и притисак у разгранатој (стаблоликој) цевној мрежи';
