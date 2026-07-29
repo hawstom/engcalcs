@@ -2,14 +2,16 @@
 <html>
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>LPN Phase 0 canvas spike (throwaway)</title>
 <style>
   html,body{margin:0;height:100%;overflow:hidden;font:13px sans-serif;background:#eee}
   #toolbar{position:fixed;top:0;left:0;right:0;z-index:10;background:#222;color:#fff;
-    padding:6px 8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    padding:6px 8px;display:flex;gap:6px;align-items:center;flex-wrap:wrap;box-sizing:border-box}
   #toolbar button,#toolbar label{background:#444;color:#fff;border:1px solid #666;
-    padding:4px 8px;border-radius:3px;cursor:pointer}
-  #fps{margin-left:auto;font-family:monospace}
+    padding:4px 6px;border-radius:3px;cursor:pointer;font-size:12px;white-space:nowrap}
+  #fps{position:fixed;top:4px;right:4px;z-index:11;font-family:monospace;background:#000;
+    color:#0f0;padding:2px 6px;border-radius:3px}
   #canvas{position:absolute;top:34px;left:0;right:0;bottom:0;touch-action:none;background:#f7f7f2}
   .node{fill:#2a6;stroke:#144;stroke-width:1;cursor:pointer}
   .node.reservoir{fill:#26a}
@@ -30,14 +32,18 @@
 </head>
 <body>
 <div id="toolbar">
-  <button id="btnGrid">Toggle 200-node grid</button>
+  <button id="btnGrid">200-node grid</button>
   <button id="btnExtent">Zoom extent</button>
   <label>Backdrop <input id="fileBackdrop" type="file" accept="image/*" style="display:none"></label>
-  <button id="btnRegister" disabled>Register backdrop (2 clicks + distance)</button>
-  <button id="btnPrint">Print preview</button>
-  <span id="fps">fps: --</span>
+  <button id="btnScale" disabled title="Click 2 points on the image, then enter the real distance">Scale</button>
+  <button id="btnPosition" disabled title="Click a point on the image, then click a node to align to it, or Cancel to type coordinates">Position</button>
+  <button id="btnPrint">Print</button>
 </div>
-<svg id="canvas">
+<div id="hint" style="position:fixed;top:34px;left:4px;z-index:9;font-size:11px;color:#666">
+  Double-click a link to add a bend; double-click a bend to remove it.
+</div>
+<span id="fps">fps: --</span>
+<svg id="canvas" width="100%" height="100%">
   <g id="world">
     <g id="backdropLayer"></g>
     <g id="grid" style="display:none"></g>
@@ -85,60 +91,146 @@ function buildNetwork(){
     if(c<cols-1)links.push({id:'L'+links.length,a:at(r,c).id,b:at(r,c+1).id});
     if(r<rows-1)links.push({id:'L'+links.length,a:at(r,c).id,b:at(r+1,c).id});
   }
+  links.forEach(l=>l.verts=[]);
   links[0].pump=true;
-  links[3].vx=at(0,2).x+dx*0.4; links[3].vy=at(0,2).y-3; // one link gets a bend vertex
-  labels.push({text:'خزان (reservoir)',x:-4,y:-6,anchorNode:'N0'});
-  labels.push({text:'መስቀለኛ መንገድ (junction)',x:20,y:22,anchorNode:'N7'});
+  links[3].verts=[{x:at(0,2).x+dx*0.4,y:at(0,2).y-3}]; // one link starts pre-bent
+  labels.push({text:'خزان (reservoir)',x:3,y:-3,anchorNode:'N0'});
+  labels.push({text:'መስቀለኛ መንገድ (junction)',x:3,y:3,anchorNode:'N7'});
 }
 
 // ---- 200-node headroom grid, hidden by default ----
+let gridNodes=[];
 function buildGrid(){
-  const cols=20,rows=10,dx=6,dy=6,gn=[],gl=[];
-  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++)gn.push({x:100+c*dx,y:r*dy});
+  const cols=20,rows=10,dx=6,dy=6,gl=[];
+  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++)gridNodes.push({x:100+c*dx,y:r*dy});
   for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
     const i=r*cols+c;
     if(c<cols-1)gl.push([i,i+1]);
     if(r<rows-1)gl.push([i,i+cols]);
   }
-  gl.forEach(([a,b])=>el('line',{x1:gn[a].x,y1:gn[a].y,x2:gn[b].x,y2:gn[b].y,class:'link'},gridLayer));
-  gn.forEach(n=>el('circle',{cx:n.x,cy:n.y,r:0.8,class:'node'},gridLayer));
+  gl.forEach(([a,b])=>el('line',{x1:gridNodes[a].x,y1:gridNodes[a].y,x2:gridNodes[b].x,y2:gridNodes[b].y,class:'link'},gridLayer));
+  gridNodes.forEach(n=>el('circle',{cx:n.x,cy:n.y,r:0.8,class:'node'},gridLayer));
 }
 
 function nodeById(id){return nodes.find(n=>n.id===id);}
-function render(){
+function linkById(id){return links.find(l=>l.id===id);}
+function linkPoints(l){
+  const a=nodeById(l.a),b=nodeById(l.b);
+  return [a,...l.verts,b].map(p=>`${p.x},${p.y}`).join(' ');
+}
+// One-time DOM build. Drag updates below touch only the elements that moved —
+// the original design rebuilt the whole SVG on every pointermove, which was
+// the actual cause of the 20-45fps reported on-device, not the technology.
+const nodeEls={},linkEls={},labelEls=[],incidentLinks={},labelsByAnchor={};
+function buildLinkEls(l){
+  const line=el('polyline',{points:linkPoints(l),fill:'none',
+    class:'link'+(l.pump?' pump':''),'data-link':l.id},linksLayer);
+  const handles=l.verts.map((v,vi)=>el('circle',{cx:v.x,cy:v.y,r:0.9,class:'vhandle',
+    'data-link':l.id,'data-vidx':vi},linksLayer));
+  linkEls[l.id]={line,handles};
+}
+function buildDom(){
   linksLayer.innerHTML='';nodesLayer.innerHTML='';labelsLayer.innerHTML='';
+  nodes.forEach(n=>incidentLinks[n.id]=[]);
   links.forEach(l=>{
-    const a=nodeById(l.a),b=nodeById(l.b);
-    let e;
-    if(l.vx!==undefined){
-      e=el('polyline',{points:`${a.x},${a.y} ${l.vx},${l.vy} ${b.x},${b.y}`,
-        fill:'none',class:'link'+(l.pump?' pump':'')},linksLayer);
-      el('circle',{cx:l.vx,cy:l.vy,r:0.9,class:'vhandle','data-link':l.id},linksLayer);
-    } else {
-      e=el('line',{x1:a.x,y1:a.y,x2:b.x,y2:b.y,class:'link'+(l.pump?' pump':'')},linksLayer);
-    }
-    e.dataset.link=l.id;
+    incidentLinks[l.a].push(l.id); incidentLinks[l.b].push(l.id);
+    buildLinkEls(l);
   });
   nodes.forEach(n=>{
-    el('circle',{cx:n.x,cy:n.y,r:1.6,class:'node'+(n.reservoir?' reservoir':''),
+    const circle=el('circle',{cx:n.x,cy:n.y,r:1.6,class:'node'+(n.reservoir?' reservoir':''),
       'data-node':n.id},nodesLayer);
-    el('text',{x:n.x+2,y:n.y-2,class:'lbl',style:'font-size:'+(2)+'px'},nodesLayer).textContent=n.id+' '+n.elev;
+    const text=el('text',{x:n.x+2,y:n.y-2,class:'lbl',style:'font-size:2px'},nodesLayer);
+    text.textContent=n.id+' '+n.elev;
+    nodeEls[n.id]={circle,text};
+    labelsByAnchor[n.id]=[];
   });
   labels.forEach((lb,i)=>{
     const an=nodeById(lb.anchorNode);
-    el('line',{x1:an.x,y1:an.y,x2:an.x+lb.x,y2:an.y+lb.y,class:'leader'},labelsLayer);
-    const t=el('text',{x:an.x+lb.x,y:an.y+lb.y,class:'lbl draglbl',style:'font-size:3px',
-      'data-lbl':i},labelsLayer);
-    t.textContent=lb.text;
+    const leader=el('line',{x1:an.x,y1:an.y,x2:an.x+lb.x,y2:an.y+lb.y,class:'leader'},labelsLayer);
+    const text=el('text',{x:an.x+lb.x,y:an.y+lb.y,class:'lbl draglbl',style:'font-size:3px',
+      'text-anchor':'start','data-lbl':i},labelsLayer);
+    text.textContent=lb.text;
+    let w=10; try{w=text.getBBox().width;}catch(err){}
+    labelEls[i]={leader,text,side:'right',width:w};
+    labelsByAnchor[lb.anchorNode].push(i);
   });
 }
+function updateLinkGeometry(id){
+  linkEls[id].line.setAttribute('points',linkPoints(linkById(id)));
+}
+// Labels flip their text-anchor once dragged 80% of their own rendered width past the anchor's
+// vertical line, so the text reads outward from its leader instead of running back over the node.
+function updateLabelGeometry(i){
+  const lb=labels[i],an=nodeById(lb.anchorNode),le=labelEls[i];
+  const px=an.x+lb.x, py=an.y+lb.y;
+  if(le.side==='right' && lb.x < -0.8*le.width){le.side='left'; le.text.setAttribute('text-anchor','end');}
+  else if(le.side==='left' && lb.x > 0.8*le.width){le.side='right'; le.text.setAttribute('text-anchor','start');}
+  le.leader.setAttribute('x1',an.x);le.leader.setAttribute('y1',an.y);
+  le.leader.setAttribute('x2',px);le.leader.setAttribute('y2',py);
+  le.text.setAttribute('x',px);le.text.setAttribute('y',py);
+}
+function updateNode(id){
+  const n=nodeById(id),ne=nodeEls[id];
+  ne.circle.setAttribute('cx',n.x);ne.circle.setAttribute('cy',n.y);
+  ne.text.setAttribute('x',n.x+2);ne.text.setAttribute('y',n.y-2);
+  incidentLinks[id].forEach(updateLinkGeometry);
+  labelsByAnchor[id].forEach(updateLabelGeometry);
+}
+function updateVertex(linkId,vidx){
+  const l=linkById(linkId),v=l.verts[vidx],handle=linkEls[linkId].handles[vidx];
+  handle.setAttribute('cx',v.x);handle.setAttribute('cy',v.y);
+  updateLinkGeometry(linkId);
+}
+function distToSegment(p,a,b){
+  const dx=b.x-a.x,dy=b.y-a.y,len2=dx*dx+dy*dy;
+  let t=len2?((p.x-a.x)*dx+(p.y-a.y)*dy)/len2:0;
+  t=Math.max(0,Math.min(1,t));
+  return Math.hypot(p.x-(a.x+t*dx),p.y-(a.y+t*dy));
+}
+function rebuildLink(l){
+  linkEls[l.id].line.remove();
+  linkEls[l.id].handles.forEach(h=>h.remove());
+  buildLinkEls(l);
+}
+function insertVertex(linkId,pt){
+  const l=linkById(linkId);
+  const pts=[nodeById(l.a),...l.verts,nodeById(l.b)];
+  let bestI=0,bestD=Infinity;
+  for(let i=0;i<pts.length-1;i++){
+    const d=distToSegment(pt,pts[i],pts[i+1]);
+    if(d<bestD){bestD=d;bestI=i;}
+  }
+  l.verts.splice(bestI,0,{x:pt.x,y:pt.y});
+  rebuildLink(l);
+}
+function removeVertex(linkId,vidx){
+  const l=linkById(linkId);
+  l.verts.splice(vidx,1);
+  rebuildLink(l);
+}
 
+// Fits the actual rendered extent, not just anchor points: a node's circle radius and a label's
+// full text-box (using its cached width/side from buildDom) both push the frame outward, so
+// zoom-extent doesn't clip a symbol or crop a line of text at the edge.
 function bbox(){
-  const xs=nodes.map(n=>n.x),ys=nodes.map(n=>n.y);
-  return {minx:Math.min(...xs),maxx:Math.max(...xs),miny:Math.min(...ys),maxy:Math.max(...ys)};
+  let minx=Infinity,maxx=-Infinity,miny=Infinity,maxy=-Infinity;
+  const inc=(x,y)=>{if(x<minx)minx=x;if(x>maxx)maxx=x;if(y<miny)miny=y;if(y>maxy)maxy=y;};
+  const NR=1.8; // node circle radius (1.6) plus a hair
+  nodes.forEach(n=>{inc(n.x-NR,n.y-NR);inc(n.x+NR,n.y+NR);});
+  labels.forEach((lb,i)=>{
+    const an=nodeById(lb.anchorNode),px=an.x+lb.x,py=an.y+lb.y;
+    const le=labelEls[i]||{width:10,side:'right'},h=4;
+    if(le.side==='right'){inc(px,py-h);inc(px+le.width,py+h*0.3);}
+    else {inc(px-le.width,py-h);inc(px,py+h*0.3);}
+  });
+  if(gridLayer.style.display!=='none'){
+    const GR=1;
+    gridNodes.forEach(n=>{inc(n.x-GR,n.y-GR);inc(n.x+GR,n.y+GR);});
+  }
+  return {minx,maxx,miny,maxy};
 }
 function zoomExtent(){
-  const b=bbox(),r=svg.getBoundingClientRect(),pad=10;
+  const b=bbox(),r=svg.getBoundingClientRect(),pad=16;
   const w=Math.max(b.maxx-b.minx,1),h=Math.max(b.maxy-b.miny,1);
   state.s=Math.min((r.width-2*pad)/w,(r.height-2*pad)/h);
   state.tx=pad-b.minx*state.s+ (r.width-2*pad-w*state.s)/2;
@@ -147,8 +239,13 @@ function zoomExtent(){
 }
 
 // ---- pointer interaction: pan, node drag, vertex drag, label drag, pinch, double-tap ----
+// All actual DOM work happens once per animation frame (the tick() loop below), never directly
+// inside a pointer event — a pointermove only records state and sets dragDirty. This decouples
+// rendering from input-event rate (which can fire far faster than the screen repaints, especially
+// on a high-poll-rate mouse), so both the drag feel and the fps readout reflect real paint frames.
 const pointers=new Map();
-let drag=null; // {type,...}
+let drag=null; // {type,pointerId,startX,startY,...}
+let dragDirty=false;
 let lastTap=null;
 function zoomAbout(sx,sy,factor){
   const r=svg.getBoundingClientRect();
@@ -169,17 +266,19 @@ svg.addEventListener('pointerdown',e=>{
   if(pointers.size===2){
     const pts=[...pointers.values()];
     drag={type:'pinch',d0:Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y),s0:state.s};
+    resetFpsWindow();
     return;
   }
   const t=e.target;
+  const common={pointerId:e.pointerId,startX:e.clientX,startY:e.clientY};
   if(t.dataset.node){
-    drag={type:'node',id:t.dataset.node};
+    drag={type:'node',id:t.dataset.node,...common};
   } else if(t.dataset.link!==undefined && t.classList.contains('vhandle')){
-    drag={type:'vertex',id:t.dataset.link};
+    drag={type:'vertex',id:t.dataset.link,vidx:+t.dataset.vidx,...common};
   } else if(t.dataset.lbl!==undefined){
-    drag={type:'label',idx:+t.dataset.lbl};
+    drag={type:'label',idx:+t.dataset.lbl,...common};
   } else {
-    drag={type:'pan',x0:e.clientX,y0:e.clientY,tx0:state.tx,ty0:state.ty};
+    drag={type:'pan',tx0:state.tx,ty0:state.ty,...common};
     // double-tap detection (touch only, background)
     if(e.pointerType==='touch'){
       const now=Date.now();
@@ -188,13 +287,16 @@ svg.addEventListener('pointerdown',e=>{
       } else lastTap={t:now,x:e.clientX,y:e.clientY};
     }
   }
+  if(drag)resetFpsWindow();
 });
 svg.addEventListener('pointermove',e=>{
   if(!pointers.has(e.pointerId))return;
   pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
-  frameCount++;
-  if(!drag)return;
-  if(drag.type==='pinch'&&pointers.size===2){
+  if(drag)dragDirty=true;
+});
+function applyDrag(){
+  if(drag.type==='pinch'){
+    if(pointers.size!==2)return;
     const pts=[...pointers.values()];
     const d=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y);
     const mx=(pts[0].x+pts[1].x)/2, my=(pts[0].y+pts[1].y)/2;
@@ -202,29 +304,47 @@ svg.addEventListener('pointermove',e=>{
     zoomAbout(mx,my,factor);
     return;
   }
+  const p=pointers.get(drag.pointerId); if(!p)return;
   if(drag.type==='pan'){
-    state.tx=drag.tx0+(e.clientX-drag.x0); state.ty=drag.ty0+(e.clientY-drag.y0);
+    state.tx=drag.tx0+(p.x-drag.startX); state.ty=drag.ty0+(p.y-drag.startY);
     setTransform();
   } else if(drag.type==='node'){
-    const w=screenToWorld(e.clientX,e.clientY);
-    const n=nodeById(drag.id); n.x=w.x; n.y=w.y; render();
+    const w=screenToWorld(p.x,p.y);
+    const n=nodeById(drag.id); n.x=w.x; n.y=w.y; updateNode(drag.id);
   } else if(drag.type==='vertex'){
-    const w=screenToWorld(e.clientX,e.clientY);
-    const l=links.find(l=>l.id===drag.id); l.vx=w.x; l.vy=w.y; render();
+    const w=screenToWorld(p.x,p.y);
+    linkById(drag.id).verts[drag.vidx]=w; updateVertex(drag.id,drag.vidx);
   } else if(drag.type==='label'){
-    const w=screenToWorld(e.clientX,e.clientY);
+    const w=screenToWorld(p.x,p.y);
     const lb=labels[drag.idx]; const an=nodeById(lb.anchorNode);
-    lb.x=w.x-an.x; lb.y=w.y-an.y; render();
+    lb.x=w.x-an.x; lb.y=w.y-an.y; updateLabelGeometry(drag.idx);
   }
-});
+}
+// A tap (down+up with negligible movement) opens the node popup. Deliberately not a 'click'
+// listener: setPointerCapture(svg) retargets the synthesized click to the capturing element on
+// desktop Chrome, so e.target there is the <svg>, never the node — click never fired on PC. Mobile
+// Chrome apparently derives click from the original touch target instead, which is why the same
+// code appeared to work on a phone. Detecting the tap ourselves from movement distance sidesteps
+// that platform inconsistency entirely.
 function endPointer(e){
   pointers.delete(e.pointerId);
-  drag=null;
+  if(drag && drag.pointerId===e.pointerId){
+    if(drag.type==='node' && Math.hypot(e.clientX-drag.startX,e.clientY-drag.startY)<4){
+      openPopup(drag.id,e.clientX,e.clientY);
+    }
+    drag=null; dragDirty=false;
+  }
 }
 svg.addEventListener('pointerup',endPointer);
 svg.addEventListener('pointercancel',endPointer);
-svg.addEventListener('click',e=>{
-  if(e.target.dataset&&e.target.dataset.node)openPopup(e.target.dataset.node,e.clientX,e.clientY);
+
+// ---- arbitrary-vertex link editing: double-click a link to bend it, a bend to remove it ----
+// elementFromPoint again, not e.target, for the same setPointerCapture-retargeting reason as above.
+svg.addEventListener('dblclick',e=>{
+  const t=document.elementFromPoint(e.clientX,e.clientY);
+  if(!t||!t.dataset)return;
+  if(t.classList.contains('vhandle'))removeVertex(t.dataset.link,+t.dataset.vidx);
+  else if(t.dataset.link!==undefined)insertVertex(t.dataset.link,screenToWorld(e.clientX,e.clientY));
 });
 
 // ---- popup: click-to-popup with a field that writes back ----
@@ -234,63 +354,105 @@ function openPopup(nodeId,sx,sy){
   document.getElementById('popupTitle').textContent=nodeId;
   document.getElementById('popupElev').value=n.elev;
   popup.style.left=sx+'px'; popup.style.top=sy+'px'; popup.style.display='block';
-  document.getElementById('popupElev').onchange=ev=>{n.elev=+ev.target.value; render();};
+  document.getElementById('popupElev').onchange=ev=>{n.elev=+ev.target.value; updateNode(nodeId);};
 }
 document.getElementById('popupClose').onclick=()=>popup.style.display='none';
 
 // ---- 200-node headroom toggle ----
 document.getElementById('btnGrid').onclick=()=>{
   gridLayer.style.display = gridLayer.style.display==='none' ? 'inline' : 'none';
+  zoomExtent();
 };
 document.getElementById('btnExtent').onclick=zoomExtent;
 document.getElementById('btnPrint').onclick=()=>window.print();
 
-// ---- registered backdrop image (two-point registration) ----
-let backdropImg=null, regClicks=[];
+// ---- registered backdrop image: separate Scale and Position steps ----
+// Position placing a translation, Scale a multiplier, kept as two independent numbers so repeating
+// either one is absolute, not relative to whatever the other has already done.
+let backdropImg=null, backdropState={tx:0,ty:0,s:1};
+function applyBackdropTransform(){
+  backdropImg.setAttribute('transform',`translate(${backdropState.tx},${backdropState.ty}) scale(${backdropState.s})`);
+}
+// Converts a world-space click back into the image's own pre-transform pixel space, so a second
+// Scale pass measures true image-pixel distance rather than a distance already stretched by a
+// previous scale factor.
+function worldToImageLocal(w){
+  return {x:(w.x-backdropState.tx)/backdropState.s, y:(w.y-backdropState.ty)/backdropState.s};
+}
 document.getElementById('fileBackdrop').onchange=e=>{
   const f=e.target.files[0]; if(!f)return;
   const reader=new FileReader();
   reader.onload=ev=>{
     backdropLayer.innerHTML='';
+    backdropState={tx:0,ty:0,s:1};
     backdropImg=el('image',{href:ev.target.result,x:0,y:0,width:40,height:30},backdropLayer);
-    backdropImg.setAttribute('transform','translate(0,0) scale(1)');
-    document.getElementById('btnRegister').disabled=false;
+    applyBackdropTransform();
+    document.getElementById('btnScale').disabled=false;
+    document.getElementById('btnPosition').disabled=false;
   };
   reader.readAsDataURL(f);
 };
-document.getElementById('btnRegister').onclick=()=>{
-  regClicks=[];
+// elementFromPoint, not e.target, throughout: setPointerCapture(svg) retargets click's target to
+// svg on desktop Chrome (see the endPointer comment above), so e.target would never be backdropImg.
+document.getElementById('btnScale').onclick=()=>{
+  const clicks=[];
   alert('Click two points on the backdrop image (e.g. the two ends of a bar scale), then enter the real distance.');
   const handler=e=>{
-    if(e.target!==backdropImg)return;
-    const w=screenToWorld(e.clientX,e.clientY);
-    regClicks.push(w);
-    if(regClicks.length===2){
-      svg.removeEventListener('click',handler,true);
-      const pxDist=Math.hypot(regClicks[1].x-regClicks[0].x,regClicks[1].y-regClicks[0].y);
+    if(document.elementFromPoint(e.clientX,e.clientY)!==backdropImg)return;
+    clicks.push(worldToImageLocal(screenToWorld(e.clientX,e.clientY)));
+    if(clicks.length===2){
+      svg.removeEventListener('pointerup',handler,true);
+      const pxDist=Math.hypot(clicks[1].x-clicks[0].x,clicks[1].y-clicks[0].y);
       const real=+prompt('Real-world distance between the two points (world units):','30');
-      if(real>0){
-        const scale=real/pxDist;
-        backdropImg.setAttribute('transform',`translate(0,0) scale(${scale})`);
+      if(real>0){backdropState.s=real/pxDist; applyBackdropTransform();}
+    }
+  };
+  svg.addEventListener('pointerup',handler,true);
+};
+document.getElementById('btnPosition').onclick=()=>{
+  alert('Click a reference point on the backdrop image.');
+  const handler=e=>{
+    if(document.elementFromPoint(e.clientX,e.clientY)!==backdropImg)return;
+    svg.removeEventListener('pointerup',handler,true);
+    const refWorld=screenToWorld(e.clientX,e.clientY);
+    if(confirm('Click OK, then click a network node to align the reference point to it.\nClick Cancel to type X,Y coordinates instead.')){
+      const handler2=e2=>{
+        const t=document.elementFromPoint(e2.clientX,e2.clientY);
+        if(!t||!t.dataset||!t.dataset.node)return;
+        svg.removeEventListener('pointerup',handler2,true);
+        const target=nodeById(t.dataset.node);
+        backdropState.tx+=target.x-refWorld.x; backdropState.ty+=target.y-refWorld.y;
+        applyBackdropTransform();
+      };
+      svg.addEventListener('pointerup',handler2,true);
+    } else {
+      const txt=prompt('Target X,Y (world units) for that reference point:','0,0');
+      const parts=(txt||'').split(',').map(Number);
+      if(txt && !isNaN(parts[0]) && !isNaN(parts[1])){
+        backdropState.tx+=parts[0]-refWorld.x; backdropState.ty+=parts[1]-refWorld.y;
+        applyBackdropTransform();
       }
     }
   };
-  svg.addEventListener('click',handler,true);
+  svg.addEventListener('pointerup',handler,true);
 };
 
-// ---- fps meter (rAF-based, honest during actual drag) ----
+// ---- single rAF loop: applies the latest pending drag (if any), then measures real paint fps ----
 let frameCount=0,lastFpsT=performance.now(),lastFrameCount=0;
-function fpsLoop(t){
+function resetFpsWindow(){lastFpsT=performance.now();lastFrameCount=frameCount;}
+function tick(t){
+  frameCount++;
+  if(drag && dragDirty){applyDrag(); dragDirty=false;}
   if(t-lastFpsT>500){
     const fps=Math.round((frameCount-lastFrameCount)/((t-lastFpsT)/1000));
     document.getElementById('fps').textContent='fps: '+fps;
     lastFpsT=t; lastFrameCount=frameCount;
   }
-  requestAnimationFrame(fpsLoop);
+  requestAnimationFrame(tick);
 }
-requestAnimationFrame(fpsLoop);
+requestAnimationFrame(tick);
 
-buildNetwork(); buildGrid(); render(); zoomExtent();
+buildNetwork(); buildGrid(); buildDom(); zoomExtent();
 </script>
 </body>
 </html>

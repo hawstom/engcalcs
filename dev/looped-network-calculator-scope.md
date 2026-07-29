@@ -474,9 +474,23 @@ Property popup per element. Units strip with working presets. Debounced GGA solv
 ID + pressure map labels. Single-network localStorage autosave. The four diagnostics. Snap-on-create.
 A Notes list stating honestly what the tool does not do.
 
-- **Biggest cut: vertex editing.** Pipes are straight segments between nodes with a stored,
-  overridable length. That removes the single hardest interaction from the first release, and `vx`
-  stays in the schema so adding it later is a pure addition.
+- **Vertex editing moved IN from Phase 3 — reversed 2026-07-29, on-device Phase 0 finding
+  (Tom).** The original plan cut polyline pipes entirely from Phase 1 ("pipes are straight segments
+  between nodes... removes the single hardest interaction from the first release"). Seeing the
+  canvas spike's one bent pipe next to fourteen straight ones on a real network settled it the other
+  way: straight-segment-only pipes are "not a post-deployment option... non-negotiable" — real
+  utility routing follows property lines, road crossings, and easements, and a tool that can't
+  express a bend around them doesn't match how pipes actually get drawn. This is exactly what
+  Phase 0 exists to catch before Phase 1 gets built on the wrong cut. Ships as an editable vertex
+  handle in Phase 1, not deferred.
+  **Vertex count: arbitrary, not capped — decided 2026-07-29 (Tom: "if it's significantly easier to
+  have max 3 vertices per link, do that; otherwise arbitrary; 1 is not enough").** The spike settled
+  this empirically: in SVG a polyline's point count doesn't change the render cost, so the only real
+  cost is the insert/delete gesture, and that gesture (double-click a segment to add a bend,
+  double-click a bend to remove it) is the same effort whether capped at 3 or unbounded — a fixed
+  cap would have added special-casing (deciding where uncreated slots start) for no savings. `link`
+  carries a `verts: [{x,y}, ...]` array in the spike's data model (0 or more), which is the schema
+  Phase 1 should carry forward.
 - **Also out:** report tables, element browser, extrema marks, draggable labels and leaders,
   collision avoidance, insets, map-vs-screen text size, valves, tanks, `.inp` export, multiple saved
   networks.
@@ -491,10 +505,11 @@ tolerance), multiple named saved networks, and the **user-supplied backdrop imag
 registration** — projection-free, offline-capable, and the thing that actually makes the map
 interface useful for real work. **The translation sprint goes here.**
 
-**Phase 3 — polish and reach.** Polyline pipes with vertex editing; draggable labels with leaders and
-collision avoidance; map insets for congested areas; `.inp` export/import; **valves as a link
-property (status + setting), not a fifth element type** — Tom's instinct matches EPANET's own data
-model.
+**Phase 3 — polish and reach.** Draggable labels with leaders and collision avoidance (see the
+Phase 0 note on a label-reset gesture); map insets for congested areas; `.inp` export/import;
+**valves as a link property (status + setting), not a fifth element type** — Tom's instinct matches
+EPANET's own data model. *(Polyline pipe vertex editing, originally slated here, moved to Phase 1 —
+see the note above.)*
 
 **Phase 4 — Task 145**, the Google/OSM tiled map and elevation mashup, moved here from `bpn_`. By
 this point it is one more backdrop *type*, not a foundation — and it brings the projection and
