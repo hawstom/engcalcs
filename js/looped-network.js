@@ -105,7 +105,43 @@ var EngCalcs = EngCalcs || {};
 				'class': 'lpn-vhandle', 'data-link': l.id, 'data-vidx': i
 			}, linksLayer));
 		}
-		linkEls[l.id] = { line: line, handles: handles };
+		// Flow-direction arrow (Tom, 2026-07-30, matching EPANET): a small triangle at the
+		// midpoint, hidden until a solve result exists. Points +x by default; positioned/rotated
+		// entirely via `transform` in updateArrow() below, never via its own x/y/points.
+		var arrow = el('polygon', {
+			points: '-1,-0.6 -1,0.6 1,0', 'class': 'lpn-arrow', 'data-link': l.id, style: 'display:none'
+		}, linksLayer);
+		linkEls[l.id] = { line: line, handles: handles, arrow: arrow };
+	}
+	// Midpoint (by arc length, so a bent pipe's arrow sits mid-path, not mid-bounding-box) and
+	// the local tangent angle there, walking a->verts->b.
+	function linkMidpoint(l) {
+		var pts = [nodeById(l.from)].concat(l.verts, [nodeById(l.to)]), segLens = [], total = 0, i, target, acc = 0, t, a, b;
+		for (i = 0; i < pts.length - 1; i++) {
+			var d = Math.hypot(pts[i + 1].x - pts[i].x, pts[i + 1].y - pts[i].y);
+			segLens.push(d); total += d;
+		}
+		target = total / 2;
+		for (i = 0; i < segLens.length; i++) {
+			if (acc + segLens[i] >= target || i === segLens.length - 1) {
+				a = pts[i]; b = pts[i + 1];
+				t = segLens[i] > 0 ? (target - acc) / segLens[i] : 0;
+				return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t, angle: Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI };
+			}
+			acc += segLens[i];
+		}
+		return null;
+	}
+	// Direction only makes sense once flows are known -- hidden until lastSolveResult exists,
+	// then rotated 180 degrees from the link's own from->to direction when Q is negative (flow
+	// actually runs to->from). Called both on geometry changes (drag) and after every solve.
+	function updateArrow(id) {
+		var le = linkEls[id]; if (!le || !le.arrow) { return; }
+		var md = linkMidpoint(linkById(id)), flow = lastSolveResult ? lastSolveResult.flows[id] : undefined;
+		if (!md || flow === undefined) { le.arrow.style.display = 'none'; return; }
+		var angle = md.angle + (flow < 0 ? 180 : 0);
+		le.arrow.setAttribute('transform', 'translate(' + md.x + ',' + md.y + ') rotate(' + angle + ')');
+		le.arrow.style.display = '';
 	}
 	function buildLabelEls(lb) {
 		var an = lb.anchorNode ? nodeById(lb.anchorNode) : { x: lb.x, y: lb.y },
@@ -145,6 +181,7 @@ var EngCalcs = EngCalcs || {};
 		var l = linkById(id);
 		linkEls[id].line.setAttribute('points', linkPoints(l));
 		if (l.lenAuto) { l.length = linkGeomLength(l); }
+		updateArrow(id);
 	}
 
 	// Same leader math as the spike: text is always text-anchor:middle and tracks the drag
@@ -179,11 +216,13 @@ var EngCalcs = EngCalcs || {};
 		ne.text.setAttribute('x', n.x + 2); ne.text.setAttribute('y', n.y - 2);
 		for (i = 0; i < incidentLinks[id].length; i++) { updateLinkGeometry(incidentLinks[id][i]); }
 		for (i = 0; i < labelsByAnchor[id].length; i++) { updateLabelGeometry(labelsByAnchor[id][i]); }
+		scheduleSolve();
 	}
 	function updateVertex(linkId, vidx) {
 		var l = linkById(linkId), v = l.verts[vidx], h = linkEls[linkId].handles[vidx];
 		h.setAttribute('cx', v.x); h.setAttribute('cy', v.y);
 		updateLinkGeometry(linkId);
+		scheduleSolve();
 	}
 	function distToSegment(p, a, b) {
 		var dx = b.x - a.x, dy = b.y - a.y, len2 = dx * dx + dy * dy,
@@ -194,7 +233,9 @@ var EngCalcs = EngCalcs || {};
 	function rebuildLink(l) {
 		linkEls[l.id].line.remove();
 		linkEls[l.id].handles.forEach(function (h) { h.remove(); });
+		linkEls[l.id].arrow.remove();
 		buildLinkEls(l);
+		updateArrow(l.id);
 	}
 	function insertVertex(linkId, pt) {
 		var l = linkById(linkId), pts = [nodeById(l.from)].concat(l.verts, [nodeById(l.to)]),
@@ -285,21 +326,38 @@ var EngCalcs = EngCalcs || {};
 		// boundary condition); junction carries elevation + demand. Different fields on
 		// purpose -- conflating them was a real trap early on (see lpn-solver.js's own notes).
 		var n = type === 'reservoir'
-			? { id: id, type: type, x: x, y: y, head: 100 }
+			? { id: id, type: type, x: x, y: y, head: niceDefault('lpn_u_elevhead', 'fth2o', 100, 30) }
 			: { id: id, type: type, x: x, y: y, elev: 0, demand: 0 };
 		doc.nodes.push(n);
 		buildNodeEls(n);
 		incidentLinks[id] = []; labelsByAnchor[id] = [];
 		updateEmptyHint();
+		scheduleSolve();
 		return n;
 	}
 	function addLink(type, fromId, toId) {
 		var prefix = type === 'pump' ? 'P' : 'L', id = prefix + (nextId[prefix]++);
-		var l = { id: id, type: type, from: fromId, to: toId, verts: [], diameter: 0.1, roughness: 100, length: 0, lenAuto: true, status: 'open' };
+		var l = {
+			id: id, type: type, from: fromId, to: toId, verts: [],
+			diameter: niceDefault('lpn_u_diameter', 'in', 4, 0.1),
+			roughness: 100, length: 0, lenAuto: true, status: 'open'
+		};
 		l.length = linkGeomLength(l);
+		if (type === 'pump') {
+			// Pump curve entry isn't implemented (see the scope doc's design note) -- without
+			// h0/a/b, EngCalcs.lpnSolve()'s pump branch reads undefined and produces NaN, which
+			// would silently break any network containing one. A generic single-point curve
+			// (nice numbers per the current unit system, not one SI pair) keeps the solve
+			// meaningful until real curve entry exists.
+			var curveQ = niceDefault('lpn_u_flow', 'gpm', 150, 0.01),
+				curveH = niceDefault('lpn_u_elevhead', 'fth2o', 65, 20),
+				curve = EngCalcs.lpnPumpFromCurve([[curveQ, curveH]]);
+			l.h0 = curve.h0; l.a = curve.a; l.b = curve.b;
+		}
 		doc.links.push(l);
 		incidentLinks[fromId].push(id); incidentLinks[toId].push(id);
 		buildLinkEls(l);
+		scheduleSolve();
 		return l;
 	}
 	function addText(x, y) {
@@ -317,6 +375,7 @@ var EngCalcs = EngCalcs || {};
 		delete nodeEls[id]; delete incidentLinks[id]; delete labelsByAnchor[id];
 		doc.nodes = doc.nodes.filter(function (n) { return n.id !== id; });
 		updateEmptyHint();
+		scheduleSolve();
 	}
 	function updateEmptyHint() {
 		var hint = document.getElementById('lpn_empty_hint');
@@ -330,6 +389,7 @@ var EngCalcs = EngCalcs || {};
 		incidentLinks[l.from] = incidentLinks[l.from].filter(function (x) { return x !== id; });
 		incidentLinks[l.to] = incidentLinks[l.to].filter(function (x) { return x !== id; });
 		doc.links = doc.links.filter(function (x) { return x.id !== id; });
+		scheduleSolve();
 	}
 	function deleteLabelById(id) {
 		var lb = labelById(id), le = labelEls[id];
@@ -424,10 +484,11 @@ var EngCalcs = EngCalcs || {};
 		saveUndoSnapshot();
 		var r = addNode('reservoir', 0, 0);
 		var j1 = addNode('junction', 20, 0);
-		j1.elev = 10; j1.demand = 0;
+		j1.elev = niceDefault('lpn_u_elevhead', 'fth2o', 50, 15); j1.demand = 0;
 		addLink('pump', r.id, j1.id);
 		var j2 = addNode('junction', 40, 15);
-		j2.elev = 8; j2.demand = 0.01;
+		j2.elev = niceDefault('lpn_u_elevhead', 'fth2o', 40, 12);
+		j2.demand = niceDefault('lpn_u_flow', 'gpm', 100, 0.006);
 		var pipe = addLink('pipe', j1.id, j2.id);
 		pipe.verts.push({ x: 30, y: -5 });
 		// addLink() computed .length before this vertex existed (straight node-to-node distance);
@@ -604,6 +665,17 @@ var EngCalcs = EngCalcs || {};
 	function unitEl(name) { return document.querySelector('select[name="' + name + '"]'); }
 	function unitFactor(name) { var s = unitEl(name); return s ? parseFloat(s.value) : 1; }
 	function unitLabel(name) { var s = unitEl(name); return s ? s.options[s.selectedIndex].textContent : ''; }
+	function unitKey(name) { var s = unitEl(name); return s ? s.options[s.selectedIndex].dataset.unit : null; }
+	// Suite-wide convention (CLAUDE.md's Unit Sets section): a default is Array('us'=>x,'si'=>y),
+	// not one SI number that happens to convert to something ugly in the other system (Tom,
+	// 2026-07-30 -- the example network's plain-SI elevations read as non-round once shown in
+	// ft). usKey is the family's US unit ("in", "gpm", "fth2o", ...); usVal is a nice number IN
+	// THAT UNIT; siVal is a separately-chosen nice number in SI. Reads the CURRENTLY selected
+	// unit, not the page's original load-time default, so this stays correct even after the user
+	// switches units mid-session.
+	function niceDefault(unitId, usKey, usVal, siVal) {
+		return unitKey(unitId) === usKey ? usVal / unitFactor(unitId) : siVal;
+	}
 
 	// ---- minimal property popup ----
 	// Real, not a stub: id (readonly) plus the fields that already exist on the element
@@ -619,7 +691,10 @@ var EngCalcs = EngCalcs || {};
 	function unitNumberField(fields, labelText, unitId, getSI, setSI) {
 		var f = unitFactor(unitId), label = document.createElement('label'), input = document.createElement('input');
 		input.type = 'number'; input.value = (getSI() * f).toFixed(4);
-		input.addEventListener('change', function () { setSI(+input.value / f); });
+		// scheduleSolve() here, not just inside setSI callbacks, centralizes it for every current
+		// and future use of this helper (elev/demand/head's setSI already also calls updateNode(),
+		// which itself schedules a solve -- calling it twice is harmless, debounced).
+		input.addEventListener('change', function () { setSI(+input.value / f); scheduleSolve(); });
 		label.textContent = labelText + ' (' + unitLabel(unitId) + ') ';
 		label.appendChild(input);
 		fields.appendChild(label);
@@ -636,6 +711,13 @@ var EngCalcs = EngCalcs || {};
 		fields.appendChild(label);
 		fields.appendChild(document.createElement('br'));
 	}
+	// SI value -> current display unit, read-only. Used for solve results: the property popups
+	// are the canonical results location (Tom, 2026-07-30) -- Map labels and a Report/table view
+	// are later presentation layers over this same computed data (scope doc Phase 2), not a
+	// separate source of truth.
+	function readonlyUnitField(fields, labelText, unitId, siValue) {
+		readonlyField(fields, labelText + ' (' + unitLabel(unitId) + ')', siValue * unitFactor(unitId));
+	}
 	// Length pairs with an Auto checkbox (the lenAuto design logged in the scope doc): typing a
 	// value takes manual control; re-checking Auto snaps back to the live geometric distance.
 	// Auto and manual get IDENTICAL treatment (Tom, 2026-07-30) -- no SI conversion for length at
@@ -649,11 +731,12 @@ var EngCalcs = EngCalcs || {};
 			input = document.createElement('input'), autoLabel = document.createElement('label'),
 			auto = document.createElement('input');
 		input.type = 'number'; input.value = l.length.toFixed(2);
-		input.addEventListener('change', function () { l.length = +input.value; l.lenAuto = false; auto.checked = false; });
+		input.addEventListener('change', function () { l.length = +input.value; l.lenAuto = false; auto.checked = false; scheduleSolve(); });
 		auto.type = 'checkbox'; auto.checked = l.lenAuto;
 		auto.addEventListener('change', function () {
 			l.lenAuto = auto.checked;
 			if (l.lenAuto) { l.length = linkGeomLength(l); input.value = l.length.toFixed(2); }
+			scheduleSolve();
 		});
 		label.textContent = (pc.lpn_field_length || 'Length') + ' (' + unitLabel('lpn_u_length') + ') ';
 		label.appendChild(input);
@@ -712,6 +795,9 @@ var EngCalcs = EngCalcs || {};
 		doc.labels.forEach(function (lb) { if (lb.anchorNode === oldId) { lb.anchorNode = newId; } });
 		currentPopup = { kind: 'node', id: newId };
 		renderNodeFields(newId);
+		// lastSolveResult's pressures are keyed by the OLD id -- without a fresh solve, the
+		// pressure label would silently vanish for this node until the next unrelated edit.
+		scheduleSolve();
 	}
 	function renameLink(oldId, newId) {
 		var l = linkById(oldId);
@@ -721,6 +807,7 @@ var EngCalcs = EngCalcs || {};
 		linkEls[newId].handles.forEach(function (h) { h.setAttribute('data-link', newId); });
 		currentPopup = { kind: 'link', id: newId };
 		renderLinkFields(newId);
+		scheduleSolve();
 	}
 	function renderNodeFields(nodeId) {
 		var n = nodeById(nodeId), fields = document.getElementById('lpn_popup_fields'), pc = EngCalcs.pageConfig || {};
@@ -734,6 +821,10 @@ var EngCalcs = EngCalcs || {};
 				function () { return n.elev; }, function (v) { n.elev = v; updateNode(nodeId); });
 			unitNumberField(fields, pc.bpn_demand || 'Demand', 'lpn_u_flow',
 				function () { return n.demand; }, function (v) { n.demand = v; updateNode(nodeId); });
+			if (lastSolveResult && lastSolveResult.pressures[nodeId] !== undefined) {
+				readonlyUnitField(fields, pc.lpn_result_head || 'Head', 'lpn_u_elevhead', lastSolveResult.heads[nodeId]);
+				readonlyUnitField(fields, pc.lpn_result_pressure || 'Pressure', 'lpn_u_pressure', lastSolveResult.pressures[nodeId]);
+			}
 		}
 		readonlyField(fields, pc.lpn_field_x || 'X', n.x);
 		readonlyField(fields, pc.lpn_field_y || 'Y', n.y);
@@ -756,6 +847,17 @@ var EngCalcs = EngCalcs || {};
 			numberFieldPlain(fields, pc.lpn_field_roughness || 'Roughness', l.roughness, function (v) { l.roughness = v; });
 			lengthField(fields, l);
 		}
+		if (lastSolveResult && lastSolveResult.flows[linkId] !== undefined) {
+			readonlyUnitField(fields, pc.lpn_result_flow || 'Flow', 'lpn_u_flow', lastSolveResult.flows[linkId]);
+			readonlyUnitField(fields, pc.lpn_result_velocity || 'Velocity', 'lpn_u_velocity', lastSolveResult.velocities[linkId]);
+			// lpn-solver.js stores a pump's headlosses as -(head gain) -- same sign convention as
+			// a head LOSS across the link (h_to - h_from), so a pump's actual gain is the negation.
+			if (l.type === 'pump') {
+				readonlyUnitField(fields, pc.lpn_result_headgain || 'Head gain', 'lpn_u_elevhead', -lastSolveResult.headlosses[linkId]);
+			} else {
+				readonlyUnitField(fields, pc.lpn_result_headloss || 'Head loss', 'lpn_u_elevhead', lastSolveResult.headlosses[linkId]);
+			}
+		}
 	}
 	function openLinkPopup(linkId, sx, sy) {
 		currentPopup = { kind: 'link', id: linkId };
@@ -769,7 +871,7 @@ var EngCalcs = EngCalcs || {};
 	function numberFieldPlain(fields, labelText, value, onChange) {
 		var label = document.createElement('label'), input = document.createElement('input');
 		input.type = 'number'; input.value = value;
-		input.addEventListener('change', function () { onChange(+input.value); });
+		input.addEventListener('change', function () { onChange(+input.value); scheduleSolve(); });
 		label.textContent = labelText + ' ';
 		label.appendChild(input);
 		fields.appendChild(label);
@@ -798,17 +900,81 @@ var EngCalcs = EngCalcs || {};
 		});
 		buildDom();
 		updateEmptyHint();
+		scheduleSolve();
 	}
 	document.addEventListener('keydown', function (e) {
 		if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); undo(); }
 	});
 
+	// ---- solve: EngCalcs.lpnSolve() (js/lpn-solver.js), debounced on every edit ----
+	// doc.nodes/doc.links already carry the field names the solver expects (id/type/elev/demand/
+	// head for nodes; id/type/from/to/diameter/roughness/length/status/h0/a/b for links) --
+	// assembling a model is just wrapping them, no field renaming needed. method is fixed to
+	// 'hw' for now (no friction-method selector yet -- see the numberFieldPlain() comment on
+	// Roughness). visc is fresh water at ~20C; not user-editable yet.
+	var lastSolveResult = null;
+	function assembleModel() { return { nodes: doc.nodes, links: doc.links, method: 'hw', visc: 1.007e-6 }; }
+	function diagIssueText(issue) {
+		var pc = EngCalcs.pageConfig || {};
+		if (issue.code === 'no-fixed-head') { return pc.lpn_diag_no_fixed_head || 'Add a Reservoir.'; }
+		if (issue.code === 'dangling-link') { return (pc.lpn_diag_dangling_link || 'Dangling link:') + ' ' + issue.ids.join(', '); }
+		if (issue.code === 'unreachable') { return (pc.lpn_diag_unreachable || 'Unreachable:') + ' ' + issue.ids.join(', '); }
+		return issue.code;
+	}
+	function setStatus(text) {
+		var el = document.getElementById('lpn_status');
+		if (el) { el.textContent = text || ''; }
+	}
+	function updateResultLabels() {
+		doc.nodes.forEach(function (n) {
+			var ne = nodeEls[n.id]; if (!ne) { return; }
+			var suffix = '';
+			if (lastSolveResult && n.type !== 'reservoir' && lastSolveResult.pressures[n.id] !== undefined) {
+				var f = unitFactor('lpn_u_pressure');
+				suffix = ' (' + (lastSolveResult.pressures[n.id] * f).toFixed(1) + ' ' + unitLabel('lpn_u_pressure') + ')';
+			}
+			ne.text.textContent = n.id + suffix;
+			try { ne.tw = ne.text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; stale tw stands */ }
+		});
+		doc.links.forEach(function (l) { updateArrow(l.id); });
+	}
+	function runSolve() {
+		if (doc.nodes.length === 0) { lastSolveResult = null; setStatus(''); return; }
+		var model = assembleModel(), issues = EngCalcs.lpnDiagnose(model);
+		if (issues.length > 0) {
+			lastSolveResult = null;
+			setStatus(issues.map(diagIssueText).join(' '));
+			updateResultLabels();
+			return;
+		}
+		var result = EngCalcs.lpnSolve(model);
+		if (!result.ok || !result.converged) {
+			lastSolveResult = null;
+			setStatus(EngCalcs.pageConfig.lpn_diag_not_converged || 'Did not converge.');
+			updateResultLabels();
+			return;
+		}
+		lastSolveResult = result;
+		setStatus('');
+		updateResultLabels();
+	}
+	// Debounced, not run synchronously on every call site: a node drag alone calls updateNode()
+	// (and therefore this) on every animation frame while dragging (see the tick()/applyDrag()
+	// architecture ported from the spike) -- solving on every one of those would both be wasted
+	// work and would fight the drag for the main thread.
+	var solveTimer = null;
+	function scheduleSolve() {
+		if (solveTimer) { clearTimeout(solveTimer); }
+		solveTimer = setTimeout(runSolve, 300);
+	}
+
 	// calcAndSave() calls this unconditionally -- from the units strip's own selects
 	// (echoUnitSelect() hardcodes onchange="EngCalcs.submitForm()") and from echoUnitsRow()'s
-	// US/SI preset buttons. Re-render the open popup in place so switching units doesn't leave
-	// it showing a stale-unit number. The real debounced GGA solve wiring is still to come.
+	// US/SI preset buttons. A unit switch doesn't need a fresh solve (the underlying SI values
+	// didn't change) -- just re-render whatever's already cached in the new unit.
 	EngCalcs.pageCalculator = function (objForm) {
 		refreshPopupIfOpen();
+		updateResultLabels();
 	};
 
 	document.addEventListener('DOMContentLoaded', function () {

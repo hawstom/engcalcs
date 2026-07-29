@@ -116,6 +116,10 @@ html[lang="zh"] .ec-welcome {
 .lpn-node-reservoir { fill: #26a; }
 .lpn-link { stroke: #557; stroke-width: 2; cursor: pointer; }
 .lpn-link-pump { stroke: #a52; }
+/* Flow-direction arrow at each link's midpoint (Tom, 2026-07-30, matching EPANET) -- hidden
+   until a solve result exists (see updateArrow() in looped-network.js). pointer-events:none so
+   it never intercepts a click meant for the link/vertex underneath it. */
+.lpn-arrow { fill: #557; pointer-events: none; }
 .lpn-vhandle { fill: #fff; stroke: #a52; stroke-width: 1; cursor: move; }
 /* No font-size here -- it must be set inline in world units at each text element (see the
    buildNodeEls/buildLabelEls comments in looped-network.js for why a screen-pixel-flavored

@@ -15,26 +15,29 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 <form id="formInput" action="javascript:EngCalcs.submitForm()" method="post">
 	<?php echoUnitsRow(); ?>
-	<?php // Five selectors (Tom, 2026-07-30): Length/Map is declarative-only (AutoCAD-style grid
-	      // units, no SI conversion -- see the lengthField() comment in looped-network.js) and
-	      // is deliberately its own selector, NOT shared with Elevation/Head, even though both
-	      // happen to use family distance_site vs total_head -- conflating "this labels a grid
-	      // unit" with "this converts a real quantity" under one control was confusing in
-	      // practice. Elevation and (reservoir) Fixed Head share ONE selector on purpose: both
-	      // are real vertical-datum quantities on the same energy scale, and letting them diverge
-	      // would make elev+pressure-head arithmetic meaningless. Pressure has no input field yet
-	      // in Phase 1 (it's a future result/diagnostic), but the selector is added now so it's
-	      // established ahead of that. Roughness stays unitless (Hazen-Williams C-factor is
-	      // dimensionless; Darcy-Weisbach's roughness height would need one -- see the
-	      // numberFieldPlain() comment in looped-network.js). ?>
+	<?php // Six selectors (Tom, 2026-07-30, +Velocity added answering "are there others?"):
+	      // Length/Map is declarative-only (AutoCAD-style grid units, no SI conversion -- see the
+	      // lengthField() comment in looped-network.js) and is deliberately its own selector, NOT
+	      // shared with Elevation/Head, even though both happen to use family distance_site vs
+	      // total_head -- conflating "this labels a grid unit" with "this converts a real
+	      // quantity" under one control was confusing in practice. Elevation and (reservoir) Fixed
+	      // Head share ONE selector on purpose: both are real vertical-datum quantities on the
+	      // same energy scale, and letting them diverge would make elev+pressure-head arithmetic
+	      // meaningless. Pressure and Velocity have no INPUT field (they're solve results,
+	      // canonically shown in the property popups per Tom, 2026-07-30), but the selectors are
+	      // established now so results render in the right unit from the start. Roughness stays
+	      // unitless (Hazen-Williams C-factor is dimensionless; Darcy-Weisbach's roughness height
+	      // would need one -- see the numberFieldPlain() comment in looped-network.js). ?>
 	<div class="d-print-none" id="lpn_units_strip">
 		<?=$ec_lang['lpn_units_length']?> <?php echoUnitSelect('lpn_u_length', 'distance_site', ''); ?>
 		<?=$ec_lang['lpn_units_elevhead']?> <?php echoUnitSelect('lpn_u_elevhead', 'total_head', ''); ?>
 		<?=$ec_lang['lpn_units_pressure']?> <?php echoUnitSelect('lpn_u_pressure', 'partial_head', ''); ?>
 		<?=$ec_lang['lpn_field_diameter']?> <?php echoUnitSelect('lpn_u_diameter', 'distance_small', ''); ?>
 		<?=$ec_lang['lpn_units_flow']?> <?php echoUnitSelect('lpn_u_flow', 'flow_node', ''); ?>
+		<?=$ec_lang['lpn_units_velocity']?> <?php echoUnitSelect('lpn_u_velocity', 'velocity', ''); ?>
 	</div>
 	<div class="d-print-none" id="lpn_toolbar"></div>
+	<p id="lpn_status" class="ec-status-warn"></p>
 	<div style="overflow-x:auto;position:relative">
 		<svg id="lpn_canvas" dir="ltr" width="100%" height="500" style="border:1px solid #ccc;background:#f7f7f2"></svg>
 		<div id="lpn_empty_hint" class="d-print-none" style="display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#999;font-size:1.2em;pointer-events:none;text-align:center">
@@ -84,9 +87,20 @@ EngCalcs.pageConfig = {
 	lpn_pump_notice: <?=json_encode($ec_lang['lpn_pump_notice'])?>,
 	bpn_demand: <?=json_encode($ec_lang['bpn_demand'])?>,
 	lpn_id_invalid: <?=json_encode($ec_lang['lpn_id_invalid'])?>,
-	lpn_id_taken: <?=json_encode($ec_lang['lpn_id_taken'])?>
+	lpn_id_taken: <?=json_encode($ec_lang['lpn_id_taken'])?>,
+	lpn_diag_no_fixed_head: <?=json_encode($ec_lang['lpn_diag_no_fixed_head'])?>,
+	lpn_diag_dangling_link: <?=json_encode($ec_lang['lpn_diag_dangling_link'])?>,
+	lpn_diag_unreachable: <?=json_encode($ec_lang['lpn_diag_unreachable'])?>,
+	lpn_diag_not_converged: <?=json_encode($ec_lang['lpn_diag_not_converged'])?>,
+	lpn_result_head: <?=json_encode($ec_lang['lpn_result_head'])?>,
+	lpn_result_pressure: <?=json_encode($ec_lang['lpn_result_pressure'])?>,
+	lpn_result_flow: <?=json_encode($ec_lang['lpn_result_flow'])?>,
+	lpn_result_velocity: <?=json_encode($ec_lang['lpn_result_velocity'])?>,
+	lpn_result_headloss: <?=json_encode($ec_lang['lpn_result_headloss'])?>,
+	lpn_result_headgain: <?=json_encode($ec_lang['lpn_result_headgain'])?>
 };
 </script>
+<script src="/engcalcs/js/lpn-solver.js?v=<?=filemtime(__DIR__.'/js/lpn-solver.js')?>"></script>
 <script src="/engcalcs/js/looped-network.js?v=<?=filemtime(__DIR__.'/js/looped-network.js')?>"></script>
 <script>
 <?php echoCookieScript(); ?>
