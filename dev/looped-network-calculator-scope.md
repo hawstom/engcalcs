@@ -287,15 +287,28 @@ Rules, stated as rules because each is silently wrong when broken:
 - **`len` is stored and overridable, not derived.** Map geometry is schematic until Task 145 supplies
   real coordinates, so a computed-only length would be a lie. `lenAuto` records whether the user has
   taken control.
-  **UI for `lenAuto` — not yet designed, Tom's sketch from the Phase 0 spike (2026-07-29):** a
-  two-level control, not a single toggle. Per-link, in the Pipe property popup: an Auto/manual
-  switch for *this* link only. Suite-wide, in the gear/settings panel: a default for new links
-  (auto by default) plus bulk operations over existing links — "force all to auto," and some
-  release/disconnect verb for the opposite (Tom's own words: "orphan/freeze/disconnect/release all
-  auto lengths") for taking a whole network off auto-length at once, e.g. before a `.inp` export
-  where schematic auto-lengths would be misleading. Design the exact verb and semantics when the
-  property popup and gear panel are actually built (Phase 1 and Phase 2 respectively) — this is a
-  placeholder for the idea, not a spec.
+  **UI for `lenAuto` — the per-link half is built (Phase 1, 2026-07-29).** Tom's original sketch
+  from the Phase 0 spike was a two-level control, not a single toggle. Per-link, in the Pipe
+  property popup: an Auto/manual switch for *this* link only — **done**: the Length field pairs
+  with an Auto checkbox; typing a value clears it (manual override), re-checking it snaps back to
+  the live geometric distance (`linkGeomLength()` in `js/looped-network.js`, schematic map-unit
+  distance, not a real ground length — that needs Task 145's backdrop scale). **Still not built**:
+  the suite-wide half, in the gear/settings panel — a default for new links (auto by default) plus
+  bulk operations over existing links, "force all to auto," and some release/disconnect verb for
+  the opposite (Tom's own words: "orphan/freeze/disconnect/release all auto lengths") for taking a
+  whole network off auto-length at once, e.g. before a `.inp` export where schematic auto-lengths
+  would be misleading. Design the exact verb and semantics when the gear panel is actually built
+  (Phase 2) — this half is still a placeholder for the idea, not a spec.
+
+- **Pump curve entry — not yet designed, Tom's sketch (2026-07-30):** rather than a separate
+  Pump Curve UI, let the Pump property popup accept *either* an inline curve table (2-point or
+  3-point, feeding `EngCalcs.lpnPumpFromCurve()`) *or* a reference to another pump's id, reusing
+  its curve. Tom's own framing: "parsimonious" — one field slot serves both "this pump has its own
+  curve" and "this pump matches an already-defined one" (a common real case: identical pumps in
+  parallel), without a second UI surface. Not built in Phase 1 (`Looped-Network.php`'s pump popup
+  currently only shows a placeholder notice that curve entry isn't implemented) — design the exact
+  table shape and the id-reference validation (what happens if the referenced pump is later
+  deleted, or forms a reference cycle) when this is actually built.
 - **Versioning:** `v` is a monotonic integer. `v > CURRENT` refuses to load and says so — never
   silently drop unknown fields. `v < CURRENT` runs an ordered chain of pure migrations, keeping a
   `_backup` copy first, because there is no undo in localStorage.
