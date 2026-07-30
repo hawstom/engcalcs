@@ -153,8 +153,12 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   and Task 145 moved here (below), so this page is *how* we become map-mashup experts rather than
   something waiting on it. Task 144's finding is still welcome evidence but is no longer a blocker.
 
-  **Build on a dedicated git branch** so it never blocks other work on `master`. The scope doc and
-  these roadmap entries are planning artifacts and belong on `master`.
+  **Commit direct to `master` (Tom, 2026-07-30 cleanup — this project does not normally use
+  branches; the per-phase `lpn-solver`/`lpn-labels` branches this task used through Phase 2 were an
+  inconsistency with the standing no-branching policy already recorded elsewhere in this file, e.g.
+  the entity-migration task below, not a deliberate exception. Both branches were fast-forward-merged
+  into `master` and deleted 2026-07-30.)** The scope doc and these roadmap entries are planning
+  artifacts and belong on `master` as always.
 
   **Biggest standing risk is scope gravity toward EPANET.** The scope doc opens with a "Cut, not
   deferred" list (extended-period simulation, water quality, PRV/PSV/FCV, demand patterns, energy
