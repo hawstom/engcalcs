@@ -46,15 +46,18 @@ document.addEventListener('DOMContentLoaded', function() {
 	</div>
 	</div>
 	<div class="d-print-none" id="lpn_toolbar"></div>
-	<?php // Deliberately NOT d-print-none (Tom, 2026-07-30) -- the Labels popover itself is
-	      // toolbar chrome and is hidden on print like the rest of #lpn_toolbar, so the color key
-	      // for whichever fields are toggled on needs a separate, always-visible home to survive
-	      // printing. Hidden by JS (display:none) whenever no field is toggled on, so it costs
-	      // nothing when the map labels are off. ?>
-	<div id="lpn_labels_legend" style="display:none;font-size:0.9em;margin-bottom:4px"></div>
 	<p id="lpn_status" class="ec-status-warn"></p>
 	<div style="overflow-x:auto;position:relative">
 		<svg id="lpn_canvas" dir="ltr" width="100%" height="500" style="border:1px solid #ccc;background:#f7f7f2"></svg>
+		<?php // Deliberately NOT d-print-none (Tom, 2026-07-30) -- the Labels popover itself is
+		      // toolbar chrome and is hidden on print like the rest of #lpn_toolbar, so the color key
+		      // for whichever fields are toggled on needs a separate, always-visible home to survive
+		      // printing. Hidden by JS (display:none) whenever no field is toggled on, so it costs
+		      // nothing when the map labels are off.
+		      // Upper-right overlay, vertically stacked (Tom, 2026-07-30) -- the original above-canvas
+		      // horizontal row read poorly. Fixed at upper-right for now; ROADMAP Task 146 notes a
+		      // future gear-panel setting to choose among corners/edges (see the scope doc). ?>
+		<div id="lpn_labels_legend" style="display:none;position:absolute;top:4px;right:4px;font-size:0.9em;line-height:1.4;background:rgba(255,255,255,.85);padding:4px 8px;pointer-events:none"></div>
 		<?php // No template_welcome here (Tom, 2026-07-30): it already shows at the top of every
 		      // page via echoHeader(), and its link wasn't even clickable in this pointer-events:
 		      // none overlay -- redundant, not just relocatable. ?>

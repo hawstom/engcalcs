@@ -1100,15 +1100,16 @@ var EngCalcs = EngCalcs || {};
 		var box = document.getElementById('lpn_labels_legend'); if (!box) { return; }
 		var pc = EngCalcs.pageConfig || {}, any = false;
 		box.innerHTML = '';
+		// One field per line (Tom, 2026-07-30: the original horizontal row read poorly) -- matches
+		// the vertical, upper-right-corner overlay this now renders into.
 		function addGroup(defs, settings) {
 			defs.forEach(function (f) {
 				if (!settings[f[0]]) { return; }
 				any = true;
-				var span = document.createElement('span');
-				span.style.color = lpnFieldColors[f[0]];
-				span.style.marginRight = '12px';
-				span.textContent = f[1];
-				box.appendChild(span);
+				var div = document.createElement('div');
+				div.style.color = lpnFieldColors[f[0]];
+				div.textContent = f[1];
+				box.appendChild(div);
 			});
 		}
 		addGroup(nodeFieldDefs(pc), labelSettings.node);

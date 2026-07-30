@@ -602,6 +602,17 @@ geometry) plus a setting for how opaque. Tom explicitly leaned toward roadmap ov
 the Phase 2 backdrop-image feature makes label-over-backdrop legibility a real, testable problem
 rather than a hypothetical one.
 
+**Legend placement, quick fix now + configurability logged for the gear panel (Tom, round 3,
+2026-07-30).** `#lpn_labels_legend` moved from a horizontal row above the canvas to a vertically-
+stacked, upper-right overlay ON the map (`Looped-Network.php`, `renderLabelsLegend()` in
+`js/looped-network.js`) -- the original placement/orientation read poorly. Upper-right is a fixed
+default for now. **Choosing among corners/edges is a gear-panel setting, not built yet**: Tom's own
+framing is 6-fold, not 8 -- one of {top, middle, bottom} crossed with one of {left, right}, since a
+legend anchored to a true corner vs. a true edge-middle are the only positions that make sense for a
+stacked block (no top-center/bottom-center variant the way an 8-fold compass rose would imply). Design
+the exact setting shape when the gear panel is actually built (already scoped there per the round-2
+note above); this note exists so the placement default isn't mistaken for a settled decision.
+
 **Phase 3 — polish and reach.** Draggable labels with leaders and collision avoidance (see the
 Phase 0 note on a label-reset gesture); map insets for congested areas; `.inp` export/import;
 **valves as a link property (status + setting), not a fifth element type** — Tom's instinct matches
