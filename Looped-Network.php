@@ -14,7 +14,14 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 <form id="formInput" action="javascript:EngCalcs.submitForm()" method="post">
-	<?php echoUnitsRow(); ?>
+	<?php // Restore Defaults' removal freed enough headroom to put the six selectors on the same
+	      // line as the US/SI row instead of a line of their own (Tom, 2026-07-30). A flex wrapper,
+	      // not a merge into one <div>: echoUnitsRow() keeps its own collapse toggle untouched, and
+	      // flex-wrap lets the two pieces re-flow onto separate lines on a narrow screen without any
+	      // extra markup -- the wrap-first-as-a-table/div behavior Tom asked for falls out of
+	      // flex-wrap for free. ?>
+	<div class="d-flex flex-wrap align-items-center d-print-none" style="gap:4px 12px">
+	<?php echoUnitsRow(false, true); // hide Restore Defaults -- this page has no cookie to restore (Tom, 2026-07-30) ?>
 	<?php // Six selectors (Tom, 2026-07-30, +Velocity added answering "are there others?"):
 	      // Length/Map is declarative-only (AutoCAD-style grid units, no SI conversion -- see the
 	      // lengthField() comment in looped-network.js) and is deliberately its own selector, NOT
@@ -36,12 +43,15 @@ document.addEventListener('DOMContentLoaded', function() {
 		<?=$ec_lang['lpn_units_flow']?> <?php echoUnitSelect('lpn_u_flow', 'flow_node', ''); ?>
 		<?=$ec_lang['lpn_units_velocity']?> <?php echoUnitSelect('lpn_u_velocity', 'velocity', ''); ?>
 	</div>
+	</div>
 	<div class="d-print-none" id="lpn_toolbar"></div>
 	<p id="lpn_status" class="ec-status-warn"></p>
 	<div style="overflow-x:auto;position:relative">
 		<svg id="lpn_canvas" dir="ltr" width="100%" height="500" style="border:1px solid #ccc;background:#f7f7f2"></svg>
+		<?php // No template_welcome here (Tom, 2026-07-30): it already shows at the top of every
+		      // page via echoHeader(), and its link wasn't even clickable in this pointer-events:
+		      // none overlay -- redundant, not just relocatable. ?>
 		<div id="lpn_empty_hint" class="d-print-none" style="display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#999;font-size:1.2em;pointer-events:none;text-align:center">
-			<span style="font-size:0.85em"><?=$ec_lang['template_welcome']?></span><br /><br />
 			<?=$ec_lang['lpn_empty_hint']?>
 		</div>
 		<div id="lpn_coords" class="d-print-none" style="position:absolute;bottom:4px;left:4px;font-size:11px;font-family:monospace;background:rgba(255,255,255,.8);padding:2px 6px;pointer-events:none">X: --  Y: --</div>
@@ -97,7 +107,10 @@ EngCalcs.pageConfig = {
 	lpn_result_flow: <?=json_encode($ec_lang['lpn_result_flow'])?>,
 	lpn_result_velocity: <?=json_encode($ec_lang['lpn_result_velocity'])?>,
 	lpn_result_headloss: <?=json_encode($ec_lang['lpn_result_headloss'])?>,
-	lpn_result_headgain: <?=json_encode($ec_lang['lpn_result_headgain'])?>
+	lpn_result_headgain: <?=json_encode($ec_lang['lpn_result_headgain'])?>,
+	lpn_tool_clear: <?=json_encode($ec_lang['lpn_tool_clear'])?>,
+	lpn_confirm_clear: <?=json_encode($ec_lang['lpn_confirm_clear'])?>,
+	lpn_storage_too_new: <?=json_encode($ec_lang['lpn_storage_too_new'])?>
 };
 </script>
 <script src="/engcalcs/js/lpn-solver.js?v=<?=filemtime(__DIR__.'/js/lpn-solver.js')?>"></script>

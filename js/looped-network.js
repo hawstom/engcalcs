@@ -378,6 +378,7 @@ var EngCalcs = EngCalcs || {};
 		nodeEls[id].circle.remove(); nodeEls[id].text.remove();
 		delete nodeEls[id]; delete incidentLinks[id]; delete labelsByAnchor[id];
 		doc.nodes = doc.nodes.filter(function (n) { return n.id !== id; });
+		if (currentPopup && currentPopup.kind === 'node' && currentPopup.id === id) { closePopup(); }
 		updateEmptyHint();
 		scheduleSolve();
 	}
@@ -389,10 +390,12 @@ var EngCalcs = EngCalcs || {};
 		var l = linkById(id);
 		linkEls[id].line.remove();
 		linkEls[id].handles.forEach(function (h) { h.remove(); });
+		linkEls[id].arrows.forEach(function (a) { a.remove(); });
 		delete linkEls[id];
 		incidentLinks[l.from] = incidentLinks[l.from].filter(function (x) { return x !== id; });
 		incidentLinks[l.to] = incidentLinks[l.to].filter(function (x) { return x !== id; });
 		doc.links = doc.links.filter(function (x) { return x.id !== id; });
+		if (currentPopup && currentPopup.kind === 'link' && currentPopup.id === id) { closePopup(); }
 		scheduleSolve();
 	}
 	function deleteLabelById(id) {
@@ -404,6 +407,53 @@ var EngCalcs = EngCalcs || {};
 			labelsByAnchor[lb.anchorNode] = labelsByAnchor[lb.anchorNode].filter(function (x) { return x !== id; });
 		}
 		doc.labels = doc.labels.filter(function (x) { return x.id !== id; });
+	}
+
+	// ---- localStorage autosave (single network) ----
+	// Versioned per the scope doc's schema rules: v > CURRENT refuses to load and says so, never
+	// silently drops unknown fields; v < CURRENT would run an ordered migration chain, keeping a
+	// _backup copy first. No migrations exist yet -- this is Phase 1's only version.
+	var LPN_STORAGE_KEY = 'lpn_document';
+	var LPN_STORAGE_VERSION = 1;
+	function saveToStorage() {
+		try {
+			localStorage.setItem(LPN_STORAGE_KEY, JSON.stringify({
+				v: LPN_STORAGE_VERSION, nodes: doc.nodes, links: doc.links, labels: doc.labels, nextId: nextId
+			}));
+		} catch (err) { /* localStorage can throw (private mode, quota) -- autosave is best-effort */ }
+	}
+	function loadFromStorage() {
+		var raw, saved;
+		try { raw = localStorage.getItem(LPN_STORAGE_KEY); } catch (err) { return false; }
+		if (!raw) { return false; }
+		try { saved = JSON.parse(raw); } catch (err) { return false; }
+		if (!saved || typeof saved.v !== 'number') { return false; }
+		if (saved.v > LPN_STORAGE_VERSION) {
+			var pc = EngCalcs.pageConfig || {};
+			alert(pc.lpn_storage_too_new || 'The saved network was created by a newer version of this page and cannot be loaded here.');
+			return false;
+		}
+		doc.nodes = saved.nodes || []; doc.links = saved.links || []; doc.labels = saved.labels || [];
+		nextId = saved.nextId || { J: 1, R: 1, L: 1, P: 1, T: 1 };
+		return true;
+	}
+	// A dedicated button, not a repurposed "Restore Defaults" (Tom asked "do we dare"): that
+	// button's suite-wide behavior (lib/Calculators.lib.php's EngCalcs.resetToDefaults) expires a
+	// cookie this page never uses and reloads, which wouldn't touch localStorage at all --
+	// unifying the two is a real design question logged in the scope doc, not resolved here.
+	function clearNetwork() {
+		var pc = EngCalcs.pageConfig || {};
+		if (!window.confirm(pc.lpn_confirm_clear || 'This will permanently delete the current network. Continue?')) { return; }
+		doc = { nodes: [], links: [], labels: [] };
+		nextId = { J: 1, R: 1, L: 1, P: 1, T: 1 };
+		try { localStorage.removeItem(LPN_STORAGE_KEY); } catch (err) { /* best-effort */ }
+		lastSolveResult = null;
+		closePopup();
+		buildDom();
+		updateEmptyHint();
+		setStatus('');
+		setMode('select');
+		zoomExtent();
 	}
 
 	function init() {
@@ -418,6 +468,7 @@ var EngCalcs = EngCalcs || {};
 		wireToolbar();
 		wirePointerEvents();
 		wirePopup();
+		if (loadFromStorage()) { buildDom(); scheduleSolve(); }
 		updateEmptyHint();
 		zoomExtent();
 		requestAnimationFrame(tick);
@@ -452,36 +503,57 @@ var EngCalcs = EngCalcs || {};
 			into.appendChild(btn);
 		}
 
+		// Four groups, in the classic File/Edit/Insert/View order (Tom, 2026-07-30): File (New,
+		// then Draw Example -- as though it were "Open a sample"), Add/Insert (Reservoir first,
+		// then in the same order the example network builds: Pump, Junction, Pipe), Edit (Select,
+		// Delete, Undo -- Select first for safety, per Tom's own correction of an earlier order),
+		// View (Zoom Extent).
+		var fileGroup = group();
+		var clearBtn = document.createElement('button');
+		clearBtn.type = 'button';
+		clearBtn.textContent = pc.lpn_tool_clear || 'Clear / New';
+		clearBtn.addEventListener('click', clearNetwork);
+		fileGroup.appendChild(clearBtn);
+		var exampleBtn = document.createElement('button');
+		exampleBtn.type = 'button';
+		exampleBtn.textContent = pc.lpn_tool_example || 'Draw example network';
+		exampleBtn.addEventListener('click', drawExampleNetwork);
+		fileGroup.appendChild(exampleBtn);
+
 		var addGroup = group();
 		[
-			// Reservoir first (Tom, 2026-07-30): a great starting place for a network.
 			{ mode: 'add-reservoir', key: 'lpn_tool_add_reservoir' },
+			{ mode: 'add-pump', key: 'lpn_tool_add_pump' },
 			{ mode: 'add-junction', key: 'lpn_tool_add_junction' },
 			{ mode: 'add-pipe', key: 'lpn_tool_add_pipe' },
-			{ mode: 'add-pump', key: 'lpn_tool_add_pump' },
 			{ mode: 'add-text', key: 'lpn_tool_add_text' }
 		].forEach(function (t) { modeButton(t, addGroup); });
 
 		var editGroup = group();
+		modeButton({ mode: 'select', key: 'lpn_tool_select' }, editGroup);
 		modeButton({ mode: 'delete', key: 'lpn_tool_delete' }, editGroup);
 		var undoBtn = document.createElement('button');
 		undoBtn.type = 'button';
 		undoBtn.textContent = pc.lpn_tool_undo || 'Undo';
 		undoBtn.addEventListener('click', undo);
 		editGroup.appendChild(undoBtn);
-		modeButton({ mode: 'select', key: 'lpn_tool_select' }, editGroup);
 
-		var miscGroup = group();
+		var viewGroup = group();
 		var extentBtn = document.createElement('button');
 		extentBtn.type = 'button';
 		extentBtn.textContent = pc.lpn_tool_zoom_extent || 'Zoom Extent';
 		extentBtn.addEventListener('click', zoomExtent);
-		miscGroup.appendChild(extentBtn);
-		var exampleBtn = document.createElement('button');
-		exampleBtn.type = 'button';
-		exampleBtn.textContent = pc.lpn_tool_example || 'Draw example network';
-		exampleBtn.addEventListener('click', drawExampleNetwork);
-		miscGroup.appendChild(exampleBtn);
+		viewGroup.appendChild(extentBtn);
+
+		// Temporary dev-only stress-test button (Tom, 2026-07-30): visually set apart (its own
+		// group, bracketed label) so it reads as not-a-real-feature. Remove once satisfied with
+		// how ~100 links performs -- see drawTestGrid() below.
+		var devGroup = group();
+		var testBtn = document.createElement('button');
+		testBtn.type = 'button';
+		testBtn.textContent = '[dev] Draw large test network';
+		testBtn.addEventListener('click', drawTestGrid);
+		devGroup.appendChild(testBtn);
 	}
 
 	// One reservoir, one pump (a link, per the header comment above), one junction between
@@ -512,6 +584,41 @@ var EngCalcs = EngCalcs || {};
 		// happens correctly). Tom caught this: 25ft shown, jumped to 28ft only after a drag.
 		pipe.length = linkGeomLength(pipe);
 		rebuildLink(pipe);
+		updateEmptyHint();
+		zoomExtent();
+		setMode('select');
+	}
+
+	// Temporary dev-only stress-test generator (Tom, 2026-07-30: "see how this handles 100
+	// links/pipes"). An 8x8 grid gives 64 nodes and 112 pipes with genuine loops on every interior
+	// cell -- a realistic worst case for the 300ms debounced solve, unlike a tree which the
+	// two-pass bpn_ solver would handle trivially. One corner is a reservoir (the solver's only
+	// fixed-head boundary condition); every other node is a junction with a small demand. Remove
+	// this function and its toolbar button once satisfied with how the debounce/solve holds up.
+	function drawTestGrid() {
+		if (doc.nodes.length > 0) {
+			if (!window.confirm('This will add to the existing network. Continue?')) { return; }
+		}
+		saveUndoSnapshot();
+		var SIZE = 8, SPACING = 20, grid = [], row, col, n, demand = niceDefault('lpn_u_flow', 'gpm', 5, 0.0003);
+		for (row = 0; row < SIZE; row++) {
+			grid.push([]);
+			for (col = 0; col < SIZE; col++) {
+				if (row === 0 && col === 0) {
+					n = addNode('reservoir', 0, 0);
+				} else {
+					n = addNode('junction', col * SPACING, row * SPACING);
+					n.demand = demand;
+				}
+				grid[row].push(n);
+			}
+		}
+		for (row = 0; row < SIZE; row++) {
+			for (col = 0; col < SIZE; col++) {
+				if (col < SIZE - 1) { addLink('pipe', grid[row][col].id, grid[row][col + 1].id); }
+				if (row < SIZE - 1) { addLink('pipe', grid[row][col].id, grid[row + 1][col].id); }
+			}
+		}
 		updateEmptyHint();
 		zoomExtent();
 		setMode('select');
@@ -713,11 +820,12 @@ var EngCalcs = EngCalcs || {};
 	// (Elevation+Demand for a junction, Fixed head for a reservoir, Diameter+Roughness+Length
 	// for a pipe). Pump curve entry isn't implemented -- see the scope doc's design note.
 	var currentPopup = null; // {kind:'node'|'link', id} -- lets a unit-strip change refresh the open popup in place
+	function closePopup() {
+		document.getElementById('lpn_popup').style.display = 'none';
+		currentPopup = null;
+	}
 	function wirePopup() {
-		document.getElementById('lpn_popup_close').addEventListener('click', function () {
-			document.getElementById('lpn_popup').style.display = 'none';
-			currentPopup = null;
-		});
+		document.getElementById('lpn_popup_close').addEventListener('click', closePopup);
 	}
 	function unitNumberField(fields, labelText, unitId, getSI, setSI) {
 		var f = unitFactor(unitId), label = document.createElement('label'), input = document.createElement('input');
@@ -929,6 +1037,7 @@ var EngCalcs = EngCalcs || {};
 			var m = /^([A-Z])(\d+)$/.exec(x.id);
 			if (m && nextId[m[1]] !== undefined) { nextId[m[1]] = Math.max(nextId[m[1]], +m[2] + 1); }
 		});
+		closePopup(); // whatever it referenced may no longer exist post-undo (e.g. undoing an Add)
 		buildDom();
 		updateEmptyHint();
 		scheduleSolve();
@@ -970,6 +1079,10 @@ var EngCalcs = EngCalcs || {};
 		doc.links.forEach(function (l) { updateArrow(l.id); });
 	}
 	function runSolve() {
+		// Autosave piggybacks on the same debounce as the solve, not a separate timer -- one
+		// mutation, one save, regardless of solve outcome (a manual delete-to-empty must persist
+		// too, or a reload would resurrect the stale pre-delete network).
+		saveToStorage();
 		if (doc.nodes.length === 0) { lastSolveResult = null; setStatus(''); return; }
 		var model = assembleModel(), issues = EngCalcs.lpnDiagnose(model);
 		if (issues.length > 0) {

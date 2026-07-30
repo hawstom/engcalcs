@@ -149,7 +149,7 @@ function echoUnitSelect($name, $units, $indent_string)
 // the Restore-defaults/US/SI row and working unit presets without copy-pasting suite chrome. Bundles
 // everything the row needs: the EngCalcs.unitSets/defaultUnitSet globals EngCalcs.setUnits() reads,
 // the button wiring, and the HTML itself — call this alone and unit presets just work.
-function echoUnitsRow($flagHideUnits = false)
+function echoUnitsRow($flagHideUnits = false, $flagHideDefaults = false)
 {
     global $ec_lang;
 ?>
@@ -168,9 +168,16 @@ document.addEventListener('DOMContentLoaded', function() {
 	<?php // Defaults sits BEFORE the "Set units:" label, not after the unit buttons, so the
 	      // label reads as introducing only the two buttons it actually controls. Grouped the
 	      // old way, "Set units: [US][SI][Default values]" implied Defaults was a third unit
-	      // choice (Tom, 2026-07-28). ?>
+	      // choice (Tom, 2026-07-28).
+	      // $flagHideDefaults (Task 146, 2026-07-30): the button calls EngCalcs.resetToDefaults(),
+	      // which expires a cookie -- meaningless on a page like lpn_ that doesn't use cookie-based
+	      // field persistence at all (it has its own localStorage document instead). Opt-in per
+	      // page, not a suite-wide removal: every other calculator still relies on it. ?>
+	<?php if ($flagHideDefaults === false) : ?>
 	<button type="button" id="calc_defaults" onclick="EngCalcs.resetToDefaults('<?=addslashes($ec_lang['calc_defaults_confirm'])?>')"><?=$ec_lang['calc_defaults']?></button>
-	&nbsp; <?=$ec_lang['calc_set_units']?> <button type="button" id="set_units_us"><?=$ec_lang['calc_units_us']?></button><button type="button" id="set_units_si"><?=$ec_lang['calc_units_si']?></button> <a data-bs-toggle="collapse" href="#set_units_row" aria-expanded="true" aria-controls="set_units_row"><?=$ec_lang['view_hide_line']?></a>
+	&nbsp;
+	<?php endif; ?>
+	<?=$ec_lang['calc_set_units']?> <button type="button" id="set_units_us"><?=$ec_lang['calc_units_us']?></button><button type="button" id="set_units_si"><?=$ec_lang['calc_units_si']?></button> <a data-bs-toggle="collapse" href="#set_units_row" aria-expanded="true" aria-controls="set_units_row"><?=$ec_lang['view_hide_line']?></a>
 </div>
 <?php
 }
