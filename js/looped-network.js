@@ -350,9 +350,13 @@ var EngCalcs = EngCalcs || {};
 	// Defaults reproduce exactly what Phase 1 already showed (node ID+pressure, nothing on links),
 	// so shipping this is a visual no-op until a user opts in.
 	function defaultLabelSettings() {
+		// Node defaults ID/Demand/Pressure/Elevation, link defaults ID/Flow/Velocity (Tom, 2026-07-30,
+		// after using the Labels panel for the first time) -- the previous defaults (node: ID+Pressure
+		// only; link: nothing) reproduced the original hardcoded pre-panel behavior, but that was never
+		// a considered choice about what's actually useful to see on first load.
 		return {
-			node: { id: true, elev: false, demand: false, head: false, pressure: true },
-			link: { id: false, diameter: false, length: false, flow: false, velocity: false, headloss: false }
+			node: { id: true, elev: true, demand: true, head: false, pressure: true },
+			link: { id: true, diameter: false, length: false, flow: true, velocity: true, headloss: false }
 		};
 	}
 	var labelSettings = defaultLabelSettings();
@@ -1217,6 +1221,19 @@ var EngCalcs = EngCalcs || {};
 	}
 
 	function init() {
+		// True first-visit reset (Tom, 2026-07-30): wipes the ONE localStorage key that carries
+		// everything -- network, backdrop, and settings/labelSettings preferences alike -- so the
+		// page loads exactly as a brand-new visitor would see it. Strictly more destructive than
+		// New/Clear (clearNetwork(), content only) or Restore defaults (rebuildSettingsFields()'s
+		// button, preferences only). Also reachable via "?lpn_wipe=1" in the URL for a scripted
+		// reset with no click needed.
+		try {
+			if (/[?&]lpn_wipe=1(&|$)/.test(window.location.search)) {
+				localStorage.removeItem('lpn_document');
+				var url = window.location.href.replace(/([?&])lpn_wipe=1&?/, '$1').replace(/[?&]$/, '');
+				window.history.replaceState(null, '', url);
+			}
+		} catch (err) { /* localStorage/history can throw (private mode) -- non-fatal, just skip the wipe */ }
 		svg = document.getElementById('lpn_canvas');
 		world = el('g', {}, svg);
 		backdropLayer = el('g', {}, world);
@@ -1766,18 +1783,24 @@ var EngCalcs = EngCalcs || {};
 			['velocity', pc.lpn_result_velocity || 'Velocity'], ['headloss', pc.lpn_result_headloss || 'Head loss']
 		];
 	}
-	function wireLabelsPopup() {
+	// Extracted from wireLabelsPopup() (Tom, 2026-07-30: "Restore defaults" button) so the checkbox
+	// list can be rebuilt in place after labelSettings is reset, without re-wiring the close button.
+	function rebuildLabelsFields() {
 		var pc = EngCalcs.pageConfig || {}, nodeBox = document.getElementById('lpn_labels_node_fields'),
 			linkBox = document.getElementById('lpn_labels_link_fields');
-		document.getElementById('lpn_labels_popup_close').addEventListener('click', function () {
-			document.getElementById('lpn_labels_popup').style.display = 'none';
-		});
+		nodeBox.innerHTML = ''; linkBox.innerHTML = '';
 		nodeFieldDefs(pc).forEach(function (f) {
 			labelCheckbox(nodeBox, f[1], lpnFieldColors[f[0]], labelSettings.node[f[0]], function (v) { labelSettings.node[f[0]] = v; });
 		});
 		linkFieldDefs(pc).forEach(function (f) {
 			labelCheckbox(linkBox, f[1], lpnFieldColors[f[0]], labelSettings.link[f[0]], function (v) { labelSettings.link[f[0]] = v; });
 		});
+	}
+	function wireLabelsPopup() {
+		document.getElementById('lpn_labels_popup_close').addEventListener('click', function () {
+			document.getElementById('lpn_labels_popup').style.display = 'none';
+		});
+		rebuildLabelsFields();
 	}
 	// A color key that survives printing (Tom, 2026-07-30): the Labels popover itself is toolbar
 	// chrome (d-print-none), so a legend that only lived there would vanish on a printed page --
@@ -1873,11 +1896,11 @@ var EngCalcs = EngCalcs || {};
 	// non-empty -- a prefix becomes the leading substring of every future auto-generated ID for that
 	// element type, so the same rules that keep a renamed ID EPANET-legal apply here too.
 	function validatePrefix(p) { return !!p && !/[\s'"]/.test(p); }
-	function wireSettingsPopup() {
+	// Extracted from wireSettingsPopup() (Tom, 2026-07-30: "Restore defaults" button) so the field
+	// list can be rebuilt in place, showing the reset values, without re-wiring the close button.
+	function rebuildSettingsFields() {
 		var pc = EngCalcs.pageConfig || {}, fields = document.getElementById('lpn_settings_fields');
-		document.getElementById('lpn_settings_popup_close').addEventListener('click', function () {
-			document.getElementById('lpn_settings_popup').style.display = 'none';
-		});
+		fields.innerHTML = '';
 		function row(labelText, input) {
 			var label = document.createElement('label');
 			label.textContent = labelText + ' ';
@@ -1979,6 +2002,45 @@ var EngCalcs = EngCalcs || {};
 			saveToStorage();
 		});
 		row(pc.lpn_settings_legend_position || 'Legend position', legendSelect);
+		// ---- restore defaults (Tom, 2026-07-30) ----
+		// Resets settings/labelSettings only -- the network (nodes/links/labels) and backdrop are
+		// untouched, same "preferences vs. content" split clearNetwork()'s own comment documents.
+		heading(pc.lpn_settings_restore || 'Reset');
+		var restoreBtn = document.createElement('button');
+		restoreBtn.type = 'button';
+		restoreBtn.textContent = pc.lpn_settings_restore_btn || 'Restore defaults';
+		restoreBtn.addEventListener('click', function () {
+			if (!window.confirm(pc.lpn_confirm_restore_defaults || 'Reset all settings (ID prefixes, solver, text size, legend position, and visible labels) to their defaults? This does not affect your network.')) { return; }
+			settings = defaultSettings();
+			labelSettings = defaultLabelSettings();
+			applyMapHeight();
+			applyLegendPosition();
+			refreshFontSizes();
+			renderLabelsLegend();
+			rebuildSettingsFields();
+			rebuildLabelsFields();
+			saveToStorage();
+		});
+		fields.appendChild(restoreBtn);
+		// "Wipe memory" (Tom, 2026-07-30, temporary): the full reset above the URL-param path
+		// already does, exposed as a button for convenience while this page is a preview. Unlike
+		// Restore defaults, this also deletes the network and backdrop -- confirm text says so.
+		var wipeBtn = document.createElement('button');
+		wipeBtn.type = 'button';
+		wipeBtn.style.marginLeft = '4px';
+		wipeBtn.textContent = pc.lpn_settings_wipe_btn || 'Wipe memory';
+		wipeBtn.addEventListener('click', function () {
+			if (!window.confirm(pc.lpn_confirm_wipe || 'Delete EVERYTHING saved for this page -- network, backdrop image, and all settings -- and reload as a brand-new visitor would see it? This cannot be undone.')) { return; }
+			try { localStorage.removeItem('lpn_document'); } catch (err) { /* private mode -- nothing to remove */ }
+			window.location.reload();
+		});
+		fields.appendChild(wipeBtn);
+	}
+	function wireSettingsPopup() {
+		document.getElementById('lpn_settings_popup_close').addEventListener('click', function () {
+			document.getElementById('lpn_settings_popup').style.display = 'none';
+		});
+		rebuildSettingsFields();
 	}
 	function toggleSettingsPopup(evt) {
 		var popup = document.getElementById('lpn_settings_popup');

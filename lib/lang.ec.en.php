@@ -1175,7 +1175,7 @@ $ec_lang['lpn_pump_notice']='Pump curve entry is not yet implemented.';
 // Persistent mode-hint line (Task 146.01 follow-up, 2026-07-30): whole sentences, not composed
 // from a "Mode:" prefix + the tool's own label, per CLAUDE.md's concept-level label reuse rule --
 // word order/grammar around a mode name varies by language, so each mode gets its own full string.
-$ec_lang['lpn_mode_select']='Mode: Select. Click an element to view or edit it; drag to move nodes, vertices, or labels.';
+$ec_lang['lpn_mode_select']='Mode: Select. Click an element to view or edit it; drag to move nodes, vertices, or labels. Double-click a pipe to add or remove a vertex.';
 $ec_lang['lpn_mode_delete']='Mode: Delete. Click an element to remove it.';
 $ec_lang['lpn_mode_add_junction']='Mode: Add Junction. Change to Select mode to edit or move elements and labels.';
 $ec_lang['lpn_mode_add_reservoir']='Mode: Add Reservoir. Change to Select mode to edit or move elements and labels.';
@@ -1233,3 +1233,8 @@ $ec_lang['lpn_settings_legend_middle_left']='Middle left';
 $ec_lang['lpn_settings_legend_middle_right']='Middle right';
 $ec_lang['lpn_settings_legend_bottom_left']='Bottom left';
 $ec_lang['lpn_settings_legend_bottom_right']='Bottom right';
+$ec_lang['lpn_settings_restore']='Reset';
+$ec_lang['lpn_settings_restore_btn']='Restore defaults';
+$ec_lang['lpn_confirm_restore_defaults']='Reset all settings (ID prefixes, solver, text size, legend position, and visible labels) to their defaults? This does not affect your network.';
+$ec_lang['lpn_settings_wipe_btn']='Wipe memory';
+$ec_lang['lpn_confirm_wipe']='Delete EVERYTHING saved for this page -- network, backdrop image, and all settings -- and reload as a brand-new visitor would see it? This cannot be undone.';

@@ -125,7 +125,10 @@ html[lang="zh"] .ec-welcome {
    color read as absorbed into the (formerly thick) pipe stroke. Black and open protrudes above
    and below the line instead of blending into it. */
 .lpn-arrow { fill: none; stroke: #000; stroke-width: 0.3; pointer-events: none; }
-.lpn-vhandle { fill: #fff; stroke: #a52; stroke-width: 0.5; cursor: move; }
+/* Filled the same color as .lpn-link (Tom, 2026-07-30: vertices should read as "on the pipe",
+   not as a third node type) -- previously a hollow white circle with the pump's #a52 stroke,
+   which had no relation to the link it belonged to and could be mistaken for a small pump. */
+.lpn-vhandle { fill: #557; stroke: #223; stroke-width: 0.25; cursor: move; }
 /* Feedback for the first-picked node of a pipe/pump (Tom, 2026-07-30: "otherwise there's no
    indication that anything is working") -- a wide red ring around the existing node fill/stroke,
    cleared by setPendingLinkFrom(null) in looped-network.js on completion or cancel. */
