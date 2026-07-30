@@ -70,6 +70,17 @@ document.addEventListener('DOMContentLoaded', function() {
 	<div id="lpn_popup_fields"></div>
 	<button type="button" id="lpn_popup_close"><?=$ec_lang['lpn_close']?></button>
 </div>
+<?php // A static settings panel, not a per-element property sheet -- deliberately its own popover
+      // (not #lpn_popup/currentPopup) so this never interacts with the rename/undo/element-property
+      // machinery. position:fixed and positioned from the Labels button's own screen rect (same
+      // reasoning as #lpn_popup above: viewport-relative, clamped into view by JS on open). ?>
+<div id="lpn_labels_popup" class="d-print-none" style="display:none;position:fixed;z-index:20;background:#fff;border:1px solid #333;padding:8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
+	<div style="font-weight:bold"><?=$ec_lang['lpn_labels_heading_node']?></div>
+	<div id="lpn_labels_node_fields"></div>
+	<div style="font-weight:bold"><?=$ec_lang['lpn_labels_heading_link']?></div>
+	<div id="lpn_labels_link_fields"></div>
+	<button type="button" id="lpn_labels_popup_close"><?=$ec_lang['lpn_close']?></button>
+</div>
 
 <?php echoFeedback(); ?>
 <h2><?=$ec_lang['ws_notes_heading']?></h2>
@@ -102,6 +113,10 @@ EngCalcs.pageConfig = {
 	lpn_field_auto: <?=json_encode($ec_lang['lpn_field_auto'])?>,
 	lpn_field_x: <?=json_encode($ec_lang['lpn_field_x'])?>,
 	lpn_field_y: <?=json_encode($ec_lang['lpn_field_y'])?>,
+	lpn_tool_labels: <?=json_encode($ec_lang['lpn_tool_labels'])?>,
+	lpn_labels_heading_node: <?=json_encode($ec_lang['lpn_labels_heading_node'])?>,
+	lpn_labels_heading_link: <?=json_encode($ec_lang['lpn_labels_heading_link'])?>,
+	lpn_field_id: <?=json_encode($ec_lang['lpn_field_id'])?>,
 	lpn_pump_notice: <?=json_encode($ec_lang['lpn_pump_notice'])?>,
 	bpn_demand: <?=json_encode($ec_lang['bpn_demand'])?>,
 	lpn_id_invalid: <?=json_encode($ec_lang['lpn_id_invalid'])?>,

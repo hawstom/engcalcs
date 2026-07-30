@@ -532,10 +532,28 @@ A Notes list stating honestly what the tool does not do.
   without it makes users quit.
 
 **Phase 2 — reporting, legibility, and the backdrop.** Node and link report tables, the EPANET-style
-element browser list, the full label toggle set with extrema over/underline marks, the gear/settings
-panel (ID prefixes J/L/P/R, emitter exponent, text size and its map-vs-screen units toggle,
-tolerance), multiple named saved networks, and the **user-supplied backdrop image with two-point
-registration** — projection-free, offline-capable, and the thing that actually makes the map
+element browser list, the gear/settings panel (ID prefixes J/L/P/R, emitter exponent, text size and
+its map-vs-screen units toggle, tolerance), multiple named saved networks, and the **user-supplied
+backdrop image with two-point registration** — projection-free, offline-capable, and the thing that
+actually makes the map
+
+**The label toggle set with extrema over/underline marks is DONE (2026-07-30, branch
+`lpn-labels`).** Every field on a node (ID, elevation, demand, head, pressure) and a link (ID,
+diameter, length, flow, velocity, headloss) is independently toggleable via a new "Labels" toolbar
+button/popover, each rendering as its own line under the element (multi-line SVG `<tspan>`s). Every
+toggled-on numeric field gets its network-wide max overlined and min underlined, computed
+**per field independently** and **after rounding to the same 2 decimals the label itself
+displays** — comparing un-rounded SI values marked one of two links carrying the same physical flow
+as "max" and the other "min" even though both printed the identical rounded number, purely from
+solver roundoff past the display precision; rounding first is what makes a displayed tie read as a
+tie. Ties (2+ elements sharing the extreme) all get marked, not just the first found. Persisted as
+`labelSettings` in the existing localStorage document, deliberately NOT part of the undo-snapshotted
+document (it's a view preference, not network content, so Ctrl-Z doesn't revert your label choices).
+Defaults reproduce exactly what Phase 1 shipped (node ID+pressure only), so this was a visual no-op
+until a user opts in. Verified on-device-equivalent via a Playwright/Chromium smoke test (drawing
+the example network, toggling every field, confirming extrema/ties/persistence/undo-independence
+all behave correctly) since no interactive browser was otherwise available in this environment.
+English-only, per the Phase-1 pattern (translation sprint still waits for the string set to settle).
 interface useful for real work. **The translation sprint goes here.**
 
 **Phase 3 — polish and reach.** Draggable labels with leaders and collision avoidance (see the

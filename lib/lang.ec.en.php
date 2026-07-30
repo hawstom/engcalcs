@@ -1175,3 +1175,7 @@ $ec_lang['lpn_pump_notice']='Pump curve entry is not yet implemented.';
 $ec_lang['lpn_field_auto']='Auto';
 $ec_lang['lpn_field_x']='X';
 $ec_lang['lpn_field_y']='Y';
+$ec_lang['lpn_tool_labels']='Labels';
+$ec_lang['lpn_labels_heading_node']='Node labels';
+$ec_lang['lpn_labels_heading_link']='Link labels';
+$ec_lang['lpn_field_id']='ID';

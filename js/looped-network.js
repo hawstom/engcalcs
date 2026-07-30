@@ -25,12 +25,64 @@ var EngCalcs = EngCalcs || {};
 	// World-unit font size shared by a node's ID/pressure label and a user-added Text label (Tom,
 	// 2026-07-30) -- no reason for the two to render at different sizes by default.
 	var LABEL_FONT_SIZE = 2.5;
+	// Line spacing for multi-line node/link labels (Task 146 Phase 2 label toggles), world units.
+	var LABEL_LINE_HEIGHT = LABEL_FONT_SIZE * 1.2;
+	// Rebuilds a <text> element's tspans from scratch -- simplest correct approach given the line
+	// count changes every time a label toggle is flipped. Each tspan repeats the same x (not a
+	// relative dx) so every line stays left/anchor-aligned under the first, which is the standard
+	// SVG multi-line-text idiom. line.decoration is undefined/'overline'/'underline', driven by the
+	// extrema check in refreshLabelText() below.
+	function setMultilineText(textEl, x, lines) {
+		while (textEl.firstChild) { textEl.removeChild(textEl.firstChild); }
+		lines.forEach(function (line, i) {
+			var tspan = el('tspan', { x: x, dy: i === 0 ? 0 : LABEL_LINE_HEIGHT }, textEl);
+			if (line.decoration) { tspan.style.textDecoration = line.decoration; }
+			tspan.textContent = line.text;
+		});
+	}
+	// Repositions an already-built multi-line label (drag/geometry updates) without touching its
+	// content -- setMultilineText() gives each tspan its own explicit x (needed for the multi-line
+	// stacking idiom), so moving the parent <text>'s x/y alone would leave old tspans stranded at
+	// the previous position; every tspan's x must move with it.
+	function repositionMultilineText(textEl, x, y) {
+		textEl.setAttribute('x', x); textEl.setAttribute('y', y);
+		var i;
+		for (i = 0; i < textEl.childNodes.length; i++) { textEl.childNodes[i].setAttribute('x', x); }
+	}
+	// Network-wide max/min of a field's values, skipping undefined (element types that don't carry
+	// it, or a solve result not yet available). Returns null when fewer than 2 defined values exist
+	// -- a lone value getting both an overline AND underline reads as a rendering glitch, not a
+	// finding, so it is deliberately left undecorated rather than marked as "the extreme."
+	function fieldExtrema(values) {
+		var defined = values.filter(function (v) { return typeof v === 'number'; });
+		if (defined.length < 2) { return null; }
+		return { min: Math.min.apply(null, defined), max: Math.max.apply(null, defined) };
+	}
+	function decorationFor(extrema, value) {
+		if (!extrema || typeof value !== 'number') { return undefined; }
+		if (value === extrema.max && value === extrema.min) { return undefined; }
+		if (value === extrema.max) { return 'overline'; }
+		if (value === extrema.min) { return 'underline'; }
+		return undefined;
+	}
 
 	// The document. nodes: Junction/Reservoir (point elements). links: Pipe/Pump (two
 	// endpoints + optional bend vertices). labels: Text elements with a leader to an
 	// anchor node, OR a free-floating text with anchorNode === null.
 	var doc = { nodes: [], links: [], labels: [] };
 	var nextId = { J: 1, R: 1, L: 1, P: 1, T: 1 };
+
+	// Map label toggles (Task 146 Phase 2) -- a VIEW preference, not network content, so it is
+	// deliberately NOT part of the undo-snapshotted `doc` and is untouched by clearNetwork()/undo().
+	// Defaults reproduce exactly what Phase 1 already showed (node ID+pressure, nothing on links),
+	// so shipping this is a visual no-op until a user opts in.
+	function defaultLabelSettings() {
+		return {
+			node: { id: true, elev: false, demand: false, head: false, pressure: true },
+			link: { id: false, diameter: false, length: false, flow: false, velocity: false, headloss: false }
+		};
+	}
+	var labelSettings = defaultLabelSettings();
 
 	function el(tag, attrs, parent) {
 		var e = document.createElementNS(NS, tag), k;
@@ -141,7 +193,12 @@ var EngCalcs = EngCalcs || {};
 				'class': 'lpn-arrow', 'data-link': l.id, style: 'display:none'
 			}, linksLayer));
 		}
-		linkEls[l.id] = { line: line, handles: handles, arrows: arrows };
+		// Link label (Task 146 Phase 2 label toggles): a multi-line <text>, same convention as a
+		// node's, positioned at the middle segment's midpoint -- content filled in by
+		// refreshLabelText(), not here (this only creates the element; it starts empty).
+		var midIdx = Math.floor(segCount / 2), mid = segmentMidpoints(l)[midIdx],
+			text = el('text', { x: mid.x + 2, y: mid.y - 2, 'class': 'lpn-lbl', style: 'font-size:' + LABEL_FONT_SIZE + 'px' }, linksLayer);
+		linkEls[l.id] = { line: line, handles: handles, arrows: arrows, text: text, tw: 8 };
 	}
 	// Midpoint and local tangent angle of every segment, walking a->verts->b -- one entry per
 	// straight run, so a bent pipe's arrows follow each segment's own direction.
@@ -201,10 +258,13 @@ var EngCalcs = EngCalcs || {};
 			buildLabelEls(doc.labels[i]);
 			updateLabelGeometry(doc.labels[i].id);
 		}
+		refreshLabelText();
 	}
 	function updateLinkGeometry(id) {
-		var l = linkById(id);
-		linkEls[id].line.setAttribute('points', linkPoints(l));
+		var l = linkById(id), le = linkEls[id], segCount = l.verts.length + 1,
+			midIdx = Math.floor(segCount / 2), mid = segmentMidpoints(l)[midIdx];
+		le.line.setAttribute('points', linkPoints(l));
+		repositionMultilineText(le.text, mid.x + 2, mid.y - 2);
 		if (l.lenAuto) { l.length = linkGeomLength(l); }
 		updateArrow(id);
 	}
@@ -238,7 +298,7 @@ var EngCalcs = EngCalcs || {};
 	function updateNode(id) {
 		var n = nodeById(id), ne = nodeEls[id], i;
 		ne.circle.setAttribute('cx', n.x); ne.circle.setAttribute('cy', n.y);
-		ne.text.setAttribute('x', n.x + 2); ne.text.setAttribute('y', n.y - 2);
+		repositionMultilineText(ne.text, n.x + 2, n.y - 2);
 		for (i = 0; i < incidentLinks[id].length; i++) { updateLinkGeometry(incidentLinks[id][i]); }
 		for (i = 0; i < labelsByAnchor[id].length; i++) { updateLabelGeometry(labelsByAnchor[id][i]); }
 		scheduleSolve();
@@ -259,8 +319,9 @@ var EngCalcs = EngCalcs || {};
 		linkEls[l.id].line.remove();
 		linkEls[l.id].handles.forEach(function (h) { h.remove(); });
 		linkEls[l.id].arrows.forEach(function (a) { a.remove(); });
+		linkEls[l.id].text.remove();
 		buildLinkEls(l);
-		updateArrow(l.id);
+		refreshLabelText();
 	}
 	function insertVertex(linkId, pt) {
 		var l = linkById(linkId), pts = [nodeById(l.from)].concat(l.verts, [nodeById(l.to)]),
@@ -289,9 +350,12 @@ var EngCalcs = EngCalcs || {};
 		}
 		if (doc.nodes.length === 0) { return { minx: 0, maxx: 10, miny: 0, maxy: 10 }; }
 		for (i = 0; i < doc.nodes.length; i++) {
-			var n = doc.nodes[i], r = nodeRadius(n) + 0.2, tw = (nodeEls[n.id] && nodeEls[n.id].tw) || 8;
+			var n = doc.nodes[i], r = nodeRadius(n) + 0.2, ne = nodeEls[n.id] || {},
+				tw = ne.tw || 8, lc = ne.lineCount || 1;
 			inc(n.x - r, n.y - r); inc(n.x + r, n.y + r);
-			inc(n.x + 2, n.y - 2 - 2); inc(n.x + 2 + tw, n.y - 2 + 0.6); // the "J1" id label beside the circle
+			// "J1"-style id/data label beside the circle -- extended downward per extra toggled-on
+			// line (Task 146 Phase 2 label toggles), since multi-line labels grow toward +y (dy>0).
+			inc(n.x + 2, n.y - 2 - 2); inc(n.x + 2 + tw, n.y - 2 + 0.6 + (lc - 1) * LABEL_LINE_HEIGHT);
 		}
 		for (i = 0; i < doc.labels.length; i++) {
 			var lb = doc.labels[i], le = labelEls[lb.id] || { width: 10 },
@@ -304,6 +368,12 @@ var EngCalcs = EngCalcs || {};
 			for (j = 0; j < doc.links[i].verts.length; j++) {
 				var v = doc.links[i].verts[j];
 				inc(v.x - 1.1, v.y - 1.1); inc(v.x + 1.1, v.y + 1.1);
+			}
+			var l = doc.links[i], lle = linkEls[l.id];
+			if (lle) {
+				var lx = +lle.text.getAttribute('x'), ly = +lle.text.getAttribute('y'),
+					ltw = lle.tw || 8, llc = lle.lineCount || 1;
+				inc(lx, ly - 2); inc(lx + ltw, ly + 0.6 + (llc - 1) * LABEL_LINE_HEIGHT);
 			}
 		}
 		return { minx: minx, maxx: maxx, miny: miny, maxy: maxy };
@@ -440,7 +510,8 @@ var EngCalcs = EngCalcs || {};
 	function saveToStorage() {
 		try {
 			localStorage.setItem(LPN_STORAGE_KEY, JSON.stringify({
-				v: LPN_STORAGE_VERSION, nodes: doc.nodes, links: doc.links, labels: doc.labels, nextId: nextId
+				v: LPN_STORAGE_VERSION, nodes: doc.nodes, links: doc.links, labels: doc.labels, nextId: nextId,
+				labelSettings: labelSettings
 			}));
 		} catch (err) { /* localStorage can throw (private mode, quota) -- autosave is best-effort */ }
 	}
@@ -457,6 +528,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		doc.nodes = saved.nodes || []; doc.links = saved.links || []; doc.labels = saved.labels || [];
 		nextId = saved.nextId || { J: 1, R: 1, L: 1, P: 1, T: 1 };
+		labelSettings = saved.labelSettings || defaultLabelSettings();
 		return true;
 	}
 	// A dedicated button, not a repurposed "Restore Defaults" (Tom asked "do we dare"): that
@@ -491,6 +563,7 @@ var EngCalcs = EngCalcs || {};
 		wirePointerEvents();
 		wirePopup();
 		if (loadFromStorage()) { buildDom(); scheduleSolve(); }
+		wireLabelsPopup();
 		updateEmptyHint();
 		zoomExtent();
 		requestAnimationFrame(tick);
@@ -566,6 +639,11 @@ var EngCalcs = EngCalcs || {};
 		extentBtn.textContent = pc.lpn_tool_zoom_extent || 'Zoom Extent';
 		extentBtn.addEventListener('click', zoomExtent);
 		viewGroup.appendChild(extentBtn);
+		var labelsBtn = document.createElement('button');
+		labelsBtn.type = 'button';
+		labelsBtn.textContent = pc.lpn_tool_labels || 'Labels';
+		labelsBtn.addEventListener('click', toggleLabelsPopup);
+		viewGroup.appendChild(labelsBtn);
 
 		// Temporary dev-only stress-test button (Tom, 2026-07-30): visually set apart (its own
 		// group, bracketed label) so it reads as not-a-real-feature. Remove once satisfied with
@@ -849,6 +927,52 @@ var EngCalcs = EngCalcs || {};
 		return unitKey(unitId) === usKey ? usVal / unitFactor(unitId) : siVal;
 	}
 
+	// ---- label toggle popover (Task 146 Phase 2) ----
+	// Deliberately separate from #lpn_popup/currentPopup below: this is a static settings panel,
+	// not a per-element property sheet, and touching none of the rename/undo machinery keeps it
+	// zero-risk to the existing popup.
+	function labelCheckbox(container, labelText, checked, onChange) {
+		var label = document.createElement('label'), input = document.createElement('input');
+		input.type = 'checkbox'; input.checked = checked;
+		input.addEventListener('change', function () { onChange(input.checked); saveToStorage(); refreshLabelText(); });
+		label.appendChild(input);
+		label.appendChild(document.createTextNode(' ' + labelText));
+		container.appendChild(label);
+		container.appendChild(document.createElement('br'));
+	}
+	function wireLabelsPopup() {
+		var pc = EngCalcs.pageConfig || {}, nodeBox = document.getElementById('lpn_labels_node_fields'),
+			linkBox = document.getElementById('lpn_labels_link_fields');
+		document.getElementById('lpn_labels_popup_close').addEventListener('click', function () {
+			document.getElementById('lpn_labels_popup').style.display = 'none';
+		});
+		[
+			['id', pc.lpn_field_id || 'ID'], ['elev', pc.lpn_field_elev || 'Elevation'],
+			['demand', pc.bpn_demand || 'Demand'], ['head', pc.lpn_result_head || 'Head'],
+			['pressure', pc.lpn_result_pressure || 'Pressure']
+		].forEach(function (f) {
+			labelCheckbox(nodeBox, f[1], labelSettings.node[f[0]], function (v) { labelSettings.node[f[0]] = v; });
+		});
+		[
+			['id', pc.lpn_field_id || 'ID'], ['diameter', pc.lpn_field_diameter || 'Diameter'],
+			['length', pc.lpn_field_length || 'Length'], ['flow', pc.lpn_result_flow || 'Flow'],
+			['velocity', pc.lpn_result_velocity || 'Velocity'], ['headloss', pc.lpn_result_headloss || 'Head loss']
+		].forEach(function (f) {
+			labelCheckbox(linkBox, f[1], labelSettings.link[f[0]], function (v) { labelSettings.link[f[0]] = v; });
+		});
+	}
+	function toggleLabelsPopup(evt) {
+		var popup = document.getElementById('lpn_labels_popup');
+		if (popup.style.display === 'block') { popup.style.display = 'none'; return; }
+		var r = evt.currentTarget.getBoundingClientRect();
+		popup.style.left = r.left + 'px'; popup.style.top = r.bottom + 'px'; popup.style.display = 'block';
+		// Clamp into the viewport same as openPopupAt() -- measured after display:block since size
+		// is unknown while display:none.
+		var pr = popup.getBoundingClientRect();
+		popup.style.left = Math.max(4, Math.min(r.left, window.innerWidth - pr.width - 4)) + 'px';
+		popup.style.top = Math.max(4, Math.min(r.bottom, window.innerHeight - pr.height - 4)) + 'px';
+	}
+
 	// ---- minimal property popup ----
 	// Real, not a stub: id (readonly) plus the fields that already exist on the element
 	// (Elevation+Demand for a junction, Fixed head for a reservoir, Diameter+Roughness+Length
@@ -1105,16 +1229,101 @@ var EngCalcs = EngCalcs || {};
 		var el = document.getElementById('lpn_status');
 		if (el) { el.textContent = text || ''; }
 	}
-	function updateResultLabels() {
+	// Rounds to the same 2 decimals the label actually displays, in the DISPLAY unit -- extrema and
+	// decoration must compare on this, not the raw SI value. Two series links carrying what is
+	// physically the same flow can differ by solver roundoff far past the 2nd decimal (continuity
+	// is satisfied to a tolerance, not bit-exact); comparing un-rounded SI values marked one as max
+	// and the other min even though both printed "100.00 gpm" -- a decoration the display can't
+	// justify. Rounding first is what fieldExtrema()'s "tie -> no decoration" rule is actually for.
+	function displayRound(siValue, unitId) {
+		if (typeof siValue !== 'number') { return undefined; } // guards a stray NaN contaminating Math.min/max in fieldExtrema
+		return Math.round(siValue * unitFactor(unitId) * 100) / 100;
+	}
+	// One line of a numeric label field: "Label: 12.34 unit", decorated overline/underline when it
+	// ties the network-wide max/min for that field (fieldExtrema()/decorationFor() above).
+	function numLine(labelText, siValue, unitId, extrema) {
+		var displayValue = displayRound(siValue, unitId);
+		return { text: labelText + ': ' + displayValue.toFixed(2) + ' ' + unitLabel(unitId), decoration: decorationFor(extrema, displayValue) };
+	}
+	// Length is declarative, not SI-converted (see the lengthField() comment above: "1 grid unit IS
+	// 1 ft or 1 m, whichever is currently selected, by declaration") -- unlike every other field
+	// here, l.length is already in the displayed unit, so this must NOT run it through unitFactor.
+	function rawLine(labelText, value, unitId, extrema) {
+		var displayValue = Math.round(value * 100) / 100;
+		return { text: labelText + ': ' + displayValue.toFixed(2) + ' ' + unitLabel(unitId), decoration: decorationFor(extrema, displayValue) };
+	}
+	// Rebuilds every node's and link's map-label text from `labelSettings` + `lastSolveResult`.
+	// Extrema are computed ONCE per field, network-wide, before any label is built, so every
+	// element's decoration is judged against the same snapshot (Tom: ties all get marked, not just
+	// the first one found -- decorationFor() already does this per element).
+	function refreshLabelText() {
+		var pc = EngCalcs.pageConfig || {}, ls = labelSettings, i;
+		// Every field below is rounded through the same displayRound()/2-decimal rule the label
+		// text itself uses (see the comment on displayRound()), so a tie in what's actually printed
+		// is always a tie in what gets decorated.
+		var extrema = {
+			elev: fieldExtrema(doc.nodes.map(function (n) { return n.type !== 'reservoir' ? displayRound(n.elev, 'lpn_u_elevhead') : undefined; })),
+			demand: fieldExtrema(doc.nodes.map(function (n) { return n.type !== 'reservoir' ? displayRound(n.demand, 'lpn_u_flow') : undefined; })),
+			head: fieldExtrema(doc.nodes.map(function (n) {
+				if (n.type === 'reservoir') { return displayRound(n.head, 'lpn_u_elevhead'); }
+				return lastSolveResult ? displayRound(lastSolveResult.heads[n.id], 'lpn_u_elevhead') : undefined;
+			})),
+			pressure: fieldExtrema(doc.nodes.map(function (n) {
+				if (n.type === 'reservoir' || !lastSolveResult) { return undefined; }
+				return displayRound(lastSolveResult.pressures[n.id], 'lpn_u_pressure');
+			})),
+			diameter: fieldExtrema(doc.links.map(function (l) { return l.type !== 'pump' ? displayRound(l.diameter, 'lpn_u_diameter') : undefined; })),
+			length: fieldExtrema(doc.links.map(function (l) { return l.type !== 'pump' ? Math.round(l.length * 100) / 100 : undefined; })),
+			flow: fieldExtrema(doc.links.map(function (l) { return lastSolveResult ? displayRound(lastSolveResult.flows[l.id], 'lpn_u_flow') : undefined; })),
+			velocity: fieldExtrema(doc.links.map(function (l) { return lastSolveResult ? displayRound(lastSolveResult.velocities[l.id], 'lpn_u_velocity') : undefined; })),
+			// Displayed value, not the raw stored headloss -- a pump shows head GAIN (-headloss) per
+			// the same sign convention as the property popup, so extrema are judged on what's shown.
+			headloss: fieldExtrema(doc.links.map(function (l) {
+				if (!lastSolveResult || lastSolveResult.headlosses[l.id] === undefined) { return undefined; }
+				return displayRound(l.type === 'pump' ? -lastSolveResult.headlosses[l.id] : lastSolveResult.headlosses[l.id], 'lpn_u_elevhead');
+			}))
+		};
 		doc.nodes.forEach(function (n) {
 			var ne = nodeEls[n.id]; if (!ne) { return; }
-			var suffix = '';
-			if (lastSolveResult && n.type !== 'reservoir' && lastSolveResult.pressures[n.id] !== undefined) {
-				var f = unitFactor('lpn_u_pressure');
-				suffix = ' (' + (lastSolveResult.pressures[n.id] * f).toFixed(1) + ' ' + unitLabel('lpn_u_pressure') + ')';
+			var lines = [];
+			if (ls.node.id) { lines.push({ text: n.id }); }
+			if (n.type !== 'reservoir') {
+				if (ls.node.elev) { lines.push(numLine(pc.lpn_field_elev || 'Elevation', n.elev, 'lpn_u_elevhead', extrema.elev)); }
+				if (ls.node.demand) { lines.push(numLine(pc.bpn_demand || 'Demand', n.demand, 'lpn_u_flow', extrema.demand)); }
 			}
-			ne.text.textContent = n.id + suffix;
+			var headSI = n.type === 'reservoir' ? n.head : (lastSolveResult ? lastSolveResult.heads[n.id] : undefined);
+			if (ls.node.head && headSI !== undefined) { lines.push(numLine(pc.lpn_result_head || 'Head', headSI, 'lpn_u_elevhead', extrema.head)); }
+			if (ls.node.pressure && n.type !== 'reservoir' && lastSolveResult && lastSolveResult.pressures[n.id] !== undefined) {
+				lines.push(numLine(pc.lpn_result_pressure || 'Pressure', lastSolveResult.pressures[n.id], 'lpn_u_pressure', extrema.pressure));
+			}
+			if (lines.length === 0) { lines.push({ text: '' }); } // keep an empty tspan so getBBox() doesn't throw
+			setMultilineText(ne.text, n.x + 2, lines);
+			ne.lineCount = lines.length;
 			try { ne.tw = ne.text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; stale tw stands */ }
+		});
+		doc.links.forEach(function (l) {
+			var le = linkEls[l.id]; if (!le) { return; }
+			var lines = [];
+			if (ls.link.id) { lines.push({ text: l.id }); }
+			if (l.type !== 'pump') {
+				if (ls.link.diameter) { lines.push(numLine(pc.lpn_field_diameter || 'Diameter', l.diameter, 'lpn_u_diameter', extrema.diameter)); }
+				if (ls.link.length) { lines.push(rawLine(pc.lpn_field_length || 'Length', l.length, 'lpn_u_length', extrema.length)); }
+			}
+			if (lastSolveResult && lastSolveResult.flows[l.id] !== undefined) {
+				if (ls.link.flow) { lines.push(numLine(pc.lpn_result_flow || 'Flow', lastSolveResult.flows[l.id], 'lpn_u_flow', extrema.flow)); }
+				if (ls.link.velocity) { lines.push(numLine(pc.lpn_result_velocity || 'Velocity', lastSolveResult.velocities[l.id], 'lpn_u_velocity', extrema.velocity)); }
+				if (ls.link.headloss) {
+					if (l.type === 'pump') {
+						lines.push(numLine(pc.lpn_result_headgain || 'Head gain', -lastSolveResult.headlosses[l.id], 'lpn_u_elevhead', extrema.headloss));
+					} else {
+						lines.push(numLine(pc.lpn_result_headloss || 'Head loss', lastSolveResult.headlosses[l.id], 'lpn_u_elevhead', extrema.headloss));
+					}
+				}
+			}
+			if (lines.length === 0) { lines.push({ text: '' }); }
+			setMultilineText(le.text, +le.text.getAttribute('x'), lines);
+			le.lineCount = lines.length;
+			try { le.tw = le.text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; stale tw stands */ }
 		});
 		doc.links.forEach(function (l) { updateArrow(l.id); });
 	}
@@ -1128,19 +1337,19 @@ var EngCalcs = EngCalcs || {};
 		if (issues.length > 0) {
 			lastSolveResult = null;
 			setStatus(issues.map(diagIssueText).join(' '));
-			updateResultLabels();
+			refreshLabelText();
 			return;
 		}
 		var result = EngCalcs.lpnSolve(model);
 		if (!result.ok || !result.converged) {
 			lastSolveResult = null;
 			setStatus(EngCalcs.pageConfig.lpn_diag_not_converged || 'Did not converge.');
-			updateResultLabels();
+			refreshLabelText();
 			return;
 		}
 		lastSolveResult = result;
 		setStatus('');
-		updateResultLabels();
+		refreshLabelText();
 	}
 	// Debounced, not run synchronously on every call site: a node drag alone calls updateNode()
 	// (and therefore this) on every animation frame while dragging (see the tick()/applyDrag()
@@ -1158,7 +1367,7 @@ var EngCalcs = EngCalcs || {};
 	// didn't change) -- just re-render whatever's already cached in the new unit.
 	EngCalcs.pageCalculator = function (objForm) {
 		refreshPopupIfOpen();
-		updateResultLabels();
+		refreshLabelText();
 	};
 
 	document.addEventListener('DOMContentLoaded', function () {
