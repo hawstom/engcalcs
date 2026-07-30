@@ -184,6 +184,7 @@ EngCalcs.pageConfig = {
 	lpn_diag_no_fixed_head: <?=json_encode($ec_lang['lpn_diag_no_fixed_head'])?>,
 	lpn_diag_dangling_link: <?=json_encode($ec_lang['lpn_diag_dangling_link'])?>,
 	lpn_diag_unreachable: <?=json_encode($ec_lang['lpn_diag_unreachable'])?>,
+	lpn_diag_pump_beyond_curve: <?=json_encode($ec_lang['lpn_diag_pump_beyond_curve'])?>,
 	lpn_diag_not_converged: <?=json_encode($ec_lang['lpn_diag_not_converged'])?>,
 	lpn_result_head: <?=json_encode($ec_lang['lpn_result_head'])?>,
 	lpn_result_pressure: <?=json_encode($ec_lang['lpn_result_pressure'])?>,

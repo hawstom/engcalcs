@@ -507,12 +507,14 @@ EngCalcs.lpnReport = function (model, junctions, junctionIndex, byId, H, Q, meth
 		flows = {},
 		headlosses = {},
 		velocities = {},
+		issues = [],
 		i,
 		k,
 		link,
 		res,
 		aq,
 		m,
+		qMax,
 		g = EngCalcs.lpnG;
 
 	for (i = 0; i < model.nodes.length; i++) {
@@ -534,6 +536,18 @@ EngCalcs.lpnReport = function (model, junctions, junctionIndex, byId, H, Q, meth
 			: 0;
 		if (link.type === 'pump') {
 			headlosses[link.id] = -(link.h0 - link.a * Math.pow(Math.max(Math.abs(Q[k]), EngCalcs.lpnQMin), link.b));
+			// The curve H = h0 - a*Q^b is an unbounded power law with no floor at zero -- past its
+			// own zero-head flow (h0 = a*Qmax^b), it keeps going negative, which reads as the pump
+			// LOSING head rather than simply being unable to deliver that much flow (a real curve
+			// just ends at Qmax, H=0). This is a real, calculated result of demanding more than the
+			// entered curve supports, not a presentation bug -- Tom found ~67 ft of "loss" this way
+			// on the Example network after raising demand to 400 gpm against the default 150gpm/
+			// 65ft curve (Qmax = 300 gpm). Flag it rather than silently clamp: clamping would hide
+			// that the real fix is a bigger pump curve or a smaller demand.
+			if (link.a > 0) {
+				qMax = Math.pow(link.h0 / link.a, 1 / link.b);
+				if (Math.abs(Q[k]) > qMax) { issues.push({ code: 'pump-beyond-curve', ids: [link.id] }); }
+			}
 		} else {
 			aq = Math.abs(Q[k]);
 			if (method === 'dw') {
@@ -549,7 +563,7 @@ EngCalcs.lpnReport = function (model, junctions, junctionIndex, byId, H, Q, meth
 
 	return {
 		ok: true,
-		issues: [],
+		issues: issues,
 		iterations: iterations,
 		converged: converged,
 		maxFlowChange: maxFlowChange,

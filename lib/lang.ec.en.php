@@ -1173,6 +1173,12 @@ $ec_lang['lpn_id_taken']='That ID is already in use.';
 $ec_lang['lpn_diag_no_fixed_head']='Add a Reservoir: the network needs at least one fixed head to solve.';
 $ec_lang['lpn_diag_dangling_link']='A pipe or pump connects to a node that no longer exists:';
 $ec_lang['lpn_diag_unreachable']='These nodes are not connected to a reservoir (check for a closed link):';
+// A pump curve H = h0 - a Q^b has no floor at zero -- demanding more flow than the curve's own
+// zero-head point can silently compute a NEGATIVE head gain (Tom, 2026-07-30: found ~67 ft of
+// "loss" this way after raising demand past the Example network's default pump curve). Flagged as
+// a warning on an otherwise-successful solve, not clamped -- the real fix is a bigger curve or a
+// smaller demand, and clamping would hide that.
+$ec_lang['lpn_diag_pump_beyond_curve']='Demand exceeds this pump\'s curve (result is an unphysical extrapolation):';
 $ec_lang['lpn_diag_not_converged']='The solver did not converge. Check for unrealistic inputs, such as a zero diameter.';
 $ec_lang['lpn_field_roughness']='Roughness';
 $ec_lang['lpn_field_length']='Length';

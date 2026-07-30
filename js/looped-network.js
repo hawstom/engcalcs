@@ -2529,6 +2529,7 @@ var EngCalcs = EngCalcs || {};
 		if (issue.code === 'no-fixed-head') { return pc.lpn_diag_no_fixed_head || 'Add a Reservoir.'; }
 		if (issue.code === 'dangling-link') { return (pc.lpn_diag_dangling_link || 'Dangling link:') + ' ' + issue.ids.join(', '); }
 		if (issue.code === 'unreachable') { return (pc.lpn_diag_unreachable || 'Unreachable:') + ' ' + issue.ids.join(', '); }
+		if (issue.code === 'pump-beyond-curve') { return (pc.lpn_diag_pump_beyond_curve || 'Demand exceeds this pump\'s curve (result is an unphysical extrapolation):') + ' ' + issue.ids.join(', '); }
 		return issue.code;
 	}
 	function setStatus(text) {
@@ -2706,7 +2707,11 @@ var EngCalcs = EngCalcs || {};
 			return;
 		}
 		lastSolveResult = result;
-		setStatus('');
+		// A converged solve can still carry WARNING-level issues (e.g. a pump demanded past its
+		// curve's own zero-head flow, EngCalcs.lpnReport()'s 'pump-beyond-curve') -- these are real
+		// numbers, not a solve failure, so they don't block lastSolveResult/refreshLabelText the way
+		// the two blocks above do, but they still need to reach the user.
+		setStatus(result.issues && result.issues.length > 0 ? result.issues.map(diagIssueText).join(' ') : '');
 		refreshLabelText();
 	}
 	// Debounced, not run synchronously on every call site: a node drag alone calls updateNode()
