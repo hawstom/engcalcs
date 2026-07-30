@@ -1171,7 +1171,14 @@ $ec_lang['lpn_diag_unreachable']='These nodes are not connected to a reservoir (
 $ec_lang['lpn_diag_not_converged']='The solver did not converge. Check for unrealistic inputs, such as a zero diameter.';
 $ec_lang['lpn_field_roughness']='Roughness';
 $ec_lang['lpn_field_length']='Length';
-$ec_lang['lpn_pump_notice']='Pump curve entry is not yet implemented.';
+// Pump curve entry (Task 146, 2026-07-30): up to 3 (flow, head) points, or a reference to
+// another pump's curve so several identical pumps need the curve entered only once.
+$ec_lang['lpn_pump_curve_source']='Curve';
+$ec_lang['lpn_pump_curve_own']='Enter points below';
+$ec_lang['lpn_pump_curve_ref_note']='Using the curve entered for pump ';
+$ec_lang['lpn_pump_point1']='Point 1 (required)';
+$ec_lang['lpn_pump_point2']='Point 2 (optional)';
+$ec_lang['lpn_pump_point3']='Point 3 (optional)';
 // Persistent mode-hint line (Task 146.01 follow-up, 2026-07-30): whole sentences, not composed
 // from a "Mode:" prefix + the tool's own label, per CLAUDE.md's concept-level label reuse rule --
 // word order/grammar around a mode name varies by language, so each mode gets its own full string.

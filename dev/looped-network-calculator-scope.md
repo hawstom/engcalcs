@@ -316,15 +316,15 @@ Rules, stated as rules because each is silently wrong when broken:
   (auto = unitless canvas distance, manual = SI-converted real length) was an unnecessary split
   and has been removed.
 
-- **Pump curve entry — not yet designed, Tom's sketch (2026-07-30):** rather than a separate
-  Pump Curve UI, let the Pump property popup accept *either* an inline curve table (2-point or
-  3-point, feeding `EngCalcs.lpnPumpFromCurve()`) *or* a reference to another pump's id, reusing
-  its curve. Tom's own framing: "parsimonious" — one field slot serves both "this pump has its own
-  curve" and "this pump matches an already-defined one" (a common real case: identical pumps in
-  parallel), without a second UI surface. Not built in Phase 1 (`Looped-Network.php`'s pump popup
-  currently only shows a placeholder notice that curve entry isn't implemented) — design the exact
-  table shape and the id-reference validation (what happens if the referenced pump is later
-  deleted, or forms a reference cycle) when this is actually built.
+- **Pump curve entry — DONE 2026-07-30 (ROADMAP Task 176), built exactly to this sketch.** The
+  Pump property popup's field slot is a `<select>`: "Enter points below" (default) shows up to 3
+  `[Q,H]` point rows feeding `EngCalcs.lpnPumpFromCurve()`, or any OTHER pump's id, which makes this
+  pump copy that pump's curve (`l.curveRef`) instead of using its own points — one slot serves both
+  cases, as sketched. Reference resolution is a single hop only (`resolveCurvePoints()` never
+  chases a chain), so a reference cycle can't form; a deleted or renamed referenced pump is handled
+  by `renameLink()` rewriting every `curveRef` that pointed at the old id, and a reference to a
+  since-deleted id simply falls back to the referencing link's own (possibly empty) points via the
+  same defensive `[[0,0]]` guard `recomputePumpCurve()` already had. `js/looped-network.js`.
 - **Versioning:** `v` is a monotonic integer. `v > CURRENT` refuses to load and says so — never
   silently drop unknown fields. `v < CURRENT` runs an ordered chain of pure migrations, keeping a
   `_backup` copy first, because there is no undo in localStorage.

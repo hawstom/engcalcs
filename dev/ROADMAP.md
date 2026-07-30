@@ -277,6 +277,65 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   data through the preview stage" (`lpn_notes_3_def`), and translating the UI reads as a promise of
   stability this preview doesn't make yet.
 - 5|146.09| **Map insets for congested areas of a drawing (Task 146 child).** Very low priority.
+- 20|177| **Link head loss: report the per-length gradient alongside total (Task 146 child).**
+  Conventional network software and reports express pipe head loss in TWO forms, not one, because
+  they answer different questions: **total head loss** (ft or m across the whole link — what you
+  need to build the HGL/EGL, and what `lpn_` already reports) and a **per-length gradient/slope**
+  (independent of how long the pipe happens to be — the form used to screen/compare pipes against a
+  design criterion, e.g. "keep it under 5 ft per 1000 ft"). EPANET's own default Link Results table
+  leads with the per-length form ("Unit Headloss", ft/1000ft or m/km) and derives total separately;
+  WaterCAD/InfoWater-class tools show both as separate columns for the same reason. **`lpn_` should
+  reuse this suite's OWN existing convention for this exact concept, not invent a new one**:
+  `mpf_`/`mphl_` already report friction slope through the `'slope'` unit family
+  (`lib/Units.lib.php`: `grade` = ft/ft or m/m, `gradePercent` = %) — a dimensionless ratio, not
+  EPANET's per-1000-length form, but the same underlying quantity (head loss ÷ length) and already
+  translated/established suite-wide. Add a link "Head loss gradient" field (`headloss/length`)
+  alongside the existing total, using the `slope` family — parallel to how `headgain` just got
+  split out from `headloss` as its own field/color/extrema bucket, not merged into it. Needs one
+  new unit selector on the page (`echoUnitSelect('lpn_u_gradient', 'slope', '')`) and a
+  `lpnFieldColors`/`linkFieldDefs`/`defaultLabelSettings` entry, same shape as every other field
+  added this way. Not yet built — a real design question (does `lpn_` want `grade`/`gradePercent`
+  like `mpf_`/`mphl_`, or is a per-1000-length form worth introducing as a second option) should be
+  confirmed with Tom before wiring the selector, since it's the kind of suite-wide convention choice
+  CLAUDE.md's concept-level reuse rule cares about getting right once rather than per-page.
+- 15|178| **Cheap filmstrip-GIF recipe for Help-menu docs (handoff, 2026-07-30).** A proof of
+  concept (drag-a-label-and-reset, add/drag/delete-a-vertex) showed this is genuinely cheap to
+  produce once set up — the fiddly part is precise SVG click targeting, not GIF assembly. Recipe,
+  so a future session doesn't re-derive it:
+  1. **Dev server: `hawsedc.local` is Tom's own reliable local dev server** — use it directly
+     (`http://hawsedc.local/engcalcs/<page>.php`) rather than guessing a docroot/port. In a sandboxed
+     agent container, `hawsedc.local` may not resolve via `/etc/hosts` (it can point at a docker
+     gateway IP unreachable from inside the sandbox) — if so, launch Chromium with
+     `--host-resolver-rules=MAP hawsedc.local 127.0.0.1` (confirmed `127.0.0.1` reaches the real
+     Apache vhost by Host header via `curl -H "Host: hawsedc.local"`) rather than editing
+     `/etc/hosts`, which needs root this environment doesn't have non-interactively.
+  2. **Drive it with Playwright + headless Chromium**, not a hand-rolled CDP client — `npm install
+     playwright` then `npx playwright install chromium` (no `--with-deps`; that needs
+     passwordless `sudo`, which this environment doesn't have — the plain chromium download works
+     without it and was already cached at `~/.cache/ms-playwright` in this container).
+  3. **Click targeting is the real difficulty, not GIF assembly.** A bounding-box CENTER on a
+     multi-line `<text>` or a thin polyline routinely misses the actual painted pixels (an
+     inter-line gap, or empty space beside a 0.5-world-unit stroke) — `elementFromPoint()` then
+     returns some unrelated element (or the page background) and the click silently no-ops. Use
+     `element.getPointAtLength(totalLength * frac)` transformed through `getScreenCTM()` for a
+     point GUARANTEED to be on a path's own paint (pipes, links); for a multi-line label, a point at
+     `(bboxCenterX, bboxTop + smallOffset)` (first line's own baseline) is far more reliable than the
+     vertical center. Verify blind — don't assume a `dblclick()`/drag "worked" from lack of a thrown
+     error; re-read the actual DOM/bounding-box state after the action (this is what caught the
+     label-reset click landing on the wrong element in the first POC pass).
+  4. **GIF assembly, pure JS, no native deps:** `gifencoder`/the `canvas` package need `node-gyp` +
+     system `cairo` and failed to build in this container (no passwordless `sudo` for
+     `--with-deps`-style system installs). `npm install omggif pngjs quantize` instead — decode
+     screenshots with `pngjs`, build ONE shared color palette across all frames with `quantize` (a
+     per-frame palette flickers colors frame to frame), write frames with `omggif`'s `GifWriter`.
+     Delay unit is centiseconds (`100`-`200` for a 1-2s/frame filmstrip, not a smooth-video rate).
+  5. **Screenshot the canvas element directly** (`page.locator('#lpn_canvas').screenshot()`), not
+     the full viewport — the page's own chrome (toolbar, unit row) pushes the SVG below the fold at
+     a normal viewport height, and a full-page screenshot then needs cropping anyway.
+  Proof-of-concept GIFs and the driver script are not committed (they lived in the session
+  scratchpad); this task is the recipe so the ~30 minutes of trial-and-error solving steps 1 and 3
+  isn't repeated. A real Help-menu asset (e.g. the add-pipe/add-junction workflow) is still to be
+  built from this recipe, not just the two POC demos.
 - 11|145| **Google Maps elevation/length helper — MOVED from `bpn_` to `lpn_` (Tom, 2026-07-28).**
   Was "Google Maps elevation/length helper for `bpn_`", extracted from Task 137 "Phase 2" on
   2026-07-27. Tom's reason for the move, recorded because it is a genuine prioritization signal and
@@ -676,6 +735,41 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
   (`renderLabelFields()`), persisted with the label (no storage-version bump needed — old saved
   labels fall back to `sizeMult || 1`). Rich text formatting (bold, font family) remains explicitly
   undesigned per the scope doc.
+
+- 0|176|[CC] **Pump curve entry, head-gain/head-loss reporting fix, demand/flow color unification —
+  DONE 2026-07-30.** Three related fixes to `js/looped-network.js`, found and built in one session:
+  1. **Pump curve entry**, built exactly to the scope doc's sketch (see
+     `dev/looped-network-calculator-scope.md`'s "Pump curve entry" entry, now marked done): the pump
+     popup's `<select>` offers "Enter points below" (1-3 `[Q,H]` rows feeding the ALREADY-WRITTEN
+     `EngCalcs.lpnPumpFromCurve()` in `js/lpn-solver.js` — that solver-side fit was done in an
+     earlier pass and had simply never been wired to a UI) or any other pump's id, copying that
+     pump's curve instead (`l.curveRef`, resolved one hop only by `resolveCurvePoints()`, so a
+     reference cycle can't form). `renameLink()` now rewrites every `curveRef` that pointed at a
+     renamed pump's old id, so a rename can't silently orphan a reference.
+  2. **A pump's head GAIN was reading as a "Head loss" of ~70+ ft.** Found while testing the popup:
+     the map-label rendering reused the `headloss` field/color/extrema bucket for a pump's
+     `-headloss` (i.e. its gain), so a 77 ft pump boost sat in the same legend swatch and the same
+     min/max scale as a pipe's fractional friction loss — indistinguishable from an enormous, wrong
+     loss at a glance, even though the property popup already correctly labeled it "Head gain"
+     (readonly field, separate string, already right). Split into a genuinely separate `headgain`
+     field: own color (`#00695c`, distinct from `headloss`'s `#4527a0`), own `linkFieldDefs()`
+     entry/checkbox/legend row, own extrema bucket computed from pump links only (`headloss`'s
+     extrema now excludes pump links symmetrically). `lpn_result_headgain` already existed as a lang
+     key from the popup; no new translation needed for this fix, only new plumbing.
+  3. **Node Demand and Link Flow now share one color** (`#1565c0`, was `#6a1b9a` for Demand) —
+     both are the same physical quantity, Q, so the Labels-panel legend should read them as one
+     concept rather than two unrelated numbers that happen to both be flow rates.
+  Also (same session): `.lpn-vhandle` (a pipe's editable vertex) is now filled the pipe's own color
+  (`#557`) instead of a hollow white circle with the PUMP's stroke color, which had no relation to
+  the link it belonged to; the Select-mode status hint gained "Double-click a pipe to add or remove
+  a vertex."; the gear/settings panel gained a "Restore defaults" button (settings/labelSettings
+  only) and a temporary "Wipe memory" button + `?lpn_wipe=1` URL param (full localStorage reset, for
+  verifying the true first-visit state during preview — Tom: "I want a way to know that I am
+  loading the first-time calculator"); default visible labels changed to ID/Demand/Pressure/
+  Elevation (node) and ID/Flow/Velocity (link), Tom's own choice after using the Labels panel for
+  the first time. See Task 177 (open) for the follow-on question this surfaced: should `lpn_` also
+  report a per-length head-loss GRADIENT alongside the total, matching conventional network-software
+  reporting.
 
 - 0|163|[CC] **Language strings standardized on single quotes; the validator's blind spot closed —
   DONE 2026-07-28.** Was: "`lang_syntax_validate.php` cannot see double-quoted lang assignments"

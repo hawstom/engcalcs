@@ -356,7 +356,7 @@ var EngCalcs = EngCalcs || {};
 		// a considered choice about what's actually useful to see on first load.
 		return {
 			node: { id: true, elev: true, demand: true, head: false, pressure: true },
-			link: { id: true, diameter: false, length: false, flow: true, velocity: true, headloss: false }
+			link: { id: true, diameter: false, length: false, flow: true, velocity: true, headloss: false, headgain: false }
 		};
 	}
 	var labelSettings = defaultLabelSettings();
@@ -397,9 +397,16 @@ var EngCalcs = EngCalcs || {};
 	// Reused verbatim where the concept overlaps bpn's palette (id/length/diameter/flow/elevation/
 	// pressure); demand/head/velocity/headloss are new colors, chosen to stay visually distinct
 	// from every other entry here.
+	// demand and flow share one color (Tom, 2026-07-30): both are a flow rate, Q -- a node's demand
+	// IS the flow leaving the network at that point, so the legend should read them as the same
+	// quantity, not as two unrelated fields that happen to both be numbers.
+	// headgain (Tom, 2026-07-30: a pump's contribution was showing under the "Head loss" legend/
+	// color/extrema, reading as if the pump LOSES ~77 ft when it actually GAINS it) is its own field,
+	// separate color, and separate extrema bucket from headloss -- see refreshLabelText() below.
 	var lpnFieldColors = {
-		id: '#000', elev: '#8b5a2b', demand: '#6a1b9a', head: '#00838f', pressure: '#455a64',
-		diameter: '#bf4b2b', length: '#2e7d32', flow: '#1565c0', velocity: '#ad1457', headloss: '#4527a0'
+		id: '#000', elev: '#8b5a2b', demand: '#1565c0', head: '#00838f', pressure: '#455a64',
+		diameter: '#bf4b2b', length: '#2e7d32', flow: '#1565c0', velocity: '#ad1457', headloss: '#4527a0',
+		headgain: '#00695c'
 	};
 
 	function el(tag, attrs, parent) {
@@ -441,6 +448,27 @@ var EngCalcs = EngCalcs || {};
 		var i;
 		for (i = 0; i < doc.links.length; i++) { if (doc.links[i].id === id) { return doc.links[i]; } }
 		return null;
+	}
+	// Pump curve support (Task 146, 2026-07-30). A pump's curvePoints are 1-3 [Q,H] pairs in SI;
+	// curveRef, if set, names another pump link to copy points from (one hop only -- resolveCurvePoints
+	// never chases a chain, so a ref-to-a-ref can't create a cycle). recomputePumpCurve() re-fits
+	// h0/a/b (what js/lpn-solver.js actually reads) from whichever points are in effect.
+	function resolveCurvePoints(l) {
+		var base = l;
+		if (l.curveRef) { var ref = linkById(l.curveRef); if (ref && ref.type === 'pump') { base = ref; } }
+		return (base.curvePoints || []).filter(function (p) { return p && p[0] !== undefined && p[1] !== undefined; });
+	}
+	function recomputePumpCurve(l) {
+		var pts = resolveCurvePoints(l);
+		if (pts.length === 0) { pts = [[0, 0]]; } // defensive only -- the popup requires point 1
+		var curve = EngCalcs.lpnPumpFromCurve(pts);
+		l.h0 = curve.h0; l.a = curve.a; l.b = curve.b;
+	}
+	// Editing one pump's points can change what OTHER pumps compute too (any referencing it via
+	// curveRef), so every curve edit recomputes the whole set rather than just the one link --
+	// cheap at this suite's target scale (~10-20 nodes, ROADMAP Task 146's own sizing decision).
+	function recomputeAllPumpCurves() {
+		doc.links.forEach(function (l) { if (l.type === 'pump') { recomputePumpCurve(l); } });
 	}
 	function linkPoints(l) {
 		var a = nodeById(l.from), b = nodeById(l.to), pts = [a].concat(l.verts, [b]), i, out = [];
@@ -1070,15 +1098,16 @@ var EngCalcs = EngCalcs || {};
 		};
 		l.length = linkGeomLength(l);
 		if (type === 'pump') {
-			// Pump curve entry isn't implemented (see the scope doc's design note) -- without
-			// h0/a/b, EngCalcs.lpnSolve()'s pump branch reads undefined and produces NaN, which
-			// would silently break any network containing one. A generic single-point curve
-			// (nice numbers per the current unit system, not one SI pair) keeps the solve
-			// meaningful until real curve entry exists.
-			var curveQ = niceDefault('lpn_u_flow', 'gpm', 150, 0.01),
-				curveH = niceDefault('lpn_u_elevhead', 'fth2o', 65, 20),
-				curve = EngCalcs.lpnPumpFromCurve([[curveQ, curveH]]);
-			l.h0 = curve.h0; l.a = curve.a; l.b = curve.b;
+			// Pump curve entry (Task 146, 2026-07-30): l.curvePoints holds 1-3 [Q,H] pairs in SI,
+			// fitted to h0/a/b by EngCalcs.lpnPumpFromCurve (see its own comment for the 1/2/3-point
+			// forms -- same math bpn_'s supply curve uses). l.curveRef, when set, names another
+			// pump link whose curvePoints this one copies instead of using its own -- so several
+			// identical pumps in one network need the curve entered only once. A brand-new pump
+			// gets one design-point default (nice numbers per the current unit system) so the solve
+			// is meaningful before the user opens its popup and enters a real curve.
+			l.curvePoints = [[niceDefault('lpn_u_flow', 'gpm', 150, 0.01), niceDefault('lpn_u_elevhead', 'fth2o', 65, 20)]];
+			l.curveRef = null;
+			recomputePumpCurve(l);
 		}
 		doc.links.push(l);
 		incidentLinks[fromId].push(id); incidentLinks[toId].push(id);
@@ -1780,7 +1809,8 @@ var EngCalcs = EngCalcs || {};
 		return [
 			['id', pc.lpn_field_id || 'ID'], ['diameter', pc.lpn_field_diameter || 'Diameter'],
 			['length', pc.lpn_field_length || 'Length'], ['flow', pc.lpn_result_flow || 'Flow'],
-			['velocity', pc.lpn_result_velocity || 'Velocity'], ['headloss', pc.lpn_result_headloss || 'Head loss']
+			['velocity', pc.lpn_result_velocity || 'Velocity'], ['headloss', pc.lpn_result_headloss || 'Head loss'],
+			['headgain', pc.lpn_result_headgain || 'Head gain']
 		];
 	}
 	// Extracted from wireLabelsPopup() (Tom, 2026-07-30: "Restore defaults" button) so the checkbox
@@ -2178,6 +2208,9 @@ var EngCalcs = EngCalcs || {};
 	function renameLink(oldId, newId) {
 		var l = linkById(oldId);
 		l.id = newId;
+		// Any OTHER pump referencing this one by curveRef must follow the rename, or its curve
+		// silently reverts to nothing (resolveCurvePoints() only matches an exact id).
+		doc.links.forEach(function (other) { if (other.curveRef === oldId) { other.curveRef = newId; } });
 		linkEls[newId] = linkEls[oldId]; delete linkEls[oldId];
 		linkEls[newId].line.setAttribute('data-link', newId);
 		linkEls[newId].handles.forEach(function (h) { h.setAttribute('data-link', newId); });
@@ -2210,13 +2243,85 @@ var EngCalcs = EngCalcs || {};
 		renderNodeFields(nodeId);
 		openPopupAt(sx, sy);
 	}
+	// Pump curve entry (Task 146, 2026-07-30): up to 3 [Q,H] points, or a reference to another
+	// pump's curve. Point 1 is required (a pump needs at least a design point); 2 and 3 are
+	// optional and refine the fit toward EPANET's 2- and 3-point forms -- see
+	// EngCalcs.lpnPumpFromCurve()'s own comment for exactly what each point count produces.
+	function renderPumpCurveFields(fields, l, linkId) {
+		var pc = EngCalcs.pageConfig || {};
+		var refLabel = document.createElement('label'), refSelect = document.createElement('select');
+		refLabel.textContent = (pc.lpn_pump_curve_source || 'Curve') + ' ';
+		var ownOpt = document.createElement('option');
+		ownOpt.value = ''; ownOpt.textContent = pc.lpn_pump_curve_own || 'Enter points below';
+		refSelect.appendChild(ownOpt);
+		doc.links.forEach(function (other) {
+			if (other.type !== 'pump' || other.id === l.id) { return; }
+			var o = document.createElement('option');
+			o.value = other.id; o.textContent = other.id;
+			if (l.curveRef === other.id) { o.selected = true; }
+			refSelect.appendChild(o);
+		});
+		refSelect.addEventListener('change', function () {
+			saveUndoSnapshot();
+			l.curveRef = refSelect.value || null;
+			recomputeAllPumpCurves();
+			scheduleSolve();
+			renderLinkFields(linkId); // rebuild: show/hide point rows, refresh the read-only result
+		});
+		refLabel.appendChild(refSelect);
+		fields.appendChild(refLabel);
+		fields.appendChild(document.createElement('br'));
+
+		if (l.curveRef) {
+			var note = document.createElement('div');
+			note.textContent = (pc.lpn_pump_curve_ref_note || 'Using the curve entered for pump ') + l.curveRef + '.';
+			fields.appendChild(note);
+			return;
+		}
+
+		if (!l.curvePoints || l.curvePoints.length === 0) { l.curvePoints = [[undefined, undefined]]; }
+		var pointLabels = [
+			pc.lpn_pump_point1 || 'Point 1 (required)',
+			pc.lpn_pump_point2 || 'Point 2 (optional)',
+			pc.lpn_pump_point3 || 'Point 3 (optional)'
+		];
+		var qf = unitFactor('lpn_u_flow'), hf = unitFactor('lpn_u_elevhead');
+		var pi;
+		for (pi = 0; pi < 3; pi++) {
+			(function (pi) {
+				var pt = l.curvePoints[pi] || [undefined, undefined];
+				var row = document.createElement('div'), lab = document.createElement('span'),
+					qInput = document.createElement('input'), hInput = document.createElement('input');
+				lab.textContent = pointLabels[pi] + ' ';
+				qInput.type = 'number'; qInput.step = 'any'; qInput.size = 6;
+				qInput.title = (pc.lpn_result_flow || 'Flow') + ' (' + unitLabel('lpn_u_flow') + ')';
+				qInput.value = pt[0] !== undefined ? (pt[0] * qf).toFixed(4) : '';
+				hInput.type = 'number'; hInput.step = 'any'; hInput.size = 6;
+				hInput.title = (pc.lpn_result_headgain || 'Head gain') + ' (' + unitLabel('lpn_u_elevhead') + ')';
+				hInput.value = pt[1] !== undefined ? (pt[1] * hf).toFixed(4) : '';
+				function commit() {
+					var qv = qInput.value === '' ? undefined : (+qInput.value / qf),
+						hv = hInput.value === '' ? undefined : (+hInput.value / hf);
+					saveUndoSnapshot();
+					// Both fields or neither -- a lone Q or lone H is not a point the curve fit can use.
+					l.curvePoints[pi] = (qv !== undefined && hv !== undefined) ? [qv, hv] : undefined;
+					l.curvePoints = l.curvePoints.filter(function (x) { return x; });
+					recomputeAllPumpCurves();
+					scheduleSolve();
+				}
+				qInput.addEventListener('change', commit);
+				hInput.addEventListener('change', commit);
+				row.appendChild(lab); row.appendChild(qInput); row.appendChild(hInput);
+				fields.appendChild(row);
+			})(pi);
+		}
+	}
 	function renderLinkFields(linkId) {
 		var l = linkById(linkId), fields = document.getElementById('lpn_popup_fields'), pc = EngCalcs.pageConfig || {};
 		idField(l.id, function (newId) { renameLink(linkId, newId); });
 		fields.innerHTML = '';
 		if (l.type === 'pump') {
-			fields.appendChild(document.createTextNode(pc.lpn_pump_notice || 'Pump curve entry is not yet implemented.'));
-			fields.appendChild(document.createElement('br'));
+			renderPumpCurveFields(fields, l, linkId);
 		} else {
 			unitNumberField(fields, pc.lpn_field_diameter || 'Diameter', 'lpn_u_diameter',
 				function () { return l.diameter; }, function (v) { l.diameter = v; });
@@ -2431,11 +2536,16 @@ var EngCalcs = EngCalcs || {};
 			length: fieldExtrema(doc.links.map(function (l) { return l.type !== 'pump' ? Math.round(l.length * 100) / 100 : undefined; })),
 			flow: fieldExtrema(doc.links.map(function (l) { return lastSolveResult ? displayRound(lastSolveResult.flows[l.id], 'lpn_u_flow') : undefined; })),
 			velocity: fieldExtrema(doc.links.map(function (l) { return (l.type !== 'pump' && lastSolveResult) ? displayRound(lastSolveResult.velocities[l.id], 'lpn_u_velocity') : undefined; })),
-			// Displayed value, not the raw stored headloss -- a pump shows head GAIN (-headloss) per
-			// the same sign convention as the property popup, so extrema are judged on what's shown.
+			// Pipe headloss and pump head GAIN are separate fields with separate extrema buckets (Tom,
+			// 2026-07-30) -- a pump's ~70+ ft gain mixed into the same min/max as a pipe's fractional
+			// loss made the pump read as an enormous "loss" under one shared legend/color/scale.
 			headloss: fieldExtrema(doc.links.map(function (l) {
-				if (!lastSolveResult || lastSolveResult.headlosses[l.id] === undefined) { return undefined; }
-				return displayRound(l.type === 'pump' ? -lastSolveResult.headlosses[l.id] : lastSolveResult.headlosses[l.id], 'lpn_u_elevhead');
+				if (l.type === 'pump' || !lastSolveResult || lastSolveResult.headlosses[l.id] === undefined) { return undefined; }
+				return displayRound(lastSolveResult.headlosses[l.id], 'lpn_u_elevhead');
+			})),
+			headgain: fieldExtrema(doc.links.map(function (l) {
+				if (l.type !== 'pump' || !lastSolveResult || lastSolveResult.headlosses[l.id] === undefined) { return undefined; }
+				return displayRound(-lastSolveResult.headlosses[l.id], 'lpn_u_elevhead');
 			}))
 		};
 		var fc = lpnFieldColors, nodeLines = {}, linkLines = {};
@@ -2474,12 +2584,10 @@ var EngCalcs = EngCalcs || {};
 				if (ls.link.flow) { lines.push(numLine(lastSolveResult.flows[l.id], 'lpn_u_flow', extrema.flow, fc.flow)); }
 				// Velocity is meaningless for a pump (no diameter -- see renderLinkFields() above).
 				if (ls.link.velocity && l.type !== 'pump') { lines.push(numLine(lastSolveResult.velocities[l.id], 'lpn_u_velocity', extrema.velocity, fc.velocity)); }
-				if (ls.link.headloss) {
-					if (l.type === 'pump') {
-						lines.push(numLine(-lastSolveResult.headlosses[l.id], 'lpn_u_elevhead', extrema.headloss, fc.headloss));
-					} else {
-						lines.push(numLine(lastSolveResult.headlosses[l.id], 'lpn_u_elevhead', extrema.headloss, fc.headloss));
-					}
+				if (l.type === 'pump') {
+					if (ls.link.headgain) { lines.push(numLine(-lastSolveResult.headlosses[l.id], 'lpn_u_elevhead', extrema.headgain, fc.headgain)); }
+				} else if (ls.link.headloss) {
+					lines.push(numLine(lastSolveResult.headlosses[l.id], 'lpn_u_elevhead', extrema.headloss, fc.headloss));
 				}
 			}
 			le.empty = lines.length === 0;
