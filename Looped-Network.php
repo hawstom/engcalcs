@@ -43,6 +43,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		<?=$ec_lang['lpn_field_diameter']?> <?php echoUnitSelect('lpn_u_diameter', 'distance_small', ''); ?>
 		<?=$ec_lang['lpn_units_flow']?> <?php echoUnitSelect('lpn_u_flow', 'flow_node', ''); ?>
 		<?=$ec_lang['lpn_units_velocity']?> <?php echoUnitSelect('lpn_u_velocity', 'velocity', ''); ?>
+		<?=$ec_lang['lpn_result_gradient']?> <?php echoUnitSelect('lpn_u_gradient', 'gradient', ''); ?>
 	</div>
 	</div>
 	<div class="d-print-none" id="lpn_toolbar"></div>
@@ -153,6 +154,7 @@ EngCalcs.pageConfig = {
 	lpn_field_diameter: <?=json_encode($ec_lang['lpn_field_diameter'])?>,
 	lpn_field_roughness: <?=json_encode($ec_lang['lpn_field_roughness'])?>,
 	lpn_field_length: <?=json_encode($ec_lang['lpn_field_length'])?>,
+	lpn_field_km: <?=json_encode($ec_lang['lpn_field_km'])?>,
 	lpn_field_auto: <?=json_encode($ec_lang['lpn_field_auto'])?>,
 	lpn_field_x: <?=json_encode($ec_lang['lpn_field_x'])?>,
 	lpn_field_y: <?=json_encode($ec_lang['lpn_field_y'])?>,
@@ -188,6 +190,7 @@ EngCalcs.pageConfig = {
 	lpn_result_flow: <?=json_encode($ec_lang['lpn_result_flow'])?>,
 	lpn_result_velocity: <?=json_encode($ec_lang['lpn_result_velocity'])?>,
 	lpn_result_headloss: <?=json_encode($ec_lang['lpn_result_headloss'])?>,
+	lpn_result_gradient: <?=json_encode($ec_lang['lpn_result_gradient'])?>,
 	lpn_result_headgain: <?=json_encode($ec_lang['lpn_result_headgain'])?>,
 	lpn_tool_clear: <?=json_encode($ec_lang['lpn_tool_clear'])?>,
 	lpn_confirm_clear: <?=json_encode($ec_lang['lpn_confirm_clear'])?>,
@@ -213,6 +216,7 @@ EngCalcs.pageConfig = {
 	lpn_settings_solver: <?=json_encode($ec_lang['lpn_settings_solver'])?>,
 	lpn_settings_emitter_exponent: <?=json_encode($ec_lang['lpn_settings_emitter_exponent'])?>,
 	lpn_settings_tolerance: <?=json_encode($ec_lang['lpn_settings_tolerance'])?>,
+	lpn_settings_km_default: <?=json_encode($ec_lang['lpn_settings_km_default'])?>,
 	lpn_settings_text_size: <?=json_encode($ec_lang['lpn_settings_text_size'])?>,
 	lpn_settings_text_size_map: <?=json_encode($ec_lang['lpn_settings_text_size_map'])?>,
 	lpn_settings_text_size_screen: <?=json_encode($ec_lang['lpn_settings_text_size_screen'])?>,

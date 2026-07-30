@@ -70,6 +70,13 @@ $ec_unit_families = Array(
     'land_area'        => Array('m2', 'ft2'),
     'velocity'         => Array('mps', 'ftps'),
     'slope'            => Array('grade', 'gradePercent'),
+    // Same two options as 'slope', different DEFAULT (ROADMAP Task 177, lpn_'s head loss
+    // gradient) -- per CLAUDE.md's unit-family rule, a family splits on a differing DEFAULT, not
+    // differing options. mpf_/mphl_'s friction slope defaults to raw grade (ft/ft) and formats it
+    // to 4 decimals in its own JS; lpn_'s generic 2-decimal-everywhere label formatter would show
+    // a typical small pipe gradient (e.g. 0.0036) as "0.00" at that precision, so it needs
+    // gradePercent (0.36) as its default instead, without changing mpf_/mphl_'s own default.
+    'gradient'         => Array('grade', 'gradePercent'),
     'stress'           => Array('npm2', 'psf'),
     'volume'           => Array('m3', 'ft3', 'acft'),
     'unit_discharge'   => Array('m2ps', 'ft2ps'),
@@ -107,6 +114,7 @@ $ec_unit_sets['us'] = Array(
     'land_area'        => 'ft2',
     'velocity'         => 'ftps',
     'slope'            => 'grade',
+    'gradient'         => 'gradePercent',
     'stress'           => 'psf',
     'volume'           => 'ft3',
     'unit_discharge'   => 'ft2ps',
@@ -137,6 +145,7 @@ $ec_unit_sets['si'] = Array(
     'land_area'        => 'm2',
     'velocity'         => 'mps',
     'slope'            => 'grade',
+    'gradient'         => 'gradePercent',
     'stress'           => 'npm2',
     'volume'           => 'm3',
     'unit_discharge'   => 'm2ps',

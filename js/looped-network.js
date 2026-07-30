@@ -179,6 +179,15 @@ var EngCalcs = EngCalcs || {};
 	// silently undone by this pass. Nudges are transient (recomputed every refreshLabelText() call,
 	// never written into n.lx/l.ly), so they are not undo-tracked or persisted -- only an actual
 	// user drag is.
+	// Per-type "resistance to being nudged" (Tom, 2026-07-30: node/link labels previously pushed
+	// each other with identical, undifferentiated 50/50 force -- both PARTICIPATED already, but
+	// with no notion that a node's label is normally denser/more central to the reader's attention
+	// than a pipe's). A box's push SHARE is proportional to the OTHER box's weight (heavier
+	// = moves the other box more, but itself moves less) -- see the loop below. A manually-dragged
+	// label (a real leader already drawn to it) gets a very large weight rather than a special-
+	// cased boolean, so "practically immovable" falls out of the same formula instead of being a
+	// second code path.
+	var LPN_LABEL_WEIGHT = { link: 0.5, node: 1, manual: 1000 };
 	function runLabelCollisionAvoidance() {
 		var fs = effectiveFontSize(), boxes = [], i, j, iter, moved;
 		doc.nodes.forEach(function (n) {
@@ -186,21 +195,27 @@ var EngCalcs = EngCalcs || {};
 			var manual = n.lx !== undefined;
 			if (manual) { ne.nudge = { x: 0, y: 0 }; } else if (!ne.nudge) { ne.nudge = { x: 0, y: 0 }; }
 			if (ne.empty) { return; } // nothing rendered -- no box to collide with
-			boxes.push({ ref: ne, base: nodeLabelBase(n), w: ne.tw, h: dataLabelBoxHeight(ne.lineCount), manual: manual });
+			boxes.push({
+				ref: ne, base: nodeLabelBase(n), w: ne.tw, h: dataLabelBoxHeight(ne.lineCount),
+				manual: manual, weight: manual ? LPN_LABEL_WEIGHT.manual : LPN_LABEL_WEIGHT.node
+			});
 		});
 		doc.links.forEach(function (l) {
 			var le = linkEls[l.id]; if (!le) { return; }
 			var manual = l.lx !== undefined;
 			if (manual) { le.nudge = { x: 0, y: 0 }; } else if (!le.nudge) { le.nudge = { x: 0, y: 0 }; }
 			if (le.empty) { return; }
-			boxes.push({ ref: le, base: linkLabelBase(l), w: le.tw, h: dataLabelBoxHeight(le.lineCount), manual: manual });
+			boxes.push({
+				ref: le, base: linkLabelBase(l), w: le.tw, h: dataLabelBoxHeight(le.lineCount),
+				manual: manual, weight: manual ? LPN_LABEL_WEIGHT.manual : LPN_LABEL_WEIGHT.link
+			});
 		});
 		for (iter = 0; iter < 4; iter++) {
 			moved = false;
 			for (i = 0; i < boxes.length; i++) {
 				for (j = i + 1; j < boxes.length; j++) {
 					var A = boxes[i], B = boxes[j];
-					if (A.manual && B.manual) { continue; } // neither can move; skip rather than spin
+					if (A.manual && B.manual) { continue; } // both practically immovable; skip rather than spin
 					var Ax = A.base.x + A.ref.nudge.x, Ay = A.base.y + A.ref.nudge.y;
 					var Bx = B.base.x + B.ref.nudge.x, By = B.base.y + B.ref.nudge.y;
 					var Atop = Ay - fs * 0.85, Btop = By - fs * 0.85;
@@ -208,14 +223,20 @@ var EngCalcs = EngCalcs || {};
 					var overlapY = Math.min(Atop + A.h, Btop + B.h) - Math.max(Atop, Btop);
 					if (overlapX <= 0 || overlapY <= 0) { continue; }
 					moved = true;
+					// A's share of the separation is proportional to B's weight (and vice versa) --
+					// a heavier box moves the lighter one more than it moves itself. Both shares sum
+					// to the full overlap plus a hair of margin, same as the old fixed 50/50 split.
+					var wSum = A.weight + B.weight;
 					if (overlapX < overlapY) {
-						var pushX = overlapX / 2 + 0.1, dirX = (Ax + A.w / 2 <= Bx + B.w / 2) ? -1 : 1;
-						if (!A.manual) { A.ref.nudge.x += dirX * pushX; }
-						if (!B.manual) { B.ref.nudge.x -= dirX * pushX; }
+						var shareAx = (overlapX + 0.1) * B.weight / wSum, shareBx = (overlapX + 0.1) * A.weight / wSum;
+						var dirX = (Ax + A.w / 2 <= Bx + B.w / 2) ? -1 : 1;
+						if (!A.manual) { A.ref.nudge.x += dirX * shareAx; }
+						if (!B.manual) { B.ref.nudge.x -= dirX * shareBx; }
 					} else {
-						var pushY = overlapY / 2 + 0.1, dirY = (Atop + A.h / 2 <= Btop + B.h / 2) ? -1 : 1;
-						if (!A.manual) { A.ref.nudge.y += dirY * pushY; }
-						if (!B.manual) { B.ref.nudge.y -= dirY * pushY; }
+						var shareAy = (overlapY + 0.1) * B.weight / wSum, shareBy = (overlapY + 0.1) * A.weight / wSum;
+						var dirY = (Atop + A.h / 2 <= Btop + B.h / 2) ? -1 : 1;
+						if (!A.manual) { A.ref.nudge.y += dirY * shareAy; }
+						if (!B.manual) { B.ref.nudge.y -= dirY * shareBy; }
 					}
 				}
 			}
@@ -356,7 +377,7 @@ var EngCalcs = EngCalcs || {};
 		// a considered choice about what's actually useful to see on first load.
 		return {
 			node: { id: true, elev: true, demand: true, head: false, pressure: true },
-			link: { id: true, diameter: false, length: false, flow: true, velocity: true, headloss: false, headgain: false }
+			link: { id: true, diameter: false, length: false, flow: true, velocity: true, headloss: false, headgain: false, gradient: false }
 		};
 	}
 	var labelSettings = defaultLabelSettings();
@@ -374,6 +395,12 @@ var EngCalcs = EngCalcs || {};
 			idPrefixes: { J: 'J', R: 'R', L: 'L', P: 'P', T: 'T' },
 			emitterExponent: 0.5, // matches js/lpn-solver.js's own default -- see assembleModel()
 			tolerance: 1e-9, // matches js/lpn-solver.js's own default relative-flow-change tol -- see runSolve()
+			// Default minor (local) loss coefficient for a NEWLY created pipe (Tom, 2026-07-30) --
+			// js/lpn-solver.js has always supported a per-pipe l.k (m = k/(2 g A^2), added to the
+			// head-loss/resistance terms), but nothing ever set it, so every pipe solved with k=0
+			// until now. 2 is a generic placeholder for "some fittings on this run", not tied to any
+			// specific fitting -- editable per-pipe in its popup, same as diameter/roughness.
+			kmDefault: 2,
 			textSize: 2.5, // world units -- the original fixed LABEL_FONT_SIZE constant's value
 			textSizeUnits: 'map', // 'map' | 'screen' -- see effectiveFontSize() above
 			legendPosition: 'top-right', // one of LEGEND_POSITIONS' keys below -- matches the original hardcoded CSS
@@ -406,7 +433,7 @@ var EngCalcs = EngCalcs || {};
 	var lpnFieldColors = {
 		id: '#000', elev: '#8b5a2b', demand: '#1565c0', head: '#00838f', pressure: '#455a64',
 		diameter: '#bf4b2b', length: '#2e7d32', flow: '#1565c0', velocity: '#ad1457', headloss: '#4527a0',
-		headgain: '#00695c'
+		headgain: '#00695c', gradient: '#8e24aa'
 	};
 
 	function el(tag, attrs, parent) {
@@ -1094,7 +1121,8 @@ var EngCalcs = EngCalcs || {};
 		var l = {
 			id: id, type: type, from: fromId, to: toId, verts: [],
 			diameter: niceDefault('lpn_u_diameter', 'in', 4, 0.1),
-			roughness: 100, length: 0, lenAuto: true, status: 'open'
+			roughness: 100, length: 0, lenAuto: true, status: 'open',
+			k: settings.kmDefault // pump ignores k -- only the pipe friction branch reads it
 		};
 		l.length = linkGeomLength(l);
 		if (type === 'pump') {
@@ -1810,7 +1838,8 @@ var EngCalcs = EngCalcs || {};
 			['id', pc.lpn_field_id || 'ID'], ['diameter', pc.lpn_field_diameter || 'Diameter'],
 			['length', pc.lpn_field_length || 'Length'], ['flow', pc.lpn_result_flow || 'Flow'],
 			['velocity', pc.lpn_result_velocity || 'Velocity'], ['headloss', pc.lpn_result_headloss || 'Head loss'],
-			['headgain', pc.lpn_result_headgain || 'Head gain']
+			['headgain', pc.lpn_result_headgain || 'Head gain'],
+			['gradient', pc.lpn_result_gradient || 'Head loss gradient']
 		];
 	}
 	// Extracted from wireLabelsPopup() (Tom, 2026-07-30: "Restore defaults" button) so the checkbox
@@ -1978,6 +2007,15 @@ var EngCalcs = EngCalcs || {};
 			else { tolInput.value = settings.tolerance; }
 		});
 		row(pc.lpn_settings_tolerance || 'Convergence tolerance', tolInput);
+		// Default km applies to NEWLY created pipes only (addLink()) -- same "future, not
+		// retroactive" rule as idPrefixes above; existing pipes keep whatever km they already have.
+		var kmInput = document.createElement('input');
+		kmInput.type = 'number'; kmInput.step = 'any'; kmInput.min = '0'; kmInput.value = settings.kmDefault;
+		kmInput.addEventListener('change', function () {
+			if (+kmInput.value >= 0) { settings.kmDefault = +kmInput.value; }
+			else { kmInput.value = settings.kmDefault; }
+		});
+		row(pc.lpn_settings_km_default || 'Default minor (local) loss coefficient, km, for new pipes', kmInput);
 		// ---- text size ----
 		heading(pc.lpn_settings_text_size || 'Text size');
 		var sizeInput = document.createElement('input');
@@ -2326,6 +2364,14 @@ var EngCalcs = EngCalcs || {};
 			unitNumberField(fields, pc.lpn_field_diameter || 'Diameter', 'lpn_u_diameter',
 				function () { return l.diameter; }, function (v) { l.diameter = v; });
 			numberFieldPlain(fields, pc.lpn_field_roughness || 'Roughness', l.roughness, function (v) { l.roughness = v; });
+			// Minor (local) loss coefficient, k_m -- dimensionless, so no unit conversion (same as
+			// Roughness above). Defaults from settings.kmDefault at creation (addLink()); editable
+			// per-pipe here, same pattern as every other pipe property. Plain-text wording only
+			// (no <sub> markup) -- this popup's fields are built via textContent, and the suite's
+			// existing "k<sub>m</sub>" label (mphl_total_junction_k) is HTML-bearing, incompatible
+			// with that call site; CLAUDE.md's concept-level reuse rule is about wording, not
+			// forcing markup into a plain-text slot.
+			numberFieldPlain(fields, pc.lpn_field_km || 'Minor (local) loss coefficient, km', l.k || 0, function (v) { l.k = v; });
 			lengthField(fields, l);
 		}
 		if (lastSolveResult && lastSolveResult.flows[linkId] !== undefined) {
@@ -2343,6 +2389,9 @@ var EngCalcs = EngCalcs || {};
 				readonlyUnitField(fields, pc.lpn_result_headgain || 'Head gain', 'lpn_u_elevhead', -lastSolveResult.headlosses[linkId]);
 			} else {
 				readonlyUnitField(fields, pc.lpn_result_headloss || 'Head loss', 'lpn_u_elevhead', lastSolveResult.headlosses[linkId]);
+				if (l.length) {
+					readonlyUnitField(fields, pc.lpn_result_gradient || 'Head loss gradient', 'lpn_u_gradient', lastSolveResult.headlosses[linkId] / l.length);
+				}
 			}
 		}
 	}
@@ -2546,6 +2595,22 @@ var EngCalcs = EngCalcs || {};
 			headgain: fieldExtrema(doc.links.map(function (l) {
 				if (l.type !== 'pump' || !lastSolveResult || lastSolveResult.headlosses[l.id] === undefined) { return undefined; }
 				return displayRound(-lastSolveResult.headlosses[l.id], 'lpn_u_elevhead');
+			})),
+			// Head loss GRADIENT (ROADMAP Task 177, Tom agreed 2026-07-30): headloss/length as a
+			// dimensionless ratio, reusing the same grade/gradePercent OPTIONS as mpf_/mphl_'s own
+			// friction-slope 'slope' family, but its own 'gradient' family (lib/Units.lib.php) so it
+			// can default to gradePercent -- lpn_'s generic 2-decimal label formatter needs the %
+			// form to read as anything but "0.00" for a typical small pipe gradient; see that
+			// family's own comment. Not a per-1000-length form (EPANET's convention) by design,
+			// matching this suite's own established slope convention instead.
+			// l.length is NOT divided by unitFactor('lpn_u_length') here -- per the
+			// scope doc's "declarative units" design, l.length is already the real SI length the
+			// solver itself used (the Length/Map selector only relabels the popup's input, it does
+			// not convert the stored number), so dividing by that selector's factor would double-
+			// convert. Pump-excluded, same as headloss.
+			gradient: fieldExtrema(doc.links.map(function (l) {
+				if (l.type === 'pump' || !l.length || !lastSolveResult || lastSolveResult.headlosses[l.id] === undefined) { return undefined; }
+				return displayRound(lastSolveResult.headlosses[l.id] / l.length, 'lpn_u_gradient');
 			}))
 		};
 		var fc = lpnFieldColors, nodeLines = {}, linkLines = {};
@@ -2586,8 +2651,9 @@ var EngCalcs = EngCalcs || {};
 				if (ls.link.velocity && l.type !== 'pump') { lines.push(numLine(lastSolveResult.velocities[l.id], 'lpn_u_velocity', extrema.velocity, fc.velocity)); }
 				if (l.type === 'pump') {
 					if (ls.link.headgain) { lines.push(numLine(-lastSolveResult.headlosses[l.id], 'lpn_u_elevhead', extrema.headgain, fc.headgain)); }
-				} else if (ls.link.headloss) {
-					lines.push(numLine(lastSolveResult.headlosses[l.id], 'lpn_u_elevhead', extrema.headloss, fc.headloss));
+				} else {
+					if (ls.link.headloss) { lines.push(numLine(lastSolveResult.headlosses[l.id], 'lpn_u_elevhead', extrema.headloss, fc.headloss)); }
+					if (ls.link.gradient && l.length) { lines.push(numLine(lastSolveResult.headlosses[l.id] / l.length, 'lpn_u_gradient', extrema.gradient, fc.gradient)); }
 				}
 			}
 			le.empty = lines.length === 0;

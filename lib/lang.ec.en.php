@@ -1146,6 +1146,11 @@ $ec_lang['lpn_units_elevhead']='Elevation/Head';
 $ec_lang['lpn_units_pressure']='Pressure';
 $ec_lang['lpn_units_flow']='Flow';
 $ec_lang['lpn_units_velocity']='Velocity';
+// Head loss GRADIENT (headloss/length, dimensionless -- grade or gradePercent, same options as
+// mpf_/mphl_'s 'slope' family but lpn_'s own 'gradient' family so it can default to gradePercent)
+// alongside the existing total head loss (ROADMAP Task 177, Tom agreed 2026-07-30) -- matches
+// mpf_/mphl_'s own friction-slope convention rather than inventing a per-1000-length form.
+$ec_lang['lpn_result_gradient']='Head loss gradient';
 $ec_lang['lpn_result_head']='Head';
 $ec_lang['lpn_result_pressure']='Pressure';
 $ec_lang['lpn_result_flow']='Flow';
@@ -1171,6 +1176,11 @@ $ec_lang['lpn_diag_unreachable']='These nodes are not connected to a reservoir (
 $ec_lang['lpn_diag_not_converged']='The solver did not converge. Check for unrealistic inputs, such as a zero diameter.';
 $ec_lang['lpn_field_roughness']='Roughness';
 $ec_lang['lpn_field_length']='Length';
+// Plain-text wording of the concept mphl_total_junction_k/mphl_junction_loss already own (their
+// values carry k<sub>m</sub> markup, incompatible with this popup's textContent-only fields) --
+// Tom, 2026-07-30, "default to 2" matches mphl_total_junction_k_tip's own stated default exactly.
+$ec_lang['lpn_field_km']='Minor (local) loss coefficient, km';
+$ec_lang['lpn_settings_km_default']='Default minor (local) loss coefficient, km, for new pipes';
 // Pump curve entry (Task 146, 2026-07-30): up to 3 (flow, head) points, or a reference to
 // another pump's curve so several identical pumps need the curve entered only once.
 $ec_lang['lpn_pump_curve_source']='Curve';
