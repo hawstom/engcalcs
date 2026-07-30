@@ -1043,15 +1043,21 @@ var EngCalcs = EngCalcs || {};
 		else { renderLinkFields(currentPopup.id); }
 	}
 
-	// One-step undo (Tom, after losing a deleted pipe's data). A full multi-step undo with a
-	// deeper history is ROADMAP Task 146 Phase 1's own listed scope ("Ctrl-Z... 20 in-memory
-	// snapshots") -- this single-slot version is a cheap, immediate safety net pending that.
-	var undoSnapshot = null;
-	function saveUndoSnapshot() { undoSnapshot = JSON.parse(JSON.stringify(doc)); }
+	// Multi-step undo, in memory only (not localStorage) -- ROADMAP Task 146 Phase 1's own listed
+	// scope ("Ctrl-Z... 20 in-memory snapshots"). A stack, not a single slot: the single-slot
+	// version (Tom, after losing a deleted pipe's data to a second accidental edit before undoing
+	// the first) only protected the most recent mutation -- a second Add or Delete before Ctrl-Z
+	// silently overwrote the one saved snapshot. UNDO_LIMIT matches the scope doc's number exactly;
+	// shift() drops the oldest snapshot once the stack is full rather than growing unbounded.
+	var UNDO_LIMIT = 20;
+	var undoStack = [];
+	function saveUndoSnapshot() {
+		undoStack.push(JSON.parse(JSON.stringify(doc)));
+		if (undoStack.length > UNDO_LIMIT) { undoStack.shift(); }
+	}
 	function undo() {
-		if (!undoSnapshot) { return; }
-		doc = JSON.parse(JSON.stringify(undoSnapshot));
-		undoSnapshot = null;
+		if (undoStack.length === 0) { return; }
+		doc = undoStack.pop();
 		nextId = { J: 1, R: 1, L: 1, P: 1, T: 1 };
 		doc.nodes.concat(doc.links, doc.labels).forEach(function (x) {
 			var m = /^([A-Z])(\d+)$/.exec(x.id);
