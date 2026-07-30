@@ -634,8 +634,21 @@ stacked block (no top-center/bottom-center variant the way an 8-fold compass ros
 the exact setting shape when the gear panel is actually built (already scoped there per the round-2
 note above); this note exists so the placement default isn't mistaken for a settled decision.
 
-**Phase 3 — polish and reach.** Draggable labels with leaders and collision avoidance (see the
-Phase 0 note on a label-reset gesture); map insets for congested areas; `.inp` export/import;
+**Correction (Tom, 2026-07-30): "draggable labels with leaders" below was a data-label/Text-label
+mixup from the start.** Text labels (the user-placed `T` elements) already have exactly this —
+drag, an auto-flipping leader, an anchor node — shipped in Phase 1/2. What was actually meant, and
+is still unbuilt, is **remote/leader placement for DATA labels** (the ID/elevation/demand/flow/etc.
+map labels that render fixed beside their node or link): on a short pipe or a crowded cluster of
+nodes, the fixed position has nowhere legible to sit, so a data label needs the same drag-to-a-leader
+escape hatch a Text label already has. Automating the placement (auto-detecting a cramped spot and
+offering a leader) is a nice-to-have; **manual leader placement must exist regardless, and collision
+avoidance is the critical piece** — a leader that can land on top of another label/leader defeats the
+whole point. Re-scope this properly (probably Phase 2's label-toggle system + Phase 3's polish, not a
+single bullet) before starting it.
+
+**Phase 3 — polish and reach.** Remote/leader data-label placement + collision avoidance (see the
+correction above; NOT Text labels, which already have this); the Phase 0 label-reset gesture note
+now applies there too, not to Text; map insets for congested areas; `.inp` export/import;
 **valves as a link property (status + setting), not a fifth element type** — Tom's instinct matches
 EPANET's own data model. *(Polyline pipe vertex editing, originally slated here, moved to Phase 1 —
 see the note above.)*
