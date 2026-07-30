@@ -22,6 +22,9 @@ var EngCalcs = EngCalcs || {};
 	var NS = 'http://www.w3.org/2000/svg';
 	var svg, world, backdropLayer, gridLayer, linksLayer, nodesLayer, labelsLayer;
 	var state = { tx: 0, ty: 0, s: 1 };
+	// World-unit font size shared by a node's ID/pressure label and a user-added Text label (Tom,
+	// 2026-07-30) -- no reason for the two to render at different sizes by default.
+	var LABEL_FONT_SIZE = 2.5;
 
 	// The document. nodes: Junction/Reservoir (point elements). links: Pipe/Pump (two
 	// endpoints + optional bend vertices). labels: Text elements with a leader to an
@@ -46,6 +49,23 @@ var EngCalcs = EngCalcs || {};
 		var i;
 		for (i = 0; i < doc.nodes.length; i++) { if (doc.nodes[i].id === id) { return doc.nodes[i]; } }
 		return null;
+	}
+	// Snap-on-create (scope doc): "a click within N screen pixels of an existing node reuses it
+	// rather than creating a new one." The scope doc names this as the real fix for diagnostic #2
+	// ("a pipe drawn near a junction but not snapped to it" -- the dominant map-editor user error),
+	// so it belongs on node-hit-testing itself, not on Text labels. N is in SCREEN pixels, not world
+	// units, so the tap target stays a constant physical size regardless of zoom level -- a tight
+	// world-unit tolerance at 10% zoom would be visually huge, and a loose one at 500% zoom would
+	// be invisible.
+	var NODE_SNAP_PX = 14;
+	function nearestNodeNearScreen(clientX, clientY, pxTolerance) {
+		var w = screenToWorld(clientX, clientY), best = null, bestPx = pxTolerance, i, n, dPx;
+		for (i = 0; i < doc.nodes.length; i++) {
+			n = doc.nodes[i];
+			dPx = Math.hypot(n.x - w.x, n.y - w.y) * state.s;
+			if (dPx <= bestPx) { best = n; bestPx = dPx; }
+		}
+		return best;
 	}
 	function linkById(id) {
 		var i;
@@ -80,12 +100,14 @@ var EngCalcs = EngCalcs || {};
 			cx: n.x, cy: n.y, r: nodeRadius(n),
 			'class': 'lpn-node lpn-node-' + n.type, 'data-node': n.id
 		}, nodesLayer);
-		// font-size:2px inline, NOT the .lpn-lbl CSS class's 11px: SVG font-size is interpreted
-		// in the local (world-unit) coordinate system, same as any other geometry under this
-		// scaled <g> -- an "11-unit" font is enormous next to nodes spaced 10-40 units apart,
-		// which is what was actually causing the zoom-extent overflow (not a missing bbox term
-		// -- the geometry itself was oversized). Matches the spike's own convention.
-		var text = el('text', { x: n.x + 2, y: n.y - 2, 'class': 'lpn-lbl', style: 'font-size:2px' }, nodesLayer);
+		// font-size inline, NOT the .lpn-lbl CSS class's 11px: SVG font-size is interpreted in the
+		// local (world-unit) coordinate system, same as any other geometry under this scaled <g> --
+		// an "11-unit" font is enormous next to nodes spaced 10-40 units apart, which is what was
+		// actually causing the zoom-extent overflow (not a missing bbox term -- the geometry itself
+		// was oversized). Matches the spike's own convention. Same LABEL_FONT_SIZE as a user Text
+		// label (Tom, 2026-07-30: no reason for these to differ) -- the two are still visually
+		// distinguishable by position (node ID sits fixed at the node) and role, not by size.
+		var text = el('text', { x: n.x + 2, y: n.y - 2, 'class': 'lpn-lbl', style: 'font-size:' + LABEL_FONT_SIZE + 'px' }, nodesLayer);
 		text.textContent = n.id;
 		var tw = 8;
 		try { tw = text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; fallback stands */ }
@@ -156,7 +178,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		text = el('text', {
 			x: px, y: py, 'class': 'lpn-lbl lpn-draglbl', 'text-anchor': 'middle',
-			'dominant-baseline': 'central', 'data-lbl': lb.id, style: 'font-size:3px'
+			'dominant-baseline': 'central', 'data-lbl': lb.id, style: 'font-size:' + LABEL_FONT_SIZE + 'px'
 		}, labelsLayer);
 		text.textContent = lb.text;
 		var w = 10;
@@ -364,29 +386,9 @@ var EngCalcs = EngCalcs || {};
 		scheduleSolve();
 		return l;
 	}
-	// Snap-on-create (scope doc, Phase 1): a text label dropped close to an existing node anchors
-	// to it (moves with the node, drawn with a leader -- see buildLabelEls) instead of sitting at a
-	// free-floating map coordinate. SNAP_DIST is in world units, comfortably bigger than either
-	// node radius (1.6-2.2) so a click that's clearly "near a node" catches it, but well under the
-	// 20-unit spacing used by both drawExampleNetwork() and drawTestGrid() so two nearby nodes
-	// can't both claim the same click.
-	var LABEL_SNAP_DIST = 4;
-	function nearestNodeWithin(x, y, dist) {
-		var best = null, bestD = dist, i, n, d;
-		for (i = 0; i < doc.nodes.length; i++) {
-			n = doc.nodes[i];
-			d = Math.hypot(n.x - x, n.y - y);
-			if (d <= bestD) { best = n; bestD = d; }
-		}
-		return best;
-	}
 	function addText(x, y) {
-		var id = 'T' + (nextId.T++), near = nearestNodeWithin(x, y, LABEL_SNAP_DIST), lb;
-		if (near) {
-			lb = { id: id, text: EngCalcs.pageConfig.lpn_new_text || 'Text', x: x - near.x, y: y - near.y, anchorNode: near.id };
-		} else {
-			lb = { id: id, text: EngCalcs.pageConfig.lpn_new_text || 'Text', x: x, y: y, anchorNode: null };
-		}
+		var id = 'T' + (nextId.T++);
+		var lb = { id: id, text: EngCalcs.pageConfig.lpn_new_text || 'Text', x: x, y: y, anchorNode: null };
 		doc.labels.push(lb);
 		buildLabelEls(lb);
 		return lb;
@@ -730,15 +732,27 @@ var EngCalcs = EngCalcs || {};
 			// user-requested action only.
 			// Undo covers Add too, not just Delete (Tom) -- snapshot before every mutation so
 			// "Undo" stays honest about what it does rather than needing a narrower name.
-			if (mode === 'add-junction') { saveUndoSnapshot(); addNode('junction', w.x, w.y); }
-			else if (mode === 'add-reservoir') { saveUndoSnapshot(); addNode('reservoir', w.x, w.y); }
+			if (mode === 'add-junction' || mode === 'add-reservoir') {
+				// Snap-on-create: a click within NODE_SNAP_PX of an existing node reuses it instead
+				// of creating a new, overlapping one -- see nearestNodeNearScreen()'s comment.
+				if (!nearestNodeNearScreen(e.clientX, e.clientY, NODE_SNAP_PX)) {
+					saveUndoSnapshot();
+					addNode(mode === 'add-reservoir' ? 'reservoir' : 'junction', w.x, w.y);
+				}
+			}
 			else if (mode === 'add-text') { saveUndoSnapshot(); addText(w.x, w.y); }
 			else if (mode === 'add-pipe' || mode === 'add-pump') {
-				if (t.dataset.node) {
-					if (!pendingLinkFrom) { pendingLinkFrom = t.dataset.node; }
-					else if (t.dataset.node !== pendingLinkFrom) {
+				// Same snap: elementFromPoint requires landing exactly on the node's small hit
+				// area, which a real tap on a real screen routinely misses by a few pixels -- that
+				// miss is diagnostic #2's dominant cause ("a pipe drawn near a junction but not
+				// snapped to it"). Falling back to the nearest node within screen-pixel tolerance
+				// makes a close tap connect anyway.
+				var hitId = t.dataset.node || (nearestNodeNearScreen(e.clientX, e.clientY, NODE_SNAP_PX) || {}).id;
+				if (hitId) {
+					if (!pendingLinkFrom) { pendingLinkFrom = hitId; }
+					else if (hitId !== pendingLinkFrom) {
 						saveUndoSnapshot();
-						addLink(mode === 'add-pump' ? 'pump' : 'pipe', pendingLinkFrom, t.dataset.node);
+						addLink(mode === 'add-pump' ? 'pump' : 'pipe', pendingLinkFrom, hitId);
 						pendingLinkFrom = null;
 					}
 				} else { pendingLinkFrom = null; }
