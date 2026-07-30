@@ -84,8 +84,8 @@ $ec_lang['ec_name_label']='Сохранить этот расчёт:';
 $ec_lang['ec_name_placeholder']='Имя';
 $ec_lang['ec_name_hint']='Сохраняет входные данные в URL для сохранения в закладках, получения из истории и обмена';
 $ec_lang['calc_copy_link']='Копировать ссылку';
-$ec_lang['calc_copy_link_done']='Скопировано!';
 $ec_lang['ec_related_calcs']='Похожие калькуляторы:';
+$ec_lang['calc_copy_link_done']='Скопировано!';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Потери напора в трубе Дарси-Вейсбах';
 $ec_lang['dw_main_title']='Бесплатный онлайн-калькулятор потерь напора в трубе Дарси-Вейсбах';
@@ -172,10 +172,10 @@ $ec_lang['mpf_full_flow']='Расход при полном сечении, Q<su
 $ec_lang['mpf_full_flow_ratio']='Отношение к полному расходу, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>Это расход и глубина внутри <em>бесконечно длинной</em> трубы.</dt><dd>Для подачи расхода в трубу может потребоваться значительно большая высота уровня воды. Добавьте не менее 1,5 скоростного напора к глубине уровня подпора или <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">см. 2-минутное руководство</a> по стандартным расчётам водопропускных труб с помощью <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a> — бесплатной программы для расчёта водопропускных труб Федерального управления шоссейных дорог США.</dd>';
 $ec_lang['mpf_sewer_ref']='<dl><dt>Проектируете бытовую канализацию?</dt><dd>См. <a target="_blank" href="/sewslope.php">таблицы минимальных уклонов канализационных труб</a> для труб от 4 до 96 дюймов (от 100 до 2400 мм), приведённые в м/м, мм/м и процентах, а также исследование <a target="_blank" href="/peakfact.php">пиковых коэффициентов для очень малых расходов</a>. Оба документа доступны только на английском языке.</dd></dl>';
-$ec_lang['mpf_solve_button']='Вычислить';
-$ec_lang['mpf_solve_for_flow']='для расхода, Q =';
 $ec_lang['mpf_solver_enter_positive_q']='Введите положительное значение целевого Q.';
 $ec_lang['mpf_solver_no_solution']='Решение отсутствует: Q превышает пропускную способность трубы при y/d0 = 93.8% (Qmax = {qmax} в выбранных единицах измерения).';
+$ec_lang['mpf_solve_button']='Вычислить';
+$ec_lang['mpf_solve_for_flow']='для расхода, Q =';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Потери напора в трубе по Маннингу';
 $ec_lang['mphl_main_title']='Бесплатный онлайн-калькулятор потерь напора в трубе по Маннингу';
@@ -339,7 +339,6 @@ $ec_lang['odt_q_max']='Макс. расход, Q<sub>max</sub>';
 $ec_lang['odt_vol']='Слитый объём';
 $ec_lang['odt_sketch_start']='Начало';
 $ec_lang['odt_sketch_end']='Конец';
-// Erosion Setback and Scour Calc.
 // Contact us.
 
 // Irrigation
@@ -500,8 +499,7 @@ $ec_lang['rc_sketch_filter']          = 'Фильтр';
 $ec_lang['rc_sketch_top_crest_curve'] = 'Кривая гребня';
 $ec_lang['rc_sketch_outlet_apron']    = 'Водобойная плита';
 $ec_lang['rc_sketch_radius']          = 'радиус';
-
-// Irrigation Pressure. Prefix ip_.
+// Irrigation Pressure Calculator (branch pipe-network pressure/DU estimate). Prefix ip_.
 $ec_lang['ip_main_menu']='Давление в ирригации';
 $ec_lang['ip_main_title']='Бесплатный онлайн-калькулятор ирригационного давления и однородности распределения';
 $ec_lang['ip_main_desc']='Испытание давления трассы и оценка однородности';
@@ -555,7 +553,8 @@ $ec_lang['irr_card_pressure_head']='Ирригационное давление 
 $ec_lang['irr_card_pressure_desc']='Модель профиля давления и расхода вдоль ветви магистраль-латераль-эмиттер для оценки однородности распределения на основе действительного давления тестовой трассы, а не просто номинального расхода эмиттера из каталога.';
 
 
-// --- Branched Pipe Network (bn_) ---
+
+// --- Branched Pipe Network (bpn_) --- English source ---
 $ec_lang['bpn_main_menu']='Разветвлённая трубопроводная сеть';
 $ec_lang['bpn_main_title']='Бесплатный онлайн-калькулятор давления в разветвлённой трубопроводной сети (без колец)';
 $ec_lang['bpn_main_desc']='Расход и давление в разветвлённой (древовидной) трубопроводной сети';

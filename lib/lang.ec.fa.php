@@ -85,8 +85,8 @@ $ec_lang['ec_name_label']='این محاسبه را ذخیره کنید:';
 $ec_lang['ec_name_placeholder']='نام';
 $ec_lang['ec_name_hint']='این داده‌های ورودی را به URL ذخیره می‌کند برای نشانک‌گذاری، بازیابی سابقه و اشتراک';
 $ec_lang['calc_copy_link']='کپی پیوند';
-$ec_lang['calc_copy_link_done']='کپی شد!';
 $ec_lang['ec_related_calcs']='ماشین‌حساب‌های مرتبط:';
+$ec_lang['calc_copy_link_done']='کپی شد!';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='افت هد لوله Darcy-Weisbach';
 $ec_lang['dw_main_title']='ماشین‌حساب رایگان آنلاین افت هد لوله Darcy-Weisbach';
@@ -173,10 +173,10 @@ $ec_lang['mpf_full_flow']='دبی کامل، Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='نسبت به دبی کامل، Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>این جریان و عمق داخل یک لوله <em>بی‌نهایت بلند</em> است.</dt><dd>برای هدایت جریان به داخل لوله ممکن است به عمق آب بالادست بیشتری نیاز باشد. حداقل ۱.۵ برابر هد سرعت را برای به‌دست آوردن عمق آب بالادست اضافه کنید یا <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">آموزش ۲ دقیقه‌ای من</a> را برای محاسبات استاندارد آب بالادست کالورت با استفاده از <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>، برنامه رایگان کالورت اداره بزرگراه‌های فدرال آمریکا، ببینید.</dd>';
 $ec_lang['mpf_sewer_ref']='<dl><dt>در حال طراحی فاضلاب بهداشتی هستید؟</dt><dd>جداول <a target="_blank" href="/sewslope.php">حداقل شیب فاضلاب</a> برای لوله‌های ۴ تا ۹۶ اینچ (۱۰۰ تا ۲۴۰۰ میلی‌متر)، ارائه‌شده به‌صورت متر بر متر، میلی‌متر بر متر و درصد، و مطالعه <a target="_blank" href="/peakfact.php">ضرایب اوج برای جریان‌های بسیار کم</a> را ببینید. هر دو سند مرجع فقط به زبان انگلیسی هستند.</dd></dl>';
-$ec_lang['mpf_solve_button']='محاسبه';
-$ec_lang['mpf_solve_for_flow']='برای دبی، Q =';
 $ec_lang['mpf_solver_enter_positive_q']='یک Q هدف مثبت وارد کنید.';
 $ec_lang['mpf_solver_no_solution']='راه‌حلی وجود ندارد: Q از ظرفیت لوله در y/d0 = 93.8% بیشتر است (Qmax = {qmax} در واحدهای انتخابی).';
+$ec_lang['mpf_solve_button']='محاسبه';
+$ec_lang['mpf_solve_for_flow']='برای دبی، Q =';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='افت هد لوله Manning';
 $ec_lang['mphl_main_title']='ماشین‌حساب رایگان آنلاین افت هد لوله Manning';
@@ -340,7 +340,6 @@ $ec_lang['odt_q_max']='حداکثر دبی، Q<sub>max</sub>';
 $ec_lang['odt_vol']='حجم تخلیه‌شده';
 $ec_lang['odt_sketch_start']='شروع';
 $ec_lang['odt_sketch_end']='پایان';
-// Erosion Setback and Scour Calc.
 // Contact us.
 
 // Irrigation
@@ -359,8 +358,6 @@ $ec_lang['irr_card_canal_desc']='کانال آبیاری را با فرمول Ma
 $ec_lang['irr_card_seepage_head']='نفوذ کانال و راندمان انتقال';
 $ec_lang['irr_card_seepage_desc']='تلفات نفوذ یک مسیر کانال را با استفاده از اندازه‌گیری دبی ورودی و خروجی برآورد کنید. راندمان انتقال و تلفات سالانه آب را محاسبه کنید تا اولویت‌بندی سرمایه‌گذاری برای آسترکاری تسهیل شود.';
 $ec_lang['irr_quickref_html']='<h3>راهنمای سریع</h3><dl><dt>سد انحرافی یا سازه کنترل</dt><dd>عمق آب بالادست را بالای تاج سرریز اندازه بگیرید. برای تاج یکنواخت از <a href="Weir-Flow-Simple.php">سرریز ساده</a> و برای تاج پله‌دار یا با نیم‌رخ متغیر از <a href="Weir-Flow-Irregular.php">سرریز نامنظم</a> استفاده کنید.</dd><dt>دریچه سردهانه یا خروجی لوله</dt><dd>تراز آب بالادست و پایین‌دست را اندازه بگیرید (یا تراز کف لوله در حالت تخلیه آزاد). از <a href="Orifice.php">جریان دریچه</a> استفاده کنید. برای لوله دایره‌ای، D = قطر لوله؛ برای دریچه مستطیلی، عرض W و ارتفاع D را وارد کنید.</dd><dt>زمان تخلیه مخزن یا استخر</dt><dd>برای برآورد زمان لازم جهت پایین آوردن سطح آب استخر یا مخزن از طریق دریچه کف، از <a href="Orifice-Drain-Time.php">زمان تخلیه دریچه</a> استفاده کنید — مفید برای برنامه‌ریزی ذخیره‌سازی آب آبیاری.</dd><dt>استانداردهای میدانی</dt><dd>معادلات جریان سرریز و دریچه مورد استفاده در اینجا با رویه‌های <em>راهنمای اندازه‌گیری آب</em> USBR (ویرایش سوم) که معمولاً ناظران آب و شبکه‌های آبیاری آن را الزامی می‌دانند، مطابقت دارد.</dd></dl>';
-$ec_lang['irr_card_pressure_head']='فشار و یکنواختی آبیاری';
-$ec_lang['irr_card_pressure_desc']='نیم‌رخ فشار و جریان را در طول یک شاخه اصلی–جانبی–قطره‌چکان مدل‌سازی می‌کند تا یکنواختی توزیع را از روی فشار واقعی مسیر آزمایش برآورد کند، نه صرفاً بر پایه دبی کاتالوگ قطره‌چکان.';
 // Drip / Sprinkler Application Rate
 $ec_lang['ip_se']='فاصله قطره‌چکان، S<sub>e</sub>';
 $ec_lang['ip_sl']='فاصله جانبی، S<sub>l</sub>';
@@ -503,6 +500,7 @@ $ec_lang['rc_sketch_filter']='فیلتر';
 $ec_lang['rc_sketch_top_crest_curve']='منحنی تاج فوقانی';
 $ec_lang['rc_sketch_outlet_apron']='پاشنه خروجی';
 $ec_lang['rc_sketch_radius']='شعاع';
+// Irrigation Pressure Calculator (branch pipe-network pressure/DU estimate). Prefix ip_.
 $ec_lang['ip_main_menu']='فشار آبیاری';
 $ec_lang['ip_main_title']='ماشین‌حساب رایگان آنلاین فشار آبیاری و یکنواختی توزیع';
 $ec_lang['ip_main_desc']='آزمایش فشار شاخه و برآورد یکنواختی';
@@ -552,9 +550,12 @@ $ec_lang['ip_notes_3_def']='این ابزار یک فشار تامین ثابت 
 $ec_lang['ip_notes_4_def']='Christiansen, J.E. (1942). “Irrigation by sprinkling.” California Agricultural Experiment Station Bulletin 670. استانداردهای ASAE/ASABE برای طراحی آبیاری قطره‌ای از همین روش تلفات اصطکاکی چندخروجی استفاده می‌کنند.';
 $ec_lang['ip_notes_5_term']='طراحی کاربرد';
 $ec_lang['ip_notes_5_def']='نرخ کاربرد و جریان سیستم/ناحیه از دبی متوسط برآوردشده قطره‌چکان در مزرعه (q<sub>avg,field</sub> — میانگین خودِ جانبی آزمایش که با برآورد اختلاف فشار واردشده اصلاح شده) استفاده می‌کنند، نه از نرخی حدسی: PR = q<sub>avg,field</sub> / A<sub>e</sub>، که با مقدار اصلاح‌شده مدل تغذیه می‌شود. فاصله‌گذاری و تعداد جانبی/قطره‌چکان در کل سیستم، ورودی‌های جداگانه‌ای در اینجا هستند، زیرا مسیر آزمایش فقط یک شاخه بدترین‌حالت را مدل می‌کند، نه هر جانبی موجود در مزرعه را.';
+$ec_lang['irr_card_pressure_head']='فشار و یکنواختی آبیاری';
+$ec_lang['irr_card_pressure_desc']='نیم‌رخ فشار و جریان را در طول یک شاخه اصلی–جانبی–قطره‌چکان مدل‌سازی می‌کند تا یکنواختی توزیع را از روی فشار واقعی مسیر آزمایش برآورد کند، نه صرفاً بر پایه دبی کاتالوگ قطره‌چکان.';
 
 
-// --- Branched Pipe Network (bn_) ---
+
+// --- Branched Pipe Network (bpn_) --- English source ---
 $ec_lang['bpn_main_menu']='شبکه لوله انشعابی';
 $ec_lang['bpn_main_title']='ماشین‌حساب رایگان آنلاین فشار شبکه لوله انشعابی (بدون حلقه)';
 $ec_lang['bpn_main_desc']='دبی و فشار شبکه لوله انشعابی (درخت‌مانند)';

@@ -84,8 +84,8 @@ $ec_lang['ec_name_label']='保存此计算：';
 $ec_lang['ec_name_placeholder']='名称';
 $ec_lang['ec_name_hint']='将这些输入值保存到网址中以便书签、历史记录和分享';
 $ec_lang['calc_copy_link']='复制链接';
-$ec_lang['calc_copy_link_done']='已复制！';
 $ec_lang['ec_related_calcs']='相关计算器：';
+$ec_lang['calc_copy_link_done']='已复制！';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='达西-韦斯巴赫管道水头损失';
 $ec_lang['dw_main_title']='免费在线达西-韦斯巴赫管道水头损失计算器';
@@ -172,10 +172,10 @@ $ec_lang['mpf_full_flow']='满流流量，Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='流量比，Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>这是<em>无限长</em>管道内部的流量和水深。</dt><dd>使水流进入管道可能需要明显更高的上游水位。请在水深基础上至少加 1.5 倍流速水头来估算上游水位，或 <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">参见 2 分钟教程</a>，了解使用 <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>（美国联邦公路管理局提供的免费涵洞计算程序）进行标准涵洞水位计算的方法。</dd>';
 $ec_lang['mpf_sewer_ref']='<dl><dt>正在设计生活污水管道？</dt><dd>请参阅 <a target="_blank" href="/sewslope.php">最小污水管道坡度表</a>（适用于4至96英寸（100至2400毫米）管道，以m/m、mm/m和百分比给出），以及 <a target="_blank" href="/peakfact.php">极低流量高峰系数</a>研究报告。两者均仅提供英文版本。</dd></dl>';
-$ec_lang['mpf_solve_button']='求解';
-$ec_lang['mpf_solve_for_flow']='对于流量，Q =';
 $ec_lang['mpf_solver_enter_positive_q']='请输入正值目标流量 Q。';
 $ec_lang['mpf_solver_no_solution']='无解：在 y/d0 = 93.8% 处，Q 已超过管道通流能力（所选单位下 Qmax = {qmax}）。';
+$ec_lang['mpf_solve_button']='求解';
+$ec_lang['mpf_solve_for_flow']='对于流量，Q =';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='曼宁管道水头损失';
 $ec_lang['mphl_main_title']='免费在线曼宁管道水头损失计算器';
@@ -339,7 +339,6 @@ $ec_lang['odt_q_max']='最大流量，Q<sub>max</sub>';
 $ec_lang['odt_vol']='排出水量';
 $ec_lang['odt_sketch_start']='开始';
 $ec_lang['odt_sketch_end']='结束';
-// Erosion Setback and Scour Calc.
 // Contact us.
 
 // Irrigation
@@ -500,7 +499,7 @@ $ec_lang['rc_sketch_filter']          = '过滤层';
 $ec_lang['rc_sketch_top_crest_curve'] = '顶部堰顶曲线';
 $ec_lang['rc_sketch_outlet_apron']    = '出口护坦';
 $ec_lang['rc_sketch_radius']          = '半径';
-// Irrigation Pressure
+// Irrigation Pressure Calculator (branch pipe-network pressure/DU estimate). Prefix ip_.
 $ec_lang['ip_main_menu']='灌溉压力';
 $ec_lang['ip_main_title']='免费在线灌溉压力与分布均匀度计算器';
 $ec_lang['ip_main_desc']='测试毛管压力与均匀度估算';
@@ -554,7 +553,8 @@ $ec_lang['irr_card_pressure_head']='灌溉压力与均匀度';
 $ec_lang['irr_card_pressure_desc']='沿干管—毛管—滴头分支模拟压力和流量分布，根据测试路径的实际压力（而非仅凭产品目录的滴头流量额定值）估算分布均匀度。';
 
 
-// --- Branched Pipe Network (bn_) --- English source / fallback (translation pending) ---
+
+// --- Branched Pipe Network (bpn_) --- English source ---
 $ec_lang['bpn_main_menu']='分支管网';
 $ec_lang['bpn_main_title']='免费在线分支管网（无环路）压力计算器';
 $ec_lang['bpn_main_desc']='分支（树状）管网流量与压力';

@@ -85,8 +85,8 @@ $ec_lang['ec_name_label']='ይህን ስሌት አስቀምጥ:';
 $ec_lang['ec_name_placeholder']='ስም';
 $ec_lang['ec_name_hint']='እነዚህ ግቤቶች ወደ URL ያስቀምጣል በደንብ ምልክት ለመስጠት ታሪክ ማግኛ እና ማጋራት';
 $ec_lang['calc_copy_link']='ቅዳ ሊንክ';
-$ec_lang['calc_copy_link_done']='ተቀድቷል!';
 $ec_lang['ec_related_calcs']='ተዛማጅ ማስያዎች፦';
+$ec_lang['calc_copy_link_done']='ተቀድቷል!';
 // Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Darcy-Weisbach የቧንቧ ሄድ ኪሳራ';
 $ec_lang['dw_main_title']='ነፃ ኦንላይን Darcy-Weisbach የቧንቧ ሄድ ኪሳራ ካልኩሌተር';
@@ -173,10 +173,10 @@ $ec_lang['mpf_full_flow']='ሙሉ ፍሰት, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='ከሙሉ ፍሰት ጋር ያለ ጥምርታ, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>ይህ <em>ወሰን የሌለው</em> ቧንቧ ውስጥ ያለ ፍሰት እና ጥልቀት ነው።</dt><dd>ፍሰቱን ወደ ቧንቧ ለማስገባት ከፍ ያለ የላይኛው ውሃ ጥልቀት ሊያስፈልግ ይችላል። የላይኛው ውሃ ጥልቀቱን ለማግኘት ቢያንስ 1.5 እጥፍ የፍጥነት ሄድ ጨምር፣ ወይም ለተለመደ culvert የላይኛው ውሃ ስሌቶች <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">የ2 ደቂቃ ትምህርቴን ይመልከቱ</a>፣ ከዩ.ኤስ. የፌዴራል ሀይዌይ አስተዳደር የተገኘ ነጻ የ culvert ፕሮግራም የሆነውን <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a> ተጠቅሞ።</dd>';
 $ec_lang['mpf_sewer_ref']='<dl><dt>የፍሳሽ ማስወገጃ (sanitary sewer) እየነደፉ ነው?</dt><dd>ከ4 እስከ 96 ኢንች (ከ100 እስከ 2400 ሚሜ) ቧንቧ ጋር በ m/m፣ mm/m እና በመቶኛ የተሰጠውን <a target="_blank" href="/sewslope.php">አነስተኛ የፍሳሽ ማስወገጃ ቁልቁለት ሰንጠረዦችን</a>፣ እና የ<a target="_blank" href="/peakfact.php">እጅግ ዝቅተኛ ፍሰቶች ጫፍ ምክንያቶች</a> ጥናትን ይመልከቱ። ሁለቱም በእንግሊዝኛ ብቻ የቀረቡ ማጣቀሻ ሰነዶች ናቸው።</dd></dl>';
-$ec_lang['mpf_solve_button']='ፍታ';
-$ec_lang['mpf_solve_for_flow']='ለፍሰት, Q =';
 $ec_lang['mpf_solver_enter_positive_q']='አዎንታዊ ዒላማ Q ያስገቡ።';
 $ec_lang['mpf_solver_no_solution']='ውጤት የለም፦ Q ከቧንቧው አቅም ይበልጣል y/d0 = 93.8% ላይ (Qmax = {qmax} በተመረጡት አሃዶች)።';
+$ec_lang['mpf_solve_button']='ፍታ';
+$ec_lang['mpf_solve_for_flow']='ለፍሰት, Q =';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Manning የቧንቧ ሄድ ኪሳራ';
 $ec_lang['mphl_main_title']='ነፃ ኦንላይን Manning የቧንቧ ሄድ ኪሳራ ካልኩሌተር';
@@ -227,8 +227,8 @@ $ec_lang['mtc_iteration_tip']='የሻካሪነት አማራጭ (Blodgett–Bathu
 $ec_lang['mtc_note_1']='<dl><dt>አውቶማቲክ የድንጋይ መጠን እና ሻካሪነት ንድፍ ድግግሞሽ</dt><dd>የሻካሪነት አማራጭ (Blodgett–Bathurst ይመከራል) እና የንድፍ የድንጋይ መጠን አማራጭ (Isbash ይመከራል) ይምረጡ። የሚፈለገውን ፍሰት በወጥ የድንጋይ መጠን ለማግኘት ጥልቀቱን እና የድንጋይ መጠን የደህንነት ሁኔታን ያስተካክሉ። ማንኛውንም ግቤት በቀየሩ ቁጥር ካልኩሌተሩ እነዚህን ደረጃዎች ይደግማል፦ 1. ሻካሪነት ከንድፍ የድንጋይ መጠን ይሰላል። 2. የተሰላው ሻካሪነት ወደ ግቤት ሻካሪነት ይገለበጣል። 3. የቦይ ፍሰት እና የሚፈለግ የድንጋይ መጠን ይሰላሉ። 4. የንድፍ የድንጋይ መጠን ይስተካከላል። 5. በንድፍ የድንጋይ መጠን ስህተት እጅግ አነስተኛ እስኪሆን ድረስ ይደገማል።</dd><dt>መሠረታዊ ካልኩሌተር (ያለ ድግግሞሽ)</dt><dd>የሚፈልጉትን የሻካሪነት ዋጋ ያስገቡ። የንድፍ የድንጋይ መጠን ግቤት ቦታን ችላ ይበሉ።</dd></dl>';
 $ec_lang['mtc_note_2_term']='የፍጥነት ምርመራ';
 $ec_lang['mtc_note_2_def']='ከፍተኛ ፍጥነት ከሚገኝ ቁልቁለት ከፍተኛ ልዩ ሃይልን ያሳያል። ያ ሃይል በስፋፊዎች፣ ጥምዞች ወይም እንቅፋቶች ላይ በፍጥነት ሊጠፋ ይችላል። ይህ ለቦታው ምክንያታዊ መሆኑን ያረጋግጡ።';
-// Weir Flow Simple
 $ec_lang['mtc_solver_no_solution']='በእነዚህ የቦዮ ግቤቶች ለተሰጠው Q መፍትሔ አልተገኘም።';
+// Weir Flow Simple
 $ec_lang['ws_main_menu']='ቀላል ዊር ፍሰት';
 $ec_lang['ws_main_title']='ነፃ ኦንላይን ቀላል ሰፊ-ጫፍ ዊር ፍሰት ካልኩሌተር';
 $ec_lang['ws_main_desc']='ቀላል ሰፊ-ጫፍ ዊር ፍሰት ካልኩሌተር';
@@ -340,7 +340,6 @@ $ec_lang['odt_q_max']='ከፍተኛ ፍሰት, Q<sub>max</sub>';
 $ec_lang['odt_vol']='የፈሰሰ መጠን';
 $ec_lang['odt_sketch_start']='ጅምር';
 $ec_lang['odt_sketch_end']='ፍጻሜ';
-// Erosion Setback and Scour Calc.
 // Contact us.
 
 // Irrigation
@@ -501,7 +500,7 @@ $ec_lang['rc_sketch_filter']          = 'ማጣሪያ';
 $ec_lang['rc_sketch_top_crest_curve'] = 'የላይኛው ጫፍ ኩርባ';
 $ec_lang['rc_sketch_outlet_apron']    = 'የመውጫ ሰሌዳ';
 $ec_lang['rc_sketch_radius']          = 'ራዲየስ';
-// Irrigation Pressure (Prefix ip_)
+// Irrigation Pressure Calculator (branch pipe-network pressure/DU estimate). Prefix ip_.
 $ec_lang['ip_main_menu']='የመስኖ ግፊት';
 $ec_lang['ip_main_title']='ነፃ ኦንላይን የመስኖ ግፊትና የስርጭት ወጥነት ካልኩሌተር';
 $ec_lang['ip_main_desc']='የሙከራ ቅርንጫፍ ግፊትና የወጥነት ግምት';
@@ -555,7 +554,8 @@ $ec_lang['irr_card_pressure_head']='የመስኖ ግፊትና ወጥነት';
 $ec_lang['irr_card_pressure_desc']='የስርጭት ወጥነትን ከካታሎግ ኤሚተር ፍሰት መጠን ብቻ ሳይሆን ከትክክለኛው የሙከራ መንገድ ግፊት ለመገመት በዋና-ላተራል-ኤሚተር ቅርንጫፍ ላይ ያለውን የግፊትና ፍሰት መገለጫ ይቅረጹ።';
 
 
-// --- Branched Pipe Network (bn_) --- English source / fallback (translation pending) ---
+
+// --- Branched Pipe Network (bpn_) --- English source ---
 $ec_lang['bpn_main_menu']='ቅርንጫፍ ያለው የቧንቧ መረብ';
 $ec_lang['bpn_main_title']='ነፃ ኦንላይን ቅርንጫፍ ያለው የቧንቧ መረብ ግፊት ካልኩሌተር (ያለ ቀለበት)';
 $ec_lang['bpn_main_desc']='ቅርንጫፍ ያለው (ዛፍ-ቅርጽ) የቧንቧ መረብ ፍሰትና ግፊት';

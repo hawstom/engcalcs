@@ -173,10 +173,10 @@ $ec_lang['mpf_full_flow']='זרימה מלאה, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='יחס לזרימה מלאה, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>זהו הזרימה והעומק בתוך צינור <em>ארוך אינסופית</em>.</dt><dd>כדי לקבל את הזרימה לתוך הצינור ייתכן שיידרש גובה מים עליון גבוה הרבה יותר. הוסף לפחות 1.5 פעמים עומד המהירות כדי לקבל את גובה המים העליון, או <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">ראה את המדריך הקצר שלי</a> לחישובי גובה מים עליון לתעלות ניקוז סטנדרטיות באמצעות <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, תוכנת תעלות הניקוז החינמית של מנהל הדרכים הפדרלי של ארצות הברית.</dd>';
 $ec_lang['mpf_sewer_ref']='<dl><dt>מתכננים ביוב סניטרי?</dt><dd>ראה את <a target="_blank" href="/sewslope.php">טבלאות השיפוע המינימלי לביוב</a> עבור צינורות בקוטר 4 עד 96 אינץ׳ (100 עד 2400 מ״מ), נתונות במ׳/מ׳, מ״מ/מ׳ ובאחוזים, ואת מחקר <a target="_blank" href="/peakfact.php">מקדמי השיא לספיקות נמוכות מאוד</a>. שני המסמכים הם מסמכי עזר באנגלית בלבד.</dd></dl>';
-$ec_lang['mpf_solve_button']='חשב';
-$ec_lang['mpf_solve_for_flow']='עבור ספיקה, Q =';
 $ec_lang['mpf_solver_enter_positive_q']='הזן ערך Q יעד חיובי.';
 $ec_lang['mpf_solver_no_solution']='אין פתרון: Q עולה על קיבולת הצינור ב-y/d0 = 93.8% (Qmax = {qmax} ביחידות הנבחרות).';
+$ec_lang['mpf_solve_button']='חשב';
+$ec_lang['mpf_solve_for_flow']='עבור ספיקה, Q =';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='אובדן לחץ בצינור — Manning';
 $ec_lang['mphl_main_title']='מחשבון אובדן לחץ בצינור לפי Manning — חינם מקוון';
@@ -340,7 +340,6 @@ $ec_lang['odt_q_max']='זרימה מקסימלית, Q<sub>max</sub>';
 $ec_lang['odt_vol']='נפח מרוקן';
 $ec_lang['odt_sketch_start']='התחלה';
 $ec_lang['odt_sketch_end']='סיום';
-// Erosion Setback and Scour Calc.
 // Contact us.
 
 // Irrigation
@@ -501,7 +500,7 @@ $ec_lang['rc_sketch_filter']          = 'מסנן';
 $ec_lang['rc_sketch_top_crest_curve'] = 'עקומת הכתר העליון';
 $ec_lang['rc_sketch_outlet_apron']    = 'מצוע יציאה';
 $ec_lang['rc_sketch_radius']          = 'רדיוס';
-// Irrigation Pressure (ip_)
+// Irrigation Pressure Calculator (branch pipe-network pressure/DU estimate). Prefix ip_.
 $ec_lang['ip_main_menu']='לחץ השקיה';
 $ec_lang['ip_main_title']='מחשבון מקוון חינמי ללחץ השקיה & אחידות ההתפלגות';
 $ec_lang['ip_main_desc']='לחץ ענף בדיקה ואומדן אחידות';
@@ -555,7 +554,8 @@ $ec_lang['irr_card_pressure_head']='לחץ השקיה & אחידות';
 $ec_lang['irr_card_pressure_desc']='מדגמנו את פרופיל הלחץ והספיקה לאורך ענף קו ראשי-שלוחה-מטפטף כדי לאמוד את אחידות ההתפלגות מלחץ נתיב הבדיקה בפועל, לא רק מספיקת המטפטף הנקובה בקטלוג.';
 
 
-// --- Branched Pipe Network (bn_) --- English source / fallback (translation pending) ---
+
+// --- Branched Pipe Network (bpn_) --- English source ---
 $ec_lang['bpn_main_menu']='רשת צנרת מסועפת';
 $ec_lang['bpn_main_title']='מחשבון חינמי מקוון ללחץ ברשת צנרת מסועפת (ללא לולאות)';
 $ec_lang['bpn_main_desc']='ספיקה ולחץ ברשת צנרת מסועפת (עצית)';

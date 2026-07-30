@@ -1,0 +1,640 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>LPN Phase 0 canvas spike (throwaway)</title>
+<style>
+  /* height:100dvh (dynamic viewport height) after the 100% fallback: on Android Chrome, 100% cascades
+     from the layout viewport (assumes the address bar is collapsed), so #canvas's bottom:0 sits below
+     what's actually visible whenever the address bar is showing, clipping the bottom row of nodes.
+     dvh tracks the real, currently-visible viewport; unsupported browsers just keep the 100% above. */
+  html,body{margin:0;height:100%;height:100dvh;overflow:hidden;font:13px sans-serif;background:#eee}
+  #toolbar{position:fixed;top:0;left:0;right:0;z-index:10;background:#222;color:#fff;
+    padding:6px 8px;display:flex;gap:6px;align-items:center;flex-wrap:wrap;box-sizing:border-box}
+  #toolbar button,#toolbar label{background:#444;color:#fff;border:1px solid #666;
+    padding:4px 6px;border-radius:3px;cursor:pointer;font-size:12px;white-space:nowrap}
+  /* pointer-events:none on both this and #hint below: they're overlays stacked above #canvas with
+     no pointer handling of their own, so without this a click landing in their strip (top-left and
+     top-right corners of the canvas) never reaches the SVG at all — during a registration sequence
+     that reads as the wizard silently ignoring a click. */
+  #fps{position:fixed;top:4px;right:4px;z-index:11;font-family:monospace;background:#000;
+    color:#0f0;padding:2px 6px;border-radius:3px;pointer-events:none}
+  /* width/height, not right/bottom insets: the <svg> also carries width="100%" height="100%"
+     attributes (needed because SVG is a CSS replaced element and won't stretch from insets alone —
+     see the earlier fix). Combining top+bottom insets WITH an explicit height is an over-constrained
+     box per CSS2.1 10.6.4 — the browser must silently drop one, and dropping "bottom" means the
+     element's real height becomes a full 100% of body regardless of the 34px top offset, so the box
+     extends exactly 34px past the visible fold. getBoundingClientRect() still reports that oversized
+     box, so zoom-extent placed nodes inside the part that's actually clipped away. Two constraints
+     per axis (top+height, left+width), never three, avoids the conflict entirely. */
+  #canvas{position:absolute;top:34px;left:0;width:100%;height:calc(100% - 34px);touch-action:none;background:#f7f7f2}
+  .node{fill:#2a6;stroke:#144;stroke-width:1;cursor:pointer}
+  .node.reservoir{fill:#26a}
+  .link{stroke:#557;stroke-width:2;cursor:pointer}
+  .link.pump{stroke:#a52}
+  .vhandle{fill:#fff;stroke:#a52;stroke-width:1;cursor:move}
+  .lbl{font-size:11px;fill:#333;pointer-events:none;user-select:none}
+  .leader{stroke:#000;stroke-width:0.125}
+  .draglbl{cursor:move;pointer-events:all}
+  /* During a Scale/Position click sequence, regMode already suppresses real interaction (see the
+     pointerdown comment below) — but the per-element cursor: pointer/move rules still fired on
+     hover, visually implying "this is clickable/draggable" when it must be fully ignored. */
+  #canvas.regmode, #canvas.regmode *{cursor:crosshair!important}
+  /* Node-mode target step: nodes ARE the valid click target here, so forcing crosshair over them
+     removes the one affordance that actually matters. More specific than the rule above (extra
+     class), so it wins the !important tie on specificity. */
+  #canvas.regmode.regmode-node .node{cursor:pointer!important}
+  #popup{position:absolute;z-index:20;background:#fff;border:1px solid #333;padding:8px;
+    box-shadow:2px 2px 6px rgba(0,0,0,.3);display:none}
+  #popup input{width:80px}
+  @media print{
+    #toolbar,#popup,#hint,#fps,#targetPanel{display:none!important}
+    #canvas{position:static;width:100%;height:100vh}
+  }
+</style>
+</head>
+<body>
+<div id="toolbar">
+  <button id="btnGrid">200-node grid</button>
+  <button id="btnExtent">Zoom extent</button>
+  <input id="fileBackdrop" type="file" accept="image/*" style="display:none">
+  <select id="backdropMenu">
+    <option value="" selected>Backdrop...</option>
+    <option value="add">Add image</option>
+    <option value="scale" id="optScale" disabled>Scale</option>
+    <option value="position" id="optPosition" disabled>Position</option>
+  </select>
+  <button id="btnPrint">Print</button>
+</div>
+<div id="hint" style="position:fixed;top:34px;left:4px;z-index:9;font-size:11px;color:#666;pointer-events:none">
+  Double-click a link to add a bend; double-click a bend to remove it.
+</div>
+<!-- A real floating panel, not toolbar chrome — appears only for the "choose target mode" step of
+     the Position sequence. A <select> rather than radio buttons: our toolbar's `label{...}` CSS was
+     making the radios look like buttons; a <select> is a distinct native control, immune to that. -->
+<div id="targetPanel" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+  z-index:30;background:#fff;border:1px solid #333;padding:12px;box-shadow:2px 2px 8px rgba(0,0,0,.4)">
+  Target mode:
+  <select id="targetModeSelect">
+    <option value="node">Node</option>
+    <option value="free">Free point</option>
+    <option value="coords">Coords</option>
+  </select>
+  <button id="btnTargetContinue">Continue</button>
+</div>
+<span id="fps">fps: --</span>
+<svg id="canvas" width="100%" height="100%">
+  <g id="world">
+    <g id="backdropLayer"></g>
+    <g id="grid" style="display:none"></g>
+    <g id="linksLayer"></g>
+    <g id="nodesLayer"></g>
+    <g id="labelsLayer"></g>
+  </g>
+</svg>
+<div id="popup">
+  <div id="popupTitle"></div>
+  Elevation <input id="popupElev" type="number">
+  <button id="popupClose">Close</button>
+</div>
+<script>
+const NS='http://www.w3.org/2000/svg';
+const svg=document.getElementById('canvas');
+const world=document.getElementById('world');
+const linksLayer=document.getElementById('linksLayer');
+const nodesLayer=document.getElementById('nodesLayer');
+const labelsLayer=document.getElementById('labelsLayer');
+const backdropLayer=document.getElementById('backdropLayer');
+const gridLayer=document.getElementById('grid');
+
+const state={tx:60,ty:60,s:6};
+let nodes=[],links=[],labels=[];
+function el(tag,attrs,parent){
+  const e=document.createElementNS(NS,tag);
+  for(const k in attrs)e.setAttribute(k,attrs[k]);
+  if(parent)parent.appendChild(e);
+  return e;
+}
+function setTransform(){world.setAttribute('transform',`translate(${state.tx},${state.ty}) scale(${state.s})`);}
+function screenToWorld(sx,sy){const r=svg.getBoundingClientRect();
+  return {x:(sx-r.left-state.tx)/state.s, y:(sy-r.top-state.ty)/state.s};}
+
+// ---- build ~15-node, 2-loop network (3x5 grid graph) ----
+function buildNetwork(){
+  const cols=5,rows=3,dx=8,dy=8;
+  let id=0;
+  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
+    nodes.push({id:'N'+(id++),x:c*dx,y:r*dy,elev:100+r*2,reservoir:(r==0&&c==0)});
+  }
+  const at=(r,c)=>nodes[r*cols+c];
+  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
+    if(c<cols-1)links.push({id:'L'+links.length,a:at(r,c).id,b:at(r,c+1).id});
+    if(r<rows-1)links.push({id:'L'+links.length,a:at(r,c).id,b:at(r+1,c).id});
+  }
+  links.forEach(l=>l.verts=[]);
+  links[0].pump=true;
+  links[3].verts=[{x:at(0,2).x+dx*0.4,y:at(0,2).y-3}]; // one link starts pre-bent
+  labels.push({text:'خزان (reservoir)',x:3,y:-3,anchorNode:'N0'});
+  labels.push({text:'መስቀለኛ መንገድ (junction)',x:3,y:3,anchorNode:'N7'});
+}
+
+// ---- 200-node headroom grid, hidden by default ----
+let gridNodes=[];
+function buildGrid(){
+  const cols=20,rows=10,dx=6,dy=6,gl=[];
+  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++)gridNodes.push({x:100+c*dx,y:r*dy});
+  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
+    const i=r*cols+c;
+    if(c<cols-1)gl.push([i,i+1]);
+    if(r<rows-1)gl.push([i,i+cols]);
+  }
+  gl.forEach(([a,b])=>el('line',{x1:gridNodes[a].x,y1:gridNodes[a].y,x2:gridNodes[b].x,y2:gridNodes[b].y,class:'link'},gridLayer));
+  gridNodes.forEach(n=>el('circle',{cx:n.x,cy:n.y,r:0.8,class:'node'},gridLayer));
+}
+
+function nodeById(id){return nodes.find(n=>n.id===id);}
+function linkById(id){return links.find(l=>l.id===id);}
+function linkPoints(l){
+  const a=nodeById(l.a),b=nodeById(l.b);
+  return [a,...l.verts,b].map(p=>`${p.x},${p.y}`).join(' ');
+}
+// One-time DOM build. Drag updates below touch only the elements that moved —
+// the original design rebuilt the whole SVG on every pointermove, which was
+// the actual cause of the 20-45fps reported on-device, not the technology.
+const nodeEls={},linkEls={},labelEls=[],incidentLinks={},labelsByAnchor={};
+function buildLinkEls(l){
+  const line=el('polyline',{points:linkPoints(l),fill:'none',
+    class:'link'+(l.pump?' pump':''),'data-link':l.id},linksLayer);
+  const handles=l.verts.map((v,vi)=>el('circle',{cx:v.x,cy:v.y,r:0.9,class:'vhandle',
+    'data-link':l.id,'data-vidx':vi},linksLayer));
+  linkEls[l.id]={line,handles};
+}
+function buildDom(){
+  linksLayer.innerHTML='';nodesLayer.innerHTML='';labelsLayer.innerHTML='';
+  nodes.forEach(n=>incidentLinks[n.id]=[]);
+  links.forEach(l=>{
+    incidentLinks[l.a].push(l.id); incidentLinks[l.b].push(l.id);
+    buildLinkEls(l);
+  });
+  nodes.forEach(n=>{
+    const circle=el('circle',{cx:n.x,cy:n.y,r:1.6,class:'node'+(n.reservoir?' reservoir':''),
+      'data-node':n.id},nodesLayer);
+    const text=el('text',{x:n.x+2,y:n.y-2,class:'lbl',style:'font-size:2px'},nodesLayer);
+    text.textContent=n.id+' '+n.elev;
+    let tw=8; try{tw=text.getBBox().width;}catch(err){}
+    nodeEls[n.id]={circle,text,tw};
+    labelsByAnchor[n.id]=[];
+  });
+  labels.forEach((lb,i)=>{
+    const an=nodeById(lb.anchorNode);
+    const leader=el('line',{x1:an.x,y1:an.y,x2:an.x+lb.x,y2:an.y+lb.y,class:'leader'},labelsLayer);
+    // dominant-baseline:central, not the SVG default (alphabetic baseline): without it, y=py sits
+    // near the BOTTOM of the glyphs (baseline, not vertical center), so both the text and the leader
+    // endpoint that tracks it look low. This makes y=py the true vertical center.
+    const text=el('text',{x:an.x+lb.x,y:an.y+lb.y,class:'lbl draglbl',style:'font-size:3px',
+      'text-anchor':'middle','dominant-baseline':'central','data-lbl':i},labelsLayer);
+    text.textContent=lb.text;
+    let w=10; try{w=text.getBBox().width;}catch(err){}
+    labelEls[i]={leader,text,side:'right',width:w};
+    labelsByAnchor[lb.anchorNode].push(i);
+    // updateLabelGeometry (not the raw x2=an.x+lb.x above) is what actually applies the side/halfW
+    // offset — without this call, the leader drawn here pointed straight at the text's own center
+    // (text-anchor:middle's anchor point) until the first drag ever touched it, which is exactly
+    // "attaches at label middle instead of at the end" on a fresh load.
+    updateLabelGeometry(i);
+  });
+}
+function updateLinkGeometry(id){
+  linkEls[id].line.setAttribute('points',linkPoints(linkById(id)));
+}
+// The text is always centered on the drag point and moves with it continuously — it never jumps.
+// Only the leader's attachment edge (left or right side of the text box) flips — never the glyphs
+// themselves (the old text-anchor flip read as a jump). ADVERSE_FRAC is defined precisely: 0% = the
+// text's near edge exactly at the anchor's vertical line (a zero-length leader); 100% = the text's
+// FAR edge reaches that line, i.e. the whole box has crossed — Tom's hard cap, since flipping any
+// later would mean the leader has to reach clear across the text to its far edge. 0.75 sits in his
+// stated 50-100% acceptable band. (The old 0.8 coefficient was measured from a different, wrong
+// baseline — px crossing zero — and worked out to ~130% adverse under this definition, past the cap.)
+const ADVERSE_FRAC=0.75;
+function updateLabelGeometry(i){
+  const lb=labels[i],an=nodeById(lb.anchorNode),le=labelEls[i];
+  const px=an.x+lb.x, py=an.y+lb.y;
+  const halfW=le.width/2;
+  const trigger=halfW*(1-2*ADVERSE_FRAC); // negative; e.g. 0.75 => -0.5*halfW
+  if(le.side==='right' && lb.x < trigger)le.side='left';
+  else if(le.side==='left' && lb.x > -trigger)le.side='right';
+  const leaderX=le.side==='right'? px-halfW : px+halfW;
+  le.leader.setAttribute('x1',an.x);le.leader.setAttribute('y1',an.y);
+  le.leader.setAttribute('x2',leaderX);le.leader.setAttribute('y2',py);
+  le.text.setAttribute('x',px);le.text.setAttribute('y',py);
+}
+function updateNode(id){
+  const n=nodeById(id),ne=nodeEls[id];
+  ne.circle.setAttribute('cx',n.x);ne.circle.setAttribute('cy',n.y);
+  ne.text.setAttribute('x',n.x+2);ne.text.setAttribute('y',n.y-2);
+  incidentLinks[id].forEach(updateLinkGeometry);
+  labelsByAnchor[id].forEach(updateLabelGeometry);
+}
+function updateVertex(linkId,vidx){
+  const l=linkById(linkId),v=l.verts[vidx],handle=linkEls[linkId].handles[vidx];
+  handle.setAttribute('cx',v.x);handle.setAttribute('cy',v.y);
+  updateLinkGeometry(linkId);
+}
+function distToSegment(p,a,b){
+  const dx=b.x-a.x,dy=b.y-a.y,len2=dx*dx+dy*dy;
+  let t=len2?((p.x-a.x)*dx+(p.y-a.y)*dy)/len2:0;
+  t=Math.max(0,Math.min(1,t));
+  return Math.hypot(p.x-(a.x+t*dx),p.y-(a.y+t*dy));
+}
+function rebuildLink(l){
+  linkEls[l.id].line.remove();
+  linkEls[l.id].handles.forEach(h=>h.remove());
+  buildLinkEls(l);
+}
+function insertVertex(linkId,pt){
+  const l=linkById(linkId);
+  const pts=[nodeById(l.a),...l.verts,nodeById(l.b)];
+  let bestI=0,bestD=Infinity;
+  for(let i=0;i<pts.length-1;i++){
+    const d=distToSegment(pt,pts[i],pts[i+1]);
+    if(d<bestD){bestD=d;bestI=i;}
+  }
+  l.verts.splice(bestI,0,{x:pt.x,y:pt.y});
+  rebuildLink(l);
+}
+function removeVertex(linkId,vidx){
+  const l=linkById(linkId);
+  l.verts.splice(vidx,1);
+  rebuildLink(l);
+}
+
+// Fits the actual rendered extent, not just anchor points: a node's circle radius and a label's
+// full text-box (using its cached width from buildDom) both push the frame outward, so zoom-extent
+// doesn't clip a symbol or crop a line of text at the edge.
+function bbox(){
+  let minx=Infinity,maxx=-Infinity,miny=Infinity,maxy=-Infinity;
+  const inc=(x,y)=>{if(x<minx)minx=x;if(x>maxx)maxx=x;if(y<miny)miny=y;if(y>maxy)maxy=y;};
+  // The 200-node grid sits far from the network (x:100-214 vs x:0-32) — it's a rendering/pan
+  // headroom check, never meant to be viewed together with the network. Fitting both into one box
+  // forces a huge mostly-empty span between them and produces lopsided margins on whichever axis
+  // ends up not being the binding constraint. So: fit whichever is actually visible, not both.
+  if(gridLayer.style.display!=='none'){
+    const GR=1;
+    gridNodes.forEach(n=>{inc(n.x-GR,n.y-GR);inc(n.x+GR,n.y+GR);});
+    return {minx,maxx,miny,maxy};
+  }
+  const NR=1.8; // node circle radius (1.6) plus a hair
+  nodes.forEach(n=>{
+    inc(n.x-NR,n.y-NR);inc(n.x+NR,n.y+NR);
+    const tw=(nodeEls[n.id]&&nodeEls[n.id].tw)||8; // the "N0 100" id/elev text beside the circle
+    inc(n.x+2,n.y-2-2);inc(n.x+2+tw,n.y-2+0.6);
+  });
+  labels.forEach((lb,i)=>{
+    const an=nodeById(lb.anchorNode),px=an.x+lb.x,py=an.y+lb.y;
+    const le=labelEls[i]||{width:10},h=2,halfW=le.width/2; // dominant-baseline:central: symmetric around px AND py now
+    inc(px-halfW,py-h);inc(px+halfW,py+h);
+  });
+  const VR=1.1; // vertex handle radius (0.9) plus a hair — bends can poke outside the node bbox
+  links.forEach(l=>l.verts.forEach(v=>{inc(v.x-VR,v.y-VR);inc(v.x+VR,v.y+VR);}));
+  return {minx,maxx,miny,maxy};
+}
+function zoomExtent(){
+  const b=bbox(),r=svg.getBoundingClientRect(),pad=16;
+  const w=Math.max(b.maxx-b.minx,1),h=Math.max(b.maxy-b.miny,1);
+  state.s=Math.min((r.width-2*pad)/w,(r.height-2*pad)/h);
+  state.tx=pad-b.minx*state.s+ (r.width-2*pad-w*state.s)/2;
+  state.ty=pad-b.miny*state.s+ (r.height-2*pad-h*state.s)/2;
+  setTransform();
+}
+
+// ---- pointer interaction: pan, node drag, vertex drag, label drag, pinch, double-tap ----
+// All actual DOM work happens once per animation frame (the tick() loop below), never directly
+// inside a pointer event — a pointermove only records state and sets dragDirty. This decouples
+// rendering from input-event rate (which can fire far faster than the screen repaints, especially
+// on a high-poll-rate mouse), so both the drag feel and the fps readout reflect real paint frames.
+const pointers=new Map();
+let drag=null; // {type,pointerId,startX,startY,...}
+let dragDirty=false;
+let lastTap=null;
+const MIN_SCALE=0.05, MAX_SCALE=500; // guards pinch fingers converging to ~0 distance -> state.s -> 0/NaN
+function zoomAbout(sx,sy,factor){
+  const r=svg.getBoundingClientRect();
+  const lx=sx-r.left, ly=sy-r.top;
+  const wx=(lx-state.tx)/state.s, wy=(ly-state.ty)/state.s;
+  state.s=Math.min(MAX_SCALE,Math.max(MIN_SCALE,state.s*factor));
+  state.tx=lx-wx*state.s; state.ty=ly-wy*state.s;
+  setTransform();
+}
+svg.addEventListener('wheel',e=>{
+  e.preventDefault();
+  zoomAbout(e.clientX,e.clientY, e.deltaY<0?1.1:1/1.1);
+},{passive:false});
+
+// While a backdrop Scale/Position click sequence is pending, normal interaction (node drag, tap-to-
+// open-popup, pan) is suppressed entirely — otherwise a click meant for registration also starts a
+// node drag or opens that node's popup underneath it, since both listen on the same pointer events.
+// The .regmode class also forces the cursor to crosshair, overriding the per-element pointer/move
+// cursors that would otherwise (mis)signal that nodes/links/labels are still interactive.
+let regMode=false;
+let cursorNudgeTimer=null;
+function nudgeCursor(){
+  svg.classList.remove('regmode');
+  void svg.getBoundingClientRect(); // forces a real reflow/style recalc, not just a class-membership change
+  svg.classList.add('regmode');
+}
+function setRegMode(v){
+  regMode=v;
+  // Rounds 9 and 10 both targeted the MOMENT of toggling regMode — but Tom's report ("reverts to a
+  // pointer on pause") describes a reversion that develops purely from the mouse sitting still,
+  // with no code running at all. A one-time fix at toggle-time can't touch that; the class is
+  // already correctly set the whole time, and something in the browser's own cursor caching drifts
+  // back regardless. Pragmatic workaround: periodically re-assert the class while a sequence is
+  // active, rather than only once at the start.
+  if(v){
+    nudgeCursor();
+    if(!cursorNudgeTimer)cursorNudgeTimer=setInterval(nudgeCursor,200);
+  } else {
+    svg.classList.remove('regmode');
+    if(cursorNudgeTimer){clearInterval(cursorNudgeTimer); cursorNudgeTimer=null;}
+  }
+}
+function setNodeCursorAllowed(v){svg.classList.toggle('regmode-node',v);}
+svg.addEventListener('pointerdown',e=>{
+  if(regMode)return;
+  svg.setPointerCapture(e.pointerId);
+  pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(pointers.size===2){
+    const pts=[...pointers.values()];
+    drag={type:'pinch',d0:Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y),s0:state.s};
+    resetFpsWindow();
+    return;
+  }
+  const t=e.target;
+  const common={pointerId:e.pointerId,startX:e.clientX,startY:e.clientY};
+  // offX/offY: the vector from the mouse-down world point to the element's actual position,
+  // held constant for the whole drag — otherwise the element snaps to the cursor on the first
+  // move instead of staying under wherever you actually grabbed it.
+  if(t.dataset.node){
+    const n=nodeById(t.dataset.node), w0=screenToWorld(e.clientX,e.clientY);
+    drag={type:'node',id:t.dataset.node,offX:n.x-w0.x,offY:n.y-w0.y,...common};
+  } else if(t.dataset.link!==undefined && t.classList.contains('vhandle')){
+    const v=linkById(t.dataset.link).verts[+t.dataset.vidx], w0=screenToWorld(e.clientX,e.clientY);
+    drag={type:'vertex',id:t.dataset.link,vidx:+t.dataset.vidx,offX:v.x-w0.x,offY:v.y-w0.y,...common};
+  } else if(t.dataset.lbl!==undefined){
+    const lb=labels[+t.dataset.lbl], an=nodeById(lb.anchorNode), w0=screenToWorld(e.clientX,e.clientY);
+    drag={type:'label',idx:+t.dataset.lbl,offX:(an.x+lb.x)-w0.x,offY:(an.y+lb.y)-w0.y,...common};
+  } else {
+    drag={type:'pan',tx0:state.tx,ty0:state.ty,...common};
+    // double-tap detection (touch only, background)
+    if(e.pointerType==='touch'){
+      const now=Date.now();
+      if(lastTap && now-lastTap.t<300 && Math.hypot(e.clientX-lastTap.x,e.clientY-lastTap.y)<20){
+        zoomAbout(e.clientX,e.clientY,1.6); lastTap=null; drag=null;
+      } else lastTap={t:now,x:e.clientX,y:e.clientY};
+    }
+  }
+  if(drag)resetFpsWindow();
+});
+svg.addEventListener('pointermove',e=>{
+  if(!pointers.has(e.pointerId))return;
+  pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(drag)dragDirty=true;
+});
+function applyDrag(){
+  if(drag.type==='pinch'){
+    if(pointers.size!==2)return;
+    const pts=[...pointers.values()];
+    const d=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y);
+    const mx=(pts[0].x+pts[1].x)/2, my=(pts[0].y+pts[1].y)/2;
+    const factor=(d/drag.d0)*drag.s0/state.s;
+    zoomAbout(mx,my,factor);
+    return;
+  }
+  const p=pointers.get(drag.pointerId); if(!p)return;
+  if(drag.type==='pan'){
+    state.tx=drag.tx0+(p.x-drag.startX); state.ty=drag.ty0+(p.y-drag.startY);
+    setTransform();
+  } else if(drag.type==='node'){
+    const w=screenToWorld(p.x,p.y);
+    const n=nodeById(drag.id); n.x=w.x+drag.offX; n.y=w.y+drag.offY; updateNode(drag.id);
+  } else if(drag.type==='vertex'){
+    const w=screenToWorld(p.x,p.y);
+    linkById(drag.id).verts[drag.vidx]={x:w.x+drag.offX,y:w.y+drag.offY}; updateVertex(drag.id,drag.vidx);
+  } else if(drag.type==='label'){
+    const w=screenToWorld(p.x,p.y);
+    const lb=labels[drag.idx]; const an=nodeById(lb.anchorNode);
+    lb.x=(w.x+drag.offX)-an.x; lb.y=(w.y+drag.offY)-an.y; updateLabelGeometry(drag.idx);
+  }
+}
+// A tap (down+up with negligible movement) opens the node popup. Deliberately not a 'click'
+// listener: setPointerCapture(svg) retargets the synthesized click to the capturing element on
+// desktop Chrome, so e.target there is the <svg>, never the node — click never fired on PC. Mobile
+// Chrome apparently derives click from the original touch target instead, which is why the same
+// code appeared to work on a phone. Detecting the tap ourselves from movement distance sidesteps
+// that platform inconsistency entirely.
+function endPointer(e){
+  pointers.delete(e.pointerId);
+  // A pinch drag has no pointerId (it spans two), so the id check below never matches it — without
+  // this, lifting one finger of a pinch left `drag` stuck at type:'pinch' with only one pointer
+  // left, and applyDrag's pinch branch bails every frame (needs exactly 2), silently freezing that
+  // remaining finger until it's lifted and re-pressed.
+  if(drag && drag.type==='pinch' && pointers.size<2){drag=null; dragDirty=false; return;}
+  if(drag && drag.pointerId===e.pointerId){
+    if(drag.type==='node' && Math.hypot(e.clientX-drag.startX,e.clientY-drag.startY)<4){
+      openPopup(drag.id,e.clientX,e.clientY);
+    }
+    drag=null; dragDirty=false;
+  }
+}
+svg.addEventListener('pointerup',endPointer);
+svg.addEventListener('pointercancel',endPointer);
+
+// ---- arbitrary-vertex link editing: double-click a link to bend it, a bend to remove it ----
+// elementFromPoint again, not e.target, for the same setPointerCapture-retargeting reason as above.
+svg.addEventListener('dblclick',e=>{
+  if(regMode)return; // otherwise two registration clicks landing on the same link also bend it
+  const t=document.elementFromPoint(e.clientX,e.clientY);
+  if(!t||!t.dataset)return;
+  if(t.classList.contains('vhandle'))removeVertex(t.dataset.link,+t.dataset.vidx);
+  else if(t.dataset.link!==undefined)insertVertex(t.dataset.link,screenToWorld(e.clientX,e.clientY));
+});
+
+// ---- popup: click-to-popup with a field that writes back ----
+const popup=document.getElementById('popup');
+function openPopup(nodeId,sx,sy){
+  const n=nodeById(nodeId);
+  document.getElementById('popupTitle').textContent=nodeId;
+  document.getElementById('popupElev').value=n.elev;
+  popup.style.left=sx+'px'; popup.style.top=sy+'px'; popup.style.display='block';
+  document.getElementById('popupElev').onchange=ev=>{
+    n.elev=+ev.target.value;
+    const ne=nodeEls[nodeId];
+    ne.text.textContent=nodeId+' '+n.elev;
+    try{ne.tw=ne.text.getBBox().width;}catch(err){} // width changed, re-measure for bbox()
+    updateNode(nodeId);
+  };
+}
+document.getElementById('popupClose').onclick=()=>popup.style.display='none';
+
+// ---- 200-node headroom toggle ----
+document.getElementById('btnGrid').onclick=()=>{
+  gridLayer.style.display = gridLayer.style.display==='none' ? 'inline' : 'none';
+  zoomExtent();
+};
+document.getElementById('btnExtent').onclick=zoomExtent;
+document.getElementById('btnPrint').onclick=()=>window.print();
+
+// ---- registered backdrop image: separate Scale and Position steps ----
+// Position placing a translation, Scale a multiplier, kept as two independent numbers so repeating
+// either one is absolute, not relative to whatever the other has already done.
+let backdropImg=null, backdropState={tx:0,ty:0,s:1};
+function applyBackdropTransform(){
+  backdropImg.setAttribute('transform',`translate(${backdropState.tx},${backdropState.ty}) scale(${backdropState.s})`);
+}
+// Converts a world-space click back into the image's own pre-transform pixel space, so a second
+// Scale pass measures true image-pixel distance rather than a distance already stretched by a
+// previous scale factor.
+function worldToImageLocal(w){
+  return {x:(w.x-backdropState.tx)/backdropState.s, y:(w.y-backdropState.ty)/backdropState.s};
+}
+document.getElementById('fileBackdrop').onchange=e=>{
+  const f=e.target.files[0]; if(!f)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    backdropLayer.innerHTML='';
+    backdropState={tx:0,ty:0,s:1};
+    backdropImg=el('image',{href:ev.target.result,x:0,y:0,width:40,height:30},backdropLayer);
+    applyBackdropTransform();
+    document.getElementById('optScale').disabled=false;
+    document.getElementById('optPosition').disabled=false;
+  };
+  reader.readAsDataURL(f);
+};
+// One dropdown for all Backdrop actions (Tom: three loose toolbar buttons read as unrelated).
+// activeCancel is the single mutual-exclusion point: every sequence below registers a teardown
+// function here, and every entry point calls cancelActive() first. That's what makes a wizard
+// "cancel self and each other when invoked" (Tom) — re-picking the same action mid-sequence tears
+// down and restarts it, picking a DIFFERENT action tears down whatever else was running. This is
+// also almost certainly what caused the reported cursor flicker: two overlapping sequences each
+// independently flipping regMode true/false/true fights over the same .regmode class.
+let activeCancel=null;
+function cancelActive(){
+  if(activeCancel){const c=activeCancel; activeCancel=null; c();}
+}
+// Escape is the one dedicated "get me out" affordance: before this, the only way to abandon a
+// Scale/Position sequence was to re-open the dropdown and pick something else, which isn't
+// discoverable as a cancel action — a user who simply changed their mind had a canvas that looked
+// dead (regMode blanks all normal interaction) with no visible way out.
+document.addEventListener('keydown',e=>{if(e.key==='Escape')cancelActive();});
+const backdropMenu=document.getElementById('backdropMenu');
+backdropMenu.onchange=()=>{
+  const v=backdropMenu.value;
+  backdropMenu.value='';
+  if(v==='add'){cancelActive(); document.getElementById('fileBackdrop').click();}
+  else if(v==='scale')startScale();
+  else if(v==='position')startPosition();
+};
+// regMode blanks out normal interaction for the duration of a click sequence (see the pointerdown
+// comment above), so every listener here just takes whatever pointerup arrives next at face value —
+// no elementFromPoint===backdropImg gate, which is also the "ignore nodes sitting on top of the
+// image" fix: with regMode on, a click is never misread as a node tap in the first place.
+function startScale(){
+  cancelActive();
+  const clicks=[];
+  setRegMode(true);
+  alert('Click two points on the backdrop image (e.g. the two ends of a bar scale), then enter the real distance.');
+  const handler=e=>{
+    clicks.push(worldToImageLocal(screenToWorld(e.clientX,e.clientY)));
+    if(clicks.length===2){
+      svg.removeEventListener('pointerup',handler,true);
+      activeCancel=null; setRegMode(false);
+      const pxDist=Math.hypot(clicks[1].x-clicks[0].x,clicks[1].y-clicks[0].y);
+      const real=+prompt('Real-world distance between the two points (world units):','30');
+      if(real>0){backdropState.s=real/pxDist; applyBackdropTransform();}
+    }
+  };
+  svg.addEventListener('pointerup',handler,true);
+  activeCancel=()=>{svg.removeEventListener('pointerup',handler,true); setRegMode(false);};
+}
+function positionTo(refWorld,target){
+  backdropState.tx+=target.x-refWorld.x; backdropState.ty+=target.y-refWorld.y;
+  applyBackdropTransform();
+}
+// Position, per Tom's exact sequence: (a) click Backdrop > Position, (b) alert asking for a
+// reference point, (c) user clicks it, (d) alert announcing the target-mode step, (e) the
+// targetPanel (a real floating <select>, not toolbar-embedded radios) is shown for the user to pick
+// Node/Free point/Coords, (f) Continue. Each step registers its own activeCancel so an interruption
+// at any point tears down cleanly instead of leaving orphaned listeners or regMode stuck on.
+const MODE_LABEL={node:'Node',free:'Free point',coords:'Coords'};
+function startPosition(){
+  cancelActive();
+  setRegMode(true);
+  alert('Reference point: Click anywhere on the backdrop image.');
+  const handler=e=>{
+    svg.removeEventListener('pointerup',handler,true);
+    const refWorld=screenToWorld(e.clientX,e.clientY);
+    alert('Target mode: Choose target mode, then click Continue.');
+    showTargetPanel(refWorld);
+  };
+  svg.addEventListener('pointerup',handler,true);
+  activeCancel=()=>{svg.removeEventListener('pointerup',handler,true); setRegMode(false);};
+}
+function showTargetPanel(refWorld){
+  const panel=document.getElementById('targetPanel');
+  const r=backdropMenu.getBoundingClientRect(); // anchor under the Backdrop dropdown, not screen-center
+  panel.style.transform='';
+  panel.style.top=(r.bottom+4)+'px';
+  panel.style.left=r.left+'px';
+  panel.style.display='block';
+  activeCancel=()=>{panel.style.display='none'; setRegMode(false);};
+  document.getElementById('btnTargetContinue').onclick=()=>{
+    const mode=document.getElementById('targetModeSelect').value;
+    panel.style.display='none';
+    if(mode==='coords'){
+      activeCancel=null; setRegMode(false);
+      const txt=prompt(`Mode: ${MODE_LABEL[mode]}. Target X,Y (world units) for that reference point:`,'1000,1000');
+      const parts=(txt||'').split(',').map(Number);
+      if(txt && !isNaN(parts[0]) && !isNaN(parts[1]))positionTo(refWorld,{x:parts[0],y:parts[1]});
+      return;
+    }
+    // No more "now click the target" alert here (Tom): the panel + Continue already made the
+    // transition clear enough that a further blocking dialog was redundant.
+    if(mode==='node')setNodeCursorAllowed(true);
+    const handler2=e2=>{
+      if(mode==='node'){
+        const t=document.elementFromPoint(e2.clientX,e2.clientY);
+        if(!t||!t.dataset||!t.dataset.node)return; // not a node — keep waiting, don't fall back to a free point
+        svg.removeEventListener('pointerup',handler2,true);
+        activeCancel=null; setNodeCursorAllowed(false); setRegMode(false);
+        positionTo(refWorld,nodeById(t.dataset.node));
+      } else {
+        svg.removeEventListener('pointerup',handler2,true);
+        activeCancel=null; setRegMode(false);
+        positionTo(refWorld,screenToWorld(e2.clientX,e2.clientY)); // 'free': the raw point, never snapped
+      }
+    };
+    svg.addEventListener('pointerup',handler2,true);
+    activeCancel=()=>{svg.removeEventListener('pointerup',handler2,true); setNodeCursorAllowed(false); setRegMode(false);};
+  };
+}
+
+// ---- single rAF loop: applies the latest pending drag (if any), then measures real paint fps ----
+let frameCount=0,lastFpsT=performance.now(),lastFrameCount=0;
+function resetFpsWindow(){lastFpsT=performance.now();lastFrameCount=frameCount;}
+function tick(t){
+  frameCount++;
+  if(drag && dragDirty){applyDrag(); dragDirty=false;}
+  if(t-lastFpsT>500){
+    const fps=Math.round((frameCount-lastFrameCount)/((t-lastFpsT)/1000));
+    document.getElementById('fps').textContent='fps: '+fps;
+    lastFpsT=t; lastFrameCount=frameCount;
+  }
+  requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+
+buildNetwork(); buildGrid(); buildDom(); zoomExtent();
+</script>
+</body>
+</html>

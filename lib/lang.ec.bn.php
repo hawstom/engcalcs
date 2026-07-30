@@ -172,10 +172,10 @@ $ec_lang['mpf_full_flow']='পূর্ণ প্রবাহ, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='পূর্ণ প্রবাহের অনুপাত, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>এটি একটি <em>অসীম দীর্ঘ</em> পাইপের মধ্যে প্রবাহ ও গভীরতা।</dt><dd>পাইপে প্রবাহ প্রবেশ করাতে উল্লেখযোগ্যভাবে বেশি হেডওয়াটার গভীরতার প্রয়োজন হতে পারে। হেডওয়াটার গভীরতা আনুমানিক করতে বেগ হেডের অন্তত ১.৫ গুণ যোগ করুন, অথবা স্ট্যান্ডার্ড কালভার্ট হেডওয়াটার গণনার জন্য <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">আমার ২ মিনিটের টিউটোরিয়াল</a> দেখুন, যেখানে <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a> ব্যবহার করা হয়েছে, যা মার্কিন যুক্তরাষ্ট্রের ফেডারেল হাইওয়ে অ্যাডমিনিস্ট্রেশনের বিনামূল্যের কালভার্ট প্রোগ্রাম।</dd>';
 $ec_lang['mpf_sewer_ref']='<dl><dt>স্যানিটারি স্যুয়ার ডিজাইন করছেন?</dt><dd>৪ থেকে ৯৬ ইঞ্চি (১০০ থেকে ২৪০০ মিমি) পাইপের জন্য <a target="_blank" href="/sewslope.php">ন্যূনতম স্যুয়ার ঢাল সারণী</a> দেখুন, যা m/m, mm/m এবং শতাংশে দেওয়া আছে, এবং <a target="_blank" href="/peakfact.php">অতি নিম্ন প্রবাহের পিকিং ফ্যাক্টর</a> সংক্রান্ত গবেষণাটি দেখুন। উভয়ই শুধুমাত্র ইংরেজি ভাষার তথ্যসূত্র নথি।</dd></dl>';
-$ec_lang['mpf_solve_button']='সমাধান করুন';
-$ec_lang['mpf_solve_for_flow']='প্রবাহের জন্য, Q =';
 $ec_lang['mpf_solver_enter_positive_q']='একটি ধনাত্মক লক্ষ্য Q প্রবেশ করান।';
 $ec_lang['mpf_solver_no_solution']='কোনো সমাধান নেই: y/d0 = 93.8%-এ Q পাইপের ধারণক্ষমতা অতিক্রম করে (Qmax = {qmax} নির্বাচিত এককে)।';
+$ec_lang['mpf_solve_button']='সমাধান করুন';
+$ec_lang['mpf_solve_for_flow']='প্রবাহের জন্য, Q =';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='ম্যানিং পাইপ হেড লস';
 $ec_lang['mphl_main_title']='বিনামূল্যে অনলাইন ম্যানিং পাইপ হেড লস ক্যালকুলেটর';
@@ -339,7 +339,6 @@ $ec_lang['odt_q_max']='সর্বোচ্চ প্রবাহ, Q<sub>max</s
 $ec_lang['odt_vol']='নিষ্কাশিত আয়তন';
 $ec_lang['odt_sketch_start']='শুরু';
 $ec_lang['odt_sketch_end']='শেষ';
-// Erosion Setback and Scour Calc.
 // Contact us.
 
 // Irrigation
@@ -500,8 +499,7 @@ $ec_lang['rc_sketch_filter']          = 'ফিল্টার';
 $ec_lang['rc_sketch_top_crest_curve'] = 'শীর্ষ ক্রেস্ট বক্র';
 $ec_lang['rc_sketch_outlet_apron']    = 'আউটলেট এপ্রন';
 $ec_lang['rc_sketch_radius']          = 'ব্যাসার্ধ';
-
-// Irrigation Pressure
+// Irrigation Pressure Calculator (branch pipe-network pressure/DU estimate). Prefix ip_.
 $ec_lang['ip_main_menu']='সেচ চাপ';
 $ec_lang['ip_main_title']='বিনামূল্যে অনলাইন সেচ চাপ & বিতরণ সমতা ক্যালকুলেটর';
 $ec_lang['ip_main_desc']='পরীক্ষা শাখা চাপ ও সমতা অনুমান';
@@ -555,7 +553,8 @@ $ec_lang['irr_card_pressure_head']='সেচ চাপ & সমতা';
 $ec_lang['irr_card_pressure_desc']='প্রকৃত পরীক্ষা-পথ চাপ থেকে বিতরণ সমতা অনুমান করতে একটি প্রধান-ল্যাটারাল-ড্রিপার শাখা বরাবর চাপ ও প্রবাহ প্রোফাইল মডেল করুন, শুধুমাত্র ক্যাটালগ ড্রিপার প্রবাহ হার নয়।';
 
 
-// --- Branched Pipe Network (bpn_) ---
+
+// --- Branched Pipe Network (bpn_) --- English source ---
 $ec_lang['bpn_main_menu']='শাখাযুক্ত পাইপ নেটওয়ার্ক';
 $ec_lang['bpn_main_title']='বিনামূল্যে অনলাইন শাখাযুক্ত পাইপ নেটওয়ার্ক চাপ ক্যালকুলেটর (কোনো লুপ নেই)';
 $ec_lang['bpn_main_desc']='শাখাযুক্ত (বৃক্ষ-আকৃতির) পাইপ নেটওয়ার্কের প্রবাহ ও চাপ';

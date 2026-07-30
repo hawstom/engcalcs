@@ -108,3 +108,33 @@ html[lang="ur"] .ec-welcome,
 html[lang="zh"] .ec-welcome {
 	font-style: normal;
 }
+
+/* Looped Pipe Network map editor (prefix lpn_, ROADMAP Task 146). Canvas mechanics ported
+   from the validated dev/lpn-spike/canvas-spike.html -- see phase0-acceptance.md. */
+#lpn_canvas { touch-action: none; cursor: default; }
+.lpn-node { fill: #2a6; stroke: #144; stroke-width: 1; cursor: pointer; }
+.lpn-node-reservoir { fill: #26a; }
+/* stroke-width was 2 -- too wide relative to a 1.6-2.2 radius node (Tom, 2026-07-30), and it was
+   also why the arrow read as absorbed into the pipe rather than a distinct mark. */
+.lpn-link { stroke: #557; stroke-width: 0.5; cursor: pointer; }
+.lpn-link-pump { stroke: #a52; }
+/* Flow-direction arrow at each link's midpoint (Tom, 2026-07-30, matching EPANET) -- hidden
+   until a solve result exists (see updateArrow() in looped-network.js). pointer-events:none so
+   it never intercepts a click meant for the link/vertex underneath it.
+   An open chevron (unfilled polyline), not a solid triangle: a filled shape in the link's own
+   color read as absorbed into the (formerly thick) pipe stroke. Black and open protrudes above
+   and below the line instead of blending into it. */
+.lpn-arrow { fill: none; stroke: #000; stroke-width: 0.3; pointer-events: none; }
+.lpn-vhandle { fill: #fff; stroke: #a52; stroke-width: 1; cursor: move; }
+/* No font-size here -- it must be set inline in world units at each text element (see the
+   buildNodeEls/buildLabelEls comments in looped-network.js for why a screen-pixel-flavored
+   CSS font-size is wrong inside this scaled SVG group). */
+.lpn-lbl { fill: #333; pointer-events: none; user-select: none; }
+.lpn-leader { stroke: #000; stroke-width: 0.125; }
+.lpn-draglbl { cursor: move; pointer-events: all; }
+/* A leading checkmark, not just bold/outline (Tom) -- reads as a standard menu "this is
+   active" mark rather than a generic emphasis style. */
+#lpn_toolbar button[aria-pressed="true"]::before { content: "\2713 "; }
+/* Three groups (Add / Delete-Undo-Select / Zoom-Example) -- a wider gap, not a line, separates
+   them (Tom, 2026-07-30: a divider line was more than needed). */
+.lpn-toolbar-group { display: inline-flex; gap: 6px; margin-right: 14px; }

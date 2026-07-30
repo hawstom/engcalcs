@@ -144,7 +144,12 @@ function echoUnitSelect($name, $units, $indent_string)
     echo "\n$indent_string</select>";
 }
 
-function echoCalculatorForm($arrayInputs, $arrayResults, $flagFormAppend = false, $flagHideUnits = false)
+// Extracted (ROADMAP Task 174) so a page that can't use echoCalculatorForm()'s fixed two-column
+// table — one whose inputs are a per-element property sheet, e.g. a map-editor page — can still get
+// the Restore-defaults/US/SI row and working unit presets without copy-pasting suite chrome. Bundles
+// everything the row needs: the EngCalcs.unitSets/defaultUnitSet globals EngCalcs.setUnits() reads,
+// the button wiring, and the HTML itself — call this alone and unit presets just work.
+function echoUnitsRow($flagHideUnits = false, $flagHideDefaults = false)
 {
     global $ec_lang;
 ?>
@@ -157,6 +162,32 @@ EngCalcs.defaultUnitSet = '<?=EC_DEFAULT_UNIT_SET?>';
 document.addEventListener('DOMContentLoaded', function() {
 	document.getElementById('set_units_us').addEventListener('click', function() { EngCalcs.setUnits('us'); });
 	document.getElementById('set_units_si').addEventListener('click', function() { EngCalcs.setUnits('si'); });
+});
+</script>
+<div class="collapse d-print-none<?php if ($flagHideUnits === false) : ?> show<?php endif; ?>" id="set_units_row">
+	<?php // Defaults sits BEFORE the "Set units:" label, not after the unit buttons, so the
+	      // label reads as introducing only the two buttons it actually controls. Grouped the
+	      // old way, "Set units: [US][SI][Default values]" implied Defaults was a third unit
+	      // choice (Tom, 2026-07-28).
+	      // $flagHideDefaults (Task 146, 2026-07-30): the button calls EngCalcs.resetToDefaults(),
+	      // which expires a cookie -- meaningless on a page like lpn_ that doesn't use cookie-based
+	      // field persistence at all (it has its own localStorage document instead). Opt-in per
+	      // page, not a suite-wide removal: every other calculator still relies on it. ?>
+	<?php if ($flagHideDefaults === false) : ?>
+	<button type="button" id="calc_defaults" onclick="EngCalcs.resetToDefaults('<?=addslashes($ec_lang['calc_defaults_confirm'])?>')"><?=$ec_lang['calc_defaults']?></button>
+	&nbsp;
+	<?php endif; ?>
+	<?=$ec_lang['calc_set_units']?> <button type="button" id="set_units_us"><?=$ec_lang['calc_units_us']?></button><button type="button" id="set_units_si"><?=$ec_lang['calc_units_si']?></button> <a data-bs-toggle="collapse" href="#set_units_row" aria-expanded="true" aria-controls="set_units_row"><?=$ec_lang['view_hide_line']?></a>
+</div>
+<?php
+}
+
+function echoCalculatorForm($arrayInputs, $arrayResults, $flagFormAppend = false, $flagHideUnits = false)
+{
+    global $ec_lang;
+?>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
 	var pdc = document.getElementById('points_data_copy');
 	if (pdc) pdc.addEventListener('click', function() { EngCalcs.pointsDataCopy(); });
 	var pdp = document.getElementById('points_data_paste');
@@ -169,14 +200,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <form id="formInput" action="javascript:EngCalcs.submitForm()" method="post">
 	<input id="printable_title" name="printable_title" type="text" style="font-size: 2em; width: 98%" placeholder="<?=$ec_lang['template_printable_title']?>" onchange="EngCalcs.submitForm();" /><br />
 	<input id="printable_subtitle" name="printable_subtitle" type="text" style="font-size: 1.5em; width: 98%" placeholder="<?=$ec_lang['template_printable_subtitle']?>" onchange="EngCalcs.submitForm();" />
-	<div class="collapse d-print-none<?php if ($flagHideUnits === false) : ?> show<?php endif; ?>" id="set_units_row">
-		<?php // Defaults sits BEFORE the "Set units:" label, not after the unit buttons, so the
-		      // label reads as introducing only the two buttons it actually controls. Grouped the
-		      // old way, "Set units: [US][SI][Default values]" implied Defaults was a third unit
-		      // choice (Tom, 2026-07-28). ?>
-		<button type="button" id="calc_defaults" onclick="EngCalcs.resetToDefaults('<?=addslashes($ec_lang['calc_defaults_confirm'])?>')"><?=$ec_lang['calc_defaults']?></button>
-		&nbsp; <?=$ec_lang['calc_set_units']?> <button type="button" id="set_units_us"><?=$ec_lang['calc_units_us']?></button><button type="button" id="set_units_si"><?=$ec_lang['calc_units_si']?></button> <a data-bs-toggle="collapse" href="#set_units_row" aria-expanded="true" aria-controls="set_units_row"><?=$ec_lang['view_hide_line']?></a>
-	</div>
+	<?php echoUnitsRow($flagHideUnits); ?>
 	<div style="overflow-x:auto">
 	<table class="bare">
 		<tbody>

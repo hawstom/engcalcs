@@ -173,10 +173,10 @@ $ec_lang['mpf_full_flow']='Mtiririko kamili, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Uwiano wa mtiririko kamili, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>Huu ni mtiririko na kina ndani ya bomba la <em>urefu usio na kikomo</em>.</dt><dd>Kuingiza mtiririko kwenye bomba kunaweza kuhitaji kina cha maji juu ya mlango kinachozidi zaidi. Ongeza angalau mara 1.5 ya kimo cha kasi ili kupata kina hicho, au <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">tazama mafunzo yangu ya dakika 2</a> kwa mahesabu ya kawaida ya maji ya juu ya mkondo ya bomba la kupita ukitumia <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, programu huru ya bomba la kupita kutoka Utawala wa Shirikisho wa Barabara Kuu wa Marekani.</dd>';
 $ec_lang['mpf_sewer_ref']='<dl><dt>Unabuni mfereji wa maji taka?</dt><dd>Angalia <a target="_blank" href="/sewslope.php">majedwali ya mteremko wa chini kabisa wa mfereji wa maji taka</a> kwa bomba la inchi 4 hadi 96 (mm 100 hadi 2400), yaliyotolewa katika m/m, mm/m na asilimia, na utafiti wa <a target="_blank" href="/peakfact.php">vigezo vya kilele kwa mtiririko mdogo sana</a>. Nyaraka zote mbili ni za marejeleo kwa Kiingereza pekee.</dd></dl>';
-$ec_lang['mpf_solve_button']='Suluhisha';
-$ec_lang['mpf_solve_for_flow']='kwa mtiririko, Q =';
 $ec_lang['mpf_solver_enter_positive_q']='Weka Q lengwa chanya.';
 $ec_lang['mpf_solver_no_solution']='Hakuna suluhisho: Q inazidi uwezo wa bomba katika y/d0 = 93.8% (Qmax = {qmax} katika vitengo vilivyochaguliwa).';
+$ec_lang['mpf_solve_button']='Suluhisha';
+$ec_lang['mpf_solve_for_flow']='kwa mtiririko, Q =';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Upotevu wa Kimo cha Bomba la Manning';
 $ec_lang['mphl_main_title']='Kikokotoo cha Bure Mtandaoni cha Upotevu wa Kimo cha Bomba la Manning';
@@ -340,7 +340,6 @@ $ec_lang['odt_q_max']='Mtiririko wa juu, Q<sub>max</sub>';
 $ec_lang['odt_vol']='Kiasi kilichomwagwa';
 $ec_lang['odt_sketch_start']='Mwanzo';
 $ec_lang['odt_sketch_end']='Mwisho';
-// Erosion Setback and Scour Calc.
 // Contact us.
 
 // Irrigation
@@ -501,8 +500,7 @@ $ec_lang['rc_sketch_filter']='Kichujio';
 $ec_lang['rc_sketch_top_crest_curve']='Upinde wa Kilele cha Juu';
 $ec_lang['rc_sketch_outlet_apron']='Sakafu ya Kutokea';
 $ec_lang['rc_sketch_radius']='radiasi';
-
-// Irrigation Pressure. Prefix ip_.
+// Irrigation Pressure Calculator (branch pipe-network pressure/DU estimate). Prefix ip_.
 $ec_lang['ip_main_menu']='Shinikizo la Umwagiliaji';
 $ec_lang['ip_main_title']='Kikokotoo cha Bure cha Mtandaoni cha Shinikizo la Umwagiliaji & Usawa wa Usambazaji';
 $ec_lang['ip_main_desc']='Shinikizo la Tawi la Jaribio na Ukadiriaji wa Usawa wa Usambazaji';
@@ -556,7 +554,8 @@ $ec_lang['irr_card_pressure_head']='Shinikizo la Umwagiliaji & Usawa wa Usambaza
 $ec_lang['irr_card_pressure_desc']='Iga wasifu wa shinikizo na mtiririko kwenye tawi la bomba kuu-tawi-kituo cha maji ili kukadiria usawa wa usambazaji kutoka shinikizo halisi la njia ya jaribio, si tu kiwango cha mtiririko cha katalogi ya kituo cha maji.';
 
 
-// --- Branched Pipe Network (bn_) ---
+
+// --- Branched Pipe Network (bpn_) --- English source ---
 $ec_lang['bpn_main_menu']='Mtandao wa Bomba wenye Matawi';
 $ec_lang['bpn_main_title']='Kikokotoo cha Bure Mtandaoni cha Shinikizo la Mtandao wa Bomba wenye Matawi (Bila Mizunguko)';
 $ec_lang['bpn_main_desc']='Mtiririko na Shinikizo la Mtandao wa Bomba wenye Matawi (Mti)';

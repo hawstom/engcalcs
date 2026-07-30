@@ -169,32 +169,51 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   *closing a parent*, because blocks in `## Completed` are never re-scanned. This parent is open and
   gets scanned every pass, so extraction bought nothing and only scattered the design.)
 
-  - **Phase 0 — canvas spike (1 day, throwaway).** Settles the technology empirically. One standalone
-    HTML file, no PHP, no lang keys, no solver, no persistence: a ~15-node two-loop network built
-    from real SVG DOM nodes (`createElementNS`, **not** the `innerHTML` string-rebuild every sketch
-    in the suite uses today), plus a generated 200-node grid behind a toggle as a headroom check.
-    Must demonstrate pan, wheel zoom about the cursor, pinch, double-tap zoom, click-to-popup with a
-    field that writes back, node drag with incident links following, link vertex handles,
-    zoom-extent, a draggable label with a leader, **one Arabic and one Amharic label**, a
-    **registered background image** (see the backdrop note below), and a print preview.
-    **Acceptance criteria are written down before starting, and the fps gate is at target scale, not
-    headroom scale:** drag visually smooth at ~20 nodes **on a real mid-range phone**; the 200-node
-    grid degrades gracefully rather than freezing; pinch works on iOS Safari and Android Chrome
-    without fighting page scroll; a 2 px link is finger-tappable; Arabic shapes and orders correctly
-    and neither label mirrors the network geometry; print is crisp vector; ≤300 LOC. Fail any one →
-    run the identical spike on Leaflet + `CRS.Simple` (half a day) and compare artifacts. **Commit to
-    a technology only then.** Expectation-setter: hit-testing is the part people assume is hard and
-    is the part SVG does natively; the real architectural change — giving up the `innerHTML` rebuild
-    — is forced by *every* candidate, so it is not a differentiator.
-  - **Phase 0.5 — headless GGA solver (2–3 days).** `js/lpn-solver.js` plus a plain HTML harness over
-    hardcoded networks: a two-loop textbook case, one with a pump, one with an emitter, a
-    disconnected one, a zero-demand one. **Validate against EPANET's own published Net1 and Net2
-    results** — a network solver that is subtly wrong is worse than none, and this suite's
-    credibility is its only real asset. Easy-to-miss design points: the **zero-flow linearization is
-    mandatory, not a corner case** (a freshly drawn network sits at Q = 0 on iteration 1, where
-    `1/p → ∞` with the Hazen-Williams exponent — cut over below `Qmin = 1e-8 m³/s`); a **0.6
-    relaxation factor** once late iterations stall, without which pumps and emitters oscillate
-    forever; and **structural diagnostics that run before the solve**, never by watching it fail.
+  - **Phase 0 — canvas spike. DONE 2026-07-29, on branch `lpn-solver`.** `dev/lpn-spike/canvas-spike.html`
+    (standalone, no PHP/lang keys/solver/persistence) plus the full round-by-round record in
+    `dev/lpn-spike/phase0-acceptance.md`. Settled the technology empirically: **SVG DOM
+    (`createElementNS`, not `innerHTML` rebuilds) is the chosen technology** — 12 rounds of on-device
+    iteration with Tom plus an independent Opus subagent review found no SVG-blocking issue, so the
+    Leaflet + `CRS.Simple` fallback was never triggered. Demonstrated: pan, wheel zoom about the
+    cursor, pinch, double-tap zoom, click-to-popup with a writeback field, node/vertex/label drag,
+    **arbitrary-vertex link editing** (not capped at one — see the Phase 1 note below), zoom-extent
+    fitted to rendered extent (not bare coordinates), a draggable label with a leader (Arabic and
+    Amharic shape and order correctly), a two-point-registered backdrop image with separate Scale/
+    Position steps, a 200-node headroom grid, and print output. On-device phone pass (drag
+    smoothness, pinch vs. page scroll, tap-target size) confirmed 2026-07-29. Real bugs found and
+    fixed along the way — several are suite-relevant beyond this spike: SVG is a CSS replaced
+    element and won't stretch from `position:absolute` insets alone (needs `width`/`height`
+    attributes); combining top+bottom insets *with* an explicit height over-constrains the box per
+    CSS2.1 §10.6.4 and silently drops one constraint; `setPointerCapture` retargets the synthesized
+    `click` event to the capturing element on desktop Chrome, breaking naive tap-detection.
+  - **Phase 0.5 — headless GGA solver. DONE 2026-07-29, on branch `lpn-solver`.**
+    `js/lpn-solver.js` + `dev/lpn-spike/`; `node dev/lpn-spike/validate.js`, 46 checks, no network
+    access or `node_modules` needed.
+    **The reference is the real EPANET engine, not published tables:** `epanet-js` (EPANET's C code
+    as WASM) runs EPA's Net1/Net2/Net3 and its output is committed. Result: heads within 0.0002 ft,
+    flows within 0.004 gpm, continuity and energy residuals at machine precision, closed-form cases
+    exact to 1e−12, and the head-loss kernel exact to 1e−12 against `branched-network.js`.
+    **Three things this task said would be true, that the spike proved wrong** — recorded because
+    they are the entire justification for spiking before building:
+    1. *"Linearize below a flow cutoff Qmin."* Not sufficient, and not what EPANET does. A flow
+       cutoff leaves the gradient unbounded just above it, so a near-zero-flow link gets an enormous
+       conductance. Net3's pipe 333 oscillated between 0 and −2.28 gpm forever. The guard must floor
+       **dh/dQ**, not |Q|.
+    2. *"A 0.6 relaxation factor, without which pumps and emitters oscillate forever."* No such
+       oscillation exists once the gradient floor is right — everything converges in 5–16 iterations
+       with no damping. And the relaxation as specified was itself a bug: multiplying every flow by
+       0.6 is arbitrary shrinkage, not under-relaxation, and would have destroyed the exact
+       continuity the GGA update guarantees.
+    3. *"200 nodes is ~2.7 M flops, a few milliseconds."* Off by an order of magnitude — it forgot
+       the iteration count. Measured: 0.4 ms at the 21-node target, 30 ms at 201 nodes. The
+       conclusion (dense Cholesky, sparse machinery cut) survives; the arithmetic did not.
+    **Two requirements nobody anticipated**, both found by cases that only exist because the harness
+    was written first: convergence must be normalised by total **demand** rather than total flow, and
+    **stagnation detection** is mandatory — without it a large network burns 100 iterations and
+    330 ms re-deriving the answer it had at iteration 6, on every keystroke.
+    Also confirmed: **structural diagnostics run before the solve** (no fixed head / unreachable
+    node named by id / node isolated behind a closed link), and this suite's Hazen-Williams differs
+    from EPANET's by ~0.012%, so the solver carries both constant sets and defaults to ours.
   - **Phases 1–4** are in the scope doc.
 
   **Backdrop: the network is drawn over a background, and the background is usually not a map (Tom,
@@ -207,6 +226,16 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   maps (Task 145) then become one more backdrop type that happens to arrive pre-registered**, not
   the foundation. Design consequence for Phase 0: the coordinate seam must be able to place and
   scale a backdrop image from day one, which is why the spike now includes one.
+  **The canonical case is a screenshot with a bar scale on it** (Tom, 2026-07-29) — often a Google
+  Maps screenshot, which is a completely different thing from a Google Maps integration: a plain
+  image the user already has, no API, no key, no terms of service. It is also *why* two-point
+  registration beats a scale-factor field: the user clicks the two ends of the bar scale and types
+  what it says, which needs no knowledge of projections or units-per-pixel and works the same for a
+  scanned plan, a CAD export, or a phone photo of a drawing on a wall. Make that the spike's
+  backdrop acceptance test. A blank project carries placeholder text across the canvas — "Start by
+  adding a background image using the toolbar" — and **what a new project starts with otherwise
+  (empty, or a worked example as every other calculator does) is deliberately left open** until the
+  editor exists to look at.
 - 11|145| **Google Maps elevation/length helper — MOVED from `bpn_` to `lpn_` (Tom, 2026-07-28).**
   Was "Google Maps elevation/length helper for `bpn_`", extracted from Task 137 "Phase 2" on
   2026-07-27. Tom's reason for the move, recorded because it is a genuine prioritization signal and
