@@ -398,12 +398,15 @@ adding a background image using the toolbar"* — which does three jobs at once:
 first, it teaches that this calculator is backdrop-first rather than form-first, and it removes the
 "is this broken?" moment that an empty drawing surface otherwise produces.
 
-**Open question, deliberately not decided yet: what a new project actually starts with.** The options
-are a genuinely empty canvas, a worked example network (the rest of the suite's convention — every
-other calculator opens on a passing design, and `CLAUDE.md` makes that a rule), or an empty canvas
-plus the prompt above. These pull in opposite directions: the suite-wide rule argues for a worked
-example, while a map page's whole premise is that the user brings their own site. Decide it when the
-editor exists and can be looked at, not on paper.
+**Decided (Tom, 2026-07-30): a genuinely empty canvas, with a hint (`lpn_empty_hint`) pointing at
+both options** — "Add a backdrop or a reservoir (or other element) to start, or use 'Draw example
+network.'" This splits the difference the three options below couldn't on paper: it doesn't force a
+worked example onto a page whose whole premise is the user's own site (a map-first tool imposing a
+stranger's network read as backwards), but "Draw example network" is one click away for anyone who
+wants the suite's usual passing-design starting point. Confirmed working well once the backdrop
+feature made the choice concrete rather than theoretical. (Original question, for the record: a
+genuinely empty canvas, a worked example network per the rest of the suite's convention, or an empty
+canvas plus the prompt — decide once the editor exists and can be looked at, not on paper.)
 
 ### Phase 4 (Task 145): tiles, and the two traps they bring
 
