@@ -177,7 +177,10 @@ document.addEventListener('DOMContentLoaded', function() {
 	<button type="button" id="calc_defaults" onclick="EngCalcs.resetToDefaults('<?=addslashes($ec_lang['calc_defaults_confirm'])?>')"><?=$ec_lang['calc_defaults']?></button>
 	&nbsp;
 	<?php endif; ?>
-	<?=$ec_lang['calc_set_units']?> <button type="button" id="set_units_us"><?=$ec_lang['calc_units_us']?></button><button type="button" id="set_units_si"><?=$ec_lang['calc_units_si']?></button> <a data-bs-toggle="collapse" href="#set_units_row" aria-expanded="true" aria-controls="set_units_row"><?=$ec_lang['view_hide_line']?></a>
+	<?php // SI first, US second (Tom, 2026-07-30): the suite serves a worldwide audience, and the
+	      // vast majority of it is metric -- leading with the one system that's a minority worldwide
+	      // reads as US-centric. Button IDs/behavior are unchanged, only the visual order. ?>
+	<?=$ec_lang['calc_set_units']?> <button type="button" id="set_units_si"><?=$ec_lang['calc_units_si']?></button><button type="button" id="set_units_us"><?=$ec_lang['calc_units_us']?></button> <a data-bs-toggle="collapse" href="#set_units_row" aria-expanded="true" aria-controls="set_units_row"><?=$ec_lang['view_hide_line']?></a>
 </div>
 <?php
 }

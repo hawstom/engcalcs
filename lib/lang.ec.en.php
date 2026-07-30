@@ -1123,7 +1123,7 @@ $ec_lang['bpn_supply1_h']='Static supply head';
 $ec_lang['lpn_main_menu']='Looped Pipe Network (Map Interface) — PREVIEW';
 $ec_lang['lpn_main_title']='PREVIEW: Free Online Looped Pipe Network Calculator with Map Interface';
 $ec_lang['lpn_main_desc']='PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map';
-$ec_lang['lpn_preview_banner']='PREVIEW — This calculator is new and actively changing. See Notes below for current limits. Comments and suggestions are always welcome.';
+$ec_lang['lpn_preview_banner']='PREVIEW — This calculator is new and actively changing, and is English only for now. See Notes below for current limits. Comments and suggestions are always welcome.';
 $ec_lang['lpn_tool_select']='Select';
 $ec_lang['lpn_tool_add_junction']='Junction';
 $ec_lang['lpn_tool_add_reservoir']='Reservoir';
@@ -1172,9 +1172,29 @@ $ec_lang['lpn_diag_not_converged']='The solver did not converge. Check for unrea
 $ec_lang['lpn_field_roughness']='Roughness';
 $ec_lang['lpn_field_length']='Length';
 $ec_lang['lpn_pump_notice']='Pump curve entry is not yet implemented.';
+// Persistent mode-hint line (Task 146.01 follow-up, 2026-07-30): whole sentences, not composed
+// from a "Mode:" prefix + the tool's own label, per CLAUDE.md's concept-level label reuse rule --
+// word order/grammar around a mode name varies by language, so each mode gets its own full string.
+$ec_lang['lpn_mode_select']='Mode: Select. Click an element to view or edit it; drag to move nodes, vertices, or labels.';
+$ec_lang['lpn_mode_delete']='Mode: Delete. Click an element to remove it.';
+$ec_lang['lpn_mode_add_junction']='Mode: Add Junction. Change to Select mode to edit or move elements and labels.';
+$ec_lang['lpn_mode_add_reservoir']='Mode: Add Reservoir. Change to Select mode to edit or move elements and labels.';
+$ec_lang['lpn_mode_add_pipe']='Mode: Add Pipe. Click a node, then another node, to connect them. Use Select mode to edit or move elements and labels.';
+$ec_lang['lpn_mode_add_pump']='Mode: Add Pump. Click a node, then another node, to connect them. Use Select mode to edit or move elements and labels.';
+// Text was wrong (Tom, 2026-07-30): "click a node first to anchor it there" implied a two-click
+// sequence (click node, THEN click to place), but placing near a node anchors it in that ONE click.
+$ec_lang['lpn_mode_add_text']='Mode: Add Text. Anchor to a node by placing near it. Use Select mode to edit or move elements and labels.';
+// Toolbar button tips (Tom, 2026-07-30): hover/tap explanations on the two buttons a new user is
+// most likely to miss the point of -- that Select is what you use to edit/move things, and that a
+// label itself can be dragged. Both economize on translation for later, per CLAUDE.md's tip-only
+// whole-label-wrap convention -- the button itself is already the click target (no separate "?"
+// glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
+$ec_lang['lpn_tip_select']='To edit and to move or drag.';
+$ec_lang['lpn_tip_labels_draggable']='Labels are draggable. Double-click to reset position.';
 $ec_lang['lpn_field_auto']='Auto';
 $ec_lang['lpn_field_x']='X';
 $ec_lang['lpn_field_y']='Y';
+$ec_lang['lpn_field_text_size']='Size ×';
 $ec_lang['lpn_tool_labels']='Labels';
 $ec_lang['lpn_labels_heading_node']='Node labels';
 $ec_lang['lpn_labels_heading_link']='Link labels';
@@ -1204,6 +1224,8 @@ $ec_lang['lpn_settings_text_size']='Text size';
 $ec_lang['lpn_settings_text_size_map']='Map units';
 $ec_lang['lpn_settings_text_size_screen']='Screen pixels';
 $ec_lang['lpn_settings_text_size_units']='Text size units';
+$ec_lang['lpn_settings_map_height']='Map height';
+$ec_lang['lpn_settings_map_height_px']='Map height (px)';
 $ec_lang['lpn_settings_legend_position']='Legend position';
 $ec_lang['lpn_settings_legend_top_left']='Top left';
 $ec_lang['lpn_settings_legend_top_right']='Top right';

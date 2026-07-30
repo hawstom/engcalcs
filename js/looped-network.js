@@ -20,7 +20,7 @@ var EngCalcs = EngCalcs || {};
 	'use strict';
 
 	var NS = 'http://www.w3.org/2000/svg';
-	var svg, world, backdropLayer, gridLayer, linksLayer, nodesLayer, labelsLayer;
+	var svg, world, backdropLayer, gridLayer, linksLayer, nodesLayer, maskLayer, labelsLayer;
 	var state = { tx: 0, ty: 0, s: 1 };
 	// Text size (Task 146 gear/settings panel, 2026-07-30): user-configurable via `settings.textSize`/
 	// `settings.textSizeUnits` (see defaultSettings() below), shared by a node's ID/pressure label,
@@ -31,10 +31,197 @@ var EngCalcs = EngCalcs || {};
 	// regardless of zoom -- achieved by dividing the world-unit size by the current scale, so it must
 	// be recomputed (see refreshFontSizes() below) whenever state.s changes, not just once at build
 	// time like every other geometry in this file.
-	function effectiveFontSize() {
-		return settings.textSizeUnits === 'screen' ? settings.textSize / state.s : settings.textSize;
+	// mult (Task 146.03): a Text label's own per-label size multiplier (lb.sizeMult, default 1),
+	// stacked on top of the shared settings.textSize -- node/link labels never pass one, so they
+	// are unaffected.
+	function effectiveFontSize(mult) {
+		var base = settings.textSizeUnits === 'screen' ? settings.textSize / state.s : settings.textSize;
+		return base * (mult || 1);
 	}
 	function effectiveLineHeight() { return effectiveFontSize() * 1.2; }
+
+	// ---- Task 146.01: draggable node/link data labels (leader lines + collision avoidance + mask) ----
+	// A node/link's data label sits at a small fixed offset from its anchor (id/elev/demand/... text
+	// beside the symbol) unless the user drags it -- n.lx/n.ly (or l.lx/l.ly) then record that as an
+	// explicit offset, persisted with the element like any other property. undefined means "still at
+	// the default" so an old saved network (no lx/ly at all) renders identically to before this task.
+	var DEFAULT_LABEL_OFFSET = { x: 2, y: -2 };
+	// Past this world-unit distance between the anchor point and the label's rendered position (drag
+	// OR automatic collision-avoidance nudge -- whichever pushed it there), a leader line is drawn so
+	// the label still reads as belonging to its anchor. Comfortably above the default offset's own
+	// resting distance (hypot(2,2) ~= 2.8) so an untouched label never shows one.
+	var LABEL_LEADER_THRESHOLD = 4;
+	function nodeLabelBase(n) {
+		return { x: n.x + (n.lx !== undefined ? n.lx : DEFAULT_LABEL_OFFSET.x),
+			y: n.y + (n.ly !== undefined ? n.ly : DEFAULT_LABEL_OFFSET.y) };
+	}
+	function linkLabelMid(l) {
+		var segCount = l.verts.length + 1, midIdx = Math.floor(segCount / 2);
+		return segmentMidpoints(l)[midIdx];
+	}
+	function linkLabelBase(l) {
+		var mid = linkLabelMid(l);
+		return { x: mid.x + (l.lx !== undefined ? l.lx : DEFAULT_LABEL_OFFSET.x),
+			y: mid.y + (l.ly !== undefined ? l.ly : DEFAULT_LABEL_OFFSET.y) };
+	}
+	// Final rendered offset from the anchor = the persisted drag offset (or default) PLUS this
+	// element's current collision-avoidance nudge (0,0 for a manually-dragged label -- see
+	// runLabelCollisionAvoidance() below, which only ever nudges labels still at their default).
+	function nodeLabelPos(n) {
+		var base = nodeLabelBase(n), ne = nodeEls[n.id], nudge = (ne && ne.nudge) || { x: 0, y: 0 };
+		return { x: base.x + nudge.x, y: base.y + nudge.y };
+	}
+	function linkLabelPos(l) {
+		var base = linkLabelBase(l), le = linkEls[l.id], nudge = (le && le.nudge) || { x: 0, y: 0 };
+		return { x: base.x + nudge.x, y: base.y + nudge.y };
+	}
+	// Shared leader-line show/hide + endpoint math for a node or link data label -- anchor is the
+	// node center or the link's mid-segment point; pos is the label's final rendered position
+	// (base offset + nudge). `holder` is nodeEls[id]/linkEls[id] (needs .leader, .tw, and a
+	// persistent .side to track across calls -- same role as a Text label's le.side).
+	// Same side-flip hysteresis as a Text label's leader (updateLabelGeometry() below, ADVERSE_FRAC):
+	// a data label is left-anchored (box is [pos.x, pos.x+tw], not centered like a Text label), so
+	// the "offset from anchor" this compares against trigger is the BOX CENTER's offset
+	// (pos.x + tw/2 - anchor.x) -- the exact analog of a Text label's lb.x, which IS its box
+	// center's offset since Text is text-anchor:middle. Tom, 2026-07-30: "leaders need to jump
+	// following the same rule as the Text leaders" -- without this a data label dragged to the left
+	// of its anchor drew its leader to the label's LEFT edge, running the line straight through the
+	// text instead of attaching to the near (right) edge.
+	function updateDataLeader(holder, anchor, pos) {
+		if (!holder.leader) { return; }
+		if (holder.empty) { holder.leader.style.display = 'none'; return; }
+		var d = Math.hypot(pos.x - anchor.x, pos.y - anchor.y);
+		if (d <= LABEL_LEADER_THRESHOLD) { holder.leader.style.display = 'none'; return; }
+		var halfW = holder.tw / 2, boxCenterX = pos.x + halfW, offset = boxCenterX - anchor.x,
+			trigger = halfW * (1 - 2 * ADVERSE_FRAC);
+		if (!holder.side) { holder.side = 'right'; }
+		if (holder.side === 'right' && offset < trigger) { holder.side = 'left'; }
+		else if (holder.side === 'left' && offset > -trigger) { holder.side = 'right'; }
+		var leaderX = holder.side === 'right' ? pos.x : pos.x + holder.tw;
+		holder.leader.style.display = '';
+		holder.leader.setAttribute('x1', anchor.x); holder.leader.setAttribute('y1', anchor.y);
+		holder.leader.setAttribute('x2', leaderX); holder.leader.setAttribute('y2', pos.y);
+	}
+	// Approximate vertical box of a left-anchored, top-down multi-line <text> (node/link labels):
+	// no exact ascent/descent metrics available cross-browser without layout, so this uses a
+	// fraction of font size that reads right for the suite's actual label content (short numbers/
+	// letters, no descenders like "g"/"y"). Good enough for a mask rect and collision boxes; not
+	// meant to be pixel-exact.
+	function dataLabelBoxHeight(lineCount) {
+		var fs = effectiveFontSize();
+		return fs * 1.1 + Math.max(0, lineCount - 1) * effectiveLineHeight();
+	}
+	// Background mask (Task 146.01): a plain rect behind a label's text so it stays legible over a
+	// backdrop image, colored fill, or another element -- sized from the SAME w/h the label's own
+	// geometry uses (dataLabelBoxHeight() above for a node/link label, effectiveFontSize()*1.2 for a
+	// single-line Text label), so it never drifts out of sync with what it's supposed to cover.
+	// hAlign/vAlign describe what x/y MEAN for the label being masked, matching each label type's own
+	// text-anchor/dominant-baseline: 'start'/'top' for a node or link label (x = left edge, y = first
+	// line's baseline); 'middle'/'middle' for a Text label (x = center, y = vertical center).
+	function positionMaskRect(mask, x, y, w, h, hAlign, vAlign) {
+		var pad = 0.4, fs = effectiveFontSize();
+		var left = hAlign === 'middle' ? x - w / 2 : x;
+		var top = vAlign === 'middle' ? y - h / 2 : y - fs * 0.85;
+		mask.setAttribute('x', left - pad);
+		mask.setAttribute('y', top - pad);
+		mask.setAttribute('width', w + 2 * pad);
+		mask.setAttribute('height', h + 2 * pad);
+	}
+	// Final per-frame layout of one node's data label -- text position, its mask, and its leader (if
+	// dragged/nudged past LABEL_LEADER_THRESHOLD). Called from buildNodeEls() (first layout),
+	// updateNode() (node moved), and refreshLabelText() (after every collision-avoidance pass, since
+	// a nudge or a toggled field changing tw/lineCount both move this label).
+	// A label with no fields toggled on (or a reservoir/pump with only type-inapplicable fields
+	// toggled) still gets an empty placeholder line pushed in refreshLabelText() so getBBox() never
+	// throws -- but rendering a mask/leader for genuinely empty content produced a small floating
+	// white "ghost" box near the node with nothing in it (Tom, 2026-07-30). ne.empty/le.empty (set
+	// in refreshLabelText(), BEFORE the placeholder is pushed) skips both here.
+	function hideMask(mask) { mask.setAttribute('width', 0); mask.setAttribute('height', 0); }
+	function layoutNodeLabel(id) {
+		var n = nodeById(id), ne = nodeEls[id]; if (!ne) { return; }
+		var pos = nodeLabelPos(n);
+		repositionMultilineText(ne.text, pos.x, pos.y);
+		if (ne.empty) { hideMask(ne.mask); } else { positionMaskRect(ne.mask, pos.x, pos.y, ne.tw, dataLabelBoxHeight(ne.lineCount), 'start', 'top'); }
+		updateDataLeader(ne, { x: n.x, y: n.y }, pos);
+	}
+	// Same as layoutNodeLabel() above, for a link's data label -- anchor is the link's own mid-
+	// segment point (linkLabelMid()), which itself moves whenever a vertex/endpoint drags.
+	function layoutLinkLabel(id) {
+		var l = linkById(id), le = linkEls[id]; if (!le) { return; }
+		var pos = linkLabelPos(l), mid = linkLabelMid(l);
+		repositionMultilineText(le.text, pos.x, pos.y);
+		if (le.empty) { hideMask(le.mask); } else { positionMaskRect(le.mask, pos.x, pos.y, le.tw, dataLabelBoxHeight(le.lineCount), 'start', 'top'); }
+		updateDataLeader(le, { x: mid.x, y: mid.y }, pos);
+	}
+	// Double-click-to-reset (Tom, 2026-07-30): clears a manually-dragged label's offset entirely
+	// (n.lx/n.ly back to undefined), so it falls back to DEFAULT_LABEL_OFFSET and the leader --
+	// which only shows past LABEL_LEADER_THRESHOLD -- disappears with it. A discrete, deliberate
+	// action like Delete/Add, so it gets its own undo snapshot (a drag itself does not -- see the
+	// comment on the 'label' drag case in applyDrag()).
+	function resetNodeLabelHome(id) {
+		var n = nodeById(id); if (!n || n.lx === undefined) { return; }
+		saveUndoSnapshot();
+		delete n.lx; delete n.ly;
+		layoutNodeLabel(id);
+		scheduleSolve();
+	}
+	function resetLinkLabelHome(id) {
+		var l = linkById(id); if (!l || l.lx === undefined) { return; }
+		saveUndoSnapshot();
+		delete l.lx; delete l.ly;
+		layoutLinkLabel(id);
+		scheduleSolve();
+	}
+	// Automatic conflict avoidance (Task 146.01): nudges any two overlapping node/link data labels
+	// apart along whichever axis has the smaller overlap, a few iterations toward a stable layout.
+	// A MANUALLY dragged label (n.lx/l.lx defined) never moves -- it still blocks others (its box is
+	// still checked), but only an auto-placed label absorbs the push, so a deliberate drag is never
+	// silently undone by this pass. Nudges are transient (recomputed every refreshLabelText() call,
+	// never written into n.lx/l.ly), so they are not undo-tracked or persisted -- only an actual
+	// user drag is.
+	function runLabelCollisionAvoidance() {
+		var fs = effectiveFontSize(), boxes = [], i, j, iter, moved;
+		doc.nodes.forEach(function (n) {
+			var ne = nodeEls[n.id]; if (!ne) { return; }
+			var manual = n.lx !== undefined;
+			if (manual) { ne.nudge = { x: 0, y: 0 }; } else if (!ne.nudge) { ne.nudge = { x: 0, y: 0 }; }
+			if (ne.empty) { return; } // nothing rendered -- no box to collide with
+			boxes.push({ ref: ne, base: nodeLabelBase(n), w: ne.tw, h: dataLabelBoxHeight(ne.lineCount), manual: manual });
+		});
+		doc.links.forEach(function (l) {
+			var le = linkEls[l.id]; if (!le) { return; }
+			var manual = l.lx !== undefined;
+			if (manual) { le.nudge = { x: 0, y: 0 }; } else if (!le.nudge) { le.nudge = { x: 0, y: 0 }; }
+			if (le.empty) { return; }
+			boxes.push({ ref: le, base: linkLabelBase(l), w: le.tw, h: dataLabelBoxHeight(le.lineCount), manual: manual });
+		});
+		for (iter = 0; iter < 4; iter++) {
+			moved = false;
+			for (i = 0; i < boxes.length; i++) {
+				for (j = i + 1; j < boxes.length; j++) {
+					var A = boxes[i], B = boxes[j];
+					if (A.manual && B.manual) { continue; } // neither can move; skip rather than spin
+					var Ax = A.base.x + A.ref.nudge.x, Ay = A.base.y + A.ref.nudge.y;
+					var Bx = B.base.x + B.ref.nudge.x, By = B.base.y + B.ref.nudge.y;
+					var Atop = Ay - fs * 0.85, Btop = By - fs * 0.85;
+					var overlapX = Math.min(Ax + A.w, Bx + B.w) - Math.max(Ax, Bx);
+					var overlapY = Math.min(Atop + A.h, Btop + B.h) - Math.max(Atop, Btop);
+					if (overlapX <= 0 || overlapY <= 0) { continue; }
+					moved = true;
+					if (overlapX < overlapY) {
+						var pushX = overlapX / 2 + 0.1, dirX = (Ax + A.w / 2 <= Bx + B.w / 2) ? -1 : 1;
+						if (!A.manual) { A.ref.nudge.x += dirX * pushX; }
+						if (!B.manual) { B.ref.nudge.x -= dirX * pushX; }
+					} else {
+						var pushY = overlapY / 2 + 0.1, dirY = (Atop + A.h / 2 <= Btop + B.h / 2) ? -1 : 1;
+						if (!A.manual) { A.ref.nudge.y += dirY * pushY; }
+						if (!B.manual) { B.ref.nudge.y -= dirY * pushY; }
+					}
+				}
+			}
+			if (!moved) { break; }
+		}
+	}
 	// Rebuilds a <text> element's tspans from scratch -- simplest correct approach given the line
 	// count changes every time a label toggle is flipped. Each tspan repeats the same x (not a
 	// relative dx) so every line stays left/anchor-aligned under the first, which is the standard
@@ -50,31 +237,70 @@ var EngCalcs = EngCalcs || {};
 			tspan.textContent = line.text;
 		});
 	}
-	// A short tick line just after a decorated number -- raised for the network-wide max, lowered
-	// for the min (Tom, 2026-07-30, replacing an overline/underline-the-number design that read as
-	// ambiguous and unfamiliar). Positioned from the number tspan's OWN rendered width
+	// A two-rail badge just after a decorated number -- a chevron pointing UP at the top rail for the
+	// network-wide max, DOWN at the bottom rail for the min (Tom, 2026-07-30, replacing an
+	// overline/underline-the-number design that read as ambiguous and unfamiliar). Positioned from
+	// the number tspan's OWN rendered width
 	// (getComputedTextLength(), only meaningful once the tspan is attached and laid out -- i.e.
 	// called right after setMultilineText()), so it sits immediately after the digits regardless of
 	// how wide they are. `holder` is nodeEls[id]/linkEls[id]; old ticks are removed first since the
 	// line count/decorations can change on every toggle or solve.
+	// Per Tom's reference sketch (2026-07-30): the rail and the chevron TOUCH -- the chevron's vertex
+	// KISSES the rail it points at (the visible tip lands on that rail's near edge without crossing
+	// it) and its two legs splay from there back toward the digit, between the rails. A single
+	// connected mark, rail-then-caret, not two marks with daylight between them.
+	var TICK_STROKE = 0.3;
+	var CARET_LEG_DROP = 0.45; // vertex-to-leg-end vertical size of the caret itself
+	var CARET_LEG_HALF = 0.5;  // vertex-to-leg-end horizontal half-width
+	var TICK_LENGTH = 1.6;
+	// A stroked polyline's mitered vertex extends past its GEOMETRIC vertex by
+	// halfWidth / sin(half-angle between the legs) -- so a vertex placed exactly on the tick pokes
+	// visibly through it (Tom, 2026-07-30: "the points of the chevrons are extending past the
+	// lines"). Backing the vertex off by that overshoot plus the tick's own half-width puts the tip
+	// on the tick's near edge instead.
+	var CARET_TIP_INSET = (TICK_STROKE / 2) *
+		(Math.sqrt(CARET_LEG_HALF * CARET_LEG_HALF + CARET_LEG_DROP * CARET_LEG_DROP) / CARET_LEG_HALF) +
+		TICK_STROKE / 2;
+	// Tick line placement relative to the number's baseline. "high" sits near the digit's cap height
+	// above the baseline; "low" sits so its OUTSIDE (lower) edge is even with the outside (baseline)
+	// of the digits -- pulled 1/8 of a text height back toward the middle from the first cut
+	// (Tom, 2026-07-30, reference sketch "FIX MIN POSITION").
+	var TICK_HIGH_RISE = 0.62;  // × font size, above baseline
+	var TICK_LOW_DROP = 0.125;  // × font size, subtracted from the old +0.2 below baseline
 	function applyExtremaTicks(holder, textEl, layer, lines) {
 		if (holder.tickEls) { holder.tickEls.forEach(function (t) { t.remove(); }); }
 		holder.tickEls = [];
-		var x = +textEl.getAttribute('x'), baseY = +textEl.getAttribute('y'), i, tspan, width, y, x0, x1;
+		var x = +textEl.getAttribute('x'), baseY = +textEl.getAttribute('y'), fs = effectiveFontSize(),
+			i, tspan, width, y, lineY, yHigh, yLow, x0, x1, dir, vertexY, legY, vertexX, chevronPts;
 		for (i = 0; i < lines.length; i++) {
 			if (!lines[i].decoration) { continue; }
 			tspan = textEl.childNodes[i];
 			try { width = tspan.getComputedTextLength(); } catch (err) { width = 0; }
-			// Gap and vertical offsets tuned against a rendered screenshot (Tom, 2026-07-30): the
-			// first cut's gap read as too wide, its "high" tick sat at only ~60% of the digits'
-			// cap-height (not near the top), and its "low" tick sat ~60% of a text-height below the
-			// baseline (far past the bottom of a digit, none of which have descenders). "high" now
-			// sits at essentially the full cap-height above baseline (effectiveFontSize()'s ~0.7 cap-
-			// height ratio), "low" just below the baseline where the digits themselves end.
-			x0 = x + width + 0.3; x1 = x0 + 1.6;
-			y = baseY + i * effectiveLineHeight() + (lines[i].decoration === 'high' ? -effectiveFontSize() * 0.72 : 0.3);
+			x0 = x + width + 0.3; x1 = x0 + TICK_LENGTH;
+			// dir points from the marked rail back toward the baseline -- down for a "high" mark
+			// (which nests under the top rail), up for a "low" one (which nests over the bottom rail).
+			dir = lines[i].decoration === 'high' ? 1 : -1;
+			lineY = baseY + i * effectiveLineHeight();
+			yHigh = lineY - fs * TICK_HIGH_RISE;
+			yLow = lineY + 0.2 - fs * TICK_LOW_DROP;
+			// BOTH rails are drawn on every mark (Tom, 2026-07-30) -- the badge's footprint is then
+			// identical for a max and a min, so the only thing the eye decodes is which way the
+			// chevron points, an absolute judgment. The earlier single-rail design asked the reader to
+			// judge where one line sat relative to digits it wasn't touching, a relative one.
+			y = lines[i].decoration === 'high' ? yHigh : yLow;
 			holder.tickEls.push(el('line', {
-				x1: x0, y1: y, x2: x1, y2: y, stroke: lines[i].color || '#000', 'stroke-width': 0.3
+				x1: x0, y1: yHigh, x2: x1, y2: yHigh, stroke: lines[i].color || '#000', 'stroke-width': TICK_STROKE
+			}, layer));
+			holder.tickEls.push(el('line', {
+				x1: x0, y1: yLow, x2: x1, y2: yLow, stroke: lines[i].color || '#000', 'stroke-width': TICK_STROKE
+			}, layer));
+			vertexY = y + dir * CARET_TIP_INSET;
+			legY = vertexY + dir * CARET_LEG_DROP;
+			vertexX = (x0 + x1) / 2;
+			chevronPts = (vertexX - CARET_LEG_HALF) + ',' + legY + ' ' + vertexX + ',' + vertexY + ' ' +
+				(vertexX + CARET_LEG_HALF) + ',' + legY;
+			holder.tickEls.push(el('polyline', {
+				points: chevronPts, fill: 'none', stroke: lines[i].color || '#000', 'stroke-width': TICK_STROKE
 			}, layer));
 		}
 	}
@@ -84,8 +310,15 @@ var EngCalcs = EngCalcs || {};
 	// the previous position; every tspan's x must move with it.
 	function repositionMultilineText(textEl, x, y) {
 		textEl.setAttribute('x', x); textEl.setAttribute('y', y);
-		var i;
-		for (i = 0; i < textEl.childNodes.length; i++) { textEl.childNodes[i].setAttribute('x', x); }
+		var i, child;
+		for (i = 0; i < textEl.childNodes.length; i++) {
+			child = textEl.childNodes[i];
+			// Element children only (tspans, from setMultilineText()) -- a freshly built node/link
+			// label (Task 146.01's layoutNodeLabel()/layoutLinkLabel(), called before the first
+			// refreshLabelText() pass converts it) still holds a single plain text node from its
+			// initial textContent assignment, which has no setAttribute.
+			if (child.nodeType === 1) { child.setAttribute('x', x); }
+		}
 	}
 	// Network-wide max/min of a field's values, skipping undefined (element types that don't carry
 	// it, or a solve result not yet available). Returns null when fewer than 3 defined values exist
@@ -139,7 +372,8 @@ var EngCalcs = EngCalcs || {};
 			tolerance: 1e-9, // matches js/lpn-solver.js's own default relative-flow-change tol -- see runSolve()
 			textSize: 2.5, // world units -- the original fixed LABEL_FONT_SIZE constant's value
 			textSizeUnits: 'map', // 'map' | 'screen' -- see effectiveFontSize() above
-			legendPosition: 'top-right' // one of LEGEND_POSITIONS' keys below -- matches the original hardcoded CSS
+			legendPosition: 'top-right', // one of LEGEND_POSITIONS' keys below -- matches the original hardcoded CSS
+			mapHeight: 500 // px -- the original fixed <svg height="500"> value; see applyMapHeight()
 		};
 	}
 	var settings = defaultSettings();
@@ -232,6 +466,13 @@ var EngCalcs = EngCalcs || {};
 			cx: n.x, cy: n.y, r: nodeRadius(n),
 			'class': 'lpn-node lpn-node-' + n.type, 'data-node': n.id
 		}, nodesLayer);
+		// Mask (Task 146.01) goes in the shared maskLayer, not here alongside the circle -- see
+		// maskLayer's declaration comment for why. Leader+text go in labelsLayer, the topmost
+		// layer, same reasoning: this label must never be covered by a LATER node/link's own
+		// symbol. Both mask and leader start effectively invisible (mask sized 0, leader hidden)
+		// until layoutNodeLabel() below positions them for real.
+		var mask = el('rect', { 'class': 'lpn-lbl-mask' }, maskLayer);
+		var leader = el('line', { 'class': 'lpn-leader', style: 'display:none' }, labelsLayer);
 		// font-size inline, NOT the .lpn-lbl CSS class's 11px: SVG font-size is interpreted in the
 		// local (world-unit) coordinate system, same as any other geometry under this scaled <g> --
 		// an "11-unit" font is enormous next to nodes spaced 10-40 units apart, which is what was
@@ -239,13 +480,19 @@ var EngCalcs = EngCalcs || {};
 		// was oversized). Matches the spike's own convention. Same effectiveFontSize() as a user Text
 		// label (Tom, 2026-07-30: no reason for these to differ) -- the two are still visually
 		// distinguishable by position (node ID sits fixed at the node) and role, not by size.
-		var text = el('text', { x: n.x + 2, y: n.y - 2, 'class': 'lpn-lbl', style: 'font-size:' + effectiveFontSize() + 'px' }, nodesLayer);
+		// lpn-draglbl (Task 146.01): draggable off its default offset, same pointer-events:all/
+		// cursor:move convention as a Text label -- data-nodelbl (not data-node, already claimed by
+		// the circle above) is this label's own drag/hit-test key.
+		var text = el('text', {
+			'class': 'lpn-lbl lpn-draglbl', 'data-nodelbl': n.id, style: 'font-size:' + effectiveFontSize() + 'px'
+		}, labelsLayer);
 		text.textContent = n.id;
 		var tw = 8;
 		try { tw = text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; fallback stands */ }
-		nodeEls[n.id] = { circle: circle, text: text, tw: tw };
+		nodeEls[n.id] = { circle: circle, text: text, tw: tw, mask: mask, leader: leader, nudge: { x: 0, y: 0 }, lineCount: 1 };
 		incidentLinks[n.id] = [];
 		labelsByAnchor[n.id] = [];
+		layoutNodeLabel(n.id);
 	}
 	function buildLinkEls(l) {
 		var line = el('polyline', {
@@ -255,7 +502,7 @@ var EngCalcs = EngCalcs || {};
 		var handles = [], i;
 		for (i = 0; i < l.verts.length; i++) {
 			handles.push(el('circle', {
-				cx: l.verts[i].x, cy: l.verts[i].y, r: 0.9,
+				cx: l.verts[i].x, cy: l.verts[i].y, r: 0.45,
 				'class': 'lpn-vhandle', 'data-link': l.id, 'data-vidx': i
 			}, linksLayer));
 		}
@@ -275,10 +522,15 @@ var EngCalcs = EngCalcs || {};
 		}
 		// Link label (Task 146 Phase 2 label toggles): a multi-line <text>, same convention as a
 		// node's, positioned at the middle segment's midpoint -- content filled in by
-		// refreshLabelText(), not here (this only creates the element; it starts empty).
-		var midIdx = Math.floor(segCount / 2), mid = segmentMidpoints(l)[midIdx],
-			text = el('text', { x: mid.x + 2, y: mid.y - 2, 'class': 'lpn-lbl', style: 'font-size:' + effectiveFontSize() + 'px' }, linksLayer);
-		linkEls[l.id] = { line: line, handles: handles, arrows: arrows, text: text, tw: 8 };
+		// refreshLabelText(), not here (this only creates the element; it starts empty). Mask goes
+		// in maskLayer, leader+text in labelsLayer -- see maskLayer's declaration comment.
+		var mask = el('rect', { 'class': 'lpn-lbl-mask' }, maskLayer);
+		var leader = el('line', { 'class': 'lpn-leader', style: 'display:none' }, labelsLayer);
+		var text = el('text', {
+			'class': 'lpn-lbl lpn-draglbl', 'data-linklbl': l.id, style: 'font-size:' + effectiveFontSize() + 'px'
+		}, labelsLayer);
+		linkEls[l.id] = { line: line, handles: handles, arrows: arrows, text: text, tw: 8, mask: mask, leader: leader, nudge: { x: 0, y: 0 }, lineCount: 1 };
+		layoutLinkLabel(l.id);
 	}
 	// Midpoint and local tangent angle of every segment, walking a->verts->b -- one entry per
 	// straight run, so a bent pipe's arrows follow each segment's own direction.
@@ -309,24 +561,29 @@ var EngCalcs = EngCalcs || {};
 		var an = lb.anchorNode ? nodeById(lb.anchorNode) : { x: lb.x, y: lb.y },
 			px = lb.anchorNode ? an.x + lb.x : lb.x,
 			py = lb.anchorNode ? an.y + lb.y : lb.y,
-			leader = null, text;
+			leader = null, text, mask;
 		if (lb.anchorNode) {
 			leader = el('line', { x1: an.x, y1: an.y, x2: px, y2: py, 'class': 'lpn-leader' }, labelsLayer);
 		}
+		// Mask (Task 146.01) goes in the shared maskLayer, not labelsLayer -- see maskLayer's
+		// declaration comment: every mask stays below every label's text regardless of type or
+		// creation order.
+		mask = el('rect', { 'class': 'lpn-lbl-mask' }, maskLayer);
 		text = el('text', {
 			x: px, y: py, 'class': 'lpn-lbl lpn-draglbl', 'text-anchor': 'middle',
-			'dominant-baseline': 'central', 'data-lbl': lb.id, style: 'font-size:' + effectiveFontSize() + 'px'
+			'dominant-baseline': 'central', 'data-lbl': lb.id, style: 'font-size:' + effectiveFontSize(lb.sizeMult) + 'px'
 		}, labelsLayer);
 		text.textContent = lb.text;
 		var w = 10;
 		try { w = text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; fallback stands */ }
-		labelEls[lb.id] = { leader: leader, text: text, side: 'right', width: w };
+		labelEls[lb.id] = { leader: leader, text: text, side: 'right', width: w, mask: mask };
+		positionMaskRect(mask, px, py, w, effectiveFontSize(lb.sizeMult) * 1.2, 'middle', 'middle');
 		if (lb.anchorNode) { labelsByAnchor[lb.anchorNode].push(lb.id); }
 	}
 
 	function buildDom() {
 		var i;
-		linksLayer.innerHTML = ''; nodesLayer.innerHTML = ''; labelsLayer.innerHTML = '';
+		linksLayer.innerHTML = ''; nodesLayer.innerHTML = ''; maskLayer.innerHTML = ''; labelsLayer.innerHTML = '';
 		nodeEls = {}; linkEls = {}; labelEls = {}; incidentLinks = {}; labelsByAnchor = {};
 		for (i = 0; i < doc.nodes.length; i++) { buildNodeEls(doc.nodes[i]); }
 		for (i = 0; i < doc.links.length; i++) {
@@ -341,10 +598,9 @@ var EngCalcs = EngCalcs || {};
 		refreshLabelText();
 	}
 	function updateLinkGeometry(id) {
-		var l = linkById(id), le = linkEls[id], segCount = l.verts.length + 1,
-			midIdx = Math.floor(segCount / 2), mid = segmentMidpoints(l)[midIdx];
+		var l = linkById(id), le = linkEls[id];
 		le.line.setAttribute('points', linkPoints(l));
-		repositionMultilineText(le.text, mid.x + 2, mid.y - 2);
+		layoutLinkLabel(id);
 		if (l.lenAuto) { l.length = linkGeomLength(l); }
 		updateArrow(id);
 	}
@@ -356,9 +612,11 @@ var EngCalcs = EngCalcs || {};
 	// has to reach clear across the text).
 	var ADVERSE_FRAC = 0.75;
 	function updateLabelGeometry(id) {
-		var lb = labelById(id), le = labelEls[id], an, px, py, halfW, trigger, leaderX;
+		var lb = labelById(id), le = labelEls[id], an, px, py, halfW, trigger, leaderX,
+			maskH = effectiveFontSize(lb.sizeMult) * 1.2;
 		if (!lb.anchorNode) {
 			le.text.setAttribute('x', lb.x); le.text.setAttribute('y', lb.y);
+			positionMaskRect(le.mask, lb.x, lb.y, le.width, maskH, 'middle', 'middle');
 			return;
 		}
 		an = nodeById(lb.anchorNode); px = an.x + lb.x; py = an.y + lb.y; halfW = le.width / 2;
@@ -369,16 +627,40 @@ var EngCalcs = EngCalcs || {};
 		le.leader.setAttribute('x1', an.x); le.leader.setAttribute('y1', an.y);
 		le.leader.setAttribute('x2', leaderX); le.leader.setAttribute('y2', py);
 		le.text.setAttribute('x', px); le.text.setAttribute('y', py);
+		positionMaskRect(le.mask, px, py, le.width, maskH, 'middle', 'middle');
+	}
+	// Double-click-to-reset for a Text label (Tom, 2026-07-30) -- only meaningful when anchored: an
+	// anchored Text's lb.x/lb.y is an offset from its node, same convention as a node/link label's,
+	// so "home" is the same DEFAULT_LABEL_OFFSET they use. A free-floating Text (no anchorNode) has
+	// no anchor to offset from -- lb.x/lb.y already ARE its absolute position, so there is no
+	// "default" to reset to, and this is a no-op.
+	function resetTextLabelHome(id) {
+		var lb = labelById(id);
+		if (!lb || !lb.anchorNode) { return; }
+		if (lb.x === DEFAULT_LABEL_OFFSET.x && lb.y === DEFAULT_LABEL_OFFSET.y) { return; }
+		saveUndoSnapshot();
+		lb.x = DEFAULT_LABEL_OFFSET.x; lb.y = DEFAULT_LABEL_OFFSET.y;
+		labelEls[id].side = 'right';
+		updateLabelGeometry(id);
+		scheduleSolve();
 	}
 	function labelById(id) {
 		var i;
 		for (i = 0; i < doc.labels.length; i++) { if (doc.labels[i].id === id) { return doc.labels[i]; } }
 		return null;
 	}
+	// A node/link data label's visible glyphs live in <tspan> children (setMultilineText()) -- a
+	// hit-test (e.target on pointerdown, or elementFromPoint() on click/tap) lands on the tspan
+	// itself, which carries none of its parent <text>'s data-nodelbl/data-linklbl/data-lbl
+	// attributes. Both hit-test paths below resolve a tspan hit up to its label <text> first, so
+	// drag/click detection sees the same element regardless of which pixel of the label was hit.
+	function resolveLabelHit(t) {
+		return (t && t.nodeName && t.nodeName.toLowerCase() === 'tspan' && t.parentNode) ? t.parentNode : t;
+	}
 	function updateNode(id) {
 		var n = nodeById(id), ne = nodeEls[id], i;
 		ne.circle.setAttribute('cx', n.x); ne.circle.setAttribute('cy', n.y);
-		repositionMultilineText(ne.text, n.x + 2, n.y - 2);
+		layoutNodeLabel(id);
 		for (i = 0; i < incidentLinks[id].length; i++) { updateLinkGeometry(incidentLinks[id][i]); }
 		for (i = 0; i < labelsByAnchor[id].length; i++) { updateLabelGeometry(labelsByAnchor[id][i]); }
 		scheduleSolve();
@@ -400,6 +682,8 @@ var EngCalcs = EngCalcs || {};
 		linkEls[l.id].handles.forEach(function (h) { h.remove(); });
 		linkEls[l.id].arrows.forEach(function (a) { a.remove(); });
 		linkEls[l.id].text.remove();
+		linkEls[l.id].mask.remove();
+		linkEls[l.id].leader.remove();
 		// tick marks (applyExtremaTicks()) are separate elements, not text children -- buildLinkEls()
 		// below replaces linkEls[l.id] wholesale, which would otherwise orphan them on screen.
 		if (linkEls[l.id].tickEls) { linkEls[l.id].tickEls.forEach(function (t) { t.remove(); }); }
@@ -434,11 +718,14 @@ var EngCalcs = EngCalcs || {};
 		if (doc.nodes.length === 0) { return { minx: 0, maxx: 10, miny: 0, maxy: 10 }; }
 		for (i = 0; i < doc.nodes.length; i++) {
 			var n = doc.nodes[i], r = nodeRadius(n) + 0.2, ne = nodeEls[n.id] || {},
-				tw = ne.tw || 8, lc = ne.lineCount || 1;
+				tw = ne.tw || 8, lc = ne.lineCount || 1,
+				nlx = ne.text ? +ne.text.getAttribute('x') : n.x + 2, nly = ne.text ? +ne.text.getAttribute('y') : n.y - 2;
 			inc(n.x - r, n.y - r); inc(n.x + r, n.y + r);
 			// "J1"-style id/data label beside the circle -- extended downward per extra toggled-on
 			// line (Task 146 Phase 2 label toggles), since multi-line labels grow toward +y (dy>0).
-			inc(n.x + 2, n.y - 2 - 2); inc(n.x + 2 + tw, n.y - 2 + 0.6 + (lc - 1) * effectiveLineHeight());
+			// Read from the label's OWN rendered x/y (Task 146.01), not a hardcoded n.x+2/n.y-2--
+			// a dragged-away or collision-nudged label can sit well outside that default offset.
+			inc(nlx, nly - 2); inc(nlx + tw, nly + 0.6 + (lc - 1) * effectiveLineHeight());
 		}
 		for (i = 0; i < doc.labels.length; i++) {
 			var lb = doc.labels[i], le = labelEls[lb.id] || { width: 10 },
@@ -450,7 +737,7 @@ var EngCalcs = EngCalcs || {};
 		for (i = 0; i < doc.links.length; i++) {
 			for (j = 0; j < doc.links[i].verts.length; j++) {
 				var v = doc.links[i].verts[j];
-				inc(v.x - 1.1, v.y - 1.1); inc(v.x + 1.1, v.y + 1.1);
+				inc(v.x - 0.65, v.y - 0.65); inc(v.x + 0.65, v.y + 0.65);
 			}
 			var l = doc.links[i], lle = linkEls[l.id];
 			if (lle) {
@@ -733,9 +1020,22 @@ var EngCalcs = EngCalcs || {};
 		if (rubberBandEl) { rubberBandEl.style.display = id ? '' : 'none'; }
 	}
 
+	// Maps a tool mode to its pageConfig mode-hint key -- see the lang keys' own comment for why
+	// each is a whole sentence rather than "Mode:" + the tool's own label composed at render time.
+	var MODE_HINT_KEYS = {
+		'select': 'lpn_mode_select', 'delete': 'lpn_mode_delete',
+		'add-junction': 'lpn_mode_add_junction', 'add-reservoir': 'lpn_mode_add_reservoir',
+		'add-pipe': 'lpn_mode_add_pipe', 'add-pump': 'lpn_mode_add_pump', 'add-text': 'lpn_mode_add_text'
+	};
+	function updateModeHint() {
+		var el = document.getElementById('lpn_mode_hint'); if (!el) { return; }
+		var pc = EngCalcs.pageConfig || {}, key = MODE_HINT_KEYS[mode];
+		el.textContent = key ? (pc[key] || '') : '';
+	}
 	function setMode(newMode) {
 		mode = newMode; setPendingLinkFrom(null);
 		if (setModeUI) { setModeUI(); }
+		updateModeHint();
 	}
 
 	function addNode(type, x, y) {
@@ -788,8 +1088,8 @@ var EngCalcs = EngCalcs || {};
 	function addText(x, y, anchorNode) {
 		var id = (settings.idPrefixes.T || 'T') + (nextId.T++), an = anchorNode ? nodeById(anchorNode) : null;
 		var lb = an
-			? { id: id, text: EngCalcs.pageConfig.lpn_new_text || 'Text', x: x - an.x, y: y - an.y, anchorNode: anchorNode }
-			: { id: id, text: EngCalcs.pageConfig.lpn_new_text || 'Text', x: x, y: y, anchorNode: null };
+			? { id: id, text: EngCalcs.pageConfig.lpn_new_text || 'Text', x: x - an.x, y: y - an.y, anchorNode: anchorNode, sizeMult: 1 }
+			: { id: id, text: EngCalcs.pageConfig.lpn_new_text || 'Text', x: x, y: y, anchorNode: null, sizeMult: 1 };
 		doc.labels.push(lb);
 		buildLabelEls(lb);
 		// A newly-added Text was never actually persisted (Task 146 Phase 1 gap, found while
@@ -803,6 +1103,7 @@ var EngCalcs = EngCalcs || {};
 		for (i = 0; i < links.length; i++) { deleteLink(links[i]); }
 		labelsByAnchor[id].slice().forEach(function (lid) { deleteLabelById(lid); });
 		nodeEls[id].circle.remove(); nodeEls[id].text.remove();
+		nodeEls[id].mask.remove(); nodeEls[id].leader.remove();
 		// Same orphaned-tick-mark bug as deleteLink()/rebuildLink() -- these are separate elements,
 		// not text children.
 		if (nodeEls[id].tickEls) { nodeEls[id].tickEls.forEach(function (t) { t.remove(); }); }
@@ -822,6 +1123,7 @@ var EngCalcs = EngCalcs || {};
 		linkEls[id].handles.forEach(function (h) { h.remove(); });
 		linkEls[id].arrows.forEach(function (a) { a.remove(); });
 		linkEls[id].text.remove();
+		linkEls[id].mask.remove(); linkEls[id].leader.remove();
 		// Extrema tick marks (applyExtremaTicks()) are separate elements, not text children --
 		// orphaned on screen otherwise (Tom, 2026-07-30: "when I delete a pipe, its orphaned labels
 		// are left behind"). Same fix rebuildLink() already needed for the same reason.
@@ -837,6 +1139,7 @@ var EngCalcs = EngCalcs || {};
 		var lb = labelById(id), le = labelEls[id];
 		if (le.leader) { le.leader.remove(); }
 		le.text.remove();
+		le.mask.remove();
 		delete labelEls[id];
 		if (lb.anchorNode) {
 			labelsByAnchor[lb.anchorNode] = labelsByAnchor[lb.anchorNode].filter(function (x) { return x !== id; });
@@ -872,9 +1175,16 @@ var EngCalcs = EngCalcs || {};
 		}
 		doc.nodes = saved.nodes || []; doc.links = saved.links || []; doc.labels = saved.labels || [];
 		nextId = saved.nextId || { J: 1, R: 1, L: 1, P: 1, T: 1 };
-		labelSettings = saved.labelSettings || defaultLabelSettings();
+		// Object.assign onto the current defaults, not saved.x || defaults() -- a plain "||" swaps in
+		// a saved object wholesale, so a preference added AFTER a user's last save (e.g. Task 146.03's
+		// mapHeight) is simply missing from it and reads as undefined rather than falling back to its
+		// default. That bug is what made the map render at the browser's tiny intrinsic SVG height the
+		// first time mapHeight shipped -- svg.setAttribute('height', undefined) is not the same as
+		// leaving the attribute at its default. Merging keeps every OLD saved value while still
+		// picking up any NEW default key that didn't exist when the save was written.
+		labelSettings = Object.assign(defaultLabelSettings(), saved.labelSettings || {});
 		backdrop = saved.backdrop || null;
-		settings = saved.settings || defaultSettings();
+		settings = Object.assign(defaultSettings(), saved.settings || {});
 		return true;
 	}
 	// A dedicated button, not a repurposed "Restore Defaults" (Tom asked "do we dare"): that
@@ -913,12 +1223,29 @@ var EngCalcs = EngCalcs || {};
 		gridLayer = el('g', {}, world);
 		linksLayer = el('g', {}, world);
 		nodesLayer = el('g', {}, world);
+		// Every label mask lives in this ONE shared layer (Task 146.01 draw-order fix, Tom,
+		// 2026-07-30), never appended alongside the element it masks: a mask is placed here
+		// regardless of whether it belongs to a node, a link, or a Text label, so ALL masks sit
+		// above ALL node/link symbols, and (since labelsLayer below holds every label's text) BELOW
+		// every label's text. Appending a mask into nodesLayer/linksLayer/labelsLayer the way the
+		// symbol next to it does was the original design, and it broke exactly the way Tom
+		// described: a later-built node's own elements sit later in that shared layer's DOM order,
+		// so its mask painted OVER an earlier node's already-placed label text if the two
+		// overlapped on screen -- draw order tracked creation order, not "masks behind everything,
+		// text on top" as intended.
+		maskLayer = el('g', {}, world);
 		labelsLayer = el('g', {}, world);
 		// Topmost layer (after labelsLayer) so the rubber-band is never hidden under a node/link
 		// while drawing a pipe/pump (Tom, 2026-07-30).
 		rubberBandEl = el('line', { 'class': 'lpn-rubberband', style: 'display:none' }, world);
 		setTransform();
 		wireToolbar();
+		// The toolbar is built here, AFTER Calculators.lib.js's own DOMContentLoaded listener
+		// already ran EngCalcs.initTips(document) once (script load order puts that listener
+		// first) -- so a button's .ec-help[title] tip (Select, Labels) would otherwise never get
+		// its touch-tap tooltip wired up (ROADMAP Task 173's exact gap). Call it again now that
+		// the buttons actually exist.
+		if (EngCalcs.initTips) { EngCalcs.initTips(document); }
 		wirePointerEvents();
 		wirePopup();
 		if (loadFromStorage()) {
@@ -929,7 +1256,9 @@ var EngCalcs = EngCalcs || {};
 		wireLabelsPopup();
 		wireSettingsPopup();
 		applyLegendPosition();
+		applyMapHeight();
 		updateEmptyHint();
+		updateModeHint(); // initial mode is 'select', set before setMode() ever runs -- render it now
 		zoomExtent();
 		requestAnimationFrame(tick);
 	}
@@ -954,6 +1283,10 @@ var EngCalcs = EngCalcs || {};
 			btn.type = 'button';
 			btn.textContent = pc[t.key] || t.mode;
 			btn.setAttribute('aria-pressed', t.mode === mode ? 'true' : 'false');
+			// Optional hover/tap tip (Tom, 2026-07-30) -- the button itself is already the click
+			// target, so the tip goes straight on it as a title, matched to .ec-help for touch
+			// (EngCalcs.initTips(), called again below once the toolbar is built).
+			if (t.tip) { btn.title = t.tip; btn.className = 'ec-help'; }
 			btn.addEventListener('click', function () {
 				// Clicking the already-active tool toggles back to Select (Tom) rather than
 				// leaving no way to "turn off" Add/Delete except picking a different tool.
@@ -991,7 +1324,7 @@ var EngCalcs = EngCalcs || {};
 		].forEach(function (t) { modeButton(t, addGroup); });
 
 		var editGroup = group();
-		modeButton({ mode: 'select', key: 'lpn_tool_select' }, editGroup);
+		modeButton({ mode: 'select', key: 'lpn_tool_select', tip: pc.lpn_tip_select }, editGroup);
 		modeButton({ mode: 'delete', key: 'lpn_tool_delete' }, editGroup);
 		var undoBtn = document.createElement('button');
 		undoBtn.type = 'button';
@@ -1008,6 +1341,7 @@ var EngCalcs = EngCalcs || {};
 		var labelsBtn = document.createElement('button');
 		labelsBtn.type = 'button';
 		labelsBtn.textContent = pc.lpn_tool_labels || 'Labels';
+		if (pc.lpn_tip_labels_draggable) { labelsBtn.title = pc.lpn_tip_labels_draggable; labelsBtn.className = 'ec-help'; }
 		labelsBtn.addEventListener('click', toggleLabelsPopup);
 		viewGroup.appendChild(labelsBtn);
 		var settingsBtn = document.createElement('button');
@@ -1139,7 +1473,7 @@ var EngCalcs = EngCalcs || {};
 				drag = { type: 'pinch', d0: Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y), s0: state.s };
 				return;
 			}
-			var t = e.target, common = { pointerId: e.pointerId, startX: e.clientX, startY: e.clientY };
+			var t = resolveLabelHit(e.target), common = { pointerId: e.pointerId, startX: e.clientX, startY: e.clientY };
 			if (mode.indexOf('add-') === 0) { return; } // handled on click below, not drag
 			if (mode === 'delete') { return; }
 			// 'select' mode
@@ -1155,6 +1489,18 @@ var EngCalcs = EngCalcs || {};
 				var lb = labelById(t.dataset.lbl), an = lb.anchorNode ? nodeById(lb.anchorNode) : { x: 0, y: 0 },
 					w2 = screenToWorld(e.clientX, e.clientY);
 				drag = { type: 'label', id: t.dataset.lbl, offX: (an.x + lb.x) - w2.x, offY: (an.y + lb.y) - w2.y };
+				Object.assign(drag, common);
+			} else if (t.dataset.nodelbl !== undefined) {
+				// Task 146.01: dragging a node's OWN data label (id/elev/demand/... beside the
+				// symbol), distinct from dragging the node itself (data-node, above) -- offset is
+				// stored as n.lx/n.ly, world units from the node center, same convention as a Text
+				// label's lb.x/lb.y offset from its anchor.
+				var nn = nodeById(t.dataset.nodelbl), posN = nodeLabelPos(nn), w4 = screenToWorld(e.clientX, e.clientY);
+				drag = { type: 'nodelbl', id: t.dataset.nodelbl, offX: posN.x - w4.x, offY: posN.y - w4.y };
+				Object.assign(drag, common);
+			} else if (t.dataset.linklbl !== undefined) {
+				var ll = linkById(t.dataset.linklbl), posL = linkLabelPos(ll), w5 = screenToWorld(e.clientX, e.clientY);
+				drag = { type: 'linklbl', id: t.dataset.linklbl, offX: posL.x - w5.x, offY: posL.y - w5.y };
 				Object.assign(drag, common);
 			} else {
 				drag = { type: 'pan', tx0: state.tx, ty0: state.ty }; Object.assign(drag, common);
@@ -1180,9 +1526,16 @@ var EngCalcs = EngCalcs || {};
 			// never fires at all. Tom caught this: double-click stopped adding vertices entirely.
 			if (regMode) { return; } // otherwise two registration clicks landing on the same link also bend it
 			if (pendingLinkPopupTimer) { clearTimeout(pendingLinkPopupTimer); pendingLinkPopupTimer = null; }
-			var t = document.elementFromPoint(e.clientX, e.clientY);
+			var t = resolveLabelHit(document.elementFromPoint(e.clientX, e.clientY));
 			if (!t || !t.dataset) { return; }
-			if (t.classList.contains('lpn-vhandle')) { removeVertex(t.dataset.link, +t.dataset.vidx); }
+			// Double-click a dragged label to send it home (Tom, 2026-07-30: "Can we double-click a
+			// dragged label to send it home without a leader?") -- clears the manual offset, so the
+			// label falls back to its default position and the leader (which only shows past
+			// LABEL_LEADER_THRESHOLD) disappears along with it.
+			if (t.dataset.nodelbl !== undefined) { resetNodeLabelHome(t.dataset.nodelbl); }
+			else if (t.dataset.linklbl !== undefined) { resetLinkLabelHome(t.dataset.linklbl); }
+			else if (t.dataset.lbl !== undefined) { resetTextLabelHome(t.dataset.lbl); }
+			else if (t.classList.contains('lpn-vhandle')) { removeVertex(t.dataset.link, +t.dataset.vidx); }
 			else if (t.dataset.link !== undefined) { insertVertex(t.dataset.link, screenToWorld(e.clientX, e.clientY)); }
 		});
 
@@ -1197,7 +1550,7 @@ var EngCalcs = EngCalcs || {};
 			// elementFromPoint, not e.target: setPointerCapture(svg) retargets pointerup's
 			// target to the capturing element (svg itself) on desktop Chrome, so e.target here
 			// is never the actual node/link/label clicked -- see phase0-acceptance.md round 2.
-			var w = screenToWorld(e.clientX, e.clientY), t = document.elementFromPoint(e.clientX, e.clientY);
+			var w = screenToWorld(e.clientX, e.clientY), t = resolveLabelHit(document.elementFromPoint(e.clientX, e.clientY));
 			// No zoomExtent() after placing an element (Tom): rescaling the whole view on every
 			// click while building a network is disorienting. Zoom Extent stays an explicit,
 			// user-requested action only.
@@ -1263,9 +1616,38 @@ var EngCalcs = EngCalcs || {};
 					}, 300);
 				}(t.dataset.link, e.clientX, e.clientY));
 			} else if (mode === 'select' && t.dataset.lbl !== undefined) {
-				// Tom, 2026-07-30: "there is no way to edit it" -- a Text label could be moved
-				// (drag) or deleted, but never have its content changed after creation.
-				openLabelPopup(t.dataset.lbl, e.clientX, e.clientY);
+				// Delayed, not immediate (Tom, 2026-07-30: double-click-to-reset a dragged label
+				// stopped working -- the popup opened on the FIRST tap and ate the second one).
+				// Same debounce as a link's own popup below.
+				if (pendingLinkPopupTimer) { clearTimeout(pendingLinkPopupTimer); }
+				(function (labelId, sx, sy) {
+					pendingLinkPopupTimer = setTimeout(function () {
+						pendingLinkPopupTimer = null;
+						// Tom, 2026-07-30: "there is no way to edit it" -- a Text label could be
+						// moved (drag) or deleted, but never have its content changed after creation.
+						openLabelPopup(labelId, sx, sy);
+					}, 300);
+				}(t.dataset.lbl, e.clientX, e.clientY));
+			} else if (mode === 'select' && t.dataset.nodelbl !== undefined) {
+				// Delayed, not immediate -- same reason as the Text label case just above.
+				if (pendingLinkPopupTimer) { clearTimeout(pendingLinkPopupTimer); }
+				(function (nodeId, sx, sy) {
+					pendingLinkPopupTimer = setTimeout(function () {
+						pendingLinkPopupTimer = null;
+						// Task 146.01: a click (not a drag) on a node's data label opens the same
+						// popup as clicking the node itself -- the label IS that node's data, just
+						// relocated.
+						openPopup(nodeId, sx, sy);
+					}, 300);
+				}(t.dataset.nodelbl, e.clientX, e.clientY));
+			} else if (mode === 'select' && t.dataset.linklbl !== undefined) {
+				if (pendingLinkPopupTimer) { clearTimeout(pendingLinkPopupTimer); }
+				(function (linkId, sx, sy) {
+					pendingLinkPopupTimer = setTimeout(function () {
+						pendingLinkPopupTimer = null;
+						openLinkPopup(linkId, sx, sy);
+					}, 300);
+				}(t.dataset.linklbl, e.clientX, e.clientY));
 			}
 		});
 	}
@@ -1299,6 +1681,16 @@ var EngCalcs = EngCalcs || {};
 			// Dragging a Text was never persisted either (same gap as addText() above, found the
 			// same way) -- scheduleSolve() is a convenient existing debounce that reaches
 			// saveToStorage() unconditionally, even though a Text has nothing to solve.
+			scheduleSolve();
+		} else if (drag.type === 'nodelbl') {
+			var w6 = screenToWorld(p.x, p.y), nn2 = nodeById(drag.id);
+			nn2.lx = (w6.x + drag.offX) - nn2.x; nn2.ly = (w6.y + drag.offY) - nn2.y;
+			layoutNodeLabel(drag.id);
+			scheduleSolve();
+		} else if (drag.type === 'linklbl') {
+			var w7 = screenToWorld(p.x, p.y), ll2 = linkById(drag.id), mid2 = linkLabelMid(ll2);
+			ll2.lx = (w7.x + drag.offX) - mid2.x; ll2.ly = (w7.y + drag.offY) - mid2.y;
+			layoutLinkLabel(drag.id);
 			scheduleSolve();
 		}
 	}
@@ -1357,11 +1749,14 @@ var EngCalcs = EngCalcs || {};
 	}
 	// Shared with renderLabelsLegend() below -- one place naming which fields exist and what their
 	// checkbox/legend text says, so the popover and the legend can never drift out of sync.
+	// Order (Tom, 2026-07-30, thinking physically): ID, Demand, Head, Pressure, Elevation -- matches
+	// the same reordering in refreshLabelText()'s node loop above, so the checkbox list, the
+	// on-map label, and the legend all agree.
 	function nodeFieldDefs(pc) {
 		return [
-			['id', pc.lpn_field_id || 'ID'], ['elev', pc.lpn_field_elev || 'Elevation'],
-			['demand', pc.bpn_demand || 'Demand'], ['head', pc.lpn_result_head || 'Head'],
-			['pressure', pc.lpn_result_pressure || 'Pressure']
+			['id', pc.lpn_field_id || 'ID'], ['demand', pc.bpn_demand || 'Demand'],
+			['head', pc.lpn_result_head || 'Head'], ['pressure', pc.lpn_result_pressure || 'Pressure'],
+			['elev', pc.lpn_field_elev || 'Elevation']
 		];
 	}
 	function linkFieldDefs(pc) {
@@ -1438,6 +1833,11 @@ var EngCalcs = EngCalcs || {};
 		'bottom-left': { top: '', bottom: '4px', left: '4px', right: '', transform: '' },
 		'bottom-right': { top: '', bottom: '4px', left: '', right: '4px', transform: '' }
 	};
+	// Map height (settings panel): the page is scrollable, so a user working on a large monitor
+	// can size the map view up toward the full screen instead of the original fixed 500px.
+	function applyMapHeight() {
+		if (svg) { svg.setAttribute('height', settings.mapHeight); }
+	}
 	function applyLegendPosition() {
 		var box = document.getElementById('lpn_labels_legend'); if (!box) { return; }
 		var pos = LEGEND_POSITIONS[settings.legendPosition] || LEGEND_POSITIONS['top-right'];
@@ -1456,8 +1856,8 @@ var EngCalcs = EngCalcs || {};
 		Object.keys(nodeEls).forEach(function (id) { nodeEls[id].text.style.fontSize = fs; });
 		Object.keys(linkEls).forEach(function (id) { linkEls[id].text.style.fontSize = fs; });
 		Object.keys(labelEls).forEach(function (id) {
-			var le = labelEls[id];
-			le.text.style.fontSize = fs;
+			var le = labelEls[id], lb = labelById(id);
+			le.text.style.fontSize = effectiveFontSize(lb && lb.sizeMult) + 'px';
 			try { le.width = le.text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; stale width stands */ }
 			updateLabelGeometry(id);
 		});
@@ -1549,6 +1949,15 @@ var EngCalcs = EngCalcs || {};
 			saveToStorage();
 		});
 		row(pc.lpn_settings_text_size_units || 'Text size units', unitsSelect);
+		// ---- canvas height ----
+		heading(pc.lpn_settings_map_height || 'Map height');
+		var heightInput = document.createElement('input');
+		heightInput.type = 'number'; heightInput.step = 'any'; heightInput.min = '100'; heightInput.value = settings.mapHeight;
+		heightInput.addEventListener('change', function () {
+			if (+heightInput.value >= 100) { settings.mapHeight = +heightInput.value; applyMapHeight(); saveToStorage(); }
+			else { heightInput.value = settings.mapHeight; }
+		});
+		row(pc.lpn_settings_map_height_px || 'Map height (px)', heightInput);
 		// ---- legend position ----
 		heading(pc.lpn_tool_labels || 'Labels');
 		var legendSelect = document.createElement('select');
@@ -1754,7 +2163,13 @@ var EngCalcs = EngCalcs || {};
 		}
 		if (lastSolveResult && lastSolveResult.flows[linkId] !== undefined) {
 			readonlyUnitField(fields, pc.lpn_result_flow || 'Flow', 'lpn_u_flow', lastSolveResult.flows[linkId]);
-			readonlyUnitField(fields, pc.lpn_result_velocity || 'Velocity', 'lpn_u_velocity', lastSolveResult.velocities[linkId]);
+			// A pump has no diameter (Tom, 2026-07-30: "how can a pump have a velocity if it has no
+			// diameter?") -- js/lpn-solver.js can only compute velocity = Q/area from a real
+			// diameter, so a pump's stored velocity is always the fallback 0, which reads as "no
+			// flow" and is actively misleading. Velocity is a pipe-only result.
+			if (l.type !== 'pump') {
+				readonlyUnitField(fields, pc.lpn_result_velocity || 'Velocity', 'lpn_u_velocity', lastSolveResult.velocities[linkId]);
+			}
 			// lpn-solver.js stores a pump's headlosses as -(head gain) -- same sign convention as
 			// a head LOSS across the link (h_to - h_from), so a pump's actual gain is the negation.
 			if (l.type === 'pump') {
@@ -1794,6 +2209,27 @@ var EngCalcs = EngCalcs || {};
 		label.textContent = (pc.lpn_tool_add_text || 'Text') + ' ';
 		label.appendChild(input);
 		fields.appendChild(label);
+		fields.appendChild(document.createElement('br'));
+		// Task 146.03: per-label size multiplier, stacked on top of the shared settings.textSize
+		// (effectiveFontSize(lb.sizeMult) in buildLabelEls/refreshFontSizes above).
+		var sizeLabel = document.createElement('label'), sizeInput = document.createElement('input');
+		sizeInput.type = 'number'; sizeInput.step = 'any'; sizeInput.min = '0.1';
+		sizeInput.value = lb.sizeMult || 1;
+		sizeInput.addEventListener('change', function () {
+			var v = +sizeInput.value;
+			if (!(v > 0)) { sizeInput.value = lb.sizeMult || 1; return; }
+			if (v === (lb.sizeMult || 1)) { return; }
+			saveUndoSnapshot();
+			lb.sizeMult = v;
+			var le = labelEls[labelId];
+			le.text.style.fontSize = effectiveFontSize(lb.sizeMult) + 'px';
+			try { le.width = le.text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; stale width stands */ }
+			updateLabelGeometry(labelId);
+			saveToStorage();
+		});
+		sizeLabel.textContent = (pc.lpn_field_text_size || 'Size ×') + ' ';
+		sizeLabel.appendChild(sizeInput);
+		fields.appendChild(sizeLabel);
 		fields.appendChild(document.createElement('br'));
 		readonlyField(fields, pc.lpn_field_x || 'X', an ? an.x + lb.x : lb.x);
 		readonlyField(fields, pc.lpn_field_y || 'Y', an ? an.y + lb.y : lb.y);
@@ -1932,7 +2368,7 @@ var EngCalcs = EngCalcs || {};
 			diameter: fieldExtrema(doc.links.map(function (l) { return l.type !== 'pump' ? displayRound(l.diameter, 'lpn_u_diameter') : undefined; })),
 			length: fieldExtrema(doc.links.map(function (l) { return l.type !== 'pump' ? Math.round(l.length * 100) / 100 : undefined; })),
 			flow: fieldExtrema(doc.links.map(function (l) { return lastSolveResult ? displayRound(lastSolveResult.flows[l.id], 'lpn_u_flow') : undefined; })),
-			velocity: fieldExtrema(doc.links.map(function (l) { return lastSolveResult ? displayRound(lastSolveResult.velocities[l.id], 'lpn_u_velocity') : undefined; })),
+			velocity: fieldExtrema(doc.links.map(function (l) { return (l.type !== 'pump' && lastSolveResult) ? displayRound(lastSolveResult.velocities[l.id], 'lpn_u_velocity') : undefined; })),
 			// Displayed value, not the raw stored headloss -- a pump shows head GAIN (-headloss) per
 			// the same sign convention as the property popup, so extrema are judged on what's shown.
 			headloss: fieldExtrema(doc.links.map(function (l) {
@@ -1940,24 +2376,28 @@ var EngCalcs = EngCalcs || {};
 				return displayRound(l.type === 'pump' ? -lastSolveResult.headlosses[l.id] : lastSolveResult.headlosses[l.id], 'lpn_u_elevhead');
 			}))
 		};
-		var fc = lpnFieldColors;
+		var fc = lpnFieldColors, nodeLines = {}, linkLines = {};
 		doc.nodes.forEach(function (n) {
 			var ne = nodeEls[n.id]; if (!ne) { return; }
 			var lines = [];
+			// Order (Tom, 2026-07-30, thinking physically): ID, Demand, Head, Pressure, Elevation --
+			// demand is the thing the user set as a design target, head/pressure are what the solve
+			// produced from it, and elevation (the input least likely to change page to page) trails.
 			if (ls.node.id) { lines.push({ text: n.id, color: fc.id }); }
-			if (n.type !== 'reservoir') {
-				if (ls.node.elev) { lines.push(numLine(n.elev, 'lpn_u_elevhead', extrema.elev, fc.elev)); }
-				if (ls.node.demand) { lines.push(numLine(n.demand, 'lpn_u_flow', extrema.demand, fc.demand)); }
-			}
+			if (n.type !== 'reservoir' && ls.node.demand) { lines.push(numLine(n.demand, 'lpn_u_flow', extrema.demand, fc.demand)); }
 			var headSI = n.type === 'reservoir' ? n.head : (lastSolveResult ? lastSolveResult.heads[n.id] : undefined);
 			if (ls.node.head && headSI !== undefined) { lines.push(numLine(headSI, 'lpn_u_elevhead', extrema.head, fc.head)); }
 			if (ls.node.pressure && n.type !== 'reservoir' && lastSolveResult && lastSolveResult.pressures[n.id] !== undefined) {
 				lines.push(numLine(lastSolveResult.pressures[n.id], 'lpn_u_pressure', extrema.pressure, fc.pressure));
 			}
+			if (n.type !== 'reservoir' && ls.node.elev) { lines.push(numLine(n.elev, 'lpn_u_elevhead', extrema.elev, fc.elev)); }
+			ne.empty = lines.length === 0; // captured BEFORE the placeholder below -- see hideMask()'s comment
 			if (lines.length === 0) { lines.push({ text: '' }); } // keep an empty tspan so getBBox() doesn't throw
-			setMultilineText(ne.text, n.x + 2, lines);
+			// x here is a placeholder -- layoutNodeLabel() below (after collision avoidance) sets the
+			// real, final x/y on both the <text> and its tspans via repositionMultilineText().
+			setMultilineText(ne.text, nodeLabelBase(n).x, lines);
 			ne.lineCount = lines.length;
-			applyExtremaTicks(ne, ne.text, nodesLayer, lines);
+			nodeLines[n.id] = lines;
 			try { ne.tw = ne.text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; stale tw stands */ }
 		});
 		doc.links.forEach(function (l) {
@@ -1970,7 +2410,8 @@ var EngCalcs = EngCalcs || {};
 			}
 			if (lastSolveResult && lastSolveResult.flows[l.id] !== undefined) {
 				if (ls.link.flow) { lines.push(numLine(lastSolveResult.flows[l.id], 'lpn_u_flow', extrema.flow, fc.flow)); }
-				if (ls.link.velocity) { lines.push(numLine(lastSolveResult.velocities[l.id], 'lpn_u_velocity', extrema.velocity, fc.velocity)); }
+				// Velocity is meaningless for a pump (no diameter -- see renderLinkFields() above).
+				if (ls.link.velocity && l.type !== 'pump') { lines.push(numLine(lastSolveResult.velocities[l.id], 'lpn_u_velocity', extrema.velocity, fc.velocity)); }
 				if (ls.link.headloss) {
 					if (l.type === 'pump') {
 						lines.push(numLine(-lastSolveResult.headlosses[l.id], 'lpn_u_elevhead', extrema.headloss, fc.headloss));
@@ -1979,11 +2420,31 @@ var EngCalcs = EngCalcs || {};
 					}
 				}
 			}
+			le.empty = lines.length === 0;
 			if (lines.length === 0) { lines.push({ text: '' }); }
-			setMultilineText(le.text, +le.text.getAttribute('x'), lines);
+			setMultilineText(le.text, linkLabelBase(l).x, lines);
 			le.lineCount = lines.length;
-			applyExtremaTicks(le, le.text, linksLayer, lines);
+			linkLines[l.id] = lines;
 			try { le.tw = le.text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; stale tw stands */ }
+		});
+		// Collision avoidance runs on the freshly measured tw/lineCount above, THEN every label is
+		// laid out for real (text/mask/leader) at its final, possibly-nudged position, THEN extrema
+		// ticks are placed from that final <text> x/y -- ticks read textEl.getAttribute('x'/'y')
+		// directly (see applyExtremaTicks()), so they must come last or they'd be measured from the
+		// placeholder position set above and go stale the moment a nudge or a drag moves the label.
+		runLabelCollisionAvoidance();
+		doc.nodes.forEach(function (n) {
+			var ne = nodeEls[n.id]; if (!ne) { return; }
+			layoutNodeLabel(n.id);
+			// labelsLayer, not nodesLayer -- ticks decorate the label TEXT, which now lives in
+			// labelsLayer (Task 146.01 draw-order fix), not beside the node's own circle. A tick
+			// appended into nodesLayer would render underneath maskLayer/labelsLayer and never be seen.
+			applyExtremaTicks(ne, ne.text, labelsLayer, nodeLines[n.id]);
+		});
+		doc.links.forEach(function (l) {
+			var le = linkEls[l.id]; if (!le) { return; }
+			layoutLinkLabel(l.id);
+			applyExtremaTicks(le, le.text, labelsLayer, linkLines[l.id]);
 		});
 		doc.links.forEach(function (l) { updateArrow(l.id); });
 		renderLabelsLegend();

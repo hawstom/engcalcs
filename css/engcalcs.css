@@ -125,7 +125,7 @@ html[lang="zh"] .ec-welcome {
    color read as absorbed into the (formerly thick) pipe stroke. Black and open protrudes above
    and below the line instead of blending into it. */
 .lpn-arrow { fill: none; stroke: #000; stroke-width: 0.3; pointer-events: none; }
-.lpn-vhandle { fill: #fff; stroke: #a52; stroke-width: 1; cursor: move; }
+.lpn-vhandle { fill: #fff; stroke: #a52; stroke-width: 0.5; cursor: move; }
 /* Feedback for the first-picked node of a pipe/pump (Tom, 2026-07-30: "otherwise there's no
    indication that anything is working") -- a wide red ring around the existing node fill/stroke,
    cleared by setPendingLinkFrom(null) in looped-network.js on completion or cancel. */
@@ -139,6 +139,11 @@ html[lang="zh"] .ec-welcome {
 .lpn-lbl { fill: #333; pointer-events: none; user-select: none; }
 .lpn-leader { stroke: #000; stroke-width: 0.125; }
 .lpn-draglbl { cursor: move; pointer-events: all; }
+/* Background mask behind a node/link/Text label (Task 146.01) so it stays legible over a backdrop
+   image, another element, or a busy area of the map -- sized/positioned entirely from JS
+   (positionMaskRect() in looped-network.js); pointer-events:none so it never steals the drag/click
+   that .lpn-draglbl's text needs. */
+.lpn-lbl-mask { fill: rgba(255, 255, 255, 0.75); pointer-events: none; }
 /* A leading checkmark, not just bold/outline (Tom) -- reads as a standard menu "this is
    active" mark rather than a generic emphasis style. */
 #lpn_toolbar button[aria-pressed="true"]::before { content: "\2713 "; }

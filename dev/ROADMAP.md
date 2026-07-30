@@ -10,6 +10,14 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 ## Calculator Improvements
 
+- 10|175| **A real printable version, suite-wide.** Raised by Tom, 2026-07-30, while reviewing the
+  `lpn_` map page: the suite's only print affordance today is `d-print-none` hiding chrome
+  (toolbar, unit-select row, nav) so `Ctrl+P` on the bare page reads a little cleaner — there is no
+  actual "printable view" (clean pagination, a results summary, a static rendering of an SVG
+  canvas like `lpn_`'s map). Not designed yet — Tom's own fallback today is a screenshot, which
+  works but produces something the reader can't page through or reflow. Whoever picks this up
+  should figure out what "printable" should even mean per calculator type (a two-column input/
+  result form vs. a map/canvas page are different problems) before building anything.
 - 15|144| **Diagnose the Hazen-Williams conversion leak.** Per the 2026-07-27 usage snapshot
   (`dev/usage-data-log.md`), HW draws 580 confirmed-human views — the suite's second-biggest genuine
   front door, at 18% human-of-reach vs Darcy-Weisbach's 4% — but only 11% of those humans ever
@@ -248,19 +256,9 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   as of this paragraph's original writing; resolved by commit `7428ff0 Task 146: close the
   empty-canvas open question`, 2026-07-29) — a new project opens on the placeholder-text canvas
   above, not a worked example.
-- 100|146.01| **Draggable data labels on leaders + collision avoidance + background mask (Task 146
-  child).** Data labels detach onto a leader line past a drag-distance threshold; labels need
-  collision avoidance against each other; and a background mask/opacity behind labels so they read
-  over the backdrop image now that Task 146.01's sibling backdrop feature has shipped. Merges what
-  were two separate scope-doc "future consideration" items (remote/leader label placement, and
-  background mask) — Tom set both at priority 100 as one unit, 2026-07-29.
 - 95|146.02| **EPANET-style icon toolbar + map symbol icons (Task 146 child).** Replace/supplement
   the current toolbar with EPANET-style icons for elements and map symbols. **Must land before the
   translation sprint (146.06) — this blocks it**, per Tom, 2026-07-29.
-- 90|146.03| **Text label custom size multiplier (Task 146 child).** Simple form of the scope doc's
-  undesigned "text format system": a per-label size multiplier, nothing more. Rich text (bold, font
-  family, etc.) stays explicitly undesigned/unscoped — not a task, just a note carried in the scope
-  doc until there's a concrete ask.
 - 30|146.08| **Multiple named saved networks (Task 146 child).** Local save/retrieve so a user can
   rotate among several `lpn_` projects. This is the real need behind the scope doc's old
   `.inp` export/import item — Tom confirmed 2026-07-29 that true EPANET `.inp` file interop is not
@@ -272,7 +270,12 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   2026-07-29: explicitly not a "valve" and not modeled via minor-loss-coefficient (Km) abuse — just
   a plain open/closed state, kept simple.
 - 5|146.06| **Translation sprint for `lpn_` strings (Task 146 child).** Not until later; blocked on
-  the string set settling (146.01/146.02/146.03 above are all still moving it).
+  the string set settling (146.01/146.02/146.03 above are all still moving it). **Also gated on
+  146.08 (multiple named saved networks) shipping first (Tom, 2026-07-30):** the page stays
+  English-only (`lpn_preview_banner` says so) until real save/retrieve exists — right now the only
+  persistence is one autosaved network in browser localStorage with "no guarantee about preserving
+  data through the preview stage" (`lpn_notes_3_def`), and translating the UI reads as a promise of
+  stability this preview doesn't make yet.
 - 5|146.09| **Map insets for congested areas of a drawing (Task 146 child).** Very low priority.
 - 11|145| **Google Maps elevation/length helper — MOVED from `bpn_` to `lpn_` (Tom, 2026-07-28).**
   Was "Google Maps elevation/length helper for `bpn_`", extracted from Task 137 "Phase 2" on
@@ -607,6 +610,72 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|146.01|[CC] **Draggable data labels on leaders + collision avoidance + background mask —
+  DONE 2026-07-30.** A node's id/elev/demand/... label and a link's id/diameter/length/... label
+  (previously fixed at a hardcoded +2,-2 offset) now carry an optional `n.lx/n.ly` (or `l.lx/l.ly`)
+  drag offset, persisted like any other property (`js/looped-network.js`). Dragging past
+  `LABEL_LEADER_THRESHOLD` (4 world units) from the anchor draws a leader line
+  (`updateDataLeader()`); a manually-dragged label is exempt from further movement.
+  `runLabelCollisionAvoidance()` runs every `refreshLabelText()` pass, nudging any two overlapping
+  AUTO-placed labels (node, link) apart along the axis of least overlap — a manually-dragged label
+  still blocks others but never moves itself. Every label (node, link, and the existing Text tool
+  label) now renders a `.lpn-lbl-mask` rect behind its text (`positionMaskRect()`) so it stays
+  legible over the backdrop image or another element. Click-to-open-popup now also works from a
+  data label itself (`data-nodelbl`/`data-linklbl`), not just the node/link symbol.
+  **Two real bugs found and fixed during this work, not just new code:** (1) `repositionMultilineText()`
+  assumed every child of a label `<text>` was an element (tspan) with `setAttribute` — true once
+  `setMultilineText()` has run, but NOT for a freshly built node/link label, which starts as a plain
+  `textContent` text node; it now skips non-element children. (2) A node/link label's visible glyphs
+  live in `<tspan>` children, so a hit-test (`e.target` on pointerdown, or `elementFromPoint()` on
+  click) lands on the tspan, which carries none of the parent `<text>`'s `data-nodelbl`/
+  `data-linklbl` attribute — drag/click detection silently no-op'd. Fixed with a shared
+  `resolveLabelHit()` that walks a tspan hit up to its parent `<text>` first, applied at both
+  hit-test sites. Verified with a headless Playwright drag (offset changed, leader appeared, mask
+  rect present) plus a screenshot, not just static reading.
+
+  **Four follow-on fixes from Tom's first real review of the shipped feature, same day:**
+  (1) *Empty ghost mask.* A reservoir/pump toggled to show only fields it doesn't have (e.g. a
+  reservoir with Demand/Elevation checked but ID/Head off) produced a floating mask with nothing in
+  it — the empty-placeholder line (`{text:''}`, kept so `getBBox()` never throws) still got a mask
+  and, if dragged/nudged far enough, a leader. `ne.empty`/`le.empty`, captured in
+  `refreshLabelText()` right before the placeholder is pushed, now skips both (`hideMask()`,
+  `updateDataLeader()`) and excludes the label from collision-avoidance entirely.
+  (2) *Mask draw order.* Masks were appended into `nodesLayer`/`linksLayer` alongside the symbol
+  they belonged to, so a later-built node's mask painted OVER an earlier node's already-placed
+  label text whenever they overlapped — draw order tracked creation order, not "masks above every
+  element, text on top" as intended. Fixed with one new shared layer, `maskLayer` (between
+  `nodesLayer` and `labelsLayer`): every mask (node, link, AND the Text tool's) now lives there
+  regardless of type or creation order, and every label's text+leader (node, link) now lives in
+  `labelsLayer` alongside the Text tool's, so ticks/text/leaders all render above all masks. Extrema
+  ticks (`applyExtremaTicks()`) moved from `nodesLayer`/`linksLayer` to `labelsLayer` with them —
+  they decorate the text, so they'd have been silently hidden under `maskLayer` otherwise.
+  (3) *Leader jump rule.* A node/link label's leader always ran to the label's LEFT edge regardless
+  of drag direction, so dragging a label to the left of its anchor drew the leader straight through
+  the text. `updateDataLeader()` now carries the same side-flip hysteresis a Text label's leader
+  already had (`ADVERSE_FRAC`), generalized to a left-anchored (not centered) box: it tracks a
+  persistent `holder.side` and flips which edge the leader attaches to once the label's box center
+  crosses the same 75%-past-center trigger.
+  (4) *Node label order.* Reordered ID, Demand, Head, Pressure, Elevation (was ID, Elevation,
+  Demand, Head, Pressure) — Tom, thinking physically: demand is the design input, head/pressure are
+  what the solve produces from it, elevation trails. Reordered in three places that must agree:
+  `refreshLabelText()`'s node loop, `nodeFieldDefs()` (drives both the Labels popover checkboxes and
+  the on-map legend).
+  Also in this pass: a pump's Velocity is meaningless (no diameter, so `js/lpn-solver.js` can only
+  fall back to 0) and is now suppressed in the property popup, the data-label toggle, and the
+  velocity extrema — Tom caught this asking "how can a pump have a velocity if it has no diameter?".
+  Confirmed Node/Link label settings already correctly apply to Reservoir/Pump wherever the field is
+  physically meaningful (ID/Head for a reservoir; ID/Flow/Head-gain for a pump) and are already
+  excluded where it isn't (Elevation/Demand for a reservoir; Diameter/Length/Velocity for a pump) —
+  no design change needed there, just the Velocity bug above.
+
+- 0|146.03|[CC] **Text label custom size multiplier — DONE 2026-07-29.** Per-label `sizeMult`
+  (default 1) stacks on top of the shared `settings.textSize`/`settings.textSizeUnits` via
+  `effectiveFontSize(mult)` in `js/looped-network.js`; only a Text label carries one — node/link
+  labels are unaffected. Editable via a new "Size ×" number field in the Text popup
+  (`renderLabelFields()`), persisted with the label (no storage-version bump needed — old saved
+  labels fall back to `sizeMult || 1`). Rich text formatting (bold, font family) remains explicitly
+  undesigned per the scope doc.
 
 - 0|163|[CC] **Language strings standardized on single quotes; the validator's blind spot closed —
   DONE 2026-07-28.** Was: "`lang_syntax_validate.php` cannot see double-quoted lang assignments"

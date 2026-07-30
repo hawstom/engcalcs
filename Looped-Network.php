@@ -63,6 +63,14 @@ document.addEventListener('DOMContentLoaded', function() {
 	<p id="lpn_status" class="ec-status-warn"></p>
 	<div style="overflow-x:auto;position:relative">
 		<svg id="lpn_canvas" dir="ltr" width="100%" height="500" style="border:1px solid #ccc;background:#f7f7f2"></svg>
+		<?php // Persistent mode signal, INSIDE the canvas (Tom, 2026-07-30, second look: "I envisioned
+		      // the mode status in the canvas area since it's active like coordinates" -- moved from a
+		      // <p> above the map to this overlay, matching #lpn_coords' own treatment below: an
+		      // absolutely-positioned, small-font, translucent-background readout that lives where the
+		      // "live" map state actually is). Top-left so it doesn't compete with the upper-right
+		      // legend or the bottom-left coordinate tracker. Updated by setMode() in
+		      // looped-network.js. ?>
+		<div id="lpn_mode_hint" class="d-print-none" style="position:absolute;top:4px;left:4px;font-size:11px;background:rgba(255,255,255,.8);padding:2px 6px;pointer-events:none"></div>
 		<?php // Deliberately NOT d-print-none (Tom, 2026-07-30) -- the Labels popover itself is
 		      // toolbar chrome and is hidden on print like the rest of #lpn_toolbar, so the color key
 		      // for whichever fields are toggled on needs a separate, always-visible home to survive
@@ -148,11 +156,21 @@ EngCalcs.pageConfig = {
 	lpn_field_auto: <?=json_encode($ec_lang['lpn_field_auto'])?>,
 	lpn_field_x: <?=json_encode($ec_lang['lpn_field_x'])?>,
 	lpn_field_y: <?=json_encode($ec_lang['lpn_field_y'])?>,
+	lpn_field_text_size: <?=json_encode($ec_lang['lpn_field_text_size'])?>,
 	lpn_tool_labels: <?=json_encode($ec_lang['lpn_tool_labels'])?>,
 	lpn_labels_heading_node: <?=json_encode($ec_lang['lpn_labels_heading_node'])?>,
 	lpn_labels_heading_link: <?=json_encode($ec_lang['lpn_labels_heading_link'])?>,
 	lpn_field_id: <?=json_encode($ec_lang['lpn_field_id'])?>,
 	lpn_pump_notice: <?=json_encode($ec_lang['lpn_pump_notice'])?>,
+	lpn_mode_select: <?=json_encode($ec_lang['lpn_mode_select'])?>,
+	lpn_mode_delete: <?=json_encode($ec_lang['lpn_mode_delete'])?>,
+	lpn_mode_add_junction: <?=json_encode($ec_lang['lpn_mode_add_junction'])?>,
+	lpn_mode_add_reservoir: <?=json_encode($ec_lang['lpn_mode_add_reservoir'])?>,
+	lpn_mode_add_pipe: <?=json_encode($ec_lang['lpn_mode_add_pipe'])?>,
+	lpn_mode_add_pump: <?=json_encode($ec_lang['lpn_mode_add_pump'])?>,
+	lpn_mode_add_text: <?=json_encode($ec_lang['lpn_mode_add_text'])?>,
+	lpn_tip_select: <?=json_encode($ec_lang['lpn_tip_select'])?>,
+	lpn_tip_labels_draggable: <?=json_encode($ec_lang['lpn_tip_labels_draggable'])?>,
 	bpn_demand: <?=json_encode($ec_lang['bpn_demand'])?>,
 	lpn_id_invalid: <?=json_encode($ec_lang['lpn_id_invalid'])?>,
 	lpn_id_taken: <?=json_encode($ec_lang['lpn_id_taken'])?>,
@@ -194,6 +212,8 @@ EngCalcs.pageConfig = {
 	lpn_settings_text_size_map: <?=json_encode($ec_lang['lpn_settings_text_size_map'])?>,
 	lpn_settings_text_size_screen: <?=json_encode($ec_lang['lpn_settings_text_size_screen'])?>,
 	lpn_settings_text_size_units: <?=json_encode($ec_lang['lpn_settings_text_size_units'])?>,
+	lpn_settings_map_height: <?=json_encode($ec_lang['lpn_settings_map_height'])?>,
+	lpn_settings_map_height_px: <?=json_encode($ec_lang['lpn_settings_map_height_px'])?>,
 	lpn_settings_legend_position: <?=json_encode($ec_lang['lpn_settings_legend_position'])?>,
 	lpn_settings_legend_top_left: <?=json_encode($ec_lang['lpn_settings_legend_top_left'])?>,
 	lpn_settings_legend_top_right: <?=json_encode($ec_lang['lpn_settings_legend_top_right'])?>,
