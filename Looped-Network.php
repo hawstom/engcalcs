@@ -161,7 +161,12 @@ EngCalcs.pageConfig = {
 	lpn_labels_heading_node: <?=json_encode($ec_lang['lpn_labels_heading_node'])?>,
 	lpn_labels_heading_link: <?=json_encode($ec_lang['lpn_labels_heading_link'])?>,
 	lpn_field_id: <?=json_encode($ec_lang['lpn_field_id'])?>,
-	lpn_pump_notice: <?=json_encode($ec_lang['lpn_pump_notice'])?>,
+	lpn_pump_curve_source: <?=json_encode($ec_lang['lpn_pump_curve_source'])?>,
+	lpn_pump_curve_own: <?=json_encode($ec_lang['lpn_pump_curve_own'])?>,
+	lpn_pump_curve_ref_note: <?=json_encode($ec_lang['lpn_pump_curve_ref_note'])?>,
+	lpn_pump_point1: <?=json_encode($ec_lang['lpn_pump_point1'])?>,
+	lpn_pump_point2: <?=json_encode($ec_lang['lpn_pump_point2'])?>,
+	lpn_pump_point3: <?=json_encode($ec_lang['lpn_pump_point3'])?>,
 	lpn_mode_select: <?=json_encode($ec_lang['lpn_mode_select'])?>,
 	lpn_mode_delete: <?=json_encode($ec_lang['lpn_mode_delete'])?>,
 	lpn_mode_add_junction: <?=json_encode($ec_lang['lpn_mode_add_junction'])?>,
@@ -220,7 +225,12 @@ EngCalcs.pageConfig = {
 	lpn_settings_legend_middle_left: <?=json_encode($ec_lang['lpn_settings_legend_middle_left'])?>,
 	lpn_settings_legend_middle_right: <?=json_encode($ec_lang['lpn_settings_legend_middle_right'])?>,
 	lpn_settings_legend_bottom_left: <?=json_encode($ec_lang['lpn_settings_legend_bottom_left'])?>,
-	lpn_settings_legend_bottom_right: <?=json_encode($ec_lang['lpn_settings_legend_bottom_right'])?>
+	lpn_settings_legend_bottom_right: <?=json_encode($ec_lang['lpn_settings_legend_bottom_right'])?>,
+	lpn_settings_restore: <?=json_encode($ec_lang['lpn_settings_restore'])?>,
+	lpn_settings_restore_btn: <?=json_encode($ec_lang['lpn_settings_restore_btn'])?>,
+	lpn_confirm_restore_defaults: <?=json_encode($ec_lang['lpn_confirm_restore_defaults'])?>,
+	lpn_settings_wipe_btn: <?=json_encode($ec_lang['lpn_settings_wipe_btn'])?>,
+	lpn_confirm_wipe: <?=json_encode($ec_lang['lpn_confirm_wipe'])?>
 };
 </script>
 <script src="/engcalcs/js/lpn-solver.js?v=<?=filemtime(__DIR__.'/js/lpn-solver.js')?>"></script>
