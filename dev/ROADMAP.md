@@ -2,7 +2,7 @@
 
 This is a prioritized, bulleted roadmap for the EngCalcs hydraulic calculator suite.
 
-The format of each task is: `Priority|ID|status Description`. Priority: 0 means "Completed" and 100 means top priority; ties (same priority for multiple tasks) are okay; any whole number 0-100 can be used; priority is mutable and gets reused across tasks, and always drops to 0 on completion. ID is a permanent, ordinal task number — never reused, never changed, unrelated to priority — used whenever a task needs to be referenced by number (in another task's text, in a commit message, in `dev/` docs). Refer to a task in prose as "Task N".
+The format of each task is: `Priority|ID|status Description`. Priority: 0 means "Completed" and 100 means top priority; ties (same priority for multiple tasks) are okay; any whole number 0-100 can be used; priority is mutable and gets reused across tasks, and always drops to 0 on completion. ID is a permanent, ordinal task number — never reused, never changed, unrelated to priority — used whenever a task needs to be referenced by number (in another task's text, in a commit message, in `dev/` docs). Refer to a task in prose as "Task N". A task that is one of several concrete sub-items under a single parent task may instead use a dotted ID, `parent.nn` (e.g. `146.01`) — introduced 2026-07-29 for Task 146's backlog — but it is still a full `Priority|ID|status` bullet like any other task, just grouped under its parent by ID rather than living inside the parent's prose.
 
 Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Copilot, `[H]` = Human decision needed, `[CC→CP]` / `[CP→CC]` = split task (first actor works, then updates tag to the next plain tag when handing off). Untagged = actor-agnostic. See `cross-platform-planning.md` §2.2.2 for the full tag lifecycle.
 
@@ -218,7 +218,14 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     Also confirmed: **structural diagnostics run before the solve** (no fixed head / unreachable
     node named by id / node isolated behind a closed link), and this suite's Hazen-Williams differs
     from EPANET's by ~0.012%, so the solver carries both constant sets and defaults to ours.
-  - **Phases 1–4** are in the scope doc.
+  - **Phases 1–4 were originally scoped in the scope doc; Phase 1 is DONE** (shipped 2026-07-29,
+    live as a PREVIEW page: page, toolbar, elements, popups, solve, autosave, diagnostics). Phase
+    2 shipped most of its scope (labels, gear/settings panel, legend positioning, user-supplied
+    backdrop image). **The rest of Phase 2/3/4's unbuilt items are no longer tracked as phases —
+    reorganized 2026-07-29 into individually-prioritized child tasks 146.01–146.09 below** (plus
+    Task 145, which already covers what was Phase 4), so each item's priority is visible instead
+    of buried in phase prose. The scope doc retains the phase framing as historical narrative;
+    ROADMAP priority is authoritative for what to work on next.
 
   **Backdrop: the network is drawn over a background, and the background is usually not a map (Tom,
   2026-07-28).** Nobody uses EPANET without a backdrop, and in practice that backdrop is a plan
@@ -237,9 +244,36 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   what it says, which needs no knowledge of projections or units-per-pixel and works the same for a
   scanned plan, a CAD export, or a phone photo of a drawing on a wall. Make that the spike's
   backdrop acceptance test. A blank project carries placeholder text across the canvas — "Start by
-  adding a background image using the toolbar" — and **what a new project starts with otherwise
-  (empty, or a worked example as every other calculator does) is deliberately left open** until the
-  editor exists to look at.
+  adding a background image using the toolbar." **The empty-canvas question is closed** (was open
+  as of this paragraph's original writing; resolved by commit `7428ff0 Task 146: close the
+  empty-canvas open question`, 2026-07-29) — a new project opens on the placeholder-text canvas
+  above, not a worked example.
+- 100|146.01| **Draggable data labels on leaders + collision avoidance + background mask (Task 146
+  child).** Data labels detach onto a leader line past a drag-distance threshold; labels need
+  collision avoidance against each other; and a background mask/opacity behind labels so they read
+  over the backdrop image now that Task 146.01's sibling backdrop feature has shipped. Merges what
+  were two separate scope-doc "future consideration" items (remote/leader label placement, and
+  background mask) — Tom set both at priority 100 as one unit, 2026-07-29.
+- 95|146.02| **EPANET-style icon toolbar + map symbol icons (Task 146 child).** Replace/supplement
+  the current toolbar with EPANET-style icons for elements and map symbols. **Must land before the
+  translation sprint (146.06) — this blocks it**, per Tom, 2026-07-29.
+- 90|146.03| **Text label custom size multiplier (Task 146 child).** Simple form of the scope doc's
+  undesigned "text format system": a per-label size multiplier, nothing more. Rich text (bold, font
+  family, etc.) stays explicitly undesigned/unscoped — not a task, just a note carried in the scope
+  doc until there's a concrete ask.
+- 30|146.08| **Multiple named saved networks (Task 146 child).** Local save/retrieve so a user can
+  rotate among several `lpn_` projects. This is the real need behind the scope doc's old
+  `.inp` export/import item — Tom confirmed 2026-07-29 that true EPANET `.inp` file interop is not
+  needed right now, only local multi-project storage.
+- 20|146.04| **Node/link report tables (Task 146 child).** Tabular results view.
+- 20|146.05| **EPANET-style element browser (Task 146 child).** List/select elements from a panel
+  rather than only the canvas.
+- 15|146.07| **Open/Closed link property (Task 146 child).** A simple boolean state on a link. Tom,
+  2026-07-29: explicitly not a "valve" and not modeled via minor-loss-coefficient (Km) abuse — just
+  a plain open/closed state, kept simple.
+- 5|146.06| **Translation sprint for `lpn_` strings (Task 146 child).** Not until later; blocked on
+  the string set settling (146.01/146.02/146.03 above are all still moving it).
+- 5|146.09| **Map insets for congested areas of a drawing (Task 146 child).** Very low priority.
 - 11|145| **Google Maps elevation/length helper — MOVED from `bpn_` to `lpn_` (Tom, 2026-07-28).**
   Was "Google Maps elevation/length helper for `bpn_`", extracted from Task 137 "Phase 2" on
   2026-07-27. Tom's reason for the move, recorded because it is a genuine prioritization signal and

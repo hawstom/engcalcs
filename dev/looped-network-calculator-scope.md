@@ -1,7 +1,10 @@
 # Looped Pipe Network Calculator (Map Interface) — Scope
 
-Status: **scoped 2026-07-28, not started.** ROADMAP Task 146, whose entry carries the phase list and
-the decision log. Prefix **`lpn_`**; page `Looped-Network.php`; JS `js/looped-network.js`.
+Status: **Phases 0, 0.5, and 1 shipped; Phase 2 mostly shipped. Live as a PREVIEW page** (2026-07-29
+on). ROADMAP Task 146 carries the decision log and shipped-phase history; the remaining unbuilt work
+is no longer phase-shaped — it is tracked as individually-prioritized child tasks **146.01–146.09**
+(plus Task 145) directly in `dev/ROADMAP.md`, reorganized 2026-07-29. Prefix **`lpn_`**; page
+`Looped-Network.php`; JS `js/looped-network.js`.
 
 **This calculator is only loosely related to the rest of the suite (Tom, 2026-07-29), and that is a
 standing instruction, not an observation.** Much of it is its own strategy: its own UI paradigm (a
@@ -15,8 +18,10 @@ Sibling of `bpn_` / `Branched-Network.php`, which stays **exactly as shipped** �
 not an evolution of that one. The row-table form is genuinely better for a simple series run, and
 `bpn_` has 53 keys translated into 26 languages that a UX rewrite would put at risk for no gain.
 
-**All build work happens on a dedicated git branch** so it never blocks other work on `master`. This
-doc and the roadmap entries are planning artifacts and live on `master`.
+**Commits go direct to `master`** (Tom, 2026-07-30 cleanup — the per-phase `lpn-solver`/`lpn-labels`
+branches used through Phase 2 were an inconsistency with this project's standing no-branching policy,
+not a deliberate exception; both were fast-forward-merged and deleted). This doc and the roadmap
+entries are planning artifacts and live on `master` as always.
 
 ## Purpose and the gap it fills
 
@@ -631,20 +636,22 @@ items this section and Phase 2's bullet named are live:
   `zoomExtent()` via `effectiveFontSize()`/`refreshFontSizes()`.
 - **Legend position**, the 6-way choice logged below — live via `applyLegendPosition()`.
 
-**Text format system** and **symbols/pipes/labels scale-settings system** remain undesigned — genuinely
-unspecified beyond their names in the round-2 note above, not deferred for lack of time. Design them
-when there's a concrete ask to design against, same as originally planned.
+**Symbols/pipes/labels scale-settings system is BUILT** — see "Built (2026-07-30)" below (legend
+position was the concrete shape it took). **Text format system is now partly scoped (Tom, 2026-07-29):
+a simple per-label size multiplier is Task 146.03** (`dev/ROADMAP.md`), priority 90. Richer text
+formatting (bold, font family, etc.) remains genuinely undesigned beyond that — not deferred for lack
+of time, just no concrete ask yet. Design it when there's one.
 
-**Future consideration, not scoped for now (Tom, round 2): an EPANET-style icon toolbar.** EPANET
-uses icons for its entire toolbar specifically to avoid translation cost. Tom is unsure whether this
-suite needs that now, but wants it on the record for whenever the toolbar's translation cost becomes
-worth avoiding — likely alongside or after the Phase 2 translation sprint, not before.
+**Now scoped: an EPANET-style icon toolbar — Task 146.02** (`dev/ROADMAP.md`), priority 95, Tom
+2026-07-29. Replaces/supplements the current toolbar with EPANET-style icons for elements and map
+symbols, avoiding per-language translation cost the way EPANET's own icon toolbar does. **Must land
+before the translation sprint (Task 146.06), which it blocks.**
 
-**Future consideration, not scoped for now (Tom, round 2): a background mask behind labels/Text.**
-A partly-opaque background behind map text (so it stays legible over a busy backdrop or overlapping
-geometry) plus a setting for how opaque. Tom explicitly leaned toward roadmap over now; revisit once
-the Phase 2 backdrop-image feature makes label-over-backdrop legibility a real, testable problem
-rather than a hypothetical one.
+**Now scoped: a background mask behind labels — merged into Task 146.01** (`dev/ROADMAP.md`),
+priority 100, Tom 2026-07-29. A partly-opaque background behind map text so it stays legible over a
+busy backdrop or overlapping geometry, plus a setting for how opaque. The backdrop-image feature this
+was waiting on shipped 2026-07-29 (`c46260f`), so label-over-backdrop legibility is now a real,
+testable problem — no longer hypothetical.
 
 **Legend placement, quick fix now + configurability logged for the gear panel (Tom, round 3,
 2026-07-30).** `#lpn_labels_legend` moved from a horizontal row above the canvas to a vertically-
@@ -672,19 +679,26 @@ nodes, the fixed position has nowhere legible to sit, so a data label needs the 
 escape hatch a Text label already has. Automating the placement (auto-detecting a cramped spot and
 offering a leader) is a nice-to-have; **manual leader placement must exist regardless, and collision
 avoidance is the critical piece** — a leader that can land on top of another label/leader defeats the
-whole point. Re-scope this properly (probably Phase 2's label-toggle system + Phase 3's polish, not a
-single bullet) before starting it.
+whole point. **This is now Task 146.01** (`dev/ROADMAP.md`), priority 100 — merged with the
+background-mask item above into one unit, per Tom 2026-07-29.
 
-**Phase 3 — polish and reach.** Remote/leader data-label placement + collision avoidance (see the
-correction above; NOT Text labels, which already have this); the Phase 0 label-reset gesture note
-now applies there too, not to Text; map insets for congested areas; `.inp` export/import;
-**valves as a link property (status + setting), not a fifth element type** — Tom's instinct matches
-EPANET's own data model. *(Polyline pipe vertex editing, originally slated here, moved to Phase 1 —
-see the note above.)*
+**Phase 3 items, reorganized 2026-07-29 into `dev/ROADMAP.md` child tasks** (no longer phase-shaped;
+priority is now visible per item there): remote/leader data-label placement + collision avoidance is
+**Task 146.01** (see the correction above; NOT Text labels, which already have this — the Phase 0
+label-reset gesture note applies there too, not to Text); map insets for congested areas is
+**Task 146.09** (very low priority); a link property is **Task 146.07** — Tom, 2026-07-29: a simple
+**Open/Closed** boolean state, explicitly *not* framed as "valve" and *not* modeled via minor-loss
+Km abuse, kept as small as possible. The old `.inp` export/import item is **not** carried forward as
+written — Tom confirmed 2026-07-29 the actual need behind it is local multi-project save/retrieve
+(rotating among several saved `lpn_` networks), which is **Task 146.08**; true EPANET `.inp` file
+interop was considered and declined for now. *(Polyline pipe vertex editing, originally slated here,
+moved to Phase 1 — see the note above.)*
 
 **Phase 4 — Task 145**, the Google/OSM tiled map and elevation mashup, moved here from `bpn_`. By
 this point it is one more backdrop *type*, not a foundation — and it brings the projection and
-Web-Mercator-distance traps documented in the Backdrop section.
+Web-Mercator-distance traps documented in the Backdrop section. **Confirmed low priority (Tom,
+2026-07-29)** — stays at its existing ROADMAP priority of 11; this is a "maybe cool, try it sometime"
+item, not a near-term target.
 
 ## Abort points
 
