@@ -46,6 +46,12 @@ document.addEventListener('DOMContentLoaded', function() {
 	</div>
 	</div>
 	<div class="d-print-none" id="lpn_toolbar"></div>
+	<?php // Deliberately NOT d-print-none (Tom, 2026-07-30) -- the Labels popover itself is
+	      // toolbar chrome and is hidden on print like the rest of #lpn_toolbar, so the color key
+	      // for whichever fields are toggled on needs a separate, always-visible home to survive
+	      // printing. Hidden by JS (display:none) whenever no field is toggled on, so it costs
+	      // nothing when the map labels are off. ?>
+	<div id="lpn_labels_legend" style="display:none;font-size:0.9em;margin-bottom:4px"></div>
 	<p id="lpn_status" class="ec-status-warn"></p>
 	<div style="overflow-x:auto;position:relative">
 		<svg id="lpn_canvas" dir="ltr" width="100%" height="500" style="border:1px solid #ccc;background:#f7f7f2"></svg>

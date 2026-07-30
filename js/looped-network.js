@@ -57,8 +57,14 @@ var EngCalcs = EngCalcs || {};
 			if (!lines[i].decoration) { continue; }
 			tspan = textEl.childNodes[i];
 			try { width = tspan.getComputedTextLength(); } catch (err) { width = 0; }
-			x0 = x + width + 0.6; x1 = x0 + 1.6;
-			y = baseY + i * LABEL_LINE_HEIGHT + (lines[i].decoration === 'high' ? -1.1 : 1.1);
+			// Gap and vertical offsets tuned against a rendered screenshot (Tom, 2026-07-30): the
+			// first cut's gap read as too wide, its "high" tick sat at only ~60% of the digits'
+			// cap-height (not near the top), and its "low" tick sat ~60% of a text-height below the
+			// baseline (far past the bottom of a digit, none of which have descenders). "high" now
+			// sits at essentially the full cap-height above baseline (LABEL_FONT_SIZE's ~0.7 cap-
+			// height ratio), "low" just below the baseline where the digits themselves end.
+			x0 = x + width + 0.3; x1 = x0 + 1.6;
+			y = baseY + i * LABEL_LINE_HEIGHT + (lines[i].decoration === 'high' ? -LABEL_FONT_SIZE * 0.72 : 0.3);
 			holder.tickEls.push(el('line', {
 				x1: x0, y1: y, x2: x1, y2: y, stroke: lines[i].color || '#000', 'stroke-width': 0.3
 			}, layer));
@@ -743,8 +749,13 @@ var EngCalcs = EngCalcs || {};
 		rebuildLink(pipe);
 		// Second, straight J1-J2 pipe (Tom, 2026-07-30): the bent pipe alone made this a tree/series
 		// network with no cycle at all, despite being the example for a LOOPED network calculator --
-		// two parallel paths between the same two nodes is the simplest genuine loop.
-		addLink('pipe', j1.id, j2.id);
+		// two parallel paths between the same two nodes is the simplest genuine loop. A bend on this
+		// one too (Tom's own suggested point) so the two parallel pipes visibly separate and meet
+		// J1/J2 at closer to a right angle, instead of running the second pipe as a straight overlap.
+		var pipe2 = addLink('pipe', j1.id, j2.id);
+		pipe2.verts.push({ x: 27, y: 15 });
+		pipe2.length = linkGeomLength(pipe2);
+		rebuildLink(pipe2);
 		updateEmptyHint();
 		zoomExtent();
 		setMode('select');
@@ -1015,26 +1026,58 @@ var EngCalcs = EngCalcs || {};
 		container.appendChild(label);
 		container.appendChild(document.createElement('br'));
 	}
+	// Shared with renderLabelsLegend() below -- one place naming which fields exist and what their
+	// checkbox/legend text says, so the popover and the legend can never drift out of sync.
+	function nodeFieldDefs(pc) {
+		return [
+			['id', pc.lpn_field_id || 'ID'], ['elev', pc.lpn_field_elev || 'Elevation'],
+			['demand', pc.bpn_demand || 'Demand'], ['head', pc.lpn_result_head || 'Head'],
+			['pressure', pc.lpn_result_pressure || 'Pressure']
+		];
+	}
+	function linkFieldDefs(pc) {
+		return [
+			['id', pc.lpn_field_id || 'ID'], ['diameter', pc.lpn_field_diameter || 'Diameter'],
+			['length', pc.lpn_field_length || 'Length'], ['flow', pc.lpn_result_flow || 'Flow'],
+			['velocity', pc.lpn_result_velocity || 'Velocity'], ['headloss', pc.lpn_result_headloss || 'Head loss']
+		];
+	}
 	function wireLabelsPopup() {
 		var pc = EngCalcs.pageConfig || {}, nodeBox = document.getElementById('lpn_labels_node_fields'),
 			linkBox = document.getElementById('lpn_labels_link_fields');
 		document.getElementById('lpn_labels_popup_close').addEventListener('click', function () {
 			document.getElementById('lpn_labels_popup').style.display = 'none';
 		});
-		[
-			['id', pc.lpn_field_id || 'ID'], ['elev', pc.lpn_field_elev || 'Elevation'],
-			['demand', pc.bpn_demand || 'Demand'], ['head', pc.lpn_result_head || 'Head'],
-			['pressure', pc.lpn_result_pressure || 'Pressure']
-		].forEach(function (f) {
+		nodeFieldDefs(pc).forEach(function (f) {
 			labelCheckbox(nodeBox, f[1], lpnFieldColors[f[0]], labelSettings.node[f[0]], function (v) { labelSettings.node[f[0]] = v; });
 		});
-		[
-			['id', pc.lpn_field_id || 'ID'], ['diameter', pc.lpn_field_diameter || 'Diameter'],
-			['length', pc.lpn_field_length || 'Length'], ['flow', pc.lpn_result_flow || 'Flow'],
-			['velocity', pc.lpn_result_velocity || 'Velocity'], ['headloss', pc.lpn_result_headloss || 'Head loss']
-		].forEach(function (f) {
+		linkFieldDefs(pc).forEach(function (f) {
 			labelCheckbox(linkBox, f[1], lpnFieldColors[f[0]], labelSettings.link[f[0]], function (v) { labelSettings.link[f[0]] = v; });
 		});
+	}
+	// A color key that survives printing (Tom, 2026-07-30): the Labels popover itself is toolbar
+	// chrome (d-print-none), so a legend that only lived there would vanish on a printed page --
+	// this renders into #lpn_labels_legend, which is NOT d-print-none, and is kept live by being
+	// called from refreshLabelText() (every toggle change, solve, and unit switch already calls
+	// that). Hidden entirely when no field is toggled on, so it costs nothing by default.
+	function renderLabelsLegend() {
+		var box = document.getElementById('lpn_labels_legend'); if (!box) { return; }
+		var pc = EngCalcs.pageConfig || {}, any = false;
+		box.innerHTML = '';
+		function addGroup(defs, settings) {
+			defs.forEach(function (f) {
+				if (!settings[f[0]]) { return; }
+				any = true;
+				var span = document.createElement('span');
+				span.style.color = lpnFieldColors[f[0]];
+				span.style.marginRight = '12px';
+				span.textContent = f[1];
+				box.appendChild(span);
+			});
+		}
+		addGroup(nodeFieldDefs(pc), labelSettings.node);
+		addGroup(linkFieldDefs(pc), labelSettings.link);
+		box.style.display = any ? '' : 'none';
 	}
 	function toggleLabelsPopup(evt) {
 		var popup = document.getElementById('lpn_labels_popup');
@@ -1407,6 +1450,7 @@ var EngCalcs = EngCalcs || {};
 			try { le.tw = le.text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; stale tw stands */ }
 		});
 		doc.links.forEach(function (l) { updateArrow(l.id); });
+		renderLabelsLegend();
 	}
 	function runSolve() {
 		// Autosave piggybacks on the same debounce as the solve, not a separate timer -- one
