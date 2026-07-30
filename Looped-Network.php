@@ -5,6 +5,7 @@ $html_desc = $ec_lang['lpn_main_desc'];
 echoHeader("EngCalcs", $html_title, "");
 ?>
 <h2><?=$ec_lang['lpn_main_desc']?></h2>
+<p class="ec-status-warn" style="font-weight:bold;font-size:1.15em"><?=$ec_lang['lpn_preview_banner']?></p>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
