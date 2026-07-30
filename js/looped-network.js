@@ -364,9 +364,29 @@ var EngCalcs = EngCalcs || {};
 		scheduleSolve();
 		return l;
 	}
+	// Snap-on-create (scope doc, Phase 1): a text label dropped close to an existing node anchors
+	// to it (moves with the node, drawn with a leader -- see buildLabelEls) instead of sitting at a
+	// free-floating map coordinate. SNAP_DIST is in world units, comfortably bigger than either
+	// node radius (1.6-2.2) so a click that's clearly "near a node" catches it, but well under the
+	// 20-unit spacing used by both drawExampleNetwork() and drawTestGrid() so two nearby nodes
+	// can't both claim the same click.
+	var LABEL_SNAP_DIST = 4;
+	function nearestNodeWithin(x, y, dist) {
+		var best = null, bestD = dist, i, n, d;
+		for (i = 0; i < doc.nodes.length; i++) {
+			n = doc.nodes[i];
+			d = Math.hypot(n.x - x, n.y - y);
+			if (d <= bestD) { best = n; bestD = d; }
+		}
+		return best;
+	}
 	function addText(x, y) {
-		var id = 'T' + (nextId.T++);
-		var lb = { id: id, text: EngCalcs.pageConfig.lpn_new_text || 'Text', x: x, y: y, anchorNode: null };
+		var id = 'T' + (nextId.T++), near = nearestNodeWithin(x, y, LABEL_SNAP_DIST), lb;
+		if (near) {
+			lb = { id: id, text: EngCalcs.pageConfig.lpn_new_text || 'Text', x: x - near.x, y: y - near.y, anchorNode: near.id };
+		} else {
+			lb = { id: id, text: EngCalcs.pageConfig.lpn_new_text || 'Text', x: x, y: y, anchorNode: null };
+		}
 		doc.labels.push(lb);
 		buildLabelEls(lb);
 		return lb;
