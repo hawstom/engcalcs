@@ -516,11 +516,20 @@ var EngCalcs = EngCalcs || {};
 		scheduleSolve();
 		return l;
 	}
-	function addText(x, y) {
-		var id = 'T' + (nextId.T++);
-		var lb = { id: id, text: EngCalcs.pageConfig.lpn_new_text || 'Text', x: x, y: y, anchorNode: null };
+	// anchorNode, if given, anchors the new Text to that node with a leader -- lb.x/lb.y become an
+	// OFFSET from the node (matching buildLabelEls'/updateLabelGeometry's model), computed here so
+	// the label still appears exactly where the user tapped, not snapped onto the node itself.
+	function addText(x, y, anchorNode) {
+		var id = 'T' + (nextId.T++), an = anchorNode ? nodeById(anchorNode) : null;
+		var lb = an
+			? { id: id, text: EngCalcs.pageConfig.lpn_new_text || 'Text', x: x - an.x, y: y - an.y, anchorNode: anchorNode }
+			: { id: id, text: EngCalcs.pageConfig.lpn_new_text || 'Text', x: x, y: y, anchorNode: null };
 		doc.labels.push(lb);
 		buildLabelEls(lb);
+		// A newly-added Text was never actually persisted (Task 146 Phase 1 gap, found while
+		// wiring the text-edit popup, 2026-07-30) -- addNode()/addLink() reach saveToStorage()
+		// via scheduleSolve(); a Text never triggers a solve, so nothing else was saving it.
+		saveToStorage();
 		return lb;
 	}
 	function deleteNode(id) {
@@ -528,6 +537,9 @@ var EngCalcs = EngCalcs || {};
 		for (i = 0; i < links.length; i++) { deleteLink(links[i]); }
 		labelsByAnchor[id].slice().forEach(function (lid) { deleteLabelById(lid); });
 		nodeEls[id].circle.remove(); nodeEls[id].text.remove();
+		// Same orphaned-tick-mark bug as deleteLink()/rebuildLink() -- these are separate elements,
+		// not text children.
+		if (nodeEls[id].tickEls) { nodeEls[id].tickEls.forEach(function (t) { t.remove(); }); }
 		delete nodeEls[id]; delete incidentLinks[id]; delete labelsByAnchor[id];
 		doc.nodes = doc.nodes.filter(function (n) { return n.id !== id; });
 		if (currentPopup && currentPopup.kind === 'node' && currentPopup.id === id) { closePopup(); }
@@ -543,6 +555,11 @@ var EngCalcs = EngCalcs || {};
 		linkEls[id].line.remove();
 		linkEls[id].handles.forEach(function (h) { h.remove(); });
 		linkEls[id].arrows.forEach(function (a) { a.remove(); });
+		linkEls[id].text.remove();
+		// Extrema tick marks (applyExtremaTicks()) are separate elements, not text children --
+		// orphaned on screen otherwise (Tom, 2026-07-30: "when I delete a pipe, its orphaned labels
+		// are left behind"). Same fix rebuildLink() already needed for the same reason.
+		if (linkEls[id].tickEls) { linkEls[id].tickEls.forEach(function (t) { t.remove(); }); }
 		delete linkEls[id];
 		incidentLinks[l.from] = incidentLinks[l.from].filter(function (x) { return x !== id; });
 		incidentLinks[l.to] = incidentLinks[l.to].filter(function (x) { return x !== id; });
@@ -559,6 +576,7 @@ var EngCalcs = EngCalcs || {};
 			labelsByAnchor[lb.anchorNode] = labelsByAnchor[lb.anchorNode].filter(function (x) { return x !== id; });
 		}
 		doc.labels = doc.labels.filter(function (x) { return x.id !== id; });
+		if (currentPopup && currentPopup.kind === 'label' && currentPopup.id === id) { closePopup(); }
 	}
 
 	// ---- localStorage autosave (single network) ----
@@ -900,7 +918,17 @@ var EngCalcs = EngCalcs || {};
 					addNode(mode === 'add-reservoir' ? 'reservoir' : 'junction', w.x, w.y);
 				}
 			}
-			else if (mode === 'add-text') { saveUndoSnapshot(); addText(w.x, w.y); }
+			else if (mode === 'add-text') {
+				saveUndoSnapshot();
+				// Snap to a nearby node the same way add-pipe/add-pump do (Tom, 2026-07-30: "I
+				// thought we programmed a leader for it if placed near a node... now it's gone" --
+				// it turns out this creation-time snap was never actually wired up; the leader-
+				// rendering machinery in buildLabelEls()/updateLabelGeometry() was already there and
+				// ready, waiting on this). A tap within NODE_SNAP_PX anchors the new Text to that
+				// node, so it drags with it and grows a leader; otherwise it's free-floating.
+				var nearNode = nearestNodeNearScreen(e.clientX, e.clientY, NODE_SNAP_PX);
+				addText(w.x, w.y, nearNode ? nearNode.id : null);
+			}
 			else if (mode === 'add-pipe' || mode === 'add-pump') {
 				// Same snap: elementFromPoint requires landing exactly on the node's small hit
 				// area, which a real tap on a real screen routinely misses by a few pixels -- that
@@ -941,6 +969,10 @@ var EngCalcs = EngCalcs || {};
 						openLinkPopup(linkId, sx, sy);
 					}, 300);
 				}(t.dataset.link, e.clientX, e.clientY));
+			} else if (mode === 'select' && t.dataset.lbl !== undefined) {
+				// Tom, 2026-07-30: "there is no way to edit it" -- a Text label could be moved
+				// (drag) or deleted, but never have its content changed after creation.
+				openLabelPopup(t.dataset.lbl, e.clientX, e.clientY);
 			}
 		});
 	}
@@ -971,6 +1003,10 @@ var EngCalcs = EngCalcs || {};
 			if (lb.anchorNode) { lb.x = (w3.x + drag.offX) - an.x; lb.y = (w3.y + drag.offY) - an.y; }
 			else { lb.x = w3.x + drag.offX; lb.y = w3.y + drag.offY; }
 			updateLabelGeometry(drag.id);
+			// Dragging a Text was never persisted either (same gap as addText() above, found the
+			// same way) -- scheduleSolve() is a convenient existing debounce that reaches
+			// saveToStorage() unconditionally, even though a Text has nothing to solve.
+			scheduleSolve();
 		}
 	}
 
@@ -1279,6 +1315,40 @@ var EngCalcs = EngCalcs || {};
 		renderLinkFields(linkId);
 		openPopupAt(sx, sy);
 	}
+	// Editable text content for a Text label (Tom, 2026-07-30: "there is no way to edit it") -- no
+	// idField()/rename here, unlike node/link popups; a Text's id has no user-facing meaning to
+	// rename. Reuses pc.lpn_tool_add_text ("Text") for both the popup title and the field label,
+	// per CLAUDE.md's concept-level label reuse rule, rather than adding a near-duplicate key.
+	function renderLabelFields(labelId) {
+		var lb = labelById(labelId), fields = document.getElementById('lpn_popup_fields'),
+			pc = EngCalcs.pageConfig || {}, title = document.getElementById('lpn_popup_title'),
+			label = document.createElement('label'), input = document.createElement('input'),
+			an = lb.anchorNode ? nodeById(lb.anchorNode) : null;
+		title.textContent = pc.lpn_tool_add_text || 'Text';
+		fields.innerHTML = '';
+		input.type = 'text'; input.value = lb.text;
+		input.addEventListener('change', function () {
+			if (input.value === lb.text) { return; }
+			saveUndoSnapshot();
+			lb.text = input.value;
+			var le = labelEls[labelId];
+			le.text.textContent = lb.text;
+			try { le.width = le.text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; stale width stands */ }
+			updateLabelGeometry(labelId);
+			saveToStorage();
+		});
+		label.textContent = (pc.lpn_tool_add_text || 'Text') + ' ';
+		label.appendChild(input);
+		fields.appendChild(label);
+		fields.appendChild(document.createElement('br'));
+		readonlyField(fields, pc.lpn_field_x || 'X', an ? an.x + lb.x : lb.x);
+		readonlyField(fields, pc.lpn_field_y || 'Y', an ? an.y + lb.y : lb.y);
+	}
+	function openLabelPopup(labelId, sx, sy) {
+		currentPopup = { kind: 'label', id: labelId };
+		renderLabelFields(labelId);
+		openPopupAt(sx, sy);
+	}
 	// Roughness has no unit selector for now: Phase 1 assumes Hazen-Williams (js/lpn-solver.js's
 	// default), whose C-factor is dimensionless. Darcy-Weisbach's roughness HEIGHT does need
 	// units (the scope doc's roughness family is "DW only") -- revisit once a friction-method
@@ -1296,7 +1366,8 @@ var EngCalcs = EngCalcs || {};
 		var popup = document.getElementById('lpn_popup');
 		if (!currentPopup || popup.style.display !== 'block') { return; }
 		if (currentPopup.kind === 'node') { renderNodeFields(currentPopup.id); }
-		else { renderLinkFields(currentPopup.id); }
+		else if (currentPopup.kind === 'link') { renderLinkFields(currentPopup.id); }
+		else { renderLabelFields(currentPopup.id); }
 	}
 
 	// Multi-step undo, in memory only (not localStorage) -- ROADMAP Task 146 Phase 1's own listed
