@@ -612,6 +612,29 @@ scale-settings system** belong (Tom asked whether a gear icon was planned at all
 confirms it and folds these two into its existing scope rather than opening a separate feature).
 Not designed in detail yet; do that when Phase 2's gear panel is actually built.
 
+**Gear/settings panel BUILT, first cut (Tom, 2026-07-30), verified with a scripted Playwright smoke
+test.** A "Settings" toolbar button opens `#lpn_settings_popup` (`wireSettingsPopup()` in
+`js/looped-network.js`), same static-panel pattern as the Labels popover. Persisted like
+`labelSettings` — a preference, not network content: NOT undo-tracked, survives "New / Clear"
+(fixing a related latent gap found while verifying this — `clearNetwork()` was calling
+`localStorage.removeItem()` instead of `saveToStorage()`, which wiped labelSettings/settings out of
+storage, not just memory, until some later unrelated mutation happened to re-save). Five of the six
+items this section and Phase 2's bullet named are live:
+- **ID prefixes** (J/R/L/P/T) — customizable text inputs; changing one only affects IDs generated
+  from that point forward, never renames existing elements.
+- **Emitter exponent** and **convergence tolerance** — feed `js/lpn-solver.js` via
+  `assembleModel()`/`runSolve()`; defaults (0.5, 1e-9) match the solver's own built-in defaults, so
+  shipping this was a no-op until a user changes either.
+- **Text size**, with a **map units / screen pixels** toggle — 'map' reproduces the original fixed
+  `LABEL_FONT_SIZE=2.5` behavior exactly (text scales with zoom, like the network geometry); 'screen'
+  keeps text a constant on-screen size regardless of zoom, recomputed on every `zoomAbout()`/
+  `zoomExtent()` via `effectiveFontSize()`/`refreshFontSizes()`.
+- **Legend position**, the 6-way choice logged below — live via `applyLegendPosition()`.
+
+**Text format system** and **symbols/pipes/labels scale-settings system** remain undesigned — genuinely
+unspecified beyond their names in the round-2 note above, not deferred for lack of time. Design them
+when there's a concrete ask to design against, same as originally planned.
+
 **Future consideration, not scoped for now (Tom, round 2): an EPANET-style icon toolbar.** EPANET
 uses icons for its entire toolbar specifically to avoid translation cost. Tom is unsure whether this
 suite needs that now, but wants it on the record for whenever the toolbar's translation cost becomes
@@ -633,6 +656,12 @@ legend anchored to a true corner vs. a true edge-middle are the only positions t
 stacked block (no top-center/bottom-center variant the way an 8-fold compass rose would imply). Design
 the exact setting shape when the gear panel is actually built (already scoped there per the round-2
 note above); this note exists so the placement default isn't mistaken for a settled decision.
+
+**Built (2026-07-30), as the exact 6-fold Tom specified.** `settings.legendPosition` (gear panel),
+one of top/middle/bottom x left/right; `applyLegendPosition()` in `js/looped-network.js` sets
+`#lpn_labels_legend`'s `top`/`bottom`/`left`/`right`/`transform`, clearing the unused axis each time
+so switching positions never leaves a stale offset behind. Default `top-right` reproduces the
+original hardcoded CSS exactly.
 
 **Correction (Tom, 2026-07-30): "draggable labels with leaders" below was a data-label/Text-label
 mixup from the start.** Text labels (the user-placed `T` elements) already have exactly this —

@@ -71,7 +71,10 @@ document.addEventListener('DOMContentLoaded', function() {
 		      // Upper-right overlay, vertically stacked (Tom, 2026-07-30) -- the original above-canvas
 		      // horizontal row read poorly. Fixed at upper-right for now; ROADMAP Task 146 notes a
 		      // future gear-panel setting to choose among corners/edges (see the scope doc). ?>
-		<div id="lpn_labels_legend" style="display:none;position:absolute;top:4px;right:4px;font-size:0.9em;line-height:1.4;background:rgba(255,255,255,.85);padding:4px 8px;pointer-events:none"></div>
+		<?php // top/bottom/left/right deliberately absent -- applyLegendPosition() in
+		      // looped-network.js sets those from settings.legendPosition (Task 146 gear panel,
+		      // 2026-07-30; default 'top-right' reproduces this div's original hardcoded position). ?>
+		<div id="lpn_labels_legend" style="display:none;position:absolute;font-size:0.9em;line-height:1.4;background:rgba(255,255,255,.85);padding:4px 8px;pointer-events:none"></div>
 		<?php // No template_welcome here (Tom, 2026-07-30): it already shows at the top of every
 		      // page via echoHeader(), and its link wasn't even clickable in this pointer-events:
 		      // none overlay -- redundant, not just relocatable. ?>
@@ -103,6 +106,15 @@ document.addEventListener('DOMContentLoaded', function() {
 	<div style="font-weight:bold"><?=$ec_lang['lpn_labels_heading_link']?></div>
 	<div id="lpn_labels_link_fields"></div>
 	<button type="button" id="lpn_labels_popup_close"><?=$ec_lang['lpn_close']?></button>
+</div>
+<?php // Gear/settings panel (Task 146 Phase 2, 2026-07-30): ID prefixes, solver emitter exponent
+      // and convergence tolerance, text size (+ map-vs-screen units), legend position -- same
+      // static-panel, non-#lpn_popup pattern as #lpn_labels_popup directly above. Fields are built
+      // entirely in JS (wireSettingsPopup() in looped-network.js), not PHP, so #lpn_settings_fields
+      // starts empty here. ?>
+<div id="lpn_settings_popup" class="d-print-none" style="display:none;position:fixed;z-index:20;background:#fff;border:1px solid #333;padding:8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
+	<div id="lpn_settings_fields"></div>
+	<button type="button" id="lpn_settings_popup_close"><?=$ec_lang['lpn_close']?></button>
 </div>
 
 <?php echoFeedback(); ?>
@@ -172,7 +184,23 @@ EngCalcs.pageConfig = {
 	lpn_backdrop_target_free: <?=json_encode($ec_lang['lpn_backdrop_target_free'])?>,
 	lpn_backdrop_target_coords: <?=json_encode($ec_lang['lpn_backdrop_target_coords'])?>,
 	lpn_backdrop_coords_prompt: <?=json_encode($ec_lang['lpn_backdrop_coords_prompt'])?>,
-	lpn_backdrop_continue: <?=json_encode($ec_lang['lpn_backdrop_continue'])?>
+	lpn_backdrop_continue: <?=json_encode($ec_lang['lpn_backdrop_continue'])?>,
+	lpn_tool_settings: <?=json_encode($ec_lang['lpn_tool_settings'])?>,
+	lpn_settings_id_prefixes: <?=json_encode($ec_lang['lpn_settings_id_prefixes'])?>,
+	lpn_settings_solver: <?=json_encode($ec_lang['lpn_settings_solver'])?>,
+	lpn_settings_emitter_exponent: <?=json_encode($ec_lang['lpn_settings_emitter_exponent'])?>,
+	lpn_settings_tolerance: <?=json_encode($ec_lang['lpn_settings_tolerance'])?>,
+	lpn_settings_text_size: <?=json_encode($ec_lang['lpn_settings_text_size'])?>,
+	lpn_settings_text_size_map: <?=json_encode($ec_lang['lpn_settings_text_size_map'])?>,
+	lpn_settings_text_size_screen: <?=json_encode($ec_lang['lpn_settings_text_size_screen'])?>,
+	lpn_settings_text_size_units: <?=json_encode($ec_lang['lpn_settings_text_size_units'])?>,
+	lpn_settings_legend_position: <?=json_encode($ec_lang['lpn_settings_legend_position'])?>,
+	lpn_settings_legend_top_left: <?=json_encode($ec_lang['lpn_settings_legend_top_left'])?>,
+	lpn_settings_legend_top_right: <?=json_encode($ec_lang['lpn_settings_legend_top_right'])?>,
+	lpn_settings_legend_middle_left: <?=json_encode($ec_lang['lpn_settings_legend_middle_left'])?>,
+	lpn_settings_legend_middle_right: <?=json_encode($ec_lang['lpn_settings_legend_middle_right'])?>,
+	lpn_settings_legend_bottom_left: <?=json_encode($ec_lang['lpn_settings_legend_bottom_left'])?>,
+	lpn_settings_legend_bottom_right: <?=json_encode($ec_lang['lpn_settings_legend_bottom_right'])?>
 };
 </script>
 <script src="/engcalcs/js/lpn-solver.js?v=<?=filemtime(__DIR__.'/js/lpn-solver.js')?>"></script>

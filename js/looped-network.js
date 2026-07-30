@@ -22,11 +22,19 @@ var EngCalcs = EngCalcs || {};
 	var NS = 'http://www.w3.org/2000/svg';
 	var svg, world, backdropLayer, gridLayer, linksLayer, nodesLayer, labelsLayer;
 	var state = { tx: 0, ty: 0, s: 1 };
-	// World-unit font size shared by a node's ID/pressure label and a user-added Text label (Tom,
-	// 2026-07-30) -- no reason for the two to render at different sizes by default.
-	var LABEL_FONT_SIZE = 2.5;
-	// Line spacing for multi-line node/link labels (Task 146 Phase 2 label toggles), world units.
-	var LABEL_LINE_HEIGHT = LABEL_FONT_SIZE * 1.2;
+	// Text size (Task 146 gear/settings panel, 2026-07-30): user-configurable via `settings.textSize`/
+	// `settings.textSizeUnits` (see defaultSettings() below), shared by a node's ID/pressure label,
+	// a link's label, and a user-added Text label -- no reason for these to render at different sizes
+	// by default. 'map' units (the default, reproducing the original fixed LABEL_FONT_SIZE=2.5
+	// behavior byte-for-byte) means the size is a world-unit constant that scales with zoom, same as
+	// the network geometry itself. 'screen' units means the text stays a constant ON-SCREEN size
+	// regardless of zoom -- achieved by dividing the world-unit size by the current scale, so it must
+	// be recomputed (see refreshFontSizes() below) whenever state.s changes, not just once at build
+	// time like every other geometry in this file.
+	function effectiveFontSize() {
+		return settings.textSizeUnits === 'screen' ? settings.textSize / state.s : settings.textSize;
+	}
+	function effectiveLineHeight() { return effectiveFontSize() * 1.2; }
 	// Rebuilds a <text> element's tspans from scratch -- simplest correct approach given the line
 	// count changes every time a label toggle is flipped. Each tspan repeats the same x (not a
 	// relative dx) so every line stays left/anchor-aligned under the first, which is the standard
@@ -37,7 +45,7 @@ var EngCalcs = EngCalcs || {};
 	function setMultilineText(textEl, x, lines) {
 		while (textEl.firstChild) { textEl.removeChild(textEl.firstChild); }
 		lines.forEach(function (line, i) {
-			var tspan = el('tspan', { x: x, dy: i === 0 ? 0 : LABEL_LINE_HEIGHT }, textEl);
+			var tspan = el('tspan', { x: x, dy: i === 0 ? 0 : effectiveLineHeight() }, textEl);
 			if (line.color) { tspan.setAttribute('fill', line.color); }
 			tspan.textContent = line.text;
 		});
@@ -61,10 +69,10 @@ var EngCalcs = EngCalcs || {};
 			// first cut's gap read as too wide, its "high" tick sat at only ~60% of the digits'
 			// cap-height (not near the top), and its "low" tick sat ~60% of a text-height below the
 			// baseline (far past the bottom of a digit, none of which have descenders). "high" now
-			// sits at essentially the full cap-height above baseline (LABEL_FONT_SIZE's ~0.7 cap-
+			// sits at essentially the full cap-height above baseline (effectiveFontSize()'s ~0.7 cap-
 			// height ratio), "low" just below the baseline where the digits themselves end.
 			x0 = x + width + 0.3; x1 = x0 + 1.6;
-			y = baseY + i * LABEL_LINE_HEIGHT + (lines[i].decoration === 'high' ? -LABEL_FONT_SIZE * 0.72 : 0.3);
+			y = baseY + i * effectiveLineHeight() + (lines[i].decoration === 'high' ? -effectiveFontSize() * 0.72 : 0.3);
 			holder.tickEls.push(el('line', {
 				x1: x0, y1: y, x2: x1, y2: y, stroke: lines[i].color || '#000', 'stroke-width': 0.3
 			}, layer));
@@ -115,6 +123,26 @@ var EngCalcs = EngCalcs || {};
 		};
 	}
 	var labelSettings = defaultLabelSettings();
+
+	// Gear/settings panel (Task 146 Phase 2, 2026-07-30) -- like labelSettings, a VIEW/preference
+	// object, not network content: persisted to localStorage as a sibling key, deliberately NOT part
+	// of the undo-snapshotted `doc`, and untouched by clearNetwork() ("New" clears the network, not
+	// your preferences). Every default below reproduces EXACTLY the fixed behavior that shipped
+	// before this panel existed, so adding it is a visual/behavioral no-op until a user opens it.
+	function defaultSettings() {
+		return {
+			// Keyed by the same structural letters nextId already uses (J/R/L/P/T) -- changing a
+			// prefix only affects IDs generated AFTER the change; existing element IDs are never
+			// live-renamed by a settings edit.
+			idPrefixes: { J: 'J', R: 'R', L: 'L', P: 'P', T: 'T' },
+			emitterExponent: 0.5, // matches js/lpn-solver.js's own default -- see assembleModel()
+			tolerance: 1e-9, // matches js/lpn-solver.js's own default relative-flow-change tol -- see runSolve()
+			textSize: 2.5, // world units -- the original fixed LABEL_FONT_SIZE constant's value
+			textSizeUnits: 'map', // 'map' | 'screen' -- see effectiveFontSize() above
+			legendPosition: 'top-right' // one of LEGEND_POSITIONS' keys below -- matches the original hardcoded CSS
+		};
+	}
+	var settings = defaultSettings();
 
 	// User-supplied backdrop image (Task 146 Phase 2), ported from dev/lpn-spike/canvas-spike.html
 	// (see phase0-acceptance.md rounds 4/5/8-10 for the validated interaction design). Deliberately
@@ -208,10 +236,10 @@ var EngCalcs = EngCalcs || {};
 		// local (world-unit) coordinate system, same as any other geometry under this scaled <g> --
 		// an "11-unit" font is enormous next to nodes spaced 10-40 units apart, which is what was
 		// actually causing the zoom-extent overflow (not a missing bbox term -- the geometry itself
-		// was oversized). Matches the spike's own convention. Same LABEL_FONT_SIZE as a user Text
+		// was oversized). Matches the spike's own convention. Same effectiveFontSize() as a user Text
 		// label (Tom, 2026-07-30: no reason for these to differ) -- the two are still visually
 		// distinguishable by position (node ID sits fixed at the node) and role, not by size.
-		var text = el('text', { x: n.x + 2, y: n.y - 2, 'class': 'lpn-lbl', style: 'font-size:' + LABEL_FONT_SIZE + 'px' }, nodesLayer);
+		var text = el('text', { x: n.x + 2, y: n.y - 2, 'class': 'lpn-lbl', style: 'font-size:' + effectiveFontSize() + 'px' }, nodesLayer);
 		text.textContent = n.id;
 		var tw = 8;
 		try { tw = text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; fallback stands */ }
@@ -249,7 +277,7 @@ var EngCalcs = EngCalcs || {};
 		// node's, positioned at the middle segment's midpoint -- content filled in by
 		// refreshLabelText(), not here (this only creates the element; it starts empty).
 		var midIdx = Math.floor(segCount / 2), mid = segmentMidpoints(l)[midIdx],
-			text = el('text', { x: mid.x + 2, y: mid.y - 2, 'class': 'lpn-lbl', style: 'font-size:' + LABEL_FONT_SIZE + 'px' }, linksLayer);
+			text = el('text', { x: mid.x + 2, y: mid.y - 2, 'class': 'lpn-lbl', style: 'font-size:' + effectiveFontSize() + 'px' }, linksLayer);
 		linkEls[l.id] = { line: line, handles: handles, arrows: arrows, text: text, tw: 8 };
 	}
 	// Midpoint and local tangent angle of every segment, walking a->verts->b -- one entry per
@@ -287,7 +315,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		text = el('text', {
 			x: px, y: py, 'class': 'lpn-lbl lpn-draglbl', 'text-anchor': 'middle',
-			'dominant-baseline': 'central', 'data-lbl': lb.id, style: 'font-size:' + LABEL_FONT_SIZE + 'px'
+			'dominant-baseline': 'central', 'data-lbl': lb.id, style: 'font-size:' + effectiveFontSize() + 'px'
 		}, labelsLayer);
 		text.textContent = lb.text;
 		var w = 10;
@@ -410,7 +438,7 @@ var EngCalcs = EngCalcs || {};
 			inc(n.x - r, n.y - r); inc(n.x + r, n.y + r);
 			// "J1"-style id/data label beside the circle -- extended downward per extra toggled-on
 			// line (Task 146 Phase 2 label toggles), since multi-line labels grow toward +y (dy>0).
-			inc(n.x + 2, n.y - 2 - 2); inc(n.x + 2 + tw, n.y - 2 + 0.6 + (lc - 1) * LABEL_LINE_HEIGHT);
+			inc(n.x + 2, n.y - 2 - 2); inc(n.x + 2 + tw, n.y - 2 + 0.6 + (lc - 1) * effectiveLineHeight());
 		}
 		for (i = 0; i < doc.labels.length; i++) {
 			var lb = doc.labels[i], le = labelEls[lb.id] || { width: 10 },
@@ -428,7 +456,7 @@ var EngCalcs = EngCalcs || {};
 			if (lle) {
 				var lx = +lle.text.getAttribute('x'), ly = +lle.text.getAttribute('y'),
 					ltw = lle.tw || 8, llc = lle.lineCount || 1;
-				inc(lx, ly - 2); inc(lx + ltw, ly + 0.6 + (llc - 1) * LABEL_LINE_HEIGHT);
+				inc(lx, ly - 2); inc(lx + ltw, ly + 0.6 + (llc - 1) * effectiveLineHeight());
 			}
 		}
 		return { minx: minx, maxx: maxx, miny: miny, maxy: maxy };
@@ -440,6 +468,7 @@ var EngCalcs = EngCalcs || {};
 		state.tx = pad - b.minx * state.s + (r.width - 2 * pad - w * state.s) / 2;
 		state.ty = pad - b.miny * state.s + (r.height - 2 * pad - h * state.s) / 2;
 		setTransform();
+		onZoomChanged();
 	}
 
 	// ---- backdrop image (Task 146 Phase 2, ported from dev/lpn-spike/canvas-spike.html) ----
@@ -676,6 +705,7 @@ var EngCalcs = EngCalcs || {};
 		state.s = Math.min(MAX_SCALE, Math.max(MIN_SCALE, state.s * factor));
 		state.tx = lx - wx * state.s; state.ty = ly - wy * state.s;
 		setTransform();
+		onZoomChanged();
 	}
 
 	// ---- toolbar mode ----
@@ -709,7 +739,11 @@ var EngCalcs = EngCalcs || {};
 	}
 
 	function addNode(type, x, y) {
-		var prefix = type === 'reservoir' ? 'R' : 'J', id = prefix + (nextId[prefix]++);
+		// key is the structural nextId/settings.idPrefixes lookup letter; the ID's actual leading
+		// text is settings.idPrefixes[key] (customizable via the gear/settings panel, Task 146 Phase
+		// 2) -- defaults to the key itself, so this reproduces the original hardcoded J1/R1 behavior
+		// until a user changes it.
+		var key = type === 'reservoir' ? 'R' : 'J', id = (settings.idPrefixes[key] || key) + (nextId[key]++);
 		// Reservoir carries a fixed head (js/lpn-solver.js reads node.head directly as the
 		// boundary condition); junction carries elevation + demand. Different fields on
 		// purpose -- conflating them was a real trap early on (see lpn-solver.js's own notes).
@@ -724,7 +758,7 @@ var EngCalcs = EngCalcs || {};
 		return n;
 	}
 	function addLink(type, fromId, toId) {
-		var prefix = type === 'pump' ? 'P' : 'L', id = prefix + (nextId[prefix]++);
+		var key = type === 'pump' ? 'P' : 'L', id = (settings.idPrefixes[key] || key) + (nextId[key]++);
 		var l = {
 			id: id, type: type, from: fromId, to: toId, verts: [],
 			diameter: niceDefault('lpn_u_diameter', 'in', 4, 0.1),
@@ -752,7 +786,7 @@ var EngCalcs = EngCalcs || {};
 	// OFFSET from the node (matching buildLabelEls'/updateLabelGeometry's model), computed here so
 	// the label still appears exactly where the user tapped, not snapped onto the node itself.
 	function addText(x, y, anchorNode) {
-		var id = 'T' + (nextId.T++), an = anchorNode ? nodeById(anchorNode) : null;
+		var id = (settings.idPrefixes.T || 'T') + (nextId.T++), an = anchorNode ? nodeById(anchorNode) : null;
 		var lb = an
 			? { id: id, text: EngCalcs.pageConfig.lpn_new_text || 'Text', x: x - an.x, y: y - an.y, anchorNode: anchorNode }
 			: { id: id, text: EngCalcs.pageConfig.lpn_new_text || 'Text', x: x, y: y, anchorNode: null };
@@ -821,7 +855,7 @@ var EngCalcs = EngCalcs || {};
 		try {
 			localStorage.setItem(LPN_STORAGE_KEY, JSON.stringify({
 				v: LPN_STORAGE_VERSION, nodes: doc.nodes, links: doc.links, labels: doc.labels, nextId: nextId,
-				labelSettings: labelSettings, backdrop: backdrop
+				labelSettings: labelSettings, backdrop: backdrop, settings: settings
 			}));
 		} catch (err) { /* localStorage can throw (private mode, quota) -- autosave is best-effort */ }
 	}
@@ -840,6 +874,7 @@ var EngCalcs = EngCalcs || {};
 		nextId = saved.nextId || { J: 1, R: 1, L: 1, P: 1, T: 1 };
 		labelSettings = saved.labelSettings || defaultLabelSettings();
 		backdrop = saved.backdrop || null;
+		settings = saved.settings || defaultSettings();
 		return true;
 	}
 	// A dedicated button, not a repurposed "Restore Defaults" (Tom asked "do we dare"): that
@@ -856,7 +891,12 @@ var EngCalcs = EngCalcs || {};
 		backdrop = null; backdropImg = null;
 		backdropLayer.innerHTML = '';
 		updateBackdropMenuState();
-		try { localStorage.removeItem(LPN_STORAGE_KEY); } catch (err) { /* best-effort */ }
+		// saveToStorage(), not removeItem() (fixed 2026-07-30, found while verifying the gear/settings
+		// panel): labelSettings/settings are preferences, not network content, and are meant to survive
+		// "New / Clear" -- removeItem() wiped them out of localStorage too, leaving them intact only in
+		// memory until some later, unrelated mutation happened to call saveToStorage() again. Saving the
+		// now-blank doc immediately keeps storage and memory in sync at every point, not just eventually.
+		saveToStorage();
 		lastSolveResult = null;
 		closePopup();
 		buildDom();
@@ -887,6 +927,8 @@ var EngCalcs = EngCalcs || {};
 			updateBackdropMenuState();
 		}
 		wireLabelsPopup();
+		wireSettingsPopup();
+		applyLegendPosition();
 		updateEmptyHint();
 		zoomExtent();
 		requestAnimationFrame(tick);
@@ -968,6 +1010,11 @@ var EngCalcs = EngCalcs || {};
 		labelsBtn.textContent = pc.lpn_tool_labels || 'Labels';
 		labelsBtn.addEventListener('click', toggleLabelsPopup);
 		viewGroup.appendChild(labelsBtn);
+		var settingsBtn = document.createElement('button');
+		settingsBtn.type = 'button';
+		settingsBtn.textContent = pc.lpn_tool_settings || 'Settings';
+		settingsBtn.addEventListener('click', toggleSettingsPopup);
+		viewGroup.appendChild(settingsBtn);
 
 		// Temporary dev-only stress-test button (Tom, 2026-07-30): visually set apart (its own
 		// group, bracketed label) so it reads as not-a-real-feature. Remove once satisfied with
@@ -1348,9 +1395,9 @@ var EngCalcs = EngCalcs || {};
 		box.innerHTML = '';
 		// One field per line (Tom, 2026-07-30: the original horizontal row read poorly) -- matches
 		// the vertical, upper-right-corner overlay this now renders into.
-		function addGroup(defs, settings) {
+		function addGroup(defs, fieldSettings) {
 			defs.forEach(function (f) {
-				if (!settings[f[0]]) { return; }
+				if (!fieldSettings[f[0]]) { return; }
 				any = true;
 				var div = document.createElement('div');
 				div.style.color = lpnFieldColors[f[0]];
@@ -1361,6 +1408,7 @@ var EngCalcs = EngCalcs || {};
 		addGroup(nodeFieldDefs(pc), labelSettings.node);
 		addGroup(linkFieldDefs(pc), labelSettings.link);
 		box.style.display = any ? '' : 'none';
+		applyLegendPosition();
 	}
 	function toggleLabelsPopup(evt) {
 		var popup = document.getElementById('lpn_labels_popup');
@@ -1369,6 +1417,165 @@ var EngCalcs = EngCalcs || {};
 		popup.style.left = r.left + 'px'; popup.style.top = r.bottom + 'px'; popup.style.display = 'block';
 		// Clamp into the viewport same as openPopupAt() -- measured after display:block since size
 		// is unknown while display:none.
+		var pr = popup.getBoundingClientRect();
+		popup.style.left = Math.max(4, Math.min(r.left, window.innerWidth - pr.width - 4)) + 'px';
+		popup.style.top = Math.max(4, Math.min(r.bottom, window.innerHeight - pr.height - 4)) + 'px';
+	}
+
+	// ---- gear/settings popover (Task 146 Phase 2, 2026-07-30) ----
+	// Deliberately separate from #lpn_popup/currentPopup, same reasoning as the Labels popover above:
+	// a static settings panel, not a per-element property sheet.
+	// Six positions: Tom's own framing is {top, middle, bottom} x {left, right}, not an 8-way compass
+	// rose -- a stacked legend block has no meaningful top-center/bottom-center variant. Style deltas
+	// only (top/bottom/left/right/transform); applyLegendPosition() below clears the unused axis on
+	// each call so switching, say, top-right to bottom-left doesn't leave a stale `top` alongside the
+	// new `bottom`.
+	var LEGEND_POSITIONS = {
+		'top-left': { top: '4px', bottom: '', left: '4px', right: '', transform: '' },
+		'top-right': { top: '4px', bottom: '', left: '', right: '4px', transform: '' },
+		'middle-left': { top: '50%', bottom: '', left: '4px', right: '', transform: 'translateY(-50%)' },
+		'middle-right': { top: '50%', bottom: '', left: '', right: '4px', transform: 'translateY(-50%)' },
+		'bottom-left': { top: '', bottom: '4px', left: '4px', right: '', transform: '' },
+		'bottom-right': { top: '', bottom: '4px', left: '', right: '4px', transform: '' }
+	};
+	function applyLegendPosition() {
+		var box = document.getElementById('lpn_labels_legend'); if (!box) { return; }
+		var pos = LEGEND_POSITIONS[settings.legendPosition] || LEGEND_POSITIONS['top-right'];
+		box.style.top = pos.top; box.style.bottom = pos.bottom;
+		box.style.left = pos.left; box.style.right = pos.right;
+		box.style.transform = pos.transform;
+	}
+	// Re-applies the current effectiveFontSize() to every already-built text element and reflows
+	// whatever depends on it (multi-line spacing, extrema ticks, a Text label's own width/leader) --
+	// needed both when the user edits Text size/units directly (settings.textSize/textSizeUnits
+	// changed) and, in 'screen' mode only, whenever state.s changes (zoomAbout()/zoomExtent() call
+	// onZoomChanged() below), since 'screen' mode's effective size is state.s-dependent while every
+	// other geometry in this file is left to the SVG's own scale transform.
+	function refreshFontSizes() {
+		var fs = effectiveFontSize() + 'px';
+		Object.keys(nodeEls).forEach(function (id) { nodeEls[id].text.style.fontSize = fs; });
+		Object.keys(linkEls).forEach(function (id) { linkEls[id].text.style.fontSize = fs; });
+		Object.keys(labelEls).forEach(function (id) {
+			var le = labelEls[id];
+			le.text.style.fontSize = fs;
+			try { le.width = le.text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; stale width stands */ }
+			updateLabelGeometry(id);
+		});
+		refreshLabelText(); // recomputes multi-line tspan dy spacing and extrema tick positions at the new size
+	}
+	// Cheap no-op in 'map' mode (the default): map-mode text scales for free via the SVG's own
+	// world-to-screen transform, exactly like the network geometry, so there is nothing to redo on
+	// zoom. Called from zoomAbout()/zoomExtent() below.
+	function onZoomChanged() {
+		if (settings.textSizeUnits === 'screen') { refreshFontSizes(); }
+	}
+	// ID-prefix validation, same illegal-character set as validateNewId() (no spaces/quotes) plus
+	// non-empty -- a prefix becomes the leading substring of every future auto-generated ID for that
+	// element type, so the same rules that keep a renamed ID EPANET-legal apply here too.
+	function validatePrefix(p) { return !!p && !/[\s'"]/.test(p); }
+	function wireSettingsPopup() {
+		var pc = EngCalcs.pageConfig || {}, fields = document.getElementById('lpn_settings_fields');
+		document.getElementById('lpn_settings_popup_close').addEventListener('click', function () {
+			document.getElementById('lpn_settings_popup').style.display = 'none';
+		});
+		function row(labelText, input) {
+			var label = document.createElement('label');
+			label.textContent = labelText + ' ';
+			label.appendChild(input);
+			fields.appendChild(label);
+			fields.appendChild(document.createElement('br'));
+		}
+		function heading(text) {
+			var h = document.createElement('div');
+			h.style.fontWeight = 'bold'; h.style.marginTop = '6px';
+			h.textContent = text;
+			fields.appendChild(h);
+		}
+		// ---- ID prefixes ----
+		heading(pc.lpn_settings_id_prefixes || 'ID prefixes');
+		// Reuses the existing Add-tool labels (Junction/Reservoir/Pipe/Pump/Text) per CLAUDE.md's
+		// concept-level label reuse rule -- these already name the element type, no new key needed.
+		[
+			['R', pc.lpn_tool_add_reservoir || 'Reservoir'], ['J', pc.lpn_tool_add_junction || 'Junction'],
+			['P', pc.lpn_tool_add_pump || 'Pump'], ['L', pc.lpn_tool_add_pipe || 'Pipe'],
+			['T', pc.lpn_tool_add_text || 'Text']
+		].forEach(function (f) {
+			var key = f[0], input = document.createElement('input');
+			input.type = 'text'; input.size = 4; input.value = settings.idPrefixes[key];
+			input.addEventListener('change', function () {
+				if (!validatePrefix(input.value)) { alert(pc.lpn_id_invalid || 'ID must be non-empty with no spaces or quotes.'); input.value = settings.idPrefixes[key]; return; }
+				settings.idPrefixes[key] = input.value;
+				saveToStorage();
+			});
+			row(f[1], input);
+		});
+		// ---- solver settings ----
+		heading(pc.lpn_settings_solver || 'Solver');
+		var emitterInput = document.createElement('input');
+		emitterInput.type = 'number'; emitterInput.step = 'any'; emitterInput.value = settings.emitterExponent;
+		emitterInput.addEventListener('change', function () {
+			if (+emitterInput.value > 0) { settings.emitterExponent = +emitterInput.value; scheduleSolve(); }
+			else { emitterInput.value = settings.emitterExponent; }
+		});
+		row(pc.lpn_settings_emitter_exponent || 'Emitter exponent', emitterInput);
+		var tolInput = document.createElement('input');
+		tolInput.type = 'number'; tolInput.step = 'any'; tolInput.value = settings.tolerance;
+		tolInput.addEventListener('change', function () {
+			if (+tolInput.value > 0) { settings.tolerance = +tolInput.value; scheduleSolve(); }
+			else { tolInput.value = settings.tolerance; }
+		});
+		row(pc.lpn_settings_tolerance || 'Convergence tolerance', tolInput);
+		// ---- text size ----
+		heading(pc.lpn_settings_text_size || 'Text size');
+		var sizeInput = document.createElement('input');
+		sizeInput.type = 'number'; sizeInput.step = 'any'; sizeInput.min = '0.1'; sizeInput.value = settings.textSize;
+		sizeInput.addEventListener('change', function () {
+			if (+sizeInput.value > 0) { settings.textSize = +sizeInput.value; refreshFontSizes(); saveToStorage(); }
+			else { sizeInput.value = settings.textSize; }
+		});
+		row(pc.lpn_settings_text_size || 'Text size', sizeInput);
+		var unitsSelect = document.createElement('select');
+		[
+			['map', pc.lpn_settings_text_size_map || 'Map units'],
+			['screen', pc.lpn_settings_text_size_screen || 'Screen pixels']
+		].forEach(function (o) {
+			var opt = document.createElement('option');
+			opt.value = o[0]; opt.textContent = o[1]; if (o[0] === settings.textSizeUnits) { opt.selected = true; }
+			unitsSelect.appendChild(opt);
+		});
+		unitsSelect.addEventListener('change', function () {
+			settings.textSizeUnits = unitsSelect.value;
+			refreshFontSizes();
+			saveToStorage();
+		});
+		row(pc.lpn_settings_text_size_units || 'Text size units', unitsSelect);
+		// ---- legend position ----
+		heading(pc.lpn_tool_labels || 'Labels');
+		var legendSelect = document.createElement('select');
+		[
+			['top-left', pc.lpn_settings_legend_top_left || 'Top left'],
+			['top-right', pc.lpn_settings_legend_top_right || 'Top right'],
+			['middle-left', pc.lpn_settings_legend_middle_left || 'Middle left'],
+			['middle-right', pc.lpn_settings_legend_middle_right || 'Middle right'],
+			['bottom-left', pc.lpn_settings_legend_bottom_left || 'Bottom left'],
+			['bottom-right', pc.lpn_settings_legend_bottom_right || 'Bottom right']
+		].forEach(function (o) {
+			var opt = document.createElement('option');
+			opt.value = o[0]; opt.textContent = o[1]; if (o[0] === settings.legendPosition) { opt.selected = true; }
+			legendSelect.appendChild(opt);
+		});
+		legendSelect.addEventListener('change', function () {
+			settings.legendPosition = legendSelect.value;
+			applyLegendPosition();
+			saveToStorage();
+		});
+		row(pc.lpn_settings_legend_position || 'Legend position', legendSelect);
+	}
+	function toggleSettingsPopup(evt) {
+		var popup = document.getElementById('lpn_settings_popup');
+		if (popup.style.display === 'block') { popup.style.display = 'none'; return; }
+		var r = evt.currentTarget.getBoundingClientRect();
+		popup.style.left = r.left + 'px'; popup.style.top = r.bottom + 'px'; popup.style.display = 'block';
 		var pr = popup.getBoundingClientRect();
 		popup.style.left = Math.max(4, Math.min(r.left, window.innerWidth - pr.width - 4)) + 'px';
 		popup.style.top = Math.max(4, Math.min(r.bottom, window.innerHeight - pr.height - 4)) + 'px';
@@ -1633,9 +1840,18 @@ var EngCalcs = EngCalcs || {};
 		if (undoStack.length === 0) { return; }
 		doc = undoStack.pop();
 		nextId = { J: 1, R: 1, L: 1, P: 1, T: 1 };
+		// Matches against the CURRENT settings.idPrefixes, not a hardcoded single-uppercase-letter
+		// regex (Task 146 gear panel, 2026-07-30) -- a customized prefix can be any non-empty,
+		// space/quote-free string (validatePrefix()), not necessarily one letter. Known limitation,
+		// not worth guarding further on a preview page: an element created under a PRIOR prefix
+		// (before the user renamed it mid-session) won't be matched here after a prefix rename, so
+		// nextId could under-count for that letter post-undo. Renaming a prefix mid-session is rare;
+		// starting nextId at 1 per key is already the safe floor.
 		doc.nodes.concat(doc.links, doc.labels).forEach(function (x) {
-			var m = /^([A-Z])(\d+)$/.exec(x.id);
-			if (m && nextId[m[1]] !== undefined) { nextId[m[1]] = Math.max(nextId[m[1]], +m[2] + 1); }
+			Object.keys(settings.idPrefixes).forEach(function (key) {
+				var p = settings.idPrefixes[key] || key, rest = x.id.indexOf(p) === 0 ? x.id.slice(p.length) : null;
+				if (rest !== null && /^\d+$/.test(rest)) { nextId[key] = Math.max(nextId[key], +rest + 1); }
+			});
 		});
 		closePopup(); // whatever it referenced may no longer exist post-undo (e.g. undoing an Add)
 		buildDom();
@@ -1653,7 +1869,9 @@ var EngCalcs = EngCalcs || {};
 	// 'hw' for now (no friction-method selector yet -- see the numberFieldPlain() comment on
 	// Roughness). visc is fresh water at ~20C; not user-editable yet.
 	var lastSolveResult = null;
-	function assembleModel() { return { nodes: doc.nodes, links: doc.links, method: 'hw', visc: 1.007e-6 }; }
+	function assembleModel() {
+		return { nodes: doc.nodes, links: doc.links, method: 'hw', visc: 1.007e-6, emitterExponent: settings.emitterExponent };
+	}
 	function diagIssueText(issue) {
 		var pc = EngCalcs.pageConfig || {};
 		if (issue.code === 'no-fixed-head') { return pc.lpn_diag_no_fixed_head || 'Add a Reservoir.'; }
@@ -1783,7 +2001,7 @@ var EngCalcs = EngCalcs || {};
 			refreshLabelText();
 			return;
 		}
-		var result = EngCalcs.lpnSolve(model);
+		var result = EngCalcs.lpnSolve(model, { tol: settings.tolerance });
 		if (!result.ok || !result.converged) {
 			lastSolveResult = null;
 			setStatus(EngCalcs.pageConfig.lpn_diag_not_converged || 'Did not converge.');
