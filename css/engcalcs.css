@@ -126,6 +126,13 @@ html[lang="zh"] .ec-welcome {
    and below the line instead of blending into it. */
 .lpn-arrow { fill: none; stroke: #000; stroke-width: 0.3; pointer-events: none; }
 .lpn-vhandle { fill: #fff; stroke: #a52; stroke-width: 1; cursor: move; }
+/* Feedback for the first-picked node of a pipe/pump (Tom, 2026-07-30: "otherwise there's no
+   indication that anything is working") -- a wide red ring around the existing node fill/stroke,
+   cleared by setPendingLinkFrom(null) in looped-network.js on completion or cancel. */
+.lpn-node.lpn-node-pending { stroke: #d32f2f; stroke-width: 0.6; }
+/* Dashed line from the first-picked node to the live pointer, same context (add-pipe/add-pump
+   mode) -- shown/hidden and repositioned entirely from JS (rubberBandEl in looped-network.js). */
+.lpn-rubberband { stroke: #d32f2f; stroke-width: 0.4; stroke-dasharray: 1.2 1; pointer-events: none; fill: none; }
 /* No font-size here -- it must be set inline in world units at each text element (see the
    buildNodeEls/buildLabelEls comments in looped-network.js for why a screen-pixel-flavored
    CSS font-size is wrong inside this scaled SVG group). */

@@ -533,28 +533,74 @@ A Notes list stating honestly what the tool does not do.
 
 **Phase 2 — reporting, legibility, and the backdrop.** Node and link report tables, the EPANET-style
 element browser list, the gear/settings panel (ID prefixes J/L/P/R, emitter exponent, text size and
-its map-vs-screen units toggle, tolerance), multiple named saved networks, and the **user-supplied
-backdrop image with two-point registration** — projection-free, offline-capable, and the thing that
-actually makes the map
+its map-vs-screen units toggle, tolerance — see the expanded scope note below), multiple named saved
+networks, and the **user-supplied backdrop image with two-point registration** — projection-free,
+offline-capable, and the thing that actually makes the map interface useful for real work. **The
+translation sprint goes here.**
 
-**The label toggle set with extrema over/underline marks is DONE (2026-07-30, branch
-`lpn-labels`).** Every field on a node (ID, elevation, demand, head, pressure) and a link (ID,
-diameter, length, flow, velocity, headloss) is independently toggleable via a new "Labels" toolbar
-button/popover, each rendering as its own line under the element (multi-line SVG `<tspan>`s). Every
-toggled-on numeric field gets its network-wide max overlined and min underlined, computed
-**per field independently** and **after rounding to the same 2 decimals the label itself
-displays** — comparing un-rounded SI values marked one of two links carrying the same physical flow
-as "max" and the other "min" even though both printed the identical rounded number, purely from
-solver roundoff past the display precision; rounding first is what makes a displayed tie read as a
-tie. Ties (2+ elements sharing the extreme) all get marked, not just the first found. Persisted as
-`labelSettings` in the existing localStorage document, deliberately NOT part of the undo-snapshotted
-document (it's a view preference, not network content, so Ctrl-Z doesn't revert your label choices).
-Defaults reproduce exactly what Phase 1 shipped (node ID+pressure only), so this was a visual no-op
-until a user opts in. Verified on-device-equivalent via a Playwright/Chromium smoke test (drawing
-the example network, toggling every field, confirming extrema/ties/persistence/undo-independence
-all behave correctly) since no interactive browser was otherwise available in this environment.
-English-only, per the Phase-1 pattern (translation sprint still waits for the string set to settle).
-interface useful for real work. **The translation sprint goes here.**
+**The label toggle set with extrema marks is DONE (2026-07-30, branch `lpn-labels`), through two
+rounds of Tom's feedback on the first cut.** Every field on a node (ID, elevation, demand, head,
+pressure) and a link (ID, diameter, length, flow, velocity, headloss) is independently toggleable via
+a new "Labels" toolbar button/popover, each rendering as its own line under the element (multi-line
+SVG `<tspan>`s).
+
+- **Pure numbers, color-coded — not "Label: value unit" text (Tom, round 2).** Reusing
+  `js/branched-network.js`'s `EngCalcs.bpnFieldColors`/colored-checkbox convention instead of a
+  label/unit suffix: `lpnFieldColors` reuses bpn's colors where the concept overlaps
+  (id/length/diameter/flow/elevation/pressure) and adds new ones for demand/head/velocity/headloss.
+  The color-coded checkbox in the Labels popover is the only legend; the map itself stays uncluttered.
+- **Extrema mark is a tick beside the number, not text-decoration on it (Tom, round 2: "it's not
+  such a great idea because it's ambiguous... I don't know if there is something else").** The first
+  cut used CSS overline/underline on the number itself; Tom read that as ambiguous and an unfamiliar
+  convention. Replaced with a short raised ("high") or lowered ("low") tick line drawn just after the
+  number, positioned from the number's own rendered width
+  (`tspan.getComputedTextLength()`) — a separate SVG `<line>`, not a text decoration, so it never
+  reads as underlining/striking the digits themselves. This is the option Tom guessed would work best
+  ("a high or low line after the number"); revisit again if it still doesn't read clearly on-device.
+- **Suppressed below 3 members (Tom, round 2), not 2.** With only 1 or 2 values, "the max" and "the
+  min" aren't a finding — `fieldExtrema()` now returns nothing until a field has at least 3 defined
+  values across the network.
+- Ties (2+ elements sharing the extreme) all get marked, not just the first found — unchanged from
+  round 1, and still correct under the round-2 rounding-before-comparison rule (comparing un-rounded
+  SI values could mark one of two links carrying the same physical flow as "max" and the other "min"
+  purely from solver roundoff past the display precision; rounding first is what makes a displayed
+  tie read as a tie).
+- Persisted as `labelSettings` in the existing localStorage document, deliberately NOT part of the
+  undo-snapshotted document (a view preference, not network content, so Ctrl-Z doesn't revert your
+  label choices). Defaults reproduce exactly what Phase 1 shipped (node ID+pressure only, plain
+  black/no color), so shipping round 1 was a visual no-op until a user opted in.
+- Verified on-device-equivalent via a Playwright/Chromium smoke test (drawing the example network,
+  toggling every field, confirming extrema/ties/threshold/persistence/undo-independence all behave
+  correctly) since no interactive browser was otherwise available in this environment.
+- English-only, per the Phase-1 pattern (translation sprint still waits for the string set to settle).
+
+**Two more Tom round-2 asks, also DONE on the same branch:**
+- **The example network is now an actual loop.** `drawExampleNetwork()` originally built R1-J1
+  (pump) then J1-J2 (one bent pipe) — a tree, with no cycle at all, despite being the example for a
+  *looped*-network calculator. Added a second, straight J1-J2 pipe so there are two parallel paths.
+- **Rubber-band + first-node highlight while drawing a pipe/pump (Tom: "otherwise there's no
+  indication that anything is working").** After the first node is picked in add-pipe/add-pump mode,
+  a dashed line now tracks the pointer to the second click, and the picked node gets a thin red ring
+  (`.lpn-node-pending`) until the link completes or the tool is switched away. Both are cleared
+  together by one function, `setPendingLinkFrom()`, so they can never drift out of sync with each
+  other or with the actual pending state.
+
+**Gear/settings panel scope, expanded (Tom, round 2).** In addition to what Phase 2's bullet above
+already named, the gear panel is also where a **text format system** and a **symbols/pipes/labels
+scale-settings system** belong (Tom asked whether a gear icon was planned at all — yes, this
+confirms it and folds these two into its existing scope rather than opening a separate feature).
+Not designed in detail yet; do that when Phase 2's gear panel is actually built.
+
+**Future consideration, not scoped for now (Tom, round 2): an EPANET-style icon toolbar.** EPANET
+uses icons for its entire toolbar specifically to avoid translation cost. Tom is unsure whether this
+suite needs that now, but wants it on the record for whenever the toolbar's translation cost becomes
+worth avoiding — likely alongside or after the Phase 2 translation sprint, not before.
+
+**Future consideration, not scoped for now (Tom, round 2): a background mask behind labels/Text.**
+A partly-opaque background behind map text (so it stays legible over a busy backdrop or overlapping
+geometry) plus a setting for how opaque. Tom explicitly leaned toward roadmap over now; revisit once
+the Phase 2 backdrop-image feature makes label-over-backdrop legibility a real, testable problem
+rather than a hypothetical one.
 
 **Phase 3 — polish and reach.** Draggable labels with leaders and collision avoidance (see the
 Phase 0 note on a label-reset gesture); map insets for congested areas; `.inp` export/import;

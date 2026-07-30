@@ -30,15 +30,39 @@ var EngCalcs = EngCalcs || {};
 	// Rebuilds a <text> element's tspans from scratch -- simplest correct approach given the line
 	// count changes every time a label toggle is flipped. Each tspan repeats the same x (not a
 	// relative dx) so every line stays left/anchor-aligned under the first, which is the standard
-	// SVG multi-line-text idiom. line.decoration is undefined/'overline'/'underline', driven by the
-	// extrema check in refreshLabelText() below.
+	// SVG multi-line-text idiom. line.color tints the field per lpnFieldColors; the extrema
+	// tick mark (line.decoration) is drawn separately by applyExtremaTicks() below, not here --
+	// text-decoration on the number itself (the original design) read as ambiguous (Tom, 2026-07-30:
+	// "I don't know if there is something else"), so the mark lives beside the number, not on it.
 	function setMultilineText(textEl, x, lines) {
 		while (textEl.firstChild) { textEl.removeChild(textEl.firstChild); }
 		lines.forEach(function (line, i) {
 			var tspan = el('tspan', { x: x, dy: i === 0 ? 0 : LABEL_LINE_HEIGHT }, textEl);
-			if (line.decoration) { tspan.style.textDecoration = line.decoration; }
+			if (line.color) { tspan.setAttribute('fill', line.color); }
 			tspan.textContent = line.text;
 		});
+	}
+	// A short tick line just after a decorated number -- raised for the network-wide max, lowered
+	// for the min (Tom, 2026-07-30, replacing an overline/underline-the-number design that read as
+	// ambiguous and unfamiliar). Positioned from the number tspan's OWN rendered width
+	// (getComputedTextLength(), only meaningful once the tspan is attached and laid out -- i.e.
+	// called right after setMultilineText()), so it sits immediately after the digits regardless of
+	// how wide they are. `holder` is nodeEls[id]/linkEls[id]; old ticks are removed first since the
+	// line count/decorations can change on every toggle or solve.
+	function applyExtremaTicks(holder, textEl, layer, lines) {
+		if (holder.tickEls) { holder.tickEls.forEach(function (t) { t.remove(); }); }
+		holder.tickEls = [];
+		var x = +textEl.getAttribute('x'), baseY = +textEl.getAttribute('y'), i, tspan, width, y, x0, x1;
+		for (i = 0; i < lines.length; i++) {
+			if (!lines[i].decoration) { continue; }
+			tspan = textEl.childNodes[i];
+			try { width = tspan.getComputedTextLength(); } catch (err) { width = 0; }
+			x0 = x + width + 0.6; x1 = x0 + 1.6;
+			y = baseY + i * LABEL_LINE_HEIGHT + (lines[i].decoration === 'high' ? -1.1 : 1.1);
+			holder.tickEls.push(el('line', {
+				x1: x0, y1: y, x2: x1, y2: y, stroke: lines[i].color || '#000', 'stroke-width': 0.3
+			}, layer));
+		}
 	}
 	// Repositions an already-built multi-line label (drag/geometry updates) without touching its
 	// content -- setMultilineText() gives each tspan its own explicit x (needed for the multi-line
@@ -50,19 +74,21 @@ var EngCalcs = EngCalcs || {};
 		for (i = 0; i < textEl.childNodes.length; i++) { textEl.childNodes[i].setAttribute('x', x); }
 	}
 	// Network-wide max/min of a field's values, skipping undefined (element types that don't carry
-	// it, or a solve result not yet available). Returns null when fewer than 2 defined values exist
-	// -- a lone value getting both an overline AND underline reads as a rendering glitch, not a
-	// finding, so it is deliberately left undecorated rather than marked as "the extreme."
+	// it, or a solve result not yet available). Returns null when fewer than 3 defined values exist
+	// (Tom, 2026-07-30) -- with only 1 or 2 members "the max" and "the min" aren't a finding, just
+	// the two ends of a trivial set (with 1, the same value would be both at once).
 	function fieldExtrema(values) {
 		var defined = values.filter(function (v) { return typeof v === 'number'; });
-		if (defined.length < 2) { return null; }
+		if (defined.length < 3) { return null; }
 		return { min: Math.min.apply(null, defined), max: Math.max.apply(null, defined) };
 	}
+	// 'high'/'low', not a boolean -- ties (2+ elements sharing the extreme) all get marked, not
+	// just the first found, since each element is judged independently against the same extrema.
 	function decorationFor(extrema, value) {
 		if (!extrema || typeof value !== 'number') { return undefined; }
 		if (value === extrema.max && value === extrema.min) { return undefined; }
-		if (value === extrema.max) { return 'overline'; }
-		if (value === extrema.min) { return 'underline'; }
+		if (value === extrema.max) { return 'high'; }
+		if (value === extrema.min) { return 'low'; }
 		return undefined;
 	}
 
@@ -83,6 +109,17 @@ var EngCalcs = EngCalcs || {};
 		};
 	}
 	var labelSettings = defaultLabelSettings();
+
+	// One color per data field, matching js/branched-network.js's EngCalcs.bpnFieldColors
+	// convention (Tom, 2026-07-30): a colored number on the map, a colored span in the checkbox
+	// label as the only legend -- no unit suffix, no field-name prefix cluttering the map itself.
+	// Reused verbatim where the concept overlaps bpn's palette (id/length/diameter/flow/elevation/
+	// pressure); demand/head/velocity/headloss are new colors, chosen to stay visually distinct
+	// from every other entry here.
+	var lpnFieldColors = {
+		id: '#000', elev: '#8b5a2b', demand: '#6a1b9a', head: '#00838f', pressure: '#455a64',
+		diameter: '#bf4b2b', length: '#2e7d32', flow: '#1565c0', velocity: '#ad1457', headloss: '#4527a0'
+	};
 
 	function el(tag, attrs, parent) {
 		var e = document.createElementNS(NS, tag), k;
@@ -320,6 +357,9 @@ var EngCalcs = EngCalcs || {};
 		linkEls[l.id].handles.forEach(function (h) { h.remove(); });
 		linkEls[l.id].arrows.forEach(function (a) { a.remove(); });
 		linkEls[l.id].text.remove();
+		// tick marks (applyExtremaTicks()) are separate elements, not text children -- buildLinkEls()
+		// below replaces linkEls[l.id] wholesale, which would otherwise orphan them on screen.
+		if (linkEls[l.id].tickEls) { linkEls[l.id].tickEls.forEach(function (t) { t.remove(); }); }
 		buildLinkEls(l);
 		refreshLabelText();
 	}
@@ -410,9 +450,23 @@ var EngCalcs = EngCalcs || {};
 	var pendingLinkFrom = null;
 	var setModeUI = null; // wired by wireToolbar(); lets non-toolbar code (Draw Example) reset the UI too
 	var pendingLinkPopupTimer = null; // see wirePointerEvents(): delays a link-tap popup so a double-click (add vertex) can cancel it
+	var rubberBandEl = null; // built in init(); a dashed line from pendingLinkFrom to the live pointer
+
+	// Sets/clears pendingLinkFrom AND its visual feedback together (Tom, 2026-07-30: "otherwise
+	// there's no indication that anything is working" between the first and second click of
+	// add-pipe/add-pump) -- a highlighted ring on the picked node, plus the rubber-band line
+	// (positioned on pointermove in wirePointerEvents()). Every call site that used to assign
+	// pendingLinkFrom directly goes through this now, so the highlight/rubber-band can never drift
+	// out of sync with the actual pending state.
+	function setPendingLinkFrom(id) {
+		if (pendingLinkFrom && nodeEls[pendingLinkFrom]) { nodeEls[pendingLinkFrom].circle.classList.remove('lpn-node-pending'); }
+		pendingLinkFrom = id;
+		if (id && nodeEls[id]) { nodeEls[id].circle.classList.add('lpn-node-pending'); }
+		if (rubberBandEl) { rubberBandEl.style.display = id ? '' : 'none'; }
+	}
 
 	function setMode(newMode) {
-		mode = newMode; pendingLinkFrom = null;
+		mode = newMode; setPendingLinkFrom(null);
 		if (setModeUI) { setModeUI(); }
 	}
 
@@ -558,6 +612,9 @@ var EngCalcs = EngCalcs || {};
 		linksLayer = el('g', {}, world);
 		nodesLayer = el('g', {}, world);
 		labelsLayer = el('g', {}, world);
+		// Topmost layer (after labelsLayer) so the rubber-band is never hidden under a node/link
+		// while drawing a pipe/pump (Tom, 2026-07-30).
+		rubberBandEl = el('line', { 'class': 'lpn-rubberband', style: 'display:none' }, world);
 		setTransform();
 		wireToolbar();
 		wirePointerEvents();
@@ -684,6 +741,10 @@ var EngCalcs = EngCalcs || {};
 		// happens correctly). Tom caught this: 25ft shown, jumped to 28ft only after a drag.
 		pipe.length = linkGeomLength(pipe);
 		rebuildLink(pipe);
+		// Second, straight J1-J2 pipe (Tom, 2026-07-30): the bent pipe alone made this a tree/series
+		// network with no cycle at all, despite being the example for a LOOPED network calculator --
+		// two parallel paths between the same two nodes is the simplest genuine loop.
+		addLink('pipe', j1.id, j2.id);
 		updateEmptyHint();
 		zoomExtent();
 		setMode('select');
@@ -739,6 +800,16 @@ var EngCalcs = EngCalcs || {};
 				coordsEl.textContent = 'X: ' + w.x.toFixed(2) + '  Y: ' + w.y.toFixed(2);
 			});
 		}
+		// Rubber-band line while drawing a pipe/pump (Tom, 2026-07-30) -- tracks the live pointer
+		// from the first-picked node (setPendingLinkFrom() shows/hides it); independent of the
+		// coords-tracker listener above so it works even if #lpn_coords is ever removed.
+		svg.addEventListener('pointermove', function (e) {
+			if (!pendingLinkFrom) { return; }
+			var from = nodeById(pendingLinkFrom), w = screenToWorld(e.clientX, e.clientY);
+			if (!from) { return; }
+			rubberBandEl.setAttribute('x1', from.x); rubberBandEl.setAttribute('y1', from.y);
+			rubberBandEl.setAttribute('x2', w.x); rubberBandEl.setAttribute('y2', w.y);
+		});
 
 		svg.addEventListener('pointerdown', function (e) {
 			svg.setPointerCapture(e.pointerId);
@@ -827,13 +898,13 @@ var EngCalcs = EngCalcs || {};
 				// makes a close tap connect anyway.
 				var hitId = t.dataset.node || (nearestNodeNearScreen(e.clientX, e.clientY, NODE_SNAP_PX) || {}).id;
 				if (hitId) {
-					if (!pendingLinkFrom) { pendingLinkFrom = hitId; }
+					if (!pendingLinkFrom) { setPendingLinkFrom(hitId); }
 					else if (hitId !== pendingLinkFrom) {
 						saveUndoSnapshot();
 						addLink(mode === 'add-pump' ? 'pump' : 'pipe', pendingLinkFrom, hitId);
-						pendingLinkFrom = null;
+						setPendingLinkFrom(null);
 					}
-				} else { pendingLinkFrom = null; }
+				} else { setPendingLinkFrom(null); }
 			} else if (mode === 'delete') {
 				// One-step undo (Tom: lost a pipe's data to an accidental delete) -- snapshot the
 				// whole document just before any destructive action, not inside the delete
@@ -931,12 +1002,16 @@ var EngCalcs = EngCalcs || {};
 	// Deliberately separate from #lpn_popup/currentPopup below: this is a static settings panel,
 	// not a per-element property sheet, and touching none of the rename/undo machinery keeps it
 	// zero-risk to the existing popup.
-	function labelCheckbox(container, labelText, checked, onChange) {
-		var label = document.createElement('label'), input = document.createElement('input');
+	function labelCheckbox(container, labelText, color, checked, onChange) {
+		var label = document.createElement('label'), input = document.createElement('input'),
+			span = document.createElement('span');
 		input.type = 'checkbox'; input.checked = checked;
 		input.addEventListener('change', function () { onChange(input.checked); saveToStorage(); refreshLabelText(); });
+		span.style.color = color;
+		span.textContent = labelText;
 		label.appendChild(input);
-		label.appendChild(document.createTextNode(' ' + labelText));
+		label.appendChild(document.createTextNode(' '));
+		label.appendChild(span);
 		container.appendChild(label);
 		container.appendChild(document.createElement('br'));
 	}
@@ -951,14 +1026,14 @@ var EngCalcs = EngCalcs || {};
 			['demand', pc.bpn_demand || 'Demand'], ['head', pc.lpn_result_head || 'Head'],
 			['pressure', pc.lpn_result_pressure || 'Pressure']
 		].forEach(function (f) {
-			labelCheckbox(nodeBox, f[1], labelSettings.node[f[0]], function (v) { labelSettings.node[f[0]] = v; });
+			labelCheckbox(nodeBox, f[1], lpnFieldColors[f[0]], labelSettings.node[f[0]], function (v) { labelSettings.node[f[0]] = v; });
 		});
 		[
 			['id', pc.lpn_field_id || 'ID'], ['diameter', pc.lpn_field_diameter || 'Diameter'],
 			['length', pc.lpn_field_length || 'Length'], ['flow', pc.lpn_result_flow || 'Flow'],
 			['velocity', pc.lpn_result_velocity || 'Velocity'], ['headloss', pc.lpn_result_headloss || 'Head loss']
 		].forEach(function (f) {
-			labelCheckbox(linkBox, f[1], labelSettings.link[f[0]], function (v) { labelSettings.link[f[0]] = v; });
+			labelCheckbox(linkBox, f[1], lpnFieldColors[f[0]], labelSettings.link[f[0]], function (v) { labelSettings.link[f[0]] = v; });
 		});
 	}
 	function toggleLabelsPopup(evt) {
@@ -1239,25 +1314,28 @@ var EngCalcs = EngCalcs || {};
 		if (typeof siValue !== 'number') { return undefined; } // guards a stray NaN contaminating Math.min/max in fieldExtrema
 		return Math.round(siValue * unitFactor(unitId) * 100) / 100;
 	}
-	// One line of a numeric label field: "Label: 12.34 unit", decorated overline/underline when it
-	// ties the network-wide max/min for that field (fieldExtrema()/decorationFor() above).
-	function numLine(labelText, siValue, unitId, extrema) {
+	// One line of a numeric label field: a bare number, colored per lpnFieldColors (Tom, 2026-07-30:
+	// "make all the labels pure numbers, no units and no prefix/description... color code like we
+	// did for bpn" -- the color-coded checkbox in the Labels popover is the only legend), decorated
+	// with a high/low tick when it ties the network-wide max/min for that field
+	// (fieldExtrema()/decorationFor() above, drawn by applyExtremaTicks()).
+	function numLine(siValue, unitId, extrema, color) {
 		var displayValue = displayRound(siValue, unitId);
-		return { text: labelText + ': ' + displayValue.toFixed(2) + ' ' + unitLabel(unitId), decoration: decorationFor(extrema, displayValue) };
+		return { text: displayValue.toFixed(2), color: color, decoration: decorationFor(extrema, displayValue) };
 	}
 	// Length is declarative, not SI-converted (see the lengthField() comment above: "1 grid unit IS
 	// 1 ft or 1 m, whichever is currently selected, by declaration") -- unlike every other field
 	// here, l.length is already in the displayed unit, so this must NOT run it through unitFactor.
-	function rawLine(labelText, value, unitId, extrema) {
+	function rawLine(value, extrema, color) {
 		var displayValue = Math.round(value * 100) / 100;
-		return { text: labelText + ': ' + displayValue.toFixed(2) + ' ' + unitLabel(unitId), decoration: decorationFor(extrema, displayValue) };
+		return { text: displayValue.toFixed(2), color: color, decoration: decorationFor(extrema, displayValue) };
 	}
 	// Rebuilds every node's and link's map-label text from `labelSettings` + `lastSolveResult`.
 	// Extrema are computed ONCE per field, network-wide, before any label is built, so every
 	// element's decoration is judged against the same snapshot (Tom: ties all get marked, not just
 	// the first one found -- decorationFor() already does this per element).
 	function refreshLabelText() {
-		var pc = EngCalcs.pageConfig || {}, ls = labelSettings, i;
+		var ls = labelSettings;
 		// Every field below is rounded through the same displayRound()/2-decimal rule the label
 		// text itself uses (see the comment on displayRound()), so a tie in what's actually printed
 		// is always a tie in what gets decorated.
@@ -1283,46 +1361,49 @@ var EngCalcs = EngCalcs || {};
 				return displayRound(l.type === 'pump' ? -lastSolveResult.headlosses[l.id] : lastSolveResult.headlosses[l.id], 'lpn_u_elevhead');
 			}))
 		};
+		var fc = lpnFieldColors;
 		doc.nodes.forEach(function (n) {
 			var ne = nodeEls[n.id]; if (!ne) { return; }
 			var lines = [];
-			if (ls.node.id) { lines.push({ text: n.id }); }
+			if (ls.node.id) { lines.push({ text: n.id, color: fc.id }); }
 			if (n.type !== 'reservoir') {
-				if (ls.node.elev) { lines.push(numLine(pc.lpn_field_elev || 'Elevation', n.elev, 'lpn_u_elevhead', extrema.elev)); }
-				if (ls.node.demand) { lines.push(numLine(pc.bpn_demand || 'Demand', n.demand, 'lpn_u_flow', extrema.demand)); }
+				if (ls.node.elev) { lines.push(numLine(n.elev, 'lpn_u_elevhead', extrema.elev, fc.elev)); }
+				if (ls.node.demand) { lines.push(numLine(n.demand, 'lpn_u_flow', extrema.demand, fc.demand)); }
 			}
 			var headSI = n.type === 'reservoir' ? n.head : (lastSolveResult ? lastSolveResult.heads[n.id] : undefined);
-			if (ls.node.head && headSI !== undefined) { lines.push(numLine(pc.lpn_result_head || 'Head', headSI, 'lpn_u_elevhead', extrema.head)); }
+			if (ls.node.head && headSI !== undefined) { lines.push(numLine(headSI, 'lpn_u_elevhead', extrema.head, fc.head)); }
 			if (ls.node.pressure && n.type !== 'reservoir' && lastSolveResult && lastSolveResult.pressures[n.id] !== undefined) {
-				lines.push(numLine(pc.lpn_result_pressure || 'Pressure', lastSolveResult.pressures[n.id], 'lpn_u_pressure', extrema.pressure));
+				lines.push(numLine(lastSolveResult.pressures[n.id], 'lpn_u_pressure', extrema.pressure, fc.pressure));
 			}
 			if (lines.length === 0) { lines.push({ text: '' }); } // keep an empty tspan so getBBox() doesn't throw
 			setMultilineText(ne.text, n.x + 2, lines);
 			ne.lineCount = lines.length;
+			applyExtremaTicks(ne, ne.text, nodesLayer, lines);
 			try { ne.tw = ne.text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; stale tw stands */ }
 		});
 		doc.links.forEach(function (l) {
 			var le = linkEls[l.id]; if (!le) { return; }
 			var lines = [];
-			if (ls.link.id) { lines.push({ text: l.id }); }
+			if (ls.link.id) { lines.push({ text: l.id, color: fc.id }); }
 			if (l.type !== 'pump') {
-				if (ls.link.diameter) { lines.push(numLine(pc.lpn_field_diameter || 'Diameter', l.diameter, 'lpn_u_diameter', extrema.diameter)); }
-				if (ls.link.length) { lines.push(rawLine(pc.lpn_field_length || 'Length', l.length, 'lpn_u_length', extrema.length)); }
+				if (ls.link.diameter) { lines.push(numLine(l.diameter, 'lpn_u_diameter', extrema.diameter, fc.diameter)); }
+				if (ls.link.length) { lines.push(rawLine(l.length, extrema.length, fc.length)); }
 			}
 			if (lastSolveResult && lastSolveResult.flows[l.id] !== undefined) {
-				if (ls.link.flow) { lines.push(numLine(pc.lpn_result_flow || 'Flow', lastSolveResult.flows[l.id], 'lpn_u_flow', extrema.flow)); }
-				if (ls.link.velocity) { lines.push(numLine(pc.lpn_result_velocity || 'Velocity', lastSolveResult.velocities[l.id], 'lpn_u_velocity', extrema.velocity)); }
+				if (ls.link.flow) { lines.push(numLine(lastSolveResult.flows[l.id], 'lpn_u_flow', extrema.flow, fc.flow)); }
+				if (ls.link.velocity) { lines.push(numLine(lastSolveResult.velocities[l.id], 'lpn_u_velocity', extrema.velocity, fc.velocity)); }
 				if (ls.link.headloss) {
 					if (l.type === 'pump') {
-						lines.push(numLine(pc.lpn_result_headgain || 'Head gain', -lastSolveResult.headlosses[l.id], 'lpn_u_elevhead', extrema.headloss));
+						lines.push(numLine(-lastSolveResult.headlosses[l.id], 'lpn_u_elevhead', extrema.headloss, fc.headloss));
 					} else {
-						lines.push(numLine(pc.lpn_result_headloss || 'Head loss', lastSolveResult.headlosses[l.id], 'lpn_u_elevhead', extrema.headloss));
+						lines.push(numLine(lastSolveResult.headlosses[l.id], 'lpn_u_elevhead', extrema.headloss, fc.headloss));
 					}
 				}
 			}
 			if (lines.length === 0) { lines.push({ text: '' }); }
 			setMultilineText(le.text, +le.text.getAttribute('x'), lines);
 			le.lineCount = lines.length;
+			applyExtremaTicks(le, le.text, linksLayer, lines);
 			try { le.tw = le.text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; stale tw stands */ }
 		});
 		doc.links.forEach(function (l) { updateArrow(l.id); });
