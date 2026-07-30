@@ -116,6 +116,15 @@ var EngCalcs = EngCalcs || {};
 	}
 	var labelSettings = defaultLabelSettings();
 
+	// User-supplied backdrop image (Task 146 Phase 2), ported from dev/lpn-spike/canvas-spike.html
+	// (see phase0-acceptance.md rounds 4/5/8-10 for the validated interaction design). Deliberately
+	// NOT part of `doc`/the undo-snapshotted document: saveUndoSnapshot() deep-clones doc via
+	// JSON.parse(JSON.stringify(doc)) on every discrete mutation, keeping up to 20 snapshots -- a
+	// multi-hundred-KB-to-multi-MB embedded data URI in there would multiply badly. Still persisted
+	// to localStorage as a sibling key (see saveToStorage()/loadFromStorage() below), just not
+	// undo-tracked.
+	var backdrop = null; // { href, iw, ih, x, y, width, height, tx, ty, s } | null
+
 	// One color per data field, matching js/branched-network.js's EngCalcs.bpnFieldColors
 	// convention (Tom, 2026-07-30): a colored number on the map, a colored span in the checkbox
 	// label as the only legend -- no unit suffix, no field-name prefix cluttering the map itself.
@@ -433,6 +442,229 @@ var EngCalcs = EngCalcs || {};
 		setTransform();
 	}
 
+	// ---- backdrop image (Task 146 Phase 2, ported from dev/lpn-spike/canvas-spike.html) ----
+	var backdropImg = null;
+	function applyBackdropTransform() {
+		if (!backdropImg) { return; }
+		backdropImg.setAttribute('transform', 'translate(' + backdrop.tx + ',' + backdrop.ty + ') scale(' + backdrop.s + ')');
+	}
+	// Converts a world-space click back into the image's own pre-transform space, so a second Scale
+	// pass measures true image-local distance rather than one already stretched by a previous scale
+	// factor -- matches the spike's worldToImageLocal() verbatim.
+	function worldToImageLocal(w) {
+		return { x: (w.x - backdrop.tx) / backdrop.s, y: (w.y - backdrop.ty) / backdrop.s };
+	}
+	function buildBackdropImg() {
+		backdropLayer.innerHTML = '';
+		backdropImg = el('image', {
+			href: backdrop.href, x: backdrop.x, y: backdrop.y, width: backdrop.width, height: backdrop.height
+		}, backdropLayer);
+		applyBackdropTransform();
+	}
+	function removeBackdrop() {
+		backdrop = null; backdropImg = null;
+		backdropLayer.innerHTML = '';
+		saveToStorage();
+		updateBackdropMenuState();
+	}
+	// Cap the longest side at 1600px before storing (scope doc: "a scanned plan can be large, so
+	// downscale on import and record the original dimensions") -- nothing else in this feature bounds
+	// the localStorage footprint of a phone photo or a large scanned plan. PNG output, not JPEG: a
+	// scanned plan's thin lines are exactly what a lossy re-encode would blur; size is bounded by
+	// this cap instead.
+	var BACKDROP_MAX_SIDE = 1600;
+	function downscaleImage(dataUrl, maxSide, cb) {
+		var img = new Image();
+		img.onload = function () {
+			var scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+			if (scale === 1) { cb(dataUrl, img.width, img.height); return; }
+			var canvas = document.createElement('canvas');
+			canvas.width = Math.round(img.width * scale); canvas.height = Math.round(img.height * scale);
+			canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+			cb(canvas.toDataURL('image/png'), img.width, img.height);
+		};
+		img.src = dataUrl;
+	}
+	// Initial placement size: the new image's longer side roughly matches the current network's own
+	// bbox extent (a fixed default when the network is empty), aspect-ratio-preserved -- Scale/
+	// Position are how the user then registers it precisely. An explicit open question in the Phase 0
+	// acceptance doc ("no way to *position* a freshly loaded backdrop relative to a grid already on
+	// screen... decide in Phase 2, not now") -- the spike's own arbitrary fixed 40x30 wasn't ported.
+	function initialBackdropSize(iw, ih) {
+		var b = bbox(), extent = Math.max(b.maxx - b.minx, b.maxy - b.miny, 1),
+			target = doc.nodes.length > 0 ? extent : 40, longer = Math.max(iw, ih), scale = target / longer;
+		return { width: iw * scale, height: ih * scale };
+	}
+	function addBackdropFromDataUrl(dataUrl) {
+		downscaleImage(dataUrl, BACKDROP_MAX_SIDE, function (href, iw, ih) {
+			var size = initialBackdropSize(iw, ih);
+			backdrop = { href: href, iw: iw, ih: ih, x: 0, y: 0, width: size.width, height: size.height, tx: 0, ty: 0, s: 1 };
+			buildBackdropImg();
+			saveToStorage();
+			updateBackdropMenuState();
+		});
+	}
+
+	// ---- backdrop registration wizard (regMode gate, Scale, Position) ----
+	// While a Scale/Position click sequence is pending, normal interaction (node drag, tap-to-open-
+	// popup, vertex insert) is suppressed entirely -- otherwise a click meant for registration also
+	// starts a node drag or opens a popup underneath it, since both listen on the same pointer
+	// events. Ported verbatim from the spike, validated through 8 rounds of Tom's on-device
+	// iteration (phase0-acceptance.md rounds 4/5/8-10), including the regmode-node cursor gate and
+	// the periodic cursor-reassert workaround for a real Chrome cursor-caching quirk found there.
+	var regMode = false;
+	var cursorNudgeTimer = null;
+	function nudgeCursor() {
+		svg.classList.remove('regmode');
+		void svg.getBoundingClientRect(); // forces a real reflow/style recalc, not just a class-membership change
+		svg.classList.add('regmode');
+	}
+	function setRegMode(v) {
+		regMode = v;
+		if (v) {
+			nudgeCursor();
+			if (!cursorNudgeTimer) { cursorNudgeTimer = setInterval(nudgeCursor, 200); }
+		} else {
+			svg.classList.remove('regmode');
+			if (cursorNudgeTimer) { clearInterval(cursorNudgeTimer); cursorNudgeTimer = null; }
+		}
+	}
+	function setNodeCursorAllowed(v) { svg.classList.toggle('regmode-node', v); }
+	// Single mutual-exclusion point: every sequence below registers a teardown function here, and
+	// every entry point calls cancelActive() first, so re-picking the same action mid-sequence tears
+	// down and restarts it, and picking a different action tears down whatever else was running.
+	var activeCancel = null;
+	function cancelActive() {
+		if (activeCancel) { var c = activeCancel; activeCancel = null; c(); }
+	}
+	// Escape is the one dedicated "get me out" affordance -- without it, the only way to abandon a
+	// Scale/Position sequence is to re-open the dropdown and pick something else, which isn't
+	// discoverable as a cancel action, and regMode blanks all normal interaction in the meantime.
+	document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { cancelActive(); } });
+
+	function startBackdropScale() {
+		cancelActive();
+		var pc = EngCalcs.pageConfig || {}, clicks = [];
+		setRegMode(true);
+		alert(pc.lpn_backdrop_scale_prompt1 || 'Click two points on the backdrop image (e.g. the two ends of a bar scale), then enter the real distance.');
+		var handler = function (e) {
+			clicks.push(worldToImageLocal(screenToWorld(e.clientX, e.clientY)));
+			if (clicks.length === 2) {
+				svg.removeEventListener('pointerup', handler, true);
+				activeCancel = null; setRegMode(false);
+				var pxDist = Math.hypot(clicks[1].x - clicks[0].x, clicks[1].y - clicks[0].y);
+				var promptText = (pc.lpn_backdrop_scale_prompt2 || 'Real-world distance between the two points') + ' (' + unitLabel('lpn_u_length') + '):';
+				var real = +prompt(promptText, '');
+				if (real > 0) { backdrop.s = real / pxDist; applyBackdropTransform(); saveToStorage(); }
+			}
+		};
+		svg.addEventListener('pointerup', handler, true);
+		activeCancel = function () { svg.removeEventListener('pointerup', handler, true); setRegMode(false); };
+	}
+	function positionTo(refWorld, target) {
+		backdrop.tx += target.x - refWorld.x; backdrop.ty += target.y - refWorld.y;
+		applyBackdropTransform();
+		saveToStorage();
+	}
+	// Per the spike's exact sequence: (a) click Backdrop > Position, (b) alert asking for a reference
+	// point, (c) user clicks it, (d) alert announcing the target-mode step, (e) a floating panel
+	// (mirroring #lpn_labels_popup's static-PHP-plus-JS-clamped-position pattern) offering
+	// Node/Free point/Coords, (f) Continue. Each step registers its own activeCancel so an
+	// interruption at any point tears down cleanly instead of leaving orphaned listeners or regMode
+	// stuck on.
+	function startBackdropPosition() {
+		cancelActive();
+		var pc = EngCalcs.pageConfig || {};
+		setRegMode(true);
+		alert(pc.lpn_backdrop_position_prompt1 || 'Reference point: Click anywhere on the backdrop image.');
+		var handler = function (e) {
+			svg.removeEventListener('pointerup', handler, true);
+			var refWorld = screenToWorld(e.clientX, e.clientY);
+			alert(pc.lpn_backdrop_position_prompt2 || 'Target mode: Choose target mode, then click Continue.');
+			showBackdropTargetPanel(refWorld);
+		};
+		svg.addEventListener('pointerup', handler, true);
+		activeCancel = function () { svg.removeEventListener('pointerup', handler, true); setRegMode(false); };
+	}
+	function showBackdropTargetPanel(refWorld) {
+		var panel = document.getElementById('lpn_backdrop_target_panel'),
+			menu = document.getElementById('lpn_backdrop_menu'), r = menu.getBoundingClientRect();
+		panel.style.left = r.left + 'px'; panel.style.top = (r.bottom + 4) + 'px'; panel.style.display = 'block';
+		// Clamp into the viewport, same as openPopupAt()/toggleLabelsPopup() -- measured after
+		// display:block since size is unknown while display:none.
+		var pr = panel.getBoundingClientRect();
+		panel.style.left = Math.max(4, Math.min(r.left, window.innerWidth - pr.width - 4)) + 'px';
+		panel.style.top = Math.max(4, Math.min(r.bottom + 4, window.innerHeight - pr.height - 4)) + 'px';
+		activeCancel = function () { panel.style.display = 'none'; setRegMode(false); };
+		document.getElementById('lpn_backdrop_target_continue').onclick = function () {
+			var mode = document.getElementById('lpn_backdrop_target_mode').value, pc = EngCalcs.pageConfig || {};
+			panel.style.display = 'none';
+			if (mode === 'coords') {
+				activeCancel = null; setRegMode(false);
+				var txt = prompt((pc.lpn_backdrop_coords_prompt || 'Target X,Y for that reference point') + ' (' + unitLabel('lpn_u_length') + '):', '');
+				var parts = (txt || '').split(',').map(Number);
+				if (txt && !isNaN(parts[0]) && !isNaN(parts[1])) { positionTo(refWorld, { x: parts[0], y: parts[1] }); }
+				return;
+			}
+			// No further blocking dialog here -- the panel + Continue already made the transition
+			// clear enough (matching the spike).
+			if (mode === 'node') { setNodeCursorAllowed(true); }
+			var handler2 = function (e2) {
+				if (mode === 'node') {
+					var t = document.elementFromPoint(e2.clientX, e2.clientY);
+					if (!t || !t.dataset || !t.dataset.node) { return; } // not a node -- keep waiting, don't fall back to a free point
+					svg.removeEventListener('pointerup', handler2, true);
+					activeCancel = null; setNodeCursorAllowed(false); setRegMode(false);
+					positionTo(refWorld, nodeById(t.dataset.node));
+				} else {
+					svg.removeEventListener('pointerup', handler2, true);
+					activeCancel = null; setRegMode(false);
+					positionTo(refWorld, screenToWorld(e2.clientX, e2.clientY)); // 'free': the raw point, never snapped
+				}
+			};
+			svg.addEventListener('pointerup', handler2, true);
+			activeCancel = function () { svg.removeEventListener('pointerup', handler2, true); setNodeCursorAllowed(false); setRegMode(false); };
+		};
+	}
+	// Menu-select build + Scale/Position/Remove enablement, wired from wireToolbar() below.
+	var updateBackdropMenuStateFn = null;
+	function updateBackdropMenuState() { if (updateBackdropMenuStateFn) { updateBackdropMenuStateFn(); } }
+	function wireBackdropMenu(into) {
+		var pc = EngCalcs.pageConfig || {}, menu = document.createElement('select');
+		menu.id = 'lpn_backdrop_menu';
+		function opt(value, text, disabled) {
+			var o = document.createElement('option');
+			o.value = value; o.textContent = text; if (disabled) { o.disabled = true; }
+			menu.appendChild(o);
+		}
+		opt('', pc.lpn_backdrop_menu || 'Backdrop...');
+		opt('add', pc.lpn_backdrop_add || 'Add image');
+		opt('scale', pc.lpn_backdrop_scale || 'Scale', true);
+		opt('position', pc.lpn_backdrop_position || 'Position', true);
+		opt('remove', pc.lpn_backdrop_remove || 'Remove image', true);
+		var fileInput = document.getElementById('lpn_backdrop_file');
+		menu.addEventListener('change', function () {
+			var v = menu.value; menu.value = '';
+			if (v === 'add') { cancelActive(); fileInput.click(); }
+			else if (v === 'scale') { startBackdropScale(); }
+			else if (v === 'position') { startBackdropPosition(); }
+			else if (v === 'remove') {
+				if (window.confirm(pc.lpn_backdrop_remove_confirm || 'Remove the backdrop image?')) { removeBackdrop(); }
+			}
+		});
+		fileInput.addEventListener('change', function () {
+			var f = fileInput.files[0]; fileInput.value = ''; if (!f) { return; }
+			var reader = new FileReader();
+			reader.onload = function (ev) { addBackdropFromDataUrl(ev.target.result); };
+			reader.readAsDataURL(f);
+		});
+		updateBackdropMenuStateFn = function () {
+			menu.options[2].disabled = !backdrop; menu.options[3].disabled = !backdrop; menu.options[4].disabled = !backdrop;
+		};
+		updateBackdropMenuStateFn();
+		into.appendChild(menu);
+	}
+
 	// ---- pan / zoom / pinch / drag ----
 	var MIN_SCALE = 0.05, MAX_SCALE = 500;
 	var pointers = new Map();
@@ -589,7 +821,7 @@ var EngCalcs = EngCalcs || {};
 		try {
 			localStorage.setItem(LPN_STORAGE_KEY, JSON.stringify({
 				v: LPN_STORAGE_VERSION, nodes: doc.nodes, links: doc.links, labels: doc.labels, nextId: nextId,
-				labelSettings: labelSettings
+				labelSettings: labelSettings, backdrop: backdrop
 			}));
 		} catch (err) { /* localStorage can throw (private mode, quota) -- autosave is best-effort */ }
 	}
@@ -607,6 +839,7 @@ var EngCalcs = EngCalcs || {};
 		doc.nodes = saved.nodes || []; doc.links = saved.links || []; doc.labels = saved.labels || [];
 		nextId = saved.nextId || { J: 1, R: 1, L: 1, P: 1, T: 1 };
 		labelSettings = saved.labelSettings || defaultLabelSettings();
+		backdrop = saved.backdrop || null;
 		return true;
 	}
 	// A dedicated button, not a repurposed "Restore Defaults" (Tom asked "do we dare"): that
@@ -618,6 +851,11 @@ var EngCalcs = EngCalcs || {};
 		if (!window.confirm(pc.lpn_confirm_clear || 'This will permanently delete the current network. Continue?')) { return; }
 		doc = { nodes: [], links: [], labels: [] };
 		nextId = { J: 1, R: 1, L: 1, P: 1, T: 1 };
+		// "New" means a genuinely blank project (Task 146 Phase 2) -- the separate "Remove image"
+		// menu action clears just the backdrop without touching the network.
+		backdrop = null; backdropImg = null;
+		backdropLayer.innerHTML = '';
+		updateBackdropMenuState();
 		try { localStorage.removeItem(LPN_STORAGE_KEY); } catch (err) { /* best-effort */ }
 		lastSolveResult = null;
 		closePopup();
@@ -643,7 +881,11 @@ var EngCalcs = EngCalcs || {};
 		wireToolbar();
 		wirePointerEvents();
 		wirePopup();
-		if (loadFromStorage()) { buildDom(); scheduleSolve(); }
+		if (loadFromStorage()) {
+			buildDom(); scheduleSolve();
+			if (backdrop) { buildBackdropImg(); }
+			updateBackdropMenuState();
+		}
 		wireLabelsPopup();
 		updateEmptyHint();
 		zoomExtent();
@@ -695,6 +937,7 @@ var EngCalcs = EngCalcs || {};
 		exampleBtn.textContent = pc.lpn_tool_example || 'Draw example network';
 		exampleBtn.addEventListener('click', drawExampleNetwork);
 		fileGroup.appendChild(exampleBtn);
+		wireBackdropMenu(fileGroup);
 
 		var addGroup = group();
 		[
@@ -841,6 +1084,7 @@ var EngCalcs = EngCalcs || {};
 		});
 
 		svg.addEventListener('pointerdown', function (e) {
+			if (regMode) { return; } // a Scale/Position registration click sequence is pending -- see wireBackdropMenu()
 			svg.setPointerCapture(e.pointerId);
 			pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
 			if (pointers.size === 2) {
@@ -887,6 +1131,7 @@ var EngCalcs = EngCalcs || {};
 			// that popup opens right at the click point, covering it, so the second tap of this
 			// same double-click lands on the popup instead of the canvas and this dblclick event
 			// never fires at all. Tom caught this: double-click stopped adding vertices entirely.
+			if (regMode) { return; } // otherwise two registration clicks landing on the same link also bend it
 			if (pendingLinkPopupTimer) { clearTimeout(pendingLinkPopupTimer); pendingLinkPopupTimer = null; }
 			var t = document.elementFromPoint(e.clientX, e.clientY);
 			if (!t || !t.dataset) { return; }
@@ -899,6 +1144,7 @@ var EngCalcs = EngCalcs || {};
 		var downPt = null;
 		svg.addEventListener('pointerdown', function (e) { downPt = { x: e.clientX, y: e.clientY }; });
 		svg.addEventListener('pointerup', function (e) {
+			if (regMode) { downPt = null; return; } // a Scale/Position registration click sequence is pending
 			if (!downPt || Math.hypot(e.clientX - downPt.x, e.clientY - downPt.y) >= 4) { downPt = null; return; }
 			downPt = null;
 			// elementFromPoint, not e.target: setPointerCapture(svg) retargets pointerup's

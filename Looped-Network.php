@@ -46,6 +46,20 @@ document.addEventListener('DOMContentLoaded', function() {
 	</div>
 	</div>
 	<div class="d-print-none" id="lpn_toolbar"></div>
+	<input type="file" id="lpn_backdrop_file" accept="image/*" style="display:none">
+	<?php // Floating "choose target mode" step of the Position sequence (Task 146 Phase 2) --
+	      // mirrors #lpn_labels_popup's static-PHP-plus-JS-clamped-position pattern (position:fixed,
+	      // positioned/clamped by showBackdropTargetPanel() in looped-network.js), not the spike's
+	      // fixed center-screen placement. ?>
+	<div id="lpn_backdrop_target_panel" class="d-print-none" style="display:none;position:fixed;z-index:30;background:#fff;border:1px solid #333;padding:8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
+		<?=$ec_lang['lpn_backdrop_target_label']?>
+		<select id="lpn_backdrop_target_mode">
+			<option value="node"><?=$ec_lang['lpn_backdrop_target_node']?></option>
+			<option value="free"><?=$ec_lang['lpn_backdrop_target_free']?></option>
+			<option value="coords"><?=$ec_lang['lpn_backdrop_target_coords']?></option>
+		</select>
+		<button type="button" id="lpn_backdrop_target_continue"><?=$ec_lang['lpn_backdrop_continue']?></button>
+	</div>
 	<p id="lpn_status" class="ec-status-warn"></p>
 	<div style="overflow-x:auto;position:relative">
 		<svg id="lpn_canvas" dir="ltr" width="100%" height="500" style="border:1px solid #ccc;background:#f7f7f2"></svg>
@@ -142,7 +156,23 @@ EngCalcs.pageConfig = {
 	lpn_result_headgain: <?=json_encode($ec_lang['lpn_result_headgain'])?>,
 	lpn_tool_clear: <?=json_encode($ec_lang['lpn_tool_clear'])?>,
 	lpn_confirm_clear: <?=json_encode($ec_lang['lpn_confirm_clear'])?>,
-	lpn_storage_too_new: <?=json_encode($ec_lang['lpn_storage_too_new'])?>
+	lpn_storage_too_new: <?=json_encode($ec_lang['lpn_storage_too_new'])?>,
+	lpn_backdrop_menu: <?=json_encode($ec_lang['lpn_backdrop_menu'])?>,
+	lpn_backdrop_add: <?=json_encode($ec_lang['lpn_backdrop_add'])?>,
+	lpn_backdrop_scale: <?=json_encode($ec_lang['lpn_backdrop_scale'])?>,
+	lpn_backdrop_position: <?=json_encode($ec_lang['lpn_backdrop_position'])?>,
+	lpn_backdrop_remove: <?=json_encode($ec_lang['lpn_backdrop_remove'])?>,
+	lpn_backdrop_remove_confirm: <?=json_encode($ec_lang['lpn_backdrop_remove_confirm'])?>,
+	lpn_backdrop_scale_prompt1: <?=json_encode($ec_lang['lpn_backdrop_scale_prompt1'])?>,
+	lpn_backdrop_scale_prompt2: <?=json_encode($ec_lang['lpn_backdrop_scale_prompt2'])?>,
+	lpn_backdrop_position_prompt1: <?=json_encode($ec_lang['lpn_backdrop_position_prompt1'])?>,
+	lpn_backdrop_position_prompt2: <?=json_encode($ec_lang['lpn_backdrop_position_prompt2'])?>,
+	lpn_backdrop_target_label: <?=json_encode($ec_lang['lpn_backdrop_target_label'])?>,
+	lpn_backdrop_target_node: <?=json_encode($ec_lang['lpn_backdrop_target_node'])?>,
+	lpn_backdrop_target_free: <?=json_encode($ec_lang['lpn_backdrop_target_free'])?>,
+	lpn_backdrop_target_coords: <?=json_encode($ec_lang['lpn_backdrop_target_coords'])?>,
+	lpn_backdrop_coords_prompt: <?=json_encode($ec_lang['lpn_backdrop_coords_prompt'])?>,
+	lpn_backdrop_continue: <?=json_encode($ec_lang['lpn_backdrop_continue'])?>
 };
 </script>
 <script src="/engcalcs/js/lpn-solver.js?v=<?=filemtime(__DIR__.'/js/lpn-solver.js')?>"></script>

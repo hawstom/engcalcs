@@ -145,3 +145,12 @@ html[lang="zh"] .ec-welcome {
 /* Three groups (Add / Delete-Undo-Select / Zoom-Example) -- a wider gap, not a line, separates
    them (Tom, 2026-07-30: a divider line was more than needed). */
 .lpn-toolbar-group { display: inline-flex; gap: 6px; margin-right: 14px; }
+/* Backdrop registration wizard (Task 146 Phase 2, ported from the spike): during a Scale/Position
+   click sequence, regMode already suppresses real interaction in looped-network.js, but the
+   per-element cursor:pointer/move rules would still fire on hover, visually implying "this is
+   clickable/draggable" when it must be fully ignored. */
+#lpn_canvas.regmode, #lpn_canvas.regmode * { cursor: crosshair !important; }
+/* Node-mode target step: nodes ARE the valid click target here, so forcing crosshair over them
+   removes the one affordance that actually matters. More specific than the rule above (extra
+   class), so it wins the !important tie on specificity. */
+#lpn_canvas.regmode.regmode-node .lpn-node { cursor: pointer !important; }

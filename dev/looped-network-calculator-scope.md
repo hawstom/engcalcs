@@ -369,6 +369,24 @@ works identically for a scanned plan sheet, a CAD export, and a phone photo of a
 Build the spike's backdrop case as a screenshot with a visible bar scale, and make registering it the
 acceptance test.
 
+**Built (Task 146 Phase 2, 2026-07-30), ported from the spike, verified with a scripted Playwright
+smoke test** (add image, two-point Scale, Position in all three target modes, Escape-cancel, reload
+persistence, Undo non-interaction, Remove image, >1600px downscale). Three decisions made during the
+port, beyond what the spike/this doc left open:
+1. **Backdrop lives outside the undo-snapshotted `doc`** (a top-level `backdrop` var in
+   `js/looped-network.js`, alongside `labelSettings`) — `saveUndoSnapshot()` deep-clones `doc` on
+   every mutation, keeping up to 20 snapshots, and a multi-hundred-KB-to-multi-MB data URI in there
+   would multiply badly. Still persisted to localStorage as a sibling key, just not undo-tracked.
+2. **Downscale on import caps the longest side at 1600px** via an offscreen `<canvas>`, PNG output
+   (not JPEG, to avoid blurring a scanned plan's thin lines) — the mechanism this section already
+   called for; 1600 is the specific number chosen.
+3. **Initial placement size** matches the new image's longer side to the current network's own bbox
+   extent (a fixed default when the network is empty), aspect-ratio-preserved, rather than an
+   arbitrary fixed size — Scale/Position are how the user then registers it precisely.
+
+Also added beyond the spike: a **"Remove image"** menu option (the spike never had a way to remove a
+backdrop once added).
+
 **Design consequence for the Phase 0 spike:** the coordinate seam must be able to place and scale a
 backdrop image from day one, so the spike includes one. Retrofitting a backdrop into a view layer
 that assumed nothing behind the network is the kind of rework this doc exists to prevent.
