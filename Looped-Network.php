@@ -229,6 +229,7 @@ EngCalcs.pageConfig = {
 	lpn_push_elements: <?=json_encode($ec_lang['lpn_push_elements'])?>,
 	lpn_push_none_displayed: <?=json_encode($ec_lang['lpn_push_none_displayed'])?>,
 	lpn_push_nothing: <?=json_encode($ec_lang['lpn_push_nothing'])?>,
+	lpn_push_no_change: <?=json_encode($ec_lang['lpn_push_no_change'])?>,
 <?php // lpn_settings_emitter_exponent is deliberately NOT wired here: its Settings row was removed
       // 2026-07-30 because nothing can create an emitter yet (ROADMAP Task 191). The language key
       // stays in lib/lang.ec.en.php so restoring the control is one line here and one there. ?>

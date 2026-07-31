@@ -2650,15 +2650,15 @@ var EngCalcs = EngCalcs || {};
 			// `applies` is what keeps the push physical rather than blindly per-field: a reservoir
 			// has no demand, and a pump has no diameter/roughness/km, so neither is counted or touched.
 			{ key: 'nodeElev', group: 'node', field: 'elev', label: pc.lpn_field_elev || 'Elevation',
-				applies: function () { return true; }, set: function (n, v) { n.elev = v; } },
+				applies: function () { return true; }, get: function (n) { return n.elev; }, set: function (n, v) { n.elev = v; } },
 			{ key: 'demand', group: 'node', field: 'demand', label: pc.bpn_demand || 'Demand',
-				applies: function (n) { return n.type !== 'reservoir'; }, set: function (n, v) { n.demand = v; } },
+				applies: function (n) { return n.type !== 'reservoir'; }, get: function (n) { return n.demand; }, set: function (n, v) { n.demand = v; } },
 			{ key: 'diameter', group: 'link', field: 'diameter', label: pc.lpn_field_diameter || 'Diameter',
-				applies: function (l) { return l.type !== 'pump'; }, set: function (l, v) { l.diameter = v; } },
+				applies: function (l) { return l.type !== 'pump'; }, get: function (l) { return l.diameter; }, set: function (l, v) { l.diameter = v; } },
 			{ key: 'roughness', group: 'link', field: 'roughness', label: pc.lpn_field_roughness || 'Roughness',
-				applies: function (l) { return l.type !== 'pump'; }, set: function (l, v) { l.roughness = v; } },
+				applies: function (l) { return l.type !== 'pump'; }, get: function (l) { return l.roughness; }, set: function (l, v) { l.roughness = v; } },
 			{ key: 'k', group: 'link', field: 'km', label: pc.lpn_field_km || 'Minor (local) loss coefficient, km',
-				applies: function (l) { return l.type !== 'pump'; }, set: function (l, v) { l.k = v; } }
+				applies: function (l) { return l.type !== 'pump'; }, get: function (l) { return l.k; }, set: function (l, v) { l.k = v; } }
 		];
 		note(defBody, pc.lpn_settings_push_note || 'Pushing sends only the properties whose labels are currently showing.');
 		var pushBtn = document.createElement('button');
@@ -2673,14 +2673,37 @@ var EngCalcs = EngCalcs || {};
 				alert(pc.lpn_push_none_displayed || 'No default input is showing as a label right now, so there is nothing to push. Turn on the labels for the properties you want (Labels panel), then try again.');
 				return;
 			}
-			var targets = 0;
-			doc.nodes.forEach(function (n) {
-				if (active.some(function (s) { return s.group === 'node' && s.applies(n); })) { targets++; }
-			});
-			doc.links.forEach(function (l) {
-				if (active.some(function (s) { return s.group === 'link' && s.applies(l); })) { targets++; }
-			});
-			if (!targets) { alert(pc.lpn_push_nothing || 'No existing element carries any of the properties being pushed.'); return; }
+			// TWO different counts, because "nothing to do" has two different causes and they need
+			// different messages (Tom, 2026-07-30 -- "no count if no change because already at that
+			// value"). `carriers` is how many elements the properties even apply to; `targets` is
+			// how many would ACTUALLY change. Reporting carriers would overstate the action --
+			// "Elements: 40" when 38 already hold the value reads as a much bigger swing than it is,
+			// and after a push the same button would still offer to change 40 things.
+			// Exact === is the right comparison, not an epsilon: a value that came from this default
+			// was assigned from this same number, so it is bit-identical. An epsilon here would
+			// instead start silently skipping elements a user had deliberately set very close by.
+			function counts(list, group) {
+				var carriers = 0, changing = 0;
+				list.forEach(function (el) {
+					var applied = false, differs = false;
+					active.forEach(function (s) {
+						if (s.group !== group || !s.applies(el)) { return; }
+						applied = true;
+						if (s.get(el) !== settings.defaults[s.key]) { differs = true; }
+					});
+					if (applied) { carriers++; }
+					if (differs) { changing++; }
+				});
+				return { carriers: carriers, changing: changing };
+			}
+			var nodeCounts = counts(doc.nodes, 'node'), linkCounts = counts(doc.links, 'link');
+			var carriers = nodeCounts.carriers + linkCounts.carriers;
+			var targets = nodeCounts.changing + linkCounts.changing;
+			if (!carriers) { alert(pc.lpn_push_nothing || 'No existing element carries any of the properties being pushed.'); return; }
+			// Distinct from the message above on purpose: "nothing carries these properties" and
+			// "everything already has these values" are opposite situations, and telling a user the
+			// first when the second is true would send them hunting for a problem that isn't there.
+			if (!targets) { alert(pc.lpn_push_no_change || 'Every element already has these values, so this would change nothing.'); return; }
 			// The confirm NAMES the properties, it does not merely count them -- a count alone
 			// ("push 2 properties?") leaves the user guessing which two, and this action is not
 			// something to guess at. Assembled from already-translated label text plus two short

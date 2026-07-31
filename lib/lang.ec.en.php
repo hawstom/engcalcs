@@ -1260,6 +1260,7 @@ $ec_lang['lpn_push_properties']='Properties:';
 $ec_lang['lpn_push_elements']='Elements:';
 $ec_lang['lpn_push_none_displayed']='No default input is showing as a label right now, so there is nothing to push. Turn on the labels for the properties you want (Labels panel), then try again.';
 $ec_lang['lpn_push_nothing']='No existing element carries any of the properties being pushed.';
+$ec_lang['lpn_push_no_change']='Every element already has these values, so this would change nothing.';
 $ec_lang['lpn_settings_emitter_exponent']='Emitter exponent';
 $ec_lang['lpn_settings_tolerance']='Convergence tolerance';
 $ec_lang['lpn_settings_text_size']='Text size';
@@ -1276,7 +1277,7 @@ $ec_lang['lpn_settings_symbol_opacity']='Symbol opacity (0 to 1)';
 // network drawn over it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_backdrop_opacity']='Backdrop opacity (0 to 1)';
 $ec_lang['lpn_settings_text_size_units']='Text size units';
-$ec_lang['lpn_settings_map_display']='Map display';
+$ec_lang['lpn_settings_map_display']='Map display and sizes';
 $ec_lang['lpn_settings_map_height_px']='Map height (px)';
 $ec_lang['lpn_settings_legend_position']='Legend position';
 $ec_lang['lpn_settings_legend_top_left']='Top left';
