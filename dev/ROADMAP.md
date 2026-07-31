@@ -358,6 +358,119 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **Geometry genuinely does stay shared**, and this is the part of the original rule with an actual
     reason rather than an inherited one: a node cannot be in two places at once in a single rendered
     map view.
+
+  **The line, stated exactly (2026-07-30, agreed): MEMBERSHIP is overridable, IDENTITY is not.** A
+  link's `from`/`to` and a node's `x`/`y` are Base-owned and never override; `active` is an ordinary
+  property override like any other. This is narrower than the retired "topology is shared" rule and
+  is the form worth defending, because:
+  - **The escape hatch is cheaper than the feature it replaces, and better.** "Same pipe, different
+    alignment" is two pipes with opposite `active` flags — one extra ID. And it is the *superior*
+    representation: alignment variants nearly always differ in length, diameter and cost, so they
+    want to be two separately priceable elements anyway.
+  - **A connectivity override has no picture.** Re-pointing P-12 from J-5 to J-9 renders as a pipe
+    that silently jumps when you switch scenarios, with no halo that reads as "this is the change."
+    The inactive/active pair draws *both at once*, greyed and solid — precisely the image an engineer
+    wants for "with the loop vs. without." The restriction is not a limitation; it is the mechanism
+    that makes the comparison visible.
+  - **Do not inherit the vendors' reason.** EPANET-lineage engines index links by array position
+    against fixed result series; we store no result series and re-solve on scenario switch, so that
+    constraint is theirs, not ours. Only the two reasons above are ours.
+  - **Two honest costs, accepted with eyes open.** (1) Report tables (146.04) get two rows for one
+    physical decision — the compare-with field below is the fix. (2) Mid-pipe insertion in one
+    scenario clutters Base: a service tap means Base gains a junction plus two half-pipes, all
+    inactive, plus deactivating the original run. That argues for an eventual "purge elements
+    inactive in every scenario" affordance, and for the audit halos to also mark inactive-everywhere
+    elements.
+
+  **Storage shape (v2), and the one seam that matters:**
+  ```json
+  { "v": 2,
+    "project": { "name": "Elm St. subdivision", "activeScenario": "base" },
+    "nodes": [], "links": [], "labels": [],
+    "nextId": {}, "labelSettings": {}, "backdrop": {}, "settings": {},
+    "scenarios": [
+      { "id": "base", "name": "Base", "isBase": true, "overrides": {} },
+      { "id": "s1", "name": "Fire flow", "overrides": {
+          "J-3":  { "demand": 1500 },
+          "P-12": { "active": true },
+          "P-4":  { "active": false } } } ] }
+  ```
+  - **The key's presence IS the marker.** No parallel marker array to drift out of sync: writing
+    `overrides["J-3"].demand` records intent, deleting it is the un-do, and both hold even when the
+    value equals Base's. The status bar's override count is a sum of key counts.
+  - **Base is a row in the same array**, flagged `isBase` with a permanently empty `overrides`. The
+    scenario selector then has no special case, and because nothing carries a parent pointer, a
+    scenario-of-a-scenario is *unrepresentable* rather than merely discouraged — the structural
+    asymmetry the model requires.
+  - **One resolver seam:** `effective(el, prop)` → `override ?? el[prop]`. Solver, renderer, labels
+    and popups all read through it. **Build this seam in 146.08 while Base is still the only
+    scenario** — it, not the JSON wrapper, is what makes scenarios purely additive later.
+  - **An overridable-property whitelist**, cheap to widen and expensive to narrow. Start with:
+    junction `demand` and `emitter` (Task 191); reservoir/tank `head`; pipe `diameter`, `roughness`,
+    `k`, `open` (146.07); `active` on anything. Explicitly out: `id`, `from`, `to`, `x`, `y`, `verts`,
+    `type`, and junction `elev` (survey data, not a design variable).
+  - **v1 → v2 is a wrap, no data loss**: the existing `lpn_document` becomes project "Untitled" with
+    one Base scenario.
+
+  **Dragging inside a scenario: no dialog. Silent to Base, with ambient warning.** Two unequal
+  intents hide behind a drag — "that node is in the wrong place" (a fact about reality, the
+  overwhelming majority) and "in this scenario the manhole is 40 ft north" (rare, and when real it
+  wants to be a separate priced element anyway). A modal taxes the common case to serve the rare one,
+  and drags are not discrete decisions but nudge-nudge-nudge; users would learn to click through
+  without reading, which is worse than no dialog. **Note this is a hydraulic edit, not just a
+  cartographic one:** `lenAuto` (`js/looped-network.js:740`) makes `length` follow geometry until the
+  user takes control, so a drag changes a solver input in every scenario. What replaces the dialog:
+  - **A one-time, dismissible notice** on the first drag in a non-Base scenario: "Moving elements
+    changes the drawing in every scenario. Property changes stay in this scenario." [OK] [Don't show
+    again].
+  - **Ambient state, not modal** — flash the recomputed length in the status bar on mouse-up when the
+    dragged link is auto-length, so the hydraulic consequence leaves a visible trace.
+  - **Undo.** One document, one undo stack, effect on screen — categorically better than the retired
+    copy model, whose push edited documents the user could not see.
+  - **"Create scenario geometry variant"** (Tom's wording, 2026-07-30) is the deliberate path, and it
+    is an *up-front command, never a post-drag question*: clone the element (new ID, same geometry and
+    properties), set the original inactive here, set the clone active only here — then drag the clone.
+    By the time a post-drag modal could fire the gesture is already complete, so "create a copy" would
+    have to retroactively reinterpret what just happened. Same machinery as drawing a new pipe in a
+    scenario, so no new concept. **Entry path in 146.08 is the toolbar/menu only** — see Task 192 for
+    why the right-click path is a separate build.
+  - **A non-clone escape valve already exists:** `length` is a property with a manual-override flag,
+    so a scenario wanting a different length *without* a different drawing just overrides `length`.
+    The clone stays reserved for real re-routes. Vertices follow the identical rule — a vertex list is
+    geometry, Base-owned.
+
+  **"Compare with base ID" — a visible, blank-by-default, usually-guessable string field** (Tom,
+  2026-07-30, simplifying an earlier proposal for a hidden clone id + named group). It is what makes
+  the two-elements-per-variant rule legible instead of chaotic, and it is load-bearing for 146.08
+  rather than a 146.04 report-table nicety — it is simultaneously the table's row key, the halo
+  grouping, and the cleanup handle for "pipes could get out of control fast."
+  - **A string, never a live reference.** Grouping is string equality; nothing is ever dereferenced.
+    This is why deleting the base object cannot break it — the earlier objection to a pointer applied
+    only to a resolved one. The group's name simply *is* that string, normally the base object's ID.
+  - **Capture, don't infer, as the primary path.** "Create scenario geometry variant" knows the
+    relationship with certainty at creation and writes it then — the same principle as the override
+    marker: a diff cannot tell "deliberate" from "drifted," and a geometric guess cannot tell
+    "alternative alignment" from "two pipes that happen to be near each other," least of all in the
+    congested drawings where it matters most.
+  - **Guessing is the secondary path**, for pipes drawn independently before the user thought of them
+    as alternatives. Two signals, the second near-conclusive: same endpoints, and **never active in
+    the same scenario**. Offer as a *suggestion*, visually distinct from confirmed, one click to
+    accept or reject.
+  - **Follow renames while the object exists; freeze on delete.** Renaming P-12 → P-100 updates every
+    member's field (we own the rename path, it is cheap, and it is what the user meant). Once P-12 is
+    deleted there is nothing to follow, so it freezes into a plain name and we hint, at that moment
+    and not as a standing nag: "Group is named after a deleted object ID. Consider changing to a
+    friendly name."
+  - **A collision is cosmetic, not corrupting.** If a later pipe is renamed *into* a deleted group's
+    name the label reads oddly, but since the string is never resolved nothing breaks. Warn on the
+    rename; build no machinery.
+  - **What the table then does:** one row per *design decision*, not per element. The group name is
+    the row; each scenario's column shows whichever member is active there, with the member ID in a
+    sub-cell.
+  - **Two guards fall out free.** Two members active in the same scenario is a table flag and a halo
+    candidate (not necessarily an error — you might build both). A group whose members are inactive
+    everywhere is exactly the "purge unused" candidate above.
+
   **Sequencing:** 146.08 must ship the **project container from day one**, holding Base as its only
   scenario. Then scenarios are purely additive and there is never a storage migration. Tom flagged
   this himself — *"this is an important decision because we want to introduce it early"* — and it is
@@ -380,6 +493,22 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   the delta decision above** — the naming problem disappears with scenario-level copy, and the
   sequencing note inverts: the container must come first, not the flat saves.
 
+- 30|192| **Right-click / long-press context-menu system (Task 146 child).** Raised by Tom,
+  2026-07-30, when "Create scenario geometry variant" (Task 184) was proposed as a right-click
+  action: the calculator has **no right-click capability at all today**, so that action cannot
+  quietly introduce one. Tom: *"if we add right-click, it should be built out robustly. It's a habit
+  that, once taught or discovered, we should leverage."* Hence a task of its own, and hence 146.08
+  ships its command on the toolbar/menu path only — this is not a blocker for it.
+  - **Every clickable class gets a menu** — node, link, vertex, label, backdrop, empty canvas. A menu
+    missing on some objects is exactly what teaches users to stop trying.
+  - **Long-press is the touch equivalent, and every item stays reachable without it.** This page runs
+    on phones; a right-click-only action is an action that does not exist for half the users. That is
+    the real reason for Tom's two entry paths — reachability, not redundancy.
+  - **Do not hijack right-click inside form fields.** Suppress the native menu only where we replace
+    it; the popup's text inputs must keep native copy/paste.
+  - **Disable-with-reason rather than hide**, where practical, so the vocabulary stays learnable.
+  - Menu contents are contextual to the clicked object (and later to the selection, if multi-select
+    lands). Escape closes.
 - 35|185| **Match/Copy properties tool (Task 146 child).** Tom, 2026-07-30: "In the absence of the
   table editor, some sort of Match or Copy tool would be very cool. Checkboxes (or current visible
   labels) say what properties to copy, top shows (or initial click gives) the Source object then you
@@ -405,6 +534,18 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   rotate among several `lpn_` projects. This is the real need behind the scope doc's old
   `.inp` export/import item — Tom confirmed 2026-07-29 that true EPANET `.inp` file interop is not
   needed right now, only local multi-project storage.
+  **Ships the project container from day one** — see Task 184 for the full delta/scenario model this
+  must not foreclose. What that means concretely here:
+  - **The v2 storage shape from Task 184**, with Base as the only scenario and no scenario UI. The
+    migration from today's single `lpn_document` is a wrap, so there is never a second migration.
+  - **The `effective(el, prop)` resolver seam**, built now even though every lookup falls through to
+    the element. This is the part that makes scenarios purely additive later; the JSON wrapper alone
+    is not.
+  - **One localStorage key per project** (`lpn_project_<id>`) plus a small index key, rather than one
+    blob — so autosave rewrites only the open project, and one large backdrop image cannot take the
+    whole library down with a single quota error.
+  - **"Create scenario geometry variant" and the "Compare with base ID" field** land here on the
+    toolbar/menu path only. Task 192 owns the right-click path.
 - 20|146.04| **Node/link report tables (Task 146 child).** Tabular results view.
 - 20|146.05| **EPANET-style element browser (Task 146 child).** List/select elements from a panel
   rather than only the canvas. **If this lists TEXT elements** (EPANET's own Browser does have a
