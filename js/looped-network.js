@@ -608,12 +608,31 @@ var EngCalcs = EngCalcs || {};
 			// Task 191, and the longer note in rebuildSettingsFields()).
 			emitterExponent: 0.5,
 			tolerance: 1e-9, // matches js/lpn-solver.js's own default relative-flow-change tol -- see runSolve()
-			// Default minor (local) loss coefficient for a NEWLY created pipe (Tom, 2026-07-30) --
-			// js/lpn-solver.js has always supported a per-pipe l.k (m = k/(2 g A^2), added to the
-			// head-loss/resistance terms), but nothing ever set it, so every pipe solved with k=0
-			// until now. 2 is a generic placeholder for "some fittings on this run", not tied to any
-			// specific fitting -- editable per-pipe in its popup, same as diameter/roughness.
-			kmDefault: 2,
+			// Default input values for NEWLY created elements (Tom, 2026-07-30). Generalizes what
+			// used to be a lone `kmDefault`: the workflow Tom described is "mostly 8-inch, 0 demand,
+			// 150 roughness, K=2, elevation 826" decided BEFORE drawing, and then switched mid-draw
+			// ("OK, now all the 8 inch pipes") -- so these are a mode the user re-enters, not a
+			// one-time setup. Same "future, not retroactive" rule as idPrefixes: changing one never
+			// touches an element that already exists.
+			// Values are null here and seeded by seedDefaultInputs() at init() instead of being
+			// written literally, because the unit-set-dependent ones go through niceDefault(), which
+			// reads the units strip out of the DOM -- and `var settings = defaultSettings()` below
+			// runs at module scope, before DOMContentLoaded, where every lookup would silently fall
+			// back to SI. Seeding after the DOM exists is what makes a US visitor's diameter default
+			// read 4 in rather than 0.1 m.
+			// NO reservoir head default, deliberately: reservoirHead() treats a blank head as "same
+			// as the elevation" and keeps the two linked as the reservoir moves. Writing this same
+			// number into head would look identical on screen while silently severing that link.
+			// nodeElev covers junctions AND reservoirs (Tom, 2026-07-30). Note this drops the old
+			// asymmetry where a new reservoir sat 100 ft above a new junction: a from-scratch
+			// reservoir now has no head until the user gives it one, which is the same "squash the
+			// secrets" call already made for the pump curve in addLink() -- no invisible driving
+			// head the user never entered. Change this one number if that trade reads wrong.
+			defaults: { nodeElev: null, demand: null, diameter: null, roughness: null, k: null },
+			// Open/closed state of the settings panel's collapsible sections, persisted so a user
+			// who lives in Default inputs is not re-opening it every session. Default inputs starts
+			// OPEN because it is the mode-switching section above; the other two are set-once.
+			sectionsOpen: { idPrefixes: false, defaults: true, mapDisplay: false },
 			textSize: 2.5, // world units -- the original fixed LABEL_FONT_SIZE constant's value
 			symbolScale: 1, // symbol size relative to text size -- see symbolFactor() above
 			symbolOpacity: 1, // 0-1, applied to symbols only (never labels) -- see refreshSymbolSizes()
@@ -624,6 +643,19 @@ var EngCalcs = EngCalcs || {};
 		};
 	}
 	var settings = defaultSettings();
+	// Fills any null in settings.defaults with its real starting value. Called from init() (after
+	// the units strip exists, so niceDefault() can see it) and again after Restore defaults. Only
+	// nulls are touched, so it doubles as the forward-migration for a save written before a given
+	// default existed -- the merge in loadFromStorage() leaves such a key null and this fills it.
+	function seedDefaultInputs() {
+		var d = settings.defaults;
+		function fill(key, value) { if (d[key] === null || d[key] === undefined) { d[key] = value; } }
+		fill('nodeElev', 0);
+		fill('demand', 0);
+		fill('diameter', niceDefault('lpn_u_diameter', 'in', 4, 0.1));
+		fill('roughness', 100);
+		fill('k', 2);
+	}
 
 	// User-supplied backdrop image (Task 146 Phase 2), ported from dev/lpn-spike/canvas-spike.html
 	// (see phase0-acceptance.md rounds 4/5/8-10 for the validated interaction design). Deliberately
@@ -1465,9 +1497,12 @@ var EngCalcs = EngCalcs || {};
 		// if blank"). So a plain reservoir is a water surface at its own ground elevation, and
 		// typing a head turns it into a tank of that depth, with the difference reported as the
 		// pressure there. See reservoirHead() for the one place that resolution happens.
+		// Both node types now take the SAME settings.defaults.nodeElev (Tom, 2026-07-30) -- see the
+		// note on settings.defaults for why the old reservoir-sits-100-ft-higher asymmetry went away.
+		// A reservoir still gets no `head` key at all, which is what keeps it following its elevation.
 		var n = type === 'reservoir'
-			? { id: id, type: type, x: x, y: y, elev: niceDefault('lpn_u_elevhead', 'fth2o', 100, 30) }
-			: { id: id, type: type, x: x, y: y, elev: 0, demand: 0 };
+			? { id: id, type: type, x: x, y: y, elev: settings.defaults.nodeElev }
+			: { id: id, type: type, x: x, y: y, elev: settings.defaults.nodeElev, demand: settings.defaults.demand };
 		doc.nodes.push(n);
 		buildNodeEls(n);
 		incidentLinks[id] = []; labelsByAnchor[id] = [];
@@ -1479,9 +1514,11 @@ var EngCalcs = EngCalcs || {};
 		var key = type === 'pump' ? 'P' : 'L', id = (settings.idPrefixes[key] || key) + (nextId[key]++);
 		var l = {
 			id: id, type: type, from: fromId, to: toId, verts: [],
-			diameter: niceDefault('lpn_u_diameter', 'in', 4, 0.1),
-			roughness: 100, length: 0, lenAuto: true, status: 'open',
-			k: settings.kmDefault // pump ignores k -- only the pipe friction branch reads it
+			diameter: settings.defaults.diameter,
+			// No `length` default, deliberately (Tom, 2026-07-30): lenAuto derives length from the
+			// drawn geometry, so a default would be overwritten by linkGeomLength() on the next line.
+			roughness: settings.defaults.roughness, length: 0, lenAuto: true, status: 'open',
+			k: settings.defaults.k // pump ignores k -- only the pipe friction branch reads it
 		};
 		l.length = linkGeomLength(l);
 		if (type === 'pump') {
@@ -1628,7 +1665,22 @@ var EngCalcs = EngCalcs || {};
 		Object.assign(labelSettings.decimals.link, savedDec.link || {});
 		if (typeof savedLS.markExtrema === 'boolean') { labelSettings.markExtrema = savedLS.markExtrema; }
 		backdrop = saved.backdrop || null;
-		settings = Object.assign(defaultSettings(), saved.settings || {});
+		// Same one-level-deeper merge the labelSettings block above documents, and for the same
+		// reason: `defaults` and `sectionsOpen` are nested objects, so a top-level Object.assign
+		// swaps the saved one in whole and any default added AFTER that save comes back undefined
+		// instead of at its default. Assigning the nested objects separately keeps every OLD saved
+		// value while still picking up NEW keys (which seedDefaultInputs() then fills).
+		var savedSettings = Object.assign({}, saved.settings || {});
+		var savedDefaults = savedSettings.defaults || {}, savedSections = savedSettings.sectionsOpen || {};
+		delete savedSettings.defaults; delete savedSettings.sectionsOpen;
+		settings = Object.assign(defaultSettings(), savedSettings);
+		Object.assign(settings.defaults, savedDefaults);
+		Object.assign(settings.sectionsOpen, savedSections);
+		// `kmDefault` was the single-purpose predecessor of settings.defaults.k (renamed 2026-07-30
+		// when defaults grew to cover every input). Carry a saved one across so a user who set it
+		// does not silently lose it, then drop the old key so it cannot drift.
+		if (typeof settings.kmDefault === 'number') { settings.defaults.k = settings.kmDefault; }
+		delete settings.kmDefault;
 		return true;
 	}
 	// A dedicated button, not a repurposed "Restore Defaults" (Tom asked "do we dare"): that
@@ -1713,6 +1765,11 @@ var EngCalcs = EngCalcs || {};
 			updateBackdropMenuState();
 		}
 		wireLabelsPopup();
+		// AFTER loadFromStorage() (so a saved default is never overwritten -- seedDefaultInputs()
+		// fills nulls only) and BEFORE wireSettingsPopup() (which calls rebuildSettingsFields(),
+		// where a still-null default would render as an empty box). Also necessarily after the
+		// units strip is in the DOM, which is what the seeding exists to wait for.
+		seedDefaultInputs();
 		wireSettingsPopup();
 		applyLegendPosition();
 		applyMapHeight();
@@ -2449,24 +2506,86 @@ var EngCalcs = EngCalcs || {};
 	function validatePrefix(p) { return !!p && !/[\s'"]/.test(p); }
 	// Extracted from wireSettingsPopup() (Tom, 2026-07-30: "Restore defaults" button) so the field
 	// list can be rebuilt in place, showing the reset values, without re-wiring the close button.
+	// The panel outgrew a flat list once every input got a default (Tom, 2026-07-30), so it is now
+	// three collapsible sections plus a short always-visible tail.
+	// ACCORDION, NOT TABS: this is a narrow floating panel over a map, on a page used on phones.
+	// Tabs need horizontal room they do not have, truncate their labels when they do not get it,
+	// force a "which tab opens first" decision, and show only one group at a time. Sections stack
+	// vertically, work at any width, degrade to a plain scrolling list, and let two be open at once.
+	// Open/closed state lives in settings.sectionsOpen, so it survives both this rebuild and the
+	// session -- a user who lives in Default inputs is not re-opening it every time.
+	// ORDER is Tom's: the three groups first, then the uncollapsed rows, then Reset. The tail rows
+	// deliberately carry NO heading of their own rather than sitting under an "Other" that alone
+	// cannot collapse -- a heading that behaves unlike every other heading in the panel misrepresents
+	// the affordance. The old "Solver" heading is gone with them: km was never a solver setting (it
+	// is a default input) and tolerance was the only genuine one.
 	function rebuildSettingsFields() {
 		var pc = EngCalcs.pageConfig || {}, fields = document.getElementById('lpn_settings_fields');
 		fields.innerHTML = '';
-		function row(labelText, input) {
+		function row(target, labelText, input) {
 			var label = document.createElement('label');
 			label.textContent = labelText + ' ';
 			label.appendChild(input);
-			fields.appendChild(label);
-			fields.appendChild(document.createElement('br'));
+			target.appendChild(label);
+			target.appendChild(document.createElement('br'));
 		}
-		function heading(text) {
-			var h = document.createElement('div');
-			h.style.fontWeight = 'bold'; h.style.marginTop = '6px';
-			h.textContent = text;
-			fields.appendChild(h);
+		function note(target, text) {
+			var p = document.createElement('div');
+			p.style.cssText = 'font-size:0.85em;opacity:0.75;margin:2px 0 4px';
+			p.textContent = text;
+			target.appendChild(p);
 		}
-		// ---- ID prefixes ----
-		heading(pc.lpn_settings_id_prefixes || 'ID prefixes');
+		function section(key, titleText) {
+			var head = document.createElement('button'), body = document.createElement('div');
+			// A real <button>, not a styled <div>: keyboard focus and Enter/Space activation come
+			// free, and the browser's own chrome is removed rather than re-implemented.
+			head.type = 'button';
+			head.style.cssText = 'display:block;width:100%;text-align:left;background:none;border:0;padding:0;margin-top:6px;font:inherit;font-weight:bold;cursor:pointer';
+			body.style.marginLeft = '8px';
+			function apply() {
+				var open = !!settings.sectionsOpen[key];
+				body.style.display = open ? 'block' : 'none';
+				// The CLOSED glyph is direction-bearing and wants an RTL mirror (U+25C2) when Task
+				// 146.06 translates this page; the open one (U+25BE) points down and is safe as is.
+				head.textContent = (open ? '▾ ' : '▸ ') + titleText;
+				head.setAttribute('aria-expanded', open ? 'true' : 'false');
+			}
+			head.addEventListener('click', function () {
+				settings.sectionsOpen[key] = !settings.sectionsOpen[key];
+				apply();
+				saveToStorage();
+			});
+			apply();
+			fields.appendChild(head);
+			fields.appendChild(body);
+			return body;
+		}
+		// Trailing zeros stripped rather than the popup's fixed toFixed(4): a default is a round
+		// number the user typed ("8", "150"), and showing it back as 8.0000 makes the panel look
+		// like a readout of a computed value instead of the field they set.
+		function trimNum(v) { return String(+v.toFixed(6)); }
+		// Unit-bearing rows show and accept the CURRENT display unit and store SI, the same
+		// convention unitNumberField() uses in the element popup -- but with NO scheduleSolve():
+		// changing a default alters nothing that already exists, so there is nothing to re-solve.
+		// EngCalcs.pageCalculator re-runs this whole rebuild on a unit switch, so these rows can
+		// never sit showing a number in a unit the strip has since changed away from.
+		// unitId null means dimensionless (roughness, K) -- no factor, no unit in the label.
+		function defaultRow(target, labelText, unitId, key, isValid) {
+			var f = unitId ? unitFactor(unitId) : 1, input = document.createElement('input');
+			input.type = 'number'; input.step = 'any';
+			input.value = trimNum(settings.defaults[key] * f);
+			input.addEventListener('change', function () {
+				var v = +input.value;
+				if (input.value !== '' && isFinite(v) && isValid(v)) { settings.defaults[key] = v / f; saveToStorage(); }
+				else { input.value = trimNum(settings.defaults[key] * f); }
+			});
+			row(target, unitId ? labelText + ' (' + unitLabel(unitId) + ')' : labelText, input);
+		}
+		function any() { return true; }
+		function positive(v) { return v > 0; }
+		function nonNegative(v) { return v >= 0; }
+		// ---- 1. ID prefixes ----
+		var idBody = section('idPrefixes', pc.lpn_settings_id_prefixes || 'ID prefixes');
 		// Reuses the existing Add-tool labels (Junction/Reservoir/Pipe/Pump) per CLAUDE.md's
 		// concept-level label reuse rule -- these already name the element type, no new key needed.
 		// TEXT ('T') IS DELIBERATELY ABSENT (Tom, 2026-07-30, asking "User never sees Text ID... is
@@ -2489,10 +2608,97 @@ var EngCalcs = EngCalcs || {};
 				settings.idPrefixes[key] = input.value;
 				saveToStorage();
 			});
-			row(f[1], input);
+			row(idBody, f[1], input);
 		});
-		// ---- solver settings ----
-		heading(pc.lpn_settings_solver || 'Solver');
+		// ---- 2. Default inputs ----
+		// Starts EXPANDED (see settings.sectionsOpen): the other two sections are set-once, but this
+		// one is a mode the user re-enters mid-drawing ("OK, now all the 8 inch pipes").
+		var defBody = section('defaults', pc.lpn_settings_defaults || 'Default inputs');
+		// Stated ONCE for the whole section rather than implied per row -- the "future, not
+		// retroactive" rule used to govern two controls and now governs five.
+		note(defBody, pc.lpn_settings_defaults_note || 'Used for elements you create from now on. Existing elements are not changed.');
+		// One elevation for BOTH junctions and reservoirs (Tom, 2026-07-30). A reservoir's head is
+		// absent by design and follows this elevation -- see reservoirHead() and addNode().
+		defaultRow(defBody, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead', 'nodeElev', any);
+		// bpn_demand, not an lpn_ key of its own -- CLAUDE.md's concept-level label reuse rule, and
+		// the same borrow the junction popup and the Labels panel already make for this concept.
+		defaultRow(defBody, pc.bpn_demand || 'Demand', 'lpn_u_flow', 'demand', any);
+		defaultRow(defBody, pc.lpn_field_diameter || 'Diameter', 'lpn_u_diameter', 'diameter', positive);
+		// Roughness and K are dimensionless, so no unit factor and no unit in the label -- same
+		// reasoning as refreshLabelText()'s plainRound() treatment of these two fields.
+		defaultRow(defBody, pc.lpn_field_roughness || 'Roughness', null, 'roughness', positive);
+		// No Length row, deliberately (Tom, 2026-07-30): lenAuto derives a pipe's length from the
+		// drawn geometry, so any default here would be overwritten the moment the pipe is drawn.
+		defaultRow(defBody, pc.lpn_field_km || 'Minor (local) loss coefficient, km', null, 'k', nonNegative);
+		// ---- 3. Map display ----
+		// "Display" rather than Tom's first "Map sizes": the section also holds symbol and backdrop
+		// opacity, which are not sizes, and stranding those two in a group of their own would be
+		// more clicking than it saves.
+		var mapBody = section('mapDisplay', pc.lpn_settings_map_display || 'Map display');
+		var sizeInput = document.createElement('input');
+		sizeInput.type = 'number'; sizeInput.step = 'any'; sizeInput.min = '0.1'; sizeInput.value = settings.textSize;
+		sizeInput.addEventListener('change', function () {
+			if (+sizeInput.value > 0) { settings.textSize = +sizeInput.value; refreshFontSizes(); saveToStorage(); }
+			else { sizeInput.value = settings.textSize; }
+		});
+		row(mapBody, pc.lpn_settings_text_size || 'Text size', sizeInput);
+		var unitsSelect = document.createElement('select');
+		[
+			['map', pc.lpn_settings_text_size_map || 'Map units'],
+			['screen', pc.lpn_settings_text_size_screen || 'Screen pixels']
+		].forEach(function (o) {
+			var opt = document.createElement('option');
+			opt.value = o[0]; opt.textContent = o[1]; if (o[0] === settings.textSizeUnits) { opt.selected = true; }
+			unitsSelect.appendChild(opt);
+		});
+		unitsSelect.addEventListener('change', function () {
+			settings.textSizeUnits = unitsSelect.value;
+			refreshFontSizes();
+			saveToStorage();
+		});
+		row(mapBody, pc.lpn_settings_text_size_units || 'Text size units', unitsSelect);
+		// Symbol size rides on the text-size block on purpose: it is expressed as a multiple of the
+		// text size and inherits its map-vs-screen units, so it belongs beside it rather than
+		// looking like an independent size system with its own units selector.
+		var symInput = document.createElement('input');
+		symInput.type = 'number'; symInput.step = 'any'; symInput.min = '0.1'; symInput.value = settings.symbolScale;
+		symInput.addEventListener('change', function () {
+			if (+symInput.value > 0) { settings.symbolScale = +symInput.value; refreshSymbolSizes(); relayoutLabels(); saveToStorage(); }
+			else { symInput.value = settings.symbolScale; }
+		});
+		row(mapBody, pc.lpn_settings_symbol_size || 'Symbol size (relative to text)', symInput);
+		var opacityInput = document.createElement('input');
+		opacityInput.type = 'number'; opacityInput.step = '0.05'; opacityInput.min = '0.05'; opacityInput.max = '1';
+		opacityInput.value = settings.symbolOpacity;
+		opacityInput.addEventListener('change', function () {
+			var v = +opacityInput.value;
+			if (v > 0 && v <= 1) { settings.symbolOpacity = v; refreshSymbolSizes(); saveToStorage(); }
+			else { opacityInput.value = settings.symbolOpacity; }
+		});
+		row(mapBody, pc.lpn_settings_symbol_opacity || 'Symbol opacity (0 to 1)', opacityInput);
+		var backdropOpacityInput = document.createElement('input');
+		backdropOpacityInput.type = 'number'; backdropOpacityInput.step = '0.05';
+		backdropOpacityInput.min = '0.05'; backdropOpacityInput.max = '1';
+		backdropOpacityInput.value = settings.backdropOpacity;
+		backdropOpacityInput.addEventListener('change', function () {
+			var v = +backdropOpacityInput.value;
+			if (v > 0 && v <= 1) { settings.backdropOpacity = v; refreshSymbolSizes(); saveToStorage(); }
+			else { backdropOpacityInput.value = settings.backdropOpacity; }
+		});
+		row(mapBody, pc.lpn_settings_backdrop_opacity || 'Backdrop opacity (0 to 1)', backdropOpacityInput);
+		var heightInput = document.createElement('input');
+		heightInput.type = 'number'; heightInput.step = 'any'; heightInput.min = '100'; heightInput.value = settings.mapHeight;
+		heightInput.addEventListener('change', function () {
+			if (+heightInput.value >= 100) { settings.mapHeight = +heightInput.value; applyMapHeight(); saveToStorage(); }
+			else { heightInput.value = settings.mapHeight; }
+		});
+		row(mapBody, pc.lpn_settings_map_height_px || 'Map height (px)', heightInput);
+		// ---- always visible: the two rows worth never burying ----
+		// Tolerance because it is the one setting that changes whether the answer is right, and
+		// legend position because it is fiddled with often. Both headingless, per the note above.
+		var tail = document.createElement('div');
+		tail.style.marginTop = '6px';
+		fields.appendChild(tail);
 		// "Emitter exponent" was REMOVED from this panel 2026-07-30 (Tom asked "Do we have emitters?
 		// Do we do something with this?" -- the honest answer was no). js/lpn-solver.js implements
 		// emitters properly (qe = K*dH^n, with the matching Jacobian term and a guarded derivative at
@@ -2508,80 +2714,7 @@ var EngCalcs = EngCalcs || {};
 			if (+tolInput.value > 0) { settings.tolerance = +tolInput.value; scheduleSolve(); }
 			else { tolInput.value = settings.tolerance; }
 		});
-		row(pc.lpn_settings_tolerance || 'Convergence tolerance', tolInput);
-		// Default km applies to NEWLY created pipes only (addLink()) -- same "future, not
-		// retroactive" rule as idPrefixes above; existing pipes keep whatever km they already have.
-		var kmInput = document.createElement('input');
-		kmInput.type = 'number'; kmInput.step = 'any'; kmInput.min = '0'; kmInput.value = settings.kmDefault;
-		kmInput.addEventListener('change', function () {
-			if (+kmInput.value >= 0) { settings.kmDefault = +kmInput.value; }
-			else { kmInput.value = settings.kmDefault; }
-		});
-		row(pc.lpn_settings_km_default || 'Default minor (local) loss coefficient, km, for new pipes', kmInput);
-		// ---- text size ----
-		heading(pc.lpn_settings_text_size || 'Text size');
-		var sizeInput = document.createElement('input');
-		sizeInput.type = 'number'; sizeInput.step = 'any'; sizeInput.min = '0.1'; sizeInput.value = settings.textSize;
-		sizeInput.addEventListener('change', function () {
-			if (+sizeInput.value > 0) { settings.textSize = +sizeInput.value; refreshFontSizes(); saveToStorage(); }
-			else { sizeInput.value = settings.textSize; }
-		});
-		row(pc.lpn_settings_text_size || 'Text size', sizeInput);
-		var unitsSelect = document.createElement('select');
-		[
-			['map', pc.lpn_settings_text_size_map || 'Map units'],
-			['screen', pc.lpn_settings_text_size_screen || 'Screen pixels']
-		].forEach(function (o) {
-			var opt = document.createElement('option');
-			opt.value = o[0]; opt.textContent = o[1]; if (o[0] === settings.textSizeUnits) { opt.selected = true; }
-			unitsSelect.appendChild(opt);
-		});
-		unitsSelect.addEventListener('change', function () {
-			settings.textSizeUnits = unitsSelect.value;
-			refreshFontSizes();
-			saveToStorage();
-		});
-		row(pc.lpn_settings_text_size_units || 'Text size units', unitsSelect);
-		// Symbol size rides on the text-size block on purpose: it is expressed as a multiple of the
-		// text size and inherits its map-vs-screen units, so it belongs under the same heading
-		// rather than looking like an independent size system with its own units selector.
-		var symInput = document.createElement('input');
-		symInput.type = 'number'; symInput.step = 'any'; symInput.min = '0.1'; symInput.value = settings.symbolScale;
-		symInput.addEventListener('change', function () {
-			if (+symInput.value > 0) { settings.symbolScale = +symInput.value; refreshSymbolSizes(); relayoutLabels(); saveToStorage(); }
-			else { symInput.value = settings.symbolScale; }
-		});
-		row(pc.lpn_settings_symbol_size || 'Symbol size (relative to text)', symInput);
-		var opacityInput = document.createElement('input');
-		opacityInput.type = 'number'; opacityInput.step = '0.05'; opacityInput.min = '0.05'; opacityInput.max = '1';
-		opacityInput.value = settings.symbolOpacity;
-		opacityInput.addEventListener('change', function () {
-			var v = +opacityInput.value;
-			if (v > 0 && v <= 1) { settings.symbolOpacity = v; refreshSymbolSizes(); saveToStorage(); }
-			else { opacityInput.value = settings.symbolOpacity; }
-		});
-		row(pc.lpn_settings_symbol_opacity || 'Symbol opacity (0 to 1)', opacityInput);
-		var backdropOpacityInput = document.createElement('input');
-		backdropOpacityInput.type = 'number'; backdropOpacityInput.step = '0.05';
-		backdropOpacityInput.min = '0.05'; backdropOpacityInput.max = '1';
-		backdropOpacityInput.value = settings.backdropOpacity;
-		backdropOpacityInput.addEventListener('change', function () {
-			var v = +backdropOpacityInput.value;
-			if (v > 0 && v <= 1) { settings.backdropOpacity = v; refreshSymbolSizes(); saveToStorage(); }
-			else { backdropOpacityInput.value = settings.backdropOpacity; }
-		});
-		row(pc.lpn_settings_backdrop_opacity || 'Backdrop opacity (0 to 1)', backdropOpacityInput);
-		// ---- canvas height ----
-		heading(pc.lpn_settings_map_height || 'Map height');
-		var heightInput = document.createElement('input');
-		heightInput.type = 'number'; heightInput.step = 'any'; heightInput.min = '100'; heightInput.value = settings.mapHeight;
-		heightInput.addEventListener('change', function () {
-			if (+heightInput.value >= 100) { settings.mapHeight = +heightInput.value; applyMapHeight(); saveToStorage(); }
-			else { heightInput.value = settings.mapHeight; }
-		});
-		row(pc.lpn_settings_map_height_px || 'Map height (px)', heightInput);
-		// ---- legend position ----
-		heading(pc.lpn_tool_labels || 'Labels');
+		row(tail, pc.lpn_settings_tolerance || 'Convergence tolerance', tolInput);
 		var legendSelect = document.createElement('select');
 		[
 			['top-left', pc.lpn_settings_legend_top_left || 'Top left'],
@@ -2600,17 +2733,19 @@ var EngCalcs = EngCalcs || {};
 			applyLegendPosition();
 			saveToStorage();
 		});
-		row(pc.lpn_settings_legend_position || 'Legend position', legendSelect);
+		row(tail, pc.lpn_settings_legend_position || 'Legend position', legendSelect);
 		// ---- restore defaults (Tom, 2026-07-30) ----
 		// Resets settings/labelSettings only -- the network (nodes/links/labels) and backdrop are
 		// untouched, same "preferences vs. content" split clearNetwork()'s own comment documents.
-		heading(pc.lpn_settings_restore || 'Reset');
 		var restoreBtn = document.createElement('button');
 		restoreBtn.type = 'button';
 		restoreBtn.textContent = pc.lpn_settings_restore_btn || 'Restore defaults';
 		restoreBtn.addEventListener('click', function () {
-			if (!window.confirm(pc.lpn_confirm_restore_defaults || 'Reset all settings (ID prefixes, solver, text size, legend position, and visible labels) to their defaults? This does not affect your network.')) { return; }
+			if (!window.confirm(pc.lpn_confirm_restore_defaults || 'Reset all settings (ID prefixes, default inputs, solver, map display, legend position, and visible labels) to their defaults? This does not affect your network.')) { return; }
 			settings = defaultSettings();
+			// defaultSettings() leaves settings.defaults full of nulls on purpose -- refill them
+			// here, or every default input would come back blank instead of at its starting value.
+			seedDefaultInputs();
 			labelSettings = defaultLabelSettings();
 			applyMapHeight();
 			applyLegendPosition();
@@ -2620,7 +2755,7 @@ var EngCalcs = EngCalcs || {};
 			rebuildLabelsFields();
 			saveToStorage();
 		});
-		fields.appendChild(restoreBtn);
+		tail.appendChild(restoreBtn);
 		// "Wipe memory" (Tom, 2026-07-30, temporary): the full reset above the URL-param path
 		// already does, exposed as a button for convenience while this page is a preview. Unlike
 		// Restore defaults, this also deletes the network and backdrop -- confirm text says so.
@@ -2633,7 +2768,7 @@ var EngCalcs = EngCalcs || {};
 			try { localStorage.removeItem('lpn_document'); } catch (err) { /* private mode -- nothing to remove */ }
 			window.location.reload();
 		});
-		fields.appendChild(wipeBtn);
+		tail.appendChild(wipeBtn);
 	}
 	function wireSettingsPopup() {
 		document.getElementById('lpn_settings_popup_close').addEventListener('click', function () {
@@ -2977,7 +3112,7 @@ var EngCalcs = EngCalcs || {};
 				function () { return l.diameter; }, function (v) { l.diameter = v; });
 			numberFieldPlain(fields, pc.lpn_field_roughness || 'Roughness', l.roughness, function (v) { l.roughness = v; });
 			// Minor (local) loss coefficient, k_m -- dimensionless, so no unit conversion (same as
-			// Roughness above). Defaults from settings.kmDefault at creation (addLink()); editable
+			// Roughness above). Defaults from settings.defaults.k at creation (addLink()); editable
 			// per-pipe here, same pattern as every other pipe property. Plain-text wording only
 			// (no <sub> markup) -- this popup's fields are built via textContent, and the suite's
 			// existing "k<sub>m</sub>" label (mphl_total_junction_k) is HTML-bearing, incompatible
@@ -3382,6 +3517,11 @@ var EngCalcs = EngCalcs || {};
 	EngCalcs.pageCalculator = function (objForm) {
 		refreshPopupIfOpen();
 		refreshLabelText();
+		// The Default inputs rows show their value in the CURRENT display unit and put that unit in
+		// their label, so a unit switch has to re-render them for the same reason the open popup
+		// does -- otherwise a US number sits under an SI label. Cheap: the panel is small, and the
+		// collapsible sections' open/closed state lives in settings, so a rebuild does not close them.
+		rebuildSettingsFields();
 	};
 
 	document.addEventListener('DOMContentLoaded', function () {

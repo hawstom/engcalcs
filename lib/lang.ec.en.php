@@ -1195,7 +1195,6 @@ $ec_lang['lpn_field_km']='Minor (local) loss coefficient, km';
 // their own key rather than being asked to carry the full popup-field wording -- an on-map legend
 // entry reading "Minor (local) loss coefficient, km" would set the width of the whole legend box.
 $ec_lang['lpn_field_km_short']='Minor loss, k';
-$ec_lang['lpn_settings_km_default']='Default minor (local) loss coefficient, km, for new pipes';
 // Pump curve entry (Task 146, 2026-07-30): up to 3 (flow, head) points, or a reference to
 // another pump's curve so several identical pumps need the curve entered only once.
 $ec_lang['lpn_pump_curve_source']='Curve';
@@ -1252,7 +1251,8 @@ $ec_lang['lpn_backdrop_coords_prompt']='Target X,Y for that reference point';
 $ec_lang['lpn_backdrop_continue']='Continue';
 $ec_lang['lpn_tool_settings']='Settings';
 $ec_lang['lpn_settings_id_prefixes']='ID prefixes';
-$ec_lang['lpn_settings_solver']='Solver';
+$ec_lang['lpn_settings_defaults']='Default inputs';
+$ec_lang['lpn_settings_defaults_note']='Used for elements you create from now on. Existing elements are not changed.';
 $ec_lang['lpn_settings_emitter_exponent']='Emitter exponent';
 $ec_lang['lpn_settings_tolerance']='Convergence tolerance';
 $ec_lang['lpn_settings_text_size']='Text size';
@@ -1269,7 +1269,7 @@ $ec_lang['lpn_settings_symbol_opacity']='Symbol opacity (0 to 1)';
 // network drawn over it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_backdrop_opacity']='Backdrop opacity (0 to 1)';
 $ec_lang['lpn_settings_text_size_units']='Text size units';
-$ec_lang['lpn_settings_map_height']='Map height';
+$ec_lang['lpn_settings_map_display']='Map display';
 $ec_lang['lpn_settings_map_height_px']='Map height (px)';
 $ec_lang['lpn_settings_legend_position']='Legend position';
 $ec_lang['lpn_settings_legend_top_left']='Top left';
@@ -1278,8 +1278,7 @@ $ec_lang['lpn_settings_legend_middle_left']='Middle left';
 $ec_lang['lpn_settings_legend_middle_right']='Middle right';
 $ec_lang['lpn_settings_legend_bottom_left']='Bottom left';
 $ec_lang['lpn_settings_legend_bottom_right']='Bottom right';
-$ec_lang['lpn_settings_restore']='Reset';
 $ec_lang['lpn_settings_restore_btn']='Restore defaults';
-$ec_lang['lpn_confirm_restore_defaults']='Reset all settings (ID prefixes, solver, text size, legend position, and visible labels) to their defaults? This does not affect your network.';
+$ec_lang['lpn_confirm_restore_defaults']='Reset all settings (ID prefixes, default inputs, solver, map display, legend position, and visible labels) to their defaults? This does not affect your network.';
 $ec_lang['lpn_settings_wipe_btn']='Wipe memory';
 $ec_lang['lpn_confirm_wipe']='Delete EVERYTHING saved for this page -- network, backdrop image, and all settings -- and reload as a brand-new visitor would see it? This cannot be undone.';

@@ -220,13 +220,13 @@ EngCalcs.pageConfig = {
 	lpn_backdrop_continue: <?=json_encode($ec_lang['lpn_backdrop_continue'])?>,
 	lpn_tool_settings: <?=json_encode($ec_lang['lpn_tool_settings'])?>,
 	lpn_settings_id_prefixes: <?=json_encode($ec_lang['lpn_settings_id_prefixes'])?>,
-	lpn_settings_solver: <?=json_encode($ec_lang['lpn_settings_solver'])?>,
+	lpn_settings_defaults: <?=json_encode($ec_lang['lpn_settings_defaults'])?>,
+	lpn_settings_defaults_note: <?=json_encode($ec_lang['lpn_settings_defaults_note'])?>,
 <?php // lpn_settings_emitter_exponent is deliberately NOT wired here: its Settings row was removed
       // 2026-07-30 because nothing can create an emitter yet (ROADMAP Task 191). The language key
       // stays in lib/lang.ec.en.php so restoring the control is one line here and one there. ?>
 
 	lpn_settings_tolerance: <?=json_encode($ec_lang['lpn_settings_tolerance'])?>,
-	lpn_settings_km_default: <?=json_encode($ec_lang['lpn_settings_km_default'])?>,
 	lpn_settings_text_size: <?=json_encode($ec_lang['lpn_settings_text_size'])?>,
 	lpn_settings_text_size_map: <?=json_encode($ec_lang['lpn_settings_text_size_map'])?>,
 	lpn_settings_text_size_screen: <?=json_encode($ec_lang['lpn_settings_text_size_screen'])?>,
@@ -234,7 +234,7 @@ EngCalcs.pageConfig = {
 	lpn_settings_symbol_size: <?=json_encode($ec_lang['lpn_settings_symbol_size'])?>,
 	lpn_settings_symbol_opacity: <?=json_encode($ec_lang['lpn_settings_symbol_opacity'])?>,
 	lpn_settings_backdrop_opacity: <?=json_encode($ec_lang['lpn_settings_backdrop_opacity'])?>,
-	lpn_settings_map_height: <?=json_encode($ec_lang['lpn_settings_map_height'])?>,
+	lpn_settings_map_display: <?=json_encode($ec_lang['lpn_settings_map_display'])?>,
 	lpn_settings_map_height_px: <?=json_encode($ec_lang['lpn_settings_map_height_px'])?>,
 	lpn_settings_legend_position: <?=json_encode($ec_lang['lpn_settings_legend_position'])?>,
 	lpn_settings_legend_top_left: <?=json_encode($ec_lang['lpn_settings_legend_top_left'])?>,
@@ -243,7 +243,6 @@ EngCalcs.pageConfig = {
 	lpn_settings_legend_middle_right: <?=json_encode($ec_lang['lpn_settings_legend_middle_right'])?>,
 	lpn_settings_legend_bottom_left: <?=json_encode($ec_lang['lpn_settings_legend_bottom_left'])?>,
 	lpn_settings_legend_bottom_right: <?=json_encode($ec_lang['lpn_settings_legend_bottom_right'])?>,
-	lpn_settings_restore: <?=json_encode($ec_lang['lpn_settings_restore'])?>,
 	lpn_settings_restore_btn: <?=json_encode($ec_lang['lpn_settings_restore_btn'])?>,
 	lpn_confirm_restore_defaults: <?=json_encode($ec_lang['lpn_confirm_restore_defaults'])?>,
 	lpn_settings_wipe_btn: <?=json_encode($ec_lang['lpn_settings_wipe_btn'])?>,
