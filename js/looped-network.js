@@ -867,14 +867,40 @@ var EngCalcs = EngCalcs || {};
 	// Midpoint and local tangent angle of every segment, walking a->verts->b -- one entry per
 	// straight run, so a bent pipe's arrows follow each segment's own direction.
 	function segmentMidpoints(l) {
-		var pts = [nodeById(l.from)].concat(l.verts, [nodeById(l.to)]), out = [], i, a, b;
+		var pts = [nodeById(l.from)].concat(l.verts, [nodeById(l.to)]), out = [], i, a, b,
+			k = symbolFactor(), vr = VERTEX_HANDLE_R * k, len, ia, ib, clearLen, ux, uy;
 		for (i = 0; i < pts.length - 1; i++) {
 			a = pts[i]; b = pts[i + 1];
+			len = Math.hypot(b.x - a.x, b.y - a.y);
+			// CLEAR RUN (Tom, 2026-07-30: "exclude the two endpoint node or vertex radii"). Each
+			// segment's usable span starts at the EDGE of whatever symbol sits at its ends, not at
+			// that symbol's center: a node circle (radius by type -- a reservoir is visibly larger
+			// than a junction) at the two outer ends, a vertex handle at every interior joint. The
+			// centerline is what the geometry is made of; the clear run is what the eye actually
+			// reads as pipe, and it is what an arrow should be centered in and measured against.
+			// Asymmetric on purpose: a pipe from a reservoir to a junction has a bigger bite taken
+			// out of its reservoir end, so splitting one combined inset evenly would be wrong.
+			ia = (i === 0) ? nodeRadius(pts[0]) : vr;
+			ib = (i === pts.length - 2) ? nodeRadius(pts[pts.length - 1]) : vr;
+			clearLen = len - ia - ib;
+			// A segment shorter than the symbols on its ends has no clear run at all. Reported as 0
+			// rather than a negative, so the "does an arrow fit" test below reads as a plain length
+			// comparison and the inset endpoints stay inside the segment instead of crossing over.
+			if (!(clearLen > 0)) { clearLen = 0; ia = len / 2; }
+			ux = len > 0 ? (b.x - a.x) / len : 0;
+			uy = len > 0 ? (b.y - a.y) / len : 0;
 			out.push({
 				x: (a.x + b.x) / 2, y: (a.y + b.y) / 2,
 				angle: Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI,
-				len: Math.hypot(b.x - a.x, b.y - a.y),
-				ax: a.x, ay: a.y, bx: b.x, by: b.y
+				len: len,
+				ax: a.x, ay: a.y, bx: b.x, by: b.y,
+				// The clear run's own endpoints and length. `insetA` is also the distance from the
+				// segment's start to the clear run's start, which arrowAlongDistances() needs to
+				// convert a position within the clear run back into a distance along the full
+				// centerline -- the space pointAlongLink() and the label logic measure in.
+				insetA: ia, clearLen: clearLen,
+				sx: a.x + ux * ia, sy: a.y + uy * ia,
+				ex: a.x + ux * (ia + clearLen), ey: a.y + uy * (ia + clearLen)
 			});
 		}
 		return out;
@@ -897,9 +923,14 @@ var EngCalcs = EngCalcs || {};
 			k = symbolFactor(), minLen = ARROW_NOMINAL_LEN * k * 2, out = [], run = 0, i, t;
 		if (flow === undefined) { return out; }
 		for (i = 0; i < mids.length; i++) {
-			if (mids[i].len >= minLen) {
+			// Measured within the CLEAR RUN, then shifted back into whole-centerline distance by
+			// insetA -- `run` still accumulates full segment lengths because that is the space
+			// pointAlongLink()/linkLabelMid() compare against. Must stay in step with updateArrow()
+			// below: these two compute the same arrow position for different consumers, and a
+			// divergence would let the label dodge a phantom.
+			if (mids[i].clearLen >= minLen) {
 				t = flow < 0 ? 1 - ARROW_ALONG : ARROW_ALONG;
-				out.push(run + mids[i].len * t);
+				out.push(run + mids[i].insetA + mids[i].clearLen * t);
 			}
 			run += mids[i].len;
 		}
@@ -920,14 +951,18 @@ var EngCalcs = EngCalcs || {};
 			// arrows if they don't fit between vertices") -- a chevron longer than the run it sits
 			// on overhangs both vertices and reads as a mark on the network rather than on that
 			// pipe. Twice the chevron's own length is the shortest run that still leaves visible
-			// pipe on each side of it.
-			if (mids[i].len < minLen) { le.arrows[i].style.display = 'none'; continue; }
+			// pipe on each side of it. Measured against the CLEAR run, not the centerline, so a
+			// short pipe between two big symbols now correctly shows nothing instead of an arrow
+			// buried under a reservoir.
+			if (mids[i].clearLen < minLen) { le.arrows[i].style.display = 'none'; continue; }
 			var angle = mids[i].angle + (flow < 0 ? 180 : 0);
-			// ARROW_ALONG measured from the UPSTREAM end: at positive flow that is the segment's own
-			// start, at negative flow its end.
+			// ARROW_ALONG measured from the UPSTREAM end, WITHIN THE CLEAR RUN (sx,sy -> ex,ey): at
+			// positive flow that is the run's own start, at negative flow its end. Interpolating the
+			// raw centerline instead put the 30% mark inside the upstream symbol on short pipes --
+			// worst exactly where space is tightest.
 			var t = flow < 0 ? 1 - ARROW_ALONG : ARROW_ALONG,
-				px = mids[i].ax + (mids[i].bx - mids[i].ax) * t,
-				py = mids[i].ay + (mids[i].by - mids[i].ay) * t;
+				px = mids[i].sx + (mids[i].ex - mids[i].sx) * t,
+				py = mids[i].sy + (mids[i].ey - mids[i].sy) * t;
 			// scale() last, so the chevron's own -0.8..0.8 geometry grows about its anchor point
 			// rather than the rotation being applied to an already-offset shape.
 			le.arrows[i].setAttribute('transform', 'translate(' + px + ',' + py +
