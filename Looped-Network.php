@@ -221,7 +221,10 @@ EngCalcs.pageConfig = {
 	lpn_tool_settings: <?=json_encode($ec_lang['lpn_tool_settings'])?>,
 	lpn_settings_id_prefixes: <?=json_encode($ec_lang['lpn_settings_id_prefixes'])?>,
 	lpn_settings_solver: <?=json_encode($ec_lang['lpn_settings_solver'])?>,
-	lpn_settings_emitter_exponent: <?=json_encode($ec_lang['lpn_settings_emitter_exponent'])?>,
+<?php // lpn_settings_emitter_exponent is deliberately NOT wired here: its Settings row was removed
+      // 2026-07-30 because nothing can create an emitter yet (ROADMAP Task 191). The language key
+      // stays in lib/lang.ec.en.php so restoring the control is one line here and one there. ?>
+
 	lpn_settings_tolerance: <?=json_encode($ec_lang['lpn_settings_tolerance'])?>,
 	lpn_settings_km_default: <?=json_encode($ec_lang['lpn_settings_km_default'])?>,
 	lpn_settings_text_size: <?=json_encode($ec_lang['lpn_settings_text_size'])?>,

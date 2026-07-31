@@ -408,6 +408,24 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 - 20|146.04| **Node/link report tables (Task 146 child).** Tabular results view.
 - 20|146.05| **EPANET-style element browser (Task 146 child).** List/select elements from a panel
   rather than only the canvas.
+- 20|191| **Junction emitters — surface the pressure-dependent demand the solver already has
+  (Task 146 child).** Raised 2026-07-30 when Tom asked of the Settings panel's "Emitter exponent"
+  row: *"Do we have emitters? Do we do something with this?"* The honest answer was **no** — that
+  control was removed in the same session (see the note in `rebuildSettingsFields()`), because:
+  - **`js/lpn-solver.js` fully implements emitters** — `qe = K·ΔH^n` with the matching Jacobian
+    term and a guarded derivative as ΔH → 0 — but **nothing in the app ever sets a junction's
+    `emitter`**. There is no field in the junction popup and no import path, so `emitter > 0` never
+    passes and the exponent adjusted nothing. A real capability, already paid for, with no way in.
+  - **What to build:** an emitter coefficient K on the junction popup, beside Demand. Then the
+    exponent row returns to Settings and finally means something. `settings.emitterExponent` and the
+    language key `lpn_settings_emitter_exponent` were both left in place for exactly that, so
+    restoring the control is one line in `Looped-Network.php` and one in `rebuildSettingsFields()`.
+  - **Why it fits this suite rather than being analysis creep:** an emitter is how you model a
+    sprinkler or a leak, and sizing an emitter to get the flow you want is a design question, not an
+    analysis one. `ip_` (Irrigation Pressure) already puts irrigation users in this suite. The
+    design-tool framing matters — fixed demands stay the default; an emitter is opt-in per junction.
+  - **Open:** whether demand and emitter can coexist on one junction (EPANET allows both, summing
+    them). Probably yes, but it needs a label that makes the sum legible rather than surprising.
 - 15|146.07| **Open/Closed link property (Task 146 child).** A simple boolean state on a link. Tom,
   2026-07-29: explicitly not a "valve" and not modeled via minor-loss-coefficient (Km) abuse — just
   a plain open/closed state, kept simple.

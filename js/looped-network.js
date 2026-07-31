@@ -566,9 +566,21 @@ var EngCalcs = EngCalcs || {};
 			// would silently reinterpret every already-saved network's toggles. 2 everywhere is the
 			// single hardcoded value this replaces, so shipping it is a visual no-op. Non-numeric
 			// fields (ID) have no entry -- there is nothing to round.
+			// Three fields depart from 2 (Tom, 2026-07-30), each for a reason about the QUANTITY, not
+			// about taste:
+			//   roughness 0 -- this page is Hazen-Williams only (assembleModel() hardcodes method:'hw'),
+			//     and a C-factor is a dimensionless integer by convention: 100, 130, 140. Nobody writes
+			//     C = 130.00. REVISIT IF A FRICTION-METHOD SELECTOR IS EVER ADDED: Darcy-Weisbach's
+			//     roughness is a HEIGHT (0.00015 m), which prints as "0" at 0 decimals. See
+			//     renderLinkFields()'s own note about the same pending change.
+			//   diameter 0 -- inches and millimetres are both whole-number standards in this trade
+			//     (6 in, 150 mm); a fractional diameter is the exception, and the user can raise it.
+			//   gradient 4 -- the only field whose unit family offers two forms differing by 100x
+			//     (gradePercent and plain rise/run). 2 decimals is fine as a percent and useless as a
+			//     ratio, where a typical pipe gradient is 0.0043; 4 covers both.
 			decimals: {
 				node: { demand: 2, head: 2, pressure: 2, elev: 2 },
-				link: { diameter: 2, length: 2, roughness: 2, km: 2, flow: 2, velocity: 2, headloss: 2, gradient: 2 }
+				link: { diameter: 0, length: 2, roughness: 0, km: 2, flow: 2, velocity: 2, headloss: 2, gradient: 4 }
 			},
 			// Whether a label's network-wide highest/lowest value gets its tick mark (Task 190).
 			// Global, not per field: the mark answers one network-wide question per field, and Tom
@@ -591,7 +603,10 @@ var EngCalcs = EngCalcs || {};
 			// prefix only affects IDs generated AFTER the change; existing element IDs are never
 			// live-renamed by a settings edit.
 			idPrefixes: { J: 'J', R: 'R', L: 'L', P: 'P', T: 'T' },
-			emitterExponent: 0.5, // matches js/lpn-solver.js's own default -- see assembleModel()
+			// Matches js/lpn-solver.js's own default -- see assembleModel(). No UI edits this since
+			// 2026-07-30: nothing can create an emitter yet, so the control was a no-op (ROADMAP
+			// Task 191, and the longer note in rebuildSettingsFields()).
+			emitterExponent: 0.5,
 			tolerance: 1e-9, // matches js/lpn-solver.js's own default relative-flow-change tol -- see runSolve()
 			// Default minor (local) loss coefficient for a NEWLY created pipe (Tom, 2026-07-30) --
 			// js/lpn-solver.js has always supported a per-pipe l.k (m = k/(2 g A^2), added to the
@@ -2435,13 +2450,15 @@ var EngCalcs = EngCalcs || {};
 		});
 		// ---- solver settings ----
 		heading(pc.lpn_settings_solver || 'Solver');
-		var emitterInput = document.createElement('input');
-		emitterInput.type = 'number'; emitterInput.step = 'any'; emitterInput.value = settings.emitterExponent;
-		emitterInput.addEventListener('change', function () {
-			if (+emitterInput.value > 0) { settings.emitterExponent = +emitterInput.value; scheduleSolve(); }
-			else { emitterInput.value = settings.emitterExponent; }
-		});
-		row(pc.lpn_settings_emitter_exponent || 'Emitter exponent', emitterInput);
+		// "Emitter exponent" was REMOVED from this panel 2026-07-30 (Tom asked "Do we have emitters?
+		// Do we do something with this?" -- the honest answer was no). js/lpn-solver.js implements
+		// emitters properly (qe = K*dH^n, with the matching Jacobian term and a guarded derivative at
+		// dH -> 0), but nothing in this app ever sets a junction's `emitter`, so the > 0 test never
+		// passes and the exponent adjusted nothing. It was also the most technical-looking control
+		// here -- the one a user is most likely to assume matters. settings.emitterExponent itself
+		// STAYS (assembleModel() passes it, and it is the value the feature will use); only the
+		// no-op control is gone. Restore this row when ROADMAP Task 191 lands -- the language key
+		// lpn_settings_emitter_exponent is deliberately left in lib/lang.ec.en.php for that.
 		var tolInput = document.createElement('input');
 		tolInput.type = 'number'; tolInput.step = 'any'; tolInput.value = settings.tolerance;
 		tolInput.addEventListener('change', function () {
