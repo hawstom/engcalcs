@@ -29,6 +29,26 @@ input[type=number] {
 	-moz-appearance: textfield;
 }
 
+/* Opt back IN to the browser's native spinner arrows, per input (Tom, 2026-07-30, on the map-label
+   decimal-places field). The two rules above strip the arrows from every number input in the suite
+   -- right for a physical quantity, where the arrows are useless (a 1-unit step means nothing to a
+   diameter or a flow) and only steal width from the number. It is wrong for a SMALL BOUNDED INTEGER
+   like "decimal places, 0-4", where clicking up/down is the natural gesture and the arrows are what
+   tell the user at a glance that this field is not a free-form number. Add .ec-spin to such a field.
+   opacity:1 is not redundant: Chrome/Safari hide the spinner until the pointer is over the input, so
+   without it the control is invisible exactly when the user is looking for it. */
+input.ec-spin::-webkit-outer-spin-button,
+input.ec-spin::-webkit-inner-spin-button {
+	-webkit-appearance: auto;
+	appearance: auto;
+	opacity: 1;
+	margin: 0;
+}
+input.ec-spin[type=number] {
+	-moz-appearance: auto;
+	appearance: auto;
+}
+
 .blink {
   animation: blinker 1s step-start 15;
 }

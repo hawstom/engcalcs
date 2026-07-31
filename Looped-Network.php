@@ -114,6 +114,9 @@ document.addEventListener('DOMContentLoaded', function() {
 	<div id="lpn_labels_node_fields"></div>
 	<div style="font-weight:bold"><?=$ec_lang['lpn_labels_heading_link']?></div>
 	<div id="lpn_labels_link_fields"></div>
+	<?php // Label options that apply to every field at once (ROADMAP Task 190's high/low mark
+	      // toggle), below both per-field lists. Built in JS by rebuildLabelsFields(). ?>
+	<div id="lpn_labels_options"></div>
 	<button type="button" id="lpn_labels_popup_close"><?=$ec_lang['lpn_close']?></button>
 </div>
 <?php // Gear/settings panel (Task 146 Phase 2, 2026-07-30): ID prefixes, solver emitter exponent
@@ -164,6 +167,8 @@ EngCalcs.pageConfig = {
 	lpn_tool_labels: <?=json_encode($ec_lang['lpn_tool_labels'])?>,
 	lpn_labels_heading_node: <?=json_encode($ec_lang['lpn_labels_heading_node'])?>,
 	lpn_labels_heading_link: <?=json_encode($ec_lang['lpn_labels_heading_link'])?>,
+	lpn_labels_decimals_tip: <?=json_encode($ec_lang['lpn_labels_decimals_tip'])?>,
+	lpn_labels_mark_extrema: <?=json_encode($ec_lang['lpn_labels_mark_extrema'])?>,
 	lpn_field_id: <?=json_encode($ec_lang['lpn_field_id'])?>,
 	lpn_pump_curve_source: <?=json_encode($ec_lang['lpn_pump_curve_source'])?>,
 	lpn_pump_curve_own: <?=json_encode($ec_lang['lpn_pump_curve_own'])?>,

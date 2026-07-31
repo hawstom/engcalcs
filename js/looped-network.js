@@ -526,6 +526,10 @@ var EngCalcs = EngCalcs || {};
 	// 'high'/'low', not a boolean -- ties (2+ elements sharing the extreme) all get marked, not
 	// just the first found, since each element is judged independently against the same extrema.
 	function decorationFor(extrema, value) {
+		// Task 190's global toggle is enforced HERE, not by suppressing the extrema themselves: the
+		// extrema objects stay computed and correct, so turning the marks back on needs no recompute
+		// and nothing else that reads them can go stale while they are hidden.
+		if (!labelSettings.markExtrema) { return undefined; }
 		if (!extrema || typeof value !== 'number') { return undefined; }
 		if (value === extrema.max && value === extrema.min) { return undefined; }
 		if (value === extrema.max) { return 'high'; }
@@ -555,7 +559,23 @@ var EngCalcs = EngCalcs || {};
 			// the minor-loss coefficient are typed per pipe and are exactly the numbers you want to
 			// see spread across a drawing when checking someone's model. Off by default, like the
 			// other inputs: turning every one on by default would bury the results.
-			link: { id: true, diameter: false, length: false, roughness: false, km: false, flow: true, velocity: true, headloss: false, gradient: false }
+			link: { id: true, diameter: false, length: false, roughness: false, km: false, flow: true, velocity: true, headloss: false, gradient: false },
+			// Per-field decimal places (ROADMAP Task 189, Tom 2026-07-30). Kept in a PARALLEL map
+			// rather than turning each field's boolean into an object: the boolean maps are read on
+			// every label rebuild and merged key-by-key out of localStorage, and a shape change there
+			// would silently reinterpret every already-saved network's toggles. 2 everywhere is the
+			// single hardcoded value this replaces, so shipping it is a visual no-op. Non-numeric
+			// fields (ID) have no entry -- there is nothing to round.
+			decimals: {
+				node: { demand: 2, head: 2, pressure: 2, elev: 2 },
+				link: { diameter: 2, length: 2, roughness: 2, km: 2, flow: 2, velocity: 2, headloss: 2, gradient: 2 }
+			},
+			// Whether a label's network-wide highest/lowest value gets its tick mark (Task 190).
+			// Global, not per field: the mark answers one network-wide question per field, and Tom
+			// described it as a single toggle. Lives here with its siblings and NOT in `settings`
+			// because a label mark is a property of a label -- and, like the rest of labelSettings,
+			// is a view preference deliberately kept out of the undo-snapshotted `doc`.
+			markExtrema: true
 		};
 	}
 	var labelSettings = defaultLabelSettings();
@@ -1546,10 +1566,17 @@ var EngCalcs = EngCalcs || {};
 		// ({node:{...}, link:{...}}): a top-level Object.assign swaps in the saved `link` object
 		// whole, so a toggle added after that save (gradient, and every future one) would come back
 		// undefined instead of at its default. Same reasoning, applied per sub-object.
+		// Groups named explicitly rather than looped over Object.keys(labelSettings): since Task
+		// 189/190 the object is no longer uniformly two flat sub-objects -- `decimals` is nested one
+		// level deeper and `markExtrema` is a bare boolean, which Object.assign() onto a primitive
+		// would have silently discarded (it boxes the boolean and throws the result away).
 		labelSettings = defaultLabelSettings();
-		Object.keys(labelSettings).forEach(function (group) {
-			Object.assign(labelSettings[group], (saved.labelSettings || {})[group] || {});
-		});
+		var savedLS = saved.labelSettings || {}, savedDec = savedLS.decimals || {};
+		Object.assign(labelSettings.node, savedLS.node || {});
+		Object.assign(labelSettings.link, savedLS.link || {});
+		Object.assign(labelSettings.decimals.node, savedDec.node || {});
+		Object.assign(labelSettings.decimals.link, savedDec.link || {});
+		if (typeof savedLS.markExtrema === 'boolean') { labelSettings.markExtrema = savedLS.markExtrema; }
 		backdrop = saved.backdrop || null;
 		settings = Object.assign(defaultSettings(), saved.settings || {});
 		return true;
@@ -2153,7 +2180,12 @@ var EngCalcs = EngCalcs || {};
 	// Deliberately separate from #lpn_popup/currentPopup below: this is a static settings panel,
 	// not a per-element property sheet, and touching none of the rename/undo machinery keeps it
 	// zero-risk to the existing popup.
-	function labelCheckbox(container, labelText, color, checked, onChange) {
+	// `decimals` (Task 189) is optional: pass {value, onChange} to put a 0-4 spinner on this field's
+	// row, or omit it for a non-numeric field (ID) that has nothing to round. The spinner sits on the
+	// SAME row as the checkbox because decimal places are a property of that one field -- the Labels
+	// popover is already the per-field row list, which is why this lives here and not in Settings
+	// (page-wide preferences).
+	function labelCheckbox(container, labelText, color, checked, onChange, decimals) {
 		var label = document.createElement('label'), input = document.createElement('input'),
 			span = document.createElement('span');
 		input.type = 'checkbox'; input.checked = checked;
@@ -2164,6 +2196,37 @@ var EngCalcs = EngCalcs || {};
 		label.appendChild(document.createTextNode(' '));
 		label.appendChild(span);
 		container.appendChild(label);
+		if (decimals) {
+			var pc = EngCalcs.pageConfig || {}, dec = document.createElement('input');
+			// Upper bound 32, not a defensible-looking 4 (Tom, 2026-07-30): "possibly some absurd limit
+			// like 32 instead of a debatable limit like 4." A limit low enough to argue about is a
+			// limit someone will hit and resent; one nobody will ever reach needs no argument. 32 is
+			// safely inside toFixed()'s own 0-100 range and comfortably past the ~17 significant digits
+			// a double actually carries, so the only thing beyond ~15 decimals is float noise -- which
+			// is the user's business, not ours to forbid. Zero stays the floor: negative decimals have
+			// no meaning here (rounding to tens would be a different feature).
+			dec.type = 'number'; dec.min = '0'; dec.max = '32'; dec.step = '1';
+			dec.value = decimals.value;
+			// .ec-spin restores the native up/down arrows, which css/engcalcs.css strips suite-wide --
+			// see that file's comment: right for a physical quantity, wrong for a small bounded integer
+			// like this one, where clicking the arrows is the natural gesture. Width allows for them.
+			dec.className = 'ec-spin';
+			dec.style.width = '4.5em'; dec.style.marginLeft = '6px';
+			dec.title = pc.lpn_labels_decimals_tip || 'Decimal places shown for this label';
+			dec.addEventListener('change', function () {
+				// Clamped rather than rejected: a spinner held down runs past its own max, and silently
+				// snapping back to the nearest legal value reads better than an alert for a field where
+				// every out-of-range value has an obvious intended meaning.
+				var v = Math.round(+dec.value);
+				if (!isFinite(v)) { v = decimals.value; }
+				v = Math.max(0, Math.min(32, v));
+				dec.value = v;
+				decimals.onChange(v);
+				saveToStorage();
+				refreshLabelText();
+			});
+			container.appendChild(dec);
+		}
 		container.appendChild(document.createElement('br'));
 	}
 	// Shared with renderLabelsLegend() below -- one place naming which fields exist and what their
@@ -2196,14 +2259,32 @@ var EngCalcs = EngCalcs || {};
 	// list can be rebuilt in place after labelSettings is reset, without re-wiring the close button.
 	function rebuildLabelsFields() {
 		var pc = EngCalcs.pageConfig || {}, nodeBox = document.getElementById('lpn_labels_node_fields'),
-			linkBox = document.getElementById('lpn_labels_link_fields');
+			linkBox = document.getElementById('lpn_labels_link_fields'),
+			optBox = document.getElementById('lpn_labels_options');
 		nodeBox.innerHTML = ''; linkBox.innerHTML = '';
+		// A field gets a decimals spinner exactly when labelSettings.decimals carries an entry for it
+		// -- that map is the one place naming which fields are numeric, so ID (and any future
+		// non-numeric field) is skipped without a second list to keep in sync.
+		function decimalsFor(group, key) {
+			var map = labelSettings.decimals[group];
+			if (typeof map[key] !== 'number') { return null; }
+			return { value: map[key], onChange: function (v) { map[key] = v; } };
+		}
 		nodeFieldDefs(pc).forEach(function (f) {
-			labelCheckbox(nodeBox, f[1], lpnFieldColors[f[0]], labelSettings.node[f[0]], function (v) { labelSettings.node[f[0]] = v; });
+			labelCheckbox(nodeBox, f[1], lpnFieldColors[f[0]], labelSettings.node[f[0]],
+				function (v) { labelSettings.node[f[0]] = v; }, decimalsFor('node', f[0]));
 		});
 		linkFieldDefs(pc).forEach(function (f) {
-			labelCheckbox(linkBox, f[1], lpnFieldColors[f[0]], labelSettings.link[f[0]], function (v) { labelSettings.link[f[0]] = v; });
+			labelCheckbox(linkBox, f[1], lpnFieldColors[f[0]], labelSettings.link[f[0]],
+				function (v) { labelSettings.link[f[0]] = v; }, decimalsFor('link', f[0]));
 		});
+		// Task 190's toggle: one row, no color swatch and no decimals, sitting below both field lists
+		// because it applies to every field at once rather than to any one row.
+		if (optBox) {
+			optBox.innerHTML = '';
+			labelCheckbox(optBox, pc.lpn_labels_mark_extrema || 'Mark highest and lowest values', 'inherit',
+				labelSettings.markExtrema, function (v) { labelSettings.markExtrema = v; });
+		}
 	}
 	function wireLabelsPopup() {
 		document.getElementById('lpn_labels_popup_close').addEventListener('click', function () {
@@ -3017,69 +3098,87 @@ var EngCalcs = EngCalcs || {};
 		var el = document.getElementById('lpn_status');
 		if (el) { el.textContent = text || ''; }
 	}
-	// Rounds to the same 2 decimals the label actually displays, in the DISPLAY unit -- extrema and
-	// decoration must compare on this, not the raw SI value. Two series links carrying what is
-	// physically the same flow can differ by solver roundoff far past the 2nd decimal (continuity
-	// is satisfied to a tolerance, not bit-exact); comparing un-rounded SI values marked one as max
-	// and the other min even though both printed "100.00 gpm" -- a decoration the display can't
-	// justify. Rounding first is what fieldExtrema()'s "tie -> no decoration" rule is actually for.
-	function displayRound(siValue, unitId) {
+	// Rounds to the same number of decimals the label actually displays, in the DISPLAY unit --
+	// extrema and decoration must compare on this, not the raw SI value. Two series links carrying
+	// what is physically the same flow can differ by solver roundoff far past the last printed
+	// decimal (continuity is satisfied to a tolerance, not bit-exact); comparing un-rounded SI values
+	// marked one as max and the other min even though both printed "100.00 gpm" -- a decoration the
+	// display can't justify. Rounding first is what fieldExtrema()'s "tie -> no decoration" rule is
+	// actually for.
+	// `decimals` (Task 189) is per field, from labelSettings.decimals, and MUST be fed through here
+	// rather than applied at print time: the whole point of this function is that the extrema and the
+	// printed text agree, so a field shown to 0 decimals has to have its extrema judged at 0 decimals
+	// too, or two links both printing "100" could still be marked max and min.
+	// Above roughly 15 decimals, Math.pow(10, d) pushes the product past 2^53 and Math.round() becomes
+	// the identity, so displayRound() degrades to returning the value unrounded. That is harmless: the
+	// extrema/decoration invariant only requires that two labels printing the SAME text compare equal,
+	// and at that precision two labels printing the same text ARE bit-identical. Nothing to guard.
+	function fieldDecimals(decimals) { return typeof decimals === 'number' ? decimals : 2; }
+	function displayRound(siValue, unitId, decimals) {
 		if (typeof siValue !== 'number') { return undefined; } // guards a stray NaN contaminating Math.min/max in fieldExtrema
-		return Math.round(siValue * unitFactor(unitId) * 100) / 100;
+		var p = Math.pow(10, fieldDecimals(decimals));
+		return Math.round(siValue * unitFactor(unitId) * p) / p;
+	}
+	// The non-SI-converted counterpart of displayRound(), for the declarative/dimensionless fields
+	// (see rawLine() below). Same rounding rule, no unit factor.
+	function plainRound(value, decimals) {
+		if (typeof value !== 'number') { return undefined; }
+		var p = Math.pow(10, fieldDecimals(decimals));
+		return Math.round(value * p) / p;
 	}
 	// One line of a numeric label field: a bare number, colored per lpnFieldColors (Tom, 2026-07-30:
 	// "make all the labels pure numbers, no units and no prefix/description... color code like we
 	// did for bpn" -- the color-coded checkbox in the Labels popover is the only legend), decorated
 	// with a high/low tick when it ties the network-wide max/min for that field
 	// (fieldExtrema()/decorationFor() above, drawn by applyExtremaTicks()).
-	function numLine(siValue, unitId, extrema, color) {
-		var displayValue = displayRound(siValue, unitId);
-		return { text: displayValue.toFixed(2), color: color, decoration: decorationFor(extrema, displayValue) };
+	function numLine(siValue, unitId, extrema, color, decimals) {
+		var displayValue = displayRound(siValue, unitId, decimals);
+		return { text: displayValue.toFixed(fieldDecimals(decimals)), color: color, decoration: decorationFor(extrema, displayValue) };
 	}
 	// Length is declarative, not SI-converted (see the lengthField() comment above: "1 grid unit IS
 	// 1 ft or 1 m, whichever is currently selected, by declaration") -- unlike every other field
 	// here, l.length is already in the displayed unit, so this must NOT run it through unitFactor.
-	function rawLine(value, extrema, color) {
-		var displayValue = Math.round(value * 100) / 100;
-		return { text: displayValue.toFixed(2), color: color, decoration: decorationFor(extrema, displayValue) };
+	function rawLine(value, extrema, color, decimals) {
+		var displayValue = plainRound(value, decimals);
+		return { text: displayValue.toFixed(fieldDecimals(decimals)), color: color, decoration: decorationFor(extrema, displayValue) };
 	}
 	// Rebuilds every node's and link's map-label text from `labelSettings` + `lastSolveResult`.
 	// Extrema are computed ONCE per field, network-wide, before any label is built, so every
 	// element's decoration is judged against the same snapshot (Tom: ties all get marked, not just
 	// the first one found -- decorationFor() already does this per element).
 	function refreshLabelText() {
-		var ls = labelSettings;
-		// Every field below is rounded through the same displayRound()/2-decimal rule the label
-		// text itself uses (see the comment on displayRound()), so a tie in what's actually printed
-		// is always a tie in what gets decorated.
+		var ls = labelSettings, nd = ls.decimals.node, ld = ls.decimals.link;
+		// Every field below is rounded through the same displayRound()/per-field-decimals rule the
+		// label text itself uses (see the comment on displayRound()), so a tie in what's actually
+		// printed is always a tie in what gets decorated.
 		var extrema = {
 			// Elevation and pressure now include reservoirs -- a reservoir has a real elevation of
 			// its own, and a real pressure (head minus that elevation) whenever its head has been
 			// raised above it. Demand still excludes them: a reservoir supplies whatever the network
 			// draws rather than demanding an amount.
-			elev: fieldExtrema(doc.nodes.map(function (n) { return displayRound(n.elev, 'lpn_u_elevhead'); })),
-			demand: fieldExtrema(doc.nodes.map(function (n) { return n.type !== 'reservoir' ? displayRound(n.demand, 'lpn_u_flow') : undefined; })),
+			elev: fieldExtrema(doc.nodes.map(function (n) { return displayRound(n.elev, 'lpn_u_elevhead', nd.elev); })),
+			demand: fieldExtrema(doc.nodes.map(function (n) { return n.type !== 'reservoir' ? displayRound(n.demand, 'lpn_u_flow', nd.demand) : undefined; })),
 			head: fieldExtrema(doc.nodes.map(function (n) {
-				if (n.type === 'reservoir') { return displayRound(reservoirHead(n), 'lpn_u_elevhead'); }
-				return lastSolveResult ? displayRound(lastSolveResult.heads[n.id], 'lpn_u_elevhead') : undefined;
+				if (n.type === 'reservoir') { return displayRound(reservoirHead(n), 'lpn_u_elevhead', nd.head); }
+				return lastSolveResult ? displayRound(lastSolveResult.heads[n.id], 'lpn_u_elevhead', nd.head) : undefined;
 			})),
 			pressure: fieldExtrema(doc.nodes.map(function (n) {
-				if (n.type === 'reservoir') { return displayRound(reservoirHead(n) - (n.elev || 0), 'lpn_u_pressure'); }
-				return lastSolveResult ? displayRound(lastSolveResult.pressures[n.id], 'lpn_u_pressure') : undefined;
+				if (n.type === 'reservoir') { return displayRound(reservoirHead(n) - (n.elev || 0), 'lpn_u_pressure', nd.pressure); }
+				return lastSolveResult ? displayRound(lastSolveResult.pressures[n.id], 'lpn_u_pressure', nd.pressure) : undefined;
 			})),
-			diameter: fieldExtrema(doc.links.map(function (l) { return l.type !== 'pump' ? displayRound(l.diameter, 'lpn_u_diameter') : undefined; })),
-			length: fieldExtrema(doc.links.map(function (l) { return l.type !== 'pump' ? Math.round(l.length * 100) / 100 : undefined; })),
-			// Both dimensionless, so they use rawLine()/plain rounding like Length, not displayRound().
-			roughness: fieldExtrema(doc.links.map(function (l) { return l.type !== 'pump' ? Math.round(l.roughness * 100) / 100 : undefined; })),
-			km: fieldExtrema(doc.links.map(function (l) { return l.type !== 'pump' ? Math.round((l.k || 0) * 100) / 100 : undefined; })),
-			flow: fieldExtrema(doc.links.map(function (l) { return lastSolveResult ? displayRound(lastSolveResult.flows[l.id], 'lpn_u_flow') : undefined; })),
-			velocity: fieldExtrema(doc.links.map(function (l) { return (l.type !== 'pump' && lastSolveResult) ? displayRound(lastSolveResult.velocities[l.id], 'lpn_u_velocity') : undefined; })),
+			diameter: fieldExtrema(doc.links.map(function (l) { return l.type !== 'pump' ? displayRound(l.diameter, 'lpn_u_diameter', ld.diameter) : undefined; })),
+			length: fieldExtrema(doc.links.map(function (l) { return l.type !== 'pump' ? plainRound(l.length, ld.length) : undefined; })),
+			// Both dimensionless, so they use rawLine()/plainRound() like Length, not displayRound().
+			roughness: fieldExtrema(doc.links.map(function (l) { return l.type !== 'pump' ? plainRound(l.roughness, ld.roughness) : undefined; })),
+			km: fieldExtrema(doc.links.map(function (l) { return l.type !== 'pump' ? plainRound(l.k || 0, ld.km) : undefined; })),
+			flow: fieldExtrema(doc.links.map(function (l) { return lastSolveResult ? displayRound(lastSolveResult.flows[l.id], 'lpn_u_flow', ld.flow) : undefined; })),
+			velocity: fieldExtrema(doc.links.map(function (l) { return (l.type !== 'pump' && lastSolveResult) ? displayRound(lastSolveResult.velocities[l.id], 'lpn_u_velocity', ld.velocity) : undefined; })),
 			// One head-loss bucket for every link type, pumps included: a pump reports a negative
 			// head loss (Tom, 2026-07-30), so it lands at the min end of this same range rather
 			// than needing a field of its own.
 			headloss: fieldExtrema(doc.links.map(function (l) {
 				if (!lastSolveResult || lastSolveResult.headlosses[l.id] === undefined) { return undefined; }
-				return displayRound(lastSolveResult.headlosses[l.id], 'lpn_u_elevhead');
+				return displayRound(lastSolveResult.headlosses[l.id], 'lpn_u_elevhead', ld.headloss);
 			})),
 			// Head loss GRADIENT (ROADMAP Task 177, Tom agreed 2026-07-30): headloss/length as a
 			// dimensionless ratio, reusing the same grade/gradePercent OPTIONS as mpf_/mphl_'s own
@@ -3095,7 +3194,7 @@ var EngCalcs = EngCalcs || {};
 			// convert. Pump-excluded, same as headloss.
 			gradient: fieldExtrema(doc.links.map(function (l) {
 				if (l.type === 'pump' || !l.length || !lastSolveResult || lastSolveResult.headlosses[l.id] === undefined) { return undefined; }
-				return displayRound(lastSolveResult.headlosses[l.id] / l.length, 'lpn_u_gradient');
+				return displayRound(lastSolveResult.headlosses[l.id] / l.length, 'lpn_u_gradient', ld.gradient);
 			}))
 		};
 		var fc = lpnFieldColors, nodeLines = {}, linkLines = {};
@@ -3106,14 +3205,14 @@ var EngCalcs = EngCalcs || {};
 			// demand is the thing the user set as a design target, head/pressure are what the solve
 			// produced from it, and elevation (the input least likely to change page to page) trails.
 			if (ls.node.id) { lines.push({ text: n.id, color: fc.id }); }
-			if (n.type !== 'reservoir' && ls.node.demand) { lines.push(numLine(n.demand, 'lpn_u_flow', extrema.demand, fc.demand)); }
+			if (n.type !== 'reservoir' && ls.node.demand) { lines.push(numLine(n.demand, 'lpn_u_flow', extrema.demand, fc.demand, nd.demand)); }
 			var headSI = n.type === 'reservoir' ? reservoirHead(n) : (lastSolveResult ? lastSolveResult.heads[n.id] : undefined);
 			var pressSI = n.type === 'reservoir'
 				? reservoirHead(n) - (n.elev || 0)
 				: (lastSolveResult ? lastSolveResult.pressures[n.id] : undefined);
-			if (ls.node.head && headSI !== undefined) { lines.push(numLine(headSI, 'lpn_u_elevhead', extrema.head, fc.head)); }
-			if (ls.node.pressure && pressSI !== undefined) { lines.push(numLine(pressSI, 'lpn_u_pressure', extrema.pressure, fc.pressure)); }
-			if (ls.node.elev) { lines.push(numLine(n.elev, 'lpn_u_elevhead', extrema.elev, fc.elev)); }
+			if (ls.node.head && headSI !== undefined) { lines.push(numLine(headSI, 'lpn_u_elevhead', extrema.head, fc.head, nd.head)); }
+			if (ls.node.pressure && pressSI !== undefined) { lines.push(numLine(pressSI, 'lpn_u_pressure', extrema.pressure, fc.pressure, nd.pressure)); }
+			if (ls.node.elev) { lines.push(numLine(n.elev, 'lpn_u_elevhead', extrema.elev, fc.elev, nd.elev)); }
 			ne.empty = lines.length === 0; // captured BEFORE the placeholder below -- see hideMask()'s comment
 			if (lines.length === 0) { lines.push({ text: '' }); } // keep an empty tspan so getBBox() doesn't throw
 			// x here is a placeholder -- layoutNodeLabel() below (after collision avoidance) sets the
@@ -3129,17 +3228,17 @@ var EngCalcs = EngCalcs || {};
 			var lines = [];
 			if (ls.link.id) { lines.push({ text: l.id, color: fc.id }); }
 			if (l.type !== 'pump') {
-				if (ls.link.diameter) { lines.push(numLine(l.diameter, 'lpn_u_diameter', extrema.diameter, fc.diameter)); }
-				if (ls.link.length) { lines.push(rawLine(l.length, extrema.length, fc.length)); }
-				if (ls.link.roughness) { lines.push(rawLine(l.roughness, extrema.roughness, fc.roughness)); }
-				if (ls.link.km) { lines.push(rawLine(l.k || 0, extrema.km, fc.km)); }
+				if (ls.link.diameter) { lines.push(numLine(l.diameter, 'lpn_u_diameter', extrema.diameter, fc.diameter, ld.diameter)); }
+				if (ls.link.length) { lines.push(rawLine(l.length, extrema.length, fc.length, ld.length)); }
+				if (ls.link.roughness) { lines.push(rawLine(l.roughness, extrema.roughness, fc.roughness, ld.roughness)); }
+				if (ls.link.km) { lines.push(rawLine(l.k || 0, extrema.km, fc.km, ld.km)); }
 			}
 			if (lastSolveResult && lastSolveResult.flows[l.id] !== undefined) {
-				if (ls.link.flow) { lines.push(numLine(lastSolveResult.flows[l.id], 'lpn_u_flow', extrema.flow, fc.flow)); }
+				if (ls.link.flow) { lines.push(numLine(lastSolveResult.flows[l.id], 'lpn_u_flow', extrema.flow, fc.flow, ld.flow)); }
 				// Velocity is meaningless for a pump (no diameter -- see renderLinkFields() above).
-				if (ls.link.velocity && l.type !== 'pump') { lines.push(numLine(lastSolveResult.velocities[l.id], 'lpn_u_velocity', extrema.velocity, fc.velocity)); }
-				if (ls.link.headloss) { lines.push(numLine(lastSolveResult.headlosses[l.id], 'lpn_u_elevhead', extrema.headloss, fc.headloss)); }
-				if (ls.link.gradient && l.type !== 'pump' && l.length) { lines.push(numLine(lastSolveResult.headlosses[l.id] / l.length, 'lpn_u_gradient', extrema.gradient, fc.gradient)); }
+				if (ls.link.velocity && l.type !== 'pump') { lines.push(numLine(lastSolveResult.velocities[l.id], 'lpn_u_velocity', extrema.velocity, fc.velocity, ld.velocity)); }
+				if (ls.link.headloss) { lines.push(numLine(lastSolveResult.headlosses[l.id], 'lpn_u_elevhead', extrema.headloss, fc.headloss, ld.headloss)); }
+				if (ls.link.gradient && l.type !== 'pump' && l.length) { lines.push(numLine(lastSolveResult.headlosses[l.id] / l.length, 'lpn_u_gradient', extrema.gradient, fc.gradient, ld.gradient)); }
 			}
 			le.empty = lines.length === 0;
 			if (lines.length === 0) { lines.push({ text: '' }); }

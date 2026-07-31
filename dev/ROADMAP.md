@@ -266,8 +266,8 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   size, each independently settable — and explicitly deferred it: "that's a lot… maybe later we
   give more fine-grained control and right now just a two-dimensional control." Build it when
   someone actually needs one symbol bigger without the others, not on symmetry grounds.
-- 40|184| **Project/scenario model for saved networks: COPY model with override markers (Task 146
-  child).** Raised by Tom, 2026-07-30, thinking ahead to Task 146.08 (multiple named saved
+- 40|184| **Project/scenario model for saved networks: DELTA model — one save, canonical Base,
+  scenarios are collections of overrides (Task 146 child).** Raised by Tom, 2026-07-30, thinking ahead to Task 146.08 (multiple named saved
   networks): "I am wondering whether the concept of project.scenario buys us anything… if multiple
   saves were grouped as scenarios under a project, we could conceivably, for any element, 'Push to
   project' to sync across scenarios. We could even get fine-grained with checkboxes in popups."
@@ -281,58 +281,104 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   confusing. EPANET itself gives you none of it: one `.inp` per scenario, whole network duplicated,
   no way to push a diameter correction across them.
 
-  **DECISION: the copy model, not the delta model. Tom, 2026-07-30, and he is right — this reverses
-  the delta-model recommendation written here earlier the same day.** The earlier argument was that
-  a delta model (a scenario stores only its overrides and inherits the rest) makes propagation
-  automatic and free, leaving Push to mean "promote to base" and Pull to mean the narrower, safer
-  "discard my override and inherit again". **What that overlooked is that the delta model still
-  needs the dangerous action.** Good UX for it demands a "Push to children" / "Clear all overrides"
-  — a base edit that deliberately overwrites what scenarios have overridden — because otherwise a
-  scenario that overrode a property can never be brought back in line en masse. Once the dangerous
-  action has to exist in BOTH models, the delta model's remaining advantages are only organizational
-  overhead and file-size parsimony, neither of which a user feels. What a user does feel is
-  **"what am I working on right now"** (Tom's words), and the copy model answers that with no
-  indirection: a scenario is a whole, self-contained network, it keeps working if the project is
-  renamed or deleted, "Save as" is a copy, and undo/versioning stay per-document.
+  **DECISION (current, 2026-07-30, third and final pass): the DELTA model — one project save, a
+  canonical Base, and scenarios that are nothing but collections of overrides.** Tom: "There is a
+  project. It's a single save… It has scenarios that consist of overrides. That's all. A scenario is
+  simply a collection of overrides? Base is canon is parent and has no overrides."
+
+  **Why this reverses the copy-model decision recorded earlier the same day (kept below as
+  superseded).** The copy-model argument was: the dangerous "clear/override children" action has to
+  exist in BOTH models, so the delta model's remaining advantages are only organizational overhead
+  and file-size parsimony, which no user feels. **That reasoning missed the bigger cost it was
+  spending to avoid the smaller one.** In the copy model, propagation is an *action* — "Push to
+  project" — and Tom found its failure by inspection: *"If I edit a child and then Push to Project,
+  the original parent doesn't get my push because everything there is an override."* Push is the
+  hassle, and a user feels it on every single edit. In the delta model **propagation is not an action
+  at all**: editing Base *is* the propagation, there is no Push upward, and nothing silently fails to
+  arrive. What survives is one dangerous action (below), and it operates inside a single document
+  where its effects are visible in the same view and reversible in one undo — categorically safer
+  than the copy model's push, which edits documents that are not on screen.
+
+  The copy model's one genuine win was **"what am I working on right now"** (Tom's words). The status
+  bar answers it: `Scenario: Fire flow · 7 overrides | Mode: …`. The override count is what makes it
+  answerable at a glance, and it is only cheap to compute in the delta model.
 
   **Shape to build:**
-  - **An override marker per property** ("an override proxy is desirable for the copy model, and it
-    can be called override" — Tom). **It must record user INTENT at edit time, not be computed by
-    diffing against the project.** A diff cannot tell "I set this deliberately in this scenario"
-    apart from "the project moved underneath me", and those two need opposite treatment. So: editing
-    a property inside a scenario marks it overridden, and the UI shows that mark.
-  - **"Push to project"** — promote this scenario's value(s) upward and out to the sibling
-    scenarios that have NOT overridden that property. Finger-wag before it: it edits documents that
-    are not on screen.
-  - **"Push through all overrides"** — the same, ignoring the markers. **Double finger-wag**: this
-    is the one that destroys deliberate work in scenarios the user cannot see. Name it so it cannot
-    be confused with the safe one, and say in the confirm how many scenarios and properties it will
-    overwrite.
-  - **Property selection via checkboxes**, per Tom's original sketch — and see Task 185, whose
-    "reuse the Labels panel as the property filter" idea applies here identically.
-  - **Copy / Save-as has two modes**, since a copy has to decide what happens to the source's
-    override markers (Tom, 2026-07-30): one that CLEARS them (the copy follows the project) and one
-    that PRESERVES them (the copy matches the scenario it came from). Both are needed; the question
-    is only what to call them.
-    **On naming: keep Tom's parentheticals, drop the genealogy.** He proposed "Copy as child (all
-    overrides cleared)" / "Copy as sibling (all overrides preserved)". The parentheticals are exact.
-    The lead words are not, for a structural reason: in this model every scenario is already a child
-    of the project and a sibling of every other scenario, so BOTH copies land in the same place in
-    the hierarchy — the metaphor names a distinction that does not exist, and the reader has to
-    ignore it to reach the parenthetical that carries the actual meaning. What differs is only what
-    the copy inherits.
-    **Recommended: "Copy with overrides" (default) and "Copy without overrides."** Terse,
-    symmetrical, and built on `override` — the one noun the whole feature already uses in "Push to
-    project" and "Push through all overrides", so a user learns one word instead of three. It also
-    survives translation: "child"/"sibling" applied to a FILE is an English computing idiom that
-    does not carry into 26 languages, whereas "override" is already glossary-able as a concept.
-    **"With overrides" must be the default** — copying something and silently discarding the very
-    differences that made it worth copying is the surprising outcome.
-    Two cases deliberately not designed here: creating a brand-new empty scenario under a project
-    (trivially "without overrides"), and promoting a scenario to become its own new project.
-  **Sequencing unchanged:** ship 146.08 as flat named saves first. Flat saves ARE the copy model
-  already, so this becomes an additive feature (a project grouping plus markers plus two push
-  actions) rather than a storage migration — which is the other reason the copy model wins here.
+  - **Two levels, permanently.** Base is canon and has no overrides; scenarios are leaves. No
+    scenario-of-a-scenario. The asymmetry must be **structural, not conventional** — Tom's own
+    diagnosis of what went wrong before: *"pushing becomes chaotic if everybody is equal."* Lazy
+    overrides and ambiguous parentage are what a second level would reintroduce.
+  - **Every edit in a non-Base scenario is an override, full stop** — even when the typed value
+    equals Base's. This preserves the one decision worth carrying over from the copy-model writeup:
+    the marker records **user INTENT at edit time** and is never computed by diffing. A diff cannot
+    tell "I set this deliberately here" from "Base moved underneath me", and those need opposite
+    treatment. Unchecking the marker is the un-do; the value returns to Base's.
+  - **Show Base's value beside the scenario's** whenever a marker is checked, in the property row.
+    This is the cheap fix for the one confusing case the model leaves: you correct a diameter in Base
+    and a scenario that overrode it does not move. Seeing what you are diverging from, at the moment
+    you can act on it, needs no change-tracking or "Base changed since" bookkeeping.
+  - **"Push displayed properties hard downstream"** — the dangerous action, and it stays (Tom,
+    2026-07-30: *"still needed for good UX"*). Base-side, it forces the displayed properties onto
+    every scenario, ignoring their markers. Finger-wag with a count of scenarios and properties.
+    "Displayed" is deliberate: the Labels panel is already the per-property checkbox filter, so
+    Task 185's "reuse the Labels panel as the property filter" idea applies here directly and the
+    user's own current view defines the blast radius.
+  - **An overrides report is explicitly low priority** (Tom, 2026-07-30) — the map halos below make
+    the same information visible in the place the user is already looking.
+  - **Audit halos.** A highlight (outline, not fill, so it composes with the flow/pressure coloring)
+    around every element carrying an override in the current scenario, filtered by the same Labels
+    panel checkboxes.
+  - **Copy is a project-level operation, not a scenario-level one.** "Save project as" duplicates the
+    whole project — Base, scenarios, and markers together. This is where a self-contained copy is
+    genuinely what the user wants, and it is the answer to the delta model's one real cost (one save
+    = one blast radius). **Copy at the project level, delta at the scenario level**; each does the job
+    it is good at. This retires the "Copy with / without overrides" naming problem entirely — there is
+    no scenario-level copy that has to decide.
+
+  **REVERSED, 2026-07-30: "topology and geometry are shared, only properties vary" was too strong.**
+  Tom pushed back on it — *"Is it possibly not true even though this is what everybody does?"* — and
+  he is right; the survey paragraph above overstated what the packages actually do. **WaterGEMS
+  varies topology every day, via an active-topology alternative that toggles elements on and off.**
+  What the packages really share is the *element set*, not the topology: membership is itself an
+  overridable property. And the reason they stop there is partly historical — EPANET-lineage engines
+  index links by array position and store result series against a fixed link set, which is an
+  implementation constraint from the 1990s, not a conceptual truth. Meanwhile "with the new 12-inch
+  loop vs. without" is *the* most common real design question this calculator will be asked, so a
+  rule that forbids it would gut the feature. Corrected rule:
+  - **Existence is an ordinary overridable boolean** (`active`). A proposed loop lives in Base as
+    inactive; the "Build the loop" scenario overrides it to active. Deleting in a scenario means
+    setting it inactive. No new delta type, no new machinery — the whole "topology varies" case is
+    just a property override, which is exactly why this stays coherent.
+  - **Drawing inside a scenario must still work.** When the user draws a new pipe in a scenario, the
+    app silently creates it in Base as inactive and overrides it active in the current scenario. The
+    user gets ordinary drawing; the model keeps a single ID space and a single element set. This is
+    what makes the corrected rule feel like no rule at all.
+  - **Deleting in Base is a real deletion** — it drops the element and every scenario's overrides on
+    it. Confirm with a count.
+  - **Geometry genuinely does stay shared**, and this is the part of the original rule with an actual
+    reason rather than an inherited one: a node cannot be in two places at once in a single rendered
+    map view.
+  **Sequencing:** 146.08 must ship the **project container from day one**, holding Base as its only
+  scenario. Then scenarios are purely additive and there is never a storage migration. Tom flagged
+  this himself — *"this is an important decision because we want to introduce it early"* — and it is
+  the reason the model had to be settled before 146.08 rather than after.
+
+  ---
+  **SUPERSEDED (kept for the reasoning, not the conclusion) — the copy model, decided and reversed
+  2026-07-30.** A scenario would be a whole, self-contained network; it keeps working if the project
+  is renamed or deleted, "Save as" is a copy, and undo/versioning stay per-document. It needed:
+  "Push to project" (promote this scenario's values up and out to siblings that have NOT overridden
+  that property, finger-wagged because it edits documents not on screen); "Push through all
+  overrides" (the same, ignoring markers — double finger-wag, and it destroys deliberate work in
+  scenarios the user cannot see); and a two-mode copy, since a copy must decide what happens to the
+  source's markers — "Copy with overrides" (default) / "Copy without overrides", preferred over
+  Tom's original "Copy as child / Copy as sibling" because in that model every scenario is already
+  both a child of the project and a sibling of every other scenario, so the genealogy named a
+  distinction that did not exist, and because "child"/"sibling" applied to a FILE is an English
+  computing idiom that does not carry into 26 languages. Its sequencing note read: ship 146.08 as
+  flat named saves first, since flat saves ARE the copy model already. **All of this is retired by
+  the delta decision above** — the naming problem disappears with scenario-level copy, and the
+  sequencing note inverts: the container must come first, not the flat saves.
 
 - 35|185| **Match/Copy properties tool (Task 146 child).** Tom, 2026-07-30: "In the absence of the
   table editor, some sort of Match or Copy tool would be very cool. Checkboxes (or current visible
@@ -765,6 +811,52 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|189|[CC] **Per-field decimal places on map labels (Task 146 child) — DONE 2026-07-30.** Tom:
+  "along with the checkbox, a decimal places input (with scroller since it's integer and small?)
+  would be nice for each numerical label." Shipped as a 0–4 number input on each numeric field's row
+  in the **Labels popover, not Settings** — it is a per-field property and that panel is already the
+  per-field row list, while Settings holds page-wide preferences.
+  - `labelSettings.decimals.{node,link}` is a **parallel map**, not a shape change to the existing
+    `node`/`link` boolean maps. Those booleans are merged key-by-key out of localStorage on every
+    load; turning each one into an object would have silently reinterpreted every already-saved
+    network's toggles. A field is numeric exactly when it has an entry here, so ID needs no second
+    list — `decimalsFor()` reads that one map to decide whether a row gets a spinner.
+  - **The decimals are fed through `displayRound()`/`plainRound()`, which is the whole point.**
+    Extrema are deliberately judged on the *rounded display value* so two series links printing the
+    same number can't be marked max and min by solver roundoff past the last printed decimal. Feeding
+    per-field decimals into that same function keeps the invariant: verified numerically — three
+    flows of 100.004 / 100.000 / 99.996 all print "100" at 0 decimals and **none** is marked, and at
+    3 decimals they differ and the max/min marks appear.
+  - `Math.round(x*100)/100` was open-coded in four places for the declarative/dimensionless fields
+    (Length, Roughness, k) — folded into `plainRound()` so those follow per-field decimals too rather
+    than staying pinned at 2.
+  - Defaults are 2 everywhere, so shipping it is a visual no-op; the spinner clamps to 0–4 rather
+    than alerting (a held-down spinner runs past its own max, and every out-of-range value has an
+    obvious intended meaning).
+  - **The up/down arrows needed a new opt-in CSS class, `.ec-spin`** (Tom asked for them, which is
+    what surfaced this). `css/engcalcs.css` strips the native spinner from *every* number input in
+    the suite — correct for a physical quantity, where a 1-unit step is meaningless and the arrows
+    only steal width, and wrong for a small bounded integer, where clicking up/down is the natural
+    gesture and the arrows themselves signal "this is not a free-form number." `.ec-spin` opts one
+    field back in; `opacity:1` is part of it because Chrome/Safari otherwise hide the spinner until
+    the pointer is over the input — invisible exactly when the user is looking for it. Reusable
+    suite-wide, but purely opt-in, so nothing existing changes.
+- 0|190|[CC] **Toggle for the high/low marks on map labels (Task 146 child) — DONE 2026-07-30.**
+  `labelSettings.markExtrema`, a single checkbox below both field lists in the Labels popover, using
+  the roadmap's recommended wording **"Mark highest and lowest values"** (per CLAUDE.md's
+  Simple-English rule, the plain verb and adjectives beat "indicate" and beat "max/min").
+  - **Global, not per field**, as the roadmap called: the mark answers one network-wide question per
+    field, and it is the smaller build.
+  - **Enforced in `decorationFor()`, not by suppressing the extrema themselves.** The `fieldExtrema()`
+    results stay computed and correct while the marks are hidden, so turning them back on needs no
+    recompute and nothing else reading them can go stale.
+  - Lives in `labelSettings` (a view preference, deliberately outside the undo-snapshotted `doc`),
+    which forced a fix to `loadFromStorage()`: its merge looped `Object.keys(labelSettings)` and
+    `Object.assign`ed each group, which **boxes a bare boolean and throws the result away**. The
+    groups are now named explicitly, since the object is no longer uniformly two flat sub-objects.
+  - Both tasks are covered by the existing "Restore defaults" button, which resets all of
+    `labelSettings`.
 
 - 0|188|[CC] **`lpn_` backdrop fade, heavier pipes, popup placement, and a click-blocking bug —
   DONE 2026-07-30.** Tom, testing against a real backdrop: "my backdrop is busy and dark… I can't
