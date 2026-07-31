@@ -2630,6 +2630,82 @@ var EngCalcs = EngCalcs || {};
 		// No Length row, deliberately (Tom, 2026-07-30): lenAuto derives a pipe's length from the
 		// drawn geometry, so any default here would be overwritten the moment the pipe is drawn.
 		defaultRow(defBody, pc.lpn_field_km || 'Minor (local) loss coefficient, km', null, 'k', nonNegative);
+		// ---- push defaults to existing elements (Tom, 2026-07-30) ----
+		// A HARD push, deliberately. The gentler "update only elements still holding the OLD
+		// default" was designed and then rejected: it cannot tell a deliberately-typed 6 from an
+		// untouched 6, so it is not non-destructive, it is SILENTLY destructive -- worse than an
+		// overwrite you watched happen. And in the case it exists for (Tom's "draw it all up, then
+		// think about numbers" crowd -- really an oops recovery) every element still holds the old
+		// default anyway, so it would degenerate into a hard push with extra machinery.
+		// SCOPED BY THE DISPLAYED LABELS, in Tom's words "only the displayed values will be pushed":
+		// the Labels panel is already a per-property checkbox list and is already on screen, so the
+		// user's own current view defines the blast radius and this tool needs no property picker of
+		// its own. That same mechanism is wanted by ROADMAP Task 185 (Match/Copy) and Task 184's
+		// push-to-scenarios, which is why it is worth reusing rather than inventing a third picker.
+		// Result fields (flow, velocity, pressure, head loss, gradient) have no default at all, so
+		// the effective filter is "displayed INTERSECT has-a-default".
+		// WHEN TASK 184 LANDS this must stay a Base-level action: run inside a scenario it would
+		// mint an override on every element at once, which is never what anyone means by it.
+		var pushSpecs = [
+			// `applies` is what keeps the push physical rather than blindly per-field: a reservoir
+			// has no demand, and a pump has no diameter/roughness/km, so neither is counted or touched.
+			{ key: 'nodeElev', group: 'node', field: 'elev', label: pc.lpn_field_elev || 'Elevation',
+				applies: function () { return true; }, set: function (n, v) { n.elev = v; } },
+			{ key: 'demand', group: 'node', field: 'demand', label: pc.bpn_demand || 'Demand',
+				applies: function (n) { return n.type !== 'reservoir'; }, set: function (n, v) { n.demand = v; } },
+			{ key: 'diameter', group: 'link', field: 'diameter', label: pc.lpn_field_diameter || 'Diameter',
+				applies: function (l) { return l.type !== 'pump'; }, set: function (l, v) { l.diameter = v; } },
+			{ key: 'roughness', group: 'link', field: 'roughness', label: pc.lpn_field_roughness || 'Roughness',
+				applies: function (l) { return l.type !== 'pump'; }, set: function (l, v) { l.roughness = v; } },
+			{ key: 'k', group: 'link', field: 'km', label: pc.lpn_field_km || 'Minor (local) loss coefficient, km',
+				applies: function (l) { return l.type !== 'pump'; }, set: function (l, v) { l.k = v; } }
+		];
+		note(defBody, pc.lpn_settings_push_note || 'Pushing sends only the properties whose labels are currently showing.');
+		var pushBtn = document.createElement('button');
+		pushBtn.type = 'button';
+		pushBtn.textContent = pc.lpn_settings_push_btn || 'Push defaults to all elements';
+		pushBtn.addEventListener('click', function () {
+			var active = pushSpecs.filter(function (s) { return labelSettings[s.group][s.field]; });
+			// An empty intersection SAYS SO rather than silently doing nothing: with no input labels
+			// displayed this button would otherwise look broken, and the reason is off-screen in
+			// another panel. Naming that panel is the whole value of the message.
+			if (!active.length) {
+				alert(pc.lpn_push_none_displayed || 'No default input is showing as a label right now, so there is nothing to push. Turn on the labels for the properties you want (Labels panel), then try again.');
+				return;
+			}
+			var targets = 0;
+			doc.nodes.forEach(function (n) {
+				if (active.some(function (s) { return s.group === 'node' && s.applies(n); })) { targets++; }
+			});
+			doc.links.forEach(function (l) {
+				if (active.some(function (s) { return s.group === 'link' && s.applies(l); })) { targets++; }
+			});
+			if (!targets) { alert(pc.lpn_push_nothing || 'No existing element carries any of the properties being pushed.'); return; }
+			// The confirm NAMES the properties, it does not merely count them -- a count alone
+			// ("push 2 properties?") leaves the user guessing which two, and this action is not
+			// something to guess at. Assembled from already-translated label text plus two short
+			// heading keys, with no plural agreement anywhere: "Elements: 17" needs no plural rule,
+			// while "17 pipes and 5 junctions" would need one in every target language.
+			var msg = (pc.lpn_push_confirm || 'Replace these properties on every existing element with the current default inputs? Values you have typed will be overwritten. You can undo this.')
+				+ '\n\n' + (pc.lpn_push_properties || 'Properties:') + ' ' + active.map(function (s) { return s.label; }).join(', ')
+				+ '\n' + (pc.lpn_push_elements || 'Elements:') + ' ' + targets;
+			if (!window.confirm(msg)) { return; }
+			saveUndoSnapshot();
+			doc.nodes.forEach(function (n) {
+				active.forEach(function (s) { if (s.group === 'node' && s.applies(n)) { s.set(n, settings.defaults[s.key]); } });
+			});
+			doc.links.forEach(function (l) {
+				active.forEach(function (s) { if (s.group === 'link' && s.applies(l)) { s.set(l, settings.defaults[s.key]); } });
+			});
+			// refreshPopupIfOpen() because an open element popup is now showing stale numbers for
+			// the very element that just changed under it.
+			refreshPopupIfOpen();
+			refreshLabelText();
+			scheduleSolve();
+			saveToStorage();
+		});
+		defBody.appendChild(pushBtn);
+		defBody.appendChild(document.createElement('br'));
 		// ---- 3. Map display ----
 		// "Display" rather than Tom's first "Map sizes": the section also holds symbol and backdrop
 		// opacity, which are not sizes, and stranding those two in a group of their own would be

@@ -222,6 +222,13 @@ EngCalcs.pageConfig = {
 	lpn_settings_id_prefixes: <?=json_encode($ec_lang['lpn_settings_id_prefixes'])?>,
 	lpn_settings_defaults: <?=json_encode($ec_lang['lpn_settings_defaults'])?>,
 	lpn_settings_defaults_note: <?=json_encode($ec_lang['lpn_settings_defaults_note'])?>,
+	lpn_settings_push_note: <?=json_encode($ec_lang['lpn_settings_push_note'])?>,
+	lpn_settings_push_btn: <?=json_encode($ec_lang['lpn_settings_push_btn'])?>,
+	lpn_push_confirm: <?=json_encode($ec_lang['lpn_push_confirm'])?>,
+	lpn_push_properties: <?=json_encode($ec_lang['lpn_push_properties'])?>,
+	lpn_push_elements: <?=json_encode($ec_lang['lpn_push_elements'])?>,
+	lpn_push_none_displayed: <?=json_encode($ec_lang['lpn_push_none_displayed'])?>,
+	lpn_push_nothing: <?=json_encode($ec_lang['lpn_push_nothing'])?>,
 <?php // lpn_settings_emitter_exponent is deliberately NOT wired here: its Settings row was removed
       // 2026-07-30 because nothing can create an emitter yet (ROADMAP Task 191). The language key
       // stays in lib/lang.ec.en.php so restoring the control is one line here and one there. ?>
