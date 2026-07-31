@@ -2432,12 +2432,20 @@ var EngCalcs = EngCalcs || {};
 		}
 		// ---- ID prefixes ----
 		heading(pc.lpn_settings_id_prefixes || 'ID prefixes');
-		// Reuses the existing Add-tool labels (Junction/Reservoir/Pipe/Pump/Text) per CLAUDE.md's
+		// Reuses the existing Add-tool labels (Junction/Reservoir/Pipe/Pump) per CLAUDE.md's
 		// concept-level label reuse rule -- these already name the element type, no new key needed.
+		// TEXT ('T') IS DELIBERATELY ABSENT (Tom, 2026-07-30, asking "User never sees Text ID... is
+		// this future-proof or YAGNI?"). Verified: openLabelPopup() renders Text/Size/X/Y with no ID
+		// field, text elements are not in the Labels popover's ID checkbox (node/link only), and no
+		// report lists them -- a text element's ID is unreachable from every screen in the app. So
+		// the row was not merely unused but VISIBLY inert: four rows here do something and a fifth
+		// did nothing, with no way to tell which from looking. settings.idPrefixes.T and nextId.T
+		// both stay -- IDs must still be generated and unique -- so this removes the control, not
+		// the concept. Restore the row (one array entry) if Task 146.05's element browser ever
+		// lists text elements the way EPANET's own Browser does.
 		[
 			['R', pc.lpn_tool_add_reservoir || 'Reservoir'], ['J', pc.lpn_tool_add_junction || 'Junction'],
-			['P', pc.lpn_tool_add_pump || 'Pump'], ['L', pc.lpn_tool_add_pipe || 'Pipe'],
-			['T', pc.lpn_tool_add_text || 'Text']
+			['P', pc.lpn_tool_add_pump || 'Pump'], ['L', pc.lpn_tool_add_pipe || 'Pipe']
 		].forEach(function (f) {
 			var key = f[0], input = document.createElement('input');
 			input.type = 'text'; input.size = 4; input.value = settings.idPrefixes[key];

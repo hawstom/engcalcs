@@ -407,7 +407,12 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   needed right now, only local multi-project storage.
 - 20|146.04| **Node/link report tables (Task 146 child).** Tabular results view.
 - 20|146.05| **EPANET-style element browser (Task 146 child).** List/select elements from a panel
-  rather than only the canvas.
+  rather than only the canvas. **If this lists TEXT elements** (EPANET's own Browser does have a
+  Labels category), restore the Text row to the Settings panel's ID-prefixes list — it was removed
+  2026-07-30 because a text element's ID is unreachable from every screen in the app, making the
+  control visibly inert. `settings.idPrefixes.T` and `nextId.T` were both kept, so restoring it is
+  one array entry in `rebuildSettingsFields()`. That row is only worth having once a text ID is
+  something the user can actually see.
 - 20|191| **Junction emitters — surface the pressure-dependent demand the solver already has
   (Task 146 child).** Raised 2026-07-30 when Tom asked of the Settings panel's "Emitter exponent"
   row: *"Do we have emitters? Do we do something with this?"* The honest answer was **no** — that
