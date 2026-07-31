@@ -10,9 +10,32 @@ var EngCalcs = EngCalcs || {};
 // dead on touch, since a bare <a title> only navigates on first tap with no hover to fall back on.
 // getOrCreateInstance (not `new Tooltip`) makes this safe to call repeatedly on overlapping roots,
 // including document itself, without creating duplicate tooltip instances on the same element.
+// An INTERACTIVE control (a button, a link, a form field) carrying a tip is treated differently
+// from a plain label, because 'click' as a tooltip trigger fights with the control's own job
+// (Tom, 2026-07-30: "tips are getting stuck open… labels hover, then labels click, then Close.
+// Tip is now stuck open until you click and close again. It cycles."). Bootstrap tracks each
+// trigger separately and will not hide while ANY of them is still active: hovering sets the hover
+// trigger, the click then sets the click trigger too, and moving the mouse away only clears hover
+// -- so the tip stays pinned open until a second click toggles the click trigger back off. Same
+// stickiness with 'focus', since a clicked button keeps focus after the click.
+// So a control gets 'hover focus' (a mouse user and a keyboard user both still get the tip) plus
+// an explicit hide on click: Bootstrap's hide() clears all three active triggers at once, which is
+// what breaks the cycle. On touch, tapping a button performs its action -- that IS the answer, and
+// a tip left hanging over the panel it just opened is noise. A plain label keeps 'click' in the
+// trigger list, because a tap is the only way to reach its tip at all.
+function ecTipIsControl(el) {
+	return !!el.closest('button, a, input, select, textarea, [role="button"]');
+}
 EngCalcs.initTips = function (root) {
 	(root || document).querySelectorAll('[title][style*="cursor:help"], .ec-help[title]').forEach(function (el) {
-		bootstrap.Tooltip.getOrCreateInstance(el, { trigger: 'hover focus click' });
+		var control = ecTipIsControl(el);
+		var tip = bootstrap.Tooltip.getOrCreateInstance(el, {
+			trigger: control ? 'hover focus' : 'hover focus click'
+		});
+		if (control && !el.dataset.ecTipClickWired) {
+			el.dataset.ecTipClickWired = '1';
+			el.addEventListener('click', function () { tip.hide(); });
+		}
 	});
 };
 document.addEventListener('DOMContentLoaded', function () { EngCalcs.initTips(document); });

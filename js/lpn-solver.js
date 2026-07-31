@@ -359,14 +359,31 @@ EngCalcs.lpnSolve = function (model, options) {
 
 			if (link.type === 'pump') {
 				// Head GAIN: H_to - H_from = H0 - a Q^b, so h = -(H0 - a Q^b).
-				// A pump pushed backwards is treated as closed for this iteration.
 				var qp = Math.max(aq, qMin);
-				if (q < 0) {
+				if (!(link.h0 > 0) && !(link.a > 0)) {
+					// NO CURVE ENTERED -- the state every newly drawn pump is in, since nothing
+					// assigns a pump a curve it was not given. It neither adds nor loses head, in
+					// EITHER direction, so it is a plain lossless connection: the same gradient
+					// floor the pipe branch below uses, with h = p*q ~ 0.
+					// Handled BEFORE the backwards check on purpose. Without a curve there is no
+					// "backwards" to guard against, and routing it through that check produced a
+					// visible artifact: with zero net demand the flow settles at ~1e-10, which
+					// wanders negative, and the check's near-zero G = 1e-8 then floats the
+					// downstream junction ~0.1 ft off the reservoir's head for no physical reason.
+					p = gradMin;
+					h = p * q;
+					G[k] = 1 / p;
+					y[k] = h / p;
+				} else if (q < 0) {
+					// A pump WITH a curve, pushed backwards, is treated as closed for this iteration.
 					G[k] = 1e-8;
 					y[k] = 0;
 				} else {
 					h = -(link.h0 - link.a * Math.pow(qp, link.b));
 					p = link.a * link.b * Math.pow(qp, link.b - 1);
+					// Same floor again, for a degenerate curve (e.g. a shutoff head with no droop):
+					// p = 0 would otherwise give an infinite conductance.
+					if (!(p > gradMin)) { p = gradMin; h = p * q; }
 					G[k] = 1 / p;
 					y[k] = h / p;
 				}
@@ -507,20 +524,22 @@ EngCalcs.lpnReport = function (model, junctions, junctionIndex, byId, H, Q, meth
 		flows = {},
 		headlosses = {},
 		velocities = {},
-		issues = [],
 		i,
 		k,
 		link,
 		res,
 		aq,
 		m,
-		qMax,
 		g = EngCalcs.lpnG;
 
 	for (i = 0; i < model.nodes.length; i++) {
 		if (model.nodes[i].type === 'reservoir') {
+			// A reservoir now carries an elevation as well as a head, so its pressure is the same
+			// head-minus-elevation a junction's is -- zero only when the water surface sits at the
+			// reservoir's own ground elevation, which is the default but no longer the only case
+			// (a tank is a reservoir whose head is above its elevation).
 			heads[model.nodes[i].id] = model.nodes[i].head;
-			pressures[model.nodes[i].id] = 0;
+			pressures[model.nodes[i].id] = model.nodes[i].head - (model.nodes[i].elev || 0);
 		}
 	}
 	for (i = 0; i < junctions.length; i++) {
@@ -535,19 +554,13 @@ EngCalcs.lpnReport = function (model, junctions, junctionIndex, byId, H, Q, meth
 			? Q[k] / (Math.PI * link.diameter * link.diameter / 4)
 			: 0;
 		if (link.type === 'pump') {
+			// Sign convention: a pump's head loss is the negation of its head gain, so a working
+			// pump reports a NEGATIVE head loss. That is the whole story -- there is no separate
+			// head-gain quantity anywhere in this page (Tom, 2026-07-30: "I don't think we need a
+			// separate Head Gain. Negative head loss is fine."), and no floor/extrapolation check
+			// on the curve either: a pump has exactly the curve the user entered for it and does
+			// exactly what that curve says, including past its own zero-head flow.
 			headlosses[link.id] = -(link.h0 - link.a * Math.pow(Math.max(Math.abs(Q[k]), EngCalcs.lpnQMin), link.b));
-			// The curve H = h0 - a*Q^b is an unbounded power law with no floor at zero -- past its
-			// own zero-head flow (h0 = a*Qmax^b), it keeps going negative, which reads as the pump
-			// LOSING head rather than simply being unable to deliver that much flow (a real curve
-			// just ends at Qmax, H=0). This is a real, calculated result of demanding more than the
-			// entered curve supports, not a presentation bug -- Tom found ~67 ft of "loss" this way
-			// on the Example network after raising demand to 400 gpm against the default 150gpm/
-			// 65ft curve (Qmax = 300 gpm). Flag it rather than silently clamp: clamping would hide
-			// that the real fix is a bigger pump curve or a smaller demand.
-			if (link.a > 0) {
-				qMax = Math.pow(link.h0 / link.a, 1 / link.b);
-				if (Math.abs(Q[k]) > qMax) { issues.push({ code: 'pump-beyond-curve', ids: [link.id] }); }
-			}
 		} else {
 			aq = Math.abs(Q[k]);
 			if (method === 'dw') {
@@ -563,7 +576,7 @@ EngCalcs.lpnReport = function (model, junctions, junctionIndex, byId, H, Q, meth
 
 	return {
 		ok: true,
-		issues: issues,
+		issues: [],
 		iterations: iterations,
 		converged: converged,
 		maxFlowChange: maxFlowChange,

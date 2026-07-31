@@ -78,7 +78,7 @@ Each calculator owns a short prefix for its language keys and JS variables:
 | `cs_`  | Canal Seepage & Conveyance Efficiency |
 | `ip_`  | Irrigation Pressure (main/lateral branch pressure profile, DU estimate & application design) |
 | `bpn_` | Branched Pipe Network (distributary/tree network; parent-pointer topology, two-pass fixed-demand solve, series-by-default, Manning/HW/DW switching) |
-| `lpn_` | Looped Pipe Network, Map Interface — **claimed 2026-07-28, not built.** Canvas/map-centric looped network solved by the global gradient algorithm. Sibling of `bpn_`, which is unaffected. Scope: `dev/looped-network-calculator-scope.md`; ROADMAP Task 146 |
+| `lpn_` | Looped Pipe Network, Map Interface — **shipped as an English-only PREVIEW 2026-07-30, still moving.** Canvas/map-centric looped network solved by the global gradient algorithm (`js/lpn-solver.js`), with a map editor over it (`js/looped-network.js`). Sibling of `bpn_`, which is unaffected. Its translation sprint is deliberately NOT run yet — see ROADMAP Task 146.06 for what gates it. Scope: `dev/looped-network-calculator-scope.md`; ROADMAP Task 146 and its 146.nn children |
 
 New calculators must define a new unique prefix and document it here.
 

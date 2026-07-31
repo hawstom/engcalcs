@@ -111,12 +111,32 @@ html[lang="zh"] .ec-welcome {
 
 /* Looped Pipe Network map editor (prefix lpn_, ROADMAP Task 146). Canvas mechanics ported
    from the validated dev/lpn-spike/canvas-spike.html -- see phase0-acceptance.md. */
-#lpn_canvas { touch-action: none; cursor: default; }
-.lpn-node { fill: #2a6; stroke: #144; stroke-width: 1; cursor: pointer; }
+/* --lpn-sym is the symbol-size factor (Settings > "Symbol size (relative to text)"), set on the
+   SVG element by refreshSymbolSizes() in looped-network.js. Every stroke width below is written as
+   its original fixed value times that factor, so the default of 1 renders exactly what shipped
+   before the setting existed. Radii and the flow-arrow chevron are geometry ATTRIBUTES, not styles,
+   so those are scaled in JS instead. */
+#lpn_canvas { touch-action: none; cursor: default; --lpn-sym: 1; --lpn-opacity: 1; --lpn-backdrop-opacity: 1; }
+/* Fading the BACKDROP is the counterpart of fading the symbols below: a busy, dark aerial or plan
+   swallows a 0.5-wide pipe and a black flow arrow, and the standard answer everywhere else (AutoCAD
+   image fade, QGIS layer transparency) is to knock the reference material back rather than thicken
+   the drawing over it -- the drawing then still reads correctly on white and in print. */
+.lpn-backdrop { opacity: var(--lpn-backdrop-opacity, 1); }
+/* Symbol opacity, for laying the network out over a backdrop image: applied to the two whole
+   layers that hold symbols, so nodes/pipes/arrows/vertex handles fade together as one drawing
+   rather than each fading independently and showing where they overlap. Labels, masks and leaders
+   live in their own layers and are deliberately untouched. */
+.lpn-symbols { opacity: var(--lpn-opacity, 1); }
+.lpn-node { fill: #2a6; stroke: #144; stroke-width: calc(1 * var(--lpn-sym, 1)); cursor: pointer; }
 .lpn-node-reservoir { fill: #26a; }
 /* stroke-width was 2 -- too wide relative to a 1.6-2.2 radius node (Tom, 2026-07-30), and it was
-   also why the arrow read as absorbed into the pipe rather than a distinct mark. */
-.lpn-link { stroke: #557; stroke-width: 0.5; cursor: pointer; }
+   also why the arrow read as absorbed into the pipe rather than a distinct mark. Then 0.5, which
+   that correction overshot: a pipe network's PIPES are its primary content, and at 0.5 they were
+   drawn lighter than the node outlines (1.0) sitting on top of them. 0.7 is Tom's "a little"
+   rather than his "maybe double" -- heavier and easier to see over a busy backdrop, still lighter
+   than a node's own outline so the original over-wide problem does not come back. The flow arrow
+   is deliberately NOT thickened with it; see .lpn-arrow below. */
+.lpn-link { stroke: #557; stroke-width: calc(0.7 * var(--lpn-sym, 1)); cursor: pointer; }
 .lpn-link-pump { stroke: #a52; }
 /* Flow-direction arrow at each link's midpoint (Tom, 2026-07-30, matching EPANET) -- hidden
    until a solve result exists (see updateArrow() in looped-network.js). pointer-events:none so
@@ -124,29 +144,52 @@ html[lang="zh"] .ec-welcome {
    An open chevron (unfilled polyline), not a solid triangle: a filled shape in the link's own
    color read as absorbed into the (formerly thick) pipe stroke. Black and open protrudes above
    and below the line instead of blending into it. */
+/* NOT multiplied by --lpn-sym, unlike every other stroke width here (Tom, 2026-07-30: "flow arrows
+   are too wide… it seemed beautifully narrow before"). The arrow is the one symbol whose SHAPE is
+   scaled by an SVG transform (updateArrow() applies scale(symbolFactor()) to the chevron), and an
+   SVG transform scales the stroke along with the geometry -- so multiplying here as well squared
+   the factor, and the line grew twice as fast as the mark it outlines.
+   Left at 0.3 when .lpn-link went to 0.7 (Tom, 2026-07-30): he called this width "beautifully
+   narrow", and what makes an arrow vanish into a dark aerial is its pure BLACK against a dark
+   background, not its width -- fading the backdrop fixes that without coarsening the mark. */
 .lpn-arrow { fill: none; stroke: #000; stroke-width: 0.3; pointer-events: none; }
 /* Filled the same color as .lpn-link (Tom, 2026-07-30: vertices should read as "on the pipe",
    not as a third node type) -- previously a hollow white circle with the pump's #a52 stroke,
    which had no relation to the link it belonged to and could be mistaken for a small pump. */
-.lpn-vhandle { fill: #557; stroke: #223; stroke-width: 0.25; cursor: move; }
+.lpn-vhandle { fill: #557; stroke: #223; stroke-width: calc(0.25 * var(--lpn-sym, 1)); cursor: move; }
 /* Feedback for the first-picked node of a pipe/pump (Tom, 2026-07-30: "otherwise there's no
    indication that anything is working") -- a wide red ring around the existing node fill/stroke,
    cleared by setPendingLinkFrom(null) in looped-network.js on completion or cancel. */
-.lpn-node.lpn-node-pending { stroke: #d32f2f; stroke-width: 0.5; }
+.lpn-node.lpn-node-pending { stroke: #d32f2f; stroke-width: calc(0.5 * var(--lpn-sym, 1)); }
 /* Dashed line from the first-picked node to the live pointer, same context (add-pipe/add-pump
    mode) -- shown/hidden and repositioned entirely from JS (rubberBandEl in looped-network.js). */
-.lpn-rubberband { stroke: #d32f2f; stroke-width: 0.4; stroke-dasharray: 1.2 1; pointer-events: none; fill: none; }
+.lpn-rubberband { stroke: #d32f2f; stroke-width: calc(0.4 * var(--lpn-sym, 1)); stroke-dasharray: 1.2 1; pointer-events: none; fill: none; }
 /* No font-size here -- it must be set inline in world units at each text element (see the
    buildNodeEls/buildLabelEls comments in looped-network.js for why a screen-pixel-flavored
    CSS font-size is wrong inside this scaled SVG group). */
 .lpn-lbl { fill: #333; pointer-events: none; user-select: none; }
-.lpn-leader { stroke: #000; stroke-width: 0.125; }
+/* pointer-events:none on both, found 2026-07-30 while verifying popup placement: labelsLayer draws
+   ABOVE the symbol layers, so a leader line or an extrema tick crossing a node swallowed the click
+   meant for that node and the property popup simply never opened. Neither is a thing you can click
+   -- a label's own text (.lpn-draglbl) is the drag/click target, and a tick decorates that text --
+   so neither has any business in hit testing. */
+.lpn-leader { stroke: #000; stroke-width: calc(0.125 * var(--lpn-sym, 1)); pointer-events: none; }
+.lpn-tick { pointer-events: none; }
 .lpn-draglbl { cursor: move; pointer-events: all; }
 /* Background mask behind a node/link/Text label (Task 146.01) so it stays legible over a backdrop
    image, another element, or a busy area of the map -- sized/positioned entirely from JS
    (positionMaskRect() in looped-network.js); pointer-events:none so it never steals the drag/click
    that .lpn-draglbl's text needs. */
 .lpn-lbl-mask { fill: rgba(255, 255, 255, 0.75); pointer-events: none; }
+/* Pump curve entry inside the element property popup (Tom, 2026-07-30: "the table needs headings
+   for Head and Flow"). Scoped rather than left to the suite's general results-table styling: this
+   is a compact input grid inside a floating popup, not a page-width results table, so it must not
+   stretch or inherit those borders. Headings left-aligned over their own input column; the row
+   label column carries the point number. */
+.lpn-curve-table { border-collapse: collapse; width: auto; margin: 2px 0; }
+.lpn-curve-table th, .lpn-curve-table td { padding: 1px 4px 1px 0; text-align: left; font-weight: normal; border: 0; }
+.lpn-curve-table thead th { font-weight: bold; }
+.lpn-curve-table input { width: 7em; }
 /* A leading checkmark, not just bold/outline (Tom) -- reads as a standard menu "this is
    active" mark rather than a generic emphasis style. */
 #lpn_toolbar button[aria-pressed="true"]::before { content: "\2713 "; }

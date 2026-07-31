@@ -182,7 +182,9 @@ comfortably inside a debounced edit, so **the decision holds even though the ari
 
 Never diagnose topology by watching the solver fail. Four checks, four distinct messages:
 
-1. **No reservoir at all** → "Add a reservoir or fixed-head source."
+1. **No reservoir at all** → "Add a reservoir or fixed-head source." (A reservoir carries an
+   elevation AND a head as of 2026-07-30, ROADMAP Task 179; a blank head means "the water surface is
+   at this reservoir's own elevation", so a reservoir doubles as a tank.)
 2. **A node not connected to any fixed-head source** → BFS/union-find from all reservoirs over open
    links. **Name the specific node IDs and grey them on the map.** This is *the* dominant user error
    in a map editor: a pipe drawn near a junction but not snapped to it.
@@ -323,8 +325,15 @@ Rules, stated as rules because each is silently wrong when broken:
   cases, as sketched. Reference resolution is a single hop only (`resolveCurvePoints()` never
   chases a chain), so a reference cycle can't form; a deleted or renamed referenced pump is handled
   by `renameLink()` rewriting every `curveRef` that pointed at the old id, and a reference to a
-  since-deleted id simply falls back to the referencing link's own (possibly empty) points via the
-  same defensive `[[0,0]]` guard `recomputePumpCurve()` already had. `js/looped-network.js`.
+  since-deleted id simply falls back to the referencing link's own (possibly empty) points.
+  **Amended 2026-07-30 (ROADMAP Tasks 179/180):** a new pump gets NO curve at all rather than a
+  default design point — a pump does exactly what the curve you entered says, and nothing until you
+  enter one (`recomputePumpCurve()` sets `h0 = a = 0`, and the solver's pump branch has an explicit
+  no-curve case using the same `gradMin` floor the pipe branch uses, so a curveless pump solves as a
+  lossless connection). There is no separate "head gain" quantity anywhere: a pump reports a
+  NEGATIVE head loss. The equation and the 1/2/3-point cases are documented in the page's own Notes
+  list (`lpn_notes_5`), with a one-line pointer under the popup's curve table.
+  `js/looped-network.js`.
 - **Versioning:** `v` is a monotonic integer. `v > CURRENT` refuses to load and says so — never
   silently drop unknown fields. `v < CURRENT` runs an ordered chain of pure migrations, keeping a
   `_backup` copy first, because there is no undo in localStorage.

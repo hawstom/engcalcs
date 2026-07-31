@@ -1135,7 +1135,10 @@ $ec_lang['lpn_tool_zoom_extent']='Zoom Extent';
 $ec_lang['lpn_new_text']='Text';
 $ec_lang['lpn_tool_example']='Draw example network';
 $ec_lang['lpn_field_elev']='Elevation';
-$ec_lang['lpn_field_head']='Fixed head';
+// A reservoir carries an elevation AND a head, so it doubles as a tank (Tom, 2026-07-30). Leaving
+// the head blank means "the water surface is at the reservoir's own elevation"; the placeholder
+// string is what shows in that empty box.
+$ec_lang['lpn_field_head']='Head';
 $ec_lang['lpn_close']='Close';
 $ec_lang['lpn_empty_hint']='PREVIEW — Add a backdrop or a reservoir (or other element) to start, or use "Draw example network."';
 $ec_lang['lpn_tool_undo']='Undo';
@@ -1156,7 +1159,6 @@ $ec_lang['lpn_result_pressure']='Pressure';
 $ec_lang['lpn_result_flow']='Flow';
 $ec_lang['lpn_result_velocity']='Velocity';
 $ec_lang['lpn_result_headloss']='Head loss';
-$ec_lang['lpn_result_headgain']='Head gain';
 $ec_lang['lpn_tool_clear']='New / Clear';
 $ec_lang['lpn_confirm_clear']='This will permanently delete the current network. Continue?';
 $ec_lang['lpn_storage_too_new']='The saved network was created by a newer version of this page and cannot be loaded here.';
@@ -1166,6 +1168,14 @@ $ec_lang['lpn_notes_2_term']='Not modeled';
 $ec_lang['lpn_notes_2_def']='Tanks, water quality, and pressure-dependent valves (PRV, PSV, FCV) are not supported. A pipe can carry a fixed minor loss, but not a valve whose open/closed status depends on the solved flow.';
 $ec_lang['lpn_notes_3_term']='Saved network';
 $ec_lang['lpn_notes_3_def']='One network is saved automatically in this browser, with no guarantee about preserving data through the preview stage. This is an early preview -- please use it for small and test networks only.';
+// Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
+// It lives in the Notes list, not in the pump popup: the popup is a small floating panel that has
+// to stay readable on a phone, while the Notes section is already this page's documentation home,
+// prints with the page, and is translated with everything else. The popup carries a one-line
+// pointer to here instead (lpn_pump_curve_note).
+// H and Q are symbols -- keep them as they are in every language.
+$ec_lang['lpn_notes_5_term']='Pump curve';
+$ec_lang['lpn_notes_5_def']='A pump follows H = H₀ − aQ^b, where H is the head it adds and Q is the flow through it. Enter one, two, or three points from the manufacturer\'s curve. Three points (a shutoff head at zero flow, a duty point, and a run-out point) fit H₀, a and b directly, and are the most faithful to a published curve. Two points fit a parabola (b = 2) with its peak at zero flow. One point uses the EPANET rule: shutoff head is 1.33 × the head you enter and maximum flow is 2 × the flow you enter, which also gives b = 2. A pump with no points entered adds no head at all. The curve has no floor at zero, so asking a pump for more flow than its curve supports gives a negative head — the fix is a larger pump or a smaller demand, not a different curve fit.';
 $ec_lang['lpn_notes_4_term']='Roadmap';
 $ec_lang['lpn_notes_4_def']='Saving, downloading, and sharing networks between devices are planned. Comments and suggestions are always welcome (see the feedback link above).';
 $ec_lang['lpn_id_invalid']='ID must be non-empty with no spaces or quotes.';
@@ -1173,12 +1183,6 @@ $ec_lang['lpn_id_taken']='That ID is already in use.';
 $ec_lang['lpn_diag_no_fixed_head']='Add a Reservoir: the network needs at least one fixed head to solve.';
 $ec_lang['lpn_diag_dangling_link']='A pipe or pump connects to a node that no longer exists:';
 $ec_lang['lpn_diag_unreachable']='These nodes are not connected to a reservoir (check for a closed link):';
-// A pump curve H = h0 - a Q^b has no floor at zero -- demanding more flow than the curve's own
-// zero-head point can silently compute a NEGATIVE head gain (Tom, 2026-07-30: found ~67 ft of
-// "loss" this way after raising demand past the Example network's default pump curve). Flagged as
-// a warning on an otherwise-successful solve, not clamped -- the real fix is a bigger curve or a
-// smaller demand, and clamping would hide that.
-$ec_lang['lpn_diag_pump_beyond_curve']='Demand exceeds this pump\'s curve (result is an unphysical extrapolation):';
 $ec_lang['lpn_diag_not_converged']='The solver did not converge. Check for unrealistic inputs, such as a zero diameter.';
 $ec_lang['lpn_field_roughness']='Roughness';
 $ec_lang['lpn_field_length']='Length';
@@ -1186,19 +1190,25 @@ $ec_lang['lpn_field_length']='Length';
 // values carry k<sub>m</sub> markup, incompatible with this popup's textContent-only fields) --
 // Tom, 2026-07-30, "default to 2" matches mphl_total_junction_k_tip's own stated default exactly.
 $ec_lang['lpn_field_km']='Minor (local) loss coefficient, km';
+// Short form of the same concept, for the two NARROW uses: the Labels checkbox list and the on-map
+// legend beside it. Per CLAUDE.md's rule that a shared label must fit its narrowest use, these get
+// their own key rather than being asked to carry the full popup-field wording -- an on-map legend
+// entry reading "Minor (local) loss coefficient, km" would set the width of the whole legend box.
+$ec_lang['lpn_field_km_short']='Minor loss, k';
 $ec_lang['lpn_settings_km_default']='Default minor (local) loss coefficient, km, for new pipes';
 // Pump curve entry (Task 146, 2026-07-30): up to 3 (flow, head) points, or a reference to
 // another pump's curve so several identical pumps need the curve entered only once.
 $ec_lang['lpn_pump_curve_source']='Curve';
 $ec_lang['lpn_pump_curve_own']='Enter points below';
 $ec_lang['lpn_pump_curve_ref_note']='Using the curve entered for pump ';
+$ec_lang['lpn_pump_curve_note']='One, two, or three points — see "Pump curve" in the Notes below.';
 $ec_lang['lpn_pump_point1']='Point 1 (required)';
 $ec_lang['lpn_pump_point2']='Point 2 (optional)';
 $ec_lang['lpn_pump_point3']='Point 3 (optional)';
 // Persistent mode-hint line (Task 146.01 follow-up, 2026-07-30): whole sentences, not composed
 // from a "Mode:" prefix + the tool's own label, per CLAUDE.md's concept-level label reuse rule --
 // word order/grammar around a mode name varies by language, so each mode gets its own full string.
-$ec_lang['lpn_mode_select']='Mode: Select. Click an element to view or edit it; drag to move nodes, vertices, or labels. Double-click a pipe to add or remove a vertex.';
+$ec_lang['lpn_mode_select']='Mode: Select. Click an element or label to view or edit it; drag to move nodes, vertices, or labels. Double-click a pipe to add or remove a vertex.';
 $ec_lang['lpn_mode_delete']='Mode: Delete. Click an element to remove it.';
 $ec_lang['lpn_mode_add_junction']='Mode: Add Junction. Change to Select mode to edit or move elements and labels.';
 $ec_lang['lpn_mode_add_reservoir']='Mode: Add Reservoir. Change to Select mode to edit or move elements and labels.';
@@ -1246,6 +1256,16 @@ $ec_lang['lpn_settings_tolerance']='Convergence tolerance';
 $ec_lang['lpn_settings_text_size']='Text size';
 $ec_lang['lpn_settings_text_size_map']='Map units';
 $ec_lang['lpn_settings_text_size_screen']='Screen pixels';
+// Symbols (node circles, pipe width, flow arrows, vertex handles) are sized as a MULTIPLE of the
+// text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
+// everything on the map is and symbols follow the text into map-vs-screen units automatically.
+$ec_lang['lpn_settings_symbol_size']='Symbol size (relative to text)';
+// Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
+// through the network while you place nodes on top of it (Tom, 2026-07-30).
+$ec_lang['lpn_settings_symbol_opacity']='Symbol opacity (0 to 1)';
+// The counterpart control: fade the backdrop image so a busy or dark one stops swallowing the
+// network drawn over it (Tom, 2026-07-30).
+$ec_lang['lpn_settings_backdrop_opacity']='Backdrop opacity (0 to 1)';
 $ec_lang['lpn_settings_text_size_units']='Text size units';
 $ec_lang['lpn_settings_map_height']='Map height';
 $ec_lang['lpn_settings_map_height_px']='Map height (px)';

@@ -132,6 +132,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	<dt><?=$ec_lang['lpn_notes_1_term']?></dt><dd><?=$ec_lang['lpn_notes_1_def']?></dd>
 	<dt><?=$ec_lang['lpn_notes_2_term']?></dt><dd><?=$ec_lang['lpn_notes_2_def']?></dd>
 	<dt><?=$ec_lang['lpn_notes_3_term']?></dt><dd><?=$ec_lang['lpn_notes_3_def']?></dd>
+	<dt><?=$ec_lang['lpn_notes_5_term']?></dt><dd><?=$ec_lang['lpn_notes_5_def']?></dd>
 	<dt><?=$ec_lang['lpn_notes_4_term']?></dt><dd><?=$ec_lang['lpn_notes_4_def']?></dd>
 </dl>
 
@@ -155,6 +156,7 @@ EngCalcs.pageConfig = {
 	lpn_field_roughness: <?=json_encode($ec_lang['lpn_field_roughness'])?>,
 	lpn_field_length: <?=json_encode($ec_lang['lpn_field_length'])?>,
 	lpn_field_km: <?=json_encode($ec_lang['lpn_field_km'])?>,
+	lpn_field_km_short: <?=json_encode($ec_lang['lpn_field_km_short'])?>,
 	lpn_field_auto: <?=json_encode($ec_lang['lpn_field_auto'])?>,
 	lpn_field_x: <?=json_encode($ec_lang['lpn_field_x'])?>,
 	lpn_field_y: <?=json_encode($ec_lang['lpn_field_y'])?>,
@@ -166,6 +168,7 @@ EngCalcs.pageConfig = {
 	lpn_pump_curve_source: <?=json_encode($ec_lang['lpn_pump_curve_source'])?>,
 	lpn_pump_curve_own: <?=json_encode($ec_lang['lpn_pump_curve_own'])?>,
 	lpn_pump_curve_ref_note: <?=json_encode($ec_lang['lpn_pump_curve_ref_note'])?>,
+	lpn_pump_curve_note: <?=json_encode($ec_lang['lpn_pump_curve_note'])?>,
 	lpn_pump_point1: <?=json_encode($ec_lang['lpn_pump_point1'])?>,
 	lpn_pump_point2: <?=json_encode($ec_lang['lpn_pump_point2'])?>,
 	lpn_pump_point3: <?=json_encode($ec_lang['lpn_pump_point3'])?>,
@@ -184,7 +187,6 @@ EngCalcs.pageConfig = {
 	lpn_diag_no_fixed_head: <?=json_encode($ec_lang['lpn_diag_no_fixed_head'])?>,
 	lpn_diag_dangling_link: <?=json_encode($ec_lang['lpn_diag_dangling_link'])?>,
 	lpn_diag_unreachable: <?=json_encode($ec_lang['lpn_diag_unreachable'])?>,
-	lpn_diag_pump_beyond_curve: <?=json_encode($ec_lang['lpn_diag_pump_beyond_curve'])?>,
 	lpn_diag_not_converged: <?=json_encode($ec_lang['lpn_diag_not_converged'])?>,
 	lpn_result_head: <?=json_encode($ec_lang['lpn_result_head'])?>,
 	lpn_result_pressure: <?=json_encode($ec_lang['lpn_result_pressure'])?>,
@@ -192,7 +194,6 @@ EngCalcs.pageConfig = {
 	lpn_result_velocity: <?=json_encode($ec_lang['lpn_result_velocity'])?>,
 	lpn_result_headloss: <?=json_encode($ec_lang['lpn_result_headloss'])?>,
 	lpn_result_gradient: <?=json_encode($ec_lang['lpn_result_gradient'])?>,
-	lpn_result_headgain: <?=json_encode($ec_lang['lpn_result_headgain'])?>,
 	lpn_tool_clear: <?=json_encode($ec_lang['lpn_tool_clear'])?>,
 	lpn_confirm_clear: <?=json_encode($ec_lang['lpn_confirm_clear'])?>,
 	lpn_storage_too_new: <?=json_encode($ec_lang['lpn_storage_too_new'])?>,
@@ -222,6 +223,9 @@ EngCalcs.pageConfig = {
 	lpn_settings_text_size_map: <?=json_encode($ec_lang['lpn_settings_text_size_map'])?>,
 	lpn_settings_text_size_screen: <?=json_encode($ec_lang['lpn_settings_text_size_screen'])?>,
 	lpn_settings_text_size_units: <?=json_encode($ec_lang['lpn_settings_text_size_units'])?>,
+	lpn_settings_symbol_size: <?=json_encode($ec_lang['lpn_settings_symbol_size'])?>,
+	lpn_settings_symbol_opacity: <?=json_encode($ec_lang['lpn_settings_symbol_opacity'])?>,
+	lpn_settings_backdrop_opacity: <?=json_encode($ec_lang['lpn_settings_backdrop_opacity'])?>,
 	lpn_settings_map_height: <?=json_encode($ec_lang['lpn_settings_map_height'])?>,
 	lpn_settings_map_height_px: <?=json_encode($ec_lang['lpn_settings_map_height_px'])?>,
 	lpn_settings_legend_position: <?=json_encode($ec_lang['lpn_settings_legend_position'])?>,

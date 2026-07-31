@@ -259,6 +259,102 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 - 95|146.02| **EPANET-style icon toolbar + map symbol icons (Task 146 child).** Replace/supplement
   the current toolbar with EPANET-style icons for elements and map symbols. **Must land before the
   translation sprint (146.06) — this blocks it**, per Tom, 2026-07-29.
+- 10|181| **Per-element symbol sizing (Task 146 child).** Task 180 shipped one overall
+  `settings.symbolScale` multiplier ("Symbol size (relative to text)") covering node radius, pipe
+  width, pump/vertex/arrow marks and stroke widths together. Tom, 2026-07-30, named the
+  fine-grained version as the eventual shape — a base pipe width, node size, pump size, reservoir
+  size, each independently settable — and explicitly deferred it: "that's a lot… maybe later we
+  give more fine-grained control and right now just a two-dimensional control." Build it when
+  someone actually needs one symbol bigger without the others, not on symmetry grounds.
+- 40|184| **Project/scenario model for saved networks: COPY model with override markers (Task 146
+  child).** Raised by Tom, 2026-07-30, thinking ahead to Task 146.08 (multiple named saved
+  networks): "I am wondering whether the concept of project.scenario buys us anything… if multiple
+  saves were grouped as scenarios under a project, we could conceivably, for any element, 'Push to
+  project' to sync across scenarios. We could even get fine-grained with checkboxes in popups."
+  **The question is not "should saves be grouped" but "what is shared and what varies."** Grouping
+  alone buys a folder. Every serious package sells the answer as its differentiator — InfoWater's
+  scenario manager over facility sets and alternatives, WaterGEMS' Alternatives / Scenarios /
+  Calculation Options triple, WNTR's one `WaterNetworkModel` with programmatic overrides — and they
+  all agree on the split: **topology and geometry are shared; demands, link statuses, roughness
+  ageing and boundary heads are what vary.** None of them lets a scenario freely add and delete
+  pipes and still call it a scenario; conflating those two is the usual way this feature turns
+  confusing. EPANET itself gives you none of it: one `.inp` per scenario, whole network duplicated,
+  no way to push a diameter correction across them.
+
+  **DECISION: the copy model, not the delta model. Tom, 2026-07-30, and he is right — this reverses
+  the delta-model recommendation written here earlier the same day.** The earlier argument was that
+  a delta model (a scenario stores only its overrides and inherits the rest) makes propagation
+  automatic and free, leaving Push to mean "promote to base" and Pull to mean the narrower, safer
+  "discard my override and inherit again". **What that overlooked is that the delta model still
+  needs the dangerous action.** Good UX for it demands a "Push to children" / "Clear all overrides"
+  — a base edit that deliberately overwrites what scenarios have overridden — because otherwise a
+  scenario that overrode a property can never be brought back in line en masse. Once the dangerous
+  action has to exist in BOTH models, the delta model's remaining advantages are only organizational
+  overhead and file-size parsimony, neither of which a user feels. What a user does feel is
+  **"what am I working on right now"** (Tom's words), and the copy model answers that with no
+  indirection: a scenario is a whole, self-contained network, it keeps working if the project is
+  renamed or deleted, "Save as" is a copy, and undo/versioning stay per-document.
+
+  **Shape to build:**
+  - **An override marker per property** ("an override proxy is desirable for the copy model, and it
+    can be called override" — Tom). **It must record user INTENT at edit time, not be computed by
+    diffing against the project.** A diff cannot tell "I set this deliberately in this scenario"
+    apart from "the project moved underneath me", and those two need opposite treatment. So: editing
+    a property inside a scenario marks it overridden, and the UI shows that mark.
+  - **"Push to project"** — promote this scenario's value(s) upward and out to the sibling
+    scenarios that have NOT overridden that property. Finger-wag before it: it edits documents that
+    are not on screen.
+  - **"Push through all overrides"** — the same, ignoring the markers. **Double finger-wag**: this
+    is the one that destroys deliberate work in scenarios the user cannot see. Name it so it cannot
+    be confused with the safe one, and say in the confirm how many scenarios and properties it will
+    overwrite.
+  - **Property selection via checkboxes**, per Tom's original sketch — and see Task 185, whose
+    "reuse the Labels panel as the property filter" idea applies here identically.
+  - **Copy / Save-as has two modes**, since a copy has to decide what happens to the source's
+    override markers (Tom, 2026-07-30): one that CLEARS them (the copy follows the project) and one
+    that PRESERVES them (the copy matches the scenario it came from). Both are needed; the question
+    is only what to call them.
+    **On naming: keep Tom's parentheticals, drop the genealogy.** He proposed "Copy as child (all
+    overrides cleared)" / "Copy as sibling (all overrides preserved)". The parentheticals are exact.
+    The lead words are not, for a structural reason: in this model every scenario is already a child
+    of the project and a sibling of every other scenario, so BOTH copies land in the same place in
+    the hierarchy — the metaphor names a distinction that does not exist, and the reader has to
+    ignore it to reach the parenthetical that carries the actual meaning. What differs is only what
+    the copy inherits.
+    **Recommended: "Copy with overrides" (default) and "Copy without overrides."** Terse,
+    symmetrical, and built on `override` — the one noun the whole feature already uses in "Push to
+    project" and "Push through all overrides", so a user learns one word instead of three. It also
+    survives translation: "child"/"sibling" applied to a FILE is an English computing idiom that
+    does not carry into 26 languages, whereas "override" is already glossary-able as a concept.
+    **"With overrides" must be the default** — copying something and silently discarding the very
+    differences that made it worth copying is the surprising outcome.
+    Two cases deliberately not designed here: creating a brand-new empty scenario under a project
+    (trivially "without overrides"), and promoting a scenario to become its own new project.
+  **Sequencing unchanged:** ship 146.08 as flat named saves first. Flat saves ARE the copy model
+  already, so this becomes an additive feature (a project grouping plus markers plus two push
+  actions) rather than a storage migration — which is the other reason the copy model wins here.
+
+- 35|185| **Match/Copy properties tool (Task 146 child).** Tom, 2026-07-30: "In the absence of the
+  table editor, some sort of Match or Copy tool would be very cool. Checkboxes (or current visible
+  labels) say what properties to copy, top shows (or initial click gives) the Source object then you
+  click the Target objects." Same interaction as AutoCAD's MATCHPROP and every GIS attribute-copy
+  tool: a toolbar mode, first click sets the source, every later click applies to a target, Escape
+  or a mode change ends it. **The good idea in Tom's own phrasing is "or current visible labels"** —
+  the Labels panel already IS a per-property checkbox list, already knows which properties are
+  interesting to this user right now, and is already on screen; reusing it as the property filter
+  means the tool needs no property picker of its own, and what you see on the map is what gets
+  copied. Worth a deliberate decision on whether ID is ever copyable (it must not be — IDs are
+  unique) and whether geometry is (it must not be — that is a move, not a property copy). This is
+  the cheap 80% of Task 186 and should ship long before it.
+- 15|186| **Table-paradigm editor with spreadsheet copy/paste (Task 146 child).** Tom, 2026-07-30:
+  "For the future a table-paradigm editor with spreadsheet-like copy and paste would be very cool."
+  A grid of nodes and a grid of links, editable in place, with clipboard paste from a spreadsheet —
+  what EPANET's own Data Browser tables and every serious package's tabular view provide, and the
+  fastest way to build or bulk-correct a model that already exists in a spreadsheet. Distinct from
+  Task 146.04 (node/link report tables), which is read-only reporting: this one is an editor and
+  needs paste parsing, per-column unit handling, undo integration, and validation of every pasted
+  cell. Large; parked deliberately behind Task 185, which gets most of the practical benefit for a
+  fraction of the work.
 - 30|146.08| **Multiple named saved networks (Task 146 child).** Local save/retrieve so a user can
   rotate among several `lpn_` projects. This is the real need behind the scope doc's old
   `.inp` export/import item — Tom confirmed 2026-07-29 that true EPANET `.inp` file interop is not
@@ -670,6 +766,224 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Completed
 
+- 0|188|[CC] **`lpn_` backdrop fade, heavier pipes, popup placement, and a click-blocking bug —
+  DONE 2026-07-30.** Tom, testing against a real backdrop: "my backdrop is busy and dark… I can't
+  see my pipes and flow arrows. Should we just strengthen their relative widths a little? Maybe
+  double? Do both? I trust your judgment."
+  1. **Backdrop opacity setting** (`settings.backdropOpacity`, 0–1, beside Symbol opacity). This is
+     the primary fix and the one that generalizes: fading the REFERENCE material rather than
+     thickening the drawing over it is what AutoCAD's image fade and a QGIS layer's transparency are
+     for, and unlike a heavier stroke it changes nothing about the network — so a drawing tuned
+     against a busy aerial still reads correctly on white and in print. Implemented as
+     `--lpn-backdrop-opacity` on a `.lpn-backdrop` layer class, same mechanism as symbol opacity.
+  2. **Pipes went from 0.5 to 0.7 wide — "a little", not Tom's offered "maybe double".** At 0.5 a
+     pipe was drawn LIGHTER than the node outlines (1.0) sitting on top of it, which is backwards
+     for a pipe network, where the pipes are the primary content. 0.7 fixes that while staying under
+     the node outline, so the over-wide problem that the earlier 2 → 0.5 correction fixed does not
+     come back. **The flow arrow was deliberately left at 0.3**: Tom called that width "beautifully
+     narrow", and what makes an arrow vanish into a dark aerial is its pure BLACK against a dark
+     background, not its width — the backdrop fade fixes that without coarsening the mark.
+  3. **Property popups no longer open on the click point.** On an orthogonal network — most real
+     ones — a popup centred on the element covers the elements directly north and south of it,
+     which are exactly the ones being compared against it. It now opens to the RIGHT of that
+     element's own data label, just past where its extrema glyph would sit, plus one node diameter
+     (Tom's own measure: "roughly a node size to the right of the extrema location"). It still reads
+     as belonging to the element because it lines up with that element's label, and it falls back to
+     the click point for an element with no rendered label. Needed a `worldToScreen()`, the inverse
+     of the existing `screenToWorld()`.
+  4. **Bug found while verifying (3): leader lines and extrema ticks were swallowing clicks.**
+     `labelsLayer` draws above the symbol layers, so a leader or a tick mark crossing a node took
+     the click meant for that node and the popup simply never opened — reproduced on the Example
+     network's J1, whose popup would not open at all while R1's and J2's did. Neither element is
+     clickable by design (a label's own text is the drag target; a tick decorates that text), so
+     both now carry `pointer-events: none` (`.lpn-leader`, and a new `.lpn-tick` class on every tick
+     element). All three nodes open correctly after the fix.
+
+- 0|187|[CC] **`lpn_` link labels at the true midpoint; roughness and minor loss added to the
+  Labels choices — DONE 2026-07-30.**
+  1. **A link's label anchored inside one SEGMENT, not at the halfway point of the pipe** (Tom:
+     "link label is placing within last segment instead of overall length. Not good."). `linkLabelMid()`
+     took `segmentMidpoints()[floor(segCount / 2)]` — the midpoint of the middle segment — which on
+     a bent pipe with an even segment count lands in the middle of the *second leg*. It now walks
+     the polyline by arc length (`pointAlongLink()`) and takes the 50% point of the whole pipe.
+  2. **...then steps clear of any flow arrow it would land on** ("but don't conflict with an
+     arrow"). Arrows sit at 30% of each SEGMENT, so on some geometries the two coincide;
+     `arrowAlongDistances()` reports where the actually-drawn arrows fall along the whole pipe (same
+     two rules `updateArrow()` applies), and the label slides along the pipe — never off it — to the
+     far side of a conflicting arrow, clamped to 12–88% so it never crowds a node.
+  3. **Roughness and the minor-loss coefficient are now Labels choices** (Tom: "add all input
+     properties to the Labels choices"). Both are dimensionless, so they render through `rawLine()`
+     like Length; both are suppressed on pumps, like the other pipe-only inputs; both are off by
+     default. Placed **with the other inputs** — after Length, before the solved results — since
+     inputs-then-results is the order the list already follows and Tom left the placement open ("do
+     something and we can change later"). They got real colors rather than the offered black
+     (teal `#00695c`, freed up when head gain was removed, and olive `#827717`), since two more
+     entries all reading black would make the legend ambiguous with ID.
+     `lpn_field_km_short` ("Minor loss, k") is a new key: the popup's full
+     "Minor (local) loss coefficient, km" would set the width of the whole on-map legend box, and
+     CLAUDE.md's rule is that a shared label must fit its narrowest use.
+
+- 0|182|[CC] **Sticky tooltips on interactive controls — suite-wide, DONE 2026-07-30.**
+  Tom, testing `lpn_` against a real system: "tips are getting stuck open. Here's something
+  repeatable. Labels hover, then labels click, then Close. Tip is now stuck open until you click and
+  close again. It cycles. I think another button was also sticking."
+  **Cause:** `EngCalcs.initTips()` (`js/Calculators.lib.js`) gave every tip
+  `trigger: 'hover focus click'`. Bootstrap tracks the three triggers separately and refuses to hide
+  while ANY is still active — hovering sets hover, the click then sets click as well, and moving the
+  mouse away only clears hover. The tip stays pinned until a second click toggles click back off,
+  which is exactly the cycle Tom described. `focus` sticks the same way, since a clicked button keeps
+  focus; that is the "another button" he suspected.
+  **Fix:** decide the trigger from what the element IS. A tip on an interactive control
+  (`closest('button, a, input, select, textarea, [role=button]')`) gets `hover focus` plus an
+  explicit `hide()` on click — Bootstrap's `hide()` clears all three active triggers at once, which
+  is what breaks the cycle. A tip on a plain label keeps `click` in the list, because a tap is the
+  only way a touch user can reach it at all (ROADMAP Task 173's whole point). On touch, tapping a
+  button performs its action, which IS the answer; a tip left hanging over the panel it just opened
+  is noise.
+  **Checked the one case that could have regressed:** the two link+tip strings
+  (`mpf_friction_slope`, `mtc_bend_angle`) put `.ec-help` as a SIBLING after `</a>`, per CLAUDE.md's
+  link+tip convention — so `closest('a')` misses them and they keep the click trigger. Verified in a
+  browser: label tips still open on tap, and the Labels-button cycle now leaves zero tooltips open
+  on two consecutive repetitions.
+
+- 0|183|[CC] **`lpn_` map geometry: scaling gaps, arrow placement/width, symbol opacity —
+  DONE 2026-07-30.** Everything Tom found once he started laying a real system over a backdrop.
+  1. **Extrema badges were not scaling.** `TICK_STROKE`/`TICK_LENGTH`/`CARET_LEG_*` were fixed world
+     sizes while the rise/drop constants beside them were already × font size, so a badge that
+     decorates a number stopped reading as part of it at any non-default text size. All of them now
+     go through a new `textFactor()` (= `effectiveFontSize() / 2.5`, so 1 at the default). Verified:
+     text 2.5 → 5 doubles the rail length (1.6 → 3.2), stroke (0.3 → 0.6) and chevron (0.5 → 1.0).
+  2. **The leader threshold was not scaling either**, so at large text a label had to travel much
+     further (relatively) before earning a leader. `leaderThreshold()` scales the 4-unit constant by
+     `max(textFactor, symbolFactor)`. The DEFAULT label offset (+2, −2) now scales with
+     `symbolFactor()` too — at 2× symbols a fixed offset started the label inside its own node. A
+     label the user has DRAGGED keeps the exact offset they dropped it at.
+  3. **Flow arrows were too wide** — "it seemed beautifully narrow before." Double-scaled: the
+     chevron's SHAPE is scaled by an SVG `scale()` transform, and an SVG transform scales the stroke
+     with the geometry, so also multiplying `stroke-width` by `--lpn-sym` in CSS squared the factor.
+     `.lpn-arrow` is now the one stroke width in that file that does NOT read `--lpn-sym`.
+  4. **Flow arrows collided with pipe labels** — both sat at the segment midpoint. The arrow moved
+     to `ARROW_ALONG` = 0.3 **measured from the upstream end** (0.3 at positive flow, 0.7 at
+     negative), so its position redundantly encodes flow direction as well.
+  5. **Arrows on a segment too short to hold one are hidden** (`len < 2 × chevron length`) — a
+     chevron longer than its own run overhangs both vertices and reads as a mark on the network
+     rather than on that pipe. Verified on the Example: 5 arrows shown at symbol size 1, 4 at 4,
+     0 at 8.
+  6. **Symbol opacity setting** (`settings.symbolOpacity`, "Symbol opacity (0 to 1)"), for laying a
+     network out over a backdrop aerial or plan. Applied as `opacity` on the two whole symbol
+     layers (now classed `.lpn-symbols`) via a `--lpn-opacity` custom property, so nodes, pipes,
+     arrows and vertex handles fade together as ONE drawing instead of each fading independently
+     and showing where they overlap. **Labels, masks and leaders are deliberately untouched** — the
+     point is to see the backdrop through the network while placing it, and fading the numbers at
+     the same time would defeat the reason you are looking at both together.
+
+- 0|180|[CC] **Tom's third review round on `lpn_`: live collision recalc, 3-point Example pump,
+  symbol size, legend headings — DONE 2026-07-30.**
+  1. **Collision avoidance now runs during a drag** (Tom: "collisions aren't recalculated after
+     drag; leaders stay unchanged"). `refreshLabelText()`'s layout half is split out as
+     `relayoutLabels()` — collision pass, then every label's text/mask/leader/ticks — and
+     `applyDrag()` calls it for node, vertex, Text-label and data-label drags. The numbers don't
+     change while dragging, so the tspans are not rebuilt; only the layout is redone.
+     **This required making the collision pass idempotent:** it used to keep an auto label's
+     previous nudge and push further from there, so a label stayed pushed long after whatever it
+     hit had moved away, and re-running it per frame would have accumulated drift. Every nudge is
+     now cleared and re-derived from scratch on each pass. Verified: dragging J1's label on the
+     Example produces three leaders (the dragged one plus two labels it pushed), where before the
+     drag there were none.
+  2. **The Example network's pump curve is three points, not one** (Tom: "1-point is not very
+     readable, and not good for our Example even if it's legal"): (0 gpm, 90 ft), (150, 65),
+     (300, 20) — a shutoff head, a duty point, and a run-out point, the way a manufacturer
+     publishes one. One point stays legal, because it is EPANET's own rule and matching EPANET is
+     the point of `lpnPumpFromCurve` — but it DERIVES shutoff head and maximum flow from the single
+     number you type, which is the same "numbers the user never entered" problem Task 179 removed
+     from new pumps. **The Example's reservoir also moved down to 55 ft**, in among the junctions
+     it feeds (50 ft and 40 ft) instead of 50 ft above them: perched high, the example was a
+     gravity system that would work with the pump deleted, so the pump's contribution was invisible.
+     It now delivers 76.3 ft at the 100 gpm duty flow and is the only reason there is pressure
+     anywhere (J1 35.3 psi, J2 39.4 psi).
+  3. **Pump curve documented in the Notes, not in the popup** — a new `lpn_notes_5` ("Pump curve")
+     giving H = H₀ − aQ^b and what one, two and three points each mean, with a one-line pointer
+     under the curve table in the popup (`lpn_pump_curve_note`). The popup floats over the map and
+     has to stay readable on a phone; the Notes list is already this page's documentation home,
+     prints with the page, and is translated with everything else.
+  4. **Symbol size setting**, as the two-dimensional control Tom asked for rather than a full
+     per-element breakdown: `settings.symbolScale`, labelled "Symbol size (relative to text)", sits
+     under the existing Text size block. Symbols are sized as a MULTIPLE OF THE TEXT
+     (`symbolFactor() = effectiveFontSize() / 2.5 × symbolScale`), so they inherit the text's
+     map-vs-screen units for free and there is no second units selector. Node/vertex radii and the
+     flow-arrow chevron are geometry, scaled in JS; the six stroke widths are styles, and now read a
+     `--lpn-sym` custom property that `refreshSymbolSizes()` writes on the SVG
+     (`stroke-width: calc(0.5 * var(--lpn-sym, 1))` etc. in `css/engcalcs.css`). A default of 1
+     reproduces exactly what shipped before. Per-element control (separate pipe width, node size,
+     pump size, reservoir size) is deliberately **not** built — see Task 181.
+  5. **The on-map labels legend gained Node labels / Link labels headings**, reusing the two keys
+     the Labels popover already has, emitted only when that group has a visible field. And the
+     Select-mode hint now reads "Click an element **or label** to view or edit it".
+
+- 0|179|[CC] **Tom's second review round on `lpn_`: reservoir-as-tank, head gain removed, pump
+  secrets squashed, collision strengths corrected, curve table headed — DONE 2026-07-30.** Five
+  pieces of test feedback, three of which reverse decisions made the day before. Recorded here
+  because the reversed decisions are written up as settled in Tasks 176 and 146.01, which are closed
+  blocks nobody re-reads.
+  1. **A Reservoir is also a Tank.** It now carries an **Elevation as well as a Head**, and the head
+     is **blank by default, meaning "same as the elevation"** (`reservoirHead()` in
+     `js/looped-network.js` is the single place that resolves it; the popup field shows the elevation
+     as its placeholder). Blank is stored as `undefined` rather than as a copy, so the two stay
+     linked — moving the reservoir's elevation moves its water surface with it until the user takes
+     control by typing a head. A reservoir's **pressure** is therefore now a real number
+     (head − elevation, `js/lpn-solver.js`'s report), zero only in the default case, and reservoirs
+     now participate in the Elevation and Pressure map labels and extrema. Networks saved before
+     this get `elev = head` on load, which reproduces their old behavior exactly (same fixed head,
+     zero pressure) rather than reinterpreting them as tanks standing on datum.
+  2. **"Head gain" is gone as a separate quantity** (Tom: "I don't think we need a separate Head
+     Gain. Negative head loss is fine."). This **reverses Task 176's item 2**, which had split
+     `headgain` into its own field, color, checkbox, legend row, and extrema bucket. A pump's
+     contribution is a **negative head loss**, reported under the same label, color, and extrema as
+     every other link. `lpn_result_headgain` deleted from `lib/lang.ec.en.php` and the pageConfig.
+     (The 176 split was not wrong about the *symptom* — a pump's gain swamping a pipe's fractional
+     loss on one shared min/max scale — but the answer was one field with a sign, not two fields.)
+  3. **The pump "loss" bug was a hidden curve, and nothing else** (Tom: "You got completely
+     distracted… just squash the secrets"). `addLink()` had been giving every new pump an invisible
+     150 gpm / 65 ft design point, so a pump silently delivered head the user never entered and then
+     behaved strangely once demand ran past that unseen curve. **A new pump now has no curve at
+     all** and neither adds nor loses head until one is typed in (`recomputePumpCurve()` sets
+     `h0 = a = 0`; `js/lpn-solver.js`'s pump branch gained an explicit no-curve case using the same
+     `gradMin` gradient floor the pipe branch already had, so a curveless pump solves as a plain
+     lossless connection instead of dividing by zero). That case is checked BEFORE the existing
+     "a pump pushed backwards is treated as closed" guard, which matters: with no curve and zero net
+     demand the flow settles around 1e-10 and wanders negative, and that guard's near-zero
+     `G = 1e-8` then floated the downstream junction 0.1 ft off the reservoir's head for no physical
+     reason. Without a curve there is no backwards to guard against. The Example network sets its pump's curve **explicitly**, as document content visible in
+     the popup, alongside the elevations and demands it already pre-fills. The
+     `pump-beyond-curve` diagnostic added the same day is **reverted entirely** — solver check,
+     status-line plumbing, and the `lpn_diag_pump_beyond_curve` string. With the curve no longer a
+     secret, a negative head at over-demand is simply the honest number the entered curve gives.
+     Verified numerically: curveless pump converges with 0.000 ft loss and full pass-through flow;
+     the 150/65 curve gives −77.04 ft (i.e. 77 ft of gain) at 100 gpm and +67.41 ft at 400 gpm, no
+     issues raised.
+  4. **Collision-avoidance strengths corrected to the ones Tom had already given: pipes 0, nodes
+     0.5, labels and leaders 1.** This **reverses the `LPN_LABEL_WEIGHT = {link: 0.5, node: 1}` cut**
+     in Task 146.01's follow-on, which misread the instruction as "node labels resist harder than
+     link labels." Node and link data labels are the same kind of object and now carry the same
+     strength. The strengths are **per obstacle, not per label type**, so obeying them meant the
+     pass had to start seeing objects it never had: it previously compared label boxes against label
+     boxes only. `runLabelCollisionAvoidance()` now also pushes a data label off **node symbols**
+     (0.5), **Text labels** (1), and **leader lines** (1) — leaders sampled into a chain of small
+     boxes (`pushLeaderSamples()`) so one overlap/push routine handles every obstacle, and rebuilt
+     each iteration because a leader follows its own label. A leader is exempt from its own label
+     (`owner`), or it would push it a little farther away forever. **Pipes are absent by design**,
+     not present with a zero — a number sitting on a pipe still reads fine. Only data labels move;
+     everything else is immovable, so the pair loop now runs over labels × everything instead of
+     everything × everything.
+  5. **The pump curve entry is a real table with real headings** (Flow, Head), `.lpn-curve-table` in
+     `css/engcalcs.css`. The point rows had been two unlabelled number boxes whose only clue as to
+     which was which lived in a `title=` tooltip — invisible on touch.
+  **One unrelated bug fixed in passing:** `loadFromStorage()` merged `labelSettings` with a
+  top-level `Object.assign`, which swaps in the saved `{node:…}`/`{link:…}` sub-objects whole — so
+  any toggle added after a user's last save (`gradient`, and every future one) came back `undefined`
+  instead of at its default. The comment above it already explained why that is wrong; the merge
+  just needed to go one level deeper.
+
 - 0|146.01|[CC] **Draggable data labels on leaders + collision avoidance + background mask —
   DONE 2026-07-30.** A node's id/elev/demand/... label and a link's id/diameter/length/... label
   (previously fixed at a hardcoded +2,-2 offset) now carry an optional `n.lx/n.ly` (or `l.lx/l.ly`)
@@ -727,6 +1041,10 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
   physically meaningful (ID/Head for a reservoir; ID/Flow/Head-gain for a pump) and are already
   excluded where it isn't (Elevation/Demand for a reservoir; Diameter/Length/Velocity for a pump) —
   no design change needed there, just the Velocity bug above.
+  **Superseded in two places by Task 179 (2026-07-30):** a reservoir now HAS an elevation and a
+  pressure (so both apply to it), and "Head gain" no longer exists as a field. The
+  per-label collision WEIGHTS added in this pass (`link: 0.5, node: 1`) were a misreading and are
+  replaced there by per-OBSTACLE strengths — pipes 0, nodes 0.5, labels and leaders 1.
 
 - 0|146.03|[CC] **Text label custom size multiplier — DONE 2026-07-29.** Per-label `sizeMult`
   (default 1) stacks on top of the shared `settings.textSize`/`settings.textSizeUnits` via
@@ -756,6 +1074,9 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
      entry/checkbox/legend row, own extrema bucket computed from pump links only (`headloss`'s
      extrema now excludes pump links symmetrically). `lpn_result_headgain` already existed as a lang
      key from the popup; no new translation needed for this fix, only new plumbing.
+     **REVERSED 2026-07-30 by Task 179** — Tom: "I don't think we need a separate Head Gain.
+     Negative head loss is fine." There is no `headgain` field, color, checkbox, or extrema bucket
+     any more, and `lpn_result_headgain` is deleted.
   3. **Node Demand and Link Flow now share one color** (`#1565c0`, was `#6a1b9a` for Demand) —
      both are the same physical quantity, Q, so the Labels-panel legend should read them as one
      concept rather than two unrelated numbers that happen to both be flow rates.

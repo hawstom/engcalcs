@@ -39,30 +39,99 @@ var EngCalcs = EngCalcs || {};
 		return base * (mult || 1);
 	}
 	function effectiveLineHeight() { return effectiveFontSize() * 1.2; }
+	// Everything on the map that is drawn at a fixed world size was drawn for the DEFAULT text size,
+	// so it is expressed as "base dimension x textFactor()" -- 1 at the default, and tracking the
+	// user's Text size (and, in 'screen' units, the zoom) everywhere else. Used by the extrema
+	// badges, the leader threshold, the default label offset, and -- multiplied by the user's own
+	// symbolScale -- every symbol; see symbolFactor().
+	var LPN_BASE_TEXT_SIZE = 2.5; // defaultSettings().textSize
+	function textFactor(mult) { return effectiveFontSize(mult) / LPN_BASE_TEXT_SIZE; }
 
 	// ---- Task 146.01: draggable node/link data labels (leader lines + collision avoidance + mask) ----
 	// A node/link's data label sits at a small fixed offset from its anchor (id/elev/demand/... text
 	// beside the symbol) unless the user drags it -- n.lx/n.ly (or l.lx/l.ly) then record that as an
 	// explicit offset, persisted with the element like any other property. undefined means "still at
 	// the default" so an old saved network (no lx/ly at all) renders identically to before this task.
+	// Scaled with the symbols, not fixed (Tom, 2026-07-30): the offset exists to clear the node or
+	// pipe the label belongs to, so at 2x symbols a fixed +2,-2 would start the label inside its own
+	// node. A label the user has DRAGGED keeps the exact offset they dropped it at (n.lx/n.ly are
+	// absolute world units) -- only the resting position follows the size.
 	var DEFAULT_LABEL_OFFSET = { x: 2, y: -2 };
-	// Past this world-unit distance between the anchor point and the label's rendered position (drag
-	// OR automatic collision-avoidance nudge -- whichever pushed it there), a leader line is drawn so
-	// the label still reads as belonging to its anchor. Comfortably above the default offset's own
-	// resting distance (hypot(2,2) ~= 2.8) so an untouched label never shows one.
-	var LABEL_LEADER_THRESHOLD = 4;
-	function nodeLabelBase(n) {
-		return { x: n.x + (n.lx !== undefined ? n.lx : DEFAULT_LABEL_OFFSET.x),
-			y: n.y + (n.ly !== undefined ? n.ly : DEFAULT_LABEL_OFFSET.y) };
+	function defaultLabelOffset() {
+		var k = symbolFactor();
+		return { x: DEFAULT_LABEL_OFFSET.x * k, y: DEFAULT_LABEL_OFFSET.y * k };
 	}
+	// Past this distance between the anchor point and the label's rendered position (drag OR
+	// automatic collision-avoidance nudge -- whichever pushed it there), a leader line is drawn so
+	// the label still reads as belonging to its anchor. Comfortably above the default offset's own
+	// resting distance (hypot(2,2) ~= 2.8) so an untouched label never shows one -- which is only
+	// true if it scales with that offset, hence textFactor() (Tom, 2026-07-30: "leader toggle
+	// decision distance isn't scaling, I think"). Text rather than symbol factor: what the threshold
+	// is really protecting is the reader's ability to tie a number back to its element by proximity,
+	// and that judgment is made at the scale of the text.
+	var LABEL_LEADER_THRESHOLD = 4;
+	function leaderThreshold() { return LABEL_LEADER_THRESHOLD * Math.max(textFactor(), symbolFactor()); }
+	function nodeLabelBase(n) {
+		var d = defaultLabelOffset();
+		return { x: n.x + (n.lx !== undefined ? n.lx : d.x),
+			y: n.y + (n.ly !== undefined ? n.ly : d.y) };
+	}
+	// The point a fraction `f` of the way along the WHOLE polyline, by arc length -- not the
+	// midpoint of some chosen segment. Returns the point plus the along-distance it sits at, so
+	// callers can reason about spacing between things placed on the same link.
+	function pointAlongLink(l, f) {
+		var pts = [nodeById(l.from)].concat(l.verts, [nodeById(l.to)]), segs = [], total = 0, i, d, want, run;
+		for (i = 0; i < pts.length - 1; i++) {
+			d = Math.hypot(pts[i + 1].x - pts[i].x, pts[i + 1].y - pts[i].y);
+			segs.push(d); total += d;
+		}
+		if (!(total > 0)) { return { x: pts[0].x, y: pts[0].y, dist: 0, total: 0 }; }
+		want = f * total; run = 0;
+		for (i = 0; i < segs.length; i++) {
+			if (run + segs[i] >= want || i === segs.length - 1) {
+				var t = segs[i] > 0 ? (want - run) / segs[i] : 0;
+				t = Math.max(0, Math.min(1, t));
+				return {
+					x: pts[i].x + (pts[i + 1].x - pts[i].x) * t,
+					y: pts[i].y + (pts[i + 1].y - pts[i].y) * t,
+					dist: want, total: total
+				};
+			}
+			run += segs[i];
+		}
+		return { x: pts[0].x, y: pts[0].y, dist: 0, total: total };
+	}
+	// A link's label anchors at the halfway point OF THE WHOLE PIPE, measured along its length
+	// (Tom, 2026-07-30: "link label is placing within last segment instead of overall length. Not
+	// good."). The old version took the midpoint of the middle SEGMENT, which on a bent pipe with an
+	// even segment count is nowhere near halfway along the pipe -- on a two-segment link it landed
+	// in the middle of the second leg.
+	var LINK_LABEL_ALONG = 0.5;
+	// ...then stepped away from any flow arrow it would land on top of ("but don't conflict with an
+	// arrow"). Arrows sit at ARROW_ALONG of each SEGMENT, so on some geometries the two coincide.
+	// The label moves along the pipe rather than off it, keeping it on the thing it labels, and is
+	// clamped well inside the ends so it never crowds a node.
 	function linkLabelMid(l) {
-		var segCount = l.verts.length + 1, midIdx = Math.floor(segCount / 2);
-		return segmentMidpoints(l)[midIdx];
+		var here = pointAlongLink(l, LINK_LABEL_ALONG);
+		if (!(here.total > 0)) { return here; }
+		var clear = (ARROW_NOMINAL_LEN * symbolFactor()) * 1.5,
+			arrows = arrowAlongDistances(l), i, f;
+		for (i = 0; i < arrows.length; i++) {
+			if (Math.abs(arrows[i] - here.dist) >= clear) { continue; }
+			// Step to whichever side of this arrow is farther from the pipe's own ends, so the
+			// dodge never pushes the label off the end of a short pipe.
+			f = (arrows[i] > here.dist)
+				? (arrows[i] - clear) / here.total
+				: (arrows[i] + clear) / here.total;
+			f = Math.max(0.12, Math.min(0.88, f));
+			return pointAlongLink(l, f);
+		}
+		return here;
 	}
 	function linkLabelBase(l) {
-		var mid = linkLabelMid(l);
-		return { x: mid.x + (l.lx !== undefined ? l.lx : DEFAULT_LABEL_OFFSET.x),
-			y: mid.y + (l.ly !== undefined ? l.ly : DEFAULT_LABEL_OFFSET.y) };
+		var mid = linkLabelMid(l), d = defaultLabelOffset();
+		return { x: mid.x + (l.lx !== undefined ? l.lx : d.x),
+			y: mid.y + (l.ly !== undefined ? l.ly : d.y) };
 	}
 	// Final rendered offset from the anchor = the persisted drag offset (or default) PLUS this
 	// element's current collision-avoidance nudge (0,0 for a manually-dragged label -- see
@@ -91,7 +160,7 @@ var EngCalcs = EngCalcs || {};
 		if (!holder.leader) { return; }
 		if (holder.empty) { holder.leader.style.display = 'none'; return; }
 		var d = Math.hypot(pos.x - anchor.x, pos.y - anchor.y);
-		if (d <= LABEL_LEADER_THRESHOLD) { holder.leader.style.display = 'none'; return; }
+		if (d <= leaderThreshold()) { holder.leader.style.display = 'none'; return; }
 		var halfW = holder.tw / 2, boxCenterX = pos.x + halfW, offset = boxCenterX - anchor.x,
 			trigger = halfW * (1 - 2 * ADVERSE_FRAC);
 		if (!holder.side) { holder.side = 'right'; }
@@ -172,71 +241,164 @@ var EngCalcs = EngCalcs || {};
 		layoutLinkLabel(id);
 		scheduleSolve();
 	}
-	// Automatic conflict avoidance (Task 146.01): nudges any two overlapping node/link data labels
-	// apart along whichever axis has the smaller overlap, a few iterations toward a stable layout.
+	// Automatic conflict avoidance (Task 146.01): nudges a node/link data label off whatever it
+	// overlaps -- another label, a node symbol, a Text label, or a leader line -- along whichever
+	// axis has the smaller overlap, a few iterations toward a stable layout. Only data labels ever
+	// move; everything else is an immovable obstacle.
 	// A MANUALLY dragged label (n.lx/l.lx defined) never moves -- it still blocks others (its box is
 	// still checked), but only an auto-placed label absorbs the push, so a deliberate drag is never
 	// silently undone by this pass. Nudges are transient (recomputed every refreshLabelText() call,
 	// never written into n.lx/l.ly), so they are not undo-tracked or persisted -- only an actual
 	// user drag is.
-	// Per-type "resistance to being nudged" (Tom, 2026-07-30: node/link labels previously pushed
-	// each other with identical, undifferentiated 50/50 force -- both PARTICIPATED already, but
-	// with no notion that a node's label is normally denser/more central to the reader's attention
-	// than a pipe's). A box's push SHARE is proportional to the OTHER box's weight (heavier
-	// = moves the other box more, but itself moves less) -- see the loop below. A manually-dragged
-	// label (a real leader already drawn to it) gets a very large weight rather than a special-
-	// cased boolean, so "practically immovable" falls out of the same formula instead of being a
-	// second code path.
-	var LPN_LABEL_WEIGHT = { link: 0.5, node: 1, manual: 1000 };
+	// Per-OBJECT repel strength -- how hard a given thing on the map pushes a label out of itself
+	// (Tom, 2026-07-30, restating the strengths he had already given after an earlier cut misread
+	// them as "node labels resist harder than link labels"):
+	//   pipe   0    -- a pipe never pushes a label at all. Pipe routes cross the whole drawing and a
+	//                  number sitting on one still reads perfectly well, so pipes are simply left out
+	//                  of the pass below rather than added with a zero that can never do anything.
+	//   node   0.5  -- a node SYMBOL pushes at half strength: worth stepping off, but not worth
+	//                  flinging a label across the map to avoid.
+	//   label  1    -- another label pushes at full strength. Text over text is the unreadable case.
+	//   leader 1    -- so does a leader LINE: a rule drawn straight through a number is just as bad.
+	// Node data labels and link data labels are the same kind of object and therefore carry the same
+	// strength (1); there is no node-vs-link distinction here.
+	// A box's push SHARE is proportional to the OTHER object's strength, so two labels split a
+	// separation 50/50 while an immovable obstacle (node symbol, leader, or a manually-dragged label)
+	// absorbs none of it. A manually-dragged label is flagged immovable AND given a very large
+	// strength, so "practically immovable" falls out of the same formula instead of being a second
+	// code path.
+	var LPN_COLLIDE_WEIGHT = { pipe: 0, node: 0.5, label: 1, leader: 1, manual: 1000 };
+	// A leader line is sampled into a chain of small boxes rather than intersected analytically --
+	// the same overlap/push code then handles it with no second geometry path. The step is well
+	// under a label box's smallest dimension, so a box cannot slip between two samples; the cap
+	// keeps a very long leader from generating an unbounded chain.
+	var LEADER_SAMPLE_STEP = 0.5, LEADER_SAMPLE_MAX = 60, LEADER_SAMPLE_HALF = 0.15;
+	// owner is the holder whose OWN label this leader belongs to -- that one label is exempt below,
+	// or the leader (which by construction ends on the label's near edge) would push its own label
+	// a little farther away on every iteration, forever.
+	function pushLeaderSamples(out, ax, ay, bx, by, owner) {
+		var len = Math.hypot(bx - ax, by - ay), i, t,
+			n = Math.min(LEADER_SAMPLE_MAX, Math.max(1, Math.ceil(len / LEADER_SAMPLE_STEP)));
+		for (i = 0; i <= n; i++) {
+			t = i / n;
+			out.push({
+				ref: null, owner: owner || null, movable: false, weight: LPN_COLLIDE_WEIGHT.leader,
+				base: { x: ax + (bx - ax) * t - LEADER_SAMPLE_HALF, y: ay + (by - ay) * t - LEADER_SAMPLE_HALF },
+				yOff: 0, w: LEADER_SAMPLE_HALF * 2, h: LEADER_SAMPLE_HALF * 2
+			});
+		}
+	}
+	// Top-left corner of a box at its CURRENT position: the persisted/default base, plus this
+	// element's live nudge (movable labels only), plus the box's own baseline-to-top offset.
+	function collideBoxTopLeft(b) {
+		var nx = b.ref ? b.ref.nudge.x : 0, ny = b.ref ? b.ref.nudge.y : 0;
+		return { x: b.base.x + nx, y: b.base.y + ny + b.yOff };
+	}
+	// Every leader currently drawn, as sample boxes -- recomputed inside the relaxation loop because
+	// a leader follows its own label: nudging the label moves the line, which changes what that line
+	// collides with. Mirrors updateDataLeader()/updateLabelGeometry()'s own geometry, minus the
+	// side-flip hysteresis (which needs render state and cannot change the line by more than the
+	// label's own width).
+	function currentLeaderBoxes() {
+		var out = [];
+		function dataLeader(holder, anchor, pos) {
+			if (!holder || holder.empty) { return; }
+			if (Math.hypot(pos.x - anchor.x, pos.y - anchor.y) <= leaderThreshold()) { return; }
+			var right = (pos.x + holder.tw / 2) >= anchor.x;
+			pushLeaderSamples(out, anchor.x, anchor.y, right ? pos.x : pos.x + holder.tw, pos.y, holder);
+		}
+		doc.nodes.forEach(function (n) { dataLeader(nodeEls[n.id], { x: n.x, y: n.y }, nodeLabelPos(n)); });
+		doc.links.forEach(function (l) { dataLeader(linkEls[l.id], linkLabelMid(l), linkLabelPos(l)); });
+		doc.labels.forEach(function (lb) {
+			var le = labelEls[lb.id], an = lb.anchorNode ? nodeById(lb.anchorNode) : null;
+			if (!le || !an) { return; }
+			var halfW = le.width / 2, px = an.x + lb.x, py = an.y + lb.y;
+			pushLeaderSamples(out, an.x, an.y, lb.x >= 0 ? px - halfW : px + halfW, py, null);
+		});
+		return out;
+	}
+	// Immovable, non-leader obstacles: node symbols (strength 0.5) and Text labels (strength 1,
+	// since a Text is a label the user placed deliberately -- a data label yields to it, never the
+	// reverse). Pipes are absent by design; see LPN_COLLIDE_WEIGHT above.
+	function staticObstacleBoxes() {
+		var out = [];
+		doc.nodes.forEach(function (n) {
+			var r = nodeRadius(n);
+			out.push({
+				ref: null, owner: null, movable: false, weight: LPN_COLLIDE_WEIGHT.node,
+				base: { x: n.x - r, y: n.y - r }, yOff: 0, w: r * 2, h: r * 2
+			});
+		});
+		doc.labels.forEach(function (lb) {
+			var le = labelEls[lb.id]; if (!le) { return; }
+			var an = lb.anchorNode ? nodeById(lb.anchorNode) : null,
+				cx = an ? an.x + lb.x : lb.x, cy = an ? an.y + lb.y : lb.y,
+				h = effectiveFontSize(lb.sizeMult) * 1.2;
+			out.push({
+				ref: null, owner: null, movable: false, weight: LPN_COLLIDE_WEIGHT.label,
+				base: { x: cx - le.width / 2, y: cy - h / 2 }, yOff: 0, w: le.width, h: h
+			});
+		});
+		return out;
+	}
 	function runLabelCollisionAvoidance() {
-		var fs = effectiveFontSize(), boxes = [], i, j, iter, moved;
+		var fs = effectiveFontSize(), labels = [], statics = staticObstacleBoxes(), boxes, i, j, iter, moved;
+		function addDataLabel(holder, base, manual, lineCount) {
+			// Every nudge is cleared and re-derived from scratch on every pass, manual or not, so the
+			// pass is IDEMPOTENT: running it twice on an unchanged drawing gives the same answer as
+			// running it once. It used to keep an auto label's previous nudge and push further from
+			// there, which meant a label stayed pushed long after whatever it collided with had moved
+			// away, and made re-running it during a drag (which is what makes collisions and leaders
+			// track a label being dragged, Tom 2026-07-30) accumulate drift on every frame.
+			holder.nudge = { x: 0, y: 0 };
+			if (holder.empty) { return; } // nothing rendered -- no box to collide with
+			labels.push({
+				ref: holder, owner: null, movable: !manual,
+				weight: manual ? LPN_COLLIDE_WEIGHT.manual : LPN_COLLIDE_WEIGHT.label,
+				base: base, yOff: -fs * 0.85, w: holder.tw, h: dataLabelBoxHeight(lineCount)
+			});
+		}
 		doc.nodes.forEach(function (n) {
 			var ne = nodeEls[n.id]; if (!ne) { return; }
-			var manual = n.lx !== undefined;
-			if (manual) { ne.nudge = { x: 0, y: 0 }; } else if (!ne.nudge) { ne.nudge = { x: 0, y: 0 }; }
-			if (ne.empty) { return; } // nothing rendered -- no box to collide with
-			boxes.push({
-				ref: ne, base: nodeLabelBase(n), w: ne.tw, h: dataLabelBoxHeight(ne.lineCount),
-				manual: manual, weight: manual ? LPN_LABEL_WEIGHT.manual : LPN_LABEL_WEIGHT.node
-			});
+			addDataLabel(ne, nodeLabelBase(n), n.lx !== undefined, ne.lineCount);
 		});
 		doc.links.forEach(function (l) {
 			var le = linkEls[l.id]; if (!le) { return; }
-			var manual = l.lx !== undefined;
-			if (manual) { le.nudge = { x: 0, y: 0 }; } else if (!le.nudge) { le.nudge = { x: 0, y: 0 }; }
-			if (le.empty) { return; }
-			boxes.push({
-				ref: le, base: linkLabelBase(l), w: le.tw, h: dataLabelBoxHeight(le.lineCount),
-				manual: manual, weight: manual ? LPN_LABEL_WEIGHT.manual : LPN_LABEL_WEIGHT.link
-			});
+			addDataLabel(le, linkLabelBase(l), l.lx !== undefined, le.lineCount);
 		});
 		for (iter = 0; iter < 4; iter++) {
 			moved = false;
-			for (i = 0; i < boxes.length; i++) {
+			// Leaders are rebuilt every iteration (they track their labels); node symbols and Text
+			// labels do not move, so they are built once above.
+			// The label boxes are first in `boxes`, so an outer loop over just those, with the inner
+			// loop starting at i+1, visits every label-label pair exactly once and every
+			// label-obstacle pair exactly once, and never wastes a comparison on two obstacles
+			// (neither of which could move anyway).
+			boxes = labels.concat(statics, currentLeaderBoxes());
+			for (i = 0; i < labels.length; i++) {
 				for (j = i + 1; j < boxes.length; j++) {
 					var A = boxes[i], B = boxes[j];
-					if (A.manual && B.manual) { continue; } // both practically immovable; skip rather than spin
-					var Ax = A.base.x + A.ref.nudge.x, Ay = A.base.y + A.ref.nudge.y;
-					var Bx = B.base.x + B.ref.nudge.x, By = B.base.y + B.ref.nudge.y;
-					var Atop = Ay - fs * 0.85, Btop = By - fs * 0.85;
-					var overlapX = Math.min(Ax + A.w, Bx + B.w) - Math.max(Ax, Bx);
-					var overlapY = Math.min(Atop + A.h, Btop + B.h) - Math.max(Atop, Btop);
+					if (!A.movable && !B.movable) { continue; } // nothing can absorb the push; skip rather than spin
+					if (B.owner === A.ref) { continue; }        // a label never collides with its own leader
+					var At = collideBoxTopLeft(A), Bt = collideBoxTopLeft(B);
+					var overlapX = Math.min(At.x + A.w, Bt.x + B.w) - Math.max(At.x, Bt.x);
+					var overlapY = Math.min(At.y + A.h, Bt.y + B.h) - Math.max(At.y, Bt.y);
 					if (overlapX <= 0 || overlapY <= 0) { continue; }
 					moved = true;
-					// A's share of the separation is proportional to B's weight (and vice versa) --
-					// a heavier box moves the lighter one more than it moves itself. Both shares sum
-					// to the full overlap plus a hair of margin, same as the old fixed 50/50 split.
+					// A's share of the separation is proportional to B's strength (and vice versa) --
+					// a stronger object moves the other one more than it moves itself.
 					var wSum = A.weight + B.weight;
+					if (wSum <= 0) { continue; }
 					if (overlapX < overlapY) {
 						var shareAx = (overlapX + 0.1) * B.weight / wSum, shareBx = (overlapX + 0.1) * A.weight / wSum;
-						var dirX = (Ax + A.w / 2 <= Bx + B.w / 2) ? -1 : 1;
-						if (!A.manual) { A.ref.nudge.x += dirX * shareAx; }
-						if (!B.manual) { B.ref.nudge.x -= dirX * shareBx; }
+						var dirX = (At.x + A.w / 2 <= Bt.x + B.w / 2) ? -1 : 1;
+						if (A.movable) { A.ref.nudge.x += dirX * shareAx; }
+						if (B.movable) { B.ref.nudge.x -= dirX * shareBx; }
 					} else {
 						var shareAy = (overlapY + 0.1) * B.weight / wSum, shareBy = (overlapY + 0.1) * A.weight / wSum;
-						var dirY = (Atop + A.h / 2 <= Btop + B.h / 2) ? -1 : 1;
-						if (!A.manual) { A.ref.nudge.y += dirY * shareAy; }
-						if (!B.manual) { B.ref.nudge.y -= dirY * shareBy; }
+						var dirY = (At.y + A.h / 2 <= Bt.y + B.h / 2) ? -1 : 1;
+						if (A.movable) { A.ref.nudge.y += dirY * shareAy; }
+						if (B.movable) { B.ref.nudge.y -= dirY * shareBy; }
 					}
 				}
 			}
@@ -270,15 +432,22 @@ var EngCalcs = EngCalcs || {};
 	// KISSES the rail it points at (the visible tip lands on that rail's near edge without crossing
 	// it) and its two legs splay from there back toward the digit, between the rails. A single
 	// connected mark, rail-then-caret, not two marks with daylight between them.
+	// Every dimension below is per unit of TEXT FACTOR (textFactor(), = 1 at the default 2.5 text
+	// size), not a fixed world size: the badge decorates a number, so it has to grow and shrink with
+	// that number or it stops reading as part of it (Tom, 2026-07-30: "extrema indicators aren't
+	// scaling"). The rise/drop constants below were already × font size; these were the ones that
+	// were not.
 	var TICK_STROKE = 0.3;
 	var CARET_LEG_DROP = 0.45; // vertex-to-leg-end vertical size of the caret itself
 	var CARET_LEG_HALF = 0.5;  // vertex-to-leg-end horizontal half-width
 	var TICK_LENGTH = 1.6;
+	var TICK_GAP = 0.3;        // digits-to-rail gap
 	// A stroked polyline's mitered vertex extends past its GEOMETRIC vertex by
 	// halfWidth / sin(half-angle between the legs) -- so a vertex placed exactly on the tick pokes
 	// visibly through it (Tom, 2026-07-30: "the points of the chevrons are extending past the
 	// lines"). Backing the vertex off by that overshoot plus the tick's own half-width puts the tip
-	// on the tick's near edge instead.
+	// on the tick's near edge instead. Scale-free (a ratio of two lengths that scale together), so
+	// it is still computed once.
 	var CARET_TIP_INSET = (TICK_STROKE / 2) *
 		(Math.sqrt(CARET_LEG_HALF * CARET_LEG_HALF + CARET_LEG_DROP * CARET_LEG_DROP) / CARET_LEG_HALF) +
 		TICK_STROKE / 2;
@@ -292,36 +461,40 @@ var EngCalcs = EngCalcs || {};
 		if (holder.tickEls) { holder.tickEls.forEach(function (t) { t.remove(); }); }
 		holder.tickEls = [];
 		var x = +textEl.getAttribute('x'), baseY = +textEl.getAttribute('y'), fs = effectiveFontSize(),
+			tf = textFactor(), stroke = TICK_STROKE * tf,
 			i, tspan, width, y, lineY, yHigh, yLow, x0, x1, dir, vertexY, legY, vertexX, chevronPts;
 		for (i = 0; i < lines.length; i++) {
 			if (!lines[i].decoration) { continue; }
 			tspan = textEl.childNodes[i];
 			try { width = tspan.getComputedTextLength(); } catch (err) { width = 0; }
-			x0 = x + width + 0.3; x1 = x0 + TICK_LENGTH;
+			x0 = x + width + TICK_GAP * tf; x1 = x0 + TICK_LENGTH * tf;
 			// dir points from the marked rail back toward the baseline -- down for a "high" mark
 			// (which nests under the top rail), up for a "low" one (which nests over the bottom rail).
 			dir = lines[i].decoration === 'high' ? 1 : -1;
 			lineY = baseY + i * effectiveLineHeight();
 			yHigh = lineY - fs * TICK_HIGH_RISE;
-			yLow = lineY + 0.2 - fs * TICK_LOW_DROP;
+			yLow = lineY + 0.2 * tf - fs * TICK_LOW_DROP;
 			// BOTH rails are drawn on every mark (Tom, 2026-07-30) -- the badge's footprint is then
 			// identical for a max and a min, so the only thing the eye decodes is which way the
 			// chevron points, an absolute judgment. The earlier single-rail design asked the reader to
 			// judge where one line sat relative to digits it wasn't touching, a relative one.
 			y = lines[i].decoration === 'high' ? yHigh : yLow;
 			holder.tickEls.push(el('line', {
-				x1: x0, y1: yHigh, x2: x1, y2: yHigh, stroke: lines[i].color || '#000', 'stroke-width': TICK_STROKE
+				x1: x0, y1: yHigh, x2: x1, y2: yHigh, stroke: lines[i].color || '#000',
+				'stroke-width': stroke, 'class': 'lpn-tick'
 			}, layer));
 			holder.tickEls.push(el('line', {
-				x1: x0, y1: yLow, x2: x1, y2: yLow, stroke: lines[i].color || '#000', 'stroke-width': TICK_STROKE
+				x1: x0, y1: yLow, x2: x1, y2: yLow, stroke: lines[i].color || '#000',
+				'stroke-width': stroke, 'class': 'lpn-tick'
 			}, layer));
-			vertexY = y + dir * CARET_TIP_INSET;
-			legY = vertexY + dir * CARET_LEG_DROP;
+			vertexY = y + dir * CARET_TIP_INSET * tf;
+			legY = vertexY + dir * CARET_LEG_DROP * tf;
 			vertexX = (x0 + x1) / 2;
-			chevronPts = (vertexX - CARET_LEG_HALF) + ',' + legY + ' ' + vertexX + ',' + vertexY + ' ' +
-				(vertexX + CARET_LEG_HALF) + ',' + legY;
+			chevronPts = (vertexX - CARET_LEG_HALF * tf) + ',' + legY + ' ' + vertexX + ',' + vertexY + ' ' +
+				(vertexX + CARET_LEG_HALF * tf) + ',' + legY;
 			holder.tickEls.push(el('polyline', {
-				points: chevronPts, fill: 'none', stroke: lines[i].color || '#000', 'stroke-width': TICK_STROKE
+				points: chevronPts, fill: 'none', stroke: lines[i].color || '#000',
+				'stroke-width': stroke, 'class': 'lpn-tick'
 			}, layer));
 		}
 	}
@@ -377,7 +550,12 @@ var EngCalcs = EngCalcs || {};
 		// a considered choice about what's actually useful to see on first load.
 		return {
 			node: { id: true, elev: true, demand: true, head: false, pressure: true },
-			link: { id: true, diameter: false, length: false, flow: true, velocity: true, headloss: false, headgain: false, gradient: false }
+			// Every INPUT property a link carries is offered, not just the ones a result depends on
+			// (Tom, 2026-07-30: "add all input properties to the Labels choices") -- roughness and
+			// the minor-loss coefficient are typed per pipe and are exactly the numbers you want to
+			// see spread across a drawing when checking someone's model. Off by default, like the
+			// other inputs: turning every one on by default would bury the results.
+			link: { id: true, diameter: false, length: false, roughness: false, km: false, flow: true, velocity: true, headloss: false, gradient: false }
 		};
 	}
 	var labelSettings = defaultLabelSettings();
@@ -402,6 +580,9 @@ var EngCalcs = EngCalcs || {};
 			// specific fitting -- editable per-pipe in its popup, same as diameter/roughness.
 			kmDefault: 2,
 			textSize: 2.5, // world units -- the original fixed LABEL_FONT_SIZE constant's value
+			symbolScale: 1, // symbol size relative to text size -- see symbolFactor() above
+			symbolOpacity: 1, // 0-1, applied to symbols only (never labels) -- see refreshSymbolSizes()
+			backdropOpacity: 1, // 0-1, applied to the backdrop image -- the other half of the same control
 			textSizeUnits: 'map', // 'map' | 'screen' -- see effectiveFontSize() above
 			legendPosition: 'top-right', // one of LEGEND_POSITIONS' keys below -- matches the original hardcoded CSS
 			mapHeight: 500 // px -- the original fixed <svg height="500"> value; see applyMapHeight()
@@ -427,13 +608,13 @@ var EngCalcs = EngCalcs || {};
 	// demand and flow share one color (Tom, 2026-07-30): both are a flow rate, Q -- a node's demand
 	// IS the flow leaving the network at that point, so the legend should read them as the same
 	// quantity, not as two unrelated fields that happen to both be numbers.
-	// headgain (Tom, 2026-07-30: a pump's contribution was showing under the "Head loss" legend/
-	// color/extrema, reading as if the pump LOSES ~77 ft when it actually GAINS it) is its own field,
-	// separate color, and separate extrema bucket from headloss -- see refreshLabelText() below.
+	// There is no separate head-GAIN field or color (Tom, 2026-07-30: "I don't think we need a
+	// separate Head Gain. Negative head loss is fine."): a pump's contribution is reported as a
+	// negative head loss, under the same label, color, and extrema bucket as every other link.
 	var lpnFieldColors = {
 		id: '#000', elev: '#8b5a2b', demand: '#1565c0', head: '#00838f', pressure: '#455a64',
-		diameter: '#bf4b2b', length: '#2e7d32', flow: '#1565c0', velocity: '#ad1457', headloss: '#4527a0',
-		headgain: '#00695c', gradient: '#8e24aa'
+		diameter: '#bf4b2b', length: '#2e7d32', roughness: '#00695c', km: '#827717',
+		flow: '#1565c0', velocity: '#ad1457', headloss: '#4527a0', gradient: '#8e24aa'
 	};
 
 	function el(tag, attrs, parent) {
@@ -471,6 +652,15 @@ var EngCalcs = EngCalcs || {};
 		}
 		return best;
 	}
+	// A reservoir's effective fixed head: whatever the user typed, or -- when that field is blank --
+	// its own elevation (Tom, 2026-07-30). Blank is stored as undefined rather than as a copy of the
+	// elevation, so the two stay linked: moving the reservoir's elevation moves its water surface
+	// with it until the user takes control by typing a head. Every consumer (the solver model, the
+	// map labels, the popup) goes through this one function so "blank means elevation" is stated
+	// once instead of being re-derived at each call site.
+	function reservoirHead(n) {
+		return (n.head === undefined || n.head === null || n.head === '') ? (n.elev || 0) : n.head;
+	}
 	function linkById(id) {
 		var i;
 		for (i = 0; i < doc.links.length; i++) { if (doc.links[i].id === id) { return doc.links[i]; } }
@@ -487,7 +677,14 @@ var EngCalcs = EngCalcs || {};
 	}
 	function recomputePumpCurve(l) {
 		var pts = resolveCurvePoints(l);
-		if (pts.length === 0) { pts = [[0, 0]]; } // defensive only -- the popup requires point 1
+		if (pts.length === 0) {
+			// No curve entered yet: h0 = a = 0, so H = h0 - a Q^b is identically zero and the pump
+			// is simply a connection that neither adds nor loses head. The solver has its own
+			// gradient floor for this (see the pump branch of lpnAssemble), so a curveless pump
+			// behaves like a very short, very smooth pipe rather than dividing by zero.
+			l.h0 = 0; l.a = 0; l.b = 2;
+			return;
+		}
 		var curve = EngCalcs.lpnPumpFromCurve(pts);
 		l.h0 = curve.h0; l.a = curve.a; l.b = curve.b;
 	}
@@ -519,7 +716,48 @@ var EngCalcs = EngCalcs || {};
 	// elements incident to what moved keeps drag at the display's real refresh rate.
 	var nodeEls = {}, linkEls = {}, labelEls = {}, incidentLinks = {}, labelsByAnchor = {};
 
-	function nodeRadius(n) { return n.type === 'reservoir' ? 2.2 : 1.6; }
+	// Symbol size (Tom, 2026-07-30: "we need a symbol size and units setting too"). Deliberately
+	// NOT a second size-and-units pair: symbols are sized RELATIVE TO THE TEXT, so they inherit the
+	// text's map-vs-screen units for free and there is only one place to change how big everything
+	// on the map is. settings.symbolScale is the "relative to text" multiplier on top of that, so
+	// 1 reproduces exactly the fixed sizes that shipped before this setting existed.
+	// A per-element breakdown (separate pipe width, node size, pump size, reservoir size) is the
+	// obvious next step and is deliberately not built yet -- this is the two-dimensional control
+	// Tom asked for, with the fine-grained one left for when someone actually needs it.
+	function symbolFactor() {
+		return textFactor() * (settings.symbolScale > 0 ? settings.symbolScale : 1);
+	}
+	function nodeRadius(n) { return (n.type === 'reservoir' ? 2.2 : 1.6) * symbolFactor(); }
+	var VERTEX_HANDLE_R = 0.45;
+	// Stroke widths (pipe, node outline, arrow, vertex handle, leader, rubber band) live in
+	// css/engcalcs.css, so they read this one custom property rather than being set per element
+	// from here -- see the .lpn-* rules there. Node/vertex radii and the arrow chevron are geometry
+	// attributes, so those are re-applied in JS below.
+	function refreshSymbolSizes() {
+		var k = symbolFactor(), op = settings.symbolOpacity;
+		svg.style.setProperty('--lpn-sym', k);
+		// Symbols only, never labels or their masks (Tom, 2026-07-30: "symbols opacity would be a
+		// very nice setting during layout") -- the point is to see the backdrop THROUGH the network
+		// while placing it against an aerial or a plan, and fading the numbers at the same time
+		// would defeat the reason you are looking at both together.
+		svg.style.setProperty('--lpn-opacity', (op === undefined || op === null) ? 1 : op);
+		// Backdrop fade, the other half of the same idea (Tom, 2026-07-30: "my backdrop is busy and
+		// dark… I can't see my pipes and flow arrows"). Fading the REFERENCE material rather than
+		// thickening the drawing is the standard move in every CAD and GIS tool (AutoCAD's image
+		// fade, a QGIS layer's transparency) for exactly this situation, and unlike a heavier stroke
+		// it changes nothing about the network itself -- so a drawing tuned against a busy aerial
+		// still prints and reads correctly on white.
+		var bop = settings.backdropOpacity;
+		svg.style.setProperty('--lpn-backdrop-opacity', (bop === undefined || bop === null) ? 1 : bop);
+		doc.nodes.forEach(function (n) {
+			var ne = nodeEls[n.id]; if (ne) { ne.circle.setAttribute('r', nodeRadius(n)); }
+		});
+		doc.links.forEach(function (l) {
+			var le = linkEls[l.id]; if (!le) { return; }
+			le.handles.forEach(function (h) { h.setAttribute('r', VERTEX_HANDLE_R * k); });
+			updateArrow(l.id);
+		});
+	}
 	function buildNodeEls(n) {
 		var circle = el('circle', {
 			cx: n.x, cy: n.y, r: nodeRadius(n),
@@ -561,7 +799,7 @@ var EngCalcs = EngCalcs || {};
 		var handles = [], i;
 		for (i = 0; i < l.verts.length; i++) {
 			handles.push(el('circle', {
-				cx: l.verts[i].x, cy: l.verts[i].y, r: 0.45,
+				cx: l.verts[i].x, cy: l.verts[i].y, r: VERTEX_HANDLE_R * symbolFactor(),
 				'class': 'lpn-vhandle', 'data-link': l.id, 'data-vidx': i
 			}, linksLayer));
 		}
@@ -597,7 +835,38 @@ var EngCalcs = EngCalcs || {};
 		var pts = [nodeById(l.from)].concat(l.verts, [nodeById(l.to)]), out = [], i, a, b;
 		for (i = 0; i < pts.length - 1; i++) {
 			a = pts[i]; b = pts[i + 1];
-			out.push({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2, angle: Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI });
+			out.push({
+				x: (a.x + b.x) / 2, y: (a.y + b.y) / 2,
+				angle: Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI,
+				len: Math.hypot(b.x - a.x, b.y - a.y),
+				ax: a.x, ay: a.y, bx: b.x, by: b.y
+			});
+		}
+		return out;
+	}
+	// Where the flow arrow sits along its segment, as a fraction measured FROM THE UPSTREAM END
+	// (Tom, 2026-07-30: "flow arrows are colliding with pipe labels… maybe arrow at 30% from low
+	// head and label at 50%?"). The label is anchored at the segment midpoint, so anything other
+	// than 0.5 separates them; 0.3 from upstream also makes the arrow's position itself carry the
+	// flow direction, redundantly with the chevron, which helps at small sizes.
+	var ARROW_ALONG = 0.3;
+	// Nominal chevron length along the pipe: the polyline spans -0.8..0.8 in its own coordinates
+	// before symbolFactor() scales it.
+	var ARROW_NOMINAL_LEN = 1.6;
+	// Along-the-whole-pipe distance of every arrow that is actually DRAWN on this link -- the same
+	// two rules updateArrow() applies (skip a segment too short to hold an arrow; measure
+	// ARROW_ALONG from the upstream end), expressed as one distance per arrow so linkLabelMid() can
+	// keep the label clear of them. Returns [] before the first solve, when no arrow is shown.
+	function arrowAlongDistances(l) {
+		var mids = segmentMidpoints(l), flow = lastSolveResult ? lastSolveResult.flows[l.id] : undefined,
+			k = symbolFactor(), minLen = ARROW_NOMINAL_LEN * k * 2, out = [], run = 0, i, t;
+		if (flow === undefined) { return out; }
+		for (i = 0; i < mids.length; i++) {
+			if (mids[i].len >= minLen) {
+				t = flow < 0 ? 1 - ARROW_ALONG : ARROW_ALONG;
+				out.push(run + mids[i].len * t);
+			}
+			run += mids[i].len;
 		}
 		return out;
 	}
@@ -608,11 +877,26 @@ var EngCalcs = EngCalcs || {};
 	// after every solve.
 	function updateArrow(id) {
 		var le = linkEls[id]; if (!le || !le.arrows) { return; }
-		var mids = segmentMidpoints(linkById(id)), flow = lastSolveResult ? lastSolveResult.flows[id] : undefined, i;
+		var mids = segmentMidpoints(linkById(id)), flow = lastSolveResult ? lastSolveResult.flows[id] : undefined,
+			k = symbolFactor(), minLen = ARROW_NOMINAL_LEN * k * 2, i;
 		for (i = 0; i < le.arrows.length; i++) {
 			if (!mids[i] || flow === undefined) { le.arrows[i].style.display = 'none'; continue; }
+			// A segment with no room for the arrow shows none (Tom, 2026-07-30: "toggle off flow
+			// arrows if they don't fit between vertices") -- a chevron longer than the run it sits
+			// on overhangs both vertices and reads as a mark on the network rather than on that
+			// pipe. Twice the chevron's own length is the shortest run that still leaves visible
+			// pipe on each side of it.
+			if (mids[i].len < minLen) { le.arrows[i].style.display = 'none'; continue; }
 			var angle = mids[i].angle + (flow < 0 ? 180 : 0);
-			le.arrows[i].setAttribute('transform', 'translate(' + mids[i].x + ',' + mids[i].y + ') rotate(' + angle + ')');
+			// ARROW_ALONG measured from the UPSTREAM end: at positive flow that is the segment's own
+			// start, at negative flow its end.
+			var t = flow < 0 ? 1 - ARROW_ALONG : ARROW_ALONG,
+				px = mids[i].ax + (mids[i].bx - mids[i].ax) * t,
+				py = mids[i].ay + (mids[i].by - mids[i].ay) * t;
+			// scale() last, so the chevron's own -0.8..0.8 geometry grows about its anchor point
+			// rather than the rotation being applied to an already-offset shape.
+			le.arrows[i].setAttribute('transform', 'translate(' + px + ',' + py +
+				') rotate(' + angle + ') scale(' + k + ')');
 			le.arrows[i].style.display = '';
 		}
 	}
@@ -696,9 +980,10 @@ var EngCalcs = EngCalcs || {};
 	function resetTextLabelHome(id) {
 		var lb = labelById(id);
 		if (!lb || !lb.anchorNode) { return; }
-		if (lb.x === DEFAULT_LABEL_OFFSET.x && lb.y === DEFAULT_LABEL_OFFSET.y) { return; }
+		var home = defaultLabelOffset();
+		if (lb.x === home.x && lb.y === home.y) { return; }
 		saveUndoSnapshot();
-		lb.x = DEFAULT_LABEL_OFFSET.x; lb.y = DEFAULT_LABEL_OFFSET.y;
+		lb.x = home.x; lb.y = home.y;
 		labelEls[id].side = 'right';
 		updateLabelGeometry(id);
 		scheduleSolve();
@@ -1103,11 +1388,15 @@ var EngCalcs = EngCalcs || {};
 		// 2) -- defaults to the key itself, so this reproduces the original hardcoded J1/R1 behavior
 		// until a user changes it.
 		var key = type === 'reservoir' ? 'R' : 'J', id = (settings.idPrefixes[key] || key) + (nextId[key]++);
-		// Reservoir carries a fixed head (js/lpn-solver.js reads node.head directly as the
-		// boundary condition); junction carries elevation + demand. Different fields on
-		// purpose -- conflating them was a real trap early on (see lpn-solver.js's own notes).
+		// Both node types carry an elevation. A reservoir ALSO carries a head -- the fixed-head
+		// boundary condition js/lpn-solver.js solves against -- and that head is left blank by
+		// default, meaning "same as the elevation" (Tom, 2026-07-30: a reservoir with both fields
+		// is also a tank; the head "can default to Elevation and literally auto-fill from elevation
+		// if blank"). So a plain reservoir is a water surface at its own ground elevation, and
+		// typing a head turns it into a tank of that depth, with the difference reported as the
+		// pressure there. See reservoirHead() for the one place that resolution happens.
 		var n = type === 'reservoir'
-			? { id: id, type: type, x: x, y: y, head: niceDefault('lpn_u_elevhead', 'fth2o', 100, 30) }
+			? { id: id, type: type, x: x, y: y, elev: niceDefault('lpn_u_elevhead', 'fth2o', 100, 30) }
 			: { id: id, type: type, x: x, y: y, elev: 0, demand: 0 };
 		doc.nodes.push(n);
 		buildNodeEls(n);
@@ -1130,10 +1419,13 @@ var EngCalcs = EngCalcs || {};
 			// fitted to h0/a/b by EngCalcs.lpnPumpFromCurve (see its own comment for the 1/2/3-point
 			// forms -- same math bpn_'s supply curve uses). l.curveRef, when set, names another
 			// pump link whose curvePoints this one copies instead of using its own -- so several
-			// identical pumps in one network need the curve entered only once. A brand-new pump
-			// gets one design-point default (nice numbers per the current unit system) so the solve
-			// is meaningful before the user opens its popup and enters a real curve.
-			l.curvePoints = [[niceDefault('lpn_u_flow', 'gpm', 150, 0.01), niceDefault('lpn_u_elevhead', 'fth2o', 65, 20)]];
+			// identical pumps in one network need the curve entered only once.
+			// A brand-new pump has NO curve at all (Tom, 2026-07-30: "the entire issue was that
+			// there was a hidden curve... just squash the secrets"). An invisible default design
+			// point made a pump silently deliver head the user never entered, and then behave
+			// strangely once demand ran past that unseen curve. With no curve it adds and loses
+			// nothing until a real one is typed into its popup -- see recomputePumpCurve().
+			l.curvePoints = [];
 			l.curveRef = null;
 			recomputePumpCurve(l);
 		}
@@ -1235,6 +1527,13 @@ var EngCalcs = EngCalcs || {};
 			return false;
 		}
 		doc.nodes = saved.nodes || []; doc.links = saved.links || []; doc.labels = saved.labels || [];
+		// Reservoirs written before they had an elevation (2026-07-30) carry only a head. Giving
+		// such a reservoir an elevation EQUAL to its head keeps the old network solving and reading
+		// exactly as it did -- same fixed head, and a pressure of zero at the water surface --
+		// rather than silently reinterpreting the whole thing as a tank standing on datum.
+		doc.nodes.forEach(function (n) {
+			if (n.type === 'reservoir' && n.elev === undefined) { n.elev = n.head || 0; }
+		});
 		nextId = saved.nextId || { J: 1, R: 1, L: 1, P: 1, T: 1 };
 		// Object.assign onto the current defaults, not saved.x || defaults() -- a plain "||" swaps in
 		// a saved object wholesale, so a preference added AFTER a user's last save (e.g. Task 146.03's
@@ -1243,7 +1542,14 @@ var EngCalcs = EngCalcs || {};
 		// first time mapHeight shipped -- svg.setAttribute('height', undefined) is not the same as
 		// leaving the attribute at its default. Merging keeps every OLD saved value while still
 		// picking up any NEW default key that didn't exist when the save was written.
-		labelSettings = Object.assign(defaultLabelSettings(), saved.labelSettings || {});
+		// Merged one level DEEPER than the comment above describes, because labelSettings is nested
+		// ({node:{...}, link:{...}}): a top-level Object.assign swaps in the saved `link` object
+		// whole, so a toggle added after that save (gradient, and every future one) would come back
+		// undefined instead of at its default. Same reasoning, applied per sub-object.
+		labelSettings = defaultLabelSettings();
+		Object.keys(labelSettings).forEach(function (group) {
+			Object.assign(labelSettings[group], (saved.labelSettings || {})[group] || {});
+		});
 		backdrop = saved.backdrop || null;
 		settings = Object.assign(defaultSettings(), saved.settings || {});
 		return true;
@@ -1293,10 +1599,12 @@ var EngCalcs = EngCalcs || {};
 		} catch (err) { /* localStorage/history can throw (private mode) -- non-fatal, just skip the wipe */ }
 		svg = document.getElementById('lpn_canvas');
 		world = el('g', {}, svg);
-		backdropLayer = el('g', {}, world);
+		backdropLayer = el('g', { 'class': 'lpn-backdrop' }, world);
 		gridLayer = el('g', {}, world);
-		linksLayer = el('g', {}, world);
-		nodesLayer = el('g', {}, world);
+		// Classed so the symbol-opacity setting can fade both symbol layers as ONE drawing -- see
+		// the .lpn-symbols rule in css/engcalcs.css.
+		linksLayer = el('g', { 'class': 'lpn-symbols' }, world);
+		nodesLayer = el('g', { 'class': 'lpn-symbols' }, world);
 		// Every label mask lives in this ONE shared layer (Task 146.01 draw-order fix, Tom,
 		// 2026-07-30), never appended alongside the element it masks: a mask is placed here
 		// regardless of whether it belongs to a node, a link, or a Text label, so ALL masks sit
@@ -1331,6 +1639,10 @@ var EngCalcs = EngCalcs || {};
 		wireSettingsPopup();
 		applyLegendPosition();
 		applyMapHeight();
+		// Node/vertex radii are already built at the right size (buildDom() reads symbolFactor()),
+		// but the --lpn-sym custom property the stroke widths read is only ever written here and in
+		// refreshSymbolSizes() -- so a saved non-default symbol size needs this call to take effect.
+		refreshSymbolSizes();
 		updateEmptyHint();
 		updateModeHint(); // initial mode is 'select', set before setMode() ever runs -- render it now
 		zoomExtent();
@@ -1447,10 +1759,33 @@ var EngCalcs = EngCalcs || {};
 			if (!window.confirm(pc.lpn_confirm_example || 'This will add to the existing network. Continue?')) { return; }
 		}
 		saveUndoSnapshot();
+		// The reservoir sits at 55 ft / 17 m, in among the junctions it feeds (50 ft and 40 ft)
+		// rather than 50 ft above them (Tom, 2026-07-30). A source perched high above the network
+		// makes the example a gravity system that would work with the pump deleted -- the pump's
+		// contribution is invisible because the elevation is doing the work. Level with the network,
+		// the pump is the only reason there is pressure anywhere, which is the point of including
+		// one. Its head is left blank, so the water surface is the reservoir's own ground elevation.
 		var r = addNode('reservoir', 0, 0);
+		r.elev = niceDefault('lpn_u_elevhead', 'fth2o', 55, 17);
 		var j1 = addNode('junction', 20, 0);
 		j1.elev = niceDefault('lpn_u_elevhead', 'fth2o', 50, 15); j1.demand = 0;
-		addLink('pump', r.id, j1.id);
+		// The example's pump gets a curve explicitly, as document content the user can see and edit
+		// in its popup -- addLink() no longer invents one (see its comment). Everything else in this
+		// example is pre-filled the same way (elevations, demands, diameters), so a worked pump
+		// curve belongs here rather than hiding inside every pump anyone ever draws.
+		// THREE points, not one (Tom, 2026-07-30: "1-point is not very readable, and not good for
+		// our Example even if it's legal"). A single design point is legal and is EPANET's own rule,
+		// but it DERIVES the shutoff head and maximum flow from that one number, so the example
+		// would again show a pump doing things the visible numbers don't explain. Three points is
+		// how a manufacturer publishes a curve and how a user will read one off a datasheet: a
+		// shutoff head at zero flow, a duty point, and a run-out point.
+		var pump = addLink('pump', r.id, j1.id);
+		pump.curvePoints = [
+			[0, niceDefault('lpn_u_elevhead', 'fth2o', 90, 27)],
+			[niceDefault('lpn_u_flow', 'gpm', 150, 0.010), niceDefault('lpn_u_elevhead', 'fth2o', 65, 20)],
+			[niceDefault('lpn_u_flow', 'gpm', 300, 0.020), niceDefault('lpn_u_elevhead', 'fth2o', 20, 6)]
+		];
+		recomputePumpCurve(pump);
 		var j2 = addNode('junction', 40, 15);
 		j2.elev = niceDefault('lpn_u_elevhead', 'fth2o', 40, 12);
 		j2.demand = niceDefault('lpn_u_flow', 'gpm', 100, 0.006);
@@ -1743,15 +2078,23 @@ var EngCalcs = EngCalcs || {};
 		} else if (drag.type === 'node') {
 			var w = screenToWorld(p.x, p.y), n = nodeById(drag.id);
 			n.x = w.x + drag.offX; n.y = w.y + drag.offY; updateNode(drag.id);
+			relayoutLabels();
 		} else if (drag.type === 'vertex') {
 			var w2 = screenToWorld(p.x, p.y);
 			linkById(drag.id).verts[drag.vidx] = { x: w2.x + drag.offX, y: w2.y + drag.offY };
 			updateVertex(drag.id, drag.vidx);
+			relayoutLabels();
 		} else if (drag.type === 'label') {
 			var w3 = screenToWorld(p.x, p.y), lb = labelById(drag.id), an = lb.anchorNode ? nodeById(lb.anchorNode) : { x: 0, y: 0 };
 			if (lb.anchorNode) { lb.x = (w3.x + drag.offX) - an.x; lb.y = (w3.y + drag.offY) - an.y; }
 			else { lb.x = w3.x + drag.offX; lb.y = w3.y + drag.offY; }
 			updateLabelGeometry(drag.id);
+			// Every label drag ends in relayoutLabels(), not just a layout of the one being dragged:
+			// the label that moved is an obstacle to every other label (and so is the leader that
+			// appears behind it), so the rest of the drawing has to settle around it live rather
+			// than staying frozen until some unrelated edit happens to trigger a full refresh
+			// (Tom, 2026-07-30).
+			relayoutLabels();
 			// Dragging a Text was never persisted either (same gap as addText() above, found the
 			// same way) -- scheduleSolve() is a convenient existing debounce that reaches
 			// saveToStorage() unconditionally, even though a Text has nothing to solve.
@@ -1760,11 +2103,13 @@ var EngCalcs = EngCalcs || {};
 			var w6 = screenToWorld(p.x, p.y), nn2 = nodeById(drag.id);
 			nn2.lx = (w6.x + drag.offX) - nn2.x; nn2.ly = (w6.y + drag.offY) - nn2.y;
 			layoutNodeLabel(drag.id);
+			relayoutLabels();
 			scheduleSolve();
 		} else if (drag.type === 'linklbl') {
 			var w7 = screenToWorld(p.x, p.y), ll2 = linkById(drag.id), mid2 = linkLabelMid(ll2);
 			ll2.lx = (w7.x + drag.offX) - mid2.x; ll2.ly = (w7.y + drag.offY) - mid2.y;
 			layoutLinkLabel(drag.id);
+			relayoutLabels();
 			scheduleSolve();
 		}
 	}
@@ -1836,9 +2181,14 @@ var EngCalcs = EngCalcs || {};
 	function linkFieldDefs(pc) {
 		return [
 			['id', pc.lpn_field_id || 'ID'], ['diameter', pc.lpn_field_diameter || 'Diameter'],
-			['length', pc.lpn_field_length || 'Length'], ['flow', pc.lpn_result_flow || 'Flow'],
+			['length', pc.lpn_field_length || 'Length'],
+			// The two new inputs sit with the other inputs (after Length, before the solved
+			// results), rather than appended at the end -- inputs-then-results is the order the
+			// existing list already follows, and Tom left the placement open ("do something and we
+			// can change later"), so this follows the pattern already there.
+			['roughness', pc.lpn_field_roughness || 'Roughness'], ['km', pc.lpn_field_km_short || 'Minor loss, k'],
+			['flow', pc.lpn_result_flow || 'Flow'],
 			['velocity', pc.lpn_result_velocity || 'Velocity'], ['headloss', pc.lpn_result_headloss || 'Head loss'],
-			['headgain', pc.lpn_result_headgain || 'Head gain'],
 			['gradient', pc.lpn_result_gradient || 'Head loss gradient']
 		];
 	}
@@ -1872,18 +2222,28 @@ var EngCalcs = EngCalcs || {};
 		box.innerHTML = '';
 		// One field per line (Tom, 2026-07-30: the original horizontal row read poorly) -- matches
 		// the vertical, upper-right-corner overlay this now renders into.
-		function addGroup(defs, fieldSettings) {
-			defs.forEach(function (f) {
-				if (!fieldSettings[f[0]]) { return; }
-				any = true;
+		// Nodes/Links headings, the same two the Labels popover already carries (Tom, 2026-07-30) --
+		// without them the legend is one undifferentiated color list, and several field names (ID,
+		// Head, Flow/Demand) read plausibly as either kind of element. The heading is only emitted
+		// when that group actually has a visible field, so a nodes-only or links-only legend does
+		// not grow a lone heading over nothing.
+		function addGroup(defs, fieldSettings, headingText) {
+			var shown = defs.filter(function (f) { return fieldSettings[f[0]]; });
+			if (shown.length === 0) { return; }
+			any = true;
+			var h = document.createElement('div');
+			h.style.fontWeight = 'bold';
+			h.textContent = headingText;
+			box.appendChild(h);
+			shown.forEach(function (f) {
 				var div = document.createElement('div');
 				div.style.color = lpnFieldColors[f[0]];
 				div.textContent = f[1];
 				box.appendChild(div);
 			});
 		}
-		addGroup(nodeFieldDefs(pc), labelSettings.node);
-		addGroup(linkFieldDefs(pc), labelSettings.link);
+		addGroup(nodeFieldDefs(pc), labelSettings.node, pc.lpn_labels_heading_node || 'Node labels');
+		addGroup(linkFieldDefs(pc), labelSettings.link, pc.lpn_labels_heading_link || 'Link labels');
 		box.style.display = any ? '' : 'none';
 		applyLegendPosition();
 	}
@@ -1943,6 +2303,7 @@ var EngCalcs = EngCalcs || {};
 			try { le.width = le.text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; stale width stands */ }
 			updateLabelGeometry(id);
 		});
+		refreshSymbolSizes(); // symbols are sized relative to the text, so they follow it everywhere it changes
 		refreshLabelText(); // recomputes multi-line tspan dy spacing and extrema tick positions at the new size
 	}
 	// Cheap no-op in 'map' mode (the default): map-mode text scales for free via the SVG's own
@@ -2040,6 +2401,35 @@ var EngCalcs = EngCalcs || {};
 			saveToStorage();
 		});
 		row(pc.lpn_settings_text_size_units || 'Text size units', unitsSelect);
+		// Symbol size rides on the text-size block on purpose: it is expressed as a multiple of the
+		// text size and inherits its map-vs-screen units, so it belongs under the same heading
+		// rather than looking like an independent size system with its own units selector.
+		var symInput = document.createElement('input');
+		symInput.type = 'number'; symInput.step = 'any'; symInput.min = '0.1'; symInput.value = settings.symbolScale;
+		symInput.addEventListener('change', function () {
+			if (+symInput.value > 0) { settings.symbolScale = +symInput.value; refreshSymbolSizes(); relayoutLabels(); saveToStorage(); }
+			else { symInput.value = settings.symbolScale; }
+		});
+		row(pc.lpn_settings_symbol_size || 'Symbol size (relative to text)', symInput);
+		var opacityInput = document.createElement('input');
+		opacityInput.type = 'number'; opacityInput.step = '0.05'; opacityInput.min = '0.05'; opacityInput.max = '1';
+		opacityInput.value = settings.symbolOpacity;
+		opacityInput.addEventListener('change', function () {
+			var v = +opacityInput.value;
+			if (v > 0 && v <= 1) { settings.symbolOpacity = v; refreshSymbolSizes(); saveToStorage(); }
+			else { opacityInput.value = settings.symbolOpacity; }
+		});
+		row(pc.lpn_settings_symbol_opacity || 'Symbol opacity (0 to 1)', opacityInput);
+		var backdropOpacityInput = document.createElement('input');
+		backdropOpacityInput.type = 'number'; backdropOpacityInput.step = '0.05';
+		backdropOpacityInput.min = '0.05'; backdropOpacityInput.max = '1';
+		backdropOpacityInput.value = settings.backdropOpacity;
+		backdropOpacityInput.addEventListener('change', function () {
+			var v = +backdropOpacityInput.value;
+			if (v > 0 && v <= 1) { settings.backdropOpacity = v; refreshSymbolSizes(); saveToStorage(); }
+			else { backdropOpacityInput.value = settings.backdropOpacity; }
+		});
+		row(pc.lpn_settings_backdrop_opacity || 'Backdrop opacity (0 to 1)', backdropOpacityInput);
 		// ---- canvas height ----
 		heading(pc.lpn_settings_map_height || 'Map height');
 		var heightInput = document.createElement('input');
@@ -2144,6 +2534,25 @@ var EngCalcs = EngCalcs || {};
 		fields.appendChild(label);
 		fields.appendChild(document.createElement('br'));
 	}
+	// Same as unitNumberField(), but the value may be BLANK, meaning "follow whatever this field
+	// defaults to" -- currently a reservoir's head following its elevation (Tom, 2026-07-30).
+	// placeholderSI is that fallback, shown greyed in the empty box so the field never looks like it
+	// is missing a number; clearing the box stores undefined, which is what re-links the two.
+	function unitNumberFieldBlank(fields, labelText, unitId, getSI, setSI, placeholderSI) {
+		var f = unitFactor(unitId), label = document.createElement('label'), input = document.createElement('input'),
+			v = getSI();
+		input.type = 'number';
+		input.value = (v === undefined || v === null || v === '') ? '' : (v * f).toFixed(4);
+		input.placeholder = (placeholderSI * f).toFixed(4);
+		input.addEventListener('change', function () {
+			setSI(input.value === '' ? undefined : +input.value / f);
+			scheduleSolve();
+		});
+		label.textContent = labelText + ' (' + unitLabel(unitId) + ') ';
+		label.appendChild(input);
+		fields.appendChild(label);
+		fields.appendChild(document.createElement('br'));
+	}
 	// Read-only, like EPANET's own property-form coordinate display (Tom) -- also doubles as
 	// the touch answer to "show coordinates of the selected element": the corner tracker
 	// below is hover-driven (PC only), but this field is visible in the popup on any device.
@@ -2188,6 +2597,28 @@ var EngCalcs = EngCalcs || {};
 		autoLabel.appendChild(document.createTextNode(' ' + (pc.lpn_field_auto || 'Auto')));
 		fields.appendChild(label); fields.appendChild(autoLabel);
 		fields.appendChild(document.createElement('br'));
+	}
+	// World -> screen, the inverse of screenToWorld() above. Both are client (viewport) coordinates,
+	// which is what a position:fixed popup wants.
+	function worldToScreen(wx, wy) {
+		var r = svg.getBoundingClientRect();
+		return { x: r.left + state.tx + wx * state.s, y: r.top + state.ty + wy * state.s };
+	}
+	// Where an element's property popup opens (Tom, 2026-07-30). NOT at the click point: on an
+	// orthogonal network -- which is most real ones -- a popup centred on the element covers the
+	// elements directly north and south of it, which are exactly the ones you are usually comparing
+	// it against. Instead it opens off to the RIGHT of that element's own data label, just past
+	// where its extrema glyph would sit, plus about a node across ("roughly a node size to the right
+	// of the extrema location" -- Tom's own measure). The popup then sits in the horizontal gap
+	// beside the element rather than on top of its neighbours, and its position still reads as
+	// belonging to the element because it lines up with that element's label.
+	// Falls back to the click point when the element has no rendered label to hang off.
+	function popupAnchorFor(holder, labelPos, gapUnits, fallbackX, fallbackY) {
+		if (!holder || labelPos === null) { return { x: fallbackX, y: fallbackY }; }
+		var tf = textFactor(), fs = effectiveFontSize();
+		var x = labelPos.x + (holder.tw || 0) + (TICK_GAP + TICK_LENGTH) * tf + gapUnits;
+		var y = labelPos.y - fs * 0.85;
+		return worldToScreen(x, y);
 	}
 	function openPopupAt(sx, sy) {
 		var popup = document.getElementById('lpn_popup'), r;
@@ -2261,8 +2692,23 @@ var EngCalcs = EngCalcs || {};
 		idField(n.id, function (newId) { renameNode(nodeId, newId); });
 		fields.innerHTML = '';
 		if (n.type === 'reservoir') {
-			unitNumberField(fields, pc.lpn_field_head || 'Fixed head', 'lpn_u_elevhead',
-				function () { return n.head; }, function (v) { n.head = v; updateNode(nodeId); });
+			unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
+				function () { return n.elev; },
+				function (v) { n.elev = v; updateNode(nodeId); refreshPopupIfOpen(); });
+			// Blank = follow the elevation, which is also what the placeholder shows -- so the field
+			// reads as already filled in with the elevation without pretending the user typed it.
+			// Clearing it hands the head back to the elevation; this is the tank/reservoir switch.
+			// Both setters re-render the popup: each of the two fields feeds the other's display --
+			// the elevation is the head's placeholder, and the pressure row below is the difference
+			// between them. That row is computed straight from the document (not from a solve
+			// result), so it can and should be right the moment either number is committed.
+			unitNumberFieldBlank(fields, pc.lpn_field_head || 'Head', 'lpn_u_elevhead',
+				function () { return n.head; },
+				function (v) { n.head = v; updateNode(nodeId); refreshPopupIfOpen(); },
+				n.elev || 0);
+			// No read-only Head row here (a junction gets one because its head is a solve RESULT) --
+			// the editable field above already shows this reservoir's head, typed or inherited.
+			readonlyUnitField(fields, pc.lpn_result_pressure || 'Pressure', 'lpn_u_pressure', reservoirHead(n) - (n.elev || 0));
 		} else {
 			unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
 				function () { return n.elev; }, function (v) { n.elev = v; updateNode(nodeId); });
@@ -2277,9 +2723,11 @@ var EngCalcs = EngCalcs || {};
 		readonlyField(fields, pc.lpn_field_y || 'Y', n.y);
 	}
 	function openPopup(nodeId, sx, sy) {
+		var n = nodeById(nodeId), ne = nodeEls[nodeId];
 		currentPopup = { kind: 'node', id: nodeId };
 		renderNodeFields(nodeId);
-		openPopupAt(sx, sy);
+		var at = popupAnchorFor(ne, n ? nodeLabelPos(n) : null, nodeRadius(n) * 2, sx, sy);
+		openPopupAt(at.x, at.y);
 	}
 	// Pump curve entry (Task 146, 2026-07-30): up to 3 [Q,H] points, or a reference to another
 	// pump's curve. Point 1 is required (a pump needs at least a design point); 2 and 3 are
@@ -2324,18 +2772,40 @@ var EngCalcs = EngCalcs || {};
 			pc.lpn_pump_point3 || 'Point 3 (optional)'
 		];
 		var qf = unitFactor('lpn_u_flow'), hf = unitFactor('lpn_u_elevhead');
+		// A real <table> with real column headings (Tom, 2026-07-30) -- the point rows were two
+		// unlabelled number boxes whose only clue as to which was which lived in a title= tooltip,
+		// invisible on touch. Flow first, then head, matching both the [Q,H] storage order and the
+		// way a manufacturer's curve is read (a head AT a flow).
+		var table = document.createElement('table'), thead = document.createElement('thead'),
+			hrow = document.createElement('tr'), tbody = document.createElement('tbody');
+		table.className = 'lpn-curve-table';
+		[ '', (pc.lpn_result_flow || 'Flow') + ' (' + unitLabel('lpn_u_flow') + ')',
+			(pc.lpn_result_head || 'Head') + ' (' + unitLabel('lpn_u_elevhead') + ')' ].forEach(function (t) {
+			var th = document.createElement('th');
+			th.textContent = t;
+			hrow.appendChild(th);
+		});
+		thead.appendChild(hrow); table.appendChild(thead); table.appendChild(tbody);
+		fields.appendChild(table);
+		// One line pointing at the "Pump curve" note on the page, rather than the equation and its
+		// three fitting cases inline: this popup floats over the map and has to stay readable on a
+		// phone (Tom, 2026-07-30, weighing the two placements). See lpn_notes_5_def.
+		var curveNote = document.createElement('div');
+		curveNote.style.fontSize = '0.9em';
+		curveNote.textContent = pc.lpn_pump_curve_note || 'One, two, or three points — see "Pump curve" in the Notes below.';
+		fields.appendChild(curveNote);
 		var pi;
 		for (pi = 0; pi < 3; pi++) {
 			(function (pi) {
 				var pt = l.curvePoints[pi] || [undefined, undefined];
-				var row = document.createElement('div'), lab = document.createElement('span'),
+				var row = document.createElement('tr'), labCell = document.createElement('th'),
+					qCell = document.createElement('td'), hCell = document.createElement('td'),
+					lab = document.createElement('span'),
 					qInput = document.createElement('input'), hInput = document.createElement('input');
-				lab.textContent = pointLabels[pi] + ' ';
+				lab.textContent = pointLabels[pi];
 				qInput.type = 'number'; qInput.step = 'any'; qInput.size = 6;
-				qInput.title = (pc.lpn_result_flow || 'Flow') + ' (' + unitLabel('lpn_u_flow') + ')';
 				qInput.value = pt[0] !== undefined ? (pt[0] * qf).toFixed(4) : '';
 				hInput.type = 'number'; hInput.step = 'any'; hInput.size = 6;
-				hInput.title = (pc.lpn_result_headgain || 'Head gain') + ' (' + unitLabel('lpn_u_elevhead') + ')';
 				hInput.value = pt[1] !== undefined ? (pt[1] * hf).toFixed(4) : '';
 				function commit() {
 					var qv = qInput.value === '' ? undefined : (+qInput.value / qf),
@@ -2349,8 +2819,9 @@ var EngCalcs = EngCalcs || {};
 				}
 				qInput.addEventListener('change', commit);
 				hInput.addEventListener('change', commit);
-				row.appendChild(lab); row.appendChild(qInput); row.appendChild(hInput);
-				fields.appendChild(row);
+				labCell.appendChild(lab); qCell.appendChild(qInput); hCell.appendChild(hInput);
+				row.appendChild(labCell); row.appendChild(qCell); row.appendChild(hCell);
+				tbody.appendChild(row);
 			})(pi);
 		}
 	}
@@ -2383,22 +2854,24 @@ var EngCalcs = EngCalcs || {};
 			if (l.type !== 'pump') {
 				readonlyUnitField(fields, pc.lpn_result_velocity || 'Velocity', 'lpn_u_velocity', lastSolveResult.velocities[linkId]);
 			}
-			// lpn-solver.js stores a pump's headlosses as -(head gain) -- same sign convention as
-			// a head LOSS across the link (h_to - h_from), so a pump's actual gain is the negation.
-			if (l.type === 'pump') {
-				readonlyUnitField(fields, pc.lpn_result_headgain || 'Head gain', 'lpn_u_elevhead', -lastSolveResult.headlosses[linkId]);
-			} else {
-				readonlyUnitField(fields, pc.lpn_result_headloss || 'Head loss', 'lpn_u_elevhead', lastSolveResult.headlosses[linkId]);
-				if (l.length) {
-					readonlyUnitField(fields, pc.lpn_result_gradient || 'Head loss gradient', 'lpn_u_gradient', lastSolveResult.headlosses[linkId] / l.length);
-				}
+			// Head loss, for a pump too: lpn-solver.js reports a pump's contribution as a NEGATIVE
+			// head loss, which is the whole of how a head gain is expressed on this page.
+			readonlyUnitField(fields, pc.lpn_result_headloss || 'Head loss', 'lpn_u_elevhead', lastSolveResult.headlosses[linkId]);
+			// Gradient is per unit of pipe LENGTH, so it is a pipe-only result -- a pump has no
+			// length to spread its head over.
+			if (l.type !== 'pump' && l.length) {
+				readonlyUnitField(fields, pc.lpn_result_gradient || 'Head loss gradient', 'lpn_u_gradient', lastSolveResult.headlosses[linkId] / l.length);
 			}
 		}
 	}
 	function openLinkPopup(linkId, sx, sy) {
+		var l = linkById(linkId), le = linkEls[linkId];
 		currentPopup = { kind: 'link', id: linkId };
 		renderLinkFields(linkId);
-		openPopupAt(sx, sy);
+		// A link has no radius of its own; a junction's is the right "one node across" measure, and
+		// keeps the offset consistent between the two popup kinds.
+		var at = popupAnchorFor(le, l ? linkLabelPos(l) : null, nodeRadius({ type: 'junction' }) * 2, sx, sy);
+		openPopupAt(at.x, at.y);
 	}
 	// Editable text content for a Text label (Tom, 2026-07-30: "there is no way to edit it") -- no
 	// idField()/rename here, unlike node/link popups; a Text's id has no user-facing meaning to
@@ -2522,14 +2995,22 @@ var EngCalcs = EngCalcs || {};
 	// Roughness). visc is fresh water at ~20C; not user-editable yet.
 	var lastSolveResult = null;
 	function assembleModel() {
-		return { nodes: doc.nodes, links: doc.links, method: 'hw', visc: 1.007e-6, emitterExponent: settings.emitterExponent };
+		// Reservoirs are passed as resolved COPIES: the solver wants a real number in node.head, but
+		// the document deliberately stores that field blank when the head just follows the elevation
+		// (see reservoirHead()). Copying rather than filling the blank in keeps the document's "still
+		// following elevation" state intact. Junctions are passed through untouched.
+		var nodes = doc.nodes.map(function (n) {
+			return n.type === 'reservoir'
+				? { id: n.id, type: n.type, elev: n.elev || 0, head: reservoirHead(n) }
+				: n;
+		});
+		return { nodes: nodes, links: doc.links, method: 'hw', visc: 1.007e-6, emitterExponent: settings.emitterExponent };
 	}
 	function diagIssueText(issue) {
 		var pc = EngCalcs.pageConfig || {};
 		if (issue.code === 'no-fixed-head') { return pc.lpn_diag_no_fixed_head || 'Add a Reservoir.'; }
 		if (issue.code === 'dangling-link') { return (pc.lpn_diag_dangling_link || 'Dangling link:') + ' ' + issue.ids.join(', '); }
 		if (issue.code === 'unreachable') { return (pc.lpn_diag_unreachable || 'Unreachable:') + ' ' + issue.ids.join(', '); }
-		if (issue.code === 'pump-beyond-curve') { return (pc.lpn_diag_pump_beyond_curve || 'Demand exceeds this pump\'s curve (result is an unphysical extrapolation):') + ' ' + issue.ids.join(', '); }
 		return issue.code;
 	}
 	function setStatus(text) {
@@ -2572,30 +3053,33 @@ var EngCalcs = EngCalcs || {};
 		// text itself uses (see the comment on displayRound()), so a tie in what's actually printed
 		// is always a tie in what gets decorated.
 		var extrema = {
-			elev: fieldExtrema(doc.nodes.map(function (n) { return n.type !== 'reservoir' ? displayRound(n.elev, 'lpn_u_elevhead') : undefined; })),
+			// Elevation and pressure now include reservoirs -- a reservoir has a real elevation of
+			// its own, and a real pressure (head minus that elevation) whenever its head has been
+			// raised above it. Demand still excludes them: a reservoir supplies whatever the network
+			// draws rather than demanding an amount.
+			elev: fieldExtrema(doc.nodes.map(function (n) { return displayRound(n.elev, 'lpn_u_elevhead'); })),
 			demand: fieldExtrema(doc.nodes.map(function (n) { return n.type !== 'reservoir' ? displayRound(n.demand, 'lpn_u_flow') : undefined; })),
 			head: fieldExtrema(doc.nodes.map(function (n) {
-				if (n.type === 'reservoir') { return displayRound(n.head, 'lpn_u_elevhead'); }
+				if (n.type === 'reservoir') { return displayRound(reservoirHead(n), 'lpn_u_elevhead'); }
 				return lastSolveResult ? displayRound(lastSolveResult.heads[n.id], 'lpn_u_elevhead') : undefined;
 			})),
 			pressure: fieldExtrema(doc.nodes.map(function (n) {
-				if (n.type === 'reservoir' || !lastSolveResult) { return undefined; }
-				return displayRound(lastSolveResult.pressures[n.id], 'lpn_u_pressure');
+				if (n.type === 'reservoir') { return displayRound(reservoirHead(n) - (n.elev || 0), 'lpn_u_pressure'); }
+				return lastSolveResult ? displayRound(lastSolveResult.pressures[n.id], 'lpn_u_pressure') : undefined;
 			})),
 			diameter: fieldExtrema(doc.links.map(function (l) { return l.type !== 'pump' ? displayRound(l.diameter, 'lpn_u_diameter') : undefined; })),
 			length: fieldExtrema(doc.links.map(function (l) { return l.type !== 'pump' ? Math.round(l.length * 100) / 100 : undefined; })),
+			// Both dimensionless, so they use rawLine()/plain rounding like Length, not displayRound().
+			roughness: fieldExtrema(doc.links.map(function (l) { return l.type !== 'pump' ? Math.round(l.roughness * 100) / 100 : undefined; })),
+			km: fieldExtrema(doc.links.map(function (l) { return l.type !== 'pump' ? Math.round((l.k || 0) * 100) / 100 : undefined; })),
 			flow: fieldExtrema(doc.links.map(function (l) { return lastSolveResult ? displayRound(lastSolveResult.flows[l.id], 'lpn_u_flow') : undefined; })),
 			velocity: fieldExtrema(doc.links.map(function (l) { return (l.type !== 'pump' && lastSolveResult) ? displayRound(lastSolveResult.velocities[l.id], 'lpn_u_velocity') : undefined; })),
-			// Pipe headloss and pump head GAIN are separate fields with separate extrema buckets (Tom,
-			// 2026-07-30) -- a pump's ~70+ ft gain mixed into the same min/max as a pipe's fractional
-			// loss made the pump read as an enormous "loss" under one shared legend/color/scale.
+			// One head-loss bucket for every link type, pumps included: a pump reports a negative
+			// head loss (Tom, 2026-07-30), so it lands at the min end of this same range rather
+			// than needing a field of its own.
 			headloss: fieldExtrema(doc.links.map(function (l) {
-				if (l.type === 'pump' || !lastSolveResult || lastSolveResult.headlosses[l.id] === undefined) { return undefined; }
+				if (!lastSolveResult || lastSolveResult.headlosses[l.id] === undefined) { return undefined; }
 				return displayRound(lastSolveResult.headlosses[l.id], 'lpn_u_elevhead');
-			})),
-			headgain: fieldExtrema(doc.links.map(function (l) {
-				if (l.type !== 'pump' || !lastSolveResult || lastSolveResult.headlosses[l.id] === undefined) { return undefined; }
-				return displayRound(-lastSolveResult.headlosses[l.id], 'lpn_u_elevhead');
 			})),
 			// Head loss GRADIENT (ROADMAP Task 177, Tom agreed 2026-07-30): headloss/length as a
 			// dimensionless ratio, reusing the same grade/gradePercent OPTIONS as mpf_/mphl_'s own
@@ -2623,12 +3107,13 @@ var EngCalcs = EngCalcs || {};
 			// produced from it, and elevation (the input least likely to change page to page) trails.
 			if (ls.node.id) { lines.push({ text: n.id, color: fc.id }); }
 			if (n.type !== 'reservoir' && ls.node.demand) { lines.push(numLine(n.demand, 'lpn_u_flow', extrema.demand, fc.demand)); }
-			var headSI = n.type === 'reservoir' ? n.head : (lastSolveResult ? lastSolveResult.heads[n.id] : undefined);
+			var headSI = n.type === 'reservoir' ? reservoirHead(n) : (lastSolveResult ? lastSolveResult.heads[n.id] : undefined);
+			var pressSI = n.type === 'reservoir'
+				? reservoirHead(n) - (n.elev || 0)
+				: (lastSolveResult ? lastSolveResult.pressures[n.id] : undefined);
 			if (ls.node.head && headSI !== undefined) { lines.push(numLine(headSI, 'lpn_u_elevhead', extrema.head, fc.head)); }
-			if (ls.node.pressure && n.type !== 'reservoir' && lastSolveResult && lastSolveResult.pressures[n.id] !== undefined) {
-				lines.push(numLine(lastSolveResult.pressures[n.id], 'lpn_u_pressure', extrema.pressure, fc.pressure));
-			}
-			if (n.type !== 'reservoir' && ls.node.elev) { lines.push(numLine(n.elev, 'lpn_u_elevhead', extrema.elev, fc.elev)); }
+			if (ls.node.pressure && pressSI !== undefined) { lines.push(numLine(pressSI, 'lpn_u_pressure', extrema.pressure, fc.pressure)); }
+			if (ls.node.elev) { lines.push(numLine(n.elev, 'lpn_u_elevhead', extrema.elev, fc.elev)); }
 			ne.empty = lines.length === 0; // captured BEFORE the placeholder below -- see hideMask()'s comment
 			if (lines.length === 0) { lines.push({ text: '' }); } // keep an empty tspan so getBBox() doesn't throw
 			// x here is a placeholder -- layoutNodeLabel() below (after collision avoidance) sets the
@@ -2636,6 +3121,7 @@ var EngCalcs = EngCalcs || {};
 			setMultilineText(ne.text, nodeLabelBase(n).x, lines);
 			ne.lineCount = lines.length;
 			nodeLines[n.id] = lines;
+			ne.lines = lines; // cached for relayoutLabels(), which re-runs layout without rebuilding text
 			try { ne.tw = ne.text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; stale tw stands */ }
 		});
 		doc.links.forEach(function (l) {
@@ -2645,23 +3131,22 @@ var EngCalcs = EngCalcs || {};
 			if (l.type !== 'pump') {
 				if (ls.link.diameter) { lines.push(numLine(l.diameter, 'lpn_u_diameter', extrema.diameter, fc.diameter)); }
 				if (ls.link.length) { lines.push(rawLine(l.length, extrema.length, fc.length)); }
+				if (ls.link.roughness) { lines.push(rawLine(l.roughness, extrema.roughness, fc.roughness)); }
+				if (ls.link.km) { lines.push(rawLine(l.k || 0, extrema.km, fc.km)); }
 			}
 			if (lastSolveResult && lastSolveResult.flows[l.id] !== undefined) {
 				if (ls.link.flow) { lines.push(numLine(lastSolveResult.flows[l.id], 'lpn_u_flow', extrema.flow, fc.flow)); }
 				// Velocity is meaningless for a pump (no diameter -- see renderLinkFields() above).
 				if (ls.link.velocity && l.type !== 'pump') { lines.push(numLine(lastSolveResult.velocities[l.id], 'lpn_u_velocity', extrema.velocity, fc.velocity)); }
-				if (l.type === 'pump') {
-					if (ls.link.headgain) { lines.push(numLine(-lastSolveResult.headlosses[l.id], 'lpn_u_elevhead', extrema.headgain, fc.headgain)); }
-				} else {
-					if (ls.link.headloss) { lines.push(numLine(lastSolveResult.headlosses[l.id], 'lpn_u_elevhead', extrema.headloss, fc.headloss)); }
-					if (ls.link.gradient && l.length) { lines.push(numLine(lastSolveResult.headlosses[l.id] / l.length, 'lpn_u_gradient', extrema.gradient, fc.gradient)); }
-				}
+				if (ls.link.headloss) { lines.push(numLine(lastSolveResult.headlosses[l.id], 'lpn_u_elevhead', extrema.headloss, fc.headloss)); }
+				if (ls.link.gradient && l.type !== 'pump' && l.length) { lines.push(numLine(lastSolveResult.headlosses[l.id] / l.length, 'lpn_u_gradient', extrema.gradient, fc.gradient)); }
 			}
 			le.empty = lines.length === 0;
 			if (lines.length === 0) { lines.push({ text: '' }); }
 			setMultilineText(le.text, linkLabelBase(l).x, lines);
 			le.lineCount = lines.length;
 			linkLines[l.id] = lines;
+			le.lines = lines;
 			try { le.tw = le.text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; stale tw stands */ }
 		});
 		// Collision avoidance runs on the freshly measured tw/lineCount above, THEN every label is
@@ -2669,6 +3154,19 @@ var EngCalcs = EngCalcs || {};
 		// ticks are placed from that final <text> x/y -- ticks read textEl.getAttribute('x'/'y')
 		// directly (see applyExtremaTicks()), so they must come last or they'd be measured from the
 		// placeholder position set above and go stale the moment a nudge or a drag moves the label.
+		relayoutLabels();
+		doc.links.forEach(function (l) { updateArrow(l.id); });
+		renderLabelsLegend();
+	}
+	// The layout half of refreshLabelText(), without rebuilding any text: re-run collision
+	// avoidance, then place every label (text, mask, leader) and its extrema ticks at the resulting
+	// position. Split out so a DRAG can call it on every frame (Tom, 2026-07-30: "collisions aren't
+	// recalculated after drag; leaders stay unchanged") -- moving one label changes what every other
+	// label collides with, but none of the NUMBERS change while dragging, so rebuilding all the
+	// tspans 60 times a second would be pure waste. Safe to call repeatedly because the collision
+	// pass is idempotent (see addDataLabel()). Ticks reuse the lines cached by the last full
+	// refreshLabelText().
+	function relayoutLabels() {
 		runLabelCollisionAvoidance();
 		doc.nodes.forEach(function (n) {
 			var ne = nodeEls[n.id]; if (!ne) { return; }
@@ -2676,15 +3174,13 @@ var EngCalcs = EngCalcs || {};
 			// labelsLayer, not nodesLayer -- ticks decorate the label TEXT, which now lives in
 			// labelsLayer (Task 146.01 draw-order fix), not beside the node's own circle. A tick
 			// appended into nodesLayer would render underneath maskLayer/labelsLayer and never be seen.
-			applyExtremaTicks(ne, ne.text, labelsLayer, nodeLines[n.id]);
+			applyExtremaTicks(ne, ne.text, labelsLayer, ne.lines || []);
 		});
 		doc.links.forEach(function (l) {
 			var le = linkEls[l.id]; if (!le) { return; }
 			layoutLinkLabel(l.id);
-			applyExtremaTicks(le, le.text, labelsLayer, linkLines[l.id]);
+			applyExtremaTicks(le, le.text, labelsLayer, le.lines || []);
 		});
-		doc.links.forEach(function (l) { updateArrow(l.id); });
-		renderLabelsLegend();
 	}
 	function runSolve() {
 		// Autosave piggybacks on the same debounce as the solve, not a separate timer -- one
@@ -2707,11 +3203,7 @@ var EngCalcs = EngCalcs || {};
 			return;
 		}
 		lastSolveResult = result;
-		// A converged solve can still carry WARNING-level issues (e.g. a pump demanded past its
-		// curve's own zero-head flow, EngCalcs.lpnReport()'s 'pump-beyond-curve') -- these are real
-		// numbers, not a solve failure, so they don't block lastSolveResult/refreshLabelText the way
-		// the two blocks above do, but they still need to reach the user.
-		setStatus(result.issues && result.issues.length > 0 ? result.issues.map(diagIssueText).join(' ') : '');
+		setStatus('');
 		refreshLabelText();
 	}
 	// Debounced, not run synchronously on every call site: a node drag alone calls updateNode()
