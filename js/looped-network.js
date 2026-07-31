@@ -543,6 +543,74 @@ var EngCalcs = EngCalcs || {};
 	var doc = { nodes: [], links: [], labels: [] };
 	var nextId = { J: 1, R: 1, L: 1, P: 1, T: 1 };
 
+	// ---- Project / scenario container (ROADMAP Task 184, shipped by 146.08) ----
+	// A save is a PROJECT: one network (doc above) plus a list of SCENARIOS. Base is canon and has
+	// no overrides; every other scenario is nothing but a collection of overrides. Base is a row in
+	// the same array, flagged isBase -- so the (future) scenario selector has no special case, and
+	// because nothing carries a parent pointer a scenario-of-a-scenario is UNREPRESENTABLE rather
+	// than merely discouraged. That structural asymmetry is the model, not a convention.
+	// Shipped with Base as the only scenario and NO scenario UI: the container has to exist from day
+	// one so scenarios are purely additive later and there is never a second storage migration.
+	// Like settings/backdrop and unlike doc, these are not undo-snapshotted. That costs nothing
+	// today (Base's overrides are permanently empty, so nothing here can change under an undo);
+	// whether an override edit joins the undo stack is a real question for the scenario-UI build,
+	// and Task 184 already answers it "yes, one document, one undo stack" -- so expect this to move
+	// into the snapshot then, which is a one-line change while the map is still empty.
+	function defaultScenarios() {
+		// name 'Base' is the shape Task 184 documents; display code should key off isBase and render
+		// its own localized word, never echo this string, so the stored data stays language-free.
+		return [{ id: 'base', name: 'Base', isBase: true, overrides: {} }];
+	}
+	var scenarios = defaultScenarios();
+	// A blank name means "not named yet"; the UI renders its own localized "Untitled" for that case
+	// rather than storing an English word in the user's data.
+	var project = { name: '', activeScenario: 'base' };
+	function baseScenario() {
+		for (var i = 0; i < scenarios.length; i++) { if (scenarios[i].isBase) { return scenarios[i]; } }
+		return scenarios[0];
+	}
+	function activeScenario() {
+		for (var i = 0; i < scenarios.length; i++) { if (scenarios[i].id === project.activeScenario) { return scenarios[i]; } }
+		return baseScenario();
+	}
+
+	// Overridable-property whitelist -- cheap to widen, expensive to narrow (Task 184). The line is
+	// MEMBERSHIP is overridable, IDENTITY is not: a link's from/to and a node's x/y/verts are
+	// Base-owned and never override (a node cannot be in two places at once in one rendered map),
+	// and so are id and type. Junction `elev` is survey data, not a design variable.
+	// `active` is an ordinary boolean here and is how topology varies: a proposed loop lives in Base
+	// inactive and a scenario overrides it active. Nothing sets `active` yet -- effective() treats
+	// its absence as true.
+	// `status` is this file's existing name for the open/closed state (Task 146.07 will surface it);
+	// `length` is the escape valve for "same drawing, different length", since a drag recomputes
+	// Base's auto length for every scenario.
+	var LPN_OVERRIDABLE = {
+		node: { demand: true, emitter: true, head: true, active: true },
+		link: { diameter: true, roughness: true, k: true, status: true, length: true, active: true }
+	};
+
+	// The one resolver seam. Solver, renderer, labels and popups read element properties through
+	// this, so that adding scenarios later changes only what this function finds -- not its callers.
+	// Every lookup falls through to the element today, because Base's overrides are empty.
+	// `prop` is always the PLAIN public name (the override map's documented shape, Task 184); the
+	// element itself stores the same property underscored (`el._diameter`, Task 184/146.08 step 2) so
+	// that a call site that forgets to route through effective() reads undefined immediately, rather
+	// than silently working today and breaking invisibly once a second scenario exists.
+	function effective(el, prop) {
+		if (!el) { return undefined; }
+		var ov = activeScenario().overrides[el.id];
+		if (ov && Object.prototype.hasOwnProperty.call(ov, prop)) { return ov[prop]; }
+		// `active` has no stored property yet (nothing sets it) -- its absence must read as true, not
+		// undefined/falsy, so a topology no scenario has touched is never mistaken for inactive. This
+		// is the one property effective() defaults itself, per the trap note in Task 146.08 step 2.
+		if (prop === 'active' && el['_' + prop] === undefined) { return true; }
+		return el['_' + prop];
+	}
+	// The write side (setOverride/clearOverride) and the status-bar override count deliberately do
+	// NOT exist yet: with Base the only scenario there is nothing they could do but write into a map
+	// that must stay empty, and an untestable write path is how a marker convention drifts before it
+	// ever runs. They land with the scenario UI, against LPN_OVERRIDABLE above.
+
 	// Map label toggles (Task 146 Phase 2) -- a VIEW preference, not network content, so it is
 	// deliberately NOT part of the undo-snapshotted `doc` and is untouched by clearNetwork()/undo().
 	// Defaults reproduce exactly what Phase 1 already showed (node ID+pressure, nothing on links),
@@ -726,7 +794,8 @@ var EngCalcs = EngCalcs || {};
 	// map labels, the popup) goes through this one function so "blank means elevation" is stated
 	// once instead of being re-derived at each call site.
 	function reservoirHead(n) {
-		return (n.head === undefined || n.head === null || n.head === '') ? (n.elev || 0) : n.head;
+		var h = effective(n, 'head');
+		return (h === undefined || h === null || h === '') ? (n.elev || 0) : h;
 	}
 	function linkById(id) {
 		var i;
@@ -1046,7 +1115,7 @@ var EngCalcs = EngCalcs || {};
 		var l = linkById(id), le = linkEls[id];
 		le.line.setAttribute('points', linkPoints(l));
 		layoutLinkLabel(id);
-		if (l.lenAuto) { l.length = linkGeomLength(l); }
+		if (l.lenAuto) { l._length = linkGeomLength(l); }
 		updateArrow(id);
 	}
 
@@ -1502,7 +1571,7 @@ var EngCalcs = EngCalcs || {};
 		// A reservoir still gets no `head` key at all, which is what keeps it following its elevation.
 		var n = type === 'reservoir'
 			? { id: id, type: type, x: x, y: y, elev: settings.defaults.nodeElev }
-			: { id: id, type: type, x: x, y: y, elev: settings.defaults.nodeElev, demand: settings.defaults.demand };
+			: { id: id, type: type, x: x, y: y, elev: settings.defaults.nodeElev, _demand: settings.defaults.demand };
 		doc.nodes.push(n);
 		buildNodeEls(n);
 		incidentLinks[id] = []; labelsByAnchor[id] = [];
@@ -1514,13 +1583,13 @@ var EngCalcs = EngCalcs || {};
 		var key = type === 'pump' ? 'P' : 'L', id = (settings.idPrefixes[key] || key) + (nextId[key]++);
 		var l = {
 			id: id, type: type, from: fromId, to: toId, verts: [],
-			diameter: settings.defaults.diameter,
+			_diameter: settings.defaults.diameter,
 			// No `length` default, deliberately (Tom, 2026-07-30): lenAuto derives length from the
 			// drawn geometry, so a default would be overwritten by linkGeomLength() on the next line.
-			roughness: settings.defaults.roughness, length: 0, lenAuto: true, status: 'open',
-			k: settings.defaults.k // pump ignores k -- only the pipe friction branch reads it
+			_roughness: settings.defaults.roughness, _length: 0, lenAuto: true, _status: 'open',
+			_k: settings.defaults.k // pump ignores k -- only the pipe friction branch reads it
 		};
-		l.length = linkGeomLength(l);
+		l._length = linkGeomLength(l);
 		if (type === 'pump') {
 			// Pump curve entry (Task 146, 2026-07-30): l.curvePoints holds 1-3 [Q,H] pairs in SI,
 			// fitted to h0/a/b by EngCalcs.lpnPumpFromCurve (see its own comment for the 1/2/3-point
@@ -1608,38 +1677,155 @@ var EngCalcs = EngCalcs || {};
 		if (currentPopup && currentPopup.kind === 'label' && currentPopup.id === id) { closePopup(); }
 	}
 
-	// ---- localStorage autosave (single network) ----
-	// Versioned per the scope doc's schema rules: v > CURRENT refuses to load and says so, never
-	// silently drops unknown fields; v < CURRENT would run an ordered migration chain, keeping a
-	// _backup copy first. No migrations exist yet -- this is Phase 1's only version.
-	var LPN_STORAGE_KEY = 'lpn_document';
-	var LPN_STORAGE_VERSION = 1;
-	function saveToStorage() {
-		try {
-			localStorage.setItem(LPN_STORAGE_KEY, JSON.stringify({
-				v: LPN_STORAGE_VERSION, nodes: doc.nodes, links: doc.links, labels: doc.labels, nextId: nextId,
-				labelSettings: labelSettings, backdrop: backdrop, settings: settings
-			}));
-		} catch (err) { /* localStorage can throw (private mode, quota) -- autosave is best-effort */ }
+	// ---- Project library storage (Task 146.08 step 3) ----
+	// ONE localStorage key per project (`lpn_project_<id>`) plus a small index (`lpn_index`), rather
+	// than one blob holding everything. Two reasons, both from the ROADMAP:
+	//   - autosave rewrites only the OPEN project, so typing in a small network does not re-serialize
+	//     every other network you own on every keystroke; and
+	//   - one large backdrop image cannot take the whole library down with a single quota error. A
+	//     project that will not fit fails alone, and the others stay readable.
+	// The index carries only what a project LIST needs (id, name, updated). It is a cache, not the
+	// authority: `project.name` inside the project document is the source of truth, and
+	// adoptOrphans() below rebuilds an index entry for any project key the index has lost.
+	var LPN_STORAGE_VERSION = 2;
+	var LPN_LEGACY_KEY = 'lpn_document';   // the pre-library single-document key (v1 and v2 alike)
+	var LPN_INDEX_KEY = 'lpn_index';
+	var LPN_PROJECT_PREFIX = 'lpn_project_';
+	var library = { v: LPN_STORAGE_VERSION, openId: null, projects: [] };
+	// True once a write has failed (quota, private mode). Autosave stays best-effort -- it must never
+	// throw into a mouse handler -- but with a LIBRARY the old silent swallow is no longer honest:
+	// a user with several projects and a full quota would go on drawing into a document that is not
+	// being saved. setStorageError() surfaces it in the status bar instead.
+	var storageError = false;
+	function setStorageError(on) {
+		var pc = EngCalcs.pageConfig || {};
+		if (on === storageError) { return; }
+		storageError = on;
+		if (on) { setStatus(pc.lpn_storage_full || 'NOT SAVED -- browser storage is full or unavailable. Your recent changes are only in this tab.'); }
 	}
-	function loadFromStorage() {
-		var raw, saved;
-		try { raw = localStorage.getItem(LPN_STORAGE_KEY); } catch (err) { return false; }
-		if (!raw) { return false; }
-		try { saved = JSON.parse(raw); } catch (err) { return false; }
-		if (!saved || typeof saved.v !== 'number') { return false; }
+	function projectKey(id) { return LPN_PROJECT_PREFIX + id; }
+	// The full reset behind "?lpn_wipe=1" and the Wipe memory button. Now that a library exists it
+	// must clear EVERY project key plus the index, not just the old single document -- a wipe that
+	// left ten project keys behind would repopulate the library on the next load via adoptOrphans()
+	// and read as the wipe having silently failed. Collected before deleting: removing while
+	// iterating localStorage by index skips entries.
+	function wipeAllStorage() {
+		var i, key, doomed = [LPN_LEGACY_KEY, LPN_INDEX_KEY];
+		try {
+			for (i = 0; i < localStorage.length; i++) {
+				key = localStorage.key(i);
+				if (key && key.indexOf(LPN_PROJECT_PREFIX) === 0) { doomed.push(key); }
+			}
+			doomed.forEach(function (k) { localStorage.removeItem(k); });
+		} catch (err) { /* private mode -- nothing to remove */ }
+	}
+	// Time-ordered prefix plus randomness: sortable for debugging, and collision-free even when two
+	// projects are created in the same millisecond in two tabs.
+	function newProjectId() {
+		return 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+	}
+	function serializeProject() {
+		return {
+			v: LPN_STORAGE_VERSION, project: project, scenarios: scenarios,
+			nodes: doc.nodes, links: doc.links, labels: doc.labels, nextId: nextId,
+			labelSettings: labelSettings, backdrop: backdrop, settings: settings
+		};
+	}
+	function writeJSON(key, obj) {
+		try { localStorage.setItem(key, JSON.stringify(obj)); setStorageError(false); return true; }
+		catch (err) { setStorageError(true); return false; }
+	}
+	function readJSON(key) {
+		var raw;
+		try { raw = localStorage.getItem(key); } catch (err) { return null; }
+		if (!raw) { return null; }
+		try { return JSON.parse(raw); } catch (err) { return null; }
+	}
+	function indexEntry(id) {
+		for (var i = 0; i < library.projects.length; i++) { if (library.projects[i].id === id) { return library.projects[i]; } }
+		return null;
+	}
+	function saveIndex() { return writeJSON(LPN_INDEX_KEY, library); }
+	// Autosave. Writes the OPEN project's document first and the index second, deliberately: if the
+	// document write fails on quota, the index still describes the last state that actually made it
+	// to disk, rather than advertising a project whose content never landed.
+	function saveToStorage() {
+		if (!library.openId) { return; }
+		if (!writeJSON(projectKey(library.openId), serializeProject())) { return; }
+		var entry = indexEntry(library.openId);
+		if (entry) { entry.name = project.name; entry.updated = Date.now(); }
+		saveIndex();
+	}
+	// Versioned per the scope doc's schema rules: v > CURRENT refuses to load and says so, never
+	// silently drops unknown fields; v < CURRENT runs an ordered migration chain.
+	// v1 -> v2 (Task 184/146.08, 2026-07-30) is a pure WRAP, with no data loss and nothing to
+	// reinterpret: the same nodes/links/labels/nextId/labelSettings/backdrop/settings keys sit
+	// alongside a new `project` and a `scenarios` array holding Base and nothing else. A v1 save
+	// therefore migrates by supplying two defaults, which is exactly what migrateSaved() does below
+	// -- and it is why the container had to ship before scenarios rather than after.
+	// Ordered, one step per version, each taking the object from v(n) to v(n+1). A save older than
+	// the newest migration therefore walks the whole chain rather than needing a special case per
+	// starting version.
+	function migrateSaved(saved) {
+		if (saved.v === 1) {
+			// The single autosaved network becomes the project's Base. Its name is left blank, not
+			// set to "Untitled": that word is UI, and the UI localizes it (see `project` above).
+			saved.project = { name: '', activeScenario: 'base' };
+			saved.scenarios = defaultScenarios();
+			// Rename every LPN_OVERRIDABLE property to its underscored storage key (Task 184/146.08
+			// step 2). Same rename effective() expects going forward -- done here, once, rather than
+			// leaving v1's plain names to silently read as undefined through the new resolver. A
+			// legitimately falsy 0 is preserved (hasOwnProperty, not truthiness); an absent key stays
+			// absent rather than being defaulted -- that is loadFromStorage()'s job, not this one's.
+			function renameOverridable(el, whitelist) {
+				Object.keys(whitelist).forEach(function (prop) {
+					if (Object.prototype.hasOwnProperty.call(el, prop)) {
+						el['_' + prop] = el[prop];
+						delete el[prop];
+					}
+				});
+			}
+			(saved.nodes || []).forEach(function (n) { renameOverridable(n, LPN_OVERRIDABLE.node); });
+			(saved.links || []).forEach(function (l) { renameOverridable(l, LPN_OVERRIDABLE.link); });
+			saved.v = 2;
+		}
+		return saved;
+	}
+	// Reads one stored document, version-checks it and runs it up to the current version. Returns
+	// null for "nothing usable here" -- absent, unparseable, or written by a NEWER page than this
+	// one, which is refused loudly rather than silently half-read.
+	function readDocument(key) {
+		var saved = readJSON(key);
+		if (!saved || typeof saved.v !== 'number') { return null; }
 		if (saved.v > LPN_STORAGE_VERSION) {
 			var pc = EngCalcs.pageConfig || {};
 			alert(pc.lpn_storage_too_new || 'The saved network was created by a newer version of this page and cannot be loaded here.');
-			return false;
+			return null;
 		}
+		return migrateSaved(saved);
+	}
+	// Installs an already-read, already-migrated document as the live network. Split out of the old
+	// loadFromStorage() so the library can apply a document from ANY project key, not just the one.
+	function applySaved(saved) {
+		// Project/scenario container. Rebuilt from defaults and merged, for the same reason the
+		// labelSettings and settings blocks below spell out: a key added after this save was written
+		// must come back at its default, not as undefined.
+		project = Object.assign({ name: '', activeScenario: 'base' }, saved.project || {});
+		scenarios = Array.isArray(saved.scenarios) && saved.scenarios.length ? saved.scenarios : defaultScenarios();
+		// Two structural guarantees the rest of the model leans on, restored here rather than
+		// trusted: exactly one Base exists, and the active scenario names a scenario that is really
+		// in the list. Both are cheap to check and both are unrecoverable to get wrong later.
+		if (!scenarios.some(function (s) { return s.isBase; })) { scenarios = defaultScenarios().concat(scenarios); }
+		scenarios.forEach(function (s) { if (!s.overrides) { s.overrides = {}; } });
+		baseScenario().overrides = {}; // Base is canon and has no overrides, by definition
+		if (!scenarios.some(function (s) { return s.id === project.activeScenario; })) { project.activeScenario = baseScenario().id; }
 		doc.nodes = saved.nodes || []; doc.links = saved.links || []; doc.labels = saved.labels || [];
 		// Reservoirs written before they had an elevation (2026-07-30) carry only a head. Giving
 		// such a reservoir an elevation EQUAL to its head keeps the old network solving and reading
 		// exactly as it did -- same fixed head, and a pressure of zero at the water surface --
 		// rather than silently reinterpreting the whole thing as a tank standing on datum.
 		doc.nodes.forEach(function (n) {
-			if (n.type === 'reservoir' && n.elev === undefined) { n.elev = n.head || 0; }
+			if (n.type === 'reservoir' && n.elev === undefined) { n.elev = n._head || 0; }
 		});
 		nextId = saved.nextId || { J: 1, R: 1, L: 1, P: 1, T: 1 };
 		// Object.assign onto the current defaults, not saved.x || defaults() -- a plain "||" swaps in
@@ -1683,6 +1869,281 @@ var EngCalcs = EngCalcs || {};
 		delete settings.kmDefault;
 		return true;
 	}
+
+	// ---- the project library ----
+	// A project with no name renders as "Untitled" HERE, at display time, rather than being stored
+	// with that word -- see the note on `project` above for why the data stays language-free.
+	function projectDisplayName(p) {
+		var pc = EngCalcs.pageConfig || {};
+		return (p && p.name) ? p.name : (pc.lpn_project_untitled || 'Untitled');
+	}
+	// The index is a cache and is repaired from the real project keys, never trusted blindly: a
+	// quota failure can land a project document while the index write that follows it fails, and a
+	// project the user can no longer SEE is indistinguishable from one that was lost. Scanning the
+	// prefix is cheap (localStorage is synchronous and small) and makes the library self-healing.
+	function adoptOrphans() {
+		var i, key, doc2, id, changed = false;
+		try {
+			for (i = 0; i < localStorage.length; i++) {
+				key = localStorage.key(i);
+				if (!key || key.indexOf(LPN_PROJECT_PREFIX) !== 0) { continue; }
+				id = key.slice(LPN_PROJECT_PREFIX.length);
+				if (indexEntry(id)) { continue; }
+				doc2 = readJSON(key);
+				if (!doc2) { continue; }
+				library.projects.push({ id: id, name: (doc2.project && doc2.project.name) || '', updated: 0 });
+				changed = true;
+			}
+		} catch (err) { /* private mode -- nothing to scan */ }
+		// The reverse repair: an index entry whose document is gone (a partial delete, or a user
+		// clearing one key by hand) would otherwise show a project that cannot be opened.
+		var before = library.projects.length;
+		library.projects = library.projects.filter(function (p) {
+			try { return localStorage.getItem(projectKey(p.id)) !== null; } catch (err) { return true; }
+		});
+		return changed || library.projects.length !== before;
+	}
+	// One-time move of the pre-library single document into the library. A MOVE, not a copy: the
+	// legacy key is removed only AFTER the project key has been written and read back successfully,
+	// so a quota failure mid-migration leaves the original exactly where it was. Copying instead
+	// would double a multi-megabyte backdrop, which is the one thing most likely to hit quota here.
+	function migrateLegacy() {
+		var saved = readDocument(LPN_LEGACY_KEY);
+		if (!saved) { return null; }
+		var id = newProjectId();
+		if (!writeJSON(projectKey(id), saved)) { return null; }
+		if (readJSON(projectKey(id)) === null) { return null; }
+		try { localStorage.removeItem(LPN_LEGACY_KEY); } catch (err) { /* leave it; harmless duplicate */ }
+		library.projects.push({ id: id, name: (saved.project && saved.project.name) || '', updated: Date.now() });
+		library.openId = id;
+		saveIndex();
+		return saved;
+	}
+	// Returns the document to install, or null for "start empty". Called once, from init().
+	function initLibrary() {
+		var saved = readJSON(LPN_INDEX_KEY);
+		if (saved && Array.isArray(saved.projects)) {
+			library.projects = saved.projects;
+			library.openId = saved.openId || null;
+		}
+		var repaired = adoptOrphans();
+		// No index and no projects: either a first visit, or a preview user whose only network is
+		// still under the old single-document key.
+		if (!library.projects.length) { return migrateLegacy(); }
+		if (repaired) { saveIndex(); }
+		if (!indexEntry(library.openId)) { library.openId = library.projects[0].id; }
+		var doc2 = readDocument(projectKey(library.openId));
+		if (!doc2) { return null; }
+		return doc2;
+	}
+	// Everything a freshly-installed document has to push back out to the UI. Shared by
+	// openProject() and newProject() so the two can never drift into repainting different subsets.
+	function refreshAllFromDocument() {
+		backdropImg = null;
+		backdropLayer.innerHTML = '';
+		if (backdrop) { buildBackdropImg(); }
+		updateBackdropMenuState();
+		lastSolveResult = null;
+		closePopup();
+		buildDom();
+		seedDefaultInputs();
+		rebuildSettingsFields();
+		rebuildLabelsFields();
+		applyLegendPosition();
+		applyMapHeight();
+		refreshFontSizes();
+		refreshSymbolSizes();
+		renderLabelsLegend();
+		updateEmptyHint();
+		setStatus('');
+		setMode('select');
+		zoomExtent();
+		scheduleSolve();
+		updateProjectName();
+	}
+	function openProject(id) {
+		if (id === library.openId) { return true; }
+		saveToStorage(); // flush the outgoing project before switching away from it
+		var doc2 = readDocument(projectKey(id));
+		if (!doc2) { return false; }
+		library.openId = id;
+		saveIndex();
+		applySaved(doc2);
+		clearUndo();
+		refreshAllFromDocument();
+		return true;
+	}
+	// A new project inherits the CURRENT project's settings and label choices rather than starting
+	// at factory defaults. This is what preserves the behavior Tom set up before the library existed
+	// -- "New" clears the network, not your preferences -- now that preferences live per project.
+	// The workflow it protects is his own: set 8-inch/150/K=2 defaults, then draw.
+	function newProject() {
+		saveToStorage();
+		var inheritedSettings = JSON.parse(JSON.stringify(settings));
+		var inheritedLabels = JSON.parse(JSON.stringify(labelSettings));
+		var id = newProjectId();
+		doc = { nodes: [], links: [], labels: [] };
+		nextId = { J: 1, R: 1, L: 1, P: 1, T: 1 };
+		scenarios = defaultScenarios();
+		project = { name: '', activeScenario: 'base' };
+		settings = inheritedSettings;
+		labelSettings = inheritedLabels;
+		backdrop = null;
+		library.projects.push({ id: id, name: '', updated: Date.now() });
+		library.openId = id;
+		clearUndo();
+		saveToStorage();
+		refreshAllFromDocument();
+		return id;
+	}
+	// "Save as new project" -- Task 184's project-level copy, and the conventional reading of the
+	// words (Tom, 2026-07-31: "New project" sounds like this, not like starting empty). Duplicates
+	// the WHOLE project -- network, scenarios, overrides, backdrop and preferences together -- and
+	// opens the copy, leaving the original on disk untouched. Task 184 wants copy at the PROJECT
+	// level precisely because that is where a self-contained duplicate is what the user means.
+	function saveProjectAs(name) {
+		saveToStorage();
+		var id = newProjectId(), copy = serializeProject();
+		copy.project = Object.assign({}, project, { name: name });
+		// Written and verified BEFORE anything switches: a backdrop image makes a project the one
+		// thing here big enough to fail on quota, and a failed copy must leave the user exactly
+		// where they were rather than half-moved into a project that does not exist.
+		if (!writeJSON(projectKey(id), copy)) { return null; }
+		library.projects.push({ id: id, name: name, updated: Date.now() });
+		library.openId = id;
+		project.name = name;
+		saveIndex();
+		clearUndo();
+		updateProjectName();
+		return id;
+	}
+	function renameProject(id, name) {
+		var entry = indexEntry(id);
+		if (!entry) { return; }
+		entry.name = name;
+		entry.updated = Date.now();
+		if (id === library.openId) { project.name = name; saveToStorage(); updateProjectName(); }
+		else {
+			// Rename a project that is not open by rewriting just its name in place -- read, patch,
+			// write. Cheaper and safer than opening it, and it keeps the document (the authority)
+			// and the index agreeing.
+			var doc2 = readJSON(projectKey(id));
+			if (doc2 && doc2.project) { doc2.project.name = name; writeJSON(projectKey(id), doc2); }
+		}
+		saveIndex();
+	}
+	// Deletes the document first, then the index entry: the reverse order can leave a document with
+	// no entry, which adoptOrphans() would helpfully resurrect on the next load.
+	function deleteProject(id) {
+		try { localStorage.removeItem(projectKey(id)); } catch (err) { /* private mode */ }
+		library.projects = library.projects.filter(function (p) { return p.id !== id; });
+		if (id === library.openId) {
+			library.openId = null;
+			// Deleting the OPEN project has to leave something open. The most recently updated
+			// survivor is the best guess at "what I was working on before this one"; with no
+			// survivors at all, a fresh empty project -- never a blank screen with no project.
+			var rest = library.projects.slice().sort(function (a, b) { return (b.updated || 0) - (a.updated || 0); });
+			if (rest.length) { library.openId = rest[0].id; var d = readDocument(projectKey(rest[0].id)); if (d) { applySaved(d); } clearUndo(); refreshAllFromDocument(); }
+			else { newProject(); return; }
+		}
+		saveIndex();
+	}
+	// ---- Projects panel ----
+	// The open project's name lives on its own toolbar button, which both SHOWS what you are working
+	// on and opens the library -- the "what am I working on right now" question Task 184 names, in
+	// the place you would look for it. Renamed in place; no separate name field to keep in sync.
+	function updateProjectName() {
+		var btn = document.getElementById('lpn_projects_btn');
+		var pc = EngCalcs.pageConfig || {};
+		if (btn) { btn.textContent = (pc.lpn_tool_projects || 'Projects') + ': ' + projectDisplayName(project); }
+	}
+	function rebuildProjectsList() {
+		var pc = EngCalcs.pageConfig || {}, list = document.getElementById('lpn_projects_list');
+		if (!list) { return; }
+		list.innerHTML = '';
+		// Most recently updated first: with no folders and no search, recency is the only ordering
+		// that keeps the project you actually want near the top as a library grows.
+		var rows = library.projects.slice().sort(function (a, b) { return (b.updated || 0) - (a.updated || 0); });
+		rows.forEach(function (p) {
+			var isOpen = p.id === library.openId;
+			var row = document.createElement('div');
+			row.style.margin = '3px 0';
+			var name = document.createElement('span');
+			name.textContent = projectDisplayName(p);
+			if (isOpen) { name.style.fontWeight = 'bold'; }
+			row.appendChild(name);
+			if (isOpen) {
+				var here = document.createElement('span');
+				here.textContent = ' (' + (pc.lpn_project_open_now || 'Open now') + ')';
+				row.appendChild(here);
+			} else {
+				var openBtn = document.createElement('button');
+				openBtn.type = 'button'; openBtn.style.marginLeft = '6px';
+				openBtn.textContent = pc.lpn_project_open || 'Open';
+				openBtn.addEventListener('click', function () { openProject(p.id); rebuildProjectsList(); });
+				row.appendChild(openBtn);
+			}
+			var renameBtn = document.createElement('button');
+			renameBtn.type = 'button'; renameBtn.style.marginLeft = '4px';
+			renameBtn.textContent = pc.lpn_project_rename || 'Rename';
+			renameBtn.addEventListener('click', function () {
+				var v = window.prompt(pc.lpn_prompt_project_name || 'Name for this project', p.name || '');
+				// null is Cancel; an empty string is a deliberate "clear the name", which is legal --
+				// the project falls back to displaying Untitled.
+				if (v === null) { return; }
+				renameProject(p.id, v.trim());
+				rebuildProjectsList();
+			});
+			row.appendChild(renameBtn);
+			var delBtn = document.createElement('button');
+			delBtn.type = 'button'; delBtn.style.marginLeft = '4px';
+			delBtn.textContent = pc.lpn_project_delete || 'Delete';
+			delBtn.addEventListener('click', function () {
+				if (!window.confirm(pc.lpn_confirm_project_delete || 'Delete this project and everything in it? This cannot be undone.')) { return; }
+				deleteProject(p.id);
+				rebuildProjectsList();
+			});
+			row.appendChild(delBtn);
+			list.appendChild(row);
+		});
+		// Two ways to get a new project, deliberately named apart (Tom, 2026-07-31): "Save as new
+		// project" duplicates what is on screen, "Start empty project" does not. A single "New
+		// project" reads as the first to most people and does the second, which is the worst
+		// possible combination.
+		var saveAsBtn = document.createElement('button');
+		saveAsBtn.type = 'button'; saveAsBtn.style.marginTop = '6px';
+		saveAsBtn.textContent = pc.lpn_project_saveas || 'Save as new project';
+		saveAsBtn.addEventListener('click', function () {
+			var suggested = (project.name || projectDisplayName(project)) + (pc.lpn_project_copy_suffix || ' (copy)');
+			var v = window.prompt(pc.lpn_prompt_project_name || 'Name for this project', suggested);
+			if (v === null) { return; }
+			saveProjectAs(v.trim());
+			rebuildProjectsList();
+		});
+		list.appendChild(saveAsBtn);
+		var newBtn = document.createElement('button');
+		newBtn.type = 'button'; newBtn.style.marginTop = '6px'; newBtn.style.marginLeft = '4px';
+		newBtn.textContent = pc.lpn_project_new || 'Start empty project';
+		newBtn.addEventListener('click', function () { newProject(); rebuildProjectsList(); });
+		list.appendChild(newBtn);
+	}
+	function toggleProjectsPopup(evt) {
+		var popup = document.getElementById('lpn_projects_popup');
+		if (popup.style.display === 'block') { popup.style.display = 'none'; return; }
+		rebuildProjectsList();
+		// Same position-from-the-button-rect-then-clamp dance the other two popovers use.
+		var r = evt.currentTarget.getBoundingClientRect();
+		popup.style.left = r.left + 'px'; popup.style.top = r.bottom + 'px'; popup.style.display = 'block';
+		var pr = popup.getBoundingClientRect();
+		popup.style.left = Math.max(4, Math.min(r.left, window.innerWidth - pr.width - 4)) + 'px';
+		popup.style.top = Math.max(4, Math.min(r.bottom, window.innerHeight - pr.height - 4)) + 'px';
+	}
+	function wireProjectsPopup() {
+		document.getElementById('lpn_projects_popup_close').addEventListener('click', function () {
+			document.getElementById('lpn_projects_popup').style.display = 'none';
+		});
+	}
+
 	// A dedicated button, not a repurposed "Restore Defaults" (Tom asked "do we dare"): that
 	// button's suite-wide behavior (lib/Calculators.lib.php's EngCalcs.resetToDefaults) expires a
 	// cookie this page never uses and reloads, which wouldn't touch localStorage at all --
@@ -1692,6 +2153,11 @@ var EngCalcs = EngCalcs || {};
 		if (!window.confirm(pc.lpn_confirm_clear || 'This will permanently delete the current network. Continue?')) { return; }
 		doc = { nodes: [], links: [], labels: [] };
 		nextId = { J: 1, R: 1, L: 1, P: 1, T: 1 };
+		// "New" means a blank PROJECT, so the container resets with the network: scenarios back to
+		// Base alone (their overrides key element IDs that no longer exist) and the project name
+		// back to unnamed. Preferences (settings/labelSettings) still survive, as below.
+		scenarios = defaultScenarios();
+		project = { name: '', activeScenario: 'base' };
 		// "New" means a genuinely blank project (Task 146 Phase 2) -- the separate "Remove image"
 		// menu action clears just the backdrop without touching the network.
 		backdrop = null; backdropImg = null;
@@ -1721,7 +2187,7 @@ var EngCalcs = EngCalcs || {};
 		// reset with no click needed.
 		try {
 			if (/[?&]lpn_wipe=1(&|$)/.test(window.location.search)) {
-				localStorage.removeItem('lpn_document');
+				wipeAllStorage();
 				var url = window.location.href.replace(/([?&])lpn_wipe=1&?/, '$1').replace(/[?&]$/, '');
 				window.history.replaceState(null, '', url);
 			}
@@ -1759,10 +2225,20 @@ var EngCalcs = EngCalcs || {};
 		if (EngCalcs.initTips) { EngCalcs.initTips(document); }
 		wirePointerEvents();
 		wirePopup();
-		if (loadFromStorage()) {
+		var opening = initLibrary();
+		if (opening) {
+			applySaved(opening);
 			buildDom(); scheduleSolve();
 			if (backdrop) { buildBackdropImg(); }
 			updateBackdropMenuState();
+		} else if (!library.openId) {
+			// First visit, or nothing readable: the library always has exactly one open project, so
+			// there is never a state where drawing has nowhere to be saved. Registered directly
+			// rather than through newProject(), which repaints a UI that does not exist yet.
+			var firstId = newProjectId();
+			library.projects.push({ id: firstId, name: '', updated: Date.now() });
+			library.openId = firstId;
+			saveIndex();
 		}
 		wireLabelsPopup();
 		// AFTER loadFromStorage() (so a saved default is never overwritten -- seedDefaultInputs()
@@ -1771,6 +2247,7 @@ var EngCalcs = EngCalcs || {};
 		// units strip is in the DOM, which is what the seeding exists to wait for.
 		seedDefaultInputs();
 		wireSettingsPopup();
+		wireProjectsPopup();
 		applyLegendPosition();
 		applyMapHeight();
 		// Node/vertex radii are already built at the right size (buildDom() reads symbolFactor()),
@@ -1779,6 +2256,13 @@ var EngCalcs = EngCalcs || {};
 		refreshSymbolSizes();
 		updateEmptyHint();
 		updateModeHint(); // initial mode is 'select', set before setMode() ever runs -- render it now
+		updateProjectName();
+		// Rotating a phone changes innerHeight, and with it the cap above -- without this, turning a
+		// portrait phone to landscape leaves a canvas taller than the screen and re-creates exactly
+		// the trap the cap exists to prevent. orientationchange as well as resize: some mobile
+		// browsers fire only one of the two, and re-applying a height twice is free.
+		window.addEventListener('resize', applyMapHeight);
+		window.addEventListener('orientationchange', applyMapHeight);
 		zoomExtent();
 		requestAnimationFrame(tick);
 	}
@@ -1822,9 +2306,17 @@ var EngCalcs = EngCalcs || {};
 		// Delete, Undo -- Select first for safety, per Tom's own correction of an earlier order),
 		// View (Zoom Extent).
 		var fileGroup = group();
+		// First in the File group and first on the toolbar: it names the open project, so it is also
+		// the page's answer to "which network am I looking at" (Task 146.08).
+		var projectsBtn = document.createElement('button');
+		projectsBtn.type = 'button';
+		projectsBtn.id = 'lpn_projects_btn';
+		projectsBtn.textContent = pc.lpn_tool_projects || 'Projects';
+		projectsBtn.addEventListener('click', toggleProjectsPopup);
+		fileGroup.appendChild(projectsBtn);
 		var clearBtn = document.createElement('button');
 		clearBtn.type = 'button';
-		clearBtn.textContent = pc.lpn_tool_clear || 'Clear / New';
+		clearBtn.textContent = pc.lpn_tool_clear || 'Clear project';
 		clearBtn.addEventListener('click', clearNetwork);
 		fileGroup.appendChild(clearBtn);
 		var exampleBtn = document.createElement('button');
@@ -1902,7 +2394,7 @@ var EngCalcs = EngCalcs || {};
 		var r = addNode('reservoir', 0, 0);
 		r.elev = niceDefault('lpn_u_elevhead', 'fth2o', 55, 17);
 		var j1 = addNode('junction', 20, 0);
-		j1.elev = niceDefault('lpn_u_elevhead', 'fth2o', 50, 15); j1.demand = 0;
+		j1.elev = niceDefault('lpn_u_elevhead', 'fth2o', 50, 15); j1._demand = 0;
 		// The example's pump gets a curve explicitly, as document content the user can see and edit
 		// in its popup -- addLink() no longer invents one (see its comment). Everything else in this
 		// example is pre-filled the same way (elevations, demands, diameters), so a worked pump
@@ -1922,7 +2414,7 @@ var EngCalcs = EngCalcs || {};
 		recomputePumpCurve(pump);
 		var j2 = addNode('junction', 40, 15);
 		j2.elev = niceDefault('lpn_u_elevhead', 'fth2o', 40, 12);
-		j2.demand = niceDefault('lpn_u_flow', 'gpm', 100, 0.006);
+		j2._demand = niceDefault('lpn_u_flow', 'gpm', 100, 0.006);
 		var pipe = addLink('pipe', j1.id, j2.id);
 		pipe.verts.push({ x: 30, y: -5 });
 		// addLink() computed .length before this vertex existed (straight node-to-node distance);
@@ -1930,7 +2422,7 @@ var EngCalcs = EngCalcs || {};
 		// initial displayed length undercounts the bend until the vertex is next dragged (which
 		// goes through updateVertex()/updateLinkGeometry(), where lenAuto recomputation already
 		// happens correctly). Tom caught this: 25ft shown, jumped to 28ft only after a drag.
-		pipe.length = linkGeomLength(pipe);
+		pipe._length = linkGeomLength(pipe);
 		rebuildLink(pipe);
 		// Second, straight J1-J2 pipe (Tom, 2026-07-30): the bent pipe alone made this a tree/series
 		// network with no cycle at all, despite being the example for a LOOPED network calculator --
@@ -1939,7 +2431,7 @@ var EngCalcs = EngCalcs || {};
 		// J1/J2 at closer to a right angle, instead of running the second pipe as a straight overlap.
 		var pipe2 = addLink('pipe', j1.id, j2.id);
 		pipe2.verts.push({ x: 27, y: 15 });
-		pipe2.length = linkGeomLength(pipe2);
+		pipe2._length = linkGeomLength(pipe2);
 		rebuildLink(pipe2);
 		updateEmptyHint();
 		zoomExtent();
@@ -1965,7 +2457,7 @@ var EngCalcs = EngCalcs || {};
 					n = addNode('reservoir', 0, 0);
 				} else {
 					n = addNode('junction', col * SPACING, row * SPACING);
-					n.demand = demand;
+					n._demand = demand;
 				}
 				grid[row].push(n);
 			}
@@ -2465,8 +2957,22 @@ var EngCalcs = EngCalcs || {};
 	};
 	// Map height (settings panel): the page is scrollable, so a user working on a large monitor
 	// can size the map view up toward the full screen instead of the original fixed 500px.
+	// The map is never allowed to fill the screen (Tom, 2026-07-31, on a phone: "a phone can get
+	// stuck on the canvas when it fills the screen... I recovered safely by reloading the page").
+	// #lpn_canvas carries `touch-action: none` so the app can own pan/zoom gestures -- which means
+	// every touch that lands on the canvas is swallowed and CANNOT scroll the page. With a canvas
+	// taller than the viewport there is then no reachable page left to touch, and the only way out
+	// is a reload. Capping the rendered height guarantees a strip of ordinary page is always within
+	// reach, which is the invariant that actually prevents the trap; a scroll affordance or a
+	// two-finger-pan rule would each be a bigger change to reach the same place.
+	// settings.mapHeight keeps the user's UNCLAMPED number -- this is a render-time cap, so a 900px
+	// map set on a desktop is not permanently rewritten by one visit on a phone.
+	function effectiveMapHeight() {
+		var room = Math.max(240, Math.round((window.innerHeight || 800) * 0.72));
+		return Math.min(settings.mapHeight, room);
+	}
 	function applyMapHeight() {
-		if (svg) { svg.setAttribute('height', settings.mapHeight); }
+		if (svg) { svg.setAttribute('height', effectiveMapHeight()); }
 	}
 	function applyLegendPosition() {
 		var box = document.getElementById('lpn_labels_legend'); if (!box) { return; }
@@ -2652,13 +3158,13 @@ var EngCalcs = EngCalcs || {};
 			{ key: 'nodeElev', group: 'node', field: 'elev', label: pc.lpn_field_elev || 'Elevation',
 				applies: function () { return true; }, get: function (n) { return n.elev; }, set: function (n, v) { n.elev = v; } },
 			{ key: 'demand', group: 'node', field: 'demand', label: pc.bpn_demand || 'Demand',
-				applies: function (n) { return n.type !== 'reservoir'; }, get: function (n) { return n.demand; }, set: function (n, v) { n.demand = v; } },
+				applies: function (n) { return n.type !== 'reservoir'; }, get: function (n) { return effective(n, 'demand'); }, set: function (n, v) { n._demand = v; } },
 			{ key: 'diameter', group: 'link', field: 'diameter', label: pc.lpn_field_diameter || 'Diameter',
-				applies: function (l) { return l.type !== 'pump'; }, get: function (l) { return l.diameter; }, set: function (l, v) { l.diameter = v; } },
+				applies: function (l) { return l.type !== 'pump'; }, get: function (l) { return effective(l, 'diameter'); }, set: function (l, v) { l._diameter = v; } },
 			{ key: 'roughness', group: 'link', field: 'roughness', label: pc.lpn_field_roughness || 'Roughness',
-				applies: function (l) { return l.type !== 'pump'; }, get: function (l) { return l.roughness; }, set: function (l, v) { l.roughness = v; } },
+				applies: function (l) { return l.type !== 'pump'; }, get: function (l) { return effective(l, 'roughness'); }, set: function (l, v) { l._roughness = v; } },
 			{ key: 'k', group: 'link', field: 'km', label: pc.lpn_field_km || 'Minor (local) loss coefficient, km',
-				applies: function (l) { return l.type !== 'pump'; }, get: function (l) { return l.k; }, set: function (l, v) { l.k = v; } }
+				applies: function (l) { return l.type !== 'pump'; }, get: function (l) { return effective(l, 'k'); }, set: function (l, v) { l._k = v; } }
 		];
 		note(defBody, pc.lpn_settings_push_note || 'Pushing sends only the properties whose labels are currently showing.');
 		var pushBtn = document.createElement('button');
@@ -2792,9 +3298,33 @@ var EngCalcs = EngCalcs || {};
 			else { heightInput.value = settings.mapHeight; }
 		});
 		row(mapBody, pc.lpn_settings_map_height_px || 'Map height (px)', heightInput);
-		// ---- always visible: the two rows worth never burying ----
-		// Tolerance because it is the one setting that changes whether the answer is right, and
-		// legend position because it is fiddled with often. Both headingless, per the note above.
+		var legendSelect = document.createElement('select');
+		[
+			['top-left', pc.lpn_settings_legend_top_left || 'Top left'],
+			['top-right', pc.lpn_settings_legend_top_right || 'Top right'],
+			['middle-left', pc.lpn_settings_legend_middle_left || 'Middle left'],
+			['middle-right', pc.lpn_settings_legend_middle_right || 'Middle right'],
+			['bottom-left', pc.lpn_settings_legend_bottom_left || 'Bottom left'],
+			['bottom-right', pc.lpn_settings_legend_bottom_right || 'Bottom right']
+		].forEach(function (o) {
+			var opt = document.createElement('option');
+			opt.value = o[0]; opt.textContent = o[1]; if (o[0] === settings.legendPosition) { opt.selected = true; }
+			legendSelect.appendChild(opt);
+		});
+		legendSelect.addEventListener('change', function () {
+			settings.legendPosition = legendSelect.value;
+			applyLegendPosition();
+			saveToStorage();
+		});
+		// Legend position lives INSIDE Map display (Tom, 2026-07-30), not loose above it: it is a
+		// map-display property by any plain reading, and it is a set-once choice -- which is the
+		// weakest case there is for promoting a row out of its section. The earlier "fiddled with
+		// often" justification for keeping it loose did not survive contact with the section it
+		// obviously belongs to.
+		row(mapBody, pc.lpn_settings_legend_position || 'Legend position', legendSelect);
+		// ---- always visible: the one row worth never burying ----
+		// Tolerance, because it is the one setting that changes whether the answer is right.
+		// Headingless, per the note above.
 		var tail = document.createElement('div');
 		tail.style.marginTop = '6px';
 		fields.appendChild(tail);
@@ -2814,25 +3344,6 @@ var EngCalcs = EngCalcs || {};
 			else { tolInput.value = settings.tolerance; }
 		});
 		row(tail, pc.lpn_settings_tolerance || 'Convergence tolerance', tolInput);
-		var legendSelect = document.createElement('select');
-		[
-			['top-left', pc.lpn_settings_legend_top_left || 'Top left'],
-			['top-right', pc.lpn_settings_legend_top_right || 'Top right'],
-			['middle-left', pc.lpn_settings_legend_middle_left || 'Middle left'],
-			['middle-right', pc.lpn_settings_legend_middle_right || 'Middle right'],
-			['bottom-left', pc.lpn_settings_legend_bottom_left || 'Bottom left'],
-			['bottom-right', pc.lpn_settings_legend_bottom_right || 'Bottom right']
-		].forEach(function (o) {
-			var opt = document.createElement('option');
-			opt.value = o[0]; opt.textContent = o[1]; if (o[0] === settings.legendPosition) { opt.selected = true; }
-			legendSelect.appendChild(opt);
-		});
-		legendSelect.addEventListener('change', function () {
-			settings.legendPosition = legendSelect.value;
-			applyLegendPosition();
-			saveToStorage();
-		});
-		row(tail, pc.lpn_settings_legend_position || 'Legend position', legendSelect);
 		// ---- restore defaults (Tom, 2026-07-30) ----
 		// Resets settings/labelSettings only -- the network (nodes/links/labels) and backdrop are
 		// untouched, same "preferences vs. content" split clearNetwork()'s own comment documents.
@@ -2864,7 +3375,7 @@ var EngCalcs = EngCalcs || {};
 		wipeBtn.textContent = pc.lpn_settings_wipe_btn || 'Wipe memory';
 		wipeBtn.addEventListener('click', function () {
 			if (!window.confirm(pc.lpn_confirm_wipe || 'Delete EVERYTHING saved for this page -- network, backdrop image, and all settings -- and reload as a brand-new visitor would see it? This cannot be undone.')) { return; }
-			try { localStorage.removeItem('lpn_document'); } catch (err) { /* private mode -- nothing to remove */ }
+			wipeAllStorage();
 			window.location.reload();
 		});
 		tail.appendChild(wipeBtn);
@@ -2958,12 +3469,12 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, label = document.createElement('label'),
 			input = document.createElement('input'), autoLabel = document.createElement('label'),
 			auto = document.createElement('input');
-		input.type = 'number'; input.value = l.length.toFixed(2);
-		input.addEventListener('change', function () { l.length = +input.value; l.lenAuto = false; auto.checked = false; scheduleSolve(); });
+		input.type = 'number'; input.value = effective(l, 'length').toFixed(2);
+		input.addEventListener('change', function () { l._length = +input.value; l.lenAuto = false; auto.checked = false; scheduleSolve(); });
 		auto.type = 'checkbox'; auto.checked = l.lenAuto;
 		auto.addEventListener('change', function () {
 			l.lenAuto = auto.checked;
-			if (l.lenAuto) { l.length = linkGeomLength(l); input.value = l.length.toFixed(2); }
+			if (l.lenAuto) { l._length = linkGeomLength(l); input.value = effective(l, 'length').toFixed(2); }
 			scheduleSolve();
 		});
 		label.textContent = (pc.lpn_field_length || 'Length') + ' (' + unitLabel('lpn_u_length') + ') ';
@@ -3078,8 +3589,8 @@ var EngCalcs = EngCalcs || {};
 			// between them. That row is computed straight from the document (not from a solve
 			// result), so it can and should be right the moment either number is committed.
 			unitNumberFieldBlank(fields, pc.lpn_field_head || 'Head', 'lpn_u_elevhead',
-				function () { return n.head; },
-				function (v) { n.head = v; updateNode(nodeId); refreshPopupIfOpen(); },
+				function () { return effective(n, 'head'); },
+				function (v) { n._head = v; updateNode(nodeId); refreshPopupIfOpen(); },
 				n.elev || 0);
 			// No read-only Head row here (a junction gets one because its head is a solve RESULT) --
 			// the editable field above already shows this reservoir's head, typed or inherited.
@@ -3088,7 +3599,7 @@ var EngCalcs = EngCalcs || {};
 			unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
 				function () { return n.elev; }, function (v) { n.elev = v; updateNode(nodeId); });
 			unitNumberField(fields, pc.bpn_demand || 'Demand', 'lpn_u_flow',
-				function () { return n.demand; }, function (v) { n.demand = v; updateNode(nodeId); });
+				function () { return effective(n, 'demand'); }, function (v) { n._demand = v; updateNode(nodeId); });
 			if (lastSolveResult && lastSolveResult.pressures[nodeId] !== undefined) {
 				readonlyUnitField(fields, pc.lpn_result_head || 'Head', 'lpn_u_elevhead', lastSolveResult.heads[nodeId]);
 				readonlyUnitField(fields, pc.lpn_result_pressure || 'Pressure', 'lpn_u_pressure', lastSolveResult.pressures[nodeId]);
@@ -3208,8 +3719,8 @@ var EngCalcs = EngCalcs || {};
 			renderPumpCurveFields(fields, l, linkId);
 		} else {
 			unitNumberField(fields, pc.lpn_field_diameter || 'Diameter', 'lpn_u_diameter',
-				function () { return l.diameter; }, function (v) { l.diameter = v; });
-			numberFieldPlain(fields, pc.lpn_field_roughness || 'Roughness', l.roughness, function (v) { l.roughness = v; });
+				function () { return effective(l, 'diameter'); }, function (v) { l._diameter = v; });
+			numberFieldPlain(fields, pc.lpn_field_roughness || 'Roughness', effective(l, 'roughness'), function (v) { l._roughness = v; });
 			// Minor (local) loss coefficient, k_m -- dimensionless, so no unit conversion (same as
 			// Roughness above). Defaults from settings.defaults.k at creation (addLink()); editable
 			// per-pipe here, same pattern as every other pipe property. Plain-text wording only
@@ -3217,7 +3728,7 @@ var EngCalcs = EngCalcs || {};
 			// existing "k<sub>m</sub>" label (mphl_total_junction_k) is HTML-bearing, incompatible
 			// with that call site; CLAUDE.md's concept-level reuse rule is about wording, not
 			// forcing markup into a plain-text slot.
-			numberFieldPlain(fields, pc.lpn_field_km || 'Minor (local) loss coefficient, km', l.k || 0, function (v) { l.k = v; });
+			numberFieldPlain(fields, pc.lpn_field_km || 'Minor (local) loss coefficient, km', effective(l, 'k') || 0, function (v) { l._k = v; });
 			lengthField(fields, l);
 		}
 		if (lastSolveResult && lastSolveResult.flows[linkId] !== undefined) {
@@ -3234,8 +3745,8 @@ var EngCalcs = EngCalcs || {};
 			readonlyUnitField(fields, pc.lpn_result_headloss || 'Head loss', 'lpn_u_elevhead', lastSolveResult.headlosses[linkId]);
 			// Gradient is per unit of pipe LENGTH, so it is a pipe-only result -- a pump has no
 			// length to spread its head over.
-			if (l.type !== 'pump' && l.length) {
-				readonlyUnitField(fields, pc.lpn_result_gradient || 'Head loss gradient', 'lpn_u_gradient', lastSolveResult.headlosses[linkId] / l.length);
+			if (l.type !== 'pump' && effective(l, 'length')) {
+				readonlyUnitField(fields, pc.lpn_result_gradient || 'Head loss gradient', 'lpn_u_gradient', lastSolveResult.headlosses[linkId] / effective(l, 'length'));
 			}
 		}
 	}
@@ -3336,6 +3847,10 @@ var EngCalcs = EngCalcs || {};
 		undoStack.push(JSON.parse(JSON.stringify(doc)));
 		if (undoStack.length > UNDO_LIMIT) { undoStack.shift(); }
 	}
+	// Switching projects drops the undo history (Task 146.08). The stack holds snapshots of the
+	// OUTGOING project's doc; leaving them in place would let one Undo in the newly-opened project
+	// paste the previous project's network over it -- silently, and with no way back.
+	function clearUndo() { undoStack.length = 0; }
 	function undo() {
 		if (undoStack.length === 0) { return; }
 		doc = undoStack.pop();
@@ -3363,23 +3878,36 @@ var EngCalcs = EngCalcs || {};
 	});
 
 	// ---- solve: EngCalcs.lpnSolve() (js/lpn-solver.js), debounced on every edit ----
-	// doc.nodes/doc.links already carry the field names the solver expects (id/type/elev/demand/
-	// head for nodes; id/type/from/to/diameter/roughness/length/status/h0/a/b for links) --
-	// assembling a model is just wrapping them, no field renaming needed. method is fixed to
-	// 'hw' for now (no friction-method selector yet -- see the numberFieldPlain() comment on
-	// Roughness). visc is fresh water at ~20C; not user-editable yet.
+	// js/lpn-solver.js is a separate interface: its model shape (id/type/elev/demand/emitter/head for
+	// nodes; id/type/from/to/diameter/roughness/length/status/k/h0/a/b for links) is the solver's own
+	// API and is NOT renamed here. But doc.nodes/doc.links themselves now store every overridable
+	// property underscored (Task 184/146.08 step 2), so passing them through untouched would hand the
+	// solver a model with no demand/diameter/etc. at all. Every node/link is therefore rebuilt into a
+	// plain-keyed COPY, reading each overridable property through effective() -- this is also where a
+	// scenario's overrides take effect for the solver, once scenarios exist. Fields the solver reads
+	// that are NOT overridable (elev, from/to, h0/a/b, curve-derived) pass through unchanged.
+	// method is fixed to 'hw' for now (no friction-method selector yet -- see the numberFieldPlain()
+	// comment on Roughness). visc is fresh water at ~20C; not user-editable yet.
 	var lastSolveResult = null;
 	function assembleModel() {
-		// Reservoirs are passed as resolved COPIES: the solver wants a real number in node.head, but
-		// the document deliberately stores that field blank when the head just follows the elevation
-		// (see reservoirHead()). Copying rather than filling the blank in keeps the document's "still
-		// following elevation" state intact. Junctions are passed through untouched.
 		var nodes = doc.nodes.map(function (n) {
 			return n.type === 'reservoir'
+				// Reservoirs pass a resolved head: the solver wants a real number, but the document
+				// deliberately stores that field blank when the head just follows the elevation (see
+				// reservoirHead()). Copying rather than filling the blank in keeps the document's
+				// "still following elevation" state intact.
 				? { id: n.id, type: n.type, elev: n.elev || 0, head: reservoirHead(n) }
-				: n;
+				: { id: n.id, type: n.type, elev: n.elev || 0, demand: effective(n, 'demand'), emitter: effective(n, 'emitter') };
 		});
-		return { nodes: nodes, links: doc.links, method: 'hw', visc: 1.007e-6, emitterExponent: settings.emitterExponent };
+		var links = doc.links.map(function (l) {
+			return {
+				id: l.id, type: l.type, from: l.from, to: l.to,
+				diameter: effective(l, 'diameter'), roughness: effective(l, 'roughness'),
+				length: effective(l, 'length'), status: effective(l, 'status'), k: effective(l, 'k'),
+				h0: l.h0, a: l.a, b: l.b
+			};
+		});
+		return { nodes: nodes, links: links, method: 'hw', visc: 1.007e-6, emitterExponent: settings.emitterExponent };
 	}
 	function diagIssueText(issue) {
 		var pc = EngCalcs.pageConfig || {};
@@ -3431,7 +3959,8 @@ var EngCalcs = EngCalcs || {};
 	}
 	// Length is declarative, not SI-converted (see the lengthField() comment above: "1 grid unit IS
 	// 1 ft or 1 m, whichever is currently selected, by declaration") -- unlike every other field
-	// here, l.length is already in the displayed unit, so this must NOT run it through unitFactor.
+	// here, effective(l,'length') is already in the displayed unit, so this must NOT run it through
+	// unitFactor.
 	function rawLine(value, extrema, color, decimals) {
 		var displayValue = plainRound(value, decimals);
 		return { text: displayValue.toFixed(fieldDecimals(decimals)), color: color, decoration: decorationFor(extrema, displayValue) };
@@ -3451,7 +3980,7 @@ var EngCalcs = EngCalcs || {};
 			// raised above it. Demand still excludes them: a reservoir supplies whatever the network
 			// draws rather than demanding an amount.
 			elev: fieldExtrema(doc.nodes.map(function (n) { return displayRound(n.elev, 'lpn_u_elevhead', nd.elev); })),
-			demand: fieldExtrema(doc.nodes.map(function (n) { return n.type !== 'reservoir' ? displayRound(n.demand, 'lpn_u_flow', nd.demand) : undefined; })),
+			demand: fieldExtrema(doc.nodes.map(function (n) { return n.type !== 'reservoir' ? displayRound(effective(n, 'demand'), 'lpn_u_flow', nd.demand) : undefined; })),
 			head: fieldExtrema(doc.nodes.map(function (n) {
 				if (n.type === 'reservoir') { return displayRound(reservoirHead(n), 'lpn_u_elevhead', nd.head); }
 				return lastSolveResult ? displayRound(lastSolveResult.heads[n.id], 'lpn_u_elevhead', nd.head) : undefined;
@@ -3460,11 +3989,11 @@ var EngCalcs = EngCalcs || {};
 				if (n.type === 'reservoir') { return displayRound(reservoirHead(n) - (n.elev || 0), 'lpn_u_pressure', nd.pressure); }
 				return lastSolveResult ? displayRound(lastSolveResult.pressures[n.id], 'lpn_u_pressure', nd.pressure) : undefined;
 			})),
-			diameter: fieldExtrema(doc.links.map(function (l) { return l.type !== 'pump' ? displayRound(l.diameter, 'lpn_u_diameter', ld.diameter) : undefined; })),
-			length: fieldExtrema(doc.links.map(function (l) { return l.type !== 'pump' ? plainRound(l.length, ld.length) : undefined; })),
+			diameter: fieldExtrema(doc.links.map(function (l) { return l.type !== 'pump' ? displayRound(effective(l, 'diameter'), 'lpn_u_diameter', ld.diameter) : undefined; })),
+			length: fieldExtrema(doc.links.map(function (l) { return l.type !== 'pump' ? plainRound(effective(l, 'length'), ld.length) : undefined; })),
 			// Both dimensionless, so they use rawLine()/plainRound() like Length, not displayRound().
-			roughness: fieldExtrema(doc.links.map(function (l) { return l.type !== 'pump' ? plainRound(l.roughness, ld.roughness) : undefined; })),
-			km: fieldExtrema(doc.links.map(function (l) { return l.type !== 'pump' ? plainRound(l.k || 0, ld.km) : undefined; })),
+			roughness: fieldExtrema(doc.links.map(function (l) { return l.type !== 'pump' ? plainRound(effective(l, 'roughness'), ld.roughness) : undefined; })),
+			km: fieldExtrema(doc.links.map(function (l) { return l.type !== 'pump' ? plainRound(effective(l, 'k') || 0, ld.km) : undefined; })),
 			flow: fieldExtrema(doc.links.map(function (l) { return lastSolveResult ? displayRound(lastSolveResult.flows[l.id], 'lpn_u_flow', ld.flow) : undefined; })),
 			velocity: fieldExtrema(doc.links.map(function (l) { return (l.type !== 'pump' && lastSolveResult) ? displayRound(lastSolveResult.velocities[l.id], 'lpn_u_velocity', ld.velocity) : undefined; })),
 			// One head-loss bucket for every link type, pumps included: a pump reports a negative
@@ -3481,14 +4010,15 @@ var EngCalcs = EngCalcs || {};
 			// form to read as anything but "0.00" for a typical small pipe gradient; see that
 			// family's own comment. Not a per-1000-length form (EPANET's convention) by design,
 			// matching this suite's own established slope convention instead.
-			// l.length is NOT divided by unitFactor('lpn_u_length') here -- per the
-			// scope doc's "declarative units" design, l.length is already the real SI length the
+			// effective(l,'length') is NOT divided by unitFactor('lpn_u_length') here -- per the
+			// scope doc's "declarative units" design, it is already the real SI length the
 			// solver itself used (the Length/Map selector only relabels the popup's input, it does
 			// not convert the stored number), so dividing by that selector's factor would double-
 			// convert. Pump-excluded, same as headloss.
 			gradient: fieldExtrema(doc.links.map(function (l) {
-				if (l.type === 'pump' || !l.length || !lastSolveResult || lastSolveResult.headlosses[l.id] === undefined) { return undefined; }
-				return displayRound(lastSolveResult.headlosses[l.id] / l.length, 'lpn_u_gradient', ld.gradient);
+				var len = effective(l, 'length');
+				if (l.type === 'pump' || !len || !lastSolveResult || lastSolveResult.headlosses[l.id] === undefined) { return undefined; }
+				return displayRound(lastSolveResult.headlosses[l.id] / len, 'lpn_u_gradient', ld.gradient);
 			}))
 		};
 		var fc = lpnFieldColors, nodeLines = {}, linkLines = {};
@@ -3499,7 +4029,7 @@ var EngCalcs = EngCalcs || {};
 			// demand is the thing the user set as a design target, head/pressure are what the solve
 			// produced from it, and elevation (the input least likely to change page to page) trails.
 			if (ls.node.id) { lines.push({ text: n.id, color: fc.id }); }
-			if (n.type !== 'reservoir' && ls.node.demand) { lines.push(numLine(n.demand, 'lpn_u_flow', extrema.demand, fc.demand, nd.demand)); }
+			if (n.type !== 'reservoir' && ls.node.demand) { lines.push(numLine(effective(n, 'demand'), 'lpn_u_flow', extrema.demand, fc.demand, nd.demand)); }
 			var headSI = n.type === 'reservoir' ? reservoirHead(n) : (lastSolveResult ? lastSolveResult.heads[n.id] : undefined);
 			var pressSI = n.type === 'reservoir'
 				? reservoirHead(n) - (n.elev || 0)
@@ -3522,17 +4052,17 @@ var EngCalcs = EngCalcs || {};
 			var lines = [];
 			if (ls.link.id) { lines.push({ text: l.id, color: fc.id }); }
 			if (l.type !== 'pump') {
-				if (ls.link.diameter) { lines.push(numLine(l.diameter, 'lpn_u_diameter', extrema.diameter, fc.diameter, ld.diameter)); }
-				if (ls.link.length) { lines.push(rawLine(l.length, extrema.length, fc.length, ld.length)); }
-				if (ls.link.roughness) { lines.push(rawLine(l.roughness, extrema.roughness, fc.roughness, ld.roughness)); }
-				if (ls.link.km) { lines.push(rawLine(l.k || 0, extrema.km, fc.km, ld.km)); }
+				if (ls.link.diameter) { lines.push(numLine(effective(l, 'diameter'), 'lpn_u_diameter', extrema.diameter, fc.diameter, ld.diameter)); }
+				if (ls.link.length) { lines.push(rawLine(effective(l, 'length'), extrema.length, fc.length, ld.length)); }
+				if (ls.link.roughness) { lines.push(rawLine(effective(l, 'roughness'), extrema.roughness, fc.roughness, ld.roughness)); }
+				if (ls.link.km) { lines.push(rawLine(effective(l, 'k') || 0, extrema.km, fc.km, ld.km)); }
 			}
 			if (lastSolveResult && lastSolveResult.flows[l.id] !== undefined) {
 				if (ls.link.flow) { lines.push(numLine(lastSolveResult.flows[l.id], 'lpn_u_flow', extrema.flow, fc.flow, ld.flow)); }
 				// Velocity is meaningless for a pump (no diameter -- see renderLinkFields() above).
 				if (ls.link.velocity && l.type !== 'pump') { lines.push(numLine(lastSolveResult.velocities[l.id], 'lpn_u_velocity', extrema.velocity, fc.velocity, ld.velocity)); }
 				if (ls.link.headloss) { lines.push(numLine(lastSolveResult.headlosses[l.id], 'lpn_u_elevhead', extrema.headloss, fc.headloss, ld.headloss)); }
-				if (ls.link.gradient && l.type !== 'pump' && l.length) { lines.push(numLine(lastSolveResult.headlosses[l.id] / l.length, 'lpn_u_gradient', extrema.gradient, fc.gradient, ld.gradient)); }
+				if (ls.link.gradient && l.type !== 'pump' && effective(l, 'length')) { lines.push(numLine(lastSolveResult.headlosses[l.id] / effective(l, 'length'), 'lpn_u_gradient', extrema.gradient, fc.gradient, ld.gradient)); }
 			}
 			le.empty = lines.length === 0;
 			if (lines.length === 0) { lines.push({ text: '' }); }

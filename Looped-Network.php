@@ -100,16 +100,19 @@ document.addEventListener('DOMContentLoaded', function() {
       // somewhere other than where it visually appeared, so the tap fell through to the canvas
       // underneath and was read as a background pan). fixed is always viewport-relative, matching
       // clientX/clientY directly with no scroll math needed. ?>
-<div id="lpn_popup" class="d-print-none" style="display:none;position:fixed;z-index:20;background:#fff;border:1px solid #333;padding:8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
+<div id="lpn_popup" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:20;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
+	<div class="lpn-popover-body">
 	<div id="lpn_popup_title"></div>
 	<div id="lpn_popup_fields"></div>
-	<button type="button" id="lpn_popup_close"><?=$ec_lang['lpn_close']?></button>
+	</div>
+	<button type="button" id="lpn_popup_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">×</button>
 </div>
 <?php // A static settings panel, not a per-element property sheet -- deliberately its own popover
       // (not #lpn_popup/currentPopup) so this never interacts with the rename/undo/element-property
       // machinery. position:fixed and positioned from the Labels button's own screen rect (same
       // reasoning as #lpn_popup above: viewport-relative, clamped into view by JS on open). ?>
-<div id="lpn_labels_popup" class="d-print-none" style="display:none;position:fixed;z-index:20;background:#fff;border:1px solid #333;padding:8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
+<div id="lpn_labels_popup" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:20;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
+	<div class="lpn-popover-body">
 	<div style="font-weight:bold"><?=$ec_lang['lpn_labels_heading_node']?></div>
 	<div id="lpn_labels_node_fields"></div>
 	<div style="font-weight:bold"><?=$ec_lang['lpn_labels_heading_link']?></div>
@@ -117,16 +120,30 @@ document.addEventListener('DOMContentLoaded', function() {
 	<?php // Label options that apply to every field at once (ROADMAP Task 190's high/low mark
 	      // toggle), below both per-field lists. Built in JS by rebuildLabelsFields(). ?>
 	<div id="lpn_labels_options"></div>
-	<button type="button" id="lpn_labels_popup_close"><?=$ec_lang['lpn_close']?></button>
+	</div>
+	<button type="button" id="lpn_labels_popup_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">×</button>
 </div>
 <?php // Gear/settings panel (Task 146 Phase 2, 2026-07-30): ID prefixes, solver emitter exponent
       // and convergence tolerance, text size (+ map-vs-screen units), legend position -- same
       // static-panel, non-#lpn_popup pattern as #lpn_labels_popup directly above. Fields are built
       // entirely in JS (wireSettingsPopup() in looped-network.js), not PHP, so #lpn_settings_fields
       // starts empty here. ?>
-<div id="lpn_settings_popup" class="d-print-none" style="display:none;position:fixed;z-index:20;background:#fff;border:1px solid #333;padding:8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
+<div id="lpn_settings_popup" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:20;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
+	<div class="lpn-popover-body">
 	<div id="lpn_settings_fields"></div>
-	<button type="button" id="lpn_settings_popup_close"><?=$ec_lang['lpn_close']?></button>
+	</div>
+	<button type="button" id="lpn_settings_popup_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">×</button>
+</div>
+<?php // Projects panel (ROADMAP Task 146.08): the saved-network library -- open, rename, delete,
+      // and start a new project. Same static-panel, JS-built-fields pattern as the two popovers
+      // above, for the same reason: it is not a per-element property sheet and must never touch
+      // the #lpn_popup/currentPopup machinery. ?>
+<div id="lpn_projects_popup" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:20;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
+	<div class="lpn-popover-body">
+	<div style="font-weight:bold"><?=$ec_lang['lpn_projects_heading']?></div>
+	<div id="lpn_projects_list"></div>
+	</div>
+	<button type="button" id="lpn_projects_popup_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">×</button>
 </div>
 
 <?php echoFeedback(); ?>
@@ -202,6 +219,19 @@ EngCalcs.pageConfig = {
 	lpn_tool_clear: <?=json_encode($ec_lang['lpn_tool_clear'])?>,
 	lpn_confirm_clear: <?=json_encode($ec_lang['lpn_confirm_clear'])?>,
 	lpn_storage_too_new: <?=json_encode($ec_lang['lpn_storage_too_new'])?>,
+	lpn_tool_projects: <?=json_encode($ec_lang['lpn_tool_projects'])?>,
+	lpn_projects_heading: <?=json_encode($ec_lang['lpn_projects_heading'])?>,
+	lpn_project_untitled: <?=json_encode($ec_lang['lpn_project_untitled'])?>,
+	lpn_project_new: <?=json_encode($ec_lang['lpn_project_new'])?>,
+	lpn_project_saveas: <?=json_encode($ec_lang['lpn_project_saveas'])?>,
+	lpn_project_copy_suffix: <?=json_encode($ec_lang['lpn_project_copy_suffix'])?>,
+	lpn_project_open: <?=json_encode($ec_lang['lpn_project_open'])?>,
+	lpn_project_rename: <?=json_encode($ec_lang['lpn_project_rename'])?>,
+	lpn_project_delete: <?=json_encode($ec_lang['lpn_project_delete'])?>,
+	lpn_project_open_now: <?=json_encode($ec_lang['lpn_project_open_now'])?>,
+	lpn_prompt_project_name: <?=json_encode($ec_lang['lpn_prompt_project_name'])?>,
+	lpn_confirm_project_delete: <?=json_encode($ec_lang['lpn_confirm_project_delete'])?>,
+	lpn_storage_full: <?=json_encode($ec_lang['lpn_storage_full'])?>,
 	lpn_backdrop_menu: <?=json_encode($ec_lang['lpn_backdrop_menu'])?>,
 	lpn_backdrop_add: <?=json_encode($ec_lang['lpn_backdrop_add'])?>,
 	lpn_backdrop_scale: <?=json_encode($ec_lang['lpn_backdrop_scale'])?>,

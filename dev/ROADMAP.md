@@ -546,6 +546,64 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     whole library down with a single quota error.
   - **"Create scenario geometry variant" and the "Compare with base ID" field** land here on the
     toolbar/menu path only. Task 192 owns the right-click path.
+
+  **BUILT 2026-07-30 (steps 1–3 of 3); the two bullets above about the geometry variant and the
+  compare-with-base-ID field are what remain open here.**
+  - **Step 1 — v2 container.** `project`/`scenarios` module state with Base as the only scenario,
+    the `LPN_OVERRIDABLE` whitelist, and a v1→v2 migration that is a pure wrap. Structural guarantees
+    (exactly one Base, `activeScenario` names a real scenario, Base's overrides stay empty) are
+    *restored* at load, not trusted.
+  - **Step 2 — the resolver seam, done as a RENAME** (Tom's addition, and the whole safety story):
+    the element stores `_diameter` and every read goes through `effective(l, 'diameter')`. With one
+    scenario the resolver is a pure passthrough, so a missed call site is invisible and no test can
+    fail — the rename makes it `undefined` immediately instead. It earned its keep at once:
+    `assembleModel()` was passing `doc.links` straight to the solver, which under a passthrough
+    resolver would have read as working forever.
+  - **Step 3 — the library.** `lpn_project_<id>` per project plus an `lpn_index` cache, a one-time
+    MOVE (not copy) of the legacy `lpn_document`, and a Projects panel (open / rename / delete / new)
+    whose toolbar button also names the open project. The index is repaired from the real project
+    keys on every load, in both directions, so a quota failure between the two writes cannot hide a
+    project or advertise a missing one. Quota failure now surfaces in the status bar instead of
+    being silently swallowed — a silent swallow was tolerable for one document and is not for a
+    library.
+  - **Open question left deliberately: `settings`/`labelSettings` are stored PER PROJECT** (they
+    always were — they live in the same document), so opening another project also swaps text size,
+    map height and legend position, not just ID prefixes and default inputs. Kept that way because
+    it needs no migration and because ID prefixes and default inputs are genuinely per-project;
+    a new project inherits the current one's preferences rather than reverting to factory defaults,
+    which is what preserves the pre-library "New clears the network, not your preferences" behavior.
+    Split display preferences out to a global key if that ever reads wrong.
+  - **Naming, settled 2026-07-31 (Tom).** The toolbar's "New / Clear" is now just **"Clear
+    project"** — it blanks the open project and never creates one, so "New" was doing nothing but
+    competing with the panel. The panel offers **"Save as new project"** (duplicate everything on
+    screen and open the copy — Task 184's project-level copy, built here) and **"Start empty
+    project"**, named apart on purpose: *"New project" reads as the first to most people and did the
+    second*, which is the worst possible combination. A failed copy (quota, with a backdrop image
+    the likely cause) leaves the user in the original rather than half-moved into a project that
+    does not exist.
+  - **Popovers dismiss with a corner X, not a "Close" button** (Tom, 2026-07-31). He caught it in
+    the Projects panel, where "Close" sat directly beneath Open / Rename / Delete — three buttons
+    that all take a *project* as their object — so it read as "close the project." The ambiguity was
+    not really unique to that panel, so all four `lpn_` popovers changed together. The translated
+    word survives as `title`/`aria-label`, so the accessible name is still a translated "Close"
+    rather than a bare multiplication sign; the button is a 40px target with matching popover
+    padding, since this page runs on phones and a glyph at natural type size is a few pixels across.
+    No other page in the suite has a Close button, so this was page-local, not a suite-wide sweep.
+  - **Two phone bugs found in Tom's testing, 2026-07-31, both "sized to content, not to screen":**
+    (1) **The canvas could fill the phone screen and trap the user** — `#lpn_canvas` carries
+    `touch-action: none` so the app owns pan/zoom, which means every touch landing on it is
+    swallowed and cannot scroll the page; with no page left to touch, reloading was the only way
+    out. `applyMapHeight()` now caps the RENDERED height at 72% of the viewport (floor 240px) and
+    re-applies on `resize`/`orientationchange`, so a strip of ordinary page is always reachable.
+    `settings.mapHeight` keeps the user's unclamped number, so a desktop 900px map is not rewritten
+    by one phone visit. Considered and rejected as bigger changes reaching the same place: a
+    two-finger-pan rule, or a scroll affordance beside the canvas. **Note the cap can make the
+    Settings "Map height" field look ignored on a phone** — it is a render cap, not a stored value.
+    (2) **Popovers overflowed the right edge** — the JS clamp can only choose a left edge, so a
+    popover wider than the viewport overflows no matter what it picks, and it bottoms out at 4px.
+    CSS now caps popover width (and height, for a long Settings or Projects list) to the viewport,
+    which is what makes the clamp solvable. Scrolling is on an inner `.lpn-popover-body` wrapper so
+    the corner X stays pinned instead of scrolling away.
 - 20|146.04| **Node/link report tables (Task 146 child).** Tabular results view.
 - 20|146.05| **EPANET-style element browser (Task 146 child).** List/select elements from a panel
   rather than only the canvas. **If this lists TEXT elements** (EPANET's own Browser does have a
@@ -582,6 +640,51 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   persistence is one autosaved network in browser localStorage with "no guarantee about preserving
   data through the preview stage" (`lpn_notes_3_def`), and translating the UI reads as a promise of
   stability this preview doesn't make yet.
+- 10|193| **`lpn_` English tightening pass — the last gate before the 146.06 sprint (Task 146
+  child).** Raised by Tom, 2026-07-30, as an item with no task of its own. Every `lpn_` string was
+  written English-only and at speed during a fast-moving preview, and none of it has had the
+  Simple-English pass CLAUDE.md requires of source strings *before* they are handed to 26 translation
+  agents. Doing it after the sprint means paying for the same string twice, in 26 languages.
+  - **This is the English-reform gate applied on purpose rather than in hindsight.** The suite's own
+    rule: fix the English at the source, where one edit fixes all 26 languages, instead of guarding a
+    weak string with per-language notes. Everything the suite has learned about jargon,
+    transliteration lures and trap terms applies to a page full of `head`, `demand`, `roughness`,
+    `emitter` and `open/closed` — several of which are already documented traps in `glossary.json`.
+  - **Scope:** every `lpn_` key — toolbar and menu labels, the Settings and Labels panels, popup
+    field labels, status/diagnostic messages, notes, tips, and the preview banner. Identity strings
+    (menu entry, `<title>`) follow the identity rule and are not plainened; explanatory strings are.
+  - **Do it once the string set has stopped moving** — 146.01/146.02/146.03 and 146.08 are all still
+    adding and renaming strings, and this pass is only worth running against a settled set. It is
+    therefore the last thing before 146.06, not a parallel track.
+  - Fold in the trap-term protocol while there: a definitional `.ec-help`/`.ec-tip` on the input
+    labels that need one, and glossary entries for any `lpn_` concept not already covered.
+- 15|194| **Touch gesture model: one finger scrolls the page, two fingers pan the map (Task 146
+  child).** Raised by Tom, 2026-07-31, after the canvas-fills-the-phone lock-up: *"It didn't occur
+  to me to try to scroll with two fingers. That's just an idea. It looks like it occurred to you
+  too."* The height cap in `applyMapHeight()` already prevents the trap, so this is an improvement,
+  not a fix — it removes the underlying conflict instead of bounding it.
+  - **The gesture is the inverse of the first phrasing.** Two-finger *scroll* is a trackpad idiom;
+    on a touchscreen two fingers means pinch-zoom. The convention to copy is Google Maps embeds and
+    Leaflet: **one finger scrolls the page, two fingers pan the map**, with a "use two fingers to
+    move the map" hint on the first one-finger background drag.
+  - **Shape:** `touch-action: pan-y` on `#lpn_canvas` instead of `none`; the app keeps claiming (and
+    `preventDefault()`ing) touches that START on an element, so node/vertex drags, taps and the
+    drawing modes are untouched; only BACKGROUND panning moves to two fingers.
+  - **Risk to respect:** every drawing gesture on this page is a one-finger touch, so this reworks
+    the layer they all sit on. Not a tweak. If it lands, keep the height cap anyway — it costs
+    nothing and is the belt to this braces.
+- 25|195| **Export/import a project as a file (Task 146 child) — a gate for dropping the PREVIEW
+  banner.** Everything lives in localStorage, which a browser-data clear wipes, which Safari evicts
+  after roughly 7 unused days, and which private mode never persists at all. Task 146.08 fixed how
+  projects are ORGANIZED, not whether they SURVIVE, so `lpn_notes_3_def`'s "no guarantee about
+  preserving data" is still true and cannot honestly be withdrawn until a project can leave the
+  browser.
+  - **Download the v2 project document as JSON, and read one back.** The storage shape is already
+    exactly right for this — one self-contained object per project, backdrop included.
+  - **Distinct from EPANET `.inp` interop**, which Tom confirmed 2026-07-29 is not needed. This is
+    backup and hand-off of our own format, not exchange with other software.
+  - **Import must run the same `migrateSaved()` chain and the same structural repair** a stored
+    document gets, and land as a NEW project rather than overwriting the open one.
 - 5|146.09| **Map insets for congested areas of a drawing (Task 146 child).** Very low priority.
 - 20|177| **Link head loss: report the per-length gradient alongside total (Task 146 child).**
   Conventional network software and reports express pipe head loss in TWO forms, not one, because

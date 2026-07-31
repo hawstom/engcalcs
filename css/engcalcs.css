@@ -225,3 +225,40 @@ html[lang="zh"] .ec-welcome {
    removes the one affordance that actually matters. More specific than the rule above (extra
    class), so it wins the !important tie on specificity. */
 #lpn_canvas.regmode.regmode-node .lpn-node { cursor: pointer !important; }
+/* Popover dismiss control (Tom, 2026-07-31). Was a bottom "Close" button on all four lpn_
+   popovers; in the Projects panel it sat directly beneath Open / Rename / Delete -- three buttons
+   that all take a PROJECT as their object -- so "Close" read as "close the project" rather than
+   "close this panel". A corner X carries no object at all, which is why it is the conventional
+   answer, and the ambiguity was not really unique to that one panel.
+   The translated word survives as title/aria-label, so the accessible name is still "Close" (and
+   still translated) rather than a bare multiplication sign. Sized well past the ~44px touch-target
+   guidance -- this page runs on phones, and a bare glyph at its natural type size would be a target
+   only a few pixels across. The popovers carry a matching 40px top padding so the button can never
+   overlap their first row, which is what a smaller pad plus a full-size hit area would have done. */
+.lpn-popover-x {
+	position: absolute; top: 0; right: 0;
+	width: 40px; height: 40px; line-height: 1;
+	padding: 0; border: 0; background: transparent;
+	font-size: 20px; color: #333; cursor: pointer;
+}
+.lpn-popover-x:hover, .lpn-popover-x:focus { background: #eee; color: #000; }
+/* Popover fit-to-screen (Tom, 2026-07-31, testing on a phone: "everything right of the middle of
+   the X is allowed to overflow off the right edge... I would have expected the right edge of the
+   popup to align with the right edge of the screen"). The JS clamp in looped-network.js can only
+   choose a LEFT edge; when a popover is wider than the viewport, every choice overflows and the
+   clamp bottoms out at 4px, spilling the rest off-screen. Capping the width is what makes the clamp
+   solvable -- it then lands at left:4px with the right edge 4px in from the far side, which is the
+   alignment that was expected.
+   Height is capped for the same reason and a worse symptom: a long panel (Settings, or a Projects
+   list once a user owns several) taller than a phone screen would be cut off with no way to reach
+   the rest -- the same "sized to content, not to screen" trap as the canvas height cap in
+   applyMapHeight(). Scrolling lives on an inner body wrapper, not the popover itself, so the
+   absolutely-positioned X stays pinned to the corner instead of scrolling away with the content.
+   dvh repeats the vh rule for mobile browsers, where vh includes the retracting URL bar and
+   overstates the room actually available. */
+.lpn-popover { box-sizing: border-box; max-width: calc(100vw - 8px); max-height: calc(100vh - 8px); }
+.lpn-popover-body { overflow: auto; max-height: calc(100vh - 56px); }
+@supports (height: 100dvh) {
+	.lpn-popover { max-height: calc(100dvh - 8px); }
+	.lpn-popover-body { max-height: calc(100dvh - 56px); }
+}
