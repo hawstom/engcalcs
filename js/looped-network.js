@@ -1377,14 +1377,14 @@ var EngCalcs = EngCalcs || {};
 		cancelActive();
 		var pc = EngCalcs.pageConfig || {}, clicks = [];
 		setRegMode(true);
-		alert(pc.lpn_backdrop_scale_prompt1 || 'Click two points on the backdrop image (e.g. the two ends of a bar scale), then enter the real distance.');
+		alert(pc.lpn_backdrop_scale_prompt1 || 'Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them.');
 		var handler = function (e) {
 			clicks.push(worldToImageLocal(screenToWorld(e.clientX, e.clientY)));
 			if (clicks.length === 2) {
 				svg.removeEventListener('pointerup', handler, true);
 				activeCancel = null; setRegMode(false);
 				var pxDist = Math.hypot(clicks[1].x - clicks[0].x, clicks[1].y - clicks[0].y);
-				var promptText = (pc.lpn_backdrop_scale_prompt2 || 'Real-world distance between the two points') + ' (' + unitLabel('lpn_u_length') + '):';
+				var promptText = (pc.lpn_backdrop_scale_prompt2 || 'Real distance between the two points') + ' (' + unitLabel('lpn_u_length') + '):';
 				var real = +prompt(promptText, '');
 				if (real > 0) { backdrop.s = real / pxDist; applyBackdropTransform(); saveToStorage(); }
 			}
@@ -1407,11 +1407,11 @@ var EngCalcs = EngCalcs || {};
 		cancelActive();
 		var pc = EngCalcs.pageConfig || {};
 		setRegMode(true);
-		alert(pc.lpn_backdrop_position_prompt1 || 'Reference point: Click anywhere on the backdrop image.');
+		alert(pc.lpn_backdrop_position_prompt1 || 'Click any point on the background image. This is the point you will move.');
 		var handler = function (e) {
 			svg.removeEventListener('pointerup', handler, true);
 			var refWorld = screenToWorld(e.clientX, e.clientY);
-			alert(pc.lpn_backdrop_position_prompt2 || 'Target mode: Choose target mode, then click Continue.');
+			alert(pc.lpn_backdrop_position_prompt2 || 'Choose where that point should go, then click Continue.');
 			showBackdropTargetPanel(refWorld);
 		};
 		svg.addEventListener('pointerup', handler, true);
@@ -1432,7 +1432,7 @@ var EngCalcs = EngCalcs || {};
 			panel.style.display = 'none';
 			if (mode === 'coords') {
 				activeCancel = null; setRegMode(false);
-				var txt = prompt((pc.lpn_backdrop_coords_prompt || 'Target X,Y for that reference point') + ' (' + unitLabel('lpn_u_length') + '):', '');
+				var txt = prompt((pc.lpn_backdrop_coords_prompt || 'Type the X,Y that point should move to') + ' (' + unitLabel('lpn_u_length') + '):', '');
 				var parts = (txt || '').split(',').map(Number);
 				if (txt && !isNaN(parts[0]) && !isNaN(parts[1])) { positionTo(refWorld, { x: parts[0], y: parts[1] }); }
 				return;
@@ -1468,7 +1468,7 @@ var EngCalcs = EngCalcs || {};
 			o.value = value; o.textContent = text; if (disabled) { o.disabled = true; }
 			menu.appendChild(o);
 		}
-		opt('', pc.lpn_backdrop_menu || 'Backdrop...');
+		opt('', pc.lpn_backdrop_menu || 'Background image...');
 		opt('add', pc.lpn_backdrop_add || 'Add image');
 		opt('scale', pc.lpn_backdrop_scale || 'Scale', true);
 		opt('position', pc.lpn_backdrop_position || 'Position', true);
@@ -1480,7 +1480,7 @@ var EngCalcs = EngCalcs || {};
 			else if (v === 'scale') { startBackdropScale(); }
 			else if (v === 'position') { startBackdropPosition(); }
 			else if (v === 'remove') {
-				if (window.confirm(pc.lpn_backdrop_remove_confirm || 'Remove the backdrop image?')) { removeBackdrop(); }
+				if (window.confirm(pc.lpn_backdrop_remove_confirm || 'Remove the background image?')) { removeBackdrop(); }
 			}
 		});
 		fileInput.addEventListener('change', function () {
@@ -1701,7 +1701,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		if (on === storageError) { return; }
 		storageError = on;
-		if (on) { setStatus(pc.lpn_storage_full || 'NOT SAVED -- browser storage is full or unavailable. Your recent changes are only in this tab.'); }
+		if (on) { setStatus(pc.lpn_storage_full || 'Not saved. Browser storage is full or unavailable, so your recent changes will be lost when you close this tab.'); }
 	}
 	function projectKey(id) { return LPN_PROJECT_PREFIX + id; }
 	// The full reset behind "?lpn_wipe=1" and the Wipe memory button. Now that a library exists it
@@ -1799,7 +1799,7 @@ var EngCalcs = EngCalcs || {};
 		if (!saved || typeof saved.v !== 'number') { return null; }
 		if (saved.v > LPN_STORAGE_VERSION) {
 			var pc = EngCalcs.pageConfig || {};
-			alert(pc.lpn_storage_too_new || 'The saved network was created by a newer version of this page and cannot be loaded here.');
+			alert(pc.lpn_storage_too_new || 'This project was saved by a newer version of the page, so it cannot be opened here.');
 			return null;
 		}
 		return migrateSaved(saved);
@@ -2150,7 +2150,7 @@ var EngCalcs = EngCalcs || {};
 	// unifying the two is a real design question logged in the scope doc, not resolved here.
 	function clearNetwork() {
 		var pc = EngCalcs.pageConfig || {};
-		if (!window.confirm(pc.lpn_confirm_clear || 'This will permanently delete the current network. Continue?')) { return; }
+		if (!window.confirm(pc.lpn_confirm_clear || 'This permanently deletes the network, the background image, and the project name. Your settings are kept. Continue?')) { return; }
 		doc = { nodes: [], links: [], labels: [] };
 		nextId = { J: 1, R: 1, L: 1, P: 1, T: 1 };
 		// "New" means a blank PROJECT, so the container resets with the network: scenarios back to
@@ -2347,7 +2347,7 @@ var EngCalcs = EngCalcs || {};
 		var viewGroup = group();
 		var extentBtn = document.createElement('button');
 		extentBtn.type = 'button';
-		extentBtn.textContent = pc.lpn_tool_zoom_extent || 'Zoom Extent';
+		extentBtn.textContent = pc.lpn_tool_zoom_extent || 'Zoom to fit';
 		extentBtn.addEventListener('click', zoomExtent);
 		viewGroup.appendChild(extentBtn);
 		var labelsBtn = document.createElement('button');
@@ -2382,7 +2382,7 @@ var EngCalcs = EngCalcs || {};
 	function drawExampleNetwork() {
 		if (doc.nodes.length > 0) {
 			var pc = EngCalcs.pageConfig || {};
-			if (!window.confirm(pc.lpn_confirm_example || 'This will add to the existing network. Continue?')) { return; }
+			if (!window.confirm(pc.lpn_confirm_example || 'This adds the example to the network you already have. Continue?')) { return; }
 		}
 		saveUndoSnapshot();
 		// The reservoir sits at 55 ft / 17 m, in among the junctions it feeds (50 ft and 40 ft)
@@ -3110,7 +3110,7 @@ var EngCalcs = EngCalcs || {};
 			var key = f[0], input = document.createElement('input');
 			input.type = 'text'; input.size = 4; input.value = settings.idPrefixes[key];
 			input.addEventListener('change', function () {
-				if (!validatePrefix(input.value)) { alert(pc.lpn_id_invalid || 'ID must be non-empty with no spaces or quotes.'); input.value = settings.idPrefixes[key]; return; }
+				if (!validatePrefix(input.value)) { alert(pc.lpn_id_invalid || 'Enter an ID with no spaces and no quotation marks.'); input.value = settings.idPrefixes[key]; return; }
 				settings.idPrefixes[key] = input.value;
 				saveToStorage();
 			});
@@ -3135,7 +3135,7 @@ var EngCalcs = EngCalcs || {};
 		defaultRow(defBody, pc.lpn_field_roughness || 'Roughness', null, 'roughness', positive);
 		// No Length row, deliberately (Tom, 2026-07-30): lenAuto derives a pipe's length from the
 		// drawn geometry, so any default here would be overwritten the moment the pipe is drawn.
-		defaultRow(defBody, pc.lpn_field_km || 'Minor (local) loss coefficient, km', null, 'k', nonNegative);
+		defaultRow(defBody, pc.lpn_field_km || 'Minor (local) loss coefficient, k', null, 'k', nonNegative);
 		// ---- push defaults to existing elements (Tom, 2026-07-30) ----
 		// A HARD push, deliberately. The gentler "update only elements still holding the OLD
 		// default" was designed and then rejected: it cannot tell a deliberately-typed 6 from an
@@ -3163,20 +3163,20 @@ var EngCalcs = EngCalcs || {};
 				applies: function (l) { return l.type !== 'pump'; }, get: function (l) { return effective(l, 'diameter'); }, set: function (l, v) { l._diameter = v; } },
 			{ key: 'roughness', group: 'link', field: 'roughness', label: pc.lpn_field_roughness || 'Roughness',
 				applies: function (l) { return l.type !== 'pump'; }, get: function (l) { return effective(l, 'roughness'); }, set: function (l, v) { l._roughness = v; } },
-			{ key: 'k', group: 'link', field: 'km', label: pc.lpn_field_km || 'Minor (local) loss coefficient, km',
+			{ key: 'k', group: 'link', field: 'km', label: pc.lpn_field_km || 'Minor (local) loss coefficient, k',
 				applies: function (l) { return l.type !== 'pump'; }, get: function (l) { return effective(l, 'k'); }, set: function (l, v) { l._k = v; } }
 		];
-		note(defBody, pc.lpn_settings_push_note || 'Pushing sends only the properties whose labels are currently showing.');
+		note(defBody, pc.lpn_settings_push_note || 'Only the properties whose labels are showing right now are applied.');
 		var pushBtn = document.createElement('button');
 		pushBtn.type = 'button';
-		pushBtn.textContent = pc.lpn_settings_push_btn || 'Push defaults to all elements';
+		pushBtn.textContent = pc.lpn_settings_push_btn || 'Apply defaults to all elements';
 		pushBtn.addEventListener('click', function () {
 			var active = pushSpecs.filter(function (s) { return labelSettings[s.group][s.field]; });
 			// An empty intersection SAYS SO rather than silently doing nothing: with no input labels
 			// displayed this button would otherwise look broken, and the reason is off-screen in
 			// another panel. Naming that panel is the whole value of the message.
 			if (!active.length) {
-				alert(pc.lpn_push_none_displayed || 'No default input is showing as a label right now, so there is nothing to push. Turn on the labels for the properties you want (Labels panel), then try again.');
+				alert(pc.lpn_push_none_displayed || 'No default input is showing as a label right now, so there is nothing to apply. Turn on the labels for the properties you want in the Labels panel, then try again.');
 				return;
 			}
 			// TWO different counts, because "nothing to do" has two different causes and they need
@@ -3205,11 +3205,11 @@ var EngCalcs = EngCalcs || {};
 			var nodeCounts = counts(doc.nodes, 'node'), linkCounts = counts(doc.links, 'link');
 			var carriers = nodeCounts.carriers + linkCounts.carriers;
 			var targets = nodeCounts.changing + linkCounts.changing;
-			if (!carriers) { alert(pc.lpn_push_nothing || 'No existing element carries any of the properties being pushed.'); return; }
+			if (!carriers) { alert(pc.lpn_push_nothing || 'No existing element has any of the properties being applied.'); return; }
 			// Distinct from the message above on purpose: "nothing carries these properties" and
 			// "everything already has these values" are opposite situations, and telling a user the
 			// first when the second is true would send them hunting for a problem that isn't there.
-			if (!targets) { alert(pc.lpn_push_no_change || 'Every element already has these values, so this would change nothing.'); return; }
+			if (!targets) { alert(pc.lpn_push_no_change || 'Every element already has these values, so nothing would change.'); return; }
 			// The confirm NAMES the properties, it does not merely count them -- a count alone
 			// ("push 2 properties?") leaves the user guessing which two, and this action is not
 			// something to guess at. Assembled from already-translated label text plus two short
@@ -3239,7 +3239,7 @@ var EngCalcs = EngCalcs || {};
 		// "Display" rather than Tom's first "Map sizes": the section also holds symbol and backdrop
 		// opacity, which are not sizes, and stranding those two in a group of their own would be
 		// more clicking than it saves.
-		var mapBody = section('mapDisplay', pc.lpn_settings_map_display || 'Map display');
+		var mapBody = section('mapDisplay', pc.lpn_settings_map_display || 'Map display and sizes');
 		var sizeInput = document.createElement('input');
 		sizeInput.type = 'number'; sizeInput.step = 'any'; sizeInput.min = '0.1'; sizeInput.value = settings.textSize;
 		sizeInput.addEventListener('change', function () {
@@ -3290,14 +3290,14 @@ var EngCalcs = EngCalcs || {};
 			if (v > 0 && v <= 1) { settings.backdropOpacity = v; refreshSymbolSizes(); saveToStorage(); }
 			else { backdropOpacityInput.value = settings.backdropOpacity; }
 		});
-		row(mapBody, pc.lpn_settings_backdrop_opacity || 'Backdrop opacity (0 to 1)', backdropOpacityInput);
+		row(mapBody, pc.lpn_settings_backdrop_opacity || 'Background image opacity (0 to 1)', backdropOpacityInput);
 		var heightInput = document.createElement('input');
 		heightInput.type = 'number'; heightInput.step = 'any'; heightInput.min = '100'; heightInput.value = settings.mapHeight;
 		heightInput.addEventListener('change', function () {
 			if (+heightInput.value >= 100) { settings.mapHeight = +heightInput.value; applyMapHeight(); saveToStorage(); }
 			else { heightInput.value = settings.mapHeight; }
 		});
-		row(mapBody, pc.lpn_settings_map_height_px || 'Map height (px)', heightInput);
+		row(mapBody, pc.lpn_settings_map_height_px || 'Map height (screen pixels)', heightInput);
 		var legendSelect = document.createElement('select');
 		[
 			['top-left', pc.lpn_settings_legend_top_left || 'Top left'],
@@ -3351,7 +3351,7 @@ var EngCalcs = EngCalcs || {};
 		restoreBtn.type = 'button';
 		restoreBtn.textContent = pc.lpn_settings_restore_btn || 'Restore defaults';
 		restoreBtn.addEventListener('click', function () {
-			if (!window.confirm(pc.lpn_confirm_restore_defaults || 'Reset all settings (ID prefixes, default inputs, solver, map display, legend position, and visible labels) to their defaults? This does not affect your network.')) { return; }
+			if (!window.confirm(pc.lpn_confirm_restore_defaults || 'Reset all settings (ID prefixes, default inputs, solver settings, map display, legend position, and visible labels) to their defaults? Your network is not changed.')) { return; }
 			settings = defaultSettings();
 			// defaultSettings() leaves settings.defaults full of nulls on purpose -- refill them
 			// here, or every default input would come back blank instead of at its starting value.
@@ -3372,9 +3372,9 @@ var EngCalcs = EngCalcs || {};
 		var wipeBtn = document.createElement('button');
 		wipeBtn.type = 'button';
 		wipeBtn.style.marginLeft = '4px';
-		wipeBtn.textContent = pc.lpn_settings_wipe_btn || 'Wipe memory';
+		wipeBtn.textContent = pc.lpn_settings_wipe_btn || 'Erase all saved data';
 		wipeBtn.addEventListener('click', function () {
-			if (!window.confirm(pc.lpn_confirm_wipe || 'Delete EVERYTHING saved for this page -- network, backdrop image, and all settings -- and reload as a brand-new visitor would see it? This cannot be undone.')) { return; }
+			if (!window.confirm(pc.lpn_confirm_wipe || 'Delete EVERYTHING saved for this page — every project, every background image, and all settings — and reload the page as a brand-new visitor would see it? This cannot be undone.')) { return; }
 			wipeAllStorage();
 			window.location.reload();
 		});
@@ -3525,7 +3525,7 @@ var EngCalcs = EngCalcs || {};
 	function validateNewId(newId, oldId) {
 		var pc = EngCalcs.pageConfig || {};
 		if (newId === oldId) { return true; }
-		if (!newId || /[\s'"]/.test(newId)) { return pc.lpn_id_invalid || 'ID must be non-empty with no spaces or quotes.'; }
+		if (!newId || /[\s'"]/.test(newId)) { return pc.lpn_id_invalid || 'Enter an ID with no spaces and no quotation marks.'; }
 		if (allIds().indexOf(newId) !== -1) { return pc.lpn_id_taken || 'That ID is already in use.'; }
 		return true;
 	}
@@ -3646,7 +3646,11 @@ var EngCalcs = EngCalcs || {};
 
 		if (l.curveRef) {
 			var note = document.createElement('div');
-			note.textContent = (pc.lpn_pump_curve_ref_note || 'Using the curve entered for pump ') + l.curveRef + '.';
+			// {id} placeholder, not concatenation (Task 193): a language that puts the pump ID
+			// before the verb, or wraps it in its own punctuation, cannot express that as a
+			// prefix + ID + '.' sandwich. Same convention as mpf_solver_no_solution's {qmax}.
+			note.textContent = (pc.lpn_pump_curve_ref_note || 'Using the curve entered for pump {id}.')
+				.replace('{id}', l.curveRef);
 			fields.appendChild(note);
 			return;
 		}
@@ -3728,7 +3732,7 @@ var EngCalcs = EngCalcs || {};
 			// existing "k<sub>m</sub>" label (mphl_total_junction_k) is HTML-bearing, incompatible
 			// with that call site; CLAUDE.md's concept-level reuse rule is about wording, not
 			// forcing markup into a plain-text slot.
-			numberFieldPlain(fields, pc.lpn_field_km || 'Minor (local) loss coefficient, km', effective(l, 'k') || 0, function (v) { l._k = v; });
+			numberFieldPlain(fields, pc.lpn_field_km || 'Minor (local) loss coefficient, k', effective(l, 'k') || 0, function (v) { l._k = v; });
 			lengthField(fields, l);
 		}
 		if (lastSolveResult && lastSolveResult.flows[linkId] !== undefined) {
@@ -3911,9 +3915,9 @@ var EngCalcs = EngCalcs || {};
 	}
 	function diagIssueText(issue) {
 		var pc = EngCalcs.pageConfig || {};
-		if (issue.code === 'no-fixed-head') { return pc.lpn_diag_no_fixed_head || 'Add a Reservoir.'; }
-		if (issue.code === 'dangling-link') { return (pc.lpn_diag_dangling_link || 'Dangling link:') + ' ' + issue.ids.join(', '); }
-		if (issue.code === 'unreachable') { return (pc.lpn_diag_unreachable || 'Unreachable:') + ' ' + issue.ids.join(', '); }
+		if (issue.code === 'no-fixed-head') { return pc.lpn_diag_no_fixed_head || 'Add a reservoir. The network needs at least one known water level before it can be solved.'; }
+		if (issue.code === 'dangling-link') { return (pc.lpn_diag_dangling_link || 'A pipe or pump connects to a node that no longer exists:') + ' ' + issue.ids.join(', '); }
+		if (issue.code === 'unreachable') { return (pc.lpn_diag_unreachable || 'These nodes have no path to a reservoir:') + ' ' + issue.ids.join(', '); }
 		return issue.code;
 	}
 	function setStatus(text) {

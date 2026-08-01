@@ -1123,7 +1123,7 @@ $ec_lang['bpn_supply1_h']='Static supply head';
 $ec_lang['lpn_main_menu']='Looped Pipe Network (Map Interface) — PREVIEW';
 $ec_lang['lpn_main_title']='PREVIEW: Free Online Looped Pipe Network Calculator with Map Interface';
 $ec_lang['lpn_main_desc']='PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map';
-$ec_lang['lpn_preview_banner']='PREVIEW — This calculator is new and actively changing, and is English only for now. See Notes below for current limits. Comments and suggestions are always welcome.';
+$ec_lang['lpn_preview_banner']='PREVIEW — This calculator is new and still changing. It is in English only for now. See the Notes below for current limits. Comments and suggestions are always welcome.';
 $ec_lang['lpn_tool_select']='Select';
 $ec_lang['lpn_tool_add_junction']='Junction';
 $ec_lang['lpn_tool_add_reservoir']='Reservoir';
@@ -1131,7 +1131,7 @@ $ec_lang['lpn_tool_add_pipe']='Pipe';
 $ec_lang['lpn_tool_add_pump']='Pump';
 $ec_lang['lpn_tool_add_text']='Text';
 $ec_lang['lpn_tool_delete']='Delete';
-$ec_lang['lpn_tool_zoom_extent']='Zoom Extent';
+$ec_lang['lpn_tool_zoom_extent']='Zoom to fit';
 $ec_lang['lpn_new_text']='Text';
 $ec_lang['lpn_tool_example']='Draw example network';
 $ec_lang['lpn_field_elev']='Elevation';
@@ -1140,12 +1140,12 @@ $ec_lang['lpn_field_elev']='Elevation';
 // string is what shows in that empty box.
 $ec_lang['lpn_field_head']='Head';
 $ec_lang['lpn_close']='Close';
-$ec_lang['lpn_empty_hint']='PREVIEW — Add a backdrop or a reservoir (or other element) to start, or use "Draw example network."';
+$ec_lang['lpn_empty_hint']='To start, use the toolbar to add a background image or a reservoir, or to draw an example network.';
 $ec_lang['lpn_tool_undo']='Undo';
-$ec_lang['lpn_confirm_example']='This will add to the existing network. Continue?';
+$ec_lang['lpn_confirm_example']='This adds the example to the network you already have. Continue?';
 $ec_lang['lpn_field_diameter']='Diameter';
-$ec_lang['lpn_units_length']='Length/Map';
-$ec_lang['lpn_units_elevhead']='Elevation/Head';
+$ec_lang['lpn_units_length']='Length and map';
+$ec_lang['lpn_units_elevhead']='Elevation and head';
 $ec_lang['lpn_units_pressure']='Pressure';
 $ec_lang['lpn_units_flow']='Flow';
 $ec_lang['lpn_units_velocity']='Velocity';
@@ -1160,8 +1160,8 @@ $ec_lang['lpn_result_flow']='Flow';
 $ec_lang['lpn_result_velocity']='Velocity';
 $ec_lang['lpn_result_headloss']='Head loss';
 $ec_lang['lpn_tool_clear']='Clear project';
-$ec_lang['lpn_confirm_clear']='This will permanently delete the current network. Continue?';
-$ec_lang['lpn_storage_too_new']='The saved network was created by a newer version of this page and cannot be loaded here.';
+$ec_lang['lpn_confirm_clear']='This permanently deletes the network, the background image, and the project name. Your settings are kept. Continue?';
+$ec_lang['lpn_storage_too_new']='This project was saved by a newer version of the page, so it cannot be opened here.';
 $ec_lang['lpn_tool_projects']='Projects';
 $ec_lang['lpn_projects_heading']='Saved projects';
 $ec_lang['lpn_project_untitled']='Untitled';
@@ -1174,13 +1174,13 @@ $ec_lang['lpn_project_delete']='Delete';
 $ec_lang['lpn_project_open_now']='Open now';
 $ec_lang['lpn_prompt_project_name']='Name for this project';
 $ec_lang['lpn_confirm_project_delete']='Delete this project and everything in it? This cannot be undone.';
-$ec_lang['lpn_storage_full']='Not saved. Browser storage is full or unavailable, so your recent changes are only in this tab.';
+$ec_lang['lpn_storage_full']='Not saved. Browser storage is full or unavailable, so your recent changes will be lost when you close this tab.';
 $ec_lang['lpn_notes_1_term']='Steady state';
-$ec_lang['lpn_notes_1_def']='Solves one loading condition at a time, using the same gradient method EPANET uses. No extended-period (time-varying) simulation.';
+$ec_lang['lpn_notes_1_def']='Solves one set of demands at a time, using the same gradient method EPANET uses. It does not model how the network changes over time.';
 $ec_lang['lpn_notes_2_term']='Not modeled';
-$ec_lang['lpn_notes_2_def']='Tanks, water quality, and pressure-dependent valves (PRV, PSV, FCV) are not supported. A pipe can carry a fixed minor loss, but not a valve whose open/closed status depends on the solved flow.';
-$ec_lang['lpn_notes_3_term']='Saved network';
-$ec_lang['lpn_notes_3_def']='One network is saved automatically in this browser, with no guarantee about preserving data through the preview stage. This is an early preview -- please use it for small and test networks only.';
+$ec_lang['lpn_notes_2_def']='Tanks, water quality, and control valves that open and close on their own (PRV, PSV, FCV) are not modeled. A pipe can carry a fixed minor loss, but not a valve whose open or closed state depends on the flow being solved for.';
+$ec_lang['lpn_notes_3_term']='Saved projects';
+$ec_lang['lpn_notes_3_def']='Your projects are saved automatically in this browser, and nowhere else. Clearing your browser data deletes them, and a project cannot yet be written to a file or moved to another device. Because this is an early preview, please use it for small networks and for testing only.';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
 // It lives in the Notes list, not in the pump popup: the popup is a small floating panel that has
 // to stay readable on a phone, while the Notes section is already this page's documentation home,
@@ -1188,21 +1188,21 @@ $ec_lang['lpn_notes_3_def']='One network is saved automatically in this browser,
 // pointer to here instead (lpn_pump_curve_note).
 // H and Q are symbols -- keep them as they are in every language.
 $ec_lang['lpn_notes_5_term']='Pump curve';
-$ec_lang['lpn_notes_5_def']='A pump follows H = H₀ − aQ^b, where H is the head it adds and Q is the flow through it. Enter one, two, or three points from the manufacturer\'s curve. Three points (a shutoff head at zero flow, a duty point, and a run-out point) fit H₀, a and b directly, and are the most faithful to a published curve. Two points fit a parabola (b = 2) with its peak at zero flow. One point uses the EPANET rule: shutoff head is 1.33 × the head you enter and maximum flow is 2 × the flow you enter, which also gives b = 2. A pump with no points entered adds no head at all. The curve has no floor at zero, so asking a pump for more flow than its curve supports gives a negative head — the fix is a larger pump or a smaller demand, not a different curve fit.';
-$ec_lang['lpn_notes_4_term']='Roadmap';
-$ec_lang['lpn_notes_4_def']='Saving, downloading, and sharing networks between devices are planned. Comments and suggestions are always welcome (see the feedback link above).';
-$ec_lang['lpn_id_invalid']='ID must be non-empty with no spaces or quotes.';
+$ec_lang['lpn_notes_5_def']='A pump follows H = H₀ − aQ^b, where H is the head the pump adds and Q is the flow through it. Enter one, two, or three points from the manufacturer\'s curve. Three points — the head at zero flow, the normal working point, and the point of highest flow — fit H₀, a and b directly, and follow a published curve most closely. Two points fit a parabola (b = 2) with its peak at zero flow. One point uses a common rule: the head at zero flow is 1.33 × the head you enter, and the highest flow is 2 × the flow you enter, which again gives b = 2. A pump with no points entered adds no head at all. The curve is not stopped at zero, so asking a pump for more flow than its curve can deliver gives a negative head. The fix is a bigger pump or a smaller demand, not a different curve fit.';
+$ec_lang['lpn_notes_4_term']='Planned';
+$ec_lang['lpn_notes_4_def']='Writing a project to a file, and moving one between devices, are planned. Comments and suggestions are always welcome (see the feedback link above).';
+$ec_lang['lpn_id_invalid']='Enter an ID with no spaces and no quotation marks.';
 $ec_lang['lpn_id_taken']='That ID is already in use.';
-$ec_lang['lpn_diag_no_fixed_head']='Add a Reservoir: the network needs at least one fixed head to solve.';
+$ec_lang['lpn_diag_no_fixed_head']='Add a reservoir. The network needs at least one known water level before it can be solved.';
 $ec_lang['lpn_diag_dangling_link']='A pipe or pump connects to a node that no longer exists:';
-$ec_lang['lpn_diag_unreachable']='These nodes are not connected to a reservoir (check for a closed link):';
-$ec_lang['lpn_diag_not_converged']='The solver did not converge. Check for unrealistic inputs, such as a zero diameter.';
+$ec_lang['lpn_diag_unreachable']='These nodes have no path to a reservoir:';
+$ec_lang['lpn_diag_not_converged']='No solution was found. Check for values that cannot be real, such as a diameter of zero.';
 $ec_lang['lpn_field_roughness']='Roughness';
 $ec_lang['lpn_field_length']='Length';
 // Plain-text wording of the concept mphl_total_junction_k/mphl_junction_loss already own (their
 // values carry k<sub>m</sub> markup, incompatible with this popup's textContent-only fields) --
 // Tom, 2026-07-30, "default to 2" matches mphl_total_junction_k_tip's own stated default exactly.
-$ec_lang['lpn_field_km']='Minor (local) loss coefficient, km';
+$ec_lang['lpn_field_km']='Minor (local) loss coefficient, k';
 // Short form of the same concept, for the two NARROW uses: the Labels checkbox list and the on-map
 // legend beside it. Per CLAUDE.md's rule that a shared label must fit its narrowest use, these get
 // their own key rather than being asked to carry the full popup-field wording -- an on-map legend
@@ -1212,7 +1212,7 @@ $ec_lang['lpn_field_km_short']='Minor loss, k';
 // another pump's curve so several identical pumps need the curve entered only once.
 $ec_lang['lpn_pump_curve_source']='Curve';
 $ec_lang['lpn_pump_curve_own']='Enter points below';
-$ec_lang['lpn_pump_curve_ref_note']='Using the curve entered for pump ';
+$ec_lang['lpn_pump_curve_ref_note']='Using the curve entered for pump {id}.';
 $ec_lang['lpn_pump_curve_note']='One, two, or three points — see "Pump curve" in the Notes below.';
 $ec_lang['lpn_pump_point1']='Point 1 (required)';
 $ec_lang['lpn_pump_point2']='Point 2 (optional)';
@@ -1220,22 +1220,22 @@ $ec_lang['lpn_pump_point3']='Point 3 (optional)';
 // Persistent mode-hint line (Task 146.01 follow-up, 2026-07-30): whole sentences, not composed
 // from a "Mode:" prefix + the tool's own label, per CLAUDE.md's concept-level label reuse rule --
 // word order/grammar around a mode name varies by language, so each mode gets its own full string.
-$ec_lang['lpn_mode_select']='Mode: Select. Click an element or label to view or edit it; drag to move nodes, vertices, or labels. Double-click a pipe to add or remove a vertex.';
+$ec_lang['lpn_mode_select']='Mode: Select. Click an element or a label to see or change it. Drag to move a node, a vertex, or a label. Double-click a pipe to add or remove a vertex.';
 $ec_lang['lpn_mode_delete']='Mode: Delete. Click an element to remove it.';
-$ec_lang['lpn_mode_add_junction']='Mode: Add Junction. Change to Select mode to edit or move elements and labels.';
-$ec_lang['lpn_mode_add_reservoir']='Mode: Add Reservoir. Change to Select mode to edit or move elements and labels.';
-$ec_lang['lpn_mode_add_pipe']='Mode: Add Pipe. Click a node, then another node, to connect them. Use Select mode to edit or move elements and labels.';
-$ec_lang['lpn_mode_add_pump']='Mode: Add Pump. Click a node, then another node, to connect them. Use Select mode to edit or move elements and labels.';
+$ec_lang['lpn_mode_add_junction']='Mode: Add Junction. Click the map to place a junction. Switch to Select mode to change or move elements and labels.';
+$ec_lang['lpn_mode_add_reservoir']='Mode: Add Reservoir. Click the map to place a reservoir. Switch to Select mode to change or move elements and labels.';
+$ec_lang['lpn_mode_add_pipe']='Mode: Add Pipe. Click a node, then another node, to connect them. Switch to Select mode to change or move elements and labels.';
+$ec_lang['lpn_mode_add_pump']='Mode: Add Pump. Click a node, then another node, to connect them. Switch to Select mode to change or move elements and labels.';
 // Text was wrong (Tom, 2026-07-30): "click a node first to anchor it there" implied a two-click
 // sequence (click node, THEN click to place), but placing near a node anchors it in that ONE click.
-$ec_lang['lpn_mode_add_text']='Mode: Add Text. Anchor to a node by placing near it. Use Select mode to edit or move elements and labels.';
+$ec_lang['lpn_mode_add_text']='Mode: Add Text. Click the map to place a text label. Click near a node to attach the text to that node. Switch to Select mode to change or move elements and labels.';
 // Toolbar button tips (Tom, 2026-07-30): hover/tap explanations on the two buttons a new user is
 // most likely to miss the point of -- that Select is what you use to edit/move things, and that a
 // label itself can be dragged. Both economize on translation for later, per CLAUDE.md's tip-only
 // whole-label-wrap convention -- the button itself is already the click target (no separate "?"
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
-$ec_lang['lpn_tip_select']='To edit and to move or drag.';
-$ec_lang['lpn_tip_labels_draggable']='Labels are draggable. Double-click to reset position.';
+$ec_lang['lpn_tip_select']='Use this mode to change, move, and drag things on the map.';
+$ec_lang['lpn_tip_labels_draggable']='You can drag a label to move it. Double-click a label to put it back.';
 $ec_lang['lpn_field_auto']='Auto';
 $ec_lang['lpn_field_x']='X';
 $ec_lang['lpn_field_y']='Y';
@@ -1246,34 +1246,34 @@ $ec_lang['lpn_labels_heading_link']='Link labels';
 $ec_lang['lpn_labels_decimals_tip']='Decimal places shown for this label';
 $ec_lang['lpn_labels_mark_extrema']='Mark highest and lowest values';
 $ec_lang['lpn_field_id']='ID';
-$ec_lang['lpn_backdrop_menu']='Backdrop...';
+$ec_lang['lpn_backdrop_menu']='Background image...';
 $ec_lang['lpn_backdrop_add']='Add image';
 $ec_lang['lpn_backdrop_scale']='Scale';
 $ec_lang['lpn_backdrop_position']='Position';
 $ec_lang['lpn_backdrop_remove']='Remove image';
-$ec_lang['lpn_backdrop_remove_confirm']='Remove the backdrop image?';
-$ec_lang['lpn_backdrop_scale_prompt1']='Click two points on the backdrop image (e.g. the two ends of a bar scale), then enter the real distance.';
-$ec_lang['lpn_backdrop_scale_prompt2']='Real-world distance between the two points';
-$ec_lang['lpn_backdrop_position_prompt1']='Reference point: Click anywhere on the backdrop image.';
-$ec_lang['lpn_backdrop_position_prompt2']='Target mode: Choose target mode, then click Continue.';
-$ec_lang['lpn_backdrop_target_label']='Target mode:';
-$ec_lang['lpn_backdrop_target_node']='Node';
-$ec_lang['lpn_backdrop_target_free']='Free point';
-$ec_lang['lpn_backdrop_target_coords']='Coords';
-$ec_lang['lpn_backdrop_coords_prompt']='Target X,Y for that reference point';
+$ec_lang['lpn_backdrop_remove_confirm']='Remove the background image?';
+$ec_lang['lpn_backdrop_scale_prompt1']='Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them.';
+$ec_lang['lpn_backdrop_scale_prompt2']='Real distance between the two points';
+$ec_lang['lpn_backdrop_position_prompt1']='Click any point on the background image. This is the point you will move.';
+$ec_lang['lpn_backdrop_position_prompt2']='Choose where that point should go, then click Continue.';
+$ec_lang['lpn_backdrop_target_label']='Move it to:';
+$ec_lang['lpn_backdrop_target_node']='A node';
+$ec_lang['lpn_backdrop_target_free']='Any point on the map';
+$ec_lang['lpn_backdrop_target_coords']='Typed coordinates';
+$ec_lang['lpn_backdrop_coords_prompt']='Type the X,Y that point should move to';
 $ec_lang['lpn_backdrop_continue']='Continue';
 $ec_lang['lpn_tool_settings']='Settings';
 $ec_lang['lpn_settings_id_prefixes']='ID prefixes';
 $ec_lang['lpn_settings_defaults']='Default inputs';
 $ec_lang['lpn_settings_defaults_note']='Used for elements you create from now on. Existing elements are not changed.';
-$ec_lang['lpn_settings_push_note']='Pushing sends only the properties whose labels are currently showing.';
-$ec_lang['lpn_settings_push_btn']='Push defaults to all elements';
+$ec_lang['lpn_settings_push_note']='Only the properties whose labels are showing right now are applied.';
+$ec_lang['lpn_settings_push_btn']='Apply defaults to all elements';
 $ec_lang['lpn_push_confirm']='Replace these properties on every existing element with the current default inputs? Values you have typed will be overwritten. You can undo this.';
 $ec_lang['lpn_push_properties']='Properties:';
 $ec_lang['lpn_push_elements']='Elements:';
-$ec_lang['lpn_push_none_displayed']='No default input is showing as a label right now, so there is nothing to push. Turn on the labels for the properties you want (Labels panel), then try again.';
-$ec_lang['lpn_push_nothing']='No existing element carries any of the properties being pushed.';
-$ec_lang['lpn_push_no_change']='Every element already has these values, so this would change nothing.';
+$ec_lang['lpn_push_none_displayed']='No default input is showing as a label right now, so there is nothing to apply. Turn on the labels for the properties you want in the Labels panel, then try again.';
+$ec_lang['lpn_push_nothing']='No existing element has any of the properties being applied.';
+$ec_lang['lpn_push_no_change']='Every element already has these values, so nothing would change.';
 $ec_lang['lpn_settings_emitter_exponent']='Emitter exponent';
 $ec_lang['lpn_settings_tolerance']='Convergence tolerance';
 $ec_lang['lpn_settings_text_size']='Text size';
@@ -1288,10 +1288,10 @@ $ec_lang['lpn_settings_symbol_size']='Symbol size (relative to text)';
 $ec_lang['lpn_settings_symbol_opacity']='Symbol opacity (0 to 1)';
 // The counterpart control: fade the backdrop image so a busy or dark one stops swallowing the
 // network drawn over it (Tom, 2026-07-30).
-$ec_lang['lpn_settings_backdrop_opacity']='Backdrop opacity (0 to 1)';
+$ec_lang['lpn_settings_backdrop_opacity']='Background image opacity (0 to 1)';
 $ec_lang['lpn_settings_text_size_units']='Text size units';
 $ec_lang['lpn_settings_map_display']='Map display and sizes';
-$ec_lang['lpn_settings_map_height_px']='Map height (px)';
+$ec_lang['lpn_settings_map_height_px']='Map height (screen pixels)';
 $ec_lang['lpn_settings_legend_position']='Legend position';
 $ec_lang['lpn_settings_legend_top_left']='Top left';
 $ec_lang['lpn_settings_legend_top_right']='Top right';
@@ -1300,6 +1300,6 @@ $ec_lang['lpn_settings_legend_middle_right']='Middle right';
 $ec_lang['lpn_settings_legend_bottom_left']='Bottom left';
 $ec_lang['lpn_settings_legend_bottom_right']='Bottom right';
 $ec_lang['lpn_settings_restore_btn']='Restore defaults';
-$ec_lang['lpn_confirm_restore_defaults']='Reset all settings (ID prefixes, default inputs, solver, map display, legend position, and visible labels) to their defaults? This does not affect your network.';
-$ec_lang['lpn_settings_wipe_btn']='Wipe memory';
-$ec_lang['lpn_confirm_wipe']='Delete EVERYTHING saved for this page -- network, backdrop image, and all settings -- and reload as a brand-new visitor would see it? This cannot be undone.';
+$ec_lang['lpn_confirm_restore_defaults']='Reset all settings (ID prefixes, default inputs, solver settings, map display, legend position, and visible labels) to their defaults? Your network is not changed.';
+$ec_lang['lpn_settings_wipe_btn']='Erase all saved data';
+$ec_lang['lpn_confirm_wipe']='Delete EVERYTHING saved for this page — every project, every background image, and all settings — and reload the page as a brand-new visitor would see it? This cannot be undone.';
