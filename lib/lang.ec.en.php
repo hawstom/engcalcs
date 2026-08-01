@@ -1172,11 +1172,16 @@ $ec_lang['lpn_result_flow']='Flow';
 $ec_lang['lpn_result_velocity']='Velocity';
 $ec_lang['lpn_result_headloss']='Head loss';
 $ec_lang['lpn_tool_clear']='Clear project';
-// One shared tip on all THREE reset controls (Tom, 2026-07-31): Clear project (toolbar), Restore
-// all settings and Delete all projects (Settings panel). Each button undoes a different scope and
-// none of them alone gets you back to a clean page -- which was invisible until they were named
-// as a set. One key, translated once, used in three places.
-$ec_lang['lpn_reset_all_tip']='This is one of three reset buttons. Used together they leave this calculator exactly as a first-time visitor finds it. Each one on its own resets only its own part.';
+// The three reset controls -- Clear project (toolbar), Restore all settings and Delete all projects
+// (Settings panel) -- get THREE tips, not one shared one. The shared version claimed they had to be
+// "used together" to reach a first-time-visitor state; that is false (Tom caught it 2026-07-31).
+// Settings live INSIDE each project document, so deleting every project deletes every setting too:
+// Delete all projects alone is the full reset, exactly as init()'s own comment says. Each tip now
+// states only its own scope, so none of them can be wrong about the others -- and no tip quotes
+// another button's label, which is the cross-key dependency lpn_empty_hint was fixed for.
+$ec_lang['lpn_tool_clear_tip']='Empties this project: the drawing, the background image, and the project name. Your settings and your other projects are not changed.';
+$ec_lang['lpn_settings_restore_tip']='Resets this project\'s settings only. Your drawing and your other projects are not changed.';
+$ec_lang['lpn_reset_all_tip']='Deletes every project, every background image, and every setting, then reloads the page exactly as a first-time visitor sees it. This is the only reset that clears everything.';
 $ec_lang['lpn_confirm_clear']='This permanently deletes the network, the background image, and the project name. Your settings are kept. Continue?';
 $ec_lang['lpn_storage_too_new']='This project was saved by a newer version of the page, so it cannot be opened here.';
 $ec_lang['lpn_tool_projects']='Projects';

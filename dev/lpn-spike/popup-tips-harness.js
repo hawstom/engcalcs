@@ -132,7 +132,8 @@ src = src.replace(marker,
   "\t\tmigrateSaved: (typeof migrateSaved === 'function' ? migrateSaved : null),\n" +
   "\t\tassembleModel: assembleModel, effective: effective,\n" +
   "\t\trenderNodeFields: renderNodeFields, renderLinkFields: renderLinkFields,\n" +
-  "\t\trebuildSettingsFields: rebuildSettingsFields, resetTip: resetTip,\n" +
+  "\t\trebuildSettingsFields: rebuildSettingsFields, helpTip: helpTip,\n" +
+  "\t\twipeAllStorage: wipeAllStorage,\n" +
   "\t\tsetDoc: function (d, s2) { doc = d; if (s2) { scenarios = s2; } },\n" +
   "\t\tgetDoc: function () { return doc; } };\n" + marker);
 eval(src);
@@ -268,19 +269,26 @@ L.renderNodeFields('R-1');
 ok('re-render does not accumulate labels', pf.querySelectorAll('.ec-help').length === before,
    before + ' -> ' + pf.querySelectorAll('.ec-help').length);
 
-// --- 10. the three reset controls share one tip -------------------------
-// Tom, 2026-07-31: Clear project / Restore all settings / Delete all projects each undo a
-// different scope, and none alone returns the page to a first-time-visitor state. The shared tip
-// is what makes that legible, so a missing one on any of the three is a real defect.
+// --- 10. the three reset controls: THREE scoped tips, not one shared -----
+// The first version shared one key claiming all three had to be "used together" to reach a
+// first-time-visitor state. False: settings live inside each project document, so Delete all
+// projects alone is the full reset. These checks exist so that claim cannot come back.
 const rb = mkEl('button');
-L.resetTip(rb);
-ok('resetTip sets the shared tip', rb.title === PC.lpn_reset_all_tip);
-ok('resetTip marks the button .ec-help (touch reachability)',
+L.helpTip(rb, 'some tip');
+ok('helpTip sets the title', rb.title === 'some tip');
+ok('helpTip marks the button .ec-help (touch reachability)',
    String(rb.className).split(/\s+/).includes('ec-help'));
 const withClass = mkEl('button'); withClass.className = 'lpn-x';
-L.resetTip(withClass);
-ok('resetTip APPENDS ec-help rather than clobbering an existing class',
+L.helpTip(withClass, 't');
+ok('helpTip APPENDS ec-help rather than clobbering an existing class',
    withClass.className === 'lpn-x ec-help', withClass.className);
+const noTip = mkEl('button');
+L.helpTip(noTip, undefined);
+ok('helpTip is a no-op with no text', noTip.title === '' && noTip.className === '');
+
+const three = [PC.lpn_tool_clear_tip, PC.lpn_settings_restore_tip, PC.lpn_reset_all_tip];
+ok('all three reset tips exist', three.every(t => t && t.length > 20));
+ok('the three reset tips are distinct', new Set(three).size === 3);
 
 const sf = byId.lpn_settings_fields;
 L.rebuildSettingsFields();
@@ -289,18 +297,39 @@ function buttonsIn(root) {
   (function walk(n) { (n.children || []).forEach(c => { if (c.tagName === 'BUTTON') out.push(c); walk(c); }); })(root);
   return out;
 }
-const resetBtns = buttonsIn(sf).filter(b =>
-  b.textContent === PC.lpn_settings_restore_btn || b.textContent === PC.lpn_settings_wipe_btn);
-ok('both Settings reset buttons are present', resetBtns.length === 2,
+const restoreBtn = buttonsIn(sf).find(b => b.textContent === PC.lpn_settings_restore_btn);
+const wipeBtn = buttonsIn(sf).find(b => b.textContent === PC.lpn_settings_wipe_btn);
+ok('both Settings reset buttons are present', !!restoreBtn && !!wipeBtn,
    buttonsIn(sf).map(b => b.textContent).join(' | '));
-ok('both carry the shared reset tip', resetBtns.every(b => b.title === PC.lpn_reset_all_tip),
-   JSON.stringify(resetBtns.map(b => [b.textContent, b.title === PC.lpn_reset_all_tip])));
+ok('Restore all settings carries ITS OWN tip', restoreBtn.title === PC.lpn_settings_restore_tip);
+ok('Delete all projects carries ITS OWN tip', wipeBtn.title === PC.lpn_reset_all_tip);
 
-// The tip must not quote the other buttons' labels -- that is the cross-key dependency this same
-// pass removed from lpn_empty_hint, and it would be hypocritical to reintroduce here.
-const quoted = [PC.lpn_tool_clear, PC.lpn_settings_restore_btn, PC.lpn_settings_wipe_btn]
-  .filter(lbl => PC.lpn_reset_all_tip.indexOf(lbl) >= 0);
-ok('shared tip quotes no other key\'s value', quoted.length === 0, quoted.join(' / '));
+// No reset tip may quote another button's label -- the cross-key dependency lpn_empty_hint was
+// fixed for in this same pass.
+const labels = [PC.lpn_tool_clear, PC.lpn_settings_restore_btn, PC.lpn_settings_wipe_btn];
+const quoted = [];
+three.forEach(t => labels.forEach(lbl => { if (t.indexOf(lbl) >= 0) { quoted.push(lbl); } }));
+ok('no reset tip quotes another key\'s value', quoted.length === 0, quoted.join(' / '));
+
+// No tip may claim the buttons must be combined -- that was the false statement.
+ok('no reset tip claims they must be used together',
+   !three.some(t => /used together|all three|three reset buttons/i.test(t)));
+
+// --- 11. the full reset really is full ----------------------------------
+// "reloads the page exactly as a first-time visitor sees it" is only true if the suite unit
+// cookie goes too: Looped-Network.php calls echoCookieScript() and the unit selects post through
+// EngCalcs.submitForm(), so unit choices round-trip through a cookie that localStorage wiping
+// cannot reach.
+localStorage.setItem('lpn_index', '{"projects":[]}');
+localStorage.setItem('lpn_project_pabc', '{}');
+localStorage.setItem('unrelated_key', 'keep me');
+let expired = 0;
+EngCalcs.expireCookie = function () { expired++; };
+L.wipeAllStorage();
+ok('wipeAllStorage removes the index', localStorage.getItem('lpn_index') === null);
+ok('wipeAllStorage removes every project key', localStorage.getItem('lpn_project_pabc') === null);
+ok('wipeAllStorage leaves unrelated keys alone', localStorage.getItem('unrelated_key') === 'keep me');
+ok('wipeAllStorage expires the suite unit cookie', expired === 1, 'expireCookie calls=' + expired);
 
 console.log(fails ? '\n' + fails + ' FAILURES' : '\nall green');
 process.exit(fails ? 1 : 0);

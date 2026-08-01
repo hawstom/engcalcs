@@ -1159,12 +1159,30 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
         warns that deleting the OPEN project drops you into a different one. That is a genuine
         surprise, and it needs a second confirm string used only for the open row — a small,
         self-contained follow-up, deliberately kept out of a naming pass.
-    - **One shared tip on all three** (`lpn_reset_all_tip`, via `resetTip()`): "This is one of three
-      reset buttons. Used together they leave this calculator exactly as a first-time visitor finds
-      it. Each one on its own resets only its own part." One key, translated once, used three times.
-      It deliberately does **not** quote the three buttons' labels — that is precisely the cross-key
-      dependency this same pass removed from `lpn_empty_hint`, and the harness now asserts the tip
-      contains none of the other three values, so it cannot be reintroduced by a later edit.
+    - **Three scoped tips — after one shared tip shipped and turned out to be FALSE.** The first
+      version was a single key on all three buttons: "…Used together they leave this calculator
+      exactly as a first-time visitor finds it." Tom tested the claim (*"Is that correct? Is that
+      something we can say in tips?"*) and it is not: **`settings` and `labelSettings` live INSIDE
+      each project document** (`serializeProject()`), so deleting every project deletes every
+      setting too. **"Delete all projects" alone is the full reset** — which `init()`'s own comment
+      had said all along ("strictly more destructive than New/Clear (content only) or Restore
+      defaults (preferences only)"). The shared tip had to describe all three scopes and got one
+      wrong; three tips can only be wrong about themselves. **Key economy is not worth a false
+      statement** — that is the durable lesson, not the specific wording.
+    - No tip quotes another button's label (the cross-key dependency `lpn_empty_hint` was fixed for),
+      and the harness asserts both that and the absence of any "used together" claim, so neither can
+      come back by a later edit.
+    - **The claim was also not true for a second reason, now fixed.** "Reloads the page exactly as a
+      first-time visitor sees it" ignored the suite cookie: `Looped-Network.php` calls
+      `echoCookieScript()`, and `echoUnitSelect()` hardcodes `onchange="EngCalcs.submitForm()"`, so
+      the seven unit dropdowns round-trip through a cookie that no amount of localStorage wiping
+      reaches — a visitor who had switched to SI came back to SI. `wipeAllStorage()` now also calls
+      `EngCalcs.expireCookie()`. This made the button's **pre-existing** confirm text true for the
+      first time; the text was not new in this pass, only re-read. A stale comment in
+      `clearNetwork()` asserting "a cookie this page never uses" was corrected in the same edit.
+    - **On wording: "new machine state" was not adopted.** "Machine" reads as a mechanical device in
+      several of the 26, and the page already says "first-time visitor" in `init()`'s comment and in
+      the confirm text. Consistency beat novelty.
     - `lpn_confirm_restore_defaults` gained one clause the panel never admitted: "Settings belong to
       the open project, so your other projects keep their own." That is 146.08's per-project-settings
       open question surfacing in the UI for the first time.

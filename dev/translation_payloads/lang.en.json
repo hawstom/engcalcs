@@ -615,7 +615,9 @@
         "lpn_result_velocity": "Velocity",
         "lpn_result_headloss": "Head loss",
         "lpn_tool_clear": "Clear project",
-        "lpn_reset_all_tip": "This is one of three reset buttons. Used together they leave this calculator exactly as a first-time visitor finds it. Each one on its own resets only its own part.",
+        "lpn_tool_clear_tip": "Empties this project: the drawing, the background image, and the project name. Your settings and your other projects are not changed.",
+        "lpn_settings_restore_tip": "Resets this project's settings only. Your drawing and your other projects are not changed.",
+        "lpn_reset_all_tip": "Deletes every project, every background image, and every setting, then reloads the page exactly as a first-time visitor sees it. This is the only reset that clears everything.",
         "lpn_confirm_clear": "This permanently deletes the network, the background image, and the project name. Your settings are kept. Continue?",
         "lpn_storage_too_new": "This project was saved by a newer version of the page, so it cannot be opened here.",
         "lpn_tool_projects": "Projects",
@@ -733,7 +735,7 @@
         "lpn_settings_wipe_btn": "Delete all projects",
         "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, and all settings — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
-    "count": 731,
+    "count": 733,
     "active_prefixes": [
         "about",
         "bpn",

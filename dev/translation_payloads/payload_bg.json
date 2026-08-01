@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "bg",
-        "expected_key_count": 731,
-        "delta_key_count": 155,
+        "expected_key_count": 733,
+        "delta_key_count": 157,
         "exempt_key_count": 11,
         "exempt_keys": [
             "calc_units_us",
@@ -93,7 +93,9 @@
         "lpn_result_velocity": "Velocity",
         "lpn_result_headloss": "Head loss",
         "lpn_tool_clear": "Clear project",
-        "lpn_reset_all_tip": "This is one of three reset buttons. Used together they leave this calculator exactly as a first-time visitor finds it. Each one on its own resets only its own part.",
+        "lpn_tool_clear_tip": "Empties this project: the drawing, the background image, and the project name. Your settings and your other projects are not changed.",
+        "lpn_settings_restore_tip": "Resets this project's settings only. Your drawing and your other projects are not changed.",
+        "lpn_reset_all_tip": "Deletes every project, every background image, and every setting, then reloads the page exactly as a first-time visitor sees it. This is the only reset that clears everything.",
         "lpn_confirm_clear": "This permanently deletes the network, the background image, and the project name. Your settings are kept. Continue?",
         "lpn_storage_too_new": "This project was saved by a newer version of the page, so it cannot be opened here.",
         "lpn_tool_projects": "Projects",
@@ -250,7 +252,9 @@
         "lpn_result_velocity": "Velocity",
         "lpn_result_headloss": "Head loss",
         "lpn_tool_clear": "Clear project",
-        "lpn_reset_all_tip": "This is one of three reset buttons. Used together they leave this calculator exactly as a first-time visitor finds it. Each one on its own resets only its own part.",
+        "lpn_tool_clear_tip": "Empties this project: the drawing, the background image, and the project name. Your settings and your other projects are not changed.",
+        "lpn_settings_restore_tip": "Resets this project's settings only. Your drawing and your other projects are not changed.",
+        "lpn_reset_all_tip": "Deletes every project, every background image, and every setting, then reloads the page exactly as a first-time visitor sees it. This is the only reset that clears everything.",
         "lpn_confirm_clear": "This permanently deletes the network, the background image, and the project name. Your settings are kept. Continue?",
         "lpn_storage_too_new": "This project was saved by a newer version of the page, so it cannot be opened here.",
         "lpn_tool_projects": "Projects",
@@ -814,6 +818,30 @@
             }
         },
         "lpn_tool_clear": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Статичен напор на подаване",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_tool_clear_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Статичен напор на подаване",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_restore_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

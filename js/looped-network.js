@@ -1718,6 +1718,15 @@ var EngCalcs = EngCalcs || {};
 			}
 			doomed.forEach(function (k) { localStorage.removeItem(k); });
 		} catch (err) { /* private mode -- nothing to remove */ }
+		// ALSO expire the suite unit cookie, or the promise this button makes is not kept
+		// (found 2026-07-31 while checking whether Tom's "returns to a new machine state" wording
+		// was true). Looped-Network.php calls echoCookieScript(), and echoUnitSelect() hardcodes
+		// onchange="EngCalcs.submitForm()", so the seven unit dropdowns ARE saved to a cookie and
+		// ARE restored on load. Without this, "reloads the page exactly as a first-time visitor
+		// sees it" was false: a returning visitor who had switched to SI came back to SI.
+		// (An older comment in clearNetwork() calls this "a cookie this page never uses" -- that
+		// was true when it was written and has not been for some time; corrected there too.)
+		try { if (EngCalcs.expireCookie) { EngCalcs.expireCookie(); } } catch (err) { /* non-fatal */ }
 	}
 	// Time-ordered prefix plus randomness: sortable for debugging, and collision-free even when two
 	// projects are created in the same millisecond in two tabs.
@@ -2145,9 +2154,13 @@ var EngCalcs = EngCalcs || {};
 	}
 
 	// A dedicated button, not a repurposed "Restore Defaults" (Tom asked "do we dare"): that
-	// button's suite-wide behavior (lib/Calculators.lib.php's EngCalcs.resetToDefaults) expires a
-	// cookie this page never uses and reloads, which wouldn't touch localStorage at all --
-	// unifying the two is a real design question logged in the scope doc, not resolved here.
+	// button's suite-wide behavior (EngCalcs.resetToDefaults) expires the page cookie and reloads,
+	// which wouldn't touch localStorage at all -- unifying the two is a real design question logged
+	// in the scope doc, not resolved here.
+	// CORRECTION 2026-07-31: this comment used to say "a cookie this page never uses". It does use
+	// one -- Looped-Network.php calls echoCookieScript(), and the units strip's selects carry
+	// echoUnitSelect()'s hardcoded onchange="EngCalcs.submitForm()", so the unit choices round-trip
+	// through the suite cookie like any other page. wipeAllStorage() now expires it.
 	function clearNetwork() {
 		var pc = EngCalcs.pageConfig || {};
 		if (!window.confirm(pc.lpn_confirm_clear || 'This permanently deletes the network, the background image, and the project name. Your settings are kept. Continue?')) { return; }
@@ -2317,8 +2330,8 @@ var EngCalcs = EngCalcs || {};
 		var clearBtn = document.createElement('button');
 		clearBtn.type = 'button';
 		clearBtn.textContent = pc.lpn_tool_clear || 'Clear project';
-		// One of the three reset controls -- see resetTip() below for why they share a tip.
-		resetTip(clearBtn);
+		// One of the three reset controls -- see helpTip() for why each states only its own scope.
+		helpTip(clearBtn, pc.lpn_tool_clear_tip);
 		clearBtn.addEventListener('click', clearNetwork);
 		fileGroup.appendChild(clearBtn);
 		var exampleBtn = document.createElement('button');
@@ -3353,7 +3366,7 @@ var EngCalcs = EngCalcs || {};
 		var restoreBtn = document.createElement('button');
 		restoreBtn.type = 'button';
 		restoreBtn.textContent = pc.lpn_settings_restore_btn || 'Restore all settings';
-		resetTip(restoreBtn);
+		helpTip(restoreBtn, pc.lpn_settings_restore_tip);
 		restoreBtn.addEventListener('click', function () {
 			if (!window.confirm(pc.lpn_confirm_restore_defaults || 'Reset all settings (ID prefixes, default inputs, solver settings, map display, legend position, and visible labels) to their defaults? Your network is not changed. Settings belong to the open project, so your other projects keep their own.')) { return; }
 			settings = defaultSettings();
@@ -3377,7 +3390,7 @@ var EngCalcs = EngCalcs || {};
 		wipeBtn.type = 'button';
 		wipeBtn.style.marginLeft = '4px';
 		wipeBtn.textContent = pc.lpn_settings_wipe_btn || 'Delete all projects';
-		resetTip(wipeBtn);
+		helpTip(wipeBtn, pc.lpn_reset_all_tip);
 		wipeBtn.addEventListener('click', function () {
 			if (!window.confirm(pc.lpn_confirm_wipe || 'Delete EVERYTHING saved for this page — every project, every background image, and all settings — and reload the page as a brand-new visitor would see it? This cannot be undone.')) { return; }
 			wipeAllStorage();
@@ -3436,19 +3449,22 @@ var EngCalcs = EngCalcs || {};
 	function tipsIn(root) {
 		if (EngCalcs && EngCalcs.initTips) { EngCalcs.initTips(root); }
 	}
+	// Hover/tap tip straight on a button: the button is already the click target, so no separate
+	// "?" glyph -- .ec-help is what makes the title reachable on touch (js/Calculators.lib.js only
+	// wires tap-triggered tooltips on .ec-help[title]).
+	//
 	// The three reset controls -- Clear project (toolbar), Restore all settings and Delete all
-	// projects (Settings panel) -- each undo a DIFFERENT scope, and none of them alone returns the
-	// page to how a first-time visitor sees it (Tom, 2026-07-31). Clear project empties the open
-	// project; Restore all settings resets that same project's preferences; Delete all projects is
-	// the only library-scoped control on the page. Naming them as a set is what makes the scopes
-	// legible, so all three carry the same tip -- one key, translated once, used three times.
-	// The tip deliberately does NOT quote the other two buttons' labels: lpn_empty_hint was fixed
-	// in this same pass for exactly that (a string that only renders correctly if two independent
-	// translations happen to match).
-	function resetTip(btn) {
-		var pc = EngCalcs.pageConfig || {};
-		if (!pc.lpn_reset_all_tip) { return; }
-		btn.title = pc.lpn_reset_all_tip;
+	// projects (Settings panel) -- get THREE tips, not one shared one. The first version shared a
+	// single key saying they had to be "used together" to reach a first-time-visitor state. That
+	// was FALSE, and Tom caught it (2026-07-31): settings live INSIDE each project document
+	// (serializeProject()), so deleting every project deletes every setting too. Delete all
+	// projects alone IS the full reset -- exactly what init()'s own comment already said, "strictly
+	// more destructive than New/Clear (content only) or Restore defaults (preferences only)".
+	// Three scoped tips cannot be wrong about each other; one shared tip had to describe all three
+	// and got it wrong. Cheaper key economy is not worth a false statement.
+	function helpTip(btn, text) {
+		if (!text) { return; }
+		btn.title = text;
 		btn.className = (btn.className ? btn.className + ' ' : '') + 'ec-help';
 	}
 	// Popups re-render in place (refreshPopupIfOpen), which throws away the elements Bootstrap
