@@ -2317,6 +2317,8 @@ var EngCalcs = EngCalcs || {};
 		var clearBtn = document.createElement('button');
 		clearBtn.type = 'button';
 		clearBtn.textContent = pc.lpn_tool_clear || 'Clear project';
+		// One of the three reset controls -- see resetTip() below for why they share a tip.
+		resetTip(clearBtn);
 		clearBtn.addEventListener('click', clearNetwork);
 		fileGroup.appendChild(clearBtn);
 		var exampleBtn = document.createElement('button');
@@ -3350,9 +3352,10 @@ var EngCalcs = EngCalcs || {};
 		// untouched, same "preferences vs. content" split clearNetwork()'s own comment documents.
 		var restoreBtn = document.createElement('button');
 		restoreBtn.type = 'button';
-		restoreBtn.textContent = pc.lpn_settings_restore_btn || 'Restore defaults';
+		restoreBtn.textContent = pc.lpn_settings_restore_btn || 'Restore all settings';
+		resetTip(restoreBtn);
 		restoreBtn.addEventListener('click', function () {
-			if (!window.confirm(pc.lpn_confirm_restore_defaults || 'Reset all settings (ID prefixes, default inputs, solver settings, map display, legend position, and visible labels) to their defaults? Your network is not changed.')) { return; }
+			if (!window.confirm(pc.lpn_confirm_restore_defaults || 'Reset all settings (ID prefixes, default inputs, solver settings, map display, legend position, and visible labels) to their defaults? Your network is not changed. Settings belong to the open project, so your other projects keep their own.')) { return; }
 			settings = defaultSettings();
 			// defaultSettings() leaves settings.defaults full of nulls on purpose -- refill them
 			// here, or every default input would come back blank instead of at its starting value.
@@ -3373,7 +3376,8 @@ var EngCalcs = EngCalcs || {};
 		var wipeBtn = document.createElement('button');
 		wipeBtn.type = 'button';
 		wipeBtn.style.marginLeft = '4px';
-		wipeBtn.textContent = pc.lpn_settings_wipe_btn || 'Erase all saved data';
+		wipeBtn.textContent = pc.lpn_settings_wipe_btn || 'Delete all projects';
+		resetTip(wipeBtn);
 		wipeBtn.addEventListener('click', function () {
 			if (!window.confirm(pc.lpn_confirm_wipe || 'Delete EVERYTHING saved for this page — every project, every background image, and all settings — and reload the page as a brand-new visitor would see it? This cannot be undone.')) { return; }
 			wipeAllStorage();
@@ -3431,6 +3435,21 @@ var EngCalcs = EngCalcs || {};
 	}
 	function tipsIn(root) {
 		if (EngCalcs && EngCalcs.initTips) { EngCalcs.initTips(root); }
+	}
+	// The three reset controls -- Clear project (toolbar), Restore all settings and Delete all
+	// projects (Settings panel) -- each undo a DIFFERENT scope, and none of them alone returns the
+	// page to how a first-time visitor sees it (Tom, 2026-07-31). Clear project empties the open
+	// project; Restore all settings resets that same project's preferences; Delete all projects is
+	// the only library-scoped control on the page. Naming them as a set is what makes the scopes
+	// legible, so all three carry the same tip -- one key, translated once, used three times.
+	// The tip deliberately does NOT quote the other two buttons' labels: lpn_empty_hint was fixed
+	// in this same pass for exactly that (a string that only renders correctly if two independent
+	// translations happen to match).
+	function resetTip(btn) {
+		var pc = EngCalcs.pageConfig || {};
+		if (!pc.lpn_reset_all_tip) { return; }
+		btn.title = pc.lpn_reset_all_tip;
+		btn.className = (btn.className ? btn.className + ' ' : '') + 'ec-help';
 	}
 	// Popups re-render in place (refreshPopupIfOpen), which throws away the elements Bootstrap
 	// attached tooltip instances to. A tooltip that is OPEN at that moment lives in document.body,

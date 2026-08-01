@@ -132,6 +132,7 @@ src = src.replace(marker,
   "\t\tmigrateSaved: (typeof migrateSaved === 'function' ? migrateSaved : null),\n" +
   "\t\tassembleModel: assembleModel, effective: effective,\n" +
   "\t\trenderNodeFields: renderNodeFields, renderLinkFields: renderLinkFields,\n" +
+  "\t\trebuildSettingsFields: rebuildSettingsFields, resetTip: resetTip,\n" +
   "\t\tsetDoc: function (d, s2) { doc = d; if (s2) { scenarios = s2; } },\n" +
   "\t\tgetDoc: function () { return doc; } };\n" + marker);
 eval(src);
@@ -266,6 +267,40 @@ const before = pf.querySelectorAll('.ec-help').length;
 L.renderNodeFields('R-1');
 ok('re-render does not accumulate labels', pf.querySelectorAll('.ec-help').length === before,
    before + ' -> ' + pf.querySelectorAll('.ec-help').length);
+
+// --- 10. the three reset controls share one tip -------------------------
+// Tom, 2026-07-31: Clear project / Restore all settings / Delete all projects each undo a
+// different scope, and none alone returns the page to a first-time-visitor state. The shared tip
+// is what makes that legible, so a missing one on any of the three is a real defect.
+const rb = mkEl('button');
+L.resetTip(rb);
+ok('resetTip sets the shared tip', rb.title === PC.lpn_reset_all_tip);
+ok('resetTip marks the button .ec-help (touch reachability)',
+   String(rb.className).split(/\s+/).includes('ec-help'));
+const withClass = mkEl('button'); withClass.className = 'lpn-x';
+L.resetTip(withClass);
+ok('resetTip APPENDS ec-help rather than clobbering an existing class',
+   withClass.className === 'lpn-x ec-help', withClass.className);
+
+const sf = byId.lpn_settings_fields;
+L.rebuildSettingsFields();
+function buttonsIn(root) {
+  const out = [];
+  (function walk(n) { (n.children || []).forEach(c => { if (c.tagName === 'BUTTON') out.push(c); walk(c); }); })(root);
+  return out;
+}
+const resetBtns = buttonsIn(sf).filter(b =>
+  b.textContent === PC.lpn_settings_restore_btn || b.textContent === PC.lpn_settings_wipe_btn);
+ok('both Settings reset buttons are present', resetBtns.length === 2,
+   buttonsIn(sf).map(b => b.textContent).join(' | '));
+ok('both carry the shared reset tip', resetBtns.every(b => b.title === PC.lpn_reset_all_tip),
+   JSON.stringify(resetBtns.map(b => [b.textContent, b.title === PC.lpn_reset_all_tip])));
+
+// The tip must not quote the other buttons' labels -- that is the cross-key dependency this same
+// pass removed from lpn_empty_hint, and it would be hypocritical to reintroduce here.
+const quoted = [PC.lpn_tool_clear, PC.lpn_settings_restore_btn, PC.lpn_settings_wipe_btn]
+  .filter(lbl => PC.lpn_reset_all_tip.indexOf(lbl) >= 0);
+ok('shared tip quotes no other key\'s value', quoted.length === 0, quoted.join(' / '));
 
 console.log(fails ? '\n' + fails + ' FAILURES' : '\nall green');
 process.exit(fails ? 1 : 0);

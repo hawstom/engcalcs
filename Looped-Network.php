@@ -225,6 +225,7 @@ EngCalcs.pageConfig = {
 	lpn_result_gradient: <?=json_encode($ec_lang['lpn_result_gradient'])?>,
 	lpn_result_gradient_tip: <?=json_encode($ec_lang['lpn_result_gradient_tip'])?>,
 	lpn_tool_clear: <?=json_encode($ec_lang['lpn_tool_clear'])?>,
+	lpn_reset_all_tip: <?=json_encode($ec_lang['lpn_reset_all_tip'])?>,
 	lpn_confirm_clear: <?=json_encode($ec_lang['lpn_confirm_clear'])?>,
 	lpn_storage_too_new: <?=json_encode($ec_lang['lpn_storage_too_new'])?>,
 	lpn_tool_projects: <?=json_encode($ec_lang['lpn_tool_projects'])?>,

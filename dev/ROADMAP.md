@@ -1124,6 +1124,50 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     harness's own `innerHTML` stub being a plain data property; a `defineProperty` setter that
     really detaches children fixed it. Worth recording because that same stub had made "clearFields
     empties the container" a vacuous pass.
+  - **The three reset controls, named as a set (Tom, 2026-07-31, in review of this pass).** Tom
+    rejected "Erase all saved data" as not descriptive and asked whether it was simply "Restore
+    defaults" plus "Clear project" — i.e. whether the button was redundant and could be replaced by
+    a hint. **It is not, and the reason is 146.08.** `wipeAllStorage()` removes `lpn_index`, the
+    legacy `lpn_document`, and every `lpn_project_*` key; Clear project blanks only the OPEN
+    project, and Restore defaults resets only that same project's settings (settings are stored per
+    project). Clear + Restore therefore leaves every OTHER saved project intact, each with its own
+    network, image and settings. **The equivalence Tom described was exactly true before the library
+    shipped** — one document meant one project — which is why the intuition was sound and the
+    conclusion wrong.
+    - That diagnosis is what fixed the name. The button is **the only library-scoped control on the
+      page**, sitting in a panel where everything else is project-scoped — which is why "Restore",
+      "Reset", "Clear" and "clean state" all sounded wrong: they read as project-scoped because
+      their neighbours are. The distinguishing word is **projects**, plural.
+    - `lpn_settings_wipe_btn` → **"Delete all projects"**. `lpn_settings_restore_btn` →
+      **"Restore all settings"** (was the objectless "Restore defaults" — defaults of *what*?).
+      `lpn_tool_clear` **stays "Clear project"**, and the reason took two passes to get right.
+      - Tom's summary called it "Delete this project", and when told it "empties rather than
+        removes" he pushed back correctly: *"There is no difference between a Delete and a good
+        clear, is there?"* — since `clearNetwork()` blanks the name too, a cleared project is
+        indistinguishable from a fresh one. The lingering index row is a weak answer.
+      - **The real difference is navigation, not residue.** `deleteProject()`
+        (`js/looped-network.js:2037`) removes the key, drops the library to N−1, and then **opens
+        the most recently updated survivor** — a different network appears on screen. Clear leaves
+        you where you were, on an empty canvas. **With exactly one project in the library the two
+        genuinely are equivalent** (Delete falls through to `newProject()`; the only residue is a
+        project ID nothing in the UI exposes), so Tom's instinct was right in the case he was
+        picturing and inverts as soon as a second project exists — which is the case the library
+        was built for.
+      - Two behaviours that differ in *where you end up* should not share a verb, so Clear keeps its
+        name. Flagged rather than silently applied.
+      - **Noted, not built:** the per-project Delete confirm (`lpn_confirm_project_delete`) never
+        warns that deleting the OPEN project drops you into a different one. That is a genuine
+        surprise, and it needs a second confirm string used only for the open row — a small,
+        self-contained follow-up, deliberately kept out of a naming pass.
+    - **One shared tip on all three** (`lpn_reset_all_tip`, via `resetTip()`): "This is one of three
+      reset buttons. Used together they leave this calculator exactly as a first-time visitor finds
+      it. Each one on its own resets only its own part." One key, translated once, used three times.
+      It deliberately does **not** quote the three buttons' labels — that is precisely the cross-key
+      dependency this same pass removed from `lpn_empty_hint`, and the harness now asserts the tip
+      contains none of the other three values, so it cannot be reintroduced by a later edit.
+    - `lpn_confirm_restore_defaults` gained one clause the panel never admitted: "Settings belong to
+      the open project, so your other projects keep their own." That is 146.08's per-project-settings
+      open question surfacing in the UI for the first time.
   - **One sequencing note, left open deliberately.** This pass ran BEFORE Task 146.02 (the
     EPANET-style icon toolbar), which is priority 95, also blocks 146.06, and will change toolbar
     strings — so 193's own "do it once the string set has stopped moving" is not strictly satisfied.

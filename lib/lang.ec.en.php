@@ -1172,6 +1172,11 @@ $ec_lang['lpn_result_flow']='Flow';
 $ec_lang['lpn_result_velocity']='Velocity';
 $ec_lang['lpn_result_headloss']='Head loss';
 $ec_lang['lpn_tool_clear']='Clear project';
+// One shared tip on all THREE reset controls (Tom, 2026-07-31): Clear project (toolbar), Restore
+// all settings and Delete all projects (Settings panel). Each button undoes a different scope and
+// none of them alone gets you back to a clean page -- which was invisible until they were named
+// as a set. One key, translated once, used in three places.
+$ec_lang['lpn_reset_all_tip']='This is one of three reset buttons. Used together they leave this calculator exactly as a first-time visitor finds it. Each one on its own resets only its own part.';
 $ec_lang['lpn_confirm_clear']='This permanently deletes the network, the background image, and the project name. Your settings are kept. Continue?';
 $ec_lang['lpn_storage_too_new']='This project was saved by a newer version of the page, so it cannot be opened here.';
 $ec_lang['lpn_tool_projects']='Projects';
@@ -1321,7 +1326,7 @@ $ec_lang['lpn_settings_legend_middle_left']='Middle left';
 $ec_lang['lpn_settings_legend_middle_right']='Middle right';
 $ec_lang['lpn_settings_legend_bottom_left']='Bottom left';
 $ec_lang['lpn_settings_legend_bottom_right']='Bottom right';
-$ec_lang['lpn_settings_restore_btn']='Restore defaults';
-$ec_lang['lpn_confirm_restore_defaults']='Reset all settings (ID prefixes, default inputs, solver settings, map display, legend position, and visible labels) to their defaults? Your network is not changed.';
-$ec_lang['lpn_settings_wipe_btn']='Erase all saved data';
+$ec_lang['lpn_settings_restore_btn']='Restore all settings';
+$ec_lang['lpn_confirm_restore_defaults']='Reset all settings (ID prefixes, default inputs, solver settings, map display, legend position, and visible labels) to their defaults? Your network is not changed. Settings belong to the open project, so your other projects keep their own.';
+$ec_lang['lpn_settings_wipe_btn']='Delete all projects';
 $ec_lang['lpn_confirm_wipe']='Delete EVERYTHING saved for this page — every project, every background image, and all settings — and reload the page as a brand-new visitor would see it? This cannot be undone.';

@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "hi",
-        "expected_key_count": 730,
-        "delta_key_count": 157,
+        "expected_key_count": 731,
+        "delta_key_count": 158,
         "exempt_key_count": 14,
         "exempt_keys": [
             "calc_units_us",
@@ -268,6 +268,7 @@
         "lpn_result_velocity": "Velocity",
         "lpn_result_headloss": "Head loss",
         "lpn_tool_clear": "Clear project",
+        "lpn_reset_all_tip": "This is one of three reset buttons. Used together they leave this calculator exactly as a first-time visitor finds it. Each one on its own resets only its own part.",
         "lpn_confirm_clear": "This permanently deletes the network, the background image, and the project name. Your settings are kept. Continue?",
         "lpn_storage_too_new": "This project was saved by a newer version of the page, so it cannot be opened here.",
         "lpn_tool_projects": "Projects",
@@ -380,9 +381,9 @@
         "lpn_settings_legend_middle_right": "Middle right",
         "lpn_settings_legend_bottom_left": "Bottom left",
         "lpn_settings_legend_bottom_right": "Bottom right",
-        "lpn_settings_restore_btn": "Restore defaults",
-        "lpn_confirm_restore_defaults": "Reset all settings (ID prefixes, default inputs, solver settings, map display, legend position, and visible labels) to their defaults? Your network is not changed.",
-        "lpn_settings_wipe_btn": "Erase all saved data",
+        "lpn_settings_restore_btn": "Restore all settings",
+        "lpn_confirm_restore_defaults": "Reset all settings (ID prefixes, default inputs, solver settings, map display, legend position, and visible labels) to their defaults? Your network is not changed. Settings belong to the open project, so your other projects keep their own.",
+        "lpn_settings_wipe_btn": "Delete all projects",
         "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, and all settings — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
     "keys": {
@@ -427,6 +428,7 @@
         "lpn_result_velocity": "Velocity",
         "lpn_result_headloss": "Head loss",
         "lpn_tool_clear": "Clear project",
+        "lpn_reset_all_tip": "This is one of three reset buttons. Used together they leave this calculator exactly as a first-time visitor finds it. Each one on its own resets only its own part.",
         "lpn_confirm_clear": "This permanently deletes the network, the background image, and the project name. Your settings are kept. Continue?",
         "lpn_storage_too_new": "This project was saved by a newer version of the page, so it cannot be opened here.",
         "lpn_tool_projects": "Projects",
@@ -539,9 +541,9 @@
         "lpn_settings_legend_middle_right": "Middle right",
         "lpn_settings_legend_bottom_left": "Bottom left",
         "lpn_settings_legend_bottom_right": "Bottom right",
-        "lpn_settings_restore_btn": "Restore defaults",
-        "lpn_confirm_restore_defaults": "Reset all settings (ID prefixes, default inputs, solver settings, map display, legend position, and visible labels) to their defaults? Your network is not changed.",
-        "lpn_settings_wipe_btn": "Erase all saved data",
+        "lpn_settings_restore_btn": "Restore all settings",
+        "lpn_confirm_restore_defaults": "Reset all settings (ID prefixes, default inputs, solver settings, map display, legend position, and visible labels) to their defaults? Your network is not changed. Settings belong to the open project, so your other projects keep their own.",
+        "lpn_settings_wipe_btn": "Delete all projects",
         "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, and all settings — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
     "key_context": {
@@ -1038,6 +1040,18 @@
             }
         },
         "lpn_tool_clear": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "स्थिर आपूर्ति शीर्ष",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_reset_all_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
