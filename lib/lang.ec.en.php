@@ -1135,15 +1135,25 @@ $ec_lang['lpn_tool_zoom_extent']='Zoom to fit';
 $ec_lang['lpn_new_text']='Text';
 $ec_lang['lpn_tool_example']='Draw example network';
 $ec_lang['lpn_field_elev']='Elevation';
+// Task 193 trap-term tips. Every one of these is a DEFINITION the user can read, which is also
+// what anchors the concept for the 26 translators in sprint 146.06 -- per CLAUDE.md's polysemy
+// protocol, a visible tip is the preferred home for a definition, in place of an $ec_lang_intent
+// entry carrying translatable payload nobody on the page can see.
+$ec_lang['lpn_field_elev_tip']='Ground or pipe level at this node. Measure it from any zero you like, as long as every node uses the same one.';
 // A reservoir carries an elevation AND a head, so it doubles as a tank (Tom, 2026-07-30). Leaving
 // the head blank means "the water surface is at the reservoir's own elevation"; the placeholder
 // string is what shows in that empty box.
 $ec_lang['lpn_field_head']='Head';
+// 'head' is a documented trap term in glossary.json (anatomical head; pressure). The tip says
+// outright that it is a height and not a pressure, which is the exact confusion the glossary's
+// avoid list guards against.
+$ec_lang['lpn_field_head_tip']='Water surface level in the reservoir, measured as a height, not as a pressure. Leave it blank to put the water surface at the reservoir elevation.';
 $ec_lang['lpn_close']='Close';
 $ec_lang['lpn_empty_hint']='To start, use the toolbar to add a background image or a reservoir, or to draw an example network.';
 $ec_lang['lpn_tool_undo']='Undo';
 $ec_lang['lpn_confirm_example']='This adds the example to the network you already have. Continue?';
 $ec_lang['lpn_field_diameter']='Diameter';
+$ec_lang['lpn_demand_tip']='Flow taken out of the network at this node. Enter a negative number for flow put into the network here.';
 $ec_lang['lpn_units_length']='Length and map';
 $ec_lang['lpn_units_elevhead']='Elevation and head';
 $ec_lang['lpn_units_pressure']='Pressure';
@@ -1154,7 +1164,9 @@ $ec_lang['lpn_units_velocity']='Velocity';
 // alongside the existing total head loss (ROADMAP Task 177, Tom agreed 2026-07-30) -- matches
 // mpf_/mphl_'s own friction-slope convention rather than inventing a per-1000-length form.
 $ec_lang['lpn_result_gradient']='Head loss gradient';
+$ec_lang['lpn_result_gradient_tip']='Head loss divided by the length of the pipe. Use it to compare pipes of different lengths against one design limit.';
 $ec_lang['lpn_result_head']='Head';
+$ec_lang['lpn_result_head_tip']='Energy of the water at this node, written as a height of water column. It is a height, not a pressure.';
 $ec_lang['lpn_result_pressure']='Pressure';
 $ec_lang['lpn_result_flow']='Flow';
 $ec_lang['lpn_result_velocity']='Velocity';
@@ -1198,11 +1210,17 @@ $ec_lang['lpn_diag_dangling_link']='A pipe or pump connects to a node that no lo
 $ec_lang['lpn_diag_unreachable']='These nodes have no path to a reservoir:';
 $ec_lang['lpn_diag_not_converged']='No solution was found. Check for values that cannot be real, such as a diameter of zero.';
 $ec_lang['lpn_field_roughness']='Roughness';
+// Which coefficient this is was invisible: assembleModel() hardcodes Hazen-Williams, so a user
+// typing a Manning n of 0.013 into it got nonsense with no warning. Revisit when a friction-method
+// selector lands (see numberFieldPlain()'s own note).
+$ec_lang['lpn_field_roughness_tip']='Hazen-Williams C. A higher number means a smoother pipe: about 150 for new plastic, 130 for new steel or iron, and 100 for old pipe.';
 $ec_lang['lpn_field_length']='Length';
+$ec_lang['lpn_field_length_tip']='Length of the pipe. With Auto turned on this follows what you drew. Turn Auto off to type a length that differs from the drawing.';
 // Plain-text wording of the concept mphl_total_junction_k/mphl_junction_loss already own (their
 // values carry k<sub>m</sub> markup, incompatible with this popup's textContent-only fields) --
 // Tom, 2026-07-30, "default to 2" matches mphl_total_junction_k_tip's own stated default exactly.
 $ec_lang['lpn_field_km']='Minor (local) loss coefficient, k';
+$ec_lang['lpn_field_km_tip']='Loss from the bends, valves, and fittings on this pipe, counted as a multiple of the velocity head. Use 0 for a plain straight pipe.';
 // Short form of the same concept, for the two NARROW uses: the Labels checkbox list and the on-map
 // legend beside it. Per CLAUDE.md's rule that a shared label must fit its narrowest use, these get
 // their own key rather than being asked to carry the full popup-field wording -- an on-map legend
@@ -1276,6 +1294,7 @@ $ec_lang['lpn_push_nothing']='No existing element has any of the properties bein
 $ec_lang['lpn_push_no_change']='Every element already has these values, so nothing would change.';
 $ec_lang['lpn_settings_emitter_exponent']='Emitter exponent';
 $ec_lang['lpn_settings_tolerance']='Convergence tolerance';
+$ec_lang['lpn_settings_tolerance_tip']='How close the solver has to get before it stops. A smaller number is more exact and takes longer.';
 $ec_lang['lpn_settings_text_size']='Text size';
 $ec_lang['lpn_settings_text_size_map']='Map units';
 $ec_lang['lpn_settings_text_size_screen']='Screen pixels';
@@ -1292,6 +1311,9 @@ $ec_lang['lpn_settings_backdrop_opacity']='Background image opacity (0 to 1)';
 $ec_lang['lpn_settings_text_size_units']='Text size units';
 $ec_lang['lpn_settings_map_display']='Map display and sizes';
 $ec_lang['lpn_settings_map_height_px']='Map height (screen pixels)';
+// The cap in applyMapHeight() makes this field look ignored on a phone (ROADMAP Task 146.08's
+// own note). It is a render cap, not a stored value -- say so instead of leaving the user to guess.
+$ec_lang['lpn_settings_map_height_tip']='On a small screen the map is drawn shorter than this, so that part of the page is always left to scroll.';
 $ec_lang['lpn_settings_legend_position']='Legend position';
 $ec_lang['lpn_settings_legend_top_left']='Top left';
 $ec_lang['lpn_settings_legend_top_right']='Top right';

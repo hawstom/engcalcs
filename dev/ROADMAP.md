@@ -259,6 +259,12 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 - 95|146.02| **EPANET-style icon toolbar + map symbol icons (Task 146 child).** Replace/supplement
   the current toolbar with EPANET-style icons for elements and map symbols. **Must land before the
   translation sprint (146.06) — this blocks it**, per Tom, 2026-07-29.
+  - **Owes a short 193-style re-read of any string it adds or renames** (added 2026-07-31). Task 193
+    ran first, so the toolbar strings it tightened are the ones this task is most likely to change.
+    That is a paragraph of work against a handful of new keys, not a repeat of 193 — but it has to
+    happen before 146.06 launches, or the sprint pays 26× for whatever this task writes at speed.
+  - Note an icon toolbar does not necessarily REMOVE those strings: they become `title`/`aria-label`
+    text, which is plain-text-constrained (Rule B) where the visible button label was not.
 - 10|181| **Per-element symbol sizing (Task 146 child).** Task 180 shipped one overall
   `settings.symbolScale` multiplier ("Symbol size (relative to text)") covering node radius, pipe
   width, pump/vertex/arrow marks and stroke widths together. Tom, 2026-07-30, named the
@@ -640,24 +646,14 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   persistence is one autosaved network in browser localStorage with "no guarantee about preserving
   data through the preview stage" (`lpn_notes_3_def`), and translating the UI reads as a promise of
   stability this preview doesn't make yet.
-- 10|193| **`lpn_` English tightening pass — the last gate before the 146.06 sprint (Task 146
-  child).** Raised by Tom, 2026-07-30, as an item with no task of its own. Every `lpn_` string was
-  written English-only and at speed during a fast-moving preview, and none of it has had the
-  Simple-English pass CLAUDE.md requires of source strings *before* they are handed to 26 translation
-  agents. Doing it after the sprint means paying for the same string twice, in 26 languages.
-  - **This is the English-reform gate applied on purpose rather than in hindsight.** The suite's own
-    rule: fix the English at the source, where one edit fixes all 26 languages, instead of guarding a
-    weak string with per-language notes. Everything the suite has learned about jargon,
-    transliteration lures and trap terms applies to a page full of `head`, `demand`, `roughness`,
-    `emitter` and `open/closed` — several of which are already documented traps in `glossary.json`.
-  - **Scope:** every `lpn_` key — toolbar and menu labels, the Settings and Labels panels, popup
-    field labels, status/diagnostic messages, notes, tips, and the preview banner. Identity strings
-    (menu entry, `<title>`) follow the identity rule and are not plainened; explanatory strings are.
-  - **Do it once the string set has stopped moving** — 146.01/146.02/146.03 and 146.08 are all still
-    adding and renaming strings, and this pass is only worth running against a settled set. It is
-    therefore the last thing before 146.06, not a parallel track.
-  - Fold in the trap-term protocol while there: a definitional `.ec-help`/`.ec-tip` on the input
-    labels that need one, and glossary entries for any `lpn_` concept not already covered.
+  - **Gate status, 2026-07-31.** 146.08 (multi-project storage) has shipped, and Task 193 (the
+    English tightening pass) is done — so of the named gates only **146.02** is outstanding, plus
+    the short re-read it now owes. `lpn_notes_3_def` was rewritten in 193 and no longer says "one
+    network"; it now says projects live in this browser and nowhere else, which stays honest until
+    Task 195 lands a file export.
+  - **Pre-sprint checklist reminder:** ten `lpn_` glossary entries were seeded in 193 with `avoid`
+    arrays and **empty** translations by design. The sprint fills them, and CLAUDE.md's mandatory
+    glossary write-back applies — a sprint that leaves them empty is not closed.
 - 15|194| **Touch gesture model: one finger scrolls the page, two fingers pan the map (Task 146
   child).** Raised by Tom, 2026-07-31, after the canvas-fills-the-phone lock-up: *"It didn't occur
   to me to try to scroll with two fingers. That's just an idea. It looks like it occurred to you
@@ -1079,6 +1075,61 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Completed
 
+- 0|193|[CC] **`lpn_` English tightening pass — DONE 2026-07-31.** The English-reform gate applied
+  before the 146.06 sprint, so each fix is paid for once rather than 26 times. Commits: the source
+  pass, then the trap-term tips and glossary seed. Every `lpn_` key was reviewed; 51 changed.
+  - **Two things the page was asserting that had stopped being true.** `lpn_notes_3_def` still said
+    "One network is saved automatically" after 146.08 shipped a multi-project library, and
+    `lpn_notes_4_def` still listed "saving" as planned. Both rewritten — and notes_3 now names the
+    two REAL failure modes (clearing browser data; no file export yet) instead of a vague "no
+    guarantee", which is the honest form of the same warning and stays true until Task 195.
+  - **Structural translation hazards, which are the ones a translator cannot route around.**
+    `lpn_pump_curve_ref_note` was string concatenation (`'…for pump ' + id + '.'`) — now a `{id}`
+    placeholder, matching `mpf_solver_no_solution`'s `{qmax}`. `lpn_empty_hint` quoted another
+    key's value ("Draw example network"), which only renders correctly if two independent
+    translations happen to match. `'Length/Map'` and `'Elevation/Head'` sat in a row of unit
+    dropdowns where a slash reads as a ratio unit.
+  - **Two judgment calls worth Tom's veto, both flagged in the commit message.** (1) `lpn_field_km`
+    carried the symbol as the bare letters **"km"** — kilometres, in a calculator whose lengths are
+    in metres. Now `k`, which is what `lpn_field_km_short` already said. (2) "Push defaults to all
+    elements" → **"Apply"**. "Push" is computing-idiomatic and a polysemy trap (press vs shove);
+    the `lpn_push_*` key names are unchanged, so this is wording only.
+  - **"Backdrop" → "Background image" everywhere it faces the user.** A theater loanword with real
+    transliteration risk, replaced by two ordinary composable words — which is what the scope doc
+    calls the thing anyway ("a user-supplied image"). Key names stay `lpn_backdrop_*`.
+  - **Ten definitional tips on the input labels**, per the polysemy/units-trap protocol: elevation,
+    head (input and result), demand, roughness, length, minor loss k, head loss gradient,
+    convergence tolerance, map height. Two of them fix a defect rather than just explaining:
+    **Roughness never said it was Hazen-Williams C** (`assembleModel()` hardcodes HW, so a Manning
+    n of 0.013 typed there produced nonsense silently), and **Map height never said the phone cap
+    is a render cap, not a stored value** — 146.08's own note predicted that would read as ignored.
+    Demand gets `lpn_demand_tip` rather than borrowing `bpn_demand_tip`, whose "at this line's
+    downstream end" is branched-network wording and false here.
+  - **Mechanism:** `setFieldLabel()` builds the whole-label `.ec-help` wrapper with the nested
+    `.ec-tip` glyph, and `clearFields()` disposes Bootstrap tooltip instances before wiping a
+    popup — an OPEN tooltip lives in `document.body`, not in the popup, so a plain `innerHTML = ''`
+    would strand it on screen with nothing to close it. Popup fields are built long after
+    `DOMContentLoaded`, so each renderer ends with `EngCalcs.initTips(fields)`.
+  - **Ten glossary entries seeded** with `avoid` arrays and empty translations: draw (a diagram),
+    junction, reservoir, node, link, vertex, background image, pump curve, project (saved network),
+    scenario. Empty on purpose — the entry exists to carry its guard into the sprint prompts, not
+    to assert a translation nobody has made. `dev/scripts/list_trap_terms.php` picks them up with
+    no second list to maintain. "draw" is the one the scope doc had already called for by name.
+  - **Verified by harness, not inspection** — `dev/lpn-spike/popup-tips-harness.js`, kept in the
+    repo. 25 checks: the `.ec-help`/`.ec-tip` nesting, tooltip disposal, every `lpn_` key
+    referenced by JS or PHP existing in `lang.ec.en.php`, the `{id}` substitution, a four-node
+    looped solve through `effective()`, and — the part unit tests miss — rendering the real node
+    and link popups and reading the tips back off them, which is where a mis-threaded argument
+    hides. The first run of that last check FAILED on a stale-node count, and the cause was the
+    harness's own `innerHTML` stub being a plain data property; a `defineProperty` setter that
+    really detaches children fixed it. Worth recording because that same stub had made "clearFields
+    empties the container" a vacuous pass.
+  - **One sequencing note, left open deliberately.** This pass ran BEFORE Task 146.02 (the
+    EPANET-style icon toolbar), which is priority 95, also blocks 146.06, and will change toolbar
+    strings — so 193's own "do it once the string set has stopped moving" is not strictly satisfied.
+    That is not a reason to hold 193 open: everything above is real regardless of what the toolbar
+    looks like. What it means is that **146.02 owes a short 193-style re-read of whatever strings it
+    adds or renames, before 146.06 launches** — a paragraph of work, not a repeat of this pass.
 - 0|189|[CC] **Per-field decimal places on map labels (Task 146 child) — DONE 2026-07-30.** Tom:
   "along with the checkbox, a decimal places input (with scroller since it's integer and small?)
   would be nice for each numerical label." Shipped as a 0–4 number input on each numeric field's row

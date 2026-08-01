@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "cs",
-        "expected_key_count": 576,
-        "delta_key_count": 1,
+        "expected_key_count": 730,
+        "delta_key_count": 155,
         "exempt_key_count": 14,
         "exempt_keys": [
             "calc_units_us",
@@ -21,6 +21,7 @@
             "bpn_id"
         ],
         "active_prefixes": [
+            "lpn",
             "mhp"
         ],
         "requested_prefix": null,
@@ -30,9 +31,33 @@
         "intent_notes": "Use key_intent when present; these entries provide terse disambiguation comments only where translation risk exists."
     },
     "prompt_context_by_prefix": {
+        "lpn": "Use these preferred technical term translations when relevant:\n- flow (Q): průtok\n- velocity (v): rychlost\n- slope (S): sklon\n    DO NOT render as: activity\/fitness sense of 'grade' — the treadmill or trail incline for running\/walking\/jogging; this is the hydraulic energy gradient, not an exercise setting; geographic or topographic landform term; school grade \/ academic mark",
         "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): průtok\n- penstock: tlakovod\n    DO NOT render as: phonetic transliteration of the English word — translate the concept (pressure pipe \/ force main to turbine), never borrow 'penstock' as a loanword\n- gross head (H_gross): hrubý spád\n    DO NOT render as: a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry; pressure\n- net head (H_net): čistý spád\n    DO NOT render as: a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry; pressure\n- plant efficiency (η): účinnost elektrárny\n- head loss (h_L): ztráta tlakové výšky\n    DO NOT render as: pressure loss \/ pressure drop (use the head-loss term, not the pressure term); a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry\n- run-of-river: průtočná vodní elektrárna\n- headworks: odběrný objekt\n- junction loss (h_m): místní ztráty\n- minor loss (h_m): místní ztráta"
     },
     "glossary_terms_by_prefix": {
+        "lpn": [
+            {
+                "term": "flow",
+                "symbol": "Q",
+                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg RESOLVED (Tom, 2026-07-13): native engineer's 2026-07-06 clarification confirmed both 'дебит' (colloquial\/general register) and 'водно количество' (academic\/hydraulic-engineering register, used at university for Q) are acceptable. Tom decided suite-wide standardization on 'водно количество' — \"I would put водно количество everywhere\" — applied across all bg calculator categories (pipes\/irrigation included, not just the hydraulic-structure\/open-channel strings the engineer originally corrected). 'дебит' fully replaced in lib\/lang.ec.bg.php 2026-07-13. Task 109 stages 3-5 (2026-07-19): bg standardized on водно количество (дебит drift removed from or_\/mpf_\/cs_ per Bulgarian-engineer-feedback.md); sr standardized on проток (stage 4); it confirmed on portata (flusso drift removed).",
+                "preferred_translation": "průtok"
+            },
+            {
+                "term": "velocity",
+                "symbol": "v",
+                "context": "Flow velocity (speed of water). Appears in all calculators.",
+                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
+                "preferred_translation": "rychlost"
+            },
+            {
+                "term": "slope",
+                "symbol": "S",
+                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators. English aliases 'slope' and 'grade' (u_grade\/u_gradePercent) both point here.",
+                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term. [2026-07-21] Centralized the grade activity-sense guard here (was living only as u_grade\/u_gradePercent label commentary): the 'avoid' array now carries the running\/walking\/jogging exercise-incline trap, so the slope entry is the single home for the grade→energy-gradient concept and its wrong senses.",
+                "preferred_translation": "sklon"
+            }
+        ],
         "mhp": [
             {
                 "term": "flow",
@@ -107,10 +132,318 @@
         ]
     },
     "keys_to_translate": {
-        "mhp_vel_ok_short": "OK"
+        "mhp_vel_ok_short": "OK",
+        "lpn_main_menu": "Looped Pipe Network (Map Interface) — PREVIEW",
+        "lpn_main_title": "PREVIEW: Free Online Looped Pipe Network Calculator with Map Interface",
+        "lpn_main_desc": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map",
+        "lpn_preview_banner": "PREVIEW — This calculator is new and still changing. It is in English only for now. See the Notes below for current limits. Comments and suggestions are always welcome.",
+        "lpn_tool_select": "Select",
+        "lpn_tool_add_junction": "Junction",
+        "lpn_tool_add_reservoir": "Reservoir",
+        "lpn_tool_add_pipe": "Pipe",
+        "lpn_tool_add_pump": "Pump",
+        "lpn_tool_add_text": "Text",
+        "lpn_tool_delete": "Delete",
+        "lpn_tool_zoom_extent": "Zoom to fit",
+        "lpn_new_text": "Text",
+        "lpn_tool_example": "Draw example network",
+        "lpn_field_elev": "Elevation",
+        "lpn_field_elev_tip": "Ground or pipe level at this node. Measure it from any zero you like, as long as every node uses the same one.",
+        "lpn_field_head": "Head",
+        "lpn_field_head_tip": "Water surface level in the reservoir, measured as a height, not as a pressure. Leave it blank to put the water surface at the reservoir elevation.",
+        "lpn_close": "Close",
+        "lpn_empty_hint": "To start, use the toolbar to add a background image or a reservoir, or to draw an example network.",
+        "lpn_tool_undo": "Undo",
+        "lpn_confirm_example": "This adds the example to the network you already have. Continue?",
+        "lpn_field_diameter": "Diameter",
+        "lpn_demand_tip": "Flow taken out of the network at this node. Enter a negative number for flow put into the network here.",
+        "lpn_units_length": "Length and map",
+        "lpn_units_elevhead": "Elevation and head",
+        "lpn_units_pressure": "Pressure",
+        "lpn_units_flow": "Flow",
+        "lpn_units_velocity": "Velocity",
+        "lpn_result_gradient": "Head loss gradient",
+        "lpn_result_gradient_tip": "Head loss divided by the length of the pipe. Use it to compare pipes of different lengths against one design limit.",
+        "lpn_result_head": "Head",
+        "lpn_result_head_tip": "Energy of the water at this node, written as a height of water column. It is a height, not a pressure.",
+        "lpn_result_pressure": "Pressure",
+        "lpn_result_flow": "Flow",
+        "lpn_result_velocity": "Velocity",
+        "lpn_result_headloss": "Head loss",
+        "lpn_tool_clear": "Clear project",
+        "lpn_confirm_clear": "This permanently deletes the network, the background image, and the project name. Your settings are kept. Continue?",
+        "lpn_storage_too_new": "This project was saved by a newer version of the page, so it cannot be opened here.",
+        "lpn_tool_projects": "Projects",
+        "lpn_projects_heading": "Saved projects",
+        "lpn_project_untitled": "Untitled",
+        "lpn_project_new": "Start empty project",
+        "lpn_project_saveas": "Save as new project",
+        "lpn_project_copy_suffix": " (copy)",
+        "lpn_project_open": "Open",
+        "lpn_project_rename": "Rename",
+        "lpn_project_delete": "Delete",
+        "lpn_project_open_now": "Open now",
+        "lpn_prompt_project_name": "Name for this project",
+        "lpn_confirm_project_delete": "Delete this project and everything in it? This cannot be undone.",
+        "lpn_storage_full": "Not saved. Browser storage is full or unavailable, so your recent changes will be lost when you close this tab.",
+        "lpn_notes_1_term": "Steady state",
+        "lpn_notes_1_def": "Solves one set of demands at a time, using the same gradient method EPANET uses. It does not model how the network changes over time.",
+        "lpn_notes_2_term": "Not modeled",
+        "lpn_notes_2_def": "Tanks, water quality, and control valves that open and close on their own (PRV, PSV, FCV) are not modeled. A pipe can carry a fixed minor loss, but not a valve whose open or closed state depends on the flow being solved for.",
+        "lpn_notes_3_term": "Saved projects",
+        "lpn_notes_3_def": "Your projects are saved automatically in this browser, and nowhere else. Clearing your browser data deletes them, and a project cannot yet be written to a file or moved to another device. Because this is an early preview, please use it for small networks and for testing only.",
+        "lpn_notes_5_term": "Pump curve",
+        "lpn_notes_5_def": "A pump follows H = H₀ − aQ^b, where H is the head the pump adds and Q is the flow through it. Enter one, two, or three points from the manufacturer's curve. Three points — the head at zero flow, the normal working point, and the point of highest flow — fit H₀, a and b directly, and follow a published curve most closely. Two points fit a parabola (b = 2) with its peak at zero flow. One point uses a common rule: the head at zero flow is 1.33 × the head you enter, and the highest flow is 2 × the flow you enter, which again gives b = 2. A pump with no points entered adds no head at all. The curve is not stopped at zero, so asking a pump for more flow than its curve can deliver gives a negative head. The fix is a bigger pump or a smaller demand, not a different curve fit.",
+        "lpn_notes_4_term": "Planned",
+        "lpn_notes_4_def": "Writing a project to a file, and moving one between devices, are planned. Comments and suggestions are always welcome (see the feedback link above).",
+        "lpn_id_invalid": "Enter an ID with no spaces and no quotation marks.",
+        "lpn_id_taken": "That ID is already in use.",
+        "lpn_diag_no_fixed_head": "Add a reservoir. The network needs at least one known water level before it can be solved.",
+        "lpn_diag_dangling_link": "A pipe or pump connects to a node that no longer exists:",
+        "lpn_diag_unreachable": "These nodes have no path to a reservoir:",
+        "lpn_diag_not_converged": "No solution was found. Check for values that cannot be real, such as a diameter of zero.",
+        "lpn_field_roughness": "Roughness",
+        "lpn_field_roughness_tip": "Hazen-Williams C. A higher number means a smoother pipe: about 150 for new plastic, 130 for new steel or iron, and 100 for old pipe.",
+        "lpn_field_length": "Length",
+        "lpn_field_length_tip": "Length of the pipe. With Auto turned on this follows what you drew. Turn Auto off to type a length that differs from the drawing.",
+        "lpn_field_km": "Minor (local) loss coefficient, k",
+        "lpn_field_km_tip": "Loss from the bends, valves, and fittings on this pipe, counted as a multiple of the velocity head. Use 0 for a plain straight pipe.",
+        "lpn_field_km_short": "Minor loss, k",
+        "lpn_pump_curve_source": "Curve",
+        "lpn_pump_curve_own": "Enter points below",
+        "lpn_pump_curve_ref_note": "Using the curve entered for pump {id}.",
+        "lpn_pump_curve_note": "One, two, or three points — see \"Pump curve\" in the Notes below.",
+        "lpn_pump_point1": "Point 1 (required)",
+        "lpn_pump_point2": "Point 2 (optional)",
+        "lpn_pump_point3": "Point 3 (optional)",
+        "lpn_mode_select": "Mode: Select. Click an element or a label to see or change it. Drag to move a node, a vertex, or a label. Double-click a pipe to add or remove a vertex.",
+        "lpn_mode_delete": "Mode: Delete. Click an element to remove it.",
+        "lpn_mode_add_junction": "Mode: Add Junction. Click the map to place a junction. Switch to Select mode to change or move elements and labels.",
+        "lpn_mode_add_reservoir": "Mode: Add Reservoir. Click the map to place a reservoir. Switch to Select mode to change or move elements and labels.",
+        "lpn_mode_add_pipe": "Mode: Add Pipe. Click a node, then another node, to connect them. Switch to Select mode to change or move elements and labels.",
+        "lpn_mode_add_pump": "Mode: Add Pump. Click a node, then another node, to connect them. Switch to Select mode to change or move elements and labels.",
+        "lpn_mode_add_text": "Mode: Add Text. Click the map to place a text label. Click near a node to attach the text to that node. Switch to Select mode to change or move elements and labels.",
+        "lpn_tip_select": "Use this mode to change, move, and drag things on the map.",
+        "lpn_tip_labels_draggable": "You can drag a label to move it. Double-click a label to put it back.",
+        "lpn_field_auto": "Auto",
+        "lpn_field_x": "X",
+        "lpn_field_y": "Y",
+        "lpn_field_text_size": "Size ×",
+        "lpn_tool_labels": "Labels",
+        "lpn_labels_heading_node": "Node labels",
+        "lpn_labels_heading_link": "Link labels",
+        "lpn_labels_decimals_tip": "Decimal places shown for this label",
+        "lpn_labels_mark_extrema": "Mark highest and lowest values",
+        "lpn_field_id": "ID",
+        "lpn_backdrop_menu": "Background image...",
+        "lpn_backdrop_add": "Add image",
+        "lpn_backdrop_scale": "Scale",
+        "lpn_backdrop_position": "Position",
+        "lpn_backdrop_remove": "Remove image",
+        "lpn_backdrop_remove_confirm": "Remove the background image?",
+        "lpn_backdrop_scale_prompt1": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them.",
+        "lpn_backdrop_scale_prompt2": "Real distance between the two points",
+        "lpn_backdrop_position_prompt1": "Click any point on the background image. This is the point you will move.",
+        "lpn_backdrop_position_prompt2": "Choose where that point should go, then click Continue.",
+        "lpn_backdrop_target_label": "Move it to:",
+        "lpn_backdrop_target_node": "A node",
+        "lpn_backdrop_target_free": "Any point on the map",
+        "lpn_backdrop_target_coords": "Typed coordinates",
+        "lpn_backdrop_coords_prompt": "Type the X,Y that point should move to",
+        "lpn_backdrop_continue": "Continue",
+        "lpn_tool_settings": "Settings",
+        "lpn_settings_id_prefixes": "ID prefixes",
+        "lpn_settings_defaults": "Default inputs",
+        "lpn_settings_defaults_note": "Used for elements you create from now on. Existing elements are not changed.",
+        "lpn_settings_push_note": "Only the properties whose labels are showing right now are applied.",
+        "lpn_settings_push_btn": "Apply defaults to all elements",
+        "lpn_push_confirm": "Replace these properties on every existing element with the current default inputs? Values you have typed will be overwritten. You can undo this.",
+        "lpn_push_properties": "Properties:",
+        "lpn_push_elements": "Elements:",
+        "lpn_push_none_displayed": "No default input is showing as a label right now, so there is nothing to apply. Turn on the labels for the properties you want in the Labels panel, then try again.",
+        "lpn_push_nothing": "No existing element has any of the properties being applied.",
+        "lpn_push_no_change": "Every element already has these values, so nothing would change.",
+        "lpn_settings_emitter_exponent": "Emitter exponent",
+        "lpn_settings_tolerance": "Convergence tolerance",
+        "lpn_settings_tolerance_tip": "How close the solver has to get before it stops. A smaller number is more exact and takes longer.",
+        "lpn_settings_text_size": "Text size",
+        "lpn_settings_text_size_map": "Map units",
+        "lpn_settings_text_size_screen": "Screen pixels",
+        "lpn_settings_symbol_size": "Symbol size (relative to text)",
+        "lpn_settings_symbol_opacity": "Symbol opacity (0 to 1)",
+        "lpn_settings_backdrop_opacity": "Background image opacity (0 to 1)",
+        "lpn_settings_text_size_units": "Text size units",
+        "lpn_settings_map_display": "Map display and sizes",
+        "lpn_settings_map_height_px": "Map height (screen pixels)",
+        "lpn_settings_map_height_tip": "On a small screen the map is drawn shorter than this, so that part of the page is always left to scroll.",
+        "lpn_settings_legend_position": "Legend position",
+        "lpn_settings_legend_top_left": "Top left",
+        "lpn_settings_legend_top_right": "Top right",
+        "lpn_settings_legend_middle_left": "Middle left",
+        "lpn_settings_legend_middle_right": "Middle right",
+        "lpn_settings_legend_bottom_left": "Bottom left",
+        "lpn_settings_legend_bottom_right": "Bottom right",
+        "lpn_settings_restore_btn": "Restore defaults",
+        "lpn_confirm_restore_defaults": "Reset all settings (ID prefixes, default inputs, solver settings, map display, legend position, and visible labels) to their defaults? Your network is not changed.",
+        "lpn_settings_wipe_btn": "Erase all saved data",
+        "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, and all settings — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
     "keys": {
-        "mhp_vel_ok_short": "OK"
+        "mhp_vel_ok_short": "OK",
+        "lpn_main_menu": "Looped Pipe Network (Map Interface) — PREVIEW",
+        "lpn_main_title": "PREVIEW: Free Online Looped Pipe Network Calculator with Map Interface",
+        "lpn_main_desc": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map",
+        "lpn_preview_banner": "PREVIEW — This calculator is new and still changing. It is in English only for now. See the Notes below for current limits. Comments and suggestions are always welcome.",
+        "lpn_tool_select": "Select",
+        "lpn_tool_add_junction": "Junction",
+        "lpn_tool_add_reservoir": "Reservoir",
+        "lpn_tool_add_pipe": "Pipe",
+        "lpn_tool_add_pump": "Pump",
+        "lpn_tool_add_text": "Text",
+        "lpn_tool_delete": "Delete",
+        "lpn_tool_zoom_extent": "Zoom to fit",
+        "lpn_new_text": "Text",
+        "lpn_tool_example": "Draw example network",
+        "lpn_field_elev": "Elevation",
+        "lpn_field_elev_tip": "Ground or pipe level at this node. Measure it from any zero you like, as long as every node uses the same one.",
+        "lpn_field_head": "Head",
+        "lpn_field_head_tip": "Water surface level in the reservoir, measured as a height, not as a pressure. Leave it blank to put the water surface at the reservoir elevation.",
+        "lpn_close": "Close",
+        "lpn_empty_hint": "To start, use the toolbar to add a background image or a reservoir, or to draw an example network.",
+        "lpn_tool_undo": "Undo",
+        "lpn_confirm_example": "This adds the example to the network you already have. Continue?",
+        "lpn_field_diameter": "Diameter",
+        "lpn_demand_tip": "Flow taken out of the network at this node. Enter a negative number for flow put into the network here.",
+        "lpn_units_length": "Length and map",
+        "lpn_units_elevhead": "Elevation and head",
+        "lpn_units_pressure": "Pressure",
+        "lpn_units_flow": "Flow",
+        "lpn_units_velocity": "Velocity",
+        "lpn_result_gradient": "Head loss gradient",
+        "lpn_result_gradient_tip": "Head loss divided by the length of the pipe. Use it to compare pipes of different lengths against one design limit.",
+        "lpn_result_head": "Head",
+        "lpn_result_head_tip": "Energy of the water at this node, written as a height of water column. It is a height, not a pressure.",
+        "lpn_result_pressure": "Pressure",
+        "lpn_result_flow": "Flow",
+        "lpn_result_velocity": "Velocity",
+        "lpn_result_headloss": "Head loss",
+        "lpn_tool_clear": "Clear project",
+        "lpn_confirm_clear": "This permanently deletes the network, the background image, and the project name. Your settings are kept. Continue?",
+        "lpn_storage_too_new": "This project was saved by a newer version of the page, so it cannot be opened here.",
+        "lpn_tool_projects": "Projects",
+        "lpn_projects_heading": "Saved projects",
+        "lpn_project_untitled": "Untitled",
+        "lpn_project_new": "Start empty project",
+        "lpn_project_saveas": "Save as new project",
+        "lpn_project_copy_suffix": " (copy)",
+        "lpn_project_open": "Open",
+        "lpn_project_rename": "Rename",
+        "lpn_project_delete": "Delete",
+        "lpn_project_open_now": "Open now",
+        "lpn_prompt_project_name": "Name for this project",
+        "lpn_confirm_project_delete": "Delete this project and everything in it? This cannot be undone.",
+        "lpn_storage_full": "Not saved. Browser storage is full or unavailable, so your recent changes will be lost when you close this tab.",
+        "lpn_notes_1_term": "Steady state",
+        "lpn_notes_1_def": "Solves one set of demands at a time, using the same gradient method EPANET uses. It does not model how the network changes over time.",
+        "lpn_notes_2_term": "Not modeled",
+        "lpn_notes_2_def": "Tanks, water quality, and control valves that open and close on their own (PRV, PSV, FCV) are not modeled. A pipe can carry a fixed minor loss, but not a valve whose open or closed state depends on the flow being solved for.",
+        "lpn_notes_3_term": "Saved projects",
+        "lpn_notes_3_def": "Your projects are saved automatically in this browser, and nowhere else. Clearing your browser data deletes them, and a project cannot yet be written to a file or moved to another device. Because this is an early preview, please use it for small networks and for testing only.",
+        "lpn_notes_5_term": "Pump curve",
+        "lpn_notes_5_def": "A pump follows H = H₀ − aQ^b, where H is the head the pump adds and Q is the flow through it. Enter one, two, or three points from the manufacturer's curve. Three points — the head at zero flow, the normal working point, and the point of highest flow — fit H₀, a and b directly, and follow a published curve most closely. Two points fit a parabola (b = 2) with its peak at zero flow. One point uses a common rule: the head at zero flow is 1.33 × the head you enter, and the highest flow is 2 × the flow you enter, which again gives b = 2. A pump with no points entered adds no head at all. The curve is not stopped at zero, so asking a pump for more flow than its curve can deliver gives a negative head. The fix is a bigger pump or a smaller demand, not a different curve fit.",
+        "lpn_notes_4_term": "Planned",
+        "lpn_notes_4_def": "Writing a project to a file, and moving one between devices, are planned. Comments and suggestions are always welcome (see the feedback link above).",
+        "lpn_id_invalid": "Enter an ID with no spaces and no quotation marks.",
+        "lpn_id_taken": "That ID is already in use.",
+        "lpn_diag_no_fixed_head": "Add a reservoir. The network needs at least one known water level before it can be solved.",
+        "lpn_diag_dangling_link": "A pipe or pump connects to a node that no longer exists:",
+        "lpn_diag_unreachable": "These nodes have no path to a reservoir:",
+        "lpn_diag_not_converged": "No solution was found. Check for values that cannot be real, such as a diameter of zero.",
+        "lpn_field_roughness": "Roughness",
+        "lpn_field_roughness_tip": "Hazen-Williams C. A higher number means a smoother pipe: about 150 for new plastic, 130 for new steel or iron, and 100 for old pipe.",
+        "lpn_field_length": "Length",
+        "lpn_field_length_tip": "Length of the pipe. With Auto turned on this follows what you drew. Turn Auto off to type a length that differs from the drawing.",
+        "lpn_field_km": "Minor (local) loss coefficient, k",
+        "lpn_field_km_tip": "Loss from the bends, valves, and fittings on this pipe, counted as a multiple of the velocity head. Use 0 for a plain straight pipe.",
+        "lpn_field_km_short": "Minor loss, k",
+        "lpn_pump_curve_source": "Curve",
+        "lpn_pump_curve_own": "Enter points below",
+        "lpn_pump_curve_ref_note": "Using the curve entered for pump {id}.",
+        "lpn_pump_curve_note": "One, two, or three points — see \"Pump curve\" in the Notes below.",
+        "lpn_pump_point1": "Point 1 (required)",
+        "lpn_pump_point2": "Point 2 (optional)",
+        "lpn_pump_point3": "Point 3 (optional)",
+        "lpn_mode_select": "Mode: Select. Click an element or a label to see or change it. Drag to move a node, a vertex, or a label. Double-click a pipe to add or remove a vertex.",
+        "lpn_mode_delete": "Mode: Delete. Click an element to remove it.",
+        "lpn_mode_add_junction": "Mode: Add Junction. Click the map to place a junction. Switch to Select mode to change or move elements and labels.",
+        "lpn_mode_add_reservoir": "Mode: Add Reservoir. Click the map to place a reservoir. Switch to Select mode to change or move elements and labels.",
+        "lpn_mode_add_pipe": "Mode: Add Pipe. Click a node, then another node, to connect them. Switch to Select mode to change or move elements and labels.",
+        "lpn_mode_add_pump": "Mode: Add Pump. Click a node, then another node, to connect them. Switch to Select mode to change or move elements and labels.",
+        "lpn_mode_add_text": "Mode: Add Text. Click the map to place a text label. Click near a node to attach the text to that node. Switch to Select mode to change or move elements and labels.",
+        "lpn_tip_select": "Use this mode to change, move, and drag things on the map.",
+        "lpn_tip_labels_draggable": "You can drag a label to move it. Double-click a label to put it back.",
+        "lpn_field_auto": "Auto",
+        "lpn_field_x": "X",
+        "lpn_field_y": "Y",
+        "lpn_field_text_size": "Size ×",
+        "lpn_tool_labels": "Labels",
+        "lpn_labels_heading_node": "Node labels",
+        "lpn_labels_heading_link": "Link labels",
+        "lpn_labels_decimals_tip": "Decimal places shown for this label",
+        "lpn_labels_mark_extrema": "Mark highest and lowest values",
+        "lpn_field_id": "ID",
+        "lpn_backdrop_menu": "Background image...",
+        "lpn_backdrop_add": "Add image",
+        "lpn_backdrop_scale": "Scale",
+        "lpn_backdrop_position": "Position",
+        "lpn_backdrop_remove": "Remove image",
+        "lpn_backdrop_remove_confirm": "Remove the background image?",
+        "lpn_backdrop_scale_prompt1": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them.",
+        "lpn_backdrop_scale_prompt2": "Real distance between the two points",
+        "lpn_backdrop_position_prompt1": "Click any point on the background image. This is the point you will move.",
+        "lpn_backdrop_position_prompt2": "Choose where that point should go, then click Continue.",
+        "lpn_backdrop_target_label": "Move it to:",
+        "lpn_backdrop_target_node": "A node",
+        "lpn_backdrop_target_free": "Any point on the map",
+        "lpn_backdrop_target_coords": "Typed coordinates",
+        "lpn_backdrop_coords_prompt": "Type the X,Y that point should move to",
+        "lpn_backdrop_continue": "Continue",
+        "lpn_tool_settings": "Settings",
+        "lpn_settings_id_prefixes": "ID prefixes",
+        "lpn_settings_defaults": "Default inputs",
+        "lpn_settings_defaults_note": "Used for elements you create from now on. Existing elements are not changed.",
+        "lpn_settings_push_note": "Only the properties whose labels are showing right now are applied.",
+        "lpn_settings_push_btn": "Apply defaults to all elements",
+        "lpn_push_confirm": "Replace these properties on every existing element with the current default inputs? Values you have typed will be overwritten. You can undo this.",
+        "lpn_push_properties": "Properties:",
+        "lpn_push_elements": "Elements:",
+        "lpn_push_none_displayed": "No default input is showing as a label right now, so there is nothing to apply. Turn on the labels for the properties you want in the Labels panel, then try again.",
+        "lpn_push_nothing": "No existing element has any of the properties being applied.",
+        "lpn_push_no_change": "Every element already has these values, so nothing would change.",
+        "lpn_settings_emitter_exponent": "Emitter exponent",
+        "lpn_settings_tolerance": "Convergence tolerance",
+        "lpn_settings_tolerance_tip": "How close the solver has to get before it stops. A smaller number is more exact and takes longer.",
+        "lpn_settings_text_size": "Text size",
+        "lpn_settings_text_size_map": "Map units",
+        "lpn_settings_text_size_screen": "Screen pixels",
+        "lpn_settings_symbol_size": "Symbol size (relative to text)",
+        "lpn_settings_symbol_opacity": "Symbol opacity (0 to 1)",
+        "lpn_settings_backdrop_opacity": "Background image opacity (0 to 1)",
+        "lpn_settings_text_size_units": "Text size units",
+        "lpn_settings_map_display": "Map display and sizes",
+        "lpn_settings_map_height_px": "Map height (screen pixels)",
+        "lpn_settings_map_height_tip": "On a small screen the map is drawn shorter than this, so that part of the page is always left to scroll.",
+        "lpn_settings_legend_position": "Legend position",
+        "lpn_settings_legend_top_left": "Top left",
+        "lpn_settings_legend_top_right": "Top right",
+        "lpn_settings_legend_middle_left": "Middle left",
+        "lpn_settings_legend_middle_right": "Middle right",
+        "lpn_settings_legend_bottom_left": "Bottom left",
+        "lpn_settings_legend_bottom_right": "Bottom right",
+        "lpn_settings_restore_btn": "Restore defaults",
+        "lpn_confirm_restore_defaults": "Reset all settings (ID prefixes, default inputs, solver settings, map display, legend position, and visible labels) to their defaults? Your network is not changed.",
+        "lpn_settings_wipe_btn": "Erase all saved data",
+        "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, and all settings — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
     "key_context": {
         "mhp_vel_ok_short": {
@@ -127,6 +460,1854 @@
                     "value": "Vysoká",
                     "english": "High"
                 }
+            }
+        },
+        "lpn_main_menu": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_main_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_main_desc": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_preview_banner": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_tool_select": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_tool_add_junction": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_tool_add_reservoir": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_tool_add_pipe": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_tool_add_pump": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_tool_add_text": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_tool_delete": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_tool_zoom_extent": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_new_text": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_tool_example": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_field_elev": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_field_elev_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_field_head": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_field_head_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_close": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_empty_hint": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_tool_undo": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_confirm_example": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_field_diameter": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_demand_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_units_length": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_units_elevhead": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_units_pressure": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_units_flow": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_units_velocity": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_result_gradient": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_result_gradient_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_result_head": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_result_head_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_result_pressure": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_result_flow": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_result_velocity": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_result_headloss": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_tool_clear": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_confirm_clear": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_storage_too_new": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_tool_projects": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_projects_heading": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_project_untitled": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_project_new": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_project_saveas": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_project_copy_suffix": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_project_open": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_project_rename": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_project_delete": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_project_open_now": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_prompt_project_name": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_confirm_project_delete": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_storage_full": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_notes_1_term": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_notes_1_def": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_notes_2_term": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_notes_2_def": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_notes_3_term": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_notes_3_def": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_notes_5_term": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_notes_5_def": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_notes_4_term": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_notes_4_def": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_id_invalid": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_id_taken": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_diag_no_fixed_head": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_diag_dangling_link": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_diag_unreachable": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_diag_not_converged": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_field_roughness": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_field_roughness_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_field_length": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_field_length_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_field_km": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_field_km_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_field_km_short": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_pump_curve_source": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_pump_curve_own": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_pump_curve_ref_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_pump_curve_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_pump_point1": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_pump_point2": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_pump_point3": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_mode_select": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_mode_delete": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_mode_add_junction": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_mode_add_reservoir": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_mode_add_pipe": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_mode_add_pump": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_mode_add_text": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_tip_select": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_tip_labels_draggable": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_field_auto": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_field_x": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_field_y": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_field_text_size": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_tool_labels": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_labels_heading_node": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_labels_heading_link": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_labels_decimals_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_labels_mark_extrema": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_field_id": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_backdrop_menu": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_backdrop_add": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_backdrop_scale": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_backdrop_position": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_backdrop_remove": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_backdrop_remove_confirm": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_backdrop_scale_prompt1": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_backdrop_scale_prompt2": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_backdrop_position_prompt1": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_backdrop_position_prompt2": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_backdrop_target_label": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_backdrop_target_node": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_backdrop_target_free": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_backdrop_target_coords": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_backdrop_coords_prompt": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_backdrop_continue": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_tool_settings": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_id_prefixes": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_defaults": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_defaults_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_push_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_push_btn": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_push_confirm": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_push_properties": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_push_elements": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_push_none_displayed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_push_nothing": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_push_no_change": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_emitter_exponent": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_tolerance": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_tolerance_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_text_size": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_text_size_map": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_text_size_screen": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_symbol_size": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_symbol_opacity": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_backdrop_opacity": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_text_size_units": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_map_display": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_map_height_px": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_map_height_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_legend_position": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_legend_top_left": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_legend_top_right": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_legend_middle_left": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_legend_middle_right": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_legend_bottom_left": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_legend_bottom_right": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_restore_btn": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_confirm_restore_defaults": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_wipe_btn": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_confirm_wipe": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Statická dodávková výška",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
             }
         }
     },

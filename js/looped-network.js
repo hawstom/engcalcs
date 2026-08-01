@@ -3027,10 +3027,10 @@ var EngCalcs = EngCalcs || {};
 	// is a default input) and tolerance was the only genuine one.
 	function rebuildSettingsFields() {
 		var pc = EngCalcs.pageConfig || {}, fields = document.getElementById('lpn_settings_fields');
-		fields.innerHTML = '';
-		function row(target, labelText, input) {
+		clearFields(fields);
+		function row(target, labelText, input, tip) {
 			var label = document.createElement('label');
-			label.textContent = labelText + ' ';
+			setFieldLabel(label, labelText, tip);
 			label.appendChild(input);
 			target.appendChild(label);
 			target.appendChild(document.createElement('br'));
@@ -3297,7 +3297,8 @@ var EngCalcs = EngCalcs || {};
 			if (+heightInput.value >= 100) { settings.mapHeight = +heightInput.value; applyMapHeight(); saveToStorage(); }
 			else { heightInput.value = settings.mapHeight; }
 		});
-		row(mapBody, pc.lpn_settings_map_height_px || 'Map height (screen pixels)', heightInput);
+		row(mapBody, pc.lpn_settings_map_height_px || 'Map height (screen pixels)', heightInput,
+			pc.lpn_settings_map_height_tip);
 		var legendSelect = document.createElement('select');
 		[
 			['top-left', pc.lpn_settings_legend_top_left || 'Top left'],
@@ -3343,7 +3344,7 @@ var EngCalcs = EngCalcs || {};
 			if (+tolInput.value > 0) { settings.tolerance = +tolInput.value; scheduleSolve(); }
 			else { tolInput.value = settings.tolerance; }
 		});
-		row(tail, pc.lpn_settings_tolerance || 'Convergence tolerance', tolInput);
+		row(tail, pc.lpn_settings_tolerance || 'Convergence tolerance', tolInput, pc.lpn_settings_tolerance_tip);
 		// ---- restore defaults (Tom, 2026-07-30) ----
 		// Resets settings/labelSettings only -- the network (nodes/links/labels) and backdrop are
 		// untouched, same "preferences vs. content" split clearNetwork()'s own comment documents.
@@ -3379,6 +3380,7 @@ var EngCalcs = EngCalcs || {};
 			window.location.reload();
 		});
 		tail.appendChild(wipeBtn);
+		tipsIn(fields);
 	}
 	function wireSettingsPopup() {
 		document.getElementById('lpn_settings_popup_close').addEventListener('click', function () {
@@ -3408,14 +3410,49 @@ var EngCalcs = EngCalcs || {};
 	function wirePopup() {
 		document.getElementById('lpn_popup_close').addEventListener('click', closePopup);
 	}
-	function unitNumberField(fields, labelText, unitId, getSI, setSI) {
+	// ---- field labels, with an optional definitional tip (Task 193) ----
+	// CLAUDE.md's tip-only convention: .ec-help carries the title and wraps the label WORDS plus a
+	// nested .ec-tip "?" glyph, so the tap target is the whole name rather than one character. The
+	// tip is where a trap term (head, roughness, demand) gets its definition -- visible to the user
+	// AND, because it is translated with the label, an anchor for the 26-language sprint.
+	// These labels are built long after DOMContentLoaded, so js/Calculators.lib.js's page-load pass
+	// cannot see them; initTips() has to be called on the container afterwards. See setFieldLabel's
+	// callers, each of which ends with tipsIn(fields).
+	function setFieldLabel(label, text, tip) {
+		if (!tip) { label.textContent = text + ' '; return; }
+		var help = document.createElement('span'), glyph = document.createElement('span');
+		help.className = 'ec-help'; help.title = tip;
+		help.appendChild(document.createTextNode(text + ' '));
+		glyph.className = 'ec-tip'; glyph.textContent = '?';
+		help.appendChild(glyph);
+		label.textContent = '';
+		label.appendChild(help);
+		label.appendChild(document.createTextNode(' '));
+	}
+	function tipsIn(root) {
+		if (EngCalcs && EngCalcs.initTips) { EngCalcs.initTips(root); }
+	}
+	// Popups re-render in place (refreshPopupIfOpen), which throws away the elements Bootstrap
+	// attached tooltip instances to. A tooltip that is OPEN at that moment lives in document.body,
+	// not in the popup, so wiping innerHTML would strand it on screen with nothing to close it.
+	// Dispose first, then clear.
+	function clearFields(fields) {
+		if (window.bootstrap && bootstrap.Tooltip) {
+			Array.prototype.forEach.call(fields.querySelectorAll('.ec-help'), function (el) {
+				var t = bootstrap.Tooltip.getInstance(el);
+				if (t) { t.dispose(); }
+			});
+		}
+		fields.innerHTML = '';
+	}
+	function unitNumberField(fields, labelText, unitId, getSI, setSI, tip) {
 		var f = unitFactor(unitId), label = document.createElement('label'), input = document.createElement('input');
 		input.type = 'number'; input.value = (getSI() * f).toFixed(4);
 		// scheduleSolve() here, not just inside setSI callbacks, centralizes it for every current
 		// and future use of this helper (elev/demand/head's setSI already also calls updateNode(),
 		// which itself schedules a solve -- calling it twice is harmless, debounced).
 		input.addEventListener('change', function () { setSI(+input.value / f); scheduleSolve(); });
-		label.textContent = labelText + ' (' + unitLabel(unitId) + ') ';
+		setFieldLabel(label, labelText + ' (' + unitLabel(unitId) + ')', tip);
 		label.appendChild(input);
 		fields.appendChild(label);
 		fields.appendChild(document.createElement('br'));
@@ -3424,7 +3461,7 @@ var EngCalcs = EngCalcs || {};
 	// defaults to" -- currently a reservoir's head following its elevation (Tom, 2026-07-30).
 	// placeholderSI is that fallback, shown greyed in the empty box so the field never looks like it
 	// is missing a number; clearing the box stores undefined, which is what re-links the two.
-	function unitNumberFieldBlank(fields, labelText, unitId, getSI, setSI, placeholderSI) {
+	function unitNumberFieldBlank(fields, labelText, unitId, getSI, setSI, placeholderSI, tip) {
 		var f = unitFactor(unitId), label = document.createElement('label'), input = document.createElement('input'),
 			v = getSI();
 		input.type = 'number';
@@ -3434,7 +3471,7 @@ var EngCalcs = EngCalcs || {};
 			setSI(input.value === '' ? undefined : +input.value / f);
 			scheduleSolve();
 		});
-		label.textContent = labelText + ' (' + unitLabel(unitId) + ') ';
+		setFieldLabel(label, labelText + ' (' + unitLabel(unitId) + ')', tip);
 		label.appendChild(input);
 		fields.appendChild(label);
 		fields.appendChild(document.createElement('br'));
@@ -3442,10 +3479,10 @@ var EngCalcs = EngCalcs || {};
 	// Read-only, like EPANET's own property-form coordinate display (Tom) -- also doubles as
 	// the touch answer to "show coordinates of the selected element": the corner tracker
 	// below is hover-driven (PC only), but this field is visible in the popup on any device.
-	function readonlyField(fields, labelText, value) {
+	function readonlyField(fields, labelText, value, tip) {
 		var label = document.createElement('label'), span = document.createElement('span');
 		span.textContent = typeof value === 'number' ? value.toFixed(2) : value;
-		label.textContent = labelText + ' ';
+		setFieldLabel(label, labelText, tip);
 		label.appendChild(span);
 		fields.appendChild(label);
 		fields.appendChild(document.createElement('br'));
@@ -3454,8 +3491,8 @@ var EngCalcs = EngCalcs || {};
 	// are the canonical results location (Tom, 2026-07-30) -- Map labels and a Report/table view
 	// are later presentation layers over this same computed data (scope doc Phase 2), not a
 	// separate source of truth.
-	function readonlyUnitField(fields, labelText, unitId, siValue) {
-		readonlyField(fields, labelText + ' (' + unitLabel(unitId) + ')', siValue * unitFactor(unitId));
+	function readonlyUnitField(fields, labelText, unitId, siValue, tip) {
+		readonlyField(fields, labelText + ' (' + unitLabel(unitId) + ')', siValue * unitFactor(unitId), tip);
 	}
 	// Length pairs with an Auto checkbox (the lenAuto design logged in the scope doc): typing a
 	// value takes manual control; re-checking Auto snaps back to the live geometric distance.
@@ -3477,7 +3514,8 @@ var EngCalcs = EngCalcs || {};
 			if (l.lenAuto) { l._length = linkGeomLength(l); input.value = effective(l, 'length').toFixed(2); }
 			scheduleSolve();
 		});
-		label.textContent = (pc.lpn_field_length || 'Length') + ' (' + unitLabel('lpn_u_length') + ') ';
+		setFieldLabel(label, (pc.lpn_field_length || 'Length') + ' (' + unitLabel('lpn_u_length') + ')',
+			pc.lpn_field_length_tip);
 		label.appendChild(input);
 		autoLabel.appendChild(auto);
 		autoLabel.appendChild(document.createTextNode(' ' + (pc.lpn_field_auto || 'Auto')));
@@ -3576,11 +3614,12 @@ var EngCalcs = EngCalcs || {};
 	function renderNodeFields(nodeId) {
 		var n = nodeById(nodeId), fields = document.getElementById('lpn_popup_fields'), pc = EngCalcs.pageConfig || {};
 		idField(n.id, function (newId) { renameNode(nodeId, newId); });
-		fields.innerHTML = '';
+		clearFields(fields);
 		if (n.type === 'reservoir') {
 			unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
 				function () { return n.elev; },
-				function (v) { n.elev = v; updateNode(nodeId); refreshPopupIfOpen(); });
+				function (v) { n.elev = v; updateNode(nodeId); refreshPopupIfOpen(); },
+				pc.lpn_field_elev_tip);
 			// Blank = follow the elevation, which is also what the placeholder shows -- so the field
 			// reads as already filled in with the elevation without pretending the user typed it.
 			// Clearing it hands the head back to the elevation; this is the tank/reservoir switch.
@@ -3591,22 +3630,29 @@ var EngCalcs = EngCalcs || {};
 			unitNumberFieldBlank(fields, pc.lpn_field_head || 'Head', 'lpn_u_elevhead',
 				function () { return effective(n, 'head'); },
 				function (v) { n._head = v; updateNode(nodeId); refreshPopupIfOpen(); },
-				n.elev || 0);
+				n.elev || 0, pc.lpn_field_head_tip);
 			// No read-only Head row here (a junction gets one because its head is a solve RESULT) --
 			// the editable field above already shows this reservoir's head, typed or inherited.
 			readonlyUnitField(fields, pc.lpn_result_pressure || 'Pressure', 'lpn_u_pressure', reservoirHead(n) - (n.elev || 0));
 		} else {
 			unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
-				function () { return n.elev; }, function (v) { n.elev = v; updateNode(nodeId); });
+				function () { return n.elev; }, function (v) { n.elev = v; updateNode(nodeId); },
+				pc.lpn_field_elev_tip);
+			// Label borrowed from bpn_demand (concept-level reuse), but the TIP is lpn_'s own:
+			// bpn_demand_tip says "at this line's downstream end", which is branched-network
+			// wording and false here, where a demand sits on a node.
 			unitNumberField(fields, pc.bpn_demand || 'Demand', 'lpn_u_flow',
-				function () { return effective(n, 'demand'); }, function (v) { n._demand = v; updateNode(nodeId); });
+				function () { return effective(n, 'demand'); }, function (v) { n._demand = v; updateNode(nodeId); },
+				pc.lpn_demand_tip);
 			if (lastSolveResult && lastSolveResult.pressures[nodeId] !== undefined) {
-				readonlyUnitField(fields, pc.lpn_result_head || 'Head', 'lpn_u_elevhead', lastSolveResult.heads[nodeId]);
+				readonlyUnitField(fields, pc.lpn_result_head || 'Head', 'lpn_u_elevhead', lastSolveResult.heads[nodeId],
+					pc.lpn_result_head_tip);
 				readonlyUnitField(fields, pc.lpn_result_pressure || 'Pressure', 'lpn_u_pressure', lastSolveResult.pressures[nodeId]);
 			}
 		}
 		readonlyField(fields, pc.lpn_field_x || 'X', n.x);
 		readonlyField(fields, pc.lpn_field_y || 'Y', n.y);
+		tipsIn(fields);
 	}
 	function openPopup(nodeId, sx, sy) {
 		var n = nodeById(nodeId), ne = nodeEls[nodeId];
@@ -3718,13 +3764,14 @@ var EngCalcs = EngCalcs || {};
 	function renderLinkFields(linkId) {
 		var l = linkById(linkId), fields = document.getElementById('lpn_popup_fields'), pc = EngCalcs.pageConfig || {};
 		idField(l.id, function (newId) { renameLink(linkId, newId); });
-		fields.innerHTML = '';
+		clearFields(fields);
 		if (l.type === 'pump') {
 			renderPumpCurveFields(fields, l, linkId);
 		} else {
 			unitNumberField(fields, pc.lpn_field_diameter || 'Diameter', 'lpn_u_diameter',
 				function () { return effective(l, 'diameter'); }, function (v) { l._diameter = v; });
-			numberFieldPlain(fields, pc.lpn_field_roughness || 'Roughness', effective(l, 'roughness'), function (v) { l._roughness = v; });
+			numberFieldPlain(fields, pc.lpn_field_roughness || 'Roughness', effective(l, 'roughness'),
+				function (v) { l._roughness = v; }, pc.lpn_field_roughness_tip);
 			// Minor (local) loss coefficient, k_m -- dimensionless, so no unit conversion (same as
 			// Roughness above). Defaults from settings.defaults.k at creation (addLink()); editable
 			// per-pipe here, same pattern as every other pipe property. Plain-text wording only
@@ -3732,7 +3779,8 @@ var EngCalcs = EngCalcs || {};
 			// existing "k<sub>m</sub>" label (mphl_total_junction_k) is HTML-bearing, incompatible
 			// with that call site; CLAUDE.md's concept-level reuse rule is about wording, not
 			// forcing markup into a plain-text slot.
-			numberFieldPlain(fields, pc.lpn_field_km || 'Minor (local) loss coefficient, k', effective(l, 'k') || 0, function (v) { l._k = v; });
+			numberFieldPlain(fields, pc.lpn_field_km || 'Minor (local) loss coefficient, k', effective(l, 'k') || 0,
+				function (v) { l._k = v; }, pc.lpn_field_km_tip);
 			lengthField(fields, l);
 		}
 		if (lastSolveResult && lastSolveResult.flows[linkId] !== undefined) {
@@ -3750,9 +3798,11 @@ var EngCalcs = EngCalcs || {};
 			// Gradient is per unit of pipe LENGTH, so it is a pipe-only result -- a pump has no
 			// length to spread its head over.
 			if (l.type !== 'pump' && effective(l, 'length')) {
-				readonlyUnitField(fields, pc.lpn_result_gradient || 'Head loss gradient', 'lpn_u_gradient', lastSolveResult.headlosses[linkId] / effective(l, 'length'));
+				readonlyUnitField(fields, pc.lpn_result_gradient || 'Head loss gradient', 'lpn_u_gradient',
+					lastSolveResult.headlosses[linkId] / effective(l, 'length'), pc.lpn_result_gradient_tip);
 			}
 		}
+		tipsIn(fields);
 	}
 	function openLinkPopup(linkId, sx, sy) {
 		var l = linkById(linkId), le = linkEls[linkId];
@@ -3773,7 +3823,7 @@ var EngCalcs = EngCalcs || {};
 			label = document.createElement('label'), input = document.createElement('input'),
 			an = lb.anchorNode ? nodeById(lb.anchorNode) : null;
 		title.textContent = pc.lpn_tool_add_text || 'Text';
-		fields.innerHTML = '';
+		clearFields(fields);
 		input.type = 'text'; input.value = lb.text;
 		input.addEventListener('change', function () {
 			if (input.value === lb.text) { return; }
@@ -3822,11 +3872,11 @@ var EngCalcs = EngCalcs || {};
 	// default), whose C-factor is dimensionless. Darcy-Weisbach's roughness HEIGHT does need
 	// units (the scope doc's roughness family is "DW only") -- revisit once a friction-method
 	// selector exists (matching bpn_'s own method switch) and this can be genuinely conditional.
-	function numberFieldPlain(fields, labelText, value, onChange) {
+	function numberFieldPlain(fields, labelText, value, onChange, tip) {
 		var label = document.createElement('label'), input = document.createElement('input');
 		input.type = 'number'; input.value = value;
 		input.addEventListener('change', function () { onChange(+input.value); scheduleSolve(); });
-		label.textContent = labelText + ' ';
+		setFieldLabel(label, labelText, tip);
 		label.appendChild(input);
 		fields.appendChild(label);
 		fields.appendChild(document.createElement('br'));
