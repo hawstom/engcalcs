@@ -4005,9 +4005,36 @@ var EngCalcs = EngCalcs || {};
 		if (issue.code === 'unreachable') { return (pc.lpn_diag_unreachable || 'These nodes have no path to a reservoir:') + ' ' + issue.ids.join(', '); }
 		return issue.code;
 	}
+	// The status bar has two writers with different lifetimes, and a naive setStatus() call loses to
+	// the other one every time. runSolve() owns the bar for DIAGNOSTICS and rewrites it on a 300ms
+	// debounce after every mutation -- including the empty string on a clean solve. So a one-shot
+	// notice ("here is what just happened") set by a command would be wiped ~300ms later, which is
+	// exactly long enough for the user not to see it.
+	//
+	// Rule: a real (non-empty) status supersedes a notice and discards it -- a live diagnostic like
+	// "Add a reservoir" always matters more than a report of a completed action. An EMPTY status
+	// falls back to the notice instead of blanking the bar, which is what lets a notice survive the
+	// clean solve that follows the command that set it. A timer expires it either way, so the bar
+	// does not keep narrating an action from a minute ago.
+	var statusNotice = '', statusNoticeTimer = null;
+	var STATUS_NOTICE_MS = 8000;
+	function clearNotice() {
+		statusNotice = '';
+		if (statusNoticeTimer) { clearTimeout(statusNoticeTimer); statusNoticeTimer = null; }
+	}
 	function setStatus(text) {
 		var el = document.getElementById('lpn_status');
-		if (el) { el.textContent = text || ''; }
+		if (!el) { return; }
+		if (text) { clearNotice(); el.textContent = text; return; }
+		el.textContent = statusNotice;
+	}
+	function setNotice(text) {
+		clearNotice();
+		statusNotice = text || '';
+		if (statusNotice) {
+			statusNoticeTimer = setTimeout(function () { clearNotice(); setStatus(''); }, STATUS_NOTICE_MS);
+		}
+		setStatus('');
 	}
 	// Rounds to the same number of decimals the label actually displays, in the DISPLAY unit --
 	// extrema and decoration must compare on this, not the raw SI value. Two series links carrying
