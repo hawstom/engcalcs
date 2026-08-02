@@ -670,17 +670,106 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     the layer they all sit on. Not a tweak. If it lands, keep the height cap anyway — it costs
     nothing and is the belt to this braces.
 - 25|195| **Export/import a project as a file (Task 146 child) — a gate for dropping the PREVIEW
-  banner.** Everything lives in localStorage, which a browser-data clear wipes, which Safari evicts
-  after roughly 7 unused days, and which private mode never persists at all. Task 146.08 fixed how
-  projects are ORGANIZED, not whether they SURVIVE, so `lpn_notes_3_def`'s "no guarantee about
-  preserving data" is still true and cannot honestly be withdrawn until a project can leave the
-  browser.
-  - **Download the v2 project document as JSON, and read one back.** The storage shape is already
+  banner. Reframed 2026-08-01 as two phases of the SAME task, not a separate one:** a one-shot JSON
+  download/import (Phase 1, as originally scoped, still the near-term target) and a live-handle,
+  multi-user file-locking system built on top of it (Phase 2, new scope, added 2026-08-01). Both
+  phases solve the same underlying problem this task was opened for — everything lives in
+  localStorage, which a browser-data clear wipes, which Safari evicts after roughly 7 unused days,
+  and which private mode never persists at all — Phase 2 just goes further, adding real file I/O and
+  team coordination instead of only a backup/hand-off download.
+
+  **Phase 1 — one-shot JSON file, as originally scoped. Unchanged.**
+  - Download the v2 project document as JSON, and read one back. The storage shape is already
     exactly right for this — one self-contained object per project, backdrop included.
-  - **Distinct from EPANET `.inp` interop**, which Tom confirmed 2026-07-29 is not needed. This is
+  - Distinct from EPANET `.inp` interop, which Tom confirmed 2026-07-29 is not needed. This is
     backup and hand-off of our own format, not exchange with other software.
-  - **Import must run the same `migrateSaved()` chain and the same structural repair** a stored
-    document gets, and land as a NEW project rather than overwriting the open one.
+  - Import must run the same `migrateSaved()` chain and the same structural repair a stored document
+    gets, and land as a NEW project rather than overwriting the open one.
+
+  **Phase 2 — client-side collaborative file locking, built on real File System Access handles
+  (added 2026-08-01).** A materially bigger version of "local file saving" than Phase 1: instead of
+  a one-shot download/import, the project file becomes the canonical source of truth, opened via
+  `showOpenFilePicker()` as a real `FileSystemFileHandle` held for the session, with the production
+  web server used purely as ephemeral lock-state metadata (never touching the project file itself)
+  so a team sharing project files from a network share can coordinate who's editing. Conflict
+  resolution is an in-office honor system — no auto-timeout; a colleague explicitly "takes over."
+  **Do not build Phase 2 before Phase 1 ships and is confirmed working** — Phase 1 is the smaller,
+  already-decided step, and Phase 2's file-handle model can reuse whatever loading/repair code
+  Phase 1 writes for JSON import.
+
+  Core pieces, as specified:
+  - **Identity, once per browser:** a `projectId` (UUID v4) baked permanently into every new project
+    file at creation; a free-text "friendly name" prompt (deliberately informal/non-identifying 
+    (like "Dave in Public works", "Dave T.", or "DWT"), saved to `localStorage` — no login, no server-side user table.
+  - **Dirty-flag autosave:** `isDirty` set on any input change; a background timer (default
+    configurable 60-180s in Settings) writes to the held file handle and clears `isDirty` only when
+    there's something to save — skips the write (and the disk I/O) otherwise. `beforeunload`/
+    visibility-change handling silently saves-and-releases the lock on tab close.
+  - **Lock broker (new, minimal server component):** a JSON record per project —
+    `{projectId, lockedBy, lastActivity}` — behind four endpoints (`checkLock`, `acquireLock`,
+    `stealLock`, `releaseLock`). **Must be file-based (one JSON file per project id, guarded with
+    PHP `flock()`), not a database** — this project's stated architecture is "No database, no
+    authentication" (CLAUDE.md), and a flat-file lock store is the one implementation that doesn't
+    cross that line even though it is genuinely new server-held state (the app's first). A real
+    DB/auth layer here would be scope creep beyond what the feature needs.
+  - **Three-scenario UI state machine:** (A) clean open on an unlocked file — acquire, enable
+    editing, start the autosave loop; (B) file locked by someone else — compute time since
+    `lastActivity`, block takeover and say "please wait" if under ~2x the autosave interval,
+    otherwise offer "take over from X" with reassurance that the other user's work is autosaved, and stay
+    strictly read-only until cancel or a successful steal; (C) walk-away recovery — before EVERY
+    autosave write, re-check the lock server first, and if someone else now owns it, abort the
+    write, freeze the UI read-only, and show a clear "you were taken over by Y, your last save is safe"
+    message rather than silently corrupting the new owner's edits.
+
+  **Open questions to resolve before Phase 2 implementation, not yet decided:**
+  - Browser support: `showOpenFilePicker`/persisted permissions are Chromium-only (no Firefox/
+    Safari) — needs a feature-detected fallback to Phase 1's plain download/import for unsupported
+    browsers, given this suite's stated humanitarian/global-reach mission and broad-device audience.
+  - Whether Phase 2 lives entirely inside `lpn_`'s existing per-project localStorage document (adding
+    file-handle + lock metadata alongside it) or reworks Task 146.08's project library into a thin
+    cache over real files.
+  - Where the lock-broker endpoint lives (a new `lib/`-adjacent PHP script, storage location) and its
+    retention/cleanup policy (stale locks with no expiry could accumulate indefinitely on disk — the
+    honor-system design deliberately has no auto-expiry for the LOCK ITSELF, but the broker's on-disk
+    *records* still need a housekeeping story so abandoned/deleted projects don't leak files
+    forever).
+  - Whether `lpn_`'s current offline-PWA precache promise is affected — Phase 2 needs a live network
+    round-trip at open/steal time even though ordinary editing keeps working offline once a lock is
+    held; the Notes text (`lpn_notes_3_def` et al.) will need a rewrite pass to describe the new
+    persistence model honestly once Phase 2 ships.
+
+  Full Phase 2 frontend implementation (state machine, async/await handle logic, pre-save lock
+  validation) is scoped here but not written yet — this is a planning entry, not a spec ready to
+  execute.
+- 12|196| **EPANET `.inp` import/export (Task 146 child) — a separate task from Task 195, deliberately.**
+  Raised 2026-08-01. **This reopens a decision already made once**: the scope doc records
+  `.inp` interop as "distinct from" Task 195 and says "Tom confirmed 2026-07-29 is not needed," in
+  favor of Task 146.08's local multi-project save/retrieve instead. Logging it here is a conscious
+  reversal of that call, not an oversight — note it as such if it's picked up, rather than losing
+  the history of why it was declined the first time.
+
+  **Independent of Task 195's native format, in both directions, and independent of whether Phase 1
+  or Phase 2 of that task has shipped.** `.inp` import/export is interop with a DIFFERENT program's
+  file format, not a persistence mechanism — it is two transcode functions between `.inp` text and
+  the same in-memory `doc` object every one of Task 195's phases already reads and writes, so it
+  slots in beside localStorage, JSON download/import, or a live file handle without changing any of
+  them.
+  - **Export is the easy direction.** Every element this suite models (junctions, reservoirs,
+    pipes, pumps with curves) is a strict subset of what `.inp` can express — nothing here needs a
+    lossy projection. A straightforward serializer, buildable independent of anything else on this
+    list.
+  - **Import is the harder direction**, because a real-world `.inp` file can carry things this
+    calculator has deliberately cut (tanks, PRV/PSV/FCV, patterns, water quality, energy cost — see
+    the scope doc's "Cut, not deferred" list). Needs a defined behavior: reject a file that uses a
+    cut feature, or import the supported subset and report exactly what was dropped. Silently
+    dropping data on import would be the worse of the two.
+  - **The known ~0.012% Hazen-Williams constant mismatch against EPANET is already handled
+    infrastructure, not new work.** `js/lpn-solver.js` already carries both constant sets
+    (`EngCalcs.lpnConstants.engcalcs` and `.epanet`) for exactly this reason — an imported network
+    can default to `'epanet'` constants so results agree with the source file it came from.
+  - **UI convenience, not an architectural dependency:** naturally sits on the same file-menu
+    surface as Task 195's Import/Export actions, so building it alongside whichever of that task's
+    phases is in flight avoids building the menu twice — but nothing here blocks on that timing.
 - 5|146.09| **Map insets for congested areas of a drawing (Task 146 child).** Very low priority.
 - 20|177| **Link head loss: report the per-length gradient alongside total (Task 146 child).**
   Conventional network software and reports express pipe head loss in TWO forms, not one, because
