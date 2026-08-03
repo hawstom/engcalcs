@@ -2044,6 +2044,9 @@ var EngCalcs = EngCalcs || {};
 	// Deletes the document first, then the index entry: the reverse order can leave a document with
 	// no entry, which adoptOrphans() would helpfully resurrect on the next load.
 	function deleteProject(id) {
+		var pc = EngCalcs.pageConfig || {}, entry = indexEntry(id),
+			// Captured BEFORE the removal below -- after it there is nothing left to name.
+			goneName = projectDisplayName(entry || { name: '' });
 		try { localStorage.removeItem(projectKey(id)); } catch (err) { /* private mode */ }
 		library.projects = library.projects.filter(function (p) { return p.id !== id; });
 		if (id === library.openId) {
@@ -2051,9 +2054,29 @@ var EngCalcs = EngCalcs || {};
 			// Deleting the OPEN project has to leave something open. The most recently updated
 			// survivor is the best guess at "what I was working on before this one"; with no
 			// survivors at all, a fresh empty project -- never a blank screen with no project.
+			// Tom, 2026-07-31, on whether it should instead always land on a clean Untitled: no,
+			// because newProject() pushes a real persisted row, so deleting 1 of 5 would leave 5
+			// rows and read as a failed delete. He also ruled out warning BEFOREHAND -- the fix is
+			// to say afterwards where you landed, since the alarm is "a network I did not ask for
+			// just appeared", and that is answered by narration, not by a different landing spot.
 			var rest = library.projects.slice().sort(function (a, b) { return (b.updated || 0) - (a.updated || 0); });
-			if (rest.length) { library.openId = rest[0].id; var d = readDocument(projectKey(rest[0].id)); if (d) { applySaved(d); } clearUndo(); refreshAllFromDocument(); }
-			else { newProject(); return; }
+			if (rest.length) {
+				library.openId = rest[0].id;
+				var d = readDocument(projectKey(rest[0].id));
+				if (d) { applySaved(d); }
+				clearUndo();
+				refreshAllFromDocument();
+				// After refreshAllFromDocument(), which itself calls setStatus('') -- see the
+				// notice/diagnostic split at setStatus().
+				setNotice((pc.lpn_status_deleted_opened || 'Deleted {deleted}. Now showing {opened}.')
+					.replace('{deleted}', goneName)
+					.replace('{opened}', projectDisplayName(rest[0])));
+			} else {
+				newProject();
+				setNotice((pc.lpn_status_deleted_empty || 'Deleted {deleted}. Started a new empty project.')
+					.replace('{deleted}', goneName));
+				return;
+			}
 		}
 		saveIndex();
 	}
@@ -3389,10 +3412,10 @@ var EngCalcs = EngCalcs || {};
 		var wipeBtn = document.createElement('button');
 		wipeBtn.type = 'button';
 		wipeBtn.style.marginLeft = '4px';
-		wipeBtn.textContent = pc.lpn_settings_wipe_btn || 'Delete all projects';
+		wipeBtn.textContent = pc.lpn_settings_wipe_btn || 'Clear calculator';
 		helpTip(wipeBtn, pc.lpn_reset_all_tip);
 		wipeBtn.addEventListener('click', function () {
-			if (!window.confirm(pc.lpn_confirm_wipe || 'Delete EVERYTHING saved for this page — every project, every background image, and all settings — and reload the page as a brand-new visitor would see it? This cannot be undone.')) { return; }
+			if (!window.confirm(pc.lpn_confirm_wipe || 'Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone.')) { return; }
 			wipeAllStorage();
 			window.location.reload();
 		});
@@ -4026,7 +4049,7 @@ var EngCalcs = EngCalcs || {};
 		var el = document.getElementById('lpn_status');
 		if (!el) { return; }
 		if (text) { clearNotice(); el.textContent = text; return; }
-		el.textContent = statusNotice;
+		el.textContent = statusNotice || '';
 	}
 	function setNotice(text) {
 		clearNotice();

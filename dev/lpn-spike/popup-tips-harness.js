@@ -18,7 +18,20 @@ const ROOT = path.resolve(__dirname, '..', '..') + path.sep;
 let created = [];
 function mkEl(tag) {
   const el = {
-    tagName: (tag || 'div').toUpperCase(), _tag: tag, children: [], style: {}, dataset: {},
+    tagName: (tag || 'div').toUpperCase(), _tag: tag, children: [], dataset: {},
+    style: {
+      _props: {},
+      setProperty(k, v) { this._props[k] = v; },
+      getPropertyValue(k) { return this._props[k] || ''; },
+      removeProperty(k) { delete this._props[k]; }
+    },
+    classList: {
+      _s: new Set(),
+      add(...c) { c.forEach(x => this._s.add(x)); },
+      remove(...c) { c.forEach(x => this._s.delete(x)); },
+      contains(c) { return this._s.has(c); },
+      toggle(c, on) { if (on === undefined) { on = !this._s.has(c); } if (on) { this._s.add(c); } else { this._s.delete(c); } return on; }
+    },
     className: '', id: '', title: '', type: '', value: '', textContent: '', _innerHTML: '',
     checked: false, placeholder: '', step: '', min: '', _listeners: {},
     appendChild(c) { this.children.push(c); c.parentNode = this; return c; },
@@ -53,12 +66,17 @@ function mkEl(tag) {
 }
 const byId = {};
 function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id; } return byId[id]; }
+// Every id js/looped-network.js reaches for, harvested from the source itself so a new
+// getElementById() in the app cannot silently leave the harness one stub short:
+//   grep -o "getElementById('[a-z_0-9]*')" js/looped-network.js | sort -u
 [
-  'lpn_canvas', 'lpn_popup', 'lpn_popup_fields', 'lpn_popup_title', 'lpn_popup_close',
-  'lpn_settings_popup', 'lpn_settings_fields', 'lpn_settings_popup_close',
-  'lpn_labels_popup', 'lpn_labels_popup_close', 'lpn_labels_node', 'lpn_labels_link',
-  'lpn_projects_popup', 'lpn_projects_popup_close', 'lpn_projects_list',
-  'lpn_toolbar', 'lpn_status', 'lpn_mode_hint', 'lpn_empty_hint', 'lpn_legend'
+  'lpn_backdrop_file', 'lpn_backdrop_menu', 'lpn_backdrop_target_continue',
+  'lpn_backdrop_target_mode', 'lpn_backdrop_target_panel', 'lpn_canvas', 'lpn_coords',
+  'lpn_empty_hint', 'lpn_labels_legend', 'lpn_labels_link_fields', 'lpn_labels_node_fields',
+  'lpn_labels_options', 'lpn_labels_popup', 'lpn_labels_popup_close', 'lpn_mode_hint',
+  'lpn_popup', 'lpn_popup_close', 'lpn_popup_fields', 'lpn_popup_title', 'lpn_projects_btn',
+  'lpn_projects_list', 'lpn_projects_popup', 'lpn_projects_popup_close', 'lpn_settings_fields',
+  'lpn_settings_popup', 'lpn_settings_popup_close', 'lpn_status', 'lpn_toolbar'
 ].forEach(ensure);
 
 global.document = {
@@ -133,6 +151,19 @@ src = src.replace(marker,
   "\t\tassembleModel: assembleModel, effective: effective,\n" +
   "\t\trenderNodeFields: renderNodeFields, renderLinkFields: renderLinkFields,\n" +
   "\t\trebuildSettingsFields: rebuildSettingsFields, helpTip: helpTip,\n" +
+  "\t\tsetStatus: setStatus, setNotice: setNotice, deleteProject: deleteProject,\n" +
+  "\t\tsetLibrary: function (l) { library = l; }, getLibrary: function () { return library; },\n" +
+  // refreshAllFromDocument() touches the SVG layer variables, which only init() assigns -- and the
+  // harness deliberately never runs init(). Build just the layer scaffold, mirroring init()'s own
+  // lines, so the delete path can run without dragging in toolbar wiring and zoomExtent.
+  "\t\tbuildLayers: function () {\n" +
+  "\t\t\tsvg = document.getElementById('lpn_canvas');\n" +
+  "\t\t\tworld = el('g', {}, svg);\n" +
+  "\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
+  "\t\t\tlinksLayer = el('g', {}, world); nodesLayer = el('g', {}, world);\n" +
+  "\t\t\tmaskLayer = el('g', {}, world); labelsLayer = el('g', {}, world);\n" +
+  "\t\t\trubberBandEl = el('line', {}, world);\n" +
+  "\t\t},\n" +
   "\t\twipeAllStorage: wipeAllStorage,\n" +
   "\t\tsetDoc: function (d, s2) { doc = d; if (s2) { scenarios = s2; } },\n" +
   "\t\tgetDoc: function () { return doc; } };\n" + marker);
@@ -330,6 +361,79 @@ ok('wipeAllStorage removes the index', localStorage.getItem('lpn_index') === nul
 ok('wipeAllStorage removes every project key', localStorage.getItem('lpn_project_pabc') === null);
 ok('wipeAllStorage leaves unrelated keys alone', localStorage.getItem('unrelated_key') === 'keep me');
 ok('wipeAllStorage expires the suite unit cookie', expired === 1, 'expireCookie calls=' + expired);
+
+// --- 12. status bar: notice vs diagnostic ------------------------------
+// The bar has two writers. runSolve() rewrites it on a 300ms debounce after EVERY mutation,
+// including the empty string on a clean solve -- so a naive setStatus() notice is wiped just after
+// it appears. These checks pin the split down.
+const bar = byId.lpn_status;
+L.setStatus('');
+ok('empty status with no notice blanks the bar', bar.textContent === '');
+
+L.setNotice('Deleted A. Now showing B.');
+ok('setNotice shows immediately', bar.textContent === 'Deleted A. Now showing B.');
+L.setStatus('');                       // <- this is what runSolve() does on a clean solve
+ok('a CLEAN SOLVE does not wipe the notice', bar.textContent === 'Deleted A. Now showing B.',
+   JSON.stringify(bar.textContent));
+L.setStatus('');
+ok('...and still does not on a second clean solve', bar.textContent === 'Deleted A. Now showing B.');
+
+L.setStatus('Add a reservoir.');       // <- a real diagnostic
+ok('a real diagnostic supersedes the notice', bar.textContent === 'Add a reservoir.');
+L.setStatus('');
+ok('the superseded notice does NOT come back', bar.textContent === '', JSON.stringify(bar.textContent));
+
+L.setNotice('');
+ok('setNotice("") clears the bar', bar.textContent === '');
+
+// --- 13. deleting the OPEN project narrates where you landed ------------
+// Tom, 2026-07-31: no warning beforehand; say afterwards where you landed.
+L.buildLayers();
+function seedLibrary(projects, openId) {
+  L.setLibrary({ projects: projects, openId: openId });
+  projects.forEach(p => localStorage.setItem('lpn_project_' + p.id,
+    JSON.stringify({ v: 2, project: { name: p.name, activeScenario: 'base' },
+      scenarios: [{ id: 'base', name: 'Base', isBase: true, overrides: {} }],
+      nodes: [], links: [], labels: [], nextId: { J: 1, R: 1, L: 1, P: 1, T: 1 },
+      labelSettings: {}, backdrop: null, settings: {} })));
+}
+
+seedLibrary([{ id: 'p1', name: 'Fire flow test', updated: 10 },
+             { id: 'p2', name: 'Water main study', updated: 20 }], 'p1');
+L.deleteProject('p1');
+ok('deleting the open project opens a survivor', L.getLibrary().openId === 'p2');
+ok('...and names BOTH projects in the status bar',
+   bar.textContent.indexOf('Fire flow test') >= 0 && bar.textContent.indexOf('Water main study') >= 0,
+   JSON.stringify(bar.textContent));
+ok('...with the placeholders substituted',
+   bar.textContent.indexOf('{deleted}') < 0 && bar.textContent.indexOf('{opened}') < 0,
+   JSON.stringify(bar.textContent));
+
+// most-recently-updated survivor wins, not first-in-array
+seedLibrary([{ id: 'q1', name: 'Open one', updated: 5 },
+             { id: 'q2', name: 'Older', updated: 1 },
+             { id: 'q3', name: 'Newer', updated: 99 }], 'q1');
+L.deleteProject('q1');
+ok('the MOST RECENT survivor is the one opened', L.getLibrary().openId === 'q3',
+   L.getLibrary().openId);
+ok('...and it is the one named', bar.textContent.indexOf('Newer') >= 0,
+   JSON.stringify(bar.textContent));
+
+// last project standing -> a fresh empty one, different message, no dangling placeholder
+seedLibrary([{ id: 'r1', name: 'Only project', updated: 1 }], 'r1');
+L.deleteProject('r1');
+ok('deleting the last project leaves something open', !!L.getLibrary().openId);
+ok('...and says a new empty project was started',
+   bar.textContent.indexOf('Only project') >= 0 && bar.textContent.indexOf('{') < 0,
+   JSON.stringify(bar.textContent));
+
+// deleting a NON-open project must not narrate or navigate
+seedLibrary([{ id: 's1', name: 'Keep me open', updated: 9 },
+             { id: 's2', name: 'Throwaway', updated: 1 }], 's1');
+L.setNotice('');
+L.deleteProject('s2');
+ok('deleting a non-open project does not switch projects', L.getLibrary().openId === 's1');
+ok('...and posts no notice', bar.textContent === '', JSON.stringify(bar.textContent));
 
 console.log(fails ? '\n' + fails + ' FAILURES' : '\nall green');
 process.exit(fails ? 1 : 0);

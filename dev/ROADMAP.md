@@ -1227,7 +1227,17 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
       page**, sitting in a panel where everything else is project-scoped — which is why "Restore",
       "Reset", "Clear" and "clean state" all sounded wrong: they read as project-scoped because
       their neighbours are. The distinguishing word is **projects**, plural.
-    - `lpn_settings_wipe_btn` → **"Delete all projects"**. `lpn_settings_restore_btn` →
+    - `lpn_settings_wipe_btn` → **"Clear calculator"** (Tom, 2026-08-03, *"Given the cookie…"*).
+      It was briefly "Delete all projects", which was right while the button only reached the
+      library — but once `wipeAllStorage()` also expires the unit cookie, that name **understates**
+      a control that clears settings and unit choices too. "Clear project" / "Clear calculator" then
+      reads as a legible scale: same verb, two scopes. The earlier worry that a destructive button
+      must not look like a sibling of a safe one still holds, but it was aimed at "Restore
+      defaults" — a different *kind* of action — not at the other Clear, which genuinely is the same
+      kind at a smaller scope. Kept in Settings beside Restore all settings rather than moved to the
+      Projects panel, since it is no longer projects-only. `lpn_confirm_wipe` and
+      `lpn_reset_all_tip` both name the unit choices now.
+    - `lpn_settings_restore_btn` →
       **"Restore all settings"** (was the objectless "Restore defaults" — defaults of *what*?).
       `lpn_tool_clear` **stays "Clear project"**, and the reason took two passes to get right.
       - Tom's summary called it "Delete this project", and when told it "empties rather than
@@ -1244,10 +1254,24 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
         was built for.
       - Two behaviours that differ in *where you end up* should not share a verb, so Clear keeps its
         name. Flagged rather than silently applied.
-      - **Noted, not built:** the per-project Delete confirm (`lpn_confirm_project_delete`) never
-        warns that deleting the OPEN project drops you into a different one. That is a genuine
-        surprise, and it needs a second confirm string used only for the open row — a small,
-        self-contained follow-up, deliberately kept out of a naming pass.
+      - **Deleting the OPEN project now says where you landed** (Tom, 2026-08-03: *"It's okay for it
+        not to warn that you will land elsewhere. We can fix the status bar to say where you
+        landed."*). No pre-warning — the alarm is "a network I did not ask for just appeared", and
+        that is answered by narration after the fact, not by a dialog before it. Two keys with
+        placeholders: `lpn_status_deleted_opened` (`{deleted}`/`{opened}`) and
+        `lpn_status_deleted_empty`.
+      - **The status bar has two writers, and the naive version loses to the other one.**
+        `runSolve()` owns it for diagnostics and rewrites it on a 300 ms debounce after every
+        mutation — *including the empty string on a clean solve* — and `refreshAllFromDocument()`
+        blanks it as well. A plain `setStatus()` notice would therefore vanish ~300 ms after
+        appearing, which is easily long enough to look like it worked when hand-testing. The split
+        now: **a non-empty status supersedes a notice and discards it** (a live "Add a reservoir"
+        outranks a report of a finished action); **an empty status falls back to the notice**
+        instead of blanking the bar, which is what lets it survive the clean solve that the
+        triggering command itself caused; an 8 s timer expires it either way. Harness pins all
+        three behaviours, including that a superseded notice does not come back.
+      - Deleting a NON-open project narrates nothing and switches nothing — the common case stays
+        silent.
     - **Three scoped tips — after one shared tip shipped and turned out to be FALSE.** The first
       version was a single key on all three buttons: "…Used together they leave this calculator
       exactly as a first-time visitor finds it." Tom tested the claim (*"Is that correct? Is that

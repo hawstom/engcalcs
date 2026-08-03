@@ -119,7 +119,7 @@ $ec_lang['template_welcome']='Drop your fears at the door; love is spoken here. 
 $ec_lang_intent['template_welcome']='Leave your fears behind when you enter this space; love is the language we speak here. You are not ruining everything.';
 $ec_lang['template_translation_help']='Can you suggest better wording or anything else? Please tell us.';
 $ec_lang_intent['template_translation_help']='';
-$ec_lang['template_feedback']='Please send suggestions or praise. Did this free calculator serve you well?';
+$ec_lang['template_feedback']='Please send suggestions or praise — or ask about advising on the roadmap (features, design decisions, candidate calculators or languages), testing, or contributing. New to coding? Ask about free mentorship in using AI tools like Claude Code.';
 $ec_lang_intent['template_feedback']='';
 $ec_lang['template_printable_title']='Printable Title';
 $ec_lang_intent['template_printable_title']='';
@@ -1181,7 +1181,7 @@ $ec_lang['lpn_tool_clear']='Clear project';
 // another button's label, which is the cross-key dependency lpn_empty_hint was fixed for.
 $ec_lang['lpn_tool_clear_tip']='Empties this project: the drawing, the background image, and the project name. Your settings and your other projects are not changed.';
 $ec_lang['lpn_settings_restore_tip']='Resets this project\'s settings only. Your drawing and your other projects are not changed.';
-$ec_lang['lpn_reset_all_tip']='Deletes every project, every background image, and every setting, then reloads the page exactly as a first-time visitor sees it. This is the only reset that clears everything.';
+$ec_lang['lpn_reset_all_tip']='Deletes every project, every background image, every setting, and your unit choices, then reloads the page exactly as a first-time visitor sees it. This is the only reset that clears everything.';
 $ec_lang['lpn_confirm_clear']='This permanently deletes the network, the background image, and the project name. Your settings are kept. Continue?';
 $ec_lang['lpn_storage_too_new']='This project was saved by a newer version of the page, so it cannot be opened here.';
 $ec_lang['lpn_tool_projects']='Projects';
@@ -1196,6 +1196,11 @@ $ec_lang['lpn_project_delete']='Delete';
 $ec_lang['lpn_project_open_now']='Open now';
 $ec_lang['lpn_prompt_project_name']='Name for this project';
 $ec_lang['lpn_confirm_project_delete']='Delete this project and everything in it? This cannot be undone.';
+// Deleting the OPEN project opens the most recently updated survivor, so a network the user did
+// not ask for appears. Tom, 2026-07-31: do NOT warn beforehand -- say afterwards where you landed.
+// {deleted} and {opened} are project names; word order is the translator's to choose.
+$ec_lang['lpn_status_deleted_opened']='Deleted {deleted}. Now showing {opened}.';
+$ec_lang['lpn_status_deleted_empty']='Deleted {deleted}. Started a new empty project.';
 $ec_lang['lpn_storage_full']='Not saved. Browser storage is full or unavailable, so your recent changes will be lost when you close this tab.';
 $ec_lang['lpn_notes_1_term']='Steady state';
 $ec_lang['lpn_notes_1_def']='Solves one set of demands at a time, using the same gradient method EPANET uses. It does not model how the network changes over time.';
@@ -1333,5 +1338,5 @@ $ec_lang['lpn_settings_legend_bottom_left']='Bottom left';
 $ec_lang['lpn_settings_legend_bottom_right']='Bottom right';
 $ec_lang['lpn_settings_restore_btn']='Restore all settings';
 $ec_lang['lpn_confirm_restore_defaults']='Reset all settings (ID prefixes, default inputs, solver settings, map display, legend position, and visible labels) to their defaults? Your network is not changed. Settings belong to the open project, so your other projects keep their own.';
-$ec_lang['lpn_settings_wipe_btn']='Delete all projects';
-$ec_lang['lpn_confirm_wipe']='Delete EVERYTHING saved for this page — every project, every background image, and all settings — and reload the page as a brand-new visitor would see it? This cannot be undone.';
+$ec_lang['lpn_settings_wipe_btn']='Clear calculator';
+$ec_lang['lpn_confirm_wipe']='Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone.';

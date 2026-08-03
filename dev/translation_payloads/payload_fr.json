@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "fr",
-        "expected_key_count": 733,
-        "delta_key_count": 166,
+        "expected_key_count": 735,
+        "delta_key_count": 168,
         "exempt_key_count": 15,
         "exempt_keys": [
             "u_depthFrac",
@@ -553,7 +553,7 @@
         "lpn_tool_clear": "Clear project",
         "lpn_tool_clear_tip": "Empties this project: the drawing, the background image, and the project name. Your settings and your other projects are not changed.",
         "lpn_settings_restore_tip": "Resets this project's settings only. Your drawing and your other projects are not changed.",
-        "lpn_reset_all_tip": "Deletes every project, every background image, and every setting, then reloads the page exactly as a first-time visitor sees it. This is the only reset that clears everything.",
+        "lpn_reset_all_tip": "Deletes every project, every background image, every setting, and your unit choices, then reloads the page exactly as a first-time visitor sees it. This is the only reset that clears everything.",
         "lpn_confirm_clear": "This permanently deletes the network, the background image, and the project name. Your settings are kept. Continue?",
         "lpn_storage_too_new": "This project was saved by a newer version of the page, so it cannot be opened here.",
         "lpn_tool_projects": "Projects",
@@ -568,6 +568,8 @@
         "lpn_project_open_now": "Open now",
         "lpn_prompt_project_name": "Name for this project",
         "lpn_confirm_project_delete": "Delete this project and everything in it? This cannot be undone.",
+        "lpn_status_deleted_opened": "Deleted {deleted}. Now showing {opened}.",
+        "lpn_status_deleted_empty": "Deleted {deleted}. Started a new empty project.",
         "lpn_storage_full": "Not saved. Browser storage is full or unavailable, so your recent changes will be lost when you close this tab.",
         "lpn_notes_1_term": "Steady state",
         "lpn_notes_1_def": "Solves one set of demands at a time, using the same gradient method EPANET uses. It does not model how the network changes over time.",
@@ -668,8 +670,8 @@
         "lpn_settings_legend_bottom_right": "Bottom right",
         "lpn_settings_restore_btn": "Restore all settings",
         "lpn_confirm_restore_defaults": "Reset all settings (ID prefixes, default inputs, solver settings, map display, legend position, and visible labels) to their defaults? Your network is not changed. Settings belong to the open project, so your other projects keep their own.",
-        "lpn_settings_wipe_btn": "Delete all projects",
-        "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, and all settings — and reload the page as a brand-new visitor would see it? This cannot be undone."
+        "lpn_settings_wipe_btn": "Clear calculator",
+        "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
     "keys": {
         "dw_regime_turbulent": "turbulent",
@@ -721,7 +723,7 @@
         "lpn_tool_clear": "Clear project",
         "lpn_tool_clear_tip": "Empties this project: the drawing, the background image, and the project name. Your settings and your other projects are not changed.",
         "lpn_settings_restore_tip": "Resets this project's settings only. Your drawing and your other projects are not changed.",
-        "lpn_reset_all_tip": "Deletes every project, every background image, and every setting, then reloads the page exactly as a first-time visitor sees it. This is the only reset that clears everything.",
+        "lpn_reset_all_tip": "Deletes every project, every background image, every setting, and your unit choices, then reloads the page exactly as a first-time visitor sees it. This is the only reset that clears everything.",
         "lpn_confirm_clear": "This permanently deletes the network, the background image, and the project name. Your settings are kept. Continue?",
         "lpn_storage_too_new": "This project was saved by a newer version of the page, so it cannot be opened here.",
         "lpn_tool_projects": "Projects",
@@ -736,6 +738,8 @@
         "lpn_project_open_now": "Open now",
         "lpn_prompt_project_name": "Name for this project",
         "lpn_confirm_project_delete": "Delete this project and everything in it? This cannot be undone.",
+        "lpn_status_deleted_opened": "Deleted {deleted}. Now showing {opened}.",
+        "lpn_status_deleted_empty": "Deleted {deleted}. Started a new empty project.",
         "lpn_storage_full": "Not saved. Browser storage is full or unavailable, so your recent changes will be lost when you close this tab.",
         "lpn_notes_1_term": "Steady state",
         "lpn_notes_1_def": "Solves one set of demands at a time, using the same gradient method EPANET uses. It does not model how the network changes over time.",
@@ -836,8 +840,8 @@
         "lpn_settings_legend_bottom_right": "Bottom right",
         "lpn_settings_restore_btn": "Restore all settings",
         "lpn_confirm_restore_defaults": "Reset all settings (ID prefixes, default inputs, solver settings, map display, legend position, and visible labels) to their defaults? Your network is not changed. Settings belong to the open project, so your other projects keep their own.",
-        "lpn_settings_wipe_btn": "Delete all projects",
-        "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, and all settings — and reload the page as a brand-new visitor would see it? This cannot be undone."
+        "lpn_settings_wipe_btn": "Clear calculator",
+        "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
     "key_context": {
         "dw_regime_turbulent": {
@@ -1633,6 +1637,30 @@
             }
         },
         "lpn_confirm_project_delete": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Charge statique d'alimentation",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_status_deleted_opened": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "bpn_supply1_h",
+                    "value": "Charge statique d'alimentation",
+                    "english": "Static supply head"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_status_deleted_empty": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
