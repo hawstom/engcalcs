@@ -1214,11 +1214,10 @@ $ec_lang['lpn_file_saving_to']='Saving to: {file}';
 // label says which of the two you are getting rather than leaving the duplicate looking like a bug.
 $ec_lang['lpn_project_download']='Download a copy';
 $ec_lang['lpn_project_download_tip']='This browser cannot keep working in a file, so each press saves another copy to your downloads. Open one with Open from file to carry on where you left off.';
-// "Close FILE", not "close project" (Tom asked whether closing clears the screen, 2026-08-03 -- it
-// does not, and that question is exactly why the other name was wrong). Nothing leaves the screen
-// and nothing is deleted; the file is handed back so a colleague can open it.
-$ec_lang['lpn_project_close']='Close file';
-$ec_lang['lpn_project_close_tip']='Stops saving to the file and lets a colleague open it. The project stays open here, and nothing is deleted. This also happens on its own when you close the tab.';
+// Close CLOSES -- to an empty project, the way Close behaves in every other program (Tom,
+// 2026-08-03). Nothing is deleted: the file stays on disk and the project stays in the list.
+$ec_lang['lpn_project_close']='Close project';
+$ec_lang['lpn_project_close_tip']='Finishes with this file and starts an empty project. Nothing is deleted: the file stays where it is, this project stays in the list, and a colleague can now open the file. Closing the tab does the same thing.';
 // Offered only when somebody else holds the file -- never as a standing button. A copy is a fork of
 // the truth, and a page that advertises forking teaches people to make copies they must later
 // reconcile. See lpn_lock_busy/lpn_lock_idle for the situation this answers.

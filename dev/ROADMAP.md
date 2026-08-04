@@ -1270,6 +1270,15 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     reconcile. As an escape from being locked out it is the answer to a question the user is already
     stuck on; as a button on the shelf it is an invitation.
 
+  **Third round, 2026-08-03 — Close now closes.** Tom: *"In all software, 'Close file' reverts either
+  to a no-document state (not really meaningful for these calculators) or a new-document state (Clear
+  calculator), and never to file-stays-open."* He is right, and both earlier names were papering over
+  the same wrong behavior: the button released the file and left the project on screen, which is a
+  state no user has a name for. **"Close project" now lands on a new empty project**, keeping the
+  closed one in the library and deleting nothing. There is no longer any way to keep editing a
+  project detached from its file, and that absence is the point — silently diverging from the file is
+  how two versions of the truth get made.
+
   **Still not done:** the UI has still never been seen rendered by the author. Every check is a
   harness against sliced-out logic (162 across four harnesses now), not a click. Tom's pass so far is
   the only real browser evidence, and it was on a non-secure origin, so the entire
@@ -1301,9 +1310,32 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   Tom's 7.1 ("we can keep a persistent reference in this browser").
 
   **Candidate directions, none chosen:**
-  - **Ask a directory handle for the project's folder** and keep the lock in a sidecar file there.
-    Solves sharing properly (the lock lives with the *location*, not the *document*), at the cost of
-    a scarier permission prompt and Chromium-only support.
+  - **Ask a directory handle for the project's folder** and keep the project file AND a sidecar lock
+    file in it — Tom's 2026-08-03 proposal, and the strongest option on the table. `showDirectoryPicker()`
+    returns a `FileSystemDirectoryHandle`, and `getFileHandle(name, {create:true})` reads or creates
+    any file in that folder, so the AutoCAD `.dwg`/`.dwl` pattern he wanted **is** reachable. This
+    supersedes the earlier note in this task that we cannot find "a file in the same folder as" —
+    that is true of a *file* handle and false of a *directory* handle, and the distinction is the
+    whole idea. It would put the friendly name in the lock file, keep the lock with the *location*
+    rather than the *document*, and **may remove the need for `lpn-lock.php` altogether**: a file
+    sent outside the office arrives with no lock file beside it and so locks nobody out, which is
+    exactly the failure this task exists for.
+    - **Tom, on hearing "Chromium-only": *"That's fatal. Too bad."* — but the premise is wrong, and
+      this should not be dropped for that reason.** `showSaveFilePicker`/`showOpenFilePicker`, which
+      Phase 2 step 1 already ships and depends on, are Chromium-only *by the same measure*. The
+      directory picker costs **no additional browser reach** — the set of users who get live file
+      saving at all is identical either way, and everyone else already falls back to Phase 1's
+      download/import. If Chromium-only were disqualifying here, it would equally disqualify the
+      live-file model already built, which is a much bigger decision than this one.
+    - **The real costs**, which are not compatibility: a heavier one-time permission prompt (a folder,
+      not a file); the loss of the native Save-As dialog, so the file name comes from us or from a
+      second step (Tom: *"maybe not so bad. I could test it"*); and — the one genuine technical
+      weakness — **no atomic test-and-set**. Two browsers can both read "no lock file" and both
+      create one, where `lpn-lock.php`'s `flock()` has no such window. A hybrid (sidecar for
+      identity and location-scoping, server broker as arbiter when reachable) may be the honest
+      answer.
+    - Directory handles persist in IndexedDB like file handles, so re-opening a known folder need
+      not re-prompt.
   - **Scope the lock to a declared team**, so a lock record is per (docId × team) and an outsider
     simply never sees an insider's lock. Cheap, but requires a shared secret nobody wants to manage.
   - **Ask on open, rather than assume**, per Tom's own sketch: *"This project is currently locked by
@@ -1324,25 +1356,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   Wants: dismiss, snooze, and a way to bring a tip back deliberately (a "show me that again" in
   Settings). Suite-shaped rather than `lpn_`-only: every calculator has explanations it currently
   either buries in Notes or repeats forever.
-
-- 30|210| **Stop counting Tom's own visits in the usage logs.** Asked 2026-08-03: *"is it hard to
-  ignore my visits? I suppose we can pretty easily detect me in the logs if I exercise many
-  calculators and languages in a human way."* Not hard, and worth doing before more hand-testing:
-  he is about to exercise `lpn_` heavily on production, and Task 203's coverage matrix is being
-  driven off exactly these numbers, so author traffic is now a measurement problem and not just
-  untidiness.
-  - **Post-hoc detection is the wrong approach** and is what the question was really asking about.
-    The logs carry timestamp, page, served lang and raw Accept-Language — **no IP, no session id** —
-    so "many calculators and languages in a human way" is a guess, it cannot be applied to data
-    already written, and it would also delete real multilingual users, who are the ones we most want
-    to see. Do not build a heuristic filter.
-  - **Do the cheap, exact thing instead:** a long-lived opt-out cookie set by visiting a URL once
-    (e.g. `?ec_nolog=1`), checked by all three log writers — `log-calc-event.php`,
-    `log-human-view.php`, and `logLanguageSelection()` in `lib/Language.lib.php`. Per-device, which
-    means setting it once per browser Tom tests in, and honest: it suppresses at write time rather
-    than guessing afterwards.
-  - Cheap follow-on while in there: a matching note in `dev/usage-data-log.md` recording the date
-    the opt-out started, so later snapshots are comparable to earlier ones.
 
 - 12|196| **EPANET `.inp` import/export (Task 146 child) — a separate task from Task 195, deliberately.**
   Raised 2026-08-01. **This reopens a decision already made once**: the scope doc records
@@ -1757,6 +1770,39 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|210| **[DONE 2026-08-03] Stop counting Tom's own visits in the usage logs.** Asked 2026-08-03: *"is it hard to
+  ignore my visits? I suppose we can pretty easily detect me in the logs if I exercise many
+  calculators and languages in a human way."* Not hard, and worth doing before more hand-testing:
+  he is about to exercise `lpn_` heavily on production, and Task 203's coverage matrix is being
+  driven off exactly these numbers, so author traffic is now a measurement problem and not just
+  untidiness.
+  - **Post-hoc detection is the wrong approach** and is what the question was really asking about.
+    The logs carry timestamp, page, served lang and raw Accept-Language — **no IP, no session id** —
+    so "many calculators and languages in a human way" is a guess, it cannot be applied to data
+    already written, and it would also delete real multilingual users, who are the ones we most want
+    to see. Do not build a heuristic filter.
+  - **Do the cheap, exact thing instead:** a long-lived opt-out cookie set by visiting a URL once
+    (e.g. `?ec_nolog=1`), checked by all three log writers — `log-calc-event.php`,
+    `log-human-view.php`, and `logLanguageSelection()` in `lib/Language.lib.php`. Per-device, which
+    means setting it once per browser Tom tests in, and honest: it suppresses at write time rather
+    than guessing afterwards.
+  - **Built exactly that way.** `EC_NOLOG_COOKIE` + `ecLoggingOptedOut()` in `lib/config.inc.php`;
+    `?ec_nolog=1` sets a ten-year cookie and takes effect on that same request, `?ec_nolog=0` clears
+    it. All three writers check the one flag: `log-calc-event.php`, `log-human-view.php`, and
+    `logLanguageSelection()` in `lib/Language.lib.php`. The two beacon endpoints answer **204, not an
+    error**, so `EngCalcs._sendOrQueue()` never queues an opted-out event for retry — otherwise it
+    would come back and be counted later.
+  - Priority raised from 30 and done the same day at Tom's request, ahead of his production testing
+    of Task 195 — that testing is precisely the author traffic this exists to keep out of the
+    numbers Task 203's coverage matrix is being computed from.
+  - Verified with a 14-check harness (each case its own process): the flag itself including junk
+    cookie values, the set/clear query parameters taking effect within the request, each of the three
+    writers falling silent, and both endpoints answering 204.
+  - **Still open, deliberately:** the matching note in `dev/usage-data-log.md` recording the date the
+    opt-out started, so later snapshots stay comparable to earlier ones. Write it at the next
+    snapshot, when there is a number to attach it to.
+
 
 - 0|199|[CC] **`lpn_` logged no real usage at all — instrumentation fix, DONE 2026-08-03.**
   Found while answering Tom's question about what usage logging could tell us. Every other

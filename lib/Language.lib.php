@@ -31,6 +31,9 @@
 function logLanguageSelection($lang, $source) {
     $logFile = defined('LANG_LOG') ? LANG_LOG : null;
     if (!$logFile) return;
+    // Task 210: a browser that opted out of being counted is not counted here either. All three log
+    // writers check the same one flag, so an opt-out cannot half-apply.
+    if (function_exists('ecLoggingOptedOut') && ecLoggingOptedOut()) return;
     $dir = dirname($logFile);
     if (!is_dir($dir)) {
         @mkdir($dir, 0750, true);

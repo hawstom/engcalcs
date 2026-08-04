@@ -2376,20 +2376,32 @@ var EngCalcs = EngCalcs || {};
 		}
 		rebuildProjectsList();
 	}
-	// "Close project" (Tom, 2026-08-03: there was no way to say "I am done with this file"). It
-	// deliberately deletes NOTHING -- not the file, not the project. It stops writing to the file and
-	// hands the lock back so a colleague can open it, and the project stays exactly where it was, in
-	// this browser. The same thing happens on its own when the tab closes; this is the way to do it
-	// without closing the tab.
-	function unlinkFile() {
+	// "Close project", and it CLOSES -- landing on a new empty project, the way Close behaves in every
+	// other program. Tom, 2026-08-03: *"In all software, 'Close file' reverts either to a no-document
+	// state (not really meaningful for these calculators) or a new-document state (Clear calculator),
+	// and never to file-stays-open."* Correct, and the first version of this was exactly that wrong
+	// thing: it unlinked the file and left the project on screen, which is a state no user has a name
+	// for. There is no longer any way to keep editing a project while detached from its file, and
+	// that absence is deliberate -- silently diverging from the file is how two versions of the truth
+	// get made.
+	//
+	// It deletes NOTHING. The file stays on disk, the project stays in the library (unlinked), and
+	// the lock goes back so a colleague can open it. Closing the tab does the same thing on its own.
+	function closeProject() {
 		if (!library.openId) { return; }
-		flushToFile(false); // one last write, so closing never silently drops the last few edits
+		// Order matters: flushToFile() resolves the handle and the content synchronously before its
+		// first await, so the last write still lands in the outgoing file even though the handle is
+		// dropped on the very next line.
+		flushToFile(false);
 		fileHandles.delete(library.openId);
 		setFileError(false);
 		releaseLock();
 		lockUnavailable = false;
 		setLockUnavailable(false);
 		setReadOnly(false);
+		// The new-document state, per the convention above. newProject() keeps the closed project in
+		// the library and inherits the current settings, so this is "close", never "discard".
+		newProject();
 		rebuildProjectsList();
 	}
 	// Recovery from a file that moved, was renamed, or was deleted. The stale handle is dropped
@@ -2851,7 +2863,7 @@ var EngCalcs = EngCalcs || {};
 			unlinkBtn.type = 'button'; unlinkBtn.style.marginLeft = '6px';
 			unlinkBtn.textContent = pc.lpn_project_close || 'Close project';
 			if (pc.lpn_project_close_tip) { helpTip(unlinkBtn, pc.lpn_project_close_tip); }
-			unlinkBtn.addEventListener('click', function () { unlinkFile(); });
+			unlinkBtn.addEventListener('click', function () { closeProject(); });
 			linkRow.appendChild(unlinkBtn);
 			list.appendChild(linkRow);
 		}

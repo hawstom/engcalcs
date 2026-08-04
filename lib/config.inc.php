@@ -66,6 +66,31 @@ define('CALC_USAGE_LOG', dirname(__DIR__) . '/log/engcalcs-calc-usage.log');
 // Run log/lang-log-stats.sh to analyze.
 define('HUMAN_VIEW_LOG', dirname(__DIR__) . '/log/engcalcs-human-view.log');
 
+// ---- Author/tester opt-out from the usage logs (ROADMAP Task 210) ----
+// Visit any page with ?ec_nolog=1 once per browser to stop that browser being counted by ALL THREE
+// log writers (LANG_LOG, CALC_USAGE_LOG, HUMAN_VIEW_LOG); ?ec_nolog=0 undoes it.
+// Deliberately an opt-out AT WRITE TIME rather than a filter applied afterwards. The logs carry no
+// IP and no session id, so "that looks like the author exercising many calculators and languages"
+// is a guess -- it cannot be applied to data already written, and it would also throw away real
+// multilingual users, who are the readers we most want to see. Suppressing at the source is exact.
+// Per-device by nature: set it once in each browser used for hand-testing.
+define('EC_NOLOG_COOKIE', 'ec_nolog');
+if (isset($_GET['ec_nolog']) && !headers_sent()) {
+    if ($_GET['ec_nolog'] === '0') {
+        setcookie(EC_NOLOG_COOKIE, '', time() - 86400, '/');
+        unset($_COOKIE[EC_NOLOG_COOKIE]);
+    } else {
+        // Ten years: this is a standing choice by someone who works on the site, not a preference
+        // anyone needs to revisit.
+        setcookie(EC_NOLOG_COOKIE, '1', time() + (10 * 365 * 86400), '/');
+        $_COOKIE[EC_NOLOG_COOKIE] = '1';
+    }
+}
+/** True when this browser has opted out of being counted. Checked by every log writer. */
+function ecLoggingOptedOut() {
+    return isset($_COOKIE[EC_NOLOG_COOKIE]) && $_COOKIE[EC_NOLOG_COOKIE] === '1';
+}
+
 // Looped-network project locks (ROADMAP Task 195 Phase 2) — one small JSON record per project
 // document id, written by lpn-lock.php, blocked from HTTP by lpn-locks/.htaccess exactly as log/ is.
 // Each record: {"projectId":…,"holder":…,"lockedBy":…,"lastActivity":unix-ts}

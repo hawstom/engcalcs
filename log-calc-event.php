@@ -16,6 +16,13 @@ require_once __DIR__ . '/lib/config.inc.php';
 
 header('Content-Type: text/plain');
 
+// Task 210: a browser that opted out is not counted. Answered 204 like a normal success so the
+// beacon is never queued for retry -- an opted-out event must not come back later.
+if (function_exists('ecLoggingOptedOut') && ecLoggingOptedOut()) {
+    http_response_code(204);
+    exit;
+}
+
 $page = isset($_POST['page']) ? preg_replace('/[^A-Za-z0-9_-]/', '', $_POST['page']) : '';
 $lang = isset($_POST['lang']) ? preg_replace('/[^A-Za-z-]/', '', $_POST['lang']) : '';
 
