@@ -277,8 +277,59 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     the answer**, and the log accrues at zero cost. Re-read it when `zh` passes 30 views.
   - **Do not re-score `zh`'s QUALITY in either direction before then.**
 
-- 60|203| **Tier translation SPEND by calculator, not by language — decision framework, open for
-  Tom's ruling.** Tom, 2026-08-03: *"is it cost-effective to translate all calculators to 26
+- 60|203| **The COVERAGE MATRIX: a mandatory core cross of calculator × language, fading in both
+  directions. DECIDED by Tom, 2026-08-03.** *"I see our usage reports pointing us to a mandatory
+  translation core of a few calculators and a few languages. All calculators get those few languages,
+  and all languages get those few calculators. From there in both directions it tapers off like a
+  fading matrix or a fading 2D gradient."*
+
+  **Why the CROSS and not a single tier.** CC's original proposal tiered only one axis (calculators)
+  and was worse. Tiering calculators alone orphans a niche calculator in English forever; tiering
+  languages alone orphans a niche language entirely. **The cross does neither** — every language
+  still gets the top calculators (so discovery is never withheld, and the chicken-and-egg objection
+  is answered), and every calculator still gets the top languages (so nothing is English-only).
+
+  **The cliffs are unusually clean, and both axes have the same shape** — one dominant member, one
+  large drop, then a flat tail. Measured 2026-08-03:
+  - **Calculators:** MPF 75.8% → *6.5× drop* → MTC 11.6% → *4.0× drop* → HW 2.9% → tail of ~1.0–1.3×
+    steps. **Top 3 = 90.4%**, matching the long-standing "MPF + HW + MTC = 92% of humans" finding.
+    Top 5 (adding MI, MPHL) = 94.7%.
+  - **Languages (non-English):** es 61.4% → *6.1× drop* → pt 10.1% → fr 8.2% → tr 6.2% → tail.
+    **es alone = 61.4%**; es+pt+fr+tr = 85.9%.
+
+  **What the cross costs and buys** (26 non-English × 16 calculators = 416 cells):
+
+  | core | cells | share of the work | covers |
+  |------|------:|------------------:|-------:|
+  | 3 calcs × all langs + all calcs × es | 91 | **22%** | **~96.3%** |
+  | 5 calcs × all langs + all calcs × es, pt, fr, tr | 174 | 42% | ~99.3% |
+
+  Even the tight core is 22% of the work for 96% of observed use. **Tom to pick tight or wider**;
+  everything else here holds either way.
+
+  **THIS IS FORWARD-LOOKING AND DELETES NOTHING.** All 416 cells are already translated except
+  `lpn_`. The matrix governs **new calculators, drift/maintenance spend, and future audit passes** —
+  never removal of work already paid for. Say this out loud in any future discussion, because
+  "tiering" invites a reading where existing translations get dropped, which is not the decision.
+
+  **Identity strings are the floor of the gradient, not part of the taper.** Menu entry, `<title>`
+  and `*_main_desc` stay translated for **every** calculator in **every** language regardless of
+  tier — ~3 strings against 100+ for a body — because they are the discovery mechanism, and
+  `dev/translation-process.md` already records the evidence: *"es at 10% proves the door opens when
+  identity strings are discoverable."* A cell outside the cross means "body in English, findable in
+  the local language," which is also what lets that cell earn its way in.
+
+  **LIVE CONSEQUENCE — Task 146.06 becomes a different task.** Under the tight core `lpn_` ranks 6th
+  (1.7%) and is not a core calculator, so it gets the core languages only: **`lpn_` × es, 154 keys ×
+  1 language**, plus identity strings in all 26. That replaces a 26-agent sprint, and `es` is exactly
+  where a wrong string costs most. If `lpn_` climbs into the core calculator band, it earns the rest.
+
+  **REQUIRED COMPANION — the tooling assumes full parity and will fight this.** See Task 204. Do not
+  adopt the matrix without it.
+
+  ---
+  **Original framing, kept for the reasoning (superseded by Tom's matrix above):** tier translation
+  SPEND by calculator, not by language. Tom, 2026-08-03: *"is it cost-effective to translate all calculators to 26
   languages? … Should we let probationary languages prove themselves on the top calculators first
   before we dive into another 14 × 26 sprint?"* The question is right and the timing is right — before
   a sprint, not after. But it **bundles two decisions that have opposite answers**, and separating
@@ -337,6 +388,27 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   until `lpn_` clears the gate. It currently shows 2 confirmed uses, and those were mismeasured
   (Task 199). This is already how the two are ranked (146.06 at 5, Task 195 at 90) — the framework
   just supplies the reason, and a number.
+
+- 50|204| **Coverage declaration for the translation tooling — required before Task 203's matrix can
+  be adopted.** Four scripts treat a missing key as debt: `lang_parity_check.php`,
+  `generate_translation_payloads.php`, `translation_completion_matrix.php` and
+  `lang_syntax_validate.php`, all reading one list via `exempt_keys.inc.php`. Under Task 203 a key
+  absent from a non-core cell is **deliberate**, not debt — and there is currently no way to say so.
+  - **The obvious shortcut is explicitly forbidden by our own rule.** `translation_exempt_keys.json`
+    is for keys where *identical to English is permanently correct* (symbols, eponyms, cognates), and
+    CLAUDE.md says: "Add a key there only when identical-to-English is permanently correct — never to
+    quiet a number you don't want to fix." A deliberately-untranslated body is neither identical nor
+    permanent. Using the exempt list for it would corrupt the one mechanism that makes **delta zero
+    mean zero**.
+  - **What is needed is a different concept:** a per-(prefix × language) *coverage* declaration —
+    which prefixes are in scope for which languages — so the delta means "missing from what we intend
+    to cover," and an out-of-scope cell is reported separately as **out of scope**, never as missing.
+  - **Why this blocks rather than follows.** Adopt the matrix without it and the very next parity run
+    reports `lpn_` alone as 154 × 25 ≈ **3,850 missing keys, permanently**. A number that large and
+    that permanent teaches everyone to ignore it, which destroys the delta-zero discipline that was
+    deliberately built (Task 161). The tooling must learn the new model **before** the model ships.
+  - Keep the two ideas separate in the data as well as the code: *exempt* = correctly identical
+    forever; *out of scope* = not translated yet, by decision, and revisitable when a cell earns it.
 
 - 45|146.02| **EPANET-style icon toolbar + map symbol icons (Task 146 child).** Replace/supplement
   the current toolbar with EPANET-style icons for elements and map symbols. **Must land before the
