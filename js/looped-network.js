@@ -2267,7 +2267,7 @@ var EngCalcs = EngCalcs || {};
 	function restartFileAutosave() {
 		if (fileWriteTimer) { clearInterval(fileWriteTimer); fileWriteTimer = null; }
 		var secs = Math.min(180, Math.max(60, +settings.fileAutosaveSeconds || 120));
-		fileWriteTimer = setInterval(function () { retryLock(); flushToFile(false); }, secs * 1000);
+		fileWriteTimer = setInterval(function () { pollLock(); flushToFile(false); }, secs * 1000);
 	}
 	// Called before any switch of library.openId. Everything that decides WHAT and WHERE to write --
 	// linkedHandle() and projectFileText() -- runs synchronously before flushToFile()'s first await,
@@ -2642,24 +2642,38 @@ var EngCalcs = EngCalcs || {};
 		if (r.held) { setReadOnly(false); return; }
 		presentLockedOut(r);
 	}
-	// Retried on the autosave tick, whether or not there is anything to save: an idle user who was
-	// warned at open time is exactly the person the promise of a follow-up was made to.
+	// Runs on the autosave tick whether or not there is anything to save, and covers BOTH states that
+	// are waiting on news from the broker:
+	//   - we warned at open time that we could not lock (lockUnavailable), and promised to say when
+	//     that changed; and
+	//   - somebody else holds the project and we are read-only.
+	// The second was a real gap until 2026-08-03: nothing re-polled once the banner was up, so a
+	// colleague who closed their project, or simply went quiet long enough for a takeover to become
+	// reasonable, left the other person staring at "please wait" forever. Found while writing the
+	// test punch list, which is exactly the sort of thing a punch list is for.
 	var lockUnavailable = false;
-	async function retryLock() {
+	async function pollLock() {
 		var pc = EngCalcs.pageConfig || {};
-		if (!lock.docId || !lockUnavailable) { return; }
+		if (!lock.docId) { return; }
+		if (!lockUnavailable && !readOnly) { return; } // nothing is waiting on an answer
 		var r = await postLock('acquire', lock.docId);
 		if (!r || !r.ok) { return; } // still unreachable; the banner stays up, say nothing
-		lockUnavailable = false;
-		setLockUnavailable(false);
+		if (lockUnavailable) { lockUnavailable = false; setLockUnavailable(false); }
 		if (r.held) {
-			setNotice(pc.lpn_lock_restored || 'Locking is working again, and this project is now yours to edit.');
-			setReadOnly(false);
-		} else {
-			// The server came back and somebody else got there first. Honest, and the reason this
-			// retry exists at all rather than assuming the lock was ours the whole time.
-			presentLockedOut(r);
+			// Note this ACQUIRES when the lock turns out to be free -- acquire is not a read. That is
+			// deliberate: the usual way to get here is the other person closing their project, and
+			// the useful outcome is that the file becomes yours rather than merely available.
+			if (readOnly) {
+				setReadOnly(false);
+				setNotice(pc.lpn_lock_now_yours || 'Nobody else has this project open now, so it is yours to edit.');
+			} else {
+				setNotice(pc.lpn_lock_restored || 'Locking is working again, and this project is now yours to edit.');
+			}
+			return;
 		}
+		// Still held. Re-presenting it is what moves the banner from "please wait" to an offer to
+		// take over as the holder's quiet time passes.
+		presentLockedOut(r);
 	}
 	async function takeOverLock() {
 		var pc = EngCalcs.pageConfig || {};

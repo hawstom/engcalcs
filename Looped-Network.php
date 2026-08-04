@@ -269,6 +269,7 @@ EngCalcs.pageConfig = {
 	lpn_lock_took_over: <?=json_encode($ec_lang['lpn_lock_took_over'])?>,
 	lpn_lock_unavailable: <?=json_encode($ec_lang['lpn_lock_unavailable'])?>,
 	lpn_lock_restored: <?=json_encode($ec_lang['lpn_lock_restored'])?>,
+	lpn_lock_now_yours: <?=json_encode($ec_lang['lpn_lock_now_yours'])?>,
 	lpn_lock_dismiss: <?=json_encode($ec_lang['lpn_lock_dismiss'])?>,
 	lpn_file_relink: <?=json_encode($ec_lang['lpn_file_relink'])?>,
 	lpn_project_download: <?=json_encode($ec_lang['lpn_project_download'])?>,

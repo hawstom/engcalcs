@@ -1251,6 +1251,9 @@ $ec_lang['lpn_lock_took_over']='You have taken over from {name}. Their work was 
 // lpn_lock_restored keeps.
 $ec_lang['lpn_lock_unavailable']='Beware: could not reach the server to check or create a lock on this project, so nothing is stopping a colleague from editing the same file at the same time. You will be told if locking starts working again.';
 $ec_lang['lpn_lock_restored']='Locking is working again, and this project is now yours to edit.';
+// Shown when the person who had the project open closes it, or is taken over from. Reached by the
+// same poll that keeps lpn_lock_unavailable's promise, so a locked-out user is never left staring.
+$ec_lang['lpn_lock_now_yours']='Nobody else has this project open now, so it is yours to edit.';
 $ec_lang['lpn_lock_dismiss']='Dismiss';
 // Shown once per browser, before the first file picker opens. Three short paragraphs on purpose:
 // this is the one place the whole file-and-lock idea is explained, and it has to survive translation

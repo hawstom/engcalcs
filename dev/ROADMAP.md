@@ -1279,8 +1279,22 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   project detached from its file, and that absence is the point — silently diverging from the file is
   how two versions of the truth get made.
 
+  **Fourth round, 2026-08-03 — a real gap found while writing the test punch list.** Nothing
+  re-polled the broker once a read-only banner was up, so a colleague who closed their project, or
+  who simply went quiet long enough for a takeover to become reasonable, left the other person
+  staring at "please wait" forever. `retryLock()` became `pollLock()` and now covers both waiting
+  states: the could-not-lock warning AND being locked out. When the lock turns out to be free it
+  ACQUIRES rather than merely reporting — the usual way to get there is the other person closing
+  their project, and the useful outcome is that the file becomes yours.
+
+  **Test punch list: `dev/lpn-file-lock-test-punchlist.md`** — 13 sections plus a ranked
+  known-shaky list. Two things in it are easy to get wrong and would produce a false "locking is
+  broken": testing over `http://` (no File System Access API at all, so everything silently uses the
+  download fallback) and testing with two TABS rather than two browser PROFILES (shared
+  `localStorage` means one identity token, so the lock reads as "mine" in both).
+
   **Still not done:** the UI has still never been seen rendered by the author. Every check is a
-  harness against sliced-out logic (162 across four harnesses now), not a click. Tom's pass so far is
+  harness against sliced-out logic (177 across five harnesses now), not a click. Tom's pass so far is
   the only real browser evidence, and it was on a non-secure origin, so the entire
   handle/lock/read-only path remains unexercised in a real browser.
 - 55|208| **A lock that travels with a COPY of a file is the wrong lock — the sharing hole in Task
@@ -1333,7 +1347,18 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
       weakness — **no atomic test-and-set**. Two browsers can both read "no lock file" and both
       create one, where `lpn-lock.php`'s `flock()` has no such window. A hybrid (sidecar for
       identity and location-scoping, server broker as arbiter when reachable) may be the honest
-      answer.
+      answer, and is the direction Tom endorsed 2026-08-03 (*"Hybrid sidecar: I love it"*).
+    - **What that race is, precisely** — Tom asked whether it meant a moved file arriving without its
+      sidecar; it does not, and the distinction matters. It is an ordinary time-of-check-to-time-of-use
+      race **in the normal case**: two browsers open the same file in the same folder at nearly the
+      same moment, both call `getFileHandle()` for the lock file, both see nothing there, both
+      conclude the project is free, and both create a lock naming themselves. Last write wins and
+      **both believe they hold it**. A file system reached through this API offers no atomic
+      create-if-absent to close that window, whereas `flock()` does. On a network share the window is
+      far wider than raw simultaneity suggests, because SMB/NFS client caching can hide a
+      just-created file from another machine for seconds. **A moved file with no sidecar is a
+      different thing and is the behavior we WANT**: no lock file beside it means nobody is locked
+      out, which is exactly how a file shared outside the office stops contending with the original.
     - Directory handles persist in IndexedDB like file handles, so re-opening a known folder need
       not re-prompt.
   - **Scope the lock to a declared team**, so a lock record is per (docId × team) and an outsider
