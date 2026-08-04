@@ -2055,9 +2055,14 @@ var EngCalcs = EngCalcs || {};
 	// The stored shape is already exactly right for this: serializeProject() returns one
 	// self-contained object per project, backdrop included, so the file IS the stored document.
 	function safeFileName(name) {
-		// Only the characters a filesystem actually refuses, plus whitespace runs -- NOT a
-		// strip-to-ASCII, which would empty the filename of any project named in a non-Latin script.
-		var s = String(name).replace(/[\\/:*?"<>| -]+/g, '-').replace(/\s+/g, '-').replace(/^-+|-+$/g, '');
+		// Filesystem-illegal characters and control characters out; whitespace and dash runs
+		// collapsed. Deliberately NOT a strip-to-ASCII, which would empty the filename of any
+		// project named in a non-Latin script.
+		var s = String(name)
+			.replace(/[\\/:*?"<>|\u0000-\u001f]+/g, '-')
+			.replace(/\s+/g, '-')
+			.replace(/-{2,}/g, '-')
+			.replace(/^-+|-+$/g, '');
 		return s.slice(0, 60) || 'project';
 	}
 	function exportProject() {
