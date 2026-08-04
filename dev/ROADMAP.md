@@ -210,6 +210,26 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - Collect the minimum: no IP stored beyond transient rate limiting, email optional and only for a
     reply. Say plainly what is collected; a form that asks for trust must deserve it.
 
+  **Idea seeds for the "warm and welcoming" surface (Tom, 2026-08-03), not yet designed:**
+  - **Polls.** A one-tap question is Rung 0's mechanics pointed at something we actually want to
+    know ("Which calculator should exist next?", "Do you work in metric or US units?", "Is this word
+    right in your language?"). Cheapest possible connection: it costs the reader one tap, it gives us
+    a real number, and — the part that matters — it is an *invitation to have an opinion*, which
+    reads as being asked rather than being solicited. Publishing the running result closes the loop
+    and makes the next tap more likely.
+  - **Intentional mistakes — REJECTED, decided 2026-08-03, do not re-propose.** The known growth
+    trick of planting a visible error to bait corrections ("someone is wrong on the internet" is the
+    most reliable engagement engine there is) is off the table here, permanently, and Tom ruled it
+    out himself in the same breath as raising it. Two independent reasons: (1) it is deception, and a
+    project whose stated purpose is to tell people they are loved cannot get there by tricking them;
+    (2) unlike a wiki article, these outputs size real infrastructure — a planted wrong number can
+    reach a channel, a pipe, or a chute that someone builds and someone else stands in. There is no
+    version of this that is safe here. Recorded so it is not rediscovered as a clever idea later.
+  - **Other warm surfaces worth designing later:** a visible "what changed because a reader wrote in"
+    log (see reinforcement above); an honest, dated "who uses this" note; a first-visit greeting in
+    the reader's own language that asks for nothing at all (`template_welcome` already does this and
+    is the tonal model for everything in this task).
+
   **Gated on Task 206.** Do not build this blind. Without contact-funnel logging there is no way to
   tell whether Rung 0 worked, and this task's entire premise — that cost, not visibility, is the
   constraint — is a hypothesis that deserves a measurement rather than another two rounds of
