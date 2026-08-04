@@ -256,9 +256,16 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   as of this paragraph's original writing; resolved by commit `7428ff0 Task 146: close the
   empty-canvas open question`, 2026-07-29) — a new project opens on the placeholder-text canvas
   above, not a worked example.
-- 95|146.02| **EPANET-style icon toolbar + map symbol icons (Task 146 child).** Replace/supplement
+- 45|146.02| **EPANET-style icon toolbar + map symbol icons (Task 146 child).** Replace/supplement
   the current toolbar with EPANET-style icons for elements and map symbols. **Must land before the
   translation sprint (146.06) — this blocks it**, per Tom, 2026-07-29.
+  - **Dropped 95 → 45 on 2026-08-03 (Tom): icons do not reduce the translation load.** *"My
+    reconsidered understanding is that icon toolbars don't really reduce our translation load since
+    everything must be described even with icons."* Correct, and if anything the load moves the
+    wrong way: a visible button label is a noun ("Junction"), while the `title`/`aria-label` that
+    replaces it wants to be a phrase ("Add a junction to the map"), so the string set gets longer
+    rather than shorter. It is still a **gate on 146.06**, but for CHURN reasons only — it rewrites
+    strings the sprint would otherwise have to pay for twice — not because it saves any.
   - **Owes a short 193-style re-read of any string it adds or renames** (added 2026-07-31). Task 193
     ran first, so the toolbar strings it tightened are the ones this task is most likely to change.
     That is a paragraph of work against a handful of new keys, not a repeat of 193 — but it has to
@@ -477,6 +484,12 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     candidate (not necessarily an error — you might build both). A group whose members are inactive
     everywhere is exactly the "purge unused" candidate above.
 
+  **INHERITED FROM 146.08 (moved 2026-08-03), and buildable only once a scenario UI exists:**
+  - **"Create scenario geometry variant"** — the toolbar/menu command described above. Task 192 owns
+    the right-click path.
+  - **The "Compare with base ID" field** — the string group key described above; simultaneously the
+    report table's row key, the halo grouping, and the cleanup handle.
+
   **Sequencing:** 146.08 must ship the **project container from day one**, holding Base as its only
   scenario. Then scenarios are purely additive and there is never a storage migration. Tom flagged
   this himself — *"this is an important decision because we want to introduce it early"* — and it is
@@ -536,80 +549,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   needs paste parsing, per-column unit handling, undo integration, and validation of every pasted
   cell. Large; parked deliberately behind Task 185, which gets most of the practical benefit for a
   fraction of the work.
-- 30|146.08| **Multiple named saved networks (Task 146 child).** Local save/retrieve so a user can
-  rotate among several `lpn_` projects. This is the real need behind the scope doc's old
-  `.inp` export/import item — Tom confirmed 2026-07-29 that true EPANET `.inp` file interop is not
-  needed right now, only local multi-project storage.
-  **Ships the project container from day one** — see Task 184 for the full delta/scenario model this
-  must not foreclose. What that means concretely here:
-  - **The v2 storage shape from Task 184**, with Base as the only scenario and no scenario UI. The
-    migration from today's single `lpn_document` is a wrap, so there is never a second migration.
-  - **The `effective(el, prop)` resolver seam**, built now even though every lookup falls through to
-    the element. This is the part that makes scenarios purely additive later; the JSON wrapper alone
-    is not.
-  - **One localStorage key per project** (`lpn_project_<id>`) plus a small index key, rather than one
-    blob — so autosave rewrites only the open project, and one large backdrop image cannot take the
-    whole library down with a single quota error.
-  - **"Create scenario geometry variant" and the "Compare with base ID" field** land here on the
-    toolbar/menu path only. Task 192 owns the right-click path.
-
-  **BUILT 2026-07-30 (steps 1–3 of 3); the two bullets above about the geometry variant and the
-  compare-with-base-ID field are what remain open here.**
-  - **Step 1 — v2 container.** `project`/`scenarios` module state with Base as the only scenario,
-    the `LPN_OVERRIDABLE` whitelist, and a v1→v2 migration that is a pure wrap. Structural guarantees
-    (exactly one Base, `activeScenario` names a real scenario, Base's overrides stay empty) are
-    *restored* at load, not trusted.
-  - **Step 2 — the resolver seam, done as a RENAME** (Tom's addition, and the whole safety story):
-    the element stores `_diameter` and every read goes through `effective(l, 'diameter')`. With one
-    scenario the resolver is a pure passthrough, so a missed call site is invisible and no test can
-    fail — the rename makes it `undefined` immediately instead. It earned its keep at once:
-    `assembleModel()` was passing `doc.links` straight to the solver, which under a passthrough
-    resolver would have read as working forever.
-  - **Step 3 — the library.** `lpn_project_<id>` per project plus an `lpn_index` cache, a one-time
-    MOVE (not copy) of the legacy `lpn_document`, and a Projects panel (open / rename / delete / new)
-    whose toolbar button also names the open project. The index is repaired from the real project
-    keys on every load, in both directions, so a quota failure between the two writes cannot hide a
-    project or advertise a missing one. Quota failure now surfaces in the status bar instead of
-    being silently swallowed — a silent swallow was tolerable for one document and is not for a
-    library.
-  - **Open question left deliberately: `settings`/`labelSettings` are stored PER PROJECT** (they
-    always were — they live in the same document), so opening another project also swaps text size,
-    map height and legend position, not just ID prefixes and default inputs. Kept that way because
-    it needs no migration and because ID prefixes and default inputs are genuinely per-project;
-    a new project inherits the current one's preferences rather than reverting to factory defaults,
-    which is what preserves the pre-library "New clears the network, not your preferences" behavior.
-    Split display preferences out to a global key if that ever reads wrong.
-  - **Naming, settled 2026-07-31 (Tom).** The toolbar's "New / Clear" is now just **"Clear
-    project"** — it blanks the open project and never creates one, so "New" was doing nothing but
-    competing with the panel. The panel offers **"Save as new project"** (duplicate everything on
-    screen and open the copy — Task 184's project-level copy, built here) and **"Start empty
-    project"**, named apart on purpose: *"New project" reads as the first to most people and did the
-    second*, which is the worst possible combination. A failed copy (quota, with a backdrop image
-    the likely cause) leaves the user in the original rather than half-moved into a project that
-    does not exist.
-  - **Popovers dismiss with a corner X, not a "Close" button** (Tom, 2026-07-31). He caught it in
-    the Projects panel, where "Close" sat directly beneath Open / Rename / Delete — three buttons
-    that all take a *project* as their object — so it read as "close the project." The ambiguity was
-    not really unique to that panel, so all four `lpn_` popovers changed together. The translated
-    word survives as `title`/`aria-label`, so the accessible name is still a translated "Close"
-    rather than a bare multiplication sign; the button is a 40px target with matching popover
-    padding, since this page runs on phones and a glyph at natural type size is a few pixels across.
-    No other page in the suite has a Close button, so this was page-local, not a suite-wide sweep.
-  - **Two phone bugs found in Tom's testing, 2026-07-31, both "sized to content, not to screen":**
-    (1) **The canvas could fill the phone screen and trap the user** — `#lpn_canvas` carries
-    `touch-action: none` so the app owns pan/zoom, which means every touch landing on it is
-    swallowed and cannot scroll the page; with no page left to touch, reloading was the only way
-    out. `applyMapHeight()` now caps the RENDERED height at 72% of the viewport (floor 240px) and
-    re-applies on `resize`/`orientationchange`, so a strip of ordinary page is always reachable.
-    `settings.mapHeight` keeps the user's unclamped number, so a desktop 900px map is not rewritten
-    by one phone visit. Considered and rejected as bigger changes reaching the same place: a
-    two-finger-pan rule, or a scroll affordance beside the canvas. **Note the cap can make the
-    Settings "Map height" field look ignored on a phone** — it is a render cap, not a stored value.
-    (2) **Popovers overflowed the right edge** — the JS clamp can only choose a left edge, so a
-    popover wider than the viewport overflows no matter what it picks, and it bottoms out at 4px.
-    CSS now caps popover width (and height, for a long Settings or Projects list) to the viewport,
-    which is what makes the clamp solvable. Scrolling is on an inner `.lpn-popover-body` wrapper so
-    the corner X stays pinned instead of scrolling away.
 - 20|146.04| **Node/link report tables (Task 146 child).** Tabular results view.
 - 20|146.05| **EPANET-style element browser (Task 146 child).** List/select elements from a panel
   rather than only the canvas. **If this lists TEXT elements** (EPANET's own Browser does have a
@@ -669,7 +608,7 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **Risk to respect:** every drawing gesture on this page is a one-finger touch, so this reworks
     the layer they all sit on. Not a tweak. If it lands, keep the height cap anyway — it costs
     nothing and is the belt to this braces.
-- 25|195| **Export/import a project as a file (Task 146 child) — a gate for dropping the PREVIEW
+- 90|195| **Export/import a project as a file (Task 146 child) — a gate for dropping the PREVIEW
   banner. Reframed 2026-08-01 as two phases of the SAME task, not a separate one:** a one-shot JSON
   download/import (Phase 1, as originally scoped, still the near-term target) and a live-handle,
   multi-user file-locking system built on top of it (Phase 2, new scope, added 2026-08-01). Both
@@ -1155,6 +1094,141 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Completed
 
+- 0|199|[CC] **`lpn_` logged no real usage at all — instrumentation fix, DONE 2026-08-03.**
+  Found while answering Tom's question about what usage logging could tell us. Every other
+  calculator reaches `maybeLogCalcUsage()` through `calcAndSave()` ← `submitForm()`. On
+  `Looped-Network.php` `submitForm()` fires **only** from the seven unit dropdowns' hardcoded
+  `onchange="EngCalcs.submitForm()"` and the US/SI preset buttons — drawing a network and solving it
+  goes `scheduleSolve()` → `runSolve()`, which never touches that path.
+  - **So `lpn_`'s "used" column counted unit-strip changes, not networks solved.** The 2026-08-03
+    report read `Looped-Network … 35 human, 2 used, 6%` against 70% for Manning-Pipe-Flow, which
+    looks like catastrophic conversion and is not a conversion figure at all — it is a different
+    event from the other fifteen rows. `runSolve()` now calls `maybeLogCalcUsage()`.
+  - **Logged before the diagnostics, not after a successful solve**, so the event matches what the
+    other pages log: interaction that triggers a recalculation, usable result or not. The existing
+    10s-after-load gate and per-page-load dedupe keep the initial solve and the debounce from
+    inflating it.
+  - **Consequence for reading past reports: `lpn_`'s conversion is simply UNKNOWN before this date.**
+    Do not treat the pre-2026-08-03 `%used` figures for this page as a baseline to improve on.
+- 20|200| **Usage logging: the questions the current report cannot answer.** Raised by Tom,
+  2026-08-03: *"I'd like to get more guidance about our development priorities from usage logging."*
+  Ordered by value ÷ effort. Nothing here needs a database — the existing
+  `log-calc-event.php` / `log-human-view.php` beacon pattern covers all of it.
+  - **First, two things about how the CURRENT report must be read, which cost nothing to adopt:**
+    - **There is a bot floor around 900.** Almost every page sits at 834–1193 reach regardless of
+      how many humans it gets; only Manning-Pipe-Flow (3619) and Manning-Trap (2141) rise above it.
+      So for every other page `%human of reach` is a signal-to-noise ratio, not a conversion rate,
+      and driving it up is not a goal.
+    - **Below roughly 40 humans, `%used` is noise.** Only MPF (1576 humans), Manning-Trap (242) and
+      marginally Hazen-Williams (60) have the sample for that ratio to mean anything. The single-digit
+      rows — Canal-Seepage at 1 human, Weir-Flow-Irregular at 2 — cannot support any decision, and
+      reading them as failure is a mistake. What those pages need is not a metric, it is either
+      traffic or an honest decision that they are niche.
+  - **Repeat use — the strongest value signal we do not collect.** One flag in `localStorage` per
+    page ("this browser has logged a calc here before") turns every event into new-vs-returning. A
+    calculator a working engineer comes back to is worth more than a hundred one-off visits, and
+    nothing in the present report can distinguish those two.
+  - **Did they touch anything before leaving?** For a human who never calculates, one bit: did any
+    input change at all? Splits "could not understand it" from "did not want it", which are opposite
+    development responses, and it is the cheapest diagnostic on this list.
+  - **`lpn_` first action, and `lpn_` diagnostic frequency.** Which of draw-example / add-element /
+    add-background / nothing happens first, and which of the four diagnostics fires most. Between
+    them they name exactly where the map interface loses people. **This is also the first evidence
+    that would bear on the empty-canvas decision** (closed 2026-07-29, commit `7428ff0`: a new
+    project opens on placeholder text rather than a worked example) — a decision made with no data,
+    which the first-action histogram would either vindicate or overturn.
+  - **Language × calculator cross-tab.** Both beacons already carry `page` AND `lang`, so this may be
+    answerable from data already on disk with no code change at all — check before building anything.
+    It directly sequences translation sprints: which calculator a given language actually reaches,
+    and whether the 0.65-tier languages reach the pages their speakers would need.
+  - **US vs SI actually chosen**, one bit per session — validates `EC_DEFAULT_UNIT_SET`-by-language
+    and shows whether per-page unit-family defaults are right (ROADMAP Task 162's design).
+  - **Lower value, listed so they are not re-brainstormed:** time-to-first-calc (separates a
+    confusing page from a long one); print / copy-link use as a proxy for work someone intends to
+    keep; intra-site path (which calculator is the entry point and where people go next).
+
+- 0|146.08|[CC] **Multiple named saved networks (Task 146 child).** Local save/retrieve so a user can
+  rotate among several `lpn_` projects. This is the real need behind the scope doc's old
+  `.inp` export/import item — Tom confirmed 2026-07-29 that true EPANET `.inp` file interop is not
+  needed right now, only local multi-project storage.
+  **Ships the project container from day one** — see Task 184 for the full delta/scenario model this
+  must not foreclose. What that means concretely here:
+  - **The v2 storage shape from Task 184**, with Base as the only scenario and no scenario UI. The
+    migration from today's single `lpn_document` is a wrap, so there is never a second migration.
+  - **The `effective(el, prop)` resolver seam**, built now even though every lookup falls through to
+    the element. This is the part that makes scenarios purely additive later; the JSON wrapper alone
+    is not.
+  - **One localStorage key per project** (`lpn_project_<id>`) plus a small index key, rather than one
+    blob — so autosave rewrites only the open project, and one large backdrop image cannot take the
+    whole library down with a single quota error.
+  - ~~"Create scenario geometry variant" and the "Compare with base ID" field land here~~ —
+    **MOVED to Task 184 on 2026-08-03.** Both are unobservable with Base as the only scenario, so
+    they were never buildable inside this task's scope. See the note at the head of the BUILT block.
+
+  **BUILT 2026-07-30 (steps 1–3 of 3) — and CLOSED 2026-08-03, priority → 0.** Tom asked whether the
+  two remaining bullets were real work or leftover test scaffolding, and proposed raising this task
+  to 80. They are real (they come from Task 184), but they are **not buildable here**: "Create
+  scenario geometry variant" clones an element and sets it active in one scenario only, and
+  "Compare with base ID" groups alternatives ACROSS scenarios — with Base as the only scenario both
+  are no-ops the user cannot observe. Priority 80 would have put a near-top task on the board with
+  nothing useful to build. Moved to **Task 184**, which owns the scenario UI they depend on, per this
+  project's own rule that unbuilt work is extracted to its own task rather than left in a closed
+  block that nobody re-scans. Easy to reverse if Tom disagrees — the bullets are verbatim.
+  - **Step 1 — v2 container.** `project`/`scenarios` module state with Base as the only scenario,
+    the `LPN_OVERRIDABLE` whitelist, and a v1→v2 migration that is a pure wrap. Structural guarantees
+    (exactly one Base, `activeScenario` names a real scenario, Base's overrides stay empty) are
+    *restored* at load, not trusted.
+  - **Step 2 — the resolver seam, done as a RENAME** (Tom's addition, and the whole safety story):
+    the element stores `_diameter` and every read goes through `effective(l, 'diameter')`. With one
+    scenario the resolver is a pure passthrough, so a missed call site is invisible and no test can
+    fail — the rename makes it `undefined` immediately instead. It earned its keep at once:
+    `assembleModel()` was passing `doc.links` straight to the solver, which under a passthrough
+    resolver would have read as working forever.
+  - **Step 3 — the library.** `lpn_project_<id>` per project plus an `lpn_index` cache, a one-time
+    MOVE (not copy) of the legacy `lpn_document`, and a Projects panel (open / rename / delete / new)
+    whose toolbar button also names the open project. The index is repaired from the real project
+    keys on every load, in both directions, so a quota failure between the two writes cannot hide a
+    project or advertise a missing one. Quota failure now surfaces in the status bar instead of
+    being silently swallowed — a silent swallow was tolerable for one document and is not for a
+    library.
+  - **Open question left deliberately: `settings`/`labelSettings` are stored PER PROJECT** (they
+    always were — they live in the same document), so opening another project also swaps text size,
+    map height and legend position, not just ID prefixes and default inputs. Kept that way because
+    it needs no migration and because ID prefixes and default inputs are genuinely per-project;
+    a new project inherits the current one's preferences rather than reverting to factory defaults,
+    which is what preserves the pre-library "New clears the network, not your preferences" behavior.
+    Split display preferences out to a global key if that ever reads wrong.
+  - **Naming, settled 2026-07-31 (Tom).** The toolbar's "New / Clear" is now just **"Clear
+    project"** — it blanks the open project and never creates one, so "New" was doing nothing but
+    competing with the panel. The panel offers **"Save as new project"** (duplicate everything on
+    screen and open the copy — Task 184's project-level copy, built here) and **"Start empty
+    project"**, named apart on purpose: *"New project" reads as the first to most people and did the
+    second*, which is the worst possible combination. A failed copy (quota, with a backdrop image
+    the likely cause) leaves the user in the original rather than half-moved into a project that
+    does not exist.
+  - **Popovers dismiss with a corner X, not a "Close" button** (Tom, 2026-07-31). He caught it in
+    the Projects panel, where "Close" sat directly beneath Open / Rename / Delete — three buttons
+    that all take a *project* as their object — so it read as "close the project." The ambiguity was
+    not really unique to that panel, so all four `lpn_` popovers changed together. The translated
+    word survives as `title`/`aria-label`, so the accessible name is still a translated "Close"
+    rather than a bare multiplication sign; the button is a 40px target with matching popover
+    padding, since this page runs on phones and a glyph at natural type size is a few pixels across.
+    No other page in the suite has a Close button, so this was page-local, not a suite-wide sweep.
+  - **Two phone bugs found in Tom's testing, 2026-07-31, both "sized to content, not to screen":**
+    (1) **The canvas could fill the phone screen and trap the user** — `#lpn_canvas` carries
+    `touch-action: none` so the app owns pan/zoom, which means every touch landing on it is
+    swallowed and cannot scroll the page; with no page left to touch, reloading was the only way
+    out. `applyMapHeight()` now caps the RENDERED height at 72% of the viewport (floor 240px) and
+    re-applies on `resize`/`orientationchange`, so a strip of ordinary page is always reachable.
+    `settings.mapHeight` keeps the user's unclamped number, so a desktop 900px map is not rewritten
+    by one phone visit. Considered and rejected as bigger changes reaching the same place: a
+    two-finger-pan rule, or a scroll affordance beside the canvas. **Note the cap can make the
+    Settings "Map height" field look ignored on a phone** — it is a render cap, not a stored value.
+    (2) **Popovers overflowed the right edge** — the JS clamp can only choose a left edge, so a
+    popover wider than the viewport overflows no matter what it picks, and it bottoms out at 4px.
+    CSS now caps popover width (and height, for a long Settings or Projects list) to the viewport,
+    which is what makes the clamp solvable. Scrolling is on an inner `.lpn-popover-body` wrapper so
+    the corner X stays pinned instead of scrolling away.
 - 0|197|[CC] **Tooltips stuck visible — the hover+click trigger stack (suite-wide) — DONE 2026-08-03.**
   Tom: *"Tips are getting stuck visible. I saw this on mtc.n."* Second report of the same symptom;
   the 2026-07-30 fix in `js/Calculators.lib.js` covered **controls only**, so every PLAIN LABEL kept

@@ -4256,6 +4256,20 @@ var EngCalcs = EngCalcs || {};
 		// too, or a reload would resurrect the stale pre-delete network).
 		saveToStorage();
 		if (doc.nodes.length === 0) { lastSolveResult = null; setStatus(''); return; }
+		// Usage logging, added 2026-08-03. Until now this page logged ZERO real usage: every other
+		// calculator reaches maybeLogCalcUsage() through calcAndSave() <- submitForm(), and on this
+		// page submitForm() fires ONLY from the seven unit dropdowns' hardcoded
+		// onchange="EngCalcs.submitForm()" and the US/SI preset buttons. Drawing a network and
+		// solving it goes scheduleSolve() -> runSolve() and never touches that path -- so the
+		// "used" column counted unit-strip changes, not networks solved, and was not measuring the
+		// same event as the other fifteen rows on the report.
+		// Placed here, after the non-empty check and BEFORE the diagnostics, on purpose: the other
+		// calculators log on interaction that triggers a recalculation, whether or not the result is
+		// usable, so the comparable event here is "the user has drawn something and we attempted to
+		// compute it" -- not "it converged". maybeLogCalcUsage() carries its own 10s-after-load gate
+		// and per-page-load dedupe, so the initial load solve and the every-keystroke debounce do
+		// not inflate it.
+		if (EngCalcs.maybeLogCalcUsage) { EngCalcs.maybeLogCalcUsage(); }
 		var model = assembleModel(), issues = EngCalcs.lpnDiagnose(model);
 		if (issues.length > 0) {
 			lastSolveResult = null;
