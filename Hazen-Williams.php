@@ -10,8 +10,6 @@ echoHeader("EngCalcs", $html_title, "");
 <p class="collapse show d-print-none" id="relatedCalcs">
 	<?=$ec_lang['ec_related_calcs']?> <a href="Darcy-Weisbach.php"><?=$ec_lang['dw_main_menu']?></a> &middot; <a href="Manning-Pipe-Head-Loss.php"><?=$ec_lang['mphl_main_menu']?></a> &middot; <a href="Manning-Pipe-Flow.php"><?=$ec_lang['mpf_main_menu']?></a> &middot; <a href="Branched-Network.php"><?=$ec_lang['bpn_main_menu']?></a> <a data-bs-toggle="collapse" href="#relatedCalcs" aria-expanded="true" aria-controls="relatedCalcs"><?=$ec_lang['view_hide_line']?></a>
 </p>
-<?php echoHelpWanted(); ?>
-
 <?php
 echoCalculatorForm(
 	//Inputs
@@ -57,10 +55,10 @@ echoCalculatorForm(
 
 <div id="sketch"></div>
 
+<?php echoFeedback(); ?>
+
 <h2><?=$ec_lang['ws_notes_heading']?></h2>
 <?php echo $ec_lang['hw_note_1']; ?>
-
-<?php echoFeedback(); ?>
 
 <script>
 EngCalcs.pageConfig = {

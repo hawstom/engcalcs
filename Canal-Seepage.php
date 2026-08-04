@@ -5,8 +5,6 @@ $html_desc = $ec_lang['cs_main_desc'];
 echoHeader("EngCalcs", $html_title, "");
 ?>
 <h2><?=$ec_lang['cs_main_desc']?></h2>
-<?php echoHelpWanted(); ?>
-
 <?php
 echoCalculatorForm(
 	// Inputs
@@ -38,6 +36,8 @@ echoCalculatorForm(
 );
 ?>
 
+<?php echoFeedback(); ?>
+
 <h2><?=$ec_lang['ws_notes_heading']?></h2>
 <dl>
 	<dt><?=$ec_lang['odt_notes_2_term']?></dt><dd><?=$ec_lang['cs_notes_1_def']?></dd>
@@ -45,8 +45,6 @@ echoCalculatorForm(
 	<dt><?=$ec_lang['cs_notes_3_term']?></dt><dd><?=$ec_lang['cs_notes_3_def']?></dd>
 	<dt><?=$ec_lang['rc_notes_4_term']?></dt><dd><?=$ec_lang['cs_notes_4_def']?></dd>
 </dl>
-
-<?php echoFeedback(); ?>
 <script>
 EngCalcs.pageConfig = {
 	loss_positive: <?=json_encode($ec_lang['cs_loss_positive'])?>,

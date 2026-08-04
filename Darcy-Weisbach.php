@@ -7,8 +7,6 @@ echoHeader("EngCalcs", $html_title, "");
 
 ?>
 <h2><?=$ec_lang['dw_main_desc']?></h2>
-<?php echoHelpWanted(); ?>
-
 <?php
 echoCalculatorForm(
 	//Inputs
@@ -56,10 +54,10 @@ echoCalculatorForm(
 
 <div id="sketch"></div>
 
+<?php echoFeedback(); ?>
+
 <h2><?=$ec_lang['ws_notes_heading']?></h2>
 <?php echo $ec_lang['hw_note_1']; ?>
-
-<?php echoFeedback(); ?>
 
 <script>
 EngCalcs.pageConfig = {

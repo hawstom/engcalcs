@@ -5,8 +5,6 @@ $html_desc = $ec_lang['or_main_desc'];
 echoHeader("EngCalcs", $html_title, "");
 ?>
 <h2><?=$ec_lang['or_main_desc']?></h2>
-<?php echoHelpWanted(); ?>
-
 <?php
 echoCalculatorForm(
 	//Inputs
@@ -31,6 +29,8 @@ echoCalculatorForm(
 
 <div id="sketch" style="margin-top:1em; max-width:540px;"></div>
 
+<?php echoFeedback(); ?>
+
 <h2><?=$ec_lang['ws_notes_heading']?></h2>
 <dl>
 	<dt><?=$ec_lang['or_notes_1_term']?></dt><dd><?=$ec_lang['or_notes_1_def']?></dd>
@@ -38,8 +38,6 @@ echoCalculatorForm(
 	<dt><?=$ec_lang['or_notes_3_term']?></dt><dd><?=$ec_lang['or_notes_3_def']?></dd>
 	<dt><?=$ec_lang['or_notes_4_term']?></dt><dd><?=$ec_lang['or_notes_4_def']?></dd>
 </dl>
-
-<?php echoFeedback(); ?>
 <script>
 EngCalcs.pageConfig = {
 	regime_valid:        <?=json_encode($ec_lang['or_regime_valid'])?>,

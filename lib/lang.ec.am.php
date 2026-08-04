@@ -62,7 +62,6 @@ $ec_lang['menu_main_hydraulics']='ሃይድሮሊክስ';
 $ec_lang['menu_main_language']='ቋንቋ';
 $ec_lang['menu_more']='ተጨማሪ';
 $ec_lang['template_welcome']='ፍርሃትህን በር ላይ ትተህ ግባ; ፍቅር እዚህ ይነገራል። ሁሉንም ነገር አታበላሽም። <a target="_blank" href="https://hawsedc.com/download.php">ነፃ HawsEDC AutoCAD መሣሪያዎችን</a> ደግሞ ተጠቀም።';
-$ec_lang['template_translation_help']='የተሻለ አገላለጽ ወይም ሌላ ማንኛውንም ማሻሻያ ሊጠቁሙን ይችላሉ? እባክዎ ንገሩን።';
 $ec_lang['template_feedback']='እባክዎ አስተያየትዎን ወይም ምስጋናዎን ይላኩልን። ይህ ነፃ ካልኩሌተር ጠቅሞዎታል?';
 $ec_lang['template_printable_title']='ሊታተም የሚችል ርዕስ';
 $ec_lang['template_printable_subtitle']='ሊታተም የሚችል ንዑስ ርዕስ';

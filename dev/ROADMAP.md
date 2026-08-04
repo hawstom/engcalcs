@@ -125,6 +125,62 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   **no new translation** — the unit sets already exist and defaults are numbers — making it the
   cheapest testable change on the board. Do not ship it before the export; per-page default divergence
   is a real cost and (e) could argue against it.
+- 30|205| **One "contact me" line per page, not two — ENGLISH SHIPPED 2026-08-03; only the
+  26-language resync (d) remains.** Raised by Tom,
+  2026-08-03, on noticing that `Manning-Pipe-Flow.php` and `Looped-Network.php` showed different
+  invitation text. They are not one line with two wordings; they are two separate lines, both
+  linking to `contact.php`:
+  `echoHelpWanted()`/`template_translation_help` ("Can you suggest better wording…") above the form
+  on 18 pages, and `echoFeedback()`/`template_feedback` ("Please send suggestions or praise…") below
+  the form on every page. `Looped-Network.php` is the only calculator page that omits the first.
+  **They converged in commit `5b3ee95`**, which expanded `template_feedback` to cover suggestions,
+  roadmap advising, testing, contributing, and mentorship — swallowing the other line's whole
+  purpose. Two collapsible links to the same destination on one page do not double the invitation;
+  they halve the weight of each. Four changes; (a)-(c) are DONE in English, (d) is the open debt:
+  (a) **DONE 2026-08-03. Deleted `template_translation_help` and every `echoHelpWanted()` call**
+  (18 pages); function retired from `lib/Calculators.lib.php`. The key was removed from all 27 lang
+  files, so this *removed* 26 translated strings rather than adding any. `lang_parity_check.php`
+  reports `extra: 0`, confirming no orphans left behind.
+  (b) **DONE 2026-08-03. Folded the wording ask into the surviving line.** Kept because asking a reader whether the wording
+  is wrong *in their own language* is the one report only they can file, and per the standing rule
+  native review is real only when feedback actually lands — a generic "connect with the project"
+  pitch will not prompt a Khmer reader to report a bad label. Final English, settled with Tom
+  2026-08-03: `Can you suggest better wording or anything else? Do you want to help or to learn to
+  create tools like these? Please contact me.` The roadmap/testing/mentorship prose that `5b3ee95`
+  added comes **out** of the page string and goes onto `contact.php`, which is one click away and
+  can be as long as it likes. A calculator page's job is to invite; the landing page's job is to
+  explain.
+  (c) **DONE 2026-08-03. Placed the surviving line before the Notes heading on every page.** It was
+  before on 6
+  (`Looped-Network`, `Branched-Network`, `Irrigation-Pressure`, `Manning-Irregular`,
+  `Weir-Flow-Irregular`, `Weir-Flow-Simple`) and after on 10 (`Canal-Seepage`, `Darcy-Weisbach`,
+  `Hazen-Williams`, `Manning-Pipe-Flow`, `Manning-Pipe-Head-Loss`, `Manning-Trap`,
+  `Micro-Hydro-Power`, `Orifice`, `Orifice-Drain-Time`, `Rock-Chute`). Before-notes is not the
+  symmetry argument — Notes are reference prose the reader dips into, sometimes a full paragraph
+  (`lpn_notes_5_def`), so an after-notes line lands at the true bottom of the page where nobody is.
+  Immediately after the results is where the reader has what they came for and is most able to say
+  something useful. It also makes `lpn_notes_4_def`'s "(see the feedback link above)" true by
+  design rather than by accident.
+  (d) **OPEN — THE WHOLE REMAINING TASK. Resync `template_feedback` into all 26 languages.** Every
+  non-English file currently shows the *pre-`5b3ee95`* short wording ("Please send suggestions or
+  praise. Was this free calculator useful?"), which is now two generations behind the English. The
+  debt was already owed before this task — `5b3ee95` rewrote the English and no translation followed
+  — so merging first paid one sprint instead of two.
+  **The debt is tracked, not remembered:** `detect_english_drift.php` flags `template_feedback` under
+  CHANGED, and `--update` was deliberately NOT run, because re-baselining the manifest is exactly
+  what would erase the signal. Do not run `--update` until all 26 languages are actually resynced.
+  The same run reports `template_translation_help` under REMOVED, which is correct and needs no
+  action.
+  This is one key × 26 languages — small enough to fold into the next sprint that touches these
+  files (`lpn_`'s Task 146.06 is the obvious host) rather than standing up 26 agents for a single
+  string. Either way it needs Tom's explicit sprint authorization; it has not been given.
+  **First person is deliberate.** "me", not "us" — Tom, 2026-08-03: "scrupulously honest and
+  unpretentious. When the time is right, it can become 'us'." An audit of `lang.ec.en.php` found
+  only one other shipped first-person-plural string, `ip_q_ratio`'s tooltip ("different than **our**
+  approximation of the standard uniformity measure"); `about_body_html` is already consistently
+  singular. **`ip_q_ratio` stays as-is — decided, not deferred** (Tom, 2026-08-03): its "our" is the
+  *inclusive* first person, "the user and I" working the same calculation together, which is a
+  different pronoun from the institutional "we" that "contact me" avoids. Do not "fix" it.
 - 70|146| **Looped pipe network calculator with a map interface — new page `lpn_`. Scoped with Tom
   2026-07-28; was "Looped-network (Hardy Cross) solving", extracted from Task 137 on 2026-07-27.**
   A canvas/map-centric calculator where the interface *is* a drawing surface: elements (Junction,

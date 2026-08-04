@@ -9,8 +9,6 @@ echoHeader("EngCalcs", $html_title, "");
 <p class="collapse show d-print-none" id="relatedCalcs">
 	<?=$ec_lang['ec_related_calcs']?> <a href="Manning-Irregular.php"><?=$ec_lang['mi_menu']?></a> &middot; <a href="Rock-Chute.php"><?=$ec_lang['rc_main_menu']?></a> &middot; <a href="Canal-Seepage.php"><?=$ec_lang['cs_main_menu']?></a> &middot; <a href="Manning-Pipe-Flow.php"><?=$ec_lang['mpf_main_menu']?></a> <a data-bs-toggle="collapse" href="#relatedCalcs" aria-expanded="true" aria-controls="relatedCalcs"><?=$ec_lang['view_hide_line']?></a>
 </p>
-<?php echoHelpWanted(); ?>
-
 <?php
 echoCalculatorForm(
 	//Inputs
@@ -58,14 +56,14 @@ echoCalculatorForm(
 
 <div id="sketch"></div>
 
+<?php echoFeedback(); ?>
+
 <h2><?=$ec_lang['ws_notes_heading']?></h2>
 <?php echo $ec_lang['mtc_note_1']; ?>
 <dl>
 	<dt><?=$ec_lang['mtc_note_2_term']?></dt>
 	<dd><?=$ec_lang['mtc_note_2_def']?></dd>
 </dl>
-
-<?php echoFeedback(); ?>
 <script>
 EngCalcs.pageConfig = {
 	mtc_vel_ok: <?=json_encode($ec_lang['mtc_vel_ok'])?>,

@@ -5,8 +5,6 @@ $html_desc = $ec_lang['odt_main_desc'];
 echoHeader("EngCalcs", $html_title, "");
 ?>
 <h2><?=$ec_lang['odt_main_desc']?></h2>
-<?php echoHelpWanted(); ?>
-
 <?php
 echoCalculatorForm(
 	//Inputs
@@ -37,14 +35,14 @@ echoCalculatorForm(
 
 <div id="sketch" style="margin-top:1em; max-width:540px;"></div>
 
+<?php echoFeedback(); ?>
+
 <h2><?=$ec_lang['ws_notes_heading']?></h2>
 <dl>
 	<dt><?=$ec_lang['odt_notes_1_term']?></dt><dd><?=$ec_lang['odt_notes_1_def']?></dd>
 	<dt><?=$ec_lang['odt_notes_2_term']?></dt><dd><?=$ec_lang['odt_notes_2_def']?></dd>
 	<dt>Derivation</dt><dd><a href="Orifice-Drain-Time-Ref.php">Equation derivation</a></dd>
 </dl>
-
-<?php echoFeedback(); ?>
 <script src="/engcalcs/js/orifice-drain-time.js?v=<?=filemtime(__DIR__.'/js/orifice-drain-time.js')?>"></script>
 <script>
 EngCalcs.pageConfig = {

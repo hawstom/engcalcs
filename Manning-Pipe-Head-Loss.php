@@ -6,8 +6,6 @@ echoHeader("EngCalcs", $html_title, "");
 
 ?>
 <h2><?php echo $ec_lang['mphl_main_desc']; ?></h2>
-<?php echoHelpWanted(); ?>
-
 <?php
 echoCalculatorForm(
 	//Inputs
@@ -39,10 +37,10 @@ echoCalculatorForm(
 );
 ?>
 
+<?php echoFeedback(); ?>
+
 <h2><?=$ec_lang['ws_notes_heading']?></h2>
 <?php echo $ec_lang['mphl_note_1']; ?>
-
-<?php echoFeedback(); ?>
 <script>
 EngCalcs.pageConfig = {
 	mhp_vel_ok_short:   <?=json_encode($ec_lang['mhp_vel_ok_short'])?>,

@@ -6,8 +6,6 @@ echoHeader("EngCalcs", $html_title, "");
 ?>
 <h2><?php echo $ec_lang['mi_main_desc'] ?></h2>
 
-<?php echoHelpWanted(); ?>
-
 <?php
 echoCalculatorForm(
 	//Inputs

@@ -5,8 +5,6 @@ $html_desc = $ec_lang['install_main_desc'];
 echoHeader("EngCalcs", $html_title, "", false);
 ?>
 <h2><?=$ec_lang['install_main_desc']?></h2>
-<?php echoHelpWanted(); ?>
-
 <p><?=$ec_lang['install_intro']?></p>
 
 <h3><?=$ec_lang['install_android_heading']?></h3>

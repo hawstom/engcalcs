@@ -5,8 +5,6 @@ $html_desc = $ec_lang['bpn_main_desc'];
 echoHeader("EngCalcs", $html_title, "");
 ?>
 <h2><?=$ec_lang['bpn_main_desc']?></h2>
-<?php echoHelpWanted(); ?>
-
 <?php
 echoCalculatorForm(
 	// Inputs

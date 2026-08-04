@@ -5,8 +5,6 @@ $html_desc = $ec_lang['rc_main_desc'];
 echoHeader("EngCalcs", $html_title, "");
 ?>
 <h2><?=$ec_lang['rc_main_desc']?></h2>
-<?php echoHelpWanted(); ?>
-
 <?php
 echoCalculatorForm(
 	// Inputs
@@ -41,12 +39,12 @@ echoCalculatorForm(
 
 <div id="rc_sketch" style="margin-top:1em;max-width:510px;"></div>
 
+<?php echoFeedback(); ?>
+
 <h2><?=$ec_lang['ws_notes_heading']?></h2>
 <dl>
 	<dt><?=$ec_lang['rc_notes_4_term']?></dt><dd><?=$ec_lang['rc_notes_4_def']?></dd>
 </dl>
-
-<?php echoFeedback(); ?>
 <script>
 EngCalcs.pageConfig = {
 	rc_eq1:          <?=json_encode($ec_lang['rc_eq1'])?>,

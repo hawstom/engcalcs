@@ -5,8 +5,6 @@ $html_desc = $ec_lang['mhp_main_desc'];
 echoHeader("EngCalcs", $html_title, "");
 ?>
 <h2><?=$ec_lang['mhp_main_desc']?></h2>
-<?php echoHelpWanted(); ?>
-
 <?php
 echoCalculatorForm(
 	//Inputs
@@ -38,6 +36,8 @@ echoCalculatorForm(
 
 <div id="sketch" style="margin-top:1em; max-width:340px;"></div>
 
+<?php echoFeedback(); ?>
+
 <h2><?=$ec_lang['ws_notes_heading']?></h2>
 <dl>
 	<dt><?=$ec_lang['mhp_notes_1_term']?></dt><dd><?=$ec_lang['mhp_notes_1_def']?></dd>
@@ -46,8 +46,6 @@ echoCalculatorForm(
 	<dt><?=$ec_lang['mhp_notes_6_term']?></dt><dd><?=$ec_lang['mhp_notes_6_def']?></dd>
 	<dt><?=$ec_lang['mhp_notes_7_term']?></dt><dd><?=$ec_lang['mhp_notes_7_def']?></dd>
 </dl>
-
-<?php echoFeedback(); ?>
 <script>
 EngCalcs.pageConfig = {
 	mhp_vel_low:  <?=json_encode($ec_lang['mhp_vel_low'])?>,

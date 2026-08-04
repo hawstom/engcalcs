@@ -1,18 +1,11 @@
 <?php
 
-function echoHelpWanted(){
-    global $ec_lang;
-?>
-<p class="collapse show d-print-none" id="helpWanted">
-	<a href="../contact.php"><?=$ec_lang['template_translation_help']?></a> <a data-bs-toggle="collapse" href="#helpWanted" aria-expanded="true" aria-controls="helpWanted"><?=$ec_lang['view_hide_line']?></a>
-</p>
-<br />
-
-
-
-<?php
-}
-
+// One invitation line per page, placed after the results and before the Notes (ROADMAP Task 205).
+// This absorbed the former echoHelpWanted()/template_translation_help line that used to sit above
+// the form: both linked to contact.php, and once template_feedback was broadened they said the same
+// thing. Two collapsible links to one destination halve each other's weight rather than doubling
+// the invitation. The "better wording" ask survives inside template_feedback on purpose -- it is
+// the one report only a non-English reader can file.
 function echoFeedback(){
     global $ec_lang;
 ?>

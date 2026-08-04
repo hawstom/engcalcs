@@ -62,7 +62,6 @@ $ec_lang['menu_main_hydraulics']='វិស្វកម្មហ៊ីដ្រ�
 $ec_lang['menu_main_language']='ភាសា';
 $ec_lang['menu_more']='បន្ថែម';
 $ec_lang['template_welcome']='ទម្លាក់ការភ័យខ្លាចរបស់អ្នកនៅក្រៅទ្វារ; ក្ដីស្រឡាញ់ត្រូវបានប្រើសម្រាប់ភាសាទីនេះ។ អ្នកមិនបំផ្លាញអ្វីទាំងអស់ឡើយ។ រីករាយជាមួយ <a target="_blank" href="https://hawsedc.com/download.php">ឧបករណ៍ HawsEDC AutoCAD ឥតគិតថ្លៃ</a> ផងដែរ។';
-$ec_lang['template_translation_help']='តើអ្នកអាចផ្ដល់យោបល់អំពីពាក្យសម្ដីល្អជាងនេះ ឬអ្វីផ្សេងទៀតបានទេ? សូមប្រាប់យើងផង។';
 $ec_lang['template_feedback']='សូមផ្ញើមតិយោបល់ ឬការសរសើរមកយើង។ តើម៉ាស៊ីនគណនាឥតគិតថ្លៃនេះមានប្រយោជន៍សម្រាប់អ្នកទេ?';
 $ec_lang['template_printable_title']='ចំណងជើងដែលអាចបោះពុម្ព';
 $ec_lang['template_printable_subtitle']='ចំណងជើងរងដែលអាចបោះពុម្ព';

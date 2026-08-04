@@ -5,7 +5,6 @@ $html_desc = $ec_lang['irr_main_desc'];
 echoHeader("EngCalcs", $html_title, "", false);
 ?>
 <h2><?=$ec_lang['irr_main_desc']?></h2>
-<?php echoHelpWanted(); ?>
 <?=$ec_lang['irr_intro_html']?>
 
 <div class="row row-cols-1 row-cols-md-2 g-4 mb-4">

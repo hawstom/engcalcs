@@ -5,7 +5,6 @@ $html_desc = $ec_lang['about_main_desc'];
 echoHeader("EngCalcs", $html_title, "", false);
 ?>
 <h2><?=$ec_lang['about_main_desc']?></h2>
-<?php echoHelpWanted(); ?>
 <?=$ec_lang['about_body_html']?>
 
 <?php echoFeedback(); ?>
