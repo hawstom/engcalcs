@@ -158,3 +158,59 @@ Non-English share of MPF is roughly 199/1576 ≈ 13% of humans on that page, con
 2026-07-21 capture (en 83%, es 10%). The two tables may cover different windows, so treat that ratio
 as approximate. Nothing here justifies translating fewer languages: the suite's parity model keeps
 every key in all 27 files, and this data sequences **QA and spot-check effort**, not shipping.
+
+---
+
+## 2026-08-03 (later the same day) — arrival pattern, and two corrections to the snapshot above
+
+Run of the new "Arrival pattern for non-English humans (bot-dwell check)" section.
+
+| lang | views | days | burst | | lang | views | days | burst |
+|------|------:|-----:|------:|-|------|------:|-----:|------:|
+| es | 188 | 8 | 2 | | de | 5 | 4 | 1 |
+| pt | 31 | 7 | 2 | | it | 3 | 3 | 1 |
+| fr | 25 | 5 | 2 | | ro, hr | 2 | 2 | 1 |
+| tr | 19 | 5 | 2 | | bg | 2 | 1 | 1 |
+| zh | 13 | 6 | 1 | | uk, sw, ru, id, cs, bn | 1 | 1 | 1 |
+| he | 10 | 5 | 1 | | | | | |
+
+**The bot hypothesis is REFUTED, and it was CC's, not Tom's — Tom raised it as a question and CC
+argued it was the more likely explanation.** `zh` is 13 views spread over 6 days with a maximum of
+one view in any minute. That is *more* human-shaped than `es` (8 days, burst 2). A rendering crawler
+does not visit once a day for a week. These are real people.
+
+### Two corrections to the 2026-08-03 snapshot above
+
+1. **"Fifteen of 26 languages appear nowhere" was wrong — it is nine**: am, ar, fa, hi, km, my, ps,
+   sr, ur. The earlier cross-tab paste was truncated at 2-view rows, hiding uk, sw, ru, id, cs and
+   bn at one view each. A truncated paste read as a zero.
+2. **"Two of four anchor languages have zero confirmed human use" was overstated.** `ar` is zero;
+   `ru` has one view. The directional point survives — es 188, fr 25, ru 1, ar 0, against pt 31 and
+   tr 19 which are not anchors — but it is "one anchor at zero and one at one", not "two at zero".
+
+### Where `zh` stands after eliminating the cheap explanations
+
+Checked and clean: **no missing keys** (`lang_parity_check --lang=zh` shows 159 missing, all of them
+`lpn_`, which is English-only by design; every `mpf_` key is present); identity strings correct and
+clearly promise a calculator (`mpf_main_title` = 免费在线曼宁管流计算器); unit tokens translated;
+`EC_DEFAULT_UNIT_SET` correctly gives a `zh` visitor SI. Tom read the page and back-translated it and
+found nothing. It is not bots, not missing strings, and not a wrong promise in search results.
+
+**So it is either small-sample noise or something not visible remotely — and the honest move is to
+wait rather than spend.** The log accrues for free.
+
+**PRE-REGISTERED TEST, so the next look costs nothing statistically.** The weakness of the original
+finding was the look-elsewhere effect: `zh` was picked as the worst of 11 languages, so its raw
+p-value overstated the case. Naming it in advance now removes that penalty entirely. Against the
+peer rate p = 0.60:
+
+| at n views | REAL if using ≤ | NOISE if using ≥ |
+|-----------:|----------------:|-----------------:|
+| 20 | 7 | 10 |
+| 25 | 10 | 13 |
+| 30 | 13 | 16 |
+
+If `zh` is truly ~60% like its peers, expected using at n=30 is 18. If it is truly ~15%, it is 4–5.
+Those do not overlap, so n=30 decides it. **Do not spend on `zh` before then, and do not re-score its
+QUALITY either way.**
+

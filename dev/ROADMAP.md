@@ -256,39 +256,26 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   as of this paragraph's original writing; resolved by commit `7428ff0 Task 146: close the
   empty-canvas open question`, 2026-07-29) — a new project opens on the placeholder-text canvas
   above, not a worked example.
-- 25|202| **`zh` converts at 17% — probably crawlers, not a translation defect. Check the arrival
-  pattern before spending anything else on it.** Dropped 55 → 25 on 2026-08-03 after two things
-  moved the odds hard toward "not a defect".
-  - **Tom inspected it and found nothing.** He read `zh` on Manning-Pipe-Flow, then had Chrome
-    translate it back to English; it looked good and usable both ways. That does not rule out
-    reading *badly* to a native engineer — nothing we can run does — but a defect severe enough to
-    stop 10 of 12 people from ever typing a number should have been visible, and was not.
-  - **Tom's own hypothesis is the better one, and it fits the signature exactly:** a JS-executing
-    crawler with a Chinese `Accept-Language` that dwells ≥10s trips the confirmed-human beacon and
-    then never calculates. That produces high shopping and near-zero using — precisely what `zh`
-    shows. His objection that it "doesn't seem very efficient of them" is fair for a classic
-    crawler, but headless-Chrome-based crawlers do render and wait, so the dwell is a side effect of
-    rendering, not deliberate patience.
-  - **The statistics are weaker than they first looked, because of the look-elsewhere effect.**
-    P(≤2 of 12 | p = 0.60) = 0.28%, about 1 in 356 — striking for a language named in advance.
-    But `zh` was picked as the WORST of 11 languages, and P(at least one of 11 that extreme) ≈
-    **3.1%**. Suggestive, not conclusive, and nowhere near enough to act on alone. The original
-    entry quoted the 0.28% framing without this correction; recording the correction because
-    "widest gap in the table" is exactly the setup where a raw p-value misleads.
-  - **The check is now built and costs nothing:** the "Arrival pattern for non-English humans
-    (bot-dwell check)" section in `log/lang-log-stats.sh` reports views / distinct days / biggest
-    single-minute burst per language. **12 views on 1 day is a crawler; 12 views over 9 days is 12
-    people.** Run it before doing anything else here — it uses data already on disk, so no waiting.
-  - **If it IS a crawler, the finding is bigger than `zh`** and belongs to the whole report: the
-    confirmed-human tier is not as bot-proof as the script's comments claim ("bots essentially never
-    reach this"), and every `%shopping` figure in the suite inherits that. Fixing it would mean
-    logging something that separates them — a coarse UA class is the obvious candidate.
-  - **If it is NOT a crawler**, then look for something blocking COMPLETION rather than
-    comprehension — a units token rendering unreadably, a required field whose label misleads, a
-    result heading that makes a correct answer look like an error, or CJK text pushing a field off
-    screen on a phone. A back-translation pass would already have caught a wrong word; it would not
-    catch any of those, which is what a completion-shaped dropout implies.
-  - **Do not re-score `zh`'s QUALITY on this either way** until the arrival pattern is checked.
+- 15|202| **`zh` converts at ~15% where its peers convert at 50–75% — PARKED until n=30, with a
+  pre-registered threshold.** Everything cheap has been eliminated; what remains is a decision that
+  data will make for free.
+  - **Not bots.** The arrival-pattern check (built for exactly this) shows `zh` at 13 views over 6
+    days, burst 1 — more human-shaped than `es` at 8 days, burst 2. **The bot hypothesis was CC's**,
+    argued as more likely than a defect, and it was wrong.
+  - **Not missing strings.** `lang_parity_check --lang=zh` reports 159 missing, every one of them
+    `lpn_` (English-only by design). All `mpf_` keys present, unit tokens translated,
+    `EC_DEFAULT_UNIT_SET` correctly gives `zh` SI.
+  - **Not a wrong promise in search.** `mpf_main_title` = 免费在线曼宁管流计算器 — unambiguously a
+    calculator. And Tom read the page, and back-translated it, and found nothing.
+  - **PRE-REGISTERED TEST — this is the point of the entry.** The original finding's weakness was the
+    look-elsewhere effect: `zh` was the worst of 11 languages, so its raw p-value overstated the
+    case. Naming it in advance removes that penalty. Against the peer rate p = 0.60: at n = 30,
+    **real if using ≤ 13, noise if using ≥ 16** (expected 18 if `zh` behaves like its peers, 4–5 if
+    it is truly ~15%). Earlier checkpoints: n = 20 → real if ≤ 7; n = 25 → real if ≤ 10.
+  - **Priority 15 on purpose.** Not because it stopped mattering — a genuine 15% on a language we
+    have already paid to translate would matter a lot — but because **no amount of work now improves
+    the answer**, and the log accrues at zero cost. Re-read it when `zh` passes 30 views.
+  - **Do not re-score `zh`'s QUALITY in either direction before then.**
 
 - 45|146.02| **EPANET-style icon toolbar + map symbol icons (Task 146 child).** Replace/supplement
   the current toolbar with EPANET-style icons for elements and map symbols. **Must land before the
