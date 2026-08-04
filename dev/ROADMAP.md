@@ -277,6 +277,67 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     the answer**, and the log accrues at zero cost. Re-read it when `zh` passes 30 views.
   - **Do not re-score `zh`'s QUALITY in either direction before then.**
 
+- 60|203| **Tier translation SPEND by calculator, not by language — decision framework, open for
+  Tom's ruling.** Tom, 2026-08-03: *"is it cost-effective to translate all calculators to 26
+  languages? … Should we let probationary languages prove themselves on the top calculators first
+  before we dive into another 14 × 26 sprint?"* The question is right and the timing is right — before
+  a sprint, not after. But it **bundles two decisions that have opposite answers**, and separating
+  them is most of the work.
+
+  **DECISION A — which LANGUAGES exist at all. Recommendation: do NOT tier. Keep all 26.**
+  - **Chicken-and-egg.** A language with no reach may have none *because* the page is not
+    discoverable in it. "Prove your worth first" is unfalsifiable when the proving requires the thing
+    being withheld. This is the standing `zero reach ≠ low value` rule in
+    `dev/translation-process.md`, and the 2026-08-03 data strengthens it rather than weakening it:
+    `es` at 188 confirmed humans over 8 days is what a language looks like *after* the door opens.
+  - **The cost is already sunk.** All 26 exist for every calculator except `lpn_`. Demoting one saves
+    nothing retroactively; it only forfeits an asset already paid for.
+  - **Mission.** Tools are the vehicle, not the destination. One Khmer-speaking engineer reached is
+    not worth less than one Spanish-speaking engineer reached. Efficiency framing quietly becomes
+    "serve the already-served," which is the opposite of the point. What efficiency *legitimately*
+    argues is that spending which reaches **nobody** delivers nothing — untranslated-and-unvisited is
+    no loss; **unvisited-because-untranslated is.**
+
+  **DECISION B — which CALCULATORS get a full 26-language sprint. Recommendation: DO tier. This is
+  where the money actually is.**
+  - The 2026-08-03 snapshot shows all non-English human use landing on **five** calculators — MPF,
+    MTC, HW, DW, MPHL. A sixteenth calculator translated 26 ways before it has demonstrated demand
+    *in any language* is speculative spending, and it is the only kind here that is still avoidable.
+  - **Gate on TOTAL confirmed human use, in any language — not on English use.** The tempting
+    version ("earn English traffic first, then translate") rests on non-English demand being
+    proportional to English demand, and the data does not support that: non-English share is ~13% on
+    MPF but appears *higher* on the smaller calculators (HW, DW). Those are small samples and may be
+    different windows, so the honest move is to sidestep the assumption entirely by gating on a
+    number that needs no such model.
+  - **Suggested gate, for Tom to set or reject:** a calculator earns its full sprint at **≥50
+    confirmed human uses**. Below that it has not demonstrated demand anywhere.
+
+  **THE MECHANISM THAT BREAKS THE CHICKEN-AND-EGG — and it is already this project's own finding.**
+  `dev/translation-process.md` records: *"es at 10% proves the door opens when identity strings are
+  discoverable."* Identity strings — menu entry, `<title>`, `*_main_desc` — are what a search engine
+  indexes; they are the discovery mechanism, and they are **~3 strings per calculator against ~100+
+  for a body**. So:
+  - **Translate identity strings for every calculator in every language** (cheap, and it is what
+    makes a language able to prove anything at all).
+  - **Gate the body on the demand that then shows up.** A language that starts arriving on a
+    calculator earns that calculator's full sprint.
+  - **Honest downside, which is why this is a recommendation and not a decision:** a page with a
+    translated title and an English body is a worse artifact than either extreme, and it produces
+    exactly the views-without-usage signature that `zh` currently shows — so it would pollute the
+    metric it is meant to feed. Mitigate by treating it as an explicitly instrumented *probation*
+    state, not a resting state.
+
+  **THE COST NOBODY BUDGETS IS MAINTENANCE, NOT SPRINTS.** A one-time sprint is a known, bounded
+  cost. Every English edit afterwards creates 26 debts *forever* — Task 193 alone changed 51 strings.
+  That recurring cost can be tiered by reach with **no user-visible partial state at all**, which
+  makes it strictly better value than tiering the sprints. Partly done already via the QUALITY tiers
+  and `es`-as-spot-check; worth making explicit.
+
+  **LIVE CONSEQUENCE — Task 146.06 (`lpn_`, 154 keys × 26).** Under this framework the sprint waits
+  until `lpn_` clears the gate. It currently shows 2 confirmed uses, and those were mismeasured
+  (Task 199). This is already how the two are ranked (146.06 at 5, Task 195 at 90) — the framework
+  just supplies the reason, and a number.
+
 - 45|146.02| **EPANET-style icon toolbar + map symbol icons (Task 146 child).** Replace/supplement
   the current toolbar with EPANET-style icons for elements and map symbols. **Must land before the
   translation sprint (146.06) — this blocks it**, per Tom, 2026-07-29.
