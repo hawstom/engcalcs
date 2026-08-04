@@ -2092,7 +2092,11 @@ var EngCalcs = EngCalcs || {};
 	// open one in an editor to see what is in it; the cost is a few percent on a small network,
 	// and on a big one the backdrop's data URL dominates the size no matter what we do here.
 	function projectFileText() { return JSON.stringify(serializeProject(), null, '\t'); }
-	function projectFileName() { return 'lpn-' + safeFileName(projectDisplayName(project)) + '.json'; }
+	// Project name FIRST (Tom offered both orders, 2026-08-03). In an alphabetical folder listing a
+	// common prefix makes every file look identical and pushes the one distinguishing part off the
+	// end of the column; engineers scan these by project. The suffix still says where the file came
+	// from, which is what someone finds a year later in a folder they have forgotten about.
+	function projectFileName() { return safeFileName(projectDisplayName(project)) + '-lpn-hawsedc-engcalcs.json'; }
 	// The Phase 1 path, and still the fallback wherever the File System Access API is missing
 	// (Firefox and Safari today). A one-shot download: the browser owns where it lands and there is
 	// no handle afterwards, so nothing can be written back to it.
@@ -2276,8 +2280,57 @@ var EngCalcs = EngCalcs || {};
 		releaseLock();
 		setReadOnly(false);
 	}
+	// Shown once per browser, before the first file picker ever opens (Tom, 2026-08-03). Built as a
+	// PANEL with its own Continue button rather than a confirm() or alert(), for a hard technical
+	// reason as well as a readability one: showSaveFilePicker() requires a live user activation, and
+	// Chrome's transient activation expires after a few seconds -- long enough to read three
+	// sentences and no longer. A blocking dialog would therefore work for a fast reader and throw
+	// "must be handling a user gesture" for a careful one. Continue is a fresh click, so it always
+	// has an activation of its own.
+	var pendingFileAction = null;
+	function requireFileIdentity(action) {
+		if (loadIdentity()) { return true; }
+		pendingFileAction = action;
+		showFileTraining();
+		return false;
+	}
+	function showFileTraining() {
+		var pc = EngCalcs.pageConfig || {}, list = document.getElementById('lpn_projects_list');
+		if (!list) { return; }
+		list.innerHTML = '';
+		[pc.lpn_file_training_1, pc.lpn_file_training_2, pc.lpn_file_training_3].forEach(function (t) {
+			if (!t) { return; }
+			var p = document.createElement('p');
+			p.style.margin = '4px 0';
+			p.textContent = t;
+			list.appendChild(p);
+		});
+		var label = document.createElement('label');
+		label.textContent = (pc.lpn_file_training_name || 'Your initials') + ' ';
+		var input = document.createElement('input');
+		input.type = 'text'; input.maxLength = 60; input.style.marginLeft = '4px';
+		label.appendChild(input);
+		list.appendChild(label);
+		list.appendChild(document.createElement('br'));
+		var go = document.createElement('button');
+		go.type = 'button'; go.style.marginTop = '6px';
+		go.textContent = pc.lpn_file_training_continue || 'Continue';
+		go.addEventListener('click', function () {
+			// An empty name is allowed. Colleagues then see lpn_lock_somebody, which is worse for
+			// them but is the user's call to make -- refusing to continue would be a gate on a
+			// feature whose whole point is that there is no login.
+			identity = { holder: randomToken(24), name: input.value.trim().slice(0, 60) };
+			writeJSON(LPN_IDENTITY_KEY, identity);
+			var next = pendingFileAction;
+			pendingFileAction = null;
+			if (next === 'open') { openFromFile(); } else { saveToFile(); }
+		});
+		list.appendChild(go);
+		input.focus();
+	}
 	async function saveToFile() {
 		if (!fileApiAvailable()) { downloadProjectFile(); return; }
+		if (!requireFileIdentity('save')) { return; }
 		var handle = linkedHandle();
 		if (!handle) {
 			try {
@@ -2301,6 +2354,7 @@ var EngCalcs = EngCalcs || {};
 			if (input) { input.click(); }
 			return;
 		}
+		if (!requireFileIdentity('open')) { return; }
 		var picked;
 		try { picked = await window.showOpenFilePicker({ multiple: false, types: fileTypes() }); }
 		catch (err) { return; } // cancelled
@@ -2348,19 +2402,24 @@ var EngCalcs = EngCalcs || {};
 		setFileMissing(false);
 		await saveToFile();
 	}
-	// The copied-file escape hatch. We cannot detect a copy: the File System Access API exposes only
-	// handle.name, never a path, so "same file moved" and "a copy in another folder" are genuinely
-	// indistinguishable to us -- and the common blooper (copy to a backup folder, same name) is
-	// exactly the case a name comparison would miss. Rather than guess wrong, this lets someone who
-	// KNOWS they are working on a copy say so, which is the one reliable signal available.
-	function forkProject() {
-		var pc = EngCalcs.pageConfig || {};
-		if (!window.confirm(pc.lpn_project_fork_confirm || 'Treat this as a separate project from the file it was copied from? Colleagues editing the original will no longer be told you have this one open.')) { return; }
-		releaseLock();
-		project.docId = newDocId();
+	// The escape hatch from being locked out of a file that is not really "yours" -- most often a
+	// project someone shared from outside the office (Tom, 2026-08-03). Offered ONLY from the
+	// locked-out banner, deliberately never as a standing button: a copy is a fork of the truth, and
+	// a page that advertises forking teaches people to make copies they will later have to reconcile.
+	// Here it is the answer to a question the user is already stuck on, which is the one moment it
+	// genuinely helps.
+	//
+	// We cannot detect a copy on our own: the File System Access API exposes handle.name and never a
+	// path, so "the same file, moved" and "a copy in another folder" are indistinguishable -- and the
+	// common blooper, a copy that keeps its name, is exactly what a name comparison would miss.
+	async function forkToOwnCopy() {
+		if (!library.openId) { return; }
+		releaseLock();                        // stop answering to the original's lock
+		project.docId = newDocId();           // a genuinely separate document from here on
+		fileHandles.delete(library.openId);   // and a separate FILE: ask where to put it
 		saveToStorage();
 		setReadOnly(false);
-		acquireLockForOpenProject();
+		await saveToFile();
 		rebuildProjectsList();
 	}
 
@@ -2461,6 +2520,12 @@ var EngCalcs = EngCalcs || {};
 		}
 		if (bannerRO && bannerRO.stealFrom !== null && bannerRO.stealFrom !== undefined) {
 			action((pc.lpn_lock_takeover || 'Take over from {name}').replace('{name}', bannerRO.stealFrom || (pc.lpn_lock_somebody || 'Somebody else')), takeOverLock);
+		}
+		// Offered whenever somebody else holds the file, including during the "please wait" window:
+		// a person who was sent this file from outside the office is not waiting for anything, and
+		// telling them to wait for a stranger is the worst of the answers available.
+		if (bannerRO) {
+			action(pc.lpn_lock_own_copy || 'Save as my own copy', forkToOwnCopy);
 		}
 		if (!bannerRO && bannerWarn) {
 			if (bannerWarn.action) { action(bannerWarn.actionLabel, bannerWarn.action); }
@@ -2788,12 +2853,6 @@ var EngCalcs = EngCalcs || {};
 			if (pc.lpn_project_close_tip) { helpTip(unlinkBtn, pc.lpn_project_close_tip); }
 			unlinkBtn.addEventListener('click', function () { unlinkFile(); });
 			linkRow.appendChild(unlinkBtn);
-			var forkBtn = document.createElement('button');
-			forkBtn.type = 'button'; forkBtn.style.marginLeft = '4px';
-			forkBtn.textContent = pc.lpn_project_fork || 'This is a copy';
-			if (pc.lpn_project_fork_tip) { helpTip(forkBtn, pc.lpn_project_fork_tip); }
-			forkBtn.addEventListener('click', function () { forkProject(); });
-			linkRow.appendChild(forkBtn);
 			list.appendChild(linkRow);
 		}
 	}

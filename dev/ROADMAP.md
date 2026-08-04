@@ -1244,10 +1244,106 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     folder keeps the name). Instead there is a **"This is a copy"** button that assigns a fresh
     `docId` and releases the old lock, letting the one party who actually knows say so.
 
+  **Second review round, 2026-08-03 (same day), from Tom's follow-up:**
+  - **File name is now `[project]-lpn-hawsedc-engcalcs.json`** — project first, of the two orders Tom
+    offered. A common prefix makes every file in a folder listing look identical and pushes the one
+    distinguishing part off the end of the column; the suffix still says where the file came from,
+    which is what helps someone a year later.
+  - **A one-time training panel before the first file picker**, explaining in three short sentences
+    that the project lives in a file, that the site tracks who has it open, and that a colleague can
+    take over. Built as a **panel with its own Continue button, not a `confirm()`** — for a hard
+    reason: `showSaveFilePicker()` needs a live user activation and Chrome's transient activation
+    expires in a few seconds, so a blocking dialog would work for a fast reader and throw for a
+    careful one. Continue is a fresh click. Shown once per browser; the snooze/dismiss version Tom
+    asked for is **Task 209**.
+  - **The name prompt now asks for initials and says the name is public** — see Task 208(a).
+  - **"Close project" renamed "Close file".** Tom asked whether it clears the screen like Start empty
+    project; it does not, and that question is exactly why the old name was wrong. Nothing leaves the
+    screen, nothing is deleted, the file is handed back.
+  - **"Download a copy" is conditional, and that is deliberate** (Tom asked). It is the same button:
+    "Save to file" where the File System Access API exists and each press writes to the linked file,
+    "Download a copy" where it does not and each press genuinely is another file. The label tracks
+    what the button will actually do rather than promising one thing and doing the other.
+  - **"This is a copy" was removed as a standing button** and became **"Save as my own copy" in the
+    locked-out banner only.** Tom: *"'This is a copy' is bad psychology. We must promote One True
+    Copy."* Right — a page that advertises forking teaches people to make copies they must later
+    reconcile. As an escape from being locked out it is the answer to a question the user is already
+    stuck on; as a button on the shelf it is an invitation.
+
   **Still not done:** the UI has still never been seen rendered by the author. Every check is a
-  harness against sliced-out logic (157 across four harnesses now), not a click. Tom's pass above is
-  the only real browser evidence so far, and it was on a non-secure origin, so the entire
+  harness against sliced-out logic (162 across four harnesses now), not a click. Tom's pass so far is
+  the only real browser evidence, and it was on a non-secure origin, so the entire
   handle/lock/read-only path remains unexercised in a real browser.
+- 55|208| **A lock that travels with a COPY of a file is the wrong lock — the sharing hole in Task
+  195 Phase 2 (Task 146 child).** Raised by Tom, 2026-08-03, thinking past the office case the lock
+  broker was designed for: *"What if somebody shares their project outside their office?"* Two
+  consequences, and he is right about both.
+  - **(a) The friendly name goes everywhere the file does.** "Locked by Dave in Planning" was written
+    for colleagues and is then read by strangers. **Partly mitigated 2026-08-03** — the prompt now
+    asks for *initials* and says outright that anyone you send the file to can see it, which makes
+    the safe answer the obvious one. Mitigation, not a fix: the name is still broadcast.
+  - **(b) Strangers lock each other out.** `docId` is baked into the file, so every copy of a shared
+    file answers to ONE lock record. Two unrelated people who were both sent the file contend for it,
+    and the loser is read-only over a project the winner has never heard of. **Partly mitigated
+    2026-08-03** — "Save as my own copy" is now offered in the locked-out banner (including during
+    the please-wait window, since someone outside the office is not waiting for anything), turning a
+    lockout into one click. Still: the *default* experience of opening a shared file can be a lockout,
+    and that is backwards.
+
+  **Why the obvious fixes do not work.** Tom proposed AutoCAD's side-by-side `.dwg`/`.dwl` pair, and
+  identified the blocker himself: we cannot find "a file in the same folder as" a file. A
+  `FileSystemFileHandle` gives a name and nothing else — no path, no parent — unless the user grants a
+  *directory* handle, which is a different and much heavier permission prompt. Worth noting one real
+  capability we do have and are not using: **`handle.isSameEntry()`** can tell whether two handles
+  point at the same file, and handles can be persisted in IndexedDB. That does not solve sharing
+  (it is per-browser), but it would let us answer "is this the same file I had last time" across
+  sessions — which is the honest version of the moved-vs-copied question for a single user, and is
+  Tom's 7.1 ("we can keep a persistent reference in this browser").
+
+  **Candidate directions, none chosen:**
+  - **Ask a directory handle for the project's folder** and keep the lock in a sidecar file there.
+    Solves sharing properly (the lock lives with the *location*, not the *document*), at the cost of
+    a scarier permission prompt and Chromium-only support.
+  - **Scope the lock to a declared team**, so a lock record is per (docId × team) and an outsider
+    simply never sees an insider's lock. Cheap, but requires a shared secret nobody wants to manage.
+  - **Ask on open, rather than assume**, per Tom's own sketch: *"This project is currently locked by
+    'ABC' in another browser or at another location. SaveAs, Take over, or Cancel?"* — which is close
+    to what now ships, and may be all this needs if the wording carries the "One True Copy" idea.
+  - **Accept it and document it**: locking is for a shared drive in one office; a file you send
+    outside should be forked on arrival.
+
+  Do not treat the 2026-08-03 mitigations as closing this. They make the failure survivable; they do
+  not make the lock mean the right thing.
+
+- 40|209| **A snoozable tip system (Task 146 child, but suite-shaped).** Asked for by Tom,
+  2026-08-03, while reviewing Task 195's file-and-lock explanation: the page needs somewhere to put
+  "here is what is about to happen" text that a user can dismiss for now and see again later, rather
+  than the two states we have (shown once ever, or shown every time). Phase 2's training panel is the
+  first instance and currently uses the crude version — **shown once per browser, keyed off whether
+  an identity exists** — which is right for onboarding and wrong for anything a user might want back.
+  Wants: dismiss, snooze, and a way to bring a tip back deliberately (a "show me that again" in
+  Settings). Suite-shaped rather than `lpn_`-only: every calculator has explanations it currently
+  either buries in Notes or repeats forever.
+
+- 30|210| **Stop counting Tom's own visits in the usage logs.** Asked 2026-08-03: *"is it hard to
+  ignore my visits? I suppose we can pretty easily detect me in the logs if I exercise many
+  calculators and languages in a human way."* Not hard, and worth doing before more hand-testing:
+  he is about to exercise `lpn_` heavily on production, and Task 203's coverage matrix is being
+  driven off exactly these numbers, so author traffic is now a measurement problem and not just
+  untidiness.
+  - **Post-hoc detection is the wrong approach** and is what the question was really asking about.
+    The logs carry timestamp, page, served lang and raw Accept-Language — **no IP, no session id** —
+    so "many calculators and languages in a human way" is a guess, it cannot be applied to data
+    already written, and it would also delete real multilingual users, who are the ones we most want
+    to see. Do not build a heuristic filter.
+  - **Do the cheap, exact thing instead:** a long-lived opt-out cookie set by visiting a URL once
+    (e.g. `?ec_nolog=1`), checked by all three log writers — `log-calc-event.php`,
+    `log-human-view.php`, and `logLanguageSelection()` in `lib/Language.lib.php`. Per-device, which
+    means setting it once per browser Tom tests in, and honest: it suppresses at write time rather
+    than guessing afterwards.
+  - Cheap follow-on while in there: a matching note in `dev/usage-data-log.md` recording the date
+    the opt-out started, so later snapshots are comparable to earlier ones.
+
 - 12|196| **EPANET `.inp` import/export (Task 146 child) — a separate task from Task 195, deliberately.**
   Raised 2026-08-01. **This reopens a decision already made once**: the scope doc records
   `.inp` interop as "distinct from" Task 195 and says "Tom confirmed 2026-07-29 is not needed," in

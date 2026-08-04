@@ -1214,14 +1214,15 @@ $ec_lang['lpn_file_saving_to']='Saving to: {file}';
 // label says which of the two you are getting rather than leaving the duplicate looking like a bug.
 $ec_lang['lpn_project_download']='Download a copy';
 $ec_lang['lpn_project_download_tip']='This browser cannot keep working in a file, so each press saves another copy to your downloads. Open one with Open from file to carry on where you left off.';
-$ec_lang['lpn_project_close']='Close project';
-$ec_lang['lpn_project_close_tip']='Stops saving to the file and lets a colleague open it. The project stays in this browser, and nothing is deleted. This also happens on its own when you close the tab.';
-// We cannot tell a moved file from a copied one -- the browser gives us a file name, never a path --
-// so this asks the one person who does know. Deliberately worded as a statement the user makes, not
-// a question we guess at.
-$ec_lang['lpn_project_fork']='This is a copy';
-$ec_lang['lpn_project_fork_tip']='Say this when you opened a copy of someone else\'s file and want to work on it separately. From then on you and they will not be told about each other.';
-$ec_lang['lpn_project_fork_confirm']='Treat this as a separate project from the file it was copied from? Colleagues editing the original will no longer be told you have this one open.';
+// "Close FILE", not "close project" (Tom asked whether closing clears the screen, 2026-08-03 -- it
+// does not, and that question is exactly why the other name was wrong). Nothing leaves the screen
+// and nothing is deleted; the file is handed back so a colleague can open it.
+$ec_lang['lpn_project_close']='Close file';
+$ec_lang['lpn_project_close_tip']='Stops saving to the file and lets a colleague open it. The project stays open here, and nothing is deleted. This also happens on its own when you close the tab.';
+// Offered only when somebody else holds the file -- never as a standing button. A copy is a fork of
+// the truth, and a page that advertises forking teaches people to make copies they must later
+// reconcile. See lpn_lock_busy/lpn_lock_idle for the situation this answers.
+$ec_lang['lpn_lock_own_copy']='Save as my own copy';
 $ec_lang['lpn_file_unlink']='Stop saving to file';
 $ec_lang['lpn_status_file_linked']='Saving {name} to {file} as you work, until this tab is closed.';
 $ec_lang['lpn_status_file_opened']='Opened {file}. Changes are saved back to it as you work, until this tab is closed.';
@@ -1231,7 +1232,10 @@ $ec_lang['lpn_file_write_failed']='Could not write to the file. It may have been
 // Project locks (Task 195 Phase 2) -- who is editing a shared project file right now. {name} is a
 // person as they chose to be known ("Dave T."), never a login; word order is the translator's to
 // choose. A lock never expires on its own, so none of these may suggest waiting will free it.
-$ec_lang['lpn_lock_prompt_name']='What should colleagues see when you have a project open? A first name or initials is plenty.';
+// Initials, and said to be public: a shared project file carries this name to everyone who opens it,
+// including outside the office (Tom, 2026-08-03 -- "your friendly name may need to be a cryptic
+// name"). Asking for initials rather than a name makes the safe answer the obvious one.
+$ec_lang['lpn_lock_prompt_name']='What should colleagues see when you have this project open? Your initials are ideal. Anyone you send the file to can see it, so do not use anything private.';
 // The stand-in when someone locked a project before giving a name. Reads in place of {name}
 // everywhere above, so it has to work mid-sentence.
 $ec_lang['lpn_lock_somebody']='Somebody else';
@@ -1249,6 +1253,14 @@ $ec_lang['lpn_lock_took_over']='You have taken over from {name}. Their work was 
 $ec_lang['lpn_lock_unavailable']='Beware: could not reach the server to check or create a lock on this project, so nothing is stopping a colleague from editing the same file at the same time. You will be told if locking starts working again.';
 $ec_lang['lpn_lock_restored']='Locking is working again, and this project is now yours to edit.';
 $ec_lang['lpn_lock_dismiss']='Dismiss';
+// Shown once per browser, before the first file picker opens. Three short paragraphs on purpose:
+// this is the one place the whole file-and-lock idea is explained, and it has to survive translation
+// into 26 languages, so it says one thing per sentence and avoids every word of jargon it can.
+$ec_lang['lpn_file_training_1']='Your project will be saved in a file on this computer. As you keep working, it keeps saving to that file.';
+$ec_lang['lpn_file_training_2']='So that two people never edit one file at the same time, this site keeps track of who has it open. If you stop working for a while, a colleague can take over, and you will be told when they do.';
+$ec_lang['lpn_file_training_3']='Give a short name your colleagues will know you by. Your initials are ideal. Anyone you send the file to can see it, so do not use anything private.';
+$ec_lang['lpn_file_training_name']='Your initials';
+$ec_lang['lpn_file_training_continue']='Continue';
 // Recovery when the linked file has moved, been renamed, or been deleted. The button does the
 // finding; the message never tells someone to go hunting through a menu.
 $ec_lang['lpn_file_relink']='Choose the file again';
