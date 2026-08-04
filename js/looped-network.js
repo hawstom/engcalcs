@@ -1474,6 +1474,7 @@ var EngCalcs = EngCalcs || {};
 	function wireBackdropMenu(into) {
 		var pc = EngCalcs.pageConfig || {}, menu = document.createElement('select');
 		menu.id = 'lpn_backdrop_menu';
+		menu.dataset.edits = '1'; // adding/scaling/removing a backdrop is a document change like any other
 		function opt(value, text, disabled) {
 			var o = document.createElement('option');
 			o.value = value; o.textContent = text; if (disabled) { o.disabled = true; }
@@ -1559,6 +1560,10 @@ var EngCalcs = EngCalcs || {};
 		el.textContent = key ? (pc[key] || '') : '';
 	}
 	function setMode(newMode) {
+		// Read-only leaves exactly one tool reachable. The toolbar's Add/Delete buttons are disabled
+		// too, so this is the belt to their braces -- a keyboard shortcut or a stale click cannot
+		// route around it.
+		if (readOnly && newMode !== 'select') { newMode = 'select'; }
 		mode = newMode; setPendingLinkFrom(null);
 		if (setModeUI) { setModeUI(); }
 		updateModeHint();
@@ -2049,7 +2054,10 @@ var EngCalcs = EngCalcs || {};
 		saveToStorage();
 		flushOutgoingFile();
 		var id = newProjectId(), copy = serializeProject();
-		copy.project = Object.assign({}, project, { name: name });
+		// A new docId, deliberately: a copy is a different document, and inheriting the original's
+		// id would make the two fight over one lock -- and let a copy's autosave abort because
+		// somebody was editing the original.
+		copy.project = Object.assign({}, project, { name: name, docId: newDocId() });
 		// Written and verified BEFORE anything switches: a backdrop image makes a project the one
 		// thing here big enough to fail on quota, and a failed copy must leave the user exactly
 		// where they were rather than half-moved into a project that does not exist.
@@ -2208,6 +2216,21 @@ var EngCalcs = EngCalcs || {};
 		if (!handle || fileWriteBusy) { return false; }
 		if (!fileDirty && !force) { return false; }
 		fileWriteBusy = true;
+		// Scenario C, the walk-away recovery: re-check the lock BEFORE every write, not just at open.
+		// Re-acquiring a lock we already hold is also the heartbeat, so this single call both proves
+		// we may still write and refreshes lastActivity for whoever is looking from the other end.
+		// Deliberately ahead of clearing fileDirty: a write we abort has to stay pending.
+		if (lock.docId) {
+			var lockNow = await postLock('acquire', lock.docId);
+			if (lockNow && lockNow.ok && !lockNow.held) {
+				// Somebody took over while we were away. Abort rather than clobber their file, and
+				// say so plainly. The reassurance is true: localStorage has every edit regardless.
+				var pcTaken = EngCalcs.pageConfig || {};
+				fileWriteBusy = false;
+				setReadOnly(true, (pcTaken.lpn_lock_taken || '{name} has taken over this project. Your changes are still saved in this browser, but they are no longer being written to the file.').replace('{name}', lockHolderName(lockNow)), null);
+				return false;
+			}
+		}
 		fileDirty = false;
 		var text = projectFileText();
 		try {
@@ -2241,7 +2264,12 @@ var EngCalcs = EngCalcs || {};
 	// so the in-flight write still lands in the outgoing project's file even though the switch
 	// continues immediately. (If a write is already in flight this skips, and the outgoing project's
 	// last edits reach its file on the next visit rather than now; localStorage has them regardless.)
-	function flushOutgoingFile() { flushToFile(false); }
+	function flushOutgoingFile() {
+		flushToFile(false);
+		// The lock belongs to the project we are leaving, not to whatever we open next.
+		releaseLock();
+		setReadOnly(false);
+	}
 	async function saveToFile() {
 		if (!fileApiAvailable()) { downloadProjectFile(); return; }
 		var handle = linkedHandle();
@@ -2259,6 +2287,7 @@ var EngCalcs = EngCalcs || {};
 		setNotice((pc.lpn_status_file_linked || 'Saving {name} to {file} as you work, until this tab is closed.')
 			.replace('{name}', projectDisplayName(project)).replace('{file}', handle.name));
 		rebuildProjectsList();
+		acquireLockForOpenProject();
 	}
 	async function openFromFile() {
 		if (!fileApiAvailable()) {
@@ -2283,6 +2312,7 @@ var EngCalcs = EngCalcs || {};
 			var pc = EngCalcs.pageConfig || {};
 			setNotice((pc.lpn_status_file_opened || 'Opened {file}. Changes are saved back to it as you work, until this tab is closed.')
 				.replace('{file}', handle.name));
+			acquireLockForOpenProject();
 		}
 		rebuildProjectsList();
 	}
@@ -2293,7 +2323,164 @@ var EngCalcs = EngCalcs || {};
 		flushToFile(false); // one last write, so unlinking never silently drops the last few edits
 		fileHandles.delete(library.openId);
 		setFileError(false);
+		releaseLock();
 		rebuildProjectsList();
+	}
+
+	// ---- Project locks (ROADMAP Task 195 Phase 2) ----
+	// Coordinates "who is editing this file right now" for a team sharing project files off a
+	// network share, against lpn-lock.php. See that file for the record format and the four actions.
+	//
+	// **It fails OPEN.** If the broker cannot be reached -- offline, a deploy hiccup, the endpoint
+	// missing entirely -- editing continues normally and nothing is read-only. Locking is a courtesy
+	// layer over an in-office honor system, so failing closed would let an unreachable server take
+	// away a calculator that has always worked without one. That trade is the whole reason this is
+	// safe to ship on a page that must keep working offline.
+	var LPN_LOCK_URL = '/engcalcs/lpn-lock.php';
+	var LPN_IDENTITY_KEY = 'lpn_identity';
+	// The document id is baked into the FILE, not into our per-browser project id: two people
+	// opening the same file off a share have different local project ids and must still compute the
+	// same lock key. Matches lpn-lock.php's /^d[A-Za-z0-9]{8,48}$/.
+	function newDocId() { return 'd' + Date.now().toString(36) + randomToken(8); }
+	function randomToken(n) {
+		var chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', out = '';
+		for (var i = 0; i < n; i++) { out += chars.charAt(Math.floor(Math.random() * chars.length)); }
+		return out;
+	}
+	// Assigned lazily, on the first thing that needs one (linking a file), rather than by bumping the
+	// storage version. A version bump would make every file this page writes unreadable to a page
+	// that has not been updated yet, which is a hostile thing to do mid-preview for a key that older
+	// code does not even look at.
+	function ensureDocId() {
+		if (!project.docId) { project.docId = newDocId(); saveToStorage(); }
+		return project.docId;
+	}
+	// Identity is per BROWSER, not per project: an opaque token that decides what "mine" means, plus
+	// a friendly name that is only ever shown to a human. No login, no server-side user table.
+	// Returns null if the user declines to give a name, which simply means no locking for them.
+	var identity = null;
+	function loadIdentity() {
+		if (identity) { return identity; }
+		var saved = readJSON(LPN_IDENTITY_KEY);
+		if (saved && saved.holder) { identity = saved; }
+		return identity;
+	}
+	function ensureIdentity() {
+		if (loadIdentity()) { return identity; }
+		var pc = EngCalcs.pageConfig || {};
+		var name = window.prompt(pc.lpn_lock_prompt_name || 'What should colleagues see when you have a project open? A first name or initials is plenty.', '');
+		if (name === null) { return null; } // declined -- no locking, and we will not ask again this action
+		identity = { holder: randomToken(24), name: name.trim().slice(0, 60) };
+		writeJSON(LPN_IDENTITY_KEY, identity);
+		return identity;
+	}
+	// null means "could not reach the broker", which every caller treats as fail-open. A non-null
+	// result is the parsed response, whatever it says.
+	async function postLock(action, docId) {
+		var idn = loadIdentity();
+		if (!idn || !docId || !window.fetch) { return null; }
+		try {
+			var resp = await fetch(LPN_LOCK_URL, {
+				method: 'POST',
+				credentials: 'same-origin',
+				body: new URLSearchParams({ action: action, id: docId, holder: idn.holder, name: idn.name })
+			});
+			if (!resp.ok) { return null; }
+			return await resp.json();
+		} catch (err) { return null; }
+	}
+	// What we currently believe about the open project's lock. `docId` is non-null only while a file
+	// is linked; nothing here is consulted otherwise.
+	var lock = { docId: null, by: '' };
+	var readOnly = false;
+	// Read-only blocks editing the NETWORK -- adding, deleting, dragging, property edits, undo,
+	// clearing, the example, the backdrop. It deliberately does NOT block view preferences (Settings,
+	// Labels) or panning and zooming: looking around a network you may not edit is exactly what a
+	// person in this state wants to do, and a label-display choice is not someone else's work.
+	function setReadOnly(on, message, stealFrom) {
+		readOnly = !!on;
+		var banner = document.getElementById('lpn_lock_banner');
+		document.querySelectorAll('#lpn_toolbar [data-edits="1"]').forEach(function (el) {
+			if (el.tagName === 'BUTTON' || el.tagName === 'SELECT') { el.disabled = readOnly; return; }
+			el.querySelectorAll('button, select').forEach(function (c) { c.disabled = readOnly; });
+		});
+		if (readOnly) {
+			closePopup();  // a property editor open over a network you cannot edit is a trap
+			setMode('select');
+		}
+		if (!banner) { return; }
+		banner.innerHTML = '';
+		if (!readOnly) { banner.style.display = 'none'; return; }
+		var pc = EngCalcs.pageConfig || {};
+		var text = document.createElement('span');
+		text.textContent = message || '';
+		banner.appendChild(text);
+		if (stealFrom !== undefined && stealFrom !== null) {
+			var btn = document.createElement('button');
+			btn.type = 'button'; btn.style.marginLeft = '8px';
+			btn.textContent = (pc.lpn_lock_takeover || 'Take over from {name}').replace('{name}', stealFrom || (pc.lpn_lock_somebody || 'the other person'));
+			btn.addEventListener('click', function () { takeOverLock(); });
+			banner.appendChild(btn);
+		}
+		banner.style.display = 'block';
+	}
+	function lockHolderName(r) {
+		var pc = EngCalcs.pageConfig || {};
+		return (r && r.lockedBy) ? r.lockedBy : (pc.lpn_lock_somebody || 'the other person');
+	}
+	// Scenario B, split by how long the holder has been quiet. Under ~2x the autosave interval they
+	// are demonstrably still working, so a takeover would yank the file out from under a live edit
+	// and the honest answer is "wait". Past that they may simply have walked away, so we offer the
+	// takeover -- but never take it automatically. A lock NEVER expires on its own; only a person
+	// ends someone else's session.
+	function presentLockedOut(r) {
+		var pc = EngCalcs.pageConfig || {};
+		var quietFor = (Date.now() / 1000) - (r.lastActivity || 0);
+		var activeWindow = 2 * Math.min(180, Math.max(60, +settings.fileAutosaveSeconds || 120));
+		var who = lockHolderName(r);
+		lock.by = who;
+		if (quietFor < activeWindow) {
+			setReadOnly(true, (pc.lpn_lock_busy || '{name} is editing this project right now. You can look at it, but not change it yet.').replace('{name}', who), null);
+		} else {
+			setReadOnly(true, (pc.lpn_lock_idle || '{name} has this project open but has not changed anything for a while. You can look at it, or take over.').replace('{name}', who), who);
+		}
+	}
+	// Called once a file has just been linked, by either route. Fails open on every path that is not
+	// an explicit "someone else holds this".
+	async function acquireLockForOpenProject() {
+		var docId = ensureDocId();
+		if (!ensureIdentity()) { setReadOnly(false); return; }
+		lock.docId = docId;
+		var r = await postLock('acquire', docId);
+		if (!r || !r.ok) { setReadOnly(false); return; } // unreachable -> fail open
+		if (r.held) { setReadOnly(false); return; }
+		presentLockedOut(r);
+	}
+	async function takeOverLock() {
+		var pc = EngCalcs.pageConfig || {};
+		if (!lock.docId) { return; }
+		var was = lock.by;
+		var r = await postLock('steal', lock.docId);
+		if (!r || !r.ok || !r.held) { return; } // could not reach the broker; stay as we are
+		setReadOnly(false);
+		setNotice((pc.lpn_lock_took_over || 'You have taken over from {name}. Their work was saved to the file before you did.')
+			.replace('{name}', r.stolenFrom || was || (pc.lpn_lock_somebody || 'the other person')));
+		flushToFile(true);
+	}
+	function releaseLock() {
+		if (!lock.docId) { return; }
+		var idn = loadIdentity();
+		// sendBeacon, because the common case for releasing is the tab closing, and a fetch() started
+		// during unload is not guaranteed to be sent. Same reason the usage logs use it.
+		if (idn && navigator.sendBeacon) {
+			try {
+				navigator.sendBeacon(LPN_LOCK_URL, new URLSearchParams({
+					action: 'release', id: lock.docId, holder: idn.holder, name: idn.name
+				}));
+			} catch (err) { /* nothing to do; the record expires on its own eventually */ }
+		}
+		lock.docId = null;
+		lock.by = '';
 	}
 	function renameProject(id, name) {
 		var entry = indexEntry(id);
@@ -2625,7 +2812,7 @@ var EngCalcs = EngCalcs || {};
 		document.addEventListener('visibilitychange', function () {
 			if (document.visibilityState === 'hidden') { flushToFile(false); }
 		});
-		window.addEventListener('beforeunload', function () { flushToFile(false); });
+		window.addEventListener('beforeunload', function () { flushToFile(false); releaseLock(); });
 		restartFileAutosave();
 		zoomExtent();
 		requestAnimationFrame(tick);
@@ -2684,15 +2871,22 @@ var EngCalcs = EngCalcs || {};
 		// One of the three reset controls -- see helpTip() for why each states only its own scope.
 		helpTip(clearBtn, pc.lpn_tool_clear_tip);
 		clearBtn.addEventListener('click', clearNetwork);
+		clearBtn.dataset.edits = '1';
 		fileGroup.appendChild(clearBtn);
 		var exampleBtn = document.createElement('button');
 		exampleBtn.type = 'button';
 		exampleBtn.textContent = pc.lpn_tool_example || 'Draw example network';
 		exampleBtn.addEventListener('click', drawExampleNetwork);
+		exampleBtn.dataset.edits = '1';
 		fileGroup.appendChild(exampleBtn);
 		wireBackdropMenu(fileGroup);
 
+		// Everything from here that CHANGES THE NETWORK carries data-edits, which is the single
+		// thing setReadOnly() queries. Projects, Zoom to fit, Labels and Settings deliberately do
+		// not: looking around and changing what is displayed stay available to someone who may not
+		// edit (see setReadOnly() for where that line is drawn and why).
 		var addGroup = group();
+		addGroup.dataset.edits = '1';
 		[
 			{ mode: 'add-reservoir', key: 'lpn_tool_add_reservoir' },
 			{ mode: 'add-pump', key: 'lpn_tool_add_pump' },
@@ -2702,6 +2896,7 @@ var EngCalcs = EngCalcs || {};
 		].forEach(function (t) { modeButton(t, addGroup); });
 
 		var editGroup = group();
+		editGroup.dataset.edits = '1';
 		modeButton({ mode: 'select', key: 'lpn_tool_select', tip: pc.lpn_tip_select }, editGroup);
 		modeButton({ mode: 'delete', key: 'lpn_tool_delete' }, editGroup);
 		var undoBtn = document.createElement('button');
@@ -2736,6 +2931,7 @@ var EngCalcs = EngCalcs || {};
 		testBtn.type = 'button';
 		testBtn.textContent = '[dev] Draw large test network';
 		testBtn.addEventListener('click', drawTestGrid);
+		testBtn.dataset.edits = '1';
 		devGroup.appendChild(testBtn);
 	}
 
@@ -2875,6 +3071,10 @@ var EngCalcs = EngCalcs || {};
 				return;
 			}
 			var t = resolveLabelHit(e.target), common = { pointerId: e.pointerId, startX: e.clientX, startY: e.clientY };
+			// Read-only (Task 195 Phase 2): every press pans. Dragging a node, a vertex or a label
+			// all move the document, while panning a network you may not edit is exactly what
+			// someone in this state wants to do.
+			if (readOnly) { drag = { type: 'pan', tx0: state.tx, ty0: state.ty }; Object.assign(drag, common); return; }
 			if (mode.indexOf('add-') === 0) { return; } // handled on click below, not drag
 			if (mode === 'delete') { return; }
 			// 'select' mode
@@ -3959,6 +4159,13 @@ var EngCalcs = EngCalcs || {};
 		r = popup.getBoundingClientRect();
 		popup.style.left = Math.max(4, Math.min(sx, window.innerWidth - r.width - 4)) + 'px';
 		popup.style.top = Math.max(4, Math.min(sy, window.innerHeight - r.height - 4)) + 'px';
+		// The one seam every property popup opens through, so read-only is enforced here rather than
+		// in each of the node/link/label builders (which would be three chances to forget).
+		if (readOnly) {
+			popup.querySelectorAll('input, select, textarea, button').forEach(function (c) {
+				if (c.className.indexOf('lpn-popover-x') === -1) { c.disabled = true; } // never the close button
+			});
+		}
 		EngCalcs.initTips(popup);
 	}
 	// ---- rename (Tom: EPANET allows editing an element's ID, so must this) ----

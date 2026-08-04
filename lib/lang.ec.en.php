@@ -1215,6 +1215,20 @@ $ec_lang['lpn_status_file_opened']='Opened {file}. Changes are saved back to it 
 // Says what is still safe before it says what failed: the reassurance is the part a worried user
 // needs, and it is true -- the browser copy is written on every edit regardless.
 $ec_lang['lpn_file_write_failed']='Could not write to the file. It may have been moved or renamed, or permission may have been withdrawn. Your work is still saved in this browser. Use Save to file to choose the file again.';
+// Project locks (Task 195 Phase 2) -- who is editing a shared project file right now. {name} is a
+// person as they chose to be known ("Dave T."), never a login; word order is the translator's to
+// choose. A lock never expires on its own, so none of these may suggest waiting will free it.
+$ec_lang['lpn_lock_prompt_name']='What should colleagues see when you have a project open? A first name or initials is plenty.';
+// The stand-in when someone locked a project before giving a name. Reads in place of {name}
+// everywhere above, so it has to work mid-sentence.
+$ec_lang['lpn_lock_somebody']='Somebody else';
+$ec_lang['lpn_lock_busy']='{name} is editing this project right now. You can look at it, but not change it yet.';
+$ec_lang['lpn_lock_idle']='{name} has this project open but has not changed anything for a while. You can look at it, or take over.';
+$ec_lang['lpn_lock_takeover']='Take over from {name}';
+// Shown when someone takes the project while you were away. Says what is still safe before it says
+// what stopped, and it is true: every edit is in this browser either way.
+$ec_lang['lpn_lock_taken']='{name} has taken over this project. Your changes are still saved in this browser, but they are no longer being written to the file.';
+$ec_lang['lpn_lock_took_over']='You have taken over from {name}. Their work was saved to the file before you did.';
 $ec_lang['lpn_settings_files']='Saving to a file';
 $ec_lang['lpn_settings_file_autosave']='Save to file every (seconds)';
 $ec_lang['lpn_settings_file_autosave_tip']='How often your project is written back to the file you linked it to. Between 60 and 180 seconds. Your work is saved in this browser every time you change something, no matter what this is set to.';
@@ -1231,7 +1245,7 @@ $ec_lang['lpn_notes_1_def']='Solves one set of demands at a time, using the same
 $ec_lang['lpn_notes_2_term']='Not modeled';
 $ec_lang['lpn_notes_2_def']='Tanks, water quality, and control valves that open and close on their own (PRV, PSV, FCV) are not modeled. A pipe can carry a fixed minor loss, but not a valve whose open or closed state depends on the flow being solved for.';
 $ec_lang['lpn_notes_3_term']='Saved projects';
-$ec_lang['lpn_notes_3_def']='Your projects are saved automatically in this browser every time you change something. Clearing your browser data deletes them, so keep a copy: the Projects panel has Save to file and Open from file. In some browsers, a project opened from a file keeps being written back to that file while the tab stays open, and the Projects panel names the file it is saving to. In others, Save to file gives you a copy to keep. Because this is an early preview, please use it for small networks and for testing only.';
+$ec_lang['lpn_notes_3_def']='Your projects are saved automatically in this browser every time you change something. Clearing your browser data deletes them, so keep a copy: the Projects panel has Save to file and Open from file. In some browsers, a project opened from a file keeps being written back to that file while the tab stays open, and the Projects panel names the file it is saving to. In others, Save to file gives you a copy to keep. When a project file is kept on a shared drive, this page tells you if a colleague already has it open, so that two people do not write over each other. Because this is an early preview, please use it for small networks and for testing only.';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
 // It lives in the Notes list, not in the pump popup: the popup is a small floating panel that has
 // to stay readable on a phone, while the Notes section is already this page's documentation home,

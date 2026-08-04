@@ -1034,9 +1034,10 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **Risk to respect:** every drawing gesture on this page is a one-finger touch, so this reworks
     the layer they all sit on. Not a tweak. If it lands, keep the height cap anyway — it costs
     nothing and is the belt to this braces.
-- 25|195| **Export/import a project as a file (Task 146 child) — PHASE 1 SHIPPED 2026-08-03; only
-  Phase 2 remains, which is why the priority dropped from 90. A gate for dropping the PREVIEW
-  banner. Reframed 2026-08-01 as two phases of the SAME task, not a separate one:** a one-shot JSON
+- 15|195| **Export/import a project as a file (Task 146 child) — BOTH PHASES SHIPPED 2026-08-03.
+  What remains is browser verification, not construction, which is why the priority is now 15 rather
+  than the old 90. A gate for dropping the PREVIEW banner. Reframed 2026-08-01 as two phases of the
+  SAME task, not a separate one:** a one-shot JSON
   download/import (Phase 1, as originally scoped, now built) and a live-handle,
   multi-user file-locking system built on top of it (Phase 2, new scope, added 2026-08-01). Both
   phases solve the same underlying problem this task was opened for — everything lives in
@@ -1166,18 +1167,58 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     text (`lpn_notes_3_def`) was rewritten this session to describe file linking honestly, including
     the fact that write-back happens "in some browsers" — the one place the split has to be admitted
     to a user.
-  - **STILL OPEN, and Tom's call — the lock broker.** Where the endpoint lives and its
-    retention/cleanup policy (stale records with no expiry could accumulate indefinitely — the
-    honor-system design deliberately has no auto-expiry for the LOCK ITSELF, but the broker's
-    on-disk *records* still need a housekeeping story so abandoned projects don't leak files
-    forever). **Not started deliberately:** this would be the app's first server-held state and its
-    first unauthenticated public write endpoint, on a live production site. Whatever it is, it needs
-    bounded abuse handling — validated project-id format, a cap on record count and size, a TTL
-    sweep — and Tom should decide it exists before it does.
+  - **RESOLVED — the lock broker's home and housekeeping.** `lpn-lock.php` at the app root (matching
+    `log-calc-event.php`, the existing convention for endpoints the JS calls), records in
+    `lpn-locks/` behind the same `.htaccess` `log/` uses, housekeeping by a 1-in-50 in-request sweep
+    rather than a cron, so the feature carries its own cleanup and cannot be deployed without it.
+    **Tom, 2026-08-03, correcting the premise this was being held back on:** *"It's not the first. We
+    are writing logs already."* Right — `LANG_LOG`, `CALC_USAGE_LOG` and `HUMAN_VIEW_LOG` are all
+    server-written already, so the "first server-held state" framing was wrong and the question was
+    smaller than it looked. He offered MySQL as the alternative and ruled it out in the same breath,
+    correctly: a new dev-environment dependency and a contributor hurdle, bought for a few hundred
+    bytes of coordination state.
 
-  Full Phase 2 frontend implementation (state machine, async/await handle logic, pre-save lock
-  validation) is scoped here but not written yet — this is a planning entry, not a spec ready to
-  execute.
+  **Phase 2 step 2 — identity, the lock broker, and the read-only state machine. SHIPPED
+  2026-08-03.** Built after Tom corrected the premise this was being held back on: the suite already
+  writes server-side logs, so a lock broker is not the app's first server-held state, and MySQL was
+  correctly ruled out as a new dev-environment dependency and a contributor hurdle. Built:
+  - **`lpn-lock.php`** — one flat JSON record per project document id in `lpn-locks/`, blocked from
+    HTTP by the same `.htaccess` `log/` uses, behind `check`/`acquire`/`steal`/`release`. One
+    `flock()` held across the whole read-modify-write, so two people pressing "take over" in the
+    same second cannot both come away believing they hold it. `acquire` doubles as the heartbeat.
+  - **Bounded, because it is a public write endpoint.** The id is format-validated rather than
+    sanitized (`/^d[A-Za-z0-9]{8,48}$/` cannot express `..`, a slash, or a NUL, so there is no
+    traversal left to defend against); names are control-character-stripped and capped at 60; a
+    `check` on an unknown project allocates no file, so reads cannot fill the disk; a 1-in-50 sweep
+    expires *records* after 30 days; a record-count cap refuses new records without disturbing
+    existing ones. The sweep never expires a *lock* — takeover stays explicit, per the honor system.
+  - **`project.docId`**, assigned lazily rather than by a storage-version bump. The lock key has to
+    live in the FILE (two people opening the same file have different local project ids), but a
+    version bump would make every file this page writes unreadable to a page that has not updated
+    yet — hostile mid-preview for a key old code never reads. A `saveProjectAs` copy gets a fresh
+    one, so a copy and its original never fight over one lock.
+  - **Identity**: an opaque per-browser token plus a friendly name, prompted once. The token is what
+    "mine" means; the name is only ever shown to a human, and two people may share one.
+  - **All three scenarios**, with the wait/takeover split driven by `2 ×` the autosave interval, and
+    the pre-save re-check on every write (scenario C) aborting the write rather than clobbering.
+  - **Read-only** blocks the network — add/delete/drag/property edits/undo/clear/example/backdrop —
+    via `data-edits` on the toolbar, a pan-instead-of-drag guard in the pointer handler, a
+    force-to-select in `setMode()`, and one disable pass in `openPopupAt()` (the single seam every
+    property popup opens through). It deliberately does **not** block Settings, Labels, pan or zoom:
+    looking around a network you may not edit is exactly what someone in this state wants to do.
+  - **It fails OPEN.** An unreachable broker — offline, a deploy hiccup, the endpoint missing —
+    leaves editing fully enabled. Locking is a courtesy layer over an honor system, so failing
+    closed would let a server outage take away a calculator that never needed one. This is what
+    makes it safe on a page that must keep working offline.
+  - Verified with 126 harness checks across four throwaway harnesses (43 driving `lpn-lock.php` with
+    each request as its own process, including a 20-process concurrent steal and the sweep; 37 on
+    the client state machine including fail-open and the mid-session takeover; 46 from Phase 1 and
+    step 1).
+
+  **Not done:** no browser testing of any of this — there is no browser in the build environment, so
+  every check above is a harness against sliced-out logic, not a click. The UI paths (the banner, the
+  disabled toolbar, the pickers) have never been seen rendered. That is the first thing to do before
+  the PREVIEW banner comes off.
 - 12|196| **EPANET `.inp` import/export (Task 146 child) — a separate task from Task 195, deliberately.**
   Raised 2026-08-01. **This reopens a decision already made once**: the scope doc records
   `.inp` interop as "distinct from" Task 195 and says "Tom confirmed 2026-07-29 is not needed," in

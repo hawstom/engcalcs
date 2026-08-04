@@ -47,6 +47,9 @@ document.addEventListener('DOMContentLoaded', function() {
 	</div>
 	</div>
 	<div class="d-print-none" id="lpn_toolbar"></div>
+	<?php // Read-only banner (Task 195 Phase 2). Empty and hidden until someone else holds the lock
+	      // on the project file; setReadOnly() in js/looped-network.js fills it. ?>
+	<div class="d-print-none" id="lpn_lock_banner" role="status" style="display:none;margin:4px 0;padding:6px 8px;border:1px solid #a80;background:#fffbe6"></div>
 	<input type="file" id="lpn_backdrop_file" accept="image/*" style="display:none">
 	<?php // Project import (Task 195). Lives here rather than inside #lpn_projects_popup because
 	      // rebuildProjectsList() replaces that popup's body on every open, which would take the
@@ -255,6 +258,13 @@ EngCalcs.pageConfig = {
 	lpn_status_file_linked: <?=json_encode($ec_lang['lpn_status_file_linked'])?>,
 	lpn_status_file_opened: <?=json_encode($ec_lang['lpn_status_file_opened'])?>,
 	lpn_file_write_failed: <?=json_encode($ec_lang['lpn_file_write_failed'])?>,
+	lpn_lock_prompt_name: <?=json_encode($ec_lang['lpn_lock_prompt_name'])?>,
+	lpn_lock_somebody: <?=json_encode($ec_lang['lpn_lock_somebody'])?>,
+	lpn_lock_busy: <?=json_encode($ec_lang['lpn_lock_busy'])?>,
+	lpn_lock_idle: <?=json_encode($ec_lang['lpn_lock_idle'])?>,
+	lpn_lock_takeover: <?=json_encode($ec_lang['lpn_lock_takeover'])?>,
+	lpn_lock_taken: <?=json_encode($ec_lang['lpn_lock_taken'])?>,
+	lpn_lock_took_over: <?=json_encode($ec_lang['lpn_lock_took_over'])?>,
 	lpn_settings_files: <?=json_encode($ec_lang['lpn_settings_files'])?>,
 	lpn_settings_file_autosave: <?=json_encode($ec_lang['lpn_settings_file_autosave'])?>,
 	lpn_settings_file_autosave_tip: <?=json_encode($ec_lang['lpn_settings_file_autosave_tip'])?>,
