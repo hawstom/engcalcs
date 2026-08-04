@@ -1127,22 +1127,53 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     write, freeze the UI read-only, and show a clear "you were taken over by Y, your last save is safe"
     message rather than silently corrupting the new owner's edits.
 
-  **Open questions to resolve before Phase 2 implementation, not yet decided:**
-  - Browser support: `showOpenFilePicker`/persisted permissions are Chromium-only (no Firefox/
-    Safari) — needs a feature-detected fallback to Phase 1's plain download/import for unsupported
-    browsers, given this suite's stated humanitarian/global-reach mission and broad-device audience.
-  - Whether Phase 2 lives entirely inside `lpn_`'s existing per-project localStorage document (adding
-    file-handle + lock metadata alongside it) or reworks Task 146.08's project library into a thin
-    cache over real files.
-  - Where the lock-broker endpoint lives (a new `lib/`-adjacent PHP script, storage location) and its
-    retention/cleanup policy (stale locks with no expiry could accumulate indefinitely on disk — the
-    honor-system design deliberately has no auto-expiry for the LOCK ITSELF, but the broker's on-disk
-    *records* still need a housekeeping story so abandoned/deleted projects don't leak files
-    forever).
-  - Whether `lpn_`'s current offline-PWA precache promise is affected — Phase 2 needs a live network
-    round-trip at open/steal time even though ordinary editing keeps working offline once a lock is
-    held; the Notes text (`lpn_notes_3_def` et al.) will need a rewrite pass to describe the new
-    persistence model honestly once Phase 2 ships.
+  **Phase 2 step 1 — live file handles, no locking. SHIPPED 2026-08-03.** Split out because it needs
+  no server at all and carries most of the user-visible value: the file becomes the thing you are
+  working in, rather than a copy you took. Built:
+  - `showSaveFilePicker`/`showOpenFilePicker` behind `fileApiAvailable()`, with Phase 1's
+    download/`<input type=file>` as the feature-detected fallback everywhere the API is missing.
+  - Handles held in a `Map` keyed by project id, **session only**, exactly as specified above.
+  - Dirty-flag autosave on a 60–180 s timer (`settings.fileAutosaveSeconds`, default 120, in a new
+    "Saving to a file" settings section). `fileDirty` is set in **`saveToStorage()` and nowhere
+    else** — every mutation on the page already funnels through it, so the flag covers all ~40 call
+    sites and cannot be forgotten by whatever the 41st turns out to be.
+  - `flushToFile()` clears the dirty flag **before** the await, not after, so an edit made while a
+    write is in flight re-sets it and is picked up by the next tick instead of being swallowed by
+    the write that did not contain it. A failed write restores the flag and says so.
+  - `flushOutgoingFile()` at all four points that change `library.openId` — everything deciding
+    *what* and *where* to write runs before the first await, so an in-flight write still lands in
+    the outgoing project's file. A copy (`saveProjectAs`) and a new project are deliberately
+    unlinked; deleting a project drops its handle but never touches the file.
+  - Tab-close flush on `visibilitychange`→hidden (the one that actually fires on mobile), with
+    `beforeunload` as a best-effort second net.
+  - `acceptImportedText()` extracted so the handle path and the `<input type=file>` path cannot
+    drift into accepting different files.
+  - 24 more harness checks (mock `FileSystemFileHandle`): no-handle, clean-skip, forced write,
+    the mid-write edit race, failed-write flag restoration and recovery, unlink, feature detection.
+
+  **Open questions — three resolved 2026-08-03, one still open:**
+  - **RESOLVED — browser support.** Feature-detected fallback to Phase 1, as the question itself
+    proposed. The settings row for the autosave interval is not even built where the API is absent:
+    a control for an interval that can never elapse is a promise the browser cannot keep.
+  - **RESOLVED — architecture: localStorage stays the authority, a file link is additive.** The
+    browser-support answer forces this one. A project library that was really a cache over files
+    would have no story for Firefox and Safari except keeping the localStorage path anyway — two
+    authorities and every bug twice. Keeping localStorage authoritative also preserves every Phase 1
+    guarantee untouched (quota-safe writes, `adoptOrphans()` self-healing, migrate-on-read) and
+    makes linking reversible: unlink and you still have your project.
+  - **RESOLVED — offline/PWA.** Step 1 changes nothing: file writes are local, and editing never
+    needed the network. Only step 2's lock check will, and it is confined to open/steal. The Notes
+    text (`lpn_notes_3_def`) was rewritten this session to describe file linking honestly, including
+    the fact that write-back happens "in some browsers" — the one place the split has to be admitted
+    to a user.
+  - **STILL OPEN, and Tom's call — the lock broker.** Where the endpoint lives and its
+    retention/cleanup policy (stale records with no expiry could accumulate indefinitely — the
+    honor-system design deliberately has no auto-expiry for the LOCK ITSELF, but the broker's
+    on-disk *records* still need a housekeeping story so abandoned projects don't leak files
+    forever). **Not started deliberately:** this would be the app's first server-held state and its
+    first unauthenticated public write endpoint, on a live production site. Whatever it is, it needs
+    bounded abuse handling — validated project-id format, a cap on record count and size, a TTL
+    sweep — and Tom should decide it exists before it does.
 
   Full Phase 2 frontend implementation (state machine, async/await handle logic, pre-save lock
   validation) is scoped here but not written yet — this is a planning entry, not a spec ready to

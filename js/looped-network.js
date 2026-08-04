@@ -700,14 +700,19 @@ var EngCalcs = EngCalcs || {};
 			// Open/closed state of the settings panel's collapsible sections, persisted so a user
 			// who lives in Default inputs is not re-opening it every session. Default inputs starts
 			// OPEN because it is the mode-switching section above; the other two are set-once.
-			sectionsOpen: { idPrefixes: false, defaults: true, mapDisplay: false },
+			sectionsOpen: { idPrefixes: false, defaults: true, mapDisplay: false, files: false },
 			textSize: 2.5, // world units -- the original fixed LABEL_FONT_SIZE constant's value
 			symbolScale: 1, // symbol size relative to text size -- see symbolFactor() above
 			symbolOpacity: 1, // 0-1, applied to symbols only (never labels) -- see refreshSymbolSizes()
 			backdropOpacity: 1, // 0-1, applied to the backdrop image -- the other half of the same control
 			textSizeUnits: 'map', // 'map' | 'screen' -- see effectiveFontSize() above
 			legendPosition: 'top-right', // one of LEGEND_POSITIONS' keys below -- matches the original hardcoded CSS
-			mapHeight: 500 // px -- the original fixed <svg height="500"> value; see applyMapHeight()
+			mapHeight: 500, // px -- the original fixed <svg height="500"> value; see applyMapHeight()
+			// How often a project linked to a file is written back to it (Task 195 Phase 2).
+			// Clamped to 60-180 s by restartFileAutosave() as the ROADMAP specifies -- shorter would
+			// put real disk I/O in the middle of drawing, longer risks more lost work than a person
+			// would forgive. Ignored entirely when no file is linked.
+			fileAutosaveSeconds: 120
 		};
 	}
 	var settings = defaultSettings();
@@ -1766,6 +1771,10 @@ var EngCalcs = EngCalcs || {};
 	// to disk, rather than advertising a project whose content never landed.
 	function saveToStorage() {
 		if (!library.openId) { return; }
+		// The one seam Task 195 Phase 2's file autosave hangs off. Every mutation on the page already
+		// funnels through here, so marking dirty at this single point covers all ~40 call sites and,
+		// more importantly, cannot be forgotten by whatever the 41st turns out to be.
+		fileDirty = true;
 		if (!writeJSON(projectKey(library.openId), serializeProject())) { return; }
 		var entry = indexEntry(library.openId);
 		if (entry) { entry.name = project.name; entry.updated = Date.now(); }
@@ -1990,10 +1999,14 @@ var EngCalcs = EngCalcs || {};
 		zoomExtent();
 		scheduleSolve();
 		updateProjectName();
+		// The interval is a per-project setting, so the timer is rebuilt whenever the open document
+		// changes -- same reason every other line in this function exists.
+		restartFileAutosave();
 	}
 	function openProject(id) {
 		if (id === library.openId) { return true; }
 		saveToStorage(); // flush the outgoing project before switching away from it
+		flushOutgoingFile();
 		var doc2 = readDocument(projectKey(id));
 		if (!doc2) { return false; }
 		library.openId = id;
@@ -2009,6 +2022,7 @@ var EngCalcs = EngCalcs || {};
 	// The workflow it protects is his own: set 8-inch/150/K=2 defaults, then draw.
 	function newProject() {
 		saveToStorage();
+		flushOutgoingFile();
 		var inheritedSettings = JSON.parse(JSON.stringify(settings));
 		var inheritedLabels = JSON.parse(JSON.stringify(labelSettings));
 		var id = newProjectId();
@@ -2033,6 +2047,7 @@ var EngCalcs = EngCalcs || {};
 	// level precisely because that is where a self-contained duplicate is what the user means.
 	function saveProjectAs(name) {
 		saveToStorage();
+		flushOutgoingFile();
 		var id = newProjectId(), copy = serializeProject();
 		copy.project = Object.assign({}, project, { name: name });
 		// Written and verified BEFORE anything switches: a backdrop image makes a project the one
@@ -2065,16 +2080,21 @@ var EngCalcs = EngCalcs || {};
 			.replace(/^-+|-+$/g, '');
 		return s.slice(0, 60) || 'project';
 	}
-	function exportProject() {
+	// Indented on purpose. A project file is a backup and a hand-off, so someone will eventually
+	// open one in an editor to see what is in it; the cost is a few percent on a small network,
+	// and on a big one the backdrop's data URL dominates the size no matter what we do here.
+	function projectFileText() { return JSON.stringify(serializeProject(), null, '\t'); }
+	function projectFileName() { return 'lpn-' + safeFileName(projectDisplayName(project)) + '.json'; }
+	// The Phase 1 path, and still the fallback wherever the File System Access API is missing
+	// (Firefox and Safari today). A one-shot download: the browser owns where it lands and there is
+	// no handle afterwards, so nothing can be written back to it.
+	function downloadProjectFile() {
 		saveToStorage(); // export what is on screen, including edits not yet autosaved
-		// Indented on purpose. A project file is a backup and a hand-off, so someone will eventually
-		// open one in an editor to see what is in it; the cost is a few percent on a small network,
-		// and on a big one the backdrop's data URL dominates the size no matter what we do here.
-		var text = JSON.stringify(serializeProject(), null, '\t');
+		var text = projectFileText();
 		var blob = new Blob([text], { type: 'application/json' });
 		var url = URL.createObjectURL(blob), a = document.createElement('a');
 		a.href = url;
-		a.download = 'lpn-' + safeFileName(projectDisplayName(project)) + '.json';
+		a.download = projectFileName();
 		document.body.appendChild(a);
 		a.click();
 		document.body.removeChild(a);
@@ -2092,6 +2112,7 @@ var EngCalcs = EngCalcs || {};
 	function importProject(saved) {
 		var pc = EngCalcs.pageConfig || {};
 		saveToStorage(); // flush the outgoing project before switching away from it
+		flushOutgoingFile();
 		var id = newProjectId();
 		if (!writeJSON(projectKey(id), saved)) {
 			alert(pc.lpn_import_no_room || 'There is not enough browser storage left to add this project. Delete a project you no longer need and try again.');
@@ -2110,24 +2131,169 @@ var EngCalcs = EngCalcs || {};
 			.replace('{name}', projectDisplayName(project)));
 		return id;
 	}
+	// Text off a disk to a prepared document, or null with the reason already reported. Shared by
+	// BOTH import paths -- the <input type=file> fallback and the File System Access handle -- so
+	// the two can never drift into accepting different files.
+	function acceptImportedText(text) {
+		var pc = EngCalcs.pageConfig || {}, parsed = null;
+		try { parsed = JSON.parse(text); } catch (err) { parsed = null; }
+		var saved = prepareDocument(parsed);
+		if (saved) { return saved; }
+		// prepareDocument() reports a too-new file itself, and returns null either way; a second
+		// alert on top of that one would be noise, so only the not-a-project case speaks here.
+		if (parsed && typeof parsed.v === 'number' && parsed.v > LPN_STORAGE_VERSION) { return null; }
+		alert(pc.lpn_import_bad_file || 'That file could not be read as a project saved from this page.');
+		return null;
+	}
 	function importProjectFromFile(file) {
 		var pc = EngCalcs.pageConfig || {}, reader = new FileReader();
 		reader.onload = function (ev) {
-			var parsed = null;
-			try { parsed = JSON.parse(ev.target.result); } catch (err) { parsed = null; }
-			// prepareDocument() reports a too-new file itself, and returns null either way; a second
-			// alert on top of that one would be noise, so only the not-a-project case speaks here.
-			var saved = prepareDocument(parsed);
-			if (!saved) {
-				if (parsed && typeof parsed.v === 'number' && parsed.v > LPN_STORAGE_VERSION) { return; }
-				alert(pc.lpn_import_bad_file || 'That file could not be read as a project saved from this page.');
-				return;
-			}
+			var saved = acceptImportedText(ev.target.result);
+			if (!saved) { return; }
 			importProject(saved);
 			rebuildProjectsList();
 		};
 		reader.onerror = function () { alert(pc.lpn_import_bad_file || 'That file could not be read as a project saved from this page.'); };
 		reader.readAsText(file);
+	}
+
+	// ---- Live file handles (ROADMAP Task 195 Phase 2, step 1) ----
+	// Phase 1 hands you a copy; this makes the FILE the thing you are working in. `showSaveFilePicker`
+	// / `showOpenFilePicker` return a real `FileSystemFileHandle`, and a dirty-flag timer writes the
+	// open project back to it as you work.
+	//
+	// **localStorage remains the authority; a file link is additive.** This resolves the ROADMAP's
+	// second open question ("live inside the existing per-project document, or rework the project
+	// library into a thin cache over real files") in favor of the first, and the browser-support
+	// question above it is what decides: the API is Chromium-only, so a library that was really a
+	// cache over files would have no story at all for Firefox and Safari except keeping the
+	// localStorage path anyway -- two authorities, and every bug twice. Keeping localStorage
+	// authoritative also means every Phase 1 guarantee (quota-safe writes, adoptOrphans() self-
+	// healing, migrate-on-read) keeps working untouched, and a user can unlink and still have their
+	// project.
+	//
+	// Handles are held **for the session only**, exactly as the ROADMAP specifies -- persisting one
+	// across reloads means stashing it in IndexedDB and re-requesting permission on return, which is
+	// a bigger feature than this and is not what was asked for. On reload a project is simply not
+	// linked until the user opens or saves it again.
+	//
+	// async/await rather than this file's usual ES5 idiom: every one of these calls is a promise, and
+	// the .then() version of acquire-write-close-recover is markedly harder to read. The syntax costs
+	// nothing here -- it is older than the File System Access API this code path requires.
+	var fileHandles = new Map(); // project id -> FileSystemFileHandle, this session only
+	var fileDirty = false;       // set by saveToStorage(), the one seam every mutation already funnels through
+	var fileWriteBusy = false;   // a write is in flight; never start a second one over it
+	var fileWriteTimer = null;
+	var fileError = false;
+	function fileApiAvailable() { return typeof window.showSaveFilePicker === 'function'; }
+	function linkedHandle() { return library.openId ? (fileHandles.get(library.openId) || null) : null; }
+	function fileTypes() {
+		var pc = EngCalcs.pageConfig || {};
+		return [{ description: pc.lpn_file_type_desc || 'Project file', accept: { 'application/json': ['.json'] } }];
+	}
+	// Same honesty rule setStorageError() follows: a user who thinks they are editing a file must be
+	// told the moment they are not. Cleared by the next write that succeeds.
+	function setFileError(on) {
+		var pc = EngCalcs.pageConfig || {};
+		if (on === fileError) { return; }
+		fileError = on;
+		if (on) { setStatus(pc.lpn_file_write_failed || 'Could not write to the file. It may have been moved or renamed, or permission may have been withdrawn. Your work is still saved in this browser. Use Save to file to choose the file again.'); }
+	}
+	// Writes the OPEN project to its linked file. Resolves false when there was nothing to do.
+	// `fileDirty` is cleared BEFORE the await, not after: an edit made while the write is in flight
+	// must set it again and be picked up by the next tick, rather than being cleared by the write
+	// that did not include it.
+	async function flushToFile(force) {
+		var handle = linkedHandle();
+		if (!handle || fileWriteBusy) { return false; }
+		if (!fileDirty && !force) { return false; }
+		fileWriteBusy = true;
+		fileDirty = false;
+		var text = projectFileText();
+		try {
+			var writable = await handle.createWritable();
+			await writable.write(text);
+			await writable.close();
+			setFileError(false);
+			return true;
+		} catch (err) {
+			// Most likely causes: the file was moved/deleted, or permission was withdrawn. We do NOT
+			// call requestPermission() here -- it needs a user activation, which a background timer
+			// does not have, so it would fail a second time and teach the user nothing. Saying so and
+			// letting them press Save to file (which DOES have an activation) is the honest recovery.
+			fileDirty = true;
+			setFileError(true);
+			return false;
+		} finally {
+			fileWriteBusy = false;
+		}
+	}
+	// Rescheduled rather than run on a fixed constant, because the interval is a setting and settings
+	// live per project -- switching projects can change it. Harmless when nothing is linked:
+	// flushToFile() returns immediately with no handle.
+	function restartFileAutosave() {
+		if (fileWriteTimer) { clearInterval(fileWriteTimer); fileWriteTimer = null; }
+		var secs = Math.min(180, Math.max(60, +settings.fileAutosaveSeconds || 120));
+		fileWriteTimer = setInterval(function () { flushToFile(false); }, secs * 1000);
+	}
+	// Called before any switch of library.openId. Everything that decides WHAT and WHERE to write --
+	// linkedHandle() and projectFileText() -- runs synchronously before flushToFile()'s first await,
+	// so the in-flight write still lands in the outgoing project's file even though the switch
+	// continues immediately. (If a write is already in flight this skips, and the outgoing project's
+	// last edits reach its file on the next visit rather than now; localStorage has them regardless.)
+	function flushOutgoingFile() { flushToFile(false); }
+	async function saveToFile() {
+		if (!fileApiAvailable()) { downloadProjectFile(); return; }
+		var handle = linkedHandle();
+		if (!handle) {
+			try {
+				handle = await window.showSaveFilePicker({ suggestedName: projectFileName(), types: fileTypes() });
+			} catch (err) { return; } // the user cancelled the picker -- not an error
+			fileHandles.set(library.openId, handle);
+		}
+		saveToStorage();
+		// force: the user asked, so write even if nothing is dirty -- this is also how a link made
+		// on a brand-new project puts something in the file immediately.
+		await flushToFile(true);
+		var pc = EngCalcs.pageConfig || {};
+		setNotice((pc.lpn_status_file_linked || 'Saving {name} to {file} as you work, until this tab is closed.')
+			.replace('{name}', projectDisplayName(project)).replace('{file}', handle.name));
+		rebuildProjectsList();
+	}
+	async function openFromFile() {
+		if (!fileApiAvailable()) {
+			var input = document.getElementById('lpn_project_file');
+			if (input) { input.click(); }
+			return;
+		}
+		var picked;
+		try { picked = await window.showOpenFilePicker({ multiple: false, types: fileTypes() }); }
+		catch (err) { return; } // cancelled
+		var handle = picked[0], text;
+		try { text = await (await handle.getFile()).text(); }
+		catch (err) {
+			alert((EngCalcs.pageConfig || {}).lpn_import_bad_file || 'That file could not be read as a project saved from this page.');
+			return;
+		}
+		var saved = acceptImportedText(text);
+		if (!saved) { return; }
+		var id = importProject(saved); // lands as a NEW project, exactly as the Phase 1 path does
+		if (id) {
+			fileHandles.set(id, handle);
+			var pc = EngCalcs.pageConfig || {};
+			setNotice((pc.lpn_status_file_opened || 'Opened {file}. Changes are saved back to it as you work, until this tab is closed.')
+				.replace('{file}', handle.name));
+		}
+		rebuildProjectsList();
+	}
+	// Deliberately does NOT delete the file or the project -- it only stops writing to it. The
+	// project stays exactly where it was, in this browser.
+	function unlinkFile() {
+		if (!library.openId) { return; }
+		flushToFile(false); // one last write, so unlinking never silently drops the last few edits
+		fileHandles.delete(library.openId);
+		setFileError(false);
+		rebuildProjectsList();
 	}
 	function renameProject(id, name) {
 		var entry = indexEntry(id);
@@ -2150,6 +2316,10 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, entry = indexEntry(id),
 			// Captured BEFORE the removal below -- after it there is nothing left to name.
 			goneName = projectDisplayName(entry || { name: '' });
+		// Drop any live file link first. The FILE is not deleted -- deleting a project here has never
+		// meant deleting anything outside this browser -- but continuing to autosave a project that
+		// no longer exists into it would be worse than either.
+		fileHandles.delete(id);
 		try { localStorage.removeItem(projectKey(id)); } catch (err) { /* private mode */ }
 		library.projects = library.projects.filter(function (p) { return p.id !== id; });
 		if (id === library.openId) {
@@ -2269,17 +2439,31 @@ var EngCalcs = EngCalcs || {};
 		var exportBtn = document.createElement('button');
 		exportBtn.type = 'button';
 		exportBtn.textContent = pc.lpn_project_export || 'Save to file';
-		exportBtn.addEventListener('click', function () { exportProject(); });
+		exportBtn.addEventListener('click', function () { saveToFile(); });
 		fileRow.appendChild(exportBtn);
 		var importBtn = document.createElement('button');
 		importBtn.type = 'button'; importBtn.style.marginLeft = '4px';
 		importBtn.textContent = pc.lpn_project_import || 'Open from file';
-		importBtn.addEventListener('click', function () {
-			var fileInput = document.getElementById('lpn_project_file');
-			if (fileInput) { fileInput.click(); }
-		});
+		importBtn.addEventListener('click', function () { openFromFile(); });
 		fileRow.appendChild(importBtn);
 		list.appendChild(fileRow);
+		// The link state, and the only place it is visible. A user who believes their work is going
+		// into a file and is wrong has lost the thing this whole task exists to protect, so the panel
+		// says which file, by name, or says nothing at all -- never anything in between.
+		var handle = linkedHandle();
+		if (handle) {
+			var linkRow = document.createElement('div');
+			linkRow.style.cssText = 'margin-top:6px;font-size:0.9em';
+			var linkText = document.createElement('span');
+			linkText.textContent = (pc.lpn_file_saving_to || 'Saving to: {file}').replace('{file}', handle.name);
+			linkRow.appendChild(linkText);
+			var unlinkBtn = document.createElement('button');
+			unlinkBtn.type = 'button'; unlinkBtn.style.marginLeft = '6px';
+			unlinkBtn.textContent = pc.lpn_file_unlink || 'Stop saving to file';
+			unlinkBtn.addEventListener('click', function () { unlinkFile(); });
+			linkRow.appendChild(unlinkBtn);
+			list.appendChild(linkRow);
+		}
 	}
 	function toggleProjectsPopup(evt) {
 		var popup = document.getElementById('lpn_projects_popup');
@@ -2431,6 +2615,18 @@ var EngCalcs = EngCalcs || {};
 		// browsers fire only one of the two, and re-applying a height twice is free.
 		window.addEventListener('resize', applyMapHeight);
 		window.addEventListener('orientationchange', applyMapHeight);
+		// Task 195 Phase 2's tab-close flush. `visibilitychange` -> hidden is the one that actually
+		// works: it fires while the page is still fully alive, and on mobile it is frequently the ONLY
+		// one that fires at all before the tab is discarded. `beforeunload` is kept as a second net
+		// for a desktop close, but it is best-effort by nature -- the write is async and the browser
+		// is under no obligation to wait for it. localStorage is written synchronously on every edit
+		// regardless, so the worst case here is a file a little behind the browser copy, never lost
+		// work.
+		document.addEventListener('visibilitychange', function () {
+			if (document.visibilityState === 'hidden') { flushToFile(false); }
+		});
+		window.addEventListener('beforeunload', function () { flushToFile(false); });
+		restartFileAutosave();
 		zoomExtent();
 		requestAnimationFrame(tick);
 	}
@@ -3493,6 +3689,27 @@ var EngCalcs = EngCalcs || {};
 		// often" justification for keeping it loose did not survive contact with the section it
 		// obviously belongs to.
 		row(mapBody, pc.lpn_settings_legend_position || 'Legend position', legendSelect);
+		// ---- 4. Saving to a file (Task 195 Phase 2) ----
+		// Its own section rather than a row inside Map display, where it was first written and did
+		// not belong: how often the file is written is not a display property, and the section is
+		// where any future file-related setting has an obvious home.
+		// Only built where a file can actually be linked. On Firefox and Safari there is no File
+		// System Access API, so "Save to file" is a one-shot download with nothing to autosave into,
+		// and a control for an interval that can never elapse would be a promise the browser cannot
+		// keep.
+		if (fileApiAvailable()) {
+			var fileBody = section('files', pc.lpn_settings_files || 'Saving to a file');
+			var fileSecsInput = document.createElement('input');
+			fileSecsInput.type = 'number'; fileSecsInput.step = '10'; fileSecsInput.min = '60'; fileSecsInput.max = '180';
+			fileSecsInput.value = settings.fileAutosaveSeconds;
+			fileSecsInput.addEventListener('change', function () {
+				var v = +fileSecsInput.value;
+				if (v >= 60 && v <= 180) { settings.fileAutosaveSeconds = v; saveToStorage(); restartFileAutosave(); }
+				else { fileSecsInput.value = settings.fileAutosaveSeconds; }
+			});
+			row(fileBody, pc.lpn_settings_file_autosave || 'Save to file every (seconds)', fileSecsInput,
+				pc.lpn_settings_file_autosave_tip);
+		}
 		// ---- always visible: the one row worth never burying ----
 		// Tolerance, because it is the one setting that changes whether the answer is right.
 		// Headingless, per the note above.

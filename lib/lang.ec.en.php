@@ -1203,6 +1203,21 @@ $ec_lang['lpn_import_no_room']='There is not enough browser storage left to add 
 // the same way lpn_status_deleted_opened does -- an opened file becomes a NEW project here, and
 // that is the part a user cannot see for themselves.
 $ec_lang['lpn_status_imported']='Opened {name} from a file, and added it to this browser as a new project.';
+// Live file link (Task 195 Phase 2). Only reachable where the browser has the File System Access
+// API -- Chromium today, not Firefox or Safari -- so a translator will not find these on every
+// browser they test in. That is expected, not a bug.
+// {file} is a file name and {name} a project name; word order is the translator's to choose.
+$ec_lang['lpn_file_type_desc']='Project file';
+$ec_lang['lpn_file_saving_to']='Saving to: {file}';
+$ec_lang['lpn_file_unlink']='Stop saving to file';
+$ec_lang['lpn_status_file_linked']='Saving {name} to {file} as you work, until this tab is closed.';
+$ec_lang['lpn_status_file_opened']='Opened {file}. Changes are saved back to it as you work, until this tab is closed.';
+// Says what is still safe before it says what failed: the reassurance is the part a worried user
+// needs, and it is true -- the browser copy is written on every edit regardless.
+$ec_lang['lpn_file_write_failed']='Could not write to the file. It may have been moved or renamed, or permission may have been withdrawn. Your work is still saved in this browser. Use Save to file to choose the file again.';
+$ec_lang['lpn_settings_files']='Saving to a file';
+$ec_lang['lpn_settings_file_autosave']='Save to file every (seconds)';
+$ec_lang['lpn_settings_file_autosave_tip']='How often your project is written back to the file you linked it to. Between 60 and 180 seconds. Your work is saved in this browser every time you change something, no matter what this is set to.';
 $ec_lang['lpn_prompt_project_name']='Name for this project';
 $ec_lang['lpn_confirm_project_delete']='Delete this project and everything in it? This cannot be undone.';
 // Deleting the OPEN project opens the most recently updated survivor, so a network the user did
@@ -1216,7 +1231,7 @@ $ec_lang['lpn_notes_1_def']='Solves one set of demands at a time, using the same
 $ec_lang['lpn_notes_2_term']='Not modeled';
 $ec_lang['lpn_notes_2_def']='Tanks, water quality, and control valves that open and close on their own (PRV, PSV, FCV) are not modeled. A pipe can carry a fixed minor loss, but not a valve whose open or closed state depends on the flow being solved for.';
 $ec_lang['lpn_notes_3_term']='Saved projects';
-$ec_lang['lpn_notes_3_def']='Your projects are saved automatically in this browser, and nowhere else. Clearing your browser data deletes them. To keep a copy, or to move a project to another device, open the Projects panel and use Save to file. Because this is an early preview, please use it for small networks and for testing only.';
+$ec_lang['lpn_notes_3_def']='Your projects are saved automatically in this browser every time you change something. Clearing your browser data deletes them, so keep a copy: the Projects panel has Save to file and Open from file. In some browsers, a project opened from a file keeps being written back to that file while the tab stays open, and the Projects panel names the file it is saving to. In others, Save to file gives you a copy to keep. Because this is an early preview, please use it for small networks and for testing only.';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
 // It lives in the Notes list, not in the pump popup: the popup is a small floating panel that has
 // to stay readable on a phone, while the Notes section is already this page's documentation home,
