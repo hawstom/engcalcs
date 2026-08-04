@@ -297,15 +297,49 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **Languages (non-English):** es 61.4% → *6.1× drop* → pt 10.1% → fr 8.2% → tr 6.2% → tail.
     **es alone = 61.4%**; es+pt+fr+tr = 85.9%.
 
-  **What the cross costs and buys** (26 non-English × 16 calculators = 416 cells):
+  **What the cross costs and buys** (26 non-English × 16 calculators = 416 cells). Computed as an
+  efficient frontier rather than picked by eye — and **the frontier prefers adding LANGUAGES over
+  adding calculators**, because a core language costs `16 − N` cells while a core calculator costs a
+  full 26:
 
-  | core | cells | share of the work | covers |
-  |------|------:|------------------:|-------:|
-  | 3 calcs × all langs + all calcs × es | 91 | **22%** | **~96.3%** |
-  | 5 calcs × all langs + all calcs × es, pt, fr, tr | 174 | 42% | ~99.3% |
+  | cells | share of work | covers | core calculators | core languages |
+  |------:|-------------:|-------:|------------------|----------------|
+  | 66 | 16% | 95.2% | MPF+MTC | es |
+  | **80** | **19%** | **96.4%** | **MPF+MTC** | **es+pt** |
+  | **108** | **26%** | **98.2%** | **MPF+MTC** | **es+pt+fr+tr** |
+  | 136 | 33% | 99.2% | MPF+MTC | es+pt+fr+tr+zh+he |
+  | 156 | 38% | 99.4% | MPF+MTC+**HW** | es+pt+fr+tr+zh+he |
 
-  Even the tight core is 22% of the work for 96% of observed use. **Tom to pick tight or wider**;
-  everything else here holds either way.
+  **CC's first proposal — 3 calculators (MPF+MTC+HW) × es, 91 cells, 96.3% — is NOT on the frontier**
+  and should not be used: MPF+MTC × es+pt is cheaper (80) *and* covers more (96.4%). The instinct to
+  take "the top 3 calculators" came from the 90%-of-humans framing, which is the right rule for a
+  single axis and the wrong one for a cross. Note HW does not earn core status until 156 cells —
+  2.9% of use does not justify 26 cells.
+
+  **Recommended starting point: 108 cells — MPF+MTC × es+pt+fr+tr, 26% of the work for 98.2%.**
+  Returns flatten hard after it. Tom to confirm or move along the frontier.
+
+  **NUMBER OF TIERS — start with TWO (Tom, 2026-08-03: "we could start with only two tiers, core and
+  non-core"). That is the right call, and the reasons are worth recording so a third is added for a
+  reason rather than for symmetry:**
+  - **Coverage is naturally binary.** A body is translated or it is not; there is no usable
+    half-translated calculator, so a middle *coverage* level has no meaning to define.
+  - **Two tiers per axis produce the cross exactly, with one sentence of rule:** *translate the body
+    iff the calculator is core OR the language is core; identity strings always.* No matrix, no
+    per-cell table.
+  - **The "medium" need is already met by a different mechanism.** The `QUALITY` tiers
+    (0.95 / 0.85 / 0.65 in `lib/Language.Settings.php`) encode **verification depth**, not coverage.
+    A Medium coverage tier would blur two questions that are currently cleanly separated — keep
+    *what we translate* and *how hard we check it* on different dials.
+  - **Tooling is far simpler** (Task 204): a coverage declaration is two lists plus the OR rule.
+  - **Splitting 2 → 3 later is easier than collapsing 3 → 2**, and promoting one calculator or one
+    language is a one-line change either way.
+
+  **WHEN A THIRD TIER WILL GENUINELY BE EARNED — name it now so it is not invented ad hoc.** The real
+  third state is about **maintenance, not coverage**: (1) *maintained* — translated and resynced on
+  every English drift; (2) *translated* — done once, resynced only in batches; (3) *identity only*.
+  That distinction will be forced the first time a large English edit lands (Task 193 alone changed
+  51 strings), which is soon. Add the third tier then, on that axis, not before.
 
   **THIS IS FORWARD-LOOKING AND DELETES NOTHING.** All 416 cells are already translated except
   `lpn_`. The matrix governs **new calculators, drift/maintenance spend, and future audit passes** —
@@ -319,9 +353,9 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   identity strings are discoverable."* A cell outside the cross means "body in English, findable in
   the local language," which is also what lets that cell earn its way in.
 
-  **LIVE CONSEQUENCE — Task 146.06 becomes a different task.** Under the tight core `lpn_` ranks 6th
-  (1.7%) and is not a core calculator, so it gets the core languages only: **`lpn_` × es, 154 keys ×
-  1 language**, plus identity strings in all 26. That replaces a 26-agent sprint, and `es` is exactly
+  **LIVE CONSEQUENCE — Task 146.06 becomes a different task.** `lpn_` ranks 6th (1.7%) and is not a
+  core calculator, so it gets the core languages only: at the recommended 108-cell point that is
+  **`lpn_` × es, pt, fr, tr — 154 keys × 4 languages**, plus identity strings in all 26. That replaces a 26-agent sprint, and `es` is exactly
   where a wrong string costs most. If `lpn_` climbs into the core calculator band, it earns the rest.
 
   **REQUIRED COMPANION — the tooling assumes full parity and will fight this.** See Task 204. Do not
