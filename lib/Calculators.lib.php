@@ -9,8 +9,16 @@
 function echoFeedback(){
     global $ec_lang;
 ?>
-<p class="collapse show d-print-none" id="feedback">
-	<a href="../contact.php"><?=$ec_lang['template_feedback']?></a> <a data-bs-toggle="collapse" href="#feedback"  aria-expanded="true" aria-controls="feedback"><?=$ec_lang['view_hide_line']?></a>
+<?php // No [Hide this line] control here, deliberately (Tom, 2026-08-03, ROADMAP Task 205). A dismiss
+      // affordance is the visual grammar of a cookie banner or nag bar, and readers have long since
+      // trained themselves to skip anything wearing it -- so it did not merely permit ignoring the
+      // invitation, it marked it as chrome. It was also doing no real work: the collapse state has no
+      // cookie or storage behind it, so a hidden line came back on the next page load. d-print-none
+      // stays, which is what actually serves the "I want a clean page" need, along with the
+      // Printable version button. Other collapsible lines (relatedCalcs, the units row) keep their
+      // toggles -- those genuinely are chrome. ?>
+<p class="d-print-none" id="feedback">
+	<a href="../contact.php"><?=$ec_lang['template_feedback']?></a>
 </p>
 <?php
 }

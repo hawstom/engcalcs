@@ -119,8 +119,10 @@ function echoCalculatorFormAppend() {
 <?php
 }
 ?>
-<div id="sketch"></div>
 <?php echoFeedback(); ?>
+
+<div id="sketch"></div>
+
 <h2><?=$ec_lang['ws_notes_heading']?></h2>
 <dl>
 <dt><?=$ec_lang['mi_notes_1_term']?></dt><dd><?=$ec_lang['mi_notes_1_def']?></dd>

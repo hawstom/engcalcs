@@ -87,7 +87,7 @@ if (mail($to, $subject, $message, $moreheaders)) {
   <BODY>
   </BODY>
   </HTML>
-  <?
+  <?php
 
 // Otherwise show a send failure message.
 } else {

@@ -150,7 +150,22 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   added comes **out** of the page string and goes onto `contact.php`, which is one click away and
   can be as long as it likes. A calculator page's job is to invite; the landing page's job is to
   explain.
-  (c) **DONE 2026-08-03. Placed the surviving line before the Notes heading on every page.** It was
+  (b2) **DONE 2026-08-03. Removed the `[Hide this line]` toggle from the invitation** (Tom: "Nothing,
+  and force a 'Printable version' button click for a screenshot"). A dismiss affordance is the visual
+  grammar of a cookie banner, and readers have trained themselves for decades to skip anything
+  wearing it — it did not merely permit ignoring the line, it *marked* it as chrome. It was also
+  doing no real work: the collapse state has no cookie or storage behind it, so a hidden line
+  reappeared on the next page load. `d-print-none` stays and the Printable version button
+  (`btn-printable`, in `lib/Calculators.lib.php`) covers the real "I want a clean page" need. An
+  `[X]` was considered and rejected — a smaller costume, the same costume. Other collapsible lines
+  (`relatedCalcs`, the units row) keep their toggles; those genuinely are chrome.
+  (c) **DONE 2026-08-03. Placed the surviving line before the Notes heading on every page, and
+  before the sketch on the 9 pages that have one.** Not above the calculator: that is *before the
+  reader has been given anything*, when they still want something from us. After the results, the
+  ask lands on someone already served — give first, then invite. The top of the page is also already
+  occupied by `template_welcome` ("Drop your fears at the door; love is spoken here"), which asks for
+  nothing at all; that division is deliberate and should hold. `Looped-Network` is excluded from the
+  above-sketch move — its map *is* the calculator, not an illustration of the answer. It was
   before on 6
   (`Looped-Network`, `Branched-Network`, `Irrigation-Pressure`, `Manning-Irregular`,
   `Weir-Flow-Irregular`, `Weir-Flow-Simple`) and after on 10 (`Canal-Seepage`, `Darcy-Weisbach`,
@@ -1412,6 +1427,29 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     inflating it.
   - **Consequence for reading past reports: `lpn_`'s conversion is simply UNKNOWN before this date.**
     Do not treat the pre-2026-08-03 `%used` figures for this page as a baseline to improve on.
+- 35|206| **Measure the contact funnel — we are blind on the one metric the mission cares about.**
+  Raised by Tom, 2026-08-03: contacts "have always been rare and gratifying. None at all in recent
+  months." Nothing logs `contact.php` views or `formmail.php` submissions, so the two possible
+  causes are indistinguishable today, and they call for **opposite** fixes:
+  - **Nobody clicks the invitation** → it is invisible or reads as chrome. Wording/placement is the
+    lever (Task 205 just changed both).
+  - **People click but do not send** → the invitation works and the form is the barrier. Placement
+    changes nothing and further tinkering with it is wasted motion.
+  Cheap: the existing `log-human-view.php` beacon pattern already covers views; add one on
+  `contact.php`, and one event on successful `formmail.php` send. No database. Two numbers —
+  invitation clicks, and sends — turn a years-long guess into arithmetic.
+  **Urgent because two confounders just landed and will otherwise be uninterpretable:** (1) Tom
+  removed the form's anti-spam test recently — a classic conversion killer, especially on mobile and
+  for non-English users — so the drought may *already* be fixed with no way to see it; (2) Task 205
+  changed the invitation's wording, placement, and dismiss affordance suite-wide on 2026-08-03. With
+  no instrument, "fixed" and "still broken" look identical for another several months, and neither
+  change can be credited or ruled out. Every month without the beacon burns evidence.
+  Context, now fixed: `formmail.php:90` carried a bare `<?` short open tag — the only one in the
+  repo. It parses only where `short_open_tag=On`, which production evidently still is (Tom's tests
+  send successfully), but any PHP upgrade or host move would have silently killed the contact form,
+  and with zero logging the symptom would have been indistinguishable from ordinary silence. Changed
+  to `<?php` on 2026-08-03. That near-miss is itself the argument for this task: a broken contact
+  path is invisible precisely because its failure mode looks exactly like nobody writing.
 - 20|200| **Usage logging: the questions the current report cannot answer.** Raised by Tom,
   2026-08-03: *"I'd like to get more guidance about our development priorities from usage logging."*
   Ordered by value ÷ effort. Nothing here needs a database — the existing

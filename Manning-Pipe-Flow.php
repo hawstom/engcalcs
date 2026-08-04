@@ -40,9 +40,9 @@ echoCalculatorForm(
 );
 ?>
 
-<div id="sketch"></div>
-
 <?php echoFeedback(); ?>
+
+<div id="sketch"></div>
 
 <h2><?=$ec_lang['ws_notes_heading']?></h2>
 <?php echo $ec_lang['mpf_note_1']; ?></dl>

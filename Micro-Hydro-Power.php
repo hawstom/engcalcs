@@ -34,9 +34,9 @@ echoCalculatorForm(
 );
 ?>
 
-<div id="sketch" style="margin-top:1em; max-width:340px;"></div>
-
 <?php echoFeedback(); ?>
+
+<div id="sketch" style="margin-top:1em; max-width:340px;"></div>
 
 <h2><?=$ec_lang['ws_notes_heading']?></h2>
 <dl>
