@@ -94,3 +94,67 @@ Per-**language** human reach was captured 2026-07-21 (en 83%, es 10%, then a ≤
 at zero measured reach). It drives the REACH-WEIGHTED QA section of `dev/translation-process.md`.
 Note the standing caveat there: **zero current reach ≠ low value** — for a big language it is a
 discovery/SEO gap, not a quality signal.
+
+---
+
+## 2026-08-03 — first NON-ENGLISH HUMAN snapshot (language × calculator)
+
+The first run of the "Non-English HUMANS by calculator" section added to `log/lang-log-stats.sh`
+that day. Unlike the 2026-07-21 per-language capture, this is the **confirmed-human** tier (both
+beacons; bots essentially never reach it), crossed with the page — so every row is a real person.
+
+**Totals: 290 non-English humans shopping, 170 using — 59% conversion**, essentially the same band
+as the suite overall. **This was not the expected result.** The section had been written with an
+empty table treated as the likely outcome, and CC explicitly advised bracing for "26 translated
+languages with no confirmed non-English human use." That was wrong, and it is worth recording as
+wrong: the translation program is reaching real engineers who complete real calculations.
+
+| lang | shopping | using | rate | pages seen on |
+|------|---------:|------:|-----:|---------------|
+| es | 186 | 116 | 62% | MPF, MTC, HW, DW, MPHL |
+| pt | 30 | 15 | 50% | MPF, HW, MTC |
+| fr | 23 | 14 | 61% | MPF, MTC, HW |
+| tr | 17 | 11 | 65% | MTC, MPF, HW |
+| zh | 12 | 2 | **17%** | MPF |
+| he | 10 | 6 | 60% | MPF |
+| de | 4 | 3 | — | MPF |
+| bg, hr, ro, it | 2 each | 2/1/0/0 | — | (n too small) |
+
+### Findings
+
+**1. `zh` is the one real anomaly — 17% against a 50–65% band.** Every other language with ≥10
+humans shopping lands between 50% and 65%. Chinese sits at 17% on Manning-Pipe-Flow, its only page.
+n=12 is small and this is not yet conclusive, but it is the widest gap in the table by a long way,
+and `zh` carries QUALITY 0.85 — the AI-translated-and-back-translation-checked tier — so nothing
+currently flags it. **This is the single most actionable line in the snapshot.** Next step is a
+targeted read of `zh` on Manning-Pipe-Flow for something that blocks *completion* rather than
+comprehension: a number/unit token that renders wrong, a required field whose label misleads, or a
+mistranslated result heading that makes a correct answer look like an error. Confirm or clear it
+before spending on any new `zh` translation work.
+
+**2. Two of the four anchor languages have zero confirmed human use.** CLAUDE.md names es, fr, ru
+and ar as glossary anchors. `es` and `fr` are validated here — 1st and 3rd. **`ru` and `ar` do not
+appear at all**, while `pt` (30), `tr` (17), `zh` (12) and `he` (10) do and are not anchors. Per the
+standing rule that **zero reach ≠ low value**, this is NOT an argument to deprioritise Russian or
+Arabic translation quality. It IS an argument about anchor *selection*: an anchor is supposed to be
+a reference other languages are checked against, and anchoring on languages we cannot observe is
+weaker than anchoring on ones we can. Worth revisiting when the glossary is next touched.
+
+**3. Fifteen of 26 non-English languages appear nowhere**: am, ar, bn, cs, fa, hi, id, km, my, ps,
+ru, sr, sw, uk, ur. Same caveat — a discovery/SEO gap for the big ones, not a quality signal.
+
+**4. Five of sixteen calculators carry all non-English use** — MPF, MTC, HW, DW, MPHL. This extends
+the existing "MPF+HW+MTC = 92% of humans" finding to the non-English population specifically, and
+`es` is the only language spread across more than three pages.
+
+**5. It supports the current priority order.** `lpn_` appears nowhere, being English-only — but the
+lesson is that a translation sprint's value depends on the page first earning traffic. That is an
+argument for Task 195 (persistence, and the gate on dropping the PREVIEW banner) ahead of Task
+146.06 (the `lpn_` sprint), which is how they are currently ranked (90 vs 5).
+
+### What this does NOT say
+
+Non-English share of MPF is roughly 199/1576 ≈ 13% of humans on that page, consistent with the
+2026-07-21 capture (en 83%, es 10%). The two tables may cover different windows, so treat that ratio
+as approximate. Nothing here justifies translating fewer languages: the suite's parity model keeps
+every key in all 27 files, and this data sequences **QA and spot-check effort**, not shipping.
