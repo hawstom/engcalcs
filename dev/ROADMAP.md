@@ -256,6 +256,27 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   as of this paragraph's original writing; resolved by commit `7428ff0 Task 146: close the
   empty-canvas open question`, 2026-07-29) — a new project opens on the placeholder-text canvas
   above, not a worked example.
+- 55|202| **`zh` converts at 17% where every comparable language converts at 50–65% — diagnose it.**
+  From the 2026-08-03 non-English human snapshot (`dev/usage-data-log.md`). Chinese shows 12 humans
+  shopping on Manning-Pipe-Flow and only 2 completing a calculation. Every other language with ≥10
+  humans shopping sits in a 50–65% band (es 62, tr 65, fr 61, he 60, pt 50). This is the widest gap
+  in the table by a long way, and **nothing currently flags it** — `zh` carries QUALITY 0.85, the
+  AI-translated-and-back-translation-checked tier.
+  - **n = 12, so this is a lead, not a conclusion.** Do not re-score QUALITY on it. Confirm or clear
+    it first; the next snapshot will also sharpen it for free.
+  - **Look for something that blocks COMPLETION, not comprehension.** A merely awkward translation
+    still lets an engineer type numbers and read an answer — these visitors are dropping out
+    *before* calculating. Candidates, cheapest first: a units token that renders wrong or is
+    unreadable in the selector; a required input whose label misleads about what to enter; a result
+    heading that makes a correct answer look like an error; anything in the CJK rendering of the
+    two-column input table that pushes a field off screen on a phone.
+  - **Check the page, not just the strings.** A back-translation pass would already have caught a
+    wrong word; it would not catch a layout or numeric-formatting failure, which is exactly the
+    class of defect a completion-shaped dropout implies.
+  - **Priority 55 — above 146.02 and below 195.** It sits high because it is the only evidence-backed
+    quality lead in the suite: 26 languages of translation with one measurable outlier. It sits below
+    Task 195 because it is a diagnosis of unknown size and 195 is a known, scoped, gating build.
+
 - 45|146.02| **EPANET-style icon toolbar + map symbol icons (Task 146 child).** Replace/supplement
   the current toolbar with EPANET-style icons for elements and map symbols. **Must land before the
   translation sprint (146.06) — this blocks it**, per Tom, 2026-07-29.
@@ -1176,6 +1197,10 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
       at all.
   - **US vs SI actually chosen**, one bit per session — validates `EC_DEFAULT_UNIT_SET`-by-language
     and shows whether per-page unit-family defaults are right (ROADMAP Task 162's design).
+  - **First run happened 2026-08-03 and the cross-tab immediately paid for itself** — see
+    `dev/usage-data-log.md` and Task 202. Headline: 290 non-English humans shopping, 170 using, and
+    one clear quality outlier that no other instrument in the suite had surfaced. The remaining
+    ideas below are still unbuilt.
   - **Lower value, listed so they are not re-brainstormed:** time-to-first-calc (separates a
     confusing page from a long one); print / copy-link use as a proxy for work someone intends to
     keep; intra-site path (which calculator is the entry point and where people go next).
