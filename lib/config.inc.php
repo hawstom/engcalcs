@@ -65,3 +65,20 @@ define('CALC_USAGE_LOG', dirname(__DIR__) . '/log/engcalcs-calc-usage.log');
 // Each line: ISO-8601 UTC timestamp TAB page-basename TAB served-lang TAB raw-Accept-Language
 // Run log/lang-log-stats.sh to analyze.
 define('HUMAN_VIEW_LOG', dirname(__DIR__) . '/log/engcalcs-human-view.log');
+
+// Looped-network project locks (ROADMAP Task 195 Phase 2) — one small JSON record per project
+// document id, written by lpn-lock.php, blocked from HTTP by lpn-locks/.htaccess exactly as log/ is.
+// Each record: {"projectId":…,"holder":…,"lockedBy":…,"lastActivity":unix-ts}
+// Deliberately flat files rather than a database: this suite's stated architecture is "no database,
+// no authentication" (CLAUDE.md), and MySQL here would be a new dev-environment dependency and a
+// hurdle for contributors, bought for a few hundred bytes of coordination state.
+// No private data lives here by design — a friendly name the user typed ("Dave T.") and a random
+// token — so discovery of the directory is not a disclosure event, but it stays blocked anyway.
+define('LPN_LOCK_DIR', dirname(__DIR__) . '/lpn-locks');
+// Housekeeping, since the honor-system design deliberately never auto-expires a LOCK. This expires
+// the on-disk RECORD long after any plausible session, purely so abandoned projects don't leak
+// files forever. 30 days is far past a working day; it can never end a live edit.
+define('LPN_LOCK_TTL_DAYS', 30);
+// Hard bound on how much disk a stranger can make us use. At the cap, existing projects keep
+// working and only the creation of a NEW record is refused.
+define('LPN_LOCK_MAX_RECORDS', 5000);

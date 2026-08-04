@@ -2,3 +2,7 @@ error_log
 *ods
 *xlsx
 log/
+
+# Lock records are runtime state, like log/. The directory and its .htaccess are tracked;
+# the records themselves are not.
+lpn-locks/*.json
