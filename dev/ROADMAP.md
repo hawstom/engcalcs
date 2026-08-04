@@ -1159,10 +1159,21 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     that would bear on the empty-canvas decision** (closed 2026-07-29, commit `7428ff0`: a new
     project opens on placeholder text rather than a worked example) — a decision made with no data,
     which the first-action histogram would either vindicate or overturn.
-  - **Language × calculator cross-tab.** Both beacons already carry `page` AND `lang`, so this may be
-    answerable from data already on disk with no code change at all — check before building anything.
-    It directly sequences translation sprints: which calculator a given language actually reaches,
-    and whether the 0.65-tier languages reach the pages their speakers would need.
+  - ~~Language × calculator cross-tab~~ — **BUILT 2026-08-03**, and it was nearly free as predicted.
+    All three tiers already carried both dimensions (`engcalcs-lang.log` = ts/lang/source/page; both
+    human logs = ts/page/lang). New "Non-English HUMANS by calculator" section in
+    `log/lang-log-stats.sh`.
+    - **A reach-tier version already existed** ("Non-English demand by page") and is the reason this
+      looked answered. It is built from `engcalcs-lang.log` — the tier with the ~900/page bot floor —
+      so it largely counts crawlers. The new section is built from the two confirmed-human logs,
+      which bots essentially never reach, so every row is a real person. Keep both; they answer
+      different questions and only one of them should sequence a sprint.
+    - **An empty table is the finding**, and the section says so in place: 26 translated languages
+      with no confirmed non-English human use would bear directly on how much further translation
+      work is worth before the pages themselves earn traffic. Verified against fixtures for both the
+      populated and empty cases, including `es-MX` → `es` subtag folding.
+    - Not yet run against production data — the dev machine has 7 human-view rows and no usage log
+      at all.
   - **US vs SI actually chosen**, one bit per session — validates `EC_DEFAULT_UNIT_SET`-by-language
     and shows whether per-page unit-family defaults are right (ROADMAP Task 162's design).
   - **Lower value, listed so they are not re-brainstormed:** time-to-first-calc (separates a

@@ -259,3 +259,39 @@ echo "    to match human/used, which only ever log the plain 2-letter served lan
                 (urate >= 0 ? sprintf("%.0f%%", urate) : "n/a")
         }
     }' | sort -t$'\t' -k1 -rn | awk -F'\t' 'BEGIN {printf "%-28s %10s %10s %10s %11s %11s\n", "lang", "reach", "humans", "humans", "%shopping", "%using"; printf "%-28s %10s %10s %10s %11s %11s\n", "", "", "shopping", "using", "of reach", "of shopping"} {printf "%-28s %10d %10d %10d %11s %11s\n", $2, $3, $4, $5, $6, $7}'
+
+echo ""
+echo "--- Non-English HUMANS by calculator (language x calculator) ---"
+echo "    THE SPRINT-SEQUENCING VIEW. There is already a 'Non-English demand by page' section far"
+echo "    above, but it reads engcalcs-lang.log -- the RAW REACH tier, where a bot floor of roughly"
+echo "    900 per page swamps the signal. This one is built from the two confirmed-human logs, which"
+echo "    bots essentially never reach, so every row below is a real person."
+echo ""
+echo "    What it answers: for a language we have already translated, is anyone actually SHOWING UP"
+echo "    on a calculator in that language, and do they get as far as computing? That is the"
+echo "    question that should order translation sprints -- not how many strings a page has."
+echo "    An empty table here is itself a finding, and an important one: it would mean 26 translated"
+echo "    languages with no confirmed non-English human use yet, which bears directly on how much"
+echo "    further translation work is worth before the pages themselves earn traffic."
+echo ""
+{
+    [ -f "$VIEW_LOG" ]  && awk -F'\t' '{split($3,a,"-"); if (a[1]!="en" && a[1]!="") print a[1]"\t"$2"\tshop"}' "$VIEW_LOG"
+    [ -f "$USAGE_LOG" ] && awk -F'\t' '{split($3,a,"-"); if (a[1]!="en" && a[1]!="") print a[1]"\t"$2"\tuse"}' "$USAGE_LOG"
+} | awk -F'\t' '
+    { k = $1 "\t" $2; seen[k] = 1; if ($3 == "shop") { s[k]++ } else { u[k]++ } }
+    END {
+        n = 0
+        for (k in seen) {
+            sh = (k in s) ? s[k] : 0
+            us = (k in u) ? u[k] : 0
+            printf "%d\t%d\t%s\n", sh, us, k
+            n++
+        }
+        if (n == 0) { print "NONE" }
+    }' | sort -rn | awk -F'\t' '
+    /^NONE/ { print "    (no confirmed non-English human has reached any calculator yet)"; next }
+    # Header on the first real row, not in BEGIN: otherwise the empty case prints column
+    # headings above a "none" message, which reads as a broken table rather than a finding.
+    !hdr { printf "%-10s %-28s %10s %10s\n", "lang", "calculator", "humans", "humans";
+           printf "%-10s %-28s %10s %10s\n", "", "", "shopping", "using"; hdr = 1 }
+    { printf "%-10s %-28s %10d %10d\n", $3, $4, $1, $2 }'
