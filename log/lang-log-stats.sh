@@ -187,17 +187,26 @@ tail -10 "$USAGE_LOG"
 echo ""
 echo "--- Funnel by calculator: reach -> confirmed-human view (% human) -> confirmed-human use (% used) ---"
 echo "    reach = raw engcalcs-lang.log page mentions (includes bots/bounces)"
-echo "    human = confirmed-human page views (window shopping included) -- a page view is only"
+echo "    humans shopping = confirmed-human page views -- a page view is only"
 echo "            logged once the visitor's SESSION (not just this page) has been open >=10s,"
 echo "            via navigator.sendBeacon from js/Calculators.lib.js; this filters out bots and"
 echo "            instant bounces without requiring a calculation, so window shoppers who read the"
 echo "            page and leave still count as human. Deduped once per (session, page, lang)."
-echo "    used  = confirmed-human calculations"
-echo "    %human = human/reach -- a LOWER BOUND on true human reach, not an estimate of it: a real"
+echo "    humans using = confirmed-human calculations"
+echo "    %shopping = shopping/reach -- a LOWER BOUND on true human reach, not an estimate of it: a real"
 echo "             human who bounces inside the first 10s of a new session is indistinguishable"
 echo "             from a bot and can't be confirmed, so they count against %human too. Low %human"
 echo "             means 'mostly bots, or mostly fast bounces, or both' -- not 'mostly bots.'"
-echo "    %used  = used/human (of confirmed humans who reached the page, how many calculated)"
+echo "    %using = using/shopping (of confirmed humans who reached the page, how many calculated)"
+echo ""
+echo "    READ WITH CARE (added 2026-08-03):"
+echo "      * There is a BOT FLOOR around 900 reach -- nearly every page sits at 830-1200 no matter"
+echo "        how many humans it gets. Only the top one or two pages rise above it. So for every"
+echo "        other page %shopping is a signal-to-noise ratio, NOT a conversion rate, and driving"
+echo "        it up is not a goal."
+echo "      * Below roughly 40 humans shopping, %using is NOISE. A page with 1-9 humans cannot"
+echo "        support a decision; reading its %using as failure is a mistake. What such a page"
+echo "        needs is traffic, or an honest decision that it is niche -- not a metric."
 {
     awk -F'\t' '{print $4}' "$LOG" | sort | uniq -c | awk '{print $2"\treach\t"$1}'
     [ -f "$VIEW_LOG" ] && awk -F'\t' '{print $2}' "$VIEW_LOG" | sort | uniq -c | awk '{print $2"\thuman\t"$1}'
@@ -220,7 +229,7 @@ echo "    %used  = used/human (of confirmed humans who reached the page, how man
                 (hrate >= 0 ? sprintf("%.0f%%", hrate) : "n/a"), \
                 (urate >= 0 ? sprintf("%.0f%%", urate) : "n/a")
         }
-    }' | sort -t$'\t' -k1 -rn | awk -F'\t' 'BEGIN {printf "%-28s %8s %8s %8s %8s %8s\n", "page", "reach", "human", "used", "%human", "%used"; printf "%-28s %8s %8s %8s %8s %8s\n", "", "", "", "", "(of reach)", "(of human)"} {printf "%-28s %8d %8d %8d %8s %8s\n", $2, $3, $4, $5, $6, $7}'
+    }' | sort -t$'\t' -k1 -rn | awk -F'\t' 'BEGIN {printf "%-28s %10s %10s %10s %11s %11s\n", "page", "reach", "humans", "humans", "%shopping", "%using"; printf "%-28s %10s %10s %10s %11s %11s\n", "", "", "shopping", "using", "of reach", "of shopping"} {printf "%-28s %10d %10d %10d %11s %11s\n", $2, $3, $4, $5, $6, $7}'
 
 echo ""
 echo "--- Funnel by language: reach -> confirmed-human view (% human) -> confirmed-human use (% used) ---"
@@ -249,4 +258,4 @@ echo "    to match human/used, which only ever log the plain 2-letter served lan
                 (hrate >= 0 ? sprintf("%.0f%%", hrate) : "n/a"), \
                 (urate >= 0 ? sprintf("%.0f%%", urate) : "n/a")
         }
-    }' | sort -t$'\t' -k1 -rn | awk -F'\t' 'BEGIN {printf "%-28s %8s %8s %8s %8s %8s\n", "lang", "reach", "human", "used", "%human", "%used"; printf "%-28s %8s %8s %8s %8s %8s\n", "", "", "", "", "(of reach)", "(of human)"} {printf "%-28s %8d %8d %8d %8s %8s\n", $2, $3, $4, $5, $6, $7}'
+    }' | sort -t$'\t' -k1 -rn | awk -F'\t' 'BEGIN {printf "%-28s %10s %10s %10s %11s %11s\n", "lang", "reach", "humans", "humans", "%shopping", "%using"; printf "%-28s %10s %10s %10s %11s %11s\n", "", "", "shopping", "using", "of reach", "of shopping"} {printf "%-28s %10d %10d %10d %11s %11s\n", $2, $3, $4, $5, $6, $7}'

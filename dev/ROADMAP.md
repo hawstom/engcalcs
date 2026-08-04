@@ -484,11 +484,9 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     candidate (not necessarily an error — you might build both). A group whose members are inactive
     everywhere is exactly the "purge unused" candidate above.
 
-  **INHERITED FROM 146.08 (moved 2026-08-03), and buildable only once a scenario UI exists:**
-  - **"Create scenario geometry variant"** — the toolbar/menu command described above. Task 192 owns
-    the right-click path.
-  - **The "Compare with base ID" field** — the string group key described above; simultaneously the
-    report table's row key, the halo grouping, and the cleanup handle.
+  **This entry is the DECISION RECORD, not a build task.** Everything above is settled; what remains
+  is to build it, which is **Task 201**. Two bullets that used to live in 146.08 moved there on
+  2026-08-03 rather than being left in a closed block.
 
   **Sequencing:** 146.08 must ship the **project container from day one**, holding Base as its only
   scenario. Then scenarios are purely additive and there is never a storage migration. Tom flagged
@@ -528,6 +526,30 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **Disable-with-reason rather than hide**, where practical, so the vocabulary stays learnable.
   - Menu contents are contextual to the clicked object (and later to the selection, if multi-select
     lands). Escape closes.
+- 40|201| **Scenario UI — build what Task 184 decided (Task 146 child).** Created 2026-08-03 while
+  closing 146.08. Task 184 settled the delta model and 146.08 shipped the storage for it, but
+  **nothing in the app can create, name, or switch a scenario**, and there is no write path for an
+  override — `setOverride()` deliberately does not exist yet (`effective(el, prop)` is a pure
+  passthrough while Base is the only scenario, which is what makes a missed call site fail loudly
+  instead of silently). Until this lands, every scenario-dependent feature is unobservable, which is
+  exactly why the two bullets below could not be built inside 146.08.
+  - **The scenario selector**, plus create / rename / delete. Base is a row in the same array, so the
+    selector needs no special case — see Task 184.
+  - **`setOverride(el, prop, value)` and its un-set**, honouring `LPN_OVERRIDABLE`. The key's presence
+    IS the override marker, including when the value equals Base's; deleting the key is the undo.
+  - **The status-bar override count**, a sum of key counts across the active scenario.
+  - **INHERITED FROM 146.08** (moved here 2026-08-03, verbatim, because both are unobservable with
+    Base as the only scenario):
+    - **"Create scenario geometry variant"** — the toolbar/menu command specified in Task 184. Task
+      192 owns the right-click path; the toolbar/menu path belongs here.
+    - **The "Compare with base ID" field** — the string group key specified in Task 184;
+      simultaneously the report table's row key, the halo grouping, and the cleanup handle.
+  - **Do not start before Task 195.** Tom set 195 to priority 90 on 2026-08-03; this sits at the same
+    priority as its own decision record (184) deliberately, so the two move together.
+  - **The first drag inside a non-Base scenario needs its one-time notice** (Task 184's
+    "ambient state, not modal" decision). Note `setNotice()` now exists in `js/looped-network.js` —
+    built for Task 193's delete narration — so the status-bar half of that is already available.
+
 - 35|185| **Match/Copy properties tool (Task 146 child).** Tom, 2026-07-30: "In the absence of the
   table editor, some sort of Match or Copy tool would be very cool. Checkboxes (or current visible
   labels) say what properties to copy, top shows (or initial click gives) the Source object then you
@@ -1162,7 +1184,7 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     blob — so autosave rewrites only the open project, and one large backdrop image cannot take the
     whole library down with a single quota error.
   - ~~"Create scenario geometry variant" and the "Compare with base ID" field land here~~ —
-    **MOVED to Task 184 on 2026-08-03.** Both are unobservable with Base as the only scenario, so
+    **MOVED to Task 201 on 2026-08-03.** Both are unobservable with Base as the only scenario, so
     they were never buildable inside this task's scope. See the note at the head of the BUILT block.
 
   **BUILT 2026-07-30 (steps 1–3 of 3) — and CLOSED 2026-08-03, priority → 0.** Tom asked whether the
