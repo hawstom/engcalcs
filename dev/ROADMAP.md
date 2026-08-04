@@ -319,11 +319,47 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   **Recommended starting point: 108 cells — MPF+MTC × es+pt+fr+tr, 26% of the work for 98.2%.**
   Returns flatten hard after it. Tom to confirm or move along the frontier.
 
+  **THE MODEL: tiers are BUCKETS ON EACH AXIS; the CELL holds a binary. (Tom, 2026-08-03, correcting
+  CC.)** *"3 or more tiers would simply look like a 3 × 3 or 5 × 5 table 'graph' of calculator tier vs
+  language tier with binary gets_translated entries… we look up this calculator and language pair to
+  determine whether or not to translate."* This is the right model and it retires CC's objection
+  below, which confused a *tier* with a *coverage level* and then argued that a middle coverage level
+  had no meaning — answering a question nobody asked. Coverage stays binary at the cell; the tiers
+  simply group rows and columns so the boundary can take a shape richer than a cross.
+
+  **The 2 × 2, written out. It is YES, YES, YES, NO** — Tom read it as "yes, no, no, no" in the same
+  message, and the difference is load-bearing, so it is recorded explicitly here:
+
+  |                        | lang T1 (es, pt, fr, tr) | lang T2 (the rest) |
+  |------------------------|--------------------------|--------------------|
+  | **calc T1** (MPF, MTC) | yes                      | **yes** ← every language gets the core calculators |
+  | **calc T2** (the rest) | **yes** ← every calculator gets the core languages | no |
+
+  Three yeses is what makes it a **cross**. "Yes, no, no, no" is an **AND** rule — translate only
+  where both axes are core — which is an 8-cell rectangle that would leave Manning-Pipe-Flow
+  untranslated in 22 languages, contradicting Tom's own sentence *"All calculators get those few
+  languages, and all languages get those few calculators."* **The OR/cross is recorded as the
+  decision because that is what Tom described in words; if the intersection was actually meant, it is
+  a far smaller commitment and needs an explicit re-ruling.**
+
+  **The cross IS the 2 × 2 staircase, and N × N generalises it** — which is exactly Tom's original
+  "fading 2D gradient", and shows the gradient intuition was right and only needed buckets rather
+  than a continuous function:
+
+  ```
+              lang T1   lang T2   lang T3
+  calc T1       yes       yes       yes
+  calc T2       yes       yes       no
+  calc T3       yes       no        no
+  ```
+
   **NUMBER OF TIERS — start with TWO (Tom, 2026-08-03: "we could start with only two tiers, core and
   non-core"). That is the right call, and the reasons are worth recording so a third is added for a
   reason rather than for symmetry:**
-  - **Coverage is naturally binary.** A body is translated or it is not; there is no usable
-    half-translated calculator, so a middle *coverage* level has no meaning to define.
+  - ~~Coverage is naturally binary, so a middle coverage level has no meaning.~~ **RETIRED — this
+    argument was wrong** (see the model above): a tier is a bucket on an axis, not a coverage level,
+    so a third tier never implied a half-translated body. Struck rather than deleted, because it is
+    the reasoning error that would otherwise be repeated.
   - **Two tiers per axis produce the cross exactly, with one sentence of rule:** *translate the body
     iff the calculator is core OR the language is core; identity strings always.* No matrix, no
     per-cell table.
