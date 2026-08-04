@@ -76,11 +76,35 @@ fi
 
 TOTAL=$(wc -l < "$LOG")
 FIRST_DATE=$(head -1 "$LOG" | awk -F'\t' '{print $1}')
+# Printed at the END of the report (Tom, 2026-08-03: the report is long, and the coverage dates
+# belong at the bottom, not the top). A function, not a trailing block, because the script exits
+# early when there is no usage log yet -- and the footer has to print on that path too.
+print_footer() {
+    echo ""
+    echo "========================================="
+    echo " Coverage — each tier began logging on a DIFFERENT date"
+    echo "========================================="
+    echo "    Compare tiers with this in mind: if the usage log started after the page-view log, then"
+    echo "    %using is understated for every row above, because some counted shoppers arrived before"
+    echo "    a calculation could be recorded at all. Check these three dates before treating any"
+    echo "    conversion rate as real."
+    echo ""
+    printf "    %-34s %12s  %s\n" "log" "entries" "first entry"
+    printf "    %-34s %12s  %s\n" "$(basename "$LOG")" "$TOTAL" "$FIRST_DATE"
+    if [ -f "$VIEW_LOG" ]; then
+        printf "    %-34s %12s  %s\n" "$(basename "$VIEW_LOG")" "$(wc -l < "$VIEW_LOG")" "$(head -1 "$VIEW_LOG" | awk -F'\t' '{print $1}')"
+    fi
+    if [ -f "$USAGE_LOG" ]; then
+        printf "    %-34s %12s  %s\n" "$(basename "$USAGE_LOG")" "$(wc -l < "$USAGE_LOG")" "$(head -1 "$USAGE_LOG" | awk -F'\t' '{print $1}')"
+    fi
+    echo ""
+}
+
 echo "========================================="
 echo " EngCalcs language selection log stats"
 echo " $LOG"
-echo " Logging began: $FIRST_DATE"
 echo " $TOTAL total log entries"
+echo " (coverage dates are in the footer at the end of this report)"
 echo "========================================="
 
 echo ""
@@ -153,6 +177,7 @@ if [ ! -f "$USAGE_LOG" ]; then
     echo " No confirmed-human calculator-usage log yet: $USAGE_LOG"
     echo " (No one has confirmed a calculation since this feature shipped.)"
     echo "========================================="
+    print_footer
     exit 0
 fi
 
@@ -295,3 +320,31 @@ echo ""
     !hdr { printf "%-10s %-28s %10s %10s\n", "lang", "calculator", "humans", "humans";
            printf "%-10s %-28s %10s %10s\n", "", "", "shopping", "using"; hdr = 1 }
     { printf "%-10s %-28s %10d %10d\n", $3, $4, $1, $2 }'
+
+echo ""
+echo "--- Arrival pattern for non-English humans (bot-dwell check) ---"
+echo "    A JS-executing crawler that sits on a page for >=10s trips the confirmed-human beacon and"
+echo "    then never calculates -- which is EXACTLY the signature of a language with high shopping"
+echo "    and near-zero using. Before reading such a language as a translation defect, check here."
+echo "    days   = distinct calendar days the views fall on"
+echo "    burst  = most views in any single minute"
+echo "    Humans spread out; a crawler arrives in bursts and often on very few days. A language with"
+echo "    (say) 12 views on 1 day with a burst of 8 is a crawler. The same 12 over 9 days, burst 1,"
+echo "    is 12 people."
+echo ""
+if [ -f "$VIEW_LOG" ]; then
+    awk -F'\t' '{split($3,a,"-"); if (a[1]!="en" && a[1]!="") print a[1]"\t"substr($1,1,10)"\t"substr($1,1,16)}' "$VIEW_LOG" |
+    awk -F'\t' '
+        { n[$1]++; day[$1"\t"$2]=1; min[$1"\t"$3]++ }
+        END {
+            for (k in day) { split(k,p,"\t"); days[p[1]]++ }
+            for (k in min) { split(k,p,"\t"); if (min[k] > burst[p[1]]) burst[p[1]] = min[k] }
+            for (l in n) printf "%d\t%s\t%d\t%d\n", n[l], l, days[l], burst[l]
+        }' | sort -rn | awk -F'\t' '
+        !hdr { printf "%-10s %10s %10s %10s\n", "lang", "views", "days", "burst"; hdr = 1 }
+        { printf "%-10s %10d %10d %10d\n", $2, $1, $3, $4 }'
+else
+    echo "    (no confirmed-human page-view log yet)"
+fi
+
+print_footer
