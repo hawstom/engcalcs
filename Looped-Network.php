@@ -48,6 +48,10 @@ document.addEventListener('DOMContentLoaded', function() {
 	</div>
 	<div class="d-print-none" id="lpn_toolbar"></div>
 	<input type="file" id="lpn_backdrop_file" accept="image/*" style="display:none">
+	<?php // Project import (Task 195). Lives here rather than inside #lpn_projects_popup because
+	      // rebuildProjectsList() replaces that popup's body on every open, which would take the
+	      // input's wired change handler with it. ?>
+	<input type="file" id="lpn_project_file" accept=".json,application/json" style="display:none">
 	<?php // Floating "choose target mode" step of the Position sequence (Task 146 Phase 2) --
 	      // mirrors #lpn_labels_popup's static-PHP-plus-JS-clamped-position pattern (position:fixed,
 	      // positioned/clamped by showBackdropTargetPanel() in looped-network.js), not the spike's
@@ -240,6 +244,11 @@ EngCalcs.pageConfig = {
 	lpn_project_rename: <?=json_encode($ec_lang['lpn_project_rename'])?>,
 	lpn_project_delete: <?=json_encode($ec_lang['lpn_project_delete'])?>,
 	lpn_project_open_now: <?=json_encode($ec_lang['lpn_project_open_now'])?>,
+	lpn_project_export: <?=json_encode($ec_lang['lpn_project_export'])?>,
+	lpn_project_import: <?=json_encode($ec_lang['lpn_project_import'])?>,
+	lpn_import_bad_file: <?=json_encode($ec_lang['lpn_import_bad_file'])?>,
+	lpn_import_no_room: <?=json_encode($ec_lang['lpn_import_no_room'])?>,
+	lpn_status_imported: <?=json_encode($ec_lang['lpn_status_imported'])?>,
 	lpn_prompt_project_name: <?=json_encode($ec_lang['lpn_prompt_project_name'])?>,
 	lpn_confirm_project_delete: <?=json_encode($ec_lang['lpn_confirm_project_delete'])?>,
 	lpn_status_deleted_opened: <?=json_encode($ec_lang['lpn_status_deleted_opened'])?>,

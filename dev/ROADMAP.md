@@ -1034,22 +1034,63 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **Risk to respect:** every drawing gesture on this page is a one-finger touch, so this reworks
     the layer they all sit on. Not a tweak. If it lands, keep the height cap anyway — it costs
     nothing and is the belt to this braces.
-- 90|195| **Export/import a project as a file (Task 146 child) — a gate for dropping the PREVIEW
+- 25|195| **Export/import a project as a file (Task 146 child) — PHASE 1 SHIPPED 2026-08-03; only
+  Phase 2 remains, which is why the priority dropped from 90. A gate for dropping the PREVIEW
   banner. Reframed 2026-08-01 as two phases of the SAME task, not a separate one:** a one-shot JSON
-  download/import (Phase 1, as originally scoped, still the near-term target) and a live-handle,
+  download/import (Phase 1, as originally scoped, now built) and a live-handle,
   multi-user file-locking system built on top of it (Phase 2, new scope, added 2026-08-01). Both
   phases solve the same underlying problem this task was opened for — everything lives in
   localStorage, which a browser-data clear wipes, which Safari evicts after roughly 7 unused days,
   and which private mode never persists at all — Phase 2 just goes further, adding real file I/O and
   team coordination instead of only a backup/hand-off download.
 
-  **Phase 1 — one-shot JSON file, as originally scoped. Unchanged.**
+  **The 90 was carried by the data-loss argument, and Phase 1 answers it.** A user can now get a
+  copy of their work out of the browser, which is the part that was urgent. Phase 2 is team
+  coordination — genuinely useful, but nobody loses a network for want of it, and its own
+  open-questions list below says it is a planning entry rather than a spec ready to execute. Raise
+  it again when an actual office is sharing project files, not on the strength of the old number.
+
+  **Phase 1 — one-shot JSON file, as originally scoped. SHIPPED 2026-08-03.**
   - Download the v2 project document as JSON, and read one back. The storage shape is already
     exactly right for this — one self-contained object per project, backdrop included.
   - Distinct from EPANET `.inp` interop, which Tom confirmed 2026-07-29 is not needed. This is
     backup and hand-off of our own format, not exchange with other software.
   - Import must run the same `migrateSaved()` chain and the same structural repair a stored document
     gets, and land as a NEW project rather than overwriting the open one.
+
+  **What Phase 1 actually built** (`js/looped-network.js`, `Looped-Network.php`, `lang.ec.en.php`):
+  - Two buttons on their own row in the Projects panel — **"Save to file"** and **"Open from file"**,
+    not "Export"/"Import". The file holds our own format for backup and hand-off, and the plainer
+    pair says so without a word of explanation.
+  - `exportProject()` flushes the open project first, then serializes **the same
+    `serializeProject()` object autosave writes** — the file IS the stored document, so there is no
+    second format to keep in step. Written indented, deliberately: someone will eventually open one
+    in an editor, and on a project big enough for that to cost anything the backdrop's data URL
+    dominates the size regardless.
+  - `readDocument()` was split into **`prepareDocument(saved)`** (version gate + migration chain +
+    shape guard) and a thin localStorage reader over it. That split is what makes the ROADMAP's
+    "same chain, same repair" requirement true *by construction* rather than by duplication — the
+    only difference between a stored document and an imported file is where the JSON came from.
+  - The shape guard is new and applies to both: `nodes`/`links`/`labels`, if present, must be
+    arrays. `applySaved()` takes them on trust (`saved.nodes || []`), so a file whose `nodes` is a
+    string would previously have installed and then broken the renderer.
+  - `importProject()` writes and verifies the new project key **before** anything switches — the
+    same order `saveProjectAs()` uses, and for the same reason: an imported file carrying a backdrop
+    is the one thing here big enough to fail on quota, and a failed import must leave the user
+    exactly where they were. It then saves a *second* time after `applySaved()`, so what lands on
+    disk is the structurally repaired document (missing Base, dangling `activeScenario`, pre-2026-07-30
+    reservoirs with no elevation, merge-onto-current-defaults), not the raw file.
+  - Narrates where the user landed (`lpn_status_imported`), the way `deleteProject()` does — an
+    imported file becomes a *new* project, and that is the part a user cannot see for themselves.
+  - `lpn_notes_3_def` was rewritten: it told users "a project cannot yet be written to a file",
+    which stopped being true with this change.
+  - Verified with a throwaway harness that slices `prepareDocument`/`migrateSaved`/`safeFileName`
+    out of the file and runs them under Node — 22 checks covering the refusals (not-an-object,
+    missing/too-new version, non-array collections), the acceptances, the full v1→v2 migration of an
+    imported file, and filename sanitizing including non-Latin project names. Not committed; there
+    is no test harness in this repo to add it to.
+  - **Not done, and deliberately:** the PREVIEW banner stays. This task is *a* gate, not the only
+    one — 146.06's translation sprint has not run, and the page is still English-only.
 
   **Phase 2 — client-side collaborative file locking, built on real File System Access handles
   (added 2026-08-01).** A materially bigger version of "local file saving" than Phase 1: instead of

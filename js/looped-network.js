@@ -1806,18 +1806,33 @@ var EngCalcs = EngCalcs || {};
 		}
 		return saved;
 	}
-	// Reads one stored document, version-checks it and runs it up to the current version. Returns
-	// null for "nothing usable here" -- absent, unparseable, or written by a NEWER page than this
-	// one, which is refused loudly rather than silently half-read.
-	function readDocument(key) {
-		var saved = readJSON(key);
-		if (!saved || typeof saved.v !== 'number') { return null; }
+	// Version-checks one already-parsed document and runs it up to the current version. Returns null
+	// for "nothing usable here" -- not a project document at all, structurally impossible, or written
+	// by a NEWER page than this one, which is refused loudly rather than silently half-read.
+	// Split out of readDocument() for Task 195: an IMPORTED file has to go through exactly the same
+	// gate a stored document does, and the only difference between the two is where the JSON came
+	// from. Anything that runs here runs for both, by construction.
+	function prepareDocument(saved) {
+		if (!saved || typeof saved !== 'object' || typeof saved.v !== 'number') { return null; }
 		if (saved.v > LPN_STORAGE_VERSION) {
 			var pc = EngCalcs.pageConfig || {};
 			alert(pc.lpn_storage_too_new || 'This project was saved by a newer version of the page, so it cannot be opened here.');
 			return null;
 		}
+		// The three collections are the one part applySaved() takes on trust (`saved.nodes || []`),
+		// so a file whose `nodes` is a string or a number would install and then break the renderer
+		// rather than being refused here. Absent is fine -- that is an empty project; present and
+		// not an array is not a project document.
+		var lists = ['nodes', 'links', 'labels'], i;
+		for (i = 0; i < lists.length; i++) {
+			if (saved[lists[i]] !== undefined && !Array.isArray(saved[lists[i]])) { return null; }
+		}
 		return migrateSaved(saved);
+	}
+	// Reads one stored document and prepares it. Absent or unparseable JSON is "nothing usable here"
+	// as well, and readJSON() already reports both as null.
+	function readDocument(key) {
+		return prepareDocument(readJSON(key));
 	}
 	// Installs an already-read, already-migrated document as the live network. Split out of the old
 	// loadFromStorage() so the library can apply a document from ANY project key, not just the one.
@@ -2032,6 +2047,83 @@ var EngCalcs = EngCalcs || {};
 		updateProjectName();
 		return id;
 	}
+	// ---- Export / import a project as a file (ROADMAP Task 195 Phase 1) ----
+	// Everything above this line lives in localStorage and nowhere else, which a browser-data clear
+	// wipes, which Safari evicts after roughly 7 unused days, and which private mode never persists
+	// at all. These two functions are the way out of that -- a backup and hand-off of OUR format,
+	// deliberately not EPANET `.inp` interop (Tom confirmed 2026-07-29 that interop is not wanted).
+	// The stored shape is already exactly right for this: serializeProject() returns one
+	// self-contained object per project, backdrop included, so the file IS the stored document.
+	function safeFileName(name) {
+		// Only the characters a filesystem actually refuses, plus whitespace runs -- NOT a
+		// strip-to-ASCII, which would empty the filename of any project named in a non-Latin script.
+		var s = String(name).replace(/[\\/:*?"<>| -]+/g, '-').replace(/\s+/g, '-').replace(/^-+|-+$/g, '');
+		return s.slice(0, 60) || 'project';
+	}
+	function exportProject() {
+		saveToStorage(); // export what is on screen, including edits not yet autosaved
+		// Indented on purpose. A project file is a backup and a hand-off, so someone will eventually
+		// open one in an editor to see what is in it; the cost is a few percent on a small network,
+		// and on a big one the backdrop's data URL dominates the size no matter what we do here.
+		var text = JSON.stringify(serializeProject(), null, '\t');
+		var blob = new Blob([text], { type: 'application/json' });
+		var url = URL.createObjectURL(blob), a = document.createElement('a');
+		a.href = url;
+		a.download = 'lpn-' + safeFileName(projectDisplayName(project)) + '.json';
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+		// Deferred: revoking synchronously can beat the download off the mark in some browsers.
+		setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
+	}
+	// Lands an imported document as a NEW project, never over the open one (the ROADMAP is explicit
+	// about this, and it is what makes import safe to try). Written and verified BEFORE anything
+	// switches, for the same reason saveProjectAs() is: an imported file carrying a backdrop is the
+	// one thing here big enough to fail on quota, and a failed import must leave the user exactly
+	// where they were. The second save, after applySaved(), rewrites the key with the STRUCTURALLY
+	// REPAIRED document -- the missing-Base, dangling-activeScenario, reservoir-elevation and
+	// merge-onto-current-defaults fixes applySaved() performs -- so an imported file is stored in
+	// exactly the state a document that had always lived here would be.
+	function importProject(saved) {
+		var pc = EngCalcs.pageConfig || {};
+		saveToStorage(); // flush the outgoing project before switching away from it
+		var id = newProjectId();
+		if (!writeJSON(projectKey(id), saved)) {
+			alert(pc.lpn_import_no_room || 'There is not enough browser storage left to add this project. Delete a project you no longer need and try again.');
+			return null;
+		}
+		applySaved(saved);
+		library.projects.push({ id: id, name: project.name, updated: Date.now() });
+		library.openId = id;
+		clearUndo();
+		saveToStorage();
+		refreshAllFromDocument();
+		// After refreshAllFromDocument(), which itself calls setStatus('') -- see the notice/
+		// diagnostic split at setStatus(). Says where the user landed, the same way deleteProject()
+		// does: a project appearing on screen that was not there a moment ago wants narration.
+		setNotice((pc.lpn_status_imported || 'Opened {name} from a file, and added it to this browser as a new project.')
+			.replace('{name}', projectDisplayName(project)));
+		return id;
+	}
+	function importProjectFromFile(file) {
+		var pc = EngCalcs.pageConfig || {}, reader = new FileReader();
+		reader.onload = function (ev) {
+			var parsed = null;
+			try { parsed = JSON.parse(ev.target.result); } catch (err) { parsed = null; }
+			// prepareDocument() reports a too-new file itself, and returns null either way; a second
+			// alert on top of that one would be noise, so only the not-a-project case speaks here.
+			var saved = prepareDocument(parsed);
+			if (!saved) {
+				if (parsed && typeof parsed.v === 'number' && parsed.v > LPN_STORAGE_VERSION) { return; }
+				alert(pc.lpn_import_bad_file || 'That file could not be read as a project saved from this page.');
+				return;
+			}
+			importProject(saved);
+			rebuildProjectsList();
+		};
+		reader.onerror = function () { alert(pc.lpn_import_bad_file || 'That file could not be read as a project saved from this page.'); };
+		reader.readAsText(file);
+	}
 	function renameProject(id, name) {
 		var entry = indexEntry(id);
 		if (!entry) { return; }
@@ -2164,6 +2256,25 @@ var EngCalcs = EngCalcs || {};
 		newBtn.textContent = pc.lpn_project_new || 'Start empty project';
 		newBtn.addEventListener('click', function () { newProject(); rebuildProjectsList(); });
 		list.appendChild(newBtn);
+		// File in / file out (Task 195). On their own row below the two in-browser "new project"
+		// buttons: those three all produce a project from something you already have here, while
+		// these two are the only controls on the page that cross the browser-storage boundary.
+		var fileRow = document.createElement('div');
+		fileRow.style.marginTop = '6px';
+		var exportBtn = document.createElement('button');
+		exportBtn.type = 'button';
+		exportBtn.textContent = pc.lpn_project_export || 'Save to file';
+		exportBtn.addEventListener('click', function () { exportProject(); });
+		fileRow.appendChild(exportBtn);
+		var importBtn = document.createElement('button');
+		importBtn.type = 'button'; importBtn.style.marginLeft = '4px';
+		importBtn.textContent = pc.lpn_project_import || 'Open from file';
+		importBtn.addEventListener('click', function () {
+			var fileInput = document.getElementById('lpn_project_file');
+			if (fileInput) { fileInput.click(); }
+		});
+		fileRow.appendChild(importBtn);
+		list.appendChild(fileRow);
 	}
 	function toggleProjectsPopup(evt) {
 		var popup = document.getElementById('lpn_projects_popup');
@@ -2179,6 +2290,16 @@ var EngCalcs = EngCalcs || {};
 	function wireProjectsPopup() {
 		document.getElementById('lpn_projects_popup_close').addEventListener('click', function () {
 			document.getElementById('lpn_projects_popup').style.display = 'none';
+		});
+		// The hidden picker lives in the page, not in the popup body, because rebuildProjectsList()
+		// replaces that body wholesale on every open -- the same reason lpn_backdrop_file does.
+		// Cleared after every pick so re-choosing the SAME file still fires a change event.
+		var fileInput = document.getElementById('lpn_project_file');
+		if (!fileInput) { return; }
+		fileInput.addEventListener('change', function () {
+			var f = fileInput.files[0];
+			fileInput.value = '';
+			if (f) { importProjectFromFile(f); }
 		});
 	}
 

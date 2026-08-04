@@ -1192,6 +1192,17 @@ $ec_lang['lpn_project_open']='Open';
 $ec_lang['lpn_project_rename']='Rename';
 $ec_lang['lpn_project_delete']='Delete';
 $ec_lang['lpn_project_open_now']='Open now';
+// File in / file out (ROADMAP Task 195). "Save to file" and "Open from file" rather than
+// "Export"/"Import": the file holds our own format for backup and hand-off, not an exchange format
+// for other software, and the plainer pair says so without a word of explanation.
+$ec_lang['lpn_project_export']='Save to file';
+$ec_lang['lpn_project_import']='Open from file';
+$ec_lang['lpn_import_bad_file']='That file could not be read as a project saved from this page.';
+$ec_lang['lpn_import_no_room']='There is not enough browser storage left to add this project. Delete a project you no longer need and try again.';
+// {name} is a project name; word order is the translator's to choose. Says where the user landed,
+// the same way lpn_status_deleted_opened does -- an opened file becomes a NEW project here, and
+// that is the part a user cannot see for themselves.
+$ec_lang['lpn_status_imported']='Opened {name} from a file, and added it to this browser as a new project.';
 $ec_lang['lpn_prompt_project_name']='Name for this project';
 $ec_lang['lpn_confirm_project_delete']='Delete this project and everything in it? This cannot be undone.';
 // Deleting the OPEN project opens the most recently updated survivor, so a network the user did
@@ -1205,7 +1216,7 @@ $ec_lang['lpn_notes_1_def']='Solves one set of demands at a time, using the same
 $ec_lang['lpn_notes_2_term']='Not modeled';
 $ec_lang['lpn_notes_2_def']='Tanks, water quality, and control valves that open and close on their own (PRV, PSV, FCV) are not modeled. A pipe can carry a fixed minor loss, but not a valve whose open or closed state depends on the flow being solved for.';
 $ec_lang['lpn_notes_3_term']='Saved projects';
-$ec_lang['lpn_notes_3_def']='Your projects are saved automatically in this browser, and nowhere else. Clearing your browser data deletes them, and a project cannot yet be written to a file or moved to another device. Because this is an early preview, please use it for small networks and for testing only.';
+$ec_lang['lpn_notes_3_def']='Your projects are saved automatically in this browser, and nowhere else. Clearing your browser data deletes them. To keep a copy, or to move a project to another device, open the Projects panel and use Save to file. Because this is an early preview, please use it for small networks and for testing only.';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
 // It lives in the Notes list, not in the pump popup: the popup is a small floating panel that has
 // to stay readable on a phone, while the Notes section is already this page's documentation home,
