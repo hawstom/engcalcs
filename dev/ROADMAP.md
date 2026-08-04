@@ -864,15 +864,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
      computed geodesically from lat/lng rather than from screen geometry. This is the strongest
      argument for the existing rule that **`len` is stored and overridable, never derived**.
 
-- 30|173| **`EngCalcs.initTips(root)` — tooltips built after page load are dead on touch.**
-  `js/Calculators.lib.js:8-12` activates Bootstrap tooltips exactly once, on `DOMContentLoaded`. Any
-  `.ec-help[title]` created later by JS therefore never gets a tooltip instance, and on a touch
-  device that means **the tip content is unreachable** — first tap does nothing, and there is no
-  hover to fall back on. This is precisely the failure CLAUDE.md's link+tip convention warns about
-  ("a bare `<a title>` just navigates on first tap"), reached by a different route. Fix is six lines:
-  extract the body into `EngCalcs.initTips(root)`, call it with `document` on `DOMContentLoaded`, and
-  call it again after building any dynamic UI. **Worth doing on its own merits, not only for Task
-  146** — but it is a hard prerequisite there, where every property popup is built at runtime.
 - 25|174| **Extract `echoUnitsRow()` from `echoCalculatorForm()`.** `lib/Calculators.lib.php:172-179`
   emits the Restore-defaults / US / SI row inline, so it is reachable only by pages that call
   `echoCalculatorForm()`. Any page that cannot use the fixed two-column input table — Task 146's map
@@ -1164,6 +1155,50 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Completed
 
+- 0|197|[CC] **Tooltips stuck visible — the hover+click trigger stack (suite-wide) — DONE 2026-08-03.**
+  Tom: *"Tips are getting stuck visible. I saw this on mtc.n."* Second report of the same symptom;
+  the 2026-07-30 fix in `js/Calculators.lib.js` covered **controls only**, so every PLAIN LABEL kept
+  `'hover focus click'` — all three triggers at once — which is precisely the accumulation that
+  file's own comment describes. The comment explained the bug and the code then shipped it for half
+  the elements.
+  - **Why `mtc_n` specifically:** its `.ec-help` sits *beside* the `<a>`, not inside it (the
+    link+tip convention), so `ecTipIsControl()`'s `closest()` finds no control and it takes the
+    plain-label branch. Nothing wrong with the markup — the branch was wrong.
+  - **The real rule is narrower than "controls differ from labels":** a tip must never carry both a
+    hover trigger and a click trigger, whatever the element is. Bootstrap will not hide while ANY
+    trigger is active, so hover-then-click leaves it pinned when the pointer leaves. The fix picks
+    **one opening gesture per device**: hover-capable pointers get `'hover focus'`; touch gets
+    `'click'` for plain labels (their only gesture) while controls stay `'hover focus'` so a tap
+    still just performs the button's action. Controls keep the explicit hide-on-click stabilizer.
+  - **Accepted gap:** a hybrid device (touch screen + mouse) reports `(hover: hover)`, so a plain
+    label's tip is hover-only there and a finger tap will not open it. Rare device, and a far
+    smaller harm than a tooltip stranded over the page for every mouse user.
+  - **Guarded by `dev/lpn-spike/suite-tips-trigger-harness.js`** (16 checks), which asserts the rule
+    for all four combinations of (is a control, device can hover) rather than for the case that
+    happened to be reported — that narrowness is what let this regress once already. Note the
+    harness tests suite-wide code from an `lpn-spike` directory; a neutral home is wanted once there
+    are more than two.
+- 0|198|[CC] **Flow arrow moved downstream of midpoint (Task 146 child) — DONE 2026-08-03.**
+  Tom: *"I think it's more intuitive for the flow arrow to be downstream of midpoint. It's currently
+  upstream."* `ARROW_ALONG` 0.3 → 0.7 in `js/looped-network.js`, measured from the upstream end.
+  One constant: `flow < 0` already mirrors it to `1 - ARROW_ALONG`, and `linkLabelMid()`'s
+  label-collision test measures against `arrowAlongDistances()`, which derives from the same value,
+  so label separation follows automatically. The arrow now leads the flow rather than trailing it,
+  keeping the same distance from the midpoint label and the same redundancy with the chevron.
+
+- 0|173|[CC] **`EngCalcs.initTips(root)` — tooltips built after page load are dead on touch — DONE
+  (built during Task 146; closed 2026-08-03 on discovering it was still listed at priority 30).**
+  `js/Calculators.lib.js` exports `EngCalcs.initTips(root)`, calls it with `document` on
+  `DOMContentLoaded`, and `js/looped-network.js` calls it again after building the toolbar, each
+  property popup, the Settings panel and the Labels panel — the three things the original entry
+  asked for. It was implemented as the hard prerequisite it was described as, and then never closed.
+  - **Closing note, and the reason this is worth a paragraph rather than a silent deletion:** the
+    entry sat at priority 30 in an active list for long enough to distort every "what is next"
+    reading of the roadmap. Recurring miss — closing a task means priority → 0 AND moving the block
+    to `## Completed`, in the same edit.
+  - The tooltip work did NOT end here. See Task 193's reset-controls block for the 2026-08-03
+    stuck-tooltip fix, which is a different defect in the same function.
+
 - 0|193|[CC] **`lpn_` English tightening pass — DONE 2026-07-31.** The English-reform gate applied
   before the 146.06 sprint, so each fix is paid for once rather than 26 times. Commits: the source
   pass, then the trap-term tips and glossary seed. Every `lpn_` key was reviewed; 51 changed.
@@ -1264,7 +1299,12 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
         `runSolve()` owns it for diagnostics and rewrites it on a 300 ms debounce after every
         mutation — *including the empty string on a clean solve* — and `refreshAllFromDocument()`
         blanks it as well. A plain `setStatus()` notice would therefore vanish ~300 ms after
-        appearing, which is easily long enough to look like it worked when hand-testing. The split
+        appearing. **Correction (Tom, 2026-08-03): 300 ms is nowhere near long enough for a human to
+        read anything** — this sentence originally called it "long enough to look like it worked",
+        which is wrong. Reading a short sentence takes 1–2 seconds; 300 ms registers as a flicker
+        you would dismiss as a repaint, if you caught it at all. That makes the bug *worse*, not
+        milder: the message never gets read, and a hand test shows nothing convincing either way.
+        The 8 s notice timer is sized for reading, not for the debounce. The split
         now: **a non-empty status supersedes a notice and discards it** (a live "Add a reservoir"
         outranks a report of a finished action); **an empty status falls back to the notice**
         instead of blanking the bar, which is what lets it survive the clean solve that the
@@ -1299,6 +1339,10 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     - `lpn_confirm_restore_defaults` gained one clause the panel never admitted: "Settings belong to
       the open project, so your other projects keep their own." That is 146.08's per-project-settings
       open question surfacing in the UI for the first time.
+  - **Called substantially complete 2026-08-03 (Tom), with one deferred verification.** Re-test the
+    `lpn_` strings and the three reset controls **once Task 195 (local save) is done** — 195 changes
+    what is true about persistence, which is exactly what `lpn_notes_3_def`, `lpn_notes_4_def` and
+    `lpn_reset_all_tip` assert. None of this pass has been seen in a browser by anyone.
   - **One sequencing note, left open deliberately.** This pass ran BEFORE Task 146.02 (the
     EPANET-style icon toolbar), which is priority 95, also blocks 146.06, and will change toolbar
     strings — so 193's own "do it once the string set has stopped moving" is not strictly satisfied.

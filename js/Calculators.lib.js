@@ -21,16 +21,38 @@ var EngCalcs = EngCalcs || {};
 // So a control gets 'hover focus' (a mouse user and a keyboard user both still get the tip) plus
 // an explicit hide on click: Bootstrap's hide() clears all three active triggers at once, which is
 // what breaks the cycle. On touch, tapping a button performs its action -- that IS the answer, and
-// a tip left hanging over the panel it just opened is noise. A plain label keeps 'click' in the
-// trigger list, because a tap is the only way to reach its tip at all.
+// a tip left hanging over the panel it just opened is noise.
+//
+// 2026-08-03: the SAME defect was reported again, on mtc_n ("Tips are getting stuck visible").
+// The 2026-07-30 fix above only ever covered CONTROLS. A plain label kept 'hover focus click' --
+// all three triggers at once -- which is precisely the accumulation the paragraph above describes,
+// so plain labels were left with the exact bug the comment explains. mtc_n reaches that branch
+// because its .ec-help sits BESIDE the <a>, not inside it, so ecTipIsControl() is false.
+//
+// The real rule is narrower than "controls differ from labels": A TIP MUST NEVER CARRY BOTH A
+// HOVER TRIGGER AND A CLICK TRIGGER. Stacking two opening gestures is what strands the tip open,
+// regardless of what the element is. So pick ONE opening gesture per DEVICE instead:
+//   - pointer can hover (mouse/trackpad): 'hover focus'. A <span> is not focusable without
+//     tabindex, so for a plain label this is effectively hover-only -- nothing to get stuck on.
+//   - pointer cannot hover (touch): 'click' for a plain label, which is the only way to reach its
+//     tip at all; controls stay 'hover focus' so a tap still just performs the button's action.
+// Known and accepted gap: on a HYBRID device (touch screen plus mouse) '(hover: hover)' reports
+// true, so a plain label's tip is hover-only and a finger tap will not open it. That is a rare
+// device and a much smaller harm than a tooltip stuck over the page for every mouse user.
 function ecTipIsControl(el) {
 	return !!el.closest('button, a, input, select, textarea, [role="button"]');
 }
+// Evaluated per call, not cached at load: a tip built into a runtime popup should be wired for the
+// device as it is now, and matchMedia is cheap.
+function ecCanHover() {
+	return !window.matchMedia || window.matchMedia('(hover: hover)').matches;
+}
 EngCalcs.initTips = function (root) {
+	var canHover = ecCanHover();
 	(root || document).querySelectorAll('[title][style*="cursor:help"], .ec-help[title]').forEach(function (el) {
 		var control = ecTipIsControl(el);
 		var tip = bootstrap.Tooltip.getOrCreateInstance(el, {
-			trigger: control ? 'hover focus' : 'hover focus click'
+			trigger: (control || canHover) ? 'hover focus' : 'click'
 		});
 		if (control && !el.dataset.ecTipClickWired) {
 			el.dataset.ecTipClickWired = '1';

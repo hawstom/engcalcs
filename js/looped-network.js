@@ -1006,12 +1006,18 @@ var EngCalcs = EngCalcs || {};
 		}
 		return out;
 	}
-	// Where the flow arrow sits along its segment, as a fraction measured FROM THE UPSTREAM END
+	// Where the flow arrow sits along its segment, as a fraction measured FROM THE UPSTREAM END.
+	// The label is anchored at the segment midpoint, so anything other than 0.5 separates the two
 	// (Tom, 2026-07-30: "flow arrows are colliding with pipe labels… maybe arrow at 30% from low
-	// head and label at 50%?"). The label is anchored at the segment midpoint, so anything other
-	// than 0.5 separates them; 0.3 from upstream also makes the arrow's position itself carry the
-	// flow direction, redundantly with the chevron, which helps at small sizes.
-	var ARROW_ALONG = 0.3;
+	// head and label at 50%?"), and an off-centre arrow makes the POSITION carry the flow direction
+	// too, redundantly with the chevron, which helps at small symbol sizes.
+	// Moved 0.3 -> 0.7 on 2026-08-03 (Tom: "more intuitive for the flow arrow to be downstream of
+	// midpoint"). Same distance from the label, same redundancy, but the arrow now sits where the
+	// water is going rather than where it came from -- it reads as leading the flow instead of
+	// trailing it. Everything else follows the constant: flow < 0 mirrors it to 1 - ARROW_ALONG,
+	// and linkLabelMid()'s collision test measures against arrowAlongDistances(), which derives
+	// from this same value, so the label keeps clear of the arrow's new position automatically.
+	var ARROW_ALONG = 0.7;
 	// Nominal chevron length along the pipe: the polyline spans -0.8..0.8 in its own coordinates
 	// before symbolFactor() scales it.
 	var ARROW_NOMINAL_LEN = 1.6;
