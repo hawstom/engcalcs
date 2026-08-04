@@ -1215,10 +1215,39 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     the client state machine including fail-open and the mid-session takeover; 46 from Phase 1 and
     step 1).
 
-  **Not done:** no browser testing of any of this — there is no browser in the build environment, so
-  every check above is a harness against sliced-out logic, not a click. The UI paths (the banner, the
-  disabled toolbar, the pickers) have never been seen rendered. That is the first thing to do before
-  the PREVIEW banner comes off.
+  **Tom's first browser pass, 2026-08-03 — five findings, all addressed the same day.**
+  - **The likely cause of what he saw:** `showSaveFilePicker` requires a **secure context**, so on
+    plain `http://` it is `undefined` and the page silently uses Phase 1's download fallback. That
+    explains "my browser saves silently to a default file name and location; when I save again I get
+    a second copy" — it was never the handle path. Anyone testing this must use `https://` or
+    `localhost`, and that is now the first thing to check when the file behavior looks wrong.
+  - **The moment of danger is opening a file you could not lock** (Tom). It now warns in the banner —
+    editing continues, because an unreachable server must never take the calculator away, but the
+    user is told the file is unprotected. **The warning promises a follow-up and now keeps it:**
+    `retryLock()` runs on every autosave tick, clears the banner and says "locking is working again"
+    when the server returns — or goes read-only if the server comes back and somebody else got there
+    first. **Dismissable only when offline or installed** (Tom was unsure; this is his instinct
+    implemented): where having no server is a standing fact of the session the banner can be
+    dismissed, and where it is an ordinary fixable fault it cannot.
+  - **Gratuitous saving.** Where a file is linked, pressing Save writes to that same file — already
+    true. Where the API is missing there is no handle to keep, so every press really is another copy;
+    the button now reads **"Download a copy"** with a tip, instead of saying "Save to file" and
+    quietly producing duplicates.
+  - **"Close project"** (there was no way to say "I am done with this file"). Flushes, releases the
+    lock so a colleague can open it, unlinks the file, deletes nothing, and its tip says the same
+    thing happens on its own when the tab closes — which answers Tom's "explain it somehow" as well.
+  - **A moved/renamed/deleted file** now reports in the banner with a **"Choose the file again"**
+    button that drops the stale handle first (otherwise the next save retries the same dead handle).
+  - **A copied file: we cannot detect it, and said so rather than guessing.** The File System Access
+    API exposes `handle.name` and never a path, so "moved" and "copied" are genuinely
+    indistinguishable — and a name comparison would miss the common blooper exactly (copy to a backup
+    folder keeps the name). Instead there is a **"This is a copy"** button that assigns a fresh
+    `docId` and releases the old lock, letting the one party who actually knows say so.
+
+  **Still not done:** the UI has still never been seen rendered by the author. Every check is a
+  harness against sliced-out logic (157 across four harnesses now), not a click. Tom's pass above is
+  the only real browser evidence so far, and it was on a non-secure origin, so the entire
+  handle/lock/read-only path remains unexercised in a real browser.
 - 12|196| **EPANET `.inp` import/export (Task 146 child) — a separate task from Task 195, deliberately.**
   Raised 2026-08-01. **This reopens a decision already made once**: the scope doc records
   `.inp` interop as "distinct from" Task 195 and says "Tom confirmed 2026-07-29 is not needed," in

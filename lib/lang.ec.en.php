@@ -1209,6 +1209,19 @@ $ec_lang['lpn_status_imported']='Opened {name} from a file, and added it to this
 // {file} is a file name and {name} a project name; word order is the translator's to choose.
 $ec_lang['lpn_file_type_desc']='Project file';
 $ec_lang['lpn_file_saving_to']='Saving to: {file}';
+// Where there is no File System Access API -- Firefox, Safari, or any page not served over https --
+// a save cannot link a file, so every press really is another copy in the downloads folder. The
+// label says which of the two you are getting rather than leaving the duplicate looking like a bug.
+$ec_lang['lpn_project_download']='Download a copy';
+$ec_lang['lpn_project_download_tip']='This browser cannot keep working in a file, so each press saves another copy to your downloads. Open one with Open from file to carry on where you left off.';
+$ec_lang['lpn_project_close']='Close project';
+$ec_lang['lpn_project_close_tip']='Stops saving to the file and lets a colleague open it. The project stays in this browser, and nothing is deleted. This also happens on its own when you close the tab.';
+// We cannot tell a moved file from a copied one -- the browser gives us a file name, never a path --
+// so this asks the one person who does know. Deliberately worded as a statement the user makes, not
+// a question we guess at.
+$ec_lang['lpn_project_fork']='This is a copy';
+$ec_lang['lpn_project_fork_tip']='Say this when you opened a copy of someone else\'s file and want to work on it separately. From then on you and they will not be told about each other.';
+$ec_lang['lpn_project_fork_confirm']='Treat this as a separate project from the file it was copied from? Colleagues editing the original will no longer be told you have this one open.';
 $ec_lang['lpn_file_unlink']='Stop saving to file';
 $ec_lang['lpn_status_file_linked']='Saving {name} to {file} as you work, until this tab is closed.';
 $ec_lang['lpn_status_file_opened']='Opened {file}. Changes are saved back to it as you work, until this tab is closed.';
@@ -1229,6 +1242,16 @@ $ec_lang['lpn_lock_takeover']='Take over from {name}';
 // what stopped, and it is true: every edit is in this browser either way.
 $ec_lang['lpn_lock_taken']='{name} has taken over this project. Your changes are still saved in this browser, but they are no longer being written to the file.';
 $ec_lang['lpn_lock_took_over']='You have taken over from {name}. Their work was saved to the file before you did.';
+// Opening a file we could not lock is the moment of danger (Tom, 2026-08-03): from then on nothing
+// stops a colleague editing the same file. Editing still works -- an unreachable server must never
+// take the calculator away -- so this warns rather than blocks, and promises the follow-up that
+// lpn_lock_restored keeps.
+$ec_lang['lpn_lock_unavailable']='Beware: could not reach the server to check or create a lock on this project, so nothing is stopping a colleague from editing the same file at the same time. You will be told if locking starts working again.';
+$ec_lang['lpn_lock_restored']='Locking is working again, and this project is now yours to edit.';
+$ec_lang['lpn_lock_dismiss']='Dismiss';
+// Recovery when the linked file has moved, been renamed, or been deleted. The button does the
+// finding; the message never tells someone to go hunting through a menu.
+$ec_lang['lpn_file_relink']='Choose the file again';
 $ec_lang['lpn_settings_files']='Saving to a file';
 $ec_lang['lpn_settings_file_autosave']='Save to file every (seconds)';
 $ec_lang['lpn_settings_file_autosave_tip']='How often your project is written back to the file you linked it to. Between 60 and 180 seconds. Your work is saved in this browser every time you change something, no matter what this is set to.';

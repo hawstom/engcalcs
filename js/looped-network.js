@@ -2201,11 +2201,13 @@ var EngCalcs = EngCalcs || {};
 	}
 	// Same honesty rule setStorageError() follows: a user who thinks they are editing a file must be
 	// told the moment they are not. Cleared by the next write that succeeds.
+	// A failed write is reported in the BANNER, not the status line, and carries the way out with it
+	// (Tom, 2026-08-03: "Local file not found. Please select project file."). A status message that
+	// tells someone to go and find a menu item is a worse answer than a button that does it.
 	function setFileError(on) {
-		var pc = EngCalcs.pageConfig || {};
 		if (on === fileError) { return; }
 		fileError = on;
-		if (on) { setStatus(pc.lpn_file_write_failed || 'Could not write to the file. It may have been moved or renamed, or permission may have been withdrawn. Your work is still saved in this browser. Use Save to file to choose the file again.'); }
+		setFileMissing(on);
 	}
 	// Writes the OPEN project to its linked file. Resolves false when there was nothing to do.
 	// `fileDirty` is cleared BEFORE the await, not after: an edit made while the write is in flight
@@ -2222,6 +2224,10 @@ var EngCalcs = EngCalcs || {};
 		// Deliberately ahead of clearing fileDirty: a write we abort has to stay pending.
 		if (lock.docId) {
 			var lockNow = await postLock('acquire', lock.docId);
+			if (lockNow && lockNow.ok && lockNow.held && lockUnavailable) {
+				lockUnavailable = false;
+				setLockUnavailable(false);
+			}
 			if (lockNow && lockNow.ok && !lockNow.held) {
 				// Somebody took over while we were away. Abort rather than clobber their file, and
 				// say so plainly. The reassurance is true: localStorage has every edit regardless.
@@ -2257,7 +2263,7 @@ var EngCalcs = EngCalcs || {};
 	function restartFileAutosave() {
 		if (fileWriteTimer) { clearInterval(fileWriteTimer); fileWriteTimer = null; }
 		var secs = Math.min(180, Math.max(60, +settings.fileAutosaveSeconds || 120));
-		fileWriteTimer = setInterval(function () { flushToFile(false); }, secs * 1000);
+		fileWriteTimer = setInterval(function () { retryLock(); flushToFile(false); }, secs * 1000);
 	}
 	// Called before any switch of library.openId. Everything that decides WHAT and WHERE to write --
 	// linkedHandle() and projectFileText() -- runs synchronously before flushToFile()'s first await,
@@ -2316,14 +2322,45 @@ var EngCalcs = EngCalcs || {};
 		}
 		rebuildProjectsList();
 	}
-	// Deliberately does NOT delete the file or the project -- it only stops writing to it. The
-	// project stays exactly where it was, in this browser.
+	// "Close project" (Tom, 2026-08-03: there was no way to say "I am done with this file"). It
+	// deliberately deletes NOTHING -- not the file, not the project. It stops writing to the file and
+	// hands the lock back so a colleague can open it, and the project stays exactly where it was, in
+	// this browser. The same thing happens on its own when the tab closes; this is the way to do it
+	// without closing the tab.
 	function unlinkFile() {
 		if (!library.openId) { return; }
-		flushToFile(false); // one last write, so unlinking never silently drops the last few edits
+		flushToFile(false); // one last write, so closing never silently drops the last few edits
 		fileHandles.delete(library.openId);
 		setFileError(false);
 		releaseLock();
+		lockUnavailable = false;
+		setLockUnavailable(false);
+		setReadOnly(false);
+		rebuildProjectsList();
+	}
+	// Recovery from a file that moved, was renamed, or was deleted. The stale handle is dropped
+	// FIRST -- otherwise saveToFile() would find it still linked and quietly try the same dead
+	// handle again instead of asking where the file went.
+	async function relinkFile() {
+		if (!library.openId) { return; }
+		fileHandles.delete(library.openId);
+		fileError = false;
+		setFileMissing(false);
+		await saveToFile();
+	}
+	// The copied-file escape hatch. We cannot detect a copy: the File System Access API exposes only
+	// handle.name, never a path, so "same file moved" and "a copy in another folder" are genuinely
+	// indistinguishable to us -- and the common blooper (copy to a backup folder, same name) is
+	// exactly the case a name comparison would miss. Rather than guess wrong, this lets someone who
+	// KNOWS they are working on a copy say so, which is the one reliable signal available.
+	function forkProject() {
+		var pc = EngCalcs.pageConfig || {};
+		if (!window.confirm(pc.lpn_project_fork_confirm || 'Treat this as a separate project from the file it was copied from? Colleagues editing the original will no longer be told you have this one open.')) { return; }
+		releaseLock();
+		project.docId = newDocId();
+		saveToStorage();
+		setReadOnly(false);
+		acquireLockForOpenProject();
 		rebuildProjectsList();
 	}
 
@@ -2397,9 +2434,49 @@ var EngCalcs = EngCalcs || {};
 	// clearing, the example, the backdrop. It deliberately does NOT block view preferences (Settings,
 	// Labels) or panning and zooming: looking around a network you may not edit is exactly what a
 	// person in this state wants to do, and a label-display choice is not someone else's work.
+	// Two things can want the banner at once -- read-only (someone else holds the project) and a
+	// warning (we could not reach the broker, or the file write failed). They are kept as separate
+	// state rather than one message string so that clearing one cannot silently erase the other, and
+	// read-only wins when both are set: it is the one that changes what the user is allowed to do.
+	var bannerRO = null;   // { message, stealFrom } | null
+	var bannerWarn = null; // { message, actionLabel, action, dismissable } | null
+	function renderBanner() {
+		var banner = document.getElementById('lpn_lock_banner');
+		if (!banner) { return; }
+		var pc = EngCalcs.pageConfig || {}, state = bannerRO || bannerWarn;
+		banner.innerHTML = '';
+		if (!state) { banner.style.display = 'none'; return; }
+		// Amber for a warning you may work through, red for a state that has taken editing away.
+		banner.style.borderColor = bannerRO ? '#a00' : '#a80';
+		banner.style.background = bannerRO ? '#fff0f0' : '#fffbe6';
+		var text = document.createElement('span');
+		text.textContent = state.message || '';
+		banner.appendChild(text);
+		function action(label, fn) {
+			var btn = document.createElement('button');
+			btn.type = 'button'; btn.style.marginLeft = '8px';
+			btn.textContent = label;
+			btn.addEventListener('click', fn);
+			banner.appendChild(btn);
+		}
+		if (bannerRO && bannerRO.stealFrom !== null && bannerRO.stealFrom !== undefined) {
+			action((pc.lpn_lock_takeover || 'Take over from {name}').replace('{name}', bannerRO.stealFrom || (pc.lpn_lock_somebody || 'Somebody else')), takeOverLock);
+		}
+		if (!bannerRO && bannerWarn) {
+			if (bannerWarn.action) { action(bannerWarn.actionLabel, bannerWarn.action); }
+			// Dismissable only where the missing server is a standing fact of how the page is being
+			// used rather than a fault to be fixed -- offline, or installed as an app (Tom, 2026-08-03,
+			// unsure which way this should go). Undismissable in the ordinary online case, because
+			// there the warning describes a real, fixable risk to a colleague's work; permanently
+			// undismissable in the offline case would be noise nobody can ever act on.
+			if (bannerWarn.dismissable) {
+				action(pc.lpn_lock_dismiss || 'Dismiss', function () { bannerWarn = null; renderBanner(); });
+			}
+		}
+		banner.style.display = 'block';
+	}
 	function setReadOnly(on, message, stealFrom) {
 		readOnly = !!on;
-		var banner = document.getElementById('lpn_lock_banner');
 		document.querySelectorAll('#lpn_toolbar [data-edits="1"]').forEach(function (el) {
 			if (el.tagName === 'BUTTON' || el.tagName === 'SELECT') { el.disabled = readOnly; return; }
 			el.querySelectorAll('button, select').forEach(function (c) { c.disabled = readOnly; });
@@ -2407,22 +2484,44 @@ var EngCalcs = EngCalcs || {};
 		if (readOnly) {
 			closePopup();  // a property editor open over a network you cannot edit is a trap
 			setMode('select');
+			bannerRO = { message: message || '', stealFrom: stealFrom };
+		} else {
+			bannerRO = null;
 		}
-		if (!banner) { return; }
-		banner.innerHTML = '';
-		if (!readOnly) { banner.style.display = 'none'; return; }
+		renderBanner();
+	}
+	// True where having no server is a standing condition of this session rather than a fault.
+	function lockWarningDismissable() {
+		try {
+			if (navigator.onLine === false) { return true; }
+			if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) { return true; }
+		} catch (err) { /* older browsers: treat as ordinary online use */ }
+		return false;
+	}
+	// The moment of danger is opening a file we could not lock (Tom, 2026-08-03): from then on
+	// nothing is stopping a colleague from editing the same file, and the user has to know. Stated as
+	// a standing banner rather than a modal alert precisely because it PROMISES a follow-up -- a
+	// modal cannot come back later to say the risk has passed, and this one can.
+	function setLockUnavailable(on) {
 		var pc = EngCalcs.pageConfig || {};
-		var text = document.createElement('span');
-		text.textContent = message || '';
-		banner.appendChild(text);
-		if (stealFrom !== undefined && stealFrom !== null) {
-			var btn = document.createElement('button');
-			btn.type = 'button'; btn.style.marginLeft = '8px';
-			btn.textContent = (pc.lpn_lock_takeover || 'Take over from {name}').replace('{name}', stealFrom || (pc.lpn_lock_somebody || 'the other person'));
-			btn.addEventListener('click', function () { takeOverLock(); });
-			banner.appendChild(btn);
-		}
-		banner.style.display = 'block';
+		if (!on) { bannerWarn = null; renderBanner(); return; }
+		bannerWarn = {
+			message: pc.lpn_lock_unavailable || 'Beware: could not reach the server to check or create a lock on this project, so nothing is stopping a colleague from editing the same file at the same time. You will be told if locking starts working again.',
+			action: null,
+			dismissable: lockWarningDismissable()
+		};
+		renderBanner();
+	}
+	function setFileMissing(on) {
+		var pc = EngCalcs.pageConfig || {};
+		if (!on) { bannerWarn = null; renderBanner(); return; }
+		bannerWarn = {
+			message: pc.lpn_file_write_failed || 'Could not write to the file. It may have been moved, renamed, or deleted, or permission may have been withdrawn. Your work is still saved in this browser.',
+			actionLabel: pc.lpn_file_relink || 'Choose the file again',
+			action: relinkFile,
+			dismissable: true
+		};
+		renderBanner();
 	}
 	function lockHolderName(r) {
 		var pc = EngCalcs.pageConfig || {};
@@ -2452,9 +2551,38 @@ var EngCalcs = EngCalcs || {};
 		if (!ensureIdentity()) { setReadOnly(false); return; }
 		lock.docId = docId;
 		var r = await postLock('acquire', docId);
-		if (!r || !r.ok) { setReadOnly(false); return; } // unreachable -> fail open
+		if (!r || !r.ok) {
+			// Fail open -- editing continues -- but SAY SO. This is the moment of danger: from here
+			// on the file is unprotected, and the retry below is what makes the promise in that
+			// message ("you will be told if locking starts working again") a real one.
+			lockUnavailable = true;
+			setLockUnavailable(true);
+			setReadOnly(false);
+			return;
+		}
+		lockUnavailable = false;
+		setLockUnavailable(false);
 		if (r.held) { setReadOnly(false); return; }
 		presentLockedOut(r);
+	}
+	// Retried on the autosave tick, whether or not there is anything to save: an idle user who was
+	// warned at open time is exactly the person the promise of a follow-up was made to.
+	var lockUnavailable = false;
+	async function retryLock() {
+		var pc = EngCalcs.pageConfig || {};
+		if (!lock.docId || !lockUnavailable) { return; }
+		var r = await postLock('acquire', lock.docId);
+		if (!r || !r.ok) { return; } // still unreachable; the banner stays up, say nothing
+		lockUnavailable = false;
+		setLockUnavailable(false);
+		if (r.held) {
+			setNotice(pc.lpn_lock_restored || 'Locking is working again, and this project is now yours to edit.');
+			setReadOnly(false);
+		} else {
+			// The server came back and somebody else got there first. Honest, and the reason this
+			// retry exists at all rather than assuming the lock was ours the whole time.
+			presentLockedOut(r);
+		}
 	}
 	async function takeOverLock() {
 		var pc = EngCalcs.pageConfig || {};
@@ -2625,7 +2753,17 @@ var EngCalcs = EngCalcs || {};
 		fileRow.style.marginTop = '6px';
 		var exportBtn = document.createElement('button');
 		exportBtn.type = 'button';
-		exportBtn.textContent = pc.lpn_project_export || 'Save to file';
+		// Two different actions wearing two different names, because they behave differently and a
+		// shared label made the difference look like a bug (Tom, 2026-08-03: "my browser saves
+		// silently to a default file name and location. When I save again, I get a second copy").
+		// Where the File System Access API exists, this LINKS a file and every later press writes to
+		// that same file. Where it does not -- Firefox, Safari, and any page not served over https --
+		// there is no handle to keep, so every press really is another copy in the downloads folder,
+		// and the button says so instead of pretending to be a save.
+		exportBtn.textContent = fileApiAvailable()
+			? (pc.lpn_project_export || 'Save to file')
+			: (pc.lpn_project_download || 'Download a copy');
+		if (!fileApiAvailable() && pc.lpn_project_download_tip) { helpTip(exportBtn, pc.lpn_project_download_tip); }
 		exportBtn.addEventListener('click', function () { saveToFile(); });
 		fileRow.appendChild(exportBtn);
 		var importBtn = document.createElement('button');
@@ -2646,9 +2784,16 @@ var EngCalcs = EngCalcs || {};
 			linkRow.appendChild(linkText);
 			var unlinkBtn = document.createElement('button');
 			unlinkBtn.type = 'button'; unlinkBtn.style.marginLeft = '6px';
-			unlinkBtn.textContent = pc.lpn_file_unlink || 'Stop saving to file';
+			unlinkBtn.textContent = pc.lpn_project_close || 'Close project';
+			if (pc.lpn_project_close_tip) { helpTip(unlinkBtn, pc.lpn_project_close_tip); }
 			unlinkBtn.addEventListener('click', function () { unlinkFile(); });
 			linkRow.appendChild(unlinkBtn);
+			var forkBtn = document.createElement('button');
+			forkBtn.type = 'button'; forkBtn.style.marginLeft = '4px';
+			forkBtn.textContent = pc.lpn_project_fork || 'This is a copy';
+			if (pc.lpn_project_fork_tip) { helpTip(forkBtn, pc.lpn_project_fork_tip); }
+			forkBtn.addEventListener('click', function () { forkProject(); });
+			linkRow.appendChild(forkBtn);
 			list.appendChild(linkRow);
 		}
 	}

@@ -47,8 +47,10 @@ document.addEventListener('DOMContentLoaded', function() {
 	</div>
 	</div>
 	<div class="d-print-none" id="lpn_toolbar"></div>
-	<?php // Read-only banner (Task 195 Phase 2). Empty and hidden until someone else holds the lock
-	      // on the project file; setReadOnly() in js/looped-network.js fills it. ?>
+	<?php // Lock banner (Task 195 Phase 2). Empty and hidden until either someone else holds the lock
+	      // on the project file (read-only, red) or something needs warning about but not blocking --
+	      // no server to lock against, or a linked file that has gone missing (amber). renderBanner()
+	      // in js/looped-network.js fills it and sets the colors; read-only wins when both apply. ?>
 	<div class="d-print-none" id="lpn_lock_banner" role="status" style="display:none;margin:4px 0;padding:6px 8px;border:1px solid #a80;background:#fffbe6"></div>
 	<input type="file" id="lpn_backdrop_file" accept="image/*" style="display:none">
 	<?php // Project import (Task 195). Lives here rather than inside #lpn_projects_popup because
@@ -265,6 +267,17 @@ EngCalcs.pageConfig = {
 	lpn_lock_takeover: <?=json_encode($ec_lang['lpn_lock_takeover'])?>,
 	lpn_lock_taken: <?=json_encode($ec_lang['lpn_lock_taken'])?>,
 	lpn_lock_took_over: <?=json_encode($ec_lang['lpn_lock_took_over'])?>,
+	lpn_lock_unavailable: <?=json_encode($ec_lang['lpn_lock_unavailable'])?>,
+	lpn_lock_restored: <?=json_encode($ec_lang['lpn_lock_restored'])?>,
+	lpn_lock_dismiss: <?=json_encode($ec_lang['lpn_lock_dismiss'])?>,
+	lpn_file_relink: <?=json_encode($ec_lang['lpn_file_relink'])?>,
+	lpn_project_download: <?=json_encode($ec_lang['lpn_project_download'])?>,
+	lpn_project_download_tip: <?=json_encode($ec_lang['lpn_project_download_tip'])?>,
+	lpn_project_close: <?=json_encode($ec_lang['lpn_project_close'])?>,
+	lpn_project_close_tip: <?=json_encode($ec_lang['lpn_project_close_tip'])?>,
+	lpn_project_fork: <?=json_encode($ec_lang['lpn_project_fork'])?>,
+	lpn_project_fork_tip: <?=json_encode($ec_lang['lpn_project_fork_tip'])?>,
+	lpn_project_fork_confirm: <?=json_encode($ec_lang['lpn_project_fork_confirm'])?>,
 	lpn_settings_files: <?=json_encode($ec_lang['lpn_settings_files'])?>,
 	lpn_settings_file_autosave: <?=json_encode($ec_lang['lpn_settings_file_autosave'])?>,
 	lpn_settings_file_autosave_tip: <?=json_encode($ec_lang['lpn_settings_file_autosave_tip'])?>,
