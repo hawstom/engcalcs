@@ -1469,6 +1469,21 @@ var EngCalcs = EngCalcs || {};
 	// Menu-select build + Scale/Position/Remove enablement, wired from wireToolbar() below.
 	var updateBackdropMenuStateFn = null;
 	function updateBackdropMenuState() { if (updateBackdropMenuStateFn) { updateBackdropMenuStateFn(); } }
+	// The four backdrop commands, in ONE implementation with two doors: the toolbar's select and the
+	// Insert > Background image submenu (Tom, 2026-08-04: "In EPANET, Backdrop has its submenu, so
+	// that's what the paradigm calls us to do... Can we duplicate the toolbar item into the pull-down
+	// menu?" -- yes, and duplication between a menu and a toolbar is the correct relationship, not
+	// something to clean up).
+	function backdropAction(v) {
+		var pc = EngCalcs.pageConfig || {};
+		var fileInput = document.getElementById('lpn_backdrop_file');
+		if (v === 'add') { cancelActive(); if (fileInput) { fileInput.click(); } }
+		else if (v === 'scale') { startBackdropScale(); }
+		else if (v === 'position') { startBackdropPosition(); }
+		else if (v === 'remove') {
+			if (window.confirm(pc.lpn_backdrop_remove_confirm || 'Remove the background image?')) { removeBackdrop(); }
+		}
+	}
 	function wireBackdropMenu(into) {
 		var pc = EngCalcs.pageConfig || {}, menu = document.createElement('select');
 		menu.id = 'lpn_backdrop_menu';
@@ -1486,12 +1501,7 @@ var EngCalcs = EngCalcs || {};
 		var fileInput = document.getElementById('lpn_backdrop_file');
 		menu.addEventListener('change', function () {
 			var v = menu.value; menu.value = '';
-			if (v === 'add') { cancelActive(); fileInput.click(); }
-			else if (v === 'scale') { startBackdropScale(); }
-			else if (v === 'position') { startBackdropPosition(); }
-			else if (v === 'remove') {
-				if (window.confirm(pc.lpn_backdrop_remove_confirm || 'Remove the background image?')) { removeBackdrop(); }
-			}
+			backdropAction(v);
 		});
 		fileInput.addEventListener('change', function () {
 			var f = fileInput.files[0]; fileInput.value = ''; if (!f) { return; }
@@ -2173,7 +2183,8 @@ var EngCalcs = EngCalcs || {};
 	// (Firefox and Safari today). A one-shot download: the browser owns where it lands and there is
 	// no handle afterwards, so nothing can be written back to it.
 	function downloadProjectFile() {
-		saveToStorage(); // export what is on screen, including edits not yet autosaved
+		var pcDl = EngCalcs.pageConfig || {};
+		saveToStorage(); // export what is on screen, including edits not yet saved
 		var text = projectFileText();
 		var blob = new Blob([text], { type: 'application/json' });
 		var url = URL.createObjectURL(blob), a = document.createElement('a');
@@ -2184,6 +2195,11 @@ var EngCalcs = EngCalcs || {};
 		document.body.removeChild(a);
 		// Deferred: revoking synchronously can beat the download off the mark in some browsers.
 		setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
+		// Said every time, because it is the answer to the question this path always provokes:
+		// "why did I get a second copy?" (Tom, 2026-08-03). The menu no longer carries that caveat
+		// in its label, so this is where the fact lives.
+		setNotice((pcDl.lpn_status_downloaded || 'Downloaded {file}. This browser cannot keep working in a file, so each save makes another copy, and this project stays marked as not saved to a file.')
+			.replace('{file}', projectFileName()));
 	}
 	// Lands an imported document as a NEW project, never over the open one (the ROADMAP is explicit
 	// about this, and it is what makes import safe to try). Written and verified BEFORE anything
@@ -3135,14 +3151,20 @@ var EngCalcs = EngCalcs || {};
 			{ label: pc.lpn_file_new || 'New', fn: function () { newProject(); renderTabs(); } },
 			{ label: pc.lpn_file_open || 'Open…', fn: openFromFile },
 			{ separator: true },
-			// Where there is no File System Access API the button says what it will really do -- put
-			// another copy in the downloads folder -- rather than promising a save it cannot perform.
-			{
-				label: api ? (pc.lpn_file_save || 'Save') : (pc.lpn_file_download || 'Download a copy'),
-				tip: api ? null : pc.lpn_file_download_tip,
-				fn: saveCurrent
-			},
-			{ label: pc.lpn_file_saveas || 'Save as…', fn: saveAs, disabled: !api },
+			// **The menu says Save and Save as… in every browser** (Tom, 2026-08-04, overruling the
+			// first version: *"'Download a copy' is a mistake, and the menu item we want is
+			// 'Save as...'"*). He is right twice. A paradigm we are ADOPTING has two names for
+			// writing a file, and this page already spends "copy" on Duplicate -- a third word for a
+			// third thing nobody asked for is exactly the invention we are trying to stop doing. And
+			// where there is no File System Access API, what the browser does IS a Save As: it writes
+			// a new file and picks the location itself.
+			//
+			// What the fallback genuinely cannot do -- keep working in that file -- is said AFTER the
+			// act, by lpn_status_downloaded, and shown continuously by an asterisk that never clears.
+			// That answers Tom's original complaint ("when I save again, I get a second copy") at the
+			// moment it arises, without a menu label carrying the caveat forever.
+			{ label: pc.lpn_file_save || 'Save', tip: api ? null : pc.lpn_file_download_tip, fn: saveCurrent },
+			{ label: pc.lpn_file_saveas || 'Save as…', tip: api ? null : pc.lpn_file_download_tip, fn: saveAs },
 			// Only shown when it beats Save -- more than one file with unsaved changes. On a page
 			// where most people will only ever have one, a permanent row would be clutter that never
 			// once did anything.
@@ -3186,7 +3208,14 @@ var EngCalcs = EngCalcs || {};
 			{ label: pc.lpn_tool_add_pipe || 'Pipe', fn: function () { setMode('add-pipe'); } },
 			{ label: pc.lpn_tool_add_text || 'Text', fn: function () { setMode('add-text'); } },
 			{ separator: true },
-			{ label: pc.lpn_backdrop_add || 'Background image', fn: function () { var f = document.getElementById('lpn_backdrop_file'); if (f) { f.click(); } } },
+			// The backdrop submenu, flattened into a labelled group. Scale/Position/Remove are greyed
+			// with no image present, exactly as the toolbar select greys them -- one state, read from
+			// the same place.
+			{ label: pc.lpn_backdrop_add || 'Add image', fn: function () { backdropAction('add'); } },
+			{ label: pc.lpn_backdrop_scale || 'Scale', fn: function () { backdropAction('scale'); }, disabled: !backdrop },
+			{ label: pc.lpn_backdrop_position || 'Position', fn: function () { backdropAction('position'); }, disabled: !backdrop },
+			{ label: pc.lpn_backdrop_remove || 'Remove image', fn: function () { backdropAction('remove'); }, disabled: !backdrop },
+			{ separator: true },
 			{ label: pc.lpn_tool_example || 'Draw example network', fn: drawExampleNetwork }
 		]);
 	}
@@ -3198,18 +3227,19 @@ var EngCalcs = EngCalcs || {};
 			// The popover openers position themselves from evt.currentTarget, so a menu row hands them
 			// the menu-bar button it came from -- the popover then opens under "View", where the eye
 			// already is, rather than under a toolbar button that may not even be on screen.
-			{ label: pc.lpn_tool_labels || 'Labels', fn: function () { toggleLabelsPopup({ currentTarget: document.getElementById('lpn_menu_view') }); } },
-			// Units are a display choice, so they live under View rather than Settings -- and they are
-			// set once and left alone, which is why a permanent row of seven dropdowns was spending
-			// the scarcest thing this page has (vertical room above the map) on a decision nobody
-			// revisits (Tom, 2026-08-04).
-			{ label: pc.lpn_view_units || 'Units…', fn: function () { toggleUnitsPopup(document.getElementById('lpn_menu_view')); } }
+			{ label: pc.lpn_tool_labels || 'Labels', fn: function () { toggleLabelsPopup({ currentTarget: document.getElementById('lpn_menu_view') }); } }
 		]);
 	}
 	function openSettingsMenu(anchor) {
 		var pc = EngCalcs.pageConfig || {};
 		openMenu(anchor, [
 			{ label: pc.lpn_tool_settings || 'Settings', fn: function () { toggleSettingsPopup({ currentTarget: document.getElementById('lpn_menu_settings') }); } },
+			// **Units are a Settings item, not a View item** (Tom, 2026-08-04, overruling the first
+			// version: "Units is not a view feature. It is a math and engineering feature... View menu
+			// traditionally is about camera-related (or layer-related) stuff"). He is right on the
+			// convention: View holds what the camera and the layers are doing -- Zoom to fit, Labels --
+			// and a unit system is a property of the calculation, not of the look at it.
+			{ label: pc.lpn_view_units || 'Units…', fn: function () { toggleUnitsPopup(document.getElementById('lpn_menu_settings')); } },
 			{ separator: true },
 			// The one control that clears EVERY project. It has always been the most dangerous button
 			// on the page; behind a menu is where it should always have been.
@@ -3310,21 +3340,21 @@ var EngCalcs = EngCalcs || {};
 			body.appendChild(p);
 		}, [
 			{
-				// In a browser with no File System Access API the honest first button is "Download a
-				// copy": pressing it cannot link a file, so the tab stays marked unsaved and the
-				// close will not go through on its own. Saying "Save" there would promise something
-				// the browser cannot do and then look broken when the tab refused to close.
-				label: !fileApiAvailable()
-					? (pc.lpn_file_download || 'Download a copy')
-					: (isBrowser ? (pc.lpn_file_saveas || 'Save as…') : (pc.lpn_file_save || 'Save')),
+				label: isBrowser ? (pc.lpn_file_saveas || 'Save as…') : (pc.lpn_file_save || 'Save'),
 				fn: async function () {
 					if (id !== library.openId) { switchToTab(id); }
+					var downloaded = !fileApiAvailable();
 					if (isBrowser) { await saveAs(); } else { await saveCurrent(); }
 					// Close ONLY if the save really landed. A cancelled file picker or a failed write
 					// must leave the project exactly where it was rather than discarding it on the
 					// strength of having asked.
+					//
+					// The fallback is the one exception, and it has to be: a download can never clear
+					// the asterisk, because there is no handle to write back through. Refusing to
+					// close there would trap the user in a prompt whose first button can never
+					// satisfy it. The file IS in their downloads, which is what they asked for.
 					var after = indexEntry(id);
-					if (after && !tabAsterisk(after).show) { discardProject(id); renderTabs(); }
+					if (downloaded || (after && !tabAsterisk(after).show)) { discardProject(id); renderTabs(); }
 				}
 			},
 			{ label: pc.lpn_close_discard || 'Close without saving', fn: function () { discardProject(id); renderTabs(); } },

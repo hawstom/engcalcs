@@ -1245,8 +1245,13 @@ $ec_lang['lpn_file_type_desc']='Project file';
 // a save cannot keep hold of a file, so every press really is another copy in the downloads folder.
 // The label says which of the two you are getting rather than leaving the duplicate looking like a
 // bug.
-$ec_lang['lpn_file_download']='Download a copy';
-$ec_lang['lpn_file_download_tip']='This browser cannot keep working in a file, so each press saves another copy to your downloads. Open one with File, Open to carry on where you left off.';
+// **The MENU still says Save and Save as… there** (Tom, 2026-08-04: *"'Download a copy' is a mistake,
+// and the menu item we want is 'Save as...'"*). A paradigm we are adopting has two names for writing
+// a file, and this page already spends the word "copy" on Duplicate; a third word for a third thing
+// is the invention we are trying to stop doing. The caveat lives in a tip on those rows, and in a
+// notice after the act -- at the moment the question arises -- rather than in a label forever.
+$ec_lang['lpn_file_download_tip']='This browser cannot keep working in a file, so each save writes another copy to your downloads. Open one with File, Open to carry on where you left off.';
+$ec_lang['lpn_status_downloaded']='Downloaded {file}. This browser cannot keep working in a file, so each save makes another copy, and this project stays marked as not saved to a file.';
 $ec_lang['lpn_status_file_opened']='Opened {file}.';
 $ec_lang['lpn_status_saved']='Saved {file}.';
 $ec_lang['lpn_status_reverted']='Loaded {file} again from the disk.';

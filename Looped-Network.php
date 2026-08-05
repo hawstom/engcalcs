@@ -21,11 +21,14 @@ document.addEventListener('DOMContentLoaded', function() {
 	      // flex-wrap lets the two pieces re-flow onto separate lines on a narrow screen without any
 	      // extra markup -- the wrap-first-as-a-table/div behavior Tom asked for falls out of
 	      // flex-wrap for free. ?>
-	<?php // The units block now lives in a POPOVER off View -> Units (ROADMAP Task 211, Tom
+	<?php // The units block now lives in a POPOVER off Settings -> Units (ROADMAP Task 211, Tom
 	      // 2026-08-04: "the units selectors really should be in a menu"). Units are set once and
 	      // then left alone, so a permanent row of seven dropdowns was spending the scarcest thing
 	      // this page has -- vertical room above the map -- on a decision nobody revisits. The US/SI
-	      // preset row comes with them, because it is the same decision at a coarser grain. ?>
+	      // preset row comes with them, because it is the same decision at a coarser grain.
+	      // SETTINGS, not View: a unit system is a property of the calculation, not of the look at it
+	      // (Tom, 2026-08-04, overruling the first version -- "View menu traditionally is about
+	      // camera-related (or layer-related) stuff"). ?>
 	<div id="lpn_units_popup" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:20;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
 	<div class="lpn-popover-body">
 	<div class="d-flex flex-wrap align-items-center" style="gap:4px 12px">
@@ -51,10 +54,13 @@ document.addEventListener('DOMContentLoaded', function() {
 		<?=$ec_lang['lpn_units_flow']?> <?php echoUnitSelect('lpn_u_flow', 'flow_node', ''); ?>
 		<?=$ec_lang['lpn_units_velocity']?> <?php echoUnitSelect('lpn_u_velocity', 'velocity', ''); ?>
 		<?=$ec_lang['lpn_result_gradient']?> <?php echoUnitSelect('lpn_u_gradient', 'gradient', ''); ?>
-	</div>
-	</div>
+	</div><?php // #lpn_units_strip ?>
+	</div><?php // the flex wrapper ?>
+	</div><?php // .lpn-popover-body -- MISSING until 2026-08-04, and the whole page went with it: an
+	            // unclosed div here put the menu bar, toolbar, tab strip and map INSIDE a display:none
+	            // popover. Every div in this popover is now labelled for that reason. ?>
 	<button type="button" id="lpn_units_popup_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">×</button>
-	</div>
+	</div><?php // #lpn_units_popup ?>
 	<?php // Menu, toolbar, tabs, map -- top to bottom (ROADMAP Task 211, revised 2026-08-04 after Tom
 	      // saw the first version rendered). The MENU holds everything; the TOOLBAR is the high-use
 	      // subset of it, which is the conventional relationship between the two and the reason
@@ -310,8 +316,8 @@ EngCalcs.pageConfig = {
 	lpn_lock_restored: <?=json_encode($ec_lang['lpn_lock_restored'])?>,
 	lpn_lock_dismiss: <?=json_encode($ec_lang['lpn_lock_dismiss'])?>,
 	lpn_file_relink: <?=json_encode($ec_lang['lpn_file_relink'])?>,
-	lpn_file_download: <?=json_encode($ec_lang['lpn_file_download'])?>,
 	lpn_file_download_tip: <?=json_encode($ec_lang['lpn_file_download_tip'])?>,
+	lpn_status_downloaded: <?=json_encode($ec_lang['lpn_status_downloaded'])?>,
 	lpn_file_training_1: <?=json_encode($ec_lang['lpn_file_training_1'])?>,
 	lpn_file_training_2: <?=json_encode($ec_lang['lpn_file_training_2'])?>,
 	lpn_file_training_3: <?=json_encode($ec_lang['lpn_file_training_3'])?>,

@@ -252,11 +252,20 @@ document.addEventListener('DOMContentLoaded', function() {
 						</tbody>
 					</table>
 				</td>
+<?php endif; ?>
 			</tr>
 		</tbody>
 	</table>
 	</div>
-<?php endif; ?>
+<?php
+// The endif above used to sit AFTER </table></div> (fixed 2026-08-04). A page with no $arrayResults
+// therefore skipped not just the results cell -- which is the whole point of the condition -- but
+// the four closing tags after it, shipping an unclosed <tr>, <td>, <table class="bare"> and
+// <div style="overflow-x:auto">. Weir-Flow-Irregular.php is the one page with no results array, and
+// it has been served that way for as long as the condition has existed. Found by
+// dev/scripts/html_balance_check.php on the day that script was written, which is a fair argument
+// for the script.
+?>
 <?php if ($flagFormAppend === true) {echoCalculatorFormAppend();} ?>
 </form>
 <p class="d-print-none"><button type="button" id="btn-printable"><?=$ec_lang['view_printable']?></button></p>
