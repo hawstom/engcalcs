@@ -9,16 +9,25 @@
  * are not counted, via the shared list in exempt_keys.inc.php (ROADMAP Task 161), so this
  * matrix reports the same debt the payload generator and parity checker do.
  *
+ * A cell OUT OF SCOPE under translation_coverage.json (ROADMAP Tasks 203/204) prints "."
+ * rather than a number. That is deliberate typography, not a missing value: a dot cannot
+ * be summed, skimmed as debt, or mistaken for progress, which a 0 or a large count both
+ * can. Out-of-scope cells are excluded from the row total for the same reason.
+ *
  * Usage:
  *   php scripts/translation_completion_matrix.php
  *   php scripts/translation_completion_matrix.php --lang=fr,uk --prefix=dw,rc
  *   php scripts/translation_completion_matrix.php --format=csv
+ *   php scripts/translation_completion_matrix.php --ignore-coverage
  */
 
 const DEFAULT_LANG_DIR = __DIR__ . '/../../lib';
 const EN_FILE = DEFAULT_LANG_DIR . '/lang.ec.en.php';
 
 require_once __DIR__ . '/exempt_keys.inc.php';
+require_once __DIR__ . '/coverage.inc.php';
+
+const EC_OUT_OF_SCOPE_CELL = '.';
 
 main($argv);
 
@@ -32,6 +41,7 @@ function main(array $argv): void
 
     $en = loadLangArray(EN_FILE);
     $exemptMap = ecLoadExemptMap();
+    $coverage = $opts['ignore_coverage'] ? null : ecLoadCoverage();
     $allPrefixes = detectPrefixes($en);
     $prefixes = filterPrefixes($allPrefixes, $opts['prefixes']);
     if (count($prefixes) === 0) {
@@ -62,7 +72,20 @@ function main(array $argv): void
         $row = ['lang' => $lang];
         $total = 0;
         foreach ($prefixes as $prefix) {
-            $count = untranslatedCountForPrefix($en, $cur, $prefix, $lang, $exemptMap);
+            $count = untranslatedCountForPrefix($en, $cur, $prefix, $lang, $exemptMap, $coverage);
+            $cellInScope = $coverage === null || ecCoverageCellInScope($prefix, $lang, $coverage);
+
+            // A dot means "nothing owed here", never merely "not looking". Even in an
+            // out-of-scope cell the IDENTITY strings are owed -- they are the floor of the
+            // gradient, and they are the whole reason such a cell stays discoverable in its
+            // own language -- so a non-zero count still prints as a number and still counts
+            // toward the total. Blanking the cell wholesale would have hidden exactly that
+            // debt: zh was missing three lpn_ identity keys behind a dot.
+            if (!$cellInScope && $count === 0) {
+                $row[$prefix] = EC_OUT_OF_SCOPE_CELL;
+                continue;
+            }
+
             $row[$prefix] = $count;
             $total += $count;
         }
@@ -80,6 +103,12 @@ function main(array $argv): void
     }
 
     printTable($rows, $prefixes);
+    if ($coverage !== null) {
+        echo "\n" . ecCoverageSummary($coverage) . "\n";
+        echo '"' . EC_OUT_OF_SCOPE_CELL . '" = out of scope for that language, and nothing owed; not debt.' . "\n";
+        echo "A number in an out-of-scope column is an IDENTITY-string gap (menu, title, desc),\n";
+        echo "which is owed in every language regardless of tier.\n";
+    }
 }
 
 function parseArgs(array $argv): array
@@ -88,6 +117,7 @@ function parseArgs(array $argv): array
         'languages' => [],
         'prefixes' => [],
         'format' => 'table',
+        'ignore_coverage' => false,
     ];
 
     for ($i = 1; $i < count($argv); $i++) {
@@ -112,6 +142,11 @@ function parseArgs(array $argv): array
             continue;
         }
 
+        if ($arg === '--ignore-coverage') {
+            $opts['ignore_coverage'] = true;
+            continue;
+        }
+
         if ($arg === '--help' || $arg === '-h') {
             printHelpAndExit();
         }
@@ -129,6 +164,7 @@ function printHelpAndExit(): void
     echo "  --lang=fr,uk       Limit to specific languages\n";
     echo "  --prefix=dw,rc     Limit to specific key prefixes\n";
     echo "  --format=table|csv Output format (default: table)\n";
+    echo "  --ignore-coverage  Count every cell, in scope or not (pre-Task-204 view)\n";
     echo "  -h, --help         Show help\n";
     exit(0);
 }
@@ -183,12 +219,18 @@ function filterPrefixes(array $all, array $selected): array
  * Counts real untranslated keys for one prefix. A value equal to English is only
  * counted when it is not legitimately identical -- a missing or blank value always
  * counts, exempt or not.
+ *
+ * Scope is applied PER KEY rather than per cell, which is what lets an out-of-scope
+ * calculator still owe its identity strings. Pass $coverage = null to count everything.
  */
-function untranslatedCountForPrefix(array $en, array $cur, string $prefix, string $lang, array $exemptMap): int
+function untranslatedCountForPrefix(array $en, array $cur, string $prefix, string $lang, array $exemptMap, ?array $coverage): int
 {
     $count = 0;
     foreach ($en as $key => $enValue) {
         if (!str_starts_with($key, $prefix . '_')) {
+            continue;
+        }
+        if ($coverage !== null && !ecCoverageKeyInScope($key, $lang, $coverage)) {
             continue;
         }
 

@@ -399,9 +399,43 @@ When translating a new calculator's keys into all 26 non-English languages, **sp
 **REQUIRED: Get explicit user authorization before launching any sprint.** A sprint spawns up to 26 paid agents. The correct pattern is always: propose → confirm → launch. Never infer authorization from a general "proceed" or a question about paths. The user must say something equivalent to "go ahead" or "run it" in response to a specific sprint proposal.
 
 **Pre-sprint checklist (complete before proposing to the user):**
-1. Regenerate payloads so the delta count reflects the *current* lang files: `wsl -e php /var/www/cnm/public_html/hawsedc/engcalcs/dev/scripts/generate_translation_payloads.php`. This is the orchestrating AI's job, never the user's — the user must never have to remember to call for it. **Enforcement:** the launcher MUST run `generate_translation_payloads.php --check` immediately before spawning agents; it prints `FRESH`/`STALE` and exits non-zero if any payload is older than its inputs (English source, that lang file, glossary, the exempt-key list, or the generator itself). A non-zero exit is a hard stop — regenerate, then re-check — so a sprint can never launch on a stale delta.
+1. Regenerate payloads so the delta count reflects the *current* lang files: `wsl -e php /var/www/cnm/public_html/hawsedc/engcalcs/dev/scripts/generate_translation_payloads.php`. This is the orchestrating AI's job, never the user's — the user must never have to remember to call for it. **Enforcement:** the launcher MUST run `generate_translation_payloads.php --check` immediately before spawning agents; it prints `FRESH`/`STALE` and exits non-zero if any payload is older than its inputs (English source, that lang file, glossary, the exempt-key list, the coverage declaration, or the generator itself). A non-zero exit is a hard stop — regenerate, then re-check — so a sprint can never launch on a stale delta.
 2. Verify `glossary.json` has `preferred_translation` populated for the calculator prefix's key terms, especially for anchor languages (es, fr, ru, ar). Check `translation_notes` for WMO-verified terms and terms with `$ec_lang_intent` framing requirements.
 3. State the delta count and which calculators are affected before asking for authorization. **Delta zero now means zero** (Task 161): keys that are *correctly* byte-identical to English — symbols, eponyms, brand names, per-language cognates — are listed in `dev/scripts/translation_exempt_keys.json` and are not counted, so you no longer hand-classify a residue before proposing. They *are* still reported when missing or blank. `generate_translation_payloads.php`, `lang_parity_check.php`, `translation_completion_matrix.php` and `lang_syntax_validate.php` all read that one list via `dev/scripts/exempt_keys.inc.php`, so a disagreement between those four counts is a bug, not a nuance. **Add a key there only when identical-to-English is permanently correct** — never to quiet a number you don't want to fix.
+
+### The coverage declaration: what we intend to translate (Tasks 203/204, adopted 2026-08-05)
+
+The same four scripts also read `dev/scripts/translation_coverage.json` via
+`dev/scripts/coverage.inc.php`. It answers a different question from the exempt list, and **the two
+must never be merged**:
+
+- **exempt** — identical to English is *permanently correct* here. The key is **finished**.
+- **out of scope** — this (calculator × language) cell is one we have decided not to translate yet.
+  The key is **not started**, and the cell can earn its way in at any time.
+
+Using the exempt list for an out-of-scope body is explicitly forbidden: it would put a permanent
+floor back under every outstanding-keys number, which is the exact defect Task 161 removed.
+
+**The rule, entire:** *a cell is in scope iff the calculator is core OR the language is core.* That
+OR is what makes it a **cross** — every language gets the core calculators, every calculator gets the
+core languages. An AND would leave Manning-Pipe-Flow untranslated in 22 languages.
+
+- **Core calculators: `mpf`, `mtc`. Core languages: `es`, `pt`, `fr`, `tr`.** 108 of 416 cells, 26%
+  of the work, 98.2% of measured use. Move along the frontier by editing the JSON — adding a core
+  *language* costs `16 − N` cells, adding a core *calculator* costs a full 26, which is why the
+  frontier prefers languages.
+- **Identity strings are the floor and are never out of scope** — menu entry, `<title>`,
+  `*_main_desc`, in every calculator in every language. A cell outside the cross means "body in
+  English, findable in the local language," which is what lets it earn its way in.
+- **Scope is consulted only about a GAP** — a key missing, blank, or still equal to English. An
+  already-translated key in an out-of-scope cell stays translated and stays maintained. Task 203
+  **deletes nothing**; it governs new calculators, drift spend, and future audit passes.
+- **A prefix not listed in `calculator_prefixes` is suite chrome and is always in scope.** An
+  unclassified new prefix therefore gets translated — the safe direction.
+- `--ignore-coverage` on `lang_parity_check.php` / `translation_completion_matrix.php` restores the
+  raw full-parity view, which is the right way to ask "what would promoting this cell cost?"
+- `php dev/scripts/coverage_selftest.php` asserts the cross, the floor, and the exempt/out-of-scope
+  separation against the real declaration. Run it after editing the JSON.
 4. Note any known quality risks (new terms without glossary coverage, intent-guided terms, proper nouns).
 5. **Check for stale-but-present drift the payload-delta can't see:** `php dev/scripts/detect_english_drift.php`. The payload-delta only finds *missing* keys; this flags keys whose *English changed* after a translation was written (the Task-129 blind spot). `--json` emits the resync key list. After any resync completes, `--update` re-baselines the manifest. Full workflow in `dev/translation-process.md` § "English-drift tripwire".
 

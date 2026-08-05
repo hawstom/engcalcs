@@ -457,209 +457,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     the answer**, and the log accrues at zero cost. Re-read it when `zh` passes 30 views.
   - **Do not re-score `zh`'s QUALITY in either direction before then.**
 
-- 60|203| **The COVERAGE MATRIX: a mandatory core cross of calculator × language, fading in both
-  directions. DECIDED by Tom, 2026-08-03.** *"I see our usage reports pointing us to a mandatory
-  translation core of a few calculators and a few languages. All calculators get those few languages,
-  and all languages get those few calculators. From there in both directions it tapers off like a
-  fading matrix or a fading 2D gradient."*
-
-  **Why the CROSS and not a single tier.** CC's original proposal tiered only one axis (calculators)
-  and was worse. Tiering calculators alone orphans a niche calculator in English forever; tiering
-  languages alone orphans a niche language entirely. **The cross does neither** — every language
-  still gets the top calculators (so discovery is never withheld, and the chicken-and-egg objection
-  is answered), and every calculator still gets the top languages (so nothing is English-only).
-
-  **The cliffs are unusually clean, and both axes have the same shape** — one dominant member, one
-  large drop, then a flat tail. Measured 2026-08-03:
-  - **Calculators:** MPF 75.8% → *6.5× drop* → MTC 11.6% → *4.0× drop* → HW 2.9% → tail of ~1.0–1.3×
-    steps. **Top 3 = 90.4%**, matching the long-standing "MPF + HW + MTC = 92% of humans" finding.
-    Top 5 (adding MI, MPHL) = 94.7%.
-  - **Languages (non-English):** es 61.4% → *6.1× drop* → pt 10.1% → fr 8.2% → tr 6.2% → tail.
-    **es alone = 61.4%**; es+pt+fr+tr = 85.9%.
-
-  **What the cross costs and buys** (26 non-English × 16 calculators = 416 cells). Computed as an
-  efficient frontier rather than picked by eye — and **the frontier prefers adding LANGUAGES over
-  adding calculators**, because a core language costs `16 − N` cells while a core calculator costs a
-  full 26:
-
-  | cells | share of work | covers | core calculators | core languages |
-  |------:|-------------:|-------:|------------------|----------------|
-  | 66 | 16% | 95.2% | MPF+MTC | es |
-  | **80** | **19%** | **96.4%** | **MPF+MTC** | **es+pt** |
-  | **108** | **26%** | **98.2%** | **MPF+MTC** | **es+pt+fr+tr** |
-  | 136 | 33% | 99.2% | MPF+MTC | es+pt+fr+tr+zh+he |
-  | 156 | 38% | 99.4% | MPF+MTC+**HW** | es+pt+fr+tr+zh+he |
-
-  **CC's first proposal — 3 calculators (MPF+MTC+HW) × es, 91 cells, 96.3% — is NOT on the frontier**
-  and should not be used: MPF+MTC × es+pt is cheaper (80) *and* covers more (96.4%). The instinct to
-  take "the top 3 calculators" came from the 90%-of-humans framing, which is the right rule for a
-  single axis and the wrong one for a cross. Note HW does not earn core status until 156 cells —
-  2.9% of use does not justify 26 cells.
-
-  **Recommended starting point: 108 cells — MPF+MTC × es+pt+fr+tr, 26% of the work for 98.2%.**
-  Returns flatten hard after it. Tom to confirm or move along the frontier.
-
-  **THE MODEL: tiers are BUCKETS ON EACH AXIS; the CELL holds a binary. (Tom, 2026-08-03, correcting
-  CC.)** *"3 or more tiers would simply look like a 3 × 3 or 5 × 5 table 'graph' of calculator tier vs
-  language tier with binary gets_translated entries… we look up this calculator and language pair to
-  determine whether or not to translate."* This is the right model and it retires CC's objection
-  below, which confused a *tier* with a *coverage level* and then argued that a middle coverage level
-  had no meaning — answering a question nobody asked. Coverage stays binary at the cell; the tiers
-  simply group rows and columns so the boundary can take a shape richer than a cross.
-
-  **The 2 × 2, written out. It is YES, YES, YES, NO** — Tom read it as "yes, no, no, no" in the same
-  message, and the difference is load-bearing, so it is recorded explicitly here:
-
-  |                        | lang T1 (es, pt, fr, tr) | lang T2 (the rest) |
-  |------------------------|--------------------------|--------------------|
-  | **calc T1** (MPF, MTC) | yes                      | **yes** ← every language gets the core calculators |
-  | **calc T2** (the rest) | **yes** ← every calculator gets the core languages | no |
-
-  Three yeses is what makes it a **cross**. "Yes, no, no, no" is an **AND** rule — translate only
-  where both axes are core — which is an 8-cell rectangle that would leave Manning-Pipe-Flow
-  untranslated in 22 languages, contradicting Tom's own sentence *"All calculators get those few
-  languages, and all languages get those few calculators."* **The OR/cross is recorded as the
-  decision because that is what Tom described in words; if the intersection was actually meant, it is
-  a far smaller commitment and needs an explicit re-ruling.**
-
-  **The cross IS the 2 × 2 staircase, and N × N generalises it** — which is exactly Tom's original
-  "fading 2D gradient", and shows the gradient intuition was right and only needed buckets rather
-  than a continuous function:
-
-  ```
-              lang T1   lang T2   lang T3
-  calc T1       yes       yes       yes
-  calc T2       yes       yes       no
-  calc T3       yes       no        no
-  ```
-
-  **NUMBER OF TIERS — start with TWO (Tom, 2026-08-03: "we could start with only two tiers, core and
-  non-core"). That is the right call, and the reasons are worth recording so a third is added for a
-  reason rather than for symmetry:**
-  - ~~Coverage is naturally binary, so a middle coverage level has no meaning.~~ **RETIRED — this
-    argument was wrong** (see the model above): a tier is a bucket on an axis, not a coverage level,
-    so a third tier never implied a half-translated body. Struck rather than deleted, because it is
-    the reasoning error that would otherwise be repeated.
-  - **Two tiers per axis produce the cross exactly, with one sentence of rule:** *translate the body
-    iff the calculator is core OR the language is core; identity strings always.* No matrix, no
-    per-cell table.
-  - **The "medium" need is already met by a different mechanism.** The `QUALITY` tiers
-    (0.95 / 0.85 / 0.65 in `lib/Language.Settings.php`) encode **verification depth**, not coverage.
-    A Medium coverage tier would blur two questions that are currently cleanly separated — keep
-    *what we translate* and *how hard we check it* on different dials.
-  - **Tooling is far simpler** (Task 204): a coverage declaration is two lists plus the OR rule.
-  - **Splitting 2 → 3 later is easier than collapsing 3 → 2**, and promoting one calculator or one
-    language is a one-line change either way.
-
-  **WHEN A THIRD TIER WILL GENUINELY BE EARNED — name it now so it is not invented ad hoc.** The real
-  third state is about **maintenance, not coverage**: (1) *maintained* — translated and resynced on
-  every English drift; (2) *translated* — done once, resynced only in batches; (3) *identity only*.
-  That distinction will be forced the first time a large English edit lands (Task 193 alone changed
-  51 strings), which is soon. Add the third tier then, on that axis, not before.
-
-  **THIS IS FORWARD-LOOKING AND DELETES NOTHING.** All 416 cells are already translated except
-  `lpn_`. The matrix governs **new calculators, drift/maintenance spend, and future audit passes** —
-  never removal of work already paid for. Say this out loud in any future discussion, because
-  "tiering" invites a reading where existing translations get dropped, which is not the decision.
-
-  **Identity strings are the floor of the gradient, not part of the taper.** Menu entry, `<title>`
-  and `*_main_desc` stay translated for **every** calculator in **every** language regardless of
-  tier — ~3 strings against 100+ for a body — because they are the discovery mechanism, and
-  `dev/translation-process.md` already records the evidence: *"es at 10% proves the door opens when
-  identity strings are discoverable."* A cell outside the cross means "body in English, findable in
-  the local language," which is also what lets that cell earn its way in.
-
-  **LIVE CONSEQUENCE — Task 146.06 becomes a different task.** `lpn_` ranks 6th (1.7%) and is not a
-  core calculator, so it gets the core languages only: at the recommended 108-cell point that is
-  **`lpn_` × es, pt, fr, tr — 154 keys × 4 languages**, plus identity strings in all 26. That replaces a 26-agent sprint, and `es` is exactly
-  where a wrong string costs most. If `lpn_` climbs into the core calculator band, it earns the rest.
-
-  **REQUIRED COMPANION — the tooling assumes full parity and will fight this.** See Task 204. Do not
-  adopt the matrix without it.
-
-  ---
-  **Original framing, kept for the reasoning (superseded by Tom's matrix above):** tier translation
-  SPEND by calculator, not by language. Tom, 2026-08-03: *"is it cost-effective to translate all calculators to 26
-  languages? … Should we let probationary languages prove themselves on the top calculators first
-  before we dive into another 14 × 26 sprint?"* The question is right and the timing is right — before
-  a sprint, not after. But it **bundles two decisions that have opposite answers**, and separating
-  them is most of the work.
-
-  **DECISION A — which LANGUAGES exist at all. Recommendation: do NOT tier. Keep all 26.**
-  - **Chicken-and-egg.** A language with no reach may have none *because* the page is not
-    discoverable in it. "Prove your worth first" is unfalsifiable when the proving requires the thing
-    being withheld. This is the standing `zero reach ≠ low value` rule in
-    `dev/translation-process.md`, and the 2026-08-03 data strengthens it rather than weakening it:
-    `es` at 188 confirmed humans over 8 days is what a language looks like *after* the door opens.
-  - **The cost is already sunk.** All 26 exist for every calculator except `lpn_`. Demoting one saves
-    nothing retroactively; it only forfeits an asset already paid for.
-  - **Mission.** Tools are the vehicle, not the destination. One Khmer-speaking engineer reached is
-    not worth less than one Spanish-speaking engineer reached. Efficiency framing quietly becomes
-    "serve the already-served," which is the opposite of the point. What efficiency *legitimately*
-    argues is that spending which reaches **nobody** delivers nothing — untranslated-and-unvisited is
-    no loss; **unvisited-because-untranslated is.**
-
-  **DECISION B — which CALCULATORS get a full 26-language sprint. Recommendation: DO tier. This is
-  where the money actually is.**
-  - The 2026-08-03 snapshot shows all non-English human use landing on **five** calculators — MPF,
-    MTC, HW, DW, MPHL. A sixteenth calculator translated 26 ways before it has demonstrated demand
-    *in any language* is speculative spending, and it is the only kind here that is still avoidable.
-  - **Gate on TOTAL confirmed human use, in any language — not on English use.** The tempting
-    version ("earn English traffic first, then translate") rests on non-English demand being
-    proportional to English demand, and the data does not support that: non-English share is ~13% on
-    MPF but appears *higher* on the smaller calculators (HW, DW). Those are small samples and may be
-    different windows, so the honest move is to sidestep the assumption entirely by gating on a
-    number that needs no such model.
-  - **Suggested gate, for Tom to set or reject:** a calculator earns its full sprint at **≥50
-    confirmed human uses**. Below that it has not demonstrated demand anywhere.
-
-  **THE MECHANISM THAT BREAKS THE CHICKEN-AND-EGG — and it is already this project's own finding.**
-  `dev/translation-process.md` records: *"es at 10% proves the door opens when identity strings are
-  discoverable."* Identity strings — menu entry, `<title>`, `*_main_desc` — are what a search engine
-  indexes; they are the discovery mechanism, and they are **~3 strings per calculator against ~100+
-  for a body**. So:
-  - **Translate identity strings for every calculator in every language** (cheap, and it is what
-    makes a language able to prove anything at all).
-  - **Gate the body on the demand that then shows up.** A language that starts arriving on a
-    calculator earns that calculator's full sprint.
-  - **Honest downside, which is why this is a recommendation and not a decision:** a page with a
-    translated title and an English body is a worse artifact than either extreme, and it produces
-    exactly the views-without-usage signature that `zh` currently shows — so it would pollute the
-    metric it is meant to feed. Mitigate by treating it as an explicitly instrumented *probation*
-    state, not a resting state.
-
-  **THE COST NOBODY BUDGETS IS MAINTENANCE, NOT SPRINTS.** A one-time sprint is a known, bounded
-  cost. Every English edit afterwards creates 26 debts *forever* — Task 193 alone changed 51 strings.
-  That recurring cost can be tiered by reach with **no user-visible partial state at all**, which
-  makes it strictly better value than tiering the sprints. Partly done already via the QUALITY tiers
-  and `es`-as-spot-check; worth making explicit.
-
-  **LIVE CONSEQUENCE — Task 146.06 (`lpn_`, 154 keys × 26).** Under this framework the sprint waits
-  until `lpn_` clears the gate. It currently shows 2 confirmed uses, and those were mismeasured
-  (Task 199). This is already how the two are ranked (146.06 at 5, Task 195 at 90) — the framework
-  just supplies the reason, and a number.
-
-- 50|204| **Coverage declaration for the translation tooling — required before Task 203's matrix can
-  be adopted.** Four scripts treat a missing key as debt: `lang_parity_check.php`,
-  `generate_translation_payloads.php`, `translation_completion_matrix.php` and
-  `lang_syntax_validate.php`, all reading one list via `exempt_keys.inc.php`. Under Task 203 a key
-  absent from a non-core cell is **deliberate**, not debt — and there is currently no way to say so.
-  - **The obvious shortcut is explicitly forbidden by our own rule.** `translation_exempt_keys.json`
-    is for keys where *identical to English is permanently correct* (symbols, eponyms, cognates), and
-    CLAUDE.md says: "Add a key there only when identical-to-English is permanently correct — never to
-    quiet a number you don't want to fix." A deliberately-untranslated body is neither identical nor
-    permanent. Using the exempt list for it would corrupt the one mechanism that makes **delta zero
-    mean zero**.
-  - **What is needed is a different concept:** a per-(prefix × language) *coverage* declaration —
-    which prefixes are in scope for which languages — so the delta means "missing from what we intend
-    to cover," and an out-of-scope cell is reported separately as **out of scope**, never as missing.
-  - **Why this blocks rather than follows.** Adopt the matrix without it and the very next parity run
-    reports `lpn_` alone as 154 × 25 ≈ **3,850 missing keys, permanently**. A number that large and
-    that permanent teaches everyone to ignore it, which destroys the delta-zero discipline that was
-    deliberately built (Task 161). The tooling must learn the new model **before** the model ships.
-  - Keep the two ideas separate in the data as well as the code: *exempt* = correctly identical
-    forever; *out of scope* = not translated yet, by decision, and revisitable when a cell earns it.
-
 - 45|146.02| **EPANET-style icon toolbar + map symbol icons (Task 146 child).** Replace/supplement
   the current toolbar with EPANET-style icons for elements and map symbols. **Must land before the
   translation sprint (146.06) — this blocks it**, per Tom, 2026-07-29.
@@ -1023,6 +820,16 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **Pre-sprint checklist reminder:** ten `lpn_` glossary entries were seeded in 193 with `avoid`
     arrays and **empty** translations by design. The sprint fills them, and CLAUDE.md's mandatory
     glossary write-back applies — a sprint that leaves them empty is not closed.
+  - **RESIZED 2026-08-05 by the coverage matrix (Tasks 203/204, now adopted and enforced in code).**
+    `lpn_` is not a core calculator, so it gets the core languages only: **`lpn_` × es, pt, fr, tr —
+    205 keys × 4 languages**, plus its **3 identity strings (`lpn_main_menu`, `lpn_main_title`,
+    `lpn_main_desc`) in the other 22 languages**. That is 4 agents and a small identity pass, not a
+    26-agent sprint. The payload generator already emits exactly this — `payload_es.json` carries
+    205 delta keys, `payload_zh.json` carries 3 — so the sprint proposal reads itself off the
+    tooling rather than being hand-scoped.
+    **The gate is unchanged**: 146.02 still has to land first, because it rewrites toolbar strings
+    the sprint would otherwise pay for twice. The matrix changed the *size* of this task, not its
+    ordering.
 - 15|194| **Touch gesture model: one finger scrolls the page, two fingers pan the map (Task 146
   child).** Raised by Tom, 2026-07-31, after the canvas-fills-the-phone lock-up: *"It didn't occur
   to me to try to scroll with two fingers. That's just an idea. It looks like it occurred to you
@@ -1770,6 +1577,257 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|203| **[ADOPTED 2026-08-05] The COVERAGE MATRIX: a mandatory core cross of calculator × language, fading in both
+  directions. DECIDED by Tom, 2026-08-03.** *"I see our usage reports pointing us to a mandatory
+  translation core of a few calculators and a few languages. All calculators get those few languages,
+  and all languages get those few calculators. From there in both directions it tapers off like a
+  fading matrix or a fading 2D gradient."*
+
+  **Why the CROSS and not a single tier.** CC's original proposal tiered only one axis (calculators)
+  and was worse. Tiering calculators alone orphans a niche calculator in English forever; tiering
+  languages alone orphans a niche language entirely. **The cross does neither** — every language
+  still gets the top calculators (so discovery is never withheld, and the chicken-and-egg objection
+  is answered), and every calculator still gets the top languages (so nothing is English-only).
+
+  **The cliffs are unusually clean, and both axes have the same shape** — one dominant member, one
+  large drop, then a flat tail. Measured 2026-08-03:
+  - **Calculators:** MPF 75.8% → *6.5× drop* → MTC 11.6% → *4.0× drop* → HW 2.9% → tail of ~1.0–1.3×
+    steps. **Top 3 = 90.4%**, matching the long-standing "MPF + HW + MTC = 92% of humans" finding.
+    Top 5 (adding MI, MPHL) = 94.7%.
+  - **Languages (non-English):** es 61.4% → *6.1× drop* → pt 10.1% → fr 8.2% → tr 6.2% → tail.
+    **es alone = 61.4%**; es+pt+fr+tr = 85.9%.
+
+  **What the cross costs and buys** (26 non-English × 16 calculators = 416 cells). Computed as an
+  efficient frontier rather than picked by eye — and **the frontier prefers adding LANGUAGES over
+  adding calculators**, because a core language costs `16 − N` cells while a core calculator costs a
+  full 26:
+
+  | cells | share of work | covers | core calculators | core languages |
+  |------:|-------------:|-------:|------------------|----------------|
+  | 66 | 16% | 95.2% | MPF+MTC | es |
+  | **80** | **19%** | **96.4%** | **MPF+MTC** | **es+pt** |
+  | **108** | **26%** | **98.2%** | **MPF+MTC** | **es+pt+fr+tr** |
+  | 136 | 33% | 99.2% | MPF+MTC | es+pt+fr+tr+zh+he |
+  | 156 | 38% | 99.4% | MPF+MTC+**HW** | es+pt+fr+tr+zh+he |
+
+  **CC's first proposal — 3 calculators (MPF+MTC+HW) × es, 91 cells, 96.3% — is NOT on the frontier**
+  and should not be used: MPF+MTC × es+pt is cheaper (80) *and* covers more (96.4%). The instinct to
+  take "the top 3 calculators" came from the 90%-of-humans framing, which is the right rule for a
+  single axis and the wrong one for a cross. Note HW does not earn core status until 156 cells —
+  2.9% of use does not justify 26 cells.
+
+  **Recommended starting point: 108 cells — MPF+MTC × es+pt+fr+tr, 26% of the work for 98.2%.**
+  Returns flatten hard after it. Tom to confirm or move along the frontier.
+
+  **THE MODEL: tiers are BUCKETS ON EACH AXIS; the CELL holds a binary. (Tom, 2026-08-03, correcting
+  CC.)** *"3 or more tiers would simply look like a 3 × 3 or 5 × 5 table 'graph' of calculator tier vs
+  language tier with binary gets_translated entries… we look up this calculator and language pair to
+  determine whether or not to translate."* This is the right model and it retires CC's objection
+  below, which confused a *tier* with a *coverage level* and then argued that a middle coverage level
+  had no meaning — answering a question nobody asked. Coverage stays binary at the cell; the tiers
+  simply group rows and columns so the boundary can take a shape richer than a cross.
+
+  **The 2 × 2, written out. It is YES, YES, YES, NO** — Tom read it as "yes, no, no, no" in the same
+  message, and the difference is load-bearing, so it is recorded explicitly here:
+
+  |                        | lang T1 (es, pt, fr, tr) | lang T2 (the rest) |
+  |------------------------|--------------------------|--------------------|
+  | **calc T1** (MPF, MTC) | yes                      | **yes** ← every language gets the core calculators |
+  | **calc T2** (the rest) | **yes** ← every calculator gets the core languages | no |
+
+  Three yeses is what makes it a **cross**. "Yes, no, no, no" is an **AND** rule — translate only
+  where both axes are core — which is an 8-cell rectangle that would leave Manning-Pipe-Flow
+  untranslated in 22 languages, contradicting Tom's own sentence *"All calculators get those few
+  languages, and all languages get those few calculators."* **The OR/cross is recorded as the
+  decision because that is what Tom described in words; if the intersection was actually meant, it is
+  a far smaller commitment and needs an explicit re-ruling.**
+
+  **The cross IS the 2 × 2 staircase, and N × N generalises it** — which is exactly Tom's original
+  "fading 2D gradient", and shows the gradient intuition was right and only needed buckets rather
+  than a continuous function:
+
+  ```
+              lang T1   lang T2   lang T3
+  calc T1       yes       yes       yes
+  calc T2       yes       yes       no
+  calc T3       yes       no        no
+  ```
+
+  **NUMBER OF TIERS — start with TWO (Tom, 2026-08-03: "we could start with only two tiers, core and
+  non-core"). That is the right call, and the reasons are worth recording so a third is added for a
+  reason rather than for symmetry:**
+  - ~~Coverage is naturally binary, so a middle coverage level has no meaning.~~ **RETIRED — this
+    argument was wrong** (see the model above): a tier is a bucket on an axis, not a coverage level,
+    so a third tier never implied a half-translated body. Struck rather than deleted, because it is
+    the reasoning error that would otherwise be repeated.
+  - **Two tiers per axis produce the cross exactly, with one sentence of rule:** *translate the body
+    iff the calculator is core OR the language is core; identity strings always.* No matrix, no
+    per-cell table.
+  - **The "medium" need is already met by a different mechanism.** The `QUALITY` tiers
+    (0.95 / 0.85 / 0.65 in `lib/Language.Settings.php`) encode **verification depth**, not coverage.
+    A Medium coverage tier would blur two questions that are currently cleanly separated — keep
+    *what we translate* and *how hard we check it* on different dials.
+  - **Tooling is far simpler** (Task 204): a coverage declaration is two lists plus the OR rule.
+  - **Splitting 2 → 3 later is easier than collapsing 3 → 2**, and promoting one calculator or one
+    language is a one-line change either way.
+
+  **WHEN A THIRD TIER WILL GENUINELY BE EARNED — name it now so it is not invented ad hoc.** The real
+  third state is about **maintenance, not coverage**: (1) *maintained* — translated and resynced on
+  every English drift; (2) *translated* — done once, resynced only in batches; (3) *identity only*.
+  That distinction will be forced the first time a large English edit lands (Task 193 alone changed
+  51 strings), which is soon. Add the third tier then, on that axis, not before.
+
+  **THIS IS FORWARD-LOOKING AND DELETES NOTHING.** All 416 cells are already translated except
+  `lpn_`. The matrix governs **new calculators, drift/maintenance spend, and future audit passes** —
+  never removal of work already paid for. Say this out loud in any future discussion, because
+  "tiering" invites a reading where existing translations get dropped, which is not the decision.
+
+  **Identity strings are the floor of the gradient, not part of the taper.** Menu entry, `<title>`
+  and `*_main_desc` stay translated for **every** calculator in **every** language regardless of
+  tier — ~3 strings against 100+ for a body — because they are the discovery mechanism, and
+  `dev/translation-process.md` already records the evidence: *"es at 10% proves the door opens when
+  identity strings are discoverable."* A cell outside the cross means "body in English, findable in
+  the local language," which is also what lets that cell earn its way in.
+
+  **LIVE CONSEQUENCE — Task 146.06 becomes a different task.** `lpn_` ranks 6th (1.7%) and is not a
+  core calculator, so it gets the core languages only: at the recommended 108-cell point that is
+  **`lpn_` × es, pt, fr, tr — 154 keys × 4 languages**, plus identity strings in all 26. That replaces a 26-agent sprint, and `es` is exactly
+  where a wrong string costs most. If `lpn_` climbs into the core calculator band, it earns the rest.
+
+  **REQUIRED COMPANION — the tooling assumes full parity and will fight this.** See Task 204. Do not
+  adopt the matrix without it.
+
+  ---
+  **Original framing, kept for the reasoning (superseded by Tom's matrix above):** tier translation
+  SPEND by calculator, not by language. Tom, 2026-08-03: *"is it cost-effective to translate all calculators to 26
+  languages? … Should we let probationary languages prove themselves on the top calculators first
+  before we dive into another 14 × 26 sprint?"* The question is right and the timing is right — before
+  a sprint, not after. But it **bundles two decisions that have opposite answers**, and separating
+  them is most of the work.
+
+  **DECISION A — which LANGUAGES exist at all. Recommendation: do NOT tier. Keep all 26.**
+  - **Chicken-and-egg.** A language with no reach may have none *because* the page is not
+    discoverable in it. "Prove your worth first" is unfalsifiable when the proving requires the thing
+    being withheld. This is the standing `zero reach ≠ low value` rule in
+    `dev/translation-process.md`, and the 2026-08-03 data strengthens it rather than weakening it:
+    `es` at 188 confirmed humans over 8 days is what a language looks like *after* the door opens.
+  - **The cost is already sunk.** All 26 exist for every calculator except `lpn_`. Demoting one saves
+    nothing retroactively; it only forfeits an asset already paid for.
+  - **Mission.** Tools are the vehicle, not the destination. One Khmer-speaking engineer reached is
+    not worth less than one Spanish-speaking engineer reached. Efficiency framing quietly becomes
+    "serve the already-served," which is the opposite of the point. What efficiency *legitimately*
+    argues is that spending which reaches **nobody** delivers nothing — untranslated-and-unvisited is
+    no loss; **unvisited-because-untranslated is.**
+
+  **DECISION B — which CALCULATORS get a full 26-language sprint. Recommendation: DO tier. This is
+  where the money actually is.**
+  - The 2026-08-03 snapshot shows all non-English human use landing on **five** calculators — MPF,
+    MTC, HW, DW, MPHL. A sixteenth calculator translated 26 ways before it has demonstrated demand
+    *in any language* is speculative spending, and it is the only kind here that is still avoidable.
+  - **Gate on TOTAL confirmed human use, in any language — not on English use.** The tempting
+    version ("earn English traffic first, then translate") rests on non-English demand being
+    proportional to English demand, and the data does not support that: non-English share is ~13% on
+    MPF but appears *higher* on the smaller calculators (HW, DW). Those are small samples and may be
+    different windows, so the honest move is to sidestep the assumption entirely by gating on a
+    number that needs no such model.
+  - **Suggested gate, for Tom to set or reject:** a calculator earns its full sprint at **≥50
+    confirmed human uses**. Below that it has not demonstrated demand anywhere.
+
+  **THE MECHANISM THAT BREAKS THE CHICKEN-AND-EGG — and it is already this project's own finding.**
+  `dev/translation-process.md` records: *"es at 10% proves the door opens when identity strings are
+  discoverable."* Identity strings — menu entry, `<title>`, `*_main_desc` — are what a search engine
+  indexes; they are the discovery mechanism, and they are **~3 strings per calculator against ~100+
+  for a body**. So:
+  - **Translate identity strings for every calculator in every language** (cheap, and it is what
+    makes a language able to prove anything at all).
+  - **Gate the body on the demand that then shows up.** A language that starts arriving on a
+    calculator earns that calculator's full sprint.
+  - **Honest downside, which is why this is a recommendation and not a decision:** a page with a
+    translated title and an English body is a worse artifact than either extreme, and it produces
+    exactly the views-without-usage signature that `zh` currently shows — so it would pollute the
+    metric it is meant to feed. Mitigate by treating it as an explicitly instrumented *probation*
+    state, not a resting state.
+
+  **THE COST NOBODY BUDGETS IS MAINTENANCE, NOT SPRINTS.** A one-time sprint is a known, bounded
+  cost. Every English edit afterwards creates 26 debts *forever* — Task 193 alone changed 51 strings.
+  That recurring cost can be tiered by reach with **no user-visible partial state at all**, which
+  makes it strictly better value than tiering the sprints. Partly done already via the QUALITY tiers
+  and `es`-as-spot-check; worth making explicit.
+
+  **LIVE CONSEQUENCE — Task 146.06 (`lpn_`, 154 keys × 26).** Under this framework the sprint waits
+  until `lpn_` clears the gate. It currently shows 2 confirmed uses, and those were mismeasured
+  (Task 199). This is already how the two are ranked (146.06 at 5, Task 195 at 90) — the framework
+  just supplies the reason, and a number.
+
+
+  **ADOPTED 2026-08-05, at the recommended 108-cell point: core calculators `mpf`, `mtc` × core
+  languages `es`, `pt`, `fr`, `tr`.** Tom confirmed the frontier point rather than moving along it.
+  The decision now lives in code as `dev/scripts/translation_coverage.json` (Task 204), so the model
+  above is no longer only a plan — the four counting scripts enforce it.
+  **Measured effect on the very first run**, which is the number Task 204 existed to prevent:
+  suite-wide missing keys fell from **5,330 to 886**, with 4,485 reclassified as *out of scope* in
+  their own bucket. The 886 is not a residue — it is exactly `lpn_` × 4 core languages (205 × 4 =
+  820) plus the 3 `lpn_` identity strings owed in each of the other 22 languages (66). The delta
+  again means something a human can act on.
+  **One thing the model as written did not say, discovered in implementation and now settled:** the
+  identity floor is per-KEY, not per-cell. An out-of-scope cell still owes its menu entry, `<title>`
+  and `*_main_desc`, so the tools must apply scope key-by-key — a first cut that blanked whole cells
+  hid the fact that `zh` was missing three `lpn_` identity strings behind a tidy dot. The floor is
+  the mechanism that lets a cell earn its way in; it cannot be allowed to disappear into the taper.
+
+- 0|204| **[DONE 2026-08-05] Coverage declaration for the translation tooling — required before Task 203's matrix can
+  be adopted.** Four scripts treat a missing key as debt: `lang_parity_check.php`,
+  `generate_translation_payloads.php`, `translation_completion_matrix.php` and
+  `lang_syntax_validate.php`, all reading one list via `exempt_keys.inc.php`. Under Task 203 a key
+  absent from a non-core cell is **deliberate**, not debt — and there is currently no way to say so.
+  - **The obvious shortcut is explicitly forbidden by our own rule.** `translation_exempt_keys.json`
+    is for keys where *identical to English is permanently correct* (symbols, eponyms, cognates), and
+    CLAUDE.md says: "Add a key there only when identical-to-English is permanently correct — never to
+    quiet a number you don't want to fix." A deliberately-untranslated body is neither identical nor
+    permanent. Using the exempt list for it would corrupt the one mechanism that makes **delta zero
+    mean zero**.
+  - **What is needed is a different concept:** a per-(prefix × language) *coverage* declaration —
+    which prefixes are in scope for which languages — so the delta means "missing from what we intend
+    to cover," and an out-of-scope cell is reported separately as **out of scope**, never as missing.
+  - **Why this blocks rather than follows.** Adopt the matrix without it and the very next parity run
+    reports `lpn_` alone as 154 × 25 ≈ **3,850 missing keys, permanently**. A number that large and
+    that permanent teaches everyone to ignore it, which destroys the delta-zero discipline that was
+    deliberately built (Task 161). The tooling must learn the new model **before** the model ships.
+  - Keep the two ideas separate in the data as well as the code: *exempt* = correctly identical
+    forever; *out of scope* = not translated yet, by decision, and revisitable when a cell earns it.
+
+  **BUILT 2026-08-05.** `dev/scripts/translation_coverage.json` (the declaration) +
+  `dev/scripts/coverage.inc.php` (the shared loader, mirroring `exempt_keys.inc.php` so the four
+  scripts cannot drift apart) + `dev/scripts/coverage_selftest.php` (asserts the cross, the identity
+  floor, and the exempt/out-of-scope separation against the REAL declaration, not a fixture — the
+  failures worth catching are edits to that file).
+  - **All four scripts wired.** `lang_parity_check.php` gains an `out_of_scope` bucket;
+    `generate_translation_payloads.php` stops sending out-of-scope keys to agents and reports
+    `out_of_scope_key_count` in payload meta; `translation_completion_matrix.php` prints `.` for a
+    cell that owes nothing and excludes it from the row total; `lang_syntax_validate.php` stops
+    warning `identical-to-english` on a body we have not asked for.
+  - **The forbidden shortcut stayed forbidden.** Nothing was added to
+    `translation_exempt_keys.json`; the selftest reports exempt keys sitting under non-core
+    calculator prefixes (13 today — all genuine symbols and eponyms: `e`, `L`, `D`, `h_f`, `ID`,
+    "Hazen-Williams", "laminar", "Circular") so a future attempt to park a body there is visible at
+    review time rather than silent.
+  - **Editing the declaration invalidates every payload.** `EC_COVERAGE_PATH` and
+    `coverage.inc.php` joined the freshness check's input set, so `--check` goes STALE and exits 1
+    the moment coverage changes — verified. A sprint cannot launch on a delta computed under a
+    different coverage model than the one in force.
+  - **`--ignore-coverage` on the parity checker and the matrix** restores the pre-204 full-parity
+    view. Kept deliberately: "what would promoting this cell cost?" is a real question, it is just
+    not the default one.
+  - **Two implementation findings worth keeping.** (1) Scope must be consulted **only about a gap** —
+    ask it about an already-translated key and the tools report finished work as "out of scope",
+    which reads as a plan to abandon it and contradicts Task 203's *deletes nothing*. (2) The
+    identity floor cannot be a `_menu` **suffix** rule: it silently swept in `lpn_tab_menu`
+    ("Project menu") and `lpn_backdrop_menu` ("Background image…"), promoting two ordinary body
+    labels to never-out-of-scope. The three legacy identity keys (`mi_menu`, `mtc_menu`, `wi_menu`)
+    are listed by exact name instead.
+  - Documented in CLAUDE.md (a new subsection under the sprint checklist) and in
+    `dev/translation-process.md` (the background-structures list and the scripts reference).
 
 - 0|211| **[DONE 2026-08-05] The tab-and-File-menu paradigm: projects as tabs, files as files (Task 146 child).
   Supersedes Task 195's Phase 2 UI.** Designed with Tom 2026-08-04, after his second browser pass on

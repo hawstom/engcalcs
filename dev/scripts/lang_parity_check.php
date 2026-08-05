@@ -7,17 +7,23 @@
  * - extra keys
  * - values still equal to English (excluding keys in translation_exempt_keys.json,
  *   which are correctly identical -- symbols, eponyms, brands, cognates; ROADMAP Task 161)
+ * - keys OUT OF SCOPE under the coverage declaration (ROADMAP Tasks 203/204), reported
+ *   in their own bucket and never as missing: a body we have decided not to translate
+ *   into a non-core language is not debt, and counting it as debt is what would make the
+ *   missing-key number meaningless.
  *
  * Usage:
  *   php scripts/lang_parity_check.php
  *   php scripts/lang_parity_check.php --lang=es,fr --prefix=dw,hw
  *   php scripts/lang_parity_check.php --strict
+ *   php scripts/lang_parity_check.php --ignore-coverage   (raw full-parity view)
  */
 
 const DEFAULT_LANG_DIR = __DIR__ . '/../../lib';
 const EN_FILE = DEFAULT_LANG_DIR . '/lang.ec.en.php';
 
 require_once __DIR__ . '/exempt_keys.inc.php';
+require_once __DIR__ . '/coverage.inc.php';
 require_once __DIR__ . '/lang_parse.inc.php';
 
 main($argv);
@@ -42,11 +48,21 @@ function main(array $argv): void
     sort($langFiles);
 
     $exemptMap = ecLoadExemptMap();
+    // --ignore-coverage restores the pre-Task-204 view: every key expected in every
+    // language. Kept because "what would full parity cost?" is a real question when
+    // deciding whether a cell should become core -- it is just not the default one.
+    $coverage = $opts['ignore_coverage'] ? null : ecLoadCoverage();
+    if ($coverage !== null) {
+        echo ecCoverageSummary($coverage) . "\n";
+    } else {
+        echo "coverage: IGNORED (--ignore-coverage) -- every key expected in every language\n";
+    }
 
     $totalMissing = 0;
     $totalExtra = 0;
     $totalEnglish = 0;
     $totalExempt = 0;
+    $totalOutOfScope = 0;
 
     foreach ($langFiles as $file) {
         if (!preg_match('/lang\.ec\.([a-z]{2})\.php$/', $file, $m)) {
@@ -64,19 +80,21 @@ function main(array $argv): void
 
         $parsed = parseLangAssignments((string)file_get_contents($file));
 
-        [$missing, $extra, $englishEqual, $exempt] =
-            compareLanguage($en, $parsed, $opts['prefixes'], $lang, $exemptMap);
+        [$missing, $extra, $englishEqual, $exempt, $outOfScope] =
+            compareLanguage($en, $parsed, $opts['prefixes'], $lang, $exemptMap, $coverage);
 
         $totalMissing += count($missing);
         $totalExtra += count($extra);
         $totalEnglish += count($englishEqual);
         $totalExempt += count($exempt);
+        $totalOutOfScope += count($outOfScope);
 
         echo "\n[{$lang}] " . basename($file) . "\n";
         echo '  missing: ' . count($missing) . "\n";
         echo '  extra: ' . count($extra) . "\n";
         echo '  equal_to_english: ' . count($englishEqual) . "\n";
         echo '  exempt_identical: ' . count($exempt) . "\n";
+        echo '  out_of_scope: ' . count($outOfScope) . "\n";
 
         printList('missing_keys', $missing);
         printList('extra_keys', $extra);
@@ -88,6 +106,7 @@ function main(array $argv): void
     echo 'extra: ' . $totalExtra . "\n";
     echo 'equal_to_english: ' . $totalEnglish . "\n";
     echo 'exempt_identical: ' . $totalExempt . " (correctly identical to English; not debt)\n";
+    echo 'out_of_scope: ' . $totalOutOfScope . " (deliberately untranslated per the coverage declaration; not debt)\n";
 
     if ($opts['strict'] && ($totalMissing > 0 || $totalExtra > 0 || $totalEnglish > 0)) {
         exit(1);
@@ -100,6 +119,7 @@ function parseArgs(array $argv): array
         'languages' => [],
         'prefixes' => [],
         'strict' => false,
+        'ignore_coverage' => false,
     ];
 
     for ($i = 1; $i < count($argv); $i++) {
@@ -107,6 +127,11 @@ function parseArgs(array $argv): array
 
         if ($arg === '--strict') {
             $opts['strict'] = true;
+            continue;
+        }
+
+        if ($arg === '--ignore-coverage') {
+            $opts['ignore_coverage'] = true;
             continue;
         }
 
@@ -137,6 +162,7 @@ function printHelpAndExit(): void
     echo "  --lang=es,fr      Limit to specific language codes\n";
     echo "  --prefix=dw,hw    Limit checks to key prefixes\n";
     echo "  --strict          Exit 1 if any mismatch is found\n";
+    echo "  --ignore-coverage Expect every key in every language (pre-Task-204 view)\n";
     echo "  -h, --help        Show this help\n";
     exit(0);
 }
@@ -150,38 +176,62 @@ function splitCsv(string $value): array
 }
 
 /**
- * Returns [missing, extra, englishEqual, exempt]. A key that equals English but is
- * correctly so -- listed in translation_exempt_keys.json for this language, or a
- * universal u_/mi_ symbol -- lands in `exempt`, not in `englishEqual`: it is correct,
- * not debt. Missing keys are reported regardless of exemption.
+ * Returns [missing, extra, englishEqual, exempt, outOfScope]. Three different reasons a
+ * key is not flagged as debt, and they are NOT interchangeable:
+ *   exempt     -- equals English and is correctly so forever (symbol, eponym, cognate).
+ *   outOfScope -- this (calculator x language) cell is not one we have decided to
+ *                 translate; the key is not started, and the cell can earn its way in.
+ *   translated -- the ordinary case.
+ * Missing keys are reported regardless of exemption, but NOT regardless of scope: an
+ * out-of-scope body being absent is the intended state, not a finding.
  *
- * Both tests come from exempt_keys.inc.php, shared with the payload generator, so the
- * two tools cannot report different "untranslated" counts for the same files.
+ * The exempt tests come from exempt_keys.inc.php and the scope test from
+ * coverage.inc.php, both shared with the payload generator, so no two tools can report
+ * different "untranslated" counts for the same files.
  */
-function compareLanguage(array $en, array $current, array $prefixes, string $lang, array $exemptMap): array
+function compareLanguage(array $en, array $current, array $prefixes, string $lang, array $exemptMap, ?array $coverage): array
 {
     $missing = [];
     $extra = [];
     $englishEqual = [];
     $exempt = [];
+    $outOfScope = [];
 
     foreach ($en as $key => $enValue) {
         if (!prefixAllowed($key, $prefixes)) {
             continue;
         }
 
+        // Find the GAP first, then ask whether we meant to fill it. Scope must never be
+        // consulted about a key that is already translated: at adoption every cell in the
+        // suite except lpn_ is fully translated, and re-labelling that finished work
+        // "out of scope" would report an intention to abandon it. Task 203 deletes nothing.
+        $gap = false;
+
         if (!array_key_exists($key, $current)) {
-            $missing[] = $key;
+            $gap = true;
+        } elseif (normalizeForCompare((string)$current[$key]) === normalizeForCompare((string)$enValue)) {
+            if (ecIsExemptFromEnglishEquality($key, $lang, $exemptMap)
+                || ecIsUniversalKey($key, (string)$enValue)) {
+                $exempt[] = $key;   // finished, and correctly identical -- not a gap at all
+                continue;
+            }
+            $gap = true;
+        }
+
+        if (!$gap) {
             continue;
         }
 
-        if (normalizeForCompare((string)$current[$key]) === normalizeForCompare((string)$enValue)) {
-            if (ecIsExemptFromEnglishEquality($key, $lang, $exemptMap)
-                || ecIsUniversalKey($key, (string)$enValue)) {
-                $exempt[] = $key;
-            } else {
-                $englishEqual[] = $key;
-            }
+        if ($coverage !== null && !ecCoverageKeyInScope($key, $lang, $coverage)) {
+            $outOfScope[] = $key;
+            continue;
+        }
+
+        if (!array_key_exists($key, $current)) {
+            $missing[] = $key;
+        } else {
+            $englishEqual[] = $key;
         }
     }
 
@@ -199,8 +249,9 @@ function compareLanguage(array $en, array $current, array $prefixes, string $lan
     sort($extra);
     sort($englishEqual);
     sort($exempt);
+    sort($outOfScope);
 
-    return [$missing, $extra, $englishEqual, $exempt];
+    return [$missing, $extra, $englishEqual, $exempt, $outOfScope];
 }
 
 function prefixAllowed(string $key, array $prefixes): bool

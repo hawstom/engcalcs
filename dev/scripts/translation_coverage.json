@@ -1,0 +1,57 @@
+{
+  "_comment": [
+    "COVERAGE DECLARATION -- which (calculator x language) cells we intend to translate.",
+    "ROADMAP Task 203 decided the model; Task 204 built this. Read Task 203 before editing.",
+    "",
+    "THIS IS NOT translation_exempt_keys.json AND MUST NEVER BECOME IT.",
+    "  exempt       = identical to English is PERMANENTLY CORRECT here (symbols, eponyms, cognates).",
+    "  out of scope = not translated yet, BY DECISION, and revisitable the moment a cell earns it.",
+    "Merging the two would destroy the delta-zero discipline built in Task 161: an exempt key is",
+    "finished, an out-of-scope key is simply not started, and a tool that cannot tell them apart",
+    "reports one permanent number that everybody learns to ignore.",
+    "",
+    "THE RULE (one sentence, two tiers per axis, no per-cell table):",
+    "  a cell is IN SCOPE iff the calculator is core OR the language is core.",
+    "That OR is what makes it a CROSS rather than an intersection: every language gets the core",
+    "calculators, and every calculator gets the core languages. An AND rule would leave",
+    "Manning-Pipe-Flow untranslated in 22 languages, which is the opposite of the decision.",
+    "",
+    "IDENTITY STRINGS ARE THE FLOOR AND ARE NEVER OUT OF SCOPE -- menu entry, <title> and",
+    "*_main_desc stay translated for every calculator in every language, because they are the",
+    "discovery mechanism. A cell outside the cross means 'body in English, findable in the local",
+    "language', which is also what lets that cell earn its way in.",
+    "",
+    "A prefix not listed in calculator_prefixes is suite chrome (nav, units, install, contact) and",
+    "is ALWAYS in scope. That default fails safe: an unclassified new prefix gets translated."
+  ],
+
+  "model": "cross-two-tier",
+  "roadmap_task": 203,
+  "adopted": "2026-08-05",
+
+  "core_calculators": ["mpf", "mtc"],
+  "core_languages": ["es", "pt", "fr", "tr"],
+
+  "identity_key_suffixes": ["_main_menu", "_main_title", "_main_desc"],
+
+  "_identity_key_extra_comment": [
+    "Three calculators predate the *_main_menu convention and name their menu entry",
+    "<prefix>_menu. They are listed by exact key rather than by a '_menu' suffix rule,",
+    "because that suffix also matches ordinary body strings -- lpn_tab_menu ('Project menu')",
+    "and lpn_backdrop_menu ('Background image...') are UI labels, not identity strings, and a",
+    "suffix rule silently promoted both to the never-out-of-scope floor."
+  ],
+  "identity_keys_extra": ["mi_menu", "mtc_menu", "wi_menu"],
+
+  "calculator_prefixes": [
+    "bpn", "cs", "dw", "hw", "ip", "irr", "lpn", "mhp", "mi", "mpf",
+    "mphl", "mtc", "odt", "or", "rc", "wi", "ws"
+  ],
+
+  "_frontier_note": [
+    "108 cells of 416 = 26% of the work for 98.2% of measured use (Task 203's efficient frontier).",
+    "Moving along that frontier is a one-line edit here: adding a core LANGUAGE costs (16 - N) cells,",
+    "adding a core CALCULATOR costs a full 26, which is why the frontier prefers languages.",
+    "HW does not earn core status until 156 cells -- 2.9% of use does not justify 26 cells."
+  ]
+}

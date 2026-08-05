@@ -68,6 +68,26 @@ counts before anything paid launches.
   wave-3 *low-resource* tier (am/km/my/ps/sw — small community **and** near-zero reach) is for.
 - **Never say "families"** for calculator groupings — say "calculator categories." Reserve "family"
   for nothing; it was retired 2026-07-07 for ambiguity with language families.
+- **THE COVERAGE MATRIX (adopted 2026-08-05; ROADMAP Tasks 203/204)** — the declaration of *which
+  cells we intend to translate at all*, in `dev/scripts/translation_coverage.json`, read by all four
+  counting scripts via `dev/scripts/coverage.inc.php`.
+  - **The rule:** a (calculator × language) cell is in scope **iff the calculator is core OR the
+    language is core**. Core calculators `mpf`, `mtc`; core languages `es`, `pt`, `fr`, `tr`.
+  - **The OR is the whole point.** Every language gets the core calculators; every calculator gets
+    the core languages. It is a **cross**, not an intersection.
+  - **Identity strings — menu entry, `<title>`, `*_main_desc` — are never out of scope**, in any
+    calculator, in any language. That is what keeps an out-of-scope cell discoverable in its own
+    language, and it is how a cell earns its way in. It is also the mechanism behind the standing
+    "zero reach ≠ low value" rule above: the door has to be visible before anyone can walk through it.
+  - **It deletes nothing.** Every cell except `lpn_` was already translated when this was adopted,
+    and stays translated and maintained. Scope is consulted only about a **gap**. The matrix governs
+    new calculators, drift spend, and future audit passes — never removal of work already paid for.
+  - **It is not the exempt list and must never be merged with it.** *exempt* = identical to English
+    is permanently correct (the key is finished); *out of scope* = not translated yet, by decision
+    (the key is not started). Merging them restores the permanent floor Task 161 removed.
+  - **Live consequence:** `lpn_`'s sprint (ROADMAP Task 146.06) is `lpn_` × es, pt, fr, tr — 205
+    keys × 4 languages — plus its 3 identity strings in the other 22. Not a 26-agent sprint.
+  - `php dev/scripts/coverage_selftest.php` asserts all of the above against the real declaration.
 
 ## Scenario A — Adding a new calculator
 
@@ -273,7 +293,13 @@ standing tripwire.
   `--check` gates on any CHANGED key, `--json` emits the resync key list, `--update` re-baselines
   `english_string_hashes.json`.
 - `dev/scripts/generate_translation_payloads.php` — build per-language JSON payloads;
-  `--check` verifies freshness against lang files/glossary/generator (hard gate before any sprint).
+  `--check` verifies freshness against lang files/glossary/exempt list/coverage declaration/generator
+  (hard gate before any sprint).
+- `dev/scripts/translation_coverage.json` + `coverage.inc.php` — the (calculator × language) coverage
+  declaration (see above). `coverage_selftest.php` asserts the cross, the identity floor, and the
+  exempt/out-of-scope separation; run it after editing the JSON.
+- `dev/scripts/lang_parity_check.php` and `translation_completion_matrix.php` — both take
+  `--ignore-coverage` for the raw full-parity view, which is how to cost promoting a cell to core.
 - `dev/scripts/lang_syntax_validate.php --lang=<codes>` — escape-leakage / tag-imbalance /
   foreign-script validator.
 - `dev/scripts/backtranslate_check.php --lang=<code> --prefix=<p>` — meaning-level spot check

@@ -11,7 +11,8 @@
  * - <sub>/<span>/<sup> tag-count imbalance within a value
  * - foreign-script characters (Hangul/Kana) that indicate model contamination
  * - values byte-identical to the English source (untranslated content), skipping keys
- *   that are correctly identical per exempt_keys.inc.php (ROADMAP Task 161)
+ *   that are correctly identical per exempt_keys.inc.php (ROADMAP Task 161) and keys
+ *   out of scope for this language per coverage.inc.php (ROADMAP Tasks 203/204)
  * - Rule A: HTML entities in ANY language string (they double-escape on two of the three
  *   attribute paths and show literally on screen)
  * - Rule B: HTML tags in a plain-text-constrained string -- one bound to a plain-text
@@ -44,6 +45,7 @@ const DEFAULT_LANG_DIR = __DIR__ . '/../../lib';
 const PLAIN_TEXT_ATTRS = 'title|placeholder|value|alt|aria-label|data-[a-z-]+';
 
 require_once __DIR__ . '/exempt_keys.inc.php';
+require_once __DIR__ . '/coverage.inc.php';
 require_once __DIR__ . '/lang_parse.inc.php';
 
 main($argv);
@@ -67,6 +69,9 @@ function main(array $argv): void
     // Keys allowed to be byte-identical to English (ROADMAP Task 161); shared with the
     // payload generator, parity checker, and completion matrix so all four agree.
     $exemptMap = ecLoadExemptMap();
+    // Which (calculator x language) cells we intend to translate. A body left in English
+    // in a non-core cell is the intended state, not a finding -- see ROADMAP Task 203.
+    $coverage = ecLoadCoverage();
 
     foreach ($files as $file) {
         if (!preg_match('/lang\.ec\.([a-z]{2})\.php$/', $file, $m)) {
@@ -95,7 +100,7 @@ function main(array $argv): void
             $issues = array_merge($issues, detectNameDerivationMismatch($file, $content, $plainKeys));
         }
         if ($lang !== 'en') {
-            $issues = array_merge($issues, detectUntranslatedValues($file, $content, $enValues, $lang, $exemptMap));
+            $issues = array_merge($issues, detectUntranslatedValues($file, $content, $enValues, $lang, $exemptMap, $coverage));
         }
     }
 
@@ -633,11 +638,16 @@ function detectEntities(string $file, string $content): array
 
 /**
  * Value byte-identical to English where English contains a real word (>=4 letters).
- * Warning-grade. Keys that are correctly identical -- symbols, eponyms, brands, and
- * per-language cognates -- are skipped via the shared exempt list, so this warning
- * agrees with the payload generator's delta instead of contradicting it.
+ * Warning-grade. Two different skips, and they mean different things: a key on the shared
+ * exempt list is correctly identical FOREVER (symbol, eponym, brand, cognate), while a key
+ * out of scope for this language is simply one we have not asked for yet -- leaving it in
+ * English is how a non-core cell is supposed to look. Both skips come from the same shared
+ * loaders the payload generator uses, so this warning cannot contradict the delta.
+ *
+ * Identity strings are never out of scope, so an untranslated menu entry or title still
+ * warns in every language.
  */
-function detectUntranslatedValues(string $file, string $content, array $enValues, string $lang, array $exemptMap): array
+function detectUntranslatedValues(string $file, string $content, array $enValues, string $lang, array $exemptMap, array $coverage): array
 {
     $issues = [];
     foreach (extractValues($content) as $key => $value) {
@@ -646,6 +656,9 @@ function detectUntranslatedValues(string $file, string $content, array $enValues
             continue;
         }
         if (ecIsExemptFromEnglishEquality($key, $lang, $exemptMap) || ecIsUniversalKey($key, (string)$en)) {
+            continue;
+        }
+        if (!ecCoverageKeyInScope($key, $lang, $coverage)) {
             continue;
         }
         $plain = preg_replace('/&\w+;|<[^>]+>/', '', $en);

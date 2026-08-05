@@ -10,6 +10,12 @@
  * delta of zero means zero -- ROADMAP Task 161. They are still reported when
  * missing or blank, and are echoed back in payload['meta']['exempt_keys'].
  *
+ * Keys OUT OF SCOPE for a language under translation_coverage.json (ROADMAP Tasks
+ * 203/204) are likewise not counted as delta and are not sent to an agent -- a body we
+ * have decided not to translate into a non-core language must not be quietly bought
+ * anyway by a sprint that could not tell the difference. The count is echoed in
+ * payload['meta']['out_of_scope_key_count'] so the suppression stays visible.
+ *
  * Optional sibling map support in lib/lang.ec.en.php:
  *   $ec_lang_intent['some_key'] = 'Expanded semantic intent for translators';
  * When present and different from the base English value, intent is emitted to
@@ -32,6 +38,7 @@ const TARGET_LANGS = [
 ];
 
 require_once __DIR__ . '/exempt_keys.inc.php';
+require_once __DIR__ . '/coverage.inc.php';
 
 main($argv);
 
@@ -69,6 +76,7 @@ function main(array $argv): void
     }
 
     $exemptMap = ecLoadExemptMap();
+    $coverage = ecLoadCoverage();
     $termIndex = termIndexByName($glossaryData['terms']);
     $prefixMap = prefixToTermNames();
 
@@ -98,6 +106,7 @@ function main(array $argv): void
     $langs = resolveTargetLanguages($opts['languages']);
     $generatedCount = 0;
     $exemptTotal = 0;
+    $outOfScopeTotal = 0;
 
     foreach ($langs as $lang) {
         $targetFile = DEFAULT_LANG_DIR . "/lang.ec.{$lang}.php";
@@ -107,10 +116,11 @@ function main(array $argv): void
         }
 
         $current = loadLangArray($targetFile);
-        [$deltaKeys, $keyContext, $exemptKeys] =
-            collectDeltaAndContext($enKeys, $current, $activePrefixes, $lang, $exemptMap);
+        [$deltaKeys, $keyContext, $exemptKeys, $outOfScopeKeys] =
+            collectDeltaAndContext($enKeys, $current, $activePrefixes, $lang, $exemptMap, $coverage);
         $keyIntent = collectKeyIntent($deltaKeys, $enKeys, $enIntent);
         $exemptTotal += count($exemptKeys);
+        $outOfScopeTotal += count($outOfScopeKeys);
 
         $prefixesInDelta = detectPrefixes($deltaKeys);
         $prefixGlossary = buildPrefixGlossary($prefixesInDelta, $termIndex, $prefixMap);
@@ -140,6 +150,11 @@ function main(array $argv): void
                 // rather than silent. See translation_exempt_keys.json (ROADMAP Task 161).
                 'exempt_key_count' => count($exemptKeys),
                 'exempt_keys' => $exemptKeys,
+                // Keys this language is deliberately not being asked to translate, per the
+                // coverage declaration (ROADMAP Tasks 203/204). Counted, not sent. Distinct
+                // from exempt above: exempt means finished, this means not started by choice.
+                'out_of_scope_key_count' => count($outOfScopeKeys),
+                'coverage' => ecCoverageSummary($coverage),
                 'active_prefixes' => $prefixesInDelta,
                 'requested_prefix' => $opts['requested_prefix'],
                 'notes' => 'Translate only keys in keys_to_translate; preserve HTML, units, and symbols.',
@@ -166,6 +181,8 @@ function main(array $argv): void
     echo "Generated {$generatedCount} payload files in: {$opts['output_dir']}\n";
     echo 'Active prefixes: ' . implode(', ', $activePrefixes) . "\n";
     echo "Exempt (correctly identical to English, not counted as delta): {$exemptTotal} across all languages.\n";
+    echo "Out of scope (deliberately untranslated per the coverage declaration): {$outOfScopeTotal} across all languages.\n";
+    echo ecCoverageSummary($coverage) . "\n";
 }
 
 function parseArgs(array $argv): array
@@ -233,7 +250,13 @@ function printHelpAndExit(): void
  */
 function runFreshnessCheck(array $opts): int
 {
-    $commonInputs = [EN_FILE, GLOSSARY_PATH, EC_EXEMPT_KEYS_PATH, __DIR__ . '/exempt_keys.inc.php', __FILE__];
+    $commonInputs = [
+        EN_FILE, GLOSSARY_PATH, EC_EXEMPT_KEYS_PATH, __DIR__ . '/exempt_keys.inc.php',
+        // The coverage declaration changes what counts as delta just as surely as the
+        // exempt list does, so editing it must make every payload stale.
+        EC_COVERAGE_PATH, __DIR__ . '/coverage.inc.php',
+        __FILE__,
+    ];
     $commonNewest = 0;
     foreach ($commonInputs as $f) {
         $commonNewest = max($commonNewest, (int) @filemtime($f));
@@ -404,19 +427,23 @@ function detectPrefixes(array $keys): array
 }
 
 /**
- * Returns [delta, context, exemptKeys]. exemptKeys lists the keys that equalled
- * English but were legitimately exempt, so the suppression stays visible.
+ * Returns [delta, context, exemptKeys, outOfScopeKeys]. Two different reasons a gap is
+ * not delta, kept apart on purpose: exemptKeys equalled English legitimately and are
+ * FINISHED; outOfScopeKeys are a body this language is not being asked for yet and are
+ * NOT STARTED. Both suppressions stay visible in the payload meta.
  */
 function collectDeltaAndContext(
     array $enKeys,
     array $current,
     array $activePrefixes,
     string $lang,
-    array $exemptMap
+    array $exemptMap,
+    array $coverage
 ): array {
     $delta = [];
     $context = [];
     $exemptKeys = [];
+    $outOfScopeKeys = [];
     $orderedKeys = array_keys($enKeys);
 
     for ($i = 0; $i < count($orderedKeys); $i++) {
@@ -446,6 +473,13 @@ function collectDeltaAndContext(
             continue;
         }
 
+        // Scope is consulted only once a gap exists -- never about an already-translated
+        // key, which stays translated and maintained whatever tier its cell is in.
+        if (!ecCoverageKeyInScope($key, $lang, $coverage)) {
+            $outOfScopeKeys[] = $key;
+            continue;
+        }
+
         $delta[$key] = $english;
         $context[$key] = [
             'reason' => $reason,
@@ -457,7 +491,7 @@ function collectDeltaAndContext(
         ];
     }
 
-    return [$delta, $context, $exemptKeys];
+    return [$delta, $context, $exemptKeys, $outOfScopeKeys];
 }
 
 function findNeighbor(array $orderedKeys, array $enKeys, array $current, int $startIndex, int $direction): ?array
