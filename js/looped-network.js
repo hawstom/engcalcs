@@ -1792,30 +1792,52 @@ var EngCalcs = EngCalcs || {};
 		return null;
 	}
 	function saveIndex() { return writeJSON(LPN_INDEX_KEY, library); }
-	// Bumped by every mutation that reaches storage. Its only job is to let a file write notice that
-	// the document changed underneath it while it was awaiting the disk -- see writeOpenProjectToFile().
-	var mutationSeq = 0;
+	// ---- "differs from the file", the only thing the asterisk may mean ----
+	// The flag used to be set by saveToStorage(), on the reasoning that every mutation funnels
+	// through there. It does -- but so does a great deal that is NOT a mutation, and runSolve() calls
+	// saveToStorage() unconditionally on a debounce. So merely OPENING a file, or switching to a tab,
+	// scheduled a solve, which wrote storage, which raised the asterisk on a project identical to the
+	// file it came from (Tom, 2026-08-04: "On opening a file on https, it immediately says it is
+	// modified. This must be a mistake." It was).
+	//
+	// A signature answers the real question instead of a proxy for it: dirty means the document is
+	// not what the file holds. That also makes edit-then-undo-back correctly clean, which no
+	// call-site-counting scheme ever manages.
+	function hash32(str) {
+		var h = 5381, i = str.length;
+		while (i) { h = (h * 33) ^ str.charCodeAt(--i); }
+		return (h >>> 0).toString(36);
+	}
+	function docSignature() {
+		var snap = serializeProject();
+		// The backdrop's data URL is megabytes and changes only when the image itself is replaced, so
+		// it is represented by its LENGTH plus its placement rather than hashed. Hashing it would put
+		// a multi-megabyte string walk on the solve debounce, several times a second while drawing.
+		var bd = snap.backdrop;
+		snap = Object.assign({}, snap, {
+			backdrop: bd ? { n: (bd.href || '').length, x: bd.x, y: bd.y, w: bd.width, h: bd.height, s: bd.s } : null
+		});
+		return hash32(JSON.stringify(snap));
+	}
 	// Autosave. Writes the OPEN project's document first and the index second, deliberately: if the
 	// document write fails on quota, the index still describes the last state that actually made it
 	// to disk, rather than advertising a project whose content never landed.
 	function saveToStorage() {
 		if (!library.openId) { return; }
-		mutationSeq++;
 		if (!writeJSON(projectKey(library.openId), serializeProject())) { return; }
 		var entry = indexEntry(library.openId);
 		if (entry) {
 			entry.name = project.name;
 			entry.updated = Date.now();
-			// The one seam the whole dirty/asterisk story hangs off (Task 195 Phase 2, kept by Task
-			// 211). Every mutation on the page already funnels through here, so marking dirty at this
-			// single point covers all ~40 call sites and, more importantly, cannot be forgotten by
-			// whatever the 41st turns out to be. Since Task 211 the flag lives on the INDEX ENTRY
-			// rather than in one module-level variable, because a tab left behind can be dirty too --
-			// switching away from an unsaved file project must not clear or steal its asterisk.
+			// Recomputed here because this is still the one seam every change passes through -- what
+			// changed is what it decides. `savedSig` is set only by a successful file write, so a
+			// project that has never been written to a file has none and is always dirty, which is
+			// exactly right: a browser project is in no file at all.
 			//
-			// The strip is redrawn only on the false->true TRANSITION. This function runs on every
-			// pointer move of a drag, and a full tab re-render per frame would be visible.
-			if (!entry.dirty) { entry.dirty = true; renderTabs(); }
+			// The strip is redrawn only when the answer CHANGES. This runs on every pointer move of a
+			// drag, and a full tab re-render per frame would be visible.
+			var nowDirty = docSignature() !== entry.savedSig;
+			if (nowDirty !== !!entry.dirty) { entry.dirty = nowDirty; renderTabs(); }
 		}
 		saveIndex();
 	}
@@ -1977,7 +1999,7 @@ var EngCalcs = EngCalcs || {};
 	// state, and closing a tab is what removes a project. These three read that state.
 	//
 	// `entry.fileName` is what makes a project a FILE project, and it is stored in the index rather
-	// than only in the session's handle Map on purpose: a browser does not keep permission to a file
+	// than only in the session's handle Map on purpose: a browser does not stay connected to a file
 	// across a page load, so after a reload we still know the tab came from `Elm-Street.json` even
 	// though we can no longer write to it. Keeping the name means the tab keeps its identity instead
 	// of silently demoting itself to a browser project, which would be a lie about where the work is.
@@ -2198,7 +2220,7 @@ var EngCalcs = EngCalcs || {};
 		// Said every time, because it is the answer to the question this path always provokes:
 		// "why did I get a second copy?" (Tom, 2026-08-03). The menu no longer carries that caveat
 		// in its label, so this is where the fact lives.
-		setNotice((pcDl.lpn_status_downloaded || 'Downloaded {file}. This browser cannot keep working in a file, so each save makes another copy, and this project stays marked as not saved to a file.')
+		setNotice((pcDl.lpn_status_downloaded || 'Downloaded {file}. This browser cannot connect to a file, so each save makes another copy, and this project stays marked as not saved to a file.')
 			.replace('{file}', projectFileName()));
 	}
 	// Lands an imported document as a NEW project, never over the open one (the ROADMAP is explicit
@@ -2339,18 +2361,17 @@ var EngCalcs = EngCalcs || {};
 					return false;
 				}
 			}
-			// Captured with the text, and re-checked after the awaits: an edit made WHILE the write is
-			// in flight bumps this, and clearing the dirty flag on its behalf would tell the user their
-			// change is in a file that does not contain it. Same discipline the old timer version used,
-			// stated positively instead of by clearing the flag early.
-			var seq = mutationSeq, text = projectFileText();
+			// Captured WITH the text, and compared again after the awaits: an edit made while the
+			// write is in flight must not be recorded as being in a file that does not contain it.
+			var sigWritten = docSignature(), text = projectFileText();
 			var writable = await handle.createWritable();
 			await writable.write(text);
 			await writable.close();
 			setFileError(false);
 			var entry = indexEntry(id);
-			if (entry && entry.dirty && mutationSeq === seq) {
-				entry.dirty = false;
+			if (entry) {
+				entry.savedSig = sigWritten;
+				entry.dirty = docSignature() !== sigWritten;
 				saveIndex();
 				renderTabs();
 			}
@@ -2560,7 +2581,11 @@ var EngCalcs = EngCalcs || {};
 		entry.name = project.name;
 		clearUndo();
 		saveToStorage();
-		entry.dirty = false;      // AFTER saveToStorage(), which sets it
+		// Just read from that very file, so this IS the file. Recorded as the baseline rather than
+		// merely clearing a flag, or the next solve would recompute dirty against nothing and raise
+		// the asterisk again.
+		entry.savedSig = docSignature();
+		entry.dirty = false;
 		saveIndex();
 		refreshAllFromDocument();
 		renderTabs();
@@ -2589,7 +2614,7 @@ var EngCalcs = EngCalcs || {};
 			// Task 209's snooze system is the right long-term home for this: shown by default, with
 			// a way to say "I know" that is the USER's to give rather than ours to assume.
 			openDialog(function (body) {
-				[pc.lpn_file_upload_explain, pc.lpn_file_upload_ask].forEach(function (txt) {
+				[pc.lpn_file_upload_explain].forEach(function (txt) {
 					if (!txt) { return; }
 					var t = document.createElement('p');
 					t.style.margin = '0 0 8px';
@@ -2658,9 +2683,11 @@ var EngCalcs = EngCalcs || {};
 			fileHandles.set(id, handle);
 			if (entry) {
 				entry.fileName = handle.name;
-				// Freshly read from that very file, so nothing is pending -- importProject() had to
-				// call saveToStorage(), which sets the flag, so it is cleared here rather than never
-				// being set.
+				// Freshly read from that very file, so this IS the file. The baseline has to be
+				// RECORDED, not merely the flag cleared: refreshAllFromDocument() has already
+				// scheduled a solve, and that solve calls saveToStorage(), which recomputes dirty.
+				// Without a baseline to compare against, every freshly opened file came up modified.
+				entry.savedSig = docSignature();
 				entry.dirty = false;
 			}
 			saveIndex();
@@ -2835,7 +2862,7 @@ var EngCalcs = EngCalcs || {};
 		if (!readOnly && entry && isFileProject(entry) && !isLinked(id)) {
 			bannerWarn = {
 				kind: 'reopen',
-				message: (pc.lpn_file_needs_reopen || 'This project came from {file}, but a browser does not keep permission to a file after the page is reloaded. Use File, Save as, or open the file again, to carry on working in it.')
+				message: (pc.lpn_file_needs_reopen || 'This project came from {file}, but a browser does not stay connected to a file after the page is reloaded. Use File, Save as, or open the file again, to connect to it.')
 					.replace('{file}', entry.fileName),
 				actionLabel: pc.lpn_file_relink || 'Choose the file again',
 				action: relinkFile,
@@ -3244,7 +3271,7 @@ var EngCalcs = EngCalcs || {};
 			// where there is no File System Access API, what the browser does IS a Save As: it writes
 			// a new file and picks the location itself.
 			//
-			// What the fallback genuinely cannot do -- keep working in that file -- is said AFTER the
+			// What the fallback genuinely cannot do -- connect to that file -- is said AFTER the
 			// act, by lpn_status_downloaded, and shown continuously by an asterisk that never clears.
 			// That answers Tom's original complaint ("when I save again, I get a second copy") at the
 			// moment it arises, without a menu label carrying the caveat forever.
@@ -3252,8 +3279,20 @@ var EngCalcs = EngCalcs || {};
 			// read-only, File, Save is not disabled. Read only is read only."). saveCurrent() still
 			// routes to Save as if it is ever reached another way, but a live Save row on a project
 			// that can never be saved is the menu telling a lie about what it will do.
-			{ label: pc.lpn_file_save || 'Save', tip: api ? null : pc.lpn_file_download_tip, fn: saveCurrent, disabled: readOnly },
-			{ label: pc.lpn_file_saveas || 'Save as…', tip: api ? null : pc.lpn_file_download_tip, fn: saveAs },
+			{
+				label: pc.lpn_file_save || 'Save',
+				tip: api ? pc.lpn_file_save_tip : pc.lpn_file_download_tip,
+				fn: saveCurrent,
+				disabled: readOnly
+			},
+			// The Save as tip is where the browser-settings advice lives (Tom, 2026-08-04) -- it
+			// answers the question at the moment the user is choosing where their work goes, rather
+			// than in a dialog they met once on the way in.
+			{
+				label: pc.lpn_file_saveas || 'Save as…',
+				tip: api ? pc.lpn_file_saveas_tip : pc.lpn_file_saveas_tip_download,
+				fn: saveAs
+			},
 			// Only shown when it beats Save -- more than one file with unsaved changes. On a page
 			// where most people will only ever have one, a permanent row would be clutter that never
 			// once did anything.

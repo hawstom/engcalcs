@@ -1242,7 +1242,7 @@ $ec_lang['lpn_status_imported']='Opened {name} from a file, and added it to this
 // {file} is a file name and {name} a project name; word order is the translator's to choose.
 $ec_lang['lpn_file_type_desc']='Project file';
 // Where there is no File System Access API -- Firefox, Safari, or any page not served over https --
-// a save cannot keep hold of a file, so every press really is another copy in the downloads folder.
+// a save cannot connect to a file, so every press really is another copy in the downloads folder.
 // The label says which of the two you are getting rather than leaving the duplicate looking like a
 // bug.
 // **The MENU still says Save and Save as… there** (Tom, 2026-08-04: *"'Download a copy' is a mistake,
@@ -1250,21 +1250,26 @@ $ec_lang['lpn_file_type_desc']='Project file';
 // a file, and this page already spends the word "copy" on Duplicate; a third word for a third thing
 // is the invention we are trying to stop doing. The caveat lives in a tip on those rows, and in a
 // notice after the act -- at the moment the question arises -- rather than in a label forever.
-$ec_lang['lpn_file_download_tip']='This browser cannot keep working in a file, so each save writes another copy to your downloads. Open one with File, Open to carry on where you left off.';
+$ec_lang['lpn_file_download_tip']='Saves using your browser\'s Download settings. This browser cannot connect to a file, so each save writes another copy rather than replacing the last one.';
 // Opening a file where there is no File System Access API is an UPLOAD, not an open: the browser
 // hands over the contents and nothing else -- no way to write back, no way to lock it, no way even
 // to recognise it next time. A user who is not told will reasonably expect Save to go back where the
 // file came from. Explained once per browser by lpn_file_upload_explain, then said every time by
 // lpn_status_uploaded.
-$ec_lang['lpn_file_upload_explain']='This browser cannot keep a file reference, so opening a file here is really an upload: the project is copied into this browser, and the only way to save your work back to the file is to overwrite the file with File, Save as.';
+$ec_lang['lpn_file_upload_explain']='This browser cannot connect to a file, so opening a file here is really an upload: the project is copied into this browser, and the only way to save your work back to the file is to overwrite the file with File, Save as.';
+// Tips on the two Save rows. They differ by what the browser can do, which is the one thing a user
+// cannot see for themselves, and "connect" is the word that carries it (Tom, 2026-08-04).
+$ec_lang['lpn_file_save_tip']='Saves to the connected file.';
+$ec_lang['lpn_file_saveas_tip']='Choose a file to save to. This project connects to that file, and Save writes to it from then on.';
 // The one thing a user can actually DO about the proliferation of files (Tom, 2026-08-04: "I hate to
 // cause the proliferation of files"). We cannot make a browser ask where to put a download -- there
 // is no API for it, and the download attribute cannot override the setting -- but the user can turn
 // that setting on themselves, and then Save as really does let them overwrite the file they started
-// from. Saying so is the whole of what we can offer.
-$ec_lang['lpn_file_upload_ask']='Tip: if you turn on your browser setting "Ask where to save each file", File, Save as lets you pick the original file and overwrite it, instead of adding another copy to your downloads folder.';
-$ec_lang['lpn_status_uploaded']='Copied into this browser. Nothing can be written back to the file you picked, so use File, Save as to keep your work.';
-$ec_lang['lpn_status_downloaded']='Downloaded {file}. This browser cannot keep working in a file, so each save makes another copy, and this project stays marked as not saved to a file.';
+// from. It belongs in this tip rather than in a dialog: it answers a question asked at the moment
+// the user is choosing where their work goes.
+$ec_lang['lpn_file_saveas_tip_download']='Saves using your browser\'s Download settings. This browser cannot connect to a file, so each save writes another copy. If you turn on your browser setting "Ask where to save each file", you can pick the original file and overwrite it instead.';
+$ec_lang['lpn_status_uploaded']='Project file uploaded. No connection to it can be maintained, so the only way to save back to it is by using File, Save as.';
+$ec_lang['lpn_status_downloaded']='Downloaded {file}. This browser cannot connect to a file, so each save makes another copy, and this project stays marked as not saved to a file.';
 $ec_lang['lpn_status_file_opened']='Opened {file}.';
 $ec_lang['lpn_status_saved']='Saved {file}.';
 $ec_lang['lpn_status_reverted']='Loaded {file} again from the disk.';
@@ -1279,10 +1284,10 @@ $ec_lang['lpn_close_browser_prompt']='{name} is kept only in this browser. If yo
 $ec_lang['lpn_close_discard']='Close without saving';
 $ec_lang['lpn_cancel']='Cancel';
 $ec_lang['lpn_revert_confirm']='Throw away the changes you have made and load {file} again from the disk?';
-// A file project whose page has been reloaded. Browsers do not keep permission to a file across a
+// A file project whose page has been reloaded. Browsers do not stay connected to a file across a
 // page load, so the link is gone even though we still know the name. Says what to do, not just what
 // happened.
-$ec_lang['lpn_file_needs_reopen']='This project came from {file}, but a browser does not keep permission to a file after the page is reloaded. Use File, Save as, or open the file again, to carry on working in it.';
+$ec_lang['lpn_file_needs_reopen']='This project came from {file}, but a browser does not stay connected to a file after the page is reloaded. Use File, Save as, or open the file again, to connect to it.';
 // Says what is still safe before it says what failed: the reassurance is the part a worried user
 // needs, and it is true -- the browser copy is written on every edit regardless.
 $ec_lang['lpn_file_write_failed']='Could not write to the file. It may have been moved or renamed, or permission may have been withdrawn. Your work is still saved in this browser. Use Save to file to choose the file again.';
