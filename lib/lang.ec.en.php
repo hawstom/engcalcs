@@ -1251,6 +1251,13 @@ $ec_lang['lpn_file_type_desc']='Project file';
 // is the invention we are trying to stop doing. The caveat lives in a tip on those rows, and in a
 // notice after the act -- at the moment the question arises -- rather than in a label forever.
 $ec_lang['lpn_file_download_tip']='This browser cannot keep working in a file, so each save writes another copy to your downloads. Open one with File, Open to carry on where you left off.';
+// Opening a file where there is no File System Access API is an UPLOAD, not an open: the browser
+// hands over the contents and nothing else -- no way to write back, no way to lock it, no way even
+// to recognise it next time. A user who is not told will reasonably expect Save to go back where the
+// file came from. Explained once per browser by lpn_file_upload_explain, then said every time by
+// lpn_status_uploaded.
+$ec_lang['lpn_file_upload_explain']='This browser cannot keep hold of a file, so opening one here is really an upload: the project is copied into this browser, and nothing you do afterwards can be written back to the file you picked. To keep your work, use File, Save as, which writes a new file each time.';
+$ec_lang['lpn_status_uploaded']='Copied into this browser. Nothing can be written back to the file you picked, so use File, Save as to keep your work.';
 $ec_lang['lpn_status_downloaded']='Downloaded {file}. This browser cannot keep working in a file, so each save makes another copy, and this project stays marked as not saved to a file.';
 $ec_lang['lpn_status_file_opened']='Opened {file}.';
 $ec_lang['lpn_status_saved']='Saved {file}.';
@@ -1408,8 +1415,12 @@ $ec_lang['lpn_labels_mark_extrema']='Mark highest and lowest values';
 $ec_lang['lpn_field_id']='ID';
 $ec_lang['lpn_backdrop_menu']='Background image...';
 $ec_lang['lpn_backdrop_add']='Add image';
-$ec_lang['lpn_backdrop_scale']='Scale';
-$ec_lang['lpn_backdrop_position']='Position';
+// "Scale image" / "Position image" rather than the bare verbs (Tom, 2026-08-04). They read fine
+// under the toolbar select's own "Background image..." heading and read as orphans in the Insert
+// menu, where nothing above them says what is being scaled. Naming the object costs one word and
+// works in both places.
+$ec_lang['lpn_backdrop_scale']='Scale image';
+$ec_lang['lpn_backdrop_position']='Position image';
 $ec_lang['lpn_backdrop_remove']='Remove image';
 $ec_lang['lpn_backdrop_remove_confirm']='Remove the background image?';
 $ec_lang['lpn_backdrop_scale_prompt1']='Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them.';

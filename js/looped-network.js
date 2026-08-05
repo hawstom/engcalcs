@@ -1738,7 +1738,7 @@ var EngCalcs = EngCalcs || {};
 		// and was missing here until 2026-08-04, when Tom noticed Clear/Wipe did not make the page
 		// behave as a first-time visitor: the file training panel stayed suppressed and the old
 		// initials were still being sent to the lock broker.
-		var i, key, doomed = [LPN_LEGACY_KEY, LPN_INDEX_KEY, LPN_IDENTITY_KEY];
+		var i, key, doomed = [LPN_LEGACY_KEY, LPN_INDEX_KEY, LPN_IDENTITY_KEY, LPN_UPLOAD_NOTICE_KEY];
 		try {
 			for (i = 0; i < localStorage.length; i++) {
 				key = localStorage.key(i);
@@ -2251,6 +2251,10 @@ var EngCalcs = EngCalcs || {};
 			var saved = acceptImportedText(ev.target.result);
 			if (!saved) { return; }
 			importProject(saved);
+			// Every time, not just the first: this is the fact that explains why the tab is named
+			// after the project rather than the file, why it wears an asterisk immediately, and why
+			// Save cannot go back where this came from.
+			setNotice(pc.lpn_status_uploaded || '');
 			renderTabs();
 		};
 		reader.onerror = function () { alert(pc.lpn_import_bad_file || 'That file could not be read as a project saved from this page.'); };
@@ -2539,8 +2543,31 @@ var EngCalcs = EngCalcs || {};
 	async function openFromFile() {
 		var pc = EngCalcs.pageConfig || {};
 		if (!fileApiAvailable()) {
-			var input = document.getElementById('lpn_project_file');
-			if (input) { input.click(); }
+			// **Say what this open really is, before it happens** (Tom, 2026-08-04). Without the File
+			// System Access API there is no handle, so the browser hands us the file's CONTENTS and
+			// nothing else: no way to write back, no way to lock it, no way even to know it is the
+			// same file next time. That is an upload, not an open, and a user who is not told will
+			// reasonably expect Save to go back where it came from.
+			//
+			// Explained ONCE per browser, then narrated every time by lpn_status_uploaded. The
+			// condition is a permanent property of this browser, so a dialog on every open would be
+			// nagging about something the user cannot change. (Task 209's snooze system is the
+			// general answer to shown-once-versus-shown-always; this is the crude version of it.)
+			var seen = readJSON(LPN_UPLOAD_NOTICE_KEY);
+			if (!seen) {
+				writeJSON(LPN_UPLOAD_NOTICE_KEY, { shown: 1 });
+				openDialog(function (body) {
+					var t = document.createElement('p');
+					t.style.margin = '0';
+					t.textContent = pc.lpn_file_upload_explain || '';
+					body.appendChild(t);
+				}, [
+					{ label: pc.lpn_file_training_continue || 'Continue', fn: function () { pickUploadFile(); } },
+					{ label: pc.lpn_cancel || 'Cancel', fn: function () { } }
+				]);
+				return;
+			}
+			pickUploadFile();
 			return;
 		}
 		if (!requireFileIdentity('open')) { return; }
@@ -2615,6 +2642,10 @@ var EngCalcs = EngCalcs || {};
 		}
 		renderTabs();
 	}
+	function pickUploadFile() {
+		var input = document.getElementById('lpn_project_file');
+		if (input) { input.click(); }
+	}
 	// Recovery from a file that moved, was renamed, or was deleted. The stale handle is dropped FIRST
 	// -- otherwise Save would find it still linked and quietly try the same dead handle again instead
 	// of asking where the file went.
@@ -2637,6 +2668,7 @@ var EngCalcs = EngCalcs || {};
 	// safe to ship on a page that must keep working offline.
 	var LPN_LOCK_URL = '/engcalcs/lpn-lock.php';
 	var LPN_IDENTITY_KEY = 'lpn_identity';
+	var LPN_UPLOAD_NOTICE_KEY = 'lpn_upload_notice';
 	// The document id is baked into the FILE, not into our per-browser project id: two people
 	// opening the same file off a share have different local project ids and must still compute the
 	// same lock key. Matches lpn-lock.php's /^d[A-Za-z0-9]{8,48}$/.
@@ -3104,9 +3136,30 @@ var EngCalcs = EngCalcs || {};
 	// ---- menus ----
 	// One popover for all three menus (File, a tab's own, the overflow list). They differ only in
 	// their rows, so three popovers would have been three copies of the same positioning and dismissal.
+	// The three view popovers (Labels, Settings, Units). They are peers of the menus, so opening a
+	// menu closes them and a click anywhere outside them closes them -- Tom, 2026-08-04: "Can the
+	// Labels form go away when user clicks away or at least when another menu item is selected? We
+	// are currently seeing the other menus while Labels persists." The property popup (#lpn_popup) is
+	// deliberately NOT in this list: it has its own currentPopup machinery and its own dismissal.
+	var VIEW_POPOVERS = ['lpn_labels_popup', 'lpn_settings_popup', 'lpn_units_popup'];
+	function closeViewPopovers(except) {
+		VIEW_POPOVERS.forEach(function (id) {
+			if (id === except) { return; }
+			var el = document.getElementById(id);
+			if (el) { el.style.display = 'none'; }
+		});
+	}
+	// Which control opened the menu that is showing, so a second click on the SAME control closes it
+	// instead of rebuilding it (Tom, 2026-08-04: the vertical-tabs icon "doesn't toggle"). The
+	// document-level dismissal cannot do this on its own, because these controls stopPropagation --
+	// they have to, or opening a menu would immediately dismiss it.
+	var openMenuAnchor = null;
 	function openMenu(anchor, rows) {
 		var popup = document.getElementById('lpn_menu_popup'), list = document.getElementById('lpn_menu_list');
 		if (!popup || !list) { return; }
+		if (openMenuAnchor === anchor && popup.style.display === 'block') { closeMenu(); return; }
+		openMenuAnchor = anchor;
+		closeViewPopovers();
 		list.innerHTML = '';
 		rows.forEach(function (r) {
 			if (r.hidden) { return; }
@@ -3143,6 +3196,7 @@ var EngCalcs = EngCalcs || {};
 	function closeMenu() {
 		var p = document.getElementById('lpn_menu_popup');
 		if (p) { p.style.display = 'none'; }
+		openMenuAnchor = null;
 	}
 	function openFileMenu(anchor) {
 		var pc = EngCalcs.pageConfig || {}, id = library.openId, entry = indexEntry(id);
@@ -3395,11 +3449,23 @@ var EngCalcs = EngCalcs || {};
 				document.getElementById('lpn_units_popup').style.display = 'none';
 			});
 		}
-		// Dismiss the menu on any click that is not in it. The dialog is deliberately NOT dismissed
-		// this way -- it asks a question that has to be answered, and Cancel is one of the answers.
+		// Dismiss the menu, and the view popovers, on any click that is not inside them. The dialog is
+		// deliberately NOT dismissed this way -- it asks a question that has to be answered, and
+		// Cancel is one of the answers.
 		document.addEventListener('click', function (e) {
 			var popup = document.getElementById('lpn_menu_popup');
 			if (popup && popup.style.display === 'block' && !popup.contains(e.target)) { closeMenu(); }
+			// A click inside ANY of them leaves ALL of them alone: the popovers hold live controls
+			// (unit selects, checkboxes, number fields), and closing one because the pointer went
+			// down in another would be worse than leaving both open.
+			var inside = VIEW_POPOVERS.some(function (id) {
+				var el = document.getElementById(id);
+				return el && el.style.display === 'block' && el.contains(e.target);
+			});
+			// The menu bar and the toolbar own their own opening logic; a click there must not be
+			// read as "clicked away" before that logic runs.
+			var onChrome = e.target.closest && e.target.closest('#lpn_menubar, #lpn_toolbar, #lpn_menu_popup');
+			if (!inside && !onChrome) { closeViewPopovers(); }
 		});
 		// The hidden picker lives in the page, not in a popup body that gets replaced wholesale --
 		// the same reason lpn_backdrop_file does. Cleared after every pick so re-choosing the SAME
