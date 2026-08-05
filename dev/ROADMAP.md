@@ -10,7 +10,7 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 ## Calculator Improvements
 
-- 05|175| **A real printable version, suite-wide.** Raised by Tom, 2026-07-30, while reviewing the
+- 5|175| **A real printable version, suite-wide.** Raised by Tom, 2026-07-30, while reviewing the
   `lpn_` map page: the suite's only print affordance today is `d-print-none` hiding chrome
   (toolbar, unit-select row, nav) so `Ctrl+P` on the bare page reads a little cleaner — there is no
   actual "printable view" (clean pagination, a results summary, a static rendering of an SVG
