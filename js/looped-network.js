@@ -2393,7 +2393,7 @@ var EngCalcs = EngCalcs || {};
 	function showFileTraining() {
 		var pc = EngCalcs.pageConfig || {}, input = null;
 		openDialog(function (body) {
-			[pc.lpn_file_training_1, pc.lpn_file_training_2, pc.lpn_file_training_3].forEach(function (t) {
+			[pc.lpn_file_training_1, pc.lpn_file_training_2, pc.lpn_file_training_permission, pc.lpn_file_training_3].forEach(function (t) {
 				if (!t) { return; }
 				var p = document.createElement('p');
 				p.style.margin = '0 0 8px';
@@ -2484,14 +2484,35 @@ var EngCalcs = EngCalcs || {};
 		if (!requireFileIdentity('saveas')) { return; }
 		var id = library.openId, entry = indexEntry(id);
 		if (!entry) { return; }
+		var forking = readOnly || isFileProject(entry);
+		var wasHandle = handleFor(id);
+		// A copy needs a name of its own -- two projects cannot share one, and a picker pre-filled
+		// with the original's name invites overwriting the very file we are copying away from.
+		var suggested = forking
+			? safeFileName(projectDisplayName(project) + (pc.lpn_project_copy_suffix || ' (copy)')) + '-lpn-hawsedc-engcalcs.json'
+			: projectFileName();
 		var handle;
-		try { handle = await window.showSaveFilePicker({ suggestedName: projectFileName(), types: fileTypes() }); }
+		try { handle = await window.showSaveFilePicker({ suggestedName: suggested, types: fileTypes() }); }
 		catch (err) { return; } // the user cancelled the picker -- not an error
+		// **READ-ONLY MEANS READ-ONLY, including here** (Tom, 2026-08-04: "we should try to prevent
+		// them from saving over the original file"). The picker will happily let someone choose the
+		// very file they are locked out of, and nothing else in this file could catch it: the API
+		// gives a name and never a path, so a name comparison would be both wrong (a legitimate copy
+		// may keep the name in another folder) and useless (a different name in the same folder is
+		// fine). handle.isSameEntry() answers the actual question, and is the one capability Task 208
+		// noted we had and were not using.
+		if (readOnly && wasHandle && wasHandle.isSameEntry) {
+			var same = false;
+			try { same = await wasHandle.isSameEntry(handle); } catch (err) { same = false; }
+			if (same) {
+				alert(pc.lpn_saveas_same_file || 'That is the same file somebody else has open, so it cannot be saved over. Choose a different file or a different name.');
+				return;
+			}
+		}
 		// Writing somewhere new makes this a DIFFERENT document, so it needs its own lock key: a copy
 		// and its original must never contend over one lock, and a copy must never be able to abort
 		// its own save because somebody is editing the original. Only a browser project's FIRST save
 		// keeps its id, because there was no other file to be a copy of.
-		var forking = readOnly || isFileProject(entry);
 		if (forking) {
 			releaseLock(id);
 			project.docId = newDocId();
@@ -2557,10 +2578,13 @@ var EngCalcs = EngCalcs || {};
 			if (!seen) {
 				writeJSON(LPN_UPLOAD_NOTICE_KEY, { shown: 1 });
 				openDialog(function (body) {
-					var t = document.createElement('p');
-					t.style.margin = '0';
-					t.textContent = pc.lpn_file_upload_explain || '';
-					body.appendChild(t);
+					[pc.lpn_file_upload_explain, pc.lpn_file_upload_ask].forEach(function (txt) {
+						if (!txt) { return; }
+						var t = document.createElement('p');
+						t.style.margin = '0 0 8px';
+						t.textContent = txt;
+						body.appendChild(t);
+					});
 				}, [
 					{ label: pc.lpn_file_training_continue || 'Continue', fn: function () { pickUploadFile(); } },
 					{ label: pc.lpn_cancel || 'Cancel', fn: function () { } }
@@ -2608,7 +2632,7 @@ var EngCalcs = EngCalcs || {};
 			// where to put it. Deliberately not a second file picker from in here -- one decision per
 			// dialog, and the asterisk on the new tab is the reminder that it is not yet anywhere.
 			{
-				label: pc.lpn_lock_open_copy || 'Open as my own copy',
+				label: pc.lpn_lock_open_copy || 'Create a copy',
 				fn: function () {
 					if (saved.project) { saved.project.docId = newDocId(); }
 					landOpenedFile(saved, null, false);
@@ -3217,7 +3241,11 @@ var EngCalcs = EngCalcs || {};
 			// act, by lpn_status_downloaded, and shown continuously by an asterisk that never clears.
 			// That answers Tom's original complaint ("when I save again, I get a second copy") at the
 			// moment it arises, without a menu label carrying the caveat forever.
-			{ label: pc.lpn_file_save || 'Save', tip: api ? null : pc.lpn_file_download_tip, fn: saveCurrent },
+			// DISABLED on a read-only project, not merely rerouted (Tom, 2026-08-04: "On Open
+			// read-only, File, Save is not disabled. Read only is read only."). saveCurrent() still
+			// routes to Save as if it is ever reached another way, but a live Save row on a project
+			// that can never be saved is the menu telling a lie about what it will do.
+			{ label: pc.lpn_file_save || 'Save', tip: api ? null : pc.lpn_file_download_tip, fn: saveCurrent, disabled: readOnly },
 			{ label: pc.lpn_file_saveas || 'Save as…', tip: api ? null : pc.lpn_file_download_tip, fn: saveAs },
 			// Only shown when it beats Save -- more than one file with unsaved changes. On a page
 			// where most people will only ever have one, a permanent row would be clutter that never
@@ -3384,6 +3412,11 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, entry = indexEntry(id);
 		if (!entry) { return; }
 		if (!tabAsterisk(entry).show) { discardProject(id); renderTabs(); return; }
+		// A read-only project is offered Save as for the same reason its File menu is (Tom,
+		// 2026-08-04: "this situation cannot allow Save. It must offer Save as..."). Treated exactly
+		// like a project that has no file yet, because in the only sense that matters here it has
+		// none: there is no file it may write.
+		var mustSaveAs = !isFileProject(entry) || roProjects.has(id);
 		var isBrowser = !isFileProject(entry), name = projectDisplayName(entry);
 		openDialog(function (body) {
 			var p = document.createElement('p');
@@ -3394,11 +3427,11 @@ var EngCalcs = EngCalcs || {};
 			body.appendChild(p);
 		}, [
 			{
-				label: isBrowser ? (pc.lpn_file_saveas || 'Save as…') : (pc.lpn_file_save || 'Save'),
+				label: mustSaveAs ? (pc.lpn_file_saveas || 'Save as…') : (pc.lpn_file_save || 'Save'),
 				fn: async function () {
 					if (id !== library.openId) { switchToTab(id); }
 					var downloaded = !fileApiAvailable();
-					if (isBrowser) { await saveAs(); } else { await saveCurrent(); }
+					if (mustSaveAs) { await saveAs(); } else { await saveCurrent(); }
 					// Close ONLY if the save really landed. A cancelled file picker or a failed write
 					// must leave the project exactly where it was rather than discarding it on the
 					// strength of having asked.

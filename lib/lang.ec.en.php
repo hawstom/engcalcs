@@ -1256,7 +1256,13 @@ $ec_lang['lpn_file_download_tip']='This browser cannot keep working in a file, s
 // to recognise it next time. A user who is not told will reasonably expect Save to go back where the
 // file came from. Explained once per browser by lpn_file_upload_explain, then said every time by
 // lpn_status_uploaded.
-$ec_lang['lpn_file_upload_explain']='This browser cannot keep hold of a file, so opening one here is really an upload: the project is copied into this browser, and nothing you do afterwards can be written back to the file you picked. To keep your work, use File, Save as, which writes a new file each time.';
+$ec_lang['lpn_file_upload_explain']='This browser cannot keep a file reference, so opening a file here is really an upload: the project is copied into this browser, and the only way to save your work back to the file is to overwrite the file with File, Save as.';
+// The one thing a user can actually DO about the proliferation of files (Tom, 2026-08-04: "I hate to
+// cause the proliferation of files"). We cannot make a browser ask where to put a download -- there
+// is no API for it, and the download attribute cannot override the setting -- but the user can turn
+// that setting on themselves, and then Save as really does let them overwrite the file they started
+// from. Saying so is the whole of what we can offer.
+$ec_lang['lpn_file_upload_ask']='Tip: if you turn on your browser setting "Ask where to save each file", File, Save as lets you pick the original file and overwrite it, instead of adding another copy to your downloads folder.';
 $ec_lang['lpn_status_uploaded']='Copied into this browser. Nothing can be written back to the file you picked, so use File, Save as to keep your work.';
 $ec_lang['lpn_status_downloaded']='Downloaded {file}. This browser cannot keep working in a file, so each save makes another copy, and this project stays marked as not saved to a file.';
 $ec_lang['lpn_status_file_opened']='Opened {file}.';
@@ -1295,12 +1301,15 @@ $ec_lang['lpn_lock_somebody']='Somebody else';
 // always done it.
 $ec_lang['lpn_lock_open_heading']='{name} has this file open.';
 $ec_lang['lpn_lock_open_readonly']='Open read-only';
-$ec_lang['lpn_lock_open_copy']='Open as my own copy';
+// "Create a copy", not "my own copy" (Tom, 2026-08-04): two projects cannot share one name, and
+// "my own copy" quietly promises a personal one of everything -- the proliferation this page keeps
+// trying not to encourage. "Create a copy" says what happens and claims nothing.
+$ec_lang['lpn_lock_open_copy']='Create a copy';
 // Read-only means read-only: it never turns itself back into an editable file while you are looking
 // at it, and it never offers to save over the other person\'s file. It cannot -- their file has moved
 // on since you opened it, so writing yours over it would destroy their work. What you CAN do is
 // everything else, including changing the network and keeping it as a file of your own.
-$ec_lang['lpn_lock_readonly_banner']='Read-only: {name} has this file open. You can change anything you like here, but you cannot save it over their file. Use File, Save as to keep your own copy.';
+$ec_lang['lpn_lock_readonly_banner']='Read-only: {name} has this file open. You can change anything you like here, but you cannot save. Use File, Save as to save to a different file.';
 // Opening a file we could not lock is the moment of danger (Tom, 2026-08-03): from then on nothing
 // stops a colleague editing the same file. Editing still works -- an unreachable server must never
 // take the calculator away -- so this warns rather than blocks, and promises the follow-up that
@@ -1313,6 +1322,12 @@ $ec_lang['lpn_lock_dismiss']='Dismiss';
 // into 26 languages, so it says one thing per sentence and avoids every word of jargon it can.
 $ec_lang['lpn_file_training_1']='Your project will be saved in a file on this computer. It is saved when you ask, and at no other time, so nothing is written to that file behind your back.';
 $ec_lang['lpn_file_training_2']='So that two people never edit one file at the same time, this site keeps track of who has it open. If somebody already has it, you can still open it and look, or keep a copy of your own.';
+// Said BEFORE it happens, because it is alarming and unexplained when it happens (Tom, 2026-08-04:
+// "hawsedc.com will be able to edit ... is a canned browser warning whose confusing meaning we
+// cannot fix"). He is right that we cannot fix it -- it is the browser asking, in the browser\'s
+// own words, and there is no way to reword it, suppress it, or pre-approve it. What we CAN do is
+// warn that it is coming and say it is normal, which is what this line is for.
+$ec_lang['lpn_file_training_permission']='The first time you save, your browser will ask whether this site may edit the file. That question comes from the browser, not from us, and saying yes is what lets Save write your work back. It is usually asked only once per file.';
 // Corrected 2026-08-04: the old wording said anyone you SEND THE FILE TO can see this name, which is
 // false -- the name is never written into the project file. It is held in this browser and on this
 // site, and it is shown to whoever opens the SAME file. That is still public enough to be worth
@@ -1323,6 +1338,9 @@ $ec_lang['lpn_file_training_continue']='Continue';
 // Recovery when the linked file has moved, been renamed, or been deleted. The button does the
 // finding; the message never tells someone to go hunting through a menu.
 $ec_lang['lpn_file_relink']='Choose the file again';
+// Read-only means read-only, so Save as from a read-only project refuses the file it came from --
+// the one file it must never write. handle.isSameEntry() is what makes this checkable at all.
+$ec_lang['lpn_saveas_same_file']='That is the same file somebody else has open, so it cannot be saved over. Choose a different file or a different name.';
 // The "Save to file every N seconds" setting and its 60-180 second range are GONE (Task 211). One
 // number was doing three jobs -- the write interval, the lock heartbeat, and the how-long-until-a
 // -colleague-may-take-over threshold -- so the range was protecting a coupling rather than the user.
