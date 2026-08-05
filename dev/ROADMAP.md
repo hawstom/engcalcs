@@ -6,6 +6,28 @@ The format of each task is: `Priority|ID|status Description`. Priority: 0 means 
 
 Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Copilot, `[H]` = Human decision needed, `[CC→CP]` / `[CP→CC]` = split task (first actor works, then updates tag to the next plain tag when handing off). Untagged = actor-agnostic. See `cross-platform-planning.md` §2.2.2 for the full tag lifecycle.
 
+**`CHECK: YYYY-MM-DD` marks a task waiting on the calendar rather than on work** (Task 155's Search Console wait; Task 202's `zh` n=30). Tom asked 2026-08-05 whether dated tasks should always be priority 100. **No** — a date says *when you can act*, priority says *how much it matters*, and they are independent: 155 is a five-minute look that changes nothing if it slips a week. Forcing it to 100 would push genuinely urgent work down the board. Put the date in the text, leave the priority honest, and **raise it when the date arrives**.
+
+## LENGTH DISCIPLINE (Tom, 2026-08-05) — read this before writing a task
+
+**Tom's complaint, verbatim and correct:** *"We are getting huge, and now apparently gratuitous, roadmap bloat. Task 219 could have been a single line: 'Add lpn to Related links on hw, bpn, and ip.'"* He was right. This file went **1,720 → 5,634 lines in nine days** (2026-07-27 → 2026-08-05, a 3.3× growth), and Task 219 was written at 44 lines for what is a three-line PHP edit plus one real blocker. It is now 9.
+
+**The default is 1–3 lines.** Most tasks are a sentence. Write the sentence and stop.
+
+**The one test that decides whether a line may be added: would a competent person, reading the short version, DO SOMETHING DIFFERENT if this line were there?** If not, cut it. That test kills, specifically:
+- Reasoning that leads to the obvious action. If the action is obvious, the reasoning is decoration.
+- Restating the request, then agreeing with it, then explaining why it is a good idea.
+- Rejected alternatives nobody proposed.
+- Explaining what a thing is, when the reader can open the file and see.
+
+**Expansion is EARNED, and only by these four:** (a) a decision with a real rejected alternative, so it is not relitigated; (b) a measured number, so it is not re-measured; (c) a non-obvious constraint or blocker; (d) a correction of something previously recorded wrong here. Task 213's ratio table and Task 219's identity-string blocker earn their lines. Almost nothing else does.
+
+**Hard cap ~15 lines.** Past that, the content is a `dev/*.md` document and the task is one line pointing at it. `dev/` already holds a dozen such docs; that is the mechanism, use it.
+
+**On close, COMPRESS — do not just set priority to 0 and move the block.** A closed task is ≤5 lines: what changed, where it lives, and any finding a future reader needs. The narrative of how it got built is not that. (Standing offenders as of 2026-08-05: Task 195 at 296 lines, 140 at 252, 211 at 218, 203 at 198. Mean task block is 26 lines and median is 13, so these are 8–20× typical.)
+
+**This is a real cost, not tidiness.** The file is loaded into context to answer almost any question about this project; every gratuitous line is paid for repeatedly, by both humans and AI, forever.
+
 # Tasks
 
 ## Calculator Improvements
@@ -234,7 +256,7 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   tell whether Rung 0 worked, and this task's entire premise — that cost, not visibility, is the
   constraint — is a hypothesis that deserves a measurement rather than another two rounds of
   rewording. 206 is cheap; do it first.
-- 30|205| **One "contact me" line per page, not two — ENGLISH SHIPPED 2026-08-03; only the
+- 68|205| **One "contact me" line per page, not two — ENGLISH SHIPPED 2026-08-03; only the
   26-language resync (d) remains.** Raised by Tom,
   2026-08-03, on noticing that `Manning-Pipe-Flow.php` and `Looped-Network.php` showed different
   invitation text. They are not one line with two wordings; they are two separate lines, both
@@ -784,7 +806,7 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   control visibly inert. `settings.idPrefixes.T` and `nextId.T` were both kept, so restoring it is
   one array entry in `rebuildSettingsFields()`. That row is only worth having once a text ID is
   something the user can actually see.
-- 20|191| **Junction emitters — surface the pressure-dependent demand the solver already has
+- 15|191| **Junction emitters — surface the pressure-dependent demand the solver already has
   (Task 146 child).** Raised 2026-07-30 when Tom asked of the Settings panel's "Emitter exponent"
   row: *"Do we have emitters? Do we do something with this?"* The honest answer was **no** — that
   control was removed in the same session (see the note in `rebuildSettingsFields()`), because:
@@ -805,7 +827,7 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 - 15|146.07| **Open/Closed link property (Task 146 child).** A simple boolean state on a link. Tom,
   2026-07-29: explicitly not a "valve" and not modeled via minor-loss-coefficient (Km) abuse — just
   a plain open/closed state, kept simple.
-- 5|146.06| **Translation sprint for `lpn_` strings (Task 146 child).** Not until later; blocked on
+- 67|146.06| **Translation sprint for `lpn_` strings (Task 146 child).** Not until later; blocked on
   the string set settling (146.01/146.02/146.03 above are all still moving it). **Also gated on
   146.08 (multiple named saved networks) shipping first (Tom, 2026-07-30):** the page stays
   English-only (`lpn_preview_banner` says so) until real save/retrieve exists — right now the only
@@ -1164,7 +1186,7 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   Settings). Suite-shaped rather than `lpn_`-only: every calculator has explanations it currently
   either buries in Notes or repeats forever.
 
-- 12|196| **EPANET `.inp` import/export (Task 146 child) — a separate task from Task 195, deliberately.**
+- 20|196| **EPANET `.inp` import/export (Task 146 child) — a separate task from Task 195, deliberately.**
   Raised 2026-08-01. **This reopens a decision already made once**: the scope doc records
   `.inp` interop as "distinct from" Task 195 and says "Tom confirmed 2026-07-29 is not needed," in
   favor of Task 146.08's local multi-project save/retrieve instead. Logging it here is a conscious
@@ -1287,60 +1309,16 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
      computed geodesically from lat/lng rather than from screen geometry. This is the strongest
      argument for the existing rule that **`len` is stored and overridable, never derived**.
 
-- 25|174| **Extract `echoUnitsRow()` from `echoCalculatorForm()`.** `lib/Calculators.lib.php:172-179`
-  emits the Restore-defaults / US / SI row inline, so it is reachable only by pages that call
-  `echoCalculatorForm()`. Any page that cannot use the fixed two-column input table — Task 146's map
-  page is the first, since its inputs are a per-element property sheet whose fields change with the
-  element type — must copy-paste suite chrome to keep the unit presets working. Pull the block into
-  its own function called by both. Mechanical, zero translation cost, and it keeps the preset buttons
-  a suite-level feature rather than something each new page re-implements. Note the shared JS already
-  cooperates: `EngCalcs.setUnits()` targets any `select[data-family]` anywhere on the page.
+- 99|219| **Add `lpn_` to the Related-calculators line on `hw_`, `bpn_` and `ip_`.**
+  `Branched-Network.php` has no such line at all yet; build one matching `Hazen-Williams.php:10`.
+  - **BLOCKED, do this first: `lpn_main_menu`/`_title`/`_desc` exist in `lang.ec.en.php` only.** A
+    related link renders the target's `*_main_menu`, so the links would show English labels on the
+    es/pt/fr/tr pages. Identity strings are never out of scope (Task 203), so this is a live
+    declaration violation regardless of the links. 3 keys x 26 languages = 78 strings.
+  - Also the live test of Task 144's hypothesis that HW's lost 517 humans/period came for a network.
+    Watch HW conversion and LPN human count together afterwards.
 
-- 55|219| **Link `lpn_` from `hw_`, `bpn_` and `ip_` — the largest cheap discoverability move
-  available.** Asked for by Tom, 2026-08-05, as a high priority. Three inbound links from the pages
-  whose users are most likely to want a looped-network solver, on a page that currently has no
-  inbound path at all except the menu.
-  - **This is also the live test of Task 144's leading hypothesis**, which is what makes it worth
-    more than an ordinary link edit. Task 144 says Hazen-Williams draws 580 confirmed humans and
-    converts 11% against a 51–67% band — roughly 517 lost humans per period, the suite's largest
-    single UX prize — and Tom's hypothesis is that they arrive with a *network* and find a
-    single-line calculator, then leave for EPANET. Task 138 already made HW→BPN a partial test of
-    that. **HW→LPN is the full test**, because a looped solver is the thing the hypothesis says they
-    actually came for. Watch HW conversion and LPN human count together afterwards.
-  - **Current state, read 2026-08-05:**
-    - `Hazen-Williams.php:10-11` has a related line (DW, MPHL, MPF, BPN) — append LPN.
-    - `Irrigation-Pressure.php:8-9` has one (BPN, MPF) — append LPN.
-    - **`Branched-Network.php` has NO related line at all** — it needs the whole `<p
-      class="collapse show d-print-none" id="relatedCalcs">` block built, matching the other two.
-      BPN→LPN is the most natural link in the suite (a branched network user hitting a loop is
-      exactly the LPN audience), and it is currently missing entirely.
-  - **BLOCKER FOUND WHILE SCOPING, and it is a coverage-declaration violation, not just an
-    inconvenience: `lpn_main_menu`, `lpn_main_title` and `lpn_main_desc` exist in `lang.ec.en.php`
-    ONLY — zero of the other 26 files.** Verified 2026-08-05. Consequences:
-    - **A related link renders its target's `*_main_menu` key.** So adding LPN to HW's line today
-      puts a raw English menu label on the Spanish, French, Portuguese and Turkish Hazen-Williams
-      pages — on `es` specifically, which is the standing spot-check target and the second-largest
-      audience in the suite.
-    - **This directly contradicts the Task 203/204 declaration adopted 2026-08-05**, which states
-      that identity strings — menu entry, `<title>`, `*_main_desc` — **are the floor and are never
-      out of scope, in any calculator, in any language.** `lpn_` being English-only was always meant
-      to mean *body* in English, not *identity* in English; that is precisely the mechanism by which
-      an out-of-scope cell stays discoverable and earns its way in. So this is a pre-existing gap
-      the new declaration turned into a defect, found the day after adoption.
-    - **Therefore the identity-string fill is IN SCOPE FOR THIS TASK and is its first step:** three
-      keys × 26 languages = 78 strings. Small, and it is the floor we already committed to. Do it
-      before touching any related line, or the links ship broken in four core languages.
-    - Note this also makes `lpn_`'s menu entry correct everywhere, which is a discoverability win on
-      its own and is independent of the three links.
-  - **The PREVIEW question — flag it, do not let it block.** `lpn_` still ships as an English-only
-    preview with a banner. Sending the suite's second-biggest front door at a preview page is a real
-    decision, and the honest framing is that a working preview beats the current outcome, which is
-    that those users leave for EPANET entirely. Tom asked for this explicitly and that is the call.
-    But the link text should not oversell; the preview banner must stay until Task 146.06 and the
-    persistence work say otherwise.
-  - Cheap: three small PHP edits plus the 78 identity strings. No new mechanism.
-
-- 40|213| **Unify Hazen-Williams on EPANET's constants across `hw_`, `bpn_` and `lpn_`.** Raised by
+- 98|213| **Unify Hazen-Williams on EPANET's constants across `hw_`, `bpn_` and `lpn_`.** Raised by
   Tom, 2026-08-05: *"I understand that something about our Hazen-Williams formula differs slightly
   from EPANET. I would like to resolve that so that we are identical to EPANET on lpn, hw, and bpn."*
   Confirmed and measured, and it is small enough to fix outright rather than document forever.
@@ -1382,7 +1360,7 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     - **The standalone `Darcy-Weisbach.php` was NOT checked** against that 3-regime treatment. One
       quick comparison; if it diverges it is a separate task, not scope creep into this one.
 
-- 45|215| **Log the Title/Subtitle milestone — the closest instrument we can build to the mission.**
+- 80|215| **Log the Title/Subtitle milestone — the closest instrument we can build to the mission.**
   Raised by Tom, 2026-08-05: *"How many people are adding Title and Subtitle? This is a major
   milestone that indicates they are sharing the calculation in a report or message."* Agreed, and it
   is the highest value ÷ effort item on the stats list. Nothing currently sees it. A person who
@@ -1514,7 +1492,7 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     suite, and we can currently neither see nor reach any of them. That is **Task 206**, which is
     therefore upstream of this item rather than parallel to it.
 
-- 25|214| **Realign the glossary anchor languages with measured reach.** Confirms and closes Tom's
+- 69|214| **Realign the glossary anchor languages with measured reach.** Confirms and closes Tom's
   2026-08-05 question, *"Confirm that our wave 1 translation language set is adjusted in light of our
   usage reports."* Answer in two parts:
   - **The priority set IS already adjusted — you did it yesterday.** Task 203's coverage cross names
@@ -1540,7 +1518,7 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     17% conversion anomaly is still outstanding (`dev/usage-data-log.md`). `he` (10 humans, 60%,
     squarely in the band) is the cleaner next candidate, with no urgency.
 
-- 20|216| **Beacon outbound reference-link clicks, with the visitor's language.** Raised by Tom,
+- 80|216| **Beacon outbound reference-link clicks, with the visitor's language.** Raised by Tom,
   2026-08-05: *"How often are non-English people asking for 'n' help? And should we let them somehow
   complain that the reference is only English?"*
   - **Build the beacon; skip the complaint UI.** The click *is* the complaint. A non-English visitor
@@ -1559,7 +1537,7 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **The decision it feeds is Task 217**, so this metric arrives with a decision already attached
     rather than becoming another number nobody acts on.
 
-- 35|206| **Measure the contact funnel — we are blind on the one metric the mission cares about.**
+- 80|206| **Measure the contact funnel — we are blind on the one metric the mission cares about.**
   Raised by Tom, 2026-08-03: contacts "have always been rare and gratifying. None at all in recent
   months." Nothing logs `contact.php` views or `formmail.php` submissions, so the two possible
   causes are indistinguishable today, and they call for **opposite** fixes:
@@ -1582,7 +1560,7 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   and with zero logging the symptom would have been indistinguishable from ordinary silence. Changed
   to `<?php` on 2026-08-03. That near-miss is itself the argument for this task: a broken contact
   path is invisible precisely because its failure mode looks exactly like nobody writing.
-- 20|200| **Usage logging: the questions the current report cannot answer.** Raised by Tom,
+- 80|200| **Usage logging: the questions the current report cannot answer.** Raised by Tom,
   2026-08-03: *"I'd like to get more guidance about our development priorities from usage logging."*
   Ordered by value ÷ effort. Nothing here needs a database — the existing
   `log-calc-event.php` / `log-human-view.php` beacon pattern covers all of it.
@@ -1752,7 +1730,7 @@ anchor or opens the *consumption* side (using energy to move/treat/purify water)
 the *generation* side `mhp_` already covers. Same 4-axis prioritization framework as the New
 Calculators section above; see that section's header for the methodology and honest-caveat note.
 
-- 3|116| **Solar water pumping sizing.** Sizes a solar-PV-powered pump system for irrigation or
+- 2|116| **Solar water pumping sizing.** Sizes a solar-PV-powered pump system for irrigation or
   domestic supply: hydraulic power required (`P_h = ρgQH`, same physics already used throughout
   `dw_`/`hw_`/`mphl_`/`mhp_`) → electrical power via pump + system efficiency → PV array size (Wp)
   via daily peak-sun-hours and a derating factor. Efficient to build: total dynamic head's
@@ -1882,7 +1860,10 @@ straight from `lib/lang.ec.sw.php`, i.e. an agent searching our own translated s
        covered, not only the calculators.
      HSTS deliberately **not** bundled in: browsers cache the policy for its full max-age and it
      cannot be recalled. A separate, deliberate decision if ever wanted.
-  6. **Remaining — verify in Search Console, no sooner than a few weeks out.** This is the only open
+  6. **CHECK: 2026-09-01.** (Date set 2026-08-05 at Tom's request — five weeks after the 2026-07-28
+     deploy, which is inside Google's usual window for a sitemap plus hreflang change to show. If it
+     is still ambiguous then, re-date it rather than closing it.)
+     **Remaining — verify in Search Console, no sooner than a few weeks out.** This is the only open
      step and it is a wait, not work: `site:hawsedc.com inurl:lang=es` should start returning
      results, and the Task 149 diagnostic query `calculo de canales trapezoidal online` (position
      2.8, 0% CTR) should begin converting. That query is the cleanest single tell, because it already
@@ -1913,7 +1894,7 @@ straight from `lib/lang.ec.sw.php`, i.e. an agent searching our own translated s
 
 ## Translation improvements
 
-- 5|160| **`lib/lang.ec.tr.php` disagrees with itself on vowel harmony for the app name.**
+- 66|160| **`lib/lang.ec.tr.php` disagrees with itself on vowel harmony for the app name.**
   Extracted from Task 154 on close, 2026-07-28. Three keys write `EngCalcs'i`
   (`install_main_title`, `install_desktop_steps_html`, `install_cached_body`) and one writes
   `EngCalcs'ı`. Turkish picks the accusative suffix by the last vowel *as pronounced*, so exactly one
@@ -1922,6 +1903,10 @@ straight from `lib/lang.ec.sw.php`, i.e. an agent searching our own translated s
   wrong would replace an inconsistency with a uniform error. **Low priority and low stakes:** it is a
   one-character suffix on a proper noun, affecting only the Install page. Best resolved by whoever
   next does verified tr work, or by the Task 159 sprint's tr agent as a ride-along question.
+  **Raised 5 -> 66 on 2026-08-05 (Tom).** Not blocked on a human: `tr` is now a core language
+  (Task 203) and a Sonnet tr agent can make the call, so this needs no decision from Tom. Raised
+  because it is cheap and CLOSABLE, not because it became important — it is still one character
+  on one page. Fold it into the next tr touch rather than spawning an agent for it alone.
 
 ## AI Efficiency Scripting (Overhead)
 
@@ -1932,6 +1917,12 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|174| **[DONE — verified 2026-08-05] Extract `echoUnitsRow()` from `echoCalculatorForm()`.**
+  Found already built while reviewing the board: `lib/Calculators.lib.php:153` defines it, and both
+  `echoCalculatorForm()` (:207) and `Looped-Network.php:35` call it — which was the whole point. It
+  even grew a second flag (`$flagHideDefaults`) for `lpn_`. Shipped as part of Task 146's map-page
+  work without anyone closing this ticket.
 
 - 0|203| **[ADOPTED 2026-08-05] The COVERAGE MATRIX: a mandatory core cross of calculator × language, fading in both
   directions. DECIDED by Tom, 2026-08-03.** *"I see our usage reports pointing us to a mandatory
