@@ -2220,7 +2220,7 @@ var EngCalcs = EngCalcs || {};
 		// Said every time, because it is the answer to the question this path always provokes:
 		// "why did I get a second copy?" (Tom, 2026-08-03). The menu no longer carries that caveat
 		// in its label, so this is where the fact lives.
-		setNotice((pcDl.lpn_status_downloaded || 'Downloaded {file}. This browser cannot connect to a file, so each save makes another copy, and this project stays marked as not saved to a file.')
+		setNotice((pcDl.lpn_status_downloaded || 'Downloaded {file}. This browser cannot connect to a file, so this project stays marked as not saved to a file.')
 			.replace('{file}', projectFileName()));
 	}
 	// Lands an imported document as a NEW project, never over the open one (the ROADMAP is explicit

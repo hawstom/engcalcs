@@ -1270,9 +1270,9 @@ $ec_lang['lpn_file_saveas_tip']='Choose a file to save to. This project connects
 // that setting on themselves, and then Save as really does let them overwrite the file they started
 // from. It belongs in this tip rather than in a dialog: it answers a question asked at the moment
 // the user is choosing where their work goes.
-$ec_lang['lpn_file_saveas_tip_download']='Saves using your browser\'s Download settings. This browser cannot connect to a file, so each save writes another copy. If you turn on your browser setting "Ask where to save each file", you can pick the original file and overwrite it instead.';
+$ec_lang['lpn_file_saveas_tip_download']='Saves using your browser\'s Download settings. This browser cannot connect to a file, so Save is disabled and only Save as is available. If you turn on your browser setting "Ask where to save each file", you can pick the original file and overwrite it.';
 $ec_lang['lpn_status_uploaded']='Project file uploaded. No connection to it can be maintained, so the only way to save back to it is by using File, Save as.';
-$ec_lang['lpn_status_downloaded']='Downloaded {file}. This browser cannot connect to a file, so each save makes another copy, and this project stays marked as not saved to a file.';
+$ec_lang['lpn_status_downloaded']='Downloaded {file}. This browser cannot connect to a file, so this project stays marked as not saved to a file.';
 $ec_lang['lpn_status_file_opened']='Opened {file}.';
 $ec_lang['lpn_status_saved']='Saved {file}.';
 $ec_lang['lpn_status_reverted']='Loaded {file} again from the disk.';
@@ -1367,7 +1367,7 @@ $ec_lang['lpn_notes_1_def']='Solves one set of demands at a time, using the same
 $ec_lang['lpn_notes_2_term']='Not modeled';
 $ec_lang['lpn_notes_2_def']='Tanks, water quality, and control valves that open and close on their own (PRV, PSV, FCV) are not modeled. A pipe can carry a fixed minor loss, but not a valve whose open or closed state depends on the flow being solved for.';
 $ec_lang['lpn_notes_3_term']='Saving projects';
-$ec_lang['lpn_notes_3_def']='Every project is a tab, and every tab is saved in this browser as you work. Clearing your browser data deletes them all, so keep your work in a file: File, Save as. An asterisk on a tab means it holds changes that are not in a file. Nothing is ever written to a file unless you ask. In some browsers a project connects to the file you save it to, and File, Save writes back to that same file from then on; in others no connection is possible, so Save is disabled and only Save as is available, which writes another copy each time. When a project file is kept on a shared drive, this page tells you if a colleague already has it open, so that two people do not write over each other. Because this is an early preview, please use it for small networks and for testing only.';
+$ec_lang['lpn_notes_3_def']='Every project is a tab, and every tab is saved in this browser as you work. Clearing your browser data deletes them all, so keep your work in a file: File, Save as. An asterisk on a tab means it holds changes that are not in a file. Nothing is ever written to a file unless you ask. In some browsers a project connects to the file you save it to, and File, Save writes back to that same file from then on; in others no connection is possible, so Save is disabled and only Save as is available. When a project file is kept on a shared drive, this page tells you if a colleague already has it open, so that two people do not write over each other. Because this is an early preview, please use it for small networks and for testing only.';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
 // It lives in the Notes list, not in the pump popup: the popup is a small floating panel that has
 // to stay readable on a phone, while the Notes section is already this page's documentation home,
