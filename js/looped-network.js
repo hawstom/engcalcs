@@ -1726,7 +1726,11 @@ var EngCalcs = EngCalcs || {};
 	// and read as the wipe having silently failed. Collected before deleting: removing while
 	// iterating localStorage by index skips entries.
 	function wipeAllStorage() {
-		var i, key, doomed = [LPN_LEGACY_KEY, LPN_INDEX_KEY];
+		// The identity (initials + opaque token) is part of "everything this page remembers about me"
+		// and was missing here until 2026-08-04, when Tom noticed Clear/Wipe did not make the page
+		// behave as a first-time visitor: the file training panel stayed suppressed and the old
+		// initials were still being sent to the lock broker.
+		var i, key, doomed = [LPN_LEGACY_KEY, LPN_INDEX_KEY, LPN_IDENTITY_KEY];
 		try {
 			for (i = 0; i < localStorage.length; i++) {
 				key = localStorage.key(i);
@@ -2338,6 +2342,15 @@ var EngCalcs = EngCalcs || {};
 			} catch (err) { return; } // the user cancelled the picker -- not an error
 			fileHandles.set(library.openId, handle);
 		}
+		// BEFORE the first write, not after (fixed 2026-08-04, found by Tom in browser testing).
+		// acquireLockForOpenProject() at the foot of this function is what used to mint the docId, so
+		// the FIRST file a project ever wrote had none. The damage was not cosmetic: a colleague
+		// opening that file found no docId, minted a different one of their own, and the two browsers
+		// computed different lock keys -- so the broker never saw a conflict, neither side was ever
+		// told the other had the file, and both autosaved over each other. That is exactly the "no
+		// warnings, then confusing messages" Tom reported. The lock key has to exist before the file
+		// that carries it does.
+		ensureDocId();
 		saveToStorage();
 		// force: the user asked, so write even if nothing is dirty -- this is also how a link made
 		// on a brand-new project puts something in the file immediately.
@@ -2604,22 +2617,32 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		return (r && r.lockedBy) ? r.lockedBy : (pc.lpn_lock_somebody || 'the other person');
 	}
-	// Scenario B, split by how long the holder has been quiet. Under ~2x the autosave interval they
-	// are demonstrably still working, so a takeover would yank the file out from under a live edit
-	// and the honest answer is "wait". Past that they may simply have walked away, so we offer the
-	// takeover -- but never take it automatically. A lock NEVER expires on its own; only a person
-	// ends someone else's session.
+	// Scenario B: somebody else holds this file, so we are read-only until they let go.
+	//
+	// This used to split on how long the holder had been quiet -- "please wait" under ~2x the autosave
+	// interval, an offer to take over past it. The split is gone with the takeover; see below.
 	function presentLockedOut(r) {
 		var pc = EngCalcs.pageConfig || {};
-		var quietFor = (Date.now() / 1000) - (r.lastActivity || 0);
-		var activeWindow = 2 * Math.min(180, Math.max(60, +settings.fileAutosaveSeconds || 120));
 		var who = lockHolderName(r);
 		lock.by = who;
-		if (quietFor < activeWindow) {
-			setReadOnly(true, (pc.lpn_lock_busy || '{name} is editing this project right now. You can look at it, but not change it yet.').replace('{name}', who), null);
-		} else {
-			setReadOnly(true, (pc.lpn_lock_idle || '{name} has this project open but has not changed anything for a while. You can look at it, or take over.').replace('{name}', who), who);
-		}
+		// TAKEOVER IS WITHDRAWN (2026-08-04). takeOverLock() stole the lock and then wrote THIS browser's
+		// in-memory copy straight over the file -- a copy that predates every autosave the holder made
+		// while we sat here read-only. Taking over therefore destroyed the very work the banner
+		// promised had been saved. Found 2026-08-04 from Tom's reasoning about read-only ("saving over
+		// it could overwrite colleague changes" -- the same physics).
+		//
+		// Removed rather than repaired on purpose. The repair is "re-read the file from disk before
+		// the new holder may write anything", which is new logic, and this whole surface is being
+		// rebuilt on the tab/File-menu paradigm within days; shipping untested recovery code into the
+		// gap would be the worse trade. Nobody is stranded meanwhile: "Save as my own copy" is still
+		// offered, and pollLock() hands the file over on its own as soon as the holder closes it. The
+		// one case left waiting is a holder whose tab crashed, and that resolves in the rebuild.
+		//
+		// One message for both states now. It reads "is editing right now", which is mildly wrong for a
+		// holder who has walked away -- but mildly wrong prose beats a correct-sounding button that
+		// eats a colleague's afternoon. `lpn_lock_idle` is left in the lang files unused rather than
+		// deleted across 27 files for a surface that is about to be rebuilt.
+		setReadOnly(true, (pc.lpn_lock_busy || '{name} is editing this project right now. You can look at it, but not change it yet.').replace('{name}', who), null);
 	}
 	// Called once a file has just been linked, by either route. Fails open on every path that is not
 	// an explicit "someone else holds this".
