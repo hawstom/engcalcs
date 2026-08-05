@@ -1198,6 +1198,18 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
       no answer arrives.
     - **ASCE EWRI** Hydraulics & Waterways technical committees, and the **Arizona Section** locally.
       Committee work is where senior people are actually reachable; conference floors are not.
+  - **ACTION LOG.**
+    - **2026-08-05 — OWA Q&A post SENT** (advisor side). Text and venue facts:
+      `dev/outreach-owa-post.md`. Quiet room; silence is the expected case for weeks.
+    - **2026-08-05 — EWB-ASU contact form SUBMITTED** (protege side), same day, at Tom's own
+      insistence. Submission NOT confirmed — *"I think it's submitted. The form acts a little
+      weird."* **CHECK: 2026-08-19.** If silent by then, the backstop is email, not a drive: **Jared
+      Schoepf, `jjschoep@asu.edu`** — listed publicly in the Fulton Schools directory, and he
+      directs **EPICS** (Engineering Projects in Community Service), a for-credit program of
+      community-project student teams. That is a larger and more durable protege pool than one club,
+      and a faculty contact persists across years while student officers turn over every May.
+      Tom offered to hand-deliver a folded note to the Student Services Building; **advised against**
+      — a paper note to a student-org office is the likeliest of the three to be lost.
   - **For proteges, and for mission fit:**
     - **Engineers Without Borders USA student chapters** — the strongest single match. Students who
       need free tools, work in exactly the low-resource-language regions this suite translates for,
