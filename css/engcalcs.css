@@ -216,6 +216,41 @@ html[lang="zh"] .ec-welcome {
 /* Three groups (Add / Delete-Undo-Select / Zoom-Example) -- a wider gap, not a line, separates
    them (Tom, 2026-07-30: a divider line was more than needed). */
 .lpn-toolbar-group { display: inline-flex; gap: 6px; margin-right: 14px; }
+/* ---- Project tab strip (ROADMAP Task 211) ----
+   Sits ABOVE the toolbar, so everything below it reads as being inside the current tab. Tabs join
+   the content below them the way tabs do everywhere: a bottom border on the strip, and the current
+   tab punching a hole in it. */
+#lpn_tabs {
+	display: flex; align-items: flex-end; gap: 2px;
+	border-bottom: 1px solid #999; margin-bottom: 6px; padding: 0 2px;
+}
+.lpn-tabs-scroll { display: flex; align-items: flex-end; gap: 2px; overflow-x: auto; flex: 1 1 auto; }
+.lpn-tab { display: inline-flex; align-items: stretch; background: #ececec; border: 1px solid #999; border-bottom: none; border-radius: 4px 4px 0 0; margin-bottom: -1px; }
+/* The current tab is white and open at the bottom -- continuous with the page under it. */
+.lpn-tab-current { background: #fff; }
+.lpn-tab-current .lpn-tab-name { font-weight: bold; }
+.lpn-tab-name, .lpn-tab-caret, .lpn-tab-btn {
+	background: none; border: 0; font: inherit; color: inherit; cursor: pointer; padding: 3px 8px; white-space: nowrap;
+}
+.lpn-tab-caret { padding: 3px 5px; border-left: 1px solid #ccc; }
+.lpn-tab-btn { border: 1px solid transparent; align-self: center; }
+.lpn-tab-name:hover, .lpn-tab-caret:hover, .lpn-tab-btn:hover { background: #ddd; }
+/* THE ASTERISK. Full strength means "there are changes this file does not have" -- something to go
+   and do. Faded means "this project is in no file at all", a standing condition rather than a task.
+   Both genuinely mean unsaved; only the salience differs (Tom, 2026-08-04). If the faded one reads
+   as broken, delete the -faint rule and nothing else changes. */
+.lpn-tab-star { font-weight: bold; margin-right: 2px; }
+.lpn-tab-star-faint { font-weight: normal; opacity: 0.45; }
+/* Narrow screens: only the CURRENT tab stays, and the vertical list behind the left-edge button is
+   how you reach the others. A map page has no horizontal room to spare on a phone, and a strip that
+   wraps to three lines above the map is worse than one button -- but hiding the current tab too
+   would take away the one thing the strip exists to say, which is where you are. */
+@media (max-width: 640px) {
+	.lpn-tabs-scroll .lpn-tab:not(.lpn-tab-current) { display: none; }
+}
+.lpn-menu-row { display: block; width: 100%; text-align: left; background: none; border: 0; font: inherit; padding: 4px 12px 4px 8px; cursor: pointer; white-space: nowrap; }
+.lpn-menu-row:hover:enabled { background: #def; }
+.lpn-menu-row:disabled { color: #999; cursor: default; }
 /* Backdrop registration wizard (Task 146 Phase 2, ported from the spike): during a Scale/Position
    click sequence, regMode already suppresses real interaction in looped-network.js, but the
    per-element cursor:pointer/move rules would still fire on hover, visually implying "this is

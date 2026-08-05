@@ -46,6 +46,12 @@ document.addEventListener('DOMContentLoaded', function() {
 		<?=$ec_lang['lpn_result_gradient']?> <?php echoUnitSelect('lpn_u_gradient', 'gradient', ''); ?>
 	</div>
 	</div>
+	<?php // Project tab strip (ROADMAP Task 211). ABOVE the toolbar, deliberately: the toolbar and the
+	      // lock banner below it are both per-document state, so the strip has to sit above them for
+	      // the tab panel to contain everything the tab owns. That is also the AutoCAD / PDF-editor
+	      // placement Tom chose over browser-chrome placement -- tabs sit on top of the document, and
+	      // on this page the top of the document and the top of the content area are the same line. ?>
+	<div class="d-print-none" id="lpn_tabs"></div>
 	<div class="d-print-none" id="lpn_toolbar"></div>
 	<?php // Lock banner (Task 195 Phase 2). Empty and hidden until either someone else holds the lock
 	      // on the project file (read-only, red) or something needs warning about but not blocking --
@@ -143,16 +149,23 @@ document.addEventListener('DOMContentLoaded', function() {
 	</div>
 	<button type="button" id="lpn_settings_popup_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">×</button>
 </div>
-<?php // Projects panel (ROADMAP Task 146.08): the saved-network library -- open, rename, delete,
-      // and start a new project. Same static-panel, JS-built-fields pattern as the two popovers
-      // above, for the same reason: it is not a per-element property sheet and must never touch
-      // the #lpn_popup/currentPopup machinery. ?>
-<div id="lpn_projects_popup" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:20;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
-	<div class="lpn-popover-body">
-	<div style="font-weight:bold"><?=$ec_lang['lpn_projects_heading']?></div>
-	<div id="lpn_projects_list"></div>
-	</div>
-	<button type="button" id="lpn_projects_popup_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">×</button>
+<?php // ONE menu popover, reused by all three menus (ROADMAP Task 211): the File menu, a tab's own
+      // menu, and the tab-strip overflow list. They differ only in their rows, and openMenu() in
+      // js/looped-network.js builds those, so three popovers would have been three copies of the
+      // same positioning and dismissal code. Replaces the Projects panel of Task 146.08 -- the tab
+      // strip now answers "which network am I looking at", permanently and without a click. ?>
+<div id="lpn_menu_popup" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:20;background:#fff;border:1px solid #333;padding:4px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
+	<div id="lpn_menu_list"></div>
+</div>
+<?php // ONE dialog, reused for every question that has to be answered before anything else happens:
+      // the close prompt, the read-only choice when somebody else has the file, and the first-run
+      // file training panel. Deliberately NOT window.confirm(): showSaveFilePicker() needs a live
+      // user activation, and Chrome's transient activation expires after a few seconds, so a
+      // blocking dialog would work for a fast reader and throw for a careful one. A button in here
+      // is a fresh click, so it always has an activation of its own. ?>
+<div id="lpn_dialog" class="d-print-none" role="dialog" aria-modal="true" style="display:none;position:fixed;z-index:40;left:50%;top:20%;transform:translateX(-50%);max-width:34em;background:#fff;border:1px solid #333;padding:12px;box-shadow:2px 2px 12px rgba(0,0,0,.4)">
+	<div id="lpn_dialog_body"></div>
+	<div id="lpn_dialog_buttons" style="margin-top:10px;text-align:right"></div>
 </div>
 
 <?php echoFeedback(); ?>
@@ -239,56 +252,55 @@ EngCalcs.pageConfig = {
 	lpn_reset_all_tip: <?=json_encode($ec_lang['lpn_reset_all_tip'])?>,
 	lpn_confirm_clear: <?=json_encode($ec_lang['lpn_confirm_clear'])?>,
 	lpn_storage_too_new: <?=json_encode($ec_lang['lpn_storage_too_new'])?>,
-	lpn_tool_projects: <?=json_encode($ec_lang['lpn_tool_projects'])?>,
-	lpn_projects_heading: <?=json_encode($ec_lang['lpn_projects_heading'])?>,
-	lpn_project_untitled: <?=json_encode($ec_lang['lpn_project_untitled'])?>,
-	lpn_project_new: <?=json_encode($ec_lang['lpn_project_new'])?>,
-	lpn_project_saveas: <?=json_encode($ec_lang['lpn_project_saveas'])?>,
+	lpn_tool_file: <?=json_encode($ec_lang['lpn_tool_file'])?>,
+	lpn_project_numbered: <?=json_encode($ec_lang['lpn_project_numbered'])?>,
 	lpn_project_copy_suffix: <?=json_encode($ec_lang['lpn_project_copy_suffix'])?>,
-	lpn_project_open: <?=json_encode($ec_lang['lpn_project_open'])?>,
 	lpn_project_rename: <?=json_encode($ec_lang['lpn_project_rename'])?>,
-	lpn_project_delete: <?=json_encode($ec_lang['lpn_project_delete'])?>,
-	lpn_project_open_now: <?=json_encode($ec_lang['lpn_project_open_now'])?>,
-	lpn_project_export: <?=json_encode($ec_lang['lpn_project_export'])?>,
-	lpn_project_import: <?=json_encode($ec_lang['lpn_project_import'])?>,
+	lpn_file_new: <?=json_encode($ec_lang['lpn_file_new'])?>,
+	lpn_file_open: <?=json_encode($ec_lang['lpn_file_open'])?>,
+	lpn_file_save: <?=json_encode($ec_lang['lpn_file_save'])?>,
+	lpn_file_saveas: <?=json_encode($ec_lang['lpn_file_saveas'])?>,
+	lpn_file_revert: <?=json_encode($ec_lang['lpn_file_revert'])?>,
+	lpn_file_close: <?=json_encode($ec_lang['lpn_file_close'])?>,
+	lpn_tab_new: <?=json_encode($ec_lang['lpn_tab_new'])?>,
+	lpn_tab_all: <?=json_encode($ec_lang['lpn_tab_all'])?>,
+	lpn_tab_menu: <?=json_encode($ec_lang['lpn_tab_menu'])?>,
+	lpn_tab_duplicate: <?=json_encode($ec_lang['lpn_tab_duplicate'])?>,
+	lpn_tab_unsaved: <?=json_encode($ec_lang['lpn_tab_unsaved'])?>,
 	lpn_import_bad_file: <?=json_encode($ec_lang['lpn_import_bad_file'])?>,
 	lpn_import_no_room: <?=json_encode($ec_lang['lpn_import_no_room'])?>,
 	lpn_status_imported: <?=json_encode($ec_lang['lpn_status_imported'])?>,
 	lpn_file_type_desc: <?=json_encode($ec_lang['lpn_file_type_desc'])?>,
-	lpn_file_saving_to: <?=json_encode($ec_lang['lpn_file_saving_to'])?>,
-	lpn_file_unlink: <?=json_encode($ec_lang['lpn_file_unlink'])?>,
-	lpn_status_file_linked: <?=json_encode($ec_lang['lpn_status_file_linked'])?>,
 	lpn_status_file_opened: <?=json_encode($ec_lang['lpn_status_file_opened'])?>,
+	lpn_status_saved: <?=json_encode($ec_lang['lpn_status_saved'])?>,
+	lpn_status_reverted: <?=json_encode($ec_lang['lpn_status_reverted'])?>,
+	lpn_close_save_prompt: <?=json_encode($ec_lang['lpn_close_save_prompt'])?>,
+	lpn_close_browser_prompt: <?=json_encode($ec_lang['lpn_close_browser_prompt'])?>,
+	lpn_close_discard: <?=json_encode($ec_lang['lpn_close_discard'])?>,
+	lpn_cancel: <?=json_encode($ec_lang['lpn_cancel'])?>,
+	lpn_revert_confirm: <?=json_encode($ec_lang['lpn_revert_confirm'])?>,
+	lpn_file_needs_reopen: <?=json_encode($ec_lang['lpn_file_needs_reopen'])?>,
 	lpn_file_write_failed: <?=json_encode($ec_lang['lpn_file_write_failed'])?>,
 	lpn_lock_prompt_name: <?=json_encode($ec_lang['lpn_lock_prompt_name'])?>,
 	lpn_lock_somebody: <?=json_encode($ec_lang['lpn_lock_somebody'])?>,
-	lpn_lock_busy: <?=json_encode($ec_lang['lpn_lock_busy'])?>,
-	lpn_lock_idle: <?=json_encode($ec_lang['lpn_lock_idle'])?>,
-	lpn_lock_takeover: <?=json_encode($ec_lang['lpn_lock_takeover'])?>,
-	lpn_lock_taken: <?=json_encode($ec_lang['lpn_lock_taken'])?>,
-	lpn_lock_took_over: <?=json_encode($ec_lang['lpn_lock_took_over'])?>,
+	lpn_lock_open_heading: <?=json_encode($ec_lang['lpn_lock_open_heading'])?>,
+	lpn_lock_open_readonly: <?=json_encode($ec_lang['lpn_lock_open_readonly'])?>,
+	lpn_lock_open_copy: <?=json_encode($ec_lang['lpn_lock_open_copy'])?>,
+	lpn_lock_readonly_banner: <?=json_encode($ec_lang['lpn_lock_readonly_banner'])?>,
 	lpn_lock_unavailable: <?=json_encode($ec_lang['lpn_lock_unavailable'])?>,
 	lpn_lock_restored: <?=json_encode($ec_lang['lpn_lock_restored'])?>,
-	lpn_lock_now_yours: <?=json_encode($ec_lang['lpn_lock_now_yours'])?>,
 	lpn_lock_dismiss: <?=json_encode($ec_lang['lpn_lock_dismiss'])?>,
 	lpn_file_relink: <?=json_encode($ec_lang['lpn_file_relink'])?>,
-	lpn_project_download: <?=json_encode($ec_lang['lpn_project_download'])?>,
-	lpn_project_download_tip: <?=json_encode($ec_lang['lpn_project_download_tip'])?>,
-	lpn_project_close: <?=json_encode($ec_lang['lpn_project_close'])?>,
-	lpn_project_close_tip: <?=json_encode($ec_lang['lpn_project_close_tip'])?>,
-	lpn_lock_own_copy: <?=json_encode($ec_lang['lpn_lock_own_copy'])?>,
+	lpn_file_download: <?=json_encode($ec_lang['lpn_file_download'])?>,
+	lpn_file_download_tip: <?=json_encode($ec_lang['lpn_file_download_tip'])?>,
 	lpn_file_training_1: <?=json_encode($ec_lang['lpn_file_training_1'])?>,
 	lpn_file_training_2: <?=json_encode($ec_lang['lpn_file_training_2'])?>,
 	lpn_file_training_3: <?=json_encode($ec_lang['lpn_file_training_3'])?>,
 	lpn_file_training_name: <?=json_encode($ec_lang['lpn_file_training_name'])?>,
 	lpn_file_training_continue: <?=json_encode($ec_lang['lpn_file_training_continue'])?>,
-	lpn_settings_files: <?=json_encode($ec_lang['lpn_settings_files'])?>,
-	lpn_settings_file_autosave: <?=json_encode($ec_lang['lpn_settings_file_autosave'])?>,
-	lpn_settings_file_autosave_tip: <?=json_encode($ec_lang['lpn_settings_file_autosave_tip'])?>,
 	lpn_prompt_project_name: <?=json_encode($ec_lang['lpn_prompt_project_name'])?>,
-	lpn_confirm_project_delete: <?=json_encode($ec_lang['lpn_confirm_project_delete'])?>,
-	lpn_status_deleted_opened: <?=json_encode($ec_lang['lpn_status_deleted_opened'])?>,
-	lpn_status_deleted_empty: <?=json_encode($ec_lang['lpn_status_deleted_empty'])?>,
+	lpn_status_closed_opened: <?=json_encode($ec_lang['lpn_status_closed_opened'])?>,
+	lpn_status_closed_empty: <?=json_encode($ec_lang['lpn_status_closed_empty'])?>,
 	lpn_storage_full: <?=json_encode($ec_lang['lpn_storage_full'])?>,
 	lpn_backdrop_menu: <?=json_encode($ec_lang['lpn_backdrop_menu'])?>,
 	lpn_backdrop_add: <?=json_encode($ec_lang['lpn_backdrop_add'])?>,

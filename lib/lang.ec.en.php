@@ -1177,26 +1177,41 @@ $ec_lang['lpn_tool_clear']='Clear project';
 // Delete all projects alone is the full reset, exactly as init()'s own comment says. Each tip now
 // states only its own scope, so none of them can be wrong about the others -- and no tip quotes
 // another button's label, which is the cross-key dependency lpn_empty_hint was fixed for.
-$ec_lang['lpn_tool_clear_tip']='Empties this project: the drawing, the background image, and the project name. Your settings and your other projects are not changed.';
+$ec_lang['lpn_tool_clear_tip']='Empties this project: the drawing and the background image. Its name, your settings, and your other projects are not changed.';
 $ec_lang['lpn_settings_restore_tip']='Resets this project\'s settings only. Your drawing and your other projects are not changed.';
 $ec_lang['lpn_reset_all_tip']='Deletes every project, every background image, every setting, and your unit choices, then reloads the page exactly as a first-time visitor sees it. This is the only reset that clears everything.';
-$ec_lang['lpn_confirm_clear']='This permanently deletes the network, the background image, and the project name. Your settings are kept. Continue?';
+// The project NAME is no longer wiped by this (Task 211): a project is a tab, and emptying the
+// drawing must not leave the tab you are looking at nameless. Throwing the project away is Close.
+$ec_lang['lpn_confirm_clear']='This permanently deletes the network and the background image from this project. Its name, your settings, and your other projects are kept. Continue?';
 $ec_lang['lpn_storage_too_new']='This project was saved by a newer version of the page, so it cannot be opened here.';
-$ec_lang['lpn_tool_projects']='Projects';
-$ec_lang['lpn_projects_heading']='Saved projects';
-$ec_lang['lpn_project_untitled']='Untitled';
-$ec_lang['lpn_project_new']='Start empty project';
-$ec_lang['lpn_project_saveas']='Save as new project';
+// ---- Projects as tabs, files as files (ROADMAP Task 211) ----
+// The whole surface below follows one rule: THE ASTERISK DECIDES. A tab wearing an asterisk has
+// something that is not in a file, so closing it asks first; a tab without one closes silently. A
+// browser project always wears one (it is in no file at all); a file project wears one only while it
+// has unsaved changes. Nothing here needs the words "browser project" or "file project" -- those are
+// our words for talking about the code, and the user sees only a name, an asterisk, and a file
+// extension.
+$ec_lang['lpn_tool_file']='File';
+// {n} is a whole number. Assigned at creation as a real, renameable name -- and it is the LOWEST
+// number not currently in use, so closing Project 2 makes the next new project Project 2 again. A
+// counter that only ever went up would reach "Project 47" in an afternoon and read as a fault.
+$ec_lang['lpn_project_numbered']='Project {n}';
 $ec_lang['lpn_project_copy_suffix']=' (copy)';
-$ec_lang['lpn_project_open']='Open';
 $ec_lang['lpn_project_rename']='Rename';
-$ec_lang['lpn_project_delete']='Delete';
-$ec_lang['lpn_project_open_now']='Open now';
-// File in / file out (ROADMAP Task 195). "Save to file" and "Open from file" rather than
-// "Export"/"Import": the file holds our own format for backup and hand-off, not an exchange format
-// for other software, and the plainer pair says so without a word of explanation.
-$ec_lang['lpn_project_export']='Save to file';
-$ec_lang['lpn_project_import']='Open from file';
+// The File menu. "New" is the same act as the + tab, deliberately: one function, two doors.
+$ec_lang['lpn_file_new']='New';
+$ec_lang['lpn_file_open']='Open…';
+$ec_lang['lpn_file_save']='Save';
+$ec_lang['lpn_file_saveas']='Save as…';
+$ec_lang['lpn_file_revert']='Revert';
+$ec_lang['lpn_file_close']='Close';
+// The tab strip. These are titles on small controls, so each has to stand alone with no sentence
+// around it.
+$ec_lang['lpn_tab_new']='New project';
+$ec_lang['lpn_tab_all']='All projects';
+$ec_lang['lpn_tab_menu']='Project menu';
+$ec_lang['lpn_tab_duplicate']='Duplicate';
+$ec_lang['lpn_tab_unsaved']='Not saved to a file';
 $ec_lang['lpn_import_bad_file']='That file could not be read as a project saved from this page.';
 $ec_lang['lpn_import_no_room']='There is not enough browser storage left to add this project. Delete a project you no longer need and try again.';
 // {name} is a project name; word order is the translator's to choose. Says where the user landed,
@@ -1208,23 +1223,30 @@ $ec_lang['lpn_status_imported']='Opened {name} from a file, and added it to this
 // browser they test in. That is expected, not a bug.
 // {file} is a file name and {name} a project name; word order is the translator's to choose.
 $ec_lang['lpn_file_type_desc']='Project file';
-$ec_lang['lpn_file_saving_to']='Saving to: {file}';
 // Where there is no File System Access API -- Firefox, Safari, or any page not served over https --
-// a save cannot link a file, so every press really is another copy in the downloads folder. The
-// label says which of the two you are getting rather than leaving the duplicate looking like a bug.
-$ec_lang['lpn_project_download']='Download a copy';
-$ec_lang['lpn_project_download_tip']='This browser cannot keep working in a file, so each press saves another copy to your downloads. Open one with Open from file to carry on where you left off.';
-// Close CLOSES -- to an empty project, the way Close behaves in every other program (Tom,
-// 2026-08-03). Nothing is deleted: the file stays on disk and the project stays in the list.
-$ec_lang['lpn_project_close']='Close project';
-$ec_lang['lpn_project_close_tip']='Finishes with this file and starts an empty project. Nothing is deleted: the file stays where it is, this project stays in the list, and a colleague can now open the file. Closing the tab does the same thing.';
-// Offered only when somebody else holds the file -- never as a standing button. A copy is a fork of
-// the truth, and a page that advertises forking teaches people to make copies they must later
-// reconcile. See lpn_lock_busy/lpn_lock_idle for the situation this answers.
-$ec_lang['lpn_lock_own_copy']='Save as my own copy';
-$ec_lang['lpn_file_unlink']='Stop saving to file';
-$ec_lang['lpn_status_file_linked']='Saving {name} to {file} as you work, until this tab is closed.';
-$ec_lang['lpn_status_file_opened']='Opened {file}. Changes are saved back to it as you work, until this tab is closed.';
+// a save cannot keep hold of a file, so every press really is another copy in the downloads folder.
+// The label says which of the two you are getting rather than leaving the duplicate looking like a
+// bug.
+$ec_lang['lpn_file_download']='Download a copy';
+$ec_lang['lpn_file_download_tip']='This browser cannot keep working in a file, so each press saves another copy to your downloads. Open one with File, Open to carry on where you left off.';
+$ec_lang['lpn_status_file_opened']='Opened {file}.';
+$ec_lang['lpn_status_saved']='Saved {file}.';
+$ec_lang['lpn_status_reverted']='Loaded {file} again from the disk.';
+// Nothing is written to a file except when the user asks (Task 211). Autosave to the file is gone on
+// purpose: a program that writes your file behind your back takes away your right to walk away from
+// a session. So these three carry the whole close/discard/revert conversation.
+// {name} is a project name and {file} a file name; word order is the translator\'s to choose.
+$ec_lang['lpn_close_save_prompt']='Save your changes to {name} before closing it?';
+// A browser project is in no file at all, so closing it really is the end of it. Said plainly rather
+// than softened -- this is the one destructive act left on the page.
+$ec_lang['lpn_close_browser_prompt']='{name} is kept only in this browser. If you close it without saving it to a file, it is gone for good.';
+$ec_lang['lpn_close_discard']='Close without saving';
+$ec_lang['lpn_cancel']='Cancel';
+$ec_lang['lpn_revert_confirm']='Throw away the changes you have made and load {file} again from the disk?';
+// A file project whose page has been reloaded. Browsers do not keep permission to a file across a
+// page load, so the link is gone even though we still know the name. Says what to do, not just what
+// happened.
+$ec_lang['lpn_file_needs_reopen']='This project came from {file}, but a browser does not keep permission to a file after the page is reloaded. Use File, Save as, or open the file again, to carry on working in it.';
 // Says what is still safe before it says what failed: the reassurance is the part a worried user
 // needs, and it is true -- the browser copy is written on every edit regardless.
 $ec_lang['lpn_file_write_failed']='Could not write to the file. It may have been moved or renamed, or permission may have been withdrawn. Your work is still saved in this browser. Use Save to file to choose the file again.';
@@ -1238,44 +1260,51 @@ $ec_lang['lpn_lock_prompt_name']='What should colleagues see when you have this 
 // The stand-in when someone locked a project before giving a name. Reads in place of {name}
 // everywhere above, so it has to work mid-sentence.
 $ec_lang['lpn_lock_somebody']='Somebody else';
-$ec_lang['lpn_lock_busy']='{name} is editing this project right now. You can look at it, but not change it yet.';
-$ec_lang['lpn_lock_idle']='{name} has this project open but has not changed anything for a while. You can look at it, or take over.';
-$ec_lang['lpn_lock_takeover']='Take over from {name}';
-// Shown when someone takes the project while you were away. Says what is still safe before it says
-// what stopped, and it is true: every edit is in this browser either way.
-$ec_lang['lpn_lock_taken']='{name} has taken over this project. Your changes are still saved in this browser, but they are no longer being written to the file.';
-$ec_lang['lpn_lock_took_over']='You have taken over from {name}. Their work was saved to the file before you did.';
+// Opening a file somebody else has open is a CHOICE, not a surprise (Task 211). One question at the
+// moment of opening, with both real answers on it -- the way every drawing and document program has
+// always done it.
+$ec_lang['lpn_lock_open_heading']='{name} has this file open.';
+$ec_lang['lpn_lock_open_readonly']='Open read-only';
+$ec_lang['lpn_lock_open_copy']='Open as my own copy';
+// Read-only means read-only: it never turns itself back into an editable file while you are looking
+// at it, and it never offers to save over the other person\'s file. It cannot -- their file has moved
+// on since you opened it, so writing yours over it would destroy their work. What you CAN do is
+// everything else, including changing the network and keeping it as a file of your own.
+$ec_lang['lpn_lock_readonly_banner']='Read-only: {name} has this file open. You can change anything you like here, but you cannot save it over their file. Use File, Save as to keep your own copy.';
 // Opening a file we could not lock is the moment of danger (Tom, 2026-08-03): from then on nothing
 // stops a colleague editing the same file. Editing still works -- an unreachable server must never
 // take the calculator away -- so this warns rather than blocks, and promises the follow-up that
 // lpn_lock_restored keeps.
 $ec_lang['lpn_lock_unavailable']='Beware: could not reach the server to check or create a lock on this project, so nothing is stopping a colleague from editing the same file at the same time. You will be told if locking starts working again.';
-$ec_lang['lpn_lock_restored']='Locking is working again, and this project is now yours to edit.';
-// Shown when the person who had the project open closes it, or is taken over from. Reached by the
-// same poll that keeps lpn_lock_unavailable's promise, so a locked-out user is never left staring.
-$ec_lang['lpn_lock_now_yours']='Nobody else has this project open now, so it is yours to edit.';
+$ec_lang['lpn_lock_restored']='Locking is working again, and this file is now yours to save to.';
 $ec_lang['lpn_lock_dismiss']='Dismiss';
 // Shown once per browser, before the first file picker opens. Three short paragraphs on purpose:
 // this is the one place the whole file-and-lock idea is explained, and it has to survive translation
 // into 26 languages, so it says one thing per sentence and avoids every word of jargon it can.
-$ec_lang['lpn_file_training_1']='Your project will be saved in a file on this computer. As you keep working, it keeps saving to that file.';
-$ec_lang['lpn_file_training_2']='So that two people never edit one file at the same time, this site keeps track of who has it open. If you stop working for a while, a colleague can take over, and you will be told when they do.';
-$ec_lang['lpn_file_training_3']='Give a short name your colleagues will know you by. Your initials are ideal. Anyone you send the file to can see it, so do not use anything private.';
+$ec_lang['lpn_file_training_1']='Your project will be saved in a file on this computer. It is saved when you ask, and at no other time, so nothing is written to that file behind your back.';
+$ec_lang['lpn_file_training_2']='So that two people never edit one file at the same time, this site keeps track of who has it open. If somebody already has it, you can still open it and look, or keep a copy of your own.';
+// Corrected 2026-08-04: the old wording said anyone you SEND THE FILE TO can see this name, which is
+// false -- the name is never written into the project file. It is held in this browser and on this
+// site, and it is shown to whoever opens the SAME file. That is still public enough to be worth
+// saying, so the warning stays and only the claim changes.
+$ec_lang['lpn_file_training_3']='Give a short name your colleagues will know you by. Your initials are ideal. Anyone who opens the same file can see it, so do not use anything private.';
 $ec_lang['lpn_file_training_name']='Your initials';
 $ec_lang['lpn_file_training_continue']='Continue';
 // Recovery when the linked file has moved, been renamed, or been deleted. The button does the
 // finding; the message never tells someone to go hunting through a menu.
 $ec_lang['lpn_file_relink']='Choose the file again';
-$ec_lang['lpn_settings_files']='Saving to a file';
-$ec_lang['lpn_settings_file_autosave']='Save to file every (seconds)';
-$ec_lang['lpn_settings_file_autosave_tip']='How often your project is written back to the file you linked it to. Between 60 and 180 seconds. Your work is saved in this browser every time you change something, no matter what this is set to.';
+// The "Save to file every N seconds" setting and its 60-180 second range are GONE (Task 211). One
+// number was doing three jobs -- the write interval, the lock heartbeat, and the how-long-until-a
+// -colleague-may-take-over threshold -- so the range was protecting a coupling rather than the user.
+// Nothing is written to a file on a timer any more, so there is no interval to set.
 $ec_lang['lpn_prompt_project_name']='Name for this project';
-$ec_lang['lpn_confirm_project_delete']='Delete this project and everything in it? This cannot be undone.';
-// Deleting the OPEN project opens the most recently updated survivor, so a network the user did
+// Closing the CURRENT project opens the most recently updated survivor, so a network the user did
 // not ask for appears. Tom, 2026-07-31: do NOT warn beforehand -- say afterwards where you landed.
-// {deleted} and {opened} are project names; word order is the translator's to choose.
-$ec_lang['lpn_status_deleted_opened']='Deleted {deleted}. Now showing {opened}.';
-$ec_lang['lpn_status_deleted_empty']='Deleted {deleted}. Started a new empty project.';
+// (Task 211 renamed the act from Delete to Close: closing IS the removal, and there is no longer a
+// separate Delete for it to be confused with.)
+// {closed} and {opened} are project names; word order is the translator's to choose.
+$ec_lang['lpn_status_closed_opened']='Closed {closed}. Now showing {opened}.';
+$ec_lang['lpn_status_closed_empty']='Closed {closed}. Started a new empty project.';
 $ec_lang['lpn_storage_full']='Not saved. Browser storage is full or unavailable, so your recent changes will be lost when you close this tab.';
 $ec_lang['lpn_notes_1_term']='Steady state';
 $ec_lang['lpn_notes_1_def']='Solves one set of demands at a time, using the same gradient method EPANET uses. It does not model how the network changes over time.';

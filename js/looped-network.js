@@ -707,12 +707,10 @@ var EngCalcs = EngCalcs || {};
 			backdropOpacity: 1, // 0-1, applied to the backdrop image -- the other half of the same control
 			textSizeUnits: 'map', // 'map' | 'screen' -- see effectiveFontSize() above
 			legendPosition: 'top-right', // one of LEGEND_POSITIONS' keys below -- matches the original hardcoded CSS
-			mapHeight: 500, // px -- the original fixed <svg height="500"> value; see applyMapHeight()
-			// How often a project linked to a file is written back to it (Task 195 Phase 2).
-			// Clamped to 60-180 s by restartFileAutosave() as the ROADMAP specifies -- shorter would
-			// put real disk I/O in the middle of drawing, longer risks more lost work than a person
-			// would forgive. Ignored entirely when no file is linked.
-			fileAutosaveSeconds: 120
+			// `fileAutosaveSeconds` was removed by Task 211 along with autosave-to-file itself. A saved
+			// document may still carry one; applySaved() merges the save ONTO these defaults, so a
+			// stale key is simply carried along and never read, and needs no migration step.
+			mapHeight: 500 // px -- the original fixed <svg height="500"> value; see applyMapHeight()
 		};
 	}
 	var settings = defaultSettings();
@@ -1775,18 +1773,31 @@ var EngCalcs = EngCalcs || {};
 		return null;
 	}
 	function saveIndex() { return writeJSON(LPN_INDEX_KEY, library); }
+	// Bumped by every mutation that reaches storage. Its only job is to let a file write notice that
+	// the document changed underneath it while it was awaiting the disk -- see writeOpenProjectToFile().
+	var mutationSeq = 0;
 	// Autosave. Writes the OPEN project's document first and the index second, deliberately: if the
 	// document write fails on quota, the index still describes the last state that actually made it
 	// to disk, rather than advertising a project whose content never landed.
 	function saveToStorage() {
 		if (!library.openId) { return; }
-		// The one seam Task 195 Phase 2's file autosave hangs off. Every mutation on the page already
-		// funnels through here, so marking dirty at this single point covers all ~40 call sites and,
-		// more importantly, cannot be forgotten by whatever the 41st turns out to be.
-		fileDirty = true;
+		mutationSeq++;
 		if (!writeJSON(projectKey(library.openId), serializeProject())) { return; }
 		var entry = indexEntry(library.openId);
-		if (entry) { entry.name = project.name; entry.updated = Date.now(); }
+		if (entry) {
+			entry.name = project.name;
+			entry.updated = Date.now();
+			// The one seam the whole dirty/asterisk story hangs off (Task 195 Phase 2, kept by Task
+			// 211). Every mutation on the page already funnels through here, so marking dirty at this
+			// single point covers all ~40 call sites and, more importantly, cannot be forgotten by
+			// whatever the 41st turns out to be. Since Task 211 the flag lives on the INDEX ENTRY
+			// rather than in one module-level variable, because a tab left behind can be dirty too --
+			// switching away from an unsaved file project must not clear or steal its asterisk.
+			//
+			// The strip is redrawn only on the false->true TRANSITION. This function runs on every
+			// pointer move of a drag, and a full tab re-render per frame would be visible.
+			if (!entry.dirty) { entry.dirty = true; renderTabs(); }
+		}
 		saveIndex();
 	}
 	// Versioned per the scope doc's schema rules: v > CURRENT refuses to load and says so, never
@@ -1919,12 +1930,42 @@ var EngCalcs = EngCalcs || {};
 	}
 
 	// ---- the project library ----
-	// A project with no name renders as "Untitled" HERE, at display time, rather than being stored
-	// with that word -- see the note on `project` above for why the data stays language-free.
+	// Since Task 211 a project's name is real, stored data from the moment it is created -- "Project 3"
+	// is assigned by newProject(), not substituted at display time the way the old "Untitled" fallback
+	// was. The fallback below is therefore a can't-happen path kept only so a hand-edited or truncated
+	// index cannot render a nameless tab; initLibrary() names every blank it finds on sight.
 	function projectDisplayName(p) {
-		var pc = EngCalcs.pageConfig || {};
-		return (p && p.name) ? p.name : (pc.lpn_project_untitled || 'Untitled');
+		return (p && p.name) ? p.name : nextProjectName();
 	}
+	// "Project 3", where 3 is the LOWEST number not currently in use -- so closing Project 2 makes the
+	// next new project Project 2 again. A counter that only ever went up would reach "Project 47" in an
+	// afternoon and read as a leak (Tom, 2026-08-04). Same convention as Book1 / Untitled-1.
+	//
+	// The pattern is derived from the localized template rather than hardcoded, so a page running in
+	// Spanish recognises its own "Proyecto 3" as numbered and does not start again at 1.
+	function nextProjectName() {
+		var pc = EngCalcs.pageConfig || {}, tpl = pc.lpn_project_numbered || 'Project {n}', used = {};
+		var rx = new RegExp('^' + tpl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace('\\{n\\}', '(\\d+)') + '$');
+		library.projects.forEach(function (p) {
+			var m = rx.exec(p.name || '');
+			if (m) { used[+m[1]] = true; }
+		});
+		var n = 1;
+		while (used[n]) { n++; }
+		return tpl.replace('{n}', n);
+	}
+	// Every project the library knows about is a TAB (Task 211) -- there is no separate open/closed
+	// state, and closing a tab is what removes a project. These three read that state.
+	//
+	// `entry.fileName` is what makes a project a FILE project, and it is stored in the index rather
+	// than only in the session's handle Map on purpose: a browser does not keep permission to a file
+	// across a page load, so after a reload we still know the tab came from `Elm-Street.json` even
+	// though we can no longer write to it. Keeping the name means the tab keeps its identity instead
+	// of silently demoting itself to a browser project, which would be a lie about where the work is.
+	function isFileProject(entry) { return !!(entry && entry.fileName); }
+	function handleFor(id) { return fileHandles.get(id) || null; }
+	// True only when we can actually WRITE without asking again.
+	function isLinked(id) { return !!handleFor(id); }
 	// The index is a cache and is repaired from the real project keys, never trusted blindly: a
 	// quota failure can land a project document while the index write that follows it fails, and a
 	// project the user can no longer SEE is indistinguishable from one that was lost. Scanning the
@@ -1978,6 +2019,17 @@ var EngCalcs = EngCalcs || {};
 		// No index and no projects: either a first visit, or a preview user whose only network is
 		// still under the old single-document key.
 		if (!library.projects.length) { return migrateLegacy(); }
+		// Name every blank on sight (Task 211). Projects created before names were real data all
+		// rendered as the same word "Untitled" -- Tom found four identically-named tabs in the library
+		// and could not tell them apart. A tab strip makes that fatal rather than merely untidy, so
+		// blanks are given a number ONCE, here, and become ordinary renameable names from then on.
+		library.projects.forEach(function (p) {
+			if (p.name) { return; }
+			p.name = nextProjectName();
+			var d = readJSON(projectKey(p.id));
+			if (d && d.project) { d.project.name = p.name; writeJSON(projectKey(p.id), d); }
+			repaired = true;
+		});
 		if (repaired) { saveIndex(); }
 		if (!indexEntry(library.openId)) { library.openId = library.projects[0].id; }
 		var doc2 = readDocument(projectKey(library.openId));
@@ -2007,10 +2059,10 @@ var EngCalcs = EngCalcs || {};
 		setMode('select');
 		zoomExtent();
 		scheduleSolve();
-		updateProjectName();
-		// The interval is a per-project setting, so the timer is rebuilt whenever the open document
-		// changes -- same reason every other line in this function exists.
-		restartFileAutosave();
+		renderTabs();
+		// The banner belongs to the project you are looking at: a read-only tab, a file that needs
+		// re-opening after a page load, or neither.
+		syncReadOnlyToOpenProject();
 	}
 	function openProject(id) {
 		if (id === library.openId) { return true; }
@@ -2035,14 +2087,16 @@ var EngCalcs = EngCalcs || {};
 		var inheritedSettings = JSON.parse(JSON.stringify(settings));
 		var inheritedLabels = JSON.parse(JSON.stringify(labelSettings));
 		var id = newProjectId();
+		// Computed BEFORE the push below, or the project would be counted against itself.
+		var name = nextProjectName();
 		doc = { nodes: [], links: [], labels: [] };
 		nextId = { J: 1, R: 1, L: 1, P: 1, T: 1 };
 		scenarios = defaultScenarios();
-		project = { name: '', activeScenario: 'base' };
+		project = { name: name, activeScenario: 'base' };
 		settings = inheritedSettings;
 		labelSettings = inheritedLabels;
 		backdrop = null;
-		library.projects.push({ id: id, name: '', updated: Date.now() });
+		library.projects.push({ id: id, name: name, updated: Date.now() });
 		library.openId = id;
 		clearUndo();
 		saveToStorage();
@@ -2069,9 +2123,14 @@ var EngCalcs = EngCalcs || {};
 		library.projects.push({ id: id, name: name, updated: Date.now() });
 		library.openId = id;
 		project.name = name;
+		// The in-memory document has to take the COPY's document id too, or the next saveToStorage()
+		// would write the original's id back over the copy -- and the two would then fight over one
+		// lock, which is the very thing the fresh id above exists to prevent. (Latent since Task 195
+		// Phase 2 step 2; reachable now that Duplicate is a first-class tab-menu action.)
+		project.docId = copy.project.docId;
 		saveIndex();
 		clearUndo();
-		updateProjectName();
+		renderTabs();
 		return id;
 	}
 	// ---- Export / import a project as a file (ROADMAP Task 195 Phase 1) ----
@@ -2141,7 +2200,7 @@ var EngCalcs = EngCalcs || {};
 		saveToStorage();
 		refreshAllFromDocument();
 		// After refreshAllFromDocument(), which itself calls setStatus('') -- see the notice/
-		// diagnostic split at setStatus(). Says where the user landed, the same way deleteProject()
+		// diagnostic split at setStatus(). Says where the user landed, the same way discardProject()
 		// does: a project appearing on screen that was not there a moment ago wants narration.
 		setNotice((pc.lpn_status_imported || 'Opened {name} from a file, and added it to this browser as a new project.')
 			.replace('{name}', projectDisplayName(project)));
@@ -2167,7 +2226,7 @@ var EngCalcs = EngCalcs || {};
 			var saved = acceptImportedText(ev.target.result);
 			if (!saved) { return; }
 			importProject(saved);
-			rebuildProjectsList();
+			renderTabs();
 		};
 		reader.onerror = function () { alert(pc.lpn_import_bad_file || 'That file could not be read as a project saved from this page.'); };
 		reader.readAsText(file);
@@ -2188,21 +2247,27 @@ var EngCalcs = EngCalcs || {};
 	// healing, migrate-on-read) keeps working untouched, and a user can unlink and still have their
 	// project.
 	//
-	// Handles are held **for the session only**, exactly as the ROADMAP specifies -- persisting one
-	// across reloads means stashing it in IndexedDB and re-requesting permission on return, which is
-	// a bigger feature than this and is not what was asked for. On reload a project is simply not
-	// linked until the user opens or saves it again.
+	// **NOTHING IS WRITTEN TO A FILE EXCEPT WHEN THE USER ASKS** (Task 211, 2026-08-04). Task 195 wrote
+	// the open project back on a 60-180 s timer; that is gone, on Tom's argument that a program which
+	// saves your file behind your back takes away your right to walk away from a session -- the
+	// ordinary Save / Discard / Cancel conversation is only possible if the file has not already been
+	// overwritten by the time you reach it. The crash net is localStorage, written on every edit
+	// regardless. Deliberately NOT a sibling .bak file: that is a second artifact in the engineer's
+	// folder that we cannot reliably clean up and that they would have to explain to somebody.
+	//
+	// Handles are held **for the session only**. Persisting one means stashing it in IndexedDB and
+	// re-requesting permission on return -- that is Task 211's deferred "Open Recent" and is the
+	// honest fix. Meanwhile `entry.fileName` outlives the handle, so a reloaded tab keeps its identity
+	// and says what it needs (lpn_file_needs_reopen) instead of silently demoting itself to a browser
+	// project.
 	//
 	// async/await rather than this file's usual ES5 idiom: every one of these calls is a promise, and
 	// the .then() version of acquire-write-close-recover is markedly harder to read. The syntax costs
 	// nothing here -- it is older than the File System Access API this code path requires.
 	var fileHandles = new Map(); // project id -> FileSystemFileHandle, this session only
-	var fileDirty = false;       // set by saveToStorage(), the one seam every mutation already funnels through
 	var fileWriteBusy = false;   // a write is in flight; never start a second one over it
-	var fileWriteTimer = null;
 	var fileError = false;
 	function fileApiAvailable() { return typeof window.showSaveFilePicker === 'function'; }
-	function linkedHandle() { return library.openId ? (fileHandles.get(library.openId) || null) : null; }
 	function fileTypes() {
 		var pc = EngCalcs.pageConfig || {};
 		return [{ description: pc.lpn_file_type_desc || 'Project file', accept: { 'application/json': ['.json'] } }];
@@ -2217,72 +2282,70 @@ var EngCalcs = EngCalcs || {};
 		fileError = on;
 		setFileMissing(on);
 	}
-	// Writes the OPEN project to its linked file. Resolves false when there was nothing to do.
-	// `fileDirty` is cleared BEFORE the await, not after: an edit made while the write is in flight
-	// must set it again and be picked up by the next tick, rather than being cleared by the write
-	// that did not include it.
-	async function flushToFile(force) {
-		var handle = linkedHandle();
+	// Writes the OPEN project to its file. The ONLY function in this file that writes to disk, and it
+	// runs only from an explicit Save. Resolves true only when bytes actually landed.
+	async function writeOpenProjectToFile() {
+		var id = library.openId, handle = handleFor(id);
 		if (!handle || fileWriteBusy) { return false; }
-		if (!fileDirty && !force) { return false; }
+		// **Read-only means read-only** (Tom, 2026-08-04). There is no path from here to writing
+		// somebody else's file -- not on a timer, not on Save, and not if their lock frees up while we
+		// are looking. Their file has moved on since we opened it, so our copy is OLDER; writing it
+		// over theirs would destroy work. Save As is the only way out, and saveCurrent() routes there.
+		if (readOnly) { return false; }
 		fileWriteBusy = true;
-		// Scenario C, the walk-away recovery: re-check the lock BEFORE every write, not just at open.
-		// Re-acquiring a lock we already hold is also the heartbeat, so this single call both proves
-		// we may still write and refreshes lastActivity for whoever is looking from the other end.
-		// Deliberately ahead of clearing fileDirty: a write we abort has to stay pending.
-		if (lock.docId) {
-			var lockNow = await postLock('acquire', lock.docId);
-			if (lockNow && lockNow.ok && lockNow.held && lockUnavailable) {
-				lockUnavailable = false;
-				setLockUnavailable(false);
-			}
-			if (lockNow && lockNow.ok && !lockNow.held) {
-				// Somebody took over while we were away. Abort rather than clobber their file, and
-				// say so plainly. The reassurance is true: localStorage has every edit regardless.
-				var pcTaken = EngCalcs.pageConfig || {};
-				fileWriteBusy = false;
-				setReadOnly(true, (pcTaken.lpn_lock_taken || '{name} has taken over this project. Your changes are still saved in this browser, but they are no longer being written to the file.').replace('{name}', lockHolderName(lockNow)), null);
-				return false;
-			}
-		}
-		fileDirty = false;
-		var text = projectFileText();
 		try {
+			// Scenario C, the walk-away recovery: re-check the lock BEFORE the write. Re-acquiring a
+			// lock we already hold doubles as the heartbeat, so this one call both proves we may still
+			// write and refreshes lastActivity for whoever is looking from the other end.
+			if (currentLockDocId()) {
+				var lockNow = await postLock('acquire', currentLockDocId());
+				if (lockNow && lockNow.ok && lockNow.held && lockUnavailable) {
+					lockUnavailable = false;
+					setLockUnavailable(false);
+				}
+				if (lockNow && lockNow.ok && !lockNow.held) {
+					// Somebody else has it now. Abort rather than clobber their file. The work is not
+					// lost -- localStorage has every edit -- and the banner says so.
+					enterReadOnly(lockHolderName(lockNow));
+					return false;
+				}
+			}
+			// Captured with the text, and re-checked after the awaits: an edit made WHILE the write is
+			// in flight bumps this, and clearing the dirty flag on its behalf would tell the user their
+			// change is in a file that does not contain it. Same discipline the old timer version used,
+			// stated positively instead of by clearing the flag early.
+			var seq = mutationSeq, text = projectFileText();
 			var writable = await handle.createWritable();
 			await writable.write(text);
 			await writable.close();
 			setFileError(false);
+			var entry = indexEntry(id);
+			if (entry && entry.dirty && mutationSeq === seq) {
+				entry.dirty = false;
+				saveIndex();
+				renderTabs();
+			}
 			return true;
 		} catch (err) {
 			// Most likely causes: the file was moved/deleted, or permission was withdrawn. We do NOT
-			// call requestPermission() here -- it needs a user activation, which a background timer
-			// does not have, so it would fail a second time and teach the user nothing. Saying so and
-			// letting them press Save to file (which DOES have an activation) is the honest recovery.
-			fileDirty = true;
+			// call requestPermission() here -- it needs a user activation this may not have, so it
+			// would fail a second time and teach the user nothing. The banner's "Choose the file
+			// again" button DOES have an activation, and is the honest recovery.
 			setFileError(true);
 			return false;
 		} finally {
 			fileWriteBusy = false;
 		}
 	}
-	// Rescheduled rather than run on a fixed constant, because the interval is a setting and settings
-	// live per project -- switching projects can change it. Harmless when nothing is linked:
-	// flushToFile() returns immediately with no handle.
-	function restartFileAutosave() {
-		if (fileWriteTimer) { clearInterval(fileWriteTimer); fileWriteTimer = null; }
-		var secs = Math.min(180, Math.max(60, +settings.fileAutosaveSeconds || 120));
-		fileWriteTimer = setInterval(function () { pollLock(); flushToFile(false); }, secs * 1000);
-	}
-	// Called before any switch of library.openId. Everything that decides WHAT and WHERE to write --
-	// linkedHandle() and projectFileText() -- runs synchronously before flushToFile()'s first await,
-	// so the in-flight write still lands in the outgoing project's file even though the switch
-	// continues immediately. (If a write is already in flight this skips, and the outgoing project's
-	// last edits reach its file on the next visit rather than now; localStorage has them regardless.)
+	// Called before any switch of library.openId. Under Task 211 a project that is not current is
+	// still OPEN -- it is a tab -- so this does NOT release its lock or write its file. It only moves
+	// the banner's attention: the warnings on screen describe the project you are looking at.
+	//
+	// Nothing is flushed here because nothing is ever written without being asked. The outgoing
+	// project keeps its asterisk, and that asterisk is the whole reminder.
 	function flushOutgoingFile() {
-		flushToFile(false);
-		// The lock belongs to the project we are leaving, not to whatever we open next.
-		releaseLock();
-		setReadOnly(false);
+		setFileError(false);
+		syncReadOnlyToOpenProject();
 	}
 	// Shown once per browser, before the first file picker ever opens (Tom, 2026-08-03). Built as a
 	// PANEL with its own Continue button rather than a confirm() or alert(), for a hard technical
@@ -2299,69 +2362,137 @@ var EngCalcs = EngCalcs || {};
 		return false;
 	}
 	function showFileTraining() {
-		var pc = EngCalcs.pageConfig || {}, list = document.getElementById('lpn_projects_list');
-		if (!list) { return; }
-		list.innerHTML = '';
-		[pc.lpn_file_training_1, pc.lpn_file_training_2, pc.lpn_file_training_3].forEach(function (t) {
-			if (!t) { return; }
-			var p = document.createElement('p');
-			p.style.margin = '4px 0';
-			p.textContent = t;
-			list.appendChild(p);
-		});
-		var label = document.createElement('label');
-		label.textContent = (pc.lpn_file_training_name || 'Your initials') + ' ';
-		var input = document.createElement('input');
-		input.type = 'text'; input.maxLength = 60; input.style.marginLeft = '4px';
-		label.appendChild(input);
-		list.appendChild(label);
-		list.appendChild(document.createElement('br'));
-		var go = document.createElement('button');
-		go.type = 'button'; go.style.marginTop = '6px';
-		go.textContent = pc.lpn_file_training_continue || 'Continue';
-		go.addEventListener('click', function () {
-			// An empty name is allowed. Colleagues then see lpn_lock_somebody, which is worse for
-			// them but is the user's call to make -- refusing to continue would be a gate on a
-			// feature whose whole point is that there is no login.
-			identity = { holder: randomToken(24), name: input.value.trim().slice(0, 60) };
-			writeJSON(LPN_IDENTITY_KEY, identity);
-			var next = pendingFileAction;
-			pendingFileAction = null;
-			if (next === 'open') { openFromFile(); } else { saveToFile(); }
-		});
-		list.appendChild(go);
-		input.focus();
+		var pc = EngCalcs.pageConfig || {}, input = null;
+		openDialog(function (body) {
+			[pc.lpn_file_training_1, pc.lpn_file_training_2, pc.lpn_file_training_3].forEach(function (t) {
+				if (!t) { return; }
+				var p = document.createElement('p');
+				p.style.margin = '0 0 8px';
+				p.textContent = t;
+				body.appendChild(p);
+			});
+			var label = document.createElement('label');
+			label.textContent = (pc.lpn_file_training_name || 'Your initials') + ' ';
+			input = document.createElement('input');
+			input.type = 'text'; input.maxLength = 60; input.style.marginLeft = '4px';
+			label.appendChild(input);
+			body.appendChild(label);
+		}, [
+			{
+				label: pc.lpn_file_training_continue || 'Continue',
+				fn: function () {
+					// An empty name is allowed. Colleagues then see lpn_lock_somebody, which is worse
+					// for them but is the user's call to make -- refusing to continue would be a gate
+					// on a feature whose whole point is that there is no login.
+					identity = { holder: randomToken(24), name: input.value.trim().slice(0, 60) };
+					writeJSON(LPN_IDENTITY_KEY, identity);
+					var next = pendingFileAction;
+					pendingFileAction = null;
+					if (next === 'open') { openFromFile(); } else if (next === 'saveas') { saveAs(); } else { saveCurrent(); }
+				}
+			},
+			// A way out. The panel is shown by an action the user chose, so backing out of it has to
+			// be possible -- without this, a first-time visitor who pressed Save to see what it did
+			// would have a dialog with no answer but "give me your initials".
+			{
+				label: pc.lpn_cancel || 'Cancel',
+				fn: function () { pendingFileAction = null; }
+			}
+		]);
+		if (input) { input.focus(); }
 	}
-	async function saveToFile() {
+	// A file project's project NAME is its file's base name -- one name, not two (Task 211,
+	// Amendment 2). Task 195 had a Rename that renamed the project and a Save that wrote the file,
+	// each correct alone and a permanent trap together: Tom renamed a project, pressed Save, and it
+	// silently wrote the old file name. With the two fused, Rename on a file project IS Save As.
+	function projectNameFromFileName(fname) {
+		var s = String(fname).replace(/\.json$/i, '').replace(/-lpn-hawsedc-engcalcs$/i, '');
+		return s || String(fname);
+	}
+	// File -> Save. Writes the file this project came from, and asks nothing.
+	async function saveCurrent() {
+		var pc = EngCalcs.pageConfig || {};
 		if (!fileApiAvailable()) { downloadProjectFile(); return; }
 		if (!requireFileIdentity('save')) { return; }
-		var handle = linkedHandle();
-		if (!handle) {
-			try {
-				handle = await window.showSaveFilePicker({ suggestedName: projectFileName(), types: fileTypes() });
-			} catch (err) { return; } // the user cancelled the picker -- not an error
-			fileHandles.set(library.openId, handle);
-		}
-		// BEFORE the first write, not after (fixed 2026-08-04, found by Tom in browser testing).
-		// acquireLockForOpenProject() at the foot of this function is what used to mint the docId, so
-		// the FIRST file a project ever wrote had none. The damage was not cosmetic: a colleague
-		// opening that file found no docId, minted a different one of their own, and the two browsers
-		// computed different lock keys -- so the broker never saw a conflict, neither side was ever
-		// told the other had the file, and both autosaved over each other. That is exactly the "no
-		// warnings, then confusing messages" Tom reported. The lock key has to exist before the file
-		// that carries it does.
-		ensureDocId();
+		// Two different "we have no file we may write" cases, one answer. READ-ONLY: somebody else has
+		// it, and their file is newer than ours, so Save As is the only honest destination -- there is
+		// deliberately no "the file is free now, save over it?" offer (Tom, 2026-08-04: that would
+		// overwrite a colleague's changes). NO LIVE HANDLE: a browser project that has never been
+		// saved, or a file project whose page has been reloaded since -- a browser does not keep
+		// permission to a file across a page load.
+		if (readOnly || !isLinked(library.openId)) { await saveAs(); return; }
 		saveToStorage();
-		// force: the user asked, so write even if nothing is dirty -- this is also how a link made
-		// on a brand-new project puts something in the file immediately.
-		await flushToFile(true);
+		var entry = indexEntry(library.openId);
+		if (await writeOpenProjectToFile()) {
+			setNotice((pc.lpn_status_saved || 'Saved {file}.').replace('{file}', (entry && entry.fileName) || ''));
+		}
+	}
+	// File -> Save as. Also the answer to Rename on a file project, to a read-only tab that wants to
+	// keep its work, and to the first save of a browser project.
+	async function saveAs() {
 		var pc = EngCalcs.pageConfig || {};
-		setNotice((pc.lpn_status_file_linked || 'Saving {name} to {file} as you work, until this tab is closed.')
-			.replace('{name}', projectDisplayName(project)).replace('{file}', handle.name));
-		rebuildProjectsList();
+		if (!fileApiAvailable()) { downloadProjectFile(); return; }
+		if (!requireFileIdentity('saveas')) { return; }
+		var id = library.openId, entry = indexEntry(id);
+		if (!entry) { return; }
+		var handle;
+		try { handle = await window.showSaveFilePicker({ suggestedName: projectFileName(), types: fileTypes() }); }
+		catch (err) { return; } // the user cancelled the picker -- not an error
+		// Writing somewhere new makes this a DIFFERENT document, so it needs its own lock key: a copy
+		// and its original must never contend over one lock, and a copy must never be able to abort
+		// its own save because somebody is editing the original. Only a browser project's FIRST save
+		// keeps its id, because there was no other file to be a copy of.
+		var forking = readOnly || isFileProject(entry);
+		if (forking) {
+			releaseLock(id);
+			project.docId = newDocId();
+			roProjects.delete(id);
+			syncReadOnlyToOpenProject();
+		} else {
+			// BEFORE the first write, not after (fixed 2026-08-04, found by Tom in browser testing).
+			// The lock key used to be minted after the write, so the first file a project ever wrote
+			// had none -- and a colleague opening that file minted a DIFFERENT one, so the two
+			// browsers computed different lock keys and the broker never saw the conflict. The lock
+			// key has to exist before the file that carries it does.
+			ensureDocId();
+		}
+		fileHandles.set(id, handle);
+		entry.fileName = handle.name;
+		project.name = projectNameFromFileName(handle.name);
+		entry.name = project.name;
+		saveToStorage();
+		saveIndex();
+		if (await writeOpenProjectToFile()) {
+			setNotice((pc.lpn_status_saved || 'Saved {file}.').replace('{file}', handle.name));
+		}
+		renderTabs();
 		acquireLockForOpenProject();
 	}
+	// File -> Revert. The counterpart to Discard-on-close, and the only escape from a bad twenty
+	// minutes now that nothing is written on a timer. Also the "re-read from disk" primitive a
+	// repaired Take over will need (see Task 195's 2026-08-04 withdrawal of it).
+	async function revertCurrent() {
+		var pc = EngCalcs.pageConfig || {}, id = library.openId;
+		var entry = indexEntry(id), handle = handleFor(id);
+		if (!entry || !handle) { return; }
+		if (!window.confirm((pc.lpn_revert_confirm || 'Throw away the changes you have made and load {file} again from the disk?').replace('{file}', entry.fileName))) { return; }
+		var text;
+		try { text = await (await handle.getFile()).text(); }
+		catch (err) { setFileError(true); return; }
+		var saved = acceptImportedText(text);
+		if (!saved) { return; }
+		applySaved(saved);
+		entry.name = project.name;
+		clearUndo();
+		saveToStorage();
+		entry.dirty = false;      // AFTER saveToStorage(), which sets it
+		saveIndex();
+		refreshAllFromDocument();
+		renderTabs();
+		setNotice((pc.lpn_status_reverted || 'Loaded {file} again from the disk.').replace('{file}', entry.fileName));
+	}
 	async function openFromFile() {
+		var pc = EngCalcs.pageConfig || {};
 		if (!fileApiAvailable()) {
 			var input = document.getElementById('lpn_project_file');
 			if (input) { input.click(); }
@@ -2374,78 +2505,80 @@ var EngCalcs = EngCalcs || {};
 		var handle = picked[0], text;
 		try { text = await (await handle.getFile()).text(); }
 		catch (err) {
-			alert((EngCalcs.pageConfig || {}).lpn_import_bad_file || 'That file could not be read as a project saved from this page.');
+			alert(pc.lpn_import_bad_file || 'That file could not be read as a project saved from this page.');
 			return;
 		}
 		var saved = acceptImportedText(text);
 		if (!saved) { return; }
+		// **The lock is checked BEFORE the project lands** (Task 211). Task 195 opened the file, then
+		// sprang read-only on the user afterwards; Tom's AutoCAD instinct -- and Word's, and Excel's --
+		// is that this is a QUESTION asked at the moment of opening, with both real answers on it.
+		var docId = (saved.project && saved.project.docId) || null;
+		var r = docId ? await postLock('check', docId) : null;
+		if (r && r.ok && r.locked && !r.mine) {
+			presentOpenChoice(saved, handle, lockHolderName(r));
+			return;
+		}
+		landOpenedFile(saved, handle, false);
+	}
+	// The three-answer dialog: look at it, keep your own copy, or think better of it. Cancel is a real
+	// answer here and does nothing at all -- the project never lands, so backing out is free.
+	function presentOpenChoice(saved, handle, who) {
+		var pc = EngCalcs.pageConfig || {};
+		openDialog(function (body) {
+			var p = document.createElement('p');
+			p.style.margin = '0';
+			p.textContent = (pc.lpn_lock_open_heading || '{name} has this file open.').replace('{name}', who);
+			body.appendChild(p);
+		}, [
+			{ label: pc.lpn_lock_open_readonly || 'Open read-only', fn: function () { landOpenedFile(saved, handle, true); } },
+			// Lands as a browser project with a fresh document id and NO handle: the next Save asks
+			// where to put it. Deliberately not a second file picker from in here -- one decision per
+			// dialog, and the asterisk on the new tab is the reminder that it is not yet anywhere.
+			{
+				label: pc.lpn_lock_open_copy || 'Open as my own copy',
+				fn: function () {
+					if (saved.project) { saved.project.docId = newDocId(); }
+					landOpenedFile(saved, null, false);
+				}
+			},
+			{ label: pc.lpn_cancel || 'Cancel', fn: function () { } }
+		]);
+	}
+	function landOpenedFile(saved, handle, asReadOnly) {
+		var pc = EngCalcs.pageConfig || {};
 		var id = importProject(saved); // lands as a NEW project, exactly as the Phase 1 path does
-		if (id) {
+		if (!id) { return; }
+		var entry = indexEntry(id);
+		if (handle) {
 			fileHandles.set(id, handle);
-			var pc = EngCalcs.pageConfig || {};
-			setNotice((pc.lpn_status_file_opened || 'Opened {file}. Changes are saved back to it as you work, until this tab is closed.')
-				.replace('{file}', handle.name));
+			if (entry) {
+				entry.fileName = handle.name;
+				// Freshly read from that very file, so nothing is pending -- importProject() had to
+				// call saveToStorage(), which sets the flag, so it is cleared here rather than never
+				// being set.
+				entry.dirty = false;
+			}
+			saveIndex();
+			setNotice((pc.lpn_status_file_opened || 'Opened {file}.').replace('{file}', handle.name));
+		}
+		if (asReadOnly) {
+			roProjects.add(id);
+			syncReadOnlyToOpenProject();
+		} else {
 			acquireLockForOpenProject();
 		}
-		rebuildProjectsList();
+		renderTabs();
 	}
-	// "Close project", and it CLOSES -- landing on a new empty project, the way Close behaves in every
-	// other program. Tom, 2026-08-03: *"In all software, 'Close file' reverts either to a no-document
-	// state (not really meaningful for these calculators) or a new-document state (Clear calculator),
-	// and never to file-stays-open."* Correct, and the first version of this was exactly that wrong
-	// thing: it unlinked the file and left the project on screen, which is a state no user has a name
-	// for. There is no longer any way to keep editing a project while detached from its file, and
-	// that absence is deliberate -- silently diverging from the file is how two versions of the truth
-	// get made.
-	//
-	// It deletes NOTHING. The file stays on disk, the project stays in the library (unlinked), and
-	// the lock goes back so a colleague can open it. Closing the tab does the same thing on its own.
-	function closeProject() {
-		if (!library.openId) { return; }
-		// Order matters: flushToFile() resolves the handle and the content synchronously before its
-		// first await, so the last write still lands in the outgoing file even though the handle is
-		// dropped on the very next line.
-		flushToFile(false);
-		fileHandles.delete(library.openId);
-		setFileError(false);
-		releaseLock();
-		lockUnavailable = false;
-		setLockUnavailable(false);
-		setReadOnly(false);
-		// The new-document state, per the convention above. newProject() keeps the closed project in
-		// the library and inherits the current settings, so this is "close", never "discard".
-		newProject();
-		rebuildProjectsList();
-	}
-	// Recovery from a file that moved, was renamed, or was deleted. The stale handle is dropped
-	// FIRST -- otherwise saveToFile() would find it still linked and quietly try the same dead
-	// handle again instead of asking where the file went.
+	// Recovery from a file that moved, was renamed, or was deleted. The stale handle is dropped FIRST
+	// -- otherwise Save would find it still linked and quietly try the same dead handle again instead
+	// of asking where the file went.
 	async function relinkFile() {
 		if (!library.openId) { return; }
 		fileHandles.delete(library.openId);
 		fileError = false;
 		setFileMissing(false);
-		await saveToFile();
-	}
-	// The escape hatch from being locked out of a file that is not really "yours" -- most often a
-	// project someone shared from outside the office (Tom, 2026-08-03). Offered ONLY from the
-	// locked-out banner, deliberately never as a standing button: a copy is a fork of the truth, and
-	// a page that advertises forking teaches people to make copies they will later have to reconcile.
-	// Here it is the answer to a question the user is already stuck on, which is the one moment it
-	// genuinely helps.
-	//
-	// We cannot detect a copy on our own: the File System Access API exposes handle.name and never a
-	// path, so "the same file, moved" and "a copy in another folder" are indistinguishable -- and the
-	// common blooper, a copy that keeps its name, is exactly what a name comparison would miss.
-	async function forkToOwnCopy() {
-		if (!library.openId) { return; }
-		releaseLock();                        // stop answering to the original's lock
-		project.docId = newDocId();           // a genuinely separate document from here on
-		fileHandles.delete(library.openId);   // and a separate FILE: ask where to put it
-		saveToStorage();
-		setReadOnly(false);
-		await saveToFile();
-		rebuildProjectsList();
+		await saveAs();
 	}
 
 	// ---- Project locks (ROADMAP Task 195 Phase 2) ----
@@ -2510,14 +2643,22 @@ var EngCalcs = EngCalcs || {};
 			return await resp.json();
 		} catch (err) { return null; }
 	}
-	// What we currently believe about the open project's lock. `docId` is non-null only while a file
-	// is linked; nothing here is consulted otherwise.
-	var lock = { docId: null, by: '' };
+	// **Locks are per TAB, not per current project** (Task 211). Every project in the library is an
+	// open tab, so a file project keeps its lock while you work in a different tab -- releasing on
+	// every tab switch would let a colleague take a file out from under unsaved work you are two
+	// clicks away from. Both maps are session state and are deliberately NOT in the index: a lock we
+	// hold and a read-only decision we made are facts about this browser session, and a reload starts
+	// both again from what the server actually says.
+	var heldLocks = new Map();   // project id -> docId we currently hold the lock for
+	var roProjects = new Set();  // project ids opened read-only, by the user's own choice
+	var lockedByName = new Map();// project id -> who has it, for the banner
+	function currentLockDocId() { return heldLocks.get(library.openId) || null; }
+	// **Read-only no longer takes editing away** (Task 211, and it deletes four enforcement seams).
+	// It means exactly what it means in Word: you may change anything you like, you simply cannot save
+	// it over that file. Save routes to Save As instead. The old version disabled the toolbar, the
+	// pointer handler, setMode() and every property popup -- four places to get wrong, in service of a
+	// restriction the user never agreed to and did not need.
 	var readOnly = false;
-	// Read-only blocks editing the NETWORK -- adding, deleting, dragging, property edits, undo,
-	// clearing, the example, the backdrop. It deliberately does NOT block view preferences (Settings,
-	// Labels) or panning and zooming: looking around a network you may not edit is exactly what a
-	// person in this state wants to do, and a label-display choice is not someone else's work.
 	// Two things can want the banner at once -- read-only (someone else holds the project) and a
 	// warning (we could not reach the broker, or the file write failed). They are kept as separate
 	// state rather than one message string so that clearing one cannot silently erase the other, and
@@ -2543,14 +2684,12 @@ var EngCalcs = EngCalcs || {};
 			btn.addEventListener('click', fn);
 			banner.appendChild(btn);
 		}
-		if (bannerRO && bannerRO.stealFrom !== null && bannerRO.stealFrom !== undefined) {
-			action((pc.lpn_lock_takeover || 'Take over from {name}').replace('{name}', bannerRO.stealFrom || (pc.lpn_lock_somebody || 'Somebody else')), takeOverLock);
-		}
-		// Offered whenever somebody else holds the file, including during the "please wait" window:
-		// a person who was sent this file from outside the office is not waiting for anything, and
-		// telling them to wait for a stranger is the worst of the answers available.
+		// One action, and it is the only one there can be: keep your work as a file of your own. There
+		// is no Take over (withdrawn 2026-08-04 -- it wrote a copy older than the file over the top of
+		// it) and no "the file is free now, save over it" (refused by Tom for the same physics: the
+		// file on disk has moved on since we read it).
 		if (bannerRO) {
-			action(pc.lpn_lock_own_copy || 'Save as my own copy', forkToOwnCopy);
+			action(pc.lpn_file_saveas || 'Save as…', saveAs);
 		}
 		if (!bannerRO && bannerWarn) {
 			if (bannerWarn.action) { action(bannerWarn.actionLabel, bannerWarn.action); }
@@ -2565,20 +2704,56 @@ var EngCalcs = EngCalcs || {};
 		}
 		banner.style.display = 'block';
 	}
-	function setReadOnly(on, message, stealFrom) {
-		readOnly = !!on;
-		document.querySelectorAll('#lpn_toolbar [data-edits="1"]').forEach(function (el) {
-			if (el.tagName === 'BUTTON' || el.tagName === 'SELECT') { el.disabled = readOnly; return; }
-			el.querySelectorAll('button, select').forEach(function (c) { c.disabled = readOnly; });
-		});
+	// Recomputes read-only from the CURRENT tab and nothing else. Called on every tab switch and
+	// whenever a lock answer changes: the banner describes the project you are looking at, and a tab
+	// you opened read-only stays read-only for as long as it is open, whatever happens to the lock
+	// afterwards (Tom, 2026-08-04: "Read only is read only"). Nothing promotes a tab behind the user's
+	// back -- the promotion poll built for Task 195 is gone.
+	function syncReadOnlyToOpenProject() {
+		var pc = EngCalcs.pageConfig || {}, id = library.openId, entry = indexEntry(id);
+		readOnly = roProjects.has(id);
 		if (readOnly) {
-			closePopup();  // a property editor open over a network you cannot edit is a trap
-			setMode('select');
-			bannerRO = { message: message || '', stealFrom: stealFrom };
+			bannerRO = {
+				message: (pc.lpn_lock_readonly_banner || 'Read-only: {name} has this file open. You can change anything you like here, but you cannot save it over their file. Use File, Save as to keep your own copy.')
+					.replace('{name}', lockedByName.get(id) || (pc.lpn_lock_somebody || 'Somebody else'))
+			};
 		} else {
 			bannerRO = null;
 		}
+		// A file project whose handle died with the last page load. We still know the file's NAME --
+		// that is why entry.fileName lives in the index -- so the tab keeps its identity rather than
+		// silently demoting itself to a browser project, and this says what to do about it. Only ever
+		// replaces a warning of its own kind, so it cannot stomp a missing-file or no-server banner.
+		if (!readOnly && entry && isFileProject(entry) && !isLinked(id)) {
+			bannerWarn = {
+				kind: 'reopen',
+				message: (pc.lpn_file_needs_reopen || 'This project came from {file}, but a browser does not keep permission to a file after the page is reloaded. Use File, Save as, or open the file again, to carry on working in it.')
+					.replace('{file}', entry.fileName),
+				actionLabel: pc.lpn_file_relink || 'Choose the file again',
+				action: relinkFile,
+				dismissable: true
+			};
+		} else {
+			clearWarn('reopen');
+		}
 		renderBanner();
+	}
+	// Clears the banner warning only if it is the KIND being cleared. Two warnings can want the same
+	// slot -- no server, a file that has gone missing, a file that needs re-opening -- and a blanket
+	// clear from one of them would silently erase another that is still true.
+	function clearWarn(kind) {
+		if (bannerWarn && bannerWarn.kind !== kind) { return; }
+		bannerWarn = null;
+		renderBanner();
+	}
+	// Somebody else has taken the file since we opened it. Fold it into the same read-only state the
+	// open-time choice produces, so there is exactly one way to be read-only and one way out of it.
+	function enterReadOnly(who) {
+		var id = library.openId;
+		roProjects.add(id);
+		if (who) { lockedByName.set(id, who); }
+		heldLocks.delete(id);
+		syncReadOnlyToOpenProject();
 	}
 	// True where having no server is a standing condition of this session rather than a fault.
 	function lockWarningDismissable() {
@@ -2594,8 +2769,9 @@ var EngCalcs = EngCalcs || {};
 	// modal cannot come back later to say the risk has passed, and this one can.
 	function setLockUnavailable(on) {
 		var pc = EngCalcs.pageConfig || {};
-		if (!on) { bannerWarn = null; renderBanner(); return; }
+		if (!on) { clearWarn('lock'); return; }
 		bannerWarn = {
+			kind: 'lock',
 			message: pc.lpn_lock_unavailable || 'Beware: could not reach the server to check or create a lock on this project, so nothing is stopping a colleague from editing the same file at the same time. You will be told if locking starts working again.',
 			action: null,
 			dismissable: lockWarningDismissable()
@@ -2604,8 +2780,9 @@ var EngCalcs = EngCalcs || {};
 	}
 	function setFileMissing(on) {
 		var pc = EngCalcs.pageConfig || {};
-		if (!on) { bannerWarn = null; renderBanner(); return; }
+		if (!on) { clearWarn('missing'); return; }
 		bannerWarn = {
+			kind: 'missing',
 			message: pc.lpn_file_write_failed || 'Could not write to the file. It may have been moved, renamed, or deleted, or permission may have been withdrawn. Your work is still saved in this browser.',
 			actionLabel: pc.lpn_file_relink || 'Choose the file again',
 			action: relinkFile,
@@ -2617,119 +2794,96 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		return (r && r.lockedBy) ? r.lockedBy : (pc.lpn_lock_somebody || 'the other person');
 	}
-	// Scenario B: somebody else holds this file, so we are read-only until they let go.
-	//
-	// This used to split on how long the holder had been quiet -- "please wait" under ~2x the autosave
-	// interval, an offer to take over past it. The split is gone with the takeover; see below.
-	function presentLockedOut(r) {
-		var pc = EngCalcs.pageConfig || {};
-		var who = lockHolderName(r);
-		lock.by = who;
-		// TAKEOVER IS WITHDRAWN (2026-08-04). takeOverLock() stole the lock and then wrote THIS browser's
-		// in-memory copy straight over the file -- a copy that predates every autosave the holder made
-		// while we sat here read-only. Taking over therefore destroyed the very work the banner
-		// promised had been saved. Found 2026-08-04 from Tom's reasoning about read-only ("saving over
-		// it could overwrite colleague changes" -- the same physics).
-		//
-		// Removed rather than repaired on purpose. The repair is "re-read the file from disk before
-		// the new holder may write anything", which is new logic, and this whole surface is being
-		// rebuilt on the tab/File-menu paradigm within days; shipping untested recovery code into the
-		// gap would be the worse trade. Nobody is stranded meanwhile: "Save as my own copy" is still
-		// offered, and pollLock() hands the file over on its own as soon as the holder closes it. The
-		// one case left waiting is a holder whose tab crashed, and that resolves in the rebuild.
-		//
-		// One message for both states now. It reads "is editing right now", which is mildly wrong for a
-		// holder who has walked away -- but mildly wrong prose beats a correct-sounding button that
-		// eats a colleague's afternoon. `lpn_lock_idle` is left in the lang files unused rather than
-		// deleted across 27 files for a surface that is about to be rebuilt.
-		setReadOnly(true, (pc.lpn_lock_busy || '{name} is editing this project right now. You can look at it, but not change it yet.').replace('{name}', who), null);
-	}
-	// Called once a file has just been linked, by either route. Fails open on every path that is not
-	// an explicit "someone else holds this".
+	// Called once a file has just been attached to the open project, by either route. Fails OPEN on
+	// every path that is not an explicit "someone else holds this": an unreachable broker leaves the
+	// file writable and says so, because a courtesy layer must never be able to take the calculator
+	// away.
 	async function acquireLockForOpenProject() {
-		var docId = ensureDocId();
-		if (!ensureIdentity()) { setReadOnly(false); return; }
-		lock.docId = docId;
+		var id = library.openId, docId = ensureDocId();
+		if (!ensureIdentity()) { return; }
 		var r = await postLock('acquire', docId);
 		if (!r || !r.ok) {
-			// Fail open -- editing continues -- but SAY SO. This is the moment of danger: from here
-			// on the file is unprotected, and the retry below is what makes the promise in that
+			// The moment of danger (Tom, 2026-08-03): from here on the file is unprotected. Editing
+			// continues, but SAY SO -- and pollLockedFiles() below is what makes the promise in that
 			// message ("you will be told if locking starts working again") a real one.
 			lockUnavailable = true;
 			setLockUnavailable(true);
-			setReadOnly(false);
 			return;
 		}
 		lockUnavailable = false;
 		setLockUnavailable(false);
-		if (r.held) { setReadOnly(false); return; }
-		presentLockedOut(r);
+		if (r.held) { heldLocks.set(id, docId); return; }
+		// Somebody took it between the open-time check and here. Rare, but it is exactly the race the
+		// pre-save re-check exists for, and the same read-only state answers it.
+		enterReadOnly(lockHolderName(r));
 	}
-	// Runs on the autosave tick whether or not there is anything to save, and covers BOTH states that
-	// are waiting on news from the broker:
-	//   - we warned at open time that we could not lock (lockUnavailable), and promised to say when
-	//     that changed; and
-	//   - somebody else holds the project and we are read-only.
-	// The second was a real gap until 2026-08-03: nothing re-polled once the banner was up, so a
-	// colleague who closed their project, or simply went quiet long enough for a takeover to become
-	// reasonable, left the other person staring at "please wait" forever. Found while writing the
-	// test punch list, which is exactly the sort of thing a punch list is for.
+	// The heartbeat, on its OWN fixed timer (Task 211). Task 195 piggybacked this on the file-autosave
+	// tick, which is why one user-facing number ended up governing the write interval, the heartbeat
+	// AND the how-long-until-takeover threshold at once -- and why that number had to be clamped to
+	// 60-180 s. With autosave gone the coupling goes too: this is 60 s, always, and no longer anybody's
+	// setting.
+	//
+	// It refreshes every lock we hold (one per open file tab), and it keeps the one promise a
+	// could-not-lock warning makes. It deliberately does NOT poll a tab the user opened read-only:
+	// read-only is read-only, and nothing promotes a tab behind the user's back.
 	var lockUnavailable = false;
-	async function pollLock() {
+	var LPN_HEARTBEAT_MS = 60000;
+	async function pollLockedFiles() {
 		var pc = EngCalcs.pageConfig || {};
-		if (!lock.docId) { return; }
-		if (!lockUnavailable && !readOnly) { return; } // nothing is waiting on an answer
-		var r = await postLock('acquire', lock.docId);
-		if (!r || !r.ok) { return; } // still unreachable; the banner stays up, say nothing
-		if (lockUnavailable) { lockUnavailable = false; setLockUnavailable(false); }
-		if (r.held) {
-			// Note this ACQUIRES when the lock turns out to be free -- acquire is not a read. That is
-			// deliberate: the usual way to get here is the other person closing their project, and
-			// the useful outcome is that the file becomes yours rather than merely available.
-			if (readOnly) {
-				setReadOnly(false);
-				setNotice(pc.lpn_lock_now_yours || 'Nobody else has this project open now, so it is yours to edit.');
-			} else {
-				setNotice(pc.lpn_lock_restored || 'Locking is working again, and this project is now yours to edit.');
+		var pending = [];
+		heldLocks.forEach(function (docId, id) { pending.push([id, docId]); });
+		for (var i = 0; i < pending.length; i++) {
+			var id = pending[i][0], r = await postLock('acquire', pending[i][1]);
+			if (!r || !r.ok) { continue; }  // unreachable; the banner stays as it is, say nothing
+			if (!r.held) {
+				// Lost it while we were away. If it is the tab on screen the banner says so now;
+				// otherwise the tab simply becomes read-only and will say so when it is next looked at.
+				lockedByName.set(id, lockHolderName(r));
+				roProjects.add(id);
+				heldLocks.delete(id);
+				if (id === library.openId) { syncReadOnlyToOpenProject(); }
 			}
-			return;
 		}
-		// Still held. Re-presenting it is what moves the banner from "please wait" to an offer to
-		// take over as the holder's quiet time passes.
-		presentLockedOut(r);
+		// The could-not-lock promise, kept. Only for the project on screen -- this message is about
+		// what the user is looking at.
+		if (lockUnavailable && library.openId && isLinked(library.openId)) {
+			var back = await postLock('acquire', ensureDocId());
+			if (back && back.ok && back.held) {
+				lockUnavailable = false;
+				setLockUnavailable(false);
+				heldLocks.set(library.openId, project.docId);
+				setNotice(pc.lpn_lock_restored || 'Locking is working again, and this file is now yours to save to.');
+			}
+		}
 	}
-	async function takeOverLock() {
-		var pc = EngCalcs.pageConfig || {};
-		if (!lock.docId) { return; }
-		var was = lock.by;
-		var r = await postLock('steal', lock.docId);
-		if (!r || !r.ok || !r.held) { return; } // could not reach the broker; stay as we are
-		setReadOnly(false);
-		setNotice((pc.lpn_lock_took_over || 'You have taken over from {name}. Their work was saved to the file before you did.')
-			.replace('{name}', r.stolenFrom || was || (pc.lpn_lock_somebody || 'the other person')));
-		flushToFile(true);
-	}
-	function releaseLock() {
-		if (!lock.docId) { return; }
+	// Releases ONE project's lock (default: the open one). A tab that is closed hands its file back;
+	// a tab that is merely switched away from does not, because it is still open.
+	function releaseLock(id) {
+		var pid = id || library.openId, docId = heldLocks.get(pid);
+		if (!docId) { return; }
 		var idn = loadIdentity();
 		// sendBeacon, because the common case for releasing is the tab closing, and a fetch() started
 		// during unload is not guaranteed to be sent. Same reason the usage logs use it.
 		if (idn && navigator.sendBeacon) {
 			try {
 				navigator.sendBeacon(LPN_LOCK_URL, new URLSearchParams({
-					action: 'release', id: lock.docId, holder: idn.holder, name: idn.name
+					action: 'release', id: docId, holder: idn.holder, name: idn.name
 				}));
 			} catch (err) { /* nothing to do; the record expires on its own eventually */ }
 		}
-		lock.docId = null;
-		lock.by = '';
+		heldLocks.delete(pid);
+	}
+	function releaseAllLocks() {
+		var ids = [];
+		heldLocks.forEach(function (docId, id) { ids.push(id); });
+		ids.forEach(function (id) { releaseLock(id); });
 	}
 	function renameProject(id, name) {
 		var entry = indexEntry(id);
 		if (!entry) { return; }
 		entry.name = name;
 		entry.updated = Date.now();
-		if (id === library.openId) { project.name = name; saveToStorage(); updateProjectName(); }
+		if (id === library.openId) { project.name = name; saveToStorage(); renderTabs(); }
 		else {
 			// Rename a project that is not open by rewriting just its name in place -- read, patch,
 			// write. Cheaper and safer than opening it, and it keeps the document (the authority)
@@ -2739,15 +2893,23 @@ var EngCalcs = EngCalcs || {};
 		}
 		saveIndex();
 	}
-	// Deletes the document first, then the index entry: the reverse order can leave a document with
+	// **Close IS the removal, and there is no Delete** (Task 211). Once every tab wears an asterisk
+	// whenever it holds something that is not in a file, "close without saving" already IS "delete",
+	// and a second verb for it was a distinction with nothing behind it. So this is the old
+	// deleteProject() with the confirm lifted out: closeTab() below asks the question, in the words
+	// the situation deserves, and this does the work.
+	//
+	// Removes the document first, then the index entry: the reverse order can leave a document with
 	// no entry, which adoptOrphans() would helpfully resurrect on the next load.
-	function deleteProject(id) {
+	function discardProject(id) {
 		var pc = EngCalcs.pageConfig || {}, entry = indexEntry(id),
 			// Captured BEFORE the removal below -- after it there is nothing left to name.
 			goneName = projectDisplayName(entry || { name: '' });
-		// Drop any live file link first. The FILE is not deleted -- deleting a project here has never
-		// meant deleting anything outside this browser -- but continuing to autosave a project that
-		// no longer exists into it would be worse than either.
+		// Hand the file back so a colleague can have it, and drop the live link. The FILE ON DISK IS
+		// NOT TOUCHED -- closing a tab has never meant deleting anything outside this browser.
+		releaseLock(id);
+		roProjects.delete(id);
+		lockedByName.delete(id);
 		fileHandles.delete(id);
 		try { localStorage.removeItem(projectKey(id)); } catch (err) { /* private mode */ }
 		library.projects = library.projects.filter(function (p) { return p.id !== id; });
@@ -2770,159 +2932,295 @@ var EngCalcs = EngCalcs || {};
 				refreshAllFromDocument();
 				// After refreshAllFromDocument(), which itself calls setStatus('') -- see the
 				// notice/diagnostic split at setStatus().
-				setNotice((pc.lpn_status_deleted_opened || 'Deleted {deleted}. Now showing {opened}.')
-					.replace('{deleted}', goneName)
+				setNotice((pc.lpn_status_closed_opened || 'Closed {closed}. Now showing {opened}.')
+					.replace('{closed}', goneName)
 					.replace('{opened}', projectDisplayName(rest[0])));
 			} else {
 				newProject();
-				setNotice((pc.lpn_status_deleted_empty || 'Deleted {deleted}. Started a new empty project.')
-					.replace('{deleted}', goneName));
+				setNotice((pc.lpn_status_closed_empty || 'Closed {closed}. Started a new empty project.')
+					.replace('{closed}', goneName));
 				return;
 			}
 		}
 		saveIndex();
 	}
-	// ---- Projects panel ----
-	// The open project's name lives on its own toolbar button, which both SHOWS what you are working
-	// on and opens the library -- the "what am I working on right now" question Task 184 names, in
-	// the place you would look for it. Renamed in place; no separate name field to keep in sync.
-	function updateProjectName() {
-		var btn = document.getElementById('lpn_projects_btn');
-		var pc = EngCalcs.pageConfig || {};
-		if (btn) { btn.textContent = (pc.lpn_tool_projects || 'Projects') + ': ' + projectDisplayName(project); }
+	// ---- The tab strip, its menus, and the dialog (ROADMAP Task 211) ----
+	// Every project in the library is a TAB. There is no "open the library" step and no popup listing
+	// projects: the strip IS the library, permanently on screen above the toolbar, which is what
+	// answers "which network am I looking at" without a click. It replaces Task 146.08's Projects
+	// panel entirely.
+	var LPN_TAB_NAME_MAX = 24;
+	// Middle-truncated so the EXTENSION survives (Tom, 2026-08-04). Truncating from the end eats the
+	// one character that proves the thing is a file, and hyphens prove nothing on their own -- a user
+	// may well hyphenate a browser project's name in anticipation of saving it. That is also why no
+	// file/disk GLYPH is needed: the name says "file", the asterisk says "unsaved", and the two facts
+	// stay independent. The full name is on the tab's title attribute.
+	function tabLabel(entry) {
+		var name = isFileProject(entry) ? entry.fileName : projectDisplayName(entry);
+		if (name.length <= LPN_TAB_NAME_MAX) { return name; }
+		var tail = 5, dot = name.lastIndexOf('.');
+		if (isFileProject(entry) && dot > 0) { tail = Math.min(12, name.length - dot); }
+		var head = Math.max(4, LPN_TAB_NAME_MAX - tail - 1);
+		return name.slice(0, head) + '…' + name.slice(name.length - tail);
 	}
-	function rebuildProjectsList() {
-		var pc = EngCalcs.pageConfig || {}, list = document.getElementById('lpn_projects_list');
-		if (!list) { return; }
-		list.innerHTML = '';
-		// Most recently updated first: with no folders and no search, recency is the only ordering
-		// that keeps the project you actually want near the top as a library grows.
-		var rows = library.projects.slice().sort(function (a, b) { return (b.updated || 0) - (a.updated || 0); });
-		rows.forEach(function (p) {
-			var isOpen = p.id === library.openId;
-			var row = document.createElement('div');
-			row.style.margin = '3px 0';
-			var name = document.createElement('span');
-			name.textContent = projectDisplayName(p);
-			if (isOpen) { name.style.fontWeight = 'bold'; }
-			row.appendChild(name);
-			if (isOpen) {
-				var here = document.createElement('span');
-				here.textContent = ' (' + (pc.lpn_project_open_now || 'Open now') + ')';
-				row.appendChild(here);
-			} else {
-				var openBtn = document.createElement('button');
-				openBtn.type = 'button'; openBtn.style.marginLeft = '6px';
-				openBtn.textContent = pc.lpn_project_open || 'Open';
-				openBtn.addEventListener('click', function () { openProject(p.id); rebuildProjectsList(); });
-				row.appendChild(openBtn);
-			}
-			var renameBtn = document.createElement('button');
-			renameBtn.type = 'button'; renameBtn.style.marginLeft = '4px';
-			renameBtn.textContent = pc.lpn_project_rename || 'Rename';
-			renameBtn.addEventListener('click', function () {
-				var v = window.prompt(pc.lpn_prompt_project_name || 'Name for this project', p.name || '');
-				// null is Cancel; an empty string is a deliberate "clear the name", which is legal --
-				// the project falls back to displaying Untitled.
-				if (v === null) { return; }
-				renameProject(p.id, v.trim());
-				rebuildProjectsList();
-			});
-			row.appendChild(renameBtn);
-			var delBtn = document.createElement('button');
-			delBtn.type = 'button'; delBtn.style.marginLeft = '4px';
-			delBtn.textContent = pc.lpn_project_delete || 'Delete';
-			delBtn.addEventListener('click', function () {
-				if (!window.confirm(pc.lpn_confirm_project_delete || 'Delete this project and everything in it? This cannot be undone.')) { return; }
-				deleteProject(p.id);
-				rebuildProjectsList();
-			});
-			row.appendChild(delBtn);
-			list.appendChild(row);
-		});
-		// Two ways to get a new project, deliberately named apart (Tom, 2026-07-31): "Save as new
-		// project" duplicates what is on screen, "Start empty project" does not. A single "New
-		// project" reads as the first to most people and does the second, which is the worst
-		// possible combination.
-		var saveAsBtn = document.createElement('button');
-		saveAsBtn.type = 'button'; saveAsBtn.style.marginTop = '6px';
-		saveAsBtn.textContent = pc.lpn_project_saveas || 'Save as new project';
-		saveAsBtn.addEventListener('click', function () {
-			var suggested = (project.name || projectDisplayName(project)) + (pc.lpn_project_copy_suffix || ' (copy)');
-			var v = window.prompt(pc.lpn_prompt_project_name || 'Name for this project', suggested);
-			if (v === null) { return; }
-			saveProjectAs(v.trim());
-			rebuildProjectsList();
-		});
-		list.appendChild(saveAsBtn);
-		var newBtn = document.createElement('button');
-		newBtn.type = 'button'; newBtn.style.marginTop = '6px'; newBtn.style.marginLeft = '4px';
-		newBtn.textContent = pc.lpn_project_new || 'Start empty project';
-		newBtn.addEventListener('click', function () { newProject(); rebuildProjectsList(); });
-		list.appendChild(newBtn);
-		// File in / file out (Task 195). On their own row below the two in-browser "new project"
-		// buttons: those three all produce a project from something you already have here, while
-		// these two are the only controls on the page that cross the browser-storage boundary.
-		var fileRow = document.createElement('div');
-		fileRow.style.marginTop = '6px';
-		var exportBtn = document.createElement('button');
-		exportBtn.type = 'button';
-		// Two different actions wearing two different names, because they behave differently and a
-		// shared label made the difference look like a bug (Tom, 2026-08-03: "my browser saves
-		// silently to a default file name and location. When I save again, I get a second copy").
-		// Where the File System Access API exists, this LINKS a file and every later press writes to
-		// that same file. Where it does not -- Firefox, Safari, and any page not served over https --
-		// there is no handle to keep, so every press really is another copy in the downloads folder,
-		// and the button says so instead of pretending to be a save.
-		exportBtn.textContent = fileApiAvailable()
-			? (pc.lpn_project_export || 'Save to file')
-			: (pc.lpn_project_download || 'Download a copy');
-		if (!fileApiAvailable() && pc.lpn_project_download_tip) { helpTip(exportBtn, pc.lpn_project_download_tip); }
-		exportBtn.addEventListener('click', function () { saveToFile(); });
-		fileRow.appendChild(exportBtn);
-		var importBtn = document.createElement('button');
-		importBtn.type = 'button'; importBtn.style.marginLeft = '4px';
-		importBtn.textContent = pc.lpn_project_import || 'Open from file';
-		importBtn.addEventListener('click', function () { openFromFile(); });
-		fileRow.appendChild(importBtn);
-		list.appendChild(fileRow);
-		// The link state, and the only place it is visible. A user who believes their work is going
-		// into a file and is wrong has lost the thing this whole task exists to protect, so the panel
-		// says which file, by name, or says nothing at all -- never anything in between.
-		var handle = linkedHandle();
-		if (handle) {
-			var linkRow = document.createElement('div');
-			linkRow.style.cssText = 'margin-top:6px;font-size:0.9em';
-			var linkText = document.createElement('span');
-			linkText.textContent = (pc.lpn_file_saving_to || 'Saving to: {file}').replace('{file}', handle.name);
-			linkRow.appendChild(linkText);
-			var unlinkBtn = document.createElement('button');
-			unlinkBtn.type = 'button'; unlinkBtn.style.marginLeft = '6px';
-			unlinkBtn.textContent = pc.lpn_project_close || 'Close project';
-			if (pc.lpn_project_close_tip) { helpTip(unlinkBtn, pc.lpn_project_close_tip); }
-			unlinkBtn.addEventListener('click', function () { closeProject(); });
-			linkRow.appendChild(unlinkBtn);
-			list.appendChild(linkRow);
+	// **THE ASTERISK DECIDES** -- the one rule the whole close/discard story falls out of. A browser
+	// project is in no file at all, so it always wears one, faded, because it describes a standing
+	// condition rather than something to go and do. A file project wears a full-strength one only
+	// while it holds changes its file does not.
+	//
+	// Tom corrected the original objection to a permanent asterisk (2026-08-04) and was right: it does
+	// not stop meaning "unsaved" and start meaning "not a file" -- that confuses POWER with MEANING. A
+	// browser project genuinely is unsaved. Only the fade is a guess; if it reads as broken or
+	// disappears on a phone it can go without touching the rule.
+	function tabAsterisk(entry) {
+		if (!isFileProject(entry)) { return { show: true, faded: true }; }
+		return { show: !!entry.dirty, faded: false };
+	}
+	function buildTab(p) {
+		var pc = EngCalcs.pageConfig || {}, isOpen = p.id === library.openId;
+		var tab = document.createElement('span');
+		tab.className = 'lpn-tab' + (isOpen ? ' lpn-tab-current' : '');
+		var btn = document.createElement('button');
+		btn.type = 'button';
+		btn.className = 'lpn-tab-name';
+		btn.title = isFileProject(p) ? p.fileName : projectDisplayName(p);
+		var star = tabAsterisk(p);
+		if (star.show) {
+			var s = document.createElement('span');
+			s.className = 'lpn-tab-star' + (star.faded ? ' lpn-tab-star-faint' : '');
+			s.textContent = '*';
+			btn.appendChild(s);
+			if (pc.lpn_tab_unsaved) { btn.title += ' — ' + pc.lpn_tab_unsaved; }
 		}
+		btn.appendChild(document.createTextNode(tabLabel(p)));
+		btn.addEventListener('click', function () { switchToTab(p.id); });
+		tab.appendChild(btn);
+		// The menu caret is on the CURRENT tab only, exactly as a spreadsheet's sheet tabs behave: one
+		// click to come here, a second to act on it. There is deliberately no per-tab [X] -- Close is
+		// the one destructive act left on this page now that Delete is gone, and it belongs behind a
+		// menu rather than under a one-character target sitting next to the tab you meant to click.
+		if (isOpen) {
+			var menu = document.createElement('button');
+			menu.type = 'button';
+			menu.className = 'lpn-tab-caret';
+			menu.textContent = '▾';
+			menu.title = pc.lpn_tab_menu || 'Project menu';
+			menu.addEventListener('click', function (e) { e.stopPropagation(); openProjectMenu(p.id, e.currentTarget); });
+			tab.appendChild(menu);
+		}
+		return tab;
 	}
-	function toggleProjectsPopup(evt) {
-		var popup = document.getElementById('lpn_projects_popup');
-		if (popup.style.display === 'block') { popup.style.display = 'none'; return; }
-		rebuildProjectsList();
-		// Same position-from-the-button-rect-then-clamp dance the other two popovers use.
-		var r = evt.currentTarget.getBoundingClientRect();
-		popup.style.left = r.left + 'px'; popup.style.top = r.bottom + 'px'; popup.style.display = 'block';
-		var pr = popup.getBoundingClientRect();
-		popup.style.left = Math.max(4, Math.min(r.left, window.innerWidth - pr.width - 4)) + 'px';
-		popup.style.top = Math.max(4, Math.min(r.bottom, window.innerHeight - pr.height - 4)) + 'px';
+	function renderTabs() {
+		var pc = EngCalcs.pageConfig || {}, strip = document.getElementById('lpn_tabs');
+		if (!strip) { return; }
+		strip.innerHTML = '';
+		// The vertical list lives at the LEFT edge of the strip (Tom's sketch). On a narrow screen it
+		// is the only way in, because CSS hides the strip itself there: this page has no horizontal
+		// room to spare on a phone, and a tab strip that wraps to three lines above a map is worse
+		// than a list behind one button.
+		var all = document.createElement('button');
+		all.type = 'button';
+		all.className = 'lpn-tab-btn';
+		all.textContent = '≡';
+		all.title = pc.lpn_tab_all || 'All projects';
+		all.addEventListener('click', function (e) { e.stopPropagation(); openTabListMenu(e.currentTarget); });
+		strip.appendChild(all);
+		var holder = document.createElement('span');
+		holder.className = 'lpn-tabs-scroll';
+		// Library order, NOT recency. The old Projects list sorted by most-recently-updated, which is
+		// right for a list you go and consult and wrong for tabs: a tab that moved every time you
+		// touched a different project could never be found twice in the same place.
+		library.projects.forEach(function (p) { holder.appendChild(buildTab(p)); });
+		strip.appendChild(holder);
+		var plus = document.createElement('button');
+		plus.type = 'button';
+		plus.className = 'lpn-tab-btn';
+		plus.textContent = '+';
+		plus.title = pc.lpn_tab_new || 'New project';
+		plus.addEventListener('click', function () { newProject(); renderTabs(); });
+		strip.appendChild(plus);
 	}
-	function wireProjectsPopup() {
-		document.getElementById('lpn_projects_popup_close').addEventListener('click', function () {
-			document.getElementById('lpn_projects_popup').style.display = 'none';
+	function switchToTab(id) {
+		if (id === library.openId) { return; }
+		openProject(id);
+		renderTabs();
+	}
+	// ---- menus ----
+	// One popover for all three menus (File, a tab's own, the overflow list). They differ only in
+	// their rows, so three popovers would have been three copies of the same positioning and dismissal.
+	function openMenu(anchor, rows) {
+		var popup = document.getElementById('lpn_menu_popup'), list = document.getElementById('lpn_menu_list');
+		if (!popup || !list) { return; }
+		list.innerHTML = '';
+		rows.forEach(function (r) {
+			if (r.separator) {
+				var hr = document.createElement('hr');
+				hr.style.cssText = 'margin:3px 0;border:0;border-top:1px solid #ccc';
+				list.appendChild(hr);
+				return;
+			}
+			var b = document.createElement('button');
+			b.type = 'button';
+			b.className = 'lpn-menu-row';
+			b.textContent = r.label;
+			// A menu row is its own click target, so the tip goes straight on it as a title matched to
+			// .ec-help for touch -- the same pattern the toolbar buttons use.
+			if (r.tip) { b.title = r.tip; b.className += ' ec-help'; }
+			b.disabled = !!r.disabled;
+			b.addEventListener('click', function () { closeMenu(); r.fn(); });
+			list.appendChild(b);
 		});
-		// The hidden picker lives in the page, not in the popup body, because rebuildProjectsList()
-		// replaces that body wholesale on every open -- the same reason lpn_backdrop_file does.
-		// Cleared after every pick so re-choosing the SAME file still fires a change event.
+		// Same position-from-the-anchor-rect-then-clamp dance the property popovers use.
+		var rect = anchor.getBoundingClientRect();
+		popup.style.left = rect.left + 'px';
+		popup.style.top = rect.bottom + 'px';
+		popup.style.display = 'block';
+		var pr = popup.getBoundingClientRect();
+		popup.style.left = Math.max(4, Math.min(rect.left, window.innerWidth - pr.width - 4)) + 'px';
+		popup.style.top = Math.max(4, Math.min(rect.bottom, window.innerHeight - pr.height - 4)) + 'px';
+		// Rows are built fresh on every open, so their tips are new DOM every time and need arming --
+		// this is exactly the case ROADMAP Task 173 added initTips(root) for (a tooltip built after
+		// page load is dead on touch without it).
+		if (EngCalcs.initTips) { EngCalcs.initTips(popup); }
+	}
+	function closeMenu() {
+		var p = document.getElementById('lpn_menu_popup');
+		if (p) { p.style.display = 'none'; }
+	}
+	function openFileMenu(anchor) {
+		var pc = EngCalcs.pageConfig || {}, id = library.openId, entry = indexEntry(id);
+		var linked = isLinked(id), api = fileApiAvailable();
+		openMenu(anchor, [
+			{ label: pc.lpn_file_new || 'New', fn: function () { newProject(); renderTabs(); } },
+			{ label: pc.lpn_file_open || 'Open…', fn: openFromFile },
+			{ separator: true },
+			// Where there is no File System Access API the button says what it will really do -- put
+			// another copy in the downloads folder -- rather than promising a save it cannot perform.
+			{
+				label: api ? (pc.lpn_file_save || 'Save') : (pc.lpn_file_download || 'Download a copy'),
+				tip: api ? null : pc.lpn_file_download_tip,
+				fn: saveCurrent
+			},
+			{ label: pc.lpn_file_saveas || 'Save as…', fn: saveAs, disabled: !api },
+			// Only offered when there is something to revert TO and something to revert FROM.
+			{ label: pc.lpn_file_revert || 'Revert', fn: revertCurrent, disabled: !(linked && entry && entry.dirty && !readOnly) },
+			{ separator: true },
+			{ label: pc.lpn_file_close || 'Close', fn: function () { closeTab(id); } }
+		]);
+	}
+	function openProjectMenu(id, anchor) {
+		var pc = EngCalcs.pageConfig || {}, entry = indexEntry(id);
+		if (!entry) { return; }
+		// Rename IS Save As on a file project: its name and its file's name are one name (Amendment 2).
+		// This is the label doing that work in the one place a user goes looking to rename something.
+		var renameLabel = isFileProject(entry) ? (pc.lpn_file_saveas || 'Save as…') : (pc.lpn_project_rename || 'Rename');
+		openMenu(anchor, [
+			{
+				label: renameLabel,
+				fn: function () {
+					if (isFileProject(entry)) { saveAs(); return; }
+					var v = window.prompt(pc.lpn_prompt_project_name || 'Name for this project', entry.name || '');
+					if (v === null) { return; }
+					renameProject(id, v.trim());
+					renderTabs();
+				}
+			},
+			{
+				label: pc.lpn_tab_duplicate || 'Duplicate',
+				fn: function () {
+					var suggested = projectDisplayName(entry) + (pc.lpn_project_copy_suffix || ' (copy)');
+					var v = window.prompt(pc.lpn_prompt_project_name || 'Name for this project', suggested);
+					if (v === null) { return; }
+					if (id !== library.openId) { openProject(id); }
+					saveProjectAs(v.trim());
+					renderTabs();
+				}
+			},
+			{ separator: true },
+			{ label: pc.lpn_file_close || 'Close', fn: function () { closeTab(id); } }
+		]);
+	}
+	function openTabListMenu(anchor) {
+		openMenu(anchor, library.projects.map(function (p) {
+			var star = tabAsterisk(p);
+			return {
+				label: (star.show ? '*' : '') + (isFileProject(p) ? p.fileName : projectDisplayName(p)),
+				fn: function () { switchToTab(p.id); }
+			};
+		}));
+	}
+	// ---- close ----
+	// Closing a tab is the ONLY way a project leaves this browser, and the asterisk decides whether it
+	// asks first. A clean file project goes quietly -- its work is on disk. Anything wearing an
+	// asterisk gets the question, in the words its situation deserves: a dirty file project can be
+	// saved, while a browser project has nowhere to be saved TO yet, so its first button is Save as
+	// and its message says plainly that closing without saving ends it.
+	function closeTab(id) {
+		var pc = EngCalcs.pageConfig || {}, entry = indexEntry(id);
+		if (!entry) { return; }
+		if (!tabAsterisk(entry).show) { discardProject(id); renderTabs(); return; }
+		var isBrowser = !isFileProject(entry), name = projectDisplayName(entry);
+		openDialog(function (body) {
+			var p = document.createElement('p');
+			p.style.margin = '0';
+			p.textContent = (isBrowser
+				? (pc.lpn_close_browser_prompt || '{name} is kept only in this browser. If you close it without saving it to a file, it is gone for good.')
+				: (pc.lpn_close_save_prompt || 'Save your changes to {name} before closing it?')).replace('{name}', name);
+			body.appendChild(p);
+		}, [
+			{
+				label: isBrowser ? (pc.lpn_file_saveas || 'Save as…') : (pc.lpn_file_save || 'Save'),
+				fn: async function () {
+					if (id !== library.openId) { switchToTab(id); }
+					if (isBrowser) { await saveAs(); } else { await saveCurrent(); }
+					// Close ONLY if the save really landed. A cancelled file picker or a failed write
+					// must leave the project exactly where it was rather than discarding it on the
+					// strength of having asked.
+					var after = indexEntry(id);
+					if (after && !tabAsterisk(after).show) { discardProject(id); renderTabs(); }
+				}
+			},
+			{ label: pc.lpn_close_discard || 'Close without saving', fn: function () { discardProject(id); renderTabs(); } },
+			{ label: pc.lpn_cancel || 'Cancel', fn: function () { } }
+		]);
+	}
+	// ---- the dialog ----
+	// Deliberately NOT window.confirm(): showSaveFilePicker() needs a live user activation, and
+	// Chrome's transient activation expires after a few seconds -- so a blocking dialog would work for
+	// a fast reader and throw "must be handling a user gesture" for a careful one. A button in here is
+	// a fresh click. The dialog is dismissed BEFORE the action runs, so the action inherits that click.
+	function openDialog(buildBody, buttons) {
+		var dlg = document.getElementById('lpn_dialog');
+		var body = document.getElementById('lpn_dialog_body');
+		var bar = document.getElementById('lpn_dialog_buttons');
+		if (!dlg || !body || !bar) { return; }
+		body.innerHTML = '';
+		bar.innerHTML = '';
+		buildBody(body);
+		buttons.forEach(function (b) {
+			var btn = document.createElement('button');
+			btn.type = 'button';
+			btn.style.marginLeft = '6px';
+			btn.textContent = b.label;
+			btn.addEventListener('click', function () { closeDialog(); b.fn(); });
+			bar.appendChild(btn);
+		});
+		dlg.style.display = 'block';
+	}
+	function closeDialog() {
+		var d = document.getElementById('lpn_dialog');
+		if (d) { d.style.display = 'none'; }
+	}
+	function wireTabs() {
+		// Dismiss the menu on any click that is not in it. The dialog is deliberately NOT dismissed
+		// this way -- it asks a question that has to be answered, and Cancel is one of the answers.
+		document.addEventListener('click', function (e) {
+			var popup = document.getElementById('lpn_menu_popup');
+			if (popup && popup.style.display === 'block' && !popup.contains(e.target)) { closeMenu(); }
+		});
+		// The hidden picker lives in the page, not in a popup body that gets replaced wholesale --
+		// the same reason lpn_backdrop_file does. Cleared after every pick so re-choosing the SAME
+		// file still fires a change event.
 		var fileInput = document.getElementById('lpn_project_file');
 		if (!fileInput) { return; }
 		fileInput.addEventListener('change', function () {
@@ -2945,11 +3243,17 @@ var EngCalcs = EngCalcs || {};
 		if (!window.confirm(pc.lpn_confirm_clear || 'This permanently deletes the network, the background image, and the project name. Your settings are kept. Continue?')) { return; }
 		doc = { nodes: [], links: [], labels: [] };
 		nextId = { J: 1, R: 1, L: 1, P: 1, T: 1 };
-		// "New" means a blank PROJECT, so the container resets with the network: scenarios back to
-		// Base alone (their overrides key element IDs that no longer exist) and the project name
-		// back to unnamed. Preferences (settings/labelSettings) still survive, as below.
+		// Empties the PROJECT, so the container resets with the network: scenarios back to Base alone
+		// (their overrides key element IDs that no longer exist). Preferences (settings/labelSettings)
+		// still survive, as below.
+		//
+		// **The NAME and the docId survive too** (changed by Task 211). They used to be wiped, which
+		// was defensible when a project was a row in a list and indefensible now that it is a tab:
+		// emptying the drawing would have left the tab you are looking at nameless, and a file project
+		// would have quietly become a different document to the lock broker. Clearing the canvas is
+		// not the same act as throwing the project away -- that is Close, and it asks first.
 		scenarios = defaultScenarios();
-		project = { name: '', activeScenario: 'base' };
+		project = { name: project.name, docId: project.docId, activeScenario: 'base' };
 		// "New" means a genuinely blank project (Task 146 Phase 2) -- the separate "Remove image"
 		// menu action clears just the backdrop without touching the network.
 		backdrop = null; backdropImg = null;
@@ -3027,9 +3331,10 @@ var EngCalcs = EngCalcs || {};
 			// First visit, or nothing readable: the library always has exactly one open project, so
 			// there is never a state where drawing has nowhere to be saved. Registered directly
 			// rather than through newProject(), which repaints a UI that does not exist yet.
-			var firstId = newProjectId();
-			library.projects.push({ id: firstId, name: '', updated: Date.now() });
+			var firstId = newProjectId(), firstName = nextProjectName();
+			library.projects.push({ id: firstId, name: firstName, updated: Date.now() });
 			library.openId = firstId;
+			project.name = firstName; // the tab and the document have to agree from the first frame
 			saveIndex();
 		}
 		wireLabelsPopup();
@@ -3039,7 +3344,7 @@ var EngCalcs = EngCalcs || {};
 		// units strip is in the DOM, which is what the seeding exists to wait for.
 		seedDefaultInputs();
 		wireSettingsPopup();
-		wireProjectsPopup();
+		wireTabs();
 		applyLegendPosition();
 		applyMapHeight();
 		// Node/vertex radii are already built at the right size (buildDom() reads symbolFactor()),
@@ -3048,25 +3353,38 @@ var EngCalcs = EngCalcs || {};
 		refreshSymbolSizes();
 		updateEmptyHint();
 		updateModeHint(); // initial mode is 'select', set before setMode() ever runs -- render it now
-		updateProjectName();
+		renderTabs();
 		// Rotating a phone changes innerHeight, and with it the cap above -- without this, turning a
 		// portrait phone to landscape leaves a canvas taller than the screen and re-creates exactly
 		// the trap the cap exists to prevent. orientationchange as well as resize: some mobile
 		// browsers fire only one of the two, and re-applying a height twice is free.
 		window.addEventListener('resize', applyMapHeight);
 		window.addEventListener('orientationchange', applyMapHeight);
-		// Task 195 Phase 2's tab-close flush. `visibilitychange` -> hidden is the one that actually
-		// works: it fires while the page is still fully alive, and on mobile it is frequently the ONLY
-		// one that fires at all before the tab is discarded. `beforeunload` is kept as a second net
-		// for a desktop close, but it is best-effort by nature -- the write is async and the browser
-		// is under no obligation to wait for it. localStorage is written synchronously on every edit
-		// regardless, so the worst case here is a file a little behind the browser copy, never lost
-		// work.
+		// **Nothing is flushed to a file on the way out any more** (Task 211). The locks ARE handed
+		// back, so a colleague is never left waiting on a browser that has gone; `visibilitychange` ->
+		// hidden is the one that actually fires on mobile, and `beforeunload` is the desktop net.
+		// releaseLock() uses sendBeacon precisely because a fetch() started during unload may never
+		// leave.
 		document.addEventListener('visibilitychange', function () {
-			if (document.visibilityState === 'hidden') { flushToFile(false); }
+			if (document.visibilityState === 'hidden') { releaseAllLocks(); }
 		});
-		window.addEventListener('beforeunload', function () { flushToFile(false); releaseLock(); });
-		restartFileAutosave();
+		// The browser's own "leave site?" prompt, and ONLY for a file project with unsaved changes.
+		// A browser project is NOT a reason to prompt here: it lives in localStorage and survives the
+		// browser closing perfectly well. It is only CLOSING ITS TAB that ends it, and closeTab() asks
+		// that question itself, in words that fit it. Prompting on every page close for something that
+		// is not at risk would teach people to click through the one prompt that matters.
+		window.addEventListener('beforeunload', function (e) {
+			releaseAllLocks();
+			var unsaved = library.projects.some(function (p) { return isFileProject(p) && p.dirty; });
+			if (!unsaved) { return; }
+			e.preventDefault();
+			e.returnValue = '';
+			return '';
+		});
+		// The heartbeat, on its own fixed 60 s timer -- no longer anybody's setting. See
+		// pollLockedFiles() for why that decoupling was the whole answer to Tom's "why must there be
+		// limits at all?".
+		setInterval(pollLockedFiles, LPN_HEARTBEAT_MS);
 		zoomExtent();
 		requestAnimationFrame(tick);
 	}
@@ -3110,14 +3428,16 @@ var EngCalcs = EngCalcs || {};
 		// Delete, Undo -- Select first for safety, per Tom's own correction of an earlier order),
 		// View (Zoom Extent).
 		var fileGroup = group();
-		// First in the File group and first on the toolbar: it names the open project, so it is also
-		// the page's answer to "which network am I looking at" (Task 146.08).
-		var projectsBtn = document.createElement('button');
-		projectsBtn.type = 'button';
-		projectsBtn.id = 'lpn_projects_btn';
-		projectsBtn.textContent = pc.lpn_tool_projects || 'Projects';
-		projectsBtn.addEventListener('click', toggleProjectsPopup);
-		fileGroup.appendChild(projectsBtn);
+		// First in the File group and first on the toolbar. It no longer NAMES the open project the
+		// way Task 146.08's Projects button did -- the tab strip above says that permanently, which is
+		// what a name belongs on. This is now an ordinary File menu: New, Open, Save, Save as, Revert,
+		// Close (Task 211).
+		var fileBtn = document.createElement('button');
+		fileBtn.type = 'button';
+		fileBtn.id = 'lpn_file_btn';
+		fileBtn.textContent = pc.lpn_tool_file || 'File';
+		fileBtn.addEventListener('click', function (e) { e.stopPropagation(); openFileMenu(e.currentTarget); });
+		fileGroup.appendChild(fileBtn);
 		var clearBtn = document.createElement('button');
 		clearBtn.type = 'button';
 		clearBtn.textContent = pc.lpn_tool_clear || 'Clear project';
@@ -3134,10 +3454,12 @@ var EngCalcs = EngCalcs || {};
 		fileGroup.appendChild(exampleBtn);
 		wireBackdropMenu(fileGroup);
 
-		// Everything from here that CHANGES THE NETWORK carries data-edits, which is the single
-		// thing setReadOnly() queries. Projects, Zoom to fit, Labels and Settings deliberately do
-		// not: looking around and changing what is displayed stay available to someone who may not
-		// edit (see setReadOnly() for where that line is drawn and why).
+		// `data-edits` is VESTIGIAL since Task 211 and nothing reads it. It marked the controls that
+		// read-only used to disable -- back when read-only took editing away. It no longer does:
+		// read-only now means only that you cannot save over somebody else's file, exactly as in Word,
+		// and Save routes to Save As instead. The attributes are left in place because they are a
+		// correct, maintained answer to "does this control change the network", which the next feature
+		// that needs that question (a review mode, a locked scenario) can use without re-deriving it.
 		var addGroup = group();
 		addGroup.dataset.edits = '1';
 		[
@@ -4142,27 +4464,13 @@ var EngCalcs = EngCalcs || {};
 		// often" justification for keeping it loose did not survive contact with the section it
 		// obviously belongs to.
 		row(mapBody, pc.lpn_settings_legend_position || 'Legend position', legendSelect);
-		// ---- 4. Saving to a file (Task 195 Phase 2) ----
-		// Its own section rather than a row inside Map display, where it was first written and did
-		// not belong: how often the file is written is not a display property, and the section is
-		// where any future file-related setting has an obvious home.
-		// Only built where a file can actually be linked. On Firefox and Safari there is no File
-		// System Access API, so "Save to file" is a one-shot download with nothing to autosave into,
-		// and a control for an interval that can never elapse would be a promise the browser cannot
-		// keep.
-		if (fileApiAvailable()) {
-			var fileBody = section('files', pc.lpn_settings_files || 'Saving to a file');
-			var fileSecsInput = document.createElement('input');
-			fileSecsInput.type = 'number'; fileSecsInput.step = '10'; fileSecsInput.min = '60'; fileSecsInput.max = '180';
-			fileSecsInput.value = settings.fileAutosaveSeconds;
-			fileSecsInput.addEventListener('change', function () {
-				var v = +fileSecsInput.value;
-				if (v >= 60 && v <= 180) { settings.fileAutosaveSeconds = v; saveToStorage(); restartFileAutosave(); }
-				else { fileSecsInput.value = settings.fileAutosaveSeconds; }
-			});
-			row(fileBody, pc.lpn_settings_file_autosave || 'Save to file every (seconds)', fileSecsInput,
-				pc.lpn_settings_file_autosave_tip);
-		}
+		// The "Saving to a file" section is GONE (Task 211). It held exactly one control -- how often
+		// the open project was written back to its file -- and nothing is written to a file on a timer
+		// any more, so there is no interval to set. Tom asked why the 60-180 s range existed at all;
+		// the honest answer was that one number was doing three jobs (write interval, lock heartbeat,
+		// and the how-long-before-a-colleague-may-take-over threshold), so the range was protecting a
+		// coupling rather than the user. Splitting those apart removed the setting instead of widening
+		// it, which is the better answer to the question he actually asked.
 		// ---- always visible: the one row worth never burying ----
 		// Tolerance, because it is the one setting that changes whether the answer is right.
 		// Headingless, per the note above.

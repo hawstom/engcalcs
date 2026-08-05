@@ -1,5 +1,19 @@
 # Task 195 test punch list — project files and locking (`lpn_`)
 
+> **§1–§8 ARE SUPERSEDED (2026-08-04).** Tom's pass through them is what produced the paradigm
+> rebuild in ROADMAP Task 211 — projects as tabs, an ordinary File menu, no autosave to the file,
+> opt-in read-only, and no Delete. Those eight sections describe controls that no longer exist and
+> must be rewritten against the new UI before the next browser pass; his annotations are left in
+> place because they are the record of *why* the rebuild happened.
+>
+> **§9–§13 survive as written** (no server, missing file, the Firefox/Safari fallback, server side,
+> non-regression) and are still the right tests.
+>
+> Three defects from that pass were fixed on production ahead of the rebuild (commit `6274a69`):
+> the `docId` was minted after the first file write instead of before — which is also why §6 saw no
+> lock contention at all — Clear/Wipe did not forget the initials, and Take over wrote a stale copy
+> over a colleague's newer file and has been withdrawn.
+
 Written 2026-08-03 for Tom's first real-browser pass. Everything in Task 195 was verified only by
 harnesses against sliced-out logic (177 checks, five harnesses); **no part of the UI has ever been
 seen rendered.** This list exists because that is the whole risk.
