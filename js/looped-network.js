@@ -3354,7 +3354,13 @@ var EngCalcs = EngCalcs || {};
 			{ label: pc.lpn_backdrop_position || 'Position', fn: function () { backdropAction('position'); }, disabled: !backdrop },
 			{ label: pc.lpn_backdrop_remove || 'Remove image', fn: function () { backdropAction('remove'); }, disabled: !backdrop },
 			{ separator: true },
-			{ label: pc.lpn_tool_example || 'Draw example network', fn: drawExampleNetwork }
+			{ label: pc.lpn_tool_example || 'Draw example network', fn: drawExampleNetwork },
+			// Dev-only, and last, and still wearing its bracketed label so it reads as
+			// not-a-real-feature (Tom, 2026-07-30, on the label). Deliberately NOT translated: it is
+			// scaffolding for measuring how ~100 links performs, and it goes when that question is
+			// settled -- see drawTestGrid(). Putting a throwaway through 26 languages would be worse
+			// than leaving it in English.
+			{ label: '[dev] Draw large test network', fn: drawTestGrid }
 		]);
 	}
 	function openViewMenu(anchor) {
@@ -3833,16 +3839,10 @@ var EngCalcs = EngCalcs || {};
 		settingsBtn.addEventListener('click', toggleSettingsPopup);
 		viewGroup.appendChild(settingsBtn);
 
-		// Temporary dev-only stress-test button (Tom, 2026-07-30): visually set apart (its own
-		// group, bracketed label) so it reads as not-a-real-feature. Remove once satisfied with
-		// how ~100 links performs -- see drawTestGrid() below.
-		var devGroup = group();
-		var testBtn = document.createElement('button');
-		testBtn.type = 'button';
-		testBtn.textContent = '[dev] Draw large test network';
-		testBtn.addEventListener('click', drawTestGrid);
-		testBtn.dataset.edits = '1';
-		devGroup.appendChild(testBtn);
+		// The dev-only stress-test button moved OFF the toolbar and to the foot of the Insert menu
+		// (Tom, 2026-08-04). A toolbar is the high-use subset of the menus, and a thing that reads
+		// "[dev]" is by definition not that -- it was taking a permanent slot on the one strip where
+		// space is scarcest. See openInsertMenu().
 	}
 
 	// One reservoir, one pump (a link, per the header comment above), one junction between
