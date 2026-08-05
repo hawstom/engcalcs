@@ -1334,287 +1334,18 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     Nobody is stranded meanwhile — "Save as my own copy" still works and `pollLock()` still hands the
     file over when the holder closes it. `lpn_lock_idle` is left in the lang files unused rather than
     deleted across 27 files for a surface about to be replaced.
-- 60|211| **The tab-and-File-menu paradigm: projects as tabs, files as files (Task 146 child).
-  Supersedes Task 195's Phase 2 UI.** Designed with Tom 2026-08-04, after his second browser pass on
-  Task 195 stopped partway with *"I apologize for this disruption, but I think we need to revisit the
-  project and file paradigm before I continue to test because things (the UX) are too confusing."*
-  The apology was unnecessary and the timing was ideal: the read-only enforcement code was about to
-  get deeper, and this **deletes more than it builds**.
-
-  **The diagnosis.** Task 195 invented three concepts a user has no name for — a "project" that is
-  neither a document nor a file, a "Close" that released a file while leaving the project on screen,
-  and a read-only mode that took editing away from someone who had not asked for it. Each was
-  defensible alone; together they needed a paragraph of explanation per control. Everything below is
-  conventional instead, which is not only kinder to the user but **cheaper for us**: less invention
-  means less rework, fewer strings, and a smaller translation surface when 146.06 finally runs.
-
-  **Canonical vocabulary** (use these words in code, comments, and this file):
-
-  | term | meaning |
-  |---|---|
-  | **browser project** | lives only in this browser, in no file. Always asterisked. |
-  | **file project** | promoted to a file. Asterisked only when dirty. |
-  | **project tab** | top strip, above the toolbar |
-  | **scenario tab** | bottom strip (Task 201 builds these) |
-  | **Close** | the only removal verb. **There is no Delete.** |
-
-  Tom first proposed "Web tab" for the browser project and accepted the substitution: *web* says
-  **on the internet**, and this thing's defining property is that it is on **no** server, in one
-  browser, on one machine. A user reading "web project" would reasonably assume we are keeping it for
-  them — precisely the misunderstanding the paradigm exists to remove — and most of the 26 languages
-  would render *web* as internet/network. Typing the **project** rather than the tab also avoids
-  colliding with the browser's own tabs.
-
-  **The one rule everything else falls out of:**
-
-  > **The asterisk decides. Asterisk → prompt on close. No asterisk → close silently.**
-
-  No tab types in the rule, no special cases. A browser project always carries an asterisk because it
-  is nowhere but this browser, so closing it always prompts — and closing it really does destroy the
-  only copy, which is why **Delete has nothing left to mean and disappears entirely** (`deleteProject()`
-  and its "Delete this project and everything in it? This cannot be undone." string go with it). A
-  file project carries one only when dirty, so a clean one closes silently, which is the ordinary
-  state one second after Save. The prompt is contextual: **Save As · Discard · Cancel** for a browser
-  project (Save has nowhere to go until you name a file), **Save · Discard · Cancel** for a dirty file
-  project.
-
-  **Tabs.**
-  - Placement is AutoCAD/PDF-editor, not browser-chrome: **site header → project tab strip → toolbar
-    → banner → map.** Everything below the strip is inside the tab. Tom leaned this way on
-    convention; it is also right for a structural reason — the toolbar and the read-only banner are
-    both *per-document* state, so the strip must sit above them for the tab panel to contain
-    everything the tab owns. This page has no input form above the map, so "top of page" and "top of
-    document" coincide and nothing is lost.
-  - Asterisk on **everything not written to a file**, faded on browser projects (a standing
-    condition), full strength on a dirty file project (an actionable one). **Tom corrected the
-    original objection here and was right:** the claim that a permanent asterisk would stop meaning
-    "unsaved" and start meaning "not a file" confused *power* with *meaning*. A browser project
-    genuinely is unsaved; the asterisk is honest; only its salience is at stake. Try the fade — if it
-    reads as broken or vanishes on a phone, drop it, because the meaning survives either way.
-  - **Tab label: middle-truncate, preserving the extension** — `Elm-Street-Apts-lpn….json`, full name
-    in the tab's `title`. Tom caught the hole in end-truncation: it eats the one character that proves
-    the thing is a file. And hyphens alone prove nothing, since a user may hyphenate a browser
-    project's name in anticipation of saving it. With the extension visible, **no glyph is needed** —
-    the name says "file", the asterisk says "unsaved", and the two facts stay independent.
-  - **New projects are named `Project {n}`** (`lpn_project_numbered`, JS substitutes), replacing the
-    "Untitled" fallback in `projectDisplayName()`. **`{n}` is the lowest integer not currently in use
-    among open tabs**, not a monotonic counter — close Project 2 and the next new tab is Project 2
-    again, as `Book1`/`Untitled-1` behave. A monotonic counter reaches "Project 47" in an afternoon
-    and reads as a leak.
-  - **Tab menu: Rename · Duplicate · Close.** Rename is labelled **`Save As…` on a file project**,
-    because a file project's name *is* its file name (see below).
-  - Overflow: a button at the left edge of the strip giving the vertical list. **On narrow screens the
-    vertical list is the primary and the strip hides** — this page has no horizontal room to spare on
-    a phone.
-
-  **A file project has one name, not two.** On promotion the file's base name *becomes* the project
-  name; Rename on a file project **is** Save As. This closes punch-list §2 (*"Rename → Save to file
-  silently saves to the original file name"*), which was not a bug — Save wrote the linked file and
-  Rename renamed the project, each correct alone — but a permanent trap: two names, one Rename, one
-  Save, and no way for a user to predict which one moved.
-
-  **File menu** (menu/toolbar, plus `Ctrl+S`):
-
-  ```
-  New                     ( = the [+] tab; identical function, must never diverge )
-  Open…
-  Open Recent  ▸          ( deferred — see below )
-  ─────
-  Save                    Ctrl+S
-  Save As…
-  Revert
-  Close
-  ```
-  - **Save is in the File menu and nowhere else — not the tab menu.** The tab menu acts on *a* tab,
-    including one that is not current (as in Google Sheets), and every item in it works that way.
-    Save acts on the current document; putting it there invites "save that other tab", which we would
-    have to either build or grey out.
-  - **`New` and `[+]` are the same function**, per convention: a new browser project, nothing on disk.
-  - **`Revert`** — re-read the handle and reload; enabled only on a dirty file project; confirms
-    first. Killing autosave leaves a bad experiment with no escape beyond the undo stack, and this is
-    the counterpart to Discard-on-close. It also builds the **"re-read from disk"** primitive that a
-    repaired Take over will need, so it pays for itself twice.
-  - **No Import/Export yet.** Tom offered them as placeholders for the EPANET interface; those names
-    belong to Task 196 and return as `Import ▸ EPANET .inp` / `Export ▸ EPANET .inp` submenus, so the
-    format is part of the name and nobody wonders how Export differs from Save. A second pair of file
-    verbs beside Open/Save today would rebuild the confusion this task is removing.
-  - **No Print.** Tom, 2026-08-04: *"Print is a 'never' priority. Screenshots are better, I think.
-    Maybe that can change."* Task 175 owns any future suite-wide printing.
-
-  **Saving: the backup problem, and why autosave-to-file dies.** Tom, punch-list §1.7: *"Autosave
-  should not modify the main save file... User must have the ability to Close without saving any
-  changes from this session. That is the standard paradigm."* Correct, and it is the most serious
-  item in his list — silently writing the master file on a timer removes the user's ability to
-  abandon a session. Therefore:
-  - **Save is explicit** (`Ctrl+S`, File → Save). **Nothing writes the master file on a timer.**
-  - **Close / tab-close / browser-close prompt**, per the asterisk rule above.
-  - **localStorage keeps the working copy of a file project continuously, as an unsaved-changes
-    cache — not a second authority** — and is cleared on a clean save-and-close. Reopening after a
-    crash offers *"This project has unsaved changes from a previous session. Restore or discard?"*
-  - **Deliberately NOT a sibling `.bak` file** (Tom's option (b), which he withdrew in favour of
-    convention): it is a second artifact in the engineer's folder that they did not ask for, that we
-    cannot reliably clean up, and that they will have to explain to somebody. localStorage recovers
-    the *session*, not a file-shaped guess at it, and costs nothing new.
-
-  **Read-only is opt-in, and it is real.**
-  - Opening a locked file presents **one dialog at open time**: *"Dave T. has this file open."* →
-    **Open read-only · Save as my own copy · Cancel**. Tom's AutoCAD instinct, and also Word and
-    Excel: a surprise becomes a decision.
-  - **Choosing read-only is permanent for that tab. Nothing promotes it behind your back** — the
-    `pollLock()` promotion built on 2026-08-03 is removed. Tom: *"Read only is read only."*
-  - **Read-only means what it means in Word: you may edit freely, you just cannot save over that
-    file.** Save on a read-only tab is always Save As. **This deletes all four read-only enforcement
-    seams** (`data-edits` on the toolbar, the pointer-handler guard, the `setMode()` force, the
-    `openPopupAt()` disable pass) — the item ranked #2 most-likely-defective on the punch list.
-  - **No re-check-on-save offer.** This was proposed and Tom killed it with the decisive argument:
-    a read-only tab holds a snapshot from *before* the holder released, so the file on disk is
-    **newer**; saving over it would destroy their work with no merge. Not merely bait-and-switch —
-    data loss. **The same physics is what condemned Take over** (see Task 195's 2026-08-04 fixes).
-
-  **What this deletes, net.** The four read-only seams; `pollLock()`'s promotion; the two-state
-  banner machine (collapses to one persistent read-only strip); autosave-to-file, the
-  `fileAutosaveSeconds` setting and its 60–180 s clamp; `deleteProject()` and its confirm string;
-  "Save as my own copy" as a banner-only escape (it becomes ordinary Save As); and the whole
-  Projects popup. **What it builds:** the tab strip and its menu, the File menu, dirty/prompt-on-close,
-  Revert, and the open-time lock dialog. Smaller than what it replaces, and far smaller to explain.
-
-  **The autosave interval's 60–180 s clamp was an error and goes away.** One number was doing three
-  jobs — the file-write interval, the lock heartbeat (`flushToFile()` piggybacked `acquire` on every
-  write), and the takeover threshold (`2 ×` it in `presentLockedOut()`). Tom asked why limits exist at
-  all; the honest answer is that they were protecting a coupling that should not exist. With autosave
-  gone: **heartbeat on its own fixed timer (60 s), quiet-holder threshold its own fixed constant
-  (~5 min), and no user-facing interval setting at all.**
-
-  **Deferred, deliberately: `Open Recent`.** A file handle dies with the tab today, so File → Open
-  always means navigating the picker again, even for the file open ten minutes ago. Handles can be
-  persisted in IndexedDB and re-permissioned with one click, which would make Open Recent real. Tom
-  agreed to defer: it is purely additive, changes nothing about the paradigm, and is worth building
-  once the rest is proven in a browser. (Note this is the same capability Task 208 wants for
-  `isSameEntry()`, so the two should be built together when they are built.)
-
-  **Translation cost: zero, and this is why 146.06 has not run.** Every string this task adds,
-  renames or deletes is English-only, because `lpn_`'s sprint is deliberately unrun. Had the 26
-  languages been translated when Task 195 shipped, this redesign would have cost a full resync of a
-  surface that turned out to be wrong. Concrete vindication of the scaffold-before-translate rule.
-
-  **Knock-ons, checked 2026-08-04:**
-  - **Task 208 (the sharing hole) gets materially smaller and should be re-decided after this, not
-    before.** With no autosave, the lock only has to be right at **two moments — Open and Save** —
-    instead of continuously; and the open-time dialog already offers "Save as my own copy" as a
-    first-class choice rather than a banner escape, which is most of what 208(b) was complaining
-    about. The hybrid-sidecar direction Tom endorsed (*"Hybrid sidecar: I love it"*) is unaffected in
-    substance but should be re-costed against the smaller problem.
-  - **Task 201 (scenario UI) gains a decided home**: scenario tabs along the bottom strip, mirroring
-    project tabs on top. Reserve the space in this task even though 201 builds the contents. Note the
-    slight imperfection Tom raised and accepted: conventionally top tabs are *files* and bottom tabs
-    are *parts*, whereas our top strip mixes filed and unfiled projects — but that mixture is itself
-    conventional (a browser has unsaved tabs; VS Code puts `Untitled-1` beside real files; Excel
-    opens `Book1` next to workbooks from disk).
-  - **Task 209 (snoozable tips)** — the training panel is still its first instance; the panel's
-    *content* changes with this task (see below), its mechanism does not.
-  - **Task 196 (EPANET)** — its two verbs are reserved in the File menu, as submenus.
-  - **Punch list `dev/lpn-file-lock-test-punchlist.md`** — §1–§8 are rewritten by this task; §9–§13
-    (no server, missing file, the Firefox/Safari fallback, server side, non-regression) survive as
-    written and stay with Task 195.
-
-  **Also fix while in here, from the same pass:**
-  - **`lpn_file_training_3` is false today**: it says the initials can be seen by "anyone you send the
-    file to", but `serializeProject()` never writes them — they live in `localStorage` and on the
-    broker. The true statement is *anyone who opens the same file*, which stays true under 208's
-    sidecar. Reword, do not delete.
-  - **`lpn_projects_heading` ("Saved projects")** and **`lpn_file_saving_to` ("Saving to: {file}")**
-    both die with the Projects popup. Tom on the latter: *"initially unsettling as in 'How long does
-    saving take?!?!'"* The tab strip replaces both — the file name is visible permanently, at the top,
-    where every other application puts it.
-  - **Nothing is untranslatable about "automatically"** (Tom asked why the word was missing from the
-    training text and Settings). It was written around, that is all; all 26 languages have an
-    ordinary adverb for it. Moot for autosave, which is being removed, but do not write around it
-    again elsewhere.
-  - **One press of Save opened two file dialogs, once, unreproduced** (§1). No path found that gives
-    two pickers on consecutive presses with a stable `openId`. It goes back on the punch list after
-    the rebuild rather than being chased in code that is about to be replaced.
-- 55|208| **A lock that travels with a COPY of a file is the wrong lock — the sharing hole in Task
-  195 Phase 2 (Task 146 child).** Raised by Tom, 2026-08-03, thinking past the office case the lock
-  broker was designed for: *"What if somebody shares their project outside their office?"* Two
-  consequences, and he is right about both.
-  - **(a) The friendly name goes everywhere the file does.** "Locked by Dave in Planning" was written
-    for colleagues and is then read by strangers. **Partly mitigated 2026-08-03** — the prompt now
-    asks for *initials* and says outright that anyone you send the file to can see it, which makes
-    the safe answer the obvious one. Mitigation, not a fix: the name is still broadcast.
-  - **(b) Strangers lock each other out.** `docId` is baked into the file, so every copy of a shared
-    file answers to ONE lock record. Two unrelated people who were both sent the file contend for it,
-    and the loser is read-only over a project the winner has never heard of. **Partly mitigated
-    2026-08-03** — "Save as my own copy" is now offered in the locked-out banner (including during
-    the please-wait window, since someone outside the office is not waiting for anything), turning a
-    lockout into one click. Still: the *default* experience of opening a shared file can be a lockout,
-    and that is backwards.
-
-  **Why the obvious fixes do not work.** Tom proposed AutoCAD's side-by-side `.dwg`/`.dwl` pair, and
-  identified the blocker himself: we cannot find "a file in the same folder as" a file. A
-  `FileSystemFileHandle` gives a name and nothing else — no path, no parent — unless the user grants a
-  *directory* handle, which is a different and much heavier permission prompt. Worth noting one real
-  capability we do have and are not using: **`handle.isSameEntry()`** can tell whether two handles
-  point at the same file, and handles can be persisted in IndexedDB. That does not solve sharing
-  (it is per-browser), but it would let us answer "is this the same file I had last time" across
-  sessions — which is the honest version of the moved-vs-copied question for a single user, and is
-  Tom's 7.1 ("we can keep a persistent reference in this browser").
-
-  **Candidate directions, none chosen:**
-  - **Ask a directory handle for the project's folder** and keep the project file AND a sidecar lock
-    file in it — Tom's 2026-08-03 proposal, and the strongest option on the table. `showDirectoryPicker()`
-    returns a `FileSystemDirectoryHandle`, and `getFileHandle(name, {create:true})` reads or creates
-    any file in that folder, so the AutoCAD `.dwg`/`.dwl` pattern he wanted **is** reachable. This
-    supersedes the earlier note in this task that we cannot find "a file in the same folder as" —
-    that is true of a *file* handle and false of a *directory* handle, and the distinction is the
-    whole idea. It would put the friendly name in the lock file, keep the lock with the *location*
-    rather than the *document*, and **may remove the need for `lpn-lock.php` altogether**: a file
-    sent outside the office arrives with no lock file beside it and so locks nobody out, which is
-    exactly the failure this task exists for.
-    - **Tom, on hearing "Chromium-only": *"That's fatal. Too bad."* — but the premise is wrong, and
-      this should not be dropped for that reason.** `showSaveFilePicker`/`showOpenFilePicker`, which
-      Phase 2 step 1 already ships and depends on, are Chromium-only *by the same measure*. The
-      directory picker costs **no additional browser reach** — the set of users who get live file
-      saving at all is identical either way, and everyone else already falls back to Phase 1's
-      download/import. If Chromium-only were disqualifying here, it would equally disqualify the
-      live-file model already built, which is a much bigger decision than this one.
-    - **The real costs**, which are not compatibility: a heavier one-time permission prompt (a folder,
-      not a file); the loss of the native Save-As dialog, so the file name comes from us or from a
-      second step (Tom: *"maybe not so bad. I could test it"*); and — the one genuine technical
-      weakness — **no atomic test-and-set**. Two browsers can both read "no lock file" and both
-      create one, where `lpn-lock.php`'s `flock()` has no such window. A hybrid (sidecar for
-      identity and location-scoping, server broker as arbiter when reachable) may be the honest
-      answer, and is the direction Tom endorsed 2026-08-03 (*"Hybrid sidecar: I love it"*).
-    - **What that race is, precisely** — Tom asked whether it meant a moved file arriving without its
-      sidecar; it does not, and the distinction matters. It is an ordinary time-of-check-to-time-of-use
-      race **in the normal case**: two browsers open the same file in the same folder at nearly the
-      same moment, both call `getFileHandle()` for the lock file, both see nothing there, both
-      conclude the project is free, and both create a lock naming themselves. Last write wins and
-      **both believe they hold it**. A file system reached through this API offers no atomic
-      create-if-absent to close that window, whereas `flock()` does. On a network share the window is
-      far wider than raw simultaneity suggests, because SMB/NFS client caching can hide a
-      just-created file from another machine for seconds. **A moved file with no sidecar is a
-      different thing and is the behavior we WANT**: no lock file beside it means nobody is locked
-      out, which is exactly how a file shared outside the office stops contending with the original.
-    - Directory handles persist in IndexedDB like file handles, so re-opening a known folder need
-      not re-prompt.
-  - **Scope the lock to a declared team**, so a lock record is per (docId × team) and an outsider
-    simply never sees an insider's lock. Cheap, but requires a shared secret nobody wants to manage.
-  - **Ask on open, rather than assume**, per Tom's own sketch: *"This project is currently locked by
-    'ABC' in another browser or at another location. SaveAs, Take over, or Cancel?"* — which is close
-    to what now ships, and may be all this needs if the wording carries the "One True Copy" idea.
-  - **Accept it and document it**: locking is for a shared drive in one office; a file you send
-    outside should be forked on arrival.
-
-  Do not treat the 2026-08-03 mitigations as closing this. They make the failure survivable; they do
-  not make the lock mean the right thing.
-
-  **Re-decide this AFTER Task 211, not before (2026-08-04).** Killing autosave-to-file shrinks the
-  problem: the lock only has to be right at **two moments — Open and Save** — rather than
-  continuously, and 211's open-time dialog already offers "Save as my own copy" as a first-class
-  choice rather than a banner escape, which is most of what (b) was complaining about. The
-  hybrid-sidecar direction is unaffected in substance but should be re-costed against the smaller
-  problem. Note also that 211 defers `Open Recent`, which wants the same persisted-handle capability
-  as `isSameEntry()` here — build the two together.
+- 20|212| **Persisted file handles: `Open Recent`, and answering "is this the same file?" (Task 146
+  child).** Extracted 2026-08-05 from Task 211's deliberate deferral and Task 208's one live
+  remnant — both want the same capability, and 211 already said to build them together.
+  - **Today a `FileSystemFileHandle` dies with the page**, so File → Open always means navigating the
+    picker again, even for the file open ten minutes ago. Handles persist in IndexedDB and are
+    re-permissioned with one click, which makes **Open Recent** real; the File menu already reserves
+    the row.
+  - **`handle.isSameEntry()`** answers whether two handles point at the same file — the honest,
+    per-browser version of the moved-vs-copied question for a single user (Tom's 7.1, "we can keep a
+    persistent reference in this browser"). It does not solve sharing and is not meant to.
+  - Purely additive: changes nothing about the tab-and-File-menu paradigm, which is why 211 deferred
+    it rather than absorbing it. Worth building once that paradigm has been proven in a browser.
 
 - 40|209| **A snoozable tip system (Task 146 child, but suite-shaped).** Asked for by Tom,
   2026-08-03, while reviewing Task 195's file-and-lock explanation: the page needs somewhere to put
@@ -2039,6 +1770,319 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|211| **[DONE 2026-08-05] The tab-and-File-menu paradigm: projects as tabs, files as files (Task 146 child).
+  Supersedes Task 195's Phase 2 UI.** Designed with Tom 2026-08-04, after his second browser pass on
+  Task 195 stopped partway with *"I apologize for this disruption, but I think we need to revisit the
+  project and file paradigm before I continue to test because things (the UX) are too confusing."*
+  The apology was unnecessary and the timing was ideal: the read-only enforcement code was about to
+  get deeper, and this **deletes more than it builds**.
+
+  **The diagnosis.** Task 195 invented three concepts a user has no name for — a "project" that is
+  neither a document nor a file, a "Close" that released a file while leaving the project on screen,
+  and a read-only mode that took editing away from someone who had not asked for it. Each was
+  defensible alone; together they needed a paragraph of explanation per control. Everything below is
+  conventional instead, which is not only kinder to the user but **cheaper for us**: less invention
+  means less rework, fewer strings, and a smaller translation surface when 146.06 finally runs.
+
+  **Canonical vocabulary** (use these words in code, comments, and this file):
+
+  | term | meaning |
+  |---|---|
+  | **browser project** | lives only in this browser, in no file. Always asterisked. |
+  | **file project** | promoted to a file. Asterisked only when dirty. |
+  | **project tab** | top strip, above the toolbar |
+  | **scenario tab** | bottom strip (Task 201 builds these) |
+  | **Close** | the only removal verb. **There is no Delete.** |
+
+  Tom first proposed "Web tab" for the browser project and accepted the substitution: *web* says
+  **on the internet**, and this thing's defining property is that it is on **no** server, in one
+  browser, on one machine. A user reading "web project" would reasonably assume we are keeping it for
+  them — precisely the misunderstanding the paradigm exists to remove — and most of the 26 languages
+  would render *web* as internet/network. Typing the **project** rather than the tab also avoids
+  colliding with the browser's own tabs.
+
+  **The one rule everything else falls out of:**
+
+  > **The asterisk decides. Asterisk → prompt on close. No asterisk → close silently.**
+
+  No tab types in the rule, no special cases. A browser project always carries an asterisk because it
+  is nowhere but this browser, so closing it always prompts — and closing it really does destroy the
+  only copy, which is why **Delete has nothing left to mean and disappears entirely** (`deleteProject()`
+  and its "Delete this project and everything in it? This cannot be undone." string go with it). A
+  file project carries one only when dirty, so a clean one closes silently, which is the ordinary
+  state one second after Save. The prompt is contextual: **Save As · Discard · Cancel** for a browser
+  project (Save has nowhere to go until you name a file), **Save · Discard · Cancel** for a dirty file
+  project.
+
+  **Tabs.**
+  - Placement is AutoCAD/PDF-editor, not browser-chrome: **site header → project tab strip → toolbar
+    → banner → map.** Everything below the strip is inside the tab. Tom leaned this way on
+    convention; it is also right for a structural reason — the toolbar and the read-only banner are
+    both *per-document* state, so the strip must sit above them for the tab panel to contain
+    everything the tab owns. This page has no input form above the map, so "top of page" and "top of
+    document" coincide and nothing is lost.
+  - Asterisk on **everything not written to a file**, faded on browser projects (a standing
+    condition), full strength on a dirty file project (an actionable one). **Tom corrected the
+    original objection here and was right:** the claim that a permanent asterisk would stop meaning
+    "unsaved" and start meaning "not a file" confused *power* with *meaning*. A browser project
+    genuinely is unsaved; the asterisk is honest; only its salience is at stake. Try the fade — if it
+    reads as broken or vanishes on a phone, drop it, because the meaning survives either way.
+  - **Tab label: middle-truncate, preserving the extension** — `Elm-Street-Apts-lpn….json`, full name
+    in the tab's `title`. Tom caught the hole in end-truncation: it eats the one character that proves
+    the thing is a file. And hyphens alone prove nothing, since a user may hyphenate a browser
+    project's name in anticipation of saving it. With the extension visible, **no glyph is needed** —
+    the name says "file", the asterisk says "unsaved", and the two facts stay independent.
+  - **New projects are named `Project {n}`** (`lpn_project_numbered`, JS substitutes), replacing the
+    "Untitled" fallback in `projectDisplayName()`. **`{n}` is the lowest integer not currently in use
+    among open tabs**, not a monotonic counter — close Project 2 and the next new tab is Project 2
+    again, as `Book1`/`Untitled-1` behave. A monotonic counter reaches "Project 47" in an afternoon
+    and reads as a leak.
+  - **Tab menu: Rename · Duplicate · Close.** Rename is labelled **`Save As…` on a file project**,
+    because a file project's name *is* its file name (see below).
+  - Overflow: a button at the left edge of the strip giving the vertical list. **On narrow screens the
+    vertical list is the primary and the strip hides** — this page has no horizontal room to spare on
+    a phone.
+
+  **A file project has one name, not two.** On promotion the file's base name *becomes* the project
+  name; Rename on a file project **is** Save As. This closes punch-list §2 (*"Rename → Save to file
+  silently saves to the original file name"*), which was not a bug — Save wrote the linked file and
+  Rename renamed the project, each correct alone — but a permanent trap: two names, one Rename, one
+  Save, and no way for a user to predict which one moved.
+
+  **File menu** (menu/toolbar, plus `Ctrl+S`):
+
+  ```
+  New                     ( = the [+] tab; identical function, must never diverge )
+  Open…
+  Open Recent  ▸          ( deferred — see below )
+  ─────
+  Save                    Ctrl+S
+  Save As…
+  Revert
+  Close
+  ```
+  - **Save is in the File menu and nowhere else — not the tab menu.** The tab menu acts on *a* tab,
+    including one that is not current (as in Google Sheets), and every item in it works that way.
+    Save acts on the current document; putting it there invites "save that other tab", which we would
+    have to either build or grey out.
+  - **`New` and `[+]` are the same function**, per convention: a new browser project, nothing on disk.
+  - **`Revert`** — re-read the handle and reload; enabled only on a dirty file project; confirms
+    first. Killing autosave leaves a bad experiment with no escape beyond the undo stack, and this is
+    the counterpart to Discard-on-close. It also builds the **"re-read from disk"** primitive that a
+    repaired Take over will need, so it pays for itself twice.
+  - **No Import/Export yet.** Tom offered them as placeholders for the EPANET interface; those names
+    belong to Task 196 and return as `Import ▸ EPANET .inp` / `Export ▸ EPANET .inp` submenus, so the
+    format is part of the name and nobody wonders how Export differs from Save. A second pair of file
+    verbs beside Open/Save today would rebuild the confusion this task is removing.
+  - **No Print.** Tom, 2026-08-04: *"Print is a 'never' priority. Screenshots are better, I think.
+    Maybe that can change."* Task 175 owns any future suite-wide printing.
+
+  **Saving: the backup problem, and why autosave-to-file dies.** Tom, punch-list §1.7: *"Autosave
+  should not modify the main save file... User must have the ability to Close without saving any
+  changes from this session. That is the standard paradigm."* Correct, and it is the most serious
+  item in his list — silently writing the master file on a timer removes the user's ability to
+  abandon a session. Therefore:
+  - **Save is explicit** (`Ctrl+S`, File → Save). **Nothing writes the master file on a timer.**
+  - **Close / tab-close / browser-close prompt**, per the asterisk rule above.
+  - **localStorage keeps the working copy of a file project continuously, as an unsaved-changes
+    cache — not a second authority** — and is cleared on a clean save-and-close. Reopening after a
+    crash offers *"This project has unsaved changes from a previous session. Restore or discard?"*
+  - **Deliberately NOT a sibling `.bak` file** (Tom's option (b), which he withdrew in favour of
+    convention): it is a second artifact in the engineer's folder that they did not ask for, that we
+    cannot reliably clean up, and that they will have to explain to somebody. localStorage recovers
+    the *session*, not a file-shaped guess at it, and costs nothing new.
+
+  **Read-only is opt-in, and it is real.**
+  - Opening a locked file presents **one dialog at open time**: *"Dave T. has this file open."* →
+    **Open read-only · Save as my own copy · Cancel**. Tom's AutoCAD instinct, and also Word and
+    Excel: a surprise becomes a decision.
+  - **Choosing read-only is permanent for that tab. Nothing promotes it behind your back** — the
+    `pollLock()` promotion built on 2026-08-03 is removed. Tom: *"Read only is read only."*
+  - **Read-only means what it means in Word: you may edit freely, you just cannot save over that
+    file.** Save on a read-only tab is always Save As. **This deletes all four read-only enforcement
+    seams** (`data-edits` on the toolbar, the pointer-handler guard, the `setMode()` force, the
+    `openPopupAt()` disable pass) — the item ranked #2 most-likely-defective on the punch list.
+  - **No re-check-on-save offer.** This was proposed and Tom killed it with the decisive argument:
+    a read-only tab holds a snapshot from *before* the holder released, so the file on disk is
+    **newer**; saving over it would destroy their work with no merge. Not merely bait-and-switch —
+    data loss. **The same physics is what condemned Take over** (see Task 195's 2026-08-04 fixes).
+
+  **What this deletes, net.** The four read-only seams; `pollLock()`'s promotion; the two-state
+  banner machine (collapses to one persistent read-only strip); autosave-to-file, the
+  `fileAutosaveSeconds` setting and its 60–180 s clamp; `deleteProject()` and its confirm string;
+  "Save as my own copy" as a banner-only escape (it becomes ordinary Save As); and the whole
+  Projects popup. **What it builds:** the tab strip and its menu, the File menu, dirty/prompt-on-close,
+  Revert, and the open-time lock dialog. Smaller than what it replaces, and far smaller to explain.
+
+  **The autosave interval's 60–180 s clamp was an error and goes away.** One number was doing three
+  jobs — the file-write interval, the lock heartbeat (`flushToFile()` piggybacked `acquire` on every
+  write), and the takeover threshold (`2 ×` it in `presentLockedOut()`). Tom asked why limits exist at
+  all; the honest answer is that they were protecting a coupling that should not exist. With autosave
+  gone: **heartbeat on its own fixed timer (60 s), quiet-holder threshold its own fixed constant
+  (~5 min), and no user-facing interval setting at all.**
+
+  **Deferred, deliberately: `Open Recent`.** A file handle dies with the tab today, so File → Open
+  always means navigating the picker again, even for the file open ten minutes ago. Handles can be
+  persisted in IndexedDB and re-permissioned with one click, which would make Open Recent real. Tom
+  agreed to defer: it is purely additive, changes nothing about the paradigm, and is worth building
+  once the rest is proven in a browser. (Note this is the same capability Task 208 wants for
+  `isSameEntry()`, so the two should be built together when they are built.)
+
+  **Translation cost: zero, and this is why 146.06 has not run.** Every string this task adds,
+  renames or deletes is English-only, because `lpn_`'s sprint is deliberately unrun. Had the 26
+  languages been translated when Task 195 shipped, this redesign would have cost a full resync of a
+  surface that turned out to be wrong. Concrete vindication of the scaffold-before-translate rule.
+
+  **Knock-ons, checked 2026-08-04:**
+  - **Task 208 (the sharing hole) gets materially smaller and should be re-decided after this, not
+    before.** With no autosave, the lock only has to be right at **two moments — Open and Save** —
+    instead of continuously; and the open-time dialog already offers "Save as my own copy" as a
+    first-class choice rather than a banner escape, which is most of what 208(b) was complaining
+    about. The hybrid-sidecar direction Tom endorsed (*"Hybrid sidecar: I love it"*) is unaffected in
+    substance but should be re-costed against the smaller problem.
+  - **Task 201 (scenario UI) gains a decided home**: scenario tabs along the bottom strip, mirroring
+    project tabs on top. Reserve the space in this task even though 201 builds the contents. Note the
+    slight imperfection Tom raised and accepted: conventionally top tabs are *files* and bottom tabs
+    are *parts*, whereas our top strip mixes filed and unfiled projects — but that mixture is itself
+    conventional (a browser has unsaved tabs; VS Code puts `Untitled-1` beside real files; Excel
+    opens `Book1` next to workbooks from disk).
+  - **Task 209 (snoozable tips)** — the training panel is still its first instance; the panel's
+    *content* changes with this task (see below), its mechanism does not.
+  - **Task 196 (EPANET)** — its two verbs are reserved in the File menu, as submenus.
+  - **Punch list `dev/lpn-file-lock-test-punchlist.md`** — §1–§8 are rewritten by this task; §9–§13
+    (no server, missing file, the Firefox/Safari fallback, server side, non-regression) survive as
+    written and stay with Task 195.
+
+  **Also fix while in here, from the same pass:**
+  - **`lpn_file_training_3` is false today**: it says the initials can be seen by "anyone you send the
+    file to", but `serializeProject()` never writes them — they live in `localStorage` and on the
+    broker. The true statement is *anyone who opens the same file*, which stays true under 208's
+    sidecar. Reword, do not delete.
+  - **`lpn_projects_heading` ("Saved projects")** and **`lpn_file_saving_to` ("Saving to: {file}")**
+    both die with the Projects popup. Tom on the latter: *"initially unsettling as in 'How long does
+    saving take?!?!'"* The tab strip replaces both — the file name is visible permanently, at the top,
+    where every other application puts it.
+  - **Nothing is untranslatable about "automatically"** (Tom asked why the word was missing from the
+    training text and Settings). It was written around, that is all; all 26 languages have an
+    ordinary adverb for it. Moot for autosave, which is being removed, but do not write around it
+    again elsewhere.
+  - **One press of Save opened two file dialogs, once, unreproduced** (§1). No path found that gives
+    two pickers on consecutive presses with a stable `openId`. It goes back on the punch list after
+    the rebuild rather than being chased in code that is about to be replaced.
+
+  **CLOSED 2026-08-05.** Shipped across commits `8aa5b51`…`d3aba33`; Tom judged it finished and a
+  source audit agreed. Verified rather than assumed: every *built* item is present (tab strip with
+  `[X]` per tab and an overflow list, the tab menu, the File menu including `Revert`,
+  `lpn_project_numbered` with lowest-unused-`{n}`, middle-truncation preserving the extension in
+  `tabLabel()`, the asterisk rule in `tabAsterisk()`, the contextual close prompts, the open-time
+  lock dialog with Open read-only / Create a copy / Cancel), and every *deleted* item is gone —
+  `deleteProject()`, `pollLock()`'s promotion, `fileAutosaveSeconds` and its 60–180 s clamp,
+  `data-edits` and the other three read-only seams, `lpn_projects_heading`, `lpn_file_saving_to`,
+  the Projects popup. The only surviving mentions of those names are comments explaining their own
+  removal. The heartbeat runs on its own fixed 60 s timer and `pollLockedFiles()` deliberately never
+  polls a read-only tab, so nothing promotes behind the user's back.
+  **One loose end found and fixed on closing:** `lpn_lock_prompt_name` still carried the false claim
+  this task fixed in `lpn_file_training_3` — "anyone you send the file to can see it", when
+  `serializeProject()` never writes the name into the file at all. Reworded to match
+  ("anyone who opens the same file"). Both strings now say the same true thing.
+  `Open Recent` remains deliberately deferred and is now **Task 212**, extracted so it is not buried
+  in a closed block.
+
+- 0|208| **[OBSOLETE 2026-08-05] A lock that travels with a COPY of a file is the wrong lock — the sharing hole in Task
+  **RULED OBSOLETE by Tom, 2026-08-05, on reading the post-211 state.** Task 211 did what the
+  "re-decide after 211" note below anticipated, and further: the lockout this task existed to fix
+  is no longer something that happens *to* a user. Opening a file somebody else holds now presents
+  one dialog with **Create a copy** as a first-class answer, so the shared-outside-the-office case
+  resolves in a single click instead of stranding the opener read-only over a project they have
+  never heard of. With autosave-to-file gone the lock only has to be right at Open and Save, and at
+  both of those moments the user is present and answering a question. The sidecar/directory-handle
+  machinery below was sized against a continuous, silent lock that no longer exists.
+  **What remains true, recorded so it is not rediscovered as a surprise:** `docId` is still baked
+  into the file, so two strangers sent the same copy still answer to one lock record — they simply
+  meet it as a dialog now; and the friendly name is still shown to whoever opens the same file
+  (never written into the file itself — see the `lpn_lock_prompt_name` fix in Task 211). Neither is
+  a defect worth building the sidecar for. **The one genuinely live idea here — persisted file
+  handles in IndexedDB and `handle.isSameEntry()` — is extracted to Task 212** rather than left in
+  a closed block, since Task 211's deferred `Open Recent` wants the same capability.
+
+  195 Phase 2 (Task 146 child).** Raised by Tom, 2026-08-03, thinking past the office case the lock
+  broker was designed for: *"What if somebody shares their project outside their office?"* Two
+  consequences, and he is right about both.
+  - **(a) The friendly name goes everywhere the file does.** "Locked by Dave in Planning" was written
+    for colleagues and is then read by strangers. **Partly mitigated 2026-08-03** — the prompt now
+    asks for *initials* and says outright that anyone you send the file to can see it, which makes
+    the safe answer the obvious one. Mitigation, not a fix: the name is still broadcast.
+  - **(b) Strangers lock each other out.** `docId` is baked into the file, so every copy of a shared
+    file answers to ONE lock record. Two unrelated people who were both sent the file contend for it,
+    and the loser is read-only over a project the winner has never heard of. **Partly mitigated
+    2026-08-03** — "Save as my own copy" is now offered in the locked-out banner (including during
+    the please-wait window, since someone outside the office is not waiting for anything), turning a
+    lockout into one click. Still: the *default* experience of opening a shared file can be a lockout,
+    and that is backwards.
+  **Why the obvious fixes do not work.** Tom proposed AutoCAD's side-by-side `.dwg`/`.dwl` pair, and
+  identified the blocker himself: we cannot find "a file in the same folder as" a file. A
+  `FileSystemFileHandle` gives a name and nothing else — no path, no parent — unless the user grants a
+  *directory* handle, which is a different and much heavier permission prompt. Worth noting one real
+  capability we do have and are not using: **`handle.isSameEntry()`** can tell whether two handles
+  point at the same file, and handles can be persisted in IndexedDB. That does not solve sharing
+  (it is per-browser), but it would let us answer "is this the same file I had last time" across
+  sessions — which is the honest version of the moved-vs-copied question for a single user, and is
+  Tom's 7.1 ("we can keep a persistent reference in this browser").
+  **Candidate directions, none chosen:**
+  - **Ask a directory handle for the project's folder** and keep the project file AND a sidecar lock
+    file in it — Tom's 2026-08-03 proposal, and the strongest option on the table. `showDirectoryPicker()`
+    returns a `FileSystemDirectoryHandle`, and `getFileHandle(name, {create:true})` reads or creates
+    any file in that folder, so the AutoCAD `.dwg`/`.dwl` pattern he wanted **is** reachable. This
+    supersedes the earlier note in this task that we cannot find "a file in the same folder as" —
+    that is true of a *file* handle and false of a *directory* handle, and the distinction is the
+    whole idea. It would put the friendly name in the lock file, keep the lock with the *location*
+    rather than the *document*, and **may remove the need for `lpn-lock.php` altogether**: a file
+    sent outside the office arrives with no lock file beside it and so locks nobody out, which is
+    exactly the failure this task exists for.
+    - **Tom, on hearing "Chromium-only": *"That's fatal. Too bad."* — but the premise is wrong, and
+      this should not be dropped for that reason.** `showSaveFilePicker`/`showOpenFilePicker`, which
+      Phase 2 step 1 already ships and depends on, are Chromium-only *by the same measure*. The
+      directory picker costs **no additional browser reach** — the set of users who get live file
+      saving at all is identical either way, and everyone else already falls back to Phase 1's
+      download/import. If Chromium-only were disqualifying here, it would equally disqualify the
+      live-file model already built, which is a much bigger decision than this one.
+    - **The real costs**, which are not compatibility: a heavier one-time permission prompt (a folder,
+      not a file); the loss of the native Save-As dialog, so the file name comes from us or from a
+      second step (Tom: *"maybe not so bad. I could test it"*); and — the one genuine technical
+      weakness — **no atomic test-and-set**. Two browsers can both read "no lock file" and both
+      create one, where `lpn-lock.php`'s `flock()` has no such window. A hybrid (sidecar for
+      identity and location-scoping, server broker as arbiter when reachable) may be the honest
+      answer, and is the direction Tom endorsed 2026-08-03 (*"Hybrid sidecar: I love it"*).
+    - **What that race is, precisely** — Tom asked whether it meant a moved file arriving without its
+      sidecar; it does not, and the distinction matters. It is an ordinary time-of-check-to-time-of-use
+      race **in the normal case**: two browsers open the same file in the same folder at nearly the
+      same moment, both call `getFileHandle()` for the lock file, both see nothing there, both
+      conclude the project is free, and both create a lock naming themselves. Last write wins and
+      **both believe they hold it**. A file system reached through this API offers no atomic
+      create-if-absent to close that window, whereas `flock()` does. On a network share the window is
+      far wider than raw simultaneity suggests, because SMB/NFS client caching can hide a
+      just-created file from another machine for seconds. **A moved file with no sidecar is a
+      different thing and is the behavior we WANT**: no lock file beside it means nobody is locked
+      out, which is exactly how a file shared outside the office stops contending with the original.
+    - Directory handles persist in IndexedDB like file handles, so re-opening a known folder need
+      not re-prompt.
+  - **Scope the lock to a declared team**, so a lock record is per (docId × team) and an outsider
+    simply never sees an insider's lock. Cheap, but requires a shared secret nobody wants to manage.
+  - **Ask on open, rather than assume**, per Tom's own sketch: *"This project is currently locked by
+    'ABC' in another browser or at another location. SaveAs, Take over, or Cancel?"* — which is close
+    to what now ships, and may be all this needs if the wording carries the "One True Copy" idea.
+  - **Accept it and document it**: locking is for a shared drive in one office; a file you send
+    outside should be forked on arrival.
+  Do not treat the 2026-08-03 mitigations as closing this. They make the failure survivable; they do
+  not make the lock mean the right thing.
+  **Re-decide this AFTER Task 211, not before (2026-08-04).** Killing autosave-to-file shrinks the
+  problem: the lock only has to be right at **two moments — Open and Save** — rather than
+  continuously, and 211's open-time dialog already offers "Save as my own copy" as a first-class
+  choice rather than a banner escape, which is most of what (b) was complaining about. The
+  hybrid-sidecar direction is unaffected in substance but should be re-costed against the smaller
+  problem. Note also that 211 defers `Open Recent`, which wants the same persisted-handle capability
+  as `isSameEntry()` here — build the two together.
 
 - 0|210| **[DONE 2026-08-03] Stop counting Tom's own visits in the usage logs.** Asked 2026-08-03: *"is it hard to
   ignore my visits? I suppose we can pretty easily detect me in the logs if I exercise many

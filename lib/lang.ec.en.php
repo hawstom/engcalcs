@@ -1297,10 +1297,12 @@ $ec_lang['lpn_file_write_failed']='Could not write to the file. It may have been
 // Project locks (Task 195 Phase 2) -- who is editing a shared project file right now. {name} is a
 // person as they chose to be known ("Dave T."), never a login; word order is the translator's to
 // choose. A lock never expires on its own, so none of these may suggest waiting will free it.
-// Initials, and said to be public: a shared project file carries this name to everyone who opens it,
-// including outside the office (Tom, 2026-08-03 -- "your friendly name may need to be a cryptic
-// name"). Asking for initials rather than a name makes the safe answer the obvious one.
-$ec_lang['lpn_lock_prompt_name']='What should colleagues see when you have this project open? Your initials are ideal. Anyone you send the file to can see it, so do not use anything private.';
+// Initials, and said to be public: whoever opens the same file sees this name, including outside the
+// office (Tom, 2026-08-03 -- "your friendly name may need to be a cryptic name"). Asking for initials
+// rather than a name makes the safe answer the obvious one.
+// Corrected 2026-08-05 to match lpn_file_training_3, which Task 211 fixed and this string missed: the
+// name is never written into the project file, so "anyone you send the file to" was false here too.
+$ec_lang['lpn_lock_prompt_name']='What should colleagues see when you have this project open? Your initials are ideal. Anyone who opens the same file can see it, so do not use anything private.';
 // The stand-in when someone locked a project before giving a name. Reads in place of {name}
 // everywhere above, so it has to work mid-sentence.
 $ec_lang['lpn_lock_somebody']='Somebody else';
