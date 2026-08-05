@@ -1169,7 +1169,6 @@ $ec_lang['lpn_result_pressure']='Pressure';
 $ec_lang['lpn_result_flow']='Flow';
 $ec_lang['lpn_result_velocity']='Velocity';
 $ec_lang['lpn_result_headloss']='Head loss';
-$ec_lang['lpn_tool_clear']='Clear project';
 // The three reset controls -- Clear project (toolbar), Restore all settings and Delete all projects
 // (Settings panel) -- get THREE tips, not one shared one. The shared version claimed they had to be
 // "used together" to reach a first-time-visitor state; that is false (Tom caught it 2026-07-31).
@@ -1177,12 +1176,10 @@ $ec_lang['lpn_tool_clear']='Clear project';
 // Delete all projects alone is the full reset, exactly as init()'s own comment says. Each tip now
 // states only its own scope, so none of them can be wrong about the others -- and no tip quotes
 // another button's label, which is the cross-key dependency lpn_empty_hint was fixed for.
-$ec_lang['lpn_tool_clear_tip']='Empties this project: the drawing and the background image. Its name, your settings, and your other projects are not changed.';
 $ec_lang['lpn_settings_restore_tip']='Resets this project\'s settings only. Your drawing and your other projects are not changed.';
 $ec_lang['lpn_reset_all_tip']='Deletes every project, every background image, every setting, and your unit choices, then reloads the page exactly as a first-time visitor sees it. This is the only reset that clears everything.';
-// The project NAME is no longer wiped by this (Task 211): a project is a tab, and emptying the
-// drawing must not leave the tab you are looking at nameless. Throwing the project away is Close.
-$ec_lang['lpn_confirm_clear']='This permanently deletes the network and the background image from this project. Its name, your settings, and your other projects are kept. Continue?';
+// `lpn_tool_clear`, `lpn_tool_clear_tip` and `lpn_confirm_clear` were REMOVED by Task 211 with the
+// "Clear project" command itself -- see lpn_edit_delete_network for what replaced it and why.
 $ec_lang['lpn_storage_too_new']='This project was saved by a newer version of the page, so it cannot be opened here.';
 // ---- Projects as tabs, files as files (ROADMAP Task 211) ----
 // The whole surface below follows one rule: THE ASTERISK DECIDES. A tab wearing an asterisk has
@@ -1191,7 +1188,28 @@ $ec_lang['lpn_storage_too_new']='This project was saved by a newer version of th
 // has unsaved changes. Nothing here needs the words "browser project" or "file project" -- those are
 // our words for talking about the code, and the user sees only a name, an asterisk, and a file
 // extension.
+// The menu bar. The MENU holds everything; the TOOLBAR is the high-use subset of it, which is the
+// conventional relationship and the reason the duplication between them is correct rather than
+// sloppy. Names are the ones every desktop application has used for thirty years -- this is a
+// paradigm we are ADOPTING, not inventing, and the point of adopting one is that nobody has to be
+// taught it (Tom, 2026-08-04).
 $ec_lang['lpn_tool_file']='File';
+$ec_lang['lpn_menu_edit']='Edit';
+$ec_lang['lpn_menu_insert']='Insert';
+$ec_lang['lpn_menu_view']='View';
+// "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
+// this one, and of the three, Settings is the word a person is most likely to look for first.
+$ec_lang['lpn_menu_settings']='Settings';
+// Replaces "Clear project" (Task 211). Tom, 2026-08-04: that command was a vestige of the days when
+// this page held ONE project -- with tabs, emptying a project is not a thing anyone needs, because
+// starting a new tab and closing the old one is the same act in fewer ideas. What is genuinely still
+// wanted is emptying the DRAWING while keeping the project: duplicate a project, delete its network,
+// keep its settings and its background image.
+$ec_lang['lpn_edit_delete_network']='Delete network';
+$ec_lang['lpn_confirm_delete_network']='Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone.';
+$ec_lang['lpn_view_units']='Units…';
+// Offered only when more than one file has unsaved changes, which is the only time it beats Save.
+$ec_lang['lpn_file_saveall']='Save all';
 // {n} is a whole number. Assigned at creation as a real, renameable name -- and it is the LOWEST
 // number not currently in use, so closing Project 2 makes the next new project Project 2 again. A
 // counter that only ever went up would reach "Project 47" in an afternoon and read as a fault.

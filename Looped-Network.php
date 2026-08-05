@@ -21,7 +21,14 @@ document.addEventListener('DOMContentLoaded', function() {
 	      // flex-wrap lets the two pieces re-flow onto separate lines on a narrow screen without any
 	      // extra markup -- the wrap-first-as-a-table/div behavior Tom asked for falls out of
 	      // flex-wrap for free. ?>
-	<div class="d-flex flex-wrap align-items-center d-print-none" style="gap:4px 12px">
+	<?php // The units block now lives in a POPOVER off View -> Units (ROADMAP Task 211, Tom
+	      // 2026-08-04: "the units selectors really should be in a menu"). Units are set once and
+	      // then left alone, so a permanent row of seven dropdowns was spending the scarcest thing
+	      // this page has -- vertical room above the map -- on a decision nobody revisits. The US/SI
+	      // preset row comes with them, because it is the same decision at a coarser grain. ?>
+	<div id="lpn_units_popup" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:20;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
+	<div class="lpn-popover-body">
+	<div class="d-flex flex-wrap align-items-center" style="gap:4px 12px">
 	<?php echoUnitsRow(false, true); // hide Restore Defaults -- this page has no cookie to restore (Tom, 2026-07-30) ?>
 	<?php // Six selectors (Tom, 2026-07-30, +Velocity added answering "are there others?"):
 	      // Length/Map is declarative-only (AutoCAD-style grid units, no SI conversion -- see the
@@ -46,22 +53,29 @@ document.addEventListener('DOMContentLoaded', function() {
 		<?=$ec_lang['lpn_result_gradient']?> <?php echoUnitSelect('lpn_u_gradient', 'gradient', ''); ?>
 	</div>
 	</div>
-	<?php // Project tab strip (ROADMAP Task 211). ABOVE the toolbar, deliberately: the toolbar and the
-	      // lock banner below it are both per-document state, so the strip has to sit above them for
-	      // the tab panel to contain everything the tab owns. That is also the AutoCAD / PDF-editor
-	      // placement Tom chose over browser-chrome placement -- tabs sit on top of the document, and
-	      // on this page the top of the document and the top of the content area are the same line. ?>
-	<div class="d-print-none" id="lpn_tabs"></div>
+	<button type="button" id="lpn_units_popup_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">×</button>
+	</div>
+	<?php // Menu, toolbar, tabs, map -- top to bottom (ROADMAP Task 211, revised 2026-08-04 after Tom
+	      // saw the first version rendered). The MENU holds everything; the TOOLBAR is the high-use
+	      // subset of it, which is the conventional relationship between the two and the reason
+	      // duplication between them is correct rather than sloppy. The TAB STRIP sits last, directly
+	      // on top of the map, the way a PDF editor's document tabs and AutoCAD's layout tabs do:
+	      // the tab is the document, and the document is what is under it. The first version put the
+	      // strip above the toolbar on the argument that the toolbar is per-document state; with a
+	      // real menu bar above it that argument stops paying for itself, because the strip then sits
+	      // in the middle of the chrome instead of against the thing it names. ?>
+	<div class="d-print-none" id="lpn_menubar"></div>
 	<div class="d-print-none" id="lpn_toolbar"></div>
+	<div class="d-print-none" id="lpn_tabs"></div>
 	<?php // Lock banner (Task 195 Phase 2). Empty and hidden until either someone else holds the lock
 	      // on the project file (read-only, red) or something needs warning about but not blocking --
 	      // no server to lock against, or a linked file that has gone missing (amber). renderBanner()
 	      // in js/looped-network.js fills it and sets the colors; read-only wins when both apply. ?>
 	<div class="d-print-none" id="lpn_lock_banner" role="status" style="display:none;margin:4px 0;padding:6px 8px;border:1px solid #a80;background:#fffbe6"></div>
 	<input type="file" id="lpn_backdrop_file" accept="image/*" style="display:none">
-	<?php // Project import (Task 195). Lives here rather than inside #lpn_projects_popup because
-	      // rebuildProjectsList() replaces that popup's body on every open, which would take the
-	      // input's wired change handler with it. ?>
+	<?php // Project import (Task 195). Lives here in the page, not inside any popover body, because
+	      // those bodies get rebuilt wholesale and would take the input's wired change handler with
+	      // them -- the same reason lpn_backdrop_file sits here. ?>
 	<input type="file" id="lpn_project_file" accept=".json,application/json" style="display:none">
 	<?php // Floating "choose target mode" step of the Position sequence (Task 146 Phase 2) --
 	      // mirrors #lpn_labels_popup's static-PHP-plus-JS-clamped-position pattern (position:fixed,
@@ -246,13 +260,18 @@ EngCalcs.pageConfig = {
 	lpn_result_headloss: <?=json_encode($ec_lang['lpn_result_headloss'])?>,
 	lpn_result_gradient: <?=json_encode($ec_lang['lpn_result_gradient'])?>,
 	lpn_result_gradient_tip: <?=json_encode($ec_lang['lpn_result_gradient_tip'])?>,
-	lpn_tool_clear: <?=json_encode($ec_lang['lpn_tool_clear'])?>,
-	lpn_tool_clear_tip: <?=json_encode($ec_lang['lpn_tool_clear_tip'])?>,
 	lpn_settings_restore_tip: <?=json_encode($ec_lang['lpn_settings_restore_tip'])?>,
 	lpn_reset_all_tip: <?=json_encode($ec_lang['lpn_reset_all_tip'])?>,
-	lpn_confirm_clear: <?=json_encode($ec_lang['lpn_confirm_clear'])?>,
 	lpn_storage_too_new: <?=json_encode($ec_lang['lpn_storage_too_new'])?>,
 	lpn_tool_file: <?=json_encode($ec_lang['lpn_tool_file'])?>,
+	lpn_menu_edit: <?=json_encode($ec_lang['lpn_menu_edit'])?>,
+	lpn_menu_insert: <?=json_encode($ec_lang['lpn_menu_insert'])?>,
+	lpn_menu_view: <?=json_encode($ec_lang['lpn_menu_view'])?>,
+	lpn_menu_settings: <?=json_encode($ec_lang['lpn_menu_settings'])?>,
+	lpn_edit_delete_network: <?=json_encode($ec_lang['lpn_edit_delete_network'])?>,
+	lpn_confirm_delete_network: <?=json_encode($ec_lang['lpn_confirm_delete_network'])?>,
+	lpn_view_units: <?=json_encode($ec_lang['lpn_view_units'])?>,
+	lpn_file_saveall: <?=json_encode($ec_lang['lpn_file_saveall'])?>,
 	lpn_project_numbered: <?=json_encode($ec_lang['lpn_project_numbered'])?>,
 	lpn_project_copy_suffix: <?=json_encode($ec_lang['lpn_project_copy_suffix'])?>,
 	lpn_project_rename: <?=json_encode($ec_lang['lpn_project_rename'])?>,

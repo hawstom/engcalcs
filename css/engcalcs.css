@@ -216,10 +216,19 @@ html[lang="zh"] .ec-welcome {
 /* Three groups (Add / Delete-Undo-Select / Zoom-Example) -- a wider gap, not a line, separates
    them (Tom, 2026-07-30: a divider line was more than needed). */
 .lpn-toolbar-group { display: inline-flex; gap: 6px; margin-right: 14px; }
+/* ---- Menu bar (ROADMAP Task 211) ----
+   Above the toolbar, and holding every command on the page; the toolbar below is the high-use
+   subset. Flat text buttons, because a menu bar that looks like a row of push-buttons reads as a
+   second toolbar. */
+#lpn_menubar { display: flex; gap: 2px; margin-bottom: 4px; }
+.lpn-menubar-item { background: none; border: 1px solid transparent; font: inherit; padding: 3px 10px; cursor: pointer; }
+.lpn-menubar-item:hover { background: #def; border-color: #9bd; }
 /* ---- Project tab strip (ROADMAP Task 211) ----
-   Sits ABOVE the toolbar, so everything below it reads as being inside the current tab. Tabs join
-   the content below them the way tabs do everywhere: a bottom border on the strip, and the current
-   tab punching a hole in it. */
+   Sits directly ON TOP OF THE MAP, below the toolbar (revised 2026-08-04 after seeing the first
+   version rendered): with a real menu bar in the chrome above, the strip belongs against the thing
+   it names, the way a PDF editor's document tabs and AutoCAD's layout tabs do. Tabs join the content
+   below them the way tabs do everywhere: a bottom border on the strip, and the current tab punching
+   a hole in it. */
 #lpn_tabs {
 	display: flex; align-items: flex-end; gap: 2px;
 	border-bottom: 1px solid #999; margin-bottom: 6px; padding: 0 2px;
@@ -232,7 +241,12 @@ html[lang="zh"] .ec-welcome {
 .lpn-tab-name, .lpn-tab-caret, .lpn-tab-btn {
 	background: none; border: 0; font: inherit; color: inherit; cursor: pointer; padding: 3px 8px; white-space: nowrap;
 }
-.lpn-tab-caret { padding: 3px 5px; border-left: 1px solid #ccc; }
+.lpn-tab-caret, .lpn-tab-x { padding: 3px 5px; border-left: 1px solid #ccc; background: none; border-top: 0; border-right: 0; border-bottom: 0; font: inherit; color: inherit; cursor: pointer; }
+/* The [X] is on EVERY tab, not just the current one -- that is what the paradigm we are adopting
+   does, and the whole return on adopting one is that nobody has to be taught it (Tom, 2026-08-04).
+   Muted until hovered so a strip of tabs does not read as a row of close buttons. */
+.lpn-tab-x { color: #777; }
+.lpn-tab-x:hover { color: #a00; background: #f4d4d4; }
 .lpn-tab-btn { border: 1px solid transparent; align-self: center; }
 .lpn-tab-name:hover, .lpn-tab-caret:hover, .lpn-tab-btn:hover { background: #ddd; }
 /* THE ASTERISK. Full strength means "there are changes this file does not have" -- something to go

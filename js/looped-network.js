@@ -1746,6 +1746,15 @@ var EngCalcs = EngCalcs || {};
 		// was true when it was written and has not been for some time; corrected there too.)
 		try { if (EngCalcs.expireCookie) { EngCalcs.expireCookie(); } } catch (err) { /* non-fatal */ }
 	}
+	// The whole-page reset, behind one confirm. Extracted from the Settings button's inline handler
+	// (Task 211) so the Settings MENU can offer the same act -- one implementation, two doors, which
+	// is the rule for every command that appears in both a menu and a control.
+	function wipeEverything() {
+		var pc = EngCalcs.pageConfig || {};
+		if (!window.confirm(pc.lpn_confirm_wipe || 'Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone.')) { return; }
+		wipeAllStorage();
+		window.location.reload();
+	}
 	// Time-ordered prefix plus randomness: sortable for debugging, and collision-free even when two
 	// projects are created in the same millisecond in two tabs.
 	function newProjectId() {
@@ -2427,6 +2436,26 @@ var EngCalcs = EngCalcs || {};
 			setNotice((pc.lpn_status_saved || 'Saved {file}.').replace('{file}', (entry && entry.fileName) || ''));
 		}
 	}
+	function dirtyFileCount() {
+		return library.projects.filter(function (p) { return isFileProject(p) && p.dirty; }).length;
+	}
+	// File -> Save all. Walks the dirty file projects, opening each in turn -- a save writes the OPEN
+	// project, so there is no second write path to keep in step with the first. Read-only tabs and
+	// tabs whose handle died with the last page load are skipped rather than made to interrupt with a
+	// file picker each; "save all" must never turn into a queue of dialogs.
+	async function saveAllFiles() {
+		var startAt = library.openId;
+		var todo = library.projects.filter(function (p) {
+			return isFileProject(p) && p.dirty && isLinked(p.id) && !roProjects.has(p.id);
+		}).map(function (p) { return p.id; });
+		for (var i = 0; i < todo.length; i++) {
+			if (todo[i] !== library.openId) { openProject(todo[i]); }
+			saveToStorage();
+			await writeOpenProjectToFile();
+		}
+		if (startAt && startAt !== library.openId) { openProject(startAt); }
+		renderTabs();
+	}
 	// File -> Save as. Also the answer to Rename on a file project, to a read-only tab that wants to
 	// keep its work, and to the first save of a browser project.
 	async function saveAs() {
@@ -2995,10 +3024,8 @@ var EngCalcs = EngCalcs || {};
 		btn.appendChild(document.createTextNode(tabLabel(p)));
 		btn.addEventListener('click', function () { switchToTab(p.id); });
 		tab.appendChild(btn);
-		// The menu caret is on the CURRENT tab only, exactly as a spreadsheet's sheet tabs behave: one
-		// click to come here, a second to act on it. There is deliberately no per-tab [X] -- Close is
-		// the one destructive act left on this page now that Delete is gone, and it belongs behind a
-		// menu rather than under a one-character target sitting next to the tab you meant to click.
+		// The menu caret is on the CURRENT tab only, as a spreadsheet's sheet tabs behave: one click
+		// to come here, a second to act on it.
 		if (isOpen) {
 			var menu = document.createElement('button');
 			menu.type = 'button';
@@ -3008,6 +3035,19 @@ var EngCalcs = EngCalcs || {};
 			menu.addEventListener('click', function (e) { e.stopPropagation(); openProjectMenu(p.id, e.currentTarget); });
 			tab.appendChild(menu);
 		}
+		// [X] ON EVERY TAB (Tom, 2026-08-04: "We need the [X] because we aren't inventing the
+		// paradigm, we are adopting it. And file tabs have [X]."). The first version left it off, on
+		// the argument that Close is now the only destructive act and deserves to sit behind a menu.
+		// That argument loses: the whole return on adopting a paradigm is that nobody has to be taught
+		// it, and an [X] is the single most recognised control in the tab paradigm. The safety it was
+		// meant to buy is bought instead by the close prompt, which is where it belongs.
+		var x = document.createElement('button');
+		x.type = 'button';
+		x.className = 'lpn-tab-x';
+		x.textContent = '×';
+		x.title = pc.lpn_file_close || 'Close';
+		x.addEventListener('click', function (e) { e.stopPropagation(); closeTab(p.id); });
+		tab.appendChild(x);
 		return tab;
 	}
 	function renderTabs() {
@@ -3053,6 +3093,7 @@ var EngCalcs = EngCalcs || {};
 		if (!popup || !list) { return; }
 		list.innerHTML = '';
 		rows.forEach(function (r) {
+			if (r.hidden) { return; }
 			if (r.separator) {
 				var hr = document.createElement('hr');
 				hr.style.cssText = 'margin:3px 0;border:0;border-top:1px solid #ccc';
@@ -3102,11 +3143,111 @@ var EngCalcs = EngCalcs || {};
 				fn: saveCurrent
 			},
 			{ label: pc.lpn_file_saveas || 'Save as…', fn: saveAs, disabled: !api },
+			// Only shown when it beats Save -- more than one file with unsaved changes. On a page
+			// where most people will only ever have one, a permanent row would be clutter that never
+			// once did anything.
+			{ label: pc.lpn_file_saveall || 'Save all', fn: saveAllFiles, hidden: dirtyFileCount() < 2 },
 			// Only offered when there is something to revert TO and something to revert FROM.
 			{ label: pc.lpn_file_revert || 'Revert', fn: revertCurrent, disabled: !(linked && entry && entry.dirty && !readOnly) },
 			{ separator: true },
 			{ label: pc.lpn_file_close || 'Close', fn: function () { closeTab(id); } }
 		]);
+	}
+	// ---- The menu bar (ROADMAP Task 211, 2026-08-04) ----
+	// Every command on this page is reachable from here. The toolbar below is the high-use subset,
+	// which is the conventional relationship between the two -- so a command appearing in both is
+	// correct, not duplication to be cleaned up.
+	//
+	// The names are the ones desktop applications have used for thirty years (File, Edit, Insert,
+	// View, Settings). Adopting a paradigm only pays if it is adopted whole: a menu bar with clever
+	// names of our own would cost the user exactly what a menu bar is supposed to save them.
+	//
+	// Rows are data, not markup, so moving a command between menus is a one-line change. That is
+	// deliberate -- where each command belongs is a judgement Tom will want to revise after seeing it.
+	function openEditMenu(anchor) {
+		var pc = EngCalcs.pageConfig || {};
+		openMenu(anchor, [
+			{ label: pc.lpn_tool_undo || 'Undo', fn: undo },
+			{ separator: true },
+			// Select all -> Delete is the paradigmatic route and this page cannot offer it yet: the
+			// selection model is single-element. Until multi-select exists, this named command IS
+			// that route, and it is the honest way to say so -- a greyed-out "Select all" would be a
+			// promise with nothing behind it.
+			{ label: pc.lpn_tool_delete || 'Delete', fn: function () { setMode(mode === 'delete' ? 'select' : 'delete'); } },
+			{ label: pc.lpn_edit_delete_network || 'Delete network', fn: deleteNetwork }
+		]);
+	}
+	function openInsertMenu(anchor) {
+		var pc = EngCalcs.pageConfig || {};
+		openMenu(anchor, [
+			{ label: pc.lpn_tool_add_reservoir || 'Reservoir', fn: function () { setMode('add-reservoir'); } },
+			{ label: pc.lpn_tool_add_pump || 'Pump', fn: function () { setMode('add-pump'); } },
+			{ label: pc.lpn_tool_add_junction || 'Junction', fn: function () { setMode('add-junction'); } },
+			{ label: pc.lpn_tool_add_pipe || 'Pipe', fn: function () { setMode('add-pipe'); } },
+			{ label: pc.lpn_tool_add_text || 'Text', fn: function () { setMode('add-text'); } },
+			{ separator: true },
+			{ label: pc.lpn_backdrop_add || 'Background image', fn: function () { var f = document.getElementById('lpn_backdrop_file'); if (f) { f.click(); } } },
+			{ label: pc.lpn_tool_example || 'Draw example network', fn: drawExampleNetwork }
+		]);
+	}
+	function openViewMenu(anchor) {
+		var pc = EngCalcs.pageConfig || {};
+		openMenu(anchor, [
+			{ label: pc.lpn_tool_zoom_extent || 'Zoom to fit', fn: zoomExtent },
+			{ separator: true },
+			// The popover openers position themselves from evt.currentTarget, so a menu row hands them
+			// the menu-bar button it came from -- the popover then opens under "View", where the eye
+			// already is, rather than under a toolbar button that may not even be on screen.
+			{ label: pc.lpn_tool_labels || 'Labels', fn: function () { toggleLabelsPopup({ currentTarget: document.getElementById('lpn_menu_view') }); } },
+			// Units are a display choice, so they live under View rather than Settings -- and they are
+			// set once and left alone, which is why a permanent row of seven dropdowns was spending
+			// the scarcest thing this page has (vertical room above the map) on a decision nobody
+			// revisits (Tom, 2026-08-04).
+			{ label: pc.lpn_view_units || 'Units…', fn: function () { toggleUnitsPopup(document.getElementById('lpn_menu_view')); } }
+		]);
+	}
+	function openSettingsMenu(anchor) {
+		var pc = EngCalcs.pageConfig || {};
+		openMenu(anchor, [
+			{ label: pc.lpn_tool_settings || 'Settings', fn: function () { toggleSettingsPopup({ currentTarget: document.getElementById('lpn_menu_settings') }); } },
+			{ separator: true },
+			// The one control that clears EVERY project. It has always been the most dangerous button
+			// on the page; behind a menu is where it should always have been.
+			{ label: pc.lpn_settings_wipe_btn || 'Clear calculator', fn: wipeEverything }
+		]);
+	}
+	// The units popover, which is just the old permanent units row given a door.
+	function toggleUnitsPopup(anchor) {
+		var popup = document.getElementById('lpn_units_popup');
+		if (!popup) { return; }
+		if (popup.style.display === 'block') { popup.style.display = 'none'; return; }
+		popup.style.display = 'block';
+		var r = anchor ? anchor.getBoundingClientRect() : { left: 8, bottom: 8 };
+		popup.style.left = r.left + 'px';
+		popup.style.top = r.bottom + 'px';
+		var pr = popup.getBoundingClientRect();
+		popup.style.left = Math.max(4, Math.min(r.left, window.innerWidth - pr.width - 4)) + 'px';
+		popup.style.top = Math.max(4, Math.min(r.bottom, window.innerHeight - pr.height - 4)) + 'px';
+	}
+	function buildMenuBar() {
+		var pc = EngCalcs.pageConfig || {}, bar = document.getElementById('lpn_menubar');
+		if (!bar) { return; }
+		bar.innerHTML = '';
+		[
+			{ id: 'lpn_menu_file', label: pc.lpn_tool_file || 'File', open: openFileMenu },
+			{ id: 'lpn_menu_edit', label: pc.lpn_menu_edit || 'Edit', open: openEditMenu },
+			{ id: 'lpn_menu_insert', label: pc.lpn_menu_insert || 'Insert', open: openInsertMenu },
+			{ id: 'lpn_menu_view', label: pc.lpn_menu_view || 'View', open: openViewMenu },
+			{ id: 'lpn_menu_settings', label: pc.lpn_menu_settings || 'Settings', open: openSettingsMenu }
+		].forEach(function (m) {
+			var b = document.createElement('button');
+			b.type = 'button';
+			b.id = m.id;
+			b.className = 'lpn-menubar-item';
+			b.textContent = m.label;
+			b.addEventListener('click', function (e) { e.stopPropagation(); m.open(e.currentTarget); });
+			bar.appendChild(b);
+		});
 	}
 	function openProjectMenu(id, anchor) {
 		var pc = EngCalcs.pageConfig || {}, entry = indexEntry(id);
@@ -3169,7 +3310,13 @@ var EngCalcs = EngCalcs || {};
 			body.appendChild(p);
 		}, [
 			{
-				label: isBrowser ? (pc.lpn_file_saveas || 'Save as…') : (pc.lpn_file_save || 'Save'),
+				// In a browser with no File System Access API the honest first button is "Download a
+				// copy": pressing it cannot link a file, so the tab stays marked unsaved and the
+				// close will not go through on its own. Saying "Save" there would promise something
+				// the browser cannot do and then look broken when the tab refused to close.
+				label: !fileApiAvailable()
+					? (pc.lpn_file_download || 'Download a copy')
+					: (isBrowser ? (pc.lpn_file_saveas || 'Save as…') : (pc.lpn_file_save || 'Save')),
 				fn: async function () {
 					if (id !== library.openId) { switchToTab(id); }
 					if (isBrowser) { await saveAs(); } else { await saveCurrent(); }
@@ -3212,6 +3359,12 @@ var EngCalcs = EngCalcs || {};
 		if (d) { d.style.display = 'none'; }
 	}
 	function wireTabs() {
+		var unitsClose = document.getElementById('lpn_units_popup_close');
+		if (unitsClose) {
+			unitsClose.addEventListener('click', function () {
+				document.getElementById('lpn_units_popup').style.display = 'none';
+			});
+		}
 		// Dismiss the menu on any click that is not in it. The dialog is deliberately NOT dismissed
 		// this way -- it asks a question that has to be answered, and Cancel is one of the answers.
 		document.addEventListener('click', function (e) {
@@ -3238,9 +3391,22 @@ var EngCalcs = EngCalcs || {};
 	// one -- Looped-Network.php calls echoCookieScript(), and the units strip's selects carry
 	// echoUnitSelect()'s hardcoded onchange="EngCalcs.submitForm()", so the unit choices round-trip
 	// through the suite cookie like any other page. wipeAllStorage() now expires it.
-	function clearNetwork() {
+	// **"Clear project" is gone; this is "Delete network"** (Task 211, Tom 2026-08-04). His own
+	// diagnosis: clearing a project was a vestige of the single-project debut of this page -- with
+	// tabs, "empty this project" is not a thing anyone needs, because starting a new tab and closing
+	// the old one is the same act in fewer ideas. What survives is the narrower thing the workflow
+	// actually wants: duplicate a project, delete its DRAWING, keep everything else.
+	//
+	// So the BACKGROUND IMAGE now survives too, where "Clear project" wiped it. That is the point of
+	// the rename: a backdrop is not part of the network, and the workflow this command exists for --
+	// a second scheme on the same site -- wants the site plan to stay. "Remove image" in the backdrop
+	// menu is still there for the other case.
+	//
+	// The paradigmatic route is Edit -> Select all -> Delete, which this page cannot offer yet: the
+	// selection model is single-element. Until multi-select exists, this named command IS that route.
+	function deleteNetwork() {
 		var pc = EngCalcs.pageConfig || {};
-		if (!window.confirm(pc.lpn_confirm_clear || 'This permanently deletes the network, the background image, and the project name. Your settings are kept. Continue?')) { return; }
+		if (!window.confirm(pc.lpn_confirm_delete_network || 'Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone.')) { return; }
 		doc = { nodes: [], links: [], labels: [] };
 		nextId = { J: 1, R: 1, L: 1, P: 1, T: 1 };
 		// Empties the PROJECT, so the container resets with the network: scenarios back to Base alone
@@ -3254,11 +3420,7 @@ var EngCalcs = EngCalcs || {};
 		// not the same act as throwing the project away -- that is Close, and it asks first.
 		scenarios = defaultScenarios();
 		project = { name: project.name, docId: project.docId, activeScenario: 'base' };
-		// "New" means a genuinely blank project (Task 146 Phase 2) -- the separate "Remove image"
-		// menu action clears just the backdrop without touching the network.
-		backdrop = null; backdropImg = null;
-		backdropLayer.innerHTML = '';
-		updateBackdropMenuState();
+		// The backdrop is deliberately NOT removed -- see the note above the function.
 		// saveToStorage(), not removeItem() (fixed 2026-07-30, found while verifying the gear/settings
 		// panel): labelSettings/settings are preferences, not network content, and are meant to survive
 		// "New / Clear" -- removeItem() wiped them out of localStorage too, leaving them intact only in
@@ -3344,6 +3506,7 @@ var EngCalcs = EngCalcs || {};
 		// units strip is in the DOM, which is what the seeding exists to wait for.
 		seedDefaultInputs();
 		wireSettingsPopup();
+		buildMenuBar();
 		wireTabs();
 		applyLegendPosition();
 		applyMapHeight();
@@ -3427,25 +3590,12 @@ var EngCalcs = EngCalcs || {};
 		// then in the same order the example network builds: Pump, Junction, Pipe), Edit (Select,
 		// Delete, Undo -- Select first for safety, per Tom's own correction of an earlier order),
 		// View (Zoom Extent).
+		// The File/menu commands moved OUT of the toolbar and into the menu bar above it (Task 211).
+		// What is left here is the high-use subset -- the drawing tools, Select/Delete/Undo, Zoom to
+		// fit -- which is what a toolbar is for. "Clear project" is gone entirely; its replacement,
+		// Edit -> Delete network, is a menu command because it is rare and destructive, and those two
+		// properties together are the definition of something that does NOT belong on a toolbar.
 		var fileGroup = group();
-		// First in the File group and first on the toolbar. It no longer NAMES the open project the
-		// way Task 146.08's Projects button did -- the tab strip above says that permanently, which is
-		// what a name belongs on. This is now an ordinary File menu: New, Open, Save, Save as, Revert,
-		// Close (Task 211).
-		var fileBtn = document.createElement('button');
-		fileBtn.type = 'button';
-		fileBtn.id = 'lpn_file_btn';
-		fileBtn.textContent = pc.lpn_tool_file || 'File';
-		fileBtn.addEventListener('click', function (e) { e.stopPropagation(); openFileMenu(e.currentTarget); });
-		fileGroup.appendChild(fileBtn);
-		var clearBtn = document.createElement('button');
-		clearBtn.type = 'button';
-		clearBtn.textContent = pc.lpn_tool_clear || 'Clear project';
-		// One of the three reset controls -- see helpTip() for why each states only its own scope.
-		helpTip(clearBtn, pc.lpn_tool_clear_tip);
-		clearBtn.addEventListener('click', clearNetwork);
-		clearBtn.dataset.edits = '1';
-		fileGroup.appendChild(clearBtn);
 		var exampleBtn = document.createElement('button');
 		exampleBtn.type = 'button';
 		exampleBtn.textContent = pc.lpn_tool_example || 'Draw example network';
@@ -4524,11 +4674,7 @@ var EngCalcs = EngCalcs || {};
 		wipeBtn.style.marginLeft = '4px';
 		wipeBtn.textContent = pc.lpn_settings_wipe_btn || 'Clear calculator';
 		helpTip(wipeBtn, pc.lpn_reset_all_tip);
-		wipeBtn.addEventListener('click', function () {
-			if (!window.confirm(pc.lpn_confirm_wipe || 'Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone.')) { return; }
-			wipeAllStorage();
-			window.location.reload();
-		});
+		wipeBtn.addEventListener('click', wipeEverything);
 		tail.appendChild(wipeBtn);
 		tipsIn(fields);
 	}
