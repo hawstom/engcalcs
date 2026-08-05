@@ -2462,7 +2462,9 @@ var EngCalcs = EngCalcs || {};
 	// File -> Save. Writes the file this project came from, and asks nothing.
 	async function saveCurrent() {
 		var pc = EngCalcs.pageConfig || {};
-		if (!fileApiAvailable()) { downloadProjectFile(); return; }
+		// Unreachable from the menu where the API is missing -- the row is disabled there -- but
+		// routed rather than left to fall through, so no future caller can make Save mean "download".
+		if (!fileApiAvailable()) { await saveAs(); return; }
 		if (!requireFileIdentity('save')) { return; }
 		// Two different "we have no file we may write" cases, one answer. READ-ONLY: somebody else has
 		// it, and their file is newer than ours, so Save As is the only honest destination -- there is
@@ -3279,11 +3281,19 @@ var EngCalcs = EngCalcs || {};
 			// read-only, File, Save is not disabled. Read only is read only."). saveCurrent() still
 			// routes to Save as if it is ever reached another way, but a live Save row on a project
 			// that can never be saved is the menu telling a lie about what it will do.
+			// **Save is DISABLED where no connection is possible** (Tom, 2026-08-04). Save means
+			// "write to the connected file"; with no connection there is no file for it to write to,
+			// and a Save that quietly produced a download instead was the command doing something
+			// other than its name. Save as is then the only way out, which is the truth of that
+			// browser stated as a menu rather than as a caveat.
+			//
+			// No tip on the disabled row: a disabled button fires no mouse events, so its title never
+			// appears. The explanation lives on Save as, which IS reachable.
 			{
 				label: pc.lpn_file_save || 'Save',
-				tip: api ? pc.lpn_file_save_tip : pc.lpn_file_download_tip,
+				tip: api ? pc.lpn_file_save_tip : null,
 				fn: saveCurrent,
-				disabled: readOnly
+				disabled: readOnly || !api
 			},
 			// The Save as tip is where the browser-settings advice lives (Tom, 2026-08-04) -- it
 			// answers the question at the moment the user is choosing where their work goes, rather

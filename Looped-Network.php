@@ -317,7 +317,6 @@ EngCalcs.pageConfig = {
 	lpn_lock_dismiss: <?=json_encode($ec_lang['lpn_lock_dismiss'])?>,
 	lpn_file_relink: <?=json_encode($ec_lang['lpn_file_relink'])?>,
 	lpn_saveas_same_file: <?=json_encode($ec_lang['lpn_saveas_same_file'])?>,
-	lpn_file_download_tip: <?=json_encode($ec_lang['lpn_file_download_tip'])?>,
 	lpn_file_save_tip: <?=json_encode($ec_lang['lpn_file_save_tip'])?>,
 	lpn_file_saveas_tip: <?=json_encode($ec_lang['lpn_file_saveas_tip'])?>,
 	lpn_file_saveas_tip_download: <?=json_encode($ec_lang['lpn_file_saveas_tip_download'])?>,

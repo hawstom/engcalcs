@@ -1250,7 +1250,10 @@ $ec_lang['lpn_file_type_desc']='Project file';
 // a file, and this page already spends the word "copy" on Duplicate; a third word for a third thing
 // is the invention we are trying to stop doing. The caveat lives in a tip on those rows, and in a
 // notice after the act -- at the moment the question arises -- rather than in a label forever.
-$ec_lang['lpn_file_download_tip']='Saves using your browser\'s Download settings. This browser cannot connect to a file, so each save writes another copy rather than replacing the last one.';
+// `lpn_file_download_tip` was removed 2026-08-04 with the fallback Save row itself: where no
+// connection is possible, Save is disabled and only Save as remains, so the caveat belongs on Save
+// as (lpn_file_saveas_tip_download) and nowhere else. A tip on a disabled row would never be seen
+// anyway -- a disabled button fires no mouse events.
 // Opening a file where there is no File System Access API is an UPLOAD, not an open: the browser
 // hands over the contents and nothing else -- no way to write back, no way to lock it, no way even
 // to recognise it next time. A user who is not told will reasonably expect Save to go back where the
@@ -1364,7 +1367,7 @@ $ec_lang['lpn_notes_1_def']='Solves one set of demands at a time, using the same
 $ec_lang['lpn_notes_2_term']='Not modeled';
 $ec_lang['lpn_notes_2_def']='Tanks, water quality, and control valves that open and close on their own (PRV, PSV, FCV) are not modeled. A pipe can carry a fixed minor loss, but not a valve whose open or closed state depends on the flow being solved for.';
 $ec_lang['lpn_notes_3_term']='Saving projects';
-$ec_lang['lpn_notes_3_def']='Every project is a tab, and every tab is saved in this browser as you work. Clearing your browser data deletes them all, so keep your work in a file: File, Save as. An asterisk on a tab means it holds changes that are not in a file. Nothing is ever written to a file unless you ask. In some browsers a project connects to the file you save it to, and File, Save writes back to that same file from then on; in others no connection is possible, so every save writes another copy. When a project file is kept on a shared drive, this page tells you if a colleague already has it open, so that two people do not write over each other. Because this is an early preview, please use it for small networks and for testing only.';
+$ec_lang['lpn_notes_3_def']='Every project is a tab, and every tab is saved in this browser as you work. Clearing your browser data deletes them all, so keep your work in a file: File, Save as. An asterisk on a tab means it holds changes that are not in a file. Nothing is ever written to a file unless you ask. In some browsers a project connects to the file you save it to, and File, Save writes back to that same file from then on; in others no connection is possible, so Save is disabled and only Save as is available, which writes another copy each time. When a project file is kept on a shared drive, this page tells you if a colleague already has it open, so that two people do not write over each other. Because this is an early preview, please use it for small networks and for testing only.';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
 // It lives in the Notes list, not in the pump popup: the popup is a small floating panel that has
 // to stay readable on a phone, while the Notes section is already this page's documentation home,
@@ -1374,7 +1377,7 @@ $ec_lang['lpn_notes_3_def']='Every project is a tab, and every tab is saved in t
 $ec_lang['lpn_notes_5_term']='Pump curve';
 $ec_lang['lpn_notes_5_def']='A pump follows H = H₀ − aQ^b, where H is the head the pump adds and Q is the flow through it. Enter one, two, or three points from the manufacturer\'s curve. Three points — the head at zero flow, the normal working point, and the point of highest flow — fit H₀, a and b directly, and follow a published curve most closely. Two points fit a parabola (b = 2) with its peak at zero flow. One point uses a common rule: the head at zero flow is 1.33 × the head you enter, and the highest flow is 2 × the flow you enter, which again gives b = 2. A pump with no points entered adds no head at all. The curve is not stopped at zero, so asking a pump for more flow than its curve can deliver gives a negative head. The fix is a bigger pump or a smaller demand, not a different curve fit.';
 $ec_lang['lpn_notes_4_term']='Planned';
-$ec_lang['lpn_notes_4_def']='Scenarios, so that one project can hold several sets of demands. Tables of node and pipe results. Opening a file you used recently without hunting for it again. Other languages: this page is in English only for now. Comments and suggestions are always welcome (see the feedback link above).';
+$ec_lang['lpn_notes_4_def']='Scenarios, so that one project can hold several sets of demands. Tables of node and pipe results. Opening a file you used recently without hunting for it again. Reading and writing EPANET .inp files. Other languages: this page is in English only for now. Comments and suggestions are always welcome (see the feedback link above).';
 $ec_lang['lpn_id_invalid']='Enter an ID with no spaces and no quotation marks.';
 $ec_lang['lpn_id_taken']='That ID is already in use.';
 $ec_lang['lpn_diag_no_fixed_head']='Add a reservoir. The network needs at least one known water level before it can be solved.';
