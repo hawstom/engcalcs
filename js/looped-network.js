@@ -1738,7 +1738,7 @@ var EngCalcs = EngCalcs || {};
 		// and was missing here until 2026-08-04, when Tom noticed Clear/Wipe did not make the page
 		// behave as a first-time visitor: the file training panel stayed suppressed and the old
 		// initials were still being sent to the lock broker.
-		var i, key, doomed = [LPN_LEGACY_KEY, LPN_INDEX_KEY, LPN_IDENTITY_KEY, LPN_UPLOAD_NOTICE_KEY];
+		var i, key, doomed = [LPN_LEGACY_KEY, LPN_INDEX_KEY, LPN_IDENTITY_KEY];
 		try {
 			for (i = 0; i < localStorage.length; i++) {
 				key = localStorage.key(i);
@@ -2536,6 +2536,11 @@ var EngCalcs = EngCalcs || {};
 			setNotice((pc.lpn_status_saved || 'Saved {file}.').replace('{file}', handle.name));
 		}
 		renderTabs();
+		// AFTER the handle is in place, not before (fixed 2026-08-04 -- Tom: the needs-reopen banner
+		// "doesn't go away after I reconnect the file"). The forking branch above calls this too, but
+		// it runs while isLinked() is still false, so it re-raised the very banner the user had just
+		// answered. Anything that changes whether a project HAS a live handle has to end with this.
+		syncReadOnlyToOpenProject();
 		acquireLockForOpenProject();
 	}
 	// File -> Revert. The counterpart to Discard-on-close, and the only escape from a bad twenty
@@ -2570,28 +2575,31 @@ var EngCalcs = EngCalcs || {};
 			// same file next time. That is an upload, not an open, and a user who is not told will
 			// reasonably expect Save to go back where it came from.
 			//
-			// Explained ONCE per browser, then narrated every time by lpn_status_uploaded. The
-			// condition is a permanent property of this browser, so a dialog on every open would be
-			// nagging about something the user cannot change. (Task 209's snooze system is the
-			// general answer to shown-once-versus-shown-always; this is the crude version of it.)
-			var seen = readJSON(LPN_UPLOAD_NOTICE_KEY);
-			if (!seen) {
-				writeJSON(LPN_UPLOAD_NOTICE_KEY, { shown: 1 });
-				openDialog(function (body) {
-					[pc.lpn_file_upload_explain, pc.lpn_file_upload_ask].forEach(function (txt) {
-						if (!txt) { return; }
-						var t = document.createElement('p');
-						t.style.margin = '0 0 8px';
-						t.textContent = txt;
-						body.appendChild(t);
-					});
-				}, [
-					{ label: pc.lpn_file_training_continue || 'Continue', fn: function () { pickUploadFile(); } },
-					{ label: pc.lpn_cancel || 'Cancel', fn: function () { } }
-				]);
-				return;
-			}
-			pickUploadFile();
+			// **Shown EVERY time, not once per browser** (fixed 2026-08-04 -- Tom: "Any other
+			// explanation does not fire"). The first version stored a once-per-browser flag AND wrote
+			// that flag before the dialog had proved it appeared, so a single missed or dismissed
+			// showing silenced it permanently with no way back. Two lessons, both worth keeping:
+			//
+			//   - Never spend a shown-once token before the thing it guards has actually happened.
+			//   - "Once per browser" is the wrong default for a fact that CHANGES WHAT A COMMAND
+			//     MEANS. This one changes what Save does. Opening a file is not a frequent act, and
+			//     one extra click on it is a far smaller cost than a user who never learns that their
+			//     work cannot go back where it came from.
+			//
+			// Task 209's snooze system is the right long-term home for this: shown by default, with
+			// a way to say "I know" that is the USER's to give rather than ours to assume.
+			openDialog(function (body) {
+				[pc.lpn_file_upload_explain, pc.lpn_file_upload_ask].forEach(function (txt) {
+					if (!txt) { return; }
+					var t = document.createElement('p');
+					t.style.margin = '0 0 8px';
+					t.textContent = txt;
+					body.appendChild(t);
+				});
+			}, [
+				{ label: pc.lpn_file_training_continue || 'Continue', fn: function () { pickUploadFile(); } },
+				{ label: pc.lpn_cancel || 'Cancel', fn: function () { } }
+			]);
 			return;
 		}
 		if (!requireFileIdentity('open')) { return; }
@@ -2658,12 +2666,12 @@ var EngCalcs = EngCalcs || {};
 			saveIndex();
 			setNotice((pc.lpn_status_file_opened || 'Opened {file}.').replace('{file}', handle.name));
 		}
-		if (asReadOnly) {
-			roProjects.add(id);
-			syncReadOnlyToOpenProject();
-		} else {
-			acquireLockForOpenProject();
-		}
+		// A read-only open takes NO lock -- that is what makes it read-only, and taking one would
+		// contend with the person who already has the file.
+		if (asReadOnly) { roProjects.add(id); } else { acquireLockForOpenProject(); }
+		// Both paths, for the same reason as in saveAs(): this project has just gained (or not gained)
+		// a live handle, and the banner is what says so.
+		syncReadOnlyToOpenProject();
 		renderTabs();
 	}
 	function pickUploadFile() {
@@ -2692,7 +2700,6 @@ var EngCalcs = EngCalcs || {};
 	// safe to ship on a page that must keep working offline.
 	var LPN_LOCK_URL = '/engcalcs/lpn-lock.php';
 	var LPN_IDENTITY_KEY = 'lpn_identity';
-	var LPN_UPLOAD_NOTICE_KEY = 'lpn_upload_notice';
 	// The document id is baked into the FILE, not into our per-browser project id: two people
 	// opening the same file off a share have different local project ids and must still compute the
 	// same lock key. Matches lpn-lock.php's /^d[A-Za-z0-9]{8,48}$/.
