@@ -46,6 +46,15 @@ counts before anything paid launches.
   - **Wave 2 — major non-Latin:** zh ar he hi bn fa ur.
   - **Wave 3 — low-resource:** am km my ps sw. Always Sonnet, always flagged for
     native review, always run last so the glossary is as mature as possible.
+  - **THE WAVE LISTS ARE NOT A PRIORITY ORDER, and in maintenance the COVERAGE CROSS supersedes
+    them (2026-08-05).** They are the *cognate-clustering recipe* for a genuinely new batch of
+    languages, and that build-out is complete. Read as priority they are now stale: wave 1 would
+    sequence ru, uk, bg, sr, hr, cs and id — all at 0–1 confirmed humans — ahead of zh (12) and
+    he (10), which sit in wave 2. The operative priority set is the Task 203 cross's core languages
+    **es, pt, fr, tr**, which are exactly the measured top four in order. Do not renumber the waves
+    to "fix" this; the lists still say something true about how to cluster a batch. See ROADMAP
+    Task 214, which also carries the one live defect this exposed — the glossary *anchors* (es, fr,
+    ru, ar) still name two languages we cannot observe.
 - **THE SEQUENCING RULE (build-phase only — Tom, 2026-07-21):** finish **all three
   waves of a calculator category — plus that category's holistic Opus consistency pass — before
   starting the next category.** Never interleave categories. (This was violated once, 2026-07-07,

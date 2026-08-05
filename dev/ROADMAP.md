@@ -10,7 +10,7 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 ## Calculator Improvements
 
-- 10|175| **A real printable version, suite-wide.** Raised by Tom, 2026-07-30, while reviewing the
+- 05|175| **A real printable version, suite-wide.** Raised by Tom, 2026-07-30, while reviewing the
   `lpn_` map page: the suite's only print affordance today is `d-print-none` hiding chrome
   (toolbar, unit-select row, nav) so `Ctrl+P` on the bare page reads a little cleaner — there is no
   actual "printable view" (clean pagination, a results summary, a static rendering of an SVG
@@ -18,7 +18,7 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   works but produces something the reader can't page through or reflow. Whoever picks this up
   should figure out what "printable" should even mean per calculator type (a two-column input/
   result form vs. a map/canvas page are different problems) before building anything.
-- 15|144| **Diagnose the Hazen-Williams conversion leak.** Per the 2026-07-27 usage snapshot
+- 25|144| **Diagnose the Hazen-Williams conversion leak.** Per the 2026-07-27 usage snapshot
   (`dev/usage-data-log.md`), HW draws 580 confirmed-human views — the suite's second-biggest genuine
   front door, at 18% human-of-reach vs Darcy-Weisbach's 4% — but only 11% of those humans ever
   calculate, against a 51–67% band on six comparable pages (and DW's 37% on a structurally identical
@@ -1296,6 +1296,361 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   a suite-level feature rather than something each new page re-implements. Note the shared JS already
   cooperates: `EngCalcs.setUnits()` targets any `select[data-family]` anywhere on the page.
 
+- 55|219| **Link `lpn_` from `hw_`, `bpn_` and `ip_` — the largest cheap discoverability move
+  available.** Asked for by Tom, 2026-08-05, as a high priority. Three inbound links from the pages
+  whose users are most likely to want a looped-network solver, on a page that currently has no
+  inbound path at all except the menu.
+  - **This is also the live test of Task 144's leading hypothesis**, which is what makes it worth
+    more than an ordinary link edit. Task 144 says Hazen-Williams draws 580 confirmed humans and
+    converts 11% against a 51–67% band — roughly 517 lost humans per period, the suite's largest
+    single UX prize — and Tom's hypothesis is that they arrive with a *network* and find a
+    single-line calculator, then leave for EPANET. Task 138 already made HW→BPN a partial test of
+    that. **HW→LPN is the full test**, because a looped solver is the thing the hypothesis says they
+    actually came for. Watch HW conversion and LPN human count together afterwards.
+  - **Current state, read 2026-08-05:**
+    - `Hazen-Williams.php:10-11` has a related line (DW, MPHL, MPF, BPN) — append LPN.
+    - `Irrigation-Pressure.php:8-9` has one (BPN, MPF) — append LPN.
+    - **`Branched-Network.php` has NO related line at all** — it needs the whole `<p
+      class="collapse show d-print-none" id="relatedCalcs">` block built, matching the other two.
+      BPN→LPN is the most natural link in the suite (a branched network user hitting a loop is
+      exactly the LPN audience), and it is currently missing entirely.
+  - **BLOCKER FOUND WHILE SCOPING, and it is a coverage-declaration violation, not just an
+    inconvenience: `lpn_main_menu`, `lpn_main_title` and `lpn_main_desc` exist in `lang.ec.en.php`
+    ONLY — zero of the other 26 files.** Verified 2026-08-05. Consequences:
+    - **A related link renders its target's `*_main_menu` key.** So adding LPN to HW's line today
+      puts a raw English menu label on the Spanish, French, Portuguese and Turkish Hazen-Williams
+      pages — on `es` specifically, which is the standing spot-check target and the second-largest
+      audience in the suite.
+    - **This directly contradicts the Task 203/204 declaration adopted 2026-08-05**, which states
+      that identity strings — menu entry, `<title>`, `*_main_desc` — **are the floor and are never
+      out of scope, in any calculator, in any language.** `lpn_` being English-only was always meant
+      to mean *body* in English, not *identity* in English; that is precisely the mechanism by which
+      an out-of-scope cell stays discoverable and earns its way in. So this is a pre-existing gap
+      the new declaration turned into a defect, found the day after adoption.
+    - **Therefore the identity-string fill is IN SCOPE FOR THIS TASK and is its first step:** three
+      keys × 26 languages = 78 strings. Small, and it is the floor we already committed to. Do it
+      before touching any related line, or the links ship broken in four core languages.
+    - Note this also makes `lpn_`'s menu entry correct everywhere, which is a discoverability win on
+      its own and is independent of the three links.
+  - **The PREVIEW question — flag it, do not let it block.** `lpn_` still ships as an English-only
+    preview with a banner. Sending the suite's second-biggest front door at a preview page is a real
+    decision, and the honest framing is that a working preview beats the current outcome, which is
+    that those users leave for EPANET entirely. Tom asked for this explicitly and that is the call.
+    But the link text should not oversell; the preview banner must stay until Task 146.06 and the
+    persistence work say otherwise.
+  - Cheap: three small PHP edits plus the 78 identity strings. No new mechanism.
+
+- 40|213| **Unify Hazen-Williams on EPANET's constants across `hw_`, `bpn_` and `lpn_`.** Raised by
+  Tom, 2026-08-05: *"I understand that something about our Hazen-Williams formula differs slightly
+  from EPANET. I would like to resolve that so that we are identical to EPANET on lpn, hw, and bpn."*
+  Confirmed and measured, and it is small enough to fix outright rather than document forever.
+  - **The two forms.** Ours (`js/hazen-williams.js`, `bpnFriction` in `js/branched-network.js`, and
+    `EngCalcs.lpnConstants.engcalcs`) is `Sf = 7.8828/d^4.8704 · (Q/(0.849 C))^1.852` — SI coefficient
+    **10.674400**, diameter exponent **4.8704**, traceable to the Wikipedia SI restatement. EPANET is
+    `hL = 4.727 L Q^1.852 / (C^1.852 d^4.871)` in US units — SI coefficient **10.666829**, exponent
+    **4.871**.
+  - **The error is diameter-dependent, not a constant offset**, because the exponents differ too. Ours
+    ÷ EPANET, at C = 150: 0.9989 at d = 50 mm, 0.9993 at 100 mm, 0.9997 at 200 mm, **1.0000 at
+    300 mm**, 1.0003 at 500 mm, 1.0007 at 1 m, 1.0011 at 2 m. So **≤ 0.12% across the whole practical
+    range, crossing zero near 300 mm** — far below the uncertainty in the C value itself.
+  - **Go EPANET's way, not ours** (confirmed by Tom, 2026-08-05). Ours traces to a secondary
+    restatement; EPANET's traces to the engine every user will check us against. Task 196 (`.inp`
+    import) would otherwise have to keep the dual constant set alive permanently.
+  - **Work:** adopt `10.666829` / `4.871` as the one suite value, delete the
+    `EngCalcs.lpnConstants` dual-set machinery in `js/lpn-solver.js` (its whole reason for existing
+    goes away), and put the derivation in one shared place rather than three comments. This is a
+    natural first customer for the `js/PipeHydraulics.lib.js` extraction that `lpn-solver.js` already
+    says is deferred until after `lpn_` ships.
+  - **Verify against `epanet-js`**, the real engine, not against published tables — the harness is
+    already named for this purpose in Task 146.
+  - **A user-facing Notes blurb in all three calculators** (Tom's wording, 2026-08-05, lightly
+    edited for Simple English and for the fact that the change is not SI-specific — computation is
+    SI internally and both unit sets shift):
+    `In August 2026 the Hazen-Williams coefficient and exponent were changed to match EPANET. Head loss results differ from earlier versions of this page by up to 0.1 percent, which is far smaller than the uncertainty in the C value itself.`
+    - `hw_` has one `<dl>` blob (`hw_note_1`) and needs a `<dt>`/`<dd>` pair inside it; `bpn_` and
+      `lpn_` use `*_notes_N_term`/`_def` pairs and need a new numbered pair each.
+    - **Translation cost is real but bounded:** `hw_` and `bpn_` are non-core calculators, so under
+      the Task 203 coverage cross the blurb is in scope for **es, pt, fr, tr only** (`lpn_` is
+      English-only). Do not fan this out to 26 languages.
+    - **It should retire.** A dated "we changed this" note is useful for a year or two and then is
+      just archaeology. Say so in the task that adds it, or the suite accumulates a changelog in its
+      user-facing Notes.
+  - **Two findings from the same read, so they are not re-derived:**
+    - **`bpn_`/`lpn_` Darcy-Weisbach ALREADY matches EPANET exactly.** `EngCalcs.lpnDwFriction` (and
+      its twin `bpnDwFriction`) implement EPANET's own Dunlop cubic interpolation across
+      2000 < Re < 4000, not generic Swamee-Jain. No work there.
+    - **The standalone `Darcy-Weisbach.php` was NOT checked** against that 3-regime treatment. One
+      quick comparison; if it diverges it is a separate task, not scope creep into this one.
+
+- 45|215| **Log the Title/Subtitle milestone — the closest instrument we can build to the mission.**
+  Raised by Tom, 2026-08-05: *"How many people are adding Title and Subtitle? This is a major
+  milestone that indicates they are sharing the calculation in a report or message."* Agreed, and it
+  is the highest value ÷ effort item on the stats list. Nothing currently sees it. A person who
+  titles a calculation is telling us they intend to put it in front of another human, which is the
+  one behavior this suite exists to produce and the only one no other counter approximates.
+  - **Design correction — do NOT put a flag on the calc event.** `maybeLogCalcUsage()` has a
+    per-page-load dedupe, and a title is almost always typed *after* the first calculation, so the
+    flag would read zero nearly always. It needs its own one-shot beacon fired from the `onchange`
+    of `printable_title` / `printable_subtitle` (`lib/Calculators.lib.php:205-206`), which already
+    call `EngCalcs.submitForm()`. Roughly 15 lines, same beacon pattern as the other two writers,
+    and it must honour `ecLoggingOptedOut()` (Task 210) like they do.
+  - **Record which of the two fields, and the page.** Title-only vs title-and-subtitle is a real
+    distinction — the second is someone building a document, not labelling a scratch calculation.
+  - **This is also where the share question from Task 218 lands.** The moment someone types a title
+    is the moment they intend to share. A "copy a link to this calculation" affordance *there* —
+    attached to something they already want — is a share mechanism that costs the user nothing and
+    needs no plea, and it connects to Task 175 (printable). Contrast a footer "tell a colleague"
+    line, which arrives at a moment of no intent and would re-fragment the single invitation Task 205
+    just consolidated. **Sequence any share affordance behind Task 206**, so it can be attributed.
+
+- 30|217| **A suite-owned, multilingual Manning's n table, built from primary sources.** Raised by
+  Tom, 2026-08-05, and accepted as mid-priority with a caution: *"No collision, but I am not into
+  ownership/maintenance. If there is any viable way to outsource, I prefer it. But if we can add
+  multilingual value with an n table, I'm game. Let's just be careful and intentional."*
+  - **The case.** `Manning-Pipe-Flow.php` and `Manning-Trap.php` both send the roughness input off
+    site to `engineeringtoolbox.com/mannings-roughness-d_799.html` — English only, ours to lose, and
+    on the two calculators that carry the great majority of our humans. Every one of those users
+    needs an n value; it is the single most-needed reference in the suite. In 26 languages it is a
+    genuine search front door rather than a leak, and it is content nobody else is publishing
+    multilingually.
+  - **Gate it on Task 216's number**, which is what that beacon exists to produce. Build the
+    instrument first.
+  - **The maintenance worry is the real design constraint, and it has an answer: freeze it.** An n
+    table sourced from primary references (Chow 1959; USGS WSP 2339 / Arcement & Schneider; FHWA
+    HDS-5) is *static data* — those values have not moved in decades and will not. Build it once,
+    cite each row, and it needs no ongoing ownership. What creates maintenance is editorial
+    ambition: photographs, user submissions, regional variants, a "suggest a value" form. Ship none
+    of that.
+  - **Translation cost is the honest cost**, not maintenance: a table of material names is a lot of
+    short strings. Scope it against the Task 203 cross before committing — the core four (es, pt,
+    fr, tr) plus identity strings may be the whole sensible first version.
+  - **Careful about the citation boundary.** Reproducing a published table verbatim is a copyright
+    question; a table of physical constants compiled from multiple cited primary sources is not.
+    Compile and cite, do not copy one source's layout and selection.
+  - **THE CURRENTLY LINKED TABLE IS THE COVERAGE BENCHMARK — Tom, 2026-08-05:** *"I would want to
+    confirm that our table is similar to the one I selected long ago to link."* Right, and this is
+    the acceptance criterion for the whole task, so do it FIRST rather than at review time. The
+    `engineeringtoolbox.com/mannings-roughness-d_799.html` link was a deliberate editorial choice
+    that has served users for years; it is the de facto spec for what a visitor arriving at this
+    reference expects to find. Concretely:
+    - **Match its COVERAGE**, material for material. A visitor who has clicked that link before and
+      cannot find their material on ours has been given a worse page, however well cited ours is.
+      Inventory it, and treat anything it covers that we do not as a gap to close or to justify.
+    - **CROSS-CHECK the values, do not copy them.** These two obligations point in opposite
+      directions and both must hold: same coverage (so users find their material), independent
+      primary sourcing (so we are not reproducing someone's table). Compile ours from Chow / USGS /
+      HDS-5, then compare against the linked table row by row.
+    - **A DISAGREEMENT IS A FINDING, not a number to quietly overwrite.** Where our primary sources
+      and the linked table differ, investigate and record which is right and why, in the task or in
+      `dev/`. That divergence log is genuinely useful content — it is the kind of thing a careful
+      engineer wants and neither table currently offers — and it is also the honest justification
+      for publishing our own at all.
+    - **If the tables come out essentially identical, that is a legitimate reason NOT to build it.**
+      Say so out loud rather than proceeding on sunk scoping effort. The case for our own table rests
+      on multilingual reach and on owning the reference, not on the existing one being wrong; if
+      Task 216's beacon shows the non-English click volume is thin, identical content plus no reach
+      argument means the honest answer is to keep the link.
+
+- 30|218| **Find advisors and proteges — a standing, nagged commitment, not a task that completes.**
+  Raised by Tom, 2026-08-05: *"I still need help knowing where to try to connect with advisors and
+  proteges; this is not my strength. r/civilengineering is mostly frivolous talk."* He is right about
+  the subreddit — it is a venting-and-memes room and the people he wants are not posting there.
+  - **Tom's explicit standing instruction, 2026-08-05:** *"This is not my strength or passion. I'll
+    want you to hold my hand and push me to 'eat my veggies.' I may have to get in my car and go to
+    lunch. I will need pushing."* **So the nagging is authorized and requested.** Whoever picks up
+    this roadmap should raise this item unprompted when it has gone quiet, propose ONE concrete next
+    action with a name and a date attached, and not accept a vague "sometime". A generic "you should
+    network more" is worthless; "email this chapter's faculty advisor this week" is the unit of work.
+  - **The pattern that works:** go where people are already doing the specific work these
+    calculators serve, not where the profession socializes.
+  - **ADVISORS AND PROTEGES ARE TWO DIFFERENT LISTS AND NO VENUE SERVES BOTH — Tom said plainly on
+    2026-08-05 that he did not understand this item, and conflating the two is probably why.** An
+    *advisor* here means someone with numerical/hydraulic depth who will answer a hard question six
+    months from now; that is a peer relationship, earned by asking good technical questions in a
+    developer community, and OWA is where it lives. A *protege* means someone learning to build
+    tools like these, who needs a person willing to teach; that only ever comes from a room with
+    students in it — EWB chapters, a classroom, a practitioner network. **Never plan one action
+    hoping it produces both.** Every concrete next action proposed under this task must say which of
+    the two it is aimed at.
+  - **Set expectations honestly, or this item keeps disappointing.** A good OWA post yields two or
+    three technically serious people who now know the project exists. It does not yield a mentor,
+    and it will not yield a protege at all. That is still worth having — but "I posted and nothing
+    happened" is the predictable failure mode if the expected return was never stated.
+  - **For advisors (numerical / hydraulic depth):**
+    - **Open Water Analytics** — the EPANET / WNTR open-source community. Highest-fit venue on this
+      list: these are exactly the people who know why 4.727 vs 0.849 matters, and Task 213 gives a
+      concrete, well-posed opening contribution to lead with rather than an introduction.
+      **VERIFIED LIVE 2026-08-05, with the entry point corrected:** `OpenWaterAnalytics/EPANET` on
+      GitHub is active (405 stars, 249 forks, 42 open issues, 4 open PRs, documented contribution
+      path). The **old Discourse forum at `community.wateranalytics.org` no longer answers on
+      HTTPS** (it times out entirely) and repo-level Discussions are **disabled**
+      (`has_discussions: false`). The live venue is **org-level GitHub Discussions**,
+      `https://github.com/orgs/OpenWaterAnalytics/discussions`, category **Q&A**. An earlier version
+      of this task said "forum", and then "repo Discussions"; both were wrong.
+      **A POST IS DRAFTED AND READY TO SEND: `dev/outreach-owa-post.md`** (2026-08-05), with the
+      venue facts, the exact title and body, and what to do with a reply. Tom sends it; there is no
+      account on this machine and no automated path, deliberately.
+      **But temper the expectation — it is a QUIET room.** Org Discussions holds roughly eight
+      threads in total. The codebase is active (last push 2026-07-23, 46 open issues, 405 stars) and
+      the maintainers are real, but the discussion surface is not busy: a reply may take weeks or
+      may never come, and **that is the expected case rather than a failure**. The activity is in
+      Issues, where this question does not belong. So: worth one evening, not a substitute for the
+      other venues, and **it must not block Task 213** — the EPANET source is public and readable if
+      no answer arrives.
+    - **ASCE EWRI** Hydraulics & Waterways technical committees, and the **Arizona Section** locally.
+      Committee work is where senior people are actually reachable; conference floors are not.
+  - **For proteges, and for mission fit:**
+    - **Engineers Without Borders USA student chapters** — the strongest single match. Students who
+      need free tools, work in exactly the low-resource-language regions this suite translates for,
+      and want mentoring. Chapters have faculty advisors, so one contact reaches a cohort per year.
+    - **RWSN (Rural Water Supply Network)** and the **SuSanA forum** — large, active practitioner
+      communities in rural water supply and sanitation, heavily non-English, doing gravity-fed pipe
+      networks, canal seepage and well work. The calculator list reads like their daily problems.
+    - **A guest lecture or evening section at ASU or Mesa CC.** Proteges self-identify in a classroom
+      in a way they never do online.
+  - **Verify each venue is still live before acting** — these were named from knowledge, not checked
+    against the current web.
+  - **The unglamorous prerequisite:** the best pool is the several thousand humans already using the
+    suite, and we can currently neither see nor reach any of them. That is **Task 206**, which is
+    therefore upstream of this item rather than parallel to it.
+
+- 25|214| **Realign the glossary anchor languages with measured reach.** Confirms and closes Tom's
+  2026-08-05 question, *"Confirm that our wave 1 translation language set is adjusted in light of our
+  usage reports."* Answer in two parts:
+  - **The priority set IS already adjusted — you did it yesterday.** Task 203's coverage cross names
+    core languages **es, pt, fr, tr**, which is exactly the measured top four in order (es 186,
+    pt 30, fr 23, tr 17 confirmed humans, 2026-08-03). Nothing to change there.
+  - **The wave lists in `dev/translation-process.md` are stale but nearly obsolete.** Wave 1 as
+    written (es pt fr it de ro ru uk bg sr hr cs tr id) would sequence ru, uk, bg, sr, hr, cs and id
+    — all at 0–1 measured humans — ahead of **zh (12) and he (10)**, which sit in wave 2. **Do not
+    renumber the waves.** They were a *build-out sequencing* device for cognate clustering, that
+    build-out is complete, and the cross supersedes them in maintenance. A one-line note saying so
+    was added to `dev/translation-process.md` on 2026-08-05, which is the whole fix.
+  - **The live defect is the anchors.** CLAUDE.md names glossary anchors **es, fr, ru, ar**. `ru` has
+    one measured human and `ar` has zero, while `pt` (30) and `tr` (17) are not anchors. An anchor is
+    a reference other languages are checked against — anchoring on two we cannot observe is strictly
+    weaker than anchoring on ones we can. **Align the anchors to the core four (es, pt, fr, tr)** in
+    CLAUDE.md's pre-sprint checklist and in `glossary.json`'s `preferred_translation` expectations.
+    The 2026-08-03 usage log already flagged this ("worth revisiting when the glossary is next
+    touched") and nothing tracked it.
+  - **This is not a reason to deprioritise ru or ar translation quality** — the standing "zero reach
+    ≠ low value" rule holds, and for a language that size zero reach is a discovery/SEO gap. It is
+    only a statement about which languages make useful *reference* points.
+  - **Do not promote `zh` to core yet.** It costs 14 cells, and the pre-registered n = 30 test on its
+    17% conversion anomaly is still outstanding (`dev/usage-data-log.md`). `he` (10 humans, 60%,
+    squarely in the band) is the cleaner next candidate, with no urgency.
+
+- 20|216| **Beacon outbound reference-link clicks, with the visitor's language.** Raised by Tom,
+  2026-08-05: *"How often are non-English people asking for 'n' help? And should we let them somehow
+  complain that the reference is only English?"*
+  - **Build the beacon; skip the complaint UI.** The click *is* the complaint. A non-English visitor
+    clicking an English-only reference is a complete, zero-cost, unambiguous signal. A button asking
+    them to additionally *say* they would like it translated collects the same bit at a much higher
+    price, and an interstitial page would tax the majority to survey the minority. Tom agreed,
+    2026-08-05.
+  - **What to log:** page, `lang`, and which link. Same beacon pattern and the same
+    `ecLoggingOptedOut()` check as the other writers.
+  - **The links that matter:** the Manning's n table
+    (`engineeringtoolbox.com/mannings-roughness-d_799.html`, on `Manning-Pipe-Flow.php` and
+    `Manning-Trap.php`), the Hazen-Williams C table (`Hazen-Williams.php`), the EPA roughness
+    document (`Darcy-Weisbach.php`, `Micro-Hydro-Power.php`), and our own English-only
+    `frictionslope.php` — whose tip already admits "English only" in all 26 languages, so we know
+    the visitor clicked *knowing* that.
+  - **The decision it feeds is Task 217**, so this metric arrives with a decision already attached
+    rather than becoming another number nobody acts on.
+
+- 35|206| **Measure the contact funnel — we are blind on the one metric the mission cares about.**
+  Raised by Tom, 2026-08-03: contacts "have always been rare and gratifying. None at all in recent
+  months." Nothing logs `contact.php` views or `formmail.php` submissions, so the two possible
+  causes are indistinguishable today, and they call for **opposite** fixes:
+  - **Nobody clicks the invitation** → it is invisible or reads as chrome. Wording/placement is the
+    lever (Task 205 just changed both).
+  - **People click but do not send** → the invitation works and the form is the barrier. Placement
+    changes nothing and further tinkering with it is wasted motion.
+  Cheap: the existing `log-human-view.php` beacon pattern already covers views; add one on
+  `contact.php`, and one event on successful `formmail.php` send. No database. Two numbers —
+  invitation clicks, and sends — turn a years-long guess into arithmetic.
+  **Urgent because two confounders just landed and will otherwise be uninterpretable:** (1) Tom
+  removed the form's anti-spam test recently — a classic conversion killer, especially on mobile and
+  for non-English users — so the drought may *already* be fixed with no way to see it; (2) Task 205
+  changed the invitation's wording, placement, and dismiss affordance suite-wide on 2026-08-03. With
+  no instrument, "fixed" and "still broken" look identical for another several months, and neither
+  change can be credited or ruled out. Every month without the beacon burns evidence.
+  Context, now fixed: `formmail.php:90` carried a bare `<?` short open tag — the only one in the
+  repo. It parses only where `short_open_tag=On`, which production evidently still is (Tom's tests
+  send successfully), but any PHP upgrade or host move would have silently killed the contact form,
+  and with zero logging the symptom would have been indistinguishable from ordinary silence. Changed
+  to `<?php` on 2026-08-03. That near-miss is itself the argument for this task: a broken contact
+  path is invisible precisely because its failure mode looks exactly like nobody writing.
+- 20|200| **Usage logging: the questions the current report cannot answer.** Raised by Tom,
+  2026-08-03: *"I'd like to get more guidance about our development priorities from usage logging."*
+  Ordered by value ÷ effort. Nothing here needs a database — the existing
+  `log-calc-event.php` / `log-human-view.php` beacon pattern covers all of it.
+  - **First, two things about how the CURRENT report must be read, which cost nothing to adopt:**
+    - **There is a bot floor around 900.** Almost every page sits at 834–1193 reach regardless of
+      how many humans it gets; only Manning-Pipe-Flow (3619) and Manning-Trap (2141) rise above it.
+      So for every other page `%human of reach` is a signal-to-noise ratio, not a conversion rate,
+      and driving it up is not a goal.
+    - **Below roughly 40 humans, `%used` is noise.** Only MPF (1576 humans), Manning-Trap (242) and
+      marginally Hazen-Williams (60) have the sample for that ratio to mean anything. The single-digit
+      rows — Canal-Seepage at 1 human, Weir-Flow-Irregular at 2 — cannot support any decision, and
+      reading them as failure is a mistake. What those pages need is not a metric, it is either
+      traffic or an honest decision that they are niche.
+  - **Repeat use — the strongest value signal we do not collect.** One flag in `localStorage` per
+    page ("this browser has logged a calc here before") turns every event into new-vs-returning. A
+    calculator a working engineer comes back to is worth more than a hundred one-off visits, and
+    nothing in the present report can distinguish those two.
+  - **Did they touch anything before leaving?** For a human who never calculates, one bit: did any
+    input change at all? Splits "could not understand it" from "did not want it", which are opposite
+    development responses, and it is the cheapest diagnostic on this list.
+  - **`lpn_` first action, and `lpn_` diagnostic frequency.** Which of draw-example / add-element /
+    add-background / nothing happens first, and which of the four diagnostics fires most. Between
+    them they name exactly where the map interface loses people. **This is also the first evidence
+    that would bear on the empty-canvas decision** (closed 2026-07-29, commit `7428ff0`: a new
+    project opens on placeholder text rather than a worked example) — a decision made with no data,
+    which the first-action histogram would either vindicate or overturn.
+  - ~~Language × calculator cross-tab~~ — **BUILT 2026-08-03**, and it was nearly free as predicted.
+    All three tiers already carried both dimensions (`engcalcs-lang.log` = ts/lang/source/page; both
+    human logs = ts/page/lang). New "Non-English HUMANS by calculator" section in
+    `log/lang-log-stats.sh`.
+    - **A reach-tier version already existed** ("Non-English demand by page") and is the reason this
+      looked answered. It is built from `engcalcs-lang.log` — the tier with the ~900/page bot floor —
+      so it largely counts crawlers. The new section is built from the two confirmed-human logs,
+      which bots essentially never reach, so every row is a real person. Keep both; they answer
+      different questions and only one of them should sequence a sprint.
+    - **An empty table is the finding**, and the section says so in place: 26 translated languages
+      with no confirmed non-English human use would bear directly on how much further translation
+      work is worth before the pages themselves earn traffic. Verified against fixtures for both the
+      populated and empty cases, including `es-MX` → `es` subtag folding.
+    - Not yet run against production data — the dev machine has 7 human-view rows and no usage log
+      at all.
+  - **US vs SI actually chosen**, one bit per session — validates `EC_DEFAULT_UNIT_SET`-by-language
+    and shows whether per-page unit-family defaults are right (ROADMAP Task 162's design).
+    **Widen this to the unit token each select actually lands on**, per family, not just the preset.
+    Asked by Tom, 2026-08-05: *"How often are units being used? Are there units we can drop because
+    nobody really uses them?"* Three findings from that discussion, recorded so they are not
+    re-brainstormed:
+    - **Prefer REORDERING to removal.** An unused option in a dropdown costs a user essentially
+      nothing; a *missing* one costs them the whole calculator. And with roughly four thousand humans
+      total, "no hits in three months" on a long-tail unit is weak evidence — that is deleting on
+      absence of data from a small sample. Reordering by measured frequency captures most of the
+      benefit at none of the risk. Set a high bar for any actual removal.
+    - **An "Other" option INSIDE a unit select is actively dangerous here.** Per the standing rule in
+      CLAUDE.md, changing a unit select *reinterprets* the typed number rather than converting it, so
+      choosing "Other" would silently reinterpret the user's value while a dialog sits open. If the
+      ask is wanted it must be a non-selecting affordance — an item that opens a prompt and reverts
+      the select, or better a small `?` beside the unit strip.
+    - **Tom likes the units `?` as an EXPERIMENT** (2026-08-05). Frame it that way: it is really
+      Rung 0 of the feedback cost-ladder (Task 207) applied to units, not a units feature, and it
+      should be measured like an experiment rather than shipped as a permanent affordance on faith.
+  - **First run happened 2026-08-03 and the cross-tab immediately paid for itself** — see
+    `dev/usage-data-log.md` and Task 202. Headline: 290 non-English humans shopping, 170 using, and
+    one clear quality outlier that no other instrument in the suite had surfaced. The remaining
+    ideas below are still unbuilt.
+  - **Lower value, listed so they are not re-brainstormed:** time-to-first-calc (separates a
+    confusing page from a long one); print / copy-link use as a proxy for work someone intends to
+    keep; intra-site path (which calculator is the entry point and where people go next).
+
 ## New Calculators (Mission Expansion)
 
 Tom, 2026-07-14: interested in expanding beyond hydraulic-structure/irrigation calculators toward
@@ -2191,81 +2546,6 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     inflating it.
   - **Consequence for reading past reports: `lpn_`'s conversion is simply UNKNOWN before this date.**
     Do not treat the pre-2026-08-03 `%used` figures for this page as a baseline to improve on.
-- 35|206| **Measure the contact funnel — we are blind on the one metric the mission cares about.**
-  Raised by Tom, 2026-08-03: contacts "have always been rare and gratifying. None at all in recent
-  months." Nothing logs `contact.php` views or `formmail.php` submissions, so the two possible
-  causes are indistinguishable today, and they call for **opposite** fixes:
-  - **Nobody clicks the invitation** → it is invisible or reads as chrome. Wording/placement is the
-    lever (Task 205 just changed both).
-  - **People click but do not send** → the invitation works and the form is the barrier. Placement
-    changes nothing and further tinkering with it is wasted motion.
-  Cheap: the existing `log-human-view.php` beacon pattern already covers views; add one on
-  `contact.php`, and one event on successful `formmail.php` send. No database. Two numbers —
-  invitation clicks, and sends — turn a years-long guess into arithmetic.
-  **Urgent because two confounders just landed and will otherwise be uninterpretable:** (1) Tom
-  removed the form's anti-spam test recently — a classic conversion killer, especially on mobile and
-  for non-English users — so the drought may *already* be fixed with no way to see it; (2) Task 205
-  changed the invitation's wording, placement, and dismiss affordance suite-wide on 2026-08-03. With
-  no instrument, "fixed" and "still broken" look identical for another several months, and neither
-  change can be credited or ruled out. Every month without the beacon burns evidence.
-  Context, now fixed: `formmail.php:90` carried a bare `<?` short open tag — the only one in the
-  repo. It parses only where `short_open_tag=On`, which production evidently still is (Tom's tests
-  send successfully), but any PHP upgrade or host move would have silently killed the contact form,
-  and with zero logging the symptom would have been indistinguishable from ordinary silence. Changed
-  to `<?php` on 2026-08-03. That near-miss is itself the argument for this task: a broken contact
-  path is invisible precisely because its failure mode looks exactly like nobody writing.
-- 20|200| **Usage logging: the questions the current report cannot answer.** Raised by Tom,
-  2026-08-03: *"I'd like to get more guidance about our development priorities from usage logging."*
-  Ordered by value ÷ effort. Nothing here needs a database — the existing
-  `log-calc-event.php` / `log-human-view.php` beacon pattern covers all of it.
-  - **First, two things about how the CURRENT report must be read, which cost nothing to adopt:**
-    - **There is a bot floor around 900.** Almost every page sits at 834–1193 reach regardless of
-      how many humans it gets; only Manning-Pipe-Flow (3619) and Manning-Trap (2141) rise above it.
-      So for every other page `%human of reach` is a signal-to-noise ratio, not a conversion rate,
-      and driving it up is not a goal.
-    - **Below roughly 40 humans, `%used` is noise.** Only MPF (1576 humans), Manning-Trap (242) and
-      marginally Hazen-Williams (60) have the sample for that ratio to mean anything. The single-digit
-      rows — Canal-Seepage at 1 human, Weir-Flow-Irregular at 2 — cannot support any decision, and
-      reading them as failure is a mistake. What those pages need is not a metric, it is either
-      traffic or an honest decision that they are niche.
-  - **Repeat use — the strongest value signal we do not collect.** One flag in `localStorage` per
-    page ("this browser has logged a calc here before") turns every event into new-vs-returning. A
-    calculator a working engineer comes back to is worth more than a hundred one-off visits, and
-    nothing in the present report can distinguish those two.
-  - **Did they touch anything before leaving?** For a human who never calculates, one bit: did any
-    input change at all? Splits "could not understand it" from "did not want it", which are opposite
-    development responses, and it is the cheapest diagnostic on this list.
-  - **`lpn_` first action, and `lpn_` diagnostic frequency.** Which of draw-example / add-element /
-    add-background / nothing happens first, and which of the four diagnostics fires most. Between
-    them they name exactly where the map interface loses people. **This is also the first evidence
-    that would bear on the empty-canvas decision** (closed 2026-07-29, commit `7428ff0`: a new
-    project opens on placeholder text rather than a worked example) — a decision made with no data,
-    which the first-action histogram would either vindicate or overturn.
-  - ~~Language × calculator cross-tab~~ — **BUILT 2026-08-03**, and it was nearly free as predicted.
-    All three tiers already carried both dimensions (`engcalcs-lang.log` = ts/lang/source/page; both
-    human logs = ts/page/lang). New "Non-English HUMANS by calculator" section in
-    `log/lang-log-stats.sh`.
-    - **A reach-tier version already existed** ("Non-English demand by page") and is the reason this
-      looked answered. It is built from `engcalcs-lang.log` — the tier with the ~900/page bot floor —
-      so it largely counts crawlers. The new section is built from the two confirmed-human logs,
-      which bots essentially never reach, so every row is a real person. Keep both; they answer
-      different questions and only one of them should sequence a sprint.
-    - **An empty table is the finding**, and the section says so in place: 26 translated languages
-      with no confirmed non-English human use would bear directly on how much further translation
-      work is worth before the pages themselves earn traffic. Verified against fixtures for both the
-      populated and empty cases, including `es-MX` → `es` subtag folding.
-    - Not yet run against production data — the dev machine has 7 human-view rows and no usage log
-      at all.
-  - **US vs SI actually chosen**, one bit per session — validates `EC_DEFAULT_UNIT_SET`-by-language
-    and shows whether per-page unit-family defaults are right (ROADMAP Task 162's design).
-  - **First run happened 2026-08-03 and the cross-tab immediately paid for itself** — see
-    `dev/usage-data-log.md` and Task 202. Headline: 290 non-English humans shopping, 170 using, and
-    one clear quality outlier that no other instrument in the suite had surfaced. The remaining
-    ideas below are still unbuilt.
-  - **Lower value, listed so they are not re-brainstormed:** time-to-first-calc (separates a
-    confusing page from a long one); print / copy-link use as a proxy for work someone intends to
-    keep; intra-site path (which calculator is the entry point and where people go next).
-
 - 0|146.08|[CC] **Multiple named saved networks (Task 146 child).** Local save/retrieve so a user can
   rotate among several `lpn_` projects. This is the real need behind the scope doc's old
   `.inp` export/import item — Tom confirmed 2026-07-29 that true EPANET `.inp` file interop is not
