@@ -1339,6 +1339,9 @@ $ec_lang['lpn_lock_readonly_banner']='Read-only: {name} has this file open. You 
 // take the calculator away -- so this warns rather than blocks, and promises the follow-up that
 // lpn_lock_restored keeps.
 $ec_lang['lpn_lock_unavailable']='Beware: could not reach the server to check or create a lock on this project, so nothing is stopping a colleague from editing the same file at the same time. You will be told if locking starts working again.';
+$ec_lang['lpn_lock_storage_error']='Beware: this site cannot save lock records, so nothing is stopping a colleague from editing the same file at the same time. This is a setup fault on the server, not something you can fix here — the lock folder is not writable by the web server.';
+$ec_lang['lpn_lock_full_error']='Beware: this site has run out of room to record who has which project open, so nothing is stopping a colleague from editing the same file at the same time. This is a setup fault on the server, not something you can fix here.';
+$ec_lang['lpn_lock_not_asked']='Locking is not running for this project, so nothing is stopping a colleague from editing the same file at the same time. This browser has no name recorded for you yet, or the project has no identifier — saving the project to a file sets both.';
 $ec_lang['lpn_lock_restored']='Locking is working again, and this file is now yours to save to.';
 $ec_lang['lpn_lock_dismiss']='Dismiss';
 // Shown once per browser, before the first file picker opens. Three short paragraphs on purpose:
@@ -1365,6 +1368,7 @@ $ec_lang['lpn_file_relink']='Choose the file again';
 // Read-only means read-only, so Save as from a read-only project refuses the file it came from --
 // the one file it must never write. handle.isSameEntry() is what makes this checkable at all.
 $ec_lang['lpn_saveas_same_file']='That is the same file somebody else has open, so it cannot be saved over. Choose a different file or a different name.';
+$ec_lang['lpn_saveas_overwrites_project']='That file already holds a different project, {name}. Saving here replaces it completely. Continue?';
 // The "Save to file every N seconds" setting and its 60-180 second range are GONE (Task 211). One
 // number was doing three jobs -- the write interval, the lock heartbeat, and the how-long-until-a
 // -colleague-may-take-over threshold -- so the range was protecting a coupling rather than the user.

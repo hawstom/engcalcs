@@ -147,6 +147,7 @@ $savedAt  = isset($_POST['savedAt'])  ? (int)$_POST['savedAt']  : 0;
 $heldBySomeoneElse = ($currentHolder !== '' && $currentHolder !== $holder);
 
 $write = null;
+$expire = false;   // back-date this record on the way out, so the next sweep collects it
 $response = array('ok' => true);
 
 if ($action === 'check') {
@@ -163,6 +164,17 @@ if ($action === 'check') {
     if (!$heldBySomeoneElse) {
         $write = array('projectId' => $id, 'holder' => '', 'lockedBy' => '', 'lastActivity' => time(),
                        'editedAt' => 0, 'savedAt' => 0);
+        // AND mark it for the next sweep. A released record carries no information -- a 'check'
+        // against a missing record and against an empty one give byte-identical answers -- but it
+        // used to sit here for 30 days with its mtime REFRESHED by the release itself, so the
+        // directory only ever grew. Every Save as, every copy and every read-only fork mints a new
+        // docId and therefore a new record, so a few afternoons of ordinary work can approach
+        // LPN_LOCK_MAX_RECORDS, at which point new locks are refused for everybody.
+        //
+        // Back-dating rather than unlinking on purpose: another request may already be blocked on
+        // flock() for this inode, and deleting it underneath them would strand their acquire on an
+        // orphaned file. Back-dating is race-free and the next sweep collects it.
+        $expire = true;
     }
     $response['released'] = !$heldBySomeoneElse;
 } elseif ($action === 'acquire' && $heldBySomeoneElse) {
@@ -193,5 +205,8 @@ if ($write !== null) {
 }
 flock($fh, LOCK_UN);
 fclose($fh);
+if ($expire) {
+    @touch($path, time() - (LPN_LOCK_TTL_DAYS * 86400) - 60);
+}
 
 lpn_send($response);

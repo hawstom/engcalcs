@@ -23,6 +23,19 @@ Scope: what is **on production now** — the server-broker version.
 ## 0. Before you start
 
 - [x] `git pull` on the server.
+- [ ] **THE LOCK BROKER MUST BE ABLE TO WRITE.** Everything in §6, §7 and §12 is meaningless if it
+      cannot, and it fails almost silently: `check` on a project with no record short-circuits before
+      touching disk and answers *"nobody has this file"*, so a colleague opens it with **no dialog at
+      all**, and only the follow-up `acquire` complains. That is exactly what happened on 2026-08-05
+      — `lpn-locks/` was `755 haws:haws` while Apache runs as `www-data`.
+
+      ```
+      ls -ld lpn-locks                    # must be writable by the web server user
+      sudo chgrp www-data lpn-locks && sudo chmod 2775 lpn-locks
+      ```
+
+      Confirm before going on: open a project, Save it, and check that a `.json` record appears in
+      `lpn-locks/`. If the page shows the amber *"cannot save lock records"* banner, this is why.
 - [x] **Use `https://hawsedc.com/engcalcs/Looped-Network.php`.** Not a plain `http://` LAN IP. The
       File System Access API needs a secure context; without it `window.showSaveFilePicker` is
       `undefined` and **every file feature below silently degrades to the download fallback**. That
@@ -127,14 +140,27 @@ single guess in the build.
       minimise, and reload the page. **A still holds it** every time, and B still gets the dialog.
       *(The release on `visibilitychange → hidden` is gone; that event fires on an ordinary tab
       switch, which is what made the lock evaporate.)*
-- [ ] **The freshness check — this is now the actual guarantee.** Have B take the file (by whatever
+      [TGH: (1) I get "This project came from Maricopa-Flex-lpn-hawsedc-engcalcs.json, but a browser does not stay connected to a file after the page is reloaded. Use File, Save as, or open the file again, to connect to it. Choose the file again Dismiss". (2) Save acts like Save as. (3) Reloading the page is what causes this. Can our connection either survive that or be re-established from our storage and our server lock?
+- [x] **The freshness check — this is now the actual guarantee.** Have B take the file (by whatever
       route) and save a change to it. Then in A press **Save** → **refused**, with a banner saying
       somebody else saved to this file and pointing at Save as / Revert. A's work is untouched.
-- [ ] From that state, **Revert** → A gets B's version and the banner clears.
-- [ ] From that state, **Save as…** to a new name → succeeds, banner clears, A keeps their work.
-- [ ] The same refusal happens **with the lock broker blocked** (see §9). The freshness check must
+      [TGH: (1) Do we want to add "AAA has this file open. They last edited X ago, Y after their last save"? (2) Revert is not an option. It says "Read-only: TGH has this file open. You can change anything you like here, but you cannot save. Use File, Save as to save to a different file.Save as…"]
+- [ ] **RETEST — fixed 2026-08-05.** From that state, **Revert** → A gets B's version and the banner
+      clears. *(Revert was disabled in read-only, leaving "fork it into a new file" as the only exit
+      from a situation whose obvious resolution is "fine, theirs wins". Revert writes nothing, so it
+      is safe in every state.)*
+- [x] From that state, **Save as…** to a new name → succeeds, banner clears, A keeps their work.
+- [-] The same refusal happens **with the lock broker blocked** (see §9). The freshness check must
       not depend on the server at all.
-- [ ] Ordinary case, unbroken: open, edit, Save, edit, Save again → **never** refused. A false
+      [TGH: You are being lazy. You should not ask me to test things that are obviously not there. "Beware: could not reach the server to check or create a lock on this project, so nothing is stopping a colleague from editing the same file at the same time. You will be told if locking starts working again."]
+      [CC 2026-08-05: Fair, and the banner you kept seeing was itself the bug. A server that ANSWERS
+      "I cannot write the lock directory" was being flattened into the same silence as a dead network,
+      so the page could only ever say "could not reach the server". The 4xx/5xx body is now read and a
+      setup fault says so in its own words.]
+- [ ] **RETEST — a broken server and an absent one now read differently.** Make `lpn-locks/`
+      unwritable again and open a project → the banner names it as a **setup fault on the server**.
+      Then block the request entirely (recipe above) → the original "could not reach" wording.
+- [x] Ordinary case, unbroken: open, edit, Save, edit, Save again → **never** refused. A false
       positive here would be worse than the bug it prevents.
 - [-] Profile **B**: open the same file. Expect a dialog headed **"<A's initials> has this file
       open."** offering exactly two choices: **Open read-only** and **Create a copy**.
@@ -144,13 +170,24 @@ single guess in the build.
       files have **different `docId`s**.
       [TGH: No. Just creates a copy in browser. No save. And uses same name. Oops.]
 - [x] In A, **File → Close**, then in B open the file again → B gets it cleanly, no dialog.
-- [ ] **RETEST — fixed 2026-08-05, this is the dangerous one.** While A holds a file, from *any*
+- [-] **RETEST — fixed 2026-08-05, this is the dangerous one.** While A holds a file, from *any*
       project in B (editable, not read-only, any name) try **Save as…** and pick A's file → refused,
       naming the collision. Then repeat with A's file *renamed* — still refused, because identity is
       the `docId` inside the file, not the name.
+      [TGH: No complaint, no refusal. All I get is this: "Beware: could not reach the server to check or create a lock on this project, so nothing is stopping a colleague from editing the same file at the same time. You will be told if locking starts working again."]
+      [CC 2026-08-05: Two causes, and the second is the real lesson. (1) The broker could not write
+      (see §0), so it could never answer "somebody has this". (2) **The guard asked ONLY the broker**,
+      so with the broker down it answered "no collision" to everything and reproduced the very bug it
+      was written to fix. Now split in two: a hard refusal when the broker says somebody holds it,
+      and — needing nothing but the file itself — a confirm naming the project about to be destroyed.]
+- [ ] **RETEST — the broker-free half.** With locking working normally, Save as… onto a file holding
+      a *different* project → a confirm naming that project. Cancel leaves both files untouched.
+- [ ] **RETEST — the same with the broker deliberately broken.** The confirm must still appear. This
+      is the case that failed on 2026-08-05.
 - [ ] Save as… onto a brand-new file, and onto a non-project file → **still allowed**. The guard must
       not turn into "Save as sometimes does nothing".
-- [ ] With the broker blocked (see §9), Save as… still works. A lock outage must not disable saving.
+      [TGH: I did not test due to previous.]
+- [x] With the broker blocked (see §9), Save as… still works. A lock outage must not disable saving.
 
 ---
 

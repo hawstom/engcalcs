@@ -2353,7 +2353,7 @@ var EngCalcs = EngCalcs || {};
 		if (!on) { clearWarn('changed'); return; }
 		bannerWarn = {
 			kind: 'changed',
-			message: pc.lpn_file_changed_elsewhere || 'Somebody else has saved to this file since you opened it, so saving now would write over their work. Use File, Save as to keep your changes in a file of your own, or File, Revert to throw yours away and load theirs.',
+			message: (pc.lpn_file_changed_elsewhere || 'Somebody else has saved to this file since you opened it, so saving now would write over their work. Use File, Save as to keep your changes in a file of your own, or File, Revert to throw yours away and load theirs.'),
 			dismissable: true
 		};
 		renderBanner();
@@ -2566,28 +2566,38 @@ var EngCalcs = EngCalcs || {};
 		if (startAt && startAt !== library.openId) { openProject(startAt); }
 		renderTabs();
 	}
-	// Does the file behind `handle` belong to a project somebody else currently holds the lock on?
+	// What is in the file we are about to write over? Two independent answers, because they have
+	// very different reliability:
 	//
-	// Returns false whenever the answer cannot be established -- an unreadable file, a file that is
-	// not one of our projects, no docId in it, or no reachable lock broker. That direction is
-	// deliberate: this guard exists to stop a *known* collision, and a broker outage must not make
-	// Save as stop working. The no-broker case is already announced by the amber
-	// `lpn_lock_unavailable` banner, which is the honest place to say locking is not protecting you.
-	async function fileIsHeldBySomeoneElse(handle) {
-		if (!handle || !handle.getFile) { return false; }
+	//   .heldBy  -- somebody has it open. Needs the broker, so it is ABSENT whenever the broker is.
+	//   .foreign -- the file already holds a DIFFERENT project of ours. Needs nothing but the file.
+	//
+	// Tom's 2026-08-05 retest is why the second exists. The first version of this guard asked only
+	// the broker, so on a server whose lock directory was not writable it answered "no collision" to
+	// everything and Save as sailed over a colleague's file exactly as before -- the fix reproduced
+	// the bug it was written for. A guard against destroying somebody's work must not depend on a
+	// server being up. The file itself is always there to be read.
+	async function inspectSaveTarget(handle) {
+		var pc = EngCalcs.pageConfig || {};
+		var out = { foreign: false, name: '', heldBy: '' };
+		if (!handle || !handle.getFile) { return out; }
 		var text, parsed, docId, r;
 		try { text = await (await handle.getFile()).text(); }
-		catch (err) { return false; }
-		if (!text) { return false; }               // a brand-new empty file
-		try { parsed = JSON.parse(text); } catch (err) { return false; }
+		catch (err) { return out; }
+		if (!text) { return out; }                  // a brand-new empty file: nothing to lose
+		try { parsed = JSON.parse(text); } catch (err) { return out; }
 		docId = parsed && parsed.project && parsed.project.docId;
-		if (!docId) { return false; }
-		// Our own open project writing back to its own file is not a collision.
-		if (docId === (project && project.docId) && !readOnly) { return false; }
+		if (!docId) { return out; }                 // not one of ours; the user's business
+		// Our own open project writing back to its own file is not a collision at all.
+		if (docId === (project && project.docId) && !readOnly) { return out; }
+		out.foreign = true;
+		out.name = (parsed.project && parsed.project.name) || '';
 		r = await postLock('check', docId);
-		return !!(r && r.ok && r.locked && !r.mine);
+		if (r && r.ok && r.locked && !r.mine) {
+			out.heldBy = r.lockedBy || pc.lpn_lock_somebody || 'Somebody else';
+		}
+		return out;
 	}
-
 	// File -> Save as. Also the answer to Rename on a file project, to a read-only tab that wants to
 	// keep its work, and to the first save of a browser project.
 	async function saveAs() {
@@ -2621,9 +2631,19 @@ var EngCalcs = EngCalcs || {};
 		// and somebody is holding it, refuse. A file that is empty, unreadable, or not one of our
 		// projects has no docId and no lock: the user has chosen to overwrite something unrelated,
 		// which is their business.
-		if (await fileIsHeldBySomeoneElse(handle)) {
+		var target = await inspectSaveTarget(handle);
+		if (target.heldBy) {
+			// Somebody is in it right now. Not negotiable.
 			alert(pc.lpn_saveas_same_file || 'That is the same file somebody else has open, so it cannot be saved over. Choose a different file or a different name.');
 			return;
+		}
+		if (target.foreign) {
+			// Nobody has it open -- or nobody we can ASK, which from here is the same thing. Still a
+			// whole project about to be destroyed, so name it and let the user decide. This branch
+			// works with the broker down, which is the entire point.
+			var warn = (pc.lpn_saveas_overwrites_project || 'That file already holds a different project, {name}. Saving here replaces it completely. Continue?')
+				.replace('{name}', target.name || (pc.lpn_lock_somebody || 'Somebody else'));
+			if (!window.confirm(warn)) { return; }
 		}
 		// Writing somewhere new makes this a DIFFERENT document, so it needs its own lock key: a copy
 		// and its original must never contend over one lock, and a copy must never be able to abort
@@ -2904,11 +2924,21 @@ var EngCalcs = EngCalcs || {};
 		writeJSON(LPN_IDENTITY_KEY, identity);
 		return identity;
 	}
-	// null means "could not reach the broker", which every caller treats as fail-open. A non-null
-	// result is the parsed response, whatever it says.
+	// null means "we could not get an answer" -- every caller treats that as fail-open. A non-null
+	// result is the parsed response, INCLUDING an {ok:false,error:...} body from a 4xx/5xx, because
+	// a server that answers "I cannot write the lock directory" is telling us something far more
+	// useful than silence, and used to be flattened into the same null as a dead network. That cost
+	// Tom an hour on 2026-08-05: lpn-locks/ was not writable by the web server user, every acquire
+	// 500'd, and the page said only "could not reach the server".
 	async function postLock(action, docId) {
 		var idn = loadIdentity();
-		if (!idn || !docId || !window.fetch) { return null; }
+		// **"We never asked" is not "the server is down."** Returning the same null for both let the
+		// page announce a server outage when the real state was a missing docId or missing initials
+		// -- a lie that sends whoever is debugging it straight to the server for no reason. If there
+		// is no request in the Network tab, this is the branch that ran.
+		if (!idn || !docId || !window.fetch) {
+			return { ok: false, error: 'notasked', asked: false };
+		}
 		try {
 			var resp = await fetch(LPN_LOCK_URL, {
 				method: 'POST',
@@ -2920,8 +2950,11 @@ var EngCalcs = EngCalcs || {};
 				editedAt: String(lastEditAt || 0), savedAt: String(lastSaveAt || 0)
 			})
 			});
-			if (!resp.ok) { return null; }
-			return await resp.json();
+			// Parse first, status second: the error body is the whole point.
+			var data = null;
+			try { data = await resp.json(); } catch (err2) { data = null; }
+			if (data && typeof data === 'object') { return data; }
+			return null;
 		} catch (err) { return null; }
 	}
 	// **Locks are per TAB, not per current project** (Task 211). Every project in the library is an
@@ -3056,9 +3089,19 @@ var EngCalcs = EngCalcs || {};
 	function setLockUnavailable(on) {
 		var pc = EngCalcs.pageConfig || {};
 		if (!on) { clearWarn('lock'); return; }
+		// A setup fault reads completely differently from an outage, and only one of the two is
+		// somebody's to go and fix. Naming it is the difference between an afternoon of confusion
+		// and one chmod.
+		var msg = lockErrorCode === 'notasked'
+			? (pc.lpn_lock_not_asked || 'Locking is not running for this project, so nothing is stopping a colleague from editing the same file at the same time. This browser has no name recorded for you yet, or the project has no identifier — saving the project to a file sets both.')
+			: lockErrorCode === 'full'
+			? (pc.lpn_lock_full_error || 'Beware: this site has run out of room to record who has which project open, so nothing is stopping a colleague from editing the same file at the same time. This is a setup fault on the server, not something you can fix here.')
+			: lockErrorCode === 'storage'
+			? (pc.lpn_lock_storage_error || 'Beware: this site cannot save lock records, so nothing is stopping a colleague from editing the same file at the same time. This is a setup fault on the server, not something you can fix here — the lock folder is not writable by the web server.')
+			: (pc.lpn_lock_unavailable || 'Beware: could not reach the server to check or create a lock on this project, so nothing is stopping a colleague from editing the same file at the same time. You will be told if locking starts working again.');
 		bannerWarn = {
 			kind: 'lock',
-			message: pc.lpn_lock_unavailable || 'Beware: could not reach the server to check or create a lock on this project, so nothing is stopping a colleague from editing the same file at the same time. You will be told if locking starts working again.',
+			message: msg,
 			action: null,
 			dismissable: lockWarningDismissable()
 		};
@@ -3089,6 +3132,7 @@ var EngCalcs = EngCalcs || {};
 		if (!ensureIdentity()) { return; }
 		var r = await postLock('acquire', docId);
 		if (!r || !r.ok) {
+			lockErrorCode = (r && r.error) || '';
 			// The moment of danger (Tom, 2026-08-03): from here on the file is unprotected. Editing
 			// continues, but SAY SO -- and pollLockedFiles() below is what makes the promise in that
 			// message ("you will be told if locking starts working again") a real one.
@@ -3113,6 +3157,10 @@ var EngCalcs = EngCalcs || {};
 	// could-not-lock warning makes. It deliberately does NOT poll a tab the user opened read-only:
 	// read-only is read-only, and nothing promotes a tab behind the user's back.
 	var lockUnavailable = false;
+	// Which flavour of "no locking" we are in, so the banner can say something a person can act on.
+	// 'storage' is a server SETUP fault (the lock directory is not writable by the web server user)
+	// and is worth naming, because nobody will ever guess it from "could not reach the server".
+	var lockErrorCode = '';
 	var LPN_HEARTBEAT_MS = 60000;
 	async function pollLockedFiles() {
 		var pc = EngCalcs.pageConfig || {};
@@ -3457,7 +3505,12 @@ var EngCalcs = EngCalcs || {};
 			// once did anything.
 			{ label: pc.lpn_file_saveall || 'Save all', fn: saveAllFiles, hidden: dirtyFileCount() < 2 },
 			// Only offered when there is something to revert TO and something to revert FROM.
-			{ label: pc.lpn_file_revert || 'Revert', fn: revertCurrent, disabled: !(linked && entry && entry.dirty && !readOnly) },
+			// Reachable in READ-ONLY on purpose (Tom, 2026-08-05: "Revert is not an option"). Revert
+			// re-reads the file and throws your edits away -- which is exactly what somebody locked
+			// out of a file wants when they decide the colleague's version wins. Disabling it there
+			// left "Save as to a new file" as the only exit, and forked a project that did not need
+			// forking. It writes nothing, so it is safe in every state.
+			{ label: pc.lpn_file_revert || 'Revert', fn: revertCurrent, disabled: !(linked && entry && entry.dirty) },
 			{ separator: true },
 			{ label: pc.lpn_file_close || 'Close', fn: function () { closeTab(id); } }
 		]);
