@@ -2668,19 +2668,30 @@ var EngCalcs = EngCalcs || {};
 	// server being up. The file itself is always there to be read.
 	async function inspectSaveTarget(handle) {
 		var pc = EngCalcs.pageConfig || {};
-		var out = { foreign: false, name: '', heldBy: '' };
+		var out = { foreign: false, name: '', heldBy: '', stale: false };
 		if (!handle || !handle.getFile) { return out; }
-		var text, parsed, docId, r;
-		try { text = await (await handle.getFile()).text(); }
+		var text, parsed, docId, r, f, stamp = '';
+		try { f = await handle.getFile(); text = await f.text(); stamp = f.lastModified + ':' + f.size; }
 		catch (err) { return out; }
 		if (!text) { return out; }                  // a brand-new empty file: nothing to lose
 		try { parsed = JSON.parse(text); } catch (err) { return out; }
 		docId = parsed && parsed.project && parsed.project.docId;
 		if (!docId) { return out; }                 // not one of ours; the user's business
-		// Our own open project writing back to its own file is not a collision at all.
-		if (docId === (project && project.docId) && !readOnly) { return out; }
-		out.foreign = true;
+		// **The freshness check belongs on THIS path too** (fixed 2026-08-06 -- Tom, twice: "Still
+		// doesn't work with broker blocked. Save is apparently allowed as normal."). Save as is not a
+		// lesser write: read-only routes Save straight here, and so does a tab that lost its handle,
+		// so "our own file" is exactly the file a colleague is most likely to have moved on. The
+		// exemption below said any file carrying our own docId was safe to overwrite -- which is true
+		// of the file we last wrote and false of the file somebody else has written since. Needs the
+		// broker for nothing: it is the same stamp comparison writeOpenProjectToFile() makes.
+		var owner = projectWithDocId(docId), base = owner ? knownStamp(owner) : '';
+		out.stale = !!(base && stamp && stamp !== base);
 		out.name = (parsed.project && parsed.project.name) || '';
+		// A file carrying our OWN docId is never "a different project" -- naming it as one would ask
+		// the user about a collision with themselves. It can still be stale, and it can still be held
+		// by somebody who took it, so it goes on to the broker rather than returning early as it used
+		// to: that early return is why Save as could write over a file a colleague had just taken.
+		if (docId !== (project && project.docId)) { out.foreign = true; }
 		r = await postLock('check', docId);
 		if (r && r.ok && r.locked && !r.mine) {
 			out.heldBy = r.lockedBy || pc.lpn_lock_somebody || 'Somebody else';
@@ -2725,6 +2736,14 @@ var EngCalcs = EngCalcs || {};
 			// Somebody is in it right now. Not negotiable.
 			alert(pc.lpn_saveas_same_file || 'That is the same file somebody else has open, so it cannot be saved over. Choose a different file or a different name.');
 			return;
+		}
+		// The file has moved on since we last saw it. Asked BEFORE the foreign question because it is
+		// the more specific fact: a stale file is one we know somebody has written to, where "foreign"
+		// only knows it holds a project that is not the one in front of us. Needs no server.
+		if (target.stale) {
+			var warnStale = (pc.lpn_saveas_overwrites_newer || 'That file has changed since you last saw it, so somebody else has almost certainly saved to it. Saving here replaces their version with yours. Continue?')
+				.replace('{name}', target.name || (pc.lpn_lock_somebody || 'Somebody else'));
+			if (!window.confirm(warnStale)) { return; }
 		}
 		if (target.foreign) {
 			// Nobody has it open -- or nobody we can ASK, which from here is the same thing. Still a
@@ -2907,17 +2926,51 @@ var EngCalcs = EngCalcs || {};
 	// **Breaking a lock is not overwriting a file.** It never was safe to conflate the two; it is now
 	// structurally impossible to, because writeOpenProjectToFile() checks the bytes on disk before
 	// every write. That is what allows this button to exist at all after Take over was withdrawn.
-	function presentOpenChoice(saved, handle, who, info) {
+	// **"{name} has this file open." on its own is not enough to decide anything** (Tom, 2026-08-06:
+	// "Are we going to add some numbers to this message?"). The whole dialog asks the reader to judge
+	// a claim -- wait, look read-only, or break it -- and that judgment is entirely about time: how
+	// long since they touched it, and how much of that is unsaved.
+	//
+	// The numbers were already reported by the holder and stored by the broker; only the richest of
+	// the four sentences was ever used, and it needed BOTH an edit and a save in the holder's current
+	// session, so the ordinary "opened it and went to lunch" case fell through to the bare sentence.
+	// Each case below says the most it truthfully can:
+	//
+	//   unsaved work   -- the one that matters most: interrupting them costs them that work.
+	//   all saved      -- safest to break; nothing of theirs is at risk.
+	//   nothing edited -- they may only have it open; `lastActivity` says whether anyone is home.
+	//   no numbers     -- an old record, or a broker that answered without them.
+	//
+	// `lastActivity` is the broker's own clock in SECONDS (it is `time()`); editedAt/savedAt are the
+	// holder's clock in milliseconds. Mixing the two units silently turns "5 minutes" into "7 weeks".
+	function lockHeadingText(who, info) {
 		var pc = EngCalcs.pageConfig || {}, now = Date.now();
 		var editedAt = (info && info.editedAt) || 0, savedAt = (info && info.savedAt) || 0;
+		var seenAt = ((info && info.lastActivity) || 0) * 1000;
+		var s;
+		if (editedAt && savedAt && editedAt > savedAt) {
+			s = (pc.lpn_lock_open_heading_times || '{name} has this file open; the last edit was {x} ago, {y} after the last save.')
+				.replace('{x}', agoText(now - editedAt)).replace('{y}', agoText(editedAt - savedAt));
+		} else if (editedAt && !savedAt) {
+			s = (pc.lpn_lock_open_heading_unsaved || '{name} has this file open; the last edit was {x} ago, and none of it has been saved to this file yet.')
+				.replace('{x}', agoText(now - editedAt));
+		} else if (editedAt) {
+			s = (pc.lpn_lock_open_heading_saved || '{name} has this file open; the last edit was {x} ago, and their work is saved to the file.')
+				.replace('{x}', agoText(now - editedAt));
+		} else if (seenAt) {
+			s = (pc.lpn_lock_open_heading_seen || '{name} has this file open but has not edited it. Their browser last checked in {x} ago.')
+				.replace('{x}', agoText(now - seenAt));
+		} else {
+			s = pc.lpn_lock_open_heading || '{name} has this file open.';
+		}
+		return s.replace('{name}', who);
+	}
+	function presentOpenChoice(saved, handle, who, info) {
+		var pc = EngCalcs.pageConfig || {};
 		openDialog(function (body) {
 			var p = document.createElement('p');
 			p.style.margin = '0 0 8px';
-			p.textContent = (editedAt && savedAt && editedAt > savedAt
-				? (pc.lpn_lock_open_heading_times || '{name} has this file open; the last edit was {x} ago, {y} after the last save.')
-					.replace('{x}', agoText(now - editedAt)).replace('{y}', agoText(editedAt - savedAt))
-				: (pc.lpn_lock_open_heading || '{name} has this file open.')
-			).replace('{name}', who);
+			p.textContent = lockHeadingText(who, info);
 			body.appendChild(p);
 			var q = document.createElement('p');
 			q.style.margin = '0';
@@ -3152,11 +3205,24 @@ var EngCalcs = EngCalcs || {};
 		// is no Take over (withdrawn 2026-08-04 -- it wrote a copy older than the file over the top of
 		// it) and no "the file is free now, save over it" (refused by Tom for the same physics: the
 		// file on disk has moved on since we read it).
+		// **Revert is the other real exit, and it was missing from both banners** (Tom, 2026-08-06:
+		// "No revert offered, only Save as"). Save as keeps your work in a file of your own; Revert
+		// says "fine, theirs wins" and re-reads the file. Both are honest answers to being locked out
+		// or overtaken, and offering only the first makes a new file the price of giving in. It writes
+		// nothing, so it is safe in read-only; it is offered only when there is something to revert
+		// FROM (unsaved changes) and something to revert TO (a live connection).
+		function offerRevert() {
+			var e = indexEntry(library.openId);
+			if (!(isLinked(library.openId) && e && e.dirty)) { return; }
+			action(pc.lpn_file_revert || 'Revert', revertCurrent);
+		}
 		if (bannerRO) {
 			action(pc.lpn_file_saveas || 'Save as…', saveAs);
+			offerRevert();
 		}
 		if (!bannerRO && bannerWarn) {
 			if (bannerWarn.action) { action(bannerWarn.actionLabel, bannerWarn.action); }
+			if (bannerWarn.kind === 'changed') { action(pc.lpn_file_saveas || 'Save as…', saveAs); offerRevert(); }
 			// Dismissable only where the missing server is a standing fact of how the page is being
 			// used rather than a fault to be fixed -- offline, or installed as an app (Tom, 2026-08-03,
 			// unsure which way this should go). Undismissable in the ordinary online case, because

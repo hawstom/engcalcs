@@ -914,6 +914,26 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     a new one. **Lesson worth more than the fix: restoring a connection is not the same as restoring
     what that connection KNEW** — Task 212 brought back the handle and silently reset the guarantee
     built on top of it.
+  - **The freshness check was on one write path out of two** (2026-08-06, Tom's third report of the
+    same symptom: *"Still doesn't work with broker blocked. Save is apparently allowed as normal."*).
+    It lived in `writeOpenProjectToFile()` — but **read-only routes Save straight to Save as**, and
+    so does a tab with no live handle, and Save as exempted any file carrying our own `docId` from
+    every question, without even asking the broker. True of the file we last wrote; false of the file
+    a colleague has written since. Save as now runs the same stamp comparison and asks the broker
+    about our own docId too. **Two lessons: a guarantee that guards one of two paths guards neither,
+    and "it is our own file" is a statement about the past.**
+  - **"{name} has this file open." now carries numbers** (Tom: *"Are we going to add some numbers to
+    this message?"*). The dialog asks the reader to judge a claim, and that judgment is entirely
+    about time. The broker already stored `editedAt`/`savedAt`/`lastActivity`; only the richest of
+    the four sentences was ever used, and it required both an edit and a save in the holder's current
+    session — so the ordinary case fell through to the bare sentence. Four cases now: unsaved work,
+    all saved, edited-but-never-saved, and only-opened.
+  - **Revert was in the menu and in neither banner**, which is where somebody locked out is looking.
+    Both banners carry it now.
+  - **Save all's tab-switching flicker is deliberately NOT fixed** — the write path writes the *open*
+    project and every warning it raises is a banner about the tab in front of you; making it silent
+    means teaching that function to report about a project the user cannot see. Cosmetic cost, P0
+    surface. Recorded so it is not re-litigated as an oversight.
   - Sits above 220 because 220 cannot finish until these are fixed and the punch list re-run.
 
 - 95|220| **Browser-verify `lpn_` project files and locking against the POST-211 UI.**

@@ -241,6 +241,79 @@ async function scenario(label, rows, openProjects, stampsOnRecord = []) {
 			'a file with no docId is not "the same file" as every project that has none');
 	}
 
+	// 11. Save as, asked of the file actually chosen. This is the OTHER write path, and read-only
+	//     routes Save straight into it — so "our own file" is exactly the file a colleague is most
+	//     likely to have moved on. None of these four answers may depend on the broker.
+	{
+		const mk = async (fileDoc, fileStamp, baseline, openDocId, ro, lockAnswer) => {
+			const project = { docId: openDocId };
+			const readOnly = ro;
+			const library = { projects: [{ id: 'p1' }] };
+			const docs = { p1: { project: { docId: 'dMINE' } } };
+			const projectKey = (id) => id, readJSON = (k) => docs[k] || null;
+			const knownStamp = () => baseline;
+			const postLock = async () => lockAnswer;
+			const lockHolderName = (r) => r.lockedBy;
+			const EngCalcs = { pageConfig: {} };
+			const projectWithDocId = eval('(' + extract('projectWithDocId') + ')');
+			const inspectSaveTarget = eval('(' + extract('inspectSaveTarget') + ')');
+			const [lm, size] = fileStamp.split(':');
+			const handle = { getFile: async () => ({ lastModified: +lm, size: +size, text: async () => JSON.stringify(fileDoc) }) };
+			return inspectSaveTarget(handle);
+		};
+		const mine = { project: { docId: 'dMINE', name: 'Maricopa Flex' } };
+		const theirs = { project: { docId: 'dOTHER', name: 'Elm Street' } };
+		const free = { ok: true, locked: false };
+		const held = { ok: true, locked: true, mine: false, lockedBy: 'ABC' };
+		const noBroker = null;
+
+		let t = await mk(mine, '1000:50', '1000:50', 'dMINE', false, free);
+		report(!t.stale && !t.foreign && !t.heldBy, 'save as: our own file, untouched since we saw it → no question asked');
+
+		t = await mk(mine, '2000:50', '1000:50', 'dMINE', false, free);
+		report(t.stale && !t.foreign, 'save as: our own file that has MOVED ON → asked about, and not as "a different project"');
+
+		t = await mk(mine, '2000:50', '1000:50', 'dMINE', false, noBroker);
+		report(t.stale, 'save as: still asked with the broker unreachable',
+			'this is the case Tom reported twice as "Save is apparently allowed as normal"');
+
+		t = await mk(mine, '1000:50', '1000:50', 'dMINE', false, held);
+		report(t.heldBy === 'ABC', 'save as: our own file that somebody has TAKEN → refused',
+			'the old early return never even asked the broker about our own docId');
+
+		t = await mk(theirs, '1000:50', '', 'dMINE', false, free);
+		report(t.foreign && t.name === 'Elm Street', 'save as: a different project of ours → named in the confirm');
+
+		t = await mk(mine, '2000:50', '', 'dMINE', false, free);
+		report(!t.stale, 'save as: no baseline → fails open, as an unanswerable question must');
+	}
+
+	// 12. What the lock dialog says. The reader is being asked to judge a claim, and every branch of
+	//     that judgment is about time — so each case says the most it truthfully can.
+	{
+		const now = Date.now();
+		const EngCalcs = { pageConfig: {} };
+		const agoText = eval('(' + extract('agoText') + ')');
+		const lockHeadingText = eval('(' + extract('lockHeadingText') + ')');
+
+		const unsavedWork = lockHeadingText('ABC', { editedAt: now - 600000, savedAt: now - 1800000 });
+		report(/10 minutes ago, 20 minutes after/.test(unsavedWork), 'lock dialog: unsaved work names both numbers',
+			unsavedWork);
+		const neverSaved = lockHeadingText('ABC', { editedAt: now - 600000, savedAt: 0 });
+		report(/10 minutes/.test(neverSaved) && /not been saved|none of it/.test(neverSaved),
+			'lock dialog: edited but never saved says so', neverSaved);
+		const allSaved = lockHeadingText('ABC', { editedAt: now - 600000, savedAt: now - 60000 });
+		report(/10 minutes/.test(allSaved) && /saved to the file/.test(allSaved),
+			'lock dialog: everything saved says so — this is the safe one to break', allSaved);
+		const justOpen = lockHeadingText('ABC', { editedAt: 0, savedAt: 0, lastActivity: Math.floor((now - 300000) / 1000) });
+		report(/5 minutes/.test(justOpen), 'lock dialog: nothing edited falls back to when we last heard from them',
+			justOpen);
+		report(!/hours|days/.test(justOpen), 'lock dialog: lastActivity is read as SECONDS, not milliseconds',
+			'mixing the units turns 5 minutes into 7 weeks');
+		report(lockHeadingText('ABC', {}) === 'ABC has this file open.',
+			'lock dialog: with no numbers at all, the bare sentence — and only then');
+	}
+
 	console.log(`\n${checks - failures}/${checks} checks passed.\n`);
 	process.exit(failures ? 1 : 0);
 })();

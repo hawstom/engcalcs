@@ -22,7 +22,7 @@ has ever been seen rendered.** This list exists because that is the whole risk.
 fatiguing, and I ask you not to ask them of me any more than necessary"*). So the rule for adding to
 this list: **if a harness can answer it, a harness must**, and only what genuinely needs a rendered
 page — or two browser profiles — is allowed to appear below. Task 212's decision table went to
-`dev/lpn-spike/handle-restore-harness.js` (43 checks, mutation-tested) instead of becoming six more
+`dev/lpn-spike/handle-restore-harness.js` (55 checks, mutation-tested) instead of becoming six more
 boxes here. When a check here fails, ask whether the retest belongs in a harness before writing it
 back into this file.
 
@@ -100,7 +100,7 @@ single guess in the build.
 
 ## 3. The File menu, and the absence of autosave
 
-- [ ] **RETEST — fixed 2026-08-05.** Menu reads: **New, Open…, Save, Save as…, Save all, Revert,
+- [x] **RETEST — fixed 2026-08-05.** Menu reads: **New, Open…, Save, Save as…, Save all, Revert,
       Close** — *every row present every time*. **Save all** is greyed out below two file projects
       with unsaved changes, in the way Save and Revert already grey out.
       [TGH: Save all is not present]
@@ -113,8 +113,16 @@ single guess in the build.
 - [x] The original file still holds the pre-Save-as contents.
 - [x] **Revert** → confirmation naming the file → the on-disk version reloads and your unsaved edits
       are gone.
-- [ ] **Save all** with two file-connected projects open and both edited → the row is now enabled,
+- [-] **Save all** with two file-connected projects open and both edited → the row is now enabled,
       and both files advance. With only one edited, the row is greyed.
+      [TGH: It works, but having it switch to each tab as it saves it is unsightly.]
+      [CC 2026-08-06: Agreed it is ugly, and NOT fixed — deliberately. Save all switches tabs because
+      the write path writes *the open project*, and every warning it can raise (read-only, the file
+      changed underneath, the file is gone) is a banner about *the tab you are looking at*. Making it
+      silent means teaching the write path to report about a project you cannot see, on the one
+      function in this file that can destroy a colleague's work. Not worth it for a flicker on a
+      command that needs two edited file projects to be reachable at all. Say the word if you want it
+      anyway and it becomes its own task.]
 - [x] Hover **Save** and **Save as…** → tips distinguish "saves to the connected file" from
       "choose a file to save to".
 
@@ -141,7 +149,7 @@ single guess in the build.
 - [x] **File → Open…** → pick a saved file → the network appears and the status line names it.
 - [x] It arrives as a **new tab**, not over the top of the current project.
 - [x] Its tab is **not** marked "Not saved to a file".
-- [ ] **RETEST — fixed 2026-08-05.** Open the *same* file twice in one browser → **no second tab**.
+- [x] **RETEST — fixed 2026-08-05.** Open the *same* file twice in one browser → **no second tab**.
       It switches to the tab that already has it and says so. If that tab has unsaved changes, the
       message says so too and points at Revert.
       [TGH: It does open two live tabs both claiming the same file.]
@@ -149,6 +157,14 @@ single guess in the build.
       `docId` inside the file, so a copy saved under a new name still opens as its own tab.]
 - [ ] **The same route is now how you reconnect.** Take a project whose banner says the connection
       was lost, and **File → Open…** its file → it reconnects *that* tab rather than adding one.
+      [TGH: I am not sure under what condition a connection would be lost. How can I test this?]
+      [CC 2026-08-06: Fair — since Task 212 it is genuinely hard to reach, which is the point. To
+      force it: **Chrome → ⋮ → Settings → Privacy and security → Site settings → hawsedc.com → File
+      editing → Remove**, then reload the page. That throws the grant away rather than making it
+      dormant, so `queryPermission()` answers `denied` and the tab comes back with the banner. The
+      other routes are a private window (no IndexedDB to keep the handle in) and moving the file
+      (§10). A project opened before 2026-08-05 also has no stored handle, but you have none of those
+      left.]
 
 ---
 
@@ -188,7 +204,19 @@ single guess in the build.
 - [x] **The freshness check — this is now the actual guarantee.** Have B take the file (by whatever
       route) and save a change to it. Then in A press **Save** → **disabled**, with a banner saying
       somebody else saved to this file and pointing at Save as / Revert. A's work is untouched.
+      [CC 2026-08-06: (1) YES, and it is in — see the new box below. (2) answered there too.]
       [TGH: (1) Do we want to add "AAA has this file open. They last edited X ago, Y after their last save"? (2) Revert is not an option. It says "Read-only: TGH has this file open. You can change anything you like here, but you cannot save. Use File, Save as to save to a different file.Save as…". I think it may be good as is.]
+- [ ] **NEW 2026-08-06 — the lock dialog now carries numbers** (Tom: *"Are we going to add some
+      numbers to this message?"*). Open a file B is holding and read the first line. It should say
+      one of four things, never the bare *"TGH has this file open."*:
+      - B edited and has **unsaved** work → *"…the last edit was X ago, Y after the last save."*
+      - B edited and **saved** it → *"…the last edit was X ago, and their work is saved to the file."*
+      - B edited, never saved this session → *"…and none of it has been saved to this file yet."*
+      - B has only **opened** it → *"…but has not edited it. Their browser last checked in X ago."*
+      *(The numbers were always reported and stored; only the richest sentence was ever used, and it
+      needed both an edit and a save in B's current session — so the ordinary "opened it and went to
+      lunch" case fell through to the bare one. Wording checked by harness §12, including that the
+      broker's seconds are not read as milliseconds.)*
 - [ ] **REWRITTEN 2026-08-05 — these are two different states, which is what did not make sense.**
       - **Read-only** (B holds the *lock*): the banner names B and offers **Save as** only. There is
         nothing to revert *to* — the file has not moved — so no Revert is offered and that is right.
@@ -197,7 +225,13 @@ single guess in the build.
         and names **both** exits, because both are real — **Save as** keeps your work in a file of
         your own, **Revert** throws yours away and loads theirs. Check **File → Revert** is enabled
         here, and that using it clears the banner.
-      [TGH: Please rewrite this, as it doesn't make sense now. No revert, only Save as.]
+      [TGH: No revert offered, only Save as.]
+      [CC 2026-08-06: You were right and the box was wrong about where to look. Revert was in the
+      File **menu**, never in either **banner** — and the banner is where somebody in this state is
+      actually looking. Both banners now carry it, whenever there is something to revert FROM
+      (unsaved changes) and something to revert TO (a live connection): read-only gets
+      **Save as… + Revert**, changed-underneath gets **Save as… + Revert + Dismiss**. Revert writes
+      nothing, so it is safe even in read-only.]
 - [x] From that state, **Save as…** to a new name → succeeds, banner clears, A keeps their work.
 - [-] The same refusal happens **with the lock broker blocked** (see §9). The freshness check must
       not depend on the server at all.
@@ -213,6 +247,16 @@ single guess in the build.
       object to. The stamp is now stored in the project index beside the file name, and boot keeps
       the old one rather than taking a new one. Harness: `dev/lpn-spike/handle-restore-harness.js`
       §9. **When you retest, reload A between B's save and A's Save — that is the case that broke.**]
+      [TGH: Still doesn't work with broker blocked. Save is apparently allowed as normal.]
+      [CC 2026-08-06: **Second root cause, and this one is the answer to "allowed as normal".** The
+      freshness check lived only in `writeOpenProjectToFile()` — the *Save* path. But **read-only
+      routes Save straight to Save as**, and so does a tab with no live handle, and Save as had an
+      explicit exemption: any file carrying our own `docId` was treated as ours to overwrite, without
+      even asking the broker. That is true of the file we last wrote and false of the file a
+      colleague has written since. Save as now runs the same stamp comparison (needs no server) and
+      asks before replacing a file that has moved on — and it now asks the broker about our own
+      docId too, so a file somebody has TAKEN is refused rather than overwritten. Harness §11.
+      **Retest both ways: press Save, and press Save as… and pick the same file.**]
 - [ ] **RETEST — a broken server and an absent one now read differently.** Make `lpn-locks/`
       unwritable again and open a project → the banner names it as a **setup fault on the server**.
       Then block the request entirely (recipe above) → the original "could not reach" wording.
@@ -397,6 +441,14 @@ Triaged by what a user loses. Roadmap Task 223 points here.
    adopts the fresh handle, which doubles as a second way to reconnect a tab that lost its file.
 7. **§10 A moved or renamed file is not noticed.** No banner, no *Choose the file again*; Save is
    silent and recreates the original name.
+
+15. §3 **Save all switches tabs as it goes**, which is unsightly. **Deliberately not fixed** — see
+    the box in §3: the write path writes the open project and every warning it raises is a banner
+    about the tab in front of you.
+16. §6 **The lock dialog said only "X has this file open."** in the ordinary case. **FIXED
+    2026-08-06** — four sentences now, chosen by what the holder has actually done.
+17. §6 **Save as had no freshness check at all**, and read-only routes Save into it. **FIXED
+    2026-08-06.** This, not the broker, is why the broker-blocked refusal never fired.
 
 **P3 — smaller, all confirmed**
 8. §3 **Save all is missing from the File menu** (the string exists and is passed to the page).
