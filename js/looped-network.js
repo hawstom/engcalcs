@@ -2013,10 +2013,12 @@ var EngCalcs = EngCalcs || {};
 	// state, and closing a tab is what removes a project. These three read that state.
 	//
 	// `entry.fileName` is what makes a project a FILE project, and it is stored in the index rather
-	// than only in the session's handle Map on purpose: a browser does not stay connected to a file
-	// across a page load, so after a reload we still know the tab came from `Elm-Street.json` even
-	// though we can no longer write to it. Keeping the name means the tab keeps its identity instead
-	// of silently demoting itself to a browser project, which would be a lie about where the work is.
+	// than only in the session's handle Map on purpose: the handle itself is kept in IndexedDB and
+	// usually comes back (Task 212), but it can fail to -- permission withdrawn, private browsing, a
+	// project last opened before that store existed -- and then we still know the tab came from
+	// `Elm-Street.json` even though we cannot write to it. Keeping the name means the tab keeps its
+	// identity instead of silently demoting itself to a browser project, which would be a lie about
+	// where the work is.
 	function isFileProject(entry) { return !!(entry && entry.fileName); }
 	function handleFor(id) { return fileHandles.get(id) || null; }
 	// True only when we can actually WRITE without asking again.
@@ -2320,9 +2322,9 @@ var EngCalcs = EngCalcs || {};
 	// regardless. Deliberately NOT a sibling .bak file: that is a second artifact in the engineer's
 	// folder that we cannot reliably clean up and that they would have to explain to somebody.
 	//
-	// Handles are held **for the session only**. Persisting one means stashing it in IndexedDB and
-	// re-requesting permission on return -- that is Task 211's deferred "Open Recent" and is the
-	// honest fix. Meanwhile `entry.fileName` outlives the handle, so a reloaded tab keeps its identity
+	// This Map is **the live connections for this page**; the handles themselves outlive it in
+	// IndexedDB (Task 212), and restoreHandlesOnBoot() refills this Map on the way back in. Where
+	// that fails, `entry.fileName` still outlives the handle, so a reloaded tab keeps its identity
 	// and says what it needs (lpn_file_needs_reopen) instead of silently demoting itself to a browser
 	// project.
 	//
@@ -3116,7 +3118,7 @@ var EngCalcs = EngCalcs || {};
 				kind: 'reopen',
 				message: (pendingHandles.has(id)
 					? (pc.lpn_file_reconnect_prompt || 'This project came from {file}. Your browser needs your permission again before it can write to it. Reconnect below.')
-					: (pc.lpn_file_needs_reopen || 'This project came from {file}, but a browser does not stay connected to a file after the page is reloaded. Use File, Save as, or open the file again, to connect to it.')
+					: (pc.lpn_file_needs_reopen || 'This project came from {file}, but the connection to that file has been lost. Choose the file again to connect to it.')
 				).replace('{file}', entry.fileName),
 				// One click when the handle survived the reload and only needs permission (Task 212);
 				// the old find-it-again picker when it did not.
@@ -3316,15 +3318,25 @@ var EngCalcs = EngCalcs || {};
 				forgetHandle(id);   // denied, or the API is not here at all
 			}
 		}
+		// Anything still pending wants a user activation, and the next gesture is one.
+		if (pendingHandles.size) { armPendingReconnect(); }
 	}
 	// Handles we hold but may not yet write to. One click away from being real.
 	var pendingHandles = new Map();
 	// The banner button for that click. Deliberately NOT a file picker: the user already chose this
 	// file, and making them find it again is the very friction Task 212 exists to remove.
+	var reconnectBusy = false;
 	async function reconnectPendingFile() {
 		var id = library.openId, handle = pendingHandles.get(id);
 		if (!handle) { await relinkFile(); return; }
-		var state = await handlePermission(handle, true);
+		// One request at a time. The first gesture on the page and a click on the banner's own button
+		// are the same click when that button IS the first thing touched -- and two overlapping
+		// requestPermission() calls on one handle is how a browser ends up showing two bubbles.
+		if (reconnectBusy) { return; }
+		reconnectBusy = true;
+		var state;
+		try { state = await handlePermission(handle, true); }
+		finally { reconnectBusy = false; }
 		if (state !== 'granted') { return; }   // declined; the banner stays, nothing is lost
 		pendingHandles.delete(id);
 		fileHandles.set(id, handle);
@@ -3333,6 +3345,41 @@ var EngCalcs = EngCalcs || {};
 		syncReadOnlyToOpenProject();
 		renderTabs();
 		acquireLockForOpenProject();
+	}
+	// **A reload should cost the user nothing** (Tom, 2026-08-05: "I should get nothing, or a prompt
+	// for single-click permission to reconnect"). Task 212 got as far as one click on a banner, which
+	// is neither.
+	//
+	// queryPermission() answers 'prompt' after a reload even where the browser still remembers the
+	// grant: the grant goes DORMANT rather than away, and requestPermission() revives a dormant grant
+	// WITHOUT showing anything -- provided it is called with a live user activation. Boot has no
+	// activation, which is why restoreHandlesOnBoot() must not ask. But the banner's button is not the
+	// only activation available: the FIRST gesture the user makes on the page is one too, and spending
+	// it here makes the ordinary case silent -- the banner is gone before it can be read.
+	//
+	// Where the grant really is gone, the browser shows its own permission bubble, which is exactly
+	// the one-click prompt asked for, and a truthful one: we are asking for write access to somebody's
+	// file, and that is a question the browser gets to put in its own words.
+	//
+	// Once per project, never more: one activation is one request, and a queue of permission bubbles
+	// on a single click would be worse than the banner ever was. The listener stays (rather than
+	// removing itself on first fire) so that switching to a second reloaded file tab gets its own
+	// attempt on the next gesture, instead of being stranded by whichever tab happened to be on
+	// screen when the page came back.
+	var reconnectTried = new Set();
+	function armPendingReconnect() {
+		if (armPendingReconnect.armed) { return; }
+		armPendingReconnect.armed = true;
+		var fire = function () {
+			var id = library.openId;
+			if (!pendingHandles.has(id) || reconnectTried.has(id)) { return; }
+			reconnectTried.add(id);
+			reconnectPendingFile();
+		};
+		// Capture, so a click that something else swallows still counts; keydown as well as
+		// pointerdown because a keyboard user's first move may never be a pointer at all.
+		document.addEventListener('pointerdown', fire, true);
+		document.addEventListener('keydown', fire, true);
 	}
 	async function reacquireLocksOnBoot() {
 		if (!loadIdentity()) { return; }   // no identity means no locking at all; the banner says so

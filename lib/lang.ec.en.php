@@ -1296,7 +1296,7 @@ $ec_lang['lpn_revert_confirm']='Throw away the changes you have made and load {f
 // A file project whose page has been reloaded. Browsers do not stay connected to a file across a
 // page load, so the link is gone even though we still know the name. Says what to do, not just what
 // happened.
-$ec_lang['lpn_file_needs_reopen']='This project came from {file}, but a browser does not stay connected to a file after the page is reloaded. Use File, Save as, or open the file again, to connect to it.';
+$ec_lang['lpn_file_needs_reopen']='This project came from {file}, but the connection to that file has been lost. Choose the file again to connect to it.';
 // Says what is still safe before it says what failed: the reassurance is the part a worried user
 // needs, and it is true -- the browser copy is written on every edit regardless.
 $ec_lang['lpn_file_write_failed']='Could not write to the file. It may have been moved or renamed, or permission may have been withdrawn. Your work is still saved in this browser. Use Save to file to choose the file again.';

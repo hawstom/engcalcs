@@ -57,12 +57,14 @@ async function scenario(label, rows, openProjects) {
 	const forgetHandle = (id) => { forgotten.push(id); };
 	const indexEntry = (id) => (openProjects.includes(id) ? { id, fileName: id + '.json' } : null);
 	const stampFile = async (id) => { stamped.push(id); };
+	let armed = 0;
+	const armPendingReconnect = () => { armed++; };
 
 	const handlePermission = eval('(' + extract('handlePermission') + ')');
 	const restoreHandlesOnBoot = eval('(' + extract('restoreHandlesOnBoot') + ')');
 
 	await restoreHandlesOnBoot();
-	return { forgotten, stamped, fileHandles, pendingHandles, label };
+	return { forgotten, stamped, fileHandles, pendingHandles, armed, label };
 }
 
 (async function () {
@@ -88,6 +90,7 @@ async function scenario(label, rows, openProjects) {
 		report(h.asked.request === 0, 'prompt: does NOT call requestPermission during boot',
 			'no user gesture exists there; asking would fail and teach nothing');
 		report(r.forgotten.length === 0, 'prompt: handle is not thrown away');
+		report(r.armed === 1, 'prompt: the next user gesture is armed to revive it silently');
 	}
 
 	// 3. Denied -> dropped, so the store does not keep something unusable.
@@ -133,6 +136,41 @@ async function scenario(label, rows, openProjects) {
 	{
 		const r = await scenario('empty store', [], ['p1']);
 		report(r.fileHandles.size === 0 && r.forgotten.length === 0, 'empty store: no connections, no errors');
+		report(r.armed === 0, 'empty store: nothing pending, so no gesture is ever spent on it');
+	}
+
+	// 8. The gesture itself. A dormant grant is revived by requestPermission() with a user
+	//    activation and shows the user NOTHING — so the first pointerdown or keydown has to spend
+	//    itself here, exactly once per project, and never on a project that has nothing pending.
+	{
+		const listeners = { pointerdown: [], keydown: [] };
+		const document = { addEventListener: (t, fn) => { (listeners[t] || []).push(fn); } };
+		const library = { openId: 'p1' };
+		const pendingHandles = new Map([['p1', fakeHandle('p1.json', 'prompt')], ['p2', fakeHandle('p2.json', 'prompt')]]);
+		const reconnectTried = new Set();
+		const reconnected = [];
+		const reconnectPendingFile = () => { reconnected.push(library.openId); };
+		const armPendingReconnect = eval('(' + extract('armPendingReconnect') + ')');
+
+		armPendingReconnect();
+		armPendingReconnect(); // a second boot-path call must not double-wire the page
+		report(listeners.pointerdown.length === 1 && listeners.keydown.length === 1,
+			'gesture: armed once, for a pointer and for a key');
+
+		const fire = () => { listeners.pointerdown.forEach(fn => fn()); };
+		fire();
+		report(reconnected.length === 1 && reconnected[0] === 'p1', 'gesture: the first one revives the open project');
+		fire(); fire();
+		report(reconnected.length === 1, 'gesture: asked once per project, never again on later clicks');
+
+		library.openId = 'p2';
+		fire();
+		report(reconnected.length === 2 && reconnected[1] === 'p2',
+			'gesture: a second reloaded tab gets its own attempt when you switch to it');
+
+		library.openId = 'p3'; // a browser project — no file, nothing pending
+		fire();
+		report(reconnected.length === 2, 'gesture: a project with no pending handle is left alone');
 	}
 
 	console.log(`\n${checks - failures}/${checks} checks passed.\n`);

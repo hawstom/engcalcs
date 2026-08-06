@@ -920,8 +920,20 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   `queryPermission()` decides: **granted** reconnects silently, **prompt** is held pending and the
   banner becomes a one-click *Reconnect to this file* — no picker, no hunting — and **denied** or a
   missing API is dropped. A handle whose project has been closed is dropped rather than restored.
-  Verified by `dev/lpn-spike/handle-restore-harness.js` (19 checks, mutation-tested three ways)
-  rather than by adding six boxes to Tom's punch list.
+  Verified by `dev/lpn-spike/handle-restore-harness.js` (26 checks, mutation-tested) rather than by
+  adding six boxes to Tom's punch list.
+  - **A banner is not "nothing"** (Tom, 2026-08-05, on the first cut: "I should get nothing, or a
+    prompt for single-click permission to reconnect"). A grant does not vanish on reload, it goes
+    **dormant**: `queryPermission()` says `prompt`, but `requestPermission()` revives it showing the
+    user *nothing* — provided it has a live user activation. Boot has none, which is why it must not
+    ask. So the **first pointerdown or keydown** on the page is spent on it instead
+    (`armPendingReconnect()`), once per project. Ordinary case: the banner is gone before it is read.
+    Where the grant really is gone the browser puts its own one-click bubble up, which is the honest
+    version of the question and what Tom asked for.
+  - `lpn_file_needs_reopen` said "a browser does not stay connected to a file after the page is
+    reloaded" — no longer true, and the sentence Tom hit. It now says the connection to *that file*
+    was lost, which is what the remaining cases (permission withdrawn, private browsing, a project
+    last opened before the IndexedDB store existed) actually are.
   - **Promoted from 20 and done out of order** because it was not a nicety: every reload disconnected,
     so it contaminated every browser pass and produced three separate "reload doesn't work" reports.
   - Still deferred: `Open Recent`, and answering "is this the same file?" across sessions. Those were
