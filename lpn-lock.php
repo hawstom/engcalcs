@@ -206,7 +206,13 @@ if ($write !== null) {
 flock($fh, LOCK_UN);
 fclose($fh);
 if ($expire) {
+    // Back-date, then collect it NOW rather than waiting for a later request to run the sweep.
+    // A tombstone left lying about is dated 30 days in the past and reads, to anyone looking in the
+    // directory, as corrupted data -- Tom spotted one on 2026-08-05 and called it "impossible",
+    // which is a fair reaction to a file from last month appearing while you watch. We just created
+    // exactly one piece of garbage; take it out.
     @touch($path, time() - (LPN_LOCK_TTL_DAYS * 86400) - 60);
+    lpn_sweep();
 }
 
 lpn_send($response);

@@ -3207,6 +3207,34 @@ var EngCalcs = EngCalcs || {};
 		}
 		heldLocks.delete(pid);
 	}
+	// **A RELOAD MUST NOT DROP YOUR CLAIM** (Tom, 2026-08-05: "Across reloads, minimizes, browser
+	// closes, and computer restarts, you still have your lock until you Close the file").
+	//
+	// beforeunload hands every lock back -- correct, the page really is going -- but nothing took
+	// them up again on the way back in, so a reload quietly un-held every file. The docId lives in
+	// localStorage beside the project, so this needs no file handle and works even though the handle
+	// itself died with the page (that is Task 212's problem, and a different one).
+	//
+	// Being refused here is a normal outcome, not an error: somebody took the file while we were
+	// gone, so that tab becomes read-only and says whose it is.
+	async function reacquireLocksOnBoot() {
+		if (!loadIdentity()) { return; }   // no identity means no locking at all; the banner says so
+		var list = library.projects.filter(isFileProject);
+		for (var i = 0; i < list.length; i++) {
+			var id = list[i].id, d = readJSON(projectKey(id));
+			var docId = d && d.project && d.project.docId;
+			if (!docId) { continue; }
+			var r = await postLock('acquire', docId);
+			if (!r || !r.ok) { continue; }   // unreachable or a server fault; the banner covers it
+			if (r.held) {
+				heldLocks.set(id, docId);
+			} else {
+				lockedByName.set(id, lockHolderName(r));
+				roProjects.add(id);
+			}
+		}
+		syncReadOnlyToOpenProject();
+	}
 	function releaseAllLocks() {
 		var ids = [];
 		heldLocks.forEach(function (docId, id) { ids.push(id); });
@@ -3927,6 +3955,7 @@ var EngCalcs = EngCalcs || {};
 		// the one situation the needs-reopen banner exists for, a page load that dropped the file
 		// handle, was the one situation in which it could not appear.
 		syncReadOnlyToOpenProject();
+		reacquireLocksOnBoot();
 		// Rotating a phone changes innerHeight, and with it the cap above -- without this, turning a
 		// portrait phone to landscape leaves a canvas taller than the screen and re-creates exactly
 		// the trap the cap exists to prevent. orientationchange as well as resize: some mobile

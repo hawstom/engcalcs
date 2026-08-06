@@ -23,7 +23,7 @@ Scope: what is **on production now** — the server-broker version.
 ## 0. Before you start
 
 - [x] `git pull` on the server.
-- [ ] **THE LOCK BROKER MUST BE ABLE TO WRITE.** Everything in §6, §7 and §12 is meaningless if it
+- [x] **THE LOCK BROKER MUST BE ABLE TO WRITE.** Everything in §6, §7 and §12 is meaningless if it
       cannot, and it fails almost silently: `check` on a project with no record short-circuits before
       touching disk and answers *"nobody has this file"*, so a colleague opens it with **no dialog at
       all**, and only the follow-up `acquire` complains. That is exactly what happened on 2026-08-05
@@ -136,11 +136,30 @@ single guess in the build.
 ## 6. Locking — somebody else has it *(two profiles)*
 
 - [x] Profile **A**: open the file. Editable, no banner.
-- [ ] **RETEST — the lock now survives looking away.** In A, open the file, then switch tabs,
+- [-] **RETEST — the lock now survives looking away.** In A, open the file, then switch tabs,
       minimise, and reload the page. **A still holds it** every time, and B still gets the dialog.
       *(The release on `visibilitychange → hidden` is gone; that event fires on an ordinary tab
       switch, which is what made the lock evaporate.)*
-      [TGH: (1) I get "This project came from Maricopa-Flex-lpn-hawsedc-engcalcs.json, but a browser does not stay connected to a file after the page is reloaded. Use File, Save as, or open the file again, to connect to it. Choose the file again Dismiss". (2) Save acts like Save as. (3) Reloading the page is what causes this. Can our connection either survive that or be re-established from our storage and our server lock?
+      [TGH: (1) I get "This project came from Maricopa-Flex-lpn-hawsedc-engcalcs.json, but a browser does not stay connected to a file after the page is reloaded. Use File, Save as, or open the file again, to connect to it. Choose the file again Dismiss". (2) Save acts like Save as. (3) Reloading the page is what causes this. Can our connection either survive that or be re-established from our storage and our server lock?]
+      [CC 2026-08-05: **This check was wrong and has been split in two below.** It bundled the LOCK
+      (server-side, keyed on a docId that lives in localStorage) with the FILE CONNECTION (a browser
+      handle that genuinely cannot survive a page load yet). Worse, it asserted "A still holds it"
+      after a reload when the code did the opposite: `beforeunload` released every lock and nothing
+      took them back on the way in. Answering (3): the LOCK can be re-established from storage and
+      now is; the CONNECTION needs Task 212 (handles persisted in IndexedDB, re-permissioned with one
+      click), which also removes (2), Save behaving like Save as.]
+
+- [ ] **RETEST (a) — looking away.** In A, open the file, switch to another tab, minimise, come back.
+      **A still holds the lock** and B still gets the dialog. No reload in this one.
+- [ ] **RETEST (b) — reload.** In A, reload the page. **A still holds the lock** — B opening the file
+      still gets the dialog naming A. *(New: locks are re-acquired on boot from the docId in
+      localStorage. Nothing did this before, so a reload silently un-held every file.)*
+- [ ] **(b) continued, and expected to be imperfect:** after that reload A is **not connected to the
+      file** and says so, and Save behaves as Save as. That is known and is Task 212's subject, not a
+      failure of this check. What matters here is only that the **lock** survived.
+- [ ] **RETEST (c) — somebody took it while you were reloading.** Have B open and hold the file, then
+      reload A. A must come back **read-only, naming B** — not silently editable, and not silently
+      holding a lock it no longer has.
 - [x] **The freshness check — this is now the actual guarantee.** Have B take the file (by whatever
       route) and save a change to it. Then in A press **Save** → **refused**, with a banner saying
       somebody else saved to this file and pointing at Save as / Revert. A's work is untouched.
@@ -149,6 +168,7 @@ single guess in the build.
       clears. *(Revert was disabled in read-only, leaving "fork it into a new file" as the only exit
       from a situation whose obvious resolution is "fine, theirs wins". Revert writes nothing, so it
       is safe in every state.)*
+      [TGH: Didn't test due to failure above.]
 - [x] From that state, **Save as…** to a new name → succeeds, banner clears, A keeps their work.
 - [-] The same refusal happens **with the lock broker blocked** (see §9). The freshness check must
       not depend on the server at all.
