@@ -5,6 +5,9 @@ $html_desc = $ec_lang['bpn_main_desc'];
 echoHeader("EngCalcs", $html_title, "");
 ?>
 <h2><?=$ec_lang['bpn_main_desc']?></h2>
+<p class="collapse show d-print-none" id="relatedCalcs">
+	<?=$ec_lang['ec_related_calcs']?> <a href="Looped-Network.php"><?=$ec_lang['lpn_main_menu']?></a> <a data-bs-toggle="collapse" href="#relatedCalcs" aria-expanded="true" aria-controls="relatedCalcs"><?=$ec_lang['view_hide_line']?></a>
+</p>
 <?php
 echoCalculatorForm(
 	// Inputs
@@ -125,6 +128,7 @@ function echoCalculatorFormAppend() {
 	<dt><?=$ec_lang['bpn_notes_1_term']?></dt><dd><?=$ec_lang['bpn_notes_1_def']?></dd>
 	<dt><?=$ec_lang['bpn_notes_2_term']?></dt><dd><?=$ec_lang['bpn_notes_2_def']?></dd>
 	<dt><?=$ec_lang['bpn_notes_3_term']?></dt><dd><?=$ec_lang['bpn_notes_3_def']?></dd>
+	<dt><?=$ec_lang['bpn_notes_epanet_term']?></dt><dd><?=$ec_lang['bpn_notes_epanet_def']?></dd>
 </dl>
 <script>
 EngCalcs.pageConfig = {
@@ -141,6 +145,7 @@ EngCalcs.pageConfig = {
 	bpn_source_label: <?=json_encode($ec_lang['bpn_source_label'])?>
 };
 </script>
+<script src="/engcalcs/js/PipeHydraulics.lib.js?v=<?=filemtime(__DIR__.'/js/PipeHydraulics.lib.js')?>"></script>
 <script src="/engcalcs/js/branched-network.js?v=<?=filemtime(__DIR__.'/js/branched-network.js')?>"></script>
 <script>
 <?php echoCookieScript(); ?>

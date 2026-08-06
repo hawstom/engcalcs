@@ -2,7 +2,6 @@ EngCalcs.pageCalculator = function(objForm) {
 	'use strict';
 	var hasUnits, precision;
 	this.var = {};
-	this.var.khw = 0.849,
 	this.var.g = 9.806;
 	// Read and convert form inputs to this.var.___ as SI units
 	this.readFormInput(objForm, 'q', hasUnits = true);
@@ -17,8 +16,8 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.var.pw = Math.PI * this.var.d;
 	this.var.rh = this.var.d / 4;
 	this.var.v = this.var.q / this.var.a;
-	// From 7.8828/d^4.8704 * (Q/(k*C))^1.852 at Wikipedia Hazen-Williams article.
-	this.var.sf = 7.8828 / Math.pow(this.var.d, 4.8704) * Math.pow(this.var.q / (this.var.khw * this.var.c), 1.852);
+	// Sf on EPANET's constants -- see js/PipeHydraulics.lib.js for the derivation.
+	this.var.sf = EngCalcs.hwSlope(this.var.q, this.var.d, this.var.c);
 	this.var.tau = this.var.rh * this.var.sf;
 	this.var.hv = Math.pow(this.var.v,2) / (2 * this.var.g);
 	this.var.hf = this.var.sf * this.var.l;

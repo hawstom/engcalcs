@@ -225,6 +225,10 @@ $ec_lang['hw_roughness']='Hazen-Williams coefficient, C';
 $ec_lang_intent['hw_roughness']='';
 $ec_lang['hw_note_1']='<dl><dt>This calculator does not model the pipe profile between the two ends.</dt><dd>It uses only the upstream and downstream elevations you enter. If the ground rises higher than either end somewhere in between, the pressure at that high point is lower than any pressure reported here. Run the calculator again for the length from the upstream end to the high point to check it.</dd><dd>Where the hydraulic grade line falls below the pipe, the water is under negative pressure. Air comes out of solution, a thin-walled pipe can collapse, and dirty groundwater can be drawn in through the joints. Keep the line under positive pressure everywhere, and consider an air valve at each high point.</dd><dt>The upstream pressure is a boundary condition you supply.</dt><dd>Read it from a gauge, from a tank water level (the height of water above the pipe), or from a pump curve. A pump delivers less pressure as flow rises, so use the point on the curve that matches the flow entered above.</dd><dt>Add up the minor (local) loss coefficients yourself.</dt><dd>Total the K values for every valve, bend, tee, meter, and entrance on the line, and enter that total. Follow the link on that input for typical values. On a long transmission main these losses are small next to friction, but in short station piping they can be most of the loss.</dd></dl>';
 $ec_lang_intent['hw_note_1']='';
+$ec_lang['hw_notes_epanet_term']='Hazen-Williams constants now match EPANET (August 2026)';
+$ec_lang_intent['hw_notes_epanet_term']='';
+$ec_lang['hw_notes_epanet_def']='In August 2026 the Hazen-Williams coefficient and exponent were changed to match EPANET. Head loss results differ from earlier versions of this page by up to 0.1 percent, which is far smaller than the uncertainty in the C value itself.';
+$ec_lang_intent['hw_notes_epanet_def']='';
 // Manning Irregular
 $ec_lang['mi_menu']='Manning Irregular Channel';
 $ec_lang_intent['mi_menu']='| gloss: irregular channel';
@@ -1109,6 +1113,8 @@ $ec_lang['bpn_notes_2_term']='Branched networks only, no loops';
 $ec_lang['bpn_notes_2_def']='Every line has exactly one upstream line (a tree). This tool does not solve looped networks; those need iterative methods (EPANET or similar). Leaving loops out is what keeps it simple and exact.';
 $ec_lang['bpn_notes_3_term']='No active pressure controls';
 $ec_lang['bpn_notes_3_def']='You can add a fixed minor-loss valve (a k-value), but not pressure-reducing or pressure-sustaining valves (PRV/PSV). Their open/closed state depends on flow and pressure, which would force iteration.';
+$ec_lang['bpn_notes_epanet_term']='Hazen-Williams constants now match EPANET (August 2026)';
+$ec_lang['bpn_notes_epanet_def']='In August 2026 the Hazen-Williams coefficient and exponent were changed to match EPANET. Head loss results differ from earlier versions of this page by up to 0.1 percent, which is far smaller than the uncertainty in the C value itself.';
 $ec_lang['bpn_supply2_q']='Supply flow 2';
 $ec_lang['bpn_supply2_h']='Supply head 2';
 $ec_lang['bpn_supply3_q']='Supply flow 3';
@@ -1213,7 +1219,7 @@ $ec_lang['lpn_file_saveall']='Save all';
 // {n} is a whole number. Assigned at creation as a real, renameable name -- and it is the LOWEST
 // number not currently in use, so closing Project 2 makes the next new project Project 2 again. A
 // counter that only ever went up would reach "Project 47" in an afternoon and read as a fault.
-$ec_lang['lpn_project_numbered']='Project {n}';
+$ec_lang['lpn_project_numbered']='Project{n}';
 $ec_lang['lpn_project_copy_suffix']=' (copy)';
 $ec_lang['lpn_project_rename']='Rename';
 // The File menu. "New" is the same act as the + tab, deliberately: one function, two doors.
@@ -1294,6 +1300,7 @@ $ec_lang['lpn_file_needs_reopen']='This project came from {file}, but a browser 
 // Says what is still safe before it says what failed: the reassurance is the part a worried user
 // needs, and it is true -- the browser copy is written on every edit regardless.
 $ec_lang['lpn_file_write_failed']='Could not write to the file. It may have been moved or renamed, or permission may have been withdrawn. Your work is still saved in this browser. Use Save to file to choose the file again.';
+$ec_lang['lpn_file_changed_elsewhere']='Somebody else has saved to this file since you opened it, so saving now would write over their work. Use File, Save as to keep your changes in a file of your own, or File, Revert to throw yours away and load theirs.';
 // Project locks (Task 195 Phase 2) -- who is editing a shared project file right now. {name} is a
 // person as they chose to be known ("Dave T."), never a login; word order is the translator's to
 // choose. A lock never expires on its own, so none of these may suggest waiting will free it.
@@ -1315,6 +1322,13 @@ $ec_lang['lpn_lock_open_readonly']='Open read-only';
 // "my own copy" quietly promises a personal one of everything -- the proliferation this page keeps
 // trying not to encourage. "Create a copy" says what happens and claims nothing.
 $ec_lang['lpn_lock_open_copy']='Create a copy';
+$ec_lang['lpn_lock_break']='Break their lock';
+$ec_lang['lpn_lock_open_heading_times']='{name} has this file open; the last edit was {x} ago, {y} after the last save.';
+$ec_lang['lpn_lock_open_choices']='Your choices: (1) Cancel and ask them to open it if necessary and then close it properly (closing the browser does not close the project), (2) Open read-only, or (3) if all else fails, you can break their lock. Their unsaved work is not lost, but they will not be able to save over your changes, and somebody may have to merge the two by hand.';
+$ec_lang['lpn_ago_minutes']='{n} minutes';
+$ec_lang['lpn_ago_hours']='{n} hours';
+$ec_lang['lpn_ago_days']='{n} days';
+$ec_lang['lpn_ago_unknown']='an unknown time';
 // Read-only means read-only: it never turns itself back into an editable file while you are looking
 // at it, and it never offers to save over the other person\'s file. It cannot -- their file has moved
 // on since you opened it, so writing yours over it would destroy their work. What you CAN do is
@@ -1380,6 +1394,8 @@ $ec_lang['lpn_notes_5_term']='Pump curve';
 $ec_lang['lpn_notes_5_def']='A pump follows H = H₀ − aQ^b, where H is the head the pump adds and Q is the flow through it. Enter one, two, or three points from the manufacturer\'s curve. Three points — the head at zero flow, the normal working point, and the point of highest flow — fit H₀, a and b directly, and follow a published curve most closely. Two points fit a parabola (b = 2) with its peak at zero flow. One point uses a common rule: the head at zero flow is 1.33 × the head you enter, and the highest flow is 2 × the flow you enter, which again gives b = 2. A pump with no points entered adds no head at all. The curve is not stopped at zero, so asking a pump for more flow than its curve can deliver gives a negative head. The fix is a bigger pump or a smaller demand, not a different curve fit.';
 $ec_lang['lpn_notes_4_term']='Planned';
 $ec_lang['lpn_notes_4_def']='Scenarios, so that one project can hold several sets of demands. Tables of node and pipe results. Opening a file you used recently without hunting for it again. Reading and writing EPANET .inp files. Other languages: this page is in English only for now. Comments and suggestions are always welcome (see the feedback link above).';
+$ec_lang['lpn_notes_epanet_term']='Hazen-Williams constants now match EPANET (August 2026)';
+$ec_lang['lpn_notes_epanet_def']='In August 2026 the Hazen-Williams coefficient and exponent were changed to match EPANET. Head loss results differ from earlier versions of this page by up to 0.1 percent, which is far smaller than the uncertainty in the C value itself.';
 $ec_lang['lpn_id_invalid']='Enter an ID with no spaces and no quotation marks.';
 $ec_lang['lpn_id_taken']='That ID is already in use.';
 $ec_lang['lpn_diag_no_fixed_head']='Add a reservoir. The network needs at least one known water level before it can be solved.';

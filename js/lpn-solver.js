@@ -17,7 +17,11 @@
 // Target scale is ~10-20 nodes, which is why the linear solve is a dense Cholesky
 // rather than anything sparse -- see solveSPD().
 
-var EngCalcs = EngCalcs || {};
+// The browser gets js/PipeHydraulics.lib.js from its own <script> tag ahead of this
+// one; Node (dev/lpn-spike/validate.js) has no script tags, so ask for it directly.
+var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
+	? require('./PipeHydraulics.lib.js')
+	: (EngCalcs || {});
 
 EngCalcs.lpnG = 9.806;
 
@@ -44,34 +48,10 @@ EngCalcs.lpnGradMin = 1e-6 * 0.3048 / 0.0283168466;
 // that is lpnGradMin above -- and it must not be used as one.
 EngCalcs.lpnQMin = 1e-8;
 
-// Head-loss constants, selectable so that agreement with EPANET can be measured
-// separately from agreement with the rest of this suite.
-//
-// They are NOT identical, and the difference is real rather than a rounding
-// artifact: this suite's Hazen-Williams (hazen-williams.js, and bpnFriction in
-// branched-network.js) uses Sf = 7.8828/d^4.8704 * (Q/(0.849 C))^1.852, while
-// EPANET uses hL = 4.727 L Q^1.852 / (C^1.852 d^4.871) in US units. Converted to
-// SI those give slightly different coefficients and a slightly different diameter
-// exponent, worth a few tenths of a percent in head loss.
-//
-// 'engcalcs' is the default because a new page disagreeing with the suite's own
-// Hazen-Williams calculator is a defect our users would actually see, whereas
-// agreeing with EPANET to 4 decimal places is something only we check. 'epanet'
-// exists so the validation harness can isolate solver error from constant choice.
-EngCalcs.lpnConstants = {
-	engcalcs: {
-		// 7.8828 / 0.849^1.852, computed rather than typed so the relationship to
-		// hazen-williams.js stays visible.
-		hwCoef: 7.8828 / Math.pow(0.849, 1.852),
-		hwDiaExp: 4.8704
-	},
-	epanet: {
-		// EPANET's US-unit constant 4.727 converted to SI (Q m3/s, L m, d m, h m).
-		// Derived in code for the same reason.
-		hwCoef: 4.727 * Math.pow(0.3048, 4.871) / Math.pow(0.3048 * 0.3048 * 0.3048, 1.852),
-		hwDiaExp: 4.871
-	}
-};
+// The Hazen-Williams constants used to be selectable here ('engcalcs' vs
+// 'epanet'), because the suite and EPANET disagreed by a few tenths of a percent.
+// Task 213 removed the disagreement: the whole suite is now on EPANET's pair, in
+// js/PipeHydraulics.lib.js, so there is nothing left to select between.
 
 // Darcy-Weisbach friction factor, 3-regime Swamee-Jain. Identical to
 // EngCalcs.bpnDwFriction; kept as a private copy for now on purpose -- the shared
@@ -110,7 +90,7 @@ EngCalcs.lpnDwFriction = function (q, d, e, visc) {
 // Unlike bpnFriction, which returns a head loss for a known Q, GGA needs the
 // coefficient itself so it can form both the SIGNED head loss and its derivative.
 // That is why this is new code rather than reuse.
-EngCalcs.lpnResistance = function (link, method, visc, consts) {
+EngCalcs.lpnResistance = function (link, method, visc) {
 	'use strict';
 	var d = link.diameter,
 		L = link.length,
@@ -125,10 +105,11 @@ EngCalcs.lpnResistance = function (link, method, visc, consts) {
 	}
 
 	if (method === 'hw') {
-		if (!(link.roughness > 0)) { return { r: 0, n: 1.852 }; }
+		if (!(link.roughness > 0)) { return { r: 0, n: EngCalcs.hwExp }; }
 		return {
-			r: consts.hwCoef * L / (Math.pow(link.roughness, 1.852) * Math.pow(d, consts.hwDiaExp)),
-			n: 1.852
+			r: EngCalcs.hwCoef * L /
+				(Math.pow(link.roughness, EngCalcs.hwExp) * Math.pow(d, EngCalcs.hwDiaExp)),
+			n: EngCalcs.hwExp
 		};
 	}
 
@@ -268,7 +249,6 @@ EngCalcs.lpnSolve = function (model, options) {
 	var opts = options || {},
 		method = model.method || 'hw',
 		visc = model.visc || 1.007e-6,
-		consts = EngCalcs.lpnConstants[opts.constants || 'engcalcs'],
 		// Relative flow change. EPANET's default is 1e-3; this is far tighter
 		// because at the 10-20 node target the extra iterations are free, and
 		// because Darcy-Weisbach carries an additional inconsistency of the same
@@ -391,7 +371,7 @@ EngCalcs.lpnSolve = function (model, options) {
 				if (method === 'dw') {
 					link.f = EngCalcs.lpnDwFriction(Math.max(aq, qMin), link.diameter, link.roughness, visc);
 				}
-				res = EngCalcs.lpnResistance(link, method, visc, consts);
+				res = EngCalcs.lpnResistance(link, method, visc);
 				var m = link.k > 0
 					? link.k / (2 * g * Math.pow(Math.PI * link.diameter * link.diameter / 4, 2))
 					: 0;
@@ -510,14 +490,14 @@ EngCalcs.lpnSolve = function (model, options) {
 	}
 
 	return EngCalcs.lpnReport(model, junctions, junctionIndex, byId, H, Q, method,
-		visc, consts, iter, converged, maxFlowChange);
+		visc, iter, converged, maxFlowChange);
 };
 
 // Turns the raw H/Q vectors into per-id results, and recomputes each link's head
 // loss from the constitutive equation rather than from the head difference, so that
 // a residual check has two independent numbers to compare.
 EngCalcs.lpnReport = function (model, junctions, junctionIndex, byId, H, Q, method,
-	visc, consts, iterations, converged, maxFlowChange) {
+	visc, iterations, converged, maxFlowChange) {
 	'use strict';
 	var heads = {},
 		pressures = {},
@@ -566,7 +546,7 @@ EngCalcs.lpnReport = function (model, junctions, junctionIndex, byId, H, Q, meth
 			if (method === 'dw') {
 				link.f = EngCalcs.lpnDwFriction(Math.max(aq, EngCalcs.lpnQMin), link.diameter, link.roughness, visc);
 			}
-			res = EngCalcs.lpnResistance(link, method, visc, consts);
+			res = EngCalcs.lpnResistance(link, method, visc);
 			m = link.k > 0
 				? link.k / (2 * g * Math.pow(Math.PI * link.diameter * link.diameter / 4, 2))
 				: 0;

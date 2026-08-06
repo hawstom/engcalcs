@@ -6,7 +6,7 @@ echoHeader("EngCalcs", $html_title, "");
 ?>
 <h2><?=$ec_lang['ip_main_desc']?></h2>
 <p class="collapse show d-print-none" id="relatedCalcs">
-	<?=$ec_lang['ec_related_calcs']?> <a href="Branched-Network.php"><?=$ec_lang['bpn_main_menu']?></a> &middot; <a href="Manning-Pipe-Flow.php"><?=$ec_lang['mpf_main_menu']?></a> <a data-bs-toggle="collapse" href="#relatedCalcs" aria-expanded="true" aria-controls="relatedCalcs"><?=$ec_lang['view_hide_line']?></a>
+	<?=$ec_lang['ec_related_calcs']?> <a href="Branched-Network.php"><?=$ec_lang['bpn_main_menu']?></a> &middot; <a href="Looped-Network.php"><?=$ec_lang['lpn_main_menu']?></a> <a data-bs-toggle="collapse" href="#relatedCalcs" aria-expanded="true" aria-controls="relatedCalcs"><?=$ec_lang['view_hide_line']?></a>
 </p>
 <?php
 echoCalculatorForm(

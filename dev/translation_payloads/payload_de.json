@@ -1,16 +1,18 @@
 {
     "meta": {
         "language": "de",
-        "expected_key_count": 780,
-        "delta_key_count": 6,
-        "exempt_key_count": 15,
+        "expected_key_count": 794,
+        "delta_key_count": 0,
+        "exempt_key_count": 17,
         "exempt_keys": [
             "calc_units_us",
             "calc_units_si",
+            "ec_name_placeholder",
             "dw_roughness",
             "dw_regime_laminar",
             "install_android_heading",
             "install_ios_heading",
+            "install_desktop_heading",
             "ip_length",
             "ip_diameter",
             "ip_roughness",
@@ -21,242 +23,19 @@
             "bpn_method_manning",
             "bpn_id"
         ],
-        "out_of_scope_key_count": 206,
+        "out_of_scope_key_count": 220,
         "coverage": "coverage: core calculators [mpf, mtc] x core languages [es, pt, fr, tr] (in scope iff calculator OR language is core; identity strings always)",
-        "active_prefixes": [
-            "ec",
-            "install",
-            "lpn",
-            "mtc"
-        ],
+        "active_prefixes": [],
         "requested_prefix": null,
         "notes": "Translate only keys in keys_to_translate; preserve HTML, units, and symbols.",
         "glossary_injection_notes": "Use prompt_context_by_prefix and glossary_terms_by_prefix.preferred_translation when available.",
         "context_notes": "Use key_context.neighbors to keep register consistent with nearby translated strings.",
         "intent_notes": "Use key_intent when present; these entries provide terse disambiguation comments only where translation risk exists."
     },
-    "prompt_context_by_prefix": {
-        "ec": "Use these preferred technical term translations when relevant:\n- flow (Q): Durchfluss\n- velocity (v): Geschwindigkeit\n- slope (S): Gefälle\n    DO NOT render as: activity\/fitness sense of 'grade' — the treadmill or trail incline for running\/walking\/jogging; this is the hydraulic energy gradient, not an exercise setting; geographic or topographic landform term; school grade \/ academic mark",
-        "install": "Use these preferred technical term translations when relevant:\n- flow (Q): Durchfluss\n- velocity (v): Geschwindigkeit\n- slope (S): Gefälle\n    DO NOT render as: activity\/fitness sense of 'grade' — the treadmill or trail incline for running\/walking\/jogging; this is the hydraulic energy gradient, not an exercise setting; geographic or topographic landform term; school grade \/ academic mark",
-        "lpn": "Use these preferred technical term translations when relevant:\n- flow (Q): Durchfluss\n- velocity (v): Geschwindigkeit\n- slope (S): Gefälle\n    DO NOT render as: activity\/fitness sense of 'grade' — the treadmill or trail incline for running\/walking\/jogging; this is the hydraulic energy gradient, not an exercise setting; geographic or topographic landform term; school grade \/ academic mark",
-        "mtc": "Use these preferred technical term translations when relevant:\n- flow (Q): Durchfluss\n- velocity (v): Geschwindigkeit\n- hydraulic radius (R_h): hydraulischer Radius\n- wetted perimeter (P_w): benetzter Umfang\n- Manning roughness (n): Manning-Rauheitskoeffizient\n- slope (S): Gefälle\n    DO NOT render as: activity\/fitness sense of 'grade' — the treadmill or trail incline for running\/walking\/jogging; this is the hydraulic energy gradient, not an exercise setting; geographic or topographic landform term; school grade \/ academic mark"
-    },
-    "glossary_terms_by_prefix": {
-        "ec": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg RESOLVED (Tom, 2026-07-13): native engineer's 2026-07-06 clarification confirmed both 'дебит' (colloquial\/general register) and 'водно количество' (academic\/hydraulic-engineering register, used at university for Q) are acceptable. Tom decided suite-wide standardization on 'водно количество' — \"I would put водно количество everywhere\" — applied across all bg calculator categories (pipes\/irrigation included, not just the hydraulic-structure\/open-channel strings the engineer originally corrected). 'дебит' fully replaced in lib\/lang.ec.bg.php 2026-07-13. Task 109 stages 3-5 (2026-07-19): bg standardized on водно количество (дебит drift removed from or_\/mpf_\/cs_ per Bulgarian-engineer-feedback.md); sr standardized on проток (stage 4); it confirmed on portata (flusso drift removed).",
-                "preferred_translation": "Durchfluss"
-            },
-            {
-                "term": "velocity",
-                "symbol": "v",
-                "context": "Flow velocity (speed of water). Appears in all calculators.",
-                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
-                "preferred_translation": "Geschwindigkeit"
-            },
-            {
-                "term": "slope",
-                "symbol": "S",
-                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators. English aliases 'slope' and 'grade' (u_grade\/u_gradePercent) both point here.",
-                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term. [2026-07-21] Centralized the grade activity-sense guard here (was living only as u_grade\/u_gradePercent label commentary): the 'avoid' array now carries the running\/walking\/jogging exercise-incline trap, so the slope entry is the single home for the grade→energy-gradient concept and its wrong senses.",
-                "preferred_translation": "Gefälle"
-            }
-        ],
-        "install": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg RESOLVED (Tom, 2026-07-13): native engineer's 2026-07-06 clarification confirmed both 'дебит' (colloquial\/general register) and 'водно количество' (academic\/hydraulic-engineering register, used at university for Q) are acceptable. Tom decided suite-wide standardization on 'водно количество' — \"I would put водно количество everywhere\" — applied across all bg calculator categories (pipes\/irrigation included, not just the hydraulic-structure\/open-channel strings the engineer originally corrected). 'дебит' fully replaced in lib\/lang.ec.bg.php 2026-07-13. Task 109 stages 3-5 (2026-07-19): bg standardized on водно количество (дебит drift removed from or_\/mpf_\/cs_ per Bulgarian-engineer-feedback.md); sr standardized on проток (stage 4); it confirmed on portata (flusso drift removed).",
-                "preferred_translation": "Durchfluss"
-            },
-            {
-                "term": "velocity",
-                "symbol": "v",
-                "context": "Flow velocity (speed of water). Appears in all calculators.",
-                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
-                "preferred_translation": "Geschwindigkeit"
-            },
-            {
-                "term": "slope",
-                "symbol": "S",
-                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators. English aliases 'slope' and 'grade' (u_grade\/u_gradePercent) both point here.",
-                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term. [2026-07-21] Centralized the grade activity-sense guard here (was living only as u_grade\/u_gradePercent label commentary): the 'avoid' array now carries the running\/walking\/jogging exercise-incline trap, so the slope entry is the single home for the grade→energy-gradient concept and its wrong senses.",
-                "preferred_translation": "Gefälle"
-            }
-        ],
-        "lpn": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg RESOLVED (Tom, 2026-07-13): native engineer's 2026-07-06 clarification confirmed both 'дебит' (colloquial\/general register) and 'водно количество' (academic\/hydraulic-engineering register, used at university for Q) are acceptable. Tom decided suite-wide standardization on 'водно количество' — \"I would put водно количество everywhere\" — applied across all bg calculator categories (pipes\/irrigation included, not just the hydraulic-structure\/open-channel strings the engineer originally corrected). 'дебит' fully replaced in lib\/lang.ec.bg.php 2026-07-13. Task 109 stages 3-5 (2026-07-19): bg standardized on водно количество (дебит drift removed from or_\/mpf_\/cs_ per Bulgarian-engineer-feedback.md); sr standardized on проток (stage 4); it confirmed on portata (flusso drift removed).",
-                "preferred_translation": "Durchfluss"
-            },
-            {
-                "term": "velocity",
-                "symbol": "v",
-                "context": "Flow velocity (speed of water). Appears in all calculators.",
-                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
-                "preferred_translation": "Geschwindigkeit"
-            },
-            {
-                "term": "slope",
-                "symbol": "S",
-                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators. English aliases 'slope' and 'grade' (u_grade\/u_gradePercent) both point here.",
-                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term. [2026-07-21] Centralized the grade activity-sense guard here (was living only as u_grade\/u_gradePercent label commentary): the 'avoid' array now carries the running\/walking\/jogging exercise-incline trap, so the slope entry is the single home for the grade→energy-gradient concept and its wrong senses.",
-                "preferred_translation": "Gefälle"
-            }
-        ],
-        "mtc": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg RESOLVED (Tom, 2026-07-13): native engineer's 2026-07-06 clarification confirmed both 'дебит' (colloquial\/general register) and 'водно количество' (academic\/hydraulic-engineering register, used at university for Q) are acceptable. Tom decided suite-wide standardization on 'водно количество' — \"I would put водно количество everywhere\" — applied across all bg calculator categories (pipes\/irrigation included, not just the hydraulic-structure\/open-channel strings the engineer originally corrected). 'дебит' fully replaced in lib\/lang.ec.bg.php 2026-07-13. Task 109 stages 3-5 (2026-07-19): bg standardized on водно количество (дебит drift removed from or_\/mpf_\/cs_ per Bulgarian-engineer-feedback.md); sr standardized on проток (stage 4); it confirmed on portata (flusso drift removed).",
-                "preferred_translation": "Durchfluss"
-            },
-            {
-                "term": "velocity",
-                "symbol": "v",
-                "context": "Flow velocity (speed of water). Appears in all calculators.",
-                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
-                "preferred_translation": "Geschwindigkeit"
-            },
-            {
-                "term": "hydraulic radius",
-                "symbol": "R_h",
-                "context": "Cross-sectional flow area divided by wetted perimeter. Appears in Manning calculators.",
-                "translation_notes": "Use the standard hydraulic engineering phrase. Pre-2026 sr\/hr human translations used the Latin loanword 'hidraulički radijus' — this form is widely used in South Slavic engineering practice and may be more recognizable to field practitioners than the native Slavic equivalents 'полупречник' (sr) \/ 'polumjer' (hr). Both are correct; native Slavic engineers may encounter both forms. DATA-ERROR FIX 2026-07-10 (category-3 sw wave-3 sprint): previous sw value 'radius ya maji' (literally 'radius of water', English loanword 'radius' + 'of water') named the substance rather than the hydraulic-geometry property, and did not read as an engineering term. Changed to 'radiasi ya kihaidroliki' (radius + 'hydraulic', adjectival ki- form), matching the '[radius] + hydraulic' construction used by fr\/de\/it\/es\/ro\/tr (rayon hydraulique \/ hydraulischer Radius \/ raggio idraulico \/ radio hidráulico \/ raza hidraulică \/ hidrolik yarıçap). Used in lib\/lang.ec.sw.php's mpf_hydraulic_radius.",
-                "preferred_translation": "hydraulischer Radius"
-            },
-            {
-                "term": "wetted perimeter",
-                "symbol": "P_w",
-                "context": "Length of the channel or pipe boundary in contact with flowing water. Appears in Manning calculators.",
-                "translation_notes": "WMO No. 385 entry 1682 confirms: es = 'perímetro mojado', fr = 'périmètre mouillé'. Use the standard hydraulic engineering phrase. 'Wetted' here means 'in contact with water', not 'soaked'. Pre-2026 sr human used 'okvašeni obim' (obim = natural South Slavic word for perimeter\/circumference); current uses 'квашени периметар' (периметар = Greek-derived loanword). Both are correct; 'obim\/opseg' is more natural in informal Serbian\/Croatian field use. Task 109 stages 4 & 5 (2026-07-19): bg wrong-word 'навлажнен' (moistened) corrected to 'омокрен' in mpf_wetted_perimeter (stage 4) and cs_notes_3_def (stage 5); km គ្រែទឹក (water bed) also confirmed corrected to glossary បរិវេណសើម (stage 4).",
-                "preferred_translation": "benetzter Umfang"
-            },
-            {
-                "term": "Manning roughness",
-                "symbol": "n",
-                "context": "Manning's n — empirical roughness coefficient used in the Manning formula for open-channel and pipe flow.",
-                "translation_notes": "Always include 'Manning' as a proper noun. The coefficient itself (n) needs no translation — only the label does. Do not translate as generic 'roughness coefficient' without 'Manning'. TYPO FIX 2026-07-09 (category-3 wave-1 sprint): ru\/uk transliterations were single-н 'Манинга'\/'Манінга', flagged by the ru wave-1 agent as inconsistent with the established double-н transliteration ('Маннинга'\/'Маннінга') used 11+ times elsewhere in both lang files (predates this sprint). Corrected to double-н for consistency. Task 109 stage 4 (2026-07-19): am 3-way 'roughness' spelling drift standardized to file-dominant ሻካሪነት (was ሻካርነት); it confirmed on scabrezza and sw on usuguo (both already glossary-correct). [2026-07-24] he corrected: was transliterated 'מנינג'; shipped lang.ec.he.php uses Latin 'Manning' throughout (mi_\/mpf_\/mphl_ menus), so glossary now matches file practice.",
-                "preferred_translation": "Manning-Rauheitskoeffizient"
-            },
-            {
-                "term": "slope",
-                "symbol": "S",
-                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators. English aliases 'slope' and 'grade' (u_grade\/u_gradePercent) both point here.",
-                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term. [2026-07-21] Centralized the grade activity-sense guard here (was living only as u_grade\/u_gradePercent label commentary): the 'avoid' array now carries the running\/walking\/jogging exercise-incline trap, so the slope entry is the single home for the grade→energy-gradient concept and its wrong senses.",
-                "preferred_translation": "Gefälle"
-            }
-        ]
-    },
-    "keys_to_translate": {
-        "ec_name_placeholder": "Name",
-        "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
-        "install_desktop_heading": "Desktop (Chrome \/ Edge)",
-        "lpn_main_menu": "Looped Pipe Network (Map Interface) — PREVIEW",
-        "lpn_main_title": "PREVIEW: Free Online Looped Pipe Network Calculator with Map Interface",
-        "lpn_main_desc": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
-    },
-    "keys": {
-        "ec_name_placeholder": "Name",
-        "mtc_blodgett_v_bathurst": "Blodgett vs. Bathurst",
-        "install_desktop_heading": "Desktop (Chrome \/ Edge)",
-        "lpn_main_menu": "Looped Pipe Network (Map Interface) — PREVIEW",
-        "lpn_main_title": "PREVIEW: Free Online Looped Pipe Network Calculator with Map Interface",
-        "lpn_main_desc": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
-    },
-    "key_context": {
-        "ec_name_placeholder": {
-            "reason": "equal_to_english",
-            "current_value": "Name",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "ec_name_label",
-                    "value": "Diese Berechnung speichern:",
-                    "english": "Save this calculation:"
-                },
-                "next_translated": {
-                    "key": "ec_name_hint",
-                    "value": "Speichert diese Eingaben in der URL zum Lesezeichen, zum Abrufen aus dem Verlauf und zum Teilen",
-                    "english": "Saves these inputs to the URL for bookmarking, history retrieval, and sharing"
-                }
-            }
-        },
-        "mtc_blodgett_v_bathurst": {
-            "reason": "equal_to_english",
-            "current_value": "Blodgett vs. Bathurst",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mtc_n_pi",
-                    "value": "n für Bemessungskorngröße nach Phillips & Ingersoll",
-                    "english": "n for design rock size (Phillips & Ingersoll method)"
-                },
-                "next_translated": {
-                    "key": "mtc_pi_range_check",
-                    "value": "P&I-Bereichsprüfung",
-                    "english": "P&I range check"
-                }
-            }
-        },
-        "install_desktop_heading": {
-            "reason": "equal_to_english",
-            "current_value": "Desktop (Chrome \/ Edge)",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "install_ios_note",
-                    "value": "Unter iOS erfolgt die Installation immer über das Teilen-Menü — es gibt keine automatische Installationsaufforderung.",
-                    "english": "On iOS, installing always uses the Share menu — there is no automatic install prompt."
-                },
-                "next_translated": {
-                    "key": "install_desktop_steps_html",
-                    "value": "<li>Öffnen Sie eine beliebige Rechnerseite.<\/li><li>Klicken Sie auf das <strong>Installationssymbol<\/strong> (⊕ oder Computersymbol) in der Adressleiste des Browsers, oder öffnen Sie das Browsermenü und wählen Sie <strong>EngCalcs installieren…<\/strong><\/li><li>Klicken Sie auf <strong>Installieren<\/strong>. EngCalcs öffnet sich als eigenständiges App-Fenster.<\/li>",
-                    "english": "<li>Open any calculator page.<\/li><li>Click the <strong>install icon<\/strong> (⊕ or computer icon) in the browser's address bar, or open the browser menu and choose <strong>Install EngCalcs…<\/strong><\/li><li>Click <strong>Install<\/strong>. EngCalcs opens as a standalone app window.<\/li>"
-                }
-            }
-        },
-        "lpn_main_menu": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statische Versorgungshöhe",
-                    "english": "Static supply head"
-                },
-                "next_translated": null
-            }
-        },
-        "lpn_main_title": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statische Versorgungshöhe",
-                    "english": "Static supply head"
-                },
-                "next_translated": null
-            }
-        },
-        "lpn_main_desc": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statische Versorgungshöhe",
-                    "english": "Static supply head"
-                },
-                "next_translated": null
-            }
-        }
-    },
+    "prompt_context_by_prefix": [],
+    "glossary_terms_by_prefix": [],
+    "keys_to_translate": [],
+    "keys": [],
+    "key_context": [],
     "key_intent": []
 }

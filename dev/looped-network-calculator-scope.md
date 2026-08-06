@@ -257,7 +257,9 @@ From `js/Calculators.lib.js`: `readFormInput` / `writeFormResult` (`:379-399`), 
 
 **Shared-library sequencing: write Phase 1 with a private copy, ship it, *then* extract
 `js/PipeHydraulics.lib.js`** in a separate behavior-preserving commit, diffing `bpn_`'s output on a
-saved network before and after. Extracting during Phase 1 would risk regressing a shipped,
+saved network before and after. *(Started 2026-08-05: ROADMAP Task 213 created that file and moved
+the Hazen-Williams constants and `hwSlope()` into it, as the constants had to be unified anyway. The
+Darcy-Weisbach and Manning kernels are still private copies and follow the same sequencing.)* Extracting during Phase 1 would risk regressing a shipped,
 26-language calculator against a page that has no tests yet. **Do not share the solver** — bpn's two
 directional sweeps and the GGA have nothing in common; the same principle `bpn_`'s own scope doc
 states about `ip_`.

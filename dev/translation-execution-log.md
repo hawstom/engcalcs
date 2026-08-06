@@ -2042,3 +2042,52 @@ already the file's established pressure word.
 - **One agent judgment worth honouring:** zh already had `bpn_id` as 编号 (a real translation) rather
   than a bare "ID". It left it and asked rather than overwriting — correct; the "copy verbatim"
   instruction was too blunt for that key.
+
+---
+
+## 2026-08-05 — `lpn_` identity strings, 26 languages (ROADMAP Task 219), plus a small drift sweep
+
+**Not a sprint. Zero agents spawned.** The delta was 78 identity strings plus 13 stragglers — about
+3.5 keys per language — and Tom's call was that a spawn per language is poor value at that size, so
+the orchestrator (Opus) translated all 91 inline. This is a deliberate exception to the one-agent-
+per-language rule, justified by size alone; it is **not** a precedent for a real sprint, where 26
+fresh single-language contexts still buy quality that one pass cannot.
+
+**What was translated:** `lpn_main_menu` / `lpn_main_title` / `lpn_main_desc` × 26. The `lpn_` page
+body stays English-only, gated by Task 146.06 — this is exactly Task 203's floor: *body in English,
+findable in the local language*. Tom decided against adding an "(English only)" marker to the menu
+label; "PREVIEW" already signals an unfinished page.
+
+**Terminology, the one real decision.** English "Looped Pipe Network" is not calqued anywhere.
+Each language got its own professional term for a network *with* closed circuits — de *vermaschtes
+Rohrnetz*, es *red mallada*, fr *réseau maillé*, pt *rede malhada*, it *rete magliata* (meshed
+family); ru *кольцевая*, uk *кільцева*, bg *пръстеновидна*, sr *прстенаста*, hr *prstenasta*,
+ro *inelară*, tr *halkalı*, zh *环状*, ar *حلقية*, fa *حلقوی*, he *טבעתית* (ring family); cs
+*okruhová*. Where a language had no settled term, the word was lifted from **that same language's
+existing `bpn_main_title` "(no loops)" phrase** — am ቀለበት, km រង្វិលបិទ, my ပတ်ကွင်း, sw *mizunguko*,
+id *tertutup* — so the branched and looped calculators read as a matched pair on the related-links
+line they now share. Written back to `glossary.json`'s `looped network` entry, seeded empty
+2026-07-23 and empty ever since.
+
+**Straggler sweep, done in the same pass because it was 13 strings:**
+- **Decimal separators were wrong in three comma-decimal languages.** `mtc_pi_ok_tip` read
+  `0.28–0.36 ft` in id, pt and sr. Fixed, *and* the sibling `mtc_pi_tip` fixed with it in each —
+  the two keys quote the same range, so fixing one alone would have left a language disagreeing
+  with itself. Worth a look elsewhere: this class of defect is invisible to every current check.
+- `mtc_blodgett_v_bathurst` translated in de, id, ro.
+- **Three keys were correctly identical and are now exempt**, not fixed: `mtc_pi_ok_tip` in
+  am/bn/he/hi/my (period-decimal languages whose own `u_ft` is `ft`, plus two surnames and a year —
+  nothing in the string *can* change), `install_desktop_heading` in de/id/it ("Desktop" is the
+  ordinary word in all three), `ec_name_placeholder` in de ("Name").
+
+**Result: all 22 non-core languages are at delta ZERO.** es/pt/fr/tr hold only the 204-key `lpn_`
+body. `lang_syntax_validate.php` full-suite is down to 9 findings, all pre-existing advisory
+`identical-to-english` in fr and pt.
+
+**QA performed:** php lint on all 27 files; `lang_syntax_validate.php` full suite;
+`lang_parity_check.php`; `coverage_selftest.php`; `html_balance_check.php` (24/24);
+back-translation semantic check inline per the no-skip rule, verifying in every language that the
+network is the one *with* loops, that the map/drawing sense survived, that "preview" reads as an
+early release rather than a document preview, and that flow/pressure match the glossary's existing
+per-language terms. Drift manifest **not** re-baselined — nothing here changed an English string
+that already had translations.

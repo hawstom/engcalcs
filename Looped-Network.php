@@ -183,6 +183,9 @@ document.addEventListener('DOMContentLoaded', function() {
       // user activation, and Chrome's transient activation expires after a few seconds, so a
       // blocking dialog would work for a fast reader and throw for a careful one. A button in here
       // is a fresh click, so it always has an activation of its own. ?>
+<!-- Swallows every click that is not in the dialog, which is what makes aria-modal true.
+     z-index sits one below the dialog's 40. -->
+<div id="lpn_dialog_backdrop" class="d-print-none" style="display:none;position:fixed;z-index:39;left:0;top:0;right:0;bottom:0;background:rgba(0,0,0,.25)"></div>
 <div id="lpn_dialog" class="d-print-none" role="dialog" aria-modal="true" style="display:none;position:fixed;z-index:40;left:50%;top:20%;transform:translateX(-50%);max-width:34em;background:#fff;border:1px solid #333;padding:12px;box-shadow:2px 2px 12px rgba(0,0,0,.4)">
 	<div id="lpn_dialog_body"></div>
 	<div id="lpn_dialog_buttons" style="margin-top:10px;text-align:right"></div>
@@ -196,6 +199,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	<dt><?=$ec_lang['lpn_notes_3_term']?></dt><dd><?=$ec_lang['lpn_notes_3_def']?></dd>
 	<dt><?=$ec_lang['lpn_notes_5_term']?></dt><dd><?=$ec_lang['lpn_notes_5_def']?></dd>
 	<dt><?=$ec_lang['lpn_notes_4_term']?></dt><dd><?=$ec_lang['lpn_notes_4_def']?></dd>
+	<dt><?=$ec_lang['lpn_notes_epanet_term']?></dt><dd><?=$ec_lang['lpn_notes_epanet_def']?></dd>
 </dl>
 
 <script>
@@ -306,11 +310,19 @@ EngCalcs.pageConfig = {
 	lpn_revert_confirm: <?=json_encode($ec_lang['lpn_revert_confirm'])?>,
 	lpn_file_needs_reopen: <?=json_encode($ec_lang['lpn_file_needs_reopen'])?>,
 	lpn_file_write_failed: <?=json_encode($ec_lang['lpn_file_write_failed'])?>,
+	lpn_file_changed_elsewhere: <?=json_encode($ec_lang['lpn_file_changed_elsewhere'])?>,
 	lpn_lock_prompt_name: <?=json_encode($ec_lang['lpn_lock_prompt_name'])?>,
 	lpn_lock_somebody: <?=json_encode($ec_lang['lpn_lock_somebody'])?>,
 	lpn_lock_open_heading: <?=json_encode($ec_lang['lpn_lock_open_heading'])?>,
 	lpn_lock_open_readonly: <?=json_encode($ec_lang['lpn_lock_open_readonly'])?>,
 	lpn_lock_open_copy: <?=json_encode($ec_lang['lpn_lock_open_copy'])?>,
+	lpn_lock_break: <?=json_encode($ec_lang['lpn_lock_break'])?>,
+	lpn_lock_open_heading_times: <?=json_encode($ec_lang['lpn_lock_open_heading_times'])?>,
+	lpn_lock_open_choices: <?=json_encode($ec_lang['lpn_lock_open_choices'])?>,
+	lpn_ago_minutes: <?=json_encode($ec_lang['lpn_ago_minutes'])?>,
+	lpn_ago_hours: <?=json_encode($ec_lang['lpn_ago_hours'])?>,
+	lpn_ago_days: <?=json_encode($ec_lang['lpn_ago_days'])?>,
+	lpn_ago_unknown: <?=json_encode($ec_lang['lpn_ago_unknown'])?>,
 	lpn_lock_readonly_banner: <?=json_encode($ec_lang['lpn_lock_readonly_banner'])?>,
 	lpn_lock_unavailable: <?=json_encode($ec_lang['lpn_lock_unavailable'])?>,
 	lpn_lock_restored: <?=json_encode($ec_lang['lpn_lock_restored'])?>,
@@ -390,6 +402,7 @@ EngCalcs.pageConfig = {
 	lpn_confirm_wipe: <?=json_encode($ec_lang['lpn_confirm_wipe'])?>
 };
 </script>
+<script src="/engcalcs/js/PipeHydraulics.lib.js?v=<?=filemtime(__DIR__.'/js/PipeHydraulics.lib.js')?>"></script>
 <script src="/engcalcs/js/lpn-solver.js?v=<?=filemtime(__DIR__.'/js/lpn-solver.js')?>"></script>
 <script src="/engcalcs/js/looped-network.js?v=<?=filemtime(__DIR__.'/js/looped-network.js')?>"></script>
 <script>

@@ -86,10 +86,10 @@ EngCalcs.bpnFriction = function (line, method, visc) {
 		sf = line.rough * line.rough * v * v / Math.pow(rh, 4 / 3);
 		hf = sf * L;
 	} else if (method === 'hw') {
-		// Hazen-Williams, identical form to hazen-williams.js (khw = 0.849):
-		// Sf = 7.8828 / d^4.8704 * (Q / (0.849 C))^1.852.
+		// Hazen-Williams on EPANET's constants, the one shared kernel -- see
+		// js/PipeHydraulics.lib.js.
 		if (!(line.rough > 0)) { return { hf: 0, v: v }; }
-		sf = 7.8828 / Math.pow(d, 4.8704) * Math.pow(Math.abs(q) / (0.849 * line.rough), 1.852);
+		sf = EngCalcs.hwSlope(q, d, line.rough);
 		hf = sf * L;
 	} else {
 		// Darcy-Weisbach / Swamee-Jain.

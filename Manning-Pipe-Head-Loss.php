@@ -6,6 +6,9 @@ echoHeader("EngCalcs", $html_title, "");
 
 ?>
 <h2><?php echo $ec_lang['mphl_main_desc']; ?></h2>
+<p class="collapse show d-print-none" id="relatedCalcs">
+	<?=$ec_lang['ec_related_calcs']?> <a href="Looped-Network.php"><?=$ec_lang['lpn_main_menu']?></a> &middot; <a href="Hazen-Williams.php"><?=$ec_lang['hw_main_menu']?></a> &middot; <a href="Darcy-Weisbach.php"><?=$ec_lang['dw_main_menu']?></a> &middot; <a href="Manning-Pipe-Flow.php"><?=$ec_lang['mpf_main_menu']?></a> <a data-bs-toggle="collapse" href="#relatedCalcs" aria-expanded="true" aria-controls="relatedCalcs"><?=$ec_lang['view_hide_line']?></a>
+</p>
 <?php
 echoCalculatorForm(
 	//Inputs

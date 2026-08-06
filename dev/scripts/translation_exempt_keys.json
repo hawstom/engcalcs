@@ -44,6 +44,10 @@
     "or_shape_circular":       { "category": "cognate", "languages": ["es", "pt"], "reason": "'Circular' is correct Spanish and Portuguese." },
     "or_shape_rectangular":    { "category": "cognate", "languages": ["es"], "reason": "'Rectangular' is correct Spanish; Portuguese is 'Retangular'." },
     "u_depthFrac":             { "category": "cognate", "languages": ["fr"], "reason": "'Fraction' is the correct French word, spelled identically. Surfaced only when Task 163 taught the validator to read double-quoted assignments -- this key had never been checked. Not global: es fraccion, it frazione, pt fracao, ro fractie, de Anteil all genuinely differ." },
+    "install_desktop_heading": { "category": "cognate", "languages": ["de", "id", "it"], "reason": "'Desktop' is the ordinary word in German, Indonesian and Italian; Chrome/Edge are brands. Not global: es Escritorio, fr Ordinateur, pt Computador, ru/uk/bg/cs/hr/sr each use their own word, zh 桌面版." },
+    "ec_name_placeholder":     { "category": "cognate", "languages": ["de"], "reason": "'Name' is the German word, spelled identically. Not global: es Nombre, fr Nom, it/pt Nome, ru Imya, tr Ad." },
+
+    "mtc_pi_ok_tip":           { "category": "numeric", "languages": ["am", "bn", "he", "hi", "my"], "reason": "'0.28-0.36 ft (Phillips & Ingersoll, 1998)' is two numbers, the unit token these five languages themselves use for foot (each one's own u_ft is 'ft'), and two surnames -- nothing in it can legitimately change. Not global: comma-decimal languages render 0,28-0,36 (id, pt and sr were corrected to the comma 2026-08-05) and ru/zh translate the unit word." },
 
     "calc_units_us":           { "category": "abbreviation", "languages": "*", "reason": "US -- the unit-preset button. All 26 languages independently kept it in the Task 166 sprint; it is the international abbreviation for the customary system and renders in a narrow button beside SI." },
     "calc_units_si":           { "category": "abbreviation", "languages": "*", "reason": "SI -- Systeme International, an international abbreviation by definition. Same button pair as calc_units_us." }

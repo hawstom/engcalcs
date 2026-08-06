@@ -138,6 +138,12 @@ if (!is_array($record)) {
     $record = array();
 }
 $currentHolder = isset($record['holder']) ? (string)$record['holder'] : '';
+// Reported by the holder, not measured here. `lastActivity` is only "we heard from them", which a
+// throttled background tab makes meaningless; these two are what a colleague actually needs to judge
+// a stale claim -- how long since they touched it, and how much of that is unsaved (Tom, 2026-08-05:
+// "the last edit was X ago, Y after the last save").
+$editedAt = isset($_POST['editedAt']) ? (int)$_POST['editedAt'] : 0;
+$savedAt  = isset($_POST['savedAt'])  ? (int)$_POST['savedAt']  : 0;
 $heldBySomeoneElse = ($currentHolder !== '' && $currentHolder !== $holder);
 
 $write = null;
@@ -148,12 +154,15 @@ if ($action === 'check') {
     $response['mine'] = ($currentHolder !== '' && !$heldBySomeoneElse);
     $response['lockedBy'] = isset($record['lockedBy']) ? $record['lockedBy'] : '';
     $response['lastActivity'] = isset($record['lastActivity']) ? (int)$record['lastActivity'] : 0;
+    $response['editedAt'] = isset($record['editedAt']) ? (int)$record['editedAt'] : 0;
+    $response['savedAt'] = isset($record['savedAt']) ? (int)$record['savedAt'] : 0;
 } elseif ($action === 'release') {
     // Releasing a lock someone else holds is a no-op, not an error: the usual way to reach it is
     // closing a tab that was taken over while you were away, and that is not a failure worth saying
     // anything about.
     if (!$heldBySomeoneElse) {
-        $write = array('projectId' => $id, 'holder' => '', 'lockedBy' => '', 'lastActivity' => time());
+        $write = array('projectId' => $id, 'holder' => '', 'lockedBy' => '', 'lastActivity' => time(),
+                       'editedAt' => 0, 'savedAt' => 0);
     }
     $response['released'] = !$heldBySomeoneElse;
 } elseif ($action === 'acquire' && $heldBySomeoneElse) {
@@ -162,9 +171,12 @@ if ($action === 'check') {
     $response['held'] = false;
     $response['lockedBy'] = isset($record['lockedBy']) ? $record['lockedBy'] : '';
     $response['lastActivity'] = isset($record['lastActivity']) ? (int)$record['lastActivity'] : 0;
+    $response['editedAt'] = isset($record['editedAt']) ? (int)$record['editedAt'] : 0;
+    $response['savedAt'] = isset($record['savedAt']) ? (int)$record['savedAt'] : 0;
 } else {
     // acquire on a free-or-ours lock (which doubles as the heartbeat), or steal on any lock.
-    $write = array('projectId' => $id, 'holder' => $holder, 'lockedBy' => $name, 'lastActivity' => time());
+    $write = array('projectId' => $id, 'holder' => $holder, 'lockedBy' => $name, 'lastActivity' => time(),
+                   'editedAt' => $editedAt, 'savedAt' => $savedAt);
     $response['held'] = true;
     if ($action === 'steal') {
         $response['stolenFrom'] = isset($record['lockedBy']) ? $record['lockedBy'] : '';

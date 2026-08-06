@@ -573,6 +573,7 @@ Set `APP_ENV=development` in your web server config or a `.env` file for local d
 | `lib/Calculators.lib.php` | `echoCalculatorForm()` and related helpers |
 | `js/Calculators.lib.js` | Client-side calculation engine, unit conversion, form wiring |
 | `js/Manning.lib.js` | Shared JS for Manning/irregular geometry and sketch rendering |
+| `js/PipeHydraulics.lib.js` | The suite's one Hazen-Williams constant pair (EPANET's) and `hwSlope()` — load before any calculator that uses it |
 | `lib/Menus.lib.php` | `echoMainMenu()`, `echoHeader()`, `echoFooter()` |
 | `lib/Units.lib.php` | Unit sets and conversion factors |
 | `lib/Language.lib.php` | Language detection and switching |

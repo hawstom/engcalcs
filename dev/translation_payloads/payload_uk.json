@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "uk",
-        "expected_key_count": 780,
-        "delta_key_count": 3,
+        "expected_key_count": 794,
+        "delta_key_count": 0,
         "exempt_key_count": 14,
         "exempt_keys": [
             "calc_units_us",
@@ -20,92 +20,19 @@
             "bpn_method_manning",
             "bpn_id"
         ],
-        "out_of_scope_key_count": 202,
+        "out_of_scope_key_count": 216,
         "coverage": "coverage: core calculators [mpf, mtc] x core languages [es, pt, fr, tr] (in scope iff calculator OR language is core; identity strings always)",
-        "active_prefixes": [
-            "lpn"
-        ],
+        "active_prefixes": [],
         "requested_prefix": null,
         "notes": "Translate only keys in keys_to_translate; preserve HTML, units, and symbols.",
         "glossary_injection_notes": "Use prompt_context_by_prefix and glossary_terms_by_prefix.preferred_translation when available.",
         "context_notes": "Use key_context.neighbors to keep register consistent with nearby translated strings.",
         "intent_notes": "Use key_intent when present; these entries provide terse disambiguation comments only where translation risk exists."
     },
-    "prompt_context_by_prefix": {
-        "lpn": "Use these preferred technical term translations when relevant:\n- flow (Q): витрата\n- velocity (v): швидкість\n- slope (S): ухил\n    DO NOT render as: activity\/fitness sense of 'grade' — the treadmill or trail incline for running\/walking\/jogging; this is the hydraulic energy gradient, not an exercise setting; geographic or topographic landform term; school grade \/ academic mark"
-    },
-    "glossary_terms_by_prefix": {
-        "lpn": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg RESOLVED (Tom, 2026-07-13): native engineer's 2026-07-06 clarification confirmed both 'дебит' (colloquial\/general register) and 'водно количество' (academic\/hydraulic-engineering register, used at university for Q) are acceptable. Tom decided suite-wide standardization on 'водно количество' — \"I would put водно количество everywhere\" — applied across all bg calculator categories (pipes\/irrigation included, not just the hydraulic-structure\/open-channel strings the engineer originally corrected). 'дебит' fully replaced in lib\/lang.ec.bg.php 2026-07-13. Task 109 stages 3-5 (2026-07-19): bg standardized on водно количество (дебит drift removed from or_\/mpf_\/cs_ per Bulgarian-engineer-feedback.md); sr standardized on проток (stage 4); it confirmed on portata (flusso drift removed).",
-                "preferred_translation": "витрата"
-            },
-            {
-                "term": "velocity",
-                "symbol": "v",
-                "context": "Flow velocity (speed of water). Appears in all calculators.",
-                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
-                "preferred_translation": "швидкість"
-            },
-            {
-                "term": "slope",
-                "symbol": "S",
-                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators. English aliases 'slope' and 'grade' (u_grade\/u_gradePercent) both point here.",
-                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term. [2026-07-21] Centralized the grade activity-sense guard here (was living only as u_grade\/u_gradePercent label commentary): the 'avoid' array now carries the running\/walking\/jogging exercise-incline trap, so the slope entry is the single home for the grade→energy-gradient concept and its wrong senses.",
-                "preferred_translation": "ухил"
-            }
-        ]
-    },
-    "keys_to_translate": {
-        "lpn_main_menu": "Looped Pipe Network (Map Interface) — PREVIEW",
-        "lpn_main_title": "PREVIEW: Free Online Looped Pipe Network Calculator with Map Interface",
-        "lpn_main_desc": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
-    },
-    "keys": {
-        "lpn_main_menu": "Looped Pipe Network (Map Interface) — PREVIEW",
-        "lpn_main_title": "PREVIEW: Free Online Looped Pipe Network Calculator with Map Interface",
-        "lpn_main_desc": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
-    },
-    "key_context": {
-        "lpn_main_menu": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Статичний напір подачі",
-                    "english": "Static supply head"
-                },
-                "next_translated": null
-            }
-        },
-        "lpn_main_title": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Статичний напір подачі",
-                    "english": "Static supply head"
-                },
-                "next_translated": null
-            }
-        },
-        "lpn_main_desc": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Статичний напір подачі",
-                    "english": "Static supply head"
-                },
-                "next_translated": null
-            }
-        }
-    },
+    "prompt_context_by_prefix": [],
+    "glossary_terms_by_prefix": [],
+    "keys_to_translate": [],
+    "keys": [],
+    "key_context": [],
     "key_intent": []
 }

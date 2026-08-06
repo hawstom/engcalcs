@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "tr",
-        "expected_key_count": 780,
-        "delta_key_count": 205,
+        "expected_key_count": 794,
+        "delta_key_count": 212,
         "exempt_key_count": 14,
         "exempt_keys": [
             "calc_units_us",
@@ -60,9 +60,6 @@
         ]
     },
     "keys_to_translate": {
-        "lpn_main_menu": "Looped Pipe Network (Map Interface) — PREVIEW",
-        "lpn_main_title": "PREVIEW: Free Online Looped Pipe Network Calculator with Map Interface",
-        "lpn_main_desc": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map",
         "lpn_preview_banner": "PREVIEW — This calculator is new and still changing. It is in English only for now. See the Notes below for current limits. Comments and suggestions are always welcome.",
         "lpn_tool_select": "Select",
         "lpn_tool_add_junction": "Junction",
@@ -109,7 +106,7 @@
         "lpn_confirm_delete_network": "Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone.",
         "lpn_view_units": "Units…",
         "lpn_file_saveall": "Save all",
-        "lpn_project_numbered": "Project {n}",
+        "lpn_project_numbered": "Project{n}",
         "lpn_project_copy_suffix": " (copy)",
         "lpn_project_rename": "Rename",
         "lpn_file_new": "New",
@@ -143,11 +140,19 @@
         "lpn_revert_confirm": "Throw away the changes you have made and load {file} again from the disk?",
         "lpn_file_needs_reopen": "This project came from {file}, but a browser does not stay connected to a file after the page is reloaded. Use File, Save as, or open the file again, to connect to it.",
         "lpn_file_write_failed": "Could not write to the file. It may have been moved or renamed, or permission may have been withdrawn. Your work is still saved in this browser. Use Save to file to choose the file again.",
+        "lpn_file_changed_elsewhere": "Somebody else has saved to this file since you opened it, so saving now would write over their work. Use File, Save as to keep your changes in a file of your own, or File, Revert to throw yours away and load theirs.",
         "lpn_lock_prompt_name": "What should colleagues see when you have this project open? Your initials are ideal. Anyone who opens the same file can see it, so do not use anything private.",
         "lpn_lock_somebody": "Somebody else",
         "lpn_lock_open_heading": "{name} has this file open.",
         "lpn_lock_open_readonly": "Open read-only",
         "lpn_lock_open_copy": "Create a copy",
+        "lpn_lock_break": "Break their lock",
+        "lpn_lock_open_heading_times": "{name} has this file open; the last edit was {x} ago, {y} after the last save.",
+        "lpn_lock_open_choices": "Your choices: (1) Cancel and ask them to open it if necessary and then close it properly (closing the browser does not close the project), (2) Open read-only, or (3) if all else fails, you can break their lock. Their unsaved work is not lost, but they will not be able to save over your changes, and somebody may have to merge the two by hand.",
+        "lpn_ago_minutes": "{n} minutes",
+        "lpn_ago_hours": "{n} hours",
+        "lpn_ago_days": "{n} days",
+        "lpn_ago_unknown": "an unknown time",
         "lpn_lock_readonly_banner": "Read-only: {name} has this file open. You can change anything you like here, but you cannot save. Use File, Save as to save to a different file.",
         "lpn_lock_unavailable": "Beware: could not reach the server to check or create a lock on this project, so nothing is stopping a colleague from editing the same file at the same time. You will be told if locking starts working again.",
         "lpn_lock_restored": "Locking is working again, and this file is now yours to save to.",
@@ -174,6 +179,8 @@
         "lpn_notes_5_def": "A pump follows H = H₀ − aQ^b, where H is the head the pump adds and Q is the flow through it. Enter one, two, or three points from the manufacturer's curve. Three points — the head at zero flow, the normal working point, and the point of highest flow — fit H₀, a and b directly, and follow a published curve most closely. Two points fit a parabola (b = 2) with its peak at zero flow. One point uses a common rule: the head at zero flow is 1.33 × the head you enter, and the highest flow is 2 × the flow you enter, which again gives b = 2. A pump with no points entered adds no head at all. The curve is not stopped at zero, so asking a pump for more flow than its curve can deliver gives a negative head. The fix is a bigger pump or a smaller demand, not a different curve fit.",
         "lpn_notes_4_term": "Planned",
         "lpn_notes_4_def": "Scenarios, so that one project can hold several sets of demands. Tables of node and pipe results. Opening a file you used recently without hunting for it again. Reading and writing EPANET .inp files. Other languages: this page is in English only for now. Comments and suggestions are always welcome (see the feedback link above).",
+        "lpn_notes_epanet_term": "Hazen-Williams constants now match EPANET (August 2026)",
+        "lpn_notes_epanet_def": "In August 2026 the Hazen-Williams coefficient and exponent were changed to match EPANET. Head loss results differ from earlier versions of this page by up to 0.1 percent, which is far smaller than the uncertainty in the C value itself.",
         "lpn_id_invalid": "Enter an ID with no spaces and no quotation marks.",
         "lpn_id_taken": "That ID is already in use.",
         "lpn_diag_no_fixed_head": "Add a reservoir. The network needs at least one known water level before it can be solved.",
@@ -267,9 +274,6 @@
         "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
     "keys": {
-        "lpn_main_menu": "Looped Pipe Network (Map Interface) — PREVIEW",
-        "lpn_main_title": "PREVIEW: Free Online Looped Pipe Network Calculator with Map Interface",
-        "lpn_main_desc": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map",
         "lpn_preview_banner": "PREVIEW — This calculator is new and still changing. It is in English only for now. See the Notes below for current limits. Comments and suggestions are always welcome.",
         "lpn_tool_select": "Select",
         "lpn_tool_add_junction": "Junction",
@@ -316,7 +320,7 @@
         "lpn_confirm_delete_network": "Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone.",
         "lpn_view_units": "Units…",
         "lpn_file_saveall": "Save all",
-        "lpn_project_numbered": "Project {n}",
+        "lpn_project_numbered": "Project{n}",
         "lpn_project_copy_suffix": " (copy)",
         "lpn_project_rename": "Rename",
         "lpn_file_new": "New",
@@ -350,11 +354,19 @@
         "lpn_revert_confirm": "Throw away the changes you have made and load {file} again from the disk?",
         "lpn_file_needs_reopen": "This project came from {file}, but a browser does not stay connected to a file after the page is reloaded. Use File, Save as, or open the file again, to connect to it.",
         "lpn_file_write_failed": "Could not write to the file. It may have been moved or renamed, or permission may have been withdrawn. Your work is still saved in this browser. Use Save to file to choose the file again.",
+        "lpn_file_changed_elsewhere": "Somebody else has saved to this file since you opened it, so saving now would write over their work. Use File, Save as to keep your changes in a file of your own, or File, Revert to throw yours away and load theirs.",
         "lpn_lock_prompt_name": "What should colleagues see when you have this project open? Your initials are ideal. Anyone who opens the same file can see it, so do not use anything private.",
         "lpn_lock_somebody": "Somebody else",
         "lpn_lock_open_heading": "{name} has this file open.",
         "lpn_lock_open_readonly": "Open read-only",
         "lpn_lock_open_copy": "Create a copy",
+        "lpn_lock_break": "Break their lock",
+        "lpn_lock_open_heading_times": "{name} has this file open; the last edit was {x} ago, {y} after the last save.",
+        "lpn_lock_open_choices": "Your choices: (1) Cancel and ask them to open it if necessary and then close it properly (closing the browser does not close the project), (2) Open read-only, or (3) if all else fails, you can break their lock. Their unsaved work is not lost, but they will not be able to save over your changes, and somebody may have to merge the two by hand.",
+        "lpn_ago_minutes": "{n} minutes",
+        "lpn_ago_hours": "{n} hours",
+        "lpn_ago_days": "{n} days",
+        "lpn_ago_unknown": "an unknown time",
         "lpn_lock_readonly_banner": "Read-only: {name} has this file open. You can change anything you like here, but you cannot save. Use File, Save as to save to a different file.",
         "lpn_lock_unavailable": "Beware: could not reach the server to check or create a lock on this project, so nothing is stopping a colleague from editing the same file at the same time. You will be told if locking starts working again.",
         "lpn_lock_restored": "Locking is working again, and this file is now yours to save to.",
@@ -381,6 +393,8 @@
         "lpn_notes_5_def": "A pump follows H = H₀ − aQ^b, where H is the head the pump adds and Q is the flow through it. Enter one, two, or three points from the manufacturer's curve. Three points — the head at zero flow, the normal working point, and the point of highest flow — fit H₀, a and b directly, and follow a published curve most closely. Two points fit a parabola (b = 2) with its peak at zero flow. One point uses a common rule: the head at zero flow is 1.33 × the head you enter, and the highest flow is 2 × the flow you enter, which again gives b = 2. A pump with no points entered adds no head at all. The curve is not stopped at zero, so asking a pump for more flow than its curve can deliver gives a negative head. The fix is a bigger pump or a smaller demand, not a different curve fit.",
         "lpn_notes_4_term": "Planned",
         "lpn_notes_4_def": "Scenarios, so that one project can hold several sets of demands. Tables of node and pipe results. Opening a file you used recently without hunting for it again. Reading and writing EPANET .inp files. Other languages: this page is in English only for now. Comments and suggestions are always welcome (see the feedback link above).",
+        "lpn_notes_epanet_term": "Hazen-Williams constants now match EPANET (August 2026)",
+        "lpn_notes_epanet_def": "In August 2026 the Hazen-Williams coefficient and exponent were changed to match EPANET. Head loss results differ from earlier versions of this page by up to 0.1 percent, which is far smaller than the uncertainty in the C value itself.",
         "lpn_id_invalid": "Enter an ID with no spaces and no quotation marks.",
         "lpn_id_taken": "That ID is already in use.",
         "lpn_diag_no_fixed_head": "Add a reservoir. The network needs at least one known water level before it can be solved.",
@@ -474,50 +488,14 @@
         "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
     "key_context": {
-        "lpn_main_menu": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
-                },
-                "next_translated": null
-            }
-        },
-        "lpn_main_title": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
-                },
-                "next_translated": null
-            }
-        },
-        "lpn_main_desc": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
-                },
-                "next_translated": null
-            }
-        },
         "lpn_preview_banner": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -527,9 +505,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -539,9 +517,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -551,9 +529,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -563,9 +541,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -575,9 +553,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -587,9 +565,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -599,9 +577,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -611,9 +589,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -623,9 +601,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -635,9 +613,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -647,9 +625,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -659,9 +637,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -671,9 +649,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -683,9 +661,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -695,9 +673,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -707,9 +685,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -719,9 +697,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -731,9 +709,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -743,9 +721,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -755,9 +733,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -767,9 +745,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -779,9 +757,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -791,9 +769,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -803,9 +781,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -815,9 +793,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -827,9 +805,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -839,9 +817,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -851,9 +829,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -863,9 +841,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -875,9 +853,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -887,9 +865,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -899,9 +877,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -911,9 +889,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -923,9 +901,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -935,9 +913,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -947,9 +925,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -959,9 +937,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -971,9 +949,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -983,9 +961,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -995,9 +973,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1007,9 +985,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1019,9 +997,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1031,9 +1009,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1043,9 +1021,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1055,9 +1033,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1067,9 +1045,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1079,9 +1057,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1091,9 +1069,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1103,9 +1081,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1115,9 +1093,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1127,9 +1105,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1139,9 +1117,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1151,9 +1129,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1163,9 +1141,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1175,9 +1153,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1187,9 +1165,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1199,9 +1177,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1211,9 +1189,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1223,9 +1201,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1235,9 +1213,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1247,9 +1225,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1259,9 +1237,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1271,9 +1249,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1283,9 +1261,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1295,9 +1273,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1307,9 +1285,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1319,9 +1297,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1331,9 +1309,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1343,9 +1321,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1355,9 +1333,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1367,9 +1345,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1379,9 +1357,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1391,9 +1369,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1403,9 +1381,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1415,9 +1393,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1427,9 +1405,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1439,9 +1417,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1451,9 +1429,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1463,9 +1441,21 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_file_changed_elsewhere": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1475,9 +1465,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1487,9 +1477,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1499,9 +1489,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1511,9 +1501,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1523,9 +1513,93 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_lock_break": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_lock_open_heading_times": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_lock_open_choices": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ago_minutes": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ago_hours": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ago_days": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ago_unknown": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1535,9 +1609,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1547,9 +1621,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1559,9 +1633,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1571,9 +1645,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1583,9 +1657,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1595,9 +1669,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1607,9 +1681,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1619,9 +1693,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1631,9 +1705,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1643,9 +1717,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1655,9 +1729,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1667,9 +1741,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1679,9 +1753,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1691,9 +1765,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1703,9 +1777,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1715,9 +1789,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1727,9 +1801,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1739,9 +1813,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1751,9 +1825,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1763,9 +1837,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1775,9 +1849,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1787,9 +1861,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1799,9 +1873,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1811,9 +1885,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1823,9 +1897,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1835,9 +1909,33 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_notes_epanet_term": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_notes_epanet_def": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1847,9 +1945,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1859,9 +1957,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1871,9 +1969,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1883,9 +1981,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1895,9 +1993,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1907,9 +2005,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1919,9 +2017,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1931,9 +2029,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1943,9 +2041,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1955,9 +2053,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1967,9 +2065,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1979,9 +2077,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1991,9 +2089,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2003,9 +2101,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2015,9 +2113,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2027,9 +2125,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2039,9 +2137,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2051,9 +2149,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2063,9 +2161,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2075,9 +2173,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2087,9 +2185,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2099,9 +2197,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2111,9 +2209,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2123,9 +2221,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2135,9 +2233,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2147,9 +2245,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2159,9 +2257,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2171,9 +2269,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2183,9 +2281,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2195,9 +2293,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2207,9 +2305,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2219,9 +2317,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2231,9 +2329,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2243,9 +2341,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2255,9 +2353,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2267,9 +2365,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2279,9 +2377,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2291,9 +2389,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2303,9 +2401,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2315,9 +2413,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2327,9 +2425,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2339,9 +2437,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2351,9 +2449,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2363,9 +2461,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2375,9 +2473,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2387,9 +2485,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2399,9 +2497,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2411,9 +2509,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2423,9 +2521,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2435,9 +2533,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2447,9 +2545,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2459,9 +2557,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2471,9 +2569,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2483,9 +2581,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2495,9 +2593,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2507,9 +2605,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2519,9 +2617,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2531,9 +2629,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2543,9 +2641,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2555,9 +2653,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2567,9 +2665,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2579,9 +2677,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2591,9 +2689,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2603,9 +2701,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2615,9 +2713,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2627,9 +2725,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2639,9 +2737,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2651,9 +2749,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2663,9 +2761,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2675,9 +2773,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2687,9 +2785,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2699,9 +2797,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2711,9 +2809,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2723,9 +2821,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2735,9 +2833,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2747,9 +2845,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2759,9 +2857,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2771,9 +2869,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2783,9 +2881,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2795,9 +2893,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2807,9 +2905,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2819,9 +2917,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2831,9 +2929,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2843,9 +2941,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2855,9 +2953,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2867,9 +2965,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2879,9 +2977,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2891,9 +2989,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2903,9 +3001,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2915,9 +3013,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2927,9 +3025,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Statik besleme yükü",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "ÖN SÜRÜM — Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }

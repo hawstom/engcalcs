@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "pt",
-        "expected_key_count": 780,
-        "delta_key_count": 208,
+        "expected_key_count": 794,
+        "delta_key_count": 214,
         "exempt_key_count": 16,
         "exempt_keys": [
             "calc_units_us",
@@ -27,8 +27,7 @@
         "active_prefixes": [
             "ip",
             "lpn",
-            "mhp",
-            "mtc"
+            "mhp"
         ],
         "requested_prefix": null,
         "notes": "Translate only keys in keys_to_translate; preserve HTML, units, and symbols.",
@@ -39,8 +38,7 @@
     "prompt_context_by_prefix": {
         "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): vazão\n- velocity (v): velocidade\n- head loss (h_L): perda de carga\n    DO NOT render as: pressure loss \/ pressure drop (use the head-loss term, not the pressure term); a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry\n- emitter: emissor\n- distribution uniformity (DU): uniformidade de distribuição\n- low-quarter distribution uniformity (DU_lq): uniformidade de distribuição do quarto inferior\n- application rate (PR): taxa de aplicação\n- lateral: linha lateral\n- mainline: linha principal\n- reach: trecho\n- velocity head (H_v): carga de velocidade\n    DO NOT render as: a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry; pressure\n- friction loss (h_f): perda de carga por atrito\n- minor loss (h_m): perda de carga localizada\n- energy grade line (EGL): linha de energia\n- upstream: a montante\n- downstream: a jusante",
         "lpn": "Use these preferred technical term translations when relevant:\n- flow (Q): vazão\n- velocity (v): velocidade\n- slope (S): declividade\n    DO NOT render as: activity\/fitness sense of 'grade' — the treadmill or trail incline for running\/walking\/jogging; this is the hydraulic energy gradient, not an exercise setting; geographic or topographic landform term; school grade \/ academic mark",
-        "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): vazão\n- penstock: conduta forçada\n    DO NOT render as: phonetic transliteration of the English word — translate the concept (pressure pipe \/ force main to turbine), never borrow 'penstock' as a loanword\n- gross head (H_gross): altura bruta\n    DO NOT render as: a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry; pressure\n- net head (H_net): altura líquida\n    DO NOT render as: a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry; pressure\n- plant efficiency (η): rendimento da instalação\n- head loss (h_L): perda de carga\n    DO NOT render as: pressure loss \/ pressure drop (use the head-loss term, not the pressure term); a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry\n- run-of-river: fio d'água\n- headworks: obras de captação\n- junction loss (h_m): perdas localizadas\n- minor loss (h_m): perda de carga localizada",
-        "mtc": "Use these preferred technical term translations when relevant:\n- flow (Q): vazão\n- velocity (v): velocidade\n- hydraulic radius (R_h): raio hidráulico\n- wetted perimeter (P_w): perímetro molhado\n- Manning roughness (n): coeficiente de rugosidade de Manning\n- slope (S): declividade\n    DO NOT render as: activity\/fitness sense of 'grade' — the treadmill or trail incline for running\/walking\/jogging; this is the hydraulic energy gradient, not an exercise setting; geographic or topographic landform term; school grade \/ academic mark"
+        "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): vazão\n- penstock: conduta forçada\n    DO NOT render as: phonetic transliteration of the English word — translate the concept (pressure pipe \/ force main to turbine), never borrow 'penstock' as a loanword\n- gross head (H_gross): altura bruta\n    DO NOT render as: a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry; pressure\n- net head (H_net): altura líquida\n    DO NOT render as: a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry; pressure\n- plant efficiency (η): rendimento da instalação\n- head loss (h_L): perda de carga\n    DO NOT render as: pressure loss \/ pressure drop (use the head-loss term, not the pressure term); a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry\n- run-of-river: fio d'água\n- headworks: obras de captação\n- junction loss (h_m): perdas localizadas\n- minor loss (h_m): perda de carga localizada"
     },
     "glossary_terms_by_prefix": {
         "ip": [
@@ -251,59 +249,11 @@
                 "translation_notes": "CANONICAL ENGLISH LABEL: \"Minor (local) loss\" (label-normalization decision, item 90, 2026-07-07). 'Minor ⇄ local' — a local\/point loss at fittings, NOT a \"smaller\" loss; the '(local)' parenthetical fixes the mistranslation trap. Symbol h_m, coefficient k_m (lowercase h reserved for loss components; capital H reserved for total\/gross\/net head, per the same decision). am ADDED (2026-07-10, category-3 am re-translation): 'ጥቃቅን (አካባቢያዊ) ኪሳራ' (tiqaqin (akababiyawi) kisara) mirrors the English structure word-for-word — 'ጥቃቅን' (minor\/small) followed by the parenthetical '(አካባቢያዊ)' (local, i.e. of a specific place\/area) — so the same mistranslation-blocking device English uses (the '(local)' qualifier preventing a 'smaller loss' misreading) is preserved in Amharic rather than silently dropped. Replaces the prior am file's 'የማያያዣ ኪሳራ' (connector\/joint loss), which named the physical fitting rather than the local\/point-loss concept. km ADDED (2026-07-10, category-3 km re-translation): 'ការបាត់បង់មូលដ្ឋាន' (local-basis loss) reuses មូលដ្ឋាន ('local', already established suite-wide for this exact merged concept in ip_km's tooltip 'មេគុណបាត់បង់មូលដ្ឋានសរុប' = 'total local-loss coefficient'), so category-3 now converges on the same word ip_ already uses rather than coining a second competing term. Deliberately avoids 'តូច' (small), sidestepping the minor⇄smaller mistranslation trap the English '(local)' parenthetical exists to block. Replaces the km file's prior mphl_junction_loss value 'ការបាត់បង់ junction' (untranslated English word left in place). ps ADDED (2026-07-10, category-3 ps wave-3 re-translation): 'ځایی ضیاع' (local loss) uses ځایی (local\/positional) + the established ps loss word ضیاع, following the majority pattern already set by ar\/fa\/es\/fr\/hr\/id\/it\/ro\/ru\/sr\/tr\/uk\/ur\/zh — all of which render this concept as 'local loss' alone rather than translating 'minor' literally, since the '(local)' qualifier is the operative disambiguator, not 'minor'. Deliberately avoids a word for 'small\/minor' (e.g. کوچنی) to sidestep the same minor⇄smaller trap the English parenthetical exists to block. Replaces the prior ps file's 'د جنکشن ضیاع' (junction loss — the pre-consolidation, pre-item-90 term) and fixes its symbol from capital H_m to lowercase h_m. Task 109 stage 4 (2026-07-19): de 'Minderverlust' (=lesser\/reduced loss — the exact 'smaller loss' mistranslation the item-90 convention blocks) corrected to 'Örtlicher (Einzel-)Verlust' matching the labels.",
                 "preferred_translation": "perda de carga localizada"
             }
-        ],
-        "mtc": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg RESOLVED (Tom, 2026-07-13): native engineer's 2026-07-06 clarification confirmed both 'дебит' (colloquial\/general register) and 'водно количество' (academic\/hydraulic-engineering register, used at university for Q) are acceptable. Tom decided suite-wide standardization on 'водно количество' — \"I would put водно количество everywhere\" — applied across all bg calculator categories (pipes\/irrigation included, not just the hydraulic-structure\/open-channel strings the engineer originally corrected). 'дебит' fully replaced in lib\/lang.ec.bg.php 2026-07-13. Task 109 stages 3-5 (2026-07-19): bg standardized on водно количество (дебит drift removed from or_\/mpf_\/cs_ per Bulgarian-engineer-feedback.md); sr standardized on проток (stage 4); it confirmed on portata (flusso drift removed).",
-                "preferred_translation": "vazão"
-            },
-            {
-                "term": "velocity",
-                "symbol": "v",
-                "context": "Flow velocity (speed of water). Appears in all calculators.",
-                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
-                "preferred_translation": "velocidade"
-            },
-            {
-                "term": "hydraulic radius",
-                "symbol": "R_h",
-                "context": "Cross-sectional flow area divided by wetted perimeter. Appears in Manning calculators.",
-                "translation_notes": "Use the standard hydraulic engineering phrase. Pre-2026 sr\/hr human translations used the Latin loanword 'hidraulički radijus' — this form is widely used in South Slavic engineering practice and may be more recognizable to field practitioners than the native Slavic equivalents 'полупречник' (sr) \/ 'polumjer' (hr). Both are correct; native Slavic engineers may encounter both forms. DATA-ERROR FIX 2026-07-10 (category-3 sw wave-3 sprint): previous sw value 'radius ya maji' (literally 'radius of water', English loanword 'radius' + 'of water') named the substance rather than the hydraulic-geometry property, and did not read as an engineering term. Changed to 'radiasi ya kihaidroliki' (radius + 'hydraulic', adjectival ki- form), matching the '[radius] + hydraulic' construction used by fr\/de\/it\/es\/ro\/tr (rayon hydraulique \/ hydraulischer Radius \/ raggio idraulico \/ radio hidráulico \/ raza hidraulică \/ hidrolik yarıçap). Used in lib\/lang.ec.sw.php's mpf_hydraulic_radius.",
-                "preferred_translation": "raio hidráulico"
-            },
-            {
-                "term": "wetted perimeter",
-                "symbol": "P_w",
-                "context": "Length of the channel or pipe boundary in contact with flowing water. Appears in Manning calculators.",
-                "translation_notes": "WMO No. 385 entry 1682 confirms: es = 'perímetro mojado', fr = 'périmètre mouillé'. Use the standard hydraulic engineering phrase. 'Wetted' here means 'in contact with water', not 'soaked'. Pre-2026 sr human used 'okvašeni obim' (obim = natural South Slavic word for perimeter\/circumference); current uses 'квашени периметар' (периметар = Greek-derived loanword). Both are correct; 'obim\/opseg' is more natural in informal Serbian\/Croatian field use. Task 109 stages 4 & 5 (2026-07-19): bg wrong-word 'навлажнен' (moistened) corrected to 'омокрен' in mpf_wetted_perimeter (stage 4) and cs_notes_3_def (stage 5); km គ្រែទឹក (water bed) also confirmed corrected to glossary បរិវេណសើម (stage 4).",
-                "preferred_translation": "perímetro molhado"
-            },
-            {
-                "term": "Manning roughness",
-                "symbol": "n",
-                "context": "Manning's n — empirical roughness coefficient used in the Manning formula for open-channel and pipe flow.",
-                "translation_notes": "Always include 'Manning' as a proper noun. The coefficient itself (n) needs no translation — only the label does. Do not translate as generic 'roughness coefficient' without 'Manning'. TYPO FIX 2026-07-09 (category-3 wave-1 sprint): ru\/uk transliterations were single-н 'Манинга'\/'Манінга', flagged by the ru wave-1 agent as inconsistent with the established double-н transliteration ('Маннинга'\/'Маннінга') used 11+ times elsewhere in both lang files (predates this sprint). Corrected to double-н for consistency. Task 109 stage 4 (2026-07-19): am 3-way 'roughness' spelling drift standardized to file-dominant ሻካሪነት (was ሻካርነት); it confirmed on scabrezza and sw on usuguo (both already glossary-correct). [2026-07-24] he corrected: was transliterated 'מנינג'; shipped lang.ec.he.php uses Latin 'Manning' throughout (mi_\/mpf_\/mphl_ menus), so glossary now matches file practice.",
-                "preferred_translation": "coeficiente de rugosidade de Manning"
-            },
-            {
-                "term": "slope",
-                "symbol": "S",
-                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators. English aliases 'slope' and 'grade' (u_grade\/u_gradePercent) both point here.",
-                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term. [2026-07-21] Centralized the grade activity-sense guard here (was living only as u_grade\/u_gradePercent label commentary): the 'avoid' array now carries the running\/walking\/jogging exercise-incline trap, so the slope entry is the single home for the grade→energy-gradient concept and its wrong senses.",
-                "preferred_translation": "declividade"
-            }
         ]
     },
     "keys_to_translate": {
-        "mtc_pi_ok_tip": "0.28–0.36 ft (Phillips & Ingersoll, 1998)",
         "mhp_vel_ok_short": "OK",
         "ip_press": "Press.",
-        "lpn_main_menu": "Looped Pipe Network (Map Interface) — PREVIEW",
-        "lpn_main_title": "PREVIEW: Free Online Looped Pipe Network Calculator with Map Interface",
-        "lpn_main_desc": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map",
         "lpn_preview_banner": "PREVIEW — This calculator is new and still changing. It is in English only for now. See the Notes below for current limits. Comments and suggestions are always welcome.",
         "lpn_tool_select": "Select",
         "lpn_tool_add_junction": "Junction",
@@ -350,7 +300,7 @@
         "lpn_confirm_delete_network": "Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone.",
         "lpn_view_units": "Units…",
         "lpn_file_saveall": "Save all",
-        "lpn_project_numbered": "Project {n}",
+        "lpn_project_numbered": "Project{n}",
         "lpn_project_copy_suffix": " (copy)",
         "lpn_project_rename": "Rename",
         "lpn_file_new": "New",
@@ -384,11 +334,19 @@
         "lpn_revert_confirm": "Throw away the changes you have made and load {file} again from the disk?",
         "lpn_file_needs_reopen": "This project came from {file}, but a browser does not stay connected to a file after the page is reloaded. Use File, Save as, or open the file again, to connect to it.",
         "lpn_file_write_failed": "Could not write to the file. It may have been moved or renamed, or permission may have been withdrawn. Your work is still saved in this browser. Use Save to file to choose the file again.",
+        "lpn_file_changed_elsewhere": "Somebody else has saved to this file since you opened it, so saving now would write over their work. Use File, Save as to keep your changes in a file of your own, or File, Revert to throw yours away and load theirs.",
         "lpn_lock_prompt_name": "What should colleagues see when you have this project open? Your initials are ideal. Anyone who opens the same file can see it, so do not use anything private.",
         "lpn_lock_somebody": "Somebody else",
         "lpn_lock_open_heading": "{name} has this file open.",
         "lpn_lock_open_readonly": "Open read-only",
         "lpn_lock_open_copy": "Create a copy",
+        "lpn_lock_break": "Break their lock",
+        "lpn_lock_open_heading_times": "{name} has this file open; the last edit was {x} ago, {y} after the last save.",
+        "lpn_lock_open_choices": "Your choices: (1) Cancel and ask them to open it if necessary and then close it properly (closing the browser does not close the project), (2) Open read-only, or (3) if all else fails, you can break their lock. Their unsaved work is not lost, but they will not be able to save over your changes, and somebody may have to merge the two by hand.",
+        "lpn_ago_minutes": "{n} minutes",
+        "lpn_ago_hours": "{n} hours",
+        "lpn_ago_days": "{n} days",
+        "lpn_ago_unknown": "an unknown time",
         "lpn_lock_readonly_banner": "Read-only: {name} has this file open. You can change anything you like here, but you cannot save. Use File, Save as to save to a different file.",
         "lpn_lock_unavailable": "Beware: could not reach the server to check or create a lock on this project, so nothing is stopping a colleague from editing the same file at the same time. You will be told if locking starts working again.",
         "lpn_lock_restored": "Locking is working again, and this file is now yours to save to.",
@@ -415,6 +373,8 @@
         "lpn_notes_5_def": "A pump follows H = H₀ − aQ^b, where H is the head the pump adds and Q is the flow through it. Enter one, two, or three points from the manufacturer's curve. Three points — the head at zero flow, the normal working point, and the point of highest flow — fit H₀, a and b directly, and follow a published curve most closely. Two points fit a parabola (b = 2) with its peak at zero flow. One point uses a common rule: the head at zero flow is 1.33 × the head you enter, and the highest flow is 2 × the flow you enter, which again gives b = 2. A pump with no points entered adds no head at all. The curve is not stopped at zero, so asking a pump for more flow than its curve can deliver gives a negative head. The fix is a bigger pump or a smaller demand, not a different curve fit.",
         "lpn_notes_4_term": "Planned",
         "lpn_notes_4_def": "Scenarios, so that one project can hold several sets of demands. Tables of node and pipe results. Opening a file you used recently without hunting for it again. Reading and writing EPANET .inp files. Other languages: this page is in English only for now. Comments and suggestions are always welcome (see the feedback link above).",
+        "lpn_notes_epanet_term": "Hazen-Williams constants now match EPANET (August 2026)",
+        "lpn_notes_epanet_def": "In August 2026 the Hazen-Williams coefficient and exponent were changed to match EPANET. Head loss results differ from earlier versions of this page by up to 0.1 percent, which is far smaller than the uncertainty in the C value itself.",
         "lpn_id_invalid": "Enter an ID with no spaces and no quotation marks.",
         "lpn_id_taken": "That ID is already in use.",
         "lpn_diag_no_fixed_head": "Add a reservoir. The network needs at least one known water level before it can be solved.",
@@ -508,12 +468,8 @@
         "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
     "keys": {
-        "mtc_pi_ok_tip": "0.28–0.36 ft (Phillips & Ingersoll, 1998)",
         "mhp_vel_ok_short": "OK",
         "ip_press": "Press.",
-        "lpn_main_menu": "Looped Pipe Network (Map Interface) — PREVIEW",
-        "lpn_main_title": "PREVIEW: Free Online Looped Pipe Network Calculator with Map Interface",
-        "lpn_main_desc": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map",
         "lpn_preview_banner": "PREVIEW — This calculator is new and still changing. It is in English only for now. See the Notes below for current limits. Comments and suggestions are always welcome.",
         "lpn_tool_select": "Select",
         "lpn_tool_add_junction": "Junction",
@@ -560,7 +516,7 @@
         "lpn_confirm_delete_network": "Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone.",
         "lpn_view_units": "Units…",
         "lpn_file_saveall": "Save all",
-        "lpn_project_numbered": "Project {n}",
+        "lpn_project_numbered": "Project{n}",
         "lpn_project_copy_suffix": " (copy)",
         "lpn_project_rename": "Rename",
         "lpn_file_new": "New",
@@ -594,11 +550,19 @@
         "lpn_revert_confirm": "Throw away the changes you have made and load {file} again from the disk?",
         "lpn_file_needs_reopen": "This project came from {file}, but a browser does not stay connected to a file after the page is reloaded. Use File, Save as, or open the file again, to connect to it.",
         "lpn_file_write_failed": "Could not write to the file. It may have been moved or renamed, or permission may have been withdrawn. Your work is still saved in this browser. Use Save to file to choose the file again.",
+        "lpn_file_changed_elsewhere": "Somebody else has saved to this file since you opened it, so saving now would write over their work. Use File, Save as to keep your changes in a file of your own, or File, Revert to throw yours away and load theirs.",
         "lpn_lock_prompt_name": "What should colleagues see when you have this project open? Your initials are ideal. Anyone who opens the same file can see it, so do not use anything private.",
         "lpn_lock_somebody": "Somebody else",
         "lpn_lock_open_heading": "{name} has this file open.",
         "lpn_lock_open_readonly": "Open read-only",
         "lpn_lock_open_copy": "Create a copy",
+        "lpn_lock_break": "Break their lock",
+        "lpn_lock_open_heading_times": "{name} has this file open; the last edit was {x} ago, {y} after the last save.",
+        "lpn_lock_open_choices": "Your choices: (1) Cancel and ask them to open it if necessary and then close it properly (closing the browser does not close the project), (2) Open read-only, or (3) if all else fails, you can break their lock. Their unsaved work is not lost, but they will not be able to save over your changes, and somebody may have to merge the two by hand.",
+        "lpn_ago_minutes": "{n} minutes",
+        "lpn_ago_hours": "{n} hours",
+        "lpn_ago_days": "{n} days",
+        "lpn_ago_unknown": "an unknown time",
         "lpn_lock_readonly_banner": "Read-only: {name} has this file open. You can change anything you like here, but you cannot save. Use File, Save as to save to a different file.",
         "lpn_lock_unavailable": "Beware: could not reach the server to check or create a lock on this project, so nothing is stopping a colleague from editing the same file at the same time. You will be told if locking starts working again.",
         "lpn_lock_restored": "Locking is working again, and this file is now yours to save to.",
@@ -625,6 +589,8 @@
         "lpn_notes_5_def": "A pump follows H = H₀ − aQ^b, where H is the head the pump adds and Q is the flow through it. Enter one, two, or three points from the manufacturer's curve. Three points — the head at zero flow, the normal working point, and the point of highest flow — fit H₀, a and b directly, and follow a published curve most closely. Two points fit a parabola (b = 2) with its peak at zero flow. One point uses a common rule: the head at zero flow is 1.33 × the head you enter, and the highest flow is 2 × the flow you enter, which again gives b = 2. A pump with no points entered adds no head at all. The curve is not stopped at zero, so asking a pump for more flow than its curve can deliver gives a negative head. The fix is a bigger pump or a smaller demand, not a different curve fit.",
         "lpn_notes_4_term": "Planned",
         "lpn_notes_4_def": "Scenarios, so that one project can hold several sets of demands. Tables of node and pipe results. Opening a file you used recently without hunting for it again. Reading and writing EPANET .inp files. Other languages: this page is in English only for now. Comments and suggestions are always welcome (see the feedback link above).",
+        "lpn_notes_epanet_term": "Hazen-Williams constants now match EPANET (August 2026)",
+        "lpn_notes_epanet_def": "In August 2026 the Hazen-Williams coefficient and exponent were changed to match EPANET. Head loss results differ from earlier versions of this page by up to 0.1 percent, which is far smaller than the uncertainty in the C value itself.",
         "lpn_id_invalid": "Enter an ID with no spaces and no quotation marks.",
         "lpn_id_taken": "That ID is already in use.",
         "lpn_diag_no_fixed_head": "Add a reservoir. The network needs at least one known water level before it can be solved.",
@@ -718,22 +684,6 @@
         "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
     "key_context": {
-        "mtc_pi_ok_tip": {
-            "reason": "equal_to_english",
-            "current_value": "0.28–0.36 ft (Phillips & Ingersoll, 1998)",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "mtc_pi_ok",
-                    "value": "d50 dentro da faixa P&I",
-                    "english": "d50 in P&I range"
-                },
-                "next_translated": {
-                    "key": "mtc_pi_out_of_range",
-                    "value": "Fora da faixa",
-                    "english": "Outside range"
-                }
-            }
-        },
         "mhp_vel_ok_short": {
             "reason": "equal_to_english",
             "current_value": "OK",
@@ -766,50 +716,14 @@
                 }
             }
         },
-        "lpn_main_menu": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
-                },
-                "next_translated": null
-            }
-        },
-        "lpn_main_title": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
-                },
-                "next_translated": null
-            }
-        },
-        "lpn_main_desc": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
-                },
-                "next_translated": null
-            }
-        },
         "lpn_preview_banner": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -819,9 +733,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -831,9 +745,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -843,9 +757,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -855,9 +769,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -867,9 +781,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -879,9 +793,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -891,9 +805,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -903,9 +817,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -915,9 +829,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -927,9 +841,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -939,9 +853,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -951,9 +865,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -963,9 +877,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -975,9 +889,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -987,9 +901,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -999,9 +913,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1011,9 +925,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1023,9 +937,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1035,9 +949,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1047,9 +961,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1059,9 +973,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1071,9 +985,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1083,9 +997,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1095,9 +1009,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1107,9 +1021,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1119,9 +1033,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1131,9 +1045,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1143,9 +1057,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1155,9 +1069,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1167,9 +1081,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1179,9 +1093,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1191,9 +1105,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1203,9 +1117,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1215,9 +1129,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1227,9 +1141,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1239,9 +1153,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1251,9 +1165,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1263,9 +1177,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1275,9 +1189,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1287,9 +1201,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1299,9 +1213,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1311,9 +1225,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1323,9 +1237,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1335,9 +1249,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1347,9 +1261,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1359,9 +1273,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1371,9 +1285,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1383,9 +1297,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1395,9 +1309,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1407,9 +1321,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1419,9 +1333,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1431,9 +1345,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1443,9 +1357,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1455,9 +1369,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1467,9 +1381,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1479,9 +1393,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1491,9 +1405,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1503,9 +1417,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1515,9 +1429,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1527,9 +1441,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1539,9 +1453,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1551,9 +1465,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1563,9 +1477,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1575,9 +1489,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1587,9 +1501,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1599,9 +1513,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1611,9 +1525,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1623,9 +1537,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1635,9 +1549,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1647,9 +1561,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1659,9 +1573,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1671,9 +1585,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1683,9 +1597,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1695,9 +1609,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1707,9 +1621,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1719,9 +1633,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1731,9 +1645,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1743,9 +1657,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1755,9 +1669,21 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_file_changed_elsewhere": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1767,9 +1693,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1779,9 +1705,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1791,9 +1717,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1803,9 +1729,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1815,9 +1741,93 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_lock_break": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_lock_open_heading_times": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_lock_open_choices": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ago_minutes": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ago_hours": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ago_days": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ago_unknown": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1827,9 +1837,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1839,9 +1849,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1851,9 +1861,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1863,9 +1873,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1875,9 +1885,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1887,9 +1897,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1899,9 +1909,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1911,9 +1921,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1923,9 +1933,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1935,9 +1945,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1947,9 +1957,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1959,9 +1969,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1971,9 +1981,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1983,9 +1993,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1995,9 +2005,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2007,9 +2017,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2019,9 +2029,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2031,9 +2041,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2043,9 +2053,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2055,9 +2065,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2067,9 +2077,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2079,9 +2089,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2091,9 +2101,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2103,9 +2113,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2115,9 +2125,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2127,9 +2137,33 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_notes_epanet_term": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_notes_epanet_def": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2139,9 +2173,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2151,9 +2185,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2163,9 +2197,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2175,9 +2209,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2187,9 +2221,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2199,9 +2233,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2211,9 +2245,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2223,9 +2257,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2235,9 +2269,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2247,9 +2281,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2259,9 +2293,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2271,9 +2305,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2283,9 +2317,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2295,9 +2329,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2307,9 +2341,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2319,9 +2353,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2331,9 +2365,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2343,9 +2377,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2355,9 +2389,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2367,9 +2401,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2379,9 +2413,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2391,9 +2425,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2403,9 +2437,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2415,9 +2449,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2427,9 +2461,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2439,9 +2473,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2451,9 +2485,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2463,9 +2497,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2475,9 +2509,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2487,9 +2521,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2499,9 +2533,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2511,9 +2545,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2523,9 +2557,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2535,9 +2569,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2547,9 +2581,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2559,9 +2593,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2571,9 +2605,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2583,9 +2617,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2595,9 +2629,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2607,9 +2641,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2619,9 +2653,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2631,9 +2665,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2643,9 +2677,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2655,9 +2689,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2667,9 +2701,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2679,9 +2713,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2691,9 +2725,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2703,9 +2737,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2715,9 +2749,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2727,9 +2761,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2739,9 +2773,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2751,9 +2785,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2763,9 +2797,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2775,9 +2809,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2787,9 +2821,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2799,9 +2833,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2811,9 +2845,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2823,9 +2857,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2835,9 +2869,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2847,9 +2881,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2859,9 +2893,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2871,9 +2905,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2883,9 +2917,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2895,9 +2929,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2907,9 +2941,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2919,9 +2953,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2931,9 +2965,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2943,9 +2977,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2955,9 +2989,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2967,9 +3001,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2979,9 +3013,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2991,9 +3025,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -3003,9 +3037,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -3015,9 +3049,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -3027,9 +3061,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -3039,9 +3073,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -3051,9 +3085,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -3063,9 +3097,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -3075,9 +3109,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -3087,9 +3121,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -3099,9 +3133,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -3111,9 +3145,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -3123,9 +3157,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -3135,9 +3169,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -3147,9 +3181,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -3159,9 +3193,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -3171,9 +3205,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -3183,9 +3217,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -3195,9 +3229,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -3207,9 +3241,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -3219,9 +3253,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "bpn_supply1_h",
-                    "value": "Carga estática de abastecimento",
-                    "english": "Static supply head"
+                    "key": "lpn_main_desc",
+                    "value": "VERSÃO PRELIMINAR — Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa",
+                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }

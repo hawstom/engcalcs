@@ -4,7 +4,7 @@ Validates `js/lpn-solver.js` (ROADMAP Task 146). Run:
 
     node dev/lpn-spike/validate.js
 
-46 checks, no network access, no `node_modules`, exits non-zero on failure.
+48 checks, no network access, no `node_modules`, exits non-zero on failure.
 
 ## Files
 
@@ -44,7 +44,9 @@ the hydraulics, not an `.inp` reader (that is Phase 3).
 2. **Closed form** — a parallel-pipe split derived by hand, an emitter solved by independent
    bisection. This tests that the equations being satisfied are the intended ones.
 3. **EPANET** — topology, pumps, and scale. Reported alongside EPANET's *own* continuity residual so
-   a disagreement can be attributed rather than assumed.
+   a disagreement can be attributed rather than assumed. Since Task 213 this runs on the *shipped*
+   Hazen-Williams constants (they are EPANET's), so it no longer has to isolate constant choice from
+   solver error.
 4. **Suite consistency** — the head-loss kernel against `branched-network.js`, so `lpn_` cannot
    disagree with the calculator next to it in the menu.
 5. **Scale** — 21 nodes (the design target) and 201 nodes (headroom, not a target).

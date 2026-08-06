@@ -8,7 +8,7 @@ echoHeader("EngCalcs", $html_title, "");
 ?>
 <h2><?=$ec_lang['mpf_main_desc']?></h2>
 <p class="collapse show d-print-none" id="relatedCalcs">
-	<?=$ec_lang['ec_related_calcs']?> <a href="Manning-Pipe-Head-Loss.php"><?=$ec_lang['mphl_main_menu']?></a> &middot; <a href="Branched-Network.php"><?=$ec_lang['bpn_main_menu']?></a> &middot; <a href="Irrigation-Pressure.php"><?=$ec_lang['ip_main_menu']?></a> &middot; <a href="Micro-Hydro-Power.php"><?=$ec_lang['mhp_main_menu']?></a> <a data-bs-toggle="collapse" href="#relatedCalcs" aria-expanded="true" aria-controls="relatedCalcs"><?=$ec_lang['view_hide_line']?></a>
+	<?=$ec_lang['ec_related_calcs']?> <a href="Looped-Network.php"><?=$ec_lang['lpn_main_menu']?></a> &middot; <a href="Manning-Trap.php"><?=$ec_lang['mtc_menu']?></a> &middot; <a href="Weir-Flow-Simple.php"><?=$ec_lang['ws_main_menu']?></a> &middot; <a href="Hazen-Williams.php"><?=$ec_lang['hw_main_menu']?></a> <a data-bs-toggle="collapse" href="#relatedCalcs" aria-expanded="true" aria-controls="relatedCalcs"><?=$ec_lang['view_hide_line']?></a>
 </p>
 <?php
 echoCalculatorForm(

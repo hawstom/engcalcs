@@ -327,7 +327,7 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   singular. **`ip_q_ratio` stays as-is — decided, not deferred** (Tom, 2026-08-03): its "our" is the
   *inclusive* first person, "the user and I" working the same calculation together, which is a
   different pronoun from the institutional "we" that "contact me" avoids. Do not "fix" it.
-- 70|146| **Looped pipe network calculator with a map interface — new page `lpn_`. Scoped with Tom
+- 85|146| **Looped pipe network calculator with a map interface — new page `lpn_`. Scoped with Tom
   2026-07-28; was "Looped-network (Hardy Cross) solving", extracted from Task 137 on 2026-07-27.**
   A canvas/map-centric calculator where the interface *is* a drawing surface: elements (Junction,
   Pipe, Reservoir, Pump, Text) added from a toolbar, properties edited in a popup, loops solved to
@@ -827,13 +827,14 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 - 15|146.07| **Open/Closed link property (Task 146 child).** A simple boolean state on a link. Tom,
   2026-07-29: explicitly not a "valve" and not modeled via minor-loss-coefficient (Km) abuse — just
   a plain open/closed state, kept simple.
-- 67|146.06| **Translation sprint for `lpn_` strings (Task 146 child).** Not until later; blocked on
-  the string set settling (146.01/146.02/146.03 above are all still moving it). **Also gated on
-  146.08 (multiple named saved networks) shipping first (Tom, 2026-07-30):** the page stays
-  English-only (`lpn_preview_banner` says so) until real save/retrieve exists — right now the only
-  persistence is one autosaved network in browser localStorage with "no guarantee about preserving
-  data through the preview stage" (`lpn_notes_3_def`), and translating the UI reads as a promise of
-  stability this preview doesn't make yet.
+- 90|146.06| **Translation sprint for `lpn_` strings (Task 146 child).** Not until later; blocked on
+  the string set settling (146.01/146.02/146.03 above are all still moving it). **Gate updated 2026-08-05: 146.08 and 195 both
+  shipped, so the remaining gate is Task 220** — the page stays English-only until browser
+  verification clears the PREVIEW banner, because translating the UI reads as a promise of stability
+  the banner explicitly withholds.
+  - **Re-prioritized 67 → 90 by Task 222's competitive finding.** Being multilingual is no longer a
+    nice-to-have that broadens reach; it is the one differentiator a funded competitor is not
+    contesting. This is now the most valuable single piece of work on the `lpn_` chain.
   - **Gate status, 2026-07-31.** 146.08 (multi-project storage) has shipped, and Task 193 (the
     English tightening pass) is done — so of the named gates only **146.02** is outstanding, plus
     the short re-read it now owes. `lpn_notes_3_def` was rewritten in 193 and no longer says "one
@@ -873,15 +874,45 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   Design narrative archived in `dev/roadmap-closed-archive.md`.
   **Browser verification is NOT part of this task — it is Task 220.**
 
-- 75|220| **Browser-verify `lpn_` project files and locking against the POST-211 UI.**
-  Punch list: `dev/lpn-file-lock-test-punchlist.md`. **29 of 51 checks are still open**, and Tom's
-  completed §1–§6 were run against the pre-211 UI, so they need re-running too — the punch list says
-  so itself: *"§1–§8 ARE SUPERSEDED... must be rewritten against the new UI before the next browser
-  pass."* Never-tested and still valid as written: §7 takeover, §8 save-as-my-own-copy, §9 no server,
-  §10 file goes missing, §11 Firefox/Safari fallback, §12 server side, §13 non-regression.
-  - **First step is rewriting §1–§8 against tabs / File menu / opt-in read-only / no autosave**, not
-    testing. Testing a superseded script is how the last pass produced three defects and a paradigm
-    rebuild instead of a pass/fail.
+- 96|223| **Fix the 14 defects from the 2026-08-05 `lpn_` browser pass.** Triaged list with root
+  causes: `dev/lpn-file-lock-test-punchlist.md` § Findings.
+  - **P0 already fixed, awaiting browser retest:** Save as… would overwrite a file another profile
+    had open. The guard only ran when *your own* tab was read-only and compared against your own
+    previous handle instead of the file chosen in the picker; identity is the `docId` inside the
+    target file, never its name.
+  - **P1 FIXED 2026-08-05, all three, awaiting browser retest.** The intermittent lock was not the
+    TTL sweep: `visibilitychange -> hidden` fires on an ordinary **tab switch**, and released every
+    lock one-way with nothing taking them back — so a colleague who glanced at their email came back
+    holding nothing, silently. Locks are now remembered on `hidden` and re-acquired on `visible`.
+    The needs-reopen banner could never appear because `syncReadOnlyToOpenProject()` ran from
+    `openProject()`/`newProject()` but not from boot — a page load being the only case it exists
+    for. Read-only now allows every edit and enforces itself in exactly two places:
+    `writeOpenProjectToFile()` refuses, and Save is disabled (it does **not** become Save as).
+  - **Also fixed 2026-08-05, reported separately by Tom:** new projects reused a taken number once
+    the first was saved (saving renames a project after its file, and `safeFileName()` collapses the
+    space, so the exact-template scan stopped recognising it); and the dialog claimed
+    `aria-modal="true"` with no backdrop, so tabs and the map stayed clickable underneath a question
+    about the project you could switch away from.
+  - **The lock design was reworked, not patched** (Tom: *"If minimizing loses the lock, then the lock
+    is useless"*). A claim now survives minimise, reload and reboot, and ends only at Close. What
+    makes that safe is a **write-time freshness check** — `writeOpenProjectToFile()` compares the
+    bytes on disk with what it last saw and refuses if they moved — so a stale claim can no longer
+    cause an overwrite, and the file is protected even with the broker down. The lock is a courtesy;
+    the freshness check is the guarantee. "Break their lock" is therefore safe to offer where "Take
+    over" never was.
+  - Sits above 220 because 220 cannot finish until these are fixed and the punch list re-run.
+
+- 95|220| **Browser-verify `lpn_` project files and locking against the POST-211 UI.**
+  Punch list: `dev/lpn-file-lock-test-punchlist.md` — **§0–§8 rewritten 2026-08-05 against tabs, the
+  File menu, no autosave, opt-in read-only, no Delete and no Take over.** 78 checks, all open; the
+  old §1–§6 "done" marks were against controls that no longer exist, so they were reset. Tom's
+  annotations from that pass are preserved in an appendix as the record of why Task 211 happened.
+  - **§11 (Firefox/Safari) is largely coverable from Chrome** on a plain `http://` LAN IP — the
+    fallback is the same `showSaveFilePicker === undefined` branch. What that misses is
+    browser-specific rendering, which is the lower risk. (`http://localhost` will NOT trigger it;
+    localhost is a secure context.)
+  - **§13 still needs the rewrite §0–§8 got** — it names controls that were renamed or removed, which
+    Tom caught in the pass. Do it before asking him to run the list again.
   - Gates dropping the PREVIEW banner, and therefore gates Task 146.06.
 
 - 20|212| **Persisted file handles: `Open Recent`, and answering "is this the same file?" (Task 146
@@ -1030,56 +1061,26 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
      computed geodesically from lat/lng rather than from screen geometry. This is the strongest
      argument for the existing rule that **`len` is stored and overridable, never derived**.
 
-- 99|219| **Add `lpn_` to the Related-calculators line on `hw_`, `bpn_` and `ip_`.**
-  `Branched-Network.php` has no such line at all yet; build one matching `Hazen-Williams.php:10`.
-  - **BLOCKED, do this first: `lpn_main_menu`/`_title`/`_desc` exist in `lang.ec.en.php` only.** A
-    related link renders the target's `*_main_menu`, so the links would show English labels on the
-    es/pt/fr/tr pages. Identity strings are never out of scope (Task 203), so this is a live
-    declaration violation regardless of the links. 3 keys x 26 languages = 78 strings.
-  - Also the live test of Task 144's hypothesis that HW's lost 517 humans/period came for a network.
-    Watch HW conversion and LPN human count together afterwards.
+- 20|221| **Retire the "constants now match EPANET" note (Task 213) — CHECK: 2027-08-01.** Delete
+  `<prefix>_notes_epanet_term`/`_def` from `Hazen-Williams.php`, `Branched-Network.php`,
+  `Looped-Network.php` and all 5 lang files (en, es, pt, fr, tr). A dated "we changed this" note is
+  useful for about a year; after that it is archaeology in a user-facing Notes list.
 
-- 98|213| **Unify Hazen-Williams on EPANET's constants across `hw_`, `bpn_` and `lpn_`.** Raised by
-  Tom, 2026-08-05: *"I understand that something about our Hazen-Williams formula differs slightly
-  from EPANET. I would like to resolve that so that we are identical to EPANET on lpn, hw, and bpn."*
-  Confirmed and measured, and it is small enough to fix outright rather than document forever.
-  - **The two forms.** Ours (`js/hazen-williams.js`, `bpnFriction` in `js/branched-network.js`, and
-    `EngCalcs.lpnConstants.engcalcs`) is `Sf = 7.8828/d^4.8704 · (Q/(0.849 C))^1.852` — SI coefficient
-    **10.674400**, diameter exponent **4.8704**, traceable to the Wikipedia SI restatement. EPANET is
-    `hL = 4.727 L Q^1.852 / (C^1.852 d^4.871)` in US units — SI coefficient **10.666829**, exponent
-    **4.871**.
-  - **The error is diameter-dependent, not a constant offset**, because the exponents differ too. Ours
-    ÷ EPANET, at C = 150: 0.9989 at d = 50 mm, 0.9993 at 100 mm, 0.9997 at 200 mm, **1.0000 at
-    300 mm**, 1.0003 at 500 mm, 1.0007 at 1 m, 1.0011 at 2 m. So **≤ 0.12% across the whole practical
-    range, crossing zero near 300 mm** — far below the uncertainty in the C value itself.
-  - **Go EPANET's way, not ours** (confirmed by Tom, 2026-08-05). Ours traces to a secondary
-    restatement; EPANET's traces to the engine every user will check us against. Task 196 (`.inp`
-    import) would otherwise have to keep the dual constant set alive permanently.
-  - **Work:** adopt `10.666829` / `4.871` as the one suite value, delete the
-    `EngCalcs.lpnConstants` dual-set machinery in `js/lpn-solver.js` (its whole reason for existing
-    goes away), and put the derivation in one shared place rather than three comments. This is a
-    natural first customer for the `js/PipeHydraulics.lib.js` extraction that `lpn-solver.js` already
-    says is deferred until after `lpn_` ships.
-  - **Verify against `epanet-js`**, the real engine, not against published tables — the harness is
-    already named for this purpose in Task 146.
-  - **A user-facing Notes blurb in all three calculators** (Tom's wording, 2026-08-05, lightly
-    edited for Simple English and for the fact that the change is not SI-specific — computation is
-    SI internally and both unit sets shift):
-    `In August 2026 the Hazen-Williams coefficient and exponent were changed to match EPANET. Head loss results differ from earlier versions of this page by up to 0.1 percent, which is far smaller than the uncertainty in the C value itself.`
-    - `hw_` has one `<dl>` blob (`hw_note_1`) and needs a `<dt>`/`<dd>` pair inside it; `bpn_` and
-      `lpn_` use `*_notes_N_term`/`_def` pairs and need a new numbered pair each.
-    - **Translation cost is real but bounded:** `hw_` and `bpn_` are non-core calculators, so under
-      the Task 203 coverage cross the blurb is in scope for **es, pt, fr, tr only** (`lpn_` is
-      English-only). Do not fan this out to 26 languages.
-    - **It should retire.** A dated "we changed this" note is useful for a year or two and then is
-      just archaeology. Say so in the task that adds it, or the suite accumulates a changelog in its
-      user-facing Notes.
-  - **Two findings from the same read, so they are not re-derived:**
-    - **`bpn_`/`lpn_` Darcy-Weisbach ALREADY matches EPANET exactly.** `EngCalcs.lpnDwFriction` (and
-      its twin `bpnDwFriction`) implement EPANET's own Dunlop cubic interpolation across
-      2000 < Re < 4000, not generic Swamee-Jain. No work there.
-    - **The standalone `Darcy-Weisbach.php` was NOT checked** against that 3-regime treatment. One
-      quick comparison; if it diverges it is a separate task, not scope creep into this one.
+- 85|222| **Position `lpn_` against epanet-js — do not lead with "free EPANET in the browser."**
+  Researched 2026-08-05 at Tom's request, before a blog/YouTube push.
+  - **The pitch is taken.** epanetjs.com (Iterating Inc.) launched ~2025-08: full EPANET via WASM,
+    local-first, **free tier with no model-size limits**, satellite basemaps, automated elevations,
+    `.inp` import/export, no account to start, multi-language on all tiers. Pro $950/yr. Trade press
+    ran it as "brings $16,000 software to browsers for free." Also HydroBOA and Qatium.
+  - **Their stated audience is not ours** — "utilities, educators, and engineers with smaller
+    budgets," positioned against commercial vendors. No geographic focus, no mobile, no field use.
+    That is the gap, and it is from their own words, not our guess.
+  - **What survives:** mobile/phone (they market Mac/Linux/Windows only), 26 languages vs. an
+    unstated number, distribution (MPF alone is 2,721 humans/period — they buy every user), and GPL
+    with no tier that can be revoked.
+  - **Unverified, do not claim publicly until checked:** their actual language count. Their help
+    centre is Notion and did not scrape; only Spanish was confirmed.
+  - Consequence: raised 146.06 to 90 and 220 to 95.
 
 - 80|215| **Log the Title/Subtitle milestone — the closest instrument we can build to the mission.**
   Raised by Tom, 2026-08-05: *"How many people are adding Title and Subtitle? This is a major
@@ -1650,6 +1651,39 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|219| **[DONE 2026-08-05] `lpn_` added to the Related-calculators line, and its identity strings
+  translated.** Order set by Tom: HW → lpn, bpn, dw, mphl, mpf; BPN → lpn (the page had no such line
+  at all); IP → bpn, lpn (`mpf` removed as not very related). The blocker is cleared —
+  `lpn_main_menu`/`_title`/`_desc` now exist in all 26 languages, so the links render in the
+  visitor's language.
+  - **Done inline by the orchestrator rather than as a 26-agent sprint** (Tom's call): the delta was
+    ~3.5 strings per language, where a spawn per language is poor value. 91 strings total.
+  - **All 22 non-core languages are now at delta ZERO.** es/pt/fr/tr retain only the `lpn_` body
+    (204 keys), still gated by Task 146.06. Along the way: `mtc_pi_ok_tip`/`mtc_pi_tip` given
+    comma decimals in id, pt, sr; `mtc_blodgett_v_bathurst` translated in de, id, ro; and
+    `mtc_pi_ok_tip` (am/bn/he/hi/my), `install_desktop_heading` (de/id/it) and `ec_name_placeholder`
+    (de) added to `translation_exempt_keys.json` as genuinely-correct cognates.
+  - **Each language's word for "looped" is its own professional term, not a calque** — de
+    *vermascht*, es *mallada*, fr *maillé*, pt *malhada*, it *magliata*, ru *кольцевая*,
+    tr *halkalı*, zh *环状*. Written back to `glossary.json`'s `looped network` entry, which had
+    been seeded empty since 2026-07-23.
+  - Still open: this was Task 144's live test — watch HW conversion and LPN human count together.
+
+- 0|213| **[DONE 2026-08-05] Hazen-Williams unified on EPANET's constants.** New
+  `js/PipeHydraulics.lib.js` owns the one pair — SI coefficient 10.666829 (derived in code from
+  EPANET's US 4.727) and diameter exponent 4.871 — plus `EngCalcs.hwSlope()`. `hazen-williams.js`,
+  `branched-network.js` and `lpn-solver.js` all call it; `lpnConstants`' dual set and the `constants`
+  solve option are gone. `dev/lpn-spike/validate.js` is 48/48: Net1/2/3 now match the real EPANET
+  engine on the **shipped** constants, and two new checks assert the US-unit form and that no
+  calculator has regrown its own copy. Head loss moves ≤0.12%, +0.042% on the HW page's own defaults.
+  User-facing note added as `*_notes_epanet_term`/`_def` (en + es/pt/fr/tr) — **Task 221 retires it.**
+  - **Checked, no work needed: `Darcy-Weisbach.php` already matches** EPANET's 3-regime Dunlop
+    treatment line for line, same as `bpnDwFriction`/`lpnDwFriction`. This closes the open question
+    the task recorded, rather than spawning a separate task.
+  - **Still duplicated on purpose:** the Darcy-Weisbach and Manning kernels remain copied between
+    `branched-network.js` and `lpn-solver.js`. They move into `PipeHydraulics.lib.js` under a
+    behavior-preserving diff, not as part of this.
 
 - 0|174| **[DONE — verified 2026-08-05] Extract `echoUnitsRow()` from `echoCalculatorForm()`.**
   Found already built while reviewing the board: `lib/Calculators.lib.php:153` defines it, and both

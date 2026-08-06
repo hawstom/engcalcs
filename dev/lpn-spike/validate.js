@@ -13,9 +13,10 @@
 //  2. CLOSED FORM -- cases whose answer is derived by hand or by an independent
 //     bisection, never by this solver. This checks that the equations being
 //     satisfied are the intended ones.
-//  3. EPANET -- the real EPANET engine (WASM) run over its own Net1/Net2/Net3, in
-//     'epanet' constants mode so that constant choice is not confounded with
-//     solver error. This checks topology handling, pumps, and scale.
+//  3. EPANET -- the real EPANET engine (WASM) run over its own Net1/Net2/Net3. As
+//     of Task 213 the suite is on EPANET's own Hazen-Williams constants, so this
+//     runs with the shipped constants and no longer has to isolate constant choice
+//     from solver error. This checks topology handling, pumps, and scale.
 //  4. SUITE CONSISTENCY -- the head-loss kernel against this suite's own shipped,
 //     long-trusted hazen-williams.js and branched-network.js. This checks that
 //     lpn_ will not disagree with the calculator sitting next to it in the menu.
@@ -111,8 +112,7 @@ function checkResiduals(model, opts, contTol, enerTol) {
 // ---------------------------------------------------------------------------
 
 function hwResistance(L, d, C) {
-	const c = EngCalcs.lpnConstants.engcalcs;
-	return c.hwCoef * L / (Math.pow(C, 1.852) * Math.pow(d, c.hwDiaExp));
+	return EngCalcs.hwCoef * L / (Math.pow(C, EngCalcs.hwExp) * Math.pow(d, EngCalcs.hwDiaExp));
 }
 
 function checkParallelSplitAnalytic() {
@@ -316,7 +316,7 @@ function checkAgainstEpanet(name) {
 	const inp = fs.readFileSync(inpPath, 'utf8');
 	const model = modelFromReference(ref, inp);
 
-	const result = EngCalcs.lpnSolve(model, { constants: 'epanet', tol: 1e-10, maxIter: 100 });
+	const result = EngCalcs.lpnSolve(model, { tol: 1e-10, maxIter: 100 });
 	if (!result.ok) {
 		report(false, `${name}: solve failed`, JSON.stringify(result.issues));
 		return;
@@ -375,10 +375,8 @@ function checkSuiteConsistency() {
 	if (!(EngCalcs.g > 0)) { throw new Error('bpn constants did not load'); }
 
 	const L = 500, d = 0.25, C = 130, q = 0.04;
-	const consts = EngCalcs.lpnConstants.engcalcs;
 
-	const mine = consts.hwCoef * L / (Math.pow(C, 1.852) * Math.pow(d, consts.hwDiaExp)) *
-		Math.pow(q, 1.852);
+	const mine = hwResistance(L, d, C) * Math.pow(q, EngCalcs.hwExp);
 	const theirs = EngCalcs.bpnFriction(
 		{ diameter: d, length: L, q: q, rough: C, roughSi: 0 }, 'hw', 1.007e-6).hf;
 	report(Math.abs(mine - theirs) < 1e-12, 'Hazen-Williams agrees with branched-network.js',
@@ -386,7 +384,7 @@ function checkSuiteConsistency() {
 
 	const nMan = 0.011;
 	const mineMan = EngCalcs.lpnResistance(
-		{ diameter: d, length: L, roughness: nMan }, 'manning', 1.007e-6, consts);
+		{ diameter: d, length: L, roughness: nMan }, 'manning', 1.007e-6);
 	const mineManH = mineMan.r * q * q;
 	const theirsMan = EngCalcs.bpnFriction(
 		{ diameter: d, length: L, q: q, rough: nMan, roughSi: 0 }, 'manning', 1.007e-6).hf;
@@ -400,21 +398,31 @@ function checkSuiteConsistency() {
 		`${fmt(f, 9)} vs ${fmt(fBpn, 9)}`);
 
 	const mineDw = EngCalcs.lpnResistance(
-		{ diameter: d, length: L, roughness: e, f: f }, 'dw', 1.007e-6, consts);
+		{ diameter: d, length: L, roughness: e, f: f }, 'dw', 1.007e-6);
 	const theirsDw = EngCalcs.bpnFriction(
 		{ diameter: d, length: L, q: q, rough: 0, roughSi: e }, 'dw', 1.007e-6).hf;
 	report(Math.abs(mineDw.r * q * q - theirsDw) < 1e-12,
 		'Darcy-Weisbach head loss agrees with branched-network.js',
 		`${fmt(mineDw.r * q * q, 9)} vs ${fmt(theirsDw, 9)} m`);
 
-	// And state the size of the EngCalcs/EPANET constant difference, since the
-	// solver deliberately carries both.
-	const ep = EngCalcs.lpnConstants.epanet;
-	const hMine = consts.hwCoef * L / (Math.pow(C, 1.852) * Math.pow(d, consts.hwDiaExp)) * Math.pow(q, 1.852);
-	const hEp = ep.hwCoef * L / (Math.pow(C, 1.852) * Math.pow(d, ep.hwDiaExp)) * Math.pow(q, 1.852);
-	console.log(`  note  EngCalcs vs EPANET Hazen-Williams differ by ` +
-		`${fmt(100 * (hMine - hEp) / hEp, 3)}% on this pipe ` +
-		`(${fmt(hMine, 6)} vs ${fmt(hEp, 6)} m)`);
+	// Task 213: the suite's Hazen-Williams IS EPANET's, so assert it against
+	// EPANET's published US-unit form evaluated independently in US units, rather
+	// than reporting a difference. h = 4.727 L Q^1.852 / (C^1.852 d^4.871), ft/cfs.
+	const Lft = L / FT_TO_M, dft = d / FT_TO_M, qcfs = q / Math.pow(FT_TO_M, 3);
+	const hUs = 4.727 * Lft * Math.pow(qcfs, 1.852) /
+		(Math.pow(C, 1.852) * Math.pow(dft, 4.871)) * FT_TO_M;
+	report(Math.abs(mine - hUs) / hUs < 1e-12,
+		'Hazen-Williams matches EPANET\'s US-unit form 4.727 L Q^1.852 / (C^1.852 d^4.871)',
+		`${fmt(mine, 9)} vs ${fmt(hUs, 9)} m`);
+
+	// And that no page has quietly grown its own copy of the constants again --
+	// three duplicated forms is exactly what Task 213 removed.
+	const dupes = ['hazen-williams.js', 'branched-network.js', 'lpn-solver.js'].filter((f) => {
+		const txt = fs.readFileSync(path.join(__dirname, '../../js/', f), 'utf8');
+		return /7\.8828|0\.849|4\.8704|4\.727/.test(txt);
+	});
+	report(dupes.length === 0, 'no calculator carries its own Hazen-Williams constants',
+		dupes.length ? dupes.join(', ') : 'all three use EngCalcs.hwSlope / EngCalcs.hwCoef');
 }
 
 // ---------------------------------------------------------------------------
@@ -433,7 +441,7 @@ checkEmitterAnalytic();
 checkZeroDemand();
 checkDiagnostics();
 
-console.log('\n=== 3. EPANET engine comparison (epanet constants) ===');
+console.log('\n=== 3. EPANET engine comparison (shipped constants) ===');
 checkAgainstEpanet('Net1');
 checkAgainstEpanet('Net2');
 checkAgainstEpanet('Net3');
