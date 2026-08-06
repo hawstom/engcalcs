@@ -915,19 +915,17 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     Tom caught in the pass. Do it before asking him to run the list again.
   - Gates dropping the PREVIEW banner, and therefore gates Task 146.06.
 
-- 20|212| **Persisted file handles: `Open Recent`, and answering "is this the same file?" (Task 146
-  child).** Extracted 2026-08-05 from Task 211's deliberate deferral and Task 208's one live
-  remnant — both want the same capability, and 211 already said to build them together.
-  - **Today a `FileSystemFileHandle` dies with the page**, so File → Open always means navigating the
-    picker again, even for the file open ten minutes ago. Handles persist in IndexedDB and are
-    re-permissioned with one click, which makes **Open Recent** real; the File menu already reserves
-    the row.
-  - **`handle.isSameEntry()`** answers whether two handles point at the same file — the honest,
-    per-browser version of the moved-vs-copied question for a single user (Tom's 7.1, "we can keep a
-    persistent reference in this browser"). It does not solve sharing and is not meant to.
-  - Purely additive: changes nothing about the tab-and-File-menu paradigm, which is why 211 deferred
-    it rather than absorbing it. Worth building once that paradigm has been proven in a browser.
-
+- 0|212| **[DONE 2026-08-05] Persisted file handles — a reload no longer drops the file.**
+  Handles are kept in IndexedDB (structured-cloneable; localStorage cannot hold them). On boot
+  `queryPermission()` decides: **granted** reconnects silently, **prompt** is held pending and the
+  banner becomes a one-click *Reconnect to this file* — no picker, no hunting — and **denied** or a
+  missing API is dropped. A handle whose project has been closed is dropped rather than restored.
+  Verified by `dev/lpn-spike/handle-restore-harness.js` (19 checks, mutation-tested three ways)
+  rather than by adding six boxes to Tom's punch list.
+  - **Promoted from 20 and done out of order** because it was not a nicety: every reload disconnected,
+    so it contaminated every browser pass and produced three separate "reload doesn't work" reports.
+  - Still deferred: `Open Recent`, and answering "is this the same file?" across sessions. Those were
+    the other half of this task and want `isSameEntry()`; extract them if they earn it.
 - 40|209| **A snoozable tip system (Task 146 child, but suite-shaped).** Asked for by Tom,
   2026-08-03, while reviewing Task 195's file-and-lock explanation: the page needs somewhere to put
   "here is what is about to happen" text that a user can dismiss for now and see again later, rather

@@ -2329,7 +2329,72 @@ var EngCalcs = EngCalcs || {};
 	// async/await rather than this file's usual ES5 idiom: every one of these calls is a promise, and
 	// the .then() version of acquire-write-close-recover is markedly harder to read. The syntax costs
 	// nothing here -- it is older than the File System Access API this code path requires.
-	var fileHandles = new Map(); // project id -> FileSystemFileHandle, this session only
+	var fileHandles = new Map(); // project id -> FileSystemFileHandle, live for this page
+
+	// ---- Handles that outlive the page (ROADMAP Task 212) ----
+	//
+	// A FileSystemFileHandle is structured-cloneable, so IndexedDB can keep it across a reload --
+	// localStorage cannot, which is why this needs a second store rather than joining the index.
+	// The PERMISSION does not travel with it: on the way back queryPermission() answers 'granted'
+	// (reconnect silently), 'prompt' (one click, and the click is the user gesture the API demands)
+	// or 'denied'.
+	//
+	// Before this, every reload dropped every connection and the only route back was Save as or
+	// opening the file again -- which Tom hit on every single reload while testing, three times in
+	// one evening. Everything else about a reloaded file project was a workaround for this.
+	var LPN_IDB_NAME = 'engcalcs-lpn';
+	var LPN_IDB_STORE = 'handles';
+	function idbOpen() {
+		return new Promise(function (resolve) {
+			if (!window.indexedDB) { resolve(null); return; }
+			var req;
+			try { req = window.indexedDB.open(LPN_IDB_NAME, 1); }
+			catch (err) { resolve(null); return; }
+			req.onupgradeneeded = function () {
+				var db = req.result;
+				if (!db.objectStoreNames.contains(LPN_IDB_STORE)) { db.createObjectStore(LPN_IDB_STORE); }
+			};
+			req.onsuccess = function () { resolve(req.result); };
+			// Private browsing, a disabled store, a quota refusal: all of them mean "no persistence",
+			// never "no calculator". Every caller treats null as "behave as we did before Task 212".
+			req.onerror = function () { resolve(null); };
+			req.onblocked = function () { resolve(null); };
+		});
+	}
+	function idbRun(mode, fn) {
+		return idbOpen().then(function (db) {
+			if (!db) { return null; }
+			return new Promise(function (resolve) {
+				var tx, store, out = null;
+				try {
+					tx = db.transaction(LPN_IDB_STORE, mode);
+					store = tx.objectStore(LPN_IDB_STORE);
+				} catch (err) { resolve(null); return; }
+				try { out = fn(store); } catch (err) { resolve(null); return; }
+				tx.oncomplete = function () { db.close(); resolve(out && out.result !== undefined ? out.result : out); };
+				tx.onerror = function () { db.close(); resolve(null); };
+				tx.onabort = function () { db.close(); resolve(null); };
+			});
+		});
+	}
+	function rememberHandle(id, handle) { return idbRun('readwrite', function (st) { return st.put(handle, id); }); }
+	function forgetHandle(id) { return idbRun('readwrite', function (st) { return st.delete(id); }); }
+	function recallHandles() { return idbRun('readonly', function (st) { return st.getAll ? st.getAll() : null; }); }
+	function recallHandleKeys() { return idbRun('readonly', function (st) { return st.getAllKeys ? st.getAllKeys() : null; }); }
+
+	// 'granted' | 'prompt' | 'denied' | '' (API missing). Never throws.
+	async function handlePermission(handle, ask) {
+		if (!handle) { return ''; }
+		var opts = { mode: 'readwrite' };
+		try {
+			if (ask) {
+				if (!handle.requestPermission) { return ''; }
+				return await handle.requestPermission(opts);
+			}
+			if (!handle.queryPermission) { return ''; }
+			return await handle.queryPermission(opts);
+		} catch (err) { return ''; }
+	}
 	var fileWriteBusy = false;   // a write is in flight; never start a second one over it
 	var fileError = false;
 	function fileApiAvailable() { return typeof window.showSaveFilePicker === 'function'; }
@@ -2663,6 +2728,7 @@ var EngCalcs = EngCalcs || {};
 			ensureDocId();
 		}
 		fileHandles.set(id, handle);
+		rememberHandle(id, handle); // survives the next reload (Task 212)
 		await stampFile(id, handle); // adopt whatever is there now; the very next write is ours
 		setFileChangedElsewhere(false); // a different file; the old warning does not follow us
 		entry.fileName = handle.name;
@@ -2856,6 +2922,7 @@ var EngCalcs = EngCalcs || {};
 		// A read-only open takes NO lock -- that is what makes it read-only, and taking one would
 		// contend with the person who already has the file.
 		stampFile(id, handle); // just read it, so this IS the file
+		rememberHandle(id, handle); // survives the next reload (Task 212)
 		if (asReadOnly) { roProjects.add(id); } else { acquireLockForOpenProject(); }
 		// Both paths, for the same reason as in saveAs(): this project has just gained (or not gained)
 		// a live handle, and the banner is what says so.
@@ -2872,6 +2939,7 @@ var EngCalcs = EngCalcs || {};
 	async function relinkFile() {
 		if (!library.openId) { return; }
 		fileHandles.delete(library.openId);
+		forgetHandle(library.openId);
 		fileError = false;
 		setFileMissing(false);
 		await saveAs();
@@ -3046,10 +3114,16 @@ var EngCalcs = EngCalcs || {};
 		if (!readOnly && entry && isFileProject(entry) && !isLinked(id)) {
 			bannerWarn = {
 				kind: 'reopen',
-				message: (pc.lpn_file_needs_reopen || 'This project came from {file}, but a browser does not stay connected to a file after the page is reloaded. Use File, Save as, or open the file again, to connect to it.')
-					.replace('{file}', entry.fileName),
-				actionLabel: pc.lpn_file_relink || 'Choose the file again',
-				action: relinkFile,
+				message: (pendingHandles.has(id)
+					? (pc.lpn_file_reconnect_prompt || 'This project came from {file}. Your browser needs your permission again before it can write to it. Reconnect below.')
+					: (pc.lpn_file_needs_reopen || 'This project came from {file}, but a browser does not stay connected to a file after the page is reloaded. Use File, Save as, or open the file again, to connect to it.')
+				).replace('{file}', entry.fileName),
+				// One click when the handle survived the reload and only needs permission (Task 212);
+				// the old find-it-again picker when it did not.
+				actionLabel: pendingHandles.has(id)
+					? (pc.lpn_file_reconnect || 'Reconnect to this file')
+					: (pc.lpn_file_relink || 'Choose the file again'),
+				action: pendingHandles.has(id) ? reconnectPendingFile : relinkFile,
 				dismissable: true
 			};
 		} else {
@@ -3217,6 +3291,49 @@ var EngCalcs = EngCalcs || {};
 	//
 	// Being refused here is a normal outcome, not an error: somebody took the file while we were
 	// gone, so that tab becomes read-only and says whose it is.
+	// Put back the connections that died with the last page. Runs BEFORE the needs-reopen banner is
+	// painted, so a file we can silently reconnect never flashes a warning about itself.
+	//
+	// A handle whose project has since been closed is dropped rather than restored -- otherwise the
+	// store would grow forever, and closing a project would not really let go of its file.
+	async function restoreHandlesOnBoot() {
+		var handles = await recallHandles();
+		var keys = await recallHandleKeys();
+		if (!handles || !keys || handles.length !== keys.length) { return; }
+		for (var i = 0; i < keys.length; i++) {
+			var id = keys[i], handle = handles[i];
+			if (!indexEntry(id)) { forgetHandle(id); continue; }
+			var state = await handlePermission(handle, false);
+			if (state === 'granted') {
+				fileHandles.set(id, handle);
+				await stampFile(id, handle);
+			} else if (state === 'prompt') {
+				// Keep it: the banner's button turns this into one click, which is the user gesture
+				// requestPermission() insists on. Asking here without one would fail and teach the
+				// user nothing -- the same reason writeOpenProjectToFile() does not ask either.
+				pendingHandles.set(id, handle);
+			} else {
+				forgetHandle(id);   // denied, or the API is not here at all
+			}
+		}
+	}
+	// Handles we hold but may not yet write to. One click away from being real.
+	var pendingHandles = new Map();
+	// The banner button for that click. Deliberately NOT a file picker: the user already chose this
+	// file, and making them find it again is the very friction Task 212 exists to remove.
+	async function reconnectPendingFile() {
+		var id = library.openId, handle = pendingHandles.get(id);
+		if (!handle) { await relinkFile(); return; }
+		var state = await handlePermission(handle, true);
+		if (state !== 'granted') { return; }   // declined; the banner stays, nothing is lost
+		pendingHandles.delete(id);
+		fileHandles.set(id, handle);
+		await stampFile(id, handle);
+		clearWarn('reopen');
+		syncReadOnlyToOpenProject();
+		renderTabs();
+		acquireLockForOpenProject();
+	}
 	async function reacquireLocksOnBoot() {
 		if (!loadIdentity()) { return; }   // no identity means no locking at all; the banner says so
 		var list = library.projects.filter(isFileProject);
@@ -3273,6 +3390,7 @@ var EngCalcs = EngCalcs || {};
 		roProjects.delete(id);
 		lockedByName.delete(id);
 		fileHandles.delete(id);
+		forgetHandle(id);
 		try { localStorage.removeItem(projectKey(id)); } catch (err) { /* private mode */ }
 		library.projects = library.projects.filter(function (p) { return p.id !== id; });
 		if (id === library.openId) {
@@ -3954,8 +4072,12 @@ var EngCalcs = EngCalcs || {};
 		// this call, but it is shared by openProject() and newProject() only -- boot never ran it. So
 		// the one situation the needs-reopen banner exists for, a page load that dropped the file
 		// handle, was the one situation in which it could not appear.
-		syncReadOnlyToOpenProject();
-		reacquireLocksOnBoot();
+		// Order matters: reconnect first so the banner is painted against the truth, and take the
+		// locks back last so a file we just reconnected is locked under the handle we actually have.
+		restoreHandlesOnBoot().then(function () {
+			syncReadOnlyToOpenProject();
+			return reacquireLocksOnBoot();
+		});
 		// Rotating a phone changes innerHeight, and with it the cap above -- without this, turning a
 		// portrait phone to landscape leaves a canvas taller than the screen and re-creates exactly
 		// the trap the cap exists to prevent. orientationchange as well as resize: some mobile

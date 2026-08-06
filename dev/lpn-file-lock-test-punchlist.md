@@ -12,9 +12,16 @@
 > why the old §6 saw no lock contention at all — Clear/Wipe did not forget the initials, and Take
 > over wrote a stale copy over a colleague's newer file and **has been withdrawn entirely**.
 
-Everything in Task 195 was verified only by harnesses against sliced-out logic (177 checks, five
-harnesses); **no part of the UI has ever been seen rendered.** This list exists because that is the
-whole risk.
+Everything in Task 195 was verified only by harnesses against sliced-out logic; **no part of the UI
+has ever been seen rendered.** This list exists because that is the whole risk.
+
+**Tom's time is the scarce thing here, not CC's** (2026-08-05: *"The full passes are slow and
+fatiguing, and I ask you not to ask them of me any more than necessary"*). So the rule for adding to
+this list: **if a harness can answer it, a harness must**, and only what genuinely needs a rendered
+page — or two browser profiles — is allowed to appear below. Task 212's decision table went to
+`dev/lpn-spike/handle-restore-harness.js` (19 checks, mutation-tested) instead of becoming six more
+boxes here. When a check here fails, ask whether the retest belongs in a harness before writing it
+back into this file.
 
 Scope: what is **on production now** — the server-broker version.
 
@@ -154,9 +161,15 @@ single guess in the build.
 - [ ] **RETEST (b) — reload.** In A, reload the page. **A still holds the lock** — B opening the file
       still gets the dialog naming A. *(New: locks are re-acquired on boot from the docId in
       localStorage. Nothing did this before, so a reload silently un-held every file.)*
-- [ ] **(b) continued, and expected to be imperfect:** after that reload A is **not connected to the
-      file** and says so, and Save behaves as Save as. That is known and is Task 212's subject, not a
-      failure of this check. What matters here is only that the **lock** survived.
+- [ ] **(b) continued — the connection should now come back too (Task 212, built 2026-08-05).**
+      After the reload, one of two things, and both are a pass:
+      **either** the file is simply connected again with no banner at all (your browser kept the
+      permission), **or** the banner says *"Your browser needs your permission again"* and offers
+      **Reconnect to this file** — one click, no file picker, no hunting for the file.
+      The old *"use File, Save as, or open the file again"* wording is a FAIL: it means the handle
+      was not persisted.
+- [ ] After reconnecting, **Save** writes to the original file — not a copy, and no `(copy)` in any
+      suggested name.
 - [ ] **RETEST (c) — somebody took it while you were reloading.** Have B open and hold the file, then
       reload A. A must come back **read-only, naming B** — not silently editable, and not silently
       holding a lock it no longer has.

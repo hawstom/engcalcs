@@ -1365,6 +1365,8 @@ $ec_lang['lpn_file_training_continue']='Continue';
 // Recovery when the linked file has moved, been renamed, or been deleted. The button does the
 // finding; the message never tells someone to go hunting through a menu.
 $ec_lang['lpn_file_relink']='Choose the file again';
+$ec_lang['lpn_file_reconnect']='Reconnect to this file';
+$ec_lang['lpn_file_reconnect_prompt']='This project came from {file}. Your browser needs your permission again before it can write to it. Reconnect below.';
 // Read-only means read-only, so Save as from a read-only project refuses the file it came from --
 // the one file it must never write. handle.isSameEntry() is what makes this checkable at all.
 $ec_lang['lpn_saveas_same_file']='That is the same file somebody else has open, so it cannot be saved over. Choose a different file or a different name.';
