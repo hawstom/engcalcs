@@ -2433,11 +2433,33 @@ var EngCalcs = EngCalcs || {};
 	// What the file looked like the last time we read or wrote it, per project id. This is the whole
 	// basis of the freshness check below: not a lock, not a name, but "is the file still the one I
 	// last saw?". A number we own, so a broker outage cannot weaken it.
+	//
+	// **It outlives the page, in the index beside `fileName`** (fixed 2026-08-05, found by Tom:
+	// "Still doesn't work with broker blocked. Save is apparently allowed as normal."). Held only in
+	// this Map, the stamp died on every reload, and Task 212 then re-stamped the file on the way back
+	// in -- so a reload silently ADOPTED whatever a colleague had written since as our own baseline,
+	// and the next Save wrote our older copy straight over their work with nothing said. A reload is
+	// the one moment this check most needs to survive, because it is the moment the page has been
+	// away and the file has had time to change.
 	var fileStamps = new Map();
+	function knownStamp(id) {
+		if (fileStamps.has(id)) { return fileStamps.get(id); }
+		var e = indexEntry(id);
+		return (e && e.fileStamp) || '';
+	}
 	async function stampFile(id, handle) {
 		if (!handle || !handle.getFile) { return; }
-		try { var f = await handle.getFile(); fileStamps.set(id, f.lastModified + ':' + f.size); }
-		catch (err) { fileStamps.delete(id); }
+		var entry = indexEntry(id), stamp = '';
+		try { var f = await handle.getFile(); stamp = f.lastModified + ':' + f.size; }
+		catch (err) { stamp = ''; }
+		if (stamp) { fileStamps.set(id, stamp); } else { fileStamps.delete(id); }
+		// Written through to the index, which is where it has to be to survive a page load. A file we
+		// could not read leaves NO stamp rather than a stale one: an unanswerable question fails open
+		// below, and a wrong answer here would fail closed on an innocent Save.
+		if (entry && entry.fileStamp !== stamp) {
+			if (stamp) { entry.fileStamp = stamp; } else { delete entry.fileStamp; }
+			saveIndex();
+		}
 	}
 	// Has somebody else written to this file since we last saw it?
 	//
@@ -2445,7 +2467,7 @@ var EngCalcs = EngCalcs || {};
 	// fails OPEN deliberately: this check exists to catch a KNOWN divergence, and must never become a
 	// reason an ordinary Save stops working.
 	async function fileChangedUnderneath(id, handle) {
-		var known = fileStamps.get(id);
+		var known = knownStamp(id);
 		if (!known || !handle || !handle.getFile) { return false; }
 		try { var f = await handle.getFile(); return (f.lastModified + ':' + f.size) !== known; }
 		catch (err) { return false; }
@@ -2839,6 +2861,18 @@ var EngCalcs = EngCalcs || {};
 		// sprang read-only on the user afterwards; Tom's AutoCAD instinct -- and Word's, and Excel's --
 		// is that this is a QUESTION asked at the moment of opening, with both real answers on it.
 		var docId = (saved.project && saved.project.docId) || null;
+		// **The same file must not become two tabs** (Tom, 2026-08-05: "It does open two live tabs
+		// both claiming the same file"). Two tabs over one file is a merge conflict with yourself:
+		// both wear the file's name, both think they own it, and whichever you Save last silently
+		// wins. Every other document program answers this the same way -- opening what is already
+		// open just brings it forward -- so this does too.
+		//
+		// Identity is the `docId` INSIDE the file, never the name: the same reason Save as reads the
+		// file it is about to clobber. A copy saved under a new name is a different document and
+		// legitimately opens as its own tab, which is exactly what the docId says and the name does
+		// not.
+		var already = docId ? projectWithDocId(docId) : null;
+		if (already) { adoptAlreadyOpen(already, handle); return; }
 		var r = docId ? await postLock('check', docId) : null;
 		if (r && r.ok && r.locked && !r.mine) {
 			presentOpenChoice(saved, handle, lockHolderName(r), r);
@@ -2901,6 +2935,47 @@ var EngCalcs = EngCalcs || {};
 				}
 			}
 		]);
+	}
+	// Which open project, if any, IS this document? Reads the docId out of each stored project rather
+	// than trusting the index, for the same reason reacquireLocksOnBoot() does: the docId lives in the
+	// document, which is the thing that gets saved to and opened from a file.
+	function projectWithDocId(docId) {
+		if (!docId) { return null; }
+		for (var i = 0; i < library.projects.length; i++) {
+			var id = library.projects[i].id, d = readJSON(projectKey(id));
+			if (d && d.project && d.project.docId === docId) { return id; }
+		}
+		return null;
+	}
+	// Opening a file this browser already has open: come forward, and take the connection with you.
+	//
+	// **Re-opening the file is a legitimate way to reconnect** -- it is the fallback the needs-reopen
+	// banner names -- so the fresh handle is adopted even though the tab already existed. That is what
+	// keeps this from being merely a refusal.
+	//
+	// The unsaved-changes case gets its own sentence because the two are genuinely different
+	// situations: somebody who re-opens a file expecting the version on disk needs to be told they are
+	// looking at their own newer edits instead, and pointed at Revert. Neither case throws anything
+	// away -- this function does not touch the document at all.
+	function adoptAlreadyOpen(id, handle) {
+		var pc = EngCalcs.pageConfig || {}, entry = indexEntry(id);
+		if (handle) {
+			fileHandles.set(id, handle);
+			rememberHandle(id, handle);
+			if (entry) { entry.fileName = handle.name; }
+			saveIndex();
+			stampFile(id, handle); // just read it, so this IS the file
+		}
+		openProject(id);
+		setNotice(((entry && entry.dirty)
+			? (pc.lpn_status_already_open_dirty || 'That file is already open here as {name}, with changes you have not saved to it. This switched to it rather than opening a second copy. Use File, Revert if you want the version on disk instead.')
+			: (pc.lpn_status_already_open || 'That file is already open here as {name}, so this switched to it rather than opening a second copy.')
+		).replace('{name}', projectDisplayName(entry || project)));
+		syncReadOnlyToOpenProject();
+		renderTabs();
+		// A tab opened read-only STAYS read-only (Tom, 2026-08-04) -- re-opening its file is not the
+		// deliberate request that would change that, so it must not quietly go and take the lock.
+		if (!roProjects.has(id)) { acquireLockForOpenProject(); }
 	}
 	function landOpenedFile(saved, handle, asReadOnly) {
 		var pc = EngCalcs.pageConfig || {};
@@ -3308,7 +3383,11 @@ var EngCalcs = EngCalcs || {};
 			var state = await handlePermission(handle, false);
 			if (state === 'granted') {
 				fileHandles.set(id, handle);
-				await stampFile(id, handle);
+				// **Only where we have no baseline at all.** Re-stamping here is what made a reload
+				// forgive a colleague's newer file: it recorded THEIR version as the one we last saw,
+				// and the freshness check then had nothing to object to. The stamp we wrote before the
+				// page went away is the truthful one, so it wins.
+				if (!knownStamp(id)) { await stampFile(id, handle); }
 			} else if (state === 'prompt') {
 				// Keep it: the banner's button turns this into one click, which is the user gesture
 				// requestPermission() insists on. Asking here without one would fail and teach the
@@ -3693,10 +3772,13 @@ var EngCalcs = EngCalcs || {};
 				tip: api ? pc.lpn_file_saveas_tip : pc.lpn_file_saveas_tip_download,
 				fn: saveAs
 			},
-			// Only shown when it beats Save -- more than one file with unsaved changes. On a page
-			// where most people will only ever have one, a permanent row would be clutter that never
-			// once did anything.
-			{ label: pc.lpn_file_saveall || 'Save all', fn: saveAllFiles, hidden: dirtyFileCount() < 2 },
+			// **Present always, disabled when it would do nothing** (fixed 2026-08-05, Tom: "Save all
+			// is not present"). It used to be HIDDEN below two dirty file projects, which is how a
+			// command that exists became a command nobody can find: a row that appears and disappears
+			// teaches no one it is there, and its absence reads as a missing feature rather than as a
+			// state. Every sibling here -- Save, Revert -- greys out instead, and consistency inside
+			// one short menu is worth more than the one row of clutter this costs.
+			{ label: pc.lpn_file_saveall || 'Save all', fn: saveAllFiles, disabled: dirtyFileCount() < 2 },
 			// Only offered when there is something to revert TO and something to revert FROM.
 			// Reachable in READ-ONLY on purpose (Tom, 2026-08-05: "Revert is not an option"). Revert
 			// re-reads the file and throws your edits away -- which is exactly what somebody locked

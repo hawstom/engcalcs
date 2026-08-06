@@ -1280,6 +1280,8 @@ $ec_lang['lpn_file_saveas_tip_download']='Saves using your browser\'s Download s
 $ec_lang['lpn_status_uploaded']='Project file uploaded. No connection to it can be maintained, so the only way to save back to it is by using File, Save as.';
 $ec_lang['lpn_status_downloaded']='Downloaded {file}. This browser cannot connect to a file, so this project stays marked as not saved to a file.';
 $ec_lang['lpn_status_file_opened']='Opened {file}.';
+$ec_lang['lpn_status_already_open']='That file is already open here as {name}, so this switched to it rather than opening a second copy.';
+$ec_lang['lpn_status_already_open_dirty']='That file is already open here as {name}, with changes you have not saved to it. This switched to it rather than opening a second copy. Use File, Revert if you want the version on disk instead.';
 $ec_lang['lpn_status_saved']='Saved {file}.';
 $ec_lang['lpn_status_reverted']='Loaded {file} again from the disk.';
 // Nothing is written to a file except when the user asks (Task 211). Autosave to the file is gone on

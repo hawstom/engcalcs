@@ -900,6 +900,20 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     cause an overwrite, and the file is protected even with the broker down. The lock is a courtesy;
     the freshness check is the guarantee. "Break their lock" is therefore safe to offer where "Take
     over" never was.
+  - **P2/P3 fixed 2026-08-05 from Tom's second pass (he stopped at punch-list line 193):** the same
+    file opening as two live tabs (identity is the `docId`, so re-opening now switches to the tab
+    that has it and adopts the fresh handle — a second route back from a lost connection); and
+    `Save all`, which was not missing but *hidden* below two dirty file projects, so a command that
+    existed was one nobody could find. It greys out now, like Save and Revert.
+  - **The freshness check had a hole exactly where it was most needed, and it was ours.** Tom:
+    *"Still doesn't work with broker blocked. Save is apparently allowed as normal."* The stamp lived
+    only in memory, so a reload dropped it — and Task 212 then re-read the file on the way back in,
+    **adopting a colleague's newer version as our own baseline**. A reloaded A would have written
+    over B's saved work with nothing said, on the one path that is supposed to hold when the broker
+    is down. The stamp now lives in the project index and boot keeps the old one rather than taking
+    a new one. **Lesson worth more than the fix: restoring a connection is not the same as restoring
+    what that connection KNEW** — Task 212 brought back the handle and silently reset the guarantee
+    built on top of it.
   - Sits above 220 because 220 cannot finish until these are fixed and the punch list re-run.
 
 - 95|220| **Browser-verify `lpn_` project files and locking against the POST-211 UI.**

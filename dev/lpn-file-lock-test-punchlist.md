@@ -5,6 +5,9 @@
 > sections described controls that no longer exist; Tom's annotations on them are the record of
 > *why* Task 211 happened and are preserved verbatim in the appendix at the bottom.
 >
+> **§8 REWRITTEN AGAIN 2026-08-05** once Task 212 landed: a reload no longer disconnects, so the
+> section that told you to expect a disconnection banner was testing the wrong behaviour.
+>
 > **§9–§13 are unchanged** and were already right.
 >
 > Three defects from the 2026-08-04 pass were fixed on production ahead of the rebuild (commit
@@ -19,7 +22,7 @@ has ever been seen rendered.** This list exists because that is the whole risk.
 fatiguing, and I ask you not to ask them of me any more than necessary"*). So the rule for adding to
 this list: **if a harness can answer it, a harness must**, and only what genuinely needs a rendered
 page — or two browser profiles — is allowed to appear below. Task 212's decision table went to
-`dev/lpn-spike/handle-restore-harness.js` (19 checks, mutation-tested) instead of becoming six more
+`dev/lpn-spike/handle-restore-harness.js` (43 checks, mutation-tested) instead of becoming six more
 boxes here. When a check here fails, ask whether the retest belongs in a harness before writing it
 back into this file.
 
@@ -97,8 +100,12 @@ single guess in the build.
 
 ## 3. The File menu, and the absence of autosave
 
-- [ ] Menu reads: **New, Open…, Save, Save as…, Revert, Close, Save all**.
+- [ ] **RETEST — fixed 2026-08-05.** Menu reads: **New, Open…, Save, Save as…, Save all, Revert,
+      Close** — *every row present every time*. **Save all** is greyed out below two file projects
+      with unsaved changes, in the way Save and Revert already grey out.
       [TGH: Save all is not present]
+      [CC 2026-08-05: It was there and hidden below that threshold, which is how a command that
+      exists became one nobody can find. It greys out now instead, like its siblings.]
 - [x] With a file connected, draw a node and **wait two minutes touching nothing**. The file's
       modified time on disk **does not change**. Nothing is written behind your back.
 - [x] **Save** → the file's modified time advances now, and the status line names the file.
@@ -106,8 +113,8 @@ single guess in the build.
 - [x] The original file still holds the pre-Save-as contents.
 - [x] **Revert** → confirmation naming the file → the on-disk version reloads and your unsaved edits
       are gone.
-- [ ] **Save all** with two file-connected projects open and both edited → both files advance.
-      *(Reset: it cannot have passed — the box above records Save all as absent from the menu.)*
+- [ ] **Save all** with two file-connected projects open and both edited → the row is now enabled,
+      and both files advance. With only one edited, the row is greyed.
 - [x] Hover **Save** and **Save as…** → tips distinguish "saves to the connected file" from
       "choose a file to save to".
 
@@ -134,16 +141,21 @@ single guess in the build.
 - [x] **File → Open…** → pick a saved file → the network appears and the status line names it.
 - [x] It arrives as a **new tab**, not over the top of the current project.
 - [x] Its tab is **not** marked "Not saved to a file".
-- [-] Open the *same* file twice in one browser → it does not silently produce two live tabs both
-      claiming the same file. *(Undefined today — record what actually happens.)*
+- [ ] **RETEST — fixed 2026-08-05.** Open the *same* file twice in one browser → **no second tab**.
+      It switches to the tab that already has it and says so. If that tab has unsaved changes, the
+      message says so too and points at Revert.
       [TGH: It does open two live tabs both claiming the same file.]
+      [CC 2026-08-05: Two tabs over one file is a merge conflict with yourself. Identity is the
+      `docId` inside the file, so a copy saved under a new name still opens as its own tab.]
+- [ ] **The same route is now how you reconnect.** Take a project whose banner says the connection
+      was lost, and **File → Open…** its file → it reconnects *that* tab rather than adding one.
 
 ---
 
 ## 6. Locking — somebody else has it *(two profiles)*
 
 - [x] Profile **A**: open the file. Editable, no banner.
-- [-] **RETEST — the lock now survives looking away.** In A, open the file, then switch tabs,
+- [x] **RETEST — the lock now survives looking away.** In A, open the file, then switch tabs,
       minimise, and reload the page. **A still holds it** every time, and B still gets the dialog.
       *(The release on `visibilitychange → hidden` is gone; that event fires on an ordinary tab
       switch, which is what made the lock evaporate.)*
@@ -156,32 +168,36 @@ single guess in the build.
       now is; the CONNECTION needs Task 212 (handles persisted in IndexedDB, re-permissioned with one
       click), which also removes (2), Save behaving like Save as.]
 
-- [ ] **RETEST (a) — looking away.** In A, open the file, switch to another tab, minimise, come back.
+- [x] **RETEST (a) — looking away.** In A, open the file, switch to another tab, minimise, come back.
       **A still holds the lock** and B still gets the dialog. No reload in this one.
-- [ ] **RETEST (b) — reload.** In A, reload the page. **A still holds the lock** — B opening the file
+- [x] **RETEST (b) — reload.** In A, reload the page. **A still holds the lock** — B opening the file
       still gets the dialog naming A. *(New: locks are re-acquired on boot from the docId in
       localStorage. Nothing did this before, so a reload silently un-held every file.)*
-- [ ] **(b) continued — the connection should now come back too (Task 212, built 2026-08-05).**
+- [x] **(b) continued — the connection should now come back too (Task 212, built 2026-08-05).**
       After the reload, one of two things, and both are a pass:
       **either** the file is simply connected again with no banner at all (your browser kept the
       permission), **or** the banner says *"Your browser needs your permission again"* and offers
       **Reconnect to this file** — one click, no file picker, no hunting for the file.
       The old *"use File, Save as, or open the file again"* wording is a FAIL: it means the handle
       was not persisted.
-- [ ] After reconnecting, **Save** writes to the original file — not a copy, and no `(copy)` in any
+- [x] After reconnecting, **Save** writes to the original file — not a copy, and no `(copy)` in any
       suggested name.
-- [ ] **RETEST (c) — somebody took it while you were reloading.** Have B open and hold the file, then
+- [x] **RETEST (c) — somebody took it while you were reloading.** Have B open and hold the file, then
       reload A. A must come back **read-only, naming B** — not silently editable, and not silently
       holding a lock it no longer has.
 - [x] **The freshness check — this is now the actual guarantee.** Have B take the file (by whatever
-      route) and save a change to it. Then in A press **Save** → **refused**, with a banner saying
+      route) and save a change to it. Then in A press **Save** → **disabled**, with a banner saying
       somebody else saved to this file and pointing at Save as / Revert. A's work is untouched.
-      [TGH: (1) Do we want to add "AAA has this file open. They last edited X ago, Y after their last save"? (2) Revert is not an option. It says "Read-only: TGH has this file open. You can change anything you like here, but you cannot save. Use File, Save as to save to a different file.Save as…"]
-- [ ] **RETEST — fixed 2026-08-05.** From that state, **Revert** → A gets B's version and the banner
-      clears. *(Revert was disabled in read-only, leaving "fork it into a new file" as the only exit
-      from a situation whose obvious resolution is "fine, theirs wins". Revert writes nothing, so it
-      is safe in every state.)*
-      [TGH: Didn't test due to failure above.]
+      [TGH: (1) Do we want to add "AAA has this file open. They last edited X ago, Y after their last save"? (2) Revert is not an option. It says "Read-only: TGH has this file open. You can change anything you like here, but you cannot save. Use File, Save as to save to a different file.Save as…". I think it may be good as is.]
+- [ ] **REWRITTEN 2026-08-05 — these are two different states, which is what did not make sense.**
+      - **Read-only** (B holds the *lock*): the banner names B and offers **Save as** only. There is
+        nothing to revert *to* — the file has not moved — so no Revert is offered and that is right.
+        *(Tom: "I think it may be good as is.")*
+      - **Changed underneath** (B *saved* to the file): the banner says somebody saved to this file
+        and names **both** exits, because both are real — **Save as** keeps your work in a file of
+        your own, **Revert** throws yours away and loads theirs. Check **File → Revert** is enabled
+        here, and that using it clears the banner.
+      [TGH: Please rewrite this, as it doesn't make sense now. No revert, only Save as.]
 - [x] From that state, **Save as…** to a new name → succeeds, banner clears, A keeps their work.
 - [-] The same refusal happens **with the lock broker blocked** (see §9). The freshness check must
       not depend on the server at all.
@@ -190,6 +206,13 @@ single guess in the build.
       "I cannot write the lock directory" was being flattened into the same silence as a dead network,
       so the page could only ever say "could not reach the server". The 4xx/5xx body is now read and a
       setup fault says so in its own words.]
+      [TGH: Still doesn't work with broker blocked. Save is apparently allowed as normal.]
+      [CC 2026-08-05: Found, and it was not the broker at all — **the freshness stamp died on every
+      reload.** It lived only in memory, and Task 212 then re-read the file on the way back in, so a
+      reload ADOPTED whatever B had written since as A's own baseline and there was nothing left to
+      object to. The stamp is now stored in the project index beside the file name, and boot keeps
+      the old one rather than taking a new one. Harness: `dev/lpn-spike/handle-restore-harness.js`
+      §9. **When you retest, reload A between B's save and A's Save — that is the case that broke.**]
 - [ ] **RETEST — a broken server and an absent one now read differently.** Make `lpn-locks/`
       unwritable again and open a project → the banner names it as a **setup fault on the server**.
       Then block the request entirely (recipe above) → the original "could not reach" wording.
@@ -249,23 +272,33 @@ This is the paradigm Tom asked for: you may do anything you like, you just canno
 
 ---
 
-## 8. Reload disconnects from the file *(known, and Task 212's subject)*
+## 8. Reload — the connection should come back *(REWRITTEN 2026-08-05, Task 212 landed)*
+
+> This section used to be titled "Reload disconnects from the file" and told you to expect a banner
+> saying so. That is no longer the design: a reload should cost you **nothing**. Everything below is
+> reset — the old boxes were passes and fails against the opposite behaviour.
 
 - [x] With a file-connected project, **reload the page**. The project is still there.
-- [ ] **RETEST — fixed 2026-08-05.** A banner appears **immediately on load**, naming the file,
-      saying a browser does not stay connected across a page load, with a **Choose the file again**
-      button. *(It could never appear before: the boot path was the only one that did not repaint
-      the banner, and a page load is the only situation it exists for.)*
-- [ ] Press **Choose the file again** → picker → reconnected, banner clears, Save works.
-- [x] **Save** in that state does not silently write somewhere unexpected.
-      [TGH: It acts as those it's saving a copy. There are no explanatory messages about "You got disconnected. Select the file again to connect again." And its suggested file name is ...(copy)... .]
-- [-] Open the file again → connected, Save works, and you do **not** end up with a duplicate tab.
-      [TGH: See line 116.]
-- [ ] Confirm the lock was released or is re-acquired sanely across the reload — a reload must not
-      leave the file locked by a session that no longer exists.
-      [TGH: Unsure, but no obvious problems. (1) Is there a way on reload to alert that connectable file projects have been disconnected and can be connected again using Save to the same file? (2) Is there a way to put up the "Leave site?" message when there is a connected file?]
-      
-      
+- [ ] **The reload is silent.** No banner, no dialog, no click: the file is simply still connected.
+      *(The browser's grant goes dormant rather than away, and the first click or keypress anywhere
+      on the page revives it without showing anything.)*
+- [ ] **Save** immediately after a reload writes to **the original file** — not a copy, and no
+      `(copy)` in any suggested name.
+      [TGH (against the old behaviour): It acts as those it's saving a copy... And its suggested file
+      name is ...(copy)... .]
+- [ ] Where the browser really has forgotten the grant, the banner says the connection to that file
+      was **lost** and offers **Choose the file again** → picker → reconnected, banner clears.
+      *(The old wording, "a browser does not stay connected to a file after the page is reloaded", is
+      now itself a FAIL: it is no longer true.)*
+- [ ] **File → Open…** on that same file also reconnects the tab, and does **not** add a second one.
+- [x] The lock survives the reload rather than being left held by a session that no longer exists
+      (§6 (b) covers this properly).
+      [TGH: (1) Is there a way on reload to alert that connectable file projects have been
+      disconnected and can be connected again using Save to the same file? (2) Is there a way to put
+      up the "Leave site?" message when there is a connected file?]
+      [CC: (1) is answered by the banner above, and by the reload no longer disconnecting in the
+      first place. (2) is a real ask and is carried in the findings list, not here.]
+
 ## 9. No server *(the honest-degradation case)*
 
 - [x] With a file linked, block the broker: DevTools → Network → Offline, or block
@@ -352,12 +385,22 @@ Triaged by what a user loses. Roadmap Task 223 points here.
 **P2 — the file connection lies about itself**
 5. **§8 No "disconnected by reload" message anywhere.** `lpn_file_needs_reopen` exists and is never
    shown. Save then behaves as a copy, suggesting `…(copy)…`, with nothing explaining why.
+   **FIXED 2026-08-05, then made moot** — the banner was repainted on the boot path, and then Task
+   212 removed the disconnection itself. Its wording no longer claims a browser cannot stay
+   connected, because it can.
+   - **A second defect fell out of it, and it was the worse one:** the freshness stamp lived only in
+     memory, so a reload dropped it and re-read the file as its own new baseline — which is why §6's
+     broker-blocked refusal never fired. A reloaded A would have written straight over B's saved
+     work. The stamp is now stored in the index and survives the page.
 6. **§5 The same file opens twice as two live tabs**, both claiming it. Confirmed.
+   **FIXED 2026-08-05** — opening a file this browser already has open switches to that tab and
+   adopts the fresh handle, which doubles as a second way to reconnect a tab that lost its file.
 7. **§10 A moved or renamed file is not noticed.** No banner, no *Choose the file again*; Save is
    silent and recreates the original name.
 
 **P3 — smaller, all confirmed**
 8. §3 **Save all is missing from the File menu** (the string exists and is passed to the page).
+   **FIXED 2026-08-05** — it was hidden below two dirty file projects; it greys out now instead.
 9. §4 Closing activates the **last-created** project rather than the next tab rightward.
 10. §4 Status messages overwrite each other — "nodes have no path to a reservoir" ate the close
     message. They should queue or stack.
