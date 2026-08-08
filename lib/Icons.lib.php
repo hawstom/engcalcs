@@ -45,14 +45,21 @@ $ec_icons = array(
 	'file'       => '<path d="M3 19V5h6l2 2h10v12z"/>',
 	'edit'       => '<path d="M4 20h4L20 8l-4-4L4 16z"/><path d="M14 6l4 4"/>',
 	'insert'     => '<path d="M12 5v14M5 12h14"/>',
+	// Stays an eye. Tom weighed a camera and two other paradigms against it and then withdrew the
+	// question — "I forgot that I love what you already have now" (2026-08-08). Recorded so the
+	// camera is not re-proposed: it was drawn, compared, and declined on the merits.
 	'view'       => '<path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="2.5"/>',
 	// Tom, 2026-08-08: "It looks a little too much like a light/sun instead of a gear. Gear teeth
 	// are short, not long like rays of light." The first version was a small hub with eight long
 	// strokes starting well outside it, and the GAP was the whole problem — a mark that floats away
 	// from its centre is a ray, and eight rays around a disc is a sun whatever you meant by it.
-	// Teeth now start ON the gear body and protrude about a fifth of its radius, which is roughly
+	// Teeth now start ON the gear body and protrude about an eighth of its radius, which is roughly
 	// what real gear teeth do. The bore in the middle is what a sun can never have.
-	'settings'   => '<circle cx="12" cy="12" r="6.5"/><circle cx="12" cy="12" r="2.4"/><path d="M18.5 12h1.3M16.6 7.4l.9-.9M12 5.5V4.2M7.4 7.4l-.9-.9M5.5 12H4.2M7.4 16.6l-.9.9M12 18.5v1.3M16.6 16.6l.9.9"/>',
+	// Then: "maybe a few more teeth so it doesn't look like a ship's wheel." Eight of anything
+	// radial is a wheel — that is the spoke count wheels actually have. Ten, shorter, reads as
+	// machined rather than turned. Ten is also the ceiling here: at twelve the gaps close to under
+	// a pixel at the 15px this renders at, and the rim greys into a solid ring.
+	'settings'   => '<circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.6"/><path d="M19 12h0.9M17.66 7.89l0.73-0.53M14.16 5.34l0.28-0.86M9.84 5.34l-0.28-0.86M6.34 7.89l-0.73-0.53M5 12h-0.9M6.34 16.11l-0.73 0.53M9.84 18.66l-0.28 0.86M14.16 18.66l0.28 0.86M17.66 16.11l0.73 0.53"/>',
 
 	// ---- File ----
 	'new'        => '<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/>',
@@ -99,7 +106,12 @@ $ec_icons = array(
 	// fills a square, so this one was drawn to fill a square too — and a pump that fills a square
 	// is mostly casing, which makes it a circle with a nub. Letting it run WIDE is what separates
 	// it at a glance from every round icon in the set. The proportion is the identity.
-	'pump'       => '<circle cx="6.5" cy="12.5" r="5"/><path d="M6.5 7.5H22"/>',
+	// Tail shortened 40% on the fifth pass — Tom asked for "25% or so... I hesitate to say 50%,
+	// though I am leaning that way", so this splits his stated range toward the lean. The casing
+	// moved right at the same time to keep the whole mark centred in the box, which shortening
+	// alone would have broken. Still 1.4:1 wide, so it keeps the squat proportion that is its
+	// identity; the number is a one-line change if he wants the other 10%.
+	'pump'       => '<circle cx="9.8" cy="12.5" r="5"/><path d="M9.8 7.5H19.1"/>',
 	// Solid, because a junction is a node and the canvas draws it solid.
 	'junction'   => '<circle cx="12" cy="12" r="4.5" fill="currentColor" stroke="none"/>',
 	// A run between two nodes — the thing you are actually about to place.
