@@ -910,6 +910,25 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     surface as Task 195's Import/Export actions, so building it alongside whichever of that task's
     phases is in flight avoids building the menu twice — but nothing here blocks on that timing.
 - 5|146.09| **Map insets for congested areas of a drawing (Task 146 child).** Very low priority.
+- 45|146.10| **Draw real element symbols on the map, from the Task 231 icon set (Task 146 child).**
+  Scoped with Tom, 2026-08-08, after the icon set landed. **What the canvas draws today:** a
+  reservoir is a `<circle>` r 2.2 filled `#26a`; a junction is a `<circle>` r 1.6 filled `#2a6`;
+  a pipe is a line `#557`; **a pump has no symbol at all** — it is a *link*, not a node
+  (`looped-network.js:14`), so it renders as a plain line in `#a52`.
+  **The prize is not prettiness.** Reservoir and junction are the same shape, separated only by
+  size and colour — so they are the same mark in a greyscale print and for a red-green colour-blind
+  reader, which is ~8% of men. Distinct silhouettes fix that for everyone at once.
+  `lib/Icons.lib.php` already holds tank, pump, junction and pipe geometry on a 24×24 grid, so the
+  map should read those and not redraw them.
+  **Pump orientation is a real requirement, not a detail (Tom):** ship **mirrored left and right
+  variants** and pick between them so the tail points toward the link's `to` node as drawn, and so
+  the tail always stays on the **map-up (north) side** — never upside down. Choose the variant from
+  the sign of `to.x − from.x`; do **not** rotate the symbol with the pipe angle, which is what
+  produces the upside-down tail on any westward or steeply-rising link.
+  **Non-obvious constraints, all in `looped-network.js`:** `nodeRadius()` feeds the pipe
+  *clear-run* calculation in `segmentMidpoints()` (arrow placement measures from the symbol edge,
+  not the centre), so a non-circular symbol needs a per-type extent, not one radius; the label mask
+  and leader placement, hit-testing, and the zoom-extent bbox all read node geometry too.
 - 20|177| **Link head loss: report the per-length gradient alongside total (Task 146 child).**
   Conventional network software and reports express pipe head loss in TWO forms, not one, because
   they answer different questions: **total head loss** (ft or m across the whole link — what you
