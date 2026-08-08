@@ -6307,6 +6307,14 @@ var EngCalcs = EngCalcs || {};
 	// (echoUnitSelect() hardcodes onchange="EngCalcs.submitForm()") and from echoUnitsRow()'s
 	// US/SI preset buttons. A unit switch doesn't need a fresh solve (the underlying SI values
 	// didn't change) -- just re-render whatever's already cached in the new unit.
+	// **Required even though this page has nothing to initialise** (found 2026-08-06 driving the real
+	// page in headless Chromium, on a profile with no cookie -- i.e. every first-time visitor).
+	// `EngCalcs.readCookieAndCalc()` calls this unconditionally when `cookieToForm()` finds no cookie,
+	// so its absence threw a TypeError that aborted the rest of that function -- taking `loadFromUrl()`
+	// and the first `pageCalculator()` down with it. Every other calculator defines it, several as
+	// exactly this empty stub; only this page had not, because this page is built in JS rather than
+	// from `$arrayInputs` rows and never looked like it needed one.
+	EngCalcs.pageCalculatorInitialize = function (objForm) {};
 	EngCalcs.pageCalculator = function (objForm) {
 		refreshPopupIfOpen();
 		refreshLabelText();

@@ -7,13 +7,16 @@ echoHeader("EngCalcs", $html_title, "");
 <h2><?=$ec_lang['lpn_main_desc']?></h2>
 <p class="ec-status-warn" style="font-weight:bold;font-size:1.15em"><?=$ec_lang['lpn_preview_banner']?></p>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-	document.getElementById('btn-printable').addEventListener('click', function() {
-		document.querySelectorAll('.d-print-none').forEach(function(el) { el.style.display = 'none'; });
-	});
-});
-</script>
+<?php
+// The "View printable" wiring that used to sit here has been REMOVED (2026-08-06). It was copied
+// from echoCalculatorForm() along with the rest of this page's hand-built form, but the BUTTON it
+// binds to is emitted by that library function's tail, which this page does not call -- so
+// getElementById('btn-printable') was null and the listener threw a TypeError on every single page
+// load. Found by driving the real page in headless Chromium; it had been in the console since the
+// page was written. Not replaced with a null guard: that would leave a listener for a button that
+// does not exist. A printable view for this page would be a feature (§13: nobody prints these,
+// everybody screenshots), not a stray listener.
+?>
 <form id="formInput" action="javascript:EngCalcs.submitForm()" method="post">
 	<?php // Restore Defaults' removal freed enough headroom to put the six selectors on the same
 	      // line as the US/SI row instead of a line of their own (Tom, 2026-07-30). A flex wrapper,
