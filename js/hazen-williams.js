@@ -2,7 +2,7 @@ EngCalcs.pageCalculator = function(objForm) {
 	'use strict';
 	var hasUnits, precision;
 	this.var = {};
-	this.var.g = 9.806;
+	this.var.g = EngCalcs.G;
 	// Read and convert form inputs to this.var.___ as SI units
 	this.readFormInput(objForm, 'q', hasUnits = true);
 	this.readFormInput(objForm, 'd', hasUnits = true);

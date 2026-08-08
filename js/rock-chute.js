@@ -3,7 +3,7 @@ EngCalcs.pageCalculator = function(objForm) {
 	var hasUnits, precision;
 	this.var = {};
 
-	var g = 9.806; // m/s²
+	var g = EngCalcs.G;
 
 	this.readFormInput(objForm, 'rc_S0', hasUnits = true);
 	this.readFormInput(objForm, 'rc_qt', hasUnits = true);

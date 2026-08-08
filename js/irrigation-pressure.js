@@ -5,7 +5,7 @@
 // EngCalcs.solveForDd0 in manning-pipe-flow.js, but the forward function
 // here is a full row-by-row march instead of one closed-form formula.
 
-EngCalcs.g = 9.806;
+EngCalcs.g = EngCalcs.G;
 // Fixed loss exponent used by Christiansen's F(n), not user-facing. 1.75, not the Hazen-Williams
 // 1.852, since this calculator's own friction model is Darcy-Weisbach/Swamee-Jain and irrigation
 // laterals (where F(n) applies) are small-diameter smooth plastic pipe in the Blasius

@@ -2,7 +2,7 @@ EngCalcs.pageCalculator = function(objForm) {
 	'use strict';
 	var hasUnits, precision;
 	this.var = {};
-	this.var.g = 9.806; // m/s²
+	this.var.g = EngCalcs.G;
 	this.var.isRect = (document.getElementById('shape_rect') && document.getElementById('shape_rect').checked) ? 1 : 0;
 	document.getElementById('w_row').style.display = this.var.isRect ? '' : 'none';
 

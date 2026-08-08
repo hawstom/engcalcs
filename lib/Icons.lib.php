@@ -68,6 +68,16 @@ $ec_icons = array(
 	// tooth depth stop competing: twelve teeth AND 3.2 units of depth, where the old spoked
 	// version could manage ten and 1.9. At 15px the valleys soften into a fine serration rather
 	// than breaking, which is the graceful direction to degrade. The bore is what no sun has.
+	//
+	// **Why fewer teeth would also have worked, recorded because it is the better principle** (Tom,
+	// 2026-08-08, after settling on twelve): a gear reads as a gear when **tooth width equals gap
+	// width**, with matching chamfers or fillets on the inside and outside corners — which is what
+	// the actual history of gear refinement converged on. Chrome's gear icon gets away with SIX
+	// teeth on exactly that basis. Tom's read of his own request: *"I probably was pushing for more
+	// teeth because of my sub-conscious understanding that tooth width = gap width."* Twelve at a
+	// 10°/12° tip-to-root ratio is already near parity, which is why it works and why he called it
+	// okay as is. If this is ever redrawn, chase the width parity and the fillets, not the count —
+	// the count is a symptom.
 	'settings'   => '<path d="M18.52 10.97L21.76 11.15A9.8 9.8 0 0 1 21.76 12.85L18.52 13.03A6.6 6.6 0 0 1 18.16 14.37L20.88 16.14A9.8 9.8 0 0 1 20.03 17.62L17.13 16.15A6.6 6.6 0 0 1 16.15 17.13L17.62 20.03A9.8 9.8 0 0 1 16.14 20.88L14.37 18.16A6.6 6.6 0 0 1 13.03 18.52L12.85 21.76A9.8 9.8 0 0 1 11.15 21.76L10.97 18.52A6.6 6.6 0 0 1 9.63 18.16L7.86 20.88A9.8 9.8 0 0 1 6.38 20.03L7.85 17.13A6.6 6.6 0 0 1 6.87 16.15L3.97 17.62A9.8 9.8 0 0 1 3.12 16.14L5.84 14.37A6.6 6.6 0 0 1 5.48 13.03L2.24 12.85A9.8 9.8 0 0 1 2.24 11.15L5.48 10.97A6.6 6.6 0 0 1 5.84 9.63L3.12 7.86A9.8 9.8 0 0 1 3.97 6.38L6.87 7.85A6.6 6.6 0 0 1 7.85 6.87L6.38 3.97A9.8 9.8 0 0 1 7.86 3.12L9.63 5.84A6.6 6.6 0 0 1 10.97 5.48L11.15 2.24A9.8 9.8 0 0 1 12.85 2.24L13.03 5.48A6.6 6.6 0 0 1 14.37 5.84L16.14 3.12A9.8 9.8 0 0 1 17.62 3.97L16.15 6.87A6.6 6.6 0 0 1 17.13 7.85L20.03 6.38A9.8 9.8 0 0 1 20.88 7.86L18.16 9.63A6.6 6.6 0 0 1 18.52 10.97Z"/><circle cx="12" cy="12" r="2.8"/>',
 
 	// ---- File ----

@@ -23,7 +23,7 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 	? require('./PipeHydraulics.lib.js')
 	: (EngCalcs || {});
 
-EngCalcs.lpnG = 9.806;
+EngCalcs.lpnG = EngCalcs.G;
 
 // Guard against the zero-flow singularity.
 //

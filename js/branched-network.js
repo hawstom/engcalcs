@@ -15,7 +15,7 @@
 // Series-by-default: a blank "upstream" defaults to the previous line (N-1), so a
 // no-topology entry is a plain series pipeline; branching is opt-in by overriding.
 
-EngCalcs.g = 9.806;
+EngCalcs.g = EngCalcs.G;
 
 // Copy/paste data area bookkeeping. 11 singleton 'i' inputs precede the table:
 // printable_title, printable_subtitle, elev_source, h_source1, h_source2, q_source2,

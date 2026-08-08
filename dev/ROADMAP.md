@@ -32,6 +32,40 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 ## Calculator Improvements
 
+- 55|233| **Manning-Irregular opens in metric on English pages, and greets everyone with a warning.
+  One root cause, found 2026-08-08.** `js/manning-irregular.js:184` seeds a hard-coded cookie:
+  `'i:,i:,i:1,s:1,i:0.001,s:1,s:1,...'`. Each `s:<n>` sets a select **by its conversion factor**,
+  and `1` is always the SI option — so the seed forces every unit select to metric, overwriting the
+  US units PHP already rendered correctly. Verified: server-side the page renders `ft`, `cfs`,
+  `ft/sec`; in a browser it shows `m`, `m³/s`, `m/s`. It is the only page in the suite that hard-codes
+  select values this way.
+  Two visible symptoms, both from that line:
+  - **Wrong unit system.** Every other calculator opens in US for `en`; this one opens in SI.
+  - **Opens on a ⚠ Low velocity warning**, because the seeded section (`0,1 / 10,0.9 / …`, a ~30-unit
+    wide, 1-unit deep channel at s=0.001, n=0.03) is metric-scaled. CLAUDE.md is explicit that a page
+    greeting a first-time visitor with a warning is worse than one greeting them with a worked
+    example.
+  **Fix is per-preset seeding keyed off `EngCalcs.defaultUnitSet`** — the exact case the unit-families
+  doc warns about ("hard-coded metric seeds read under `us` produced a 100-inch pipe"). Needs the
+  positional cookie columns mapped to their selects, US geometry chosen, and both presets checked to
+  open on a *passing* design. **Not a quick fix — do not guess the column order.**
+  `dev/browser-pass/` can verify it: drive the page in both presets and read `v_check`.
+
+- 30|234| **Canal Seepage must prove its worth or go (Tom, 2026-08-08: "in my crosshairs").** After
+  Task 232 removed `Irrigation.php`, `cs_` is the remaining page Tom is not proud of — his standing
+  position is that it was AI momentum rather than a real need, and it is already under a
+  do-not-promote (never propose it for links, outreach, or feature work).
+  **The 2026-07-27 numbers are the case against it:** reach 1,746, confirmed humans **6**, used
+  **0** — a 0% conversion, tied with Orifice-Drain-Time for the worst in the suite.
+  **Decide with one more data point, not on feeling:** pull `cs_` again in the next usage snapshot.
+  If humans are still single digits and `used` is still 0, remove it the way 232 was removed — page,
+  `sw.js` line, and all `cs_` keys across 27 files, which is the larger prize since `cs_` is a much
+  bigger key set than `irr_`'s 17. If it has real users, it stays and the embarrassment is a quality
+  problem to fix rather than a deletion to make.
+  **One caution 232 did not have:** `Canal-Seepage.php` is linked from the Hydraulics menu, so unlike
+  `Irrigation.php` it has a real in-site path. Check what that contributes before assuming the
+  numbers mean nobody wants it.
+
 - 5|175| **A real printable version, suite-wide.** Raised by Tom, 2026-07-30, while reviewing the
   `lpn_` map page: the suite's only print affordance today is `d-print-none` hiding chrome
   (toolbar, unit-select row, nav) so `Ctrl+P` on the bare page reads a little cleaner — there is no

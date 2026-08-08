@@ -574,6 +574,17 @@ EngCalcs.inlineRangeWarnHtml = function (valueSI, lowSI, highSI, labels) {
 	* into elId, with the full explanation available as a hover tip on the
 	* whole string. status is 'ok', 'high', 'low', or '' (blank/no result).
 	*/
+// Standard gravity, in SI, for the whole suite (ROADMAP Task 230 follow-up, 2026-08-08).
+// It was 9.806 written out at FOURTEEN sites under four different names -- EngCalcs.Manning.g, a
+// bare local `var g`, per-instance this.var.g, EngCalcs.g and EngCalcs.lpnG. They all happened to
+// agree, which is exactly why it was worth fixing while they still did: a physical constant that
+// drifts between calculators is a correctness bug that shows up as two pages disagreeing about the
+// same pipe, and nothing in the suite would have caught it.
+// 9.806 rather than 9.80665: it is what every site already used, and the fourth digit is far below
+// the uncertainty in any n, C or f a user will enter. Changing the VALUE is a separate decision
+// from removing the duplication; this commit only removed the duplication.
+EngCalcs.G = 9.806;
+
 // The velocity band every calculator's check is measured against (ROADMAP Task 230).
 // ONE definition: this used to be the literals 0.6 and 3.0 repeated in nine calculator files, so
 // changing it meant finding all nine and a missed one would disagree silently.

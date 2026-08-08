@@ -2,7 +2,7 @@ EngCalcs.pageCalculator = function(objForm) {
 	'use strict';
 	var hasUnits, precision;
 	this.var = {};
-	this.var.g   = 9.806;
+	this.var.g   = EngCalcs.G;
 	this.var.rho = 1000;
 
 	this.readFormInput(objForm, 'q',      hasUnits = true);
