@@ -17,9 +17,49 @@
 // subject
 // message
 //
+// ROADMAP Task 206: for CONTACT_SEND_LOG and ecLoggingOptedOut(). Defines constants and reads
+// cookies only -- no output, so it cannot disturb the redirect this script emits on success.
+require_once __DIR__ . '/lib/config.inc.php';
+
 // Modify the spam test string, to address, and success file name below.
 $testanswer='six';
 $to = 'tom.haws@gmail.com';
+
+/**
+ * Records one SUCCESSFUL contact-form send to CONTACT_SEND_LOG (ROADMAP Task 206).
+ *
+ * Called only from the mail() success branch, which is the entire point: this is the half of the
+ * contact funnel a client-side beacon cannot honestly measure. Divided into the count of
+ * HUMAN_VIEW_LOG rows for page 'contact', it answers the one question years of silence could not:
+ * do people not click the invitation, or do they click it and then not send?
+ *
+ * Records nothing about the message -- not its length, not its referrer, not its subject. Those
+ * would be a third question, and none of them answer "is the form the barrier?".
+ */
+function ecLogContactSend() {
+  // Same opt-out as the other three log writers, and cheaper here than in a beacon because the
+  // function is already in scope.
+  if (function_exists('ecLoggingOptedOut') && ecLoggingOptedOut()) return;
+
+  // The language actually served, read straight from the cookie Language.lib.php sets: formmail
+  // does not bootstrap the app, and loading all 27 lang files to learn one code would be silly.
+  // Blank when a visitor never chose one, which is itself the honest answer.
+  $lang = isset($_COOKIE['ec_language']) ? preg_replace('/[^A-Za-z-]/', '', $_COOKIE['ec_language']) : '';
+
+  $browserLang = '';
+  if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+    $browserLang = strtolower(trim(explode(';', explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE'])[0])[0]));
+  }
+
+  $dir = dirname(CONTACT_SEND_LOG);
+  if (!is_dir($dir)) {
+    @mkdir($dir, 0750, true);
+  }
+  // 'contact' rather than 'formmail': the page-basename column has to match the view rows this
+  // number is divided by, or the funnel does not line up.
+  $line = gmdate('Y-m-d\TH:i:s\Z') . "\t" . 'contact' . "\t" . $lang . "\t" . $browserLang . "\n";
+  @file_put_contents(CONTACT_SEND_LOG, $line, FILE_APPEND | LOCK_EX);
+}
 
 // We define the error messages below.
 $errnoto = 'No To: address provided!  Can\'t send mail to nobody.';
@@ -78,6 +118,7 @@ $moreheaders = $from."\r\n".$replyto;
 
 // Send the message. If send was successful, show the success page.
 if (mail($to, $subject, $message, $moreheaders)) {
+  ecLogContactSend();
   // Redirect to the fixed internal success page.
   ?><!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
   <html>

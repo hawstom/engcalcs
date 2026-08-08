@@ -57,6 +57,15 @@
 #      i.e. "AWStats with the robots pruned" — plus a raw browser_lang column for cross-checking
 #      against engcalcs-lang.log's browser source among only-confirmed-human visits.
 #
+#   4. engcalcs-contact-send.log — CONFIRMED SENT contact message (ROADMAP Task 206). Written
+#      server-side by formmail.php in its mail() success branch, not by a beacon: a beacon fired
+#      from the submit handler races the navigation and cannot know whether the send succeeded,
+#      so it would count attempts rather than sends. Same four columns as the two logs above,
+#      with page fixed at 'contact' so these rows divide cleanly by the contact views in
+#      engcalcs-human-view.log. Not deduped — a second message from the same person is a second
+#      send. This answers the only question the suite's mission actually cares about: are people
+#      not clicking the invitation, or clicking it and then not writing?
+#
 # WHY ALL THREE LOGS: engcalcs-lang.log can't tell you which visits were bots vs. bounces vs.
 # real usage; engcalcs-human-view.log can't tell you who actually got value out of the page vs.
 # who just looked and left; engcalcs-calc-usage.log can't tell you about visitors who left before
@@ -67,6 +76,10 @@
 LOG="$(dirname "$0")/engcalcs-lang.log"
 VIEW_LOG="$(dirname "$0")/engcalcs-human-view.log"
 USAGE_LOG="$(dirname "$0")/engcalcs-calc-usage.log"
+# The contact funnel (ROADMAP Task 206): views of contact.php live in VIEW_LOG under page
+# 'contact', and successful sends are written server-side by formmail.php. Two numbers, reported
+# together in their own section below, because the ratio between them is the whole point.
+SEND_LOG="$(dirname "$0")/engcalcs-contact-send.log"
 
 if [ ! -f "$LOG" ]; then
     echo "Log file not found: $LOG"
@@ -96,6 +109,9 @@ print_footer() {
     fi
     if [ -f "$USAGE_LOG" ]; then
         printf "    %-34s %12s  %s\n" "$(basename "$USAGE_LOG")" "$(wc -l < "$USAGE_LOG")" "$(head -1 "$USAGE_LOG" | awk -F'\t' '{print $1}')"
+    fi
+    if [ -f "$SEND_LOG" ]; then
+        printf "    %-34s %12s  %s\n" "$(basename "$SEND_LOG")" "$(wc -l < "$SEND_LOG")" "$(head -1 "$SEND_LOG" | awk -F'\t' '{print $1}')"
     fi
     echo ""
 }
@@ -169,6 +185,41 @@ else
     echo " No confirmed-human page-view log yet: $VIEW_LOG"
     echo " (No one has dwelt on a page since this feature shipped.)"
     echo "========================================="
+fi
+
+echo ""
+echo "========================================="
+echo " Contact funnel: invitation clicks -> messages actually sent"
+echo "========================================="
+echo "    clicks = confirmed-human views of contact.php (VIEW_LOG rows with page 'contact'),"
+echo "            deduped once per (session, page, lang) like every other page view."
+echo "    sends  = messages formmail.php actually mailed, logged server-side in its success"
+echo "            branch. NOT deduped: one person writing twice is two sends, which is right."
+echo "    The two causes of a contact drought call for OPPOSITE fixes, and only this ratio tells"
+echo "    them apart: few clicks means the invitation is invisible or reads as chrome (wording and"
+echo "    placement are the lever); many clicks and few sends means the invitation works and the"
+echo "    FORM is the barrier (moving the invitation again is wasted motion)."
+echo ""
+CONTACT_CLICKS=0
+[ -f "$VIEW_LOG" ] && CONTACT_CLICKS=$(awk -F'\t' '$2 == "contact"' "$VIEW_LOG" | wc -l)
+CONTACT_SENDS=0
+[ -f "$SEND_LOG" ] && CONTACT_SENDS=$(wc -l < "$SEND_LOG")
+printf "    %-28s %10d\n" "invitation clicks" "$CONTACT_CLICKS"
+printf "    %-28s %10d\n" "messages sent" "$CONTACT_SENDS"
+if [ "$CONTACT_CLICKS" -gt 0 ]; then
+    printf "    %-28s %9s%%\n" "sent per click" "$(awk -v s="$CONTACT_SENDS" -v c="$CONTACT_CLICKS" 'BEGIN{printf "%.1f", 100*s/c}')"
+fi
+echo ""
+echo "    Read this ratio only once BOTH counts are out of single digits -- with a handful of"
+echo "    contacts a year, one message either way moves it enormously. Until then the useful"
+echo "    reading is the pair of raw counts, not the percentage."
+if [ -f "$SEND_LOG" ]; then
+    echo ""
+    echo "--- Sends by served language ---"
+    awk -F'\t' '{print ($3 == "" ? "(none chosen)" : $3)}' "$SEND_LOG" | sort | uniq -c | sort -rn
+    echo ""
+    echo "--- Most recent 10 sends ---"
+    tail -10 "$SEND_LOG"
 fi
 
 if [ ! -f "$USAGE_LOG" ]; then

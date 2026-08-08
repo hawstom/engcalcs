@@ -2,6 +2,8 @@
 require_once('lib/base.inc.php');
 $html_title = $ec_lang['contact_main_menu'];
 echoHeader("EngCalcs", $html_title, "", false);
+// Task 206: this page has no calculator form, so nothing else names it for the human-view beacon.
+echoPageNameScript();
 ?>
 <p>Tom Haws, Professional Engineer (Civil)<br />
 859 N Lafayette<br />

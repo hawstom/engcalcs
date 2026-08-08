@@ -252,10 +252,13 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     the reader's own language that asks for nothing at all (`template_welcome` already does this and
     is the tonal model for everything in this task).
 
-  **Gated on Task 206.** Do not build this blind. Without contact-funnel logging there is no way to
-  tell whether Rung 0 worked, and this task's entire premise — that cost, not visibility, is the
-  constraint — is a hypothesis that deserves a measurement rather than another two rounds of
-  rewording. 206 is cheap; do it first.
+  **Was gated on Task 206, which shipped 2026-08-07 — the gate is now a waiting period, not a build
+  step.** Do not build this blind. Without contact-funnel logging there was no way to tell whether
+  Rung 0 worked, and this task's entire premise — that cost, not visibility, is the constraint — is
+  a hypothesis that deserves a measurement rather than another two rounds of rewording. The
+  instrument exists and starts at zero on 2026-08-07: read the "Contact funnel" section of
+  `log/lang-log-stats.sh` once both counts are out of single digits, and let the clicks-vs-sends
+  split pick which lever this task pulls.
 - 68|205| **One "contact me" line per page, not two — ENGLISH SHIPPED 2026-08-03; only the
   26-language resync (d) remains.** Raised by Tom,
   2026-08-03, on noticing that `Manning-Pipe-Flow.php` and `Looped-Network.php` showed different
@@ -1095,7 +1098,9 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     attached to something they already want — is a share mechanism that costs the user nothing and
     needs no plea, and it connects to Task 175 (printable). Contrast a footer "tell a colleague"
     line, which arrives at a moment of no intent and would re-fragment the single invitation Task 205
-    just consolidated. **Sequence any share affordance behind Task 206**, so it can be attributed.
+    just consolidated. **Sequence any share affordance behind Task 206** (shipped 2026-08-07), so it
+    can be attributed against the contact funnel's baseline rather than landing in the same window
+    as another change.
 
 - 30|217| **A suite-owned, multilingual Manning's n table, built from primary sources.** Raised by
   Tom, 2026-08-05, and accepted as mid-priority with a caution: *"No collision, but I am not into
@@ -1217,8 +1222,9 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **Verify each venue is still live before acting** — these were named from knowledge, not checked
     against the current web.
   - **The unglamorous prerequisite:** the best pool is the several thousand humans already using the
-    suite, and we can currently neither see nor reach any of them. That is **Task 206**, which is
-    therefore upstream of this item rather than parallel to it.
+    suite, and until 2026-08-07 we could neither see nor reach any of them. Seeing them was
+    **Task 206**, now shipped; reaching them is still this item's own problem, so it is no longer
+    blocked — only unstarted.
 
 - 69|214| **Realign the glossary anchor languages with measured reach.** Confirms and closes Tom's
   2026-08-05 question, *"Confirm that our wave 1 translation language set is adjusted in light of our
@@ -1265,49 +1271,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **The decision it feeds is Task 217**, so this metric arrives with a decision already attached
     rather than becoming another number nobody acts on.
 
-- 80|206| **Measure the contact funnel — we are blind on the one metric the mission cares about.**
-  Raised by Tom, 2026-08-03: contacts "have always been rare and gratifying. None at all in recent
-  months." Nothing logs `contact.php` views or `formmail.php` submissions, so the two possible
-  causes are indistinguishable today, and they call for **opposite** fixes:
-  - **Nobody clicks the invitation** → it is invisible or reads as chrome. Wording/placement is the
-    lever (Task 205 just changed both).
-  - **People click but do not send** → the invitation works and the form is the barrier. Placement
-    changes nothing and further tinkering with it is wasted motion.
-  Cheap: the existing `log-human-view.php` beacon pattern already covers views; add one on
-  `contact.php`, and one event on successful `formmail.php` send. No database. Two numbers —
-  invitation clicks, and sends — turn a years-long guess into arithmetic.
-  **Urgent because two confounders just landed and will otherwise be uninterpretable:** (1) Tom
-  removed the form's anti-spam test recently — a classic conversion killer, especially on mobile and
-  for non-English users — so the drought may *already* be fixed with no way to see it; (2) Task 205
-  changed the invitation's wording, placement, and dismiss affordance suite-wide on 2026-08-03. With
-  no instrument, "fixed" and "still broken" look identical for another several months, and neither
-  change can be credited or ruled out. Every month without the beacon burns evidence.
-  **BUILD PLAN, verified against the code 2026-08-06 — this is the next task.** Two numbers, two
-  different mechanisms, and the difference is the only non-obvious part:
-  - **The view is already 90% built and silently doing nothing.** `maybeLogHumanView()` fires on
-    every page that loads `js/Calculators.lib.js`, including `contact.php` — but it posts
-    `page: EngCalcs.cookieName`, and `cookieName` is written by `echoCookieScript()`
-    (`lib/Calculators.lib.php:279`), which a non-calculator page never calls. So it posts an empty
-    page name and `log-human-view.php` answers 400. Giving `contact.php` a page name is the whole
-    fix for half this task; no new endpoint, no new log.
-  - **The send must be logged SERVER-SIDE, in `formmail.php`'s success branch** (it is the `if
-    (mail(...))` at line 80), NOT by a beacon. Rejected alternative, so it is not re-litigated: a
-    beacon fired from the form's submit handler races the navigation AND cannot know whether the
-    send succeeded — it would count attempts, and attempts are exactly what we already cannot
-    distinguish from successes. `formmail.php` knows the truth and is already on the page.
-  - **It must honour the opt-out** (`ecLoggingOptedOut()`, Task 210) like the other three writers —
-    which is easier server-side than in a beacon, since the function is right there.
-  - **Match the existing log line format** (`lib/config.inc.php`, `log-calc-event.php`) so whatever
-    reads the other three logs reads this one. One new constant beside `HUMAN_VIEW_LOG`.
-  - **Do not add a third question.** Invitation clicks and sends. The temptation to log the referring
-    page, the language, the message length and so on is how a two-number instrument becomes a project
-    nobody finishes, and none of those answer "is the form the barrier?".
-  Context, now fixed: `formmail.php:90` carried a bare `<?` short open tag — the only one in the
-  repo. It parses only where `short_open_tag=On`, which production evidently still is (Tom's tests
-  send successfully), but any PHP upgrade or host move would have silently killed the contact form,
-  and with zero logging the symptom would have been indistinguishable from ordinary silence. Changed
-  to `<?php` on 2026-08-03. That near-miss is itself the argument for this task: a broken contact
-  path is invisible precisely because its failure mode looks exactly like nobody writing.
 - 80|200| **Usage logging: the questions the current report cannot answer.** Raised by Tom,
   2026-08-03: *"I'd like to get more guidance about our development priorities from usage logging."*
   Ordered by value ÷ effort. Nothing here needs a database — the existing
@@ -1665,6 +1628,56 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|206| **[DONE 2026-08-07] Measured the contact funnel — the one metric the mission cares about,
+  and we were blind on it.** Raised by Tom, 2026-08-03: contacts "have always been rare and
+  gratifying. None at all in recent months." Nothing logged `contact.php` views or `formmail.php`
+  submissions, so the two possible causes were indistinguishable, and they call for **opposite**
+  fixes: nobody clicks the invitation (wording/placement is the lever) versus people click but do
+  not send (the form is the barrier, and further tinkering with placement is wasted motion). Two
+  numbers now answer it. What shipped:
+  - **The view half was 90% built and silently doing nothing, exactly as the build plan predicted.**
+    `maybeLogHumanView()` fires on every page that loads `js/Calculators.lib.js`, `contact.php`
+    included — but it posts `EngCalcs.cookieName`, which only `echoCookieScript()` assigns, and a
+    page with no calculator form never calls it. So it posted an empty page name and
+    `log-human-view.php` answered 400. Verified both ways against a live server before and after:
+    `page=contact` → 204 and a log row, `page=` → 400. New `echoPageNameScript()`
+    (`lib/Calculators.lib.php`) emits the page name and `sessionAgeMs`; `contact.php` calls it after
+    `echoHeader()`. No new endpoint, no new log, no beacon changes.
+    - It also emits `sessionAgeMs` for a reason worth keeping: without it the beacon assumes a
+      brand-new session and waits the full 10s, so a visitor arriving from a calculator page — the
+      arrival path that matters most for this funnel — would have had to dwell another 10s to count.
+  - **The send half is logged SERVER-SIDE** in `formmail.php`'s `mail()` success branch
+    (`ecLogContactSend()` → `CONTACT_SEND_LOG`, `log/engcalcs-contact-send.log`). **Rejected
+    alternative, recorded so it is not re-litigated:** a beacon fired from the submit handler races
+    the navigation AND cannot know whether the send succeeded — it would count attempts, and
+    attempts are exactly what we already could not tell apart from successes. `formmail.php` knows
+    the truth and is already on the page.
+  - **Honours the Task 210 opt-out**, like the other three writers, and more cheaply than a beacon
+    could since `ecLoggingOptedOut()` is right there. **Same four-column line format** as the other
+    logs, with page fixed at `contact` so send rows divide cleanly by the view rows — verified by
+    exercising the real function against the real config: opted-out wrote nothing, a junk
+    `ec_language` cookie was sanitized with no tab or newline injection.
+  - **Only two questions asked.** No referrer, no message length, no subject. Those would be the
+    third question that turns a two-number instrument into a project nobody finishes, and none of
+    them answer "is the form the barrier?".
+  - **Reported by `log/lang-log-stats.sh`** in a new "Contact funnel" section: clicks, sends, and
+    sent-per-click, with the percentage suppressed when there are no clicks. It prints on the
+    no-usage-log path too, and the new log gets a coverage-footer row. Verified against fixtures for
+    the populated, no-sends, and no-view-log cases.
+    - The section says in place that the ratio is only readable once **both** counts leave single
+      digits — with a handful of contacts a year, one message either way moves it enormously.
+  - **Why it was urgent:** two confounders had just landed and were otherwise going to be
+    uninterpretable — Tom removed the form's anti-spam test (a classic conversion killer, especially
+    on mobile and for non-English users), and Task 205 changed the invitation's wording, placement
+    and dismiss affordance suite-wide on 2026-08-03. Both are now measurable going forward, though
+    neither can be credited retroactively: the instrument starts at zero on 2026-08-07.
+  - Context, fixed along the way on 2026-08-03: `formmail.php:90` carried a bare `<?` short open tag
+    — the only one in the repo. It parses only where `short_open_tag=On`, which production evidently
+    still is, but any PHP upgrade or host move would have silently killed the contact form, and with
+    zero logging the symptom would have been indistinguishable from ordinary silence. That near-miss
+    is itself the argument for this task: a broken contact path is invisible precisely because its
+    failure mode looks exactly like nobody writing.
 
 - 0|223| **[DONE 2026-08-06] Fixed the defects from the 2026-08-05 and 2026-08-06 `lpn_` browser passes.** Triaged list with root
   causes: `dev/lpn-file-lock-test-punchlist.md` § Findings.

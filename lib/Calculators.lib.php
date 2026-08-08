@@ -281,4 +281,28 @@ function echoCookieScript ()
 	EngCalcs.readCookieAndCalc(document.forms['formInput']);
 <?php
 }
+/**
+ * Emits the two globals EngCalcs.maybeLogHumanView() needs, for a page that has no calculator
+ * form and therefore never calls echoCookieScript() (ROADMAP Task 206).
+ *
+ * The human-view beacon already fires on every page that loads js/Calculators.lib.js — including
+ * contact.php — but it posts EngCalcs.cookieName, which only echoCookieScript() ever assigns. So
+ * a non-calculator page has been posting an empty page name and getting a 400 back: the beacon
+ * was 90% built and silently doing nothing. Naming the page is the whole fix.
+ *
+ * sessionAgeMs is emitted for the same reason it is in echoCookieScript(): without it the beacon
+ * assumes a brand-new session and waits the full 10s, so a visitor arriving here from a
+ * calculator page — the arrival path that matters most for the contact funnel — would have to
+ * dwell another 10s to be counted.
+ */
+function echoPageNameScript ()
+{
+	$p = pathinfo($_SERVER['SCRIPT_NAME']);
+?>
+<script>
+	EngCalcs.cookieName = <?=json_encode($p['filename'])?>;
+	EngCalcs.sessionAgeMs = <?=json_encode($GLOBALS['ec_sessionAgeMs'] ?? 0)?>;
+</script>
+<?php
+}
 // Omit last closing tag is good practice.

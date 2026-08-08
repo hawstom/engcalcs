@@ -66,9 +66,22 @@ define('CALC_USAGE_LOG', dirname(__DIR__) . '/log/engcalcs-calc-usage.log');
 // Run log/lang-log-stats.sh to analyze.
 define('HUMAN_VIEW_LOG', dirname(__DIR__) . '/log/engcalcs-human-view.log');
 
+// Contact-form SEND log (ROADMAP Task 206) — the second of the two numbers that make the
+// contact funnel arithmetic instead of a guess: HUMAN_VIEW_LOG rows for page 'contact' are the
+// invitation clicks, and this file is the messages actually sent. Written SERVER-SIDE by
+// formmail.php in its mail() success branch, deliberately NOT by a beacon: a beacon fired from
+// the submit handler races the navigation and cannot know whether the send succeeded, so it
+// would count attempts — and attempts are exactly what we already cannot tell apart from
+// successes. formmail.php knows the truth and is already on the page.
+// Each line: ISO-8601 UTC timestamp TAB page-basename TAB served-lang TAB raw-Accept-Language
+// — the same four fields as the two logs above, with page-basename fixed at 'contact' so the
+// send rows line up with the view rows they are divided by.
+// Run log/lang-log-stats.sh to analyze.
+define('CONTACT_SEND_LOG', dirname(__DIR__) . '/log/engcalcs-contact-send.log');
+
 // ---- Author/tester opt-out from the usage logs (ROADMAP Task 210) ----
-// Visit any page with ?ec_nolog=1 once per browser to stop that browser being counted by ALL THREE
-// log writers (LANG_LOG, CALC_USAGE_LOG, HUMAN_VIEW_LOG); ?ec_nolog=0 undoes it.
+// Visit any page with ?ec_nolog=1 once per browser to stop that browser being counted by ALL FOUR
+// log writers (LANG_LOG, CALC_USAGE_LOG, HUMAN_VIEW_LOG, CONTACT_SEND_LOG); ?ec_nolog=0 undoes it.
 // Deliberately an opt-out AT WRITE TIME rather than a filter applied afterwards. The logs carry no
 // IP and no session id, so "that looks like the author exercising many calculators and languages"
 // is a guess -- it cannot be applied to data already written, and it would also throw away real
