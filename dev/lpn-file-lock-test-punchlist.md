@@ -24,6 +24,9 @@ has ever been seen rendered.** This list exists because that is the whole risk.
 > `dev/browser-pass/README.md`**: §1's native picker handshake, a permission that is genuinely
 > `prompt`/`denied`, §10 (a real folder, not OPFS), §11 Firefox/Safari, and anything visual. Boxes
 > below that the runner now owns are marked **[auto]** — do not spend a pass on them.
+>
+> **What is left for you is §H immediately below, written as steps.** Nothing else in this file is
+> asked of you until §H is done and the runner is green.
 
 **Tom's time is the scarce thing here, not CC's** (2026-08-05: *"The full passes are slow and
 fatiguing, and I ask you not to ask them of me any more than necessary"*). So the rule for adding to
@@ -34,6 +37,75 @@ boxes here. When a check here fails, ask whether the retest belongs in a harness
 back into this file.
 
 Scope: what is **on production now** — the server-broker version.
+
+---
+
+## H. THE HUMAN LIST — the whole of what needs Tom
+
+Everything else in §2–§8 and §12 is `node dev/browser-pass/run.js`, run before you are asked to look
+at anything. **This section is the entire ask.** Fifteen boxes, one browser, maybe twenty minutes.
+Work down it — it is in value order, and you can stop anywhere and still have told us something.
+
+Setup: Chrome, a normal profile, `https://hawsedc.com/engcalcs/Looped-Network.php`, and visit once
+with `?ec_nolog=1` first. A real folder you can see in Explorer — Documents is fine.
+
+**H1. The native file dialog opens at all** *(§1 — the riskiest single guess in the build; nothing
+automated can test it)*
+- [ ] In a Chrome profile that has never used this: **File → Save** → the training panel appears.
+- [ ] Read it slowly — take twenty seconds or so, deliberately — then type initials and press
+      **Continue**. **Does the operating system's Save dialog open?**
+      *(If it does not, that is Chrome's transient user activation expiring while you read, which is
+      the exact failure the panel design exists to avoid. Say so and it gets rebuilt.)*
+- [ ] Save it to a real folder. Open the file in Notepad: readable, indented, and it contains
+      `"docId": "d…"`.
+
+**H2. Reload really is silent** *(§8 — the runner only proves the always-granted case)*
+- [ ] With that file open, press **F5**. **Expect nothing at all**: no banner, no dialog, no click.
+- [ ] Draw something, **File → Save**. It writes the same file — no picker, no `(copy)` in any name.
+- [ ] Close the whole browser, reopen it, go back to the page. Same again: nothing, or *at most* one
+      **Reconnect to this file** button. Anything that tells you to Save as or find the file again is
+      a FAIL.
+
+**H3. A connection that really is lost** *(§5/§8 — cannot be produced without Chrome's own settings)*
+- [ ] Chrome → ⋮ → **Settings → Privacy and security → Site settings → hawsedc.com → File editing →
+      Remove**. Reload the page.
+- [ ] The banner should say the connection to *that file* was **lost** and offer **Choose the file
+      again**. *(The old wording — "a browser does not stay connected to a file after the page is
+      reloaded" — is now itself a FAIL.)*
+- [ ] Press it, pick the same file → connected, banner gone, Save works.
+- [ ] Instead of that button, try **File → Open…** on the same file → it reconnects **that tab** and
+      does **not** add a second one.
+
+**H4. A file that goes missing** *(§10 — the sandbox recreates deleted files, a real folder does not)*
+- [ ] With a file connected, **rename or move it in Explorer**.
+- [ ] Draw something, **File → Save** → expect an amber banner and **Choose the file again**.
+      *(Tom 2026-08-05: "No. There's an asterisk, but no complaints. Saving is silent and recreates
+      the original name." That is the defect; check whether it still does that.)*
+
+**H5. The words, which only a person can judge**
+- [ ] Have a colleague — or a second Chrome profile — hold the file, then open it. The first line of
+      the dialog should now carry **a number**: "…the last edit was 20 minutes ago, 5 minutes after
+      the last save", or "…and their work is saved to the file", or "…their browser last checked in
+      3 minutes ago". Is it the sentence you would want to read before deciding whether to interrupt
+      somebody?
+- [ ] The read-only banner should now **name them**, not say "Somebody else".
+- [ ] Known and not yet fixed: it says **"1 minutes ago"**. Confirm you are happy leaving that until
+      the `lpn_` translation sprint (three singular forms now become 78 then).
+
+**H6. The visual ones — nothing automated can see these**
+- [ ] Banner colours and wrapping: amber for a warning you can work through, red for read-only. Do
+      the buttons inside them wrap sanely on a narrow window?
+- [ ] Open enough projects to overflow the tab strip. A horizontal scrollbar is expected; the
+      **vertical one on the right is finding 14** — still there?
+- [ ] **Save all** with two edited file projects: it flickers through each tab as it saves. Live with
+      it, or shall it become its own task?
+
+**H7. Firefox or Safari** *(§11 — five minutes, and it is the whole story for those browsers)*
+- [ ] In Firefox: **File → Save** is disabled, **Save as…** is enabled, and its tip explains that
+      this browser cannot connect to a file.
+- [ ] Save as → you get a download. Press it again → another download. Expected.
+- [ ] **Known defect 13:** after Save as the unsaved asterisk **persists**. Still true?
+- [ ] No lock banner ever appears.
 
 ---
 

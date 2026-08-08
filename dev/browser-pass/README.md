@@ -55,6 +55,11 @@ would advance the file's modified time and trip the very freshness check these c
 
 ## What stays on the human list
 
+**It is written out as steps, not as section numbers**, at the top of
+`dev/lpn-file-lock-test-punchlist.md` — see **§H, "THE HUMAN LIST"**: fifteen boxes, one browser,
+about twenty minutes, in value order so it can be stopped anywhere. What follows here is why each
+one cannot be automated.
+
 - **§1 the native picker's user-activation handshake.** The training panel exists precisely because
   `showSaveFilePicker()` needs a live activation and Chrome's expires in seconds. A stub needs none.
   The pass proves the panel appears, gates the picker, and reaches it — not that Chrome agrees.
