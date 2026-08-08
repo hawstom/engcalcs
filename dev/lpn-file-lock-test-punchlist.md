@@ -45,9 +45,13 @@ Scope: what is **on production now** — the server-broker version.
 Everything else in §2–§8 and §12 is `node dev/browser-pass/run.js`, run before you are asked to look
 at anything. **This section is the entire ask.**
 
-**RUN 2026-08-06 — H1, H2, H3, H5, H6 and H7 all passed or produced fixes; see the notes in place.
-Exactly ONE box is still open: H4.** Everything else in this file is `[x]` or `[auto]`, and the only
-other empty boxes are in the Appendix, which is history and is never to be worked.
+**CLOSED 2026-08-06. Every box in this file is now `[x]` or `[auto]`**, and the only empty ones left
+are in the Appendix, which is history and is never to be worked. H1–H7 all passed; H4 took four
+rounds and found four separate defects, the last of which — `getFile()` answering for a file that is
+not there — would never have been found any other way.
+
+**If this list is ever re-run, run `node dev/browser-pass/run.js` first and only work what it cannot
+answer.** The sections above say which those are.
 
 Setup: Chrome, a normal profile, `https://hawsedc.com/engcalcs/Looped-Network.php`, and visit once
 with `?ec_nolog=1` first. A real folder you can see in Explorer — Documents is fine.
@@ -91,7 +95,7 @@ automated can test it)*
 
 **H4. A file that goes missing** *(§10 — the sandbox recreates deleted files, a real folder does not)*
 - [x] With a file connected, **rename or move it in Explorer**.
-- [-] **⇦ THE ONE BOX LEFT. RETEST after pulling 7e644c6.** Draw something, **File → Save** →
+- [x] **PASSES — Tom, 2026-08-06: "It worked right this time."** Draw something, **File → Save** →
       expect an amber banner and **Choose the file again**, and the asterisk to STAY LIT.
       *(Tom 2026-08-05: "No. There's an asterisk, but no complaints. Saving is silent and recreates
       the original name." Tom 2026-08-06: "It neither complains nor creates a new file. It silently
@@ -155,6 +159,7 @@ automated can test it)*
       exactly like yours: real, current metadata, reads that throw (§10, three checks,
       mutation-confirmed — trusting `getFile()` alone turns them red).
       Four rounds on one box, and every round found something real. Thank you for the patience.]
+      [TGH: It worked right this time.]
 
 **H5. The words, which only a person can judge**
 - [x] Have a colleague — or a second Chrome profile — hold the file, then open it. The first line of
@@ -622,7 +627,8 @@ Triaged by what a user loses. Roadmap Task 223 points here.
    **FIXED 2026-08-05** — opening a file this browser already has open switches to that tab and
    adopts the fresh handle, which doubles as a second way to reconnect a tab that lost its file.
 7. **§10 A moved or renamed file is not noticed.** No banner, no *Choose the file again*; Save is
-   silent and recreates the original name.
+   silent and recreates the original name. **FIXED 2026-08-06 after four rounds and four distinct
+   causes** — see finding 23. Confirmed by Tom on real disk: *"It worked right this time."*
 
 15. §3 **Save all switches tabs as it goes**, which is unsightly. **Deliberately not fixed** — see
     the box in §3: the write path writes the open project and every warning it raises is a banner
@@ -675,8 +681,13 @@ Triaged by what a user loses. Roadmap Task 223 points here.
     `createWritable()` **recreates the file at the old path**, so the write genuinely succeeds and
     the user is left editing a file they did not choose. Caught now by the BASELINE: we have read
     that file before, so if it cannot be read now it is gone, and that case refuses rather than
-    failing open. **Both FIXED 2026-08-06. The worst class of bug this feature can have: the page
-    believed it had saved — twice, for two different reasons.**
+    failing open. **(c)** Still silent, file deleted before every attempt: the rule was narrowed to
+    the flat one — **Save must never CREATE a file** — with no dependence on a baseline. **(d)** Still
+    silent: **`getFile()` succeeding is not proof the file is there.** It answers from metadata the
+    browser already holds, so every guard built on it was asking the browser's memory rather than the
+    disk. It now reads a byte. **All FIXED 2026-08-06, confirmed by Tom on real disk. The worst class
+    of bug this feature can have: the page believed it had saved — four times, for four different
+    reasons.**
 24. §3 Save all's flicker wants an explanation rather than a rewrite (Tom: *"Some sort of an
     explanation might be nice. But I don't know where or how unless we had a snoozable tip system."*)
     — carried to Task 209 as its second concrete instance.

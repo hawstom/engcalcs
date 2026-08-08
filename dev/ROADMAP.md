@@ -828,10 +828,12 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   2026-07-29: explicitly not a "valve" and not modeled via minor-loss-coefficient (Km) abuse — just
   a plain open/closed state, kept simple.
 - 90|146.06| **Translation sprint for `lpn_` strings (Task 146 child).** Not until later; blocked on
-  the string set settling (146.01/146.02/146.03 above are all still moving it). **Gate updated 2026-08-05: 146.08 and 195 both
-  shipped, so the remaining gate is Task 220** — the page stays English-only until browser
-  verification clears the PREVIEW banner, because translating the UI reads as a promise of stability
-  the banner explicitly withholds.
+  the string set settling (146.01/146.02/146.03 above are all still moving it). **Gate updated 2026-08-06: 146.08, 195 and now 220
+  have all cleared** — the punch list is closed and `dev/browser-pass/run.js` keeps it closed. The
+  page stays English-only anyway, because the remaining gate was never really the testing: it is
+  whether the FEATURE SET has settled enough that a translated UI is not a promise of stability we
+  withdraw next week (`project_lpn_scaffold_before_translate`). Dropping the PREVIEW banner is Tom's
+  call, and it is the same call.
   - **Re-prioritized 67 → 90 by Task 222's competitive finding.** Being multilingual is no longer a
     nice-to-have that broadens reach; it is the one differentiator a funded competitor is not
     contesting. This is now the most valuable single piece of work on the `lpn_` chain.
@@ -874,94 +876,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   Design narrative archived in `dev/roadmap-closed-archive.md`.
   **Browser verification is NOT part of this task — it is Task 220.**
 
-- 96|223| **Fix the 14 defects from the 2026-08-05 `lpn_` browser pass.** Triaged list with root
-  causes: `dev/lpn-file-lock-test-punchlist.md` § Findings.
-  - **P0 already fixed, awaiting browser retest:** Save as… would overwrite a file another profile
-    had open. The guard only ran when *your own* tab was read-only and compared against your own
-    previous handle instead of the file chosen in the picker; identity is the `docId` inside the
-    target file, never its name.
-  - **P1 FIXED 2026-08-05, all three, awaiting browser retest.** The intermittent lock was not the
-    TTL sweep: `visibilitychange -> hidden` fires on an ordinary **tab switch**, and released every
-    lock one-way with nothing taking them back — so a colleague who glanced at their email came back
-    holding nothing, silently. Locks are now remembered on `hidden` and re-acquired on `visible`.
-    The needs-reopen banner could never appear because `syncReadOnlyToOpenProject()` ran from
-    `openProject()`/`newProject()` but not from boot — a page load being the only case it exists
-    for. Read-only now allows every edit and enforces itself in exactly two places:
-    `writeOpenProjectToFile()` refuses, and Save is disabled (it does **not** become Save as).
-  - **Also fixed 2026-08-05, reported separately by Tom:** new projects reused a taken number once
-    the first was saved (saving renames a project after its file, and `safeFileName()` collapses the
-    space, so the exact-template scan stopped recognising it); and the dialog claimed
-    `aria-modal="true"` with no backdrop, so tabs and the map stayed clickable underneath a question
-    about the project you could switch away from.
-  - **The lock design was reworked, not patched** (Tom: *"If minimizing loses the lock, then the lock
-    is useless"*). A claim now survives minimise, reload and reboot, and ends only at Close. What
-    makes that safe is a **write-time freshness check** — `writeOpenProjectToFile()` compares the
-    bytes on disk with what it last saw and refuses if they moved — so a stale claim can no longer
-    cause an overwrite, and the file is protected even with the broker down. The lock is a courtesy;
-    the freshness check is the guarantee. "Break their lock" is therefore safe to offer where "Take
-    over" never was.
-  - **P2/P3 fixed 2026-08-05 from Tom's second pass (he stopped at punch-list line 193):** the same
-    file opening as two live tabs (identity is the `docId`, so re-opening now switches to the tab
-    that has it and adopts the fresh handle — a second route back from a lost connection); and
-    `Save all`, which was not missing but *hidden* below two dirty file projects, so a command that
-    existed was one nobody could find. It greys out now, like Save and Revert.
-  - **The freshness check had a hole exactly where it was most needed, and it was ours.** Tom:
-    *"Still doesn't work with broker blocked. Save is apparently allowed as normal."* The stamp lived
-    only in memory, so a reload dropped it — and Task 212 then re-read the file on the way back in,
-    **adopting a colleague's newer version as our own baseline**. A reloaded A would have written
-    over B's saved work with nothing said, on the one path that is supposed to hold when the broker
-    is down. The stamp now lives in the project index and boot keeps the old one rather than taking
-    a new one. **Lesson worth more than the fix: restoring a connection is not the same as restoring
-    what that connection KNEW** — Task 212 brought back the handle and silently reset the guarantee
-    built on top of it.
-  - **The freshness check was on one write path out of two** (2026-08-06, Tom's third report of the
-    same symptom: *"Still doesn't work with broker blocked. Save is apparently allowed as normal."*).
-    It lived in `writeOpenProjectToFile()` — but **read-only routes Save straight to Save as**, and
-    so does a tab with no live handle, and Save as exempted any file carrying our own `docId` from
-    every question, without even asking the broker. True of the file we last wrote; false of the file
-    a colleague has written since. Save as now runs the same stamp comparison and asks the broker
-    about our own docId too. **Two lessons: a guarantee that guards one of two paths guards neither,
-    and "it is our own file" is a statement about the past.**
-  - **"{name} has this file open." now carries numbers** (Tom: *"Are we going to add some numbers to
-    this message?"*). The dialog asks the reader to judge a claim, and that judgment is entirely
-    about time. The broker already stored `editedAt`/`savedAt`/`lastActivity`; only the richest of
-    the four sentences was ever used, and it required both an edit and a save in the holder's current
-    session — so the ordinary case fell through to the bare sentence. Four cases now: unsaved work,
-    all saved, edited-but-never-saved, and only-opened.
-  - **Revert was in the menu and in neither banner**, which is where somebody locked out is looking.
-    Both banners carry it now.
-  - **Save all's tab-switching flicker is deliberately NOT fixed** — the write path writes the *open*
-    project and every warning it raises is a banner about the tab in front of you; making it silent
-    means teaching that function to report about a project the user cannot see. Cosmetic cost, P0
-    surface. Recorded so it is not re-litigated as an oversight.
-  - **From Tom's §H pass, 2026-08-06 — the first pass run against a list this short.** H1 (the
-    native picker handshake, the riskiest single guess in the build) **passes**; H2 and H5 pass; H3
-    passes once you know Chrome's row says Block, not Remove. Two real defects, both fixed:
-    - **§10 a moved file was reported as saved** — *"It neither complains nor creates a new file. It
-      silently fails to save."* Everything through `writable.close()` can resolve without a byte
-      landing. **A write is not a save until you can read it back**: the file is now re-read after
-      every write and its size compared with what was written. This is the worst class of bug this
-      feature can have — not refusing to save, but *believing* it had.
-    - **§11 the fallback asterisk never went out.** In a browser that cannot connect to a file the
-      downloaded copy IS the saved state; it now records a baseline and the star clears until the
-      next change, staying faint because the page still cannot write back to it.
-    - Not defects: the tab-strip scrollbar (*"there all along"* — struck from the findings), and
-      Save all's flicker (wants an explanation, carried to Task 209).
-  - Sits above 220 because 220 cannot finish until these are fixed and the punch list re-run.
-
-- 95|220| **Browser-verify `lpn_` project files and locking against the POST-211 UI.**
-  Punch list: `dev/lpn-file-lock-test-punchlist.md` — **§0–§8 rewritten 2026-08-05 against tabs, the
-  File menu, no autosave, opt-in read-only, no Delete and no Take over.** 78 checks, all open; the
-  old §1–§6 "done" marks were against controls that no longer exist, so they were reset. Tom's
-  annotations from that pass are preserved in an appendix as the record of why Task 211 happened.
-  - **§11 (Firefox/Safari) is largely coverable from Chrome** on a plain `http://` LAN IP — the
-    fallback is the same `showSaveFilePicker === undefined` branch. What that misses is
-    browser-specific rendering, which is the lower risk. (`http://localhost` will NOT trigger it;
-    localhost is a secure context.)
-  - **§13 still needs the rewrite §0–§8 got** — it names controls that were renamed or removed, which
-    Tom caught in the pass. Do it before asking him to run the list again.
-  - Gates dropping the PREVIEW banner, and therefore gates Task 146.06.
-
 - 0|212| **[DONE 2026-08-05] Persisted file handles — a reload no longer drops the file.**
   Handles are kept in IndexedDB (structured-cloneable; localStorage cannot hold them). On boot
   `queryPermission()` decides: **granted** reconnects silently, **prompt** is held pending and the
@@ -985,6 +899,24 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     so it contaminated every browser pass and produced three separate "reload doesn't work" reports.
   - Still deferred: `Open Recent`, and answering "is this the same file?" across sessions. Those were
     the other half of this task and want `isSameEntry()`; extract them if they earn it.
+- 55|225| **The `lpn_` punch-list leftovers — small, confirmed, and none of them dangerous.** Extracted
+  from Tasks 223/220 as they closed, because a defect left inside a `## Completed` block is a defect
+  nobody reads again. All confirmed in a browser; full wording in
+  `dev/lpn-file-lock-test-punchlist.md` § Findings.
+  - **§4 Closing a tab activates the LAST-CREATED project** rather than the next one rightward, which
+    is what every tab strip in the world does.
+  - **§4 Status messages overwrite each other** — "nodes have no path to a reservoir" ate the message
+    saying what had just closed. They should queue, or the notice should outlive the diagnostic.
+  - **§4 The "gone for good" prompt fires for an empty, untouched new project**, where there is
+    nothing to lose and the question is noise.
+  - **§6 The lock dialog says "1 minutes ago".** `agoText()` has no singular. **Deliberately timed
+    with the `lpn_` translation sprint**: three singular forms now become 78 then.
+  - **§13 needs the rewrite §0–§8 got** (Tom: *"Some stuff no longer exists or is renamed"*), before
+    anybody is asked to run that section again.
+  - Two feature asks, both from Tom and both real: a `beforeunload` **"Leave site?"** when a connected
+    file has unsaved work, and his suggestion for the Restore-settings tip — *"To save your favorite
+    settings, save a project file with nothing but settings."*
+
 - 45|209| **A snoozable tip system (Task 146 child, but suite-shaped).** Asked for by Tom,
   2026-08-03, while reviewing Task 195's file-and-lock explanation: the page needs somewhere to put
   "here is what is about to happen" text that a user can dismiss for now and see again later, rather
@@ -1714,10 +1646,112 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Completed
 
+- 0|223| **[DONE 2026-08-06] Fixed the defects from the 2026-08-05 and 2026-08-06 `lpn_` browser passes.** Triaged list with root
+  causes: `dev/lpn-file-lock-test-punchlist.md` § Findings.
+  - **P0 already fixed, awaiting browser retest:** Save as… would overwrite a file another profile
+    had open. The guard only ran when *your own* tab was read-only and compared against your own
+    previous handle instead of the file chosen in the picker; identity is the `docId` inside the
+    target file, never its name.
+  - **P1 FIXED 2026-08-05, all three, awaiting browser retest.** The intermittent lock was not the
+    TTL sweep: `visibilitychange -> hidden` fires on an ordinary **tab switch**, and released every
+    lock one-way with nothing taking them back — so a colleague who glanced at their email came back
+    holding nothing, silently. Locks are now remembered on `hidden` and re-acquired on `visible`.
+    The needs-reopen banner could never appear because `syncReadOnlyToOpenProject()` ran from
+    `openProject()`/`newProject()` but not from boot — a page load being the only case it exists
+    for. Read-only now allows every edit and enforces itself in exactly two places:
+    `writeOpenProjectToFile()` refuses, and Save is disabled (it does **not** become Save as).
+  - **Also fixed 2026-08-05, reported separately by Tom:** new projects reused a taken number once
+    the first was saved (saving renames a project after its file, and `safeFileName()` collapses the
+    space, so the exact-template scan stopped recognising it); and the dialog claimed
+    `aria-modal="true"` with no backdrop, so tabs and the map stayed clickable underneath a question
+    about the project you could switch away from.
+  - **The lock design was reworked, not patched** (Tom: *"If minimizing loses the lock, then the lock
+    is useless"*). A claim now survives minimise, reload and reboot, and ends only at Close. What
+    makes that safe is a **write-time freshness check** — `writeOpenProjectToFile()` compares the
+    bytes on disk with what it last saw and refuses if they moved — so a stale claim can no longer
+    cause an overwrite, and the file is protected even with the broker down. The lock is a courtesy;
+    the freshness check is the guarantee. "Break their lock" is therefore safe to offer where "Take
+    over" never was.
+  - **P2/P3 fixed 2026-08-05 from Tom's second pass (he stopped at punch-list line 193):** the same
+    file opening as two live tabs (identity is the `docId`, so re-opening now switches to the tab
+    that has it and adopts the fresh handle — a second route back from a lost connection); and
+    `Save all`, which was not missing but *hidden* below two dirty file projects, so a command that
+    existed was one nobody could find. It greys out now, like Save and Revert.
+  - **The freshness check had a hole exactly where it was most needed, and it was ours.** Tom:
+    *"Still doesn't work with broker blocked. Save is apparently allowed as normal."* The stamp lived
+    only in memory, so a reload dropped it — and Task 212 then re-read the file on the way back in,
+    **adopting a colleague's newer version as our own baseline**. A reloaded A would have written
+    over B's saved work with nothing said, on the one path that is supposed to hold when the broker
+    is down. The stamp now lives in the project index and boot keeps the old one rather than taking
+    a new one. **Lesson worth more than the fix: restoring a connection is not the same as restoring
+    what that connection KNEW** — Task 212 brought back the handle and silently reset the guarantee
+    built on top of it.
+  - **The freshness check was on one write path out of two** (2026-08-06, Tom's third report of the
+    same symptom: *"Still doesn't work with broker blocked. Save is apparently allowed as normal."*).
+    It lived in `writeOpenProjectToFile()` — but **read-only routes Save straight to Save as**, and
+    so does a tab with no live handle, and Save as exempted any file carrying our own `docId` from
+    every question, without even asking the broker. True of the file we last wrote; false of the file
+    a colleague has written since. Save as now runs the same stamp comparison and asks the broker
+    about our own docId too. **Two lessons: a guarantee that guards one of two paths guards neither,
+    and "it is our own file" is a statement about the past.**
+  - **"{name} has this file open." now carries numbers** (Tom: *"Are we going to add some numbers to
+    this message?"*). The dialog asks the reader to judge a claim, and that judgment is entirely
+    about time. The broker already stored `editedAt`/`savedAt`/`lastActivity`; only the richest of
+    the four sentences was ever used, and it required both an edit and a save in the holder's current
+    session — so the ordinary case fell through to the bare sentence. Four cases now: unsaved work,
+    all saved, edited-but-never-saved, and only-opened.
+  - **Revert was in the menu and in neither banner**, which is where somebody locked out is looking.
+    Both banners carry it now.
+  - **Save all's tab-switching flicker is deliberately NOT fixed** — the write path writes the *open*
+    project and every warning it raises is a banner about the tab in front of you; making it silent
+    means teaching that function to report about a project the user cannot see. Cosmetic cost, P0
+    surface. Recorded so it is not re-litigated as an oversight.
+  - **From Tom's §H pass, 2026-08-06 — the first pass run against a list this short.** H1 (the
+    native picker handshake, the riskiest single guess in the build) **passes**; H2 and H5 pass; H3
+    passes once you know Chrome's row says Block, not Remove. Two real defects, both fixed:
+    - **§10 a moved file was reported as saved** — *"It neither complains nor creates a new file. It
+      silently fails to save."* Everything through `writable.close()` can resolve without a byte
+      landing. **A write is not a save until you can read it back**: the file is now re-read after
+      every write and its size compared with what was written. This is the worst class of bug this
+      feature can have — not refusing to save, but *believing* it had.
+    - **§11 the fallback asterisk never went out.** In a browser that cannot connect to a file the
+      downloaded copy IS the saved state; it now records a baseline and the star clears until the
+      next change, staying faint because the page still cannot write back to it.
+    - Not defects: the tab-strip scrollbar (*"there all along"* — struck from the findings), and
+      Save all's flicker (wants an explanation, carried to Task 209).
+  - **Closed with every P0/P1/P2 fixed and verified**, most of them by
+    `dev/browser-pass/run.js` (138 checks) and the rest by Tom on real disk. The small survivors are
+    Task 225, extracted rather than left inside a closed block.
+  - **The one that cost the most, and the one worth remembering:** four rounds on a single box —
+    a save reporting success while the file was gone — because each fix was correct and none of them
+    was asking the disk. Read-back, then a baseline, then a flat no-create rule, and finally the real
+    answer: `getFile()` answers from metadata the browser already holds. **An API that answers
+    without touching the thing it describes is not evidence about that thing.**
+
+
+- 0|220| **[DONE 2026-08-06] Browser-verified `lpn_` project files and locking against the POST-211 UI.**
+  Punch list: `dev/lpn-file-lock-test-punchlist.md` — **§0–§8 rewritten 2026-08-05 against tabs, the
+  File menu, no autosave, opt-in read-only, no Delete and no Take over.** 78 checks, all open; the
+  old §1–§6 "done" marks were against controls that no longer exist, so they were reset. Tom's
+  annotations from that pass are preserved in an appendix as the record of why Task 211 happened.
+  - **§11 (Firefox/Safari) is largely coverable from Chrome** on a plain `http://` LAN IP — the
+    fallback is the same `showSaveFilePicker === undefined` branch. What that misses is
+    browser-specific rendering, which is the lower risk. (`http://localhost` will NOT trigger it;
+    localhost is a secure context.)
+  - **§13 still needs the rewrite §0–§8 got** — it names controls that were renamed or removed, which
+    Tom caught in the pass. Do it before asking him to run the list again.
+  - **Closed 2026-08-06.** Every box is `[x]` or `[auto]`: 138 automated checks over two real browser
+    profiles against the real broker (Task 224), plus Tom's §H pass for the handful a machine cannot
+    answer. §13's rewrite and the small leftovers moved to Task 225.
+  - **It no longer gates Task 146.06 on verification** — but dropping the PREVIEW banner is Tom's
+    call, not a consequence of a green test run, and the feature laundry list in
+    `project_lpn_scaffold_before_translate` is the other half of that decision.
+
+
 - 0|224| **[DONE 2026-08-06] The punch list runs itself: `dev/browser-pass/`.** Asked for by Tom
   (*"I am very tired and feeble-minded right now. Is there any way that we can proceed without my
   working through the test punch list?"*). 89 checks over two real browser profiles against the real
-  `lpn-lock.php`, in twenty seconds, re-runnable: `node dev/browser-pass/run.js`.
+  `lpn-lock.php`, in about a minute, re-runnable: `node dev/browser-pass/run.js`. It began at 89 checks and closed the punch list at 138.
   - **The one lie is the picker, and it is small.** `showSaveFilePicker`/`showOpenFilePicker` are
     replaced — nothing else — with functions returning **OPFS** handles, which are real
     `FileSystemFileHandle`s: structured-cloneable (so Task 212's IndexedDB persistence is genuinely
