@@ -49,17 +49,26 @@ $ec_icons = array(
 	// question — "I forgot that I love what you already have now" (2026-08-08). Recorded so the
 	// camera is not re-proposed: it was drawn, compared, and declined on the merits.
 	'view'       => '<path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="2.5"/>',
-	// Tom, 2026-08-08: "It looks a little too much like a light/sun instead of a gear. Gear teeth
-	// are short, not long like rays of light." The first version was a small hub with eight long
-	// strokes starting well outside it, and the GAP was the whole problem — a mark that floats away
-	// from its centre is a ray, and eight rays around a disc is a sun whatever you meant by it.
-	// Teeth now start ON the gear body and protrude about an eighth of its radius, which is roughly
-	// what real gear teeth do. The bore in the middle is what a sun can never have.
-	// Then: "maybe a few more teeth so it doesn't look like a ship's wheel." Eight of anything
-	// radial is a wheel — that is the spoke count wheels actually have. Ten, shorter, reads as
-	// machined rather than turned. Ten is also the ceiling here: at twelve the gaps close to under
-	// a pixel at the 15px this renders at, and the rim greys into a solid ring.
-	'settings'   => '<circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.6"/><path d="M19 12h0.9M17.66 7.89l0.73-0.53M14.16 5.34l0.28-0.86M9.84 5.34l-0.28-0.86M6.34 7.89l-0.73-0.53M5 12h-0.9M6.34 16.11l-0.73 0.53M9.84 18.66l-0.28 0.86M14.16 18.66l0.28 0.86M17.66 16.11l0.73 0.53"/>',
+	// Three passes with Tom, 2026-08-08, and the third one broke the constraint rather than
+	// accepting it.
+	//   1. "It looks too much like a light/sun instead of a gear. Gear teeth are short, not long
+	//      like rays of light." The GAP was the problem — eight long strokes starting outside a
+	//      small hub are rays, and a mark that floats away from its centre is never a tooth.
+	//   2. "A few more teeth so it doesn't look like a ship's wheel." Eight of anything radial is
+	//      a wheel; that is the spoke count wheels actually have.
+	//   3. "At large scale I'd say add more teeth. At smaller scale we need a little more length.
+	//      I don't think we can do both." — and with the old construction he was exactly right.
+	//      Teeth drawn as separate radial strokes are limited by the GAP between them: more teeth
+	//      closes the gap, longer teeth means a smaller body, which closes it further. At twelve
+	//      the gaps fell under a pixel and the rim greyed into a solid ring.
+	//
+	// So the teeth stopped being strokes. This is one closed outline whose edge IS the tooth
+	// profile — flank out, across the tip, flank in, along the root — which is how a real gear
+	// is shaped and how gear icons are actually drawn. With no gaps to collapse, tooth count and
+	// tooth depth stop competing: twelve teeth AND 3.2 units of depth, where the old spoked
+	// version could manage ten and 1.9. At 15px the valleys soften into a fine serration rather
+	// than breaking, which is the graceful direction to degrade. The bore is what no sun has.
+	'settings'   => '<path d="M18.52 10.97L21.76 11.15A9.8 9.8 0 0 1 21.76 12.85L18.52 13.03A6.6 6.6 0 0 1 18.16 14.37L20.88 16.14A9.8 9.8 0 0 1 20.03 17.62L17.13 16.15A6.6 6.6 0 0 1 16.15 17.13L17.62 20.03A9.8 9.8 0 0 1 16.14 20.88L14.37 18.16A6.6 6.6 0 0 1 13.03 18.52L12.85 21.76A9.8 9.8 0 0 1 11.15 21.76L10.97 18.52A6.6 6.6 0 0 1 9.63 18.16L7.86 20.88A9.8 9.8 0 0 1 6.38 20.03L7.85 17.13A6.6 6.6 0 0 1 6.87 16.15L3.97 17.62A9.8 9.8 0 0 1 3.12 16.14L5.84 14.37A6.6 6.6 0 0 1 5.48 13.03L2.24 12.85A9.8 9.8 0 0 1 2.24 11.15L5.48 10.97A6.6 6.6 0 0 1 5.84 9.63L3.12 7.86A9.8 9.8 0 0 1 3.97 6.38L6.87 7.85A6.6 6.6 0 0 1 7.85 6.87L6.38 3.97A9.8 9.8 0 0 1 7.86 3.12L9.63 5.84A6.6 6.6 0 0 1 10.97 5.48L11.15 2.24A9.8 9.8 0 0 1 12.85 2.24L13.03 5.48A6.6 6.6 0 0 1 14.37 5.84L16.14 3.12A9.8 9.8 0 0 1 17.62 3.97L16.15 6.87A6.6 6.6 0 0 1 17.13 7.85L20.03 6.38A9.8 9.8 0 0 1 20.88 7.86L18.16 9.63A6.6 6.6 0 0 1 18.52 10.97Z"/><circle cx="12" cy="12" r="2.8"/>',
 
 	// ---- File ----
 	'new'        => '<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/>',
