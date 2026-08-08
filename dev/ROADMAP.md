@@ -32,15 +32,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 ## Calculator Improvements
 
-- 40|230| **Translate the new `mtc_vel_high` into the 26 non-English files.** The defect is fixed:
-  `Manning-Trap.php` and `Manning-Irregular.php` used to feed the channel velocity verdict from
-  `$ec_lang['mhp_vel_high']`, telling a trapezoidal channel to check **water hammer**. A real
-  `mtc_vel_high` now exists in `lang.ec.en.php` and both pages read it (2026-08-08). Because
-  `base.inc.php` loads English first, every language already renders the correct English sentence
-  rather than the wrong localized one — so what remains is translation quality, not a wrong answer.
-  `lang_parity_check.php` reports exactly 26 missing, confirming mtc is in scope everywhere.
-  Fold into the next sprint rather than spawning 26 agents for one string.
-
 - 5|175| **A real printable version, suite-wide.** Raised by Tom, 2026-07-30, while reviewing the
   `lpn_` map page: the suite's only print affordance today is `d-print-none` hiding chrome
   (toolbar, unit-select row, nav) so `Ctrl+P` on the bare page reads a little cleaner — there is no
@@ -1570,6 +1561,21 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|230| **[DONE 2026-08-08] The open-channel velocity verdict stopped citing water hammer.**
+  `Manning-Trap.php` and `Manning-Irregular.php` fed the channel high-velocity verdict from
+  `$ec_lang['mhp_vel_high']` — there was no `mtc_vel_high` — so a trapezoidal channel was told to
+  check transition losses and water hammer. A real `mtc_vel_high` now exists and both pages read it,
+  translated into all 26 languages the same day. Parity delta 0.
+  **Translated inline by the orchestrating model, not by a 26-agent sprint** — 26 paid agents for
+  one string is the wrong shape. Each language was anchored on vocabulary already shipped in its
+  own file (`mtc_note_2_def` for expansions/bends/obstructions, `rc_yn` for erosion,
+  `mi_notes_2_term`/`rc_main_desc` for lining); all 78 term probes matched. Glossary write-back:
+  new `channel lining` and `erosion` entries, glossary 1.22 → 1.23.
+  **Side effect worth knowing:** the mandatory `detect_english_drift.php --update` re-baselined 232
+  keys, of which 227 are `lpn_` — a pre-existing unbaselined backlog from the English-only preview,
+  not this task's doing. Harmless (parity and coverage still report them), but it means the drift
+  manifest now treats those lpn_ strings as synced.
 
 - 0|231| **[DONE 2026-08-08] Toolbar: icon as a small prefix to the text, never icon-only.** Added
   `↺` Restore defaults, `📏` Set units, `🖨` Printable (`lib/Calculators.lib.php`) and `🔗` Copy link

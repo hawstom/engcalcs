@@ -211,6 +211,7 @@
         "mtc_d50_searcy": "Required angular rock size, D<sub>50<\/sub> (Searcy 1967)",
         "mtc_vel_ok": "Velocity is reasonable for the uniform-flow assumptions.",
         "mtc_vel_low": "Velocity is low; sedimentation risk.",
+        "mtc_vel_high": "Velocity is high and may not be realistic; check erosion of the channel lining, added depth at bends, and energy loss at expansions or obstructions.",
         "mtc_iteration_tip": "Choose a roughness option (Blodgett–Bathurst recommended) and a rock size option (Isbash recommended) to auto-iterate toward a uniform rock size for your target flow. See Notes below for the full method, or enter your own roughness value (follow link for guidance) and ignore rock size to skip iteration.",
         "mtc_note_1": "<dl><dt>Automated rock size and roughness design iteration<\/dt><dd>Choose a roughness option (Blodgett–Bathurst recommended) and a design rock size option (Isbash recommended). Adjust depth and rock size safety factor to reach your target flow with a uniform rock size. Each time you change an input, the calculator repeats these steps: 1. Roughness is calculated from design rock size. 2. The requested roughness calculation is copied to input roughness. 3. Channel flow and required rock size are calculated. 4. Design rock size is adjusted. 5. Repeat until error in the design rock size is very small.<\/dd><dt>Basic calculator (no iteration)<\/dt><dd>Enter your desired roughness value. Ignore the design rock size input area.<\/dd><\/dl>",
         "mtc_note_2_term": "Velocity check",
@@ -808,7 +809,7 @@
         "lpn_settings_wipe_btn": "Clear calculator",
         "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
-    "count": 806,
+    "count": 807,
     "active_prefixes": [
         "about",
         "bpn",

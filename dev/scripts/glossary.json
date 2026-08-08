@@ -1,6 +1,6 @@
 {
   "meta": {
-    "version": "1.22",
+    "version": "1.23",
     "description": "Engineering term glossary for EngCalcs translation prompts. Preferred translations per language to prevent term drift across calculators and sprints. Covers all calculators including Rock Chute Design (Robinson), Micro-Hydro Power, and Manning series.",
     "usage": "Inject relevant entries as context in translation prompts: 'Use these preferred translations for technical terms: [terms for this calculator prefix]'. Entries with empty strings need a sprint to fill.",
     "language_codes": [
@@ -3109,6 +3109,74 @@
         "ur": "",
         "zh": ""
       }
+    },
+    {
+      "term": "channel lining",
+      "context": "The protective surface on a channel bed and banks - rock, concrete, or other material. Used by mtc_ (mtc_vel_high), mi_ (mi_notes_2_term), rc_ (rc_main_desc) and cs_ (cs_lining_cost, cs_lining_area). This is the generic concept; rock-specific labels compose it with the local word for rock.",
+      "translation_notes": "Established 2026-08-08 while translating mtc_vel_high, harvesting terms already shipped in mi_notes_2_term and rc_main_desc rather than coining new ones. zh takes 衬砌 (canal/tunnel lining) for the generic concept while rc_main_desc keeps 护坡 (rock slope protection) - both correct, different concepts, do not unify. ru крепление and cs opevnění are revetment-flavored and are each language's own standard; keep them. de composes as Gerinneauskleidung when the channel is named.",
+      "translations": {
+        "am": "ሽፋን",
+        "ar": "تبطين",
+        "bg": "облицовка",
+        "bn": "আস্তরণ",
+        "cs": "opevnění",
+        "de": "Auskleidung",
+        "es": "revestimiento",
+        "fa": "پوشش",
+        "fr": "revêtement",
+        "he": "חיפוי",
+        "hi": "अस्तर",
+        "hr": "obloga",
+        "id": "lapisan",
+        "it": "rivestimento",
+        "km": "ស្រទាប់ការពារ",
+        "my": "အကာ",
+        "ps": "پوښ",
+        "pt": "revestimento",
+        "ro": "îmbrăcăminte",
+        "ru": "крепление",
+        "sr": "облога",
+        "sw": "kifuniko",
+        "tr": "kaplama",
+        "uk": "облицювання",
+        "ur": "استر",
+        "zh": "衬砌"
+      },
+      "source": "ai-generated"
+    },
+    {
+      "term": "erosion",
+      "context": "Wearing away of a channel surface by flowing water. Used by mtc_ (mtc_vel_high) and rc_ (rc_yn tip). Distinct from sedimentation, its opposite, which is the low-velocity verdict.",
+      "translation_notes": "Established 2026-08-08 from the terms already shipped in each rc_yn tooltip, so the velocity verdict and the Rock Chute tip agree. zh uses 冲刷 (scour by flowing water), not 侵蚀 (general/geological erosion). he סחיפה and my ရေတိုက်စားမှု are water-specific and correct.",
+      "translations": {
+        "am": "ሸርሸራ",
+        "ar": "تآكل",
+        "bg": "ерозия",
+        "bn": "ক্ষয়",
+        "cs": "eroze",
+        "de": "Erosion",
+        "es": "erosión",
+        "fa": "فرسایش",
+        "fr": "érosion",
+        "he": "סחיפה",
+        "hi": "कटाव",
+        "hr": "erozija",
+        "id": "erosi",
+        "it": "erosione",
+        "km": "ការហូរច្រោះ",
+        "my": "ရေတိုက်စားမှု",
+        "ps": "فرسایش",
+        "pt": "erosão",
+        "ro": "eroziune",
+        "ru": "эрозия",
+        "sr": "ерозија",
+        "sw": "mmomonyoko",
+        "tr": "erozyon",
+        "uk": "ерозія",
+        "ur": "کٹاؤ",
+        "zh": "冲刷"
+      },
+      "source": "ai-generated"
     }
   ]
 }
