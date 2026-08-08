@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "es",
-        "expected_key_count": 790,
-        "delta_key_count": 224,
+        "expected_key_count": 789,
+        "delta_key_count": 223,
         "exempt_key_count": 17,
         "exempt_keys": [
             "calc_units_us",
@@ -63,7 +63,6 @@
         ]
     },
     "keys_to_translate": {
-        "lpn_preview_banner": "PREVIEW — This calculator is new and still changing. It is in English only for now. See the Notes below for current limits. Comments and suggestions are always welcome.",
         "lpn_tool_select": "Select",
         "lpn_tool_add_junction": "Junction",
         "lpn_tool_add_reservoir": "Reservoir",
@@ -289,7 +288,6 @@
         "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
     "keys": {
-        "lpn_preview_banner": "PREVIEW — This calculator is new and still changing. It is in English only for now. See the Notes below for current limits. Comments and suggestions are always welcome.",
         "lpn_tool_select": "Select",
         "lpn_tool_add_junction": "Junction",
         "lpn_tool_add_reservoir": "Reservoir",
@@ -515,26 +513,14 @@
         "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
     "key_context": {
-        "lpn_preview_banner": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
-                },
-                "next_translated": null
-            }
-        },
         "lpn_tool_select": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -545,8 +531,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -557,8 +543,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -569,8 +555,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -581,8 +567,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -593,8 +579,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -605,8 +591,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -617,8 +603,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -629,8 +615,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -641,8 +627,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -653,8 +639,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -665,8 +651,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -677,8 +663,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -689,8 +675,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -701,8 +687,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -713,8 +699,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -725,8 +711,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -737,8 +723,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -749,8 +735,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -761,8 +747,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -773,8 +759,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -785,8 +771,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -797,8 +783,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -809,8 +795,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -821,8 +807,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -833,8 +819,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -845,8 +831,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -857,8 +843,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -869,8 +855,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -881,8 +867,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -893,8 +879,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -905,8 +891,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -917,8 +903,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -929,8 +915,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -941,8 +927,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -953,8 +939,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -965,8 +951,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -977,8 +963,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -989,8 +975,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1001,8 +987,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1013,8 +999,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1025,8 +1011,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1037,8 +1023,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1049,8 +1035,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1061,8 +1047,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1073,8 +1059,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1085,8 +1071,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1097,8 +1083,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1109,8 +1095,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1121,8 +1107,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1133,8 +1119,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1145,8 +1131,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1157,8 +1143,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1169,8 +1155,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1181,8 +1167,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1193,8 +1179,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1205,8 +1191,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1217,8 +1203,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1229,8 +1215,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1241,8 +1227,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1253,8 +1239,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1265,8 +1251,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1277,8 +1263,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1289,8 +1275,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1301,8 +1287,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1313,8 +1299,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1325,8 +1311,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1337,8 +1323,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1349,8 +1335,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1361,8 +1347,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1373,8 +1359,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1385,8 +1371,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1397,8 +1383,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1409,8 +1395,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1421,8 +1407,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1433,8 +1419,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1445,8 +1431,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1457,8 +1443,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1469,8 +1455,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1481,8 +1467,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1493,8 +1479,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1505,8 +1491,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1517,8 +1503,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1529,8 +1515,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1541,8 +1527,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1553,8 +1539,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1565,8 +1551,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1577,8 +1563,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1589,8 +1575,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1601,8 +1587,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1613,8 +1599,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1625,8 +1611,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1637,8 +1623,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1649,8 +1635,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1661,8 +1647,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1673,8 +1659,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1685,8 +1671,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1697,8 +1683,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1709,8 +1695,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1721,8 +1707,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1733,8 +1719,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1745,8 +1731,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1757,8 +1743,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1769,8 +1755,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1781,8 +1767,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1793,8 +1779,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1805,8 +1791,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1817,8 +1803,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1829,8 +1815,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1841,8 +1827,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1853,8 +1839,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1865,8 +1851,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1877,8 +1863,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1889,8 +1875,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1901,8 +1887,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1913,8 +1899,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1925,8 +1911,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1937,8 +1923,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1949,8 +1935,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1961,8 +1947,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1973,8 +1959,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1985,8 +1971,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -1997,8 +1983,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2009,8 +1995,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2021,8 +2007,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2033,8 +2019,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2045,8 +2031,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2057,8 +2043,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2069,8 +2055,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2081,8 +2067,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2093,8 +2079,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2105,8 +2091,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2117,8 +2103,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2129,8 +2115,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2141,8 +2127,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2153,8 +2139,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2165,8 +2151,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2177,8 +2163,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2189,8 +2175,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2201,8 +2187,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2213,8 +2199,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2225,8 +2211,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2237,8 +2223,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2249,8 +2235,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2261,8 +2247,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2273,8 +2259,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2285,8 +2271,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2297,8 +2283,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2309,8 +2295,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2321,8 +2307,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2333,8 +2319,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2345,8 +2331,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2357,8 +2343,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2369,8 +2355,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2381,8 +2367,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2393,8 +2379,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2405,8 +2391,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2417,8 +2403,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2429,8 +2415,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2441,8 +2427,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2453,8 +2439,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2465,8 +2451,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2477,8 +2463,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2489,8 +2475,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2501,8 +2487,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2513,8 +2499,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2525,8 +2511,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2537,8 +2523,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2549,8 +2535,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2561,8 +2547,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2573,8 +2559,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2585,8 +2571,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2597,8 +2583,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2609,8 +2595,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2621,8 +2607,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2633,8 +2619,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2645,8 +2631,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2657,8 +2643,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2669,8 +2655,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2681,8 +2667,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2693,8 +2679,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2705,8 +2691,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2717,8 +2703,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2729,8 +2715,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2741,8 +2727,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2753,8 +2739,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2765,8 +2751,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2777,8 +2763,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2789,8 +2775,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2801,8 +2787,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2813,8 +2799,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2825,8 +2811,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2837,8 +2823,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2849,8 +2835,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2861,8 +2847,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2873,8 +2859,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2885,8 +2871,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2897,8 +2883,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2909,8 +2895,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2921,8 +2907,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2933,8 +2919,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2945,8 +2931,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2957,8 +2943,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2969,8 +2955,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2981,8 +2967,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -2993,8 +2979,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -3005,8 +2991,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -3017,8 +3003,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -3029,8 +3015,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -3041,8 +3027,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -3053,8 +3039,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -3065,8 +3051,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -3077,8 +3063,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -3089,8 +3075,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -3101,8 +3087,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -3113,8 +3099,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -3125,8 +3111,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -3137,8 +3123,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -3149,8 +3135,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -3161,8 +3147,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -3173,8 +3159,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -3185,8 +3171,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }
@@ -3197,8 +3183,8 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_main_desc",
-                    "value": "VERSIÓN PRELIMINAR — Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
-                    "english": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+                    "value": "Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa",
+                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
                 },
                 "next_translated": null
             }

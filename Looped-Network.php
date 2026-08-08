@@ -5,7 +5,6 @@ $html_desc = $ec_lang['lpn_main_desc'];
 echoHeader("EngCalcs", $html_title, "");
 ?>
 <h2><?=$ec_lang['lpn_main_desc']?></h2>
-<p class="ec-status-warn" style="font-weight:bold;font-size:1.15em"><?=$ec_lang['lpn_preview_banner']?></p>
 
 <?php
 // The "View printable" wiring that used to sit here has been REMOVED (2026-08-06). It was copied

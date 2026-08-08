@@ -564,10 +564,9 @@
         "bpn_h_supply_tip": "Source head at the design flow, read from the supply curve. Equals the entered source head when the curve is flat (a reservoir).",
         "bpn_show_elevation": "Elevation",
         "bpn_supply1_h": "Static supply head",
-        "lpn_main_menu": "Looped Pipe Network (Map Interface) — PREVIEW",
-        "lpn_main_title": "PREVIEW: Free Online Looped Pipe Network Calculator with Map Interface",
-        "lpn_main_desc": "PREVIEW — Pressure and Flow in a Looped Pipe Network You Draw on a Map",
-        "lpn_preview_banner": "PREVIEW — This calculator is new and still changing. It is in English only for now. See the Notes below for current limits. Comments and suggestions are always welcome.",
+        "lpn_main_menu": "Looped Pipe Network (Map Interface)",
+        "lpn_main_title": "Free Online Looped Pipe Network Calculator with Map Interface",
+        "lpn_main_desc": "Pressure and Flow in a Looped Pipe Network You Draw on a Map",
         "lpn_tool_select": "Select",
         "lpn_tool_add_junction": "Junction",
         "lpn_tool_add_reservoir": "Reservoir",
@@ -792,7 +791,7 @@
         "lpn_settings_wipe_btn": "Clear calculator",
         "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
-    "count": 790,
+    "count": 789,
     "active_prefixes": [
         "about",
         "bpn",

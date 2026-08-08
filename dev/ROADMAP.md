@@ -759,9 +759,20 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 - 15|146.07| **Open/Closed link property (Task 146 child).** A simple boolean state on a link. Tom,
   2026-07-29: explicitly not a "valve" and not modeled via minor-loss-coefficient (Km) abuse — just
   a plain open/closed state, kept simple.
-- 90|146.06| **Translation sprint for `lpn_` strings (Task 146 child).** **No longer blocked on any
-  other task — see GATE CLEARED below.** **Gate updated 2026-08-06: 146.08, 195 and now 220
-  have all cleared** — the punch list is closed and `dev/browser-pass/run.js` keeps it closed. The
+- 90|146.06| **Translation sprint for `lpn_` strings (Task 146 child).** **Unblocked, and PREVIEW is
+  already off — this is the only thing left before `lpn_` can deploy.**
+  - **PREVIEW dropped 2026-08-08, ahead of the sprint, deliberately and at Tom's direction**
+    (*"Let's drop PREVIEW, I will not deploy, then we will do the translation sprint once my
+    usage credits session reset"*). The marker came out of `lpn_main_menu`, `lpn_main_title`
+    and `lpn_main_desc` in all 27 files, and `lpn_preview_banner` plus its `<p>` on
+    `Looped-Network.php` are deleted. The drift manifest was re-baselined in the same pass:
+    all 27 languages changed together, so those 3 keys are in sync, not stale.
+  - **⚠ DO NOT DEPLOY `lpn_` UNTIL THIS SPRINT LANDS.** Order normally runs the other way
+    (translate, then drop PREVIEW) because the banner promised "English only for now" and the
+    marker was what warned a non-English visitor. Both are now gone, so between today and the
+    sprint the page presents itself as finished and multilingual in 26 languages while its
+    body is still English. Holding the deploy is the only thing keeping that honest.
+  - **Gate updated 2026-08-06: 146.08, 195 and now 220 have all cleared** — the punch list is closed and `dev/browser-pass/run.js` keeps it closed. The
   page stays English-only anyway, because the remaining gate was never really the testing: it is
   whether the FEATURE SET has settled enough that a translated UI is not a promise of stability we
   withdraw next week (`project_lpn_scaffold_before_translate`). Dropping the PREVIEW banner is Tom's
