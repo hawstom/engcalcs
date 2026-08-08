@@ -57,7 +57,7 @@ EngCalcs.pageCalculator = function(objForm) {
 
 	// Velocity check
 	var vms = this.var.vel;
-	this.writeVelocityCheck('vel_check', (vms >= 0.6 && vms <= 3.0) ? 'ok' : (vms > 3.0 ? 'high' : 'low'), {
+	this.writeVelocityCheck('vel_check', (vms >= EngCalcs.VELOCITY_OK.min && vms <= EngCalcs.VELOCITY_OK.max) ? 'ok' : (vms > EngCalcs.VELOCITY_OK.max ? 'high' : 'low'), {
 		ok: EngCalcs.pageConfig.mhp_vel_ok_short,
 		high: EngCalcs.pageConfig.mhp_vel_high_short,
 		low: EngCalcs.pageConfig.mhp_vel_low_short,

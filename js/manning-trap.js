@@ -76,7 +76,7 @@ EngCalcs.pageCalculator = function(objForm) {
 			piEl.classList.add('ec-status-ok');
 		}
 	}
-	this.writeVelocityCheck('v_check', this.var.v > 3.0 ? 'high' : (this.var.v < 0.6 ? 'low' : 'ok'), {
+	this.writeVelocityCheck('v_check', this.var.v > EngCalcs.VELOCITY_OK.max ? 'high' : (this.var.v < EngCalcs.VELOCITY_OK.min ? 'low' : 'ok'), {
 		ok: EngCalcs.pageConfig.mhp_vel_ok_short,
 		high: EngCalcs.pageConfig.mhp_vel_high_short,
 		low: EngCalcs.pageConfig.mhp_vel_low_short,

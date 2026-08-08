@@ -574,6 +574,24 @@ EngCalcs.inlineRangeWarnHtml = function (valueSI, lowSI, highSI, labels) {
 	* into elId, with the full explanation available as a hover tip on the
 	* whole string. status is 'ok', 'high', 'low', or '' (blank/no result).
 	*/
+// The velocity band every calculator's check is measured against (ROADMAP Task 230).
+// ONE definition: this used to be the literals 0.6 and 3.0 repeated in nine calculator files, so
+// changing it meant finding all nine and a missed one would disagree silently.
+//
+//   min 0.6 m/s (~2 ft/s) -- the self-cleansing minimum below which solids settle. Long-standing
+//     sanitary-sewer practice (Ten States Standards); unchanged.
+//   max 2.5 m/s (~8.2 ft/s) -- lowered from 3.0 by Tom, 2026-08-08: "I am a little worried that the
+//     trigger for the warning is too high." Both numbers have real support, and they come from
+//     different traditions: 3.0 m/s is ~10 ft/s, the customary US ceiling for abrasion in concrete
+//     pipe, while 2.5 m/s is the round metric ceiling common in water-main and sewer practice. For
+//     an ADVISORY caution the more conservative one is the better default -- it asks for a second
+//     look rather than certifying a limit, and this suite's audience is largely people who would
+//     rather be told early.
+//   Verified before the change: no calculator's factory defaults newly warn. The highest default
+//     velocity in the suite is Hazen-Williams at 1.38 m/s, comfortably inside the band, so no page
+//     greets a first-time visitor with a warning it did not have before.
+EngCalcs.VELOCITY_OK = { min: 0.6, max: 2.5 };
+
 EngCalcs.writeVelocityCheck = function (elId, status, labels) {
 	'use strict';
 	var el = document.getElementById(elId);

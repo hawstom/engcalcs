@@ -114,7 +114,7 @@ EngCalcs.pageCalculator = function (objForm) {
 	}
 	document.getElementById('q_617').innerHTML = (this.Manning.q617c * objForm['q_617u'].value).toFixed(2);
 	var vCheckStatus = (minRegionVelocity === Infinity) ? ''
-		: (maxRegionVelocity > 3.0) ? 'high'
+		: (maxRegionVelocity > EngCalcs.VELOCITY_OK.max) ? 'high'
 		: (minRegionVelocity < 0.6) ? 'low'
 		: 'ok';
 	this.writeVelocityCheck('v_check', vCheckStatus, {

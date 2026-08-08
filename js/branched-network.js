@@ -431,7 +431,7 @@ EngCalcs.bpnWriteRows = function (objForm) {
 		line = this.lines[i];
 		if (line.reachable) {
 			document.getElementsByName('q_line')[i].innerHTML = (line.q * q_lineu).toFixed(4);
-			document.getElementsByName('v')[i].innerHTML = (line.v * vu).toFixed(4) + EngCalcs.inlineRangeWarnHtml(line.v, 0.6, 3.0, velocityLabels);
+			document.getElementsByName('v')[i].innerHTML = (line.v * vu).toFixed(4) + EngCalcs.inlineRangeWarnHtml(line.v, EngCalcs.VELOCITY_OK.min, EngCalcs.VELOCITY_OK.max, velocityLabels);
 			document.getElementsByName('hl')[i].innerHTML = (line.hl * hlu).toFixed(4);
 			document.getElementsByName('p_down')[i].innerHTML = (line.pDown * p_downu).toFixed(4) + EngCalcs.inlineRangeWarnHtml(line.pDown, 0, this.var.hMaxAllow, pressureLabels);
 		} else {
