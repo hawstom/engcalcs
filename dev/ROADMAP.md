@@ -51,6 +51,41 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   open on a *passing* design. **Not a quick fix — do not guess the column order.**
   `dev/browser-pass/` can verify it: drive the page in both presets and read `v_check`.
 
+- 40|235| **The glossary's `pressure` and `elevation` entries hold the UPSTREAM label form in 22
+  languages.** Found during the Task 146.06 sprint, 2026-08-08 — by a translation agent, which is
+  worth noting: the tr agent was handed `preferred_translation` = "Memba basıncı" (*upstream*
+  pressure) for a generic node label, recognized it was wrong for the concept, and declined.
+  - **What happened:** both entries were created in the Task 166 sprint by harvesting the attested
+    label forms of `hw_pressure_up` and `hw_elev_up`. Those are *upstream-specific* labels. The
+    entries' own `translation_notes` say so plainly ("ATTESTED LABEL FORMS of `hw_pressure_up`"),
+    which is how the defect survived: it was documented as a feature.
+  - **Why it matters:** these are the entries for the bare concepts `pressure` and `elevation`, and
+    they are injected into every sprint that touches a pressure or elevation label. A compliant
+    agent puts "upstream" on labels that have nothing to do with upstream. `lpn_` applies both to
+    any node.
+  - **Done: es, pt, fr, tr**, corrected from attested `lpn_result_pressure` / `lpn_field_elev`
+    (Presión, Pressão, Pression, Basınç; Elevación, Elevação, Cote, Kot). **Remaining: the other 22
+    languages**, which still hold the upstream form and are marked as such in the glossary notes.
+  - **This is cheap to fix and does not need a sprint.** Each language already has an attested bare
+    form somewhere in its own file (`bpn_`/`mpf_` elevation and pressure labels); the work is
+    reading it off and writing it back, one language at a time, not standing up 22 agents.
+  - **Worth a wider look:** if two entries were built this way, others harvested in the same Task
+    166 pass may carry the same scope error. Check any entry whose notes describe its values as the
+    attested form of a *specific label* rather than of the concept.
+
+- 25|236| **One preview-era sentence outlived the PREVIEW drop, and it is Tom's call.**
+  `lpn_notes_3_def` still ends: *"Because this is an early preview, please use it for small networks
+  and for testing only."* The 2026-08-08 PREVIEW removal took the 3 identity keys and the banner but
+  not this sentence, and the Task 146.06 sprint has now translated it into es, pt, fr and tr.
+  - **Deliberately not touched by the sprint.** Two things are tangled in one sentence: the
+    *preview framing*, which is gone, and a *real scale caution*, which may still be true — the
+    solver's practical network size is a question about the solver, not about the label. Deleting
+    the whole sentence would quietly drop a caution nobody decided to drop.
+  - **Three options:** keep it as-is (the caution stands and the preview framing is a wart); rewrite
+    it to keep the size guidance without the preview word; or delete it outright. Whichever wins is
+    a 5-file edit (en + es/pt/fr/tr — no other language carries `lpn_` body strings) plus a drift
+    re-baseline.
+
 - 30|234| **Canal Seepage must prove its worth or go (Tom, 2026-08-08: "in my crosshairs").** After
   Task 232 removed `Irrigation.php`, `cs_` is the remaining page Tom is not proud of — his standing
   position is that it was AI momentum rather than a real need, and it is already under a
@@ -793,60 +828,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 - 15|146.07| **Open/Closed link property (Task 146 child).** A simple boolean state on a link. Tom,
   2026-07-29: explicitly not a "valve" and not modeled via minor-loss-coefficient (Km) abuse — just
   a plain open/closed state, kept simple.
-- 90|146.06| **Translation sprint for `lpn_` strings (Task 146 child).** **Unblocked, and PREVIEW is
-  already off — this is the only thing left before `lpn_` can deploy.**
-  - **PREVIEW dropped 2026-08-08, ahead of the sprint, deliberately and at Tom's direction**
-    (*"Let's drop PREVIEW, I will not deploy, then we will do the translation sprint once my
-    usage credits session reset"*). The marker came out of `lpn_main_menu`, `lpn_main_title`
-    and `lpn_main_desc` in all 27 files, and `lpn_preview_banner` plus its `<p>` on
-    `Looped-Network.php` are deleted. The drift manifest was re-baselined in the same pass:
-    all 27 languages changed together, so those 3 keys are in sync, not stale.
-  - **⚠ DO NOT DEPLOY `lpn_` UNTIL THIS SPRINT LANDS.** Order normally runs the other way
-    (translate, then drop PREVIEW) because the banner promised "English only for now" and the
-    marker was what warned a non-English visitor. Both are now gone, so between today and the
-    sprint the page presents itself as finished and multilingual in 26 languages while its
-    body is still English. Holding the deploy is the only thing keeping that honest.
-  - **Gate updated 2026-08-06: 146.08, 195 and now 220 have all cleared** — the punch list is closed and `dev/browser-pass/run.js` keeps it closed. The
-  page stays English-only anyway, because the remaining gate was never really the testing: it is
-  whether the FEATURE SET has settled enough that a translated UI is not a promise of stability we
-  withdraw next week (`project_lpn_scaffold_before_translate`). Dropping the PREVIEW banner is Tom's
-  call, and it is the same call.
-  - **Re-prioritized 67 → 90 by Task 222's competitive finding.** Being multilingual is no longer a
-    nice-to-have that broadens reach; it is the one differentiator a funded competitor is not
-    contesting. This is now the most valuable single piece of work on the `lpn_` chain.
-  - **Gate status, 2026-07-31.** 146.08 (multi-project storage) has shipped, and Task 193 (the
-    English tightening pass) is done — so of the named gates only **146.02** is outstanding, plus
-    the short re-read it now owes. `lpn_notes_3_def` was rewritten in 193 and no longer says "one
-    network"; it now says projects live in this browser and nowhere else, which stays honest until
-    Task 195 lands a file export.
-  - **Pre-sprint checklist reminder:** ten `lpn_` glossary entries were seeded in 193 with `avoid`
-    arrays and **empty** translations by design. The sprint fills them, and CLAUDE.md's mandatory
-    glossary write-back applies — a sprint that leaves them empty is not closed.
-  - **RESIZED 2026-08-05 by the coverage matrix (Tasks 203/204, now adopted and enforced in code).**
-    `lpn_` is not a core calculator, so it gets the core languages only: **`lpn_` × es, pt, fr, tr —
-    205 keys × 4 languages**, plus its **3 identity strings (`lpn_main_menu`, `lpn_main_title`,
-    `lpn_main_desc`) in the other 22 languages**. That is 4 agents and a small identity pass, not a
-    26-agent sprint. The payload generator already emits exactly this — `payload_es.json` carries
-    205 delta keys, `payload_zh.json` carries 3 — so the sprint proposal reads itself off the
-    tooling rather than being hand-scoped.
-  - **GATE CLEARED 2026-08-08.** 146.02 — the last named blocker — closed with Task 231, and it
-    closed in the way that costs the sprint nothing: icons went in as *prefixes*, so no `lpn_` key
-    was added, renamed or removed, and the "193-style re-read" it owed has nothing to read. **The
-    only remaining gate is the judgement call 146.06 always really had**: has the feature set
-    settled enough that a translated UI is not a promise of stability we withdraw next week
-    (`project_lpn_scaffold_before_translate`)? That is Tom's call, and it is the same call as
-    dropping PREVIEW.
-  - **Exact size, read off the tooling 2026-08-08** (payloads FRESH): **224 `lpn_` keys × 4
-    languages** (es, pt, fr, tr) = 896 strings, **4 Sonnet agents**. The 3 identity strings are
-    **already translated in all 26 languages**, so there is no identity pass left to run — the
-    non-core payloads carry a delta of 0.
-  - **Dropping PREVIEW is a 27-file edit, not an English one.** The marker is baked into the
-    *translated* values of `lpn_main_menu`, `lpn_main_title` and `lpn_main_desc` in every language
-    ("VORABVERSION", "预览版", "ПРЕДВАРИТЕЛЬНАЯ ВЕРСИЯ"), so removing it means editing 3 keys × 27
-    files and re-baselining the drift manifest. `lpn_preview_banner` (English-only, 0 of 26, used at
-    `Looped-Network.php:8`) is deleted outright. **Order matters: translate first, then drop
-    PREVIEW** — the banner's own text promises "It is in English only for now", so removing the
-    marker before the sprint would leave that promise pointing at an English page.
 - 15|194| **Touch gesture model: one finger scrolls the page, two fingers pan the map (Task 146
   child).** Raised by Tom, 2026-07-31, after the canvas-fills-the-phone lock-up: *"It didn't occur
   to me to try to scroll with two fingers. That's just an idea. It looks like it occurred to you
@@ -1616,6 +1597,54 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|146.06| **[DONE 2026-08-08] Translation sprint for `lpn_` strings (Task 146 child).**
+  `lpn_` is now translated into es, pt, fr and tr — **223 keys × 4 languages**, 4 Sonnet agents,
+  plus 10 non-`lpn_` stragglers the payloads swept up. Sized by the coverage declaration (Tasks
+  203/204): `lpn_` is not a core calculator, so it gets the core languages, and its 3 identity
+  strings were already translated in all 26. **Suite-wide `equal_to_english` is now 0.**
+  - **A pre-sprint check caught the sprint's biggest risk before a single agent was spawned.**
+    `prefixToTermNames()` in `generate_translation_payloads.php` had no `lpn` entry (nor `bpn`), so
+    both fell back to the three default terms and **every network concept seeded in Task 193 —
+    `node`, `link`, `vertex`, `junction`, `reservoir`, `scenario`, `project`, `draw`, `background
+    image`, `demand`, `pump curve`, `pressure rating`, each with a hand-written `avoid` array — was
+    invisible to translation agents.** That seeding was the whole point of 193's glossary work.
+    Fixed in `7c86785`; payloads went from 3 injected terms to 33. **The lesson generalizes: a new
+    calculator prefix needs a `prefixToTermNames()` entry, or its glossary work silently never
+    ships.** Nothing warns you — the generator just uses the default three.
+  - **The trap terms held.** Every language avoided its hyperlink word for `link` (es *enlace*,
+    fr *lien*, tr *bağlantı*), the draw-water sense of `draw`, and the computing sense of `node`.
+    The paired **Reservoir/Tanks** trap — English uses the first for the node type and the second,
+    in `lpn_notes_2_def`, for what `lpn_` deliberately does NOT model — was kept distinct in all
+    four unprompted: es *embalse*/*depósitos*, pt *reservatório*/*tanques*, fr *réservoir*/
+    *réservoirs à niveau variable*.
+  - **Where the languages diverge, they diverge for a reason, and it is recorded.** es splits
+    *nodo* (generic node) from *nudo* (the junction subtype), matching EPANET-Spanish; tr does
+    **not** split, because Turkish water-engineering practice uses *düğüm* for both and
+    disambiguates by context. The tr agent explicitly declined to coin an artificial distinction.
+    Both decisions are now in `glossary.json` rather than waiting to be re-derived next sprint.
+  - **Glossary write-back done before close, as required.** The 12 concepts 193 seeded empty now
+    carry es/pt/fr/tr values and dated notes. Glossary version 1.23 → 1.24.
+  - **Three defects the sprint exposed, all fixed in `19355f2`:**
+    1. **`lpn_notes_4_def` promised "Other languages: this page is in English only for now"** — a
+       sentence this very sprint makes false, and which rendered as *"por ahora esta página está
+       solo en inglés"* on a fully Spanish page. Removed from en and all four; drift manifest
+       re-baselined. **A sprint must re-read the page's own prose for claims the sprint invalidates
+       — the translation agents will faithfully translate a lie.**
+    2. **The glossary's `pressure` and `elevation` entries stored the UPSTREAM label form as the
+       bare concept**, in all 26 languages — `Pression amont`, `Memba basıncı`, `Presión aguas
+       arriba`. The entries' own notes admitted they were "ATTESTED LABEL FORMS of `hw_pressure_up`".
+       Any agent following `preferred_translation` literally puts "upstream" on a generic node
+       label. **The tr agent caught this itself and declined to apply it.** Fixed for the four
+       sprint languages; the other 22 are **Task 235**.
+    3. **tr rendered `lpn_field_id` as "Kimlik" while its own `bpn_id` stayed "ID"** — same concept,
+       same suite, two spellings. Aligned to the incumbent per the label-reuse convention.
+  - **QUALITY scores unchanged at 0.85** for all four, which is the honest tier: AI-translated,
+    back-translation-checked, consistency-checked, never confirmed by a native human. 0.95 needs a
+    review on file and there is none.
+  - **`lpn_` is now clear to deploy** as far as this task is concerned — the hold recorded when
+    PREVIEW came off ahead of the sprint is released. See **Task 236** for the one leftover
+    preview-era sentence that is Tom's call, not a blocker.
 
 - 0|230| **[DONE 2026-08-08] The open-channel velocity verdict stopped citing water hammer.**
   `Manning-Trap.php` and `Manning-Irregular.php` fed the channel high-velocity verdict from
