@@ -1582,6 +1582,14 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
   with a matching `✓ Copied!` confirm state (`lib/Menus.lib.php`), following the existing
   `⬇ Install` / `🌐 English` house style. Glyphs live in the markup, never in `$ec_lang` — a glyph
   baked into a translated value is 27 copies of one decision. No new language keys.
+  **Extended to `lpn_` the same day** (Tom: what he actually meant by the request). One `ICON` map
+  in `js/looped-network.js` feeds the menu bar, every dropdown row, the toolbar and the backdrop
+  select — 31 glyphs, no duplicates, none unused. Menu rows get a *reserved* icon column
+  (`.lpn-menu-icon`) rather than an inline prefix, so a row with no natural glyph still aligns;
+  confirm-dialog rows (Cancel / Break their lock / Close without saving) deliberately take no icon,
+  since they are sentences rather than commands. The five drawing tools map the map — square
+  reservoir, circle junction, line pipe — so the icon teaches the canvas notation instead of
+  decorating it.
   **Icon-only was rejected on the merits:** it saves no translation work (the label text stays
   either way) and spends first-time comprehension, which is the entire audience a web calculator
   exists for. **The pop-up A/B preference poll was rejected too** — it breaks Task 207's "nothing

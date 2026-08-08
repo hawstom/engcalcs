@@ -265,6 +265,14 @@ html[lang="zh"] .ec-welcome {
 .lpn-menu-row { display: block; width: 100%; text-align: left; background: none; border: 0; font: inherit; padding: 4px 12px 4px 8px; cursor: pointer; white-space: nowrap; }
 .lpn-menu-row:hover:enabled { background: #def; }
 .lpn-menu-row:disabled { color: #999; cursor: default; }
+/* Reserved icon column for menu rows (Task 231). Fixed width and always present, even when the
+   row has no glyph, so one iconless row cannot ragged-edge the labels around it. line-height:1
+   keeps a colour emoji from growing the row taller than its text-only neighbours, and the em
+   width means it tracks the font rather than a guessed pixel count. */
+.lpn-menu-icon { display: inline-block; width: 1.5em; line-height: 1; text-align: center; }
+/* A disabled row greys its word; without this the emoji stays fully saturated and the row reads
+   as half-available. Not a filter on the button itself -- that would wash out the hover colour. */
+.lpn-menu-row:disabled .lpn-menu-icon { filter: grayscale(1); opacity: 0.5; }
 /* Backdrop registration wizard (Task 146 Phase 2, ported from the spike): during a Scale/Position
    click sequence, regMode already suppresses real interaction in looped-network.js, but the
    per-element cursor:pointer/move rules would still fire on hover, visually implying "this is
