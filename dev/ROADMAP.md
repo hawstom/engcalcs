@@ -911,24 +911,27 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     phases is in flight avoids building the menu twice — but nothing here blocks on that timing.
 - 5|146.09| **Map insets for congested areas of a drawing (Task 146 child).** Very low priority.
 - 45|146.10| **Draw real element symbols on the map, from the Task 231 icon set (Task 146 child).**
-  Scoped with Tom, 2026-08-08, after the icon set landed. **What the canvas draws today:** a
-  reservoir is a `<circle>` r 2.2 filled `#26a`; a junction is a `<circle>` r 1.6 filled `#2a6`;
-  a pipe is a line `#557`; **a pump has no symbol at all** — it is a *link*, not a node
-  (`looped-network.js:14`), so it renders as a plain line in `#a52`.
-  **The prize is not prettiness.** Reservoir and junction are the same shape, separated only by
-  size and colour — so they are the same mark in a greyscale print and for a red-green colour-blind
-  reader, which is ~8% of men. Distinct silhouettes fix that for everyone at once.
-  `lib/Icons.lib.php` already holds tank, pump, junction and pipe geometry on a 24×24 grid, so the
-  map should read those and not redraw them.
-  **Pump orientation is a real requirement, not a detail (Tom):** ship **mirrored left and right
-  variants** and pick between them so the tail points toward the link's `to` node as drawn, and so
-  the tail always stays on the **map-up (north) side** — never upside down. Choose the variant from
-  the sign of `to.x − from.x`; do **not** rotate the symbol with the pipe angle, which is what
-  produces the upside-down tail on any westward or steeply-rising link.
-  **Non-obvious constraints, all in `looped-network.js`:** `nodeRadius()` feeds the pipe
-  *clear-run* calculation in `segmentMidpoints()` (arrow placement measures from the symbol edge,
-  not the centre), so a non-circular symbol needs a per-type extent, not one radius; the label mask
-  and leader placement, hit-testing, and the zoom-extent bbox all read node geometry too.
+  Scoped with Tom 2026-08-08. **Today the canvas draws** reservoir = `<circle>` r2.2 `#26a`,
+  junction = `<circle>` r1.6 `#2a6`, pipe = line `#557`, and **a pump has no symbol at all** — it
+  is a *link*, not a node (`looped-network.js:14`), so it is just a line in `#a52`.
+  **The prize is not prettiness:** reservoir and junction are the same shape, separated only by
+  size and colour, so they are the same mark in greyscale and to a red-green colour-blind reader
+  (~8% of men). `lib/Icons.lib.php` already holds the geometry — read it, do not redraw it.
+  **Pump orientation.** *An earlier draft here said "do not rotate with the pipe angle"; Tom
+  corrected it and the rule below is verified over all 25 angles at 15° steps, 0 failures.*
+  **Do** rotate, so the discharge points at the `to` node. Rotation is what swings the tail under
+  the casing going west, and the fix is a mirrored variant, not the absence of rotation:
+  - `a = atan2(to.y − from.y, to.x − from.x)`; **always** `rotate(a)`. Then `dx = to.x − from.x`:
+    `dx ≥ 0` draw as-is, `dx < 0` vertically flip (`scale(1,−1)`) first.
+  - Boundary is **vertical** — at `dx = 0` the tail lands horizontal and either variant is right,
+    which is why the test is on `dx`, never `dy`.
+  - **Flip y, not x:** the tail sits at local `−y`, and `rotate(a)` sends that offset to `−cos a`,
+    which is above the casing exactly when `dx ≥ 0`. Negating y restores it for every west angle.
+  - A tail *pointing* up or down is fine; only a tail **below** the casing is wrong.
+  **Constraints, all in `looped-network.js`:** `nodeRadius()` feeds the pipe clear-run in
+  `segmentMidpoints()` (arrows measure from the symbol edge), so a non-circular symbol needs a
+  per-type extent, not one radius. Label mask, leader placement, hit-testing and the zoom-extent
+  bbox all read node geometry too.
 - 20|177| **Link head loss: report the per-length gradient alongside total (Task 146 child).**
   Conventional network software and reports express pipe head loss in TWO forms, not one, because
   they answer different questions: **total head loss** (ft or m across the whole link — what you
