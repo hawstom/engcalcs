@@ -9,6 +9,13 @@
                 "or_notes_3_def"
             ],
             "reason": "URL typo fix (venture->venturi) from Task 227; prose unchanged and the same edit was applied to all 27 files, so no translator is needed"
+        },
+        {
+            "date": "2026-08-08",
+            "keys": [
+                "template_feedback"
+            ],
+            "reason": "Task 205(d) resync complete: all 26 languages rewritten to the current English on 2026-08-08, first-person singular restored"
         }
     ],
     "hashes": {
@@ -516,7 +523,7 @@
         "rc_sketch_radius": "ef7eea16aa4e15baafdcb62e93eb19a432f749cc",
         "rc_sketch_top_crest_curve": "3d5b67639e07087508c70d33c818f4b19772e7a4",
         "rc_yn": "61de4190e97162c99c467e555829c4f406b56ed3",
-        "template_feedback": "b7acdbbd7d80a2506f3202df78173666d3d9277f",
+        "template_feedback": "2ac420d3d188032135ad832aa4147b7ca97a6bed",
         "template_printable_subtitle": "ed172446717fad6d8990c6169f1796e931a3758c",
         "template_printable_title": "595ceee10f8b51d2a11baf28141d435ff342675a",
         "template_translation_help": "2aec76a449af59ae7240a6a8ef5ddca16aa348a8",

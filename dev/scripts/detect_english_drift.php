@@ -242,7 +242,12 @@ if ($mode === '--update-partial') {
         $manifest[$key] = $current[$key];
         echo "re-baselined $key\n";
         echo "  English now: " . preg_replace('/\s+/', ' ', mb_substr((string)$english[$key], 0, 120)) . "\n";
-        echo "  every language file already carries the same URLs — no translator needed.\n";
+        // State what was actually CHECKED, not what it implies. This path serves two different
+        // claims -- "a URL-only edit needs no translator" and "the resync for this key is finished"
+        // -- and the earlier wording asserted the first one in both cases, which was false the
+        // second time it was used (Task 205(d), where 26 translators had just done the work).
+        // The URL check is the only thing the tool verified; the reason is where the human says why.
+        echo "  checked: every language file carries the same URLs as English.\n";
     }
     $notes[] = [
         'date' => date('Y-m-d'),
