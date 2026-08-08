@@ -62,7 +62,7 @@ $ec_lang['menu_main_hydraulics']='जलगतिकी';
 $ec_lang['menu_main_language']='भाषा';
 $ec_lang['menu_more']='अधिक';
 $ec_lang['template_welcome']='दरवाज़े पर अपने डर छोड़ें; यहाँ प्यार हमारी भाषा है। आप सब कुछ बर्बाद नहीं कर रहे। <a target="_blank" href="https://hawsedc.com/download.php">मुफ़्त HawsEDC AutoCAD टूल</a> भी आज़माएँ।';
-$ec_lang['template_feedback']='कृपया सुझाव या प्रशंसा भेजें। क्या यह मुफ़्त कैलकुलेटर आपके काम आया?';
+$ec_lang['template_feedback']='क्या आप इस पृष्ठ की भाषा को बेहतर बना सकते हैं, या कुछ और सुझाव देना चाहेंगे? क्या आप मदद करना चाहते हैं या ऐसे उपकरण बनाना सीखना चाहते हैं? कृपया मुझसे संपर्क करें।';
 $ec_lang['template_printable_title']='प्रिंट करने योग्य शीर्षक';
 $ec_lang['template_printable_subtitle']='प्रिंट करने योग्य उप-शीर्षक';
 $ec_lang['index_title']='मुफ़्त ऑनलाइन इंजीनियरिंग कैलकुलेटर';

@@ -61,7 +61,7 @@ $ec_lang['menu_main_hydraulics']='Hidraulika';
 $ec_lang['menu_main_language']='Bahasa';
 $ec_lang['menu_more']='Lainnya';
 $ec_lang['template_welcome']='Buang rasa takutmu di pintu; di sini cinta adalah bahasa kami. Kamu tidak merusak segalanya. Nikmati juga <a target="_blank" href="https://hawsedc.com/download.php">alat AutoCAD HawsEDC gratis</a>.';
-$ec_lang['template_feedback']='Silakan kirim saran atau pujian. Apakah kalkulator gratis ini bermanfaat bagi Anda?';
+$ec_lang['template_feedback']='Bisakah Anda menyarankan kata-kata yang lebih baik untuk halaman ini, atau ada hal lain yang bisa diperbaiki? Apakah Anda ingin membantu, atau belajar membuat alat seperti ini? Silakan hubungi saya.';
 $ec_lang['template_printable_title']='Judul Cetak';
 $ec_lang['template_printable_subtitle']='Subjudul Cetak';
 $ec_lang['index_title']='Kalkulator Teknik Gratis Daring';
