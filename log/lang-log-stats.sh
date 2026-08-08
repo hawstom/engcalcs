@@ -66,6 +66,14 @@
 #      send. This answers the only question the suite's mission actually cares about: are people
 #      not clicking the invitation, or clicking it and then not writing?
 #
+#   5. engcalcs-title.log — NAMED CALCULATION (ROADMAP Task 215). Written by log-title-event.php
+#      from EngCalcs.maybeLogTitleEvent() when a visitor types a Printable Title or Subtitle.
+#      The four usual columns plus a fifth, 'title' or 'subtitle'. Deduped per (session, page,
+#      field); the text typed is never sent or stored. No dwell gate, unlike the two beacons
+#      above — typing into a text field is already the human proof their 10s timer stands in for.
+#      This answers the question closest to the suite's reason for existing: how many people
+#      intend to put a result in front of another human?
+#
 # WHY ALL THREE LOGS: engcalcs-lang.log can't tell you which visits were bots vs. bounces vs.
 # real usage; engcalcs-human-view.log can't tell you who actually got value out of the page vs.
 # who just looked and left; engcalcs-calc-usage.log can't tell you about visitors who left before
@@ -80,6 +88,9 @@ USAGE_LOG="$(dirname "$0")/engcalcs-calc-usage.log"
 # 'contact', and successful sends are written server-side by formmail.php. Two numbers, reported
 # together in their own section below, because the ratio between them is the whole point.
 SEND_LOG="$(dirname "$0")/engcalcs-contact-send.log"
+# Named calculations (ROADMAP Task 215): someone typed a Printable Title or Subtitle, i.e. told us
+# they mean to show this to another person. Reported in its own section below.
+TITLE_LOG="$(dirname "$0")/engcalcs-title.log"
 
 if [ ! -f "$LOG" ]; then
     echo "Log file not found: $LOG"
@@ -112,6 +123,9 @@ print_footer() {
     fi
     if [ -f "$SEND_LOG" ]; then
         printf "    %-34s %12s  %s\n" "$(basename "$SEND_LOG")" "$(wc -l < "$SEND_LOG")" "$(head -1 "$SEND_LOG" | awk -F'\t' '{print $1}')"
+    fi
+    if [ -f "$TITLE_LOG" ]; then
+        printf "    %-34s %12s  %s\n" "$(basename "$TITLE_LOG")" "$(wc -l < "$TITLE_LOG")" "$(head -1 "$TITLE_LOG" | awk -F'\t' '{print $1}')"
     fi
     echo ""
 }
@@ -220,6 +234,58 @@ if [ -f "$SEND_LOG" ]; then
     echo ""
     echo "--- Most recent 10 sends ---"
     tail -10 "$SEND_LOG"
+fi
+
+echo ""
+echo "========================================="
+echo " Named calculations: somebody meant to show this to another person"
+echo "========================================="
+echo "    Written when a visitor types a Printable Title or Subtitle. Of everything counted in this"
+echo "    report this is the strongest signal and the closest to why the suite exists: a page view"
+echo "    says they looked, a calc event says they got an answer, and a typed title says they intend"
+echo "    to put the result in front of somebody else."
+echo "    title    = named a calculation at all."
+echo "    subtitle = also added a subtitle, i.e. building a document rather than labelling a scratch"
+echo "               calculation. Counted separately for exactly that reason."
+echo "    Deduped once per (session, page, field). The text typed is never logged."
+echo ""
+if [ -f "$TITLE_LOG" ]; then
+    TITLES=$(awk -F'\t' '$5 == "title"' "$TITLE_LOG" | wc -l)
+    SUBTITLES=$(awk -F'\t' '$5 == "subtitle"' "$TITLE_LOG" | wc -l)
+    printf "    %-28s %10d\n" "titles" "$TITLES"
+    printf "    %-28s %10d\n" "subtitles" "$SUBTITLES"
+    if [ -f "$USAGE_LOG" ] && [ "$(wc -l < "$USAGE_LOG")" -gt 0 ]; then
+        echo ""
+        echo "--- Named per confirmed calculation, by page ---"
+        echo "    Of the people who got an answer on this page, how many cared enough to name it."
+        echo "    Both counts are deduped per (session, page), so they are the same kind of number."
+        echo "    Same small-sample caution as everywhere else here: under about 40 calculations the"
+        echo "    ratio is noise, and a page with a handful of rows cannot support a decision."
+        echo ""
+        {
+            awk -F'\t' '$5 == "title" {print $2"\tnamed"}' "$TITLE_LOG"
+            awk -F'\t' '{print $2"\tcalc"}' "$USAGE_LOG"
+        } | awk -F'\t' '
+            { if ($2 == "named") n[$1]++; else c[$1]++; seen[$1] = 1 }
+            END { for (p in seen) printf "%d\t%s\t%d\n", (p in c ? c[p] : 0), p, (p in n ? n[p] : 0) }
+        ' | sort -rn | awk -F'\t' '
+            !hdr { printf "    %-28s %10s %10s %10s\n", "page", "calcs", "named", "%named"; hdr = 1 }
+            { printf "    %-28s %10d %10d %9s%%\n", $2, $1, $3, ($1 > 0 ? sprintf("%.1f", 100*$3/$1) : "-") }'
+    fi
+    echo ""
+    echo "--- Named calculations by page ---"
+    awk -F'\t' '{print $2}' "$TITLE_LOG" | sort | uniq -c | sort -rn
+    echo ""
+    echo "--- Named calculations by served language ---"
+    awk -F'\t' '{print ($3 == "" ? "(none)" : $3)}' "$TITLE_LOG" | sort | uniq -c | sort -rn
+    echo ""
+    echo "--- Most recent 10 named calculations ---"
+    tail -10 "$TITLE_LOG"
+else
+    echo "    (no named-calculation log yet: $TITLE_LOG)"
+    echo "    Nobody has typed a Printable Title since this began logging -- or nobody has yet since"
+    echo "    the feature shipped. Check the coverage dates in the footer before reading anything"
+    echo "    into it."
 fi
 
 if [ ! -f "$USAGE_LOG" ]; then

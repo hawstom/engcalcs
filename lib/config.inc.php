@@ -79,9 +79,24 @@ define('HUMAN_VIEW_LOG', dirname(__DIR__) . '/log/engcalcs-human-view.log');
 // Run log/lang-log-stats.sh to analyze.
 define('CONTACT_SEND_LOG', dirname(__DIR__) . '/log/engcalcs-contact-send.log');
 
+// Named-calculation log (ROADMAP Task 215) — the closest instrument this suite can build to its
+// own mission. Written by log-title-event.php from EngCalcs.maybeLogTitleEvent()
+// (js/Calculators.lib.js) when a visitor actually types a Printable Title or Subtitle. Somebody
+// who names a calculation is telling us they mean to put it in front of another human, which is
+// the one behavior the suite exists to produce and the one no other counter here approximates:
+// CALC_USAGE_LOG says they got an answer, this says they intend to pass it on.
+// Each line: ISO-8601 UTC timestamp TAB page-basename TAB served-lang TAB raw-Accept-Language TAB field
+// The fifth column is 'title' or 'subtitle'. Both are logged because they are different acts:
+// a title labels a scratch calculation, a subtitle as well means someone is building a document.
+// Deduped once per (session, page, field), so editing a title five times counts once.
+// Run log/lang-log-stats.sh to analyze.
+define('TITLE_LOG', dirname(__DIR__) . '/log/engcalcs-title.log');
+
 // ---- Author/tester opt-out from the usage logs (ROADMAP Task 210) ----
-// Visit any page with ?ec_nolog=1 once per browser to stop that browser being counted by ALL FOUR
-// log writers (LANG_LOG, CALC_USAGE_LOG, HUMAN_VIEW_LOG, CONTACT_SEND_LOG); ?ec_nolog=0 undoes it.
+// Visit any page with ?ec_nolog=1 once per browser to stop that browser being counted by EVERY log
+// writer -- LANG_LOG, CALC_USAGE_LOG, HUMAN_VIEW_LOG, CONTACT_SEND_LOG and TITLE_LOG;
+// ?ec_nolog=0 undoes it. A new writer joins that list by calling ecLoggingOptedOut(), and every one
+// of them must: an opt-out with an exception in it is not an opt-out.
 // Deliberately an opt-out AT WRITE TIME rather than a filter applied afterwards. The logs carry no
 // IP and no session id, so "that looks like the author exercising many calculators and languages"
 // is a guess -- it cannot be applied to data already written, and it would also throw away real

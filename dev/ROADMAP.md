@@ -147,6 +147,22 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   **no new translation** — the unit sets already exist and defaults are numbers — making it the
   cheapest testable change on the board. Do not ship it before the export; per-page default divergence
   is a real cost and (e) could argue against it.
+- 50|228| **A share affordance at the moment someone names a calculation.** Extracted from Task 215
+  when it closed 2026-08-08 — 215 built the *measurement*; this is the unbuilt feature that
+  measurement was always pointing at.
+  - **The moment someone types a Printable Title is the moment they intend to share.** A "copy a
+    link to this calculation" control *there* — attached to something the user already wants — is a
+    share mechanism that costs them nothing and needs no plea. It connects to Task 175 (printable)
+    and is where the share question from Task 218 lands.
+  - **Contrast a footer "tell a colleague" line**, which arrives at a moment of no intent and would
+    re-fragment the single invitation Task 205 just consolidated. That is the design this replaces,
+    not a fallback for it.
+  - **Now measurable before and after.** Task 206 (contact funnel) and Task 215 (named calculations)
+    both ship with baselines from 2026-08-08, so this can be attributed instead of argued about —
+    which was the stated reason for sequencing it behind them. Give it a clear window of its own
+    rather than landing it alongside another change.
+  - `EngCalcs.updateUrl()` already maintains a shareable URL, so the mechanism is largely present;
+    what is missing is the affordance, its placement, and one honest measure of whether it gets used.
 - 50|207| **The dilettante path: make replying cost one tap, not five steps.** Scoped with Tom
   2026-08-03, after Task 205 optimized the invitation's wording and placement twice and neither
   addressed the actual constraint. Tom's framing: *"Cost and fun of reaching out; harnessing
@@ -1079,29 +1095,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     centre is Notion and did not scrape; only Spanish was confirmed.
   - Consequence: raised 146.06 to 90 and 220 to 95.
 
-- 80|215| **Log the Title/Subtitle milestone — the closest instrument we can build to the mission.**
-  Raised by Tom, 2026-08-05: *"How many people are adding Title and Subtitle? This is a major
-  milestone that indicates they are sharing the calculation in a report or message."* Agreed, and it
-  is the highest value ÷ effort item on the stats list. Nothing currently sees it. A person who
-  titles a calculation is telling us they intend to put it in front of another human, which is the
-  one behavior this suite exists to produce and the only one no other counter approximates.
-  - **Design correction — do NOT put a flag on the calc event.** `maybeLogCalcUsage()` has a
-    per-page-load dedupe, and a title is almost always typed *after* the first calculation, so the
-    flag would read zero nearly always. It needs its own one-shot beacon fired from the `onchange`
-    of `printable_title` / `printable_subtitle` (`lib/Calculators.lib.php:205-206`), which already
-    call `EngCalcs.submitForm()`. Roughly 15 lines, same beacon pattern as the other two writers,
-    and it must honour `ecLoggingOptedOut()` (Task 210) like they do.
-  - **Record which of the two fields, and the page.** Title-only vs title-and-subtitle is a real
-    distinction — the second is someone building a document, not labelling a scratch calculation.
-  - **This is also where the share question from Task 218 lands.** The moment someone types a title
-    is the moment they intend to share. A "copy a link to this calculation" affordance *there* —
-    attached to something they already want — is a share mechanism that costs the user nothing and
-    needs no plea, and it connects to Task 175 (printable). Contrast a footer "tell a colleague"
-    line, which arrives at a moment of no intent and would re-fragment the single invitation Task 205
-    just consolidated. **Sequence any share affordance behind Task 206** (shipped 2026-08-07), so it
-    can be attributed against the contact funnel's baseline rather than landing in the same window
-    as another change.
-
 - 30|217| **A suite-owned, multilingual Manning's n table, built from primary sources.** Raised by
   Tom, 2026-08-05, and accepted as mid-priority with a caution: *"No collision, but I am not into
   ownership/maintenance. If there is any viable way to outsource, I prefer it. But if we can add
@@ -1628,6 +1621,46 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|215| **[DONE 2026-08-08] The Title/Subtitle milestone is logged — the closest instrument this
+  suite can build to its own mission.** Asked for by Tom, 2026-08-05: *"How many people are adding
+  Title and Subtitle? This is a major milestone that indicates they are sharing the calculation in a
+  report or message."* Nothing saw it before. A page view says someone looked, a calc event says
+  they got an answer; a typed title says they mean to put the result in front of another human,
+  which is the one behavior this suite exists to produce.
+  - **Its own one-shot beacon, not a flag on the calc event** — the design correction that was
+    already recorded here, and it held up: `maybeLogCalcUsage()` dedupes per page load and a title
+    is nearly always typed *after* the first calculation, so a flag there would have read zero
+    almost every time. `EngCalcs.maybeLogTitleEvent()` → `log-title-event.php` → `TITLE_LOG`
+    (`log/engcalcs-title.log`), honouring `ecLoggingOptedOut()` (Task 210) like every other writer.
+  - **Both fields, recorded separately.** A title labels a scratch calculation; a subtitle as well
+    means someone is building a document. The fifth log column is a closed vocabulary
+    (`title`/`subtitle`) — anything else is a 400 rather than a quietly widened log.
+  - **The typed text is never sent and never stored.** What the calculation is *called* is the
+    user's business; that they named one is ours. The harness asserts this as a standing property,
+    because a regression here is a privacy defect rather than a metrics one.
+  - **Bound in JS on the `change` event, not in the inputs' `onchange` attributes.** Two
+    consequences that are the whole reason for the choice: a value restored programmatically from a
+    cookie or a shared URL fires nothing at all (restoring a saved title is not a person deciding to
+    name something, and `input` would have counted every returning visitor), and it works on any
+    page carrying those ids, including the JS-built ones.
+  - **No 10s dwell gate**, unlike the other two beacons. Those gate on time because a bot can trip a
+    page load or a calculation; typing into a text field is already the human proof that timer is a
+    proxy for.
+  - **Verified without a browser pass**, per the standing preference: `dev/lpn-spike/
+    title-beacon-harness.js` drives the real `js/Calculators.lib.js` against a DOM stub over **both**
+    transports (`fetch` and the `sendBeacon` fallback — a beacon that works on only one silently
+    under-reports on the other). Mutation-tested three ways: removing the empty-value guard,
+    removing the dedupe, and leaking the typed text each make it fail. Endpoint tested directly for
+    dedupe, the 400s, and the opt-out; the report section against populated and empty fixtures.
+    - **One trap worth keeping for the next harness:** Node 21+ ships a **read-only** built-in
+      `navigator`, so `global.navigator = {...}` is silently ignored and every beacon vanishes into
+      a stub that was never installed — which reads exactly like the feature being broken.
+      `Object.defineProperty` is required. Cost an hour before the harness was believable.
+  - **Reported by `log/lang-log-stats.sh`**: titles, subtitles, a named-per-confirmed-calculation
+    ratio by page (both counts deduped per session+page, so they are the same kind of number), and
+    breakdowns by page and language — carrying the same under-40-is-noise caution as the rest of the
+    report.
 
 - 0|227| **[DONE 2026-08-08] `prod_smoke.php --links` now follows the links our pages emit, not just
   that the pages answer.** Written the same day as Task 226, whose six-week 404 nothing in the repo

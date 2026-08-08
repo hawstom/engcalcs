@@ -271,6 +271,45 @@ document.addEventListener('DOMContentLoaded', function () {
 	EngCalcs.maybeLogHumanView();
 });
 
+// Logs one "somebody named this calculation" event (see log-title-event.php) -- ROADMAP Task 215.
+// The strongest signal the suite can collect: a page view says they looked, a calc event says they
+// got an answer, and a typed title says they mean to put it in front of another person.
+//
+// Only ever the FACT that a field was filled, never its text. What the calculation is called is
+// the user's business.
+//
+// No 10s dwell gate, unlike the other two beacons: those gate on time because a bot can trip a
+// page load or a calculation, whereas typing into a text field is already the human proof the
+// timer is a proxy for. Deduped per page load here, and per (session, page, field) server-side.
+EngCalcs._titleLogged = {};
+EngCalcs.maybeLogTitleEvent = function (field) {
+	'use strict';
+	if (this._titleLogged[field]) return;
+	this._titleLogged[field] = true;
+	this._sendOrQueue('/engcalcs/log-title-event.php', {
+		page: this.cookieName || '',
+		lang: document.documentElement.lang || '',
+		field: field
+	});
+};
+// Bound here rather than in the inputs' onchange attributes (lib/Calculators.lib.php) so this
+// works on any page carrying those ids, including the JS-built ones, and so the markup keeps one
+// job. 'change' rather than 'input': it fires on blur once the value actually differs, so a
+// half-typed word is not an event -- and, importantly, a value restored programmatically from the
+// cookie or a shared URL fires nothing at all, which is correct. Restoring a saved title is not a
+// person deciding to name something.
+document.addEventListener('DOMContentLoaded', function () {
+	['title', 'subtitle'].forEach(function (field) {
+		var el = document.getElementById(field === 'title' ? 'printable_title' : 'printable_subtitle');
+		if (!el) return;
+		el.addEventListener('change', function () {
+			// Clearing a title is not naming one.
+			if (el.value.trim() === '') return;
+			EngCalcs.maybeLogTitleEvent(field);
+		});
+	});
+});
+
 EngCalcs.updateUrl = function () {
 	'use strict';
 	var params = new URLSearchParams();
