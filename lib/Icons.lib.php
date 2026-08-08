@@ -76,12 +76,17 @@ $ec_icons = array(
 	// "water container" without being told. EPANET's downward triangle scales smaller but has to
 	// be learned first; that trade goes the other way on a page whose whole audience is new.
 	'reservoir'  => '<path d="M6 9h12v11H6z" fill="currentColor" stroke="none" opacity=".18"/><path d="M6 4v16h12V4"/><path d="M6 9h12"/>',
-	// Circle with a tangent discharge tail, per the same sketch. The tail meets the casing at the
-	// top tangent point, which is what makes it read as a pump rather than as a magnifier.
-	// SHORT tail, on Tom's second sketch, 2026-08-08: "the pump tail can be short, almost like the
-	// digit 6, and still look okay." He is right, and short is strictly better here — a long tail
-	// pushed the casing off-centre and shrank it, and the casing is the half that carries meaning.
-	'pump'       => '<circle cx="11" cy="13.5" r="6.5"/><path d="M12 7h6V3.5h-6"/>',
+	// Casing plus a short discharge tail leaving it on the top tangent — the tangency is what makes
+	// this read as a pump rather than as a magnifier.
+	//
+	// Three passes, and the last one is the lesson (Tom, 2026-08-08). First a long tail: it pushed
+	// the casing off-centre and shrank it, and the casing is the half that carries the meaning.
+	// Then a short one, but drawn as a box turning upward — "the arrowhead is too much to fit.
+	// It's like a 6, but with a horizontal tail, not upward." He is right on both counts: at 15px
+	// the box's two extra corners collapsed into a blob, and the outlet on a pump runs ACROSS, not
+	// up. So the tail is now one horizontal line off the top of the casing and nothing else. It
+	// survives being small, which the box did not, and it is the whole symbol his office draws.
+	'pump'       => '<circle cx="10" cy="14.5" r="6.5"/><path d="M10 8h8"/>',
 	// Solid, because a junction is a node and the canvas draws it solid.
 	'junction'   => '<circle cx="12" cy="12" r="4.5" fill="currentColor" stroke="none"/>',
 	// A run between two nodes — the thing you are actually about to place.
