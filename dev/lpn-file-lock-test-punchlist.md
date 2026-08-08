@@ -121,6 +121,27 @@ automated can test it)*
       does here, so the runner now TESTS this box instead of skipping it (§10, five checks,
       mutation-confirmed). **One more retest, and I think this one is real: after pulling, expect the
       amber banner, the asterisk still lit, and NO new file at the old name.**]
+     [TGH: It saves silently to a new file.]
+      [CC 2026-08-06 (3): **Guard tightened, and then I need one fact from you rather than a fourth
+      guess.** The rule is now flat: **Save must never CREATE a file.** You chose that file in a
+      picker once; if it cannot be read when you press Save, it is not there, and writing anyway
+      invents a file in a folder you moved it out of. Creating files is Save AS's job, and Save as
+      asks. (It no longer depends on having a baseline stamp — a missing baseline is a reason to be
+      more careful, not less, and tying the guard to one left exactly the hole this symptom kept
+      coming back through.)
+
+      **But that only helps if `getFile()` actually fails on your machine, and your last result says
+      it may not.** Two questions, and the second is one line:
+
+      1. After the move, does a file reappear at the **old** name/location, or does the file at the
+         **new** location get updated? (i.e. is Chrome following your file, or recreating it?)
+      2. In DevTools → Console on that page, paste:
+         `JSON.parse(localStorage.lpn_index).projects.map(p=>[p.name,p.fileName,p.fileStamp])`
+         and send the output. If `fileStamp` is missing for that project, the fault is upstream of
+         everything above and I have been fixing the wrong end.
+
+      I would rather ask than ship a fourth speculative fix at you.]
+
 **H5. The words, which only a person can judge**
 - [x] Have a colleague — or a second Chrome profile — hold the file, then open it. The first line of
       the dialog should now carry **a number**: "…the last edit was 20 minutes ago, 5 minutes after

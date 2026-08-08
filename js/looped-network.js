@@ -2511,13 +2511,21 @@ var EngCalcs = EngCalcs || {};
 	// second copy of their project sitting where the first one used to be. (OPFS behaves the same
 	// way, which is why the browser pass can now test this instead of skipping it.)
 	//
-	// The only thing that knows better is the BASELINE. If we have a stamp for this project, we have
-	// read that file before; if it cannot be read now, it is gone — not "unanswerable". That is the
-	// one case where a failure to read must NOT fail open, and it is the difference between the two
-	// questions this pair asks: `fileChangedUnderneath` is "is this still the same file?", and this
-	// is "is there a file here at all?".
+	// **SAVE MUST NEVER CREATE A FILE.** That is the rule, and it is simpler and stronger than the
+	// baseline test this started as (2026-08-06, third report of the same symptom: *"It saves silently
+	// to a new file."*). The user chose this file in a picker once; if it cannot be read now, it is
+	// not there, and writing anyway invents a file in a folder they moved it out of. Creating files is
+	// Save AS's job, and Save as asks.
+	//
+	// Deliberately independent of `knownStamp()`: a missing baseline is a reason to be MORE careful,
+	// not less, and tying the guard to one left exactly the hole the symptom kept coming back through.
+	// A transient read error therefore refuses a save — with a banner and a picker to fix it — which
+	// is the right way round for a page whose worst failure mode is believing it has saved.
+	//
+	// The pair asks two different questions: `fileChangedUnderneath` is "is this still the same
+	// file?", and this is "is there a file here at all?".
 	async function fileVanished(id, handle) {
-		if (!knownStamp(id) || !handle || !handle.getFile) { return false; }
+		if (!handle || !handle.getFile) { return false; }
 		try { await handle.getFile(); return false; }
 		catch (err) { return true; }
 	}
