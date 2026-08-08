@@ -70,6 +70,33 @@ exports.run = async function ({ browser, report }) {
 		report.ok(await b.currentTabDirty(), 'B can still edit anything it likes — only the file is off limits');
 		report.eq(b.errors.length, 0, 'and editing read-only raises no errors');
 
+		// Read-only edits are ordinary browser edits: they live in localStorage like any other
+		// project, and only the FILE is off limits. Switching away and back must not lose them, and
+		// must not quietly promote the tab out of read-only either.
+		const roTabs = await b.tabs();
+		const roTab = roTabs.find(t => t.current);
+		const otherTab = roTabs.find(t => !t.current);
+		if (otherTab) {
+			await b.page.evaluate((label) => {
+				const el = Array.from(document.querySelectorAll('#lpn_tabs .lpn-tab-name'))
+					.find(x => x.textContent === label);
+				if (el) { el.click(); }
+			}, otherTab.label);
+			await b.settle(400);
+			await b.page.evaluate((label) => {
+				const el = Array.from(document.querySelectorAll('#lpn_tabs .lpn-tab-name'))
+					.find(x => x.textContent === label);
+				if (el) { el.click(); }
+			}, roTab.label);
+			await b.settle(400);
+			report.ok(await b.currentTabDirty(), 'read-only edits survive a trip to another tab and back');
+			const stillRO = await b.banner();
+			report.ok(stillRO && /Read-only/.test(stillRO.text || ''),
+				'and the tab is still read-only — nothing promotes it behind your back');
+			const rows2 = await b.menuRows('file');
+			report.ok((rows2.find(r => r.label === 'Save') || {}).disabled, 'Save still disabled after the round trip');
+		}
+
 		// A must be unaffected by any of that.
 		await share.from(b);   // nothing of B's should have reached the file
 		report.eq(share.files.get(FILE), await a.readFile(FILE), 'B has written nothing to A\'s file');

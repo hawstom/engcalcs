@@ -68,7 +68,17 @@ exports.run = async function ({ browser, report }) {
 			'and says the file could not be written', b2 ? (b2.text || '').slice(0, 90) : '');
 		report.ok(b2 && (b2.buttons || []).includes('Choose the file again'), 'and offers the way back');
 		report.ok(await a.currentTabDirty(), 'the tab keeps its asterisk — the work is NOT in a file');
+
+		// The way back out, which is the half of §10 that was never testable before: the banner's
+		// button is a picker, and choosing a file must make saving work again.
 		await a.sabotageWrites(false);
+		await a.queuePick('Relinked-lpn-hawsedc-engcalcs.json');
+		await a.bannerClick('Choose the file again');
+		await a.settle(500);
+		report.ok(!!(await a.readFile('Relinked-lpn-hawsedc-engcalcs.json')),
+			'"Choose the file again" picks a file and the save lands there');
+		report.ok(await a.banner() === null, 'and the banner clears');
+		report.ok(!(await a.currentTabDirty()), 'and the asterisk goes out, honestly this time');
 
 		report.eq(a.errors.length, 0, 'no uncaught JavaScript');
 	} finally {

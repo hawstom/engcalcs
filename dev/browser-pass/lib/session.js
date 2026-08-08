@@ -202,6 +202,16 @@ class Session {
 	async unblockBroker() {
 		await this.page.unroute('**/lpn-lock.php');
 	}
+	// A server that ANSWERS a fault reads completely differently from one that is not there, and only
+	// one of the two is somebody's to go and fix. This makes the broker reply with a real error body
+	// rather than vanish — the distinction the page was flattening until 2026-08-05.
+	async brokerReplies(status, body) {
+		await this.page.route('**/lpn-lock.php', (route) => route.fulfill({
+			status,
+			contentType: 'application/json',
+			body: JSON.stringify(body)
+		}));
+	}
 
 	// ---- editing the network ----------------------------------------------
 	// Enough of a change to make the project dirty and worth saving, without depending on the map's

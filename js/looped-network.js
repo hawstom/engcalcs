@@ -2533,6 +2533,18 @@ var EngCalcs = EngCalcs || {};
 					lockUnavailable = false;
 					setLockUnavailable(false);
 				}
+				// **The onset was missing, only the recovery was here** (found by the browser pass,
+				// 2026-08-06). This block would clear the "locking is not working" banner when the
+				// broker came back, but nothing raised it when the broker went away DURING a session
+				// -- so a Save that could not check the lock went through in silence, at the exact
+				// moment the risk is real: writing to a shared file with nothing coordinating you.
+				// The write itself is still allowed (the freshness check is the guarantee, not the
+				// lock), but it must not be quiet about it.
+				if (!lockNow || !lockNow.ok) {
+					lockErrorCode = (lockNow && lockNow.error) || '';
+					lockUnavailable = true;
+					setLockUnavailable(true);
+				}
 				if (lockNow && lockNow.ok && !lockNow.held) {
 					// Somebody else has it now. Abort rather than clobber their file. The work is not
 					// lost -- localStorage has every edit -- and the banner says so.

@@ -3,7 +3,7 @@
 ```
 cd dev/browser-pass
 npm install          # once — playwright-core; the Chromium binary is already cached
-node run.js          # everything
+node run.js          # everything — 131 checks, about a minute
 node run.js locking  # one section
 ```
 
@@ -53,26 +53,43 @@ OPFS is per-profile, so the runner plays the network share: `share.from(A)` then
 literally *"A saved it, B opened it"*. It writes only what actually differs — pushing identical bytes
 would advance the file's modified time and trip the very freshness check these checks are about.
 
-## What stays on the human list
+## What is left for Tom — one box
 
-**It is written out as steps, not as section numbers**, at the top of
-`dev/lpn-file-lock-test-punchlist.md` — see **§H, "THE HUMAN LIST"**: fifteen boxes, one browser,
-about twenty minutes, in value order so it can be stopped anywhere. What follows here is why each
-one cannot be automated.
+As of 2026-08-06, after the §H pass and the specs it produced, the honest answer is **one retest**:
+
+- **§H4 / §10 — a file moved or renamed in Explorer.** Save it, move the file, edit, press Save.
+  Expect an **amber banner** and **Choose the file again**, and the asterisk to stay lit. Tom found
+  this reported as a successful save twice; the fix (read the file back after writing and compare its
+  size) is in, and only a real folder can prove it — OPFS recreates a deleted file through its old
+  handle, so the runner cannot produce the condition at all. It reproduces the page's *answer* by
+  handing it a handle whose writes are discarded, which is not the same thing as proving what Chrome
+  does to a real Explorer rename.
+
+Everything else in `dev/lpn-file-lock-test-punchlist.md` is now `[x]` or `[auto]`, and its remaining
+empty boxes are in the **Appendix**, which is history and is never to be worked.
+
+**Worth a glance next time you are in there anyway, but nothing is waiting on them:**
+
+- The tip wording on **Save as…** in a real Firefox (§11). The runner takes that branch by deleting
+  `showSaveFilePicker` — the one property the page tests — so the behaviour is covered; the tip's
+  prose in a real Firefox is not.
+- The 60-second poll that clears the lock banner when the broker comes back (§9). Automating it costs
+  a minute per run to prove one line, which is the wrong trade.
+- **"1 minutes ago"** in the lock dialog — known, and deliberately left until the `lpn_` translation
+  sprint, when three singular forms would otherwise become 78.
+
+## Why the rest cannot be automated
 
 - **§1 the native picker's user-activation handshake.** The training panel exists precisely because
-  `showSaveFilePicker()` needs a live activation and Chrome's expires in seconds. A stub needs none.
-  The pass proves the panel appears, gates the picker, and reaches it — not that Chrome agrees.
+  `showSaveFilePicker()` needs a live activation and Chrome's expires in seconds. A stub needs none,
+  so the runner proves the panel appears, gates the picker, and reaches it — not that Chrome agrees.
+  **Tom passed this by hand on 2026-08-06**, which is the single most valuable box in the file.
 - **§6/§8 a permission that is `prompt` or `denied`.** OPFS is always `granted`, so the silent
-  reconnect is covered and the dormant-grant revival on first gesture is not.
-- **§10 a file that has gone missing.** OPFS recreates a deleted file through its old handle, so the
-  failure this tests cannot occur here. A real folder throws, which is the branch that warns. *(The
-  page's answer to a write that goes nowhere IS covered — by handing it a handle whose writes are
-  discarded. What is not covered is which of those two things a real Explorer rename produces.)*
-- **§11 Firefox and Safari's own rendering.** The BRANCH is covered: the page decides on
-  `typeof window.showSaveFilePicker`, so a Chromium with that one property removed takes exactly the
-  same path, and the spec drives it.
-- **Anything visual**: banner colours, the Save-all flicker, the stray scrollbar, print layout.
+  reconnect is covered and the dormant-grant revival on first gesture is not. **Passed by hand,
+  2026-08-06**, using Chrome's Site settings → File editing → **Block**.
+- **§10 a real folder.** As above.
+- **§11 Firefox and Safari's own rendering.** The BRANCH is covered; the pixels are not.
+- **Anything visual**: banner colours, the Save-all flicker, print layout.
 
 ## Adding a check
 

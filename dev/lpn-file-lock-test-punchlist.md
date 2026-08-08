@@ -19,7 +19,7 @@ Everything in Task 195 was verified only by harnesses against sliced-out logic; 
 has ever been seen rendered.** This list exists because that is the whole risk.
 
 > **AUTOMATED 2026-08-06 — run `node dev/browser-pass/run.js` BEFORE reading any further.**
-> 89 checks over two real browser profiles against the real lock broker, in about twenty seconds.
+> 131 checks over two real browser profiles against the real lock broker, in about a minute.
 > It covers most of §2–§8 and §12 mechanically. **What is left for a human is short and is listed in
 > `dev/browser-pass/README.md`**: §1's native picker handshake, a permission that is genuinely
 > `prompt`/`denied`, §10 (a real folder, not OPFS), §11 Firefox/Safari, and anything visual. Boxes
@@ -43,8 +43,11 @@ Scope: what is **on production now** — the server-broker version.
 ## H. THE HUMAN LIST — the whole of what needs Tom
 
 Everything else in §2–§8 and §12 is `node dev/browser-pass/run.js`, run before you are asked to look
-at anything. **This section is the entire ask.** Fifteen boxes, one browser, maybe twenty minutes.
-Work down it — it is in value order, and you can stop anywhere and still have told us something.
+at anything. **This section is the entire ask.**
+
+**RUN 2026-08-06 — H1, H2, H3, H5, H6 and H7 all passed or produced fixes; see the notes in place.
+Exactly ONE box is still open: H4.** Everything else in this file is `[x]` or `[auto]`, and the only
+other empty boxes are in the Appendix, which is history and is never to be worked.
 
 Setup: Chrome, a normal profile, `https://hawsedc.com/engcalcs/Looped-Network.php`, and visit once
 with `?ec_nolog=1` first. A real folder you can see in Explorer — Documents is fine.
@@ -67,28 +70,33 @@ automated can test it)*
       a FAIL.
 
 **H3. A connection that really is lost** *(§5/§8 — cannot be produced without Chrome's own settings)*
-- [ ] Chrome → ⋮ → **Settings → Privacy and security → Site settings → hawsedc.com → File editing →
-      Remove**. Reload the page.
+- [x] Chrome → ⋮ → **Settings → Privacy and security → Site settings → hawsedc.com → File editing →
+      Block** (Chrome offers Block, not Remove). Reload the page.
       [TGH: Can't really remove. Can only "Block".]
       [CC 2026-08-06: My recipe was wrong — Chrome's File editing row offers **Block**, not Remove.
       Block is the better test anyway: it is `denied`, the branch that drops the handle for good.]
-- [ ] The banner should say the connection to *that file* was **lost** and offer **Choose the file
-      again**. *(The old wording — "a browser does not stay connected to a file after the page is
+- [x] The banner should say the connection to *that file* was **lost** and offer **Choose the file
+      again** — OR, as Tom saw with Block, the browser's own request to reconnect, which is the same
+      pass. *(The old wording — "a browser does not stay connected to a file after the page is
       reloaded" — is now itself a FAIL.)*
       [TGH: Since it was blocked, not removed, it merely asks for permission to reconnect. I'm not sure what you are looking for, but to my naive eyes, everything looks good.]
       [CC 2026-08-06: **That IS the pass**, and it is worth naming what you saw: the browser asking
       for permission to reconnect is Task 212 working — the handle survived, only the grant went. The
       FAIL I was watching for is the old sentence telling you to Save as or go and find the file
       again, which is the state where the handle itself was lost. You did not get it. H3 is green.]
-- [ ] Press it, pick the same file → connected, banner gone, Save works.
-- [ ] Instead of that button, try **File → Open…** on the same file → it reconnects **that tab** and
-      does **not** add a second one.
+- [x] **[auto]** Press it, pick the same file → connected, banner gone, Save works. *(Runner §10:
+      the banner's picker relinks and the save lands.)*
+- [x] **[auto]** Instead of that button, try **File → Open…** on the same file → it reconnects **that
+      tab** and does **not** add a second one. *(Runner §1&5.)*
 
 **H4. A file that goes missing** *(§10 — the sandbox recreates deleted files, a real folder does not)*
 - [x] With a file connected, **rename or move it in Explorer**.
-- [ ] Draw something, **File → Save** → expect an amber banner and **Choose the file again**.
+- [ ] **⇦ THE ONE BOX LEFT. RETEST after pulling 7e644c6.** Draw something, **File → Save** →
+      expect an amber banner and **Choose the file again**, and the asterisk to STAY LIT.
       *(Tom 2026-08-05: "No. There's an asterisk, but no complaints. Saving is silent and recreates
-      the original name." That is the defect; check whether it still does that.)*
+      the original name." Tom 2026-08-06: "It neither complains nor creates a new file. It silently
+      fails to save." Both are the same root cause and it is fixed — but only a real folder can
+      prove it, which is why this box is yours.)*
       [TGH: The situation seems to be worse now. It neither complains nor creates a new file. It silently fails to save.]
       [CC 2026-08-06: **The most valuable line in this pass, and fixed.** Everything up to and
       including `writable.close()` can resolve without a byte reaching the disk you are looking at —
@@ -222,8 +230,9 @@ single guess in the build.
 - [x] The original file still holds the pre-Save-as contents.
 - [x] **Revert** → confirmation naming the file → the on-disk version reloads and your unsaved edits
       are gone.
-- [-] **Save all** with two file-connected projects open and both edited → the row is now enabled,
-      and both files advance. With only one edited, the row is greyed.
+- [x] **Save all** with two file-connected projects open and both edited → the row is now enabled,
+      and both files advance. With only one edited, the row is greyed. *(Tom, 2026-08-06: "It
+      works.")*
       [TGH: It works, but having it switch to each tab as it saves it is unsightly.]
       [CC 2026-08-06: Agreed it is ugly, and NOT fixed — deliberately. Save all switches tabs because
       the write path writes *the open project*, and every warning it can raise (read-only, the file
@@ -366,35 +375,39 @@ single guess in the build.
       asks before replacing a file that has moved on — and it now asks the broker about our own
       docId too, so a file somebody has TAKEN is refused rather than overwritten. Harness §11.
       **Retest both ways: press Save, and press Save as… and pick the same file.**]
-- [ ] **RETEST — a broken server and an absent one now read differently.** Make `lpn-locks/`
-      unwritable again and open a project → the banner names it as a **setup fault on the server**.
-      Then block the request entirely (recipe above) → the original "could not reach" wording.
+- [x] **[auto]** **RETEST — a broken server and an absent one now read differently.** *(Runner §9
+      drives all three: unreachable, `error:storage` — "setup fault on the server … not writable by
+      the web server" — and `error:full`. It fulfils the broker's reply rather than chmod'ing a
+      directory, because what was wrong was the page's reading of the answer, not the answer.)*
 - [x] Ordinary case, unbroken: open, edit, Save, edit, Save again → **never** refused. A false
       positive here would be worse than the bug it prevents.
 - [x] **[auto]** Profile **B**: open the same file. Expect a dialog headed **"<A's initials> has this file
       open."** offering exactly two choices: **Open read-only** and **Create a copy**.
       **There must be no Take over.**
       [TGH: Yes, most of the time. But more than once I have experienced a silent same open in another browser. I am not sure what are the conditions. Testing this, I find that when it happens, closing and reopening in B just repeats the mistake. Next I checked that A is indeed connected. Then I closed A and reopened it. That ends the manifestation.]
-- [-] **Create a copy** → asks where to save → B works in the new file, A is untouched, and the two
-      files have **different `docId`s**.
+- [x] ~~**Create a copy** → asks where to save → …~~ **STALE — that button no longer exists.** The
+      open-time dialog now offers Cancel / Open read-only / Break their lock, and *open read-only then
+      Save as* IS making a copy. Tom's "uses same name. Oops." was the last word on the old one.
       [TGH: No. Just creates a copy in browser. No save. And uses same name. Oops.]
 - [x] In A, **File → Close**, then in B open the file again → B gets it cleanly, no dialog.
-- [-] **RETEST — fixed 2026-08-05, this is the dangerous one.** While A holds a file, from *any*
-      project in B (editable, not read-only, any name) try **Save as…** and pick A's file → refused,
-      naming the collision. Then repeat with A's file *renamed* — still refused, because identity is
-      the `docId` inside the file, not the name.
+- [x] **[auto]** **RETEST — fixed 2026-08-05, this is the dangerous one.** While A holds a file,
+      from *any* project in B try **Save as…** and pick A's file → refused, naming the collision;
+      renaming the file changes nothing, because identity is the `docId` inside it.
+      *(Runner §6-saveas and the harness's inspectSaveTarget table, both broker-up and broker-down.)*
       [TGH: No complaint, no refusal. All I get is this: "Beware: could not reach the server to check or create a lock on this project, so nothing is stopping a colleague from editing the same file at the same time. You will be told if locking starts working again."]
       [CC 2026-08-05: Two causes, and the second is the real lesson. (1) The broker could not write
       (see §0), so it could never answer "somebody has this". (2) **The guard asked ONLY the broker**,
       so with the broker down it answered "no collision" to everything and reproduced the very bug it
       was written to fix. Now split in two: a hard refusal when the broker says somebody holds it,
       and — needing nothing but the file itself — a confirm naming the project about to be destroyed.]
-- [ ] **RETEST — the broker-free half.** With locking working normally, Save as… onto a file holding
-      a *different* project → a confirm naming that project. Cancel leaves both files untouched.
-- [ ] **RETEST — the same with the broker deliberately broken.** The confirm must still appear. This
-      is the case that failed on 2026-08-05.
-- [ ] Save as… onto a brand-new file, and onto a non-project file → **still allowed**. The guard must
-      not turn into "Save as sometimes does nothing".
+- [x] **[auto]** **RETEST — the broker-free half.** Save as… onto a file holding a *different*
+      project → a confirm naming that project; Cancel leaves both files untouched. *(Runner §6-saveas.)*
+- [x] **[auto]** **RETEST — the same with the broker deliberately broken.** The confirm still
+      appears. *(Runner §6-saveas runs every one of these twice, once with the broker unreachable —
+      a guard against destroying somebody's work that needs a server is not a guard.)*
+- [x] **[auto]** Save as… onto a brand-new file, and onto a non-project file → **still allowed**,
+      no question asked. *(Runner §6-saveas. The guard must never become "Save as sometimes does
+      nothing".)*
       [TGH: I did not test due to previous.]
 - [x] With the broker blocked (see §9), Save as… still works. A lock outage must not disable saving.
 
@@ -410,16 +423,20 @@ This is the paradigm Tom asked for: you may do anything you like, you just canno
       settings → **all allowed**. Every tool in the toolbar is reachable.
 - [x] **[auto]** In B: **Save is disabled** in the File menu and does nothing if reached any other way. It must
       **not** turn itself into Save as. *(Tom, 2026-08-05: "Save is disabled as it should be.")*
-- [ ] In B: edits made in read-only **survive switching to another tab and back**. They live in the
-      browser like any other project; only the *file* is off limits.
+- [x] **[auto]** In B: edits made in read-only **survive switching to another tab and back**, the
+      tab is still read-only afterwards, and Save is still disabled. *(Runner §6&7.)*
 - [x] **Save as…** to a different name → succeeds, B is now a normal editable project on its own
       file, banner gone, and the new file has a **different `docId`**.
-- [-] Leave A idle for >2 min. B's read-only banner **does not** grow a Take over button and B does
-      **not** silently become editable. Read-only stays read-only until B asks otherwise.
+- [x] ~~Leave A idle for >2 min…~~ **NO LONGER TESTABLE, BY DESIGN.** Take over was withdrawn and
+      the promotion poll was deleted in Task 211 — there is no code path that can promote a tab, so
+      there is nothing to wait two minutes for. What replaced it is asserted instead: nothing
+      promotes a read-only tab, ever (runner §6&7).
       [TGH: What seems to happen is that B is allowed to open the project until A closes it and opens again.]
-- [-] In A, close the project. B **still** does not silently become editable.
+- [x] ~~In A, close the project. B **still** does not silently become editable.~~ Same answer as
+      above: read-only is a property of B's tab, and only B can change it. A's closing frees the
+      LOCK, which is what lets B's *next* open be clean — that transition is covered by the runner.
       [TGH: Can't test because lines 145 and 156 are inconsistent.]
-- [ ] *(REMOVED 2026-08-05 — this check contradicted the one above it and was CC's error carried
+- [x] *(REMOVED 2026-08-05 — this check contradicted the one above it and was CC's error carried
       over from the pre-211 list. Read-only allows every edit; it only refuses to Save. There is no
       "inert tools" behaviour to test.)*
 
@@ -439,8 +456,9 @@ This is the paradigm Tom asked for: you may do anything you like, you just canno
       `(copy)` in any suggested name.
       [TGH (against the old behaviour): It acts as those it's saving a copy... And its suggested file
       name is ...(copy)... .]
-- [ ] Where the browser really has forgotten the grant, the banner says the connection to that file
+- [x] Where the browser really has forgotten the grant, the banner says the connection to that file
       was **lost** and offers **Choose the file again** → picker → reconnected, banner clears.
+      *(Tom did this by hand as §H3, 2026-08-06, via Chrome's Block. Pass.)*
       *(The old wording, "a browser does not stay connected to a file after the page is reloaded", is
       now itself a FAIL: it is no longer true.)*
 - [x] **[auto]** **File → Open…** on that same file also reconnects the tab, and does **not** add a second one.
@@ -457,26 +475,30 @@ This is the paradigm Tom asked for: you may do anything you like, you just canno
 - [x] With a file linked, block the broker: DevTools → Network → Offline, or block
       `/engcalcs/lpn-lock.php`.
 - [x] Close and re-open the file → **amber banner**, beginning "Beware", and **editing still works**.
-- [ ] While online-but-blocked the banner has **no Dismiss**. With the whole browser set Offline it
-      **does**. *(Recipe, since the old instruction was not actionable: DevTools → Network → right-click
+- [x] **[auto]** While online-but-blocked the banner has **no Dismiss**. With the whole browser set
+      Offline it **does**. *(Runner §9.)* *(Recipe, since the old instruction was not actionable: DevTools → Network → right-click
       any request → **Block request URL**, on a `lpn-lock.php` request. Leave "Offline" unchecked.)*
 - [x] Unblock → within a poll cycle the banner clears and you are told locking is working again.
 
 ## 10. The file goes missing
 
 - [x] With a file linked, rename or move the file in Explorer.
-- [-] Make an edit and wait a cycle → **amber banner** with **"Choose the file again"**.
+- [ ] Make an edit and **File → Save** → **amber banner** with **"Choose the file again"**.
+      **This is the same box as §H4 — do it once, there, in a real folder.** (No waiting: nothing is
+      written on a timer any more, so it happens when you press Save.)
       [TGH: No. There's an asterisk, but no complaints. Saving is silent and recreates the original name.]
-- [ ] Press it → picker → pick a location → saving resumes, banner clears.
+- [x] **[auto]** Press it → picker → pick a location → saving resumes, banner clears, asterisk goes
+      out. *(Runner §10.)*
 
 ## 11. The fallback path — Firefox or Safari *(or any `http://` URL)*
 
-- [ ] File → **Save** is disabled and **Save as…** is enabled, and the tip explains that this
-      browser cannot connect to a file. *(CC's "Download a copy" wording was stale — corrected.)*
+- [x] **[auto]** File → **Save** is disabled and **Save as…** is enabled. *(Runner §11 removes
+      `showSaveFilePicker`, which is the one property the page tests, so it takes exactly this
+      branch. The TIP's wording is still worth a human glance in a real Firefox.)* *(CC's "Download a copy" wording was stale — corrected.)*
 - [x] Each press downloads another file. *(Expected here, and why the label differs.)*
       [TGH: After Save as, there are no unsaved changes. Asterisk should disappear until there are changes.]
 - [x] **Open from file** uses the ordinary file-chooser and still loads a project.
-- [ ] *(REMOVED — there is no "Saving to a file" settings section anywhere any more. Stale check.)*
+- [x] *(REMOVED — there is no "Saving to a file" settings section anywhere any more. Stale check.)*
 - [x] No lock banner ever appears.
 
 ## 12. Server side
@@ -618,6 +640,9 @@ Triaged by what a user loses. Roadmap Task 223 points here.
 ---
 
 ## Appendix — annotations from the 2026-08-04 pass (the record of why Task 211 happened)
+
+**The checkboxes below are HISTORY, not a to-do list** — every control they name has been renamed or
+removed, and nothing in this appendix is ever to be worked. It is kept as an argument, not a task.
 
 These are Tom's notes against the *old* §1–§8. The controls they describe are gone. They are kept
 because they are the argument that produced the tab-and-File-menu paradigm, and because several are
