@@ -2,6 +2,15 @@
     "description": "sha1 of each lang.ec.en.php $ec_lang value as of the last full translation sync. Maintained by detect_english_drift.php --update. A current-vs-manifest hash mismatch means that key's English changed and translations may be stale. Do not hand-edit.",
     "updated": "2026-07-29",
     "count": 576,
+    "partial_updates": [
+        {
+            "date": "2026-08-08",
+            "keys": [
+                "or_notes_3_def"
+            ],
+            "reason": "URL typo fix (venture->venturi) from Task 227; prose unchanged and the same edit was applied to all 27 files, so no translator is needed"
+        }
+    ],
     "hashes": {
         "about_body_html": "73187ffb04c8f4e8f25dde6a6eb3c7ac9dc97691",
         "about_main_desc": "11e87516dcc0c7ec37ed448c384ecc23eebb661b",
@@ -425,7 +434,7 @@
         "or_notes_1_term": "605bca36060870a51300b45ed85408998a545fd3",
         "or_notes_2_def": "38b36678b2f592b43ab18920abb05b2f43aa5c1f",
         "or_notes_2_term": "ddf1bea965d9dc9edefa4088524bc6941e679613",
-        "or_notes_3_def": "09c804c4dcaabccfaddc8610df9bb47f418ebab9",
+        "or_notes_3_def": "674f52850af197bade1d200fe633c3a083db1d59",
         "or_notes_3_term": "10306d032d8c940fa4dcb009479a19490e68aac9",
         "or_notes_4_def": "9c8eb957b3273de03b8f113eaea5c6c5c8a199fc",
         "or_notes_4_term": "5c388027d4d955611d9356de16c85c5bd6268388",

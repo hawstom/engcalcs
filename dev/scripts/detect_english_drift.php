@@ -29,6 +29,21 @@
  * brought into sync." Only run --update once a resync of the flagged keys is
  * actually complete, or you will silently baseline away real drift.
  *
+ * NOT EVERY ENGLISH EDIT NEEDS A TRANSLATOR (--update=<key>, ROADMAP Task 227 follow-up).
+ * A hash is blind to WHY a string changed. Fixing a dead hyperlink inside a value —
+ * `or_notes_3_def`'s engineeringtoolbox URL on 2026-08-08 — flags exactly like a rewritten
+ * sentence, and left alone it would send 26 agents off to re-translate a note whose prose never
+ * moved. So a single key can be re-baselined on its own:
+ *
+ *   php detect_english_drift.php --update=or_notes_3_def --reason="URL typo fix, prose unchanged"
+ *
+ * This is deliberately NOT a way to make an inconvenient flag go away. A URL-only edit still has
+ * to be applied to all 27 files — the href lives inside each language's own string — it just
+ * needs no translator. So before it will silence anything, the tool checks that every language
+ * file's value for that key already carries the same URLs as English, and refuses if any language
+ * is still on the old link. That check is the point: "no translator needed" and "nothing left to
+ * do" are different claims, and only the first one is being made here.
+ *
  * Scope: $ec_lang display strings only (not $ec_lang_intent — intent is
  * translator metadata, not a shipped translated string).
  */
@@ -68,18 +83,77 @@ function load_manifest(): array
     return is_array($data['hashes'] ?? null) ? $data['hashes'] : [];
 }
 
-function write_manifest(array $hashes): void
+/** Whatever partial re-baselines have been recorded, so the history survives a full --update. */
+function load_notes(): array
+{
+    if (!is_file(MANIFEST)) {
+        return [];
+    }
+    $data = json_decode(file_get_contents(MANIFEST), true);
+    return is_array($data['partial_updates'] ?? null) ? $data['partial_updates'] : [];
+}
+
+/**
+ * @param string $updated The date this manifest represents. A PARTIAL re-baseline must pass the
+ *   existing date through: 'updated' means "English as of the last FULL sync", and the human
+ *   report prints it as such, so stamping today onto a one-key update would claim a sync that
+ *   never happened -- the report would read "last synced: today" over 500 keys nobody looked at.
+ */
+function write_manifest(array $hashes, array $notes = [], string $updated = ''): void
 {
     ksort($hashes);
     $payload = [
         'description' => 'sha1 of each lang.ec.en.php $ec_lang value as of the last full translation sync. '
             . 'Maintained by detect_english_drift.php --update. A current-vs-manifest hash mismatch means '
             . 'that key\'s English changed and translations may be stale. Do not hand-edit.',
-        'updated' => date('Y-m-d'),
+        'updated' => $updated !== '' ? $updated : date('Y-m-d'),
         'count' => count($hashes),
-        'hashes' => $hashes,
     ];
+    // Kept because a single-key re-baseline is precisely the kind of act that later looks like a
+    // mistake -- a key sitting un-flagged with no explanation is indistinguishable from a bug in
+    // the tripwire. The reason travels with the manifest.
+    if ($notes) {
+        $payload['partial_updates'] = $notes;
+    }
+    $payload['hashes'] = $hashes;
     file_put_contents(MANIFEST, json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "\n");
+}
+
+/** Every URL inside a value, sorted — the part of a string a translator never authors. */
+function urls_in(string $value): array
+{
+    preg_match_all('#https?://[^\s"\'<>]+|(?<=href=")[^"]+#i', $value, $m);
+    $urls = array_values(array_unique($m[0]));
+    sort($urls);
+    return $urls;
+}
+
+/**
+ * Which languages do NOT yet carry the same URLs as English for this key.
+ * A URL-only English edit is still an edit to all 27 files; this is what tells the difference
+ * between "already applied everywhere" and "applied in English and forgotten in nine languages".
+ * @return array<string,string[]> lang code => the URLs that file actually has
+ */
+function languages_out_of_step(string $key, string $englishValue): array
+{
+    require_once __DIR__ . '/lang_parse.inc.php';
+    $want = urls_in($englishValue);
+    $out = [];
+    foreach (glob(LANG_DIR . '/lang.ec.*.php') as $file) {
+        $code = substr(basename($file), strlen('lang.ec.'), -strlen('.php'));
+        if ($code === 'en') {
+            continue;
+        }
+        $values = ecLangValues(file_get_contents($file));
+        // A key absent from a language file is the payload-delta's business, not this check's.
+        if (!array_key_exists($key, $values)) {
+            continue;
+        }
+        if (urls_in($values[$key]) !== $want) {
+            $out[$code] = urls_in($values[$key]);
+        }
+    }
+    return $out;
 }
 
 /** @return array{changed:string[],new:string[],removed:string[]} */
@@ -109,9 +183,88 @@ $mode = $argv[1] ?? '';
 $current = current_hashes();
 $manifest = load_manifest();
 
+// --update=<key>[,<key>...] : re-baseline just these, leaving every other drift signal standing.
+$partialKeys = [];
+$reason = '';
+foreach (array_slice($argv, 1) as $arg) {
+    if (strpos($arg, '--update=') === 0) {
+        $mode = '--update-partial';
+        $partialKeys = array_values(array_filter(array_map('trim', explode(',', substr($arg, strlen('--update='))))));
+    } elseif (strpos($arg, '--reason=') === 0) {
+        $reason = trim(substr($arg, strlen('--reason=')));
+    }
+}
+
+if ($mode === '--update-partial') {
+    if (!$manifest) {
+        fwrite(STDERR, "No manifest to update. Run --update first to baseline it.\n");
+        exit(2);
+    }
+    if (!$partialKeys) {
+        fwrite(STDERR, "--update= needs at least one key.\n");
+        exit(2);
+    }
+    $english = load_ec_lang(EN_FILE);
+    $d = diff($current, $manifest);
+    $blocked = false;
+
+    foreach ($partialKeys as $key) {
+        if (!array_key_exists($key, $current)) {
+            fwrite(STDERR, "REFUSED $key: not a key in lang.ec.en.php.\n");
+            $blocked = true;
+            continue;
+        }
+        // Re-baselining a key that is not drifting is always a mistake -- a typo in the key name,
+        // or a second run of a command that already succeeded. Either way, say so rather than
+        // writing a no-op and reporting success.
+        if (!in_array($key, $d['changed'], true)) {
+            fwrite(STDERR, "REFUSED $key: not currently CHANGED, so there is nothing to re-baseline.\n");
+            $blocked = true;
+            continue;
+        }
+        $stragglers = languages_out_of_step($key, (string)$english[$key]);
+        if ($stragglers) {
+            fwrite(STDERR, "REFUSED $key: " . count($stragglers) . " language file(s) still carry different URLs.\n");
+            fwrite(STDERR, "  English has: " . implode(' ', urls_in((string)$english[$key])) . "\n");
+            foreach ($stragglers as $code => $have) {
+                fwrite(STDERR, "  $code has: " . ($have ? implode(' ', $have) : '(none)') . "\n");
+            }
+            fwrite(STDERR, "  Apply the same edit to those files first. 'No translator needed' is not 'nothing left to do'.\n");
+            $blocked = true;
+        }
+    }
+    if ($blocked) {
+        exit(2);
+    }
+
+    $notes = load_notes();
+    foreach ($partialKeys as $key) {
+        $manifest[$key] = $current[$key];
+        echo "re-baselined $key\n";
+        echo "  English now: " . preg_replace('/\s+/', ' ', mb_substr((string)$english[$key], 0, 120)) . "\n";
+        echo "  every language file already carries the same URLs — no translator needed.\n";
+    }
+    $notes[] = [
+        'date' => date('Y-m-d'),
+        'keys' => $partialKeys,
+        'reason' => $reason !== '' ? $reason : '(none given)',
+    ];
+    // Carry the last FULL sync date forward -- see write_manifest().
+    $syncDate = json_decode(file_get_contents(MANIFEST), true)['updated'] ?? '';
+    write_manifest($manifest, $notes, $syncDate);
+    $after = diff($current, load_manifest());
+    echo "\nStill CHANGED and awaiting a real resync: " . count($after['changed'])
+        . ($after['changed'] ? ' (' . implode(', ', $after['changed']) . ')' : '') . "\n";
+    if ($reason === '') {
+        echo "NOTE: no --reason given. Pass one next time; a silenced key with no explanation is\n";
+        echo "      indistinguishable from a bug in the tripwire six months from now.\n";
+    }
+    exit(0);
+}
+
 if ($mode === '--update') {
     $existed = is_file(MANIFEST);
-    write_manifest($current);
+    write_manifest($current, load_notes());
     $d = diff($current, $manifest);
     if (!$existed) {
         echo "Manifest created: " . MANIFEST . " (" . count($current) . " English keys baselined).\n";

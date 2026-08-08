@@ -1622,6 +1622,35 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Completed
 
+- 0|229| **[DONE 2026-08-08] The drift tripwire can now tell "no translator needed" from "nothing
+  changed" — `detect_english_drift.php --update=<key>`.** Fallout from Task 227, and caught the same
+  day it was created: fixing the dead engineeringtoolbox URL inside `or_notes_3_def` flagged that
+  key as CHANGED exactly like a rewritten sentence would. A hash cannot see *why* a string moved.
+  Left alone, the next resync sprint would have sent 26 agents to re-translate a note whose prose
+  never changed.
+  - **The wrong fix would have been to just re-baseline it.** A URL-only edit still has to reach all
+    27 files — the `href` lives inside each language's own string, which is why the fix was a `sed`
+    across `lang.ec.*.php` and not a one-line English edit. So the tool refuses to silence a key
+    until **every language file already carries the same URLs as English**, naming the stragglers
+    when it won't. "No translator needed" and "nothing left to do" are different claims; only the
+    first one is being made.
+  - **It refuses three ways**, each verified: a key that is not currently CHANGED (a typo, or a
+    command already run), a key that does not exist in English, and a key where any language is
+    still on the old link. Mutation-tested by reverting `km` and `ur` to the old URL — refused,
+    named both, exit 2; restored — accepted.
+  - **The reason travels with the manifest.** A `partial_updates` record (date, keys, reason) is
+    written into `english_string_hashes.json` and survives a later full `--update`, because a key
+    sitting un-flagged with no explanation is indistinguishable from a bug in the tripwire six
+    months on. Omitting `--reason` still works but says so.
+  - **One defect found in this feature's own first run and fixed:** a partial re-baseline was
+    stamping today's date onto the manifest's `updated` field, so the report announced "last synced:
+    2026-08-08" over 500 keys nobody had looked at. The last-FULL-sync date is now carried through.
+  - **Result:** `or_notes_3_def` re-baselined with its reason on the record; the tripwire now flags
+    exactly two keys, both genuine — `template_feedback` (Task 205(d), two generations behind in all
+    26 languages and still using the institutional "us" the English deliberately dropped) and
+    `mhp_vel_high` (English gained "and may not be realistic"; the translations are the older,
+    shorter wording). Neither is silenced.
+
 - 0|215| **[DONE 2026-08-08] The Title/Subtitle milestone is logged — the closest instrument this
   suite can build to its own mission.** Asked for by Tom, 2026-08-05: *"How many people are adding
   Title and Subtitle? This is a major milestone that indicates they are sharing the calculation in a
