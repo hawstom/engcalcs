@@ -60,7 +60,7 @@ $ec_lang['menu_main_hydraulics']='Hidraulică';
 $ec_lang['menu_main_language']='Limbă';
 $ec_lang['menu_more']='Mai mult';
 $ec_lang['template_welcome']='Lasă temerile la ușă; dragostea se vorbește aici. Nu stricați totul. Bucurați-vă și de <a target="_blank" href="https://hawsedc.com/download.php">instrumentele gratuite HawsEDC AutoCAD</a>.';
-$ec_lang['template_feedback']='Trimiteți-ne sugestii sau aprecieri. V-a fost util acest calculator gratuit?';
+$ec_lang['template_feedback']='Puteți sugera o formulare mai bună pentru acest text, sau altceva? Doriți să ajutați, sau să învățați să creați instrumente ca acestea? Vă rog, contactați-mă.';
 $ec_lang['template_printable_title']='Titlu tipărit';
 $ec_lang['template_printable_subtitle']='Subtitlu tipărit';
 $ec_lang['index_title']='Calculatoare Inginerești Gratuite Online';

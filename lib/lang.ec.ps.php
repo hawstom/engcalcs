@@ -62,7 +62,7 @@ $ec_lang['menu_main_hydraulics']='هایدرولیک';
 $ec_lang['menu_main_language']='ژبه';
 $ec_lang['menu_more']='نور';
 $ec_lang['template_welcome']='خپل ویرونه دروازې ته پرېږده؛ دلته مینه زموږ ژبه ده. ته هر څه خرابوي نه یې. د <a target="_blank" href="https://hawsedc.com/download.php">وړیا HawsEDC AutoCAD وسیلو</a> خوند هم واخله.';
-$ec_lang['template_feedback']='مهرباني وکړئ وړاندیزونه یا ستاینې راولېږئ. ایا دا وړیا محاسبه ستاسو لپاره ګټوره وه؟';
+$ec_lang['template_feedback']='ایا تاسو کولی شئ د دې پاڼې د عبارتونو ښه کولو یا نورو شیانو لپاره وړاندیز راکړئ؟ ایا غواړئ مرسته وکړئ، یا داسې وسایل جوړول زده کړئ؟ مهرباني وکړئ ما سره اړیکه ونیسئ.';
 $ec_lang['template_printable_title']='د چاپ سرلیک';
 $ec_lang['template_printable_subtitle']='د چاپ فرعي سرلیک';
 $ec_lang['index_title']='وړیا آنلاین انجینري محاسبې';

@@ -62,7 +62,7 @@ $ec_lang['menu_main_hydraulics']='Haidroliki';
 $ec_lang['menu_main_language']='Lugha';
 $ec_lang['menu_more']='Zaidi';
 $ec_lang['template_welcome']='Acha wasiwasi wako mlangoni; hapa upendo unasemwa. Huharibu kila kitu. Furahia <a target="_blank" href="https://hawsedc.com/download.php">zana za bure za HawsEDC AutoCAD</a> pia.';
-$ec_lang['template_feedback']='Tafadhali tutumie mapendekezo au sifa. Je, kikokotoo hiki cha bure kilikusaidia?';
+$ec_lang['template_feedback']='Je, unaweza kupendekeza maneno bora zaidi ya ukurasa huu, au kitu kingine chochote? Unataka kusaidia, au kujifunza kutengeneza vikokotoo kama hivi? Tafadhali wasiliana nami.';
 $ec_lang['template_printable_title']='Kichwa cha Kuchapishwa';
 $ec_lang['template_printable_subtitle']='Kichwa Kidogo cha Kuchapishwa';
 $ec_lang['index_title']='Vikokotoo vya Uhandisi Bure Mtandaoni';

@@ -62,7 +62,7 @@ $ec_lang['menu_main_hydraulics']='הידרוליקה';
 $ec_lang['menu_main_language']='שפה';
 $ec_lang['menu_more']='עוד';
 $ec_lang['template_welcome']='השאירו את פחדיכם בדלת; כאן מדברים אהבה. אתם לא הורסים הכול. נהנו גם מ<a target="_blank" href="https://hawsedc.com/download.php">כלי ה-AutoCAD החינמיים של HawsEDC.</a>';
-$ec_lang['template_feedback']='אנא שלחו לנו הצעות או מילות שבח. האם המחשבון החינמי הזה שירת אתכם היטב?';
+$ec_lang['template_feedback']='האם תוכלו להציע ניסוח טוב יותר לטקסט שבעמוד הזה, או כל דבר אחר? רוצים לעזור, או ללמוד ליצור כלים כאלה? אנא צרו איתי קשר.';
 $ec_lang['template_printable_title']='אזור כותרת להדפסה';
 $ec_lang['template_printable_subtitle']='אזור כותרת משנה להדפסה';
 $ec_lang['index_title']='מחשבוני הנדסה חינמיים מקוונים';

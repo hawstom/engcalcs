@@ -60,7 +60,7 @@ $ec_lang['menu_main_hydraulics']='Хидраулика';
 $ec_lang['menu_main_language']='Језик';
 $ec_lang['menu_more']='Више';
 $ec_lang['template_welcome']='Оставите страхове за вратима; овде је љубав наш језик. Не кварите све. Уживајте и у <a target="_blank" href="https://hawsedc.com/download.php">бесплатним HawsEDC AutoCAD алатима</a>.';
-$ec_lang['template_feedback']='Пошаљите нам предлоге или похвале. Да ли вам је овај бесплатни калкулатор добро послужио?';
+$ec_lang['template_feedback']='Можете ли предложити бољу формулацију овог текста или нешто друго? Желите ли да помогнете или да научите да правите овакве алате? Јавите ми се.';
 $ec_lang['template_printable_title']='Наслов за штампу';
 $ec_lang['template_printable_subtitle']='Поднаслов за штампу';
 $ec_lang['index_title']='Бесплатни онлајн инжењерски калкулатори';
