@@ -32,39 +32,14 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 ## Calculator Improvements
 
-- 60|230| **The two open-channel pages show pipe advice in the high-velocity check.** There is no
-  `mtc_vel_high` key: `Manning-Trap.php:70` and `Manning-Irregular.php:138` feed the JS var
-  `mtc_vel_high` from `$ec_lang['mhp_vel_high']`, so a trapezoidal channel is told to "check
-  transition losses, available energy, and water hammer." An open channel cannot water-hammer.
-  (`mtc_vel_low` is already channel-specific — only the high side was aliased.) Fix: add a real
-  `mtc_vel_high` — scour/erosion of the lining, freeboard and superelevation at bends, and energy
-  loss at expansions/obstructions; `mtc_note_2_def` already carries most of that wording. Cost is
-  1 key × 26 languages (mtc is a core calculator, so every language is in scope).
-  **Tom's "may not be realistic" ask is already shipped** on the pipe side —
-  `mhp_vel_high` reads "Velocity is high and may not be realistic; …" in all 27 files. Carry the
-  same clause into the new channel string. Pages with a velocity verdict: mpf, mphl, hw, dw, bpn,
-  ip (all `mhp_*`) and mtc, mi (the two above). `lpn_` reports velocity as a number with no
-  verdict; or/ws/wi/odt/cs/rc have no velocity check at all.
-
-- 15|231| **Toolbar: icon as a small prefix to the text, never icon-only.** Tom, 2026-08-08.
-  Decision made — icon-only is rejected: it saves no translation work (the label text stays either
-  way, so the cost is unchanged) and it spends first-time comprehension, which is the entire
-  audience a web calculator exists for. The prefix pattern is already the house style in
-  `lib/Menus.lib.php` (`⬇ Install`, `🌐 English`); the work is just extending it to the controls
-  that lack one — `calc_defaults`, `calc_set_units` SI/US, `calc_copy_link`, `view_printable`,
-  `view_hide_line` — as HTML in the PHP, **not** inside `$ec_lang` values (a glyph baked into a
-  translated string is 27 copies of one decision). No new language keys.
-  **Rejected in the same breath: the pop-up / on-landing A/B preference poll** Tom asked about.
-  Three reasons, any one sufficient. (a) It violates Task 207's stated boundary — "anything that
-  must be dismissed to proceed" is off the table, and that boundary is the mission, not a
-  preference. (b) A "which screenshot do you like best?" poll measures *stated* preference about
-  chrome, which is the classic case where stated and revealed preference diverge; people reliably
-  say they prefer the cleaner icon bar and then fail to find the button. (c) The sample cannot
-  carry it: ~4,042 confirmed humans in the whole suite per period, so a two-arm split on anything
-  but Manning-Pipe-Flow is under-powered before the first dismissal. If a chrome variant is ever
-  worth testing, test it **behaviorally** against the existing `used`-of-`human` conversion band
-  (Task 202's instrumentation, already shipped, already cross-tabbed) — it costs the visitor no
-  attention and measures what they did rather than what they said.
+- 40|230| **Translate the new `mtc_vel_high` into the 26 non-English files.** The defect is fixed:
+  `Manning-Trap.php` and `Manning-Irregular.php` used to feed the channel velocity verdict from
+  `$ec_lang['mhp_vel_high']`, telling a trapezoidal channel to check **water hammer**. A real
+  `mtc_vel_high` now exists in `lang.ec.en.php` and both pages read it (2026-08-08). Because
+  `base.inc.php` loads English first, every language already renders the correct English sentence
+  rather than the wrong localized one — so what remains is translation quality, not a wrong answer.
+  `lang_parity_check.php` reports exactly 26 missing, confirming mtc is in scope everywhere.
+  Fold into the next sprint rather than spawning 26 agents for one string.
 
 - 5|175| **A real printable version, suite-wide.** Raised by Tom, 2026-07-30, while reviewing the
   `lpn_` map page: the suite's only print affordance today is `d-print-none` hiding chrome
@@ -1479,20 +1454,16 @@ circling one question — *is Manning valid for full/pressurized pipe, and is R 
 impressions, zero clicks; and one query was `"kikokotoo" -site:reddit.com …`, the Swahili word taken
 straight from `lib/lang.ec.sw.php`, i.e. an agent searching our own translated string.
 
-- 40|232|[H] **`Irrigation.php` is the only non-calculator in the Hydraulics dropdown, and its menu
-  label doesn't say so.** Tom, 2026-08-08: "harmful and spammy." Every other item under Hydraulics
-  is a calculator; `irr_main_menu` is the bare word "Irrigation", so it reads as one and isn't. The
-  page (79 lines) is a card index pointing at WFS, WFI, Orifice, MTC, MI, Canal-Seepage and IP —
-  i.e. it duplicates the dropdown that contains it. It also fronts Canal-Seepage, which is under a
-  standing do-not-promote.
-  **The number needed to decide does not exist:** `Irrigation.php` is absent from the 2026-07-27
-  per-calculator snapshot entirely, so its reach and human count were never measured. Pull them
-  before deleting the page. Tom's vote is removal; his fallback is a label that names it as an index.
-  Recommended split, because the two halves have very different costs: **drop the menu item now**
-  (one line in `lib/Menus.lib.php`, reversible, no translation), and **keep the page** pending its
-  numbers — `irr_main_title` is "Free Online Irrigation Flow Measurement Calculators", a plausible
-  search landing, and a deleted URL is the one part that isn't cheap to undo. Renaming the label is
-  the strictly worse option: it costs 26 translated strings to keep a menu entry we may delete.
+- 20|232|[H] **Decide whether `Irrigation.php` itself stays, now that its menu entry is gone.**
+  Tom, 2026-08-08: the entry was "harmful and spammy" — the only non-calculator under Hydraulics,
+  labelled the bare word "Irrigation", fronting a 79-line card index that pointed back at the very
+  dropdown containing it (Canal-Seepage among them, which is under a standing do-not-promote).
+  **Menu entry removed 2026-08-08**; the page, its sitemap entries and its `sw.js` precache line are
+  untouched, so search reach is preserved and the removal is one line to revert.
+  **The number needed to finish this does not exist:** `Irrigation.php` is absent from the
+  2026-07-27 per-calculator snapshot, so its reach and human count were never measured. Pull them in
+  the next usage snapshot, then delete or keep. Do not instead rename the label — that spends 26
+  translated strings to preserve an entry we may delete.
 
 - 10|155|[H] **Deploy and verify the Task 149 search-index fix — deployed, awaiting Search Console
   confirmation.** Extracted from 149 on close, 2026-07-28, rather than left as a to-do inside a
@@ -1599,6 +1570,19 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|231| **[DONE 2026-08-08] Toolbar: icon as a small prefix to the text, never icon-only.** Added
+  `↺` Restore defaults, `📏` Set units, `🖨` Printable (`lib/Calculators.lib.php`) and `🔗` Copy link
+  with a matching `✓ Copied!` confirm state (`lib/Menus.lib.php`), following the existing
+  `⬇ Install` / `🌐 English` house style. Glyphs live in the markup, never in `$ec_lang` — a glyph
+  baked into a translated value is 27 copies of one decision. No new language keys.
+  **Icon-only was rejected on the merits:** it saves no translation work (the label text stays
+  either way) and spends first-time comprehension, which is the entire audience a web calculator
+  exists for. **The pop-up A/B preference poll was rejected too** — it breaks Task 207's "nothing
+  that must be dismissed to proceed" boundary; a "which screenshot do you prefer?" poll measures
+  stated preference about chrome, where stated and revealed reliably diverge; and ~4,042
+  confirmed humans per period leaves a two-arm split under-powered anywhere but Manning-Pipe-Flow.
+  Test chrome variants behaviorally against the `used`-of-`human` band (Task 202) instead.
 
 - 0|205| **[DONE 2026-08-08] One "contact me" line per page, not two — English shipped 2026-08-03, the
   26-language resync (d) completed 2026-08-08.** Raised by Tom,

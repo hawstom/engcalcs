@@ -113,9 +113,13 @@ function echoEngCalcsMenu ($html_title = '', $show_name_field = false, $calc_nam
 					<a class="dropdown-item" href="Weir-Flow-Simple.php" title="<?=$ec_lang['ws_main_desc']?>"><?=$ec_lang['ws_main_menu']?></a>
 					<a class="dropdown-item" href="Weir-Flow-Irregular.php" title="<?=$ec_lang['wi_main_desc']?>"><?=$ec_lang['wi_menu']?></a>
 					<div class="dropdown-divider"></div>
-					<a class="dropdown-item" href="Irrigation.php" title="<?=$ec_lang['irr_main_desc']?>"><?=$ec_lang['irr_main_menu']?></a>
-						<a class="dropdown-item" href="Canal-Seepage.php" title="<?=$ec_lang['cs_main_desc']?>"><?=$ec_lang['cs_main_menu']?></a>
-						<a class="dropdown-item" href="Irrigation-Pressure.php" title="<?=$ec_lang['ip_main_desc']?>"><?=$ec_lang['ip_main_menu']?></a>
+					<?php // Irrigation.php is deliberately absent from this menu (Task 232, 2026-08-08).
+					      // Every other item here is a calculator; that page is a card index pointing
+					      // back at this very dropdown, so as a plain "Irrigation" entry it read as a
+					      // calculator and wasn't one. The page still exists and is still in the
+					      // sitemap -- only the menu entry is gone. ?>
+					<a class="dropdown-item" href="Canal-Seepage.php" title="<?=$ec_lang['cs_main_desc']?>"><?=$ec_lang['cs_main_menu']?></a>
+					<a class="dropdown-item" href="Irrigation-Pressure.php" title="<?=$ec_lang['ip_main_desc']?>"><?=$ec_lang['ip_main_menu']?></a>
 				</div>
 			</li>
 			<li class="nav-item dropdown">
@@ -142,8 +146,11 @@ function echoEngCalcsMenu ($html_title = '', $show_name_field = false, $calc_nam
 				maxlength="50"
 				autocomplete="off">
 			<button type="button" id="ec-copy-link-btn" class="btn btn-sm btn-outline-secondary"
-				data-copied-text="<?=htmlspecialchars($ec_lang['calc_copy_link_done'], ENT_QUOTES, 'UTF-8')?>"
-				onclick="EngCalcs.copyLink()"><?=$ec_lang['calc_copy_link']?></button>
+				<?php // The confirm state carries a glyph too (Task 231). copyLink() swaps the whole
+				      // textContent, so without one the button would visibly shed its icon -- and
+				      // change width -- for the 1.5s it reads "Copied!". ?>
+				data-copied-text="<?=htmlspecialchars('✓ ' . $ec_lang['calc_copy_link_done'], ENT_QUOTES, 'UTF-8')?>"
+				onclick="EngCalcs.copyLink()">🔗 <?=$ec_lang['calc_copy_link']?></button>
 		</form>
 <?php endif; ?>
 		<ul class="navbar-nav ms-auto">
