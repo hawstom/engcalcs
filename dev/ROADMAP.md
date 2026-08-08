@@ -1716,6 +1716,14 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
   - **What it cannot answer stays visible, never silently passed**: `--` lines with a reason. §1's
     native user-activation handshake, a `prompt`/`denied` permission, §10 on a real folder, §11, and
     anything visual. Listed in `dev/browser-pass/README.md`.
+  - **`dev/scripts/prod_smoke.php` is the other half, for the server** (Tom: *"node is not a known
+    command at the CPanel production server"*). Correct, and it never needs to be — the pass runs
+    where the code is edited. But the `Accept-Language: *` fatal WAS on production and nothing there
+    would have said so, so: 46 probes over five page shapes and nine header forms plus the broker,
+    needing nothing but PHP (curl where there is curl, streams where there is not), exiting non-zero
+    so it can gate a deploy. A 200 carrying a PHP warning counts as a failure — a warning above the
+    broker's JSON makes the page report "the server is unreachable", and a fault disguised as a
+    network problem is the worst kind to ship.
 
 - 0|219| **[DONE 2026-08-05] `lpn_` added to the Related-calculators line, and its identity strings
   translated.** Order set by Tom: HW → lpn, bpn, dw, mphl, mpf; BPN → lpn (the page had no such line
