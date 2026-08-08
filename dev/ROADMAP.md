@@ -427,22 +427,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     the answer**, and the log accrues at zero cost. Re-read it when `zh` passes 30 views.
   - **Do not re-score `zh`'s QUALITY in either direction before then.**
 
-- 45|146.02| **EPANET-style icon toolbar + map symbol icons (Task 146 child).** Replace/supplement
-  the current toolbar with EPANET-style icons for elements and map symbols. **Must land before the
-  translation sprint (146.06) — this blocks it**, per Tom, 2026-07-29.
-  - **Dropped 95 → 45 on 2026-08-03 (Tom): icons do not reduce the translation load.** *"My
-    reconsidered understanding is that icon toolbars don't really reduce our translation load since
-    everything must be described even with icons."* Correct, and if anything the load moves the
-    wrong way: a visible button label is a noun ("Junction"), while the `title`/`aria-label` that
-    replaces it wants to be a phrase ("Add a junction to the map"), so the string set gets longer
-    rather than shorter. It is still a **gate on 146.06**, but for CHURN reasons only — it rewrites
-    strings the sprint would otherwise have to pay for twice — not because it saves any.
-  - **Owes a short 193-style re-read of any string it adds or renames** (added 2026-07-31). Task 193
-    ran first, so the toolbar strings it tightened are the ones this task is most likely to change.
-    That is a paragraph of work against a handful of new keys, not a repeat of 193 — but it has to
-    happen before 146.06 launches, or the sprint pays 26× for whatever this task writes at speed.
-  - Note an icon toolbar does not necessarily REMOVE those strings: they become `title`/`aria-label`
-    text, which is plain-text-constrained (Rule B) where the visible button label was not.
 - 10|181| **Per-element symbol sizing (Task 146 child).** Task 180 shipped one overall
   `settings.symbolScale` multiplier ("Symbol size (relative to text)") covering node radius, pipe
   width, pump/vertex/arrow marks and stroke widths together. Tom, 2026-07-30, named the
@@ -775,8 +759,8 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 - 15|146.07| **Open/Closed link property (Task 146 child).** A simple boolean state on a link. Tom,
   2026-07-29: explicitly not a "valve" and not modeled via minor-loss-coefficient (Km) abuse — just
   a plain open/closed state, kept simple.
-- 90|146.06| **Translation sprint for `lpn_` strings (Task 146 child).** Not until later; blocked on
-  the string set settling (146.01/146.02/146.03 above are all still moving it). **Gate updated 2026-08-06: 146.08, 195 and now 220
+- 90|146.06| **Translation sprint for `lpn_` strings (Task 146 child).** **No longer blocked on any
+  other task — see GATE CLEARED below.** **Gate updated 2026-08-06: 146.08, 195 and now 220
   have all cleared** — the punch list is closed and `dev/browser-pass/run.js` keeps it closed. The
   page stays English-only anyway, because the remaining gate was never really the testing: it is
   whether the FEATURE SET has settled enough that a translated UI is not a promise of stability we
@@ -800,9 +784,24 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     26-agent sprint. The payload generator already emits exactly this — `payload_es.json` carries
     205 delta keys, `payload_zh.json` carries 3 — so the sprint proposal reads itself off the
     tooling rather than being hand-scoped.
-    **The gate is unchanged**: 146.02 still has to land first, because it rewrites toolbar strings
-    the sprint would otherwise pay for twice. The matrix changed the *size* of this task, not its
-    ordering.
+  - **GATE CLEARED 2026-08-08.** 146.02 — the last named blocker — closed with Task 231, and it
+    closed in the way that costs the sprint nothing: icons went in as *prefixes*, so no `lpn_` key
+    was added, renamed or removed, and the "193-style re-read" it owed has nothing to read. **The
+    only remaining gate is the judgement call 146.06 always really had**: has the feature set
+    settled enough that a translated UI is not a promise of stability we withdraw next week
+    (`project_lpn_scaffold_before_translate`)? That is Tom's call, and it is the same call as
+    dropping PREVIEW.
+  - **Exact size, read off the tooling 2026-08-08** (payloads FRESH): **224 `lpn_` keys × 4
+    languages** (es, pt, fr, tr) = 896 strings, **4 Sonnet agents**. The 3 identity strings are
+    **already translated in all 26 languages**, so there is no identity pass left to run — the
+    non-core payloads carry a delta of 0.
+  - **Dropping PREVIEW is a 27-file edit, not an English one.** The marker is baked into the
+    *translated* values of `lpn_main_menu`, `lpn_main_title` and `lpn_main_desc` in every language
+    ("VORABVERSION", "预览版", "ПРЕДВАРИТЕЛЬНАЯ ВЕРСИЯ"), so removing it means editing 3 keys × 27
+    files and re-baselining the drift manifest. `lpn_preview_banner` (English-only, 0 of 26, used at
+    `Looped-Network.php:8`) is deleted outright. **Order matters: translate first, then drop
+    PREVIEW** — the banner's own text promises "It is in English only for now", so removing the
+    marker before the sprint would leave that promise pointing at an English page.
 - 15|194| **Touch gesture model: one finger scrolls the page, two fingers pan the map (Task 146
   child).** Raised by Tom, 2026-07-31, after the canvas-fills-the-phone lock-up: *"It didn't occur
   to me to try to scroll with two fingers. That's just an idea. It looks like it occurred to you
@@ -1619,6 +1618,17 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
   stated preference about chrome, where stated and revealed reliably diverge; and ~4,042
   confirmed humans per period leaves a two-arm split under-powered anywhere but Manning-Pipe-Flow.
   Test chrome variants behaviorally against the `used`-of-`human` band (Task 202) instead.
+
+- 0|146.02| **[DONE 2026-08-08] EPANET-style icon toolbar — shipped as Task 231; map symbols
+  extracted to 146.10.** The toolbar half is done: one SVG icon set in `lib/Icons.lib.php`, applied
+  to the lpn menu bar, dropdowns and toolbar and to shared site chrome. The map-symbol half was
+  re-scoped separately as **146.10** and is still open.
+  **This task's gate on 146.06 is RELEASED.** It gated the sprint for churn reasons only — the fear
+  being that icon-only buttons would turn visible noun labels into `title`/`aria-label` phrases,
+  adding and rewriting strings the sprint would then pay for twice. Task 231 chose icon-as-**prefix**
+  instead, so every label kept its word and **zero language keys were added, renamed or removed**.
+  There is therefore nothing for the promised "193-style re-read" to read. 146.10 adds no strings
+  either (it is geometry), so it does not re-gate the sprint.
 
 - 0|205| **[DONE 2026-08-08] One "contact me" line per page, not two — English shipped 2026-08-03, the
   26-language resync (d) completed 2026-08-08.** Raised by Tom,
