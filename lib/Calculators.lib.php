@@ -18,7 +18,15 @@ function echoFeedback(){
       // Printable version button. Other collapsible lines (relatedCalcs, the units row) keep their
       // toggles -- those genuinely are chrome. ?>
 <p class="d-print-none" id="feedback">
-	<a href="../contact.php"><?=$ec_lang['template_feedback']?></a>
+	<?php // Root-relative on purpose, NOT "../contact.php" (fixed 2026-08-08, found by Tom on the
+	      // live site). This link 404'd from 2026-06-26 -- when commit b625286 moved the contact
+	      // system from the parent site INTO engcalcs/ and repointed both menu links but not this
+	      // one -- until today. "../" resolved to hawsedc.com/contact.php, which stopped existing
+	      // that day. It is also the wrong shape even when it works: this file is included by pages
+	      // that could sit at any depth, and the site answers on all four of http/https x www/non-www
+	      // with no redirect, so a path anchored at the site root is the only form that cannot drift.
+	      // Menus.lib.php:44 already uses exactly this form. ?>
+	<a href="/engcalcs/contact.php"><?=$ec_lang['template_feedback']?></a>
 </p>
 <?php
 }

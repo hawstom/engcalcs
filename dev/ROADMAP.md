@@ -1271,6 +1271,23 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **The decision it feeds is Task 217**, so this metric arrives with a decision already attached
     rather than becoming another number nobody acts on.
 
+- 75|227| **Check the links our pages emit, not just that the pages answer.** Raised by the Task 226
+  finding: the Feedback invitation 404'd for six weeks on every calculator page, and nothing in the
+  repo could have noticed. `prod_smoke.php` verifies each *page* returns 200 to every shape of
+  client; no tool has ever resolved the `href`s inside them.
+  - **The check is small and already prototyped** — fetch a sample of pages, extract every
+    `href="…"`, resolve relative to the page URL, and report anything that is not 200. Run against
+    production it found the one real break immediately, with only http→https 301s as noise (the
+    hard-coded `http://hawsedc.com/...` links in `echoMainMenu()` — worth normalizing to https
+    while in there, though they redirect correctly today).
+  - **Sample pages, not all 24 × 27 languages.** The lang files contain their own links (every
+    `mpf_friction_slope` carries `../frictionslope.php`, which is correct — the parent site does
+    still have that file, verified 2026-08-08), so a link fault can hide in a single language. But
+    a full crawl is a different, slower tool; one page per shape plus a pass over the distinct link
+    targets found in `lib/lang.ec.*.php` catches essentially all of it.
+  - **Fold it into `prod_smoke.php`** behind a flag rather than adding a second script — it is the
+    same question ("is what we deployed actually reachable?") asked one level deeper, and the
+    deploy-gating exit code should cover both.
 - 80|200| **Usage logging: the questions the current report cannot answer.** Raised by Tom,
   2026-08-03: *"I'd like to get more guidance about our development priorities from usage logging."*
   Ordered by value ÷ effort. Nothing here needs a database — the existing
@@ -1629,6 +1646,34 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Completed
 
+- 0|226| **[DONE 2026-08-08] The Feedback invitation on every calculator page had been a 404 for six
+  weeks.** Found by Tom on the live site the day after Task 206 shipped: the in-page invitation
+  linked to `../contact.php`, which from `/engcalcs/` resolves to `hawsedc.com/contact.php` —
+  confirmed 404 in production, while the menu's Contact item (200) worked fine.
+  - **Cause, and it is the ordinary one:** commit `b625286` (2026-06-26) moved the contact system
+    from the parent site *into* `engcalcs/` and repointed both links in `lib/Menus.lib.php` — but
+    not the third referrer, `echoFeedback()` in `lib/Calculators.lib.php`. Before that day
+    `../contact.php` was correct, because the parent site really did have one. The destination
+    moved; two of its three referrers came along.
+  - **Fixed** to `/engcalcs/contact.php` — root-relative, the same form `Menus.lib.php:44` already
+    used. `../` is the wrong shape even when it happens to work: the file is included by pages that
+    could sit at any depth, and the site answers on all four of http/https × www/non-www with no
+    redirect.
+  - **Bounds on the damage, stated honestly.** This broke 2026-06-26 and was fixed 2026-08-08 — six
+    weeks, on the suite's most prominent invitation. Tom's drought predates it ("none at all in
+    recent months"), so this is a real cause of the most recent stretch and **not** an explanation
+    of the whole silence. Resist reading it as case closed.
+  - **It nearly poisoned Task 206's first reading.** The funnel instrument shipped 2026-08-07 with
+    the link still broken: clicks would have logged normally, sends would have sat at zero, and the
+    honest-looking conclusion — "the invitation works, the form is the barrier" — would have been
+    exactly wrong. **Any funnel number that includes 2026-08-07 is contaminated; the clean baseline
+    starts 2026-08-08.**
+  - **The lesson worth keeping:** a link's failure mode here is silent on both ends. The visitor
+    sees a 404 and does not write to report that they could not write, and the site owner sees
+    nothing at all. `dev/scripts/prod_smoke.php` checks that every *page* answers 200 but has never
+    followed the links those pages *emit* — which is why six weeks passed. A one-command live link
+    check of every emitted `href` is now Task 227.
+
 - 0|206| **[DONE 2026-08-07] Measured the contact funnel — the one metric the mission cares about,
   and we were blind on it.** Raised by Tom, 2026-08-03: contacts "have always been rare and
   gratifying. None at all in recent months." Nothing logged `contact.php` views or `formmail.php`
@@ -1667,6 +1712,12 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     the populated, no-sends, and no-view-log cases.
     - The section says in place that the ratio is only readable once **both** counts leave single
       digits — with a handful of contacts a year, one message either way moves it enormously.
+  - **The baseline starts 2026-08-08, not 2026-08-07 — see Task 226.** The day after this shipped,
+    Tom found that the in-page Feedback invitation had been linking to a 404 since 2026-06-26. Had
+    that gone unnoticed, this instrument's first reading would have shown clicks with zero sends and
+    pointed confidently at the wrong culprit ("the form is the barrier"). Discard any funnel figure
+    covering 2026-08-07. It is also a fair verdict on the instrument: it took one day to turn a
+    six-week silent failure into a visible question.
   - **Why it was urgent:** two confounders had just landed and were otherwise going to be
     uninterpretable — Tom removed the form's anti-spam test (a classic conversion killer, especially
     on mobile and for non-English users), and Task 205 changed the invitation's wording, placement
