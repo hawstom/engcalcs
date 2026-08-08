@@ -179,6 +179,9 @@ class Session {
 	// ---- the picker ------------------------------------------------------
 	async queuePick(name) { await this.page.evaluate((n) => window.__lpn.queue(n), name); }
 	async cancelNextPicker() { await this.page.evaluate(() => window.__lpn.cancelNextPicker()); }
+	// Hand out handles whose writes are discarded — see lib/pickers.js. The only way to reproduce a
+	// real folder's "the write went nowhere" from inside OPFS.
+	async sabotageWrites(on = true) { await this.page.evaluate((v) => window.__lpn.sabotageWrites(v), on); }
 	async pickerCalls() { return this.page.evaluate(() => window.__lpn.calls()); }
 
 	// ---- this profile's view of the disk ---------------------------------

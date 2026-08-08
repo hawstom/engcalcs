@@ -66,8 +66,12 @@ one cannot be automated.
 - **§6/§8 a permission that is `prompt` or `denied`.** OPFS is always `granted`, so the silent
   reconnect is covered and the dormant-grant revival on first gesture is not.
 - **§10 a file that has gone missing.** OPFS recreates a deleted file through its old handle, so the
-  failure this tests cannot occur here. A real folder throws, which is the branch that warns.
-- **§11 Firefox and Safari.**
+  failure this tests cannot occur here. A real folder throws, which is the branch that warns. *(The
+  page's answer to a write that goes nowhere IS covered — by handing it a handle whose writes are
+  discarded. What is not covered is which of those two things a real Explorer rename produces.)*
+- **§11 Firefox and Safari's own rendering.** The BRANCH is covered: the page decides on
+  `typeof window.showSaveFilePicker`, so a Chromium with that one property removed takes exactly the
+  same path, and the spec drives it.
 - **Anything visual**: banner colours, the Save-all flicker, the stray scrollbar, print layout.
 
 ## Adding a check

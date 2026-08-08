@@ -17,7 +17,7 @@
 const path = require('path');
 const { startServer, launchBrowser, clearLockRecords } = require('./lib/env');
 
-const SPECS = ['boot', 'menu', 'files', 'reload', 'locking', 'missing'];
+const SPECS = ['boot', 'menu', 'files', 'reload', 'locking', 'missing', 'fallback'];
 
 let checks = 0, failures = 0, skipped = 0, current = '';
 const report = {

@@ -52,6 +52,24 @@ exports.run = async function ({ browser, report }) {
 				'and offers the way back', banner ? banner.buttons.join(' / ') : '');
 			report.ok(await a.currentTabDirty(), 'the tab still wears its asterisk — the work is NOT in a file');
 		}
+		// --- the write that goes nowhere ---------------------------------------
+		// The real §10 failure, reproduced the only way OPFS allows: a handle whose writes are
+		// discarded. This is Tom's 2026-08-06 report — "It neither complains nor creates a new file.
+		// It silently fails to save." — and the page must now catch it by READING THE FILE BACK,
+		// because everything up to and including close() can resolve without a byte landing.
+		await a.sabotageWrites(true);
+		await a.queuePick('Sabotaged-lpn-hawsedc-engcalcs.json');
+		await a.menuClick('Save as…');
+		await a.settle(400);
+
+		const b2 = await a.waitBanner(2000);
+		report.ok(!!b2, 'a write that goes nowhere is NOT reported as a save');
+		report.ok(b2 && /moved, renamed, or deleted|Could not write/.test(b2.text || ''),
+			'and says the file could not be written', b2 ? (b2.text || '').slice(0, 90) : '');
+		report.ok(b2 && (b2.buttons || []).includes('Choose the file again'), 'and offers the way back');
+		report.ok(await a.currentTabDirty(), 'the tab keeps its asterisk — the work is NOT in a file');
+		await a.sabotageWrites(false);
+
 		report.eq(a.errors.length, 0, 'no uncaught JavaScript');
 	} finally {
 		await a.close();

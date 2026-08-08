@@ -2240,6 +2240,18 @@ var EngCalcs = EngCalcs || {};
 		document.body.removeChild(a);
 		// Deferred: revoking synchronously can beat the download off the mark in some browsers.
 		setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
+		// The download IS this browser's save, so record it as one: `savedSig` is what saveToStorage()
+		// measures `dirty` against, and `exported` is what tells tabAsterisk() this project has a copy
+		// somewhere at all. Without these the asterisk could never go out in Firefox, whatever the
+		// user did (punch-list finding 13).
+		var dlEntry = indexEntry(library.openId);
+		if (dlEntry) {
+			dlEntry.savedSig = docSignature();
+			dlEntry.dirty = false;
+			dlEntry.exported = true;
+			saveIndex();
+			renderTabs();
+		}
 		// Said every time, because it is the answer to the question this path always provokes:
 		// "why did I get a second copy?" (Tom, 2026-08-03). The menu no longer carries that caveat
 		// in its label, so this is where the fact lives.
@@ -2442,10 +2454,18 @@ var EngCalcs = EngCalcs || {};
 		};
 		renderBanner();
 	}
+	// **Every fresh failure speaks**, for the same reason setFileChangedElsewhere() does: the banner is
+	// dismissable, so an early return on "we already knew that" turns the second failed Save into
+	// silence. Only the all-clear direction is allowed to be a no-op.
 	function setFileError(on) {
-		if (on === fileError) { return; }
-		fileError = on;
-		setFileMissing(on);
+		if (!on) {
+			if (!fileError) { return; }
+			fileError = false;
+			setFileMissing(false);
+			return;
+		}
+		fileError = true;
+		setFileMissing(true);
 	}
 	// What the file looked like the last time we read or wrote it, per project id. This is the whole
 	// basis of the freshness check below: not a lock, not a name, but "is the file still the one I
@@ -2464,8 +2484,10 @@ var EngCalcs = EngCalcs || {};
 		var e = indexEntry(id);
 		return (e && e.fileStamp) || '';
 	}
+	// Returns the stamp it recorded, or '' if the file could not be read. The return value is what
+	// makes it double as the post-write READBACK check below.
 	async function stampFile(id, handle) {
-		if (!handle || !handle.getFile) { return; }
+		if (!handle || !handle.getFile) { return ''; }
 		var entry = indexEntry(id), stamp = '';
 		try { var f = await handle.getFile(); stamp = f.lastModified + ':' + f.size; }
 		catch (err) { stamp = ''; }
@@ -2477,6 +2499,7 @@ var EngCalcs = EngCalcs || {};
 			if (stamp) { entry.fileStamp = stamp; } else { delete entry.fileStamp; }
 			saveIndex();
 		}
+		return stamp;
 	}
 	// Has somebody else written to this file since we last saw it?
 	//
@@ -2533,9 +2556,23 @@ var EngCalcs = EngCalcs || {};
 			var writable = await handle.createWritable();
 			await writable.write(text);
 			await writable.close();
-			setFileError(false);
+			// **A WRITE IS NOT A SAVE UNTIL YOU CAN READ IT BACK** (Tom, 2026-08-06, on a file he had
+			// moved in Explorer: *"It neither complains nor creates a new file. It silently fails to
+			// save."*). Everything above can resolve without a byte reaching the disk the user is
+			// looking at -- a handle whose file has been moved or deleted, a revoked permission, a
+			// sync client holding the path. So the file is read back and its SIZE compared with what
+			// we just wrote. Cheap, because the stamp has to be re-read here anyway.
+			//
+			// Byte length, not `text.length`: the file is UTF-8, and a project with any non-ASCII in
+			// a label would fail this check forever if it were compared in characters.
 			lastSaveAt = Date.now();
-			await stampFile(id, handle); // this IS the file now
+			var stamped = await stampFile(id, handle);
+			var wroteBytes = new Blob([text]).size;
+			if (!stamped || parseInt(stamped.split(':')[1], 10) !== wroteBytes) {
+				setFileError(true);
+				return false;
+			}
+			setFileError(false);
 			var entry = indexEntry(id);
 			if (entry) {
 				entry.savedSig = sigWritten;
@@ -3669,8 +3706,19 @@ var EngCalcs = EngCalcs || {};
 	// not stop meaning "unsaved" and start meaning "not a file" -- that confuses POWER with MEANING. A
 	// browser project genuinely is unsaved. Only the fade is a guess; if it reads as broken or
 	// disappears on a phone it can go without touching the rule.
+	// A bold asterisk means "changes not in the file"; a faint one means "this lives only in the
+	// browser". They are different facts and both are worth saying.
+	//
+	// **Once a fallback-path project has been exported, the faint star follows its changes too**
+	// (Tom, twice: *"After Save as, there are no unsaved changes. Asterisk should disappear until
+	// there are changes."*). In Firefox and Safari there is no such thing as a connected file, so the
+	// downloaded copy IS the saved state, and a star that can never go out is a star that says
+	// nothing. It stays FAINT rather than turning bold, because the second fact is still true: the
+	// page cannot write back to what it handed you.
 	function tabAsterisk(entry) {
-		if (!isFileProject(entry)) { return { show: true, faded: true }; }
+		if (!isFileProject(entry)) {
+			return { show: entry && entry.exported ? !!entry.dirty : true, faded: true };
+		}
 		return { show: !!entry.dirty, faded: false };
 	}
 	function buildTab(p) {

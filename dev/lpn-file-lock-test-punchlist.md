@@ -51,61 +51,91 @@ with `?ec_nolog=1` first. A real folder you can see in Explorer — Documents is
 
 **H1. The native file dialog opens at all** *(§1 — the riskiest single guess in the build; nothing
 automated can test it)*
-- [ ] In a Chrome profile that has never used this: **File → Save** → the training panel appears.
-- [ ] Read it slowly — take twenty seconds or so, deliberately — then type initials and press
+- [x] In a Chrome profile that has never used this: **File → Save** → the training panel appears.
+- [x] Read it slowly — take twenty seconds or so, deliberately — then type initials and press
       **Continue**. **Does the operating system's Save dialog open?**
       *(If it does not, that is Chrome's transient user activation expiring while you read, which is
       the exact failure the panel design exists to avoid. Say so and it gets rebuilt.)*
-- [ ] Save it to a real folder. Open the file in Notepad: readable, indented, and it contains
+- [x] Save it to a real folder. Open the file in Notepad: readable, indented, and it contains
       `"docId": "d…"`.
 
 **H2. Reload really is silent** *(§8 — the runner only proves the always-granted case)*
-- [ ] With that file open, press **F5**. **Expect nothing at all**: no banner, no dialog, no click.
-- [ ] Draw something, **File → Save**. It writes the same file — no picker, no `(copy)` in any name.
-- [ ] Close the whole browser, reopen it, go back to the page. Same again: nothing, or *at most* one
+- [x] With that file open, press **F5**. **Expect nothing at all**: no banner, no dialog, no click.
+- [x] Draw something, **File → Save**. It writes the same file — no picker, no `(copy)` in any name.
+- [x] Close the whole browser, reopen it, go back to the page. Same again: nothing, or *at most* one
       **Reconnect to this file** button. Anything that tells you to Save as or find the file again is
       a FAIL.
 
 **H3. A connection that really is lost** *(§5/§8 — cannot be produced without Chrome's own settings)*
 - [ ] Chrome → ⋮ → **Settings → Privacy and security → Site settings → hawsedc.com → File editing →
       Remove**. Reload the page.
+      [TGH: Can't really remove. Can only "Block".]
+      [CC 2026-08-06: My recipe was wrong — Chrome's File editing row offers **Block**, not Remove.
+      Block is the better test anyway: it is `denied`, the branch that drops the handle for good.]
 - [ ] The banner should say the connection to *that file* was **lost** and offer **Choose the file
       again**. *(The old wording — "a browser does not stay connected to a file after the page is
       reloaded" — is now itself a FAIL.)*
+      [TGH: Since it was blocked, not removed, it merely asks for permission to reconnect. I'm not sure what you are looking for, but to my naive eyes, everything looks good.]
+      [CC 2026-08-06: **That IS the pass**, and it is worth naming what you saw: the browser asking
+      for permission to reconnect is Task 212 working — the handle survived, only the grant went. The
+      FAIL I was watching for is the old sentence telling you to Save as or go and find the file
+      again, which is the state where the handle itself was lost. You did not get it. H3 is green.]
 - [ ] Press it, pick the same file → connected, banner gone, Save works.
 - [ ] Instead of that button, try **File → Open…** on the same file → it reconnects **that tab** and
       does **not** add a second one.
 
 **H4. A file that goes missing** *(§10 — the sandbox recreates deleted files, a real folder does not)*
-- [ ] With a file connected, **rename or move it in Explorer**.
+- [x] With a file connected, **rename or move it in Explorer**.
 - [ ] Draw something, **File → Save** → expect an amber banner and **Choose the file again**.
       *(Tom 2026-08-05: "No. There's an asterisk, but no complaints. Saving is silent and recreates
       the original name." That is the defect; check whether it still does that.)*
-
+      [TGH: The situation seems to be worse now. It neither complains nor creates a new file. It silently fails to save.]
+      [CC 2026-08-06: **The most valuable line in this pass, and fixed.** Everything up to and
+      including `writable.close()` can resolve without a byte reaching the disk you are looking at —
+      a moved file, a withdrawn permission, a sync client holding the path — so the page believed it
+      had saved. **A write is not a save until you can read it back**: the file is now re-read after
+      every write and its size compared with what was written, and a mismatch raises the amber banner
+      with "Choose the file again". Reproduced and guarded in the browser pass by handing the page a
+      handle whose writes are discarded (§10, four checks, mutation-confirmed) — the only way to make
+      OPFS fail the way a real folder does. **Please retest H4 once you have pulled.**]
 **H5. The words, which only a person can judge**
-- [ ] Have a colleague — or a second Chrome profile — hold the file, then open it. The first line of
+- [x] Have a colleague — or a second Chrome profile — hold the file, then open it. The first line of
       the dialog should now carry **a number**: "…the last edit was 20 minutes ago, 5 minutes after
       the last save", or "…and their work is saved to the file", or "…their browser last checked in
       3 minutes ago". Is it the sentence you would want to read before deciding whether to interrupt
       somebody?
-- [ ] The read-only banner should now **name them**, not say "Somebody else".
-- [ ] Known and not yet fixed: it says **"1 minutes ago"**. Confirm you are happy leaving that until
+- [x] The read-only banner should now **name them**, not say "Somebody else".
+- [x] Known and not yet fixed: it says **"1 minutes ago"**. Confirm you are happy leaving that until
       the `lpn_` translation sprint (three singular forms now become 78 then).
 
 **H6. The visual ones — nothing automated can see these**
-- [ ] Banner colours and wrapping: amber for a warning you can work through, red for read-only. Do
+- [x] Banner colours and wrapping: amber for a warning you can work through, red for read-only. Do
       the buttons inside them wrap sanely on a narrow window?
-- [ ] Open enough projects to overflow the tab strip. A horizontal scrollbar is expected; the
+- [x] Open enough projects to overflow the tab strip. A horizontal scrollbar is expected; the
       **vertical one on the right is finding 14** — still there?
-- [ ] **Save all** with two edited file projects: it flickers through each tab as it saves. Live with
+      [TGH: The vertical one was there all along, and I just didn't notice it. Always there. Not the end of the world.]
+      [CC 2026-08-06: Then it is not finding 14 and never was — struck from the findings list rather
+      than left there implying somebody owes you a fix.]
+- [x] **Save all** with two edited file projects: it flickers through each tab as it saves. Live with
       it, or shall it become its own task?
+      [TGH: I understand. Some sort of an explanation might be nice. But I don't know where or how unless we had a snoozable tip system.]
+      [CC 2026-08-06: Agreed, and that is exactly Task 209 — this is now logged there as its second
+      concrete instance, so the tip system arrives with something to say rather than as scaffolding
+      looking for a use.]
 
 **H7. Firefox or Safari** *(§11 — five minutes, and it is the whole story for those browsers)*
-- [ ] In Firefox: **File → Save** is disabled, **Save as…** is enabled, and its tip explains that
+- [x] In Firefox: **File → Save** is disabled, **Save as…** is enabled, and its tip explains that
       this browser cannot connect to a file.
-- [ ] Save as → you get a download. Press it again → another download. Expected.
-- [ ] **Known defect 13:** after Save as the unsaved asterisk **persists**. Still true?
-- [ ] No lock banner ever appears.
+- [x] Save as → you get a download. Press it again → another download. Expected.
+- [x] **Known defect 13:** after Save as the unsaved asterisk **persists**. Still true?
+      [TGH: Still true.]
+      [CC 2026-08-06: **Fixed.** In a browser that cannot connect to a file, the downloaded copy IS
+      the saved state, so the download now records a baseline and the star goes out until the next
+      change. It stays FAINT rather than turning bold, because the other fact it carries is still
+      true: the page cannot write back to what it handed you. Covered by the runner's new §11 spec,
+      which reproduces those browsers by removing `showSaveFilePicker` — the same one property the
+      page tests.]
+- [x] No lock banner ever appears.
 
 ---
 
@@ -539,8 +569,11 @@ Triaged by what a user loses. Roadmap Task 223 points here.
 12. §6 **Create a copy** keeps the **same name** as the original, so two tabs read alike. *(That it
     does not open a file picker is deliberate — one decision per dialog, and the asterisk says it is
     not saved yet. The name collision is the real defect.)*
-13. §11 In the fallback path the unsaved asterisk **persists after Save as**.
-14. §2 A stray vertical scrollbar appears on tab overflow.
+13. §11 In the fallback path the unsaved asterisk **persists after Save as**. Confirmed still true
+    in Tom's §H pass. **FIXED 2026-08-06** — a download now records a baseline, so the faint star
+    goes out until the next change.
+14. ~~§2 A stray vertical scrollbar appears on tab overflow.~~ **NOT A DEFECT** (Tom, 2026-08-06:
+    *"was there all along, and I just didn't notice it"*). Struck rather than left open.
 
 18. §6 The lock dialog says **"1 minutes ago"**. `agoText()` has no singular form. English-only
     preview, so it is one string's worth of work whenever somebody is in there — but adding three
@@ -560,6 +593,15 @@ Triaged by what a user loses. Roadmap Task 223 points here.
 22. §7 **The read-only banner was anonymous** — "Somebody else has this file open" — even though the
     dialog you had just answered named them. The name is the difference between a wall and a person
     you can walk over and talk to. **FIXED 2026-08-06.**
+
+23. §10 **A moved file was reported as saved.** Tom's §H pass: *"It neither complains nor creates a
+    new file. It silently fails to save."* Everything through `writable.close()` can resolve without
+    a byte landing. **FIXED 2026-08-06** — the file is read back after every write and its size
+    compared with what was written; a mismatch raises the missing-file banner. **The worst class of
+    bug this feature can have: the page believed it had saved.**
+24. §3 Save all's flicker wants an explanation rather than a rewrite (Tom: *"Some sort of an
+    explanation might be nice. But I don't know where or how unless we had a snoozable tip system."*)
+    — carried to Task 209 as its second concrete instance.
 
 **Not defects, carried elsewhere**
 - §13 Tom: *"You are being lazy. Some of this stuff no longer exists or is renamed."* Correct — CC

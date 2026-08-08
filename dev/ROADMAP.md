@@ -934,6 +934,19 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     project and every warning it raises is a banner about the tab in front of you; making it silent
     means teaching that function to report about a project the user cannot see. Cosmetic cost, P0
     surface. Recorded so it is not re-litigated as an oversight.
+  - **From Tom's §H pass, 2026-08-06 — the first pass run against a list this short.** H1 (the
+    native picker handshake, the riskiest single guess in the build) **passes**; H2 and H5 pass; H3
+    passes once you know Chrome's row says Block, not Remove. Two real defects, both fixed:
+    - **§10 a moved file was reported as saved** — *"It neither complains nor creates a new file. It
+      silently fails to save."* Everything through `writable.close()` can resolve without a byte
+      landing. **A write is not a save until you can read it back**: the file is now re-read after
+      every write and its size compared with what was written. This is the worst class of bug this
+      feature can have — not refusing to save, but *believing* it had.
+    - **§11 the fallback asterisk never went out.** In a browser that cannot connect to a file the
+      downloaded copy IS the saved state; it now records a baseline and the star clears until the
+      next change, staying faint because the page still cannot write back to it.
+    - Not defects: the tab-strip scrollbar (*"there all along"* — struck from the findings), and
+      Save all's flicker (wants an explanation, carried to Task 209).
   - Sits above 220 because 220 cannot finish until these are fixed and the punch list re-run.
 
 - 95|220| **Browser-verify `lpn_` project files and locking against the POST-211 UI.**
@@ -972,7 +985,7 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     so it contaminated every browser pass and produced three separate "reload doesn't work" reports.
   - Still deferred: `Open Recent`, and answering "is this the same file?" across sessions. Those were
     the other half of this task and want `isSameEntry()`; extract them if they earn it.
-- 40|209| **A snoozable tip system (Task 146 child, but suite-shaped).** Asked for by Tom,
+- 45|209| **A snoozable tip system (Task 146 child, but suite-shaped).** Asked for by Tom,
   2026-08-03, while reviewing Task 195's file-and-lock explanation: the page needs somewhere to put
   "here is what is about to happen" text that a user can dismiss for now and see again later, rather
   than the two states we have (shown once ever, or shown every time). Phase 2's training panel is the
@@ -981,6 +994,11 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   Wants: dismiss, snooze, and a way to bring a tip back deliberately (a "show me that again" in
   Settings). Suite-shaped rather than `lpn_`-only: every calculator has explanations it currently
   either buries in Notes or repeats forever.
+  - **Second concrete instance, 2026-08-06:** Save all switches tabs as it saves — ugly, but the
+    honest consequence of the write path writing the OPEN project (punch list §3). Tom: *"Some sort
+    of an explanation might be nice. But I don't know where or how unless we had a snoozable tip
+    system."* That is this task, and it is why the priority moved 40 → 45: it now has two real things
+    to say, and a tip system with nothing to say is scaffolding.
 
 - 20|196| **EPANET `.inp` import/export (Task 146 child) — a separate task from Task 195, deliberately.**
   Raised 2026-08-01. **This reopens a decision already made once**: the scope doc records

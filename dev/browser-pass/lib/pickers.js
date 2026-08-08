@@ -63,6 +63,30 @@ const INIT_SCRIPT = `
 			} catch (err) { return null; }
 		}
 	};
+	// **A write that goes nowhere.** Tom, 2026-08-06, on a file he had moved in Explorer: "It neither
+	// complains nor creates a new file. It silently fails to save." A real folder can fail that way
+	// -- a moved file, a revoked permission, a sync client holding the path -- and OPFS never can, so
+	// the only way to test the page's answer to it is to hand it a handle whose writes are discarded.
+	// Everything else about the handle stays real.
+	//
+	// The wrapper is NOT structured-cloneable, so a handle taken while this is on cannot be persisted
+	// to IndexedDB. That is fine and deliberate: this switch exists for the save path, and any spec
+	// using it says so.
+	var sabotage = false;
+	function sabotaged(h) {
+		return {
+			name: h.name,
+			getFile: function () { return h.getFile(); },
+			queryPermission: function () { return Promise.resolve('granted'); },
+			requestPermission: function () { return Promise.resolve('granted'); },
+			isSameEntry: function (o) { return h.isSameEntry(o); },
+			createWritable: function () {
+				return Promise.resolve({ write: function () { return Promise.resolve(); },
+				                         close: function () { return Promise.resolve(); } });
+			}
+		};
+	}
+	window.__lpn.sabotageWrites = function (on) { sabotage = !!on; };
 	var cancelNext = false;
 	window.__lpn.cancelNextPicker = function () { cancelNext = true; };
 	function maybeCancel() {
@@ -75,14 +99,16 @@ const INIT_SCRIPT = `
 		log.push({ kind: 'save', suggestedName: opts.suggestedName || '' });
 		if (maybeCancel()) { throw new DOMException('cancelled', 'AbortError'); }
 		var name = nextName(opts.suggestedName || 'Untitled-lpn-hawsedc-engcalcs.json');
-		return await (await root()).getFileHandle(name, { create: true });
+		var h = await (await root()).getFileHandle(name, { create: true });
+		return sabotage ? sabotaged(h) : h;
 	};
 	window.showOpenFilePicker = async function (opts) {
 		log.push({ kind: 'open' });
 		if (maybeCancel()) { throw new DOMException('cancelled', 'AbortError'); }
 		var name = nextName(null);
 		if (!name) { throw new DOMException('nothing queued for showOpenFilePicker', 'AbortError'); }
-		return [await (await root()).getFileHandle(name)];
+		var oh = await (await root()).getFileHandle(name);
+		return [sabotage ? sabotaged(oh) : oh];
 	};
 }());
 `;
