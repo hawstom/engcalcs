@@ -562,6 +562,21 @@ function prefixToTermNames(): array
         'pd' => ['flow', 'penstock', 'gross head', 'net head', 'head loss', 'friction factor'],
         'rc' => ['flow', 'velocity', 'riprap', 'slope', 'rock chute', 'chute', 'unit discharge', 'median rock size', 'gradation', 'porosity', 'specific gravity', 'ponding', 'outlet apron', 'weir head', 'upstream', 'downstream', 'reach'],
         'rrc' => ['flow', 'velocity', 'riprap', 'slope', 'rock chute', 'chute', 'unit discharge', 'median rock size', 'gradation', 'porosity', 'specific gravity', 'ponding', 'outlet apron', 'weir head', 'upstream', 'downstream', 'reach'],
+        // lpn/bpn were missing here until 2026-08-08, so both silently fell back to the
+        // three default terms and the network-concept entries seeded in Task 193 — every one
+        // of them carrying an 'avoid' array — never reached a translation agent.
+        'lpn' => ['flow', 'velocity', 'head', 'head loss', 'friction loss', 'minor loss', 'pressure',
+            'elevation', 'demand', 'static head', 'maximum allowable head', 'supply head',
+            'supply curve', 'looped network', 'branched network', 'pipe line', 'pressure rating',
+            'pressure reduction', 'energy grade line', 'Manning roughness', 'friction factor',
+            'draw (a diagram)', 'junction', 'reservoir', 'node', 'link', 'vertex',
+            'background image', 'pump curve', 'project (saved network)', 'scenario',
+            'upstream', 'downstream'],
+        'bpn' => ['flow', 'velocity', 'head', 'head loss', 'friction loss', 'minor loss', 'pressure',
+            'elevation', 'demand', 'static head', 'maximum allowable head', 'supply head',
+            'supply curve', 'branched network', 'branch', 'pipe line', 'pressure rating',
+            'pressure reduction', 'energy grade line', 'Manning roughness', 'friction factor',
+            'junction', 'reservoir', 'node', 'link', 'upstream', 'downstream'],
         'ip' => ['flow', 'velocity', 'head loss', 'emitter', 'distribution uniformity', 'low-quarter distribution uniformity', 'application rate', 'lateral', 'mainline', 'reach', 'velocity head', 'friction loss', 'minor loss', 'energy grade line', 'upstream', 'downstream'],
     ];
 }
