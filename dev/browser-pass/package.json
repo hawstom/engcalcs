@@ -1,0 +1,8 @@
+{
+  "name": "engcalcs-lpn-browser-pass",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Automated half of the lpn_ project-file and locking punch list.",
+  "scripts": { "test": "node run.js" },
+  "dependencies": { "playwright-core": "^1.0.0" }
+}

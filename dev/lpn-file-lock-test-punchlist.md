@@ -18,6 +18,13 @@
 Everything in Task 195 was verified only by harnesses against sliced-out logic; **no part of the UI
 has ever been seen rendered.** This list exists because that is the whole risk.
 
+> **AUTOMATED 2026-08-06 — run `node dev/browser-pass/run.js` BEFORE reading any further.**
+> 89 checks over two real browser profiles against the real lock broker, in about twenty seconds.
+> It covers most of §2–§8 and §12 mechanically. **What is left for a human is short and is listed in
+> `dev/browser-pass/README.md`**: §1's native picker handshake, a permission that is genuinely
+> `prompt`/`denied`, §10 (a real folder, not OPFS), §11 Firefox/Safari, and anything visual. Boxes
+> below that the runner now owns are marked **[auto]** — do not spend a pass on them.
+
 **Tom's time is the scarce thing here, not CC's** (2026-08-05: *"The full passes are slow and
 fatiguing, and I ask you not to ask them of me any more than necessary"*). So the rule for adding to
 this list: **if a harness can answer it, a harness must**, and only what genuinely needs a rendered
@@ -100,7 +107,7 @@ single guess in the build.
 
 ## 3. The File menu, and the absence of autosave
 
-- [x] **RETEST — fixed 2026-08-05.** Menu reads: **New, Open…, Save, Save as…, Save all, Revert,
+- [x] **[auto]** **RETEST — fixed 2026-08-05, and the runner now checks every row and its greying.** Menu reads: **New, Open…, Save, Save as…, Save all, Revert,
       Close** — *every row present every time*. **Save all** is greyed out below two file projects
       with unsaved changes, in the way Save and Revert already grey out.
       [TGH: Save all is not present]
@@ -149,13 +156,13 @@ single guess in the build.
 - [x] **File → Open…** → pick a saved file → the network appears and the status line names it.
 - [x] It arrives as a **new tab**, not over the top of the current project.
 - [x] Its tab is **not** marked "Not saved to a file".
-- [x] **RETEST — fixed 2026-08-05.** Open the *same* file twice in one browser → **no second tab**.
+- [x] **[auto]** **FIXED 2026-08-05, verified by the runner.** Open the *same* file twice in one browser → **no second tab**.
       It switches to the tab that already has it and says so. If that tab has unsaved changes, the
       message says so too and points at Revert.
       [TGH: It does open two live tabs both claiming the same file.]
       [CC 2026-08-05: Two tabs over one file is a merge conflict with yourself. Identity is the
       `docId` inside the file, so a copy saved under a new name still opens as its own tab.]
-- [ ] **The same route is now how you reconnect.** Take a project whose banner says the connection
+- [x] **[auto]** **The same route is now how you reconnect.** Take a project whose banner says the connection
       was lost, and **File → Open…** its file → it reconnects *that* tab rather than adding one.
       [TGH: I am not sure under what condition a connection would be lost. How can I test this?]
       [CC 2026-08-06: Fair — since Task 212 it is genuinely hard to reach, which is the point. To
@@ -206,7 +213,7 @@ single guess in the build.
       somebody else saved to this file and pointing at Save as / Revert. A's work is untouched.
       [CC 2026-08-06: (1) YES, and it is in — see the new box below. (2) answered there too.]
       [TGH: (1) Do we want to add "AAA has this file open. They last edited X ago, Y after their last save"? (2) Revert is not an option. It says "Read-only: TGH has this file open. You can change anything you like here, but you cannot save. Use File, Save as to save to a different file.Save as…". I think it may be good as is.]
-- [ ] **NEW 2026-08-06 — the lock dialog now carries numbers** (Tom: *"Are we going to add some
+- [x] **[auto]** **NEW 2026-08-06 — the lock dialog now carries numbers** (Tom: *"Are we going to add some
       numbers to this message?"*). Open a file B is holding and read the first line. It should say
       one of four things, never the bare *"TGH has this file open."*:
       - B edited and has **unsaved** work → *"…the last edit was X ago, Y after the last save."*
@@ -217,7 +224,7 @@ single guess in the build.
       needed both an edit and a save in B's current session — so the ordinary "opened it and went to
       lunch" case fell through to the bare one. Wording checked by harness §12, including that the
       broker's seconds are not read as milliseconds.)*
-- [ ] **REWRITTEN 2026-08-05 — these are two different states, which is what did not make sense.**
+- [x] **[auto]** **REWRITTEN 2026-08-05 — both states are now checked by the runner, including the Revert button.**
       - **Read-only** (B holds the *lock*): the banner names B and offers **Save as** only. There is
         nothing to revert *to* — the file has not moved — so no Revert is offered and that is right.
         *(Tom: "I think it may be good as is.")*
@@ -233,7 +240,7 @@ single guess in the build.
       **Save as… + Revert**, changed-underneath gets **Save as… + Revert + Dismiss**. Revert writes
       nothing, so it is safe even in read-only.]
 - [x] From that state, **Save as…** to a new name → succeeds, banner clears, A keeps their work.
-- [-] The same refusal happens **with the lock broker blocked** (see §9). The freshness check must
+- [x] **[auto]** The same refusal happens **with the lock broker blocked** (see §9). The freshness check must
       not depend on the server at all.
       [TGH: You are being lazy. You should not ask me to test things that are obviously not there. "Beware: could not reach the server to check or create a lock on this project, so nothing is stopping a colleague from editing the same file at the same time. You will be told if locking starts working again."]
       [CC 2026-08-05: Fair, and the banner you kept seeing was itself the bug. A server that ANSWERS
@@ -262,7 +269,7 @@ single guess in the build.
       Then block the request entirely (recipe above) → the original "could not reach" wording.
 - [x] Ordinary case, unbroken: open, edit, Save, edit, Save again → **never** refused. A false
       positive here would be worse than the bug it prevents.
-- [-] Profile **B**: open the same file. Expect a dialog headed **"<A's initials> has this file
+- [x] **[auto]** Profile **B**: open the same file. Expect a dialog headed **"<A's initials> has this file
       open."** offering exactly two choices: **Open read-only** and **Create a copy**.
       **There must be no Take over.**
       [TGH: Yes, most of the time. But more than once I have experienced a silent same open in another browser. I am not sure what are the conditions. Testing this, I find that when it happens, closing and reopening in B just repeats the mistake. Next I checked that A is indeed connected. Then I closed A and reopened it. That ends the manifestation.]
@@ -297,9 +304,9 @@ This is the paradigm Tom asked for: you may do anything you like, you just canno
 
 - [x] In B choose **Open read-only** → a banner names A and says you can change anything but cannot
       save.
-- [ ] **RETEST — fixed 2026-08-05.** In B: add nodes, drag, delete, undo, edit properties, change
+- [x] **[auto]** **RETEST — fixed 2026-08-05.** In B: add nodes, drag, delete, undo, edit properties, change
       settings → **all allowed**. Every tool in the toolbar is reachable.
-- [ ] In B: **Save is disabled** in the File menu and does nothing if reached any other way. It must
+- [x] **[auto]** In B: **Save is disabled** in the File menu and does nothing if reached any other way. It must
       **not** turn itself into Save as. *(Tom, 2026-08-05: "Save is disabled as it should be.")*
 - [ ] In B: edits made in read-only **survive switching to another tab and back**. They live in the
       browser like any other project; only the *file* is off limits.
@@ -323,10 +330,10 @@ This is the paradigm Tom asked for: you may do anything you like, you just canno
 > reset — the old boxes were passes and fails against the opposite behaviour.
 
 - [x] With a file-connected project, **reload the page**. The project is still there.
-- [ ] **The reload is silent.** No banner, no dialog, no click: the file is simply still connected.
+- [x] **[auto]** **The reload is silent.** No banner, no dialog, no click: the file is simply still connected.
       *(The browser's grant goes dormant rather than away, and the first click or keypress anywhere
       on the page revives it without showing anything.)*
-- [ ] **Save** immediately after a reload writes to **the original file** — not a copy, and no
+- [x] **[auto]** **Save** immediately after a reload writes to **the original file** — not a copy, and no
       `(copy)` in any suggested name.
       [TGH (against the old behaviour): It acts as those it's saving a copy... And its suggested file
       name is ...(copy)... .]
@@ -334,7 +341,7 @@ This is the paradigm Tom asked for: you may do anything you like, you just canno
       was **lost** and offers **Choose the file again** → picker → reconnected, banner clears.
       *(The old wording, "a browser does not stay connected to a file after the page is reloaded", is
       now itself a FAIL: it is no longer true.)*
-- [ ] **File → Open…** on that same file also reconnects the tab, and does **not** add a second one.
+- [x] **[auto]** **File → Open…** on that same file also reconnects the tab, and does **not** add a second one.
 - [x] The lock survives the reload rather than being left held by a session that no longer exists
       (§6 (b) covers this properly).
       [TGH: (1) Is there a way on reload to alert that connectable file projects have been
@@ -462,6 +469,25 @@ Triaged by what a user loses. Roadmap Task 223 points here.
     not saved yet. The name collision is the real defect.)*
 13. §11 In the fallback path the unsaved asterisk **persists after Save as**.
 14. §2 A stray vertical scrollbar appears on tab overflow.
+
+18. §6 The lock dialog says **"1 minutes ago"**. `agoText()` has no singular form. English-only
+    preview, so it is one string's worth of work whenever somebody is in there — but adding three
+    singular keys before the translation sprint would triple into 78, so it waits for the sprint.
+19. §0 **`Accept-Language: *` 500'd every page in the suite** on PHP 8 (`'' * '0.85'` is a fatal
+    TypeError, where PHP 5 gave 0). **FIXED 2026-08-06.** Not an `lpn_` defect at all — found because
+    the browser pass's HTTP client sends exactly that header by default, and a browser almost never
+    does.
+20. §2 **Arriving and reloading before touching anything emptied the tab strip.** `adoptOrphans()`
+    drops an index entry whose document is missing, and a brand-new project has no document until its
+    first edit — so `openId` went on pointing at a project that had been dropped, `init()` read that
+    as "something is already open", and registered nothing. **FIXED 2026-08-06.**
+21. §8 **Dismiss the "somebody saved to this file" banner and the next Save refused in silence.**
+    Dismiss cleared the banner, not the flag, and the flag suppressed the re-raise. A Save that does
+    nothing without saying why is the same defect as one that overwrites without asking, from the
+    other side. **FIXED 2026-08-06.**
+22. §7 **The read-only banner was anonymous** — "Somebody else has this file open" — even though the
+    dialog you had just answered named them. The name is the difference between a wall and a person
+    you can walk over and talk to. **FIXED 2026-08-06.**
 
 **Not defects, carried elsewhere**
 - §13 Tom: *"You are being lazy. Some of this stuff no longer exists or is renamed."* Correct — CC

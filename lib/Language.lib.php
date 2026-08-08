@@ -114,10 +114,18 @@ function chooseLanguage($all_language_settings) {
               $browserLang[2] = explode("-", $browserLang[0]);
               // Put the sub language into element 2 of the array
               $browserLang[2] = $browserLang[2][0];
-              // If the range is "*", it gives the default language quality.
-              if ($browserLang[0] == "*") $browserDefaultQuality = $browserLang[1];
               // If the range has no quality, the quality is 1.
+              // **This has to come BEFORE the "*" line below** (fixed 2026-08-06). A bare
+              // "Accept-Language: *" -- no q-value -- left $browserDefaultQuality as the empty
+              // string, and PHP 8 makes '' * '0.85' a fatal TypeError rather than the 0 PHP 5 gave
+              // us. Every page of the suite answered 500 to that one header. Found by the new
+              // browser pass, whose HTTP client sends exactly that by default; a browser rarely
+              // does, which is why it survived years of human testing.
               if ($browserLang[1] == "") $browserLang[1] = "1";
+              // If the range is "*", it gives the default language quality. Cast, because this
+              // value is multiplied: a header is user input, and no user input should be able to
+              // choose between a number and a fatal error.
+              if ($browserLang[0] == "*") $browserDefaultQuality = (float)$browserLang[1];
               $accept_langs_array[$key] = $browserLang;
             }
         }

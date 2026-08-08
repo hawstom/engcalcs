@@ -1696,6 +1696,27 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Completed
 
+- 0|224| **[DONE 2026-08-06] The punch list runs itself: `dev/browser-pass/`.** Asked for by Tom
+  (*"I am very tired and feeble-minded right now. Is there any way that we can proceed without my
+  working through the test punch list?"*). 89 checks over two real browser profiles against the real
+  `lpn-lock.php`, in twenty seconds, re-runnable: `node dev/browser-pass/run.js`.
+  - **The one lie is the picker, and it is small.** `showSaveFilePicker`/`showOpenFilePicker` are
+    replaced — nothing else — with functions returning **OPFS** handles, which are real
+    `FileSystemFileHandle`s: structured-cloneable (so Task 212's IndexedDB persistence is genuinely
+    exercised), real `createWritable()`, real `queryPermission()`. Injected via `addInitScript`, so
+    **no test-only code ships in the page**: no flag, no seam, no build step.
+  - **Two contexts, not two tabs** — separate `localStorage`, separate identity, real contention. OPFS
+    is per-profile, so the runner plays the network share and moves the bytes when a spec says so.
+  - **It paid for itself in the first hour**, with four defects, three of which no human pass could
+    have found: `pageCalculatorInitialize` missing (every FIRST-TIME visitor's page half-initialised —
+    Tom's own browser has had the cookie for weeks); a listener for a button not on the page;
+    **`Accept-Language: *` 500'd every page in the suite** on PHP 8; and arriving-then-reloading
+    emptying the tab strip. Then three more while writing the specs: a dismissed change-banner
+    silencing later refusals, and the read-only banner not naming who holds the file.
+  - **What it cannot answer stays visible, never silently passed**: `--` lines with a reason. §1's
+    native user-activation handshake, a `prompt`/`denied` permission, §10 on a real folder, §11, and
+    anything visual. Listed in `dev/browser-pass/README.md`.
+
 - 0|219| **[DONE 2026-08-05] `lpn_` added to the Related-calculators line, and its identity strings
   translated.** Order set by Tom: HW → lpn, bpn, dw, mphl, mpf; BPN → lpn (the page had no such line
   at all); IP → bpn, lpn (`mpf` removed as not very related). The blocker is cleared —

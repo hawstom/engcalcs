@@ -2075,7 +2075,14 @@ var EngCalcs = EngCalcs || {};
 		var repaired = adoptOrphans();
 		// No index and no projects: either a first visit, or a preview user whose only network is
 		// still under the old single-document key.
-		if (!library.projects.length) { return migrateLegacy(); }
+		//
+		// **`openId` has to go with them** (fixed 2026-08-06, found by the browser pass). adoptOrphans()
+		// drops an index entry whose document is missing -- and a brand-new project has no document
+		// until its first edit, so arriving and reloading before touching anything dropped the only
+		// project while `openId` went on pointing at it. init() then saw a truthy `openId`, decided a
+		// project was already open, and registered none: an empty tab strip for the rest of the
+		// session, with edits saving under an id no index entry knew about.
+		if (!library.projects.length) { library.openId = null; return migrateLegacy(); }
 		// Name every blank on sight (Task 211). Projects created before names were real data all
 		// rendered as the same word "Untitled" -- Tom found four identically-named tabs in the library
 		// and could not tell them apart. A tab strip makes that fatal rather than merely untidy, so
@@ -2415,9 +2422,19 @@ var EngCalcs = EngCalcs || {};
 	var fileChangedFlag = false;
 	function setFileChangedElsewhere(on) {
 		var pc = EngCalcs.pageConfig || {};
-		if (on === fileChangedFlag) { return; }
-		fileChangedFlag = on;
-		if (!on) { clearWarn('changed'); return; }
+		// **A fresh refusal always speaks, even after a Dismiss** (fixed 2026-08-06, found by the
+		// browser pass). This used to return early whenever the flag was already set -- but Dismiss
+		// clears the BANNER, not the flag, so the second Save refused in complete silence: the file
+		// was protected and the user was told nothing at all. A Save that does nothing without
+		// saying why is the same defect as a Save that overwrites without asking, seen from the
+		// other side. Only the "all clear" direction is allowed to be a no-op.
+		if (!on) {
+			if (!fileChangedFlag) { return; }
+			fileChangedFlag = false;
+			clearWarn('changed');
+			return;
+		}
+		fileChangedFlag = true;
 		bannerWarn = {
 			kind: 'changed',
 			message: (pc.lpn_file_changed_elsewhere || 'Somebody else has saved to this file since you opened it, so saving now would write over their work. Use File, Save as to keep your changes in a file of your own, or File, Revert to throw yours away and load theirs.'),
@@ -2978,7 +2995,7 @@ var EngCalcs = EngCalcs || {};
 			body.appendChild(q);
 		}, [
 			{ label: pc.lpn_cancel || 'Cancel', fn: function () { } },
-			{ label: pc.lpn_lock_open_readonly || 'Open read-only', fn: function () { landOpenedFile(saved, handle, true); } },
+			{ label: pc.lpn_lock_open_readonly || 'Open read-only', fn: function () { landOpenedFile(saved, handle, true, who); } },
 			{
 				label: pc.lpn_lock_break || 'Break their lock',
 				fn: async function () {
@@ -3030,7 +3047,12 @@ var EngCalcs = EngCalcs || {};
 		// deliberate request that would change that, so it must not quietly go and take the lock.
 		if (!roProjects.has(id)) { acquireLockForOpenProject(); }
 	}
-	function landOpenedFile(saved, handle, asReadOnly) {
+	// `heldBy` is the name of whoever the open-time dialog said has it, and it exists only for the
+	// read-only path. **Without it the banner you then live with all session is anonymous** ("Somebody
+	// else has this file open") even though the dialog you just answered named them -- found by the
+	// browser pass 2026-08-06. The name is the whole difference between a wall and a person you can
+	// walk over and talk to.
+	function landOpenedFile(saved, handle, asReadOnly, heldBy) {
 		var pc = EngCalcs.pageConfig || {};
 		var id = importProject(saved); // lands as a NEW project, exactly as the Phase 1 path does
 		if (!id) { return; }
@@ -3053,7 +3075,10 @@ var EngCalcs = EngCalcs || {};
 		// contend with the person who already has the file.
 		stampFile(id, handle); // just read it, so this IS the file
 		rememberHandle(id, handle); // survives the next reload (Task 212)
-		if (asReadOnly) { roProjects.add(id); } else { acquireLockForOpenProject(); }
+		if (asReadOnly) {
+			roProjects.add(id);
+			if (heldBy) { lockedByName.set(id, heldBy); }
+		} else { acquireLockForOpenProject(); }
 		// Both paths, for the same reason as in saveAs(): this project has just gained (or not gained)
 		// a live handle, and the banner is what says so.
 		syncReadOnlyToOpenProject();
@@ -4234,7 +4259,12 @@ var EngCalcs = EngCalcs || {};
 			buildDom(); scheduleSolve();
 			if (backdrop) { buildBackdropImg(); }
 			updateBackdropMenuState();
-		} else if (!library.openId) {
+		} else if (!indexEntry(library.openId)) {
+			// **`!indexEntry()`, not `!library.openId`** (fixed 2026-08-06): an id pointing at a
+			// project that is no longer in the library is not an open project, and treating it as one
+			// is how the page ended up with no tab at all. The question this branch is really asking
+			// is "is there a project open?", and only the index can answer that.
+			//
 			// First visit, or nothing readable: the library always has exactly one open project, so
 			// there is never a state where drawing has nowhere to be saved. Registered directly
 			// rather than through newProject(), which repaints a UI that does not exist yet.
