@@ -1271,23 +1271,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **The decision it feeds is Task 217**, so this metric arrives with a decision already attached
     rather than becoming another number nobody acts on.
 
-- 75|227| **Check the links our pages emit, not just that the pages answer.** Raised by the Task 226
-  finding: the Feedback invitation 404'd for six weeks on every calculator page, and nothing in the
-  repo could have noticed. `prod_smoke.php` verifies each *page* returns 200 to every shape of
-  client; no tool has ever resolved the `href`s inside them.
-  - **The check is small and already prototyped** — fetch a sample of pages, extract every
-    `href="…"`, resolve relative to the page URL, and report anything that is not 200. Run against
-    production it found the one real break immediately, with only http→https 301s as noise (the
-    hard-coded `http://hawsedc.com/...` links in `echoMainMenu()` — worth normalizing to https
-    while in there, though they redirect correctly today).
-  - **Sample pages, not all 24 × 27 languages.** The lang files contain their own links (every
-    `mpf_friction_slope` carries `../frictionslope.php`, which is correct — the parent site does
-    still have that file, verified 2026-08-08), so a link fault can hide in a single language. But
-    a full crawl is a different, slower tool; one page per shape plus a pass over the distinct link
-    targets found in `lib/lang.ec.*.php` catches essentially all of it.
-  - **Fold it into `prod_smoke.php`** behind a flag rather than adding a second script — it is the
-    same question ("is what we deployed actually reachable?") asked one level deeper, and the
-    deploy-gating exit code should cover both.
 - 80|200| **Usage logging: the questions the current report cannot answer.** Raised by Tom,
   2026-08-03: *"I'd like to get more guidance about our development priorities from usage logging."*
   Ordered by value ÷ effort. Nothing here needs a database — the existing
@@ -1646,6 +1629,47 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Completed
 
+- 0|227| **[DONE 2026-08-08] `prod_smoke.php --links` now follows the links our pages emit, not just
+  that the pages answer.** Written the same day as Task 226, whose six-week 404 nothing in the repo
+  could have noticed: this script proved every *page* returned 200 while saying nothing about
+  whether the links *on* those pages went anywhere.
+  - **Two sources, because pages alone are not enough.** It resolves every `href` from a sample of
+    served pages, AND statically from all 27 `lib/lang.ec.*.php` files. Only one language renders
+    per request, so a link broken in exactly one language file is invisible to any amount of page
+    fetching; reading them off disk covers all 27 at once. 201 distinct on-site links from five
+    pages plus the lang files. A failure names its source (`lang.ec.en.php:zz_key`, or the page).
+  - **Off-site links are advisory and never touch the exit code.** A reference site rate-limiting a
+    script is not our deploy being broken, and a gate that fails for reasons outside the repo is a
+    gate everyone learns to ignore. `--external` opts into checking them.
+  - **It refuses to run against a host that answers 200 for everything.** `php -S` falls back to the
+    docroot's `index.php` for any missing path, so a link check against the built-in server returns
+    a cheerful all-clear no matter how broken the links are — worse than not running, because it is
+    a green light that means nothing. Found the honest way: the mutation test for this feature
+    passed against localhost with the Task 226 404 reintroduced and sitting right there in the page.
+    It now probes a URL that cannot exist first, and skips with an explanation if that answers 200.
+    **Run `--links` against production.**
+  - **Verified by mutation, not by inspection:** a dead link injected into `lang.ec.en.php` produced
+    `FAIL … 404`, named `lang.ec.en.php:zz_mutation_test`, and exited 1; removing it returned the
+    run to all-clear. The resolver has its own case table — `../`, `./`, root-relative,
+    scheme-relative, `?query`-only, ports, climbing past the root, and the `mailto:`/`javascript:`/
+    `#fragment` forms it must ignore.
+  - **It found two real defects on its first production run, which is the argument for it:**
+    - **Nine links per page were downgrading to `http://`.** `echoMainMenu()` built every
+      root-relative menu item as `'http://' . $_SERVER['SERVER_NAME'] . $path`. Wrong three ways:
+      an https visitor got nine 301 round trips and a moment of plaintext on a site with no HSTS;
+      the host came from a client-supplied header, the very thing `config.inc.php` refuses to do for
+      `CANONICAL_ORIGIN`; and it emitted an undefined-index warning wherever `SERVER_NAME` is absent
+      (CLI). The paths were already root-relative — they are now emitted as-is. Fixed.
+    - **A dead reference link on the Orifice calculator, in all 27 languages.** `or_notes_3_def`
+      pointed at `engineeringtoolbox.com/orifice-nozzle-**venture**-d_590.html`; the real page is
+      `**venturi**`. A one-letter typo, 404 for as long as it has existed, in every language at
+      once. Fixed in all 27 files (one line each, `lang_syntax_validate.php` clean).
+  - **What it still does not do**, recorded so nobody assumes otherwise: it checks a sample of five
+    pages, not all 24; it does not render JS, so links built at runtime by `js/looped-network.js`
+    are outside it; and the page-emitted path is exercised against production, which serves its own
+    deployed code rather than the working tree, so only the lang-file path can be mutation-tested
+    locally end to end.
+
 - 0|226| **[DONE 2026-08-08] The Feedback invitation on every calculator page had been a 404 for six
   weeks.** Found by Tom on the live site the day after Task 206 shipped: the in-page invitation
   linked to `../contact.php`, which from `/engcalcs/` resolves to `hawsedc.com/contact.php` —
@@ -1672,7 +1696,8 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     sees a 404 and does not write to report that they could not write, and the site owner sees
     nothing at all. `dev/scripts/prod_smoke.php` checks that every *page* answers 200 but has never
     followed the links those pages *emit* — which is why six weeks passed. A one-command live link
-    check of every emitted `href` is now Task 227.
+    check of every emitted `href` is Task 227 — written and shipped the same day, and it found two
+    more defects on its first production run.
 
 - 0|206| **[DONE 2026-08-07] Measured the contact funnel — the one metric the mission cares about,
   and we were blind on it.** Raised by Tom, 2026-08-03: contacts "have always been rare and

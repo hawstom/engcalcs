@@ -531,7 +531,7 @@ $ec_lang['or_notes_2_def']='Orifice flow equations apply when the headwater surf
 $ec_lang_intent['or_notes_2_def']='| gloss: crown';
 $ec_lang['or_notes_3_term']='Discharge Coefficient';
 $ec_lang_intent['or_notes_3_term']='';
-$ec_lang['or_notes_3_def']='C<sub>d</sub> ranges from about 0.60–0.65 for sharp-edged orifices. Rounded or re-entrant inlets use different values. See the <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venture-d_590.html">Engineering Toolbox</a> or the HEC-RAS Hydraulic Reference Manual for guidance.';
+$ec_lang['or_notes_3_def']='C<sub>d</sub> ranges from about 0.60–0.65 for sharp-edged orifices. Rounded or re-entrant inlets use different values. See the <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venturi-d_590.html">Engineering Toolbox</a> or the HEC-RAS Hydraulic Reference Manual for guidance.';
 $ec_lang_intent['or_notes_3_def']='';
 $ec_lang['or_notes_4_term']='Submergence';
 $ec_lang_intent['or_notes_4_term']='';

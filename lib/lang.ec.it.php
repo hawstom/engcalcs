@@ -274,7 +274,7 @@ $ec_lang['or_notes_1_def']='Q = C<sub>d</sub> × A × √(2gh). Per scarico libe
 $ec_lang['or_notes_2_term']='Regime di orifizio';
 $ec_lang['or_notes_2_def']='Le equazioni del deflusso a orifizio si applicano quando il pelo libero a monte è sopra la sommità (il punto più alto) dell\'apertura. Quando il pelo libero a monte è sotto la sommità, utilizzare invece un\'equazione di stramazzo.';
 $ec_lang['or_notes_3_term']='Coefficiente di efflusso';
-$ec_lang['or_notes_3_def']='C<sub>d</sub> varia da circa 0,60 a 0,65 per orifizi a spigolo vivo. Imbocchi arrotondati o rientranti richiedono valori diversi. Vedere <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venture-d_590.html">Engineering Toolbox</a> o il Manuale di Riferimento Idraulico HEC-RAS per maggiori indicazioni.';
+$ec_lang['or_notes_3_def']='C<sub>d</sub> varia da circa 0,60 a 0,65 per orifizi a spigolo vivo. Imbocchi arrotondati o rientranti richiedono valori diversi. Vedere <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venturi-d_590.html">Engineering Toolbox</a> o il Manuale di Riferimento Idraulico HEC-RAS per maggiori indicazioni.';
 $ec_lang['or_notes_4_term']='Sommersione';
 $ec_lang['or_notes_4_def']='Quando TWE è sopra la quota di fondo dell\'apertura, questo calcolatore applica automaticamente l\'equazione dell\'orifizio sommerso usando h = HWE − TWE. Quando TWE è pari o inferiore alla quota di fondo, si assume lo scarico libero e h = HWE − centroide.';
 // Micro-Hydro Power

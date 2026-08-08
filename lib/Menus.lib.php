@@ -52,9 +52,16 @@ function echoMainMenu() {
 // Else if the URL is the current page, show the text as plain bold (not a link).
     } elseif (rtrim($menuarr[$i][0]) == $_SERVER['PHP_SELF']) {
       echo '<strong>'.rtrim($menuarr[$i][1]).'</strong>';
-// Else show the URL and text as a link
+// Else show the URL and text as a link. The path is already root-relative, so emit it as-is
+// (fixed 2026-08-08, ROADMAP Task 227). It used to be absolutized as
+// 'http://' . $_SERVER['SERVER_NAME'] . $path, which was wrong three ways at once: it downgraded
+// nine links per page to http for every https visitor (each one a 301 round trip, and a moment of
+// plaintext on a site with no HSTS); it derived the host from a client-supplied header, the very
+// thing config.inc.php refuses to do for CANONICAL_ORIGIN; and it emitted an undefined-index
+// warning wherever SERVER_NAME is absent, such as CLI. A root-relative path is correct from any
+// depth and on all four of http/https x www/non-www, which is what the site actually answers on.
     } else {
-      echo '<a href="http://'.htmlspecialchars($_SERVER['SERVER_NAME'], ENT_QUOTES, 'UTF-8').rtrim($menuarr[$i][0]).'">'.rtrim($menuarr[$i][1]).'</a>';
+      echo '<a href="'.htmlspecialchars(rtrim($menuarr[$i][0]), ENT_QUOTES, 'UTF-8').'">'.rtrim($menuarr[$i][1]).'</a>';
     }
 // If there are more menu items coming, add a vertical bar and spaces.
     if (isset($menuarr[$i + 1]))

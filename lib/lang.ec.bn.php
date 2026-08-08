@@ -274,7 +274,7 @@ $ec_lang['or_notes_1_def']='Q = C<sub>d</sub> × A × √(2gh)। মুক্�
 $ec_lang['or_notes_2_term']='অরিফিস ব্যবস্থা';
 $ec_lang['or_notes_2_def']='অরিফিস প্রবাহ সমীকরণ প্রযোজ্য হয় যখন উজানের পানির পৃষ্ঠ খোলার ক্রাউনের (শীর্ষের) উপরে থাকে। উজানের পানি ক্রাউনের নিচে থাকলে, ওয়্যার সমীকরণ ব্যবহার করুন।';
 $ec_lang['or_notes_3_term']='স্রাব সহগ';
-$ec_lang['or_notes_3_def']='তীক্ষ্ণ-প্রান্ত অরিফিসের জন্য C<sub>d</sub> প্রায় 0.60–0.65 পর্যন্ত। গোলাকার বা পুনঃপ্রবেশী ইনলেট ভিন্ন মান ব্যবহার করে। নির্দেশিকার জন্য <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venture-d_590.html">Engineering Toolbox</a> বা HEC-RAS হাইড্রোলিক রেফারেন্স ম্যানুয়াল দেখুন।';
+$ec_lang['or_notes_3_def']='তীক্ষ্ণ-প্রান্ত অরিফিসের জন্য C<sub>d</sub> প্রায় 0.60–0.65 পর্যন্ত। গোলাকার বা পুনঃপ্রবেশী ইনলেট ভিন্ন মান ব্যবহার করে। নির্দেশিকার জন্য <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venturi-d_590.html">Engineering Toolbox</a> বা HEC-RAS হাইড্রোলিক রেফারেন্স ম্যানুয়াল দেখুন।';
 $ec_lang['or_notes_4_term']='নিমজ্জন';
 $ec_lang['or_notes_4_def']='যখন TWE খোলার ইনভার্টের উপরে থাকে, এই ক্যালকুলেটর স্বয়ংক্রিয়ভাবে h = HWE − TWE ব্যবহার করে নিমজ্জিত অরিফিস সমীকরণ প্রয়োগ করে। যখন TWE ইনভার্টে বা তার নিচে থাকে, মুক্ত বহির্গমন ধরে নেওয়া হয় এবং h = HWE − কেন্দ্রবিন্দু।';
 // Micro-Hydro Power

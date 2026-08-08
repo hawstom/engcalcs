@@ -275,7 +275,7 @@ $ec_lang['or_notes_1_def']='Q = C<sub>d</sub> × A × √(2gh)۔ آزاد اخر
 $ec_lang['or_notes_2_term']='سوراخ کی حالت';
 $ec_lang['or_notes_2_def']='سوراخ بہاؤ مساوات اس وقت لاگو ہوتی ہیں جب بالا آب سطح کھلنے کے تاج سے اوپر ہو۔ جب بالا آب تاج سے نیچے ہو، تو ویر مساوات استعمال کریں۔';
 $ec_lang['or_notes_3_term']='اخراج عامل';
-$ec_lang['or_notes_3_def']='تیز کنارے والے سوراخوں کے لیے C<sub>d</sub> تقریباً 0.60–0.65 تک ہوتا ہے۔ گول یا دوبارہ داخل ہونے والے ان لیٹس مختلف اقدار استعمال کرتے ہیں۔ رہنمائی کے لیے <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venture-d_590.html">Engineering Toolbox</a> یا HEC-RAS ہائیڈرولک حوالہ دستی دیکھیں۔';
+$ec_lang['or_notes_3_def']='تیز کنارے والے سوراخوں کے لیے C<sub>d</sub> تقریباً 0.60–0.65 تک ہوتا ہے۔ گول یا دوبارہ داخل ہونے والے ان لیٹس مختلف اقدار استعمال کرتے ہیں۔ رہنمائی کے لیے <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venturi-d_590.html">Engineering Toolbox</a> یا HEC-RAS ہائیڈرولک حوالہ دستی دیکھیں۔';
 $ec_lang['or_notes_4_term']='ڈوبنا';
 $ec_lang['or_notes_4_def']='جب TWE کھلنے کی انورٹ کے اوپر ہو، تو یہ حاسبہ خودکار طور پر h = HWE − TWE استعمال کرتے ہوئے ڈوبا ہوا سوراخ مساوات لاگو کرتا ہے۔ جب TWE انورٹ پر یا اس سے نیچے ہو، تو آزاد اخراج فرض کیا جاتا ہے اور h = HWE − مرکز ثقل۔';
 // Micro-Hydro Power

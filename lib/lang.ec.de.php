@@ -274,7 +274,7 @@ $ec_lang['or_notes_1_def']='Q = C<sub>d</sub> × A × √(2gh). Bei freiem Ausfl
 $ec_lang['or_notes_2_term']='Öffnungsregime';
 $ec_lang['or_notes_2_def']='Die Ausflussformeln für Öffnungen gelten, wenn der Oberwasserspiegel über dem Scheitel (der Oberkante) der Öffnung liegt. Liegt der Oberwasserspiegel darunter, ist stattdessen eine Wehrformel zu verwenden.';
 $ec_lang['or_notes_3_term']='Ausflusskoeffizient';
-$ec_lang['or_notes_3_def']='C<sub>d</sub> liegt bei ca. 0,60–0,65 für scharfkantige Öffnungen. Abgerundete oder einspringende Einläufe haben andere Werte. Siehe <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venture-d_590.html">Engineering Toolbox</a> oder das HEC-RAS Hydraulic Reference Manual.';
+$ec_lang['or_notes_3_def']='C<sub>d</sub> liegt bei ca. 0,60–0,65 für scharfkantige Öffnungen. Abgerundete oder einspringende Einläufe haben andere Werte. Siehe <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venturi-d_590.html">Engineering Toolbox</a> oder das HEC-RAS Hydraulic Reference Manual.';
 $ec_lang['or_notes_4_term']='Einstau';
 $ec_lang['or_notes_4_def']='Wenn TWE über der Sohle der Öffnung liegt, verwendet der Rechner automatisch die Formel für eingestauten Ausfluss mit h = HWE − TWE. Liegt TWE auf oder unter der Sohle, wird freier Ausfluss angenommen und h = HWE − Schwerpunkt.';
 // Micro-Hydro Power

@@ -275,7 +275,7 @@ $ec_lang['or_notes_1_def']='Q = C<sub>d</sub> × A × √(2gh). د آزاد وت
 $ec_lang['or_notes_2_term']='د سوري رژیم';
 $ec_lang['or_notes_2_def']='د سوري بهاو معادلې هغه وخت پلي کیږي کله چې د پورته اوبو سطحه د خلاص د تاج (پورتنۍ برخې) نه پورته وي. کله چې پورته اوبه د تاج نه لاندې وي، پر ځای یې د ویر معادله وکاروئ.';
 $ec_lang['or_notes_3_term']='د بهاو ضریب';
-$ec_lang['or_notes_3_def']='C<sub>d</sub> د تیزو غاړو لرونکو سوریو لپاره شاوخوا 0.60–0.65 پورې وي. ګرد شوي یا شاته ننوتلي ننوتونه بېل ارزښتونه کاروي. د لارښوونې لپاره <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venture-d_590.html">Engineering Toolbox</a> یا HEC-RAS هایدرولیک حوالې لارښود وګورئ.';
+$ec_lang['or_notes_3_def']='C<sub>d</sub> د تیزو غاړو لرونکو سوریو لپاره شاوخوا 0.60–0.65 پورې وي. ګرد شوي یا شاته ننوتلي ننوتونه بېل ارزښتونه کاروي. د لارښوونې لپاره <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venturi-d_590.html">Engineering Toolbox</a> یا HEC-RAS هایدرولیک حوالې لارښود وګورئ.';
 $ec_lang['or_notes_4_term']='لاندې اوبو حالت';
 $ec_lang['or_notes_4_def']='کله چې TWE د خلاص انورټ پورته وي، دا محاسبه اتوماتیک د لاندې اوبو د سوري معادله h = HWE − TWE کاروي. کله چې TWE د انورټ پر سطحه یا لاندې وي، آزاد وتل فرض کیږي او h = HWE − مرکز.';
 // Micro-Hydro Power

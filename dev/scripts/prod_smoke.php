@@ -4,6 +4,8 @@
  *
  *   php dev/scripts/prod_smoke.php                       # checks https://hawsedc.com/engcalcs/
  *   php dev/scripts/prod_smoke.php http://127.0.0.1:8899 # or anywhere else
+ *   php dev/scripts/prod_smoke.php --links              # also follow every link the pages emit
+ *   php dev/scripts/prod_smoke.php --links --external   # ...including off-site ones (advisory)
  *
  * **Deliberately not node.** `dev/browser-pass/` is the real pass and needs a browser and a package
  * manager; the cPanel server has neither. This is the other half of the answer: after `git pull` on
@@ -16,10 +18,23 @@
  * almost never sends that form, but HTTP libraries, some crawlers and every `fetch()` in Node do. The
  * header matrix below is the point of this script; the page list is just breadth.
  *
- * Exit code 0 if everything answered 200, 1 otherwise, so it can gate a deploy script.
+ * `--links` asks the other half of the question. Until 2026-08-08 this script proved that every
+ * PAGE answered 200 while saying nothing about whether the links ON those pages went anywhere. They
+ * did not: the Feedback invitation on every calculator page pointed at `../contact.php`, which
+ * stopped existing on 2026-06-26 when the contact system moved into `engcalcs/`. Six weeks, on the
+ * suite's most prominent invitation, and the failure was silent from both ends — a visitor who
+ * cannot reach the contact form cannot use the contact form to report that. See ROADMAP Task 226.
+ *
+ * Exit code 0 if everything answered 200, 1 otherwise, so it can gate a deploy script. Off-site
+ * links never affect that code: a third party rate-limiting us is not our deploy being broken.
  */
 
-$base = isset($argv[1]) ? rtrim($argv[1], '/') : 'https://hawsedc.com';
+$argvRest = array_slice($argv, 1);
+$optLinks    = in_array('--links', $argvRest, true);
+$optExternal = in_array('--external', $argvRest, true);
+$positional  = array_values(array_filter($argvRest, function ($a) { return substr($a, 0, 2) !== '--'; }));
+
+$base = isset($positional[0]) ? rtrim($positional[0], '/') : 'https://hawsedc.com';
 $base .= (substr($base, -9) === '/engcalcs') ? '' : '/engcalcs';
 
 // One page per shape of page, not all twenty: a plain calculator, the JS-built one, the two-column
@@ -105,6 +120,69 @@ function body_is_noisy($body)
 {
     return (bool)preg_match('/<b>(Warning|Notice|Fatal error|Deprecated)<\/b>|PHP (Warning|Notice|Fatal error|Deprecated)/', $body);
 }
+// ---- link checking (--links, ROADMAP Task 227) ----
+
+/** Every href a page emits, entity-decoded. Includes <link> as well as <a>: a dead canonical or a
+ *  404 stylesheet is a real defect too, and they cost nothing extra to check. */
+function ec_extract_hrefs($html)
+{
+    $out = array();
+    if (preg_match_all('/\shref\s*=\s*(["\'])(.*?)\1/is', $html, $m)) {
+        foreach ($m[2] as $h) { $out[] = html_entity_decode($h, ENT_QUOTES, 'UTF-8'); }
+    }
+    return $out;
+}
+
+/** Resolves an href against the page that emitted it, normalizing "../" the way a browser does.
+ *  Normalizing here rather than leaving "/engcalcs/../contact.php" for the server is the point:
+ *  the resolved form is what the visitor's address bar shows, and it is what makes a report
+ *  readable enough to act on. Returns null for anything not worth fetching. */
+function ec_resolve_url($pageUrl, $href)
+{
+    $href = trim($href);
+    $href = preg_replace('/#.*$/', '', $href);
+    if ($href === '') { return null; }
+    // Non-navigational schemes. mailto: in particular is a link we cannot check and must not fail.
+    if (preg_match('#^(mailto|tel|javascript|data|sms):#i', $href)) { return null; }
+
+    $p = parse_url($pageUrl);
+    $scheme = isset($p['scheme']) ? $p['scheme'] : 'https';
+    $host   = isset($p['host']) ? $p['host'] : '';
+    if (isset($p['port'])) { $host .= ':' . $p['port']; }
+    $path   = isset($p['path']) ? $p['path'] : '/';
+
+    if (substr($href, 0, 2) === '//')       { return $scheme . ':' . $href; }
+    if (preg_match('#^[a-z][a-z0-9+.\-]*://#i', $href)) { return $href; }
+    if (substr($href, 0, 1) === '?')        { return $scheme . '://' . $host . $path . $href; }
+
+    if (substr($href, 0, 1) === '/') {
+        $newPath = $href;
+    } else {
+        $newPath = substr($path, 0, strrpos($path, '/') + 1) . $href;
+    }
+    // Collapse "." and ".." segments. A ".." that climbs past the root is dropped, which is what
+    // every browser and server does -- and is exactly how ../contact.php became /contact.php.
+    $qs = '';
+    if (($qpos = strpos($newPath, '?')) !== false) { $qs = substr($newPath, $qpos); $newPath = substr($newPath, 0, $qpos); }
+    $parts = explode('/', $newPath);
+    $stack = array();
+    foreach ($parts as $seg) {
+        if ($seg === '.' || $seg === '') { continue; }
+        if ($seg === '..') { array_pop($stack); continue; }
+        $stack[] = $seg;
+    }
+    $normalized = '/' . implode('/', $stack);
+    // A trailing slash is meaningful (directory index); the segment loop above eats it.
+    if (substr($newPath, -1) === '/' && $normalized !== '/') { $normalized .= '/'; }
+    return $scheme . '://' . $host . $normalized . $qs;
+}
+
+function ec_host_of($url)
+{
+    $h = parse_url($url, PHP_URL_HOST);
+    return $h === null ? '' : strtolower($h);
+}
+
 function fetch_status($url, $acceptLanguage)
 {
     $r = http_probe($url, $acceptLanguage);
@@ -174,6 +252,113 @@ foreach ($assets as $rel) {
     if (!$same) { $bad++; }
     printf("  %-6s %-28s %s\n", $same ? 'ok' : 'STALE', $rel,
         $same ? 'matches' : ($r['code'] !== 200 ? "HTTP {$r['code']}" : 'DIFFERENT — the server has not pulled, or has something newer'));
+}
+
+// ---- Do the links on those pages go anywhere? (--links, ROADMAP Task 227) ----
+//
+// Opt-in because it is the slow half: dozens of distinct URLs rather than one page each. The
+// default run stays fast enough to put in a deploy script without thinking about it.
+if ($optLinks) {
+    $repoRoot = dirname(dirname(__DIR__));
+    $baseHost = ec_host_of($base);
+    $baseIsHttps = (stripos($base, 'https://') === 0);
+    $refs = array();   // resolved url => list of the places that emit it
+
+    // Can this host tell a dead link from a live one AT ALL? `php -S` answers 200 for every
+    // missing .php path -- it falls back to the docroot's index.php as a router -- so a link check
+    // against the built-in server reports a cheerful all-clear no matter how broken the links are.
+    // That is worse than not running: it is a green light that means nothing. Found 2026-08-08 when
+    // the mutation test for this very feature passed against localhost while the reintroduced
+    // 404 sat right there in the page. So ask first, with a URL that cannot exist.
+    $sentinel = "$base/zz-prod-smoke-nonexistent-" . substr(sha1((string)time()), 0, 8) . '.php';
+    $sr = http_probe($sentinel, null);
+    if ($sr['code'] === 200) {
+        echo "\nlinks: SKIPPED -- this host answers 200 for a URL that does not exist\n";
+        echo "  probed $sentinel -> 200\n";
+        echo "  A catch-all like this (php -S, or a router/404-handler that returns 200) makes every\n";
+        echo "  link look alive, so the check cannot distinguish a working link from a dead one.\n";
+        echo "  Run --links against the real server (Apache on production) instead.\n";
+        $optLinks = false;
+    }
+}
+if ($optLinks) {
+
+    // 1. The links in the pages as actually served. Same sample as above -- one page per shape.
+    foreach ($pages as $page) {
+        $pageUrl = "$base/$page";
+        $r = http_probe($pageUrl, 'en-US,en;q=0.9');
+        foreach (ec_extract_hrefs($r['body']) as $href) {
+            $u = ec_resolve_url($pageUrl, $href);
+            if ($u === null) { continue; }
+            $refs[$u][] = $page;
+        }
+    }
+
+    // 2. The links inside the language files, which the served pages above cannot show us: only
+    //    one language renders per request, so a link that is broken in exactly one of 27 files is
+    //    invisible to any amount of page fetching. Reading them statically costs one pass over
+    //    disk and covers every language at once. They are emitted by pages sitting at the engcalcs
+    //    root, so they resolve as if from a calculator page there.
+    $langRefPage = "$base/Manning-Pipe-Flow.php";
+    require_once __DIR__ . '/lang_parse.inc.php';
+    foreach (glob($repoRoot . '/lib/lang.ec.*.php') as $langFile) {
+        $values = ecLangValues(file_get_contents($langFile));
+        foreach ($values as $key => $val) {
+            if (strpos($val, 'href') === false) { continue; }
+            foreach (ec_extract_hrefs($val) as $href) {
+                $u = ec_resolve_url($langRefPage, $href);
+                if ($u === null) { continue; }
+                $refs[$u][] = basename($langFile) . ':' . $key;
+            }
+        }
+    }
+
+    ksort($refs);
+    $internal = array();
+    $external = array();
+    foreach ($refs as $u => $srcs) {
+        if (ec_host_of($u) === $baseHost) { $internal[$u] = $srcs; } else { $external[$u] = $srcs; }
+    }
+
+    echo "\nlinks emitted by the sampled pages and the language files\n";
+    printf("  %d distinct on-site, %d off-site\n", count($internal), count($external));
+    foreach ($internal as $u => $srcs) {
+        $r = http_probe($u, 'en-US,en;q=0.9');
+        $ok = ($r['code'] === 200 && $r['err'] === '');
+        if (!$ok) { $bad++; }
+        // An on-site link written as http:// still works -- it 301s up to https, which the probe
+        // follows -- so it is not a failure. It is worth seeing anyway: every one costs a visitor a
+        // redirect and a moment of plaintext, and this is where such a link becomes visible at all.
+        // Only meaningful when the SITE is https: checking a plain-http dev server would otherwise
+        // flag every link on the page, which is noise, not a finding.
+        $warn = $baseIsHttps && (stripos($u, 'http://') === 0);
+        printf("  %-6s %-58s %s\n",
+            $ok ? ($warn ? 'warn' : 'ok') : 'FAIL',
+            strlen($u) > 58 ? substr($u, 0, 55) . '...' : $u,
+            ($ok ? ($warn ? 'reachable, but downgrades to http' : '200') : $r['code'] . ($r['err'] ? ' ' . $r['err'] : ''))
+        );
+        if (!$ok) {
+            $shown = array_slice(array_unique($srcs), 0, 4);
+            printf("         emitted by: %s%s\n", implode(', ', $shown),
+                count(array_unique($srcs)) > count($shown) ? ' (+' . (count(array_unique($srcs)) - count($shown)) . ' more)' : '');
+        }
+    }
+
+    // Off-site links are ADVISORY and never touch the exit code. A reference site that rate-limits
+    // or 403s a script is not our deploy being broken, and letting a third party fail our deploy
+    // gate would train everyone to ignore the gate.
+    if ($optExternal) {
+        echo "\noff-site links (advisory -- never affects the exit code)\n";
+        foreach ($external as $u => $srcs) {
+            $r = http_probe($u, 'en-US,en;q=0.9');
+            $ok = ($r['code'] >= 200 && $r['code'] < 400 && $r['err'] === '');
+            printf("  %-6s %-58s %s\n", $ok ? 'ok' : 'note',
+                strlen($u) > 58 ? substr($u, 0, 55) . '...' : $u,
+                $r['code'] . ($r['err'] ? ' ' . $r['err'] : ''));
+        }
+    } elseif (count($external)) {
+        printf("  (%d off-site links not checked; add --external)\n", count($external));
+    }
 }
 
 echo "\n" . ($bad ? "$bad FAILED\n" : "all clear\n");

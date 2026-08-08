@@ -273,7 +273,7 @@ $ec_lang['or_notes_1_def']='Q = C<sub>d</sub> × A × √(2gh). Pentru curgere l
 $ec_lang['or_notes_2_term']='Regimul orificiului';
 $ec_lang['or_notes_2_def']='Ecuațiile de debit prin orificiu se aplică atunci când suprafața apei din amonte este deasupra coronamentului (partea superioară) deschiderii. Când nivelul din amonte este sub coronament, utilizați în schimb o ecuație de deversor.';
 $ec_lang['or_notes_3_term']='Coeficient de debit';
-$ec_lang['or_notes_3_def']='C<sub>d</sub> variază de la aproximativ 0,60–0,65 pentru orificii cu muchii ascuțite. Intrările rotunjite sau reintrante folosesc valori diferite. Consultați <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venture-d_590.html">Engineering Toolbox</a> sau Manualul de Referință Hidraulică HEC-RAS pentru îndrumări.';
+$ec_lang['or_notes_3_def']='C<sub>d</sub> variază de la aproximativ 0,60–0,65 pentru orificii cu muchii ascuțite. Intrările rotunjite sau reintrante folosesc valori diferite. Consultați <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venturi-d_590.html">Engineering Toolbox</a> sau Manualul de Referință Hidraulică HEC-RAS pentru îndrumări.';
 $ec_lang['or_notes_4_term']='Înecare';
 $ec_lang['or_notes_4_def']='Când TWE este deasupra radierului deschiderii, acest calculator aplică automat ecuația orificiului înecat folosind h = HWE − TWE. Când TWE este la nivelul radierului sau sub acesta, se presupune curgere liberă și h = HWE − centroid.';
 // Micro-Hydro Power

@@ -274,7 +274,7 @@ $ec_lang['or_notes_1_def']='Q = C<sub>d</sub> × A × √(2gh). Untuk aliran beb
 $ec_lang['or_notes_2_term']='Rezim Lubang Aliran';
 $ec_lang['or_notes_2_def']='Persamaan debit lubang aliran berlaku ketika permukaan air hulu berada di atas mahkota (bagian atas) bukaan. Ketika air hulu berada di bawah mahkota, gunakan persamaan bendung ukur.';
 $ec_lang['or_notes_3_term']='Koefisien Debit';
-$ec_lang['or_notes_3_def']='C<sub>d</sub> berkisar sekitar 0,60–0,65 untuk lubang aliran bersudut tajam. Saluran masuk berbentuk bulat atau re-entrant menggunakan nilai yang berbeda. Lihat <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venture-d_590.html">Engineering Toolbox</a> atau HEC-RAS Hydraulic Reference Manual untuk panduan.';
+$ec_lang['or_notes_3_def']='C<sub>d</sub> berkisar sekitar 0,60–0,65 untuk lubang aliran bersudut tajam. Saluran masuk berbentuk bulat atau re-entrant menggunakan nilai yang berbeda. Lihat <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venturi-d_590.html">Engineering Toolbox</a> atau HEC-RAS Hydraulic Reference Manual untuk panduan.';
 $ec_lang['or_notes_4_term']='Ketenggelaman';
 $ec_lang['or_notes_4_def']='Ketika TWE berada di atas dasar bukaan, kalkulator ini secara otomatis menerapkan persamaan lubang aliran tenggelam menggunakan h = HWE − TWE. Ketika TWE sama dengan atau di bawah dasar, aliran bebas diasumsikan dan h = HWE − sentroid.';
 // Micro-Hydro Power

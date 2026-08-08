@@ -275,7 +275,7 @@ $ec_lang['or_notes_1_def']='Q = C<sub>d</sub> × A × √(2gh)। स्वत�
 $ec_lang['or_notes_2_term']='छिद्र व्यवस्था';
 $ec_lang['or_notes_2_def']='छिद्र प्रवाह समीकरण तब लागू होते हैं जब अपस्ट्रीम जल सतह उद्घाटन के शिखर (ऊपर) से ऊपर हो। जब अपस्ट्रीम जल शिखर से नीचे हो, तो वियर समीकरण का उपयोग करें।';
 $ec_lang['or_notes_3_term']='निर्वहन गुणांक';
-$ec_lang['or_notes_3_def']='तीखे-किनारे वाले छिद्रों के लिए C<sub>d</sub> लगभग 0.60–0.65 तक होता है। गोलाकार या पुनः-प्रवेशी इनलेट अलग मूल्य उपयोग करते हैं। मार्गदर्शन के लिए <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venture-d_590.html">Engineering Toolbox</a> या HEC-RAS हाइड्रॉलिक संदर्भ मैनुअल देखें।';
+$ec_lang['or_notes_3_def']='तीखे-किनारे वाले छिद्रों के लिए C<sub>d</sub> लगभग 0.60–0.65 तक होता है। गोलाकार या पुनः-प्रवेशी इनलेट अलग मूल्य उपयोग करते हैं। मार्गदर्शन के लिए <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venturi-d_590.html">Engineering Toolbox</a> या HEC-RAS हाइड्रॉलिक संदर्भ मैनुअल देखें।';
 $ec_lang['or_notes_4_term']='जलमग्नता';
 $ec_lang['or_notes_4_def']='जब TWE उद्घाटन इनवर्ट के ऊपर हो, तो यह कैलकुलेटर स्वचालित रूप से h = HWE − TWE का उपयोग करके जलमग्न छिद्र समीकरण लागू करता है। जब TWE इनवर्ट पर या उससे नीचे हो, तो स्वतंत्र निकास माना जाता है और h = HWE − केन्द्रक।';
 // Micro-Hydro Power

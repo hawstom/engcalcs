@@ -275,7 +275,7 @@ $ec_lang['or_notes_1_def']='Q = C<sub>d</sub> × A × √(2gh). Kwa kutoka huru:
 $ec_lang['or_notes_2_term']='Utaratibu wa Tundu';
 $ec_lang['or_notes_2_def']='Mlinganyo wa mtiririko wa tundu unatumika wakati uso wa maji ya juu uko juu ya kilele (juu) ya ufunguzi. Wakati maji ya juu yako chini ya kilele, tumia mlinganyo wa kizingiti cha maji badala yake.';
 $ec_lang['or_notes_3_term']='Mgawo wa Kutoka';
-$ec_lang['or_notes_3_def']='C<sub>d</sub> inaanzia takriban 0.60–0.65 kwa matundu yenye makingo makali. Matundu yenye makingo ya mviringo au yanayoingia hutumia thamani tofauti. Tazama <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venture-d_590.html">Engineering Toolbox</a> au Mwongozo wa Marejeleo wa HEC-RAS Hydraulic kwa mwongozo.';
+$ec_lang['or_notes_3_def']='C<sub>d</sub> inaanzia takriban 0.60–0.65 kwa matundu yenye makingo makali. Matundu yenye makingo ya mviringo au yanayoingia hutumia thamani tofauti. Tazama <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venturi-d_590.html">Engineering Toolbox</a> au Mwongozo wa Marejeleo wa HEC-RAS Hydraulic kwa mwongozo.';
 $ec_lang['or_notes_4_term']='Kuzama';
 $ec_lang['or_notes_4_def']='Wakati TWE iko juu ya kiwango cha chini cha ufunguzi, kikokotoo hiki kinatumia kiotomatiki mlinganyo wa tundu lililozama ukitumia h = HWE − TWE. Wakati TWE iko kwenye au chini ya kiwango cha chini, kutoka huru kunakadiriwa na h = HWE − katikati.';
 // Micro-Hydro Power

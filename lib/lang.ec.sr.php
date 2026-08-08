@@ -273,7 +273,7 @@ $ec_lang['or_notes_1_def']='Q = C<sub>d</sub> × A × √(2gh). За слобо�
 $ec_lang['or_notes_2_term']='Режим отвора';
 $ec_lang['or_notes_2_def']='Једначине протока кроз отвор важе када је узводни ниво воде изнад темена (врха) отвора. Када је узводни ниво испод темена, користи се једначина прелива.';
 $ec_lang['or_notes_3_term']='Коефицијент протока';
-$ec_lang['or_notes_3_def']='C<sub>d</sub> се креће од приближно 0,60 до 0,65 за оштроивичне отворе. Заобљени или увучени улази имају друге вредности. Погледајте <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venture-d_590.html">Engineering Toolbox</a> или HEC-RAS Хидраулички приручник за смернице.';
+$ec_lang['or_notes_3_def']='C<sub>d</sub> се креће од приближно 0,60 до 0,65 за оштроивичне отворе. Заобљени или увучени улази имају друге вредности. Погледајте <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venturi-d_590.html">Engineering Toolbox</a> или HEC-RAS Хидраулички приручник за смернице.';
 $ec_lang['or_notes_4_term']='Потопљеност';
 $ec_lang['or_notes_4_def']='Када је TWE изнад дна отвора, калкулатор аутоматски примењује једначину потопљеног отвора са h = HWE − TWE. Када је TWE на нивоу дна или испод њега, претпоставља се слободно истицање и h = HWE − тежиште.';
 // Micro-Hydro Power

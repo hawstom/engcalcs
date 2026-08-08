@@ -277,7 +277,7 @@ $ec_lang['or_notes_1_def']='Q = C<sub>d</sub> × A × √(2gh). Para salida libr
 $ec_lang['or_notes_2_term']='Régimen de orificio';
 $ec_lang['or_notes_2_def']='Las ecuaciones de flujo por orificio se aplican cuando la lámina de agua aguas arriba está sobre la clave (parte superior) de la apertura. Cuando está bajo la clave, use en su lugar una ecuación de vertedero.';
 $ec_lang['or_notes_3_term']='Coeficiente de descarga';
-$ec_lang['or_notes_3_def']='C<sub>d</sub> varía entre aproximadamente 0,60–0,65 para orificios de borde agudo. Las entradas redondeadas o reentrantes usan valores diferentes. Consulte <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venture-d_590.html">Engineering Toolbox</a> o el Manual de Referencia Hidráulica de HEC-RAS para orientación.';
+$ec_lang['or_notes_3_def']='C<sub>d</sub> varía entre aproximadamente 0,60–0,65 para orificios de borde agudo. Las entradas redondeadas o reentrantes usan valores diferentes. Consulte <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venturi-d_590.html">Engineering Toolbox</a> o el Manual de Referencia Hidráulica de HEC-RAS para orientación.';
 $ec_lang['or_notes_4_term']='Sumersión';
 $ec_lang['or_notes_4_def']='Cuando TWE está sobre la solera de la apertura, esta calculadora aplica automáticamente la ecuación de orificio sumergido usando h = HWE − TWE. Cuando TWE está en o por debajo de la solera, se asume salida libre y h = HWE − centroide.';
 // Micro-Hydro Power

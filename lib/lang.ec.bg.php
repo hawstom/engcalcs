@@ -275,7 +275,7 @@ $ec_lang['or_notes_1_def']='Q = C<sub>d</sub> × A × √(2gh). При своб�
 $ec_lang['or_notes_2_term']='Режим на отвор';
 $ec_lang['or_notes_2_def']='Уравнението за отвор е приложимо, когато нивото на горната вода е над горния ръб (върха) на отвора. Когато горната вода е под горния ръб, използвайте уравнение за преливник.';
 $ec_lang['or_notes_3_term']='Коефициент на изтичане';
-$ec_lang['or_notes_3_def']='C<sub>d</sub> е приблизително 0,60–0,65 за отвори с остри ръбове. Заоблени или вдлъбнати (re-entrant) входове използват различни стойности. Вижте <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venture-d_590.html">Engineering Toolbox</a> или Наръчника по хидравлика на HEC-RAS за насоки.';
+$ec_lang['or_notes_3_def']='C<sub>d</sub> е приблизително 0,60–0,65 за отвори с остри ръбове. Заоблени или вдлъбнати (re-entrant) входове използват различни стойности. Вижте <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venturi-d_590.html">Engineering Toolbox</a> или Наръчника по хидравлика на HEC-RAS за насоки.';
 $ec_lang['or_notes_4_term']='Потопяване';
 $ec_lang['or_notes_4_def']='Когато TWE е над дъното на отвора, калкулаторът автоматично прилага уравнението за потопен отвор с h = HWE − TWE. Когато TWE е на или под дъното, се приема свободно изтичане и h = HWE − центроид.';
 // Micro-Hydro Power

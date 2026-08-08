@@ -274,7 +274,7 @@ $ec_lang['or_notes_1_def']='Q = C<sub>d</sub> × A × √(2gh)。自由出流：
 $ec_lang['or_notes_2_term']='孔口流态';
 $ec_lang['or_notes_2_def']='当上游水位高于孔口顶部时，适用孔口流量方程。当上游水位低于孔顶时，请改用堰流方程。';
 $ec_lang['or_notes_3_term']='流量系数';
-$ec_lang['or_notes_3_def']='锐缘孔口的 C<sub>d</sub> 约为 0.60–0.65。圆角或内缩入口的值不同。请参考 <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venture-d_590.html">Engineering Toolbox</a> 或 HEC-RAS 水力学参考手册。';
+$ec_lang['or_notes_3_def']='锐缘孔口的 C<sub>d</sub> 约为 0.60–0.65。圆角或内缩入口的值不同。请参考 <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venturi-d_590.html">Engineering Toolbox</a> 或 HEC-RAS 水力学参考手册。';
 $ec_lang['or_notes_4_term']='淹没';
 $ec_lang['or_notes_4_def']='当下游水位高于孔口底部时，计算器自动采用淹没孔口方程，h = HWE − TWE。当下游水位等于或低于孔底时，采用自由出流假定，h = HWE − 形心高程。';
 // Micro-Hydro Power

@@ -277,7 +277,7 @@ $ec_lang['or_notes_1_def']='Q = C<sub>d</sub> × A × √(2gh). Pour un déverse
 $ec_lang['or_notes_2_term']='Régime d\'orifice';
 $ec_lang['or_notes_2_def']='Les équations de débit par orifice s\'appliquent lorsque la surface d\'eau amont est au-dessus de la couronne (le sommet) de l\'ouverture. Lorsqu\'elle est en dessous de la couronne, utilisez plutôt une équation de déversoir.';
 $ec_lang['or_notes_3_term']='Coefficient de décharge';
-$ec_lang['or_notes_3_def']='C<sub>d</sub> varie d\'environ 0,60 à 0,65 pour les orifices à arête vive. Les entrées arrondies ou en retrait ont des valeurs différentes. Voir l\'<a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venture-d_590.html">Engineering Toolbox</a> ou le Manuel de référence hydraulique HEC-RAS pour plus d\'indications.';
+$ec_lang['or_notes_3_def']='C<sub>d</sub> varie d\'environ 0,60 à 0,65 pour les orifices à arête vive. Les entrées arrondies ou en retrait ont des valeurs différentes. Voir l\'<a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venturi-d_590.html">Engineering Toolbox</a> ou le Manuel de référence hydraulique HEC-RAS pour plus d\'indications.';
 $ec_lang['or_notes_4_term']='Submersion';
 $ec_lang['or_notes_4_def']='Lorsque le niveau d\'eau aval (TWE) est au-dessus du radier de l\'ouverture, ce calculateur applique automatiquement l\'équation d\'orifice noyé avec h = HWE − TWE. Lorsque TWE est au niveau du radier ou en dessous, un déversement libre est supposé et h = HWE − centroïde.';
 // Micro-Hydro Power

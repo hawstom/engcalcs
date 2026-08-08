@@ -275,7 +275,7 @@ $ec_lang['or_notes_1_def']='Q = C<sub>d</sub> × A × √(2gh). للتصريف �
 $ec_lang['or_notes_2_term']='نظام الفتحة';
 $ec_lang['or_notes_2_def']='تُطبَّق معادلات جريان الفتحة عندما يكون منسوب المياه العلوية فوق تاج (قمة) الفتحة. عندما تكون المياه العلوية أدنى من التاج، استخدم معادلة عتبة بدلاً من ذلك.';
 $ec_lang['or_notes_3_term']='معامل التصريف';
-$ec_lang['or_notes_3_def']='يتراوح C<sub>d</sub> من حوالي 0.60 إلى 0.65 للفتحات ذات الحافة الحادة. تستخدم المداخل المستديرة أو المعكوسة قيماً مختلفة. انظر <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venture-d_590.html">Engineering Toolbox</a> أو دليل مرجعية هيدروليكا HEC-RAS للإرشاد.';
+$ec_lang['or_notes_3_def']='يتراوح C<sub>d</sub> من حوالي 0.60 إلى 0.65 للفتحات ذات الحافة الحادة. تستخدم المداخل المستديرة أو المعكوسة قيماً مختلفة. انظر <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venturi-d_590.html">Engineering Toolbox</a> أو دليل مرجعية هيدروليكا HEC-RAS للإرشاد.';
 $ec_lang['or_notes_4_term']='الغمر';
 $ec_lang['or_notes_4_def']='عندما يكون TWE فوق قاع الفتحة، تُطبّق الحاسبة تلقائياً معادلة الفتحة المغمورة باستخدام h = HWE − TWE. عندما يكون TWE عند قاع الفتحة أو أدنى منه، يُفترض التصريف الحر وh = HWE − المركز الهندسي.';
 // Micro-Hydro Power

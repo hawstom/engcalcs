@@ -275,7 +275,7 @@ $ec_lang['or_notes_1_def']='Q = C<sub>d</sub> × A × √(2gh)። ለነፃ ፍ�
 $ec_lang['or_notes_2_term']='የቀዳዳ አገዛዝ';
 $ec_lang['or_notes_2_def']='የቀዳዳ ፍሰት እኩልታዎች የላይ ዳርቻ ውሃ ወለሉ ከክፍት ቦታው ጫፍ (ላይኛው ክፍል) በላይ ሲሆን ይሠራሉ። የላይ ዳርቻ ውሃ ከጫፉ በታች ሲሆን ግን የዊር እኩልታ ተጠቀም።';
 $ec_lang['or_notes_3_term']='የፍሰት ቅንጅት';
-$ec_lang['or_notes_3_def']='C<sub>d</sub> ለሹል-ጫፍ ቀዳዳዎች ከ0.60 እስከ 0.65 አካባቢ ይደርሳል። ክብ ወይም ወደ ውስጥ ዘልቀው የገቡ (re-entrant) መግቢያዎች ግን የተለያዩ ዋጋዎችን ይጠቀማሉ። ለተጨማሪ መመሪያ <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venture-d_590.html">Engineering Toolbox</a> ወይም የHEC-RAS Hydraulic Reference Manual ይመልከቱ።';
+$ec_lang['or_notes_3_def']='C<sub>d</sub> ለሹል-ጫፍ ቀዳዳዎች ከ0.60 እስከ 0.65 አካባቢ ይደርሳል። ክብ ወይም ወደ ውስጥ ዘልቀው የገቡ (re-entrant) መግቢያዎች ግን የተለያዩ ዋጋዎችን ይጠቀማሉ። ለተጨማሪ መመሪያ <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venturi-d_590.html">Engineering Toolbox</a> ወይም የHEC-RAS Hydraulic Reference Manual ይመልከቱ።';
 $ec_lang['or_notes_4_term']='መጠለቅ';
 $ec_lang['or_notes_4_def']='TWE ከክፍት ቦታው ግርጌ (invert) በላይ ሲሆን ይህ ካልኩሌተር በራስ-ሰር h = HWE − TWE የተጠለቀ ቀዳዳ እኩልታን ይጠቀማል። TWE ከግርጌው ጋር እኩል ወይም ከዚያ ዝቅ ሲል ግን ነፃ ፍሰት ተብሎ ተወስዶ h = HWE − ማዕከል ይሰላል።';
 // Micro-Hydro Power

@@ -275,7 +275,7 @@ $ec_lang['or_notes_1_def']='Q = C<sub>d</sub> × A × √(2gh)។ សម្រ�
 $ec_lang['or_notes_2_term']='របបហូរប្រហោង';
 $ec_lang['or_notes_2_def']='សមីការការហូរប្រហោងអនុវត្តនៅពេលផ្ទៃទឹកខាងលើស្ថិតនៅលើកំពូល (ខាងលើ) នៃរន្ធ។ នៅពេលទឹកខាងលើនៅក្រោមកំពូល សូមប្រើសមីការស្ទីងជំនួសវិញ។';
 $ec_lang['or_notes_3_term']='មេគុណលំហូរ';
-$ec_lang['or_notes_3_def']='C<sub>d</sub> ស្ថិតក្នុងចន្លោះប្រហែល 0.60–0.65 សម្រាប់ប្រហោងគែមមុត។ ធាតុចូលមូល ឬបញ្ច្រាស (re-entrant) ប្រើតម្លៃខុសគ្នា។ សូមមើល <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venture-d_590.html">Engineering Toolbox</a> ឬ HEC-RAS Hydraulic Reference Manual សម្រាប់ការណែនាំបន្ថែម។';
+$ec_lang['or_notes_3_def']='C<sub>d</sub> ស្ថិតក្នុងចន្លោះប្រហែល 0.60–0.65 សម្រាប់ប្រហោងគែមមុត។ ធាតុចូលមូល ឬបញ្ច្រាស (re-entrant) ប្រើតម្លៃខុសគ្នា។ សូមមើល <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venturi-d_590.html">Engineering Toolbox</a> ឬ HEC-RAS Hydraulic Reference Manual សម្រាប់ការណែនាំបន្ថែម។';
 $ec_lang['or_notes_4_term']='ការជ្រុក';
 $ec_lang['or_notes_4_def']='នៅពេល TWE ស្ថិតនៅលើបាតរន្ធ ម៉ាស៊ីនគណនានេះនឹងអនុវត្តសមីការប្រហោងជ្រុកដោយស្វ័យប្រវត្តិ ដោយប្រើ h = HWE − TWE។ នៅពេល TWE ស្ថិតនៅ ឬ ក្រោមបាតរន្ធ ការហូរចេញសេរីត្រូវបានសន្មត និង h = HWE − ចំណុចកណ្ដាល។';
 // Micro-Hydro Power

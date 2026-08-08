@@ -274,7 +274,7 @@ $ec_lang['or_notes_1_def']='Q = C<sub>d</sub> × A × √(2gh). Для своб�
 $ec_lang['or_notes_2_term']='Режим отверстия';
 $ec_lang['or_notes_2_def']='Уравнения истечения через отверстие применяются, когда уровень верхнего бьефа выше шелыги (верха) отверстия. Если верхний бьеф ниже шелыги, используйте уравнение водослива.';
 $ec_lang['or_notes_3_term']='Коэффициент расхода';
-$ec_lang['or_notes_3_def']='C<sub>d</sub> составляет примерно 0,60–0,65 для острокромочных отверстий. Скруглённые или заглублённые входы имеют другие значения. См. <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venture-d_590.html">Engineering Toolbox</a> или Гидравлическое справочное руководство HEC-RAS.';
+$ec_lang['or_notes_3_def']='C<sub>d</sub> составляет примерно 0,60–0,65 для острокромочных отверстий. Скруглённые или заглублённые входы имеют другие значения. См. <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venturi-d_590.html">Engineering Toolbox</a> или Гидравлическое справочное руководство HEC-RAS.';
 $ec_lang['or_notes_4_term']='Затопление';
 $ec_lang['or_notes_4_def']='Когда TWE выше низа отверстия, калькулятор автоматически применяет уравнение затопленного отверстия: h = HWE − TWE. Когда TWE на уровне низа или ниже, принимается свободное истечение: h = HWE − центроид.';
 // Micro-Hydro Power

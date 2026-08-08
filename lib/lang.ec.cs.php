@@ -274,7 +274,7 @@ $ec_lang['or_notes_1_def']='Q = C<sub>d</sub> × A × √(2gh). Volný výtok: h
 $ec_lang['or_notes_2_term']='Režim otvoru';
 $ec_lang['or_notes_2_def']='Rovnice průtoku otvorem platí, pokud je nadržená hladina nad vrcholem (horní hranou) otvoru. Pokud je nadržená hladina pod vrcholem, použijte místo toho rovnici přepadu.';
 $ec_lang['or_notes_3_term']='Součinitel výtoku';
-$ec_lang['or_notes_3_def']='C<sub>d</sub> se pohybuje přibližně od 0,60 do 0,65 pro ostrohranné otvory. Zaoblené nebo vtažené (re-entrant) vtoky mají jiné hodnoty. Viz <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venture-d_590.html">Engineering Toolbox</a> nebo Hydraulický referenční manuál HEC-RAS.';
+$ec_lang['or_notes_3_def']='C<sub>d</sub> se pohybuje přibližně od 0,60 do 0,65 pro ostrohranné otvory. Zaoblené nebo vtažené (re-entrant) vtoky mají jiné hodnoty. Viz <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venturi-d_590.html">Engineering Toolbox</a> nebo Hydraulický referenční manuál HEC-RAS.';
 $ec_lang['or_notes_4_term']='Zatopení';
 $ec_lang['or_notes_4_def']='Pokud je TWE nad dnem otvoru, tento kalkulátor automaticky použije rovnici zatopeného otvoru s h = HWE − TWE. Pokud je TWE na úrovni dna otvoru nebo níže, předpokládá se volný výtok a h = HWE − těžiště.';
 // Micro-Hydro Power

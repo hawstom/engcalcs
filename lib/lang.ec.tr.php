@@ -277,7 +277,7 @@ $ec_lang['or_notes_1_def']='Q = C<sub>d</sub> × A × √(2gh). Serbest çıkı�
 $ec_lang['or_notes_2_term']='Orifis Rejimi';
 $ec_lang['or_notes_2_def']='Orifis akış denklemleri, memba su yüzü açıklığın tavanının (üst noktasının) üzerinde olduğunda uygulanır. Memba su yüzü tavanın altındaysa, bunun yerine bir savak denklemi kullanın.';
 $ec_lang['or_notes_3_term']='Debi Katsayısı';
-$ec_lang['or_notes_3_def']='C<sub>d</sub>, keskin kenarlı orifisler için yaklaşık 0,60–0,65 aralığındadır. Yuvarlatılmış veya içe girik girişler farklı değerler alır. Bkz. <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venture-d_590.html">Engineering Toolbox</a> veya HEC-RAS Hidrolik Referans Kılavuzu.';
+$ec_lang['or_notes_3_def']='C<sub>d</sub>, keskin kenarlı orifisler için yaklaşık 0,60–0,65 aralığındadır. Yuvarlatılmış veya içe girik girişler farklı değerler alır. Bkz. <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venturi-d_590.html">Engineering Toolbox</a> veya HEC-RAS Hidrolik Referans Kılavuzu.';
 $ec_lang['or_notes_4_term']='Batıklık';
 $ec_lang['or_notes_4_def']='TWE, açıklığın taban kotunun üzerindeyken bu hesaplayıcı, h = HWE − TWE kullanarak batık orifis denklemini otomatik olarak uygular. TWE taban kotunda veya altındayken serbest çıkış varsayılır ve h = HWE − ağırlık merkezi kotu alınır.';
 // Micro-Hydro Power

@@ -275,7 +275,7 @@ $ec_lang['or_notes_1_def']='Q = C<sub>d</sub> × A × √(2gh). برای خرو�
 $ec_lang['or_notes_2_term']='رژیم دریچه';
 $ec_lang['or_notes_2_def']='معادلات جریان دریچه زمانی اعمال می‌شوند که سطح آب بالادست بالاتر از تاج (بالای) دهانه باشد. وقتی آب بالادست پایین‌تر از تاج باشد، در عوض از معادله سرریز استفاده کنید.';
 $ec_lang['or_notes_3_term']='ضریب تخلیه';
-$ec_lang['or_notes_3_def']='C<sub>d</sub> برای دریچه‌های لبه تیز در حدود 0.60–0.65 است. ورودی‌های گرد یا داخل‌برآمده مقادیر متفاوتی دارند. برای راهنمایی به <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venture-d_590.html">Engineering Toolbox</a> یا راهنمای مرجع هیدرولیک HEC-RAS مراجعه کنید.';
+$ec_lang['or_notes_3_def']='C<sub>d</sub> برای دریچه‌های لبه تیز در حدود 0.60–0.65 است. ورودی‌های گرد یا داخل‌برآمده مقادیر متفاوتی دارند. برای راهنمایی به <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venturi-d_590.html">Engineering Toolbox</a> یا راهنمای مرجع هیدرولیک HEC-RAS مراجعه کنید.';
 $ec_lang['or_notes_4_term']='استغراق';
 $ec_lang['or_notes_4_def']='وقتی TWE بالاتر از کف دهانه است، این ماشین‌حساب به‌طور خودکار معادله دریچه مستغرق را با h = HWE − TWE اعمال می‌کند. وقتی TWE در سطح کف یا پایین‌تر از آن باشد، خروج آزاد فرض می‌شود و h = HWE − مرکز ثقل.';
 // Micro-Hydro Power
