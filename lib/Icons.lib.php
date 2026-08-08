@@ -55,8 +55,13 @@ $ec_icons = array(
 	'save'       => '<path d="M4 4h12l4 4v12H4z"/><path d="M8 4v5h7V4"/><path d="M8 20v-7h8v7"/>',
 	// Tom, 2026-08-08: "Sometimes a disk with a pencil. You used a page with a pencil." Correct —
 	// Save as is a variant of Save, so it must wear Save's disk, not a different object entirely.
-	'saveas'     => '<path d="M4 4h11l3 3v4"/><path d="M4 4v16h6"/><path d="M8 4v4h6"/><path d="M20.5 12.5l-7 7-3 1 1-3 7-7z"/>',
-	'saveall'    => '<path d="M8 3h9l4 4v11H8z"/><path d="M12 3v4h6"/><path d="M17 18v3H3V7h3"/>',
+	// Second pass, same day: "we can afford to depict a little of the lower label square." He is
+	// right — the shutter alone is the top half of a floppy, and a viewer reading only the top half
+	// is reading a rectangle. The label is what makes the object a disk. Here it runs partway and
+	// then disappears under the pencil, which is what an occluded object should do; on saveall
+	// nothing occludes it, so it is drawn whole.
+	'saveas'     => '<path d="M4 4h10l4 4v4"/><path d="M4 4v16h8"/><path d="M8 4v4h6"/><path d="M8 20v-5h4"/><path d="M21.5 12.5l-6 6-3 1 1-3 6-6z"/>',
+	'saveall'    => '<path d="M8 3h9l4 4v11H8z"/><path d="M12 3v4h6"/><path d="M11.5 18v-5h6v5"/><path d="M17 18v3H3V7h3"/>',
 	'revert'     => '<path d="M20.5 12a8.5 8.5 0 1 1-2.6-6.1"/><path d="M21 3v5h-5"/>',
 	'close'      => '<path d="M6 6l12 12M18 6L6 18"/>',
 
@@ -76,17 +81,20 @@ $ec_icons = array(
 	// "water container" without being told. EPANET's downward triangle scales smaller but has to
 	// be learned first; that trade goes the other way on a page whose whole audience is new.
 	'reservoir'  => '<path d="M6 9h12v11H6z" fill="currentColor" stroke="none" opacity=".18"/><path d="M6 4v16h12V4"/><path d="M6 9h12"/>',
-	// Casing plus a short discharge tail leaving it on the top tangent — the tangency is what makes
-	// this read as a pump rather than as a magnifier.
+	// Casing plus a discharge tail leaving it on the top tangent — the tangency is what makes this
+	// read as a pump rather than as a magnifier.
 	//
-	// Three passes, and the last one is the lesson (Tom, 2026-08-08). First a long tail: it pushed
-	// the casing off-centre and shrank it, and the casing is the half that carries the meaning.
-	// Then a short one, but drawn as a box turning upward — "the arrowhead is too much to fit.
-	// It's like a 6, but with a horizontal tail, not upward." He is right on both counts: at 15px
-	// the box's two extra corners collapsed into a blob, and the outlet on a pump runs ACROSS, not
-	// up. So the tail is now one horizontal line off the top of the casing and nothing else. It
-	// survives being small, which the box did not, and it is the whole symbol his office draws.
-	'pump'       => '<circle cx="10" cy="14.5" r="6.5"/><path d="M10 8h8"/>',
+	// Four passes (Tom, 2026-08-08), and the shape only got simpler each time. A long tail pushed
+	// the casing off-centre. A short tail drawn as a box turning upward collapsed into a blob at
+	// 15px — "the arrowhead is too much to fit. It's like a 6, but with a horizontal tail, not
+	// upward." Then, with the tail finally horizontal, it was too short: "about twice as wide...
+	// shrink the circle a little so this ends up wide or squat instead of square."
+	//
+	// That last note is the real design lesson, and it is not about pumps. Every other icon here
+	// fills a square, so this one was drawn to fill a square too — and a pump that fills a square
+	// is mostly casing, which makes it a circle with a nub. Letting it run WIDE is what separates
+	// it at a glance from every round icon in the set. The proportion is the identity.
+	'pump'       => '<circle cx="6.5" cy="12.5" r="5"/><path d="M6.5 7.5H22"/>',
 	// Solid, because a junction is a node and the canvas draws it solid.
 	'junction'   => '<circle cx="12" cy="12" r="4.5" fill="currentColor" stroke="none"/>',
 	// A run between two nodes — the thing you are actually about to place.
