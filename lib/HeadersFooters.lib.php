@@ -106,7 +106,12 @@ endif;
 ?>
 <h1 class="d-print-none"><?=$html_title?></h1>
 <p class="d-print-none ec-welcome"><?=$ec_lang['template_welcome']?></p>
-<script>EngCalcs.pageTitle = <?=json_encode($html_title)?>;</script>
+<script>EngCalcs.pageTitle = <?=json_encode($html_title)?>;
+<?php // The single source of icon geometry, shared with PHP's ecIcon() (Task 231). JS-built
+      // chrome builds its <svg> from these same strings; a path redrawn in JS would be a
+      // second icon pretending to be the first. ?>
+EngCalcs.icons = <?=json_encode($GLOBALS['ec_icons'], JSON_UNESCAPED_SLASHES)?>;
+EngCalcs.iconOpenTag = <?=json_encode(EC_ICON_OPEN_TAG)?>;</script>
 <?php
 }
 /****************************************************************************************************************/

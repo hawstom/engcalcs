@@ -185,13 +185,13 @@ document.addEventListener('DOMContentLoaded', function() {
 	<?php if ($flagHideDefaults === false) : ?>
 	<?php // Icon-as-prefix, never icon-only (Task 231): the glyph lives in the markup, not in the
 	      // $ec_lang value, so one decision stays one decision instead of 27 copies of it. ?>
-	<button type="button" id="calc_defaults" onclick="EngCalcs.resetToDefaults('<?=addslashes($ec_lang['calc_defaults_confirm'])?>')">↺ <?=$ec_lang['calc_defaults']?></button>
+	<button type="button" id="calc_defaults" onclick="EngCalcs.resetToDefaults('<?=addslashes($ec_lang['calc_defaults_confirm'])?>')"><?=ecIcon('restore')?><?=$ec_lang['calc_defaults']?></button>
 	&nbsp;
 	<?php endif; ?>
 	<?php // SI first, US second (Tom, 2026-07-30): the suite serves a worldwide audience, and the
 	      // vast majority of it is metric -- leading with the one system that's a minority worldwide
 	      // reads as US-centric. Button IDs/behavior are unchanged, only the visual order. ?>
-	📏 <?=$ec_lang['calc_set_units']?> <button type="button" id="set_units_si"><?=$ec_lang['calc_units_si']?></button><button type="button" id="set_units_us"><?=$ec_lang['calc_units_us']?></button> <a data-bs-toggle="collapse" href="#set_units_row" aria-expanded="true" aria-controls="set_units_row"><?=$ec_lang['view_hide_line']?></a>
+	<?=ecIcon('units')?><?=$ec_lang['calc_set_units']?> <button type="button" id="set_units_si"><?=$ec_lang['calc_units_si']?></button><button type="button" id="set_units_us"><?=$ec_lang['calc_units_us']?></button> <a data-bs-toggle="collapse" href="#set_units_row" aria-expanded="true" aria-controls="set_units_row"><?=$ec_lang['view_hide_line']?></a>
 </div>
 <?php
 }
@@ -278,7 +278,7 @@ document.addEventListener('DOMContentLoaded', function() {
 ?>
 <?php if ($flagFormAppend === true) {echoCalculatorFormAppend();} ?>
 </form>
-<p class="d-print-none"><button type="button" id="btn-printable">🖨 <?=$ec_lang['view_printable']?></button></p>
+<p class="d-print-none"><button type="button" id="btn-printable"><?=ecIcon('print')?><?=$ec_lang['view_printable']?></button></p>
 <?php
 }
 function echoCookieScript ()

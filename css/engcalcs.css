@@ -77,6 +77,29 @@ input.ec-spin[type=number] {
 	color: gray;
 }
 
+/* The suite's one icon set (ROADMAP Task 231). Geometry lives once in lib/Icons.lib.php; this is
+   the only place its size and alignment are decided.
+
+   Sized in em, so an icon tracks whatever text it prefixes instead of fighting it at one fixed
+   pixel size. stroke:currentColor (set on the element) plus no colour here means an icon is
+   automatically right on a light row, a hover row, a disabled row and a dark print stylesheet --
+   the property colour emoji could never have. vertical-align sits it on the text's optical
+   centre; baseline alignment would hang it low next to a capital letter. */
+.ec-icon {
+	width: 1.05em;
+	height: 1.05em;
+	vertical-align: -0.16em;
+	flex: none;
+}
+/* A control whose label is "<icon> Word" gets its gap from here rather than from a space character
+   baked into every call site -- a literal space is unremovable and wrong in a narrow toolbar.
+   margin-inline-end, not margin-right: in Arabic, Hebrew, Persian, Urdu and Pashto the icon sits
+   to the RIGHT of its word and the gap has to follow it there. */
+button > .ec-icon, a > .ec-icon, label > .ec-icon { margin-inline-end: 0.4em; }
+/* Except inside the lpn menu's fixed-width icon column, where the cell already provides the gap
+   and a margin on top of it would push every label off the column it is meant to line up with. */
+.lpn-menu-icon > .ec-icon { margin-inline-end: 0; }
+
 /* Hover-tip icons (⚠, ?) that carry a longer explanation in the title attribute */
 .ec-tip {
 	cursor: help;
@@ -266,13 +289,10 @@ html[lang="zh"] .ec-welcome {
 .lpn-menu-row:hover:enabled { background: #def; }
 .lpn-menu-row:disabled { color: #999; cursor: default; }
 /* Reserved icon column for menu rows (Task 231). Fixed width and always present, even when the
-   row has no glyph, so one iconless row cannot ragged-edge the labels around it. line-height:1
-   keeps a colour emoji from growing the row taller than its text-only neighbours, and the em
-   width means it tracks the font rather than a guessed pixel count. */
-.lpn-menu-icon { display: inline-block; width: 1.5em; line-height: 1; text-align: center; }
-/* A disabled row greys its word; without this the emoji stays fully saturated and the row reads
-   as half-available. Not a filter on the button itself -- that would wash out the hover colour. */
-.lpn-menu-row:disabled .lpn-menu-icon { filter: grayscale(1); opacity: 0.5; }
+   row has no icon, so one iconless row cannot ragged-edge the labels around it. */
+.lpn-menu-icon { display: inline-block; width: 1.6em; text-align: center; }
+/* The icon inherits the row's colour, so a disabled row greys its icon along with its word with
+   no separate rule -- which is the whole reason these are stroked SVG and not colour emoji. */
 /* Backdrop registration wizard (Task 146 Phase 2, ported from the spike): during a Scale/Position
    click sequence, regMode already suppresses real interaction in looped-network.js, but the
    per-element cursor:pointer/move rules would still fire on hover, visually implying "this is

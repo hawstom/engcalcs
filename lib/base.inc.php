@@ -51,6 +51,9 @@ require_once('Language.lib.php');
 require_once('lang.ec.en.php');
 require_once('lang.ec.'.$clanguage.'.php');
 
+// Load the one icon set (Task 231). Must precede HeadersFooters/Menus: both call ecIcon().
+require_once('Icons.lib.php');
+
 // Load the headers and footers
 require_once('HeadersFooters.lib.php');
 

@@ -379,6 +379,34 @@ EngCalcs.calcAndSave = function (objForm) {
 	this.maybeLogCalcUsage();
 };
 
+// ---- Icons (ROADMAP Task 231) ----
+// Geometry is NOT defined here. It lives once in lib/Icons.lib.php and arrives as
+// EngCalcs.icons / EngCalcs.iconOpenTag, so PHP's ecIcon() and every JS-built control draw the
+// same shape at the same stroke weight. Redrawing a path in JS would be a second icon pretending
+// to be the first. js/looped-network.js builds its whole menu bar and toolbar through these.
+EngCalcs.iconEl = function (name) {
+	'use strict';
+	var geom = (this.icons || {})[name];
+	if (!geom || !this.iconOpenTag) { return null; }
+	// Built through a detached wrapper rather than createElementNS + innerHTML: setting innerHTML
+	// directly on an SVG element is unreliable in older engines, and the markup here is our own
+	// constant data, never anything a user typed.
+	var wrap = document.createElement('div');
+	wrap.innerHTML = this.iconOpenTag + geom + '</svg>';
+	return wrap.firstChild;
+};
+
+// The one way a control gets an icon + word, so no call site can grow a second convention --
+// which is exactly how the lpn Settings popover shipped without its warning triangle (Tom,
+// 2026-08-08: "I see it on the pull-down menu Settings, but not on the toolbar Settings").
+EngCalcs.setLabel = function (el, iconName, text) {
+	'use strict';
+	el.textContent = '';
+	var ic = iconName ? this.iconEl(iconName) : null;
+	if (ic) { el.appendChild(ic); }
+	el.appendChild(document.createTextNode(text));
+};
+
 // Explicit "Copy link" action -- URL sync is opt-in, not automatic on every keystroke
 // (constant history.replaceState churn was noise, especially for dynamic-row calculators).
 EngCalcs.copyLink = function () {
@@ -386,10 +414,14 @@ EngCalcs.copyLink = function () {
 	this.updateUrl();
 	var btn = document.getElementById('ec-copy-link-btn');
 	if (!btn || !navigator.clipboard || !navigator.clipboard.writeText) { return; }
+	var self = this;
 	navigator.clipboard.writeText(window.location.href).then(function () {
+		// Swaps the icon as well as the word. The old version assigned textContent, which since
+		// Task 231 would have destroyed the button's <svg> on the first click and never restored it
+		// -- textContent reads the text back but cannot read an element back.
 		var originalText = btn.textContent;
-		btn.textContent = btn.dataset.copiedText || originalText;
-		setTimeout(function () { btn.textContent = originalText; }, 1500);
+		self.setLabel(btn, 'check', btn.dataset.copiedText || originalText);
+		setTimeout(function () { self.setLabel(btn, 'link', originalText); }, 1500);
 	});
 };
 

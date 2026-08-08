@@ -1493,13 +1493,13 @@ var EngCalcs = EngCalcs || {};
 			o.value = value; o.textContent = text; if (disabled) { o.disabled = true; }
 			menu.appendChild(o);
 		}
-		// An <option> holds text only -- no icon column is possible here, so these are inline
-		// prefixes drawn from the same ICON map the menu rows use.
-		opt('', ICON.image + ' ' + (pc.lpn_backdrop_menu || 'Background image...'));
-		opt('add', ICON.image + ' ' + (pc.lpn_backdrop_add || 'Add image'));
-		opt('scale', ICON.scale + ' ' + (pc.lpn_backdrop_scale || 'Scale'), true);
-		opt('position', ICON.position + ' ' + (pc.lpn_backdrop_position || 'Position'), true);
-		opt('remove', ICON.del + ' ' + (pc.lpn_backdrop_remove || 'Remove image'), true);
+		// An <option> can hold text and nothing else -- no element, so no SVG. These stay words, and
+		// the identical commands in Insert > Background image carry the icons instead.
+		opt('', pc.lpn_backdrop_menu || 'Background image...');
+		opt('add', pc.lpn_backdrop_add || 'Add image');
+		opt('scale', pc.lpn_backdrop_scale || 'Scale', true);
+		opt('position', pc.lpn_backdrop_position || 'Position', true);
+		opt('remove', pc.lpn_backdrop_remove || 'Remove image', true);
 		var fileInput = document.getElementById('lpn_backdrop_file');
 		menu.addEventListener('change', function () {
 			var v = menu.value; menu.value = '';
@@ -3887,30 +3887,27 @@ var EngCalcs = EngCalcs || {};
 	var openMenuAnchor = null;
 
 	// ---- Icons (ROADMAP Task 231) ----
-	// Prefix, never replacement: every control keeps its word, and the glyph rides in front of it.
-	// Icon-only was rejected suite-wide because it saves no translation work (the label stays) and
-	// spends first-time comprehension, which is the audience a web calculator exists for.
+	// Prefix, never replacement: every control keeps its word, and the icon rides in front of it.
+	// Icon-only was rejected suite-wide -- it saves no translation work (the label stays) and spends
+	// first-time comprehension, which is the audience a web calculator exists for.
 	//
-	// Defined here, in code, and never in $ec_lang -- a glyph baked into a translated value is 27
-	// copies of one decision, and `lpn_` has 26 of those still ahead of it (Task 146.06).
+	// GEOMETRY IS NOT DEFINED HERE. It lives once in lib/Icons.lib.php and arrives as
+	// EngCalcs.icons; the wrapper attributes arrive as EngCalcs.iconOpenTag, so stroke weight and
+	// viewBox are one decision shared with PHP's ecIcon() rather than two that drift. Redrawing a
+	// path here would be a second icon pretending to be the first.
 	//
-	// Two families, chosen on purpose:
-	//   * The five drawing tools MAP THE MAP -- a reservoir is a square and a junction is a circle
-	//     on the canvas, so the toolbar shows a square and a circle. The icon teaches the notation
-	//     rather than decorating it, which is the one place an icon genuinely outruns its word.
-	//   * Everything else uses the glyph the user already met in another program (folder, floppy,
-	//     bin, gear). Nothing invented; recognition is the whole value.
-	// Units is 📏 to match the '📏 Set units' row every other calculator in the suite now shows.
-	var ICON = {
-		file: '📁', edit: '✏️', insert: '➕', view: '👁️', settings: '⚙️',
-		'new': '📄', open: '📂', save: '💾', saveas: '📝', saveall: '🗂️',
-		revert: '🔄', close: '✖️',
-		undo: '↩️', del: '🗑️', delnetwork: '🧹', wipe: '⚠️',
-		reservoir: '🟦', pump: '⏫', junction: '🔵', pipe: '➖', text: '🅰️',
-		image: '🖼️', scale: '📐', position: '✋',
-		example: '✨', devtest: '🧪',
-		zoom: '🔍', labels: '🏷️', units: '📏', select: '↖️', duplicate: '📋'
-	};
+	// The first pass used emoji and Tom's review killed it (2026-08-08) on the two icons that carry
+	// the most meaning: a reservoir is an open-top tank and a pump is a circle with a tangent tail,
+	// and Unicode has neither. Those are the shapes this canvas already draws, so the icon that
+	// teaches the notation beats an approximate glyph -- and unlike emoji, these inherit the row's
+	// colour, so a disabled row greys its icon with no extra rule.
+	// Both helpers live in js/Calculators.lib.js so every page in the suite builds an icon the same
+	// way; these are just local names for them. setLabel() is the ONLY way a control here gets an
+	// icon + word, so no call site can quietly grow a second convention -- which is exactly how the
+	// toolbar's Settings popover shipped without its warning triangle (Tom, 2026-08-08: "I see it on
+	// the pull-down menu Settings, but not on the toolbar Settings"). Two render sites, one missed.
+	function iconEl(name) { return EngCalcs.iconEl(name); }
+	function setLabel(el, iconName, text) { EngCalcs.setLabel(el, iconName, text); }
 
 	function openMenu(anchor, rows) {
 		var popup = document.getElementById('lpn_menu_popup'), list = document.getElementById('lpn_menu_list');
@@ -3935,7 +3932,8 @@ var EngCalcs = EngCalcs || {};
 			// would ragged-edge the whole menu the moment one row went without.
 			var ic = document.createElement('span');
 			ic.className = 'lpn-menu-icon';
-			ic.textContent = r.icon || '';
+			var ic2 = r.icon ? iconEl(r.icon) : null;
+			if (ic2) { ic.appendChild(ic2); }
 			b.appendChild(ic);
 			b.appendChild(document.createTextNode(r.label));
 			// A menu row is its own click target, so the tip goes straight on it as a title matched to
@@ -3967,8 +3965,8 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, id = library.openId, entry = indexEntry(id);
 		var linked = isLinked(id), api = fileApiAvailable();
 		openMenu(anchor, [
-			{ icon: ICON['new'], label: pc.lpn_file_new || 'New', fn: function () { newProject(); renderTabs(); } },
-			{ icon: ICON.open, label: pc.lpn_file_open || 'Open…', fn: openFromFile },
+			{ icon: 'new', label: pc.lpn_file_new || 'New', fn: function () { newProject(); renderTabs(); } },
+			{ icon: 'open', label: pc.lpn_file_open || 'Open…', fn: openFromFile },
 			{ separator: true },
 			// **The menu says Save and Save as… in every browser** (Tom, 2026-08-04, overruling the
 			// first version: *"'Download a copy' is a mistake, and the menu item we want is
@@ -3995,7 +3993,7 @@ var EngCalcs = EngCalcs || {};
 			// No tip on the disabled row: a disabled button fires no mouse events, so its title never
 			// appears. The explanation lives on Save as, which IS reachable.
 			{
-				icon: ICON.save,
+				icon: 'save',
 				label: pc.lpn_file_save || 'Save',
 				tip: api ? pc.lpn_file_save_tip : null,
 				fn: saveCurrent,
@@ -4005,7 +4003,7 @@ var EngCalcs = EngCalcs || {};
 			// answers the question at the moment the user is choosing where their work goes, rather
 			// than in a dialog they met once on the way in.
 			{
-				icon: ICON.saveas,
+				icon: 'saveas',
 				label: pc.lpn_file_saveas || 'Save as…',
 				tip: api ? pc.lpn_file_saveas_tip : pc.lpn_file_saveas_tip_download,
 				fn: saveAs
@@ -4016,16 +4014,16 @@ var EngCalcs = EngCalcs || {};
 			// teaches no one it is there, and its absence reads as a missing feature rather than as a
 			// state. Every sibling here -- Save, Revert -- greys out instead, and consistency inside
 			// one short menu is worth more than the one row of clutter this costs.
-			{ icon: ICON.saveall, label: pc.lpn_file_saveall || 'Save all', fn: saveAllFiles, disabled: dirtyFileCount() < 2 },
+			{ icon: 'saveall', label: pc.lpn_file_saveall || 'Save all', fn: saveAllFiles, disabled: dirtyFileCount() < 2 },
 			// Only offered when there is something to revert TO and something to revert FROM.
 			// Reachable in READ-ONLY on purpose (Tom, 2026-08-05: "Revert is not an option"). Revert
 			// re-reads the file and throws your edits away -- which is exactly what somebody locked
 			// out of a file wants when they decide the colleague's version wins. Disabling it there
 			// left "Save as to a new file" as the only exit, and forked a project that did not need
 			// forking. It writes nothing, so it is safe in every state.
-			{ icon: ICON.revert, label: pc.lpn_file_revert || 'Revert', fn: revertCurrent, disabled: !(linked && entry && entry.dirty) },
+			{ icon: 'revert', label: pc.lpn_file_revert || 'Revert', fn: revertCurrent, disabled: !(linked && entry && entry.dirty) },
 			{ separator: true },
-			{ icon: ICON.close, label: pc.lpn_file_close || 'Close', fn: function () { closeTab(id); } }
+			{ icon: 'close', label: pc.lpn_file_close || 'Close', fn: function () { closeTab(id); } }
 		]);
 	}
 	// ---- The menu bar (ROADMAP Task 211, 2026-08-04) ----
@@ -4042,67 +4040,67 @@ var EngCalcs = EngCalcs || {};
 	function openEditMenu(anchor) {
 		var pc = EngCalcs.pageConfig || {};
 		openMenu(anchor, [
-			{ icon: ICON.undo, label: pc.lpn_tool_undo || 'Undo', fn: undo },
+			{ icon: 'undo', label: pc.lpn_tool_undo || 'Undo', fn: undo },
 			{ separator: true },
 			// Select all -> Delete is the paradigmatic route and this page cannot offer it yet: the
 			// selection model is single-element. Until multi-select exists, this named command IS
 			// that route, and it is the honest way to say so -- a greyed-out "Select all" would be a
 			// promise with nothing behind it.
-			{ icon: ICON.del, label: pc.lpn_tool_delete || 'Delete', fn: function () { setMode(mode === 'delete' ? 'select' : 'delete'); } },
-			{ icon: ICON.delnetwork, label: pc.lpn_edit_delete_network || 'Delete network', fn: deleteNetwork }
+			{ icon: 'del', label: pc.lpn_tool_delete || 'Delete', fn: function () { setMode(mode === 'delete' ? 'select' : 'delete'); } },
+			{ icon: 'delnetwork', label: pc.lpn_edit_delete_network || 'Delete network', fn: deleteNetwork }
 		]);
 	}
 	function openInsertMenu(anchor) {
 		var pc = EngCalcs.pageConfig || {};
 		openMenu(anchor, [
-			{ icon: ICON.reservoir, label: pc.lpn_tool_add_reservoir || 'Reservoir', fn: function () { setMode('add-reservoir'); } },
-			{ icon: ICON.pump, label: pc.lpn_tool_add_pump || 'Pump', fn: function () { setMode('add-pump'); } },
-			{ icon: ICON.junction, label: pc.lpn_tool_add_junction || 'Junction', fn: function () { setMode('add-junction'); } },
-			{ icon: ICON.pipe, label: pc.lpn_tool_add_pipe || 'Pipe', fn: function () { setMode('add-pipe'); } },
-			{ icon: ICON.text, label: pc.lpn_tool_add_text || 'Text', fn: function () { setMode('add-text'); } },
+			{ icon: 'reservoir', label: pc.lpn_tool_add_reservoir || 'Reservoir', fn: function () { setMode('add-reservoir'); } },
+			{ icon: 'pump', label: pc.lpn_tool_add_pump || 'Pump', fn: function () { setMode('add-pump'); } },
+			{ icon: 'junction', label: pc.lpn_tool_add_junction || 'Junction', fn: function () { setMode('add-junction'); } },
+			{ icon: 'pipe', label: pc.lpn_tool_add_pipe || 'Pipe', fn: function () { setMode('add-pipe'); } },
+			{ icon: 'text', label: pc.lpn_tool_add_text || 'Text', fn: function () { setMode('add-text'); } },
 			{ separator: true },
 			// The backdrop submenu, flattened into a labelled group. Scale/Position/Remove are greyed
 			// with no image present, exactly as the toolbar select greys them -- one state, read from
 			// the same place.
-			{ icon: ICON.image, label: pc.lpn_backdrop_add || 'Add image', fn: function () { backdropAction('add'); } },
-			{ icon: ICON.scale, label: pc.lpn_backdrop_scale || 'Scale', fn: function () { backdropAction('scale'); }, disabled: !backdrop },
-			{ icon: ICON.position, label: pc.lpn_backdrop_position || 'Position', fn: function () { backdropAction('position'); }, disabled: !backdrop },
-			{ icon: ICON.del, label: pc.lpn_backdrop_remove || 'Remove image', fn: function () { backdropAction('remove'); }, disabled: !backdrop },
+			{ icon: 'image', label: pc.lpn_backdrop_add || 'Add image', fn: function () { backdropAction('add'); } },
+			{ icon: 'scale', label: pc.lpn_backdrop_scale || 'Scale', fn: function () { backdropAction('scale'); }, disabled: !backdrop },
+			{ icon: 'position', label: pc.lpn_backdrop_position || 'Position', fn: function () { backdropAction('position'); }, disabled: !backdrop },
+			{ icon: 'del', label: pc.lpn_backdrop_remove || 'Remove image', fn: function () { backdropAction('remove'); }, disabled: !backdrop },
 			{ separator: true },
-			{ icon: ICON.example, label: pc.lpn_tool_example || 'Draw example network', fn: drawExampleNetwork },
+			{ icon: 'example', label: pc.lpn_tool_example || 'Draw example network', fn: drawExampleNetwork },
 			// Dev-only, and last, and still wearing its bracketed label so it reads as
 			// not-a-real-feature (Tom, 2026-07-30, on the label). Deliberately NOT translated: it is
 			// scaffolding for measuring how ~100 links performs, and it goes when that question is
 			// settled -- see drawTestGrid(). Putting a throwaway through 26 languages would be worse
 			// than leaving it in English.
-			{ icon: ICON.devtest, label: '[dev] Draw large test network', fn: drawTestGrid }
+			{ icon: 'devtest', label: '[dev] Draw large test network', fn: drawTestGrid }
 		]);
 	}
 	function openViewMenu(anchor) {
 		var pc = EngCalcs.pageConfig || {};
 		openMenu(anchor, [
-			{ icon: ICON.zoom, label: pc.lpn_tool_zoom_extent || 'Zoom to fit', fn: zoomExtent },
+			{ icon: 'zoom', label: pc.lpn_tool_zoom_extent || 'Zoom to fit', fn: zoomExtent },
 			{ separator: true },
 			// The popover openers position themselves from evt.currentTarget, so a menu row hands them
 			// the menu-bar button it came from -- the popover then opens under "View", where the eye
 			// already is, rather than under a toolbar button that may not even be on screen.
-			{ icon: ICON.labels, label: pc.lpn_tool_labels || 'Labels', fn: function () { toggleLabelsPopup({ currentTarget: document.getElementById('lpn_menu_view') }); } }
+			{ icon: 'labels', label: pc.lpn_tool_labels || 'Labels', fn: function () { toggleLabelsPopup({ currentTarget: document.getElementById('lpn_menu_view') }); } }
 		]);
 	}
 	function openSettingsMenu(anchor) {
 		var pc = EngCalcs.pageConfig || {};
 		openMenu(anchor, [
-			{ icon: ICON.settings, label: pc.lpn_tool_settings || 'Settings', fn: function () { toggleSettingsPopup({ currentTarget: document.getElementById('lpn_menu_settings') }); } },
+			{ icon: 'settings', label: pc.lpn_tool_settings || 'Settings', fn: function () { toggleSettingsPopup({ currentTarget: document.getElementById('lpn_menu_settings') }); } },
 			// **Units are a Settings item, not a View item** (Tom, 2026-08-04, overruling the first
 			// version: "Units is not a view feature. It is a math and engineering feature... View menu
 			// traditionally is about camera-related (or layer-related) stuff"). He is right on the
 			// convention: View holds what the camera and the layers are doing -- Zoom to fit, Labels --
 			// and a unit system is a property of the calculation, not of the look at it.
-			{ icon: ICON.units, label: pc.lpn_view_units || 'Units…', fn: function () { toggleUnitsPopup(document.getElementById('lpn_menu_settings')); } },
+			{ icon: 'units', label: pc.lpn_view_units || 'Units…', fn: function () { toggleUnitsPopup(document.getElementById('lpn_menu_settings')); } },
 			{ separator: true },
 			// The one control that clears EVERY project. It has always been the most dangerous button
 			// on the page; behind a menu is where it should always have been.
-			{ icon: ICON.wipe, label: pc.lpn_settings_wipe_btn || 'Clear calculator', fn: wipeEverything }
+			{ icon: 'wipe', label: pc.lpn_settings_wipe_btn || 'Clear calculator', fn: wipeEverything }
 		]);
 	}
 	// The units popover, which is just the old permanent units row given a door.
@@ -4123,17 +4121,17 @@ var EngCalcs = EngCalcs || {};
 		if (!bar) { return; }
 		bar.innerHTML = '';
 		[
-			{ id: 'lpn_menu_file', icon: ICON.file, label: pc.lpn_tool_file || 'File', open: openFileMenu },
-			{ id: 'lpn_menu_edit', icon: ICON.edit, label: pc.lpn_menu_edit || 'Edit', open: openEditMenu },
-			{ id: 'lpn_menu_insert', icon: ICON.insert, label: pc.lpn_menu_insert || 'Insert', open: openInsertMenu },
-			{ id: 'lpn_menu_view', icon: ICON.view, label: pc.lpn_menu_view || 'View', open: openViewMenu },
-			{ id: 'lpn_menu_settings', icon: ICON.settings, label: pc.lpn_menu_settings || 'Settings', open: openSettingsMenu }
+			{ id: 'lpn_menu_file', icon: 'file', label: pc.lpn_tool_file || 'File', open: openFileMenu },
+			{ id: 'lpn_menu_edit', icon: 'edit', label: pc.lpn_menu_edit || 'Edit', open: openEditMenu },
+			{ id: 'lpn_menu_insert', icon: 'insert', label: pc.lpn_menu_insert || 'Insert', open: openInsertMenu },
+			{ id: 'lpn_menu_view', icon: 'view', label: pc.lpn_menu_view || 'View', open: openViewMenu },
+			{ id: 'lpn_menu_settings', icon: 'settings', label: pc.lpn_menu_settings || 'Settings', open: openSettingsMenu }
 		].forEach(function (m) {
 			var b = document.createElement('button');
 			b.type = 'button';
 			b.id = m.id;
 			b.className = 'lpn-menubar-item';
-			b.textContent = m.icon + ' ' + m.label;
+			setLabel(b, m.icon, m.label);
 			b.addEventListener('click', function (e) { e.stopPropagation(); m.open(e.currentTarget); });
 			bar.appendChild(b);
 		});
@@ -4146,7 +4144,7 @@ var EngCalcs = EngCalcs || {};
 		var renameLabel = isFileProject(entry) ? (pc.lpn_file_saveas || 'Save as…') : (pc.lpn_project_rename || 'Rename');
 		openMenu(anchor, [
 			{
-				icon: isFileProject(entry) ? ICON.saveas : ICON.edit,
+				icon: isFileProject(entry) ? 'saveas' : 'edit',
 				label: renameLabel,
 				fn: function () {
 					if (isFileProject(entry)) { saveAs(); return; }
@@ -4157,7 +4155,7 @@ var EngCalcs = EngCalcs || {};
 				}
 			},
 			{
-				icon: ICON.duplicate,
+				icon: 'duplicate',
 				label: pc.lpn_tab_duplicate || 'Duplicate',
 				fn: function () {
 					var suggested = projectDisplayName(entry) + (pc.lpn_project_copy_suffix || ' (copy)');
@@ -4169,7 +4167,7 @@ var EngCalcs = EngCalcs || {};
 				}
 			},
 			{ separator: true },
-			{ icon: ICON.close, label: pc.lpn_file_close || 'Close', fn: function () { closeTab(id); } }
+			{ icon: 'close', label: pc.lpn_file_close || 'Close', fn: function () { closeTab(id); } }
 		]);
 	}
 	function openTabListMenu(anchor) {
@@ -4514,7 +4512,7 @@ var EngCalcs = EngCalcs || {};
 			var btn = document.createElement('button');
 			btn.type = 'button';
 			// Prefix, so the pressed/unpressed word is still the thing being read.
-			btn.textContent = (t.icon ? t.icon + ' ' : '') + (pc[t.key] || t.mode);
+			setLabel(btn, t.icon, pc[t.key] || t.mode);
 			btn.setAttribute('aria-pressed', t.mode === mode ? 'true' : 'false');
 			// Optional hover/tap tip (Tom, 2026-07-30) -- the button itself is already the click
 			// target, so the tip goes straight on it as a title, matched to .ec-help for touch
@@ -4542,7 +4540,7 @@ var EngCalcs = EngCalcs || {};
 		var fileGroup = group();
 		var exampleBtn = document.createElement('button');
 		exampleBtn.type = 'button';
-		exampleBtn.textContent = ICON.example + ' ' + (pc.lpn_tool_example || 'Draw example network');
+		setLabel(exampleBtn, 'example', pc.lpn_tool_example || 'Draw example network');
 		exampleBtn.addEventListener('click', drawExampleNetwork);
 		exampleBtn.dataset.edits = '1';
 		fileGroup.appendChild(exampleBtn);
@@ -4557,38 +4555,38 @@ var EngCalcs = EngCalcs || {};
 		var addGroup = group();
 		addGroup.dataset.edits = '1';
 		[
-			{ mode: 'add-reservoir', key: 'lpn_tool_add_reservoir', icon: ICON.reservoir },
-			{ mode: 'add-pump', key: 'lpn_tool_add_pump', icon: ICON.pump },
-			{ mode: 'add-junction', key: 'lpn_tool_add_junction', icon: ICON.junction },
-			{ mode: 'add-pipe', key: 'lpn_tool_add_pipe', icon: ICON.pipe },
-			{ mode: 'add-text', key: 'lpn_tool_add_text', icon: ICON.text }
+			{ mode: 'add-reservoir', key: 'lpn_tool_add_reservoir', icon: 'reservoir' },
+			{ mode: 'add-pump', key: 'lpn_tool_add_pump', icon: 'pump' },
+			{ mode: 'add-junction', key: 'lpn_tool_add_junction', icon: 'junction' },
+			{ mode: 'add-pipe', key: 'lpn_tool_add_pipe', icon: 'pipe' },
+			{ mode: 'add-text', key: 'lpn_tool_add_text', icon: 'text' }
 		].forEach(function (t) { modeButton(t, addGroup); });
 
 		var editGroup = group();
 		editGroup.dataset.edits = '1';
-		modeButton({ mode: 'select', key: 'lpn_tool_select', tip: pc.lpn_tip_select, icon: ICON.select }, editGroup);
-		modeButton({ mode: 'delete', key: 'lpn_tool_delete', icon: ICON.del }, editGroup);
+		modeButton({ mode: 'select', key: 'lpn_tool_select', tip: pc.lpn_tip_select, icon: 'select' }, editGroup);
+		modeButton({ mode: 'delete', key: 'lpn_tool_delete', icon: 'del' }, editGroup);
 		var undoBtn = document.createElement('button');
 		undoBtn.type = 'button';
-		undoBtn.textContent = ICON.undo + ' ' + (pc.lpn_tool_undo || 'Undo');
+		setLabel(undoBtn, 'undo', pc.lpn_tool_undo || 'Undo');
 		undoBtn.addEventListener('click', undo);
 		editGroup.appendChild(undoBtn);
 
 		var viewGroup = group();
 		var extentBtn = document.createElement('button');
 		extentBtn.type = 'button';
-		extentBtn.textContent = ICON.zoom + ' ' + (pc.lpn_tool_zoom_extent || 'Zoom to fit');
+		setLabel(extentBtn, 'zoom', pc.lpn_tool_zoom_extent || 'Zoom to fit');
 		extentBtn.addEventListener('click', zoomExtent);
 		viewGroup.appendChild(extentBtn);
 		var labelsBtn = document.createElement('button');
 		labelsBtn.type = 'button';
-		labelsBtn.textContent = ICON.labels + ' ' + (pc.lpn_tool_labels || 'Labels');
+		setLabel(labelsBtn, 'labels', pc.lpn_tool_labels || 'Labels');
 		if (pc.lpn_tip_labels_draggable) { labelsBtn.title = pc.lpn_tip_labels_draggable; labelsBtn.className = 'ec-help'; }
 		labelsBtn.addEventListener('click', toggleLabelsPopup);
 		viewGroup.appendChild(labelsBtn);
 		var settingsBtn = document.createElement('button');
 		settingsBtn.type = 'button';
-		settingsBtn.textContent = ICON.settings + ' ' + (pc.lpn_tool_settings || 'Settings');
+		setLabel(settingsBtn, 'settings', pc.lpn_tool_settings || 'Settings');
 		settingsBtn.addEventListener('click', toggleSettingsPopup);
 		viewGroup.appendChild(settingsBtn);
 
@@ -5606,7 +5604,9 @@ var EngCalcs = EngCalcs || {};
 		var wipeBtn = document.createElement('button');
 		wipeBtn.type = 'button';
 		wipeBtn.style.marginLeft = '4px';
-		wipeBtn.textContent = pc.lpn_settings_wipe_btn || 'Clear calculator';
+		// The second of this command's two render sites; the menu row is the other. Both wear the
+		// warning triangle, because it is the same dangerous command either way.
+		setLabel(wipeBtn, 'wipe', pc.lpn_settings_wipe_btn || 'Clear calculator');
 		helpTip(wipeBtn, pc.lpn_reset_all_tip);
 		wipeBtn.addEventListener('click', wipeEverything);
 		tail.appendChild(wipeBtn);

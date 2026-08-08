@@ -134,7 +134,7 @@ function echoEngCalcsMenu ($html_title = '', $show_name_field = false, $calc_nam
 			</li>
 		</ul>
 <?php if ($show_name_field) : ?>
-		<button id="ec-install-btn" type="button" class="btn btn-sm btn-outline-primary ms-3" style="display:none" onclick="EngCalcs.installPWA()">⬇ <?=$ec_lang['install_main_menu']?></button>
+		<button id="ec-install-btn" type="button" class="btn btn-sm btn-outline-primary ms-3" style="display:none" onclick="EngCalcs.installPWA()"><?=ecIcon('install')?><?=$ec_lang['install_main_menu']?></button>
 		<form class="d-flex align-items-center ms-3" style="gap:0.4em" onsubmit="return false;">
 			<label for="ec_calc_name" class="small fw-semibold text-nowrap mb-0"><?=$ec_lang['ec_name_label'] ?? 'Label:'?></label><span title="<?=htmlspecialchars($ec_lang['ec_name_hint'] ?? '', ENT_QUOTES, 'UTF-8')?>" style="cursor:help;color:steelblue;font-size:0.9em" tabindex="0">?</span>
 			<input type="text" id="ec_calc_name"
@@ -146,17 +146,16 @@ function echoEngCalcsMenu ($html_title = '', $show_name_field = false, $calc_nam
 				maxlength="50"
 				autocomplete="off">
 			<button type="button" id="ec-copy-link-btn" class="btn btn-sm btn-outline-secondary"
-				<?php // The confirm state carries a glyph too (Task 231). copyLink() swaps the whole
-				      // textContent, so without one the button would visibly shed its icon -- and
-				      // change width -- for the 1.5s it reads "Copied!". ?>
-				data-copied-text="<?=htmlspecialchars('✓ ' . $ec_lang['calc_copy_link_done'], ENT_QUOTES, 'UTF-8')?>"
-				onclick="EngCalcs.copyLink()">🔗 <?=$ec_lang['calc_copy_link']?></button>
+				<?php // Just the word: copyLink() swaps the icon to a tick for the 1.5s this shows,
+				      // so the confirm state keeps an icon without one being baked into the text. ?>
+				data-copied-text="<?=htmlspecialchars($ec_lang['calc_copy_link_done'], ENT_QUOTES, 'UTF-8')?>"
+				onclick="EngCalcs.copyLink()"><?=ecIcon('link')?><?=$ec_lang['calc_copy_link']?></button>
 		</form>
 <?php endif; ?>
 		<ul class="navbar-nav ms-auto">
 			<li class="nav-item dropdown">
 				<a class="nav-link dropdown-toggle active" id="dropdown-lang" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-					&#x1F310; <?=$language_settings['LANGNAME']?>
+					<?=ecIcon('globe')?><?=$language_settings['LANGNAME']?>
 				</a>
 				<div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-lang">
 <?php foreach ($GLOBALS['all_language_settings'] as $key => $lang) : ?>
