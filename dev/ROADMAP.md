@@ -1731,7 +1731,7 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     **`Accept-Language: *` 500'd every page in the suite** on PHP 8; and arriving-then-reloading
     emptying the tab strip. Then three more while writing the specs: a dismissed change-banner
     silencing later refusals, and the read-only banner not naming who holds the file.
-  - **Grown to 135 checks 2026-08-06** as Tom's §H answers came back: §9 (an unreachable broker, a
+  - **Grown to 138 checks 2026-08-06** as Tom's §H answers came back: §9 (an unreachable broker, a
     broker that ANSWERS a setup fault, a full lock directory, and when a warning may be dismissed),
     §6-saveas (every Save-as guard, run twice — once with the broker unreachable, because a guard
     against destroying somebody's work that needs a server is not a guard), §11 (the fallback branch,
@@ -1747,6 +1747,14 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     "your work is in the file you meant" are different claims, and only the second is worth making.**
     It also retired the excuse for skipping §10 in the runner: OPFS does exactly what Chrome does
     here, so it is tested rather than deferred.
+  - **`getFile()` succeeding is not proof the file is there** (Tom, fourth report of one silent save,
+    with the file confirmed deleted before every attempt). It returns a File built from metadata the
+    browser already holds, and on Windows it will do that for a path with nothing at it; the error
+    surfaces only when something reads the BYTES. So every guard layered on over four rounds — the
+    stamp, the metadata comparison, the existence check — was interrogating the browser's memory
+    rather than the disk, and all of them passed. The guard now reads one byte off a slice.
+    **The lesson is the general one: an API that answers without touching the thing it describes is
+    not evidence about the thing.**
   - **It found one more defect on the way**: a Save whose pre-write lock re-check failed said nothing.
     The block cleared the "locking is not working" banner when the broker came back but never raised
     it when the broker went away mid-session — recovery without onset — so a Save that could not

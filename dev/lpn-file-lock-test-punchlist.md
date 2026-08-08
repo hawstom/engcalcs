@@ -19,7 +19,7 @@ Everything in Task 195 was verified only by harnesses against sliced-out logic; 
 has ever been seen rendered.** This list exists because that is the whole risk.
 
 > **AUTOMATED 2026-08-06 — run `node dev/browser-pass/run.js` BEFORE reading any further.**
-> 135 checks over two real browser profiles against the real lock broker, in about a minute.
+> 138 checks over two real browser profiles against the real lock broker, in about a minute.
 > It covers most of §2–§8 and §12 mechanically. **What is left for a human is short and is listed in
 > `dev/browser-pass/README.md`**: §1's native picker handshake, a permission that is genuinely
 > `prompt`/`denied`, §10 (a real folder, not OPFS), §11 Firefox/Safari, and anything visual. Boxes
@@ -141,6 +141,20 @@ automated can test it)*
          everything above and I have been fixing the wrong end.
 
       I would rather ask than ship a fourth speculative fix at you.]
+      [TGH: 1. A file reappears at the old name. 2. fileStamp is present: '1786169566337:442531'.
+      I pulled. Still a silent save. I always delete the file before testing.]
+      [CC 2026-08-06 (4): **Answered, and it was my assumption that was wrong, not your procedure.**
+      `getFile()` SUCCEEDING IS NOT PROOF THE FILE IS THERE. It hands back a File object built from
+      what the browser already knows — name, size, lastModified — and on Windows it will do that for
+      a path with nothing at it any more. The error only surfaces when something actually **reads the
+      bytes**, and nothing in the guard was doing that: every check I have added over four rounds was
+      asking the browser's memory rather than the disk. That is why the stamp was fine, why the
+      metadata comparison saw no change, and why the write went ahead.
+      It now reads one byte off a slice — a real disk touch, free next to the several hundred KB a
+      save writes — and refuses if that fails. The browser pass tests it with a handle that behaves
+      exactly like yours: real, current metadata, reads that throw (§10, three checks,
+      mutation-confirmed — trusting `getFile()` alone turns them red).
+      Four rounds on one box, and every round found something real. Thank you for the patience.]
 
 **H5. The words, which only a person can judge**
 - [x] Have a colleague — or a second Chrome profile — hold the file, then open it. The first line of

@@ -2524,10 +2524,23 @@ var EngCalcs = EngCalcs || {};
 	//
 	// The pair asks two different questions: `fileChangedUnderneath` is "is this still the same
 	// file?", and this is "is there a file here at all?".
+	// **`getFile()` SUCCEEDING IS NOT PROOF THE FILE IS THERE** (Tom, 2026-08-06, fourth report of the
+	// same silent save, with the file confirmed deleted before every attempt). `getFile()` hands back
+	// a File object built from what the browser already knows -- name, size, lastModified -- and on
+	// Windows it can do that for a path with nothing at it any more. The error surfaces when
+	// something actually reads the bytes, which nothing here was doing. Every check built on top of
+	// it was therefore asking the browser's memory, not the disk.
+	//
+	// So read a byte. One byte, off a slice, is a real disk touch and costs nothing next to the
+	// several hundred kilobytes a save writes. This is also why `fileChangedUnderneath()` could not
+	// be trusted to notice on its own: it compares metadata that may be as stale as this.
 	async function fileVanished(id, handle) {
 		if (!handle || !handle.getFile) { return false; }
-		try { await handle.getFile(); return false; }
-		catch (err) { return true; }
+		try {
+			var f = await handle.getFile();
+			await f.slice(0, 1).arrayBuffer();
+			return false;
+		} catch (err) { return true; }
 	}
 	// Has somebody else written to this file since we last saw it?
 	//

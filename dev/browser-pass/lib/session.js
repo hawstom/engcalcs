@@ -182,6 +182,8 @@ class Session {
 	// Hand out handles whose writes are discarded — see lib/pickers.js. The only way to reproduce a
 	// real folder's "the write went nowhere" from inside OPFS.
 	async sabotageWrites(on = true) { await this.page.evaluate((v) => window.__lpn.sabotageWrites(v), on); }
+	// Hand out a handle that reports a file which is not there — see lib/pickers.js.
+	async phantomFiles(on = true) { await this.page.evaluate((v) => window.__lpn.phantomNext(v), on); }
 	async pickerCalls() { return this.page.evaluate(() => window.__lpn.calls()); }
 
 	// ---- this profile's view of the disk ---------------------------------

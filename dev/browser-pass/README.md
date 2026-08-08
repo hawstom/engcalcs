@@ -3,7 +3,7 @@
 ```
 cd dev/browser-pass
 npm install          # once — playwright-core; the Chromium binary is already cached
-node run.js          # everything — 135 checks, about a minute
+node run.js          # everything — 138 checks, about a minute
 node run.js locking  # one section
 ```
 

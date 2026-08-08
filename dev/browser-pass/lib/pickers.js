@@ -87,6 +87,38 @@ const INIT_SCRIPT = `
 		};
 	}
 	window.__lpn.sabotageWrites = function (on) { sabotage = !!on; };
+	// **A file that is not there but says it is.** Tom's Windows Chrome hands back a File object for a
+	// path whose file has been deleted -- name, size and lastModified all from what the browser
+	// already knew -- and only fails when something reads the bytes. Every guard that trusted
+	// getFile() alone was therefore asking the browser's memory rather than the disk. OPFS never lies
+	// this way, so the only way to test the page's answer is to build a handle that does.
+	var phantom = false;
+	// The METADATA is deliberately real and current — it mirrors the underlying file, so the size and
+	// timestamp look exactly as they should and every metadata-based check passes. Only reading the
+	// bytes fails. That is the whole point: a phantom whose metadata was obviously wrong would be
+	// caught by the post-write size comparison, and would prove nothing about the guard being tested.
+	function phantomed(h) {
+		return {
+			name: h.name,
+			queryPermission: function () { return Promise.resolve('granted'); },
+			requestPermission: function () { return Promise.resolve('granted'); },
+			isSameEntry: function (o) { return h.isSameEntry(o); },
+			getFile: async function () {
+				var real = await h.getFile();
+				return {
+					name: real.name,
+					size: real.size,
+					lastModified: real.lastModified,
+					slice: function () {
+						return { arrayBuffer: function () { return Promise.reject(new DOMException('gone', 'NotFoundError')); } };
+					},
+					text: function () { return Promise.reject(new DOMException('gone', 'NotFoundError')); }
+				};
+			},
+			createWritable: function () { return h.createWritable(); }
+		};
+	}
+	window.__lpn.phantomNext = function (on) { phantom = !!on; };
 	var cancelNext = false;
 	window.__lpn.cancelNextPicker = function () { cancelNext = true; };
 	function maybeCancel() {
@@ -100,6 +132,7 @@ const INIT_SCRIPT = `
 		if (maybeCancel()) { throw new DOMException('cancelled', 'AbortError'); }
 		var name = nextName(opts.suggestedName || 'Untitled-lpn-hawsedc-engcalcs.json');
 		var h = await (await root()).getFileHandle(name, { create: true });
+		if (phantom) { return phantomed(h); }
 		return sabotage ? sabotaged(h) : h;
 	};
 	window.showOpenFilePicker = async function (opts) {

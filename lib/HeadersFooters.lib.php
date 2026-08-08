@@ -71,6 +71,12 @@ $ec_canonical = ec_canonical_url($html_lang);
 <?php unset($ec_alt_lang, $ec_alt_settings); ?>
 	<link rel="manifest" href="/engcalcs/manifest.json">
 	<meta name="theme-color" content="#1a6faf">
+	<?php // Both spellings, deliberately. `mobile-web-app-capable` is the standard one and the only
+	      // one Chrome still wants -- it logs a deprecation for the apple- prefix on every page load.
+	      // The apple- one stays because iOS Safari has never supported the standard name, and
+	      // dropping it would break add-to-home-screen on exactly the platform this feature exists
+	      // for (found 2026-08-06 in Tom's console). ?>
+	<meta name="mobile-web-app-capable" content="yes">
 	<meta name="apple-mobile-web-app-capable" content="yes">
 	<meta name="apple-mobile-web-app-status-bar-style" content="default">
 	<meta name="apple-mobile-web-app-title" content="EngCalcs">

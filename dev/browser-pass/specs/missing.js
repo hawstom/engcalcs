@@ -80,6 +80,27 @@ exports.run = async function ({ browser, report }) {
 		report.ok(await a.banner() === null, 'and the banner clears');
 		report.ok(!(await a.currentTabDirty()), 'and the asterisk goes out, honestly this time');
 
+		// --- the file that is not there but says it is -----------------------------
+		// Tom's Windows Chrome, four reports in: the file was deleted before every attempt, and the
+		// save still succeeded silently. `getFile()` resolves for a path with nothing at it, handing
+		// back metadata the browser already knew. **Resolving is not proof.** So the guard reads a
+		// byte, and this handle is the only way to prove it does.
+		await a.phantomFiles(true);
+		await a.queuePick('Phantom-lpn-hawsedc-engcalcs.json');
+		await a.menuClick('Save as…');
+		await a.settle(400);
+		await a.phantomFiles(false);
+		await a.drawExample();
+		await a.menuClick('Save');
+		await a.settle(400);
+
+		const ph = await a.waitBanner(2000);
+		report.ok(!!ph, 'a file that only CLAIMS to be there does not get a silent save',
+			ph ? '' : 'the page believed getFile() and wrote anyway');
+		report.ok(ph && /moved, renamed, or deleted|Could not write/.test(ph.text || ''),
+			'and the banner says the file could not be written');
+		report.ok(await a.currentTabDirty(), 'the asterisk stays lit — nothing was really saved');
+
 		report.eq(a.errors.length, 0, 'no uncaught JavaScript');
 	} finally {
 		await a.close();
