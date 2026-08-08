@@ -144,5 +144,37 @@ if (!$jsonOk) { $bad++; }
 printf("  %-6s check on an unknown project -> %d  %s\n", $jsonOk ? 'ok' : 'FAIL', $code,
     $jsonOk ? json_encode($json) : 'not parseable JSON: ' . substr(trim((string)$body), 0, 160));
 
+// **IS THE SERVER RUNNING WHAT YOU JUST FIXED?**
+//
+// Added 2026-08-06 after a whole round trip was spent on a defect that was already fixed: Tom
+// retested twice against a production server that was two commits behind, and every theory about
+// why the fix "did not work" was a theory about code that was not there. Neither of us could see
+// that from the symptom, and neither of us thought to look.
+//
+// Compares the bytes of the files most likely to be mid-change against this working tree. It cannot
+// name a commit — the server has no way to tell us one — but "the file you are debugging is not the
+// file they are running" is the fact that matters, and this is the cheapest possible way to know it.
+$assets = array(
+    'js/looped-network.js',
+    'js/lpn-solver.js',
+    'js/Calculators.lib.js',
+    'lpn-lock.php'
+);
+echo "\ndeployed vs this working tree\n";
+$repo = dirname(dirname(__DIR__));
+foreach ($assets as $rel) {
+    $localPath = $repo . '/' . $rel;
+    if (!is_file($localPath)) { continue; }
+    // PHP files are executed by the server, so only their static siblings can be compared this way.
+    if (substr($rel, -4) === '.php') { continue; }
+    $r = http_probe("$base/$rel", null);
+    $local = sha1(file_get_contents($localPath));
+    $remote = sha1((string)$r['body']);
+    $same = ($r['code'] === 200 && $local === $remote);
+    if (!$same) { $bad++; }
+    printf("  %-6s %-28s %s\n", $same ? 'ok' : 'STALE', $rel,
+        $same ? 'matches' : ($r['code'] !== 200 ? "HTTP {$r['code']}" : 'DIFFERENT — the server has not pulled, or has something newer'));
+}
+
 echo "\n" . ($bad ? "$bad FAILED\n" : "all clear\n");
 exit($bad ? 1 : 0);
