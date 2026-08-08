@@ -345,21 +345,6 @@ $ec_lang['odt_sketch_end']='Fin';
 // Contact us.
 
 // Irrigation
-$ec_lang['irr_main_menu']='Riego';
-$ec_lang['irr_main_title']='Calculadoras en línea gratuitas para la medición de caudal de riego';
-$ec_lang['irr_main_desc']='Medición de Caudal de Riego — Vertederos y Orificios';
-$ec_lang['irr_intro_html']='<p>Los vertederos y orificios son las herramientas de campo estándar para medir el caudal en los sistemas de riego. Seleccione la calculadora que corresponde a su estructura:</p>';
-$ec_lang['irr_card_weir_uniform_head']='Vertedero — Cresta Ancha (Ancho Uniforme)';
-$ec_lang['irr_card_weir_uniform_desc']='Mida el caudal sobre una cresta de presa de desvío, estructura de control o tablero vertedor. Ingrese la longitud del vertedero y la profundidad del agua sobre la cresta.';
-$ec_lang['irr_card_weir_irregular_head']='Vertedero — Perfil Irregular';
-$ec_lang['irr_card_weir_irregular_desc']='Úselo cuando la cresta del vertedero no tenga una elevación uniforme única: aliviaderos naturales, estructuras de caída con ancho variable o estructuras de control de múltiples secciones.';
-$ec_lang['irr_card_orifice_head']='Orificio — Compuerta de Cabecera o Toma de Tubería';
-$ec_lang['irr_card_orifice_desc']='Mida el caudal a través de una compuerta deslizante, toma de tubería o abertura de alcantarilla. Maneja automáticamente tanto la descarga libre como las condiciones sumergidas (aguas abajo).';
-$ec_lang['irr_card_canal_head']='Diseño y Análisis de Canal';
-$ec_lang['irr_card_canal_desc']='Diseñe o verifique un canal de riego usando la fórmula de Manning. Use la calculadora Trapezoidal para canales nuevos; la calculadora Irregular para secciones naturales o construidas existentes.';
-$ec_lang['irr_card_seepage_head']='Infiltración en Canales y Eficiencia de Conducción';
-$ec_lang['irr_card_seepage_desc']='Estime la pérdida por infiltración en un tramo de canal usando mediciones de caudal de entrada y salida. Calcule la eficiencia de conducción y la pérdida anual de agua para ayudar a priorizar inversiones en revestimiento.';
-$ec_lang['irr_quickref_html']='<h3>Referencia Rápida</h3><dl><dt>Presa de desvío o estructura de control</dt><dd>Mida la profundidad del agua sobre la cresta del vertedero. Use <a href="Weir-Flow-Simple.php">Vertedero Simple</a> para una cresta uniforme, o <a href="Weir-Flow-Irregular.php">Vertedero Irregular</a> para una cresta perfilada o escalonada.</dd><dt>Compuerta de cabecera o toma de tubería</dt><dd>Mida la elevación del agua aguas arriba y aguas abajo (o la cota de solera si descarga libremente). Use <a href="Orifice.php">Caudal por Orificio</a>. Para una tubería circular, D = diámetro de la tubería; para una compuerta rectangular, ingrese el ancho W y la altura D.</dd><dt>Tiempo de vaciado de embalse o estanque</dt><dd>Use <a href="Orifice-Drain-Time.php">Tiempo de Vaciado por Orificio</a> para estimar cuánto tiempo tarda en bajar el nivel de un estanque o embalse a través de un orificio en el fondo — útil para la planificación del almacenamiento de riego.</dd><dt>Estándares de campo</dt><dd>Las ecuaciones de caudal por vertedero y orificio usadas aquí corresponden a los procedimientos del <em>Manual de Medición de Agua</em> (3.ª ed.) del USBR, comúnmente requeridos por administradores de agua y distritos de riego.</dd></dl>';
 // Drip / Sprinkler Application Rate
 $ec_lang['ip_se']='Espaciado de emisores, S<sub>e</sub>';
 $ec_lang['ip_sl']='Espaciado de laterales, S<sub>l</sub>';
@@ -552,8 +537,6 @@ $ec_lang['ip_notes_3_def']='Modela una presión de suministro fija (sin curva de
 $ec_lang['ip_notes_4_def']='Christiansen, J.E. (1942). "Irrigation by sprinkling." California Agricultural Experiment Station Bulletin 670. Los estándares ASAE/ASABE para diseño de microrriego usan el mismo enfoque de pérdida de fricción multi-salida.';
 $ec_lang['ip_notes_5_term']='Diseño de Aplicación';
 $ec_lang['ip_notes_5_def']='Tasa de aplicación y caudal de sistema/zona usan el caudal promedio de emisor estimado de campo (q<sub>avg,field</sub> — el promedio de la propia lateral de prueba, corregido por la estimación de diferencia de presión ingresada), no un caudal adivinado: PR = q<sub>avg,field</sub> / A<sub>e</sub>, alimentado por el valor modelado corregido. El espaciado y los números de lateral/emisor de todo el sistema son entradas separadas aquí porque la ruta de prueba solo modela una rama peor caso, no cada lateral en el campo.';
-$ec_lang['irr_card_pressure_head']='Presión en Riego y Uniformidad';
-$ec_lang['irr_card_pressure_desc']='Modele el perfil de presión y caudal a lo largo de una rama tubería principal-lateral-emisor para estimar la uniformidad de distribución a partir de la presión real de la ruta de prueba, no solo una tasa de caudal del catálogo del emisor.';
 
 
 

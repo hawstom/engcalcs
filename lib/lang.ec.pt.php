@@ -345,21 +345,6 @@ $ec_lang['odt_sketch_end']='Fim';
 // Contact us.
 
 // Irrigation
-$ec_lang['irr_main_menu']='Irrigação';
-$ec_lang['irr_main_title']='Calculadoras Online Gratuitas de Medição de Vazão de Irrigação';
-$ec_lang['irr_main_desc']='Medição de Vazão de Irrigação — Vertedouros e Orifícios';
-$ec_lang['irr_intro_html']='<p>Vertedouros e orifícios são as ferramentas de campo padrão para medir o fluxo de água em sistemas de irrigação. Selecione a calculadora que corresponde à sua estrutura:</p>';
-$ec_lang['irr_card_weir_uniform_head']='Vertedouro — Crista Larga (Largura Uniforme)';
-$ec_lang['irr_card_weir_uniform_desc']='Meça o fluxo sobre a crista de uma barragem de desvio, estrutura de controle ou prancha vertedora. Insira o comprimento do vertedouro e a profundidade da água acima da crista.';
-$ec_lang['irr_card_weir_irregular_head']='Vertedouro — Perfil Irregular';
-$ec_lang['irr_card_weir_irregular_desc']='Use quando a crista do vertedouro não tiver uma elevação uniforme única — vertedouros naturais, estruturas de queda com largura variável ou estruturas de controle de múltiplas seções.';
-$ec_lang['irr_card_orifice_head']='Orifício — Comporta de Cabeçal ou Saída de Tubulação';
-$ec_lang['irr_card_orifice_desc']='Meça o fluxo através de uma comporta deslizante, saída de tubulação ou abertura de bueiro. Trata automaticamente tanto a descarga livre quanto as condições submersas (contrapressão de jusante).';
-$ec_lang['irr_card_canal_head']='Projeto & Análise de Canal';
-$ec_lang['irr_card_canal_desc']='Projete ou verifique um canal de irrigação usando a fórmula de Manning. Use a calculadora Trapezoidal para novos canais; a calculadora Irregular para seções naturais ou construídas existentes.';
-$ec_lang['irr_card_seepage_head']='Infiltração em Canal & Eficiência de Condução';
-$ec_lang['irr_card_seepage_desc']='Estime a perda por infiltração em um trecho de canal usando medições de entrada e saída. Calcule a eficiência de condução e a perda anual de água para ajudar a priorizar investimentos em revestimento.';
-$ec_lang['irr_quickref_html']='<h3>Referência Rápida</h3><dl><dt>Barragem de desvio ou estrutura de controle</dt><dd>Meça a profundidade da água acima da crista do vertedouro. Use <a href="Weir-Flow-Simple.php">Vertedouro Simples</a> para uma crista uniforme, ou <a href="Weir-Flow-Irregular.php">Vertedouro Irregular</a> para uma crista perfilada ou escalonada.</dd><dt>Comporta de cabeçal ou saída de tubulação</dt><dd>Meça a elevação da água a montante e a jusante (ou a cota de fundo se a descarga for livre). Use <a href="Orifice.php">Fluxo por Orifício</a>. Para uma tubulação circular, D = diâmetro da tubulação; para uma comporta retangular, insira a largura W e a altura D.</dd><dt>Tempo de esvaziamento de reservatório ou lagoa</dt><dd>Use <a href="Orifice-Drain-Time.php">Tempo de Drenagem por Orifício</a> para estimar quanto tempo leva para baixar o nível de uma lagoa ou reservatório através de um orifício no fundo — útil para o planejamento do armazenamento de irrigação.</dd><dt>Padrões de campo</dt><dd>As equações de fluxo por vertedouro e orifício usadas aqui correspondem aos procedimentos do <em>Manual de Medição de Água</em> (3.ª ed.) do USBR, comumente exigidos por administradores de água e distritos de irrigação.</dd></dl>';
 // Drip / Sprinkler Application Rate
 $ec_lang['ip_se']='Espaçamento de emissores, S<sub>e</sub>';
 $ec_lang['ip_sl']='Espaçamento de laterais, S<sub>l</sub>';
@@ -552,8 +537,6 @@ $ec_lang['ip_notes_3_def']='Modela uma pressão de abastecimento fixa (sem curva
 $ec_lang['ip_notes_4_def']='Christiansen, J.E. (1942). “Irrigation by sprinkling.” California Agricultural Experiment Station Bulletin 670. Padrões ASAE/ASABE para projeto de microirrigação usam a mesma abordagem de perda de fricção de saída múltipla.';
 $ec_lang['ip_notes_5_term']='Projeto de Aplicação';
 $ec_lang['ip_notes_5_def']='Taxa de aplicação e fluxo de sistema/zona usam a vazão média estimada do emissor em campo (q<sub>avg,field</sub> — a média da própria lateral de teste, corrigida pela estimativa ΔPressão inserida), não uma taxa adivinhada: PR = q<sub>avg,field</sub> / A<sub>e</sub>, alimentada pelo valor modelado corrigido. Espaçamento e contagens de lateral/emissor do sistema amplo são entradas separadas aqui porque o caminho de teste modela apenas uma ramificação de pior caso, não cada lateral no campo.';
-$ec_lang['irr_card_pressure_head']='Pressão de Irrigação & Uniformidade';
-$ec_lang['irr_card_pressure_desc']='Modele o perfil de pressão e vazão ao longo de um ramal principal-lateral-emissor para estimar a uniformidade de distribuição a partir da pressão real do caminho de teste, não apenas uma vazão nominal de catálogo do emissor.';
 
 
 

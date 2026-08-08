@@ -342,21 +342,6 @@ $ec_lang['odt_sketch_end']='Konec';
 // Contact us.
 
 // Irrigation
-$ec_lang['irr_main_menu']='Závlaha';
-$ec_lang['irr_main_title']='Bezplatné online kalkulátory pro měření průtoku závlahy';
-$ec_lang['irr_main_desc']='Měření průtoku závlahy — přelivy a otvory';
-$ec_lang['irr_intro_html']='<p>Přelivy a otvory jsou standardní terénní nástroje pro měření průtoku vody v závlahových systémech. Vyberte kalkulátor odpovídající vaší konstrukci:</p>';
-$ec_lang['irr_card_weir_uniform_head']='Přeliv — široká koruna (rovnoměrná šířka)';
-$ec_lang['irr_card_weir_uniform_desc']='Měřte průtok přes korunu odváděcího jezu, regulačního objektu nebo přelivné desky. Zadejte délku přelivu a hloubku vody nad korunou.';
-$ec_lang['irr_card_weir_irregular_head']='Přeliv — nepravidelný profil';
-$ec_lang['irr_card_weir_irregular_desc']='Použijte, pokud se koruna přelivu mění ve výšce nebo profilu — přírodní bezpečnostní přelivy, stupňovité objekty s proměnnou šířkou nebo vícesekční regulační objekty.';
-$ec_lang['irr_card_orifice_head']='Otvor — hlavní šoupě nebo trubní výpust';
-$ec_lang['irr_card_orifice_desc']='Měřte průtok stavidlovým šoupětem, trubní odbočkou nebo otvorem propustku. Automaticky zohledňuje jak volný výtok, tak zatopené podmínky (vzdutí dolní vodou).';
-$ec_lang['irr_card_canal_head']='Návrh a analýza kanálu';
-$ec_lang['irr_card_canal_desc']='Navrhněte nebo posuďte závlahový kanál pomocí Manningova vzorce. Použijte lichoběžníkový kalkulátor pro nové kanály; nepravidelný kalkulátor pro stávající přirozené nebo vybudované průřezy.';
-$ec_lang['irr_card_seepage_head']='Průsak kanálu a efektivita dopravy vody';
-$ec_lang['irr_card_seepage_desc']='Odhadněte průsakovou ztrátu úseku kanálu na základě měření přítoku a odtoku. Vypočtěte efektivitu dopravy vody a roční ztrátu vody jako podklad pro stanovení priorit investic do zpevnění kanálu.';
-$ec_lang['irr_quickref_html']='<h3>Rychlá reference</h3><dl><dt>Odváděcí jez nebo regulační objekt</dt><dd>Změřte hloubku vody nad korunou přelivu. Použijte <a href="Weir-Flow-Simple.php">Jednoduchý přeliv</a> pro rovnoměrnou korunu, nebo <a href="Weir-Flow-Irregular.php">Nepravidelný přeliv</a> pro profilovanou nebo stupňovitou korunu.</dd><dt>Hradítko nebo trubní odbočka</dt><dd>Změřte nadmořskou výšku horní a dolní vody (nebo výšku dna při volném výtoku). Použijte <a href="Orifice.php">Průtok otvorem</a>. Pro kruhové potrubí D = průměr potrubí; pro obdélníkové šoupě zadejte šířku W a výšku D.</dd><dt>Doba vyprázdnění nádrže nebo rybníka</dt><dd>Použijte <a href="Orifice-Drain-Time.php">Dobu vyprázdnění otvorem</a> pro odhad doby potřebné ke snížení hladiny rybníka nebo nádrže spodním otvorem — užitečné pro plánování závlahové akumulace.</dd><dt>Terénní standardy</dt><dd>Rovnice průtoku přes přeliv a otvorem zde odpovídají postupům USBR <em>Water Measurement Manual</em> (3. vyd.), které běžně vyžadují správci vod a závlahové obvody.</dd></dl>';
 // Drip / Sprinkler Application Rate
 $ec_lang['ip_se']='Rozteč emitorů, S<sub>e</sub>';
 $ec_lang['ip_sl']='Rozteč postranních větví, S<sub>l</sub>';
@@ -549,8 +534,6 @@ $ec_lang['ip_notes_3_def']='Modeluje jeden pevný tlak na přívodu (žádná k�
 $ec_lang['ip_notes_4_def']='Christiansen, J.E. (1942). “Irrigation by sprinkling.” California Agricultural Experiment Station Bulletin 670. Standardy ASAE/ASABE pro návrh mikroirrigace používají stejný přístup ztráty třením vícečetného výstupu.';
 $ec_lang['ip_notes_5_term']='Návrh aplikace';
 $ec_lang['ip_notes_5_def']='Dávka aplikace a průtok systému/zóny používá odhadovaný průtok průměrného emitoru v poli (q<sub>avg,field</sub> — vlastní průměr testovací postranní větve, korigovaný zadaným odhadem Δtlaku), ne odhadovanou sazbu: PR = q<sub>avg,field</sub> / A<sub>e</sub>, podávaný korigovanou modelovanou hodnotou. Rozteče a počty postranních větví/emitorů v systému jsou oddělené vstupy zde, protože testovací cesta modeluje pouze jednu nejhorší větev, ne každou postranní větev v poli.';
-$ec_lang['irr_card_pressure_head']='Závlahový tlak & Uniformita';
-$ec_lang['irr_card_pressure_desc']='Modelujte profil tlaku a průtoku podél větve hlavní-postranní-emitor pro odhad distribuční uniformity ze skutečného tlaku testovací cesty, ne jen z katalogového průtoku emitoru.';
 
 
 

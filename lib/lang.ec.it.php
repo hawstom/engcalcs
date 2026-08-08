@@ -342,21 +342,6 @@ $ec_lang['odt_sketch_end']='Fine';
 // Contact us.
 
 // Irrigation
-$ec_lang['irr_main_menu']='Irrigazione';
-$ec_lang['irr_main_title']='Calcolatrici online gratuite per la misura della portata di irrigazione';
-$ec_lang['irr_main_desc']='Misura della portata di irrigazione — stramazzi e orifizi';
-$ec_lang['irr_intro_html']='<p>Gli stramazzi e gli orifizi sono gli strumenti standard da campo per misurare la portata d\'acqua nei sistemi di irrigazione. Selezionare la calcolatrice che corrisponde alla propria struttura:</p>';
-$ec_lang['irr_card_weir_uniform_head']='Stramazzo — a soglia larga (larghezza uniforme)';
-$ec_lang['irr_card_weir_uniform_desc']='Misurare la portata sopra la soglia di una diga di derivazione, una struttura di regolazione, o una paratoia di stramazzo. Inserire la lunghezza dello stramazzo e il tirante a monte sopra la soglia.';
-$ec_lang['irr_card_weir_irregular_head']='Stramazzo — profilo irregolare';
-$ec_lang['irr_card_weir_irregular_desc']='Utilizzare quando la soglia dello stramazzo varia in quota o profilo — sfioratori naturali, strutture di caduta con larghezza variabile, o strutture di controllo a più sezioni.';
-$ec_lang['irr_card_orifice_head']='Orifizio — paratoia di testata o presa da tubazione';
-$ec_lang['irr_card_orifice_desc']='Misurare la portata attraverso una paratoia a saracinesca, una presa da tubazione, o un\'apertura di tombino. Gestisce automaticamente sia le condizioni di scarico libero sia quelle sommerse (a valle).';
-$ec_lang['irr_card_canal_head']='Progettazione e verifica di canali';
-$ec_lang['irr_card_canal_desc']='Progettare o verificare un canale di irrigazione usando la formula di Manning. Utilizzare la calcolatrice Trapezoidale per nuovi canali; la calcolatrice Irregolare per sezioni naturali o costruite esistenti.';
-$ec_lang['irr_card_seepage_head']='Infiltrazione del canale & efficienza di trasporto';
-$ec_lang['irr_card_seepage_desc']='Stimare la perdita per infiltrazione da un tratto di canale usando le misurazioni di portata in ingresso e in uscita. Calcolare l\'efficienza di trasporto e la perdita annua d\'acqua per aiutare a stabilire le priorità degli investimenti di rivestimento.';
-$ec_lang['irr_quickref_html']='<h3>Riferimento rapido</h3><dl><dt>Diga di derivazione o struttura di regolazione</dt><dd>Misurare il tirante a monte sopra la soglia dello stramazzo. Utilizzare <a href="Weir-Flow-Simple.php">Stramazzo semplice</a> per una soglia uniforme, oppure <a href="Weir-Flow-Irregular.php">Stramazzo irregolare</a> per una soglia sagomata o a gradini.</dd><dt>Paratoia di testata o presa da tubazione</dt><dd>Misurare la quota a monte e la quota a valle (oppure la quota di fondo se lo scarico è libero). Utilizzare <a href="Orifice.php">Deflusso a orifizio</a>. Per una tubazione circolare, D = diametro della tubazione; per una paratoia rettangolare, inserire la larghezza W e l\'altezza D.</dd><dt>Tempo di svuotamento di serbatoio o invaso</dt><dd>Utilizzare <a href="Orifice-Drain-Time.php">Tempo di svuotamento da orifizio</a> per stimare quanto tempo serve per abbassare un invaso o serbatoio attraverso un orifizio di fondo — utile per la pianificazione degli invasi di irrigazione.</dd><dt>Standard di campo</dt><dd>Le equazioni di flusso per stramazzi e orifizi utilizzate qui corrispondono alle procedure USBR <em>Water Measurement Manual</em> (3 ed.) comunemente richieste dai gestori idrici e dai consorzi di irrigazione.</dd></dl>';
 // Drip / Sprinkler Application Rate
 $ec_lang['ip_se']='Spaziatura tra gli emettitori, S<sub>e</sub>';
 $ec_lang['ip_sl']='Spaziatura delle ali laterali, S<sub>l</sub>';
@@ -549,8 +534,6 @@ $ec_lang['ip_notes_3_def']='Modella una pressione di alimentazione fissa (nessun
 $ec_lang['ip_notes_4_def']='Christiansen, J.E. (1942). “Irrigation by sprinkling.” California Agricultural Experiment Station Bulletin 670. Gli standard ASAE/ASABE per la progettazione della microirrigazione utilizzano lo stesso approccio alla perdita per attrito multi-uscita.';
 $ec_lang['ip_notes_5_term']='Progettazione dell\'applicazione';
 $ec_lang['ip_notes_5_def']='Il tasso di applicazione e la portata di sistema/zona utilizzano la portata media di campo stimata dell\'emettitore (q<sub>avg,field</sub> — la media dell\'ala laterale di prova stessa, corretta dalla stima di Δpressione inserita), non un tasso ipotizzato: PR = q<sub>avg,field</sub> / A<sub>e</sub>, alimentato dal valore modellato corretto. La spaziatura e il numero di ali laterali/emettitori dell\'intero sistema sono input separati qui, poiché il percorso di prova modella solo un ramo nel caso peggiore, non ogni ala laterale del campo.';
-$ec_lang['irr_card_pressure_head']='Pressione di irrigazione & uniformità';
-$ec_lang['irr_card_pressure_desc']='Modellare il profilo di pressione e portata lungo un ramo condotta principale-ala laterale-emettitore per stimare l\'uniformità di distribuzione dalla pressione reale del percorso di prova, non solo da una portata nominale da catalogo dell\'emettitore.';
 
 
 

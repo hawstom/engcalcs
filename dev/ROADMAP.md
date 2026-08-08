@@ -1466,17 +1466,6 @@ circling one question — *is Manning valid for full/pressurized pipe, and is R 
 impressions, zero clicks; and one query was `"kikokotoo" -site:reddit.com …`, the Swahili word taken
 straight from `lib/lang.ec.sw.php`, i.e. an agent searching our own translated string.
 
-- 20|232|[H] **Decide whether `Irrigation.php` itself stays, now that its menu entry is gone.**
-  Tom, 2026-08-08: the entry was "harmful and spammy" — the only non-calculator under Hydraulics,
-  labelled the bare word "Irrigation", fronting a 79-line card index that pointed back at the very
-  dropdown containing it (Canal-Seepage among them, which is under a standing do-not-promote).
-  **Menu entry removed 2026-08-08**; the page, its sitemap entries and its `sw.js` precache line are
-  untouched, so search reach is preserved and the removal is one line to revert.
-  **The number needed to finish this does not exist:** `Irrigation.php` is absent from the
-  2026-07-27 per-calculator snapshot, so its reach and human count were never measured. Pull them in
-  the next usage snapshot, then delete or keep. Do not instead rename the label — that spends 26
-  translated strings to preserve an entry we may delete.
-
 - 10|155|[H] **Deploy and verify the Task 149 search-index fix — deployed, awaiting Search Console
   confirmation.** Extracted from 149 on close, 2026-07-28, rather than left as a to-do inside a
   closed block. **Steps 1–5 are done and verified live 2026-07-28; only step 6 is open, and it is a
@@ -1597,6 +1586,20 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
   keys, of which 227 are `lpn_` — a pre-existing unbaselined backlog from the English-only preview,
   not this task's doing. Harmless (parity and coverage still report them), but it means the drift
   manifest now treats those lpn_ strings as synced.
+
+- 0|232| **[DONE 2026-08-08] `Irrigation.php` removed — the page and its 17 keys are gone.**
+  Tom called the menu entry "harmful and spammy" (it was the only non-calculator under Hydraulics,
+  labelled the bare word "Irrigation", fronting a card index that pointed back at the dropdown
+  containing it). The entry went 2026-08-08; the page stayed pending the one number nobody had.
+  **That number arrived the same day and settled it: reach 1,977, confirmed humans 0, used 0.**
+  Pure crawler traffic — the usage log's own reading of "high reach + ~0% human" — so there was no
+  audience to strand. Deleted: the page, its `sw.js` precache line, and all 17 `irr_` keys across
+  27 lang files (476 lines), which also retired `irr` from the translation payloads' active
+  prefixes. `generate_sitemap.php` globs `*.php`, so the sitemap dropped it on regeneration;
+  `glossary_compliance_audit.php` had hardcoded `irr_` keys as its 'weir' and 'conveyance
+  efficiency' samples and now uses `ws_`/`wi_`/`cs_` instead.
+  **`../sitemap.xml` is regenerated but NOT tracked by git** — it must be re-uploaded to the site
+  root when this deploys, or the dead URL stays advertised.
 
 - 0|231| **[DONE 2026-08-08] Toolbar: icon as a small prefix to the text, never icon-only.** Added
   `↺` Restore defaults, `📏` Set units, `🖨` Printable (`lib/Calculators.lib.php`) and `🔗` Copy link

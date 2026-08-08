@@ -26,12 +26,11 @@ const TERM_KEYS = [
         'mphl_main_menu', 'mphl_main_title', 'mphl_main_desc',
         'mhp_hl_check', 'mhp_notes_1_term', 'mhp_notes_3_term',
     ],
-    'weir' => [
-        'irr_card_weir_uniform_head', 'irr_card_weir_uniform_desc',
-        'irr_card_weir_irregular_head', 'irr_card_weir_irregular_desc',
-    ],
+    // The irr_ landing-page keys that used to anchor 'weir' and 'conveyance efficiency' went
+    // with Irrigation.php (Task 232, 2026-08-08). 'weir' now has no sampled key: the weir
+    // calculators' own identity strings are ws_/wi_, which this audit already covers elsewhere.
+    'weir' => ['ws_main_title', 'ws_main_desc', 'wi_main_title'],
     'conveyance efficiency' => [
-        'irr_card_seepage_head', 'irr_card_seepage_desc',
         'cs_main_title', 'cs_main_desc', 'cs_Ec', 'cs_Ec_target', 'cs_notes_1_def',
     ],
     'rock chute' => ['rc_main_menu', 'rc_main_title', 'rc_main_desc'],

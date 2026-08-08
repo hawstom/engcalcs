@@ -342,21 +342,6 @@ $ec_lang['odt_sketch_end']='结束';
 // Contact us.
 
 // Irrigation
-$ec_lang['irr_main_menu']='灌溉';
-$ec_lang['irr_main_title']='免费在线灌溉流量测量计算器';
-$ec_lang['irr_main_desc']='灌溉流量测量 — 堰和孔口';
-$ec_lang['irr_intro_html']='<p>量水堰和孔口是灌溉系统中测量水流量的标准现场工具。请选择与您的水工建筑物相匹配的计算器：</p>';
-$ec_lang['irr_card_weir_uniform_head']='量水堰 — 宽顶堰（等宽）';
-$ec_lang['irr_card_weir_uniform_desc']='测量引水坝堰顶、节制闸或量水板的过流量。输入堰长和堰顶以上的上游水深。';
-$ec_lang['irr_card_weir_irregular_head']='量水堰 — 不规则堰顶';
-$ec_lang['irr_card_weir_irregular_desc']='适用于堰顶高程或断面形状变化的情况——天然溢洪道、宽度变化的跌水建筑物，或多段控制建筑物。';
-$ec_lang['irr_card_orifice_head']='孔口 — 闸门或管道出水口';
-$ec_lang['irr_card_orifice_desc']='测量通过闸门、管道出水口或涵洞开口的流量，自动处理自由出流和淹没（受下游顶托）两种情况。';
-$ec_lang['irr_card_canal_head']='渠道设计 & 分析';
-$ec_lang['irr_card_canal_desc']='使用曼宁公式设计或校核灌溉渠道。新建渠道使用梯形断面计算器；已有天然或人工渠道断面使用不规则断面计算器。';
-$ec_lang['irr_card_seepage_head']='渠道渗漏 & 输水效率';
-$ec_lang['irr_card_seepage_desc']='利用渠段进出流量测量值估算渠道渗漏损失，计算输水效率和年渗漏水量，为衬砌投资决策提供依据。';
-$ec_lang['irr_quickref_html']='<h3>快速参考</h3><dl><dt>引水坝或节制闸</dt><dd>测量堰顶以上的上游水深。均匀堰顶使用 <a href="Weir-Flow-Simple.php">简单量水堰</a>，异形或阶梯堰顶使用 <a href="Weir-Flow-Irregular.php">不规则量水堰</a>。</dd><dt>闸门或管道出水口</dt><dd>测量上游水位和下游水位（自由出流时测底部高程）。使用 <a href="Orifice.php">孔口流量</a>。圆形管道：D = 管径；矩形闸门：输入宽度 W 和高度 D。</dd><dt>水库或池塘排空时间</dt><dd>使用 <a href="Orifice-Drain-Time.php">孔口排空时间</a> 估算通过底部孔口降低池塘或水库水位所需的时间——适用于灌溉蓄水规划。</dd><dt>现场标准</dt><dd>本计算器采用的堰流和孔口流量公式符合美国垦务局（USBR）<em>量水手册</em>（第3版）规程，通常为水资源管理机构和灌区所要求。</dd></dl>';
 // Drip / Sprinkler Application Rate
 $ec_lang['ip_se']='滴头间距，S<sub>e</sub>';
 $ec_lang['ip_sl']='毛管间距，S<sub>l</sub>';
@@ -549,8 +534,6 @@ $ec_lang['ip_notes_3_def']='本模型仅考虑一个固定供水压力（不含�
 $ec_lang['ip_notes_4_def']='Christiansen, J.E.（1942年）。“Irrigation by sprinkling.” 加利福尼亚州农业试验站公报670号。ASAE/ASABE 微灌设计标准采用相同的多出口沿程损失计算方法。';
 $ec_lang['ip_notes_5_term']='灌水设计';
 $ec_lang['ip_notes_5_def']='灌水强度和系统/灌区流量采用估计的田间平均滴头流量（q<sub>avg,field</sub>——即测试毛管自身平均值经输入的Δ压力估计修正后的结果），而非凭空猜测的速率：PR = q<sub>avg,field</sub> / A<sub>e</sub>，由修正后的模型值提供。间距及系统范围内的毛管/滴头数量在此为独立输入项，因为测试路径仅模拟一条最不利分支，而非田间所有毛管。';
-$ec_lang['irr_card_pressure_head']='灌溉压力与均匀度';
-$ec_lang['irr_card_pressure_desc']='沿干管—毛管—滴头分支模拟压力和流量分布，根据测试路径的实际压力（而非仅凭产品目录的滴头流量额定值）估算分布均匀度。';
 
 
 

@@ -345,21 +345,6 @@ $ec_lang['odt_sketch_end']='Fin';
 // Contact us.
 
 // Irrigation
-$ec_lang['irr_main_menu']='Irrigation';
-$ec_lang['irr_main_title']='Calculateurs en ligne gratuits de mesure du d\'ebit d\'irrigation';
-$ec_lang['irr_main_desc']='Mesure du d\'ebit d\'irrigation — déversoirs et orifices';
-$ec_lang['irr_intro_html']='<p>Les déversoirs et les orifices sont les outils de terrain standard pour mesurer le débit d\'eau dans les systèmes d\'irrigation. Sélectionnez le calculateur correspondant à votre structure :</p>';
-$ec_lang['irr_card_weir_uniform_head']='Déversoir — Seuil Large (Largeur Uniforme)';
-$ec_lang['irr_card_weir_uniform_desc']='Mesurez le débit sur la crête d\'un barrage de dérivation, d\'un ouvrage de régulation, ou d\'une planche de déversoir. Saisissez la longueur du déversoir et la hauteur d\'eau amont au-dessus de la crête.';
-$ec_lang['irr_card_weir_irregular_head']='Déversoir — Profil Irrégulier';
-$ec_lang['irr_card_weir_irregular_desc']='À utiliser lorsque la crête du déversoir varie en élévation ou en profil — déversoirs naturels, structures de chute à largeur variable, ou structures de contrôle à sections multiples.';
-$ec_lang['irr_card_orifice_head']='Orifice — Vanne de Prise ou Sortie de Canalisation';
-$ec_lang['irr_card_orifice_desc']='Mesurez le débit à travers une vanne de type batardeau, une sortie de canalisation ou une ouverture de buse. Gère automatiquement les conditions de déversement libre et noyé (contrecharge aval).';
-$ec_lang['irr_card_canal_head']='Conception & Analyse de Canal';
-$ec_lang['irr_card_canal_desc']='Concevez ou vérifiez un canal d\'irrigation à l\'aide de la formule de Manning. Utilisez le calculateur Trapézoïdal pour les nouveaux canaux ; le calculateur Irrégulier pour les sections naturelles ou construites existantes.';
-$ec_lang['irr_card_seepage_head']='Infiltration en Canal & Rendement de Transport d\'Eau';
-$ec_lang['irr_card_seepage_desc']='Estimez les pertes par infiltration d\'un bief de canal à partir des mesures de débit entrant et sortant. Calculez le rendement de transport d\'eau et le volume d\'eau perdu annuellement pour aider à prioriser les investissements de revêtement.';
-$ec_lang['irr_quickref_html']='<h3>Référence Rapide</h3><dl><dt>Barrage de dérivation ou ouvrage de régulation</dt><dd>Mesurez la hauteur d\'eau amont au-dessus de la crête du déversoir. Utilisez <a href="Weir-Flow-Simple.php">Déversoir Simple</a> pour une crête uniforme, ou <a href="Weir-Flow-Irregular.php">Déversoir Irrégulier</a> pour une crête profilée ou à gradins.</dd><dt>Vanne de prise ou sortie de canalisation</dt><dd>Mesurez la cote de l\'eau amont et la cote de l\'eau aval (ou la cote du radier en cas de déversement libre). Utilisez <a href="Orifice.php">Débit par Orifice</a>. Pour une canalisation circulaire, D = diamètre de la canalisation ; pour une vanne rectangulaire, saisissez la largeur W et la hauteur D.</dd><dt>Temps de vidange de réservoir ou d\'étang</dt><dd>Utilisez <a href="Orifice-Drain-Time.php">Temps de Vidange par Orifice</a> pour estimer le temps nécessaire pour abaisser le niveau d\'un étang ou d\'un réservoir par un orifice de fond — utile pour la planification du stockage d\'irrigation.</dd><dt>Normes de terrain</dt><dd>Les équations de débit par déversoir et orifice utilisées ici correspondent aux procédures du <em>Water Measurement Manual</em> (3e éd.) de l\'USBR, couramment exigées par les gestionnaires de l\'eau et les districts d\'irrigation.</dd></dl>';
 // Drip / Sprinkler Application Rate
 $ec_lang['ip_se']='Espacement des goutteurs, S<sub>e</sub>';
 $ec_lang['ip_sl']='Espacement des rampes, S<sub>l</sub>';
@@ -552,8 +537,6 @@ $ec_lang['ip_notes_3_def']='Modélise une seule pression d\'alimentation fixe (p
 $ec_lang['ip_notes_4_def']='Christiansen, J.E. (1942). “Irrigation by sprinkling.” California Agricultural Experiment Station Bulletin 670. Les normes ASAE/ASABE pour la conception de la micro-irrigation utilisent la même approche de perte de charge par frottement à sorties multiples.';
 $ec_lang['ip_notes_5_term']='Conception d\'Application';
 $ec_lang['ip_notes_5_def']='Le taux d\'application et le débit du système/de la zone utilisent le débit moyen estimé des goutteurs sur le terrain (q<sub>avg,field</sub> — la moyenne propre de la rampe testée, corrigée par l\'estimation de Δpression saisie), et non un taux deviné : PR = q<sub>avg,field</sub> / A<sub>e</sub>, alimenté par la valeur modélisée corrigée. L\'espacement et le nombre de rampes/goutteurs à l\'échelle du système sont des entrées séparées ici, car le cheminement de test ne modélise qu\'une seule branche dans le cas le plus défavorable, et non chaque rampe du champ.';
-$ec_lang['irr_card_pressure_head']='Pression d\'Irrigation & Uniformité';
-$ec_lang['irr_card_pressure_desc']='Modélisez le profil de pression et de débit le long d\'une branche conduite principale-rampe-goutteur pour estimer l\'uniformité de distribution à partir de la pression réelle du cheminement de test, et non simplement du débit catalogue du goutteur.';
 
 
 

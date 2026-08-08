@@ -38,7 +38,6 @@ const STATIC_ASSETS = [
 const CALC_PAGES = [
   '/engcalcs/index.php',
   '/engcalcs/About.php',
-  '/engcalcs/Irrigation.php',
   '/engcalcs/Manning-Pipe-Flow.php',
   '/engcalcs/Manning-Pipe-Head-Loss.php',
   '/engcalcs/Manning-Trap.php',

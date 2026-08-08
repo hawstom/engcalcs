@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "fr",
-        "expected_key_count": 807,
-        "delta_key_count": 233,
+        "expected_key_count": 790,
+        "delta_key_count": 232,
         "exempt_key_count": 15,
         "exempt_keys": [
             "u_depthFrac",
@@ -28,7 +28,6 @@
             "contact",
             "dw",
             "ip",
-            "irr",
             "lpn",
             "mhp",
             "mi",
@@ -45,7 +44,6 @@
         "contact": "Use these preferred technical term translations when relevant:\n- flow (Q): débit\n- velocity (v): vitesse\n- slope (S): pente\n    DO NOT render as: activity\/fitness sense of 'grade' — the treadmill or trail incline for running\/walking\/jogging; this is the hydraulic energy gradient, not an exercise setting; geographic or topographic landform term; school grade \/ academic mark",
         "dw": "Use these preferred technical term translations when relevant:\n- flow (Q): débit\n- velocity (v): vitesse\n- head loss (h_L): perte de charge\n    DO NOT render as: pressure loss \/ pressure drop (use the head-loss term, not the pressure term); a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry\n- friction factor (f): facteur de frottement\n- slope (S): pente\n    DO NOT render as: activity\/fitness sense of 'grade' — the treadmill or trail incline for running\/walking\/jogging; this is the hydraulic energy gradient, not an exercise setting; geographic or topographic landform term; school grade \/ academic mark\n- laminar: laminaire\n- transitional: de transition\n- turbulent: turbulent",
         "ip": "Use these preferred technical term translations when relevant:\n- flow (Q): débit\n- velocity (v): vitesse\n- head loss (h_L): perte de charge\n    DO NOT render as: pressure loss \/ pressure drop (use the head-loss term, not the pressure term); a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry\n- emitter: émetteur\n- distribution uniformity (DU): uniformité de distribution\n- low-quarter distribution uniformity (DU_lq): uniformité de distribution du quart inférieur\n- application rate (PR): taux d'application\n- lateral: rampe\n- mainline: conduite principale\n- reach: tronçon\n- velocity head (H_v): hauteur de vitesse\n    DO NOT render as: a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry; pressure\n- friction loss (h_f): perte de charge par frottement\n- minor loss (h_m): perte de charge singulière\n- energy grade line (EGL): ligne d'énergie\n- upstream: amont\n- downstream: aval",
-        "irr": "Use these preferred technical term translations when relevant:\n- flow (Q): débit\n- weir: déversoir\n- orifice: orifice\n- seepage: infiltration\n- conveyance efficiency (E_c): rendement de transport d'eau\n- check structure: ouvrage de régulation",
         "lpn": "Use these preferred technical term translations when relevant:\n- flow (Q): débit\n- velocity (v): vitesse\n- slope (S): pente\n    DO NOT render as: activity\/fitness sense of 'grade' — the treadmill or trail incline for running\/walking\/jogging; this is the hydraulic energy gradient, not an exercise setting; geographic or topographic landform term; school grade \/ academic mark",
         "mhp": "Use these preferred technical term translations when relevant:\n- flow (Q): débit\n- penstock: conduite forcée\n    DO NOT render as: phonetic transliteration of the English word — translate the concept (pressure pipe \/ force main to turbine), never borrow 'penstock' as a loanword\n- gross head (H_gross): hauteur brute\n    DO NOT render as: a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry; pressure\n- net head (H_net): hauteur nette\n    DO NOT render as: a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry; pressure\n- plant efficiency (η): rendement de l'installation\n- head loss (h_L): perte de charge\n    DO NOT render as: pressure loss \/ pressure drop (use the head-loss term, not the pressure term); a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry\n- run-of-river: au fil de l'eau\n- headworks: ouvrage de prise d'eau\n- junction loss (h_m): pertes singulières\n- minor loss (h_m): perte de charge singulière",
         "mi": "Use these preferred technical term translations when relevant:\n- flow (Q): débit\n- velocity (v): vitesse\n- hydraulic radius (R_h): rayon hydraulique\n- wetted perimeter (P_w): périmètre mouillé\n- Manning roughness (n): coefficient de rugosité de Manning\n- slope (S): pente\n    DO NOT render as: activity\/fitness sense of 'grade' — the treadmill or trail incline for running\/walking\/jogging; this is the hydraulic energy gradient, not an exercise setting; geographic or topographic landform term; school grade \/ academic mark\n- irregular channel: canal à section irrégulière",
@@ -270,50 +268,6 @@
                 "preferred_translation": "aval"
             }
         ],
-        "irr": [
-            {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg RESOLVED (Tom, 2026-07-13): native engineer's 2026-07-06 clarification confirmed both 'дебит' (colloquial\/general register) and 'водно количество' (academic\/hydraulic-engineering register, used at university for Q) are acceptable. Tom decided suite-wide standardization on 'водно количество' — \"I would put водно количество everywhere\" — applied across all bg calculator categories (pipes\/irrigation included, not just the hydraulic-structure\/open-channel strings the engineer originally corrected). 'дебит' fully replaced in lib\/lang.ec.bg.php 2026-07-13. Task 109 stages 3-5 (2026-07-19): bg standardized on водно количество (дебит drift removed from or_\/mpf_\/cs_ per Bulgarian-engineer-feedback.md); sr standardized on проток (stage 4); it confirmed on portata (flusso drift removed).",
-                "preferred_translation": "débit"
-            },
-            {
-                "term": "weir",
-                "symbol": "",
-                "context": "A flow-measurement or water-control structure — a barrier across a channel over which water flows. Appears in Weir Flow Simple and Weir Flow Irregular calculators.",
-                "translation_notes": "WMO No. 385 entry 1665 confirms: es = 'vertedero', fr = 'déversoir', ru = 'водослив'. In an irrigation context, the term often overlaps with 'diversion dam' or 'check structure'. Use the term most common among irrigation field workers in the target language, not a purely civil-engineering dictionary term.",
-                "preferred_translation": "déversoir"
-            },
-            {
-                "term": "orifice",
-                "symbol": "",
-                "context": "A submerged or free-flowing opening through which water discharges under head. Appears in Orifice Flow and Orifice Drain Time calculators.",
-                "translation_notes": "In irrigation contexts, often the opening of a headgate or pipe turnout. Use the hydraulic engineering term, not a general word for 'hole' or 'opening'. Task 109 stage 3 (2026-07-19): zh confirmed on 孔口 — the tooltip 'opening' drift 开口 in or_width was aligned. Task 130 (2026-07-21): ps odt_ menu\/desc used سوري (generic hole); corrected to the glossary term منفذ.",
-                "preferred_translation": "orifice"
-            },
-            {
-                "term": "seepage",
-                "symbol": "",
-                "context": "Water lost from a canal through the bed and banks by percolation into the soil. Appears in Canal Seepage calculator.",
-                "translation_notes": "Use the irrigation\/canal engineering term for slow percolation loss, not a word implying leakage through a crack or structural failure. Task 109 stage 5 (2026-07-19): ur wrong-word رسائی (access) corrected to رساؤ (seepage) across ~9 cs_ keys; glossary's prior 'رستا پانی' superseded by the now-consistent shipped رساؤ.",
-                "preferred_translation": "infiltration"
-            },
-            {
-                "term": "conveyance efficiency",
-                "symbol": "E_c",
-                "context": "Ratio of outflow to inflow in a canal reach — measures how much water delivered at the head is received at the tail. Appears in Canal Seepage calculator. E_c = Q_out \/ Q_in.",
-                "translation_notes": "This is the most terminology-sensitive term in the suite. 'Conveyance' means transport of water along a canal — do not use a general word for 'efficiency' alone. The term should convey 'how well the canal transports water without loss'. DATA-ERROR FIX 2026-07-10 (category-4 wave-2 hi re-translation): glossary hi value was 'वहन दक्षता' (vahan dakshata), but lib\/lang.ec.hi.php's own cs_ and irr_ keys (cs_main_menu, cs_main_title, cs_Ec, cs_Ec_check, cs_notes_1_def, cs_notes_2_term, irr_card_seepage_head, etc. — 10+ occurrences, predating this sprint) all already establish 'संवहन दक्षता' (sanvahan dakshata) as the incumbent term. Standardized the glossary to match established suite usage, same defect class as prior DATA-ERROR FIX entries in this file. DATA-ERROR FIX 2026-07-10 (category-4 wave-3 ps re-translation): glossary ps value was 'د اوبو د رسولو موثریت', but lib\/lang.ec.ps.php's own irr_ keys (irr_quickref_html and others, 15+ occurrences, predating this sprint) all already establish 'د لیږدولو اغیزمنتیا' as the incumbent term. Standardized the glossary to match established suite usage rather than switch the shipped file mid-sprint. DATA-ERROR FIX 2026-07-10 (category-4 holistic pass, hr): glossary hr value was \"učinkovitost prijenosa\", but lib\/lang.ec.hr.php own cs_ keys (cs_main_desc, cs_Ec, cs_Ec_check, cs_notes_1_def, cs_notes_2_term, cs_notes_2_def, cs_Ec_target — 7 occurrences, predating this pass) all already establish \"korisnost transporta\" as the incumbent term; irr_card_seepage_head\/desc had drifted to the minority \"učinkovitost prijenosa\" and were corrected to match. Standardized glossary to match established suite usage, same defect class as prior DATA-ERROR FIX entries in this file. Task 109 stage 5 (2026-07-19): ru conveyance-efficiency terminology drift standardized (2 keys); hr 'target efficiency' aligned to the incumbent korisnost rather than a new ciljnu iskoristivost coinage.",
-                "preferred_translation": "rendement de transport d'eau"
-            },
-            {
-                "term": "check structure",
-                "symbol": "",
-                "context": "A small flow-control structure (gate or board structure) in an irrigation canal, used to raise ('check') the upstream water level for diversion or measurement. 'Check' is part of the structure's name.",
-                "translation_notes": "Use the local irrigation term for a canal check\/control gate. 'Check' here is NOT the verb 'to verify\/inspect' — do not translate as 'inspect the structure'. Wave-1 coinages (2026-07, category-4 sprint, this term had zero prior translations): es=\"estructura de control\", pt=\"estrutura de controle\", fr=\"ouvrage de régulation\", it=\"struttura di regolazione\", de=\"Kontrollbauwerk\", ro=\"stăvilar de control\", ru=\"регулирующее сооружение\", uk=\"контрольна споруда\", bg=\"контролно съоръжение\", sr=\"устава\", hr=\"regulacijska ustava\", cs=\"regulační objekt\", tr=\"kontrol yapısı\", id=\"bangunan pengatur\". Not yet reviewed by a native speaker; propagate to waves 2-3 for consistency. ur ADDED (2026-07-10, category-4 wave-2 sprint): \"کنٹرول ڈھانچہ\" (control structure) follows the majority \"control structure\" pattern (es\/pt\/it\/de\/ro\/ru\/uk\/bg\/hr\/cs\/tr\/id) rather than a literal \"check\", avoiding the check=verify mistranslation trap. Matches the term already used consistently in the shipped ur file (irr_ keys) prior to this sprint. Not yet native-reviewed. hi ADDED (2026-07-10, category-4 wave-2 re-translation): 'नियंत्रण संरचना' (control\/regulating structure) follows the majority wave-1 pattern (es\/pt=\"estructura\/estrutura de control(e)\", fr=\"ouvrage de régulation\", ru=\"регулирующее сооружение\") and matches the suite's own established incumbent Hindi phrase for this exact control-structure concept already used in lib\/lang.ec.hi.php (irr_card_weir_irregular_desc: \"बहु-खंड नियंत्रण संरचनाएं\" = multi-section control structures, predates this sprint). ar ADDED (2026-07-10, category-4 wave-2 re-translation): 'منشأة تحكم' (control structure\/facility) follows the same majority 'control structure' pattern, and matches the incumbent phrasing already used in the shipped ar file's irr_card_weir_uniform_desc and irr_quickref_html prior to this sprint (both already said منشأة تحكم\/منشأة التحكم for this exact concept) — no change to established suite usage, just confirmed and propagated to the glossary. تحكم (control\/regulation) keeps the 'check' = control-gate sense and avoids the verb-of-inspection trap. zh ADDED (2026-07-10, category-4 wave-2 re-translation): '节制闸' (jiézhìzhá, control\/check gate) is the standard Chinese irrigation-engineering term for exactly this structure type, distinct from any 'inspect' sense. bn ADDED (2026-07-10, category-4 wave-2 re-translation): 'নিয়ন্ত্রণ কাঠামো' (control structure) follows the majority pattern. fa ADDED (2026-07-10, category-4 wave-2 re-translation): 'سازه کنترل' (control structure) follows the majority pattern. my ADDED (2026-07-10, category-4 cs_\/irr_\/ip_ re-translation): 'ထိန်းချုပ်ဆောက်လုပ်ရေး' (control structure) follows the same majority 'control structure' pattern (avoiding a literal 'check' translation and the verify\/inspect trap) and matches the incumbent phrase already used in the shipped my file's irr_card_weir_irregular_desc ('...အပိုင်းများစွာပါသော ထိန်းချုပ်ဆောက်လုပ်ရေးများ' = multi-section control structures) prior to this sprint — no new coinage, just confirmed and propagated to irr_card_weir_uniform_desc and irr_quickref_html for suite-wide consistency, and recorded here for the glossary. Not yet native-reviewed (my is category-3 wave-3 tier, QUALITY 0.65). am\/km\/ps\/sw ADDED (2026-07-10, category-4 wave-3 re-translation): am='የቁጥጥር መዋቅር', km='រចនាសម្ព័ន្ធត្រួតត្រា', ps='د کنترول جوړښت', sw='muundo wa kudhibiti' (sw's was already the shipped file's incumbent phrase in irr_card_weir_uniform_desc\/irr_card_weir_irregular_desc prior to this sprint, just confirmed and propagated to the glossary) — all follow the majority 'control structure' pattern, avoiding the check=verify mistranslation trap. None yet native-reviewed (wave-3 low-resource tier, QUALITY 0.65).",
-                "preferred_translation": "ouvrage de régulation"
-            }
-        ],
         "lpn": [
             {
                 "term": "flow",
@@ -511,7 +465,6 @@
         "mi_groupSegment": "Segment",
         "ws_notes_heading": "Notes",
         "mhp_vel_ok_short": "OK",
-        "irr_main_menu": "Irrigation",
         "contact_main_menu": "Contact",
         "ip_press": "Press.",
         "bpn_source_label": "Source",
@@ -746,7 +699,6 @@
         "mi_groupSegment": "Segment",
         "ws_notes_heading": "Notes",
         "mhp_vel_ok_short": "OK",
-        "irr_main_menu": "Irrigation",
         "contact_main_menu": "Contact",
         "ip_press": "Press.",
         "bpn_source_label": "Source",
@@ -1053,22 +1005,6 @@
                     "key": "mhp_vel_high_short",
                     "value": "Élevée",
                     "english": "High"
-                }
-            }
-        },
-        "irr_main_menu": {
-            "reason": "equal_to_english",
-            "current_value": "Irrigation",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "odt_sketch_end",
-                    "value": "Fin",
-                    "english": "End"
-                },
-                "next_translated": {
-                    "key": "irr_main_title",
-                    "value": "Calculateurs en ligne gratuits de mesure du d'ebit d'irrigation",
-                    "english": "Free Online Irrigation Flow Measurement Calculators"
                 }
             }
         },

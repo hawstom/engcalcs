@@ -657,36 +657,6 @@ $ec_lang_intent['odt_sketch_end']='';
 // Contact us.
 
 // Irrigation
-$ec_lang['irr_main_menu']='Irrigation';
-$ec_lang_intent['irr_main_menu']='';
-$ec_lang['irr_main_title']='Free Online Irrigation Flow Measurement Calculators';
-$ec_lang_intent['irr_main_title']='';
-$ec_lang['irr_main_desc']='Irrigation Flow Measurement — Weirs and Orifices';
-$ec_lang_intent['irr_main_desc']='';
-$ec_lang['irr_intro_html']='<p>Weirs and orifices are the standard field tools for measuring water flow in irrigation systems. Select the calculator that matches your structure:</p>';
-$ec_lang_intent['irr_intro_html']='';
-$ec_lang['irr_card_weir_uniform_head']='Weir — Broad-Crested (Uniform Width)';
-$ec_lang_intent['irr_card_weir_uniform_head']='';
-$ec_lang['irr_card_weir_uniform_desc']='Measure flow over a diversion dam crest, check structure, or weir board. Enter weir length and headwater depth above the crest.';
-$ec_lang_intent['irr_card_weir_uniform_desc']='| gloss: check structure; avoid: verb "to check/verify"';
-$ec_lang['irr_card_weir_irregular_head']='Weir — Irregular Profile';
-$ec_lang_intent['irr_card_weir_irregular_head']='';
-$ec_lang['irr_card_weir_irregular_desc']='Use when the weir crest varies in elevation or profile — natural spillways, drop structures with varying width, or multi-section control structures.';
-$ec_lang_intent['irr_card_weir_irregular_desc']='';
-$ec_lang['irr_card_orifice_head']='Orifice — Headgate or Pipe Turnout';
-$ec_lang_intent['irr_card_orifice_head']='';
-$ec_lang['irr_card_orifice_desc']='Measure flow through a sluice gate, pipe turnout, or culvert opening. Handles both free outfall and submerged (tailwater) conditions automatically.';
-$ec_lang_intent['irr_card_orifice_desc']='';
-$ec_lang['irr_card_canal_head']='Canal Design & Analysis';
-$ec_lang_intent['irr_card_canal_head']='';
-$ec_lang['irr_card_canal_desc']='Design or check an irrigation canal using Manning\'s formula. Use the Trapezoidal calculator for new channels; the Irregular calculator for existing natural or constructed sections.';
-$ec_lang_intent['irr_card_canal_desc']='';
-$ec_lang['irr_card_seepage_head']='Canal Seepage & Conveyance Efficiency';
-$ec_lang_intent['irr_card_seepage_head']='| gloss: seepage; gloss: conveyance efficiency';
-$ec_lang['irr_card_seepage_desc']='Estimate seepage loss from a canal reach using inflow and outflow measurements. Compute conveyance efficiency and annual water loss to help prioritize lining investments.';
-$ec_lang_intent['irr_card_seepage_desc']='| gloss: seepage';
-$ec_lang['irr_quickref_html']='<h3>Quick Reference</h3><dl><dt>Diversion dam or check structure</dt><dd>Measure headwater depth above the weir crest. Use <a href="Weir-Flow-Simple.php">Weir Flow Simple</a> for a uniform crest, or <a href="Weir-Flow-Irregular.php">Weir Flow Irregular</a> for a profiled or stepped crest.</dd><dt>Headgate or pipe turnout</dt><dd>Measure headwater elevation and tailwater elevation (or invert if freely discharging). Use <a href="Orifice.php">Orifice Flow</a>. For a circular pipe, D = pipe diameter; for a rectangular gate, enter width W and height D.</dd><dt>Reservoir or pond drain time</dt><dd>Use <a href="Orifice-Drain-Time.php">Orifice Drain Time</a> to estimate how long it takes to lower a pond or reservoir through a bottom orifice — useful for irrigation storage planning.</dd><dt>Field standards</dt><dd>Weir and orifice flow equations used here match USBR <em>Water Measurement Manual</em> (3rd ed.) procedures commonly required by water masters and irrigation districts.</dd></dl>';
-$ec_lang_intent['irr_quickref_html']='Quick reference for choosing a flow-measurement calculator. A water master (zanjero, ditch rider) is the official who administers water rights and deliveries. | avoid: "water master" as a skill title';
 // Drip / Sprinkler Application Rate
 $ec_lang['ip_se']='Emitter spacing, S<sub>e</sub>';
 $ec_lang_intent['ip_se']='';
@@ -1061,10 +1031,6 @@ $ec_lang['ip_notes_5_term']='Application Design';
 $ec_lang_intent['ip_notes_5_term']='';
 $ec_lang['ip_notes_5_def']='Application rate and system/zone flow use the estimated field-average emitter flow (q<sub>avg,field</sub> — the test lateral’s own average, corrected by the entered Δpressure estimate), not a guessed rate: PR = q<sub>avg,field</sub> / A<sub>e</sub>, fed by the corrected modeled value. Spacing and system-wide lateral/emitter counts are separate inputs here because the test path only models one worst-case branch, not every lateral in the field.';
 $ec_lang_intent['ip_notes_5_def']='';
-$ec_lang['irr_card_pressure_head']='Irrigation Pressure & Uniformity';
-$ec_lang_intent['irr_card_pressure_head']='';
-$ec_lang['irr_card_pressure_desc']='Model the pressure and flow profile along a main-lateral-emitter branch to estimate distribution uniformity from the real test-path pressure, not just a catalog emitter flow rate.';
-$ec_lang_intent['irr_card_pressure_desc']='';
 
 
 

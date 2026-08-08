@@ -342,21 +342,6 @@ $ec_lang['odt_sketch_end']='Ende';
 // Contact us.
 
 // Irrigation
-$ec_lang['irr_main_menu']='Bewässerung';
-$ec_lang['irr_main_title']='Kostenlose Online-Rechner für Bewässerungsdurchflussmessung';
-$ec_lang['irr_main_desc']='Bewässerungsdurchflussmessung — Wehre und Öffnungen';
-$ec_lang['irr_intro_html']='<p>Wehre und Öffnungen sind die Standard-Feldwerkzeuge zur Messung des Wasserdurchflusses in Bewässerungssystemen. Wählen Sie den Rechner, der zu Ihrer Anlage passt:</p>';
-$ec_lang['irr_card_weir_uniform_head']='Wehr — Breitkronig (einheitliche Breite)';
-$ec_lang['irr_card_weir_uniform_desc']='Messen Sie den Durchfluss über die Krone eines Ableitungsdamms, eines Kontrollbauwerks oder eines Wehrbretts. Geben Sie die Wehrlänge und die Oberwassertiefe über der Krone ein.';
-$ec_lang['irr_card_weir_irregular_head']='Wehr — Unregelmäßiges Profil';
-$ec_lang['irr_card_weir_irregular_desc']='Verwenden Sie dies, wenn die Höhe oder das Profil der Wehrkrone variiert — natürliche Überläufe, Absturzbauwerke mit veränderlicher Breite oder mehrteilige Kontrollbauwerke.';
-$ec_lang['irr_card_orifice_head']='Öffnung — Schütz oder Rohrauslass';
-$ec_lang['irr_card_orifice_desc']='Messen Sie den Durchfluss durch ein Schütz, einen Rohrauslass oder eine Durchlassöffnung. Verarbeitet automatisch sowohl freien Ausfluss als auch eingestaute (Unterwasser-)Bedingungen.';
-$ec_lang['irr_card_canal_head']='Kanalplanung & -analyse';
-$ec_lang['irr_card_canal_desc']='Planen oder überprüfen Sie einen Bewässerungskanal mit der Manning-Formel. Verwenden Sie den Trapezrechner für neue Kanäle und den Rechner für unregelmäßige Querschnitte für bestehende natürliche oder gebaute Querschnitte.';
-$ec_lang['irr_card_seepage_head']='Kanalversickerung & Transportwirkungsgrad';
-$ec_lang['irr_card_seepage_desc']='Schätzen Sie den Versickerungsverlust einer Kanalhaltung anhand von Zu- und Abflussmessungen. Berechnen Sie den Transportwirkungsgrad und den jährlichen Wasserverlust, um Auskleidungsinvestitionen zu priorisieren.';
-$ec_lang['irr_quickref_html']='<h3>Kurzreferenz</h3><dl><dt>Ableitungsdamm oder Kontrollbauwerk</dt><dd>Messen Sie die Oberwassertiefe über der Wehrkrone. Verwenden Sie <a href="Weir-Flow-Simple.php">Einfaches Wehr</a> für eine einheitliche Krone oder <a href="Weir-Flow-Irregular.php">Unregelmäßiges Wehr</a> für eine profilierte oder gestufte Krone.</dd><dt>Schütz oder Rohrauslass</dt><dd>Messen Sie den Oberwasserstand und den Unterwasserstand (oder die Sohlhöhe bei freiem Ausfluss). Verwenden Sie <a href="Orifice.php">Öffnungsdurchfluss</a>. Bei einem Kreisrohr ist D = Rohrdurchmesser; bei einem rechteckigen Schütz geben Sie Breite W und Höhe D ein.</dd><dt>Entleerungszeit von Speicherbecken oder Teich</dt><dd>Verwenden Sie <a href="Orifice-Drain-Time.php">Öffnungs-Entleerungszeit</a>, um abzuschätzen, wie lange es dauert, einen Teich oder ein Speicherbecken durch eine Bodenöffnung abzusenken — nützlich für die Planung der Bewässerungsspeicherung.</dd><dt>Feldstandards</dt><dd>Die hier verwendeten Wehr- und Öffnungsdurchflussgleichungen entsprechen den Verfahren des USBR <em>Water Measurement Manual</em> (3. Aufl.), die von Wasserwärtern und Bewässerungsverbänden häufig gefordert werden.</dd></dl>';
 // Drip / Sprinkler Application Rate
 $ec_lang['ip_se']='Emitterabstand, S<sub>e</sub>';
 $ec_lang['ip_sl']='Lateralabstand, S<sub>l</sub>';
@@ -549,8 +534,6 @@ $ec_lang['ip_notes_3_def']='Modelliert einen festen Versorgungsdruck (keine Pump
 $ec_lang['ip_notes_4_def']='Christiansen, J.E. (1942). „Irrigation by sprinkling." California Agricultural Experiment Station Bulletin 670. Die ASAE/ASABE-Normen für die Mikrobewässerungsauslegung verwenden denselben Mehrfachauslass-Reibungsverlust-Ansatz.';
 $ec_lang['ip_notes_5_term']='Anwendungsauslegung';
 $ec_lang['ip_notes_5_def']='Beregnungsintensität und System-/Zonendurchfluss verwenden den geschätzten Feld-Durchschnitt des Emitter-Durchflusses (q<sub>avg,field</sub> — der eigene Durchschnitt der Testleitung, korrigiert durch die eingegebene Δ-Druck-Schätzung), nicht eine geschätzte Rate: PR = q<sub>avg,field</sub> / A<sub>e</sub>, gespeist vom korrigierten modellierten Wert. Abstand sowie systemweite Lateral-/Emitterzahlen sind hier separate Eingaben, da der Testpfad nur einen Zweig mit dem schlechtesten Fall modelliert, nicht jedes Lateral im Feld.';
-$ec_lang['irr_card_pressure_head']='Bewässerungsdruck & Gleichmäßigkeit';
-$ec_lang['irr_card_pressure_desc']='Modellieren Sie das Druck- und Durchflussprofil entlang eines Zweigs aus Hauptleitung, Lateral und Emitter, um die Verteilungsgleichmäßigkeit aus dem tatsächlichen Druck des Testpfads zu schätzen — nicht nur anhand des Katalog-Durchflusswerts des Emitters.';
 
 
 

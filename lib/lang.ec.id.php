@@ -342,21 +342,6 @@ $ec_lang['odt_sketch_end']='Akhir';
 // Contact us.
 
 // Irrigation
-$ec_lang['irr_main_menu']='Irigasi';
-$ec_lang['irr_main_title']='Kalkulator Pengukuran Debit Irigasi Gratis Daring';
-$ec_lang['irr_main_desc']='Pengukuran Debit Irigasi — Bendung Ukur dan Lubang Aliran';
-$ec_lang['irr_intro_html']='<p>Bendung ukur dan lubang aliran adalah alat lapangan standar untuk mengukur debit air dalam sistem irigasi. Pilih kalkulator yang sesuai dengan struktur Anda:</p>';
-$ec_lang['irr_card_weir_uniform_head']='Bendung Ukur — Mercu Lebar (Lebar Seragam)';
-$ec_lang['irr_card_weir_uniform_desc']='Ukur debit di atas mercu bendung pengalih, bangunan pengatur, atau papan bendung. Masukkan panjang bendung dan kedalaman air hulu di atas mercu.';
-$ec_lang['irr_card_weir_irregular_head']='Bendung Ukur — Profil Tidak Beraturan';
-$ec_lang['irr_card_weir_irregular_desc']='Gunakan saat mercu bendung bervariasi elevasi atau profilnya — pelimpah alami, bangunan terjun dengan lebar bervariasi, atau bangunan kendali multi-bagian.';
-$ec_lang['irr_card_orifice_head']='Lubang Aliran — Pintu Air atau Sambungan Pipa';
-$ec_lang['irr_card_orifice_desc']='Ukur debit melalui pintu sorong, sambungan pipa, atau bukaan gorong-gorong. Menangani kondisi aliran bebas maupun tenggelam (dipengaruhi air hilir) secara otomatis.';
-$ec_lang['irr_card_canal_head']='Desain & Analisis Saluran';
-$ec_lang['irr_card_canal_desc']='Desain atau periksa saluran irigasi menggunakan rumus Manning. Gunakan kalkulator Trapesium untuk saluran baru; kalkulator Tidak Beraturan untuk penampang alami atau buatan yang sudah ada.';
-$ec_lang['irr_card_seepage_head']='Rembesan Saluran & Efisiensi Saluran';
-$ec_lang['irr_card_seepage_desc']='Perkirakan kehilangan rembesan dari segmen saluran menggunakan pengukuran debit masuk dan keluar. Hitung efisiensi saluran dan kehilangan air tahunan untuk membantu memprioritaskan investasi pelapisan saluran.';
-$ec_lang['irr_quickref_html']='<h3>Referensi Cepat</h3><dl><dt>Bendung pengalih atau bangunan pengatur</dt><dd>Ukur kedalaman air hulu di atas mercu bendung. Gunakan <a href="Weir-Flow-Simple.php">Aliran Bendung Ukur Sederhana</a> untuk mercu seragam, atau <a href="Weir-Flow-Irregular.php">Aliran Bendung Ukur Tidak Beraturan</a> untuk mercu berprofil atau bertangga.</dd><dt>Pintu air atau sambungan pipa</dt><dd>Ukur elevasi muka air hulu dan hilir (atau elevasi dasar pipa jika mengalir bebas). Gunakan <a href="Orifice.php">Debit Lubang Aliran</a>. Untuk pipa bulat, D = diameter pipa; untuk pintu persegi panjang, masukkan lebar W dan tinggi D.</dd><dt>Waktu pengosongan waduk atau kolam</dt><dd>Gunakan <a href="Orifice-Drain-Time.php">Waktu Pengosongan Lubang Aliran</a> untuk memperkirakan berapa lama waktu yang diperlukan untuk menurunkan kolam atau waduk melalui lubang aliran dasar — berguna untuk perencanaan tampungan irigasi.</dd><dt>Standar lapangan</dt><dd>Persamaan debit bendung ukur dan lubang aliran yang digunakan di sini sesuai dengan prosedur USBR <em>Water Measurement Manual</em> (edisi ke-3), yang umumnya disyaratkan oleh pengelola air dan distrik irigasi.</dd></dl>';
 // Drip / Sprinkler Application Rate
 $ec_lang['ip_se']='Jarak emiter, S<sub>e</sub>';
 $ec_lang['ip_sl']='Jarak lateral, S<sub>l</sub>';
@@ -549,8 +534,6 @@ $ec_lang['ip_notes_3_def']='Memodelkan satu tekanan pasokan tetap (tanpa kurva p
 $ec_lang['ip_notes_4_def']='Christiansen, J.E. (1942). “Irrigation by sprinkling.” California Agricultural Experiment Station Bulletin 670. Standar ASAE/ASABE untuk desain mikroirigasi menggunakan pendekatan kehilangan gesekan multi-outlet yang sama.';
 $ec_lang['ip_notes_5_term']='Desain Aplikasi';
 $ec_lang['ip_notes_5_def']='Laju pemberian air dan debit sistem/zona menggunakan estimasi debit emiter rata-rata lapangan (q<sub>avg,field</sub> — rata-rata lateral pengujian itu sendiri, dikoreksi oleh estimasi Δtekanan yang dimasukkan), bukan laju yang ditebak: PR = q<sub>avg,field</sub> / A<sub>e</sub>, dipasok oleh nilai model yang telah dikoreksi. Jarak dan jumlah lateral/emiter seluruh sistem merupakan input terpisah di sini karena jalur pengujian hanya memodelkan satu cabang kasus terburuk, bukan setiap lateral di lapangan.';
-$ec_lang['irr_card_pressure_head']='Tekanan Irigasi & Keseragaman';
-$ec_lang['irr_card_pressure_desc']='Modelkan profil tekanan dan debit di sepanjang cabang saluran utama-lateral-emiter untuk memperkirakan keseragaman distribusi dari tekanan jalur uji yang sebenarnya, bukan hanya laju debit emiter dari katalog.';
 
 
 

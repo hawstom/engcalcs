@@ -341,21 +341,6 @@ $ec_lang['odt_sketch_end']='Kraj';
 // Contact us.
 
 // Irrigation
-$ec_lang['irr_main_menu']='Navodnjavanje';
-$ec_lang['irr_main_title']='Besplatni online kalkulatori za mjerenje protoka u navodnjavanju';
-$ec_lang['irr_main_desc']='Mjerenje protoka u navodnjavanju — preljevi i otvori';
-$ec_lang['irr_intro_html']='<p>Preljevi i otvori standardni su terenski alati za mjerenje protoka vode u sustavima navodnjavanja. Odaberite kalkulator koji odgovara vašoj građevini:</p>';
-$ec_lang['irr_card_weir_uniform_head']='Preljev — širokog praga (jednolike širine)';
-$ec_lang['irr_card_weir_uniform_desc']='Izmjerite protok preko krune skretne brane, regulacijske ustave ili preljevne daske. Unesite duljinu preljeva i dubinu vode iznad krune.';
-$ec_lang['irr_card_weir_irregular_head']='Preljev — nepravilnog profila';
-$ec_lang['irr_card_weir_irregular_desc']='Koristite kada se kruna preljeva mijenja po visini ili profilu — prirodni prelijevi, kaskadne građevine promjenjive širine ili višesekcijske regulacijske građevine.';
-$ec_lang['irr_card_orifice_head']='Otvor — zasun ili cjevovodni ispust';
-$ec_lang['irr_card_orifice_desc']='Izmjerite protok kroz zasun, cjevovodni ispust ili otvor propusta. Automatski obrađuje slobodno istjecanje i potopljene (nizvodne) uvjete.';
-$ec_lang['irr_card_canal_head']='Projektiranje i analiza kanala';
-$ec_lang['irr_card_canal_desc']='Projektirajte ili provjerite kanal za navodnjavanje pomoću Manningove formule. Koristite trapezni kalkulator za nove kanale, a kalkulator za nepravilni presjek za postojeće prirodne ili izgrađene presjeke.';
-$ec_lang['irr_card_seepage_head']='Procjeđivanje kanala i korisnost transporta';
-$ec_lang['irr_card_seepage_desc']='Procijenite gubitak procjeđivanjem u dionici kanala na temelju mjerenja dotoka i otjecaja. Izračunajte korisnost transporta i godišnji gubitak vode kako biste odredili prioritete ulaganja u oblaganje.';
-$ec_lang['irr_quickref_html']='<h3>Brzi vodič</h3><dl><dt>Skretna brana ili regulacijska ustava</dt><dd>Izmjerite dubinu vode uzvodno iznad krune preljeva. Koristite <a href="Weir-Flow-Simple.php">Jednostavni preljev</a> za jednoliku krunu, ili <a href="Weir-Flow-Irregular.php">Preljev nepravilnog profila</a> za profiliranu ili stepenastu krunu.</dd><dt>Zasun ili cjevovodni ispust</dt><dd>Izmjerite kotu vode uzvodno i kotu vode nizvodno (ili kotu dna ako je istjecanje slobodno). Koristite <a href="Orifice.php">Protok kroz otvor</a>. Za kružnu cijev D = promjer cijevi; za pravokutni zasun unesite širinu W i visinu D.</dd><dt>Vrijeme pražnjenja akumulacije ili ribnjaka</dt><dd>Koristite <a href="Orifice-Drain-Time.php">Vrijeme pražnjenja kroz otvor</a> za procjenu koliko je potrebno da se razina ribnjaka ili akumulacije spusti kroz otvor na dnu — korisno za planiranje akumulacija za navodnjavanje.</dd><dt>Terenski standardi</dt><dd>Ovdje korištene jednadžbe protoka kroz preljev i otvor odgovaraju postupcima iz USBR-ova <em>Water Measurement Manual</em> (3. izd.), koje obično zahtijevaju vodni upravitelji i navodnjavački okruzi.</dd></dl>';
 // Drip / Sprinkler Application Rate
 $ec_lang['ip_se']='Razmak emitera, S<sub>e</sub>';
 $ec_lang['ip_sl']='Razmak laterala, S<sub>l</sub>';
@@ -548,8 +533,6 @@ $ec_lang['ip_notes_3_def']='Modelira jedan fiksni tlak opskrbe (nema krivulje pu
 $ec_lang['ip_notes_4_def']='Christiansen, J.E. (1942). “Irrigation by sprinkling.” California Agricultural Experiment Station Bulletin 670. ASAE/ASABE standardi za mikro-navodnjavanje koriste isti pristup gubitka trenja s više izlaza.';
 $ec_lang['ip_notes_5_term']='Projektiranje Primjene';
 $ec_lang['ip_notes_5_def']='Norma primjene i tok sustava/zone koriste procijenjeni prosječan protok emitera na poljima (q<sub>avg,field</sub> — vlastiti prosječan testne laterale, ispravljeni unešenom procjenom Δtlaka), ne pogađan tok: PR = q<sub>avg,field</sub> / A<sub>e</sub>, hranjena ispravljenom modeliranom vrijednosti. Razmak i broji laterala/emitera na razini cijelog sustava su odvojeni unosi jer testni put modelira samo jednu najgoru granu, ne svaku lateralu u poljima.';
-$ec_lang['irr_card_pressure_head']='Tlak navodnjavanja i jednolikost';
-$ec_lang['irr_card_pressure_desc']='Modelirajte profil tlaka i protoka duž grane glavni vod-lateral-emiter kako biste procijenili jednolikost distribucije iz stvarnog tlaka testnog puta, a ne samo kataloškog protoka emitera.';
 
 
 

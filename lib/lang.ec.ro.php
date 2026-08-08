@@ -341,21 +341,6 @@ $ec_lang['odt_sketch_end']='Sfârșit';
 // Contact us.
 
 // Irrigation
-$ec_lang['irr_main_menu']='Irigare';
-$ec_lang['irr_main_title']='Calculatoare Online Gratuite pentru Măsurarea Debitului de Irigare';
-$ec_lang['irr_main_desc']='Măsurarea Debitului de Irigare — Deversoare și Orificii';
-$ec_lang['irr_intro_html']='<p>Deversorele și orificiile sunt instrumentele standard de teren pentru măsurarea debitului de apă în sistemele de irigații. Selectați calculatorul care corespunde structurii dvs.:</p>';
-$ec_lang['irr_card_weir_uniform_head']='Deversor — Prag Lat (Lățime Uniformă)';
-$ec_lang['irr_card_weir_uniform_desc']='Măsurați debitul peste creasta unui baraj de derivație, a unui stăvilar de control, sau a unei plăci deversoare. Introduceți lungimea deversorului și adâncimea apei în amonte deasupra crestei.';
-$ec_lang['irr_card_weir_irregular_head']='Deversor — Profil Neregulat';
-$ec_lang['irr_card_weir_irregular_desc']='Utilizați atunci când creasta deversorului variază ca elevație sau profil — preaplinuri naturale, structuri de cădere cu lățime variabilă sau structuri de control cu mai multe secțiuni.';
-$ec_lang['irr_card_orifice_head']='Orificiu — Vană de Cap sau Branșament de Conductă';
-$ec_lang['irr_card_orifice_desc']='Măsurați debitul printr-o vană glisantă, un branșament de conductă sau orificiul unui podeț. Gestionează automat atât descărcarea liberă, cât și condițiile înecate (apă din aval).';
-$ec_lang['irr_card_canal_head']='Proiectarea & Analiza Canalului';
-$ec_lang['irr_card_canal_desc']='Proiectați sau verificați un canal de irigații utilizând formula Manning. Folosiți calculatorul Trapezoidal pentru canale noi; calculatorul Neregulat pentru secțiuni naturale sau construite existente.';
-$ec_lang['irr_card_seepage_head']='Infiltrația Canalului & Eficiența de Transport';
-$ec_lang['irr_card_seepage_desc']='Estimați pierderile prin infiltrație dintr-un tronson de canal folosind măsurătorile de influx și eflux. Calculați eficiența de transport și volumul anual de apă pierdut pentru a ajuta la prioritizarea investițiilor în căptușire.';
-$ec_lang['irr_quickref_html']='<h3>Referință Rapidă</h3><dl><dt>Baraj de derivație sau stăvilar de control</dt><dd>Măsurați adâncimea apei în amonte deasupra crestei deversorului. Utilizați <a href="Weir-Flow-Simple.php">Deversor Simplu</a> pentru o creastă uniformă, sau <a href="Weir-Flow-Irregular.php">Deversor Neregulat</a> pentru o creastă profilată sau în trepte.</dd><dt>Vană de cap sau branșament de conductă</dt><dd>Măsurați cota apei în amonte și cota apei în aval (sau cota radierului dacă descărcarea este liberă). Utilizați <a href="Orifice.php">Debit prin Orificiu</a>. Pentru o conductă circulară, D = diametrul conductei; pentru o vană dreptunghiulară, introduceți lățimea W și înălțimea D.</dd><dt>Timpul de golire a unui rezervor sau iaz</dt><dd>Utilizați <a href="Orifice-Drain-Time.php">Timp de Golire prin Orificiu</a> pentru a estima cât timp durează coborârea nivelului unui iaz sau rezervor printr-un orificiu de fund — util pentru planificarea stocării apei de irigație.</dd><dt>Standarde de teren</dt><dd>Ecuațiile de debit pentru deversor și orificiu utilizate aici corespund procedurilor din USBR <em>Water Measurement Manual</em> (ediția a 3-a), solicitate frecvent de administratorii de apă și districtele de irigații.</dd></dl>';
 // Drip / Sprinkler Application Rate
 $ec_lang['ip_se']='Distanța dintre emițătoare, S<sub>e</sub>';
 $ec_lang['ip_sl']='Distanța dintre laterale, S<sub>l</sub>';
@@ -548,8 +533,6 @@ $ec_lang['ip_notes_3_def']='Modelează o singură presiune de alimentare fixă (
 $ec_lang['ip_notes_4_def']='Christiansen, J.E. (1942). “Irrigation by sprinkling.” Buletin 670 al Stației de Experiment Agricol California. Standardele ASAE/ASABE pentru proiectarea microirigației folosesc aceeași abordare a pierderii prin frecare cu ieșiri multiple.';
 $ec_lang['ip_notes_5_term']='Proiectarea Aplicației';
 $ec_lang['ip_notes_5_def']='Rata de aplicare și debitul sistemului/zonei folosesc debitul mediu estimat al emițătorului pe teren (q<sub>avg,field</sub> — media proprie a lateralului test, corectată prin estimarea Δpresiune introdusă), nu o rată ghicită: PR = q<sub>avg,field</sub> / A<sub>e</sub>, alimentată de valoarea modelată corectată. Distanța și numărul de laterale/emițători la nivelul întregului sistem sunt intrări separate aici, deoarece calea test modelează doar o singură ramură de caz cel mai defavorabil, nu fiecare lateral din teren.';
-$ec_lang['irr_card_pressure_head']='Presiune de Irigație & Uniformitate';
-$ec_lang['irr_card_pressure_desc']='Modelați profilul de presiune și debit de-a lungul unei ramuri principal-lateral-emițător pentru a estima uniformitatea distribuției din presiunea reală a căii test, nu doar dintr-un debit de catalog al emițătorului.';
 
 
 

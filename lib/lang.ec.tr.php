@@ -345,21 +345,6 @@ $ec_lang['odt_sketch_end']='Bitiş';
 // Contact us.
 
 // Irrigation
-$ec_lang['irr_main_menu']='Sulama';
-$ec_lang['irr_main_title']='Ücretsiz Çevrimiçi Sulama Akışı Ölçüm Hesaplayıcıları';
-$ec_lang['irr_main_desc']='Sulama Akışı Ölçümü — Savaklar ve Orifisler';
-$ec_lang['irr_intro_html']='<p>Savaklar ve orifisler, sulama sistemlerinde su akışını ölçmek için standart saha araçlarıdır. Yapınıza uygun hesaplayıcıyı seçin:</p>';
-$ec_lang['irr_card_weir_uniform_head']='Savak — Geniş Eşik (Tekdüze Genişlik)';
-$ec_lang['irr_card_weir_uniform_desc']='Bir derivasyon barajının kreti, kontrol yapısı veya savak tahtası üzerindeki akışı ölçün. Savak uzunluğunu ve kret üzerindeki su yükünü girin.';
-$ec_lang['irr_card_weir_irregular_head']='Savak — Düzensiz Profil';
-$ec_lang['irr_card_weir_irregular_desc']='Savak kreti yükseklik veya profil bakımından değiştiğinde kullanın — doğal dolusavaklar, değişken genişlikli düşü yapıları veya çok kesimli kontrol yapıları.';
-$ec_lang['irr_card_orifice_head']='Orifis — Baş Kapak veya Boru Çıkışı';
-$ec_lang['irr_card_orifice_desc']='Bir sürgülü kapak, boru çıkışı veya menfez açıklığından geçen akışı ölçün. Hem serbest akış hem de batık (kuyruk suyu) koşullarını otomatik olarak işler.';
-$ec_lang['irr_card_canal_head']='Kanal Tasarımı & Analizi';
-$ec_lang['irr_card_canal_desc']='Manning formülünü kullanarak bir sulama kanalı tasarlayın veya kontrol edin. Yeni kanallar için Trapez hesaplayıcısını; mevcut doğal veya yapay kesitler için Düzensiz hesaplayıcısını kullanın.';
-$ec_lang['irr_card_seepage_head']='Kanal Sızıntısı & İletim Verimliliği';
-$ec_lang['irr_card_seepage_desc']='Giriş ve çıkış ölçümlerini kullanarak bir kanal güzergahındaki sızıntı kaybını tahmin edin. İletim verimliliğini ve yıllık su kaybını hesaplayarak astar yatırımlarının önceliklendirilmesine yardımcı olun.';
-$ec_lang['irr_quickref_html']='<h3>Hızlı Başvuru</h3><dl><dt>Derivasyon barajı veya kontrol yapısı</dt><dd>Savak kreti üzerindeki memba su derinliğini ölçün. Tekdüze bir kret için <a href="Weir-Flow-Simple.php">Basit Savak Akışı</a>\'nı, profilli veya kademeli bir kret için <a href="Weir-Flow-Irregular.php">Düzensiz Savak Akışı</a>\'nı kullanın.</dd><dt>Baş kapak veya boru çıkışı</dt><dd>Memba su yüzü kotunu ve mansap su yüzü kotunu ölçün (serbest akışta taban kotunu kullanın). <a href="Orifice.php">Orifis Akışı</a>\'nı kullanın. Dairesel bir boru için D = boru çapı; dikdörtgen bir kapak için genişlik W ve yükseklik D girin.</dd><dt>Rezervuar veya gölet boşalma süresi</dt><dd>Bir gölet veya rezervuarı taban orifisinden ne kadar sürede boşaltacağınızı tahmin etmek için <a href="Orifice-Drain-Time.php">Orifis Boşalma Süresi</a>\'ni kullanın — sulama depolama planlaması için kullanışlıdır.</dd><dt>Saha standartları</dt><dd>Burada kullanılan savak ve orifis akış denklemleri, su yöneticileri ve sulama birlikleri tarafından genellikle şart koşulan USBR <em>Water Measurement Manual</em> (3. baskı) prosedürleriyle örtüşür.</dd></dl>';
 // Drip / Sprinkler Application Rate
 $ec_lang['ip_se']='Damlatıcı aralığı, S<sub>e</sub>';
 $ec_lang['ip_sl']='Lateral aralığı, S<sub>l</sub>';
@@ -552,8 +537,6 @@ $ec_lang['ip_notes_3_def']='Tek bir sabit besleme basıncı (pompa eğrisi yok),
 $ec_lang['ip_notes_4_def']='Christiansen, J.E. (1942). “Irrigation by sprinkling.” California Tarımsal Deneme İstasyonu Bülteni 670. ASAE/ASABE mikrosulama tasarımı standartları aynı çok çıkışlı sürtünme-kayıp yaklaşımını kullanır.';
 $ec_lang['ip_notes_5_term']='Uygulama Tasarımı';
 $ec_lang['ip_notes_5_def']='Uygulama oranı ve sistem/bölge debi tahmini saha-ortalama damlatıcı debisini (q<sub>avg,field</sub> — test lateral\'inin kendi ortalaması, girilen Δbasınç tahmini tarafından düzeltilmiş), tahmin edilen oran değil kullanır: PR = q<sub>avg,field</sub> / A<sub>e</sub>, düzeltilmiş modellenen değer tarafından beslenmiş. Aralık ve sistem-geniş lateral/damlatıcı sayıları ayrı girdilerdir çünkü test yolu sadece bir en kötü durum dalı modeller, sahada her lateral değil.';
-$ec_lang['irr_card_pressure_head']='Sulama Basıncı ve Dağılım Düzgünlüğü';
-$ec_lang['irr_card_pressure_desc']='Dağılım düzgünlüğünü, yalnızca katalog damlatıcı debisinden değil gerçek test yolu basıncından tahmin etmek için bir ana hat-lateral-damlatıcı dalı boyunca basınç ve debi profilini modelleyin.';
 
 
 
