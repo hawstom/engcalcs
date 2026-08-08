@@ -46,8 +46,13 @@ $ec_icons = array(
 	'edit'       => '<path d="M4 20h4L20 8l-4-4L4 16z"/><path d="M14 6l4 4"/>',
 	'insert'     => '<path d="M12 5v14M5 12h14"/>',
 	'view'       => '<path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="2.5"/>',
-	// A spoked gear rather than a toothed one: at 14px real teeth turn into a grey ring.
-	'settings'   => '<circle cx="12" cy="12" r="3.2"/><path d="M17.2 12h2.4M15.7 8.3l1.7-1.7M12 6.8V4.4M8.3 8.3L6.6 6.6M6.8 12H4.4M8.3 15.7l-1.7 1.7M12 17.2v2.4M15.7 15.7l1.7 1.7"/>',
+	// Tom, 2026-08-08: "It looks a little too much like a light/sun instead of a gear. Gear teeth
+	// are short, not long like rays of light." The first version was a small hub with eight long
+	// strokes starting well outside it, and the GAP was the whole problem — a mark that floats away
+	// from its centre is a ray, and eight rays around a disc is a sun whatever you meant by it.
+	// Teeth now start ON the gear body and protrude about a fifth of its radius, which is roughly
+	// what real gear teeth do. The bore in the middle is what a sun can never have.
+	'settings'   => '<circle cx="12" cy="12" r="6.5"/><circle cx="12" cy="12" r="2.4"/><path d="M18.5 12h1.3M16.6 7.4l.9-.9M12 5.5V4.2M7.4 7.4l-.9-.9M5.5 12H4.2M7.4 16.6l-.9.9M12 18.5v1.3M16.6 16.6l.9.9"/>',
 
 	// ---- File ----
 	'new'        => '<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/>',
