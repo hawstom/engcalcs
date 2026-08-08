@@ -3,7 +3,7 @@
 ```
 cd dev/browser-pass
 npm install          # once — playwright-core; the Chromium binary is already cached
-node run.js          # everything — 131 checks, about a minute
+node run.js          # everything — 135 checks, about a minute
 node run.js locking  # one section
 ```
 
@@ -58,12 +58,13 @@ would advance the file's modified time and trip the very freshness check these c
 As of 2026-08-06, after the §H pass and the specs it produced, the honest answer is **one retest**:
 
 - **§H4 / §10 — a file moved or renamed in Explorer.** Save it, move the file, edit, press Save.
-  Expect an **amber banner** and **Choose the file again**, and the asterisk to stay lit. Tom found
-  this reported as a successful save twice; the fix (read the file back after writing and compare its
-  size) is in, and only a real folder can prove it — OPFS recreates a deleted file through its old
-  handle, so the runner cannot produce the condition at all. It reproduces the page's *answer* by
-  handing it a handle whose writes are discarded, which is not the same thing as proving what Chrome
-  does to a real Explorer rename.
+  Expect an **amber banner**, **Choose the file again**, the asterisk still lit, and **no new file at
+  the old name**. Tom reported this as a successful save twice, for two different reasons — the
+  second being that moving a file does not make the write fail at all: `createWritable()` recreates
+  it at the old path, so the save genuinely succeeds and you are left editing a file you did not
+  choose. Both are fixed and **the runner now tests this** (OPFS turned out to behave exactly like a
+  real folder, which retired the excuse for skipping it). It stays here because a real Explorer move
+  on a real NTFS path is still the only proof that matters.
 
 Everything else in `dev/lpn-file-lock-test-punchlist.md` is now `[x]` or `[auto]`, and its remaining
 empty boxes are in the **Appendix**, which is history and is never to be worked.

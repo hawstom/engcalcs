@@ -34,24 +34,24 @@ exports.run = async function ({ browser, report }) {
 		await a.menuClick('Save');
 		await a.settle(400);
 
-		const banner = await a.banner();
-		const recreated = await a.readFile(FILE) !== null;
-		if (recreated) {
-			// **OPFS recreates the file through the old handle**, so the write SUCCEEDS and the page
-			// has nothing to report — correctly. A real folder does not behave this way: Chrome's
-			// handle to a deleted file throws NotFoundError, which is the branch that raises the
-			// banner. This environment therefore cannot produce §10's condition at all, and saying
-			// FAIL here would be blaming the page for the sandbox.
-			report.skip('Save on a missing file warns and offers "Choose the file again"',
-				'OPFS silently recreates a deleted file, so the failure this tests cannot happen here — stays a human check');
-			report.ok(!(await a.currentTabDirty()),
-				'the write really did land, so the asterisk clearing is honest here');
-		} else {
-			report.ok(!!banner, 'Save on a missing file says something rather than nothing');
-			report.ok(banner && (banner.buttons || []).includes('Choose the file again'),
-				'and offers the way back', banner ? banner.buttons.join(' / ') : '');
-			report.ok(await a.currentTabDirty(), 'the tab still wears its asterisk — the work is NOT in a file');
-		}
+		// **This turned out NOT to be a sandbox artefact.** The first version of this spec skipped
+		// here, on the reasoning that OPFS recreates a deleted file through its old handle while a
+		// real folder throws. Tom's §H4 retest proved otherwise — *"It saves silently"* — because
+		// Chrome does the same thing with a real file: `createWritable()` on a handle whose file has
+		// been moved RECREATES it at the old path. The write succeeds, the read-back matches, and the
+		// user is left editing a file they did not choose while their moved copy goes stale.
+		//
+		// So the check that catches it is the BASELINE, not the write: we have read this file before,
+		// and now it cannot be read, so it is gone.
+		const banner = await a.waitBanner(2000);
+		report.ok(!!banner, 'Save on a file that has gone says so rather than silently recreating it');
+		report.ok(banner && /moved, renamed, or deleted|Could not write/.test(banner.text || ''),
+			'and names what probably happened', banner ? (banner.text || '').slice(0, 80) : '');
+		report.ok(banner && (banner.buttons || []).includes('Choose the file again'),
+			'and offers the way back', banner ? banner.buttons.join(' / ') : '');
+		report.ok(await a.currentTabDirty(), 'the tab keeps its asterisk — the work is NOT in a file');
+		report.eq(await a.readFile(FILE), null,
+			'and it did NOT quietly recreate the file the user moved away');
 		// --- the write that goes nowhere ---------------------------------------
 		// The real §10 failure, reproduced the only way OPFS allows: a handle whose writes are
 		// discarded. This is Tom's 2026-08-06 report — "It neither complains nor creates a new file.

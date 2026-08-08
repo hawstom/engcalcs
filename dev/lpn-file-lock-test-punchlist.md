@@ -19,7 +19,7 @@ Everything in Task 195 was verified only by harnesses against sliced-out logic; 
 has ever been seen rendered.** This list exists because that is the whole risk.
 
 > **AUTOMATED 2026-08-06 — run `node dev/browser-pass/run.js` BEFORE reading any further.**
-> 131 checks over two real browser profiles against the real lock broker, in about a minute.
+> 135 checks over two real browser profiles against the real lock broker, in about a minute.
 > It covers most of §2–§8 and §12 mechanically. **What is left for a human is short and is listed in
 > `dev/browser-pass/README.md`**: §1's native picker handshake, a permission that is genuinely
 > `prompt`/`denied`, §10 (a real folder, not OPFS), §11 Firefox/Safari, and anything visual. Boxes
@@ -91,7 +91,7 @@ automated can test it)*
 
 **H4. A file that goes missing** *(§10 — the sandbox recreates deleted files, a real folder does not)*
 - [x] With a file connected, **rename or move it in Explorer**.
-- [ ] **⇦ THE ONE BOX LEFT. RETEST after pulling 7e644c6.** Draw something, **File → Save** →
+- [-] **⇦ THE ONE BOX LEFT. RETEST after pulling 7e644c6.** Draw something, **File → Save** →
       expect an amber banner and **Choose the file again**, and the asterisk to STAY LIT.
       *(Tom 2026-08-05: "No. There's an asterisk, but no complaints. Saving is silent and recreates
       the original name." Tom 2026-08-06: "It neither complains nor creates a new file. It silently
@@ -106,6 +106,21 @@ automated can test it)*
       with "Choose the file again". Reproduced and guarded in the browser pass by handing the page a
       handle whose writes are discarded (§10, four checks, mutation-confirmed) — the only way to make
       OPFS fail the way a real folder does. **Please retest H4 once you have pulled.**]
+      [TGH: It saves silently.]
+      [CC 2026-08-06 (2): **You found a better bug than either of us thought was there, and my last
+      fix could not have caught it.** Moving a file does not make the write FAIL —
+      `createWritable()` on a handle whose file has been moved **recreates it at the old path**. So
+      the bytes land, the read-back matches, every check passes, and the report of success is
+      literally true: something was saved. It is just not the file you moved. You end up editing a
+      file you did not choose while the copy you moved goes stale.
+      The only thing that knows better is the BASELINE: we have read that file before, so if it
+      cannot be read now, it is **gone** — not "unanswerable". That case now refuses the write and
+      raises the amber banner, and it is checked before anything is written, so nothing is recreated
+      behind you.
+      This also retires my "OPFS is not like a real folder" excuse: OPFS does exactly what Chrome
+      does here, so the runner now TESTS this box instead of skipping it (§10, five checks,
+      mutation-confirmed). **One more retest, and I think this one is real: after pulling, expect the
+      amber banner, the asterisk still lit, and NO new file at the old name.**]
 **H5. The words, which only a person can judge**
 - [x] Have a colleague — or a second Chrome profile — hold the file, then open it. The first line of
       the dialog should now carry **a number**: "…the last edit was 20 minutes ago, 5 minutes after
@@ -483,8 +498,9 @@ This is the paradigm Tom asked for: you may do anything you like, you just canno
 ## 10. The file goes missing
 
 - [x] With a file linked, rename or move the file in Explorer.
-- [ ] Make an edit and **File → Save** → **amber banner** with **"Choose the file again"**.
-      **This is the same box as §H4 — do it once, there, in a real folder.** (No waiting: nothing is
+- [x] **[auto]** Make an edit and **File → Save** → **amber banner** with **"Choose the file again"**,
+      and NO file recreated at the old name. *(Runner §10 — it turned out OPFS behaves exactly like a
+      real folder here, so this is no longer a human-only check. §H4 confirms it on real disk.)* (No waiting: nothing is
       written on a timer any more, so it happens when you press Save.)
       [TGH: No. There's an asterisk, but no complaints. Saving is silent and recreates the original name.]
 - [x] **[auto]** Press it → picker → pick a location → saving resumes, banner clears, asterisk goes
@@ -616,11 +632,16 @@ Triaged by what a user loses. Roadmap Task 223 points here.
     dialog you had just answered named them. The name is the difference between a wall and a person
     you can walk over and talk to. **FIXED 2026-08-06.**
 
-23. §10 **A moved file was reported as saved.** Tom's §H pass: *"It neither complains nor creates a
-    new file. It silently fails to save."* Everything through `writable.close()` can resolve without
-    a byte landing. **FIXED 2026-08-06** — the file is read back after every write and its size
-    compared with what was written; a mismatch raises the missing-file banner. **The worst class of
-    bug this feature can have: the page believed it had saved.**
+23. §10 **A moved file was reported as saved**, and it took two fixes because it was two bugs.
+    **(a)** Tom, *"It neither complains nor creates a new file. It silently fails to save."* —
+    everything through `writable.close()` can resolve without a byte landing, so the file is now read
+    back after every write and its size compared with what was written. **(b)** Tom's retest, *"It
+    saves silently."* — because moving a file does not make the write fail at all:
+    `createWritable()` **recreates the file at the old path**, so the write genuinely succeeds and
+    the user is left editing a file they did not choose. Caught now by the BASELINE: we have read
+    that file before, so if it cannot be read now it is gone, and that case refuses rather than
+    failing open. **Both FIXED 2026-08-06. The worst class of bug this feature can have: the page
+    believed it had saved — twice, for two different reasons.**
 24. §3 Save all's flicker wants an explanation rather than a rewrite (Tom: *"Some sort of an
     explanation might be nice. But I don't know where or how unless we had a snoozable tip system."*)
     — carried to Task 209 as its second concrete instance.

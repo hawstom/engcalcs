@@ -1731,12 +1731,22 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     **`Accept-Language: *` 500'd every page in the suite** on PHP 8; and arriving-then-reloading
     emptying the tab strip. Then three more while writing the specs: a dismissed change-banner
     silencing later refusals, and the read-only banner not naming who holds the file.
-  - **Grown to 131 checks 2026-08-06** as Tom's §H answers came back: §9 (an unreachable broker, a
+  - **Grown to 135 checks 2026-08-06** as Tom's §H answers came back: §9 (an unreachable broker, a
     broker that ANSWERS a setup fault, a full lock directory, and when a warning may be dismissed),
     §6-saveas (every Save-as guard, run twice — once with the broker unreachable, because a guard
     against destroying somebody's work that needs a server is not a guard), §11 (the fallback branch,
     reached by deleting the one property the page tests), §10's relink, and read-only surviving a tab
     switch. **The punch list is now down to a single open box** — §H4, a file moved in a real folder.
+  - **A moved file was reported as saved, and it was TWO bugs** (Tom, §H4, twice). The first: a write
+    can resolve without a byte landing, so the file is now read back and its size compared. The
+    second, which the first fix could not have caught: **moving a file does not make the write fail
+    at all** — `createWritable()` recreates it at the old path, so the save genuinely succeeds and
+    the user is left editing a file they did not choose while their moved copy goes stale. Only the
+    BASELINE knows better: we have read that file before, so if it cannot be read now it is gone —
+    the one case where an unreadable file must not fail open. **Lesson: "the write succeeded" and
+    "your work is in the file you meant" are different claims, and only the second is worth making.**
+    It also retired the excuse for skipping §10 in the runner: OPFS does exactly what Chrome does
+    here, so it is tested rather than deferred.
   - **It found one more defect on the way**: a Save whose pre-write lock re-check failed said nothing.
     The block cleared the "locking is not working" banner when the broker came back but never raised
     it when the broker went away mid-session — recovery without onset — so a Save that could not

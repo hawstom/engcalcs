@@ -2501,6 +2501,26 @@ var EngCalcs = EngCalcs || {};
 		}
 		return stamp;
 	}
+	// **Is the file we were connected to still there at all?**
+	//
+	// Tom, 2026-08-06, after the read-back fix went in: *"It saves silently."* He had moved the file
+	// in Explorer, and the save still reported success — because it WAS a success. A handle whose
+	// file has been moved or deleted does not fail on write: `createWritable()` RECREATES the file at
+	// the old path, so the bytes land, the read-back matches, and every check we had was satisfied.
+	// The user is then editing a file they did not choose, in a folder they moved it out of, with a
+	// second copy of their project sitting where the first one used to be. (OPFS behaves the same
+	// way, which is why the browser pass can now test this instead of skipping it.)
+	//
+	// The only thing that knows better is the BASELINE. If we have a stamp for this project, we have
+	// read that file before; if it cannot be read now, it is gone — not "unanswerable". That is the
+	// one case where a failure to read must NOT fail open, and it is the difference between the two
+	// questions this pair asks: `fileChangedUnderneath` is "is this still the same file?", and this
+	// is "is there a file here at all?".
+	async function fileVanished(id, handle) {
+		if (!knownStamp(id) || !handle || !handle.getFile) { return false; }
+		try { await handle.getFile(); return false; }
+		catch (err) { return true; }
+	}
 	// Has somebody else written to this file since we last saw it?
 	//
 	// Returns false when the question cannot be answered (unreadable file, no stamp on record). That
@@ -2551,6 +2571,14 @@ var EngCalcs = EngCalcs || {};
 					enterReadOnly(lockHolderName(lockNow));
 					return false;
 				}
+			}
+			// Gone entirely, rather than merely different. Checked BEFORE the freshness comparison
+			// because that one cannot answer this: an unreadable file leaves it with nothing to
+			// compare and it fails open, which is right for "we never had a baseline" and exactly
+			// wrong for "the file we had is missing".
+			if (await fileVanished(id, handle)) {
+				setFileError(true);
+				return false;
 			}
 			// **THE GUARANTEE** (Tom, 2026-08-05). The lock above is a courtesy and can be stale --
 			// deliberately so, now that a claim survives a minimise. What actually protects a
