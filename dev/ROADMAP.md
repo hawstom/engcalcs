@@ -1282,6 +1282,26 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   changed the invitation's wording, placement, and dismiss affordance suite-wide on 2026-08-03. With
   no instrument, "fixed" and "still broken" look identical for another several months, and neither
   change can be credited or ruled out. Every month without the beacon burns evidence.
+  **BUILD PLAN, verified against the code 2026-08-06 — this is the next task.** Two numbers, two
+  different mechanisms, and the difference is the only non-obvious part:
+  - **The view is already 90% built and silently doing nothing.** `maybeLogHumanView()` fires on
+    every page that loads `js/Calculators.lib.js`, including `contact.php` — but it posts
+    `page: EngCalcs.cookieName`, and `cookieName` is written by `echoCookieScript()`
+    (`lib/Calculators.lib.php:279`), which a non-calculator page never calls. So it posts an empty
+    page name and `log-human-view.php` answers 400. Giving `contact.php` a page name is the whole
+    fix for half this task; no new endpoint, no new log.
+  - **The send must be logged SERVER-SIDE, in `formmail.php`'s success branch** (it is the `if
+    (mail(...))` at line 80), NOT by a beacon. Rejected alternative, so it is not re-litigated: a
+    beacon fired from the form's submit handler races the navigation AND cannot know whether the
+    send succeeded — it would count attempts, and attempts are exactly what we already cannot
+    distinguish from successes. `formmail.php` knows the truth and is already on the page.
+  - **It must honour the opt-out** (`ecLoggingOptedOut()`, Task 210) like the other three writers —
+    which is easier server-side than in a beacon, since the function is right there.
+  - **Match the existing log line format** (`lib/config.inc.php`, `log-calc-event.php`) so whatever
+    reads the other three logs reads this one. One new constant beside `HUMAN_VIEW_LOG`.
+  - **Do not add a third question.** Invitation clicks and sends. The temptation to log the referring
+    page, the language, the message length and so on is how a two-number instrument becomes a project
+    nobody finishes, and none of those answer "is the form the barrier?".
   Context, now fixed: `formmail.php:90` carried a bare `<?` short open tag — the only one in the
   repo. It parses only where `short_open_tag=On`, which production evidently still is (Tom's tests
   send successfully), but any PHP upgrade or host move would have silently killed the contact form,
