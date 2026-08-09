@@ -6,6 +6,30 @@ A PHP/JS suite of hydraulic engineering calculators. 12 calculators, 11 language
 
 **License:** GNU GPL v3 or later. Copyright 2009 Thomas Gail Haws.
 
+## Git Workflow
+
+**Commit and push by default, without asking, at the end of every piece of work in this repo.**
+This overrides the general assistant default of only committing when explicitly asked — Tom's
+standing instruction (2026-08-09) is that he *always* wants completed work committed and pushed
+here, and a docs gap that left this ambiguous is itself the bug to fix, not a reason to keep asking.
+
+- **Work directly on `master`.** No feature branches, no `git checkout -b` — see the branching
+  decision below. Commit straight to `master` and push to `origin/master`.
+- **Only exception: the user explicitly says to leave something uncommitted** (e.g. "don't commit
+  this yet", "let me look first"). Silence is not that signal — silence means commit and push.
+- **Still exercise judgment about *what* lands in the commit** — the general Git Safety Protocol
+  still applies (don't commit likely-secret files, review a broad `git add`, prefer a new commit
+  over amending, never force-push or skip hooks without being asked). "Commit by default" answers
+  *whether* to commit; it does not waive care about *what* gets committed.
+- **Report the push state unabridged at the end of the work**, unprompted: the commit SHA and
+  confirmation it is on `origin/master` (`git log --oneline origin/master..master` should be
+  empty). Never tell Tom to `git pull` before verifying the push actually landed.
+
+**Why direct to `master`, no branches:** Tom, 2026-07-29 — the project is simple enough to stay on
+one branch. It's live on preview and master, and per-task branches accumulated as stale refs
+needing periodic manual cleanup. "We are no longer branching by habit." This is specific to
+engcalcs; it is not a general "never branch" rule for other projects.
+
 ## How to Add a New Calculator
 
 1. Copy an existing calculator file (e.g. `Manning-Pipe-Flow.php`) as your starting point.
