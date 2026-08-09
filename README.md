@@ -40,7 +40,7 @@ a calculator page and go.
 | [Hazen-Williams Pipe Head Loss](Hazen-Williams.php) | Pressure pipe head loss (Hazen-Williams) |
 | [Darcy-Weisbach Pipe Head Loss](Darcy-Weisbach.php) | Pressure pipe head loss (Darcy-Weisbach / Swamee-Jain) |
 | [Branched Pipe Network](Branched-Network.php) | Distributary/tree pipe network solver |
-| [Looped Pipe Network](Looped-Network.php) *(preview)* | Draw a looped network — junctions, pipes, reservoirs, pumps — on a scaled backdrop image and solve it. Global gradient algorithm, checked against EPANET's own engine |
+| [Looped Pipe Network](Looped-Network.php) | Draw a looped network — junctions, pipes, reservoirs, pumps — on a scaled backdrop image and solve it. Global gradient algorithm, checked against EPANET's own engine |
 | [Manning Trapezoidal Channel](Manning-Trap.php) | Open-channel flow, trapezoidal geometry |
 | [Manning Irregular Channel](Manning-Irregular.php) | Open-channel flow, surveyed (station/elevation) cross-sections |
 | [Rock Chute Design (Robinson)](Rock-Chute.php) | Steep-channel rock lining sizing |

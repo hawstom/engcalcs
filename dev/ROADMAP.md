@@ -1119,10 +1119,16 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     with no tier that can be revoked.
   - **Unverified, do not claim publicly until checked:** their actual language count. Their help
     centre is Notion and did not scrape; only Spanish was confirmed.
-  - **Why not lead with it (Tom asked 2026-08-09, and this was missing):** because on that exact
-    claim they are already better and free, so the comparison a reader runs next is one we lose.
-    Lead where they have publicly conceded the ground — phone/field use, 26 languages, offline PWA,
-    GPL that cannot be revoked. Adopting WASM (Task 243) does not change this.
+  - **Why not lead with it as a TAGLINE:** on that exact claim they are already better and free, so
+    the comparison a reader runs next is one we lose. Lead where they have publicly conceded the
+    ground — phone/field use, 26 languages, offline PWA, GPL that cannot be revoked.
+  - **TOM OVERRULED THE BROADER VERSION OF THIS, 2026-08-09, and he is right:** *"I disagree with
+    not leading with EPANET engine once we have it. I think it could be a litmus test for some
+    orgs."* The two claims are about different things. Mine was about the consumer-facing headline;
+    his is about **qualification** — for some agencies and NGOs "does it run the actual EPANET
+    engine?" is a yes/no gate that decides whether we get evaluated at all, and no amount of
+    mobile/multilingual advantage substitutes for a "yes". **So: say it prominently and make it
+    checkable; just do not spend the blog/video headline on it.** Do not relitigate.
   - Consequence: raised 146.06 to 90 and 220 to 95.
 
 - 45|243| **Run the real EPANET engine in `lpn_` via WASM — as a second engine, not a replacement.**
@@ -1144,17 +1150,28 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     low bandwidth). **Therefore: keep `lpn-solver.js` as the default fast path, load WASM lazily only
     when a feature needs it.** Keep our pre-solve structural diagnostics either way — EPANET returns
     numeric error codes, which is worse UX than what we already ship.
-  - **Correction of a premise:** Tom wrote "easier than translating lpn into 26 languages." These are
-    unrelated — the engine has no UI. Every label stays ours to translate, and surfacing EPANET's
-    error messages would *add* strings.
+  - **THE SHAPE, settled 2026-08-09: an opt-in "Solve with the EPANET engine" toggle, off by
+    default.** Tom accepted the cost argument and asked for *"something minimal about the EPANET
+    engine, even if it's only an option that we don't normally have active."* That is the whole
+    design: lazy-load the 159 KB only when the toggle is flipped, so the default keystroke path
+    keeps its 0.4 ms synchronous solve and the offline bundle stays small — while the claim becomes
+    literally true and verifiable, which is what Task 222's litmus-test point needs. Build the
+    toggle before building tanks/valves/EPS; it is the cheap 90% of the value.
+  - Do not surface EPANET's numeric error codes wholesale — Tom, 2026-08-09: *"maybe we don't have
+    to present or translate most of them."* Map the few that matter onto our existing diagnostics.
 
 - 40|244| **Standardize the distinguishing term, and put it in the navbar next to the language menu.**
   Tom, 2026-08-09, on epanet-js labelling itself "Open Source" while shipping FSL. `About.php` is
   done (heading is now "Free Libre Open Source License", plus a "promise, not a price" paragraph).
-  Open: **the navbar item.** Recommendation — do *not* put "Libre Software" there. It is insider
-  vocabulary, and it translates unevenly: perfect in es/pt/fr/it/ro ("Software Libre"), meaningless
-  as a loan in am/km/my/ur. Put the GitHub mark plus a plain promise ("Free forever" / "Source code")
-  by the language menu, and keep the precise license taxonomy on About.php where there is room for it.
+  Open: **the navbar item** — GitHub mark plus a short word, by the language menu.
+  - **"Forever" is out.** Tom, 2026-08-09: *"I don't make promises."* Applies to nav copy generally,
+    not just this item. (He kept "now and forever" inside the About.php license paragraph, where it
+    describes the GPL's effect rather than pledging his own future conduct.)
+  - **"Libre" is back in play.** My objection was that it is insider vocabulary; Tom's counter is
+    LibreOffice, which has normalized the word for a decade. Concede the point. Live candidates:
+    **"Libre Software"**, **"Freely yours"**, **"Community software"**.
+  - The translation caveat still stands and is the tiebreak: "Libre" lands perfectly in
+    es/pt/fr/it/ro and as an opaque loan in am/km/my/ur. "Freely yours" translates everywhere.
   **[H] Tom picks the navbar wording before this is built.**
 
 - 40|245| **Resync `about_body_html` + `about_main_desc` into 26 languages.** English changed
