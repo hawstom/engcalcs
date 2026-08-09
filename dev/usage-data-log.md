@@ -214,3 +214,52 @@ If `zh` is truly ~60% like its peers, expected using at n=30 is 18. If it is tru
 Those do not overlap, so n=30 decides it. **Do not spend on `zh` before then, and do not re-score its
 QUALITY either way.**
 
+
+---
+
+## 2026-08-09 — per-calculator reach / shopping / using
+
+Supplied by Tom, with his own reading: *"lpn has risen fast… these complicated calculators (lpn, ip,
+bpn, and even mi and wi to a lesser extent) will never have the same used/shopping as the easy
+calculators (mpf and mtc), and yet lpn is already outperforming ip and bpn on that measure."*
+
+| page | reach | shopping | using | %shop of reach | %use of shop |
+|---|---:|---:|---:|---:|---:|
+| Manning-Pipe-Flow | 6963 | 2831 | 1979 | 41% | 70% |
+| Manning-Trap | 3803 | 421 | 276 | 11% | 66% |
+| Hazen-Williams | 2606 | 111 | 64 | 4% | 58% |
+| Manning-Irregular | 2282 | 85 | 49 | 4% | 58% |
+| Manning-Pipe-Head-Loss | 2058 | 78 | 36 | 4% | 46% |
+| **Looped-Network** | **2172** | **51** | **7** | **2%** | **14%** |
+| Darcy-Weisbach | 2134 | 32 | 14 | 1% | 44% |
+| Micro-Hydro-Power | 2140 | 25 | 8 | 1% | 32% |
+| Branched-Network | 1446 | 19 | 2 | 1% | 11% |
+| Weir-Flow-Simple | 2004 | 17 | 7 | 1% | 41% |
+| Orifice | 2010 | 15 | 8 | 1% | 53% |
+| Rock-Chute | 2045 | 14 | 6 | 1% | 43% |
+| Weir-Flow-Irregular | 1950 | 11 | 4 | 1% | 36% |
+| Orifice-Drain-Time | 2015 | 10 | 6 | 0% | 60% |
+| Irrigation-Pressure | 2228 | 9 | 2 | 0% | 22% |
+| Canal-Seepage | 2075 | 5 | 1 | 0% | 20% |
+
+**Tom's read is correct on attraction.** Among the complex calculators lpn shops best by a clear
+margin — 51 vs bpn 19 and ip 9, i.e. 2.7x and 5.7x. For a page shipped 2026-07-30 that is fast.
+
+**REACH IS NOT A USEFUL DISCRIMINATOR AND SHOULD STOP BEING QUOTED AS ONE.** Fourteen of sixteen
+pages sit in a 1446–2606 band regardless of how differently they perform downstream; only mpf (6963)
+and mtc (3803) break out. A number that is ~2000 for the best and worst page alike is measuring
+something common to all of them (menu traffic, crawlers, incidental arrivals), not interest.
+**Shopping is the first metric that discriminates**, so use it.
+
+**THE FINDING TOM DID NOT FLAG, AND IT IS THE ACTIONABLE ONE: lpn CONVERTS WORST.** 14% of shoppers
+use it — below every peer except bpn's 11%, and against 58–70% for the Manning family. 51 people
+opened it and 44 left without computing anything. Attraction is not the problem; the first minute is.
+**Hypothesis, and it is specific and cheap to test: lpn is the only calculator that greets a
+first-time visitor with an empty canvas.** Every other page opens on a worked example that already
+computes — which is CLAUDE.md's own rule ("choose defaults that open on a *passing* design… a page
+that greets a first-time visitor with a warning is worse than one that greets them with a worked
+example"). lpn instead shows `lpn_empty_hint` and nothing to look at, and `drawExampleNetwork()`
+exists but must be found and clicked. See ROADMAP Task 254.
+
+**Do not read the 7 as a verdict on lpn's worth.** n=7 is noise-dominated, and the conversion
+hypothesis above would move the denominator, not the interest. Re-read after Task 254 ships.
