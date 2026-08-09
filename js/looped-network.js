@@ -867,6 +867,18 @@ var EngCalcs = EngCalcs || {};
 		return textFactor() * (settings.symbolScale > 0 ? settings.symbolScale : 1);
 	}
 	function nodeRadius(n) { return (n.type === 'reservoir' ? 2.2 : 1.6) * symbolFactor(); }
+	// Positions/sizes a node's overlay symbol (currently: the reservoir tank -- see buildNodeEls())
+	// as a square box centred on the node, `2 * nodeRadius(n)` on a side. Every OTHER consumer of
+	// node geometry -- clear-run insets, label mask/leader placement, hit-testing, the zoom-extent
+	// bbox -- keeps reading nodeRadius(n) exactly as before; only what is DRAWN inside that
+	// footprint changed, so none of those had to change with it (ROADMAP Task 146.10).
+	function positionNodeSymbol(id) {
+		var n = nodeById(id), ne = nodeEls[id];
+		if (!ne || !ne.symbol) { return; }
+		var r = nodeRadius(n);
+		ne.symbol.setAttribute('x', n.x - r); ne.symbol.setAttribute('y', n.y - r);
+		ne.symbol.setAttribute('width', 2 * r); ne.symbol.setAttribute('height', 2 * r);
+	}
 	var VERTEX_HANDLE_R = 0.45;
 	// Stroke widths (pipe, node outline, arrow, vertex handle, leader, rubber band) live in
 	// css/engcalcs.css, so they read this one custom property rather than being set per element
@@ -890,11 +902,13 @@ var EngCalcs = EngCalcs || {};
 		svg.style.setProperty('--lpn-backdrop-opacity', (bop === undefined || bop === null) ? 1 : bop);
 		doc.nodes.forEach(function (n) {
 			var ne = nodeEls[n.id]; if (ne) { ne.circle.setAttribute('r', nodeRadius(n)); }
+			positionNodeSymbol(n.id);
 		});
 		doc.links.forEach(function (l) {
 			var le = linkEls[l.id]; if (!le) { return; }
 			le.handles.forEach(function (h) { h.setAttribute('r', VERTEX_HANDLE_R * k); });
 			updateArrow(l.id);
+			resizePumpSymbol(l.id);
 		});
 	}
 	function buildNodeEls(n) {
@@ -902,6 +916,15 @@ var EngCalcs = EngCalcs || {};
 			cx: n.x, cy: n.y, r: nodeRadius(n),
 			'class': 'lpn-node lpn-node-' + n.type, 'data-node': n.id
 		}, nodesLayer);
+		// Reservoir renders as an open-top tank, not a circle (ROADMAP Task 146.10, Task 231 icon
+		// set): a reservoir and a junction were the SAME mark, told apart only by size and colour,
+		// which collapses to one mark in greyscale and for a red-green colour-blind reader (~8% of
+		// men). `circle` above is untouched and stays the real hit target -- same radius, same
+		// data-node, same click/drag/hit-test path as before. This is a second, non-interactive
+		// element laid on top of it, built from the exact path data the toolbar's reservoir icon
+		// uses (buildMapIconSvg() below) -- never a redrawn copy of that shape.
+		var symbol = n.type === 'reservoir' ? buildMapIconSvg('reservoir', 'lpn-node-symbol lpn-node-symbol-reservoir') : null;
+		if (symbol) { nodesLayer.appendChild(symbol); }
 		// Mask (Task 146.01) goes in the shared maskLayer, not here alongside the circle -- see
 		// maskLayer's declaration comment for why. Leader+text go in labelsLayer, the topmost
 		// layer, same reasoning: this label must never be covered by a LATER node/link's own
@@ -925,9 +948,10 @@ var EngCalcs = EngCalcs || {};
 		text.textContent = n.id;
 		var tw = 8;
 		try { tw = text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; fallback stands */ }
-		nodeEls[n.id] = { circle: circle, text: text, tw: tw, mask: mask, leader: leader, nudge: { x: 0, y: 0 }, lineCount: 1 };
+		nodeEls[n.id] = { circle: circle, symbol: symbol, text: text, tw: tw, mask: mask, leader: leader, nudge: { x: 0, y: 0 }, lineCount: 1 };
 		incidentLinks[n.id] = [];
 		labelsByAnchor[n.id] = [];
+		positionNodeSymbol(n.id);
 		layoutNodeLabel(n.id);
 	}
 	function buildLinkEls(l) {
@@ -965,8 +989,54 @@ var EngCalcs = EngCalcs || {};
 		var text = el('text', {
 			'class': 'lpn-lbl lpn-draglbl', 'data-linklbl': l.id, style: 'font-size:' + effectiveFontSize() + 'px'
 		}, labelsLayer);
-		linkEls[l.id] = { line: line, handles: handles, arrows: arrows, text: text, tw: 8, mask: mask, leader: leader, nudge: { x: 0, y: 0 }, lineCount: 1 };
+		// A pump is a LINK, not a node (see the file header), so it had no symbol at all -- just a
+		// line in its own colour. ROADMAP Task 146.10: casing + tangent discharge tail, the same
+		// path data the toolbar's pump icon uses, rotated to point at the `to` node -- see
+		// positionPumpSymbol() for the rotate/flip rule. symbolG is the rotate/flip pivot (drawn in
+		// nodesLayer, same layer as node symbols, so a pump reads on top of every pipe it crosses);
+		// symbolSvg inside it is the icon box itself, non-interactive -- clicking/dragging a pump
+		// still goes through `line` above, unchanged.
+		var symbolG = null, symbolSvg = null;
+		if (l.type === 'pump') {
+			symbolG = el('g', { 'class': 'lpn-link-symbol lpn-link-symbol-pump' }, nodesLayer);
+			symbolSvg = buildMapIconSvg('pump', '');
+			if (symbolSvg) { symbolG.appendChild(symbolSvg); } else { symbolG.remove(); symbolG = null; }
+		}
+		linkEls[l.id] = {
+			line: line, handles: handles, arrows: arrows, text: text, tw: 8, mask: mask, leader: leader,
+			nudge: { x: 0, y: 0 }, lineCount: 1, symbolG: symbolG, symbolSvg: symbolSvg
+		};
+		if (symbolG) { resizePumpSymbol(l.id); positionPumpSymbol(l.id); }
 		layoutLinkLabel(l.id);
+	}
+	// Icon box size for a pump's map symbol, in world units -- same "relative to text" scaling as
+	// every other symbol (symbolFactor()), sized a touch smaller than a reservoir's footprint
+	// (2*2.2*k) because the pump icon's own casing sits well inside its 24x24 box, unlike the
+	// tank silhouette which nearly fills it.
+	function pumpSymbolSize() { return 4 * symbolFactor(); }
+	function resizePumpSymbol(id) {
+		var le = linkEls[id];
+		if (!le || !le.symbolSvg) { return; }
+		var size = pumpSymbolSize(), half = size / 2;
+		le.symbolSvg.setAttribute('x', -half); le.symbolSvg.setAttribute('y', -half);
+		le.symbolSvg.setAttribute('width', size); le.symbolSvg.setAttribute('height', size);
+	}
+	// ROADMAP Task 146.10's pump-orientation rule, verified over all 25 angles at 15-degree steps:
+	// always rotate to point the discharge at the `to` node, and flip vertically first whenever the
+	// pipe runs west (dx < 0) -- otherwise the tail swings under the casing for every westward pump.
+	// The boundary is on dx, never dy: at dx=0 the tail lands horizontal and either variant is right.
+	// Positioned from the link's own from/to nodes only (ignoring verts, same as the spec) -- a
+	// pump is drawn straight in practice, and the pivot is the icon's own box centre, not its
+	// casing's, which only shifts where the mark sits, never the flip/rotate logic itself.
+	function positionPumpSymbol(id) {
+		var l = linkById(id), le = linkEls[id];
+		if (!le || !le.symbolG) { return; }
+		var a = nodeById(l.from), b = nodeById(l.to),
+			mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2,
+			angle = Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI,
+			flip = (b.x - a.x) < 0;
+		le.symbolG.setAttribute('transform',
+			'translate(' + mx + ',' + my + ') rotate(' + angle + ')' + (flip ? ' scale(1,-1)' : ''));
 	}
 	// Midpoint and local tangent angle of every segment, walking a->verts->b -- one entry per
 	// straight run, so a bent pipe's arrows follow each segment's own direction.
@@ -1126,6 +1196,7 @@ var EngCalcs = EngCalcs || {};
 		layoutLinkLabel(id);
 		if (l.lenAuto) { l._length = linkGeomLength(l); }
 		updateArrow(id);
+		positionPumpSymbol(id);
 	}
 
 	// Same leader math as the spike: text is always text-anchor:middle and tracks the drag
@@ -1184,6 +1255,7 @@ var EngCalcs = EngCalcs || {};
 	function updateNode(id) {
 		var n = nodeById(id), ne = nodeEls[id], i;
 		ne.circle.setAttribute('cx', n.x); ne.circle.setAttribute('cy', n.y);
+		positionNodeSymbol(id);
 		layoutNodeLabel(id);
 		for (i = 0; i < incidentLinks[id].length; i++) { updateLinkGeometry(incidentLinks[id][i]); }
 		for (i = 0; i < labelsByAnchor[id].length; i++) { updateLabelGeometry(labelsByAnchor[id][i]); }
@@ -1208,6 +1280,7 @@ var EngCalcs = EngCalcs || {};
 		linkEls[l.id].text.remove();
 		linkEls[l.id].mask.remove();
 		linkEls[l.id].leader.remove();
+		if (linkEls[l.id].symbolG) { linkEls[l.id].symbolG.remove(); }
 		// tick marks (applyExtremaTicks()) are separate elements, not text children -- buildLinkEls()
 		// below replaces linkEls[l.id] wholesale, which would otherwise orphan them on screen.
 		if (linkEls[l.id].tickEls) { linkEls[l.id].tickEls.forEach(function (t) { t.remove(); }); }
@@ -1660,6 +1733,7 @@ var EngCalcs = EngCalcs || {};
 		labelsByAnchor[id].slice().forEach(function (lid) { deleteLabelById(lid); });
 		nodeEls[id].circle.remove(); nodeEls[id].text.remove();
 		nodeEls[id].mask.remove(); nodeEls[id].leader.remove();
+		if (nodeEls[id].symbol) { nodeEls[id].symbol.remove(); }
 		// Same orphaned-tick-mark bug as deleteLink()/rebuildLink() -- these are separate elements,
 		// not text children.
 		if (nodeEls[id].tickEls) { nodeEls[id].tickEls.forEach(function (t) { t.remove(); }); }
@@ -1680,6 +1754,7 @@ var EngCalcs = EngCalcs || {};
 		linkEls[id].arrows.forEach(function (a) { a.remove(); });
 		linkEls[id].text.remove();
 		linkEls[id].mask.remove(); linkEls[id].leader.remove();
+		if (linkEls[id].symbolG) { linkEls[id].symbolG.remove(); }
 		// Extrema tick marks (applyExtremaTicks()) are separate elements, not text children --
 		// orphaned on screen otherwise (Tom, 2026-07-30: "when I delete a pipe, its orphaned labels
 		// are left behind"). Same fix rebuildLink() already needed for the same reason.
@@ -3916,6 +3991,19 @@ var EngCalcs = EngCalcs || {};
 	// the pull-down menu Settings, but not on the toolbar Settings"). Two render sites, one missed.
 	function iconEl(name) { return EngCalcs.iconEl(name); }
 	function setLabel(el, iconName, text) { EngCalcs.setLabel(el, iconName, text); }
+	// A map symbol (ROADMAP Task 146.10 -- real element symbols from this same icon set) is the
+	// SAME markup iconEl() builds for a toolbar button, just re-homed onto the canvas: strip the
+	// button-sizing 'ec-icon' class (its CSS width/height:1.05em would fight the explicit
+	// world-unit x/y/width/height the caller sets) and give it the caller's own class instead.
+	// Everything else -- paths, stroke weight, the currentColor hookup -- stays exactly what
+	// iconEl() already built, so a map symbol and its toolbar icon are never two drawings of one
+	// shape.
+	function buildMapIconSvg(name, cls) {
+		var svgEl = iconEl(name);
+		if (!svgEl) { return null; }
+		svgEl.setAttribute('class', cls);
+		return svgEl;
+	}
 
 	function openMenu(anchor, rows) {
 		var popup = document.getElementById('lpn_menu_popup'), list = document.getElementById('lpn_menu_list');

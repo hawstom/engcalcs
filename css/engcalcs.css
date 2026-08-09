@@ -171,7 +171,19 @@ html[lang="zh"] .ec-welcome {
    live in their own layers and are deliberately untouched. */
 .lpn-symbols { opacity: var(--lpn-opacity, 1); }
 .lpn-node { fill: #2a6; stroke: #144; stroke-width: calc(1 * var(--lpn-sym, 1)); cursor: pointer; }
-.lpn-node-reservoir { fill: #26a; }
+/* A reservoir now draws as a tank symbol, not this circle (ROADMAP Task 146.10) -- fill:none/
+   stroke:none hides the circle itself; pointer-events:all keeps its full disc clickable/draggable
+   anyway (data-node, drag, hit-testing all still read THIS element, unchanged), same trick used
+   for any invisible-but-clickable hit target. `.lpn-node-pending`'s ring below still overrides
+   stroke, so the pending-link indicator still shows on a reservoir mid-pipe-draw. */
+.lpn-node-reservoir { fill: none; stroke: none; pointer-events: all; }
+/* The tank/pump overlay symbols themselves (looped-network.js buildMapIconSvg()) -- purely
+   visual, never a click target; the interactive element is always the plain node circle or link
+   polyline underneath. `color` is the currentColor the icon paths read for both stroke and the
+   reservoir's translucent water-fill path. */
+.lpn-node-symbol, .lpn-link-symbol { pointer-events: none; }
+.lpn-node-symbol-reservoir { color: #26a; }
+.lpn-link-symbol-pump { color: #a52; }
 /* stroke-width was 2 -- too wide relative to a 1.6-2.2 radius node (Tom, 2026-07-30), and it was
    also why the arrow read as absorbed into the pipe rather than a distinct mark. Then 0.5, which
    that correction overshot: a pipe network's PIPES are its primary content, and at 0.5 they were

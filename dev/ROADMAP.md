@@ -149,27 +149,14 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     `lpn_units_popup`. The panel is already sectioned, the strip is already a flex row, and this
     removes a popover and a menu row rather than adding one. Needs Tom's go — it changes a layout he
     negotiated three days ago.
-- 40|235| **The glossary's `pressure` and `elevation` entries hold the UPSTREAM label form in 22
-  languages.** Found during the Task 146.06 sprint, 2026-08-08 — by a translation agent, which is
-  worth noting: the tr agent was handed `preferred_translation` = "Memba basıncı" (*upstream*
-  pressure) for a generic node label, recognized it was wrong for the concept, and declined.
-  - **What happened:** both entries were created in the Task 166 sprint by harvesting the attested
-    label forms of `hw_pressure_up` and `hw_elev_up`. Those are *upstream-specific* labels. The
-    entries' own `translation_notes` say so plainly ("ATTESTED LABEL FORMS of `hw_pressure_up`"),
-    which is how the defect survived: it was documented as a feature.
-  - **Why it matters:** these are the entries for the bare concepts `pressure` and `elevation`, and
-    they are injected into every sprint that touches a pressure or elevation label. A compliant
-    agent puts "upstream" on labels that have nothing to do with upstream. `lpn_` applies both to
-    any node.
-  - **Done: es, pt, fr, tr**, corrected from attested `lpn_result_pressure` / `lpn_field_elev`
-    (Presión, Pressão, Pression, Basınç; Elevación, Elevação, Cote, Kot). **Remaining: the other 22
-    languages**, which still hold the upstream form and are marked as such in the glossary notes.
-  - **This is cheap to fix and does not need a sprint.** Each language already has an attested bare
-    form somewhere in its own file (`bpn_`/`mpf_` elevation and pressure labels); the work is
-    reading it off and writing it back, one language at a time, not standing up 22 agents.
-  - **Worth a wider look:** if two entries were built this way, others harvested in the same Task
-    166 pass may carry the same scope error. Check any entry whose notes describe its values as the
-    attested form of a *specific label* rather than of the concept.
+- 40|242| **Check for the same scope error in other Task 166 glossary entries.** `pressure` and
+  `elevation` (Task 235) were both built by harvesting the attested label form of one *specific*
+  upstream-framed label (`hw_pressure_up`/`hw_elev_up`) and storing it as the bare concept's
+  translation. If two entries were built this way, other entries populated in the same Task 166
+  pass may carry the same defect. Check any glossary entry whose `translation_notes` describe its
+  values as the attested form of a specific label rather than of the concept itself, and correct
+  the same way: find a bare-concept key already translated across all 26 languages (as
+  `bpn_show_p`/`bpn_show_elevation` were for Task 235) and read the concept word off it.
 
 - 30|234| **Canal Seepage must prove its worth or go (Tom, 2026-08-08: "in my crosshairs").** After
   Task 232 removed `Irrigation.php`, `cs_` is the remaining page Tom is not proud of — his standing
@@ -1020,28 +1007,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     surface as Task 195's Import/Export actions, so building it alongside whichever of that task's
     phases is in flight avoids building the menu twice — but nothing here blocks on that timing.
 - 5|146.09| **Map insets for congested areas of a drawing (Task 146 child).** Very low priority.
-- 45|146.10| **Draw real element symbols on the map, from the Task 231 icon set (Task 146 child).**
-  Scoped with Tom 2026-08-08. **Today the canvas draws** reservoir = `<circle>` r2.2 `#26a`,
-  junction = `<circle>` r1.6 `#2a6`, pipe = line `#557`, and **a pump has no symbol at all** — it
-  is a *link*, not a node (`looped-network.js:14`), so it is just a line in `#a52`.
-  **The prize is not prettiness:** reservoir and junction are the same shape, separated only by
-  size and colour, so they are the same mark in greyscale and to a red-green colour-blind reader
-  (~8% of men). `lib/Icons.lib.php` already holds the geometry — read it, do not redraw it.
-  **Pump orientation.** *An earlier draft here said "do not rotate with the pipe angle"; Tom
-  corrected it and the rule below is verified over all 25 angles at 15° steps, 0 failures.*
-  **Do** rotate, so the discharge points at the `to` node. Rotation is what swings the tail under
-  the casing going west, and the fix is a mirrored variant, not the absence of rotation:
-  - `a = atan2(to.y − from.y, to.x − from.x)`; **always** `rotate(a)`. Then `dx = to.x − from.x`:
-    `dx ≥ 0` draw as-is, `dx < 0` vertically flip (`scale(1,−1)`) first.
-  - Boundary is **vertical** — at `dx = 0` the tail lands horizontal and either variant is right,
-    which is why the test is on `dx`, never `dy`.
-  - **Flip y, not x:** the tail sits at local `−y`, and `rotate(a)` sends that offset to `−cos a`,
-    which is above the casing exactly when `dx ≥ 0`. Negating y restores it for every west angle.
-  - A tail *pointing* up or down is fine; only a tail **below** the casing is wrong.
-  **Constraints, all in `looped-network.js`:** `nodeRadius()` feeds the pipe clear-run in
-  `segmentMidpoints()` (arrows measure from the symbol edge), so a non-circular symbol needs a
-  per-type extent, not one radius. Label mask, leader placement, hit-testing and the zoom-extent
-  bbox all read node geometry too.
 - 20|177| **Link head loss: report the per-length gradient alongside total (Task 146 child).**
   Conventional network software and reports express pipe head loss in TWO forms, not one, because
   they answer different questions: **total head loss** (ft or m across the whole link — what you
@@ -1682,6 +1647,56 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|146.10| **[DONE 2026-08-09] Real element symbols on the lpn map, from the Task 231 icon set
+  (Task 146 child).** Scoped with Tom 2026-08-08. A reservoir and a junction were the same `<circle>`
+  mark, told apart only by size and colour — the same mark in greyscale and to a red-green
+  colour-blind reader (~8% of men) — and a pump (a *link*, not a node) had no symbol at all, just a
+  plain coloured line.
+  - **Reservoir**: the plain circle in `js/looped-network.js` `buildNodeEls()` stays exactly as it
+    was — same radius, same `data-node`, same click/drag/hit-test path — but is now invisible
+    (`fill:none; stroke:none`) and kept clickable purely via `pointer-events:all` (`css/engcalcs.css`
+    `.lpn-node-reservoir`). A second, non-interactive element drawn on top of it is the real visible
+    mark: the toolbar's own reservoir icon (`lib/Icons.lib.php`, arrived as `EngCalcs.icons` — never
+    redrawn), placed via `buildMapIconSvg()`, a nested `<svg viewBox="0 0 24 24">` sized to
+    `2×nodeRadius(n)` and positioned by `positionNodeSymbol()`. Junction is unchanged — it was already
+    a filled circle, which is what the Task 231 icon draws too.
+  - **Pump**: same reuse pattern, on a link instead of a node — `buildLinkEls()` adds a `<g
+    class="lpn-link-symbol-pump">` in the nodesLayer (so it paints over every pipe it crosses),
+    holding the pump icon (casing + tangent discharge tail) at the link's own from/to midpoint.
+    **Orientation, verified over all 25 angles at 15° steps, 0 failures:** always
+    `rotate(atan2(to.y−from.y, to.x−from.x))` so the discharge points at the `to` node, and — because
+    that rotation alone swings the tail under the casing for every westward pump — vertically flip
+    (`scale(1,−1)`) first whenever `dx = to.x − from.x < 0`. Boundary is on `dx`, never `dy`: at
+    `dx=0` the tail lands horizontal and either variant is correct. Verified in a headless-browser
+    check (Playwright): an east-pointing pump transforms to `rotate(0)`, no flip; a west-pointing one
+    (built by drawing a pump from an east node to a west node through the actual toolbar) transforms
+    to `rotate(180) scale(1,−1)`, exactly as specified.
+  - **Every constraint the scoping note called out held with no extra work**, because `nodeRadius()`
+    itself was left untouched — only what gets DRAWN inside its footprint changed. `segmentMidpoints()`
+    (arrow clear-run), label mask/leader placement, hit-testing, and the zoom-extent `bbox()` all still
+    read the same scalar radius they always did, so none of them needed to change.
+  - Symbol sizing (`pumpSymbolSize() = 4 × symbolFactor()`) is a starting value, a one-line change if
+    Tom wants pumps to read larger or smaller relative to reservoirs/junctions — noted rather than
+    hand-tuned, same spirit as `lib/Icons.lib.php`'s own "one-line change" notes on the pump tail.
+
+- 0|235| **[DONE 2026-08-09] The glossary's `pressure` and `elevation` entries no longer hold the
+  UPSTREAM label form in any of the 26 languages.** Found during the Task 146.06 sprint,
+  2026-08-08 — by a translation agent: the tr agent was handed `preferred_translation` = "Memba
+  basıncı" (*upstream* pressure) for a generic node label, recognized it was wrong for the
+  concept, and declined.
+  - **What happened:** both entries were created in the Task 166 sprint by harvesting the attested
+    label forms of `hw_pressure_up` and `hw_elev_up`. Those are *upstream-specific* labels. The
+    entries' own `translation_notes` said so plainly ("ATTESTED LABEL FORMS of `hw_pressure_up`"),
+    which is how the defect survived: it was documented as a feature.
+  - **es, pt, fr, tr** were already corrected in the 146.06 sprint, from attested
+    `lpn_result_pressure` / `lpn_field_elev`. **The other 22 languages**, corrected here, from
+    `bpn_show_p` ('Pressure') / `bpn_show_elevation` ('Elevation') — both bare-concept keys
+    already translated into all 26 languages, free of the upstream framing, verified against each
+    language's own file before writing back. No sprint, no agents — direct per-language lookup.
+  - `translation_notes` on both entries carry the 2026-08-09 correction record.
+  - Spun off **Task 242**: check whether other glossary entries populated in the same Task 166 pass
+    carry the same specific-label-as-concept scope error.
 
 - 0|238| **[DONE 2026-08-08] "Map display and sizes" fixed at the source; "Restore defaults" audited
   in all 26 and given a glossary entry.** Two labels Tom read on the shipped page.
