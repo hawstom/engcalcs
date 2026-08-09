@@ -1679,6 +1679,38 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
   - Symbol sizing (`pumpSymbolSize() = 4 × symbolFactor()`) is a starting value, a one-line change if
     Tom wants pumps to read larger or smaller relative to reservoirs/junctions — noted rather than
     hand-tuned, same spirit as `lib/Icons.lib.php`'s own "one-line change" notes on the pump tail.
+  - **Follow-up, same day (Tom): two more things needed fixing before this could ship.**
+    1. **Opacity.** A toolbar icon is drawn stroke-only (`fill:none` — correct for a button, nothing
+       is ever behind it), so on the map a pipe ran right through the open/translucent parts of a
+       reservoir tank or a pump casing and stayed visible. Fixed by `prependSymbolBackdrop()`: an
+       opaque patch (rect for the reservoir, circle for the pump casing — matching each icon's own
+       silhouette, not just its bounding square) inserted as the FIRST child of the icon's nested
+       `<svg>`, so it paints underneath the icon's own unmodified linework. Filled with the new
+       `--lpn-map-bg` custom property (`#f7f7f2`, matching `#lpn_canvas`'s own inline background).
+       Verified by sampling actual rendered pixel colour through a zoomed screenshot (not just DOM
+       structure) at the pipe's centerline through both symbols — solid backdrop colour, no pipe
+       colour bleeding through, on both.
+    2. **Sizing.** Read as "twice as large" next to text: junction was a diameter-3.2 circle,
+       shrunk to `JUNCTION_R = 0.72` (was 1.6× symbolFactor — 0.45×, inside Tom's asked-for
+       0.4-0.5× range). Reservoir was *also* a scaled-up copy of that same circle's square box
+       (`2×nodeRadius(n)` on a side, so a tall/square tank) — Tom didn't want a uniform shrink here
+       (would also narrow it), wanting instead what EPANET's own reservoir icon looks like: wide,
+       not tall. Reservoir now has its own independent width/height
+       (`RESERVOIR_HALF_W = 3.3, RESERVOIR_HALF_H = 1.1` — half-height is exactly his instruction,
+       "shortening its height to 0.5 its current height" of 4.4; half-width is a widened starting
+       value, not a specified factor, since that half of the ask was an experiment to try, not a
+       number he gave). Needs `preserveAspectRatio="none"` on the nested `<svg>` so the icon
+       actually stretches into that non-square box instead of a default "meet" letterboxing it.
+       `nodeRadius(n)` — the one scalar every OTHER consumer (clear-run insets, label mask/leader,
+       hit-testing, `staticObstacleBoxes()`, the zoom-extent `bbox()`) still reads — now returns the
+       CIRCUMSCRIBING radius (half the longer side) for a reservoir rather than a true radius:
+       generous rather than tight, so none of those consumers clips the wide/short tank on either
+       axis. Pump's own size was confirmed correct as shipped ("literally the same size as text, as
+       advertised") and deliberately left alone. All four numbers (`JUNCTION_R`,
+       `RESERVOIR_HALF_W`, `RESERVOIR_HALF_H`, `pumpSymbolSize()`'s `4`) are one-line changes,
+       explicitly experimental starting values per Tom's own framing ("since all is customizable,
+       maybe we should try...") rather than settled numbers — revisit if he wants any of them
+       nudged after looking at it live.
 
 - 0|235| **[DONE 2026-08-09] The glossary's `pressure` and `elevation` entries no longer hold the
   UPSTREAM label form in any of the 26 languages.** Found during the Task 146.06 sprint,

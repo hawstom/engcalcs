@@ -866,18 +866,46 @@ var EngCalcs = EngCalcs || {};
 	function symbolFactor() {
 		return textFactor() * (settings.symbolScale > 0 ? settings.symbolScale : 1);
 	}
-	function nodeRadius(n) { return (n.type === 'reservoir' ? 2.2 : 1.6) * symbolFactor(); }
-	// Positions/sizes a node's overlay symbol (currently: the reservoir tank -- see buildNodeEls())
-	// as a square box centred on the node, `2 * nodeRadius(n)` on a side. Every OTHER consumer of
-	// node geometry -- clear-run insets, label mask/leader placement, hit-testing, the zoom-extent
-	// bbox -- keeps reading nodeRadius(n) exactly as before; only what is DRAWN inside that
-	// footprint changed, so none of those had to change with it (ROADMAP Task 146.10).
+	// Junction radius (Tom, 2026-08-09): was 1.6, read as "about twice as large" next to text --
+	// 0.72 sits in the 0.4-0.5x range he asked for (1.6 x 0.45). One-line change if he wants it
+	// nudged further either way.
+	var JUNCTION_R = 0.72;
+	// Reservoir is no longer a scaled-up copy of the junction circle's box -- it has its own
+	// width/height (Tom, 2026-08-09: "the EPANET icon is more wide" than the tall/square tank this
+	// shipped with, and he didn't want a uniform 0.5x shrink because that would also narrow it).
+	// Half-height is the one number he gave exactly ("shortening its height to 0.5 its current
+	// height": old full height was 2*2.2=4.4, so new full height is 4.4*0.5=2.2, half-height 1.1).
+	// Half-width is widened from the old 2.2 rather than held there -- his "widening" ask, a
+	// starting value (not a specified factor) to try alongside the height change. Both are a
+	// one-line change either way; this is explicitly an experiment, not a settled number.
+	var RESERVOIR_HALF_W = 3.3;
+	var RESERVOIR_HALF_H = 1.1;
+	function reservoirSize() {
+		var k = symbolFactor();
+		return { w: 2 * RESERVOIR_HALF_W * k, h: 2 * RESERVOIR_HALF_H * k };
+	}
+	// The single scalar every OTHER consumer of node geometry reads -- clear-run insets, label
+	// mask/leader placement, hit-testing (the invisible-but-clickable circle under a reservoir
+	// symbol), staticObstacleBoxes(), the zoom-extent bbox. A reservoir is no longer visually a
+	// circle, so this is the circumscribing radius (half its LONGER side) rather than a true
+	// radius -- generous rather than tight, so none of those consumers ever clips the wide/short
+	// tank short on any one side (ROADMAP Task 146.10 and its 2026-08-09 follow-up).
+	function nodeRadius(n) {
+		if (n.type === 'reservoir') { var s = reservoirSize(); return Math.max(s.w, s.h) / 2; }
+		return JUNCTION_R * symbolFactor();
+	}
+	// Positions/sizes a node's overlay symbol (currently: the reservoir tank -- see buildNodeEls()).
+	// Only a reservoir ever has one (`ne.symbol` is null for a junction, which draws as the plain
+	// circle above with no overlay), so this always sizes to reservoirSize() -- an independent
+	// width/height, not nodeRadius()'s single circumscribing scalar; see buildNodeEls() for the
+	// `preserveAspectRatio="none"` that makes the icon actually stretch to that box instead of
+	// being letterboxed inside it.
 	function positionNodeSymbol(id) {
 		var n = nodeById(id), ne = nodeEls[id];
 		if (!ne || !ne.symbol) { return; }
-		var r = nodeRadius(n);
-		ne.symbol.setAttribute('x', n.x - r); ne.symbol.setAttribute('y', n.y - r);
-		ne.symbol.setAttribute('width', 2 * r); ne.symbol.setAttribute('height', 2 * r);
+		var s = reservoirSize();
+		ne.symbol.setAttribute('x', n.x - s.w / 2); ne.symbol.setAttribute('y', n.y - s.h / 2);
+		ne.symbol.setAttribute('width', s.w); ne.symbol.setAttribute('height', s.h);
 	}
 	var VERTEX_HANDLE_R = 0.45;
 	// Stroke widths (pipe, node outline, arrow, vertex handle, leader, rubber band) live in
@@ -924,7 +952,20 @@ var EngCalcs = EngCalcs || {};
 		// element laid on top of it, built from the exact path data the toolbar's reservoir icon
 		// uses (buildMapIconSvg() below) -- never a redrawn copy of that shape.
 		var symbol = n.type === 'reservoir' ? buildMapIconSvg('reservoir', 'lpn-node-symbol lpn-node-symbol-reservoir') : null;
-		if (symbol) { nodesLayer.appendChild(symbol); }
+		if (symbol) {
+			// The nested <svg>'s viewBox is square (0 0 24 24, same as every icon) but the box it's
+			// placed into is not (reservoirSize() -- wide, short). Default preserveAspectRatio
+			// ("xMidYMid meet") would keep the icon square and letterbox it inside that box; "none"
+			// is what actually stretches the tank horizontally and squashes it vertically to fill
+			// the box, which is the whole point of giving it an independent width/height.
+			symbol.setAttribute('preserveAspectRatio', 'none');
+			// Backdrop matches the tank's own silhouette in lib/Icons.lib.php's reservoir path (the
+			// (6,4)-(18,20) box `M6 4v16h12V4` traces) -- same box, so the opaque patch never peeks
+			// out past the tank's own outline nor leaves a sliver of it uncovered. It stretches
+			// along with the rest of the icon's content since it lives in the same viewBox.
+			prependSymbolBackdrop(symbol, 'rect', { x: 6, y: 4, width: 12, height: 16 }, 'lpn-node-symbol-backdrop');
+			nodesLayer.appendChild(symbol);
+		}
 		// Mask (Task 146.01) goes in the shared maskLayer, not here alongside the circle -- see
 		// maskLayer's declaration comment for why. Leader+text go in labelsLayer, the topmost
 		// layer, same reasoning: this label must never be covered by a LATER node/link's own
@@ -1000,7 +1041,16 @@ var EngCalcs = EngCalcs || {};
 		if (l.type === 'pump') {
 			symbolG = el('g', { 'class': 'lpn-link-symbol lpn-link-symbol-pump' }, nodesLayer);
 			symbolSvg = buildMapIconSvg('pump', '');
-			if (symbolSvg) { symbolG.appendChild(symbolSvg); } else { symbolG.remove(); symbolG = null; }
+			if (symbolSvg) {
+				symbolG.appendChild(symbolSvg);
+				// Backdrop matches the casing circle in lib/Icons.lib.php's pump path
+				// (`<circle cx="9.8" cy="12.5" r="5"/>`) -- round, not the icon's own square box, so
+				// it occludes exactly the casing's footprint rather than plastering a rectangle over
+				// the pipe on both sides of it. The thin discharge tail gets no backdrop of its own;
+				// a stroke-width line crossing a pipe reads as two lines crossing, not as seeing
+				// through a symbol.
+				prependSymbolBackdrop(symbolSvg, 'circle', { cx: 9.8, cy: 12.5, r: 5 }, 'lpn-link-symbol-backdrop');
+			} else { symbolG.remove(); symbolG = null; }
 		}
 		linkEls[l.id] = {
 			line: line, handles: handles, arrows: arrows, text: text, tw: 8, mask: mask, leader: leader,
@@ -1010,9 +1060,8 @@ var EngCalcs = EngCalcs || {};
 		layoutLinkLabel(l.id);
 	}
 	// Icon box size for a pump's map symbol, in world units -- same "relative to text" scaling as
-	// every other symbol (symbolFactor()), sized a touch smaller than a reservoir's footprint
-	// (2*2.2*k) because the pump icon's own casing sits well inside its 24x24 box, unlike the
-	// tank silhouette which nearly fills it.
+	// every other symbol (symbolFactor()). Confirmed right-sized as shipped (Tom, 2026-08-09: "the
+	// pump icon is literally the same size as text, as advertised") -- leave this one alone.
 	function pumpSymbolSize() { return 4 * symbolFactor(); }
 	function resizePumpSymbol(id) {
 		var le = linkEls[id];
@@ -4003,6 +4052,21 @@ var EngCalcs = EngCalcs || {};
 		if (!svgEl) { return null; }
 		svgEl.setAttribute('class', cls);
 		return svgEl;
+	}
+	// A toolbar icon is drawn stroke-only, fill:none (Icons.lib.php's EC_ICON_OPEN_TAG) -- correct
+	// for a button, where nothing is ever behind it, but on the map a pipe can run right through
+	// the open/translucent parts of a reservoir tank or a pump casing and show through (Tom,
+	// 2026-08-09: "they should be opaque so that they hide the pipes under/through them"). This
+	// prepends one opaque shape as the FIRST child of an icon built by buildMapIconSvg(), so it
+	// paints underneath the icon's own (unmodified) linework rather than replacing any of it --
+	// the shared paths from lib/Icons.lib.php are still never redrawn, this only adds an occlusion
+	// backing behind them. Filled with --lpn-map-bg (css/engcalcs.css), matching the canvas's own
+	// background, so the patch reads as "the icon is opaque," not as a colored blob.
+	function prependSymbolBackdrop(svgEl, tag, attrs, cls) {
+		if (!svgEl) { return; }
+		var b = el(tag, attrs, null);
+		b.setAttribute('class', cls);
+		svgEl.insertBefore(b, svgEl.firstChild);
 	}
 
 	function openMenu(anchor, rows) {
