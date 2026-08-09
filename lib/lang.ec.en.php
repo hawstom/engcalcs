@@ -1408,7 +1408,7 @@ $ec_lang['lpn_field_km_tip']='Loss from the bends, valves, and fittings on this 
 $ec_lang['lpn_field_km_short']='Minor loss, k';
 // Pump curve entry (Task 146, 2026-07-30): up to 3 (flow, head) points, or a reference to
 // another pump's curve so several identical pumps need the curve entered only once.
-$ec_lang['lpn_pump_curve_source']='Curve from';
+$ec_lang['lpn_pump_curve_source']='Curve source';
 $ec_lang['lpn_pump_curve_own']='Enter points below';
 $ec_lang['lpn_pump_curve_ref_note']='Using the curve entered for pump {id}.';
 $ec_lang['lpn_pump_curve_note']='One, two, or three points — see "Pump curve" in the Notes below.';
@@ -1480,7 +1480,7 @@ $ec_lang['lpn_settings_emitter_exponent']='Emitter exponent';
 $ec_lang['lpn_settings_tolerance']='Convergence tolerance';
 $ec_lang['lpn_settings_tolerance_tip']='How close the solver has to get before it stops. A smaller number is more exact and takes longer.';
 $ec_lang['lpn_settings_text_size']='Text size';
-$ec_lang['lpn_settings_text_size_map']='Scales with the map';
+$ec_lang['lpn_settings_text_size_map']='Map distance';
 $ec_lang['lpn_settings_text_size_screen']='Screen pixels';
 // Symbols (node circles, pipe width, flow arrows, vertex handles) are sized as a MULTIPLE of the
 // text size rather than in their own units (Tom, 2026-07-30), so one number changes how big

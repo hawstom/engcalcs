@@ -1,0 +1,48 @@
+{
+  "sprint": "241-lpn-resync",
+  "description": "Resync of 28 lpn_ keys into es/pt/fr/tr after the Wave 0 English rewrites, run 2026-08-09. FIRST sprint whose agents carried the suggestion box in their prompts, so this log was filled live rather than reconstructed. Four entries, two of them unanimous or near-unanimous findings against English rewrites I had made the day before.",
+  "entries": [
+    {
+      "key": "lpn_pump_curve_source",
+      "source": "translator",
+      "lang": "es, pt, fr, tr",
+      "complaint": "ALL FOUR languages flagged it independently. \"Curve from\" is a dangling preposition on a dropdown label -- the object lives in the <select> beside it, so the string alone never says what the curve is from. fr had to read looped-network.js to be sure it precedes pump IDs rather than a point count.",
+      "readings": [
+        "a label naming the SOURCE of the curve",
+        "a fragment awaiting a noun the translator cannot see"
+      ],
+      "disposition": "english",
+      "resolution": "English rewritten to \"Curve source\" -- a noun phrase, no dangling preposition. This was MY Wave 0 rewrite (\"Curve\" -> \"Curve from\") and four independent translators voted it down; unanimity across unrelated language families is the strongest signal this channel can produce. Note tr had already chosen 'Egri kaynagi' (= curve source) on its own rather than calque the preposition -- the translator reached the right English before I did. Retranslated in all four."
+    },
+    {
+      "key": "lpn_settings_text_size_map",
+      "source": "translator",
+      "lang": "es, pt, fr",
+      "complaint": "Three of four flagged it. \"Scales with the map\" is a VERB phrase offered as one of two options under the label \"Text size units\", whose sibling \"Screen pixels\" is a NOUN phrase. Two options of one selector were different parts of speech, so each translator had to invent a parallel form and they invented different ones.",
+      "readings": [
+        "a noun naming what the size is measured in, parallel to Screen pixels",
+        "a verb phrase describing behaviour"
+      ],
+      "disposition": "english",
+      "resolution": "English rewritten to \"Map distance\", parallel with \"Screen pixels\". Also MY Wave 0 rewrite: the original \"Map units\" was flagged for colliding with the page's real Units menu, and my fix cured the collision by breaking the parallelism. \"Map distance\" does both -- it names a measure, matches its sibling's form, and contains no \"units\". Retranslated in all four."
+    },
+    {
+      "key": "lpn_file_write_failed",
+      "source": "translator",
+      "lang": "pt",
+      "complaint": "Asked whether dropping the trailing sentence (\"Use Save to file to choose the file again\") was intentional or an oversight, since the advice still seemed useful.",
+      "readings": [],
+      "disposition": "dismissed",
+      "resolution": "Intentional, and the question was a good one to ask. The sentence named a control REMOVED in Task 211 -- there is no \"Save to file\" -- while the banner it renders in already carries a live \"Choose the file again\" button, and the JS fallback string had already dropped the sentence. It was wrong AND redundant. Recorded here so nobody restores it on the same reasoning."
+    },
+    {
+      "key": "lpn_notes_epanet_term",
+      "source": "translator",
+      "lang": "tr",
+      "complaint": "Asked whether dropping \"(August 2026)\" was deliberate suite-wide or missed in this batch, having noticed es/pt/fr still carried the date.",
+      "readings": [],
+      "disposition": "dismissed",
+      "resolution": "Deliberate. It is a dated changelog line inside a PERMANENT notes list: \"now match\" goes stale on its own and reads a year from now as something that just happened -- the same class as the \"English only for now\" banner we had to remove. The other three languages still showed the date only because they had not been resynced yet at the moment tr looked; all four now match. Good observation, correctly reasoned, wrong conclusion available -- exactly what the box is for."
+    }
+  ]
+}
