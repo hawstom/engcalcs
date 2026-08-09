@@ -875,10 +875,13 @@ var EngCalcs = EngCalcs || {};
 	function symbolFactor() {
 		return textFactor() * (settings.symbolScale > 0 ? settings.symbolScale : 1);
 	}
-	// Junction radius (Tom, 2026-08-09): was 1.6, read as "about twice as large" next to text --
-	// 0.72 sits in the 0.4-0.5x range he asked for (1.6 x 0.45). One-line change if he wants it
-	// nudged further either way.
-	var JUNCTION_R = 0.72;
+	// Junction radius. 1.6 -> 0.72 earlier on 2026-08-09 ("about twice as large" next to text),
+	// then 0.9 the same day once the node became a stroke-less solid dot: with the 1-unit ring
+	// gone, 0.72 alone was too small to see, and 0.9 puts the WHOLE dot at 1.8 units -- one cap
+	// height of the 2.5-unit base font, which is the "no larger than 1 text height" Tom asked
+	// for. Total size fell 2.44 -> 1.8 even though the radius went up, because the ring was
+	// adding 0.5 all round. One-line change if he wants it nudged either way.
+	var JUNCTION_R = 0.9;
 	// Reservoir is no longer a scaled-up copy of the junction circle's box -- it has its own
 	// width/height (Tom, 2026-08-09: "the EPANET icon is more wide" than the tall/square tank this
 	// shipped with, and he didn't want a uniform 0.5x shrink because that would also narrow it).
@@ -1421,12 +1424,38 @@ var EngCalcs = EngCalcs || {};
 		}
 		return { minx: minx, maxx: maxx, miny: miny, maxy: maxy };
 	}
+	// Height an absolutely-positioned canvas overlay occupies, measured rather than guessed --
+	// #lpn_mode_hint and #lpn_coords are both 11px text whose height depends on the font that
+	// actually rendered, and the mode hint wraps to two lines in several languages. Returns 0 for
+	// an absent or empty overlay, so a hidden readout costs no margin.
+	function overlayReserve(id) {
+		var e = document.getElementById(id);
+		if (!e || !e.offsetHeight || !e.textContent.trim()) { return 0; }
+		return e.offsetHeight + 8;   // its own height plus a little clear air
+	}
+
 	function zoomExtent() {
+		// ASYMMETRIC PADDING, because the canvas has permanent furniture on it (Tom, 2026-08-09:
+		// "it seems unforgivable to have a persistent message overwriting our map... maybe what we
+		// really need to do is make Zoom to Fit account for this top margin"). The mode hint sits
+		// top-left and the coordinate readout bottom-left, both inside the SVG's box, so a fit that
+		// pads all four sides equally deliberately places drawing content underneath them. It is
+		// the fit that is wrong here, not the overlays: they are live state, which is why they live
+		// on the canvas at all.
+		//
+		// NOTE WHAT THIS DOES AND DOES NOT FIX. It guarantees nothing is under an overlay
+		// IMMEDIATELY AFTER a fit. The user can still pan or zoom content back under one, because
+		// the overlays are screen-fixed and the drawing is not. A guarantee would need the
+		// overlays moved out of the canvas entirely -- see ROADMAP Task 253 for that argument and
+		// the screenshot case that is the real reason to want it.
 		var b = bbox(), r = svg.getBoundingClientRect(), pad = 16,
-			w = Math.max(b.maxx - b.minx, 1), h = Math.max(b.maxy - b.miny, 1);
-		state.s = Math.min((r.width - 2 * pad) / w, (r.height - 2 * pad) / h);
+			padTop = Math.max(pad, overlayReserve('lpn_mode_hint')),
+			padBottom = Math.max(pad, overlayReserve('lpn_coords')),
+			w = Math.max(b.maxx - b.minx, 1), h = Math.max(b.maxy - b.miny, 1),
+			availH = Math.max(r.height - padTop - padBottom, 1);
+		state.s = Math.min((r.width - 2 * pad) / w, availH / h);
 		state.tx = pad - b.minx * state.s + (r.width - 2 * pad - w * state.s) / 2;
-		state.ty = pad - b.miny * state.s + (r.height - 2 * pad - h * state.s) / 2;
+		state.ty = padTop - b.miny * state.s + (availH - h * state.s) / 2;
 		setTransform();
 		onZoomChanged();
 	}

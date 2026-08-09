@@ -1131,6 +1131,22 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     checkable; just do not spend the blog/video headline on it.** Do not relitigate.
   - Consequence: raised 146.06 to 90 and 220 to 95.
 
+- 35|252| **Reorder project tabs, left/right.** Tom, 2026-08-09: *"We talked about this, but I
+  guess we forgot about it. Either Drag or click an item on the tab menu. Either one is fine."*
+  He is right that it was dropped. Either mechanism is authorized; the tab menu item is the
+  cheaper one and works on touch, where tab-dragging fights the scroll gesture.
+
+- 30|253| **A clean-map view: hide canvas chrome for screenshots.** Tom, 2026-08-09, wants it
+  under the View menu and in the toolbar's View area. **Scope it as "clean map", not "print".**
+  His own framing: *"The only thing I care for it to hide at the moment (for map screenshots) is
+  the Mode status line... what a true printable version should look like is debatable, which is
+  why I prefer just a nice map for a screenshot until we create report tables."* So: one toggle
+  that hides `#lpn_mode_hint` (and arguably `#lpn_coords`), nothing else, no print stylesheet
+  work, no decisions about what a report contains. Task 175 already holds the real
+  printable-version question — do not merge them, and do not let this grow into it.
+  - Partly mitigated already: `zoomExtent()` now reserves the overlays' measured height so a fit
+    never places content under them. That does not survive a pan, which is why this still exists.
+
 - 25|250|[H] **Where do we explain lpn at all? A Help menu on the page.** Tom, 2026-08-09, after
   the EPANET toggle shipped: *"Where are we going to discuss, explain, or feature this? Does lpn
   need its own Help menu in the pull-down and the toolbar after Settings? Help > About and Help >
@@ -1156,6 +1172,14 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     precisely so scope follows evidence rather than symmetry — see the Reciprocity memory. If lpn
     shows real non-English use, promoting it is obvious; if it does not, the honest answer is that
     a map editor is the wrong first thing to translate for a field worker on a phone.
+  - **BUT THE HONESTY PROBLEM IS SEPARATE AND DOES NOT WAIT FOR THE BEACON.** Tom, 2026-08-09:
+    *"Maybe irrational, but consistent. We've been talking out of one side of our mouth that
+    languages are a superpower of lpn when it really has only 4 (about the same as epanet-js)."*
+    He is right, and this is the more urgent half. Task 222's surviving differentiator list says
+    "26 languages"; on `lpn_` that is FOUR, which is parity with the competitor, not an edge. So
+    **either promote lpn, or stop citing 26 languages when positioning lpn specifically** — the
+    suite-wide claim stays true, the page-level one does not. Fix the claim now; decide the
+    promotion on the beacon.
   - Blocked behind Task 216, deliberately.
 
 - 20|248| **What the EPANET toggle actually unlocks: tanks, valves, extended-period simulation.**

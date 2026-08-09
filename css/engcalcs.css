@@ -174,7 +174,24 @@ html[lang="zh"] .ec-welcome {
    rather than each fading independently and showing where they overlap. Labels, masks and leaders
    live in their own layers and are deliberately untouched. */
 .lpn-symbols { opacity: var(--lpn-opacity, 1); }
-.lpn-node { fill: #2a6; stroke: #144; stroke-width: calc(1 * var(--lpn-sym, 1)); cursor: pointer; }
+/* A junction is a SOLID DOT, one colour, no stroke (Tom, 2026-08-09).
+   Two reasons, both from looking at a real drawing. The old two-tone treatment -- #2a6 fill
+   inside a heavy #144 ring -- stopped working once the node shrank: "the light green in the
+   middle has shrunk to nearly nothing", so it read as a dark blob with a colour fringe rather
+   than as a green node. And the ring was most of the size: a 1 unit stroke centred on the edge
+   adds 0.5 all round, taking a 1.44 fill out to 2.44 overall, which against a 2.5 unit font's
+   ~1.8 cap height is the "about 1.33" too-big he measured by eye. Dropping the stroke and
+   sizing the fill alone (JUNCTION_R in looped-network.js) puts the whole dot at one cap height.
+
+   BLUE, NOT GREEN, and matched to .lpn-node-symbol-reservoir's #26a so a junction and a
+   reservoir read as the same water system rather than two unrelated things. Tom: "I am not
+   really liking green for water system nodes." EPANET draws everything black; epanet-js draws
+   the normal case in one blue and reserves colour for CONDITION (red for a closed valve).
+   That is the convention worth copying, and it is a reason to keep the base state visually
+   boring: every colour we spend on decoration now is one we cannot spend on meaning later.
+   The one existing conditional style, .lpn-node-pending's red ring, still overrides stroke
+   below and is unaffected. */
+.lpn-node { fill: #26a; stroke: none; cursor: pointer; }
 /* A reservoir now draws as a tank symbol, not this circle (ROADMAP Task 146.10) -- fill:none/
    stroke:none hides the circle itself; pointer-events:all keeps its full disc clickable/draggable
    anyway (data-node, drag, hit-testing all still read THIS element, unchanged), same trick used
