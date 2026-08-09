@@ -136,7 +136,7 @@ section verbatim. Sequence recap:
    (mandatory, no exceptions — Haiku is fully deprecated for translation, see CLAUDE.md § "Translation
    Sprints" Model policy, 2026-07-12). Each agent gets: payload path,
    target lang file path, full instructions (glossary terms + values + notes, relevant
-   `$ec_lang_intent` entries, HTML/symbol-preservation rules, any known wrong-sense traps carried
+   `$ec_lang_syn` entries, HTML/symbol-preservation rules, any known wrong-sense traps carried
    over from prior audits of related terms in that language family).
 4. **Post-sprint QA, in order:**
    - `php dev/scripts/lang_syntax_validate.php --lang=<codes>` — clean of escape-leakage,
@@ -251,7 +251,7 @@ read-only watchlist dump and grep-slice are free and can be done any time.
 
 ## Standing content rules (apply in all three scenarios)
 
-- **`$ec_lang_intent` is off-limits to AI** without explicit written permission each time — see
+- **`$ec_lang_syn` is off-limits to AI** without explicit written permission each time — see
   `CLAUDE.md`. Format: `<intent> | <commentary>`, tag vocabulary (`layout`, `avoid`, `symbol`,
   `gloss`) defined once there. **No standing carve-outs** — Task 132's intent-trimming
   pre-authorization was retired 2026-08-08. Working pattern: AI proposes a diff, human approves,
@@ -263,7 +263,7 @@ read-only watchlist dump and grep-slice are free and can be done any time.
   that would have helped — and the `lpn_` sprint's three worst labels ("Zoom to fit", "Map display
   and sizes", "Restore defaults") were all plain English.
 - **Routing — does an English reader also stumble?** Yes → fix the English (one edit, all 27
-  languages). No, but a translator can't recover the concept from the words → `$ec_lang_intent`
+  languages). No, but a translator can't recover the concept from the words → `$ec_lang_syn`
   synonyms. Recurs across labels/calculators → `glossary.json`. Never duplicate the same fact across
   two channels; a weight-flavored/standard term a culture actually uses is correct — `avoid` forbids
   only physical errors and lazy transliterations, never a genuine local standard, and **`avoid` is

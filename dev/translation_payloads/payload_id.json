@@ -29,12 +29,12 @@
         "notes": "Translate only keys in keys_to_translate; preserve HTML, units, and symbols.",
         "glossary_injection_notes": "Use prompt_context_by_prefix and glossary_terms_by_prefix.preferred_translation when available.",
         "context_notes": "Use key_context.neighbors to keep register consistent with nearby translated strings.",
-        "intent_notes": "Use key_intent when present; these entries provide terse disambiguation comments only where translation risk exists."
+        "syn_notes": "Use key_syn when present; these entries provide terse disambiguation comments only where translation risk exists."
     },
     "prompt_context_by_prefix": [],
     "glossary_terms_by_prefix": [],
     "keys_to_translate": [],
     "keys": [],
     "key_context": [],
-    "key_intent": []
+    "key_syn": []
 }

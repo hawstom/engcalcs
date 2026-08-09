@@ -17,9 +17,10 @@
  * payload['meta']['out_of_scope_key_count'] so the suppression stays visible.
  *
  * Optional sibling map support in lib/lang.ec.en.php:
- *   $ec_lang_intent['some_key'] = 'Expanded semantic intent for translators';
- * When present and different from the base English value, intent is emitted to
- * payload['key_intent'][key] for prompt-time disambiguation.
+ *   $ec_lang_syn['some_key'] = 'Synonyms and alternate wordings a translator can re-compress';
+ * Every phrase must pass the substitution test -- it could stand in the slot as the
+ * label itself. Emitted to payload['key_syn'][key]. Renamed from $ec_lang_intent
+ * 2026-08-08: "intent" invited description, which is the drift the rename ends.
  *
  * Usage:
  *   php scripts/generate_translation_payloads.php
@@ -118,7 +119,7 @@ function main(array $argv): void
         $current = loadLangArray($targetFile);
         [$deltaKeys, $keyContext, $exemptKeys, $outOfScopeKeys] =
             collectDeltaAndContext($enKeys, $current, $activePrefixes, $lang, $exemptMap, $coverage);
-        $keyIntent = collectKeyIntent($deltaKeys, $enKeys, $enIntent);
+        $keySyn = collectKeySyn($deltaKeys, $enKeys, $enIntent);
         $exemptTotal += count($exemptKeys);
         $outOfScopeTotal += count($outOfScopeKeys);
 
@@ -160,7 +161,7 @@ function main(array $argv): void
                 'notes' => 'Translate only keys in keys_to_translate; preserve HTML, units, and symbols.',
                 'glossary_injection_notes' => 'Use prompt_context_by_prefix and glossary_terms_by_prefix.preferred_translation when available.',
                 'context_notes' => 'Use key_context.neighbors to keep register consistent with nearby translated strings.',
-                'intent_notes' => 'Use key_intent when present; these entries provide terse disambiguation comments only where translation risk exists.',
+                'syn_notes' => 'Use key_syn when present; these entries provide terse disambiguation comments only where translation risk exists.',
             ],
             'prompt_context_by_prefix' => $promptByPrefix,
             'glossary_terms_by_prefix' => $termsByPrefix,
@@ -168,7 +169,7 @@ function main(array $argv): void
             // Backward-compatibility for scripts that still expect payload["keys"].
             'keys' => $deltaKeys,
             'key_context' => $keyContext,
-            'key_intent' => $keyIntent,
+            'key_syn' => $keySyn,
         ];
 
         file_put_contents(
@@ -370,17 +371,17 @@ function loadLangArray(string $file): array
 function loadEnglishIntentMap(string $file): array
 {
     $ec_lang = [];
-    $ec_lang_intent = [];
+    $ec_lang_syn = [];
     include $file;
 
-    if (!is_array($ec_lang_intent)) {
+    if (!is_array($ec_lang_syn)) {
         return [];
     }
 
-    return $ec_lang_intent;
+    return $ec_lang_syn;
 }
 
-function collectKeyIntent(array $deltaKeys, array $enKeys, array $intentMap): array
+function collectKeySyn(array $deltaKeys, array $enKeys, array $intentMap): array
 {
     $result = [];
 

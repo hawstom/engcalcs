@@ -245,7 +245,7 @@ function detectDoubleQuotedAssignments(string $file, string $content): array
 {
     $issues = [];
 
-    $pattern = '/\$ec_lang(?:_intent)?\[\'[^\']+\'\]\s*=\s*"/m';
+    $pattern = '/\$ec_lang(?:_syn)?\[\'[^\']+\'\]\s*=\s*"/m';
     if (!preg_match_all($pattern, $content, $matches, PREG_OFFSET_CAPTURE)) {
         return $issues;
     }

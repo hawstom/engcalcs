@@ -44,7 +44,7 @@
  * is still on the old link. That check is the point: "no translator needed" and "nothing left to
  * do" are different claims, and only the first one is being made here.
  *
- * Scope: $ec_lang display strings only (not $ec_lang_intent — intent is
+ * Scope: $ec_lang display strings only (not $ec_lang_syn — intent is
  * translator metadata, not a shipped translated string).
  */
 

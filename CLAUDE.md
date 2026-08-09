@@ -219,24 +219,24 @@ different rules:
   matching the source method (if any) and plain, composable English for explanatory content, when a
   calculator is first written, so it never needs this fix later.
 
-**`$ec_lang_intent` supplies SYNONYMS AND ALTERNATE EXPRESSIONS, so a translator can pick their
+**`$ec_lang_syn` supplies SYNONYMS AND ALTERNATE EXPRESSIONS, so a translator can pick their
 own language's natural phrase.** It is not a place to *describe* a label, explain a decision, or
 leave notes for a human. It answers exactly one question, asked by a translator: *"what other ways
 could this be said?"* — and it answers in words, not commentary. Tom, 2026-08-08, restating the
-original design after it had drifted: *"`_intent` is not for me or for you to describe anything. It
+original design after it had drifted: *"`_syn` is not for me or for you to describe anything. It
 is for synonyms or alternate expressions."*
 
 **THE SUBSTITUTION TEST — the one rule that separates a synonym from a description.** Every phrase
-in an intent must be able to **stand in the slot**: you could put it on that button, that heading,
+in a synonym entry must be able to **stand in the slot**: you could put it on that button, that heading,
 that label, and it would still mean the right thing. If a phrase could not go on the control, it is
 a description and it does not belong.
 
 ```php
 // ✅ synonyms -- every item could be the label
-$ec_lang_intent['lpn_new_text']='Text, Label, Temporary Text, Placeholder, Unfinished text, or Default words';
-$ec_lang_intent['lpn_units_length']='Pipe lengths and map coordinates';
+$ec_lang_syn['lpn_new_text']='Text, Label, Temporary Text, Placeholder, Unfinished text, or Default words';
+$ec_lang_syn['lpn_units_length']='Pipe lengths and map coordinates';
 // ❌ description -- none of this could ever be the label
-$ec_lang_intent['lpn_new_text']='The word that appears inside a new text label when it is first placed on the drawing.';
+$ec_lang_syn['lpn_new_text']='The word that appears inside a new text label when it is first placed on the drawing.';
 ```
 
 Both bad examples above are real: AI wrote them on 2026-08-08 and Tom rejected them on sight
@@ -255,9 +255,9 @@ That is the whole test, and it is much broader than jargon. Worked examples, all
 
 ```php
 // The English is a known idiom, but "fit" never names WHAT is fitted.
-$ec_lang_intent['lpn_tool_zoom_extent']='Zoom out (or in) until the whole drawing fits in the window; show everything at once (zoom to extents, fit to window, show all). | avoid: adjusting the zoom by an amount';
+$ec_lang_syn['lpn_tool_zoom_extent']='Zoom out (or in) until the whole drawing fits in the window; show everything at once (zoom to extents, fit to window, show all). | avoid: adjusting the zoom by an amount';
 // "Defaults" is standard English but its plain meaning is "the original values".
-$ec_lang_intent['calc_defaults']='Restore (revert, return) to the original (initial, as-shipped, factory) values (state).';
+$ec_lang_syn['calc_defaults']='Restore (revert, return) to the original (initial, as-shipped, factory) values (state).';
 ```
 
 **Do not gate intent on jargon or transliteration risk.** An earlier version of this section said
@@ -279,7 +279,7 @@ One question decides it: **does an English reader also stumble?**
 | Test | Home | Why |
 |---|---|---|
 | An English reader must re-read, or can read it two ways | **Fix the English** | Defective for its own audience. One edit fixes all 27 languages at once. |
-| English is correct and idiomatic, but a translator cannot recover the concept from the words | **`$ec_lang_intent`** | The English reader is served; the translator is not. |
+| English is correct and idiomatic, but a translator cannot recover the concept from the words | **`$ec_lang_syn`** | The English reader is served; the translator is not. |
 | The concept recurs across labels or calculators | **`glossary.json`** | It is about consistency across call sites, not about one label. |
 
 They compose — a string may take an English fix *and* an intent. Worked: "Map display and sizes"
@@ -292,9 +292,9 @@ which ditch to miss, not where the road is; a synonym set lets them just transla
 `avoid` only for a genuine polysemy trap (financial "default", anatomical "head"), and never as a
 substitute for saying plainly what the label means.
 
-**`$ec_lang_intent` is off-limits to AI.** This array is human-authored translation guidance,
+**`$ec_lang_syn` is off-limits to AI.** This array is human-authored translation guidance,
 interleaved with `$ec_lang` for human review. AI must never add, change, or remove any
-`$ec_lang_intent` entry without explicit written permission from the human in that conversation.
+`$ec_lang_syn` entry without explicit written permission from the human in that conversation.
 The working pattern, confirmed 2026-08-08: **AI proposes intent entries as a diff in the
 conversation; the human approves; only then does AI write them.** Tom is keeping the bar in place
 for now and may lift it later.
@@ -312,7 +312,7 @@ them** (duplication is what let stale values drift):
 - **Glossary (`glossary.json`) — per *concept*.** One entry, referenced by every label/calculator that
   uses the term. The single source of truth for: the plain meaning, English synonyms, each language's
   dominant standard translation, any `avoid` list, and sourcing. Terminology *consistency* lives here.
-- **`$ec_lang_intent` — per *label*, and its payload is SYNONYMS.** The left-of-pipe is a synonymic
+- **`$ec_lang_syn` — per *label*, and its payload is SYNONYMS.** The left-of-pipe is a synonymic
   expansion of *this label's* meaning — alternate wordings a translator can re-compress in their own
   language. **That payload is the point of the channel, not a legacy of it.** The right-of-pipe stays
   what it was: terse production commentary (`layout`, `symbol`, `avoid`, `gloss`). A `gloss:` pointer
@@ -326,7 +326,7 @@ Rule of thumb: **concept → glossary; this label's other wordings → intent; u
 tip.** Don't copy the same *fact* between glossary and intent (that is how stale values drift) — but
 a label may legitimately carry both a `gloss:` pointer and its own synonyms.
 
-**Superseded 2026-08-08.** This section previously read "`$ec_lang_intent` — per label, metadata
+**Superseded 2026-08-08.** This section previously read "`$ec_lang_syn` — per label, metadata
 only", called the left-of-pipe "largely superseded by visible tips", and directed that it "should be
 trimmed toward pointers (Task 132)". All three statements are retired. They redefined a
 translator-facing synonym channel as AI-facing metadata, which is why intents stopped carrying the
@@ -370,11 +370,11 @@ The `avoid` arrays are the single source of truth for the **trap-term watchlist*
 (`dev/scripts/list_trap_terms.php`) — a one-command dump handed to a high-power agent for an on-demand
 sweep. Never maintain a separate watchlist; it derives from the glossary.
 
-### `$ec_lang_intent` format: `<intent> | <commentary>`
+### `$ec_lang_syn` format: `<synonyms> | <commentary>`
 
 An intent string has two parts separated by the first pipe (`|`):
 
-- **Left of the pipe — the intent.** A synonymic expansion of *this label's* meaning: a fuller paraphrase, with alternate words in parentheses, that a translator can re-compress in their language. This is the translatable payload. It may freely contain parentheses.
+- **Left of the pipe — the synonyms.** Alternate wordings of *this label*: a word bank, or a fuller phrasing with alternates in parentheses, that a translator can re-compress in their language. This is the translatable payload, and **every phrase in it must pass the substitution test above** — it could stand on the control as the label itself. It may freely contain parentheses.
 - **Right of the pipe — commentary.** Production/layout notes and disambiguation. **Not** translated; the payload generator strips it. Keep it parsimonious by using the tag vocabulary below rather than prose.
 
 A string with **no pipe** is entirely intent (all existing clean strings stay valid — zero migration).
@@ -405,7 +405,7 @@ translators actually struggled with it first.
 
 Add new `layout` tokens or tags here (defined once) rather than expanding prose in the data. Example:
 ```php
-$ec_lang_intent['mi_is_bank']='Boundary (divider, edge, break, or bank as in HEC-RAS) between adjacent regions of differing flow, hydraulic radius, and composite n. | layout: column heading';
+$ec_lang_syn['mi_is_bank']='Boundary (divider, edge, break, or bank as in HEC-RAS) between adjacent regions of differing flow, hydraulic radius, and composite n. | layout: column heading';
 ```
 
 The 26 non-English languages: am, ar, bg, bn, cs, de, es, fa, fr, he, hi, hr, id, it, km, my, ps, pt, ro, ru, sr, sw, tr, uk, ur, zh.
@@ -460,7 +460,7 @@ automatically. That is the point: it replaces "remember not to."
 ### Rule D: language strings are single-quoted (ROADMAP Task 163, enforced 2026-07-28)
 
 `$ec_lang['k']='value';` — never `"value"`. An apostrophe inside the text is escaped `\'`. Enforced
-for both `$ec_lang` and `$ec_lang_intent` by `lang_syntax_validate.php`
+for both `$ec_lang` and `$ec_lang_syn` by `lang_syntax_validate.php`
 (`double-quoted-assignment`); all 660 pre-existing double-quoted assignments were converted, so the
 count is zero and any new one is a hard error.
 
@@ -500,7 +500,7 @@ When translating a new calculator's keys into all 26 non-English languages, **sp
    `dev/english-friction/<sprint>.json`; route each one with the English/intent/glossary rule above.
    **`php dev/scripts/friction_check.php --sprint=<id>` must exit 0 before the sprint launches.**
 1. Regenerate payloads so the delta count reflects the *current* lang files: `wsl -e php /var/www/cnm/public_html/hawsedc/engcalcs/dev/scripts/generate_translation_payloads.php`. This is the orchestrating AI's job, never the user's — the user must never have to remember to call for it. **Enforcement:** the launcher MUST run `generate_translation_payloads.php --check` immediately before spawning agents; it prints `FRESH`/`STALE` and exits non-zero if any payload is older than its inputs (English source, that lang file, glossary, the exempt-key list, the coverage declaration, or the generator itself). A non-zero exit is a hard stop — regenerate, then re-check — so a sprint can never launch on a stale delta.
-2. Verify `glossary.json` has `preferred_translation` populated for the calculator prefix's key terms, especially for anchor languages (es, fr, ru, ar). Check `translation_notes` for WMO-verified terms and terms with `$ec_lang_intent` framing requirements.
+2. Verify `glossary.json` has `preferred_translation` populated for the calculator prefix's key terms, especially for anchor languages (es, fr, ru, ar). Check `translation_notes` for WMO-verified terms and terms with `$ec_lang_syn` framing requirements.
 3. State the delta count and which calculators are affected before asking for authorization. **Delta zero now means zero** (Task 161): keys that are *correctly* byte-identical to English — symbols, eponyms, brand names, per-language cognates — are listed in `dev/scripts/translation_exempt_keys.json` and are not counted, so you no longer hand-classify a residue before proposing. They *are* still reported when missing or blank. `generate_translation_payloads.php`, `lang_parity_check.php`, `translation_completion_matrix.php` and `lang_syntax_validate.php` all read that one list via `dev/scripts/exempt_keys.inc.php`, so a disagreement between those four counts is a bug, not a nuance. **Add a key there only when identical-to-English is permanently correct** — never to quiet a number you don't want to fix.
 
 ### The coverage declaration: what we intend to translate (Tasks 203/204, adopted 2026-08-05)

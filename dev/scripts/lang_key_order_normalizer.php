@@ -12,7 +12,7 @@
  * comments are re-derived from the English file's structure (comments are
  * dev-facing, not translated content). Each file's own preamble (the
  * `<?php` opening plus its own leading comment block) is left untouched.
- * $ec_lang_intent is English-only and is never reordered here.
+ * $ec_lang_syn is English-only and is never reordered here.
  *
  * Usage:
  *   php scripts/lang_key_order_normalizer.php               # rewrite all non-English files
@@ -165,7 +165,7 @@ function splitCsv(string $value): array
  * Tokenizes a lang file into an ordered list of records:
  *   ['type' => 'filler',    'text' => string]                 whitespace, comments, <?php, init lines
  *   ['type' => 'keyline',   'key' => string, 'raw' => string]  a $ec_lang['key'] = ...; statement
- *   ['type' => 'intentline','key' => string, 'raw' => string]  a $ec_lang_intent['key'] = ...; statement
+ *   ['type' => 'intentline','key' => string, 'raw' => string]  a $ec_lang_syn['key'] = ...; statement
  *
  * Concatenating every record's text/raw in order reproduces the original
  * file byte-for-byte, so no formatting is lost.
@@ -183,7 +183,7 @@ function tokenizeLangFile(string $content, bool $allowIntent): array
         $text = is_array($tok) ? $tok[1] : $tok;
         $id = is_array($tok) ? $tok[0] : null;
 
-        $isTargetVar = $id === T_VARIABLE && ($text === '$ec_lang' || ($allowIntent && $text === '$ec_lang_intent'));
+        $isTargetVar = $id === T_VARIABLE && ($text === '$ec_lang' || ($allowIntent && $text === '$ec_lang_syn'));
 
         if (!$isTargetVar) {
             $filler .= $text;
