@@ -137,7 +137,12 @@ global.prompt = global.window.prompt;
 global.navigator = { userAgent: 'node' };
 global.requestAnimationFrame = f => setTimeout(f, 0);
 // iconEl comes from js/Icons.lib.js in the browser; the map symbols only need to not throw here.
-global.EngCalcs = { pageConfig: {}, initTips: () => {}, unitFactorFor: () => 1, iconEl: () => mkEl('g') };
+// iconEl/setLabel come from js/Icons.lib.js in the browser; here they only need to not throw.
+global.EngCalcs = {
+  pageConfig: {}, initTips: () => {}, unitFactorFor: () => 1,
+  iconEl: () => mkEl('g'),
+  setLabel: (el, iconName, text) => { el.textContent = text; }
+};
 global.bootstrap = global.window.bootstrap = { Tooltip: { getInstance: () => null, getOrCreateInstance: () => ({ hide() {}, dispose() {} }) } };
 
 // ---- solver + the file under test ---------------------------------------
@@ -158,6 +163,9 @@ src = src.replace(marker,
   "\t\tsettings: function () { return settings; }, getDoc: function () { return doc; },\n" +
   "\t\tseedDefaultInputs: seedDefaultInputs, bbox: bbox, effective: effective,\n" +
   "\t\tfitPending: function () { return fitAfterSolve; },\n" +
+  "\t\tlinkLengthSI: linkLengthSI, rebuildSettingsFields: rebuildSettingsFields,\n" +
+  "\t\ttoggleSettingsPopup: toggleSettingsPopup, defaultSettings: defaultSettings,\n" +
+  "\t\tsettingsFieldsEl: function () { return document.getElementById('lpn_settings_fields'); },\n" +
   "\t\treset: function () { doc = { nodes: [], links: [], labels: [] };\n" +
   "\t\t\tnodeEls = {}; linkEls = {}; labelEls = {}; incidentLinks = {}; labelsByAnchor = {};\n" +
   "\t\t\tnextId = { J: 1, R: 1, L: 1, P: 1, T: 1 };\n" +
@@ -206,17 +214,27 @@ byId.lpn_toolbar.querySelectorAll = () => [];
   // links - nodes + 1 independent cycles; a tree scores 0, this must score exactly 1.
   ok('exactly one independent loop', links.length - nodes.length + 1 === 1,
     'cyclomatic ' + (links.length - nodes.length + 1));
-  ok('one pipe carries a bend vertex', pipes.filter(p => p.verts.length > 0).length === 1);
+  // Tom, 2026-08-09: "it would be nice to have more than one vertex for demonstration" -- one
+  // vertex shows pipes can bend, several show they are polylines.
+  const bent = pipes.filter(p => p.verts.length > 0);
+  const verts = pipes.reduce((t, p) => t + p.verts.length, 0);
+  ok('more than one bend vertex, spread over more than one pipe', verts >= 3 && bent.length >= 2,
+    verts + ' vertices on ' + bent.length + ' pipes');
 
   // SCALE (Task 254's opening complaint). Coordinates are declarative, so they are read raw.
   const xs = nodes.map(n => n.x), ys = nodes.map(n => n.y);
   const w = Math.max(...xs) - Math.min(...xs), h = Math.max(...ys) - Math.min(...ys);
-  const want = us ? 2800 : 840;
-  ok('extent is project-sized, not plot-sized', near(w, want, 1) && near(h, want / 2, 1),
-    w.toFixed(0) + ' x ' + h.toFixed(0) + ' (want ' + want + ' x ' + want / 2 + ')');
-  ok('text size tracks the geometry, not the 2.5 default', s.textSize === (us ? 20 : 6), s.textSize);
+  // ONE drawing for both presets -- map units are unitless, so there is nothing to scale.
+  ok('extent is 1400 x 700 in both unit sets', near(w, 1400, 1) && near(h, 700, 1),
+    w.toFixed(0) + ' x ' + h.toFixed(0));
+  const cx = (Math.max(...xs) + Math.min(...xs)) / 2, cy = (Math.max(...ys) + Math.min(...ys)) / 2;
+  ok('anchored on 5000,5000', near(cx, 5000, 1) && near(cy, 5000, 1), cx + ',' + cy);
+  // The example must NOT write settings.textSize -- that was the desync Tom found. It inherits
+  // the shipped default, which is now 20.
+  ok('example leaves textSize on the shipped default', s.textSize === L.defaultSettings().textSize
+    && s.textSize === 20, s.textSize);
   const ratio = w / s.textSize;
-  ok('extent:text ratio reads like plan lettering (100-200)', ratio > 100 && ratio < 200, ratio.toFixed(0));
+  ok('extent:text ratio reads like plan lettering (50-100)', ratio > 50 && ratio < 100, ratio.toFixed(0));
 
   // The pump curve is real datasheet shape: 3 points, head falling with flow, from zero flow.
   const cp = pumps[0].curvePoints;
@@ -261,20 +279,66 @@ byId.lpn_toolbar.querySelectorAll = () => [];
   ok('velocities stay under the 5 fps / 1.5 m/s design ceiling', Math.max(...vel) < 1.5,
     vel.map(v => (us ? (v / FT).toFixed(2) + 'fps' : v.toFixed(2) + 'm/s')).join(' '));
 
-  // Auto length must already include the bend -- the defect Tom caught on the old example.
-  const bent = pipes.find(p => p.verts.length > 0);
+  // Auto length must already include the bends -- the defect Tom caught on the old example.
+  const dogleg = pipes.find(p => p.verts.length > 1);
   const straightDist = (() => {
-    const a = doc.nodes.find(n => n.id === bent.from), b = doc.nodes.find(n => n.id === bent.to);
+    const a = doc.nodes.find(n => n.id === dogleg.from), b = doc.nodes.find(n => n.id === dogleg.to);
     return Math.hypot(a.x - b.x, a.y - b.y);
   })();
-  ok('bent pipe length already counts the bend (no drag needed)',
-    L.effective(bent, 'length') > straightDist + 1,
-    L.effective(bent, 'length').toFixed(0) + ' vs straight ' + straightDist.toFixed(0));
+  ok('dog-legged pipe length already counts both bends (no drag needed)',
+    L.effective(dogleg, 'length') > straightDist + 1,
+    L.effective(dogleg, 'length').toFixed(0) + ' vs straight ' + straightDist.toFixed(0));
+
+  // ---- ROADMAP Task 255: the declared length reaches the solver in METRES ----
+  // The guard the ROADMAP asked for: a HAND-COMPUTED Hazen-Williams case, never a comparison
+  // against the other engine (both engines read the same model, so they were wrong together).
+  const p1 = pipes[0], declared = L.effective(p1, 'length');
+  const expectSI = us ? declared * FT : declared;
+  ok('linkLengthSI converts the declared length to metres',
+    near(L.linkLengthSI(p1), expectSI, 1e-9),
+    declared.toFixed(0) + (us ? ' ft -> ' : ' m -> ') + L.linkLengthSI(p1).toFixed(1) + ' m');
+  ok('the model handed to the solver carries the SI length',
+    near(model.links.find(x => x.id === p1.id).length, expectSI, 1e-9));
+  // hf = 10.67 L Q^1.852 / (C^1.852 d^4.87), plus the minor loss k Q^2 / (2 g A^2) the solver adds.
+  const Q1 = Math.abs(r.flows[p1.id]), d1 = L.effective(p1, 'diameter'), A1 = Math.PI / 4 * d1 * d1;
+  const hand = 10.67 * expectSI * Math.pow(Q1, 1.852) / (Math.pow(130, 1.852) * Math.pow(d1, 4.871))
+    + L.effective(p1, 'k') * Q1 * Q1 / (2 * 9.806 * A1 * A1);
+  ok('reported head loss matches hand-computed Hazen-Williams to 1%',
+    Math.abs(Math.abs(r.headlosses[p1.id]) - hand) / hand < 0.01,
+    'solver ' + Math.abs(r.headlosses[p1.id]).toFixed(4) + ' m vs hand ' + hand.toFixed(4) + ' m');
 
   // bbox() must contain every node -- this is what zoomExtent() fits to.
   const b = L.bbox();
   ok('bbox encloses every node', nodes.every(n => n.x >= b.minx && n.x <= b.maxx && n.y >= b.miny && n.y <= b.maxy));
 });
+
+// ---- the Settings panel is a VIEW of `settings`, not a copy taken at page load ----
+// Tom, 2026-08-09: the map drew 20-unit text while the Text size box read 2.5, "a condition
+// [that] should be impossible". It was possible for every setting, because the panel was built
+// once at init and only repainted by the writers that remembered to. toggleSettingsPopup() now
+// rebuilds on open; this proves it for a value changed behind the panel's back.
+console.log('\n--- Settings panel stays in sync ---');
+{
+  const fieldsEl = L.settingsFieldsEl();
+  function textSizeInputValue() {
+    let found;
+    (function walk(n) {
+      (n.children || []).forEach(c => {
+        if (c.type === 'number' && c.step === 'any' && c.min === '0.1' && found === undefined) { found = c.value; }
+        walk(c);
+      });
+    })(fieldsEl);
+    return found;
+  }
+  L.rebuildSettingsFields();
+  ok('panel opens on the shipped default', String(textSizeInputValue()) === '20', textSizeInputValue());
+  L.settings().textSize = 37;                       // a writer that does NOT repaint the panel
+  const popup = byId.lpn_settings_popup;
+  popup.style.display = 'none';
+  L.toggleSettingsPopup({ currentTarget: mkEl('button') });   // reopening must repaint it
+  ok('reopening the panel shows a value changed behind its back',
+    String(textSizeInputValue()) === '37', textSizeInputValue());
+}
 
 console.log('\n' + (fails === 0 ? 'ALL PASS' : fails + ' FAILURE(S)'));
 process.exit(fails === 0 ? 0 : 1);

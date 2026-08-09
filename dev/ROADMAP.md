@@ -1090,32 +1090,7 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     checkable; just do not spend the blog/video headline on it.** Do not relitigate.
   - Consequence: raised 146.06 to 90 and 220 to 95.
 
-- 80|255| **`lpn_` solves US networks with the length in the wrong unit — head loss is 3.28x
-  too high.** Found 2026-08-09 while sizing the Task 254 example. **This is a real physics defect
-  in the shipped calculator, not a display nit.**
-  - `assembleModel()` (`js/looped-network.js`) passes `effective(l, 'length')` straight into
-    `EngCalcs.lpnSolve()`, whose header says *"EVERYTHING HERE IS SI: Q in m3/s, H and lengths in
-    m."* But length is DECLARATIVE — with the Length/Map selector on `ft`, a pipe the user drew and
-    labelled 1000 ft arrives at the solver as 1000 **metres**. Every other quantity handed to the
-    solver (elevation, head, demand, diameter) IS converted, so the model is internally
-    inconsistent, and only in the US preset.
-  - **Measured:** 1000 ft of 6 in at C = 130 carrying 132 gpm. Suite Hazen-Williams says 1.74 ft of
-    loss; the page reports 5.73 ft. Ratio 3.281 = exactly 1 ft/m, which is the fingerprint.
-  - `lpn_u_gradient` inherits it twice over — `js/looped-network.js` divides an SI head loss by a
-    declared-foot length and calls the quotient dimensionless, with a comment asserting the length
-    "is already the real SI length the solver itself used". That comment is the mistaken belief.
-  - **Fix is small but it changes published answers**, so it is Tom's call, not a silent patch:
-    divide by `unitFactor('lpn_u_length')` at the two call sites. **The declarative design is NOT
-    what is wrong** — "one grid unit is one foot by declaration" is a fine decision; the bug is
-    failing to convert that declaration into SI at the solver boundary. Do not "fix" this by making
-    the map metric.
-  - **Task 254's example survives the fix either way** (US pressures rise ~2 psi, still 54-65 psi),
-    which is why it did not block that task.
-  - The EPANET path (`js/lpn-epanet.js`) inherits the same length, so both engines agree with each
-    other and are wrong together — which is exactly why `validate_epanet.js` never caught it. Any
-    fix needs a check that compares against a HAND-COMPUTED US case, not against the other engine.
-
-- 45|256| **`dev/lpn-spike/popup-tips-harness.js` is dead and has been for a while.** Found
+- 55|256| **`dev/lpn-spike/popup-tips-harness.js` is dead and has been for a while.** Found
   2026-08-09. It dies on `MODULE_NOT_FOUND` before a single check runs, so its ~60 assertions have
   been reporting nothing. Four separate causes, all diagnosed, none fixed (the last two need a
   judgment call about what the harness SHOULD assert now):
@@ -1773,6 +1748,32 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Completed
 
+- 0|255| **[DONE 2026-08-09] `lpn_` was solving US networks with the length in the wrong unit.
+  Head loss was 3.281x too high. Fixed same day, at Tom's "Wow. Bad. Can we fix immediately?"**
+  - **The defect.** Length is DECLARATIVE — one map unit IS one foot or one metre by declaration,
+    nothing converts — and `assembleModel()` handed that declared number straight to
+    `js/lpn-solver.js`, whose header says *"EVERYTHING HERE IS SI … lengths in m."* With the
+    Length/Map selector on `ft`, a pipe drawn and labelled 1000 ft was solved as 1000 **metres**,
+    while the elevation, head, demand and diameter around it all WERE converted. SI users were
+    never affected, because there the factor is 1.
+  - **The fix is one new function, `linkLengthSI()`, and four call sites** — the solver model plus
+    the three places that compute a head-loss gradient (popup readonly field, map label line, and
+    the extrema pass), all of which were dividing an SI head loss by a declared-foot length and
+    calling the quotient dimensionless. **The declarative design was NOT the bug and was not
+    touched**; the stored number is still declared, and only the handoff converts.
+  - **Verified against a HAND-COMPUTED Hazen-Williams case, not against the other engine** — 461 ft
+    → 140.5 m, solver 0.2709 m of loss vs 0.2710 m by hand, in
+    `dev/lpn-spike/example-network-harness.js`. That distinction matters: `js/lpn-epanet.js` reads
+    the same model, so both engines were wrong together and agreed with each other perfectly, which
+    is exactly why `validate_epanet.js` (8/8, still green) never caught it.
+  - **Why nothing else caught it:** `validate.js` and `validate_epanet.js` both feed the solver
+    directly, in SI, so neither ever crossed this boundary. **The lesson generalises — a check that
+    never exercises a unit boundary cannot find a unit bug**, and this suite's other calculators
+    convert at the edges too.
+  - **Published US answers changed.** Head loss and gradient both drop by 3.281x; pressures rise
+    slightly. Anyone comparing against a note made before 2026-08-09 will see a difference, and the
+    new numbers are the correct ones.
+
 - 0|254| **[DONE 2026-08-09] The lpn example network is a real ring main, at project scale.**
   `drawExampleNetwork()` in `js/looped-network.js`. Replaced the two-parallel-pipes placeholder.
   - **Shape:** one reservoir, one pump (link) into a tie-in junction, then a closed ring of five
@@ -1782,10 +1783,27 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     networks need a solver.
   - **Scale was the real complaint, and it is a RATIO, not a size.** Tom, 2026-08-09: the old
     example's 45 x 20 extent was "unrealistically small and too small relative to the initial
-    default text and symbol size"; a real project is "on the order of 1000 m (3000 ft)". So the
-    example now spans 2800 x 1400 ft / 840 x 420 m AND sets `settings.textSize` to 20 ft / 6 m in
-    the same breath (~1:140, the ratio Tom named). Changing either alone would have reproduced the
-    defect. Symbols follow the text through `symbolFactor()`, so they needed nothing.
+    default text and symbol size". Symbols follow the text through `symbolFactor()`, so they needed
+    nothing; text and geometry had to move together.
+  - **Final geometry (after Tom's review the same day): 1400 x 700, centred exactly on 5000,5000.**
+    He asked to "scale it all down about 50% and center it or anchor it around 5000,5000" — the
+    anchor puts the example in positive coordinates that read like a survey or state-plane grid
+    rather than a sketch starting at 0,0.
+  - **ONE drawing, not two.** The first cut scaled coordinates per unit preset. That was wrong:
+    Tom, 2026-08-09 — "text size is in map units, which are unitless." Map units are declarative,
+    so there is nothing to scale, and the same 1400 x 700 layout serves both presets (a US visitor
+    gets a 1400 ft ring, a metric one a 1400 m ring; both solve to sensible pressures, checked).
+    Only the real SI quantities still go through `niceDefault()`.
+  - **`defaultSettings().textSize` is now 20, and the example sets nothing.** The first cut wrote
+    `settings.textSize` directly, which drew 20-unit text while the Settings panel still read 2.5 —
+    Tom flagged that as a condition that "should be impossible", and he was right. Two real fixes
+    came out of it, both better than the override: 20 is the shipped default for any drawing (2.5
+    was the old fixed `LABEL_FONT_SIZE` carried over unexamined, and suits a map a few dozen units
+    across, which nobody draws), and `toggleSettingsPopup()` now rebuilds the panel on every open.
+  - **`LPN_BASE_TEXT_SIZE` stays 2.5 and did NOT follow the default.** Its only job is to record
+    what size the fixed world dimensions were drawn for so everything scales together; moving it in
+    step would pin `textFactor()` at 1 and leave symbols and label offsets at their old absolute
+    size while the lettering grew 8x.
   - **Numbers:** 6 in / 150 mm ring at C = 130, ~250 gpm / 15 L/s total demand, pump duty at that
     flow. Solves to 52–63 psi (365–422 kPa) at every junction, 0.05–1.5 fps velocities. Both unit
     presets are the same drawing at different scale, not a conversion of one another.
@@ -1795,15 +1813,21 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     complaint). `fitAfterSolve` / `consumeFitAfterSolve()` request one more fit on every exit path
     from a solve, including the async EPANET one. `drawTestGrid()` uses it too.
   - **Kept deliberately:** reservoir level with the network (so the pump is visibly the reason
-    there is pressure), the 3-point datasheet-shaped pump curve, US/SI through `niceDefault()`,
-    and one bend vertex so the example still ships something to drag.
+    there is pressure), the 3-point datasheet-shaped pump curve, and US/SI through `niceDefault()`.
+  - **Three bend vertices across two pipes** (Tom: "it would be nice to have more than one vertex
+    for demonstration") — a two-vertex dog-leg on the long back run and a single easy bend on the
+    return. One vertex shows that pipes can bend; several show they are polylines. The other three
+    legs stay straight, because a ring with a kink in every leg reads as sketchy, not as a plan.
   - **Coordinates are NOT run through `niceDefault()`** — lengths and map coordinates are
     declarative (1 grid unit IS 1 ft or 1 m, no conversion), so they are scaled by a local `gu`
     factor instead. Getting this wrong would silently produce a 3.3x-wrong drawing.
-  - **Verified by `node dev/lpn-spike/example-network-harness.js`** (new, 18 checks x 2 unit sets,
-    all pass): topology, cyclomatic number, extent, text ratio, pump curve shape, convergence,
-    pressure band, flow reversal, velocity ceiling, bent-pipe auto length, and the pending re-fit
-    being consumed exactly once. No browser pass was needed.
+  - **Verified by `node dev/lpn-spike/example-network-harness.js`** (new, 24 checks x 2 unit sets
+    plus 2 settings-panel checks, all pass): topology, cyclomatic number, extent, 5000,5000 anchor,
+    text default, pump curve shape, convergence, pressure band, flow reversal, velocity ceiling,
+    multi-vertex auto length, the pending re-fit being consumed exactly once, the Task 255 unit
+    conversion against a hand-computed case, and the Settings panel repainting a value changed
+    behind its back. No browser pass was needed.
+  - **Final numbers:** 55-63 psi (US) and 361-422 kPa (SI) at every junction, 0.04-1.5 fps.
   - **Example PROJECTS are still open and are a different task — see Task 257.**
 
 - 0|243| **[DONE 2026-08-09] Real EPANET engine in `lpn_`, as an opt-in second engine.**

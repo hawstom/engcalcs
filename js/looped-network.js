@@ -39,12 +39,18 @@ var EngCalcs = EngCalcs || {};
 		return base * (mult || 1);
 	}
 	function effectiveLineHeight() { return effectiveFontSize() * 1.2; }
-	// Everything on the map that is drawn at a fixed world size was drawn for the DEFAULT text size,
-	// so it is expressed as "base dimension x textFactor()" -- 1 at the default, and tracking the
-	// user's Text size (and, in 'screen' units, the zoom) everywhere else. Used by the extrema
-	// badges, the leader threshold, the default label offset, and -- multiplied by the user's own
-	// symbolScale -- every symbol; see symbolFactor().
-	var LPN_BASE_TEXT_SIZE = 2.5; // defaultSettings().textSize
+	// Everything on the map that is drawn at a fixed world size was drawn against THIS size, so it
+	// is expressed as "base dimension x textFactor()" -- tracking the user's Text size (and, in
+	// 'screen' units, the zoom) everywhere else. Used by the extrema badges, the leader threshold,
+	// the default label offset, and -- multiplied by the user's own symbolScale -- every symbol;
+	// see symbolFactor().
+	// NOT defaultSettings().textSize any more (2026-08-09, Task 254): that default moved to 20 and
+	// this did NOT follow it, deliberately. This number's only job is to say what size the fixed
+	// world dimensions below were drawn for, so that everything scales together; moving it in step
+	// with the default would hold textFactor() at 1 and leave symbols and offsets at their old
+	// absolute size while the lettering grew 8x. Leave it at 2.5 unless those base dimensions are
+	// themselves re-drawn.
+	var LPN_BASE_TEXT_SIZE = 2.5;
 	function textFactor(mult) { return effectiveFontSize(mult) / LPN_BASE_TEXT_SIZE; }
 
 	// ---- Task 146.01: draggable node/link data labels (leader lines + collision avoidance + mask) ----
@@ -710,7 +716,15 @@ var EngCalcs = EngCalcs || {};
 			// who lives in Default inputs is not re-opening it every session. Default inputs starts
 			// OPEN because it is the mode-switching section above; the other two are set-once.
 			sectionsOpen: { idPrefixes: false, defaults: true, mapDisplay: false, files: false },
-			textSize: 2.5, // world units -- the original fixed LABEL_FONT_SIZE constant's value
+			// Map units, which are UNITLESS (Tom, 2026-08-09) -- the Length/Map selector only
+			// declares what one of them means, so this number is not a length in ft or m and does
+			// not convert. 20 replaces the original 2.5, which was the old fixed LABEL_FONT_SIZE
+			// constant carried over unexamined: 2.5 suits a drawing a few dozen units across, and
+			// nobody draws a water system at that size. At the scale real work arrives in --
+			// hundreds to thousands of units -- 2.5 renders as a hairline. Tom named 20 as the good
+			// initial default, and it is now the ONLY place the example network's text size comes
+			// from; drawExampleNetwork() deliberately no longer overrides it.
+			textSize: 20,
 			symbolScale: 1, // symbol size relative to text size -- see symbolFactor() above
 			symbolOpacity: 1, // 0-1, applied to symbols only (never labels) -- see refreshSymbolSizes()
 			backdropOpacity: 1, // 0-1, applied to the backdrop image -- the other half of the same control
@@ -4821,39 +4835,41 @@ var EngCalcs = EngCalcs || {};
 	// together (see the comment on that line): they are one decision, not two, because what was
 	// wrong was the RATIO between linework and lettering, not either one alone.
 	//
-	// UNITS. Coordinates and lengths are DECLARATIVE (see the lengthField()/units comments): one
-	// grid unit is one foot or one metre by declaration, with no conversion. So they are NOT run
-	// through niceDefault() -- they are scaled here by `gu`, which lays the same drawing out in ft
-	// or in round metres. Everything that IS a real SI quantity (elevation, demand, diameter, pump
-	// curve) still goes through niceDefault() as before.
+	// UNITS AND PLACEMENT. Map coordinates are DECLARATIVE and UNITLESS (Tom, 2026-08-09; see the
+	// lengthField()/units comments): one map unit IS one foot or one metre by declaration, and
+	// nothing converts. So the drawing below is ONE drawing, laid out once and identical in both
+	// unit presets -- there is no US/SI coordinate scaling, because there is nothing to scale. Only
+	// the real SI quantities (elevation, demand, diameter, pump curve) go through niceDefault().
+	// A US visitor therefore gets a 1400 ft ring and a metric one a 1400 m ring; both solve to
+	// sensible pressures, which is checked in dev/lpn-spike/example-network-harness.js.
+	//
+	// It is anchored at 5000,5000 rather than at the origin (Tom, 2026-08-09: "center it or anchor
+	// it around 5000,5000"), so the example lands in positive coordinates that look like a survey
+	// or state-plane grid rather than like a sketch that starts at 0,0. The extent is 1400 x 700
+	// and the centre is exactly 5000,5000.
+	//
+	// TEXT SIZE IS NOT SET HERE ANY MORE. An earlier version of this function wrote
+	// settings.textSize directly, which produced a map drawing 20-unit text while the Settings
+	// panel still read 2.5 -- a desync Tom rightly called impossible-looking. The real fix was two
+	// other things: defaultSettings().textSize is now 20 (a sane default for any real drawing, not
+	// just this one), and toggleSettingsPopup() rebuilds the panel on every open. The example needs
+	// no override at all, which also means undoing it cannot strand a changed setting.
 	function drawExampleNetwork() {
 		if (doc.nodes.length > 0) {
 			var pc = EngCalcs.pageConfig || {};
 			if (!window.confirm(pc.lpn_confirm_example || 'This adds the example to the network you already have. Continue?')) { return; }
 		}
 		saveUndoSnapshot();
-		// One grid unit per declared length unit. The layout below is written in FEET; 0.3 turns
-		// every one of those round hundreds into an equally round multiple of 30 m, so the metric
-		// visitor gets a ~840 m network with no ragged coordinates rather than a converted one.
-		var gu = unitKey('lpn_u_length') === 'ft' ? 1 : 0.3;
-		// Text size is part of the example, not a separate preference. At a 2800-unit extent the
-		// shipped 2.5-unit default renders as a hairline, which is exactly the complaint that
-		// opened Task 254 ("linework size... too small relative to the initial default text").
-		// 20 ft / 6 m is the ratio Tom named (~1:140 to the extent) and reads like plan lettering.
-		// NOTE this outlives Undo: settings are not part of `doc`, so saveUndoSnapshot() above does
-		// not capture textSize and undoing the example leaves the new size in place. Accepted --
-		// it is one visible, user-editable number in the Settings panel, not hidden state.
-		settings.textSize = gu === 1 ? 20 : 6;
 		// The reservoir sits at 50 ft / 15 m, in among the junctions it feeds (45-62 ft) rather
 		// than perched above them (Tom, 2026-07-30). A source high above the network makes the
 		// example a gravity system that would work with the pump deleted -- the pump's contribution
 		// is invisible because the elevation is doing the work. Level with the network, the pump is
 		// the only reason there is pressure anywhere, which is the point of including one. Its head
 		// is left blank, so the water surface is the reservoir's own ground elevation.
-		var r = addNode('reservoir', 0 * gu, 900 * gu);
+		var r = addNode('reservoir', 4300, 5000);
 		r.elev = niceDefault('lpn_u_elevhead', 'fth2o', 50, 15);
 		// J1 is the tie-in: no demand of its own, it is where the pump discharges into the ring.
-		var j1 = addNode('junction', 400 * gu, 900 * gu);
+		var j1 = addNode('junction', 4500, 5000);
 		j1.elev = niceDefault('lpn_u_elevhead', 'fth2o', 45, 14); j1._demand = 0;
 		// The example's pump gets a curve explicitly, as document content the user can see and edit
 		// in its popup -- addLink() no longer invents one (see its comment). Everything else in this
@@ -4879,19 +4895,26 @@ var EngCalcs = EngCalcs || {};
 		// elevations would put the hydraulic divide exactly opposite the tie-in and make the answer
 		// look like symmetry rather than like a solve.
 		var ring = [
-			{ x: 1200, y: 300, elev: [55, 17], demand: [60, 0.004] },
-			{ x: 2400, y: 500, elev: [62, 19], demand: [80, 0.005] },
-			{ x: 2800, y: 1400, elev: [58, 18], demand: [50, 0.003] },
-			{ x: 1500, y: 1700, elev: [52, 16], demand: [60, 0.003] }
+			{ x: 4800, y: 4650, elev: [55, 17], demand: [60, 0.004] },
+			{ x: 5400, y: 4700, elev: [62, 19], demand: [80, 0.005] },
+			{ x: 5700, y: 5150, elev: [58, 18], demand: [50, 0.003] },
+			{ x: 5000, y: 5350, elev: [52, 16], demand: [60, 0.003] }
 		];
+		// Bend vertices, by ring leg index. MORE THAN ONE, and on more than one pipe (Tom,
+		// 2026-08-09: "it would be nice to have more than one vertex for demonstration") -- a single
+		// vertex shows that pipes can bend but not that they are polylines. Leg 3 gets a two-vertex
+		// dog-leg, the shape a main takes around an obstacle; leg 4 gets a single easy bend. The
+		// other three stay straight, because a ring with a kink in every leg reads as sketchy
+		// rather than as a plan.
+		var bends = { 3: [{ x: 5550, y: 5300 }, { x: 5250, y: 5300 }], 4: [{ x: 4650, y: 5250 }] };
 		// 6 in / 150 mm at C = 130 (ductile iron or PVC), not the 4 in / 0.1 m page default: a 6 in
-		// ring at these demands runs 0.4-1.5 ft/s with a visible gradient on every pipe, where the
-		// default diameter would read as a fire-flow-limited main and a wider one would show
-		// head losses too small to see at two decimals.
+		// ring at these demands runs well under the design velocity ceiling with a readable gradient
+		// on every pipe, where the default diameter would read as a fire-flow-limited main and a
+		// wider one would show head losses too small to see at two decimals.
 		var dia = niceDefault('lpn_u_diameter', 'in', 6, 0.15), rough = 130;
 		var nodes = [j1], i, n, pipe;
 		for (i = 0; i < ring.length; i++) {
-			n = addNode('junction', ring[i].x * gu, ring[i].y * gu);
+			n = addNode('junction', ring[i].x, ring[i].y);
 			n.elev = niceDefault('lpn_u_elevhead', 'fth2o', ring[i].elev[0], ring[i].elev[1]);
 			n._demand = niceDefault('lpn_u_flow', 'gpm', ring[i].demand[0], ring[i].demand[1]);
 			nodes.push(n);
@@ -4900,11 +4923,8 @@ var EngCalcs = EngCalcs || {};
 			pipe = addLink('pipe', nodes[i].id, nodes[(i + 1) % nodes.length].id);
 			pipe._diameter = dia;
 			pipe._roughness = rough;
-			// One bend, on the long back run, so the example still ships a vertex to drag -- the
-			// original reason the old example had a bent pipe at all. Everything else is straight,
-			// because a ring drawn with a kink in every leg reads as sketchy rather than as a plan.
-			if (i === 3) { pipe.verts.push({ x: 2100 * gu, y: 1750 * gu }); }
-			// addLink() computed .length before that vertex existed (straight node-to-node
+			if (bends[i]) { bends[i].forEach(function (v) { pipe.verts.push({ x: v.x, y: v.y }); }); }
+			// addLink() computed .length before those vertices existed (straight node-to-node
 			// distance); rebuildLink() only rebuilds the DOM, not the length -- recompute
 			// explicitly, or the initial displayed length undercounts the bend until the vertex is
 			// next dragged (which goes through updateVertex()/updateLinkGeometry(), where lenAuto
@@ -4914,7 +4934,6 @@ var EngCalcs = EngCalcs || {};
 			rebuildLink(pipe);
 		}
 		updateEmptyHint();
-		refreshFontSizes(); // the new settings.textSize above; also resizes symbols and label offsets
 		saveToStorage();
 		zoomExtent();
 		// ...and again once the labels exist. zoomExtent() measures the RENDERED label text, and at
@@ -5917,6 +5936,16 @@ var EngCalcs = EngCalcs || {};
 	function toggleSettingsPopup(evt) {
 		var popup = document.getElementById('lpn_settings_popup');
 		if (popup.style.display === 'block') { popup.style.display = 'none'; return; }
+		// REBUILD ON EVERY OPEN. The panel used to be built once, by wireSettingsPopup() at init,
+		// and then only rebuilt by the paths that happened to remember (Restore defaults, opening a
+		// project). Anything else that wrote to `settings` left the panel showing the value from
+		// page load -- Tom, 2026-08-09, found the example network drawing 20-unit text while the
+		// Text size box still read 2.5, and said correctly that this condition "should be
+		// impossible". It was possible for every setting, not just that one; a writer had to
+		// remember to repaint, and one did not. Rebuilding here makes the panel a VIEW of
+		// `settings` rather than a copy of it, so no future writer can desync it either. Cheap:
+		// this is ~30 form controls, built only when the user actually opens the panel.
+		rebuildSettingsFields();
 		var r = evt.currentTarget.getBoundingClientRect();
 		popup.style.left = r.left + 'px'; popup.style.top = r.bottom + 'px'; popup.style.display = 'block';
 		var pr = popup.getBoundingClientRect();
@@ -6340,10 +6369,10 @@ var EngCalcs = EngCalcs || {};
 			// head loss, which is the whole of how a head gain is expressed on this page.
 			readonlyUnitField(fields, pc.lpn_result_headloss || 'Head loss', 'lpn_u_elevhead', lastSolveResult.headlosses[linkId]);
 			// Gradient is per unit of pipe LENGTH, so it is a pipe-only result -- a pump has no
-			// length to spread its head over.
-			if (l.type !== 'pump' && effective(l, 'length')) {
+			// length to spread its head over. linkLengthSI(), not the declared length: see Task 255.
+			if (l.type !== 'pump' && linkLengthSI(l)) {
 				readonlyUnitField(fields, pc.lpn_result_gradient || 'Head loss gradient', 'lpn_u_gradient',
-					lastSolveResult.headlosses[linkId] / effective(l, 'length'), pc.lpn_result_gradient_tip);
+					lastSolveResult.headlosses[linkId] / linkLengthSI(l), pc.lpn_result_gradient_tip);
 			}
 		}
 		tipsIn(fields);
@@ -6487,6 +6516,30 @@ var EngCalcs = EngCalcs || {};
 	// that are NOT overridable (elev, from/to, h0/a/b, curve-derived) pass through unchanged.
 	// method is fixed to 'hw' for now (no friction-method selector yet -- see the numberFieldPlain()
 	// comment on Roughness). visc is fresh water at ~20C; not user-editable yet.
+	// A link's length in METRES, which is the only thing js/lpn-solver.js and js/lpn-epanet.js will
+	// accept ("EVERYTHING HERE IS SI: Q in m3/s, H and lengths in m. Callers convert at the edges").
+	// THIS FUNCTION IS THAT EDGE, and it did not exist until 2026-08-09 (ROADMAP Task 255).
+	//
+	// THE BUG IT FIXES. Length is DECLARATIVE: one map unit IS one foot or one metre by declaration,
+	// with no conversion anywhere in the document, the popup or the labels -- a deliberate design
+	// (see the lengthField() and units comments) and still the right one. But assembleModel() then
+	// handed that declared number straight to an SI solver. With the Length/Map selector on `ft`, a
+	// pipe the user drew and labelled 1000 ft was solved as 1000 METRES, while its elevation, head,
+	// demand and diameter around it all WERE converted. Head loss came out 3.281x too high -- and
+	// 3.281 is exactly 1 ft/m, which is the fingerprint. Measured before the fix: 1000 ft of 6 in at
+	// C = 130 carrying 132 gpm reported 5.73 ft of loss where this suite's own Hazen-Williams says
+	// 1.74 ft. SI users were never affected, because there the factor is 1.
+	//
+	// WHY NOTHING CAUGHT IT. dev/lpn-spike/validate.js and validate_epanet.js both feed the SOLVER
+	// directly, in SI, so they never crossed this boundary; and the EPANET path reads the same
+	// model, so both engines were wrong together and agreed with each other perfectly. Any future
+	// check of this has to compare against a hand-computed US case, never against the other engine.
+	//
+	// Do NOT "fix" a future variant of this by making the map metric or by converting the stored
+	// length. The stored number stays declarative; only the handoff converts.
+	function linkLengthSI(l) {
+		return effective(l, 'length') / unitFactor('lpn_u_length');
+	}
 	var lastSolveResult = null;
 	function assembleModel() {
 		var nodes = doc.nodes.map(function (n) {
@@ -6502,7 +6555,7 @@ var EngCalcs = EngCalcs || {};
 			return {
 				id: l.id, type: l.type, from: l.from, to: l.to,
 				diameter: effective(l, 'diameter'), roughness: effective(l, 'roughness'),
-				length: effective(l, 'length'), status: effective(l, 'status'), k: effective(l, 'k'),
+				length: linkLengthSI(l), status: effective(l, 'status'), k: effective(l, 'k'),
 				h0: l.h0, a: l.a, b: l.b
 			};
 		});
@@ -6636,13 +6689,15 @@ var EngCalcs = EngCalcs || {};
 			// form to read as anything but "0.00" for a typical small pipe gradient; see that
 			// family's own comment. Not a per-1000-length form (EPANET's convention) by design,
 			// matching this suite's own established slope convention instead.
-			// effective(l,'length') is NOT divided by unitFactor('lpn_u_length') here -- per the
-			// scope doc's "declarative units" design, it is already the real SI length the
-			// solver itself used (the Length/Map selector only relabels the popup's input, it does
-			// not convert the stored number), so dividing by that selector's factor would double-
-			// convert. Pump-excluded, same as headloss.
+			// linkLengthSI(), NOT effective(l,'length'). A gradient is dimensionless, so BOTH sides
+			// of the division must be in the same system, and the numerator is a solver head loss
+			// in metres. This line used to divide by the DECLARED length and carried a comment
+			// asserting that number "is already the real SI length the solver itself used" -- that
+			// belief was the Task 255 bug (see linkLengthSI()), and it made the gradient wrong by
+			// the same 3.281x in US units, on top of the head loss already being wrong.
+			// Pump-excluded, same as headloss.
 			gradient: fieldExtrema(doc.links.map(function (l) {
-				var len = effective(l, 'length');
+				var len = linkLengthSI(l);
 				if (l.type === 'pump' || !len || !lastSolveResult || lastSolveResult.headlosses[l.id] === undefined) { return undefined; }
 				return displayRound(lastSolveResult.headlosses[l.id] / len, 'lpn_u_gradient', ld.gradient);
 			}))
@@ -6688,7 +6743,7 @@ var EngCalcs = EngCalcs || {};
 				// Velocity is meaningless for a pump (no diameter -- see renderLinkFields() above).
 				if (ls.link.velocity && l.type !== 'pump') { lines.push(numLine(lastSolveResult.velocities[l.id], 'lpn_u_velocity', extrema.velocity, fc.velocity, ld.velocity)); }
 				if (ls.link.headloss) { lines.push(numLine(lastSolveResult.headlosses[l.id], 'lpn_u_elevhead', extrema.headloss, fc.headloss, ld.headloss)); }
-				if (ls.link.gradient && l.type !== 'pump' && effective(l, 'length')) { lines.push(numLine(lastSolveResult.headlosses[l.id] / effective(l, 'length'), 'lpn_u_gradient', extrema.gradient, fc.gradient, ld.gradient)); }
+				if (ls.link.gradient && l.type !== 'pump' && linkLengthSI(l)) { lines.push(numLine(lastSolveResult.headlosses[l.id] / linkLengthSI(l), 'lpn_u_gradient', extrema.gradient, fc.gradient, ld.gradient)); }
 			}
 			le.empty = lines.length === 0;
 			if (lines.length === 0) { lines.push({ text: '' }); }
