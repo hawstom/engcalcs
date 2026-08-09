@@ -33,30 +33,16 @@
         "syn_notes": "Use key_syn when present; these entries provide terse disambiguation comments only where translation risk exists."
     },
     "prompt_context_by_prefix": {
-        "menu": "Use these preferred technical term translations when relevant:\n- flow (Q): प्रवाह\n- velocity (v): वेग\n- slope (S): ढाल\n    DO NOT render as: activity\/fitness sense of 'grade' — the treadmill or trail incline for running\/walking\/jogging; this is the hydraulic energy gradient, not an exercise setting; geographic or topographic landform term; school grade \/ academic mark"
+        "menu": "Use these preferred technical term translations when relevant:\n- libre software: मुक्त सॉफ़्टवेयर\n    DO NOT render as: free of charge, gratis, no-cost, or any price-sense rendering; phonetic transliteration of the English word \"libre\" as if it were a brand name; phonetic transliteration of \"open source\" where the language has its own term; wording that implies a free trial, a free tier, or a limited free version"
     },
     "glossary_terms_by_prefix": {
         "menu": [
             {
-                "term": "flow",
-                "symbol": "Q",
-                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
-                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg RESOLVED (Tom, 2026-07-13): native engineer's 2026-07-06 clarification confirmed both 'дебит' (colloquial\/general register) and 'водно количество' (academic\/hydraulic-engineering register, used at university for Q) are acceptable. Tom decided suite-wide standardization on 'водно количество' — \"I would put водно количество everywhere\" — applied across all bg calculator categories (pipes\/irrigation included, not just the hydraulic-structure\/open-channel strings the engineer originally corrected). 'дебит' fully replaced in lib\/lang.ec.bg.php 2026-07-13. Task 109 stages 3-5 (2026-07-19): bg standardized on водно количество (дебит drift removed from or_\/mpf_\/cs_ per Bulgarian-engineer-feedback.md); sr standardized on проток (stage 4); it confirmed on portata (flusso drift removed).",
-                "preferred_translation": "प्रवाह"
-            },
-            {
-                "term": "velocity",
-                "symbol": "v",
-                "context": "Flow velocity (speed of water). Appears in all calculators.",
-                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
-                "preferred_translation": "वेग"
-            },
-            {
-                "term": "slope",
-                "symbol": "S",
-                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators. English aliases 'slope' and 'grade' (u_grade\/u_gradePercent) both point here.",
-                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term. [2026-07-21] Centralized the grade activity-sense guard here (was living only as u_grade\/u_gradePercent label commentary): the 'avoid' array now carries the running\/walking\/jogging exercise-incline trap, so the slope entry is the single home for the grade→energy-gradient concept and its wrong senses.",
-                "preferred_translation": "ढाल"
+                "term": "libre software",
+                "symbol": "",
+                "context": "Software licensed so that its users are free to run, study, modify and redistribute it -- the freedom sense, never the price sense. Appears as the navbar item (menu_libre) and in the About page license section. Tom chose the English word \"Libre\" deliberately on 2026-08-09, over \"Freely yours\" and \"Community software\", citing LibreOffice as precedent.",
+                "translation_notes": "2026-08-09 (Task 244): DEFER TO EACH LANGUAGE ESTABLISHED TERM, do not coin a new one. This concept has been translated by the free-software movement for decades and most of these languages have a settled, published phrase; ours must match it or it will read as an amateur calque. The English $ec_lang_syn entry deliberately offers coinages (Liberated \/ Liberty \/ Freedom Software) to convey the SENSE, because English lacks an unambiguous word -- that is an English-only problem and must NOT be exported. Where a language already distinguishes freedom from price (Romance libre\/livre\/libero\/liber, de frei, ru свободное), use that word and the trap disappears. Where it does not, translate the concept (software whose users hold the rights) rather than transliterating \"libre\" phonetically -- transliteration is the specific failure mode this entry exists to prevent, and it falls hardest on am, bn, km, my, ps, ur.",
+                "preferred_translation": "मुक्त सॉफ़्टवेयर"
             }
         ]
     },
@@ -84,5 +70,7 @@
             }
         }
     },
-    "key_syn": []
+    "key_syn": {
+        "menu_libre": "FLOSS (Free Libre Open Source Software), Liberated Software, Liberty Software, Freedom Software, or Software you are free to use, study, change, and share."
+    }
 }

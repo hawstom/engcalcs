@@ -25,7 +25,7 @@
         "an untranslatable brand name, to be transliterated phonetically"
       ],
       "disposition": "refer-to-human",
-      "resolution": "OPEN. The English is deliberate -- Tom chose it 2026-08-09 over 'Freely yours' and 'Community software', citing LibreOffice as precedent, and the choice is sound for its own audience. So the routing rule sends this to $ec_lang_syn, not to an English rewrite. But $ec_lang_syn is off-limits to AI without in-conversation permission, so CC has PROPOSED an entry and it awaits Tom's approval. Until it is approved this sprint ships menu_libre with no translator guidance, which is the exact transliteration risk described above. Blocking for the low-resource languages; harmless for the Romance ones."
+      "resolution": "OPEN -- TOM IS WRITING THE ENTRY HIMSELF. The English is deliberate: Tom chose it 2026-08-09 over 'Freely yours' and 'Community software', citing LibreOffice as precedent, and the choice is sound for its own audience. So the routing rule sends this to $ec_lang_syn, not to an English rewrite. CC proposed an entry; Tom declined it and said 2026-08-09 that he would edit the wording himself, which is the correct owner for this channel. $ec_lang_syn['menu_libre'] is therefore in place but EMPTY, awaiting his text. THE SPRINT MUST NOT LAUNCH UNTIL IT IS FILLED -- shipping menu_libre with an empty syn is exactly the transliteration risk described above, and it lands on am/km/my/ur/bn/ps, the audiences the mission is for."
     },
     {
       "key": "about_body_html",

@@ -569,6 +569,12 @@ function prefixToTermNames(): array
         // Suite chrome, not a calculator -- but it owns the Restore-defaults button, so it needs
         // the concept too. Without an entry here it silently falls back to the default three.
         'calc' => ['default (setting)', 'flow', 'velocity', 'slope'],
+        // 'menu' and 'about' were missing here until 2026-08-09 (Task 244), the same silent
+        // fallback that bit lpn/bpn above: both own the 'libre software' concept -- the navbar
+        // item and the About page license section -- and without an entry here the glossary
+        // term, including its 'avoid' guards, would never have reached a translation agent.
+        'menu' => ['libre software'],
+        'about' => ['libre software'],
         'lpn' => ['flow', 'velocity', 'head', 'head loss', 'friction loss', 'minor loss', 'pressure',
             'elevation', 'demand', 'static head', 'maximum allowable head', 'supply head',
             'supply curve', 'looped network', 'branched network', 'pipe line', 'pressure rating',

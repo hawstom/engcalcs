@@ -116,7 +116,7 @@ $ec_lang_syn['menu_main_language']='';
 $ec_lang['menu_more']='More';
 $ec_lang_syn['menu_more']='';
 $ec_lang['menu_libre']='Libre Software';
-$ec_lang_syn['menu_libre']='';
+$ec_lang_syn['menu_libre']='FLOSS (Free Libre Open Source Software), Liberated Software, Liberty Software, Freedom Software, or Software you are free to use, study, change, and share. | layout: nav item; gloss: libre software; avoid: free of charge (gratis); transliterating "libre" as a brand name';
 $ec_lang['template_welcome']='Drop your fears at the door; love is spoken here. You are not ruining everything. Enjoy the <a target="_blank" href="https://hawsedc.com/download.php">free libre HawsEDC AutoCAD tools</a> too.';
 $ec_lang_syn['template_welcome']='Leave your fears behind when you enter this space; love is the language we speak here. You are not ruining everything.';
 $ec_lang['template_feedback']='Can you suggest better wording or anything else? Do you want to help or to learn to create tools like these? Please contact me.';
