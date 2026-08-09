@@ -73,19 +73,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     166 pass may carry the same scope error. Check any entry whose notes describe its values as the
     attested form of a *specific label* rather than of the concept.
 
-- 25|236| **One preview-era sentence outlived the PREVIEW drop, and it is Tom's call.**
-  `lpn_notes_3_def` still ends: *"Because this is an early preview, please use it for small networks
-  and for testing only."* The 2026-08-08 PREVIEW removal took the 3 identity keys and the banner but
-  not this sentence, and the Task 146.06 sprint has now translated it into es, pt, fr and tr.
-  - **Deliberately not touched by the sprint.** Two things are tangled in one sentence: the
-    *preview framing*, which is gone, and a *real scale caution*, which may still be true — the
-    solver's practical network size is a question about the solver, not about the label. Deleting
-    the whole sentence would quietly drop a caution nobody decided to drop.
-  - **Three options:** keep it as-is (the caution stands and the preview framing is a wart); rewrite
-    it to keep the size guidance without the preview word; or delete it outright. Whichever wins is
-    a 5-file edit (en + es/pt/fr/tr — no other language carries `lpn_` body strings) plus a drift
-    re-baseline.
-
 - 30|234| **Canal Seepage must prove its worth or go (Tom, 2026-08-08: "in my crosshairs").** After
   Task 232 removed `Irrigation.php`, `cs_` is the remaining page Tom is not proud of — his standing
   position is that it was AI momentum rather than a real need, and it is already under a
@@ -1597,6 +1584,22 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|236| **[DONE 2026-08-08] The last preview-era sentence is gone — Tom said delete.**
+  `lpn_notes_3_def` ended *"Because this is an early preview, please use it for small networks and
+  for testing only."* The 2026-08-08 PREVIEW removal took the 3 identity keys and the banner but
+  missed this one, and the Task 146.06 sprint had just translated it into es, pt, fr and tr.
+  - **Raised as a question rather than fixed inside the sprint**, because the sentence tangled a
+    dead preview framing with a live scale caution, and dropping a caution nobody decided to drop
+    is not a translation sprint's call. Tom's answer was "delete" — the size guidance goes with it.
+  - **Deleted from all 5 files that carry it** (en + es/pt/fr/tr; no other language has `lpn_` body
+    strings), drift manifest re-baselined, payloads FRESH, `equal_to_english` still 0 suite-wide,
+    and the page re-rendered in es and fr to confirm no preview wording survives anywhere.
+  - **`lpn_` now carries no preview language in any of the 27 lang files.** Four stale mentions
+    remain in `js/looped-network.js` (lines 2078, 3225, 5602, 6164) but they are **code comments
+    only** — never rendered. One of them (5602) explains a button's existence as a
+    preview-era convenience, so it is worth a read next time that code is touched; it is not worth
+    a commit of its own.
 
 - 0|146.06| **[DONE 2026-08-08] Translation sprint for `lpn_` strings (Task 146 child).**
   `lpn_` is now translated into es, pt, fr and tr — **223 keys × 4 languages**, 4 Sonnet agents,
