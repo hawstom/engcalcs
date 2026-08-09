@@ -1,7 +1,7 @@
 {
     "description": "sha1 of each lang.ec.en.php $ec_lang value as of the last full translation sync. Maintained by detect_english_drift.php --update. A current-vs-manifest hash mismatch means that key's English changed and translations may be stale. Do not hand-edit.",
     "updated": "2026-08-09",
-    "count": 789,
+    "count": 790,
     "partial_updates": [
         {
             "date": "2026-08-08",
@@ -19,8 +19,8 @@
         }
     ],
     "hashes": {
-        "about_body_html": "73187ffb04c8f4e8f25dde6a6eb3c7ac9dc97691",
-        "about_main_desc": "11e87516dcc0c7ec37ed448c384ecc23eebb661b",
+        "about_body_html": "e651e7dcb7cf59d674f936d34fd505691384fdcd",
+        "about_main_desc": "c671d6afea684309c2946e6ec2c059b9fd1fb656",
         "about_main_menu": "6b21fb791ac05170893860c248401cd24a59b732",
         "about_main_title": "364db8c9061b9cfc77f1f69ac886590c1dfee5d9",
         "bpn_demand": "5dfc68721f3d071b69d27ebcd8245d0506b058de",
@@ -473,6 +473,7 @@
         "lpn_units_velocity": "d80a548eda6c0e81c84db1aa2c1099cc803abddd",
         "lpn_view_units": "12748281e0f02357f2a2f65c1c6a7d01ee122506",
         "menu_brand": "bf8b00231568173bfc88835a77624be526d4dd96",
+        "menu_libre": "38f2a5b458b1b859bea3099c904d3eab6c585532",
         "menu_main_hydraulics": "d6f18fa68583ba0854b0df1a9e753670114f8451",
         "menu_main_language": "89b86ab0e66f527166d98df92ddbcf5416ed58f6",
         "menu_main_list": "ab17a9a530fec26a0c276c8111051cd4c6ff6a17",

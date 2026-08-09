@@ -1174,12 +1174,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     es/pt/fr/it/ro and as an opaque loan in am/km/my/ur. "Freely yours" translates everywhere.
   **[H] Tom picks the navbar wording before this is built.**
 
-- 40|245| **Resync `about_body_html` + `about_main_desc` into 26 languages.** English changed
-  2026-08-09 (Contributing rewritten, contact line, license heading, new paragraph). URLs and the
-  Bitbucket→GitHub proper noun were swapped mechanically in all 27 files, so only the prose drifted.
-  Two keys, 26 languages; `about_` is suite chrome, always in scope. Run `detect_english_drift.php`
-  first, then a sprint under the standard authorization rule.
-
 - 30|246| **Give `lpn_` a real file identity: `.lpn` extension and standard file-toolbar icons.**
   Tom, 2026-08-09, from the epanet-js UX read. JSON inside, `.lpn` outside; new/open/save/save-as
   icons on the toolbar. Cheap, and it is what makes a saved network feel like a document.
@@ -1715,6 +1709,26 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|245| **[DONE 2026-08-09] About-page resync + `menu_libre` into all 26 languages.** 3 keys ×
+  26 agents (Sonnet). Final state: parity `missing 0, extra 0, equal_to_english 0`; drift manifest
+  re-baselined; friction gate 6/6 answered.
+  - **Every language used its own established free-software term; not one transliterated "libre"** —
+    the exact failure the new `glossary.json` entry was written to prevent. es *software libre*,
+    de *Freie Software*, ru *Свободное ПО*, zh *自由软件*, ar *برمجيات حرة*, am *ነጻ ሶፍትዌር*,
+    km *កម្មវិធីសេរី*, my *လွတ်လပ်သော ဆော့ဖ်ဝဲ*, sw *Programu Huria*.
+  - **Found and fixed a silent parse-truncation bug in `lang_parse.inc.php`** (see its comment).
+    Burmese at 3 bytes/char pushed one value to 8,354 bytes, exhausting PCRE's JIT stack;
+    `preg_match_all` returned false, the return was unchecked, and the parse silently truncated to
+    386 of 563 keys — blinding the validator, parity checker, completion matrix and payload
+    generator at once. **This was luck, not diligence: it surfaced only because Burmese prose
+    crossed the threshold first.** Any multi-byte script at ordinary paragraph length reaches it.
+  - **Two agents committed and one pushed despite "do not run git commands."** A bare instruction
+    loses to CLAUDE.md's commit-by-default policy inside a subagent. The wording that held was an
+    explicit "DO NOT RUN ANY GIT COMMAND — no add, no commit, no push, no status." Use that form.
+  - Long-running agents are normal: km and my each ran ~6 h across a session-limit reset and
+    finished correctly. **Check the file before relaunching a "failed" agent** — sw and ps had
+    already written their work when their agents died.
 
 - 0|146.10| **[DONE 2026-08-09] Real element symbols on the lpn map, from the Task 231 icon set
   (Task 146 child).** Scoped with Tom 2026-08-08. A reservoir and a junction were the same `<circle>`
