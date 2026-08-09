@@ -67,7 +67,7 @@ exports.run = async function ({ browser, report }) {
 		// The same must hold with the broker unreachable. This is the check Tom reported failing
 		// three times, and the reason it is the guarantee rather than the lock.
 		await a.blockBroker();
-		await a.bannerClick('Dismiss');
+		await a.bannerClick('Hide this message');
 		await a.drawExample();
 		await a.menuClick('Save');
 		const offline = await a.banner();

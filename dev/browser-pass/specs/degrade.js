@@ -67,14 +67,14 @@ exports.run = async function ({ browser, report }) {
 		await a.drawExample();
 		await a.menuClick('Save');
 		b = await a.waitBanner();
-		report.ok(b && !(b.buttons || []).includes('Dismiss'),
+		report.ok(b && !(b.buttons || []).includes('Hide this message'),
 			'online but refused: the warning cannot be dismissed', b ? b.buttons.join(' / ') : '');
 
 		await a.context.setOffline(true);
 		await a.drawExample();
 		await a.menuClick('Save');
 		b = await a.waitBanner();
-		report.ok(b && (b.buttons || []).includes('Dismiss'),
+		report.ok(b && (b.buttons || []).includes('Hide this message'),
 			'genuinely offline: it CAN be dismissed — nobody can act on it',
 			b ? b.buttons.join(' / ') : '');
 		await a.context.setOffline(false);

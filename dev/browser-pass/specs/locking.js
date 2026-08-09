@@ -49,7 +49,7 @@ exports.run = async function ({ browser, report }) {
 		report.ok(!!dlg, 'B is asked before the project lands, not told afterwards');
 		report.has(dlg && dlg.text, 'AAA', 'the dialog names who has it');
 		report.has(dlg && dlg.text, 'has this file open', 'in the words of the punch list');
-		report.ok(/minutes|hours|days|unknown/.test(dlg.text), 'and carries a NUMBER, not just a name',
+		report.ok(/seconds|minutes|hours|days|unknown/.test(dlg.text), 'and carries a NUMBER, not just a name',
 			(dlg.text || '').slice(0, 120));
 		report.eq(JSON.stringify(dlg.buttons), JSON.stringify(['Cancel', 'Open read-only', 'Break their lock']),
 			'three choices, in the order a decent colleague tries them, and no Take over');

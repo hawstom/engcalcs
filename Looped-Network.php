@@ -23,16 +23,21 @@ echoHeader("EngCalcs", $html_title, "");
 	      // flex-wrap lets the two pieces re-flow onto separate lines on a narrow screen without any
 	      // extra markup -- the wrap-first-as-a-table/div behavior Tom asked for falls out of
 	      // flex-wrap for free. ?>
-	<?php // The units block now lives in a POPOVER off Settings -> Units (ROADMAP Task 211, Tom
-	      // 2026-08-04: "the units selectors really should be in a menu"). Units are set once and
-	      // then left alone, so a permanent row of seven dropdowns was spending the scarcest thing
-	      // this page has -- vertical room above the map -- on a decision nobody revisits. The US/SI
-	      // preset row comes with them, because it is the same decision at a coarser grain.
+	<?php // The units block is a SECTION OF THE SETTINGS PANEL (Task 241, Tom 2026-08-08). It lived
+	      // in a popover of its own from Task 211 until then, which cost Tom himself two failed
+	      // attempts to find it three days after he chose the location -- "I can't see them at all".
+	      // It is rendered here, hidden, and MOVED into the panel by rebuildSettingsFields(); the
+	      // selects must be server-rendered (echoUnitSelect) to keep their unit families and option
+	      // values, so the node is adopted rather than rebuilt. Task 211's reason for getting them
+	      // off the page -- seven permanent dropdowns spending the scarcest thing this page has,
+	      // vertical room above the map -- still holds and is still honoured; they are simply behind
+	      // ONE door now instead of a second one nobody found. The US/SI preset row comes with them,
+	      // because it is the same decision at a coarser grain.
 	      // SETTINGS, not View: a unit system is a property of the calculation, not of the look at it
 	      // (Tom, 2026-08-04, overruling the first version -- "View menu traditionally is about
 	      // camera-related (or layer-related) stuff"). ?>
-	<div id="lpn_units_popup" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:20;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
-	<div class="lpn-popover-body">
+	<div id="lpn_units_holder" class="d-print-none" style="display:none">
+	<div id="lpn_units_block">
 	<div class="d-flex flex-wrap align-items-center" style="gap:4px 12px">
 	<?php echoUnitsRow(false, true); // hide Restore Defaults -- this page has no cookie to restore (Tom, 2026-07-30) ?>
 	<?php // Six selectors (Tom, 2026-07-30, +Velocity added answering "are there others?"):
@@ -58,11 +63,9 @@ echoHeader("EngCalcs", $html_title, "");
 		<?=$ec_lang['lpn_result_gradient']?> <?php echoUnitSelect('lpn_u_gradient', 'gradient', ''); ?>
 	</div><?php // #lpn_units_strip ?>
 	</div><?php // the flex wrapper ?>
-	</div><?php // .lpn-popover-body -- MISSING until 2026-08-04, and the whole page went with it: an
-	            // unclosed div here put the menu bar, toolbar, tab strip and map INSIDE a display:none
-	            // popover. Every div in this popover is now labelled for that reason. ?>
-	<button type="button" id="lpn_units_popup_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">×</button>
-	</div><?php // #lpn_units_popup ?>
+	</div><?php // #lpn_units_block -- the node rebuildSettingsFields() adopts into the panel ?>
+	</div><?php // #lpn_units_holder -- parking spot; every div here is labelled because an unclosed
+	            // one in this block once swallowed the whole page (Task 211, 2026-08-04) ?>
 	<?php // Menu, toolbar, tabs, map -- top to bottom (ROADMAP Task 211, revised 2026-08-04 after Tom
 	      // saw the first version rendered). The MENU holds everything; the TOOLBAR is the high-use
 	      // subset of it, which is the conventional relationship between the two and the reason
@@ -326,6 +329,7 @@ EngCalcs.pageConfig = {
 	lpn_lock_open_heading_saved: <?=json_encode($ec_lang['lpn_lock_open_heading_saved'])?>,
 	lpn_lock_open_heading_seen: <?=json_encode($ec_lang['lpn_lock_open_heading_seen'])?>,
 	lpn_lock_open_choices: <?=json_encode($ec_lang['lpn_lock_open_choices'])?>,
+	lpn_ago_seconds: <?=json_encode($ec_lang['lpn_ago_seconds'])?>,
 	lpn_ago_minutes: <?=json_encode($ec_lang['lpn_ago_minutes'])?>,
 	lpn_ago_hours: <?=json_encode($ec_lang['lpn_ago_hours'])?>,
 	lpn_ago_days: <?=json_encode($ec_lang['lpn_ago_days'])?>,

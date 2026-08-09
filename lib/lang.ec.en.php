@@ -1184,7 +1184,7 @@ $ec_lang['lpn_menu_settings']='Settings';
 // keep its settings and its background image.
 $ec_lang['lpn_edit_delete_network']='Delete network';
 $ec_lang['lpn_confirm_delete_network']='Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone.';
-$ec_lang['lpn_view_units']='Units…';
+$ec_lang['lpn_view_units']='Units';
 // Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='Save all';
 // {n} is a whole number. Assigned at creation as a real, renameable name -- and it is the LOWEST
@@ -1297,12 +1297,13 @@ $ec_lang['lpn_lock_open_readonly']='Open read-only';
 // "my own copy" quietly promises a personal one of everything -- the proliferation this page keeps
 // trying not to encourage. "Create a copy" says what happens and claims nothing.
 $ec_lang['lpn_lock_open_copy']='Create a copy';
-$ec_lang['lpn_lock_break']='Take over the file';
+$ec_lang['lpn_lock_break']='Break their lock';
 $ec_lang['lpn_lock_open_heading_times']='{name} has this file open; the last edit was {x} ago, {y} after the last save.';
 $ec_lang['lpn_lock_open_heading_unsaved']='{name} has this file open; the last edit was {x} ago, and none of it has been saved to this file yet.';
 $ec_lang['lpn_lock_open_heading_saved']='{name} has this file open; the last edit was {x} ago, and their work is saved to the file.';
 $ec_lang['lpn_lock_open_heading_seen']='{name} has this file open but has not edited it. Their browser last checked in {x} ago.';
 $ec_lang['lpn_lock_open_choices']='Your choices: (1) Cancel and ask them to open it if necessary and then close it properly (closing the browser does not close the project), (2) Open read-only, or (3) if all else fails, you can break their lock. Their unsaved work is not lost, but they will not be able to save over your changes, and somebody may have to merge the two by hand.';
+$ec_lang['lpn_ago_seconds']='{n} seconds';
 $ec_lang['lpn_ago_minutes']='{n} minutes';
 $ec_lang['lpn_ago_hours']='{n} hours';
 $ec_lang['lpn_ago_days']='{n} days';

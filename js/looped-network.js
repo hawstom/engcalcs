@@ -3023,11 +3023,19 @@ var EngCalcs = EngCalcs || {};
 	function agoText(ms) {
 		var pc = EngCalcs.pageConfig || {};
 		if (!(ms > 0)) { return pc.lpn_ago_unknown || 'an unknown time'; }
-		var mins = Math.max(1, Math.round(ms / 60000));
-		if (mins < 60) { return (pc.lpn_ago_minutes || '{n} minutes').replace('{n}', mins); }
+		// **n is never 1** (Tom, 2026-08-08). A count of one forces a singular form, and these strings
+		// have exactly one form each -- so English shipped "1 minutes" and every other language would
+		// have had to pick a form that is wrong half the time. Dropping to the next smaller unit at
+		// the boundary (1 hour -> "90 minutes") keeps n >= 2 in every language at once, which is the
+		// cheap way out of plural rules rather than the expensive one. Buckets stay coarse on purpose
+		// -- see the note above; the extra unit is a fourth bucket, not extra precision.
+		var secs = Math.round(ms / 1000);
+		if (secs < 120) { return (pc.lpn_ago_seconds || '{n} seconds').replace('{n}', Math.max(2, secs)); }
+		var mins = Math.round(secs / 60);
+		if (mins < 120) { return (pc.lpn_ago_minutes || '{n} minutes').replace('{n}', mins); }
 		var hrs = Math.round(mins / 60);
 		if (hrs < 48) { return (pc.lpn_ago_hours || '{n} hours').replace('{n}', hrs); }
-		return (pc.lpn_ago_days || '{n} days').replace('{n}', Math.round(hrs / 24));
+		return (pc.lpn_ago_days || '{n} days').replace('{n}', Math.max(2, Math.round(hrs / 24)));
 	}
 	// The stale-claim conversation, worded by Tom 2026-08-05.
 	//
@@ -3872,7 +3880,7 @@ var EngCalcs = EngCalcs || {};
 	// Labels form go away when user clicks away or at least when another menu item is selected? We
 	// are currently seeing the other menus while Labels persists." The property popup (#lpn_popup) is
 	// deliberately NOT in this list: it has its own currentPopup machinery and its own dismissal.
-	var VIEW_POPOVERS = ['lpn_labels_popup', 'lpn_settings_popup', 'lpn_units_popup'];
+	var VIEW_POPOVERS = ['lpn_labels_popup', 'lpn_settings_popup'];
 	function closeViewPopovers(except) {
 		VIEW_POPOVERS.forEach(function (id) {
 			if (id === except) { return; }
@@ -4087,35 +4095,9 @@ var EngCalcs = EngCalcs || {};
 			{ icon: 'labels', label: pc.lpn_tool_labels || 'Labels', fn: function () { toggleLabelsPopup({ currentTarget: document.getElementById('lpn_menu_view') }); } }
 		]);
 	}
-	function openSettingsMenu(anchor) {
-		var pc = EngCalcs.pageConfig || {};
-		openMenu(anchor, [
-			{ icon: 'settings', label: pc.lpn_tool_settings || 'Settings', fn: function () { toggleSettingsPopup({ currentTarget: document.getElementById('lpn_menu_settings') }); } },
-			// **Units are a Settings item, not a View item** (Tom, 2026-08-04, overruling the first
-			// version: "Units is not a view feature. It is a math and engineering feature... View menu
-			// traditionally is about camera-related (or layer-related) stuff"). He is right on the
-			// convention: View holds what the camera and the layers are doing -- Zoom to fit, Labels --
-			// and a unit system is a property of the calculation, not of the look at it.
-			{ icon: 'units', label: pc.lpn_view_units || 'Units…', fn: function () { toggleUnitsPopup(document.getElementById('lpn_menu_settings')); } },
-			{ separator: true },
-			// The one control that clears EVERY project. It has always been the most dangerous button
-			// on the page; behind a menu is where it should always have been.
-			{ icon: 'wipe', label: pc.lpn_settings_wipe_btn || 'Clear calculator', fn: wipeEverything }
-		]);
-	}
-	// The units popover, which is just the old permanent units row given a door.
-	function toggleUnitsPopup(anchor) {
-		var popup = document.getElementById('lpn_units_popup');
-		if (!popup) { return; }
-		if (popup.style.display === 'block') { popup.style.display = 'none'; return; }
-		popup.style.display = 'block';
-		var r = anchor ? anchor.getBoundingClientRect() : { left: 8, bottom: 8 };
-		popup.style.left = r.left + 'px';
-		popup.style.top = r.bottom + 'px';
-		var pr = popup.getBoundingClientRect();
-		popup.style.left = Math.max(4, Math.min(r.left, window.innerWidth - pr.width - 4)) + 'px';
-		popup.style.top = Math.max(4, Math.min(r.bottom, window.innerHeight - pr.height - 4)) + 'px';
-	}
+	// openSettingsMenu() is GONE (Task 241). Its three rows now live where they belong: Settings
+	// and Units are sections of the panel, and Clear calculator is the button at its foot --
+	// which it already was, so the menu row was the duplicate, not the button.
 	function buildMenuBar() {
 		var pc = EngCalcs.pageConfig || {}, bar = document.getElementById('lpn_menubar');
 		if (!bar) { return; }
@@ -4125,7 +4107,12 @@ var EngCalcs = EngCalcs || {};
 			{ id: 'lpn_menu_edit', icon: 'edit', label: pc.lpn_menu_edit || 'Edit', open: openEditMenu },
 			{ id: 'lpn_menu_insert', icon: 'insert', label: pc.lpn_menu_insert || 'Insert', open: openInsertMenu },
 			{ id: 'lpn_menu_view', icon: 'view', label: pc.lpn_menu_view || 'View', open: openViewMenu },
-			{ id: 'lpn_menu_settings', icon: 'settings', label: pc.lpn_menu_settings || 'Settings', open: openSettingsMenu }
+			// Settings is the one menu-bar item that opens a PANEL, not a pull-down (Task 241, Tom
+			// 2026-08-08): "there be a duplicated identical Settings that lives on the Toolbar and in
+			// the Menu". Identical label, identical element, both places -- which is the rule the old
+			// arrangement broke by making the toolbar button open the panel and the menu open a list
+			// whose first row was also called Settings.
+			{ id: 'lpn_menu_settings', icon: 'settings', label: pc.lpn_menu_settings || 'Settings', open: function (a) { toggleSettingsPopup({ currentTarget: a }); } }
 		].forEach(function (m) {
 			var b = document.createElement('button');
 			b.type = 'button';
@@ -4264,12 +4251,6 @@ var EngCalcs = EngCalcs || {};
 		if (back) { back.style.display = 'none'; }
 	}
 	function wireTabs() {
-		var unitsClose = document.getElementById('lpn_units_popup_close');
-		if (unitsClose) {
-			unitsClose.addEventListener('click', function () {
-				document.getElementById('lpn_units_popup').style.display = 'none';
-			});
-		}
 		// Dismiss the menu, and the view popovers, on any click that is not inside them. The dialog is
 		// deliberately NOT dismissed this way -- it asks a question that has to be answered, and
 		// Cancel is one of the answers.
@@ -5250,6 +5231,12 @@ var EngCalcs = EngCalcs || {};
 	// is a default input) and tolerance was the only genuine one.
 	function rebuildSettingsFields() {
 		var pc = EngCalcs.pageConfig || {}, fields = document.getElementById('lpn_settings_fields');
+		// The units block is server-rendered ONCE (echoUnitSelect keeps each select's unit family and
+		// option values) and MOVED in and out of this panel, never rebuilt. Park it back in its holder
+		// before clearFields() runs, or the clear would destroy the only copy that exists.
+		var unitsBlock = document.getElementById('lpn_units_block'),
+			unitsHolder = document.getElementById('lpn_units_holder');
+		if (unitsBlock && unitsHolder && unitsBlock.parentNode !== unitsHolder) { unitsHolder.appendChild(unitsBlock); }
 		clearFields(fields);
 		function row(target, labelText, input, tip) {
 			var label = document.createElement('label');
@@ -5553,6 +5540,18 @@ var EngCalcs = EngCalcs || {};
 		// and the how-long-before-a-colleague-may-take-over threshold), so the range was protecting a
 		// coupling rather than the user. Splitting those apart removed the setting instead of widening
 		// it, which is the better answer to the question he actually asked.
+		// ---- units (Task 241, Tom 2026-08-08) ----
+		// Last section before the panel's foot, because a unit system is set once and then left
+		// alone -- it belongs with the settings, but not above the ones people actually revisit.
+		if (unitsBlock) {
+			var unitsBody = section('units', pc.lpn_view_units || 'Units');
+			// The "[Hide this line]" collapse link is a leftover from when this row was permanent
+			// page furniture. Inside a collapsible section with its own toggle it is a second, worse
+			// control for the same job, so it goes.
+			var hideLink = unitsBlock.querySelector('a[data-bs-toggle="collapse"]');
+			if (hideLink) { hideLink.parentNode.removeChild(hideLink); }
+			unitsBody.appendChild(unitsBlock);
+		}
 		// ---- always visible: the one row worth never burying ----
 		// Tolerance, because it is the one setting that changes whether the answer is right.
 		// Headingless, per the note above.
