@@ -51,7 +51,7 @@ call it done — not a computer science degree.
 
 ## 1. What You'll Need
 
-- **A free [Bitbucket](https://bitbucket.org) account.** Bitbucket is a website that hosts this
+- **A free [GitHub](https://github.com) account.** GitHub is a website that hosts this
   project's source code and lets people propose changes ("pull requests") without ever touching the
   original copy directly.
 - **Git**, a tool that tracks changes to code over time. If you don't have it, install it from
@@ -96,16 +96,16 @@ Everything from here on is for contributions that do touch code.
 
 ## 3. Get the Code (Fork & Clone)
 
-**"Forking"** makes your own personal copy of this repository on Bitbucket, which you can freely
+**"Forking"** makes your own personal copy of this repository on GitHub, which you can freely
 edit. **"Cloning"** downloads that copy onto your computer so you can work on it.
 
-1. Go to [bitbucket.org/hawstom/engcalcs](https://bitbucket.org/hawstom/engcalcs) and sign in.
+1. Go to [github.com/hawstom/engcalcs](https://github.com/hawstom/engcalcs) and sign in.
 2. Click **Fork** (usually near the top of the repository page) to create your own copy, e.g.
-   `bitbucket.org/your-username/engcalcs`.
-3. On your fork's page, click **Clone** and copy the command it gives you. It will look like:
+   `github.com/your-username/engcalcs`.
+3. On your fork's page, click the green **Code** button and copy the HTTPS URL it gives you. The clone command will look like:
 
    ```bash
-   git clone https://your-username@bitbucket.org/your-username/engcalcs.git
+   git clone https://github.com/your-username/engcalcs.git
    cd engcalcs
    ```
 
@@ -224,10 +224,9 @@ stressful for everyone, including you.
    git push origin my-first-change
    ```
 
-3. **Open a pull request.** On Bitbucket, go to your fork's page — it will usually show a banner
+3. **Open a pull request.** On GitHub, go to your fork's page — it will usually show a banner
    offering to **Create pull request** for the branch you just pushed. Click it, and:
-   - Set the destination to `hawstom/engcalcs` (the original repository), branch `main` (or
-     whatever the default branch is called).
+   - Set the destination to `hawstom/engcalcs` (the original repository), branch `master`.
    - Write a short description: what you changed and why. (If you did Section 6 above, you already
      have this written.)
    - Submit it.

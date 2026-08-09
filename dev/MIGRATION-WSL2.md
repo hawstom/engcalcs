@@ -6,8 +6,8 @@
 git push origin master
 ```
 
-The branch is currently 6 commits ahead of `origin/master` on Bitbucket
-(`git@bitbucket.org:hawstom/engcalcs.git`). Push before leaving the source machine.
+The branch is currently 6 commits ahead of `origin/master` on GitHub
+(`git@github.com:hawstom/engcalcs.git`). Push before leaving the source machine.
 
 ---
 
@@ -42,7 +42,7 @@ php --version   # should show 8.3.x
 
 ---
 
-## Step 4 — Set up SSH key for Bitbucket
+## Step 4 — Set up SSH key for GitHub
 
 Generate a key (skip if you already have one you'll copy over):
 
@@ -51,13 +51,13 @@ ssh-keygen -t ed25519 -C "tom.haws@gmail.com"
 cat ~/.ssh/id_ed25519.pub
 ```
 
-Add that public key to your Bitbucket account:
-**Bitbucket → Personal settings → SSH keys → Add key**
+Add that public key to your GitHub account:
+**GitHub → Settings → SSH and GPG keys → New SSH key**
 
 Test the connection:
 
 ```bash
-ssh -T git@bitbucket.org
+ssh -T git@github.com
 ```
 
 ---
@@ -67,7 +67,7 @@ ssh -T git@bitbucket.org
 ```bash
 sudo mkdir -p /var/www/cnm/public_html/hawsedc
 sudo chown -R $USER:$USER /var/www/cnm
-git clone git@bitbucket.org:hawstom/engcalcs.git /var/www/cnm/public_html/hawsedc/engcalcs
+git clone git@github.com:hawstom/engcalcs.git /var/www/cnm/public_html/hawsedc/engcalcs
 ```
 
 ---

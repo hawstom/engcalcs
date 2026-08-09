@@ -54,7 +54,7 @@ fi
 
 read -rp "Push branch '$BRANCH' to origin now? [y/N] " CONFIRM
 if [[ "$CONFIRM" =~ ^[Yy]$ ]]; then
-    echo "==> Pushing to origin/$BRANCH via altssh.bitbucket.org:443"
+    echo "==> Pushing to origin/$BRANCH"
     git push origin "$BRANCH"
 else
     echo "==> Skipped push. Run 'git push origin $BRANCH' manually when ready."

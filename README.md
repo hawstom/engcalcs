@@ -40,7 +40,7 @@ a calculator page and go.
 | [Hazen-Williams Pipe Head Loss](Hazen-Williams.php) | Pressure pipe head loss (Hazen-Williams) |
 | [Darcy-Weisbach Pipe Head Loss](Darcy-Weisbach.php) | Pressure pipe head loss (Darcy-Weisbach / Swamee-Jain) |
 | [Branched Pipe Network](Branched-Network.php) | Distributary/tree pipe network solver |
-| [Looped Pipe Network](Looped-Network.php) *(preview)* | Map-based looped network solver (global gradient algorithm) |
+| [Looped Pipe Network](Looped-Network.php) *(preview)* | Draw a looped network — junctions, pipes, reservoirs, pumps — on a scaled backdrop image and solve it. Global gradient algorithm, checked against EPANET's own engine |
 | [Manning Trapezoidal Channel](Manning-Trap.php) | Open-channel flow, trapezoidal geometry |
 | [Manning Irregular Channel](Manning-Irregular.php) | Open-channel flow, surveyed (station/elevation) cross-sections |
 | [Rock Chute Design (Robinson)](Rock-Chute.php) | Steep-channel rock lining sizing |
@@ -109,7 +109,7 @@ no build step, no `npm install`.
 
 ```bash
 # 1. Clone the repository
-git clone https://bitbucket.org/hawstom/engcalcs.git
+git clone https://github.com/hawstom/engcalcs.git
 cd engcalcs
 
 # 2. (optional) turn on DEBUG_MODE (shows HTML validator links)
@@ -156,7 +156,7 @@ Contributions of all kinds are welcome:
   term was chosen).
 - **UX feedback and roadmap ideas** — the main advisory need: confusing workflows, missing
   features, candidate new calculators, candidate languages. Use the feedback link on any calculator
-  page or open an issue on Bitbucket. (Heaven forbid — but in the unlikely event of an actual
+  page or open an issue on GitHub. (Heaven forbid — but in the unlikely event of an actual
   formula or math mistake, report that too.)
 - **New calculators** — ideas for hydraulic tools that serve field workers and irrigation
   practitioners, especially in low-resource regions, are especially welcome.

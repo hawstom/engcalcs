@@ -1119,7 +1119,58 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     with no tier that can be revoked.
   - **Unverified, do not claim publicly until checked:** their actual language count. Their help
     centre is Notion and did not scrape; only Spanish was confirmed.
+  - **Why not lead with it (Tom asked 2026-08-09, and this was missing):** because on that exact
+    claim they are already better and free, so the comparison a reader runs next is one we lose.
+    Lead where they have publicly conceded the ground — phone/field use, 26 languages, offline PWA,
+    GPL that cannot be revoked. Adopting WASM (Task 243) does not change this.
   - Consequence: raised 146.06 to 90 and 220 to 95.
+
+- 45|243| **Run the real EPANET engine in `lpn_` via WASM — as a second engine, not a replacement.**
+  Raised by Tom 2026-08-09. Package facts verified 2026-08-09, and they are better than expected.
+  - **Three different things share the name; only the app is the non-FLOSS one.** OWA-EPANET (the C
+    engine) is MIT. `epanet-js` + `@model-create/epanet-engine` (the npm toolkit/WASM build) are MIT,
+    © Luke Butler. Only the epanetjs.com *web app* is FSL-1.1-MIT (two-year delayed MIT). **We may
+    use the toolkit freely; MIT is GPL-3-compatible.** Ship the MIT text and attribution.
+  - **Measured:** `@model-create/epanet-engine` dist is one 458 KB ES module, **159 KB gzipped**, with
+    the WASM embedded — no second fetch, no build step, no `node_modules`. Vendor the file into
+    `js/` and add it to `sw.js`; the README's "no build pipeline" promise survives intact.
+  - **It buys features, not correctness.** `js/lpn-solver.js` already matches EPANET to 0.0002 ft on
+    Net1/2/3. What WASM adds is what we would otherwise hand-write: **tanks, valves (PRV/PSV/FCV/TCV),
+    extended-period simulation, controls/patterns, water quality, and near-free `.inp` interop
+    (Task 196)**. If we do not want those, WASM buys only a marketing claim we are told not to lead
+    with (Task 222) — so **gate this task on wanting the features, not on the claim.**
+  - **Costs, decided:** async `await ws.loadModule()` gate and a marshalling layer vs. today's
+    synchronous 0.4 ms keystroke solve; +159 KB on the one axis that is our differentiator (offline,
+    low bandwidth). **Therefore: keep `lpn-solver.js` as the default fast path, load WASM lazily only
+    when a feature needs it.** Keep our pre-solve structural diagnostics either way — EPANET returns
+    numeric error codes, which is worse UX than what we already ship.
+  - **Correction of a premise:** Tom wrote "easier than translating lpn into 26 languages." These are
+    unrelated — the engine has no UI. Every label stays ours to translate, and surfacing EPANET's
+    error messages would *add* strings.
+
+- 40|244| **Standardize the distinguishing term, and put it in the navbar next to the language menu.**
+  Tom, 2026-08-09, on epanet-js labelling itself "Open Source" while shipping FSL. `About.php` is
+  done (heading is now "Free Libre Open Source License", plus a "promise, not a price" paragraph).
+  Open: **the navbar item.** Recommendation — do *not* put "Libre Software" there. It is insider
+  vocabulary, and it translates unevenly: perfect in es/pt/fr/it/ro ("Software Libre"), meaningless
+  as a loan in am/km/my/ur. Put the GitHub mark plus a plain promise ("Free forever" / "Source code")
+  by the language menu, and keep the precise license taxonomy on About.php where there is room for it.
+  **[H] Tom picks the navbar wording before this is built.**
+
+- 40|245| **Resync `about_body_html` + `about_main_desc` into 26 languages.** English changed
+  2026-08-09 (Contributing rewritten, contact line, license heading, new paragraph). URLs and the
+  Bitbucket→GitHub proper noun were swapped mechanically in all 27 files, so only the prose drifted.
+  Two keys, 26 languages; `about_` is suite chrome, always in scope. Run `detect_english_drift.php`
+  first, then a sprint under the standard authorization rule.
+
+- 30|246| **Give `lpn_` a real file identity: `.lpn` extension and standard file-toolbar icons.**
+  Tom, 2026-08-09, from the epanet-js UX read. JSON inside, `.lpn` outside; new/open/save/save-as
+  icons on the toolbar. Cheap, and it is what makes a saved network feel like a document.
+
+- 20|247| **Demand allocation by customer (epanet-js has it, EPANET does not).** Tom, 2026-08-09.
+  Assign named demands to a junction and sum them, rather than typing one lumped figure. Genuinely
+  fits the irrigation/rural-water audience. Below Task 184 (scenarios), which epanet-js charges for
+  and Tom therefore wants raised.
 
 - 30|217| **A suite-owned, multilingual Manning's n table, built from primary sources.** Raised by
   Tom, 2026-08-05, and accepted as mid-priority with a caution: *"No collision, but I am not into
@@ -4477,7 +4528,7 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 - 0|76|Quality-score updater: Added `dev/scripts/update_quality_score.php` (usage: `php update_quality_score.php <lang> <quality>`). The roadmap item's original description was slightly off — the `QUALITY` constant actually lives in `lib/Language.Settings.php` (one `$all_language_settings[lang]` array per language), not in the per-language `lang.ec.??.php` files, which only hold display strings. Script validates the lang code (2-letter, must already exist in the settings file) and quality value (numeric, 0–1), then does a targeted regex replace of just that language's `QUALITY` value, leaving formatting/comments untouched. Verified: successful update on `es`, rejected an unknown lang code and an out-of-range quality value, `php -l` clean. Originally scoped to Copilot (`[CP]`); reassigned to Claude Code this session per Human economics call.
 
-- 0|75|Deployment workflow script: Added `dev/scripts/deploy.sh` wrapping the full release sequence — `php -l` on every changed/new PHP file (diff-filter ACMR against HEAD plus untracked new files), aborts on any lint failure before touching git; then `git add -A`, an interactive commit-message prompt (skips commit if nothing staged, aborts on empty message), then an interactive push confirmation (`git push origin <branch>`, defaulting to the current branch) via the existing `altssh.bitbucket.org:443` origin remote — no separate SSH config needed since the remote URL already routes through altssh. Originally scoped to Copilot (`[CP]`); reassigned to Claude Code this session per Human economics call. Verified `bash -n` clean and a dry run (declining both prompts) correctly skipped commit/push with no changes to the tree.
+- 0|75|Deployment workflow script: Added `dev/scripts/deploy.sh` wrapping the full release sequence — `php -l` on every changed/new PHP file (diff-filter ACMR against HEAD plus untracked new files), aborts on any lint failure before touching git; then `git add -A`, an interactive commit-message prompt (skips commit if nothing staged, aborts on empty message), then an interactive push confirmation (`git push origin <branch>`, defaulting to the current branch) via the origin remote (at the time, Bitbucket over `altssh.bitbucket.org:443`; origin moved to GitHub 2026-08-09). Originally scoped to Copilot (`[CP]`); reassigned to Claude Code this session per Human economics call. Verified `bash -n` clean and a dry run (declining both prompts) correctly skipped commit/push with no changes to the tree.
 
 - 0|74|Lang-file key-order normalizer: Added `dev/scripts/lang_key_order_normalizer.php`, which rewrites each non-English `lib/lang.ec.??.php` so its `$ec_lang[]` key order matches `lang.ec.en.php` exactly (values, quoting, and trailing same-line comments preserved byte-for-byte via PHP's own tokenizer; stale/duplicated section-header comments consolidated to English's structure). Originally scoped to Copilot (`[CP]`); reassigned to Claude Code and executed directly this session. Ran on all 26 non-English files: `lang_syntax_validate.php` clean, `lang_parity_check.php --strict` shows 0 missing/extra keys, and a separate token-level value-equality check (order-independent) confirmed 0 content diffs across every file. One real hazard surfaced and handled: `lang.ec.es.php` had two keys (`u_gradePercent`, `u_in2`) that reference an earlier key's own translation via PHP's unquoted string-interpolation syntax (e.g. `"$ec_lang[u_grade]"`) rather than retranslating it — naive English-order reordering would have flipped the assignment order and silently broken that reference at runtime (undefined-key warning, empty interpolation). The normalizer detects this pattern generically and topologically re-sorts just the affected pair, deferring to English order everywhere else — confirmed by re-rendering both interpolated strings through PHP post-reorder. The script's `--check` mode (exit 1 on any mismatch) serves as the "hook to enforce order on future edits" called for in the original spec, runnable in CI or pre-commit.
 
@@ -4581,7 +4632,7 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 - 0|25|Language quality — structural fixes: he, pt, hr, sr, ro, zh all raised to 0.85–0.9. he: fixed 6 English strings in mtc_ section and mixed-language mphl_hgl_2. sr: fixed 4 Croatian-script strings in irr_/mhp_ sections. All 26 non-English lang files gained about_ keys.
 
-- 0|24|About page (About.php): added to nav menu. Covers global humanitarian open source mission, GNU GPL v3 license, Bitbucket repository link (bitbucket.org/hawstom/engcalcs), contributing (translations, bugs, new calculators, hosting), offline ZIP download (planned/roadmap), and PWA status.
+- 0|24|About page (About.php): added to nav menu. Covers global humanitarian open source mission, GNU GPL v3 license, GitHub repository link (github.com/hawstom/engcalcs), contributing (translations, bugs, new calculators, hosting), offline ZIP download (planned/roadmap), and PWA status.
 
 - 0|23|Irrigation landing page (Irrigation.php): added to menu with divider. Links to Weir Flow Simple, Weir Flow Irregular, Orifice Flow, Orifice Drain Time, and Manning channel calculators. Quick-reference section for diversion dams, headgates, pipe turnouts, and USBR Water Measurement Manual alignment. irr_ keys added to all 27 lang files.
 
