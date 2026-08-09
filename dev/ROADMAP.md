@@ -1853,6 +1853,13 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     beside a ring that only has pressure because a pump gives it some, the two say more than either
     alone. **This does not undo the 2026-07-30 "reservoir level with the network" decision** — that
     exists so the RING's pump is visibly load-bearing, and it still is.
+    - **Drawn INSIDE the ring, not below it.** Tom, 2026-08-09: *"Drawing the separate system
+      outside our main loop effectively changes the scale of the project too much. We must draw the
+      separate system inside our main loop so that our text doesn't look too small."* The ring's
+      interior is space zoom-to-fit already pays for, so a system placed there is free; slung
+      underneath it added ~350 units of height and shrank every label on the map. Kept clear of the
+      tie-in's multi-line data label, which grows down-and-right into the interior. The harness
+      asserts containment within the ring footprint.
     - Its elevations are chosen so it stays **above** the ring's minimum pressure (60.4 psi / 406 kPa
       against the ring's 52 psi / 365 kPa). A separate system that quietly stole the network low
       would make the "Lowest pressure" callout a lie while every other assertion still passed. The
@@ -1892,6 +1899,22 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     its own. The fix is to render the text, read its real width, then push the centre out by half
     that plus a gap clearing the node symbol. A constant cannot do this; the width depends on the
     string, the language, and the label's own `sizeMult`.
+  - **Leader ANGLE is derived too, from one shared constant `LPN_CALLOUT_ANGLE`.** Tom, 2026-08-09:
+    *"Leaders don't look great horizontal. Ideal angle is 60 degrees like you make the 'lowest
+    pressure' text."* The leader runs to the label's near edge, which sits exactly `gap` away
+    horizontally — the text width cancels out — so the slope is `atan(|dy| / gap)`, and a FIXED `dy`
+    could not hold one angle across both callouts: `nodeRadius()` is `JUNCTION_R` for a junction but
+    half the tank's longer side for a reservoir, so equal rise over unequal gap is unequal slope.
+    - **Set to 70, not 60, and that is deliberate.** The J3 callout Tom was approving when he said
+      "60" actually measures ~70 (a 60-unit rise over a 22.2-unit gap). The two halves of his
+      sentence disagree, so the code keeps the appearance he approved rather than the number he
+      estimated from it, and says so at the constant. One line to change if a true 60 reads better.
+  - **The title block is tucked close to the ring, and its two lines are stacked by derivation.**
+    `bbox()` includes the title, so white space above the drawing is space zoom-to-fit must shrink
+    everything else to accommodate — which is why Tom asked for the lines 120 and 60 units further
+    south. The second line takes his 60 literally; the first is derived from it by half-heights plus
+    a gap, because a flat 120 would have overlapped them by 5 units at the default text size (the
+    lines are 40 and 30 units tall). Deriving also keeps the block tight at a non-default text size.
   - **`bbox()` was reserving a constant ±2 for a Text label's height.** Correct only while the text
     size was 2.5; at the shipped 20 with the title's x2 multiplier the label is 40 units tall and
     the fit clipped it. Now half the label's own `effectiveFontSize(lb.sizeMult)`.

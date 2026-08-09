@@ -51,6 +51,13 @@ var EngCalcs = EngCalcs || {};
 	// absolute size while the lettering grew 8x. Leave it at 2.5 unless those base dimensions are
 	// themselves re-drawn.
 	var LPN_BASE_TEXT_SIZE = 2.5;
+	// Leader slope for the example network's anchored callouts, degrees above horizontal.
+	// 70, not the 60 Tom named on 2026-08-09, because he named it while approving the J3 callout he
+	// was looking at -- and that one measures ~70 (a 60-unit rise over a 22.2-unit gap). He asked
+	// for "60 degrees LIKE you make the 'lowest pressure' text"; the two halves of that sentence
+	// disagree, so this keeps the appearance he approved rather than the number he estimated from
+	// it. One constant to change if a true 60 turns out to read better.
+	var LPN_CALLOUT_ANGLE = 70;
 	function textFactor(mult) { return effectiveFontSize(mult) / LPN_BASE_TEXT_SIZE; }
 
 	// ---- Task 146.01: draggable node/link data labels (leader lines + collision avoidance + mask) ----
@@ -4968,9 +4975,17 @@ var EngCalcs = EngCalcs || {};
 		// Its elevations are chosen so it stays ABOVE the ring's minimum pressure, deliberately: the
 		// "Lowest pressure" callout below is pinned to a ring junction, and a separate system that
 		// quietly stole the network minimum would make that callout a lie. The harness asserts it.
-		var r2 = addNode('reservoir', 4400, 5700);
+		//
+		// DRAWN INSIDE THE RING, not below it (Tom, 2026-08-09: *"Drawing the separate system
+		// outside our main loop effectively changes the scale of the project too much. We must draw
+		// the separate system inside our main loop so that our text doesn't look too small."*). The
+		// ring's interior is empty space the fit is already paying for, so a system placed there is
+		// free; the same system slung underneath added ~350 units of height and shrank everything at
+		// zoom-to-fit. Placed low-centre and kept clear of J1's multi-line data label, which grows
+		// down and to the right into the interior from the tie-in at 4500,5000.
+		var r2 = addNode('reservoir', 4900, 5080);
 		r2.elev = niceDefault('lpn_u_elevhead', 'fth2o', 200, 60);
-		var j6 = addNode('junction', 5000, 5700);
+		var j6 = addNode('junction', 5320, 5080);
 		j6.elev = niceDefault('lpn_u_elevhead', 'fth2o', 60, 18);
 		j6._demand = niceDefault('lpn_u_flow', 'gpm', 100, 0.006);
 		var sep = addLink('pipe', r2.id, j6.id);
@@ -5028,20 +5043,43 @@ var EngCalcs = EngCalcs || {};
 				var an = nodeById(anchorNode),
 					gap = nodeRadius(an) + effectiveFontSize(sizeMult) * 0.5;
 				lb.x = (side === 'left' ? -1 : 1) * (le.width / 2 + gap);
+				// And the RISE that makes the leader slope. The leader is drawn from the node to the
+				// label's near edge, which sits exactly `gap` away horizontally -- the text width
+				// cancels out -- so the leader vector is (gap, lb.y) and its angle is set entirely
+				// by this line. Tom, 2026-08-09: "Leaders don't look great horizontal. Ideal angle
+				// is 60 degrees like you make the 'lowest pressure' text."
+				// A FIXED dy would NOT hold the angle across the two callouts: nodeRadius() is
+				// JUNCTION_R for a junction but half the tank's longer side for a reservoir, so the
+				// same rise over a different gap is a different slope. Deriving from the angle is
+				// what makes them match.
+				lb.y = -Math.tan(LPN_CALLOUT_ANGLE * Math.PI / 180) * gap;
 			}
 			updateLabelGeometry(lb.id);
 			return lb;
 		}
-		// Title block, centred on the drawing and above it (labels are centred on their x, and -y is
-		// up). Two lines at different sizes rather than one, so the size multiplier is visibly doing
-		// something a reader can then go and change.
-		annotate(5000, 4470, null, pcx.menu_brand, 2);
-		annotate(5000, 4560, null, pcx.lpn_main_menu, 1.5);
+		// Title block, centred on the drawing and just above it (labels are centred on their x, and
+		// -y is up). Two lines at different sizes rather than one, so the size multiplier is visibly
+		// doing something a reader can then go and change.
+		//
+		// TUCKED CLOSE TO THE RING ON PURPOSE. bbox() -- and therefore zoom-to-fit -- includes the
+		// title, so every unit of white space between it and the drawing is a unit the fit has to
+		// shrink everything else to accommodate. Tom, 2026-08-09, asked for the two lines 120 and 60
+		// units further south for exactly that reason.
+		// The SECOND line takes his 60 literally (4560 -> 4620, clearing the ring top at 4650). The
+		// first is then DERIVED from it rather than moved by his 120: the lines are 40 and 30 units
+		// tall at the default text size, so a flat 120 would have overlapped them by 5 units. This
+		// stacks them by their own half-heights plus a gap, which also keeps the block tight if the
+		// visitor's text size is not the default.
+		var titleY = 4620;
+		annotate(5000, titleY - (effectiveFontSize(2) + effectiveFontSize(1.5)) / 2 - 8, null, pcx.menu_brand, 2);
+		annotate(5000, titleY, null, pcx.lpn_main_menu, 1.5);
 		// Anchored callouts: the offset is from the node, and the label follows if the node moves.
 		// The reservoir is the drawing's far-left node and its own data label sits to the upper
-		// right, so its callout goes LEFT, level with it -- clear space, and a clean horizontal
-		// leader. The `y` passed here is only a seed; annotate() overwrites the x from the measured
-		// width, and dy stays as given.
+		// right, so its callout goes LEFT -- and UP, at the shared leader angle. It was level with
+		// the node in the first cut, which put the leader dead horizontal; Tom, 2026-08-09:
+		// "Leaders don't look great horizontal."
+		// The x and y passed here are only seeds -- annotate() derives both offsets from the
+		// measured text width and LPN_CALLOUT_ANGLE.
 		annotate(r.x, r.y, r.id, pcx.lpn_tool_add_reservoir, 1.5, 'left');
 		// "Lowest pressure" goes on nodes[2] -- the third ring junction -- which is the minimum in
 		// BOTH unit sets. Hard-coded rather than computed, because the solve is 300 ms away on the
@@ -5055,9 +5093,11 @@ var EngCalcs = EngCalcs || {};
 		// and a checkbox ("ignore reservoirs during pressure extrema") or a silent special case, and
 		// he judged both worse than the wart. This callout is the cheap way to point at the number
 		// that actually matters.
-		// RIGHT and slightly above: J3 is the drawing's top-right node, and its own multi-line data
-		// label grows downward from the upper right, so a callout level with it would collide.
-		annotate(nodes[2].x, nodes[2].y - 60, nodes[2].id, pcx.bpn_p_min, 1.5, 'right');
+		// RIGHT and above: J3 is the drawing's top-right node, and its own multi-line data label
+		// grows downward from the upper right, so a callout level with it would collide. Tom
+		// approved how this one looks; LPN_CALLOUT_ANGLE is set to reproduce it, and the reservoir
+		// callout above now matches it rather than the other way round.
+		annotate(nodes[2].x, nodes[2].y, nodes[2].id, pcx.bpn_p_min, 1.5, 'right');
 		updateEmptyHint();
 		saveToStorage();
 		zoomExtent();

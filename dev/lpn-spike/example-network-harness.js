@@ -280,6 +280,19 @@ byId.lpn_toolbar.querySelectorAll = () => [];
     w.toFixed(0) + ' x ' + h.toFixed(0));
   const cx = (Math.max(...xs) + Math.min(...xs)) / 2, cy = (Math.max(...ys) + Math.min(...ys)) / 2;
   ok('ring anchored on 5000,5000', near(cx, 5000, 1) && near(cy, 5000, 1), cx + ',' + cy);
+  // THE SEPARATE SYSTEM LIVES INSIDE THE RING'S FOOTPRINT. Tom, 2026-08-09: "Drawing the separate
+  // system outside our main loop effectively changes the scale of the project too much... so that
+  // our text doesn't look too small." The ring's interior is space zoom-to-fit already pays for;
+  // anything slung outside it shrinks every label on the map.
+  const sepNodes = nodes.filter(n => sepComp.indexOf(n.id) >= 0);
+  ok('the separate system sits inside the ring footprint, costing the fit nothing',
+    sepNodes.every(n => n.x > Math.min(...xs) && n.x < Math.max(...xs)
+      && n.y > Math.min(...ys) && n.y < Math.max(...ys)),
+    sepNodes.map(n => n.id + '(' + n.x + ',' + n.y + ')').join(' '));
+  // ...and the title block must stay tucked above the ring, not floated off into white space.
+  const titleGap = Math.min(...ys) - Math.max(...doc.labels.filter(t => !t.anchorNode).map(t => t.y));
+  ok('title block sits just above the ring, not stranded in white space',
+    titleGap > 0 && titleGap < 120, titleGap.toFixed(0) + ' units of clearance');
   // TEXT SIZE IS THE SHIPPED DEFAULT AND THE EXAMPLE MUST NOT TOUCH IT. Tom, 2026-08-09: ship a
   // default that suits the example, and "anything other is on the user, not us." So the stored 2.5
   // seeded above must survive the draw -- a visitor who set their own size keeps it.
@@ -321,6 +334,17 @@ byId.lpn_toolbar.querySelectorAll = () => [];
     // ...and the side the leader is drawn for must agree with the side the label is actually on.
     ok('..."' + t.text + '" leader is drawn on the matching side',
       L.labelSide(t.id) === (t.x < 0 ? 'left' : 'right'), L.labelSide(t.id));
+    // LEADER ANGLE. The leader runs from the node to the label's near edge, which sits exactly
+    // `gap` away horizontally -- the text width cancels -- so the slope is atan(|dy| / gap) and
+    // `gap` is |t.x| minus half the width. Both callouts must come out at the SAME angle even
+    // though a reservoir's radius and a junction's differ, which is the thing a fixed dy could
+    // not deliver. Tom, 2026-08-09: "Leaders don't look great horizontal."
+    const gap = Math.abs(t.x) - halfW;
+    const deg = Math.atan2(Math.abs(t.y), gap) * 180 / Math.PI;
+    ok('..."' + t.text + '" leader rises at the shared callout angle, not flat',
+      near(deg, 70, 0.5), deg.toFixed(1) + ' degrees');
+    ok('..."' + t.text + '" leader rises (label is above its node, not level)', t.y < 0,
+      't.y = ' + t.y.toFixed(1));
   });
 
   // The pump curve is real datasheet shape: 3 points, head falling with flow, from zero flow.
