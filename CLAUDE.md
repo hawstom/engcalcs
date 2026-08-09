@@ -219,16 +219,66 @@ different rules:
   matching the source method (if any) and plain, composable English for explanatory content, when a
   calculator is first written, so it never needs this fix later.
 
-**`$ec_lang_intent` is reserved for jargon/transliteration risk, not general definitions.** If a
-label is already simple, directly-translatable technical English (e.g. "Friction slope"), it needs
-no intent entry — that's what Simple English source strings are for. Intent exists for words like
-"chute" or "riprap": terms a translator, especially in a lower-resource language, is liable to
-phonetically transliterate rather than translate because there's nothing to compositionally parse.
-Adding an intent string to a plain label is itself a defect — it burns translator attention on
-something that isn't at risk. Before adding one, confirm the term has real transliteration or
-polysemy risk, not just "could use more explanation."
+**`$ec_lang_intent` supplies SYNONYMS AND ALTERNATE EXPRESSIONS, so a translator can pick their
+own language's natural phrase.** It is not a place to *describe* a label, explain a decision, or
+leave notes for a human. It answers exactly one question, asked by a translator: *"what other ways
+could this be said?"* — and it answers in words, not commentary. Tom, 2026-08-08, restating the
+original design after it had drifted: *"`_intent` is not for me or for you to describe anything. It
+is for synonyms or alternate expressions."*
 
-**`$ec_lang_intent` is off-limits to AI.** This array provides human-authored translation guidance that is interleaved with `$ec_lang` for human review. AI must never add, change, or remove any `$ec_lang_intent` entry without explicit written permission from the human in that conversation. **Standing exception (Tom, 2026-07-20):** the bounded intent-trimming operation in ROADMAP Task 132 is pre-authorized — where an intent's left-of-pipe merely *duplicates* a glossary concept, AI may replace it with a `| gloss: <term>` pointer (and nothing else), showing a diff for review. This one authorized, narrowly-scoped task is the only standing carve-out; all other intent edits still require in-conversation permission.
+**When it is needed: whenever the plain meaning is not what the English words literally say.**
+That is the whole test, and it is much broader than jargon. Worked examples, all real:
+
+```php
+// The English is a known idiom, but "fit" never names WHAT is fitted.
+$ec_lang_intent['lpn_tool_zoom_extent']='Zoom out (or in) until the whole drawing fits in the window; show everything at once (zoom to extents, fit to window, show all). | avoid: adjusting the zoom by an amount';
+// "Defaults" is standard English but its plain meaning is "the original values".
+$ec_lang_intent['calc_defaults']='Restore (revert, return) to the original (initial, as-shipped, factory) values (state).';
+```
+
+**Do not gate intent on jargon or transliteration risk.** An earlier version of this section said
+intent was "reserved for jargon/transliteration risk" and that "adding an intent string to a plain
+label is itself a defect." **That was wrong and it is retired** (Tom, 2026-08-08). It inverted the
+mechanism: the labels that hurt most in the 146.06 sprint — "Zoom to fit", "Map display and sizes",
+"Restore defaults" — are all *plain* English, which under the old rule made them ineligible for the
+one channel that would have fixed them. A plain label whose plain meaning differs from its literal
+words is exactly the case intent exists for.
+
+**Prefer fixing the English when an English reader also stumbles** (see the three-way routing rule
+below) — but where the English is right for its own audience and only the translator is left
+guessing, intent is the answer, not a rewrite and not an `avoid` list.
+
+### Routing rule: English, intent, or glossary? (Tom, 2026-08-08)
+
+One question decides it: **does an English reader also stumble?**
+
+| Test | Home | Why |
+|---|---|---|
+| An English reader must re-read, or can read it two ways | **Fix the English** | Defective for its own audience. One edit fixes all 27 languages at once. |
+| English is correct and idiomatic, but a translator cannot recover the concept from the words | **`$ec_lang_intent`** | The English reader is served; the translator is not. |
+| The concept recurs across labels or calculators | **`glossary.json`** | It is about consistency across call sites, not about one label. |
+
+They compose — a string may take an English fix *and* an intent. Worked: "Map display and sizes"
+had two valid parses, so the English was fixed (→ "Map appearance"); "Zoom to fit" reads fine to an
+English user, so the English stayed and an intent carries the synonyms.
+
+**Positive guidance beats negative guidance.** Tom, 2026-08-08: *"we do ourselves a disservice by
+relying on 'Avoid' instead of providing the correct intent."* An `avoid` list tells a translator
+which ditch to miss, not where the road is; a synonym set lets them just translate. Reach for
+`avoid` only for a genuine polysemy trap (financial "default", anatomical "head"), and never as a
+substitute for saying plainly what the label means.
+
+**`$ec_lang_intent` is off-limits to AI.** This array is human-authored translation guidance,
+interleaved with `$ec_lang` for human review. AI must never add, change, or remove any
+`$ec_lang_intent` entry without explicit written permission from the human in that conversation.
+The working pattern, confirmed 2026-08-08: **AI proposes intent entries as a diff in the
+conversation; the human approves; only then does AI write them.** Tom is keeping the bar in place
+for now and may lift it later.
+**The Task 132 standing exception is RETIRED** (Tom, 2026-08-08). It pre-authorized AI to *trim*
+an intent's left-of-pipe into a `| gloss:` pointer wherever it "duplicated" a glossary concept.
+That authorization was actively eroding the mechanism: the left-of-pipe **is** the payload, and
+trimming it to a pointer deletes the synonyms a translator needs. There are now **no** standing
+carve-outs — every intent edit needs in-conversation permission.
 
 ### Division of labor: glossary vs. intent vs. tips (2026-07-20)
 
@@ -236,20 +286,27 @@ Three channels carry translation guidance; keep each to its job and **do not dup
 them** (duplication is what let stale values drift):
 
 - **Glossary (`glossary.json`) — per *concept*.** One entry, referenced by every label/calculator that
-  uses the term. The single source of truth for: the definition, each language's dominant standard
-  translation, the `avoid` list, and sourcing. Terminology *consistency* lives here.
-- **`$ec_lang_intent` — per *label*, metadata only.** Its durable job is the right-of-pipe commentary
-  a concept can't express: `layout`, `symbol`, short-vs-long-form role, and a `gloss:` *pointer* to the
-  concept. Intent should **point** to the glossary (`| gloss: specific gravity`), never restate the
-  concept's definition or `avoid` list. The left-of-pipe (translatable definition) is now largely
-  superseded by visible tips and should be trimmed toward pointers (Task 132).
+  uses the term. The single source of truth for: the plain meaning, English synonyms, each language's
+  dominant standard translation, any `avoid` list, and sourcing. Terminology *consistency* lives here.
+- **`$ec_lang_intent` — per *label*, and its payload is SYNONYMS.** The left-of-pipe is a synonymic
+  expansion of *this label's* meaning — alternate wordings a translator can re-compress in their own
+  language. **That payload is the point of the channel, not a legacy of it.** The right-of-pipe stays
+  what it was: terse production commentary (`layout`, `symbol`, `avoid`, `gloss`). A `gloss:` pointer
+  *accompanies* the synonyms; it never replaces them.
 - **Visible `.ec-help`/`.ec-tip` tips — user-facing definition.** Because a tip's text is translated
-  with the label, it is now the preferred home for a plain-language definition that helps the user AND
-  anchors the concept for translators (e.g. "Density relative to water"). This replaced intent's
-  old translatable-payload role.
+  with the label, it is a good home for a plain-language definition that helps the user AND anchors
+  the concept for translators (e.g. "Density relative to water"). A tip serves the *reader*; an
+  intent serves the *translator*. Both may exist for one label and that is not duplication.
 
-Rule of thumb: **concept → glossary; label metadata → intent (pointing at glossary); user-facing
-definition → tip.** If you find the same sentence in two of these, one copy is wrong.
+Rule of thumb: **concept → glossary; this label's other wordings → intent; user-facing definition →
+tip.** Don't copy the same *fact* between glossary and intent (that is how stale values drift) — but
+a label may legitimately carry both a `gloss:` pointer and its own synonyms.
+
+**Superseded 2026-08-08.** This section previously read "`$ec_lang_intent` — per label, metadata
+only", called the left-of-pipe "largely superseded by visible tips", and directed that it "should be
+trimmed toward pointers (Task 132)". All three statements are retired. They redefined a
+translator-facing synonym channel as AI-facing metadata, which is why intents stopped carrying the
+one thing translators actually needed. See the routing rule above.
 
 ### Polysemy / units-trap protocol (2026-07-20)
 
@@ -410,6 +467,14 @@ When translating a new calculator's keys into all 26 non-English languages, **sp
 **REQUIRED: Get explicit user authorization before launching any sprint.** A sprint spawns up to 26 paid agents. The correct pattern is always: propose → confirm → launch. Never infer authorization from a general "proceed" or a question about paths. The user must say something equivalent to "go ahead" or "run it" in response to a specific sprint proposal.
 
 **Pre-sprint checklist (complete before proposing to the user):**
+0. **Wave 0, mechanized: run the adversarial English pass, and clear its findings.** One agent,
+   English only, over the new/changed strings. It does NOT ask "is this string good?" — a fluent
+   English reader answers yes to almost everything, which is why `lpn_`'s Wave 0 (Task 193, 226 keys
+   reviewed, 51 rewritten) still shipped "Zoom to fit", "Map display and sizes" and "Restore
+   defaults". It asks **"list every plausible reading of this string; if there is more than one,
+   propose a rewrite."** Falsification, not review. Findings go to
+   `dev/english-friction/<sprint>.json`; route each one with the English/intent/glossary rule above.
+   **`php dev/scripts/friction_check.php --sprint=<id>` must exit 0 before the sprint launches.**
 1. Regenerate payloads so the delta count reflects the *current* lang files: `wsl -e php /var/www/cnm/public_html/hawsedc/engcalcs/dev/scripts/generate_translation_payloads.php`. This is the orchestrating AI's job, never the user's — the user must never have to remember to call for it. **Enforcement:** the launcher MUST run `generate_translation_payloads.php --check` immediately before spawning agents; it prints `FRESH`/`STALE` and exits non-zero if any payload is older than its inputs (English source, that lang file, glossary, the exempt-key list, the coverage declaration, or the generator itself). A non-zero exit is a hard stop — regenerate, then re-check — so a sprint can never launch on a stale delta.
 2. Verify `glossary.json` has `preferred_translation` populated for the calculator prefix's key terms, especially for anchor languages (es, fr, ru, ar). Check `translation_notes` for WMO-verified terms and terms with `$ec_lang_intent` framing requirements.
 3. State the delta count and which calculators are affected before asking for authorization. **Delta zero now means zero** (Task 161): keys that are *correctly* byte-identical to English — symbols, eponyms, brand names, per-language cognates — are listed in `dev/scripts/translation_exempt_keys.json` and are not counted, so you no longer hand-classify a residue before proposing. They *are* still reported when missing or blank. `generate_translation_payloads.php`, `lang_parity_check.php`, `translation_completion_matrix.php` and `lang_syntax_validate.php` all read that one list via `dev/scripts/exempt_keys.inc.php`, so a disagreement between those four counts is a bug, not a nuance. **Add a key there only when identical-to-English is permanently correct** — never to quiet a number you don't want to fix.
@@ -459,7 +524,22 @@ Always announce the launch count before spawning so the user knows what is happe
 
 **Model policy** (Haiku fully deprecated for translation, 2026-07-12 — Tom): evidence from the 2026-07 rc_/ip_ sprint (`dev/translation-audit-rc-ip-2026-07.md`) showed Haiku mistranslated polysemous words in long prose and produced script contamination, escape leakage, and truncation in low-resource languages even with full glossary + intent injection. The suite previously carved out an exception allowing Haiku for "short-labels-only" batches; that exception is **removed** — even short labels carry real mistranslation risk (a wrong word in a 3-word label is just as wrong as one in a paragraph), and a standing exception is an easy trap to fall back into by habit. **Sonnet is mandatory for every translation agent, every batch size, every language, no exceptions.** Do not propose, launch, or accept Haiku for any translation task, including future sprints reasoning "it's just a short string."
 
+**Every translation agent gets a suggestion box, and it is part of its prompt.** Tom, 2026-08-08:
+*"**Every translator** needs a suggestion box, an ombudsman, and a place to file grievances about
+the working conditions. And the sprint ends with a review of all the problems that surfaced and an
+attempt to resolve them or refer to the human for attention."* So every agent prompt — every wave,
+every language, every batch size — must ask the agent to **file structured entries for any English
+string it had to guess at**, and the orchestrator writes them into
+`dev/english-friction/<sprint>.json`. Structured, not prose: today's agents *did* volunteer real
+findings (the tr agent caught the glossary's upstream-scope defect) and nothing routed them, because
+a paragraph at the end of a report is not a queue. **Nothing is dismissed silently** — an entry
+closes as `english`, `intent`, `glossary` or `dismissed` *with a reason*, or it escalates as
+`refer-to-human` and stays open until the human rules.
+
 **Post-sprint QA (mandatory, in order):**
+0. `php dev/scripts/friction_check.php --sprint=<id>` — must exit 0. This is the sprint-close half
+   of the same gate the launch used: every translator complaint answered, every escalation ruled on.
+   A sprint is not closed while an entry is `open` or `refer-to-human`.
 1. `php dev/scripts/lang_syntax_validate.php --lang=<codes>` — must be clean of escape-leakage,
    tag-imbalance, and foreign-script findings (identical-to-english warnings are advisory).
 2. Tag-parity check of the sprinted keys against English (`<sub>/<sup>/<span>` sets must match).

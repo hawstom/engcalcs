@@ -51,6 +51,54 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   open on a *passing* design. **Not a quick fix — do not guess the column order.**
   `dev/browser-pass/` can verify it: drive the page in both presets and read `v_check`.
 
+- 60|239| **The English-friction loop: mechanize Wave 0, and give every translator a suggestion box.**
+  Built 2026-08-08 out of Tom's diagnosis after the 146.06 sprint. **The mechanism exists and is
+  wired in; what remains is running it and measuring the yield** (see the open sub-items).
+  - **The finding that started it: `lpn_` HAD a Wave 0 and it did not work.** Task 193 reviewed all
+    226 English keys and rewrote 51, and the sprint still shipped "Zoom to fit", "Map display and
+    sizes" and "Restore defaults" — all three caught later by Tom reading the *Spanish*. **Wave 0
+    was not skipped; Wave 0 was not falsifiable.** A review asks "is this string good?", and read
+    alone in English by a fluent reader all three answer yes. Fluency resolves ambiguity
+    automatically and invisibly, which makes a fluent English reader structurally blind to exactly
+    this class. That is why the fix is a different *question*, not more diligence.
+  - **Wave 0 mechanized** = an adversarial pass that asks "list every plausible reading; more than
+    one means rewrite." One agent, English only, changed strings only — against 4–26 translation
+    agents, so the cost is noise. Now checklist item 0 in CLAUDE.md.
+  - **Wave 1 made structural.** It was always "intended to feed back to English" and never did,
+    because "feeds back" had no artifact and no gate. Both waves now write to one file per sprint,
+    `dev/english-friction/<sprint>.json`, and `dev/scripts/friction_check.php` fails while anything
+    is unanswered — blocking sprint *launch* on wave-0 findings and sprint *close* on translator
+    findings. Verified in all three states: pass, open, malformed.
+  - **The ombudsman rule (Tom).** Every translator, every wave, files grievances; the sprint ends by
+    resolving them or referring them to the human. `refer-to-human` deliberately does NOT close the
+    gate — escalating is not resolving, and an escalation that silently closed would rebuild the
+    exact hole this replaces. A closed entry must carry a `resolution` or the log is malformed.
+  - **The routing rule** that tells you where a finding goes, now in CLAUDE.md: *does an English
+    reader also stumble?* Yes → fix the English (one edit, all 27 languages). No, but a translator
+    can't recover the concept → `$ec_lang_intent`. Recurs across labels → glossary.
+  - **`$ec_lang_intent` restored to its original design.** Tom: *"CC has misunderstood _intent from
+    the beginning. _intent is not for me or for you to describe anything. It is for synonyms or
+    alternate expressions."* Two accreted rules were retired: "intent is reserved for
+    jargon/transliteration risk" (which made every *plain* label ineligible for the one channel that
+    would have fixed it — and all three of this sprint's worst labels were plain), and **Task 132's
+    standing pre-authorization for AI to trim intents into `gloss:` pointers**, which was deleting
+    the synonym payload that is the channel's whole purpose. There are now no standing carve-outs on
+    intent. The AI bar stays as-is for now (Tom: *"I agree for now. Maybe we lift it later"*), with
+    the working pattern recorded: AI proposes a diff, human approves, then AI writes.
+  - **Positive guidance over negative.** Tom: *"we do ourselves a disservice by relying on 'Avoid'
+    instead of providing the correct intent."* `avoid` is now for genuine polysemy traps only, never
+    a substitute for saying plainly what a label means.
+  - **Shipped alongside:** `lpn_settings_map_display` → "Map appearance" (tr needed no change — it
+    had already chosen *görünümü*, "appearance", unprompted); intents written for `calc_defaults`,
+    `lpn_tool_zoom_extent`, `lpn_settings_map_display`; `lpn_settings_restore_btn` merged into the
+    incumbent `calc_defaults` (26 languages vs 4), retiring 4 translations.
+  - **OPEN — run the adversarial Wave 0 over all 226 `lpn_` keys.** Task 193 already reviewed them,
+    so whatever this finds *on top of* a completed review is a direct measurement of the yield, and
+    tells Tom whether the pass earns a permanent place. Tom, on making it standing: *"I lean to yes,
+    but let's try it."*
+  - **OPEN — add the suggestion-box instruction to the standard agent prompt template**, so it is
+    not re-typed per sprint and cannot be forgotten.
+
 - 40|235| **The glossary's `pressure` and `elevation` entries hold the UPSTREAM label form in 22
   languages.** Found during the Task 146.06 sprint, 2026-08-08 — by a translation agent, which is
   worth noting: the tr agent was handed `preferred_translation` = "Memba basıncı" (*upstream*

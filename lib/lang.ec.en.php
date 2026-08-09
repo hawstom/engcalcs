@@ -133,7 +133,7 @@ $ec_lang_intent['calc_units_us']='';
 $ec_lang['calc_units_si']='SI';
 $ec_lang_intent['calc_units_si']='';
 $ec_lang['calc_defaults']='Restore defaults';
-$ec_lang_intent['calc_defaults']='';
+$ec_lang_intent['calc_defaults']='Restore (revert, return) to the original (initial, as-shipped, factory) values (state).';
 $ec_lang['calc_defaults_confirm']='Reset calculator to the original default values?';
 $ec_lang_intent['calc_defaults_confirm']='';
 $ec_lang['points_data_help']='(or copy/paste using the data area)';
@@ -1103,6 +1103,7 @@ $ec_lang['lpn_tool_add_pump']='Pump';
 $ec_lang['lpn_tool_add_text']='Text';
 $ec_lang['lpn_tool_delete']='Delete';
 $ec_lang['lpn_tool_zoom_extent']='Zoom to fit';
+$ec_lang_intent['lpn_tool_zoom_extent']='Zoom out (or in) until the whole drawing fits in the window; show everything at once (zoom to extents, fit to window, show all). | avoid: adjusting the zoom by an amount';
 $ec_lang['lpn_new_text']='Text';
 $ec_lang['lpn_tool_example']='Draw example network';
 $ec_lang['lpn_field_elev']='Elevation';
@@ -1485,7 +1486,8 @@ $ec_lang['lpn_settings_symbol_opacity']='Symbol opacity (0 to 1)';
 // network drawn over it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_backdrop_opacity']='Background image opacity (0 to 1)';
 $ec_lang['lpn_settings_text_size_units']='Text size units';
-$ec_lang['lpn_settings_map_display']='Map display';
+$ec_lang['lpn_settings_map_display']='Map appearance';
+$ec_lang_intent['lpn_settings_map_display']='How the map looks (appearance, style, the way it is drawn) — sizes, opacity, position.';
 $ec_lang['lpn_settings_map_height_px']='Map height (screen pixels)';
 // The cap in applyMapHeight() makes this field look ignored on a phone (ROADMAP Task 146.08's
 // own note). It is a render cap, not a stored value -- say so instead of leaving the user to guess.
@@ -1497,7 +1499,6 @@ $ec_lang['lpn_settings_legend_middle_left']='Middle left';
 $ec_lang['lpn_settings_legend_middle_right']='Middle right';
 $ec_lang['lpn_settings_legend_bottom_left']='Bottom left';
 $ec_lang['lpn_settings_legend_bottom_right']='Bottom right';
-$ec_lang['lpn_settings_restore_btn']='Restore all settings';
 $ec_lang['lpn_confirm_restore_defaults']='Reset all settings (ID prefixes, default inputs, solver settings, map display, legend position, and visible labels) to their defaults? Your network is not changed. Settings belong to the open project, so your other projects keep their own.';
 $ec_lang['lpn_settings_wipe_btn']='Clear calculator';
 $ec_lang['lpn_confirm_wipe']='Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone.';

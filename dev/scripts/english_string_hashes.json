@@ -1,7 +1,7 @@
 {
     "description": "sha1 of each lang.ec.en.php $ec_lang value as of the last full translation sync. Maintained by detect_english_drift.php --update. A current-vs-manifest hash mismatch means that key's English changed and translations may be stale. Do not hand-edit.",
     "updated": "2026-08-09",
-    "count": 789,
+    "count": 788,
     "partial_updates": [
         {
             "date": "2026-08-08",
@@ -418,12 +418,11 @@
         "lpn_settings_legend_position": "36d979d15c7655130e2d88b6f74f688cb74f194f",
         "lpn_settings_legend_top_left": "04b38cf935ddb566539a9d8e1cdb43936bd668bb",
         "lpn_settings_legend_top_right": "c1cc898f9464ac2b95be31217a4bf923f156129e",
-        "lpn_settings_map_display": "ab497ab6bda922a87636c552e44e87efe9fd6002",
+        "lpn_settings_map_display": "986ff567ff2c4fc5523453c2180dd843d731c11a",
         "lpn_settings_map_height_px": "57bc82a0e9381166f06c7cc0ff2547459fb3fe62",
         "lpn_settings_map_height_tip": "d445f7f5d0c615e13f228181822cce73569c1ade",
         "lpn_settings_push_btn": "2830762ccceb626b4fe77a5ee9af92d007403728",
         "lpn_settings_push_note": "d3754624671985db69287dabd915782065100ae0",
-        "lpn_settings_restore_btn": "e09c76fb7c1f36b72cf73b6b669aa2d95e01aafb",
         "lpn_settings_restore_tip": "bed80101899be9074fc0a7d09a97cd87101e678b",
         "lpn_settings_symbol_opacity": "60ff3b0e2ee09b63c828a1055c6f7ca7e5a817df",
         "lpn_settings_symbol_size": "2f1983b4117fe2eed3a0fae017d31832fad471b2",

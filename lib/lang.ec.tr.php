@@ -766,7 +766,6 @@ $ec_lang['lpn_settings_legend_middle_left']='Sol orta';
 $ec_lang['lpn_settings_legend_middle_right']='Sağ orta';
 $ec_lang['lpn_settings_legend_bottom_left']='Sol alt';
 $ec_lang['lpn_settings_legend_bottom_right']='Sağ alt';
-$ec_lang['lpn_settings_restore_btn']='Tüm ayarları geri yükle';
 $ec_lang['lpn_confirm_restore_defaults']='Tüm ayarlar (kimlik önekleri, varsayılan girdiler, çözücü ayarları, harita görünümü, lejant konumu ve görünür etiketler) varsayılanlarına sıfırlansın mı? Şebekeniz değişmez. Ayarlar açık projeye aittir, bu yüzden diğer projeleriniz kendi ayarlarını korur.';
 $ec_lang['lpn_settings_wipe_btn']='Hesaplayıcıyı temizle';
 $ec_lang['lpn_confirm_wipe']='Bu sayfa için kaydedilmiş HER ŞEY — her proje, her arka plan görüntüsü, tüm ayarlar ve birim seçimleriniz — silinsin ve sayfa yepyeni bir ziyaretçinin göreceği gibi yeniden yüklensin mi? Bu işlem geri alınamaz.';

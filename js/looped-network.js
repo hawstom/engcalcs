@@ -5580,7 +5580,7 @@ var EngCalcs = EngCalcs || {};
 		// untouched, same "preferences vs. content" split clearNetwork()'s own comment documents.
 		var restoreBtn = document.createElement('button');
 		restoreBtn.type = 'button';
-		restoreBtn.textContent = pc.lpn_settings_restore_btn || 'Restore all settings';
+		restoreBtn.textContent = pc.calc_defaults || 'Restore defaults';
 		helpTip(restoreBtn, pc.lpn_settings_restore_tip);
 		restoreBtn.addEventListener('click', function () {
 			if (!window.confirm(pc.lpn_confirm_restore_defaults || 'Reset all settings (ID prefixes, default inputs, solver settings, map display, legend position, and visible labels) to their defaults? Your network is not changed. Settings belong to the open project, so your other projects keep their own.')) { return; }

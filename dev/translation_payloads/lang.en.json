@@ -776,7 +776,7 @@
         "lpn_settings_symbol_opacity": "Symbol opacity (0 to 1)",
         "lpn_settings_backdrop_opacity": "Background image opacity (0 to 1)",
         "lpn_settings_text_size_units": "Text size units",
-        "lpn_settings_map_display": "Map display",
+        "lpn_settings_map_display": "Map appearance",
         "lpn_settings_map_height_px": "Map height (screen pixels)",
         "lpn_settings_map_height_tip": "On a small screen the map is drawn shorter than this, so that part of the page is always left to scroll.",
         "lpn_settings_legend_position": "Legend position",
@@ -786,12 +786,11 @@
         "lpn_settings_legend_middle_right": "Middle right",
         "lpn_settings_legend_bottom_left": "Bottom left",
         "lpn_settings_legend_bottom_right": "Bottom right",
-        "lpn_settings_restore_btn": "Restore all settings",
         "lpn_confirm_restore_defaults": "Reset all settings (ID prefixes, default inputs, solver settings, map display, legend position, and visible labels) to their defaults? Your network is not changed. Settings belong to the open project, so your other projects keep their own.",
         "lpn_settings_wipe_btn": "Clear calculator",
         "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
-    "count": 789,
+    "count": 788,
     "active_prefixes": [
         "about",
         "bpn",

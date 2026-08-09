@@ -1,0 +1,70 @@
+{
+  "sprint": "146.06-lpn",
+  "description": "lpn_ translation sprint into es, pt, fr, tr (223 keys x 4). Entries below were filed RETROACTIVELY on 2026-08-08: the sprint ran before this mechanism existed, and every one of these was caught either by a translation agent whose report nobody routed, or by Tom reading the shipped Spanish. That is the case for the mechanism, so they are recorded here as the log's first real content rather than as a clean template.",
+  "entries": [
+    {
+      "key": "lpn_settings_map_display",
+      "source": "translator",
+      "lang": "es",
+      "complaint": "\"Map display and sizes\" has two valid parses -- [map display] and [sizes], or [map] [display and sizes]. All four languages guessed, and es/pt left a dangling \"y tamanos\"/\"e tamanhos\" modifying nothing. Tom caught it reading the Spanish: \"in Spanish it is translated as 'Display of the map and sizes'.\" He also noted \"display\" carries an unintended sense of revelation.",
+      "readings": [
+        "settings for how the map looks, including sizes",
+        "map-display settings, and separately, size settings"
+      ],
+      "disposition": "english",
+      "resolution": "English rewritten to \"Map appearance\" (Tom's call). The section holds text size, symbol size and opacity, backdrop opacity, map height and legend position -- all appearance, so \"and sizes\" named a subset, not a second category. Retranslated in es/pt/fr; tr needed NO change because it had already independently chosen 'gorunumu' (= appearance), which is the strongest evidence the new English names the real concept. An intent with synonyms was added on top."
+    },
+    {
+      "key": "lpn_tool_zoom_extent",
+      "source": "translator",
+      "lang": "es",
+      "complaint": "\"Zoom to fit\" never says WHAT is fitted, so a translator reasonably renders it as a general adjust-the-zoom control. es shipped \"Ajustar zoom\" and pt \"Zoom para ajustar\", both meaning ADJUST THE ZOOM -- a description of the zoom slider, not of a button that frames the whole drawing. Caught by Tom reading the Spanish.",
+      "readings": [
+        "zoom until the whole drawing fits in the window",
+        "adjust the zoom by some amount"
+      ],
+      "disposition": "intent",
+      "resolution": "English KEPT -- \"Zoom to fit\" is an established UI idiom (browsers, PDF viewers, design tools) and an English reader does not stumble, so by the routing rule this is an intent case, not an English case. $ec_lang_intent added with synonyms (zoom to extents / fit to window / show all) plus an avoid guard. Glossary concept 'zoom to extents' created and wired into prefixToTermNames. es/pt fixed to 'Ver todo'/'Ver tudo'."
+    },
+    {
+      "key": "calc_defaults",
+      "source": "translator",
+      "lang": "ro",
+      "complaint": "\"Restore defaults\" -- 'defaults' is standard English but its plain meaning is 'the original values', and the word carries a strong financial sense in many languages. ro dropped the concept entirely (bare \"Reseteaza\" = Reset) while its own confirm string used 'valorile implicite' correctly; sw substituted 'maadili ya kawaida', where maadili means MORALS. Tom: \"'default' is a troublesome word... I just want it to be right.\"",
+      "readings": [
+        "restore the original, as-shipped values",
+        "failure to pay (financial sense)",
+        "reset, without saying to what"
+      ],
+      "disposition": "intent",
+      "resolution": "English KEPT -- an English reader does not stumble. $ec_lang_intent added carrying Tom's own synonym set: 'Restore (revert, return) to the original (initial, as-shipped, factory) values (state).' Glossary concept 'default (setting)' created with all 26 attested forms. ro/sw/he fixed. lpn_settings_restore_btn was merged into this key (Tom approved) so one string now serves both buttons, context disambiguating values from settings."
+    },
+    {
+      "key": "lpn_notes_4_def",
+      "source": "translator",
+      "lang": "es",
+      "complaint": "The English promised \"Other languages: this page is in English only for now\" -- a sentence the sprint itself made false. Four agents faithfully translated it, producing \"por ahora esta pagina esta solo en ingles\" on a fully Spanish page. Not an ambiguity: a stale claim nobody re-read before translating it.",
+      "readings": [],
+      "disposition": "english",
+      "resolution": "Sentence removed from en and all four languages; drift manifest re-baselined. Lesson recorded in ROADMAP 146.06: a sprint must re-read the page's own prose for claims the sprint invalidates, because translation agents will faithfully translate a lie."
+    },
+    {
+      "key": "lpn_notes_3_def",
+      "source": "translator",
+      "lang": "es",
+      "complaint": "Still called the page an early preview after PREVIEW had been dropped, and the sprint translated that into four languages.",
+      "readings": [],
+      "disposition": "english",
+      "resolution": "Referred to Tom rather than decided by the sprint, because the sentence tangled a dead preview framing with a live scale caution. Tom ruled 'delete' (ROADMAP Task 236); removed from all 5 files."
+    },
+    {
+      "key": "glossary:pressure,elevation",
+      "source": "translator",
+      "lang": "tr",
+      "complaint": "The tr agent was handed preferred_translation 'Memba basinci' (= UPSTREAM pressure) for a generic node label and declined to use it. The glossary's 'pressure' and 'elevation' entries stored the upstream-specific label form as the bare concept, in all 26 languages -- the entries' own notes admitted it. This is a translator filing a grievance about the tooling, and it was right.",
+      "readings": [],
+      "disposition": "glossary",
+      "resolution": "Fixed for es/pt/fr/tr from attested generic labels. The other 22 languages still hold the upstream form and are logged as ROADMAP Task 235, with the glossary notes marking them unusable for a generic label until fixed."
+    }
+  ]
+}
