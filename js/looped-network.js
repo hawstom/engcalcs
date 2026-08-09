@@ -676,6 +676,15 @@ var EngCalcs = EngCalcs || {};
 			// Task 191, and the longer note in rebuildSettingsFields()).
 			emitterExponent: 0.5,
 			tolerance: 1e-9, // matches js/lpn-solver.js's own default relative-flow-change tol -- see runSolve()
+			// 'native' (js/lpn-solver.js) or 'epanet' (the real EPANET engine as WASM,
+			// js/lpn-epanet.js). NATIVE IS THE DEFAULT AND SHOULD STAY THAT WAY: it is
+			// synchronous and takes 0.4 ms at this page's 10-20 node target, where the EPANET
+			// path costs a 678 KB lazy import and an async round trip on a page that re-solves
+			// on every keystroke. The toggle exists because "does it run the actual EPANET
+			// engine?" is a yes/no gate for some agencies (ROADMAP Tasks 222, 243), not because
+			// the native solver needs help -- the two agree to 1e-5..1e-3 m of head
+			// (dev/lpn-spike/validate_epanet.js).
+			engine: 'native',
 			// Default input values for NEWLY created elements (Tom, 2026-07-30). Generalizes what
 			// used to be a lone `kmDefault`: the workflow Tom described is "mostly 8-inch, 0 demand,
 			// 150 roughness, K=2, elevation 826" decided BEFORE drawing, and then switched mid-draw
@@ -5744,6 +5753,18 @@ var EngCalcs = EngCalcs || {};
 			else { tolInput.value = settings.tolerance; }
 		});
 		row(tail, pc.lpn_settings_tolerance || 'Convergence tolerance', tolInput, pc.lpn_settings_tolerance_tip);
+		// ---- engine choice (ROADMAP Task 243) ----
+		// A checkbox rather than a two-option select: there is a plain default and one opt-in,
+		// and a select would imply the two are peers when the native path is the one this page
+		// is built around.
+		var engInput = document.createElement('input');
+		engInput.type = 'checkbox';
+		engInput.checked = (settings.engine === 'epanet');
+		engInput.addEventListener('change', function () {
+			settings.engine = engInput.checked ? 'epanet' : 'native';
+			scheduleSolve();
+		});
+		row(tail, pc.lpn_settings_engine_epanet || 'Solve with the EPANET engine', engInput, pc.lpn_settings_engine_epanet_tip);
 		// ---- restore defaults (Tom, 2026-07-30) ----
 		// Resets settings/labelSettings only -- the network (nodes/links/labels) and backdrop are
 		// untouched, same "preferences vs. content" split clearNetwork()'s own comment documents.
@@ -6631,16 +6652,52 @@ var EngCalcs = EngCalcs || {};
 			refreshLabelText();
 			return;
 		}
-		var result = EngCalcs.lpnSolve(model, { tol: settings.tolerance });
+		if (settings.engine === 'epanet' && EngCalcs.lpnSolveEpanet) {
+			runSolveEpanet(model);
+			return;
+		}
+		applySolveResult(EngCalcs.lpnSolve(model, { tol: settings.tolerance }));
+	}
+
+	function applySolveResult(result) {
+		var pc = EngCalcs.pageConfig || {};
 		if (!result.ok || !result.converged) {
 			lastSolveResult = null;
-			setStatus(EngCalcs.pageConfig.lpn_diag_not_converged || 'Did not converge.');
+			setStatus(pc.lpn_diag_not_converged || 'Did not converge.');
 			refreshLabelText();
 			return;
 		}
 		lastSolveResult = result;
-		setStatus('');
+		// The only case where the two engines knowingly disagree, so say so rather than let a
+		// user discover a 0.6% shift by switching the checkbox. See js/lpn-epanet.js.
+		var manningNote = (result.warnings || []).some(function (w) { return w.code === 'manning-constant-differs'; });
+		setStatus(manningNote ? (pc.lpn_engine_manning_note || '') : '');
 		refreshLabelText();
+	}
+
+	// EPANET path. Async, so it needs a guard the synchronous path never did: this page solves
+	// on a 300 ms debounce after every keystroke and drag, and the WASM round trip can easily
+	// outlast the next edit. Without the token, a slow solve of an OLD network can land after a
+	// fast solve of the CURRENT one and silently overwrite correct results with stale ones --
+	// and it would look like a physics bug, not a race.
+	var epanetToken = 0;
+	function runSolveEpanet(model) {
+		var pc = EngCalcs.pageConfig || {};
+		var myToken = ++epanetToken;
+		setStatus(pc.lpn_engine_loading || 'Loading the EPANET engine…');
+		EngCalcs.lpnSolveEpanet(model, { tol: settings.tolerance }).then(function (result) {
+			if (myToken !== epanetToken) { return; }   // a newer solve already started; drop this one
+			applySolveResult(result);
+		}, function (err) {
+			if (myToken !== epanetToken) { return; }
+			// Fall BACK to the native solver rather than leaving the user with no numbers. The
+			// import can fail for reasons that have nothing to do with the network -- offline on
+			// a first use, a blocked module request -- and the native answer is just as correct.
+			lastSolveResult = null;
+			setStatus(pc.lpn_engine_failed || 'The EPANET engine could not be loaded; showing the built-in solver instead.');
+			applySolveResult(EngCalcs.lpnSolve(model, { tol: settings.tolerance }));
+			if (window.console && console.warn) { console.warn('EPANET engine load/solve failed:', err); }
+		});
 	}
 	// Debounced, not run synchronously on every call site: a node drag alone calls updateNode()
 	// (and therefore this) on every animation frame while dragging (see the tick()/applyDrag()

@@ -1,7 +1,7 @@
 var Fg = Object.defineProperty;
 var kg = (g, a, t) => a in g ? Fg(g, a, { enumerable: !0, configurable: !0, writable: !0, value: t }) : g[a] = t;
 var w = (g, a, t) => kg(g, typeof a != "symbol" ? a + "" : a, t);
-import { Workspace as Kg } from "./slim/index.mjs";
+import { Workspace as Kg } from "./slim/index.js";
 var Mg = (() => {
   var g = import.meta.url;
   return async function(a = {}) {

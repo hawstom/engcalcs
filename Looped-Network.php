@@ -397,6 +397,11 @@ EngCalcs.pageConfig = {
 
 	lpn_settings_tolerance: <?=json_encode($ec_lang['lpn_settings_tolerance'])?>,
 	lpn_settings_tolerance_tip: <?=json_encode($ec_lang['lpn_settings_tolerance_tip'])?>,
+	lpn_settings_engine_epanet: <?=json_encode($ec_lang['lpn_settings_engine_epanet'])?>,
+	lpn_settings_engine_epanet_tip: <?=json_encode($ec_lang['lpn_settings_engine_epanet_tip'])?>,
+	lpn_engine_loading: <?=json_encode($ec_lang['lpn_engine_loading'])?>,
+	lpn_engine_failed: <?=json_encode($ec_lang['lpn_engine_failed'])?>,
+	lpn_engine_manning_note: <?=json_encode($ec_lang['lpn_engine_manning_note'])?>,
 	lpn_settings_text_size: <?=json_encode($ec_lang['lpn_settings_text_size'])?>,
 	lpn_settings_text_size_map: <?=json_encode($ec_lang['lpn_settings_text_size_map'])?>,
 	lpn_settings_text_size_screen: <?=json_encode($ec_lang['lpn_settings_text_size_screen'])?>,
@@ -422,6 +427,7 @@ EngCalcs.pageConfig = {
 </script>
 <script src="/engcalcs/js/PipeHydraulics.lib.js?v=<?=filemtime(__DIR__.'/js/PipeHydraulics.lib.js')?>"></script>
 <script src="/engcalcs/js/lpn-solver.js?v=<?=filemtime(__DIR__.'/js/lpn-solver.js')?>"></script>
+<script src="/engcalcs/js/lpn-epanet.js?v=<?=filemtime(__DIR__.'/js/lpn-epanet.js')?>"></script>
 <script src="/engcalcs/js/looped-network.js?v=<?=filemtime(__DIR__.'/js/looped-network.js')?>"></script>
 <script>
 <?php echoCookieScript(); ?>

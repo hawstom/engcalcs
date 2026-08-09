@@ -771,6 +771,11 @@
         "lpn_settings_emitter_exponent": "Emitter exponent",
         "lpn_settings_tolerance": "Convergence tolerance",
         "lpn_settings_tolerance_tip": "How close the solver has to get before it stops. A smaller number is more exact and takes longer.",
+        "lpn_settings_engine_epanet": "Solve with the EPANET engine",
+        "lpn_settings_engine_epanet_tip": "Runs the original EPANET engine from the US EPA, here in your browser. The built-in solver gives the same answers and is faster, so leave this off unless you need EPANET itself.",
+        "lpn_engine_loading": "Loading the EPANET engine…",
+        "lpn_engine_failed": "The EPANET engine could not be loaded. Showing the built-in solver instead.",
+        "lpn_engine_manning_note": "Note: with Manning roughness, EPANET computes head loss about 0.6% lower than the built-in solver.",
         "lpn_settings_text_size": "Text size",
         "lpn_settings_text_size_map": "Map distance",
         "lpn_settings_text_size_screen": "Screen pixels",
@@ -792,7 +797,7 @@
         "lpn_settings_wipe_btn": "Erase everything on this page",
         "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
-    "count": 790,
+    "count": 795,
     "active_prefixes": [
         "about",
         "bpn",

@@ -1,6 +1,6 @@
 // EngCalcs Service Worker
 // Cache version — bump this string when static assets change
-const CACHE_VERSION = 'engcalcs-v7';
+const CACHE_VERSION = 'engcalcs-v8';
 const ASSET_CACHE = CACHE_VERSION + '-assets';
 const PAGE_CACHE  = CACHE_VERSION + '-pages';
 
@@ -25,6 +25,7 @@ const STATIC_ASSETS = [
   '/engcalcs/js/irrigation-pressure.js',
   '/engcalcs/js/rock-chute.js',
   '/engcalcs/js/lpn-solver.js',
+  '/engcalcs/js/lpn-epanet.js',
   '/engcalcs/js/looped-network.js',
   '/engcalcs/icons/icon.svg',
   '/engcalcs/icons/icon-192.png',

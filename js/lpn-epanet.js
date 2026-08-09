@@ -13,7 +13,7 @@
 // that is synchronous and takes 0.4 ms at the 21-node target. So we lazy-import it only when
 // the user asks, and the offline PWA bundle never carries it unless it has been used.
 //
-// LICENSING. js/vendor/epanet-js.mjs is epanet-js 0.9.0, MIT, (c) Luke Butler, wrapping
+// LICENSING. js/vendor/epanet-js.js is epanet-js 0.9.0, MIT, (c) Luke Butler, wrapping
 // OWA-EPANET (also MIT). MIT is GPL-3-compatible, so this suite stays GPL v3+. The full
 // licence text is js/vendor/epanet-js.LICENSE and must ship with any redistribution.
 // NOTE the name collision that caused real confusion when this was scoped: the epanetjs.com
@@ -172,7 +172,7 @@
 
 	EngCalcs.lpnEpanetLoad = function (url) {
 		if (enginePromise === null) {
-			enginePromise = import(url || '/engcalcs/js/vendor/epanet-js.mjs');
+			enginePromise = import(url || '/engcalcs/js/vendor/epanet-js.js');
 		}
 		return enginePromise;
 	};

@@ -50,7 +50,7 @@ function loadForNode() {
 	// Point the engine at the wasm bytes directly. The vendored single-file build embeds
 	// them, so this is only needed if a future build splits the .wasm back out; kept as a
 	// no-op hook so the failure mode is a clear message rather than a fetch stack trace.
-	return EngCalcs.lpnEpanetLoad('file://' + path.join(ROOT, 'js', 'vendor', 'epanet-js.mjs'));
+	return EngCalcs.lpnEpanetLoad('file://' + path.join(ROOT, 'js', 'vendor', 'epanet-js.js'));
 }
 
 function maxDiff(a, b, keys) {
@@ -81,7 +81,7 @@ async function run() {
 		let epa;
 		try {
 			epa = await EngCalcs.lpnSolveEpanet(model, {
-				moduleUrl: 'file://' + path.join(ROOT, 'js', 'vendor', 'epanet-js.mjs'),
+				moduleUrl: 'file://' + path.join(ROOT, 'js', 'vendor', 'epanet-js.js'),
 			});
 		} catch (e) {
 			console.log(`FAIL ${model.name}: EPANET threw -- ${e.message}`);
