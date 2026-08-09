@@ -22,6 +22,17 @@ A PHP/JS suite of hydraulic engineering calculators. 12 calculators, 11 language
    ```php
    <script src="/engcalcs/js/my-calc.js?v=<?=filemtime(__DIR__.'/js/my-calc.js')?>"></script>
    ```
+10. **Add the prefix to `prefixToTermNames()` in `dev/scripts/generate_translation_payloads.php`,
+    listing the `glossary.json` terms the calculator uses.** A prefix that is missing there falls
+    back to three default terms (`flow`, `velocity`, `slope`), so **every glossary entry written for
+    the calculator — definitions, `preferred_translation`, and the `avoid` arrays that are the whole
+    point of a trap term — is silently invisible to its translation agents.** Nothing warns you:
+    payloads generate, `--check` says FRESH, the sprint runs, and the guards simply were never
+    delivered. Found 2026-08-08 during Task 146.06's pre-sprint checklist, where `lpn` and `bpn` had
+    both been missing since they were written; the twelve network concepts seeded for `lpn_` in Task
+    193 had never reached an agent. **Verify before proposing any sprint** by reading
+    `glossary_terms_by_prefix.<prefix>` out of a generated payload — if it has exactly three
+    entries, the map is missing.
 
 ### Meta description (ROADMAP Task 150)
 
