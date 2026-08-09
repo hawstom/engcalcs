@@ -1434,6 +1434,19 @@ var EngCalcs = EngCalcs || {};
 		return e.offsetHeight + 8;   // its own height plus a little clear air
 	}
 
+	// "Fit once the labels are real." zoomExtent() sizes the view to the RENDERED label text
+	// (bbox() reads each label's measured width and line count), but a network created in code --
+	// drawExampleNetwork(), drawTestGrid(), a freshly opened file -- is fitted before its first
+	// solve has produced any label content, so the fit is to bare symbols and the labels then
+	// overflow the map when they appear 300 ms later. Setting this asks for one more fit as soon
+	// as the solve lands; consumeFitAfterSolve() below is called on every path out of a solve,
+	// including the async EPANET one, so it fires exactly once whichever engine answered.
+	var fitAfterSolve = false;
+	function consumeFitAfterSolve() {
+		if (!fitAfterSolve) { return; }
+		fitAfterSolve = false;
+		zoomExtent();
+	}
 	function zoomExtent() {
 		// ASYMMETRIC PADDING, because the canvas has permanent furniture on it (Tom, 2026-08-09:
 		// "it seems unforgivable to have a persistent message overwriting our map... maybe what we
@@ -4785,28 +4798,63 @@ var EngCalcs = EngCalcs || {};
 		// space is scarcest. See openInsertMenu().
 	}
 
-	// One reservoir, one pump (a link, per the header comment above), one junction between
-	// them, and a bent pipe to a second junction -- exercises a node, a fixed head, both
-	// link types, and vertex editing in one click, per Tom's request. Confirms before
-	// clobbering an existing network, and always leaves the toolbar back on Select --
-	// otherwise whatever tool (e.g. Delete) was active before stays active after, which
-	// reads as the example accidentally being deletable on the very next click.
+	// A small RING MAIN: one reservoir, one pump (a link, per the header comment above), and a
+	// closed loop of five junctions with varied demands and elevations. Exercises every element
+	// type except Text, a fixed head, both link types, and vertex editing in one click. Confirms
+	// before clobbering an existing network, and always leaves the toolbar back on Select --
+	// otherwise whatever tool (e.g. Delete) was active before stays active after, which reads as
+	// the example accidentally being deletable on the very next click.
+	//
+	// REWRITTEN 2026-08-09 (ROADMAP Task 254). What it replaced and why, so it is not walked back:
+	//
+	// TOPOLOGY. The old example was two parallel pipes between ONE pair of junctions. That is a
+	// loop topologically and satisfies the solver, but it is not what a water system looks like,
+	// and the calculator is named Looped Pipe Network. A five-junction ring fed at one point is
+	// the smallest thing a practitioner recognises as a ring main, and it shows the one behaviour
+	// the parallel pair cannot: flow leaves the tie-in BOTH ways round the ring and meets at a
+	// hydraulic divide (here between J3 and J4, where the flow reverses and head loss crosses
+	// zero). That divide is the whole reason looped networks need a solver at all.
+	//
+	// SCALE. The old example spanned 45 x 20 map units -- a plot, not a project. Tom, 2026-08-09:
+	// a real network a user brings is "on the order of 1000 m (3000 ft)" across, and at that size
+	// the default 2.5-unit text is invisible. So this sets BOTH the geometry and settings.textSize
+	// together (see the comment on that line): they are one decision, not two, because what was
+	// wrong was the RATIO between linework and lettering, not either one alone.
+	//
+	// UNITS. Coordinates and lengths are DECLARATIVE (see the lengthField()/units comments): one
+	// grid unit is one foot or one metre by declaration, with no conversion. So they are NOT run
+	// through niceDefault() -- they are scaled here by `gu`, which lays the same drawing out in ft
+	// or in round metres. Everything that IS a real SI quantity (elevation, demand, diameter, pump
+	// curve) still goes through niceDefault() as before.
 	function drawExampleNetwork() {
 		if (doc.nodes.length > 0) {
 			var pc = EngCalcs.pageConfig || {};
 			if (!window.confirm(pc.lpn_confirm_example || 'This adds the example to the network you already have. Continue?')) { return; }
 		}
 		saveUndoSnapshot();
-		// The reservoir sits at 55 ft / 17 m, in among the junctions it feeds (50 ft and 40 ft)
-		// rather than 50 ft above them (Tom, 2026-07-30). A source perched high above the network
-		// makes the example a gravity system that would work with the pump deleted -- the pump's
-		// contribution is invisible because the elevation is doing the work. Level with the network,
-		// the pump is the only reason there is pressure anywhere, which is the point of including
-		// one. Its head is left blank, so the water surface is the reservoir's own ground elevation.
-		var r = addNode('reservoir', 0, 0);
-		r.elev = niceDefault('lpn_u_elevhead', 'fth2o', 55, 17);
-		var j1 = addNode('junction', 20, 0);
-		j1.elev = niceDefault('lpn_u_elevhead', 'fth2o', 50, 15); j1._demand = 0;
+		// One grid unit per declared length unit. The layout below is written in FEET; 0.3 turns
+		// every one of those round hundreds into an equally round multiple of 30 m, so the metric
+		// visitor gets a ~840 m network with no ragged coordinates rather than a converted one.
+		var gu = unitKey('lpn_u_length') === 'ft' ? 1 : 0.3;
+		// Text size is part of the example, not a separate preference. At a 2800-unit extent the
+		// shipped 2.5-unit default renders as a hairline, which is exactly the complaint that
+		// opened Task 254 ("linework size... too small relative to the initial default text").
+		// 20 ft / 6 m is the ratio Tom named (~1:140 to the extent) and reads like plan lettering.
+		// NOTE this outlives Undo: settings are not part of `doc`, so saveUndoSnapshot() above does
+		// not capture textSize and undoing the example leaves the new size in place. Accepted --
+		// it is one visible, user-editable number in the Settings panel, not hidden state.
+		settings.textSize = gu === 1 ? 20 : 6;
+		// The reservoir sits at 50 ft / 15 m, in among the junctions it feeds (45-62 ft) rather
+		// than perched above them (Tom, 2026-07-30). A source high above the network makes the
+		// example a gravity system that would work with the pump deleted -- the pump's contribution
+		// is invisible because the elevation is doing the work. Level with the network, the pump is
+		// the only reason there is pressure anywhere, which is the point of including one. Its head
+		// is left blank, so the water surface is the reservoir's own ground elevation.
+		var r = addNode('reservoir', 0 * gu, 900 * gu);
+		r.elev = niceDefault('lpn_u_elevhead', 'fth2o', 50, 15);
+		// J1 is the tie-in: no demand of its own, it is where the pump discharges into the ring.
+		var j1 = addNode('junction', 400 * gu, 900 * gu);
+		j1.elev = niceDefault('lpn_u_elevhead', 'fth2o', 45, 14); j1._demand = 0;
 		// The example's pump gets a curve explicitly, as document content the user can see and edit
 		// in its popup -- addLink() no longer invents one (see its comment). Everything else in this
 		// example is pre-filled the same way (elevations, demands, diameters), so a worked pump
@@ -4817,36 +4865,64 @@ var EngCalcs = EngCalcs || {};
 		// would again show a pump doing things the visible numbers don't explain. Three points is
 		// how a manufacturer publishes a curve and how a user will read one off a datasheet: a
 		// shutoff head at zero flow, a duty point, and a run-out point.
+		// The duty point is the ring's total demand (250 gpm / 15 L/s) at 140 ft / 42 m, chosen so
+		// the network settles at 52-63 psi (365-422 kPa) -- distribution pressures a reviewer reads
+		// as normal, rather than numbers that merely converge.
 		var pump = addLink('pump', r.id, j1.id);
 		pump.curvePoints = [
-			[0, niceDefault('lpn_u_elevhead', 'fth2o', 90, 27)],
-			[niceDefault('lpn_u_flow', 'gpm', 150, 0.010), niceDefault('lpn_u_elevhead', 'fth2o', 65, 20)],
-			[niceDefault('lpn_u_flow', 'gpm', 300, 0.020), niceDefault('lpn_u_elevhead', 'fth2o', 20, 6)]
+			[0, niceDefault('lpn_u_elevhead', 'fth2o', 165, 50)],
+			[niceDefault('lpn_u_flow', 'gpm', 250, 0.015), niceDefault('lpn_u_elevhead', 'fth2o', 140, 42)],
+			[niceDefault('lpn_u_flow', 'gpm', 500, 0.030), niceDefault('lpn_u_elevhead', 'fth2o', 60, 18)]
 		];
 		recomputePumpCurve(pump);
-		var j2 = addNode('junction', 40, 15);
-		j2.elev = niceDefault('lpn_u_elevhead', 'fth2o', 40, 12);
-		j2._demand = niceDefault('lpn_u_flow', 'gpm', 100, 0.006);
-		var pipe = addLink('pipe', j1.id, j2.id);
-		pipe.verts.push({ x: 30, y: -5 });
-		// addLink() computed .length before this vertex existed (straight node-to-node distance);
-		// rebuildLink() only rebuilds the DOM, not the length -- recompute explicitly, or the
-		// initial displayed length undercounts the bend until the vertex is next dragged (which
-		// goes through updateVertex()/updateLinkGeometry(), where lenAuto recomputation already
-		// happens correctly). Tom caught this: 25ft shown, jumped to 28ft only after a drag.
-		pipe._length = linkGeomLength(pipe);
-		rebuildLink(pipe);
-		// Second, straight J1-J2 pipe (Tom, 2026-07-30): the bent pipe alone made this a tree/series
-		// network with no cycle at all, despite being the example for a LOOPED network calculator --
-		// two parallel paths between the same two nodes is the simplest genuine loop. A bend on this
-		// one too (Tom's own suggested point) so the two parallel pipes visibly separate and meet
-		// J1/J2 at closer to a right angle, instead of running the second pipe as a straight overlap.
-		var pipe2 = addLink('pipe', j1.id, j2.id);
-		pipe2.verts.push({ x: 27, y: 15 });
-		pipe2._length = linkGeomLength(pipe2);
-		rebuildLink(pipe2);
+		// The ring. Demands and elevations both vary around it on purpose: equal demands at equal
+		// elevations would put the hydraulic divide exactly opposite the tie-in and make the answer
+		// look like symmetry rather than like a solve.
+		var ring = [
+			{ x: 1200, y: 300, elev: [55, 17], demand: [60, 0.004] },
+			{ x: 2400, y: 500, elev: [62, 19], demand: [80, 0.005] },
+			{ x: 2800, y: 1400, elev: [58, 18], demand: [50, 0.003] },
+			{ x: 1500, y: 1700, elev: [52, 16], demand: [60, 0.003] }
+		];
+		// 6 in / 150 mm at C = 130 (ductile iron or PVC), not the 4 in / 0.1 m page default: a 6 in
+		// ring at these demands runs 0.4-1.5 ft/s with a visible gradient on every pipe, where the
+		// default diameter would read as a fire-flow-limited main and a wider one would show
+		// head losses too small to see at two decimals.
+		var dia = niceDefault('lpn_u_diameter', 'in', 6, 0.15), rough = 130;
+		var nodes = [j1], i, n, pipe;
+		for (i = 0; i < ring.length; i++) {
+			n = addNode('junction', ring[i].x * gu, ring[i].y * gu);
+			n.elev = niceDefault('lpn_u_elevhead', 'fth2o', ring[i].elev[0], ring[i].elev[1]);
+			n._demand = niceDefault('lpn_u_flow', 'gpm', ring[i].demand[0], ring[i].demand[1]);
+			nodes.push(n);
+		}
+		for (i = 0; i < nodes.length; i++) {
+			pipe = addLink('pipe', nodes[i].id, nodes[(i + 1) % nodes.length].id);
+			pipe._diameter = dia;
+			pipe._roughness = rough;
+			// One bend, on the long back run, so the example still ships a vertex to drag -- the
+			// original reason the old example had a bent pipe at all. Everything else is straight,
+			// because a ring drawn with a kink in every leg reads as sketchy rather than as a plan.
+			if (i === 3) { pipe.verts.push({ x: 2100 * gu, y: 1750 * gu }); }
+			// addLink() computed .length before that vertex existed (straight node-to-node
+			// distance); rebuildLink() only rebuilds the DOM, not the length -- recompute
+			// explicitly, or the initial displayed length undercounts the bend until the vertex is
+			// next dragged (which goes through updateVertex()/updateLinkGeometry(), where lenAuto
+			// recomputation already happens correctly). Tom caught this: 25 ft shown, jumped to
+			// 28 ft only after a drag.
+			pipe._length = linkGeomLength(pipe);
+			rebuildLink(pipe);
+		}
 		updateEmptyHint();
+		refreshFontSizes(); // the new settings.textSize above; also resizes symbols and label offsets
+		saveToStorage();
 		zoomExtent();
+		// ...and again once the labels exist. zoomExtent() measures the RENDERED label text, and at
+		// this instant there is none: the solve is 300 ms behind on the debounce, so every node's
+		// data label is still a placeholder width. Fitting now is right for immediate feedback but
+		// leaves labels hanging outside the map a third of a second later, which is the second half
+		// of Task 254 ("it is not zoomed to fit after drawing. Some labels extend beyond the map").
+		fitAfterSolve = true;
 		setMode('select');
 	}
 
@@ -4882,6 +4958,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		updateEmptyHint();
 		zoomExtent();
+		fitAfterSolve = true; // labels are still placeholders at this instant -- see consumeFitAfterSolve()
 		setMode('select');
 	}
 
@@ -6679,6 +6756,7 @@ var EngCalcs = EngCalcs || {};
 			lastSolveResult = null;
 			setStatus(issues.map(diagIssueText).join(' '));
 			refreshLabelText();
+			consumeFitAfterSolve();
 			return;
 		}
 		if (settings.engine === 'epanet' && EngCalcs.lpnSolveEpanet) {
@@ -6694,6 +6772,7 @@ var EngCalcs = EngCalcs || {};
 			lastSolveResult = null;
 			setStatus(pc.lpn_diag_not_converged || 'Did not converge.');
 			refreshLabelText();
+			consumeFitAfterSolve();
 			return;
 		}
 		lastSolveResult = result;
@@ -6702,6 +6781,7 @@ var EngCalcs = EngCalcs || {};
 		var manningNote = (result.warnings || []).some(function (w) { return w.code === 'manning-constant-differs'; });
 		setStatus(manningNote ? (pc.lpn_engine_manning_note || '') : '');
 		refreshLabelText();
+		consumeFitAfterSolve();
 	}
 
 	// EPANET path. Async, so it needs a guard the synchronous path never did: this page solves

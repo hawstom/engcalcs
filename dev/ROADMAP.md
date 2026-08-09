@@ -1090,23 +1090,73 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     checkable; just do not spend the blog/video headline on it.** Do not relitigate.
   - Consequence: raised 146.06 to 90 and 220 to 95.
 
-- 50|254| **Make the lpn example network really good. It is a placeholder.** Tom, 2026-08-09:
-  *"It was kind of a quick placeholder. I need to make sure it's really nice."*
-  - **NOT an autodraw.** CC proposed drawing it automatically for first-time visitors; Tom said no.
-    The page already greets a visitor with an invitation (`lpn_empty_hint`: add a background, add a
-    reservoir, or draw the example network) and the example is already a solved one. The task is
-    quality, not placement. **Do not re-propose autodraw.**
-  - **The concrete weakness: it is two parallel pipes between one pair of junctions.** That is a
-    loop topologically, and it is not what a water system looks like — the calculator is named
-    Looped Pipe Network and its example does not show a ring main. 1 reservoir + 2 junctions is
-    also too small to make the map interface look worth using.
-  - What is already right and must survive: the reservoir level with the network rather than
-    perched above it (so the pump is visibly the reason there is pressure), the 3-point pump curve
-    (a shutoff, a duty point and a run-out, the way a datasheet reads), and US/SI defaults through
-    `niceDefault()`. See the comments in `drawExampleNetwork()` — they record decisions, not
-    description.
-  - Aim: a small ring main a practitioner recognises — one source, a loop of 4–6 junctions with
-    varied demands and elevations, sensible diameters, solving to pressures that all pass.
+- 80|255| **`lpn_` solves US networks with the length in the wrong unit — head loss is 3.28x
+  too high.** Found 2026-08-09 while sizing the Task 254 example. **This is a real physics defect
+  in the shipped calculator, not a display nit.**
+  - `assembleModel()` (`js/looped-network.js`) passes `effective(l, 'length')` straight into
+    `EngCalcs.lpnSolve()`, whose header says *"EVERYTHING HERE IS SI: Q in m3/s, H and lengths in
+    m."* But length is DECLARATIVE — with the Length/Map selector on `ft`, a pipe the user drew and
+    labelled 1000 ft arrives at the solver as 1000 **metres**. Every other quantity handed to the
+    solver (elevation, head, demand, diameter) IS converted, so the model is internally
+    inconsistent, and only in the US preset.
+  - **Measured:** 1000 ft of 6 in at C = 130 carrying 132 gpm. Suite Hazen-Williams says 1.74 ft of
+    loss; the page reports 5.73 ft. Ratio 3.281 = exactly 1 ft/m, which is the fingerprint.
+  - `lpn_u_gradient` inherits it twice over — `js/looped-network.js` divides an SI head loss by a
+    declared-foot length and calls the quotient dimensionless, with a comment asserting the length
+    "is already the real SI length the solver itself used". That comment is the mistaken belief.
+  - **Fix is small but it changes published answers**, so it is Tom's call, not a silent patch:
+    divide by `unitFactor('lpn_u_length')` at the two call sites. **The declarative design is NOT
+    what is wrong** — "one grid unit is one foot by declaration" is a fine decision; the bug is
+    failing to convert that declaration into SI at the solver boundary. Do not "fix" this by making
+    the map metric.
+  - **Task 254's example survives the fix either way** (US pressures rise ~2 psi, still 54-65 psi),
+    which is why it did not block that task.
+  - The EPANET path (`js/lpn-epanet.js`) inherits the same length, so both engines agree with each
+    other and are wrong together — which is exactly why `validate_epanet.js` never caught it. Any
+    fix needs a check that compares against a HAND-COMPUTED US case, not against the other engine.
+
+- 45|256| **`dev/lpn-spike/popup-tips-harness.js` is dead and has been for a while.** Found
+  2026-08-09. It dies on `MODULE_NOT_FOUND` before a single check runs, so its ~60 assertions have
+  been reporting nothing. Four separate causes, all diagnosed, none fixed (the last two need a
+  judgment call about what the harness SHOULD assert now):
+  1. It `eval()`s `js/lpn-solver.js`, whose own `require('./PipeHydraulics.lib.js')` then resolves
+     against `dev/lpn-spike/` instead of `js/`. Fix: `require('./bootstrap.js')` then
+     `Object.assign(global.EngCalcs, require(ROOT + 'js/lpn-solver.js'))` — with NO `var EngCalcs`,
+     which would hoist and shadow the global for the pageConfig loader above it.
+  2. That eval was also, by accident, what created the module-scope `EngCalcs` the app's
+     `var EngCalcs = EngCalcs || {}` lands on. Without it the evaluated app gets a bare `{}`.
+     Fix: `Object.assign(EngCalcs, global.EngCalcs)` immediately after `eval(src)`.
+  3. `deleteProject` no longer exists — Task 211 renamed it `discardProject`. Mechanical.
+  4. **The real work:** the Settings panel has since been restructured, so "all three reset tips
+     exist" and "both Settings reset buttons are present" now assert against a UI that is gone (it
+     reads `Restore defaults | Erase everything on this page` today). Also needs `iconEl`/`setLabel`
+     stubs for `js/Icons.lib.js`. Deciding what these should check now is a small design call.
+  - **The lesson is bigger than this file: nothing runs these harnesses.** `validate.js`,
+    `validate_epanet.js`, `handle-restore-harness.js`, `suite-tips-trigger-harness.js`,
+    `title-beacon-harness.js` and the new `example-network-harness.js` are all green, and this one
+    has been red for weeks with nobody the wiser. **Consider a one-line `dev/scripts/run_harnesses.sh`
+    that runs every `dev/lpn-spike/*harness*.js` plus `validate*.js` and fails on the first non-zero
+    exit** — that, not this repair, is what stops the next one rotting.
+
+- 40|257| **Example PROJECTS (plural) for lpn, seeded from EPANET's own example networks.** Tom,
+  2026-08-09, while Task 254 was in flight: *"some example projects would also be nice, but that's
+  another task for another day, and I suppose it's up to me to prepare those. Maybe I can get
+  something from EPANET, I hope."* He then found the source:
+  <https://github.com/OpenWaterAnalytics/EPANET/tree/dev/example-networks>.
+  - **Distinct from Task 254**, which is the one-click *drawing* example a first-time visitor makes
+    from an empty canvas. This is a LIBRARY of openable projects — Net1/Net2/Net3 and friends —
+    which is a Projects/tabs feature, not a toolbar button.
+  - **The blocker is that we deliberately have no `.inp` importer.** Tom confirmed 2026-07-29 that
+    interop is not wanted, and `js/looped-network.js` says so. But `EngCalcs.lpnToInp()` already
+    exists (Task 243, for the EPANET engine), so we can WRITE `.inp` — the missing half is reading
+    it. **Decide the direction before scoping:** (a) write a one-off dev-time converter that bakes
+    the chosen examples into our own JSON, shipping no importer, or (b) build a real `.inp` reader
+    and reopen the interop decision. (a) is much cheaper and does not relitigate anything.
+  - **We already have Net1/Net2/Net3 in the repo** as `dev/lpn-spike/reference/` fixtures, so the
+    first example costs no download and no network access.
+  - **Licensing is clean** — OWA-EPANET is MIT, so its example networks can ship under GPL v3+.
+  - **These are ANALYSIS networks and this suite is a DESIGN tool.** They will make the map look
+    serious, but do not let them quietly redefine what the calculator is for.
 
 - 35|252| **Reorder project tabs, left/right.** Tom, 2026-08-09: *"We talked about this, but I
   guess we forgot about it. Either Drag or click an item on the tab menu. Either one is fine."*
@@ -1722,6 +1772,39 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|254| **[DONE 2026-08-09] The lpn example network is a real ring main, at project scale.**
+  `drawExampleNetwork()` in `js/looped-network.js`. Replaced the two-parallel-pipes placeholder.
+  - **Shape:** one reservoir, one pump (link) into a tie-in junction, then a closed ring of five
+    junctions with varied demands and elevations. Cyclomatic number is exactly 1, and the flow
+    leaves the tie-in BOTH ways and meets a hydraulic divide between J3 and J4 (head loss crosses
+    zero there) — the behaviour a parallel pair structurally cannot show, and the reason looped
+    networks need a solver.
+  - **Scale was the real complaint, and it is a RATIO, not a size.** Tom, 2026-08-09: the old
+    example's 45 x 20 extent was "unrealistically small and too small relative to the initial
+    default text and symbol size"; a real project is "on the order of 1000 m (3000 ft)". So the
+    example now spans 2800 x 1400 ft / 840 x 420 m AND sets `settings.textSize` to 20 ft / 6 m in
+    the same breath (~1:140, the ratio Tom named). Changing either alone would have reproduced the
+    defect. Symbols follow the text through `symbolFactor()`, so they needed nothing.
+  - **Numbers:** 6 in / 150 mm ring at C = 130, ~250 gpm / 15 L/s total demand, pump duty at that
+    flow. Solves to 52–63 psi (365–422 kPa) at every junction, 0.05–1.5 fps velocities. Both unit
+    presets are the same drawing at different scale, not a conversion of one another.
+  - **Zoom-to-fit now happens TWICE, and the second one is the point.** `zoomExtent()` fits to
+    RENDERED label text, but a network built in code is fitted before the 300 ms debounced solve
+    has produced any — so labels appeared outside the map a third of a second later (Tom's second
+    complaint). `fitAfterSolve` / `consumeFitAfterSolve()` request one more fit on every exit path
+    from a solve, including the async EPANET one. `drawTestGrid()` uses it too.
+  - **Kept deliberately:** reservoir level with the network (so the pump is visibly the reason
+    there is pressure), the 3-point datasheet-shaped pump curve, US/SI through `niceDefault()`,
+    and one bend vertex so the example still ships something to drag.
+  - **Coordinates are NOT run through `niceDefault()`** — lengths and map coordinates are
+    declarative (1 grid unit IS 1 ft or 1 m, no conversion), so they are scaled by a local `gu`
+    factor instead. Getting this wrong would silently produce a 3.3x-wrong drawing.
+  - **Verified by `node dev/lpn-spike/example-network-harness.js`** (new, 18 checks x 2 unit sets,
+    all pass): topology, cyclomatic number, extent, text ratio, pump curve shape, convergence,
+    pressure band, flow reversal, velocity ceiling, bent-pipe auto length, and the pending re-fit
+    being consumed exactly once. No browser pass was needed.
+  - **Example PROJECTS are still open and are a different task — see Task 257.**
 
 - 0|243| **[DONE 2026-08-09] Real EPANET engine in `lpn_`, as an opt-in second engine.**
   `js/lpn-epanet.js` + `js/vendor/` (epanet-js 0.9.0, MIT). Settings toggle, off by default;
