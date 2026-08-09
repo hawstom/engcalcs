@@ -84,20 +84,21 @@ function echoEngCalcsMenu ($html_title = '', $show_name_field = false, $calc_nam
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light d-print-none">
 	<a class="navbar-brand" href="index.php"><?=$ec_lang['menu_brand']?></a>
+	<?php // Task 244 (Tom, 2026-08-09), placed OUTSIDE .navbar-collapse deliberately.
+	      // It first shipped as the top item of the collapsing nav list, and Tom's browser
+	      // review rejected that: "I think it would be better for 'Libre Software' not to
+	      // collapse into the upper right corner menu as its top item, but instead to appear
+	      // as an extension of the HawsEDC Calculators {} Libre Software, almost as one
+	      // string." So it is a sibling of the brand, not a nav item -- always visible, never
+	      // behind the hamburger, reading as a continuation of the project's name rather than
+	      // as one destination among many. Anything inside .collapse disappears under lg. ?>
+	<a class="ec-nav-libre" id="nav-libre" target="_blank" rel="noopener" href="https://github.com/hawstom/engcalcs"><?=ecIcon('github')?><?=$ec_lang['menu_libre']?></a>
 	<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 		<span class="navbar-toggler-icon"></span>
 	</button>
 
 	<div class="collapse navbar-collapse" id="navbarSupportedContent">
 		<ul class="navbar-nav me-auto">
-			<?php // Task 244 (Tom, 2026-08-09). Placed immediately after the brand, not tucked at
-			      // the right by the language menu, because Tom chose the wording by reading it in
-			      // exactly this layout -- "HawsEDC Calculators | Libre Software | Hydraulics".
-			      // It is a claim about what this suite IS, so it sits with the name, and the
-			      // GitHub mark is what makes the claim checkable rather than decorative. ?>
-			<li class="nav-item">
-				<a class="nav-link" id="nav-libre" target="_blank" rel="noopener" href="https://github.com/hawstom/engcalcs"><?=ecIcon('github')?><?=$ec_lang['menu_libre']?></a>
-			</li>
 			<li class="nav-item dropdown">
 				<a class="nav-link dropdown-toggle active" id="dropdown-calc" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 					<?=$ec_lang['menu_main_hydraulics']?>

@@ -359,3 +359,47 @@ html[lang="zh"] .ec-welcome {
 	.lpn-popover { max-height: calc(100dvh - 8px); }
 	.lpn-popover-body { max-height: calc(100dvh - 56px); }
 }
+
+/* Task 244 -- the "Libre Software" mark beside the brand.
+
+   It sits OUTSIDE .navbar-collapse (see lib/Menus.lib.php) so it never hides behind the
+   hamburger. Tom, 2026-08-09: it should read "as an extension of the HawsEDC Calculators {}
+   Libre Software, almost as one string" -- so it is styled as a quieter continuation of the
+   brand, not as a nav destination. Deliberately NOT .nav-link: nav links carry Bootstrap's
+   nav padding and hover affordance, which is what made it read as one menu item among many.
+
+   margin-inline-start rather than margin-left, and the separator uses ::before rather than a
+   literal character, because 5 of the 27 languages are RTL -- the mark must land on the
+   trailing side of the brand in both directions, and a hard-coded "|" would strand itself on
+   the wrong edge. */
+.ec-nav-libre {
+	display: inline-flex;
+	align-items: center;
+	margin-inline-start: 0.55rem;
+	font-size: 0.85rem;
+	white-space: nowrap;
+	text-decoration: none;
+	color: #5a6570;
+}
+.ec-nav-libre::before {
+	content: "|";
+	margin-inline-end: 0.55rem;
+	color: #b9c0c7;
+	font-size: 1.05rem;
+	line-height: 1;
+}
+.ec-nav-libre:hover, .ec-nav-libre:focus { color: #1a6faf; text-decoration: underline; }
+.ec-nav-libre > .ec-icon { margin-inline-end: 0.3em; }
+
+/* Narrow phones: the brand plus a long translation (bg "Свободен софтуер", id "Perangkat
+   Lunak Bebas") plus the hamburger will not co-exist on one line. Drop the word and keep the
+   GitHub mark, which is the part that makes the claim checkable; the full wording is still on
+   About.php. The link keeps an accessible name because the icon is aria-hidden by design, so
+   the text is hidden visually rather than removed from the accessibility tree. */
+@media (max-width: 400px) {
+	.ec-nav-libre { font-size: 0; }
+	.ec-nav-libre::before { font-size: 1.05rem; }
+	/* .ec-icon sizes itself in em, so the font-size: 0 above would collapse the mark to
+	   nothing along with the word. Re-assert it in rem, which the parent cannot zero. */
+	.ec-nav-libre > .ec-icon { width: 1.15rem; height: 1.15rem; margin-inline-end: 0; }
+}
