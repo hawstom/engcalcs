@@ -1,7 +1,18 @@
 # Task 195/220 test punch list — project files and locking (`lpn_`)
 
 > **§0–§8 REWRITTEN 2026-08-05 against the post-211 UI** (projects as tabs, an ordinary File menu,
-> **no autosave**, opt-in read-only, no Delete, no Take over). The previous versions of these
+> **no autosave**, opt-in read-only, no Delete, **no AUTOMATIC take-over** — see the correction
+> below).
+>
+> **CORRECTION, 2026-08-09 (Tom).** "No Take over" is written all through this file and it is now
+> misleading. What Task 211 withdrew was the **automatic** promotion: a poll that could silently
+> turn B's read-only tab into an editable one after A went idle. That is gone and stays gone —
+> nothing promotes a tab by itself, ever. But **B can take over, deliberately**, via *Break their
+> lock*, and doing so does leave A unable to save. Tom, 2026-08-09: *"Because of the advancements
+> we have made in file management, I am now softened on my position about 'Take over'. We literally
+> do now allow B to take over, leaving A unable to save. But we are managing it well."* Read every
+> "no Take over" below as **"no automatic take-over"**; the explicit, user-initiated one is a
+> feature, is announced, and is guarded by the three-choice dialog. The previous versions of these
 > sections described controls that no longer exist; Tom's annotations on them are the record of
 > *why* Task 211 happened and are preserved verbatim in the appendix at the bottom.
 >
@@ -438,7 +449,9 @@ single guess in the build.
       positive here would be worse than the bug it prevents.
 - [x] **[auto]** Profile **B**: open the same file. Expect a dialog headed **"<A's initials> has this file
       open."** offering exactly two choices: **Open read-only** and **Create a copy**.
-      **There must be no Take over.**
+      **There must be no AUTOMATIC take-over** (see the 2026-08-09 correction at the top): nothing
+      may promote B's tab on its own. B taking the file deliberately, via *Break their lock*, is a
+      supported action and is offered as the third choice.
       [TGH: Yes, most of the time. But more than once I have experienced a silent same open in another browser. I am not sure what are the conditions. Testing this, I find that when it happens, closing and reopening in B just repeats the mistake. Next I checked that A is indeed connected. Then I closed A and reopened it. That ends the manifestation.]
 - [x] ~~**Create a copy** → asks where to save → …~~ **STALE — that button no longer exists.** The
       open-time dialog now offers Cancel / Open read-only / Break their lock, and *open read-only then
@@ -482,9 +495,10 @@ This is the paradigm Tom asked for: you may do anything you like, you just canno
       tab is still read-only afterwards, and Save is still disabled. *(Runner §6&7.)*
 - [x] **Save as…** to a different name → succeeds, B is now a normal editable project on its own
       file, banner gone, and the new file has a **different `docId`**.
-- [x] ~~Leave A idle for >2 min…~~ **NO LONGER TESTABLE, BY DESIGN.** Take over was withdrawn and
-      the promotion poll was deleted in Task 211 — there is no code path that can promote a tab, so
-      there is nothing to wait two minutes for. What replaced it is asserted instead: nothing
+- [x] ~~Leave A idle for >2 min…~~ **NO LONGER TESTABLE, BY DESIGN.** The AUTOMATIC take-over was
+      withdrawn and the promotion poll was deleted in Task 211 — there is no code path that can
+      promote a tab on its own, so there is nothing to wait two minutes for. (Deliberate take-over
+      via *Break their lock* is unaffected and is tested in §6&7.) What replaced it is asserted instead: nothing
       promotes a read-only tab, ever (runner §6&7).
       [TGH: What seems to happen is that B is allowed to open the project until A closes it and opens again.]
 - [x] ~~In A, close the project. B **still** does not silently become editable.~~ Same answer as

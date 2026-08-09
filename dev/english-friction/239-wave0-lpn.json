@@ -164,8 +164,8 @@
         "damage/destroy their lock",
         "open a canal lock"
       ],
-      "disposition": "refer-to-human",
-      "resolution": "REVERTED 2026-08-09. The finding was right about the risk -- \"lock\" invites the canal-lock word in a hydraulics glossary, and \"break\" invites the physical destroy sense -- but my English rewrite to \"Take over the file\" was WRONG for this codebase: \"Take over\" names a WITHDRAWN feature (automatic lock promotion, deleted in Task 211), and dev/lpn-file-lock-test-punchlist.md asserts \"There must be no Take over.\" Caught by the browser harness, not by review. English restored to \"Break their lock\". By the routing rule this was never an English case at all -- an English reader does not stumble -- so it needs a $ec_lang_syn entry instead, proposed to Tom and awaiting his approval."
+      "disposition": "intent",
+      "resolution": "English kept as \"Break their lock\" -- Tom: \"an ancient physical metaphor and therefore universal\". $ec_lang_syn written in his wording, with NO avoid array: he asked \"do we really think that with all these synonyms we need an avoid?\" and the answer is no. Three of the six synonyms (take over the file, claim the file, override their claim) contain no lock at all, so a translator already has escape routes from the canal-lock trap without being told what to dodge -- which is the positive-guidance principle working as intended. If that guard is ever wanted it belongs ONCE in a glossary concept covering all ~10 lock strings, not repeated per label. Along the way Tom corrected the docs: \"no Take over\" now reads \"no AUTOMATIC take-over\", because deliberate take-over via this very button IS supported and does leave A unable to save. My earlier English rewrite to \"Take over the file\" was still wrong -- but for a reason that has now itself expired."
     },
     {
       "key": "lpn_ago_unknown",

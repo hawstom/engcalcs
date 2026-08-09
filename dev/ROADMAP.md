@@ -2260,7 +2260,9 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 - 0|220| **[DONE 2026-08-06] Browser-verified `lpn_` project files and locking against the POST-211 UI.**
   Punch list: `dev/lpn-file-lock-test-punchlist.md` — **§0–§8 rewritten 2026-08-05 against tabs, the
-  File menu, no autosave, opt-in read-only, no Delete and no Take over.** 78 checks, all open; the
+  File menu, no autosave, opt-in read-only, no Delete and no AUTOMATIC take-over** (corrected
+  2026-08-09: deliberate take-over via *Break their lock* is a supported action and always was —
+  what Task 211 deleted was the silent promotion poll; see the note at the top of the punch list).** 78 checks, all open; the
   old §1–§6 "done" marks were against controls that no longer exist, so they were reset. Tom's
   annotations from that pass are preserved in an appendix as the record of why Task 211 happened.
   - **§11 (Firefox/Safari) is largely coverable from Chrome** on a plain `http://` LAN IP — the
