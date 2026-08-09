@@ -90,6 +90,14 @@ function echoEngCalcsMenu ($html_title = '', $show_name_field = false, $calc_nam
 
 	<div class="collapse navbar-collapse" id="navbarSupportedContent">
 		<ul class="navbar-nav me-auto">
+			<?php // Task 244 (Tom, 2026-08-09). Placed immediately after the brand, not tucked at
+			      // the right by the language menu, because Tom chose the wording by reading it in
+			      // exactly this layout -- "HawsEDC Calculators | Libre Software | Hydraulics".
+			      // It is a claim about what this suite IS, so it sits with the name, and the
+			      // GitHub mark is what makes the claim checkable rather than decorative. ?>
+			<li class="nav-item">
+				<a class="nav-link" id="nav-libre" target="_blank" rel="noopener" href="https://github.com/hawstom/engcalcs"><?=ecIcon('github')?><?=$ec_lang['menu_libre']?></a>
+			</li>
 			<li class="nav-item dropdown">
 				<a class="nav-link dropdown-toggle active" id="dropdown-calc" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 					<?=$ec_lang['menu_main_hydraulics']?>

@@ -1,0 +1,55 @@
+{
+  "sprint": "245",
+  "description": "About.php resync (about_body_html, about_main_desc) plus the new navbar key menu_libre (Task 244). Wave 0 run inline by CC on 2026-08-09 rather than by a spawned agent -- three strings is below the threshold where a dedicated agent adds anything. Falsification pass: for each changed string, enumerate every plausible reading; more than one reading means propose a rewrite.",
+  "entries": [
+    {
+      "key": "about_main_desc",
+      "source": "wave0",
+      "lang": "en",
+      "complaint": "'Mission, Free Libre Open Source Software, and Contributing' is a comma-separated list of topics whose middle item is itself an unpunctuated four-word acronym expansion. A reader scanning the list cannot tell where item two starts and ends.",
+      "readings": [
+        "three topics: Mission / Free Libre Open Source Software / Contributing",
+        "five topics: Mission / Free / Libre / Open Source Software / Contributing"
+      ],
+      "disposition": "english",
+      "resolution": "Rewritten to 'Mission, Libre Software, and Contributing'. Two words cannot be misparsed as a sub-list, and it now matches the navbar term Tom chose the same day (menu_libre), so the site says one thing in both places. The full 'Free Libre Open Source License' expansion survives where it belongs -- as the h3 heading inside about_body_html, where heading position cues it as an acronym expansion rather than a list."
+    },
+    {
+      "key": "menu_libre",
+      "source": "wave0",
+      "lang": "en",
+      "complaint": "'Libre' is a loanword in English carrying a license meaning that the word itself does not supply. It lands perfectly in the Romance languages, where libre/livre/libero/liber is the ordinary word for free, and lands as an opaque transliteration in am, ar, bn, fa, he, hi, km, my, ps, ur, zh -- precisely the audiences the mission targets.",
+      "readings": [
+        "software licensed so that users are free to use, study, modify and redistribute it (intended)",
+        "software that costs nothing (gratis)",
+        "an untranslatable brand name, to be transliterated phonetically"
+      ],
+      "disposition": "refer-to-human",
+      "resolution": "OPEN. The English is deliberate -- Tom chose it 2026-08-09 over 'Freely yours' and 'Community software', citing LibreOffice as precedent, and the choice is sound for its own audience. So the routing rule sends this to $ec_lang_syn, not to an English rewrite. But $ec_lang_syn is off-limits to AI without in-conversation permission, so CC has PROPOSED an entry and it awaits Tom's approval. Until it is approved this sprint ships menu_libre with no translator guidance, which is the exact transliteration risk described above. Blocking for the low-resource languages; harmless for the Romance ones."
+    },
+    {
+      "key": "about_body_html",
+      "source": "wave0",
+      "lang": "en",
+      "complaint": "List item 'Translations: Correct wording. Improve or add a language.' -- 'Correct wording' is ambiguous between imperative verb + object and adjective + noun. English readers resolve it from the sibling items, which are all imperative; a translator working the string in isolation may not.",
+      "readings": [
+        "correct the wording (imperative -- intended)",
+        "wording that is correct (adjective phrase, a sentence fragment)"
+      ],
+      "disposition": "refer-to-human",
+      "resolution": "OPEN, and deliberately NOT auto-fixed. This is Tom's own verbatim wording, supplied 2026-08-09; CC does not silently rewrite the founder's voice. The imperative reading is well cued by the sibling list items, so the risk is moderate rather than high. Two ways to close it: Tom blesses a tiny English change ('Fix wording' or 'Correct our wording'), or approves a $ec_lang_syn entry. Either closes it; doing nothing leaves a coin-flip for 26 translators."
+    },
+    {
+      "key": "about_body_html",
+      "source": "wave0",
+      "lang": "en",
+      "complaint": "'This is an invitation, not a price.' does not name what the invitation is TO. The paragraph that follows supplies it by implication (use and modify the code), but the sentence alone is a rhetorical figure rather than a proposition.",
+      "readings": [
+        "the license is an offer extended to you, not a transaction (intended)",
+        "some unnamed invitation is being contrasted with some unnamed cost"
+      ],
+      "disposition": "dismissed",
+      "resolution": "Dismissed as an English defect. It is Tom's own sentence and a deliberate rhetorical opener, the surrounding paragraph resolves it in the very next sentence, and the equivalent figure exists in every target language. Translators are told in the sprint prompt to render the rhetorical contrast rather than calque the nouns."
+    }
+  ]
+}
