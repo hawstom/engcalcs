@@ -613,7 +613,7 @@
         "lpn_view_units": "Units…",
         "lpn_file_saveall": "Save all",
         "lpn_project_numbered": "Project{n}",
-        "lpn_project_copy_suffix": " (copy)",
+        "lpn_project_copy_suffix": "(copy)",
         "lpn_project_rename": "Rename",
         "lpn_file_new": "New project",
         "lpn_file_open": "Open…",

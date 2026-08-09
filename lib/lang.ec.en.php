@@ -1106,6 +1106,7 @@ $ec_lang['lpn_tool_delete']='Delete';
 $ec_lang['lpn_tool_zoom_extent']='Zoom to fit';
 $ec_lang_intent['lpn_tool_zoom_extent']='Zoom out (or in) until the whole drawing fits in the window; show everything at once (zoom to extents, fit to window, show all). | avoid: adjusting the zoom by an amount';
 $ec_lang['lpn_new_text']='Text';
+$ec_lang_intent['lpn_new_text']='Text, Label, Temporary Text, Placeholder, Unfinished text, or Default words';
 $ec_lang['lpn_tool_example']='Draw example network';
 $ec_lang['lpn_field_elev']='Elevation';
 // Task 193 trap-term tips. Every one of these is a DEFINITION the user can read, which is also
@@ -1128,6 +1129,7 @@ $ec_lang['lpn_confirm_example']='This adds the example to the network you alread
 $ec_lang['lpn_field_diameter']='Diameter';
 $ec_lang['lpn_demand_tip']='Flow taken out of the network at this node. Enter a negative number for flow put into the network here.';
 $ec_lang['lpn_units_length']='Length and map coordinates';
+$ec_lang_intent['lpn_units_length']='Pipe lengths and map coordinates';
 $ec_lang['lpn_units_elevhead']='Elevation and head';
 $ec_lang['lpn_units_pressure']='Pressure';
 $ec_lang['lpn_units_flow']='Flow';
@@ -1189,7 +1191,7 @@ $ec_lang['lpn_file_saveall']='Save all';
 // number not currently in use, so closing Project 2 makes the next new project Project 2 again. A
 // counter that only ever went up would reach "Project 47" in an afternoon and read as a fault.
 $ec_lang['lpn_project_numbered']='Project{n}';
-$ec_lang['lpn_project_copy_suffix']=' (copy)';
+$ec_lang['lpn_project_copy_suffix']='(copy)';
 $ec_lang['lpn_project_rename']='Rename';
 // The File menu. "New" is the same act as the + tab, deliberately: one function, two doors.
 $ec_lang['lpn_file_new']='New project';

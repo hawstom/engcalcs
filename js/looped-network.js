@@ -2828,7 +2828,7 @@ var EngCalcs = EngCalcs || {};
 		// A copy needs a name of its own -- two projects cannot share one, and a picker pre-filled
 		// with the original's name invites overwriting the very file we are copying away from.
 		var suggested = forking
-			? safeFileName(projectDisplayName(project) + (pc.lpn_project_copy_suffix || ' (copy)')) + '-lpn-hawsedc-engcalcs.json'
+			? safeFileName(projectDisplayName(project) + ' ' + (pc.lpn_project_copy_suffix || '(copy)')) + '-lpn-hawsedc-engcalcs.json'
 			: projectFileName();
 		var handle;
 		try { handle = await window.showSaveFilePicker({ suggestedName: suggested, types: fileTypes() }); }
@@ -4158,7 +4158,7 @@ var EngCalcs = EngCalcs || {};
 				icon: 'duplicate',
 				label: pc.lpn_tab_duplicate || 'Duplicate',
 				fn: function () {
-					var suggested = projectDisplayName(entry) + (pc.lpn_project_copy_suffix || ' (copy)');
+					var suggested = projectDisplayName(entry) + ' ' + (pc.lpn_project_copy_suffix || '(copy)');
 					var v = window.prompt(pc.lpn_prompt_project_name || 'Name for this project', suggested);
 					if (v === null) { return; }
 					if (id !== library.openId) { openProject(id); }

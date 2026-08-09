@@ -226,6 +226,30 @@ could this be said?"* — and it answers in words, not commentary. Tom, 2026-08-
 original design after it had drifted: *"`_intent` is not for me or for you to describe anything. It
 is for synonyms or alternate expressions."*
 
+**THE SUBSTITUTION TEST — the one rule that separates a synonym from a description.** Every phrase
+in an intent must be able to **stand in the slot**: you could put it on that button, that heading,
+that label, and it would still mean the right thing. If a phrase could not go on the control, it is
+a description and it does not belong.
+
+```php
+// ✅ synonyms -- every item could be the label
+$ec_lang_intent['lpn_new_text']='Text, Label, Temporary Text, Placeholder, Unfinished text, or Default words';
+$ec_lang_intent['lpn_units_length']='Pipe lengths and map coordinates';
+// ❌ description -- none of this could ever be the label
+$ec_lang_intent['lpn_new_text']='The word that appears inside a new text label when it is first placed on the drawing.';
+```
+
+Both bad examples above are real: AI wrote them on 2026-08-08 and Tom rejected them on sight
+(*"You are drifting again into description, which was the original sin, and is disheartening to
+me."*). **Description is the failure mode this channel has drifted into every single time.** The
+substitution test exists because "write synonyms, not descriptions" was said repeatedly and did not
+hold; a testable rule does what an instruction could not. Apply it to every phrase, including the
+ones inside parentheses.
+
+Two shapes both pass the test and both are correct: a **word bank** (`Text, Label, Placeholder…`)
+and a **substitutable phrase with alternates in parentheses** (`Throw away (discard) my changes by
+reloading the saved version…`). Use whichever fits the label.
+
 **When it is needed: whenever the plain meaning is not what the English words literally say.**
 That is the whole test, and it is much broader than jargon. Worked examples, all real:
 
