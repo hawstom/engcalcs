@@ -571,7 +571,7 @@ function prefixToTermNames(): array
             'pressure reduction', 'energy grade line', 'Manning roughness', 'friction factor',
             'draw (a diagram)', 'junction', 'reservoir', 'node', 'link', 'vertex',
             'background image', 'pump curve', 'project (saved network)', 'scenario',
-            'upstream', 'downstream'],
+            'zoom to extents', 'upstream', 'downstream'],
         'bpn' => ['flow', 'velocity', 'head', 'head loss', 'friction loss', 'minor loss', 'pressure',
             'elevation', 'demand', 'static head', 'maximum allowable head', 'supply head',
             'supply curve', 'branched network', 'branch', 'pipe line', 'pressure rating',

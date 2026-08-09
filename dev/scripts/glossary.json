@@ -1,6 +1,6 @@
 {
   "meta": {
-    "version": "1.24",
+    "version": "1.25",
     "description": "Engineering term glossary for EngCalcs translation prompts. Preferred translations per language to prevent term drift across calculators and sprints. Covers all calculators including Rock Chute Design (Robinson), Micro-Hydro Power, and Manning series.",
     "usage": "Inject relevant entries as context in translation prompts: 'Use these preferred translations for technical terms: [terms for this calculator prefix]'. Entries with empty strings need a sprint to fill.",
     "language_codes": [
@@ -3177,6 +3177,25 @@
         "zh": "冲刷"
       },
       "source": "ai-generated"
+    },
+    {
+      "term": "zoom to extents",
+      "symbol": "",
+      "context": "A map/drawing toolbar command that rescales and recentres the view so the WHOLE drawing is visible at once — it computes the bounding box of every element and fits it to the window. The English label is \"Zoom to fit\" (key lpn_tool_zoom_extent); the key name carries the real meaning. It is one specific command, not a general zoom control: it takes no amount and has no direction.",
+      "avoid": [
+        "a general \"adjust/change the zoom\" — this is the trap. es \"Ajustar zoom\" and pt \"Zoom para ajustar\" both shipped meaning ADJUST THE ZOOM, which describes the zoom slider, not this button. A verb meaning adjust/regulate/set is wrong unless the label also says WHAT is fitted",
+        "zoom in / zoom out / a zoom level or percentage — this command has no direction and no amount",
+        "a transliterated \"zoom\" loanword standing alone, where the language has a real word for showing the whole drawing",
+        "the photographic or camera sense of zoom (a lens movement)"
+      ],
+      "translations": {
+        "es": "Ver todo",
+        "pt": "Ver tudo",
+        "fr": "Zoom sur l'étendue",
+        "tr": "Tümünü göster"
+      },
+      "translation_notes": "Created 2026-08-08 (ROADMAP Task 237) after Tom read the shipped Spanish and said \"Ajustar zoom ... I think that's wrong\". He was right, and the defect had spread: 2 of the 4 languages carrying this key (es, pt) had rendered it as ADJUST THE ZOOM. The word \"fit\" in the English label is the lure — it invites a fitting/adjusting verb while saying nothing about what is fitted, so a translator with no other context reasonably lands on \"adjust\". THE ENGLISH IS DELIBERATELY UNCHANGED: \"Zoom to fit\" is an established UI idiom (browsers, PDF viewers, design tools all ship it) and renaming a recognized control costs more than guarding it — this entry plus its avoid array is the guard. Two legitimate conventions exist and both are correct: CAD-faithful (fr \"Zoom sur l'étendue\", matching AutoCAD's own French/Spanish \"Zoom Étendu\"/\"Zoom Extensión\") and plain (tr \"Tümünü göster\" = show all). Tom chose the PLAIN register for es and pt on 2026-08-08, so 3 of 4 now share the show-everything mental model while fr keeps its correct CAD form. Either register is acceptable for a new language; an adjust-the-zoom reading is not.",
+      "source": "EngCalcs lpn_ map toolbar (lpn_tool_zoom_extent); AutoCAD and QGIS localized UI for the equivalent Zoom Extents / Zoom Full command."
     }
   ]
 }

@@ -1585,6 +1585,30 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Completed
 
+- 0|237| **[DONE 2026-08-08] "Zoom to fit" shipped meaning "adjust the zoom" in 2 of 4 languages.**
+  Caught by Tom reading the shipped Spanish: *"Zoom to fit in Spanish is ajustar zoom. I could be
+  wrong, but I think that's wrong."* He was right, and it had spread further than the one example.
+  - **The review he asked for, complete.** `lpn_tool_zoom_extent` is a `lpn_` body string, so only
+    es/pt/fr/tr carry it — a 4-language review, not 27. es *Ajustar zoom* ("adjust zoom") and pt
+    *Zoom para ajustar* ("zoom to adjust") were both wrong; fr *Zoom sur l'étendue* and tr *Tümünü
+    göster* ("show all") were both correct. Fixed to **es *Ver todo*, pt *Ver tudo***.
+  - **Why it happened, and why the English is deliberately NOT reformed.** The lure is the word
+    "fit": it invites a fitting/adjusting verb while saying nothing about *what* is fitted, so a
+    translator with no other context lands on "adjust" and produces a label describing the zoom
+    slider rather than the button. The English-reform gate was considered and declined — "Zoom to
+    fit" is an established UI idiom (browsers, PDF viewers, design tools all ship it) and renaming a
+    recognized control costs more than guarding it. The guard is the glossary entry, not a rename.
+  - **New glossary concept `zoom to extents`** (version 1.24 → 1.25) with a 4-item `avoid` array
+    that names this exact failure, plus the attested forms for all four languages. **Two registers
+    are both correct and both are recorded**: CAD-faithful (fr, matching AutoCAD's own
+    *Zoom Étendu*/*Zoom Extensión*) and plain (tr *show all*). Tom chose plain for es/pt, so 3 of 4
+    now share the show-everything model. An adjust-the-zoom reading is what the entry forbids.
+  - **Wired into `prefixToTermNames()` in the same commit** — verified by resolving the `lpn` map
+    against the live glossary (34 of 34 names resolve, the new term among them) and reading the
+    generated `DO NOT render as:` line. **This is the step that Task 146.06 found had never been
+    done for `lpn` at all**; a glossary entry that is not in that map reaches no agent, so adding
+    the entry without the map line would have been the same defect in miniature.
+
 - 0|236| **[DONE 2026-08-08] The last preview-era sentence is gone — Tom said delete.**
   `lpn_notes_3_def` ended *"Because this is an early preview, please use it for small networks and
   for testing only."* The 2026-08-08 PREVIEW removal took the 3 identity keys and the banner but
