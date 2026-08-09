@@ -99,6 +99,27 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **OPEN — add the suggestion-box instruction to the standard agent prompt template**, so it is
     not re-typed per sprint and cannot be forgotten.
 
+- 45|240| **Two `lpn_` strings cannot be fixed in English, only in code — run-time sentence fragments.**
+  Surfaced 2026-08-08 by the adversarial Wave 0 pass (Task 239), and logged here because they are the
+  findings that pass could *not* close: no English rewrite reaches them.
+  - **`lpn_ago_unknown` / `lpn_ago_minutes` / `lpn_ago_hours` / `lpn_ago_days`** are fragments
+    substituted into `{x} ago` (`js/looped-network.js:3025-3030`) inside four
+    `lpn_lock_open_heading_*` sentences. **English postposes "ago"; Spanish fronts it** — *hace 5
+    minutos*. So a translator who correctly localises the fragment breaks the host sentence, and one
+    who correctly localises the host sentence cannot use the fragment. There is no wording that
+    works; the construction itself is the defect.
+    **Fix:** compose whole sentences per branch — one complete, translatable string for each of
+    unknown/minutes/hours/days with `{n}` inside it — instead of concatenating a fragment with a
+    suffix. Costs 4 keys and removes a whole class of breakage.
+  - **`lpn_project_copy_suffix` = `" (copy)"`** — the leading space is load-bearing (it is
+    concatenated straight onto a project name) and is exactly what a careful translator or tooling
+    strips. **Fix:** put the space at the call site, so the translatable string is `(copy)` and
+    cannot be silently broken by trimming.
+  - **The general lesson, worth applying beyond these two:** any string that is a *fragment* of a
+    sentence assembled at run time is a latent i18n defect, because word order is not universal.
+    Grep for `.replace('{` and string concatenation onto a translated value before the next
+    calculator ships.
+
 - 40|235| **The glossary's `pressure` and `elevation` entries hold the UPSTREAM label form in 22
   languages.** Found during the Task 146.06 sprint, 2026-08-08 — by a translation agent, which is
   worth noting: the tr agent was handed `preferred_translation` = "Memba basıncı" (*upstream*

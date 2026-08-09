@@ -1,6 +1,6 @@
 {
   "meta": {
-    "version": "1.26",
+    "version": "1.27",
     "description": "Engineering term glossary for EngCalcs translation prompts. Preferred translations per language to prevent term drift across calculators and sprints. Covers all calculators including Rock Chute Design (Robinson), Micro-Hydro Power, and Manning series.",
     "usage": "Inject relevant entries as context in translation prompts: 'Use these preferred translations for technical terms: [terms for this calculator prefix]'. Entries with empty strings need a sprint to fill.",
     "language_codes": [
@@ -3238,6 +3238,32 @@
       },
       "translation_notes": "Created 2026-08-08 (ROADMAP Task 238) at Tom's request: *\"default is a troublesome word. but this is a phrase for which it should be easy to find standard renditions of in any language. so I am hesitant to judge. I just want it to be right.\"* That is exactly the right instinct and it is why this entry exists: the concept HAS a settled term in every language, so no agent should ever re-derive it, and the risk is not invention but reaching for the wrong sense (financial/legal) or dropping the concept.\n\nValues above are the attested forms already shipping in each language's calc_defaults / calc_defaults_confirm, cross-checked against each other — a language that used the same term in both was taken as self-confirming. Note the low-resource languages (bn, hi, id, ps) legitimately use the English loanword: it IS the standard software term there, and per the defer-to-cultural-standard principle that is correct, not a transliteration defect.\n\nThe 2026-08-08 audit of all 26 found 3 real defects, each caught by contradicting its OWN file rather than by outside judgement: ro said only \"Reseteaza\" on the button while its confirm string said \"valorile implicite\"; sw said \"maadili ya kawaida\" (= normal MORALS — \"maadili\" is ethics, and thamani is the word this file uses for a numeric value in 19 other keys); he had \"lerachim breirat hamechdal\" where the construct state requires \"lerachei\". All three fixed. am, my and id were noted as lower-confidence and deliberately left alone rather than guessed at — see Task 238.",
       "source": "EngCalcs suite chrome (calc_defaults, calc_defaults_confirm) and lpn_ settings panel; attested per-language forms cross-checked within each lang file."
+    },
+    {
+      "term": "connected file",
+      "context": "A saved project file that the browser still holds a live handle to, so File, Save writes straight back to it without asking again. Coined for the File System Access API. Spans 7 lpn_ strings (lpn_file_save_tip, lpn_file_saveas_tip, lpn_file_upload_explain, lpn_status_uploaded, lpn_status_downloaded, lpn_file_needs_reopen, lpn_file_reconnect), so it must be rendered the SAME way in all of them.",
+      "avoid": [
+        "a network connection sense -- connected to the internet, to a server, online. This is the dominant sense of \"connect\" and it is the wrong one: the file is local",
+        "a physical attachment or joining sense (pipes connecting, a cable plugged in) -- especially dangerous here because this suite is full of real hydraulic connections between nodes",
+        "rendering it differently in different strings -- the 7 strings describe one state and must share one word"
+      ],
+      "translations": [],
+      "translation_notes": "Created 2026-08-08 from the adversarial Wave 0 pass (ROADMAP Task 239), which flagged lpn_file_save_tip (\"Saves to the connected file.\") -- seven words with nothing in them to signal the local-file meaning. Deliberately entered as a CONCEPT rather than fixed as a string: rewriting one of the 7 would leave the cluster inconsistent, which is worse than leaving it alone. Translations left empty on purpose; the next sprint that touches these strings fills them, and CLAUDE.md's mandatory glossary write-back applies.",
+      "source": "EngCalcs lpn_ file-handling strings; File System Access API handle semantics.",
+      "symbol": ""
+    },
+    {
+      "term": "tab (project tab)",
+      "context": "The in-page tab strip where each open project is a tab. NOT the browser tab. Both senses appear in lpn_: lpn_notes_3_def says every project tab is saved as you work, while lpn_storage_full warns that changes \"will be lost when you close this tab\" meaning the BROWSER tab.",
+      "avoid": [
+        "using one target word for both senses -- the two strings make opposite promises about whether work survives, so collapsing them produces a visible contradiction",
+        "a tab stop / indentation sense",
+        "a bill or tally sense (to pick up the tab)"
+      ],
+      "translations": [],
+      "translation_notes": "Created 2026-08-08 from the adversarial Wave 0 pass (ROADMAP Task 239). The English is correct in both strings and was deliberately not rewritten; the hazard is a translator reusing one word across both. Translations left empty for the next sprint to fill.",
+      "source": "EngCalcs lpn_ project tab strip vs browser tab.",
+      "symbol": ""
     }
   ]
 }

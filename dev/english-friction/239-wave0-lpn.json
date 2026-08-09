@@ -1,0 +1,456 @@
+{
+    "sprint": "239-wave0-lpn",
+    "description": "Adversarial Wave 0 over all 225 lpn_ English strings, run 2026-08-08 by one Opus agent AFTER Task 193 had already reviewed the same 226 keys and rewritten 51. Its purpose was to measure the yield of falsification (\"list every plausible reading\") on top of a completed review (\"is this string good?\"). Result: 36 findings -- 6 high, 22 medium, 8 low. 26 English strings rewritten; the rest routed to glossary, intent or code.",
+    "entries": [
+        {
+            "key": "lpn_units_length",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "high: Exactly the failure shape of 'Map display and sizes': two nouns joined by 'and' where only the first is a quantity, so the second dangles with nothing to modify. This labels the units dropdown for the distance_site family, and means 'the unit used for pipe lengths and for map coordinates' -- but 'map' is not a measurable quantity, so the phrase does not parse as a coordinate pair the way its sibling 'Elevation and head' does.",
+            "readings": [
+                "units for length, and units for the map (intended)",
+                "the length of the map",
+                "a 'length' setting and a 'map' setting (two things, second one unspecified)"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten 2026-08-08 from the adversarial Wave 0 finding. Needs retranslation in es/pt/fr/tr."
+        },
+        {
+            "key": "lpn_labels_heading_link",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "high: 'Link' is EPANET terminology for a pipe or pump, but the overwhelmingly dominant sense of 'link' -- especially to a translator working on a web page in a browser -- is hyperlink. Nothing in the string signals the network sense. Its sibling heading 'Node labels' is safe because 'node' has no competing web sense of comparable strength.",
+            "readings": [
+                "labels for the links (pipes and pumps) of the network (intended)",
+                "labels of hyperlinks",
+                "labels that are links / clickable labels"
+            ],
+            "disposition": "glossary",
+            "resolution": "English kept -- \"Node labels\"/\"Link labels\" is EPANET vocabulary and the sibling symmetry is worth keeping. The risk is already carried by the glossary \"link\" entry, whose avoid array forbids the hyperlink sense; verified that all four sprint languages avoided it (es linea, pt trecho, fr liaison, tr hat). Reassess if a future language gets it wrong."
+        },
+        {
+            "key": "lpn_settings_defaults",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "high: Same word that broke 'Restore defaults'. As a settings-section heading with no surrounding sentence, 'Default' has to be resolved cold, and its financial sense (failure to pay) plus its computing-jargon sense compete with the intended plain meaning 'the values used when nothing else is specified'. It also anchors a whole cluster (lpn_settings_defaults_note, lpn_settings_push_btn, lpn_push_confirm, lpn_confirm_restore_defaults) -- one wrong choice here propagates through five strings.",
+            "readings": [
+                "the starting values given to newly created elements (intended)",
+                "inputs that are missing or failed",
+                "inputs about a financial default"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten 2026-08-08 from the adversarial Wave 0 finding. Needs retranslation in es/pt/fr/tr."
+        },
+        {
+            "key": "lpn_backdrop_target_label",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "high: The antecedent of 'it' is on screen but not in the string. It is the point the user clicked on the background image (per lpn_backdrop_position_prompt1), not the image and not the map. Worse than a normal unstated referent: languages that inflect the object pronoun for gender or animacy cannot render 'it' at all without knowing the noun, so every translator must guess a noun and may guess a different one from the one the two prompt strings established.",
+            "readings": [
+                "move the clicked point to... (intended)",
+                "move the background image to...",
+                "move the selected element to..."
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten 2026-08-08 from the adversarial Wave 0 finding. Needs retranslation in es/pt/fr/tr."
+        },
+        {
+            "key": "lpn_file_write_failed",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "high: Stale claim, not ambiguity: it instructs the user to use a control called 'Save to file' that does not exist. The page's File menu offers 'Save' and 'Save as…'; the old 'Save to file' setting was removed (Task 211 -- see the comment at lib/lang.ec.en.php:1348). Every sibling string that references a menu path uses the live form 'File, Save as'. Translating this now freezes a wrong instruction into 26 files.",
+            "readings": [
+                "use a menu command named 'Save to file' (does not exist)",
+                "use File, Save as (what the user actually has to do)"
+            ],
+            "disposition": "english",
+            "resolution": "FACTUAL ERROR, not ambiguity: it named a control (\"Save to file\") removed in Task 211. The banner it renders in already carries a real \"Choose the file again\" button, and the JS fallback at js/looped-network.js:3457 already omitted the sentence -- so the lang string was both wrong and redundant. Stale sentence deleted; en now matches the fallback."
+        },
+        {
+            "key": "lpn_tool_zoom_extent",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "high: The known failure, still present in the current source: 'fit' never names what is fitted, so the phrase can read as an instruction to adjust the zoom rather than a command to frame the whole drawing.",
+            "readings": [
+                "zoom until the whole network fits in the window (intended)",
+                "adjust the zoom by some amount"
+            ],
+            "disposition": "intent",
+            "resolution": "Already resolved earlier the same day, independently, by exactly this reasoning: English kept (established UI idiom, an English reader does not stumble), $ec_lang_intent given synonyms, glossary concept \"zoom to extents\" created. That this pass re-flagged it unprompted is corroboration that the falsification question finds what review misses."
+        },
+        {
+            "key": "lpn_settings_wipe_btn",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "medium: Two problems at once. 'Clear' is adjective-or-verb ('a clear calculator' vs 'clear the calculator'), a parse that is invisible to an English reader who sees it on a button. And 'calculator' names the wrong scope: this button deletes every project, every background image, every setting and the unit choices for the whole page, but the suite has twelve calculators and a user reads 'the calculator' as the current inputs.",
+            "readings": [
+                "erase everything this page has stored (intended)",
+                "clear the current inputs / start a fresh calculation",
+                "a transparent calculator (adjective reading)"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten 2026-08-08 from the adversarial Wave 0 finding. Needs retranslation in es/pt/fr/tr."
+        },
+        {
+            "key": "lpn_settings_push_btn",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "medium: Inherits 'defaults' from lpn_settings_defaults, and adds 'elements', which in a web context reads as HTML elements and in a science context as chemical elements. Here it means the nodes, pipes and pumps of the drawn network. Also 'Apply' is a soft verb: it does not say the existing typed values are overwritten (the confirm dialog does).",
+            "readings": [
+                "overwrite the properties of every node and pipe with the starting values (intended)",
+                "apply to all HTML elements / all page components"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten 2026-08-08 from the adversarial Wave 0 finding. Needs retranslation in es/pt/fr/tr."
+        },
+        {
+            "key": "lpn_push_elements",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "medium: A bare one-word list heading inside the apply-defaults confirm dialog, with no sentence around it to fix the sense. 'Element' has strong competing senses (HTML element, chemical element, weather/the elements) and the intended sense -- the drawn nodes, pipes and pumps -- is only inferable from the screen.",
+            "readings": [
+                "the nodes, pipes and pumps that will be changed (intended)",
+                "page components",
+                "chemical elements"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten 2026-08-08 from the adversarial Wave 0 finding. Needs retranslation in es/pt/fr/tr."
+        },
+        {
+            "key": "lpn_backdrop_scale",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "medium: Verb-plus-object or adjective-plus-noun: 'scale the image' vs 'the scale image' (an image of a scale). The second reading is unusually live here because the operation's own prompt talks about 'the two ends of a bar scale' -- so a scale bar is a real object in this feature's vocabulary. The JS fallback label is the even barer 'Scale'.",
+            "readings": [
+                "set the real-world scale of the background image (intended)",
+                "resize the image",
+                "the image showing the scale bar"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten 2026-08-08 from the adversarial Wave 0 finding. Needs retranslation in es/pt/fr/tr."
+        },
+        {
+            "key": "lpn_backdrop_position",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "medium: Same verb/noun ambiguity as its neighbour. 'Position' as a verb is much rarer than 'position' as a noun, so the noun-plus-noun reading ('the position image') is the more available parse for a reader who cannot see that this is a menu command.",
+            "readings": [
+                "move the background image into place (intended)",
+                "the position of the image / an image showing position"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten 2026-08-08 from the adversarial Wave 0 finding. Needs retranslation in es/pt/fr/tr."
+        },
+        {
+            "key": "lpn_backdrop_target_coords",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "medium: 'Typed' is ambiguous between 'entered from the keyboard' (intended) and 'having a data type / classified by type' -- the second sense is the dominant one in software vocabulary, which is the register a translator is in when working on a web app. It is a dropdown option, so there is no sentence to disambiguate.",
+            "readings": [
+                "coordinates you type in (intended)",
+                "coordinates that are typed / strongly typed",
+                "coordinates of a certain type"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten 2026-08-08 from the adversarial Wave 0 finding. Needs retranslation in es/pt/fr/tr."
+        },
+        {
+            "key": "lpn_lock_break",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "medium: Two risks. 'Break' invites the physical destroy sense (the lock is not damaged, it is released and taken over), and 'lock' in a hydraulic-engineering glossary context has a strong competing sense -- a navigation lock on a canal. A translator primed on this suite's water vocabulary is measurably at risk of reaching for the canal-lock word.",
+            "readings": [
+                "take over the lock that another user holds (intended)",
+                "damage/destroy their lock",
+                "open a canal lock"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten 2026-08-08 from the adversarial Wave 0 finding. Needs retranslation in es/pt/fr/tr."
+        },
+        {
+            "key": "lpn_ago_unknown",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "medium: A sentence fragment composed at run time: it is substituted into '{x} ago' inside four different lpn_lock_open_heading_* sentences, producing 'the last edit was an unknown time ago'. The fragment carries no clue that a following 'ago' is coming, and the '{n} minutes' / '{n} hours' / '{n} days' siblings have the same shape. Several languages do not express elapsed time with a postposed 'ago' at all (Spanish fronts it: 'hace 5 minutos'), so a translator who correctly localises the fragment breaks the host sentence, and one who correctly localises the host sentence cannot use the fragment.",
+            "readings": [
+                "a duration of unknown length, to be followed by 'ago'",
+                "a standalone noun phrase meaning 'an unknown moment'"
+            ],
+            "disposition": "refer-to-human",
+            "resolution": "NOT fixable in English: the strings are run-time fragments substituted into \"{x} ago\", and languages that front the construction (es \"hace 5 minutos\") cannot produce a working fragment at all. This needs a CODE change -- compose whole sentences per branch instead of concatenating -- logged as ROADMAP Task 240. Left open deliberately: it is a real defect that no English rewrite can close."
+        },
+        {
+            "key": "lpn_notes_4_term",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "medium: A bare participle used as a definition-list term. It can be a past-tense verb ('we planned'), a passive participle ('it is planned'), or an adjective modifying an elided noun ('planned features'). Languages that inflect adjectives cannot choose a form without knowing the elided noun, and its list-neighbours are a mix of noun phrases ('Steady state', 'Pump curve') and a participle ('Not modeled'), so the pattern gives no guidance.",
+            "readings": [
+                "features that are planned (intended)",
+                "what was planned",
+                "already planned / scheduled"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten 2026-08-08 from the adversarial Wave 0 finding. Needs retranslation in es/pt/fr/tr."
+        },
+        {
+            "key": "lpn_notes_1_def",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "medium: 'Gradient' collides with itself inside this page. Here it names EPANET's solver algorithm (the global gradient algorithm); in lpn_result_gradient and lpn_result_gradient_tip it names a hydraulic quantity, head loss per unit length. A translator handling both will very likely use one word for both, silently asserting that the solver method and the reported quantity are the same thing.",
+            "readings": [
+                "the global gradient algorithm, a named numerical method (intended)",
+                "a method based on the hydraulic gradient reported by this page"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten 2026-08-08 from the adversarial Wave 0 finding. Needs retranslation in es/pt/fr/tr."
+        },
+        {
+            "key": "lpn_notes_3_def",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "medium: 'Tab' means the in-page project tab strip here, but lpn_storage_full uses the same word for the browser tab ('will be lost when you close this tab'). Two different objects, one English word, in the same app -- and the two strings make opposite promises about persistence, so collapsing them onto one target word produces a visible contradiction.",
+            "readings": [
+                "an in-page project tab (intended here)",
+                "a browser tab (intended in lpn_storage_full)"
+            ],
+            "disposition": "glossary",
+            "resolution": "\"tab\" means the in-page project tab here but the browser tab in lpn_storage_full, and the two strings make opposite promises about persistence. English kept (both readings are correct in their own string); routed to the glossary so one target word is not used for both."
+        },
+        {
+            "key": "lpn_file_save_tip",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "medium: 'Connected' is a coined metaphor for the File System Access API handle, and 'connect' has a dominant network sense (connected to the internet, connected to a server). Nothing in this seven-word tooltip signals the local-file meaning. The metaphor recurs in at least six other strings (lpn_file_saveas_tip, lpn_file_upload_explain, lpn_status_uploaded, lpn_status_downloaded, lpn_file_needs_reopen, lpn_file_reconnect), so one wrong choice repeats everywhere.",
+            "readings": [
+                "the file on your computer this project is linked to (intended)",
+                "a file on a network / a file that is online"
+            ],
+            "disposition": "glossary",
+            "resolution": "The \"connected file\" metaphor spans 7 strings, so rewriting one would leave the cluster inconsistent -- worse than leaving it. New glossary concept \"connected file\" added instead, which is the mechanism that covers all 7 at once."
+        },
+        {
+            "key": "lpn_field_text_size",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "medium: The '×' is a multiplier marker -- the field holds a factor, and the label renders as 'Size × [1]'. But '×' most often signals dimensions ('3 × 4'), and a translator with no view of the screen may read it as the start of a width-by-height pair, drop it as decoration, or replace it with a local multiplication word.",
+            "readings": [
+                "size as a multiple of the normal size (intended)",
+                "size in two dimensions, width × height",
+                "a stray symbol to be discarded"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten 2026-08-08 from the adversarial Wave 0 finding. Needs retranslation in es/pt/fr/tr."
+        },
+        {
+            "key": "lpn_settings_text_size_map",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "medium: Collides with the page's own Units menu. Here 'map units' means the text scales with the drawing (world coordinates), the alternative being screen pixels. But this page has a whole units system -- feet, metres, psi -- reached from View, Units…, and 'Map units' reads naturally as 'the units the map is measured in'. A translator will very plausibly render it with the same word used for the unit selectors.",
+            "readings": [
+                "text sized in drawing coordinates, so it zooms with the map (intended)",
+                "the measurement units used for the map (feet, metres)"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten 2026-08-08 from the adversarial Wave 0 finding. Needs retranslation in es/pt/fr/tr."
+        },
+        {
+            "key": "lpn_diag_not_converged",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "medium: 'Cannot be real' means physically impossible, but 'real' is also a mathematical term of art (real vs imaginary numbers) -- and this is a numerical-solver error message, the one context where the mathematical sense is most primed. Several languages have a distinct word for each sense and the translator must choose.",
+            "readings": [
+                "values that could not exist physically (intended)",
+                "values that are not real numbers"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten 2026-08-08 from the adversarial Wave 0 finding. Needs retranslation in es/pt/fr/tr."
+        },
+        {
+            "key": "lpn_notes_epanet_term",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "medium: A dated changelog entry embedded in a permanent notes list. 'Now' is relative to a moment the string does not carry, so it goes stale on its own; a year from now it reads as a change that has just happened. This is the same class as the 'English only for now' banner that had to be removed. It also forces every translator to localise a month name and a date format inside a heading.",
+            "readings": [
+                "a change made in August 2026 (intended, but only true while recent)",
+                "an ongoing/current state of affairs"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten 2026-08-08 from the adversarial Wave 0 finding. Needs retranslation in es/pt/fr/tr."
+        },
+        {
+            "key": "lpn_field_length_tip",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "medium: 'Follows' is used in the sense 'matches / is taken from', but its far more common sense is temporal or spatial sequence ('comes after'). Combined with 'this', whose antecedent is the length value rather than the Auto setting or the pipe, the middle sentence has two soft spots in six words.",
+            "readings": [
+                "the length is taken from what you drew (intended)",
+                "the length comes after what you drew / is applied next"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten 2026-08-08 from the adversarial Wave 0 finding. Needs retranslation in es/pt/fr/tr."
+        },
+        {
+            "key": "lpn_tip_labels_draggable",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "medium: 'Put it back' has an unstated destination. Back to where -- its previous position, its automatic position, or the position before the whole session? The intended meaning is the automatic default position next to the element, which is nowhere in the string.",
+            "readings": [
+                "return the label to its automatic position (intended)",
+                "undo the last drag",
+                "restore the label's original position from when it was created"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten 2026-08-08 from the adversarial Wave 0 finding. Needs retranslation in es/pt/fr/tr."
+        },
+        {
+            "key": "lpn_file_new",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "medium: A bare adjective modifying an elided noun ('new project'). English can drop the noun; most target languages cannot, because the adjective must agree in gender and number with the noun it modifies -- so every translator has to reconstruct the noun, and different translators in the same File menu may reconstruct different ones. The sibling lpn_tab_new is spelled out as 'New project', which shows the noun is known and simply omitted here.",
+            "readings": [
+                "new project (intended)",
+                "new file",
+                "new network / new drawing"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten 2026-08-08 from the adversarial Wave 0 finding. Needs retranslation in es/pt/fr/tr."
+        },
+        {
+            "key": "lpn_file_revert",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "medium: A bare verb with no object, in a menu where every other row acts on either the project or the file, and the two are different things on this page. 'Revert' is also a comparatively formal, low-frequency English word whose closest equivalents in several languages lean toward 'return' or 'go back' rather than 'discard my changes and reload'.",
+            "readings": [
+                "discard changes and reload the project from the file on disk (intended)",
+                "go back / undo the last action",
+                "return to a previous version"
+            ],
+            "disposition": "refer-to-human",
+            "resolution": "English kept (established idiom or bare menu verb the pass itself recommended not renaming), but the translator still has to guess. These are the cases the routing rule sends to $ec_lang_intent -- and intent is off-limits to AI without Tom approving the diff, so this stays open until he rules on the proposed synonyms."
+        },
+        {
+            "key": "lpn_project_copy_suffix",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "medium: The leading space is significant -- the string is concatenated directly onto a project name -- and leading whitespace is exactly what a translation tool or a careful translator strips. 'Copy' is also noun-or-verb, and here it is a noun modifier appended to a name, which is a construction several languages build differently (or with agreement).",
+            "readings": [
+                "a suffix marking a duplicate, appended to a name (intended)",
+                "the imperative 'copy'",
+                "the same string without its leading space"
+            ],
+            "disposition": "refer-to-human",
+            "resolution": "The leading space in \" (copy)\" is load-bearing and is exactly what a careful translator strips. The robust fix is in code (append the space at the call site, not in the string), logged with Task 240."
+        },
+        {
+            "key": "lpn_notes_5_def",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "medium: 'Not stopped at zero' does not say which quantity reaches zero or what 'stopped' means. The intended meaning is that the curve is not truncated where head reaches zero, so it is extrapolated into negative head. 'Stopped' can equally read as 'halted', 'blocked', or 'clipped', and 'at zero' can attach to flow (the string's own earlier sentences discuss 'the head at zero flow' twice), which is the wrong end of the curve entirely.",
+            "readings": [
+                "the curve is not cut off where head reaches zero (intended)",
+                "the curve does not stop at zero flow",
+                "the curve is not blocked / limited at zero"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten 2026-08-08 from the adversarial Wave 0 finding. Needs retranslation in es/pt/fr/tr."
+        },
+        {
+            "key": "lpn_field_auto",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "low: A clipped word next to a checkbox. 'Auto' is a clipping of 'automatic' in English but is a standalone word meaning car in German, Dutch, Spanish and several others, and it invites transliteration rather than translation in lower-resource languages because there is nothing to parse compositionally.",
+            "readings": [
+                "automatic (intended)",
+                "car",
+                "a transliterated loanword with no local meaning"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Low severity and already handled by a different mechanism: \"Auto\" is in translation_exempt_keys.json for es/fr as a genuine cognate, and pt/tr translated it (Automatico/Otomatik). Widening the English to \"Automatic\" would invalidate a correct, already-shipped exemption for no gain on a narrow checkbox label."
+        },
+        {
+            "key": "lpn_tool_select",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "low: Noun-or-verb on a toolbar button. English toolbar convention reads it as an imperative naming a mode; a translator could equally produce a noun ('Selection'). It also has to match the capitalised 'Select mode' referenced inside six other strings (lpn_mode_select and the five 'Switch to Select mode' sentences).",
+            "readings": [
+                "the imperative: enter select mode (intended)",
+                "the noun: selection"
+            ],
+            "disposition": "refer-to-human",
+            "resolution": "English kept (established idiom or bare menu verb the pass itself recommended not renaming), but the translator still has to guess. These are the cases the routing rule sends to $ec_lang_intent -- and intent is off-limits to AI without Tom approving the diff, so this stays open until he rules on the proposed synonyms."
+        },
+        {
+            "key": "lpn_new_text",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "low: Byte-identical to lpn_tool_add_text ('Text'), but plays a completely different role: this is the literal content placed into a newly created label on the map, not a button. A translator seeing two identical strings will assume they are the same label and may render both as an imperative ('Add text'), which would put the words 'Add text' on the drawing.",
+            "readings": [
+                "placeholder content for a new label (intended)",
+                "the name of the text tool"
+            ],
+            "disposition": "refer-to-human",
+            "resolution": "English kept (established idiom or bare menu verb the pass itself recommended not renaming), but the translator still has to guess. These are the cases the routing rule sends to $ec_lang_intent -- and intent is off-limits to AI without Tom approving the diff, so this stays open until he rules on the proposed synonyms."
+        },
+        {
+            "key": "lpn_tab_duplicate",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "low: Three-way ambiguous in isolation: verb ('duplicate this'), noun ('a duplicate'), and adjective ('duplicate copy'). It is a menu row, so the verb is intended, but the string carries no marker of that.",
+            "readings": [
+                "make a copy of this project (intended)",
+                "a duplicate / this item is a duplicate"
+            ],
+            "disposition": "refer-to-human",
+            "resolution": "English kept (established idiom or bare menu verb the pass itself recommended not renaming), but the translator still has to guess. These are the cases the routing rule sends to $ec_lang_intent -- and intent is off-limits to AI without Tom approving the diff, so this stays open until he rules on the proposed synonyms."
+        },
+        {
+            "key": "lpn_lock_dismiss",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "low: A bare verb with no object, and its most common everyday sense is firing an employee or sending someone away. Here it means closing a warning banner.",
+            "readings": [
+                "hide this message (intended)",
+                "dismiss a person / discharge",
+                "reject / disregard"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten 2026-08-08 from the adversarial Wave 0 finding. Needs retranslation in es/pt/fr/tr."
+        },
+        {
+            "key": "lpn_settings_legend_position",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "low: 'Legend' means a map key here, but its mythological sense is dominant in general vocabulary and in several target languages the two are different words. Its six paired option strings (Top left … Bottom right) do not contain the word, so they offer no anchor.",
+            "readings": [
+                "position of the map key (intended)",
+                "position of a legend / story"
+            ],
+            "disposition": "refer-to-human",
+            "resolution": "English kept (established idiom or bare menu verb the pass itself recommended not renaming), but the translator still has to guess. These are the cases the routing rule sends to $ec_lang_intent -- and intent is off-limits to AI without Tom approving the diff, so this stays open until he rules on the proposed synonyms."
+        },
+        {
+            "key": "lpn_pump_curve_source",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "low: A one-word dropdown label standing for 'which curve this pump uses'. The dropdown's options are 'Enter points below' or another pump's ID, so the label is naming a choice of source, not a curve. Compressed to the point where the concept has to be reconstructed.",
+            "readings": [
+                "which pump curve to use (intended)",
+                "the curve itself / a curve value"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten 2026-08-08 from the adversarial Wave 0 finding. Needs retranslation in es/pt/fr/tr."
+        },
+        {
+            "key": "lpn_settings_emitter_exponent",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "low: Not currently reachable: Looped-Network.php:390 and js/looped-network.js:5570 both record that its Settings row was removed and the key is deliberately not wired to any control. It is therefore a string with no on-screen context at all for a translator, and 'emitter' is EPANET jargon with a strong competing everyday sense (something that emits light or radiation).",
+            "readings": [
+                "the exponent in EPANET's pressure-dependent emitter demand law (intended)",
+                "an exponent belonging to a light/radiation emitter"
+            ],
+            "disposition": "dismissed",
+            "resolution": "The key is deliberately unwired -- its Settings row was removed and Looped-Network.php:390 and js/looped-network.js:5570 both say so. A string with no on-screen presence cannot mislead a user; if it is ever wired up again this finding should be reopened."
+        }
+    ]
+}

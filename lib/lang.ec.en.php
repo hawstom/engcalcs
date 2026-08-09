@@ -1126,7 +1126,7 @@ $ec_lang['lpn_tool_undo']='Undo';
 $ec_lang['lpn_confirm_example']='This adds the example to the network you already have. Continue?';
 $ec_lang['lpn_field_diameter']='Diameter';
 $ec_lang['lpn_demand_tip']='Flow taken out of the network at this node. Enter a negative number for flow put into the network here.';
-$ec_lang['lpn_units_length']='Length and map';
+$ec_lang['lpn_units_length']='Length and map coordinates';
 $ec_lang['lpn_units_elevhead']='Elevation and head';
 $ec_lang['lpn_units_pressure']='Pressure';
 $ec_lang['lpn_units_flow']='Flow';
@@ -1191,7 +1191,7 @@ $ec_lang['lpn_project_numbered']='Project{n}';
 $ec_lang['lpn_project_copy_suffix']=' (copy)';
 $ec_lang['lpn_project_rename']='Rename';
 // The File menu. "New" is the same act as the + tab, deliberately: one function, two doors.
-$ec_lang['lpn_file_new']='New';
+$ec_lang['lpn_file_new']='New project';
 $ec_lang['lpn_file_open']='Open…';
 $ec_lang['lpn_file_save']='Save';
 $ec_lang['lpn_file_saveas']='Save as…';
@@ -1269,7 +1269,7 @@ $ec_lang['lpn_revert_confirm']='Throw away the changes you have made and load {f
 $ec_lang['lpn_file_needs_reopen']='This project came from {file}, but the connection to that file has been lost. Choose the file again to connect to it.';
 // Says what is still safe before it says what failed: the reassurance is the part a worried user
 // needs, and it is true -- the browser copy is written on every edit regardless.
-$ec_lang['lpn_file_write_failed']='Could not write to the file. It may have been moved or renamed, or permission may have been withdrawn. Your work is still saved in this browser. Use Save to file to choose the file again.';
+$ec_lang['lpn_file_write_failed']='Could not write to the file. It may have been moved or renamed, or permission may have been withdrawn. Your work is still saved in this browser.';
 $ec_lang['lpn_file_changed_elsewhere']='Somebody else has saved to this file since you opened it, so saving now would write over their work. Use File, Save as to keep your changes in a file of your own, or File, Revert to throw yours away and load theirs.';
 // Project locks (Task 195 Phase 2) -- who is editing a shared project file right now. {name} is a
 // person as they chose to be known ("Dave T."), never a login; word order is the translator's to
@@ -1292,7 +1292,7 @@ $ec_lang['lpn_lock_open_readonly']='Open read-only';
 // "my own copy" quietly promises a personal one of everything -- the proliferation this page keeps
 // trying not to encourage. "Create a copy" says what happens and claims nothing.
 $ec_lang['lpn_lock_open_copy']='Create a copy';
-$ec_lang['lpn_lock_break']='Break their lock';
+$ec_lang['lpn_lock_break']='Take over the file';
 $ec_lang['lpn_lock_open_heading_times']='{name} has this file open; the last edit was {x} ago, {y} after the last save.';
 $ec_lang['lpn_lock_open_heading_unsaved']='{name} has this file open; the last edit was {x} ago, and none of it has been saved to this file yet.';
 $ec_lang['lpn_lock_open_heading_saved']='{name} has this file open; the last edit was {x} ago, and their work is saved to the file.';
@@ -1316,7 +1316,7 @@ $ec_lang['lpn_lock_storage_error']='Beware: this site cannot save lock records, 
 $ec_lang['lpn_lock_full_error']='Beware: this site has run out of room to record who has which project open, so nothing is stopping a colleague from editing the same file at the same time. This is a setup fault on the server, not something you can fix here.';
 $ec_lang['lpn_lock_not_asked']='Locking is not running for this project, so nothing is stopping a colleague from editing the same file at the same time. This browser has no name recorded for you yet, or the project has no identifier — saving the project to a file sets both.';
 $ec_lang['lpn_lock_restored']='Locking is working again, and this file is now yours to save to.';
-$ec_lang['lpn_lock_dismiss']='Dismiss';
+$ec_lang['lpn_lock_dismiss']='Hide this message';
 // Shown once per browser, before the first file picker opens. Three short paragraphs on purpose:
 // this is the one place the whole file-and-lock idea is explained, and it has to survive translation
 // into 26 languages, so it says one thing per sentence and avoids every word of jargon it can.
@@ -1359,7 +1359,7 @@ $ec_lang['lpn_status_closed_opened']='Closed {closed}. Now showing {opened}.';
 $ec_lang['lpn_status_closed_empty']='Closed {closed}. Started a new empty project.';
 $ec_lang['lpn_storage_full']='Not saved. Browser storage is full or unavailable, so your recent changes will be lost when you close this tab.';
 $ec_lang['lpn_notes_1_term']='Steady state';
-$ec_lang['lpn_notes_1_def']='Solves one set of demands at a time, using the same gradient method EPANET uses. It does not model how the network changes over time.';
+$ec_lang['lpn_notes_1_def']='Solves one set of demands at a time, using the same global gradient algorithm EPANET uses. It does not model how the network changes over time.';
 $ec_lang['lpn_notes_2_term']='Not modeled';
 $ec_lang['lpn_notes_2_def']='Tanks, water quality, and control valves that open and close on their own (PRV, PSV, FCV) are not modeled. A pipe can carry a fixed minor loss, but not a valve whose open or closed state depends on the flow being solved for.';
 $ec_lang['lpn_notes_3_term']='Saving projects';
@@ -1371,24 +1371,24 @@ $ec_lang['lpn_notes_3_def']='Every project is a tab, and every tab is saved in t
 // pointer to here instead (lpn_pump_curve_note).
 // H and Q are symbols -- keep them as they are in every language.
 $ec_lang['lpn_notes_5_term']='Pump curve';
-$ec_lang['lpn_notes_5_def']='A pump follows H = H₀ − aQ^b, where H is the head the pump adds and Q is the flow through it. Enter one, two, or three points from the manufacturer\'s curve. Three points — the head at zero flow, the normal working point, and the point of highest flow — fit H₀, a and b directly, and follow a published curve most closely. Two points fit a parabola (b = 2) with its peak at zero flow. One point uses a common rule: the head at zero flow is 1.33 × the head you enter, and the highest flow is 2 × the flow you enter, which again gives b = 2. A pump with no points entered adds no head at all. The curve is not stopped at zero, so asking a pump for more flow than its curve can deliver gives a negative head. The fix is a bigger pump or a smaller demand, not a different curve fit.';
-$ec_lang['lpn_notes_4_term']='Planned';
+$ec_lang['lpn_notes_5_def']='A pump follows H = H₀ − aQ^b, where H is the head the pump adds and Q is the flow through it. Enter one, two, or three points from the manufacturer\'s curve. Three points — the head at zero flow, the normal working point, and the point of highest flow — fit H₀, a and b directly, and follow a published curve most closely. Two points fit a parabola (b = 2) with its peak at zero flow. One point uses a common rule: the head at zero flow is 1.33 × the head you enter, and the highest flow is 2 × the flow you enter, which again gives b = 2. A pump with no points entered adds no head at all. The curve is not cut off where the head reaches zero, so asking a pump for more flow than its curve can deliver gives a negative head. The fix is a bigger pump or a smaller demand, not a different curve fit.';
+$ec_lang['lpn_notes_4_term']='Planned additions';
 $ec_lang['lpn_notes_4_def']='Scenarios, so that one project can hold several sets of demands. Tables of node and pipe results. Opening a file you used recently without hunting for it again. Reading and writing EPANET .inp files. Comments and suggestions are always welcome (see the feedback link above).';
-$ec_lang['lpn_notes_epanet_term']='Hazen-Williams constants now match EPANET (August 2026)';
+$ec_lang['lpn_notes_epanet_term']='Hazen-Williams constants match EPANET';
 $ec_lang['lpn_notes_epanet_def']='In August 2026 the Hazen-Williams coefficient and exponent were changed to match EPANET. Head loss results differ from earlier versions of this page by up to 0.1 percent, which is far smaller than the uncertainty in the C value itself.';
 $ec_lang['lpn_id_invalid']='Enter an ID with no spaces and no quotation marks.';
 $ec_lang['lpn_id_taken']='That ID is already in use.';
 $ec_lang['lpn_diag_no_fixed_head']='Add a reservoir. The network needs at least one known water level before it can be solved.';
 $ec_lang['lpn_diag_dangling_link']='A pipe or pump connects to a node that no longer exists:';
 $ec_lang['lpn_diag_unreachable']='These nodes have no path to a reservoir:';
-$ec_lang['lpn_diag_not_converged']='No solution was found. Check for values that cannot be real, such as a diameter of zero.';
+$ec_lang['lpn_diag_not_converged']='No solution was found. Check for values that are impossible in real life, such as a diameter of zero.';
 $ec_lang['lpn_field_roughness']='Roughness';
 // Which coefficient this is was invisible: assembleModel() hardcodes Hazen-Williams, so a user
 // typing a Manning n of 0.013 into it got nonsense with no warning. Revisit when a friction-method
 // selector lands (see numberFieldPlain()'s own note).
 $ec_lang['lpn_field_roughness_tip']='Hazen-Williams C. A higher number means a smoother pipe: about 150 for new plastic, 130 for new steel or iron, and 100 for old pipe.';
 $ec_lang['lpn_field_length']='Length';
-$ec_lang['lpn_field_length_tip']='Length of the pipe. With Auto turned on this follows what you drew. Turn Auto off to type a length that differs from the drawing.';
+$ec_lang['lpn_field_length_tip']='Length of the pipe. With Auto turned on the length is measured from what you drew. Turn Auto off to type a length that differs from the drawing.';
 // Plain-text wording of the concept mphl_total_junction_k/mphl_junction_loss already own (their
 // values carry k<sub>m</sub> markup, incompatible with this popup's textContent-only fields) --
 // Tom, 2026-07-30, "default to 2" matches mphl_total_junction_k_tip's own stated default exactly.
@@ -1401,7 +1401,7 @@ $ec_lang['lpn_field_km_tip']='Loss from the bends, valves, and fittings on this 
 $ec_lang['lpn_field_km_short']='Minor loss, k';
 // Pump curve entry (Task 146, 2026-07-30): up to 3 (flow, head) points, or a reference to
 // another pump's curve so several identical pumps need the curve entered only once.
-$ec_lang['lpn_pump_curve_source']='Curve';
+$ec_lang['lpn_pump_curve_source']='Curve from';
 $ec_lang['lpn_pump_curve_own']='Enter points below';
 $ec_lang['lpn_pump_curve_ref_note']='Using the curve entered for pump {id}.';
 $ec_lang['lpn_pump_curve_note']='One, two, or three points — see "Pump curve" in the Notes below.';
@@ -1426,11 +1426,11 @@ $ec_lang['lpn_mode_add_text']='Mode: Add Text. Click the map to place a text lab
 // whole-label-wrap convention -- the button itself is already the click target (no separate "?"
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='Use this mode to change, move, and drag things on the map.';
-$ec_lang['lpn_tip_labels_draggable']='You can drag a label to move it. Double-click a label to put it back.';
+$ec_lang['lpn_tip_labels_draggable']='You can drag a label to move it. Double-click a label to send it back to its automatic position.';
 $ec_lang['lpn_field_auto']='Auto';
 $ec_lang['lpn_field_x']='X';
 $ec_lang['lpn_field_y']='Y';
-$ec_lang['lpn_field_text_size']='Size ×';
+$ec_lang['lpn_field_text_size']='Size multiplier';
 $ec_lang['lpn_tool_labels']='Labels';
 $ec_lang['lpn_labels_heading_node']='Node labels';
 $ec_lang['lpn_labels_heading_link']='Link labels';
@@ -1443,37 +1443,37 @@ $ec_lang['lpn_backdrop_add']='Add image';
 // under the toolbar select's own "Background image..." heading and read as orphans in the Insert
 // menu, where nothing above them says what is being scaled. Naming the object costs one word and
 // works in both places.
-$ec_lang['lpn_backdrop_scale']='Scale image';
-$ec_lang['lpn_backdrop_position']='Position image';
+$ec_lang['lpn_backdrop_scale']='Set image scale';
+$ec_lang['lpn_backdrop_position']='Move image';
 $ec_lang['lpn_backdrop_remove']='Remove image';
 $ec_lang['lpn_backdrop_remove_confirm']='Remove the background image?';
 $ec_lang['lpn_backdrop_scale_prompt1']='Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them.';
 $ec_lang['lpn_backdrop_scale_prompt2']='Real distance between the two points';
 $ec_lang['lpn_backdrop_position_prompt1']='Click any point on the background image. This is the point you will move.';
 $ec_lang['lpn_backdrop_position_prompt2']='Choose where that point should go, then click Continue.';
-$ec_lang['lpn_backdrop_target_label']='Move it to:';
+$ec_lang['lpn_backdrop_target_label']='Move that point to:';
 $ec_lang['lpn_backdrop_target_node']='A node';
 $ec_lang['lpn_backdrop_target_free']='Any point on the map';
-$ec_lang['lpn_backdrop_target_coords']='Typed coordinates';
+$ec_lang['lpn_backdrop_target_coords']='Coordinates you type';
 $ec_lang['lpn_backdrop_coords_prompt']='Type the X,Y that point should move to';
 $ec_lang['lpn_backdrop_continue']='Continue';
 $ec_lang['lpn_tool_settings']='Settings';
 $ec_lang['lpn_settings_id_prefixes']='ID prefixes';
-$ec_lang['lpn_settings_defaults']='Default inputs';
+$ec_lang['lpn_settings_defaults']='Starting values';
 $ec_lang['lpn_settings_defaults_note']='Used for elements you create from now on. Existing elements are not changed.';
 $ec_lang['lpn_settings_push_note']='Only the properties whose labels are showing right now are applied.';
-$ec_lang['lpn_settings_push_btn']='Apply defaults to all elements';
-$ec_lang['lpn_push_confirm']='Replace these properties on every existing element with the current default inputs? Values you have typed will be overwritten. You can undo this.';
+$ec_lang['lpn_settings_push_btn']='Apply starting values to all elements';
+$ec_lang['lpn_push_confirm']='Replace these properties on every existing element with the current starting values? Values you have typed will be overwritten. You can undo this.';
 $ec_lang['lpn_push_properties']='Properties:';
-$ec_lang['lpn_push_elements']='Elements:';
-$ec_lang['lpn_push_none_displayed']='No default input is showing as a label right now, so there is nothing to apply. Turn on the labels for the properties you want in the Labels panel, then try again.';
+$ec_lang['lpn_push_elements']='Nodes and pipes:';
+$ec_lang['lpn_push_none_displayed']='No starting value is showing as a label right now, so there is nothing to apply. Turn on the labels for the properties you want in the Labels panel, then try again.';
 $ec_lang['lpn_push_nothing']='No existing element has any of the properties being applied.';
 $ec_lang['lpn_push_no_change']='Every element already has these values, so nothing would change.';
 $ec_lang['lpn_settings_emitter_exponent']='Emitter exponent';
 $ec_lang['lpn_settings_tolerance']='Convergence tolerance';
 $ec_lang['lpn_settings_tolerance_tip']='How close the solver has to get before it stops. A smaller number is more exact and takes longer.';
 $ec_lang['lpn_settings_text_size']='Text size';
-$ec_lang['lpn_settings_text_size_map']='Map units';
+$ec_lang['lpn_settings_text_size_map']='Scales with the map';
 $ec_lang['lpn_settings_text_size_screen']='Screen pixels';
 // Symbols (node circles, pipe width, flow arrows, vertex handles) are sized as a MULTIPLE of the
 // text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
@@ -1499,6 +1499,6 @@ $ec_lang['lpn_settings_legend_middle_left']='Middle left';
 $ec_lang['lpn_settings_legend_middle_right']='Middle right';
 $ec_lang['lpn_settings_legend_bottom_left']='Bottom left';
 $ec_lang['lpn_settings_legend_bottom_right']='Bottom right';
-$ec_lang['lpn_confirm_restore_defaults']='Reset all settings (ID prefixes, default inputs, solver settings, map display, legend position, and visible labels) to their defaults? Your network is not changed. Settings belong to the open project, so your other projects keep their own.';
-$ec_lang['lpn_settings_wipe_btn']='Clear calculator';
+$ec_lang['lpn_confirm_restore_defaults']='Reset all settings (ID prefixes, starting values, solver settings, map appearance, legend position, and visible labels) to their original values? Your network is not changed. Settings belong to the open project, so your other projects keep their own.';
+$ec_lang['lpn_settings_wipe_btn']='Erase everything on this page';
 $ec_lang['lpn_confirm_wipe']='Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone.';
