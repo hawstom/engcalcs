@@ -1090,19 +1090,23 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     checkable; just do not spend the blog/video headline on it.** Do not relitigate.
   - Consequence: raised 146.06 to 90 and 220 to 95.
 
-- 60|254| **lpn greets a first-time visitor with an empty canvas, and converts worst because of it.**
-  From the 2026-08-09 usage snapshot (`dev/usage-data-log.md`): lpn shops best of the complex
-  calculators (51, vs bpn 19 and ip 9) and then **converts worst — 14% of shoppers use it**, below
-  every peer but bpn, against 58–70% for the Manning family. 51 opened it, 44 computed nothing.
-  Attraction is not the problem; the first minute is.
-  - **lpn is the ONLY calculator that opens on nothing.** Every other page opens on a worked
-    example that already computes — CLAUDE.md's own rule. lpn shows `lpn_empty_hint` text and an
-    empty canvas; `drawExampleNetwork()` exists but has to be found and clicked.
-  - **Fix: draw the example network automatically for a visitor with no saved project**, so the
-    page opens solved, labelled and pannable — then they delete it or start over. Same principle as
-    every other page's default inputs. Cheap: the function already exists.
-  - This is the highest-value small task on the list, and it must land BEFORE Task 251's sprint —
-    translating a page nobody gets past is spending 26 languages on a first screen that fails.
+- 50|254| **Make the lpn example network really good. It is a placeholder.** Tom, 2026-08-09:
+  *"It was kind of a quick placeholder. I need to make sure it's really nice."*
+  - **NOT an autodraw.** CC proposed drawing it automatically for first-time visitors; Tom said no.
+    The page already greets a visitor with an invitation (`lpn_empty_hint`: add a background, add a
+    reservoir, or draw the example network) and the example is already a solved one. The task is
+    quality, not placement. **Do not re-propose autodraw.**
+  - **The concrete weakness: it is two parallel pipes between one pair of junctions.** That is a
+    loop topologically, and it is not what a water system looks like — the calculator is named
+    Looped Pipe Network and its example does not show a ring main. 1 reservoir + 2 junctions is
+    also too small to make the map interface look worth using.
+  - What is already right and must survive: the reservoir level with the network rather than
+    perched above it (so the pump is visibly the reason there is pressure), the 3-point pump curve
+    (a shutoff, a duty point and a run-out, the way a datasheet reads), and US/SI defaults through
+    `niceDefault()`. See the comments in `drawExampleNetwork()` — they record decisions, not
+    description.
+  - Aim: a small ring main a practitioner recognises — one source, a loop of 4–6 junctions with
+    varied demands and elevations, sensible diameters, solving to pressures that all pass.
 
 - 35|252| **Reorder project tabs, left/right.** Tom, 2026-08-09: *"We talked about this, but I
   guess we forgot about it. Either Drag or click an item on the tab menu. Either one is fine."*

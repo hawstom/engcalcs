@@ -242,24 +242,35 @@ calculators (mpf and mtc), and yet lpn is already outperforming ip and bpn on th
 | Irrigation-Pressure | 2228 | 9 | 2 | 0% | 22% |
 | Canal-Seepage | 2075 | 5 | 1 | 0% | 20% |
 
-**Tom's read is correct on attraction.** Among the complex calculators lpn shops best by a clear
-margin — 51 vs bpn 19 and ip 9, i.e. 2.7x and 5.7x. For a page shipped 2026-07-30 that is fast.
+**TOM'S READ IS CORRECT, AND CC'S FIRST ANALYSIS OF THIS TABLE WAS WRONG — corrected 2026-08-09
+in the same session, at Tom's push.** Recorded rather than quietly edited, because the mistake is
+one this log exists to prevent and is easy to repeat.
 
-**REACH IS NOT A USEFUL DISCRIMINATOR AND SHOULD STOP BEING QUOTED AS ONE.** Fourteen of sixteen
-pages sit in a 1446–2606 band regardless of how differently they perform downstream; only mpf (6963)
-and mtc (3803) break out. A number that is ~2000 for the best and worst page alike is measuring
-something common to all of them (menu traffic, crawlers, incidental arrivals), not interest.
-**Shopping is the first metric that discriminates**, so use it.
+**What the numbers actually support.** Ranked by shopping, lpn is **6th of 16** — ahead of
+Darcy-Weisbach, Micro-Hydro, Branched-Network, Weir-Flow-Simple, Orifice, Rock-Chute,
+Weir-Flow-Irregular, Orifice-Drain-Time, Irrigation-Pressure and Canal-Seepage. Against its true
+peer group, the complicated calculators, it leads ip and bpn on shopping (51 vs 9 and 19) and on
+absolute using (7 vs 2 and 2), on a page shipped 2026-07-30 against pages years older. That is
+exactly the claim Tom made and it holds on every defensible reading.
 
-**THE FINDING TOM DID NOT FLAG, AND IT IS THE ACTIONABLE ONE: lpn CONVERTS WORST.** 14% of shoppers
-use it — below every peer except bpn's 11%, and against 58–70% for the Manning family. 51 people
-opened it and 44 left without computing anything. Attraction is not the problem; the first minute is.
-**Hypothesis, and it is specific and cheap to test: lpn is the only calculator that greets a
-first-time visitor with an empty canvas.** Every other page opens on a worked example that already
-computes — which is CLAUDE.md's own rule ("choose defaults that open on a *passing* design… a page
-that greets a first-time visitor with a warning is worse than one that greets them with a worked
-example"). lpn instead shows `lpn_empty_hint` and nothing to look at, and `drawExampleNetwork()`
-exists but must be found and clicked. See ROADMAP Task 254.
+**CC's error, stated plainly: it quoted Tom's rule and then broke it one sentence later.** Tom:
+*"these complicated calculators will never have the same used/shopping as the easy calculators."*
+CC quoted that, then benchmarked lpn's 14% conversion against "58–70% for the Manning family" and
+called lpn "worst-converting". Comparing a map editor's conversion to a three-field form's is
+comparing different tasks: "using" fires after a keystroke on mpf and after drawing a network on
+lpn. The ratio is not portable across complexity, which is the whole content of Tom's sentence.
 
-**Do not read the 7 as a verdict on lpn's worth.** n=7 is noise-dominated, and the conversion
-hypothesis above would move the denominator, not the interest. Re-read after Task 254 ships.
+**Second error: the comparison had no statistical basis at these counts.** lpn 7/51, ip 2/9,
+bpn 2/19 — Wilson 95% intervals are roughly 7–26%, 6–55% and 3–31%. They overlap almost
+completely. Nothing distinguishes these three, in either direction. This log already carries a
+worked example of the right discipline (the `zh` pre-registered test above); CC did not apply it.
+
+**REACH IS STILL NOT A DISCRIMINATOR** — 14 of 16 pages sit in 1446–2606 regardless of downstream
+performance, so it measures menu traffic and crawlers. That part stands, and it was never what Tom
+was referring to; his "that measure" meant used/shopping among the complex calculators.
+
+**Standing rules this table establishes:**
+- Rank complex calculators against each other (lpn, ip, bpn, mi, wi), never against mpf/mtc.
+- Conversion ratios are not comparable across complexity classes, and not comparable at all at
+  n of a few dozen shoppers.
+- Do not turn a small-n ratio into a verdict about a page's worth.
