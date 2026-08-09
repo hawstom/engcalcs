@@ -24,8 +24,8 @@
         "software that costs nothing (gratis)",
         "an untranslatable brand name, to be transliterated phonetically"
       ],
-      "disposition": "refer-to-human",
-      "resolution": "OPEN -- TOM IS WRITING THE ENTRY HIMSELF. The English is deliberate: Tom chose it 2026-08-09 over 'Freely yours' and 'Community software', citing LibreOffice as precedent, and the choice is sound for its own audience. So the routing rule sends this to $ec_lang_syn, not to an English rewrite. CC proposed an entry; Tom declined it and said 2026-08-09 that he would edit the wording himself, which is the correct owner for this channel. $ec_lang_syn['menu_libre'] is therefore in place but EMPTY, awaiting his text. THE SPRINT MUST NOT LAUNCH UNTIL IT IS FILLED -- shipping menu_libre with an empty syn is exactly the transliteration risk described above, and it lands on am/km/my/ur/bn/ps, the audiences the mission is for."
+      "disposition": "intent",
+      "resolution": "CLOSED 2026-08-09, by Tom, in two channels. (1) He authored $ec_lang_syn['menu_libre'] himself, declining CC's draft -- 'FLOSS (Free Libre Open Source Software), Liberated Software, Liberty Software, Freedom Software, or Software you are free to use, study, change, and share', with avoid guards for the gratis sense and for transliteration. (2) CC added glossary.json term 'libre software' carrying each language's ESTABLISHED published term rather than a coinage, because the English coinages exist only to work around a gap in English and must not be exported; four avoid guards, transliteration first. Also fixed: 'menu' and 'about' were missing from prefixToTermNames(), which would have made the whole glossary entry invisible to every agent. Verified the guards land in payload_am prompt_context_by_prefix.menu. ORIGINAL NOTE FOR THE RECORD -- The English is deliberate: Tom chose it 2026-08-09 over 'Freely yours' and 'Community software', citing LibreOffice as precedent, and the choice is sound for its own audience. So the routing rule sends this to $ec_lang_syn, not to an English rewrite. CC proposed an entry; Tom declined it and said 2026-08-09 that he would edit the wording himself, which is the correct owner for this channel. $ec_lang_syn['menu_libre'] is therefore in place but EMPTY, awaiting his text. THE SPRINT MUST NOT LAUNCH UNTIL IT IS FILLED -- shipping menu_libre with an empty syn is exactly the transliteration risk described above, and it lands on am/km/my/ur/bn/ps, the audiences the mission is for."
     },
     {
       "key": "about_body_html",
@@ -36,8 +36,8 @@
         "correct the wording (imperative -- intended)",
         "wording that is correct (adjective phrase, a sentence fragment)"
       ],
-      "disposition": "refer-to-human",
-      "resolution": "OPEN, and deliberately NOT auto-fixed. This is Tom's own verbatim wording, supplied 2026-08-09; CC does not silently rewrite the founder's voice. The imperative reading is well cued by the sibling list items, so the risk is moderate rather than high. Two ways to close it: Tom blesses a tiny English change ('Fix wording' or 'Correct our wording'), or approves a $ec_lang_syn entry. Either closes it; doing nothing leaves a coin-flip for 26 translators."
+      "disposition": "english",
+      "resolution": "CLOSED 2026-08-09. Tom chose 'Suggest better wording.' over 'Correct our wording.' and over leaving it. The imperative is now unambiguous -- 'suggest' has no adjective reading -- and it also aligns the About page with CONTRIBUTING.md, which asks contributors to describe a wording improvement rather than edit the string directly, because the glossary records WHY each term was chosen. Flagged by CC's Wave 0, ruled on by Tom, who owns the voice."
     },
     {
       "key": "about_body_html",
