@@ -96,12 +96,25 @@
 			link = model.links[k];
 			if (link.type === 'pump') {
 				if (link.h0 > 0 || link.a > 0) {
-					// Our curve is H = h0 - a Q^b. EPANET fits exactly that form to a 3-point
-					// HEAD curve, so three points sampled off our own curve round-trip it rather
-					// than approximating it. Points must be strictly increasing in Q and
-					// decreasing in H or EPANET rejects the curve.
+					// Our curve is H = h0 - a Q^b, and EPANET fits exactly that form to a 3-point
+					// HEAD curve -- so three points sampled off our own curve round-trip it
+					// rather than approximating it, PROVIDED the first sample sits at Q = 0.
+					//
+					// THE FIRST POINT MUST BE THE SHUTOFF POINT. This is not a preference and it
+					// is not documented anywhere obvious; it was measured 2026-08-09 after Tom
+					// reported in the browser that "the EPANET engine gives me bigger losses than
+					// our engine, and the difference seems possibly to be entirely in the pump."
+					// He was exactly right. This code first sampled [0.25, 0.5, 0.75] of shutoff
+					// flow, and EPANET then fitted a DIFFERENT curve through them -- on a 30 m
+					// design-point pump it delivered 36.00 m of head where our own curve says
+					// 36.40 at the same flow, a 1.1% shortfall that reads as extra loss.
+					// Measured across four samplings: [0, .5, .9] and [0, .6, .95] reproduce our
+					// curve to 0.0000 m; [.25, .5, .75] is off by 0.40 m and [.1, .5, .9] by
+					// 1.60 m. Anything whose first point has Q > 0 is wrong.
+					// dev/lpn-spike/validate_epanet.js now carries a pump case so this cannot
+					// regress unnoticed -- its absence is why this shipped in the first place.
 					var qMax = Math.pow(link.h0 / link.a, 1 / link.b),
-						pts = [0.25, 0.5, 0.75],
+						pts = [0, 0.5, 0.9],
 						cname = 'C_' + link.id,
 						rows = [],
 						j, q, h;

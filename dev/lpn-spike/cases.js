@@ -151,7 +151,41 @@ const zeroDemandCase = {
 	]
 };
 
+// A pump on a real network, with a curve fitted the way the UI fits one.
+//
+// THIS CASE EXISTS BECAUSE ITS ABSENCE SHIPPED A BUG. validate_epanet.js had no pump when the
+// EPANET adapter first landed, so nothing caught that EPANET's 3-point curve fit only recovers
+// the shutoff head when the FIRST sample sits at Q = 0. Tom found it in the browser instead.
+// A loop around the pump, so the pump is not the only path to the demand -- a pump feeding a
+// fixed demand through a single path has no degrees of freedom left and is a poor test.
+const pumpCase = {
+	name: 'pump-with-curve',
+	method: 'hw',
+	nodes: [
+		{ id: 'R', type: 'reservoir', head: 10 },
+		{ id: 'J1', type: 'junction', elev: 0, demand: 0 },
+		{ id: 'J2', type: 'junction', elev: 0, demand: 20 * M3S_PER_LPS },
+		{ id: 'J3', type: 'junction', elev: 0, demand: 10 * M3S_PER_LPS }
+	],
+	links: [
+		pipe('P1', 'R', 'J1', 100, 0.25, 130),
+		{ id: 'PU', type: 'pump', from: 'J1', to: 'J2', status: 'open',
+		  // H = h0 - a Q^b, the same fit recomputePumpCurve() produces from a single
+		  // design point of 50 L/s at 30 m (see EngCalcs.lpnPumpFromCurve).
+		  h0: 40.0002, a: 4000.08, b: 2,
+		  // A PUMP STILL NEEDS A DIAMETER, even though no head-loss term uses it. The solver
+		  // seeds every link's initial flow from 0.3 * pi * d^2 / 4 (lpnSolve), so a pump
+		  // without one starts at NaN and the whole network solves to NaN while reporting
+		  // ok: true and converged: false. assembleModel() always supplies it, so the app is
+		  // fine; a hand-written test case is where this bites. Cost an hour on 2026-08-09.
+		  diameter: 0.25 },
+		pipe('P2', 'J2', 'J3', 200, 0.20, 130),
+		pipe('P3', 'J3', 'J1', 250, 0.20, 130)
+	]
+};
+
 module.exports = {
+	pumpCase,
 	twoLoopAnalytic,
 	twoLoopGrid,
 	twoLoopManning,

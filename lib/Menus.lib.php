@@ -83,6 +83,15 @@ function echoEngCalcsMenu ($html_title = '', $show_name_field = false, $calc_nam
 ?>
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light d-print-none">
+	<?php // ONE flex item, not two (Tom, 2026-08-09, third pass): "I still see it floating
+	      // rightward/center instead of leftward against 'HawsEDC Calculators' when the window is
+	      // narrow. Why can't they be in the same div?" Right on both counts. Bootstrap's .navbar
+	      // is display:flex with justify-content:space-between, so the brand, this link and the
+	      // hamburger were three SIBLING flex items and the free space was dealt out BETWEEN them
+	      // -- which is why the gap grew as the window narrowed, the opposite of what you want.
+	      // Wrapping the two in one element makes them a single item that the space-between rule
+	      // cannot split. ?>
+	<span class="ec-brandgroup">
 	<a class="navbar-brand" href="index.php"><?=$ec_lang['menu_brand']?></a>
 	<?php // Task 244 (Tom, 2026-08-09), placed OUTSIDE .navbar-collapse deliberately.
 	      // It first shipped as the top item of the collapsing nav list, and Tom's browser
@@ -93,6 +102,7 @@ function echoEngCalcsMenu ($html_title = '', $show_name_field = false, $calc_nam
 	      // behind the hamburger, reading as a continuation of the project's name rather than
 	      // as one destination among many. Anything inside .collapse disappears under lg. ?>
 	<a class="ec-nav-libre" id="nav-libre" target="_blank" rel="noopener" href="https://github.com/hawstom/engcalcs"><?=ecIcon('github')?><?=$ec_lang['menu_libre']?></a>
+	</span>
 	<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 		<span class="navbar-toggler-icon"></span>
 	</button>

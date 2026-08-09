@@ -69,6 +69,7 @@ async function run() {
 		cases.twoLoopManning,
 		cases.twoLoopDw,
 		cases.twoLoopMinorLosses,
+		cases.pumpCase,
 		cases.emitterCase,
 		cases.closedLinkCase,
 		cases.zeroDemandCase,

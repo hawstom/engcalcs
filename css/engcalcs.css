@@ -378,7 +378,13 @@ html[lang="zh"] .ec-welcome {
 
    margin-inline-start rather than margin-left because 5 of the 27 languages are RTL -- the
    mark must land on the trailing side of the brand in both directions. */
-.navbar > .navbar-brand { margin-inline-end: 0; }
+/* The brand and the claim are ONE flex item. .navbar is display:flex with
+   justify-content:space-between, so as three siblings (brand, link, hamburger) the free space
+   was distributed BETWEEN them and the pair drifted apart as the window narrowed -- exactly
+   backwards. As one item there is no gap to grow. align-items keeps the two baselines together
+   now that the wrapper, not the navbar, is doing the aligning. */
+.ec-brandgroup { display: inline-flex; align-items: baseline; min-width: 0; }
+.ec-brandgroup > .navbar-brand { margin-inline-end: 0; }
 .ec-nav-libre {
 	display: inline-flex;
 	align-items: center;
