@@ -1789,17 +1789,34 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     He asked to "scale it all down about 50% and center it or anchor it around 5000,5000" — the
     anchor puts the example in positive coordinates that read like a survey or state-plane grid
     rather than a sketch starting at 0,0.
-  - **ONE drawing, not two.** The first cut scaled coordinates per unit preset. That was wrong:
-    Tom, 2026-08-09 — "text size is in map units, which are unitless." Map units are declarative,
-    so there is nothing to scale, and the same 1400 x 700 layout serves both presets (a US visitor
-    gets a 1400 ft ring, a metric one a 1400 m ring; both solve to sensible pressures, checked).
-    Only the real SI quantities still go through `niceDefault()`.
-  - **`defaultSettings().textSize` is now 20, and the example sets nothing.** The first cut wrote
-    `settings.textSize` directly, which drew 20-unit text while the Settings panel still read 2.5 —
-    Tom flagged that as a condition that "should be impossible", and he was right. Two real fixes
-    came out of it, both better than the override: 20 is the shipped default for any drawing (2.5
-    was the old fixed `LABEL_FONT_SIZE` carried over unexamined, and suits a map a few dozen units
-    across, which nobody draws), and `toggleSettingsPopup()` now rebuilds the panel on every open.
+  - **ONE drawing, not two, and the metric one is a physically LARGER system.** The first cut
+    scaled coordinates per unit preset; that was dropped, and the same 1400 x 700 layout now serves
+    both. Only the real SI quantities go through `niceDefault()`.
+  - **Map coordinates are NOT unitless — they FOLLOW the Length/Map declaration.** Tom said
+    "unitless" on 2026-08-09 and corrected himself the same day: *"I was too adamant… The truth is
+    that they follow length and elevation."* So the one drawing is a 1400 **ft** ring in US and a
+    1400 **m** ring in SI — ~3.3x larger, not the same system in other units. **Accepted
+    deliberately:** both are realistic systems, both solve to sensible pressures, and *"that's okay
+    since there is no background right now."* **That last clause is the condition, and it is the
+    thing to re-examine** — the day the example ships over a backdrop, a scale meaning two
+    different things becomes visible and wrong.
+  - **Text size: BOTH the default AND an explicit set before drawing. Each alone is insufficient,
+    and this took two rounds to get right.**
+    - Round 1 wrote `settings.textSize` in the example only. The map drew at 20 while the Settings
+      panel still read 2.5 — Tom flagged that as a condition that "should be impossible", and he
+      was right. **The real defect was not the write; it was that the panel was built once at init
+      and only repainted by the writers that remembered to.** `toggleSettingsPopup()` now rebuilds
+      on every open, making the panel a *view* of `settings` rather than a copy. That is what makes
+      writing a setting from anywhere safe.
+    - Round 2 removed the write and relied on `defaultSettings().textSize: 20` alone. **That
+      reaches nobody who has used the page before**, because `loadFromStorage()` does
+      `Object.assign(defaultSettings(), savedSettings)` — a stored 2.5 wins over a raised default,
+      forever. Tom: "Now text size is per the Settings, but that is still 2.5."
+    - **Final: the default is 20 (for a first-time visitor) and `drawExampleNetwork()` sets 20
+      explicitly (for everyone else).** 2.5 was the old fixed `LABEL_FONT_SIZE` carried over
+      unexamined; it suits a map a few dozen units across, which nobody draws.
+    - Known wart, documented in the code: `settings` is not part of `doc`, so the Undo snapshot
+      does not capture it and undoing the example leaves the text size at 20.
   - **`LPN_BASE_TEXT_SIZE` stays 2.5 and did NOT follow the default.** Its only job is to record
     what size the fixed world dimensions were drawn for so everything scales together; moving it in
     step would pin `textFactor()` at 1 and leave symbols and label offsets at their old absolute
@@ -1826,7 +1843,8 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     text default, pump curve shape, convergence, pressure band, flow reversal, velocity ceiling,
     multi-vertex auto length, the pending re-fit being consumed exactly once, the Task 255 unit
     conversion against a hand-computed case, and the Settings panel repainting a value changed
-    behind its back. No browser pass was needed.
+    behind its back — including a returning-visitor case that pre-seeds a stored 2.5, which is the
+    state Tom was actually in when he reported the map still drawing small. No browser pass needed.
   - **Final numbers:** 55-63 psi (US) and 361-422 kPa (SI) at every junction, 0.04-1.5 fps.
   - **Example PROJECTS are still open and are a different task — see Task 257.**
 

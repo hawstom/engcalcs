@@ -716,14 +716,17 @@ var EngCalcs = EngCalcs || {};
 			// who lives in Default inputs is not re-opening it every session. Default inputs starts
 			// OPEN because it is the mode-switching section above; the other two are set-once.
 			sectionsOpen: { idPrefixes: false, defaults: true, mapDisplay: false, files: false },
-			// Map units, which are UNITLESS (Tom, 2026-08-09) -- the Length/Map selector only
-			// declares what one of them means, so this number is not a length in ft or m and does
-			// not convert. 20 replaces the original 2.5, which was the old fixed LABEL_FONT_SIZE
+			// Map units -- the same units the drawing is in, so this number scales with the map and
+			// means 20 ft or 20 m according to the Length/Map declaration (Tom, 2026-08-09: map
+			// coordinates "follow length and elevation"; it is a size on the drawing, not a font
+			// point size). 20 replaces the original 2.5, which was the old fixed LABEL_FONT_SIZE
 			// constant carried over unexamined: 2.5 suits a drawing a few dozen units across, and
-			// nobody draws a water system at that size. At the scale real work arrives in --
-			// hundreds to thousands of units -- 2.5 renders as a hairline. Tom named 20 as the good
-			// initial default, and it is now the ONLY place the example network's text size comes
-			// from; drawExampleNetwork() deliberately no longer overrides it.
+			// nobody draws a water system at that size -- at the scale real work arrives in it
+			// renders as a hairline.
+			// THIS ONLY REACHES A FIRST-TIME VISITOR. loadFromStorage() merges a saved settings
+			// object ON TOP of these defaults, so anyone who used the page before this changed
+			// keeps their stored 2.5 forever. That is why drawExampleNetwork() also sets 20
+			// explicitly -- raising the default alone left Tom looking at the old size.
 			textSize: 20,
 			symbolScale: 1, // symbol size relative to text size -- see symbolFactor() above
 			symbolOpacity: 1, // 0-1, applied to symbols only (never labels) -- see refreshSymbolSizes()
@@ -4835,31 +4838,44 @@ var EngCalcs = EngCalcs || {};
 	// together (see the comment on that line): they are one decision, not two, because what was
 	// wrong was the RATIO between linework and lettering, not either one alone.
 	//
-	// UNITS AND PLACEMENT. Map coordinates are DECLARATIVE and UNITLESS (Tom, 2026-08-09; see the
-	// lengthField()/units comments): one map unit IS one foot or one metre by declaration, and
-	// nothing converts. So the drawing below is ONE drawing, laid out once and identical in both
-	// unit presets -- there is no US/SI coordinate scaling, because there is nothing to scale. Only
-	// the real SI quantities (elevation, demand, diameter, pump curve) go through niceDefault().
-	// A US visitor therefore gets a 1400 ft ring and a metric one a 1400 m ring; both solve to
-	// sensible pressures, which is checked in dev/lpn-spike/example-network-harness.js.
+	// UNITS AND PLACEMENT. ONE drawing serves both unit presets: the layout below is laid out once,
+	// in map units, with no US/SI coordinate scaling. Only the real SI quantities (elevation,
+	// demand, diameter, pump curve) go through niceDefault().
 	//
-	// It is anchored at 5000,5000 rather than at the origin (Tom, 2026-08-09: "center it or anchor
-	// it around 5000,5000"), so the example lands in positive coordinates that look like a survey
-	// or state-plane grid rather than like a sketch that starts at 0,0. The extent is 1400 x 700
-	// and the centre is exactly 5000,5000.
+	// **Map coordinates are NOT unitless -- they FOLLOW the Length/Map declaration** (Tom,
+	// 2026-08-09, correcting his own earlier "map coordinates are unitless": *"The truth is that
+	// they follow length and elevation."*). So this one drawing is a 1400 **ft** ring for a US
+	// visitor and a 1400 **m** ring for a metric one -- the metric network is physically ~3.3x
+	// larger, not the same system in other units. **That is accepted deliberately, not overlooked:**
+	// both sizes are realistic systems, both solve to sensible pressures (checked in
+	// dev/lpn-spike/example-network-harness.js), and with no backdrop registered there is nothing
+	// on screen for the difference to contradict. Revisit if the example ever ships with a
+	// background image, where a scale that means two different things would be visible and wrong.
 	//
-	// TEXT SIZE IS NOT SET HERE ANY MORE. An earlier version of this function wrote
-	// settings.textSize directly, which produced a map drawing 20-unit text while the Settings
-	// panel still read 2.5 -- a desync Tom rightly called impossible-looking. The real fix was two
-	// other things: defaultSettings().textSize is now 20 (a sane default for any real drawing, not
-	// just this one), and toggleSettingsPopup() rebuilds the panel on every open. The example needs
-	// no override at all, which also means undoing it cannot strand a changed setting.
+	// Anchored at 5000,5000 rather than at the origin (Tom, 2026-08-09: "center it or anchor it
+	// around 5000,5000"), so the example lands in positive coordinates that look like a survey or
+	// state-plane grid rather than like a sketch that starts at 0,0. Extent 1400 x 700, centre
+	// exactly 5000,5000.
 	function drawExampleNetwork() {
 		if (doc.nodes.length > 0) {
 			var pc = EngCalcs.pageConfig || {};
 			if (!window.confirm(pc.lpn_confirm_example || 'This adds the example to the network you already have. Continue?')) { return; }
 		}
 		saveUndoSnapshot();
+		// TEXT SIZE IS SET HERE, not merely defaulted (Tom, 2026-08-09: "Before the demonstration
+		// is drawn, we need to set the text size to 20"). Raising defaultSettings().textSize to 20
+		// was necessary but is NOT sufficient: loadFromStorage() does
+		// `Object.assign(defaultSettings(), savedSettings)`, so any visitor who has used this page
+		// before carries their stored 2.5 forward and the new default never reaches them. The
+		// example needs 20 at its 1400-unit extent regardless of what is in their localStorage.
+		// Safe to write now in a way it was not an hour ago: toggleSettingsPopup() rebuilds the
+		// panel on every open, so the Settings box and the map can no longer disagree.
+		// Still NOT captured by the Undo snapshot above -- `settings` is not part of `doc` -- so
+		// undoing the example leaves the text size at 20. One visible, user-editable number, and
+		// the alternative (snapshotting settings with the document) is a bigger change than the
+		// wart deserves.
+		settings.textSize = 20;
+		refreshFontSizes(); // applies the new size, and resizes symbols and label offsets with it
 		// The reservoir sits at 50 ft / 15 m, in among the junctions it feeds (45-62 ft) rather
 		// than perched above them (Tom, 2026-07-30). A source high above the network makes the
 		// example a gravity system that would work with the pump deleted -- the pump's contribution

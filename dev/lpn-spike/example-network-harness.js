@@ -195,6 +195,11 @@ byId.lpn_toolbar.querySelectorAll = () => [];
   console.log('\n--- ' + which.toUpperCase() + ' unit set ---');
   setUnitSet(which);
   L.reset();
+  // Simulate a RETURNING visitor: loadFromStorage() merges a saved settings object onto the
+  // defaults, so someone who used the page before the default moved to 20 still carries 2.5. The
+  // example must override that -- raising the default alone never reaches them. This is exactly
+  // the state Tom was in when he reported the map still drawing at the old size.
+  L.settings().textSize = 2.5;
   L.drawExample();
 
   const doc = L.getDoc(), s = L.settings();
@@ -224,15 +229,19 @@ byId.lpn_toolbar.querySelectorAll = () => [];
   // SCALE (Task 254's opening complaint). Coordinates are declarative, so they are read raw.
   const xs = nodes.map(n => n.x), ys = nodes.map(n => n.y);
   const w = Math.max(...xs) - Math.min(...xs), h = Math.max(...ys) - Math.min(...ys);
-  // ONE drawing for both presets -- map units are unitless, so there is nothing to scale.
+  // ONE drawing for both presets. Map coordinates FOLLOW the Length/Map declaration (they are not
+  // unitless), so this same 1400 x 700 layout is a 1400 ft ring in US and a 1400 m ring in SI --
+  // a physically larger system, accepted deliberately. See drawExampleNetwork()'s comment.
   ok('extent is 1400 x 700 in both unit sets', near(w, 1400, 1) && near(h, 700, 1),
     w.toFixed(0) + ' x ' + h.toFixed(0));
   const cx = (Math.max(...xs) + Math.min(...xs)) / 2, cy = (Math.max(...ys) + Math.min(...ys)) / 2;
   ok('anchored on 5000,5000', near(cx, 5000, 1) && near(cy, 5000, 1), cx + ',' + cy);
-  // The example must NOT write settings.textSize -- that was the desync Tom found. It inherits
-  // the shipped default, which is now 20.
-  ok('example leaves textSize on the shipped default', s.textSize === L.defaultSettings().textSize
-    && s.textSize === 20, s.textSize);
+  // The example FORCES 20 over whatever the visitor had stored (2.5, set just above). Raising
+  // defaultSettings().textSize to 20 is necessary but not sufficient -- a returning visitor's
+  // saved value wins over the default, which is why the map was still drawing small.
+  ok('example forces textSize to 20 over a stored 2.5', s.textSize === 20, s.textSize);
+  ok('...and 20 is also the shipped default, for a first-time visitor',
+    L.defaultSettings().textSize === 20, L.defaultSettings().textSize);
   const ratio = w / s.textSize;
   ok('extent:text ratio reads like plan lettering (50-100)', ratio > 50 && ratio < 100, ratio.toFixed(0));
 
