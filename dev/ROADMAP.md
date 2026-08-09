@@ -1844,6 +1844,21 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
   - **Coordinates are NOT run through `niceDefault()`** — lengths and map coordinates are
     declarative (1 grid unit IS 1 ft or 1 m, no conversion), so they are scaled by a local `gu`
     factor instead. Getting this wrong would silently produce a 3.3x-wrong drawing.
+  - **A SECOND, SEPARATE SYSTEM — a gravity feed with no pump.** Tom, 2026-08-09: *"It still would
+    be nice to demonstrate that separated systems are acceptable. A separate simple reservoir, pipe,
+    and demand isn't a bad demonstration."* A tank at 200 ft / 60 m feeding one demand, touching the
+    ring nowhere. Nothing else on the page says disjoint components are legal, and a user who
+    assumes one drawing means one connected network will never try it — yet the solver handles them
+    natively, needing only a fixed head per component. The gravity/pumped contrast is the bonus:
+    beside a ring that only has pressure because a pump gives it some, the two say more than either
+    alone. **This does not undo the 2026-07-30 "reservoir level with the network" decision** — that
+    exists so the RING's pump is visibly load-bearing, and it still is.
+    - Its elevations are chosen so it stays **above** the ring's minimum pressure (60.4 psi / 406 kPa
+      against the ring's 52 psi / 365 kPa). A separate system that quietly stole the network low
+      would make the "Lowest pressure" callout a lie while every other assertion still passed. The
+      harness checks the minimum across BOTH systems.
+    - The drawing is now 8 nodes / 7 links / **2 components**, and independent cycles = links −
+      nodes + components = 1. Still exactly one loop; the second system adds none.
   - **Four Text annotations, composed entirely from strings that already existed** (Tom, 2026-08-09:
     *"To minimize translation load, we can compose it from existing lang strings"*). A two-line
     title block — `menu_brand` at size x2 over `lpn_main_menu` at x1.5 — plus `lpn_tool_add_reservoir`
@@ -1865,6 +1880,18 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     a rule plus a checkbox ("ignore reservoirs during pressure extrema") or a silent special case,
     and he judged both worse than the wart. The `bpn_p_min` callout is the cheap substitute. **Do
     not re-propose the checkbox.**
+  - **Anchored labels must sit ENTIRELY to one side of their node, and the offset is MEASURED.**
+    First cut centred them over their anchors (offsets of 0 and 40 against labels hundreds of units
+    wide). Tom, 2026-08-09: *"they both are oriented badly in the worst way, centered over their
+    anchor so that their leaders look worst of all possible positions. A centered text looks better
+    unanchored."* Exactly right, and the mechanism explains why: a Text label is `text-anchor:
+    middle`, so `lb.x` offsets its CENTRE, while `updateLabelGeometry()` runs the leader to the near
+    EDGE (`px ± halfW`). Offset by less than half the text width and that edge falls **inside** the
+    words, so the leader is a stub poking out from under the middle of them. **The existing
+    left/right flip logic was never the problem** — it resolves the side correctly from the sign on
+    its own. The fix is to render the text, read its real width, then push the centre out by half
+    that plus a gap clearing the node symbol. A constant cannot do this; the width depends on the
+    string, the language, and the label's own `sizeMult`.
   - **`bbox()` was reserving a constant ±2 for a Text label's height.** Correct only while the text
     size was 2.5; at the shipped 20 with the title's x2 multiplier the label is 40 units tall and
     the fit clipped it. Now half the label's own `effectiveFontSize(lb.sizeMult)`.

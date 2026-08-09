@@ -4952,6 +4952,33 @@ var EngCalcs = EngCalcs || {};
 			pipe._length = linkGeomLength(pipe);
 			rebuildLink(pipe);
 		}
+		// ---- a SECOND, SEPARATE system (Tom, 2026-08-09) ----
+		// *"It still would be nice to demonstrate that separated systems are acceptable. A separate
+		// simple reservoir, pipe, and demand isn't a bad demonstration."* Nothing else on the page
+		// says this is allowed, and a user who assumes one drawing means one connected network will
+		// never try it -- yet the solver handles disjoint components natively, needing only that
+		// each has its own fixed head (lpnDiagnose's `unreachable` check is per component).
+		//
+		// It is a GRAVITY system, and that is the contrast worth drawing: a tank uphill at 200 ft /
+		// 60 m feeding one demand, with no pump anywhere in it. Beside a ring main that only has
+		// pressure because a pump gives it some, the two together say more than either alone.
+		// (This does not undo the 2026-07-30 decision to keep the RING's reservoir level with its
+		// network -- that exists so the ring's pump is visibly load-bearing, and it still is.)
+		//
+		// Its elevations are chosen so it stays ABOVE the ring's minimum pressure, deliberately: the
+		// "Lowest pressure" callout below is pinned to a ring junction, and a separate system that
+		// quietly stole the network minimum would make that callout a lie. The harness asserts it.
+		var r2 = addNode('reservoir', 4400, 5700);
+		r2.elev = niceDefault('lpn_u_elevhead', 'fth2o', 200, 60);
+		var j6 = addNode('junction', 5000, 5700);
+		j6.elev = niceDefault('lpn_u_elevhead', 'fth2o', 60, 18);
+		j6._demand = niceDefault('lpn_u_flow', 'gpm', 100, 0.006);
+		var sep = addLink('pipe', r2.id, j6.id);
+		sep._diameter = dia;
+		sep._roughness = rough;
+		sep._length = linkGeomLength(sep);
+		rebuildLink(sep);
+
 		// ---- annotations (Tom, 2026-08-09) ----
 		// A title block and two callouts, so the demonstration also demonstrates the Text element
 		// itself and its per-label size multiplier -- the fifth element type, otherwise unused here.
@@ -4970,7 +4997,22 @@ var EngCalcs = EngCalcs || {};
 		// here; it would need a key of its own. Same reason there is no velocity callout: there is
 		// no "Highest velocity" string to borrow, only the bare word "Velocity".
 		var pcx = EngCalcs.pageConfig || {};
-		function annotate(x, y, anchorNode, text, sizeMult) {
+		// side: 'left' | 'right', for an ANCHORED annotation only -- which side of its node the
+		// whole label sits on. It is not a nicety.
+		//
+		// A Text label is `text-anchor: middle`, so lb.x/lb.y put its CENTRE at that offset from the
+		// node, and updateLabelGeometry() runs the leader to the label's near EDGE (px ± halfW).
+		// Offset the centre by less than half the text width and that near edge lands INSIDE the
+		// text: the leader is then a short stub poking out from under the middle of the words, on
+		// whichever side the flip rule happened to pick. That is what the first cut did (offsets of
+		// 0 and 40 against labels a few hundred units wide) and Tom's verdict was exact -- "centered
+		// over their anchor so that their leaders look worst of all possible positions... A centered
+		// text looks better unanchored."
+		//
+		// So the offset is MEASURED, not guessed: render the text, read its real width, then push
+		// the centre out by half that width plus a gap that clears the node symbol. The existing
+		// left/right flip in updateLabelGeometry() then resolves the side by itself from the sign.
+		function annotate(x, y, anchorNode, text, sizeMult, side) {
 			if (!text) { return null; }   // key missing from pageConfig: draw nothing, never "Text"
 			var lb = addText(x, y, anchorNode);
 			lb.text = text;
@@ -4982,6 +5024,11 @@ var EngCalcs = EngCalcs || {};
 			le.text.textContent = lb.text;
 			le.text.style.fontSize = effectiveFontSize(lb.sizeMult) + 'px';
 			try { le.width = le.text.getBBox().width; } catch (err) { /* pre-layout measure can throw; stale width stands */ }
+			if (anchorNode && side) {
+				var an = nodeById(anchorNode),
+					gap = nodeRadius(an) + effectiveFontSize(sizeMult) * 0.5;
+				lb.x = (side === 'left' ? -1 : 1) * (le.width / 2 + gap);
+			}
 			updateLabelGeometry(lb.id);
 			return lb;
 		}
@@ -4991,7 +5038,11 @@ var EngCalcs = EngCalcs || {};
 		annotate(5000, 4470, null, pcx.menu_brand, 2);
 		annotate(5000, 4560, null, pcx.lpn_main_menu, 1.5);
 		// Anchored callouts: the offset is from the node, and the label follows if the node moves.
-		annotate(r.x, r.y - 70, r.id, pcx.lpn_tool_add_reservoir, 1.5);
+		// The reservoir is the drawing's far-left node and its own data label sits to the upper
+		// right, so its callout goes LEFT, level with it -- clear space, and a clean horizontal
+		// leader. The `y` passed here is only a seed; annotate() overwrites the x from the measured
+		// width, and dy stays as given.
+		annotate(r.x, r.y, r.id, pcx.lpn_tool_add_reservoir, 1.5, 'left');
 		// "Lowest pressure" goes on nodes[2] -- the third ring junction -- which is the minimum in
 		// BOTH unit sets. Hard-coded rather than computed, because the solve is 300 ms away on the
 		// debounce and there are no pressures to compare yet at this point in the draw. That is only
@@ -5004,7 +5055,9 @@ var EngCalcs = EngCalcs || {};
 		// and a checkbox ("ignore reservoirs during pressure extrema") or a silent special case, and
 		// he judged both worse than the wart. This callout is the cheap way to point at the number
 		// that actually matters.
-		annotate(nodes[2].x + 40, nodes[2].y - 70, nodes[2].id, pcx.bpn_p_min, 1.5);
+		// RIGHT and slightly above: J3 is the drawing's top-right node, and its own multi-line data
+		// label grows downward from the upper right, so a callout level with it would collide.
+		annotate(nodes[2].x, nodes[2].y - 60, nodes[2].id, pcx.bpn_p_min, 1.5, 'right');
 		updateEmptyHint();
 		saveToStorage();
 		zoomExtent();

@@ -181,6 +181,8 @@ src = src.replace(marker,
   "\t\tfitPending: function () { return fitAfterSolve; },\n" +
   "\t\tlinkLengthSI: linkLengthSI, rebuildSettingsFields: rebuildSettingsFields,\n" +
   "\t\taddNode: addNode, addLink: addLink,\n" +
+  "\t\tlabelWidth: function (id) { return labelEls[id] ? labelEls[id].width : 0; },\n" +
+  "\t\tlabelSide: function (id) { return labelEls[id] ? labelEls[id].side : null; },\n" +
   "\t\ttoggleSettingsPopup: toggleSettingsPopup, defaultSettings: defaultSettings,\n" +
   "\t\tsettingsFieldsEl: function () { return document.getElementById('lpn_settings_fields'); },\n" +
   "\t\treset: function () { doc = { nodes: [], links: [], labels: [] };\n" +
@@ -224,18 +226,41 @@ byId.lpn_toolbar.querySelectorAll = () => [];
   const res = nodes.filter(n => n.type === 'reservoir'), junc = nodes.filter(n => n.type === 'junction');
   const pipes = links.filter(l => l.type === 'pipe'), pumps = links.filter(l => l.type === 'pump');
 
-  ok('1 reservoir, 5 junctions', res.length === 1 && junc.length === 5, res.length + ' / ' + junc.length);
-  ok('5 pipes, 1 pump', pipes.length === 5 && pumps.length === 1, pipes.length + ' / ' + pumps.length);
+  ok('2 reservoirs, 6 junctions', res.length === 2 && junc.length === 6, res.length + ' / ' + junc.length);
+  ok('6 pipes, 1 pump', pipes.length === 6 && pumps.length === 1, pipes.length + ' / ' + pumps.length);
 
-  // A RING, not a tree: every junction has degree 2 except the tie-in, which also takes the pump.
+  // TWO SEPARATE SYSTEMS (Tom, 2026-08-09) -- the pumped ring, and a standalone gravity feed that
+  // touches it nowhere. Demonstrating that disjoint components are legal is the whole point, so
+  // the count is asserted rather than assumed.
+  const adj = {};
+  nodes.forEach(n => { adj[n.id] = []; });
+  links.forEach(l => { adj[l.from].push(l.to); adj[l.to].push(l.from); });
+  const seen = {}, components = [];
+  nodes.forEach(n => {
+    if (seen[n.id]) { return; }
+    const q = [n.id], comp = [];
+    seen[n.id] = true;
+    while (q.length) { const id = q.shift(); comp.push(id); adj[id].forEach(x => { if (!seen[x]) { seen[x] = true; q.push(x); } }); }
+    components.push(comp);
+  });
+  ok('exactly two separate systems', components.length === 2,
+    components.map(c => c.length + ' nodes').join(' + '));
+  const ring = components.find(c => c.length === 6), sepComp = components.find(c => c.length === 2);
+  ok('one is a 6-node ring system, the other a 2-node gravity feed', !!ring && !!sepComp);
+
+  // A RING, not a tree: every ring junction has degree 2 except the tie-in, which also takes pump.
   const deg = {};
   links.forEach(l => { deg[l.from] = (deg[l.from] || 0) + 1; deg[l.to] = (deg[l.to] || 0) + 1; });
-  const tie = junc.find(n => deg[n.id] === 3);
+  const ringJunc = junc.filter(n => ring.indexOf(n.id) >= 0);
   ok('every ring junction has degree 2 except one tie-in with 3',
-    tie !== undefined && junc.filter(n => deg[n.id] === 2).length === 4);
-  // links - nodes + 1 independent cycles; a tree scores 0, this must score exactly 1.
-  ok('exactly one independent loop', links.length - nodes.length + 1 === 1,
-    'cyclomatic ' + (links.length - nodes.length + 1));
+    ringJunc.filter(n => deg[n.id] === 3).length === 1 && ringJunc.filter(n => deg[n.id] === 2).length === 4);
+  // links - nodes + components independent cycles. A forest scores 0; this must score exactly 1,
+  // so the second system genuinely adds no loop of its own.
+  const cyclomatic = links.length - nodes.length + components.length;
+  ok('exactly one independent loop across the whole drawing', cyclomatic === 1, 'cyclomatic ' + cyclomatic);
+  const sepLinks = links.filter(l => sepComp.indexOf(l.from) >= 0);
+  ok('the separate system is one pipe with no pump -- gravity, not pumping',
+    sepLinks.length === 1 && sepLinks[0].type === 'pipe');
   // Tom, 2026-08-09: "it would be nice to have more than one vertex for demonstration" -- one
   // vertex shows pipes can bend, several show they are polylines.
   const bent = pipes.filter(p => p.verts.length > 0);
@@ -243,16 +268,18 @@ byId.lpn_toolbar.querySelectorAll = () => [];
   ok('more than one bend vertex, spread over more than one pipe', verts >= 3 && bent.length >= 2,
     verts + ' vertices on ' + bent.length + ' pipes');
 
-  // SCALE (Task 254's opening complaint). Coordinates are declarative, so they are read raw.
-  const xs = nodes.map(n => n.x), ys = nodes.map(n => n.y);
+  // SCALE (Task 254's opening complaint), measured on the RING, which is the part sized and
+  // anchored on purpose. The title block and the separate system sit outside it by design.
+  const ringNodes = nodes.filter(n => ring.indexOf(n.id) >= 0);
+  const xs = ringNodes.map(n => n.x), ys = ringNodes.map(n => n.y);
   const w = Math.max(...xs) - Math.min(...xs), h = Math.max(...ys) - Math.min(...ys);
   // ONE drawing for both presets. Map coordinates FOLLOW the Length/Map declaration (they are not
   // unitless), so this same 1400 x 700 layout is a 1400 ft ring in US and a 1400 m ring in SI --
   // a physically larger system, accepted deliberately. See drawExampleNetwork()'s comment.
-  ok('extent is 1400 x 700 in both unit sets', near(w, 1400, 1) && near(h, 700, 1),
+  ok('ring extent is 1400 x 700 in both unit sets', near(w, 1400, 1) && near(h, 700, 1),
     w.toFixed(0) + ' x ' + h.toFixed(0));
   const cx = (Math.max(...xs) + Math.min(...xs)) / 2, cy = (Math.max(...ys) + Math.min(...ys)) / 2;
-  ok('anchored on 5000,5000', near(cx, 5000, 1) && near(cy, 5000, 1), cx + ',' + cy);
+  ok('ring anchored on 5000,5000', near(cx, 5000, 1) && near(cy, 5000, 1), cx + ',' + cy);
   // TEXT SIZE IS THE SHIPPED DEFAULT AND THE EXAMPLE MUST NOT TOUCH IT. Tom, 2026-08-09: ship a
   // default that suits the example, and "anything other is on the user, not us." So the stored 2.5
   // seeded above must survive the draw -- a visitor who set their own size keeps it.
@@ -280,6 +307,21 @@ byId.lpn_toolbar.querySelectorAll = () => [];
     doc.labels.filter(t => t.sizeMult === 2).length === 1
     && doc.labels.filter(t => t.sizeMult === 1.5).length === 3,
     doc.labels.map(t => t.sizeMult).join(','));
+
+  // ANCHOR ORIENTATION (Tom, 2026-08-09). An anchored Text is text-anchor:middle, so lb.x offsets
+  // its CENTRE and updateLabelGeometry() runs the leader to the near edge (px +/- halfW). If the
+  // offset is smaller than half the text width, that edge is inside the words and the leader is a
+  // stub emerging from the middle of them -- "the worst of all possible positions". The whole label
+  // must clear its node horizontally, which is a property of the MEASURED width, not of a constant.
+  doc.labels.filter(t => t.anchorNode).forEach(t => {
+    const halfW = L.labelWidth(t.id) / 2;
+    ok('"' + t.text + '" sits entirely to one side of its anchor',
+      Math.abs(t.x) > halfW,
+      'offset ' + t.x.toFixed(1) + ' vs half-width ' + halfW.toFixed(1));
+    // ...and the side the leader is drawn for must agree with the side the label is actually on.
+    ok('..."' + t.text + '" leader is drawn on the matching side',
+      L.labelSide(t.id) === (t.x < 0 ? 'left' : 'right'), L.labelSide(t.id));
+  });
 
   // The pump curve is real datasheet shape: 3 points, head falling with flow, from zero flow.
   const cp = pumps[0].curvePoints;
@@ -316,6 +358,9 @@ byId.lpn_toolbar.querySelectorAll = () => [];
   // The "Lowest pressure" callout is anchored to a HARD-CODED node, because at draw time the solve
   // has not run. This is the assertion that makes that safe: if a tweak moves the minimum, fail
   // here rather than ship a map that points at the wrong junction.
+  // Across BOTH systems -- the separate gravity feed is deliberately sized to stay above the ring's
+  // minimum, because a second system that quietly stole the network low would make this callout a
+  // lie while every other assertion still passed.
   const minId = Object.keys(press).reduce((a, b) => (press[a] <= press[b] ? a : b));
   const callout = doc.labels.find(t => t.text === PC.bpn_p_min);
   ok('the "Lowest pressure" callout is on the actual minimum-pressure junction',
@@ -324,7 +369,9 @@ byId.lpn_toolbar.querySelectorAll = () => [];
 
   // THE POINT OF A RING: flow leaves the tie-in both ways and meets at a divide, so around the
   // ring in a consistent direction the sign of Q must change. A series main cannot do this.
-  const ringQ = pipes.map(p => r.flows[p.id]);
+  // Ring pipes only -- the separate gravity feed always flows one way and would mask a ring that
+  // had stopped splitting.
+  const ringQ = pipes.filter(p => ring.indexOf(p.from) >= 0).map(p => r.flows[p.id]);
   ok('flow reverses somewhere on the ring (a real hydraulic divide)',
     ringQ.some(q => q > 0) && ringQ.some(q => q < 0),
     ringQ.map(q => (us ? (q / GPM).toFixed(0) + 'gpm' : (q * 1000).toFixed(1) + 'L/s')).join(' '));
@@ -364,7 +411,7 @@ byId.lpn_toolbar.querySelectorAll = () => [];
   // bbox() must contain every node AND every annotation -- this is what zoomExtent() fits to, and
   // a title that falls outside it gets clipped by the fit (which is Task 254's second complaint).
   const b = L.bbox();
-  ok('bbox encloses every node', nodes.every(n => n.x >= b.minx && n.x <= b.maxx && n.y >= b.miny && n.y <= b.maxy));
+  ok('bbox encloses every node, both systems', nodes.every(n => n.x >= b.minx && n.x <= b.maxx && n.y >= b.miny && n.y <= b.maxy));
   const title = doc.labels.find(t => t.text === PC.menu_brand);
   // The CURRENT text size, not the default -- this run deliberately seeds a returning visitor's
   // stored 2.5, and bbox() must track whatever size the labels are actually rendered at.
