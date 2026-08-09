@@ -253,13 +253,21 @@ read-only watchlist dump and grep-slice are free and can be done any time.
 
 - **`$ec_lang_intent` is off-limits to AI** without explicit written permission each time — see
   `CLAUDE.md`. Format: `<intent> | <commentary>`, tag vocabulary (`layout`, `avoid`, `symbol`,
-  `gloss`) defined once there. (One standing carve-out: the bounded intent-trimming of ROADMAP
-  Task 132.)
-- **Division of labor — concept → glossary; label metadata → intent (pointing via `gloss:`);
-  user-facing definition → visible tip.** Never duplicate the same fact across two channels; a
-  weight-flavored/standard term a culture actually uses is correct — `avoid` forbids only physical
-  errors and lazy transliterations, never a genuine local standard. See `CLAUDE.md` § "Division of
-  labor" and § "Polysemy / units-trap protocol."
+  `gloss`) defined once there. **No standing carve-outs** — Task 132's intent-trimming
+  pre-authorization was retired 2026-08-08. Working pattern: AI proposes a diff, human approves,
+  then AI writes.
+- **Intent's payload is SYNONYMS, and it applies to plain labels too.** The left-of-pipe is
+  alternate wordings a translator can re-compress in their own language. Two former rules are
+  retired (2026-08-08): "intent is reserved for jargon/transliteration risk", and "adding an intent
+  to a plain label is itself a defect". They made every *plain* label ineligible for the one channel
+  that would have helped — and the `lpn_` sprint's three worst labels ("Zoom to fit", "Map display
+  and sizes", "Restore defaults") were all plain English.
+- **Routing — does an English reader also stumble?** Yes → fix the English (one edit, all 27
+  languages). No, but a translator can't recover the concept from the words → `$ec_lang_intent`
+  synonyms. Recurs across labels/calculators → `glossary.json`. Never duplicate the same fact across
+  two channels; a weight-flavored/standard term a culture actually uses is correct — `avoid` forbids
+  only physical errors and lazy transliterations, never a genuine local standard, and **`avoid` is
+  never a substitute for saying plainly what the label means**. See `CLAUDE.md` § "Routing rule".
 - **Concept-level label reuse**: whole labels only, never fragment composition at render time.
   Owner = incumbency (most pages using the key), menu order is only the tiebreak. See
   `CLAUDE.md` § "Concept-level label reuse."
@@ -270,6 +278,40 @@ read-only watchlist dump and grep-slice are free and can be done any time.
   current category before calling the audit done — don't wait for a second complaint.
 - **Column-heading vs. tooltip width discipline**: shared label's short form goes in the
   column-heading key, long form in the tooltip — never the reverse (width-is-king).
+
+## The suggestion box — paste this into EVERY translation agent prompt
+
+Every translator, every wave, every language, every batch size. Not optional, not Wave-1-only.
+Tom, 2026-08-08: *"**Every translator** needs a suggestion box, an ombudsman, and a place to file
+grievances about the working conditions."* Copy the block below verbatim into the agent prompt:
+
+```
+## Suggestion box — file a grievance about the English
+
+If any English string made you guess, file it. You are the only person who will ever
+notice, and a string that made you guess will make the next 25 translators guess too.
+
+File an entry when: the English has more than one plausible reading; a verb or adjective
+has no stated object; a word's intended sense is not its most common sense; a term maps
+onto a dangerous second sense in your language; a claim in the text looks false or stale;
+or the tooling handed you a preferred_translation that is wrong for the context.
+
+Report them in your final message as a JSON array, separate from your prose:
+
+FRICTION: [
+  {"key": "<lang key>", "complaint": "<what made you guess, in one sentence>",
+   "readings": ["<reading you chose>", "<reading you rejected>"]}
+]
+
+An empty array is a fine and useful answer. Do NOT invent entries -- a false one costs a
+human's attention. But do not stay quiet to be agreeable either: this channel exists
+because real complaints were previously buried in prose and never acted on.
+```
+
+The orchestrator collects these into `dev/english-friction/<sprint>.json`, routes each with the
+English/intent/glossary rule, and `php dev/scripts/friction_check.php --sprint=<id>` must exit 0
+before the sprint closes. **Nothing is dismissed silently** — an entry closes with a written reason
+or escalates as `refer-to-human` and stays open. See `dev/english-friction/README.md`.
 
 ## English-drift tripwire (staleness detection)
 
