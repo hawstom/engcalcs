@@ -875,10 +875,21 @@ var EngCalcs = EngCalcs || {};
 	// shipped with, and he didn't want a uniform 0.5x shrink because that would also narrow it).
 	// Half-height is the one number he gave exactly ("shortening its height to 0.5 its current
 	// height": old full height was 2*2.2=4.4, so new full height is 4.4*0.5=2.2, half-height 1.1).
-	// Half-width is widened from the old 2.2 rather than held there -- his "widening" ask, a
-	// starting value (not a specified factor) to try alongside the height change. Both are a
-	// one-line change either way; this is explicitly an experiment, not a settled number.
-	var RESERVOIR_HALF_W = 3.3;
+	// Half-width went through two passes the same day. First pass widened it to 3.3 (a starting
+	// value, not a specified factor). Second pass (Tom): "make the map reservoir icon and its side
+	// walls about 80% as wide as they are" -- but by then lib/Icons.lib.php's shared reservoir path
+	// had ALSO been widened 1.5x (x:6-18 -> x:3-21, the "menu icon" half of that same request), and
+	// this map box stretches that shared path with preserveAspectRatio="none", so a naive 3.3*0.8
+	// would have landed 20% WIDER, not 20% narrower, once the wider path filled it. The math that
+	// actually lands on "80% of the ORIGINAL map rendering":
+	//   old wall width  = (old path fraction 12/24=0.5) x (old box width 2x3.3=6.6) = 3.3
+	//   target           = 3.3 x 0.8 = 2.64
+	//   new path fraction = 18/24 = 0.75 (from the widened shared path)
+	//   new box width backs out to 2.64 / 0.75 = 3.52 -> new half-width 1.76
+	// One-line change either way (both this and Icons.lib.php's path); this is explicitly an
+	// experiment, not a settled number -- but if it changes again, redo this division, don't just
+	// scale by the requested percentage, or the two surfaces' shared path will fight each other.
+	var RESERVOIR_HALF_W = 1.76;
 	var RESERVOIR_HALF_H = 1.1;
 	function reservoirSize() {
 		var k = symbolFactor();
@@ -960,10 +971,11 @@ var EngCalcs = EngCalcs || {};
 			// the box, which is the whole point of giving it an independent width/height.
 			symbol.setAttribute('preserveAspectRatio', 'none');
 			// Backdrop matches the tank's own silhouette in lib/Icons.lib.php's reservoir path (the
-			// (6,4)-(18,20) box `M6 4v16h12V4` traces) -- same box, so the opaque patch never peeks
+			// (3,4)-(21,20) box `M3 4v16h18V4` traces) -- same box, so the opaque patch never peeks
 			// out past the tank's own outline nor leaves a sliver of it uncovered. It stretches
-			// along with the rest of the icon's content since it lives in the same viewBox.
-			prependSymbolBackdrop(symbol, 'rect', { x: 6, y: 4, width: 12, height: 16 }, 'lpn-node-symbol-backdrop');
+			// along with the rest of the icon's content since it lives in the same viewBox. Keep
+			// this in sync with that path's own x-coordinates if it's ever widened/narrowed again.
+			prependSymbolBackdrop(symbol, 'rect', { x: 3, y: 4, width: 18, height: 16 }, 'lpn-node-symbol-backdrop');
 			nodesLayer.appendChild(symbol);
 		}
 		// Mask (Task 146.01) goes in the shared maskLayer, not here alongside the circle -- see

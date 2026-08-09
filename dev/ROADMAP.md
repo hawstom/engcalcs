@@ -1711,6 +1711,25 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
        explicitly experimental starting values per Tom's own framing ("since all is customizable,
        maybe we should try...") rather than settled numbers — revisit if he wants any of them
        nudged after looking at it live.
+  - **Second follow-up, same day: the map/menu reservoir widths pull in opposite directions on ONE
+    shared path, which needs a division, not two independent percentages.** Tom asked for both at
+    once: the MAP reservoir "about 80% as wide as they are", and the MENU (toolbar) reservoir "as
+    wide as you can make it... about 50% wider" — but the menu icon has no separate box-width knob
+    the way the map does (`RESERVOIR_HALF_W`); its only lever is `lib/Icons.lib.php`'s own path
+    coordinates, which is the SAME path data the map stretches via `preserveAspectRatio="none"`.
+    Widened the shared path from x:6-18 (12 wide, margin 6) to x:3-21 (18 wide, margin 3 — this
+    set's own established convention at this size, matching `file`/`image`/`zoom`), landing the
+    menu icon at exactly 1.5x. Left alone, that widening would ALSO have widened the map's
+    rendering by the same 1.5x. `RESERVOIR_HALF_W` was reset to `1.76` (not `3.3 x 0.8 = 2.64`) to
+    back out the path's own 1.5x first — see the derivation comment beside the constant in
+    `js/looped-network.js` — so the map lands at exactly 80% of its ORIGINAL (pre-either-change)
+    width while the menu lands at exactly 150% of ITS original. Both verified in a headless
+    browser: toolbar row screenshot shows the reservoir button visibly wider than its neighbours;
+    zoomed map screenshot confirms the tank is narrower than before AND still fully occludes the
+    pipe underneath it (the backdrop rect's own x/width were updated to match the widened path,
+    same (3,4)-(21,20) box). Height, on both surfaces, was untouched by this — only x-coordinates
+    changed, so `RESERVOIR_HALF_H` and the icon's y-coordinates are exactly as the first follow-up
+    left them.
 
 - 0|235| **[DONE 2026-08-09] The glossary's `pressure` and `elevation` entries no longer hold the
   UPSTREAM label form in any of the 26 languages.** Found during the Task 146.06 sprint,

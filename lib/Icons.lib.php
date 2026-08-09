@@ -111,7 +111,14 @@ $ec_icons = array(
 	// past the water line — the shape his office draws and a shape a first-time visitor reads as
 	// "water container" without being told. EPANET's downward triangle scales smaller but has to
 	// be learned first; that trade goes the other way on a page whose whole audience is new.
-	'reservoir'  => '<path d="M6 9h12v11H6z" fill="currentColor" stroke="none" opacity=".18"/><path d="M6 4v16h12V4"/><path d="M6 9h12"/>',
+	// Walls widened from x:6-18 (12 wide, margin 6) to x:3-21 (18 wide, margin 3) 2026-08-09, per
+	// Tom: "as wide as you can make it without violating the space constraints of the standard
+	// menu icon in our palette (about 50% wider)". A 3-unit margin is this set's own established
+	// convention at this size, not a new one -- 'file', 'image' and 'zoom' all use it. This is the
+	// ONE shared source for both the toolbar button and the map symbol (js/looped-network.js,
+	// ROADMAP Task 146.10) -- see RESERVOIR_HALF_W there for how the map compensates its own box
+	// width so widening this shared path doesn't also widen the map's rendering.
+	'reservoir'  => '<path d="M3 9h18v11H3z" fill="currentColor" stroke="none" opacity=".18"/><path d="M3 4v16h18V4"/><path d="M3 9h18"/>',
 	// Casing plus a discharge tail leaving it on the top tangent — the tangency is what makes this
 	// read as a pump rather than as a magnifier.
 	//
