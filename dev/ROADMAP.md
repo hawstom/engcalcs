@@ -1131,6 +1131,33 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     checkable; just do not spend the blog/video headline on it.** Do not relitigate.
   - Consequence: raised 146.06 to 90 and 220 to 95.
 
+- 25|250|[H] **Where do we explain lpn at all? A Help menu on the page.** Tom, 2026-08-09, after
+  the EPANET toggle shipped: *"Where are we going to discuss, explain, or feature this? Does lpn
+  need its own Help menu in the pull-down and the toolbar after Settings? Help > About and Help >
+  I don't know what else (Videos? I already have two. Features? Discover?)."*
+  - **The real gap is that lpn has no front door.** Every claim we just built — real EPANET
+    engine, GPL, offline, 26 languages — is invisible on the page itself. That is also Task 222's
+    unfinished half: positioning nobody can read is not positioning.
+  - **Tom already has two videos.** Linking what exists beats authoring anything new, so the
+    cheapest real version is Help > About (what this is, what engine, what licence, link to
+    About.php) + Help > Videos. "Features"/"Discover" needs content that does not exist — do not
+    scope it until something is written.
+  - **[H] Tom decides the menu shape before this is built.**
+
+- 20|251|[H] **Promote `lpn` to a core calculator in `translation_coverage.json`?** Tom,
+  2026-08-09: *"If we care about lpn and its 26-language offering, then we must irrationally add
+  lpn to the top tier... But maybe we block this behind other tasks."* He is right that it is
+  irrational on current evidence and right to hesitate.
+  - **The cost is the whole point:** promoting a core *calculator* costs a full 26 cells, and
+    `lpn_` is ~226 keys, so it is 22 more languages x 226 keys — far and away the largest single
+    translation commitment this suite has ever considered, on the calculator with the least
+    measured reach.
+  - **Do not decide this on principle; decide it on Task 216's beacon.** The coverage cross exists
+    precisely so scope follows evidence rather than symmetry — see the Reciprocity memory. If lpn
+    shows real non-English use, promoting it is obvious; if it does not, the honest answer is that
+    a map editor is the wrong first thing to translate for a field worker on a phone.
+  - Blocked behind Task 216, deliberately.
+
 - 20|248| **What the EPANET toggle actually unlocks: tanks, valves, extended-period simulation.**
   Task 243 shipped the engine and the toggle; none of this is built. The engine makes each of
   these a mapping-and-UI job rather than a numerical one, which is the entire reason it was worth
