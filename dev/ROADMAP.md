@@ -1160,18 +1160,22 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     scope it until something is written.
   - **[H] Tom decides the menu shape before this is built.**
 
-- 20|251|[H] **Promote `lpn` to a core calculator in `translation_coverage.json`?** Tom,
+- 40|251| **Promote `lpn` to a core calculator in `translation_coverage.json`?** Tom,
   2026-08-09: *"If we care about lpn and its 26-language offering, then we must irrationally add
   lpn to the top tier... But maybe we block this behind other tasks."* He is right that it is
   irrational on current evidence and right to hesitate.
-  - **The cost is the whole point:** promoting a core *calculator* costs a full 26 cells, and
-    `lpn_` is ~226 keys, so it is 22 more languages x 226 keys — far and away the largest single
-    translation commitment this suite has ever considered, on the calculator with the least
-    measured reach.
-  - **Do not decide this on principle; decide it on Task 216's beacon.** The coverage cross exists
-    precisely so scope follows evidence rather than symmetry — see the Reciprocity memory. If lpn
-    shows real non-English use, promoting it is obvious; if it does not, the honest answer is that
-    a map editor is the wrong first thing to translate for a field worker on a phone.
+  - **DECIDED: DO IT. Tom asked 2026-08-09 why CC was resistant, and the resistance was wrong.**
+    Three counts. (1) The cost was overstated: 22 languages x 226 keys is 22 agents in ONE sprint,
+    the same shape as the wave-1 category sprints and as 146.06 itself — not "the largest
+    commitment ever considered". (2) "Least measured reach" is the wrong test here, and this
+    project already knows it: zero reach is not low value when the mission is reach into places
+    that have none. (3) The Task 216 gate was borrowed from Task 217, where it fits an
+    outsourceable reference table; it does not fit a mission claim.
+  - **The one REAL cost is churn, not the sprint: maintenance.** Today an English edit to an
+    `lpn_` string costs 4 languages; after promotion it costs 26. `lpn_` is still moving —
+    Tasks 248, 250, 252, 253 all add or change strings. **So the gate is ENGLISH STABILITY, not
+    the beacon:** land the current `lpn_` UI batch, then promote and sprint once over a settled
+    surface rather than three times over a moving one.
   - **BUT THE HONESTY PROBLEM IS SEPARATE AND DOES NOT WAIT FOR THE BEACON.** Tom, 2026-08-09:
     *"Maybe irrational, but consistent. We've been talking out of one side of our mouth that
     languages are a superpower of lpn when it really has only 4 (about the same as epanet-js)."*
@@ -1180,7 +1184,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     **either promote lpn, or stop citing 26 languages when positioning lpn specifically** — the
     suite-wide claim stays true, the page-level one does not. Fix the claim now; decide the
     promotion on the beacon.
-  - Blocked behind Task 216, deliberately.
 
 - 20|248| **What the EPANET toggle actually unlocks: tanks, valves, extended-period simulation.**
   Task 243 shipped the engine and the toggle; none of this is built. The engine makes each of
