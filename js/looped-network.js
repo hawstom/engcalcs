@@ -886,10 +886,16 @@ var EngCalcs = EngCalcs || {};
 	//   target           = 3.3 x 0.8 = 2.64
 	//   new path fraction = 18/24 = 0.75 (from the widened shared path)
 	//   new box width backs out to 2.64 / 0.75 = 3.52 -> new half-width 1.76
+	// Third pass, same day: menu icon confirmed good ("approximately square looks as expected");
+	// map still read "a bit too wide" while "its side walls are good now" -- i.e. the shared
+	// path's own wall-to-box ratio (0.75, set in the second pass) is right, only the map's overall
+	// box needs to shrink, uniformly, on top of that. No shared-path division this time (nothing
+	// in lib/Icons.lib.php changed), so this IS a plain 1.76 x 0.8 = 1.408.
 	// One-line change either way (both this and Icons.lib.php's path); this is explicitly an
-	// experiment, not a settled number -- but if it changes again, redo this division, don't just
-	// scale by the requested percentage, or the two surfaces' shared path will fight each other.
-	var RESERVOIR_HALF_W = 1.76;
+	// experiment, not a settled number -- but if the SHARED PATH ever changes again, redo the
+	// division two passes up, don't just scale by the requested percentage, or the two surfaces'
+	// shared path will fight each other.
+	var RESERVOIR_HALF_W = 1.408;
 	var RESERVOIR_HALF_H = 1.1;
 	function reservoirSize() {
 		var k = symbolFactor();

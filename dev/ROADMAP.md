@@ -1730,6 +1730,14 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     same (3,4)-(21,20) box). Height, on both surfaces, was untouched by this — only x-coordinates
     changed, so `RESERVOIR_HALF_H` and the icon's y-coordinates are exactly as the first follow-up
     left them.
+  - **Third follow-up, same day: menu confirmed, map still too wide — but no shared-path change
+    this time.** Tom: menu icon "approximately square looks as expected... looks great"; map "still
+    looks a bit too wide, but its side walls are good now" — i.e. the shared path's wall-to-box
+    ratio (0.75, set in the second follow-up) is right, only the map's own box needed to shrink
+    further, on top of that. Since `lib/Icons.lib.php` didn't change this time, no division was
+    needed: `RESERVOIR_HALF_W = 1.76 x 0.8 = 1.408`, a plain 80% of the prior value. Verified in a
+    headless browser at the same zoom level as the second follow-up's check — tank visibly
+    narrower, side-wall proportions unchanged, pipe still fully occluded underneath it.
 
 - 0|235| **[DONE 2026-08-09] The glossary's `pressure` and `elevation` entries no longer hold the
   UPSTREAM label form in any of the 26 languages.** Found during the Task 146.06 sprint,
