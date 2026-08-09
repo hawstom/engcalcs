@@ -1,6 +1,6 @@
 {
   "meta": {
-    "version": "1.25",
+    "version": "1.26",
     "description": "Engineering term glossary for EngCalcs translation prompts. Preferred translations per language to prevent term drift across calculators and sprints. Covers all calculators including Rock Chute Design (Robinson), Micro-Hydro Power, and Manning series.",
     "usage": "Inject relevant entries as context in translation prompts: 'Use these preferred translations for technical terms: [terms for this calculator prefix]'. Entries with empty strings need a sprint to fill.",
     "language_codes": [
@@ -3196,6 +3196,48 @@
       },
       "translation_notes": "Created 2026-08-08 (ROADMAP Task 237) after Tom read the shipped Spanish and said \"Ajustar zoom ... I think that's wrong\". He was right, and the defect had spread: 2 of the 4 languages carrying this key (es, pt) had rendered it as ADJUST THE ZOOM. The word \"fit\" in the English label is the lure — it invites a fitting/adjusting verb while saying nothing about what is fitted, so a translator with no other context reasonably lands on \"adjust\". THE ENGLISH IS DELIBERATELY UNCHANGED: \"Zoom to fit\" is an established UI idiom (browsers, PDF viewers, design tools all ship it) and renaming a recognized control costs more than guarding it — this entry plus its avoid array is the guard. Two legitimate conventions exist and both are correct: CAD-faithful (fr \"Zoom sur l'étendue\", matching AutoCAD's own French/Spanish \"Zoom Étendu\"/\"Zoom Extensión\") and plain (tr \"Tümünü göster\" = show all). Tom chose the PLAIN register for es and pt on 2026-08-08, so 3 of 4 now share the show-everything mental model while fr keeps its correct CAD form. Either register is acceptable for a new language; an adjust-the-zoom reading is not.",
       "source": "EngCalcs lpn_ map toolbar (lpn_tool_zoom_extent); AutoCAD and QGIS localized UI for the equivalent Zoom Extents / Zoom Full command."
+    },
+    {
+      "term": "default (setting)",
+      "symbol": "",
+      "context": "The value a field or setting starts with before the user changes it, and the value \"Restore defaults\" puts back. A software-settings concept, not an engineering one — it appears in suite chrome (calc_defaults, calc_defaults_confirm) and in lpn_ (lpn_settings_defaults \"Default inputs\", lpn_settings_push_btn, lpn_confirm_restore_defaults). Every language already ships a settled software term for this; the job is to USE that term, not to coin one.",
+      "avoid": [
+        "the financial sense — failure to pay a debt, defaulting on a loan. This is the dominant everyday sense of the English word in many languages and the single most dangerous confusion here",
+        "the legal sense — failure to appear or to act, a default judgment",
+        "a bare \"reset\" or \"restore\" with the default concept dropped entirely. ro shipped calc_defaults as just \"Reseteaza\" (Reset) while its own calc_defaults_confirm used \"valorile implicite\" correctly — the button must say WHAT is restored",
+        "a word meaning normal/usual/ordinary where the language has a real settings term. sw shipped \"maadili ya kawaida\" (normal values) instead of \"chaguo-msingi\"; \"kawaida\" describes what is typical, not what the software ships with",
+        "the sports sense — winning or losing by default, by forfeit"
+      ],
+      "translations": {
+        "am": "ነባሪ",
+        "ar": "الافتراضي",
+        "bg": "по подразбиране",
+        "bn": "ডিফল্ট",
+        "cs": "výchozí",
+        "de": "Standard",
+        "es": "predeterminado",
+        "fa": "پیش‌فرض",
+        "fr": "par défaut",
+        "he": "ברירת מחדל",
+        "hi": "डिफ़ॉल्ट",
+        "hr": "zadano",
+        "id": "default",
+        "it": "predefinito",
+        "km": "លំនាំដើម",
+        "my": "ပုံမှန်",
+        "ps": "ډيفالټ",
+        "pt": "padrão",
+        "ro": "implicit",
+        "ru": "по умолчанию",
+        "sr": "подразумевано",
+        "sw": "chaguo-msingi",
+        "tr": "varsayılan",
+        "uk": "за замовчуванням",
+        "ur": "پہلے سے مقررہ",
+        "zh": "默认"
+      },
+      "translation_notes": "Created 2026-08-08 (ROADMAP Task 238) at Tom's request: *\"default is a troublesome word. but this is a phrase for which it should be easy to find standard renditions of in any language. so I am hesitant to judge. I just want it to be right.\"* That is exactly the right instinct and it is why this entry exists: the concept HAS a settled term in every language, so no agent should ever re-derive it, and the risk is not invention but reaching for the wrong sense (financial/legal) or dropping the concept.\n\nValues above are the attested forms already shipping in each language's calc_defaults / calc_defaults_confirm, cross-checked against each other — a language that used the same term in both was taken as self-confirming. Note the low-resource languages (bn, hi, id, ps) legitimately use the English loanword: it IS the standard software term there, and per the defer-to-cultural-standard principle that is correct, not a transliteration defect.\n\nThe 2026-08-08 audit of all 26 found 3 real defects, each caught by contradicting its OWN file rather than by outside judgement: ro said only \"Reseteaza\" on the button while its confirm string said \"valorile implicite\"; sw said \"maadili ya kawaida\" (= normal MORALS — \"maadili\" is ethics, and thamani is the word this file uses for a numeric value in 19 other keys); he had \"lerachim breirat hamechdal\" where the construct state requires \"lerachei\". All three fixed. am, my and id were noted as lower-confidence and deliberately left alone rather than guessed at — see Task 238.",
+      "source": "EngCalcs suite chrome (calc_defaults, calc_defaults_confirm) and lpn_ settings panel; attested per-language forms cross-checked within each lang file."
     }
   ]
 }

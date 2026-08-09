@@ -1585,6 +1585,56 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Completed
 
+- 0|238| **[DONE 2026-08-08] "Map display and sizes" fixed at the source; "Restore defaults" audited
+  in all 26 and given a glossary entry.** Two labels Tom read on the shipped page.
+  - **`lpn_settings_map_display`: the ENGLISH was the defect, so the English was fixed.** Tom:
+    *"the short name could be just Map Display... But in Spanish it is translated as 'Display of the
+    map and sizes'."* He was right about the symptom and right about the cure. "Map display and
+    sizes" is an ambiguous coordination — is it *[map display] and [sizes]* or *[map] [display and
+    sizes]*? — and every language had to guess, leaving a dangling "y tamaños" / "e tamanhos".
+    **The section holds text size, symbol size and opacity, backdrop opacity, map height and legend
+    position — all of them display settings, so "and sizes" named a subset, not a second category,
+    and dropping it loses nothing.** Now **"Map display"**, retranslated in all 4: es
+    *Visualización del mapa*, pt *Exibição do mapa*, fr *Affichage de la carte*, tr *Harita
+    görünümü*.
+    - **Deliberately NOT given an `$ec_lang_intent` entry**, though Tom raised the option. Once the
+      English is unambiguous the label is plain, directly-translatable technical English, and
+      CLAUDE.md is explicit that adding an intent to a plain label is itself a defect — it burns
+      translator attention on something no longer at risk. **Fixing the English fixed all 26
+      languages at the source; an intent would only have described the ambiguity we removed.** This
+      is the English-reform gate working as designed.
+  - **`calc_defaults` ("Restore defaults"): audited across all 26.** Tom: *"default is a troublesome
+    word... it should be easy to find standard renditions in any language. so I am hesitant to
+    judge. I just want it to be right."*
+    - **Method: cross-check each language against ITSELF**, not against outside judgement — every
+      language ships this concept twice (`calc_defaults` and `calc_defaults_confirm`), so a language
+      that contradicts itself has a defect provable from inside its own file. That is what makes
+      this auditable without a native speaker for each of 26.
+    - **3 real defects found and fixed, each self-evidenced:**
+      1. **ro** — button was bare *"Resetează"* ("Reset"), concept dropped, while its own confirm
+         string said *"valorile implicite"* correctly. Now *"Restabilește valorile implicite"*.
+      2. **sw** — confirm said *"maadili ya kawaida"*. **`maadili` means morals/ethics**; the word
+         this file uses for a numeric value in **19 other keys** is `thamani`, and the button
+         already used the correct `chaguo-msingi`. Now *"thamani za awali za chaguo-msingi"*.
+      3. **he** — *"לערכים ברירת המחדל"* required the construct state before a definite noun
+         phrase. Now *"לערכי ברירת המחדל"*.
+    - **3 languages deliberately left alone as lower-confidence** rather than guessed at: **am**
+      (ነባሪ vs ነባር across the two keys), **my** (ပုံမှန် = normal/regular, may or may not be the
+      settled Burmese software term), **id** (*"Pulihkan Default"* — the loanword is genuinely
+      standard in Indonesian UI, but the Title-Cased *Default* mid-phrase is odd). Two are 0.65-tier
+      languages where our own confidence is lowest by design. **Recorded, not silently "fixed".**
+  - **New glossary concept `default (setting)`** (version 1.25 → 1.26) with all 26 attested forms
+    and a 5-item `avoid` array. The dangerous senses are named explicitly — **financial** (defaulting
+    on a debt, the dominant everyday sense in many languages), legal, sports-forfeit — plus the two
+    real failure shapes this audit found: *dropping the concept* (ro) and *substituting a
+    normal/usual word* (sw). Per the defer-to-cultural-standard principle the entry records that
+    bn/hi/id/ps legitimately use the English loanword: it IS the local software standard there, and
+    that is correct rather than a transliteration defect.
+  - **Wired into `prefixToTermNames()`: `lpn`, `bpn`, and a new `calc` entry** — suite chrome had no
+    entry at all and was silently falling back to the default three terms, so the button that owns
+    this concept could never have received its own guard. Verified by resolution (calc 4/4, lpn
+    35/35, bpn 28/28) and by reading the generated `DO NOT render as:` line.
+
 - 0|237| **[DONE 2026-08-08] "Zoom to fit" shipped meaning "adjust the zoom" in 2 of 4 languages.**
   Caught by Tom reading the shipped Spanish: *"Zoom to fit in Spanish is ajustar zoom. I could be
   wrong, but I think that's wrong."* He was right, and it had spread further than the one example.

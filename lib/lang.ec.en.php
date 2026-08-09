@@ -1485,7 +1485,7 @@ $ec_lang['lpn_settings_symbol_opacity']='Symbol opacity (0 to 1)';
 // network drawn over it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_backdrop_opacity']='Background image opacity (0 to 1)';
 $ec_lang['lpn_settings_text_size_units']='Text size units';
-$ec_lang['lpn_settings_map_display']='Map display and sizes';
+$ec_lang['lpn_settings_map_display']='Map display';
 $ec_lang['lpn_settings_map_height_px']='Map height (screen pixels)';
 // The cap in applyMapHeight() makes this field look ignored on a phone (ROADMAP Task 146.08's
 // own note). It is a render cap, not a stored value -- say so instead of leaving the user to guess.

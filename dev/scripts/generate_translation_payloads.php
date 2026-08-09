@@ -565,18 +565,21 @@ function prefixToTermNames(): array
         // lpn/bpn were missing here until 2026-08-08, so both silently fell back to the
         // three default terms and the network-concept entries seeded in Task 193 — every one
         // of them carrying an 'avoid' array — never reached a translation agent.
+        // Suite chrome, not a calculator -- but it owns the Restore-defaults button, so it needs
+        // the concept too. Without an entry here it silently falls back to the default three.
+        'calc' => ['default (setting)', 'flow', 'velocity', 'slope'],
         'lpn' => ['flow', 'velocity', 'head', 'head loss', 'friction loss', 'minor loss', 'pressure',
             'elevation', 'demand', 'static head', 'maximum allowable head', 'supply head',
             'supply curve', 'looped network', 'branched network', 'pipe line', 'pressure rating',
             'pressure reduction', 'energy grade line', 'Manning roughness', 'friction factor',
             'draw (a diagram)', 'junction', 'reservoir', 'node', 'link', 'vertex',
             'background image', 'pump curve', 'project (saved network)', 'scenario',
-            'zoom to extents', 'upstream', 'downstream'],
+            'zoom to extents', 'default (setting)', 'upstream', 'downstream'],
         'bpn' => ['flow', 'velocity', 'head', 'head loss', 'friction loss', 'minor loss', 'pressure',
             'elevation', 'demand', 'static head', 'maximum allowable head', 'supply head',
             'supply curve', 'branched network', 'branch', 'pipe line', 'pressure rating',
             'pressure reduction', 'energy grade line', 'Manning roughness', 'friction factor',
-            'junction', 'reservoir', 'node', 'link', 'upstream', 'downstream'],
+            'junction', 'reservoir', 'node', 'link', 'default (setting)', 'upstream', 'downstream'],
         'ip' => ['flow', 'velocity', 'head loss', 'emitter', 'distribution uniformity', 'low-quarter distribution uniformity', 'application rate', 'lateral', 'mainline', 'reach', 'velocity head', 'friction loss', 'minor loss', 'energy grade line', 'upstream', 'downstream'],
     ];
 }

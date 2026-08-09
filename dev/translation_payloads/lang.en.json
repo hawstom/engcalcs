@@ -776,7 +776,7 @@
         "lpn_settings_symbol_opacity": "Symbol opacity (0 to 1)",
         "lpn_settings_backdrop_opacity": "Background image opacity (0 to 1)",
         "lpn_settings_text_size_units": "Text size units",
-        "lpn_settings_map_display": "Map display and sizes",
+        "lpn_settings_map_display": "Map display",
         "lpn_settings_map_height_px": "Map height (screen pixels)",
         "lpn_settings_map_height_tip": "On a small screen the map is drawn shorter than this, so that part of the page is always left to scroll.",
         "lpn_settings_legend_position": "Legend position",
