@@ -1800,8 +1800,8 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     since there is no background right now."* **That last clause is the condition, and it is the
     thing to re-examine** — the day the example ships over a backdrop, a scale meaning two
     different things becomes visible and wrong.
-  - **Text size: BOTH the default AND an explicit set before drawing. Each alone is insufficient,
-    and this took two rounds to get right.**
+  - **Text size: the shipped default, 20, and NOTHING ELSE. Three rounds to land on the simplest
+    answer.**
     - Round 1 wrote `settings.textSize` in the example only. The map drew at 20 while the Settings
       panel still read 2.5 — Tom flagged that as a condition that "should be impossible", and he
       was right. **The real defect was not the write; it was that the panel was built once at init
@@ -1812,11 +1812,17 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
       reaches nobody who has used the page before**, because `loadFromStorage()` does
       `Object.assign(defaultSettings(), savedSettings)` — a stored 2.5 wins over a raised default,
       forever. Tom: "Now text size is per the Settings, but that is still 2.5."
-    - **Final: the default is 20 (for a first-time visitor) and `drawExampleNetwork()` sets 20
-      explicitly (for everyone else).** 2.5 was the old fixed `LABEL_FONT_SIZE` carried over
-      unexamined; it suits a map a few dozen units across, which nobody draws.
-    - Known wart, documented in the code: `settings` is not part of `doc`, so the Undo snapshot
-      does not capture it and undoing the example leaves the text size at 20.
+    - **Final (Tom's call, and it dissolves the problem rather than solving it):** *"How about we
+      circumvent the settings and doc issue by just shipping with an initial default text size that
+      works for our example network, namely 20? And we remove our changes to text size at the time
+      of draw. Anything other is on the user, not us."* `defaultSettings().textSize` is 20;
+      `drawExampleNetwork()` touches it never. A visitor who changed their text size has expressed
+      a preference and an example is not a reason to overrule it — and the Undo wart (settings are
+      not part of `doc`, so a snapshot cannot restore them) simply stops existing.
+    - **Consequence to know: a returning visitor keeps their stored 2.5** and must click Restore
+      defaults once, or set 20 by hand. Accepted deliberately, per the quote above.
+    - 2.5 was the old fixed `LABEL_FONT_SIZE` carried over unexamined; it suits a map a few dozen
+      units across, which nobody draws.
   - **`LPN_BASE_TEXT_SIZE` stays 2.5 and did NOT follow the default.** Its only job is to record
     what size the fixed world dimensions were drawn for so everything scales together; moving it in
     step would pin `textFactor()` at 1 and leave symbols and label offsets at their old absolute
@@ -1838,13 +1844,50 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
   - **Coordinates are NOT run through `niceDefault()`** — lengths and map coordinates are
     declarative (1 grid unit IS 1 ft or 1 m, no conversion), so they are scaled by a local `gu`
     factor instead. Getting this wrong would silently produce a 3.3x-wrong drawing.
+  - **Four Text annotations, composed entirely from strings that already existed** (Tom, 2026-08-09:
+    *"To minimize translation load, we can compose it from existing lang strings"*). A two-line
+    title block — `menu_brand` at size x2 over `lpn_main_menu` at x1.5 — plus `lpn_tool_add_reservoir`
+    on the reservoir and `bpn_p_min` ("Lowest pressure") anchored to the minimum-pressure junction.
+    **Net translation cost: zero new keys.** `menu_brand` is suite chrome (all 26 languages);
+    `bpn_p_min` is the sibling calculator's and exists wherever `lpn_` does — the harness asserts
+    that for es/pt/fr/tr. This also makes Text the fifth element type the example demonstrates, and
+    shows the per-label size multiplier doing something visible.
+  - **Two annotations Tom asked for were NOT built, and the reason is a rule, not an oversight.**
+    A callout carrying "Double-click a pipe to add or remove a vertex" would have to be spliced out
+    of the third sentence of `lpn_mode_select`, and cutting a clause out of a translated sentence is
+    exactly the fragment composition CLAUDE.md bans (it breaks in gendered, word-order and RTL
+    languages). A velocity callout has no string to borrow — only the bare word "Velocity", no
+    "Highest velocity". **Either would need one new key**, which is a fine trade if wanted; it just
+    is not free, which was the premise.
+  - **The pressure extrema tick does not mark the lowest junction, and we are not fixing it.** Tom
+    found this and ruled on it, 2026-08-09: the reservoir sits at zero gauge pressure and is almost
+    always the network low, so it takes the "low" tick and no junction is marked. The fix would be
+    a rule plus a checkbox ("ignore reservoirs during pressure extrema") or a silent special case,
+    and he judged both worse than the wart. The `bpn_p_min` callout is the cheap substitute. **Do
+    not re-propose the checkbox.**
+  - **`bbox()` was reserving a constant ±2 for a Text label's height.** Correct only while the text
+    size was 2.5; at the shipped 20 with the title's x2 multiplier the label is 40 units tall and
+    the fit clipped it. Now half the label's own `effectiveFontSize(lb.sizeMult)`.
+  - **Tom's zero-pressure calibration idea went into the HARNESS, not the shipped map.** He proposed
+    adding independent reservoir-pipe-junction stubs tuned so the junction pressure reads exactly
+    0.00, one for US and one for SI, as a sneaky regression test. The idea is right and is now
+    implemented — but in `example-network-harness.js`, for two reasons. On the map only one of the
+    pair can read zero at a time (the other is tuned for the other preset), so a visitor in the
+    wrong unit set sees a stray stub reporting an arbitrary number beside a ring main we spent this
+    task making look like real work; and a check nobody runs is not a check. In the harness both are
+    exact, both run every time, and the demand is DERIVED by inverting Hazen-Williams in closed form
+    rather than iterated by hand, so the tolerance is 1e-6 m instead of "looks like 0.00".
+    **Proved it bites:** with the Task 255 fix temporarily reverted, the US case fails at −69.5 m
+    gauge head while SI stays clean — exactly the asymmetry the bug had. The visible on-map version
+    is still available if wanted; it was a judgment call, not a refusal.
   - **Verified by `node dev/lpn-spike/example-network-harness.js`** (new, 24 checks x 2 unit sets
     plus 2 settings-panel checks, all pass): topology, cyclomatic number, extent, 5000,5000 anchor,
     text default, pump curve shape, convergence, pressure band, flow reversal, velocity ceiling,
     multi-vertex auto length, the pending re-fit being consumed exactly once, the Task 255 unit
     conversion against a hand-computed case, and the Settings panel repainting a value changed
-    behind its back — including a returning-visitor case that pre-seeds a stored 2.5, which is the
-    state Tom was actually in when he reported the map still drawing small. No browser pass needed.
+    behind its back, the annotation strings existing and being emitted into pageConfig in en plus
+    all four translated languages, and the zero-pressure calibration. It pre-seeds a stored 2.5 so
+    it runs as a returning visitor, which is the state Tom was actually in. No browser pass needed.
   - **Final numbers:** 55-63 psi (US) and 361-422 kPa (SI) at every junction, 0.04-1.5 fps.
   - **Example PROJECTS are still open and are a different task — see Task 257.**
 

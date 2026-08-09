@@ -138,12 +138,28 @@ global.navigator = { userAgent: 'node' };
 global.requestAnimationFrame = f => setTimeout(f, 0);
 // iconEl comes from js/Icons.lib.js in the browser; the map symbols only need to not throw here.
 // iconEl/setLabel come from js/Icons.lib.js in the browser; here they only need to not throw.
+// The example's annotations are composed from strings that already exist elsewhere in the suite
+// (see drawExampleNetwork()); the page emits them into pageConfig, so the harness must too, read
+// from the real lang file rather than restated here.
 global.EngCalcs = {
   pageConfig: {}, initTips: () => {}, unitFactorFor: () => 1,
   iconEl: () => mkEl('g'),
   setLabel: (el, iconName, text) => { el.textContent = text; }
 };
 global.bootstrap = global.window.bootstrap = { Tooltip: { getInstance: () => null, getOrCreateInstance: () => ({ hide() {}, dispose() {} }) } };
+
+// ---- pageConfig, read from the real lang file ---------------------------
+// Not stubbed: the example's annotations ARE lang strings, so a harness with an empty pageConfig
+// would silently assert that four labels reading "undefined" are fine. Harvest every key the page
+// could emit, then check below that the page really does emit the ones the JS reaches for.
+{
+  const langSrc = fs.readFileSync(ROOT + 'lib/lang.ec.en.php', 'utf8');
+  const re = /^\$ec_lang\['([a-z0-9_]+)'\]\s*=\s*'((?:[^'\\]|\\.)*)';$/gm;
+  let m;
+  while ((m = re.exec(langSrc))) {
+    global.EngCalcs.pageConfig[m[1]] = m[2].replace(/\\'/g, "'").replace(/\\\\/g, '\\');
+  }
+}
 
 // ---- solver + the file under test ---------------------------------------
 // bootstrap.js FIRST, for the same reason validate.js says: it supplies EngCalcs.G out of
@@ -164,6 +180,7 @@ src = src.replace(marker,
   "\t\tseedDefaultInputs: seedDefaultInputs, bbox: bbox, effective: effective,\n" +
   "\t\tfitPending: function () { return fitAfterSolve; },\n" +
   "\t\tlinkLengthSI: linkLengthSI, rebuildSettingsFields: rebuildSettingsFields,\n" +
+  "\t\taddNode: addNode, addLink: addLink,\n" +
   "\t\ttoggleSettingsPopup: toggleSettingsPopup, defaultSettings: defaultSettings,\n" +
   "\t\tsettingsFieldsEl: function () { return document.getElementById('lpn_settings_fields'); },\n" +
   "\t\treset: function () { doc = { nodes: [], links: [], labels: [] };\n" +
@@ -236,14 +253,33 @@ byId.lpn_toolbar.querySelectorAll = () => [];
     w.toFixed(0) + ' x ' + h.toFixed(0));
   const cx = (Math.max(...xs) + Math.min(...xs)) / 2, cy = (Math.max(...ys) + Math.min(...ys)) / 2;
   ok('anchored on 5000,5000', near(cx, 5000, 1) && near(cy, 5000, 1), cx + ',' + cy);
-  // The example FORCES 20 over whatever the visitor had stored (2.5, set just above). Raising
-  // defaultSettings().textSize to 20 is necessary but not sufficient -- a returning visitor's
-  // saved value wins over the default, which is why the map was still drawing small.
-  ok('example forces textSize to 20 over a stored 2.5', s.textSize === 20, s.textSize);
-  ok('...and 20 is also the shipped default, for a first-time visitor',
+  // TEXT SIZE IS THE SHIPPED DEFAULT AND THE EXAMPLE MUST NOT TOUCH IT. Tom, 2026-08-09: ship a
+  // default that suits the example, and "anything other is on the user, not us." So the stored 2.5
+  // seeded above must survive the draw -- a visitor who set their own size keeps it.
+  ok('20 is the shipped default, for a first-time visitor',
     L.defaultSettings().textSize === 20, L.defaultSettings().textSize);
-  const ratio = w / s.textSize;
-  ok('extent:text ratio reads like plan lettering (50-100)', ratio > 50 && ratio < 100, ratio.toFixed(0));
+  ok('the example does NOT overwrite a size the visitor had already chosen', s.textSize === 2.5,
+    s.textSize);
+  const ratio = w / L.defaultSettings().textSize;
+  ok('extent:default-text ratio reads like plan lettering (50-100)', ratio > 50 && ratio < 100,
+    ratio.toFixed(0));
+
+  // ---- annotations, all composed from already-translated strings ----
+  const PC = EngCalcs.pageConfig;
+  const texts = doc.labels.map(t => t.text);
+  ok('four Text annotations were placed', doc.labels.length === 4, doc.labels.length);
+  ok('title block uses the real brand and menu strings',
+    texts.includes(PC.menu_brand) && texts.includes(PC.lpn_main_menu));
+  ok('reservoir and lowest-pressure callouts use real strings',
+    texts.includes(PC.lpn_tool_add_reservoir) && texts.includes(PC.bpn_p_min));
+  ok('no annotation was left on the placeholder "Text"',
+    !texts.some(t => t === PC.lpn_new_text || t === 'Text'), JSON.stringify(texts));
+  ok('the two callouts are anchored to nodes, the title block is not',
+    doc.labels.filter(t => t.anchorNode).length === 2);
+  ok('size multipliers are set (a 2 and two 1.5s), not left at 1',
+    doc.labels.filter(t => t.sizeMult === 2).length === 1
+    && doc.labels.filter(t => t.sizeMult === 1.5).length === 3,
+    doc.labels.map(t => t.sizeMult).join(','));
 
   // The pump curve is real datasheet shape: 3 points, head falling with flow, from zero flow.
   const cp = pumps[0].curvePoints;
@@ -276,6 +312,15 @@ byId.lpn_toolbar.querySelectorAll = () => [];
   ok('every junction pressure lands in the normal distribution band',
     lo > loWant && hi < hiWant,
     lo.toFixed(0) + '-' + hi.toFixed(0) + (us ? ' psi' : ' kPa'));
+
+  // The "Lowest pressure" callout is anchored to a HARD-CODED node, because at draw time the solve
+  // has not run. This is the assertion that makes that safe: if a tweak moves the minimum, fail
+  // here rather than ship a map that points at the wrong junction.
+  const minId = Object.keys(press).reduce((a, b) => (press[a] <= press[b] ? a : b));
+  const callout = doc.labels.find(t => t.text === PC.bpn_p_min);
+  ok('the "Lowest pressure" callout is on the actual minimum-pressure junction',
+    callout && callout.anchorNode === minId,
+    'callout on ' + (callout && callout.anchorNode) + ', minimum at ' + minId);
 
   // THE POINT OF A RING: flow leaves the tie-in both ways and meets at a divide, so around the
   // ring in a consistent direction the sign of Q must change. A series main cannot do this.
@@ -316,9 +361,17 @@ byId.lpn_toolbar.querySelectorAll = () => [];
     Math.abs(Math.abs(r.headlosses[p1.id]) - hand) / hand < 0.01,
     'solver ' + Math.abs(r.headlosses[p1.id]).toFixed(4) + ' m vs hand ' + hand.toFixed(4) + ' m');
 
-  // bbox() must contain every node -- this is what zoomExtent() fits to.
+  // bbox() must contain every node AND every annotation -- this is what zoomExtent() fits to, and
+  // a title that falls outside it gets clipped by the fit (which is Task 254's second complaint).
   const b = L.bbox();
   ok('bbox encloses every node', nodes.every(n => n.x >= b.minx && n.x <= b.maxx && n.y >= b.miny && n.y <= b.maxy));
+  const title = doc.labels.find(t => t.text === PC.menu_brand);
+  // The CURRENT text size, not the default -- this run deliberately seeds a returning visitor's
+  // stored 2.5, and bbox() must track whatever size the labels are actually rendered at.
+  const titleHalfH = s.textSize * title.sizeMult / 2;   // dominant-baseline:central
+  ok('bbox reserves the title block\'s real height, not a constant',
+    b.miny <= title.y - titleHalfH + 1e-9,
+    'title top ' + (title.y - titleHalfH).toFixed(1) + ' vs bbox top ' + b.miny.toFixed(1));
 });
 
 // ---- the Settings panel is a VIEW of `settings`, not a copy taken at page load ----
@@ -326,6 +379,94 @@ byId.lpn_toolbar.querySelectorAll = () => [];
 // [that] should be impossible". It was possible for every setting, because the panel was built
 // once at init and only repainted by the writers that remembered to. toggleSettingsPopup() now
 // rebuilds on open; this proves it for a value changed behind the panel's back.
+// ---- the annotation strings must actually reach the browser -------------
+// drawExampleNetwork() reads these off EngCalcs.pageConfig, which Looped-Network.php builds by
+// hand, one line per key. A key that exists in the lang file but is never emitted there arrives
+// as undefined and the annotation is silently skipped -- nothing throws, the map is just missing
+// a label. This is the check that turns that into a failure.
+// ---- ZERO-PRESSURE CALIBRATION (Tom's idea, 2026-08-09) -----------------
+// Tom proposed adding "independent systems whose length and upper elevation are tweaked so that
+// their lower elevation or pressure is exactly 0", one tuned for US and one for SI, as a sneaky
+// regression test -- a 0.00 on the map that stops reading 0.00 the moment a unit or a constant
+// drifts. The idea is exactly right; this is that idea with two changes.
+//
+//  1. It lives HERE, not in the shipped example. On the map only one of the two can read zero at a
+//     time (the other is tuned for the other unit set), so a visitor in the wrong preset sees a
+//     stray reservoir-and-stub reporting an arbitrary pressure next to a ring main we spent Task
+//     254 making look like real work. And a check nobody runs is not a check. Here BOTH are exact,
+//     both run on every invocation, and a drift fails loudly instead of waiting to be noticed.
+//  2. The demand is DERIVED, not iterated. Tom's screenshot shows 537.15 gpm found by hand; the
+//     Hazen-Williams law inverts in closed form, so the length that makes the pressure exactly
+//     zero is computed here and the tolerance can be 1e-9 m instead of "looks like 0.00".
+//
+// WHAT IT ACTUALLY CATCHES, and why it is not redundant with the hand-computed check above: this
+// one runs end to end through the APP -- addNode/addLink, effective(), linkLengthSI(),
+// assembleModel() -- with the Length/Map selector set, so it exercises the unit boundary that
+// Task 255 got wrong. Before that fix, the US case reported 68 ft of pressure where zero was
+// designed in.
+console.log('\n--- zero-pressure calibration, end to end through the app ---');
+['us', 'si'].forEach(which => {
+  const us = which === 'us';
+  setUnitSet(which);
+  L.reset();
+  // A reservoir at 100 ft / 30 m feeding one pipe to a junction at elevation zero. Choose the
+  // demand, then solve Hazen-Williams backwards for the pipe length that burns EXACTLY the whole
+  // static head: L = hf C^n d^m / (coef Q^n), in metres, then declared in map units.
+  // CONSTANTS COME FROM EngCalcs, never restated here. Restating them makes the test agree with
+  // itself instead of with the app -- literal 10.67/1.852/4.871 left a 0.03% residual against the
+  // shipped hwCoef of 10.66682948893005, which is precisely the drift this test exists to catch.
+  const coef = EngCalcs.hwCoef, n = EngCalcs.hwExp, m = EngCalcs.hwDiaExp;
+  const head = us ? 100 * FT : 30;               // metres
+  const Q = us ? 500 * GPM : 0.030;              // m3/s
+  const d = us ? 4 * IN : 0.10, C = 130;
+  const lenSI = head * Math.pow(C, n) * Math.pow(d, m) / (coef * Math.pow(Q, n));
+  const lenDeclared = lenSI * (us ? 1 / FT : 1); // map units -- the number a user would type
+
+  const r2 = L.addNode('reservoir', 1000, 1000);
+  r2.elev = head;
+  const j = L.addNode('junction', 1000 + lenDeclared, 1000);
+  j.elev = 0;
+  j._demand = Q;
+  const pipe = L.addLink('pipe', r2.id, j.id);
+  pipe._diameter = d;
+  pipe._roughness = C;
+  pipe._k = 0;                 // keep the closed form exact -- no minor-loss term
+  pipe._length = lenDeclared;
+  pipe.lenAuto = false;
+
+  // The unit boundary is engaged: in US the declared number and the SI number genuinely differ,
+  // which is the whole thing Task 255 was getting wrong.
+  ok(which.toUpperCase() + ': the declared length converts to the intended SI length',
+    near(L.linkLengthSI(pipe), lenSI, 1e-9),
+    lenDeclared.toFixed(1) + (us ? ' ft -> ' : ' m -> ') + lenSI.toFixed(1) + ' m');
+
+  const model = L.assembleModel(), out = EngCalcs.lpnSolve(model, { tol: 1e-12 });
+  const gauge = out.heads[j.id] - j.elev;
+  ok(which.toUpperCase() + ': pressure at the calibration junction is exactly zero',
+    out.converged && Math.abs(gauge) < 1e-6,
+    'gauge head ' + gauge.toExponential(2) + ' m, from a '
+      + lenDeclared.toFixed(1) + (us ? ' ft' : ' m') + ' pipe at '
+      + (us ? (Q / GPM).toFixed(0) + ' gpm' : (Q * 1000).toFixed(0) + ' L/s'));
+});
+
+console.log('\n--- annotation strings are wired end to end ---');
+{
+  const php = fs.readFileSync(ROOT + 'Looped-Network.php', 'utf8');
+  const langSrc = fs.readFileSync(ROOT + 'lib/lang.ec.en.php', 'utf8');
+  ['menu_brand', 'lpn_main_menu', 'lpn_tool_add_reservoir', 'bpn_p_min'].forEach(k => {
+    ok(k + ' exists in lang.ec.en.php', langSrc.indexOf("$ec_lang['" + k + "']=") >= 0);
+    ok(k + ' is emitted into pageConfig by Looped-Network.php', php.indexOf('\t' + k + ':') >= 0);
+  });
+  // The whole point of composing from existing strings was zero new translation load, and lpn_'s
+  // translated languages are the Task 203 core four. Anything borrowed must already exist there.
+  ['es', 'pt', 'fr', 'tr'].forEach(lang => {
+    const src = fs.readFileSync(ROOT + 'lib/lang.ec.' + lang + '.php', 'utf8');
+    const missing = ['menu_brand', 'lpn_main_menu', 'lpn_tool_add_reservoir', 'bpn_p_min']
+      .filter(k => src.indexOf("$ec_lang['" + k + "']=") < 0);
+    ok('every borrowed string already exists in ' + lang, missing.length === 0, missing.join(','));
+  });
+}
+
 console.log('\n--- Settings panel stays in sync ---');
 {
   const fieldsEl = L.settingsFieldsEl();
@@ -339,6 +480,9 @@ console.log('\n--- Settings panel stays in sync ---');
     })(fieldsEl);
     return found;
   }
+  // Clear the returning-visitor 2.5 the draw loop above seeded, so this section starts from the
+  // shipped default rather than from the previous block's leftovers.
+  L.settings().textSize = L.defaultSettings().textSize;
   L.rebuildSettingsFields();
   ok('panel opens on the shipped default', String(textSizeInputValue()) === '20', textSizeInputValue());
   L.settings().textSize = 37;                       // a writer that does NOT repaint the panel

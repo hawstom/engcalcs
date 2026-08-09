@@ -1424,8 +1424,16 @@ var EngCalcs = EngCalcs || {};
 			var lb = doc.labels[i], le = labelEls[lb.id] || { width: 10 },
 				an = lb.anchorNode ? nodeById(lb.anchorNode) : { x: 0, y: 0 },
 				px = lb.anchorNode ? an.x + lb.x : lb.x, py = lb.anchorNode ? an.y + lb.y : lb.y,
-				halfW = le.width / 2;
-			inc(px - halfW, py - 2); inc(px + halfW, py + 2);
+				halfW = le.width / 2,
+				// Half the label's OWN rendered height, not a constant. buildLabelEls() sets
+				// dominant-baseline:central, so py is the vertical centre and the text reaches
+				// half a font size either side -- times the label's own sizeMult, which is the
+				// part a constant cannot know. This was a hardcoded 2, correct only while the
+				// text size was 2.5; at the shipped default of 20 a title at sizeMult 2 is 40
+				// units tall and bbox() was reserving 4, so zoom-to-fit clipped it. Found
+				// 2026-08-09 adding the example's title block (Task 254).
+				halfH = effectiveFontSize(lb.sizeMult) / 2;
+			inc(px - halfW, py - halfH); inc(px + halfW, py + halfH);
 		}
 		for (i = 0; i < doc.links.length; i++) {
 			for (j = 0; j < doc.links[i].verts.length; j++) {
@@ -4862,20 +4870,15 @@ var EngCalcs = EngCalcs || {};
 			if (!window.confirm(pc.lpn_confirm_example || 'This adds the example to the network you already have. Continue?')) { return; }
 		}
 		saveUndoSnapshot();
-		// TEXT SIZE IS SET HERE, not merely defaulted (Tom, 2026-08-09: "Before the demonstration
-		// is drawn, we need to set the text size to 20"). Raising defaultSettings().textSize to 20
-		// was necessary but is NOT sufficient: loadFromStorage() does
-		// `Object.assign(defaultSettings(), savedSettings)`, so any visitor who has used this page
-		// before carries their stored 2.5 forward and the new default never reaches them. The
-		// example needs 20 at its 1400-unit extent regardless of what is in their localStorage.
-		// Safe to write now in a way it was not an hour ago: toggleSettingsPopup() rebuilds the
-		// panel on every open, so the Settings box and the map can no longer disagree.
-		// Still NOT captured by the Undo snapshot above -- `settings` is not part of `doc` -- so
-		// undoing the example leaves the text size at 20. One visible, user-editable number, and
-		// the alternative (snapshotting settings with the document) is a bigger change than the
-		// wart deserves.
-		settings.textSize = 20;
-		refreshFontSizes(); // applies the new size, and resizes symbols and label offsets with it
+		// THIS FUNCTION DELIBERATELY DOES NOT TOUCH settings.textSize. It did, briefly, because
+		// raising defaultSettings().textSize to 20 reaches only a first-time visitor -- a returning
+		// one carries their stored value through loadFromStorage()'s
+		// `Object.assign(defaultSettings(), savedSettings)`. Tom, 2026-08-09, chose the shipped
+		// default as the whole answer: *"How about we circumvent the settings and doc issue by just
+		// shipping with an initial default text size that works for our example network, namely 20?
+		// ... Anything other is on the user, not us."* A visitor who has changed their text size has
+		// expressed a preference, and an example is not a reason to overrule it. It also keeps
+		// `settings` out of a function whose undo snapshot cannot restore it.
 		// The reservoir sits at 50 ft / 15 m, in among the junctions it feeds (45-62 ft) rather
 		// than perched above them (Tom, 2026-07-30). A source high above the network makes the
 		// example a gravity system that would work with the pump deleted -- the pump's contribution
@@ -4949,6 +4952,59 @@ var EngCalcs = EngCalcs || {};
 			pipe._length = linkGeomLength(pipe);
 			rebuildLink(pipe);
 		}
+		// ---- annotations (Tom, 2026-08-09) ----
+		// A title block and two callouts, so the demonstration also demonstrates the Text element
+		// itself and its per-label size multiplier -- the fifth element type, otherwise unused here.
+		//
+		// EVERY STRING IS ONE THAT ALREADY EXISTS AND IS ALREADY TRANSLATED, which was Tom's own
+		// constraint ("to minimize translation load, we can compose it from existing lang strings").
+		// `menu_brand` is suite chrome, so it is translated in all 26 languages; `lpn_main_menu` and
+		// `lpn_tool_add_reservoir` are this page's own; `bpn_p_min` ("Lowest pressure") belongs to
+		// the sibling branched-network calculator and is translated wherever lpn_ is. Net cost: zero
+		// new keys.
+		//
+		// WHOLE LABELS ONLY -- never a clause cut out of a longer string. Tom asked for a callout
+		// carrying "Double-click a pipe to add or remove a vertex", and that text exists ONLY as the
+		// third sentence of `lpn_mode_select`. Splicing it out is exactly the fragment composition
+		// CLAUDE.md bans (it breaks in gendered, word-order and RTL languages), so it is NOT done
+		// here; it would need a key of its own. Same reason there is no velocity callout: there is
+		// no "Highest velocity" string to borrow, only the bare word "Velocity".
+		var pcx = EngCalcs.pageConfig || {};
+		function annotate(x, y, anchorNode, text, sizeMult) {
+			if (!text) { return null; }   // key missing from pageConfig: draw nothing, never "Text"
+			var lb = addText(x, y, anchorNode);
+			lb.text = text;
+			lb.sizeMult = sizeMult;
+			// Same two steps the text/size fields in renderLabelFields() take after an edit: push the
+			// new content into the existing element and re-measure, rather than rebuilding it (a
+			// second buildLabelEls() would leave the first element orphaned in the DOM).
+			var le = labelEls[lb.id];
+			le.text.textContent = lb.text;
+			le.text.style.fontSize = effectiveFontSize(lb.sizeMult) + 'px';
+			try { le.width = le.text.getBBox().width; } catch (err) { /* pre-layout measure can throw; stale width stands */ }
+			updateLabelGeometry(lb.id);
+			return lb;
+		}
+		// Title block, centred on the drawing and above it (labels are centred on their x, and -y is
+		// up). Two lines at different sizes rather than one, so the size multiplier is visibly doing
+		// something a reader can then go and change.
+		annotate(5000, 4470, null, pcx.menu_brand, 2);
+		annotate(5000, 4560, null, pcx.lpn_main_menu, 1.5);
+		// Anchored callouts: the offset is from the node, and the label follows if the node moves.
+		annotate(r.x, r.y - 70, r.id, pcx.lpn_tool_add_reservoir, 1.5);
+		// "Lowest pressure" goes on nodes[2] -- the third ring junction -- which is the minimum in
+		// BOTH unit sets. Hard-coded rather than computed, because the solve is 300 ms away on the
+		// debounce and there are no pressures to compare yet at this point in the draw. That is only
+		// safe because example-network-harness.js asserts it: if a future tweak to demands or
+		// elevations moves the minimum elsewhere, the harness fails rather than the map lying.
+		//
+		// NOTE THE MINIMUM IS NOT THE ONE THE EXTREMA TICK MARKS. Tom found this and decided against
+		// fixing it, 2026-08-09: the reservoir is at zero gauge pressure and is almost always the
+		// network low, so it wins the "low" tick and no junction is marked. The fix would be a rule
+		// and a checkbox ("ignore reservoirs during pressure extrema") or a silent special case, and
+		// he judged both worse than the wart. This callout is the cheap way to point at the number
+		// that actually matters.
+		annotate(nodes[2].x + 40, nodes[2].y - 70, nodes[2].id, pcx.bpn_p_min, 1.5);
 		updateEmptyHint();
 		saveToStorage();
 		zoomExtent();

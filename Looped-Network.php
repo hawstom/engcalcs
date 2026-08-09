@@ -261,6 +261,14 @@ EngCalcs.pageConfig = {
 	lpn_tip_select: <?=json_encode($ec_lang['lpn_tip_select'])?>,
 	lpn_tip_labels_draggable: <?=json_encode($ec_lang['lpn_tip_labels_draggable'])?>,
 	bpn_demand: <?=json_encode($ec_lang['bpn_demand'])?>,
+	<?php // Annotations on the example network (Task 254). Composed ENTIRELY from strings that
+	      // already exist and are already translated, per Tom 2026-08-09 ("to minimize translation
+	      // load, we can compose it from existing lang strings") -- menu_brand is suite chrome and
+	      // so is translated in all 26 languages; bpn_p_min belongs to the sibling branched-network
+	      // calculator and is translated wherever lpn_ is. Neither adds a single key to translate. ?>
+	menu_brand: <?=json_encode($ec_lang['menu_brand'])?>,
+	lpn_main_menu: <?=json_encode($ec_lang['lpn_main_menu'])?>,
+	bpn_p_min: <?=json_encode($ec_lang['bpn_p_min'])?>,
 	lpn_id_invalid: <?=json_encode($ec_lang['lpn_id_invalid'])?>,
 	lpn_id_taken: <?=json_encode($ec_lang['lpn_id_taken'])?>,
 	lpn_diag_no_fixed_head: <?=json_encode($ec_lang['lpn_diag_no_fixed_head'])?>,
