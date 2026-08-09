@@ -1,55 +1,67 @@
 {
-  "sprint": "245",
-  "description": "About.php resync (about_body_html, about_main_desc) plus the new navbar key menu_libre (Task 244). Wave 0 run inline by CC on 2026-08-09 rather than by a spawned agent -- three strings is below the threshold where a dedicated agent adds anything. Falsification pass: for each changed string, enumerate every plausible reading; more than one reading means propose a rewrite.",
-  "entries": [
-    {
-      "key": "about_main_desc",
-      "source": "wave0",
-      "lang": "en",
-      "complaint": "'Mission, Free Libre Open Source Software, and Contributing' is a comma-separated list of topics whose middle item is itself an unpunctuated four-word acronym expansion. A reader scanning the list cannot tell where item two starts and ends.",
-      "readings": [
-        "three topics: Mission / Free Libre Open Source Software / Contributing",
-        "five topics: Mission / Free / Libre / Open Source Software / Contributing"
-      ],
-      "disposition": "english",
-      "resolution": "Rewritten to 'Mission, Libre Software, and Contributing'. Two words cannot be misparsed as a sub-list, and it now matches the navbar term Tom chose the same day (menu_libre), so the site says one thing in both places. The full 'Free Libre Open Source License' expansion survives where it belongs -- as the h3 heading inside about_body_html, where heading position cues it as an acronym expansion rather than a list."
-    },
-    {
-      "key": "menu_libre",
-      "source": "wave0",
-      "lang": "en",
-      "complaint": "'Libre' is a loanword in English carrying a license meaning that the word itself does not supply. It lands perfectly in the Romance languages, where libre/livre/libero/liber is the ordinary word for free, and lands as an opaque transliteration in am, ar, bn, fa, he, hi, km, my, ps, ur, zh -- precisely the audiences the mission targets.",
-      "readings": [
-        "software licensed so that users are free to use, study, modify and redistribute it (intended)",
-        "software that costs nothing (gratis)",
-        "an untranslatable brand name, to be transliterated phonetically"
-      ],
-      "disposition": "intent",
-      "resolution": "CLOSED 2026-08-09, by Tom, in two channels. (1) He authored $ec_lang_syn['menu_libre'] himself, declining CC's draft -- 'FLOSS (Free Libre Open Source Software), Liberated Software, Liberty Software, Freedom Software, or Software you are free to use, study, change, and share', with avoid guards for the gratis sense and for transliteration. (2) CC added glossary.json term 'libre software' carrying each language's ESTABLISHED published term rather than a coinage, because the English coinages exist only to work around a gap in English and must not be exported; four avoid guards, transliteration first. Also fixed: 'menu' and 'about' were missing from prefixToTermNames(), which would have made the whole glossary entry invisible to every agent. Verified the guards land in payload_am prompt_context_by_prefix.menu. ORIGINAL NOTE FOR THE RECORD -- The English is deliberate: Tom chose it 2026-08-09 over 'Freely yours' and 'Community software', citing LibreOffice as precedent, and the choice is sound for its own audience. So the routing rule sends this to $ec_lang_syn, not to an English rewrite. CC proposed an entry; Tom declined it and said 2026-08-09 that he would edit the wording himself, which is the correct owner for this channel. $ec_lang_syn['menu_libre'] is therefore in place but EMPTY, awaiting his text. THE SPRINT MUST NOT LAUNCH UNTIL IT IS FILLED -- shipping menu_libre with an empty syn is exactly the transliteration risk described above, and it lands on am/km/my/ur/bn/ps, the audiences the mission is for."
-    },
-    {
-      "key": "about_body_html",
-      "source": "wave0",
-      "lang": "en",
-      "complaint": "List item 'Translations: Correct wording. Improve or add a language.' -- 'Correct wording' is ambiguous between imperative verb + object and adjective + noun. English readers resolve it from the sibling items, which are all imperative; a translator working the string in isolation may not.",
-      "readings": [
-        "correct the wording (imperative -- intended)",
-        "wording that is correct (adjective phrase, a sentence fragment)"
-      ],
-      "disposition": "english",
-      "resolution": "CLOSED 2026-08-09. Tom chose 'Suggest better wording.' over 'Correct our wording.' and over leaving it. The imperative is now unambiguous -- 'suggest' has no adjective reading -- and it also aligns the About page with CONTRIBUTING.md, which asks contributors to describe a wording improvement rather than edit the string directly, because the glossary records WHY each term was chosen. Flagged by CC's Wave 0, ruled on by Tom, who owns the voice."
-    },
-    {
-      "key": "about_body_html",
-      "source": "wave0",
-      "lang": "en",
-      "complaint": "'This is an invitation, not a price.' does not name what the invitation is TO. The paragraph that follows supplies it by implication (use and modify the code), but the sentence alone is a rhetorical figure rather than a proposition.",
-      "readings": [
-        "the license is an offer extended to you, not a transaction (intended)",
-        "some unnamed invitation is being contrasted with some unnamed cost"
-      ],
-      "disposition": "dismissed",
-      "resolution": "Dismissed as an English defect. It is Tom's own sentence and a deliberate rhetorical opener, the surrounding paragraph resolves it in the very next sentence, and the equivalent figure exists in every target language. Translators are told in the sprint prompt to render the rhetorical contrast rather than calque the nouns."
-    }
-  ]
+    "sprint": "245",
+    "description": "About.php resync (about_body_html, about_main_desc) plus the new navbar key menu_libre (Task 244). Wave 0 run inline by CC on 2026-08-09 rather than by a spawned agent -- three strings is below the threshold where a dedicated agent adds anything. Falsification pass: for each changed string, enumerate every plausible reading; more than one reading means propose a rewrite.",
+    "entries": [
+        {
+            "key": "about_main_desc",
+            "source": "wave0",
+            "lang": "en",
+            "complaint": "'Mission, Free Libre Open Source Software, and Contributing' is a comma-separated list of topics whose middle item is itself an unpunctuated four-word acronym expansion. A reader scanning the list cannot tell where item two starts and ends.",
+            "readings": [
+                "three topics: Mission / Free Libre Open Source Software / Contributing",
+                "five topics: Mission / Free / Libre / Open Source Software / Contributing"
+            ],
+            "disposition": "english",
+            "resolution": "Rewritten to 'Mission, Libre Software, and Contributing'. Two words cannot be misparsed as a sub-list, and it now matches the navbar term Tom chose the same day (menu_libre), so the site says one thing in both places. The full 'Free Libre Open Source License' expansion survives where it belongs -- as the h3 heading inside about_body_html, where heading position cues it as an acronym expansion rather than a list."
+        },
+        {
+            "key": "menu_libre",
+            "source": "wave0",
+            "lang": "en",
+            "complaint": "'Libre' is a loanword in English carrying a license meaning that the word itself does not supply. It lands perfectly in the Romance languages, where libre/livre/libero/liber is the ordinary word for free, and lands as an opaque transliteration in am, ar, bn, fa, he, hi, km, my, ps, ur, zh -- precisely the audiences the mission targets.",
+            "readings": [
+                "software licensed so that users are free to use, study, modify and redistribute it (intended)",
+                "software that costs nothing (gratis)",
+                "an untranslatable brand name, to be transliterated phonetically"
+            ],
+            "disposition": "intent",
+            "resolution": "CLOSED 2026-08-09, by Tom, in two channels. (1) He authored $ec_lang_syn['menu_libre'] himself, declining CC's draft -- 'FLOSS (Free Libre Open Source Software), Liberated Software, Liberty Software, Freedom Software, or Software you are free to use, study, change, and share', with avoid guards for the gratis sense and for transliteration. (2) CC added glossary.json term 'libre software' carrying each language's ESTABLISHED published term rather than a coinage, because the English coinages exist only to work around a gap in English and must not be exported; four avoid guards, transliteration first. Also fixed: 'menu' and 'about' were missing from prefixToTermNames(), which would have made the whole glossary entry invisible to every agent. Verified the guards land in payload_am prompt_context_by_prefix.menu. ORIGINAL NOTE FOR THE RECORD -- The English is deliberate: Tom chose it 2026-08-09 over 'Freely yours' and 'Community software', citing LibreOffice as precedent, and the choice is sound for its own audience. So the routing rule sends this to $ec_lang_syn, not to an English rewrite. CC proposed an entry; Tom declined it and said 2026-08-09 that he would edit the wording himself, which is the correct owner for this channel. $ec_lang_syn['menu_libre'] is therefore in place but EMPTY, awaiting his text. THE SPRINT MUST NOT LAUNCH UNTIL IT IS FILLED -- shipping menu_libre with an empty syn is exactly the transliteration risk described above, and it lands on am/km/my/ur/bn/ps, the audiences the mission is for."
+        },
+        {
+            "key": "about_body_html",
+            "source": "wave0",
+            "lang": "en",
+            "complaint": "List item 'Translations: Correct wording. Improve or add a language.' -- 'Correct wording' is ambiguous between imperative verb + object and adjective + noun. English readers resolve it from the sibling items, which are all imperative; a translator working the string in isolation may not.",
+            "readings": [
+                "correct the wording (imperative -- intended)",
+                "wording that is correct (adjective phrase, a sentence fragment)"
+            ],
+            "disposition": "english",
+            "resolution": "CLOSED 2026-08-09. Tom chose 'Suggest better wording.' over 'Correct our wording.' and over leaving it. The imperative is now unambiguous -- 'suggest' has no adjective reading -- and it also aligns the About page with CONTRIBUTING.md, which asks contributors to describe a wording improvement rather than edit the string directly, because the glossary records WHY each term was chosen. Flagged by CC's Wave 0, ruled on by Tom, who owns the voice."
+        },
+        {
+            "key": "about_body_html",
+            "source": "wave0",
+            "lang": "en",
+            "complaint": "'This is an invitation, not a price.' does not name what the invitation is TO. The paragraph that follows supplies it by implication (use and modify the code), but the sentence alone is a rhetorical figure rather than a proposition.",
+            "readings": [
+                "the license is an offer extended to you, not a transaction (intended)",
+                "some unnamed invitation is being contrasted with some unnamed cost"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Dismissed as an English defect. It is Tom's own sentence and a deliberate rhetorical opener, the surrounding paragraph resolves it in the very next sentence, and the equivalent figure exists in every target language. Translators are told in the sprint prompt to render the rhetorical contrast rather than calque the nouns."
+        },
+        {
+            "key": "about_body_html",
+            "source": "translator",
+            "lang": "ru, zh",
+            "complaint": "TWO LANGUAGES FLAGGED THIS INDEPENDENTLY. The h3 heading \"Free Libre Open Source License\" stacks three near-synonymous English qualifiers. Russian collapses Free and Libre into one word (свободное); Chinese collapses them into 自由. Both translators had to compress the three-way emphasis and both reported the asymmetry unprompted, each asking whether the heading names three distinct facets or is emphatic repetition of one.",
+            "readings": [
+                "three distinct legal/philosophical facets, i.e. the FLOSS acronym expanded",
+                "emphatic English repetition of a single concept"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Dismissed as an English defect, but recorded because the signal is real and the reasoning should not be re-derived. The heading IS the FLOSS acronym expanded, and Tom chose that expansion deliberately on 2026-08-09 as the distinguishing term for this project; the redundancy is the point in English, where no single unambiguous word exists. Compression in languages that have such a word is the CORRECT outcome, not a loss -- ru свободное and zh 自由 already carry what the English needs three words to say. Both translators did exactly the right thing and neither proposed an English rewrite. If a THIRD language raises it, revisit under the 3-independent-languages rule; two is not yet an English-source signal."
+        }
+    ]
 }
