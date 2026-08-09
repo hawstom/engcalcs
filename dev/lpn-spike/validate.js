@@ -26,6 +26,10 @@
 
 const fs = require('fs');
 const path = require('path');
+// bootstrap.js FIRST: it supplies EngCalcs.G out of js/Calculators.lib.js, which the browser
+// loads before lpn-solver.js but a Node require() would skip. Without it minor-loss and
+// Darcy-Weisbach cases silently solve to 'no head loss' and report success. See bootstrap.js.
+require('./bootstrap.js');
 const EngCalcs = require('../../js/lpn-solver.js');
 const cases = require('./cases.js');
 

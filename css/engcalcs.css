@@ -368,25 +368,25 @@ html[lang="zh"] .ec-welcome {
    brand, not as a nav destination. Deliberately NOT .nav-link: nav links carry Bootstrap's
    nav padding and hover affordance, which is what made it read as one menu item among many.
 
-   margin-inline-start rather than margin-left, and the separator uses ::before rather than a
-   literal character, because 5 of the 27 languages are RTL -- the mark must land on the
-   trailing side of the brand in both directions, and a hard-coded "|" would strand itself on
-   the wrong edge. */
+   NO SEPARATOR AND NO GAP -- Tom's second browser review, 2026-08-09, marked both on a
+   screenshot: "I think A should be removed. And I think that there is no need for gap B.
+   Can't they be like one string, separated only by a space?" A was a "|" glyph this rule used
+   to draw; B was Bootstrap's own .navbar-brand margin-right: 1rem, which is why zeroing our
+   own margin alone would not have closed it. Both are gone, leaving a single space, so the
+   name and the claim read as one continuous phrase. They stay distinguishable by colour and
+   by the GitHub mark rather than by punctuation.
+
+   margin-inline-start rather than margin-left because 5 of the 27 languages are RTL -- the
+   mark must land on the trailing side of the brand in both directions. */
+.navbar > .navbar-brand { margin-inline-end: 0; }
 .ec-nav-libre {
 	display: inline-flex;
 	align-items: center;
-	margin-inline-start: 0.55rem;
+	margin-inline-start: 0.4rem;
 	font-size: 0.85rem;
 	white-space: nowrap;
 	text-decoration: none;
 	color: #5a6570;
-}
-.ec-nav-libre::before {
-	content: "|";
-	margin-inline-end: 0.55rem;
-	color: #b9c0c7;
-	font-size: 1.05rem;
-	line-height: 1;
 }
 .ec-nav-libre:hover, .ec-nav-libre:focus { color: #1a6faf; text-decoration: underline; }
 .ec-nav-libre > .ec-icon { margin-inline-end: 0.3em; }
@@ -398,7 +398,6 @@ html[lang="zh"] .ec-welcome {
    the text is hidden visually rather than removed from the accessibility tree. */
 @media (max-width: 400px) {
 	.ec-nav-libre { font-size: 0; }
-	.ec-nav-libre::before { font-size: 1.05rem; }
 	/* .ec-icon sizes itself in em, so the font-size: 0 above would collapse the mark to
 	   nothing along with the word. Re-assert it in rem, which the parent cannot zero. */
 	.ec-nav-libre > .ec-icon { width: 1.15rem; height: 1.15rem; margin-inline-end: 0; }
