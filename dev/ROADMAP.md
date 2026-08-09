@@ -99,27 +99,41 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **OPEN — add the suggestion-box instruction to the standard agent prompt template**, so it is
     not re-typed per sprint and cannot be forgotten.
 
-- 45|240| **Two `lpn_` strings cannot be fixed in English, only in code — run-time sentence fragments.**
-  Surfaced 2026-08-08 by the adversarial Wave 0 pass (Task 239), and logged here because they are the
-  findings that pass could *not* close: no English rewrite reaches them.
-  - **`lpn_ago_unknown` / `lpn_ago_minutes` / `lpn_ago_hours` / `lpn_ago_days`** are fragments
-    substituted into `{x} ago` (`js/looped-network.js:3025-3030`) inside four
-    `lpn_lock_open_heading_*` sentences. **English postposes "ago"; Spanish fronts it** — *hace 5
-    minutos*. So a translator who correctly localises the fragment breaks the host sentence, and one
-    who correctly localises the host sentence cannot use the fragment. There is no wording that
-    works; the construction itself is the defect.
-    **Fix:** compose whole sentences per branch — one complete, translatable string for each of
-    unknown/minutes/hours/days with `{n}` inside it — instead of concatenating a fragment with a
-    suffix. Costs 4 keys and removes a whole class of breakage.
-  - **`lpn_project_copy_suffix` = `" (copy)"`** — the leading space is load-bearing (it is
-    concatenated straight onto a project name) and is exactly what a careful translator or tooling
-    strips. **Fix:** put the space at the call site, so the translatable string is `(copy)` and
-    cannot be silently broken by trimming.
-  - **The general lesson, worth applying beyond these two:** any string that is a *fragment* of a
-    sentence assembled at run time is a latent i18n defect, because word order is not universal.
-    Grep for `.replace('{` and string concatenation onto a translated value before the next
-    calculator ships.
+- 25|240| **`lpn_project_copy_suffix` carries a load-bearing leading space.**
+  `" (copy)"` is concatenated straight onto a project name (`js/looped-network.js:2831`, `:4161`), so
+  the leading space is functional — and leading whitespace is exactly what a careful translator or a
+  translation tool strips. **Fix:** move the space to the call site so the translatable string is
+  `(copy)` and cannot be silently broken.
+  - **The `lpn_ago_*` half of this task was WITHDRAWN 2026-08-08 — the finding was wrong.** The Wave 0
+    agent claimed the fragments were spliced into `"{x} ago"` and that Spanish therefore could not
+    render them. **Tom caught it:** *"Spanish can say 'hace {minutes} minutos' while English says
+    '{minutes} ago'. The concept is good. Did you misunderstand and build it wrong?"* No — it was
+    built right. `"ago"` lives in the **host** sentence, never in the fragment: en
+    `the last edit was {x} ago` / es `la última edición fue hace {x}`, with the fragment supplying
+    only `{n} minutos`. Composed, Spanish reads *"la última edición fue hace 5 minutos"*, and has
+    been shipping correctly all along.
+  - **Kept as a record, not deleted**, because a withdrawn finding is data about the *pass*: an
+    adversarial reviewer over-calls, and the orchestrator relaying it without checking the composed
+    output is the failure mode to watch. The general caution still stands — a run-time sentence
+    fragment IS a latent i18n defect — but this particular instance is a correct implementation.
 
+- 40|241| **Units are two clicks deep in their own popover, and Tom could not find them.**
+  Raised 2026-08-08: *"I think we have a serious bug. The units selectors are not available on lpn
+  that I can see."* Verified in a real browser — **they are present and they work**: Settings →
+  Units… opens `lpn_units_popup` and all 7 family-bound selectors appear. Nothing is broken and
+  nothing disappeared.
+  - **The finding is discoverability, and it is strong evidence.** Tom moved Units from View to
+    Settings himself in Task 211 (2026-08-04, *"Units is not a view feature. It is a math and
+    engineering feature"* — a correct call). **If the person who chose the location cannot find it
+    three days later, no first-time user will.**
+  - **His recollection points at the fix.** He remembered units living *in the Settings panel
+    alongside the decimal-places inputs*. They do not: Task 211 put them in a **separate popover**
+    reached from the Settings **menu**, and the per-field decimals from Task 189 went into the
+    **Labels** popover, not Settings. Three panels, one mental model.
+  - **Proposed:** fold the units strip into the Settings panel as its own section, and drop
+    `lpn_units_popup`. The panel is already sectioned, the strip is already a flex row, and this
+    removes a popover and a menu row rather than adding one. Needs Tom's go — it changes a layout he
+    negotiated three days ago.
 - 40|235| **The glossary's `pressure` and `elevation` entries hold the UPSTREAM label form in 22
   languages.** Found during the Task 146.06 sprint, 2026-08-08 — by a translation agent, which is
   worth noting: the tr agent was handed `preferred_translation` = "Memba basıncı" (*upstream*

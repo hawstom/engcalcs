@@ -85,7 +85,7 @@ exports.run = async function ({ browser, report }) {
 		const before = (await a.tabs()).length;
 		await a.drawExample();
 		report.ok(await a.currentTabDirty(), 'editing still works with no broker at all');
-		await a.menuClick('New');
+		await a.menuClick('New project');
 		report.eq((await a.tabs()).length, before + 1, 'and so does everything else — a lock outage is not an outage');
 		await a.unblockBroker();
 

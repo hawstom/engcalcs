@@ -27,7 +27,7 @@ exports.run = async function ({ browser, report }) {
 
 		// A second project, in a second file, in the same browser. This is the "a different project
 		// of ours" case — the one the confirm has to be able to name.
-		await a.menuClick('New');
+		await a.menuClick('New project');
 		await a.drawExample();
 		await a.queuePick(OTHER);
 		await a.menuClick('Save as…');
@@ -37,7 +37,7 @@ exports.run = async function ({ browser, report }) {
 
 		// --- onto a file holding a DIFFERENT project ---------------------------
 		// Back to the first project, and try to save it over the second's file.
-		await a.menuClick('New');
+		await a.menuClick('New project');
 		await a.drawExample();
 		await a.answerConfirmsWith(false);              // read the warning, back out
 		const beforeBytes = await a.readFile(OTHER);

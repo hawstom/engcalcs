@@ -176,8 +176,8 @@
                 "a duration of unknown length, to be followed by 'ago'",
                 "a standalone noun phrase meaning 'an unknown moment'"
             ],
-            "disposition": "refer-to-human",
-            "resolution": "NOT fixable in English: the strings are run-time fragments substituted into \"{x} ago\", and languages that front the construction (es \"hace 5 minutos\") cannot produce a working fragment at all. This needs a CODE change -- compose whole sentences per branch instead of concatenating -- logged as ROADMAP Task 240. Left open deliberately: it is a real defect that no English rewrite can close."
+            "disposition": "dismissed",
+            "resolution": "WITHDRAWN 2026-08-08 -- the finding was WRONG, and Tom caught it: \"Spanish can say hace {minutes} minutos while English says {minutes} ago. The concept is good.\" Verified in the source: \"ago\" lives in the HOST sentence, not in the fragment. en lpn_lock_open_heading_times = \"the last edit was {x} ago\"; es = \"la ultima edicion fue hace {x}\"; fragment es lpn_ago_minutes = \"{n} minutos\". Composed, Spanish reads \"la ultima edicion fue hace 5 minutos\" -- correct, and already shipping. The agent assumed the fragment was spliced into \"{x} ago\"; it is not. No defect. Recorded rather than deleted, because a withdrawn finding is evidence about the PASS (an adversarial reviewer will over-call) and deleting it would hide that."
         },
         {
             "key": "lpn_notes_4_term",
@@ -325,8 +325,8 @@
                 "go back / undo the last action",
                 "return to a previous version"
             ],
-            "disposition": "refer-to-human",
-            "resolution": "English kept (established idiom or bare menu verb the pass itself recommended not renaming), but the translator still has to guess. These are the cases the routing rule sends to $ec_lang_intent -- and intent is off-limits to AI without Tom approving the diff, so this stays open until he rules on the proposed synonyms."
+            "disposition": "intent",
+            "resolution": "$ec_lang_intent written 2026-08-08 in Tom's own wording."
         },
         {
             "key": "lpn_project_copy_suffix",
@@ -339,7 +339,7 @@
                 "the same string without its leading space"
             ],
             "disposition": "refer-to-human",
-            "resolution": "The leading space in \" (copy)\" is load-bearing and is exactly what a careful translator strips. The robust fix is in code (append the space at the call site, not in the string), logged with Task 240."
+            "resolution": "CONFIRMED at js/looped-network.js:2831 and :4161 -- the value is concatenated directly onto a project name, so the leading space is load-bearing. Still a code fix (Task 240), still awaiting Tom."
         },
         {
             "key": "lpn_notes_5_def",
@@ -376,8 +376,8 @@
                 "the imperative: enter select mode (intended)",
                 "the noun: selection"
             ],
-            "disposition": "refer-to-human",
-            "resolution": "English kept (established idiom or bare menu verb the pass itself recommended not renaming), but the translator still has to guess. These are the cases the routing rule sends to $ec_lang_intent -- and intent is off-limits to AI without Tom approving the diff, so this stays open until he rules on the proposed synonyms."
+            "disposition": "intent",
+            "resolution": "$ec_lang_intent written 2026-08-08 in Tom's own wording."
         },
         {
             "key": "lpn_new_text",
@@ -389,7 +389,7 @@
                 "the name of the text tool"
             ],
             "disposition": "refer-to-human",
-            "resolution": "English kept (established idiom or bare menu verb the pass itself recommended not renaming), but the translator still has to guess. These are the cases the routing rule sends to $ec_lang_intent -- and intent is off-limits to AI without Tom approving the diff, so this stays open until he rules on the proposed synonyms."
+            "resolution": "STILL OPEN, and the proposed intent was corrected before writing. Tom proposed \"Place (add) a new text object on the map\" and asked why this would not be a command. Verified at js/looped-network.js:1647-1648: the string is the \"text\" property of the object created -- the literal words that land on the drawing. The command is a separate key, lpn_tool_add_text, which happens to share the English \"Text\". An intent phrased as a command would produce exactly the defect it is meant to prevent (a label reading \"Anadir texto\" on the user's map). Awaiting Tom on the corrected wording."
         },
         {
             "key": "lpn_tab_duplicate",
@@ -400,8 +400,8 @@
                 "make a copy of this project (intended)",
                 "a duplicate / this item is a duplicate"
             ],
-            "disposition": "refer-to-human",
-            "resolution": "English kept (established idiom or bare menu verb the pass itself recommended not renaming), but the translator still has to guess. These are the cases the routing rule sends to $ec_lang_intent -- and intent is off-limits to AI without Tom approving the diff, so this stays open until he rules on the proposed synonyms."
+            "disposition": "intent",
+            "resolution": "$ec_lang_intent written 2026-08-08 in Tom's own wording."
         },
         {
             "key": "lpn_lock_dismiss",
@@ -425,8 +425,8 @@
                 "position of the map key (intended)",
                 "position of a legend / story"
             ],
-            "disposition": "refer-to-human",
-            "resolution": "English kept (established idiom or bare menu verb the pass itself recommended not renaming), but the translator still has to guess. These are the cases the routing rule sends to $ec_lang_intent -- and intent is off-limits to AI without Tom approving the diff, so this stays open until he rules on the proposed synonyms."
+            "disposition": "intent",
+            "resolution": "$ec_lang_intent written 2026-08-08 in Tom's own wording."
         },
         {
             "key": "lpn_pump_curve_source",

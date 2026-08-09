@@ -8,7 +8,7 @@ const { Session } = require('../lib/session');
 
 exports.title = '3. The File menu';
 
-const EXPECTED = ['New', 'Open…', 'Save', 'Save as…', 'Save all', 'Revert', 'Close'];
+const EXPECTED = ['New project', 'Open…', 'Save', 'Save as…', 'Save all', 'Revert', 'Close'];
 
 exports.run = async function ({ browser, report }) {
 	const a = await Session.open(browser, 'A');
@@ -25,7 +25,7 @@ exports.run = async function ({ browser, report }) {
 		report.ok(by('Revert').disabled, 'Revert is greyed with no file to revert to');
 		report.ok(!by('Save').disabled, 'Save is live — this browser can connect to a file');
 		report.ok(!by('Save as…').disabled, 'Save as is always live');
-		report.ok(!by('New').disabled && !by('Open…').disabled && !by('Close').disabled,
+		report.ok(!by('New project').disabled && !by('Open…').disabled && !by('Close').disabled,
 			'New, Open and Close are always live');
 
 		// Nothing is written behind your back. The punch list asks for a two-minute wait; the same

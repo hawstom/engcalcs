@@ -1096,6 +1096,7 @@ $ec_lang['lpn_main_menu']='Looped Pipe Network (Map Interface)';
 $ec_lang['lpn_main_title']='Free Online Looped Pipe Network Calculator with Map Interface';
 $ec_lang['lpn_main_desc']='Pressure and Flow in a Looped Pipe Network You Draw on a Map';
 $ec_lang['lpn_tool_select']='Select';
+$ec_lang_intent['lpn_tool_select']='Select mode; the mode (state) in which you pick (select, choose, pick, point at, indicate, signal) things to act on rather than add things.';
 $ec_lang['lpn_tool_add_junction']='Junction';
 $ec_lang['lpn_tool_add_reservoir']='Reservoir';
 $ec_lang['lpn_tool_add_pipe']='Pipe';
@@ -1196,6 +1197,7 @@ $ec_lang['lpn_file_open']='Open…';
 $ec_lang['lpn_file_save']='Save';
 $ec_lang['lpn_file_saveas']='Save as…';
 $ec_lang['lpn_file_revert']='Revert';
+$ec_lang_intent['lpn_file_revert']='Throw away (discard) my changes by reloading the saved version (undo all changes, go back to the saved file).';
 $ec_lang['lpn_file_close']='Close';
 // The tab strip. These are titles on small controls, so each has to stand alone with no sentence
 // around it.
@@ -1203,6 +1205,7 @@ $ec_lang['lpn_tab_new']='New project';
 $ec_lang['lpn_tab_all']='All projects';
 $ec_lang['lpn_tab_menu']='Project menu';
 $ec_lang['lpn_tab_duplicate']='Duplicate';
+$ec_lang_intent['lpn_tab_duplicate']='Duplicate (Copy or Make a copy of) this.';
 $ec_lang['lpn_tab_unsaved']='Not saved to a file';
 $ec_lang['lpn_import_bad_file']='That file could not be read as a project saved from this page.';
 $ec_lang['lpn_import_no_room']='There is not enough browser storage left to add this project. Delete a project you no longer need and try again.';
@@ -1493,6 +1496,7 @@ $ec_lang['lpn_settings_map_height_px']='Map height (screen pixels)';
 // own note). It is a render cap, not a stored value -- say so instead of leaving the user to guess.
 $ec_lang['lpn_settings_map_height_tip']='On a small screen the map is drawn shorter than this, so that part of the page is always left to scroll.';
 $ec_lang['lpn_settings_legend_position']='Legend position';
+$ec_lang_intent['lpn_settings_legend_position']='The position where the key table (legend, map key — the box explaining the symbols) sits on the map. | avoid: legend as a myth or folk tale';
 $ec_lang['lpn_settings_legend_top_left']='Top left';
 $ec_lang['lpn_settings_legend_top_right']='Top right';
 $ec_lang['lpn_settings_legend_middle_left']='Middle left';
