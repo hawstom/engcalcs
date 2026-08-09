@@ -62,6 +62,18 @@
             ],
             "disposition": "dismissed",
             "resolution": "Dismissed as an English defect, but recorded because the signal is real and the reasoning should not be re-derived. The heading IS the FLOSS acronym expanded, and Tom chose that expansion deliberately on 2026-08-09 as the distinguishing term for this project; the redundancy is the point in English, where no single unambiguous word exists. Compression in languages that have such a word is the CORRECT outcome, not a loss -- ru свободное and zh 自由 already carry what the English needs three words to say. Both translators did exactly the right thing and neither proposed an English rewrite. If a THIRD language raises it, revisit under the 3-independent-languages rule; two is not yet an English-source signal."
+        },
+        {
+            "key": "about_body_html",
+            "source": "translator",
+            "lang": "my",
+            "complaint": "The new \"invitation, not a price\" paragraph uses BOTH senses of English \"free\" within three sentences: \"no free tier that can be withdrawn\" is the price sense, \"free for everyone now and forever to use and to modify\" is the freedom sense. That is precisely the distinction this suite instructs every other language to keep apart. Burmese has no word doing double duty, so the translator used two different words in one passage, losing the English rhetorical unity of the repeated word.",
+            "readings": [
+                "free = freedom throughout the paragraph",
+                "free = no-cost in this paragraph, freedom in the license paragraph above it"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Dismissed, and the translator was RIGHT on every point -- recorded so the reasoning is not re-derived. The paragraph does deliberately use both senses, and the English is not defective: an English reader disambiguates from \"tier\" (commercial) and from \"to use and to modify\" (freedom), and the contrast between the two senses is part of what the paragraph argues. Splitting into two words is the CORRECT handling, not a loss, and FOUR languages reached it independently without being told -- my, hi, bn and bg each chose a freedom word and a no-cost word for the two halves. That convergence is the evidence it needs no English fix. NOTE FOR A FUTURE PASS: this is the second distinct complaint about the word \"free\" in this one paragraph (see also the ru/zh heading entry). If Tom ever revisits the About copy, the cheap improvement is to name the commercial sense explicitly (\"no no-cost tier that can be withdrawn\"), but that is an editorial preference on his own sentence, not a defect, and does not justify a 26-language resync by itself."
         }
     ]
 }

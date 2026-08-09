@@ -2,7 +2,7 @@
     "meta": {
         "language": "de",
         "expected_key_count": 790,
-        "delta_key_count": 1,
+        "delta_key_count": 0,
         "exempt_key_count": 17,
         "exempt_keys": [
             "calc_units_us",
@@ -25,54 +25,17 @@
         ],
         "out_of_scope_key_count": 231,
         "coverage": "coverage: core calculators [mpf, mtc] x core languages [es, pt, fr, tr] (in scope iff calculator OR language is core; identity strings always)",
-        "active_prefixes": [
-            "menu"
-        ],
+        "active_prefixes": [],
         "requested_prefix": null,
         "notes": "Translate only keys in keys_to_translate; preserve HTML, units, and symbols.",
         "glossary_injection_notes": "Use prompt_context_by_prefix and glossary_terms_by_prefix.preferred_translation when available.",
         "context_notes": "Use key_context.neighbors to keep register consistent with nearby translated strings.",
         "syn_notes": "Use key_syn when present; these entries provide terse disambiguation comments only where translation risk exists."
     },
-    "prompt_context_by_prefix": {
-        "menu": "Use these preferred technical term translations when relevant:\n- libre software: Freie Software\n    DO NOT render as: free of charge, gratis, no-cost, or any price-sense rendering; phonetic transliteration of the English word \"libre\" as if it were a brand name; phonetic transliteration of \"open source\" where the language has its own term; wording that implies a free trial, a free tier, or a limited free version"
-    },
-    "glossary_terms_by_prefix": {
-        "menu": [
-            {
-                "term": "libre software",
-                "symbol": "",
-                "context": "Software licensed so that its users are free to run, study, modify and redistribute it -- the freedom sense, never the price sense. Appears as the navbar item (menu_libre) and in the About page license section. Tom chose the English word \"Libre\" deliberately on 2026-08-09, over \"Freely yours\" and \"Community software\", citing LibreOffice as precedent.",
-                "translation_notes": "2026-08-09 (Task 244): DEFER TO EACH LANGUAGE ESTABLISHED TERM, do not coin a new one. This concept has been translated by the free-software movement for decades and most of these languages have a settled, published phrase; ours must match it or it will read as an amateur calque. The English $ec_lang_syn entry deliberately offers coinages (Liberated \/ Liberty \/ Freedom Software) to convey the SENSE, because English lacks an unambiguous word -- that is an English-only problem and must NOT be exported. Where a language already distinguishes freedom from price (Romance libre\/livre\/libero\/liber, de frei, ru свободное), use that word and the trap disappears. Where it does not, translate the concept (software whose users hold the rights) rather than transliterating \"libre\" phonetically -- transliteration is the specific failure mode this entry exists to prevent, and it falls hardest on am, bn, km, my, ps, ur.",
-                "preferred_translation": "Freie Software"
-            }
-        ]
-    },
-    "keys_to_translate": {
-        "menu_libre": "Libre Software"
-    },
-    "keys": {
-        "menu_libre": "Libre Software"
-    },
-    "key_context": {
-        "menu_libre": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "menu_more",
-                    "value": "Mehr",
-                    "english": "More"
-                },
-                "next_translated": {
-                    "key": "template_welcome",
-                    "value": "Lasst Eure Ängste an der Tür; hier wird Liebe gesprochen. Ihr ruiniert nicht alles. Genießt auch die <a target=\"_blank\" href=\"https:\/\/hawsedc.com\/download.php\">kostenlosen HawsEDC AutoCAD-Tools.<\/a>",
-                    "english": "Drop your fears at the door; love is spoken here. You are not ruining everything. Enjoy the <a target=\"_blank\" href=\"https:\/\/hawsedc.com\/download.php\">free libre HawsEDC AutoCAD tools<\/a> too."
-                }
-            }
-        }
-    },
-    "key_syn": {
-        "menu_libre": "FLOSS (Free Libre Open Source Software), Liberated Software, Liberty Software, Freedom Software, or Software you are free to use, study, change, and share."
-    }
+    "prompt_context_by_prefix": [],
+    "glossary_terms_by_prefix": [],
+    "keys_to_translate": [],
+    "keys": [],
+    "key_context": [],
+    "key_syn": []
 }

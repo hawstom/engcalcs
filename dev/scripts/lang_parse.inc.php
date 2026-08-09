@@ -40,12 +40,39 @@
  */
 function ecParseLangAssignments(string $content): array
 {
-    $pattern = '/\$ec_lang\[\'([^\']+)\'\]\s*=\s*(?:\'((?:[^\'\\\\]|\\\\.)*)\'|"((?:[^"\\\\]|\\\\.)*)"|([^;]*));/m';
+    // POSSESSIVE QUANTIFIERS ARE LOAD-BEARING, and this is a correctness guard rather
+    // than a micro-optimization (found 2026-08-09). The original body-of-string pattern
+    // was (?:[^'\\]|\\.)* -- one alternation step PER CHARACTER, each pushing a
+    // backtrack frame onto PCRE's JIT stack. lang.ec.my.php's about_body_html is 3,438
+    // Burmese characters, and Burmese is 3 bytes per character in UTF-8, so that one
+    // value is 8,354 bytes. It exhausted the JIT stack, preg_match_all returned FALSE,
+    // and because the return value was never checked, this function handed back a
+    // SILENTLY TRUNCATED parse: 386 of 563 keys, everything after that line invisible.
+    // lang_syntax_validate.php then reported "no findings" for a file it could only see
+    // two thirds of, and the parity checker, the completion matrix and the payload
+    // generator were blind in exactly the same way -- all four read through here.
+    // (?:[^'\\]++|\\.)*+ matches the identical language with no backtracking at all: the
+    // two alternatives start with disjoint characters, so there is never a choice to
+    // reconsider. Non-Latin scripts make this reachable at ordinary paragraph lengths,
+    // so it will recur -- km, am, zh and the Indic scripts are all multi-byte.
+    $pattern = '/\$ec_lang\[\'([^\']++)\'\]\s*=\s*(?:\'((?:[^\'\\\\]++|\\\\.)*+)\'|"((?:[^"\\\\]++|\\\\.)*+)"|([^;]*+));/m';
     // PREG_UNMATCHED_AS_NULL is load-bearing: it distinguishes "this alternative did
     // not fire" (null) from "it fired and matched an empty string" ('').  Without it a
     // legitimately empty value -- $ec_lang['k']=''; -- is indistinguishable from an
     // unmatched group and falls through to the bare-expression branch.
-    preg_match_all($pattern, $content, $matches, PREG_SET_ORDER | PREG_UNMATCHED_AS_NULL);
+    $count = preg_match_all($pattern, $content, $matches, PREG_SET_ORDER | PREG_UNMATCHED_AS_NULL);
+
+    // NEVER return a partial parse. A truncated key list is far more dangerous than a
+    // crash: every caller treats "key absent" as "key missing from this language" and
+    // would cheerfully report clean, or queue 177 keys for retranslation that are
+    // already there. Fail loudly instead.
+    if ($count === false) {
+        throw new RuntimeException(
+            'ecParseLangAssignments: preg_match_all failed (' . preg_last_error_msg() . '). '
+            . 'The parse would have been silently truncated. If this is a JIT/backtrack '
+            . 'limit, a single language string has grown past what the pattern can scan.'
+        );
+    }
 
     $parsed = [];
     foreach ($matches as $m) {
