@@ -289,10 +289,19 @@ byId.lpn_toolbar.querySelectorAll = () => [];
     sepNodes.every(n => n.x > Math.min(...xs) && n.x < Math.max(...xs)
       && n.y > Math.min(...ys) && n.y < Math.max(...ys)),
     sepNodes.map(n => n.id + '(' + n.x + ',' + n.y + ')').join(' '));
-  // ...and the title block must stay tucked above the ring, not floated off into white space.
-  const titleGap = Math.min(...ys) - Math.max(...doc.labels.filter(t => !t.anchorNode).map(t => t.y));
-  ok('title block sits just above the ring, not stranded in white space',
-    titleGap > 0 && titleGap < 120, titleGap.toFixed(0) + ' units of clearance');
+  // ...and the title block must stay tucked above the ring without touching it. Measured edge to
+  // edge, not centre to node: the lower title line is `dominant-baseline: central`, so half its
+  // rendered height sticks out below its y. Too small and it collides with the ring's top node and
+  // that node's own data label; too large and zoom-to-fit shrinks the whole map for white space.
+  const lowerTitle = doc.labels.filter(t => !t.anchorNode)
+    .reduce((a, b) => (a.y > b.y ? a : b));
+  // Judged at the DEFAULT text size, not this run's seeded 2.5: the title's y is a fixed map
+  // coordinate, so the layout was composed for the size it ships with. A visitor who shrinks their
+  // text only opens the gap further, which is harmless.
+  const dts = L.defaultSettings().textSize;
+  const titleGap = Math.min(...ys) - (lowerTitle.y + dts * lowerTitle.sizeMult / 2);
+  ok('title block clears the ring top without stranding it in white space',
+    titleGap > 15 && titleGap < 80, titleGap.toFixed(1) + ' units at the shipped text size');
   // TEXT SIZE IS THE SHIPPED DEFAULT AND THE EXAMPLE MUST NOT TOUCH IT. Tom, 2026-08-09: ship a
   // default that suits the example, and "anything other is on the user, not us." So the stored 2.5
   // seeded above must survive the draw -- a visitor who set their own size keeps it.

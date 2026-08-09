@@ -1912,9 +1912,14 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
   - **The title block is tucked close to the ring, and its two lines are stacked by derivation.**
     `bbox()` includes the title, so white space above the drawing is space zoom-to-fit must shrink
     everything else to accommodate — which is why Tom asked for the lines 120 and 60 units further
-    south. The second line takes his 60 literally; the first is derived from it by half-heights plus
-    a gap, because a flat 120 would have overlapped them by 5 units at the default text size (the
+    south. The second line anchors the block and the first is derived from it by half-heights plus a
+    gap, because his flat 120 would have overlapped them by 5 units at the default text size (the
     lines are 40 and 30 units tall). Deriving also keeps the block tight at a non-default text size.
+    - Then back up 20 — *"I pushed too hard. Can you move them both up or move J2 down about 20?"*
+      **Moving the title, not J2, is the right half of that choice:** J2 is a ring vertex, and the
+      ring being exactly 1400 x 700 centred on 5000,5000 is worth more than 20 units of clearance
+      (dropping J2 makes it 1400 x 680, off-centre). The title block carries no such constraint.
+      Final clearance, edge to edge at the shipped text size, is 35 units.
   - **`bbox()` was reserving a constant ±2 for a Text label's height.** Correct only while the text
     size was 2.5; at the shipped 20 with the title's x2 multiplier the label is 40 units tall and
     the fit clipped it. Now half the label's own `effectiveFontSize(lb.sizeMult)`.

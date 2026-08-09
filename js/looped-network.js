@@ -5065,12 +5065,18 @@ var EngCalcs = EngCalcs || {};
 		// title, so every unit of white space between it and the drawing is a unit the fit has to
 		// shrink everything else to accommodate. Tom, 2026-08-09, asked for the two lines 120 and 60
 		// units further south for exactly that reason.
-		// The SECOND line takes his 60 literally (4560 -> 4620, clearing the ring top at 4650). The
-		// first is then DERIVED from it rather than moved by his 120: the lines are 40 and 30 units
-		// tall at the default text size, so a flat 120 would have overlapped them by 5 units. This
-		// stacks them by their own half-heights plus a gap, which also keeps the block tight if the
-		// visitor's text size is not the default.
-		var titleY = 4620;
+		// The SECOND line anchors the block and the FIRST is DERIVED from it, stacked by their own
+		// half-heights plus a gap -- not moved by a flat amount. Tom asked for 120 and 60; 60 landed
+		// the second line at 4620, but a flat 120 would have OVERLAPPED the two by 5 units, because
+		// they are 40 and 30 units tall at the default text size. Deriving also keeps the block
+		// tight if the visitor's text size is not the default.
+		// Then back up 20 (4620 -> 4600): Tom, 2026-08-09, "I pushed too hard. Can you move them
+		// both up or move J2 down about 20?" -- and moving the TITLE is the right half of that
+		// choice. J2 is a ring vertex, and the ring's 1400 x 700 extent centred exactly on 5000,5000
+		// is a property worth more than 20 units of clearance; dropping J2 would make it 1400 x 680
+		// off-centre. The title block has no such constraint. Clearance from the second line's
+		// bottom edge to the ring top is now ~35 units.
+		var titleY = 4600;
 		annotate(5000, titleY - (effectiveFontSize(2) + effectiveFontSize(1.5)) / 2 - 8, null, pcx.menu_brand, 2);
 		annotate(5000, titleY, null, pcx.lpn_main_menu, 1.5);
 		// Anchored callouts: the offset is from the node, and the label follows if the node moves.
