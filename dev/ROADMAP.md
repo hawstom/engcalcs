@@ -1131,34 +1131,16 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     checkable; just do not spend the blog/video headline on it.** Do not relitigate.
   - Consequence: raised 146.06 to 90 and 220 to 95.
 
-- 45|243| **Run the real EPANET engine in `lpn_` via WASM — as a second engine, not a replacement.**
-  Raised by Tom 2026-08-09. Package facts verified 2026-08-09, and they are better than expected.
-  - **Three different things share the name; only the app is the non-FLOSS one.** OWA-EPANET (the C
-    engine) is MIT. `epanet-js` + `@model-create/epanet-engine` (the npm toolkit/WASM build) are MIT,
-    © Luke Butler. Only the epanetjs.com *web app* is FSL-1.1-MIT (two-year delayed MIT). **We may
-    use the toolkit freely; MIT is GPL-3-compatible.** Ship the MIT text and attribution.
-  - **Measured:** `@model-create/epanet-engine` dist is one 458 KB ES module, **159 KB gzipped**, with
-    the WASM embedded — no second fetch, no build step, no `node_modules`. Vendor the file into
-    `js/` and add it to `sw.js`; the README's "no build pipeline" promise survives intact.
-  - **It buys features, not correctness.** `js/lpn-solver.js` already matches EPANET to 0.0002 ft on
-    Net1/2/3. What WASM adds is what we would otherwise hand-write: **tanks, valves (PRV/PSV/FCV/TCV),
-    extended-period simulation, controls/patterns, water quality, and near-free `.inp` interop
-    (Task 196)**. If we do not want those, WASM buys only a marketing claim we are told not to lead
-    with (Task 222) — so **gate this task on wanting the features, not on the claim.**
-  - **Costs, decided:** async `await ws.loadModule()` gate and a marshalling layer vs. today's
-    synchronous 0.4 ms keystroke solve; +159 KB on the one axis that is our differentiator (offline,
-    low bandwidth). **Therefore: keep `lpn-solver.js` as the default fast path, load WASM lazily only
-    when a feature needs it.** Keep our pre-solve structural diagnostics either way — EPANET returns
-    numeric error codes, which is worse UX than what we already ship.
-  - **THE SHAPE, settled 2026-08-09: an opt-in "Solve with the EPANET engine" toggle, off by
-    default.** Tom accepted the cost argument and asked for *"something minimal about the EPANET
-    engine, even if it's only an option that we don't normally have active."* That is the whole
-    design: lazy-load the 159 KB only when the toggle is flipped, so the default keystroke path
-    keeps its 0.4 ms synchronous solve and the offline bundle stays small — while the claim becomes
-    literally true and verifiable, which is what Task 222's litmus-test point needs. Build the
-    toggle before building tanks/valves/EPS; it is the cheap 90% of the value.
-  - Do not surface EPANET's numeric error codes wholesale — Tom, 2026-08-09: *"maybe we don't have
-    to present or translate most of them."* Map the few that matter onto our existing diagnostics.
+- 20|248| **What the EPANET toggle actually unlocks: tanks, valves, extended-period simulation.**
+  Task 243 shipped the engine and the toggle; none of this is built. The engine makes each of
+  these a mapping-and-UI job rather than a numerical one, which is the entire reason it was worth
+  vendoring. Do NOT start until someone asks for one — Task 243's own conclusion was that the
+  toggle is the cheap 90% of the value and these are the expensive 10%.
+
+- 15|249| **Translate the 5 `lpn_` engine keys into the core four.** `lpn_settings_engine_epanet`,
+  its tip, `lpn_engine_loading`, `_failed`, `_manning_note`. English shipped 2026-08-09; `lpn_` is
+  not a core calculator under the Task 203 cross, so es/pt/fr/tr only. Fold into the next `lpn_`
+  sprint rather than running one for five strings.
 
 - 40|244| **Standardize the distinguishing term, and put it in the navbar next to the language menu.**
   Tom, 2026-08-09, on epanet-js labelling itself "Open Source" while shipping FSL. `About.php` is
@@ -1709,6 +1691,26 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|243| **[DONE 2026-08-09] Real EPANET engine in `lpn_`, as an opt-in second engine.**
+  `js/lpn-epanet.js` + `js/vendor/` (epanet-js 0.9.0, MIT). Settings toggle, off by default;
+  678 KB lazy-imported only when checked, so the offline case pays nothing. Verified
+  `node dev/lpn-spike/validate_epanet.js` 8/8 against the native solver.
+  - **Manning is a real 0.6% disagreement and we KEPT OURS** — the opposite of the Task 213
+    Hazen-Williams call. Measured over an 8x diameter range, EPANET's C-M is a near-constant
+    0.9939–0.9944 of ours (*not* the truncated 16/3 exponent, which predicts 0.9924–0.9993 and is
+    refuted). Ours is the exact derivation, 10.2936; EPANET's implies 10.231. Adopting EPANET's
+    would desync this page from Manning-Pipe-Flow/-Head-Loss/-Trap, which carry most of our users.
+    Surfaced to the user, not hidden. **Do not relitigate.**
+  - **Vendored as `.js`, never `.mjs`** — module-ness comes from the import statement, but the
+    server must still send a JS MIME type and shared hosts routinely do not know `.mjs`. Same
+    reasoning chose the WASM-embedded build over a separate `.wasm`. See `js/vendor/README.md`.
+  - **`dev/lpn-spike/validate.js` had been silently FAILING** and was repaired in passing
+    (`bootstrap.js`). `EngCalcs.G` lives in `js/Calculators.lib.js`; a Node `require()` of
+    lpn-solver.js skips it, every minor-loss and D-W resistance went `NaN`, and the gradient floor
+    swallows `NaN` because `!(NaN > gradMin)` is true — so networks "converged" in 2 iterations to
+    no head loss and reported success. Browser was never affected. **The lesson is that a harness
+    nobody runs is worse than no harness: run both before trusting either.**
 
 - 0|245| **[DONE 2026-08-09] About-page resync + `menu_libre` into all 26 languages.** 3 keys ×
   26 agents (Sonnet). Final state: parity `missing 0, extra 0, equal_to_english 0`; drift manifest
