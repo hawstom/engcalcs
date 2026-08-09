@@ -126,6 +126,21 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     Settings himself in Task 211 (2026-08-04, *"Units is not a view feature. It is a math and
     engineering feature"* — a correct call). **If the person who chose the location cannot find it
     three days later, no first-time user will.**
+  - **THE HISTORY, from the commits Tom asked for.** Three states, not two:
+    - **Jul 30 — `9534a09` ("lpn_: label decimal defaults, remove the no-op Emitter exponent
+      control").** The units strip was **permanently visible at the top of the page** — no popover
+      wrapper, no `display:none` — with `echoUnitsRow()`'s US/SI preset row above it. Per-field
+      decimals lived in the **Labels** popover (Task 189), and the Settings panel was flat, with no
+      `section()` calls at all. **This is the arrangement Tom remembers.**
+    - **Aug 4 — `299a867` (Task 211).** The strip moved into `lpn_units_popup`, at Tom's own
+      request: *"the units selectors really should be in a menu"* — a permanent row of seven
+      dropdowns was spending the page's scarcest resource, vertical room above the map, on a
+      decision nobody revisits. Sound then and sound now. Same commit, negotiated separately, moved
+      it from View to Settings.
+    - **Today.** Three panels: Settings (3 sections), Units (its own popover), Labels (decimals).
+    - **So nothing disappeared** — the visible strip was deliberately hidden behind a menu five days
+      after the state Tom is picturing. The gap is between *permanently visible* and *two clicks
+      deep*, not between working and broken.
   - **His recollection points at the fix.** He remembered units living *in the Settings panel
     alongside the decimal-places inputs*. They do not: Task 211 put them in a **separate popover**
     reached from the Settings **menu**, and the per-field decimals from Task 189 went into the
