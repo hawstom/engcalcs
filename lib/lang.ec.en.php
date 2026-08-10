@@ -1155,7 +1155,7 @@ $ec_lang['lpn_result_headloss']='Head loss';
 // Delete all projects alone is the full reset, exactly as init()'s own comment says. Each tip now
 // states only its own scope, so none of them can be wrong about the others -- and no tip quotes
 // another button's label, which is the cross-key dependency lpn_empty_hint was fixed for.
-$ec_lang['lpn_settings_restore_tip']='Resets this project\'s settings only. Your drawing and your other projects are not changed.';
+$ec_lang['lpn_settings_restore_tip']='Resets this project\'s settings only. Your drawing and your other projects are not changed. To save your favorite settings for reuse, save a project file with nothing but settings in it.';
 $ec_lang['lpn_reset_all_tip']='Deletes every project, every background image, every setting, and your unit choices, then reloads the page exactly as a first-time visitor sees it. This is the only reset that clears everything.';
 // `lpn_tool_clear`, `lpn_tool_clear_tip` and `lpn_confirm_clear` were REMOVED by Task 211 with the
 // "Clear project" command itself -- see lpn_edit_delete_network for what replaced it and why.
@@ -1210,6 +1210,8 @@ $ec_lang['lpn_tab_all']='All projects';
 $ec_lang['lpn_tab_menu']='Project menu';
 $ec_lang['lpn_tab_duplicate']='Duplicate';
 $ec_lang_syn['lpn_tab_duplicate']='Duplicate (Copy or Make a copy of) this.';
+$ec_lang['lpn_tab_move_left']='Move left';
+$ec_lang['lpn_tab_move_right']='Move right';
 $ec_lang['lpn_tab_unsaved']='Not saved to a file';
 $ec_lang['lpn_import_bad_file']='That file could not be read as a project saved from this page.';
 $ec_lang['lpn_import_no_room']='There is not enough browser storage left to add this project. Delete a project you no longer need and try again.';

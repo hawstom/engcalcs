@@ -2019,6 +2019,14 @@ var EngCalcs = EngCalcs || {};
 		for (var i = 0; i < library.projects.length; i++) { if (library.projects[i].id === id) { return library.projects[i]; } }
 		return null;
 	}
+	// Nodes/links/labels only -- NOT scenarios/settings/backdrop, which every new project inherits
+	// from whichever one was open (see newProject()) and so are never evidence that THIS project was
+	// touched. Reads the live doc for the open project rather than round-tripping through storage,
+	// since that is always current; a background tab is read from its own saved JSON.
+	function projectIsEmpty(id) {
+		var saved = id === library.openId ? doc : readJSON(projectKey(id));
+		return !!saved && !(saved.nodes && saved.nodes.length) && !(saved.links && saved.links.length) && !(saved.labels && saved.labels.length);
+	}
 	function saveIndex() { return writeJSON(LPN_INDEX_KEY, library); }
 	// ---- "differs from the file", the only thing the asterisk may mean ----
 	// The flag used to be set by saveToStorage(), on the reasoning that every mutation funnels
@@ -3933,7 +3941,12 @@ var EngCalcs = EngCalcs || {};
 	function discardProject(id) {
 		var pc = EngCalcs.pageConfig || {}, entry = indexEntry(id),
 			// Captured BEFORE the removal below -- after it there is nothing left to name.
-			goneName = projectDisplayName(entry || { name: '' });
+			goneName = projectDisplayName(entry || { name: '' }),
+			// Position in the TAB STRIP, not recency -- see the "library order, not recency" note at
+			// renderTabs(). Every tab-strip paradigm in the world lands on the neighbor that slides
+			// left into the closed tab's spot, not on whatever was touched last (punch list §4, Tom
+			// 2026-08-06).
+			closedIndex = library.projects.findIndex(function (p) { return p.id === id; });
 		// Hand the file back so a colleague can have it, and drop the live link. The FILE ON DISK IS
 		// NOT TOUCHED -- closing a tab has never meant deleting anything outside this browser.
 		releaseLock(id);
@@ -3945,18 +3958,20 @@ var EngCalcs = EngCalcs || {};
 		library.projects = library.projects.filter(function (p) { return p.id !== id; });
 		if (id === library.openId) {
 			library.openId = null;
-			// Deleting the OPEN project has to leave something open. The most recently updated
-			// survivor is the best guess at "what I was working on before this one"; with no
-			// survivors at all, a fresh empty project -- never a blank screen with no project.
+			// Deleting the OPEN project has to leave something open. The tab that slides into the
+			// closed one's spot -- the next one rightward, or the new last tab if it was the
+			// rightmost -- is the best guess at "what I meant to look at next"; with no survivors at
+			// all, a fresh empty project -- never a blank screen with no project.
 			// Tom, 2026-07-31, on whether it should instead always land on a clean Untitled: no,
 			// because newProject() pushes a real persisted row, so deleting 1 of 5 would leave 5
 			// rows and read as a failed delete. He also ruled out warning BEFOREHAND -- the fix is
 			// to say afterwards where you landed, since the alarm is "a network I did not ask for
 			// just appeared", and that is answered by narration, not by a different landing spot.
-			var rest = library.projects.slice().sort(function (a, b) { return (b.updated || 0) - (a.updated || 0); });
+			var rest = library.projects, landIndex = Math.min(closedIndex, rest.length - 1);
 			if (rest.length) {
-				library.openId = rest[0].id;
-				var d = readDocument(projectKey(rest[0].id));
+				var landed = rest[landIndex];
+				library.openId = landed.id;
+				var d = readDocument(projectKey(landed.id));
 				if (d) { applySaved(d); }
 				clearUndo();
 				refreshAllFromDocument();
@@ -3964,7 +3979,7 @@ var EngCalcs = EngCalcs || {};
 				// notice/diagnostic split at setStatus().
 				setNotice((pc.lpn_status_closed_opened || 'Closed {closed}. Now showing {opened}.')
 					.replace('{closed}', goneName)
-					.replace('{opened}', projectDisplayName(rest[0])));
+					.replace('{opened}', projectDisplayName(landed)));
 			} else {
 				newProject();
 				setNotice((pc.lpn_status_closed_empty || 'Closed {closed}. Started a new empty project.')
@@ -4376,12 +4391,27 @@ var EngCalcs = EngCalcs || {};
 			bar.appendChild(b);
 		});
 	}
+	// Swaps the tab at `id` with its neighbor in the TAB STRIP order (library.projects, which is
+	// display order, not recency -- see the note at renderTabs()). Task 252, Tom 2026-08-09: "Either
+	// Drag or click an item on the tab menu. Either one is fine" -- the menu item is the cheaper of
+	// the two and works on touch, where dragging a tab fights the scroll gesture.
+	function moveTab(id, dir) {
+		var idx = library.projects.findIndex(function (p) { return p.id === id; });
+		var swapWith = idx + dir;
+		if (idx < 0 || swapWith < 0 || swapWith >= library.projects.length) { return; }
+		var tmp = library.projects[idx];
+		library.projects[idx] = library.projects[swapWith];
+		library.projects[swapWith] = tmp;
+		saveIndex();
+		renderTabs();
+	}
 	function openProjectMenu(id, anchor) {
 		var pc = EngCalcs.pageConfig || {}, entry = indexEntry(id);
 		if (!entry) { return; }
 		// Rename IS Save As on a file project: its name and its file's name are one name (Amendment 2).
 		// This is the label doing that work in the one place a user goes looking to rename something.
 		var renameLabel = isFileProject(entry) ? (pc.lpn_file_saveas || 'Save as…') : (pc.lpn_project_rename || 'Rename');
+		var idx = library.projects.findIndex(function (p) { return p.id === id; });
 		openMenu(anchor, [
 			{
 				icon: isFileProject(entry) ? 'saveas' : 'edit',
@@ -4407,6 +4437,9 @@ var EngCalcs = EngCalcs || {};
 				}
 			},
 			{ separator: true },
+			{ label: pc.lpn_tab_move_left || 'Move left', disabled: idx <= 0, fn: function () { moveTab(id, -1); } },
+			{ label: pc.lpn_tab_move_right || 'Move right', disabled: idx < 0 || idx >= library.projects.length - 1, fn: function () { moveTab(id, 1); } },
+			{ separator: true },
 			{ icon: 'close', label: pc.lpn_file_close || 'Close', fn: function () { closeTab(id); } }
 		]);
 	}
@@ -4428,7 +4461,11 @@ var EngCalcs = EngCalcs || {};
 	function closeTab(id) {
 		var pc = EngCalcs.pageConfig || {}, entry = indexEntry(id);
 		if (!entry) { return; }
-		if (!tabAsterisk(entry).show) { discardProject(id); renderTabs(); return; }
+		// A browser-only project always carries the (faded) asterisk -- see tabAsterisk() -- because
+		// it is in no file at all, not because anyone touched it. An untouched "+"-created project is
+		// exactly that: nothing drawn, nothing to lose, so the "gone for good" prompt below would be
+		// pure noise (punch list §4, Tom 2026-08-06).
+		if (!tabAsterisk(entry).show || (!isFileProject(entry) && projectIsEmpty(id))) { discardProject(id); renderTabs(); return; }
 		// A read-only project is offered Save as for the same reason its File menu is (Tom,
 		// 2026-08-04: "this situation cannot allow Save. It must offer Save as..."). Treated exactly
 		// like a project that has no file yet, because in the only sense that matters here it has
@@ -6745,11 +6782,14 @@ var EngCalcs = EngCalcs || {};
 	// notice ("here is what just happened") set by a command would be wiped ~300ms later, which is
 	// exactly long enough for the user not to see it.
 	//
-	// Rule: a real (non-empty) status supersedes a notice and discards it -- a live diagnostic like
-	// "Add a reservoir" always matters more than a report of a completed action. An EMPTY status
-	// falls back to the notice instead of blanking the bar, which is what lets a notice survive the
-	// clean solve that follows the command that set it. A timer expires it either way, so the bar
-	// does not keep narrating an action from a minute ago.
+	// Rule: a real (non-empty) status TEMPORARILY OUTRANKS a notice -- a live diagnostic like "Add a
+	// reservoir" is shown in preference to a report of a completed action, but the notice is not
+	// thrown away to make room for it. An EMPTY status falls back to the notice, so as soon as the
+	// diagnostic clears (or its own timer expires), the notice reappears rather than having been
+	// silently eaten (punch list §4, Tom 2026-08-06: closing a tab's "Closed X. Now showing Y." was
+	// overwritten and gone for good the instant the freshly-opened project's own solve produced a
+	// diagnostic). A timer expires the notice either way, so the bar does not keep narrating an
+	// action from a minute ago once it does resurface.
 	var statusNotice = '', statusNoticeTimer = null;
 	var STATUS_NOTICE_MS = 8000;
 	function clearNotice() {
@@ -6759,7 +6799,7 @@ var EngCalcs = EngCalcs || {};
 	function setStatus(text) {
 		var el = document.getElementById('lpn_status');
 		if (!el) { return; }
-		if (text) { clearNotice(); el.textContent = text; return; }
+		if (text) { el.textContent = text; return; }
 		el.textContent = statusNotice || '';
 	}
 	function setNotice(text) {

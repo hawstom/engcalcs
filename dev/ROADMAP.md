@@ -903,23 +903,11 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     so it contaminated every browser pass and produced three separate "reload doesn't work" reports.
   - Still deferred: `Open Recent`, and answering "is this the same file?" across sessions. Those were
     the other half of this task and want `isSameEntry()`; extract them if they earn it.
-- 55|225| **The `lpn_` punch-list leftovers — small, confirmed, and none of them dangerous.** Extracted
-  from Tasks 223/220 as they closed, because a defect left inside a `## Completed` block is a defect
-  nobody reads again. All confirmed in a browser; full wording in
-  `dev/lpn-file-lock-test-punchlist.md` § Findings.
-  - **§4 Closing a tab activates the LAST-CREATED project** rather than the next one rightward, which
-    is what every tab strip in the world does.
-  - **§4 Status messages overwrite each other** — "nodes have no path to a reservoir" ate the message
-    saying what had just closed. They should queue, or the notice should outlive the diagnostic.
-  - **§4 The "gone for good" prompt fires for an empty, untouched new project**, where there is
-    nothing to lose and the question is noise.
-  - **§6 The lock dialog says "1 minutes ago".** `agoText()` has no singular. **Deliberately timed
-    with the `lpn_` translation sprint**: three singular forms now become 78 then.
-  - **§13 needs the rewrite §0–§8 got** (Tom: *"Some stuff no longer exists or is renamed"*), before
-    anybody is asked to run that section again.
-  - Two feature asks, both from Tom and both real: a `beforeunload` **"Leave site?"** when a connected
-    file has unsaved work, and his suggestion for the Restore-settings tip — *"To save your favorite
-    settings, save a project file with nothing but settings."*
+- 20|225.13| **`dev/lpn-file-lock-test-punchlist.md` §13 needs the rewrite §0–§8 got** (Tom: *"Some
+  stuff no longer exists or is renamed"*), before anybody is asked to run that section again.
+  Split out of Task 225 when the rest of it closed 2026-08-09 — this piece is a punch-list document
+  rewrite against live controls, not a code fix, so it needs a browser pass rather than static
+  reading.
 
 - 45|209| **A snoozable tip system (Task 146 child, but suite-shaped).** Asked for by Tom,
   2026-08-03, while reviewing Task 195's file-and-lock explanation: the page needs somewhere to put
@@ -1090,29 +1078,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     checkable; just do not spend the blog/video headline on it.** Do not relitigate.
   - Consequence: raised 146.06 to 90 and 220 to 95.
 
-- 55|256| **`dev/lpn-spike/popup-tips-harness.js` is dead and has been for a while.** Found
-  2026-08-09. It dies on `MODULE_NOT_FOUND` before a single check runs, so its ~60 assertions have
-  been reporting nothing. Four separate causes, all diagnosed, none fixed (the last two need a
-  judgment call about what the harness SHOULD assert now):
-  1. It `eval()`s `js/lpn-solver.js`, whose own `require('./PipeHydraulics.lib.js')` then resolves
-     against `dev/lpn-spike/` instead of `js/`. Fix: `require('./bootstrap.js')` then
-     `Object.assign(global.EngCalcs, require(ROOT + 'js/lpn-solver.js'))` — with NO `var EngCalcs`,
-     which would hoist and shadow the global for the pageConfig loader above it.
-  2. That eval was also, by accident, what created the module-scope `EngCalcs` the app's
-     `var EngCalcs = EngCalcs || {}` lands on. Without it the evaluated app gets a bare `{}`.
-     Fix: `Object.assign(EngCalcs, global.EngCalcs)` immediately after `eval(src)`.
-  3. `deleteProject` no longer exists — Task 211 renamed it `discardProject`. Mechanical.
-  4. **The real work:** the Settings panel has since been restructured, so "all three reset tips
-     exist" and "both Settings reset buttons are present" now assert against a UI that is gone (it
-     reads `Restore defaults | Erase everything on this page` today). Also needs `iconEl`/`setLabel`
-     stubs for `js/Icons.lib.js`. Deciding what these should check now is a small design call.
-  - **The lesson is bigger than this file: nothing runs these harnesses.** `validate.js`,
-    `validate_epanet.js`, `handle-restore-harness.js`, `suite-tips-trigger-harness.js`,
-    `title-beacon-harness.js` and the new `example-network-harness.js` are all green, and this one
-    has been red for weeks with nobody the wiser. **Consider a one-line `dev/scripts/run_harnesses.sh`
-    that runs every `dev/lpn-spike/*harness*.js` plus `validate*.js` and fails on the first non-zero
-    exit** — that, not this repair, is what stops the next one rotting.
-
 - 40|257| **Example PROJECTS (plural) for lpn, seeded from EPANET's own example networks.** Tom,
   2026-08-09, while Task 254 was in flight: *"some example projects would also be nice, but that's
   another task for another day, and I suppose it's up to me to prepare those. Maybe I can get
@@ -1132,11 +1097,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **Licensing is clean** — OWA-EPANET is MIT, so its example networks can ship under GPL v3+.
   - **These are ANALYSIS networks and this suite is a DESIGN tool.** They will make the map look
     serious, but do not let them quietly redefine what the calculator is for.
-
-- 35|252| **Reorder project tabs, left/right.** Tom, 2026-08-09: *"We talked about this, but I
-  guess we forgot about it. Either Drag or click an item on the tab menu. Either one is fine."*
-  He is right that it was dropped. Either mechanism is authorized; the tab menu item is the
-  cheaper one and works on touch, where tab-dragging fights the scroll gesture.
 
 - 30|253| **A clean-map view: hide canvas chrome for screenshots.** Tom, 2026-08-09, wants it
   under the View menu and in the toolbar's View area. **Scope it as "clean map", not "print".**
@@ -1747,6 +1707,66 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|225| **[DONE 2026-08-09] The `lpn_` punch-list leftovers — small, confirmed, and none of them
+  dangerous.** Extracted from Tasks 223/220 as they closed. Full wording in
+  `dev/lpn-file-lock-test-punchlist.md` § Findings.
+  - **§4 Closing a tab now activates the next tab RIGHTWARD** (or, if the closed tab was rightmost,
+    its new rightmost neighbor) rather than the most-recently-updated project, matching every tab
+    strip in the world. `discardProject()` (`js/looped-network.js`) now captures the closed tab's
+    index in `library.projects` before removal and lands on `Math.min(closedIndex, rest.length-1)`.
+  - **§4 Status messages no longer overwrite each other.** `setStatus(text)` used to call
+    `clearNotice()` on every non-empty (diagnostic) status, discarding a just-shown notice for good
+    — "nodes have no path to a reservoir" really did eat "Closed X. Now showing Y." A diagnostic now
+    only TEMPORARILY outranks the notice; the notice resurfaces once the diagnostic clears.
+  - **§4 The "gone for good" close prompt no longer fires for an empty, untouched new project.**
+    `tabAsterisk()` always shows the (faded) star on a browser-only project regardless of whether
+    anything was drawn — correct for the star, wrong as a gate for the destructive-close dialog. New
+    `projectIsEmpty(id)` (checks nodes/links/labels only, not inherited settings/scenarios) lets
+    `closeTab()` discard silently when there is genuinely nothing to lose.
+  - **§6 "1 minutes ago" was already fixed** — `agoText()`'s minutes/hours/days buckets all have a
+    floor of 2 by construction (the boundary from the seconds bucket is 120s, i.e. 2 min). No code
+    change needed; confirmed by reading, not just by the comment claiming it.
+  - **§13's rewrite is NOT part of this close** — split out as its own task (225.13): it is a
+    punch-list document rewrite against live browser controls, not a code fix.
+  - **Both feature asks landed.** The `beforeunload` "Leave site?" guard for a connected file with
+    unsaved changes was already shipped (`js/looped-network.js`, wired in `init()`) — confirmed, no
+    change needed. The Restore-settings tip (`lpn_settings_restore_tip`) now also says *"To save
+    your favorite settings for reuse, save a project file with nothing but settings in it"* — English
+    plus the Task 203 core four (es, fr, pt, tr).
+
+- 0|252| **[DONE 2026-08-09] Reorder project tabs, left/right, via the tab menu.** Tom, 2026-08-09:
+  *"Either Drag or click an item on the tab menu. Either one is fine."* Built the cheaper of the two
+  (works on touch, where dragging fights the scroll gesture): `openProjectMenu()` in
+  `js/looped-network.js` gained **Move left**/**Move right** rows (disabled at either end), backed
+  by a new `moveTab(id, dir)` that swaps the tab's position in `library.projects` (display order)
+  and persists it. New keys `lpn_tab_move_left`/`lpn_tab_move_right`, English + the core four.
+
+- 0|256| **[DONE 2026-08-09] `dev/lpn-spike/popup-tips-harness.js` was dead** (found 2026-08-09,
+  `MODULE_NOT_FOUND` before a single check ran — its ~60 assertions had been reporting nothing).
+  All four diagnosed causes fixed:
+  1. Solver loading switched from `eval()`-ing `js/lpn-solver.js` (whose own
+     `require('./PipeHydraulics.lib.js')` resolved against `dev/lpn-spike/`) to
+     `require('./bootstrap.js')` then `Object.assign(global.EngCalcs, require(ROOT +
+     'js/lpn-solver.js'))`, with no local `var EngCalcs` declaration (that would have hoisted and
+     shadowed the global for the pageConfig loader above it).
+  2. Added `Object.assign(EngCalcs, global.EngCalcs)` immediately after `eval(src)` (of
+     `looped-network.js`) so the module-scope `EngCalcs` binding that eval's own
+     `var EngCalcs = EngCalcs || {}` creates is reconciled back onto the fully-assembled object.
+  3. `deleteProject` → `discardProject` (Task 211 rename), at the injected-export site and all four
+     call sites.
+  4. Rewrote the reset-controls checks for the current Settings panel: TWO tips now, not three
+     (`lpn_tool_clear`/`_tip` were removed by Task 211), matched via `calc_defaults` ("Restore
+     defaults") and `lpn_settings_wipe_btn` ("Erase everything on this page") rather than the
+     retired `lpn_settings_restore_btn` key; added `iconEl`/`setLabel` stubs since the wipe button
+     now renders through `EngCalcs.setLabel()`.
+  - **Two assertions also had to change, not just get un-broken** — they were pinned to the exact
+    pre-Task-225 behaviors that Task 225 (above) just fixed on purpose: the notice-survives-a-
+    diagnostic case, and the tab-strip-position-not-recency landing case (added a second
+    rightmost-tab-closes case too).
+  - **New: `dev/scripts/run_harnesses.sh`** runs every `dev/lpn-spike/*harness*.js` plus
+    `validate*.js` and fails on the first non-zero exit — the actual fix for "nothing runs these
+    harnesses," which is how this one went red for weeks unnoticed.
 
 - 0|255| **[DONE 2026-08-09] `lpn_` was solving US networks with the length in the wrong unit.
   Head loss was 3.281x too high. Fixed same day, at Tom's "Wow. Bad. Can we fix immediately?"**

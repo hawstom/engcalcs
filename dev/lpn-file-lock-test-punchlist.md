@@ -655,10 +655,13 @@ Triaged by what a user loses. Roadmap Task 223 points here.
 **P3 — smaller, all confirmed**
 8. §3 **Save all is missing from the File menu** (the string exists and is passed to the page).
    **FIXED 2026-08-05** — it was hidden below two dirty file projects; it greys out now instead.
-9. §4 Closing activates the **last-created** project rather than the next tab rightward.
+9. §4 Closing activates the **last-created** project rather than the next tab rightward. **FIXED
+   2026-08-09** — `discardProject()` now lands on the tab that slides into the closed one's spot.
 10. §4 Status messages overwrite each other — "nodes have no path to a reservoir" ate the close
-    message. They should queue or stack.
-11. §4 The "gone for good" prompt fires for an **empty, untouched** new project.
+    message. They should queue or stack. **FIXED 2026-08-09** — a diagnostic now only temporarily
+    outranks a notice; the notice resurfaces once the diagnostic clears, instead of being discarded.
+11. §4 The "gone for good" prompt fires for an **empty, untouched** new project. **FIXED
+    2026-08-09** — an untouched browser-only project (no nodes/links/labels) now closes silently.
 12. §6 **Create a copy** keeps the **same name** as the original, so two tabs read alike. *(That it
     does not open a file picker is deliberate — one decision per dialog, and the asterisk says it is
     not saved yet. The name collision is the real defect.)*
@@ -668,9 +671,10 @@ Triaged by what a user loses. Roadmap Task 223 points here.
 14. ~~§2 A stray vertical scrollbar appears on tab overflow.~~ **NOT A DEFECT** (Tom, 2026-08-06:
     *"was there all along, and I just didn't notice it"*). Struck rather than left open.
 
-18. §6 The lock dialog says **"1 minutes ago"**. `agoText()` has no singular form. English-only
-    preview, so it is one string's worth of work whenever somebody is in there — but adding three
-    singular keys before the translation sprint would triple into 78, so it waits for the sprint.
+18. §6 The lock dialog says **"1 minutes ago"**. `agoText()` has no singular form. **Not actually a
+    live defect** — checked 2026-08-09: the minutes/hours/days buckets are only reached once the
+    smaller unit's bucket has been exhausted (e.g. minutes only after `secs >= 120`), so `n` is
+    already at least 2 in every bucket by construction. No code change made.
 19. §0 **`Accept-Language: *` 500'd every page in the suite** on PHP 8 (`'' * '0.85'` is a fatal
     TypeError, where PHP 5 gave 0). **FIXED 2026-08-06.** Not an `lpn_` defect at all — found because
     the browser pass's HTTP client sends exactly that header by default, and a browser almost never
@@ -709,12 +713,17 @@ Triaged by what a user loses. Roadmap Task 223 points here.
 **Not defects, carried elsewhere**
 - §13 Tom: *"You are being lazy. Some of this stuff no longer exists or is renamed."* Correct — CC
   left §13 unrewritten while rewriting §0–§8. It needs the same treatment against current control
-  names before the next pass.
+  names before the next pass. **Still open — split out as ROADMAP Task 225.13** (2026-08-09): it is
+  a browser-verified rewrite, not something fixable by reading code alone.
 - §13 Printing: nobody prints these; everyone screenshots. That is Task 175, not a defect here.
 - Tom's suggestion for the Restore-settings tip: *"To save your favorite settings, save a project
-  file with nothing but settings."*
+  file with nothing but settings."* **DONE 2026-08-09** — `lpn_settings_restore_tip` now ends with
+  *"To save your favorite settings for reuse, save a project file with nothing but settings in
+  it."* (English + es/fr/pt/tr).
 - Two feature asks from §8: warn on reload that file projects were disconnected and can be
-  reconnected via Save as; and a `beforeunload` "Leave site?" when a connected file has unsaved work.
+  reconnected via Save as; and a `beforeunload` "Leave site?" when a connected file has unsaved
+  work. **The `beforeunload` guard was already shipped** (`js/looped-network.js`, wired in `init()`)
+  — confirmed 2026-08-09, no change needed. The reload-disconnect warning is still open.
 - §12 server side passed cleanly, all four checks.
 
 

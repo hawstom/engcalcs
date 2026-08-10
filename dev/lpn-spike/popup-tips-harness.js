@@ -113,7 +113,16 @@ global.requestAnimationFrame = f => setTimeout(f, 0);
 global.EngCalcs = {
   pageConfig: {},
   initTips: function (root) { global.__initTipsCalls.push(root); },
-  unitFactorFor: () => 1
+  unitFactorFor: () => 1,
+  // js/Icons.lib.js in the browser; here they only need to not throw and to produce something
+  // setLabel() can append -- see EngCalcs.setLabel in js/Calculators.lib.js for the real shape.
+  iconEl: () => mkEl('g'),
+  setLabel: function (el, iconName, text) {
+    el.textContent = '';
+    var ic = iconName ? this.iconEl(iconName) : null;
+    if (ic) { el.appendChild(ic); }
+    el.appendChild(document.createTextNode(text));
+  }
 };
 global.__initTipsCalls = [];
 global.window.bootstrap = global.bootstrap = { Tooltip: { getInstance: () => null, getOrCreateInstance: () => ({ hide() {}, dispose() {} }) } };
@@ -133,12 +142,15 @@ while ((m = re.exec(langSrc))) {
 });
 
 // ---- solver -------------------------------------------------------------
-eval(fs.readFileSync(ROOT + 'js/lpn-solver.js', 'utf8'));
-
-// lpn-solver.js declares `var EngCalcs`, which in CommonJS module scope SHADOWS global.EngCalcs.
-// Re-attach the config and the tip stub to whatever object the evaluated code actually sees.
-EngCalcs.pageConfig = global.EngCalcs.pageConfig;
-EngCalcs.initTips = global.EngCalcs.initTips;
+// bootstrap.js FIRST -- it supplies EngCalcs.G out of js/Calculators.lib.js, and without it every
+// minor-loss term goes NaN (see bootstrap.js's own header for the full story). require(), not
+// eval(): lpn-solver.js's own require('./PipeHydraulics.lib.js') would otherwise resolve against
+// THIS file's directory (dev/lpn-spike/) instead of js/, which is why this harness died on
+// MODULE_NOT_FOUND (ROADMAP Task 256).
+require('./bootstrap.js');
+// Deliberately no `var EngCalcs` here -- that would be hoisted to the top of this script and
+// shadow global.EngCalcs for the pageConfig loader above, which reads/writes the bare identifier.
+Object.assign(global.EngCalcs, require(ROOT + 'js/lpn-solver.js'));
 
 // ---- the file under test ------------------------------------------------
 let src = fs.readFileSync(ROOT + 'js/looped-network.js', 'utf8');
@@ -151,7 +163,7 @@ src = src.replace(marker,
   "\t\tassembleModel: assembleModel, effective: effective,\n" +
   "\t\trenderNodeFields: renderNodeFields, renderLinkFields: renderLinkFields,\n" +
   "\t\trebuildSettingsFields: rebuildSettingsFields, helpTip: helpTip,\n" +
-  "\t\tsetStatus: setStatus, setNotice: setNotice, deleteProject: deleteProject,\n" +
+  "\t\tsetStatus: setStatus, setNotice: setNotice, discardProject: discardProject,\n" +
   "\t\tsetLibrary: function (l) { library = l; }, getLibrary: function () { return library; },\n" +
   // refreshAllFromDocument() touches the SVG layer variables, which only init() assigns -- and the
   // harness deliberately never runs init(). Build just the layer scaffold, mirroring init()'s own
@@ -168,6 +180,12 @@ src = src.replace(marker,
   "\t\tsetDoc: function (d, s2) { doc = d; if (s2) { scenarios = s2; } },\n" +
   "\t\tgetDoc: function () { return doc; } };\n" + marker);
 eval(src);
+// The eval above ran `var EngCalcs = EngCalcs || {}` (js/looped-network.js:17) as a direct eval in
+// sloppy mode, which declares a module-scope `EngCalcs` binding here for the first time -- pulling
+// in whatever the bare identifier resolved to at that moment. Reconcile it back onto
+// global.EngCalcs's contents explicitly rather than trust that resolution, so every later `PC =
+// EngCalcs.pageConfig` and `EngCalcs.lpnSolve` below is reading the real, fully-assembled object.
+Object.assign(EngCalcs, global.EngCalcs);
 
 const L = global.__LPN;
 let fails = 0;
@@ -300,10 +318,15 @@ L.renderNodeFields('R-1');
 ok('re-render does not accumulate labels', pf.querySelectorAll('.ec-help').length === before,
    before + ' -> ' + pf.querySelectorAll('.ec-help').length);
 
-// --- 10. the three reset controls: THREE scoped tips, not one shared -----
-// The first version shared one key claiming all three had to be "used together" to reach a
-// first-time-visitor state. False: settings live inside each project document, so Delete all
-// projects alone is the full reset. These checks exist so that claim cannot come back.
+// --- 10. the two reset controls: TWO scoped tips, not one shared ---------
+// "Clear project" (lpn_tool_clear / lpn_tool_clear_tip) was REMOVED by Task 211 -- see
+// lpn_edit_delete_network in lib/lang.ec.en.php for what replaced it. What is left is Settings'
+// own two buttons: Restore defaults (settings only) and Erase everything on this page (full
+// reset). This section used to check for a THIRD, no-longer-existing tip -- fixed 2026-08-09
+// (ROADMAP Task 256) rather than restated, so a future removal shows up here again instead of
+// silently rotting the harness a second time. The original point still holds: settings live
+// inside each project document, so Erase everything alone is the full reset, and no tip may claim
+// otherwise.
 const rb = mkEl('button');
 L.helpTip(rb, 'some tip');
 ok('helpTip sets the title', rb.title === 'some tip');
@@ -317,9 +340,9 @@ const noTip = mkEl('button');
 L.helpTip(noTip, undefined);
 ok('helpTip is a no-op with no text', noTip.title === '' && noTip.className === '');
 
-const three = [PC.lpn_tool_clear_tip, PC.lpn_settings_restore_tip, PC.lpn_reset_all_tip];
-ok('all three reset tips exist', three.every(t => t && t.length > 20));
-ok('the three reset tips are distinct', new Set(three).size === 3);
+const two = [PC.lpn_settings_restore_tip, PC.lpn_reset_all_tip];
+ok('both reset tips exist', two.every(t => t && t.length > 20));
+ok('the two reset tips are distinct', new Set(two).size === 2);
 
 const sf = byId.lpn_settings_fields;
 L.rebuildSettingsFields();
@@ -328,23 +351,31 @@ function buttonsIn(root) {
   (function walk(n) { (n.children || []).forEach(c => { if (c.tagName === 'BUTTON') out.push(c); walk(c); }); })(root);
   return out;
 }
-const restoreBtn = buttonsIn(sf).find(b => b.textContent === PC.lpn_settings_restore_btn);
-const wipeBtn = buttonsIn(sf).find(b => b.textContent === PC.lpn_settings_wipe_btn);
+// Restore defaults sets .textContent directly; Erase everything goes through
+// EngCalcs.setLabel(icon, text), which appends a text NODE instead -- so a button's label is
+// whichever one it actually has, not always the bare property.
+function buttonLabel(b) {
+  if (b.textContent) { return b.textContent; }
+  const words = b.children.find(c => c._text);
+  return words ? words.textContent : '';
+}
+const restoreBtn = buttonsIn(sf).find(b => buttonLabel(b) === (PC.calc_defaults || 'Restore defaults'));
+const wipeBtn = buttonsIn(sf).find(b => buttonLabel(b) === PC.lpn_settings_wipe_btn);
 ok('both Settings reset buttons are present', !!restoreBtn && !!wipeBtn,
-   buttonsIn(sf).map(b => b.textContent).join(' | '));
-ok('Restore all settings carries ITS OWN tip', restoreBtn.title === PC.lpn_settings_restore_tip);
-ok('Delete all projects carries ITS OWN tip', wipeBtn.title === PC.lpn_reset_all_tip);
+   buttonsIn(sf).map(buttonLabel).join(' | '));
+ok('Restore defaults carries ITS OWN tip', restoreBtn.title === PC.lpn_settings_restore_tip);
+ok('Erase everything carries ITS OWN tip', wipeBtn.title === PC.lpn_reset_all_tip);
 
 // No reset tip may quote another button's label -- the cross-key dependency lpn_empty_hint was
 // fixed for in this same pass.
-const labels = [PC.lpn_tool_clear, PC.lpn_settings_restore_btn, PC.lpn_settings_wipe_btn];
+const labels = [PC.calc_defaults, PC.lpn_settings_wipe_btn];
 const quoted = [];
-three.forEach(t => labels.forEach(lbl => { if (t.indexOf(lbl) >= 0) { quoted.push(lbl); } }));
+two.forEach(t => labels.forEach(lbl => { if (t.indexOf(lbl) >= 0) { quoted.push(lbl); } }));
 ok('no reset tip quotes another key\'s value', quoted.length === 0, quoted.join(' / '));
 
 // No tip may claim the buttons must be combined -- that was the false statement.
 ok('no reset tip claims they must be used together',
-   !three.some(t => /used together|all three|three reset buttons/i.test(t)));
+   !two.some(t => /used together|all three|three reset buttons/i.test(t)));
 
 // --- 11. the full reset really is full ----------------------------------
 // "reloads the page exactly as a first-time visitor sees it" is only true if the suite unit
@@ -379,9 +410,14 @@ L.setStatus('');
 ok('...and still does not on a second clean solve', bar.textContent === 'Deleted A. Now showing B.');
 
 L.setStatus('Add a reservoir.');       // <- a real diagnostic
-ok('a real diagnostic supersedes the notice', bar.textContent === 'Add a reservoir.');
+ok('a real diagnostic outranks the notice while it is live', bar.textContent === 'Add a reservoir.');
 L.setStatus('');
-ok('the superseded notice does NOT come back', bar.textContent === '', JSON.stringify(bar.textContent));
+// Fixed 2026-08-09 (ROADMAP Task 225 punch list §4, Tom 2026-08-06): a diagnostic used to DISCARD
+// the notice outright -- "nodes have no path to a reservoir" ate "Closed X. Now showing Y." for
+// good, the instant the freshly-opened project's own solve produced a diagnostic. The notice must
+// only be OUTRANKED while the diagnostic is live, and resurface once it clears.
+ok('...and the notice resurfaces once the diagnostic clears', bar.textContent === 'Deleted A. Now showing B.',
+   JSON.stringify(bar.textContent));
 
 L.setNotice('');
 ok('setNotice("") clears the bar', bar.textContent === '');
@@ -400,7 +436,7 @@ function seedLibrary(projects, openId) {
 
 seedLibrary([{ id: 'p1', name: 'Fire flow test', updated: 10 },
              { id: 'p2', name: 'Water main study', updated: 20 }], 'p1');
-L.deleteProject('p1');
+L.discardProject('p1');
 ok('deleting the open project opens a survivor', L.getLibrary().openId === 'p2');
 ok('...and names BOTH projects in the status bar',
    bar.textContent.indexOf('Fire flow test') >= 0 && bar.textContent.indexOf('Water main study') >= 0,
@@ -409,19 +445,29 @@ ok('...with the placeholders substituted',
    bar.textContent.indexOf('{deleted}') < 0 && bar.textContent.indexOf('{opened}') < 0,
    JSON.stringify(bar.textContent));
 
-// most-recently-updated survivor wins, not first-in-array
+// TAB-STRIP POSITION wins, not recency -- fixed 2026-08-09 (ROADMAP Task 225 punch list §4): every
+// tab strip in the world lands on the neighbor that slides into the closed tab's spot (next
+// rightward), not on whatever was touched last. 'q3' is the most-recently-updated of the three but
+// sits to the LEFT of the closed tab in library order, so it must NOT be the one landed on.
 seedLibrary([{ id: 'q1', name: 'Open one', updated: 5 },
              { id: 'q2', name: 'Older', updated: 1 },
-             { id: 'q3', name: 'Newer', updated: 99 }], 'q1');
-L.deleteProject('q1');
-ok('the MOST RECENT survivor is the one opened', L.getLibrary().openId === 'q3',
+             { id: 'q3', name: 'Newer', updated: 99 }], 'q2');
+L.discardProject('q2');
+ok('the tab to the RIGHT is the one opened, not the most recently updated', L.getLibrary().openId === 'q3',
    L.getLibrary().openId);
 ok('...and it is the one named', bar.textContent.indexOf('Newer') >= 0,
    JSON.stringify(bar.textContent));
 
+// closing the RIGHTMOST tab lands on its new rightmost neighbor (the one to its left)
+seedLibrary([{ id: 'v1', name: 'Left', updated: 1 },
+             { id: 'v2', name: 'Right', updated: 99 }], 'v2');
+L.discardProject('v2');
+ok('closing the rightmost tab lands on its left neighbor', L.getLibrary().openId === 'v1',
+   L.getLibrary().openId);
+
 // last project standing -> a fresh empty one, different message, no dangling placeholder
 seedLibrary([{ id: 'r1', name: 'Only project', updated: 1 }], 'r1');
-L.deleteProject('r1');
+L.discardProject('r1');
 ok('deleting the last project leaves something open', !!L.getLibrary().openId);
 ok('...and says a new empty project was started',
    bar.textContent.indexOf('Only project') >= 0 && bar.textContent.indexOf('{') < 0,
@@ -431,7 +477,7 @@ ok('...and says a new empty project was started',
 seedLibrary([{ id: 's1', name: 'Keep me open', updated: 9 },
              { id: 's2', name: 'Throwaway', updated: 1 }], 's1');
 L.setNotice('');
-L.deleteProject('s2');
+L.discardProject('s2');
 ok('deleting a non-open project does not switch projects', L.getLibrary().openId === 's1');
 ok('...and posts no notice', bar.textContent === '', JSON.stringify(bar.textContent));
 
