@@ -101,7 +101,11 @@ function echoEngCalcsMenu ($html_title = '', $show_name_field = false, $calc_nam
 	      // string." So it is a sibling of the brand, not a nav item -- always visible, never
 	      // behind the hamburger, reading as a continuation of the project's name rather than
 	      // as one destination among many. Anything inside .collapse disappears under lg. ?>
-	<a class="ec-nav-libre" id="nav-libre" target="_blank" rel="noopener" href="https://github.com/hawstom/engcalcs"><?=ecIcon('github')?><?=$ec_lang['menu_libre']?></a>
+	<?php // Points at the README's License section, not at the repository root (Tom, 2026-08-10).
+	      // The label makes a claim -- "Libre Software" -- and the link should land on the sentence
+	      // that backs it up (GPL v3 or later, plus what that grants you), rather than on a file
+	      // listing the visitor then has to read a repo to verify. ?>
+	<a class="ec-nav-libre" id="nav-libre" target="_blank" rel="noopener" href="https://github.com/hawstom/engcalcs/blob/master/README.md#license"><?=ecIcon('github')?><?=$ec_lang['menu_libre']?></a>
 	</span>
 	<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 		<span class="navbar-toggler-icon"></span>

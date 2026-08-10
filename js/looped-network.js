@@ -2600,15 +2600,23 @@ var EngCalcs = EngCalcs || {};
 	// one evening. Everything else about a reloaded file project was a workaround for this.
 	var LPN_IDB_NAME = 'engcalcs-lpn';
 	var LPN_IDB_STORE = 'handles';
+	// Task 258: the recent-files list. A SECOND store rather than more rows in `handles`, because
+	// the two have opposite lifetimes -- `handles` is keyed by project id and is deleted the moment
+	// that project is closed (that is what makes a closed project gone), while the whole point of a
+	// recent list is to outlive the project it came from.
+	var LPN_IDB_RECENT = 'recent';
 	function idbOpen() {
 		return new Promise(function (resolve) {
 			if (!window.indexedDB) { resolve(null); return; }
 			var req;
-			try { req = window.indexedDB.open(LPN_IDB_NAME, 1); }
+			// Version 2 adds LPN_IDB_RECENT. The upgrade only ever CREATES missing stores, so a
+			// browser arriving from version 1 keeps every handle it had.
+			try { req = window.indexedDB.open(LPN_IDB_NAME, 2); }
 			catch (err) { resolve(null); return; }
 			req.onupgradeneeded = function () {
 				var db = req.result;
 				if (!db.objectStoreNames.contains(LPN_IDB_STORE)) { db.createObjectStore(LPN_IDB_STORE); }
+				if (!db.objectStoreNames.contains(LPN_IDB_RECENT)) { db.createObjectStore(LPN_IDB_RECENT); }
 			};
 			req.onsuccess = function () { resolve(req.result); };
 			// Private browsing, a disabled store, a quota refusal: all of them mean "no persistence",
@@ -2617,14 +2625,14 @@ var EngCalcs = EngCalcs || {};
 			req.onblocked = function () { resolve(null); };
 		});
 	}
-	function idbRun(mode, fn) {
+	function idbRun(mode, fn, storeName) {
 		return idbOpen().then(function (db) {
 			if (!db) { return null; }
 			return new Promise(function (resolve) {
-				var tx, store, out = null;
+				var tx, store, out = null, which = storeName || LPN_IDB_STORE;
 				try {
-					tx = db.transaction(LPN_IDB_STORE, mode);
-					store = tx.objectStore(LPN_IDB_STORE);
+					tx = db.transaction(which, mode);
+					store = tx.objectStore(which);
 				} catch (err) { resolve(null); return; }
 				try { out = fn(store); } catch (err) { resolve(null); return; }
 				tx.oncomplete = function () { db.close(); resolve(out && out.result !== undefined ? out.result : out); };
@@ -2633,8 +2641,71 @@ var EngCalcs = EngCalcs || {};
 			});
 		});
 	}
-	function rememberHandle(id, handle) { return idbRun('readwrite', function (st) { return st.put(handle, id); }); }
+	function rememberHandle(id, handle) {
+		// Every route that connects a project to a file lands here -- Open, Save as, and re-opening a
+		// file that is already a tab -- so this is the one chokepoint the recent list needs. Boot
+		// restoration deliberately does NOT come through here (restoreHandlesOnBoot sets the Map
+		// directly): reopening the page is not using a file, and letting it reorder the list would
+		// mean the list said "most recently reloaded" instead of "most recently opened".
+		noteRecentFile(handle);
+		return idbRun('readwrite', function (st) { return st.put(handle, id); });
+	}
 	function forgetHandle(id) { return idbRun('readwrite', function (st) { return st.delete(id); }); }
+
+	// ---- Recent files (ROADMAP Task 258) ----
+	//
+	// Deferred out of Task 212 ("Still deferred: Open Recent") and asked for again by Tom
+	// 2026-08-10. The list is FILES, not projects: a project you closed was discarded on purpose and
+	// there is nothing left of it to reopen, whereas the file it was saved to is still on the disk
+	// and is exactly what somebody means by "the thing I was working on yesterday".
+	//
+	// Stored as ONE record holding the whole array, not a row per file. The array is short and is
+	// always read and written whole (dedupe and cap both need to see all of it), so a keyed store
+	// would have bought nothing but a second round of key management. A FileSystemFileHandle is
+	// structured-cloneable, and so is an array of them.
+	var LPN_RECENT_MAX = 8;
+	var recentFiles = [];   // [{handle, name, at}], most recent first; mirrors the store
+	function loadRecentFiles() {
+		return idbRun('readonly', function (st) { return st.get('list'); }, LPN_IDB_RECENT)
+			.then(function (rows) {
+				recentFiles = (Array.isArray(rows) ? rows : []).filter(function (r) { return r && r.handle; });
+			})
+			.catch(function () { recentFiles = []; });
+	}
+	function saveRecentFiles() {
+		return idbRun('readwrite', function (st) { return st.put(recentFiles, 'list'); }, LPN_IDB_RECENT);
+	}
+	// Dedupe is by isSameEntry() where the browser has it -- the same question Save as asks before it
+	// clobbers, and the only honest answer to "is this the same file?" Two different folders can hold
+	// two different Main-St.json, and a name match would have quietly collapsed them into one row
+	// pointing at whichever was touched last. Falls back to the name only where isSameEntry is
+	// missing, which is the best that browser can do.
+	async function sameFile(a, b) {
+		if (!a || !b) { return false; }
+		if (a === b) { return true; }
+		if (a.isSameEntry) { try { return await a.isSameEntry(b); } catch (err) { /* fall through */ } }
+		return a.name === b.name;
+	}
+	async function noteRecentFile(handle) {
+		if (!handle || !handle.name) { return; }   // landOpenedFile reaches rememberHandle with no handle
+		var kept = [];
+		for (var i = 0; i < recentFiles.length; i++) {
+			if (!(await sameFile(recentFiles[i].handle, handle))) { kept.push(recentFiles[i]); }
+		}
+		kept.unshift({ handle: handle, name: handle.name, at: Date.now() });
+		recentFiles = kept.slice(0, LPN_RECENT_MAX);
+		saveRecentFiles();
+	}
+	// A handle that no longer resolves -- the file was moved, renamed or deleted -- is dropped rather
+	// than left in the menu to fail a second time.
+	async function dropRecentFile(handle) {
+		var kept = [];
+		for (var i = 0; i < recentFiles.length; i++) {
+			if (!(await sameFile(recentFiles[i].handle, handle))) { kept.push(recentFiles[i]); }
+		}
+		recentFiles = kept;
+		saveRecentFiles();
+	}
 	function recallHandles() { return idbRun('readonly', function (st) { return st.getAll ? st.getAll() : null; }); }
 	function recallHandleKeys() { return idbRun('readonly', function (st) { return st.getAllKeys ? st.getAllKeys() : null; }); }
 
@@ -3218,7 +3289,14 @@ var EngCalcs = EngCalcs || {};
 		var picked;
 		try { picked = await window.showOpenFilePicker({ multiple: false, types: fileTypes() }); }
 		catch (err) { return; } // cancelled
-		var handle = picked[0], text;
+		await openHandle(picked[0]);
+	}
+	// Everything that happens once a handle is in hand, split out of openFromFile() so the recent
+	// list opens a file by exactly the same route the picker does -- same identity check, same
+	// already-open rule, same lock question. A second copy of this would be a second place for the
+	// lock protocol to drift.
+	async function openHandle(handle) {
+		var pc = EngCalcs.pageConfig || {}, text;
 		try { text = await (await handle.getFile()).text(); }
 		catch (err) {
 			alert(pc.lpn_import_bad_file || 'That file could not be read as a project saved from this page.');
@@ -3248,6 +3326,34 @@ var EngCalcs = EngCalcs || {};
 			return;
 		}
 		landOpenedFile(saved, handle, false);
+	}
+	// Opening a file from the recent list. The permission grant does not survive a reload, so this
+	// usually has to ask -- and it can, because a click on a menu row IS the live user activation
+	// requestPermission() demands. Where the grant is still warm the browser shows nothing at all,
+	// which is the whole point of the list: no picker, no hunting for the folder again.
+	async function openRecentFile(rec) {
+		var pc = EngCalcs.pageConfig || {};
+		if (!rec || !rec.handle) { return; }
+		if (!requireFileIdentity('open')) { return; }
+		var perm = await handlePermission(rec.handle, false);
+		if (perm !== 'granted') { perm = await handlePermission(rec.handle, true); }
+		if (perm !== 'granted') {
+			// Refused, or a browser that cannot ask. Left in the list on purpose: the file is still
+			// there and still the one they wanted, and a row that vanishes when you decline a
+			// permission prompt reads as the app losing the file.
+			setNotice(pc.lpn_recent_denied || 'Permission to open that file was not given, so it was not opened.');
+			return;
+		}
+		// getFile() succeeding is the only proof the file is still where the handle says (see the
+		// commit of that name): a moved, renamed or deleted file throws here, and a row that can
+		// never work again is worse than no row.
+		try { await rec.handle.getFile(); }
+		catch (err) {
+			dropRecentFile(rec.handle);
+			setNotice((pc.lpn_recent_gone || 'Could not open {file}. It may have been moved, renamed, or deleted, so it was taken off the recent list.').replace('{file}', rec.name));
+			return;
+		}
+		await openHandle(rec.handle);
 	}
 	// The three-answer dialog: look at it, keep your own copy, or think better of it. Cancel is a real
 	// answer here and does nothing at all -- the project never lands, so backing out is free.
@@ -4200,6 +4306,16 @@ var EngCalcs = EngCalcs || {};
 				list.appendChild(hr);
 				return;
 			}
+			// A group label, not a command: the recent-file rows below it carry file names, and
+			// without a word over them a menu of bare filenames does not say what it will do with
+			// one. A <div> rather than a disabled button so it is never in the tab order.
+			if (r.heading) {
+				var hd = document.createElement('div');
+				hd.className = 'lpn-menu-heading';
+				hd.textContent = r.label;
+				list.appendChild(hd);
+				return;
+			}
 			var b = document.createElement('button');
 			b.type = 'button';
 			b.className = 'lpn-menu-row';
@@ -4240,9 +4356,30 @@ var EngCalcs = EngCalcs || {};
 	function openFileMenu(anchor) {
 		var pc = EngCalcs.pageConfig || {}, id = library.openId, entry = indexEntry(id);
 		var linked = isLinked(id), api = fileApiAvailable();
+		// Recent files sit directly under Open…, which is where thirty years of File menus have put
+		// them, and are simply ABSENT when there are none -- an empty "Recent files" heading over
+		// nothing teaches the user only that the feature does not work yet. They cannot appear at all
+		// without the File System Access API, because a browser with no handle to keep has nothing to
+		// remember: there, opening a file is an upload and there is no way back to it.
+		var recentRows = [];
+		if (api && recentFiles.length) {
+			recentRows.push({ separator: true });
+			recentRows.push({ heading: true, label: pc.lpn_file_recent || 'Recent files' });
+			recentFiles.forEach(function (rec) {
+				recentRows.push({
+					icon: 'open',
+					// The file NAME, not the project name: this list is about files on the disk, and
+					// the project inside one may since have been renamed or may not exist here at all.
+					label: rec.name,
+					tip: (pc.lpn_recent_tip || 'Open {file} again, without looking for it.').replace('{file}', rec.name),
+					fn: function () { openRecentFile(rec); }
+				});
+			});
+		}
 		openMenu(anchor, [
 			{ icon: 'new', label: pc.lpn_file_new || 'New', fn: function () { newProject(); renderTabs(); } },
-			{ icon: 'open', label: pc.lpn_file_open || 'Open…', fn: openFromFile },
+			{ icon: 'open', label: pc.lpn_file_open || 'Open…', fn: openFromFile }
+		].concat(recentRows, [
 			{ separator: true },
 			// **The menu says Save and Save as… in every browser** (Tom, 2026-08-04, overruling the
 			// first version: *"'Download a copy' is a mistake, and the menu item we want is
@@ -4300,7 +4437,7 @@ var EngCalcs = EngCalcs || {};
 			{ icon: 'revert', label: pc.lpn_file_revert || 'Revert', fn: revertCurrent, disabled: !(linked && entry && entry.dirty) },
 			{ separator: true },
 			{ icon: 'close', label: pc.lpn_file_close || 'Close', fn: function () { closeTab(id); } }
-		]);
+		]));
 	}
 	// ---- The menu bar (ROADMAP Task 211, 2026-08-04) ----
 	// Every command on this page is reachable from here. The toolbar below is the high-use subset,
@@ -4721,6 +4858,10 @@ var EngCalcs = EngCalcs || {};
 			syncReadOnlyToOpenProject();
 			return reacquireLocksOnBoot();
 		});
+		// Independent of the above, and unordered against it: the File menu reads `recentFiles`
+		// synchronously when it opens, so this only has to have finished before the user gets to the
+		// menu -- which it will, being one small read. An empty list simply omits the section.
+		loadRecentFiles();
 		// Rotating a phone changes innerHeight, and with it the cap above -- without this, turning a
 		// portrait phone to landscape leaves a canvas taller than the screen and re-creates exactly
 		// the trap the cap exists to prevent. orientationchange as well as resize: some mobile

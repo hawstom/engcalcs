@@ -1203,6 +1203,12 @@ $ec_lang['lpn_file_saveas']='Save as…';
 $ec_lang['lpn_file_revert']='Revert';
 $ec_lang_syn['lpn_file_revert']='Throw away (discard) my changes by reloading the saved version (undo all changes, go back to the saved file).';
 $ec_lang['lpn_file_close']='Close';
+// Recent files (Task 258). "Files", not "projects": a project you closed was discarded, but the file
+// it was saved to is still on the disk, and that is what this list reopens.
+$ec_lang['lpn_file_recent']='Recent files';
+$ec_lang['lpn_recent_tip']='Open {file} again, without looking for it.';
+$ec_lang['lpn_recent_denied']='Permission to open that file was not given, so it was not opened.';
+$ec_lang['lpn_recent_gone']='Could not open {file}. It may have been moved, renamed, or deleted, so it was taken off the recent list.';
 // The tab strip. These are titles on small controls, so each has to stand alone with no sentence
 // around it.
 $ec_lang['lpn_tab_new']='New project';
@@ -1384,7 +1390,7 @@ $ec_lang['lpn_notes_3_def']='Every project is a tab, and every tab is saved in t
 $ec_lang['lpn_notes_5_term']='Pump curve';
 $ec_lang['lpn_notes_5_def']='A pump follows H = H₀ − aQ^b, where H is the head the pump adds and Q is the flow through it. Enter one, two, or three points from the manufacturer\'s curve. Three points — the head at zero flow, the normal working point, and the point of highest flow — fit H₀, a and b directly, and follow a published curve most closely. Two points fit a parabola (b = 2) with its peak at zero flow. One point uses a common rule: the head at zero flow is 1.33 × the head you enter, and the highest flow is 2 × the flow you enter, which again gives b = 2. A pump with no points entered adds no head at all. The curve is not cut off where the head reaches zero, so asking a pump for more flow than its curve can deliver gives a negative head. The fix is a bigger pump or a smaller demand, not a different curve fit.';
 $ec_lang['lpn_notes_4_term']='Planned additions';
-$ec_lang['lpn_notes_4_def']='Scenarios, so that one project can hold several sets of demands. Tables of node and pipe results. Opening a file you used recently without hunting for it again. Reading and writing EPANET .inp files. Comments and suggestions are always welcome (see the feedback link above).';
+$ec_lang['lpn_notes_4_def']='Scenarios, so that one project can hold several sets of demands. Tables of node and pipe results. Reading and writing EPANET .inp files. Comments and suggestions are always welcome (see the feedback link above).';
 $ec_lang['lpn_notes_epanet_term']='Hazen-Williams constants match EPANET';
 $ec_lang['lpn_notes_epanet_def']='In August 2026 the Hazen-Williams coefficient and exponent were changed to match EPANET. Head loss results differ from earlier versions of this page by up to 0.1 percent, which is far smaller than the uncertainty in the C value itself.';
 $ec_lang['lpn_id_invalid']='Enter an ID with no spaces and no quotation marks.';

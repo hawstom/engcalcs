@@ -901,8 +901,7 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     last opened before the IndexedDB store existed) actually are.
   - **Promoted from 20 and done out of order** because it was not a nicety: every reload disconnected,
     so it contaminated every browser pass and produced three separate "reload doesn't work" reports.
-  - Still deferred: `Open Recent`, and answering "is this the same file?" across sessions. Those were
-    the other half of this task and want `isSameEntry()`; extract them if they earn it.
+  - `Open Recent` was deferred here and shipped as Task 258 (2026-08-10), on `isSameEntry()`.
 - 20|225.13| **`dev/lpn-file-lock-test-punchlist.md` §13 needs the rewrite §0–§8 got** (Tom: *"Some
   stuff no longer exists or is renamed"*), before anybody is asked to run that section again.
   Split out of Task 225 when the rest of it closed 2026-08-09 — this piece is a punch-list document
@@ -1707,6 +1706,21 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|259| **[DONE 2026-08-10] Navbar overlap just above the hamburger breakpoint.** Tom's screenshot:
+  "Libre Software" printing over "Hydraulics" and over the brand, and a squeezed Copy link wrapping
+  onto two lines. Bootstrap's `.navbar-expand-lg` pins the expanded bar to `flex-wrap: nowrap`, so
+  from 992px to about 1150px nothing yields and every nowrap item spills out of its shrunken box.
+  `css/engcalcs.css` now lets the navbar and the expanded collapse wrap in that band.
+  Also: "Libre Software" links to the README's `#license` section rather than the repo root.
+
+- 0|258| **[DONE 2026-08-10] File > Recent files on Looped-Network.** The `Open Recent` deferred out
+  of Task 212, asked for again by Tom 2026-08-10. Up to 8 file handles in a second IndexedDB store
+  (`recent`, DB version 2) that outlives the projects — `handles` is deleted on close, which is why
+  it could not carry this. Deduped by `isSameEntry()`, not by name. Clicking a row spends the click
+  as the user activation `requestPermission()` needs, so a warm grant reopens with no picker; a
+  vanished file drops off the list. 26 checks in `dev/lpn-spike/recent-files-harness.js`,
+  mutation-tested. Removed the matching promise from `lpn_notes_4_def` in en/es/fr/pt/tr.
 
 - 0|225| **[DONE 2026-08-09] The `lpn_` punch-list leftovers — small, confirmed, and none of them
   dangerous.** Extracted from Tasks 223/220 as they closed. Full wording in

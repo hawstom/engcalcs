@@ -325,6 +325,9 @@ html[lang="zh"] .ec-welcome {
 .lpn-menu-row { display: block; width: 100%; text-align: left; background: none; border: 0; font: inherit; padding: 4px 12px 4px 8px; cursor: pointer; white-space: nowrap; }
 .lpn-menu-row:hover:enabled { background: #def; }
 .lpn-menu-row:disabled { color: #999; cursor: default; }
+/* Group label above the recent-file rows (Task 258). Indented to the icon column so it reads as a
+   heading over those rows rather than as a row of its own that failed to get a glyph. */
+.lpn-menu-heading { padding: 4px 12px 1px 8px; font-size: 0.8em; color: #666; white-space: nowrap; }
 /* Reserved icon column for menu rows (Task 231). Fixed width and always present, even when the
    row has no icon, so one iconless row cannot ragged-edge the labels around it. */
 .lpn-menu-icon { display: inline-block; width: 1.6em; text-align: center; }
@@ -425,3 +428,31 @@ html[lang="zh"] .ec-welcome {
 	   nothing along with the word. Re-assert it in rem, which the parent cannot zero. */
 	.ec-nav-libre > .ec-icon { width: 1.15rem; height: 1.15rem; margin-inline-end: 0; }
 }
+
+/* NARROW DESKTOP: the band just above the hamburger breakpoint (Tom, 2026-08-10, on a
+   Looped-Network screenshot -- "Libre Software and the Hydraulics menu overlap each other, and
+   HawsEDC Calculators; the Copy link wrap looks strange").
+
+   Bootstrap's .navbar-expand-lg pins the expanded bar to `flex-wrap: nowrap`, so from 992px up
+   to roughly 1150px -- where the brand group, both dropdowns, the Save-this-calculation form and
+   the language picker together want more room than there is -- NOTHING yields. Flex shrinks the
+   items instead, and because every one of them is white-space:nowrap text, they shrink their
+   BOXES without shrinking their content: the words spill out and print on top of each other.
+   Below 992px the problem disappears on its own, because the hamburger takes the menus away.
+
+   The fix is to let the row wrap rather than collide. Wrapping is decided before shrinking, so
+   whichever piece no longer fits drops to a second line at full width instead of being squeezed
+   -- which also cures the Copy link button, whose icon and word were being crushed onto two
+   lines by the same squeeze. Costs a little navbar height inside that ~150px band and nothing
+   at all outside it. Deliberately NOT solved by truncating the brand: "HawsEDC Calculators" is
+   the site's own name, and an ellipsis in it is worse than a taller bar. */
+@media (min-width: 992px) {
+	.navbar-expand-lg { flex-wrap: wrap; }
+	.navbar-expand-lg > .navbar-collapse { flex-wrap: wrap; row-gap: 0.25rem; }
+}
+/* Belt for the same collision inside the brand group itself: it carries min-width: 0 (so the
+   navbar may shrink it), which means its own two nowrap children would otherwise spill out of
+   it. Wrapping puts "Libre Software" on a line under the brand instead. */
+.ec-brandgroup { flex-wrap: wrap; }
+/* The icon and the word are one label, never a two-line stack (Tom's mark C). */
+#ec-copy-link-btn { white-space: nowrap; }
