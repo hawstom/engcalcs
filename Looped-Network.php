@@ -307,7 +307,6 @@ EngCalcs.pageConfig = {
 	calc_units_us: <?=json_encode($ec_lang['calc_units_us'])?>,
 	calc_units_si: <?=json_encode($ec_lang['calc_units_si'])?>,
 	lpn_title_units: <?=json_encode($ec_lang['lpn_title_units'])?>,
-	lpn_title_units_mixed: <?=json_encode($ec_lang['lpn_title_units_mixed'])?>,
 	bpn_p_min: <?=json_encode($ec_lang['bpn_p_min'])?>,
 	lpn_id_invalid: <?=json_encode($ec_lang['lpn_id_invalid'])?>,
 	lpn_id_taken: <?=json_encode($ec_lang['lpn_id_taken'])?>,

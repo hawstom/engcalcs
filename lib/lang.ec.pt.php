@@ -549,7 +549,6 @@ $ec_lang['lpn_main_menu']='Rede de Tubulações Malhada (Interface de Mapa)';
 $ec_lang['lpn_main_title']='Calculadora Gratuita Online de Rede de Tubulações Malhada com Interface de Mapa';
 $ec_lang['lpn_main_desc']='Pressão e Vazão em Rede de Tubulações Malhada Que Você Desenha em um Mapa';
 $ec_lang['lpn_title_units']='Unidades {units}';
-$ec_lang['lpn_title_units_mixed']='Unidades mistas';
 $ec_lang['lpn_tool_select']='Selecionar';
 $ec_lang['lpn_tool_add_junction']='Junção';
 $ec_lang['lpn_tool_add_reservoir']='Reservatório';

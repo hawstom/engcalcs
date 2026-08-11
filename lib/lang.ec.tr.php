@@ -549,7 +549,6 @@ $ec_lang['lpn_main_menu']='Halkalı Boru Şebekesi (Harita Arayüzü)';
 $ec_lang['lpn_main_title']='Harita Arayüzlü Ücretsiz Çevrimiçi Halkalı Boru Şebekesi Hesaplayıcısı';
 $ec_lang['lpn_main_desc']='Harita Üzerinde Çizdiğiniz Halkalı Boru Şebekesinde Basınç ve Debi';
 $ec_lang['lpn_title_units']='{units} Birimleri';
-$ec_lang['lpn_title_units_mixed']='Karışık Birimler';
 $ec_lang['lpn_tool_select']='Seç';
 $ec_lang['lpn_tool_add_junction']='Düğüm';
 $ec_lang['lpn_tool_add_reservoir']='Rezervuar';

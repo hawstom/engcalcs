@@ -1098,7 +1098,6 @@ $ec_lang['lpn_main_menu']='Looped Pipe Network (Map Interface)';
 $ec_lang['lpn_main_title']='Free Online Looped Pipe Network Calculator with Map Interface';
 $ec_lang['lpn_main_desc']='Pressure and Flow in a Looped Pipe Network You Draw on a Map';
 $ec_lang['lpn_title_units']='{units} Units';
-$ec_lang['lpn_title_units_mixed']='Mixed Units';
 $ec_lang['lpn_tool_select']='Select';
 $ec_lang_syn['lpn_tool_select']='Select mode; the mode (state) in which you pick (select, choose, pick, point at, indicate, signal) things to act on rather than add things.';
 $ec_lang['lpn_tool_add_junction']='Junction';

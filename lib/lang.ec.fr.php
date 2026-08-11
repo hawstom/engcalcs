@@ -601,7 +601,6 @@ $ec_lang['lpn_main_menu']='Réseau de conduites maillé (interface cartographiqu
 $ec_lang['lpn_main_title']='Calculateur en ligne gratuit de réseau de conduites maillé avec interface cartographique';
 $ec_lang['lpn_main_desc']='Pression et débit d\'un réseau de conduites maillé que vous dessinez sur une carte';
 $ec_lang['lpn_title_units']='Unités {units}';
-$ec_lang['lpn_title_units_mixed']='Unités mixtes';
 $ec_lang['lpn_tool_select']='Sélectionner';
 $ec_lang['lpn_tool_add_junction']='Jonction';
 $ec_lang['lpn_tool_add_reservoir']='Réservoir';

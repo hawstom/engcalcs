@@ -569,7 +569,6 @@
         "lpn_main_title": "Free Online Looped Pipe Network Calculator with Map Interface",
         "lpn_main_desc": "Pressure and Flow in a Looped Pipe Network You Draw on a Map",
         "lpn_title_units": "{units} Units",
-        "lpn_title_units_mixed": "Mixed Units",
         "lpn_tool_select": "Select",
         "lpn_tool_add_junction": "Junction",
         "lpn_tool_add_reservoir": "Reservoir",
@@ -815,7 +814,7 @@
         "lpn_settings_wipe_btn": "Erase everything on this page",
         "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
-    "count": 813,
+    "count": 812,
     "active_prefixes": [
         "about",
         "bpn",

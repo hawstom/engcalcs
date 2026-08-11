@@ -180,6 +180,12 @@ URI either way. PNG is good advice for a screenshot, but the post reads as a req
   the whole preference set, which is what makes steps 1–3 worth doing.
 - **The map viewport is not** — zoom and pan are re-fitted on load rather than restored. Deliberate,
   and probably right, but a template cannot carry a view.
+- **Closing a browser-only project deletes it** (`discardProject()` removes its localStorage key);
+  the close prompt says so. A closed FILE project is still reopenable from File > Recent files,
+  which `discardProject()` never touches. **Tom ruled 2026-08-10 that this is finished as it
+  stands** — *"All I wanted was the ability to open a file from my PC again. So let's forget the
+  whole thing and call this feature good for now."* Do not propose a recently-closed / reopen-tab
+  feature; it was considered and declined.
 - **Screenshots still include the mode hint and coordinate readout** (New Project step 6). ROADMAP
   Task 253 is the clean-map toggle that fixes this; it is not built.
 

@@ -549,7 +549,6 @@ $ec_lang['lpn_main_menu']='Red de tuberías mallada (interfaz de mapa)';
 $ec_lang['lpn_main_title']='Calculadora gratuita en línea de redes de tuberías malladas con interfaz de mapa';
 $ec_lang['lpn_main_desc']='Presión y caudal en una red de tuberías mallada que usted dibuja en un mapa';
 $ec_lang['lpn_title_units']='Unidades {units}';
-$ec_lang['lpn_title_units_mixed']='Unidades mixtas';
 $ec_lang['lpn_tool_select']='Seleccionar';
 $ec_lang['lpn_tool_add_junction']='Nudo';
 $ec_lang['lpn_tool_add_reservoir']='Embalse';

@@ -1134,24 +1134,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **epanet-js's silence is not evidence.** It prioritised map tiles, where registration is the
     basemap's job; that is a different product decision, not a verdict on world files.
 
-- 60|278| **"Recently closed": hold the last 3 closed BROWSER projects instead of deleting them.**
-  Tom, 2026-08-10. Today `discardProject()` does `localStorage.removeItem(projectKey(id))` and the
-  content is gone; a file project is fine (its handle stays in Recent files, which `discardProject()`
-  never touches), but a browser-only project is unrecoverable, and an *untouched* one is deleted with
-  no prompt at all.
-  - **His own argument settles the "web closing is permanent" objection**: *"we expect web closing to
-    be permanent"* — but we adopted the TAB paradigm, and reopening a closed tab is universal in it.
-    Ctrl+Shift+T is the expectation we actually set.
-  - **Keep it separate from Recent files.** Two different things: files on disk (survive clearing the
-    browser, Chromium-only) vs. projects we held back (die with localStorage, every browser). Merging
-    them would put two failure modes under one heading.
-  - **The real cost is bytes, and it must not be paid by live work.** A backdrop project runs 0.5–2 MB
-    against a ~5–10 MB budget, so three held-back projects could be most of it. Cap by count AND total
-    size, evict oldest, and **purge the closed list first when `writeJSON` hits quota** — a project
-    somebody closed must never be why a project somebody is editing fails to save.
-  - **`lpn_close_browser_prompt` has to change with it.** It says "gone for good"; once this exists
-    that is false, and a warning users learn is overstated is worse than no warning.
-
 - 55|277| **Moving something cannot be undone.** No drag handler calls `saveUndoSnapshot()` — not
   node, vertex, Text-label or data-label drags. So Undo after a drag leaves the drag in place and
   reverts an *earlier* discrete act instead, which is worse than doing nothing. Snapshot on drag
@@ -1833,13 +1815,18 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
   in the lower left corner of the map."* He is right — the status strip answers it continuously,
   where you are already looking, and a tab is a second copy of the same fact free to drift. Nothing
   writes `document.title`; the harness asserts that, because the defect is a line coming back.
-  - **What survives, and should not be re-deleted:** `unitSetName()`/`unitSetLabel()` and the two
-    keys, now feeding the **example network's title block** — which is what Tom actually wanted
-    (*"I do like having the units as a title text on the example projects. And I don't see that."*
-    He was not misunderstanding; it was not there). A screenshot of the example leaves the page
-    without the status strip, so the drawing has to say what it is drawn in.
-  - **Do not store "US"/"SI"** (Tom): the preset name is derived from the live strip, and the
-    document stores all seven selections. A hand-mixed strip is named mixed, not rounded.
+  - **What survives:** `unitSetLabel(system)` and `lpn_title_units`, feeding the **example network's
+    title block** — which is what Tom actually wanted (*"I do like having the units as a title text
+    on the example projects. And I don't see that."* He was not misunderstanding; it was not there).
+    A screenshot of the example leaves the page without the status strip.
+  - **The label is FORCED by the caller, not derived from the strip** — Tom cut the derived version
+    the same day: *"We never create an example based on the current units, or we shouldn't. We should
+    force the units we want and label thusly. `unitSetName()` sounds like a function without a
+    cause."* It was: `newProjectFromExample(system)` already knew the answer, so reading it back off
+    the selects was indirection with nothing behind it. `unitSetName()` and `lpn_title_units_mixed`
+    are deleted; the harness asserts the label ignores the live strip.
+  - **Do not store "US"/"SI"** (Tom): the document stores all seven unit selections, which is the
+    fact. A preset name would be a second copy of it, free to disagree.
   - Adding the third title line moved `titleY` 4600 → 4572 to keep the ring's ~35 units of
     clearance. **The harness had been measuring that clearance at a seeded text size of 2.5, not the
     shipped 20** — 8× tighter, so it read 29 units where a real visitor would have had 7. It now

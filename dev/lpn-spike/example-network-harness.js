@@ -232,7 +232,7 @@ src = src.replace(marker,
   "\t\ttabAsterisk: tabAsterisk, indexEntry: indexEntry, openId: function () { return library.openId; },\n" +
   "\t\tnewProjectFromExample: newProjectFromExample, saveToStorage: saveToStorage,\n" +
   "\t\tnewBlankProject: newBlankProject, refreshMapStatus: refreshMapStatus,\n" +
-  "\t\tunitSetName: unitSetName, unitSetLabel: unitSetLabel,\n" +
+  "\t\tunitSetLabel: unitSetLabel,\n" +
   "\t\tfrictionMethod: frictionMethod,\n" +
   "\t\tbuildMenuBar: buildMenuBar, menuPopupOpen: function () { return document.getElementById('lpn_menu_popup').style.display === 'block'; },\n" +
   "\t\tsubMenuOpen: function () { return document.getElementById('lpn_menu_popup2').style.display === 'block'; },\n" +
@@ -278,7 +278,7 @@ byId.lpn_toolbar.querySelectorAll = () => [];
   // example must override that -- raising the default alone never reaches them. This is exactly
   // the state Tom was in when he reported the map still drawing at the old size.
   L.settings().textSize = 2.5;
-  L.drawExample();
+  L.drawExample(which);
 
   const doc = L.getDoc(), s = L.settings();
   const nodes = doc.nodes, links = doc.links;
@@ -370,7 +370,7 @@ byId.lpn_toolbar.querySelectorAll = () => [];
   {
     L.reset();
     L.settings().textSize = L.defaultSettings().textSize;
-    L.drawExample();
+    L.drawExample(which);
     const d2 = L.getDoc();
     const ring2 = d2.nodes.filter(n => ring.indexOf(n.id) >= 0).map(n => n.y);
     const low2 = d2.labels.filter(t => !t.anchorNode).reduce((a, b) => (a.y > b.y ? a : b));
@@ -398,8 +398,9 @@ byId.lpn_toolbar.querySelectorAll = () => [];
   // THE UNITS LINE (Tom, 2026-08-10). The example commits to a unit system (Task 264) and this is
   // where it says so -- a screenshot of the drawing travels without the map's status strip, which
   // is the whole reason this line exists here and not on the browser tab.
-  ok('...and a third line naming the unit system the example is drawn in',
-    texts.includes(L.unitSetLabel()) && /(US|SI)/.test(L.unitSetLabel()), L.unitSetLabel());
+  ok('...and a third line naming the unit system the example was FORCED to',
+    texts.includes(L.unitSetLabel(which)) && /(US|SI)/.test(L.unitSetLabel(which)),
+    L.unitSetLabel(which));
   ok('reservoir and lowest-pressure callouts use real strings',
     texts.includes(PC.lpn_tool_add_reservoir) && texts.includes(PC.bpn_p_min));
   ok('no annotation was left on the placeholder "Text"',
@@ -669,7 +670,7 @@ console.log('\n--- Settings panel stays in sync ---');
   console.log('\n--- Task 263: inputs are declared, not converted ---');
   setUnitSet('us');
   L.reset();
-  L.drawExample();
+  L.drawExample('us');
   const doc = L.getDoc();
   const pipe = doc.links.find(l => l.type !== 'pump');
   const junction = doc.nodes.find(n => n.type === 'junction');
@@ -968,6 +969,12 @@ console.log('\n--- Settings panel stays in sync ---');
   ok('a project made from an example starts clean too',
     L.tabAsterisk(L.indexEntry(exId)).show === false, 'dirty = ' + L.indexEntry(exId).dirty);
   ok('...even though it is full of network', L.getDoc().links.length > 0);
+  // THROUGH THE REAL ENTRY POINT, not L.drawExample() directly: newProjectFromExample() is where the
+  // chosen system lives, and this is the only assertion that proves it reaches the title block. The
+  // direct-call tests above pass the system by hand, so dropping the argument here survives them.
+  ok('...and its title block names the system the menu row committed to',
+    L.getDoc().labels.some(t => t.text === L.unitSetLabel('us')),
+    L.getDoc().labels.map(t => t.text).join(' | '));
 }
 
 
@@ -1024,21 +1031,26 @@ console.log('\n--- Settings panel stays in sync ---');
   }
 }
 
-// ---- The unit-set NAME, and where it is allowed to appear ----
-// Task 265 put "US Units" on the browser tab; Tom reversed it on sight (2026-08-10): the map's
-// status strip already answers "what units am I in", continuously, where you are already looking.
-// What survives is the derivation and its one legitimate consumer -- the example network's title
-// block, checked in the annotations section above.
+// ---- The unit-set label: FORCED by the caller, never read back off the strip ----
+// Task 265 put "US Units" on the browser tab; Tom reversed it the same day -- the map's status strip
+// already answers "what units am I in", continuously, where you are already looking. He then cut the
+// derivation that survived it: *"We never create an example based on the current units, or we
+// shouldn't. We should force the units we want and label thusly."* So the label takes the preset the
+// caller committed to, and there is no reading of the live selects anywhere.
 {
-  console.log('\n--- the unit-set name is derived, never stored ---');
+  console.log('\n--- the unit-set label is forced, not derived ---');
   const PC = EngCalcs.pageConfig;
-  setUnitSet('us');
-  ok('a US strip is recognised as US', L.unitSetName() === 'us');
-  ok('...and renders as a whole translated phrase, not "US" + "Units" concatenated',
-    L.unitSetLabel() === PC.lpn_title_units.replace('{units}', PC.calc_units_us), L.unitSetLabel());
-  EngCalcs.setUnits('si');
-  ok('an SI strip is recognised as SI', L.unitSetName() === 'si' && /SI/.test(L.unitSetLabel()),
-    L.unitSetLabel());
+  ok('US renders as a whole translated phrase, not "US" + "Units" concatenated',
+    L.unitSetLabel('us') === PC.lpn_title_units.replace('{units}', PC.calc_units_us),
+    L.unitSetLabel('us'));
+  ok('...and SI likewise', /SI/.test(L.unitSetLabel('si')), L.unitSetLabel('si'));
+
+  // THE POINT OF THE CUT: the label follows its ARGUMENT, not the strip. Set the strip to the
+  // opposite system and require the answer not to move. A derived version fails this.
+  setUnitSet('si');
+  ok('the label ignores the live strip entirely',
+    L.unitSetLabel('us') === PC.lpn_title_units.replace('{units}', PC.calc_units_us),
+    'strip is SI, label says ' + L.unitSetLabel('us'));
 
   // Perturb the KEYS, not the units, to prove the label is really plumbed through pageConfig. In
   // English `calc_units_si` is the literal "SI", so hardcoding it would pass every check above --
@@ -1048,24 +1060,16 @@ console.log('\n--- Settings panel stays in sync ---');
     const keepTok = PC.calc_units_si, keepTpl = PC.lpn_title_units;
     PC.calc_units_si = 'ZZ'; PC.lpn_title_units = '[{units}]';
     ok('the label is composed from the lang keys, not from literals in the JS',
-      L.unitSetLabel() === '[ZZ]', L.unitSetLabel());
+      L.unitSetLabel('si') === '[ZZ]', L.unitSetLabel('si'));
     PC.calc_units_si = keepTok; PC.lpn_title_units = keepTpl;
   }
-
-  // A strip matching NEITHER preset is the case a stored "us" would lie about, and is exactly why
-  // this is derived: Tom, 2026-08-10, "Don't store 'US' or 'SI'. Those don't mean anything." It is
-  // reachable -- the seven selects are individually settable, and Task 263 made a switch
-  // reinterpret rather than convert, so a half-changed strip is a state a real user lands in.
-  const dia = L.setUnitEl('lpn_u_diameter');
-  dia.selectedIndex = dia.options.findIndex(o => o.dataset.unit === 'in');
-  ok('a hand-mixed strip is named as mixed, not rounded to the nearer preset',
-    L.unitSetName() === null && L.unitSetLabel() === PC.lpn_title_units_mixed, L.unitSetLabel());
 
   // NOTHING writes the browser tab any more. A source check, because the defect this guards is a
   // line coming back, not a value being wrong.
   {
     const js = fs.readFileSync(ROOT + 'js/looped-network.js', 'utf8');
     ok('the page never writes document.title', js.indexOf('document.title') < 0);
+    ok('...and nothing derives a preset name from the selects', js.indexOf('unitSetName') < 0);
   }
 
   // The strings are real lang keys, not literals hiding behind a fallback -- the mistake that made
@@ -1074,11 +1078,12 @@ console.log('\n--- Settings panel stays in sync ---');
     const langSrc = fs.readFileSync(ROOT + 'lib/lang.ec.en.php', 'utf8');
     ok('lpn_title_units carries a {units} placeholder rather than concatenating fragments',
       /\$ec_lang\['lpn_title_units'\]='[^']*\{units\}[^']*';/.test(langSrc));
-    ok('lpn_title_units_mixed exists', /\$ec_lang\['lpn_title_units_mixed'\]=/.test(langSrc));
     const page = fs.readFileSync(ROOT + 'Looped-Network.php', 'utf8');
-    ok('...and all four strings reach pageConfig',
-      ['lpn_title_units', 'lpn_title_units_mixed', 'calc_units_us', 'calc_units_si']
+    ok('...and its three strings reach pageConfig',
+      ['lpn_title_units', 'calc_units_us', 'calc_units_si']
         .every(k => page.indexOf(k + ': <?=json_encode') >= 0));
+    ok('the retired mixed-units key is gone everywhere',
+      langSrc.indexOf('lpn_title_units_mixed') < 0 && page.indexOf('lpn_title_units_mixed') < 0);
   }
 }
 

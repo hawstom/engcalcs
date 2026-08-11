@@ -4677,7 +4677,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function newProjectFromExample(system) {
 		var id = newProjectWithUnits(system);
-		drawExampleNetwork();
+		drawExampleNetwork(system);
 		// The example is not the user's unsaved work either -- it arrived by their choosing it from a
 		// menu, and it is two clicks to get back. So it starts clean, exactly as a blank project
 		// does, and earns its asterisk at the first edit.
@@ -5419,7 +5419,7 @@ var EngCalcs = EngCalcs || {};
 	// around 5000,5000"), so the example lands in positive coordinates that look like a survey or
 	// state-plane grid rather than like a sketch that starts at 0,0. Extent 1400 x 700, centre
 	// exactly 5000,5000.
-	function drawExampleNetwork() {
+	function drawExampleNetwork(system) {
 		if (doc.nodes.length > 0) {
 			var pc = EngCalcs.pageConfig || {};
 			if (!window.confirm(pc.lpn_confirm_example || 'This adds the example to the network you already have. Continue?')) { return; }
@@ -5643,7 +5643,7 @@ var EngCalcs = EngCalcs || {};
 		// it -- by the two lines' own half-heights plus the same 8-unit gap, never a flat offset, so
 		// the block stays tight at any text size. It lands between the title and the ring, which had
 		// ~35 units of clearance; a 1.0-size line is 20 tall at the default, so the ring keeps room.
-		annotate(5000, titleY + (effectiveFontSize(1.5) + effectiveFontSize(1)) / 2 + 8, null, unitSetLabel(), 1);
+		annotate(5000, titleY + (effectiveFontSize(1.5) + effectiveFontSize(1)) / 2 + 8, null, unitSetLabel(system), 1);
 		// Anchored callouts: the offset is from the node, and the label follows if the node moves.
 		// The reservoir is the drawing's far-left node and its own data label sits to the upper
 		// right, so its callout goes LEFT -- and UP, at the shared leader angle. It was level with
@@ -6092,51 +6092,19 @@ var EngCalcs = EngCalcs || {};
 			(pc.bpn_method || 'Friction method') + ': ' + frictionMethodLabel()
 		].join(' | ');
 	}
-	// Which unit preset the live strip matches -- 'us', 'si', or null for a hand-mixed strip.
+	// "US Units" / "SI Units", for the example network's title block. `system` is the preset the
+	// caller just committed the project to, never a reading of the live strip: an example FORCES the
+	// units it wants and then says which it forced (Tom, 2026-08-10, cutting the derived version --
+	// *"We never create an example based on the current units, or we shouldn't. We should force the
+	// units we want and label thusly."* The derivation was answering a question nobody asks).
 	//
-	// DERIVED, never stored. `serializeProject().units` records the seven selections, not a preset
-	// name, and that is right: the selections are the truth, and a stored "us" would be a second
-	// copy of the same fact, free to disagree with them. Tom, 2026-08-10, on being told the tab
-	// would name a unit system: *"Don't store 'US' or 'SI'. Those don't mean anything. Store all our
-	// settings."* We do, and this is how the preset NAME is recovered when one is needed for display
-	// -- which is now exactly one place, the example network's title block.
-	//
-	// A hand-mixed strip returns null and is named as mixed rather than rounded to the nearer
-	// preset. Reachable: the seven selects are individually settable, and Task 263 made a switch
-	// reinterpret rather than convert.
-	function unitSetName() {
-		var sets = EngCalcs.unitSets || {}, names = ['us', 'si'], i, s, ok, j, sel, fam;
-		for (i = 0; i < names.length; i++) {
-			s = sets[names[i]];
-			if (!s) { continue; }
-			ok = true;
-			for (j = 0; j < LPN_UNIT_SELECTS.length; j++) {
-				sel = unitEl(LPN_UNIT_SELECTS[j]);
-				if (!sel) { continue; }
-				fam = sel.dataset.family;
-				// A select with no declared family cannot be judged against a preset, and CLAUDE.md
-				// says it is invisible to the preset buttons too -- so it is skipped here for the
-				// same reason, rather than being allowed to force a "Mixed" verdict on its own.
-				if (!fam || !s[fam]) { continue; }
-				if (unitKey(LPN_UNIT_SELECTS[j]) !== s[fam]) { ok = false; break; }
-			}
-			if (ok) { return names[i]; }
-		}
-		return null;
-	}
-	// "US Units" / "SI Units" / "Mixed Units", for DRAWING on the map. Not for the browser tab:
-	// Task 265 put it there and Tom reversed it on sight (2026-08-10) -- *"Units on tab are not the
-	// right way to go. I think we solved this need with the statuses in the lower left corner of the
-	// map."* He is right; the status strip already answers "what units am I in" continuously, in the
-	// place you are already looking, and a second answer in the tab is the same fact maintained
-	// twice. What he DID want, and what this now serves, is a units line in the example network's
-	// own title block -- a drawing that claims to be a worked example should say what it is worked
-	// in, because a screenshot of it travels without the status strip.
-	function unitSetLabel() {
-		var pc = EngCalcs.pageConfig || {}, set = unitSetName();
-		if (!set) { return pc.lpn_title_units_mixed || 'Mixed Units'; }
+	// Not on the browser tab: Task 265 put it there and Tom reversed it the same day -- the map's
+	// status strip already answers "what units am I in" continuously, where you are already looking.
+	// The title block is different because a screenshot of the example travels without that strip.
+	function unitSetLabel(system) {
+		var pc = EngCalcs.pageConfig || {};
 		return (pc.lpn_title_units || '{units} Units')
-			.replace('{units}', set === 'us' ? (pc.calc_units_us || 'US') : (pc.calc_units_si || 'SI'));
+			.replace('{units}', system === 'us' ? (pc.calc_units_us || 'US') : (pc.calc_units_si || 'SI'));
 	}
 	// Suite-wide convention (CLAUDE.md's Unit Sets section): a default is Array('us'=>x,'si'=>y),
 	// not one SI number that happens to convert to something ugly in the other system (Tom,

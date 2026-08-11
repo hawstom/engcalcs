@@ -1,7 +1,7 @@
 {
     "meta": {
         "language": "it",
-        "expected_key_count": 813,
+        "expected_key_count": 812,
         "delta_key_count": 0,
         "exempt_key_count": 15,
         "exempt_keys": [
@@ -21,7 +21,7 @@
             "bpn_method_manning",
             "bpn_id"
         ],
-        "out_of_scope_key_count": 254,
+        "out_of_scope_key_count": 253,
         "coverage": "coverage: core calculators [mpf, mtc] x core languages [es, pt, fr, tr] (in scope iff calculator OR language is core; identity strings always)",
         "active_prefixes": [],
         "requested_prefix": null,
