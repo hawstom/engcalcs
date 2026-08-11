@@ -1095,23 +1095,20 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - Note for the audit: the guide's template-project flow is now the DESIGNED mechanism, not a
     workaround — see CLAUDE.md, "there are no browser units, only project units".
 
-- 60|271| **Give `lpn_` a friction-method choice: Hazen-Williams, Darcy-Weisbach, Manning.** Tom,
-  2026-08-10, arriving via "what units does a new user get" — he wanted the map readout to name the
-  method, then said the thing he actually means is "a choice among HW, DW, and Manning" that we do
-  not have. `bpn_` has one; `lpn_` hardcoded `method: 'hw'`.
-  - **The solver already implements all three.** `EngCalcs.lpnResistance()` in `js/lpn-solver.js`
-    branches on `manning` / `hw` / `dw`, and the DW path iterates on friction factor in both
-    `lpnSolve` and `lpnReport`. So this is a UI task, not a numerics task — do not re-derive that.
-  - `assembleModel()` and the map readout now both go through `frictionMethod()` (returns
-    `settings.method || 'hw'`), so the plumbing is in place and a control writing `settings.method`
-    is most of the work.
-  - **The real cost is ROUGHNESS.** It means a different quantity per method — C (dimensionless) for
-    HW, roughness height ε (a LENGTH, needing a unit family) for DW, n (dimensionless) for Manning —
-    so the field's label, unit, default and validation all change with the choice, and
-    `settings.defaults.roughness` has to follow. That, not the solver, is what this task is.
-  - Labels exist and are translated: `bpn_method`, `bpn_method_hw`, `bpn_method_dw`,
-    `bpn_method_manning`. `lpn_engine_manning_note` already warns that EPANET and the built-in
-    solver differ by ~0.6% under Manning.
+- 60|271| **Give `lpn_` a friction-method choice: HW, DW, Manning.** Tom, 2026-08-10. `bpn_` has
+  one; `lpn_` hardcodes `hw`. `assembleModel()` and the map readout already read `frictionMethod()`
+  (`settings.method || 'hw'`), and `bpn_method`/`_hw`/`_dw`/`_manning` are translated, so a control
+  writing `settings.method` is the missing piece.
+  - **The solver already does all three** — `lpnResistance()` branches on manning/hw/dw, and DW
+    iterates on friction factor in `lpnSolve` and `lpnReport`. UI task, not numerics.
+  - **The real cost is ROUGHNESS**: C, absolute height ε (a LENGTH, so a unit family), n. Label,
+    unit, default, validation and `settings.defaults.roughness` all change with the choice.
+  - **A new project must be INTENTIONAL about both** — Tom: *"being unaware of those on a new
+    project (model) is dangerous."* 2 units × 3 methods is six blank menu rows, so **"Blank project"
+    collapses back to ONE row plus a WIZARD picking units and method.** That reverses the two-row
+    split shipped 2026-08-10, which was right for units alone. `openDialog()` is the pattern.
+  - **Examples carry a method implicitly**: their roughness is HW C = 130, nonsense under Manning.
+    Fix them to HW, or give each one a method.
 
 - 55|265| **The lpn page title must disclose which unit system the project was created for.** Tom,
   2026-08-10: `"HawsEDC Calculators" / "Looped Pipe Network (Map Interface)" / "{units_set} Units"`.
