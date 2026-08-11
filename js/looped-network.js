@@ -2512,7 +2512,7 @@ var EngCalcs = EngCalcs || {};
 			// below LPN_DECLARATIVE_VERSION. Close still saves, so the units the project was opened
 			// under are recorded even while its numbers stay unruled.
 			{ label: pc.lpn_v2_restore_yes || 'Convert', fn: applyV2Restore },
-			{ label: pc.lpn_v2_restore_never || 'Never ask again', fn: stampDocAnswered },
+			{ label: pc.lpn_v2_restore_never || 'No. Never ask again.', fn: stampDocAnswered },
 			{ label: pc.lpn_v2_restore_no || 'Close so that I can check the current units first', fn: function () { saveToStorage(); } }
 		]);
 	}
