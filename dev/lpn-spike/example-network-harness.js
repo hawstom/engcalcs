@@ -189,8 +189,9 @@ src = src.replace(marker,
   "\t\treadUnitSelections: readUnitSelections, applyUnitSelections: applyUnitSelections,\n" +
   "\t\tmigrateSaved: migrateSaved, serializeProject: serializeProject,\n" +
   "\t\tv2RestoreEvidence: v2RestoreEvidence, applyV2Restore: applyV2Restore,\n" +
+  "\t\tgetProject: function () { return project; },\n" +
+  "\t\tsetProjectFlag: function (v) { if (v) { project.unitsUnconfirmed = true; } else { delete project.unitsUnconfirmed; } },\n" +
   "\t\tniceDefault: niceDefault, setUnitEl: function (name) { return unitEl(name); },\n" +
-  "\t\tgetScenarios: function () { return scenarios; }, setScenarios: function (x) { scenarios = x; },\n" +
   "\t\taddNode: addNode, addLink: addLink,\n" +
   "\t\tlabelWidth: function (id) { return labelEls[id] ? labelEls[id].width : 0; },\n" +
   "\t\tlabelSide: function (id) { return labelEls[id] ? labelEls[id].side : null; },\n" +
@@ -655,7 +656,9 @@ console.log('\n--- Settings panel stays in sync ---');
     links: [{ id: 'P1', type: 'pipe', _diameter: 0.1524, _length: 461, _roughness: 130 }], labels: [] };
   const out = L.migrateSaved(JSON.parse(JSON.stringify(v2)));
   ok('migrateSaved stamps v2 up to v3', out.v === 3);
-  ok('...flags it for the restore offer', out._v2Numbers === true);
+  // PERSISTENT, on the project, not a transient field: "Close so that I can check the current units
+  // first" is a promise the offer comes back, so declining must survive being written to storage.
+  ok('...flags it, persistently, for the restore offer', out.project.unitsUnconfirmed === true);
   ok('...and changes no number at all',
     out.nodes[0].elev === 15.24 && out.links[0]._diameter === 0.1524 && out.links[0]._length === 461);
 
@@ -689,9 +692,11 @@ console.log('\n--- Settings panel stays in sync ---');
   const p3 = L.addLink('pipe', r3.id, j3.id);
   p3._diameter = 0.2032; p3._length = 675.4; p3._roughness = 130; p3._k = 2;
   p3.curvePoints = null;
-  L.setScenarios([{ id: 'base', isBase: true, overrides: {} },
-    { id: 's2', overrides: { [p3.id]: { diameter: 0.3048 }, [j3.id]: { demand: 0.063 } } }]);
+  L.setProjectFlag(true);
+  ok('the flag stands before the answer', L.getProject().unitsUnconfirmed === true);
   L.applyV2Restore();
+  ok('converting clears the flag, so the offer does not return',
+    L.getProject().unitsUnconfirmed === undefined);
   ok('restore scales elevation to feet', near(r3.elev, 100, 0.01), r3.elev.toFixed(2));
   ok('restore scales the reservoir head', near(r3._head, 110, 0.01), r3._head.toFixed(2));
   ok('restore scales demand to gpm', near(j3._demand, 499.2, 1), j3._demand.toFixed(1));
@@ -699,10 +704,8 @@ console.log('\n--- Settings panel stays in sync ---');
   ok('restore leaves LENGTH alone (already declarative before this task)', p3._length === 675.4);
   ok('restore leaves roughness alone (dimensionless)', p3._roughness === 130);
   ok('restore leaves k alone (dimensionless)', p3._k === 2);
-  const ov = L.getScenarios()[1].overrides;
-  ok('restore reaches SCENARIO OVERRIDES too, or a scenario sits 39x from its Base',
-    near(ov[p3.id].diameter, 12, 0.001) && near(ov[j3.id].demand, 998.4, 2),
-    ov[p3.id].diameter.toFixed(3) + ' in, ' + ov[j3.id].demand.toFixed(1) + ' gpm');
+  // No scenario-override assertion: scenarios are not reachable from any UI, so no v2 document can
+  // carry an override. A test for it would be testing code that cannot run.
 }
 
 console.log('\n' + (fails === 0 ? 'ALL PASS' : fails + ' FAILURE(S)'));

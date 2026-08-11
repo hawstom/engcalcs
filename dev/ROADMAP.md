@@ -1751,9 +1751,17 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     Mandatory, not a nicety: a declared 400 written under mm would otherwise open as 400 inches.
     Consequence, Tom's own: there are no browser units and no "save as defaults" — a user keeps
     preferences by saving an **empty template project**. See CLAUDE.md.
-  - **v2 documents get one offer, and No is the default.** `offerUnitRestore()` shows real diameters
-    from that project as `0.2032 → 8` and rewrites nothing unless told to. Stamped v3 before the
-    answer, so dismissal means "leave my numbers alone" once rather than a dialog every open.
+  - **v2 documents get an offer that STANDS until accepted.** `offerUnitRestore()` shows real
+    diameters from that project as `0.2032 → 8` and rewrites nothing unless told to. Declining is
+    "not yet", not "no": Tom's own button text is *"Close so that I can check the current units
+    first"*, which promises the offer comes back, so `project.unitsUnconfirmed` persists and the
+    dialog returns on the next open. There is no "never ask again" — say so if one is wanted.
+  - **The first cut also migrated scenario overrides and claimed that mattered. It did not.**
+    Scenarios exist in the data model and are reachable from nothing — no command, no lang key,
+    `scenarios` is always one empty Base — so no v2 document can carry an override. Tom caught the
+    claim ("Scenarios: they don't exist yet. I am confused."); the code is gone. **Unreachable
+    scenario machinery is still sitting in `js/looped-network.js`** and should either grow a UI or
+    be deleted; nothing depends on which.
   - **`niceDefault`'s SI branch needed a factor it never had**: `siVal` is quoted in the SI *base*
     unit while the SI preset shows mm and l/s, so 0.15 m was landing as 0.15 mm and the solve
     returned −1.3e10 kPa. Caught by the example-network harness within seconds of the switch.

@@ -2131,11 +2131,17 @@ var EngCalcs = EngCalcs || {};
 			// document is stamped v3 and flagged, and offerUnitRestore() asks once, after it is on
 			// screen where the user can see what is being talked about.
 			//
-			// Stamped BEFORE the answer, deliberately (Tom, 2026-08-10, choosing "ask, defaulting to
-			// No"): dismissing the dialog IS an answer -- leave my numbers alone -- and a flag that
-			// survived dismissal would re-ask on every single open forever.
+			// The flag is PERSISTENT, and that is a reversal of the first cut. It was transient --
+			// stamp v3, ask once, never again -- which was right while the decline button read
+			// "Leave my numbers alone". Tom then rewrote it as "Close so that I can check the
+			// current units first" (2026-08-10), and that label is a promise to come back: a user
+			// who goes off to look at the units strip and returns to find the offer gone for good
+			// has been lied to by a button. So declining now means NOT YET, and the offer stands
+			// until it is accepted. The version still goes to 3 -- the document's SHAPE really is
+			// v3 -- but `unitsUnconfirmed` records that its NUMBERS have not been ruled on.
 			saved.v = 3;
-			saved._v2Numbers = true;
+			saved.project = saved.project || {};
+			saved.project.unitsUnconfirmed = true;
 		}
 		return saved;
 	}
@@ -2234,11 +2240,10 @@ var EngCalcs = EngCalcs || {};
 		// under mm now opens under mm however this browser was last left, because its numbers only
 		// mean anything alongside the units they were typed in.
 		applyUnitSelections(saved.units);
-		// A v2 document has no units to restore and holds SI numbers. Hand the fact to
-		// offerUnitRestore(), which refreshAllFromDocument() calls once the network is on screen --
-		// the question is unanswerable in the abstract and obvious next to the drawing.
-		pendingV2Restore = !!saved._v2Numbers;
-		delete saved._v2Numbers;
+		// A v2 document has no units to restore and holds SI numbers. offerUnitRestore(), called by
+		// refreshAllFromDocument() once the network is on screen, asks about it there -- the
+		// question is unanswerable in the abstract and obvious next to the drawing.
+		pendingV2Restore = !!project.unitsUnconfirmed;
 		return true;
 	}
 
@@ -2457,44 +2462,51 @@ var EngCalcs = EngCalcs || {};
 				if (typeof pt[1] === 'number') { pt[1] = pt[1] * hf; }
 			});
 		});
-		// Scenario overrides hold the same fields under the same names and are just as SI as the
-		// base values are -- missing them would leave a scenario silently 39x out from its own Base.
-		scenarios.forEach(function (sc) {
-			var ov = sc.overrides || {};
-			Object.keys(ov).forEach(function (elId) {
-				scale(ov[elId], 'elev', hf);
-				scale(ov[elId], 'head', hf);
-				scale(ov[elId], 'demand', qf);
-				scale(ov[elId], 'diameter', df);
-			});
-		});
+		// SCENARIO OVERRIDES ARE DELIBERATELY NOT TOUCHED, because no v2 document can contain one.
+		// The scenario machinery exists in the data model (defaultScenarios/effective/overrides) but
+		// nothing in the UI has ever created a scenario -- there is no command, no lang key, and
+		// `scenarios` is always exactly one empty Base. The first version of this migration scaled
+		// them anyway and its comment claimed that omitting them would leave a scenario "39x out
+		// from its Base"; that was wrong, and Tom caught it ("Scenarios: they don't exist yet. I am
+		// confused."). Dead code in a one-time migration is worse than absent code: it reads as
+		// evidence that the case is real. When scenarios do ship, every v2 document will long since
+		// have been migrated or abandoned.
 		recomputeAllPumpCurves();
+		// Answered. The numbers are now in the units the strip names, so the question is closed.
+		delete project.unitsUnconfirmed;
 		saveToStorage();
 		refreshAllFromDocument();
 	}
 	function offerUnitRestore() {
 		if (!pendingV2Restore) { return; }
-		pendingV2Restore = false;   // asked once per open, whatever the answer
+		pendingV2Restore = false;   // shown at most once per open; the persistent flag decides the rest
 		var pc = EngCalcs.pageConfig || {};
 		// Nothing to restore: with the base SI unit selected the factor is 1, so the stored number
 		// and the declared number are the same number and there is no question to ask. An empty
-		// project has no evidence and nothing to fix either.
+		// project has no evidence and nothing to fix either. Both cases are SETTLED, not deferred,
+		// so the flag is cleared -- the offer must not reappear for a project it can do nothing for.
 		var rows = v2RestoreEvidence();
-		if (!rows.length || unitFactor('lpn_u_diameter') === 1) { saveToStorage(); return; }
+		if (!rows.length || unitFactor('lpn_u_diameter') === 1) {
+			delete project.unitsUnconfirmed;
+			saveToStorage();
+			return;
+		}
 		openDialog(function (body) {
 			var p1 = document.createElement('p');
 			p1.style.margin = '0 0 8px';
-			p1.textContent = (pc.lpn_v2_restore_prompt || 'This calculator changed how it stores numbers, so that switching units no longer converts your inputs. This project was saved under the old way. May it convert your inputs one last time? Representative pipe diameters, before and after:');
+			p1.textContent = (pc.lpn_v2_restore_prompt || 'This calculator stores project units and inputs as entered, but it formerly converted numbers to SI for storage. This project was saved before that change, so its numbers were stored in SI. Convert them one last time to the current units? For your evaluation, these are some diameters that will be converted. Before and after values are shown:');
 			body.appendChild(p1);
 			var p2 = document.createElement('p');
 			p2.style.cssText = 'margin:0;font-weight:bold';
 			p2.textContent = rows.join(', ');
 			body.appendChild(p2);
 		}, [
-			// No first ONLY in the sense that it is the safe answer and dismissal lands on it; Yes
-			// leads because it is the answer that is right for the project this dialog appeared over.
+			// Convert leads, and declining is explicitly NOT YET -- the flag is left in place so the
+			// offer returns next time this project is opened. There is deliberately no third
+			// "never ask again" button: nobody has asked for one, and the only project it would
+			// serve is one whose numbers are wrong and whose owner wants them left wrong.
 			{ label: pc.lpn_v2_restore_yes || 'Convert', fn: applyV2Restore },
-			{ label: pc.lpn_v2_restore_no || 'Leave my numbers alone', fn: function () { saveToStorage(); } }
+			{ label: pc.lpn_v2_restore_no || 'Close so that I can check the current units first', fn: function () { saveToStorage(); } }
 		]);
 	}
 	function openProject(id) {

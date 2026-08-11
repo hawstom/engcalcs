@@ -1161,9 +1161,9 @@ $ec_lang['lpn_reset_all_tip']='Deletes every project, every background image, ev
 // Task 263's one-time migration offer. Shown ONCE, on opening a project saved before inputs
 // stopped being converted, and never again whatever the answer. Plain text only -- it is built with
 // textContent into the dialog body.
-$ec_lang['lpn_v2_restore_prompt']='This calculator no longer changes your numbers when you change units. This project was saved before that change, so its numbers were stored in metric and would now be read as the units you are working in. May it convert them, one last time? These pipe diameters come from this project, before and after:';
+$ec_lang['lpn_v2_restore_prompt']='This calculator stores project units and inputs as entered, but it formerly converted numbers to SI for storage. This project was saved before that change, so its numbers were stored in SI. Convert them one last time to the current units? For your evaluation, these are some diameters that will be converted. Before and after values are shown:';
 $ec_lang['lpn_v2_restore_yes']='Convert';
-$ec_lang['lpn_v2_restore_no']='Leave my numbers alone';
+$ec_lang['lpn_v2_restore_no']='Close so that I can check the current units first';
 $ec_lang['lpn_storage_too_new']='This project was saved by a newer version of the page, so it cannot be opened here.';
 // ---- Projects as tabs, files as files (ROADMAP Task 211) ----
 // The whole surface below follows one rule: THE ASTERISK DECIDES. A tab wearing an asterisk has
