@@ -79,7 +79,8 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   'lpn_projects_list', 'lpn_projects_popup', 'lpn_projects_popup_close', 'lpn_settings_fields',
   'lpn_settings_popup', 'lpn_settings_popup_close', 'lpn_status', 'lpn_toolbar',
   'lpn_project_file', 'lpn_menubar', 'lpn_menu_popup', 'lpn_menu_list', 'lpn_dialog',
-  'lpn_dialog_body', 'lpn_dialog_buttons', 'lpn_menu_popup2', 'lpn_menu_list2', 'lpn_map_status'
+  'lpn_dialog_body', 'lpn_dialog_buttons', 'lpn_menu_popup2', 'lpn_menu_list2', 'lpn_map_status',
+  'lpn_map_footer'
 ].forEach(ensure);
 // Looped-Network.php nests each menu LIST inside its POPUP. The ensure() list above creates them as
 // unrelated stubs, so popup.contains(row) answered false for a row that really is inside -- and the
@@ -967,6 +968,20 @@ console.log('\n--- Settings panel stays in sync ---');
     byId.lpn_map_status.textContent.indexOf(PC.bpn_method_dw) >= 0, byId.lpn_map_status.textContent);
   ok('...as does the model handed to the solver', L.assembleModel().method === 'dw');
   delete L.settings().method;
+
+  // ORDER, which lives in the markup rather than in JS: settings first, then the cursor position,
+  // matching EPANET's status bar (Tom, 2026-08-10). A source-level check because that is where the
+  // fact is -- and because "they don't collide" is not the same claim as "they are in this order",
+  // which is what two absolutely-positioned boxes used to give us.
+  {
+    const page = fs.readFileSync(ROOT + 'Looped-Network.php', 'utf8');
+    const footer = page.indexOf('id="lpn_map_footer"');
+    const status = page.indexOf('id="lpn_map_status"');
+    const coords = page.indexOf('id="lpn_coords"');
+    ok('both readouts live in one status strip', footer >= 0 && footer < status && footer < coords);
+    ok('...with the settings BEFORE the coordinates', status < coords, 
+      'status@' + status + ' coords@' + coords);
+  }
 }
 
 console.log('\n' + (fails === 0 ? 'ALL PASS' : fails + ' FAILURE(S)'));

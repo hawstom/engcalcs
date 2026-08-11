@@ -1466,9 +1466,11 @@ var EngCalcs = EngCalcs || {};
 		return { minx: minx, maxx: maxx, miny: miny, maxy: maxy };
 	}
 	// Height an absolutely-positioned canvas overlay occupies, measured rather than guessed --
-	// #lpn_mode_hint and #lpn_coords are both 11px text whose height depends on the font that
-	// actually rendered, and the mode hint wraps to two lines in several languages. Returns 0 for
-	// an absent or empty overlay, so a hidden readout costs no margin.
+	// #lpn_mode_hint and #lpn_map_footer are both 11px text whose height depends on the font that
+	// actually rendered, and either can wrap to two lines (the mode hint in several languages, the
+	// footer on a narrow window). Returns 0 for an absent or empty overlay, so a hidden readout
+	// costs no margin. Measured on the footer WRAPPER, not on the coordinate box inside it: the
+	// wrapper is what actually occupies the bottom of the canvas once the strip wraps.
 	function overlayReserve(id) {
 		var e = document.getElementById(id);
 		if (!e || !e.offsetHeight || !e.textContent.trim()) { return 0; }
@@ -1504,7 +1506,7 @@ var EngCalcs = EngCalcs || {};
 		// the screenshot case that is the real reason to want it.
 		var b = bbox(), r = svg.getBoundingClientRect(), pad = 16,
 			padTop = Math.max(pad, overlayReserve('lpn_mode_hint')),
-			padBottom = Math.max(pad, overlayReserve('lpn_coords')),
+			padBottom = Math.max(pad, overlayReserve('lpn_map_footer')),
 			w = Math.max(b.maxx - b.minx, 1), h = Math.max(b.maxy - b.miny, 1),
 			availH = Math.max(r.height - padTop - padBottom, 1);
 		state.s = Math.min((r.width - 2 * pad) / w, availH / h);

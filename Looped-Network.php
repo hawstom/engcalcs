@@ -130,16 +130,25 @@ echoHeader("EngCalcs", $html_title, "");
 		<div id="lpn_empty_hint" class="d-print-none" style="display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#999;font-size:1.2em;pointer-events:none;text-align:center">
 			<?=$ec_lang['lpn_empty_hint']?>
 		</div>
-		<div id="lpn_coords" class="d-print-none" style="position:absolute;bottom:4px;left:4px;font-size:11px;font-family:monospace;background:rgba(255,255,255,.8);padding:2px 6px;pointer-events:none">X: --  Y: --</div>
-		<?php // WHAT AM I LOOKING AT? (Tom, 2026-08-10: "when the new user arrives, what units do they
-		      // get, and is there a way they should know?"). They get US on an English page and SI on
-		      // every other -- EC_DEFAULT_UNIT_SET, derived from the language -- and until now there
-		      // was NO way to find out short of opening Settings or clicking an element, because map
-		      // labels are deliberately bare numbers. A calculator whose numbers do not say what they
-		      // are is the defect; this is the cheapest honest fix.
-		      // Bottom RIGHT, opposite the coordinate tracker, sharing its band so zoomExtent()'s
-		      // existing bottom reserve already covers it. Filled by refreshMapStatus(). ?>
-		<div id="lpn_map_status" class="d-print-none" style="position:absolute;bottom:4px;right:4px;font-size:11px;background:rgba(255,255,255,.8);padding:2px 6px;pointer-events:none;text-align:right;max-width:60%"></div>
+		<?php // THE BOTTOM STATUS STRIP. Both readouts in ONE flex row so their order is real rather
+		      // than two absolute boxes that happen not to collide: settings first, then the
+		      // coordinate tracker (Tom, 2026-08-10 -- "move to left before the coordinates to match
+		      // EPANET more closely"). EPANET puts its unit/mode readouts at the left of the status
+		      // bar and the cursor position after them, and this page is adopting that paradigm
+		      // rather than inventing one.
+		      //
+		      // The WRAPPER is what zoomExtent() reserves against (overlayReserve('lpn_map_footer')),
+		      // so a narrow window that wraps the strip onto two lines reserves two lines' worth --
+		      // measuring only the coordinate box would have under-reserved the moment it wrapped. ?>
+		<div id="lpn_map_footer" class="d-print-none" style="position:absolute;bottom:4px;left:4px;right:4px;display:flex;flex-wrap:wrap;gap:4px 8px;align-items:flex-end;pointer-events:none;font-size:11px">
+			<?php // What the numbers on the map ARE. Map labels are bare numbers by design, so without
+			      // this a first-time visitor cannot tell gpm from l/s -- they get US on an English
+			      // page and SI on every other, and nothing said which. Filled by refreshMapStatus(). ?>
+			<div id="lpn_map_status" style="background:rgba(255,255,255,.8);padding:2px 6px"></div>
+			<?php // Monospace, and only this one: the X/Y digits change on every pointer move, and a
+			      // proportional font makes the whole readout jitter as they do. ?>
+			<div id="lpn_coords" style="font-family:monospace;background:rgba(255,255,255,.8);padding:2px 6px">X: --  Y: --</div>
+		</div>
 	</div>
 </form>
 <?php // position:fixed, not absolute: the popup is positioned from pointer-event clientX/clientY
