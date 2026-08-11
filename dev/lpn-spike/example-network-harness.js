@@ -136,10 +136,15 @@ global.document = {
   },
   querySelectorAll: () => [],
   addEventListener: () => {},
+  // The pointerUP handlers hit-test with this rather than trusting e.target (a real tap moves a few
+  // pixels between down and up). Tests set `hitTarget` to whatever they are pretending is under the
+  // pointer; null means bare canvas, which is what a pan or an empty-space click lands on.
+  elementFromPoint: () => hitTarget,
   body: mkEl('body'),
   documentElement: mkEl('html'),
   title: ''   // Task 265 writes here; a stub without it would let document.title = ... pass unseen
 };
+let hitTarget = null;
 const store = {};
 global.localStorage = {
   getItem: k => (k in store ? store[k] : null),
@@ -233,6 +238,13 @@ src = src.replace(marker,
   "\t\tnewProjectFromExample: newProjectFromExample, saveToStorage: saveToStorage,\n" +
   "\t\tnewBlankProject: newBlankProject, refreshMapStatus: refreshMapStatus,\n" +
   "\t\tunitSetLabel: unitSetLabel,\n" +
+  // Task 277. The gesture is driven through the REAL pointer handlers below; applyDrag() is
+  // exported because tick() calls it off requestAnimationFrame, which the stub makes async.
+  "\t\tundo: undo, undoDepth: function () { return undoStack.length; }, applyDrag: applyDrag,\n" +
+  "\t\tdragActive: function () { return !!drag; },\n" +
+  // init() never runs here (that is the point of the injection), so the pointer listeners this
+  // tests are not attached until the test asks for them.
+  "\t\twirePointerEvents: wirePointerEvents, setMode: setMode,\n" +
   "\t\tfrictionMethod: frictionMethod,\n" +
   "\t\tbuildMenuBar: buildMenuBar, menuPopupOpen: function () { return document.getElementById('lpn_menu_popup').style.display === 'block'; },\n" +
   "\t\tsubMenuOpen: function () { return document.getElementById('lpn_menu_popup2').style.display === 'block'; },\n" +
@@ -1084,6 +1096,132 @@ console.log('\n--- Settings panel stays in sync ---');
         .every(k => page.indexOf(k + ': <?=json_encode') >= 0));
     ok('the retired mixed-units key is gone everywhere',
       langSrc.indexOf('lpn_title_units_mixed') < 0 && page.indexOf('lpn_title_units_mixed') < 0);
+  }
+}
+
+// ---- ROADMAP Task 277: a move is undoable ----
+// The bug was not "Undo skips a drag". No drag handler snapshotted at all, so Undo after a drag
+// reverted the last DISCRETE act and left the drag standing -- it took back something the user was
+// not looking at. Driven through the REAL pointer handlers, because the defect lived in the gap
+// between them and saveUndoSnapshot(); calling applyDrag() alone would test the wrong half.
+{
+  console.log('\n--- Task 277: moving is undoable ---');
+  const svg = byId.lpn_canvas;
+  function fire(type, ev) {
+    hitTarget = ev.target && ev.target.dataset ? ev.target : null;
+    (svg._listeners[type] || []).forEach(fn => fn(ev));
+  }
+  // One whole gesture: press on `target`, then FOUR move-and-apply frames on the way to (x2,y2),
+  // then release. Multi-frame on purpose -- a real drag is hundreds of frames, and a one-frame
+  // stand-in cannot tell "one snapshot per gesture" from "one snapshot per frame", which is the
+  // difference between an Undo that works and an undo stack of 20 near-identical states.
+  function dragTo(target, x1, y1, x2, y2) {
+    fire('pointerdown', { pointerId: 1, clientX: x1, clientY: y1, target: target, button: 0 });
+    for (let f = 1; f <= 4; f++) {
+      fire('pointermove', {
+        pointerId: 1, target: target,
+        clientX: x1 + (x2 - x1) * f / 4, clientY: y1 + (y2 - y1) * f / 4
+      });
+      if (L.dragActive()) { L.applyDrag(); }
+    }
+    fire('pointerup', { pointerId: 1, clientX: x2, clientY: y2, target: target });
+  }
+
+  setUnitSet('us');
+  L.reset();
+  L.wirePointerEvents();
+  L.drawExample('us');
+  const doc0 = L.getDoc();
+  const node = doc0.nodes.find(n => n.type === 'junction');
+  const home = { x: node.x, y: node.y };
+
+  // A node carries data-node; that is what the pointerdown handler reads to open a 'node' drag.
+  const nodeEl = { dataset: { node: node.id }, classList: { contains: () => false } };
+  const before = L.undoDepth();
+  dragTo(nodeEl, 100, 100, 260, 180);
+  const moved = { x: node.x, y: node.y };
+  ok('the drag actually moved the node', moved.x !== home.x || moved.y !== home.y,
+    home.x.toFixed(1) + ',' + home.y.toFixed(1) + ' -> ' + moved.x.toFixed(1) + ',' + moved.y.toFixed(1));
+  ok('...and cost exactly ONE undo snapshot, not one per frame',
+    L.undoDepth() === before + 1, before + ' -> ' + L.undoDepth());
+
+  L.undo();
+  const back = L.getDoc().nodes.find(n => n.id === node.id);
+  ok('Undo puts the node back where it was',
+    near(back.x, home.x, 1e-9) && near(back.y, home.y, 1e-9),
+    back.x.toFixed(1) + ',' + back.y.toFixed(1));
+
+  // THE ACTUAL DEFECT, stated as a test: with a discrete act sitting under the drag, Undo used to
+  // revert THAT and leave the drag alone. Delete a link, drag a node, Undo once -- the node must
+  // come home and the deleted link must stay deleted.
+  {
+    L.reset();
+    L.drawExample('us');
+    const d = L.getDoc();
+    const n2 = d.nodes.find(x => x.type === 'junction');
+    const victim = d.links.find(l => l.type !== 'pump' && l.from !== n2.id && l.to !== n2.id);
+    const delEl = { dataset: { link: victim.id }, classList: { contains: () => false } };
+    L.setMode('delete');
+    fire('pointerup', { pointerId: 9, clientX: 5, clientY: 5, target: delEl });
+    const afterDelete = L.getDoc().links.length;
+    L.setMode('select');
+    const p0 = { x: n2.x, y: n2.y };
+    dragTo({ dataset: { node: n2.id }, classList: { contains: () => false } }, 100, 100, 300, 220);
+    L.undo();
+    const d2 = L.getDoc(), n3 = d2.nodes.find(x => x.id === n2.id);
+    ok('one Undo takes back the DRAG, not the delete underneath it',
+      near(n3.x, p0.x, 1e-9) && near(n3.y, p0.y, 1e-9) && d2.links.length === afterDelete,
+      'node ' + n3.x.toFixed(1) + ',' + n3.y.toFixed(1) + ' / links ' + d2.links.length
+        + ' (was ' + afterDelete + ' after the delete)');
+  }
+
+  // EVERY DRAGGABLE THING, not just a node. Each is a separate branch of applyDrag() and so a
+  // separate place the snapshot can be dropped -- covering only the node left four call sites that
+  // could regress silently (all four survived mutation until this ran).
+  {
+    L.reset();
+    L.wirePointerEvents();
+    L.drawExample('us');
+    const d = L.getDoc();
+    const bent = d.links.find(l => l.verts && l.verts.length > 0);
+    const anchored = d.labels[0];
+    const someNode = d.nodes.find(n => n.type === 'junction');
+    const someLink = d.links.find(l => l.type !== 'pump');
+    const hit = (dataset, cls) => ({ dataset: dataset, classList: { contains: c => c === cls } });
+    [
+      ['a pipe vertex', hit({ link: bent.id, vidx: '0' }, 'lpn-vhandle')],
+      ['a Text label', hit({ lbl: anchored.id })],
+      ["a node's data label", hit({ nodelbl: someNode.id })],
+      ["a link's data label", hit({ linklbl: someLink.id })]
+    ].forEach(function (row) {
+      const before = L.undoDepth();
+      dragTo(row[1], 120, 120, 320, 240);
+      ok('dragging ' + row[0] + ' costs exactly one snapshot',
+        L.undoDepth() === before + 1, before + ' -> ' + L.undoDepth());
+    });
+  }
+
+  // A CLICK IS NOT A DRAG. Every select-mode press opens a drag record, so snapshotting at
+  // pointerdown would push a document copy for every tap that merely opened a popup -- the stack
+  // fills with identical states and Undo looks broken. Press and release without moving.
+  {
+    L.reset();
+    L.drawExample('us');
+    const n4 = L.getDoc().nodes.find(x => x.type === 'junction');
+    const el4 = { dataset: { node: n4.id }, classList: { contains: () => false } };
+    const d0 = L.undoDepth();
+    fire('pointerdown', { pointerId: 2, clientX: 100, clientY: 100, target: el4 });
+    fire('pointerup', { pointerId: 2, clientX: 100, clientY: 100, target: el4 });
+    ok('a click that never moves costs no snapshot', L.undoDepth() === d0,
+      d0 + ' -> ' + L.undoDepth());
+  }
+
+  // Panning moves the CAMERA. saveUndoSnapshot() deep-clones the document, so a pan in the stack
+  // would be both a wasted copy and an Undo that appears to do nothing.
+  {
+    const d0 = L.undoDepth();
+    dragTo({ dataset: {}, classList: { contains: () => false } }, 100, 100, 400, 400);
+    ok('panning the map costs no snapshot', L.undoDepth() === d0, d0 + ' -> ' + L.undoDepth());
   }
 }
 

@@ -5931,6 +5931,30 @@ var EngCalcs = EngCalcs || {};
 		});
 	}
 
+	// ---- ROADMAP Task 277: a move is undoable ----
+	//
+	// Until this, NO drag handler snapshotted. The consequence was not "Undo skips the drag" -- it
+	// was worse: Undo reverted the last DISCRETE act instead, leaving the drag in place and taking
+	// back something the user did earlier. Tom, 2026-08-10: "277 is an ugly bug."
+	//
+	// LAZILY, on the first frame that actually moves something -- not on pointerdown. Every click in
+	// select mode opens a drag record (that is how a click can become a drag), so snapshotting at
+	// pointerdown would push a document copy for every tap that merely opened a popup: the stack
+	// would fill with 20 identical states and Undo would appear to do nothing, which is the same
+	// complaint from the other side. applyDrag() only runs once the pointer has actually moved, so
+	// this fires exactly when there is a change to take back.
+	//
+	// ONCE PER GESTURE, via drag.snapped, so a 200-frame drag costs one snapshot and one Undo
+	// returns the whole gesture rather than one frame of it. `drag` is replaced wholesale on each
+	// pointerdown, so the flag resets itself and cannot leak into the next drag.
+	//
+	// Pan and pinch are deliberately absent: they move the CAMERA, not the document, and
+	// saveUndoSnapshot() deep-clones `doc`. Undoing a pan is not a thing this stack is for.
+	function snapshotDragOnce() {
+		if (drag.snapped) { return; }
+		drag.snapped = true;
+		saveUndoSnapshot();
+	}
 	function applyDrag() {
 		if (drag.type === 'pinch') {
 			if (pointers.size !== 2) { return; }
@@ -5946,15 +5970,18 @@ var EngCalcs = EngCalcs || {};
 			state.tx = drag.tx0 + (p.x - drag.startX); state.ty = drag.ty0 + (p.y - drag.startY);
 			setTransform();
 		} else if (drag.type === 'node') {
+			snapshotDragOnce();
 			var w = screenToWorld(p.x, p.y), n = nodeById(drag.id);
 			n.x = w.x + drag.offX; n.y = w.y + drag.offY; updateNode(drag.id);
 			relayoutLabels();
 		} else if (drag.type === 'vertex') {
+			snapshotDragOnce();
 			var w2 = screenToWorld(p.x, p.y);
 			linkById(drag.id).verts[drag.vidx] = { x: w2.x + drag.offX, y: w2.y + drag.offY };
 			updateVertex(drag.id, drag.vidx);
 			relayoutLabels();
 		} else if (drag.type === 'label') {
+			snapshotDragOnce();
 			var w3 = screenToWorld(p.x, p.y), lb = labelById(drag.id), an = lb.anchorNode ? nodeById(lb.anchorNode) : { x: 0, y: 0 };
 			if (lb.anchorNode) { lb.x = (w3.x + drag.offX) - an.x; lb.y = (w3.y + drag.offY) - an.y; }
 			else { lb.x = w3.x + drag.offX; lb.y = w3.y + drag.offY; }
@@ -5970,12 +5997,14 @@ var EngCalcs = EngCalcs || {};
 			// saveToStorage() unconditionally, even though a Text has nothing to solve.
 			scheduleSolve();
 		} else if (drag.type === 'nodelbl') {
+			snapshotDragOnce();
 			var w6 = screenToWorld(p.x, p.y), nn2 = nodeById(drag.id);
 			nn2.lx = (w6.x + drag.offX) - nn2.x; nn2.ly = (w6.y + drag.offY) - nn2.y;
 			layoutNodeLabel(drag.id);
 			relayoutLabels();
 			scheduleSolve();
 		} else if (drag.type === 'linklbl') {
+			snapshotDragOnce();
 			var w7 = screenToWorld(p.x, p.y), ll2 = linkById(drag.id), mid2 = linkLabelMid(ll2);
 			ll2.lx = (w7.x + drag.offX) - mid2.x; ll2.ly = (w7.y + drag.offY) - mid2.y;
 			layoutLinkLabel(drag.id);

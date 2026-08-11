@@ -1134,11 +1134,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **epanet-js's silence is not evidence.** It prioritised map tiles, where registration is the
     basemap's job; that is a different product decision, not a verdict on world files.
 
-- 55|277| **Moving something cannot be undone.** No drag handler calls `saveUndoSnapshot()` — not
-  node, vertex, Text-label or data-label drags. So Undo after a drag leaves the drag in place and
-  reverts an *earlier* discrete act instead, which is worse than doing nothing. Snapshot on drag
-  START (not end), so one Undo returns the whole gesture. From Task 270.
-
 - 60|271| **Give `lpn_` a friction-method choice: HW, DW, Manning.** Tom, 2026-08-10. `bpn_` has
   one; `lpn_` hardcodes `hw`. `assembleModel()` and the map readout already read `frictionMethod()`
   (`settings.method || 'hw'`), and `bpn_method`/`_hw`/`_dw`/`_manning` are translated, so a control
@@ -1831,6 +1826,20 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     clearance. **The harness had been measuring that clearance at a seeded text size of 2.5, not the
     shipped 20** — 8× tighter, so it read 29 units where a real visitor would have had 7. It now
     redraws at the default and checks again; that blind spot predates this task.
+
+- 0|277| **[DONE 2026-08-10] Moving something is undoable.** No drag handler snapshotted, so Undo
+  after a drag reverted the last DISCRETE act and left the drag standing — it took back something
+  the user was not looking at. `snapshotDragOnce()` at the head of all five mutating branches of
+  `applyDrag()`.
+  - **Lazy, on the first frame that moves something — NOT on pointerdown.** Every select-mode press
+    opens a drag record (that is how a click becomes a drag), so snapshotting on down would push a
+    document copy for every tap that merely opened a popup: 20 identical states and an Undo that
+    appears dead. `applyDrag()` runs only after real movement.
+  - Once per gesture via `drag.snapped`, which resets itself because `drag` is rebuilt on each
+    pointerdown. Pan and pinch are excluded on purpose: they move the camera, not the document.
+  - 10 assertions driving the REAL pointer handlers over a four-frame gesture — a one-frame stand-in
+    cannot tell "per gesture" from "per frame". All five branches mutation-tested independently;
+    covering only the node drag left four call sites that regressed silently.
 
 - 0|275| **[DONE 2026-08-10] The Settings panel says "Saved with this project."** One note at the
   head of the panel (`lpn_settings_scope_note`, translated in the core four). Verified true of the
