@@ -1105,7 +1105,30 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - (3) **World file** is the parsimonious *import* answer and should follow, not lead: it gives
     pixel size directly, which is strictly more than EPANET's method, and costs a six-line text
     parse. It cannot lead because it only helps a user who already has one, and a screenshot never
-    does. Menu prompt on insertion: "No world file found. Scale and move using the menu."
+    does. Menu prompt when only the image arrives: "No world file found. Scale and move using the
+    menu."
+  - **A sidecar cannot be auto-detected in ANY browser, not only non-Chromium ones** (Tom,
+    2026-08-10, asking about non-connect browsers — the limit is broader than he assumed). A file
+    picker returns the files the user picked and nothing about their folder; the only API that
+    enumerates siblings is `showDirectoryPicker`, a much larger permission ask than picking a file,
+    and Chromium-only. So the world file is always **user-supplied**, never discovered.
+  - **Take both files in ONE picker rather than a second step**: add `multiple` and widen `accept` to
+    `image/*,.pgw,.jgw,.wld,.tfw` on `#lpn_backdrop_file`, then partition what comes back. The user
+    shift-picks image + sidecar in the dialog they already opened. Works in every browser, and the
+    instructive prompt still fires when only one file arrives. Tom's second-step prompt ("Choose a
+    World File for automatic scale and location?") is the fallback if multi-select reads as
+    confusing — his call, but one dialog beats two.
+  - **Cheapest of all, and it folds into (4): let the Scale (by entry) box accept a PASTED world
+    file.** It is six lines of plain text. No file plumbing, and it covers the sidecar that arrived
+    in an email or a GIS export note rather than next to the image.
+  - **Our transform is `translate + uniform scale`** (`applyBackdropTransform`) — no rotation, no
+    skew, no independent X/Y. A world file with nonzero B/D, or |A| ≠ |E|, cannot be represented:
+    reject it with a message rather than silently using A and dropping the rest.
+  - **Do this AFTER Task 274.** A world file's E is negative precisely because world Y is up and
+    image Y is down; under today's Y-down map that needs a sign flip, and after 274 it is natural.
+  - **`downscaleImage()` already reports the ORIGINAL width/height**, not the downscaled canvas
+    dimensions, so a world file's pixel size maps onto `backdrop.iw/ih` with no correction
+    (`s = A * iw / backdrop.width`). Do not "tidy" that callback into passing `canvas.width`.
   - (2) **enter map width/height** is EPANET's own paradigm and Tom does not like it; with (4) built
     it is redundant. (5) **nearest-edge picking** is a small usability patch on picking, not a
     precision answer, and is worth doing only alongside (4).
