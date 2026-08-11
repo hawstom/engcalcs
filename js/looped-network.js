@@ -1981,7 +1981,43 @@ var EngCalcs = EngCalcs || {};
 	// 3 (Task 263, 2026-08-10): inputs are stored AS DECLARED rather than in SI, and the document
 	// records the unit selection it was written under. A v2 document holds SI numbers and says
 	// nothing about units, which is why opening one runs the one-time restore offer below.
-	var LPN_STORAGE_VERSION = 3;
+	var LPN_STORAGE_VERSION = 4;
+	// ---- ROADMAP Task 274, second half (Tom, 2026-08-11: "Eventually needs to be Cartesian. If we
+	// can do that now without causing trouble, let's do it.") ----
+	//
+	// From v4 the FILE stores Cartesian Y (up is positive), matching what the user sees and what
+	// EPANET uses. `doc` in memory stays Y-down, which is SVG's own system and what every drawing
+	// routine here is written against -- so the sign flips at the storage boundary, in exactly two
+	// functions: serializeProject() on the way out and applySaved() on the way in.
+	//
+	// "WITHOUT CAUSING TROUBLE" IS WHY THIS IS VERSION-GATED RATHER THAN MIGRATED. A document
+	// written at v2 or v3 holds Y-down, is read without a flip, and -- because serializeProject()
+	// writes `openDocVersion`, not the constant -- is written back without one too. It keeps working
+	// forever and never mirrors. Nothing has to be converted, which is what Tom asked for ("let's
+	// not worry about doing anything with existing projects").
+	//
+	// A v2 document that answers the UNITS question gets this for free: stampDocAnswered() moves it
+	// to LPN_STORAGE_VERSION, and from that save on it is Cartesian. That is why the two questions
+	// can share one version number after all -- the coordinate change needs no separate answer, so
+	// it can ride on any bump rather than needing one of its own.
+	var LPN_CARTESIAN_VERSION = 4;
+	// The six Y-bearing fields, and no others. Offsets (`ly`, a Text label's `y`, `backdrop.ty`) are
+	// VECTORS and negate exactly like positions do -- a vector in a flipped frame flips with it.
+	// `backdrop.y`/`height` are NOT here: the image is anchored by its top-left corner, and "extends
+	// downward on screen" is the same visual fact in both frames, so only the anchor's sign moves.
+	function flipStoredY(o) {
+		(o.nodes || []).forEach(function (n) {
+			if (typeof n.y === 'number') { n.y = -n.y; }
+			if (typeof n.ly === 'number') { n.ly = -n.ly; }
+		});
+		(o.links || []).forEach(function (l) {
+			(l.verts || []).forEach(function (v) { if (typeof v.y === 'number') { v.y = -v.y; } });
+			if (typeof l.ly === 'number') { l.ly = -l.ly; }
+		});
+		(o.labels || []).forEach(function (lb) { if (typeof lb.y === 'number') { lb.y = -lb.y; } });
+		if (o.backdrop && typeof o.backdrop.ty === 'number') { o.backdrop.ty = -o.backdrop.ty; }
+		return o;
+	}
 	// The version at which inputs became declarative. A document below it holds SI numbers that have
 	// not been ruled on, and that is the ONLY thing the restore offer keys off (Tom, 2026-08-10:
 	// "The project receives no version number, right? Isn't that absence enough to trigger the offer
@@ -2051,7 +2087,7 @@ var EngCalcs = EngCalcs || {};
 		return 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 	}
 	function serializeProject() {
-		return {
+		var out = {
 			v: openDocVersion, project: project, scenarios: scenarios,
 			nodes: doc.nodes, links: doc.links, labels: doc.labels, nextId: nextId,
 			labelSettings: labelSettings, backdrop: backdrop, settings: settings,
@@ -2059,6 +2095,11 @@ var EngCalcs = EngCalcs || {};
 			// not say what it means, and a 400 mm main would open as a 400 inch main (Tom).
 			units: readUnitSelections()
 		};
+		// From v4 the file is Cartesian. CLONED FIRST -- flipStoredY() mutates, and the object above
+		// holds live references to doc.nodes/links/labels, so flipping in place would turn the
+		// drawing upside down on screen every time it was saved.
+		if (out.v >= LPN_CARTESIAN_VERSION) { return flipStoredY(JSON.parse(JSON.stringify(out))); }
+		return out;
 	}
 	function writeJSON(key, obj) {
 		try { localStorage.setItem(key, JSON.stringify(obj)); setStorageError(false); return true; }
@@ -2205,6 +2246,11 @@ var EngCalcs = EngCalcs || {};
 	// Installs an already-read, already-migrated document as the live network. Split out of the old
 	// loadFromStorage() so the library can apply a document from ANY project key, not just the one.
 	function applySaved(saved) {
+		// Cartesian file -> Y-down memory (Task 274). Mutates `saved` in place, which is safe and
+		// deliberate: every caller hands over a freshly parsed object it does not reuse, and
+		// doc.nodes/links/labels below are assigned BY REFERENCE from it, so a copy here would only
+		// double the memory and create a second thing to keep in step.
+		if (saved.v >= LPN_CARTESIAN_VERSION) { flipStoredY(saved); }
 		// Project/scenario container. Rebuilt from defaults and merged, for the same reason the
 		// labelSettings and settings blocks below spell out: a key added after this save was written
 		// must come back at its default, not as undefined.
@@ -5697,6 +5743,21 @@ var EngCalcs = EngCalcs || {};
 		// approved how this one looks; LPN_CALLOUT_ANGLE is set to reproduce it, and the reservoir
 		// callout above now matches it rather than the other way round.
 		annotate(nodes[2].x, nodes[2].y, nodes[2].id, pcx.bpn_p_min, 1.5, 'right');
+		// ---- Re-anchor so the centre READS 5000,5000 (Task 274; Tom, 2026-08-11: "Center is now at
+		// 5000,-5000. Should be at 5000,5000.") ----
+		// Everything above is laid out around INTERNAL y = 5000, and internal is Y-down, so the
+		// coordinate readout showed -5000. A pure TRANSLATION of -10000 puts the centre at internal
+		// -5000, which reads +5000, and moves nothing relative to anything else -- so every
+		// clearance, stacking and side-flip number reasoned about above still holds exactly as
+		// written, and the drawing on screen is unchanged.
+		//
+		// ABSOLUTE coordinates only. A Text label anchored to a node stores an OFFSET in lb.x/lb.y,
+		// and a data label likewise in n.lx/n.ly; translating a vector would drag every callout off
+		// the element it points at.
+		doc.nodes.forEach(function (n) { n.y -= 10000; });
+		doc.links.forEach(function (l) { (l.verts || []).forEach(function (v) { v.y -= 10000; }); });
+		doc.labels.forEach(function (lb) { if (!lb.anchorNode) { lb.y -= 10000; } });
+		buildDom();   // every element above was built at its pre-shift position
 		updateEmptyHint();
 		saveToStorage();
 		zoomExtent();

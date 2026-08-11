@@ -1105,10 +1105,9 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **Our transform is `translate + uniform scale`** (`applyBackdropTransform`) — no rotation, no
     skew, no independent X/Y. A world file with nonzero B/D, or |A| ≠ |E|, cannot be represented:
     reject it with a message rather than silently using A and dropping the rest.
-  - **Task 274 did NOT settle this.** It flipped the USER boundary; the stored document and the
-    internal frame are still Y-down. So a world file's negative E still needs an explicit sign
-    decision here, and this is the task that will have to decide whether the FILE becomes Cartesian
-    (a storage version bump plus a migration — see 274's note on why `v` cannot carry it today).
+  - **Task 274 settled the sign question**: from v4 the stored document is Cartesian, so a world
+    file's negative E now maps onto the file's own convention with no extra decision. The INTERNAL
+    frame is still Y-down, so a world file read has to cross the same boundary `applySaved()` does.
   - **`downscaleImage()` already reports the ORIGINAL width/height**, not the downscaled canvas
     dimensions, so a world file's pixel size maps onto `backdrop.iw/ih` with no correction
     (`s = A * iw / backdrop.width`). Do not "tidy" that callback into passing `canvas.width`.
@@ -1826,16 +1825,29 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     written natively against it. Flipping `setTransform()` to `scale(s,-s)` instead needs ~10
     counter-flips, and each one fails silently and visually. **The drawing is pixel-identical; only
     the numbers changed.**
-  - **KNOWN AND DELIBERATE: the stored JSON keeps Y-down.** Invisible today — `lpnToInp()` emits no
-    `[COORDINATES]`, so no Y leaves the page. It becomes a real question the day we export
-    coordinates or read a world file (Task 276: its E term is negative precisely because world Y is
-    up). Not answered here because it costs a storage version, and `v` already carries the units
-    question (v2 = "units not yet ruled on"); one number cannot carry two independent migrations
-    without the second flag Tom removed 2026-08-10.
-  - 5 assertions, every one stated as a DIRECTION ("higher on screen reports a larger Y") rather than
-    a sign — `y === -n.y` would restate the implementation and would pass a version that flipped
-    display AND entry, which is the bug that matters. Mutation-tested, 5 mutations, all caught,
-    including entry-not-flipped.
+  - **The FILE is Cartesian too, from v4** (Tom, 2026-08-11: *"Eventually needs to be Cartesian. If
+    we can do that now without causing trouble, let's do it."*). The sign flips at the storage
+    boundary in exactly two places — `serializeProject()` out, `applySaved()` in — over six fields:
+    node `y`/`ly`, vertex `y`, link `ly`, label `y`, `backdrop.ty`. The backdrop's own `y`/`height`
+    are NOT flipped; it is anchored top-left, and "extends downward on screen" reads the same in
+    both frames.
+  - **VERSION-GATED, NOT MIGRATED, and that is what made it free.** A v2/v3 document is read
+    without a flip and — because `serializeProject()` writes `openDocVersion`, not the constant —
+    written back without one. It keeps working forever and never mirrors, so nothing is converted
+    ("let's not worry about doing anything with existing projects"). It also dissolves the reason
+    this was deferred: the coordinate change needs no answer from the user, so it rides on any bump
+    rather than needing a version of its own, and a v2 document that answers the UNITS question
+    becomes Cartesian for free via `stampDocAnswered()`.
+  - **`serializeProject()` clones before flipping.** It builds its object from live references to
+    `doc.nodes/links/labels`, so flipping in place turns the map upside down on every autosave.
+  - **The example is re-anchored** (Tom: *"Center is now at 5000,-5000. Should be at 5000,5000."*)
+    by a pure translation of −10000 applied after it is built, so every clearance and stacking
+    number reasoned about in `drawExampleNetwork()` still holds as written and the drawing on screen
+    is unchanged. Offsets are vectors and are deliberately not translated.
+  - 12 assertions. The user-boundary ones are stated as a DIRECTION ("higher on screen reports a
+    larger Y") rather than a sign — `y === -n.y` would restate the implementation and would pass a
+    version that flipped display AND entry. Mutation-tested, 12 mutations, all caught, including
+    entry-not-flipped, no-clone-on-save, and gate-removed.
 
 - 0|277| **[DONE 2026-08-10] Moving something is undoable.** No drag handler snapshotted, so Undo
   after a drag reverted the last DISCRETE act and left the drag standing — it took back something

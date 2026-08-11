@@ -248,6 +248,7 @@ src = src.replace(marker,
   // Task 274. renderNodeFields fills the popup; screenToWorld/positionTo are the two frames the
   // Cartesian boundary sits between.
   "\t\trenderNodeFields: renderNodeFields, screenToWorld: screenToWorld,\n" +
+  "\t\tcartesianY: cartesianY, flipStoredY: flipStoredY,\n" +
   "\t\tgetBackdrop: function () { return backdrop; },\n" +
   "\t\tshowBackdropTargetPanel: showBackdropTargetPanel,\n" +
   "\t\tsetBackdrop: function (b) { backdrop = b; },\n" +
@@ -356,7 +357,11 @@ byId.lpn_toolbar.querySelectorAll = () => [];
   ok('ring extent is 1400 x 700 in both unit sets', near(w, 1400, 1) && near(h, 700, 1),
     w.toFixed(0) + ' x ' + h.toFixed(0));
   const cx = (Math.max(...xs) + Math.min(...xs)) / 2, cy = (Math.max(...ys) + Math.min(...ys)) / 2;
-  ok('ring anchored on 5000,5000', near(cx, 5000, 1) && near(cy, 5000, 1), cx + ',' + cy);
+  // Asserted in the coordinates the USER reads, not the internal Y-down ones (Task 274). Tom,
+  // 2026-08-11: "Center is now at 5000,-5000. Should be at 5000,5000." It is the readout that has
+  // to say 5000,5000; which sign the renderer keeps in memory is not a promise to anybody.
+  ok('ring reads as anchored on 5000,5000', near(cx, 5000, 1) && near(L.cartesianY(cy), 5000, 1),
+    cx + ',' + L.cartesianY(cy) + ' (internal y ' + cy + ')');
   // THE SEPARATE SYSTEM LIVES INSIDE THE RING'S FOOTPRINT. Tom, 2026-08-09: "Drawing the separate
   // system outside our main loop effectively changes the scale of the project too much... so that
   // our text doesn't look too small." The ring's interior is space zoom-to-fit already pays for;
@@ -1228,6 +1233,80 @@ console.log('\n--- Settings panel stays in sync ---');
     const d0 = L.undoDepth();
     dragTo({ dataset: {}, classList: { contains: () => false } }, 100, 100, 400, 400);
     ok('panning the map costs no snapshot', L.undoDepth() === d0, d0 + ' -> ' + L.undoDepth());
+  }
+}
+
+// ---- Task 274, second half: the FILE stores Cartesian Y from v4 ----
+// Tom, 2026-08-11: "Eventually needs to be Cartesian. If we can do that now without causing
+// trouble, let's do it." The trouble to avoid is existing projects, and the gate is what avoids it.
+{
+  console.log('\n--- Task 274: the saved file is Cartesian from v4 ---');
+  setUnitSet('us');
+  L.reset();
+  L.drawExample('us');
+  L.setDocVersion(L.storageVersion());
+  const doc = L.getDoc();
+  const node = doc.nodes.find(n => n.type === 'junction');
+  const internalY = node.y;
+
+  const file = L.serializeProject();
+  const fileNode = file.nodes.find(n => n.id === node.id);
+  ok('the file stores the coordinate the USER sees, not the internal one',
+    Math.abs(fileNode.y - L.cartesianY(internalY)) < 1e-9,
+    'internal ' + internalY.toFixed(1) + ' -> file ' + fileNode.y.toFixed(1));
+
+  // SERIALIZING MUST NOT MOVE THE DRAWING. flipStoredY() mutates, and serializeProject() builds its
+  // object from live references to doc.nodes/links/labels -- so a missing clone would flip the map
+  // upside down on every autosave. This is the assertion that catches it.
+  ok('...and serializing left the live document alone',
+    L.getDoc().nodes.find(n => n.id === node.id).y === internalY, internalY.toFixed(1));
+
+  // ROUND TRIP. The two flips are each other's inverse or every save/load cycle mirrors the map.
+  {
+    const copy = JSON.parse(JSON.stringify(file));
+    L.applySaved(copy);
+    ok('save then load returns the identical drawing',
+      Math.abs(L.getDoc().nodes.find(n => n.id === node.id).y - internalY) < 1e-9,
+      L.getDoc().nodes.find(n => n.id === node.id).y.toFixed(1));
+  }
+
+  // EVERY Y-BEARING FIELD, not just node positions. A label offset or a backdrop anchor left
+  // unflipped survives the round trip above (it flips zero times either way) but writes a file that
+  // is half Cartesian and half not.
+  {
+    const probe = {
+      v: 4,
+      nodes: [{ id: 'J1', y: 10, ly: 3 }],
+      links: [{ id: 'P1', ly: 5, verts: [{ x: 1, y: 7 }] }],
+      labels: [{ id: 'T1', y: 9 }],
+      backdrop: { ty: 11, y: 0, height: 100 }
+    };
+    L.flipStoredY(probe);
+    ok('all six Y-bearing fields flip: node y/ly, vertex y, link ly, label y, backdrop ty',
+      probe.nodes[0].y === -10 && probe.nodes[0].ly === -3 && probe.links[0].verts[0].y === -7
+      && probe.links[0].ly === -5 && probe.labels[0].y === -9 && probe.backdrop.ty === -11,
+      JSON.stringify(probe));
+    ok('...and the backdrop\'s own y/height are NOT flipped -- it is anchored top-left',
+      probe.backdrop.y === 0 && probe.backdrop.height === 100);
+  }
+
+  // THE GATE. An older document holds Y-down, must be read without a flip, and -- because
+  // serializeProject() writes openDocVersion rather than the constant -- written back without one.
+  // That is the whole reason nothing has to be converted.
+  {
+    L.reset();
+    L.drawExample('us');
+    L.setDocVersion(3);
+    const older = L.serializeProject();
+    const olderNode = older.nodes.find(n => n.type === 'junction');
+    const live = L.getDoc().nodes.find(n => n.id === olderNode.id);
+    ok('a pre-v4 project is written Y-down, exactly as it always was',
+      older.v === 3 && olderNode.y === live.y, 'v' + older.v + ', y ' + olderNode.y.toFixed(1));
+    const copy = JSON.parse(JSON.stringify(older));
+    L.applySaved(copy);
+    ok('...and reading one back does not mirror it',
+      L.getDoc().nodes.find(n => n.id === olderNode.id).y === live.y,
+      L.getDoc().nodes.find(n => n.id === olderNode.id).y.toFixed(1));
   }
 }
 
