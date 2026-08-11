@@ -1158,6 +1158,12 @@ $ec_lang['lpn_settings_restore_tip']='Resets this project\'s settings only. Your
 $ec_lang['lpn_reset_all_tip']='Deletes every project, every background image, every setting, and your unit choices, then reloads the page exactly as a first-time visitor sees it. This is the only reset that clears everything.';
 // `lpn_tool_clear`, `lpn_tool_clear_tip` and `lpn_confirm_clear` were REMOVED by Task 211 with the
 // "Clear project" command itself -- see lpn_edit_delete_network for what replaced it and why.
+// Task 263's one-time migration offer. Shown ONCE, on opening a project saved before inputs
+// stopped being converted, and never again whatever the answer. Plain text only -- it is built with
+// textContent into the dialog body.
+$ec_lang['lpn_v2_restore_prompt']='This calculator no longer changes your numbers when you change units. This project was saved before that change, so its numbers were stored in metric and would now be read as the units you are working in. May it convert them, one last time? These pipe diameters come from this project, before and after:';
+$ec_lang['lpn_v2_restore_yes']='Convert';
+$ec_lang['lpn_v2_restore_no']='Leave my numbers alone';
 $ec_lang['lpn_storage_too_new']='This project was saved by a newer version of the page, so it cannot be opened here.';
 // ---- Projects as tabs, files as files (ROADMAP Task 211) ----
 // The whole surface below follows one rule: THE ASTERISK DECIDES. A tab wearing an asterisk has

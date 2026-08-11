@@ -680,6 +680,26 @@ gets `si`. Returning visitors are unaffected — the cookie stores each select's
   `EngCalcs.defaultUnitSet`. Hard-coded metric seeds read under `us` produced a 100-inch pipe.
 - **Changing a unit select reinterprets the typed number, it does not convert it** (1 becomes 1 ft
   instead of 1 m). Long-standing and deliberate — reviewed and kept 2026-07-28. Do not "fix" it.
+  **This is now absolute, and `lpn_` was the one place that broke it** (ROADMAP Task 263, Tom
+  2026-08-10: *"a bad design decision was made without my knowledge to convert inputs when units are
+  switched. Scrub and ban this."*). `lpn_` stored SI and displayed the conversion, so every unit
+  switch silently rewrote the whole map. EPANET behaves the same way we do — switching GPM to LPS
+  converts nothing — so there is no authority on the other side of this. **A calculator stores what
+  the user typed. Conversion happens at the solver, and on results coming back from it, and nowhere
+  else.** If a third conversion site seems necessary, the design is wrong.
+- **`lpn_` only: there are no browser units, only PROJECT units** (Tom, 2026-08-10). A project
+  records its own unit selection (`serializeProject().units`) and restores it on open, because
+  declarative storage makes a bare number meaningless without them — *"imagine opening a 400
+  diameter pipe into an inch browser!"* Consequences, all deliberate:
+  - **No "save these units as my defaults"**, and no per-browser unit cookie for this page. Tom's
+    answer to "where do my preferred settings live" is that the user **saves an empty template
+    project** and opens it — which also carries ID prefixes, default inputs and map appearance, not
+    just units. One mechanism instead of two.
+  - Switching a unit reinterprets **that project**, and is persisted to it immediately.
+  - A document written before this (`v` ≤ 2) holds SI and names no units; opening one offers a
+    one-time conversion (`offerUnitRestore()`), asks before rewriting anything, and defaults to No.
+  - The other 19 calculators are unaffected — they have no document, so a unit select there is
+    exactly the per-page control it always was.
 - **Keep one page's cross-section geometry in one family.** A pipe page reads diameter, depth, top
   width, wetted perimeter and hydraulic radius all in inches; a channel page reads them all in feet.
   Mixing them within a page (an 18 in pipe reporting `T` = 1.5 ft) is the defect to avoid.

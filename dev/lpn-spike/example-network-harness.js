@@ -180,6 +180,17 @@ src = src.replace(marker,
   "\t\tseedDefaultInputs: seedDefaultInputs, bbox: bbox, effective: effective,\n" +
   "\t\tfitPending: function () { return fitAfterSolve; },\n" +
   "\t\tlinkLengthSI: linkLengthSI, rebuildSettingsFields: rebuildSettingsFields,\n" +
+  // Task 263: the document stores DECLARED values, so a test that wants SI has to cross the
+  // same boundary the solver does. Exported rather than re-derived here, or the test would
+  // agree with itself instead of with the app -- the same rule the hwCoef note below states.
+  "\t\ttoSI: toSI, toDisplay: toDisplay, unitFactor: unitFactor,\n" +
+  // ...and the rest of the Task 263 boundary: what the document records about its own units, the
+  // v2 migration, and the one-time restore offer's two halves (what it SHOWS and what it DOES).
+  "\t\treadUnitSelections: readUnitSelections, applyUnitSelections: applyUnitSelections,\n" +
+  "\t\tmigrateSaved: migrateSaved, serializeProject: serializeProject,\n" +
+  "\t\tv2RestoreEvidence: v2RestoreEvidence, applyV2Restore: applyV2Restore,\n" +
+  "\t\tniceDefault: niceDefault, setUnitEl: function (name) { return unitEl(name); },\n" +
+  "\t\tgetScenarios: function () { return scenarios; }, setScenarios: function (x) { scenarios = x; },\n" +
   "\t\taddNode: addNode, addLink: addLink,\n" +
   "\t\tlabelWidth: function (id) { return labelEls[id] ? labelEls[id].width : 0; },\n" +
   "\t\tlabelSide: function (id) { return labelEls[id] ? labelEls[id].side : null; },\n" +
@@ -362,8 +373,11 @@ byId.lpn_toolbar.querySelectorAll = () => [];
   ok('pump curve head falls monotonically', cp[0][1] > cp[1][1] && cp[1][1] > cp[2][1]);
 
   // Diameters/roughness were pinned by the example, not left on the page default.
-  ok('pipes are 6 in / 150 mm', pipes.every(p => near(L.effective(p, 'diameter'), 0.1524, 0.003)),
-    (L.effective(pipes[0], 'diameter') * 1000).toFixed(0) + ' mm');
+  // Declared 6 (in) or 150 (mm) since Task 263 -- checked in SI so ONE assertion covers both, and
+  // so it is the number the solver will actually see that is being checked.
+  ok('pipes are 6 in / 150 mm',
+    pipes.every(p => near(L.toSI(L.effective(p, 'diameter'), 'lpn_u_diameter'), 0.1524, 0.003)),
+    (L.toSI(L.effective(pipes[0], 'diameter'), 'lpn_u_diameter') * 1000).toFixed(0) + ' mm');
   ok('pipes are C = 130', pipes.every(p => L.effective(p, 'roughness') === 130));
 
   // ---- and it must actually solve, to numbers a reviewer accepts --------
@@ -409,7 +423,7 @@ byId.lpn_toolbar.querySelectorAll = () => [];
     ringQ.some(q => q > 0) && ringQ.some(q => q < 0),
     ringQ.map(q => (us ? (q / GPM).toFixed(0) + 'gpm' : (q * 1000).toFixed(1) + 'L/s')).join(' '));
 
-  const vel = pipes.map(p => Math.abs(r.flows[p.id]) / (Math.PI / 4 * Math.pow(L.effective(p, 'diameter'), 2)));
+  const vel = pipes.map(p => Math.abs(r.flows[p.id]) / (Math.PI / 4 * Math.pow(L.toSI(L.effective(p, 'diameter'), 'lpn_u_diameter'), 2)));
   ok('velocities stay under the 5 fps / 1.5 m/s design ceiling', Math.max(...vel) < 1.5,
     vel.map(v => (us ? (v / FT).toFixed(2) + 'fps' : v.toFixed(2) + 'm/s')).join(' '));
 
@@ -434,7 +448,7 @@ byId.lpn_toolbar.querySelectorAll = () => [];
   ok('the model handed to the solver carries the SI length',
     near(model.links.find(x => x.id === p1.id).length, expectSI, 1e-9));
   // hf = 10.67 L Q^1.852 / (C^1.852 d^4.87), plus the minor loss k Q^2 / (2 g A^2) the solver adds.
-  const Q1 = Math.abs(r.flows[p1.id]), d1 = L.effective(p1, 'diameter'), A1 = Math.PI / 4 * d1 * d1;
+  const Q1 = Math.abs(r.flows[p1.id]), d1 = L.toSI(L.effective(p1, 'diameter'), 'lpn_u_diameter'), A1 = Math.PI / 4 * d1 * d1;
   const hand = 10.67 * expectSI * Math.pow(Q1, 1.852) / (Math.pow(130, 1.852) * Math.pow(d1, 4.871))
     + L.effective(p1, 'k') * Q1 * Q1 / (2 * 9.806 * A1 * A1);
   ok('reported head loss matches hand-computed Hazen-Williams to 1%',
@@ -502,13 +516,16 @@ console.log('\n--- zero-pressure calibration, end to end through the app ---');
   const lenSI = head * Math.pow(C, n) * Math.pow(d, m) / (coef * Math.pow(Q, n));
   const lenDeclared = lenSI * (us ? 1 / FT : 1); // map units -- the number a user would type
 
+  // Written in the DISPLAYED unit, not SI (Task 263): the document now stores what a user types,
+  // so a test that wrote metres into a millimetre project would be testing a network 1000x too
+  // small -- which is precisely the mistake the wizard in offerUnitRestore() exists to undo.
   const r2 = L.addNode('reservoir', 1000, 1000);
-  r2.elev = head;
+  r2.elev = head * L.unitFactor('lpn_u_elevhead');
   const j = L.addNode('junction', 1000 + lenDeclared, 1000);
   j.elev = 0;
-  j._demand = Q;
+  j._demand = Q * L.unitFactor('lpn_u_flow');
   const pipe = L.addLink('pipe', r2.id, j.id);
-  pipe._diameter = d;
+  pipe._diameter = d * L.unitFactor('lpn_u_diameter');
   pipe._roughness = C;
   pipe._k = 0;                 // keep the closed form exact -- no minor-loss term
   pipe._length = lenDeclared;
@@ -571,6 +588,121 @@ console.log('\n--- Settings panel stays in sync ---');
   L.toggleSettingsPopup({ currentTarget: mkEl('button') });   // reopening must repaint it
   ok('reopening the panel shows a value changed behind its back',
     String(textSizeInputValue()) === '37', textSizeInputValue());
+}
+
+
+// ---- ROADMAP Task 263: the unit boundary ----------------------------------
+// The ban Tom stated: "no inputs conversion on units change." Everything here is about WHERE a
+// number is allowed to be multiplied by a unit factor -- at the solver, and on the way back from
+// it, and nowhere else. These assertions fail loudly if anybody reintroduces a third site.
+{
+  console.log('\n--- Task 263: inputs are declared, not converted ---');
+  setUnitSet('us');
+  L.reset();
+  L.drawExample();
+  const doc = L.getDoc();
+  const pipe = doc.links.find(l => l.type !== 'pump');
+  const junction = doc.nodes.find(n => n.type === 'junction');
+
+  // 1. THE BAN ITSELF. Snapshot the declared inputs, switch the strip to metric, and require that
+  //    not one stored number moved. This is the whole task in one assertion.
+  const before = {
+    d: pipe._diameter, len: pipe._length, rough: pipe._roughness,
+    elev: junction.elev, demand: junction._demand
+  };
+  const siBefore = L.assembleModel().links.find(l => l.id === pipe.id).diameter;
+  setUnitSet('si');
+  ok('switching units changes NO stored input',
+    pipe._diameter === before.d && pipe._length === before.len &&
+    pipe._roughness === before.rough && junction.elev === before.elev &&
+    junction._demand === before.demand,
+    'diameter still ' + pipe._diameter);
+  // 2. ...and the physics DOES move, which is the other half of "reinterpret". A 6 that meant
+  //    6 inches now means 6 mm, so the model the solver sees must have changed.
+  const siAfter = L.assembleModel().links.find(l => l.id === pipe.id).diameter;
+  ok('...but the SI value handed to the solver does change',
+    Math.abs(siAfter - siBefore) > 1e-9,
+    (siBefore * 1000).toFixed(1) + ' mm -> ' + (siAfter * 1000).toFixed(1) + ' mm');
+
+  // 3. niceDefault returns a number IN THE SELECTED UNIT, both branches. The SI branch is the one
+  //    that bit us: siVal is quoted in the SI BASE unit, but the SI preset shows mm and l/s.
+  setUnitSet('us');
+  ok('niceDefault US branch is the US number as typed', L.niceDefault('lpn_u_diameter', 'in', 6, 0.15) === 6);
+  setUnitSet('si');
+  ok('niceDefault SI branch scales base SI to the shown unit (0.15 m -> 150 mm)',
+    near(L.niceDefault('lpn_u_diameter', 'in', 6, 0.15), 150, 1e-9),
+    String(L.niceDefault('lpn_u_diameter', 'in', 6, 0.15)));
+  ok('...and 0.015 m3/s -> 15 l/s', near(L.niceDefault('lpn_u_flow', 'gpm', 250, 0.015), 15, 1e-9),
+    String(L.niceDefault('lpn_u_flow', 'gpm', 250, 0.015)));
+
+  // 4. THE PROJECT OWNS ITS UNITS. Tom: "it would be another disaster for projects not to be stored
+  //    with their units. Imagine opening a 400 diameter pipe into an inch browser!"
+  const savedSI = L.serializeProject();
+  ok('the saved document records its units by KEY', savedSI.units.lpn_u_diameter === 'mm', JSON.stringify(savedSI.units));
+  setUnitSet('us');
+  ok('a browser left in inches really is in inches', L.setUnitEl('lpn_u_diameter').options[L.setUnitEl('lpn_u_diameter').selectedIndex].dataset.unit === 'in');
+  L.applyUnitSelections(savedSI.units);
+  ok('opening that document puts the browser back in mm -- the 400 mm pipe stays 400 mm',
+    L.setUnitEl('lpn_u_diameter').options[L.setUnitEl('lpn_u_diameter').selectedIndex].dataset.unit === 'mm');
+  // A unit this browser does not offer is skipped, not forced: a wrong selection beats a broken one.
+  L.applyUnitSelections({ lpn_u_diameter: 'furlong' });
+  ok('an unknown unit is ignored rather than breaking the select',
+    L.setUnitEl('lpn_u_diameter').options[L.setUnitEl('lpn_u_diameter').selectedIndex].dataset.unit === 'mm');
+
+  // 5. MIGRATION. v2 documents hold SI and say nothing about units. migrateSaved must stamp and
+  //    flag, and must NOT touch a single number -- the rewrite is the user's to authorise.
+  const v2 = { v: 2, nodes: [{ id: 'J1', type: 'junction', elev: 15.24, _demand: 0.0157 }],
+    links: [{ id: 'P1', type: 'pipe', _diameter: 0.1524, _length: 461, _roughness: 130 }], labels: [] };
+  const out = L.migrateSaved(JSON.parse(JSON.stringify(v2)));
+  ok('migrateSaved stamps v2 up to v3', out.v === 3);
+  ok('...flags it for the restore offer', out._v2Numbers === true);
+  ok('...and changes no number at all',
+    out.nodes[0].elev === 15.24 && out.links[0]._diameter === 0.1524 && out.links[0]._length === 461);
+
+  // 6. WHAT THE DIALOG SHOWS. Five most COMMON diameters, then those sorted smallest to largest,
+  //    rendered before -> after so the user can recognise their own pipe schedule.
+  setUnitSet('us');
+  L.reset();
+  const dias = [0.1016, 0.1016, 0.1016, 0.2032, 0.2032, 0.1524, 0.3048, 0.4064, 0.508, 0.6096];
+  const nA = L.addNode('junction', 0, 0), nB = L.addNode('junction', 100, 0);
+  dias.forEach(d => { const l = L.addLink('pipe', nA.id, nB.id); l._diameter = d; });
+  const rows = L.v2RestoreEvidence();
+  ok('the offer shows at most 5 diameters', rows.length === 5, rows.join(', '));
+  ok('...sorted smallest to largest', rows.map(r => +r.split(' → ')[0]).every((v, i, arr) => i === 0 || arr[i - 1] <= v), rows.join(', '));
+  ok('...as before → after, in the units on the strip (0.1016 → 4)',
+    rows.some(r => r === '0.1016 → 4'), rows.join(', '));
+  // The two genuinely common sizes must survive the cut; the ten-entry set has five singletons
+  // tied for the last three slots, so WHICH singletons make it is arbitrary and not asserted.
+  ok('...keeping the two most common sizes',
+    rows.some(r => r.indexOf('0.1016 ') === 0) && rows.some(r => r.indexOf('0.2032 ') === 0), rows.join(', '));
+  ok('...and dropping some of the singletons rather than listing all ten',
+    !rows.some(r => r.indexOf('0.6096 ') === 0), rows.join(', '));
+
+  // 7. WHAT THE DIALOG DOES. Scale the SI-stored inputs into the displayed unit -- and only those.
+  //    _length was already declarative before this task, and roughness/k are dimensionless: any of
+  //    the three getting scaled here would be a new bug wearing a migration's clothes.
+  L.reset();
+  setUnitSet('us');
+  const r3 = L.addNode('reservoir', 0, 0), j3 = L.addNode('junction', 500, 0);
+  r3.elev = 30.48; r3._head = 33.53;            // metres, v2 style
+  j3.elev = 15.24; j3._demand = 0.0315;          // metres, m3/s
+  const p3 = L.addLink('pipe', r3.id, j3.id);
+  p3._diameter = 0.2032; p3._length = 675.4; p3._roughness = 130; p3._k = 2;
+  p3.curvePoints = null;
+  L.setScenarios([{ id: 'base', isBase: true, overrides: {} },
+    { id: 's2', overrides: { [p3.id]: { diameter: 0.3048 }, [j3.id]: { demand: 0.063 } } }]);
+  L.applyV2Restore();
+  ok('restore scales elevation to feet', near(r3.elev, 100, 0.01), r3.elev.toFixed(2));
+  ok('restore scales the reservoir head', near(r3._head, 110, 0.01), r3._head.toFixed(2));
+  ok('restore scales demand to gpm', near(j3._demand, 499.2, 1), j3._demand.toFixed(1));
+  ok('restore scales diameter to inches', near(p3._diameter, 8, 0.001), p3._diameter.toFixed(3));
+  ok('restore leaves LENGTH alone (already declarative before this task)', p3._length === 675.4);
+  ok('restore leaves roughness alone (dimensionless)', p3._roughness === 130);
+  ok('restore leaves k alone (dimensionless)', p3._k === 2);
+  const ov = L.getScenarios()[1].overrides;
+  ok('restore reaches SCENARIO OVERRIDES too, or a scenario sits 39x from its Base',
+    near(ov[p3.id].diameter, 12, 0.001) && near(ov[j3.id].demand, 998.4, 2),
+    ov[p3.id].diameter.toFixed(3) + ' in, ' + ov[j3.id].demand.toFixed(1) + ' gpm');
 }
 
 console.log('\n' + (fails === 0 ? 'ALL PASS' : fails + ' FAILURE(S)'));

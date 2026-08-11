@@ -1077,19 +1077,23 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     checkable; just do not spend the blog/video headline on it.** Do not relitigate.
   - Consequence: raised 146.06 to 90 and 220 to 95.
 
-- 70|263| **BANNED FOREVER: lpn must not convert inputs when a unit is switched.** Tom, 2026-08-10,
-  on a decision made without him: *"a bad design decision was made without my knowledge to convert
-  inputs when units are switched. Scrub and ban this."* Every other calculator in the suite
-  **reinterprets** the typed number (1 becomes 1 ft instead of 1 m — CLAUDE.md, Unit Sets), and so
-  does EPANET: switching GPM to LPS there converts nothing. lpn instead stores SI and displays
-  converted, so a unit switch silently rewrites every number on the map.
-  - **The fix is the `lengthField()` model applied everywhere:** the stored number is declarative in
-    the displayed unit, and conversion happens only at the solver handoff. That comment already
-    warns *"Do NOT 'fix' a future variant of this by … converting the stored length."*
-  - **Blocker: saved projects hold SI numbers**, so this needs a document-version migration that
-    reads the unit selection in force when the file was written. Scope that before touching code.
-  - **The example network is NOT a reason to keep conversion** (Tom: *"that is the tail wagging the
-    dog"*). Task 264 removes that dependency; do it first.
+- 75|270| **Audit lpn against Tom's own New User guide, and report the mismatches.** Tom, 2026-08-10:
+  *"I need you to very carefully ensure that there is not more about our system that I
+  misunderstood."* Source of truth is the "New User" section of
+  <https://tomsthird.blogspot.com/2026/08/hawsedc-free-unlimited-online-looped.html>. The deliverable
+  is a REPORT of mismatches, not a pile of fixes — some will be the post to change, some the app.
+  - Already found while logging this: **"Use File, Save to create a local settings template file"
+    holds in Chromium only.** `saveCurrent()` routes an unsaved project to Save As there, but where
+    the File System Access API is missing the Save row is *disabled*, so a Firefox or Safari reader
+    following the guide finds a greyed-out command. Either the post says "Save as", or Save stops
+    being disabled and routes.
+  - Verified as written, no action: double-click sends a dragged label home; double-click adds and
+    removes pipe vertices; Labels is on both the toolbar and View; Settings holds Map appearance and
+    label size; the solve updates as you work; the EPANET engine toggle exists.
+  - **"Use File, Open to open an example project" has a better route since Task 264** — File > New
+    project > From examples. The post's download-and-open path still works.
+  - Note for the audit: the guide's template-project flow is now the DESIGNED mechanism, not a
+    workaround — see CLAUDE.md, "there are no browser units, only project units".
 
 - 55|265| **The lpn page title must disclose which unit system the project was created for.** Tom,
   2026-08-10: `"HawsEDC Calculators" / "Looped Pipe Network (Map Interface)" / "{units_set} Units"`.
@@ -1737,6 +1741,25 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|263| **[DONE 2026-08-10] Inputs are stored as declared; nothing converts them on a unit change.**
+  `lpn_` stored SI and displayed the conversion, so switching a unit silently rewrote every number
+  on the map. Now the document holds what the user typed, and conversion happens in exactly two
+  places: at the solver handoff (`toSI`, in `assembleModel`/`recomputePumpCurve`) and on results
+  coming back (`toDisplay`). A third site would re-create the banned behaviour.
+  - **The project owns its units** (`serializeProject().units`, restored by `applyUnitSelections()`).
+    Mandatory, not a nicety: a declared 400 written under mm would otherwise open as 400 inches.
+    Consequence, Tom's own: there are no browser units and no "save as defaults" — a user keeps
+    preferences by saving an **empty template project**. See CLAUDE.md.
+  - **v2 documents get one offer, and No is the default.** `offerUnitRestore()` shows real diameters
+    from that project as `0.2032 → 8` and rewrites nothing unless told to. Stamped v3 before the
+    answer, so dismissal means "leave my numbers alone" once rather than a dialog every open.
+  - **`niceDefault`'s SI branch needed a factor it never had**: `siVal` is quoted in the SI *base*
+    unit while the SI preset shows mm and l/s, so 0.15 m was landing as 0.15 mm and the solve
+    returned −1.3e10 kPa. Caught by the example-network harness within seconds of the switch.
+  - 24 new assertions in `dev/lpn-spike/example-network-harness.js`, mutation-tested (7 mutations,
+    all caught). Wizard strings in en and fr only — Tom, 2026-08-10: lpn has no human users outside
+    those two, and this is a transient migration string.
 
 - 0|264| **[DONE 2026-08-10] "Draw example network" retired; File > New project instead.** The
   toolbar's most prominent slot now opens **File > New project** (a second popup off the same

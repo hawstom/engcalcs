@@ -769,6 +769,9 @@ var EngCalcs = EngCalcs || {};
 	// to localStorage as a sibling key (see saveToStorage()/loadFromStorage() below), just not
 	// undo-tracked.
 	var backdrop = null; // { href, iw, ih, x, y, width, height, tx, ty, s } | null
+	// Set by applySaved() when the document just read was written before Task 263 (v2, SI numbers);
+	// consumed once by offerUnitRestore() at the tail of refreshAllFromDocument().
+	var pendingV2Restore = false;
 
 	// One color per data field, matching js/branched-network.js's EngCalcs.bpnFieldColors
 	// convention (Tom, 2026-07-30): a colored number on the map, a colored span in the checkbox
@@ -857,7 +860,13 @@ var EngCalcs = EngCalcs || {};
 			l.h0 = 0; l.a = 0; l.b = 2;
 			return;
 		}
-		var curve = EngCalcs.lpnPumpFromCurve(pts);
+		// h0/a/b are what js/lpn-solver.js reads, so they are SI -- but curvePoints are now what the
+		// user typed, in the flow and head units on the strip (Task 263). This is the pump's own
+		// crossing of the unit boundary, and it is why refreshPumpCurvesForUnits() has to re-run the
+		// fit when a unit changes: the same three points mean a different pump under l/s than gpm.
+		var curve = EngCalcs.lpnPumpFromCurve(pts.map(function (pt) {
+			return [toSI(pt[0], 'lpn_u_flow'), toSI(pt[1], 'lpn_u_elevhead')];
+		}));
 		l.h0 = curve.h0; l.a = curve.a; l.b = curve.b;
 	}
 	// Editing one pump's points can change what OTHER pumps compute too (any referencing it via
@@ -1939,7 +1948,10 @@ var EngCalcs = EngCalcs || {};
 	// The index carries only what a project LIST needs (id, name, updated). It is a cache, not the
 	// authority: `project.name` inside the project document is the source of truth, and
 	// adoptOrphans() below rebuilds an index entry for any project key the index has lost.
-	var LPN_STORAGE_VERSION = 2;
+	// 3 (Task 263, 2026-08-10): inputs are stored AS DECLARED rather than in SI, and the document
+	// records the unit selection it was written under. A v2 document holds SI numbers and says
+	// nothing about units, which is why opening one runs the one-time restore offer below.
+	var LPN_STORAGE_VERSION = 3;
 	var LPN_LEGACY_KEY = 'lpn_document';   // the pre-library single-document key (v1 and v2 alike)
 	var LPN_INDEX_KEY = 'lpn_index';
 	var LPN_PROJECT_PREFIX = 'lpn_project_';
@@ -2002,7 +2014,10 @@ var EngCalcs = EngCalcs || {};
 		return {
 			v: LPN_STORAGE_VERSION, project: project, scenarios: scenarios,
 			nodes: doc.nodes, links: doc.links, labels: doc.labels, nextId: nextId,
-			labelSettings: labelSettings, backdrop: backdrop, settings: settings
+			labelSettings: labelSettings, backdrop: backdrop, settings: settings,
+			// The units the numbers above are IN. Not a preference -- without it the document does
+			// not say what it means, and a 400 mm main would open as a 400 inch main (Tom).
+			units: readUnitSelections()
 		};
 	}
 	function writeJSON(key, obj) {
@@ -2110,6 +2125,18 @@ var EngCalcs = EngCalcs || {};
 			(saved.links || []).forEach(function (l) { renameOverridable(l, LPN_OVERRIDABLE.link); });
 			saved.v = 2;
 		}
+		if (saved.v === 2) {
+			// v2 stored SI and recorded no units. The numbers are NOT touched here -- rewriting a
+			// user's network without asking is the thing this whole task is about not doing. The
+			// document is stamped v3 and flagged, and offerUnitRestore() asks once, after it is on
+			// screen where the user can see what is being talked about.
+			//
+			// Stamped BEFORE the answer, deliberately (Tom, 2026-08-10, choosing "ask, defaulting to
+			// No"): dismissing the dialog IS an answer -- leave my numbers alone -- and a flag that
+			// survived dismissal would re-ask on every single open forever.
+			saved.v = 3;
+			saved._v2Numbers = true;
+		}
 		return saved;
 	}
 	// Version-checks one already-parsed document and runs it up to the current version. Returns null
@@ -2203,6 +2230,15 @@ var EngCalcs = EngCalcs || {};
 		// does not silently lose it, then drop the old key so it cannot drift.
 		if (typeof settings.kmDefault === 'number') { settings.defaults.k = settings.kmDefault; }
 		delete settings.kmDefault;
+		// THE PROJECT'S OWN UNITS, restored before anything renders (Task 263). A document written
+		// under mm now opens under mm however this browser was last left, because its numbers only
+		// mean anything alongside the units they were typed in.
+		applyUnitSelections(saved.units);
+		// A v2 document has no units to restore and holds SI numbers. Hand the fact to
+		// offerUnitRestore(), which refreshAllFromDocument() calls once the network is on screen --
+		// the question is unanswerable in the abstract and obvious next to the drawing.
+		pendingV2Restore = !!saved._v2Numbers;
+		delete saved._v2Numbers;
 		return true;
 	}
 
@@ -2362,6 +2398,104 @@ var EngCalcs = EngCalcs || {};
 		// The banner belongs to the project you are looking at: a read-only tab, a file that needs
 		// re-opening after a page load, or neither.
 		syncReadOnlyToOpenProject();
+		// LAST, and only after the network is drawn: the question it asks is about the numbers the
+		// user can now see.
+		offerUnitRestore();
+	}
+	// ---- one-time restore of a pre-Task-263 project (Tom's design, 2026-08-10) ----
+	//
+	// A v2 document stored SI. Under declarative storage those same numbers now MEAN what they say,
+	// so a US project's 0.2032 m pipe would read as a 0.2032 inch pipe. Multiplying every input by
+	// the factor currently on the strip puts it back to the 8 the user typed -- and the strip is the
+	// best evidence there is, because the unit selection is cookie-persisted per browser, so a
+	// returning user is almost always looking at the units they drew in.
+	//
+	// **Almost always is not always, so it ASKS, and No is the default** (Tom). Getting this wrong
+	// silently would rewrite somebody's whole network by a factor of 39.37. The dialog shows real
+	// diameters out of THIS project, before and after, because that is the one thing that lets a
+	// user recognise their own work: "0.2032 -> 8" is checkable at a glance in a way that no
+	// explanation of storage models ever will be.
+	//
+	// Diameters are the evidence field on purpose. Elevations and demands can legitimately be
+	// round-ish in either system, but a pipe is bought in a catalogue size, so a converted one is
+	// conspicuous.
+	function v2RestoreEvidence() {
+		var f = unitFactor('lpn_u_diameter'), counts = {}, out = [];
+		doc.links.forEach(function (l) {
+			if (l.type === 'pump') { return; }
+			var d = effective(l, 'diameter');
+			if (typeof d !== 'number' || !(d > 0)) { return; }
+			counts[d] = (counts[d] || 0) + 1;
+		});
+		Object.keys(counts).forEach(function (k) { out.push({ v: +k, n: counts[k] }); });
+		// Most COMMON first (that is what makes them representative), then the chosen few sorted
+		// smallest to largest so the list reads like a pipe schedule.
+		out.sort(function (a, b) { return b.n - a.n; });
+		out = out.slice(0, 5).sort(function (a, b) { return a.v - b.v; });
+		return out.map(function (e) { return trimNumber(e.v) + ' → ' + trimNumber(e.v * f); });
+	}
+	function trimNumber(v) { return String(+(+v).toFixed(6)); }
+	function applyV2Restore() {
+		var hf = unitFactor('lpn_u_elevhead'), qf = unitFactor('lpn_u_flow'),
+			df = unitFactor('lpn_u_diameter');
+		function scale(obj, key, f) {
+			if (obj && typeof obj[key] === 'number') { obj[key] = obj[key] * f; }
+		}
+		saveUndoSnapshot(); // one Ctrl-Z undoes the whole migration
+		doc.nodes.forEach(function (n) {
+			scale(n, 'elev', hf);
+			scale(n, '_head', hf);
+			scale(n, '_demand', qf);
+		});
+		doc.links.forEach(function (l) {
+			scale(l, '_diameter', df);
+			// _length was ALREADY declarative before this task (see linkLengthSI) -- scaling it here
+			// would break the one field that was never wrong. _roughness and _k are dimensionless.
+			(l.curvePoints || []).forEach(function (pt) {
+				if (!pt) { return; }
+				if (typeof pt[0] === 'number') { pt[0] = pt[0] * qf; }
+				if (typeof pt[1] === 'number') { pt[1] = pt[1] * hf; }
+			});
+		});
+		// Scenario overrides hold the same fields under the same names and are just as SI as the
+		// base values are -- missing them would leave a scenario silently 39x out from its own Base.
+		scenarios.forEach(function (sc) {
+			var ov = sc.overrides || {};
+			Object.keys(ov).forEach(function (elId) {
+				scale(ov[elId], 'elev', hf);
+				scale(ov[elId], 'head', hf);
+				scale(ov[elId], 'demand', qf);
+				scale(ov[elId], 'diameter', df);
+			});
+		});
+		recomputeAllPumpCurves();
+		saveToStorage();
+		refreshAllFromDocument();
+	}
+	function offerUnitRestore() {
+		if (!pendingV2Restore) { return; }
+		pendingV2Restore = false;   // asked once per open, whatever the answer
+		var pc = EngCalcs.pageConfig || {};
+		// Nothing to restore: with the base SI unit selected the factor is 1, so the stored number
+		// and the declared number are the same number and there is no question to ask. An empty
+		// project has no evidence and nothing to fix either.
+		var rows = v2RestoreEvidence();
+		if (!rows.length || unitFactor('lpn_u_diameter') === 1) { saveToStorage(); return; }
+		openDialog(function (body) {
+			var p1 = document.createElement('p');
+			p1.style.margin = '0 0 8px';
+			p1.textContent = (pc.lpn_v2_restore_prompt || 'This calculator changed how it stores numbers, so that switching units no longer converts your inputs. This project was saved under the old way. May it convert your inputs one last time? Representative pipe diameters, before and after:');
+			body.appendChild(p1);
+			var p2 = document.createElement('p');
+			p2.style.cssText = 'margin:0;font-weight:bold';
+			p2.textContent = rows.join(', ');
+			body.appendChild(p2);
+		}, [
+			// No first ONLY in the sense that it is the safe answer and dismissal lands on it; Yes
+			// leads because it is the answer that is right for the project this dialog appeared over.
+			{ label: pc.lpn_v2_restore_yes || 'Convert', fn: applyV2Restore },
+			{ label: pc.lpn_v2_restore_no || 'Leave my numbers alone', fn: function () { saveToStorage(); } }
+		]);
 	}
 	function openProject(id) {
 		if (id === library.openId) { return true; }
@@ -5688,6 +5822,46 @@ var EngCalcs = EngCalcs || {};
 	// By [name=], not getElementById: echoUnitSelect() (lib/Calculators.lib.php) emits name=
 	// only, never id= -- these names double as the lookup key here.
 	function unitEl(name) { return document.querySelector('select[name="' + name + '"]'); }
+	// The seven selectors this page owns, in one list, so reading and restoring a project's units
+	// cannot drift out of step with each other or with Looped-Network.php's units strip.
+	var LPN_UNIT_SELECTS = ['lpn_u_length', 'lpn_u_elevhead', 'lpn_u_pressure', 'lpn_u_diameter',
+		'lpn_u_flow', 'lpn_u_velocity', 'lpn_u_gradient'];
+	// {selectName: unitKey}, e.g. {lpn_u_diameter: 'in'}. Stored by KEY, never by factor: a factor is
+	// a number whose meaning depends on a table that may be re-derived, while 'in' will mean inches
+	// forever. Same reason the option carries data-unit at all.
+	function readUnitSelections() {
+		var out = {};
+		LPN_UNIT_SELECTS.forEach(function (name) {
+			var k = unitKey(name);
+			if (k) { out[name] = k; }
+		});
+		return out;
+	}
+	// Restores a project's own units WITHOUT going through EngCalcs.setUnits(): that helper calls
+	// submitForm(), which re-enters pageCalculator, which is exactly the code path that is calling
+	// this. The selects are set directly and the caller re-renders once, in its own order.
+	// A unit this browser does not offer (a family that changed) is skipped rather than forced --
+	// leaving the current selection is a wrong unit; setting a missing one is a broken select.
+	function applyUnitSelections(units) {
+		if (!units) { return false; }
+		var changed = false;
+		LPN_UNIT_SELECTS.forEach(function (name) {
+			var want = units[name], sel = unitEl(name), i;
+			if (!want || !sel || !sel.options) { return; }
+			// Walked as `options` + `selectedIndex` rather than a querySelector on [data-unit],
+			// matching unitKey() two functions up. That is the idiom the rest of this file already
+			// reads a select with, and it is the one a harness can stub -- an attribute selector on
+			// a live <option> works only against a real DOM, so the check that this function does
+			// its job at all could not have been written.
+			for (i = 0; i < sel.options.length; i++) {
+				if (sel.options[i].dataset && sel.options[i].dataset.unit === want) {
+					if (sel.selectedIndex !== i) { sel.selectedIndex = i; changed = true; }
+					return;
+				}
+			}
+		});
+		return changed;
+	}
 	function unitFactor(name) { var s = unitEl(name); return s ? parseFloat(s.value) : 1; }
 	function unitLabel(name) { var s = unitEl(name); return s ? s.options[s.selectedIndex].textContent : ''; }
 	function unitKey(name) { var s = unitEl(name); return s ? s.options[s.selectedIndex].dataset.unit : null; }
@@ -5699,7 +5873,46 @@ var EngCalcs = EngCalcs || {};
 	// unit, not the page's original load-time default, so this stays correct even after the user
 	// switches units mid-session.
 	function niceDefault(unitId, usKey, usVal, siVal) {
-		return unitKey(unitId) === usKey ? usVal / unitFactor(unitId) : siVal;
+		// DECLARATIVE since Task 263: what comes back is in the unit the strip is SHOWING.
+		//
+		// The two arguments are therefore asymmetric, and the asymmetry is in the existing call
+		// sites, not invented here. `usVal` is already a nice number IN usKey ("6" inches), so it is
+		// returned untouched. `siVal` is a nice number in the SI BASE unit (0.15 m, 0.015 m³/s) --
+		// which is not what the SI preset displays: it shows mm and l/s. So the SI branch scales to
+		// the selected unit and 0.15 m becomes 150 mm, 0.015 m³/s becomes 15 l/s.
+		//
+		// Getting this wrong is silent and enormous: without the factor a 150 mm main is stored as
+		// 0.15 mm and the solve returns pressures around -1.3e10 kPa. That is exactly what the
+		// example-network harness caught the moment storage went declarative, which is the reason
+		// that harness exists.
+		return unitKey(unitId) === usKey ? usVal : siVal * unitFactor(unitId);
+	}
+
+	// ---- THE UNIT BOUNDARY (ROADMAP Task 263, Tom 2026-08-10) ----
+	//
+	// **Inputs are stored in the unit they were typed in, and NOTHING converts them.** Switching a
+	// unit select reinterprets the number (8 in becomes 8 mm), exactly as every other calculator in
+	// this suite behaves and exactly as EPANET behaves. The previous design stored SI and displayed
+	// the conversion, so a unit switch silently rewrote every number on the map; Tom banned it:
+	// *"a bad design decision was made without my knowledge to convert inputs when units are
+	// switched. Scrub and ban this."*
+	//
+	// Conversion therefore happens in exactly TWO places and nowhere else:
+	//   1. HERE, at the solver handoff (assembleModel, recomputePumpCurve) -- declared value to SI.
+	//   2. On the way BACK, for solve RESULTS only (readonlyUnitField, numLine) -- SI to display.
+	// A number that is an input never passes through either on its way to the screen. If you find
+	// yourself adding a third conversion site, you are re-creating the banned behaviour.
+	//
+	// **The project stores its own units** (see serializeProject/applyUnitSelections). It has to:
+	// declarative storage means a 400 written by a millimetre user is the number 400, and opening
+	// that file in an inch browser without restoring its units would read it as a 400 INCH pipe.
+	// Tom, 2026-08-10: *"it would be another disaster for projects not to be stored with their
+	// units."*
+	function toSI(value, unitId) {
+		return (typeof value === 'number') ? value / unitFactor(unitId) : value;
+	}
+	function toDisplay(siValue, unitId) {
+		return (typeof siValue === 'number') ? siValue * unitFactor(unitId) : siValue;
 	}
 
 	// ---- label toggle popover (Task 146 Phase 2) ----
@@ -6002,21 +6215,29 @@ var EngCalcs = EngCalcs || {};
 		// Trailing zeros stripped rather than the popup's fixed toFixed(4): a default is a round
 		// number the user typed ("8", "150"), and showing it back as 8.0000 makes the panel look
 		// like a readout of a computed value instead of the field they set.
-		function trimNum(v) { return String(+v.toFixed(6)); }
-		// Unit-bearing rows show and accept the CURRENT display unit and store SI, the same
-		// convention unitNumberField() uses in the element popup -- but with NO scheduleSolve():
-		// changing a default alters nothing that already exists, so there is nothing to re-solve.
-		// EngCalcs.pageCalculator re-runs this whole rebuild on a unit switch, so these rows can
-		// never sit showing a number in a unit the strip has since changed away from.
-		// unitId null means dimensionless (roughness, K) -- no factor, no unit in the label.
+		// `+v` FIRST, and it is load-bearing: defaultSettings() leaves settings.defaults full of
+		// nulls until seedDefaultInputs() fills them, and any path that rebuilds this panel before
+		// that has run hands a null in here. The pre-Task-263 code multiplied by a unit factor on the
+		// way in, so `null * f` coerced to 0 and the null never surfaced; dropping the factor dropped
+		// the accidental coercion with it and this threw. Coerce on purpose now, rather than rely on
+		// arithmetic that is no longer there. (Caught by popup-tips-harness.js, which calls
+		// rebuildSettingsFields() directly -- exactly the unseeded path.)
+		function trimNum(v) { return String(+(+v).toFixed(6)); }
+		// Unit-bearing rows show and accept the value AS DECLARED, the same convention
+		// unitNumberField() uses in the element popup (Task 263) -- no factor either way. NO
+		// scheduleSolve(): changing a default alters nothing that already exists.
+		// EngCalcs.pageCalculator re-runs this whole rebuild on a unit switch, so the unit named in
+		// the label is always the one the number is in. A default therefore REINTERPRETS along with
+		// everything else -- a default diameter of 8 becomes 8 mm -- which is the point of the ban.
+		// unitId null means dimensionless (roughness, K) -- no unit in the label.
 		function defaultRow(target, labelText, unitId, key, isValid) {
-			var f = unitId ? unitFactor(unitId) : 1, input = document.createElement('input');
+			var input = document.createElement('input');
 			input.type = 'number'; input.step = 'any';
-			input.value = trimNum(settings.defaults[key] * f);
+			input.value = trimNum(settings.defaults[key]);
 			input.addEventListener('change', function () {
 				var v = +input.value;
-				if (input.value !== '' && isFinite(v) && isValid(v)) { settings.defaults[key] = v / f; saveToStorage(); }
-				else { input.value = trimNum(settings.defaults[key] * f); }
+				if (input.value !== '' && isFinite(v) && isValid(v)) { settings.defaults[key] = v; saveToStorage(); }
+				else { input.value = trimNum(settings.defaults[key]); }
 			});
 			row(target, unitId ? labelText + ' (' + unitLabel(unitId) + ')' : labelText, input);
 		}
@@ -6448,13 +6669,19 @@ var EngCalcs = EngCalcs || {};
 		}
 		fields.innerHTML = '';
 	}
-	function unitNumberField(fields, labelText, unitId, getSI, setSI, tip) {
-		var f = unitFactor(unitId), label = document.createElement('label'), input = document.createElement('input');
-		input.type = 'number'; input.value = (getSI() * f).toFixed(4);
-		// scheduleSolve() here, not just inside setSI callbacks, centralizes it for every current
-		// and future use of this helper (elev/demand/head's setSI already also calls updateNode(),
+	// get/set are DECLARED values, not SI (Task 263) -- what the user typed, in the unit the label
+	// names. No factor in either direction; the solver does the converting at its own boundary.
+	function unitNumberField(fields, labelText, unitId, get, set, tip) {
+		var label = document.createElement('label'), input = document.createElement('input'), v0 = get();
+		input.type = 'number';
+		// Printed with trailing zeros stripped rather than a fixed toFixed(4). Under SI storage the
+		// value was the result of a division and 4 places was a reasonable guess at it; now it is the
+		// number the user typed, and showing "8" back as "8.0000" makes their own input look computed.
+		input.value = (typeof v0 === 'number') ? String(+v0.toFixed(6)) : '';
+		// scheduleSolve() here, not just inside set callbacks, centralizes it for every current
+		// and future use of this helper (elev/demand/head's set already also calls updateNode(),
 		// which itself schedules a solve -- calling it twice is harmless, debounced).
-		input.addEventListener('change', function () { setSI(+input.value / f); scheduleSolve(); });
+		input.addEventListener('change', function () { set(+input.value); scheduleSolve(); });
 		setFieldLabel(label, labelText + ' (' + unitLabel(unitId) + ')', tip);
 		label.appendChild(input);
 		fields.appendChild(label);
@@ -6464,14 +6691,14 @@ var EngCalcs = EngCalcs || {};
 	// defaults to" -- currently a reservoir's head following its elevation (Tom, 2026-07-30).
 	// placeholderSI is that fallback, shown greyed in the empty box so the field never looks like it
 	// is missing a number; clearing the box stores undefined, which is what re-links the two.
-	function unitNumberFieldBlank(fields, labelText, unitId, getSI, setSI, placeholderSI, tip) {
-		var f = unitFactor(unitId), label = document.createElement('label'), input = document.createElement('input'),
-			v = getSI();
+	function unitNumberFieldBlank(fields, labelText, unitId, get, set, placeholder, tip) {
+		var label = document.createElement('label'), input = document.createElement('input'),
+			v = get();
 		input.type = 'number';
-		input.value = (v === undefined || v === null || v === '') ? '' : (v * f).toFixed(4);
-		input.placeholder = (placeholderSI * f).toFixed(4);
+		input.value = (v === undefined || v === null || v === '') ? '' : String(+(+v).toFixed(6));
+		input.placeholder = String(+(+placeholder).toFixed(6));
 		input.addEventListener('change', function () {
-			setSI(input.value === '' ? undefined : +input.value / f);
+			set(input.value === '' ? undefined : +input.value);
 			scheduleSolve();
 		});
 		setFieldLabel(label, labelText + ' (' + unitLabel(unitId) + ')', tip);
@@ -6636,7 +6863,13 @@ var EngCalcs = EngCalcs || {};
 				n.elev || 0, pc.lpn_field_head_tip);
 			// No read-only Head row here (a junction gets one because its head is a solve RESULT) --
 			// the editable field above already shows this reservoir's head, typed or inherited.
-			readonlyUnitField(fields, pc.lpn_result_pressure || 'Pressure', 'lpn_u_pressure', reservoirHead(n) - (n.elev || 0));
+			// The one place two DISPLAY units meet: head and elevation are declared in the Elevation/
+			// Head unit, their difference is a pressure, and the Pressure selector may be showing
+			// something else entirely (psi against ft of water). So it crosses to SI and back. This
+			// is a conversion between two units the user chose, not a conversion of an input on a
+			// unit change -- the number they typed is untouched.
+			readonlyUnitField(fields, pc.lpn_result_pressure || 'Pressure', 'lpn_u_pressure',
+				toSI(reservoirHead(n) - (n.elev || 0), 'lpn_u_elevhead'));
 		} else {
 			unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
 				function () { return n.elev; }, function (v) { n.elev = v; updateNode(nodeId); },
@@ -6710,7 +6943,8 @@ var EngCalcs = EngCalcs || {};
 			pc.lpn_pump_point2 || 'Point 2 (optional)',
 			pc.lpn_pump_point3 || 'Point 3 (optional)'
 		];
-		var qf = unitFactor('lpn_u_flow'), hf = unitFactor('lpn_u_elevhead');
+		// No factors here since Task 263: a curve point is stored in the units its column heading
+		// names, so the table shows and accepts the number as typed.
 		// A real <table> with real column headings (Tom, 2026-07-30) -- the point rows were two
 		// unlabelled number boxes whose only clue as to which was which lived in a title= tooltip,
 		// invisible on touch. Flow first, then head, matching both the [Q,H] storage order and the
@@ -6743,12 +6977,12 @@ var EngCalcs = EngCalcs || {};
 					qInput = document.createElement('input'), hInput = document.createElement('input');
 				lab.textContent = pointLabels[pi];
 				qInput.type = 'number'; qInput.step = 'any'; qInput.size = 6;
-				qInput.value = pt[0] !== undefined ? (pt[0] * qf).toFixed(4) : '';
+				qInput.value = pt[0] !== undefined ? String(+pt[0].toFixed(6)) : '';
 				hInput.type = 'number'; hInput.step = 'any'; hInput.size = 6;
-				hInput.value = pt[1] !== undefined ? (pt[1] * hf).toFixed(4) : '';
+				hInput.value = pt[1] !== undefined ? String(+pt[1].toFixed(6)) : '';
 				function commit() {
-					var qv = qInput.value === '' ? undefined : (+qInput.value / qf),
-						hv = hInput.value === '' ? undefined : (+hInput.value / hf);
+					var qv = qInput.value === '' ? undefined : +qInput.value,
+						hv = hInput.value === '' ? undefined : +hInput.value;
 					saveUndoSnapshot();
 					// Both fields or neither -- a lone Q or lone H is not a point the curve fit can use.
 					l.curvePoints[pi] = (qv !== undefined && hv !== undefined) ? [qv, hv] : undefined;
@@ -6978,13 +7212,15 @@ var EngCalcs = EngCalcs || {};
 				// deliberately stores that field blank when the head just follows the elevation (see
 				// reservoirHead()). Copying rather than filling the blank in keeps the document's
 				// "still following elevation" state intact.
-				? { id: n.id, type: n.type, elev: n.elev || 0, head: reservoirHead(n) }
-				: { id: n.id, type: n.type, elev: n.elev || 0, demand: effective(n, 'demand'), emitter: effective(n, 'emitter') };
+				? { id: n.id, type: n.type, elev: toSI(n.elev || 0, 'lpn_u_elevhead'), head: toSI(reservoirHead(n), 'lpn_u_elevhead') }
+				: { id: n.id, type: n.type, elev: toSI(n.elev || 0, 'lpn_u_elevhead'), demand: toSI(effective(n, 'demand') || 0, 'lpn_u_flow'), emitter: effective(n, 'emitter') };
 		});
 		var links = doc.links.map(function (l) {
 			return {
 				id: l.id, type: l.type, from: l.from, to: l.to,
-				diameter: effective(l, 'diameter'), roughness: effective(l, 'roughness'),
+				// roughness (Hazen-Williams C) and k are dimensionless, so they cross this boundary
+				// unchanged -- the same reason they use rawLine() rather than numLine() on the map.
+				diameter: toSI(effective(l, 'diameter') || 0, 'lpn_u_diameter'), roughness: effective(l, 'roughness'),
 				length: linkLengthSI(l), status: effective(l, 'status'), k: effective(l, 'k'),
 				h0: l.h0, a: l.a, b: l.b
 			};
@@ -7091,17 +7327,23 @@ var EngCalcs = EngCalcs || {};
 			// its own, and a real pressure (head minus that elevation) whenever its head has been
 			// raised above it. Demand still excludes them: a reservoir supplies whatever the network
 			// draws rather than demanding an amount.
-			elev: fieldExtrema(doc.nodes.map(function (n) { return displayRound(n.elev, 'lpn_u_elevhead', nd.elev); })),
-			demand: fieldExtrema(doc.nodes.map(function (n) { return n.type !== 'reservoir' ? displayRound(effective(n, 'demand'), 'lpn_u_flow', nd.demand) : undefined; })),
+			// INPUTS use plainRound() -- they are already in the displayed unit (Task 263), the same
+			// treatment length/roughness/km have always had. Only solve RESULTS still come out of the
+			// solver in SI and go through displayRound().
+			elev: fieldExtrema(doc.nodes.map(function (n) { return plainRound(n.elev, nd.elev); })),
+			demand: fieldExtrema(doc.nodes.map(function (n) { return n.type !== 'reservoir' ? plainRound(effective(n, 'demand'), nd.demand) : undefined; })),
 			head: fieldExtrema(doc.nodes.map(function (n) {
-				if (n.type === 'reservoir') { return displayRound(reservoirHead(n), 'lpn_u_elevhead', nd.head); }
+				// Head is an INPUT on a reservoir and a RESULT on a junction, so the two halves of
+				// this one field cross the boundary differently. Both end up in Elevation/Head units,
+				// which is what makes them comparable for the extrema tick.
+				if (n.type === 'reservoir') { return plainRound(reservoirHead(n), nd.head); }
 				return lastSolveResult ? displayRound(lastSolveResult.heads[n.id], 'lpn_u_elevhead', nd.head) : undefined;
 			})),
 			pressure: fieldExtrema(doc.nodes.map(function (n) {
-				if (n.type === 'reservoir') { return displayRound(reservoirHead(n) - (n.elev || 0), 'lpn_u_pressure', nd.pressure); }
+				if (n.type === 'reservoir') { return displayRound(toSI(reservoirHead(n) - (n.elev || 0), 'lpn_u_elevhead'), 'lpn_u_pressure', nd.pressure); }
 				return lastSolveResult ? displayRound(lastSolveResult.pressures[n.id], 'lpn_u_pressure', nd.pressure) : undefined;
 			})),
-			diameter: fieldExtrema(doc.links.map(function (l) { return l.type !== 'pump' ? displayRound(effective(l, 'diameter'), 'lpn_u_diameter', ld.diameter) : undefined; })),
+			diameter: fieldExtrema(doc.links.map(function (l) { return l.type !== 'pump' ? plainRound(effective(l, 'diameter'), ld.diameter) : undefined; })),
 			length: fieldExtrema(doc.links.map(function (l) { return l.type !== 'pump' ? plainRound(effective(l, 'length'), ld.length) : undefined; })),
 			// Both dimensionless, so they use rawLine()/plainRound() like Length, not displayRound().
 			roughness: fieldExtrema(doc.links.map(function (l) { return l.type !== 'pump' ? plainRound(effective(l, 'roughness'), ld.roughness) : undefined; })),
@@ -7143,14 +7385,20 @@ var EngCalcs = EngCalcs || {};
 			// demand is the thing the user set as a design target, head/pressure are what the solve
 			// produced from it, and elevation (the input least likely to change page to page) trails.
 			if (ls.node.id) { lines.push({ text: n.id, color: fc.id }); }
-			if (n.type !== 'reservoir' && ls.node.demand) { lines.push(numLine(effective(n, 'demand'), 'lpn_u_flow', extrema.demand, fc.demand, nd.demand)); }
-			var headSI = n.type === 'reservoir' ? reservoirHead(n) : (lastSolveResult ? lastSolveResult.heads[n.id] : undefined);
-			var pressSI = n.type === 'reservoir'
-				? reservoirHead(n) - (n.elev || 0)
-				: (lastSolveResult ? lastSolveResult.pressures[n.id] : undefined);
-			if (ls.node.head && headSI !== undefined) { lines.push(numLine(headSI, 'lpn_u_elevhead', extrema.head, fc.head, nd.head)); }
-			if (ls.node.pressure && pressSI !== undefined) { lines.push(numLine(pressSI, 'lpn_u_pressure', extrema.pressure, fc.pressure, nd.pressure)); }
-			if (ls.node.elev) { lines.push(numLine(n.elev, 'lpn_u_elevhead', extrema.elev, fc.elev, nd.elev)); }
+			if (n.type !== 'reservoir' && ls.node.demand) { lines.push(rawLine(effective(n, 'demand'), extrema.demand, fc.demand, nd.demand)); }
+			// Both are already IN Elevation/Head and Pressure units by the time they get here -- the
+			// reservoir branch because those are declared inputs, the junction branch because the
+			// solve result is converted on the spot. rawLine() then prints what it is given, so the
+			// two halves of each field agree with the extrema computed above.
+			var headVal = n.type === 'reservoir'
+				? reservoirHead(n)
+				: (lastSolveResult ? toDisplay(lastSolveResult.heads[n.id], 'lpn_u_elevhead') : undefined);
+			var pressVal = n.type === 'reservoir'
+				? toDisplay(toSI(reservoirHead(n) - (n.elev || 0), 'lpn_u_elevhead'), 'lpn_u_pressure')
+				: (lastSolveResult ? toDisplay(lastSolveResult.pressures[n.id], 'lpn_u_pressure') : undefined);
+			if (ls.node.head && headVal !== undefined) { lines.push(rawLine(headVal, extrema.head, fc.head, nd.head)); }
+			if (ls.node.pressure && pressVal !== undefined) { lines.push(rawLine(pressVal, extrema.pressure, fc.pressure, nd.pressure)); }
+			if (ls.node.elev) { lines.push(rawLine(n.elev, extrema.elev, fc.elev, nd.elev)); }
 			ne.empty = lines.length === 0; // captured BEFORE the placeholder below -- see hideMask()'s comment
 			if (lines.length === 0) { lines.push({ text: '' }); } // keep an empty tspan so getBBox() doesn't throw
 			// x here is a placeholder -- layoutNodeLabel() below (after collision avoidance) sets the
@@ -7166,7 +7414,7 @@ var EngCalcs = EngCalcs || {};
 			var lines = [];
 			if (ls.link.id) { lines.push({ text: l.id, color: fc.id }); }
 			if (l.type !== 'pump') {
-				if (ls.link.diameter) { lines.push(numLine(effective(l, 'diameter'), 'lpn_u_diameter', extrema.diameter, fc.diameter, ld.diameter)); }
+				if (ls.link.diameter) { lines.push(rawLine(effective(l, 'diameter'), extrema.diameter, fc.diameter, ld.diameter)); }
 				if (ls.link.length) { lines.push(rawLine(effective(l, 'length'), extrema.length, fc.length, ld.length)); }
 				if (ls.link.roughness) { lines.push(rawLine(effective(l, 'roughness'), extrema.roughness, fc.roughness, ld.roughness)); }
 				if (ls.link.km) { lines.push(rawLine(effective(l, 'k') || 0, extrema.km, fc.km, ld.km)); }
@@ -7319,6 +7567,15 @@ var EngCalcs = EngCalcs || {};
 	// from `$arrayInputs` rows and never looked like it needed one.
 	EngCalcs.pageCalculatorInitialize = function (objForm) {};
 	EngCalcs.pageCalculator = function (objForm) {
+		// A unit switch REINTERPRETS every input (Task 263), so it changes the physics rather than
+		// the display: the same three curve points mean a different pump under l/s than under gpm,
+		// and every solved head, pressure and velocity moves with them. Refit, then re-solve.
+		// This is the whole visible consequence of the ban, and it is deliberate.
+		recomputeAllPumpCurves();
+		scheduleSolve();
+		// The project's units are part of the project (serializeProject), so a switch is a change to
+		// persist -- otherwise closing the tab would lose which units the numbers are in.
+		saveToStorage();
 		refreshPopupIfOpen();
 		refreshLabelText();
 		// The Default inputs rows show their value in the CURRENT display unit and put that unit in
