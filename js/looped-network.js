@@ -4507,7 +4507,14 @@ var EngCalcs = EngCalcs || {};
 			// .ec-help for touch -- the same pattern the toolbar buttons use.
 			if (r.tip) { b.title = r.tip; b.className += ' ec-help'; }
 			b.disabled = !!r.disabled;
-			b.addEventListener('click', function () { closeMenu(); r.fn(); });
+			// The EVENT is handed to the row's action, because a row that opens ANOTHER menu has to
+			// stop this click from reaching the document-level dismissal in wireTabs(). It reaches
+			// there after `list.innerHTML = ''` has already detached the very button that was
+			// clicked, so `popup.contains(e.target)` is false, and the dismissal closes the menu the
+			// row just opened. That is the same trap the menubar buttons avoid by calling
+			// stopPropagation(), and it is why File > New project opened nothing (Tom, 2026-08-10:
+			// "File New has no options. And it does nothing.").
+			b.addEventListener('click', function (e) { closeMenu(); r.fn(e); });
 			list.appendChild(b);
 		});
 		// Same position-from-the-anchor-rect-then-clamp dance the property popovers use.
@@ -4597,7 +4604,7 @@ var EngCalcs = EngCalcs || {};
 			// New project OPENS A SUBMENU now (Task 264, Tom 2026-08-10) rather than making a blank
 			// one on the spot -- "Blank project" is still the first row of it, so the old act is one
 			// extra click and every other way to start is finally reachable from the same place.
-			{ icon: 'new', label: pc.lpn_file_new || 'New', fn: function () { openNewProjectMenu(anchor); } },
+			{ icon: 'new', label: pc.lpn_file_new || 'New', fn: function (e) { if (e) { e.stopPropagation(); } openNewProjectMenu(anchor); } },
 			{ icon: 'open', label: pc.lpn_file_open || 'Open…', fn: openFromFile }
 		].concat(recentRows, [
 			{ separator: true },
@@ -4906,7 +4913,13 @@ var EngCalcs = EngCalcs || {};
 		// Cancel is one of the answers.
 		document.addEventListener('click', function (e) {
 			var popup = document.getElementById('lpn_menu_popup');
-			if (popup && popup.style.display === 'block' && !popup.contains(e.target)) { closeMenu(); }
+			// `onAnchor` is belt, not the fix: a control that opens a menu should stop this click
+			// itself. But "the click that opened it must not also close it" is a rule worth holding
+			// in one place, because getting it wrong looks like the feature simply not working --
+			// no error, no menu, twice now.
+			var onAnchor = openMenuAnchor && (e.target === openMenuAnchor ||
+				(openMenuAnchor.contains && openMenuAnchor.contains(e.target)));
+			if (popup && popup.style.display === 'block' && !popup.contains(e.target) && !onAnchor) { closeMenu(); }
 			// A click inside ANY of them leaves ALL of them alone: the popovers hold live controls
 			// (unit selects, checkboxes, number fields), and closing one because the pointer went
 			// down in another would be worse than leaving both open.
@@ -5181,7 +5194,10 @@ var EngCalcs = EngCalcs || {};
 		var newBtn = document.createElement('button');
 		newBtn.type = 'button';
 		setLabel(newBtn, 'new', pc.lpn_file_new || 'New project');
-		newBtn.addEventListener('click', function (e) { openNewProjectMenu(e.currentTarget); });
+		// stopPropagation for the same reason every menubar item does it (see buildMenuBar): without
+		// it this click carries on to the document dismissal in wireTabs(), which sees a click
+		// outside #lpn_menu_popup and closes the menu that was just opened.
+		newBtn.addEventListener('click', function (e) { e.stopPropagation(); openNewProjectMenu(e.currentTarget); });
 		newBtn.dataset.edits = '1';
 		fileGroup.appendChild(newBtn);
 		wireBackdropMenu(fileGroup);

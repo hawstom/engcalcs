@@ -45,6 +45,10 @@ function mkEl(tag) {
     addEventListener(t, f) { (this._listeners[t] = this._listeners[t] || []).push(f); },
     removeEventListener() {},
     querySelectorAll() { return []; }, querySelector() { return null; }, closest() { return null; },
+    // Real containment, walking the stub tree -- the menu-dismissal rule in wireTabs() is written in
+    // terms of popup.contains(e.target), so a stub that always said false (or always true) would
+    // make the Task 264 regression test below meaningless.
+    contains(n) { if (n === this) { return true; } return this.children.some(c => c.contains && c.contains(n)); },
     getBoundingClientRect() { return { left: 0, top: 0, right: 1000, bottom: 500, width: 1000, height: 500 }; },
     getBBox() { return { x: 0, y: 0, width: 10, height: 10 }; },
     getComputedTextLength() { return 10; },
@@ -74,7 +78,8 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   'lpn_popup', 'lpn_popup_close', 'lpn_popup_fields', 'lpn_popup_title', 'lpn_projects_btn',
   'lpn_projects_list', 'lpn_projects_popup', 'lpn_projects_popup_close', 'lpn_settings_fields',
   'lpn_settings_popup', 'lpn_settings_popup_close', 'lpn_status', 'lpn_toolbar',
-  'lpn_project_file'
+  'lpn_project_file', 'lpn_menubar', 'lpn_menu_popup', 'lpn_menu_list', 'lpn_dialog',
+  'lpn_dialog_body', 'lpn_dialog_buttons'
 ].forEach(ensure);
 
 // A unit <select> the way echoUnitSelect() renders one: option.value is "units per SI unit" and
@@ -195,6 +200,8 @@ src = src.replace(marker,
   "\t\tstampDocAnswered: stampDocAnswered, storageVersion: function () { return LPN_STORAGE_VERSION; },\n" +
   "\t\tapplySaved: applySaved, restorePending: function () { return pendingV2Restore; },\n" +
   "\t\tnewProject: newProject, offerUnitRestore: offerUnitRestore,\n" +
+  "\t\tbuildMenuBar: buildMenuBar, menuPopupOpen: function () { return document.getElementById('lpn_menu_popup').style.display === 'block'; },\n" +
+  "\t\tmenuRowLabels: function () { return Array.prototype.map.call(document.getElementById('lpn_menu_list').children, function (c) { return c.textContent || (c.children[1] && c.children[1].textContent) || ''; }); },\n" +
   "\t\tniceDefault: niceDefault, setUnitEl: function (name) { return unitEl(name); },\n" +
   "\t\taddNode: addNode, addLink: addLink,\n" +
   "\t\tlabelWidth: function (id) { return labelEls[id] ? labelEls[id].width : 0; },\n" +
@@ -755,6 +762,75 @@ console.log('\n--- Settings panel stays in sync ---');
     L.docVersion() === L.storageVersion(), 'v = ' + L.docVersion());
   // No scenario-override assertion: scenarios are not reachable from any UI, so no v2 document can
   // carry an override. A test for it would be testing code that cannot run.
+}
+
+
+// ---- ROADMAP Task 264: File > New project actually opens ------------------
+// Tom, 2026-08-10: "264 is broken. File New has no options. And it does nothing."
+//
+// The cause was not in the menu contents at all. A row's click bubbles to the document-level
+// dismissal in wireTabs(), and by the time it gets there openMenu() has already run
+// `list.innerHTML = ''` -- so the clicked button is DETACHED, popup.contains(e.target) is false,
+// and the dismissal closes the submenu the row just opened. Every menubar button avoids this by
+// calling stopPropagation(); the row handler and the new toolbar button did not.
+//
+// This is testable without a browser because the stubs record listeners: drive the real handler,
+// then run the real dismissal predicate against the result. It is worth testing rather than just
+// fixing, because the failure mode is silent -- no error, no menu, and the feature simply looks
+// unbuilt.
+{
+  console.log('\n--- Task 264: the New project submenu survives its own click ---');
+  const PC = EngCalcs.pageConfig;
+  L.buildMenuBar();
+  const bar = byId.lpn_menubar;
+  const fileBtn = bar.children[0];
+  function fire(el, target) {
+    let stopped = false;
+    const ev = { currentTarget: el, target: target || el, stopPropagation() { stopped = true; } };
+    (el._listeners.click || []).forEach(fn => fn(ev));
+    return { stopped, ev };
+  }
+  // The document dismissal, transcribed from wireTabs(). If a handler did not stop the click, this
+  // is what would run next -- so asserting against it is asserting against the real rule.
+  function dismissalWouldClose(target) {
+    const popup = byId.lpn_menu_popup;
+    return popup.style.display === 'block' && !popup.contains(target);
+  }
+
+  const openFile = fire(fileBtn);
+  ok('the File menu opens', L.menuPopupOpen());
+  ok('...and the menubar button stops its click reaching the dismissal', openFile.stopped);
+
+  const rows = byId.lpn_menu_list.children;
+  const newRow = rows.find(r => (r.children[1] && r.children[1].textContent) === PC.lpn_file_new);
+  ok('File carries a New project row', !!newRow);
+
+  const clicked = fire(newRow);
+  ok('clicking it leaves a menu OPEN', L.menuPopupOpen());
+  const labels = byId.lpn_menu_list.children
+    .map(c => (c.children && c.children[1] && c.children[1].textContent) || '')
+    .filter(Boolean);
+  ok('...and that menu is the New project submenu, with real options',
+    labels.indexOf(PC.lpn_new_blank) >= 0 && labels.indexOf(PC.lpn_new_example_us) >= 0 &&
+    labels.indexOf(PC.lpn_new_example_si) >= 0, labels.join(' | '));
+
+  // THE ACTUAL BUG, asserted directly: the clicked row is detached by innerHTML='' and would fail
+  // popup.contains(), so without stopPropagation the dismissal closes what we just opened.
+  ok('the row stops its own click, or the dismissal would close the submenu', clicked.stopped);
+  ok('...and it needs to, because the clicked row is no longer in the popup',
+    dismissalWouldClose(newRow) === true);
+
+  // The TOOLBAR route to the same submenu had the identical defect. Building the whole toolbar here
+  // is more scaffolding than the check is worth, so this is a source-level guard instead: any click
+  // handler that opens this menu must stop the click. Crude, and it would not catch a third route
+  // written differently -- but it holds the two that exist, and it costs nothing.
+  {
+    const appSrc = fs.readFileSync(ROOT + 'js/looped-network.js', 'utf8');
+    const openers = appSrc.split('\n').filter(l => /addEventListener\('click'/.test(l) && /openNewProjectMenu/.test(l));
+    ok('every click handler that opens the New project menu stops its click',
+      openers.length > 0 && openers.every(l => /stopPropagation\(\)/.test(l)),
+      openers.length + ' handler(s)');
+  }
 }
 
 console.log('\n' + (fails === 0 ? 'ALL PASS' : fails + ' FAILURE(S)'));

@@ -1786,6 +1786,14 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     network?") and his own second thought replaced it: the choice IS the menu row, so a dialog would
     ask a question the user just answered. The flow unit is in the label for the same reason.
   - `lpn_tool_example` retired from en/es/fr/pt/tr.
+  - **Shipped broken and fixed the same day** (Tom: *"264 is broken. File New has no options. And it
+    does nothing."*). Neither the submenu row nor the new toolbar button called `stopPropagation()`,
+    so the click carried on to the document dismissal in `wireTabs()` — which by then could not find
+    the clicked row inside the popup, because `openMenu()` had already replaced the list — and closed
+    the menu it had just opened. Every menubar button had always stopped its click; the two new
+    openers did not. **The harness had no coverage of menu interaction at all**, which is why a
+    change that reads correctly shipped dead. It does now: 7 assertions drive the real listeners and
+    run the real dismissal predicate against the result.
 
 - 0|268| **[DONE 2026-08-10] lock-free / unlocked / unchained added to `menu_libre`'s synonyms.**
   Tom's order, most-liked first. English `menu_libre` unchanged — still an open question whether
