@@ -2397,6 +2397,7 @@ var EngCalcs = EngCalcs || {};
 		updateEmptyHint();
 		setStatus('');
 		setMode('select');
+		refreshMapStatus();   // units belong to the project now, so switching projects can change this
 		zoomExtent();
 		scheduleSolve();
 		renderTabs();
@@ -6022,6 +6023,41 @@ var EngCalcs = EngCalcs || {};
 	function unitFactor(name) { var s = unitEl(name); return s ? parseFloat(s.value) : 1; }
 	function unitLabel(name) { var s = unitEl(name); return s ? s.options[s.selectedIndex].textContent : ''; }
 	function unitKey(name) { var s = unitEl(name); return s ? s.options[s.selectedIndex].dataset.unit : null; }
+	// The friction method. HARDCODED to Hazen-Williams today -- this page has no control for it,
+	// unlike bpn_ -- but read through a function rather than written as a literal in two places,
+	// because js/lpn-solver.js already implements all three (hw, dw, manning) and the control is
+	// ROADMAP Task 271. When it lands, assembleModel() and this readout both already ask the right
+	// question.
+	function frictionMethod() { return settings.method || 'hw'; }
+	function frictionMethodLabel() {
+		var pc = EngCalcs.pageConfig || {};
+		var m = frictionMethod();
+		if (m === 'dw') { return pc.bpn_method_dw || 'Darcy-Weisbach'; }
+		if (m === 'manning') { return pc.bpn_method_manning || 'Manning'; }
+		return pc.bpn_method_hw || 'Hazen-Williams';
+	}
+	// The bottom-right map overlay: the few facts you need in order to read the numbers on the map at
+	// all. Map labels are bare numbers by design (Tom, 2026-07-30 -- "no units and no prefix"), which
+	// is right for the drawing and left a first-time visitor no way to tell gpm from l/s. They get US
+	// on an English page and SI on every other (EC_DEFAULT_UNIT_SET, from the language), and until
+	// now nothing on screen said which. Tom, 2026-08-10: "what units do they get, and is there a way
+	// they should know?"
+	//
+	// EVERY LABEL HERE IS BORROWED, no new keys: lpn_units_flow, lpn_units_pressure, bpn_method and
+	// bpn_method_hw/dw/manning all exist and are already translated in every language this page is.
+	// That is CLAUDE.md's concept-level reuse rule paying for itself -- this shipped at zero
+	// translation cost.
+	function refreshMapStatus() {
+		var el = document.getElementById('lpn_map_status'), pc = EngCalcs.pageConfig || {};
+		if (!el) { return; }
+		// Separated by spaces, not by a glyph: a bullet or pipe would need its own RTL thinking, and
+		// the labels already keep the three apart.
+		el.textContent = [
+			(pc.lpn_units_flow || 'Flow') + ': ' + unitLabel('lpn_u_flow'),
+			(pc.lpn_units_pressure || 'Pressure') + ': ' + unitLabel('lpn_u_pressure'),
+			(pc.bpn_method || 'Friction method') + ': ' + frictionMethodLabel()
+		].join('   ');
+	}
 	// Suite-wide convention (CLAUDE.md's Unit Sets section): a default is Array('us'=>x,'si'=>y),
 	// not one SI number that happens to convert to something ugly in the other system (Tom,
 	// 2026-07-30 -- the example network's plain-SI elevations read as non-round once shown in
@@ -7382,7 +7418,7 @@ var EngCalcs = EngCalcs || {};
 				h0: l.h0, a: l.a, b: l.b
 			};
 		});
-		return { nodes: nodes, links: links, method: 'hw', visc: 1.007e-6, emitterExponent: settings.emitterExponent };
+		return { nodes: nodes, links: links, method: frictionMethod(), visc: 1.007e-6, emitterExponent: settings.emitterExponent };
 	}
 	function diagIssueText(issue) {
 		var pc = EngCalcs.pageConfig || {};
@@ -7730,6 +7766,7 @@ var EngCalcs = EngCalcs || {};
 		// This is the whole visible consequence of the ban, and it is deliberate.
 		recomputeAllPumpCurves();
 		scheduleSolve();
+		refreshMapStatus();   // a unit switch is exactly when this readout has to be right
 		// The project's units are part of the project (serializeProject), so a switch is a change to
 		// persist -- otherwise closing the tab would lose which units the numbers are in.
 		saveToStorage();

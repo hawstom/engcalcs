@@ -79,7 +79,7 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   'lpn_projects_list', 'lpn_projects_popup', 'lpn_projects_popup_close', 'lpn_settings_fields',
   'lpn_settings_popup', 'lpn_settings_popup_close', 'lpn_status', 'lpn_toolbar',
   'lpn_project_file', 'lpn_menubar', 'lpn_menu_popup', 'lpn_menu_list', 'lpn_dialog',
-  'lpn_dialog_body', 'lpn_dialog_buttons', 'lpn_menu_popup2', 'lpn_menu_list2'
+  'lpn_dialog_body', 'lpn_dialog_buttons', 'lpn_menu_popup2', 'lpn_menu_list2', 'lpn_map_status'
 ].forEach(ensure);
 // Looped-Network.php nests each menu LIST inside its POPUP. The ensure() list above creates them as
 // unrelated stubs, so popup.contains(row) answered false for a row that really is inside -- and the
@@ -216,7 +216,8 @@ src = src.replace(marker,
   "\t\tnewProject: newProject, offerUnitRestore: offerUnitRestore,\n" +
   "\t\ttabAsterisk: tabAsterisk, indexEntry: indexEntry, openId: function () { return library.openId; },\n" +
   "\t\tnewProjectFromExample: newProjectFromExample, saveToStorage: saveToStorage,\n" +
-  "\t\tnewBlankProject: newBlankProject,\n" +
+  "\t\tnewBlankProject: newBlankProject, refreshMapStatus: refreshMapStatus,\n" +
+  "\t\tfrictionMethod: frictionMethod,\n" +
   "\t\tbuildMenuBar: buildMenuBar, menuPopupOpen: function () { return document.getElementById('lpn_menu_popup').style.display === 'block'; },\n" +
   "\t\tsubMenuOpen: function () { return document.getElementById('lpn_menu_popup2').style.display === 'block'; },\n" +
   "\t\tsubClosePending: function () { return subCloseTimer !== null; },\n" +
@@ -929,6 +930,43 @@ console.log('\n--- Settings panel stays in sync ---');
   ok('a project made from an example starts clean too',
     L.tabAsterisk(L.indexEntry(exId)).show === false, 'dirty = ' + L.indexEntry(exId).dirty);
   ok('...even though it is full of network', L.getDoc().links.length > 0);
+}
+
+
+// ---- the map status readout ----------------------------------------------
+// Tom, 2026-08-10: "when the new user arrives, what units do they get, and is there a way they
+// should know?" They get US on an English page and SI on every other, and until this there was no
+// way to find out without opening Settings -- map labels are bare numbers by design.
+{
+  console.log('\n--- map status readout ---');
+  const PC = EngCalcs.pageConfig;
+  setUnitSet('us');
+  L.refreshMapStatus();
+  const usText = byId.lpn_map_status.textContent;
+  ok('it names the flow unit the map is drawn in', /gpm/.test(usText), usText);
+  ok('...and the pressure unit', /psi/.test(usText), usText);
+  ok('...and the friction method', usText.indexOf(PC.bpn_method_hw) >= 0, usText);
+  ok('...each behind a translated label, not a bare token',
+    usText.indexOf(PC.lpn_units_flow) >= 0 && usText.indexOf(PC.lpn_units_pressure) >= 0 &&
+    usText.indexOf(PC.bpn_method) >= 0, usText);
+
+  // It has to FOLLOW the units, or it is worse than nothing -- a stale readout is a confident lie.
+  // Through EngCalcs.setUnits, which is the REAL path a user takes (it re-enters pageCalculator);
+  // calling refreshMapStatus() by hand here would assert only that the function works, not that
+  // anything ever calls it. That mutation survived until this line changed.
+  EngCalcs.setUnits('si');
+  const siText = byId.lpn_map_status.textContent;
+  ok('switching units changes it', /lps/.test(siText) && !/gpm/.test(siText), siText);
+
+  // The method is hardcoded today, but read through frictionMethod() so Task 271 inherits a working
+  // readout rather than a literal to hunt down.
+  ok('the friction method defaults to Hazen-Williams', L.frictionMethod() === 'hw');
+  L.settings().method = 'dw';
+  L.refreshMapStatus();
+  ok('...and the readout follows settings.method when one is set',
+    byId.lpn_map_status.textContent.indexOf(PC.bpn_method_dw) >= 0, byId.lpn_map_status.textContent);
+  ok('...as does the model handed to the solver', L.assembleModel().method === 'dw');
+  delete L.settings().method;
 }
 
 console.log('\n' + (fails === 0 ? 'ALL PASS' : fails + ' FAILURE(S)'));

@@ -1095,6 +1095,24 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - Note for the audit: the guide's template-project flow is now the DESIGNED mechanism, not a
     workaround — see CLAUDE.md, "there are no browser units, only project units".
 
+- 60|271| **Give `lpn_` a friction-method choice: Hazen-Williams, Darcy-Weisbach, Manning.** Tom,
+  2026-08-10, arriving via "what units does a new user get" — he wanted the map readout to name the
+  method, then said the thing he actually means is "a choice among HW, DW, and Manning" that we do
+  not have. `bpn_` has one; `lpn_` hardcoded `method: 'hw'`.
+  - **The solver already implements all three.** `EngCalcs.lpnResistance()` in `js/lpn-solver.js`
+    branches on `manning` / `hw` / `dw`, and the DW path iterates on friction factor in both
+    `lpnSolve` and `lpnReport`. So this is a UI task, not a numerics task — do not re-derive that.
+  - `assembleModel()` and the map readout now both go through `frictionMethod()` (returns
+    `settings.method || 'hw'`), so the plumbing is in place and a control writing `settings.method`
+    is most of the work.
+  - **The real cost is ROUGHNESS.** It means a different quantity per method — C (dimensionless) for
+    HW, roughness height ε (a LENGTH, needing a unit family) for DW, n (dimensionless) for Manning —
+    so the field's label, unit, default and validation all change with the choice, and
+    `settings.defaults.roughness` has to follow. That, not the solver, is what this task is.
+  - Labels exist and are translated: `bpn_method`, `bpn_method_hw`, `bpn_method_dw`,
+    `bpn_method_manning`. `lpn_engine_manning_note` already warns that EPANET and the built-in
+    solver differ by ~0.6% under Manning.
+
 - 55|265| **The lpn page title must disclose which unit system the project was created for.** Tom,
   2026-08-10: `"HawsEDC Calculators" / "Looped Pipe Network (Map Interface)" / "{units_set} Units"`.
   The unit-set strings already exist. Depends on Task 264 deciding what "created for" means.
@@ -1813,6 +1831,12 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     (it had one reader), and `closeTab()`'s `projectIsEmpty` special case is gone — it existed only
     to paper over a mark that should never have been there, so THE ASTERISK DECIDES is literally
     true again. Consequence: a project you drew and then emptied now asks before closing.
+  - **The map now says what its numbers ARE** (Tom: *"when the new user arrives, what units do they
+    get, and is there a way they should know?"*). A new user gets **US on an English page and SI on
+    every other** — `EC_DEFAULT_UNIT_SET`, derived from the language — and nothing on screen said so,
+    because map labels are bare numbers by design. `#lpn_map_status`, bottom-right opposite the
+    coordinate tracker, now reads `Flow: gpm   Pressure: psi   Friction method: Hazen-Williams`.
+    Every label borrowed from an existing translated key, so it shipped at zero translation cost.
   - `lpn_empty_hint` still said "draw an example network", a retired feature. Now ends *"…or to
     start a New project from examples."* — en/es/fr/pt/tr.
   - **Shipped broken and fixed the same day** (Tom: *"264 is broken. File New has no options. And it

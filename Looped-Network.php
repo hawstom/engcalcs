@@ -131,6 +131,15 @@ echoHeader("EngCalcs", $html_title, "");
 			<?=$ec_lang['lpn_empty_hint']?>
 		</div>
 		<div id="lpn_coords" class="d-print-none" style="position:absolute;bottom:4px;left:4px;font-size:11px;font-family:monospace;background:rgba(255,255,255,.8);padding:2px 6px;pointer-events:none">X: --  Y: --</div>
+		<?php // WHAT AM I LOOKING AT? (Tom, 2026-08-10: "when the new user arrives, what units do they
+		      // get, and is there a way they should know?"). They get US on an English page and SI on
+		      // every other -- EC_DEFAULT_UNIT_SET, derived from the language -- and until now there
+		      // was NO way to find out short of opening Settings or clicking an element, because map
+		      // labels are deliberately bare numbers. A calculator whose numbers do not say what they
+		      // are is the defect; this is the cheapest honest fix.
+		      // Bottom RIGHT, opposite the coordinate tracker, sharing its band so zoomExtent()'s
+		      // existing bottom reserve already covers it. Filled by refreshMapStatus(). ?>
+		<div id="lpn_map_status" class="d-print-none" style="position:absolute;bottom:4px;right:4px;font-size:11px;background:rgba(255,255,255,.8);padding:2px 6px;pointer-events:none;text-align:right;max-width:60%"></div>
 	</div>
 </form>
 <?php // position:fixed, not absolute: the popup is positioned from pointer-event clientX/clientY
@@ -269,6 +278,12 @@ EngCalcs.pageConfig = {
 	lpn_tip_select: <?=json_encode($ec_lang['lpn_tip_select'])?>,
 	lpn_tip_labels_draggable: <?=json_encode($ec_lang['lpn_tip_labels_draggable'])?>,
 	bpn_demand: <?=json_encode($ec_lang['bpn_demand'])?>,
+	lpn_units_flow: <?=json_encode($ec_lang['lpn_units_flow'])?>,
+	lpn_units_pressure: <?=json_encode($ec_lang['lpn_units_pressure'])?>,
+	bpn_method: <?=json_encode($ec_lang['bpn_method'])?>,
+	bpn_method_hw: <?=json_encode($ec_lang['bpn_method_hw'])?>,
+	bpn_method_dw: <?=json_encode($ec_lang['bpn_method_dw'])?>,
+	bpn_method_manning: <?=json_encode($ec_lang['bpn_method_manning'])?>,
 	<?php // Annotations on the example network (Task 254). Composed ENTIRELY from strings that
 	      // already exist and are already translated, per Tom 2026-08-09 ("to minimize translation
 	      // load, we can compose it from existing lang strings") -- menu_brand is suite chrome and
