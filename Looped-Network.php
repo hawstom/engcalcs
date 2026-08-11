@@ -103,7 +103,7 @@ echoHeader("EngCalcs", $html_title, "");
 	</div>
 	<p id="lpn_status" class="ec-status-warn"></p>
 	<div style="overflow-x:auto;position:relative">
-		<svg id="lpn_canvas" dir="ltr" width="100%" height="500" style="border:1px solid #ccc;background:#f7f7f2"></svg>
+		<svg id="lpn_canvas" dir="ltr" width="100%" height="500" style="border:1px solid #ccc;background:#fff"></svg>
 		<?php // Persistent mode signal, INSIDE the canvas (Tom, 2026-07-30, second look: "I envisioned
 		      // the mode status in the canvas area since it's active like coordinates" -- moved from a
 		      // <p> above the map to this overlay, matching #lpn_coords' own treatment below: an
@@ -409,6 +409,7 @@ EngCalcs.pageConfig = {
       // 2026-07-30 because nothing can create an emitter yet (ROADMAP Task 191). The language key
       // stays in lib/lang.ec.en.php so restoring the control is one line here and one there. ?>
 
+	lpn_settings_computation: <?=json_encode($ec_lang['lpn_settings_computation'])?>,
 	lpn_settings_tolerance: <?=json_encode($ec_lang['lpn_settings_tolerance'])?>,
 	lpn_settings_tolerance_tip: <?=json_encode($ec_lang['lpn_settings_tolerance_tip'])?>,
 	lpn_settings_engine_epanet: <?=json_encode($ec_lang['lpn_settings_engine_epanet'])?>,

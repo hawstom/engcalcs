@@ -159,11 +159,15 @@ html[lang="zh"] .ec-welcome {
    its original fixed value times that factor, so the default of 1 renders exactly what shipped
    before the setting existed. Radii and the flow-arrow chevron are geometry ATTRIBUTES, not styles,
    so those are scaled in JS instead. */
-/* --lpn-map-bg backs a reservoir/pump map symbol's occlusion patch (.lpn-node-symbol-backdrop/
-   .lpn-link-symbol-backdrop below, ROADMAP Task 146.10 follow-up, 2026-08-09) -- matches this
-   element's OWN inline `background:#f7f7f2` set in Looped-Network.php; keep the two in sync if
-   either changes. */
-#lpn_canvas { touch-action: none; cursor: default; --lpn-sym: 1; --lpn-opacity: 1; --lpn-backdrop-opacity: 1; --lpn-map-bg: #f7f7f2; }
+/* PLAIN WHITE (Tom, 2026-08-10, very high priority). It was #f7f7f2 -- a faint warm tint that read
+   as "paper" on its own and as a dirty smudge next to the white page around it, and that no longer
+   matched anything now that a backdrop image can sit under the drawing.
+
+   --lpn-map-bg backs a reservoir/pump map symbol's occlusion patch (.lpn-node-symbol-backdrop/
+   .lpn-link-symbol-backdrop below, ROADMAP Task 146.10 follow-up, 2026-08-09), so it must equal
+   whatever the canvas itself is painted -- keep it in step with the inline `background` on
+   #lpn_canvas in Looped-Network.php. */
+#lpn_canvas { touch-action: none; cursor: default; --lpn-sym: 1; --lpn-opacity: 1; --lpn-backdrop-opacity: 1; --lpn-map-bg: #fff; }
 /* Fading the BACKDROP is the counterpart of fading the symbols below: a busy, dark aerial or plan
    swallows a 0.5-wide pipe and a black flow arrow, and the standard answer everywhere else (AutoCAD
    image fade, QGIS layer transparency) is to knock the reference material back rather than thicken
@@ -208,7 +212,7 @@ html[lang="zh"] .ec-welcome {
 /* Opaque patch behind a symbol's own linework (prependSymbolBackdrop() in looped-network.js) so a
    pipe running under a reservoir's open tank or a pump's unfilled casing doesn't show through --
    the icon's own paths are untouched, this only paints underneath them. */
-.lpn-node-symbol-backdrop, .lpn-link-symbol-backdrop { fill: var(--lpn-map-bg, #f7f7f2); stroke: none; }
+.lpn-node-symbol-backdrop, .lpn-link-symbol-backdrop { fill: var(--lpn-map-bg, #fff); stroke: none; }
 /* stroke-width was 2 -- too wide relative to a 1.6-2.2 radius node (Tom, 2026-07-30), and it was
    also why the arrow read as absorbed into the pipe rather than a distinct mark. Then 0.5, which
    that correction overshot: a pipe network's PIPES are its primary content, and at 0.5 they were

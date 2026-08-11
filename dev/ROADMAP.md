@@ -1077,6 +1077,52 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     checkable; just do not spend the blog/video headline on it.** Do not relitigate.
   - Consequence: raised 146.06 to 90 and 220 to 95.
 
+- 70|263| **BANNED FOREVER: lpn must not convert inputs when a unit is switched.** Tom, 2026-08-10,
+  on a decision made without him: *"a bad design decision was made without my knowledge to convert
+  inputs when units are switched. Scrub and ban this."* Every other calculator in the suite
+  **reinterprets** the typed number (1 becomes 1 ft instead of 1 m — CLAUDE.md, Unit Sets), and so
+  does EPANET: switching GPM to LPS there converts nothing. lpn instead stores SI and displays
+  converted, so a unit switch silently rewrites every number on the map.
+  - **The fix is the `lengthField()` model applied everywhere:** the stored number is declarative in
+    the displayed unit, and conversion happens only at the solver handoff. That comment already
+    warns *"Do NOT 'fix' a future variant of this by … converting the stored length."*
+  - **Blocker: saved projects hold SI numbers**, so this needs a document-version migration that
+    reads the unit selection in force when the file was written. Scope that before touching code.
+  - **The example network is NOT a reason to keep conversion** (Tom: *"that is the tail wagging the
+    dog"*). Task 264 removes that dependency; do it first.
+
+- 60|264| **Retire "Draw example network"; make it File > New project.** Tom, 2026-08-10.
+  - Toolbar button renames to **New project**. The example projects planned in Task 257 move out of
+    Insert into a **File > New project** submenu: **Blank project**, **From examples**, room for more.
+  - First two examples are **Basic US units** and **Basic SI units** — two drawings, explicitly
+    labelled, replacing the one drawing that adapted itself via `niceDefault()`. That adaptation is
+    the last thing depending on unit conversion, which is why this unblocks Task 263.
+  - **Every water-network example in the field is published as US or SI, never as both.** So ours
+    must be too, and the user picks: *"Units for network: US (gpm) or SI (l/s)"* — showing the preset
+    flow unit, because that is the concrete thing they recognise. After that, changing units is on
+    them.
+  - EPANET's own examples follow, named as published, **if we can make sense of them** — uncertain,
+    since they are water-quality examples (see Task 257's closing caution).
+
+- 55|265| **The lpn page title must disclose which unit system the project was created for.** Tom,
+  2026-08-10: `"HawsEDC Calculators" / "Looped Pipe Network (Map Interface)" / "{units_set} Units"`.
+  The unit-set strings already exist. Depends on Task 264 deciding what "created for" means.
+
+- 35|266| **Multi-select (lasso) plus edit-all-selected, as EPANET has.** Tom, 2026-08-10: *"very nice
+  for bigger models."* Today's selection model is single-element — `openEditMenu()` already says so
+  where it explains why "Select all" is absent. Wants a rubber-band select and one property sheet
+  that writes a value to every selected element.
+
+- 25|268| **Stronger words than "libre" for the FLOSS claim: unchained, unlocked, lock-free.** Tom
+  found these 2026-08-10. They say the freedom positively and dodge the gratis/libre confusion that
+  `menu_libre` currently spends an `avoid:` note on. Two questions, in order: (a) do any of them
+  improve the **English** `menu_libre` / About page copy; (b) they belong in that key's synonyms
+  regardless, so translators of the 22 languages that still show English have real alternatives.
+  **`$ec_lang_syn` is human-authored** — AI proposes the diff, Tom approves, then AI writes it.
+
+- 5|267| **"Save as" the backdrop image.** Tom, 2026-08-10, "very low priority". The image is stored
+  as a data URI on `backdrop.href`, so writing it back out is a blob download away.
+
 - 40|257| **Example PROJECTS (plural) for lpn, seeded from EPANET's own example networks.** Tom,
   2026-08-09, while Task 254 was in flight: *"some example projects would also be nice, but that's
   another task for another day, and I suppose it's up to me to prepare those. Maybe I can get
@@ -1577,6 +1623,11 @@ Calculators section above; see that section's header for the methodology and hon
 
 ## Discoverability (Search Reach)
 
+- 60|269| **ASU Engineers Without Borders answered, and asked to meet.** Tom, 2026-08-10 — a human
+  reply to outreach, and he has replied gratefully. This is the first real conversation this suite's
+  mission has earned; prepare for the meeting and record what comes of it. Not a search-reach task,
+  but it lives here because it is the same goal reached by a better road.
+
 Evidence base for this whole section: the 2026-07-27 Google Search Console export (`dev/Queries.csv`,
 999 queries, 5,621 impressions, 565 clicks — a temporary file, not committed; the numbers below are
 the durable record). Aggregate by cluster:
@@ -1706,6 +1757,26 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|262| **[DONE 2026-08-10] A file opened in a no-connect browser arrived already asterisked.**
+  Tom, 2026-08-10. `importProjectFromFile()` now sets `savedSig`/`dirty`/`exported` exactly as the
+  download path does: a file the user just handed us off their own disk is the strongest possible
+  case of "a copy exists on disk", so the faint star starts OFF and returns on the first edit. It was
+  permanently on from the moment of opening, so it could never say anything — the same defect
+  punch-list finding 13 fixed on the download side and this side missed.
+  - **Recent files does not appear in a no-connect browser, and that is correct, not a gap** (Tom
+    observed it the same day; it works including locking in Chromium). Without the File System Access
+    API there is no handle to keep, so a "recent" row could only re-prompt for an upload — the list
+    would name files it cannot open.
+
+- 0|261| **[DONE 2026-08-10] A Computation section in lpn Settings.** Convergence tolerance and the
+  EPANET engine toggle had accumulated loose in the headingless tail among the panel's *actions*
+  (Restore defaults, Clear calculator), so a reader could not tell where the settings stopped. One
+  setting there was fine; two were a group without a name. The tail now holds buttons only.
+
+- 0|260| **[DONE 2026-08-10] The lpn map canvas is plain white.** Tom, very high priority. Was
+  `#f7f7f2` in three places — `css/engcalcs.css` (twice, including `--lpn-map-bg` behind the symbol
+  occlusion patches) and the inline `background` on `#lpn_canvas` in `Looped-Network.php`.
 
 - 0|259| **[DONE 2026-08-10] Navbar overlap just above the hamburger breakpoint.** Tom's screenshot:
   "Libre Software" printing over "Hydraulics" and over the brand, and a squeezed Copy link wrapping

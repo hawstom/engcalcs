@@ -722,7 +722,7 @@ var EngCalcs = EngCalcs || {};
 			// Open/closed state of the settings panel's collapsible sections, persisted so a user
 			// who lives in Default inputs is not re-opening it every session. Default inputs starts
 			// OPEN because it is the mode-switching section above; the other two are set-once.
-			sectionsOpen: { idPrefixes: false, defaults: true, mapDisplay: false, files: false },
+			sectionsOpen: { idPrefixes: false, defaults: true, mapDisplay: false, computation: false, files: false },
 			// Map units -- the same units the drawing is in, so this number scales with the map and
 			// means 20 ft or 20 m according to the Length/Map declaration (Tom, 2026-08-09: map
 			// coordinates "follow length and elevation"; it is a size on the drawing, not a font
@@ -2542,10 +2542,27 @@ var EngCalcs = EngCalcs || {};
 		reader.onload = function (ev) {
 			var saved = acceptImportedText(ev.target.result);
 			if (!saved) { return; }
-			importProject(saved);
+			var upId = importProject(saved);
+			// **An uploaded project arrives SAVED, not modified** (Tom, 2026-08-10: "when you open a
+			// file, it comes in immediately modified/asterisked. Fix that."). It is the same
+			// bookkeeping the download path already does, and for the same reason: `exported` means
+			// "a copy of this exists on disk somewhere", and a file the user just handed us off
+			// their own disk is the strongest possible case of that. Without it the faint star was
+			// permanently on from the moment of opening, so it could never say anything -- the exact
+			// defect punch-list finding 13 fixed on the download side and this side missed.
+			//
+			// It stays a BROWSER project and the star still comes back on the first edit (faint,
+			// because this browser genuinely cannot write back to that file). What changed is only
+			// that "unsaved" now starts false, which is the truth.
+			var upEntry = upId ? indexEntry(upId) : null;
+			if (upEntry) {
+				upEntry.savedSig = docSignature();
+				upEntry.dirty = false;
+				upEntry.exported = true;
+				saveIndex();
+			}
 			// Every time, not just the first: this is the fact that explains why the tab is named
-			// after the project rather than the file, why it wears an asterisk immediately, and why
-			// Save cannot go back where this came from.
+			// after the project rather than the file, and why Save cannot go back where this came from.
 			setNotice(pc.lpn_status_uploaded || '');
 			renderTabs();
 		};
@@ -6205,9 +6222,20 @@ var EngCalcs = EngCalcs || {};
 			if (hideLink) { hideLink.parentNode.removeChild(hideLink); }
 			unitsBody.appendChild(unitsBlock);
 		}
-		// ---- always visible: the one row worth never burying ----
-		// Tolerance, because it is the one setting that changes whether the answer is right.
-		// Headingless, per the note above.
+		// ---- computation (Tom, 2026-08-10) ----
+		// Tolerance and the EPANET engine toggle sat loose in the headingless tail, which was right
+		// while tolerance was the ONE genuine solver setting and a heading over a single row would
+		// have been ceremony. With two of them the tail had become an unnamed group of settings
+		// sitting among the panel's ACTIONS (Restore defaults, Clear calculator), and that is a
+		// different thing: a reader could not tell where the settings stopped. So they get the
+		// section every other group here has, and the tail goes back to holding only buttons.
+		//
+		// "Computation", not "Solver": the two rows are how the answer is computed and how close is
+		// close enough -- and "solver" is jargon for the internals, while what the user is choosing
+		// is the arithmetic they get.
+		var compBody = section('computation', pc.lpn_settings_computation || 'Computation');
+		// The panel's foot: ACTIONS only, no settings. Headingless on purpose -- a heading over
+		// buttons that cannot collapse would behave unlike every other heading in this panel.
 		var tail = document.createElement('div');
 		tail.style.marginTop = '6px';
 		fields.appendChild(tail);
@@ -6226,7 +6254,7 @@ var EngCalcs = EngCalcs || {};
 			if (+tolInput.value > 0) { settings.tolerance = +tolInput.value; scheduleSolve(); }
 			else { tolInput.value = settings.tolerance; }
 		});
-		row(tail, pc.lpn_settings_tolerance || 'Convergence tolerance', tolInput, pc.lpn_settings_tolerance_tip);
+		row(compBody, pc.lpn_settings_tolerance || 'Convergence tolerance', tolInput, pc.lpn_settings_tolerance_tip);
 		// ---- engine choice (ROADMAP Task 243) ----
 		// A checkbox rather than a two-option select: there is a plain default and one opt-in,
 		// and a select would imply the two are peers when the native path is the one this page
@@ -6238,7 +6266,7 @@ var EngCalcs = EngCalcs || {};
 			settings.engine = engInput.checked ? 'epanet' : 'native';
 			scheduleSolve();
 		});
-		row(tail, pc.lpn_settings_engine_epanet || 'Solve with the EPANET engine', engInput, pc.lpn_settings_engine_epanet_tip);
+		row(compBody, pc.lpn_settings_engine_epanet || 'Solve with the EPANET engine', engInput, pc.lpn_settings_engine_epanet_tip);
 		// ---- restore defaults (Tom, 2026-07-30) ----
 		// Resets settings/labelSettings only -- the network (nodes/links/labels) and backdrop are
 		// untouched, same "preferences vs. content" split clearNetwork()'s own comment documents.

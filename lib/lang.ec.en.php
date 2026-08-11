@@ -1487,6 +1487,9 @@ $ec_lang['lpn_push_none_displayed']='No starting value is showing as a label rig
 $ec_lang['lpn_push_nothing']='No existing element has any of the properties being applied.';
 $ec_lang['lpn_push_no_change']='Every element already has these values, so nothing would change.';
 $ec_lang['lpn_settings_emitter_exponent']='Emitter exponent';
+// The Settings panel's Computation section (Tom, 2026-08-10). "Computation", not "Solver": what the
+// two rows under it decide is the arithmetic the user gets, and "solver" names the internals.
+$ec_lang['lpn_settings_computation']='Computation';
 $ec_lang['lpn_settings_tolerance']='Convergence tolerance';
 $ec_lang['lpn_settings_tolerance_tip']='How close the solver has to get before it stops. A smaller number is more exact and takes longer.';
 $ec_lang['lpn_settings_engine_epanet']='Solve with the EPANET engine';
