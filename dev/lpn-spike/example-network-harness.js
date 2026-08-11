@@ -947,6 +947,9 @@ console.log('\n--- Settings panel stays in sync ---');
   ok('it names the flow unit the map is drawn in', /gpm/.test(usText), usText);
   ok('...and the pressure unit', /psi/.test(usText), usText);
   ok('...and the friction method', usText.indexOf(PC.bpn_method_hw) >= 0, usText);
+  // A language-neutral divider, so the three pairs do not read as one string (Tom, 2026-08-10).
+  ok('...divided by a pipe, not run together by whitespace',
+    usText.split(' | ').length === 3, usText);
   ok('...each behind a translated label, not a bare token',
     usText.indexOf(PC.lpn_units_flow) >= 0 && usText.indexOf(PC.lpn_units_pressure) >= 0 &&
     usText.indexOf(PC.bpn_method) >= 0, usText);

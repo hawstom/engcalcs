@@ -6052,13 +6052,22 @@ var EngCalcs = EngCalcs || {};
 	function refreshMapStatus() {
 		var el = document.getElementById('lpn_map_status'), pc = EngCalcs.pageConfig || {};
 		if (!el) { return; }
-		// Separated by spaces, not by a glyph: a bullet or pipe would need its own RTL thinking, and
-		// the labels already keep the three apart.
+		// A PIPE, not spaces (Tom, 2026-08-10). Three "Label: value" pairs run together are one
+		// undifferentiated string at 11px, and whitespace is the weakest divider there is.
+		//
+		// This corrects the previous comment here, which refused a glyph on the grounds that "a
+		// bullet or pipe would need its own RTL thinking". That was overcautious and wrong about
+		// this glyph specifically: U+007C is BiDi class ON (Other Neutral) and is VERTICALLY
+		// SYMMETRIC, so it needs no mirrored counterpart and renders identically whichever direction
+		// the run around it takes -- the three pairs reorder in Arabic or Hebrew, as they should, and
+		// the dividers simply stay between them. The caution was right for a DIRECTIONAL glyph
+		// (an arrow, a guillemet, the fly-out's own U+25B8); it was never right for a pipe. And a
+		// pipe carries no language at all, which is Tom's reason for preferring it.
 		el.textContent = [
 			(pc.lpn_units_flow || 'Flow') + ': ' + unitLabel('lpn_u_flow'),
 			(pc.lpn_units_pressure || 'Pressure') + ': ' + unitLabel('lpn_u_pressure'),
 			(pc.bpn_method || 'Friction method') + ': ' + frictionMethodLabel()
-		].join('   ');
+		].join(' | ');
 	}
 	// Suite-wide convention (CLAUDE.md's Unit Sets section): a default is Array('us'=>x,'si'=>y),
 	// not one SI number that happens to convert to something ugly in the other system (Tom,
