@@ -16,9 +16,7 @@
 //
 // Tom's browser passes are slow and tiring -- this runs the whole path in well under a second.
 
-const {
-	ROOT, byId, unitSelects, setUnitSet, loadLoopedNetwork, GPM, FT, IN
-} = require('./lpn-dom-stub.js');
+const { ROOT, byId, setUnitSet, loadLoopedNetwork, GPM, FT } = require('./lpn-dom-stub.js');
 const fs = require('fs');
 const path = require('path');
 
@@ -39,10 +37,10 @@ global.alert = global.window.alert = function (m) { lastAlert = m; };
 
 const L = loadLoopedNetwork(
 	"\t\timportInp: importInpFromFile, getDoc: function () { return doc; },\n" +
-	"\t\treadUnitSelections: readUnitSelections, toDisplay: toDisplay, unitFactor: unitFactor,\n" +
+	"\t\treadUnitSelections: readUnitSelections,\n" +
 	"\t\tgetProject: function () { return project; }, nextId: function () { return nextId; },\n" +
 	"\t\tindexEntry: indexEntry, openId: function () { return library.openId; },\n" +
-	"\t\tassembleModel: assembleModel, runSolve: runSolve, settings: function () { return settings; },\n" +
+	"\t\tassembleModel: assembleModel,\n" +
 	// init() never runs (that is the point of the injection), so the SVG layer variables it would
 	// have built are undefined. Same one-time setup example-network-harness.js does.
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
