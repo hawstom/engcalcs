@@ -800,6 +800,32 @@ var EngCalcs = EngCalcs || {};
 	function setTransform() {
 		world.setAttribute('transform', 'translate(' + state.tx + ',' + state.ty + ') scale(' + state.s + ')');
 	}
+	// ---- ROADMAP Task 274: the user works in CARTESIAN coordinates (Y increases upward) ----
+	//
+	// Tom, 2026-08-10: *"EPANET uses normal cartesian coordinates, where up and right are positive.
+	// But we have the opposite like a graphic arts software. We need to fix this. Cartesian is
+	// engineering."*
+	//
+	// THE FLIP LIVES AT THE USER BOUNDARY, NOT IN THE DOCUMENT. Internally `doc` stays Y-down,
+	// because that is SVG's own coordinate system and every drawing routine in this file -- text
+	// baselines, mask rects, extrema chevrons, the backdrop image, the reservoir tank, label
+	// collision boxes and leader side-flips -- is written natively against it. Flipping the world
+	// transform instead would mirror every glyph and every symbol, and each of the ~10 counter-flips
+	// that repairs fails SILENTLY and visually (one upside-down number nobody notices for a month).
+	// This way there is one negation, in one place, and it cannot mirror anything.
+	//
+	// WHAT THIS DOES NOT DO: the stored JSON keeps Y-down. That is invisible today -- `lpnToInp()`
+	// emits no [COORDINATES] section, so nothing leaves this page carrying a Y. If we ever export
+	// coordinates, or read a world file (Task 276, whose E term is negative precisely because world
+	// Y is up), the file's own convention becomes a real question and gets its own task with a
+	// version bump and a migration. It is deliberately not being answered here, because answering it
+	// costs a storage version that currently also carries the units question (v2 = "units not yet
+	// ruled on"), and one number cannot carry two independent migrations without the second flag
+	// Tom removed on 2026-08-10.
+	//
+	// Self-inverse on purpose: the same call converts both ways, so a display site and an entry site
+	// can never drift into disagreeing about which direction they are going.
+	function cartesianY(y) { return -y; }
 	function screenToWorld(sx, sy) {
 		var r = svg.getBoundingClientRect();
 		return { x: (sx - r.left - state.tx) / state.s, y: (sy - r.top - state.ty) / state.s };
@@ -1677,7 +1703,9 @@ var EngCalcs = EngCalcs || {};
 				activeCancel = null; setRegMode(false);
 				var txt = prompt((pc.lpn_backdrop_coords_prompt || 'Type the X,Y that point should move to') + ' (' + unitLabel('lpn_u_length') + '):', '');
 				var parts = (txt || '').split(',').map(Number);
-				if (txt && !isNaN(parts[0]) && !isNaN(parts[1])) { positionTo(refWorld, { x: parts[0], y: parts[1] }); }
+				// The one ENTRY site (Task 274): what the user types is Cartesian, and positionTo()
+				// works in the internal Y-down frame.
+				if (txt && !isNaN(parts[0]) && !isNaN(parts[1])) { positionTo(refWorld, { x: parts[0], y: cartesianY(parts[1]) }); }
 				return;
 			}
 			// No further blocking dialog here -- the panel + Continue already made the transition
@@ -5729,7 +5757,7 @@ var EngCalcs = EngCalcs || {};
 		if (coordsEl) {
 			svg.addEventListener('pointermove', function (e) {
 				var w = screenToWorld(e.clientX, e.clientY);
-				coordsEl.textContent = 'X: ' + w.x.toFixed(2) + '  Y: ' + w.y.toFixed(2);
+				coordsEl.textContent = 'X: ' + w.x.toFixed(2) + '  Y: ' + cartesianY(w.y).toFixed(2);
 			});
 		}
 		// Rubber-band line while drawing a pipe/pump (Tom, 2026-07-30) -- tracks the live pointer
@@ -7167,7 +7195,7 @@ var EngCalcs = EngCalcs || {};
 			}
 		}
 		readonlyField(fields, pc.lpn_field_x || 'X', n.x);
-		readonlyField(fields, pc.lpn_field_y || 'Y', n.y);
+		readonlyField(fields, pc.lpn_field_y || 'Y', cartesianY(n.y));
 		tipsIn(fields);
 	}
 	function openPopup(nodeId, sx, sy) {
@@ -7378,7 +7406,7 @@ var EngCalcs = EngCalcs || {};
 		fields.appendChild(sizeLabel);
 		fields.appendChild(document.createElement('br'));
 		readonlyField(fields, pc.lpn_field_x || 'X', an ? an.x + lb.x : lb.x);
-		readonlyField(fields, pc.lpn_field_y || 'Y', an ? an.y + lb.y : lb.y);
+		readonlyField(fields, pc.lpn_field_y || 'Y', cartesianY(an ? an.y + lb.y : lb.y));
 	}
 	function openLabelPopup(labelId, sx, sy) {
 		currentPopup = { kind: 'label', id: labelId };

@@ -1077,19 +1077,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     checkable; just do not spend the blog/video headline on it.** Do not relitigate.
   - Consequence: raised 146.06 to 90 and 220 to 95.
 
-- 80|274| **`lpn_` map coordinates are upside down. Y must increase UPWARD.** Tom, 2026-08-10:
-  *"EPANET uses normal cartesian coordinates... but we have the opposite like a graphic arts
-  software. We need to fix this. Cartesian is engineering."* Today world Y = screen Y
-  (`screenToWorld`/`worldToScreen`/`setTransform` apply no flip), so north is negative.
-  - **The flip belongs in `setTransform()`** (`scale(s, -s)`) so one line owns it. Everything that
-    reads a raw screen delta then follows: label offsets `n.lx/n.ly`, Text `x/y`, vertex drags, the
-    backdrop transform, and `bbox`/`zoomExtent`.
-  - **Text and symbols must counter-flip or they render mirrored.** That is the real cost, not the
-    coordinate math.
-  - **Existing documents open upside down** unless migrated. Bump the storage version and negate
-    every stored Y on load — cheaper than the units question was, because there is no ambiguity
-    about what an old document meant.
-
 - 40|276| **Precise background-image scaling.** Tom, 2026-08-10: pick-two-points is handy but never
   precise ("mouse (and hand!!!) picking is never precise"); EPANET's is precise but painful. Full
   option list and his own ranking are in the task body below; his lead candidate is a **World File**.
@@ -1118,8 +1105,10 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **Our transform is `translate + uniform scale`** (`applyBackdropTransform`) — no rotation, no
     skew, no independent X/Y. A world file with nonzero B/D, or |A| ≠ |E|, cannot be represented:
     reject it with a message rather than silently using A and dropping the rest.
-  - **Do this AFTER Task 274.** A world file's E is negative precisely because world Y is up and
-    image Y is down; under today's Y-down map that needs a sign flip, and after 274 it is natural.
+  - **Task 274 did NOT settle this.** It flipped the USER boundary; the stored document and the
+    internal frame are still Y-down. So a world file's negative E still needs an explicit sign
+    decision here, and this is the task that will have to decide whether the FILE becomes Cartesian
+    (a storage version bump plus a migration — see 274's note on why `v` cannot carry it today).
   - **`downscaleImage()` already reports the ORIGINAL width/height**, not the downscaled canvas
     dimensions, so a world file's pixel size maps onto `backdrop.iw/ih` with no correction
     (`s = A * iw / backdrop.width`). Do not "tidy" that callback into passing `canvas.width`.
@@ -1826,6 +1815,27 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     clearance. **The harness had been measuring that clearance at a seeded text size of 2.5, not the
     shipped 20** — 8× tighter, so it read 29 units where a real visitor would have had 7. It now
     redraws at the default and checks again; that blind spot predates this task.
+
+- 0|274| **[DONE 2026-08-11] The user works in Cartesian coordinates; Y increases upward.** Tom:
+  *"EPANET uses normal cartesian coordinates… Cartesian is engineering."* One self-inverse
+  `cartesianY()` at the four places a coordinate reaches or leaves the user: the hover readout, the
+  node popup, the Text-label popup, and the backdrop "type the X,Y" prompt (the only entry site).
+  - **The flip is at the USER boundary, not in the document or the world transform.** `doc` stays
+    Y-down because that is SVG's own system and every drawing routine — text baselines, mask rects,
+    extrema chevrons, the backdrop and reservoir images, collision boxes, leader side-flips — is
+    written natively against it. Flipping `setTransform()` to `scale(s,-s)` instead needs ~10
+    counter-flips, and each one fails silently and visually. **The drawing is pixel-identical; only
+    the numbers changed.**
+  - **KNOWN AND DELIBERATE: the stored JSON keeps Y-down.** Invisible today — `lpnToInp()` emits no
+    `[COORDINATES]`, so no Y leaves the page. It becomes a real question the day we export
+    coordinates or read a world file (Task 276: its E term is negative precisely because world Y is
+    up). Not answered here because it costs a storage version, and `v` already carries the units
+    question (v2 = "units not yet ruled on"); one number cannot carry two independent migrations
+    without the second flag Tom removed 2026-08-10.
+  - 5 assertions, every one stated as a DIRECTION ("higher on screen reports a larger Y") rather than
+    a sign — `y === -n.y` would restate the implementation and would pass a version that flipped
+    display AND entry, which is the bug that matters. Mutation-tested, 5 mutations, all caught,
+    including entry-not-flipped.
 
 - 0|277| **[DONE 2026-08-10] Moving something is undoable.** No drag handler snapshotted, so Undo
   after a drag reverted the last DISCRETE act and left the drag standing — it took back something

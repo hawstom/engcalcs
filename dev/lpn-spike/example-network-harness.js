@@ -245,6 +245,12 @@ src = src.replace(marker,
   // init() never runs here (that is the point of the injection), so the pointer listeners this
   // tests are not attached until the test asks for them.
   "\t\twirePointerEvents: wirePointerEvents, setMode: setMode,\n" +
+  // Task 274. renderNodeFields fills the popup; screenToWorld/positionTo are the two frames the
+  // Cartesian boundary sits between.
+  "\t\trenderNodeFields: renderNodeFields, screenToWorld: screenToWorld,\n" +
+  "\t\tgetBackdrop: function () { return backdrop; },\n" +
+  "\t\tshowBackdropTargetPanel: showBackdropTargetPanel,\n" +
+  "\t\tsetBackdrop: function (b) { backdrop = b; },\n" +
   "\t\tfrictionMethod: frictionMethod,\n" +
   "\t\tbuildMenuBar: buildMenuBar, menuPopupOpen: function () { return document.getElementById('lpn_menu_popup').style.display === 'block'; },\n" +
   "\t\tsubMenuOpen: function () { return document.getElementById('lpn_menu_popup2').style.display === 'block'; },\n" +
@@ -1222,6 +1228,103 @@ console.log('\n--- Settings panel stays in sync ---');
     const d0 = L.undoDepth();
     dragTo({ dataset: {}, classList: { contains: () => false } }, 100, 100, 400, 400);
     ok('panning the map costs no snapshot', L.undoDepth() === d0, d0 + ' -> ' + L.undoDepth());
+  }
+}
+
+// ---- ROADMAP Task 274: the user works in Cartesian coordinates (Y increases upward) ----
+// Tom, 2026-08-10: "EPANET uses normal cartesian coordinates, where up and right are positive. But
+// we have the opposite like a graphic arts software. Cartesian is engineering."
+//
+// EVERY ASSERTION HERE IS STATED AS A DIRECTION, never as a sign. "Higher on screen reports a
+// larger Y" is the user's claim and stays true however the internals are arranged; `y === -n.y`
+// would just restate the implementation back to itself and would pass a version that flipped BOTH
+// the display and the entry, which is exactly the bug that matters.
+{
+  console.log('\n--- Task 274: Cartesian coordinates at the user boundary ---');
+  const svg = byId.lpn_canvas;
+  function fire(type, ev) {
+    hitTarget = ev.target && ev.target.dataset ? ev.target : null;
+    (svg._listeners[type] || []).forEach(fn => fn(ev));
+  }
+  function readoutYAt(screenY) {
+    fire('pointermove', { pointerId: 7, clientX: 400, clientY: screenY, target: svg });
+    return parseFloat(byId.lpn_coords.textContent.split('Y:')[1]);
+  }
+
+  setUnitSet('us');
+  L.reset();
+  L.wirePointerEvents();
+  L.drawExample('us');
+
+  // 1. THE READOUT. Screen Y grows downward, so the HIGHER point is the SMALLER clientY.
+  const yHigh = readoutYAt(100), yLow = readoutYAt(400);
+  ok('the coordinate readout reports a LARGER Y higher up the screen', yHigh > yLow,
+    'screen 100 -> ' + yHigh.toFixed(1) + ', screen 400 -> ' + yLow.toFixed(1));
+
+  // 2. THE POPUP, and it must agree with the readout rather than having its own opinion. Dragging a
+  // node upward has to raise the Y its property sheet shows.
+  {
+    const node = L.getDoc().nodes.find(n => n.type === 'junction');
+    const PCX = EngCalcs.pageConfig;
+    // readonlyField() builds <label>[label text]<span>value</span></label>. Walk the labels, match
+    // the one whose text is exactly "Y", and read the span beside it.
+    function popupY(id) {
+      L.renderNodeFields(id);
+      const rows = byId.lpn_popup_fields.children.filter(c => c.tagName === 'LABEL');
+      for (const r of rows) {
+        if ((r.textContent || '').trim() !== PCX.lpn_field_y) { continue; }
+        const span = (r.children || []).find(c => c.tagName === 'SPAN');
+        return span ? parseFloat(span.textContent) : NaN;
+      }
+      return NaN;
+    }
+    const beforeY = popupY(node.id);
+    // Drag straight UP the screen: same clientX, a smaller clientY.
+    const el = { dataset: { node: node.id }, classList: { contains: () => false } };
+    fire('pointerdown', { pointerId: 3, clientX: 300, clientY: 400, target: el });
+    fire('pointermove', { pointerId: 3, clientX: 300, clientY: 200, target: el });
+    if (L.dragActive()) { L.applyDrag(); }
+    fire('pointerup', { pointerId: 3, clientX: 300, clientY: 200, target: el });
+    const afterY = popupY(node.id);
+    ok('dragging a node UP raises the Y its popup reports', afterY > beforeY,
+      beforeY.toFixed(1) + ' -> ' + afterY.toFixed(1));
+    // readonlyField() prints toFixed(2), so the tolerance is half a displayed digit, not an epsilon.
+    const storedY = L.getDoc().nodes.find(n => n.id === node.id).y;
+    ok('...and the popup agrees with the readout, not with the raw stored value',
+      Math.abs(afterY - (-storedY)) < 0.005,
+      'popup ' + afterY.toFixed(2) + ' vs stored ' + storedY.toFixed(2));
+  }
+
+  // 3. ENTRY AND DISPLAY MUST BE INVERSES. The backdrop "type the X,Y" prompt is the only place the
+  // page reads a coordinate FROM the user, and it is the one site where getting the sign wrong
+  // twice would cancel out in every test that checks only display. So: type a Cartesian Y, then ask
+  // the readout where that point actually is.
+  {
+    L.setBackdrop({ href: 'x', iw: 100, ih: 100, x: 0, y: 0, width: 100, height: 100, tx: 0, ty: 0, s: 1 });
+    // Drive the real prompt path: pick a reference point, choose "coords", type a target.
+    const refScreenY = 300;
+    const refWorld = L.screenToWorld(400, refScreenY);
+    const targetCartesianY = 1234;
+    global.prompt = global.window.prompt = () => '500,' + targetCartesianY;
+    byId.lpn_backdrop_target_mode.value = 'coords';
+    L.showBackdropTargetPanel(refWorld);
+    byId.lpn_backdrop_target_continue.onclick({});   // showBackdropTargetPanel wires it with .onclick, not addEventListener
+    // The reference point moved to the typed coordinate, so the backdrop shifted by the difference.
+    // Ask the readout what Cartesian Y the reference point now sits at -- it must be what was typed.
+    const b = L.getBackdrop();
+    ok('a typed Cartesian Y puts the point where the readout then reports that same Y',
+      Math.abs(-(refWorld.y + b.ty) - targetCartesianY) < 1e-9,
+      'typed ' + targetCartesianY + ', point now at ' + (-(refWorld.y + b.ty)).toFixed(2));
+    L.setBackdrop(null);
+    global.prompt = global.window.prompt = () => 'X';
+  }
+
+  // 4. ONE HOME for the concept. Four call sites is already enough for two of them to drift apart.
+  {
+    const js = fs.readFileSync(ROOT + 'js/looped-network.js', 'utf8');
+    const uses = (js.match(/cartesianY\(/g) || []).length;
+    ok('the flip has exactly one definition and every boundary goes through it', uses === 5,
+      uses + ' occurrences (1 definition + 4 boundary sites)');
   }
 }
 
