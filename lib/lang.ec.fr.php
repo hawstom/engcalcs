@@ -705,7 +705,8 @@ $ec_lang['lpn_file_new']='Nouveau projet…';
 // File > New project's submenu (Task 264). `lpn_tool_example` ("Draw example network") was RETIRED
 // with the toolbar button of that name -- an example is a whole network, so it starts a project
 // rather than being drawn into the one you are in.
-$ec_lang['lpn_new_blank']='Projet vierge';
+$ec_lang['lpn_new_blank_us']='Projet vierge, unités américaines (gpm)';
+$ec_lang['lpn_new_blank_si']='Projet vierge, unités SI (l/s)';
 $ec_lang['lpn_new_from_examples']='À partir d\'un exemple';
 // The flow unit is IN the label, not left implied by "US"/"SI": gpm and l/s are what a water
 // engineer recognises at a glance, and this is the moment the choice is being made.

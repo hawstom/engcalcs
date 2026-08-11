@@ -155,7 +155,15 @@ global.requestAnimationFrame = f => setTimeout(f, 0);
 global.EngCalcs = {
   pageConfig: {}, initTips: () => {}, unitFactorFor: () => 1,
   iconEl: () => mkEl('g'),
-  setLabel: (el, iconName, text) => { el.textContent = text; }
+  setLabel: (el, iconName, text) => { el.textContent = text; },
+  // The REAL EngCalcs.setUnits (js/Calculators.lib.js) moves every unit select to a preset and then
+  // calls submitForm(), which re-enters EngCalcs.pageCalculator. Both halves matter and this stub
+  // does both: without it `if (EngCalcs.setUnits)` was simply false here, so every code path that
+  // commits a project to a unit system was untested -- two mutations survived on exactly that.
+  setUnits: (which) => {
+    setUnitSet(which);
+    if (global.EngCalcs.pageCalculator) { global.EngCalcs.pageCalculator(); }
+  }
 };
 global.bootstrap = global.window.bootstrap = { Tooltip: { getInstance: () => null, getOrCreateInstance: () => ({ hide() {}, dispose() {} }) } };
 
@@ -208,6 +216,7 @@ src = src.replace(marker,
   "\t\tnewProject: newProject, offerUnitRestore: offerUnitRestore,\n" +
   "\t\ttabAsterisk: tabAsterisk, indexEntry: indexEntry, openId: function () { return library.openId; },\n" +
   "\t\tnewProjectFromExample: newProjectFromExample, saveToStorage: saveToStorage,\n" +
+  "\t\tnewBlankProject: newBlankProject,\n" +
   "\t\tbuildMenuBar: buildMenuBar, menuPopupOpen: function () { return document.getElementById('lpn_menu_popup').style.display === 'block'; },\n" +
   "\t\tsubMenuOpen: function () { return document.getElementById('lpn_menu_popup2').style.display === 'block'; },\n" +
   "\t\tsubClosePending: function () { return subCloseTimer !== null; },\n" +
@@ -826,7 +835,7 @@ console.log('\n--- Settings panel stays in sync ---');
     .map(c => (c.children && c.children[1] && c.children[1].textContent) || '')
     .filter(Boolean);
   ok('...carrying the real options', 
-    labels.indexOf(PC.lpn_new_blank) >= 0 && labels.indexOf(PC.lpn_new_example_us) >= 0 &&
+    labels.indexOf(PC.lpn_new_blank_us) >= 0 && labels.indexOf(PC.lpn_new_blank_si) >= 0 && labels.indexOf(PC.lpn_new_example_us) >= 0 &&
     labels.indexOf(PC.lpn_new_example_si) >= 0, labels.join(' | '));
   ok('...and the parent list is untouched, so File is still File',
     byId.lpn_menu_list.children.length > 3);
@@ -850,8 +859,11 @@ console.log('\n--- Settings panel stays in sync ---');
   // BECAUSE you reach it." The dismiss-on-hover was attached to every plain row at EVERY level, so
   // entering a row of the fly-out closed the fly-out that row was in. Reaching it was fatal.
   const blankRow = byId.lpn_menu_list2.children
-    .find(r => (r.children[1] && r.children[1].textContent) === PC.lpn_new_blank);
+    .find(r => (r.children[1] && r.children[1].textContent) === PC.lpn_new_blank_us);
   ok('the fly-out has a Blank project row to reach', !!blankRow);
+  ok('...and both blank rows name their unit system, as the examples do',
+    labels.filter(l => l.indexOf(PC.lpn_new_blank_us) === 0 || l.indexOf(PC.lpn_new_blank_si) === 0).length === 2,
+    labels.join(' | '));
   (blankRow._listeners.mouseenter || []).forEach(fn => fn({}));
   ok('hovering a row INSIDE the fly-out does not close it', L.subMenuOpen());
 
@@ -890,9 +902,18 @@ console.log('\n--- Settings panel stays in sync ---');
   setUnitSet('us');
   L.reset();
 
-  const blankId = L.newProject();
-  ok('a blank project starts clean -- no asterisk',
-    L.tabAsterisk(L.indexEntry(blankId)).show === false);
+  // Through the real menu path (newBlankProject), not newProject() directly -- the unit switch it
+  // performs is itself a change that marks the project dirty, so the baseline has to be stamped
+  // after it. Testing the raw newProject() would miss that ordering entirely.
+  // START IN SI so the switch to US is observable. Asserting the unit AFTER a run that was already
+  // in US proves nothing, which is how the "does it commit to its units at all" mutation survived.
+  setUnitSet('si');
+  L.newBlankProject('us');
+  const blankId = L.openId();
+  ok('a blank project from the menu starts clean -- no asterisk',
+    L.tabAsterisk(L.indexEntry(blankId)).show === false, 'dirty = ' + L.indexEntry(blankId).dirty);
+  ok('...and it is in the unit system its row named',
+    L.setUnitEl('lpn_u_flow').options[L.setUnitEl('lpn_u_flow').selectedIndex].dataset.unit === 'gpm');
 
   // ...and it must EARN one. Anything else would make the mark meaningless in the other direction.
   L.addNode('junction', 10, 10);

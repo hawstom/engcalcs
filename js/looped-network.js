@@ -4618,7 +4618,15 @@ var EngCalcs = EngCalcs || {};
 	function newProjectRows() {
 		var pc = EngCalcs.pageConfig || {};
 		return [
-			{ icon: 'new', label: pc.lpn_new_blank || 'Blank project', fn: function () { newProject(); renderTabs(); } },
+			// **A BLANK PROJECT COMMITS TO A UNIT SYSTEM TOO** (Tom, 2026-08-10: "to act more like
+			// other software, let's just have 'Blank project, US units (gpm)' and 'Blank project, SI
+			// units (l/s)'"). The single "Blank project" row inherited whatever units happened to be
+			// on the strip, which is the one thing left on this page that decided a project's units
+			// by accident -- and since Task 263 a project's units are part of the project. With this
+			// the fly-out is a template list, which is the shape File > New has in every application
+			// that has one.
+			{ icon: 'new', label: pc.lpn_new_blank_us || 'Blank project, US units (gpm)', fn: function () { newBlankProject('us'); } },
+			{ icon: 'new', label: pc.lpn_new_blank_si || 'Blank project, SI units (l/s)', fn: function () { newBlankProject('si'); } },
 			{ separator: true },
 			{ heading: true, label: pc.lpn_new_from_examples || 'From examples' },
 			// The flow unit is IN THE LABEL, not merely implied by "US"/"SI" (Tom, 2026-08-10: "it's
@@ -4643,9 +4651,23 @@ var EngCalcs = EngCalcs || {};
 	// example network?"), and then answered it himself with the better version: make the choice the
 	// menu item. The user has already said which system they want by which row they clicked, so a
 	// dialog confirming it would be asking a question they just answered.
-	function newProjectFromExample(system) {
+	// Blank project, then the units, then whatever content -- and the order is the design. setUnits()
+	// moves the whole strip to the preset and re-enters EngCalcs.pageCalculator; doing it while the
+	// project is still empty means nothing is on screen to be re-rendered against the new units.
+	function newProjectWithUnits(system) {
 		var id = newProject();
 		if (EngCalcs.setUnits) { EngCalcs.setUnits(system); }
+		return id;
+	}
+	function newBlankProject(system) {
+		// stampProjectSaved AFTER setUnits: the unit switch is a change like any other and marks the
+		// project dirty, so stamping first would leave a brand-new empty tab wearing an asterisk --
+		// the very defect the baseline exists to remove.
+		stampProjectSaved(newProjectWithUnits(system));
+		renderTabs();
+	}
+	function newProjectFromExample(system) {
+		var id = newProjectWithUnits(system);
 		drawExampleNetwork();
 		// The example is not the user's unsaved work either -- it arrived by their choosing it from a
 		// menu, and it is two clicks to get back. So it starts clean, exactly as a blank project

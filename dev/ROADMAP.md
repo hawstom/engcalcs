@@ -1791,6 +1791,11 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     (`#lpn_menu_popup2`), opens on click or hover, parent stays on screen, ▸ marker on the row,
     flips left when there is no room right. The row is labelled `New project…` — it opens a chooser.
     The toolbar button keeps a plain pull-down: no parent row to branch from.
+    Rows: **Blank project, US units (gpm)** / **Blank project, SI units (l/s)**, then *From
+    examples* with the two networks (Tom, 2026-08-10 — *"to act more like other software"*). A blank
+    project commits to a unit system like everything else here; the single "Blank project" row
+    inherited whatever was on the strip, which was the last place a project's units were decided by
+    accident. The fly-out is now a template list, which is the shape File > New has everywhere.
   - **The fly-out closed on being reached** (Tom: *"it disappears before the mouse can reach it; it
     honestly seems to disappear BECAUSE you reach it."* It did.) `closeSubMenu` was bound to
     mouseenter on every plain row at **every level**, so entering a fly-out row closed the fly-out
