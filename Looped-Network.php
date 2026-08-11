@@ -300,6 +300,14 @@ EngCalcs.pageConfig = {
 	      // calculator and is translated wherever lpn_ is. Neither adds a single key to translate. ?>
 	menu_brand: <?=json_encode($ec_lang['menu_brand'])?>,
 	lpn_main_menu: <?=json_encode($ec_lang['lpn_main_menu'])?>,
+	<?php // The browser-tab title's unit disclosure (ROADMAP Task 265). calc_units_us/si are suite
+	      // chrome and already translated everywhere; lpn_title_units carries the {units} placeholder
+	      // so a language decides its own word order rather than having "US" + "Units" concatenated
+	      // for it at render time -- CLAUDE.md forbids composing a label from fragments. ?>
+	calc_units_us: <?=json_encode($ec_lang['calc_units_us'])?>,
+	calc_units_si: <?=json_encode($ec_lang['calc_units_si'])?>,
+	lpn_title_units: <?=json_encode($ec_lang['lpn_title_units'])?>,
+	lpn_title_units_mixed: <?=json_encode($ec_lang['lpn_title_units_mixed'])?>,
 	bpn_p_min: <?=json_encode($ec_lang['bpn_p_min'])?>,
 	lpn_id_invalid: <?=json_encode($ec_lang['lpn_id_invalid'])?>,
 	lpn_id_taken: <?=json_encode($ec_lang['lpn_id_taken'])?>,

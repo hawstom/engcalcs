@@ -92,9 +92,13 @@ byId.lpn_menu_popup2.appendChild(byId.lpn_menu_list2);
 // A unit <select> the way echoUnitSelect() renders one: option.value is "units per SI unit" and
 // option.dataset.unit is the family's key for that unit. unitEl() finds these by NAME, not id.
 const unitSelects = {};
-function mkUnitSelect(name, opts, chosen) {
+// `family` is NOT decoration: echoUnitSelect() puts data-family on every real select, and Task
+// 265's unitSetName() reads it to ask whether the strip matches a preset. A stub without it makes
+// that function skip every select and vacuously report "us", which is a test agreeing with itself.
+function mkUnitSelect(name, family, opts, chosen) {
   const s = mkEl('select');
   s.name = name;
+  s.dataset.family = family;
   s.options = opts.map(o => ({ value: String(o[1]), textContent: o[0], dataset: { unit: o[0] } }));
   s.selectedIndex = opts.findIndex(o => o[0] === chosen);
   if (s.selectedIndex < 0) { throw new Error('no such unit ' + chosen + ' on ' + name); }
@@ -105,14 +109,21 @@ function mkUnitSelect(name, opts, chosen) {
 // Factors are "number of that unit per SI unit" -- lib/Units.lib.php's own convention.
 function setUnitSet(which) {
   const us = which === 'us';
-  mkUnitSelect('lpn_u_length', [['m', 1], ['ft', 1 / FT]], us ? 'ft' : 'm');
-  mkUnitSelect('lpn_u_elevhead', [['mh2o', 1], ['fth2o', 1 / FT]], us ? 'fth2o' : 'mh2o');
-  mkUnitSelect('lpn_u_pressure', [['kpa', 9.80638], ['psi', 1.42233]], us ? 'psi' : 'kpa');
-  mkUnitSelect('lpn_u_diameter', [['mm', 1000], ['in', 1 / IN]], us ? 'in' : 'mm');
-  mkUnitSelect('lpn_u_flow', [['lps', 1000], ['gpm', 1 / GPM]], us ? 'gpm' : 'lps');
-  mkUnitSelect('lpn_u_velocity', [['mps', 1], ['fps', 1 / FT]], us ? 'fps' : 'mps');
-  mkUnitSelect('lpn_u_gradient', [['gradePercent', 100], ['grade', 1]], 'gradePercent');
+  mkUnitSelect('lpn_u_length', 'distance_site', [['m', 1], ['ft', 1 / FT]], us ? 'ft' : 'm');
+  mkUnitSelect('lpn_u_elevhead', 'total_head', [['mh2o', 1], ['fth2o', 1 / FT]], us ? 'fth2o' : 'mh2o');
+  mkUnitSelect('lpn_u_pressure', 'partial_head', [['mh2o', 1], ['kpa', 9.80638], ['psi', 1.42233]], us ? 'psi' : 'mh2o');
+  mkUnitSelect('lpn_u_diameter', 'distance_small', [['mm', 1000], ['in', 1 / IN]], us ? 'in' : 'mm');
+  mkUnitSelect('lpn_u_flow', 'flow_node', [['lps', 1000], ['gpm', 1 / GPM]], us ? 'gpm' : 'lps');
+  mkUnitSelect('lpn_u_velocity', 'velocity', [['mps', 1], ['ftps', 1 / FT]], us ? 'ftps' : 'mps');
+  mkUnitSelect('lpn_u_gradient', 'gradient', [['gradePercent', 100], ['grade', 1]], 'gradePercent');
 }
+// The two presets exactly as lib/Units.lib.php declares them for the seven families this page owns.
+// EngCalcs.unitSets is emitted by echoUnitsRow() in the browser; unitSetName() compares the strip
+// against it, so the harness needs the real mapping, not a placeholder.
+const LPN_UNIT_PRESETS = {
+  us: { distance_site: 'ft', total_head: 'fth2o', partial_head: 'psi', distance_small: 'in', flow_node: 'gpm', velocity: 'ftps', gradient: 'gradePercent' },
+  si: { distance_site: 'm', total_head: 'mh2o', partial_head: 'mh2o', distance_small: 'mm', flow_node: 'lps', velocity: 'mps', gradient: 'gradePercent' }
+};
 
 global.document = {
   createElement: mkEl,
@@ -126,7 +137,8 @@ global.document = {
   querySelectorAll: () => [],
   addEventListener: () => {},
   body: mkEl('body'),
-  documentElement: mkEl('html')
+  documentElement: mkEl('html'),
+  title: ''   // Task 265 writes here; a stub without it would let document.title = ... pass unseen
 };
 const store = {};
 global.localStorage = {
@@ -141,6 +153,7 @@ global.window = {
   addEventListener: () => {}, innerWidth: 1200, innerHeight: 900,
   confirm: () => true, prompt: () => 'X', alert: () => {},
   matchMedia: () => ({ matches: false, addEventListener: () => {} }),
+  location: { search: '' },   // refreshPageTitle() reads ?name= off it (Task 265)
   devicePixelRatio: 1, getComputedStyle: () => ({ getPropertyValue: () => '' })
 };
 global.alert = global.window.alert;
@@ -155,6 +168,7 @@ global.requestAnimationFrame = f => setTimeout(f, 0);
 // from the real lang file rather than restated here.
 global.EngCalcs = {
   pageConfig: {}, initTips: () => {}, unitFactorFor: () => 1,
+  unitSets: LPN_UNIT_PRESETS,
   iconEl: () => mkEl('g'),
   setLabel: (el, iconName, text) => { el.textContent = text; },
   // The REAL EngCalcs.setUnits (js/Calculators.lib.js) moves every unit select to a preset and then
@@ -218,6 +232,7 @@ src = src.replace(marker,
   "\t\ttabAsterisk: tabAsterisk, indexEntry: indexEntry, openId: function () { return library.openId; },\n" +
   "\t\tnewProjectFromExample: newProjectFromExample, saveToStorage: saveToStorage,\n" +
   "\t\tnewBlankProject: newBlankProject, refreshMapStatus: refreshMapStatus,\n" +
+  "\t\tunitSetName: unitSetName, refreshPageTitle: refreshPageTitle,\n" +
   "\t\tfrictionMethod: frictionMethod,\n" +
   "\t\tbuildMenuBar: buildMenuBar, menuPopupOpen: function () { return document.getElementById('lpn_menu_popup').style.display === 'block'; },\n" +
   "\t\tsubMenuOpen: function () { return document.getElementById('lpn_menu_popup2').style.display === 'block'; },\n" +
@@ -982,8 +997,76 @@ console.log('\n--- Settings panel stays in sync ---');
     const status = page.indexOf('id="lpn_map_status"');
     const coords = page.indexOf('id="lpn_coords"');
     ok('both readouts live in one status strip', footer >= 0 && footer < status && footer < coords);
-    ok('...with the settings BEFORE the coordinates', status < coords, 
+    ok('...with the settings BEFORE the coordinates', status < coords,
       'status@' + status + ' coords@' + coords);
+  }
+}
+
+// ---- ROADMAP Task 265: the browser tab discloses the project's unit system ----
+// Tom, 2026-08-10, specified the three parts. The reason it matters is the same one that put units
+// inside the document: on this page a bare number means nothing without them, and the tab is where
+// you tell two open windows of this page apart when neither is in front of you.
+{
+  console.log('\n--- Task 265: the tab title names the unit system ---');
+  const PC = EngCalcs.pageConfig;
+  setUnitSet('us');
+  L.refreshPageTitle();
+  const usTitle = global.document.title;
+  ok('the unit system is DERIVED from the live strip, not stored', L.unitSetName() === 'us');
+  ok('the tab names the brand, the calculator, and the units',
+    usTitle.indexOf(PC.menu_brand) >= 0 && usTitle.indexOf(PC.lpn_main_menu) >= 0
+    && usTitle.indexOf('US') >= 0, usTitle);
+  ok('...in that order, brand first', usTitle.indexOf(PC.menu_brand) < usTitle.indexOf(PC.lpn_main_menu), usTitle);
+  ok('...and the units last', usTitle.lastIndexOf('US') > usTitle.indexOf(PC.lpn_main_menu), usTitle);
+
+  // Through EngCalcs.setUnits, the real path (it re-enters pageCalculator) -- calling
+  // refreshPageTitle() by hand would assert the function works, not that anything calls it. Same
+  // reasoning as the map-status block above, and the same mutation it was written to catch.
+  EngCalcs.setUnits('si');
+  const siTitle = global.document.title;
+  ok('switching units rewrites the tab', L.unitSetName() === 'si'
+    && siTitle.indexOf('SI') >= 0 && siTitle !== usTitle, siTitle);
+
+  // A strip that matches NEITHER preset is the case a stored "us" would lie about. It is reachable:
+  // the seven selects are individually settable, and Task 263 made a switch reinterpret rather than
+  // convert, so a half-changed strip is a state a real user lands in.
+  const dia = L.setUnitEl('lpn_u_diameter');
+  dia.selectedIndex = dia.options.findIndex(o => o.dataset.unit === 'in');
+  L.refreshPageTitle();
+  ok('a hand-mixed strip says so rather than naming a preset it does not match',
+    L.unitSetName() === null && global.document.title.indexOf(PC.lpn_title_units_mixed) >= 0,
+    global.document.title);
+
+  // The ?name= prefix echoHTMLHead() puts in front of the server title must survive the rewrite,
+  // or naming a calculation would silently stop working on this one page.
+  global.window.location.search = '?name=Well%20Field';
+  setUnitSet('si');
+  L.refreshPageTitle();
+  ok('a ?name= calculation name still leads the tab',
+    global.document.title.indexOf('Well Field') === 0, global.document.title);
+  global.window.location.search = '';
+
+  // SWITCHING PROJECTS has to rewrite it too, and by its own call site: a project carries its own
+  // units (Task 263), so the tab can be wrong the instant you change tabs even though no select
+  // moved. Asserted through newProject(), which reaches refreshAllFromDocument() WITHOUT going
+  // near setUnits() -- so it isolates that one call rather than riding on the unit-switch path.
+  setUnitSet('us');
+  global.document.title = '';
+  L.newProject();
+  ok('switching projects rewrites the tab from its own call site',
+    global.document.title.indexOf(PC.lpn_main_menu) >= 0 && global.document.title.indexOf('US') >= 0,
+    global.document.title);
+
+  // The three strings are real lang keys, not literals hiding behind a fallback.
+  {
+    const langSrc = fs.readFileSync(ROOT + 'lib/lang.ec.en.php', 'utf8');
+    ok('lpn_title_units carries a {units} placeholder rather than concatenating fragments',
+      /\$ec_lang\['lpn_title_units'\]='[^']*\{units\}[^']*';/.test(langSrc));
+    ok('lpn_title_units_mixed exists', /\$ec_lang\['lpn_title_units_mixed'\]=/.test(langSrc));
+    const page = fs.readFileSync(ROOT + 'Looped-Network.php', 'utf8');
+    ok('...and all four strings reach pageConfig',
+      ['lpn_title_units', 'lpn_title_units_mixed', 'calc_units_us', 'calc_units_si']
+        .every(k => page.indexOf(k + ': <?=json_encode') >= 0));
   }
 }
 

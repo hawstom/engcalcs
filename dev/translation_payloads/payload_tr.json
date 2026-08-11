@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "tr",
-        "expected_key_count": 795,
-        "delta_key_count": 5,
+        "expected_key_count": 812,
+        "delta_key_count": 19,
         "exempt_key_count": 17,
         "exempt_keys": [
             "calc_units_us",
@@ -287,6 +287,20 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_v2_restore_prompt": "This calculator stores project units and inputs as entered, but it formerly converted numbers to SI for storage. This project was saved before that change, so its numbers were stored in SI. Convert them one last time to the current units? For your evaluation, these are some diameters that will be converted. Before and after values are shown:",
+        "lpn_v2_restore_yes": "Convert",
+        "lpn_v2_restore_never": "No. Never ask again.",
+        "lpn_v2_restore_no": "Close so that I can check the current units first",
+        "lpn_new_blank_us": "Blank project, US units (gpm)",
+        "lpn_new_blank_si": "Blank project, SI units (l\/s)",
+        "lpn_new_from_examples": "From examples",
+        "lpn_new_example_us": "Basic network, US units (gpm)",
+        "lpn_new_example_si": "Basic network, SI units (l\/s)",
+        "lpn_file_recent": "Recent files",
+        "lpn_recent_tip": "Open {file} again, without looking for it.",
+        "lpn_recent_denied": "Permission to open that file was not given, so it was not opened.",
+        "lpn_recent_gone": "Could not open {file}. It may have been moved, renamed, or deleted, so it was taken off the recent list.",
+        "lpn_settings_computation": "Computation",
         "lpn_settings_engine_epanet": "Solve with the EPANET engine",
         "lpn_settings_engine_epanet_tip": "Runs the original EPANET engine from the US EPA, here in your browser. The built-in solver gives the same answers and is faster, so leave this off unless you need EPANET itself.",
         "lpn_engine_loading": "Loading the EPANET engine…",
@@ -294,6 +308,20 @@
         "lpn_engine_manning_note": "Note: with Manning roughness, EPANET computes head loss about 0.6% lower than the built-in solver."
     },
     "keys": {
+        "lpn_v2_restore_prompt": "This calculator stores project units and inputs as entered, but it formerly converted numbers to SI for storage. This project was saved before that change, so its numbers were stored in SI. Convert them one last time to the current units? For your evaluation, these are some diameters that will be converted. Before and after values are shown:",
+        "lpn_v2_restore_yes": "Convert",
+        "lpn_v2_restore_never": "No. Never ask again.",
+        "lpn_v2_restore_no": "Close so that I can check the current units first",
+        "lpn_new_blank_us": "Blank project, US units (gpm)",
+        "lpn_new_blank_si": "Blank project, SI units (l\/s)",
+        "lpn_new_from_examples": "From examples",
+        "lpn_new_example_us": "Basic network, US units (gpm)",
+        "lpn_new_example_si": "Basic network, SI units (l\/s)",
+        "lpn_file_recent": "Recent files",
+        "lpn_recent_tip": "Open {file} again, without looking for it.",
+        "lpn_recent_denied": "Permission to open that file was not given, so it was not opened.",
+        "lpn_recent_gone": "Could not open {file}. It may have been moved, renamed, or deleted, so it was taken off the recent list.",
+        "lpn_settings_computation": "Computation",
         "lpn_settings_engine_epanet": "Solve with the EPANET engine",
         "lpn_settings_engine_epanet_tip": "Runs the original EPANET engine from the US EPA, here in your browser. The built-in solver gives the same answers and is faster, so leave this off unless you need EPANET itself.",
         "lpn_engine_loading": "Loading the EPANET engine…",
@@ -301,6 +329,230 @@
         "lpn_engine_manning_note": "Note: with Manning roughness, EPANET computes head loss about 0.6% lower than the built-in solver."
     },
     "key_context": {
+        "lpn_v2_restore_prompt": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_reset_all_tip",
+                    "value": "Her projeyi, her arka plan görüntüsünü, her ayarı ve birim seçimlerinizi siler, ardından sayfayı ilk kez ziyaret eden birinin gördüğü haliyle yeniden yükler. Her şeyi temizleyen tek sıfırlama budur.",
+                    "english": "Deletes every project, every background image, every setting, and your unit choices, then reloads the page exactly as a first-time visitor sees it. This is the only reset that clears everything."
+                },
+                "next_translated": {
+                    "key": "lpn_storage_too_new",
+                    "value": "Bu proje, sayfanın daha yeni bir sürümüyle kaydedilmiş, bu yüzden burada açılamaz.",
+                    "english": "This project was saved by a newer version of the page, so it cannot be opened here."
+                }
+            }
+        },
+        "lpn_v2_restore_yes": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_reset_all_tip",
+                    "value": "Her projeyi, her arka plan görüntüsünü, her ayarı ve birim seçimlerinizi siler, ardından sayfayı ilk kez ziyaret eden birinin gördüğü haliyle yeniden yükler. Her şeyi temizleyen tek sıfırlama budur.",
+                    "english": "Deletes every project, every background image, every setting, and your unit choices, then reloads the page exactly as a first-time visitor sees it. This is the only reset that clears everything."
+                },
+                "next_translated": {
+                    "key": "lpn_storage_too_new",
+                    "value": "Bu proje, sayfanın daha yeni bir sürümüyle kaydedilmiş, bu yüzden burada açılamaz.",
+                    "english": "This project was saved by a newer version of the page, so it cannot be opened here."
+                }
+            }
+        },
+        "lpn_v2_restore_never": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_reset_all_tip",
+                    "value": "Her projeyi, her arka plan görüntüsünü, her ayarı ve birim seçimlerinizi siler, ardından sayfayı ilk kez ziyaret eden birinin gördüğü haliyle yeniden yükler. Her şeyi temizleyen tek sıfırlama budur.",
+                    "english": "Deletes every project, every background image, every setting, and your unit choices, then reloads the page exactly as a first-time visitor sees it. This is the only reset that clears everything."
+                },
+                "next_translated": {
+                    "key": "lpn_storage_too_new",
+                    "value": "Bu proje, sayfanın daha yeni bir sürümüyle kaydedilmiş, bu yüzden burada açılamaz.",
+                    "english": "This project was saved by a newer version of the page, so it cannot be opened here."
+                }
+            }
+        },
+        "lpn_v2_restore_no": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_reset_all_tip",
+                    "value": "Her projeyi, her arka plan görüntüsünü, her ayarı ve birim seçimlerinizi siler, ardından sayfayı ilk kez ziyaret eden birinin gördüğü haliyle yeniden yükler. Her şeyi temizleyen tek sıfırlama budur.",
+                    "english": "Deletes every project, every background image, every setting, and your unit choices, then reloads the page exactly as a first-time visitor sees it. This is the only reset that clears everything."
+                },
+                "next_translated": {
+                    "key": "lpn_storage_too_new",
+                    "value": "Bu proje, sayfanın daha yeni bir sürümüyle kaydedilmiş, bu yüzden burada açılamaz.",
+                    "english": "This project was saved by a newer version of the page, so it cannot be opened here."
+                }
+            }
+        },
+        "lpn_new_blank_us": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_new",
+                    "value": "Yeni proje…",
+                    "english": "New project…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_open",
+                    "value": "Aç…",
+                    "english": "Open…"
+                }
+            }
+        },
+        "lpn_new_blank_si": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_new",
+                    "value": "Yeni proje…",
+                    "english": "New project…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_open",
+                    "value": "Aç…",
+                    "english": "Open…"
+                }
+            }
+        },
+        "lpn_new_from_examples": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_new",
+                    "value": "Yeni proje…",
+                    "english": "New project…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_open",
+                    "value": "Aç…",
+                    "english": "Open…"
+                }
+            }
+        },
+        "lpn_new_example_us": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_new",
+                    "value": "Yeni proje…",
+                    "english": "New project…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_open",
+                    "value": "Aç…",
+                    "english": "Open…"
+                }
+            }
+        },
+        "lpn_new_example_si": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_new",
+                    "value": "Yeni proje…",
+                    "english": "New project…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_open",
+                    "value": "Aç…",
+                    "english": "Open…"
+                }
+            }
+        },
+        "lpn_file_recent": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_close",
+                    "value": "Kapat",
+                    "english": "Close"
+                },
+                "next_translated": {
+                    "key": "lpn_tab_new",
+                    "value": "Yeni proje",
+                    "english": "New project"
+                }
+            }
+        },
+        "lpn_recent_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_close",
+                    "value": "Kapat",
+                    "english": "Close"
+                },
+                "next_translated": {
+                    "key": "lpn_tab_new",
+                    "value": "Yeni proje",
+                    "english": "New project"
+                }
+            }
+        },
+        "lpn_recent_denied": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_close",
+                    "value": "Kapat",
+                    "english": "Close"
+                },
+                "next_translated": {
+                    "key": "lpn_tab_new",
+                    "value": "Yeni proje",
+                    "english": "New project"
+                }
+            }
+        },
+        "lpn_recent_gone": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_close",
+                    "value": "Kapat",
+                    "english": "Close"
+                },
+                "next_translated": {
+                    "key": "lpn_tab_new",
+                    "value": "Yeni proje",
+                    "english": "New project"
+                }
+            }
+        },
+        "lpn_settings_computation": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Emiter üssü",
+                    "english": "Emitter exponent"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_tolerance",
+                    "value": "Yakınsama toleransı",
+                    "english": "Convergence tolerance"
+                }
+            }
+        },
         "lpn_settings_engine_epanet": {
             "reason": "missing",
             "current_value": null,

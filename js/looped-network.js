@@ -2400,6 +2400,7 @@ var EngCalcs = EngCalcs || {};
 		setStatus('');
 		setMode('select');
 		refreshMapStatus();   // units belong to the project now, so switching projects can change this
+		refreshPageTitle();   // ...and so can the tab title (Task 265), for the same reason
 		zoomExtent();
 		scheduleSolve();
 		renderTabs();
@@ -5203,6 +5204,11 @@ var EngCalcs = EngCalcs || {};
 		updateEmptyHint();
 		updateModeHint(); // initial mode is 'select', set before setMode() ever runs -- render it now
 		renderTabs();
+		// On the boot path explicitly (Task 265). The two calls next to refreshMapStatus() cover a
+		// project switch and a unit switch; neither fires on a plain page load, and loadFromStorage()
+		// has already restored the open project's own units by here, so this is the first moment the
+		// answer is knowable and the last moment it is still missing.
+		refreshPageTitle();
 		// **The banner has to be painted on the BOOT path too** (fixed 2026-08-05, found by Tom: "It
 		// doesn't say anything. When? Where would it say this?"). refreshAllFromDocument() ends with
 		// this call, but it is shared by openProject() and newProject() only -- boot never ran it. So
@@ -6068,6 +6074,61 @@ var EngCalcs = EngCalcs || {};
 			(pc.lpn_units_pressure || 'Pressure') + ': ' + unitLabel('lpn_u_pressure'),
 			(pc.bpn_method || 'Friction method') + ': ' + frictionMethodLabel()
 		].join(' | ');
+	}
+	// ---- The browser-tab title says which unit system this project is in (ROADMAP Task 265) ----
+	//
+	// Tom, 2026-08-10, gave the three parts exactly: "HawsEDC Calculators" / "Looped Pipe Network
+	// (Map Interface)" / "{units_set} Units". The tab is where you tell one open project from
+	// another when the page is not in front of you, and this page is the ONLY calculator in the
+	// suite where a bare number is meaningless without its unit system (CLAUDE.md: "imagine opening
+	// a 400 diameter pipe into an inch browser"). The map status strip already says it on screen;
+	// this says it on the tab, where a second window of the same page is the case that needs it.
+	//
+	// DERIVED, never stored. `serializeProject().units` records the seven selections, not a preset
+	// name, and that is right -- the selections are the truth and a stored "us" could disagree with
+	// them. So this asks the honest question of the live strip: does every select match one preset?
+	// That also makes the readout correct for a v2 document written before units were stored at all,
+	// and for the user who deliberately mixes (inches with l/s), who gets "Mixed Units" rather than
+	// a confident lie. "Created for" and "currently in" are the same thing until somebody changes a
+	// select, and when they do, the second answer is the one worth showing.
+	function unitSetName() {
+		var sets = EngCalcs.unitSets || {}, names = ['us', 'si'], i, s, ok, j, sel, fam;
+		for (i = 0; i < names.length; i++) {
+			s = sets[names[i]];
+			if (!s) { continue; }
+			ok = true;
+			for (j = 0; j < LPN_UNIT_SELECTS.length; j++) {
+				sel = unitEl(LPN_UNIT_SELECTS[j]);
+				if (!sel) { continue; }
+				fam = sel.dataset.family;
+				// A select with no declared family cannot be judged against a preset, and CLAUDE.md
+				// says it is invisible to the preset buttons too -- so it is skipped here for the
+				// same reason, rather than being allowed to force a "Mixed" verdict on its own.
+				if (!fam || !s[fam]) { continue; }
+				if (unitKey(LPN_UNIT_SELECTS[j]) !== s[fam]) { ok = false; break; }
+			}
+			if (ok) { return names[i]; }
+		}
+		return null;
+	}
+	// The server-rendered <title> is left alone (it is the SEO title, and it is what a crawler that
+	// does not run scripts sees). This replaces it in the live page only, once the project's units
+	// are known -- which is client-side by definition, so there is no server route to the same
+	// answer. The ?name= prefix echoHTMLHead() puts in front of the title is read back off the URL
+	// rather than re-plumbed through pageConfig: same value, same trim, and no user-supplied string
+	// travelling through a <script> block to get here.
+	function refreshPageTitle() {
+		var pc = EngCalcs.pageConfig || {}, set = unitSetName(), parts = [], name = '';
+		try { name = (new URLSearchParams(window.location.search).get('name') || '').trim(); }
+		catch (err) { name = ''; }
+		if (name) { parts.push(name); }
+		parts.push(pc.menu_brand || 'HawsEDC Calculators');
+		parts.push(pc.lpn_main_menu || 'Looped Pipe Network (Map Interface)');
+		parts.push(set
+			? (pc.lpn_title_units || '{units} Units').replace('{units}',
+				set === 'us' ? (pc.calc_units_us || 'US') : (pc.calc_units_si || 'SI'))
+			: (pc.lpn_title_units_mixed || 'Mixed Units'));
+		document.title = parts.join(' — ');
 	}
 	// Suite-wide convention (CLAUDE.md's Unit Sets section): a default is Array('us'=>x,'si'=>y),
 	// not one SI number that happens to convert to something ugly in the other system (Tom,
@@ -7778,6 +7839,7 @@ var EngCalcs = EngCalcs || {};
 		recomputeAllPumpCurves();
 		scheduleSolve();
 		refreshMapStatus();   // a unit switch is exactly when this readout has to be right
+		refreshPageTitle();   // and exactly when the tab has to stop naming the old system
 		// The project's units are part of the project (serializeProject), so a switch is a change to
 		// persist -- otherwise closing the tab would lose which units the numbers are in.
 		saveToStorage();

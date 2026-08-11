@@ -1077,23 +1077,14 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     checkable; just do not spend the blog/video headline on it.** Do not relitigate.
   - Consequence: raised 146.06 to 90 and 220 to 95.
 
-- 75|270| **Audit lpn against Tom's own New User guide, and report the mismatches.** Tom, 2026-08-10:
-  *"I need you to very carefully ensure that there is not more about our system that I
-  misunderstood."* Source of truth is the "New User" section of
-  <https://tomsthird.blogspot.com/2026/08/hawsedc-free-unlimited-online-looped.html>. The deliverable
-  is a REPORT of mismatches, not a pile of fixes — some will be the post to change, some the app.
-  - Already found while logging this: **"Use File, Save to create a local settings template file"
-    holds in Chromium only.** `saveCurrent()` routes an unsaved project to Save As there, but where
-    the File System Access API is missing the Save row is *disabled*, so a Firefox or Safari reader
-    following the guide finds a greyed-out command. Either the post says "Save as", or Save stops
-    being disabled and routes.
-  - Verified as written, no action: double-click sends a dragged label home; double-click adds and
-    removes pipe vertices; Labels is on both the toolbar and View; Settings holds Map appearance and
-    label size; the solve updates as you work; the EPANET engine toggle exists.
-  - **"Use File, Open to open an example project" has a better route since Task 264** — File > New
-    project > From examples. The post's download-and-open path still works.
-  - Note for the audit: the guide's template-project flow is now the DESIGNED mechanism, not a
-    workaround — see CLAUDE.md, "there are no browser units, only project units".
+- 60|272| **File, Save is disabled outside Chromium with no way out of that row.** A disabled row
+  fires no events, so it can carry no tip; `saveCurrent()` would route to Save as but is unreachable.
+  Optional — Task 270's recommendation is that the blog post says "Save as" instead. From Task 270.
+
+- 55|273| **The tab strip's `+` button starts a project with accidental units.** `renderTabs()` binds
+  it to `newProject()` directly, bypassing the New project chooser, so the new project inherits
+  whichever units were on the strip — the exact accident Task 264 removed from File > New. From
+  Task 270.
 
 - 60|271| **Give `lpn_` a friction-method choice: HW, DW, Manning.** Tom, 2026-08-10. `bpn_` has
   one; `lpn_` hardcodes `hw`. `assembleModel()` and the map readout already read `frictionMethod()`
@@ -1109,10 +1100,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     split shipped 2026-08-10, which was right for units alone. `openDialog()` is the pattern.
   - **Examples carry a method implicitly**: their roughness is HW C = 130, nonsense under Manning.
     Fix them to HW, or give each one a method.
-
-- 55|265| **The lpn page title must disclose which unit system the project was created for.** Tom,
-  2026-08-10: `"HawsEDC Calculators" / "Looped Pipe Network (Map Interface)" / "{units_set} Units"`.
-  The unit-set strings already exist. Depends on Task 264 deciding what "created for" means.
 
 - 35|266| **Multi-select (lasso) plus edit-all-selected, as EPANET has.** Tom, 2026-08-10: *"very nice
   for bigger models."* Today's selection model is single-element — `openEditMenu()` already says so
@@ -1756,6 +1743,30 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|270| **[DONE 2026-08-10] Audited lpn against Tom's three blog checklists.** Report:
+  `dev/lpn-new-user-guide-audit.md`. All three were audited, not only New User — the New Shopper
+  list is where most of the drift is.
+  - **App is wrong in 2 places**, both now filed: Save disabled outside Chromium (Task 272) and the
+    `+` tab button's accidental units (Task 273). A third, the unsettable friction method, is
+    Task 271 and is the largest hole in "set everything to your preferences".
+  - **Post is wrong in 7 places**, the load-bearing ones being: the backdrop command is **Position**,
+    not Move (twice); **Delete is a mode**, not a one-shot; **Ctrl+Z** is unmentioned.
+  - **Undo depth, which the post left as "???": 20**, in memory only, cleared on project switch, and
+    a drag is not a snapshot.
+
+- 0|265| **[DONE 2026-08-10] The lpn browser tab names the project's unit system.**
+  `HawsEDC Calculators — Looped Pipe Network (Map Interface) — US Units`, via `refreshPageTitle()`
+  beside `refreshMapStatus()`'s two call sites plus the boot path. A `?name=` prefix still leads.
+  - **DERIVED from the live strip, not stored.** `serializeProject().units` records the seven
+    selections, not a preset name; a stored `"us"` could disagree with them. A hand-mixed strip says
+    **Mixed Units** rather than naming a preset it does not match.
+  - Two new en keys, translated in the core four: `lpn_title_units` (`{units}` placeholder, so a
+    language picks its own word order instead of having "US" + "Units" concatenated for it) and
+    `lpn_title_units_mixed`. The server `<title>` is untouched — it is the SEO title.
+  - 10 assertions in `dev/lpn-spike/example-network-harness.js`, mutation-tested (6 mutations, all
+    caught). The harness's unit-select stub gained `data-family` and the real preset table; without
+    them `unitSetName()` skipped every select and reported "us" vacuously.
 
 - 0|263| **[DONE 2026-08-10] Inputs are stored as declared; nothing converts them on a unit change.**
   `lpn_` stored SI and displayed the conversion, so switching a unit silently rewrote every number
