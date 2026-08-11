@@ -1990,16 +1990,18 @@ var EngCalcs = EngCalcs || {};
 	// routine here is written against -- so the sign flips at the storage boundary, in exactly two
 	// functions: serializeProject() on the way out and applySaved() on the way in.
 	//
-	// "WITHOUT CAUSING TROUBLE" IS WHY THIS IS VERSION-GATED RATHER THAN MIGRATED. A document
-	// written at v2 or v3 holds Y-down, is read without a flip, and -- because serializeProject()
-	// writes `openDocVersion`, not the constant -- is written back without one too. It keeps working
-	// forever and never mirrors. Nothing has to be converted, which is what Tom asked for ("let's
-	// not worry about doing anything with existing projects").
+	// A v3 document is MIGRATED on open, like every other version step in migrateSaved(): converted
+	// and stamped. "Let's not worry about doing anything with existing projects" (Tom) is satisfied
+	// by the conversion being invisible and automatic, not by leaving old files behind -- the first
+	// cut did leave them behind, and Tom caught it ("We always upgrade the file to the current
+	// format. Right?").
 	//
-	// A v2 document that answers the UNITS question gets this for free: stampDocAnswered() moves it
-	// to LPN_STORAGE_VERSION, and from that save on it is Cartesian. That is why the two questions
-	// can share one version number after all -- the coordinate change needs no separate answer, so
-	// it can ride on any bump rather than needing one of its own.
+	// V2 IS THE ONE VERSION THAT LAGS, and only because the units question it carries is the user's
+	// to answer. It keeps Y-down storage, correctly, since the read and write gates below key off the
+	// same number -- and it picks up Cartesian for free the moment the units question is answered,
+	// because stampDocAnswered() moves it to LPN_STORAGE_VERSION. That is why the two questions can
+	// share one version number after all: the coordinate change needs no answer from anybody, so it
+	// rides on a bump rather than needing one of its own.
 	var LPN_CARTESIAN_VERSION = 4;
 	// The six Y-bearing fields, and no others. Offsets (`ly`, a Text label's `y`, `backdrop.ty`) are
 	// VECTORS and negate exactly like positions do -- a vector in a flipped frame flips with it.
@@ -2206,13 +2208,26 @@ var EngCalcs = EngCalcs || {};
 			(saved.links || []).forEach(function (l) { renameOverridable(l, LPN_OVERRIDABLE.link); });
 			saved.v = 2;
 		}
-		// **There is deliberately NO v2 -> v3 step here.** Every other migration in this function
-		// converts the document and stamps it; this one cannot, because the conversion is the USER'S
-		// to authorise. So the document stays at v2 until they answer, and the missing stamp IS the
-		// pending question. An earlier cut stamped v3 on sight and carried a separate
-		// `unitsUnconfirmed` flag beside it; Tom removed the flag by asking why the version alone was
-		// not enough (2026-08-10). It is, and serializeProject() writes `openDocVersion` so a v2
-		// document saves back as v2.
+		// v3 -> v4: coordinates become Cartesian. A NORMAL migration -- convert and stamp -- because
+		// it asks the user nothing (Tom, 2026-08-11: "We always upgrade the file to the current
+		// format. Right?" Right, and the first cut of this wrongly left v3 documents at v3 forever,
+		// relying on serializeProject() writing openDocVersion. That turned the ONE documented
+		// exception below into two, the second undocumented and for no reason at all).
+		if (saved.v === 3) {
+			flipStoredY(saved);
+			saved.v = 4;
+		}
+		// **There is deliberately NO v2 -> v3 step here, and v2 is the ONLY version that lags.**
+		// Every other migration in this function converts the document and stamps it; this one
+		// cannot, because the conversion is the USER'S to authorise. So the document stays at v2
+		// until they answer, and the missing stamp IS the pending question. An earlier cut stamped v3
+		// on sight and carried a separate `unitsUnconfirmed` flag beside it; Tom removed the flag by
+		// asking why the version alone was not enough (2026-08-10). It is, and serializeProject()
+		// writes `openDocVersion` so a v2 document saves back as v2.
+		// A v2 document therefore keeps Y-down storage too -- correctly, since applySaved() and
+		// serializeProject() both gate on the same version -- and picks up Cartesian for free the
+		// moment the units question is answered, because stampDocAnswered() moves it to
+		// LPN_STORAGE_VERSION.
 		return saved;
 	}
 	// Version-checks one already-parsed document and runs it up to the current version. Returns null

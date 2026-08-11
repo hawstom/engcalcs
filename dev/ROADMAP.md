@@ -1831,23 +1831,25 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     node `y`/`ly`, vertex `y`, link `ly`, label `y`, `backdrop.ty`. The backdrop's own `y`/`height`
     are NOT flipped; it is anchored top-left, and "extends downward on screen" reads the same in
     both frames.
-  - **VERSION-GATED, NOT MIGRATED, and that is what made it free.** A v2/v3 document is read
-    without a flip and — because `serializeProject()` writes `openDocVersion`, not the constant —
-    written back without one. It keeps working forever and never mirrors, so nothing is converted
-    ("let's not worry about doing anything with existing projects"). It also dissolves the reason
-    this was deferred: the coordinate change needs no answer from the user, so it rides on any bump
-    rather than needing a version of its own, and a v2 document that answers the UNITS question
-    becomes Cartesian for free via `stampDocAnswered()`.
+  - **v3 is MIGRATED on open — converted and stamped, like every other step in `migrateSaved()`.**
+    The first cut left v3 documents at v3 forever, leaning on `serializeProject()` writing
+    `openDocVersion`; Tom caught it (*"We always upgrade the file to the current format. Right?"*).
+    It had turned the one documented exception into two, the second undocumented and pointless.
+  - **v2 is the ONLY version that lags**, because the units question it carries is the user's to
+    answer. It keeps Y-down storage — correctly, since the read and write gates key off the same
+    number — and becomes Cartesian for free the moment the units question is answered, via
+    `stampDocAnswered()`. That is why the two questions can share one version after all: the
+    coordinate change needs no answer from anybody, so it rides on a bump instead of needing one.
   - **`serializeProject()` clones before flipping.** It builds its object from live references to
     `doc.nodes/links/labels`, so flipping in place turns the map upside down on every autosave.
   - **The example is re-anchored** (Tom: *"Center is now at 5000,-5000. Should be at 5000,5000."*)
     by a pure translation of −10000 applied after it is built, so every clearance and stacking
     number reasoned about in `drawExampleNetwork()` still holds as written and the drawing on screen
     is unchanged. Offsets are vectors and are deliberately not translated.
-  - 12 assertions. The user-boundary ones are stated as a DIRECTION ("higher on screen reports a
+  - 16 assertions. The user-boundary ones are stated as a DIRECTION ("higher on screen reports a
     larger Y") rather than a sign — `y === -n.y` would restate the implementation and would pass a
-    version that flipped display AND entry. Mutation-tested, 12 mutations, all caught, including
-    entry-not-flipped, no-clone-on-save, and gate-removed.
+    version that flipped display AND entry. Mutation-tested, 15 mutations, all caught, including
+    entry-not-flipped, no-clone-on-save, v3-left-behind, and v2-swept-up.
 
 - 0|277| **[DONE 2026-08-10] Moving something is undoable.** No drag handler snapshotted, so Undo
   after a drag reverted the last DISCRETE act and left the drag standing — it took back something

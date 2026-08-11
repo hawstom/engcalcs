@@ -1290,23 +1290,40 @@ console.log('\n--- Settings panel stays in sync ---');
       probe.backdrop.y === 0 && probe.backdrop.height === 100);
   }
 
-  // THE GATE. An older document holds Y-down, must be read without a flip, and -- because
-  // serializeProject() writes openDocVersion rather than the constant -- written back without one.
-  // That is the whole reason nothing has to be converted.
+  // A v3 DOCUMENT IS UPGRADED ON OPEN, like every other version step in migrateSaved(). Tom,
+  // 2026-08-11: "We always upgrade the file to the current format. Right?" -- right, and the first
+  // cut of this wrongly left v3 files at v3 forever on the strength of serializeProject() writing
+  // openDocVersion. That made a second, undocumented exception out of what should have been one.
   {
     L.reset();
     L.drawExample('us');
     L.setDocVersion(3);
-    const older = L.serializeProject();
-    const olderNode = older.nodes.find(n => n.type === 'junction');
-    const live = L.getDoc().nodes.find(n => n.id === olderNode.id);
-    ok('a pre-v4 project is written Y-down, exactly as it always was',
-      older.v === 3 && olderNode.y === live.y, 'v' + older.v + ', y ' + olderNode.y.toFixed(1));
-    const copy = JSON.parse(JSON.stringify(older));
-    L.applySaved(copy);
-    ok('...and reading one back does not mirror it',
-      L.getDoc().nodes.find(n => n.id === olderNode.id).y === live.y,
-      L.getDoc().nodes.find(n => n.id === olderNode.id).y.toFixed(1));
+    const v3file = L.serializeProject();               // written Y-down, as a real v3 file is
+    const j = v3file.nodes.find(n => n.type === 'junction');
+    const liveY = L.getDoc().nodes.find(n => n.id === j.id).y;
+    ok('a v3 file is stored Y-down, as it always was', v3file.v === 3 && j.y === liveY,
+      'v' + v3file.v + ', y ' + j.y.toFixed(1));
+
+    const opened = L.migrateSaved(JSON.parse(JSON.stringify(v3file)));
+    ok('...and opening it upgrades it to the current version', opened.v === L.storageVersion(),
+      'v3 -> v' + opened.v);
+    ok('...converting its coordinates on the way, not leaving them behind',
+      opened.nodes.find(n => n.id === j.id).y === -j.y,
+      j.y.toFixed(1) + ' -> ' + opened.nodes.find(n => n.id === j.id).y.toFixed(1));
+    L.applySaved(opened);
+    ok('...so the drawing comes back exactly where it was, not mirrored',
+      L.getDoc().nodes.find(n => n.id === j.id).y === liveY,
+      L.getDoc().nodes.find(n => n.id === j.id).y.toFixed(1));
+  }
+
+  // V2 IS THE ONE VERSION THAT LAGS, and only because the units question is the user's to answer.
+  // It must NOT be swept up by the coordinate upgrade, or answering that question silently answers
+  // the other one too.
+  {
+    const v2 = { v: 2, nodes: [{ id: 'J1', x: 1, y: 10 }], links: [], labels: [] };
+    const out = L.migrateSaved(JSON.parse(JSON.stringify(v2)));
+    ok('a v2 document stays at v2, coordinates untouched',
+      out.v === 2 && out.nodes[0].y === 10, 'v' + out.v + ', y ' + out.nodes[0].y);
   }
 }
 
