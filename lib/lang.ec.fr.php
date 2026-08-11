@@ -624,7 +624,7 @@ $ec_lang['lpn_field_head']='Charge';
 // avoid list guards against.
 $ec_lang['lpn_field_head_tip']='Niveau de la surface libre dans le réservoir, exprimé comme une hauteur, pas comme une pression. Laissez ce champ vide pour placer la surface libre à la cote du réservoir.';
 $ec_lang['lpn_close']='Fermer';
-$ec_lang['lpn_empty_hint']='Pour commencer, utilisez la barre d\'outils pour ajouter une image de fond ou un réservoir, ou pour dessiner un réseau d\'exemple.';
+$ec_lang['lpn_empty_hint']='Pour commencer, utilisez la barre d\'outils pour ajouter une image de fond ou un réservoir, ou pour démarrer un Nouveau projet à partir d\'un exemple.';
 $ec_lang['lpn_tool_undo']='Annuler';
 $ec_lang['lpn_confirm_example']='Ceci ajoute l\'exemple au réseau que vous avez déjà. Continuer ?';
 $ec_lang['lpn_field_diameter']='Diamètre';
@@ -701,7 +701,7 @@ $ec_lang['lpn_project_numbered']='Projet{n}';
 $ec_lang['lpn_project_copy_suffix']='(copie)';
 $ec_lang['lpn_project_rename']='Renommer';
 // The File menu. "New" is the same act as the + tab, deliberately: one function, two doors.
-$ec_lang['lpn_file_new']='Nouveau projet';
+$ec_lang['lpn_file_new']='Nouveau projet…';
 // File > New project's submenu (Task 264). `lpn_tool_example` ("Draw example network") was RETIRED
 // with the toolbar button of that name -- an example is a whole network, so it starts a project
 // rather than being drawn into the one you are in.

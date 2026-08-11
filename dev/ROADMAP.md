@@ -1786,6 +1786,20 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     network?") and his own second thought replaced it: the choice IS the menu row, so a dialog would
     ask a question the user just answered. The flow unit is in the label for the same reason.
   - `lpn_tool_example` retired from en/es/fr/pt/tr.
+  - **Reworked as a real FLY-OUT** (Tom, 2026-08-10: *"the universal convention is for that to be a
+    fly-out submenu of New rather than a visually disconnected replacement"*). Second popup
+    (`#lpn_menu_popup2`), opens on click or hover, parent stays on screen, ▸ marker on the row,
+    flips left when there is no room right. The row is labelled `New project…` — it opens a chooser.
+    The toolbar button keeps a plain pull-down: no parent row to branch from.
+  - **A new project no longer wears an asterisk** (*"New blank projects and from template appear with
+    asterisk, which is bad. But a blank project with asterisk closes without confirmation, which is
+    bad."*). Both halves were one defect. `stampProjectSaved()` records a baseline at birth, so
+    `dirty` starts false and the mark is earned at the first edit. **The `exported` flag is retired**
+    (it had one reader), and `closeTab()`'s `projectIsEmpty` special case is gone — it existed only
+    to paper over a mark that should never have been there, so THE ASTERISK DECIDES is literally
+    true again. Consequence: a project you drew and then emptied now asks before closing.
+  - `lpn_empty_hint` still said "draw an example network", a retired feature. Now ends *"…or to
+    start a New project from examples."* — en/es/fr/pt/tr.
   - **Shipped broken and fixed the same day** (Tom: *"264 is broken. File New has no options. And it
     does nothing."*). Neither the submenu row nor the new toolbar button called `stopPropagation()`,
     so the click carried on to the document dismissal in `wireTabs()` — which by then could not find

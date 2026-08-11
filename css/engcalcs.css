@@ -332,6 +332,10 @@ html[lang="zh"] .ec-welcome {
 /* Group label above the recent-file rows (Task 258). Indented to the icon column so it reads as a
    heading over those rows rather than as a row of its own that failed to get a glyph. */
 .lpn-menu-heading { padding: 4px 12px 1px 8px; font-size: 0.8em; color: #666; white-space: nowrap; }
+/* "There is more this way" on a row that opens a fly-out (Task 264). Pushed to the trailing edge so
+   the arrow lines up down the menu regardless of label length; margin-inline-start, not left,
+   because in the five RTL languages the fly-out opens on the other side. */
+.lpn-menu-arrow { margin-inline-start: 1.5em; float: inline-end; color: #666; }
 /* Reserved icon column for menu rows (Task 231). Fixed width and always present, even when the
    row has no icon, so one iconless row cannot ragged-edge the labels around it. */
 .lpn-menu-icon { display: inline-block; width: 1.6em; text-align: center; }

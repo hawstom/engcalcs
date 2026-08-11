@@ -182,6 +182,15 @@ echoHeader("EngCalcs", $html_title, "");
 <div id="lpn_menu_popup" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:20;background:#fff;border:1px solid #333;padding:4px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
 	<div id="lpn_menu_list"></div>
 </div>
+<?php // The SUBMENU layer (Task 264 rework, Tom 2026-08-10: "the universal convention is for that to
+      // be a fly-out submenu of New rather than a visually disconnected replacement"). A second
+      // element rather than a second use of the first, because a fly-out's whole point is that the
+      // PARENT STAYS ON SCREEN -- replacing the list in one popup is what made New read as a menu
+      // that had been navigated away from. z-index one above its parent so it paints over it where
+      // the clamp has to overlap them on a narrow window. ?>
+<div id="lpn_menu_popup2" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:21;background:#fff;border:1px solid #333;padding:4px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
+	<div id="lpn_menu_list2"></div>
+</div>
 <?php // ONE dialog, reused for every question that has to be answered before anything else happens:
       // the close prompt, the read-only choice when somebody else has the file, and the first-run
       // file training panel. Deliberately NOT window.confirm(): showSaveFilePicker() needs a live

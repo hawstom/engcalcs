@@ -1124,7 +1124,7 @@ $ec_lang['lpn_field_head']='Head';
 // avoid list guards against.
 $ec_lang['lpn_field_head_tip']='Water surface level in the reservoir, measured as a height, not as a pressure. Leave it blank to put the water surface at the reservoir elevation.';
 $ec_lang['lpn_close']='Close';
-$ec_lang['lpn_empty_hint']='To start, use the toolbar to add a background image or a reservoir, or to draw an example network.';
+$ec_lang['lpn_empty_hint']='To start, use the toolbar to add a background image or a reservoir, or to start a New project from examples.';
 $ec_lang['lpn_tool_undo']='Undo';
 $ec_lang['lpn_confirm_example']='This adds the example to the network you already have. Continue?';
 $ec_lang['lpn_field_diameter']='Diameter';
@@ -1202,7 +1202,7 @@ $ec_lang['lpn_project_numbered']='Project{n}';
 $ec_lang['lpn_project_copy_suffix']='(copy)';
 $ec_lang['lpn_project_rename']='Rename';
 // The File menu. "New" is the same act as the + tab, deliberately: one function, two doors.
-$ec_lang['lpn_file_new']='New project';
+$ec_lang['lpn_file_new']='New project…';
 // File > New project's submenu (Task 264). `lpn_tool_example` ("Draw example network") was RETIRED
 // with the toolbar button of that name -- an example is a whole network, so it starts a project
 // rather than being drawn into the one you are in.

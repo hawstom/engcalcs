@@ -2558,7 +2558,22 @@ var EngCalcs = EngCalcs || {};
 		clearUndo();
 		saveToStorage();
 		refreshAllFromDocument();
+		// AFTER the refresh, not before: refreshAllFromDocument() schedules a solve, and that solve
+		// calls saveToStorage(), which recomputes `dirty` against the baseline. Stamping first would
+		// be undone by a network that has not changed. Same ordering landOpenedFile() uses.
+		stampProjectSaved(id);
 		return id;
+	}
+	// "As of right now, this project has no unsaved work." The baseline `dirty` is measured against.
+	// A project with no baseline is dirty forever, which is what made a brand-new tab wear an
+	// asterisk (Task 264 follow-up, Tom 2026-08-10).
+	function stampProjectSaved(id) {
+		var e = indexEntry(id || library.openId);
+		if (!e) { return; }
+		e.savedSig = docSignature();
+		e.dirty = false;
+		saveIndex();
+		renderTabs();
 	}
 	// "Save as new project" -- Task 184's project-level copy, and the conventional reading of the
 	// words (Tom, 2026-07-31: "New project" sounds like this, not like starting empty). Duplicates
@@ -2633,18 +2648,9 @@ var EngCalcs = EngCalcs || {};
 		document.body.removeChild(a);
 		// Deferred: revoking synchronously can beat the download off the mark in some browsers.
 		setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
-		// The download IS this browser's save, so record it as one: `savedSig` is what saveToStorage()
-		// measures `dirty` against, and `exported` is what tells tabAsterisk() this project has a copy
-		// somewhere at all. Without these the asterisk could never go out in Firefox, whatever the
-		// user did (punch-list finding 13).
-		var dlEntry = indexEntry(library.openId);
-		if (dlEntry) {
-			dlEntry.savedSig = docSignature();
-			dlEntry.dirty = false;
-			dlEntry.exported = true;
-			saveIndex();
-			renderTabs();
-		}
+		// The download IS this browser's save, so record it as one. Without the baseline the asterisk
+		// could never go out in Firefox, whatever the user did (punch-list finding 13).
+		stampProjectSaved(library.openId);
 		// Said every time, because it is the answer to the question this path always provokes:
 		// "why did I get a second copy?" (Tom, 2026-08-03). The menu no longer carries that caveat
 		// in its label, so this is where the fact lives.
@@ -2702,23 +2708,14 @@ var EngCalcs = EngCalcs || {};
 			if (!saved) { return; }
 			var upId = importProject(saved);
 			// **An uploaded project arrives SAVED, not modified** (Tom, 2026-08-10: "when you open a
-			// file, it comes in immediately modified/asterisked. Fix that."). It is the same
-			// bookkeeping the download path already does, and for the same reason: `exported` means
-			// "a copy of this exists on disk somewhere", and a file the user just handed us off
-			// their own disk is the strongest possible case of that. Without it the faint star was
-			// permanently on from the moment of opening, so it could never say anything -- the exact
-			// defect punch-list finding 13 fixed on the download side and this side missed.
+			// file, it comes in immediately modified/asterisked. Fix that."). The same baseline the
+			// download path records, for the same reason: a file the user just handed us off their
+			// own disk is not unsaved work.
 			//
 			// It stays a BROWSER project and the star still comes back on the first edit (faint,
 			// because this browser genuinely cannot write back to that file). What changed is only
 			// that "unsaved" now starts false, which is the truth.
-			var upEntry = upId ? indexEntry(upId) : null;
-			if (upEntry) {
-				upEntry.savedSig = docSignature();
-				upEntry.dirty = false;
-				upEntry.exported = true;
-				saveIndex();
-			}
+			if (upId) { stampProjectSaved(upId); }
 			// Every time, not just the first: this is the fact that explains why the tab is named
 			// after the project rather than the file, and why Save cannot go back where this came from.
 			setNotice(pc.lpn_status_uploaded || '');
@@ -4294,24 +4291,32 @@ var EngCalcs = EngCalcs || {};
 	// condition rather than something to go and do. A file project wears a full-strength one only
 	// while it holds changes its file does not.
 	//
-	// Tom corrected the original objection to a permanent asterisk (2026-08-04) and was right: it does
-	// not stop meaning "unsaved" and start meaning "not a file" -- that confuses POWER with MEANING. A
-	// browser project genuinely is unsaved. Only the fade is a guess; if it reads as broken or
-	// disappears on a phone it can go without touching the rule.
 	// A bold asterisk means "changes not in the file"; a faint one means "this lives only in the
 	// browser". They are different facts and both are worth saying.
 	//
-	// **Once a fallback-path project has been exported, the faint star follows its changes too**
-	// (Tom, twice: *"After Save as, there are no unsaved changes. Asterisk should disappear until
-	// there are changes."*). In Firefox and Safari there is no such thing as a connected file, so the
-	// downloaded copy IS the saved state, and a star that can never go out is a star that says
-	// nothing. It stays FAINT rather than turning bold, because the second fact is still true: the
-	// page cannot write back to what it handed you.
+	// **The `exported` flag this rule used to consult is GONE** (2026-08-10). It existed to answer
+	// "does a copy of this project exist on disk at all", which the faint-asterisk-always rule needed
+	// and the baseline rule below does not: every path that produces a copy -- download, upload, file
+	// save -- now records a baseline instead, and `dirty` answers the question on its own. It had one
+	// reader and no other purpose, so keeping it would have left a field nothing consults.
+	// ONE RULE NOW: the asterisk follows `dirty`, and the fade says whether the project lives in a
+	// file or only in this browser. A browser project no longer wears a STANDING asterisk.
+	//
+	// Tom, 2026-08-10: "New blank projects and from template appear with asterisk, which is bad. But
+	// a blank project with asterisk closes without confirmation, which is bad." Both halves of that
+	// are the same defect. The old rule showed the faint asterisk on any browser project that had
+	// never been exported -- so a project created one second ago, containing nothing anybody would
+	// miss, claimed to have unsaved work. closeTab() then had to special-case it back out again
+	// (`projectIsEmpty`) to avoid a pointless prompt, and the mark and the behaviour disagreed in
+	// plain view. The mark was the thing that was wrong.
+	//
+	// What makes this work is that a freshly created project now gets a BASELINE (see
+	// stampProjectSaved(), called by newProject and newProjectFromExample): `savedSig` is recorded
+	// at birth, so `dirty` is false until the user actually changes something. The faint asterisk
+	// then means what the bold one means -- there is work here that is in no file -- and appears at
+	// the first edit, which is the first moment there is anything to lose.
 	function tabAsterisk(entry) {
-		if (!isFileProject(entry)) {
-			return { show: entry && entry.exported ? !!entry.dirty : true, faded: true };
-		}
-		return { show: !!entry.dirty, faded: false };
+		return { show: !!(entry && entry.dirty), faded: !isFileProject(entry) };
 	}
 	function buildTab(p) {
 		var pc = EngCalcs.pageConfig || {}, isOpen = p.id === library.openId;
@@ -4466,12 +4471,27 @@ var EngCalcs = EngCalcs || {};
 		svgEl.insertBefore(b, svgEl.firstChild);
 	}
 
-	function openMenu(anchor, rows) {
-		var popup = document.getElementById('lpn_menu_popup'), list = document.getElementById('lpn_menu_list');
+	// TWO LEVELS (Task 264 rework, Tom 2026-08-10). Level 0 is a pull-down under its menubar or
+	// toolbar button; level 1 is a FLY-OUT beside the row that opened it, with the parent still on
+	// screen. The first cut replaced the parent's contents in the one popup, which is what Tom
+	// rejected: "the universal convention is for that to be a fly-out submenu of New rather than a
+	// visually disconnected replacement." He is right, and the disconnection is also what hid the
+	// dismissal bug -- a menu that legitimately swaps its own contents looks exactly like one that
+	// has been closed.
+	function menuEls(level) {
+		return level
+			? { popup: document.getElementById('lpn_menu_popup2'), list: document.getElementById('lpn_menu_list2') }
+			: { popup: document.getElementById('lpn_menu_popup'), list: document.getElementById('lpn_menu_list') };
+	}
+	function openMenu(anchor, rows, level) {
+		var els = menuEls(level), popup = els.popup, list = els.list;
 		if (!popup || !list) { return; }
-		if (openMenuAnchor === anchor && popup.style.display === 'block') { closeMenu(); return; }
-		openMenuAnchor = anchor;
-		closeViewPopovers();
+		if (!level) {
+			if (openMenuAnchor === anchor && popup.style.display === 'block') { closeMenu(); return; }
+			openMenuAnchor = anchor;
+			closeSubMenu();   // a new pull-down never inherits the previous one's fly-out
+			closeViewPopovers();
+		}
 		list.innerHTML = '';
 		rows.forEach(function (r) {
 			if (r.hidden) { return; }
@@ -4507,32 +4527,57 @@ var EngCalcs = EngCalcs || {};
 			// .ec-help for touch -- the same pattern the toolbar buttons use.
 			if (r.tip) { b.title = r.tip; b.className += ' ec-help'; }
 			b.disabled = !!r.disabled;
-			// The EVENT is handed to the row's action, because a row that opens ANOTHER menu has to
-			// stop this click from reaching the document-level dismissal in wireTabs(). It reaches
-			// there after `list.innerHTML = ''` has already detached the very button that was
-			// clicked, so `popup.contains(e.target)` is false, and the dismissal closes the menu the
-			// row just opened. That is the same trap the menubar buttons avoid by calling
-			// stopPropagation(), and it is why File > New project opened nothing (Tom, 2026-08-10:
-			// "File New has no options. And it does nothing.").
-			b.addEventListener('click', function (e) { closeMenu(); r.fn(e); });
+			if (r.submenu) {
+				// The universal marker for "there is more this way". Directional, so it wants a
+				// mirrored glyph in the five RTL languages -- the same outstanding caveat the
+				// Settings accordion's arrows already carry.
+				var arrow = document.createElement('span');
+				arrow.className = 'lpn-menu-arrow';
+				arrow.textContent = '▸';
+				b.appendChild(arrow);
+				// Click AND hover, because both are the convention and they cost the same. Either way
+				// the click is STOPPED: a row that opens a menu must not let its click reach the
+				// document dismissal in wireTabs(), which by then cannot find the row inside the
+				// popup and would close what was just opened. That was Tom's "File New has no
+				// options. And it does nothing."
+				b.addEventListener('click', function (e) { e.stopPropagation(); openMenu(b, r.submenu(), 1); });
+				b.addEventListener('mouseenter', function () { openMenu(b, r.submenu(), 1); });
+			} else {
+				// Moving onto a plain row dismisses any open fly-out, as every desktop menu does --
+				// otherwise the submenu hangs beside a parent row it no longer belongs to.
+				b.addEventListener('mouseenter', closeSubMenu);
+				b.addEventListener('click', function (e) { closeMenu(); r.fn(e); });
+			}
 			list.appendChild(b);
 		});
-		// Same position-from-the-anchor-rect-then-clamp dance the property popovers use.
+		// Same position-from-the-anchor-rect-then-clamp dance the property popovers use. A fly-out
+		// goes BESIDE its row (right edge, top aligned) rather than below it, which is what makes it
+		// read as a branch of the parent instead of a replacement for it.
 		var rect = anchor.getBoundingClientRect();
-		popup.style.left = rect.left + 'px';
-		popup.style.top = rect.bottom + 'px';
+		var wantLeft = level ? rect.right : rect.left;
+		var wantTop = level ? rect.top : rect.bottom;
+		popup.style.left = wantLeft + 'px';
+		popup.style.top = wantTop + 'px';
 		popup.style.display = 'block';
 		var pr = popup.getBoundingClientRect();
-		popup.style.left = Math.max(4, Math.min(rect.left, window.innerWidth - pr.width - 4)) + 'px';
-		popup.style.top = Math.max(4, Math.min(rect.bottom, window.innerHeight - pr.height - 4)) + 'px';
+		// A fly-out with no room to its right flips to the LEFT of the parent row rather than being
+		// clamped on top of it -- the clamp alone would slide it back over the words it branches from.
+		if (level && wantLeft + pr.width > window.innerWidth - 4) { wantLeft = rect.left - pr.width; }
+		popup.style.left = Math.max(4, Math.min(wantLeft, window.innerWidth - pr.width - 4)) + 'px';
+		popup.style.top = Math.max(4, Math.min(wantTop, window.innerHeight - pr.height - 4)) + 'px';
 		// Rows are built fresh on every open, so their tips are new DOM every time and need arming --
 		// this is exactly the case ROADMAP Task 173 added initTips(root) for (a tooltip built after
 		// page load is dead on touch without it).
 		if (EngCalcs.initTips) { EngCalcs.initTips(popup); }
 	}
+	function closeSubMenu() {
+		var p = document.getElementById('lpn_menu_popup2');
+		if (p) { p.style.display = 'none'; }
+	}
 	function closeMenu() {
 		var p = document.getElementById('lpn_menu_popup');
 		if (p) { p.style.display = 'none'; }
+		closeSubMenu();   // the fly-out belongs to the pull-down; it cannot outlive it
 		openMenuAnchor = null;
 	}
 	// File > New project (ROADMAP Task 264, Tom 2026-08-10). A second popup off the same anchor
@@ -4546,9 +4591,9 @@ var EngCalcs = EngCalcs || {};
 	// units" and sees inches has been told the truth by the name they clicked. It also removes the only
 	// thing in this page that needed inputs to convert when a unit changed, which is what unblocks
 	// Task 263.
-	function openNewProjectMenu(anchor) {
+	function newProjectRows() {
 		var pc = EngCalcs.pageConfig || {};
-		openMenu(anchor, [
+		return [
 			{ icon: 'new', label: pc.lpn_new_blank || 'Blank project', fn: function () { newProject(); renderTabs(); } },
 			{ separator: true },
 			{ heading: true, label: pc.lpn_new_from_examples || 'From examples' },
@@ -4558,8 +4603,11 @@ var EngCalcs = EngCalcs || {};
 			// category they have to translate into units themselves.
 			{ icon: 'example', label: pc.lpn_new_example_us || 'Basic network, US units (gpm)', fn: function () { newProjectFromExample('us'); } },
 			{ icon: 'example', label: pc.lpn_new_example_si || 'Basic network, SI units (l/s)', fn: function () { newProjectFromExample('si'); } }
-		]);
+		];
 	}
+	// The TOOLBAR route opens these as a pull-down under the button, not as a fly-out: there is no
+	// parent row for it to branch from. Same rows either way, built once.
+	function openNewProjectMenu(anchor) { openMenu(anchor, newProjectRows()); }
 	// Blank project, then the units, then the drawing -- in that order, and the order is the design.
 	// setUnits() moves the whole units strip to the preset and calls submitForm(), which re-enters
 	// EngCalcs.pageCalculator; doing it on a project that is still empty means nothing is on screen to
@@ -4572,9 +4620,13 @@ var EngCalcs = EngCalcs || {};
 	// menu item. The user has already said which system they want by which row they clicked, so a
 	// dialog confirming it would be asking a question they just answered.
 	function newProjectFromExample(system) {
-		newProject();
+		var id = newProject();
 		if (EngCalcs.setUnits) { EngCalcs.setUnits(system); }
 		drawExampleNetwork();
+		// The example is not the user's unsaved work either -- it arrived by their choosing it from a
+		// menu, and it is two clicks to get back. So it starts clean, exactly as a blank project
+		// does, and earns its asterisk at the first edit.
+		stampProjectSaved(id);
 		renderTabs();
 	}
 	function openFileMenu(anchor) {
@@ -4604,7 +4656,7 @@ var EngCalcs = EngCalcs || {};
 			// New project OPENS A SUBMENU now (Task 264, Tom 2026-08-10) rather than making a blank
 			// one on the spot -- "Blank project" is still the first row of it, so the old act is one
 			// extra click and every other way to start is finally reachable from the same place.
-			{ icon: 'new', label: pc.lpn_file_new || 'New', fn: function (e) { if (e) { e.stopPropagation(); } openNewProjectMenu(anchor); } },
+			{ icon: 'new', label: pc.lpn_file_new || 'New project…', submenu: newProjectRows },
 			{ icon: 'open', label: pc.lpn_file_open || 'Open…', fn: openFromFile }
 		].concat(recentRows, [
 			{ separator: true },
@@ -4832,7 +4884,18 @@ var EngCalcs = EngCalcs || {};
 		// it is in no file at all, not because anyone touched it. An untouched "+"-created project is
 		// exactly that: nothing drawn, nothing to lose, so the "gone for good" prompt below would be
 		// pure noise (punch list §4, Tom 2026-08-06).
-		if (!tabAsterisk(entry).show || (!isFileProject(entry) && projectIsEmpty(id))) { discardProject(id); renderTabs(); return; }
+		// THE ASTERISK DECIDES, and now it decides alone. The second clause here used to read
+		// `|| (!isFileProject(entry) && projectIsEmpty(id))` -- a special case that closed an empty
+		// browser project silently DESPITE its asterisk, because under the old rule every browser
+		// project wore one from birth. That is the disagreement Tom named ("a blank project with
+		// asterisk closes without confirmation, which is bad"): the mark said one thing and the
+		// behaviour did another, and the special case existed only to paper over a mark that should
+		// never have been there. With baselines the asterisk is right, so the exception is gone and
+		// the rule is literally true again.
+		//
+		// Consequence, deliberate: a project you drew and then emptied is dirty, so closing it now
+		// asks. It did not before. Asking about work somebody did is the safer side to err on.
+		if (!tabAsterisk(entry).show) { discardProject(id); renderTabs(); return; }
 		// A read-only project is offered Save as for the same reason its File menu is (Tom,
 		// 2026-08-04: "this situation cannot allow Save. It must offer Save as..."). Treated exactly
 		// like a project that has no file yet, because in the only sense that matters here it has
@@ -4913,13 +4976,17 @@ var EngCalcs = EngCalcs || {};
 		// Cancel is one of the answers.
 		document.addEventListener('click', function (e) {
 			var popup = document.getElementById('lpn_menu_popup');
+			var sub = document.getElementById('lpn_menu_popup2');
 			// `onAnchor` is belt, not the fix: a control that opens a menu should stop this click
 			// itself. But "the click that opened it must not also close it" is a rule worth holding
 			// in one place, because getting it wrong looks like the feature simply not working --
 			// no error, no menu, twice now.
 			var onAnchor = openMenuAnchor && (e.target === openMenuAnchor ||
 				(openMenuAnchor.contains && openMenuAnchor.contains(e.target)));
-			if (popup && popup.style.display === 'block' && !popup.contains(e.target) && !onAnchor) { closeMenu(); }
+			// A click in the FLY-OUT is a click in the menu. Without this the submenu's own rows
+			// would dismiss the pull-down under them mid-click.
+			var inSub = sub && sub.style.display === 'block' && sub.contains(e.target);
+			if (popup && popup.style.display === 'block' && !popup.contains(e.target) && !inSub && !onAnchor) { closeMenu(); }
 			// A click inside ANY of them leaves ALL of them alone: the popovers hold live controls
 			// (unit selects, checkboxes, number fields), and closing one because the pointer went
 			// down in another would be worse than leaving both open.
@@ -5193,7 +5260,7 @@ var EngCalcs = EngCalcs || {};
 		// read as "open a sample" to a user who wanted to start work.
 		var newBtn = document.createElement('button');
 		newBtn.type = 'button';
-		setLabel(newBtn, 'new', pc.lpn_file_new || 'New project');
+		setLabel(newBtn, 'new', pc.lpn_file_new || 'New project…');
 		// stopPropagation for the same reason every menubar item does it (see buildMenuBar): without
 		// it this click carries on to the document dismissal in wireTabs(), which sees a click
 		// outside #lpn_menu_popup and closes the menu that was just opened.

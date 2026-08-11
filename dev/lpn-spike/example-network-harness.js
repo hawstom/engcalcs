@@ -79,8 +79,14 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   'lpn_projects_list', 'lpn_projects_popup', 'lpn_projects_popup_close', 'lpn_settings_fields',
   'lpn_settings_popup', 'lpn_settings_popup_close', 'lpn_status', 'lpn_toolbar',
   'lpn_project_file', 'lpn_menubar', 'lpn_menu_popup', 'lpn_menu_list', 'lpn_dialog',
-  'lpn_dialog_body', 'lpn_dialog_buttons'
+  'lpn_dialog_body', 'lpn_dialog_buttons', 'lpn_menu_popup2', 'lpn_menu_list2'
 ].forEach(ensure);
+// Looped-Network.php nests each menu LIST inside its POPUP. The ensure() list above creates them as
+// unrelated stubs, so popup.contains(row) answered false for a row that really is inside -- and the
+// dismissal rule in wireTabs() is written entirely in those terms. Reproduce the nesting, or a test
+// of that rule tests nothing.
+byId.lpn_menu_popup.appendChild(byId.lpn_menu_list);
+byId.lpn_menu_popup2.appendChild(byId.lpn_menu_list2);
 
 // A unit <select> the way echoUnitSelect() renders one: option.value is "units per SI unit" and
 // option.dataset.unit is the family's key for that unit. unitEl() finds these by NAME, not id.
@@ -200,7 +206,10 @@ src = src.replace(marker,
   "\t\tstampDocAnswered: stampDocAnswered, storageVersion: function () { return LPN_STORAGE_VERSION; },\n" +
   "\t\tapplySaved: applySaved, restorePending: function () { return pendingV2Restore; },\n" +
   "\t\tnewProject: newProject, offerUnitRestore: offerUnitRestore,\n" +
+  "\t\ttabAsterisk: tabAsterisk, indexEntry: indexEntry, openId: function () { return library.openId; },\n" +
+  "\t\tnewProjectFromExample: newProjectFromExample, saveToStorage: saveToStorage,\n" +
   "\t\tbuildMenuBar: buildMenuBar, menuPopupOpen: function () { return document.getElementById('lpn_menu_popup').style.display === 'block'; },\n" +
+  "\t\tsubMenuOpen: function () { return document.getElementById('lpn_menu_popup2').style.display === 'block'; },\n" +
   "\t\tmenuRowLabels: function () { return Array.prototype.map.call(document.getElementById('lpn_menu_list').children, function (c) { return c.textContent || (c.children[1] && c.children[1].textContent) || ''; }); },\n" +
   "\t\tniceDefault: niceDefault, setUnitEl: function (name) { return unitEl(name); },\n" +
   "\t\taddNode: addNode, addLink: addLink,\n" +
@@ -805,20 +814,41 @@ console.log('\n--- Settings panel stays in sync ---');
   const newRow = rows.find(r => (r.children[1] && r.children[1].textContent) === PC.lpn_file_new);
   ok('File carries a New project row', !!newRow);
 
+  ok('...and it is marked as opening a submenu', !!newRow.children.find(c => c.textContent === '▸'));
+
   const clicked = fire(newRow);
-  ok('clicking it leaves a menu OPEN', L.menuPopupOpen());
-  const labels = byId.lpn_menu_list.children
+  // THE FLY-OUT CONTRACT (Tom, 2026-08-10): the parent stays on screen. The first cut replaced the
+  // File menu's own contents, which reads as having navigated away from File rather than into it.
+  ok('clicking it leaves the PARENT menu open', L.menuPopupOpen());
+  ok('...and opens the fly-out beside it', L.subMenuOpen());
+  const labels = byId.lpn_menu_list2.children
     .map(c => (c.children && c.children[1] && c.children[1].textContent) || '')
     .filter(Boolean);
-  ok('...and that menu is the New project submenu, with real options',
+  ok('...carrying the real options', 
     labels.indexOf(PC.lpn_new_blank) >= 0 && labels.indexOf(PC.lpn_new_example_us) >= 0 &&
     labels.indexOf(PC.lpn_new_example_si) >= 0, labels.join(' | '));
+  ok('...and the parent list is untouched, so File is still File',
+    byId.lpn_menu_list.children.length > 3);
+  ok('the row stops its own click, so the dismissal cannot reach past it', clicked.stopped);
+  // The fly-out also removes the ORIGINAL failure mode rather than merely working around it: the
+  // clicked row is still in the parent popup, so the dismissal predicate would not have closed
+  // anything even if the click had got through.
+  ok('...and the clicked row is still inside the parent popup', dismissalWouldClose(newRow) === false);
 
-  // THE ACTUAL BUG, asserted directly: the clicked row is detached by innerHTML='' and would fail
-  // popup.contains(), so without stopPropagation the dismissal closes what we just opened.
-  ok('the row stops its own click, or the dismissal would close the submenu', clicked.stopped);
-  ok('...and it needs to, because the clicked row is no longer in the popup',
-    dismissalWouldClose(newRow) === true);
+  // HOVER opens it as well -- both gestures are the convention, and a fly-out that only answers to
+  // clicks is the half-built version of one.
+  fire(fileBtn);              // toggles the whole menu shut, fly-out with it
+  ok('closing the parent takes the fly-out with it', !L.menuPopupOpen() && !L.subMenuOpen());
+  fire(fileBtn);              // and open again, fresh rows
+  const newRow2 = byId.lpn_menu_list.children
+    .find(r => (r.children[1] && r.children[1].textContent) === PC.lpn_file_new);
+  (newRow2._listeners.mouseenter || []).forEach(fn => fn({}));
+  ok('hovering the row opens the fly-out too', L.subMenuOpen());
+  // ...and moving onto a plain row takes it away again.
+  const openRow = byId.lpn_menu_list.children
+    .find(r => (r.children[1] && r.children[1].textContent) === PC.lpn_file_open);
+  (openRow._listeners.mouseenter || []).forEach(fn => fn({}));
+  ok('...and hovering a plain row dismisses it', !L.subMenuOpen());
 
   // The TOOLBAR route to the same submenu had the identical defect. Building the whole toolbar here
   // is more scaffolding than the check is worth, so this is a source-level guard instead: any click
@@ -831,6 +861,37 @@ console.log('\n--- Settings panel stays in sync ---');
       openers.length > 0 && openers.every(l => /stopPropagation\(\)/.test(l)),
       openers.length + ' handler(s)');
   }
+}
+
+
+// ---- Task 264 follow-up: a brand-new project wears no asterisk ------------
+// Tom, 2026-08-10: "New blank projects and from template appear with asterisk, which is bad. But a
+// blank project with asterisk closes without confirmation, which is bad." Both halves are the same
+// defect -- the mark claimed unsaved work a second after creation, and closeTab() had to special-
+// case the claim back out again. The fix is a BASELINE at birth, so `dirty` starts false.
+{
+  console.log('\n--- Task 264 follow-up: no asterisk on a new project ---');
+  setUnitSet('us');
+  L.reset();
+
+  const blankId = L.newProject();
+  ok('a blank project starts clean -- no asterisk',
+    L.tabAsterisk(L.indexEntry(blankId)).show === false);
+
+  // ...and it must EARN one. Anything else would make the mark meaningless in the other direction.
+  L.addNode('junction', 10, 10);
+  L.saveToStorage();
+  ok('...and earns one at the first edit', L.tabAsterisk(L.indexEntry(blankId)).show === true);
+  ok('...faint, because it lives only in this browser',
+    L.tabAsterisk(L.indexEntry(blankId)).faded === true);
+
+  // The example arrives by the user choosing it from a menu and is two clicks to recreate, so it is
+  // not unsaved work either.
+  L.newProjectFromExample('us');
+  const exId = L.openId();
+  ok('a project made from an example starts clean too',
+    L.tabAsterisk(L.indexEntry(exId)).show === false, 'dirty = ' + L.indexEntry(exId).dirty);
+  ok('...even though it is full of network', L.getDoc().links.length > 0);
 }
 
 console.log('\n' + (fails === 0 ? 'ALL PASS' : fails + ' FAILURE(S)'));
