@@ -4541,11 +4541,21 @@ var EngCalcs = EngCalcs || {};
 				// popup and would close what was just opened. That was Tom's "File New has no
 				// options. And it does nothing."
 				b.addEventListener('click', function (e) { e.stopPropagation(); openMenu(b, r.submenu(), 1); });
-				b.addEventListener('mouseenter', function () { openMenu(b, r.submenu(), 1); });
+				b.addEventListener('mouseenter', function () { cancelSubClose(); openMenu(b, r.submenu(), 1); });
+			} else if (level) {
+				// A row INSIDE the fly-out keeps it open. This is the whole of Tom's "it disappears
+				// before the mouse can reach it; it honestly seems to disappear BECAUSE you reach
+				// it" (2026-08-10) -- and it did: the dismiss-on-hover below was attached to every
+				// plain row at every level, so entering "Blank project" closed the menu that
+				// "Blank project" was in.
+				b.addEventListener('mouseenter', cancelSubClose);
+				b.addEventListener('click', function (e) { closeMenu(); r.fn(e); });
 			} else {
-				// Moving onto a plain row dismisses any open fly-out, as every desktop menu does --
-				// otherwise the submenu hangs beside a parent row it no longer belongs to.
-				b.addEventListener('mouseenter', closeSubMenu);
+				// Moving onto a plain row in the PARENT dismisses the fly-out, as every desktop menu
+				// does -- otherwise it hangs beside a row it no longer belongs to. On a DELAY, because
+				// the path from "New project…" to its fly-out is diagonal and crosses the rows
+				// underneath: closing on the first of them is the other half of "you can't get to it".
+				b.addEventListener('mouseenter', scheduleSubClose);
 				b.addEventListener('click', function (e) { closeMenu(); r.fn(e); });
 			}
 			list.appendChild(b);
@@ -4570,7 +4580,21 @@ var EngCalcs = EngCalcs || {};
 		// page load is dead on touch without it).
 		if (EngCalcs.initTips) { EngCalcs.initTips(popup); }
 	}
+	// The classic fly-out grace period. Travelling from the parent row to its fly-out is a DIAGONAL
+	// move across the rows below, so dismissing on the first row entered makes the submenu
+	// unreachable by pointer -- you can only ever get there in a straight line, and menus are not
+	// laid out for that. Arm a close instead, and let anything inside the fly-out cancel it.
+	var subCloseTimer = null;
+	var SUB_CLOSE_MS = 350;
+	function cancelSubClose() {
+		if (subCloseTimer) { clearTimeout(subCloseTimer); subCloseTimer = null; }
+	}
+	function scheduleSubClose() {
+		cancelSubClose();
+		subCloseTimer = setTimeout(function () { subCloseTimer = null; closeSubMenu(); }, SUB_CLOSE_MS);
+	}
 	function closeSubMenu() {
+		cancelSubClose();
 		var p = document.getElementById('lpn_menu_popup2');
 		if (p) { p.style.display = 'none'; }
 	}
@@ -4974,6 +4998,10 @@ var EngCalcs = EngCalcs || {};
 		// Dismiss the menu, and the view popovers, on any click that is not inside them. The dialog is
 		// deliberately NOT dismissed this way -- it asks a question that has to be answered, and
 		// Cancel is one of the answers.
+		// The fly-out's own box, not just its rows: the pointer crosses 4px of padding on the way in,
+		// and a close armed by the parent must not fire in that gap.
+		var subPopup = document.getElementById('lpn_menu_popup2');
+		if (subPopup) { subPopup.addEventListener('mouseenter', cancelSubClose); }
 		document.addEventListener('click', function (e) {
 			var popup = document.getElementById('lpn_menu_popup');
 			var sub = document.getElementById('lpn_menu_popup2');

@@ -1791,6 +1791,16 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     (`#lpn_menu_popup2`), opens on click or hover, parent stays on screen, ▸ marker on the row,
     flips left when there is no room right. The row is labelled `New project…` — it opens a chooser.
     The toolbar button keeps a plain pull-down: no parent row to branch from.
+  - **The fly-out closed on being reached** (Tom: *"it disappears before the mouse can reach it; it
+    honestly seems to disappear BECAUSE you reach it."* It did.) `closeSubMenu` was bound to
+    mouseenter on every plain row at **every level**, so entering a fly-out row closed the fly-out
+    that row was in. Now bound only at level 0, and on a 350 ms delay — the path from the parent row
+    to its fly-out is diagonal and crosses the rows below, so dismissing on contact was the other
+    half of "you can't get to it". Anything inside the fly-out cancels the pending close.
+  - **Not a Bootstrap component, and could not be.** Bootstrap 5 has no nested-dropdown support
+    (dropped after v3 and never restored), and these menus were never Bootstrap dropdowns anyway —
+    `openMenu()` builds a hand-rolled popover because the rows are data. The navbar's dropdowns are
+    Bootstrap; the lpn menu bar is not.
   - **A new project no longer wears an asterisk** (*"New blank projects and from template appear with
     asterisk, which is bad. But a blank project with asterisk closes without confirmation, which is
     bad."*). Both halves were one defect. `stampProjectSaved()` records a baseline at birth, so

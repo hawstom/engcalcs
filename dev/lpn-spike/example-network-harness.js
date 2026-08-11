@@ -210,6 +210,7 @@ src = src.replace(marker,
   "\t\tnewProjectFromExample: newProjectFromExample, saveToStorage: saveToStorage,\n" +
   "\t\tbuildMenuBar: buildMenuBar, menuPopupOpen: function () { return document.getElementById('lpn_menu_popup').style.display === 'block'; },\n" +
   "\t\tsubMenuOpen: function () { return document.getElementById('lpn_menu_popup2').style.display === 'block'; },\n" +
+  "\t\tsubClosePending: function () { return subCloseTimer !== null; },\n" +
   "\t\tmenuRowLabels: function () { return Array.prototype.map.call(document.getElementById('lpn_menu_list').children, function (c) { return c.textContent || (c.children[1] && c.children[1].textContent) || ''; }); },\n" +
   "\t\tniceDefault: niceDefault, setUnitEl: function (name) { return unitEl(name); },\n" +
   "\t\taddNode: addNode, addLink: addLink,\n" +
@@ -845,10 +846,25 @@ console.log('\n--- Settings panel stays in sync ---');
   (newRow2._listeners.mouseenter || []).forEach(fn => fn({}));
   ok('hovering the row opens the fly-out too', L.subMenuOpen());
   // ...and moving onto a plain row takes it away again.
+  // THE BUG TOM HIT: "it disappears before the mouse can reach it; it honestly seems to disappear
+  // BECAUSE you reach it." The dismiss-on-hover was attached to every plain row at EVERY level, so
+  // entering a row of the fly-out closed the fly-out that row was in. Reaching it was fatal.
+  const blankRow = byId.lpn_menu_list2.children
+    .find(r => (r.children[1] && r.children[1].textContent) === PC.lpn_new_blank);
+  ok('the fly-out has a Blank project row to reach', !!blankRow);
+  (blankRow._listeners.mouseenter || []).forEach(fn => fn({}));
+  ok('hovering a row INSIDE the fly-out does not close it', L.subMenuOpen());
+
+  // The other half: the path from the parent row to the fly-out is diagonal and crosses the rows
+  // below it, so those must not dismiss on contact either -- they ARM a close that anything inside
+  // the fly-out cancels.
   const openRow = byId.lpn_menu_list.children
     .find(r => (r.children[1] && r.children[1].textContent) === PC.lpn_file_open);
   (openRow._listeners.mouseenter || []).forEach(fn => fn({}));
-  ok('...and hovering a plain row dismisses it', !L.subMenuOpen());
+  ok('crossing a parent row on the way there does not close it immediately', L.subMenuOpen());
+  ok('...it arms a close instead', L.subClosePending() === true);
+  (blankRow._listeners.mouseenter || []).forEach(fn => fn({}));
+  ok('...which reaching the fly-out cancels', L.subClosePending() === false && L.subMenuOpen());
 
   // The TOOLBAR route to the same submenu had the identical defect. Building the whole toolbar here
   // is more scaffolding than the check is worth, so this is a source-level guard instead: any click
