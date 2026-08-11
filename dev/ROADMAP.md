@@ -1077,7 +1077,7 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     checkable; just do not spend the blog/video headline on it.** Do not relitigate.
   - Consequence: raised 146.06 to 90 and 220 to 95.
 
-- 70|274| **`lpn_` map coordinates are upside down. Y must increase UPWARD.** Tom, 2026-08-10:
+- 80|274| **`lpn_` map coordinates are upside down. Y must increase UPWARD.** Tom, 2026-08-10:
   *"EPANET uses normal cartesian coordinates... but we have the opposite like a graphic arts
   software. We need to fix this. Cartesian is engineering."* Today world Y = screen Y
   (`screenToWorld`/`worldToScreen`/`setTransform` apply no flip), so north is negative.
@@ -1089,11 +1089,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **Existing documents open upside down** unless migrated. Bump the storage version and negate
     every stored Y on load — cheaper than the units question was, because there is no ambiguity
     about what an old document meant.
-
-- 45|275| **Say "Saved with this project" at the top of the Settings panel.** Verified 2026-08-10:
-  everything in the panel and the Labels popover IS saved with the project (`serializeProject()`
-  carries `settings`, `labelSettings`, `units`, `backdrop`), so the label would be true with no code
-  change. The only thing not saved is the map viewport — zoom/pan re-fit on load.
 
 - 40|276| **Precise background-image scaling.** Tom, 2026-08-10: pick-two-points is handy but never
   precise ("mouse (and hand!!!) picking is never precise"); EPANET's is precise but painful. Full
@@ -1112,15 +1107,14 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     picker returns the files the user picked and nothing about their folder; the only API that
     enumerates siblings is `showDirectoryPicker`, a much larger permission ask than picking a file,
     and Chromium-only. So the world file is always **user-supplied**, never discovered.
-  - **Take both files in ONE picker rather than a second step**: add `multiple` and widen `accept` to
-    `image/*,.pgw,.jgw,.wld,.tfw` on `#lpn_backdrop_file`, then partition what comes back. The user
-    shift-picks image + sidecar in the dialog they already opened. Works in every browser, and the
-    instructive prompt still fires when only one file arrives. Tom's second-step prompt ("Choose a
-    World File for automatic scale and location?") is the fallback if multi-select reads as
-    confusing — his call, but one dialog beats two.
-  - **Cheapest of all, and it folds into (4): let the Scale (by entry) box accept a PASTED world
-    file.** It is six lines of plain text. No file plumbing, and it covers the sidecar that arrived
-    in an email or a GIS export note rather than next to the image.
+  - **RULED, Tom 2026-08-10: the second step WINS over silent multi-select.** *"An extra step is
+    excusable as tutorial; better than silent 'allow multiple'."* So: prompt "Choose a World File for
+    automatic scale and location?" after the image is picked. Allow multiple anyway — *"though if
+    they **do** choose multiple, they don't get the tutorial second step; nice"* — i.e. multi-select
+    is the expert shortcut that skips the tutorial, not the primary path.
+  - **Paste-a-world-file into the entry box: yes, but only with explicit wording.** Tom: *"I don't
+    like the paste unless it's very clear; it could get confusing."* His own label, use it verbatim:
+    **"Enter pixel size or paste the complete contents of the World File for the image"**.
   - **Our transform is `translate + uniform scale`** (`applyBackdropTransform`) — no rotation, no
     skew, no independent X/Y. A world file with nonzero B/D, or |A| ≠ |E|, cannot be represented:
     reject it with a message rather than silently using A and dropping the rest.
@@ -1130,23 +1124,20 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     dimensions, so a world file's pixel size maps onto `backdrop.iw/ih` with no correction
     (`s = A * iw / backdrop.width`). Do not "tidy" that callback into passing `canvas.width`.
   - (2) **enter map width/height** is EPANET's own paradigm and Tom does not like it; with (4) built
-    it is redundant. (5) **nearest-edge picking** is a small usability patch on picking, not a
-    precision answer, and is worth doing only alongside (4).
-  - (1) **A precise crosshair cursor is a separate, cheap fix and should just be done**: a CSS
+    it is redundant. **(5) nearest-edge picking is REJECTED** (Tom, 2026-08-10: *"probably more
+    trouble than it's worth; we have to document it; I say no"*) — do not re-propose it.
+  - (1) **A precise crosshair cursor is a separate, cheap fix and should just be done** — Tom agreed
+    2026-08-10: a CSS
     `cursor: crosshair` is already better than the default arrow, and a custom single-pixel-gap
     crosshair (Tom's reference: <https://www.cursor.cc/?action=icon&file_id=190223>) is a data-URI
     cursor on `.regmode`. It helps every pick on the page, not only scaling.
   - **epanet-js's silence is not evidence.** It prioritised map tiles, where registration is the
     basemap's job; that is a different product decision, not a verdict on world files.
 
-- 60|272| **File, Save is disabled outside Chromium with no way out of that row.** A disabled row
-  fires no events, so it can carry no tip; `saveCurrent()` would route to Save as but is unreachable.
-  Optional — Task 270's recommendation is that the blog post says "Save as" instead. From Task 270.
-
-- 55|273| **The tab strip's `+` button starts a project with accidental units.** `renderTabs()` binds
-  it to `newProject()` directly, bypassing the New project chooser, so the new project inherits
-  whichever units were on the strip — the exact accident Task 264 removed from File > New. From
-  Task 270.
+- 55|277| **Moving something cannot be undone.** No drag handler calls `saveUndoSnapshot()` — not
+  node, vertex, Text-label or data-label drags. So Undo after a drag leaves the drag in place and
+  reverts an *earlier* discrete act instead, which is worse than doing nothing. Snapshot on drag
+  START (not end), so one Undo returns the whole gesture. From Task 270.
 
 - 60|271| **Give `lpn_` a friction-method choice: HW, DW, Manning.** Tom, 2026-08-10. `bpn_` has
   one; `lpn_` hardcodes `hw`. `assembleModel()` and the map readout already read `frictionMethod()`
@@ -1809,26 +1800,43 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 - 0|270| **[DONE 2026-08-10] Audited lpn against Tom's three blog checklists.** Report:
   `dev/lpn-new-user-guide-audit.md`. All three were audited, not only New User — the New Shopper
   list is where most of the drift is.
-  - **App is wrong in 2 places**, both now filed: Save disabled outside Chromium (Task 272) and the
-    `+` tab button's accidental units (Task 273). A third, the unsettable friction method, is
-    Task 271 and is the largest hole in "set everything to your preferences".
-  - **Post is wrong in 7 places**, the load-bearing ones being: the backdrop command is **Position**,
-    not Move (twice); **Delete is a mode**, not a one-shot; **Ctrl+Z** is unmentioned.
-  - **Undo depth, which the post left as "???": 20**, in memory only, cleared on project switch, and
-    a drag is not a snapshot.
+  - **Scored after Tom's review: of 10 findings, 1 retracted, 1 downgraded, 1 strengthened, 2 fixed.**
+  - **RETRACTED, and the lesson is the value here:** the "app says Position, post says Move" finding
+    was wrong because I read the **JS fallback literal** (`pc.lpn_backdrop_position || 'Position'`)
+    instead of `lang.ec.en.php` (**'Move image'**). A fallback is a guess at the call site. **Read
+    label claims out of the lang file, always.**
+  - **Strengthened into a defect: moving cannot be undone at all** (Task 277), not merely "a drag is
+    not a snapshot". Undo depth is otherwise **20**, in memory only, cleared on project switch.
+  - Fixed here: Task 273 (`+` opens the chooser) and Task 275 (Settings says "Saved with this
+    project"). Task 272 dropped — Tom changed the post to "Save as" and the app is correct.
 
-- 0|265| **[DONE 2026-08-10] The lpn browser tab names the project's unit system.**
-  `HawsEDC Calculators — Looped Pipe Network (Map Interface) — US Units`, via `refreshPageTitle()`
-  beside `refreshMapStatus()`'s two call sites plus the boot path. A `?name=` prefix still leads.
-  - **DERIVED from the live strip, not stored.** `serializeProject().units` records the seven
-    selections, not a preset name; a stored `"us"` could disagree with them. A hand-mixed strip says
-    **Mixed Units** rather than naming a preset it does not match.
-  - Two new en keys, translated in the core four: `lpn_title_units` (`{units}` placeholder, so a
-    language picks its own word order instead of having "US" + "Units" concatenated for it) and
-    `lpn_title_units_mixed`. The server `<title>` is untouched — it is the SEO title.
-  - 10 assertions in `dev/lpn-spike/example-network-harness.js`, mutation-tested (6 mutations, all
-    caught). The harness's unit-select stub gained `data-family` and the real preset table; without
-    them `unitSetName()` skipped every select and reported "us" vacuously.
+- 0|265| **[REVERTED 2026-08-10, same day it shipped] Units do NOT go on the browser tab.** Tom, on
+  review: *"Units on tab are not the right way to go. I think we solved this need with the statuses
+  in the lower left corner of the map."* He is right — the status strip answers it continuously,
+  where you are already looking, and a tab is a second copy of the same fact free to drift. Nothing
+  writes `document.title`; the harness asserts that, because the defect is a line coming back.
+  - **What survives, and should not be re-deleted:** `unitSetName()`/`unitSetLabel()` and the two
+    keys, now feeding the **example network's title block** — which is what Tom actually wanted
+    (*"I do like having the units as a title text on the example projects. And I don't see that."*
+    He was not misunderstanding; it was not there). A screenshot of the example leaves the page
+    without the status strip, so the drawing has to say what it is drawn in.
+  - **Do not store "US"/"SI"** (Tom): the preset name is derived from the live strip, and the
+    document stores all seven selections. A hand-mixed strip is named mixed, not rounded.
+  - Adding the third title line moved `titleY` 4600 → 4572 to keep the ring's ~35 units of
+    clearance. **The harness had been measuring that clearance at a seeded text size of 2.5, not the
+    shipped 20** — 8× tighter, so it read 29 units where a real visitor would have had 7. It now
+    redraws at the default and checks again; that blind spot predates this task.
+
+- 0|275| **[DONE 2026-08-10] The Settings panel says "Saved with this project."** One note at the
+  head of the panel (`lpn_settings_scope_note`, translated in the core four). Verified true of the
+  panel entire before writing it: `serializeProject()` carries `settings`, `labelSettings`, `units`
+  and `backdrop`, so there is no exception to hedge. It is what makes the New User template flow
+  legible — there is no "save as my defaults" because saving the project IS that.
+
+- 0|273| **[DONE 2026-08-10] The tab strip's `+` opens the New project chooser.** It called
+  `newProject()` directly, inheriting whatever units were on the strip — the last place a project's
+  units were decided by accident, and the one Task 264 removed from File > New. Both doors now ask
+  the same question, and both inherit Task 271's wizard when it lands.
 
 - 0|263| **[DONE 2026-08-10] Inputs are stored as declared; nothing converts them on a unit change.**
   `lpn_` stored SI and displayed the conversion, so switching a unit silently rewrote every number

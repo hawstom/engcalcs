@@ -773,6 +773,7 @@
         "lpn_backdrop_coords_prompt": "Type the X,Y that point should move to",
         "lpn_backdrop_continue": "Continue",
         "lpn_tool_settings": "Settings",
+        "lpn_settings_scope_note": "Saved with this project.",
         "lpn_settings_id_prefixes": "ID prefixes",
         "lpn_settings_defaults": "Starting values",
         "lpn_settings_defaults_note": "Used for elements you create from now on. Existing elements are not changed.",
@@ -814,7 +815,7 @@
         "lpn_settings_wipe_btn": "Erase everything on this page",
         "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
-    "count": 812,
+    "count": 813,
     "active_prefixes": [
         "about",
         "bpn",

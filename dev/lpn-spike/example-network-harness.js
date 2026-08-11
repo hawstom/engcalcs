@@ -232,7 +232,7 @@ src = src.replace(marker,
   "\t\ttabAsterisk: tabAsterisk, indexEntry: indexEntry, openId: function () { return library.openId; },\n" +
   "\t\tnewProjectFromExample: newProjectFromExample, saveToStorage: saveToStorage,\n" +
   "\t\tnewBlankProject: newBlankProject, refreshMapStatus: refreshMapStatus,\n" +
-  "\t\tunitSetName: unitSetName, refreshPageTitle: refreshPageTitle,\n" +
+  "\t\tunitSetName: unitSetName, unitSetLabel: unitSetLabel,\n" +
   "\t\tfrictionMethod: frictionMethod,\n" +
   "\t\tbuildMenuBar: buildMenuBar, menuPopupOpen: function () { return document.getElementById('lpn_menu_popup').style.display === 'block'; },\n" +
   "\t\tsubMenuOpen: function () { return document.getElementById('lpn_menu_popup2').style.display === 'block'; },\n" +
@@ -361,6 +361,23 @@ byId.lpn_toolbar.querySelectorAll = () => [];
   const titleGap = Math.min(...ys) - (lowerTitle.y + dts * lowerTitle.sizeMult / 2);
   ok('title block clears the ring top without stranding it in white space',
     titleGap > 15 && titleGap < 80, titleGap.toFixed(1) + ' units at the shipped text size');
+  // ...AND AT THE DEFAULT TEXT SIZE, which is the size a first-time visitor actually sees. The
+  // check above judges positions that annotate() baked from THIS run's seeded 2.5, so it flatters
+  // the layout: a block stacked at 2.5 is 8x tighter than the same block stacked at 20, and the
+  // gap measured against the default is correspondingly generous. Adding the units line exposed
+  // this -- the third line cleared the ring by 29 units here and by 7 in a real browser. So redraw
+  // at the shipped default and measure that.
+  {
+    L.reset();
+    L.settings().textSize = L.defaultSettings().textSize;
+    L.drawExample();
+    const d2 = L.getDoc();
+    const ring2 = d2.nodes.filter(n => ring.indexOf(n.id) >= 0).map(n => n.y);
+    const low2 = d2.labels.filter(t => !t.anchorNode).reduce((a, b) => (a.y > b.y ? a : b));
+    const gap2 = Math.min(...ring2) - (low2.y + dts * low2.sizeMult / 2);
+    ok('...and still clears it when drawn AT the default text size',
+      gap2 > 15 && gap2 < 80, gap2.toFixed(1) + ' units, lowest line "' + low2.text + '"');
+  }
   // TEXT SIZE IS THE SHIPPED DEFAULT AND THE EXAMPLE MUST NOT TOUCH IT. Tom, 2026-08-09: ship a
   // default that suits the example, and "anything other is on the user, not us." So the stored 2.5
   // seeded above must survive the draw -- a visitor who set their own size keeps it.
@@ -375,9 +392,14 @@ byId.lpn_toolbar.querySelectorAll = () => [];
   // ---- annotations, all composed from already-translated strings ----
   const PC = EngCalcs.pageConfig;
   const texts = doc.labels.map(t => t.text);
-  ok('four Text annotations were placed', doc.labels.length === 4, doc.labels.length);
+  ok('five Text annotations were placed', doc.labels.length === 5, doc.labels.length);
   ok('title block uses the real brand and menu strings',
     texts.includes(PC.menu_brand) && texts.includes(PC.lpn_main_menu));
+  // THE UNITS LINE (Tom, 2026-08-10). The example commits to a unit system (Task 264) and this is
+  // where it says so -- a screenshot of the drawing travels without the map's status strip, which
+  // is the whole reason this line exists here and not on the browser tab.
+  ok('...and a third line naming the unit system the example is drawn in',
+    texts.includes(L.unitSetLabel()) && /(US|SI)/.test(L.unitSetLabel()), L.unitSetLabel());
   ok('reservoir and lowest-pressure callouts use real strings',
     texts.includes(PC.lpn_tool_add_reservoir) && texts.includes(PC.bpn_p_min));
   ok('no annotation was left on the placeholder "Text"',
@@ -1002,62 +1024,52 @@ console.log('\n--- Settings panel stays in sync ---');
   }
 }
 
-// ---- ROADMAP Task 265: the browser tab discloses the project's unit system ----
-// Tom, 2026-08-10, specified the three parts. The reason it matters is the same one that put units
-// inside the document: on this page a bare number means nothing without them, and the tab is where
-// you tell two open windows of this page apart when neither is in front of you.
+// ---- The unit-set NAME, and where it is allowed to appear ----
+// Task 265 put "US Units" on the browser tab; Tom reversed it on sight (2026-08-10): the map's
+// status strip already answers "what units am I in", continuously, where you are already looking.
+// What survives is the derivation and its one legitimate consumer -- the example network's title
+// block, checked in the annotations section above.
 {
-  console.log('\n--- Task 265: the tab title names the unit system ---');
+  console.log('\n--- the unit-set name is derived, never stored ---');
   const PC = EngCalcs.pageConfig;
   setUnitSet('us');
-  L.refreshPageTitle();
-  const usTitle = global.document.title;
-  ok('the unit system is DERIVED from the live strip, not stored', L.unitSetName() === 'us');
-  ok('the tab names the brand, the calculator, and the units',
-    usTitle.indexOf(PC.menu_brand) >= 0 && usTitle.indexOf(PC.lpn_main_menu) >= 0
-    && usTitle.indexOf('US') >= 0, usTitle);
-  ok('...in that order, brand first', usTitle.indexOf(PC.menu_brand) < usTitle.indexOf(PC.lpn_main_menu), usTitle);
-  ok('...and the units last', usTitle.lastIndexOf('US') > usTitle.indexOf(PC.lpn_main_menu), usTitle);
-
-  // Through EngCalcs.setUnits, the real path (it re-enters pageCalculator) -- calling
-  // refreshPageTitle() by hand would assert the function works, not that anything calls it. Same
-  // reasoning as the map-status block above, and the same mutation it was written to catch.
+  ok('a US strip is recognised as US', L.unitSetName() === 'us');
+  ok('...and renders as a whole translated phrase, not "US" + "Units" concatenated',
+    L.unitSetLabel() === PC.lpn_title_units.replace('{units}', PC.calc_units_us), L.unitSetLabel());
   EngCalcs.setUnits('si');
-  const siTitle = global.document.title;
-  ok('switching units rewrites the tab', L.unitSetName() === 'si'
-    && siTitle.indexOf('SI') >= 0 && siTitle !== usTitle, siTitle);
+  ok('an SI strip is recognised as SI', L.unitSetName() === 'si' && /SI/.test(L.unitSetLabel()),
+    L.unitSetLabel());
 
-  // A strip that matches NEITHER preset is the case a stored "us" would lie about. It is reachable:
-  // the seven selects are individually settable, and Task 263 made a switch reinterpret rather than
-  // convert, so a half-changed strip is a state a real user lands in.
+  // Perturb the KEYS, not the units, to prove the label is really plumbed through pageConfig. In
+  // English `calc_units_si` is the literal "SI", so hardcoding it would pass every check above --
+  // and would then be wrong the day a language translates the token. This is the only assertion
+  // that can tell a lookup from a literal.
+  {
+    const keepTok = PC.calc_units_si, keepTpl = PC.lpn_title_units;
+    PC.calc_units_si = 'ZZ'; PC.lpn_title_units = '[{units}]';
+    ok('the label is composed from the lang keys, not from literals in the JS',
+      L.unitSetLabel() === '[ZZ]', L.unitSetLabel());
+    PC.calc_units_si = keepTok; PC.lpn_title_units = keepTpl;
+  }
+
+  // A strip matching NEITHER preset is the case a stored "us" would lie about, and is exactly why
+  // this is derived: Tom, 2026-08-10, "Don't store 'US' or 'SI'. Those don't mean anything." It is
+  // reachable -- the seven selects are individually settable, and Task 263 made a switch
+  // reinterpret rather than convert, so a half-changed strip is a state a real user lands in.
   const dia = L.setUnitEl('lpn_u_diameter');
   dia.selectedIndex = dia.options.findIndex(o => o.dataset.unit === 'in');
-  L.refreshPageTitle();
-  ok('a hand-mixed strip says so rather than naming a preset it does not match',
-    L.unitSetName() === null && global.document.title.indexOf(PC.lpn_title_units_mixed) >= 0,
-    global.document.title);
+  ok('a hand-mixed strip is named as mixed, not rounded to the nearer preset',
+    L.unitSetName() === null && L.unitSetLabel() === PC.lpn_title_units_mixed, L.unitSetLabel());
 
-  // The ?name= prefix echoHTMLHead() puts in front of the server title must survive the rewrite,
-  // or naming a calculation would silently stop working on this one page.
-  global.window.location.search = '?name=Well%20Field';
-  setUnitSet('si');
-  L.refreshPageTitle();
-  ok('a ?name= calculation name still leads the tab',
-    global.document.title.indexOf('Well Field') === 0, global.document.title);
-  global.window.location.search = '';
+  // NOTHING writes the browser tab any more. A source check, because the defect this guards is a
+  // line coming back, not a value being wrong.
+  {
+    const js = fs.readFileSync(ROOT + 'js/looped-network.js', 'utf8');
+    ok('the page never writes document.title', js.indexOf('document.title') < 0);
+  }
 
-  // SWITCHING PROJECTS has to rewrite it too, and by its own call site: a project carries its own
-  // units (Task 263), so the tab can be wrong the instant you change tabs even though no select
-  // moved. Asserted through newProject(), which reaches refreshAllFromDocument() WITHOUT going
-  // near setUnits() -- so it isolates that one call rather than riding on the unit-switch path.
-  setUnitSet('us');
-  global.document.title = '';
-  L.newProject();
-  ok('switching projects rewrites the tab from its own call site',
-    global.document.title.indexOf(PC.lpn_main_menu) >= 0 && global.document.title.indexOf('US') >= 0,
-    global.document.title);
-
-  // The three strings are real lang keys, not literals hiding behind a fallback.
+  // The strings are real lang keys, not literals hiding behind a fallback -- the mistake that made
+  // the Task 270 audit report the backdrop menu wrong (it quoted JS fallbacks, not shipped values).
   {
     const langSrc = fs.readFileSync(ROOT + 'lib/lang.ec.en.php', 'utf8');
     ok('lpn_title_units carries a {units} placeholder rather than concatenating fragments',

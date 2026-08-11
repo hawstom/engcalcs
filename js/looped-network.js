@@ -2400,7 +2400,6 @@ var EngCalcs = EngCalcs || {};
 		setStatus('');
 		setMode('select');
 		refreshMapStatus();   // units belong to the project now, so switching projects can change this
-		refreshPageTitle();   // ...and so can the tab title (Task 265), for the same reason
 		zoomExtent();
 		scheduleSolve();
 		renderTabs();
@@ -4394,7 +4393,13 @@ var EngCalcs = EngCalcs || {};
 		plus.className = 'lpn-tab-btn';
 		plus.textContent = '+';
 		plus.title = pc.lpn_tab_new || 'New project';
-		plus.addEventListener('click', function () { newProject(); renderTabs(); });
+		// OPENS THE CHOOSER, exactly as File > New project does (Tom, 2026-08-10, agreeing it was a
+		// defect: "it should open the chooser, which will become the units and method chooser").
+		// It used to call newProject() directly, which inherits whatever units happened to be on the
+		// strip -- the last place on this page where a project's units were decided by accident, and
+		// the very thing Task 264 removed from the File menu. Both doors now ask the same question.
+		// stopPropagation for the reason every menu opener here does it: see buildMenuBar().
+		plus.addEventListener('click', function (e) { e.stopPropagation(); openNewProjectMenu(e.currentTarget); });
 		strip.appendChild(plus);
 	}
 	function switchToTab(id) {
@@ -5204,11 +5209,6 @@ var EngCalcs = EngCalcs || {};
 		updateEmptyHint();
 		updateModeHint(); // initial mode is 'select', set before setMode() ever runs -- render it now
 		renderTabs();
-		// On the boot path explicitly (Task 265). The two calls next to refreshMapStatus() cover a
-		// project switch and a unit switch; neither fires on a plain page load, and loadFromStorage()
-		// has already restored the open project's own units by here, so this is the first moment the
-		// answer is knowable and the last moment it is still missing.
-		refreshPageTitle();
 		// **The banner has to be painted on the BOOT path too** (fixed 2026-08-05, found by Tom: "It
 		// doesn't say anything. When? Where would it say this?"). refreshAllFromDocument() ends with
 		// this call, but it is shared by openProject() and newProject() only -- boot never ran it. So
@@ -5624,9 +5624,26 @@ var EngCalcs = EngCalcs || {};
 		// is a property worth more than 20 units of clearance; dropping J2 would make it 1400 x 680
 		// off-centre. The title block has no such constraint. Clearance from the second line's
 		// bottom edge to the ring top is now ~35 units.
-		var titleY = 4600;
+		// 4600 -> 4572 when the units line was added below the anchor: the block grew downward by
+		// (30 + 20)/2 + 8 = 33 units at the SHIPPED text size, so the whole thing moves up by
+		// enough to hand the ring back the ~35 units of clearance Tom asked for. Sized against the
+		// shipped default deliberately, not against this session's textSize -- see the harness note
+		// on the default-size gap check, which is the assertion that would otherwise not notice.
+		var titleY = 4572;
 		annotate(5000, titleY - (effectiveFontSize(2) + effectiveFontSize(1.5)) / 2 - 8, null, pcx.menu_brand, 2);
 		annotate(5000, titleY, null, pcx.lpn_main_menu, 1.5);
+		// THIRD LINE: what the example is drawn in (Tom, 2026-08-10 -- "I do like having the units as
+		// a title text on the example projects. And I don't see that."). He was not misunderstanding;
+		// it was not there. It belongs here and not on the browser tab (see unitSetLabel()) because
+		// this drawing is the one thing on the page that leaves the page: a screenshot of the example
+		// carries no status strip, and Task 264 made each example COMMIT to a unit system, so the
+		// drawing should say which one it committed to.
+		//
+		// Stacked DOWNWARD from the anchor line, mirroring how the first line is derived upward from
+		// it -- by the two lines' own half-heights plus the same 8-unit gap, never a flat offset, so
+		// the block stays tight at any text size. It lands between the title and the ring, which had
+		// ~35 units of clearance; a 1.0-size line is 20 tall at the default, so the ring keeps room.
+		annotate(5000, titleY + (effectiveFontSize(1.5) + effectiveFontSize(1)) / 2 + 8, null, unitSetLabel(), 1);
 		// Anchored callouts: the offset is from the node, and the label follows if the node moves.
 		// The reservoir is the drawing's far-left node and its own data label sits to the upper
 		// right, so its callout goes LEFT -- and UP, at the shared leader angle. It was level with
@@ -6075,22 +6092,18 @@ var EngCalcs = EngCalcs || {};
 			(pc.bpn_method || 'Friction method') + ': ' + frictionMethodLabel()
 		].join(' | ');
 	}
-	// ---- The browser-tab title says which unit system this project is in (ROADMAP Task 265) ----
-	//
-	// Tom, 2026-08-10, gave the three parts exactly: "HawsEDC Calculators" / "Looped Pipe Network
-	// (Map Interface)" / "{units_set} Units". The tab is where you tell one open project from
-	// another when the page is not in front of you, and this page is the ONLY calculator in the
-	// suite where a bare number is meaningless without its unit system (CLAUDE.md: "imagine opening
-	// a 400 diameter pipe into an inch browser"). The map status strip already says it on screen;
-	// this says it on the tab, where a second window of the same page is the case that needs it.
+	// Which unit preset the live strip matches -- 'us', 'si', or null for a hand-mixed strip.
 	//
 	// DERIVED, never stored. `serializeProject().units` records the seven selections, not a preset
-	// name, and that is right -- the selections are the truth and a stored "us" could disagree with
-	// them. So this asks the honest question of the live strip: does every select match one preset?
-	// That also makes the readout correct for a v2 document written before units were stored at all,
-	// and for the user who deliberately mixes (inches with l/s), who gets "Mixed Units" rather than
-	// a confident lie. "Created for" and "currently in" are the same thing until somebody changes a
-	// select, and when they do, the second answer is the one worth showing.
+	// name, and that is right: the selections are the truth, and a stored "us" would be a second
+	// copy of the same fact, free to disagree with them. Tom, 2026-08-10, on being told the tab
+	// would name a unit system: *"Don't store 'US' or 'SI'. Those don't mean anything. Store all our
+	// settings."* We do, and this is how the preset NAME is recovered when one is needed for display
+	// -- which is now exactly one place, the example network's title block.
+	//
+	// A hand-mixed strip returns null and is named as mixed rather than rounded to the nearer
+	// preset. Reachable: the seven selects are individually settable, and Task 263 made a switch
+	// reinterpret rather than convert.
 	function unitSetName() {
 		var sets = EngCalcs.unitSets || {}, names = ['us', 'si'], i, s, ok, j, sel, fam;
 		for (i = 0; i < names.length; i++) {
@@ -6111,24 +6124,19 @@ var EngCalcs = EngCalcs || {};
 		}
 		return null;
 	}
-	// The server-rendered <title> is left alone (it is the SEO title, and it is what a crawler that
-	// does not run scripts sees). This replaces it in the live page only, once the project's units
-	// are known -- which is client-side by definition, so there is no server route to the same
-	// answer. The ?name= prefix echoHTMLHead() puts in front of the title is read back off the URL
-	// rather than re-plumbed through pageConfig: same value, same trim, and no user-supplied string
-	// travelling through a <script> block to get here.
-	function refreshPageTitle() {
-		var pc = EngCalcs.pageConfig || {}, set = unitSetName(), parts = [], name = '';
-		try { name = (new URLSearchParams(window.location.search).get('name') || '').trim(); }
-		catch (err) { name = ''; }
-		if (name) { parts.push(name); }
-		parts.push(pc.menu_brand || 'HawsEDC Calculators');
-		parts.push(pc.lpn_main_menu || 'Looped Pipe Network (Map Interface)');
-		parts.push(set
-			? (pc.lpn_title_units || '{units} Units').replace('{units}',
-				set === 'us' ? (pc.calc_units_us || 'US') : (pc.calc_units_si || 'SI'))
-			: (pc.lpn_title_units_mixed || 'Mixed Units'));
-		document.title = parts.join(' — ');
+	// "US Units" / "SI Units" / "Mixed Units", for DRAWING on the map. Not for the browser tab:
+	// Task 265 put it there and Tom reversed it on sight (2026-08-10) -- *"Units on tab are not the
+	// right way to go. I think we solved this need with the statuses in the lower left corner of the
+	// map."* He is right; the status strip already answers "what units am I in" continuously, in the
+	// place you are already looking, and a second answer in the tab is the same fact maintained
+	// twice. What he DID want, and what this now serves, is a units line in the example network's
+	// own title block -- a drawing that claims to be a worked example should say what it is worked
+	// in, because a screenshot of it travels without the status strip.
+	function unitSetLabel() {
+		var pc = EngCalcs.pageConfig || {}, set = unitSetName();
+		if (!set) { return pc.lpn_title_units_mixed || 'Mixed Units'; }
+		return (pc.lpn_title_units || '{units} Units')
+			.replace('{units}', set === 'us' ? (pc.calc_units_us || 'US') : (pc.calc_units_si || 'SI'));
 	}
 	// Suite-wide convention (CLAUDE.md's Unit Sets section): a default is Array('us'=>x,'si'=>y),
 	// not one SI number that happens to convert to something ugly in the other system (Tom,
@@ -6509,6 +6517,16 @@ var EngCalcs = EngCalcs || {};
 		function any() { return true; }
 		function positive(v) { return v > 0; }
 		function nonNegative(v) { return v >= 0; }
+		// ---- 0. What this whole panel IS (Tom, 2026-08-10) ----
+		// Verified before writing it: every control below, plus the Units block adopted above and
+		// the Labels popover, is carried by serializeProject() (`settings`, `labelSettings`,
+		// `units`, `backdrop`). So the sentence is true of the panel entire, with no exceptions to
+		// hedge. It is the line that makes the New User checklist's template flow make sense --
+		// there is no "save as my defaults" here because saving the PROJECT is that (CLAUDE.md,
+		// "there are no browser units, only project units"), and nothing said so on screen.
+		// The one thing not carried is the map viewport: zoom and pan re-fit on load. That is not
+		// a setting and is not in this panel, so it does not qualify the claim.
+		note(fields, pc.lpn_settings_scope_note || 'Saved with this project.');
 		// ---- 1. ID prefixes ----
 		var idBody = section('idPrefixes', pc.lpn_settings_id_prefixes || 'ID prefixes');
 		// Reuses the existing Add-tool labels (Junction/Reservoir/Pipe/Pump) per CLAUDE.md's
@@ -7839,7 +7857,6 @@ var EngCalcs = EngCalcs || {};
 		recomputeAllPumpCurves();
 		scheduleSolve();
 		refreshMapStatus();   // a unit switch is exactly when this readout has to be right
-		refreshPageTitle();   // and exactly when the tab has to stop naming the old system
 		// The project's units are part of the project (serializeProject), so a switch is a change to
 		// persist -- otherwise closing the tab would lose which units the numbers are in.
 		saveToStorage();

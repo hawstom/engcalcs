@@ -443,6 +443,7 @@ EngCalcs.pageConfig = {
 	lpn_backdrop_coords_prompt: <?=json_encode($ec_lang['lpn_backdrop_coords_prompt'])?>,
 	lpn_backdrop_continue: <?=json_encode($ec_lang['lpn_backdrop_continue'])?>,
 	lpn_tool_settings: <?=json_encode($ec_lang['lpn_tool_settings'])?>,
+	lpn_settings_scope_note: <?=json_encode($ec_lang['lpn_settings_scope_note'])?>,
 	lpn_settings_id_prefixes: <?=json_encode($ec_lang['lpn_settings_id_prefixes'])?>,
 	lpn_settings_defaults: <?=json_encode($ec_lang['lpn_settings_defaults'])?>,
 	lpn_settings_defaults_note: <?=json_encode($ec_lang['lpn_settings_defaults_note'])?>,

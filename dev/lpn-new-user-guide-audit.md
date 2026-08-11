@@ -28,8 +28,8 @@ connected file; with no connection there is no file"). So the honest fix is on t
 actually performs. Alternatively the app grows a tip on the disabled row, but a disabled row cannot
 show one.
 
-**Recommended: change the post.** Filed as ROADMAP Task 272 for the app-side half (a discoverable
-route out of the disabled row), which is optional.
+**RESOLVED 2026-08-10: Tom changed the post to "Save as".** The app is correct as it stands and
+needs no change; the app-side follow-up (Task 272) was dropped rather than left open.
 
 ### A2. The tab strip's `+` button starts a project with accidental units
 *Not stated in the guide — found while auditing New User step 1.*
@@ -43,7 +43,8 @@ A user following New User step 1 ("set everything to your preferences") and then
 project with `+` gets units decided by accident, in a page where CLAUDE.md says a bare number is
 meaningless without them.
 
-**App fix.** Filed as ROADMAP Task 273.
+**FIXED 2026-08-10** (Task 273): `+` now calls `openNewProjectMenu()`, the same chooser File > New
+opens. When Task 271 turns that chooser into a units-and-method wizard, both doors inherit it.
 
 ### A3. The friction method cannot be set, so "set everything to your preferences" is not possible
 *New User, step 1.*
@@ -60,15 +61,21 @@ User step 1 as written, and the post promises completeness ("set *everything*").
 
 ## B. Mismatches where the POST is wrong
 
-### B1. "Scale, **Move**, or Remove the Background image" — the app says **Position**
-*New Shopper (last bullet) and New Project (step 2, "Scale and Move it as you wish").*
+### B1. RETRACTED — the post was right and this audit was wrong
+*Was: "Scale, Move, or Remove the Background image — the app says Position."*
 
-Both the toolbar selector (`wireBackdropMenu()`) and Insert menu (`openInsertMenu()`) read
-**Add image / Scale / Position / Remove image**. There is no command called Move. `lpn_backdrop_position`
-is the key, and it is translated. Two occurrences in the post.
+**Tom caught this, 2026-08-10, and he is correct.** The shipped English is
+`lpn_backdrop_scale`=**'Set image scale'**, `lpn_backdrop_position`=**'Move image'**,
+`lpn_backdrop_remove`=**'Remove image'**. The post's "Scale, Move, or Remove" matches the app in
+both verbs. There is no mismatch and nothing to change on either side.
 
-**Post fix** — unless Tom prefers "Move" as the label, in which case it is a one-key English change
-plus four core-language retranslations.
+**How the error was made, because it is a repeatable one:** I read the *fallback literals* in
+`js/looped-network.js` (`pc.lpn_backdrop_position || 'Position'`) instead of the values in
+`lib/lang.ec.en.php`. A fallback is what renders only when pageConfig is missing the key — it is a
+guess written at the call site, not the shipped string. **Every user-facing label claim must be read
+out of the lang file.** All 16 other labels asserted in this report were re-checked against
+`lang.ec.en.php` after this was found; the backdrop pair were the only two where fallback and
+shipped value disagree, which is exactly why nothing else caught it.
 
 ### B2. "Use File, Open to open an example project" has a better route since Task 264
 *New Shopper, step 1.*
@@ -92,21 +99,31 @@ beyond that. Two further facts the post should carry, because both surprise peop
 - **Switching projects clears it** (`clearUndo()`), because a snapshot of one project's document
   cannot be applied to another's.
 
-Also: a *drag* is not a snapshot (only discrete acts like Add and Delete are), so Undo will not step
-back through a drag.
+**And the third fact, which Tom asked me to reword and which is worse than the way I first put it:
+moving something cannot be undone at all.** Not "a drag is not a snapshot" — *nothing* takes a
+snapshot when you drag. `saveUndoSnapshot()` is called by the discrete acts (add, delete, add/remove
+vertex, rename, edit a property, double-click a label home, draw the example) and by **no drag
+handler**: not node drags, not vertex drags, not Text-label drags, not data-label drags. The
+`dragDirty` flag near them is a render throttle, not an undo hook.
 
-### B4. "Use Delete and Undo as desired" reads as two commands; Delete is a MODE
+So Undo does not "step past" a drag — it steps back to the state before the last *discrete* act,
+silently discarding every move made since. Drag a node, then Undo: the node stays where you dragged
+it, and something else you did earlier comes back instead. That is a defect, not a documentation
+gap; filed as **ROADMAP Task 277**. Until it is fixed, the post should not imply Undo covers moves.
+
+### B4. DOWNGRADED — "Use Delete and Undo as desired" states nothing false
 *New Shopper.*
 
-Undo is a one-shot button. **Delete is a mode**: clicking it puts the map in delete mode
-(`setMode('delete')`), and you then click elements to remove them; clicking Delete again (or Select)
-leaves the mode. A reader expecting "select then press Delete" will not find that — there is no
-keyboard Delete binding and the selection model is single-element (see ROADMAP Task 266).
+**Tom's pushback is right** (2026-08-10: *"the post doesn't say it's a mode; what do you want
+fixed?"*). Nothing needed fixing. The post makes no claim about how either command is invoked, so
+there was no mismatch to report — this was an optional addition dressed as a finding, which is the
+wrong thing to put in a mismatch report.
 
-**Undo, by contrast, does have a keyboard shortcut — Ctrl+Z / ⌘Z** — and the post does not mention
-it. Worth a clause; it is the shortcut people try first.
+Kept only as a fact worth having: Delete *is* a mode (`setMode('delete')` — click the tool, then
+click elements, click again or Select to leave), there is no keyboard Delete binding, and the
+selection model is single-element (ROADMAP Task 266).
 
-**Post fix** — one clause each, matching how the post already explains add mode.
+**Ctrl+Z was a real omission and Tom has added it to the post.**
 
 ### B5. "Use Settings to change Map appearance settings including the size of Labels"
 *New Shopper.*
@@ -165,3 +182,22 @@ URI either way. PNG is good advice for a screenshot, but the post reads as a req
   and probably right, but a template cannot carry a view.
 - **Screenshots still include the mode hint and coordinate readout** (New Project step 6). ROADMAP
   Task 253 is the clean-map toggle that fixes this; it is not built.
+
+---
+
+## E. Audit corrections (2026-08-10, after Tom's review)
+
+Recorded so the score of this report is honest and the method improves:
+
+- **B1 was wrong** — I quoted JS fallback literals instead of shipped `$ec_lang` values. The post
+  was correct. Retracted above, with the method fix: label claims come from the lang file.
+- **B4 was not a finding** — the post stated nothing false; I reported an optional addition as a
+  mismatch.
+- **B3 was understated** — moving is not undoable *at all*, which is a defect (Task 277), not a
+  wording nuance.
+- **A1 and A2 are closed** — post edited to "Save as"; the `+` button now opens the chooser.
+- **The units line Tom expected on the example projects was genuinely missing.** He was not
+  misunderstanding the app; `drawExampleNetwork()` drew two title lines and no unit system. Added.
+
+Net: of 10 findings, 1 retracted, 1 downgraded, 1 strengthened into a defect, 2 fixed, and the rest
+stand.

@@ -1493,6 +1493,7 @@ $ec_lang['lpn_backdrop_target_coords']='Coordinates you type';
 $ec_lang['lpn_backdrop_coords_prompt']='Type the X,Y that point should move to';
 $ec_lang['lpn_backdrop_continue']='Continue';
 $ec_lang['lpn_tool_settings']='Settings';
+$ec_lang['lpn_settings_scope_note']='Saved with this project.';
 $ec_lang['lpn_settings_id_prefixes']='ID prefixes';
 $ec_lang['lpn_settings_defaults']='Starting values';
 $ec_lang['lpn_settings_defaults_note']='Used for elements you create from now on. Existing elements are not changed.';

@@ -740,6 +740,7 @@ $ec_lang['lpn_backdrop_target_coords']='Coordenadas digitadas';
 $ec_lang['lpn_backdrop_coords_prompt']='Digite o X,Y para onde esse ponto deve ir';
 $ec_lang['lpn_backdrop_continue']='Continuar';
 $ec_lang['lpn_tool_settings']='Configurações';
+$ec_lang['lpn_settings_scope_note']='Salvo com este projeto.';
 $ec_lang['lpn_settings_id_prefixes']='Prefixos de ID';
 $ec_lang['lpn_settings_defaults']='Valores iniciais';
 $ec_lang['lpn_settings_defaults_note']='Usadas para os elementos que você criar a partir de agora. Os elementos existentes não são alterados.';
