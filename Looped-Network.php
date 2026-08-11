@@ -88,6 +88,10 @@ echoHeader("EngCalcs", $html_title, "");
 	      // those bodies get rebuilt wholesale and would take the input's wired change handler with
 	      // them -- the same reason lpn_backdrop_file sits here. ?>
 	<input type="file" id="lpn_project_file" accept=".json,application/json" style="display:none">
+	<?php // EPANET .inp import (Task 196). A SECOND picker rather than another accept type on the
+	      // one above: the two feed different readers, and one input serving both would have to
+	      // guess which from the extension -- a guess whose wrong answer is silent. ?>
+	<input type="file" id="lpn_inp_file" accept=".inp,text/plain" style="display:none">
 	<?php // Floating "choose target mode" step of the Position sequence (Task 146 Phase 2) --
 	      // mirrors #lpn_labels_popup's static-PHP-plus-JS-clamped-position pattern (position:fixed,
 	      // positioned/clamped by showBackdropTargetPanel() in looped-network.js), not the spike's
@@ -364,6 +368,33 @@ EngCalcs.pageConfig = {
 	lpn_tab_move_right: <?=json_encode($ec_lang['lpn_tab_move_right'])?>,
 	lpn_tab_unsaved: <?=json_encode($ec_lang['lpn_tab_unsaved'])?>,
 	lpn_import_bad_file: <?=json_encode($ec_lang['lpn_import_bad_file'])?>,
+	lpn_dialog_ok: <?=json_encode($ec_lang['lpn_dialog_ok'])?>,
+	lpn_file_import_inp: <?=json_encode($ec_lang['lpn_file_import_inp'])?>,
+	lpn_file_import_inp_tip: <?=json_encode($ec_lang['lpn_file_import_inp_tip'])?>,
+	lpn_inp_bad_file: <?=json_encode($ec_lang['lpn_inp_bad_file'])?>,
+	lpn_inp_report_heading: <?=json_encode($ec_lang['lpn_inp_report_heading'])?>,
+	lpn_inp_report_counts: <?=json_encode($ec_lang['lpn_inp_report_counts'])?>,
+	lpn_inp_report_clean: <?=json_encode($ec_lang['lpn_inp_report_clean'])?>,
+	lpn_inp_report_lead: <?=json_encode($ec_lang['lpn_inp_report_lead'])?>,
+	lpn_inp_drop_headloss: <?=json_encode($ec_lang['lpn_inp_drop_headloss'])?>,
+	lpn_inp_drop_tanks: <?=json_encode($ec_lang['lpn_inp_drop_tanks'])?>,
+	lpn_inp_drop_tank_links: <?=json_encode($ec_lang['lpn_inp_drop_tank_links'])?>,
+	lpn_inp_drop_tcv: <?=json_encode($ec_lang['lpn_inp_drop_tcv'])?>,
+	lpn_inp_drop_valve: <?=json_encode($ec_lang['lpn_inp_drop_valve'])?>,
+	lpn_inp_drop_cv: <?=json_encode($ec_lang['lpn_inp_drop_cv'])?>,
+	lpn_inp_drop_demands: <?=json_encode($ec_lang['lpn_inp_drop_demands'])?>,
+	lpn_inp_drop_patterns: <?=json_encode($ec_lang['lpn_inp_drop_patterns'])?>,
+	lpn_inp_drop_emitters: <?=json_encode($ec_lang['lpn_inp_drop_emitters'])?>,
+	lpn_inp_drop_curve_long: <?=json_encode($ec_lang['lpn_inp_drop_curve_long'])?>,
+	lpn_inp_drop_curve_missing: <?=json_encode($ec_lang['lpn_inp_drop_curve_missing'])?>,
+	lpn_inp_drop_pump_other: <?=json_encode($ec_lang['lpn_inp_drop_pump_other'])?>,
+	lpn_inp_drop_setting: <?=json_encode($ec_lang['lpn_inp_drop_setting'])?>,
+	lpn_inp_drop_controls: <?=json_encode($ec_lang['lpn_inp_drop_controls'])?>,
+	lpn_inp_drop_eps: <?=json_encode($ec_lang['lpn_inp_drop_eps'])?>,
+	lpn_inp_drop_quality: <?=json_encode($ec_lang['lpn_inp_drop_quality'])?>,
+	lpn_inp_drop_backdrop: <?=json_encode($ec_lang['lpn_inp_drop_backdrop'])?>,
+	lpn_inp_drop_dangling: <?=json_encode($ec_lang['lpn_inp_drop_dangling'])?>,
+	lpn_inp_drop_units: <?=json_encode($ec_lang['lpn_inp_drop_units'])?>,
 	lpn_import_no_room: <?=json_encode($ec_lang['lpn_import_no_room'])?>,
 	lpn_status_imported: <?=json_encode($ec_lang['lpn_status_imported'])?>,
 	lpn_file_type_desc: <?=json_encode($ec_lang['lpn_file_type_desc'])?>,
@@ -492,6 +523,7 @@ EngCalcs.pageConfig = {
 <script src="/engcalcs/js/PipeHydraulics.lib.js?v=<?=filemtime(__DIR__.'/js/PipeHydraulics.lib.js')?>"></script>
 <script src="/engcalcs/js/lpn-solver.js?v=<?=filemtime(__DIR__.'/js/lpn-solver.js')?>"></script>
 <script src="/engcalcs/js/lpn-epanet.js?v=<?=filemtime(__DIR__.'/js/lpn-epanet.js')?>"></script>
+<script src="/engcalcs/js/lpn-inp.js?v=<?=filemtime(__DIR__.'/js/lpn-inp.js')?>"></script>
 <script src="/engcalcs/js/looped-network.js?v=<?=filemtime(__DIR__.'/js/looped-network.js')?>"></script>
 <script>
 <?php echoCookieScript(); ?>

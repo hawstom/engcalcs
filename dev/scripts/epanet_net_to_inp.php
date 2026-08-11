@@ -254,11 +254,14 @@ function netToInp($net) {
 				$n['id'], numOr(slot($n, 'node', 'elev'), '0'), numOr(slot($n, 'node', 'demand'), '0'), slot($n, 'node', 'pattern'));
 			$em = slot($n, 'node', 'emitter');
 			if ($em !== '' && (float)$em != 0) { $emitters[] = sprintf(' %-18s %s', $n['id'], $em); }
-			// Categories beyond the first live only in the demand list; EPANET itself writes
-			// them all to [DEMANDS] and leaves the [JUNCTIONS] column as category 1.
+			// EVERY category goes to [DEMANDS], including the first, because [DEMANDS] REPLACES
+			// the [JUNCTIONS] column rather than adding to it -- measured against the real engine
+			// 2026-08-11 (100 in [JUNCTIONS] plus rows of 50 and 25 reads back as 75). Emitting
+			// only categories 2+ would therefore have silently deleted category 1.
+			// The triple layout (base, pattern, name) is INFERRED: all three of the models this
+			// was written against carry an empty list, so no sample exercises it.
 			$d = isset($n['demands']) ? $n['demands'] : array();
 			for ($i = 0; $i + 1 < count($d); $i += 3) {
-				if ($i === 0) { continue; }
 				$demands[] = sprintf(' %-18s %-12s %s', $n['id'], $d[$i], isset($d[$i + 1]) ? $d[$i + 1] : '');
 			}
 		} elseif ($n['kind'] === 'reservoir') {

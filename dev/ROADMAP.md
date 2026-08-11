@@ -923,35 +923,28 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     system."* That is this task, and it is why the priority moved 40 → 45: it now has two real things
     to say, and a tip system with nothing to say is scaffolding.
 
-- 20|196| **EPANET `.inp` import/export (Task 146 child) — a separate task from Task 195, deliberately.**
-  Raised 2026-08-01. **This reopens a decision already made once**: the scope doc records
-  `.inp` interop as "distinct from" Task 195 and says "Tom confirmed 2026-07-29 is not needed," in
-  favor of Task 146.08's local multi-project save/retrieve instead. Logging it here is a conscious
-  reversal of that call, not an oversight — note it as such if it's picked up, rather than losing
-  the history of why it was declined the first time.
+- 25|281| **EPANET `.inp` EXPORT — the unbuilt half of Task 196.** Import shipped 2026-08-11;
+  writing an `.inp` did not. It is the much easier direction and most of it already exists:
+  `EngCalcs.lpnToInp()` (js/lpn-epanet.js, Task 243) writes a complete `.inp` for the EPANET engine
+  toggle today, and every element this page models is a strict subset of what `.inp` can express,
+  so nothing needs a lossy projection.
+  - **What is actually missing is small:** a File menu row and a download, plus deciding whether
+    the file is written in the PROJECT's units (which is what a user would expect back) rather than
+    the LPS the engine adapter hard-codes for its own convenience, and whether coordinates,
+    vertices and text labels go out as `[COORDINATES]`/`[VERTICES]`/`[LABELS]` (they should — the
+    drawing is most of the value, and dropping it makes the export a downgrade).
+  - **Round-trip is the test to write:** export a project, re-import it, and assert the same
+    document comes back. `dev/lpn-spike/inp-import-harness.js` is the natural home.
+  - **A pump with no curve is the one thing that cannot round-trip** — `lpnToInp()` already turns
+    it into a short, wide, smooth pipe and warns, because EPANET has no such element.
 
-  **Independent of Task 195's native format, in both directions, and independent of whether Phase 1
-  or Phase 2 of that task has shipped.** `.inp` import/export is interop with a DIFFERENT program's
-  file format, not a persistence mechanism — it is two transcode functions between `.inp` text and
-  the same in-memory `doc` object every one of Task 195's phases already reads and writes, so it
-  slots in beside localStorage, JSON download/import, or a live file handle without changing any of
-  them.
-  - **Export is the easy direction.** Every element this suite models (junctions, reservoirs,
-    pipes, pumps with curves) is a strict subset of what `.inp` can express — nothing here needs a
-    lossy projection. A straightforward serializer, buildable independent of anything else on this
-    list.
-  - **Import is the harder direction**, because a real-world `.inp` file can carry things this
-    calculator has deliberately cut (tanks, PRV/PSV/FCV, patterns, water quality, energy cost — see
-    the scope doc's "Cut, not deferred" list). Needs a defined behavior: reject a file that uses a
-    cut feature, or import the supported subset and report exactly what was dropped. Silently
-    dropping data on import would be the worse of the two.
-  - **The known ~0.012% Hazen-Williams constant mismatch against EPANET is already handled
-    infrastructure, not new work.** `js/lpn-solver.js` already carries both constant sets
-    (`EngCalcs.lpnConstants.engcalcs` and `.epanet`) for exactly this reason — an imported network
-    can default to `'epanet'` constants so results agree with the source file it came from.
-  - **UI convenience, not an architectural dependency:** naturally sits on the same file-menu
-    surface as Task 195's Import/Export actions, so building it alongside whichever of that task's
-    phases is in flight avoids building the menu twice — but nothing here blocks on that timing.
+- 15|282| **Offer to attach the backdrop an imported `.inp` names.** An `.inp` (and a `.net`) stores
+  only a PATH to its background picture, never the picture. The import reports the file name and
+  tells the user to add it with Map, Backdrop; it could instead offer a picker right there, seeded
+  with that name, and set the map extent from the file's own `[BACKDROP] DIMENSIONS` so the image
+  lands registered rather than needing the two-point scale gesture. Low priority — a user who wants
+  the picture already knows where it is, and Map, Backdrop already works.
+
 - 5|146.09| **Map insets for congested areas of a drawing (Task 146 child).** Very low priority.
 - 20|177| **Link head loss: report the per-length gradient alongside total (Task 146 child).**
   Conventional network software and reports express pipe head loss in TWO forms, not one, because
@@ -1145,20 +1138,26 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 - 5|267| **"Save as" the backdrop image.** Tom, 2026-08-10, "very low priority". The image is stored
   as a data URI on `backdrop.href`, so writing it back out is a blob download away.
 
-- 40|257| **Example PROJECTS (plural) for lpn, seeded from EPANET's own example networks.** Tom,
-  2026-08-09, while Task 254 was in flight: *"some example projects would also be nice, but that's
-  another task for another day, and I suppose it's up to me to prepare those. Maybe I can get
-  something from EPANET, I hope."* He then found the source:
-  <https://github.com/OpenWaterAnalytics/EPANET/tree/dev/example-networks>.
+- 40|257|[H] **[HUMAN] Find or build the example PROJECTS (plural) for lpn.** **Reassigned to Tom,
+  2026-08-11, at his own request: *"Let's change this task to a human assignment to create or find
+  some EPANET examples."*** What is wanted is the CHOICE of networks — which ones teach something,
+  which ones look like the work our users do — and that is a judgement call, not a build. Handing
+  over the files is enough; the wiring is a small job once they exist.
+  - Original framing, kept because it still holds. Tom, 2026-08-09, while Task 254 was in flight:
+    *"some example projects would also be nice, but that's another task for another day, and I
+    suppose it's up to me to prepare those. Maybe I can get something from EPANET, I hope."* He then
+    found the source: <https://github.com/OpenWaterAnalytics/EPANET/tree/dev/example-networks>.
   - **Distinct from Task 254**, which is the one-click *drawing* example a first-time visitor makes
     from an empty canvas. This is a LIBRARY of openable projects — Net1/Net2/Net3 and friends —
     which is a Projects/tabs feature, not a toolbar button.
-  - **The blocker is that we deliberately have no `.inp` importer.** Tom confirmed 2026-07-29 that
-    interop is not wanted, and `js/looped-network.js` says so. But `EngCalcs.lpnToInp()` already
-    exists (Task 243, for the EPANET engine), so we can WRITE `.inp` — the missing half is reading
-    it. **Decide the direction before scoping:** (a) write a one-off dev-time converter that bakes
-    the chosen examples into our own JSON, shipping no importer, or (b) build a real `.inp` reader
-    and reopen the interop decision. (a) is much cheaper and does not relitigate anything.
+  - **THE BLOCKER IS GONE (Task 196, 2026-08-11).** This used to say "we deliberately have no
+    `.inp` importer" and asked whether to bake examples into our own JSON or build a real reader.
+    Option (b) happened: File > Import EPANET file (.inp) ships, and it has been run over EPA's
+    Net1/Net2/Net3 and three real production models. So an example project is now literally an
+    `.inp` file we choose, import, and save — no converter, no decision left.
+  - **Net1/Net2/Net3 import but do not solve as themselves**, because all three are built on TANKS,
+    which this page cuts. They are a poor first choice for that reason, not a good one. A network
+    with reservoirs, pipes and a pump is what shows this calculator doing its job.
   - **We already have Net1/Net2/Net3 in the repo** as `dev/lpn-spike/reference/` fixtures, so the
     first example costs no download and no network access.
   - **Licensing is clean** — OWA-EPANET is MIT, so its example networks can ship under GPL v3+.
@@ -1779,6 +1778,55 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|196| **[DONE 2026-08-11] EPANET `.inp` IMPORT (Task 146 child). Export is NOT built — see Task 281.**
+  Raised 2026-08-01 as import/export together; only the reading half shipped. **This reverses the
+  2026-07-29 call that interop "is not needed"**, deliberately and on Tom's own instruction
+  (2026-08-11: *"I think it is wise now for us to stress-test our paradigms by trying to import an
+  EPANET file"*), so the history of why it was declined the first time is preserved rather than
+  quietly overwritten.
+  - **File > Import EPANET file (.inp)… — a SEPARATE row from Open…, not a second file type on
+    it.** Open means one of our own documents, with a docId, a lock, a live file handle and a Save
+    that writes back. An `.inp` has none of that and never will, so hiding it behind the same word
+    would promise a round trip we cannot make. An import lands as a new BROWSER project named after
+    the file, arriving clean (not asterisked), and Save as is the way out.
+  - **THE CUT-FEATURE QUESTION IS ANSWERED: import the supported subset and REPORT it, never
+    reject.** Reject loses on contact with real work — two of Tom's three production models carry
+    throttle valves, so a rejecting importer would have refused a third of its own first test set.
+    Every difference is named in a dialog shown after every import, including a clean one ("Nothing
+    was left out"), because the one thing a user needs from interop is to know whether to trust it.
+  - **A throttle control valve (TCV) becomes a ZERO-LENGTH pipe carrying the same local loss, and
+    that is exact rather than approximate.** `lpnResistance()` returns r = 0 for a zero-length link
+    while the minor-loss term is computed from k and diameter alone, so the substitute is precisely
+    the pure local loss the valve was. Every other valve type imposes a CONTROL rather than a loss;
+    those come in as open pipes and are reported as a real loss of behaviour.
+  - **Two EPANET behaviours were MEASURED against the real engine because the obvious reading of
+    each is wrong, and both are silent when got wrong:**
+    - `[DEMANDS]` **replaces** the `[JUNCTIONS]` demand rather than adding to it (100 in
+      `[JUNCTIONS]` with rows of 50 and 25 reads back as 75, not 175). Adding would have inflated
+      every multi-category junction in silence.
+    - A TCV's loss is its **SETTING ALONE**; the `[VALVES]` minor-loss column is ignored for it,
+      which is the opposite of what that section's own column heading suggests. The obvious reading
+      (sum the two) put 10.6 m of phantom head into the first real model that had one.
+  - **Validated two ways, both against the real EPANET engine, both headless.**
+    `dev/lpn-spike/validate_inp.js` checks the READER (parse → our solver vs EPANET on the same
+    file: heads agree to 2 mm, flows to 6e-5 m3/s on four networks, three of them Tom's own
+    production models). `dev/lpn-spike/inp-import-harness.js` checks the DOCUMENT round trip, which
+    is where the interesting mistakes live — a 12 inch main stored as 0.3048 still draws, still
+    solves, and is a different pipe.
+  - **The `.net` discovery, and why it needed its own tool.** Tom's models arrived as `.net`, which
+    is what EPANET's Windows UI saves by default and is a binary Delphi value stream, not text.
+    `dev/scripts/epanet_net_to_inp.php` reads it and documents the format, which is documented
+    nowhere else. **The backdrop is stored as a PATH ONLY** — neither `.net` nor `.inp` embeds the
+    image — so a drawing has to be handed over separately. That answers Tom's first question.
+  - **The client models themselves are NOT committed.** They carry client names and Dropbox paths
+    and this repo is on GitHub. They live in `dev/epanet-models/`, untracked.
+  - **Two real findings fell out of the stress test, both already known traps that bit again:** a
+    pump with no diameter starts the solver at NaN (the trap documented on `pumpCase` in
+    `dev/lpn-spike/cases.js`, which cost an hour on 2026-08-09 and cost more here), so the importer
+    inherits one from the largest pipe the pump touches; and `dev/lpn-spike/lpn-dom-stub.js` had to
+    use INDIRECT eval, because `var EngCalcs = EngCalcs || {};` at the top of `looped-network.js`
+    silently builds a SECOND, empty EngCalcs under a direct eval inside a function.
 
 - 0|270| **[DONE 2026-08-10] Audited lpn against Tom's three blog checklists.** Report:
   `dev/lpn-new-user-guide-audit.md`. All three were audited, not only New User — the New Shopper

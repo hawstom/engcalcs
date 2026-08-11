@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "pt",
-        "expected_key_count": 812,
-        "delta_key_count": 19,
+        "expected_key_count": 839,
+        "delta_key_count": 46,
         "exempt_key_count": 21,
         "exempt_keys": [
             "calc_units_us",
@@ -304,6 +304,33 @@
         "lpn_recent_tip": "Open {file} again, without looking for it.",
         "lpn_recent_denied": "Permission to open that file was not given, so it was not opened.",
         "lpn_recent_gone": "Could not open {file}. It may have been moved, renamed, or deleted, so it was taken off the recent list.",
+        "lpn_dialog_ok": "OK",
+        "lpn_file_import_inp": "Import EPANET file (.inp)…",
+        "lpn_file_import_inp_tip": "Read a network out of an EPANET .inp file and add it to this browser as a new project. This page cannot write an .inp file back, so use Save as to keep your work.",
+        "lpn_inp_bad_file": "That file could not be read as an EPANET network file.",
+        "lpn_inp_report_heading": "Imported {file}",
+        "lpn_inp_report_counts": "{nodes} junctions and reservoirs, {links} pipes and pumps, in {units}.",
+        "lpn_inp_report_clean": "Everything in the file came across. Nothing was left out.",
+        "lpn_inp_report_lead": "This page does not hold everything EPANET does. Here is what changed on the way in:",
+        "lpn_inp_drop_headloss": "This file does not use the Hazen-Williams formula. This page computes Hazen-Williams, so the pipe roughness numbers were kept exactly as written, but the answers here will not match the answers in EPANET.",
+        "lpn_inp_drop_tanks": "Storage tanks were left out. This page has reservoirs, which hold one fixed water level, and a tank is not one.",
+        "lpn_inp_drop_tank_links": "These pipes were left out because they connect to a tank that was left out.",
+        "lpn_inp_drop_tcv": "These throttle control valves came in as very short pipes carrying the same local loss. The water behaves the same way; the element is not the same.",
+        "lpn_inp_drop_valve": "These valves control pressure or flow, and this page has no such element. They came in as open pipes, so the network is still joined up, but nothing is controlling it any more.",
+        "lpn_inp_drop_cv": "In EPANET these pipes let water pass in one direction only. They came in as ordinary pipes, so water may now flow either way through them.",
+        "lpn_inp_drop_demands": "These junctions had more than one demand. The demands were added together into the single demand this page holds.",
+        "lpn_inp_drop_patterns": "Demand patterns were left out. This page solves one moment in time, so every demand is the number written in the file.",
+        "lpn_inp_drop_emitters": "These junctions have a sprinkler or leak coefficient. It was kept and it is being solved, but there is nowhere on this page to see it or change it yet.",
+        "lpn_inp_drop_curve_long": "This pump curve had more than three points. Its lowest, middle and highest points were kept, which is the most this page can fit a curve to.",
+        "lpn_inp_drop_curve_missing": "This pump names a curve that is not in the file. It came in with no curve, so it adds no head.",
+        "lpn_inp_drop_pump_other": "This pump is described by power, by speed, or by a schedule, rather than by a curve. It came in with no curve, so it adds no head.",
+        "lpn_inp_drop_setting": "These links carry a setting this page cannot hold. They came in open.",
+        "lpn_inp_drop_controls": "Controls and rules were left out. Every pipe, pump and valve came in at the state written in the file, and stays there.",
+        "lpn_inp_drop_eps": "This file runs over a period of time. This page solves one moment, so only the starting conditions came in.",
+        "lpn_inp_drop_quality": "Water quality, chemical reaction and pump energy settings were left out. This page solves flow and pressure only.",
+        "lpn_inp_drop_backdrop": "This file names a background picture but does not contain the picture itself. Add it yourself with Map, Backdrop.",
+        "lpn_inp_drop_dangling": "These pipes name a junction that is not in the file, so they were left out.",
+        "lpn_inp_drop_units": "The flow units in this file were not recognised, so gallons per minute were assumed. Check every number before you use the answers.",
         "lpn_settings_computation": "Computation",
         "lpn_settings_engine_epanet": "Solve with the EPANET engine",
         "lpn_settings_engine_epanet_tip": "Runs the original EPANET engine from the US EPA, here in your browser. The built-in solver gives the same answers and is faster, so leave this off unless you need EPANET itself.",
@@ -325,6 +352,33 @@
         "lpn_recent_tip": "Open {file} again, without looking for it.",
         "lpn_recent_denied": "Permission to open that file was not given, so it was not opened.",
         "lpn_recent_gone": "Could not open {file}. It may have been moved, renamed, or deleted, so it was taken off the recent list.",
+        "lpn_dialog_ok": "OK",
+        "lpn_file_import_inp": "Import EPANET file (.inp)…",
+        "lpn_file_import_inp_tip": "Read a network out of an EPANET .inp file and add it to this browser as a new project. This page cannot write an .inp file back, so use Save as to keep your work.",
+        "lpn_inp_bad_file": "That file could not be read as an EPANET network file.",
+        "lpn_inp_report_heading": "Imported {file}",
+        "lpn_inp_report_counts": "{nodes} junctions and reservoirs, {links} pipes and pumps, in {units}.",
+        "lpn_inp_report_clean": "Everything in the file came across. Nothing was left out.",
+        "lpn_inp_report_lead": "This page does not hold everything EPANET does. Here is what changed on the way in:",
+        "lpn_inp_drop_headloss": "This file does not use the Hazen-Williams formula. This page computes Hazen-Williams, so the pipe roughness numbers were kept exactly as written, but the answers here will not match the answers in EPANET.",
+        "lpn_inp_drop_tanks": "Storage tanks were left out. This page has reservoirs, which hold one fixed water level, and a tank is not one.",
+        "lpn_inp_drop_tank_links": "These pipes were left out because they connect to a tank that was left out.",
+        "lpn_inp_drop_tcv": "These throttle control valves came in as very short pipes carrying the same local loss. The water behaves the same way; the element is not the same.",
+        "lpn_inp_drop_valve": "These valves control pressure or flow, and this page has no such element. They came in as open pipes, so the network is still joined up, but nothing is controlling it any more.",
+        "lpn_inp_drop_cv": "In EPANET these pipes let water pass in one direction only. They came in as ordinary pipes, so water may now flow either way through them.",
+        "lpn_inp_drop_demands": "These junctions had more than one demand. The demands were added together into the single demand this page holds.",
+        "lpn_inp_drop_patterns": "Demand patterns were left out. This page solves one moment in time, so every demand is the number written in the file.",
+        "lpn_inp_drop_emitters": "These junctions have a sprinkler or leak coefficient. It was kept and it is being solved, but there is nowhere on this page to see it or change it yet.",
+        "lpn_inp_drop_curve_long": "This pump curve had more than three points. Its lowest, middle and highest points were kept, which is the most this page can fit a curve to.",
+        "lpn_inp_drop_curve_missing": "This pump names a curve that is not in the file. It came in with no curve, so it adds no head.",
+        "lpn_inp_drop_pump_other": "This pump is described by power, by speed, or by a schedule, rather than by a curve. It came in with no curve, so it adds no head.",
+        "lpn_inp_drop_setting": "These links carry a setting this page cannot hold. They came in open.",
+        "lpn_inp_drop_controls": "Controls and rules were left out. Every pipe, pump and valve came in at the state written in the file, and stays there.",
+        "lpn_inp_drop_eps": "This file runs over a period of time. This page solves one moment, so only the starting conditions came in.",
+        "lpn_inp_drop_quality": "Water quality, chemical reaction and pump energy settings were left out. This page solves flow and pressure only.",
+        "lpn_inp_drop_backdrop": "This file names a background picture but does not contain the picture itself. Add it yourself with Map, Backdrop.",
+        "lpn_inp_drop_dangling": "These pipes name a junction that is not in the file, so they were left out.",
+        "lpn_inp_drop_units": "The flow units in this file were not recognised, so gallons per minute were assumed. Check every number before you use the answers.",
         "lpn_settings_computation": "Computation",
         "lpn_settings_engine_epanet": "Solve with the EPANET engine",
         "lpn_settings_engine_epanet_tip": "Runs the original EPANET engine from the US EPA, here in your browser. The built-in solver gives the same answers and is faster, so leave this off unless you need EPANET itself.",
@@ -538,6 +592,438 @@
                     "key": "lpn_tab_new",
                     "value": "Novo projeto",
                     "english": "New project"
+                }
+            }
+        },
+        "lpn_dialog_ok": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_import_no_room",
+                    "value": "Não há espaço suficiente no armazenamento do navegador para adicionar este projeto. Exclua um projeto de que não precisa mais e tente novamente.",
+                    "english": "There is not enough browser storage left to add this project. Delete a project you no longer need and try again."
+                },
+                "next_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} foi aberto a partir de um arquivo e adicionado a este navegador como um novo projeto.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                }
+            }
+        },
+        "lpn_file_import_inp": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_import_no_room",
+                    "value": "Não há espaço suficiente no armazenamento do navegador para adicionar este projeto. Exclua um projeto de que não precisa mais e tente novamente.",
+                    "english": "There is not enough browser storage left to add this project. Delete a project you no longer need and try again."
+                },
+                "next_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} foi aberto a partir de um arquivo e adicionado a este navegador como um novo projeto.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                }
+            }
+        },
+        "lpn_file_import_inp_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_import_no_room",
+                    "value": "Não há espaço suficiente no armazenamento do navegador para adicionar este projeto. Exclua um projeto de que não precisa mais e tente novamente.",
+                    "english": "There is not enough browser storage left to add this project. Delete a project you no longer need and try again."
+                },
+                "next_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} foi aberto a partir de um arquivo e adicionado a este navegador como um novo projeto.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                }
+            }
+        },
+        "lpn_inp_bad_file": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_import_no_room",
+                    "value": "Não há espaço suficiente no armazenamento do navegador para adicionar este projeto. Exclua um projeto de que não precisa mais e tente novamente.",
+                    "english": "There is not enough browser storage left to add this project. Delete a project you no longer need and try again."
+                },
+                "next_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} foi aberto a partir de um arquivo e adicionado a este navegador como um novo projeto.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                }
+            }
+        },
+        "lpn_inp_report_heading": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_import_no_room",
+                    "value": "Não há espaço suficiente no armazenamento do navegador para adicionar este projeto. Exclua um projeto de que não precisa mais e tente novamente.",
+                    "english": "There is not enough browser storage left to add this project. Delete a project you no longer need and try again."
+                },
+                "next_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} foi aberto a partir de um arquivo e adicionado a este navegador como um novo projeto.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                }
+            }
+        },
+        "lpn_inp_report_counts": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_import_no_room",
+                    "value": "Não há espaço suficiente no armazenamento do navegador para adicionar este projeto. Exclua um projeto de que não precisa mais e tente novamente.",
+                    "english": "There is not enough browser storage left to add this project. Delete a project you no longer need and try again."
+                },
+                "next_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} foi aberto a partir de um arquivo e adicionado a este navegador como um novo projeto.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                }
+            }
+        },
+        "lpn_inp_report_clean": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_import_no_room",
+                    "value": "Não há espaço suficiente no armazenamento do navegador para adicionar este projeto. Exclua um projeto de que não precisa mais e tente novamente.",
+                    "english": "There is not enough browser storage left to add this project. Delete a project you no longer need and try again."
+                },
+                "next_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} foi aberto a partir de um arquivo e adicionado a este navegador como um novo projeto.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                }
+            }
+        },
+        "lpn_inp_report_lead": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_import_no_room",
+                    "value": "Não há espaço suficiente no armazenamento do navegador para adicionar este projeto. Exclua um projeto de que não precisa mais e tente novamente.",
+                    "english": "There is not enough browser storage left to add this project. Delete a project you no longer need and try again."
+                },
+                "next_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} foi aberto a partir de um arquivo e adicionado a este navegador como um novo projeto.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                }
+            }
+        },
+        "lpn_inp_drop_headloss": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_import_no_room",
+                    "value": "Não há espaço suficiente no armazenamento do navegador para adicionar este projeto. Exclua um projeto de que não precisa mais e tente novamente.",
+                    "english": "There is not enough browser storage left to add this project. Delete a project you no longer need and try again."
+                },
+                "next_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} foi aberto a partir de um arquivo e adicionado a este navegador como um novo projeto.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                }
+            }
+        },
+        "lpn_inp_drop_tanks": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_import_no_room",
+                    "value": "Não há espaço suficiente no armazenamento do navegador para adicionar este projeto. Exclua um projeto de que não precisa mais e tente novamente.",
+                    "english": "There is not enough browser storage left to add this project. Delete a project you no longer need and try again."
+                },
+                "next_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} foi aberto a partir de um arquivo e adicionado a este navegador como um novo projeto.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                }
+            }
+        },
+        "lpn_inp_drop_tank_links": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_import_no_room",
+                    "value": "Não há espaço suficiente no armazenamento do navegador para adicionar este projeto. Exclua um projeto de que não precisa mais e tente novamente.",
+                    "english": "There is not enough browser storage left to add this project. Delete a project you no longer need and try again."
+                },
+                "next_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} foi aberto a partir de um arquivo e adicionado a este navegador como um novo projeto.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                }
+            }
+        },
+        "lpn_inp_drop_tcv": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_import_no_room",
+                    "value": "Não há espaço suficiente no armazenamento do navegador para adicionar este projeto. Exclua um projeto de que não precisa mais e tente novamente.",
+                    "english": "There is not enough browser storage left to add this project. Delete a project you no longer need and try again."
+                },
+                "next_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} foi aberto a partir de um arquivo e adicionado a este navegador como um novo projeto.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                }
+            }
+        },
+        "lpn_inp_drop_valve": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_import_no_room",
+                    "value": "Não há espaço suficiente no armazenamento do navegador para adicionar este projeto. Exclua um projeto de que não precisa mais e tente novamente.",
+                    "english": "There is not enough browser storage left to add this project. Delete a project you no longer need and try again."
+                },
+                "next_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} foi aberto a partir de um arquivo e adicionado a este navegador como um novo projeto.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                }
+            }
+        },
+        "lpn_inp_drop_cv": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_import_no_room",
+                    "value": "Não há espaço suficiente no armazenamento do navegador para adicionar este projeto. Exclua um projeto de que não precisa mais e tente novamente.",
+                    "english": "There is not enough browser storage left to add this project. Delete a project you no longer need and try again."
+                },
+                "next_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} foi aberto a partir de um arquivo e adicionado a este navegador como um novo projeto.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                }
+            }
+        },
+        "lpn_inp_drop_demands": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_import_no_room",
+                    "value": "Não há espaço suficiente no armazenamento do navegador para adicionar este projeto. Exclua um projeto de que não precisa mais e tente novamente.",
+                    "english": "There is not enough browser storage left to add this project. Delete a project you no longer need and try again."
+                },
+                "next_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} foi aberto a partir de um arquivo e adicionado a este navegador como um novo projeto.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                }
+            }
+        },
+        "lpn_inp_drop_patterns": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_import_no_room",
+                    "value": "Não há espaço suficiente no armazenamento do navegador para adicionar este projeto. Exclua um projeto de que não precisa mais e tente novamente.",
+                    "english": "There is not enough browser storage left to add this project. Delete a project you no longer need and try again."
+                },
+                "next_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} foi aberto a partir de um arquivo e adicionado a este navegador como um novo projeto.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                }
+            }
+        },
+        "lpn_inp_drop_emitters": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_import_no_room",
+                    "value": "Não há espaço suficiente no armazenamento do navegador para adicionar este projeto. Exclua um projeto de que não precisa mais e tente novamente.",
+                    "english": "There is not enough browser storage left to add this project. Delete a project you no longer need and try again."
+                },
+                "next_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} foi aberto a partir de um arquivo e adicionado a este navegador como um novo projeto.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                }
+            }
+        },
+        "lpn_inp_drop_curve_long": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_import_no_room",
+                    "value": "Não há espaço suficiente no armazenamento do navegador para adicionar este projeto. Exclua um projeto de que não precisa mais e tente novamente.",
+                    "english": "There is not enough browser storage left to add this project. Delete a project you no longer need and try again."
+                },
+                "next_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} foi aberto a partir de um arquivo e adicionado a este navegador como um novo projeto.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                }
+            }
+        },
+        "lpn_inp_drop_curve_missing": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_import_no_room",
+                    "value": "Não há espaço suficiente no armazenamento do navegador para adicionar este projeto. Exclua um projeto de que não precisa mais e tente novamente.",
+                    "english": "There is not enough browser storage left to add this project. Delete a project you no longer need and try again."
+                },
+                "next_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} foi aberto a partir de um arquivo e adicionado a este navegador como um novo projeto.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                }
+            }
+        },
+        "lpn_inp_drop_pump_other": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_import_no_room",
+                    "value": "Não há espaço suficiente no armazenamento do navegador para adicionar este projeto. Exclua um projeto de que não precisa mais e tente novamente.",
+                    "english": "There is not enough browser storage left to add this project. Delete a project you no longer need and try again."
+                },
+                "next_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} foi aberto a partir de um arquivo e adicionado a este navegador como um novo projeto.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                }
+            }
+        },
+        "lpn_inp_drop_setting": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_import_no_room",
+                    "value": "Não há espaço suficiente no armazenamento do navegador para adicionar este projeto. Exclua um projeto de que não precisa mais e tente novamente.",
+                    "english": "There is not enough browser storage left to add this project. Delete a project you no longer need and try again."
+                },
+                "next_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} foi aberto a partir de um arquivo e adicionado a este navegador como um novo projeto.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                }
+            }
+        },
+        "lpn_inp_drop_controls": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_import_no_room",
+                    "value": "Não há espaço suficiente no armazenamento do navegador para adicionar este projeto. Exclua um projeto de que não precisa mais e tente novamente.",
+                    "english": "There is not enough browser storage left to add this project. Delete a project you no longer need and try again."
+                },
+                "next_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} foi aberto a partir de um arquivo e adicionado a este navegador como um novo projeto.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                }
+            }
+        },
+        "lpn_inp_drop_eps": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_import_no_room",
+                    "value": "Não há espaço suficiente no armazenamento do navegador para adicionar este projeto. Exclua um projeto de que não precisa mais e tente novamente.",
+                    "english": "There is not enough browser storage left to add this project. Delete a project you no longer need and try again."
+                },
+                "next_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} foi aberto a partir de um arquivo e adicionado a este navegador como um novo projeto.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                }
+            }
+        },
+        "lpn_inp_drop_quality": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_import_no_room",
+                    "value": "Não há espaço suficiente no armazenamento do navegador para adicionar este projeto. Exclua um projeto de que não precisa mais e tente novamente.",
+                    "english": "There is not enough browser storage left to add this project. Delete a project you no longer need and try again."
+                },
+                "next_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} foi aberto a partir de um arquivo e adicionado a este navegador como um novo projeto.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                }
+            }
+        },
+        "lpn_inp_drop_backdrop": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_import_no_room",
+                    "value": "Não há espaço suficiente no armazenamento do navegador para adicionar este projeto. Exclua um projeto de que não precisa mais e tente novamente.",
+                    "english": "There is not enough browser storage left to add this project. Delete a project you no longer need and try again."
+                },
+                "next_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} foi aberto a partir de um arquivo e adicionado a este navegador como um novo projeto.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                }
+            }
+        },
+        "lpn_inp_drop_dangling": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_import_no_room",
+                    "value": "Não há espaço suficiente no armazenamento do navegador para adicionar este projeto. Exclua um projeto de que não precisa mais e tente novamente.",
+                    "english": "There is not enough browser storage left to add this project. Delete a project you no longer need and try again."
+                },
+                "next_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} foi aberto a partir de um arquivo e adicionado a este navegador como um novo projeto.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                }
+            }
+        },
+        "lpn_inp_drop_units": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_import_no_room",
+                    "value": "Não há espaço suficiente no armazenamento do navegador para adicionar este projeto. Exclua um projeto de que não precisa mais e tente novamente.",
+                    "english": "There is not enough browser storage left to add this project. Delete a project you no longer need and try again."
+                },
+                "next_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} foi aberto a partir de um arquivo e adicionado a este navegador como um novo projeto.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
                 }
             }
         },

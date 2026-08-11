@@ -1,0 +1,84 @@
+[TITLE]
+Import test network -- one file that touches every branch of EngCalcs.lpnInpParse.
+Hand-written for dev/lpn-spike/validate_inp.js (ROADMAP Task 196). No tanks, so the
+real EPANET engine and our own solver are comparing the SAME network and any
+disagreement is an import bug rather than a cut feature.
+
+[JUNCTIONS]
+;ID     Elev    Demand  Pattern
+ J1     100     0
+ J2     95      120
+ J3     90      0
+ J4     88      60
+ J5     92      0
+ J6     85      80
+
+[RESERVOIRS]
+;ID     Head
+ R1     100
+ R2     260
+
+[PIPES]
+;ID     Node1   Node2   Length  Diam    Rough   MinorLoss  Status
+ P1     J1      J2      1200    12      130     0          Open
+ P2     J2      J3      800     10      120     2          Open
+ P3     J3      J4      1500    8       110     0          Open
+ P4     J4      J5      600     8       130     0.5        Open
+ P5     J5      J2      2000    6       100     0          Open
+ P6     J3      J6      400     6       140     0          Open
+ P8     J1      J5      2500    6       100     0          Closed
+ P7     R2      J5      900     12      130     0          Open
+
+[PUMPS]
+;ID     Node1   Node2   Parameters
+ PU1    R1      J1      HEAD  C1
+
+[VALVES]
+;ID     Node1   Node2   Diam    Type    Setting  MinorLoss
+ V1     J4      J6      8       TCV     12       3
+
+[CURVES]
+;ID     Flow    Head
+ C1     0       220
+ C1     500     190
+ C1     1000    120
+
+[DEMANDS]
+;Junction  Demand   Pattern
+ J3        40
+ J3        35
+
+[EMITTERS]
+;Junction  Coefficient
+ J6        1.5
+
+[OPTIONS]
+ Units                GPM
+ Headloss             H-W
+ Emitter Exponent     0.5
+ Accuracy             1e-8
+ Trials               200
+ Unbalanced           Continue 10
+
+[COORDINATES]
+;Node   X-Coord   Y-Coord
+ J1     100       100
+ J2     300       100
+ J3     500       100
+ J4     700       100
+ J5     500       300
+ J6     700       300
+ R1     0         100
+ R2     300       400
+
+[VERTICES]
+;Link   X-Coord   Y-Coord
+ P5     380       220
+ P5     420       260
+
+[LABELS]
+;X-Coord  Y-Coord  Label
+ 100      420      "Import test network"
+ 300      380      "Source" R2
+
+[END]

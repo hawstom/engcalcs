@@ -705,6 +705,15 @@ written — Tom confirmed 2026-07-29 the actual need behind it is local multi-pr
 interop was considered and declined for now. *(Polyline pipe vertex editing, originally slated here,
 moved to Phase 1 — see the note above.)*
 
+> **SUPERSEDED 2026-08-11 for the READING half.** The "declined for now" above was reversed on Tom's
+> own instruction (*"I think it is wise now for us to stress-test our paradigms by trying to import
+> an EPANET file"*), and **File > Import EPANET file (.inp) ships** — `js/lpn-inp.js`, ROADMAP Task
+> 196. Two things did NOT change and are worth keeping straight. The cut list below is untouched:
+> tanks, control valves, patterns, quality and extended-period simulation are still absent, and an
+> import that meets one reports it rather than pretending. And import is not persistence: an `.inp`
+> lands as an ordinary browser project, Task 146.08's library is still where projects live, and
+> nothing writes an `.inp` back yet (that is Task 281).
+
 **Phase 4 — Task 145**, the Google/OSM tiled map and elevation mashup, moved here from `bpn_`. By
 this point it is one more backdrop *type*, not a foundation — and it brings the projection and
 Web-Mercator-distance traps documented in the Backdrop section. **Confirmed low priority (Tom,

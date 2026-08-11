@@ -2817,6 +2817,250 @@ var EngCalcs = EngCalcs || {};
 		reader.readAsText(file);
 	}
 
+	// ---- EPANET .inp import (ROADMAP Task 196) ----
+	//
+	// A DIFFERENT ACT FROM File > Open, and kept apart from it on purpose. Open is about OUR
+	// documents: it carries a docId, a lock, a live file handle, and a Save that goes back where it
+	// came from. An `.inp` has none of that -- it is somebody else's format, and writing our JSON
+	// back into it would be a lie. So an import lands as a new BROWSER project, named after the
+	// file, and Save as is the way to give it a home.
+	//
+	// The reading itself is js/lpn-inp.js, which is DOM-free and validated against the real EPANET
+	// engine (dev/lpn-spike/validate_inp.js). Everything here is the other half: turning its SI
+	// model into a document in the units the file was written in, and telling the user what the
+	// import could not keep.
+
+	// Which unit each selector should show for an imported file. The file's own units where this
+	// page offers them -- EPANET's two systems are exactly the ft/in/psi/ft-of-water and
+	// m/mm/m-of-water sets, so almost everything matches with no conversion at all. Only the flow
+	// unit can miss (this page offers six, EPANET names ten), and a miss is harmless: every number
+	// crosses through SI anyway, so the network is identical and only the label differs.
+	var LPN_INP_FLOW_UNIT = {
+		GPM: 'gpm', MGD: 'gpm', IMGD: 'gpm', CFS: 'ft3ps', AFD: 'ft3ps',
+		LPS: 'lps', LPM: 'lps', MLD: 'lps', CMH: 'lps', CMD: 'lps'
+	};
+	function inpUnitSelections(parsed) {
+		var us = parsed.unitSystem === 'us';
+		return {
+			lpn_u_length: us ? 'ft' : 'm',
+			lpn_u_elevhead: us ? 'fth2o' : 'mh2o',
+			lpn_u_pressure: us ? 'psi' : 'mh2o',
+			lpn_u_diameter: us ? 'in' : 'mm',
+			lpn_u_flow: LPN_INP_FLOW_UNIT[parsed.flowUnits] || (us ? 'gpm' : 'lps'),
+			lpn_u_velocity: us ? 'ftps' : 'mps'
+			// No lpn_u_gradient: head-loss gradient is dimensionless and an .inp does not name one.
+		};
+	}
+
+	/**
+	 * The parsed .inp as a saved document, ready for importProject().
+	 *
+	 * Must run with the units strip ALREADY on the file's units, because it converts through
+	 * toDisplay() -- one authority for the factors rather than a second table in here.
+	 */
+	function docFromInp(parsed, name) {
+		var nodes = parsed.nodes.map(function (n) {
+			if (n.type === 'reservoir') {
+				// No `_head` written, deliberately: a blank head means "the water surface is at the
+				// ground", and elevation already carries EPANET's total head. Writing the same
+				// number into both would look identical and silently sever the link the page keeps
+				// between them (see reservoirHead()).
+				return { id: n.id, type: 'reservoir', x: n.x, y: n.y, elev: toDisplay(n.elev, 'lpn_u_elevhead') };
+			}
+			var j = {
+				id: n.id, type: 'junction', x: n.x, y: n.y,
+				elev: toDisplay(n.elev, 'lpn_u_elevhead'),
+				_demand: toDisplay(n.demand, 'lpn_u_flow')
+			};
+			// Dimensionless in the solver's own terms (m3/s per m^gamma), so it is stored as parsed
+			// and never shown -- nothing in the UI edits an emitter yet, which is why the import
+			// report names every junction that has one.
+			if (n.emitter) { j._emitter = n.emitter; }
+			return j;
+		});
+		var links = parsed.links.map(function (l) {
+			var out = {
+				id: l.id, type: l.type, from: l.from, to: l.to,
+				verts: (l.verts || []).map(function (v) { return { x: v.x, y: v.y }; }),
+				_diameter: toDisplay(l.diameter, 'lpn_u_diameter'),
+				_roughness: l.roughness,
+				// LENGTH IS THE FILE'S OWN NUMBER, and lenAuto is OFF. An EPANET length is the real
+				// pipe length, which is routinely nothing like the distance between two symbols on
+				// a schematic; letting linkGeomLength() recompute it on the first edit would quietly
+				// redesign the network. Auto stays available in the popup for anyone who wants it.
+				_length: l.length,
+				lenAuto: false,
+				_status: l.status,
+				_k: l.k || 0
+			};
+			if (l.type === 'pump') {
+				out.curvePoints = (l.curvePoints || []).map(function (pt) {
+					return [toDisplay(pt[0], 'lpn_u_flow'), toDisplay(pt[1], 'lpn_u_elevhead')];
+				});
+				out.curveRef = null;
+				// h0/a/b are what the solver reads and are SI, so they are fitted from the SI points
+				// rather than the displayed ones -- the same split recomputePumpCurve() makes.
+				var fit = (l.curvePoints && l.curvePoints.length)
+					? EngCalcs.lpnPumpFromCurve(l.curvePoints)
+					: { h0: 0, a: 0, b: 2 };
+				out.h0 = fit.h0; out.a = fit.a; out.b = fit.b;
+			}
+			return out;
+		});
+		var nodeAt = {};
+		nodes.forEach(function (n) { nodeAt[n.id] = n; });
+		var labels = parsed.labels.map(function (lb, i) {
+			// An anchored label stores an OFFSET from its node, not a position (buildLabelEls'
+			// model); EPANET stores the absolute point, so the anchor is subtracted here.
+			var an = lb.anchorNode && nodeAt[lb.anchorNode] ? nodeAt[lb.anchorNode] : null;
+			return {
+				id: 'T' + (i + 1), text: lb.text,
+				x: an ? lb.x - an.x : lb.x,
+				y: an ? lb.y - an.y : lb.y,
+				anchorNode: an ? lb.anchorNode : null,
+				sizeMult: 1
+			};
+		});
+		// nextId must clear every id the file brought, or the next element drawn would collide with
+		// one. Only ids shaped like this page's own (prefix + number) can collide, so only those are
+		// counted -- an EPANET id like "J-TF" is left alone and simply never reproduced.
+		var next = { J: 1, R: 1, L: 1, P: 1, T: labels.length + 1 };
+		function claim(id, key) {
+			var prefix = settings.idPrefixes[key] || key;
+			if (id.slice(0, prefix.length) !== prefix) { return; }
+			var n = parseInt(id.slice(prefix.length), 10);
+			if (isFinite(n) && String(n) === id.slice(prefix.length) && n >= next[key]) { next[key] = n + 1; }
+		}
+		nodes.forEach(function (n) { claim(n.id, n.type === 'reservoir' ? 'R' : 'J'); });
+		links.forEach(function (l) { claim(l.id, l.type === 'pump' ? 'P' : 'L'); });
+
+		return {
+			v: LPN_STORAGE_VERSION,
+			project: { name: name, activeScenario: 'base' },
+			scenarios: defaultScenarios(),
+			nodes: nodes, links: links, labels: labels, nextId: next,
+			labelSettings: JSON.parse(JSON.stringify(labelSettings)),
+			backdrop: null,   // an .inp names an image file; it never carries one. See the report.
+			settings: JSON.parse(JSON.stringify(settings)),
+			units: readUnitSelections()
+		};
+	}
+
+	// One sentence per thing an import could not keep. Written as whole sentences rather than
+	// composed from fragments (CLAUDE.md's key-reuse rule), and grouped so that closely related
+	// EPANET features share one message instead of each buying its own translated string.
+	function inpDropText(code) {
+		var pc = EngCalcs.pageConfig || {};
+		switch (code) {
+			case 'headloss-formula': return pc.lpn_inp_drop_headloss || 'This file does not use the Hazen-Williams formula. This page computes Hazen-Williams, so the pipe roughness numbers were kept exactly as written but the results here will not match the results in EPANET.';
+			case 'tanks': return pc.lpn_inp_drop_tanks || 'Storage tanks were left out. This page has reservoirs, which hold a fixed water level, and a tank is not one.';
+			case 'links-on-tanks': return pc.lpn_inp_drop_tank_links || 'These pipes were left out because they connect to a tank that was left out.';
+			case 'valve-tcv-as-pipe': return pc.lpn_inp_drop_tcv || 'These throttle control valves came in as very short pipes carrying the same local loss. The hydraulics are the same; the element is not.';
+			case 'valve-dropped': return pc.lpn_inp_drop_valve || 'These valves control pressure or flow, and this page has no such element. They came in as open pipes, so the network is still connected but nothing is controlling it.';
+			case 'check-valve': return pc.lpn_inp_drop_cv || 'These pipes only let water flow one way in EPANET. They came in as ordinary pipes, so water may now flow either way through them.';
+			case 'demand-categories': return pc.lpn_inp_drop_demands || 'These junctions had more than one demand. The demands were added together into the one demand this page holds.';
+			case 'demand-pattern':
+			case 'head-pattern':
+			case 'patterns': return pc.lpn_inp_drop_patterns || 'Demand patterns were left out. This page solves one moment in time, so every demand is the number written in the file.';
+			case 'emitters-not-editable': return pc.lpn_inp_drop_emitters || 'These junctions have a sprinkler or leak coefficient. It was kept and it is being solved, but there is nowhere on this page to see or change it yet.';
+			case 'pump-curve-reduced': return pc.lpn_inp_drop_curve_long || 'This pump curve had more than three points. Its lowest, middle and highest points were kept, which is the most this page fits a curve from.';
+			case 'pump-curve-missing': return pc.lpn_inp_drop_curve_missing || 'This pump names a curve that is not in the file. It came in with no curve, so it adds no head.';
+			case 'pump-constant-power':
+			case 'pump-speed':
+			case 'pump-pattern': return pc.lpn_inp_drop_pump_other || 'This pump is described by power, speed or a schedule rather than by a curve. It came in with no curve, so it adds no head.';
+			case 'link-setting': return pc.lpn_inp_drop_setting || 'These links carry a setting this page cannot hold. They came in open.';
+			case 'controls':
+			case 'rules': return pc.lpn_inp_drop_controls || 'Controls and rules were left out. Every pipe, pump and valve came in at the state written in the file and stays there.';
+			case 'extended-period': return pc.lpn_inp_drop_eps || 'This file runs over a period of time. This page solves one moment, so only the starting conditions came in.';
+			case 'quality':
+			case 'reactions':
+			case 'sources':
+			case 'mixing':
+			case 'energy': return pc.lpn_inp_drop_quality || 'Water quality, chemical reaction and pump energy settings were left out. This page solves flow and pressure only.';
+			case 'backdrop-not-embedded': return pc.lpn_inp_drop_backdrop || 'This file names a background picture but does not contain it. Add the picture yourself with Map, Backdrop.';
+			case 'dangling-link': return pc.lpn_inp_drop_dangling || 'These pipes name a junction that is not in the file, so they were left out.';
+			case 'unknown-flow-units': return pc.lpn_inp_drop_units || 'The flow units in this file were not recognised, so gallons per minute were assumed. Check every number before using the results.';
+			default: return code;
+		}
+	}
+
+	// The report. Shown ALWAYS, even when nothing was dropped -- a clean import is worth saying out
+	// loud, because the one thing a user needs from an interop feature is to know whether to trust
+	// it, and silence is the same answer as "something went wrong and nobody mentioned it".
+	function showInpReport(parsed, fileName) {
+		var pc = EngCalcs.pageConfig || {};
+		// Several parse codes share one sentence, so they are merged here rather than printed twice.
+		var byText = [], seen = {};
+		parsed.dropped.forEach(function (d) {
+			var text = inpDropText(d.code), at = seen[text];
+			if (at === undefined) { seen[text] = byText.length; byText.push({ text: text, ids: d.ids.slice() }); }
+			else { byText[at].ids = byText[at].ids.concat(d.ids); }
+		});
+		openDialog(function (body) {
+			var h = document.createElement('p');
+			h.style.margin = '0 0 8px';
+			h.style.fontWeight = 'bold';
+			h.textContent = (pc.lpn_inp_report_heading || 'Imported {file}').replace('{file}', fileName);
+			body.appendChild(h);
+			var sum = document.createElement('p');
+			sum.style.margin = '0 0 8px';
+			sum.textContent = (pc.lpn_inp_report_counts || '{nodes} junctions and reservoirs, {links} pipes and pumps, in {units}.')
+				.replace('{nodes}', parsed.nodes.length)
+				.replace('{links}', parsed.links.length)
+				.replace('{units}', parsed.flowUnits);
+			body.appendChild(sum);
+			if (!byText.length) {
+				var ok = document.createElement('p');
+				ok.style.margin = '0';
+				ok.textContent = pc.lpn_inp_report_clean || 'Everything in the file came across. Nothing was left out.';
+				body.appendChild(ok);
+				return;
+			}
+			var lead = document.createElement('p');
+			lead.style.margin = '0 0 6px';
+			lead.textContent = pc.lpn_inp_report_lead || 'This page does not hold everything EPANET does. Here is what changed on the way in:';
+			body.appendChild(lead);
+			var ul = document.createElement('ul');
+			ul.style.margin = '0';
+			ul.style.paddingLeft = '20px';
+			byText.forEach(function (row) {
+				var li = document.createElement('li');
+				li.style.marginBottom = '4px';
+				li.textContent = row.ids.length ? row.text + ' (' + row.ids.join(', ') + ')' : row.text;
+				ul.appendChild(li);
+			});
+			body.appendChild(ul);
+		}, [{ label: pc.lpn_dialog_ok || 'OK', fn: function () { } }]);
+	}
+
+	function importInpFromFile(file) {
+		var pc = EngCalcs.pageConfig || {}, reader = new FileReader();
+		reader.onload = function (ev) {
+			var parsed = EngCalcs.lpnInpParse ? EngCalcs.lpnInpParse(ev.target.result) : { ok: false };
+			if (!parsed.ok) {
+				alert(pc.lpn_inp_bad_file || 'That file could not be read as an EPANET network file.');
+				return;
+			}
+			// The units strip moves FIRST, because docFromInp() converts through it.
+			applyUnitSelections(inpUnitSelections(parsed));
+			var name = String(file.name).replace(/\.inp$/i, '') || String(file.name);
+			var id = importProject(docFromInp(parsed, name));
+			if (!id) { return; }   // importProject already reported the storage failure
+			// Arrives SAVED, for the same reason an uploaded project does: a file the user just
+			// handed us off their own disk is not unsaved work. It earns its asterisk on the first
+			// edit, and it can only ever go out as one of our own files, via Save as.
+			stampProjectSaved(id);
+			renderTabs();
+			showInpReport(parsed, file.name);
+		};
+		reader.onerror = function () { alert(pc.lpn_inp_bad_file || 'That file could not be read as an EPANET network file.'); };
+		reader.readAsText(file);
+	}
+	function pickInpFile() {
+		var input = document.getElementById('lpn_inp_file');
+		if (input) { input.click(); }
+	}
+
 	// ---- Live file handles (ROADMAP Task 195 Phase 2, step 1) ----
 	// Phase 1 hands you a copy; this makes the FILE the thing you are working in. `showSaveFilePicker`
 	// / `showOpenFilePicker` return a real `FileSystemFileHandle`, and a dirty-flag timer writes the
@@ -4801,7 +5045,13 @@ var EngCalcs = EngCalcs || {};
 			// one on the spot -- "Blank project" is still the first row of it, so the old act is one
 			// extra click and every other way to start is finally reachable from the same place.
 			{ icon: 'new', label: pc.lpn_file_new || 'New project…', submenu: newProjectRows },
-			{ icon: 'open', label: pc.lpn_file_open || 'Open…', fn: openFromFile }
+			{ icon: 'open', label: pc.lpn_file_open || 'Open…', fn: openFromFile },
+			// A SEPARATE ROW FROM Open…, not a second file type on it (Task 196). Open means one of
+			// our own documents, with everything that comes with it -- a lock, a live file handle, a
+			// Save that writes back. An .inp has none of that and never will, so hiding it behind
+			// the same word would promise a round trip we cannot make. Import says what it is.
+			{ icon: 'open', label: pc.lpn_file_import_inp || 'Import EPANET file (.inp)…',
+			  tip: pc.lpn_file_import_inp_tip, fn: pickInpFile }
 		].concat(recentRows, [
 			{ separator: true },
 			// **The menu says Save and Save as… in every browser** (Tom, 2026-08-04, overruling the
@@ -5156,6 +5406,16 @@ var EngCalcs = EngCalcs || {};
 			var f = fileInput.files[0];
 			fileInput.value = '';
 			if (f) { importProjectFromFile(f); }
+		});
+		// Its own picker rather than a second accept type on the one above: the two land in
+		// different places (our document reader vs the EPANET reader), and one input serving both
+		// would have to guess which from the extension -- a guess with a silent wrong answer.
+		var inpInput = document.getElementById('lpn_inp_file');
+		if (!inpInput) { return; }
+		inpInput.addEventListener('change', function () {
+			var f = inpInput.files[0];
+			inpInput.value = '';
+			if (f) { importInpFromFile(f); }
 		});
 	}
 

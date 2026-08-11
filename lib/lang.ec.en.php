@@ -1238,6 +1238,40 @@ $ec_lang['lpn_tab_move_right']='Move right';
 $ec_lang['lpn_tab_unsaved']='Not saved to a file';
 $ec_lang['lpn_import_bad_file']='That file could not be read as a project saved from this page.';
 $ec_lang['lpn_import_no_room']='There is not enough browser storage left to add this project. Delete a project you no longer need and try again.';
+// ---- EPANET .inp import (ROADMAP Task 196) ----
+// The import REPORTS every difference between the file and what this page can hold, so each
+// lpn_inp_drop_* key is one whole sentence naming one thing that changed and why. They are joined
+// to a list of element IDs at render time and to nothing else -- no key here is a fragment of
+// another sentence, and none may become one.
+// {file} is a file name; {nodes}, {links} and {units} are numbers and a unit name. Word order is
+// the translator's to choose.
+$ec_lang['lpn_dialog_ok']='OK';
+$ec_lang['lpn_file_import_inp']='Import EPANET file (.inp)…';
+$ec_lang['lpn_file_import_inp_tip']='Read a network out of an EPANET .inp file and add it to this browser as a new project. This page cannot write an .inp file back, so use Save as to keep your work.';
+$ec_lang['lpn_inp_bad_file']='That file could not be read as an EPANET network file.';
+$ec_lang['lpn_inp_report_heading']='Imported {file}';
+$ec_lang['lpn_inp_report_counts']='{nodes} junctions and reservoirs, {links} pipes and pumps, in {units}.';
+$ec_lang['lpn_inp_report_clean']='Everything in the file came across. Nothing was left out.';
+$ec_lang['lpn_inp_report_lead']='This page does not hold everything EPANET does. Here is what changed on the way in:';
+$ec_lang['lpn_inp_drop_headloss']='This file does not use the Hazen-Williams formula. This page computes Hazen-Williams, so the pipe roughness numbers were kept exactly as written, but the answers here will not match the answers in EPANET.';
+$ec_lang['lpn_inp_drop_tanks']='Storage tanks were left out. This page has reservoirs, which hold one fixed water level, and a tank is not one.';
+$ec_lang['lpn_inp_drop_tank_links']='These pipes were left out because they connect to a tank that was left out.';
+$ec_lang['lpn_inp_drop_tcv']='These throttle control valves came in as very short pipes carrying the same local loss. The water behaves the same way; the element is not the same.';
+$ec_lang['lpn_inp_drop_valve']='These valves control pressure or flow, and this page has no such element. They came in as open pipes, so the network is still joined up, but nothing is controlling it any more.';
+$ec_lang['lpn_inp_drop_cv']='In EPANET these pipes let water pass in one direction only. They came in as ordinary pipes, so water may now flow either way through them.';
+$ec_lang['lpn_inp_drop_demands']='These junctions had more than one demand. The demands were added together into the single demand this page holds.';
+$ec_lang['lpn_inp_drop_patterns']='Demand patterns were left out. This page solves one moment in time, so every demand is the number written in the file.';
+$ec_lang['lpn_inp_drop_emitters']='These junctions have a sprinkler or leak coefficient. It was kept and it is being solved, but there is nowhere on this page to see it or change it yet.';
+$ec_lang['lpn_inp_drop_curve_long']='This pump curve had more than three points. Its lowest, middle and highest points were kept, which is the most this page can fit a curve to.';
+$ec_lang['lpn_inp_drop_curve_missing']='This pump names a curve that is not in the file. It came in with no curve, so it adds no head.';
+$ec_lang['lpn_inp_drop_pump_other']='This pump is described by power, by speed, or by a schedule, rather than by a curve. It came in with no curve, so it adds no head.';
+$ec_lang['lpn_inp_drop_setting']='These links carry a setting this page cannot hold. They came in open.';
+$ec_lang['lpn_inp_drop_controls']='Controls and rules were left out. Every pipe, pump and valve came in at the state written in the file, and stays there.';
+$ec_lang['lpn_inp_drop_eps']='This file runs over a period of time. This page solves one moment, so only the starting conditions came in.';
+$ec_lang['lpn_inp_drop_quality']='Water quality, chemical reaction and pump energy settings were left out. This page solves flow and pressure only.';
+$ec_lang['lpn_inp_drop_backdrop']='This file names a background picture but does not contain the picture itself. Add it yourself with Map, Backdrop.';
+$ec_lang['lpn_inp_drop_dangling']='These pipes name a junction that is not in the file, so they were left out.';
+$ec_lang['lpn_inp_drop_units']='The flow units in this file were not recognised, so gallons per minute were assumed. Check every number before you use the answers.';
 // {name} is a project name; word order is the translator's to choose. Says where the user landed,
 // the same way lpn_status_deleted_opened does -- an opened file becomes a NEW project here, and
 // that is the part a user cannot see for themselves.

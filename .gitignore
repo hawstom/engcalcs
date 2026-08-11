@@ -11,3 +11,9 @@ lpn-locks/*.json
 # user cache, not here. Both are reproducible from dev/browser-pass/package.json.
 dev/browser-pass/node_modules/
 dev/browser-pass/package-lock.json
+
+# Real client water models Tom drops in to stress-test the .inp importer (ROADMAP Task 196). They
+# carry client names and Windows Dropbox paths and this repo is on GitHub, so they stay local.
+# dev/scripts/epanet_net_to_inp.php converts the .net ones; dev/lpn-spike/validate_inp.js reads
+# whatever is here. Reverse this if Tom decides a model is his to publish.
+dev/epanet-models/
