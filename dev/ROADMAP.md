@@ -1751,11 +1751,15 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     Mandatory, not a nicety: a declared 400 written under mm would otherwise open as 400 inches.
     Consequence, Tom's own: there are no browser units and no "save as defaults" — a user keeps
     preferences by saving an **empty template project**. See CLAUDE.md.
-  - **v2 documents get an offer that STANDS until accepted.** `offerUnitRestore()` shows real
-    diameters from that project as `0.2032 → 8` and rewrites nothing unless told to. Declining is
-    "not yet", not "no": Tom's own button text is *"Close so that I can check the current units
-    first"*, which promises the offer comes back, so `project.unitsUnconfirmed` persists and the
-    dialog returns on the next open. There is no "never ask again" — say so if one is wanted.
+  - **The MISSING VERSION STAMP is the pending question — there is no second flag.** `migrateSaved()`
+    leaves a pre-declarative document at v2 and `serializeProject()` writes `openDocVersion`, so an
+    unruled project saves back as v2 and asks again. Tom's own simplification (*"The project receives
+    no version number, right? Isn't that absence enough?"*) — the first cut stamped v3 on sight and
+    carried a `project.unitsUnconfirmed` flag beside it, which was one mechanism too many.
+  - **Three answers.** *Convert* converts and stamps; *Never ask again* stamps and changes nothing;
+    *Close so that I can check the current units first* does neither, so the offer returns — its own
+    label is a promise that it will. Undo after Convert restores the numbers but not the version,
+    which is the same verdict as Never ask again reached another way.
   - **The first cut also migrated scenario overrides and claimed that mattered. It did not.**
     Scenarios exist in the data model and are reachable from nothing — no command, no lang key,
     `scenarios` is always one empty Base — so no v2 document can carry an override. Tom caught the

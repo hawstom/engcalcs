@@ -584,6 +584,7 @@ $ec_lang['lpn_settings_restore_tip']='Réinitialise uniquement les paramètres d
 $ec_lang['lpn_reset_all_tip']='Supprime tous les projets, toutes les images de fond, tous les paramètres et vos choix d\'unités, puis recharge la page exactement comme la voit un nouveau visiteur. C\'est la seule réinitialisation qui efface tout.';
 $ec_lang['lpn_v2_restore_prompt']='Ce calculateur enregistre les unités du projet et les valeurs saisies telles quelles, mais il convertissait autrefois les nombres en unités SI pour les enregistrer. Ce projet a été enregistré avant ce changement : ses nombres ont donc été enregistrés en unités SI. Faut-il les convertir une dernière fois vers les unités actuelles ? Pour vous permettre de vérifier, voici quelques diamètres qui seront convertis. Les valeurs avant et après sont indiquées :';
 $ec_lang['lpn_v2_restore_yes']='Convertir';
+$ec_lang['lpn_v2_restore_never']='Ne plus me le demander';
 $ec_lang['lpn_v2_restore_no']='Fermer pour que je vérifie d\'abord les unités actuelles';
 $ec_lang['lpn_storage_too_new']='Ce projet a été enregistré par une version plus récente de la page, il ne peut donc pas être ouvert ici.';
 $ec_lang['lpn_tool_file']='Fichier';

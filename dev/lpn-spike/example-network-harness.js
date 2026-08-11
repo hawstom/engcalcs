@@ -190,7 +190,11 @@ src = src.replace(marker,
   "\t\tmigrateSaved: migrateSaved, serializeProject: serializeProject,\n" +
   "\t\tv2RestoreEvidence: v2RestoreEvidence, applyV2Restore: applyV2Restore,\n" +
   "\t\tgetProject: function () { return project; },\n" +
-  "\t\tsetProjectFlag: function (v) { if (v) { project.unitsUnconfirmed = true; } else { delete project.unitsUnconfirmed; } },\n" +
+  "\t\tdocVersion: function () { return openDocVersion; },\n" +
+  "\t\tsetDocVersion: function (v) { openDocVersion = v; },\n" +
+  "\t\tstampDocAnswered: stampDocAnswered, storageVersion: function () { return LPN_STORAGE_VERSION; },\n" +
+  "\t\tapplySaved: applySaved, restorePending: function () { return pendingV2Restore; },\n" +
+  "\t\tnewProject: newProject, offerUnitRestore: offerUnitRestore,\n" +
   "\t\tniceDefault: niceDefault, setUnitEl: function (name) { return unitEl(name); },\n" +
   "\t\taddNode: addNode, addLink: addLink,\n" +
   "\t\tlabelWidth: function (id) { return labelEls[id] ? labelEls[id].width : 0; },\n" +
@@ -655,10 +659,11 @@ console.log('\n--- Settings panel stays in sync ---');
   const v2 = { v: 2, nodes: [{ id: 'J1', type: 'junction', elev: 15.24, _demand: 0.0157 }],
     links: [{ id: 'P1', type: 'pipe', _diameter: 0.1524, _length: 461, _roughness: 130 }], labels: [] };
   const out = L.migrateSaved(JSON.parse(JSON.stringify(v2)));
-  ok('migrateSaved stamps v2 up to v3', out.v === 3);
-  // PERSISTENT, on the project, not a transient field: "Close so that I can check the current units
-  // first" is a promise the offer comes back, so declining must survive being written to storage.
-  ok('...flags it, persistently, for the restore offer', out.project.unitsUnconfirmed === true);
+  // THE MISSING STAMP *IS* THE PENDING QUESTION -- there is no second flag. migrateSaved must
+  // therefore leave a v2 document at v2, or the offer would be silently answered on the user's
+  // behalf the first time it was read.
+  ok('migrateSaved leaves a v2 document at v2 -- the conversion is the user\'s to authorise',
+    out.v === 2, 'v = ' + out.v);
   ok('...and changes no number at all',
     out.nodes[0].elev === 15.24 && out.links[0]._diameter === 0.1524 && out.links[0]._length === 461);
 
@@ -692,11 +697,13 @@ console.log('\n--- Settings panel stays in sync ---');
   const p3 = L.addLink('pipe', r3.id, j3.id);
   p3._diameter = 0.2032; p3._length = 675.4; p3._roughness = 130; p3._k = 2;
   p3.curvePoints = null;
-  L.setProjectFlag(true);
-  ok('the flag stands before the answer', L.getProject().unitsUnconfirmed === true);
+  L.setDocVersion(2);
+  ok('the document is below the declarative version before the answer', L.docVersion() === 2);
+  ok('...and a save of it writes v2, so the offer survives a round trip',
+    L.serializeProject().v === 2, 'v = ' + L.serializeProject().v);
   L.applyV2Restore();
-  ok('converting clears the flag, so the offer does not return',
-    L.getProject().unitsUnconfirmed === undefined);
+  ok('converting stamps the version, so the offer does not return',
+    L.docVersion() === L.storageVersion(), 'v = ' + L.docVersion());
   ok('restore scales elevation to feet', near(r3.elev, 100, 0.01), r3.elev.toFixed(2));
   ok('restore scales the reservoir head', near(r3._head, 110, 0.01), r3._head.toFixed(2));
   ok('restore scales demand to gpm', near(j3._demand, 499.2, 1), j3._demand.toFixed(1));
@@ -704,6 +711,48 @@ console.log('\n--- Settings panel stays in sync ---');
   ok('restore leaves LENGTH alone (already declarative before this task)', p3._length === 675.4);
   ok('restore leaves roughness alone (dimensionless)', p3._roughness === 130);
   ok('restore leaves k alone (dimensionless)', p3._k === 2);
+
+  // "Never ask again" is the third answer (Tom, 2026-08-10). It must stamp the version WITHOUT
+  // touching a number -- that is the whole difference between it and Convert.
+  L.setDocVersion(2);
+  const keepD = p3._diameter, keepElev = r3.elev;
+  L.stampDocAnswered();
+  ok('never-ask-again stamps the version', L.docVersion() === L.storageVersion());
+  ok('...and changes nothing', p3._diameter === keepD && r3.elev === keepElev);
+  ok('...so a save of it writes the current version, and the offer is gone',
+    L.serializeProject().v === L.storageVersion());
+
+  // THE LINE THAT DECIDES WHETHER ANY OF THIS EVER RUNS. applySaved() reads the version off the
+  // document; hard-coding it to current there would silently answer the question for every user,
+  // and every assertion above would still pass. A mutation test found exactly that hole.
+  const v2doc = L.migrateSaved({ v: 2, project: { name: 'old' }, nodes: [], links: [], labels: [] });
+  L.applySaved(v2doc);
+  ok('opening a v2 document leaves the version at 2 and arms the offer',
+    L.docVersion() === 2 && L.restorePending() === true, 'v = ' + L.docVersion() + ', pending = ' + L.restorePending());
+  L.applySaved({ v: L.storageVersion(), project: { name: 'new' }, nodes: [], links: [], labels: [], units: {} });
+  ok('opening a current document arms nothing',
+    L.docVersion() === L.storageVersion() && L.restorePending() === false,
+    'v = ' + L.docVersion() + ', pending = ' + L.restorePending());
+
+  // A NEW project made while a v2 one is open must not inherit its version, or File > New project
+  // from inside an unmigrated project would save as v2 and be offered a conversion it cannot need.
+  //
+  // The v2 document here needs REAL PIPES. With none, offerUnitRestore() takes its "nothing to
+  // convert" exit and stamps the version itself, so the assertion passed whether newProject() did
+  // its job or not -- caught by mutation testing, and the reason this comment is here.
+  L.applySaved(L.migrateSaved({ v: 2, project: { name: 'old' },
+    nodes: [{ id: 'J1', type: 'junction', elev: 15.24 }, { id: 'J2', type: 'junction', elev: 15.24 }],
+    links: [{ id: 'P1', type: 'pipe', from: 'J1', to: 'J2', _diameter: 0.2032 }], labels: [] }));
+  ok('a v2 document with real pipes stays at 2 with the offer still standing',
+    L.docVersion() === 2 && L.restorePending() === true, 'v = ' + L.docVersion());
+  // Consume the offer first (the dialog itself is a no-op here -- there is no #lpn_dialog), so the
+  // NEXT refreshAllFromDocument() cannot reach the "nothing to convert" exit and stamp the version
+  // on newProject()'s behalf. Without this step the assertion below passes either way.
+  L.offerUnitRestore();
+  ok('...and showing the offer does not itself answer it', L.docVersion() === 2);
+  L.newProject();
+  ok('a new project starts at the current version, whatever was open before it',
+    L.docVersion() === L.storageVersion(), 'v = ' + L.docVersion());
   // No scenario-override assertion: scenarios are not reachable from any UI, so no v2 document can
   // carry an override. A test for it would be testing code that cannot run.
 }

@@ -1163,6 +1163,7 @@ $ec_lang['lpn_reset_all_tip']='Deletes every project, every background image, ev
 // textContent into the dialog body.
 $ec_lang['lpn_v2_restore_prompt']='This calculator stores project units and inputs as entered, but it formerly converted numbers to SI for storage. This project was saved before that change, so its numbers were stored in SI. Convert them one last time to the current units? For your evaluation, these are some diameters that will be converted. Before and after values are shown:';
 $ec_lang['lpn_v2_restore_yes']='Convert';
+$ec_lang['lpn_v2_restore_never']='Never ask again';
 $ec_lang['lpn_v2_restore_no']='Close so that I can check the current units first';
 $ec_lang['lpn_storage_too_new']='This project was saved by a newer version of the page, so it cannot be opened here.';
 // ---- Projects as tabs, files as files (ROADMAP Task 211) ----

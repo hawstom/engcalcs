@@ -1952,6 +1952,16 @@ var EngCalcs = EngCalcs || {};
 	// records the unit selection it was written under. A v2 document holds SI numbers and says
 	// nothing about units, which is why opening one runs the one-time restore offer below.
 	var LPN_STORAGE_VERSION = 3;
+	// The version at which inputs became declarative. A document below it holds SI numbers that have
+	// not been ruled on, and that is the ONLY thing the restore offer keys off (Tom, 2026-08-10:
+	// "The project receives no version number, right? Isn't that absence enough to trigger the offer
+	// again?" -- yes, and a second flag beside it was one mechanism too many).
+	var LPN_DECLARATIVE_VERSION = 3;
+	// The version of the document currently open, which is NOT always LPN_STORAGE_VERSION.
+	// serializeProject() writes THIS rather than the constant, so a project whose numbers have not
+	// been ruled on saves as v2 and is asked again next time. Moving it forward is what "answered"
+	// means: Convert does it, "Never ask again" does it, and Close deliberately does not.
+	var openDocVersion = LPN_STORAGE_VERSION;
 	var LPN_LEGACY_KEY = 'lpn_document';   // the pre-library single-document key (v1 and v2 alike)
 	var LPN_INDEX_KEY = 'lpn_index';
 	var LPN_PROJECT_PREFIX = 'lpn_project_';
@@ -2012,7 +2022,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function serializeProject() {
 		return {
-			v: LPN_STORAGE_VERSION, project: project, scenarios: scenarios,
+			v: openDocVersion, project: project, scenarios: scenarios,
 			nodes: doc.nodes, links: doc.links, labels: doc.labels, nextId: nextId,
 			labelSettings: labelSettings, backdrop: backdrop, settings: settings,
 			// The units the numbers above are IN. Not a preference -- without it the document does
@@ -2125,24 +2135,13 @@ var EngCalcs = EngCalcs || {};
 			(saved.links || []).forEach(function (l) { renameOverridable(l, LPN_OVERRIDABLE.link); });
 			saved.v = 2;
 		}
-		if (saved.v === 2) {
-			// v2 stored SI and recorded no units. The numbers are NOT touched here -- rewriting a
-			// user's network without asking is the thing this whole task is about not doing. The
-			// document is stamped v3 and flagged, and offerUnitRestore() asks once, after it is on
-			// screen where the user can see what is being talked about.
-			//
-			// The flag is PERSISTENT, and that is a reversal of the first cut. It was transient --
-			// stamp v3, ask once, never again -- which was right while the decline button read
-			// "Leave my numbers alone". Tom then rewrote it as "Close so that I can check the
-			// current units first" (2026-08-10), and that label is a promise to come back: a user
-			// who goes off to look at the units strip and returns to find the offer gone for good
-			// has been lied to by a button. So declining now means NOT YET, and the offer stands
-			// until it is accepted. The version still goes to 3 -- the document's SHAPE really is
-			// v3 -- but `unitsUnconfirmed` records that its NUMBERS have not been ruled on.
-			saved.v = 3;
-			saved.project = saved.project || {};
-			saved.project.unitsUnconfirmed = true;
-		}
+		// **There is deliberately NO v2 -> v3 step here.** Every other migration in this function
+		// converts the document and stamps it; this one cannot, because the conversion is the USER'S
+		// to authorise. So the document stays at v2 until they answer, and the missing stamp IS the
+		// pending question. An earlier cut stamped v3 on sight and carried a separate
+		// `unitsUnconfirmed` flag beside it; Tom removed the flag by asking why the version alone was
+		// not enough (2026-08-10). It is, and serializeProject() writes `openDocVersion` so a v2
+		// document saves back as v2.
 		return saved;
 	}
 	// Version-checks one already-parsed document and runs it up to the current version. Returns null
@@ -2240,10 +2239,11 @@ var EngCalcs = EngCalcs || {};
 		// under mm now opens under mm however this browser was last left, because its numbers only
 		// mean anything alongside the units they were typed in.
 		applyUnitSelections(saved.units);
-		// A v2 document has no units to restore and holds SI numbers. offerUnitRestore(), called by
-		// refreshAllFromDocument() once the network is on screen, asks about it there -- the
-		// question is unanswerable in the abstract and obvious next to the drawing.
-		pendingV2Restore = !!project.unitsUnconfirmed;
+		// A pre-declarative document holds SI numbers and has not been ruled on. offerUnitRestore(),
+		// called by refreshAllFromDocument() once the network is on screen, asks about it there --
+		// the question is unanswerable in the abstract and obvious next to the drawing.
+		openDocVersion = (typeof saved.v === 'number') ? saved.v : LPN_STORAGE_VERSION;
+		pendingV2Restore = openDocVersion < LPN_DECLARATIVE_VERSION;
 		return true;
 	}
 
@@ -2472,10 +2472,18 @@ var EngCalcs = EngCalcs || {};
 		// evidence that the case is real. When scenarios do ship, every v2 document will long since
 		// have been migrated or abandoned.
 		recomputeAllPumpCurves();
-		// Answered. The numbers are now in the units the strip names, so the question is closed.
-		delete project.unitsUnconfirmed;
-		saveToStorage();
+		// Answered: the numbers are now in the units the strip names, so the document is current.
+		//
+		// A Ctrl-Z after this restores the NUMBERS but not the version, so the offer does not come
+		// back. That is deliberate rather than an oversight -- undoing a conversion you just asked
+		// for is the same verdict as "Never ask again", reached by a different route.
+		stampDocAnswered();
 		refreshAllFromDocument();
+	}
+	// "This document's numbers have been ruled on." The one place openDocVersion moves forward.
+	function stampDocAnswered() {
+		openDocVersion = LPN_STORAGE_VERSION;
+		saveToStorage();
 	}
 	function offerUnitRestore() {
 		if (!pendingV2Restore) { return; }
@@ -2486,11 +2494,7 @@ var EngCalcs = EngCalcs || {};
 		// project has no evidence and nothing to fix either. Both cases are SETTLED, not deferred,
 		// so the flag is cleared -- the offer must not reappear for a project it can do nothing for.
 		var rows = v2RestoreEvidence();
-		if (!rows.length || unitFactor('lpn_u_diameter') === 1) {
-			delete project.unitsUnconfirmed;
-			saveToStorage();
-			return;
-		}
+		if (!rows.length || unitFactor('lpn_u_diameter') === 1) { stampDocAnswered(); return; }
 		openDialog(function (body) {
 			var p1 = document.createElement('p');
 			p1.style.margin = '0 0 8px';
@@ -2501,11 +2505,14 @@ var EngCalcs = EngCalcs || {};
 			p2.textContent = rows.join(', ');
 			body.appendChild(p2);
 		}, [
-			// Convert leads, and declining is explicitly NOT YET -- the flag is left in place so the
-			// offer returns next time this project is opened. There is deliberately no third
-			// "never ask again" button: nobody has asked for one, and the only project it would
-			// serve is one whose numbers are wrong and whose owner wants them left wrong.
+			// THREE answers, because there are three (Tom, 2026-08-10: "Third button: invent it").
+			// Convert and Never both STAMP the version, which is what "answered" means here. Close
+			// deliberately does not: its own label -- "so that I can check the current units first"
+			// -- is a promise that the offer comes back, and it does, because the document is still
+			// below LPN_DECLARATIVE_VERSION. Close still saves, so the units the project was opened
+			// under are recorded even while its numbers stay unruled.
 			{ label: pc.lpn_v2_restore_yes || 'Convert', fn: applyV2Restore },
+			{ label: pc.lpn_v2_restore_never || 'Never ask again', fn: stampDocAnswered },
 			{ label: pc.lpn_v2_restore_no || 'Close so that I can check the current units first', fn: function () { saveToStorage(); } }
 		]);
 	}
@@ -2541,6 +2548,11 @@ var EngCalcs = EngCalcs || {};
 		settings = inheritedSettings;
 		labelSettings = inheritedLabels;
 		backdrop = null;
+		// A project created now is written by the current code, so its numbers are declarative and
+		// its version is current. Without this it would inherit openDocVersion from whatever project
+		// was open -- and a new project made while a v2 one was on screen would save as v2 and be
+		// offered a conversion it does not need.
+		openDocVersion = LPN_STORAGE_VERSION;
 		library.projects.push({ id: id, name: name, updated: Date.now() });
 		library.openId = id;
 		clearUndo();

@@ -287,6 +287,7 @@ EngCalcs.pageConfig = {
 	lpn_storage_too_new: <?=json_encode($ec_lang['lpn_storage_too_new'])?>,
 	lpn_v2_restore_prompt: <?=json_encode($ec_lang['lpn_v2_restore_prompt'])?>,
 	lpn_v2_restore_yes: <?=json_encode($ec_lang['lpn_v2_restore_yes'])?>,
+	lpn_v2_restore_never: <?=json_encode($ec_lang['lpn_v2_restore_never'])?>,
 	lpn_v2_restore_no: <?=json_encode($ec_lang['lpn_v2_restore_no'])?>,
 	lpn_tool_file: <?=json_encode($ec_lang['lpn_tool_file'])?>,
 	lpn_menu_edit: <?=json_encode($ec_lang['lpn_menu_edit'])?>,
