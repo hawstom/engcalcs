@@ -1091,19 +1091,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **The example network is NOT a reason to keep conversion** (Tom: *"that is the tail wagging the
     dog"*). Task 264 removes that dependency; do it first.
 
-- 60|264| **Retire "Draw example network"; make it File > New project.** Tom, 2026-08-10.
-  - Toolbar button renames to **New project**. The example projects planned in Task 257 move out of
-    Insert into a **File > New project** submenu: **Blank project**, **From examples**, room for more.
-  - First two examples are **Basic US units** and **Basic SI units** — two drawings, explicitly
-    labelled, replacing the one drawing that adapted itself via `niceDefault()`. That adaptation is
-    the last thing depending on unit conversion, which is why this unblocks Task 263.
-  - **Every water-network example in the field is published as US or SI, never as both.** So ours
-    must be too, and the user picks: *"Units for network: US (gpm) or SI (l/s)"* — showing the preset
-    flow unit, because that is the concrete thing they recognise. After that, changing units is on
-    them.
-  - EPANET's own examples follow, named as published, **if we can make sense of them** — uncertain,
-    since they are water-quality examples (see Task 257's closing caution).
-
 - 55|265| **The lpn page title must disclose which unit system the project was created for.** Tom,
   2026-08-10: `"HawsEDC Calculators" / "Looped Pipe Network (Map Interface)" / "{units_set} Units"`.
   The unit-set strings already exist. Depends on Task 264 deciding what "created for" means.
@@ -1112,13 +1099,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   for bigger models."* Today's selection model is single-element — `openEditMenu()` already says so
   where it explains why "Select all" is absent. Wants a rubber-band select and one property sheet
   that writes a value to every selected element.
-
-- 25|268| **Stronger words than "libre" for the FLOSS claim: unchained, unlocked, lock-free.** Tom
-  found these 2026-08-10. They say the freedom positively and dodge the gratis/libre confusion that
-  `menu_libre` currently spends an `avoid:` note on. Two questions, in order: (a) do any of them
-  improve the **English** `menu_libre` / About page copy; (b) they belong in that key's synonyms
-  regardless, so translators of the 22 languages that still show English have real alternatives.
-  **`$ec_lang_syn` is human-authored** — AI proposes the diff, Tom approves, then AI writes it.
 
 - 5|267| **"Save as" the backdrop image.** Tom, 2026-08-10, "very low priority". The image is stored
   as a data URI on `backdrop.href`, so writing it back out is a blob download away.
@@ -1757,6 +1737,25 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|264| **[DONE 2026-08-10] "Draw example network" retired; File > New project instead.** The
+  toolbar's most prominent slot now opens **File > New project** (a second popup off the same
+  anchor), whose rows are **Blank project** and, under a *From examples* heading, **Basic network,
+  US units (gpm)** and **Basic network, SI units (l/s)**. The Insert row is gone: Insert adds an
+  element to the drawing you are in, and an example is a whole network.
+  - **Each example commits to a unit system rather than adapting to yours.** `newProjectFromExample()`
+    makes the blank project, calls `EngCalcs.setUnits()`, THEN draws — so `niceDefault()` lands on one
+    branch deterministically. This removes the only thing on the page that needed inputs to convert
+    on a unit change, which is what unblocks Task 263.
+  - **No confirmation dialog.** Tom's first sketch had one ("Set project units to match example
+    network?") and his own second thought replaced it: the choice IS the menu row, so a dialog would
+    ask a question the user just answered. The flow unit is in the label for the same reason.
+  - `lpn_tool_example` retired from en/es/fr/pt/tr.
+
+- 0|268| **[DONE 2026-08-10] lock-free / unlocked / unchained added to `menu_libre`'s synonyms.**
+  Tom's order, most-liked first. English `menu_libre` unchanged — still an open question whether
+  "Lock-free Software" is a better nav item than "Libre Software"; it needs no `avoid: gratis` guard,
+  which is an argument for it.
 
 - 0|262| **[DONE 2026-08-10] A file opened in a no-connect browser arrived already asterisked.**
   Tom, 2026-08-10. `importProjectFromFile()` now sets `savedSig`/`dirty`/`exported` exactly as the

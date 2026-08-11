@@ -116,7 +116,7 @@ $ec_lang_syn['menu_main_language']='';
 $ec_lang['menu_more']='More';
 $ec_lang_syn['menu_more']='';
 $ec_lang['menu_libre']='Libre Software';
-$ec_lang_syn['menu_libre']='FLOSS (Free Libre Open Source Software), Liberated Software, Liberty Software, Freedom Software, or Software you are free to use, study, change, and share. | layout: nav item; gloss: libre software; avoid: free of charge (gratis); transliterating "libre" as a brand name';
+$ec_lang_syn['menu_libre']='Lock-free Software, Unlocked Software, Unchained Software, FLOSS (Free Libre Open Source Software), Liberated Software, Liberty Software, Freedom Software, or Software you are free to use, study, change, and share. | layout: nav item; gloss: libre software; avoid: free of charge (gratis); transliterating "libre" as a brand name';
 $ec_lang['template_welcome']='Drop your fears at the door; love is spoken here. You are not ruining everything. Enjoy the <a target="_blank" href="https://hawsedc.com/download.php">free libre HawsEDC AutoCAD tools</a> too.';
 $ec_lang_syn['template_welcome']='Leave your fears behind when you enter this space; love is the language we speak here. You are not ruining everything.';
 $ec_lang['template_feedback']='Can you suggest better wording or anything else? Do you want to help or to learn to create tools like these? Please contact me.';
@@ -1109,7 +1109,6 @@ $ec_lang['lpn_tool_zoom_extent']='Zoom to fit';
 $ec_lang_syn['lpn_tool_zoom_extent']='Zoom out (or in) until the whole drawing fits in the window; show everything at once (zoom to extents, fit to window, show all). | avoid: adjusting the zoom by an amount';
 $ec_lang['lpn_new_text']='Text';
 $ec_lang_syn['lpn_new_text']='Text, Label, Temporary Text, Placeholder, Unfinished text, or Default words';
-$ec_lang['lpn_tool_example']='Draw example network';
 $ec_lang['lpn_field_elev']='Elevation';
 // Task 193 trap-term tips. Every one of these is a DEFINITION the user can read, which is also
 // what anchors the concept for the 26 translators in sprint 146.06 -- per CLAUDE.md's polysemy
@@ -1197,6 +1196,15 @@ $ec_lang['lpn_project_copy_suffix']='(copy)';
 $ec_lang['lpn_project_rename']='Rename';
 // The File menu. "New" is the same act as the + tab, deliberately: one function, two doors.
 $ec_lang['lpn_file_new']='New project';
+// File > New project's submenu (Task 264). `lpn_tool_example` ("Draw example network") was RETIRED
+// with the toolbar button of that name -- an example is a whole network, so it starts a project
+// rather than being drawn into the one you are in.
+$ec_lang['lpn_new_blank']='Blank project';
+$ec_lang['lpn_new_from_examples']='From examples';
+// The flow unit is IN the label, not left implied by "US"/"SI": gpm and l/s are what a water
+// engineer recognises at a glance, and this is the moment the choice is being made.
+$ec_lang['lpn_new_example_us']='Basic network, US units (gpm)';
+$ec_lang['lpn_new_example_si']='Basic network, SI units (l/s)';
 $ec_lang['lpn_file_open']='Open…';
 $ec_lang['lpn_file_save']='Save';
 $ec_lang['lpn_file_saveas']='Save as…';

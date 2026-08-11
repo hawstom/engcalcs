@@ -557,7 +557,6 @@ $ec_lang['lpn_tool_add_text']='Texte';
 $ec_lang['lpn_tool_delete']='Supprimer';
 $ec_lang['lpn_tool_zoom_extent']='Zoom sur l\'étendue';
 $ec_lang['lpn_new_text']='Texte';
-$ec_lang['lpn_tool_example']='Dessiner un réseau d\'exemple';
 $ec_lang['lpn_field_elev']='Cote';
 $ec_lang['lpn_field_elev_tip']='Niveau du sol ou de la conduite à ce nœud. Mesurez-le à partir du zéro de votre choix, du moment que tous les nœuds utilisent le même.';
 $ec_lang['lpn_field_head']='Charge';

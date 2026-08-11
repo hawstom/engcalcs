@@ -4370,6 +4370,48 @@ var EngCalcs = EngCalcs || {};
 		if (p) { p.style.display = 'none'; }
 		openMenuAnchor = null;
 	}
+	// File > New project (ROADMAP Task 264, Tom 2026-08-10). A second popup off the same anchor
+	// rather than a hover-out submenu: the menu machinery here is one flat popover, hover submenus are
+	// a poor bargain on the touch screens this page is used on, and one extra click on a command used
+	// once per project is not a cost worth new machinery.
+	//
+	// **Each example COMMITS TO A UNIT SYSTEM; it does not adapt to yours.** That is the whole point of
+	// the rework. Every water-network example published anywhere -- EPANET's included -- is a US
+	// example or an SI example, never one drawing that rewrites itself, and a user who opens "Basic US
+	// units" and sees inches has been told the truth by the name they clicked. It also removes the only
+	// thing in this page that needed inputs to convert when a unit changed, which is what unblocks
+	// Task 263.
+	function openNewProjectMenu(anchor) {
+		var pc = EngCalcs.pageConfig || {};
+		openMenu(anchor, [
+			{ icon: 'new', label: pc.lpn_new_blank || 'Blank project', fn: function () { newProject(); renderTabs(); } },
+			{ separator: true },
+			{ heading: true, label: pc.lpn_new_from_examples || 'From examples' },
+			// The flow unit is IN THE LABEL, not merely implied by "US"/"SI" (Tom, 2026-08-10: "it's
+			// important in this situation to show them what our preset flow units are"). gpm and l/s are
+			// the concrete thing a water engineer recognises at a glance; the system name alone is a
+			// category they have to translate into units themselves.
+			{ icon: 'example', label: pc.lpn_new_example_us || 'Basic network, US units (gpm)', fn: function () { newProjectFromExample('us'); } },
+			{ icon: 'example', label: pc.lpn_new_example_si || 'Basic network, SI units (l/s)', fn: function () { newProjectFromExample('si'); } }
+		]);
+	}
+	// Blank project, then the units, then the drawing -- in that order, and the order is the design.
+	// setUnits() moves the whole units strip to the preset and calls submitForm(), which re-enters
+	// EngCalcs.pageCalculator; doing it on a project that is still empty means nothing is on screen to
+	// be re-rendered against the new units. drawExampleNetwork() then reads those selects through
+	// niceDefault() and lands on one branch deterministically, instead of on whatever the visitor
+	// happened to have set.
+	//
+	// This ASKS FOR NOTHING. Tom's first sketch had a permission dialog ("Set project units to match
+	// example network?"), and then answered it himself with the better version: make the choice the
+	// menu item. The user has already said which system they want by which row they clicked, so a
+	// dialog confirming it would be asking a question they just answered.
+	function newProjectFromExample(system) {
+		newProject();
+		if (EngCalcs.setUnits) { EngCalcs.setUnits(system); }
+		drawExampleNetwork();
+		renderTabs();
+	}
 	function openFileMenu(anchor) {
 		var pc = EngCalcs.pageConfig || {}, id = library.openId, entry = indexEntry(id);
 		var linked = isLinked(id), api = fileApiAvailable();
@@ -4394,7 +4436,10 @@ var EngCalcs = EngCalcs || {};
 			});
 		}
 		openMenu(anchor, [
-			{ icon: 'new', label: pc.lpn_file_new || 'New', fn: function () { newProject(); renderTabs(); } },
+			// New project OPENS A SUBMENU now (Task 264, Tom 2026-08-10) rather than making a blank
+			// one on the spot -- "Blank project" is still the first row of it, so the old act is one
+			// extra click and every other way to start is finally reachable from the same place.
+			{ icon: 'new', label: pc.lpn_file_new || 'New', fn: function () { openNewProjectMenu(anchor); } },
 			{ icon: 'open', label: pc.lpn_file_open || 'Open…', fn: openFromFile }
 		].concat(recentRows, [
 			{ separator: true },
@@ -4497,7 +4542,10 @@ var EngCalcs = EngCalcs || {};
 			{ icon: 'position', label: pc.lpn_backdrop_position || 'Position', fn: function () { backdropAction('position'); }, disabled: !backdrop },
 			{ icon: 'del', label: pc.lpn_backdrop_remove || 'Remove image', fn: function () { backdropAction('remove'); }, disabled: !backdrop },
 			{ separator: true },
-			{ icon: 'example', label: pc.lpn_tool_example || 'Draw example network', fn: drawExampleNetwork },
+			// "Draw example network" is GONE from here (Task 264, Tom 2026-08-10). Insert adds an element
+			// to the drawing you are in; an example is a whole network, and dropping one on top of your
+			// work was never an insert. It is now File > New project > From examples, which is also what
+			// lets each example commit to a unit system instead of adapting to yours.
 			// Dev-only, and last, and still wearing its bracketed label so it reads as
 			// not-a-real-feature (Tom, 2026-07-30, on the label). Deliberately NOT translated: it is
 			// scaffolding for measuring how ~100 links performs, and it goes when that question is
@@ -4967,12 +5015,17 @@ var EngCalcs = EngCalcs || {};
 		// Edit -> Delete network, is a menu command because it is rare and destructive, and those two
 		// properties together are the definition of something that does NOT belong on a toolbar.
 		var fileGroup = group();
-		var exampleBtn = document.createElement('button');
-		exampleBtn.type = 'button';
-		setLabel(exampleBtn, 'example', pc.lpn_tool_example || 'Draw example network');
-		exampleBtn.addEventListener('click', drawExampleNetwork);
-		exampleBtn.dataset.edits = '1';
-		fileGroup.appendChild(exampleBtn);
+		// **"New project", not "Draw example network"** (Task 264, Tom 2026-08-10). The button is in
+		// the same place and does the more general thing: it opens File > New project, whose first
+		// row is Blank project and whose others are the examples. A toolbar button that could only
+		// ever produce the example was the narrowest possible use of the most prominent slot, and it
+		// read as "open a sample" to a user who wanted to start work.
+		var newBtn = document.createElement('button');
+		newBtn.type = 'button';
+		setLabel(newBtn, 'new', pc.lpn_file_new || 'New project');
+		newBtn.addEventListener('click', function (e) { openNewProjectMenu(e.currentTarget); });
+		newBtn.dataset.edits = '1';
+		fileGroup.appendChild(newBtn);
 		wireBackdropMenu(fileGroup);
 
 		// `data-edits` is VESTIGIAL since Task 211 and nothing reads it. It marked the controls that

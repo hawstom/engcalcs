@@ -557,7 +557,6 @@ $ec_lang['lpn_tool_add_text']='Texto';
 $ec_lang['lpn_tool_delete']='Eliminar';
 $ec_lang['lpn_tool_zoom_extent']='Ver todo';
 $ec_lang['lpn_new_text']='Texto';
-$ec_lang['lpn_tool_example']='Dibujar red de ejemplo';
 $ec_lang['lpn_field_elev']='Elevación';
 $ec_lang['lpn_field_elev_tip']='Nivel del terreno o de la tubería en este nodo. Mídalo desde cualquier cero que prefiera, siempre que todos los nodos usen el mismo.';
 $ec_lang['lpn_field_head']='Carga';

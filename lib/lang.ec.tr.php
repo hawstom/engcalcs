@@ -557,7 +557,6 @@ $ec_lang['lpn_tool_add_text']='Metin';
 $ec_lang['lpn_tool_delete']='Sil';
 $ec_lang['lpn_tool_zoom_extent']='Tümünü göster';
 $ec_lang['lpn_new_text']='Metin';
-$ec_lang['lpn_tool_example']='Örnek şebeke çiz';
 $ec_lang['lpn_field_elev']='Kot';
 $ec_lang['lpn_field_elev_tip']='Bu düğümdeki zemin veya boru kotu. İstediğiniz herhangi bir sıfır noktasından ölçebilirsiniz, yeter ki tüm düğümler aynı sıfırı kullansın.';
 $ec_lang['lpn_field_head']='Yük';

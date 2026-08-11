@@ -557,7 +557,6 @@ $ec_lang['lpn_tool_add_text']='Texto';
 $ec_lang['lpn_tool_delete']='Excluir';
 $ec_lang['lpn_tool_zoom_extent']='Ver tudo';
 $ec_lang['lpn_new_text']='Texto';
-$ec_lang['lpn_tool_example']='Desenhar rede de exemplo';
 $ec_lang['lpn_field_elev']='Elevação';
 $ec_lang['lpn_field_elev_tip']='Nível do solo ou do tubo neste nó. Meça a partir de qualquer referência zero que preferir, desde que todos os nós usem a mesma.';
 $ec_lang['lpn_field_head']='Carga';
