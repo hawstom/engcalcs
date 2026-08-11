@@ -1077,6 +1077,45 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     checkable; just do not spend the blog/video headline on it.** Do not relitigate.
   - Consequence: raised 146.06 to 90 and 220 to 95.
 
+- 70|274| **`lpn_` map coordinates are upside down. Y must increase UPWARD.** Tom, 2026-08-10:
+  *"EPANET uses normal cartesian coordinates... but we have the opposite like a graphic arts
+  software. We need to fix this. Cartesian is engineering."* Today world Y = screen Y
+  (`screenToWorld`/`worldToScreen`/`setTransform` apply no flip), so north is negative.
+  - **The flip belongs in `setTransform()`** (`scale(s, -s)`) so one line owns it. Everything that
+    reads a raw screen delta then follows: label offsets `n.lx/n.ly`, Text `x/y`, vertex drags, the
+    backdrop transform, and `bbox`/`zoomExtent`.
+  - **Text and symbols must counter-flip or they render mirrored.** That is the real cost, not the
+    coordinate math.
+  - **Existing documents open upside down** unless migrated. Bump the storage version and negate
+    every stored Y on load — cheaper than the units question was, because there is no ambiguity
+    about what an old document meant.
+
+- 45|275| **Say "Saved with this project" at the top of the Settings panel.** Verified 2026-08-10:
+  everything in the panel and the Labels popover IS saved with the project (`serializeProject()`
+  carries `settings`, `labelSettings`, `units`, `backdrop`), so the label would be true with no code
+  change. The only thing not saved is the map viewport — zoom/pan re-fit on load.
+
+- 40|276| **Precise background-image scaling.** Tom, 2026-08-10: pick-two-points is handy but never
+  precise ("mouse (and hand!!!) picking is never precise"); EPANET's is precise but painful. Full
+  option list and his own ranking are in the task body below; his lead candidate is a **World File**.
+  - **Recommended order, cheapest real gain first: (4) then (3).** (4) is *store, report and allow
+    editing of the pixel size we already compute* — `backdrop.s` exists, so this is a number in a
+    box: **Scale (by picking)** stays, **Scale (by entry)** joins it, and picking becomes the coarse
+    step you then correct. It removes the imprecision without adding a file format.
+  - (3) **World file** is the parsimonious *import* answer and should follow, not lead: it gives
+    pixel size directly, which is strictly more than EPANET's method, and costs a six-line text
+    parse. It cannot lead because it only helps a user who already has one, and a screenshot never
+    does. Menu prompt on insertion: "No world file found. Scale and move using the menu."
+  - (2) **enter map width/height** is EPANET's own paradigm and Tom does not like it; with (4) built
+    it is redundant. (5) **nearest-edge picking** is a small usability patch on picking, not a
+    precision answer, and is worth doing only alongside (4).
+  - (1) **A precise crosshair cursor is a separate, cheap fix and should just be done**: a CSS
+    `cursor: crosshair` is already better than the default arrow, and a custom single-pixel-gap
+    crosshair (Tom's reference: <https://www.cursor.cc/?action=icon&file_id=190223>) is a data-URI
+    cursor on `.regmode`. It helps every pick on the page, not only scaling.
+  - **epanet-js's silence is not evidence.** It prioritised map tiles, where registration is the
+    basemap's job; that is a different product decision, not a verdict on world files.
+
 - 60|272| **File, Save is disabled outside Chromium with no way out of that row.** A disabled row
   fires no events, so it can carry no tip; `saveCurrent()` would route to Save as but is unreachable.
   Optional — Task 270's recommendation is that the blog post says "Save as" instead. From Task 270.
