@@ -489,7 +489,6 @@ html[lang="zh"] .ec-welcome {
    is belt and braces against a future display: flex here silently un-hiding the banner. */
 .ec-consent[hidden] { display: none; }
 .ec-consent-inner { max-width: 55rem; margin: 0 auto; }
-.ec-consent-heading { font-size: 1.1rem; margin: 0 0 0.35rem; }
 .ec-consent-body { margin: 0 0 0.5rem; }
 .ec-consent-current { margin: 0 0 0.5rem; font-style: italic; }
 .ec-consent-current:empty { display: none; }

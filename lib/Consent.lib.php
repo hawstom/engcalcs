@@ -47,7 +47,12 @@ function echoConsentBanner() {
 ?>
 <div id="ec-consent" class="ec-consent d-print-none" role="region" aria-label="<?=htmlspecialchars($ec_lang['consent_region_label'], ENT_QUOTES, 'UTF-8')?>"<?=$answered ? ' hidden' : ''?>>
 	<div class="ec-consent-inner">
-		<h2 class="ec-consent-heading"><?=$ec_lang['consent_heading']?></h2>
+		<?php // NO VISIBLE HEADING (Tom, 2026-08-12, asking "Is this necessary?" -- it was not). The
+		      // body is a single question and the buttons answer it; a heading above one sentence
+		      // restates it or, as "Browsers and visits" did, names two nouns without saying what
+		      // about them. Screen readers still get a name for this region from the aria-label on
+		      // the wrapper, so dropping it costs nothing in accessibility and saves 26
+		      // translations of a string that was doing no work. ?>
 		<p class="ec-consent-body"><?=$ec_lang['consent_body']?></p>
 		<p class="ec-consent-current" id="ec-consent-current"><?=htmlspecialchars($current, ENT_QUOTES, 'UTF-8')?></p>
 		<form class="ec-consent-actions" method="post" action="/engcalcs/consent.php">

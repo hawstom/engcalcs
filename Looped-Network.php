@@ -4,22 +4,33 @@ $html_title = $ec_lang['lpn_main_title'];
 $html_desc = $ec_lang['lpn_main_desc'];
 echoHeader("EngCalcs", $html_title, "");
 ?>
+<h2 id="ec-page-desc"><?=$ec_lang['lpn_main_desc']?></h2>
 <script>
-// ROADMAP Task 289. Applied HERE, inline and immediately after the heading is parsed, rather than
-// from js/looped-network.js at DOMContentLoaded: the preference is paint-critical, and reading it
-// later means a visitor who turned the titles off still sees them flash on every load. Five lines
-// in the page beats a flash on the page this setting exists to give more room to.
+// ROADMAP Task 289. PLACEMENT IS LOAD-BEARING: this runs AFTER the three elements it hides, so
+// getElementById can find them. It first ran before the <h2>, which parses below it, so the page
+// description reappeared on every reload while the heading and welcome line hid correctly -- a
+// null return from getElementById looks exactly like success. Fixed 2026-08-12; dev/lpn-spike/
+// page-titles-harness.js now fails if this block is ever moved above an element it names.
+//
+// Inline and immediate rather than from js/looped-network.js at DOMContentLoaded, because the
+// preference is paint-critical: reading it later means somebody who turned the titles off watches
+// them flash on every load, on the page the setting exists to give room to. The DOMContentLoaded
+// pass below is a BACKSTOP, not the mechanism -- it costs nothing when the first pass worked and
+// it means a future reordering degrades to a flash instead of to silence.
 (function () {
-	try {
-		if (localStorage.getItem('lpn_show_titles') !== '0') { return; }
-		['ec-page-title', 'ec-page-welcome', 'ec-page-desc'].forEach(function (id) {
-			var el = document.getElementById(id);
-			if (el) { el.style.display = 'none'; }
-		});
-	} catch (e) { /* storage blocked -- titles simply stay visible, which is the safe direction */ }
+	function applyStoredTitleVisibility() {
+		try {
+			if (localStorage.getItem('lpn_show_titles') !== '0') { return; }
+			['ec-page-title', 'ec-page-welcome', 'ec-page-desc'].forEach(function (id) {
+				var el = document.getElementById(id);
+				if (el) { el.style.display = 'none'; }
+			});
+		} catch (e) { /* storage blocked -- titles stay visible, which is the safe direction */ }
+	}
+	applyStoredTitleVisibility();
+	document.addEventListener('DOMContentLoaded', applyStoredTitleVisibility);
 }());
 </script>
-<h2 id="ec-page-desc"><?=$ec_lang['lpn_main_desc']?></h2>
 
 <?php
 // The "View printable" wiring that used to sit here has been REMOVED (2026-08-06). It was copied

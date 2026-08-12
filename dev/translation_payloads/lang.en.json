@@ -59,7 +59,6 @@
         "template_feedback": "Can you suggest better wording or anything else? Do you want to help or to learn to create tools like these? Please contact me.",
         "template_printable_title": "Printable Title",
         "template_printable_subtitle": "Printable Subtitle",
-        "consent_heading": "Browsers and visits",
         "consent_body": "May we keep a single digit per page in this browser's storage to prevent us from logging its visits repeatedly?",
         "consent_accept": "Accept this",
         "consent_accept_all": "Accept all",
@@ -857,7 +856,7 @@
         "lpn_settings_wipe_btn": "Erase everything on this page",
         "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
-    "count": 855,
+    "count": 854,
     "active_prefixes": [
         "about",
         "bpn",

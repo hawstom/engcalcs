@@ -2143,6 +2143,13 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     holds the sprint until he rules.
 
 
+  - **The banner has no visible heading** (Tom, 2026-08-12: *"Is this necessary?"* — it was not).
+    `consent_heading` said "Browsers and visits", which named two nouns without saying what about
+    them. The body is a single question and the buttons answer it; a heading above one sentence
+    either restates it or adds noise. The `aria-label` on the region still names it for screen
+    readers, so nothing was lost and 26 translations were saved. **Last button is "Accept all"** —
+    the universal convention, and short enough not to undo the equal-effort styling that
+    "Accept all, and do not ask again" was quietly breaking.
 - 0|290|[DONE 2026-08-12] **Six Rock Chute notes were written, translated into 26 languages, and
   rendered by nothing.** Tom: *"Great find! Yes, those are 'lost notes'. They should be on the rc
   page."* Restored.
@@ -2198,6 +2205,21 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     up. Suite-wide, its own translation cost, and it solves printing rather than screen room.
 
 
+  - **SHIPPED BROKEN AND FIXED THE SAME DAY, and the bug is worth more than the feature.** The page
+    description reappeared on every reload while the heading and welcome line hid correctly. Cause:
+    the inline block was placed ABOVE the `<h2>` it names, so `getElementById('ec-page-desc')`
+    returned null. **A null return from getElementById is indistinguishable from success** — no
+    error, no console warning, two of three elements behaving perfectly.
+  - **Nothing could have caught it, which was the real defect.** `check_all.sh` had no DOM test for
+    this page, and the block is inline PHP so no JS harness saw it. I had even flagged in the
+    session summary that the toggle had not been seen in a browser, and shipped it anyway — a
+    verification failure, not a design one.
+  - **`dev/lpn-spike/page-titles-harness.js` now guards it**, and was verified to FAIL when the bug
+    is reintroduced rather than merely passing today. Three assertions: every named id exists, the
+    script is parsed after every element it names, and the inline list matches
+    `applyPageTitles()`'s list (two copies of one fact, either of which could drift).
+  - A `DOMContentLoaded` backstop was added alongside the immediate call, so a future reordering
+    degrades to a flash rather than to silence.
 - 0|287|[DONE 2026-08-12] **Serve Bootstrap from this site instead of jsDelivr — the last third
   party is gone.** Found while writing `privacy.php`, which could not honestly claim "no third
   parties" until this was either disclosed or fixed. Tom, 2026-08-12: *"OK. Fair enough. We

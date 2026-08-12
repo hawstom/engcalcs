@@ -129,7 +129,6 @@ $ec_lang_syn['template_printable_subtitle']='';
 // prose, and they are translated into all 26 languages for one reason: consent that the visitor
 // cannot read is not consent. The long-form privacy notice and terms are a separate question --
 // English-authoritative, and translated by a human later if at all.
-$ec_lang['consent_heading']='Browsers and visits';
 $ec_lang['consent_body']='May we keep a single digit per page in this browser\'s storage to prevent us from logging its visits repeatedly?';
 $ec_lang_syn['consent_body']='May we keep (store, save, put) a single 1 (a small flag, one digit) in this browser\'s storage to prevent us from logging (recording) its visits repeatedly?';
 $ec_lang['consent_accept']='Accept this';

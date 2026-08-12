@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "fr",
-        "expected_key_count": 855,
-        "delta_key_count": 48,
+        "expected_key_count": 854,
+        "delta_key_count": 47,
         "exempt_key_count": 26,
         "exempt_keys": [
             "u_depthFrac",
@@ -473,7 +473,6 @@
         ]
     },
     "keys_to_translate": {
-        "consent_heading": "Browsers and visits",
         "consent_body": "May we keep a single digit per page in this browser's storage to prevent us from logging its visits repeatedly?",
         "consent_accept": "Accept this",
         "consent_accept_all": "Accept all",
@@ -523,7 +522,6 @@
         "lpn_engine_manning_note": "Note: with Manning roughness, EPANET computes head loss about 0.6% lower than the built-in solver."
     },
     "keys": {
-        "consent_heading": "Browsers and visits",
         "consent_body": "May we keep a single digit per page in this browser's storage to prevent us from logging its visits repeatedly?",
         "consent_accept": "Accept this",
         "consent_accept_all": "Accept all",
@@ -573,22 +571,6 @@
         "lpn_engine_manning_note": "Note: with Manning roughness, EPANET computes head loss about 0.6% lower than the built-in solver."
     },
     "key_context": {
-        "consent_heading": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "template_printable_subtitle",
-                    "value": "Sous-titre imprimable",
-                    "english": "Printable Subtitle"
-                },
-                "next_translated": {
-                    "key": "index_title",
-                    "value": "Calculateurs d'ingénierie gratuits en ligne",
-                    "english": "Free Online Engineering Calculators"
-                }
-            }
-        },
         "consent_body": {
             "reason": "missing",
             "current_value": null,

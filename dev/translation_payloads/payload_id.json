@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "id",
-        "expected_key_count": 855,
-        "delta_key_count": 287,
+        "expected_key_count": 854,
+        "delta_key_count": 286,
         "exempt_key_count": 16,
         "exempt_keys": [
             "calc_units_us",
@@ -340,7 +340,6 @@
         ]
     },
     "keys_to_translate": {
-        "consent_heading": "Browsers and visits",
         "consent_body": "May we keep a single digit per page in this browser's storage to prevent us from logging its visits repeatedly?",
         "consent_accept": "Accept this",
         "consent_accept_all": "Accept all",
@@ -629,7 +628,6 @@
         "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
     "keys": {
-        "consent_heading": "Browsers and visits",
         "consent_body": "May we keep a single digit per page in this browser's storage to prevent us from logging its visits repeatedly?",
         "consent_accept": "Accept this",
         "consent_accept_all": "Accept all",
@@ -918,22 +916,6 @@
         "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
     "key_context": {
-        "consent_heading": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "template_printable_subtitle",
-                    "value": "Subjudul Cetak",
-                    "english": "Printable Subtitle"
-                },
-                "next_translated": {
-                    "key": "index_title",
-                    "value": "Kalkulator Teknik Gratis Daring",
-                    "english": "Free Online Engineering Calculators"
-                }
-            }
-        },
         "consent_body": {
             "reason": "missing",
             "current_value": null,
