@@ -1,6 +1,9 @@
 // EngCalcs Service Worker
 // Cache version — bump this string when static assets change
-const CACHE_VERSION = 'engcalcs-v8';
+// v9: Bootstrap moved from jsDelivr to this origin (ROADMAP Task 287). The bump is REQUIRED,
+// not housekeeping -- without it every returning visitor keeps serving the CDN URLs out of
+// their existing cache, and the third party we just removed stays in the page for them.
+const CACHE_VERSION = 'engcalcs-v9';
 const ASSET_CACHE = CACHE_VERSION + '-assets';
 const PAGE_CACHE  = CACHE_VERSION + '-pages';
 
@@ -30,9 +33,9 @@ const STATIC_ASSETS = [
   '/engcalcs/icons/icon.svg',
   '/engcalcs/icons/icon-192.png',
   '/engcalcs/icons/icon-512.png',
-  // Bootstrap from CDN
-  'https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css',
-  'https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js',
+  // Bootstrap, vendored (Task 287)
+  '/engcalcs/css/vendor/bootstrap.min.css',
+  '/engcalcs/js/vendor/bootstrap.bundle.min.js',
 ];
 
 // Calculator pages: network-first, fall back to cache
@@ -94,7 +97,7 @@ self.addEventListener('fetch', event => {
   }
 
   // EngCalcs pages → network-first
-  if (url.pathname.startsWith('/engcalcs/') || url.host === 'cdn.jsdelivr.net') {
+  if (url.pathname.startsWith('/engcalcs/')) {
     event.respondWith(networkFirst(event.request, PAGE_CACHE));
     return;
   }
@@ -102,8 +105,7 @@ self.addEventListener('fetch', event => {
 
 function isStaticAsset(url) {
   return (
-    url.pathname.match(/\.(js|css|svg|png|gif|jpg|ico|woff2?)(\?|$)/) ||
-    url.host === 'cdn.jsdelivr.net'
+    url.pathname.match(/\.(js|css|svg|png|gif|jpg|ico|woff2?)(\?|$)/)
   );
 }
 

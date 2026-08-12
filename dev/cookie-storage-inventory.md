@@ -79,10 +79,13 @@ The one piece of client-side storage that is NOT exempt is the offline beacon qu
 (`engcalcs-offline-queue`, `js/Calculators.lib.js`): it is analytics, so it is written only with
 consent and emptied by `EngCalcs.flushQueue()` on withdrawal.
 
-**No third-party storage anywhere.** No analytics vendor, no tag manager, no ad network, no CDN
-fonts, no embedded maps. Everything above is first-party, and `js/vendor/epanet-js.js` is served
-from this origin. That is a materially better starting position than most sites face and it should
-be said out loud in whatever notice gets written.
+**No third party at all, storage or otherwise** — as of 2026-08-12 (Task 287). No analytics
+vendor, no tag manager, no ad network, no CDN fonts, no embedded maps, and now no CDN either:
+Bootstrap was coming from jsDelivr, which set no cookie but did tell a third party the visitor's IP
+and user-agent on every page load. It is now served from this origin alongside
+`js/vendor/epanet-js.js`. That is a materially better position than most sites are in, and
+`privacy.php` now says so out loud — which also means **adding any external `src` would make that
+page false**, not merely add a line to it.
 
 ## 4. Server-side collection (GDPR, not ePrivacy)
 

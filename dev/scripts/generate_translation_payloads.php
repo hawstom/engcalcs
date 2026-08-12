@@ -579,8 +579,8 @@ function prefixToTermNames(): array
         // 'count', whose wrong senses (mattering, relying, the noble title) would each turn a
         // request for permission into something else, and 'cookie', where the food is the literal
         // meaning of the English word. Without an entry here both fall back to flow/velocity/slope.
-        'consent' => ['count (tally)', 'cookie (browser storage)'],
-        'privacy' => ['cookie (browser storage)'],
+        'consent' => ['count (tally)', 'cookie (browser storage)', 'log (record)'],
+        'privacy' => ['cookie (browser storage)', 'log (record)'],
         'terms' => ['cookie (browser storage)'],
         'lpn' => ['flow', 'velocity', 'head', 'head loss', 'friction loss', 'minor loss', 'pressure',
             'elevation', 'demand', 'static head', 'maximum allowable head', 'supply head',

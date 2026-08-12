@@ -1170,27 +1170,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     wide change with its own translation cost, and it solves a different problem (printing) than
     the one raised here (screen real estate on one page).
 
-- 30|287| **Serve Bootstrap from this site instead of jsDelivr — the only third party we have.**
-  Found 2026-08-12 while writing privacy.php, which could not honestly say "no third parties" until
-  this was disclosed. `lib/HeadersFooters.lib.php` loads `bootstrap.min.css` and
-  `bootstrap.bundle.min.js` from `cdn.jsdelivr.net`, the parent site's pages do the same, and
-  `sw.js` caches both URLs and special-cases that host in its fetch handler.
-  - **What it actually costs a visitor:** every page load tells jsDelivr their IP address and
-    user-agent. No cookie, no data flowing back, no tracking intent — but it is a transfer to a
-    third party in another jurisdiction, and it is the entire reason German courts have been ruling
-    against embedded Google Fonts. `privacy.php` discloses it plainly and says we intend to stop.
-  - **It is out of place here on the merits, not only the law.** This project vendors its own copy
-    of `epanet-js.js` precisely so nothing is fetched from anybody else, the PWA is built to work
-    offline, and the suite's pitch is "open the page and get an answer" — a CDN is a dependency on
-    somebody else's uptime for a site that otherwise has none.
-  - **Four files, and the fourth is the one that bites:** the two tags in `HeadersFooters.lib.php`,
-    the same tags on the parent site's pages (NOT in this repo), `STATIC_ASSETS` in `sw.js`, and
-    `sw.js`'s `url.host === 'cdn.jsdelivr.net'` branches. **Bump `CACHE_VERSION`** or every
-    returning PWA visitor keeps serving the CDN URLs out of their old cache.
-  - Needs a browser pass to confirm nothing shifted, which is why it was not done inline with
-    Task 286. Update `privacy.php`'s "Who else sees it" section in the same commit that lands it —
-    the page currently promises this.
-
 - 20|285| **We do not know what devices anybody uses this on, and several decisions have quietly
   assumed an answer.** Tom, 2026-08-11: *"we don't know whether anybody uses this on a phone."* He
   is right, and it is worth being precise about why: `log-human-view.php` and `log-calc-event.php`
@@ -2137,6 +2116,32 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|287|[DONE 2026-08-12] **Serve Bootstrap from this site instead of jsDelivr — the last third
+  party is gone.** Found while writing `privacy.php`, which could not honestly claim "no third
+  parties" until this was either disclosed or fixed. Tom, 2026-08-12: *"OK. Fair enough. We
+  self-host."*
+  - **What it cost a visitor before:** every page load told jsDelivr their IP address and
+    user-agent. No cookie, no data coming back, no tracking intent — but a transfer to a third
+    party in another jurisdiction, and the reason German courts have ruled against embedded Google
+    Fonts. It was also out of place on the merits: this project already vendors `epanet-js.js` so
+    nothing is fetched from anybody, and the PWA is built to work offline.
+  - **VERIFIED, NOT TRUSTED.** The vendored files' sha384 digests match the SRI hashes the old tags
+    carried, so they are byte-identical to what visitors were already being served. That check is
+    the upgrade procedure too — it is written down in `js/vendor/README.md`.
+  - **Four places, and the fourth is the one that bites.** The two tags in
+    `lib/HeadersFooters.lib.php`; the same two in the parent site's `hawsedc.lib.php` (**not in
+    git** — recreate by hand if that site is rebuilt); `STATIC_ASSETS` in `sw.js`; and `sw.js`'s two
+    `url.host === 'cdn.jsdelivr.net'` branches. **`CACHE_VERSION` bumped v8 → v9**, which is
+    required rather than housekeeping: without it every returning PWA visitor keeps serving the CDN
+    URLs out of their existing cache, and the third party stays in the page for exactly the people
+    who visit most.
+  - **`privacy.php` changed in the same commit**, from disclosing jsDelivr to stating that nothing
+    is loaded from anybody else's server. That page is now a constraint on the codebase: adding an
+    external `src` anywhere would make it false, not merely out of date.
+  - Verified on all four page shapes (calculator, lpn, legal, parent-site index): zero jsDelivr
+    references, correct local paths, correct MIME types.
+
 
 - 0|196| **[DONE 2026-08-11] EPANET `.inp` IMPORT (Task 146 child). Export is NOT built — see Task 281.**
   Raised 2026-08-01 as import/export together; only the reading half shipped. **This reverses the

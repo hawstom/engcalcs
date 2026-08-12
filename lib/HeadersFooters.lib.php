@@ -81,7 +81,13 @@ $ec_canonical = ec_canonical_url($html_lang);
 	<meta name="apple-mobile-web-app-status-bar-style" content="default">
 	<meta name="apple-mobile-web-app-title" content="EngCalcs">
 	<link rel="apple-touch-icon" href="/engcalcs/icons/icon-192.png">
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+	<?php // Bootstrap 5.3.2, MIT, served from this site (ROADMAP Task 287). It used to come from
+	      // jsDelivr, which meant every page load told a third party the visitor's IP address and
+	      // user-agent -- no cookie and no tracking intent, but a transfer we could not honestly
+	      // claim was not happening. The vendored copies are byte-identical to what the CDN served:
+	      // their sha384 digests match the SRI hashes this tag used to carry. No integrity/crossorigin
+	      // attributes now, because same-origin files have nothing to verify against a third party. ?>
+	<link rel="stylesheet" href="/engcalcs/css/vendor/bootstrap.min.css?v=<?=filemtime(__DIR__.'/../css/vendor/bootstrap.min.css')?>">
 
 <?php
 if (substr($type, 0, 8) === "EngCalcs") {
@@ -95,7 +101,7 @@ if (substr($type, 0, 8) === "EngCalcs") {
 
 </head>
 <body>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+<script src="/engcalcs/js/vendor/bootstrap.bundle.min.js?v=<?=filemtime(__DIR__.'/../js/vendor/bootstrap.bundle.min.js')?>"></script>
 
 <?php if (substr($type, 0, 8) === "EngCalcs") : ?>
 <script src="/engcalcs/js/Cookies.lib.js?v=<?=filemtime(__DIR__.'/../js/Cookies.lib.js')?>"></script>

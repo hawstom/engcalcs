@@ -3330,6 +3330,20 @@
             ],
             "translations": {},
             "translation_notes": "Created 2026-08-12 alongside 'count (tally)', from the same Wave 0 pass. Empty translations for the same reason, with one extra: this is the term where deferring to the culture matters most, because the label's whole value is being the findable, conventional one. See CLAUDE.md, 'defer to cultural standard' — we are not the judges of terminology."
+        },
+        "log (record)": {
+            "term": "log (record)",
+            "symbol": "",
+            "context": "To write down that something happened, in a file kept on the server. What EngCalcs logs is that a page was opened or a calculation was run — the page name, the language, and the time — with no IP address, no account and no identifier of any kind. Used throughout the Task 286 consent banner and privacy notice. The everyday verb your language uses for RECORDING an event is the right choice; there is nothing technical about it, and no language needs to borrow the English word.",
+            "avoid": [
+                "the timber sense — a felled tree, a log of wood. This is the literal meaning of the English word and the failure mode to expect",
+                "the mathematical sense — logarithm. 'Log' abbreviates both in English, and in a suite full of engineering formulas this is a live confusion",
+                "the sense of LOGGING IN or signing in to an account. There are no accounts on this site at all, so any rendering that suggests one is wrong twice over",
+                "rendering it as MONITOR, TRACK or FOLLOW, all of which imply watching a person over time. We write one line saying a page was opened; we do not follow anybody",
+                "borrowing the English word where an ordinary verb for recording exists"
+            ],
+            "translations": {},
+            "translation_notes": "Created 2026-08-12 at Tom's suggestion: *\"There must be a better way to help translate 'logging' (recording) than to repeat that synonym in several _syn keys. Isn't that what our glossary is for?\"* Exactly right, and this entry is the answer — the CONCEPT gloss belongs here once, not repeated in four labels. Note the boundary, which is easy to get wrong in the other direction: this replaces the repeated '(recording)' gloss, and NOT a label's own alternate wordings. See CLAUDE.md's routing rule and the retirement of the Task 132 trimming exception — the left-of-pipe is the payload, and a glossary pointer accompanies the synonyms rather than deleting them.\n\nTranslations empty on purpose, as with 'count (tally)' and 'cookie (browser storage)': every language has a settled ordinary verb for this, we have nothing attested, and inventing 26 would be judging other people's terminology. The sprint fills them via the mandatory write-back."
         }
     }
 }

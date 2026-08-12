@@ -155,12 +155,10 @@ at the foot of every page.</p>
 <p><strong>Nobody.</strong> We do not share, sell, or transfer any of it to third parties. We use
 no processor, no analytics service, and no advertising partner.</p>
 
-<p>One technical exception, stated because it is true rather than because it is significant: the
-site loads the Bootstrap stylesheet and script from <strong>jsDelivr</strong>, a public open-source
-content delivery network. Like any request your browser makes to any server, that request tells
-jsDelivr your IP address and which browser you are using. We send them nothing else, they set no
-cookie here, and we receive nothing back from them. We would rather not depend on anybody else at
-all, and intend to serve those two files from this site instead.</p>
+<p><strong>Nothing on this site is loaded from anybody else&rsquo;s server.</strong> Every
+stylesheet, script, font and image comes from this site, so no third party ever learns that you
+visited, not even by serving you a file. There is no content delivery network, no hosted font, and
+no embedded map or video.</p>
 
 <h2>Where it goes</h2>
 

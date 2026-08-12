@@ -129,13 +129,17 @@ $ec_lang_syn['template_printable_subtitle']='';
 // prose, and they are translated into all 26 languages for one reason: consent that the visitor
 // cannot read is not consent. The long-form privacy notice and terms are a separate question --
 // English-authoritative, and translated by a human later if at all.
-$ec_lang['consent_heading']='Visitors and visits';
-$ec_lang['consent_body']='May we store a little information in this browser, so that we can tell visitors apart from visits when we count? It is used for counting only, and it gives permission for nothing else.';
-$ec_lang['consent_accept']='Allow this';
+$ec_lang['consent_heading']='Browsers and visits';
+$ec_lang['consent_body']='May we keep a single 1 in this browser\'s storage to prevent us from logging its visits repeatedly?';
+$ec_lang_syn['consent_body']='May we keep (store, save, put) a single 1 (a small flag, one digit) in this browser\'s storage to prevent us from logging (recording) its visits repeatedly?';
+$ec_lang['consent_accept']='Allow this logging reducer';
+$ec_lang_syn['consent_accept']='Allow this logging (recording) reducer (limiter)';
 $ec_lang['consent_decline']='Refuse this';
-$ec_lang['consent_current_granted']='You allowed this. We count you as one visitor rather than as one visit each time.';
-$ec_lang['consent_current_denied']='You refused this. We store nothing in this browser for our counts.';
-$ec_lang['consent_region_label']='Your choice about being counted';
+$ec_lang['consent_current_granted']='You allowed this. We limit logging for this browser profile.';
+$ec_lang_syn['consent_current_granted']='You allowed this. We limit logging (recording) for this browser profile.';
+$ec_lang['consent_current_denied']='You refused this. We store nothing to limit logging for this browser profile.';
+$ec_lang['consent_region_label']='Your choice about limiting logging.';
+$ec_lang_syn['consent_region_label']='Your choice about limiting logging (recording).';
 $ec_lang['consent_settings_link']='Cookie settings';
 $ec_lang['privacy_link']='Privacy notice';
 $ec_lang['terms_link']='Terms of use';
