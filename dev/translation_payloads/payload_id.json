@@ -4391,8 +4391,8 @@
     },
     "key_syn": {
         "consent_body": "May we keep (store, save, put) a single digit per page in this browser profile's storage to prevent us from logging (recording) its visits repeatedly?",
-        "consent_accept": "Accept (allow) this",
-        "consent_accept_all": "Accept (allow) all",
+        "consent_accept": "Accept (allow) this ask (this request, this question)",
+        "consent_accept_all": "Accept (allow) this and any later ask; do not ask (question) me again",
         "consent_decline": "Refuse (decline or deny)",
         "consent_current_granted": "You allowed this. We limit logging (recording) for this browser profile.",
         "consent_current_denied": "You refused (declined or denied) this. We store (keep or save) nothing to limit logging (recording) for this browser profile.",
