@@ -1124,25 +1124,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **Not legal advice and not from a lawyer.** The inventory is what an adviser would ask for
     first, which is why it exists; the verdict is not ours to give.
 
-- 40|290| **18 language keys are rendered by nothing, and six of them look like a page lost its
-  content.** Found 2026-08-12 by the new `dev/scripts/key_hygiene_check.php`, which is the first
-  thing here that could see them at all.
-  - **The cluster is the interesting part: `rc_notes_1/2/3/5/6/7_term` and `_def`.**
-    `Rock-Chute.php` renders exactly ONE note — number 4 — and the other six pairs are defined,
-    translated, and displayed nowhere. That does not read like keys nobody deleted; it reads like a
-    notes list that was written and then lost from the page. **Decide which it is before deleting
-    anything** — if the content was meant to ship, this is a missing-content bug and the keys are
-    the evidence, not the debt.
-  - The rest: `menu_main_list`, `menu_main_language`, `mi_d50in` (whose own syn note already says
-    "not used"), `mpf_spreadheet_notice` (also carrying a typo in the key name), `wi_save_and_calculate`,
-    `or_shape`, `contact_title`.
-  - **What each one costs:** it is maintained in 27 language files and shown on no page, so every
-    future sprint pays to translate it again. Deleting one retires 27 strings.
-  - **Do not bulk-delete.** A key parked on purpose for a returning feature is a real pattern here —
-    `lpn_settings_emitter_exponent` is kept deliberately for Task 191, and the check says so in its
-    own output. This wants one human decision per key, and `rename_lang_key.php` makes the ones
-    that stay cheap to fix.
-
 - 25|291| **Suffix vocabulary the hygiene check cannot judge, and a human should.** Three synonym
   groups are deliberately excluded from `key_hygiene_check.php` because deciding them needs the
   value or the call site, not the name:
@@ -2151,6 +2132,30 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|290|[DONE 2026-08-12] **Six Rock Chute notes were written, translated into 26 languages, and
+  rendered by nothing.** Tom: *"Great find! Yes, those are 'lost notes'. They should be on the rc
+  page."* Restored.
+  - **`Rock-Chute.php` displayed exactly ONE of its seven notes** — number 4, the Robinson citation.
+    Notes 1, 2, 3, 5, 6 and 7 existed as keys, were carried through every sprint, and appeared on no
+    page. **A missing `<dt>`/`<dd>` pair looks like nothing at all**, and translating one looks like
+    ordinary work, which is why this survived a full rc_ translation sprint and an audit.
+  - **`rc_notes_7_term` did not exist in ANY language** — note 7 had a body and no heading. That
+    asymmetry is what made only half the pair show up as unreferenced, and it is why
+    `glossary_compliance_audit.php` had been pointing at a key that was never written. Now written
+    as "Ponding Above the Inlet"; the preposition is load-bearing, since "Inlet Ponding" also reads
+    as the inlet being flooded.
+  - **Restored in LANGUAGE-FILE order, not key order** — 1,2,3,5,6,7,4 — because note 4 was appended
+    later and a loop over 1..7 would put the bibliography in the middle of the notes.
+  - **Content re-checked against the code before restoring**, on the `lpn_notes_4_def` lesson that a
+    sprint faithfully translates a stale claim: the 0.45 porosity default matches `rc_np`, and note
+    1's 0.02–0.40 validity range matches the guard in `js/rock-chute.js`.
+  - **Dead keys 18 → 7.** What remains is `menu_main_list`, `menu_main_language`, `mi_d50in`,
+    `mpf_spreadheet_notice` (typo in the key name too), `wi_save_and_calculate`, `or_shape`,
+    `contact_title` — genuinely unreferenced, one human decision each, no cluster among them.
+  - **The lesson worth keeping:** this was invisible not because nobody looked but because nothing
+    could look. `key_hygiene_check.php` found it in its first run, minutes after being written.
+
 
 - 0|289|[DONE 2026-08-12] **"Show page titles" — the first setting on lpn that is not part of the
   project.** Tom: *"our standard titles... really don't seem like much in most cases. But for lpn

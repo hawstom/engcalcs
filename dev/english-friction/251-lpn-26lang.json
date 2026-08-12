@@ -251,6 +251,18 @@
       "readings": [],
       "disposition": "dismissed",
       "resolution": "Kept: it renders directly under lpn_inp_report_heading ('Imported {file}'), so it is a caption on a stated subject rather than a floating fragment, and the three placeholders make the shape self-evident. Noted rather than silently passed over, because the same shape was a real defect in lpn_settings_scope_note above -- the difference is having a heading above it."
+    },
+    {
+      "key": "rc_notes_7_term",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "NEW STRING, written 2026-08-12, and it exists because note 7 on the Rock Chute page had a body and no heading in any of the 27 languages. Adversarial reading of the candidates: 'Inlet Ponding' parses two ways -- ponding ABOVE the inlet (meant) or ponding OF the inlet (not meant, and physically a different picture). 'Upstream Ponding' loses the reference point entirely, since everything on the page is upstream of something.",
+      "readings": [
+        "water backing up above the steep channel inlet",
+        "the inlet itself being submerged or flooded"
+      ],
+      "disposition": "english",
+      "resolution": "Written as 'Ponding Above the Inlet' -- the preposition carries the relationship, so no reading survives but the intended one. Title Case to match its six siblings (Rock Sizing Equations, Unit Discharge, ...). 'ponding' is already a glossary concept and rc is wired to it, so the trap word is guarded; verified by gloss_ref_check.php, which passes on rc_notes_7_def's existing 'gloss: weir head, upstream, ponding' pointer."
     }
   ]
 }

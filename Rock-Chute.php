@@ -42,7 +42,31 @@ echoCalculatorForm(
 <?php echoFeedback(); ?>
 
 <h2><?=$ec_lang['ws_notes_heading']?></h2>
+<?php
+// ROADMAP Task 290: SIX OF THESE SEVEN NOTES WERE WRITTEN, TRANSLATED INTO 26 LANGUAGES, AND
+// RENDERED BY NOTHING. Only note 4 (the Robinson citation) was on the page; 1, 2, 3, 5, 6 and 7
+// existed as keys nobody displayed. Found 2026-08-12 by key_hygiene_check.php, which is the first
+// thing here that could see them -- a missing <dt>/<dd> pair looks like nothing at all on a page,
+// and translating one looks like ordinary work.
+//
+// Restored in LANGUAGE-FILE ORDER, which puts the Reference last where a citation belongs. That
+// order is 1,2,3,5,6,7,4 -- note 4 was authored later and appended, so key number does not track
+// reading order here and a loop over 1..7 would put the bibliography in the middle.
+//
+// rc_notes_7_term did not exist in ANY language: note 7 had a body and no heading, which is why
+// only half the pair showed up as unreferenced. Written 2026-08-12.
+//
+// Content re-checked against the code before restoring, on the lpn_notes_4_def lesson that a
+// sprint will faithfully translate a stale claim: the 0.45 porosity default matches rc_np in this
+// file, and note 1's 0.02-0.40 slope validity range matches the guard in js/rock-chute.js.
+?>
 <dl>
+	<dt><?=$ec_lang['rc_notes_1_term']?></dt><dd><?=$ec_lang['rc_notes_1_def']?></dd>
+	<dt><?=$ec_lang['rc_notes_2_term']?></dt><dd><?=$ec_lang['rc_notes_2_def']?></dd>
+	<dt><?=$ec_lang['rc_notes_3_term']?></dt><dd><?=$ec_lang['rc_notes_3_def']?></dd>
+	<dt><?=$ec_lang['rc_notes_5_term']?></dt><dd><?=$ec_lang['rc_notes_5_def']?></dd>
+	<dt><?=$ec_lang['rc_notes_6_term']?></dt><dd><?=$ec_lang['rc_notes_6_def']?></dd>
+	<dt><?=$ec_lang['rc_notes_7_term']?></dt><dd><?=$ec_lang['rc_notes_7_def']?></dd>
 	<dt><?=$ec_lang['rc_notes_4_term']?></dt><dd><?=$ec_lang['rc_notes_4_def']?></dd>
 </dl>
 <script>
