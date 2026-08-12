@@ -121,13 +121,13 @@ its last activity.</p>
 	</tr>
 	<tr>
 		<td><code>ec_nolog</code></td>
-		<td>Stops this browser being counted <strong>at all</strong>, in any way. Stronger than
-		refusing above: refusing means we store nothing on your device but still count the page
-		load anonymously, while this records nothing whatsoever. Set it by visiting any page with
-		<code>?ec_nolog=1</code> on the end of the address, and undo it with
-		<code>?ec_nolog=0</code></td>
+		<td>A maintenance control, not part of the site&rsquo;s normal use: it stops a browser being
+		counted at all, and we set it on the browsers we test the site with so our own work does not
+		show up in the figures. It is only ever set by opening a page with <code>?ec_nolog=1</code>
+		on the end of the address, so you will not have it unless you did that deliberately
+		(<code>?ec_nolog=0</code> undoes it)</td>
 		<td>10 years</td>
-		<td>No &mdash; same reason: it exists only to honour a choice you made</td>
+		<td>No &mdash; same reason: it exists only to honour a choice that was made</td>
 	</tr>
 	<tr>
 		<td><code>ec_blang</code></td>
