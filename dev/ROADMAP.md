@@ -1483,7 +1483,7 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **TO RESUME:** regenerate payloads, `--check` for FRESH, then relaunch the 23 remaining
     (am ar bg bn cs de fa he hi hr id it km my ps ro ru sr sw tr uk ur zh) with the same brief.
     **Concurrency caps at 20 agents**, so it is two batches, not one.
-  - **Settle Task 293's retitle BEFORE relaunching** — see that task. The three `lpn_` identity
+  - **Task 296's retitle was settled and folded in before the relaunch** — see that task. The three `lpn_` identity
     strings are already translated in all 26 languages and are therefore NOT in the delta; changing
     the English after this sprint means a separate 26-language resync, while folding it in now is
     three extra keys on a 286-key job.
@@ -1580,37 +1580,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     **either promote lpn, or stop citing 26 languages when positioning lpn specifically** — the
     suite-wide claim stays true, the page-level one does not. Fix the claim now; decide the
     promotion on the beacon.
-
-- 45|293| **The word "water" appears nowhere in `lpn_`'s name, title or description. OPEN — Tom's
-  call, and it gates the rest of Task 251's sprint.** Tom, 2026-08-12: *"We have water nowhere in
-  our titles or description. I think this is bad... I want to deliver what people are really
-  searching for."* He is right on the fact. The three identity strings are:
-  - `lpn_main_menu` = "Looped Pipe Network (Map Interface)"
-  - `lpn_main_title` = "Free Online Looped Pipe Network Calculator with Map Interface"
-  - `lpn_main_desc` = "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
-
-  Not one contains "water", "distribution", or "supply". Somebody searching *water distribution
-  network software* — which is what this page IS — cannot find it.
-  - **SEO IS THE RIGHT TEST FOR THESE PARTICULAR STRINGS, and CLAUDE.md already says so.** The
-    identity rule ("match the authoritative published source's terminology") exists for calculators
-    named after a paper — Manning, Robinson. `lpn_` is named after no paper, so the rule's own
-    rationale applies instead: the menu entry and title are *what a returning user searches for and
-    bookmarks*. That is a search-behaviour criterion, and Tom is invoking it correctly. The
-    Simple-English rule still governs `lpn_main_desc`, which is explanatory.
-  - **THE SEQUENCING IS THE EXPENSIVE PART, AND IT INVERTS THE OBVIOUS ANSWER.** Tom wondered
-    whether this should wait until after the sprint. It should not, and the reason is measurable:
-    these three keys were translated into all 26 languages by the 146.06 identity-floor pass, so
-    they are **already translated and NOT in the 251 delta**. Retitling later means a separate
-    26-language resync of 78 strings. Retitling before the 23 remaining agents relaunch adds three
-    keys to a 286-key job they are already doing. **Same work, one pass instead of two** — and the
-    sprint is already paused on a session limit, so the window is free.
-  - **DO NOT put "WaterCAD", "WaterGEMS" or "Bentley" in a title or meta description.** Those are
-    live trademarks of a direct competitor, and the reputational and legal downside of trading on
-    them dwarfs the traffic. "Reads EPANET `.inp` files" is different and is fair game: EPANET is
-    public-domain EPA software, and Task 196 made the claim literally true. Say what we do, not
-    whose customers we want.
-  - **Needs Tom's wording decision before anything ships** — naming is his call, and he said his
-    clarity is not perfect. Two drafts were put to him 2026-08-12; neither is adopted yet.
 
 - 20|248| **What the EPANET toggle actually unlocks: tanks, valves, extended-period simulation.**
   Task 243 shipped the engine and the toggle; none of this is built. The engine makes each of
@@ -2179,6 +2148,71 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|296| **The word "water" appeared nowhere in `lpn_`'s name, title or description. DONE 2026-08-12.**
+  Tom, 2026-08-12: *"We have water nowhere in our titles or description. I think this is bad...
+  I want to deliver what people are really searching for."* He was right on the fact. The three
+  identity strings had been:
+  - `lpn_main_menu` = "Looped Pipe Network (Map Interface)"
+  - `lpn_main_title` = "Free Online Looped Pipe Network Calculator with Map Interface"
+  - `lpn_main_desc` = "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+
+  Not one contains "water", "distribution", or "supply". Somebody searching *water distribution
+  network software* — which is what this page IS — cannot find it.
+  - **SEO IS THE RIGHT TEST FOR THESE PARTICULAR STRINGS, and CLAUDE.md already says so.** The
+    identity rule ("match the authoritative published source's terminology") exists for calculators
+    named after a paper — Manning, Robinson. `lpn_` is named after no paper, so the rule's own
+    rationale applies instead: the menu entry and title are *what a returning user searches for and
+    bookmarks*. That is a search-behaviour criterion, and Tom is invoking it correctly. The
+    Simple-English rule still governs `lpn_main_desc`, which is explanatory.
+  - **THE SEQUENCING IS THE EXPENSIVE PART, AND IT INVERTS THE OBVIOUS ANSWER.** Tom wondered
+    whether this should wait until after the sprint. It should not, and the reason is measurable:
+    these three keys were translated into all 26 languages by the 146.06 identity-floor pass, so
+    they are **already translated and NOT in the 251 delta**. Retitling later means a separate
+    26-language resync of 78 strings. Retitling before the 23 remaining agents relaunch adds three
+    keys to a 286-key job they are already doing. **Same work, one pass instead of two** — and the
+    sprint is already paused on a session limit, so the window is free.
+  - **DO NOT put "WaterCAD", "WaterGEMS" or "Bentley" in a title or meta description.** Those are
+    live trademarks of a direct competitor, and the reputational and legal downside of trading on
+    them dwarfs the traffic. "Reads EPANET `.inp` files" is different and is fair game: EPANET is
+    public-domain EPA software, and Task 196 made the claim literally true. Say what we do, not
+    whose customers we want.
+  - **DECIDED AND SHIPPED 2026-08-12.** Tom chose the water-first wording:
+    ```php
+    $ec_lang['lpn_main_menu']='Water Supply Network';
+    $ec_lang['lpn_main_title']='Free Online Water Distribution Network Calculator with the EPANET Engine';
+    $ec_lang['lpn_main_desc']='Water Supply Network Analysis: Draw a Looped Pipe Network or Import EPANET Files';
+    ```
+  - **"WITH the EPANET engine", never "EPANET-POWERED" — and this is a correctness rule, not a
+    style preference.** Tom proposed "EPANET-powered" and it had to be refused on the facts:
+    `js/looped-network.js:700` sets `engine: 'native'`, the EPANET path at `:8286` fires only when
+    the user ticks a box, and our own tooltip (`lpn_settings_engine_epanet_tip`) says *"The
+    built-in solver gives the same answers and is faster, so leave this off unless you need EPANET
+    itself."* A "powered by EPANET" title would therefore be false for essentially every visitor
+    AND be contradicted by a tooltip on the same page — the page arguing with itself, the exact
+    defect fixed in `7509dc7`. **"With" claims we ship it and you can switch to it, which is
+    true, and stays true if the default ever flips.** If the default DOES flip to EPANET, this
+    title can be strengthened; until then it cannot.
+  - **"Web clone of EPANET" was also refused**, from the other direction: no tanks, no valves, no
+    extended-period simulation (Task 248). "Clone" promises three headline features we do not have.
+  - **"On a map" demoted from the title to the description.** Tom's instinct was right — the map
+    editor is a real differentiator but nobody searches for it. The title spends its width on the
+    words people actually type.
+  - **Competitor trademarks stay out of the title and meta.** Tom agreed, having cited WaterCAD /
+    WaterGEMS only as evidence that "water" matters. Nominative fair use would probably permit a
+    truthful "alternative to X", but it invites complaints on merit-independent grounds and reads
+    as chasing their customers. If wanted later, its home is body text on a comparison page where
+    the comparison can be substantiated.
+  - **Do not add a meta keywords tag.** The site emits none, and that is correct — Google has
+    ignored the tag since 2009. The description is where these words have to land.
+  - **HOW THE RETITLE REACHED THE AGENTS, since a changed English string does NOT enter the
+    delta on its own.** These three keys were already translated in all 26 languages, so the
+    payload generator saw nothing missing. The three lines were deleted from all 26 lang files,
+    which made them missing and pulled them into `keys_to_translate` (22 non-core went 286 → 289).
+    **This is the general recipe for retranslating a reworded key, and it is not obvious.**
+    Expect `check_all.sh` to fail the lpn harness on "every borrowed string already exists" for
+    es/fr/pt/tr in the window between the deletion and the sprint landing — that failure is the
+    guard working, and it clears when the agents write the new translations.
 
 - 0|288|[DONE 2026-08-12] **The unique identifier is gone. What is stored is one digit per page.**
   Tom wrote the banner sentence first — *"May we store a single digit per page in this browser's
