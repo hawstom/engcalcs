@@ -1048,10 +1048,31 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     - **The bucket marker is a TRAILING column emitted only for `visit` rows**, so the entire
       pre-existing log history stays byte-identical and every awk field index keeps its meaning.
       Absence of the marker means a deduplicated row, which is what every old row is.
-    - **Still open on this task:** the privacy and terms pages themselves (blocked on the human
-      decisions in `dev/privacy-and-terms-draft.md` §1), and translating the ten new
+  - **PAGES SHIPPED 2026-08-12: `privacy.php` and `terms.php`**, English-authoritative and
+    hard-coded, which is a deliberate exception to every other page in this suite — machine
+    translating a liability position into 26 languages is a way to say something you did not mean
+    where nobody would notice. Tom answered the open decisions the same day: usage counts kept **at
+    most 26 months** (enforced by `dev/scripts/trim_logs.php`, not merely promised), contact
+    messages **until deleted**, transfer basis **Art 49(1)(a) + 49(1)(b)**, liability cap **the
+    greater of fees paid or USD 100**, governing law **Arizona**.
+    - **The notice covers hawsedc.com, not just /engcalcs** — the cookies are set with `path=/`. It
+      answers at `/privacy.php` and `/terms.php` through three-line redirects at the parent root.
+      **Those two shims are NOT in this repo** (the parent site is not under version control) and
+      must be recreated by hand if that site is ever rebuilt.
+    - **Tom asked whether deleting logs often is bad. Answer: on its own, a little; with a snapshot
+      first, no.** What deleting costs is the multi-year trend that language and calculator
+      decisions rest on — and `sh log/lang-log-stats.sh` produces exactly that as aggregates with no
+      rows in them. Snapshot into `dev/usage-data-log.md`, then delete as freely as he likes.
+      `trim_logs.php` is the backstop that makes the 26-month claim true even when nobody
+      remembers; it refuses `--months` above 26 because that would make the page lie.
+    - **A CLI render is not a visitor** (`PHP_SAPI === 'cli'` guard in `logLanguageSelection`).
+      Never mattered before: a CLI render had a session and logged one row per process. With the
+      storage-free path logging per page load, one run of `html_balance_check.php` put 25 fictional
+      visits in the log. Caught by noticing the row count move during testing.
+    - **Still open on this task:** translating the ten new
       `consent_*`/`privacy_link`/`terms_link` keys — which exist in English precisely so they ride
-      the Task 251 sprint rather than paying for one of their own.
+      the Task 251 sprint rather than paying for one of their own. And Task 287, split out because
+      writing the notice is what found it.
   - **What triggers it is ePrivacy Article 5(3), not GDPR**, and its test is *strictly necessary for
     a service the user explicitly requested* — applied **per purpose**, and to `localStorage` as
     much as to cookies. Consent under it means opt-IN, before the storage; the existing `ec_nolog`
@@ -1102,6 +1123,27 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     is what this project pays 26x for.
   - **Not legal advice and not from a lawyer.** The inventory is what an adviser would ask for
     first, which is why it exists; the verdict is not ours to give.
+
+- 30|287| **Serve Bootstrap from this site instead of jsDelivr — the only third party we have.**
+  Found 2026-08-12 while writing privacy.php, which could not honestly say "no third parties" until
+  this was disclosed. `lib/HeadersFooters.lib.php` loads `bootstrap.min.css` and
+  `bootstrap.bundle.min.js` from `cdn.jsdelivr.net`, the parent site's pages do the same, and
+  `sw.js` caches both URLs and special-cases that host in its fetch handler.
+  - **What it actually costs a visitor:** every page load tells jsDelivr their IP address and
+    user-agent. No cookie, no data flowing back, no tracking intent — but it is a transfer to a
+    third party in another jurisdiction, and it is the entire reason German courts have been ruling
+    against embedded Google Fonts. `privacy.php` discloses it plainly and says we intend to stop.
+  - **It is out of place here on the merits, not only the law.** This project vendors its own copy
+    of `epanet-js.js` precisely so nothing is fetched from anybody else, the PWA is built to work
+    offline, and the suite's pitch is "open the page and get an answer" — a CDN is a dependency on
+    somebody else's uptime for a site that otherwise has none.
+  - **Four files, and the fourth is the one that bites:** the two tags in `HeadersFooters.lib.php`,
+    the same tags on the parent site's pages (NOT in this repo), `STATIC_ASSETS` in `sw.js`, and
+    `sw.js`'s `url.host === 'cdn.jsdelivr.net'` branches. **Bump `CACHE_VERSION`** or every
+    returning PWA visitor keeps serving the CDN URLs out of their old cache.
+  - Needs a browser pass to confirm nothing shifted, which is why it was not done inline with
+    Task 286. Update `privacy.php`'s "Who else sees it" section in the same commit that lands it —
+    the page currently promises this.
 
 - 20|285| **We do not know what devices anybody uses this on, and several decisions have quietly
   assumed an answer.** Tom, 2026-08-11: *"we don't know whether anybody uses this on a phone."* He

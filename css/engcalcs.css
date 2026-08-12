@@ -512,3 +512,12 @@ html[lang="zh"] .ec-welcome {
 .ec-consent-btn:hover, .ec-consent-btn:focus { background: #14588c; border-color: #14588c; }
 .ec-consent-links, .ec-legal-links { margin: 0; font-size: 0.9rem; }
 .ec-consent-links a, .ec-legal-links a { margin-inline-end: 1rem; }
+
+/* The two English-authoritative legal pages (ROADMAP Task 286). Long prose, not a calculator:
+   a reading measure rather than the full window width, and tables that scroll rather than
+   squeeze on a phone. */
+.ec-legal { max-width: 44rem; }
+.ec-legal h2 { font-size: 1.25rem; margin-top: 1.5rem; }
+.ec-legal h3 { font-size: 1.05rem; margin-top: 1rem; }
+.ec-legal-table { display: block; overflow-x: auto; border-collapse: collapse; margin: 0.5rem 0 1rem; }
+.ec-legal-table th, .ec-legal-table td { border: 1px solid #ccc; padding: 0.3rem 0.5rem; text-align: start; vertical-align: top; }

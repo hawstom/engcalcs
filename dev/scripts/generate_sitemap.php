@@ -41,7 +41,13 @@ $excluded = [
     'log-human-view.php'   => 'beacon endpoint, emits no HTML',
     'Install.php'          => 'operator documentation, not a visitor page',
     'Compare-Languages.php'=> 'translator tool, output is a diff table',
+    'log-title-event.php'  => 'beacon endpoint, emits no HTML',
+    'consent.php'          => 'redirect endpoint for the no-JS consent path, emits no HTML',
 ];
+// English-only pages: real content, indexable, but with no ?lang= variants because the body is
+// hard-coded English (ROADMAP Task 286 -- legal prose is not machine-translated). Emitting 27
+// language URLs for one English document would ask Google to index 27 duplicates.
+$englishOnly = ['privacy.php', 'terms.php'];
 $pages = [];
 foreach (glob($repoRoot . '/*.php') as $path) {
     $file = basename($path);
@@ -70,6 +76,13 @@ $count = count($parentPages);
 foreach ($pages as $file) {
     // Match ec_canonical_url(): /index.php collapses to the directory URL.
     $path = ($file === 'index.php') ? '/engcalcs/' : '/engcalcs/' . $file;
+    if (in_array($file, $englishOnly, true)) {
+        $xml .= "  <url>\n    <loc>" . htmlspecialchars($origin . $path, ENT_XML1) . "</loc>\n"
+              . "    <lastmod>" . gmdate('Y-m-d', filemtime($repoRoot . '/' . $file)) . "</lastmod>\n"
+              . "  </url>\n";
+        $count++;
+        continue;
+    }
     foreach ($languages as $lang) {
         $loc = $origin . $path . '?lang=' . $lang;
         $xml .= "  <url>\n    <loc>" . htmlspecialchars($loc, ENT_XML1) . "</loc>\n"
