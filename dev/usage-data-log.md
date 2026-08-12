@@ -274,3 +274,33 @@ was referring to; his "that measure" meant used/shopping among the complex calcu
 - Conversion ratios are not comparable across complexity classes, and not comparable at all at
   n of a few dozen shoppers.
 - Do not turn a small-n ratio into a verdict about a page's worth.
+
+
+---
+
+## 2026-08-11 — `lpn` only, a two-day re-read
+
+Supplied by Tom in passing, for `Looped-Network` alone: **shopping 58, using 10, still 6th of 16 by
+shopping.** His own framing: *"I know that's not as useful without any context. But I thought I
+would throw it at you anyway."* Logged as a partial snapshot rather than folded into the 2026-08-09
+table, which stays as it was read.
+
+| page | shopping | using | %use of shop | vs 2026-08-09 |
+|---|---:|---:|---:|---|
+| Looped-Network | 58 | 10 | 17% | +7 shopping, +3 using, rank unchanged at 6th |
+
+**What this does and does not say**, under this log's own standing rules.
+
+- **The conversion did not move.** 7/51 and 10/58 have Wilson 95% intervals of roughly 7–26% and
+  10–28%. They overlap almost entirely. 14% → 17% is not a change; it is the same reading twice.
+- **The growth RATE is flat, not rising.** `lpn_` shipped 2026-07-30, so 51 shoppers by 08-09 is
+  about 5 a day; 7 more over the two days to 08-11 is about 3.5 a day. That is in line with, not
+  above, the launch average — and two days is far too short to say even that much. **Resist the
+  "rising fast" story on this data**; the 2026-08-09 entry earned that phrase over ten days, this
+  one does not extend it.
+- **What IS solid is the rank**: 6th of 16 by shopping, unchanged, on a page ten days old competing
+  with pages years older. That was the defensible claim on 08-09 and it is still the defensible
+  claim now.
+- **These counters cannot tell us what DEVICE anyone used** — see ROADMAP Task 285. `log-human-view.php`
+  records page and language and nothing else, so every statement anywhere in this project about
+  phone or tablet use of `lpn_` is an assumption, not a measurement.

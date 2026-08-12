@@ -24,7 +24,7 @@
             "lpn_field_id"
         ],
         "out_of_scope_key_count": 0,
-        "coverage": "coverage: core calculators [mpf, mtc] x core languages [es, pt, fr, tr] (in scope iff calculator OR language is core; identity strings always)",
+        "coverage": "coverage: core calculators [mpf, mtc, lpn] x core languages [es, pt, fr, tr] (in scope iff calculator OR language is core; identity strings always)",
         "active_prefixes": [
             "lpn"
         ],

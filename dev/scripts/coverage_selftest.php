@@ -27,8 +27,13 @@ function check(string $what, bool $got, bool $want, array &$failures): void
 // intersection. If an edit ever turns the OR into an AND, these four catch it.
 check('core calc x core lang (mpf/es)',        ecCoverageCellInScope('mpf', 'es', $cov), true,  $failures);
 check('core calc x non-core lang (mpf/zh)',    ecCoverageCellInScope('mpf', 'zh', $cov), true,  $failures);
-check('non-core calc x core lang (lpn/es)',    ecCoverageCellInScope('lpn', 'es', $cov), true,  $failures);
-check('non-core calc x non-core lang (lpn/zh)', ecCoverageCellInScope('lpn', 'zh', $cov), false, $failures);
+// bpn, not lpn: lpn became a CORE calculator on 2026-08-11 (Task 251) and so no longer has an
+// out-of-scope cell to point at. bpn is its closest sibling -- same map/network family, same
+// complexity class -- which keeps this example meaning what it always meant.
+check('non-core calc x core lang (bpn/es)',    ecCoverageCellInScope('bpn', 'es', $cov), true,  $failures);
+check('non-core calc x non-core lang (bpn/zh)', ecCoverageCellInScope('bpn', 'zh', $cov), false, $failures);
+check('lpn is core now, so every language is in scope (lpn/zh)',
+    ecCoverageCellInScope('lpn', 'zh', $cov), true, $failures);
 
 // --- THE FLOOR. Identity strings are in scope in the one cell that is otherwise out,
 // including the three calculators that predate the *_main_menu convention.
@@ -37,10 +42,12 @@ check('identity: lpn_main_title in zh', ecCoverageKeyInScope('lpn_main_title', '
 check('identity: lpn_main_desc in zh',  ecCoverageKeyInScope('lpn_main_desc', 'zh', $cov),  true, $failures);
 check('identity: mi_menu in zh',        ecCoverageKeyInScope('mi_menu', 'zh', $cov),        true, $failures);
 
-// --- NOT THE FLOOR. A "_menu" suffix rule used to promote these two body labels to the
-// never-out-of-scope floor by accident. They are ordinary UI strings.
-check('body: lpn_tab_menu in zh',      ecCoverageKeyInScope('lpn_tab_menu', 'zh', $cov),      false, $failures);
-check('body: lpn_backdrop_menu in zh', ecCoverageKeyInScope('lpn_backdrop_menu', 'zh', $cov), false, $failures);
+// --- NOT THE FLOOR. A "_menu" suffix rule used to promote body labels to the never-out-of-scope
+// floor by accident. These are ordinary UI strings, and the check has to run on a NON-core
+// calculator to mean anything -- on a core one they are in scope for a different reason and the
+// suffix bug would hide behind that.
+check('body: bpn_demand in zh',   ecCoverageKeyInScope('bpn_demand', 'zh', $cov),   false, $failures);
+check('body: mi_station in zh',   ecCoverageKeyInScope('mi_station', 'zh', $cov),   false, $failures);
 
 // --- CHROME is always in scope, and an UNKNOWN prefix is treated as chrome on purpose:
 // the safe direction for something unclassified is to translate it.

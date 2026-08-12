@@ -1573,15 +1573,32 @@ var EngCalcs = EngCalcs || {};
 	// scanned plan's thin lines are exactly what a lossy re-encode would blur; size is bounded by
 	// this cap instead.
 	var BACKDROP_MAX_SIDE = 1600;
+	// RE-ENCODE EVEN WHEN NOTHING IS RESIZED, AND KEEP WHICHEVER IS SMALLER.
+	//
+	// The cap alone does not bound the footprint, because an UNCOMPRESSED format can be enormous at
+	// a perfectly ordinary pixel size. Tom's colleague exports utility maps as Windows BMP, and the
+	// one he sent (2026-08-11) is 640 x 782 -- comfortably under the cap, so the old code stored it
+	// exactly as it arrived: 1.5 MB, which is ~1.96 MB once base64 makes it a data URI, out of a
+	// localStorage budget of about 5 MB for every project this browser holds. Re-encoded as PNG the
+	// same picture is ~67 KB. That is 22x, on a file that needed no resizing at all.
+	//
+	// Whichever-is-smaller rather than always-PNG, because always-PNG is wrong in the other
+	// direction: re-encoding a photographic JPEG as lossless PNG typically INFLATES it several
+	// times over. Comparing the two lengths needs no format table, no sniffing, and no list of
+	// exceptions to get out of date -- it just asks the question that actually matters.
 	function downscaleImage(dataUrl, maxSide, cb) {
 		var img = new Image();
 		img.onload = function () {
-			var scale = Math.min(1, maxSide / Math.max(img.width, img.height));
-			if (scale === 1) { cb(dataUrl, img.width, img.height); return; }
-			var canvas = document.createElement('canvas');
+			var scale = Math.min(1, maxSide / Math.max(img.width, img.height)),
+				canvas = document.createElement('canvas'), out;
 			canvas.width = Math.round(img.width * scale); canvas.height = Math.round(img.height * scale);
 			canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-			cb(canvas.toDataURL('image/png'), img.width, img.height);
+			// PNG, not JPEG: a scanned plan's thin lines are exactly what a lossy re-encode blurs.
+			out = canvas.toDataURL('image/png');
+			// Only a full-size re-encode is a fair swap for the original. A DOWNSCALED one has to
+			// win by default -- the original is the wrong number of pixels, whatever it weighs.
+			if (scale === 1 && dataUrl.length <= out.length) { out = dataUrl; }
+			cb(out, img.width, img.height);
 		};
 		img.src = dataUrl;
 	}

@@ -29,7 +29,17 @@
   "roadmap_task": 203,
   "adopted": "2026-08-05",
 
-  "core_calculators": ["mpf", "mtc"],
+  "_core_calculators_comment": [
+    "lpn joined 2026-08-11 (ROADMAP Task 251). Tom decided this on 2026-08-09 and the decision was",
+    "written up then; the one-line edit here was never made, so for two days every counter reported",
+    "lpn as out of scope and the standing debt was understated by ~22 languages x 230 keys. Tom",
+    "found it by saying 'remember that we have moved lpn to top-tier meaning 26 languages' -- which",
+    "was true of the decision and false of the file. A decision that lives only in a task block is",
+    "not in effect: THIS FILE is what the tools read.",
+    "The promotion is deliberately NOT the sprint. Task 251's gate is English stability, and lpn_ is",
+    "still moving. Declaring scope makes the debt visible and honest; paying it needs Tom's word."
+  ],
+  "core_calculators": ["mpf", "mtc", "lpn"],
   "core_languages": ["es", "pt", "fr", "tr"],
 
   "identity_key_suffixes": ["_main_menu", "_main_title", "_main_desc"],
@@ -52,6 +62,9 @@
     "108 cells of 416 = 26% of the work for 98.2% of measured use (Task 203's efficient frontier).",
     "Moving along that frontier is a one-line edit here: adding a core LANGUAGE costs (16 - N) cells,",
     "adding a core CALCULATOR costs a full 26, which is why the frontier prefers languages.",
-    "HW does not earn core status until 156 cells -- 2.9% of use does not justify 26 cells."
+    "HW does not earn core status until 156 cells -- 2.9% of use does not justify 26 cells.",
+    "lpn was added as a core CALCULATOR anyway (Task 251), against that arithmetic and knowingly:",
+    "the 26-language claim is what this suite says lpn IS, and shipping it in four was the claim",
+    "being false rather than the frontier being wrong."
   ]
 }

@@ -938,7 +938,8 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **A pump with no curve is the one thing that cannot round-trip** — `lpnToInp()` already turns
     it into a short, wide, smooth pipe and warns, because EPANET has no such element.
   - **`.inp` ONLY. Never write a `.net`** (Tom asked the question directly, 2026-08-11: *"maybe we
-    export only .inp?"* — yes). `.inp` is documented, is text, is opened natively by EPANET, and is
+    export only .inp?"* — yes, and he checked it independently the same day: *"Gemini agrees on all
+    counts. TL;DR: inp is the industry standard format."*). `.inp` is documented, is text, is opened natively by EPANET, and is
     read by every other tool in this space. `.net` is an undocumented binary serialization of one
     program's internal object graph; `js/lpn-net.js` reads it as a courtesy to users whose Save
     button makes one, and emitting it would be a different thing entirely — shipping a format we
@@ -1004,10 +1005,37 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     to persist which accordion sections a user left open; with a content pane that never collapses
     there is nothing for it to remember. Decide whether it becomes a scroll position, or is simply
     dropped and left as a stale key the way `fileAutosaveSeconds` was.
-  - **Check it against the phone before committing.** Two panes side by side is conventional on a
-    desktop and is exactly the layout that fails on a narrow screen, and this page is used on
-    touch devices. The index probably has to collapse to a drop-down under a breakpoint — which is
-    fine, but it means the design is two designs and should be scoped as two.
+  - **Check it against a narrow screen before committing.** Two panes side by side is conventional
+    on a desktop and is exactly the layout that fails on a narrow one. The index probably has to
+    collapse to a drop-down under a breakpoint — fine, but it means the design is two designs and
+    should be scoped as two.
+  - **DO NOT justify that with "this page is used on phones". WE DO NOT KNOW THAT** (Tom,
+    2026-08-11: *"we don't know whether anybody uses this on a phone"*). The first draft of this
+    task asserted it as fact; it is an assumption, and Task 285 is the reason it is still one. The
+    narrow-screen case stands on its own — a layout that breaks when the window is small is worth
+    avoiding whether or not anyone has yet opened it that way — and that is the whole argument.
+
+- 20|285| **We do not know what devices anybody uses this on, and several decisions have quietly
+  assumed an answer.** Tom, 2026-08-11: *"we don't know whether anybody uses this on a phone."* He
+  is right, and it is worth being precise about why: `log-human-view.php` and `log-calc-event.php`
+  record **page and language and nothing else**. There is no device signal anywhere in this
+  project's instrumentation, so every touch-target, breakpoint and two-pane-layout argument ever
+  made here has rested on a guess.
+  - **This is not a small guess.** "Touch-friendly" is load-bearing in CLAUDE.md's own conventions
+    (the whole-label `.ec-help` tap-target rule exists for it), Task 284's layout hinges on it, and
+    `lpn_`'s map editor was designed around finger-precision limits. All of that may well be right.
+    None of it is measured.
+  - **The cheapest honest signal is a COARSE one, and it should stay coarse.** A full user-agent
+    string is fingerprinting-grade data on a suite that already offers a logging opt-out (Task 210)
+    and takes that seriously. One bucket per event — `pointer: coarse|fine` from a media query, or a
+    viewport-width band — answers "does anyone use this on a phone" without identifying anybody, and
+    is a one-field addition to the existing beacon.
+  - **Decide what the answer would CHANGE before collecting it.** If the answer is "almost nobody",
+    the honest consequence is to stop paying for phone-shaped compromises on `lpn_` specifically —
+    which is a real design freedom, not a disappointment. If it is "a third of them", several
+    open tasks get a lot more urgent. Either way it is worth more than the guess it replaces.
+  - Add the reading to `dev/usage-data-log.md` as its own tier when it exists, not folded into
+    reach/shopping/using — it answers a different question from all three.
 
 - 15|282| **Offer to attach the backdrop an imported `.inp` names.** An `.inp` (and a `.net`) stores
   only a PATH to its background picture, never the picture. The import reports the file name and
@@ -1015,6 +1043,11 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   with that name, and set the map extent from the file's own `[BACKDROP] DIMENSIONS` so the image
   lands registered rather than needing the two-point scale gesture. Low priority — a user who wants
   the picture already knows where it is, and Map, Backdrop already works.
+  - **Worth more than it was, 2026-08-11.** The models Tom is collecting name BMP backdrops, which
+    browsers can actually display, so "the file it names is one you could hand over right now" has
+    gone from hypothetical to the common case. The registration half is the valuable half: an
+    `[BACKDROP] DIMENSIONS` record places the image in the model's own coordinates exactly, which
+    is strictly better than the two-point scale gesture a human would otherwise perform by eye.
 
 - 5|146.09| **Map insets for congested areas of a drawing (Task 146 child).** Very low priority.
 - 20|177| **Link head loss: report the per-length gradient alongside total (Task 146 child).**
@@ -1232,13 +1265,19 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **We already have Net1/Net2/Net3 in the repo** as `dev/lpn-spike/reference/` fixtures, so the
     first example costs no download and no network access.
   - **Licensing is clean** — OWA-EPANET is MIT, so its example networks can ship under GPL v3+.
-  - **Backdrops, 2026-08-11: Tom supplied three `.wmf` files, and a browser cannot display WMF at
-    all.** They are placeable Windows metafiles (vector CAD exports, ~16.6 x 16.7 in), so they need
-    converting to SVG or PNG before they can be a backdrop here — a one-time job on a Windows
-    machine (Inkscape opens a `.wmf` and saves SVG directly). Two loose ends beside that: the
-    Estrellas model names `utility-map-estrellas.bmp`, which was not among them, and
-    `20069-WP-Backdrop.wmf` matches none of the three models' `[BACKDROP] FILE` paths — it appears
-    to belong to a fourth model we do not have.
+  - **Backdrops, 2026-08-11.** Tom first supplied three `.wmf` files; **a browser cannot display
+    WMF at all**, so those still need converting to SVG or PNG (Inkscape opens a `.wmf` and saves
+    SVG directly). He then found the missing `utility-map-estrellas.bmp`, and **BMP is a format
+    browsers do read**, so the Estrellas model is the one that can be shown on its own backdrop
+    today, start to finish — and that makes it the natural first example project.
+    - **His colleague appears to have moved from WMF to BMP, which is good news for us**: it makes
+      every future model he collects usable without a conversion step.
+    - **BMP arrives ENORMOUS, and that is now handled** — the one he sent is 640 x 782 and 1.5 MB,
+      because BMP is uncompressed. `downscaleImage()` used to pass an under-cap image through
+      untouched, so it would have gone into localStorage as a ~1.96 MB data URI out of a ~5 MB
+      budget; it now re-encodes and keeps whichever is smaller, which makes that picture ~67 KB.
+    - Still loose: `20069-WP-Backdrop.wmf` matches none of the three models' `[BACKDROP] FILE`
+      paths, so it appears to belong to a fourth model we do not have.
   - **These are ANALYSIS networks and this suite is a DESIGN tool.** They will make the map look
     serious, but do not let them quietly redefine what the calculator is for.
 
@@ -1266,10 +1305,25 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     scope it until something is written.
   - **[H] Tom decides the menu shape before this is built.**
 
-- 40|251| **Promote `lpn` to a core calculator in `translation_coverage.json`?** Tom,
+- 35|251| **Promote `lpn` to a core calculator — DECLARED 2026-08-11, SPRINT NOT RUN.** Tom,
   2026-08-09: *"If we care about lpn and its 26-language offering, then we must irrationally add
   lpn to the top tier... But maybe we block this behind other tasks."* He is right that it is
   irrational on current evidence and right to hesitate.
+  - **THE DECLARATION WAS TWO DAYS LATE, AND THE LESSON IS THE VALUE HERE.** The decision below was
+    taken and written up on 2026-08-09; the one-line edit to `translation_coverage.json` was never
+    made. So for two days every counter in this project reported `lpn_` as out of scope and the
+    standing debt was understated by about 6,000 keys, while this block said DECIDED: DO IT. Tom
+    found it by saying *"remember that we have moved lpn to top-tier meaning 26 languages"* — true
+    of the decision, false of the file. **A decision that lives only in a ROADMAP block is not in
+    effect. The declaration file is what the tools read**, and closing a decision means editing it
+    in the same session.
+  - **Now declared. The real debt is visible: 6,180 keys missing, up from 174**, of which ~6,006 is
+    `lpn_` across the 22 non-core languages (~273 keys each). That number was always owed; it was
+    simply not being counted.
+  - **The SPRINT is still gated, and the gate is still English stability.** 28 new `lpn_` keys
+    landed on 2026-08-11 alone (Task 196's import reporting). Declaring scope costs nothing and
+    makes the number honest; paying it is 22 agents over a settled surface and needs Tom's explicit
+    go-ahead per CLAUDE.md.
   - **DECIDED: DO IT. Tom asked 2026-08-09 why CC was resistant, and the resistance was wrong.**
     Three counts. (1) The cost was overstated: 22 languages x 226 keys is 22 agents in ONE sprint,
     the same shape as the wave-1 category sprints and as 146.06 itself — not "the largest
@@ -1297,10 +1351,12 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   vendoring. Do NOT start until someone asks for one — Task 243's own conclusion was that the
   toggle is the cheap 90% of the value and these are the expensive 10%.
 
-- 15|249| **Translate the 5 `lpn_` engine keys into the core four.** `lpn_settings_engine_epanet`,
-  its tip, `lpn_engine_loading`, `_failed`, `_manning_note`. English shipped 2026-08-09; `lpn_` is
-  not a core calculator under the Task 203 cross, so es/pt/fr/tr only. Fold into the next `lpn_`
-  sprint rather than running one for five strings.
+- 15|249| **Translate the 5 `lpn_` engine keys — now into all 26, not the core four.**
+  `lpn_settings_engine_epanet`, its tip, `lpn_engine_loading`, `_failed`, `_manning_note`. English
+  shipped 2026-08-09. **Rewritten 2026-08-11:** this used to say "es/pt/fr/tr only, because `lpn_`
+  is not a core calculator", which stopped being true the moment Task 251's declaration landed.
+  There is nothing left to schedule separately — these five are now five of the ~273 keys per
+  language that `lpn_`'s promotion owes, and they go with that sprint.
 
 - 40|244| **Standardize the distinguishing term, and put it in the navbar next to the language menu.**
   Tom, 2026-08-09, on epanet-js labelling itself "Open Source" while shipping FSL. `About.php` is
