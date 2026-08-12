@@ -17,9 +17,9 @@
  * Licensed under GNU GPL v3.0 or later
  */
 require_once __DIR__ . '/lib/config.inc.php';
-// Task 286: the session is analytics storage, so it starts only for a visitor who agreed to it.
-// Everybody else is still counted -- see the 'visit' bucket in ecLogBucketSuffix().
-ecSessionStart();
+// Task 288: no session. De-duplication is one base-32 digit per page in the ec_seen cookie, and it
+// happens only for a visitor who agreed to it. Everybody else is still counted -- see the 'visit'
+// bucket in ecLogBucketSuffix().
 
 header('Content-Type: text/plain');
 
@@ -68,12 +68,12 @@ if (isset($_POST['offline_ts'])) {
 // both. Editing the same field repeatedly still counts once.
 // Task 286: with no session there is nothing to dedupe against, so the event goes undeduplicated
 // to the 'visit' bucket rather than being dropped.
-$dedupKey = $page . '|' . $field;
-$alreadyLogged = ecSessionActive() && !empty($_SESSION['TITLE_LOGGED'][$dedupKey]);
+// Task 288: title and subtitle are two different findings and keep their own bits, so somebody
+// who adds a subtitle after a title still shows up as both.
+$fieldFlag = ($field === 'title') ? EC_SEEN_TITLE : EC_SEEN_SUBTITLE;
+$alreadyLogged = ecAnalyticsConsented() && ecSeen($page, $fieldFlag);
 if (!$alreadyLogged) {
-    if (ecSessionActive()) {
-        $_SESSION['TITLE_LOGGED'][$dedupKey] = true;
-    }
+    ecMarkSeen($page, $fieldFlag);
 
     $browserLang = '';
     if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {

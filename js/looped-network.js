@@ -6901,7 +6901,10 @@ var EngCalcs = EngCalcs || {};
 		try { return localStorage.getItem(PAGE_TITLES_KEY) !== '0'; } catch (e) { return true; }
 	}
 	function applyPageTitles(show) {
-		['ec-page-title', 'ec-page-welcome'].forEach(function (id) {
+		// The h2 page description goes with them (Tom, 2026-08-12): with the box unchecked he wants
+		// the calculator's own toolbar to sit directly under the site navbar, and a lone subtitle
+		// floating where the heading used to be is worse than either state.
+		['ec-page-title', 'ec-page-welcome', 'ec-page-desc'].forEach(function (id) {
 			var el = document.getElementById(id);
 			// Not display:none -- these are already d-print-none, and hiding them for the screen
 			// must not change what a print does.

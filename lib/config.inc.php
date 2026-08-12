@@ -151,13 +151,55 @@ define('EC_CONSENT_COOKIE', 'ec_consent');
 define('EC_CONSENT_VERSION', '1');
 define('EC_CONSENT_DAYS', 365);
 
+// The de-duplication store: ONE DIGIT PER PAGE, and no identifier of any kind (ROADMAP Task 288).
+//
+// Tom, 2026-08-12, writing the banner: *"May we store a single digit per page..."* That sentence
+// is the specification. It is also the honest limit — one digit per page is what de-duplication
+// actually needs, and a single global bit could only ever say "seen before", which would buy
+// distinct-browsers-ever and destroy every per-page and per-session number the funnel rests on.
+//
+// WHAT REPLACED WHAT. This used to be PHPSESSID: a 32-hex random unique identifier plus a
+// server-side session file, holding SESSION_START, CLANG_LOGGED, LANG_VIEW_LOGGED[page],
+// HUMAN_VIEW_LOGGED[page|lang], CALC_USAGE_LOGGED[page] and TITLE_LOGGED[page|field]. Every one of
+// those is the same question — "have we already counted this?" — and none of them needed an
+// identifier to answer it. So there is no session any more, no server-side state, and nothing
+// stored that could single a visitor out. What remains is a session cookie holding, per page
+// visited, one base-32 digit whose bits are:
+//
+//   1  the language 'view' row for this page                (was LANG_VIEW_LOGGED)
+//   2  the confirmed-human page view                        (was HUMAN_VIEW_LOGGED)
+//   4  the confirmed calculation                            (was CALC_USAGE_LOGGED)
+//   8  a printable Title was named                          (was TITLE_LOGGED[title])
+//  16  a printable Subtitle was named                       (was TITLE_LOGGED[subtitle])
+//
+// Five bits, maximum 31, so exactly one digit in base 32 — which is why the sentence in the banner
+// is true rather than approximately true. Format: "page:d,page:d". A session visits a handful of
+// pages, so this stays short.
+//
+// SESSION_START IS GONE and nothing replaced it. It existed so a session that had already proven
+// itself human did not make later pages wait out their own 10 seconds. Bit 2 answers that question
+// better: if ANY page carries it, this browser has already dwelt somewhere, so no timestamp needs
+// storing at all. One less thing on the device, and one less thing to explain.
+define('EC_SEEN_COOKIE', 'ec_seen');
+define('EC_SEEN_LANG_VIEW', 1);
+define('EC_SEEN_HUMAN_VIEW', 2);
+define('EC_SEEN_CALC', 4);
+define('EC_SEEN_TITLE', 8);
+define('EC_SEEN_SUBTITLE', 16);
+// One reserved pseudo-page for the facts that are about the VISIT rather than about a page. Its
+// name cannot collide with a real one: every real page name is a script basename, and no script is
+// called "_v". Bit 1 means the visit's one demand row ('cookie' or 'browser') has been written --
+// without it, LANG_LOG loses the "returning users with a saved preference" statistic entirely,
+// because every page would log 'view' and nothing would ever log 'cookie'.
+define('EC_SEEN_VISIT', '_v');
+define('EC_SEEN_DEMAND', 1);
+
 /**
  * Whether cookies should carry the Secure attribute on THIS request.
  *
  * Not a constant true: the server answers on http as well as https, and a Secure cookie set over
  * http is silently dropped. Before Task 286 that silence cost the language preference of any
- * visitor arriving over http — the session carried them instead, and the session is exactly what
- * is going away.
+ * visitor arriving over http — the session carried them instead, and the session is now gone.
  */
 function ecCookieSecure() {
     if (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) !== 'off') return true;
@@ -165,24 +207,44 @@ function ecCookieSecure() {
     return false;
 }
 
-/** 'granted', 'denied', or 'unknown' — the third is a visitor who has not answered yet. */
+/**
+ * 'granted', 'granted_all', 'denied', or 'unknown'.
+ *
+ * THREE ANSWERS, NOT TWO (Tom, 2026-08-12): *"[Refuse] [Accept this] [Accept all], where 'Accept
+ * all' means we never ask them again, just as 'Refuse' does."* Read with his earlier draft
+ * ("[Accept this storage only]"), the middle answer is SCOPE-LIMITED consent — yes to this, ask me
+ * again if you ever add another purpose — which is why the stored record carries the policy
+ * version and why bumping EC_CONSENT_VERSION re-asks exactly those people and nobody else.
+ *
+ * The middle answer does NOT mean "ask me again next visit". Nagging somebody who already said yes
+ * is the one direction that makes a consent flow worse rather than safer.
+ */
 function ecConsentState() {
     if (empty($_COOKIE[EC_CONSENT_COOKIE])) return 'unknown';
-    $state = explode('.', $_COOKIE[EC_CONSENT_COOKIE])[0];
-    if ($state === '1') return 'granted';
+    $parts   = explode('.', $_COOKIE[EC_CONSENT_COOKIE]);
+    $state   = $parts[0];
+    $version = $parts[2] ?? '';
     if ($state === '0') return 'denied';
+    if ($state === '2') return 'granted_all';
+    if ($state === '1') {
+        // Consent pinned to the version it was given for. A materially changed ask means a
+        // changed EC_CONSENT_VERSION, and these people asked to be asked again.
+        return ($version === EC_CONSENT_VERSION) ? 'granted' : 'unknown';
+    }
     return 'unknown';
 }
 
-/** True only for an explicit yes. Unknown is not consent; silence never is. */
+/** True for either kind of yes. Silence is never consent. */
 function ecAnalyticsConsented() {
-    return ecConsentState() === 'granted';
+    $state = ecConsentState();
+    return $state === 'granted' || $state === 'granted_all';
 }
 
-/** Writes the consent record. $granted true = yes, false = no. Both answers are recorded. */
-function ecConsentSet($granted) {
+/** Writes the consent record. $answer is '0' (refuse), '1' (this version), or '2' (all). */
+function ecConsentSet($answer) {
     if (headers_sent()) return;
-    $value = ($granted ? '1' : '0') . '.' . time() . '.' . EC_CONSENT_VERSION;
+    if (!in_array($answer, ['0', '1', '2'], true)) return;
+    $value = $answer . '.' . time() . '.' . EC_CONSENT_VERSION;
     setcookie(EC_CONSENT_COOKIE, $value, [
         'expires'  => time() + EC_CONSENT_DAYS * 86400,
         'path'     => '/',
@@ -191,7 +253,7 @@ function ecConsentSet($granted) {
         'httponly' => false, // the banner reads and writes it from JS so answering needs no reload
     ]);
     $_COOKIE[EC_CONSENT_COOKIE] = $value;
-    if (!$granted) ecForgetAnalyticsStorage();
+    if ($answer === '0') ecForgetAnalyticsStorage();
 }
 
 /**
@@ -201,11 +263,7 @@ function ecConsentSet($granted) {
  */
 function ecForgetAnalyticsStorage() {
     if (headers_sent()) return;
-    if (session_status() === PHP_SESSION_ACTIVE) {
-        $_SESSION = [];
-        session_destroy();
-    }
-    foreach (['ec_blang', session_name()] as $name) {
+    foreach (['ec_blang', EC_SEEN_COOKIE] as $name) {
         if (isset($_COOKIE[$name])) {
             setcookie($name, '', ['expires' => time() - 86400, 'path' => '/']);
             unset($_COOKIE[$name]);
@@ -214,33 +272,75 @@ function ecForgetAnalyticsStorage() {
 }
 
 /**
- * Starts the PHP session — and ONLY if the visitor said yes.
+ * Parses ec_seen into page => digit. Anything malformed is simply dropped: it is a cache, not a
+ * record, and a visitor who hand-edits it only affects whether they are counted twice.
  *
- * Before Task 286 lib/base.inc.php called session_start() unconditionally at the top of every
- * page load, so PHPSESSID was written before anybody had been asked anything. No banner can fix
- * that from the outside, which is why lazy sessions were the real work of this phase rather than
- * the banner. Every caller must be prepared for this to return false and simply not dedupe.
- *
- * @return bool whether a session is running afterwards
+ * Memoized in a GLOBAL rather than a function static so ecMarkSeen() can invalidate it after a
+ * write. A static would be unreachable from outside and the second mark in one request would read
+ * a stale map -- which matters, because a page can log a language view and a human view in the
+ * same request.
  */
-function ecSessionStart() {
-    if (session_status() === PHP_SESSION_ACTIVE) return true;
-    if (!ecAnalyticsConsented()) return false;
-    if (headers_sent()) return false;
-    session_set_cookie_params([
-        'lifetime' => 0,
+function ecSeenMap() {
+    if (isset($GLOBALS['_ec_seen_map'])) return $GLOBALS['_ec_seen_map'];
+    $map = [];
+    $GLOBALS['_ec_seen_map'] = &$map;
+    if (!ecAnalyticsConsented() || empty($_COOKIE[EC_SEEN_COOKIE])) return $map;
+    // A digit is one base-32 character; anything else is a cookie we did not write.
+    foreach (explode(',', (string) $_COOKIE[EC_SEEN_COOKIE]) as $pair) {
+        $bits = explode(':', $pair);
+        if (count($bits) !== 2) continue;
+        $page = preg_replace('/[^A-Za-z0-9_-]/', '', $bits[0]);
+        if ($page === '' || strlen($bits[1]) !== 1) continue;
+        $digit = intval($bits[1], 32);
+        if ($digit > 0) $map[$page] = $digit;
+    }
+    return $map;
+}
+
+/** Has this event already been counted for this page in this browser session? */
+function ecSeen($page, $flag) {
+    $map = ecSeenMap();
+    return isset($map[$page]) && ($map[$page] & $flag) === $flag;
+}
+
+/**
+ * Records that it has been, and writes the cookie back.
+ *
+ * A SESSION COOKIE — no expiry — so it lasts exactly as long as the visit it de-duplicates, and a
+ * visitor who returns tomorrow is counted again, which is what "visits" has always meant here.
+ */
+function ecMarkSeen($page, $flag) {
+    if (!ecAnalyticsConsented() || headers_sent()) return;
+    $page = preg_replace('/[^A-Za-z0-9_-]/', '', (string) $page);
+    if ($page === '') return;
+    $map = ecSeenMap();
+    $map[$page] = ($map[$page] ?? 0) | $flag;
+    // Rebuild the static cache so a second call in the same request sees the first one.
+    $pairs = [];
+    foreach ($map as $p => $d) { $pairs[] = $p . ':' . base_convert((string) $d, 10, 32); }
+    $value = implode(',', $pairs);
+    setcookie(EC_SEEN_COOKIE, $value, [
+        'expires'  => 0,
         'path'     => '/',
         'samesite' => 'Lax',
         'secure'   => ecCookieSecure(),
         'httponly' => true,
     ]);
-    session_start();
-    return true;
+    $_COOKIE[EC_SEEN_COOKIE] = $value;
+    $GLOBALS['_ec_seen_map'] = $map;
 }
 
-/** True when a session is running, i.e. when de-duplication of the usage logs is possible. */
-function ecSessionActive() {
-    return session_status() === PHP_SESSION_ACTIVE;
+/**
+ * How long this browser has been around, in milliseconds, as far as the human-view beacon needs to
+ * know. Not a stored timestamp: bit 2 on ANY page means this browser already dwelt somewhere long
+ * enough to be counted human, so later pages need not wait out their own 10 seconds. A brand-new
+ * browser reads 0 and waits the full 10s, which is the strict direction.
+ */
+function ecSessionAgeMs() {
+    foreach (ecSeenMap() as $digit) {
+        if (($digit & EC_SEEN_HUMAN_VIEW) === EC_SEEN_HUMAN_VIEW) return 10000;
+    }
+    return 0;
 }
 
 /**
@@ -253,7 +353,7 @@ function ecSessionActive() {
  * and no identifier of any kind needs no cookie to be lawful and no cookie to be useful.
  *
  * So there are two honest numbers, reported side by side and NEVER summed:
- *   visitors — consented, de-duplicated per session. Today's numbers, unchanged.
+ *   visitors — consented, de-duplicated. Today's numbers, unchanged.
  *   visits   — everybody else, one row per event, no de-duplication and nothing stored.
  *
  * A row with no trailing column is a 'visitor' row, which is what every row written before this
@@ -261,12 +361,12 @@ function ecSessionActive() {
  * byte-identical and every existing awk field index keeps its meaning.
  */
 function ecLogBucketSuffix() {
-    return ecSessionActive() ? '' : "\tvisit";
+    return ecAnalyticsConsented() ? '' : "\tvisit";
 }
 
 // A visitor who has withdrawn consent, or refused it, must not keep carrying the storage it
 // covered. Checked on every page load because withdrawal can happen in another tab.
-if (ecConsentState() !== 'granted' && (isset($_COOKIE['ec_blang']) || isset($_COOKIE[session_name()]))) {
+if (!ecAnalyticsConsented() && (isset($_COOKIE['ec_blang']) || isset($_COOKIE[EC_SEEN_COOKIE]))) {
     ecForgetAnalyticsStorage();
 }
 

@@ -58,13 +58,16 @@ languages, is not a plausible candidate for "we do not target the EU."
 | `ec_language` | `lib/Language.lib.php` | 1 year, HttpOnly | The language the visitor explicitly chose from the language menu | **Exempt** — a preference the visitor set deliberately |
 | `ec_consent` | `lib/Consent.lib.php` (JS) or `consent.php` (no-JS) | 1 year, readable by JS | The consent record: `<state>.<unix-ts>.<policy-version>` | **Exempt** — it exists solely to honour the answer given |
 | `ec_nolog` | `lib/config.inc.php` | 10 years | Marks a browser as opted out of every usage log | **Exempt** — same reasoning; it only honours a choice |
-| `ec_blang` | `lib/Language.lib.php` | 1 year, HttpOnly | **Analytics only.** Records the raw `Accept-Language` header so it is logged **once per browser** rather than once per visit | **Requires consent.** Not written otherwise, and deleted on withdrawal |
-| `PHPSESSID` | `ecSessionStart()`, called from `lib/base.inc.php` and the three `log-*.php` | Session | **Analytics only, now that its other job has moved out.** De-duplicates the usage logs per session | **Requires consent.** No session is started otherwise, and it is deleted on withdrawal |
+| `ec_blang` | `lib/Language.lib.php` | 1 year, HttpOnly | **Analytics only.** The literal value `1`, meaning the browser-language row has been written. Was the language tag until Task 288; every use site is `isset()`, so the value was written and never once read | **Requires consent.** Not written otherwise, deleted on withdrawal |
+| `ec_seen` | `ecMarkSeen()`, `lib/config.inc.php` | Session cookie, HttpOnly | **Analytics only.** One base-32 digit per page, five bits: language view, human view, calculation, title, subtitle. Plus one reserved `_v` entry for the visit's single demand row. **No identifier of any kind** | **Requires consent.** Not written otherwise, deleted on withdrawal |
+| ~~`PHPSESSID`~~ | — | — | **GONE as of Task 288.** It was a 32-hex unique identifier plus a server-side session file, and everything it held was "have we already counted this" — which needs no identifier to answer | — |
 
 `PHPSESSID` used to be the hard case: it carried `$_SESSION['CLANGUAGE']` (service) *and* the log
 gates (analytics), and under a per-purpose test the analytics half tainted the whole cookie. Task
 286 did not resolve that by argument — it moved the language job onto `ec_language`, which the
-visitor sets deliberately, leaving the session with one purpose and one honest answer.
+visitor sets deliberately, leaving the session with one purpose and one honest answer. **Task 288
+then removed it entirely**, which is the stronger outcome: there is now no unique identifier stored
+on a visitor's device at all, and no server-side session state anywhere in the suite.
 
 ## 3. Browser storage
 

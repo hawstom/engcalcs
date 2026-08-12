@@ -31,24 +31,17 @@
 // consent helpers in it can answer (ROADMAP Task 286).
 require_once('config.inc.php');
 
-// Start the session here and here only -- and only for a visitor who has agreed to being counted
-// once rather than every time. Until Task 286 this was an unconditional session_start() ABOVE the
-// config require, which wrote PHPSESSID on every page load before anybody had been asked anything.
-// The session's other job -- remembering a chosen language -- moved to the ec_language cookie,
-// which the visitor sets deliberately and which is exempt on its own footing.
-ecSessionStart();
-// First request of this session: mark when it started, so pages can tell how long
-// this visitor has been around (used by the confirmed-human page-view log, which
-// gates on session age rather than this single page's age). With no session there is nothing to
-// remember, so age reads 0 and the beacon simply waits out its full 10s on every page -- a
-// slightly stricter human test, never a looser one.
-$ec_sessionAgeMs = 0;
-if (ecSessionActive()) {
-    if (empty($_SESSION['SESSION_START'])) {
-        $_SESSION['SESSION_START'] = time();
-    }
-    $ec_sessionAgeMs = (time() - $_SESSION['SESSION_START']) * 1000;
-}
+// NO SESSION IS STARTED, HERE OR ANYWHERE (ROADMAP Tasks 286 and 288). Until 2026-08-11 this file
+// called session_start() at the top of every page load, above the config require, so PHPSESSID --
+// a 32-hex unique identifier -- was written before anybody had been asked anything. Task 286 made
+// it conditional on consent; Task 288 removed it outright. Everything the session held was some
+// form of "have we already counted this", which now lives in one session cookie holding a single
+// base-32 digit per page. No identifier, no server-side state. See EC_SEEN_COOKIE in config.
+//
+// How long this browser has been around, for the confirmed-human beacon's 10s gate. Derived from
+// the de-duplication digits rather than a stored timestamp: if any page carries the human-view
+// bit, this browser already dwelt somewhere long enough to count.
+$ec_sessionAgeMs = ecSessionAgeMs();
 
 // Load the language settings.
 // They are needed for determining the session language in Session.lib.php below.

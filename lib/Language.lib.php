@@ -82,22 +82,24 @@ function normalizeLang($lang) {
  * @param array $all_language_settings
  * @return string the language code to serve
  *
- * ROADMAP Task 286 split this function's two jobs apart. Choosing the language now rests on the
- * ec_language COOKIE, which the visitor sets deliberately by picking from the language menu and
- * which is therefore exempt from the consent requirement on its own footing. The SESSION is now
- * used for one thing only -- de-duplicating the usage log -- and it exists only for a visitor who
- * agreed to that. Every $_SESSION touch below is guarded by $sessionOn accordingly, and a visitor
- * with no session gets exactly the same language, just counted in the 'visit' bucket instead of
- * the de-duplicated 'visitor' one.
+ * ROADMAP Task 286 split this function's two jobs apart, and Task 288 finished the job. Choosing
+ * the language rests on the ec_language COOKIE, which the visitor sets deliberately by picking from
+ * the language menu and which is therefore exempt from the consent requirement on its own footing.
+ * There is no PHP session at all any more; the only remaining question is whether we may
+ * DE-DUPLICATE, which needs consent, and which is answered by one base-32 digit per page in
+ * ec_seen. A visitor who refuses gets exactly the same language, just counted in the 'visit'
+ * bucket instead of the de-duplicated 'visitor' one.
  */
 function chooseLanguage($all_language_settings) {
-    $sessionOn = function_exists('ecSessionActive') && ecSessionActive();
+    // Task 288: "may we de-duplicate" replaces "is a session running". Same question, no session.
+    $dedupe = function_exists('ecAnalyticsConsented') && ecAnalyticsConsented();
+    $page   = isset($_SERVER['SCRIPT_NAME']) ? basename($_SERVER['SCRIPT_NAME'], '.php') : '';
     $browserDefaultQuality = 0;
     if (!empty($_GET["lang"])) {
         // If $_GET["lang"] is a valid language, remember it as this browser's chosen language.
         $lang = normalizeLang($_GET["lang"]);
         if (ctype_alpha($lang) && strlen($lang) == 2 && !empty($all_language_settings[$lang])) {
-            if ($sessionOn) $_SESSION["CLANGUAGE"] = $lang;
+
             setcookie("ec_language", $lang, [
                 'expires'  => time() + 365 * 24 * 60 * 60,
                 'path'     => '/',
@@ -113,26 +115,24 @@ function chooseLanguage($all_language_settings) {
         } else {
             return "en";
         }
-    } elseif ($sessionOn && !empty($_SESSION["CLANGUAGE"]) && !empty($all_language_settings[$_SESSION["CLANGUAGE"]])) {
-        // Else if a valid language was already determined in this session, use it.
-        // Still log a page-view hit (source='view'), once per session per page, so LANG_LOG's
-        // page/lang breakdown reflects every page a session visits -- not just the entry page
-        // where the language was first pinned. Without this, 'reach' undercounts every non-entry
-        // page relative to engcalcs-human-view.log, which dedupes per (session, page, lang)
-        // rather than per session -- producing >100% "%human" in the funnel report.
-        $page = isset($_SERVER['SCRIPT_NAME']) ? basename($_SERVER['SCRIPT_NAME'], '.php') : '';
-        if (empty($_SESSION['LANG_VIEW_LOGGED'][$page])) {
-            $_SESSION['LANG_VIEW_LOGGED'][$page] = true;
-            logLanguageSelection($_SESSION["CLANGUAGE"], 'view');
-        }
-        return $_SESSION["CLANGUAGE"];
     } elseif (!empty($_COOKIE["ec_language"]) && ctype_alpha($_COOKIE["ec_language"]) && strlen($_COOKIE["ec_language"]) == 2 && !empty($all_language_settings[$cookieLang = normalizeLang($_COOKIE["ec_language"])])) {
         // Else if a valid language cookie exists from a previous browser session, use it.
-        if ($sessionOn) {
-            $_SESSION["CLANGUAGE"] = $cookieLang;
-            if (empty($_SESSION['CLANG_LOGGED'])) {
+        // One 'view' row per page per visit, which is what the funnel's "reach" divides by. The
+        // first page of a visit is the one that also carries the 'browser' demand row below.
+        if ($dedupe) {
+            if (!ecSeen(EC_SEEN_VISIT, EC_SEEN_DEMAND)) {
+                // First page of this visit: this is the DEMAND row -- a returning visitor arriving
+                // on a language they chose before. Once per visit, which is what makes the
+                // "retains users across sessions" number in lang-log-stats.sh mean anything.
+                ecMarkSeen(EC_SEEN_VISIT, EC_SEEN_DEMAND);
+                ecMarkSeen($page, EC_SEEN_LANG_VIEW);
                 logLanguageSelection($cookieLang, 'cookie');
-                $_SESSION['CLANG_LOGGED'] = true;
+            } elseif (!ecSeen($page, EC_SEEN_LANG_VIEW)) {
+                // A later page in the same visit. Logged so LANG_LOG's page breakdown covers every
+                // page visited rather than only the entry page, and excluded from the demand
+                // sections so it cannot double-count the visit's language.
+                ecMarkSeen($page, EC_SEEN_LANG_VIEW);
+                logLanguageSelection($cookieLang, 'view');
             }
         } else {
             logAnonymousView($cookieLang);
@@ -247,11 +247,14 @@ function chooseLanguage($all_language_settings) {
     // it is written only for a visitor who agreed to it. Everyone else is counted in the 'visit'
     // bucket instead: the same raw tag, once per page load rather than once per browser, with
     // nothing stored anywhere.
-    if ($sessionOn) {
+    if ($dedupe) {
         if (!isset($_COOKIE['ec_blang']) && isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
             $rawLang = strtolower(trim(explode(';', explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE'])[0])[0]));
             logLanguageSelection($rawLang, 'browser');
-            setcookie('ec_blang', $rawLang, [
+            // VALUE IS A LITERAL 1 as of Task 288. It was the raw language tag, but every use site
+            // is isset() -- the value was written and never read once. Storing a tag we do not read
+            // made the banner's "a single digit" claim false for no benefit whatever.
+            setcookie('ec_blang', '1', [
                 'expires'  => time() + 365 * 24 * 60 * 60,
                 'path'     => '/',
                 'samesite' => 'Strict',
@@ -259,7 +262,8 @@ function chooseLanguage($all_language_settings) {
                 'httponly' => true,
             ]);
         }
-        $_SESSION['CLANG_LOGGED'] = true;
+        ecMarkSeen(EC_SEEN_VISIT, EC_SEEN_DEMAND);
+        ecMarkSeen($page, EC_SEEN_LANG_VIEW);
     } else {
         logAnonymousView($winningLanguage);
     }

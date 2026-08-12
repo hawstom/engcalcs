@@ -33,9 +33,12 @@
 function echoConsentBanner() {
     global $ec_lang;
     $state = ecConsentState();
+    // 'unknown' covers both a first visit AND somebody who chose "Accept this" before the ask
+    // materially changed -- they asked to be asked again, so they see the banner again. Anyone who
+    // chose "Accept all" or "Refuse" never does.
     $answered = ($state !== 'unknown');
     $current = '';
-    if ($state === 'granted') $current = $ec_lang['consent_current_granted'];
+    if ($state === 'granted' || $state === 'granted_all') $current = $ec_lang['consent_current_granted'];
     if ($state === 'denied')  $current = $ec_lang['consent_current_denied'];
     // Where consent.php sends the visitor back to when JavaScript is off. SCRIPT_NAME, not
     // REQUEST_URI: the same reasoning as ec_canonical_url()'s, one step stronger here because
@@ -49,8 +52,18 @@ function echoConsentBanner() {
 		<p class="ec-consent-current" id="ec-consent-current"><?=htmlspecialchars($current, ENT_QUOTES, 'UTF-8')?></p>
 		<form class="ec-consent-actions" method="post" action="/engcalcs/consent.php">
 			<input type="hidden" name="return" value="<?=htmlspecialchars($return, ENT_QUOTES, 'UTF-8')?>" />
-			<button type="submit" name="ec_consent" value="1" class="ec-consent-btn"><?=$ec_lang['consent_accept']?></button>
+			<?php // REFUSE FIRST, and all three share one class (ROADMAP Task 288). Two accepts against
+			      // one refusal errs safe rather than dark-patterned, but only while every button is
+			      // the same size, weight and colour -- so never give one of them its own rule, and
+			      // never put the refusal last where it reads as the afterthought.
+			      //
+			      // "Accept this" is SCOPE-LIMITED consent, pinned to EC_CONSENT_VERSION: yes to this,
+			      // ask me again if the ask itself materially changes. It does NOT mean "ask me again
+			      // next visit" -- nagging somebody who already said yes is the one direction that
+			      // makes a consent flow worse rather than safer. ?>
 			<button type="submit" name="ec_consent" value="0" class="ec-consent-btn"><?=$ec_lang['consent_decline']?></button>
+			<button type="submit" name="ec_consent" value="1" class="ec-consent-btn"><?=$ec_lang['consent_accept']?></button>
+			<button type="submit" name="ec_consent" value="2" class="ec-consent-btn"><?=$ec_lang['consent_accept_all']?></button>
 		</form>
 		<p class="ec-consent-links">
 			<a href="/engcalcs/privacy.php"><?=$ec_lang['privacy_link']?></a>
@@ -66,6 +79,7 @@ function echoConsentBanner() {
 	var form = banner.querySelector('form');
 	var current = document.getElementById('ec-consent-current');
 	var texts = {
+		'2': <?=json_encode($ec_lang['consent_current_granted'])?>,
 		'1': <?=json_encode($ec_lang['consent_current_granted'])?>,
 		'0': <?=json_encode($ec_lang['consent_current_denied'])?><?="\n"?>	};
 
@@ -95,7 +109,7 @@ function echoConsentBanner() {
 			// for browsers that predate it. Which button matters: the two answers are opposite.
 			var btn = event.submitter || document.activeElement;
 			var answer = btn ? btn.value : '';
-			if (answer !== '0' && answer !== '1') return; // let the no-JS path handle anything odd
+			if (answer !== '0' && answer !== '1' && answer !== '2') return; // no-JS path handles anything odd
 			event.preventDefault();
 			record(answer);
 			banner.hidden = true;

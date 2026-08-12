@@ -12,9 +12,9 @@
  * Licensed under GNU GPL v3.0 or later
  */
 require_once __DIR__ . '/lib/config.inc.php';
-// Task 286: the session is analytics storage, so it starts only for a visitor who agreed to it.
-// Everybody else is still counted -- see the 'visit' bucket in ecLogBucketSuffix().
-ecSessionStart();
+// Task 288: no session. De-duplication is one base-32 digit per page in the ec_seen cookie, and it
+// happens only for a visitor who agreed to it. Everybody else is still counted -- see the 'visit'
+// bucket in ecLogBucketSuffix().
 
 header('Content-Type: text/plain');
 
@@ -51,11 +51,9 @@ if (isset($_POST['offline_ts'])) {
 // With a session, dedupe per (session, page) exactly as before. Without one there is nothing to
 // dedupe against and nothing may be stored to make one, so the event is written to the 'visit'
 // bucket instead of being thrown away.
-$alreadyLogged = ecSessionActive() && !empty($_SESSION['CALC_USAGE_LOGGED'][$page]);
+$alreadyLogged = ecAnalyticsConsented() && ecSeen($page, EC_SEEN_CALC);
 if (!$alreadyLogged) {
-    if (ecSessionActive()) {
-        $_SESSION['CALC_USAGE_LOGGED'][$page] = true;
-    }
+    ecMarkSeen($page, EC_SEEN_CALC);
 
     $browserLang = '';
     if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {

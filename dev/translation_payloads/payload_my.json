@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "my",
-        "expected_key_count": 854,
-        "delta_key_count": 286,
+        "expected_key_count": 855,
+        "delta_key_count": 287,
         "exempt_key_count": 15,
         "exempt_keys": [
             "calc_units_us",
@@ -340,9 +340,10 @@
     },
     "keys_to_translate": {
         "consent_heading": "Browsers and visits",
-        "consent_body": "May we keep a single 1 in this browser's storage to prevent us from logging its visits repeatedly?",
-        "consent_accept": "Allow this logging reducer",
-        "consent_decline": "Refuse this",
+        "consent_body": "May we keep a single digit per page in this browser's storage to prevent us from logging its visits repeatedly?",
+        "consent_accept": "Accept this",
+        "consent_accept_all": "Accept all, and do not ask again",
+        "consent_decline": "Refuse",
         "consent_current_granted": "You allowed this. We limit logging for this browser profile.",
         "consent_current_denied": "You refused this. We store nothing to limit logging for this browser profile.",
         "consent_region_label": "Your choice about limiting logging.",
@@ -628,9 +629,10 @@
     },
     "keys": {
         "consent_heading": "Browsers and visits",
-        "consent_body": "May we keep a single 1 in this browser's storage to prevent us from logging its visits repeatedly?",
-        "consent_accept": "Allow this logging reducer",
-        "consent_decline": "Refuse this",
+        "consent_body": "May we keep a single digit per page in this browser's storage to prevent us from logging its visits repeatedly?",
+        "consent_accept": "Accept this",
+        "consent_accept_all": "Accept all, and do not ask again",
+        "consent_decline": "Refuse",
         "consent_current_granted": "You allowed this. We limit logging for this browser profile.",
         "consent_current_denied": "You refused this. We store nothing to limit logging for this browser profile.",
         "consent_region_label": "Your choice about limiting logging.",
@@ -948,6 +950,22 @@
             }
         },
         "consent_accept": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "template_printable_subtitle",
+                    "value": "မှတ်တမ်းတင်ရာ အမည်ငယ်",
+                    "english": "Printable Subtitle"
+                },
+                "next_translated": {
+                    "key": "index_title",
+                    "value": "အခမဲ့ အွန်လိုင်း အင်ဂျင်နီယာ တွက်ချက်မှုကိရိယာများ",
+                    "english": "Free Online Engineering Calculators"
+                }
+            }
+        },
+        "consent_accept_all": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

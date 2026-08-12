@@ -1157,54 +1157,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **Do not attempt all 19 at once.** The value is concentrated: a calculator nobody has changed in
     two years is not where a regression will appear. Test what is being edited.
 
-- 35|288| **Ask for less, by storing less: replace the session identifier with a few bits.** Tom,
-  2026-08-12, proposing banner wording: *"May we store a single 1 or 0 in this browser, so that we
-  don't count its repeated visits?"* **That sentence is not true today, and the interesting response
-  is to make it nearly true rather than to soften the sentence.**
-  - **What we actually store, and the gap:** `ec_blang` (a language tag) and `PHPSESSID` (a 32-hex
-    **unique random identifier**). An identifier is categorically different from a flag — it is the
-    one thing here that could in principle single a person out, and it is the hardest thing to ask
-    permission for in one short sentence.
-  - **`ec_blang` can become a literal `1` today, at zero cost.** Its value is written but **never
-    read** — every use site is `isset($_COOKIE['ec_blang'])` (`lib/Language.lib.php`). It stores a
-    language tag purely as a side effect of how it was written.
-  - **`PHPSESSID` can go away entirely, and that is the real prize.** Everything the session holds is
-    "have we already counted this": `SESSION_START`, `CLANG_LOGGED`, `LANG_VIEW_LOGGED[page]`,
-    `HUMAN_VIEW_LOGGED[page|lang]`, `CALC_USAGE_LOGGED[page]`, `TITLE_LOGGED[page|field]`. **None of
-    it needs a unique id or a server-side store.** ~23 pages x 4 event types fits in a short
-    session-scoped bitfield carried in one non-identifying cookie. No identifier, no server state,
-    nothing that can single anybody out — and the ask becomes "a few bits saying which pages we have
-    already counted", which is close to what Tom wanted to be able to say.
-  - **Be honest about what it is NOT:** still not "a single 1 or 0", and still not exempt. The
-    purpose is analytics either way, and ePrivacy tests purpose, not size. This buys a far better
-    privacy position and a far shorter ask; it does not buy the banner's removal.
-  - **Cost:** rewrite four de-duplication sites (`Language.lib.php` and the three `log-*.php`) and
-    the `$ec_sessionAgeMs` gate. Moderate, self-contained, fully covered by the two-bucket logging
-    already in place. **Do it BEFORE the Task 251 sprint if at all** — it changes `consent_body`,
-    which is one of the ten keys riding that sprint.
-  - **THE WORDING THAT DECIDES THE DESIGN, Tom 2026-08-12: "a single digit per page".** That is
-    exactly right and it is what makes the sentence true — the bitfield IS one digit per page,
-    saying whether this page has been counted yet. It also concedes the honest limit in the right
-    direction: **one bit can only ever say "seen before"**, which would buy distinct-browsers-ever
-    and destroy every per-page and per-session number the funnel is built from. A digit per page
-    keeps all of them, still with no identifier and nothing that can single anybody out.
-  - **THREE ANSWERS, not two, and the machinery is already there.** Tom: *"[Refuse] [Accept this]
-    [Accept all], where 'Accept all' means we never ask them again, just as 'Refuse' does."* Read
-    against his earlier draft (*"[Accept this storage only]"*), the middle answer is **scope-limited
-    consent**: yes to this purpose, ask me again if you ever add another. That maps straight onto
-    `EC_CONSENT_VERSION`, which `ec_consent` already carries as its third field:
-    - `0` refused — never re-ask.
-    - `1` accepted THIS version — re-ask when `EC_CONSENT_VERSION` is bumped, i.e. when the ask
-      itself materially changes.
-    - `2` accepted every version — never re-ask.
-    So bumping the policy version becomes the one mechanism that re-asks the people who wanted to be
-    re-asked, and nobody else. **Do not read the middle answer as "ask me again next visit"** — that
-    would nag the people who already said yes, which is the one direction that makes a consent flow
-    worse rather than safer.
-  - **Style all three buttons identically**, for the same reason the two are styled identically now.
-    Two accepts against one refuse errs safe rather than dark-patterned, but only while all three
-    are the same size, weight and colour.
-
 - 20|285| **We do not know what devices anybody uses this on, and several decisions have quietly
   assumed an answer.** Tom, 2026-08-11: *"we don't know whether anybody uses this on a phone."* He
   is right, and it is worth being precise about why: `log-human-view.php` and `log-calc-event.php`
@@ -2151,6 +2103,45 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|288|[DONE 2026-08-12] **The unique identifier is gone. What is stored is one digit per page.**
+  Tom wrote the banner sentence first — *"May we store a single digit per page in this browser's
+  storage to prevent us from logging its visits repeatedly?"* — and the implementation was made to
+  match it rather than the other way round.
+  - **`PHPSESSID` is removed outright, not merely gated.** It was a 32-hex random unique identifier
+    plus a server-side session file holding `SESSION_START`, `CLANG_LOGGED`, `LANG_VIEW_LOGGED`,
+    `HUMAN_VIEW_LOGGED`, `CALC_USAGE_LOGGED` and `TITLE_LOGGED`. **Every one of those is the same
+    question — "have we already counted this?" — and none of them needed an identifier to answer
+    it.** There is now no session anywhere in the suite and nothing stored that could single a
+    visitor out.
+  - **`ec_seen`: one base-32 digit per page, five bits** (language view 1, human view 2,
+    calculation 4, title 8, subtitle 16 — max 31, which is exactly one digit in base 32, which is
+    what makes the banner's sentence literally true rather than approximately true).
+  - **`SESSION_START` was deleted and nothing replaced it.** It existed so a visit that had already
+    proven itself human did not make later pages wait out their own 10 seconds. Bit 2 on *any* page
+    answers that better, so no timestamp is stored at all — one less thing on the device and one
+    less thing to explain.
+  - **One reserved pseudo-page, `_v`, carries the visit-level facts.** Without it the `cookie`
+    demand row vanishes: every page would log `view` and the "returning users with a saved
+    preference" statistic would silently go to zero. Caught during implementation, not after.
+  - **`ec_blang` is now the literal `1`.** It held the language tag, and every use site is
+    `isset()` — the value was written and never once read.
+  - **THREE ANSWERS.** `0` refuse, `1` accept this version, `2` accept every version. The middle one
+    is scope-limited consent pinned to `EC_CONSENT_VERSION`, so bumping that version re-asks exactly
+    the people who asked to be re-asked and nobody else. It does **not** mean "ask again next
+    visit" — nagging somebody who already said yes is the one direction that makes a consent flow
+    worse. Refuse is rendered FIRST and all three share one CSS rule.
+  - **Verified end to end:** fresh visitor gets zero `Set-Cookie` headers; an accepted visit writes
+    `ec_seen` and `ec_blang=1` and no session; the digit accumulates across pages
+    (`Orifice:1` → `Orifice:3`); a reload adds no row; the beacons dedupe on the digit; refusing
+    deletes both cookies; `1` under an old version re-asks and `2` never does.
+  - **`privacy.php` was updated in the same commit** — its cookie table described `PHPSESSID`, which
+    no longer exists. That page is a constraint on the code, not a description of it.
+  - **Still open, and it BLOCKS the sprint:** three `$ec_lang_syn` entries now describe labels that
+    changed underneath them (`consent_accept`, `consent_body`, and `consent_accept_all` which has
+    none). AI may not edit that array without Tom's written permission, so `friction_check.php`
+    holds the sprint until he rules.
+
 
 - 0|290|[DONE 2026-08-12] **Six Rock Chute notes were written, translated into 26 languages, and
   rendered by nothing.** Tom: *"Great find! Yes, those are 'lost notes'. They should be on the rc

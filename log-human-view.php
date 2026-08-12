@@ -14,9 +14,9 @@
  * Licensed under GNU GPL v3.0 or later
  */
 require_once __DIR__ . '/lib/config.inc.php';
-// Task 286: the session is analytics storage, so it starts only for a visitor who agreed to it.
-// Everybody else is still counted -- see the 'visit' bucket in ecLogBucketSuffix().
-ecSessionStart();
+// Task 288: no session. De-duplication is one base-32 digit per page in the ec_seen cookie, and it
+// happens only for a visitor who agreed to it. Everybody else is still counted -- see the 'visit'
+// bucket in ecLogBucketSuffix().
 
 header('Content-Type: text/plain');
 
@@ -65,12 +65,13 @@ if (isset($_POST['offline_ts'])) {
 // every time -- there is nothing to dedupe against, so the view goes to the 'visit' bucket
 // undeduplicated. That is the honest shape of the number, and it is a far better answer than
 // dropping those visitors entirely.
-$dedupKey = $page . '|' . $lang;
-$alreadyLogged = ecSessionActive() && !empty($_SESSION['HUMAN_VIEW_LOGGED'][$dedupKey]);
+// Task 288: deduped per (visit, page) rather than per (visit, page, lang). The language is
+// carried in the digit's page slot, and a visitor who switches language mid-page is one human
+// looking at one page -- counting them twice was always the weaker reading, and one digit per page
+// cannot express it anyway.
+$alreadyLogged = ecAnalyticsConsented() && ecSeen($page, EC_SEEN_HUMAN_VIEW);
 if (!$alreadyLogged) {
-    if (ecSessionActive()) {
-        $_SESSION['HUMAN_VIEW_LOGGED'][$dedupKey] = true;
-    }
+    ecMarkSeen($page, EC_SEEN_HUMAN_VIEW);
 
     $browserLang = '';
     if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {

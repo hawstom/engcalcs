@@ -55,8 +55,14 @@ Each record is the page name, the language, and the time. It contains no IP addr
 and no identifier of any kind. We use it to decide which calculators to improve and which languages
 to translate into.</p>
 
-<p>To count you once rather than once per visit, we need to keep a small amount of information in
-your browser, which is why we ask permission first.</p>
+<p>To count you once rather than once per page you open, we need to keep a small amount of
+information in your browser, which is why we ask permission first. It is a single digit for each
+page, recording only which counts we have already made. <strong>There is no identifier of any kind
+&mdash; nothing stored on your device could be used to recognise you, here or anywhere else.</strong></p>
+
+<p>You can answer in three ways. <em>Refuse</em> and we store nothing and never ask again.
+<em>Accept this</em> covers exactly what is described above, and we will ask again only if we ever
+want to do something different. <em>Accept all</em> covers that too, so we never ask again.</p>
 
 <p><strong>If you say no, we keep nothing in your browser, and nothing we record can be connected
 to you or to your other visits.</strong> We still count the page load itself, in the same way any
@@ -121,13 +127,13 @@ its last activity.</p>
 	</tr>
 	<tr>
 		<td><code>ec_blang</code></td>
-		<td>The language your browser asked for, so we count it once per browser</td>
+		<td>The single digit <code>1</code>, meaning we have already recorded which language your browser asks for, so we do not record it again</td>
 		<td>1 year</td>
 		<td><strong>Yes</strong></td>
 	</tr>
 	<tr>
-		<td><code>PHPSESSID</code></td>
-		<td>Tells us your second page today is the same visit as your first, so we count you once</td>
+		<td><code>ec_seen</code></td>
+		<td>One digit for each page you open, recording which counts we have already made for it, so opening the same page again is not counted again. It holds no identifier and nothing that could single you out</td>
 		<td>Until you close your browser</td>
 		<td><strong>Yes</strong></td>
 	</tr>

@@ -12,14 +12,14 @@ echoHeader("EngCalcs", $html_title, "");
 (function () {
 	try {
 		if (localStorage.getItem('lpn_show_titles') !== '0') { return; }
-		['ec-page-title', 'ec-page-welcome'].forEach(function (id) {
+		['ec-page-title', 'ec-page-welcome', 'ec-page-desc'].forEach(function (id) {
 			var el = document.getElementById(id);
 			if (el) { el.style.display = 'none'; }
 		});
 	} catch (e) { /* storage blocked -- titles simply stay visible, which is the safe direction */ }
 }());
 </script>
-<h2><?=$ec_lang['lpn_main_desc']?></h2>
+<h2 id="ec-page-desc"><?=$ec_lang['lpn_main_desc']?></h2>
 
 <?php
 // The "View printable" wiring that used to sit here has been REMOVED (2026-08-06). It was copied

@@ -12,8 +12,10 @@
  */
 require_once __DIR__ . '/lib/config.inc.php';
 
+// '0' refuse, '1' accept this version, '2' accept every version. ecConsentSet() validates and
+// ignores anything else, so a hand-crafted POST cannot invent a fourth state.
 if (isset($_POST['ec_consent'])) {
-    ecConsentSet($_POST['ec_consent'] === '1');
+    ecConsentSet((string) $_POST['ec_consent']);
 }
 
 // Where to go back to. Accept only a same-site absolute PATH -- never a full URL, never a

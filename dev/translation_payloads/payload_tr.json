@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "tr",
-        "expected_key_count": 854,
-        "delta_key_count": 61,
+        "expected_key_count": 855,
+        "delta_key_count": 62,
         "exempt_key_count": 17,
         "exempt_keys": [
             "calc_units_us",
@@ -465,16 +465,17 @@
     },
     "keys_to_translate": {
         "consent_heading": "Browsers and visits",
-        "consent_body": "May we keep a single 1 in this browser's storage to prevent us from logging its visits repeatedly?",
-        "consent_accept": "Allow this logging reducer",
-        "consent_decline": "Refuse this",
+        "consent_body": "May we keep a single digit per page in this browser's storage to prevent us from logging its visits repeatedly?",
+        "consent_accept": "Accept this",
+        "consent_accept_all": "Accept all, and do not ask again",
+        "consent_decline": "Refuse",
         "consent_current_granted": "You allowed this. We limit logging for this browser profile.",
         "consent_current_denied": "You refused this. We store nothing to limit logging for this browser profile.",
         "consent_region_label": "Your choice about limiting logging.",
         "consent_settings_link": "Cookie settings",
         "privacy_link": "Privacy notice",
         "terms_link": "Terms of use",
-        "rc_notes_7_term": "Ponding Above the Inlet",
+        "rc_notes_7_term": "Inlet Ponding",
         "lpn_v2_restore_prompt": "This calculator stores project units and inputs as entered, but it formerly converted numbers to SI for storage. This project was saved before that change, so its numbers were stored in SI. Convert them one last time to the current units? So that you can judge, here are some diameters that would be converted, with their values before and after:",
         "lpn_v2_restore_yes": "Convert",
         "lpn_v2_restore_never": "No. Never ask again.",
@@ -528,16 +529,17 @@
     },
     "keys": {
         "consent_heading": "Browsers and visits",
-        "consent_body": "May we keep a single 1 in this browser's storage to prevent us from logging its visits repeatedly?",
-        "consent_accept": "Allow this logging reducer",
-        "consent_decline": "Refuse this",
+        "consent_body": "May we keep a single digit per page in this browser's storage to prevent us from logging its visits repeatedly?",
+        "consent_accept": "Accept this",
+        "consent_accept_all": "Accept all, and do not ask again",
+        "consent_decline": "Refuse",
         "consent_current_granted": "You allowed this. We limit logging for this browser profile.",
         "consent_current_denied": "You refused this. We store nothing to limit logging for this browser profile.",
         "consent_region_label": "Your choice about limiting logging.",
         "consent_settings_link": "Cookie settings",
         "privacy_link": "Privacy notice",
         "terms_link": "Terms of use",
-        "rc_notes_7_term": "Ponding Above the Inlet",
+        "rc_notes_7_term": "Inlet Ponding",
         "lpn_v2_restore_prompt": "This calculator stores project units and inputs as entered, but it formerly converted numbers to SI for storage. This project was saved before that change, so its numbers were stored in SI. Convert them one last time to the current units? So that you can judge, here are some diameters that would be converted, with their values before and after:",
         "lpn_v2_restore_yes": "Convert",
         "lpn_v2_restore_never": "No. Never ask again.",
@@ -623,6 +625,22 @@
             }
         },
         "consent_accept": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "template_printable_subtitle",
+                    "value": "Yazdırılabilir Alt Başlık",
+                    "english": "Printable Subtitle"
+                },
+                "next_translated": {
+                    "key": "index_title",
+                    "value": "Bedava çevrimiçi mühendislik hesaplayıcıları",
+                    "english": "Free Online Engineering Calculators"
+                }
+            }
+        },
+        "consent_accept_all": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

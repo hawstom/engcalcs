@@ -130,11 +130,12 @@ $ec_lang_syn['template_printable_subtitle']='';
 // cannot read is not consent. The long-form privacy notice and terms are a separate question --
 // English-authoritative, and translated by a human later if at all.
 $ec_lang['consent_heading']='Browsers and visits';
-$ec_lang['consent_body']='May we keep a single 1 in this browser\'s storage to prevent us from logging its visits repeatedly?';
+$ec_lang['consent_body']='May we keep a single digit per page in this browser\'s storage to prevent us from logging its visits repeatedly?';
 $ec_lang_syn['consent_body']='May we keep (store, save, put) a single 1 (a small flag, one digit) in this browser\'s storage to prevent us from logging (recording) its visits repeatedly?';
-$ec_lang['consent_accept']='Allow this logging reducer';
+$ec_lang['consent_accept']='Accept this';
+$ec_lang['consent_accept_all']='Accept all, and do not ask again';
 $ec_lang_syn['consent_accept']='Allow this logging (recording) reducer (limiter)';
-$ec_lang['consent_decline']='Refuse this';
+$ec_lang['consent_decline']='Refuse';
 $ec_lang['consent_current_granted']='You allowed this. We limit logging for this browser profile.';
 $ec_lang_syn['consent_current_granted']='You allowed this. We limit logging (recording) for this browser profile.';
 $ec_lang['consent_current_denied']='You refused this. We store nothing to limit logging for this browser profile.';
@@ -941,7 +942,7 @@ $ec_lang['rc_notes_6_term']='Outlet Apron Elevation';
 $ec_lang_syn['rc_notes_6_term']='';
 $ec_lang['rc_notes_6_def']='The elevation of the top of the rock lining in the outlet reach should be at or below the downstream channel bed elevation. If it is higher, the outlet rock will be unstable.';
 $ec_lang_syn['rc_notes_6_def']='| gloss: outlet apron, downstream';
-$ec_lang['rc_notes_7_term']='Ponding Above the Inlet';
+$ec_lang['rc_notes_7_term']='Inlet Ponding';
 $ec_lang['rc_notes_7_def']='When the normal depth in the inlet channel is less than the weir head (H<sub>p</sub>) required to pass q<sub>t</sub>, restricted flow or ponding occurs upstream of the steep channel inlet. This is generally acceptable — ponding reduces velocity and prevents erosion upstream. To check: use a weir flow calculator to find H<sub>p</sub> for the given q<sub>t</sub> and crest width, and compare it to the inlet channel normal depth. If H<sub>p</sub> exceeds normal depth, ponding will occur.';
 $ec_lang_syn['rc_notes_7_def']='| gloss: weir head, upstream, ponding';
 $ec_lang['rc_notes_4_term']='Reference';

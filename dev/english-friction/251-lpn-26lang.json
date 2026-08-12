@@ -262,7 +262,16 @@
         "the inlet itself being submerged or flooded"
       ],
       "disposition": "english",
-      "resolution": "Written as 'Ponding Above the Inlet' -- the preposition carries the relationship, so no reading survives but the intended one. Title Case to match its six siblings (Rock Sizing Equations, Unit Discharge, ...). 'ponding' is already a glossary concept and rc is wired to it, so the trap word is guarded; verified by gloss_ref_check.php, which passes on rc_notes_7_def's existing 'gloss: weir head, upstream, ponding' pointer."
+      "resolution": "FIRST ANSWER WAS WRONG, corrected by Tom the same day: *\"'Inlet ponding' is the term used in the calculator, and this is an explanation about that. So I think we need to keep 'Inlet ponding', and we explain in the definition.\"* Right, and the mistake is worth recording because it is a whole class. The adversarial reading was sound in isolation and ignored the page it lives on: rc_ponding_check already says \"Inlet ponding check\", so the heading and the check now name the same thing, and the ambiguity the first answer worried about is resolved by the definition sitting directly underneath rather than by a longer heading. CLAUDE.md's concept-level label reuse rule says this outright — reuse the whole label a sibling already uses — and Wave 0 read the string without reading its siblings.\n\nShipped as 'Inlet Ponding', Title Case to match its six sibling headings (Rock Sizing Equations, Unit Discharge, ...) while naming the calculator's own term. THE LESSON: an adversarial pass must check whether a sibling label already owns the concept before proposing new wording, or it will invent clarity at the cost of consistency."
+    },
+    {
+      "key": "consent_accept",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "BLOCKS THE SPRINT UNTIL TOM RULES. Task 288 changed this label from 'Allow this logging reducer' to 'Accept this', and added a third answer ('Accept all, and do not ask again') because the ask now has two kinds of yes. Tom's hand-written $ec_lang_syn entry still reads 'Allow this logging (recording) reducer (limiter)' -- synonyms for a label that no longer exists. Shipping it would hand 26 agents alternate wordings for the wrong string, which is worse than no guidance at all.",
+      "readings": [],
+      "disposition": "refer-to-human",
+      "resolution": "AI must not edit $ec_lang_syn without written permission in-conversation, and this is squarely that rule rather than a technicality -- the whole point of the channel is that the wordings are Tom's. Three entries need his eye before the sprint: consent_accept (label replaced), consent_body (still says 'a single 1'; the label now says 'a single digit per page'), and consent_accept_all (new label, no entry at all). consent_current_granted and consent_region_label are unaffected -- their labels did not change."
     }
   ]
 }
