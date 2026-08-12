@@ -3068,10 +3068,38 @@ var EngCalcs = EngCalcs || {};
 		zoomExtent();
 	}
 
+	// BOTH of EPANET's file formats, decided by the CONTENT rather than the extension.
+	//
+	// `.inp` is the documented text interchange format; `.net` is what EPANET's Windows UI saves
+	// when you press Save, and is an undocumented binary. Tom's answer on 2026-08-11, the day after
+	// `.inp` import shipped, settled it: every model he actually has is a `.net`, because that is
+	// what the Save button makes. Telling a user to go and find File > Export > Network first is a
+	// step most of them do not know exists.
+	//
+	// Sniffed, not guessed from the name: a file renamed `.inp` that is really binary would
+	// otherwise be read as text and produce nonsense, and the reverse is just as easy to do. So
+	// every file is read as BYTES, checked for the `.net` magic, converted if it has it, and
+	// decoded as UTF-8 text if it does not.
+	function inpTextFromBytes(buffer, fileName) {
+		var pc = EngCalcs.pageConfig || {}, bytes = new Uint8Array(buffer);
+		if (!EngCalcs.lpnLooksLikeNet || !EngCalcs.lpnLooksLikeNet(bytes)) {
+			return new TextDecoder('utf-8').decode(bytes);
+		}
+		var conv = EngCalcs.lpnNetToInp(bytes, fileName);
+		if (conv.ok) { return conv.inp; }
+		// A `.net` we cannot read is refused outright, never half-read -- see the integrity check in
+		// js/lpn-net.js. The way out is always available and always works, so the message names it.
+		alert((pc.lpn_net_bad_file || 'This looks like an EPANET .net file, but this page could not read it. Open it in EPANET and use File, Export, Network to save it as an .inp file, then import that.') +
+			(conv.detail ? ' (' + conv.detail + ')' : ''));
+		return null;
+	}
+
 	function importInpFromFile(file) {
 		var pc = EngCalcs.pageConfig || {}, reader = new FileReader();
 		reader.onload = function (ev) {
-			var parsed = EngCalcs.lpnInpParse ? EngCalcs.lpnInpParse(ev.target.result) : { ok: false };
+			var text = inpTextFromBytes(ev.target.result, file.name);
+			if (text === null) { return; }   // inpTextFromBytes already said why
+			var parsed = EngCalcs.lpnInpParse ? EngCalcs.lpnInpParse(text) : { ok: false };
 			if (!parsed.ok) {
 				alert(pc.lpn_inp_bad_file || 'That file could not be read as an EPANET network file.');
 				return;
@@ -3091,7 +3119,9 @@ var EngCalcs = EngCalcs || {};
 			showInpReport(parsed, file.name);
 		};
 		reader.onerror = function () { alert(pc.lpn_inp_bad_file || 'That file could not be read as an EPANET network file.'); };
-		reader.readAsText(file);
+		// BYTES, not text: which of EPANET's two formats this is gets decided by the content (see
+		// inpTextFromBytes), and decoding a binary .net as UTF-8 first would destroy it.
+		reader.readAsArrayBuffer(file);
 	}
 	function pickInpFile() {
 		var input = document.getElementById('lpn_inp_file');

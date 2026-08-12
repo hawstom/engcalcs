@@ -1246,9 +1246,13 @@ $ec_lang['lpn_import_no_room']='There is not enough browser storage left to add 
 // {file} is a file name; {nodes}, {links} and {units} are numbers and a unit name. Word order is
 // the translator's to choose.
 $ec_lang['lpn_dialog_ok']='OK';
-$ec_lang['lpn_file_import_inp']='Import EPANET file (.inp)…';
-$ec_lang['lpn_file_import_inp_tip']='Read a network out of an EPANET .inp file and add it to this browser as a new project. This page cannot write an .inp file back, so use Save as to keep your work.';
+$ec_lang['lpn_file_import_inp']='Import EPANET file…';
+$ec_lang['lpn_file_import_inp_tip']='Read a network out of an EPANET file, either the .inp text file or the .net file EPANET saves, and add it to this browser as a new project. This page cannot write an EPANET file back, so use Save as to keep your work.';
 $ec_lang['lpn_inp_bad_file']='That file could not be read as an EPANET network file.';
+// EPANET has two file formats. This one is about the BINARY .net that its Windows program saves;
+// the way out named here always works, so keep the instruction in the message rather than leaving
+// the reader to guess.
+$ec_lang['lpn_net_bad_file']='This looks like an EPANET .net file, but this page could not read it. Open it in EPANET and use File, Export, Network to save it as an .inp file, then import that.';
 $ec_lang['lpn_inp_report_heading']='Imported {file}';
 $ec_lang['lpn_inp_report_counts']='{nodes} junctions and reservoirs, {links} pipes and pumps, in {units}.';
 $ec_lang['lpn_inp_report_clean']='Everything in the file came across. Nothing was left out.';

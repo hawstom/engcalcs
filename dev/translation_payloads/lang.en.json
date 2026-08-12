@@ -645,9 +645,10 @@
         "lpn_import_bad_file": "That file could not be read as a project saved from this page.",
         "lpn_import_no_room": "There is not enough browser storage left to add this project. Delete a project you no longer need and try again.",
         "lpn_dialog_ok": "OK",
-        "lpn_file_import_inp": "Import EPANET file (.inp)…",
-        "lpn_file_import_inp_tip": "Read a network out of an EPANET .inp file and add it to this browser as a new project. This page cannot write an .inp file back, so use Save as to keep your work.",
+        "lpn_file_import_inp": "Import EPANET file…",
+        "lpn_file_import_inp_tip": "Read a network out of an EPANET file, either the .inp text file or the .net file EPANET saves, and add it to this browser as a new project. This page cannot write an EPANET file back, so use Save as to keep your work.",
         "lpn_inp_bad_file": "That file could not be read as an EPANET network file.",
+        "lpn_net_bad_file": "This looks like an EPANET .net file, but this page could not read it. Open it in EPANET and use File, Export, Network to save it as an .inp file, then import that.",
         "lpn_inp_report_heading": "Imported {file}",
         "lpn_inp_report_counts": "{nodes} junctions and reservoirs, {links} pipes and pumps, in {units}.",
         "lpn_inp_report_clean": "Everything in the file came across. Nothing was left out.",
@@ -841,7 +842,7 @@
         "lpn_settings_wipe_btn": "Erase everything on this page",
         "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
-    "count": 839,
+    "count": 840,
     "active_prefixes": [
         "about",
         "bpn",

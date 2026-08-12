@@ -221,8 +221,39 @@ function netParse($path) {
 	$net['extent'] = array($r->num(), $r->num(), $r->num(), $r->num());
 	$net['backdrop'] = array('units' => $r->int(), 'file' => $r->str(), 'x' => $r->num(), 'y' => $r->num());
 	// Everything after this is map display state (colors, symbol sizes, default properties).
-	// Not read: nothing downstream needs it, and the trailer's shape varies by EPANET build.
+	// Not read: nothing downstream needs it, and the trailer's shape varies by EPANET build --
+	// which is why the integrity check below counts SECTIONS rather than demanding a clean EOF.
+	$bad = netIntegrityError($net);
+	if ($bad !== null) { throw new RuntimeException("section mismatch -- $bad"); }
 	return $net;
+}
+
+/**
+ * The header's ten counts against what was actually read.
+ *
+ * This is what makes reading an undocumented binary format defensible. The slot maps above were
+ * derived from real files, not from a specification, so a build of EPANET that lays a section out
+ * differently is a real possibility -- and a silent one, since a roughness read from the
+ * minor-loss slot still produces a network that solves. If the walk lands in the wrong place these
+ * counts disagree, and the file is refused instead of being read as a plausible different network.
+ * js/lpn-net.js carries the same check for the browser.
+ */
+function netIntegrityError($net) {
+	$got = array('junction' => 0, 'reservoir' => 0, 'tank' => 0, 'pipe' => 0, 'pump' => 0, 'valve' => 0);
+	foreach ($net['nodes'] as $n) { $got[$n['kind']]++; }
+	foreach ($net['links'] as $l) { $got[$l['kind']]++; }
+	$h = $net['header'];
+	$pairs = array(
+		array('junctions', $h[0], $got['junction']), array('reservoirs', $h[1], $got['reservoir']),
+		array('tanks', $h[2], $got['tank']), array('pipes', $h[3], $got['pipe']),
+		array('pumps', $h[4], $got['pump']), array('valves', $h[5], $got['valve']),
+		array('labels', $h[6], count($net['labels'])), array('patterns', $h[7], count($net['patterns'])),
+		array('curves', $h[8], count($net['curves']))
+	);
+	foreach ($pairs as $p) {
+		if ($p[1] !== $p[2]) { return $p[0] . ': the file says ' . $p[1] . ', the reader found ' . $p[2]; }
+	}
+	return null;
 }
 
 // ---------------------------------------------------------------- helpers

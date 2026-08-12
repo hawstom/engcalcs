@@ -88,10 +88,13 @@ echoHeader("EngCalcs", $html_title, "");
 	      // those bodies get rebuilt wholesale and would take the input's wired change handler with
 	      // them -- the same reason lpn_backdrop_file sits here. ?>
 	<input type="file" id="lpn_project_file" accept=".json,application/json" style="display:none">
-	<?php // EPANET .inp import (Task 196). A SECOND picker rather than another accept type on the
-	      // one above: the two feed different readers, and one input serving both would have to
-	      // guess which from the extension -- a guess whose wrong answer is silent. ?>
-	<input type="file" id="lpn_inp_file" accept=".inp,text/plain" style="display:none">
+	<?php // EPANET import (Task 196). A SECOND picker rather than another accept type on the one
+	      // above: the two feed different readers, and one input serving both would have to guess
+	      // which from the extension -- a guess whose wrong answer is silent.
+	      // BOTH of EPANET's formats: .inp is its documented text interchange format, .net is what
+	      // its Windows UI saves when you press Save. The accept list only filters the PICKER; which
+	      // format a chosen file really is gets decided from its first bytes, not its name. ?>
+	<input type="file" id="lpn_inp_file" accept=".inp,.net,text/plain" style="display:none">
 	<?php // Floating "choose target mode" step of the Position sequence (Task 146 Phase 2) --
 	      // mirrors #lpn_labels_popup's static-PHP-plus-JS-clamped-position pattern (position:fixed,
 	      // positioned/clamped by showBackdropTargetPanel() in looped-network.js), not the spike's
@@ -372,6 +375,7 @@ EngCalcs.pageConfig = {
 	lpn_file_import_inp: <?=json_encode($ec_lang['lpn_file_import_inp'])?>,
 	lpn_file_import_inp_tip: <?=json_encode($ec_lang['lpn_file_import_inp_tip'])?>,
 	lpn_inp_bad_file: <?=json_encode($ec_lang['lpn_inp_bad_file'])?>,
+	lpn_net_bad_file: <?=json_encode($ec_lang['lpn_net_bad_file'])?>,
 	lpn_inp_report_heading: <?=json_encode($ec_lang['lpn_inp_report_heading'])?>,
 	lpn_inp_report_counts: <?=json_encode($ec_lang['lpn_inp_report_counts'])?>,
 	lpn_inp_report_clean: <?=json_encode($ec_lang['lpn_inp_report_clean'])?>,
@@ -524,6 +528,7 @@ EngCalcs.pageConfig = {
 <script src="/engcalcs/js/lpn-solver.js?v=<?=filemtime(__DIR__.'/js/lpn-solver.js')?>"></script>
 <script src="/engcalcs/js/lpn-epanet.js?v=<?=filemtime(__DIR__.'/js/lpn-epanet.js')?>"></script>
 <script src="/engcalcs/js/lpn-inp.js?v=<?=filemtime(__DIR__.'/js/lpn-inp.js')?>"></script>
+<script src="/engcalcs/js/lpn-net.js?v=<?=filemtime(__DIR__.'/js/lpn-net.js')?>"></script>
 <script src="/engcalcs/js/looped-network.js?v=<?=filemtime(__DIR__.'/js/looped-network.js')?>"></script>
 <script>
 <?php echoCookieScript(); ?>

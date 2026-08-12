@@ -20,16 +20,22 @@ const { ROOT, byId, setUnitSet, loadLoopedNetwork, GPM, FT } = require('./lpn-do
 const fs = require('fs');
 const path = require('path');
 
-// The page loads js/lpn-inp.js before js/looped-network.js; do the same, onto the same EngCalcs.
+// The page loads both readers before js/looped-network.js; do the same, onto the same EngCalcs.
 require(ROOT + 'js/lpn-inp.js');
+require(ROOT + 'js/lpn-net.js');
 
 // FileReader is the browser's; the import path is written around it, so it is stubbed rather than
 // bypassed -- calling docFromInp() directly would skip importInpFromFile()'s own ordering, and the
 // order (units strip first, THEN the conversion) is exactly the thing most likely to be wrong.
+//
+// It reads BYTES, as the real path does: which of EPANET's two formats a file is gets decided from
+// its first bytes rather than its name, so a stub that handed over text would skip that decision
+// entirely -- and it is the decision a renamed file turns on.
 let lastAlert = null;
 global.FileReader = function () {
-	this.readAsText = function (file) {
-		this.result = file._text;
+	this.readAsArrayBuffer = function (file) {
+		const bytes = file._bytes || new TextEncoder().encode(file._text);
+		this.result = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
 		if (this.onload) { this.onload({ target: { result: this.result } }); }
 	};
 };
@@ -99,6 +105,11 @@ function importText(text, name) {
 	lastAlert = null;
 	byId.lpn_dialog_body.children.length = 0;
 	L.importInp({ name: name, _text: text });
+}
+function importBytes(bytes, name) {
+	lastAlert = null;
+	byId.lpn_dialog_body.children.length = 0;
+	L.importInp({ name: name, _bytes: bytes });
 }
 
 const CASES = path.join(__dirname, 'reference', 'import-cases.inp');
@@ -296,6 +307,38 @@ console.log('\n--- a file that is not a network ---');
 	importText('{"v":4,"nodes":[]}', 'notanetwork.inp');
 	ok('it is refused with a message', !!lastAlert, JSON.stringify(lastAlert));
 	ok('and nothing was imported over the open project', L.getDoc().nodes.length === before);
+}
+
+// ---------------------------------------------------------------------------
+// 6. A BINARY .net goes through the very same menu item.
+// ---------------------------------------------------------------------------
+// The format is decided from the file's first bytes, not its name, so this is deliberately handed
+// over with the WRONG extension: a user who renames a file must still get the right reader, and a
+// path that trusted the name would import binary as text and produce nonsense without a word.
+// js/lpn-net.js itself is tested in dev/lpn-spike/net-import-harness.js; what is checked here is
+// only that this page's one import command reaches it.
+console.log('\n--- a binary .net, handed over as "model.inp" ---');
+{
+	const netBytes = fs.existsSync(ROOT + 'dev/epanet-models')
+		? fs.readdirSync(ROOT + 'dev/epanet-models').filter(f => f.endsWith('.net'))[0]
+		: null;
+	if (!netBytes) {
+		console.log('  skip  no dev/epanet-models/*.net here (they are gitignored client models)');
+	} else {
+		const bytes = new Uint8Array(fs.readFileSync(path.join(ROOT, 'dev/epanet-models', netBytes)));
+		importBytes(bytes, 'model.inp');
+		ok('a binary file named .inp is still read as a .net', !lastAlert, JSON.stringify(lastAlert));
+		ok('...and a real network lands', L.getDoc().nodes.length > 5, L.getDoc().nodes.length + ' nodes');
+		ok('...in the units the model was written in', L.readUnitSelections().lpn_u_flow === 'gpm');
+	}
+	// And the other way: a .net that this page cannot read is refused with the way out, never
+	// half-imported.
+	const before = L.getDoc().nodes.length;
+	const junk = new Uint8Array([0x06, 9, 60, 69, 80, 65, 78, 69, 84, 50, 62, 0x03, 0xe9, 0x4e, 0x02, 1]);
+	importBytes(junk, 'broken.net');
+	ok('a damaged .net is refused, and the message says to export it as .inp',
+		!!lastAlert && /\.inp/.test(lastAlert), JSON.stringify(lastAlert));
+	ok('...and nothing was imported over the open project', L.getDoc().nodes.length === before);
 }
 
 console.log('\n' + (fails === 0 ? 'ALL PASS' : fails + ' FAILURE(S)'));
