@@ -121,9 +121,13 @@ its last activity.</p>
 	</tr>
 	<tr>
 		<td><code>ec_nolog</code></td>
-		<td>Marks this browser as one we never count, however you answered</td>
+		<td>Stops this browser being counted <strong>at all</strong>, in any way. Stronger than
+		refusing above: refusing means we store nothing on your device but still count the page
+		load anonymously, while this records nothing whatsoever. Set it by visiting any page with
+		<code>?ec_nolog=1</code> on the end of the address, and undo it with
+		<code>?ec_nolog=0</code></td>
 		<td>10 years</td>
-		<td>No &mdash; same reason</td>
+		<td>No &mdash; same reason: it exists only to honour a choice you made</td>
 	</tr>
 	<tr>
 		<td><code>ec_blang</code></td>
@@ -206,10 +210,7 @@ first.</p>
 
 <p>If we change this notice we will change the date at the top of this page.</p>
 
-<p><em>This notice is written in English, and the English version is the one that governs. We
-translate the calculators into 27 languages and would like to translate this page too; until we
-can do it properly, a machine translation of a document like this one would be worse than
-none.</em></p>
+<p><em>This notice is written in English, and the English version is the one that governs.</em></p>
 
 </div>
 <?php
