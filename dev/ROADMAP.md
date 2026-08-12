@@ -937,6 +937,77 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     document comes back. `dev/lpn-spike/inp-import-harness.js` is the natural home.
   - **A pump with no curve is the one thing that cannot round-trip** — `lpnToInp()` already turns
     it into a short, wide, smooth pipe and warns, because EPANET has no such element.
+  - **`.inp` ONLY. Never write a `.net`** (Tom asked the question directly, 2026-08-11: *"maybe we
+    export only .inp?"* — yes). `.inp` is documented, is text, is opened natively by EPANET, and is
+    read by every other tool in this space. `.net` is an undocumented binary serialization of one
+    program's internal object graph; `js/lpn-net.js` reads it as a courtesy to users whose Save
+    button makes one, and emitting it would be a different thing entirely — shipping a format we
+    reverse-engineered, as though we knew it was right.
+  - **A LABEL'S EXPORTED POINT IS ITS UPPER-LEFT CORNER, not its centre.** EPANET's `[LABELS]`
+    coordinates mean the corner (its own documentation says so, and the import corrects for it —
+    see `reanchorImportedLabels()`), while this page anchors text at the centre. The export has to
+    apply the same shift in reverse or every label comes back half its own width to the right.
+
+- 30|283| **Map label legibility: prefixes instead of colours, pipe-aligned link labels, and an
+  auto-hide rule.** Tom, 2026-08-11, after studying how epanet-js does it. Four separable pieces;
+  they are one task because they are one question — how do the numbers on the map read — but any of
+  them can ship alone.
+
+  1. **Label PREFIXES, not units, and not colours alone.** epanet-js suffixes every label with its
+     unit and offers no way to turn that off. Tom: *"I personally don't see the need for units on a
+     map when they are endlessly redundant. But we could offer that."* His preference is the other
+     end of the label: a prefix, `P=` or `Pressure=`, `Q=` or `Flow=`, set in a **Settings > Label
+     prefixes** section — so a user picks between nothing, a short symbol, or a full word.
+     - **This is also the answer to a limit we already chose not to have.** epanet-js shows ONE
+       field at a time; `lpn_` shows several at once and Tom wants to keep that. Several fields at
+       once is what makes them need telling apart, and today that job is done entirely by COLOUR
+       (`lpnFieldColors` plus the checkbox legend). A prefix does it better: it survives a
+       screenshot, a black-and-white print, and a colour-blind reader, none of which a hue does.
+       **Keep the legend either way** (`Q` Flow, `P` Pressure, …) — a prefix still has to be
+       introduced once.
+     - Optional units-as-suffix stays available as a setting for anyone who wants epanet-js's
+       behaviour; it is just not the default.
+  2. **Link labels drawn ALONG the pipe.** epanet-js sets a pipe's label on the pipe itself, rotated
+     to its bearing, repeated from zero to several times per segment at a hard-coded view-based
+     spacing whenever it fits. Two observations from Tom, both worth keeping:
+     - **Which SIDE it picks is not decipherable** — not always top, not always left or right as
+       seen from the high-head node, not the least congested side. *"I suppose we could choose
+       anything we want, but I wonder why they aren't always top."* So: choose deliberately, and
+       "always top" is the candidate to beat.
+     - **Their flip rule has no readability bias.** Text is rotated to avoid being upside-down, with
+       the decision angle at exactly 90 degrees. A bias (flip only past ~100 degrees, say) keeps a
+       near-vertical run of labels from alternating direction pipe by pipe.
+  3. **Auto-hide text that does not fit, as a rule we state rather than inherit.** epanet-js's
+     labels are a constant on-screen size — which `lpn_` already offers as `textSizeUnits:
+     'screen'` — and it hides what will not fit. We have no such rule at any size. Tom's proposal,
+     and he leans to it being **two separate toggles**: *"Auto-hide map-sized text"* (or no toggle
+     and the answer is always no) and *"Auto-hide screen-sized text"* (or no toggle and the answer
+     is always yes). The asymmetry is the point: map-sized text shrinks with the drawing and its
+     absence would be surprising, screen-sized text stays put and collides.
+     - epanet-js hides NODE labels at a single zoom threshold, all of them together, and it looks
+       hard-coded. That is a cruder rule than per-label fit, and worth beating rather than copying.
+  4. **Flow direction arrows stay.** epanet-js has none. Tom: *"I like that we do."* Recorded so a
+     future tidy-up does not quietly remove them in the name of matching.
+
+  **Node labels need no work here** — Tom's reading is that epanet-js orients and places them much
+  as `lpn_` already does. This task is about link labels, prefixes, and the hiding rule.
+
+- 25|284| **Settings panel: an index pane on the left, content on the right, nothing collapsing.**
+  Tom, 2026-08-11, from epanet-js: *"the Settings box has a left 'index' pane and a right 'content'
+  pane. When you click a heading in the left pane, the right pane scrolls to your desired heading.
+  And the right pane never collapses. This is a very conventional web paradigm."*
+  - **Headings AND sub-headings in both panes**, and in the right pane the current heading and
+    sub-heading **stick to the top** rather than scrolling away — so there is always a heading at
+    the top of the content, with its sub-heading under it where one applies.
+  - **This RETIRES the collapsible sections, and that is a real consequence, not a detail.**
+    `settings.sectionsOpen` (`idPrefixes`, `defaults`, `mapDisplay`, `computation`, `files`) exists
+    to persist which accordion sections a user left open; with a content pane that never collapses
+    there is nothing for it to remember. Decide whether it becomes a scroll position, or is simply
+    dropped and left as a stale key the way `fileAutosaveSeconds` was.
+  - **Check it against the phone before committing.** Two panes side by side is conventional on a
+    desktop and is exactly the layout that fails on a narrow screen, and this page is used on
+    touch devices. The index probably has to collapse to a drop-down under a breakpoint — which is
+    fine, but it means the design is two designs and should be scoped as two.
 
 - 15|282| **Offer to attach the backdrop an imported `.inp` names.** An `.inp` (and a `.net`) stores
   only a PATH to its background picture, never the picture. The import reports the file name and
@@ -1161,6 +1232,13 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **We already have Net1/Net2/Net3 in the repo** as `dev/lpn-spike/reference/` fixtures, so the
     first example costs no download and no network access.
   - **Licensing is clean** — OWA-EPANET is MIT, so its example networks can ship under GPL v3+.
+  - **Backdrops, 2026-08-11: Tom supplied three `.wmf` files, and a browser cannot display WMF at
+    all.** They are placeable Windows metafiles (vector CAD exports, ~16.6 x 16.7 in), so they need
+    converting to SVG or PNG before they can be a backdrop here — a one-time job on a Windows
+    machine (Inkscape opens a `.wmf` and saves SVG directly). Two loose ends beside that: the
+    Estrellas model names `utility-map-estrellas.bmp`, which was not among them, and
+    `20069-WP-Backdrop.wmf` matches none of the three models' `[BACKDROP] FILE` paths — it appears
+    to belong to a fourth model we do not have.
   - **These are ANALYSIS networks and this suite is a DESIGN tool.** They will make the map look
     serious, but do not let them quietly redefine what the calculator is for.
 
