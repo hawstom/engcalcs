@@ -1015,6 +1015,38 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     narrow-screen case stands on its own — a layout that breaks when the window is small is worth
     avoiding whether or not anyone has yet opened it that way — and that is the whole argument.
 
+- 45|286|[H] **EU cookie/ePrivacy compliance, and a privacy page this site does not have.** Tom,
+  2026-08-11: *"That is looming over us. I don't know what triggers it, but probably we are already
+  outlaws. That's my guess."* Half of that is answerable from the code, and it is:
+  **`dev/cookie-storage-inventory.md`** — every cookie, every `localStorage` key, every server log,
+  what each is for, and which ones fail the test. Read it before scoping anything here.
+  - **What triggers it is ePrivacy Article 5(3), not GDPR**, and its test is *strictly necessary for
+    a service the user explicitly requested* — applied **per purpose**, and to `localStorage` as
+    much as to cookies. Consent under it means opt-IN, before the storage; the existing `ec_nolog`
+    opt-out is not consent and was never meant to be.
+  - **His guess is roughly right, and the exposure is smaller than "outlaws" suggests.** There are
+    no third parties at all here — no analytics vendor, no tag manager, no ads, no CDN fonts — and
+    the usage logs carry no IP and no session id by deliberate design. What fails is narrow:
+    `ec_blang` (exists only to make a statistic accurate once per browser), the analytics half of
+    `PHPSESSID`, and a page-input cookie with a **36,000-day** lifetime that is bad hygiene whatever
+    the law says. `lpn_`'s project storage is the strongest case in the file, not the weakest — it
+    holds the document the user made in order to give it back to them.
+  - **AIM AT NEEDING NO BANNER.** A consent prompt on a free calculator whose pitch is "open the
+    page and get an answer" is paid by every visitor on every page, forever. The inventory's §6
+    lists four changes that would remove the non-exempt storage instead of asking permission for it,
+    and none is load-bearing.
+  - **[H] THE ONE REAL DECISION IS TOM'S:** what are the reach/shopping/using counters worth? They
+    need per-visitor de-duplication, which needs stored state, which is the thing that is not
+    exempt. Either they justify a consent prompt, or coarser numbers with no client-side state are
+    the honest trade. Everything else in this task follows from that answer. Note the interaction
+    with Task 285 — adding a device signal makes this MORE pressing, not less.
+  - **A privacy page is owed independently of all of it**, because `contact.php` collects a name and
+    an email address and there is no notice anywhere on this site.
+  - **Cheaper now than after the Task 251 sprint.** A banner and a privacy page are text, and text
+    is what this project pays 26x for.
+  - **Not legal advice and not from a lawyer.** The inventory is what an adviser would ask for
+    first, which is why it exists; the verdict is not ours to give.
+
 - 20|285| **We do not know what devices anybody uses this on, and several decisions have quietly
   assumed an answer.** Tom, 2026-08-11: *"we don't know whether anybody uses this on a phone."* He
   is right, and it is worth being precise about why: `log-human-view.php` and `log-calc-event.php`
@@ -1320,10 +1352,33 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **Now declared. The real debt is visible: 6,180 keys missing, up from 174**, of which ~6,006 is
     `lpn_` across the 22 non-core languages (~273 keys each). That number was always owed; it was
     simply not being counted.
-  - **The SPRINT is still gated, and the gate is still English stability.** 28 new `lpn_` keys
-    landed on 2026-08-11 alone (Task 196's import reporting). Declaring scope costs nothing and
-    makes the number honest; paying it is 22 agents over a settled surface and needs Tom's explicit
-    go-ahead per CLAUDE.md.
+  - **THE GATE IS SMALLER AND MORE CONCRETE THAN "STABILITY", AND IT IS MEASURED.** Tom,
+    2026-08-11: *"stability may be elusive... What I think matters is that we foresee mostly
+    additions rather than tweaks. And I think we may already have that kind of stability now that we
+    have seen how .inp handling goes."* **His instinct is right, and the git history of
+    `lib/lang.ec.en.php` says so.** Since the 2026-08-08 English-hardening pass: **52 keys added, 8
+    edited** — better than 6 additions per tweak. The one bad day in the record, 2026-08-08 itself
+    (34 edits, 0 additions), was the *pre-sprint adversarial English pass* for the core-four sprint,
+    which is a thing that happens BEFORE a sprint by design, not churn that threatens one. Over the
+    whole life of `lpn_`: 327 added, 158 edited, 51 deleted — and the edits are heavily
+    front-loaded into the first week, exactly as a new page should be.
+  - **So the gate is ONE Wave 0 pass over ~56 strings, not a wait for the page to stop moving.**
+    CLAUDE.md's pre-sprint checklist wants the adversarial English pass over *new or changed*
+    strings. That is the 52 added since 2026-08-08 plus the 4 `detect_english_drift.php` reports as
+    changed since the 08-09 sync (`lpn_empty_hint`, `lpn_file_new`, `lpn_notes_4_def`,
+    `lpn_settings_restore_tip`) — **not all 276**. The 24 new `lpn_inp_*` keys are the batch that
+    most needs it: long explanatory sentences about what an import could not keep, which is exactly
+    where "list every plausible reading" earns its keep.
+  - **Everything else on the checklist is already green**, checked 2026-08-11: `friction_check.php`
+    passes on all four existing sprint files (every entry answered, nothing open or escalated);
+    `lpn` is properly registered in `prefixToTermNames()` with **35 glossary terms**, not the
+    three-term fallback that silently blinds a sprint; payloads are FRESH.
+  - **The size, so the decision is made on a real number:** 22 non-core languages at **273 keys**
+    each, plus the core four at 47 each (their delta since 146.06) — 26 agents in one sprint, the
+    same shape as a wave-1 category sprint. Tom, 2026-08-11: *"Translation is a huge task, but maybe
+    we will do it this week."*
+  - **Still needs Tom's explicit go-ahead per CLAUDE.md.** Declaring scope costs nothing and makes
+    the number honest; spending 26 agents does not.
   - **DECIDED: DO IT. Tom asked 2026-08-09 why CC was resistant, and the resistance was wrong.**
     Three counts. (1) The cost was overstated: 22 languages x 226 keys is 22 agents in ONE sprint,
     the same shape as the wave-1 category sprints and as 146.06 itself — not "the largest
