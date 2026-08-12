@@ -685,6 +685,39 @@ Update via `php dev/scripts/update_quality_score.php <lang> <quality>`, never by
 file. When a language's tier changes (new native review lands, a category-level audit completes),
 update the score in the same session as the finding, not as a deferred follow-up.
 
+## The review office: what runs free, what costs, and what nobody is watching (Tom, 2026-08-12)
+
+Tom: *"I would like to be a better leader when it comes to budgeting and staffing the code review
+office."* There are three tiers and they have very different prices. Knowing which tier a risk
+belongs to IS the budgeting decision.
+
+**Tier 1 — automated, seconds, free. `sh dev/scripts/check_all.sh` before every commit.**
+Ten checks: PHP and JS syntax, HTML balance on every page, language rules A–D, gloss pointers,
+the coverage declaration, payload freshness, the 11 lpn harnesses, plus two advisory ones (key
+hygiene, English drift). Blocking failures exit 1. **This list used to live only in prose and in
+whoever remembered it** — a check nobody runs is indistinguishable from a check that does not
+exist, which is the same failure that hid six Rock Chute notes and the missing `lpn`/`bpn` glossary
+wiring.
+
+**Tier 2 — `/code-review`, billed, and only a human can start it.** An AI cannot launch it; do not
+try. It is what reads code for design, duplication and subtle logic errors — the entire class Tier 1
+cannot see. Worth spending when a change (a) alters logic a person cannot confirm by using the page,
+(b) touches storage, privacy, money or legal text, or (c) is cross-cutting. Not worth it for string
+edits, roadmap prose, or anything Tier 1 fully covers. **The natural moments are the expensive-to-
+undo ones:** before a 26-agent translation sprint, and before anything that changes what is stored
+on a visitor's device.
+
+**Tier 3 — Tom's own attention, the scarcest, and he has said he will not read code.** Correct, and
+the tooling is built on that assumption. Reserve it for decisions the tools cannot make: naming,
+scope, wording, and whether an unreferenced key is debt or lost content. Every one of those calls
+he made on 2026-08-12 was in this tier and none of them could have been automated.
+
+**THE GAP, stated plainly because a checklist that hides its own holes is worse than none: the 19
+non-lpn calculators have no behavioural test.** `run_harnesses.sh` covers the lpn solver thoroughly
+and nothing else. Their math is verified by reading and by Tom driving a browser — which is slow and
+tiring, and is exactly the constraint that produced the lpn harness suite in the first place. See
+ROADMAP Task 292.
+
 ## Renaming a language key, and finding key debt (Tom, 2026-08-12)
 
 Tom does not review code directly and has said he will not. So key debt has to be found by a tool

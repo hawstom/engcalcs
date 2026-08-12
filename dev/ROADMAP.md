@@ -1138,6 +1138,25 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - Low priority on purpose. This is the residue after the automatable part was automated, and the
     honest reason it is not automated is that a check that cries wolf gets muted.
 
+- 35|292| **The 19 non-lpn calculators have no behavioural test, and that is the biggest hole in
+  the review office.** Named 2026-08-12 while answering Tom's question about budgeting review.
+  `dev/scripts/check_all.sh` runs ten checks and every one of them is either syntax, structure, or
+  the lpn solver. **Nothing anywhere confirms that Manning Pipe Flow still computes Manning pipe
+  flow.**
+  - **The asymmetry is stark and it is historical, not principled:** `lpn` has 11 harnesses and
+    ~1,500 assertions because Tom said his manual browser passes were slow and fatiguing, so the
+    harness was built to spend machine time instead of his. That reasoning applies to all 19 of the
+    others and was simply never extended to them.
+  - **What a test would look like here is already solved** — `dev/lpn-spike/` stubs a DOM, requires
+    the calculator JS, and asserts on numbers. The same shape works for any page whose
+    `pageCalculator` is a pure function of its form: seed inputs, run, compare against a worked
+    example from the source method's own paper.
+  - **Start with the two core calculators** (`mpf`, `mtc`) — they carry the coverage cross and the
+    most measured use, so a defect there is worth the most. One worked example each from Manning's
+    published tables would be a real regression test where there is currently none.
+  - **Do not attempt all 19 at once.** The value is concentrated: a calculator nobody has changed in
+    two years is not where a regression will appear. Test what is being edited.
+
 - 35|288| **Ask for less, by storing less: replace the session identifier with a few bits.** Tom,
   2026-08-12, proposing banner wording: *"May we store a single 1 or 0 in this browser, so that we
   don't count its repeated visits?"* **That sentence is not true today, and the interesting response
