@@ -1124,6 +1124,52 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **Not legal advice and not from a lawyer.** The inventory is what an adviser would ask for
     first, which is why it exists; the verdict is not ours to give.
 
+- 35|288| **Ask for less, by storing less: replace the session identifier with a few bits.** Tom,
+  2026-08-12, proposing banner wording: *"May we store a single 1 or 0 in this browser, so that we
+  don't count its repeated visits?"* **That sentence is not true today, and the interesting response
+  is to make it nearly true rather than to soften the sentence.**
+  - **What we actually store, and the gap:** `ec_blang` (a language tag) and `PHPSESSID` (a 32-hex
+    **unique random identifier**). An identifier is categorically different from a flag — it is the
+    one thing here that could in principle single a person out, and it is the hardest thing to ask
+    permission for in one short sentence.
+  - **`ec_blang` can become a literal `1` today, at zero cost.** Its value is written but **never
+    read** — every use site is `isset($_COOKIE['ec_blang'])` (`lib/Language.lib.php`). It stores a
+    language tag purely as a side effect of how it was written.
+  - **`PHPSESSID` can go away entirely, and that is the real prize.** Everything the session holds is
+    "have we already counted this": `SESSION_START`, `CLANG_LOGGED`, `LANG_VIEW_LOGGED[page]`,
+    `HUMAN_VIEW_LOGGED[page|lang]`, `CALC_USAGE_LOGGED[page]`, `TITLE_LOGGED[page|field]`. **None of
+    it needs a unique id or a server-side store.** ~23 pages x 4 event types fits in a short
+    session-scoped bitfield carried in one non-identifying cookie. No identifier, no server state,
+    nothing that can single anybody out — and the ask becomes "a few bits saying which pages we have
+    already counted", which is close to what Tom wanted to be able to say.
+  - **Be honest about what it is NOT:** still not "a single 1 or 0", and still not exempt. The
+    purpose is analytics either way, and ePrivacy tests purpose, not size. This buys a far better
+    privacy position and a far shorter ask; it does not buy the banner's removal.
+  - **Cost:** rewrite four de-duplication sites (`Language.lib.php` and the three `log-*.php`) and
+    the `$ec_sessionAgeMs` gate. Moderate, self-contained, fully covered by the two-bucket logging
+    already in place. **Do it BEFORE the Task 251 sprint if at all** — it changes `consent_body`,
+    which is one of the ten keys riding that sprint.
+
+- 20|289| **The page title block eats real estate, and on lpn it hurts.** Tom, 2026-08-12: *"our
+  standard titles... really don't seem like much in most cases. But for lpn they do."* Right, and
+  lpn is the one page that is an application rather than a form — a canvas wants the window.
+  - **His own three ideas, and his own verdict on them.** (1) Move the Printable version button to
+    the top and rebrand it "Minimal version". (2) Make lpn's normal page a landing page linking to
+    the real thing — *"this is kind of rude. It's what epanet-js does, and I don't like it."*
+    **Idea 2 is rejected by its author; do not resurrect it.** (3) What he would actually do: a
+    control above the lpn menus — "Maximize app" / "Hide titles above" — *"or maybe that's just in
+    Settings as 'Show page titles [checked]'."*
+  - **Settings checkbox is the shape to build**, on his own reasoning and on this project's: lpn
+    already keeps every preference in the project document (Task 263), so a checkbox there costs no
+    new persistence mechanism, whereas a floating "Maximize" button costs new chrome on a page whose
+    problem is too much chrome.
+  - **THE TIMING IS THE WHOLE POINT AND IT IS NOW.** This adds one or two UI strings. The Task 251
+    sprint is HELD and has not launched, so those strings can ride it for nothing — exactly the
+    argument that put the Task 286 consent keys in it. After the sprint they cost a second one.
+  - Weigh idea 1 separately: "Minimal version" as a rename of Printable version is a small, suite-
+    wide change with its own translation cost, and it solves a different problem (printing) than
+    the one raised here (screen real estate on one page).
+
 - 30|287| **Serve Bootstrap from this site instead of jsDelivr — the only third party we have.**
   Found 2026-08-12 while writing privacy.php, which could not honestly say "no third parties" until
   this was disclosed. `lib/HeadersFooters.lib.php` loads `bootstrap.min.css` and
