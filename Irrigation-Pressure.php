@@ -18,13 +18,13 @@ echoCalculatorForm(
 		Array('name' => 'h_design',        'type' => 'number', 'default' => Array('us' => '15', 'si' => '10'),    'units' => 'partial_head', 'label' => $ec_lang['ip_h_design']),
 		Array('name' => 'x',               'type' => 'number', 'default' => '0.5',  'units' => NULL,                                                    'label' => $ec_lang['ip_x']),
 		Array('name' => 'dp_avg',          'type' => 'number', 'default' => '0',    'units' => 'partial_head', 'label' => $ec_lang['ip_dp_avg']),
-		Array('name' => 'visc',            'type' => 'number', 'default' => '1e-6', 'units' => NULL,                                                    'label' => '<a target="_blank" href="https://www.engineersedge.com/fluid_flow/kinematic-viscosity-table.htm">'.$ec_lang['dw_kinematic_viscosity_short'].'</a><span class="ec-help" title="'.htmlspecialchars(strip_tags($ec_lang['dw_kinematic_viscosity_tip'])).'"><span class="ec-tip">?</span></span>'),
+		Array('name' => 'visc',            'type' => 'number', 'default' => '1e-6', 'units' => NULL,                                                    'label' => ecLinkTipLabel('https://www.engineersedge.com/fluid_flow/kinematic-viscosity-table.htm', $ec_lang['dw_kinematic_viscosity_short'], $ec_lang['dw_kinematic_viscosity_tip'])),
 		Array('name' => 'se',              'type' => 'number', 'default' => Array('us' => '2', 'si' => '0.6'),  'units' => 'distance_medium',                            'label' => $ec_lang['ip_se']),
 		Array('name' => 'sl',              'type' => 'number', 'default' => Array('us' => '5', 'si' => '1.5'),  'units' => 'distance_medium',                            'label' => $ec_lang['ip_sl']),
 		Array('name' => 'n_e',             'type' => 'number', 'default' => '10',   'units' => NULL,                                                    'label' => $ec_lang['ip_n_e']),
 		Array('name' => 'n_l',             'type' => 'number', 'default' => '10',   'units' => NULL,                                                    'label' => $ec_lang['ip_n_l']),
 		Array('name' => 'd',               'type' => 'number', 'default' => Array('us' => '0.75', 'si' => '20'),   'units' => 'distance_small',                            'label' => $ec_lang['ip_d']),
-		Array('name' => 'h_max_allow',     'type' => 'number', 'default' => '',     'units' => 'partial_head', 'label' => '<span class="ec-help" title="'.htmlspecialchars(strip_tags($ec_lang['ip_max_head_tip'])).'">'.$ec_lang['ip_max_head'].' <span class="ec-tip">?</span></span>'),
+		Array('name' => 'h_max_allow',     'type' => 'number', 'default' => '',     'units' => 'partial_head', 'label' => ecTipLabel($ec_lang['ip_max_head'], $ec_lang['ip_max_head_tip'])),
 	),
 	// Results
 	Array(
@@ -75,11 +75,11 @@ function echoCalculatorFormAppend() {
 					<?php echoUnitSelect($name = 'diameteru', $units = 'distance_small', $indent_string); ?>
 				</th>
 				<th>
-					<a target="_blank" href="https://nepis.epa.gov/Exe/ZyNET.exe/P1007WWU.txt?ZyActionD=ZyDocument&Client=EPA&Index=2000%20Thru%202005&SearchMethod=1&TocRestrict=n&&IntQFieldOp=0&ExtQFieldOp=0&XmlQuery=&File=D%3A%5CZYFILES%5CINDEX%20DATA%5C00THRU05%5CTXT%5C00000024%5CP1007WWU.txt&User=ANONYMOUS&Password=anonymous&SortMethod=h%7C-&MaximumDocuments=1&FuzzyDegree=0&ImageQuality=r75g8/r75g8/x150y150g16/i425&Display=hpfr&DefSeekPage=x&SearchBack=ZyActionL&Back=ZyActionS&BackDesc=Results%20page&MaximumPages=1&ZyEntry=31"><?=$ec_lang['ip_roughness']?></a><span class="ec-help" title="<?=htmlspecialchars(strip_tags($ec_lang['dw_roughness_tip']))?>"><span class="ec-tip">?</span></span><br />
+					<?=ecLinkTipLabel('https://nepis.epa.gov/Exe/ZyNET.exe/P1007WWU.txt?ZyActionD=ZyDocument&Client=EPA&Index=2000%20Thru%202005&SearchMethod=1&TocRestrict=n&&IntQFieldOp=0&ExtQFieldOp=0&XmlQuery=&File=D%3A%5CZYFILES%5CINDEX%20DATA%5C00THRU05%5CTXT%5C00000024%5CP1007WWU.txt&User=ANONYMOUS&Password=anonymous&SortMethod=h%7C-&MaximumDocuments=1&FuzzyDegree=0&ImageQuality=r75g8/r75g8/x150y150g16/i425&Display=hpfr&DefSeekPage=x&SearchBack=ZyActionL&Back=ZyActionS&BackDesc=Results%20page&MaximumPages=1&ZyEntry=31', $ec_lang['ip_roughness'], $ec_lang['dw_roughness_tip'])?><br />
 					<?php echoUnitSelect($name = 'roughnessu', $units = 'roughness', $indent_string); ?>
 				</th>
 				<th>
-					<a target="_blank" href="https://www.engineeringtoolbox.com/minor-loss-coefficients-pipes-d_626.html"><?=$ec_lang['mphl_total_junction_k_short']?></a><span class="ec-help" title="<?=htmlspecialchars(strip_tags($ec_lang['mphl_total_junction_k_tip']))?>"><span class="ec-tip">?</span></span>
+					<?=ecLinkTipLabel('https://www.engineeringtoolbox.com/minor-loss-coefficients-pipes-d_626.html', $ec_lang['mphl_total_junction_k_short'], $ec_lang['mphl_total_junction_k_tip'])?>
 				</th>
 				<th>
 					<?=$ec_lang['ip_elev_ds']?><br />

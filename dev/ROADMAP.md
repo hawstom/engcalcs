@@ -32,6 +32,16 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 ## Calculator Improvements
 
+- 35|293| **Extract the pure functions out of `js/looped-network.js` so the map editor becomes
+  testable.** 8,381 lines, 327 functions, ~30 shared mutable closure variables — 58% of all JS in
+  the suite. The solver has 11 harnesses because it is 641 lines with clean inputs and outputs; the
+  editor has none because no part of it can be reached without the other 8,000 lines and a browser.
+  That is the direct cause of Tom's manual-testing load on lpn. Do NOT "split it into files" — lift
+  out the parts that already take values and return values: label collision avoidance
+  (`currentLeaderBoxes`/`runLabelCollisionAvoidance`, ~lines 283–430) and link geometry
+  (`pointAlongLink`, `linkPoints`, `linkGeomLength`). Each becomes harness-testable without a
+  browser. `php dev/scripts/size_budget_check.php` tracks the shape.
+
 - 55|233| **Manning-Irregular opens in metric on English pages, and greets everyone with a warning.
   One root cause, found 2026-08-08.** `js/manning-irregular.js:184` seeds a hard-coded cookie:
   `'i:,i:,i:1,s:1,i:0.001,s:1,s:1,...'`. Each `s:<n>` sets a select **by its conversion factor**,

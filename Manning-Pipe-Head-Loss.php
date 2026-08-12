@@ -17,7 +17,7 @@ echoCalculatorForm(
 		Array('name' => 'd', 'type' => 'number', 'default' => Array('us' => '24', 'si' => '600'), 'units' => 'distance_small', 'label' => $ec_lang['mpf_pipe_diameter']),
 		Array('name' => 'l', 'type' => 'number', 'default' => Array('us' => '200', 'si' => '60'), 'units' => 'distance_medium', 'label' => $ec_lang['mphl_pipe_length']),
 		Array('name' => 'n', 'type' => 'number', 'default' => '0.013', 'units' => NULL, 'label' => '<a target="_blank" href="http://www.engineeringtoolbox.com/mannings-roughness-d_799.html">'.$ec_lang['mpf_manningRoughness'].'</a>'),
-		Array( 'name' => 'k', 'type' => 'number', 'default' => '2.0', 'units' => NULL, 'label' => '<a target="_blank" href="https://www.engineeringtoolbox.com/minor-loss-coefficients-pipes-d_626.html">'.$ec_lang['mphl_total_junction_k_short'].'</a><span class="ec-help" title="'.htmlspecialchars(strip_tags($ec_lang['mphl_total_junction_k_tip'])).'"><span class="ec-tip">?</span></span>'),
+		Array( 'name' => 'k', 'type' => 'number', 'default' => '2.0', 'units' => NULL, 'label' => ecLinkTipLabel('https://www.engineeringtoolbox.com/minor-loss-coefficients-pipes-d_626.html', $ec_lang['mphl_total_junction_k_short'], $ec_lang['mphl_total_junction_k_tip'])),
 		Array('name' => 'egl1', 'type' => 'number', 'default' => '0', 'units' => 'total_head', 'label' => $ec_lang['mphl_egl_1']),
 ),
 	//Results
@@ -34,8 +34,8 @@ echoCalculatorForm(
 		Array('name' => 'hm', 'units' => 'partial_head', 'label' => $ec_lang['mphl_junction_loss']),
 		Array('name' => 'hl', 'units' => 'partial_head', 'label' => $ec_lang['mphl_total_loss']),
 		Array('name' => 'hgl1', 'units' => 'total_head', 'label' => $ec_lang['hw_hgl_1']),
-		Array('name' => 'egl2', 'units' => 'total_head', 'label' => '<span class="ec-help" title="'.htmlspecialchars(strip_tags($ec_lang['mphl_hgl_egl_tip'])).'">'.$ec_lang['mphl_egl_2'].' <span class="ec-tip">?</span></span>'),
-		Array('name' => 'hgl2', 'units' => 'total_head', 'label' => '<span class="ec-help" title="'.htmlspecialchars(strip_tags($ec_lang['mphl_hgl_egl_tip'])).'">'.$ec_lang['hw_hgl_2'].' <span class="ec-tip">?</span></span>'),
+		Array('name' => 'egl2', 'units' => 'total_head', 'label' => ecTipLabel($ec_lang['mphl_egl_2'], $ec_lang['mphl_hgl_egl_tip'])),
+		Array('name' => 'hgl2', 'units' => 'total_head', 'label' => ecTipLabel($ec_lang['hw_hgl_2'], $ec_lang['mphl_hgl_egl_tip'])),
 	)
 );
 ?>

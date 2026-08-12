@@ -33,7 +33,7 @@ echoCalculatorForm(
 		Array('name' => 'vel_check', 'units' => NULL, 'label' => $ec_lang['mhp_vel_check']),
 		Array('name' => 'f', 'units' => NULL, 'label' => '<a target="_blank" href="https://www.engineeringtoolbox.com/froude-number-d_578.html">'.$ec_lang['mpf_froude_number'].'</a>'),
 		Array('name' => 'tau', 'units' => 'stress', 'label' => $ec_lang['mpf_shear_stress']),
-		Array('name' => 'q', 'units' => 'flow_channel', 'label' => '<span class="ec-help" title="' . htmlspecialchars(strip_tags($ec_lang['mpf_flow_tip'])) . '"><strong>' . $ec_lang['mpf_flow'] . '</strong> <span class="ec-tip">?</span></span>'),
+		Array('name' => 'q', 'units' => 'flow_channel', 'label' => ecTipLabel('<strong>' . $ec_lang['mpf_flow'] . '</strong>', $ec_lang['mpf_flow_tip'])),
 		Array('name' => 'q0', 'units' => 'flow_channel', 'label' => $ec_lang['mpf_full_flow']),
 		Array('name' => 'qq0', 'units' => 'fraction', 'label' => $ec_lang['mpf_full_flow_ratio']),
 	)

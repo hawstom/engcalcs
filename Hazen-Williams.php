@@ -18,7 +18,7 @@ echoCalculatorForm(
 		Array('name' => 'd', 'type' => 'number', 'default' => Array('us' => '6', 'si' => '150'), 'units' => 'distance_small', 'label' => $ec_lang['mpf_pipe_diameter']),
 		Array('name' => 'l', 'type' => 'number', 'default' => Array('us' => '1000', 'si' => '300'), 'units' => 'distance_medium', 'label' => $ec_lang['mphl_pipe_length']),
 		Array('name' => 'c', 'type' => 'number', 'default' => '130', 'units' => NULL, 'label' => '<a target="_blank" href="https://www.engineeringtoolbox.com/hazen-williams-coefficients-d_798.html">'.$ec_lang['hw_roughness'].'</a>'),
-		Array( 'name' => 'km', 'type' => 'number', 'default' => '2.0', 'units' => NULL, 'label' => '<a target="_blank" href="https://www.engineeringtoolbox.com/minor-loss-coefficients-pipes-d_626.html">'.$ec_lang['mphl_total_junction_k_short'].'</a><span class="ec-help" title="'.htmlspecialchars(strip_tags($ec_lang['mphl_total_junction_k_tip'])).'"><span class="ec-tip">?</span></span>'),
+		Array( 'name' => 'km', 'type' => 'number', 'default' => '2.0', 'units' => NULL, 'label' => ecLinkTipLabel('https://www.engineeringtoolbox.com/minor-loss-coefficients-pipes-d_626.html', $ec_lang['mphl_total_junction_k_short'], $ec_lang['mphl_total_junction_k_tip'])),
 		// Upstream is what a waterline engineer KNOWS (tank level, pump discharge, city
 		// main); the downstream residual is what they want (ROADMAP Task 167). Elevation
 		// and pressure are separate fields because that is how the two numbers reach them
@@ -44,8 +44,8 @@ echoCalculatorForm(
 		Array('name' => 'hl', 'units' => 'partial_head', 'label' => $ec_lang['mphl_total_loss']),
 		Array('name' => 'p_down', 'units' => 'partial_head', 'label' => $ec_lang['hw_pressure_down']),
 		Array('name' => 'p_check', 'units' => NULL, 'label' => $ec_lang['hw_pressure_check']),
-		Array('name' => 'hgl_up', 'units' => 'total_head', 'label' => '<span class="ec-help" title="'.htmlspecialchars(strip_tags($ec_lang['mphl_hgl_egl_tip'])).'">'.$ec_lang['hw_hgl_2'].' <span class="ec-tip">?</span></span>'),
-		Array('name' => 'egl_up', 'units' => 'total_head', 'label' => '<span class="ec-help" title="'.htmlspecialchars(strip_tags($ec_lang['mphl_hgl_egl_tip'])).'">'.$ec_lang['mphl_egl_2'].' <span class="ec-tip">?</span></span>'),
+		Array('name' => 'hgl_up', 'units' => 'total_head', 'label' => ecTipLabel($ec_lang['hw_hgl_2'], $ec_lang['mphl_hgl_egl_tip'])),
+		Array('name' => 'egl_up', 'units' => 'total_head', 'label' => ecTipLabel($ec_lang['mphl_egl_2'], $ec_lang['mphl_hgl_egl_tip'])),
 		Array('name' => 'egl_down', 'units' => 'total_head', 'label' => $ec_lang['mphl_egl_1']),
 		Array('name' => 'hgl_down', 'units' => 'total_head', 'label' => $ec_lang['hw_hgl_1']),
 	)

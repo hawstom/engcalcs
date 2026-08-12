@@ -61,6 +61,13 @@ run_check "js syntax (js/*.js)"          blocking sh -c 'for f in js/*.js; do no
 # --- Does every page still produce well-formed HTML ------------------------------------------
 run_check "html balance (every page)"    blocking php dev/scripts/html_balance_check.php
 
+# --- Structural conventions that fail SILENTLY when broken ------------------------------------
+# Both of these guard a defect that renders without erroring: an unsupplied pageConfig key shows
+# the visitor "undefined", and the wrong .ec-help nesting gives touch users a one-character tap
+# target. Neither is visible to the person who introduced it.
+run_check "pageConfig php->js bridge"    blocking php dev/scripts/pageconfig_check.php
+run_check "tip markup via helpers"       blocking php dev/scripts/tip_markup_check.php
+
 # --- Language integrity: the part of this suite that costs 27x --------------------------------
 run_check "lang syntax rules A-D"        blocking php dev/scripts/lang_syntax_validate.php
 run_check "gloss pointers resolve"       blocking php dev/scripts/gloss_ref_check.php
@@ -72,6 +79,7 @@ run_check "lpn harnesses (11)"           blocking sh dev/scripts/run_harnesses.s
 
 # --- Advisory: real findings, but judgement calls that must not block a commit ------------------
 run_check "key hygiene"                  advisory php dev/scripts/key_hygiene_check.php --strict
+run_check "size budget"                  advisory php dev/scripts/size_budget_check.php --strict
 run_check "english drift"                advisory sh -c 'php dev/scripts/detect_english_drift.php | grep -q "^CHANGED" && exit 1 || exit 0'
 
 echo ""

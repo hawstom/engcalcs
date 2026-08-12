@@ -56,6 +56,56 @@ function ecDefaultValue($default)
     return reset($default);
 }
 
+/**
+ * Builds a label carrying a hover/tap explanation, and (optionally) an external link.
+ *
+ * THESE TWO FUNCTIONS EXIST BECAUSE THE CONVENTION THEY IMPLEMENT WAS BEING BROKEN BY HAND.
+ * CLAUDE.md spent ~40 lines describing how to nest .ec-help and .ec-tip -- including that the
+ * two cases nest OPPOSITE ways -- and two pages had already been caught getting it wrong and
+ * retrofitted (mpf_flow, mtc_d50_in, 2026-07-16). A rule a person must remember at 34 separate
+ * call sites is a rule that will eventually be broken at one of them, silently, because the
+ * wrong nesting still renders; it just produces a one-character tap target that fails on touch.
+ * Encoding the convention in a function is what makes it unbreakable rather than merely
+ * documented.
+ *
+ * The two nestings, and why they differ:
+ *
+ *   ecTipLabel()      no link, so the label text has no other big click target -- .ec-help
+ *                     (carrying the title) wraps the text AND the glyph, making the whole
+ *                     label the hover/tap target. Only the glyph gets .ec-tip.
+ *
+ *   ecLinkTipLabel()  the <a> is already a big, real click target, so it takes the label text
+ *                     and .ec-help wraps the glyph alone. Exactly one "?" per label: the tip's.
+ *                     The link never renders as a bare "?" -- a lone "?" as a hyperlink gives
+ *                     no signal that it navigates rather than explains.
+ *
+ * $tip is plain-text-constrained: it lands in a title="" attribute, so tags are stripped and
+ * the result escaped. That strip_tags()/htmlspecialchars() pair was written out by hand 34
+ * times before this; getting it wrong in one place is an escaping bug, not a cosmetic one.
+ *
+ * $text is trusted HTML (labels legitimately contain <strong>, <sub>, or a symbol <span>), so
+ * it is NOT escaped -- it is composed from $ec_lang values by the page, exactly as before.
+ */
+function ecTipLabel($text, $tip)
+{
+    return '<span class="ec-help" title="'.htmlspecialchars(strip_tags($tip)).'">'
+         . $text.' <span class="ec-tip">?</span></span>';
+}
+
+/**
+ * Label text wrapped in an external link, followed by a separate tip glyph. See ecTipLabel().
+ *
+ * $target defaults to a new tab because every existing call site opens one: these are reference
+ * pages (roughness tables, loss coefficients) consulted mid-calculation, and navigating away
+ * would discard the numbers the visitor has typed.
+ */
+function ecLinkTipLabel($href, $text, $tip)
+{
+    return '<a target="_blank" href="'.htmlspecialchars($href, ENT_QUOTES, 'UTF-8').'">'.$text.'</a>'
+         . '<span class="ec-help" title="'.htmlspecialchars(strip_tags($tip)).'">'
+         . '<span class="ec-tip">?</span></span>';
+}
+
 function inputHtml($name, $type, $default, $indent_string)
 {
     $value = ecDefaultValue($default);

@@ -17,9 +17,9 @@ echoCalculatorForm(
 		Array('name' => 'q', 'type' => 'number', 'default' => Array('us' => '400', 'si' => '25'), 'units' => 'flow_pipe', 'label' => $ec_lang['mpf_flow']),
 		Array('name' => 'd', 'type' => 'number', 'default' => Array('us' => '6', 'si' => '150'), 'units' => 'distance_small', 'label' => $ec_lang['mpf_pipe_diameter']),
 		Array('name' => 'l', 'type' => 'number', 'default' => Array('us' => '1000', 'si' => '300'), 'units' => 'distance_medium', 'label' => $ec_lang['mphl_pipe_length']),
-		Array('name' => 'e', 'type' => 'number', 'default' => Array('us' => '0.0005', 'si' => '0.15'), 'units' => 'roughness', 'label' => '<a target="_blank" href="https://nepis.epa.gov/Exe/ZyNET.exe/P1007WWU.txt?ZyActionD=ZyDocument&Client=EPA&Index=2000%20Thru%202005&SearchMethod=1&TocRestrict=n&&IntQFieldOp=0&ExtQFieldOp=0&XmlQuery=&File=D%3A%5CZYFILES%5CINDEX%20DATA%5C00THRU05%5CTXT%5C00000024%5CP1007WWU.txt&User=ANONYMOUS&Password=anonymous&SortMethod=h%7C-&MaximumDocuments=1&FuzzyDegree=0&ImageQuality=r75g8/r75g8/x150y150g16/i425&Display=hpfr&DefSeekPage=x&SearchBack=ZyActionL&Back=ZyActionS&BackDesc=Results%20page&MaximumPages=1&ZyEntry=31">'.$ec_lang['dw_roughness'].'</a><span class="ec-help" title="'.htmlspecialchars(strip_tags($ec_lang['dw_roughness_tip'])).'"><span class="ec-tip">?</span></span>'),
+		Array('name' => 'e', 'type' => 'number', 'default' => Array('us' => '0.0005', 'si' => '0.15'), 'units' => 'roughness', 'label' => ecLinkTipLabel('https://nepis.epa.gov/Exe/ZyNET.exe/P1007WWU.txt?ZyActionD=ZyDocument&Client=EPA&Index=2000%20Thru%202005&SearchMethod=1&TocRestrict=n&&IntQFieldOp=0&ExtQFieldOp=0&XmlQuery=&File=D%3A%5CZYFILES%5CINDEX%20DATA%5C00THRU05%5CTXT%5C00000024%5CP1007WWU.txt&User=ANONYMOUS&Password=anonymous&SortMethod=h%7C-&MaximumDocuments=1&FuzzyDegree=0&ImageQuality=r75g8/r75g8/x150y150g16/i425&Display=hpfr&DefSeekPage=x&SearchBack=ZyActionL&Back=ZyActionS&BackDesc=Results%20page&MaximumPages=1&ZyEntry=31', $ec_lang['dw_roughness'], $ec_lang['dw_roughness_tip'])),
 		Array('name' => 'v', 'type' => 'number', 'default' => '1e-6', 'units' => NULL, 'label' => '<a target="_blank" href="https://www.engineersedge.com/fluid_flow/kinematic-viscosity-table.htm">'.$ec_lang['dw_kinematic_viscosity'].'</a>'),
-		Array( 'name' => 'km', 'type' => 'number', 'default' => '2.0', 'units' => NULL, 'label' => '<a target="_blank" href="https://www.engineeringtoolbox.com/minor-loss-coefficients-pipes-d_626.html">'.$ec_lang['mphl_total_junction_k_short'].'</a><span class="ec-help" title="'.htmlspecialchars(strip_tags($ec_lang['mphl_total_junction_k_tip'])).'"><span class="ec-tip">?</span></span>'),
+		Array( 'name' => 'km', 'type' => 'number', 'default' => '2.0', 'units' => NULL, 'label' => ecLinkTipLabel('https://www.engineeringtoolbox.com/minor-loss-coefficients-pipes-d_626.html', $ec_lang['mphl_total_junction_k_short'], $ec_lang['mphl_total_junction_k_tip'])),
 		// Upstream-first, elevation separate from pressure -- the Task 167 form, borrowed
 		// whole from Hazen-Williams under the concept-level label reuse rule, so this
 		// costs no new language keys (ROADMAP Task 168).
@@ -46,8 +46,8 @@ echoCalculatorForm(
 		Array('name' => 'hl', 'units' => 'partial_head', 'label' => $ec_lang['mphl_total_loss']),
 		Array('name' => 'p_down', 'units' => 'partial_head', 'label' => $ec_lang['hw_pressure_down']),
 		Array('name' => 'p_check', 'units' => NULL, 'label' => $ec_lang['hw_pressure_check']),
-		Array('name' => 'hgl_up', 'units' => 'total_head', 'label' => '<span class="ec-help" title="'.htmlspecialchars(strip_tags($ec_lang['mphl_hgl_egl_tip'])).'">'.$ec_lang['hw_hgl_2'].' <span class="ec-tip">?</span></span>'),
-		Array('name' => 'egl_up', 'units' => 'total_head', 'label' => '<span class="ec-help" title="'.htmlspecialchars(strip_tags($ec_lang['mphl_hgl_egl_tip'])).'">'.$ec_lang['mphl_egl_2'].' <span class="ec-tip">?</span></span>'),
+		Array('name' => 'hgl_up', 'units' => 'total_head', 'label' => ecTipLabel($ec_lang['hw_hgl_2'], $ec_lang['mphl_hgl_egl_tip'])),
+		Array('name' => 'egl_up', 'units' => 'total_head', 'label' => ecTipLabel($ec_lang['mphl_egl_2'], $ec_lang['mphl_hgl_egl_tip'])),
 		Array('name' => 'egl_down', 'units' => 'total_head', 'label' => $ec_lang['mphl_egl_1']),
 		Array('name' => 'hgl_down', 'units' => 'total_head', 'label' => $ec_lang['hw_hgl_1']),
 	)

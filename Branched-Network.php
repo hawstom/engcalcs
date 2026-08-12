@@ -13,20 +13,20 @@ echoCalculatorForm(
 	// Inputs
 	Array(
 		Array('name' => 'elev_source', 'type' => 'number', 'default' => Array('us' => '330', 'si' => '100'),  'units' => 'distance_site', 'label' => $ec_lang['bpn_elev_source']),
-		Array('name' => 'h_source1',   'type' => 'number', 'default' => Array('us' => '60', 'si' => '40'),   'units' => 'partial_head', 'label' => '<span class="ec-help" title="'.htmlspecialchars(strip_tags($ec_lang['bpn_h_source_tip'])).'">'.$ec_lang['bpn_supply1_h'].' <span class="ec-tip">?</span></span>'),
-		Array('name' => 'h_source2',   'type' => 'number', 'default' => '',     'units' => 'partial_head', 'label' => '<span class="ec-help" title="'.htmlspecialchars(strip_tags($ec_lang['bpn_supply_pt_tip'])).'">'.$ec_lang['bpn_supply2_h'].' <span class="ec-tip">?</span></span>'),
+		Array('name' => 'h_source1',   'type' => 'number', 'default' => Array('us' => '60', 'si' => '40'),   'units' => 'partial_head', 'label' => ecTipLabel($ec_lang['bpn_supply1_h'], $ec_lang['bpn_h_source_tip'])),
+		Array('name' => 'h_source2',   'type' => 'number', 'default' => '',     'units' => 'partial_head', 'label' => ecTipLabel($ec_lang['bpn_supply2_h'], $ec_lang['bpn_supply_pt_tip'])),
 		Array('name' => 'q_source2',   'type' => 'number', 'default' => '',     'units' => 'flow_node', 'label' => $ec_lang['bpn_supply2_q']),
 		Array('name' => 'h_source3',   'type' => 'number', 'default' => '',     'units' => 'partial_head', 'label' => $ec_lang['bpn_supply3_h']),
 		Array('name' => 'q_source3',   'type' => 'number', 'default' => '',     'units' => 'flow_node', 'label' => $ec_lang['bpn_supply3_q']),
-		Array('name' => 'visc',        'type' => 'number', 'default' => '1e-6', 'units' => NULL, 'label' => '<a target="_blank" href="https://www.engineersedge.com/fluid_flow/kinematic-viscosity-table.htm">'.$ec_lang['dw_kinematic_viscosity_short'].'</a><span class="ec-help" title="'.htmlspecialchars(strip_tags($ec_lang['dw_kinematic_viscosity_tip'])).'"><span class="ec-tip">?</span></span>'),
-		Array('name' => 'h_max_allow', 'type' => 'number', 'default' => '',     'units' => 'partial_head', 'label' => '<span class="ec-help" title="'.htmlspecialchars(strip_tags($ec_lang['ip_max_head_tip'])).'">'.$ec_lang['ip_max_head'].' <span class="ec-tip">?</span></span>'),
-		Array('name' => 'demand_mult', 'type' => 'number', 'default' => '1',    'units' => NULL, 'label' => '<span class="ec-help" title="'.htmlspecialchars(strip_tags($ec_lang['bpn_demand_mult_tip'])).'">'.$ec_lang['bpn_demand_mult'].' <span class="ec-tip">?</span></span>'),
+		Array('name' => 'visc',        'type' => 'number', 'default' => '1e-6', 'units' => NULL, 'label' => ecLinkTipLabel('https://www.engineersedge.com/fluid_flow/kinematic-viscosity-table.htm', $ec_lang['dw_kinematic_viscosity_short'], $ec_lang['dw_kinematic_viscosity_tip'])),
+		Array('name' => 'h_max_allow', 'type' => 'number', 'default' => '',     'units' => 'partial_head', 'label' => ecTipLabel($ec_lang['ip_max_head'], $ec_lang['ip_max_head_tip'])),
+		Array('name' => 'demand_mult', 'type' => 'number', 'default' => '1',    'units' => NULL, 'label' => ecTipLabel($ec_lang['bpn_demand_mult'], $ec_lang['bpn_demand_mult_tip'])),
 	),
 	// Results
 	Array(
-		Array('name' => 'q_total',  'units' => 'flow_total', 'label' => '<span class="ec-help" title="'.htmlspecialchars(strip_tags($ec_lang['bpn_q_total_tip'])).'">'.$ec_lang['bpn_q_total'].' <span class="ec-tip">?</span></span>'),
-		Array('name' => 'h_supply', 'units' => 'partial_head', 'label' => '<span class="ec-help" title="'.htmlspecialchars(strip_tags($ec_lang['bpn_h_supply_tip'])).'">'.$ec_lang['bpn_h_supply'].' <span class="ec-tip">?</span></span>'),
-		Array('name' => 'p_min',    'units' => 'partial_head', 'label' => '<span class="ec-help" title="'.htmlspecialchars(strip_tags($ec_lang['bpn_p_min_tip'])).'">'.$ec_lang['bpn_p_min'].' <span class="ec-tip">?</span></span>'),
+		Array('name' => 'q_total',  'units' => 'flow_total', 'label' => ecTipLabel($ec_lang['bpn_q_total'], $ec_lang['bpn_q_total_tip'])),
+		Array('name' => 'h_supply', 'units' => 'partial_head', 'label' => ecTipLabel($ec_lang['bpn_h_supply'], $ec_lang['bpn_h_supply_tip'])),
+		Array('name' => 'p_min',    'units' => 'partial_head', 'label' => ecTipLabel($ec_lang['bpn_p_min'], $ec_lang['bpn_p_min_tip'])),
 	),
 	$flagFormAppend = true
 );
@@ -52,8 +52,8 @@ function echoCalculatorFormAppend() {
 				</th>
 			</tr>
 			<tr>
-				<th><span class="ec-help" title="<?=htmlspecialchars(strip_tags($ec_lang['bpn_id_tip']))?>"><?=$ec_lang['bpn_id']?> <span class="ec-tip">?</span></span></th>
-				<th><span class="ec-help" title="<?=htmlspecialchars(strip_tags($ec_lang['bpn_upstream_tip']))?>"><?=$ec_lang['bpn_upstream']?> <span class="ec-tip">?</span></span></th>
+				<th><?=ecTipLabel($ec_lang['bpn_id'], $ec_lang['bpn_id_tip'])?></th>
+				<th><?=ecTipLabel($ec_lang['bpn_upstream'], $ec_lang['bpn_upstream_tip'])?></th>
 				<th>
 					<?=$ec_lang['ip_length']?><br />
 					<?php echoUnitSelect($name = 'lengthu', $units = 'distance_site', $indent_string); ?>
@@ -63,14 +63,14 @@ function echoCalculatorFormAppend() {
 					<?php echoUnitSelect($name = 'diameteru', $units = 'distance_small', $indent_string); ?>
 				</th>
 				<th>
-					<span class="ec-help" title="<?=htmlspecialchars(strip_tags($ec_lang['bpn_roughness_tip']))?>"><span id="bpn_roughness_symbol">C</span> <span class="ec-tip">?</span></span><br />
+					<?=ecTipLabel('<span id="bpn_roughness_symbol">C</span>', $ec_lang['bpn_roughness_tip'])?><br />
 					<?php echoUnitSelect($name = 'roughnessu', $units = 'roughness', $indent_string); ?>
 				</th>
 				<th>
-					<span class="ec-narrowcol"><a target="_blank" href="https://www.engineeringtoolbox.com/minor-loss-coefficients-pipes-d_626.html"><?=$ec_lang['mphl_total_junction_k_short']?></a><span class="ec-help" title="<?=htmlspecialchars(strip_tags($ec_lang['mphl_total_junction_k_tip']))?>"><span class="ec-tip">?</span></span></span>
+					<span class="ec-narrowcol"><?=ecLinkTipLabel('https://www.engineeringtoolbox.com/minor-loss-coefficients-pipes-d_626.html', $ec_lang['mphl_total_junction_k_short'], $ec_lang['mphl_total_junction_k_tip'])?></span>
 				</th>
 				<th>
-					<span class="ec-help" title="<?=htmlspecialchars(strip_tags($ec_lang['bpn_demand_tip']))?>"><?=$ec_lang['bpn_demand']?> <span class="ec-tip">?</span></span><br />
+					<?=ecTipLabel($ec_lang['bpn_demand'], $ec_lang['bpn_demand_tip'])?><br />
 					<?php echoUnitSelect($name = 'demandu', $units = 'flow_node', $indent_string); ?>
 				</th>
 				<th>
@@ -78,7 +78,7 @@ function echoCalculatorFormAppend() {
 					<?php echoUnitSelect($name = 'elevu', $units = 'distance_site', $indent_string); ?>
 				</th>
 				<th>
-					<span class="ec-help" title="<?=htmlspecialchars(strip_tags($ec_lang['bpn_q_line_tip']))?>"><?=$ec_lang['bpn_q_line']?> <span class="ec-tip">?</span></span><br />
+					<?=ecTipLabel($ec_lang['bpn_q_line'], $ec_lang['bpn_q_line_tip'])?><br />
 					<?php echoUnitSelect($name = 'q_lineu', $units = 'flow_node', $indent_string); ?>
 				</th>
 				<th>
@@ -90,7 +90,7 @@ function echoCalculatorFormAppend() {
 					<?php echoUnitSelect($name = 'hlu', $units = 'partial_head', $indent_string); ?>
 				</th>
 				<th>
-					<span class="ec-help" title="<?=htmlspecialchars(strip_tags($ec_lang['bpn_p_down_tip']))?>"><?=$ec_lang['bpn_p_down']?> <span class="ec-tip">?</span></span><br />
+					<?=ecTipLabel($ec_lang['bpn_p_down'], $ec_lang['bpn_p_down_tip'])?><br />
 					<?php echoUnitSelect($name = 'p_downu', $units = 'partial_head', $indent_string); ?>
 				</th>
 			</tr>

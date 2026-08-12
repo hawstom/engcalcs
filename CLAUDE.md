@@ -151,54 +151,36 @@ All check/verdict outputs (velocity, regime, loss-sign, head-loss %, …) use on
   `title` (not just the glyph — a one-character tap target is bad on touch). Short visible text,
   long text in the tooltip (width-is-king).
 
-### Link + tip convention (item-90 decision, 2026-07-16)
+### Link + tip labels: call the helper, do not write the markup (2026-08-12)
 
-When a label needs both an external/reference link *and* a hover/tap explanation, use exactly one
-`?` glyph, and it is always the `.ec-help`/`.ec-tip` tip trigger — never a link:
+**Never hand-assemble `.ec-help` / `.ec-tip` markup.** Two functions in `lib/Calculators.lib.php`
+build it, and `php dev/scripts/tip_markup_check.php` (blocking, in `check_all.sh`) fails the build
+if any page writes it out longhand:
 
-```
-<a target="_blank" href="URL">Label text</a><span class="ec-help" title="Tip text"><span class="ec-tip">?</span></span>
-```
-
-- **The link wraps the actual label text**, never a bare `?`. Words carry their own click affordance;
-  a lone `?` as a link has no visual signal that it navigates rather than explains.
-- **Never two `?` glyphs on one label.** A link-`?` immediately followed by a tip-`?`
-  (`<a href="...">?</a><span class="ec-tip">?</span>`) is the defect this convention replaces — it
-  reads as a doubled, unexplained glyph and gives no indication either one is a real hyperlink.
-- **A link with no tip needs no `.ec-help` wrapper**; a tip with no link never uses a bare `<a>`.
-  Only combine them when both are genuinely needed.
-- **Why the `.ec-help` wrapper matters even for links:** `js/Calculators.lib.js` only activates
-  touch-friendly (tap-triggered) tooltips on `.ec-help[title]` elements. A bare `<a title="...">` on
-  a touch device just navigates on first tap — the tip content in its `title` attribute is never
-  seen. Real explanatory content always goes in an `.ec-help`/`.ec-tip` tip, not a link's `title`.
-- If the linked page is not available in the visitor's language (e.g. `frictionslope.php` is
-  English-only with no language switcher), say so in the tip text (e.g. "Follow link for explanation
-  (English only)") so the visitor isn't surprised after clicking.
-
-**Tip-only labels (no link) wrap the whole label, not just the glyph (Tom, 2026-07-16):** when
-there is no link — only a hover/tap explanation — the `.ec-help` wrapper (with the `title`) goes
-*around the label text and the `?` glyph together*, not around the glyph alone:
-
-```
-<span class="ec-help" title="Tip text">Label text <span class="ec-tip">?</span></span>
+```php
+ecTipLabel($ec_lang['mpf_flow'], $ec_lang['mpf_flow_tip'])                  // tip, no link
+ecLinkTipLabel('https://...', $ec_lang['hw_roughness'], $ec_lang['hw_tip']) // link + tip
 ```
 
-- **Why:** `css/engcalcs.css`'s `.ec-help` rule is documented as a "whole-label wrapper" specifically
-  so the entire label — not a bare one-character `?` — is the hover/tap target (the same touch-target
-  reasoning as the Verdict/check-string convention above). A glyph-only `.ec-help` wrapper technically
-  works but produces a tap target too small to be reliably touch-friendly, defeating the CSS's own
-  documented intent.
-- **Only the `?` glyph gets the `.ec-tip` class** (its `color`/`font-size` styling is meant for the
-  small icon, not the label text) — `.ec-tip` nests inside `.ec-help`, wrapping only the glyph, while
-  `.ec-help` (carrying the `title`) wraps the label text plus that nested glyph span.
-- **This is the opposite nesting from the link+tip case above**: when there's a link, the label text
-  goes in the `<a>` (which is already a big, real click target) and only the glyph is
-  `.ec-help`/`.ec-tip`; when there's no link, the label text has no other big click target, so
-  `.ec-help` must wrap it directly.
-- Retrofitted 2026-07-16 from a glyph-only pattern found in `mpf_flow`/`mpf_flow_tip`
-  (`Manning-Pipe-Flow.php`) and `mtc_d50_in`/`mtc_iteration_tip` (`Manning-Trap.php`), both fixed to
-  match.
+They handle the `strip_tags()` + `htmlspecialchars()` a `title=""` needs, and — the part that kept
+going wrong by hand — the two **opposite** nestings: with a link, `.ec-help` wraps the `?` glyph
+alone (the `<a>` is already a big click target); without one, `.ec-help` wraps the label text *and*
+the glyph, or the tap target is a single character and fails on touch. Getting that backwards
+still renders, which is why it survived ~40 lines of prose here and had to be retrofitted by hand
+on two pages in July 2026. `$text` is trusted HTML (`<strong>`, `<sub>`, symbol spans are fine);
+`$tip` is plain text.
 
+The judgement calls the helpers cannot make:
+
+- **Exactly one `?` per label, and it is always the tip.** A link-`?` next to a tip-`?` reads as a
+  doubled, unexplained glyph with no sign either one navigates.
+- **A link with no tip needs no wrapper at all** — plain `<a>` is correct, and the check permits it.
+  Only reach for a helper when a tip genuinely exists.
+- **Never put explanatory text in a link's `title=`.** `js/Calculators.lib.js` only activates
+  tap-triggered tooltips on `.ec-help[title]`, so on touch a bare `<a title="...">` just navigates
+  and the text is never seen.
+- **If the linked page has no translation** (e.g. `frictionslope.php` is English-only), say so in
+  the tip — "Follow link for explanation (English only)" — so the click isn't a surprise.
 ## Language Keys
 
 All display strings live in `lib/lang.ec.??.php` (27 files: en + 26 non-English). Keys follow the pattern `prefix_description`, e.g. `dw_friction_factor`, `mpf_flow`. Add keys to **all** language files when adding a new calculator — use English text as the fallback where translations aren't available yet.
@@ -692,12 +674,25 @@ office."* There are three tiers and they have very different prices. Knowing whi
 belongs to IS the budgeting decision.
 
 **Tier 1 — automated, seconds, free. `sh dev/scripts/check_all.sh` before every commit.**
-Ten checks: PHP and JS syntax, HTML balance on every page, language rules A–D, gloss pointers,
-the coverage declaration, payload freshness, the 11 lpn harnesses, plus two advisory ones (key
-hygiene, English drift). Blocking failures exit 1. **This list used to live only in prose and in
-whoever remembered it** — a check nobody runs is indistinguishable from a check that does not
-exist, which is the same failure that hid six Rock Chute notes and the missing `lpn`/`bpn` glossary
-wiring.
+Thirteen checks: PHP and JS syntax, HTML balance on every page, the pageConfig PHP→JS bridge, tip
+markup via the helpers, language rules A–D, gloss pointers, the coverage declaration, payload
+freshness, the 11 lpn harnesses, plus three advisory ones (key hygiene, size budget, English
+drift). Blocking failures exit 1. **This list used to live only in prose and in whoever remembered
+it** — a check nobody runs is indistinguishable from a check that does not exist, which is the same
+failure that hid six Rock Chute notes and the missing `lpn`/`bpn` glossary wiring.
+
+**THE PRACTICE BEHIND ALL OF THIS, and the one worth applying every time (2026-08-12): when you
+are about to write a new rule in this file, first ask whether it can be a check. If it can, write
+the check and let this file just name it.** The evidence is entirely local. Every rule that became
+a script stopped being violated — Rules A–D, `gloss_ref_check`, the coverage declaration. Every
+rule that stayed prose kept being violated, sometimes for months, *by people who had read it*:
+`lang_syntax_validate.php` found 660 pre-existing double-quoted assignments; the missing
+`prefixToTermNames()` wiring silently blinded two calculators' whole glossary while being
+documented the entire time; the `.ec-help` nesting was retrofitted by hand on two pages after ~40
+lines here explained it. A rule a machine enforces is worth roughly ten a human must remember.
+This file is long enough that nobody re-reads it before an edit, so its unexecutable half is
+decoration — and the honest response is to keep converting prose into checks, not to add more
+prose.
 
 **Tier 2 — `/code-review`, billed, and only a human can start it.** An AI cannot launch it; do not
 try. It is what reads code for design, duplication and subtle logic errors — the entire class Tier 1
