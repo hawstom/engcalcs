@@ -129,15 +129,18 @@ $ec_lang_syn['template_printable_subtitle']='';
 // prose, and they are translated into all 26 languages for one reason: consent that the visitor
 // cannot read is not consent. The long-form privacy notice and terms are a separate question --
 // English-authoritative, and translated by a human later if at all.
-$ec_lang['consent_body']='May we keep a single digit per page in this browser\'s storage to prevent us from logging its visits repeatedly?';
-$ec_lang_syn['consent_body']='May we keep (store, save, put) a single 1 (a small flag, one digit) in this browser\'s storage to prevent us from logging (recording) its visits repeatedly?';
+$ec_lang['consent_body']='May we keep a single digit per page in this browser profile\'s storage to prevent us from logging its visits repeatedly?';
+$ec_lang_syn['consent_body']='May we keep (store, save, put) a single digit per page in this browser profile\'s storage to prevent us from logging (recording) its visits repeatedly?';
 $ec_lang['consent_accept']='Accept this';
+$ec_lang_syn['consent_accept']='Accept this, Accept this request, Yes to this question, Agree to what is asked here';
 $ec_lang['consent_accept_all']='Accept all';
-$ec_lang_syn['consent_accept']='Allow this logging (recording) reducer (limiter)';
+$ec_lang_syn['consent_accept_all']='Accept all, Accept this and any later request, Yes to this and to future questions, Agree without being asked again';
 $ec_lang['consent_decline']='Refuse';
+$ec_lang_syn['consent_decline']='Refuse (decline or deny)';
 $ec_lang['consent_current_granted']='You allowed this. We limit logging for this browser profile.';
 $ec_lang_syn['consent_current_granted']='You allowed this. We limit logging (recording) for this browser profile.';
 $ec_lang['consent_current_denied']='You refused this. We store nothing to limit logging for this browser profile.';
+$ec_lang_syn['consent_current_denied']='You refused (declined or denied) this. We store (keep or save) nothing to limit logging (recording) for this browser profile.';
 $ec_lang['consent_region_label']='Your choice about limiting logging.';
 $ec_lang_syn['consent_region_label']='Your choice about limiting logging (recording).';
 $ec_lang['consent_settings_link']='Cookie settings';

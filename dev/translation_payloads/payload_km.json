@@ -338,7 +338,7 @@
         ]
     },
     "keys_to_translate": {
-        "consent_body": "May we keep a single digit per page in this browser's storage to prevent us from logging its visits repeatedly?",
+        "consent_body": "May we keep a single digit per page in this browser profile's storage to prevent us from logging its visits repeatedly?",
         "consent_accept": "Accept this",
         "consent_accept_all": "Accept all",
         "consent_decline": "Refuse",
@@ -626,7 +626,7 @@
         "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
     "keys": {
-        "consent_body": "May we keep a single digit per page in this browser's storage to prevent us from logging its visits repeatedly?",
+        "consent_body": "May we keep a single digit per page in this browser profile's storage to prevent us from logging its visits repeatedly?",
         "consent_accept": "Accept this",
         "consent_accept_all": "Accept all",
         "consent_decline": "Refuse",
@@ -4388,9 +4388,12 @@
         }
     },
     "key_syn": {
-        "consent_body": "May we keep (store, save, put) a single 1 (a small flag, one digit) in this browser's storage to prevent us from logging (recording) its visits repeatedly?",
-        "consent_accept": "Allow this logging (recording) reducer (limiter)",
+        "consent_body": "May we keep (store, save, put) a single digit per page in this browser profile's storage to prevent us from logging (recording) its visits repeatedly?",
+        "consent_accept": "Accept this, Accept this request, Yes to this question, Agree to what is asked here",
+        "consent_accept_all": "Accept all, Accept this and any later request, Yes to this and to future questions, Agree without being asked again",
+        "consent_decline": "Refuse (decline or deny)",
         "consent_current_granted": "You allowed this. We limit logging (recording) for this browser profile.",
+        "consent_current_denied": "You refused (declined or denied) this. We store (keep or save) nothing to limit logging (recording) for this browser profile.",
         "consent_region_label": "Your choice about limiting logging (recording).",
         "lpn_tool_select": "Select mode; the mode (state) in which you pick (select, choose, pick, point at, indicate, signal) things to act on rather than add things.",
         "lpn_tool_zoom_extent": "Zoom out (or in) until the whole drawing fits in the window; show everything at once (zoom to extents, fit to window, show all).",
