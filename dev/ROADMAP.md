@@ -1031,15 +1031,39 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     `PHPSESSID`, and a page-input cookie with a **36,000-day** lifetime that is bad hygiene whatever
     the law says. `lpn_`'s project storage is the strongest case in the file, not the weakest — it
     holds the document the user made in order to give it back to them.
-  - **AIM AT NEEDING NO BANNER.** A consent prompt on a free calculator whose pitch is "open the
-    page and get an answer" is paid by every visitor on every page, forever. The inventory's §6
-    lists four changes that would remove the non-exempt storage instead of asking permission for it,
-    and none is load-bearing.
-  - **[H] THE ONE REAL DECISION IS TOM'S:** what are the reach/shopping/using counters worth? They
-    need per-visitor de-duplication, which needs stored state, which is the thing that is not
-    exempt. Either they justify a consent prompt, or coarser numbers with no client-side state are
-    the honest trade. Everything else in this task follows from that answer. Note the interaction
-    with Task 285 — adding a device signal makes this MORE pressing, not less.
+  - **DECIDED 2026-08-11: SHIP THE BANNER, KEEP THE COUNTERS.** CC argued for engineering around
+    the banner; Tom overruled it, on two grounds worth keeping because they are better than the
+    argument they replaced. **(1) The cost is already sunk on the user's side:** *"We are late in
+    the game on this. So users are already trained to 'Accept and continue'. So I don't think that
+    the once-per-suite cost is high for users to pay."* **(2) The alternative buys doubt, not
+    savings:** *"I think we will forever second-guess a decision to avoid the banner. We want good
+    development guidance. We could go for something like 'visits', and that's not terrible. But I
+    just don't think the cost is high enough to avoid."* A permanently uncertain compliance posture
+    plus permanently degraded numbers is a bad trade against one click.
+  - **So the counters stay as they are** — reach, shopping and using keep their per-visitor
+    de-duplication, and consent is what makes that lawful. Task 285's device signal can ride the
+    same consent rather than needing its own argument.
+  - **What must still be fixed regardless of the banner**, because these are hygiene rather than
+    consent: the page-input cookie's **36,000-day** (~98 year) lifetime, and the fact that
+    `lib/base.inc.php` calls `session_start()` on **every page load** — so `PHPSESSID` is written
+    before anybody has been asked anything, which no banner can fix from the outside. Sessions have
+    to become lazy.
+  - **DRAFTS EXIST FOR REVIEW: `dev/privacy-and-terms-draft.md`** — a privacy notice built on the
+    GDPR Art 13 checklist, terms of use, the constraints a valid banner must meet, and the five
+    decisions only a human can make (controller name and address, contact address, whether the
+    notice lives at hawsedc.com or engcalcs level, governing law, and whether a lawyer reads the
+    liability clause).
+  - **There is NO official EU template**, contrary to a reasonable first impression (Tom: *"my
+    understanding is that the European Union may have a boilerplate template"*). GDPR Art 13/14
+    specify required *content*; the Commission publishes its own policy as an example, not a form.
+    The uniform look of many sites' policies is commercial generators, not a published EU form. Good
+    news, on balance: a short honest document beats a long generated one describing trackers this
+    site does not have.
+  - **ORDER MATTERS, AND IT IS THE CHEAP ORDER, NOT JUST TOM'S PREFERENCE.** The banner's ~8-12
+    strings are UI and must be translated into all 26 languages — consent nobody can read is not
+    consent. Landing them BEFORE the Task 251 sprint costs nothing; missing it costs a second
+    26-agent sprint for a dozen strings. The long-form notice and terms are a separate question:
+    legal prose, English-authoritative, human translation later if at all.
   - **A privacy page is owed independently of all of it**, because `contact.php` collects a name and
     an email address and there is no notice anywhere on this site.
   - **Cheaper now than after the Task 251 sprint.** A banner and a privacy page are text, and text
