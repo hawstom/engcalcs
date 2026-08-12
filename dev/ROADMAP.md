@@ -1475,6 +1475,32 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     each, plus the core four at 47 each (their delta since 146.06) — 26 agents in one sprint, the
     same shape as a wave-1 category sprint. Tom, 2026-08-11: *"Translation is a huge task, but maybe
     we will do it this week."*
+  - **READY AND HELD, 2026-08-12. Nothing below needs re-deriving; the sprint is one command away.**
+    - **Wave 0 is DONE and the gate is green.** `dev/english-friction/251-lpn-26lang.json`, 23
+      entries over the 65 strings that had never had an adversarial pass — 18 English rewrites, 2
+      routed to the glossary, 3 dismissals recorded rather than dropped.
+      `php dev/scripts/friction_check.php --sprint=251-lpn-26lang` exits 0.
+    - **The finding that paid for the pass:** `lpn_inp_drop_backdrop` told the reader to use "Map,
+      Backdrop". There is no Map menu and no Backdrop item. Not an ambiguity — an instruction that
+      cannot be followed, which 26 agents would have translated faithfully. **A string that names a
+      UI path is a claim about the UI, and nothing checks it.** Two more of the same family:
+      `lpn_net_bad_file` named EPANET's own menu with nothing saying so, and `lpn_notes_4_def` still
+      listed reading .inp files under "Planned additions" months after Task 196 shipped it.
+    - **The measured delta is 6,440**, up from the 6,180 this block estimated, because the ten Task
+      286 consent/legal keys ride along: 22 non-core languages at **283** each (273 `lpn_` + 10),
+      plus es/pt/tr at 57 and fr at 43. `--check` says FRESH; `lang_parity_check`,
+      `translation_completion_matrix` and the payloads all agree on 6,440.
+    - **Glossary verified delivered, not assumed:** `payload_sw.json` carries 35 `lpn` terms (not
+      the three-term fallback) plus the two new ones, `count (tally)` and `cookie (browser
+      storage)`, wired into `prefixToTermNames()` under `consent`/`privacy`/`terms`. Both ship with
+      **empty translations on purpose** — settled ordinary words exist in every language, we have
+      nothing attested, and inventing 26 would be judging other people's terminology. The sprint
+      fills them via the mandatory write-back.
+    - **HELD BY TOM 2026-08-12** in answer to a proposal of 26 Sonnet agents. He also asked to edit
+      the proposed `$ec_lang_syn['consent_body']` entry himself before it lands, so **that key has
+      no syn entry yet** — the proposed text is in the conversation of 2026-08-12 and in the
+      `count` entry of the friction file. **Payloads go stale the moment any English string
+      changes; regenerate and re-run `--check` before launching.**
   - **Still needs Tom's explicit go-ahead per CLAUDE.md.** Declaring scope costs nothing and makes
     the number honest; spending 26 agents does not.
   - **DECIDED: DO IT. Tom asked 2026-08-09 why CC was resistant, and the resistance was wrong.**
